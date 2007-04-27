@@ -1,487 +1,560 @@
 <?xml version="1.0"?>
 
+<!-- This file includes targets for building FreeCol,
+     the metaserver, distribution packages, running tests
+     and creating documentation. -->
 <project name="FreeCol" default="package">
+    <description>
+        This file includes targets for building FreeCol,
+        the metaserver, distribution packages, running tests
+        and creating documentation.
+    </description>
 
-  <property name="freecol.name" value="freecol"/>
-      
-  <property environment="env"/>  
-  <property name="freecol.data.dir" value="${basedir}/data"/>
-  <property name="freecol.src.dir" value="${basedir}/src"/>
-  <property name="freecol.build.dir" value="${basedir}/build"/>
-  <property name="freecol.packaging.dir" value="${basedir}/packaging"/>
-  <property name="freecol.release.dir" value="${basedir}/dist"/>
-  <property name="freecol.javadoc.dir" value="${basedir}/doc/javadoc"/>
-  <property name="freecol.jar.file" value="${basedir}/FreeCol.jar"/>
-  <property name="freecol.metaserver.jar.file" value="${basedir}/FreeCol-metaserver.jar"/>
-  <property name="freecol.overview.file" value="${freecol.src.dir}/overview.html"/>
-  <path id="test.class.path">
-    <fileset dir="test/lib" includes="*.jar" />
-    <fileset dir="${basedir}/jars/" includes="*.jar" />
-  </path>
-	<condition property="isOsUnixLike">
-	      <os family="unix" />
-	</condition>
-	<condition property="isOsWindows">
-	      <os family="windows" />
-	</condition>	
-  <!-- TASK DEFINITIONS -->
-  <taskdef name="jsmoothgen"
-           classname="net.charabia.jsmoothgen.ant.JSmoothGen"
-           classpath="${freecol.build.dir}/jars/jsmoothgen-ant.jar"
-  />
-  <taskdef name="izpack"
-           classname="com.izforge.izpack.ant.IzPackTask"
-           classpath="${freecol.build.dir}/jars/standalone-compiler.jar"
-  />
-	
-	<!--JarBundler is a feature-rich Ant task which will create a Mac OS X 
-	application bundle from a list of Jar files and a main class name. 	
-	(GPL-Software) -> http://informagen.com/JarBundler/ 
-	Download and place jarbundler.jar into  ${freecol.build.dir}/jars-->
-	<taskdef name="jarbundler" 
-		classname="net.sourceforge.jarbundler.JarBundler" 
-		classpath="${freecol.build.dir}/jars/jarbundler.jar"
-	/>
-  
-  <target name="init" unless="TSTAMP">
-    <tstamp/>
-  </target>
+    <property name="freecol.name" value="freecol"/>
+    <property environment="env"/>  
+    <property name="freecol.data.dir" value="${basedir}/data"/>
+    <property name="freecol.src.dir" value="${basedir}/src"/>
+    <property name="freecol.build.dir" value="${basedir}/build"/>
+    <property name="freecol.packaging.dir" value="${basedir}/packaging"/>
+    <property name="freecol.release.dir" value="${basedir}/dist"/>
+    <property name="freecol.doc.dir" value="${basedir}/doc"/>
+    <property name="freecol.javadoc.dir" value="${freecol.doc.dir}/javadoc"/>
+    <property name="freecol.jar.file" value="${basedir}/FreeCol.jar"/>
+    <property name="freecol.metaserver.jar.file" value="${basedir}/FreeCol-metaserver.jar"/>
+    <property name="freecol.overview.file" value="${freecol.src.dir}/overview.html"/>
 
-  
-  <!-- Compiles the java source files and updates the version numbers. -->
-  <target name="compile" depends="init">
-    <mkdir dir="${freecol.build.dir}"/>
-    
-    <javac srcdir="${freecol.src.dir}"
-           destdir="${freecol.build.dir}"
-           classpath="${basedir}/jars/higlayout.jar:${basedir}/jars/jsr173_1.0_api.jar:${basedir}/jars/wstx-lgpl-4.0pr1.jar"
-           debug="on"
-           optimize="on"
-           deprecation="off"
-           source="1.5"
-    />    
-  </target>
-
-  
-  <target name="compile-test" depends="init">
-    <mkdir dir="${freecol.build.dir}"/>
-    <javac srcdir="test/src"
-           destdir="${freecol.build.dir}"
-           classpath="test/lib/junit.jar:${basedir}/jars/higlayout.jar:${basedir}/jars/jsr173_1.0_api.jar:${basedir}/jars/wstx-lgpl-4.0pr1.jar"
-           debug="on"
-           optimize="on"
-           deprecation="off"
-           source="1.5"
-    />
-  </target>
-
-  
-  <target name="build" depends="init,compile" description="Compiles the source files.">
-    <copy todir="${freecol.build.dir}">
-      <fileset dir="${freecol.src.dir}" includes="**/*.xml" />
-    </copy>
-
-    <native2ascii src="${freecol.src.dir}" dest="${freecol.build.dir}"
-                  encoding="UTF-8" 
-                  includes="**/*.properties" 
-                  excludes="classes/** **/*_de_DE.properties **/*_hu.properties **/*_pt_BR.properties **/*_br.properties"/>
-    <native2ascii src="${freecol.src.dir}" dest="${freecol.build.dir}"
-                  encoding="ISO-8859-1"
-                  includes="**/*_de_DE.properties **/*_hu.properties **/*_pt_BR.properties **/*_br.properties"
-                  excludes="classes/**" />
-  </target>
-
-  
-  <!-- Compiles the source files and creates a JAR-file. -->
-  <target name="package" depends="init,build" description="Compiles the source files and creates a JAR-file.">
-    <jar jarfile="${freecol.jar.file}"
-         basedir="${freecol.build.dir}"
-         manifest="${basedir}/src/MANIFEST.MF"
-         includes="net/**, org/**"
-         excludes="**/CVS/**, **/metaserver/**"
-    />
-  </target>
-
-  
-  <!-- Compiles the metaserver and creates a JAR-file. -->
-  <target name="metaserver" depends="init,build" description="Compiles the metaserver and creates a JAR-file.">
-    <jar jarfile="${freecol.metaserver.jar.file}"
-         basedir="${freecol.build.dir}"
-         manifest="${basedir}/src/MANIFEST.MF"
-         includes="net/**, org/**"
-         excludes="**/CVS/**"
-    />
-  </target>
-
-  
-  <!--
-    Creates archives and installers for distribution and places these in the
-    "dist" directory.
-    Various platforms can be omitted for prerelease testing by setting properties on the command line:
-      skip.dist.mac="true" suppresses mac packaging
-      skip.dist.win="true" suppresses windows packaging
-      skip.dist.java="true" suppresses zip and tar creation of the jarfiles
-      skip.dist.source="true" suppresses packaging the source files
-      skip.dist.test="true" suppresses execution of the junit tests
-      
-      For a formal release, none of these properties should be set.
-  -->
-  <target name="dist" description="Creates archives and installers for distribution.">
-		
-    <input message="Please specify the release version (x.y.z): " addproperty="freecol.version" defaultvalue="custom_build" />    
-    <property name="freecol.release.name" value="${freecol.name}-${freecol.version}"/>  
-    <echo message="Creating Distribution of ${freecol.release.name}"/>
-    <replaceregexp file="${freecol.src.dir}/net/sf/freecol/FreeCol.java"
-                   match="FREECOL_VERSION\s*=\s*&quot;(.*?)&quot;\;"
-                   replace="FREECOL_VERSION = &quot;${freecol.version}&quot;\;"
-    />
-    <echo message="Game version updated in FreeCol.java" />
-    
-    <antcall target="clean" />
-    <antcall target="package" />    
-    <antcall target="testall" />    
-
-    <mkdir dir="${freecol.release.dir}"/>
-    <mkdir dir="${freecol.release.dir}/${freecol.name}"/>
-            
-    <copy todir="${freecol.release.dir}/${freecol.name}">
-      <fileset dir="${basedir}" includes="FreeCol.jar"/>
-      <fileset dir="${freecol.packaging.dir}/common" excludes="**/CVS/**"/>
-      <fileset dir="${basedir}" includes="data/**" excludes="**/CVS/**"/>
-      <fileset dir="${basedir}" includes="jars/**" excludes="**/CVS/**"/>    
-    </copy>
-
-        
-    <antcall target="tarJavaBundle" />
-    <antcall target="tarSourceBundle" />
-    <antcall target="winInstallerBundle" />
-	<antcall target="macJavaBundle"/>
-	<antcall target="tarMacJavaBundle"/>
-	<antcall target="tarMacJavaBundleOnWindows"/>
-
-    <echo message="" />
-    <echo message="-------------------------------------------------"/>
-    <echo message="Distribution files created:"/>
-    <echo message="${freecol.release.dir}"/>
-    <echo message="-------------------------------------------------"/>
-  </target>
-  <target name="tarJavaBundle" unless="skip.dist.java">
-    <zip destfile="${freecol.release.dir}/${freecol.release.name}.zip">
-      <fileset dir="${freecol.release.dir}" includes="${freecol.name}/**"/>
-    </zip>    
-    <tar destfile="${freecol.release.dir}/${freecol.release.name}.tar.gz" compression="gzip">
-      <tarfileset dir="${freecol.release.dir}" includes="${freecol.name}/**"/>
-    </tar>  
-  </target>
-  <target name="tarSourceBundle" unless="skip.dist.source">
-    <copy todir="${freecol.release.dir}/${freecol.name}">
-      <fileset dir="${basedir}" includes="src/**" excludes="**/CVS/**"/>
-      <fileset dir="${basedir}" includes="build.xml" />
-    </copy>
-    <zip destfile="${freecol.release.dir}/${freecol.release.name}-src.zip">
-      <fileset dir="${freecol.release.dir}" includes="${freecol.name}/**"/>
-    </zip>    
-    <tar destfile="${freecol.release.dir}/${freecol.release.name}-src.tar.gz" compression="gzip">
-      <tarfileset dir="${freecol.release.dir}" includes="${freecol.name}/**"/>
-    </tar>    
-  </target>
-  <target name="winInstallerBundle" unless="skip.dist.win" description="Builds a doubleclickable windows installer">
-      <copy tofile="${freecol.build.dir}/installer-tmp.xml">
-      <fileset file="${freecol.build.dir}/installer.xml" />
-    </copy>
-    <replace file="${freecol.build.dir}/installer-tmp.xml"
-             token="%ant:freecol.version%"
-             value="${freecol.version}"
-    />
-	
-    <jsmoothgen project="${freecol.build.dir}/startup.jsmooth" skeletonroot="${freecol.build.dir}/skeletons"/>    
-    <move todir="${freecol.release.dir}/${freecol.name}">
-      <fileset dir="${freecol.build.dir}" includes="freecol.exe"/>
-    </move>
-
-    <mkdir dir="${freecol.release.dir}/${freecol.name}/Uninstaller"/>
-    <jsmoothgen project="${freecol.build.dir}/uninstaller.jsmooth" skeletonroot="${freecol.build.dir}/skeletons"/>    
-    <move todir="${freecol.release.dir}/${freecol.name}/Uninstaller">
-      <fileset dir="${freecol.build.dir}" includes="uninstaller.exe"/>
-    </move>
-        
-    <izpack input="${freecol.build.dir}/installer-tmp.xml" 
-            output="${freecol.release.dir}/${freecol.release.name}-installer.jar" installerType="standard" 
-            basedir="${freecol.release.dir}/${freecol.name}"
-            izpackdir="${freecol.build.dir}"
-    />
-    <delete quiet="true" file="${freecol.build.dir}/installer-tmp.xml"/>
-
-    <copy todir="${freecol.release.dir}">
-      <fileset dir="${freecol.build.dir}" includes="installer.jsmooth"/>
-    </copy>
-    <replace file="${freecol.release.dir}/installer.jsmooth" 
-             token="%ant:freecol.release.name%"
-             value="${freecol.release.name}"
-    />
-    <replace file="${freecol.release.dir}/installer.jsmooth" 
-             token="%ant:freecol.installerjar%"
-             value="${freecol.release.dir}/${freecol.release.name}-installer.jar"
-    />        
-    <jsmoothgen project="${freecol.release.dir}/installer.jsmooth" skeletonroot="${freecol.build.dir}/skeletons"/>
-
-    <delete quiet="true" dir="${freecol.release.dir}/${freecol.name}"/>
-    <delete quiet="true" file="${freecol.release.dir}/installer.jsmooth"/>
-  </target>
-  <target name="macJavaBundle" unless="skip.dist.mac" description="Builds a doubleclickable application bundle running on Mac OS X">
-	<mkdir dir="${freecol.release.dir}"/>  		
-    <!--  Mac OS X -->
-	<jarbundler dir="${freecol.release.dir}"
-			name="FreeCol"
-			mainclass="net.sf.freecol.FreeCol"
-			version="${freecol.version}"
-			vmoptions="-Xmx256M"
-			jvmversion="1.5+"
-			arguments="--windowed --freecol-data FreeCol.app/Contents/Resources/"
-			stubfile="${freecol.build.dir}/skeletons/FreeCol"
-			icon="${basedir}/FreeCol.icns"> 
-			<!--
-				TODO: Where should I place the icon file?
-				Replace the value of the icon-attribute with the future icon path
-			-->
-	  <jarfilelist dir="${basedir}" files="FreeCol.jar" />
-
-	  <jarfileset dir="${basedir}/jars/">
-		<include name="**/*.jar" />
-		<exclude name="**/CVS" />
-	  </jarfileset>
-      <resourcefileset dir="${basedir}/data">
-		<exclude name="**/CVS" />
-	  </resourcefileset>		
-	</jarbundler>
-  </target>
-  <target name="tarMacJavaBundle" unless="skip.dist.mac" if="isOsUnixLike" depends="macJavaBundle">
-	<delete file="${freecol.release.dir}/FreeCol.app/Contents/MacOS/FreeCol"/>
-	<symlink link="${freecol.release.dir}/FreeCol.app/Contents/MacOS/FreeCol" 	resource="/System/Library/Frameworks/JavaVM.framework/Resources/MacOS/JavaApplicationStub"/>
-	<exec executable="tar">
-  	  <arg value="cfvj"/>
-	  <arg value="${freecol.release.dir}/${freecol.release.name}-mac.tar.bz2"/>
-	  <arg value="-C"/>
-	  <arg value="${freecol.release.dir}"/>
-	  <arg value="FreeCol.app/"/>
-	</exec>
-	<delete quiet="true" dir="${freecol.release.dir}/FreeCol.app"/>
-  </target>
-  
-  <target name="tarMacJavaBundleOnWindows" depends="macJavaBundle" unless="skip.dist.mac" if="isOsWindows">
-	<echo message="Warning: You are building a Mac Os X Java Application Bundle containing a Copy Java Application Stub. Creating a bundle with the current copy of Java Launching Stub could lead to a future situation where the JavaApplicationStub file could become incompatible with a future OS X update. To avoid this, use a unix like system ... "/>
-	<tar destfile="${freecol.release.dir}/${freecol.release.name}-mac.tar.bz2" compression="bzip2">
-	  <tarfileset dir="${freecol.release.dir}" mode="755" 
-				includes="FreeCol.app/Contents/MacOS/FreeCol" 
-				excludes="**/freecol*"
-				followsymlinks="false" 
-				/>
-	  <tarfileset followsymlinks="false" dir="${freecol.release.dir}">
-				<include name="FreeCol.app/**"/>
-				<exclude name="**/freecol*"/>
-				<exclude name="FreeCol.app/Contents/MacOS/FreeCol"/>
-	  </tarfileset>	
-	</tar>
-	<delete quiet="true" dir="${freecol.release.dir}/FreeCol.app"/>
-  </target>
-	
-
-  <!-- Cleans the directories by removing auto-generated files. -->
-  <target name="clean" depends="init" description="Cleans the directories by removing auto-generated files.">
-    <delete quiet="true" includeEmptyDirs="true">
-      <fileset dir="${freecol.build.dir}" includes="net/**" />
-      <fileset dir="${freecol.build.dir}" includes="timestamp.inf" />
-      <fileset dir="${freecol.release.dir}" />
-    </delete>
-    <delete quiet="true" file="${freecol.jar.file}"/>
-    <delete quiet="true" dir="${freecol.javadoc.dir}"/>
-  </target>
-
-  <target name="fix" depends="init">
-    <fixcrlf srcdir="${freecol.src.dir}"
-             includes="**/*.java"
-             eol="asis"
-             tab="remove"
-             javafiles="yes"
-             tablength="4"
-             eof="asis"
-    />
-  </target>
-
-  
-  <!-- Generate JavaDoc documentation. -->
-  <target name="javadoc" depends="init" description="Generate JavaDoc documentation.">
-    <mkdir dir="${freecol.javadoc.dir}"/>
-    <javadoc sourcepath="${freecol.src.dir}"
-             overview="${freecol.overview.file}"
-             destdir="${freecol.javadoc.dir}"
-             packagenames="net.sf.freecol.*"
-             classpath="${basedir}/jars/higlayout.jar:${basedir}/jars/jsr173_1.0_api.jar:${basedir}/jars/wstx-lgpl-4.0pr1.jar"
-             Author="true"
-             Windowtitle="FreeCol Code Documentation"
-    />
-    <echo message="" />
-    <echo message="-------------------------------------------------"/>
-    <echo message="JavaDoc-generated documentation created:"/>
-    <echo message="${freecol.javadoc.dir}"/>
-    <echo message="-------------------------------------------------"/>
-  </target>
-
-
-  <!-- example:
-       ant -lib test/lib/junit.jar -Dtest=common.model.Building test
-       -->
-  <target name="test" depends="build, build-unit-tests"
-          description="Runs a particular unit test"
-  >
-    <echo message="if the next task fails then please read the build script" />
-    <!-- if the next fails then here is the long answer:
-           http://ant.apache.org/faq.html#delegating-classloader
-         the short answer depends.
-         if you have Ant 1.7, the junit.jar can exist on the classpath.  
-           upgrading to 1.7 may be the best solution.
-         
-         if you have Ant 1.6:
-           ant -lib test/lib/junit.jar testall
-         if you have a version of Ant prior to 1.6 on Windows:
-           set CLASSPATH=%CLASSPATH%;test\lib\junit.jar
-           ant testall
-         if you have a version of Ant prior to 1.6 on UNIX:
-           export CLASSPATH=${CLASSPATH}:test/lib/junit.jar; ant testall
-         -->
-    <junit printsummary="yes">
-      <classpath>
-        <pathelement location="${freecol.build.dir}" />
-        <pathelement location="test/lib/junit.jar" />
-        <pathelement location="${basedir}/jars/higlayout.jar" />
-        <pathelement location="${basedir}/jars/jsr173_1.0_api.jar" />
-        <pathelement location="${basedir}/jars/wstx-lgpl-4.0pr1.jar"/>
-      </classpath>
-      <formatter type="plain" />
-      <test todir="${freecol.build.dir}" name="net.sf.freecol.${test}Test" />
-    </junit>
-  </target>
-
-
-  <target name="testall" depends="build-unit-tests" unless="skip.dist.test"
-          description="Runs all unit tests"
-  >
-    <echo message="if the next task fails then please read the build script" />
-    <!-- if the next fails then here is the long answer:
-           http://ant.apache.org/faq.html#delegating-classloader
-         the short answer depends.
-         if you have Ant 1.7, the junit.jar can exist on the classpath.  
-           upgrading to 1.7 may be the best solution.
-         
-         if you have Ant 1.6:
-           ant -lib test/lib/junit.jar testall
-         if you have a version of Ant prior to 1.6 on Windows:
-           set CLASSPATH=%CLASSPATH%;test\lib\junit.jar
-           ant testall
-         if you have a version of Ant prior to 1.6 on UNIX:
-           export CLASSPATH=${CLASSPATH}:test/lib/junit.jar; ant testall
-         -->
-    <junit printsummary="on" errorproperty="error.junit">
-      <classpath>
-        <pathelement location="${freecol.build.dir}" />
-        <pathelement location="test/lib/junit.jar" />
-        <pathelement location="${basedir}/jars/higlayout.jar" />
-        <pathelement location="${basedir}/jars/jsr173_1.0_api.jar" />
-        <pathelement location="${basedir}/jars/wstx-lgpl-4.0pr1.jar"/>
-      </classpath>
-      <formatter type="xml" />
-      <batchtest fork="yes" todir="${freecol.build.dir}">
-        <fileset dir="test/src" includes="**/*Test.java" />
-      </batchtest>
-    </junit>
-    <delete dir="build/report" />
-    <mkdir dir="build/report"/>
-    <echo message="Basedir:${basedir}"/>
-    <junitreport>
-      <fileset dir="build">
-        <include name="TEST-*.xml"/>
-      </fileset>
-      <report todir="build/report" />
-    </junitreport>
-    
-    <fail if="error.junit">
-      Automated Unit Tests failed.
-    </fail>
-  </target>
-
-
-  <target name="build-unit-tests" depends="build">
-
-    <depend srcDir="test/src" destDir="${freecol.build.dir}"
-            cache="${freecol.build.dir}" />
-
-    <javac srcdir="test/src" destdir="${freecol.build.dir}"
-           classpathref="test.class.path" debug="on" deprecation="off"
-           source="1.5" />
-
-  </target>
-
-  <target name="print-manual"
-          description="Creates the printable user guide.">
-    <delete file="doc/FreeCol.ind" />
-    <exec executable="pdflatex" dir="doc" >
-      <arg file="doc/FreeCol.tex"/>
-    </exec>
-    <exec executable="makeindex" dir="doc" >
-      <arg file="doc/FreeCol.idx"/>
-    </exec>
-    <exec executable="pdflatex" dir="doc" >
-      <arg file="doc/FreeCol.tex"/>
-    </exec>
-  </target>
-
-  <target name="online-manual"
-          description="Creates the online user guide.">
-    <delete file="doc/FreeCol.ind" />
-    <exec executable="htlatex" dir="doc" >
-      <arg file="doc/FreeCol.tex"/>
-    </exec>
-    <exec executable="tex" dir="doc">
-      <arg line="\def\filename{{FreeCol}{idx}{4dx}{ind}} \input  idxmake.4ht" />
-    </exec>
-    <exec executable="makeindex" dir="doc" >
-      <arg file="doc/FreeCol.4dx"/>
-    </exec>
-    <exec executable="htlatex" dir="doc" >
-      <arg file="doc/FreeCol.tex"/>
-    </exec>
-  </target>
-
-  <target name="manual" depends="print-manual,online-manual" 
-          description="Creates the printable and online user guides.">
-  </target>
-  <target name="fixTabsWindows">
-      <fixcrlf srcdir="${freecol.src.dir}" tab="remove" tablength="4"
-          includes="**/*.java" eol="crlf"
-      />
-  </target>
-  
-  <target name="fixTabsUnix">
-      <fixcrlf srcdir="${freecol.src.dir}" tab="remove" tablength="4"
-          includes="**/*.java" eol="lf"
-      />
-  </target>
-
-  <!-- Prints a report on certain translations, which you can specify
-       by setting the localeKey property ("-DlocaleKey=fi", for example),
-       or all translations. Use "-emacs" in order to suppress extensive
-       logging.  --> 
-  <target name="translation-report" depends="build"
-          description="Creates report on translations.">
-    <condition property="localeKey" else="">
-      <isset property="localeKey" />
+    <path id="test.class.path">
+        <fileset dir="test/lib" includes="*.jar" />
+        <fileset dir="${basedir}/jars/" includes="*.jar" />
+    </path>
+    <condition property="isOsUnixLike">
+        <os family="unix" />
     </condition>
-    <java classname="net.sf.freecol.tools.TranslationReport"
-          classpath="build/" >
-      <arg value="src/net/sf/freecol/client/gui/i18n/" />
-      <arg value="${localeKey}" />
-    </java>
-  </target>
+    <condition property="isOsWindows">
+            <os family="windows" />
+    </condition>	
 
+    <!-- TASK DEFINITIONS -->
+    <taskdef name="jsmoothgen"
+            classname="net.charabia.jsmoothgen.ant.JSmoothGen"
+            classpath="${freecol.build.dir}/jars/jsmoothgen-ant.jar"
+    />
+    <taskdef name="izpack"
+            classname="com.izforge.izpack.ant.IzPackTask"
+            classpath="${freecol.build.dir}/jars/standalone-compiler.jar"
+    />
+
+    <!-- JarBundler is a feature-rich Ant task which will create a Mac OS X
+         application bundle from a list of Jar files and a main class name.
+         (GPL-Software) -> http://informagen.com/JarBundler/  -->
+    <taskdef name="jarbundler" 
+            classname="net.sourceforge.jarbundler.JarBundler" 
+            classpath="${freecol.build.dir}/jars/jarbundler.jar"
+    />
+
+    <target name="init" unless="TSTAMP">
+        <tstamp/>
+    </target>
+
+    <!-- Compiles the java source files. -->
+    <target name="compile" depends="init">
+        <mkdir dir="${freecol.build.dir}"/>
+        <javac srcdir="${freecol.src.dir}"
+            destdir="${freecol.build.dir}"
+            classpath="${basedir}/jars/higlayout.jar:${basedir}/jars/jsr173_1.0_api.jar:${basedir}/jars/wstx-lgpl-4.0pr1.jar"
+            debug="on"
+            optimize="on"
+            deprecation="off"
+            source="1.5"
+        />
+    </target>
+
+    <target name="compile-test" depends="init">
+        <mkdir dir="${freecol.build.dir}"/>
+        <javac srcdir="test/src"
+            destdir="${freecol.build.dir}"
+            classpath="test/lib/junit.jar:${basedir}/jars/higlayout.jar:${basedir}/jars/jsr173_1.0_api.jar:${basedir}/jars/wstx-lgpl-4.0pr1.jar"
+            debug="on"
+            optimize="on"
+            deprecation="off"
+            source="1.5"
+        />
+    </target>
+
+
+    <target name="build" depends="init,compile" description="Compiles the source files.">
+        <copy todir="${freecol.build.dir}">
+        <fileset dir="${freecol.src.dir}" includes="**/*.xml" />
+        </copy>
+
+        <native2ascii src="${freecol.src.dir}" dest="${freecol.build.dir}"
+                    encoding="UTF-8" 
+                    includes="**/*.properties" 
+                    excludes="classes/** **/*_de_DE.properties **/*_hu.properties **/*_pt_BR.properties **/*_br.properties"/>
+        <native2ascii src="${freecol.src.dir}" dest="${freecol.build.dir}"
+                    encoding="ISO-8859-1"
+                    includes="**/*_de_DE.properties **/*_hu.properties **/*_pt_BR.properties **/*_br.properties"
+                    excludes="classes/**" />
+    </target>
+
+
+    <!-- Compiles the source files and creates a JAR-file. -->
+    <target name="package" depends="init,build" description="Compiles the source files and creates a JAR-file.">
+        <jar jarfile="${freecol.jar.file}"
+            basedir="${freecol.build.dir}"
+            manifest="${basedir}/src/MANIFEST.MF"
+            includes="net/**, org/**"
+            excludes="**/CVS/**, **/metaserver/**"
+        />
+    </target>
+
+
+    <!-- Compiles the metaserver and creates a JAR-file. -->
+    <target name="metaserver" depends="init,build" description="Compiles the metaserver and creates a JAR-file.">
+        <jar jarfile="${freecol.metaserver.jar.file}"
+            basedir="${freecol.build.dir}"
+            manifest="${basedir}/src/MANIFEST.MF"
+            includes="net/**, org/**"
+            excludes="**/CVS/**"
+        />
+    </target>
+
+
+    <!--
+        Creates archives and installers for distribution and places these in the
+        "dist" directory.
+        Various platforms can be omitted for prerelease testing by setting properties on the command line:
+        skip.dist.mac="true" suppresses mac packaging
+        skip.dist.installer="true" suppresses creation of installers
+        skip.dist.java="true" suppresses zip and tar creation of the jarfiles
+        skip.dist.source="true" suppresses packaging the source files
+
+        For a formal release, none of these properties should be set.
+    -->
+    <target name="dist" description="Creates archives and installers for distribution." 
+            depends="init,initDist,tarJavaBundle,zipJavaBundle,tarSourceBundle,zipSourceBundle,javaInstallerBundle,winInstallerBundle,tarMacJavaBundle">
+
+        <echo message="" />
+        <echo message="-------------------------------------------------"/>
+        <echo message="Distribution files created:"/>
+        <echo message="${freecol.release.dir}"/>
+        <echo message="-------------------------------------------------"/>
+    </target>
+
+    <target name="initDist" depends="init,setReleaseVersion">
+        <mkdir dir="${freecol.release.dir}"/>
+    </target>
+
+    <target name="setReleaseVersion" unless="freecol.version">
+        <input message="Please specify the release version (default: cvs-${DSTAMP}): " addproperty="freecol.version" defaultvalue="cvs-${DSTAMP}" />
+        <property name="freecol.release.name" value="${freecol.name}-${freecol.version}"/>  
+        <echo message="Creating Distribution of ${freecol.release.name}"/>
+        <replaceregexp file="${freecol.src.dir}/net/sf/freecol/FreeCol.java"
+                       match="FREECOL_VERSION\s*=\s*&quot;(.*?)&quot;\;"
+                       replace="FREECOL_VERSION = &quot;${freecol.version}&quot;\;"
+                       />
+        <echo message="Game version updated in FreeCol.java" />
+    </target>
+
+    <target name="prepareManual" depends="initDist,print-manual">
+        <mkdir dir="${freecol.release.dir}/manual/${freecol.name}"/>
+        <copy todir="${freecol.release.dir}/manual/${freecol.name}">
+            <fileset dir="${freecol.doc.dir}" includes="FreeCol.pdf"/>
+        </copy>
+    </target>
+
+    <target name="prepareBaseFiles" depends="initDist">
+        <antcall target="clean"/>
+        <antcall target="package"/>
+        <mkdir dir="${freecol.release.dir}/base/${freecol.name}"/>
+        <copy todir="${freecol.release.dir}/base/${freecol.name}">
+            <fileset dir="${basedir}" includes="FreeCol.jar"/>
+            <fileset dir="${freecol.packaging.dir}/common" includes="COPYING"/>
+            <fileset dir="${freecol.packaging.dir}/common" includes="README"/>
+            <fileset dir="${freecol.packaging.dir}/common" includes="freecol"/>
+            <fileset dir="${freecol.packaging.dir}/common" includes="freecol.xpm"/>
+            <fileset dir="${basedir}" includes="data/**" excludes="**/CVS/**"/>
+            <fileset dir="${basedir}" includes="jars/**" excludes="**/CVS/**"/>
+        </copy>
+    </target>
+
+    <target name="prepareSourceFiles" depends="initDist">
+        <antcall target="clean"/>
+        <mkdir dir="${freecol.release.dir}/source/${freecol.name}"/>
+        <copy todir="${freecol.release.dir}/source/${freecol.name}">
+            <fileset dir="${basedir}" excludes="**/CVS/**,dist/**,data/**,jars/**"/>
+        </copy>
+    </target>
+
+    <target name="prepareWinFiles" depends="initDist">
+        <jsmoothgen project="${freecol.build.dir}/startup.jsmooth" skeletonroot="${freecol.build.dir}/skeletons"/>
+        <move todir="${freecol.release.dir}/win/${freecol.name}">
+            <fileset dir="${freecol.build.dir}" includes="freecol.exe"/>
+        </move>
+        <mkdir dir="${freecol.release.dir}/win/${freecol.name}/Uninstaller"/>
+        <jsmoothgen project="${freecol.build.dir}/uninstaller.jsmooth" skeletonroot="${freecol.build.dir}/skeletons"/>
+        <move todir="${freecol.release.dir}/win/${freecol.name}/Uninstaller">
+            <fileset dir="${freecol.build.dir}" includes="uninstaller.exe"/>
+        </move>
+    </target>
+
+    <target name="tarJavaBundle" unless="skip.dist.java" depends="initDist,prepareManual,prepareBaseFiles">
+        <tar destfile="${freecol.release.dir}/${freecol.release.name}.tar.gz" compression="gzip">
+            <tarfileset dir="${freecol.release.dir}/base" includes="${freecol.name}/**"/>
+            <tarfileset dir="${freecol.release.dir}/manual" includes="${freecol.name}/**"/>
+        </tar>
+    </target>
+
+    <target name="zipJavaBundle" unless="skip.dist.java" depends="initDist,prepareManual,prepareBaseFiles">
+        <zip destfile="${freecol.release.dir}/${freecol.release.name}.zip">
+            <fileset dir="${freecol.release.dir}/base" includes="${freecol.name}/**"/>
+            <fileset dir="${freecol.release.dir}/manual" includes="${freecol.name}/**"/>
+        </zip>
+    </target>
+
+    <target name="tarSourceBundle" unless="skip.dist.source" depends="initDist,prepareSourceFiles">
+        <tar destfile="${freecol.release.dir}/${freecol.release.name}-src.tar.gz" compression="gzip">
+            <tarfileset dir="${freecol.release.dir}/base" includes="${freecol.name}/**"/>
+            <tarfileset dir="${freecol.release.dir}/source" includes="${freecol.name}/**"/>
+        </tar>
+    </target>
+
+    <target name="zipSourceBundle" unless="skip.dist.source" depends="initDist,prepareSourceFiles">
+        <zip destfile="${freecol.release.dir}/${freecol.release.name}-src.zip">
+            <fileset dir="${freecol.release.dir}/base" includes="${freecol.name}/**"/>
+            <fileset dir="${freecol.release.dir}/source" includes="${freecol.name}/**"/>
+        </zip>
+    </target>
+
+    <target name="javaInstallerBundle" unless="skip.dist.installer" description="Builds a platform independent installer"
+                depends="initDist,prepareWinFiles,prepareManual,prepareBaseFiles,prepareSourceFiles">
+        <izpack output="${freecol.release.dir}/${freecol.release.name}-installer.jar"
+                installerType="standard" 
+                basedir="${freecol.release.dir}/"
+                izpackdir="${freecol.build.dir}">
+            <config><![CDATA[
+                <installation version="1.0">
+                    <info>
+                        <appname>FreeCol</appname>
+                        <appversion>@{freecol.version}</appversion>
+                        <appsubpath>freecol</appsubpath>
+                        <url>http://www.freecol.org</url>
+                        <authors>
+                            <author name="The FreeCol Team" email="developers@freecol.org" />
+                        </authors>
+                        <javaversion>1.5</javaversion>
+                    </info>
+                    <guiprefs width="640" height="480" resizable="no"/>
+                    <locale>
+                        <langpack iso3="eng"/>
+                        <langpack iso3="deu"/>
+                        <langpack iso3="spa"/>
+                        <langpack iso3="hun"/>
+                        <langpack iso3="fin"/>
+                        <langpack iso3="fra"/>
+                        <langpack iso3="por"/>
+                    </locale>
+                    <resources>
+                        <res id="LicencePanel.licence" src="base/@{freecol.name}/COPYING"/>
+                        <res id="shortcutSpec.xml" src="@{freecol.build.dir}/winShortcutSpec.xml"/>
+                        <res id="Unix_shortcutSpec.xml" src="@{freecol.build.dir}/unixShortcutSpec.xml"/>
+                    </resources>
+                    <native type="izpack" name="ShellLink.dll"/>
+                    <panels>
+                        <panel classname="HelloPanel"/>
+                        <panel classname="LicencePanel"/>
+                        <panel classname="TargetPanel"/>
+                        <panel classname="PacksPanel"/>
+                        <panel classname="InstallPanel"/>
+                        <panel classname="ShortcutPanel"/>
+                        <panel classname="SimpleFinishPanel"/>
+                    </panels>
+                    <packs>
+                        <pack name="FreeCol" required="yes">
+                            <description>The FreeCol game files.</description>
+                            <fileset dir="base/@{freecol.name}" targetdir="$INSTALL_PATH"/>
+                            <fileset dir="@{freecol.packaging.dir}/common/" includes="Uninstaller/**" targetdir="$INSTALL_PATH"/>
+                            <fileset dir="win/@{freecol.name}" targetdir="$INSTALL_PATH" os="windows"/>
+                            <executable targetfile="$INSTALL_PATH/freecol" stage="never" keep="true" />
+                            <executable targetfile="$INSTALL_PATH/Uninstaller/uninstaller" stage="never" keep="true" />
+                        </pack>
+                        <pack name="Game Manual" required="no" preselected="yes">
+                            <description>A game manual.</description>
+                            <fileset dir="manual/@{freecol.name}" targetdir="$INSTALL_PATH"/>
+                        </pack>
+                        <!--
+                        <pack name="Source Code" required="no" preselected="no">
+                            <description>The source code.</description>
+                            <fileset dir="source/@{freecol.name}" targetdir="$INSTALL_PATH"/>
+                        </pack>
+                        -->
+                    </packs>
+                </installation>
+            ]]></config>
+        </izpack>
+    </target>
+
+    <target name="winInstallerBundle" unless="skip.dist.installer" description="Builds a windows installer"
+            depends="initDist,javaInstallerBundle">
+
+        <copy todir="${freecol.release.dir}">
+            <fileset dir="${freecol.build.dir}" includes="installer.jsmooth"/>
+        </copy>
+        <replace file="${freecol.release.dir}/installer.jsmooth" 
+                token="%ant:freecol.release.name%"
+                value="${freecol.release.name}"
+        />
+        <replace file="${freecol.release.dir}/installer.jsmooth" 
+                token="%ant:freecol.installerjar%"
+                value="${freecol.release.dir}/${freecol.release.name}-installer.jar"
+        />
+        <jsmoothgen project="${freecol.release.dir}/installer.jsmooth" skeletonroot="${freecol.build.dir}/skeletons"/>
+    </target>
+
+    <!-- Builds a doubleclickable application bundle running on Mac OS X -->
+    <target name="macJavaBundle" unless="skip.dist.mac" depends="prepareManual,prepareBaseFiles">
+        <jarbundler dir="${freecol.release.dir}"
+                            name="FreeCol"
+                            mainclass="net.sf.freecol.FreeCol"
+                            version="${freecol.version}"
+                            vmoptions="-Xmx256M"
+                            jvmversion="1.5+"
+                            arguments="--windowed --freecol-data FreeCol.app/Contents/Resources/"
+                            stubfile="${freecol.build.dir}/skeletons/FreeCol"
+                            icon="${freecol.packaging.dir}/icons/FreeCol.icns"> 
+            <jarfileset dir="${freecol.release.dir}/base/freecol/">
+                <include name="**/*" />
+                <exclude name="data/**" />
+	    </jarfileset>
+            <resourcefileset dir="${freecol.release.dir}/base/freecol/data" />
+        </jarbundler>
+    </target>
+
+    <target name="tarMacJavaBundle" unless="skip.dist.mac" depends="tarMacJavaBundleOnUnixLike,tarMacJavaBundleOnWindows" description="Creates a Mac OS X application bundle inside a tar file.">
+    </target>
+
+    <target name="tarMacJavaBundleOnUnixLike" unless="skip.dist.mac" if="isOsUnixLike" depends="macJavaBundle">
+        <delete file="${freecol.release.dir}/FreeCol.app/Contents/MacOS/FreeCol"/>
+        <symlink link="${freecol.release.dir}/FreeCol.app/Contents/MacOS/FreeCol" 	resource="/System/Library/Frameworks/JavaVM.framework/Resources/MacOS/JavaApplicationStub"/>
+        <exec executable="tar">
+            <arg value="cfvj"/>
+            <arg value="${freecol.release.dir}/${freecol.release.name}-mac.tar.bz2"/>
+            <arg value="-C"/>
+            <arg value="${freecol.release.dir}"/>
+            <arg value="FreeCol.app/"/>
+        </exec>
+    </target>
+
+    <target name="tarMacJavaBundleOnWindows" depends="macJavaBundle" unless="skip.dist.mac" if="isOsWindows">
+        <echo message="Warning: You are building a Mac Os X Java Application Bundle containing a Copy Java Application Stub. Creating a bundle with the current copy of Java Launching Stub could lead to a future situation where the JavaApplicationStub file could become incompatible with a future OS X update. To avoid this, use a unix like system ... "/>
+        <tar destfile="${freecol.release.dir}/${freecol.release.name}-mac.tar.bz2" compression="bzip2">
+            <tarfileset dir="${freecol.release.dir}" mode="755" 
+                    includes="FreeCol.app/Contents/MacOS/FreeCol" 
+                    excludes="**/freecol*"
+                    followsymlinks="false" 
+            />
+            <tarfileset followsymlinks="false" dir="${freecol.release.dir}">
+                <include name="FreeCol.app/**"/>
+                <exclude name="**/freecol*"/>
+                <exclude name="FreeCol.app/Contents/MacOS/FreeCol"/>
+            </tarfileset>	
+        </tar>
+    </target>
+
+    <!-- Cleans the directories by removing auto-generated files. -->
+    <target name="clean" depends="init" description="Cleans the directories by removing auto-generated files.">
+        <delete quiet="true" includeEmptyDirs="true">
+            <fileset dir="${freecol.build.dir}" includes="net/**" />
+            <fileset dir="${freecol.build.dir}" includes="timestamp.inf" />
+        </delete>
+        <delete quiet="true" file="${freecol.jar.file}"/>
+        <delete quiet="true" dir="${freecol.javadoc.dir}"/>
+    </target>
+
+    <target name="distclean" depends="init,clean" description="Cleans the directories and removes the distribution directory.">
+        <delete quiet="true" includeEmptyDirs="true">
+            <fileset dir="${freecol.release.dir}" />
+        </delete>
+    </target>
+
+    <target name="fix" depends="init">
+        <fixcrlf srcdir="${freecol.src.dir}"
+                includes="**/*.java"
+                eol="asis"
+                tab="remove"
+                javafiles="yes"
+                tablength="4"
+                eof="asis"
+        />
+    </target>
+
+    <!-- Generate JavaDoc documentation. -->
+    <target name="javadoc" depends="init" description="Generate JavaDoc documentation.">
+        <mkdir dir="${freecol.javadoc.dir}"/>
+        <javadoc sourcepath="${freecol.src.dir}"
+                overview="${freecol.overview.file}"
+                destdir="${freecol.javadoc.dir}"
+                packagenames="net.sf.freecol.*"
+                classpath="${basedir}/jars/higlayout.jar:${basedir}/jars/jsr173_1.0_api.jar:${basedir}/jars/wstx-lgpl-4.0pr1.jar"
+                Author="true"
+                Windowtitle="FreeCol Code Documentation"
+        />
+        <echo message="" />
+        <echo message="-------------------------------------------------"/>
+        <echo message="JavaDoc-generated documentation created:"/>
+        <echo message="${freecol.javadoc.dir}"/>
+        <echo message="-------------------------------------------------"/>
+    </target>
+
+
+    <!-- example:
+        ant -lib test/lib/junit.jar -Dtest=common.model.Building test
+        -->
+    <target name="test" depends="build, build-unit-tests"
+            description="Runs a particular unit test"
+    >
+        <echo message="if the next task fails then please read the build script" />
+        <!-- if the next fails then here is the long answer:
+            http://ant.apache.org/faq.html#delegating-classloader
+            the short answer depends.
+            if you have Ant 1.7, the junit.jar can exist on the classpath.  
+            upgrading to 1.7 may be the best solution.
+
+            if you have Ant 1.6:
+            ant -lib test/lib/junit.jar testall
+            if you have a version of Ant prior to 1.6 on Windows:
+            set CLASSPATH=%CLASSPATH%;test\lib\junit.jar
+            ant testall
+            if you have a version of Ant prior to 1.6 on UNIX:
+            export CLASSPATH=${CLASSPATH}:test/lib/junit.jar; ant testall
+            -->
+        <junit printsummary="yes">
+        <classpath>
+            <pathelement location="${freecol.build.dir}" />
+            <pathelement location="test/lib/junit.jar" />
+            <pathelement location="${basedir}/jars/higlayout.jar" />
+            <pathelement location="${basedir}/jars/jsr173_1.0_api.jar" />
+            <pathelement location="${basedir}/jars/wstx-lgpl-4.0pr1.jar"/>
+        </classpath>
+        <formatter type="plain" />
+        <test todir="${freecol.build.dir}" name="net.sf.freecol.${test}Test" />
+        </junit>
+    </target>
+
+
+    <target name="testall" depends="build-unit-tests" unless="skip.dist.test"
+            description="Runs all unit tests"
+    >
+        <echo message="if the next task fails then please read the build script" />
+        <!-- if the next fails then here is the long answer:
+            http://ant.apache.org/faq.html#delegating-classloader
+            the short answer depends.
+            if you have Ant 1.7, the junit.jar can exist on the classpath.  
+            upgrading to 1.7 may be the best solution.
+
+            if you have Ant 1.6:
+            ant -lib test/lib/junit.jar testall
+            if you have a version of Ant prior to 1.6 on Windows:
+            set CLASSPATH=%CLASSPATH%;test\lib\junit.jar
+            ant testall
+            if you have a version of Ant prior to 1.6 on UNIX:
+            export CLASSPATH=${CLASSPATH}:test/lib/junit.jar; ant testall
+            -->
+        <junit printsummary="on" errorproperty="error.junit">
+            <classpath>
+                <pathelement location="${freecol.build.dir}" />
+                <pathelement location="test/lib/junit.jar" />
+                <pathelement location="${basedir}/jars/higlayout.jar" />
+                <pathelement location="${basedir}/jars/jsr173_1.0_api.jar" />
+                <pathelement location="${basedir}/jars/wstx-lgpl-4.0pr1.jar"/>
+            </classpath>
+            <formatter type="xml" />
+            <batchtest fork="yes" todir="${freecol.build.dir}">
+                <fileset dir="test/src" includes="**/*Test.java" />
+            </batchtest>
+        </junit>
+        <delete dir="build/report" />
+        <mkdir dir="build/report"/>
+        <echo message="Basedir:${basedir}"/>
+        <junitreport>
+            <fileset dir="build">
+                <include name="TEST-*.xml"/>
+            </fileset>
+            <report todir="build/report" />
+        </junitreport>
+
+        <fail if="error.junit">
+            Automated Unit Tests failed.
+        </fail>
+    </target>
+
+    <target name="build-unit-tests" depends="build">
+        <depend srcDir="test/src" destDir="${freecol.build.dir}"
+                cache="${freecol.build.dir}" />
+        <javac srcdir="test/src" destdir="${freecol.build.dir}"
+            classpathref="test.class.path" debug="on" deprecation="off"
+            source="1.5" />
+    </target>
+
+    <target name="print-manual"
+            description="Creates the printable user guide.">
+        <delete file="doc/FreeCol.ind" />
+        <exec executable="pdflatex" dir="doc" >
+            <arg file="doc/FreeCol.tex"/>
+        </exec>
+        <exec executable="makeindex" dir="doc" >
+            <arg file="doc/FreeCol.idx"/>
+        </exec>
+        <exec executable="pdflatex" dir="doc" >
+            <arg file="doc/FreeCol.tex"/>
+        </exec>
+    </target>
+
+    <target name="online-manual"
+            description="Creates the online user guide.">
+        <delete file="doc/FreeCol.ind" />
+        <exec executable="htlatex" dir="doc" >
+            <arg file="doc/FreeCol.tex"/>
+        </exec>
+        <exec executable="tex" dir="doc">
+            <arg line="\def\filename{{FreeCol}{idx}{4dx}{ind}} \input  idxmake.4ht" />
+        </exec>
+        <exec executable="makeindex" dir="doc" >
+            <arg file="doc/FreeCol.4dx"/>
+        </exec>
+        <exec executable="htlatex" dir="doc" >
+            <arg file="doc/FreeCol.tex"/>
+        </exec>
+    </target>
+
+    <target name="manual" depends="print-manual,online-manual" 
+            description="Creates the printable and online user guides.">
+    </target>
+
+    <target name="fixTabsWindows">
+        <fixcrlf srcdir="${freecol.src.dir}" tab="remove" tablength="4"
+            includes="**/*.java" eol="crlf"
+        />
+    </target>
+
+    <target name="fixTabsUnix">
+        <fixcrlf srcdir="${freecol.src.dir}" tab="remove" tablength="4"
+            includes="**/*.java" eol="lf"
+        />
+    </target>
+
+    <!-- Prints a report on certain translations, which you can specify
+        by setting the localeKey property ("-DlocaleKey=fi", for example),
+        or all translations. Use "-emacs" in order to suppress extensive
+        logging.  --> 
+    <target name="translation-report" depends="build"
+            description="Creates report on translations.">
+        <condition property="localeKey" else="">
+            <isset property="localeKey" />
+        </condition>
+        <java classname="net.sf.freecol.tools.TranslationReport" classpath="build/" >
+            <arg value="src/net/sf/freecol/client/gui/i18n/" />
+            <arg value="${localeKey}" />
+        </java>
+    </target>
 </project>
- 	  	 
