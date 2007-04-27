@@ -158,7 +158,9 @@ public class TradeRoute extends FreeColGameObject implements Cloneable, Ownable 
         this.stops = newStops;
     }
 
-    // do nothing
+    /**
+     * A traderoute does not do anything on a new turn.
+     */
     public void newTurn() {
     }
 
@@ -184,6 +186,8 @@ public class TradeRoute extends FreeColGameObject implements Cloneable, Ownable 
     /**
      * Replace all the stops for this trade route with the stops passed from
      * another trade route.
+     * 
+     * This method will create a deep copy as it creates new stops based on the given ones.
      * 
      * @param otherStops The new stops to use.
      * @see #clone()
@@ -213,6 +217,11 @@ public class TradeRoute extends FreeColGameObject implements Cloneable, Ownable 
             this.locationId = location.getID();
         }
 
+        /**
+         * Copy constructor. Creates a stop based on the given one.
+         * 
+         * @param other
+         */
         private Stop(Stop other) {
             this.locationId = other.locationId;
             this.cargo = new ArrayList<Integer>(other.cargo);
