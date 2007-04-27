@@ -1,16 +1,16 @@
 package net.sf.freecol.util.test;
 
-import java.util.HashSet;
-import java.util.Set;
 import java.util.Vector;
 
 import junit.framework.TestCase;
 import net.sf.freecol.common.FreeColException;
+import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.Game;
+import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.Map;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Tile;
-import net.sf.freecol.common.model.Map.Position;
+import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.server.generator.MapGeneratorOptions;
 
 /**
@@ -92,6 +92,22 @@ public class FreeColTestCase extends TestCase {
         }
         return tiles;
     }
+
+    
+    /**
+     * Creates a standardized map on which all fields have the same given type.
+     * 
+     * Uses the getGame() method to access the currently running game.
+     * 
+     * Does not call Game.setMap(Map) with the returned map. The map is unexplored.
+     * 
+     * @param type The type of land with which to initialize the map.
+     * 
+     * @return The map created as described above.
+     */
+    public static Map getTestMap(int type) {
+        return getTestMap(type, false);
+    }
     
     /**
      * Creates a standardized map on which all fields have the same given type.
@@ -100,10 +116,69 @@ public class FreeColTestCase extends TestCase {
      * 
      * Does not call Game.setMap(Map) with the returned map.
      * 
-     * @param type
+     * @param type The type of land with which to initialize the map.
+     * 
+     * @param explored Set to true if you want all the tiles on the map to have been explored by all players.
+     * 
+     * @return The map created as described above.
+     */
+    public static Map getTestMap(int type, boolean explored) {
+        Map m = new Map(getGame(), getTestTiles(getGame(), 20, 15, type));
+        if (explored) {
+            for (Player player : getGame().getPlayers()) {
+                for (Tile tile : m.getAllTiles()) {
+                    tile.setExploredBy(player, true);
+                }
+            }
+        }
+        return m;
+    }
+
+    /**
+     * Get a standard colony at the location 5,8 with one free colonist
+     * 
      * @return
      */
-    public static Map getTestMap(int type){
-        return new Map(getGame(), getTestTiles(getGame(), 20, 15, type));
+    public Colony getStandardColony() {
+        return getStandardColony(1);
     }
+
+    /**
+     * Get a colony with the given number of settlers
+     * 
+     * @param numberOfSettlers The number of settlers to put into the colony.
+     *            Must be >= 1.
+     * 
+     * @return
+     */
+    public Colony getStandardColony(int numberOfSettlers) {
+
+        if (numberOfSettlers < 1)
+            throw new IllegalArgumentException();
+
+        Game game = getStandardGame();
+        Player dutch = game.getPlayer(Player.DUTCH);
+
+        Map map = getTestMap(Tile.PLAINS, true);
+        game.setMap(map);
+        map.getTile(5, 8).setExploredBy(dutch, true);
+
+        Colony colony = new Colony(game, dutch, "New Amsterdam", map.getTile(5, 8));
+
+        Unit soldier = new Unit(game, map.getTile(6, 8), dutch, Unit.FREE_COLONIST, Unit.ACTIVE, true, false, 0, false);
+
+        soldier.setWorkType(Goods.FOOD);
+        soldier.buildColony(colony);
+
+        for (int i = 1; i < numberOfSettlers; i++) {
+            Unit settler = new Unit(game, map.getTile(6, 8), dutch, Unit.FREE_COLONIST, Unit.ACTIVE, true, false, 0,
+                    false);
+            settler.setLocation(colony);
+        }
+
+        assertEquals(numberOfSettlers, colony.getUnitCount());
+
+        return colony;
+    }
+
 }
