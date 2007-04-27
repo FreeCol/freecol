@@ -104,7 +104,7 @@ public final class InGameController implements NetworkConstants {
     public void saveGame() {
         final Canvas canvas = freeColClient.getCanvas();
         String fileName = freeColClient.getMyPlayer().getName() + "_" + freeColClient.getMyPlayer().getNationAsString()
-                + "_" + freeColClient.getGame().getTurn();
+                + "_" + freeColClient.getGame().getTurn().toSaveGameString();
         fileName = fileName.replaceAll(" ", "_");
         if (freeColClient.getMyPlayer().isAdmin() && freeColClient.getFreeColServer() != null) {
             final File file = canvas.showSaveDialog(FreeCol.getSaveDirectory(), fileName);
@@ -244,9 +244,8 @@ public final class InGameController implements NetworkConstants {
             final int turnNumber = freeColClient.getGame().getTurn().getNumber();
             final int savegamePeriod = freeColClient.getClientOptions().getInteger(ClientOptions.AUTOSAVE_PERIOD);
             if (savegamePeriod == 1 || (savegamePeriod != 0 && turnNumber % savegamePeriod == 0)) {
-                final String turn = freeColClient.getGame().getTurn().toString().replaceAll(" ", "");
-                final String filename = Messages.message("clientOptions.savegames.autosave.fileprefix") + '-' + turn
-                        + ".fsg";
+                final String filename = Messages.message("clientOptions.savegames.autosave.fileprefix") +
+                   '-' + freeColClient.getGame().getTurn().toSaveGameString() + ".fsg";
                 saveGame(new File(FreeCol.getAutosaveDirectory(), filename));
             }
 

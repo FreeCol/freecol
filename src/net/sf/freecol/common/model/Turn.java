@@ -113,4 +113,25 @@ public class Turn {
         return ((c%2==0) ? Messages.message("spring") : Messages.message("autumn"))
                 + " " + Integer.toString(SEASON_YEAR + c/2 - 1);
     }
+
+    /**
+    * Returns a string representation of this turn suitable for
+    * savegame files.
+    * @return A string with the format: "<i>[season] year</i>".
+    *         Examples: "1602_1_Spring", "1503"...
+    */
+    public String toSaveGameString() {
+        if (STARTING_YEAR + turn - 1 < SEASON_YEAR) {
+            return Integer.toString(STARTING_YEAR + turn - 1);
+        }
+
+        int c = turn - (SEASON_YEAR - STARTING_YEAR - 1);
+        String result = Integer.toString(SEASON_YEAR + c/2 - 1);
+        if (c % 2 == 0) {
+            result += "_1_" + Messages.message("spring");
+        } else {
+            result += "_2_" + Messages.message("autumn");
+        }
+        return result;
+    }
 }
