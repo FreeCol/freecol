@@ -135,10 +135,13 @@ public class MapTest extends FreeColTestCase {
 		}
 
 		Set<Position> positions = new HashSet<Position>();
-
+        Set<Tile> allTiles = new HashSet<Tile>();
+        
 		for (int x = 0; x < 5; x++) {
 			for (int y = 0; y < 6; y++) {
-				tiles.get(x).add(new Tile(game, Tile.PLAINS, x, y));
+                Tile tile = new Tile(game, Tile.PLAINS, x, y);
+				tiles.get(x).add(tile);
+                allTiles.add(tile);
 				positions.add(new Position(x, y));
 			}
 		}
@@ -148,9 +151,16 @@ public class MapTest extends FreeColTestCase {
 		Iterator<Position> wholeMapIterator = map.getWholeMapIterator();
 		for (int i = 0; i < 30; i++) {
 			assertTrue(wholeMapIterator.hasNext());
-			assertTrue(positions.contains(wholeMapIterator.next()));
-		}
+			assertTrue(positions.remove(wholeMapIterator.next()));
+        }
+        assertEquals(0, positions.size());
 		assertFalse(wholeMapIterator.hasNext());
+
+        // Check for-Iterator
+		for (Tile t : map.getAllTiles()){
+		    assertTrue(allTiles.remove(t));
+        }
+        assertEquals(0, positions.size());
 	}
 
 	public void testGetAdjacent() {

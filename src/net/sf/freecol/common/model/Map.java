@@ -11,6 +11,7 @@ import org.w3c.dom.Element;
  * An isometric map. The map is represented as a collection of tiles.
  */
 public class Map extends FreeColGameObject {
+    
     public static final String COPYRIGHT = "Copyright (C) 2003-2005 The FreeCol Team";
     public static final String LICENSE = "http://www.gnu.org/licenses/gpl.html";
     public static final String REVISION = "$Revision$";
@@ -1784,5 +1785,34 @@ public class Map extends FreeColGameObject {
      */
     public static String getXMLElementTagName() {
         return "map";
+    }
+
+    /**
+     * Make the map usable as a parameter in the for-loop.
+     * 
+     * Returns all Tiles based on the order of the WholeMapIterator.
+     * 
+     * @return An Iterable that can be used to get an iterator for all tiles of the map.
+     */
+    public Iterable<Tile> getAllTiles() {
+        return new Iterable<Tile>(){
+            public Iterator<Tile> iterator(){
+                final WholeMapIterator m = getWholeMapIterator();
+                
+                return new Iterator<Tile>(){
+                    public boolean hasNext() {
+                        return m.hasNext();
+                    }
+
+                    public Tile next() {
+                        return getTile(m.next());
+                    }
+
+                    public void remove() {
+                        m.remove();
+                    }
+                };
+            }
+        };
     }
 }
