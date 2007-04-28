@@ -3643,8 +3643,13 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
 
         String newName = getName();
         if (!newName.equals(oldName)) {
-            addModelMessage(this, "model.unit.unitImproved", new String[][] { { "%oldName%", oldName },
-                    { "%newName%", getName() }, { "%nation%", nation } }, ModelMessage.UNIT_IMPROVED);
+            addModelMessage(this,
+                            "model.unit.unitPromoted",
+                            new String[][] {
+                                { "%oldName%", oldName },
+                                { "%newName%", getName() },
+                                { "%nation%", nation } },
+                            ModelMessage.UNIT_IMPROVED);
         }
     }
 
@@ -4182,9 +4187,13 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
                 logger.finest("About to change type of unit due to experience.");
                 String oldName = getName();
                 setType(((ColonyTile) location).getExpertForProducing(workType));
-                addModelMessage(getTile().getColony(), "model.unit.experience",
-                        new String[][] { { "%oldName%", oldName }, { "%newName%", getName() },
-                                { "%nation%", owner.getNationAsString() } }, ModelMessage.UNIT_IMPROVED, this);
+                addModelMessage(getTile().getColony(),
+                                "model.unit.experience",
+                                new String[][] {
+                                    { "%oldName%", oldName },
+                                    { "%newName%", getName() },
+                                    { "%colony%", getTile().getColony().getName() } },
+                                ModelMessage.UNIT_IMPROVED, this);
             }
         }
         movesLeft = getInitialMovesLeft();
