@@ -423,6 +423,7 @@ public class MapGenerator {
                             return IndianSettlement.EXPERT_ORE_MINER;
                         }
                     case Tile.ARCTIC:
+                        continue;
                     case Tile.OCEAN:
                         return IndianSettlement.EXPERT_FISHERMAN;
                     default:
