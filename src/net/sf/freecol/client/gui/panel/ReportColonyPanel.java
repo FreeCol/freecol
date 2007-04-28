@@ -56,8 +56,8 @@ public final class ReportColonyPanel extends ReportPanel implements ActionListen
 
         int widths[] = new int[] { 0, 12, 0 };
         int heights[] = new int[colonies.size() * ROWS_PER_COLONY];
-        for (int i = 0; i < colonies.size(); i++) {
-            heights[i * ROWS_PER_COLONY + 3] = SEPARATOR;
+        for (int i = 1; i < colonies.size(); i++) {
+            heights[i * ROWS_PER_COLONY - 1] = SEPARATOR;
         }
 
         reportPanel.setLayout(new HIGLayout(widths, heights));
@@ -73,7 +73,7 @@ public final class ReportColonyPanel extends ReportPanel implements ActionListen
             JButton colonyButton = new JButton(colony.getName());
             colonyButton.setActionCommand(String.valueOf(colonyIndex));
             colonyButton.addActionListener(this);
-            reportPanel.add(colonyButton, higConst.rc(row, colonyColumn));
+            reportPanel.add(colonyButton, higConst.rc(row, colonyColumn, "lrt"));
 
             // units
             JPanel unitPanel = new JPanel(new GridLayout(0, 10));
