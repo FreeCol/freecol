@@ -74,7 +74,9 @@ public final class ReportLabourPanel extends ReportPanel implements ActionListen
         if (player.getEurope() != null)
             locationNames.add(player.getEurope().toString());
         while (colonyIterator.hasNext()) {
-            locationNames.add(colonyIterator.next().getName());
+            String colonyName = colonyIterator.next().getName();
+            locationNames.add(colonyName);
+            locationNames.add(colonyName + "*");
         }
 
         while (units.hasNext()) {
@@ -84,7 +86,11 @@ public final class ReportLabourPanel extends ReportPanel implements ActionListen
             String locationName = null;
 
             if (location instanceof WorkLocation) {
-                locationName = ((WorkLocation) location).getColony().getName();
+                Colony colony = ((WorkLocation) location).getColony();
+                locationName = colony.getName();
+                if (colony.canTrain(unit)) {
+                    locationName += "*";
+                }
             } else if (location instanceof Europe) {
                 locationName = player.getEurope().toString();
             } else if (location instanceof Tile &&

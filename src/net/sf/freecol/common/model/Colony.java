@@ -759,6 +759,21 @@ public final class Colony extends Settlement implements Location, Nameable {
     }
 
     /**
+     * Returns true if this colony has a schoolhouse and the unit is a
+     * skilled unit with a skill level not exceeding the level of the
+     * schoolhouse. The number of units already in the schoolhouse and
+     * the availability of pupils are not taken into account. @see
+     * Building#canAddAsTeacher
+     * 
+     * @param unit The unit to add as a teacher.
+     * @return <code>true</code> if this unit could be added.
+    */
+
+    public boolean canTrain(Unit unit) {
+        return getBuilding(Building.SCHOOLHOUSE).canAddAsTeacher(unit);
+    }
+
+    /**
      * Gets the <code>Unit</code> that is currently defending this
      * <code>Colony</code>.
      * <p>

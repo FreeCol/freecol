@@ -399,16 +399,39 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
             return false;
         }
 
-        if (getType() == SCHOOLHOUSE
-                && (getLevel() < Unit.getSkillLevel(((Unit) locatable).getType())
-                        || ((Unit) locatable).getType() == Unit.INDIAN_CONVERT
-                        || ((Unit) locatable).getType() == Unit.FREE_COLONIST
-                        || ((Unit) locatable).getType() == Unit.INDENTURED_SERVANT || ((Unit) locatable).getType() == Unit.PETTY_CRIMINAL)) {
-            return false;
+        if (getType() == SCHOOLHOUSE) {
+            return canAddAsTeacher((Unit) locatable);
         }
 
         return true;
     }
+
+
+    /**
+     * Returns true if this building is a schoolhouse and the unit is
+     * a skilled unit with a skill level not exceeding the level of
+     * the schoolhouse. The number of units already in the schoolhouse
+     * is not taken into account. @see #canAdd
+     * 
+     * @param unit The unit to add as a teacher.
+     * @return <code>true</code> if this unit could be added.
+    */
+    public boolean canAddAsTeacher(Unit unit) {
+        if (getType() == SCHOOLHOUSE) {
+            switch (unit.getType()) {
+            case Unit.INDIAN_CONVERT:
+            case Unit.FREE_COLONIST:
+            case Unit.INDENTURED_SERVANT:
+            case Unit.PETTY_CRIMINAL:
+                return false;
+            default:
+                return (getLevel() >= unit.getSkillLevel());
+            }
+        } else {
+            return false;
+        }
+    }
+
 
     /**
      * Adds the specified <code>Locatable</code> to this
