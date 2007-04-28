@@ -108,9 +108,20 @@ public final class ReportProductionPanel extends JPanel implements ActionListene
         heights[2] = 0;
         heights[3] = marginWidth;
 
-        /*
-         * for (int h = 4; h < heights.length; h++) { heights[h] = 0; }
-         */
+        
+        for (int index = 4; index < heights.length; index++) {
+            /** TODO: replace this magic number by some value from the
+             * ImageLibrary. At the moment this is difficult, as the
+             * unit images in the library are not sorted according to
+             * type. For this purpose, however, one would need to
+             * consider only ships for the naval report and only units
+             * able to defend colonies for the military report. The
+             * value of 64 is large enough to accommodate the 2/3
+             * scale version of all unit graphics.
+             */
+            heights[index] = 64;
+        }
+        
 
         setLayout(new HIGLayout(widths, heights));
 
@@ -154,7 +165,7 @@ public final class ReportProductionPanel extends JPanel implements ActionListene
             JButton colonyButton = new JButton(colony.getName());
             colonyButton.setActionCommand(String.valueOf(colonyIndex));
             colonyButton.addActionListener(this);
-            add(colonyButton, higConst.rc(row, colonyColumn));
+            add(colonyButton, higConst.rc(row, colonyColumn, "lr"));
 
             // production
             Goods goods = new Goods(goodsType);

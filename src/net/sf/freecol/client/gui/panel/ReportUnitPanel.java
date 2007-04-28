@@ -177,6 +177,19 @@ public final class ReportUnitPanel extends JPanel implements ActionListener {
 
         heights = new int[colonies.size() + otherNames.size() + extraRows];
         heights[1] = separator;
+        for (int index = 2; index < heights.length; index++) {
+            /** TODO: replace this magic number by some value from the
+             * ImageLibrary. At the moment this is difficult, as the
+             * unit images in the library are not sorted according to
+             * type. For this purpose, however, one would need to
+             * consider only ships for the naval report and only units
+             * able to defend colonies for the military report. The
+             * value of 64 is large enough to accommodate the 2/3
+             * scale version of all unit graphics.
+             */
+            heights[index] = 64;
+        }
+
 
         setLayout(new HIGLayout(widths, heights));
 
@@ -243,13 +256,13 @@ public final class ReportUnitPanel extends JPanel implements ActionListener {
                 JButton locationButton = new JButton(location);
                 locationButton.setActionCommand(String.valueOf(locationIndex));
                 locationButton.addActionListener(this);
-                add(locationButton, higConst.rc(row, labelColumn));
+                add(locationButton, higConst.rc(row, labelColumn, "lr"));
             } else {
                 JLabel locationLabel = new JLabel(location);
                 add(locationLabel, higConst.rc(row, labelColumn));
             }
             if (unitList != null) {
-                JPanel unitPanel = new JPanel(new GridLayout(0, 7));
+                JPanel unitPanel = new JPanel();
                 unitPanel.setOpaque(false);
                 Collections.sort(unitList, reportPanel.getUnitTypeComparator());
                 Iterator<Unit> unitIterator = unitList.iterator();
