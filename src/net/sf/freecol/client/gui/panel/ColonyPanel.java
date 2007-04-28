@@ -950,7 +950,7 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener {
             Building building;
 
             JPanel productionInBuildingPanel = new JPanel();
-            public final int[] widths = {180, 120, 100};
+            public final int[] widths = {160, 140, 100};
             public final int[] heights = {60};
 
 
