@@ -700,11 +700,22 @@ public final class InGameController implements NetworkConstants {
         
         Location location = unit.getLocation();
         if (location instanceof Tile) {
-            location = ((Tile) location).getColony();
+            logger.finer("Stopped in colony " + ((Tile) unit.getLocation()).getColony().getName());
+            stopInColony(unit);
+        } else if (location instanceof Europe) {
+            logger.finer("Stopped in Europe.");
+            stopInEurope(unit);
         }
+    }
+
+    private void stopInColony(Unit unit) {
+
+        Stop stop = unit.getCurrentStop();
+        Location location = ((Tile) unit.getLocation()).getColony();
+        
         GoodsContainer warehouse = location.getGoodsContainer();
         if (warehouse == null) {
-            throw new IllegalStateException("Not warehouse in a stop's location");
+            throw new IllegalStateException("No warehouse in a stop's location");
         }
         
         // unload cargo that should not be on board and complete loaded goods with less than 100 units
@@ -757,6 +768,54 @@ public final class InGameController implements NetworkConstants {
             return;
         } else {
             setDestination(unit, stop.getLocation());
+        }
+    }
+
+    private void stopInEurope(Unit unit) {
+
+        Stop stop = unit.getCurrentStop();
+
+        // unload cargo that should not be on board and complete loaded goods with less than 100 units
+        ArrayList<Integer> goodsTypesToLoad = stop.getCargo();
+        Iterator<Goods> goodsIterator = unit.getGoodsIterator();
+        test: while (goodsIterator.hasNext()) {
+            Goods goods = goodsIterator.next();
+            for (int index = 0; index < goodsTypesToLoad.size(); index++) {
+                int goodsType = goodsTypesToLoad.get(index).intValue();
+                if (goods.getType() == goodsType) {
+                    if (goods.getAmount() < 100) {
+                        logger.finest("Automatically loading goods " + goods.getName());
+                        buyGoods(goods.getType(), (100 - goods.getAmount()), unit);
+                    }
+                    // remove item: other items of the same type
+                    // may or may not be present
+                    goodsTypesToLoad.remove(index);
+                    continue test;
+                }
+            }
+            // this type of goods was not in the cargo list
+            logger.finest("Automatically unloading " + goods.getName());
+            sellGoods(goods);
+        }
+        
+        // load cargo that should be on board
+        for (Integer goodsType : goodsTypesToLoad) {
+            if (unit.getSpaceLeft() > 0) {
+                logger.finest("Automatically loading goods " + Goods.getName(goodsType.intValue()));
+                buyGoods(goodsType.intValue(), 100, unit);
+            }
+        }
+
+        // TODO: do we want to load/unload units as well?
+        // if so, when?
+        
+        // Set destination to next stop's location
+        stop = unit.nextStop();
+        if (stop == null) {
+            return;
+        } else {
+            setDestination(unit, stop.getLocation());
+            moveToAmerica(unit);
         }
     }
 

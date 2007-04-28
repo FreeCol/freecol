@@ -274,8 +274,7 @@ public final class Europe extends FreeColGameObject implements Location,
         if (locatable instanceof Unit) {
             unitContainer.removeUnit((Unit) locatable);
         } else {
-            logger
-                    .warning("Tried to remove an unrecognized 'Locatable' from a europe.");
+            logger.warning("Tried to remove an unrecognized 'Locatable' from a europe.");
         }
     }
 
@@ -405,8 +404,6 @@ public final class Europe extends FreeColGameObject implements Location,
         int required = owner.getCrossesRequired();
         int crosses = owner.getCrosses();
         int difference = Math.max(required - crosses, 0);
-        // return (recruitPrice * difference) / required;
-        // EXPERIMENTAL: cap lower limit
         return Math.max((recruitPrice * difference) / required, 80);
     }
 

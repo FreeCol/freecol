@@ -783,8 +783,7 @@ public final class Colony extends Settlement implements Location, Nameable {
      * units outside of the colony (@see Tile#getDefendingUnit).
      * <p>
      * Note! Several callers fail to handle null as a return value. Return an
-     * arbitrary unarmed land unit unless Paul Revere is present as founding
-     * father, in which case the unit can be armed as well.
+     * arbitrary unarmed land unit.
      * 
      * @return The <code>Unit</code> that has been choosen to defend this
      *         colony.
@@ -796,15 +795,7 @@ public final class Colony extends Settlement implements Location, Nameable {
             throw new IllegalStateException("Colony " + name + " contains no units!");
         }
         // Get the first unit
-        Unit defender = unitList.get(0);
-        /*
-         * don't do that here! // Paul Revere present? If so, arm it if
-         * (getOwner().hasFather(FoundingFather.PAUL_REVERE)) { if
-         * (getGoodsCount(Goods.MUSKETS) >= 50) { defender.setArmed(true); } if
-         * (getGoodsCount(Goods.HORSES) >= 50) { defender.setMounted(true); } }
-         */
-        // Done!
-        return defender;
+        return unitList.get(0);
     }
 
     /**
