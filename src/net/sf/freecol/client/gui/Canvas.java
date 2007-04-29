@@ -66,6 +66,7 @@ import net.sf.freecol.client.gui.panel.ReportMilitaryPanel;
 import net.sf.freecol.client.gui.panel.ReportNavalPanel;
 import net.sf.freecol.client.gui.panel.ReportPanel;
 import net.sf.freecol.client.gui.panel.ReportReligiousPanel;
+import net.sf.freecol.client.gui.panel.ReportRequirementsPanel;
 import net.sf.freecol.client.gui.panel.ReportTradePanel;
 import net.sf.freecol.client.gui.panel.ReportTurnPanel;
 import net.sf.freecol.client.gui.panel.ServerListPanel;
@@ -1333,6 +1334,8 @@ public final class Canvas extends JDesktopPane {
             reportPanel = new ReportNavalPanel(this);
         } else if ("net.sf.freecol.client.gui.panel.ReportColonyPanel".equals(classname)) {
             reportPanel = new ReportColonyPanel(this);
+        } else if ("net.sf.freecol.client.gui.panel.ReportRequirementsPanel".equals(classname)) {
+            reportPanel = new ReportRequirementsPanel(this);
         } else {
             logger.warning("Request for Report panel could not be processed.  Name=" + classname);
         }

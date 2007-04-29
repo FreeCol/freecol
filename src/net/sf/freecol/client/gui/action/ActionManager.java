@@ -75,6 +75,7 @@ public class ActionManager extends OptionGroup {
         add(new ReportMilitaryAction(freeColClient));
         add(new ReportNavalAction(freeColClient));
         add(new ReportReligionAction(freeColClient));
+        add(new ReportRequirementsAction(freeColClient));
         add(new ReportTradeAction(freeColClient));
         add(new ReportTurnAction(freeColClient));
         add(new SaveAction(freeColClient));
