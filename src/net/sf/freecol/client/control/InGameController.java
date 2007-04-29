@@ -241,12 +241,14 @@ public final class InGameController implements NetworkConstants {
 
         if (freeColClient.getMyPlayer().equals(currentPlayer)) {
             // Autosave the game:
-            final int turnNumber = freeColClient.getGame().getTurn().getNumber();
-            final int savegamePeriod = freeColClient.getClientOptions().getInteger(ClientOptions.AUTOSAVE_PERIOD);
-            if (savegamePeriod == 1 || (savegamePeriod != 0 && turnNumber % savegamePeriod == 0)) {
-                final String filename = Messages.message("clientOptions.savegames.autosave.fileprefix") +
-                   '-' + freeColClient.getGame().getTurn().toSaveGameString() + ".fsg";
-                saveGame(new File(FreeCol.getAutosaveDirectory(), filename));
+            if (freeColClient.getFreeColServer() != null) {
+                final int turnNumber = freeColClient.getGame().getTurn().getNumber();
+                final int savegamePeriod = freeColClient.getClientOptions().getInteger(ClientOptions.AUTOSAVE_PERIOD);
+                if (savegamePeriod == 1 || (savegamePeriod != 0 && turnNumber % savegamePeriod == 0)) {
+                    final String filename = Messages.message("clientOptions.savegames.autosave.fileprefix") +
+                    '-' + freeColClient.getGame().getTurn().toSaveGameString() + ".fsg";
+                    saveGame(new File(FreeCol.getAutosaveDirectory(), filename));
+                }
             }
 
             removeUnitsOutsideLOS();
