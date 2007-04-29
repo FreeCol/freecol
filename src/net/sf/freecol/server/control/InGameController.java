@@ -4,13 +4,25 @@ import java.io.IOException;
 import java.util.Iterator;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import net.sf.freecol.common.model.*;
+
+import net.sf.freecol.common.model.Building;
+import net.sf.freecol.common.model.Colony;
+import net.sf.freecol.common.model.FoundingFather;
+import net.sf.freecol.common.model.Game;
+import net.sf.freecol.common.model.GameOptions;
+import net.sf.freecol.common.model.Goods;
+import net.sf.freecol.common.model.Map;
+import net.sf.freecol.common.model.Market;
+import net.sf.freecol.common.model.Monarch;
+import net.sf.freecol.common.model.Player;
+import net.sf.freecol.common.model.Settlement;
+import net.sf.freecol.common.model.Tile;
+import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.Map.Position;
 import net.sf.freecol.common.networking.Message;
 import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.model.ServerPlayer;
 
-import org.w3c.dom.DOMException;
 import org.w3c.dom.Element;
 
 /**
@@ -49,6 +61,14 @@ public final class InGameController extends Controller {
         if (oldPlayer != player) {
             throw new IllegalArgumentException("It is not " + player.getName() + "'s turn!");
         }
+        
+        // Wait for a human player to connect.
+        try {
+            while (!isHumanPlayersLeft()) {
+                Thread.sleep(1000);
+            }
+        } catch (InterruptedException e) {}
+        
         // Clean up server side model messages:
         game.clearModelMessages();
         ServerPlayer nextPlayer = (ServerPlayer) game.getNextPlayer();
@@ -115,6 +135,17 @@ public final class InGameController extends Controller {
         Element setCurrentPlayerElement = Message.createNewRootElement("setCurrentPlayer");
         setCurrentPlayerElement.setAttribute("player", nextPlayer.getID());
         freeColServer.getServer().sendToAll(setCurrentPlayerElement, null);
+    }
+    
+    private boolean isHumanPlayersLeft() {
+        Iterator<Player> playerIterator = getFreeColServer().getGame().getPlayerIterator();
+        while (playerIterator.hasNext()) {
+            Player p = playerIterator.next();
+            if (!p.isDead() && !p.isAI()) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private void chooseFoundingFather(ServerPlayer player) {

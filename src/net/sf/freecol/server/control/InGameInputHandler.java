@@ -2411,8 +2411,8 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
          * for now - allow the player to reconnect:
          */
         player.setConnected(false);
-        if (getFreeColServer().getGame().getCurrentPlayer() == player && !getFreeColServer().isSingleplayer()
-                && isHumanPlayersLeft()) {
+        if (getFreeColServer().getGame().getCurrentPlayer() == player
+                && !getFreeColServer().isSingleplayer()) {
             getFreeColServer().getInGameController().endTurn(player);
         }
         try {
@@ -2420,17 +2420,6 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         } catch (NoRouteToServerException e) {}
         
         return null;
-    }
-
-    private boolean isHumanPlayersLeft() {
-        Iterator<Player> playerIterator = getFreeColServer().getGame().getPlayerIterator();
-        while (playerIterator.hasNext()) {
-            Player p = playerIterator.next();
-            if (!p.isDead() && !p.isAI()) {
-                return true;
-            }
-        }
-        return false;
     }
 
     private void sendUpdatedTileToAll(Tile newTile, Player player) {
