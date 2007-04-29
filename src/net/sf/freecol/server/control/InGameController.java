@@ -58,40 +58,15 @@ public final class InGameController extends Controller {
         FreeColServer freeColServer = getFreeColServer();
         Game game = freeColServer.getGame();
         ServerPlayer oldPlayer = (ServerPlayer) game.getCurrentPlayer();
+        
         if (oldPlayer != player) {
+            logger.warning("It is not " + player.getName() + "'s turn!");
             throw new IllegalArgumentException("It is not " + player.getName() + "'s turn!");
         }
         
-        // Wait for a human player to connect.
-        try {
-            while (!isHumanPlayersLeft()) {
-                Thread.sleep(1000);
-            }
-        } catch (InterruptedException e) {}
-        
-        // Clean up server side model messages:
         game.clearModelMessages();
-        ServerPlayer nextPlayer = (ServerPlayer) game.getNextPlayer();
-        synchronized (nextPlayer) {
-            while (nextPlayer != null && checkForDeath(nextPlayer)) {
-                nextPlayer.setDead(true);
-                Element setDeadElement = Message.createNewRootElement("setDead");
-                setDeadElement.setAttribute("player", nextPlayer.getID());
-                freeColServer.getServer().sendToAll(setDeadElement, null);
-                nextPlayer = (ServerPlayer) game.getNextPlayer();
-            }
-        }
-        while (nextPlayer != null && !nextPlayer.isConnected()) {
-            game.setCurrentPlayer(nextPlayer);
-            nextPlayer = (ServerPlayer) game.getPlayerAfter(nextPlayer);
-        }
-        while (nextPlayer != null && !nextPlayer.isAI() && debugOnlyAITurns > 0) {
-            nextPlayer = (ServerPlayer) game.getPlayerAfter(nextPlayer);
-        }
-        if (nextPlayer == null) {
-            game.setCurrentPlayer(null);
-            return;
-        }
+        freeColServer.getModelController().clearTaskRegister();
+
         Player winner = checkForWinner();
         if (winner != null && (!freeColServer.isSingleplayer() || !winner.isAI())) {
             Element gameEndedElement = Message.createNewRootElement("gameEnded");
@@ -99,7 +74,30 @@ public final class InGameController extends Controller {
             freeColServer.getServer().sendToAll(gameEndedElement, null);
             return;
         }
-        freeColServer.getModelController().clearTaskRegister();
+        
+        ServerPlayer newPlayer = (ServerPlayer) nextPlayer();
+
+        if (newPlayer != null 
+                && !newPlayer.isAI()
+                && (!newPlayer.isConnected() || debugOnlyAITurns > 0)) {
+            endTurn(newPlayer);
+            return;
+        }
+    }
+    
+    /**
+     * Sets a new current player and notifies the clients.
+     * @return The new current player.
+     */
+    private Player nextPlayer() {
+        final FreeColServer freeColServer = getFreeColServer();
+        final Game game = freeColServer.getGame();
+        
+        if (!isHumanPlayersLeft()) {
+            game.setCurrentPlayer(null);
+            return null;
+        }
+        
         if (game.isNextPlayerInNewTurn()) {
             game.newTurn();
             if (debugOnlyAITurns > 0) {
@@ -108,40 +106,58 @@ public final class InGameController extends Controller {
             Element newTurnElement = Message.createNewRootElement("newTurn");
             freeColServer.getServer().sendToAll(newTurnElement, null);
         }
-        if (nextPlayer.isEuropean()) {
+        
+        ServerPlayer newPlayer = (ServerPlayer) game.getNextPlayer();
+        game.setCurrentPlayer(newPlayer);
+        if (newPlayer == null) {
+            game.setCurrentPlayer(null);
+            return null;
+        }
+        
+        synchronized (newPlayer) {
+            if (checkForDeath(newPlayer)) {
+                newPlayer.setDead(true);
+                Element setDeadElement = Message.createNewRootElement("setDead");
+                setDeadElement.setAttribute("player", newPlayer.getID());
+                freeColServer.getServer().sendToAll(setDeadElement, null);
+                return nextPlayer();
+            }
+        }
+        
+        if (newPlayer.isEuropean()) {
             try {
                 Market market = game.getMarket();
                 // make random change to the market
                 market.add(getPseudoRandom().nextInt(Goods.NUMBER_OF_TYPES), (50 - getPseudoRandom().nextInt(71)));
                 Element updateElement = Message.createNewRootElement("update");
-                updateElement.appendChild(game.getMarket().toXMLElement(nextPlayer, updateElement.getOwnerDocument()));
-                nextPlayer.getConnection().send(updateElement);
+                updateElement.appendChild(game.getMarket().toXMLElement(newPlayer, updateElement.getOwnerDocument()));
+                newPlayer.getConnection().send(updateElement);
             } catch (IOException e) {
-                logger.warning("Could not send message to: " + nextPlayer.getName() + " with connection "
-                        + nextPlayer.getConnection());
+                logger.warning("Could not send message to: " + newPlayer.getName() + " with connection "
+                        + newPlayer.getConnection());
             }
+
+            if (newPlayer.getCurrentFather() == -1 && newPlayer.getSettlements().size() > 0) {
+                chooseFoundingFather(newPlayer);
+            }
+            if (newPlayer.getMonarch() != null) {
+                monarchAction(newPlayer);
+            }
+            bombardEnemyShips(newPlayer);
         }
-        game.setCurrentPlayer(nextPlayer);
-        // Ask the player to choose a founding father if none has been chosen:
-        if (nextPlayer.isEuropean()) {
-            if (nextPlayer.getCurrentFather() == -1 && nextPlayer.getSettlements().size() > 0) {
-                chooseFoundingFather(nextPlayer);
-            }
-            if (nextPlayer.getMonarch() != null) {
-                monarchAction(nextPlayer);
-            }
-            bombardEnemyShips(nextPlayer);
-        }
+        
         Element setCurrentPlayerElement = Message.createNewRootElement("setCurrentPlayer");
-        setCurrentPlayerElement.setAttribute("player", nextPlayer.getID());
+        setCurrentPlayerElement.setAttribute("player", newPlayer.getID());
         freeColServer.getServer().sendToAll(setCurrentPlayerElement, null);
+        
+        return newPlayer;
     }
     
     private boolean isHumanPlayersLeft() {
         Iterator<Player> playerIterator = getFreeColServer().getGame().getPlayerIterator();
         while (playerIterator.hasNext()) {
-            Player p = playerIterator.next();
-            if (!p.isDead() && !p.isAI()) {
+            ServerPlayer p = (ServerPlayer) playerIterator.next();
+            if (!p.isDead() && !p.isAI() && p.isConnected()) {
                 return true;
             }
         }
