@@ -12,6 +12,7 @@ import net.sf.freecol.common.model.GameOptions;
 import net.sf.freecol.common.model.Map;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.networking.Message;
+import net.sf.freecol.common.networking.NoRouteToServerException;
 import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.ai.AIInGameInputHandler;
 import net.sf.freecol.server.ai.AIMain;
@@ -179,7 +180,9 @@ public final class PreGameController extends Controller {
         
         // Start the game:
         freeColServer.setGameState(FreeColServer.IN_GAME);
-        freeColServer.updateMetaServer();
+        try {
+            freeColServer.updateMetaServer();
+        } catch (NoRouteToServerException e) {}
         
         Element startGameElement = Message.createNewRootElement("startGame");
         freeColServer.getServer().sendToAll(startGameElement);

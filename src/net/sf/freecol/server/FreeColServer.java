@@ -23,12 +23,14 @@ import java.util.Vector;
 import java.util.logging.Logger;
 import java.util.zip.DeflaterOutputStream;
 import java.util.zip.InflaterInputStream;
+
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
+
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.common.FreeColException;
 import net.sf.freecol.common.PseudoRandom;
@@ -38,6 +40,7 @@ import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.networking.Message;
+import net.sf.freecol.common.networking.NoRouteToServerException;
 import net.sf.freecol.server.ai.AIInGameInputHandler;
 import net.sf.freecol.server.ai.AIMain;
 import net.sf.freecol.server.control.Controller;
@@ -52,6 +55,7 @@ import net.sf.freecol.server.model.ServerModelObject;
 import net.sf.freecol.server.model.ServerPlayer;
 import net.sf.freecol.server.networking.DummyConnection;
 import net.sf.freecol.server.networking.Server;
+
 import org.w3c.dom.Element;
 
 /**
@@ -138,7 +142,7 @@ public final class FreeColServer {
      *             will be logged by this class).
      * 
      */
-    public FreeColServer(boolean publicServer, boolean singleplayer, int port, String name) throws IOException {
+    public FreeColServer(boolean publicServer, boolean singleplayer, int port, String name) throws IOException, NoRouteToServerException {
         this.publicServer = publicServer;
         this.singleplayer = singleplayer;
         this.port = port;
@@ -185,7 +189,7 @@ public final class FreeColServer {
      * @throws FreeColException if the savegame could not be loaded.
      */
     public FreeColServer(File file, boolean publicServer, boolean singleplayer, int port, String name)
-            throws IOException, FreeColException {
+            throws IOException, FreeColException, NoRouteToServerException {
         this.publicServer = publicServer;
         this.singleplayer = singleplayer;
         this.port = port;
@@ -232,7 +236,9 @@ public final class FreeColServer {
         Timer t = new Timer(true);
         t.scheduleAtFixedRate(new TimerTask() {
             public void run() {
-                updateMetaServer();
+                try {
+                    updateMetaServer();
+                } catch (NoRouteToServerException e) {}
             }
         }, META_SERVER_UPDATE_INTERVAL, META_SERVER_UPDATE_INTERVAL);
     }
@@ -278,7 +284,7 @@ public final class FreeColServer {
      * Sends information about this server to the meta-server. The information
      * is only sent if <code>public == true</code>.
      */
-    public void updateMetaServer() {
+    public void updateMetaServer() throws NoRouteToServerException {
         updateMetaServer(false);
     }
 
@@ -305,9 +311,11 @@ public final class FreeColServer {
      * is only sent if <code>public == true</code>.
      * 
      * @param firstTime Should be set to <i>true></i> when calling this method
-     *            for the first time.
+     *      for the first time.
+     * @throws NoRouteToServerException if the meta-server cannot connect to
+     *      this server.
      */
-    public void updateMetaServer(boolean firstTime) {
+    public void updateMetaServer(boolean firstTime) throws NoRouteToServerException {
         if (!publicServer) {
             return;
         }
@@ -338,7 +346,10 @@ public final class FreeColServer {
             element.setAttribute("isGameStarted", Boolean.toString(gameState != STARTING_GAME));
             element.setAttribute("version", FreeCol.getVersion());
             element.setAttribute("gameState", Integer.toString(getGameState()));
-            mc.send(element);
+            Element reply = mc.ask(element);
+            if (reply != null && reply.getTagName().equals("noRouteToServer")) {
+                throw new NoRouteToServerException();
+            }
         } catch (IOException e) {
             logger.warning("Network error while communicating with the meta-server.");
             return;

@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.Iterator;
 import java.util.Vector;
 import java.util.logging.Logger;
+
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.ColonyTile;
 import net.sf.freecol.common.model.Europe;
@@ -30,9 +31,11 @@ import net.sf.freecol.common.model.Map.Position;
 import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.networking.Message;
 import net.sf.freecol.common.networking.NetworkConstants;
+import net.sf.freecol.common.networking.NoRouteToServerException;
 import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.ai.AIPlayer;
 import net.sf.freecol.server.model.ServerPlayer;
+
 import org.w3c.dom.Element;
 
 /**
@@ -2412,7 +2415,10 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
                 && isHumanPlayersLeft()) {
             getFreeColServer().getInGameController().endTurn(player);
         }
-        getFreeColServer().updateMetaServer();
+        try {
+            getFreeColServer().updateMetaServer();
+        } catch (NoRouteToServerException e) {}
+        
         return null;
     }
 

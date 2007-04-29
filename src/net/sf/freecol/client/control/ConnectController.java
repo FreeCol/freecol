@@ -30,6 +30,7 @@ import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.networking.Message;
+import net.sf.freecol.common.networking.NoRouteToServerException;
 import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.generator.MapGeneratorOptions;
 
@@ -86,8 +87,10 @@ public final class ConnectController {
         try {
             FreeColServer freeColServer = new FreeColServer(publicServer, false, port, null);
             freeColClient.setFreeColServer(freeColServer);
-        }
-        catch (IOException e) {
+        } catch (NoRouteToServerException e) {
+            freeColClient.getCanvas().errorMessage("server.noRouteToServer");
+            return;
+        } catch (IOException e) {
             freeColClient.getCanvas().errorMessage("server.couldNotStart");
             return;
         }
@@ -120,8 +123,10 @@ public final class ConnectController {
         try {
             FreeColServer freeColServer = new FreeColServer(false, true, port, null);
             freeColClient.setFreeColServer(freeColServer);
-        }
-        catch (IOException e) {
+        } catch (NoRouteToServerException e) {
+            logger.warning("Illegal state: An exception occured that can only appear in public multiplayer games.");
+            return;
+        } catch (IOException e) {
             freeColClient.getCanvas().errorMessage("server.couldNotStart");
             return;
         }
@@ -386,6 +391,18 @@ public final class ConnectController {
                             canvas.closeStatusPanel();
                         }
                     } );                    
+                } catch (NoRouteToServerException e) {
+                    final FreeColServer theFreeColServer = freeColServer;
+                    SwingUtilities.invokeLater(new Runnable() {
+                        public void run() {
+                            if (theFreeColServer != null) {
+                                theFreeColServer.getServer().shutdown();
+                            }
+                            freeColClient.getCanvas().closeMainPanel();
+                            freeColClient.getCanvas().showMainPanel();
+                        }
+                    });
+                    SwingUtilities.invokeLater( new ErrorJob("server.noRouteToServer") );
                 } catch (FileNotFoundException e) {                    
                     final FreeColServer theFreeColServer = freeColServer;
                     SwingUtilities.invokeLater(new Runnable() {

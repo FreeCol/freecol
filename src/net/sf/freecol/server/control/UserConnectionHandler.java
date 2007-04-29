@@ -14,6 +14,7 @@ import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.networking.Message;
 import net.sf.freecol.common.networking.MessageHandler;
+import net.sf.freecol.common.networking.NoRouteToServerException;
 import net.sf.freecol.common.networking.StreamedMessageHandler;
 import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.model.ServerPlayer;
@@ -180,7 +181,9 @@ public final class UserConnectionHandler implements MessageHandler, StreamedMess
 
             connection.setMessageHandler(freeColServer.getInGameInputHandler());
 
-            freeColServer.updateMetaServer();
+            try {
+                freeColServer.updateMetaServer();
+            } catch (NoRouteToServerException e) {}
 
             // Make the reply:
             try {
@@ -239,7 +242,10 @@ public final class UserConnectionHandler implements MessageHandler, StreamedMess
 
         connection.setMessageHandler(freeColServer.getPreGameInputHandler());
 
-        freeColServer.updateMetaServer();
+        try {
+            freeColServer.updateMetaServer();
+        } catch (NoRouteToServerException e) {}
+        
         // Make the reply:
         try {
             out.writeStartElement("loginConfirmed");

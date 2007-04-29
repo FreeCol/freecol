@@ -4,7 +4,9 @@ import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.InetSocketAddress;
 import java.net.Socket;
+import java.net.SocketAddress;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -38,6 +40,8 @@ public class Connection {
 
     public static final String REVISION = "$Revision$";
 
+    private static final int TIMEOUT = 5000;
+    
     private final OutputStream out;
 
     private final InputStream in;
@@ -79,7 +83,7 @@ public class Connection {
      * @throws IOException
      */
     public Connection(String host, int port, MessageHandler messageHandler) throws IOException {
-        this(new Socket(host, port), messageHandler);
+        this(createSocket(host, port), messageHandler);
     }
 
     /**
@@ -94,7 +98,7 @@ public class Connection {
     public Connection(Socket socket, MessageHandler messageHandler) throws IOException {
         this.messageHandler = messageHandler;
         this.socket = socket;
-
+        
         out = socket.getOutputStream();
         in = socket.getInputStream();
 
@@ -113,6 +117,14 @@ public class Connection {
         thread.start();
     }
 
+    private static Socket createSocket(String host, int port) throws IOException {
+        Socket socket = new Socket();
+        SocketAddress addr = new InetSocketAddress(host, port);
+        socket.connect(addr, TIMEOUT);
+        
+        return socket;
+    }
+    
     /**
      * Sends a "disconnect"-message and closes this connection.
      * 

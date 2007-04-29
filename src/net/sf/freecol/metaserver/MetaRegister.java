@@ -2,9 +2,11 @@
 package net.sf.freecol.metaserver;
 
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.logging.Logger;
 
+import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.networking.Message;
 import net.sf.freecol.server.FreeColServer;
 
@@ -91,9 +93,26 @@ public final class MetaRegister {
     * @param gameState The current state of the game.
     */
     public synchronized void addServer(String name, String address, int port, int slotsAvailable,
-                int currentlyPlaying, boolean isGameStarted, String version, int gameState) {
+                int currentlyPlaying, boolean isGameStarted, String version, int gameState)
+                throws IOException {
         MetaItem mi = getItem(address, port);
         if (mi == null) {
+            // Check connection before adding the server:
+            Connection mc = null;
+            try {                
+                mc = new Connection(address, port, null);
+                Element element = Message.createNewRootElement("disconnect");
+                mc.send(element);
+            } catch (IOException e) {
+                logger.info("Server rejected (no route to destination):" + address + ":" + port);
+                throw e;
+            } finally {
+                try {
+                    if (mc != null) {
+                        mc.close();
+                    }
+                } catch (IOException e) {}
+            }
             items.add(new MetaItem(name, address, port, slotsAvailable, currentlyPlaying, isGameStarted, version, gameState));
             logger.info("Server added:" + address + ":" + port);
         } else {
@@ -115,7 +134,8 @@ public final class MetaRegister {
     * @param gameState The current state of the game.
     */
     public synchronized void updateServer(String name, String address, int port, int slotsAvailable,
-            int currentlyPlaying, boolean isGameStarted, String version, int gameState) {
+            int currentlyPlaying, boolean isGameStarted, String version, int gameState)
+            throws IOException {
         MetaItem mi = getItem(address, port);
         if (mi == null) {
             addServer(name, address, port, slotsAvailable, currentlyPlaying, isGameStarted, version, gameState);

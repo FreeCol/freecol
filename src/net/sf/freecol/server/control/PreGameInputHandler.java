@@ -8,8 +8,10 @@ import java.util.logging.Logger;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.networking.Message;
+import net.sf.freecol.common.networking.NoRouteToServerException;
 import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.model.ServerPlayer;
+
 import org.w3c.dom.Element;
 
 /**
@@ -247,7 +249,10 @@ public final class PreGameInputHandler extends InputHandler {
         player.setConnected(false);
         getFreeColServer().getGame().removePlayer(player);
         getFreeColServer().getServer().sendToAll(logoutMessage, connection);
-        getFreeColServer().updateMetaServer();
+        try {
+            getFreeColServer().updateMetaServer();
+        } catch (NoRouteToServerException e) {}
+        
         return null;
     }
 }
