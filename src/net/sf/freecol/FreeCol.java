@@ -15,12 +15,14 @@ import javax.xml.stream.XMLStreamReader;
 
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.ImageLibrary;
+import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.client.gui.plaf.FreeColLookAndFeel;
 import net.sf.freecol.client.gui.sound.MusicLibrary;
 import net.sf.freecol.client.gui.sound.SfxLibrary;
 import net.sf.freecol.common.FreeColException;
 import net.sf.freecol.common.Specification;
 import net.sf.freecol.common.logging.DefaultHandler;
+import net.sf.freecol.common.networking.NoRouteToServerException;
 import net.sf.freecol.server.FreeColServer;
 
 
@@ -149,7 +151,13 @@ public final class FreeCol {
                         return;
                     }
                 } else {
-                    freeColServer = new FreeColServer(true, false, serverPort, serverName);
+                    try {
+                        freeColServer = new FreeColServer(true, false, serverPort, serverName);
+                    } catch (NoRouteToServerException e) {
+                        System.out.println(Messages.message("server.noRouteToServer"));
+                        System.exit(1);
+                        return;
+                    }
                 }
 
                 Runtime runtime = Runtime.getRuntime();
