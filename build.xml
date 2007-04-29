@@ -30,9 +30,23 @@
     <condition property="isOsUnixLike">
         <os family="unix" />
     </condition>
+
     <condition property="isOsWindows">
             <os family="windows" />
-    </condition>	
+    </condition>
+    <condition property="isOsMac">
+        <os family="mac" />
+    </condition>
+
+    <condition property="isNotMacOrWindows">
+        <not>
+            <or>
+                <isset property="isOsWindows" />
+                <isset property="isOsMac" />
+            </or>
+        </not>
+    </condition>
+
 
     <!-- TASK DEFINITIONS -->
     <taskdef name="jsmoothgen"
@@ -119,6 +133,17 @@
         />
     </target>
 
+    <target name="mydist" depends="mydistWindows,mydistMac,mydistJava"
+            description="Creates a distribution package for the current system." />
+    <target name="mydistWindows" if="isOsWindows">
+        <antcall target="winInstallerBundle"/>
+    </target>
+    <target name="mydistMac" if="isOsMac">
+        <antcall target="tarMacJavaBundle"/>
+    </target>
+    <target name="mydistJava" if="isNotMacOrWindows">
+        <antcall target="javaInstallerBundle"/>
+    </target>
 
     <!--
         Creates archives and installers for distribution and places these in the
