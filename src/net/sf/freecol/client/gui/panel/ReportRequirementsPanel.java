@@ -1,7 +1,9 @@
 package net.sf.freecol.client.gui.panel;
 
 import java.awt.Color;
+import java.awt.Cursor;
 import java.awt.GridLayout;
+import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
@@ -9,10 +11,15 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
+import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JTextArea;
+import javax.swing.JTextPane;
+import javax.swing.text.Style;
+import javax.swing.text.StyleConstants;
+import javax.swing.text.StyleContext;
+import javax.swing.text.StyledDocument;
 
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.i18n.Messages;
@@ -64,19 +71,16 @@ public final class ReportRequirementsPanel extends ReportPanel implements Action
         Collections.sort(colonies, getCanvas().getClient().getClientOptions().getColonyComparator());
 
         // Display Panel
-        reportPanel.removeAll();
+        //reportPanel.removeAll();
+        reportPanel.setLayout(new HIGLayout(new int[] {780}, new int[] {0}));
 
-        int widths[] = new int[] { 0, 12, 0 };
-        int heights[] = new int[colonies.size() * 2];
-        for (int index = 1; index < heights.length; index += 2) {
-            heights[index] = SEPARATOR;
-        }
+        //Create a text pane.
+        JTextPane textPane = new JTextPane();
+        textPane.setOpaque(false);
+	textPane.setEditable(false);
 
-        reportPanel.setLayout(new HIGLayout(widths, heights));
-
-        int row = 1;
-        int colonyColumn = 1;
-        int panelColumn = 3;
+        StyledDocument doc = textPane.getStyledDocument();
+        defineStyles(doc);
 
         unitCount = new int[colonies.size()][Unit.UNIT_COUNT];
         canTrain = new boolean[colonies.size()][Unit.UNIT_COUNT];
@@ -84,12 +88,10 @@ public final class ReportRequirementsPanel extends ReportPanel implements Action
         // check which colonies can train which units
         for (int index = 0; index < colonies.size(); index++) {
             Colony colony = colonies.get(index);
-            if (colony.getBuilding(Building.SCHOOLHOUSE).getLevel() != Building.NOT_BUILT) {
-                for (Unit unit : colony.getUnitList()) {
-                    unitCount[index][unit.getType()]++;
-                    if (colony.canTrain(unit)) {
-                        canTrain[index][unit.getType()] = true;
-                    }
+            for (Unit unit : colony.getUnitList()) {
+                unitCount[index][unit.getType()]++;
+                if (colony.canTrain(unit)) {
+                    canTrain[index][unit.getType()] = true;
                 }
             }
         }
@@ -99,18 +101,13 @@ public final class ReportRequirementsPanel extends ReportPanel implements Action
             Colony colony = colonies.get(index);
 
             // colonyLabel
-            JButton colonyButton = new JButton(colony.getName());
-            colonyButton.setActionCommand(String.valueOf(index));
-            colonyButton.addActionListener(this);
-            reportPanel.add(colonyButton, higConst.rc(row, colonyColumn, "lrt"));
-
-            JTextArea textArea = new JTextArea();
-            textArea.setColumns(45);
-            textArea.setOpaque(false);
-            textArea.setLineWrap(true);
-            textArea.setWrapStyleWord(true);
-            textArea.setFocusable(false);
-            textArea.setFont(defaultFont);
+            try {
+                StyleConstants.setComponent(doc.getStyle("button"), createColonyButton(index, true));
+                doc.insertString(doc.getLength(), " ", doc.getStyle("button"));
+                doc.insertString(doc.getLength(), "\n\n", doc.getStyle("regular"));
+            } catch(Exception e) {
+                logger.warning(e.toString());
+            }
 
             boolean[] expertWarning = new boolean[Unit.UNIT_COUNT];
 
@@ -123,7 +120,7 @@ public final class ReportRequirementsPanel extends ReportPanel implements Action
                         int workType = unit.getWorkType();
                         int expert = ((ColonyTile) workLocation).getExpertForProducing(workType);
                         if (unitCount[index][expert] == 0 && !expertWarning[expert]) {
-                            addMessage(textArea, colony.getName(), Goods.getName(workType), expert);
+                            addMessage(doc, index, Goods.getName(workType), expert);
                             expertWarning[expert] = true;
                         }
                     }
@@ -133,7 +130,7 @@ public final class ReportRequirementsPanel extends ReportPanel implements Action
                     if (workType != -1 &&
                         ((Building) workLocation).getFirstUnit() != null && !expertWarning[expert]) {
                         if (unitCount[index][expert] == 0) {
-                            addMessage(textArea, colony.getName(), Goods.getName(workType), expert);
+                            addMessage(doc, index, Goods.getName(workType), expert);
                             expertWarning[expert] = true;
                         }
                     }
@@ -141,57 +138,106 @@ public final class ReportRequirementsPanel extends ReportPanel implements Action
             }
 
             // text area
-            reportPanel.add(textArea, higConst.rc(row, panelColumn));
-            row += 2;
+            reportPanel.add(textPane, higConst.rc(1, 1));
 
         }
     }
 
-    public void addMessage(JTextArea textArea, String colonyName, String goods, int workType) {
+    private void addMessage(StyledDocument doc, int colonyIndex, String goods, int workType) {
         String expertName = Unit.getName(workType);
-        textArea.append(Messages.message("report.requirements.noExpert",
-                                         new String[][] {
-                                             {"%colony%", colonyName},
-                                             {"%goods%", goods},
-                                             {"%unit%", expertName}}));
-        textArea.append("\n\n");
-
-        ArrayList<Colony> severalExperts = new ArrayList<Colony>();
-        ArrayList<Colony> canTrainExperts = new ArrayList<Colony>();
-        for (int index = 0; index < colonies.size(); index++) {
-            if (unitCount[index][workType] > 1) {
-                severalExperts.add(colonies.get(index));
-            }
-            if (canTrain[index][workType]) {
-                canTrainExperts.add(colonies.get(index));
-            }
-        }
-
-        if (!severalExperts.isEmpty()) {
-            textArea.append(Messages.message("report.requirements.severalExperts",
+        String colonyName = colonies.get(colonyIndex).getName();
+        String newMessage = Messages.message("report.requirements.noExpert",
                                              new String[][] {
-                                                 {"%unit%", expertName}}) + " ");
-            for (int index = 0; index < severalExperts.size() - 1; index++) {
-                textArea.append(severalExperts.get(index).getName() + ", ");
+                                                 {"%colony%", colonyName},
+                                                 {"%goods%", goods},
+                                                 {"%unit%", expertName}});
+
+        try {
+            doc.insertString(doc.getLength(), newMessage + "\n\n", doc.getStyle("regular"));
+
+            ArrayList<Colony> severalExperts = new ArrayList<Colony>();
+            ArrayList<Colony> canTrainExperts = new ArrayList<Colony>();
+            for (int index = 0; index < colonies.size(); index++) {
+                if (unitCount[index][workType] > 1) {
+                    severalExperts.add(colonies.get(index));
+                }
+                if (canTrain[index][workType]) {
+                    canTrainExperts.add(colonies.get(index));
+                }
             }
-            textArea.append(severalExperts.get(severalExperts.size() - 1).getName());
-            textArea.append("\n\n");
-        }
 
-
-
-        if (!canTrainExperts.isEmpty()) {
-            textArea.append(Messages.message("report.requirements.canTrainExperts",
-                                             new String[][] {
-                                                 {"%unit%", expertName}}) + " ");
-            for (int index = 0; index < canTrainExperts.size() - 1; index++) {
-                textArea.append(canTrainExperts.get(index).getName() + ", ");
+            if (!severalExperts.isEmpty()) {
+                doc.insertString(doc.getLength(),
+                                 (Messages.message("report.requirements.severalExperts",
+                                                   new String[][] {
+                                                       {"%unit%", expertName}}) + " "),
+                                 doc.getStyle("regular"));
+                for (int index = 0; index < severalExperts.size() - 1; index++) {
+                    StyleConstants.setComponent(doc.getStyle("button"), createColonyButton(index, false));
+                    doc.insertString(doc.getLength(), " ", doc.getStyle("button"));
+                    doc.insertString(doc.getLength(), ", ", doc.getStyle("regular"));
+                }
+                StyleConstants.setComponent(doc.getStyle("button"), 
+                                            createColonyButton(severalExperts.size() - 1, false));
+                doc.insertString(doc.getLength(), " ", doc.getStyle("button"));
+                doc.insertString(doc.getLength(), "\n\n", doc.getStyle("regular"));
             }
-            textArea.append(canTrainExperts.get(canTrainExperts.size() - 1).getName());
-            textArea.append("\n\n");
-        }
 
+            if (!canTrainExperts.isEmpty()) {
+                doc.insertString(doc.getLength(),
+                                 (Messages.message("report.requirements.canTrainExperts",
+                                                   new String[][] {
+                                                       {"%unit%", expertName}}) + " "),
+                                 doc.getStyle("regular"));
+                for (int index = 0; index < canTrainExperts.size() - 1; index++) {
+                    StyleConstants.setComponent(doc.getStyle("button"), createColonyButton(index, false));
+                    doc.insertString(doc.getLength(), " ", doc.getStyle("button"));
+                    doc.insertString(doc.getLength(), ", ", doc.getStyle("regular"));
+                }
+                StyleConstants.setComponent(doc.getStyle("button"), 
+                                            createColonyButton(canTrainExperts.size() - 1, false));
+                doc.insertString(doc.getLength(), " ", doc.getStyle("button"));
+                doc.insertString(doc.getLength(), "\n\n", doc.getStyle("regular"));
+            }
+  
+        } catch(Exception e) {
+            logger.warning(e.toString());
+        }
+        
     }
+
+
+    private JButton createColonyButton(int index, boolean headline) {
+
+        JButton button = new JButton(colonies.get(index).getName());
+        if (headline) {
+            button.setFont(smallHeaderFont);
+        }
+        button.setCursor(Cursor.getDefaultCursor());
+        button.setMargin(new Insets(0,0,0,0));
+        button.setOpaque(false);
+        button.setForeground(Color.BLUE);
+        //button.setBackground(Color.WHITE);
+        button.setAlignmentY(0.8f);
+        button.setBorder(BorderFactory.createEmptyBorder());
+        button.setActionCommand(String.valueOf(index));
+        button.addActionListener(this);
+        return button;
+    }
+
+    private void defineStyles(StyledDocument doc) {
+
+        //Initialize some styles.
+        Style def = StyleContext.getDefaultStyleContext().getStyle(StyleContext.DEFAULT_STYLE);
+	
+        Style regular = doc.addStyle("regular", def);
+        StyleConstants.setFontFamily(def, "Dialog");
+	StyleConstants.setFontSize(def, 12);
+
+        Style buttonStyle = doc.addStyle("button", regular);
+        StyleConstants.setForeground(buttonStyle, Color.BLUE);
+    }
+
 
     /**
      * This function analyses an event and calls the right methods to take care
