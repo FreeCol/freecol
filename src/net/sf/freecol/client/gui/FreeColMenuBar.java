@@ -222,7 +222,7 @@ public class FreeColMenuBar extends JMenuBar {
         menu.addSeparator();
 
         menu.add(getMenuItem(EuropeAction.ID));
-        menu.add(getMenuItem(TradeRouteAction.ID));
+        //menu.add(getMenuItem(TradeRouteAction.ID));
 
         add(menu);
     }
@@ -237,7 +237,7 @@ public class FreeColMenuBar extends JMenuBar {
         menu.add(getMenuItem(SentryAction.ID));
         menu.add(getMenuItem(FortifyAction.ID));
         menu.add(getMenuItem(GotoAction.ID));
-        menu.add(getMenuItem(AssignTradeRouteAction.ID));
+        //menu.add(getMenuItem(AssignTradeRouteAction.ID));
 
         menu.addSeparator();
 
