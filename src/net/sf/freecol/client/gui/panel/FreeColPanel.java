@@ -1,5 +1,6 @@
 package net.sf.freecol.client.gui.panel;
 
+import java.awt.Color;
 import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.Image;
@@ -61,6 +62,9 @@ public class FreeColPanel extends JPanel {
 
     // The margin to use for HIGLayout
     protected static final int margin = 3;
+
+    // The color to use for links
+    protected static final Color LINK_COLOR = new Color(122, 109, 82);
 
 
     /**

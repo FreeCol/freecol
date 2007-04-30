@@ -2,11 +2,14 @@ package net.sf.freecol.client.gui.panel;
 
 import java.awt.Color;
 import java.awt.GridLayout;
+import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Collections;
 import java.util.List;
 
+import javax.swing.border.Border;
+import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -33,7 +36,7 @@ public final class ReportColonyPanel extends ReportPanel implements ActionListen
     private List<Colony> colonies;
 
     private final int ROWS_PER_COLONY = 4;
-    private final int SEPARATOR = 24;
+
     /**
      * The constructor that will add the items to this panel.
      * 
@@ -52,81 +55,115 @@ public final class ReportColonyPanel extends ReportPanel implements ActionListen
         colonies = player.getColonies();
 
         // Display Panel
-        reportPanel.removeAll();
-
-        int widths[] = new int[] { 0, 12, 0 };
-        int heights[] = new int[colonies.size() * ROWS_PER_COLONY];
-        for (int i = 1; i < colonies.size(); i++) {
-            heights[i * ROWS_PER_COLONY - 1] = SEPARATOR;
+        
+        int widths[] = new int[] {0};
+        int heights[] = new int[colonies.size() * 2 - 1];
+        for (int i = 1; i < heights.length; i += 2) {
+            heights[i] = 12;
         }
-
         reportPanel.setLayout(new HIGLayout(widths, heights));
 
-        int row = 1;
-        int colonyColumn = 1;
-        int panelColumn = 3;
-        int colonyIndex = 0;
-        Collections.sort(colonies, getCanvas().getClient().getClientOptions().getColonyComparator());
-        for(Colony colony : colonies) {
-
-            // colonyLabel
-            JButton colonyButton = new JButton(colony.getName());
-            colonyButton.setActionCommand(String.valueOf(colonyIndex));
-            colonyButton.addActionListener(this);
-            reportPanel.add(colonyButton, higConst.rc(row, colonyColumn, "lrt"));
-
-            // units
-            JPanel unitPanel = new JPanel(new GridLayout(0, 10));
-            unitPanel.setOpaque(false);
-            List<Unit> unitList = colony.getUnitList();
-            Collections.sort(unitList, getUnitTypeComparator());
-            for(Unit unit : unitList) {
-                UnitLabel unitLabel = new UnitLabel(unit, getCanvas(), true, true);
-                unitPanel.add(unitLabel);
-            }
-            reportPanel.add(unitPanel, higConst.rc(row, panelColumn));
-            row++;
-
-            // production
-            JPanel goodsPanel = new JPanel(new GridLayout(0, 10));
-            goodsPanel.setOpaque(false);
-            for (int goodsType = 0; goodsType < Goods.NUMBER_OF_ALL_TYPES; goodsType++) {
-                int newValue = colony.getProductionOf(goodsType);
-                if (newValue > 0) {
-                    Goods goods = new Goods(colony.getGame(), colony, goodsType, newValue);
-                    // goods.setAmount(newValue);
-                    GoodsLabel goodsLabel = new GoodsLabel(goods, getCanvas());
-                    goodsLabel.setHorizontalAlignment(JLabel.LEADING);
-                    goodsPanel.add(goodsLabel);
-                }
-            }
-            reportPanel.add(goodsPanel, higConst.rc(row, panelColumn));
-            row++;
-
-            // buildings
-            JPanel buildingPanel = new JPanel(new GridLayout(0, 4, 12, 0));
-            buildingPanel.setOpaque(false);
-            int currentType = colony.getCurrentlyBuilding();
-            for (int buildingType = 0; buildingType < Building.NUMBER_OF_TYPES; buildingType++) {
-                Building building = colony.getBuilding(buildingType);
-                if (building.getLevel() != Building.NOT_BUILT) {
-                    buildingPanel.add(new JLabel(building.getName()));
-                }
-                if (buildingType == currentType) {
-                    JLabel buildingLabel = new JLabel(building.getNextName());
-                    buildingLabel.setForeground(Color.GRAY);
-                    buildingPanel.add(buildingLabel);
-                }
-            }
-            if (currentType >= Colony.BUILDING_UNIT_ADDITION) {
-                JLabel unitLabel = new JLabel(Unit.getName(currentType - Colony.BUILDING_UNIT_ADDITION));
-                unitLabel.setForeground(Color.GRAY);
-                buildingPanel.add(unitLabel);
-            }
-            reportPanel.add(buildingPanel, higConst.rc(row, panelColumn));
-            row += 2;
-            colonyIndex++;
+        widths = new int[] {0};
+        heights = new int[2 * ROWS_PER_COLONY - 1];
+        for (int i = 1; i < heights.length; i += 2) {
+            heights[i] = 5;
         }
+
+        int panelColumn = 1;
+        int colonyRow = 1;
+
+        Border colonyBorder = BorderFactory.createCompoundBorder(BorderFactory.createLineBorder(LINK_COLOR),
+                                                                 BorderFactory.createEmptyBorder(5, 5, 5, 5));
+
+        Collections.sort(colonies, getCanvas().getClient().getClientOptions().getColonyComparator());
+        for (int colonyIndex = 0; colonyIndex < colonies.size(); colonyIndex++) {
+            int row = 1;
+
+            Colony colony = colonies.get(colonyIndex);
+            JPanel colonyPanel = new JPanel(new HIGLayout(widths, heights));
+            colonyPanel.setBorder(colonyBorder);
+
+            colonyPanel.add(createColonyButton(colonyIndex), higConst.rc(row, panelColumn, "l"));
+            row += 2;
+
+            colonyPanel.add(createUnitPanel(colony), higConst.rc(row, panelColumn));
+            row += 2;
+
+            colonyPanel.add(createProductionPanel(colony), higConst.rc(row, panelColumn));
+            row += 2;
+
+            colonyPanel.add(createBuildingPanel(colony), higConst.rc(row, panelColumn));
+
+            reportPanel.add(colonyPanel, higConst.rc(colonyRow, panelColumn));
+            colonyRow += 2;
+        }
+
+    }
+
+
+    private JPanel createUnitPanel(Colony colony) { 
+        JPanel unitPanel = new JPanel(new GridLayout(0, 12));
+        unitPanel.setOpaque(false);
+        List<Unit> unitList = colony.getUnitList();
+        Collections.sort(unitList, getUnitTypeComparator());
+        for(Unit unit : unitList) {
+            UnitLabel unitLabel = new UnitLabel(unit, getCanvas(), true, true);
+            unitPanel.add(unitLabel);
+        }
+        return unitPanel;
+    }
+
+    private JPanel createProductionPanel(Colony colony) {
+        JPanel goodsPanel = new JPanel(new GridLayout(0, 10));
+        goodsPanel.setOpaque(false);
+        for (int goodsType = 0; goodsType < Goods.NUMBER_OF_ALL_TYPES; goodsType++) {
+            int newValue = colony.getProductionOf(goodsType);
+            if (newValue > 0) {
+                Goods goods = new Goods(colony.getGame(), colony, goodsType, newValue);
+                // goods.setAmount(newValue);
+                GoodsLabel goodsLabel = new GoodsLabel(goods, getCanvas());
+                goodsLabel.setHorizontalAlignment(JLabel.LEADING);
+                goodsPanel.add(goodsLabel);
+            }
+        }
+        return goodsPanel;
+    }
+
+    private JPanel createBuildingPanel(Colony colony) {
+        JPanel buildingPanel = new JPanel(new GridLayout(0, 5, 12, 0));
+        buildingPanel.setOpaque(false);
+        int currentType = colony.getCurrentlyBuilding();
+        for (int buildingType = 0; buildingType < Building.NUMBER_OF_TYPES; buildingType++) {
+            Building building = colony.getBuilding(buildingType);
+            if (building.getLevel() != Building.NOT_BUILT) {
+                buildingPanel.add(new JLabel(building.getName()));
+            }
+            if (buildingType == currentType) {
+                JLabel buildingLabel = new JLabel(building.getNextName());
+                buildingLabel.setForeground(Color.GRAY);
+                buildingPanel.add(buildingLabel);
+            }
+        }
+        if (currentType >= Colony.BUILDING_UNIT_ADDITION) {
+            JLabel unitLabel = new JLabel(Unit.getName(currentType - Colony.BUILDING_UNIT_ADDITION));
+            unitLabel.setForeground(Color.GRAY);
+            buildingPanel.add(unitLabel);
+        }
+        return buildingPanel;
+    }
+
+    private JButton createColonyButton(int index) {
+
+        JButton button = new JButton(colonies.get(index).getName());
+        button.setFont(smallHeaderFont);
+        button.setMargin(new Insets(0,0,0,0));
+        button.setOpaque(false);
+        button.setForeground(LINK_COLOR);
+        button.setAlignmentY(0.8f);
+        button.setBorder(BorderFactory.createEmptyBorder());
+        button.setActionCommand(String.valueOf(index));
+        button.addActionListener(this);
+        return button;
     }
 
     /**

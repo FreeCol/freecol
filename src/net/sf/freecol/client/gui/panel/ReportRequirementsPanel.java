@@ -44,9 +44,6 @@ public final class ReportRequirementsPanel extends ReportPanel implements Action
 
     private List<Colony> colonies;
 
-    private final int ROWS_PER_COLONY = 4;
-    private final int SEPARATOR = 24;
-
     private int[][] unitCount;
     private boolean[][] canTrain; 
 
@@ -71,7 +68,6 @@ public final class ReportRequirementsPanel extends ReportPanel implements Action
         Collections.sort(colonies, getCanvas().getClient().getClientOptions().getColonyComparator());
 
         // Display Panel
-        //reportPanel.removeAll();
         reportPanel.setLayout(new HIGLayout(new int[] {780}, new int[] {0}));
 
         //Create a text pane.
@@ -110,9 +106,12 @@ public final class ReportRequirementsPanel extends ReportPanel implements Action
             }
 
             boolean[] expertWarning = new boolean[Unit.UNIT_COUNT];
+            boolean hasWarning = false;
 
+            // check if all unit requirements are met
             Iterator<WorkLocation> workLocationIterator = colony.getWorkLocationIterator();
             while (workLocationIterator.hasNext()) {
+                // check colony tiles
                 WorkLocation workLocation = workLocationIterator.next();
                 if (workLocation instanceof ColonyTile) {
                     Unit unit = ((ColonyTile) workLocation).getUnit();
@@ -120,20 +119,32 @@ public final class ReportRequirementsPanel extends ReportPanel implements Action
                         int workType = unit.getWorkType();
                         int expert = ((ColonyTile) workLocation).getExpertForProducing(workType);
                         if (unitCount[index][expert] == 0 && !expertWarning[expert]) {
-                            addMessage(doc, index, Goods.getName(workType), expert);
+                            addWarning(doc, index, Goods.getName(workType), expert);
                             expertWarning[expert] = true;
+                            hasWarning = true;
                         }
                     }
                 } else {
+                    // check buildings
                     int workType = ((Building) workLocation).getGoodsOutputType();
                     int expert = ((Building) workLocation).getExpertUnitType();
                     if (workType != -1 &&
                         ((Building) workLocation).getFirstUnit() != null && !expertWarning[expert]) {
                         if (unitCount[index][expert] == 0) {
-                            addMessage(doc, index, Goods.getName(workType), expert);
+                            addWarning(doc, index, Goods.getName(workType), expert);
                             expertWarning[expert] = true;
+                            hasWarning = true;
                         }
                     }
+                }
+            }
+
+            if (!hasWarning) {
+                try {
+                    doc.insertString(doc.getLength(), Messages.message("report.requirements.met") + "\n\n",
+                                     doc.getStyle("regular"));
+                } catch(Exception e) {
+                    logger.warning(e.toString());
                 }
             }
 
@@ -143,7 +154,7 @@ public final class ReportRequirementsPanel extends ReportPanel implements Action
         }
     }
 
-    private void addMessage(StyledDocument doc, int colonyIndex, String goods, int workType) {
+    private void addWarning(StyledDocument doc, int colonyIndex, String goods, int workType) {
         String expertName = Unit.getName(workType);
         String colonyName = colonies.get(colonyIndex).getName();
         String newMessage = Messages.message("report.requirements.noExpert",
@@ -213,11 +224,9 @@ public final class ReportRequirementsPanel extends ReportPanel implements Action
         if (headline) {
             button.setFont(smallHeaderFont);
         }
-        button.setCursor(Cursor.getDefaultCursor());
         button.setMargin(new Insets(0,0,0,0));
         button.setOpaque(false);
-        button.setForeground(Color.BLUE);
-        //button.setBackground(Color.WHITE);
+        button.setForeground(LINK_COLOR);
         button.setAlignmentY(0.8f);
         button.setBorder(BorderFactory.createEmptyBorder());
         button.setActionCommand(String.valueOf(index));
@@ -232,10 +241,11 @@ public final class ReportRequirementsPanel extends ReportPanel implements Action
 	
         Style regular = doc.addStyle("regular", def);
         StyleConstants.setFontFamily(def, "Dialog");
+        StyleConstants.setBold(def, true);
 	StyleConstants.setFontSize(def, 12);
 
         Style buttonStyle = doc.addStyle("button", regular);
-        StyleConstants.setForeground(buttonStyle, Color.BLUE);
+        StyleConstants.setForeground(buttonStyle, LINK_COLOR);
     }
 
 
