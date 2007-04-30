@@ -3,13 +3,14 @@ package net.sf.freecol.client.gui.panel;
 import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.Insets;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
+import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JLabel;
-import javax.swing.border.MatteBorder;
 
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.i18n.Messages;
@@ -35,6 +36,7 @@ public final class ReportTradePanel extends ReportPanel implements ActionListene
 
     /** How many additional rows are defined. */
     private static final int extraRows = 5; // labels and separators
+    private static final int extraBottomRows = 2;
 
     /** How many additional columns are defined. */
     private static final int extraColumns = 1; // labels
@@ -59,8 +61,6 @@ public final class ReportTradePanel extends ReportPanel implements ActionListene
     private final JLabel beforeTaxesLabel;
 
     private final JLabel afterTaxesLabel;
-
-    private final MatteBorder myBorder = new MatteBorder(0, 0, 1, 0, Color.BLACK);
 
     private List<Colony> colonies;
 
@@ -100,10 +100,11 @@ public final class ReportTradePanel extends ReportPanel implements ActionListene
         colonies = player.getColonies();
         Collections.sort(colonies, getCanvas().getClient().getClientOptions().getColonyComparator());
 
-        heights = new int[colonies.size() + extraRows];
+        heights = new int[colonies.size() + extraRows + extraBottomRows];
         int labelColumn = 1;
 
         heights[extraRows - 1] = marginWidth; // separator
+        heights[heights.length - 2] = marginWidth;
 
         reportPanel.setLayout(new HIGLayout(widths, heights));
 
@@ -141,18 +142,12 @@ public final class ReportTradePanel extends ReportPanel implements ActionListene
             reportPanel.add(currentLabel, higConst.rc(4, column));
         }
 
-        Iterator<Colony> colonyIterator = colonies.iterator();
-        int row = 6;
-        int colonyIndex = 0;
-        while (colonyIterator.hasNext()) {
-            Colony colony = colonyIterator.next();
-            JButton colonyButton = new JButton(colony.getName());
-            colonyButton.setActionCommand(String.valueOf(colonyIndex));
-            colonyButton.addActionListener(this);
-            if (colony.getBuilding(Building.CUSTOM_HOUSE).isBuilt()) {
-                colonyButton.setForeground(Color.BLUE);
-            }
-            reportPanel.add(colonyButton, higConst.rc(row, labelColumn));
+        int row = extraRows + 1;
+
+        for (int colonyIndex = 0; colonyIndex < colonies.size(); colonyIndex++) {
+            Colony colony = colonies.get(colonyIndex);
+            JButton colonyButton = createColonyButton(colonyIndex);
+            reportPanel.add(colonyButton, higConst.rc(row, labelColumn, "l"));
             int adjustment = colony.getWarehouseCapacity() / 100;
             int[] lowLevel = colony.getLowLevel();
             int[] highLevel = colony.getHighLevel();
@@ -161,21 +156,44 @@ public final class ReportTradePanel extends ReportPanel implements ActionListene
                 int column = columnsPerLabel * (goodsType + 1) + extraColumns;
                 int amount = colony.getGoodsCount(goodsType);
                 JLabel goodsLabel = new JLabel(String.valueOf(amount), JLabel.TRAILING);
+                if (colony.getExports(goodsType)) {
+                    goodsLabel.setText("*" + String.valueOf(amount));
+                }
+                /* too much color
                 if (amount < lowLevel[goodsType] * adjustment || amount > highLevel[goodsType] * adjustment) {
                     goodsLabel.setForeground(Color.RED);
-                } else if (amount > 200) {
+                    } else */
+                if (amount > 200) {
                     goodsLabel.setForeground(Color.BLUE);
                 } else if (amount > 100) {
                     goodsLabel.setForeground(Color.GREEN);
                 }
-                if (colony.getExports(goodsType)) {
-                    goodsLabel.setBorder(myBorder);
-                }
                 reportPanel.add(goodsLabel, higConst.rc(row, column));
             }
             row++;
-            colonyIndex++;
         }
+
+        row++;
+        reportPanel.add(new JLabel(Messages.message("report.trade.hasCustomHouse")),
+                        higConst.rcwh(row, 1, widths.length, 1));
+    }
+
+    private JButton createColonyButton(int index) {
+
+        JButton button = new JButton();
+        if (colonies.get(index).getBuilding(Building.CUSTOM_HOUSE).isBuilt()) {
+            button.setText(colonies.get(index).getName() + "*");
+        } else {
+            button.setText(colonies.get(index).getName());
+        }
+        button.setMargin(new Insets(0,0,0,0));
+        button.setOpaque(false);
+        button.setForeground(LINK_COLOR);
+        button.setAlignmentY(0.8f);
+        button.setBorder(BorderFactory.createEmptyBorder());
+        button.setActionCommand(String.valueOf(index));
+        button.addActionListener(this);
+        return button;
     }
 
     /**

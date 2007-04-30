@@ -51,6 +51,8 @@ public class FreeColPanel extends JPanel {
     protected static final Font defaultFont = new Font("Dialog", Font.BOLD, 12);
 
     // Fonts to use for report headers, etc.
+    protected static final Font headerFont = ((Font) UIManager.get("HeaderFont")).deriveFont(0, 12);
+
     protected static final Font smallHeaderFont = ((Font) UIManager.get("HeaderFont")).deriveFont(0, 24);
 
     protected static final Font mediumHeaderFont = ((Font) UIManager.get("HeaderFont")).deriveFont(0, 36);
