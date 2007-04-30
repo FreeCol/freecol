@@ -1,8 +1,9 @@
 package net.sf.freecol.client.gui.panel;
 
-import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.GridLayout;
+import java.awt.Insets;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -254,9 +255,14 @@ public final class ReportUnitPanel extends JPanel implements ActionListener {
         if (!(unitList == null && ignoreEmptyLocations)) {
             if (makeButton) {
                 JButton locationButton = new JButton(location);
+                locationButton.setMargin(new Insets(0,0,0,0));
+                locationButton.setOpaque(false);
+                locationButton.setForeground(FreeColPanel.LINK_COLOR);
+                locationButton.setAlignmentY(0.8f);
+                locationButton.setBorder(BorderFactory.createEmptyBorder());
                 locationButton.setActionCommand(String.valueOf(locationIndex));
                 locationButton.addActionListener(this);
-                add(locationButton, higConst.rc(row, labelColumn, "lr"));
+                add(locationButton, higConst.rc(row, labelColumn, "l"));
             } else {
                 JLabel locationLabel = new JLabel(location);
                 add(locationLabel, higConst.rc(row, labelColumn));
@@ -278,6 +284,7 @@ public final class ReportUnitPanel extends JPanel implements ActionListener {
         }
         locationIndex++;
     }
+
 
     /**
      * This function analyses an event and calls the right methods to take care

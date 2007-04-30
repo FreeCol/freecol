@@ -3,10 +3,12 @@ package net.sf.freecol.client.gui.panel;
 import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.Insets;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
+import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -71,6 +73,9 @@ public final class ReportProductionPanel extends JPanel implements ActionListene
         if (goodsType == Goods.BELLS) {
             widths = new int[] { 0, columnSeparatorWidth, 0, columnSeparatorWidth, 0, columnSeparatorWidth, 0,
                     columnSeparatorWidth, 0, columnSeparatorWidth, 0, columnSeparatorWidth, 0, columnSeparatorWidth, 0 };
+        } else if (goodsType == Goods.CROSSES) {
+            widths = new int[] { 0, columnSeparatorWidth, 0, columnSeparatorWidth, 0, columnSeparatorWidth, 0,
+                    columnSeparatorWidth, 0 };
         } else {
             widths = new int[] { 0, columnSeparatorWidth, 0, columnSeparatorWidth, 0 };
         }
@@ -88,8 +93,8 @@ public final class ReportProductionPanel extends JPanel implements ActionListene
         int colonyColumn = 1;
         int productionColumn = 3;
         int unitColumn = 5;
-        int pressColumn = 7;
-        int paperColumn = 9;
+        int level1Column = 7;
+        int level2Column = 9;
         int percentageColumn = 11;
         int solColumn = 13;
         int toryColumn = 15;
@@ -134,9 +139,9 @@ public final class ReportProductionPanel extends JPanel implements ActionListene
 
         if (goodsType == Goods.BELLS) {
 
-            add(new JLabel(Messages.message("colopedia.buildings.name.PrintingPress")), higConst.rc(1, pressColumn));
+            add(new JLabel(Messages.message("colopedia.buildings.name.PrintingPress")), higConst.rc(1, level1Column));
 
-            add(new JLabel(Messages.message("colopedia.buildings.name.Newspaper")), higConst.rc(1, paperColumn));
+            add(new JLabel(Messages.message("colopedia.buildings.name.Newspaper")), higConst.rc(1, level2Column));
 
             add(new JLabel(Messages.message("sonsOfLiberty") + "%"), higConst.rc(1, percentageColumn));
 
@@ -144,7 +149,14 @@ public final class ReportProductionPanel extends JPanel implements ActionListene
 
             add(new JLabel(Messages.message("tory")), higConst.rc(1, toryColumn));
 
+        } else if (goodsType == Goods.CROSSES) {
+
+            add(new JLabel(Messages.message("colopedia.buildings.name.Church")), higConst.rc(1, level1Column));
+
+            add(new JLabel(Messages.message("colopedia.buildings.name.Cathedral")), higConst.rc(1, level2Column));
+
         }
+            
 
         int row = 5;
         totalProduction = 0;
@@ -152,20 +164,20 @@ public final class ReportProductionPanel extends JPanel implements ActionListene
 
         int pressCount = 0;
         int paperCount = 0;
+        int churchCount = 0;
+        int cathedralCount = 0;
         int percentageCount = 0;
         int solCount = 0;
         int toryCount = 0;
-        int colonyIndex = 0;
+
         Collections.sort(colonies, parent.getClient().getClientOptions().getColonyComparator());
-        Iterator<Colony> colonyIterator = colonies.iterator();
-        while (colonyIterator.hasNext()) {
-            Colony colony = colonyIterator.next();
+
+        for (int colonyIndex = 0; colonyIndex < colonies.size(); colonyIndex++) {
+
+            Colony colony = colonies.get(colonyIndex);
 
             // colonyButton
-            JButton colonyButton = new JButton(colony.getName());
-            colonyButton.setActionCommand(String.valueOf(colonyIndex));
-            colonyButton.addActionListener(this);
-            add(colonyButton, higConst.rc(row, colonyColumn, "lr"));
+            add(createColonyButton(colonyIndex), higConst.rc(row, colonyColumn, "l"));
 
             // production
             Goods goods = new Goods(goodsType);
@@ -196,10 +208,10 @@ public final class ReportProductionPanel extends JPanel implements ActionListene
 
                 int level = colony.getBuilding(Building.PRINTING_PRESS).getLevel();
                 if (level == Building.HOUSE) {
-                    add(new JLabel("X"), higConst.rc(row, pressColumn));
+                    add(new JLabel("X"), higConst.rc(row, level1Column));
                     pressCount++;
                 } else if (level == Building.SHOP) {
-                    add(new JLabel("X"), higConst.rc(row, paperColumn));
+                    add(new JLabel("X"), higConst.rc(row, level2Column));
                     paperCount++;
                 }
 
@@ -214,7 +226,19 @@ public final class ReportProductionPanel extends JPanel implements ActionListene
                 add(new JLabel(String.valueOf(percentage), JLabel.TRAILING), higConst.rc(row, percentageColumn));
                 add(new JLabel(String.valueOf(sol), JLabel.TRAILING), higConst.rc(row, solColumn));
                 add(new JLabel(String.valueOf(tories), JLabel.TRAILING), higConst.rc(row, toryColumn));
+
+            } else if (goodsType == Goods.CROSSES) {
+
+                int level = colony.getBuilding(Building.CHURCH).getLevel();
+                if (level == Building.HOUSE) {
+                    add(new JLabel("X"), higConst.rc(row, level1Column));
+                    churchCount++;
+                } else if (level == Building.SHOP) {
+                    add(new JLabel("X"), higConst.rc(row, level2Column));
+                    cathedralCount++;
+                }
             }
+
 
             row++;
             colonyIndex++;
@@ -236,8 +260,8 @@ public final class ReportProductionPanel extends JPanel implements ActionListene
         add(new JLabel(String.valueOf(totalUnits)), higConst.rc(row, unitColumn));
 
         if (goodsType == Goods.BELLS) {
-            add(new JLabel(String.valueOf(pressCount), JLabel.TRAILING), higConst.rc(row, pressColumn));
-            add(new JLabel(String.valueOf(paperCount), JLabel.TRAILING), higConst.rc(row, paperColumn));
+            add(new JLabel(String.valueOf(pressCount), JLabel.TRAILING), higConst.rc(row, level1Column));
+            add(new JLabel(String.valueOf(paperCount), JLabel.TRAILING), higConst.rc(row, level2Column));
             int percentage = 0;
             if (numberOfColonies > 0) {
                 percentage = percentageCount / numberOfColonies;
@@ -245,8 +269,25 @@ public final class ReportProductionPanel extends JPanel implements ActionListene
             add(new JLabel(String.valueOf(percentage), JLabel.TRAILING), higConst.rc(row, percentageColumn));
             add(new JLabel(String.valueOf(solCount), JLabel.TRAILING), higConst.rc(row, solColumn));
             add(new JLabel(String.valueOf(toryCount), JLabel.TRAILING), higConst.rc(row, toryColumn));
+        } else if (goodsType == Goods.CROSSES) {
+            add(new JLabel(String.valueOf(churchCount), JLabel.TRAILING), higConst.rc(row, level1Column));
+            add(new JLabel(String.valueOf(cathedralCount), JLabel.TRAILING), higConst.rc(row, level2Column));
         }
+    }
 
+
+    private JButton createColonyButton(int index) {
+
+        JButton button = new JButton(colonies.get(index).getName());
+        //button.setFont(FreeColPanel.smallHeaderFont);
+        button.setMargin(new Insets(0,0,0,0));
+        button.setOpaque(false);
+        button.setForeground(FreeColPanel.LINK_COLOR);
+        button.setAlignmentY(0.8f);
+        button.setBorder(BorderFactory.createEmptyBorder());
+        button.setActionCommand(String.valueOf(index));
+        button.addActionListener(this);
+        return button;
     }
 
     /**
