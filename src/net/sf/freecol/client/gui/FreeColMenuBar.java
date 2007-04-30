@@ -60,12 +60,12 @@ import net.sf.freecol.client.gui.action.ReportNavalAction;
 import net.sf.freecol.client.gui.action.ReportReligionAction;
 import net.sf.freecol.client.gui.action.ReportRequirementsAction;
 import net.sf.freecol.client.gui.action.ReportTradeAction;
+import net.sf.freecol.client.gui.action.ReportTurnAction;
 import net.sf.freecol.client.gui.action.SaveAction;
 import net.sf.freecol.client.gui.action.SelectableAction;
 import net.sf.freecol.client.gui.action.SentryAction;
 import net.sf.freecol.client.gui.action.SkipUnitAction;
 import net.sf.freecol.client.gui.action.ToggleViewModeAction;
-import net.sf.freecol.client.gui.action.TradeRouteAction;
 import net.sf.freecol.client.gui.action.UnloadAction;
 import net.sf.freecol.client.gui.action.WaitAction;
 import net.sf.freecol.client.gui.i18n.Messages;
@@ -237,7 +237,7 @@ public class FreeColMenuBar extends JMenuBar {
         menu.add(getMenuItem(SentryAction.ID));
         menu.add(getMenuItem(FortifyAction.ID));
         menu.add(getMenuItem(GotoAction.ID));
-        //menu.add(getMenuItem(AssignTradeRouteAction.ID));
+        menu.add(getMenuItem(AssignTradeRouteAction.ID));
 
         menu.addSeparator();
 
@@ -278,7 +278,7 @@ public class FreeColMenuBar extends JMenuBar {
         menu.add(getMenuItem(ReportNavalAction.ID));
         menu.add(getMenuItem(ReportTradeAction.ID));
         menu.add(getMenuItem(ReportRequirementsAction.ID));
-        // menu.add(getMenuItem(ReportTurnAction.ID));
+        menu.add(getMenuItem(ReportTurnAction.ID));
 
         add(menu);
 
