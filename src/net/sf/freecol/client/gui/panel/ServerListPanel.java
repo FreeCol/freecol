@@ -22,6 +22,8 @@ import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.ServerInfo;
 
+import cz.autel.dmi.HIGLayout;
+
 /**
  * This panel is used to display the information received from the meta-server.
  */
@@ -99,15 +101,15 @@ public final class ServerListPanel extends FreeColPanel implements ActionListene
         tableScroll.getViewport().setOpaque(false);
         tableScroll.getColumnHeader().setOpaque(false);
 
-        connect.setSize(110, 20);
-        cancel.setSize(80, 20);
-        tableScroll.setSize(400, 350);
+        HIGLayout layout = new HIGLayout(new int[] {200, 200}, new int[] {350, 12, 0});
+        layout.setRowWeight(1, 1);
+        layout.setColumnWeight(1, 1);
+        layout.setColumnWeight(2, 1);
+        setLayout(layout);
 
-        connect.setLocation(15, 370);
-        cancel.setLocation(155, 370);
-        tableScroll.setLocation(10, 10);
-
-        setLayout(null);
+        add(tableScroll, higConst.rcwh(1, 1, 2, 1));
+        add(connect, higConst.rc(3, 1, "l"));
+        add(cancel, higConst.rc(3, 2, "r"));
 
         connect.setActionCommand(String.valueOf(CONNECT));
         cancel.setActionCommand(String.valueOf(CANCEL));
@@ -115,11 +117,7 @@ public final class ServerListPanel extends FreeColPanel implements ActionListene
         connect.addActionListener(this);
         cancel.addActionListener(this);
 
-        add(connect);
-        add(cancel);
-        add(tableScroll);
-
-        setSize(420, 400);
+        setSize(getPreferredSize());
     }
 
     public void requestFocus() {
