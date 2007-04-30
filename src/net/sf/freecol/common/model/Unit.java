@@ -3125,9 +3125,11 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
             }
 
             // 50% veteran bonus
-            factor = 1.5f;
-            result.add(Modifier.createMultiplicativeModifier("modifiers.veteranBonus", factor));
-            totalFactor *= factor;
+            if (attacker.getType() == Unit.VETERAN_SOLDIER) {
+                factor = 1.5f;
+                result.add(Modifier.createMultiplicativeModifier("modifiers.veteranBonus", factor));
+                totalFactor *= factor;
+            }
 
             // 50% attack bonus
             factor = 1.5f;
@@ -3137,7 +3139,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
             // movement penalty
             int movesLeft = attacker.getMovesLeft();
             if (movesLeft < 3) {
-                factor = movesLeft / 3;
+                factor = movesLeft / 3f;
                 result.add(Modifier.createMultiplicativeModifier("modifiers.movementPenalty", factor));
                 totalFactor *= factor;
             }
@@ -3150,10 +3152,8 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
                 /** Ambush bonus in the open = defender's defense
                  * bonus, if defender is REF, or attacker is Brave.
                  */
-                if ((attacker.getType() != Unit.BRAVE && 
-                     defender.getOwner().isREF()) ||
-                    (attacker.getType() == Unit.BRAVE && 
-                     !defender.getOwner().isREF())) {
+                if (attacker.getType() == Unit.BRAVE
+                        || defender.getOwner().isREF()) {
                     // TODO: terrain defense bonus is not cumulative, probably not ambush either!
 
                     // A bonus of 50 means base strength plus 50% of base
@@ -3163,18 +3163,23 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
                     totalFactor *= factor;
                 }
 
-                // REF bombardment bonus
-                if (attacker.getOwner().isREF()) {
-                    factor = 1.5f;
-                    result.add(Modifier.createMultiplicativeModifier("modifiers.REFbonus", factor));
-                    totalFactor *= factor;
-                }
-
                 // 75% Artillery in the open penalty
                 if (attacker.getType() == Unit.ARTILLERY ||
                     attacker.getType() == Unit.DAMAGED_ARTILLERY) {
                     factor = .25f;
                     result.add(Modifier.createMultiplicativeModifier("modifiers.artilleryPenalty", factor));
+                    totalFactor *= factor;
+                }
+            }
+            
+            // Attacking a settlement
+            if (defender != null &&
+                    defender.getTile() != null &&
+                    defender.getTile().getSettlement() != null) {
+                // REF bombardment bonus
+                if (attacker.getOwner().isREF()) {
+                    factor = 1.5f;
+                    result.add(Modifier.createMultiplicativeModifier("modifiers.REFbonus", factor));
                     totalFactor *= factor;
                 }
             }
@@ -3228,13 +3233,6 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
                 result.add(Modifier.createMultiplicativeModifier("modifiers.cargoPenalty", factor));
                 totalFactor *= factor;
             }
-            if (defender.getType() == Unit.PRIVATEER && 
-                defender.getOwner().hasFather(FoundingFather.FRANCIS_DRAKE)) {
-                // Drake grants 50% attack bonus
-                factor = 1.5f;
-                result.add(Modifier.createMultiplicativeModifier("modifiers.drake", factor));
-                totalFactor *= factor;
-            }
         } else {
             // Paul Revere makes an unarmed colonist in a settlement pick up
             // a stock-piled musket if attacked, so the bonus should be applied
@@ -3244,11 +3242,11 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
                 addend = 1;
                 result.add(Modifier.createAdditiveModifier("modifiers.armed", addend));
                 totalAddend += addend;
-            } else if (defender.getOwner().hasFather(FoundingFather.PAUL_REVERE) && 
-                defender.isColonist() &&
-                defender.getLocation() instanceof WorkLocation) {
+            } else if (defender.getOwner().hasFather(FoundingFather.PAUL_REVERE)
+                    && defender.isColonist()
+                    && defender.getLocation() instanceof WorkLocation) {
                 Colony colony = ((WorkLocation)defender.getLocation()).getColony();
-                if(colony.getGoodsCount(Goods.MUSKETS) >= 50) {
+                if (colony.getGoodsCount(Goods.MUSKETS) >= 50) {
                     addend = 1;
                     result.add(Modifier.createAdditiveModifier("modifiers.paulRevere", addend));
                     totalAddend += addend;
@@ -3260,6 +3258,13 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
                 result.add(Modifier.createAdditiveModifier("modifiers.mounted", addend));
                 totalAddend += addend;
             }
+            
+            //  50% veteran bonus
+            if (defender.getType() == Unit.VETERAN_SOLDIER) {
+                factor = 1.5f;
+                result.add(Modifier.createMultiplicativeModifier("modifiers.veteranBonus", factor));
+                totalFactor *= factor;
+            }
 
             // 50% fortify bonus
             if (defender.getState() == Unit.FORTIFIED) {
@@ -3268,8 +3273,8 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
                 totalFactor *= factor;
             }
 
-            if (defender.getTile() != null && 
-                defender.getTile().getSettlement() != null) {
+            if (defender.getTile() != null
+                    && defender.getTile().getSettlement() != null) {
                 Modifier settlementModifier = getSettlementModifier(attacker, defender.getTile().getSettlement());
                 result.add(settlementModifier);
                 totalFactor *= settlementModifier.factor;
@@ -3281,12 +3286,10 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
                     result.add(Modifier.createMultiplicativeModifier("modifiers.artilleryAgainstRaid", factor));
                     totalFactor *= factor;
                 }
-            } else {
+            } else if (defender.getTile() != null) {
                 // In the open
-                if (!((attacker.getType() != Unit.BRAVE && 
-                       defender.getOwner().isREF()) ||
-                      (attacker.getType() == Unit.BRAVE && 
-                       !defender.getOwner().isREF()))) {
+                if (attacker.getType() != Unit.BRAVE 
+                        && !defender.getOwner().isREF()) {
                     // Terrain defensive bonus.
                     // terrain defense bonus has different scale
                     factor = (defender.getTile().defenseBonus() + 100) / 100f;
