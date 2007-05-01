@@ -6,6 +6,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.util.logging.Logger;
 
+import javax.swing.KeyStroke;
+
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.panel.ReportTurnPanel;
 
@@ -28,7 +30,7 @@ public class ReportTurnAction extends MapboardAction {
      * @param freeColClient The main controller object for the client.
      */
     ReportTurnAction(FreeColClient freeColClient) {
-        super(freeColClient, "menuBar.report.turn", null, KeyEvent.VK_Z);        
+        super(freeColClient, "menuBar.report.turn", null, KeyStroke.getKeyStroke(KeyEvent.VK_F10, 0));
     }
     
     /**
@@ -54,6 +56,6 @@ public class ReportTurnAction extends MapboardAction {
      * @param e The <code>ActionEvent</code>.
      */
     public void actionPerformed(ActionEvent e) {
-        freeColClient.getCanvas().showReportPanel(ReportTurnPanel.class.getName());
+        freeColClient.getInGameController().displayModelMessages(true);
     }
 }

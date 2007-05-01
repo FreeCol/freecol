@@ -3546,9 +3546,8 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
         if (enemyUnit.isUndead()) {
             // this unit is captured, don't show old owner's messages to new
             // owner
-            Iterator<ModelMessage> i = getGame().getModelMessageIterator(getOwner());
-            while (i.hasNext()) {
-                i.next().setBeenDisplayed(true);
+            for (ModelMessage message : getGame().getModelMessages(getOwner())) {
+                message.setBeenDisplayed(true);
             }
             messageID = "model.unit.unitCaptured";
             type = ModelMessage.UNIT_LOST;
@@ -3595,9 +3594,8 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
             if (enemyUnit.getOwner().isEuropean()) {
                 // this unit is captured, don't show old owner's messages to new
                 // owner
-                Iterator<ModelMessage> i = getGame().getModelMessageIterator(getOwner());
-                while (i.hasNext()) {
-                    i.next().setBeenDisplayed(true);
+                for (ModelMessage message : getGame().getModelMessages(getOwner())) {
+                    message.setBeenDisplayed(true);
                 }
                 messageID = "model.unit.unitCaptured";
                 type = ModelMessage.UNIT_LOST;

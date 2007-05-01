@@ -261,6 +261,7 @@ public final class InGameController implements NetworkConstants {
                 }
             }
 
+            displayModelMessages(true);
             freeColClient.getGUI().setActiveUnit(null);
             nextActiveUnit();
         }
@@ -2922,14 +2923,22 @@ public final class InGameController implements NetworkConstants {
      * @see net.sf.freecol.common.model.ModelMessage ModelMessage
      */
     public void nextModelMessage() {
+        displayModelMessages(false);
+    }
+
+    public void displayModelMessages(boolean allMessages) {
+
         int thisTurn = freeColClient.getGame().getTurn().getNumber();
 
         final ArrayList<ModelMessage> messageList = new ArrayList<ModelMessage>();
+        ArrayList<ModelMessage> inputList;
+        if (allMessages) {
+            inputList = freeColClient.getGame().getModelMessages(freeColClient.getMyPlayer());
+        } else {
+            inputList = freeColClient.getGame().getNewModelMessages(freeColClient.getMyPlayer());
+        }
 
-        for (Iterator<ModelMessage> i = freeColClient.getGame().getModelMessageIterator(freeColClient.getMyPlayer()); i
-                .hasNext();) {
-
-            ModelMessage message = i.next();
+        for (ModelMessage message : inputList) {
             if (shouldAllowMessage(message)) {
                 if (message.getType() == ModelMessage.WAREHOUSE_CAPACITY) {
                     String key = message.getSource().getID();

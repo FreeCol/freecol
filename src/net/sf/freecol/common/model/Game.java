@@ -58,7 +58,7 @@ public class Game extends FreeColGameObject {
     private HashMap<String, FreeColGameObject> freeColGameObjects = new HashMap<String, FreeColGameObject>(10000);
 
     /** Contains all the messages for this round. */
-    private ArrayList<ModelMessage> modelMessages = new ArrayList<ModelMessage>();
+    private HashMap<Player, ArrayList<ModelMessage>> modelMessages = new HashMap<Player, ArrayList<ModelMessage>>();
 
     /**
      * The next availeble ID, that can be given to a new
@@ -745,21 +745,41 @@ public class Game extends FreeColGameObject {
      * @param modelMessage The <code>ModelMessage</code>.
      */
     public void addModelMessage(ModelMessage modelMessage) {
-        modelMessages.add(modelMessage);
+        // add new message to the beginning, so that new messages can
+        // be identified more efficiently
+        if (modelMessage.getOwner() == null) {
+            for (Player player : players) {
+                if (modelMessages.get(player) == null) {
+                    modelMessages.put(player, new ArrayList<ModelMessage>());
+                }
+                modelMessages.get(player).add(0, modelMessage);
+            }
+        } else {
+            Player player = modelMessage.getOwner();
+            if (modelMessages.get(player) == null) {
+                modelMessages.put(player, new ArrayList<ModelMessage>());
+            }
+            modelMessages.get(player).add(0, modelMessage);
+        }
     }
 
-    public Iterator<ModelMessage> getModelMessageIterator(Player player) {
+    public ArrayList<ModelMessage> getModelMessages(Player player) {
+        return modelMessages.get(player);
+    }
+
+    public ArrayList<ModelMessage> getNewModelMessages(Player player) {
+
         ArrayList<ModelMessage> out = new ArrayList<ModelMessage>();
 
-        Iterator<ModelMessage> i = modelMessages.iterator();
-        while (i.hasNext()) {
-            ModelMessage m = i.next();
-            if ((m.getOwner() == null || m.getOwner() == player) && !m.hasBeenDisplayed()) {
-                out.add(m);
+        for (ModelMessage message : modelMessages.get(player)) {
+            if (message.hasBeenDisplayed()) {
+                break;
+            } else {
+                out.add(message);
             }
         }
 
-        return out.iterator();
+        return out;
     }
 
     /**
@@ -768,11 +788,11 @@ public class Game extends FreeColGameObject {
      * @param player The <code>Player</code> to remove the messages for.
      */
     public void removeModelMessagesFor(Player player) {
-        Iterator<ModelMessage> i = modelMessages.iterator();
-        while (i.hasNext()) {
-            ModelMessage m = i.next();
-            if (m.hasBeenDisplayed()) {
-                i.remove();
+        Iterator<ModelMessage> messageIterator = modelMessages.get(player).iterator();
+        while (messageIterator.hasNext()) {
+            ModelMessage message = messageIterator.next();
+            if (message.hasBeenDisplayed()) {
+                messageIterator.remove();
             }
         }
     }
@@ -781,7 +801,9 @@ public class Game extends FreeColGameObject {
      * Removes all the model messages.
      */
     public void clearModelMessages() {
-        modelMessages.clear();
+        for (Player player : players) {
+            modelMessages.get(player).clear();
+        }
     }
 
     /**

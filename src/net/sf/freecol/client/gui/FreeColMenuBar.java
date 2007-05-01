@@ -277,8 +277,8 @@ public class FreeColMenuBar extends JMenuBar {
         menu.add(getMenuItem(ReportMilitaryAction.ID));
         menu.add(getMenuItem(ReportNavalAction.ID));
         menu.add(getMenuItem(ReportTradeAction.ID));
-        menu.add(getMenuItem(ReportRequirementsAction.ID));
         menu.add(getMenuItem(ReportTurnAction.ID));
+        menu.add(getMenuItem(ReportRequirementsAction.ID));
 
         add(menu);
 

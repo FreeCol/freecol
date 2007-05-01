@@ -54,9 +54,9 @@ public final class ReportTurnPanel extends ReportPanel implements ActionListener
      * @param parent The parent of this panel.
      * @param freeColClient The main controller object for the client.
      */
-    public ReportTurnPanel(Canvas parent, FreeColClient freeColClient) {
+    public ReportTurnPanel(Canvas parent) {
         super(parent, Messages.message("menuBar.report.turn"));
-        this.freeColClient = freeColClient;
+        this.freeColClient = parent.getClient();
     }
 
     /**

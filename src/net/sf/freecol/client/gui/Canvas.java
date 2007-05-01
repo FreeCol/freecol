@@ -523,7 +523,7 @@ public final class Canvas extends JDesktopPane {
      * @param messages A list of messages to display.
      */
     public void showTurnReport(ArrayList<ModelMessage> messages) {
-        final ReportTurnPanel reportTurnPanel = new ReportTurnPanel(this, freeColClient);
+        final ReportTurnPanel reportTurnPanel = new ReportTurnPanel(this);
         reportTurnPanel.initialize(messages);
         addAsFrame(reportTurnPanel);
         reportTurnPanel.requestFocus();
@@ -1323,7 +1323,7 @@ public final class Canvas extends JDesktopPane {
         } else if ("net.sf.freecol.client.gui.panel.ReportIndianPanel".equals(classname)) {
             reportPanel = new ReportIndianPanel(this);
         } else if ("net.sf.freecol.client.gui.panel.ReportTurnPanel".equals(classname)) {
-            reportPanel = new ReportTurnPanel(this, freeColClient);
+            reportPanel = new ReportTurnPanel(this);
         } else if ("net.sf.freecol.client.gui.panel.ReportContinentalCongressPanel".equals(classname)) {
             reportPanel = new ReportContinentalCongressPanel(this);
         } else if ("net.sf.freecol.client.gui.panel.ReportTradePanel".equals(classname)) {
