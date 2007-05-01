@@ -1765,16 +1765,22 @@ public final class InGameController implements NetworkConstants {
      * @param colony The colony with the custom house.
      * @param goods The goods for which to set the settings.
      */
-    public void setExports(Colony colony, int goodsType, boolean value) {
+    public void setGoodsLevels(Colony colony, int goodsType) {
         Client client = freeColClient.getClient();
+        boolean export = colony.getExports(goodsType);
+        int exportLevel = colony.getExportLevel()[goodsType];
+        int highLevel = colony.getHighLevel()[goodsType];
+        int lowLevel = colony.getLowLevel()[goodsType];
 
-        Element setExportsElement = Message.createNewRootElement("setExports");
-        setExportsElement.setAttribute("colony", colony.getID());
-        setExportsElement.setAttribute("goods", String.valueOf(goodsType));
-        setExportsElement.setAttribute("value", String.valueOf(value));
+        Element setGoodsLevelsElement = Message.createNewRootElement("setGoodsLevels");
+        setGoodsLevelsElement.setAttribute("colony", colony.getID());
+        setGoodsLevelsElement.setAttribute("goods", String.valueOf(goodsType));
+        setGoodsLevelsElement.setAttribute("export", String.valueOf(export));
+        setGoodsLevelsElement.setAttribute("exportLevel", String.valueOf(exportLevel));
+        setGoodsLevelsElement.setAttribute("highLevel", String.valueOf(highLevel));
+        setGoodsLevelsElement.setAttribute("lowLevel", String.valueOf(lowLevel));
 
-        colony.setExports(goodsType, value);
-        client.sendAndWait(setExportsElement);
+        client.sendAndWait(setGoodsLevelsElement);
     }
 
     /**

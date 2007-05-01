@@ -200,14 +200,21 @@ public final class WarehouseDialog extends FreeColDialog implements ActionListen
         }
 
         public void saveSettings() {
-            if (export.isSelected() != colony.getExports(goodsType)) {
-                parent.getClient().getInGameController().setExports(colony, goodsType, export.isSelected());
-                colony.setExports(goodsType, export.isSelected());
+            int lowLevelValue = ((SpinnerNumberModel) lowLevel.getModel()).getNumber().intValue();
+            int highLevelValue = ((SpinnerNumberModel) highLevel.getModel()).getNumber().intValue();
+            int exportLevelValue = ((SpinnerNumberModel) exportLevel.getModel()).getNumber().intValue();
+            boolean changed = (export.isSelected() != colony.getExports(goodsType))
+                                || (lowLevelValue != colony.getLowLevel()[goodsType])
+                                || (highLevelValue != colony.getHighLevel()[goodsType])
+                                || (exportLevelValue != colony.getExportLevel()[goodsType]);
+            
+            colony.setExports(goodsType, export.isSelected());
+            colony.getLowLevel()[goodsType] = lowLevelValue;
+            colony.getHighLevel()[goodsType] = highLevelValue;
+            colony.getExportLevel()[goodsType] = exportLevelValue;
+            if (changed) {
+                parent.getClient().getInGameController().setGoodsLevels(colony, goodsType);
             }
-            colony.getLowLevel()[goodsType] = ((SpinnerNumberModel) lowLevel.getModel()).getNumber().intValue();
-            colony.getHighLevel()[goodsType] = ((SpinnerNumberModel) highLevel.getModel()).getNumber().intValue();
-            colony.getExportLevel()[goodsType] = ((SpinnerNumberModel) exportLevel.getModel()).getNumber().intValue();
-
         }
 
     }

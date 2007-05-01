@@ -320,10 +320,10 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
                 return payArrears(connection, element);
             }
         });
-        register("setExports", new CurrentPlayerNetworkRequestHandler() {
+        register("setGoodsLevels", new CurrentPlayerNetworkRequestHandler() {
             @Override
             public Element handle(Player player, Connection connection, Element element) {
-                return setExports(connection, element);
+                return setGoodsLevels(connection, element);
             }
         });
         register("declareIndependence", new CurrentPlayerNetworkRequestHandler() {
@@ -1876,17 +1876,17 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
     }
 
     /**
-     * Handles a "setExports"-request from a client.
+     * Handles a "setGoodsLevels"-request from a client.
      * 
      * @param connection The connection the message came from.
-     * @param setExportsElement The element containing the request.
+     * @param setGoodsLevelsElement The element containing the request.
      */
-    private Element setExports(Connection connection, Element setExportsElement) {
+    private Element setGoodsLevels(Connection connection, Element setGoodsLevelsElement) {
         Game game = getFreeColServer().getGame();
         ServerPlayer player = getFreeColServer().getPlayer(connection);
-        Colony colony = (Colony) game.getFreeColGameObject(setExportsElement.getAttribute("colony"));
+        Colony colony = (Colony) game.getFreeColGameObject(setGoodsLevelsElement.getAttribute("colony"));
         if (colony == null) {
-            throw new IllegalArgumentException("Found no colony with ID " + setExportsElement.getAttribute("colony"));
+            throw new IllegalArgumentException("Found no colony with ID " + setGoodsLevelsElement.getAttribute("colony"));
         } else if (colony.getOwner() != player) {
             throw new IllegalStateException("Not your colony!");
             /**
@@ -1895,9 +1895,16 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
              * new IllegalStateException("Colony has no custom house!");
              */
         }
-        int goods = Integer.valueOf(setExportsElement.getAttribute("goods")).intValue();
-        boolean value = Boolean.valueOf(setExportsElement.getAttribute("value")).booleanValue();
-        colony.setExports(goods, value);
+        int goods = Integer.valueOf(setGoodsLevelsElement.getAttribute("goods")).intValue();
+        boolean export = Boolean.valueOf(setGoodsLevelsElement.getAttribute("export")).booleanValue();
+        int exportLevel = Integer.valueOf(setGoodsLevelsElement.getAttribute("exportLevel")).intValue();
+        int highLevel = Integer.valueOf(setGoodsLevelsElement.getAttribute("highLevel")).intValue();
+        int lowLevel = Integer.valueOf(setGoodsLevelsElement.getAttribute("lowLevel")).intValue();
+
+        colony.setExports(goods, export);
+        colony.getExportLevel()[goods] = exportLevel;
+        colony.getHighLevel()[goods] = highLevel;
+        colony.getLowLevel()[goods] = lowLevel;
         return null;
     }
 
