@@ -773,6 +773,10 @@ public final class Colony extends Settlement implements Location, Nameable {
         return getBuilding(Building.SCHOOLHOUSE).canAddAsTeacher(unit);
     }
 
+    public boolean canTrain(int unitType) {
+        return getBuilding(Building.SCHOOLHOUSE).canAddAsTeacher(unitType);
+    }
+
     /**
      * Gets the <code>Unit</code> that is currently defending this
      * <code>Colony</code>.

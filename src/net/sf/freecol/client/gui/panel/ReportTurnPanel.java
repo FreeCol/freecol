@@ -46,8 +46,6 @@ public final class ReportTurnPanel extends ReportPanel implements ActionListener
 
     private final FreeColClient freeColClient;
 
-    private HashMap<String, Colony> colonies;
-
     /**
      * The constructor that will add the items to this panel.
      * 
@@ -64,12 +62,7 @@ public final class ReportTurnPanel extends ReportPanel implements ActionListener
      */
     public void initialize(ArrayList<ModelMessage> messages) {
 
-        colonies = new HashMap<String, Colony>();
         Player player = getCanvas().getClient().getMyPlayer();
-
-        for (Colony colony : player.getColonies()) {
-            colonies.put(colony.getName(), colony);
-        }
 
         Comparator<ModelMessage> comparator = getCanvas().getClient().getClientOptions().getModelMessageComparator();
         if (comparator != null) {
@@ -316,7 +309,7 @@ public final class ReportTurnPanel extends ReportPanel implements ActionListener
         if (command.equals("-1")) {
             super.actionPerformed(event);
         } else {
-            getCanvas().showColonyPanel(colonies.get(command));
+            getCanvas().showColonyPanel(freeColClient.getMyPlayer().getColony(command));
         }
     }
 
