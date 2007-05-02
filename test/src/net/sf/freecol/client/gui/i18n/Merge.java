@@ -1,14 +1,11 @@
-
 package net.sf.freecol.client.gui.i18n;
-
 
 import java.util.List;
 
+public final class Merge {
 
-public final class Merge
-{
+    List<String> lineFromFile1;
 
-    List  lineFromFile1;
-    List  lineFromFile2;
+    List<String> lineFromFile2;
 
 }
