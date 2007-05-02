@@ -2645,6 +2645,9 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
         if (!canBuildColony()) {
             throw new IllegalStateException();
         }
+        if (!getTile().getPosition().equals(colony.getTile().getPosition())) {
+            throw new IllegalStateException("A Unit can only build a colony if on the same tile as the colony");
+        }
 
         getTile().setNationOwner(owner.getNation());
         getTile().setSettlement(colony);
@@ -2666,7 +2669,6 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
      *         Europe.
      */
     public Tile getTile() {
-
         return (location != null) ? location.getTile() : null;
     }
 
