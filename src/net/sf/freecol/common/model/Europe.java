@@ -256,12 +256,10 @@ public final class Europe extends FreeColGameObject implements Location,
      *            The <code>Locatable</code> to add to this Location.
      */
     public void add(Locatable locatable) {
-        if (locatable instanceof Unit) {
-            unitContainer.addUnit((Unit) locatable);
-        } else {
-            logger
-                    .warning("Tried to add an unrecognized 'Locatable' to a europe.");
+        if (!(locatable instanceof Unit)) {
+            throw new IllegalArgumentException("Only units can be added to Europe.");
         }
+        unitContainer.addUnit((Unit) locatable);
     }
 
     /**
