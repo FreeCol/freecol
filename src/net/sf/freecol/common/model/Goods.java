@@ -78,11 +78,12 @@ public class Goods implements Locatable, Ownable, Nameable {
      * Creates a standard <code>Goods</code>-instance given the place where
      * the goods .
      * 
-     * This constructor only asserts that the game and the location are
-     * non-null, and that the location can store goods.
+     * This constructor only asserts that the game and 
+     * that the location (if given) can store goods. The goods will not
+     * be added to the location (use Location.add for this).
      * 
      * @param game The <code>Game</code> in which this object belongs
-     * @param location The location of the goods,
+     * @param location The location of the goods (may be null)
      * @param type The type of the goods.
      * @param amount The amount of the goods.
      * 
@@ -92,12 +93,8 @@ public class Goods implements Locatable, Ownable, Nameable {
         if (game == null) {
             throw new NullPointerException();
         }
-
-        if (location == null) {
-            throw new NullPointerException();
-        }
         
-        if (location.getGoodsContainer() == null){
+        if (location != null && location.getGoodsContainer() == null){
             throw new IllegalArgumentException("This location cannot store goods");
         }
 
@@ -276,6 +273,11 @@ public class Goods implements Locatable, Ownable, Nameable {
     * @param location The new location of the goods,
     */
     public void setLocation(Location location) {
+        
+        if (location != null && location.getGoodsContainer() == null) {
+            throw new IllegalArgumentException("Goods have to be located in a GoodsContainers.");
+        }
+        
         try {
             if ((this.location != null)) {
                 this.location.remove(this);
@@ -287,9 +289,9 @@ public class Goods implements Locatable, Ownable, Nameable {
 
             this.location = location;
         } catch (IllegalStateException e) {
-            throw (IllegalStateException) new IllegalStateException("Could not move the goods of type: "
+            throw new IllegalStateException("Could not move the goods of type: "
                     + getName(getType()) + " (" + type + ") with amount: " + getAmount() + " from "
-                    + this.location + " to " + location).initCause(e);
+                    + this.location + " to " + location, e);
         }
     }
 
@@ -351,47 +353,59 @@ public class Goods implements Locatable, Ownable, Nameable {
     }
 
     /**
-    * Loads the cargo onto a carrier that is on the same tile.
-    *
-    * @param carrier The carrier this unit shall embark.
-    * @exception IllegalStateException If the carrier is on another tile than this unit.
-    */
+     * Loads the cargo onto a carrier that is on the same tile.
+     * 
+     * This method has the same effect as setLocation but ensures that: 1.) The
+     * given unit is at the same tile as the goods (including a check if
+     * transfering the goods in Europe makes sense) and 2.) that the source
+     * location of the goods is not null. checks that
+     * 
+     * @param carrier The carrier onto which to the load the goods.
+     * @exception IllegalStateException If the carrier is on another tile than
+     *                this unit, the location of the goods is null or both
+     *                carriers are not in port in Europe.
+     */
     public void loadOnto(Unit carrier) {
         if (getLocation() == null) {
             throw new IllegalStateException("The goods need to be taken from a place, but 'location == null'.");
-        } else if ((getLocation().getTile() == carrier.getTile())) {
-            if (carrier.getLocation() instanceof Europe && (carrier.getState() == Unit.TO_EUROPE || carrier.getState() == Unit.TO_AMERICA)) {
-                throw new IllegalStateException("Unloading cargo from a ship that is not in port in Europe.");
-            }
-
-            setLocation(carrier);
-        } else {
+        }
+        if ((getLocation().getTile() != carrier.getTile())) {
             throw new IllegalStateException("It is not allowed to load cargo onto a ship on another tile.");
         }
+        if (getLocation().getTile() == null){
+            // In Europe
+            Unit source = (Unit)getLocation();
+
+            // Make sure that both carriers are in a port in Europe.
+            if ((carrier.getLocation() instanceof Europe && (carrier.getState() == Unit.TO_EUROPE || carrier.getState() == Unit.TO_AMERICA)) ||
+                (source.getLocation() instanceof Europe && (source.getState() == Unit.TO_EUROPE || source.getState() == Unit.TO_AMERICA))){
+                throw new IllegalStateException("Loading cargo onto a ship that is not in port in Europe.");
+            }
+        }
+        setLocation(carrier);
     }
 
 
     /**
-    * Unload the goods from the ship. This method should only be invoked if the ship is in a harbour.
-    *
-    * @exception IllegalStateException If not in harbour.
-    * @exception ClassCastException If not located on a ship.
-    */
+     * Unload this Goods from a carrier into a colony.
+     * 
+     * This method has the same effect as setLocation but performs checks whether the 
+     * goods are on a carrier and whether the carrier is in a colony.
+     * 
+     * @exception IllegalStateException If the goods are not on a unit or the unit not in a colony.
+     */
     public void unload() {
-        Location l = ((Unit) getLocation()).getLocation();
-
-        logger.info("Unloading cargo from a ship.");
-        if (l instanceof Europe) {
-            if ((((Unit) getLocation()).getState() == Unit.TO_EUROPE || ((Unit) getLocation()).getState() == Unit.TO_AMERICA)) {
-                throw new IllegalStateException("Unloading cargo from a ship that is not in port in Europe.");
-            }
-
-            setLocation(l);
-        } else if (l.getTile().getSettlement() != null && l.getTile().getSettlement() instanceof Colony) {
-            setLocation(l.getTile().getSettlement());
-        } else {
-            throw new IllegalStateException("Goods may only leave a ship while in a harbour.");
+        if (!(getLocation() instanceof Unit)){
+            throw new IllegalStateException("Goods not on a unit");
         }
+
+        Unit carrier = (Unit) getLocation();
+        Location location = carrier.getLocation();
+
+        if (location instanceof Europe || location.getTile().getSettlement() == null || !(location.getTile().getSettlement() instanceof Colony)) {
+            throw new IllegalStateException("Goods may only be unloaded while the carrier is in a colony");
+        }
+        setLocation(location.getTile().getSettlement());
     }
 
 
