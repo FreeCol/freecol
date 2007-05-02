@@ -58,7 +58,8 @@ public class Game extends FreeColGameObject {
     private HashMap<String, FreeColGameObject> freeColGameObjects = new HashMap<String, FreeColGameObject>(10000);
 
     /** Contains all the messages for this round. */
-    private HashMap<Player, ArrayList<ModelMessage>> modelMessages = new HashMap<Player, ArrayList<ModelMessage>>();
+    private final HashMap<Player, ArrayList<ModelMessage>> modelMessages = 
+            new HashMap<Player, ArrayList<ModelMessage>>();
 
     /**
      * The next availeble ID, that can be given to a new
@@ -769,8 +770,14 @@ public class Game extends FreeColGameObject {
 
     public ArrayList<ModelMessage> getNewModelMessages(Player player) {
 
-        ArrayList<ModelMessage> out = new ArrayList<ModelMessage>();
-
+        ArrayList<ModelMessage> out = new ArrayList<ModelMessage>();    
+        
+        // TODO: Find out why this happens and remove the check.
+        // This should only be a temporary fix.
+        if (modelMessages.get(player) == null) {
+           return out; 
+        }
+            
         for (ModelMessage message : modelMessages.get(player)) {
             if (message.hasBeenDisplayed()) {
                 break;
