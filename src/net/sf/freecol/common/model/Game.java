@@ -795,6 +795,9 @@ public class Game extends FreeColGameObject {
      * @param player The <code>Player</code> to remove the messages for.
      */
     public void removeModelMessagesFor(Player player) {
+        if (modelMessages.get(player) == null) {
+            return;
+        }
         Iterator<ModelMessage> messageIterator = modelMessages.get(player).iterator();
         while (messageIterator.hasNext()) {
             ModelMessage message = messageIterator.next();
@@ -809,7 +812,9 @@ public class Game extends FreeColGameObject {
      */
     public void clearModelMessages() {
         for (Player player : players) {
-            modelMessages.get(player).clear();
+            if (modelMessages.get(player) != null) {
+                modelMessages.get(player).clear();
+            }
         }
     }
 
