@@ -2122,6 +2122,11 @@ public class Player extends FreeColGameObject implements Nameable {
      */
     public void newTurn() {
 
+        // apparently this information may be lost (bug #1709327)
+        if (hasFather(FoundingFather.FRANSISCO_DE_CORONADO)) {
+            exploreAllColonies();
+        }
+
         // settlements next
         for (Settlement settlement : getSettlements()) {
             logger.finest("Calling newTurn for settlement " + settlement.toString());
@@ -2172,22 +2177,7 @@ public class Player extends FreeColGameObject implements Nameable {
                     break;
 
                 case FoundingFather.FRANSISCO_DE_CORONADO:
-                    // explore all tiles surrounding colonies
-                    ArrayList<Tile> tiles = new ArrayList<Tile>();
-                    Iterator<Position> tileIterator = getGame().getMap().getWholeMapIterator();
-                    while (tileIterator.hasNext()) {
-                        Tile tile = getGame().getMap().getTile((tileIterator.next()));
-                        if (tile.getColony() != null) {
-                            tiles.add(tile);
-                            for (int i = 0; i < 8; i++) {
-                                Tile addTile = getGame().getMap().getNeighbourOrNull(i, tile);
-                                if (addTile != null) {
-                                    tiles.add(addTile);
-                                }
-                            }
-                        }
-                    }
-                    getGame().getModelController().exploreTiles(this, tiles);
+                    exploreAllColonies();
                     break;
 
                 case FoundingFather.LA_SALLE:
@@ -2288,6 +2278,26 @@ public class Player extends FreeColGameObject implements Nameable {
             oldSoL = newSoL;
         }
     }
+
+    private void exploreAllColonies() {
+        // explore all tiles surrounding colonies
+        ArrayList<Tile> tiles = new ArrayList<Tile>();
+        Iterator<Position> tileIterator = getGame().getMap().getWholeMapIterator();
+        while (tileIterator.hasNext()) {
+            Tile tile = getGame().getMap().getTile((tileIterator.next()));
+            if (tile.getColony() != null) {
+                tiles.add(tile);
+                for (int i = 0; i < 8; i++) {
+                    Tile addTile = getGame().getMap().getNeighbourOrNull(i, tile);
+                    if (addTile != null) {
+                        tiles.add(addTile);
+                    }
+                }
+            }
+        }
+        getGame().getModelController().exploreTiles(this, tiles);
+    }
+
 
     /**
      * This method writes an XML-representation of this object to the given
