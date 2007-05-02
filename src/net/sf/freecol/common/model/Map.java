@@ -1329,21 +1329,20 @@ public class Map extends FreeColGameObject {
         }
 
         /**
-         * Indicates whether some other object is "equal to" this one.
+         * Compares the other Position based on the coordinates.
          * 
-         * @param obj
-         *            the reference object with which to compare.
+         * @param other the reference object with which to compare.
          * @return true iff the coordinates match.
          */
         @Override
-        public boolean equals(Object obj) {
-            if (this == obj)
+        public boolean equals(Object other) {
+            if (this == other)
                 return true;
-            if (obj == null)
+            if (other == null)
                 return false;
-            if (getClass() != obj.getClass())
+            if (!(other instanceof Position))
                 return false;
-            return x == ((Position) obj).x && y == ((Position) obj).y;
+            return x == ((Position) other).x && y == ((Position) other).y;
         }
 
         /**
