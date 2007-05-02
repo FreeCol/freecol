@@ -2121,12 +2121,6 @@ public class Player extends FreeColGameObject implements Nameable {
      * Prepares this <code>Player</code> for a new turn.
      */
     public void newTurn() {
-
-        // apparently this information may be lost (bug #1709327)
-        if (hasFather(FoundingFather.FRANSISCO_DE_CORONADO)) {
-            exploreAllColonies();
-        }
-
         // settlements next
         for (Settlement settlement : getSettlements()) {
             logger.finest("Calling newTurn for settlement " + settlement.toString());

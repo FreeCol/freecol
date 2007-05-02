@@ -252,6 +252,7 @@ public class ServerModelController implements ModelController {
         Element updateElement = Message.createNewRootElement("update");
         for (int i = 0; i < tiles.size(); i++) {
             Tile t = tiles.get(i);
+            t.setExploredBy(player, true);
             updateElement.appendChild(t.toXMLElement(player, updateElement.getOwnerDocument()));
         }
 
