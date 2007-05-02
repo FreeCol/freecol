@@ -185,7 +185,7 @@
                skill="1"                                           abilities="found-colony,recruitable" />
     <unit-type name="model.unit.hardyPioneer"         offence="0"  defence="1"  price="1100" 
                skill="1"                                           abilities="found-colony,recruitable" />
-    <unit-type name="model.unit.veteranSoldier"       offence="0"  defence="2"  price="2000" 
+    <unit-type name="model.unit.veteranSoldier"       offence="0"  defence="1"  price="2000" 
                skill="2"                                           abilities="found-colony,recruitable" />
     <unit-type name="model.unit.jesuitMissionary"     offence="0"  defence="1"  price="1400" 
                skill="3"                                           abilities="found-colony,recruitable" />
