@@ -585,7 +585,7 @@
       <required-ability id="model.ability.buildFactory"/>
       <production-bonus goods-type="model.goods.muskets" factor="150"/>
     </building-type>
-    <building-type id="model.building.invisibleChurch" produces="model.goods.crosses" visible="false" upgrade="model.building.Church">
+    <building-type id="model.building.Chapel" produces="model.goods.crosses" upgrade="model.building.Church">
       <production-bonus goods-type="model.goods.crosses" bonus="1"/>
     </building-type>
     <building-type id="model.building.Church" produces="model.goods.crosses" workplaces="1" level="1" upgrade="model.building.Cathedral">
@@ -629,7 +629,7 @@
       <ability id="model.ability.abandonColony" value="false"/>
       <defence-bonus factor="400"/>
     </building-type>
-    <building-type id="model.building.invisibleWarehouse" visible="false" upgrade="model.building.Warehouse">
+    <building-type id="model.building.Depot" upgrade="model.building.Warehouse">
       <ability id="model.ability.storage" value="100"/>
     </building-type>
     <building-type id="model.building.Warehouse" upgrade="model.building.WarehouseExpansion">
