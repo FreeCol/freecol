@@ -20,6 +20,10 @@ public class MessagesTest extends TestCase {
             Messages.setResources(Messages.getMessageBundle(Locale.US));
         }
     }
+    
+    public void tearDown(){
+        Messages.setResources(Messages.getMessageBundle(Locale.US));
+    }
 
     public void testMessageString() {
 
