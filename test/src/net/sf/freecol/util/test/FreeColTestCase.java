@@ -161,17 +161,16 @@ public class FreeColTestCase extends TestCase {
 
         Map map = getTestMap(Tile.PLAINS, true);
         game.setMap(map);
-        map.getTile(5, 8).setExploredBy(dutch, true);
 
         Colony colony = new Colony(game, dutch, "New Amsterdam", map.getTile(5, 8));
 
-        Unit soldier = new Unit(game, map.getTile(6, 8), dutch, Unit.FREE_COLONIST, Unit.ACTIVE, true, false, 0, false);
+        Unit soldier = new Unit(game, map.getTile(5, 8), dutch, Unit.FREE_COLONIST, Unit.ACTIVE, true, false, 0, false);
 
         soldier.setWorkType(Goods.FOOD);
         soldier.buildColony(colony);
 
         for (int i = 1; i < numberOfSettlers; i++) {
-            Unit settler = new Unit(game, map.getTile(6, 8), dutch, Unit.FREE_COLONIST, Unit.ACTIVE, true, false, 0,
+            Unit settler = new Unit(game, map.getTile(5, 8), dutch, Unit.FREE_COLONIST, Unit.ACTIVE, true, false, 0,
                     false);
             settler.setLocation(colony);
         }
