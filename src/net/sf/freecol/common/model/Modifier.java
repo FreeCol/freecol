@@ -1,7 +1,6 @@
 
 package net.sf.freecol.common.model;
 
-import java.util.ArrayList;
 
 /**
  * The <code>Modifier</code> class encapsulates a bonus or penalty
