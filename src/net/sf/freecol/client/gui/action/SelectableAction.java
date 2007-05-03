@@ -64,8 +64,8 @@ public abstract class SelectableAction extends MapboardAction {
         super.update();
         
         final Game game = getFreeColClient().getGame();
-        final Player p = getFreeColClient().getMyPlayer();
-        if (game != null && p != null && !game.getNewModelMessages(p).isEmpty()) {
+        final Player player = getFreeColClient().getMyPlayer();
+        if (game != null && player != null && !player.getNewModelMessages().isEmpty()) {
             enabled = false;
         }
     }

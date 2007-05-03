@@ -201,6 +201,9 @@ public class Player extends FreeColGameObject implements Nameable {
     // Trade routes of this player
     private List<TradeRoute> tradeRoutes = new ArrayList<TradeRoute>();
 
+    // Model messages for this player
+    private List<ModelMessage> modelMessages = new ArrayList<ModelMessage>();
+
     // Temporary variables:
     protected boolean[][] canSeeTiles = null;
 
@@ -437,6 +440,66 @@ public class Player extends FreeColGameObject implements Nameable {
             }
             settlements.remove(s);
         }
+    }
+
+    /**
+     * Adds a <code>ModelMessage</code> for this player.
+     * 
+     * @param modelMessage The <code>ModelMessage</code>.
+     */
+    public void addModelMessage(ModelMessage modelMessage) {
+        // add new message to the beginning, so that new messages can
+        // be identified more efficiently
+        modelMessages.add(0, modelMessage);
+    }
+
+    /**
+     * Returns all ModelMessages for this player.
+     *
+     * @return all ModelMessages for this player.
+     */
+    public List<ModelMessage> getModelMessages() {
+        return modelMessages;
+    }
+
+    /**
+     * Returns all new ModelMessages for this player.
+     *
+     * @return all new ModelMessages for this player.
+     */
+    public List<ModelMessage> getNewModelMessages() {
+
+        ArrayList<ModelMessage> out = new ArrayList<ModelMessage>();    
+        
+        for (ModelMessage message : modelMessages) {
+            if (message.hasBeenDisplayed()) {
+                break;
+            } else {
+                out.add(message);
+            }
+        }
+
+        return out;
+    }
+
+    /**
+     * Removes all undisplayed model messages for this player.
+     */
+    public void removeModelMessages() {
+        Iterator<ModelMessage> messageIterator = modelMessages.iterator();
+        while (messageIterator.hasNext()) {
+            ModelMessage message = messageIterator.next();
+            if (message.hasBeenDisplayed()) {
+                messageIterator.remove();
+            }
+        }
+    }
+
+    /**
+     * Removes all the model messages for this player.
+     */
+    public void clearModelMessages() {
+        modelMessages.clear();
     }
 
     /**
@@ -1209,7 +1272,7 @@ public class Player extends FreeColGameObject implements Nameable {
      * Gets called when this player's turn has ended.
      */
     public void endTurn() {
-        getGame().removeModelMessagesFor(this);
+        removeModelMessages();
         resetCanSeeTiles();
     }
 

@@ -64,7 +64,7 @@ public final class InGameController extends Controller {
             throw new IllegalArgumentException("It is not " + player.getName() + "'s turn!");
         }
         
-        game.clearModelMessages();
+        player.clearModelMessages();
         freeColServer.getModelController().clearTaskRegister();
 
         Player winner = checkForWinner();

@@ -2937,11 +2937,11 @@ public final class InGameController implements NetworkConstants {
         int thisTurn = freeColClient.getGame().getTurn().getNumber();
 
         final ArrayList<ModelMessage> messageList = new ArrayList<ModelMessage>();
-        ArrayList<ModelMessage> inputList;
+        List<ModelMessage> inputList;
         if (allMessages) {
-            inputList = freeColClient.getGame().getModelMessages(freeColClient.getMyPlayer());
+            inputList = freeColClient.getMyPlayer().getModelMessages();
         } else {
-            inputList = freeColClient.getGame().getNewModelMessages(freeColClient.getMyPlayer());
+            inputList = freeColClient.getMyPlayer().getNewModelMessages();
         }
 
         for (ModelMessage message : inputList) {

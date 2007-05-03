@@ -6,6 +6,7 @@ import java.io.PrintWriter;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.lang.reflect.Method;
+import java.util.Iterator;
 import java.util.logging.Logger;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -541,7 +542,8 @@ abstract public class FreeColGameObject {
      * @see ModelMessage
      */    
     protected void addModelMessage(FreeColGameObject source, String messageID, String[][] data, int type) {
-        getGame().addModelMessage(new ModelMessage(source, messageID, data, type));
+        //getGame().addModelMessage(new ModelMessage(source, messageID, data, type));
+        addModelMessage(source, messageID, data, type, null);
     }
 
     /**
@@ -568,8 +570,20 @@ abstract public class FreeColGameObject {
      * @see Game#addModelMessage(ModelMessage)
      * @see ModelMessage
      */
-    protected void addModelMessage(FreeColGameObject source, String messageID, String[][] data, int type, Object display) {
-        getGame().addModelMessage(new ModelMessage(source, messageID, data, type, display));
+    protected void addModelMessage(FreeColGameObject source, String messageID, String[][] data,
+                                   int type, Object display) {
+        //getGame().addModelMessage(new ModelMessage(source, messageID, data, type, display));
+        ModelMessage message = new ModelMessage(source, messageID, data, type, display);
+        if (source != null && source instanceof Ownable) {
+            ((Ownable) source).getOwner().addModelMessage(message);
+        }
+        /*else {
+          Iterator<Player> playerIterator = getGame().getPlayerIterator();
+          while (playerIterator.hasNext()) {
+          playerIterator.next().addModelMessage(message);
+          }
+          }
+        */
     }
 
 

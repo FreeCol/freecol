@@ -932,7 +932,7 @@ public final class InGameInputHandler extends InputHandler {
         default:
             throw new IllegalStateException("No such rumour.");
         }
-        game.addModelMessage(m);
+        player.addModelMessage(m);
         return null;
     }
 
