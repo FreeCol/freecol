@@ -11,7 +11,7 @@ import javax.xml.stream.XMLStreamWriter;
 import org.w3c.dom.Element;
 
 /**
- * A trade route.
+ * A TradeRoute holds all information for a unit to follow along a trade route.
  */
 public class TradeRoute extends FreeColGameObject implements Cloneable, Ownable {
 
