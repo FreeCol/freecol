@@ -849,7 +849,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
             }
         } else {
             Colony targetColony = newTile.getColony();
-            // Paul Revere present? If so, arm it
+            // Paul Revere present? If so, arm the defender if MUSKETS and HORSES are available
             if (targetColony != null && targetColony.getOwner().hasFather(FoundingFather.PAUL_REVERE)) {
                 if (targetColony.getGoodsCount(Goods.MUSKETS) >= 50) {
                     defender.setArmed(true);
@@ -860,6 +860,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
             }
 
             result = generateAttackResult(unit, defender);
+            // TODO: Shouldn't the defender be unarmed again, afterwards? 
         }
         if (result == Unit.ATTACK_DONE_SETTLEMENT) {
             // 10% of their gold
