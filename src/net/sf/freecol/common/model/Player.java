@@ -2223,6 +2223,7 @@ public class Player extends FreeColGameObject implements Nameable {
 
                 case FoundingFather.THOMAS_PAINE:
                     // increase bell production by current tax rate
+                    // TODO: This probably needs to be updated each time the tax rate is increased.
                     bellsBonus += tax;
                     break;
 
