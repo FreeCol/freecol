@@ -412,13 +412,13 @@ public final class Tile extends FreeColGameObject implements Location, Nameable 
         while (unitIterator.hasNext()) {
             Unit nextUnit = unitIterator.next();
 
-            if (isLand() != nextUnit.isNaval()
+            if (this.isLand() != nextUnit.isNaval()
                     && (defender == null || nextUnit.getDefensePower(attacker) > defender.getDefensePower(attacker))) {
                 defender = nextUnit;
             }
         }
 
-        if (settlement != null) {
+        if (getSettlement() != null) {
             if (defender == null || defender.isColonist() && !defender.isArmed() && !defender.isMounted()) {
                 return settlement.getDefendingUnit(attacker);
             }
