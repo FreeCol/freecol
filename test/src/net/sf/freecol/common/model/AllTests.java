@@ -23,6 +23,7 @@ public class AllTests {
         suite.addTestSuite(GoodsTest.class);
         suite.addTestSuite(ColonyProductionTest.class);
         suite.addTestSuite(GameTest.class);
+        suite.addTestSuite(SchoolTest.class);
         //$JUnit-END$
         return suite;
     }
