@@ -1713,7 +1713,7 @@ public final class InGameController implements NetworkConstants {
             amount = Math.min(amount, 100 - carrier.getGoodsContainer().getGoodsCount(type) % 100);
         }
 
-        if (game.getMarket().getBidPrice(type, amount) > myPlayer.getGold()) {
+        if (myPlayer.getMarket().getBidPrice(type, amount) > myPlayer.getGold()) {
             canvas.errorMessage("notEnoughGold");
             return;
         }
@@ -1753,7 +1753,7 @@ public final class InGameController implements NetworkConstants {
         sellGoodsElement.appendChild(goods.toXMLElement(freeColClient.getMyPlayer(), sellGoodsElement
                 .getOwnerDocument()));
 
-        player.getGame().getMarket().sell(goods, player);
+        player.getMarket().sell(goods, player);
         freeColClient.getCanvas().updateGoldLabel();
 
         client.sendAndWait(sellGoodsElement);

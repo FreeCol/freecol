@@ -1639,10 +1639,13 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
      *         location.
      */
     private boolean canBeEquipped(int equipType, int amount) {
-        return ((getGoodsDumpLocation() != null && getGoodsDumpLocation().getGoodsCount(equipType) >= amount) || ((location instanceof Europe || location instanceof Unit
-                && ((Unit) location).getLocation() instanceof Europe)
-                && getOwner().getGold() >= getGame().getMarket().getBidPrice(equipType, amount) && getOwner().canTrade(
-                equipType)));
+        return ((getGoodsDumpLocation() != null &&
+                 getGoodsDumpLocation().getGoodsCount(equipType) >= amount) ||
+                ((location instanceof Europe ||
+                  location instanceof Unit
+                  && ((Unit) location).getLocation() instanceof Europe)
+                 && getOwner().getGold() >= getOwner().getMarket().getBidPrice(equipType, amount) &&
+                 getOwner().canTrade(equipType)));
     }
 
     /**
@@ -1724,7 +1727,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
                 getGoodsDumpLocation().removeGoods(Goods.MUSKETS, 50);
                 armed = true;
             } else if (isInEurope()) {
-                getGame().getMarket().buy(Goods.MUSKETS, 50, getOwner());
+                getOwner().getMarket().buy(Goods.MUSKETS, 50, getOwner());
                 armed = true;
             } else {
                 logger.warning("Attempting to arm a soldier outside of a colony or Europe!");
@@ -1735,7 +1738,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
             if (getGoodsDumpLocation() != null) {
                 getGoodsDumpLocation().addGoods(Goods.MUSKETS, 50);
             } else if (isInEurope()) {
-                getGame().getMarket().sell(Goods.MUSKETS, 50, getOwner());
+                getOwner().getMarket().sell(Goods.MUSKETS, 50, getOwner());
             } else {
                 throw new IllegalStateException();
             }
@@ -1795,7 +1798,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
                 getGoodsDumpLocation().removeGoods(Goods.HORSES, 50);
                 mounted = true;
             } else if (isInEurope()) {
-                getGame().getMarket().buy(Goods.HORSES, 50, getOwner());
+                getOwner().getMarket().buy(Goods.HORSES, 50, getOwner());
                 mounted = true;
             } else {
                 logger.warning("Attempting to mount a colonist outside of a colony or Europe!");
@@ -1806,7 +1809,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
             if (getGoodsDumpLocation() != null) {
                 getGoodsDumpLocation().addGoods(Goods.HORSES, 50);
             } else if (isInEurope()) {
-                getGame().getMarket().sell(Goods.HORSES, 50, getOwner());
+                getOwner().getMarket().sell(Goods.HORSES, 50, getOwner());
             }
         }
     }
@@ -1896,7 +1899,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
         }
 
         try {
-            getGame().getMarket().buy(goodsType, amount, getOwner());
+            getOwner().getMarket().buy(goodsType, amount, getOwner());
             goodsContainer.addGoods(goodsType, amount);
         } catch (IllegalStateException ise) {
             this.addModelMessage(this, "notEnoughGold", null, ModelMessage.DEFAULT);
@@ -1953,14 +1956,14 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
                 getGoodsDumpLocation().removeGoods(Goods.TOOLS, changeAmount);
                 this.numberOfTools = this.numberOfTools + changeAmount;
             } else if (isInEurope()) {
-                int maximumAmount = ((getOwner().getGold()) / (getGame().getMarket().costToBuy(Goods.TOOLS)));
+                int maximumAmount = ((getOwner().getGold()) / (getOwner().getMarket().costToBuy(Goods.TOOLS)));
                 if (maximumAmount < changeAmount)
                     changeAmount = maximumAmount;
                 if ((this.numberOfTools + changeAmount) % 20 > 0)
                     changeAmount -= (this.numberOfTools + changeAmount) % 20;
                 if (changeAmount <= 0)
                     return;
-                getGame().getMarket().buy(Goods.TOOLS, changeAmount, getOwner());
+                getOwner().getMarket().buy(Goods.TOOLS, changeAmount, getOwner());
                 this.numberOfTools = this.numberOfTools + changeAmount;
             } else {
                 logger.warning("Attempting to create a pioneer outside of a colony or Europe!");
@@ -1971,7 +1974,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
             if (getGoodsDumpLocation() != null) {
                 getGoodsDumpLocation().addGoods(Goods.TOOLS, -changeAmount);
             } else if (isInEurope()) {
-                getGame().getMarket().sell(Goods.TOOLS, -changeAmount, getOwner());
+                getOwner().getMarket().sell(Goods.TOOLS, -changeAmount, getOwner());
             }
         }
     }

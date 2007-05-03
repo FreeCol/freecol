@@ -204,7 +204,7 @@ public class WorkLocationPlan {
                 } else if (goodsType == Goods.CROSSES) {
                     return 10;
                 } else {
-                    return getGame().getMarket().getSalePrice(goodsType, 1);
+                    return workLocation.getColony().getOwner().getMarket().getSalePrice(goodsType, 1);
                 }
             }
         }

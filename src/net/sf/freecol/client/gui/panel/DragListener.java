@@ -154,7 +154,7 @@ public final class DragListener extends MouseAdapter {
                         } else {
                             if (tempUnit.getTile() == null) { // -> in Europe
                                 menuItem = new JMenuItem(Messages.message("arm") + " ("
-                                        + tempUnit.getGame().getMarket().getBidPrice(Goods.MUSKETS, 50) + " gold)",
+                                        + tempUnit.getOwner().getMarket().getBidPrice(Goods.MUSKETS, 50) + " gold)",
                                         unitLabel.getCanvas().getImageProvider().getGoodsImageIcon(
                                                 ImageLibrary.GOODS_MUSKETS));
                             } else {
@@ -174,7 +174,7 @@ public final class DragListener extends MouseAdapter {
                         } else {
                             if (tempUnit.getTile() == null) { // -> in Europe
                                 menuItem = new JMenuItem(Messages.message("mount") + " ("
-                                        + tempUnit.getGame().getMarket().getBidPrice(Goods.HORSES, 50) + " gold)",
+                                        + tempUnit.getOwner().getMarket().getBidPrice(Goods.HORSES, 50) + " gold)",
                                         unitLabel.getCanvas().getImageProvider().getGoodsImageIcon(
                                                 ImageLibrary.GOODS_HORSES));
                             } else {
@@ -194,7 +194,7 @@ public final class DragListener extends MouseAdapter {
                         } else {
                             if (tempUnit.getTile() == null) { // -> in Europe
                                 int amount = 100;
-                                int price = tempUnit.getGame().getMarket().getBidPrice(Goods.TOOLS, amount);
+                                int price = tempUnit.getOwner().getMarket().getBidPrice(Goods.TOOLS, amount);
                                 if (price <= tempUnit.getOwner().getGold()) {
                                     menuItem = new JMenuItem(Messages.message("equipWithTools") + " (" + price
                                             + " gold)", unitLabel.getCanvas().getImageProvider().getGoodsImageIcon(
@@ -202,7 +202,7 @@ public final class DragListener extends MouseAdapter {
                                 } else {
                                     while (price > tempUnit.getOwner().getGold()) {
                                         amount -= 20;
-                                        price = tempUnit.getGame().getMarket().getBidPrice(Goods.TOOLS, amount);
+                                        price = tempUnit.getOwner().getMarket().getBidPrice(Goods.TOOLS, amount);
                                     }
                                     menuItem = new JMenuItem(Messages.message("equipWith") + ' ' + amount + " "
                                             + Messages.message("model.goods.Tools") + " (" + price + " "

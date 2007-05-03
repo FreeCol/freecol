@@ -202,7 +202,7 @@ public final class PreGameController extends Controller {
         // Already done my the map generator:
         //game.setMap(map);
 
-        game.reinitialiseMarket(); // Do this here because game is restarting. -sjm
+        //game.reinitialiseMarket(); // Do this here because game is restarting. -sjm
 
         Iterator<Player> playerIterator = game.getPlayerIterator();
         while (playerIterator.hasNext()) {

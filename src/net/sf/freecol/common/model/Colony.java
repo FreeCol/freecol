@@ -1285,7 +1285,7 @@ public final class Colony extends Settlement implements Location, Nameable {
             toolsRemaining = Math.max(getBuilding(currentlyBuilding).getNextTools() - getGoodsCount(Goods.TOOLS), 0);
         }
         int price = hammersRemaining * getGameOptions().getInteger(GameOptions.HAMMER_PRICE)
-                + (getGame().getMarket().getBidPrice(Goods.TOOLS, toolsRemaining) * 110) / 100;
+                + (getOwner().getMarket().getBidPrice(Goods.TOOLS, toolsRemaining) * 110) / 100;
         return price;
     }
 
@@ -1319,7 +1319,7 @@ public final class Colony extends Settlement implements Location, Nameable {
             getOwner().modifyGold(-hammersRemaining * getGameOptions().getInteger(GameOptions.HAMMER_PRICE));
         }
         if (toolsRemaining > 0) {
-            getGame().getMarket().buy(Goods.TOOLS, toolsRemaining, getOwner());
+            getOwner().getMarket().buy(Goods.TOOLS, toolsRemaining, getOwner());
             getGoodsContainer().addGoods(Goods.TOOLS, toolsRemaining);
         }
     }
@@ -1509,7 +1509,7 @@ public final class Colony extends Settlement implements Location, Nameable {
                     int amount = goods.getAmount() - getExportLevel()[type];
                     if (amount > 0) {
                         removeGoods(type, amount);
-                        getGame().getMarket().sell(type, amount, owner, Market.CUSTOM_HOUSE);
+                        getOwner().getMarket().sell(type, amount, owner, Market.CUSTOM_HOUSE);
                     }
                 }
             }

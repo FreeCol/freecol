@@ -1505,7 +1505,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         if (goods.getLocation() instanceof Unit && ((Unit) goods.getLocation()).getOwner() != player) {
             throw new IllegalStateException("Not your unit!");
         }
-        game.getMarket().sell(goods, player);
+        player.getMarket().sell(goods, player);
         return null;
     }
 

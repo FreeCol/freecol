@@ -92,7 +92,7 @@ public final class ReportTradePanel extends ReportPanel implements ActionListene
      */
     public void initialize() {
         Player player = getCanvas().getClient().getMyPlayer();
-        Market market = player.getGame().getMarket();
+        Market market = player.getMarket();
 
         // Display Panel
         reportPanel.removeAll();

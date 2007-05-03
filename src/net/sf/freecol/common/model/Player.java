@@ -132,6 +132,9 @@ public class Player extends FreeColGameObject implements Nameable {
 
     private int gold;
 
+    /** The market for Europe. */
+    private Market market;
+
     private Europe europe;
 
     private Monarch monarch;
@@ -380,6 +383,23 @@ public class Player extends FreeColGameObject implements Nameable {
      */
     public Player(Game game, String id) {
         super(game, id);
+    }
+
+
+    /**
+     * Returns this Player's Market.
+     * 
+     * @return This Player's Market.
+     */
+    public Market getMarket() {
+        return market;
+    }
+
+    /**
+     * Resets this Player's Market.
+     */
+    public void reinitialiseMarket() {
+        market = new Market(getGame());
     }
 
     /**
@@ -2184,6 +2204,10 @@ public class Player extends FreeColGameObject implements Nameable {
      * Prepares this <code>Player</code> for a new turn.
      */
     public void newTurn() {
+
+        logger.finer("Calling newTurn for Market");
+        getMarket().newTurn();
+
         // settlements next
         for (Settlement settlement : getSettlements()) {
             logger.finest("Calling newTurn for settlement " + settlement.toString());
@@ -2448,6 +2472,10 @@ public class Player extends FreeColGameObject implements Nameable {
         for (TradeRoute route : getTradeRoutes()) {
             route.toXML(out, this);
         }
+        if (market != null) {
+            market.toXML(out, player, showAll, toSavedGame);
+        }
+
         out.writeEndElement();
     }
 
@@ -2556,7 +2584,18 @@ public class Player extends FreeColGameObject implements Nameable {
                 TradeRoute route = new TradeRoute(getGame(), "", this);
                 route.readFromXML(in);
                 getTradeRoutes().add(route);
+            } else if (in.getLocalName().equals(Market.getXMLElementTagName())) {
+                market = (Market) getGame().getFreeColGameObject(in.getAttributeValue(null, "ID"));
+                // Get the market
+                if (market != null) {
+                    market.readFromXML(in);
+                } else {
+                    market = new Market(getGame(), in);
+                }
             }
+        }
+        if (market == null) {
+            market = new Market(getGame());
         }
         if (tension == null) {
             tension = new Tension[TRIBES.length + NATIONS.length];
@@ -2728,7 +2767,7 @@ public class Player extends FreeColGameObject implements Nameable {
      * @param typeOfGoods The type of goods.
      */
     public void setArrears(int typeOfGoods) {
-        arrears[typeOfGoods] = (getDifficulty() + 3) * 100 * getGame().getMarket().paidForSale(typeOfGoods);
+        arrears[typeOfGoods] = (getDifficulty() + 3) * 100 * getMarket().paidForSale(typeOfGoods);
     }
 
     /**
@@ -2904,7 +2943,6 @@ public class Player extends FreeColGameObject implements Nameable {
         if (!isEuropean()) {
             return goods;
         }
-        Market market = getGame().getMarket();
         int value = 0;
         Iterator<Settlement> colonyIterator = getSettlementIterator();
         while (colonyIterator.hasNext()) {

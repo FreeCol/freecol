@@ -70,9 +70,6 @@ public class Game extends FreeColGameObject {
     /** Indicates wether or not this object may give IDs. */
     private boolean canGiveID;
 
-    /** The market for Europe. */
-    private Market market;
-
     private Turn turn = new Turn(1);
 
     private final ModelController modelController;
@@ -102,7 +99,7 @@ public class Game extends FreeColGameObject {
 
         currentPlayer = null;
         canGiveID = true;
-        market = new Market(this);
+        //market = new Market(this);
     }
 
     /**
@@ -246,15 +243,6 @@ public class Game extends FreeColGameObject {
     }
 
     /**
-     * Returns this Game's Market.
-     * 
-     * @return This game's Market.
-     */
-    public Market getMarket() {
-        return market;
-    }
-
-    /**
      * Returns the first <code>Colony</code> with the given name.
      * 
      * @param name The name of the <code>Colony</code>.
@@ -288,13 +276,6 @@ public class Game extends FreeColGameObject {
      */
     public LostCityRumour getLostCityRumour() {
         return lostCityRumour;
-    }
-
-    /**
-     * Resets this game's Market.
-     */
-    public void reinitialiseMarket() {
-        market = new Market(this);
     }
 
     /**
@@ -783,10 +764,6 @@ public class Game extends FreeColGameObject {
         turn.increase();
         logger.info("Turn is now " + turn.toString());
 
-        // TODO: create market for each Europe
-        logger.finer("Calling newTurn for Market");
-        getMarket().newTurn();
-
         for (Player player : players) {
             logger.finer("Calling newTurn for player " + player.getName());
             player.newTurn();
@@ -884,8 +861,6 @@ public class Game extends FreeColGameObject {
             map.toXML(out, player, showAll, toSavedGame);
         }
 
-        market.toXML(out, player, showAll, toSavedGame);
-
         out.writeEndElement();
     }
 
@@ -923,14 +898,6 @@ public class Game extends FreeColGameObject {
                     gameOptions.readFromXML(in);
                 } else {
                     gameOptions = new GameOptions(in);
-                }
-            } else if (in.getLocalName().equals(Market.getXMLElementTagName())) {
-                market = (Market) getFreeColGameObject(in.getAttributeValue(null, "ID"));
-                // Get the market
-                if (market != null) {
-                    market.readFromXML(in);
-                } else {
-                    market = new Market(this, in);
                 }
             } else if (in.getLocalName().equals(Player.getXMLElementTagName())) {
                 Player player = (Player) getFreeColGameObject(in.getAttributeValue(null, "ID"));

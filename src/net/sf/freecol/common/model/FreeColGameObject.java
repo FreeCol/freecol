@@ -520,7 +520,7 @@ abstract public class FreeColGameObject {
     
     /**
      * Creates a <code>ModelMessage</code> and uses <code>
-     * getGame().addModelMessage(modelMessage)</code>
+     * Player.addModelMessage(modelMessage)</code>
      * to register it.
      *
      * <br><br><br>
@@ -538,17 +538,16 @@ abstract public class FreeColGameObject {
      * @param data Contains the data to be displayed in the message or <i>null</i>.
      * @param type The type of message.
      * @see net.sf.freecol.client.gui.Canvas Canvas
-     * @see Game#addModelMessage(ModelMessage)
+     * @see Player#addModelMessage(ModelMessage)
      * @see ModelMessage
      */    
     protected void addModelMessage(FreeColGameObject source, String messageID, String[][] data, int type) {
-        //getGame().addModelMessage(new ModelMessage(source, messageID, data, type));
         addModelMessage(source, messageID, data, type, null);
     }
 
     /**
      * Creates a <code>ModelMessage</code> and uses <code>
-     * getGame().addModelMessage(modelMessage)</code>
+     * Player.addModelMessage(modelMessage)</code>
      * to register it.
      *
      * <br><br><br>
@@ -567,23 +566,22 @@ abstract public class FreeColGameObject {
      * @param type The type of message.
      * @param display The Object to display.
      * @see net.sf.freecol.client.gui.Canvas Canvas
-     * @see Game#addModelMessage(ModelMessage)
+     * @see Player#addModelMessage(ModelMessage)
      * @see ModelMessage
      */
     protected void addModelMessage(FreeColGameObject source, String messageID, String[][] data,
                                    int type, Object display) {
-        //getGame().addModelMessage(new ModelMessage(source, messageID, data, type, display));
         ModelMessage message = new ModelMessage(source, messageID, data, type, display);
-        if (source != null && source instanceof Ownable) {
+        if (source == null) {
+            logger.warning("ModelMessage with ID " + messageID + " has null source.");
+        } else if (source instanceof Player) {
+            ((Player) source).addModelMessage(message);
+        } else if (source instanceof Ownable) {
             ((Ownable) source).getOwner().addModelMessage(message);
+        } else {
+            logger.warning("ModelMessage with ID " + messageID + " and source " +
+                           source.toString() + " has unknown owner.");
         }
-        /*else {
-          Iterator<Player> playerIterator = getGame().getPlayerIterator();
-          while (playerIterator.hasNext()) {
-          playerIterator.next().addModelMessage(message);
-          }
-          }
-        */
     }
 
 

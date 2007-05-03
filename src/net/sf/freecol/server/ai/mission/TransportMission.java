@@ -574,7 +574,7 @@ public class TransportMission extends Mission {
     public AIGoods buyGoodsInEurope(Connection connection, int type, int amount, Location destination) {
         AIPlayer aiPlayer = (AIPlayer) getAIMain().getAIObject(getUnit().getOwner().getID());
         Player player = aiPlayer.getPlayer();
-        Market market = getAIMain().getGame().getMarket();
+        Market market = player.getMarket();
 
         if (player.getGold() >= market.getBidPrice(type, amount)) {
             Element buyGoodsElement = Message.createNewRootElement("buyGoods");
@@ -928,7 +928,7 @@ public class TransportMission extends Mission {
                         Player p = carrier.getOwner();
                         if (p.isAI() && getAIMain().getFreeColServer().isSingleplayer()) {
                             // Double the income by adding this bonus:
-                            p.modifyGold(p.getGame().getMarket().getSalePrice(ag.getGoods()));
+                            p.modifyGold(p.getMarket().getSalePrice(ag.getGoods()));
                         }
                         // END: TODO-AI-CHEATING.
                         Element sellGoodsElement = Message.createNewRootElement("sellGoods");

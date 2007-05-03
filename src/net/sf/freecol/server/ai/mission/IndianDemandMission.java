@@ -237,7 +237,7 @@ public class IndianDemandMission extends Mission {
         if (tension <= Tension.CONTENT && warehouse.getGoodsCount(Goods.FOOD) >= 100) {
             goods = new Goods(getGame(), target, Goods.FOOD, (warehouse.getGoodsCount(Goods.FOOD) * dx) / 6);
         } else if (tension <= Tension.DISPLEASED) {
-            Market market = getGame().getMarket();
+            Market market = target.getOwner().getMarket();
             int value = 0;
             Iterator<Goods> iterator = warehouse.getCompactGoodsIterator();
             while (iterator.hasNext()) {

@@ -126,11 +126,11 @@ public final class InGameController extends Controller {
         
         if (newPlayer.isEuropean()) {
             try {
-                Market market = game.getMarket();
+                Market market = newPlayer.getMarket();
                 // make random change to the market
                 market.add(getPseudoRandom().nextInt(Goods.NUMBER_OF_TYPES), (50 - getPseudoRandom().nextInt(71)));
                 Element updateElement = Message.createNewRootElement("update");
-                updateElement.appendChild(game.getMarket().toXMLElement(newPlayer, updateElement.getOwnerDocument()));
+                updateElement.appendChild(newPlayer.getMarket().toXMLElement(newPlayer, updateElement.getOwnerDocument()));
                 newPlayer.getConnection().send(updateElement);
             } catch (IOException e) {
                 logger.warning("Could not send message to: " + newPlayer.getName() + " with connection "

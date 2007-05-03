@@ -439,8 +439,9 @@ public final class EuropePanel extends FreeColPanel implements ActionListener {
             }
         }
 
+        Player player = freeColClient.getMyPlayer();
         for (int i = 0; i < Goods.NUMBER_OF_TYPES; i++) {
-            MarketLabel marketLabel = new MarketLabel(i, game.getMarket(), parent);
+            MarketLabel marketLabel = new MarketLabel(i, player.getMarket(), parent);
             marketLabel.setTransferHandler(defaultTransferHandler);
             marketLabel.addMouseListener(pressListener);
             ((JPanel)marketPanel).add(marketLabel);
@@ -448,10 +449,10 @@ public final class EuropePanel extends FreeColPanel implements ActionListener {
 
         setSelectedUnitLabel(carrier);
 
-        if (freeColClient.getMyPlayer() != null) {
-            String newLandName = freeColClient.getMyPlayer().getNewLandName();
+        if (player != null) {
+            String newLandName = player.getNewLandName();
             if (newLandName == null) {
-                newLandName = freeColClient.getMyPlayer().getDefaultNewLandName();
+                newLandName = player.getDefaultNewLandName();
             }
             ((TitledBorder) toAmericaPanel.getBorder())
                .setTitle(Messages.message("sailingTo", new String[][] {{"%location%", 

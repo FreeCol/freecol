@@ -243,8 +243,8 @@ public class AIPlayer extends AIObject {
                 && player.getRebellionState() == Player.REBELLION_PRE_WAR) {
             if (getRandom().nextInt(40) == 21) {
                 player.modifyGold(Unit.getPrice(Unit.EXPERT_ORE_MINER));
-                player.modifyGold(getGame().getMarket().getBidPrice(Goods.MUSKETS, 50));
-                player.modifyGold(getGame().getMarket().getBidPrice(Goods.HORSES, 50));
+                player.modifyGold(player.getMarket().getBidPrice(Goods.MUSKETS, 50));
+                player.modifyGold(player.getMarket().getBidPrice(Goods.HORSES, 50));
                 Unit unit = null;
                 try {
                     Element trainUnitInEuropeElement = Message.createNewRootElement("trainUnitInEurope");
@@ -1780,7 +1780,7 @@ public class AIPlayer extends AIObject {
             int tensionLevel = player.getTension(otherPlayer).getLevel();
             int percentage = (9 - tensionLevel) * 10;
             // what we could get for the goods in Europe (minus taxes)
-            int netProfits = ((100 - player.getTax()) * getGame().getMarket().getSalePrice(goods.getType(), amount)) / 100;
+            int netProfits = ((100 - player.getTax()) * player.getMarket().getSalePrice(goods.getType(), amount)) / 100;
             int price = (netProfits * percentage) / 100;
             return price;
         } else {

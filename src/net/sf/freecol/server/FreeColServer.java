@@ -599,6 +599,8 @@ public final class FreeColServer {
                         logger.info("Replacing AIMain.");
                     }
                     game.setFreeColGameObjectListener(aiMain);
+                } else if (xsr.getLocalName().equals("marketdata")) {
+                    logger.info("Ignoring market data for compatibility.");
                 } else {
                     throw new XMLStreamException("Unknown tag: " + xsr.getLocalName());
                 }
