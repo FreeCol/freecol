@@ -684,6 +684,25 @@ public final class Colony extends Settlement implements Location, Nameable {
         }
         return units;
     }
+    
+    /**
+     * Returns a list of all units in this colony of the given type.
+     * 
+     * @param type The type of the units to include in the list. For instance
+     *            Unit.EXPERT_FARMER.
+     * @return A list of all the units of the given type in this colony.
+     */
+    public List<Unit> getUnitList(int type) {
+        ArrayList<Unit> units = new ArrayList<Unit>();
+        for (WorkLocation wl : workLocations) {
+            for (Unit unit : wl.getUnitList()) {
+                if (unit.getType() == type) {
+                    units.add(unit);
+                }
+            }
+        }
+        return units;
+    }
 
     public Iterator<Unit> getUnitIterator() {
         return getUnitList().iterator();
@@ -814,6 +833,7 @@ public final class Colony extends Settlement implements Location, Nameable {
             throw new IllegalStateException("Colony " + name + " contains no units!");
         }
         // Get the first unit
+        // TODO should return an experienced soldier rather if available.
         return unitList.get(0);
     }
 
