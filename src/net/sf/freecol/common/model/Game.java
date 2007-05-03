@@ -750,21 +750,18 @@ public class Game extends FreeColGameObject {
         // be identified more efficiently
         if (modelMessage.getOwner() == null) {
             for (Player player : players) {
-                if (modelMessages.get(player) == null) {
-                    modelMessages.put(player, new ArrayList<ModelMessage>());
-                }
-                modelMessages.get(player).add(0, modelMessage);
+                getModelMessages(player).add(0, modelMessage);
             }
         } else {
             Player player = modelMessage.getOwner();
-            if (modelMessages.get(player) == null) {
-                modelMessages.put(player, new ArrayList<ModelMessage>());
-            }
-            modelMessages.get(player).add(0, modelMessage);
+            getModelMessages(player).add(0, modelMessage);
         }
     }
 
     public ArrayList<ModelMessage> getModelMessages(Player player) {
+        if (modelMessages.get(player) == null) {
+            modelMessages.put(player, new ArrayList<ModelMessage>());
+        }
         return modelMessages.get(player);
     }
 
@@ -772,13 +769,7 @@ public class Game extends FreeColGameObject {
 
         ArrayList<ModelMessage> out = new ArrayList<ModelMessage>();    
         
-        // TODO: Find out why this happens and remove the check.
-        // This should only be a temporary fix.
-        if (modelMessages.get(player) == null) {
-           return out; 
-        }
-            
-        for (ModelMessage message : modelMessages.get(player)) {
+        for (ModelMessage message : getModelMessages(player)) {
             if (message.hasBeenDisplayed()) {
                 break;
             } else {
@@ -795,10 +786,7 @@ public class Game extends FreeColGameObject {
      * @param player The <code>Player</code> to remove the messages for.
      */
     public void removeModelMessagesFor(Player player) {
-        if (modelMessages.get(player) == null) {
-            return;
-        }
-        Iterator<ModelMessage> messageIterator = modelMessages.get(player).iterator();
+        Iterator<ModelMessage> messageIterator = getModelMessages(player).iterator();
         while (messageIterator.hasNext()) {
             ModelMessage message = messageIterator.next();
             if (message.hasBeenDisplayed()) {
@@ -812,9 +800,7 @@ public class Game extends FreeColGameObject {
      */
     public void clearModelMessages() {
         for (Player player : players) {
-            if (modelMessages.get(player) != null) {
-                modelMessages.get(player).clear();
-            }
+            getModelMessages(player).clear();
         }
     }
 
