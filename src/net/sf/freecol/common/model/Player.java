@@ -399,7 +399,7 @@ public class Player extends FreeColGameObject implements Nameable {
      * Resets this Player's Market.
      */
     public void reinitialiseMarket() {
-        market = new Market(getGame());
+        market = new Market(getGame(), this);
     }
 
     /**
@@ -2595,7 +2595,7 @@ public class Player extends FreeColGameObject implements Nameable {
             }
         }
         if (market == null) {
-            market = new Market(getGame());
+            market = new Market(getGame(), this);
         }
         if (tension == null) {
             tension = new Tension[TRIBES.length + NATIONS.length];

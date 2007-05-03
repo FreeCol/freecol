@@ -13,11 +13,13 @@ import org.w3c.dom.Element;
  * goods that have been sold and the price of a particular type of good is
  * determined solely by its availability in that market.
  */
-public final class Market extends FreeColGameObject {
+public final class Market extends FreeColGameObject implements Ownable {
 
     public static final String  COPYRIGHT = "Copyright (C) 2003-2005 The FreeCol Team";
     public static final String  LICENSE = "http://www.gnu.org/licenses/gpl.html";
     public static final String  REVISION = "$Revision$";
+
+    private Player owner;
 
     /**
      * Constant for specifying the access to this <code>Market</code>
@@ -34,8 +36,9 @@ public final class Market extends FreeColGameObject {
 
     // ----------------------------------------------------------- constructors
 
-    public Market(Game game) {
+    public Market(Game game, Player player) {
         super(game);
+        this.owner = player;
 
         /* create the objects to hold the market data for each type of good */
         for (int i = 0; i < dataForGoodType.length; i++) {
@@ -114,6 +117,27 @@ public final class Market extends FreeColGameObject {
     }
 
     // ------------------------------------------------------------ API methods
+
+    /**
+    * Gets the owner of this <code>Market</code>.
+    *
+    * @return The owner of this <code>Market</code>.
+    * @see #setOwner
+    */
+    public Player getOwner() {
+        return owner;
+    }
+
+    
+    /**
+    * Sets the owner of this <code>Market</code>.
+    *
+    * @param owner The <code>Player</code> that shall own this <code>Market</code>.
+    * @see #getOwner
+    */
+    public void setOwner(Player owner) {
+        this.owner = owner;
+    }
 
     /**
      * Determines the cost to buy a single unit of a particular type of good.
@@ -364,6 +388,7 @@ public final class Market extends FreeColGameObject {
         out.writeStartElement(getXMLElementTagName());
 
         out.writeAttribute("ID", getID());
+        out.writeAttribute("owner", owner.getID());
 
         for (int i=0; i<dataForGoodType.length;i++) {
             dataForGoodType[i].toXML(out, player, showAll, toSavedGame);
@@ -422,6 +447,11 @@ public final class Market extends FreeColGameObject {
     protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
         setID(in.getAttributeValue(null, "ID"));
         
+        owner = (Player) getGame().getFreeColGameObject(in.getAttributeValue(null, "owner"));
+        if (owner == null) {
+            owner = new Player(getGame(), in.getAttributeValue(null, "owner"));
+        }
+
         int[] oldPrices = new int[dataForGoodType.length];
         for(int i = 0; i < dataForGoodType.length; i++) {
             if (dataForGoodType[i] != null) {
