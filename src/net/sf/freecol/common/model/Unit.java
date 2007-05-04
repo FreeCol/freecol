@@ -500,7 +500,6 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
      *         otherwise.
      */
     public boolean isColonist() {
-
         return unitType.hasAbility("found-colony");
     }
 
@@ -545,7 +544,6 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
         UnitType unitType = FreeCol.specification.unitType(unitTypeIndex);
 
         if (unitType.hasSkill()) {
-
             return unitType.skill;
         }
 
@@ -1098,6 +1096,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
         if (type == REVENGER || type == FLYING_DUTCHMAN) {
             return 3;
         } else if (isScout() || type == FRIGATE || type == GALLEON || type == MAN_O_WAR || type == PRIVATEER) {
+            // TODO Confirm that in the original game this was not 3 if HERNANDO DE SOTO was in the congress.
             return 2;
         } else if (getOwner().hasFather(FoundingFather.HERNANDO_DE_SOTO)) {
             return 2;
