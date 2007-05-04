@@ -312,6 +312,9 @@ public class Player extends FreeColGameObject implements Nameable {
         bells = 0;
         currentFather = FoundingFather.NONE;
         rebellionState = 0;
+        
+        market = new Market(getGame(), this);
+        
         if (isEuropean(nation)) {
             europe = new Europe(game, this);
             if (!isREF(nation)) {
