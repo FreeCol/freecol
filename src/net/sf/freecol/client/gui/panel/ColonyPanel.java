@@ -42,8 +42,6 @@ import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.border.BevelBorder;
 import javax.swing.border.Border;
-import javax.swing.border.CompoundBorder;
-import javax.swing.border.EtchedBorder;
 import javax.swing.border.TitledBorder;
 
 import net.sf.freecol.client.FreeColClient;

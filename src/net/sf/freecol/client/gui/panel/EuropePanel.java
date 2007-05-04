@@ -16,20 +16,18 @@ import java.awt.event.MouseListener;
 import java.util.Iterator;
 import java.util.logging.Logger;
 
-import javax.swing.border.TitledBorder;
 import javax.swing.BorderFactory;
 import javax.swing.ComponentInputMap;
-import javax.swing.ImageIcon;
 import javax.swing.InputMap;
 import javax.swing.JButton;
 import javax.swing.JComponent;
-import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.KeyStroke;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
+import javax.swing.border.TitledBorder;
 
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.control.InGameController;
@@ -40,7 +38,6 @@ import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Unit;
-
 import cz.autel.dmi.HIGLayout;
 
 

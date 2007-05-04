@@ -1,11 +1,9 @@
 package net.sf.freecol.client.gui.panel;
 
 import java.awt.Color;
-import java.awt.Dimension;
+import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.Insets;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -24,7 +22,6 @@ import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.Europe;
 import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.Player;
-import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.WorkLocation;
@@ -92,7 +89,6 @@ public final class ReportLabourPanel extends ReportPanel implements ActionListen
             Unit unit = units.next();
             int type = unit.getType();
             Location location = unit.getLocation();
-            String locationName = null;
 
             unitCount[type]++;
 

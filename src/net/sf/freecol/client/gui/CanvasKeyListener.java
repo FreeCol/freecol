@@ -3,7 +3,6 @@ package net.sf.freecol.client.gui;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.util.logging.Level;
-import java.util.logging.LogRecord;
 import java.util.logging.Logger;
 
 import net.sf.freecol.FreeCol;

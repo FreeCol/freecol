@@ -1,8 +1,5 @@
 package net.sf.freecol.client.gui.panel;
 
-import java.awt.Color;
-import java.awt.Cursor;
-import java.awt.GridLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -13,8 +10,6 @@ import java.util.List;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
 import javax.swing.JTextPane;
 import javax.swing.text.Style;
 import javax.swing.text.StyleConstants;

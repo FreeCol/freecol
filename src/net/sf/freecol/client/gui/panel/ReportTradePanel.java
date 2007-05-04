@@ -1,11 +1,10 @@
 package net.sf.freecol.client.gui.panel;
 
 import java.awt.Color;
+import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.Insets;
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.List;
 
 import javax.swing.BorderFactory;
@@ -148,10 +147,11 @@ public final class ReportTradePanel extends ReportPanel implements ActionListene
             Colony colony = colonies.get(colonyIndex);
             JButton colonyButton = createColonyButton(colonyIndex);
             reportPanel.add(colonyButton, higConst.rc(row, labelColumn, "l"));
-            int adjustment = colony.getWarehouseCapacity() / 100;
-            int[] lowLevel = colony.getLowLevel();
-            int[] highLevel = colony.getHighLevel();
-
+            /*
+             * int adjustment = colony.getWarehouseCapacity() / 100; int[]
+             * lowLevel = colony.getLowLevel(); int[] highLevel =
+             * colony.getHighLevel();
+             */
             for (int goodsType = 0; goodsType < Goods.NUMBER_OF_TYPES; goodsType++) {
                 int column = columnsPerLabel * (goodsType + 1) + extraColumns;
                 int amount = colony.getGoodsCount(goodsType);

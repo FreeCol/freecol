@@ -1,19 +1,16 @@
 package net.sf.freecol.client.gui.panel;
 
+import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.Insets;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashMap;
-import java.util.MissingResourceException;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
-import javax.swing.JTextArea;
 import javax.swing.JTextPane;
 import javax.swing.text.Style;
 import javax.swing.text.StyleConstants;
@@ -61,8 +58,6 @@ public final class ReportTurnPanel extends ReportPanel implements ActionListener
      * Prepares this panel to be displayed.
      */
     public void initialize(ArrayList<ModelMessage> messages) {
-
-        Player player = getCanvas().getClient().getMyPlayer();
 
         Comparator<ModelMessage> comparator = getCanvas().getClient().getClientOptions().getModelMessageComparator();
         if (comparator != null) {
