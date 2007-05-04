@@ -39,7 +39,6 @@ import net.sf.freecol.common.model.GoodsContainer;
 import net.sf.freecol.common.model.IndianSettlement;
 import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.Map;
-import net.sf.freecol.common.model.Market;
 import net.sf.freecol.common.model.ModelMessage;
 import net.sf.freecol.common.model.Nameable;
 import net.sf.freecol.common.model.Ownable;
@@ -1696,7 +1695,6 @@ public final class InGameController implements NetworkConstants {
         }
 
         Client client = freeColClient.getClient();
-        Game game = freeColClient.getGame();
         Player myPlayer = freeColClient.getMyPlayer();
         Canvas canvas = freeColClient.getCanvas();
 

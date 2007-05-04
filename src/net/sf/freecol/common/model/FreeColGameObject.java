@@ -6,7 +6,6 @@ import java.io.PrintWriter;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.lang.reflect.Method;
-import java.util.Iterator;
 import java.util.logging.Logger;
 
 import javax.xml.parsers.DocumentBuilder;

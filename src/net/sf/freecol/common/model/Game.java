@@ -1,7 +1,6 @@
 package net.sf.freecol.common.model;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Vector;
@@ -56,10 +55,6 @@ public class Game extends FreeColGameObject {
 
     /** Contains references to all objects created in this game. */
     private HashMap<String, FreeColGameObject> freeColGameObjects = new HashMap<String, FreeColGameObject>(10000);
-
-    /** Contains all the messages for this round. */
-    private final HashMap<Player, ArrayList<ModelMessage>> modelMessages = 
-            new HashMap<Player, ArrayList<ModelMessage>>();
 
     /**
      * The next availeble ID, that can be given to a new
