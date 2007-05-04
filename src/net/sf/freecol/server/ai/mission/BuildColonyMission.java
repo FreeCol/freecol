@@ -174,8 +174,11 @@ public class BuildColonyMission extends Mission {
         if (getUnit().getTile() != null) {
             if (target != getUnit().getTile()) {
                 int r = moveTowards(connection, target);
-                if (r >= 0 && (unit.getMoveType(r) == Unit.MOVE || unit.getMoveType(r) == Unit.DISEMBARK)) {
-                    move(connection, r);
+                if (r >= 0) {
+                    final int mt = getUnit().getMoveType(r);
+                    if (mt != Unit.ILLEGAL_MOVE && mt != Unit.ATTACK) {
+                        move(connection, r);
+                    }
                 }
             }
             if (getUnit().canBuildColony() && target == getUnit().getTile() && getUnit().getMovesLeft() > 0) {

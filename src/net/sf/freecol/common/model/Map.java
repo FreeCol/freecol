@@ -387,13 +387,7 @@ public class Map extends FreeColGameObject {
                 }
                 return currentNode.next;
             }
-
-            if (currentNode.isOnCarrier()) {
-                unit = carrier;
-            } else {
-                unit = theUnit;
-            }
-
+            
             // Try every direction:
             for (int direction = 0; direction < 8; direction++) {
                 Tile newTile = getNeighbourOrNull(direction, currentNode
@@ -406,7 +400,25 @@ public class Map extends FreeColGameObject {
                 int cost = currentNode.getCost();
                 int movesLeft = currentNode.getMovesLeft();
                 int turns = currentNode.getTurns();
-
+                boolean onCarrier = currentNode.isOnCarrier();
+                
+                // Check for disembark:
+                if (carrier != null
+                        && onCarrier
+                        && newTile.isLand()                        
+                        && (newTile.getSettlement() == null || newTile
+                                .getSettlement().getOwner() == unit.getOwner())) {
+                    onCarrier = false;
+                    unit = theUnit;
+                    movesLeft = unit.getInitialMovesLeft();
+                } else {
+                    if (currentNode.isOnCarrier()) {
+                        unit = carrier;
+                    } else {
+                        unit = theUnit;
+                    }
+                }
+                
                 if (unit != null) {
                     int extraCost = defaultCostDecider.getCost(unit,
                             currentNode.getTile(), newTile, movesLeft, turns);
@@ -419,6 +431,13 @@ public class Map extends FreeColGameObject {
                             movesLeft = 0;
                         }
                     } else {
+                        if (carrier != null) {
+                            if (unit == carrier) {
+                                extraCost *= theUnit.getInitialMovesLeft();    
+                            } else {
+                                extraCost *= carrier.getInitialMovesLeft();
+                            }
+                        }
                         cost += extraCost;
                         movesLeft = defaultCostDecider.getMovesLeft();
                         if (defaultCostDecider.isNewTurn()) {
@@ -433,23 +452,6 @@ public class Map extends FreeColGameObject {
                     } else {
                         cost += newTile.getMoveCost(currentNode.getTile());
                     }
-                }
-
-                // Disembark from 'carrier':
-                if (carrier != null
-                        && newTile.isLand()
-                        && unit.isNaval()
-                        && (newTile.getSettlement() == null || newTile
-                                .getSettlement().getOwner() == unit.getOwner())
-                        && newTile != end) {
-                    int mc = newTile.getMoveCost(currentNode.getTile());
-                    if (theUnit.getInitialMovesLeft() < carrier
-                            .getInitialMovesLeft()) {
-                        mc *= (carrier.getInitialMovesLeft() - theUnit
-                                .getInitialMovesLeft());
-                    }
-                    cost = mc;
-                    movesLeft = Math.max(0, theUnit.getInitialMovesLeft() - mc);
                 }
 
                 int f = cost
@@ -480,17 +482,7 @@ public class Map extends FreeColGameObject {
                 successor = new PathNode(newTile, cost, f, direction,
                         movesLeft, turns);
                 successor.previous = currentNode;
-                successor.setOnCarrier(currentNode.isOnCarrier());
-
-                // Disembark from 'carrier':
-                if (carrier != null
-                        && newTile.isLand()
-                        && unit == carrier
-                        && (newTile.getSettlement() == null || newTile
-                                .getSettlement().getOwner() != unit.getOwner())
-                        && newTile != end) {
-                    successor.setOnCarrier(false);
-                }
+                successor.setOnCarrier(onCarrier);
 
                 // Adding the new node to the open list:
                 openList.put(successor.getTile().getID(), successor);
@@ -556,6 +548,36 @@ public class Map extends FreeColGameObject {
     public PathNode search(Unit unit, Tile startTile, GoalDecider gd,
             int maxTurns) {
         return search(unit, startTile, gd, defaultCostDecider, maxTurns);
+    }
+    
+    /**
+     * Finds a path to a goal determined by the given <code>GoalDecider</code>.
+     * 
+     * <br />
+     * <br />
+     * 
+     * A <code>GoalDecider</code> is typically defined inline to serve a
+     * specific need.
+     * 
+     * @param unit
+     *            The <code>Unit</code> to find the path for.
+     * @param gd
+     *            The object responsible for determining wether a given
+     *            <code>PathNode</code> is a goal or not.
+     * @param maxTurns
+     *            The maximum number of turns the given <code>Unit</code> is
+     *            allowed to move. This is the maximum search range for a goal.
+     * @param carrier
+     *            The carrier the <code>unit</code> is currently onboard or
+     *            <code>null</code> if the <code>unit</code> is either not
+     *            onboard a carrier or should not use the carrier while finding
+     *            the path.
+     * @return The path to a goal determined by the given
+     *         <code>GoalDecider</code>.
+     */
+    public PathNode search(Unit unit, GoalDecider gd,
+            int maxTurns, Unit carrier) {
+        return search(unit, unit.getTile(), gd, defaultCostDecider, maxTurns, carrier);
     }
 
     /**
@@ -696,13 +718,7 @@ public class Map extends FreeColGameObject {
             // Reached the end
             if (currentNode.getTurns() > maxTurns) {
                 break;
-            }
-
-            if (currentNode.isOnCarrier()) {
-                unit = carrier;
-            } else {
-                unit = theUnit;
-            }
+            }            
 
             if (gd.check(unit, currentNode) && !gd.hasSubGoals()) {
                 PathNode bestTarget = gd.getGoal();
@@ -733,10 +749,23 @@ public class Map extends FreeColGameObject {
                 int cost = currentNode.getCost();
                 int movesLeft = currentNode.getMovesLeft();
                 int turns = currentNode.getTurns();
-
-                if (currentNode.isOnCarrier() && newTile.isLand()) {
+                boolean onCarrier = currentNode.isOnCarrier();
+                
+                // Check for disembark:
+                if (carrier != null
+                        && onCarrier
+                        && newTile.isLand()                        
+                        && (newTile.getSettlement() == null || newTile
+                                .getSettlement().getOwner() == unit.getOwner())) {
+                    onCarrier = false;
                     unit = theUnit;
                     movesLeft = unit.getInitialMovesLeft();
+                } else {
+                    if (currentNode.isOnCarrier()) {
+                        unit = carrier;
+                    } else {
+                        unit = theUnit;
+                    }
                 }
 
                 int extraCost = costDecider.getCost(unit,
@@ -777,8 +806,7 @@ public class Map extends FreeColGameObject {
                     successor = new PathNode(newTile, cost, cost, direction,
                             movesLeft, turns);
                     successor.previous = currentNode;
-                    successor.setOnCarrier(currentNode.isOnCarrier()
-                            && unit != theUnit);
+                    successor.setOnCarrier(onCarrier);
                     openList.put(successor.getTile().getID(), successor);
                     openListQueue.offer(successor);
                 }

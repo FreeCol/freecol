@@ -118,8 +118,8 @@ public class CashInTreasureTrainMission extends Mission {
             if (bestPath != null) {
                 int direction = moveTowards(connection, bestPath);
                 if (direction >= 0) {
-                    if (getUnit().getMoveType(direction) == Unit.MOVE
-                            || getUnit().getMoveType(direction) == Unit.EXPLORE_LOST_CITY_RUMOUR) {
+                    final int mt = getUnit().getMoveType(direction);
+                    if (mt != Unit.ILLEGAL_MOVE && mt != Unit.ATTACK) {
                         move(connection, direction);                    
                     } 
                 }

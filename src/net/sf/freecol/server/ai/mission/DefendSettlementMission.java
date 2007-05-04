@@ -154,8 +154,11 @@ public class DefendSettlementMission extends Mission {
         if (unit.getTile() != settlement.getTile()) {
             // Move towards the target.
             int r = moveTowards(connection, settlement.getTile());
-            if (r >= 0 && (unit.getMoveType(r) == Unit.MOVE || unit.getMoveType(r) == Unit.DISEMBARK)) {
-                move(connection, r);
+            if (r >= 0) {
+                final int mt = getUnit().getMoveType(r);
+                if (mt != Unit.ILLEGAL_MOVE && mt != Unit.ATTACK) {
+                    move(connection, r);
+                }
             }
         } else {
             if (unit.getState() != Unit.FORTIFIED

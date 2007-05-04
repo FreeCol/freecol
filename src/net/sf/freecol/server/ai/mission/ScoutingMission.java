@@ -159,10 +159,8 @@ public class ScoutingMission extends Mission {
                 transportDestination = null;
                 int direction = moveTowards(connection, bestPath);
                 if (direction >= 0) {
-                    if (getUnit().getMoveType(direction) == Unit.MOVE
-                            || getUnit().getMoveType(direction) == Unit.EXPLORE_LOST_CITY_RUMOUR) {
-                        move(connection, direction);
-                    } else if (getUnit().getMoveType(direction) == Unit.ENTER_INDIAN_VILLAGE_WITH_SCOUT) {
+                    final int mt = getUnit().getMoveType(direction);                                            
+                    if (getUnit().getMoveType(direction) == Unit.ENTER_INDIAN_VILLAGE_WITH_SCOUT) {
                         Element scoutMessage = Message.createNewRootElement("scoutIndianSettlement");
                         scoutMessage.setAttribute("unit", getUnit().getID());
                         scoutMessage.setAttribute("direction", Integer.toString(direction));
@@ -183,6 +181,8 @@ public class ScoutingMission extends Mission {
                         if (getUnit().isDisposed()) {
                             return;
                         }
+                    } else if (mt != Unit.ILLEGAL_MOVE && mt != Unit.ATTACK) {
+                        move(connection, direction);
                     }
                 }
             } else {
@@ -190,16 +190,7 @@ public class ScoutingMission extends Mission {
                     transportDestination = null;
                 }
                 if (transportDestination == null) {
-                    Iterator<Position> it = map.getFloodFillIterator(getUnit().getTile().getPosition());
-                    while (it.hasNext()) {
-                        Tile t = map.getTile(it.next());
-                        if (isTarget(t, getUnit())) {
-                            transportDestination = t;
-                            debugAction = "Transport to: " + transportDestination.getPosition();
-                            return;
-                        }
-                    }
-                    valid = false;
+                    updateTransportDestination();
                 }
             }
         }
@@ -221,6 +212,55 @@ public class ScoutingMission extends Mission {
                 return;
             }
             debugAction = "Awaiting 52 horses";
+        }
+    }
+        
+    private void updateTransportDestination() {
+        if (getUnit().getTile() == null) {
+            transportDestination = (Tile) getUnit().getOwner().getEntryLocation();
+        } else if (getUnit().getLocation() instanceof Unit) {
+            GoalDecider destinationDecider = new GoalDecider() {
+                private PathNode best = null;
+
+
+                public PathNode getGoal() {
+                    return best;
+                }
+
+                public boolean hasSubGoals() {
+                    return false;
+                }
+
+                public boolean check(Unit u, PathNode pathNode) {
+                    Tile t = pathNode.getTile();
+                    boolean target = isTarget(t, getUnit());
+                    if (target) {
+                        best = pathNode;
+                        debugAction = "Target: " + t.getPosition();
+                    }
+                    return target;
+                }
+            };
+            PathNode bestPath = getGame().getMap().search(getUnit(), destinationDecider, Integer.MAX_VALUE, (Unit) getUnit().getLocation());
+            if (bestPath != null) {
+                transportDestination = bestPath.getLastNode().getTile();
+                debugAction = "Transport to: " + transportDestination.getPosition();
+            } else {
+                transportDestination = null;
+                valid = false;
+            }
+        } else {
+            Iterator<Position> it = getGame().getMap().getFloodFillIterator(getUnit().getTile().getPosition());
+            while (it.hasNext()) {
+                Tile t = getGame().getMap().getTile(it.next());
+                if (isTarget(t, getUnit())) {
+                    transportDestination = t;
+                    debugAction = "Transport to: " + transportDestination.getPosition();
+                    return;
+                }
+            }
+            transportDestination = null;
+            valid = false;
         }
     }
 
@@ -249,6 +289,9 @@ public class ScoutingMission extends Mission {
      */
     public Tile getTransportDestination() {
         if (getUnit().getLocation() instanceof Unit) {
+            if (transportDestination == null) {
+                updateTransportDestination();
+            }
             return transportDestination;
         } else if (getUnit().getTile() == transportDestination) {
             transportDestination = null;

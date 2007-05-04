@@ -170,7 +170,6 @@ public abstract class Mission extends AIObject {
         }
     }
     
-    
     /**
      * Finds the best target to attack within the given range.
      *

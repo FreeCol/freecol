@@ -112,8 +112,11 @@ public class WishRealizationMission extends Mission {
         if (getUnit().getTile() != null) {
             if (wish.getDestination().getTile() != getUnit().getTile()) {
                 int r = moveTowards(connection, wish.getDestination().getTile());
-                if (r >= 0 && (unit.getMoveType(r) == Unit.MOVE || unit.getMoveType(r) == Unit.DISEMBARK)) {
-                    move(connection, r);
+                if (r >= 0) {
+                    final int mt = getUnit().getMoveType(r);
+                    if (mt != Unit.ILLEGAL_MOVE && mt != Unit.ATTACK) {
+                        move(connection, r);
+                    }
                 }
             }
             if (wish.getDestination().getTile() == getUnit().getTile()) {

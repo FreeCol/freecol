@@ -103,8 +103,11 @@ public class IndianDemandMission extends Mission {
             if (getUnit().getTile() != getUnit().getIndianSettlement().getTile()) {
                 // Move to the owning settlement:
                 int r = moveTowards(connection, getUnit().getIndianSettlement().getTile());
-                if (r >= 0 && getUnit().getMoveType(r) == Unit.MOVE) {
-                    move(connection, r);
+                if (r >= 0) {
+                    final int mt = getUnit().getMoveType(r);
+                    if (mt != Unit.ILLEGAL_MOVE && mt != Unit.ATTACK) {
+                        move(connection, r);
+                    }
                 }
             } else {
                 // Load the goods:

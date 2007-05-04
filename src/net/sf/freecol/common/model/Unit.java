@@ -3049,7 +3049,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
      *         {@link #isOffensiveUnit offensive}.
      */
     public boolean isDefensiveUnit() {
-        return (getUnitType().defence > 0 || isArmed()) && !isNaval();
+        return (getUnitType().defence > 1 || isArmed() || isMounted()) && !isNaval();
     }
 
     /**

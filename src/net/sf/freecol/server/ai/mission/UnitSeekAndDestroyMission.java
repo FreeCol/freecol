@@ -146,9 +146,8 @@ public class UnitSeekAndDestroyMission extends Mission {
                         logger.warning("Could not send message!");
                     }
                     break;
-                } else if (unit.getMoveType(direction) == Unit.MOVE
-                        || unit.getMoveType(direction) == Unit.EXPLORE_LOST_CITY_RUMOUR
-                        || unit.getMoveType(direction) == Unit.DISEMBARK) {
+                } else if (unit.getMoveType(direction) != Unit.ATTACK                        
+                        && unit.getMoveType(direction) != Unit.ILLEGAL_MOVE) {
                     Element element = Message.createNewRootElement("move");
                     element.setAttribute("unit", unit.getID());
                     element.setAttribute("direction", Integer.toString(direction));

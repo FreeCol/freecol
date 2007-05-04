@@ -39,7 +39,7 @@ public final class Market extends FreeColGameObject implements Ownable {
     public Market(Game game, Player player) {
         super(game);
         this.owner = player;
-
+        
         /* create the objects to hold the market data for each type of good */
         for (int i = 0; i < dataForGoodType.length; i++) {
             dataForGoodType[i] = new Data(getGame());

@@ -223,8 +223,8 @@ public class PioneeringMission extends Mission {
                     if (bestPath != null) {
                         int direction = moveTowards(connection, bestPath);
                         if (direction >= 0) {
-                            if (getUnit().getMoveType(direction) == Unit.MOVE
-                                    || getUnit().getMoveType(direction) == Unit.EXPLORE_LOST_CITY_RUMOUR) {
+                            final int mt = getUnit().getMoveType(direction);
+                            if (mt != Unit.ILLEGAL_MOVE && mt != Unit.ATTACK) {
                                 move(connection, direction);                    
                             }
                         }
@@ -256,10 +256,6 @@ public class PioneeringMission extends Mission {
         if (tileImprovement == null) {
             updateTileImprovement();
         }
-
-        if (getUnit().getState() != Unit.ACTIVE) {
-            return;
-        }
         
         if (tileImprovement != null) {
             if (getUnit().getTile() != null) {
@@ -267,7 +263,8 @@ public class PioneeringMission extends Mission {
                     PathNode pathToTarget = getUnit().findPath(tileImprovement.getTarget());
                     if (pathToTarget != null) {
                         int direction = moveTowards(connection, pathToTarget);
-                        if (direction >= 0 && getUnit().getMoveType(direction) == Unit.MOVE) {
+                        if (direction >= 0 && (getUnit().getMoveType(direction) == Unit.MOVE
+                                || getUnit().getMoveType(direction) == Unit.EXPLORE_LOST_CITY_RUMOUR)) {
                             move(connection, direction);
                         }
                     }

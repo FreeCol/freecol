@@ -3,6 +3,8 @@ package net.sf.freecol.server.ai.mission;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamConstants;
@@ -908,14 +910,43 @@ public class TransportMission extends Mission {
                     } else if (!(carrier.getLocation() instanceof Europe) && au.getTransportDestination() != null
                             && au.getTransportDestination().getTile() != null) {
                         PathNode p = getGame().getMap().findPath(u, carrier.getTile(),
-                                au.getTransportDestination().getTile());
-                        if (p != null && p.getTransportDropNode().getTurns() <= 2) {
+                                au.getTransportDestination().getTile(), carrier);
+                        if (p != null) {
+                            final PathNode dropNode = p.getTransportDropNode();
+                            if (dropNode != null && dropNode.getTile().getDistanceTo(carrier.getTile()) <= 1) {
+                                mission.doMission(connection);
+                                if (u.getLocation() != getUnit()) {
+                                    removeFromTransportList(au);
+                                    transportListChanged = true;
+                                }    
+                            }
+                        }
+                        /*
+                        boolean atTarget = (au.getTransportDestination().getTile() == carrier.getTile());
+                        for (Tile c : getGame().getMap().getSurroundingTiles(carrier.getTile(), 1)) {
+                            if (c == au.getTransportDestination().getTile()) {
+                                atTarget = true;
+                            }
+                        }
+                        if (atTarget) {
                             mission.doMission(connection);
                             if (u.getLocation() != getUnit()) {
                                 removeFromTransportList(au);
                                 transportListChanged = true;
                             }
                         }
+                        */
+                        /*
+                        PathNode p = getGame().getMap().findPath(u, carrier.getTile(),
+                                au.getTransportDestination().getTile());
+                        if (p != null && p.getTransportDropNode().getTurns() <= 0) {
+                            mission.doMission(connection);
+                            if (u.getLocation() != getUnit()) {
+                                removeFromTransportList(au);
+                                transportListChanged = true;
+                            }
+                        }
+                        */
                     }
                 }
             } else if (t instanceof AIGoods) {
@@ -1151,15 +1182,31 @@ public class TransportMission extends Mission {
      * for debugging purposes.
      */
     public String toString() {
-        StringBuffer sb = new StringBuffer("<html><body><b>Transport list:</b><br><br>");
-        Iterator<Transportable> it = transportList.iterator();
-        while (it.hasNext()) {
-            Transportable t = it.next();
+        StringBuffer sb = new StringBuffer("Transport list:\n");
+        List<Transportable> ts = new LinkedList<Transportable>();
+        for(Transportable t : transportList) {
             Locatable l = t.getTransportLocatable();
             sb.append(l.toString());
-            sb.append("<br>");
+            sb.append(" (");
+            Location target; 
+            if (ts.contains(t) || isCarrying(t)) {
+                sb.append("to ");
+                target = t.getTransportDestination();
+            } else {
+                sb.append("from ");
+                target = t.getTransportSource();
+            }
+            if (target instanceof Europe) {
+                sb.append("Europe");
+            } else if (target == null) {
+                sb.append("null");
+            } else {
+                sb.append(target.getTile().getPosition());
+            }
+            sb.append(")");
+            sb.append("\n");
+            ts.add(t);
         }
-        sb.append("</body></html>");
         return sb.toString();
     }
 }

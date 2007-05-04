@@ -109,8 +109,11 @@ public class IndianBringGiftMission extends Mission {
             if (getUnit().getTile() != getUnit().getIndianSettlement().getTile()) {
                 // Move to the owning settlement:
                 int r = moveTowards(connection, getUnit().getIndianSettlement().getTile());
-                if (r >= 0 && getUnit().getMoveType(r) == Unit.MOVE) {
-                    move(connection, r);
+                if (r >= 0) {
+                    final int mt = getUnit().getMoveType(r);
+                    if (mt != Unit.ILLEGAL_MOVE && mt != Unit.ATTACK) {
+                        move(connection, r);
+                    }
                 }
             } else {
                 // Load the goods:
@@ -157,8 +160,10 @@ public class IndianBringGiftMission extends Mission {
             int direction = (int) (Math.random() * 8);
             int j;
             for (j = 8; j > 0
-                    && ((unit.getGame().getMap().getNeighbourOrNull(direction, thisTile) == null) || (unit
-                            .getMoveType(direction) != Unit.MOVE)); j--) {
+                    && ((unit.getGame().getMap().getNeighbourOrNull(direction, thisTile) == null)
+                    || (unit.getMoveType(direction) == Unit.ILLEGAL_MOVE)
+                    || (unit.getMoveType(direction) == Unit.ATTACK)
+                    ); j--) {
                 direction = (int) (Math.random() * 8);
             }
             if (j == 0)

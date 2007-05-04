@@ -199,7 +199,11 @@ public class ServerPlayer extends Player implements ServerModelObject {
                 continue;
             }
             setExplored(getGame().getMap().getTile(p));
-            canSeeTiles[p.getX()][p.getY()] = true;
+            if (canSeeTiles != null) {
+                canSeeTiles[p.getX()][p.getY()] = true;
+            } else {
+                invalidateCanSeeTiles();
+            }
         }
     }
     
