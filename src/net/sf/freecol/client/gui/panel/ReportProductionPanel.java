@@ -241,7 +241,6 @@ public final class ReportProductionPanel extends JPanel implements ActionListene
 
 
             row++;
-            colonyIndex++;
         }
 
         row = 3;
