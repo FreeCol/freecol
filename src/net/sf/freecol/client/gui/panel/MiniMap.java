@@ -6,6 +6,7 @@ import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.Insets;
 import java.awt.event.MouseEvent;
+import java.awt.image.BufferedImage;
 import java.util.logging.Logger;
 
 import javax.swing.JButton;
@@ -43,6 +44,8 @@ public final class MiniMap extends JPanel implements MouseInputListener {
 
     private int mapX;
     private int mapY;
+    
+    private boolean scaleMap = false;
 
     private FreeColClient freeColClient;
     private final ImageProvider imageProvider;
@@ -63,6 +66,8 @@ public final class MiniMap extends JPanel implements MouseInputListener {
     */
     private int adjustX = 0, adjustY = 0;
 
+    float scaledFactorX = 1, scaledFactorY = 1;
+    int scaledOffsetX = 0, scaledOffsetY = 0;
 
 
 
@@ -132,9 +137,13 @@ public final class MiniMap extends JPanel implements MouseInputListener {
      * Zooms in the mini map.
      */
     public void zoomIn() {
-        tileSize += 4;
-        if (tileSize >= 24) {
-            tileSize = 24;
+        if (scaleMap) {
+            scaleMap = false;
+        } else { 
+            tileSize += 4;
+            if (tileSize >= 24) {
+                tileSize = 24;
+            }
         }
 
         repaint();
@@ -147,6 +156,8 @@ public final class MiniMap extends JPanel implements MouseInputListener {
     public void zoomOut() {
         if (tileSize > 8) {
             tileSize -= 4;
+        } else if (tileSize == 4) {
+            scaleMap = true;
         } else {
             tileSize = 4;
         }
@@ -155,11 +166,18 @@ public final class MiniMap extends JPanel implements MouseInputListener {
     }
     
     public boolean canZoomIn() {
-        return tileSize < 24;
+        return tileSize < 20;
     }
     
     public boolean canZoomOut() {
-        return tileSize > 4;
+        if (freeColClient.getGame() == null
+                || freeColClient.getGame().getMap() == null) {
+            return false;
+        }
+        final int realMapWidth = freeColClient.getGame().getMap().getWidth();
+        final int realMapHeight = freeColClient.getGame().getMap().getHeight();
+        return tileSize > 4 || (!scaleMap 
+                && (realMapWidth * 4 > MAP_WIDTH || realMapHeight > MAP_HEIGHT));
     }
 
 
@@ -172,16 +190,47 @@ public final class MiniMap extends JPanel implements MouseInputListener {
         if (freeColClient.getGame() == null
                 || freeColClient.getGame().getMap() == null) {
             return;
-        }
+        }        
         Image skin = (Image) UIManager.get("MiniMap.skin");
+        
+        scaledFactorX = 1;
+        scaledFactorY = 1;
+        scaledOffsetX = 0;
+        scaledOffsetY = 1;
+        
         if (skin == null) {
             paintMap(graphics, 0, 0, getWidth(), getHeight());
         } else {
-            paintMap(graphics, mapX, mapY, MAP_WIDTH, MAP_HEIGHT);
+            if (!scaleMap) {
+                paintMap(graphics, mapX, mapY, MAP_WIDTH, MAP_HEIGHT);
+            } else {
+                graphics.setColor(Color.BLACK);
+                graphics.fillRect(mapX, mapY, MAP_WIDTH, MAP_HEIGHT);
+                
+                final int realMapWidth = freeColClient.getGame().getMap().getWidth();
+                final int realMapHeight = freeColClient.getGame().getMap().getHeight();
+                BufferedImage bi = new BufferedImage(realMapWidth * 4, realMapHeight, BufferedImage.TYPE_INT_ARGB);
+                paintMap(bi.createGraphics(), 0, 0, realMapWidth * 4, realMapHeight);
+                
+                int scaledWidth = MAP_WIDTH;
+                int scaledHeight = MAP_HEIGHT;
+                if (realMapWidth * 4 > realMapHeight * 2) {
+                    scaledHeight = (MAP_WIDTH * realMapHeight) / (realMapWidth * 4);
+                } else {
+                    scaledWidth = (MAP_HEIGHT * realMapWidth * 4) / (realMapHeight); 
+                }
+                scaledOffsetX = (MAP_WIDTH - scaledWidth) / 2;
+                scaledOffsetY = (MAP_HEIGHT - scaledHeight) / 2;
+                
+                scaledFactorX = (realMapWidth * 4) / ((float) scaledWidth);
+                scaledFactorY = realMapHeight / ((float) scaledHeight);
+                
+                Image image = bi.getScaledInstance(scaledWidth, scaledHeight, Image.SCALE_FAST);
+                graphics.drawImage(image, mapX + scaledOffsetX, mapY + scaledOffsetY, null);
+            }
             paintSkin(graphics, skin);
         }
     }
-
 
     /**
      * Paints the skin onto this component.
@@ -407,18 +456,11 @@ public final class MiniMap extends JPanel implements MouseInputListener {
         miniRectX += x;
         miniRectY += y;
 
-        /* Make the white rectangle smaller if necessary: */
-        if (miniRectX - miniRectWidth / 2 < mapX) {
-            miniRectWidth -= mapX - miniRectX + miniRectWidth / 2;
-            miniRectX = mapX + miniRectWidth / 2;
-        }
-        if (miniRectY - miniRectHeight / 2 < mapY) {
-            miniRectHeight -= mapY - miniRectY + miniRectHeight / 2;
-            miniRectY = mapY + miniRectHeight / 2;
-        }
-
         g.setColor(Color.WHITE);
         g.drawRect(miniRectX - miniRectWidth / 2, miniRectY - miniRectHeight / 2, miniRectWidth, miniRectHeight);
+        if (scaleMap) {
+            g.drawRect(miniRectX - miniRectWidth / 2 + 1, miniRectY - miniRectHeight / 2 + 1, miniRectWidth - 2, miniRectHeight - 2);
+        }
 
         if (adjustX > 0 && adjustY > 0) {
             g.setColor(Color.WHITE);
@@ -443,12 +485,15 @@ public final class MiniMap extends JPanel implements MouseInputListener {
             return;
         }
 
-        int x = e.getX() - mapX;
-        int y = e.getY() - mapY;
         initialX = xOffset;
         initialY = yOffset;
-        int tileX = ((x - adjustX) / tileSize) + xOffset;
-        int tileY = ((y - adjustY) / tileSize * 4) + yOffset;
+        
+        int x = (int) ((e.getX() - mapX - scaledOffsetX) * scaledFactorX);
+        int y = (int) ((e.getY() - mapY - scaledOffsetY) * scaledFactorY);
+
+        int tileX = ((x - adjustX) / tileSize) + initialX;
+        int tileY = ((y - adjustY) / tileSize * 4) + initialY;
+
         freeColClient.getGUI().setFocus(tileX, tileY);
     }
 
@@ -482,11 +527,13 @@ public final class MiniMap extends JPanel implements MouseInputListener {
         if (!e.getComponent().isEnabled() || !isInMap(e.getX(), e.getY())) {
             return;
         }
+        
+        int x = (int) ((e.getX() - mapX - scaledOffsetX) * scaledFactorX);
+        int y = (int) ((e.getY() - mapY - scaledOffsetY) * scaledFactorY);
 
-        int x = e.getX() - mapX;
-        int y = e.getY() - mapY;
         int tileX = ((x - adjustX) / tileSize) + initialX;
         int tileY = ((y - adjustY) / tileSize * 4) + initialY;
+
         freeColClient.getGUI().setFocus(tileX, tileY);
     }
 
