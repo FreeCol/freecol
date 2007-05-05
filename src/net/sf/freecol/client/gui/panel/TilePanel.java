@@ -131,7 +131,8 @@ public final class TilePanel extends FreeColDialog implements ActionListener {
      */
     public void initialize(Tile tile) {
         this.tile = tile;
-        tileNameLabel.setText(tile.getName());
+        tileNameLabel.setText(tile.getName() + " (" + tile.getX() + ", " +
+                              tile.getY() + ")");
         if (tile.getNationOwner() == Player.NO_NATION) {
             ownerLabel.setText("");
         } else {
