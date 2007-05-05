@@ -1912,6 +1912,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
      */
     public void setNumberOfTools(int numberOfTools) {
         setMovesLeft(0);
+        setState(ACTIVE);
 
         if (numberOfTools >= 20) {
             if (isMounted()) {
