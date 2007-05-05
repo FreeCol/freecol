@@ -2,6 +2,7 @@ package net.sf.freecol.client.gui.panel;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.awt.Insets;
 import java.util.ArrayList;
@@ -50,9 +51,9 @@ public final class ReportUnitPanel extends JPanel implements ActionListener {
 
     // The column for unit panels.
     private static final int unitColumn = 3;
-
-    // The extra rows needed (one row for REF, one separator).
-    private static final int extraRows = 2;
+    
+    // The extra rows needed (one row for REF, one for summary, one separator).
+    private static final int extraRows = 3;
 
     // The height of the separator row.
     private static final int separator = 12;
@@ -87,6 +88,18 @@ public final class ReportUnitPanel extends JPanel implements ActionListener {
 
     private final ReportPanel reportPanel;
 
+    private final Player player;
+
+    /**
+     * Records the number of units of each type.
+     */
+    private int[][] unitCounts = new int[Unit.UNIT_COUNT][2];
+
+    /**
+     * Records the total cargo capacity of the fleet (currently
+     * unused).
+     */
+    int capacity = 0;
 
     /**
      * The constructor that will add the items to this panel.
@@ -98,6 +111,7 @@ public final class ReportUnitPanel extends JPanel implements ActionListener {
         this.ignoreEmptyLocations = ignoreEmptyLocations;
         this.parent = parent;
         this.reportPanel = reportPanel;
+        player = parent.getClient().getMyPlayer();
         heights = null;
         setOpaque(false);
     }
@@ -106,8 +120,6 @@ public final class ReportUnitPanel extends JPanel implements ActionListener {
      * Prepares this panel to be displayed.
      */
     public void initialize() {
-        Player player = parent.getClient().getMyPlayer();
-
         locations = new HashMap<String, ArrayList<Unit>>();
         colonies = player.getColonies();
         Collections.sort(colonies, parent.getClient().getClientOptions().getColonyComparator());
@@ -129,104 +141,19 @@ public final class ReportUnitPanel extends JPanel implements ActionListener {
         // reset location index
         locationIndex = 0;
 
-        // total cargo capacity of fleet (currently unused)
-        int capacity = 0;
-
-        Iterator<Unit> units = player.getUnitIterator();
-        while (units.hasNext()) {
-            Unit unit = units.next();
-            String locationName = null;
-
-            if (isNaval && unit.isNaval()) {
-
-                capacity += unit.getInitialSpaceLeft();
-                Location location = unit.getLocation();
-                if (unit.getState() == Unit.TO_AMERICA) {
-                    locationName = Messages.message("goingToAmerica");
-                } else if (unit.getState() == Unit.TO_EUROPE) {
-                    locationName = Messages.message("goingToEurope");
-                } else if (unit.getDestination() != null) {
-                    locationName = Messages.message("sailingTo", new String[][] { { "%location%",
-                            unit.getDestination().getLocationName() } });
-                } else {
-                    locationName = location.getLocationName();
-                }
-            } else if (!isNaval
-                    && (unit.getType() == Unit.ARTILLERY || unit.getType() == Unit.DAMAGED_ARTILLERY || unit.isArmed())) {
-
-                Location location = unit.getLocation();
-                if (unit.getDestination() != null) {
-                    locationName = Messages.message("goingTo", new String[][] { { "%location%",
-                            unit.getDestination().getLocationName() } });
-                } else {
-                    locationName = location.getLocationName();
-                }
-            }
-
-            if (locationName != null) {
-                ArrayList<Unit> unitList = locations.get(locationName);
-                if (unitList == null) {
-                    unitList = new ArrayList<Unit>();
-                    locations.put(locationName, unitList);
-                }
-                unitList.add(unit);
-                if (!(colonyNames.contains(locationName) || otherNames.contains(locationName))) {
-                    otherNames.add(locationName);
-                }
-            }
-        }
+        gatherData(colonyNames, otherNames);
 
         heights = new int[colonies.size() + otherNames.size() + extraRows];
-        heights[1] = separator;
-        for (int index = 2; index < heights.length; index++) {
-            /** TODO: replace this magic number by some value from the
-             * ImageLibrary. At the moment this is difficult, as the
-             * unit images in the library are not sorted according to
-             * type. For this purpose, however, one would need to
-             * consider only ships for the naval report and only units
-             * able to defend colonies for the military report. The
-             * value of 64 is large enough to accommodate the 2/3
-             * scale version of all unit graphics.
-             */
-            heights[index] = 64;
-        }
-
+        heights[extraRows - 1] = separator;
 
         setLayout(new HIGLayout(widths, heights));
 
         // REF
-        Element refUnits = parent.getClient().getInGameController().getREFUnits();
-        int artillery = Integer.parseInt(refUnits.getAttribute("artillery"));
-        int menOfWar = Integer.parseInt(refUnits.getAttribute("menOfWar"));
-        int dragoons = Integer.parseInt(refUnits.getAttribute("dragoons"));
-        int infantry = Integer.parseInt(refUnits.getAttribute("infantry"));
-
-        JPanel refPanel;
-        if (isNaval) {
-            refPanel = new JPanel(new GridLayout(0, 6));
-            for (int count = 0; count < menOfWar; count++) {
-                refPanel.add(reportPanel.buildUnitLabel(ImageLibrary.MAN_O_WAR, 0.66f));
-            }
-        } else {
-            int[] refUnitCounts = new int[] { artillery, dragoons, infantry };
-            int[] libraryUnitType = new int[] { ImageLibrary.ARTILLERY, ImageLibrary.KINGS_CAVALRY,
-                    ImageLibrary.KINGS_REGULAR };
-            refPanel = new JPanel(new GridLayout(0, 12));
-            for (int index = 0; index < refUnitCounts.length; index++) {
-                for (int count = 0; count < refUnitCounts[index]; count++) {
-                    refPanel.add(reportPanel.buildUnitLabel(libraryUnitType[index], 0.66f));
-                }
-            }
-        }
-        refPanel.setOpaque(false);
-        refPanel.setBorder(BorderFactory.createTitledBorder(player.getREFPlayer().getNationAsString()));
-        add(refPanel, higConst.rcwh(row, labelColumn, widths.length, 1));
+        add(createREFPanel(), higConst.rcwh(row, labelColumn, widths.length, 1));
         row++;
-
-        // add separator with strut
-        add(Box.createHorizontalStrut(500), higConst.rc(row, unitColumn));
-        row++;
-
+        add(createUnitPanel(), higConst.rcwh(row, labelColumn, widths.length, 1));
+        row += 2;
+        
         // colonies first, sorted according to user preferences
         Iterator<String> locationIterator = colonyNames.iterator();
         while (locationIterator.hasNext()) {
@@ -250,6 +177,157 @@ public final class ReportUnitPanel extends JPanel implements ActionListener {
 
     }
 
+    private void gatherData(ArrayList<String> colonyNames, ArrayList<String> otherNames) {
+        Iterator<Unit> units = player.getUnitIterator();
+        while (units.hasNext()) {
+            Unit unit = units.next();
+            int type = unit.getType();
+            String locationName = null;
+
+            if (isNaval && unit.isNaval()) {
+
+                unitCounts[type][0]++;
+                capacity += unit.getInitialSpaceLeft();
+                Location location = unit.getLocation();
+                if (unit.getState() == Unit.TO_AMERICA) {
+                    locationName = Messages.message("goingToAmerica");
+                } else if (unit.getState() == Unit.TO_EUROPE) {
+                    locationName = Messages.message("goingToEurope");
+                } else if (unit.getDestination() != null) {
+                    locationName = Messages.message("sailingTo", new String[][] { { "%location%",
+                            unit.getDestination().getLocationName() } });
+                } else {
+                    locationName = location.getLocationName();
+                }
+            } else if (!isNaval && !unit.isNaval()) {
+                switch (type) {
+                case Unit.ARTILLERY:
+                case Unit.DAMAGED_ARTILLERY:
+                    unitCounts[type][0]++;
+                    break;
+                case Unit.VETERAN_SOLDIER:
+                case Unit.COLONIAL_REGULAR:
+                    if (unit.isArmed()) {
+                        if (unit.isMounted()) {
+                            unitCounts[type][1]++;
+                        } else {
+                            unitCounts[type][0]++;
+                        }
+                    } else {
+                        continue;
+                    }
+                    break;
+                default:
+                    if (unit.isArmed()) {
+                        if (unit.isMounted()) {
+                            unitCounts[Unit.FREE_COLONIST][1]++;
+                        } else {
+                            unitCounts[Unit.FREE_COLONIST][0]++;
+                        }
+                    } else {
+                        continue;
+                    }
+                    break;
+                }                    
+
+                Location location = unit.getLocation();
+                if (unit.getDestination() != null) {
+                    locationName = Messages.message("goingTo", new String[][] { { "%location%",
+                            unit.getDestination().getLocationName() } });
+                } else {
+                    locationName = location.getLocationName();
+                }
+            }
+
+            if (locationName != null) {
+                ArrayList<Unit> unitList = locations.get(locationName);
+                if (unitList == null) {
+                    unitList = new ArrayList<Unit>();
+                    locations.put(locationName, unitList);
+                }
+                unitList.add(unit);
+                if (!(colonyNames.contains(locationName) || otherNames.contains(locationName))) {
+                    otherNames.add(locationName);
+                }
+            }
+        }
+}
+
+    private JPanel createREFPanel() {
+        Element refUnits = parent.getClient().getInGameController().getREFUnits();
+        JPanel refPanel;
+        if (isNaval) {
+            int menOfWar = Integer.parseInt(refUnits.getAttribute("menOfWar"));
+            refPanel = new JPanel();
+            JLabel menOfWarLabel = reportPanel.buildUnitLabel(ImageLibrary.MAN_O_WAR, 0.66f);
+            menOfWarLabel.setText(String.valueOf(menOfWar));
+            refPanel.add(menOfWarLabel);
+        } else {
+            int artillery = Integer.parseInt(refUnits.getAttribute("artillery"));
+            int dragoons = Integer.parseInt(refUnits.getAttribute("dragoons"));
+            int infantry = Integer.parseInt(refUnits.getAttribute("infantry"));
+            int[] refUnitCounts = new int[] { artillery, dragoons, infantry };
+            int[] libraryUnitType = new int[] { ImageLibrary.ARTILLERY, ImageLibrary.KINGS_CAVALRY,
+                    ImageLibrary.KINGS_REGULAR };
+            refPanel = new JPanel(new GridLayout(0, 8));
+            for (int index = 0; index < refUnitCounts.length; index++) {
+               JLabel unitLabel = reportPanel.buildUnitLabel(libraryUnitType[index], 0.66f);
+               unitLabel.setText(String.valueOf(refUnitCounts[index]));
+               refPanel.add(unitLabel);
+            }
+        }
+        refPanel.setOpaque(false);
+        refPanel.setBorder(BorderFactory.createTitledBorder(player.getREFPlayer().getNationAsString()));
+        return refPanel;
+    }
+
+    private JPanel createUnitPanel() {
+        JPanel unitPanel;
+        if (isNaval) {
+            int[] unitTypes = new int[] {
+                Unit.CARAVEL, Unit.MERCHANTMAN, Unit.GALLEON,
+                Unit.FRIGATE, Unit.MAN_O_WAR, Unit.PRIVATEER
+            };
+            unitPanel = new JPanel(new GridLayout(1, unitTypes.length));
+            for (int index = 0; index < unitTypes.length; index++) {
+                int count = unitCounts[unitTypes[index]][0];
+                int graphicsType = reportPanel.getLibrary().getUnitGraphicsType(unitTypes[index], true, false, 0, false);
+                JLabel unitLabel = reportPanel.buildUnitLabel(graphicsType, 0.66f);
+                unitLabel.setText(String.valueOf(count));
+                unitPanel.add(unitLabel);
+            }
+        } else {
+            int[] unitTypes = new int[] {
+                Unit.ARTILLERY, Unit.DAMAGED_ARTILLERY,
+                Unit.COLONIAL_REGULAR, Unit.VETERAN_SOLDIER,
+                Unit.FREE_COLONIST
+            };
+            unitPanel = new JPanel(new GridLayout(1, unitTypes.length));
+            // artillery can not be mounted
+            for (int index = 0; index < 2; index++) {
+                int count = unitCounts[unitTypes[index]][0];
+                int graphicsType = reportPanel.getLibrary().getUnitGraphicsType(unitTypes[index], true, false, 0, false);
+                JLabel unitLabel = reportPanel.buildUnitLabel(graphicsType, 0.66f);
+                unitLabel.setText(String.valueOf(count));
+                unitPanel.add(unitLabel);
+            }
+            // other units can be mounted
+            for (int mounted = 1; mounted >= 0; mounted--) {
+                for (int index = 2; index < unitTypes.length; index++) {
+                    int count = unitCounts[unitTypes[index]][mounted];
+                    int graphicsType = reportPanel.getLibrary().getUnitGraphicsType(unitTypes[index], true, (mounted == 1), 0, false);
+                    JLabel unitLabel = reportPanel.buildUnitLabel(graphicsType, 0.66f);
+                    unitLabel.setText(String.valueOf(count));
+                    unitPanel.add(unitLabel);
+                }
+            }
+        }
+        unitPanel.setOpaque(false);
+        unitPanel.setBorder(BorderFactory.createTitledBorder(player.getNationAsString()));
+        return unitPanel;
+    }
+
+
     private void handleLocation(String location, boolean makeButton) {
         List<Unit> unitList = locations.get(location);
         if (!(unitList == null && ignoreEmptyLocations)) {
@@ -262,13 +340,18 @@ public final class ReportUnitPanel extends JPanel implements ActionListener {
                 locationButton.setBorder(BorderFactory.createEmptyBorder());
                 locationButton.setActionCommand(String.valueOf(locationIndex));
                 locationButton.addActionListener(this);
-                add(locationButton, higConst.rc(row, labelColumn, "l"));
+                add(locationButton, higConst.rc(row, labelColumn, "lt"));
             } else {
                 JLabel locationLabel = new JLabel(location);
                 add(locationLabel, higConst.rc(row, labelColumn));
             }
             if (unitList != null) {
                 JPanel unitPanel = new JPanel();
+                if (isNaval) {
+                    unitPanel.setLayout(new GridLayout(0, 6));
+                } else {
+                    unitPanel.setLayout(new GridLayout(0, 10));
+                }
                 unitPanel.setOpaque(false);
                 Collections.sort(unitList, reportPanel.getUnitTypeComparator());
                 Iterator<Unit> unitIterator = unitList.iterator();

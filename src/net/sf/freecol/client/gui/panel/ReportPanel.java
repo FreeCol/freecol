@@ -71,7 +71,7 @@ public class ReportPanel extends FreeColPanel implements ActionListener {
         reportPanel.setBorder(new EmptyBorder(20, 20, 20, 20));
 
         scrollPane = new JScrollPane(reportPanel, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
-                JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+                                     JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
         add(scrollPane, BorderLayout.CENTER);
 
         ok = new JButton(Messages.message("ok"));
@@ -108,6 +108,14 @@ public class ReportPanel extends FreeColPanel implements ActionListener {
      */
     public void requestFocus() {
         ok.requestFocus();
+    }
+
+    /**
+     * Returns the ImageLibrary.
+     * @return the ImageLibrary.
+     */
+    public ImageLibrary getLibrary() {
+        return library;
     }
 
     /**
