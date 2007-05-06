@@ -2,7 +2,7 @@ package net.sf.freecol.client.gui.panel;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.Dimension;
+import java.awt.Color;
 import java.awt.GridLayout;
 import java.awt.Insets;
 import java.util.ArrayList;
@@ -12,13 +12,11 @@ import java.util.Iterator;
 import java.util.List;
 
 import javax.swing.BorderFactory;
-import javax.swing.Box;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 import net.sf.freecol.client.gui.Canvas;
-import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.Location;
@@ -34,17 +32,11 @@ import cz.autel.dmi.HIGLayout;
  * This panel displays the Naval Report.
  */
 public final class ReportUnitPanel extends JPanel implements ActionListener {
-    public static final String COPYRIGHT = "Copyright (C) 2003-2006 The FreeCol Team";
+    public static final String COPYRIGHT = "Copyright (C) 2003-2007 The FreeCol Team";
 
     public static final String LICENSE = "http://www.gnu.org/licenses/gpl.html";
 
     public static final String REVISION = "$Revision$";
-
-    // The HIGLayout widths.
-    private static final int[] widths = new int[] { 0, 12, 0 };
-
-    // The HIGLayout heights.
-    private static int[] heights;
 
     // The column for location labels.
     private static final int labelColumn = 1;
@@ -85,6 +77,8 @@ public final class ReportUnitPanel extends JPanel implements ActionListener {
     private Canvas parent;
 
     private List<Colony> colonies;
+    private ArrayList<String> colonyNames;
+    private ArrayList<String> otherNames;
 
     private final ReportPanel reportPanel;
 
@@ -112,7 +106,6 @@ public final class ReportUnitPanel extends JPanel implements ActionListener {
         this.parent = parent;
         this.reportPanel = reportPanel;
         player = parent.getClient().getMyPlayer();
-        heights = null;
         setOpaque(false);
     }
 
@@ -120,32 +113,49 @@ public final class ReportUnitPanel extends JPanel implements ActionListener {
      * Prepares this panel to be displayed.
      */
     public void initialize() {
+
+        gatherData();
+
+        int[] widths = new int[] {0};
+        int[] heights = new int[4];
+        heights[2] = separator;
+
+        setLayout(new HIGLayout(widths, heights));
+
+        add(createREFPanel(), higConst.rc(1, labelColumn));
+        add(createUnitPanel(), higConst.rc(2, labelColumn));
+
+        JButton detailButton = new JButton(Messages.message("details"));
+        detailButton.setActionCommand("details");
+        detailButton.addActionListener(this);
+
+        add(detailButton, higConst.rc(4, labelColumn, "tl"));
+    }
+
+    private void prepareData() {
         locations = new HashMap<String, ArrayList<Unit>>();
         colonies = player.getColonies();
         Collections.sort(colonies, parent.getClient().getClientOptions().getColonyComparator());
-        ArrayList<String> colonyNames = new ArrayList<String>();
+        colonyNames = new ArrayList<String>();
         Iterator<Colony> colonyIterator = colonies.iterator();
         String colonyName;
         while (colonyIterator.hasNext()) {
             colonyName = (colonyIterator.next()).getName();
             colonyNames.add(colonyName);
         }
+        otherNames = new ArrayList<String>();
+    }
 
-        ArrayList<String> otherNames = new ArrayList<String>();
+    private void showDetails() {
 
-        // Display Panel
-        removeAll();
+        int[] widths = new int[] { 0, 12, 0 };
+        int[] heights = new int[colonies.size() + otherNames.size() + extraRows];
+        heights[2] = separator;
 
         // reset row
         row = 1;
-        // reset location index
-        locationIndex = 0;
 
-        gatherData(colonyNames, otherNames);
-
-        heights = new int[colonies.size() + otherNames.size() + extraRows];
-        heights[extraRows - 1] = separator;
-
+        removeAll();
         setLayout(new HIGLayout(widths, heights));
 
         // REF
@@ -153,7 +163,14 @@ public final class ReportUnitPanel extends JPanel implements ActionListener {
         row++;
         add(createUnitPanel(), higConst.rcwh(row, labelColumn, widths.length, 1));
         row += 2;
+
+        JButton detailButton = new JButton(Messages.message("details"));
+        detailButton.setActionCommand("details");
+        detailButton.addActionListener(this);
         
+        // reset location index
+        locationIndex = 0;
+
         // colonies first, sorted according to user preferences
         Iterator<String> locationIterator = colonyNames.iterator();
         while (locationIterator.hasNext()) {
@@ -175,9 +192,13 @@ public final class ReportUnitPanel extends JPanel implements ActionListener {
             handleLocation(locationIterator.next(), false);
         }
 
+        revalidate();
+        //repaint();
     }
 
-    private void gatherData(ArrayList<String> colonyNames, ArrayList<String> otherNames) {
+    private void gatherData() {
+        prepareData();
+
         Iterator<Unit> units = player.getUnitIterator();
         while (units.hasNext()) {
             Unit unit = units.next();
@@ -258,23 +279,16 @@ public final class ReportUnitPanel extends JPanel implements ActionListener {
         JPanel refPanel;
         if (isNaval) {
             int menOfWar = Integer.parseInt(refUnits.getAttribute("menOfWar"));
-            refPanel = new JPanel();
-            JLabel menOfWarLabel = reportPanel.buildUnitLabel(ImageLibrary.MAN_O_WAR, 0.66f);
-            menOfWarLabel.setText(String.valueOf(menOfWar));
-            refPanel.add(menOfWarLabel);
+            refPanel = new JPanel(new GridLayout(1, 6));
+            refPanel.add(createUnitTypeLabel(Unit.MAN_O_WAR, false, menOfWar));
         } else {
             int artillery = Integer.parseInt(refUnits.getAttribute("artillery"));
             int dragoons = Integer.parseInt(refUnits.getAttribute("dragoons"));
             int infantry = Integer.parseInt(refUnits.getAttribute("infantry"));
-            int[] refUnitCounts = new int[] { artillery, dragoons, infantry };
-            int[] libraryUnitType = new int[] { ImageLibrary.ARTILLERY, ImageLibrary.KINGS_CAVALRY,
-                    ImageLibrary.KINGS_REGULAR };
-            refPanel = new JPanel(new GridLayout(0, 8));
-            for (int index = 0; index < refUnitCounts.length; index++) {
-               JLabel unitLabel = reportPanel.buildUnitLabel(libraryUnitType[index], 0.66f);
-               unitLabel.setText(String.valueOf(refUnitCounts[index]));
-               refPanel.add(unitLabel);
-            }
+            refPanel = new JPanel(new GridLayout(1, 8));
+            refPanel.add(createUnitTypeLabel(Unit.ARTILLERY, false, artillery));
+            refPanel.add(createUnitTypeLabel(Unit.KINGS_REGULAR, true, dragoons));
+            refPanel.add(createUnitTypeLabel(Unit.KINGS_REGULAR, false, infantry));
         }
         refPanel.setOpaque(false);
         refPanel.setBorder(BorderFactory.createTitledBorder(player.getREFPlayer().getNationAsString()));
@@ -291,10 +305,7 @@ public final class ReportUnitPanel extends JPanel implements ActionListener {
             unitPanel = new JPanel(new GridLayout(1, unitTypes.length));
             for (int index = 0; index < unitTypes.length; index++) {
                 int count = unitCounts[unitTypes[index]][0];
-                int graphicsType = reportPanel.getLibrary().getUnitGraphicsType(unitTypes[index], true, false, 0, false);
-                JLabel unitLabel = reportPanel.buildUnitLabel(graphicsType, 0.66f);
-                unitLabel.setText(String.valueOf(count));
-                unitPanel.add(unitLabel);
+                unitPanel.add(createUnitTypeLabel(unitTypes[index], false, count));
             }
         } else {
             int[] unitTypes = new int[] {
@@ -306,19 +317,13 @@ public final class ReportUnitPanel extends JPanel implements ActionListener {
             // artillery can not be mounted
             for (int index = 0; index < 2; index++) {
                 int count = unitCounts[unitTypes[index]][0];
-                int graphicsType = reportPanel.getLibrary().getUnitGraphicsType(unitTypes[index], true, false, 0, false);
-                JLabel unitLabel = reportPanel.buildUnitLabel(graphicsType, 0.66f);
-                unitLabel.setText(String.valueOf(count));
-                unitPanel.add(unitLabel);
+                unitPanel.add(createUnitTypeLabel(unitTypes[index], false, count));
             }
             // other units can be mounted
             for (int mounted = 1; mounted >= 0; mounted--) {
                 for (int index = 2; index < unitTypes.length; index++) {
                     int count = unitCounts[unitTypes[index]][mounted];
-                    int graphicsType = reportPanel.getLibrary().getUnitGraphicsType(unitTypes[index], true, (mounted == 1), 0, false);
-                    JLabel unitLabel = reportPanel.buildUnitLabel(graphicsType, 0.66f);
-                    unitLabel.setText(String.valueOf(count));
-                    unitPanel.add(unitLabel);
+                    unitPanel.add(createUnitTypeLabel(unitTypes[index], (mounted == 1), count));
                 }
             }
         }
@@ -338,7 +343,7 @@ public final class ReportUnitPanel extends JPanel implements ActionListener {
                 locationButton.setForeground(FreeColPanel.LINK_COLOR);
                 locationButton.setAlignmentY(0.8f);
                 locationButton.setBorder(BorderFactory.createEmptyBorder());
-                locationButton.setActionCommand(String.valueOf(locationIndex));
+                locationButton.setActionCommand(location);
                 locationButton.addActionListener(this);
                 add(locationButton, higConst.rc(row, labelColumn, "lt"));
             } else {
@@ -350,7 +355,7 @@ public final class ReportUnitPanel extends JPanel implements ActionListener {
                 if (isNaval) {
                     unitPanel.setLayout(new GridLayout(0, 6));
                 } else {
-                    unitPanel.setLayout(new GridLayout(0, 10));
+                    unitPanel.setLayout(new GridLayout(0, 9));
                 }
                 unitPanel.setOpaque(false);
                 Collections.sort(unitList, reportPanel.getUnitTypeComparator());
@@ -368,6 +373,55 @@ public final class ReportUnitPanel extends JPanel implements ActionListener {
         locationIndex++;
     }
 
+    private JLabel createUnitTypeLabel(int unitType, boolean mounted, int count) {
+        int graphicsType = reportPanel.getLibrary().getUnitGraphicsType(unitType, true, mounted, 0, false);
+        JLabel unitLabel = reportPanel.buildUnitLabel(graphicsType, 0.66f);
+        unitLabel.setText(String.valueOf(count));
+        if (count == 0) {
+            unitLabel.setForeground(Color.GRAY);
+        }
+        switch (unitType) {
+        case Unit.ARTILLERY:
+        case Unit.DAMAGED_ARTILLERY:
+        case Unit.CARAVEL:
+        case Unit.MERCHANTMAN:
+        case Unit.GALLEON:
+        case Unit.FRIGATE:
+        case Unit.MAN_O_WAR:
+        case Unit.PRIVATEER:
+            unitLabel.setToolTipText(Unit.getName(unitType));
+            break;
+        case Unit.VETERAN_SOLDIER:
+            if (mounted) {
+                unitLabel.setToolTipText(Messages.message("model.unit.veteranDragoon"));
+            } else {
+                unitLabel.setToolTipText(Messages.message("model.unit.veteranSoldier"));
+            }
+            break;
+        case Unit.COLONIAL_REGULAR:
+            if (mounted) {
+                unitLabel.setToolTipText(Messages.message("model.unit.colonialCavalry"));
+            } else {
+                unitLabel.setToolTipText(Messages.message("model.unit.colonialRegular"));
+            }
+            break;
+        case Unit.KINGS_REGULAR:
+            if (mounted) {
+                unitLabel.setToolTipText(Messages.message("model.unit.kingsCavalry"));
+            } else {
+                unitLabel.setToolTipText(Messages.message("model.unit.kingsRegular"));
+            }
+            break;
+        default:
+            if (mounted) {
+                unitLabel.setToolTipText(Messages.message("model.unit.dragoon"));
+            } else {
+                unitLabel.setToolTipText(Messages.message("model.unit.soldier"));
+            }
+        }
+        return unitLabel;
+    }
+
 
     /**
      * This function analyses an event and calls the right methods to take care
@@ -377,14 +431,16 @@ public final class ReportUnitPanel extends JPanel implements ActionListener {
      */
     public void actionPerformed(ActionEvent event) {
         String command = event.getActionCommand();
-        int action = Integer.valueOf(command).intValue();
-        if (action == ReportPanel.OK) {
+        if (command.equals("-1")) {
             reportPanel.actionPerformed(event);
-        } else if (action < colonies.size()) {
-            parent.showColonyPanel(colonies.get(action));
-        } else if (action == colonies.size()) {
+        } else if (command.equals("details")) {
+            showDetails();
+        } else if (command.equals(player.getEurope().getName())) {
             parent.showEuropePanel();
+        } else if (player.getColony(command) != null) {
+            parent.showColonyPanel(player.getColony(command));
+        } else {
+            //logger.warning("Unknown action command: " + command);
         }
-
     }
 }
