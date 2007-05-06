@@ -9,13 +9,24 @@ import java.util.Enumeration;
 import java.util.Properties;
 import java.util.TreeSet;
 
-
 public class TranslationReport {
+    
+    private static class LanguageStatsRecord{
+        String localFile = "";
+        int missingKeys = 0;
+        int missingVariables = 0;
+        int copiedKeys = 0;
+        public int superfluousVariables;
+        public int superfluousKeys;
+    }
 
     private static final String stars =
-        "************************************************************";
+        "*****************************************************************";
+
+    private static final boolean printSummary = true;
 
     public static void main(String[] args) throws Exception {
+        ArrayList<LanguageStatsRecord> statistics = new ArrayList<LanguageStatsRecord>();
 
         //String dirName = "src/net/sf/freecol/client/gui/i18n/";
         String dirName = args[0];
@@ -24,7 +35,7 @@ public class TranslationReport {
             System.exit(1);
         }
         final String localeKey = args.length > 1 ? args[1] : "";
-        String[] fileNames = directory.list(new FilenameFilter() {
+        String[] languageFiles = directory.list(new FilenameFilter() {
                 public boolean accept(File dir, String name) {
                     return name.matches("FreeColMessages_" + localeKey + ".*\\.properties");
                 }
@@ -35,15 +46,17 @@ public class TranslationReport {
         master.load(new FileInputStream(masterFile));
         //System.out.println("*** Found master property file with " + master.size() + " properties.\n");
 
-        for (String name : fileNames) {
+        for (String name : languageFiles) {
+            LanguageStatsRecord lstat = new LanguageStatsRecord();
+            lstat.localFile = name;
             File propertyFile = new File(directory, name);
             Properties properties = new Properties();
             properties.load(new FileInputStream(propertyFile));
-            System.out.println(stars.substring(0, name.length() + 8));
+            System.out.println(name.length()+8 < stars.length() ? stars.substring(0, name.length() + 8) : stars);
             System.out.println("*** " + name + " ***");
-            System.out.println(stars.substring(0, name.length() + 8));
+            System.out.println(name.length()+8 < stars.length() ? stars.substring(0, name.length() + 8) : stars);
 
-            ArrayList<String> missingKeys = new ArrayList<String>();
+            ArrayList<String> missingKeys      = new ArrayList<String>();
             ArrayList<String> missingVariables = new ArrayList<String>();
             ArrayList<String> copiedFromMaster = new ArrayList<String>();
             
@@ -91,6 +104,7 @@ public class TranslationReport {
                 for (String key : sort(missingKeys)) {
                     System.out.println(key + "=" + master.getProperty(key));
                 }
+                lstat.missingKeys = missingKeys.size();
                 System.out.println("");
             } else {
                 System.out.println("** No properties missing.\n");
@@ -101,6 +115,7 @@ public class TranslationReport {
                 for (String key : sort(copiedFromMaster)) {
                     System.out.println(key + "=" + master.getProperty(key));
                 }
+                lstat.copiedKeys = copiedFromMaster.size();
                 System.out.println("");
             } else {
                 System.out.println("** No properties copied.\n");
@@ -112,6 +127,7 @@ public class TranslationReport {
                     System.out.println("* CORRECT: " + key + "=" + master.getProperty(key));
                     System.out.println("INCORRECT: " + key + "=" + properties.getProperty(key));
                 }
+                lstat.missingVariables = missingVariables.size();
                 System.out.println("");
             } else {
                 System.out.println("** No properties with missing variables.\n");
@@ -155,10 +171,12 @@ public class TranslationReport {
                 for (String key : sort(superfluousKeys)) {
                     System.out.println(key + "=" + properties.getProperty(key));
                 }
+                lstat.superfluousKeys = superfluousKeys.size();
                 System.out.println("");
             } else {
                 System.out.println("** No superfluous properties.\n");
             }
+            
             if (superfluousVariables.size() > 0) {
                 System.out.println("** Total of " + superfluousVariables.size() +
                                    " properties with superfluous variables:\n");
@@ -166,14 +184,62 @@ public class TranslationReport {
                     System.out.println("* CORRECT: " + key + "=" + master.getProperty(key));
                     System.out.println("INCORRECT: " + key + "=" + properties.getProperty(key));
                 }
+                lstat.superfluousVariables = superfluousVariables.size();
                 System.out.println("");
             } else {
                 System.out.println("** No properties with superfluous variables.\n");
             }
 
-
+            statistics.add(lstat);
         }
+        
+        if (printSummary){
+            System.out.println(stars);
+            System.out.println("*** Summary of translation efforts (" + master.size() + " keys in master file) ***");
+            System.out.println(stars);
+            for (LanguageStatsRecord stats : statistics){
+                StringBuffer output = new StringBuffer();
+                output.append(shortenName(stats.localFile));
+                output.append(": ");
+                output.append(prettyPrint(stats.missingKeys));
+                output.append(" keys missing, ");
+                output.append(prettyPrint(stats.missingVariables));
+                output.append(" vars missing, ");
+                output.append(prettyPrint(stats.copiedKeys));
+                output.append(" entries copied, ");
+                output.append(prettyPrint(stats.superfluousKeys));
+                output.append(" redundant keys, ");
+                output.append(prettyPrint(stats.superfluousVariables));
+                output.append(" redundant vars. ");
+                
+                float percentageDone =  (100 * (master.size() - (stats.missingKeys + stats.copiedKeys))) / (float) master.size();
+                percentageDone = Math.round(percentageDone*100)/100f;
+                output.append(percentageDone + "% finished.");
+                
+                System.out.println(output.toString());
+            }
+        }
+    }
 
+    private static StringBuffer shortenName(String localFile) {
+        StringBuffer out = new StringBuffer(5);
+        String temp = localFile.substring(16, localFile.indexOf("."));
+        if (temp.length() < 5)
+            out.append("   ");
+        out.append(temp);
+        return out;
+    }
+
+    private static StringBuffer prettyPrint(int number) {
+        StringBuffer output = new StringBuffer(4);
+        if (number < 10)
+            output.append(" ");
+        if (number < 100)
+            output.append(" ");
+        if (number < 1000)
+            output.append(" ");
+        output.append(number);
+        return output;
     }
 
     private static TreeSet<String> sort(ArrayList<String> missingKeys) {
