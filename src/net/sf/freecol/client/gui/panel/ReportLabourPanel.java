@@ -73,17 +73,6 @@ public final class ReportLabourPanel extends ReportPanel implements ActionListen
 
         Collections.sort(colonies, getCanvas().getClient().getClientOptions().getColonyComparator());
 
-        //locationNames.add(Messages.message("report.atSea"));
-        //locationNames.add(Messages.message("report.onLand"));
-        /*
-        if (player.getEurope() != null)
-            locationNames.add(player.getEurope().toString());
-        while (colonyIterator.hasNext()) {
-            String colonyName = colonyIterator.next().getName();
-            locationNames.add(colonyName);
-            locationNames.add(colonyName + "*");
-        }
-        */
         Iterator<Unit> units = player.getUnitIterator();
         while (units.hasNext()) {
             Unit unit = units.next();
@@ -121,9 +110,15 @@ public final class ReportLabourPanel extends ReportPanel implements ActionListen
         // Display Panel
         //reportPanel.removeAll();
         int margin = 30;
-        int[] widths = new int[] {0, 5, 0, margin, 0, 5, 0, margin, 0, 5, 0};
-        int[] heights = new int[] {0, 12, 0, 12, 0, 12, 0, 12, 0, 12, 0, 12, 0, 12, 0, 12, 0, 12, 0};
-        reportPanel.setLayout(new HIGLayout(widths, heights));
+        int[] widths = new int[] {
+            0, 5, 0, 5, 0, margin,
+            0, 5, 0, 5, 0, margin,
+            0, 5, 0, 5, 0
+        };
+        int columnsPerUnit = 6;
+        int buttonColumn = 1;
+        int nameColumn = 3;
+        int countColumn = 5;
 
         int[][] unitTypes = new int[][] {
             {Unit.FREE_COLONIST, Unit.INDENTURED_SERVANT, Unit.PETTY_CRIMINAL},
@@ -137,41 +132,76 @@ public final class ReportLabourPanel extends ReportPanel implements ActionListen
             {Unit.ELDER_STATESMAN, Unit.FIREBRAND_PREACHER, -1}
         };
 
-        for (int row = 0; row < 9; row++) {
-            for (int column = 0; column < 3; column++) {
+        int[] heights = new int[2 * unitTypes.length - 1];
+        for (int index = 1; index < heights.length; index += 2) {
+            heights[index] = 12;
+        }
+
+        reportPanel.setLayout(new HIGLayout(widths, heights));
+
+        for (int row = 0; row < unitTypes.length; row++) {
+            for (int column = 0; column < unitTypes[0].length; column++) {
                 int tools = 0;
                 if (unitTypes[row][column] < 0) {
                     continue;
                 } else if (unitTypes[row][column] == Unit.HARDY_PIONEER) {
                     tools = 20;
                 }
-                int imageType = ImageLibrary.getUnitGraphicsType(unitTypes[row][column], false, false, tools, false);
-                reportPanel.add(buildUnitLabel(imageType, 1f),
-                                higConst.rc(2 * row + 1, 4 * column + 1, "t"));
-                reportPanel.add(buildUnitDetails(unitTypes[row][column]),
-                                higConst.rc(2 * row + 1, 4 * column + 3));
+
+                reportPanel.add(createUnitLabel(unitTypes[row][column], tools),
+                                higConst.rc(2 * row + 1, columnsPerUnit * column + buttonColumn, "t"));
+                if (unitCount[unitTypes[row][column]] > 0) {
+                    reportPanel.add(createUnitNameButton(unitTypes[row][column]),
+                                    higConst.rc(2 * row + 1, columnsPerUnit * column + nameColumn, "tl"));
+                    reportPanel.add(new JLabel(String.valueOf(unitCount[unitTypes[row][column]])),
+                                    higConst.rc(2 * row + 1, columnsPerUnit * column + countColumn, "tr"));
+                } else {
+                    JLabel unitNameLabel = new JLabel(Unit.getName(unitTypes[row][column])); 
+                    unitNameLabel.setForeground(Color.GRAY);
+                    reportPanel.add(unitNameLabel,
+                                    higConst.rc(2 * row + 1, columnsPerUnit * column + nameColumn, "tl"));
+                }
             }
         }
-        reportPanel.add(new JLabel(Messages.message("report.labour.canTrain")),
-                        higConst.rcwh(heights.length, 1, widths.length, 1, "l"));
+    }
+    
+
+    private JButton createUnitNameButton(int unitType) {
+        JButton button = new JButton(Unit.getName(unitType));
+        button.setMargin(new Insets(0,0,0,0));
+        button.setOpaque(false);
+        button.setForeground(LINK_COLOR);
+        button.setAlignmentY(0.8f);
+        button.setBorder(BorderFactory.createEmptyBorder());
+        button.setActionCommand(String.valueOf(unitType));
+        button.addActionListener(this);
+        return button;
+
     }
 
-    private JPanel buildUnitDetails(int unit) {
+    private JLabel createUnitLabel(int unitType, int tools) {
+        int imageType = ImageLibrary.getUnitGraphicsType(unitType, false, false, tools, false);
+        JLabel unitLabel = new JLabel(getLibrary().getUnitImageIcon(imageType));
+        return unitLabel;
+    }
 
-        HashMap<Colony, Integer> locations = unitLocations.get(unit);
+    private JPanel createUnitDetails(int unit, ReportLabourDetailPanel report) {
 
-        JPanel textPanel = new JPanel();
-        textPanel.setOpaque(false);
+        int tools = 0;
+        if (unit == Unit.HARDY_PIONEER) {
+            tools = 20;
+        }
 
-        int[] widths = {0, 5, 0};
-        int[] heights = null;
-        int colonyColumn = 1;
-        int countColumn = 3;
-
+        int maxColumns = 3;
+        int columnsPerColumn = 4;
+        int[] widths = new int[maxColumns * columnsPerColumn - 1];
+        for (int index = 1; index < widths.length; index += 2) {
+            widths[index] = 12;
+        }
         int keys = 0;
         if (unitCount[unit] > 0) {
-            if (locations != null) {
-                keys = locations.size();
+            if (unitLocations != null) {
+                keys = unitLocations.get(unit).size();
             }
             if (unitInEurope[unit] > 0) {
                 keys++;
@@ -184,75 +214,106 @@ public final class ReportLabourPanel extends ReportPanel implements ActionListen
             }
         }
 
-        if (keys == 0) {
-            heights = new int[] {0};
-        } else {
-            heights = new int[keys + 2];
-            heights[1] = 5;
+        int numberOfRows = 6;
+        if (keys > numberOfRows * maxColumns) {
+            numberOfRows = keys / 3;
+            if (keys % 3 > 0) {
+                numberOfRows++;
+            }
         }
 
-        textPanel.setLayout(new HIGLayout(widths, heights));
+        int[] heights = new int[numberOfRows + 2];
+        heights[1] = 12;
+
+        int colonyColumn = 1;
+        int countColumn = 3;
+        int startRow = 3;
+
+        JPanel detailPanel = new JPanel(new HIGLayout(widths, heights));
+        detailPanel.setOpaque(false);
 
         // summary
         int row = 1;
-        JLabel unitLabel = new JLabel(Unit.getName(unit)); 
-        textPanel.add(unitLabel, higConst.rc(row, colonyColumn));
+        detailPanel.add(new JLabel(Unit.getName(unit)),
+                        higConst.rc(row, colonyColumn));
+        detailPanel.add(new JLabel(String.valueOf(unitCount[unit])),
+                        higConst.rc(row, countColumn));
 
-        if (unitCount[unit] == 0) {
-            unitLabel.setForeground(Color.GRAY);
-        } else {
-            textPanel.add(new JLabel(String.valueOf(unitCount[unit])),
-                          higConst.rc(row, countColumn));
-
-            row = 3;
-            for (Colony colony : colonies) {
-                if (locations.get(colony) != null) {
-                    textPanel.add(createColonyButton(colony, unit),
-                                  higConst.rc(row, colonyColumn, "l"));
-                    JLabel countLabel = new JLabel(locations.get(colony).toString());
-                    countLabel.setForeground(LINK_COLOR);
-                    textPanel.add(countLabel, higConst.rc(row, countColumn, "r"));
+        row = startRow;
+        int column = 0;
+        for (Colony colony : colonies) {
+            if (unitLocations.get(unit).get(colony) != null) {
+                detailPanel.add(createColonyButton(colony, unit, report),
+                                higConst.rc(row, column * columnsPerColumn + colonyColumn, "l"));
+                JLabel countLabel = new JLabel(unitLocations.get(unit).get(colony).toString());
+                countLabel.setForeground(LINK_COLOR);
+                detailPanel.add(countLabel, 
+                                higConst.rc(row, column * columnsPerColumn + countColumn, "r"));
+                if (row == heights.length) {
+                    row = startRow;
+                    column++;
+                } else {
                     row++;
                 }
             }
-            if (unitInEurope[unit] > 0) {
-                JButton button = new JButton(player.getEurope().getName());
-                button.setMargin(new Insets(0,0,0,0));
-                button.setOpaque(false);
-                button.setForeground(LINK_COLOR);
-                button.setBorder(BorderFactory.createEmptyBorder());
-                button.setActionCommand(player.getEurope().getName());
-                button.addActionListener(this);
-                textPanel.add(button, higConst.rc(row, colonyColumn, "l"));
-                JLabel countLabel = new JLabel(String.valueOf(unitInEurope[unit]));
-                countLabel.setForeground(LINK_COLOR);
-                textPanel.add(countLabel, higConst.rc(row, countColumn, "r"));
-                row++;
-            }
-            if (unitOnLand[unit] > 0) {
-                JLabel onLandLabel = new JLabel(Messages.message("report.onLand"));
-                onLandLabel.setForeground(Color.GRAY);
-                textPanel.add(onLandLabel, higConst.rc(row, colonyColumn, "l"));
-                JLabel countLabel = new JLabel(String.valueOf(unitOnLand[unit]));
-                countLabel.setForeground(Color.GRAY);
-                textPanel.add(countLabel, higConst.rc(row, countColumn, "r"));
-                row++;
-            }
-            if (unitAtSea[unit] > 0) {
-                JLabel atSeaLabel = new JLabel(Messages.message("report.atSea"));
-                atSeaLabel.setForeground(Color.GRAY);
-                textPanel.add(atSeaLabel, higConst.rc(row, colonyColumn, "l"));
-                JLabel countLabel = new JLabel(String.valueOf(unitAtSea[unit]));
-                countLabel.setForeground(Color.GRAY);
-                textPanel.add(countLabel, higConst.rc(row, countColumn, "r"));
+        }
+        if (unitInEurope[unit] > 0) {
+            JButton button = new JButton(player.getEurope().getName());
+            button.setMargin(new Insets(0,0,0,0));
+            button.setOpaque(false);
+            button.setForeground(LINK_COLOR);
+            button.setBorder(BorderFactory.createEmptyBorder());
+            button.setActionCommand(player.getEurope().getName());
+            button.addActionListener(this);
+            detailPanel.add(button,
+                            higConst.rc(row, column * columnsPerColumn + colonyColumn, "l"));
+            JLabel countLabel = new JLabel(String.valueOf(unitInEurope[unit]));
+            countLabel.setForeground(LINK_COLOR);
+            detailPanel.add(countLabel,
+                            higConst.rc(row, column * columnsPerColumn + countColumn, "r"));
+            if (row == heights.length) {
+                row = startRow;
+                column++;
+            } else {
                 row++;
             }
         }
-
-        return textPanel;
+        if (unitOnLand[unit] > 0) {
+            JLabel onLandLabel = new JLabel(Messages.message("report.onLand"));
+            onLandLabel.setForeground(Color.GRAY);
+            detailPanel.add(onLandLabel,
+                            higConst.rc(row, column * columnsPerColumn + colonyColumn, "l"));
+            JLabel countLabel = new JLabel(String.valueOf(unitOnLand[unit]));
+            countLabel.setForeground(Color.GRAY);
+            detailPanel.add(countLabel,
+                            higConst.rc(row, column * columnsPerColumn + countColumn, "r"));
+            if (row == heights.length) {
+                row = startRow;
+                column++;
+            } else {
+                row++;
+            }
+        }
+        if (unitAtSea[unit] > 0) {
+            JLabel atSeaLabel = new JLabel(Messages.message("report.atSea"));
+            atSeaLabel.setForeground(Color.GRAY);
+            detailPanel.add(atSeaLabel,
+                            higConst.rc(row, column * columnsPerColumn + colonyColumn, "l"));
+            JLabel countLabel = new JLabel(String.valueOf(unitAtSea[unit]));
+            countLabel.setForeground(Color.GRAY);
+            detailPanel.add(countLabel, 
+                            higConst.rc(row, column * columnsPerColumn + countColumn, "r"));
+            if (row == heights.length) {
+                row = startRow;
+                column++;
+            } else {
+                row++;
+            }
+        }
+        return detailPanel;
     }
 
-    private JButton createColonyButton(Colony colony, int unit) {
+    private JButton createColonyButton(Colony colony, int unit, ReportLabourDetailPanel report) {
 
         JButton button = new JButton();
         if (colony.canTrain(unit)) {
@@ -265,7 +326,7 @@ public final class ReportLabourPanel extends ReportPanel implements ActionListen
         button.setForeground(LINK_COLOR);
         button.setBorder(BorderFactory.createEmptyBorder());
         button.setActionCommand(colony.getName());
-        button.addActionListener(this);
+        button.addActionListener(report);
         return button;
     }
 
@@ -278,12 +339,17 @@ public final class ReportLabourPanel extends ReportPanel implements ActionListen
     @Override
     public void actionPerformed(ActionEvent event) {
         String command = event.getActionCommand();
-        if (command.equals("-1")) {
+        int action = Integer.parseInt(command);
+        if (action == OK) {
             super.actionPerformed(event);
-        } else if (command.equals(player.getEurope().getName())) {
-            getCanvas().showEuropePanel();
+        } else if (action < unitCount.length) {
+            ReportLabourDetailPanel details = new ReportLabourDetailPanel(getCanvas());
+            JPanel detailPanel = createUnitDetails(action, details);
+            details.initialize(detailPanel, action);
+            getCanvas().addAsFrame(details);
+            details.requestFocus();
         } else {
-            getCanvas().showColonyPanel(player.getColony(command));
+            logger.warning("Unknown action command " + command);
         }
     }
 }
