@@ -335,9 +335,7 @@ public class DebugMenu extends JMenu {
 
                     File resourceFile = freeColClient.getCanvas().showLoadDialog(FreeCol.getSaveDirectory(),
                             new FileFilter[] { ff });
-                    FileInputStream stream = new FileInputStream(resourceFile);
-                    PropertyResourceBundle bundle = new PropertyResourceBundle(stream);
-                    Messages.setResources(bundle);
+                    Messages.loadResources(resourceFile);
                 } catch (Exception ex) {
                     System.out.println("Failed to load resource bundle");
                 }

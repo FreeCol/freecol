@@ -5,6 +5,7 @@ import java.io.FileInputStream;
 import java.util.Locale;
 import java.util.MissingResourceException;
 import java.util.PropertyResourceBundle;
+import java.util.Properties;
 import java.util.ResourceBundle;
 import java.util.logging.Logger;
 
@@ -31,7 +32,7 @@ public class Messages {
     public static final String FILE_PREFIX = "FreeColMessages";
     public static final String FILE_SUFFIX = ".properties";
 
-    private static PropertyResourceBundle messageBundle;
+    private static Properties messageBundle = null;
 
 
     /**
@@ -52,10 +53,10 @@ public class Messages {
         }
 
         if (messageBundle == null) {
-            messageBundle = getMessageBundle(Locale.getDefault());
+            setMessageBundle(Locale.getDefault());
         }
 
-        return messageBundle.getString(messageId);
+        return messageBundle.getProperty(messageId);
     }
 
     /**
@@ -64,20 +65,14 @@ public class Messages {
      * @param locale
      * @return The ResourceBundle containing the messages for the given locale.
      */
-    public static PropertyResourceBundle getMessageBundle(Locale locale) {
+    //public static PropertyResourceBundle getMessageBundle(Locale locale) {
+    public static void setMessageBundle(Locale locale) {
 
         if (locale == null)
             throw new NullPointerException("Parameter locale may not be null");
 
-        /*
-         * this palaver is only necessary because Class.getPackage() can return
-         * null
-         */
-        /*
-        String packageName = Messages.class.getName().substring(0, Messages.class.getName().lastIndexOf('.'));
-        PropertyResourceBundle bundle = (PropertyResourceBundle) ResourceBundle.getBundle(packageName
-                + ".FreeColMessages", locale);
-        */
+        messageBundle = new Properties();
+
         String language = locale.getLanguage();
         if (!language.equals("")) {
             language = "_" + language;
@@ -87,35 +82,16 @@ public class Messages {
             country = "_" + country;
         }
         String[] fileNames = {
-            FILE_PREFIX + language + country + FILE_SUFFIX,
+            FILE_PREFIX + FILE_SUFFIX,
             FILE_PREFIX + language + FILE_SUFFIX,
-            FILE_PREFIX + FILE_SUFFIX
+            FILE_PREFIX + language + country + FILE_SUFFIX
         };
 
-        PropertyResourceBundle bundle = null;
         for (String fileName : fileNames) {
             File resourceFile = new File(DATA_DIR, fileName);
-            if ((resourceFile != null) && resourceFile.exists() && resourceFile.isFile() &&
-                resourceFile.canRead()) {
-                try {
-                    bundle = new PropertyResourceBundle(new FileInputStream(resourceFile));
-                    break;
-                } catch(Exception e) {
-                    logger.warning("Unable to load resource file " + fileName);
-                }
-            }
+            loadResources(resourceFile);
         }
 
-        if (bundle == null) {
-            logger.warning("Could not load resource bundle for the locale " + locale.getDisplayName());
-        } else {
-            if (!bundle.getLocale().equals(locale)) {
-                logger.warning("Could not load resource bundle for locale '" + locale.getDisplayName()
-                        + "' falling back to '" + bundle.getLocale().toString() + "'");
-            }
-        }
-
-        return bundle;
     }
 
     /**
@@ -151,10 +127,18 @@ public class Messages {
      * Calling this method can be used to replace the messages used currently
      * with a new bundle. This is used only in the debugging of FreeCol.
      * 
-     * @param bundle
+     * @param resourceFile
      */
-    public static void setResources(PropertyResourceBundle bundle) {
-        messageBundle = bundle;
+    public static void loadResources(File resourceFile) {
+
+        if ((resourceFile != null) && resourceFile.exists() && resourceFile.isFile() &&
+            resourceFile.canRead()) {
+            try {
+                messageBundle.load(new FileInputStream(resourceFile));
+            } catch(Exception e) {
+                logger.warning("Unable to load resource file " + resourceFile.getPath());
+            }
+        }
     }
 
 }
