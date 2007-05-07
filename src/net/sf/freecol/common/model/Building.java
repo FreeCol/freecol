@@ -35,7 +35,7 @@ import org.w3c.dom.Element;
  * 
  */
 public final class Building extends FreeColGameObject implements WorkLocation, Ownable, Nameable {
-
+    
     public static final String COPYRIGHT = "Copyright (C) 2003-2006 The FreeCol Team";
 
     public static final String LICENSE = "http://www.gnu.org/licenses/gpl.html";
@@ -599,56 +599,6 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
     }
 
     /**
-     * Gets the best unit to train for the given unit type.
-     * 
-     * @param unitType The unit type to train for.
-     * @return The <code>Unit</code>.
-     */
-    private Unit getUnitToTrain(int teacherType) {
-        Unit bestUnit = null;
-        int bestScore = 0;
-
-        for (Unit unit : colony.getUnitList()) {
-            switch (unit.getType()) {
-            case Unit.FREE_COLONIST:
-                if (unit.getTrainingType() == teacherType
-                        && (bestUnit == null || unit.getTurnsOfTraining() > bestUnit.getTurnsOfTraining())) {
-                    // this unit is already training for the job
-                    bestUnit = unit;
-                    bestScore = 5;
-                } else if (unit.getTurnsOfTraining() == 0 && bestScore < 4) {
-                    // this unit has not started training
-                    bestUnit = unit;
-                    bestScore = 4;
-                } else if (bestScore == 0
-                        || (bestScore == 1 && unit.getTurnsOfTraining() < bestUnit.getTurnsOfTraining())) {
-                    // this unit has started training for another job,
-                    // but has spent less time training than the previous
-                    // best choice
-                    bestUnit = unit;
-                    bestScore = 1;
-                }
-                break;
-            case Unit.INDENTURED_SERVANT:
-                if (bestScore < 3) {
-                    bestUnit = unit;
-                    bestScore = 3;
-                }
-                break;
-            case Unit.PETTY_CRIMINAL:
-                if (bestScore < 2) {
-                    bestUnit = unit;
-                    bestScore = 2;
-                }
-                break;
-            default:
-                // ignore any other type of unit
-            }
-        }
-        return bestUnit;
-    }
-
-    /**
      * Gets this <code>Location</code>'s <code>GoodsContainer</code>.
      * 
      * @return <code>null</code>.
@@ -665,7 +615,7 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
             // Don't do anything if the building does not exist.
             return; 
         } else if (type == SCHOOLHOUSE) {
-            trainStudent();
+            trainStudents();
         } else if (getGoodsOutputType() != -1) {
             produceGoods();
         }
@@ -703,49 +653,51 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
             colony.addGoods(goodsOutputType, goodsOutput);
         }
     }
-    
 
-    private void trainStudent() {
-        Iterator<Unit> i = getUnitIterator();
-        while (i.hasNext()) {
-            Unit teacher = i.next();
-            Unit student = getUnitToTrain(teacher.getType());
+    private void trainStudents() {
+        
+        // Nothing to do if there is nobody in the building
+        if (getUnitCount() == 0) {
+            return;
+        }
+        
+        // Gather the potential students
+        ArrayList<Unit> potentialStudents = new ArrayList<Unit>();
+        potentialStudents.addAll(colony.getUnitList(Unit.FREE_COLONIST));
+        potentialStudents.addAll(colony.getUnitList(Unit.INDENTURED_SERVANT));
+        potentialStudents.addAll(colony.getUnitList(Unit.PETTY_CRIMINAL));
 
-            if (student != null) {
-                if (student.getTrainingType() != teacher.getType()
-                    && student.getTrainingType() != Unit.FREE_COLONIST) {
-                    student.setTrainingType(teacher.getType());
-                    student.setTurnsOfTraining(0);
-                }
-
-                student.setTurnsOfTraining(student.getTurnsOfTraining() + ((colony.getSoL() == 100) ? 2 : 1));
-
-                if (student.getTurnsOfTraining() >= student.getNeededTurnsOfTraining()) {
-                    String oldName = student.getName();
-
-                    if (student.getType() == Unit.INDENTURED_SERVANT) {
-                        student.setType(Unit.FREE_COLONIST);
-                    } else if (student.getType() == Unit.PETTY_CRIMINAL) {
-                        student.setType(Unit.INDENTURED_SERVANT);
-                    } else {
-                        student.setType(student.getTrainingType());
-                    }
-
-                    student.setTrainingType(-1);
-                    student.setTurnsOfTraining(0);
-                    addModelMessage(getColony(),
-                                    "model.unit.unitEducated",
-                                    new String[][] {
-                                        { "%oldName%", oldName },
-                                        { "%newName%", student.getName() },
-                                        { "%colony%", getColony().getName()}},
-                                    ModelMessage.UNIT_IMPROVED, student);
-                }
-            } else {
-                addModelMessage(getColony(), "model.building.noStudent", new String[][] {
-                    { "%teacher%", teacher.getName() }, { "%colony%", colony.getName() } },
-                                ModelMessage.WARNING, teacher);
+        // Update the progress of each teacher for whom we have a student
+        Iterator<Unit> teachers = getUnitIterator();
+        Iterator<Unit> actualStudents = potentialStudents.iterator();
+        
+        for (int i = 0; i < potentialStudents.size(); i++) {
+            if (!teachers.hasNext()) {
+                break;
             }
+
+            Unit teacher = teachers.next();
+            int training = teacher.getTurnsOfTraining() + 1;
+            if (training < teacher.getNeededTurnsOfTraining()) {
+                teacher.setTurnsOfTraining(training);
+            } else {
+                teacher.setTurnsOfTraining(0);
+                actualStudents.next().train(teacher);
+            }
+        }
+
+        // Other teachers will get a warning message
+        while (teachers.hasNext()) {
+            Unit teacher = teachers.next();
+
+            // We could reset teaching potential for these teachers
+            // to make education more difficult.
+            // Note: education is not reset when moving a teacher so
+            // that the player can reorganize its education order.
+            // teacher.setTurnsOfTraining(0);
+            addModelMessage(getColony(), "model.building.noStudent",
+                    new String[][] { { "%teacher%", teacher.getName() }, { "%colony%", colony.getName() } },
+                    ModelMessage.WARNING, teacher);
         }
     }
 

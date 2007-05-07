@@ -156,7 +156,7 @@ public class FreeColTestCase extends TestCase {
         if (numberOfSettlers < 1)
             throw new IllegalArgumentException();
 
-        Game game = getStandardGame();
+        Game game = getGame();
         Player dutch = game.getPlayer(Player.DUTCH);
 
         Map map = getTestMap(Tile.PLAINS, true);

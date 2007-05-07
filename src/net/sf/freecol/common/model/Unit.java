@@ -122,11 +122,9 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
     private int workType; // What type of goods this unit produces in its
 
     // occupation.
-    private int experience;
+    private int experience = 0;
 
     private int turnsOfTraining = 0;
-
-    private int trainingType = -1;
 
     /** The individual name of this unit, not of the unit type. */
     private String name = null;
@@ -210,7 +208,6 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
         state = s;
         workLeft = -1;
         workType = Goods.FOOD;
-        experience = 0;
 
         this.movesLeft = getInitialMovesLeft();
         setHitpoints(getInitialHitpoints(getType()));
@@ -504,22 +501,17 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
     }
 
     /**
-     * Gets the number of turns this unit has to train to become the current
-     * {@link #getTrainingType training type}.
+     * Gets the number of turns this unit has to train to educate a student.
+     * This value is only meaningful for units that can be put in a school.
      * 
-     * @return The turns of training needed to become the current training type,
-     *         or <code>Integer.MAX_VALUE</code> if if no training type is
-     *         specified.
-     * @see #getTrainingType
+     * @return The turns of training needed to teach its current type to a
+     *         free colonist or to promote an indentured servant or a petty
+     *         criminal.
      * @see #getTurnsOfTraining
      */
     public int getNeededTurnsOfTraining() {
-
-        if (trainingType != -1) {
-            return 2 + getSkillLevel(trainingType);
-        }
-
-        return Integer.MAX_VALUE;
+        // number of turns is 4/6/8 for skill 1/2/3
+        return 2 * (getSkillLevel() + 1);
     }
 
     /**
@@ -554,7 +546,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
      * Gets the number of turns this unit has been training.
      * 
      * @return The number of turns of training this <code>Unit</code> has
-     *         received.
+     *         given.
      * @see #setTurnsOfTraining
      * @see #getTrainingType
      * @see #getNeededTurnsOfTraining
@@ -567,40 +559,11 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
      * Sets the number of turns this unit has been training.
      * 
      * @param turnsOfTraining The number of turns of training this
-     *            <code>Unit</code> has received.
+     *            <code>Unit</code> has given.
      * @see #getNeededTurnsOfTraining
      */
     public void setTurnsOfTraining(int turnsOfTraining) {
         this.turnsOfTraining = turnsOfTraining;
-    }
-
-    /**
-     * Gets the unit type this <code>Unit</code> is training for.
-     * 
-     * @return The type of <code>Unit</code> which this <code>Unit</code> is
-     *         currently working to become.
-     * @see #getTurnsOfTraining
-     * @see #setTrainingType
-     */
-    public int getTrainingType() {
-        return trainingType;
-    }
-
-    /**
-     * Sets the unit type this <code>Unit</code> is training for. Use
-     * <code>-1</code> for no type at all.
-     * 
-     * @param trainingType The type of <code>Unit</code> which this
-     *            <code>Unit</code> should currently working to become.
-     * @see #getTurnsOfTraining
-     * @see #getTrainingType
-     */
-    public void setTrainingType(int trainingType) {
-        if (getType() == PETTY_CRIMINAL || getType() == INDENTURED_SERVANT) {
-            this.trainingType = FREE_COLONIST;
-        } else {
-            this.trainingType = trainingType;
-        }
     }
 
     /**
@@ -2261,7 +2224,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
 
     /**
      * Gets the initial hitpoints for a given type of <code>Unit</code>. For
-     * now this method only returns <code>5</code> that is used to determine
+     * now this method only returns <code>6</code> that is used to determine
      * the number of rounds needed to repair a unit, but later it can be used
      * for indicating the health of a unit as well.
      * 
@@ -3631,6 +3594,37 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
     }
 
     /**
+     * Train the current unit in the job of the given teacher.
+     * 
+     * The type of the unit is updated from petty criminal to indentured
+     * servant, from servant to free colonist and then to the teachers type.
+     * 
+     * @param teacher
+     */
+    public void train(Unit teacher){
+        String oldName = getName();
+
+        if (getType() == PETTY_CRIMINAL) {
+            setType(INDENTURED_SERVANT);
+        } else if (getType() == INDENTURED_SERVANT) {
+            setType(FREE_COLONIST);
+        } else if (getType() == FREE_COLONIST) {
+            setType(teacher.getType());
+        } 
+
+        String newName = getName();
+        if (!newName.equals(oldName)) {
+            addModelMessage(this,
+                            "model.unit.unitEducated",
+                            new String[][] {
+                                { "%oldName%", oldName },
+                                { "%newName%", newName },
+                                { "%colony%", getLocationName() } },
+                            ModelMessage.UNIT_IMPROVED);
+        }
+    }
+    
+    /**
      * Promotes this unit.
      */
     public void promote() {
@@ -4180,12 +4174,9 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
     }
 
     /**
-     * Prepares the <code>Unit</code> for a new turn.
+     * Checks if a colonist can get promoted by experience.
      */
-    public void newTurn() {
-        if (isUninitialized()) {
-            logger.warning("Calling newTurn for an uninitialized object: " + getID());
-        }
+    private void checkExperiencePromotion() {
         if (getType() == FREE_COLONIST && location instanceof ColonyTile) {
             logger.finest("About to call getRandom for experience");
             int random = getGame().getModelController().getRandom(getID() + "experience", 5000);
@@ -4202,6 +4193,16 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
                                 ModelMessage.UNIT_IMPROVED, this);
             }
         }
+    }
+
+    /**
+     * Prepares the <code>Unit</code> for a new turn.
+     */
+    public void newTurn() {
+        if (isUninitialized()) {
+            logger.warning("Calling newTurn for an uninitialized object: " + getID());
+        }
+        checkExperiencePromotion();
         movesLeft = getInitialMovesLeft();
         doAssignedWork();
     }
@@ -4249,7 +4250,6 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
         String ownerID = (getOwner().equals(player) || getType() != PRIVATEER || showAll) ? owner.getID() : "unknown";
         out.writeAttribute("owner", ownerID);
         out.writeAttribute("turnsOfTraining", Integer.toString(turnsOfTraining));
-        out.writeAttribute("trainingType", Integer.toString(trainingType));
         out.writeAttribute("workType", Integer.toString(workType));
         out.writeAttribute("experience", Integer.toString(experience));
         out.writeAttribute("treasureAmount", Integer.toString(treasureAmount));
@@ -4332,7 +4332,6 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
         }
 
         turnsOfTraining = Integer.parseInt(in.getAttributeValue(null, "turnsOfTraining"));
-        trainingType = Integer.parseInt(in.getAttributeValue(null, "trainingType"));
         hitpoints = Integer.parseInt(in.getAttributeValue(null, "hitpoints"));
 
         final String indianSettlementStr = in.getAttributeValue(null, "indianSettlement");
