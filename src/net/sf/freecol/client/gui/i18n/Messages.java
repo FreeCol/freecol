@@ -1,5 +1,7 @@
 package net.sf.freecol.client.gui.i18n;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.util.Locale;
 import java.util.MissingResourceException;
 import java.util.PropertyResourceBundle;
@@ -24,6 +26,10 @@ public class Messages {
     public static final String REVISION = "$Revision$";
 
     private static final Logger logger = Logger.getLogger(Messages.class.getName());
+
+    public static final String DATA_DIR = "data/strings";
+    public static final String FILE_PREFIX = "FreeColMessages";
+    public static final String FILE_SUFFIX = ".properties";
 
     private static PropertyResourceBundle messageBundle;
 
@@ -67,9 +73,38 @@ public class Messages {
          * this palaver is only necessary because Class.getPackage() can return
          * null
          */
+        /*
         String packageName = Messages.class.getName().substring(0, Messages.class.getName().lastIndexOf('.'));
         PropertyResourceBundle bundle = (PropertyResourceBundle) ResourceBundle.getBundle(packageName
                 + ".FreeColMessages", locale);
+        */
+        String language = locale.getLanguage();
+        if (!language.equals("")) {
+            language = "_" + language;
+        }
+        String country = locale.getCountry();
+        if (!country.equals("")) {
+            country = "_" + country;
+        }
+        String[] fileNames = {
+            FILE_PREFIX + language + country + FILE_SUFFIX,
+            FILE_PREFIX + language + FILE_SUFFIX,
+            FILE_PREFIX + FILE_SUFFIX
+        };
+
+        PropertyResourceBundle bundle = null;
+        for (String fileName : fileNames) {
+            File resourceFile = new File(DATA_DIR, fileName);
+            if ((resourceFile != null) && resourceFile.exists() && resourceFile.isFile() &&
+                resourceFile.canRead()) {
+                try {
+                    bundle = new PropertyResourceBundle(new FileInputStream(resourceFile));
+                    break;
+                } catch(Exception e) {
+                    logger.warning("Unable to load resource file " + fileName);
+                }
+            }
+        }
 
         if (bundle == null) {
             logger.warning("Could not load resource bundle for the locale " + locale.getDisplayName());
