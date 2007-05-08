@@ -15,6 +15,7 @@ import javax.swing.UIManager;
 import javax.swing.border.BevelBorder;
 import javax.swing.event.MouseInputListener;
 
+import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.action.MiniMapZoomInAction;
 import net.sf.freecol.client.gui.action.MiniMapZoomOutAction;
@@ -39,7 +40,7 @@ public final class MiniMap extends JPanel implements MouseInputListener {
     public static final int MINIMAP_ZOOMOUT = 13;
     public static final int MINIMAP_ZOOMIN = 14;
     
-    private static final int MAP_WIDTH = 256;
+    private static final int MAP_WIDTH = 220;
     private static final int MAP_HEIGHT = 128;
 
     private int mapX;
@@ -127,7 +128,7 @@ public final class MiniMap extends JPanel implements MouseInputListener {
 
         // TODO-LATER: The values below should be specified by a skin-configuration-file:
         miniMapZoomInButton.setLocation(4, 174);
-        miniMapZoomOutButton.setLocation(300, 174);
+        miniMapZoomOutButton.setLocation(264, 174);
 
         add(miniMapZoomInButton);
         add(miniMapZoomOutButton);        
@@ -277,13 +278,13 @@ public final class MiniMap extends JPanel implements MouseInputListener {
 
         if (xOffset < 0) {
             xOffset = 0;
-        } else if (xOffset + xSize > map.getWidth()) {
-            xOffset = map.getWidth() - xSize;
+        } else if (xOffset + xSize + 1 > map.getWidth()) {
+            xOffset = map.getWidth() - xSize - 1;
         }
         if (yOffset < 0) {
             yOffset = 0;
-        } else if (yOffset + ySize > map.getHeight()) {
-            yOffset = map.getHeight() - ySize;
+        } else if (yOffset + ySize + 1> map.getHeight()) {
+            yOffset = map.getHeight() - ySize - 1;
         }
 
 

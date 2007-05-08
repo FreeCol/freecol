@@ -270,16 +270,15 @@ public class MapGeneratorOptions extends OptionMap {
         final int size = getInteger(MAP_SIZE);
         switch (size) {
         case MAP_SIZE_SMALL:
-            return 30;
+            return 28;
         case MAP_SIZE_MEDIUM:
-            return 45;
+            return 28;
         case MAP_SIZE_LARGE:
-            return 60;
+            return 37;
         case MAP_SIZE_VERY_LARGE:
-            return 90;
+            return 46;
         case MAP_SIZE_HUGE:
-            return 120;
-            //return 240;
+            return 55;
         default:
             throw new IllegalStateException("Invalid map-size: " + size + ".");
         }
@@ -293,16 +292,15 @@ public class MapGeneratorOptions extends OptionMap {
         final int size = getInteger(MAP_SIZE);
         switch (size) {
         case MAP_SIZE_SMALL:
-            return 64;
+            return 65;
         case MAP_SIZE_MEDIUM:
-            return 96;
-        case MAP_SIZE_LARGE:
             return 128;
-        case MAP_SIZE_VERY_LARGE:
+        case MAP_SIZE_LARGE:
             return 192;
+        case MAP_SIZE_VERY_LARGE:
+            return 257;
         case MAP_SIZE_HUGE:
-            return 256;
-            //return 512;
+            return 321;
         default:
             throw new IllegalStateException("Invalid map-size: " + size + ".");
         }

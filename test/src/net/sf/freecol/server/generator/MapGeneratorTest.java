@@ -63,8 +63,8 @@ public class MapGeneratorTest extends TestCase {
 		// Check that the map is created at all
 		assertNotNull(g.getMap());
 
-		assertEquals(30, g.getMap().getWidth());
-		assertEquals(64, g.getMap().getHeight());
+		assertEquals(gen.getMapGeneratorOptions().getWidth(), g.getMap().getWidth());
+		assertEquals(gen.getMapGeneratorOptions().getHeight(), g.getMap().getHeight());
 
 	}
 	
