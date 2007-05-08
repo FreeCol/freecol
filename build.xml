@@ -103,12 +103,21 @@
 
         <native2ascii src="${freecol.src.dir}/net/sf/freecol/client/gui/i18n" dest="${freecol.data.dir}/strings"
                     encoding="UTF-8" 
-                    includes="**/*.properties" 
-                    excludes="classes/** **/*_de_DE.properties **/*_hu.properties **/*_pt_BR.properties **/*_br.properties"/>
+                    includes="*.properties" 
+                    excludes="*_br.properties
+                              *_de_DE.properties
+                              *_hu.properties
+                              *_pt_BR.properties
+                              *_pt_PT.properties
+                              *_sv_SE.properties"/>
         <native2ascii src="${freecol.src.dir}/net/sf/freecol/client/gui/i18n" dest="${freecol.data.dir}/strings"
                     encoding="ISO-8859-1"
-                    includes="**/*_de_DE.properties **/*_hu.properties **/*_pt_BR.properties **/*_br.properties"
-                    excludes="classes/**" />
+                    includes="*_br.properties
+                              *_de_DE.properties
+                              *_hu.properties
+                              *_pt_BR.properties
+                              *_pt_PT.properties
+                              *_sv_SE.properties"/>
     </target>
 
 
