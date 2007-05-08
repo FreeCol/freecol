@@ -578,7 +578,6 @@ public final class Colony extends Settlement implements Location, Nameable {
                 WorkLocation w = getVacantWorkLocationFor((Unit) locatable);
                 if (w != null) {
                     locatable.setLocation(w);
-                    updatePopulation();
                 } else {
                     logger.warning("Could not find a 'WorkLocation' for " + locatable + " in " + this);
                 }
