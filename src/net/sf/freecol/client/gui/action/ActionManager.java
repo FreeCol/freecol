@@ -33,9 +33,17 @@ public class ActionManager extends OptionGroup {
         super("actionManager.name", "actionManager.shortDescription");
 
         this.freeColClient = freeColClient;
+        initializeActions();
 
+        freeColClient.getClientOptions().add(this);
+        freeColClient.getClientOptions().addToMap(this);
+    }
+
+
+    public void initializeActions() {
+        removeAll();
         // keep this list alphabetized.
-
+        
         add(new AssignTradeRouteAction(freeColClient));
         add(new BuildColonyAction(freeColClient));
         add(new BuildRoadAction(freeColClient));
@@ -79,6 +87,7 @@ public class ActionManager extends OptionGroup {
         add(new ReportTradeAction(freeColClient));
         add(new ReportTurnAction(freeColClient));
         add(new SaveAction(freeColClient));
+        add(new SelectLanguageAction(freeColClient));
         add(new SentryAction(freeColClient));
         add(new SkipUnitAction(freeColClient));
         add(new ToggleViewModeAction(freeColClient));
@@ -86,9 +95,6 @@ public class ActionManager extends OptionGroup {
         add(new UnloadAction(freeColClient));
         add(new WaitAction(freeColClient));
         add(new QuitAction(freeColClient));
-
-        freeColClient.getClientOptions().add(this);
-        freeColClient.getClientOptions().addToMap(this);
     }
 
     /**

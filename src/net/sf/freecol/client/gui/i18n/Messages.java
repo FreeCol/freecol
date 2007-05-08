@@ -65,26 +65,40 @@ public class Messages {
      * @param locale
      * @return The ResourceBundle containing the messages for the given locale.
      */
-    //public static PropertyResourceBundle getMessageBundle(Locale locale) {
     public static void setMessageBundle(Locale locale) {
+        if (locale == null) {
+            throw new NullPointerException("Parameter locale must not be null");
+        } else {
+            setMessageBundle(locale.getLanguage(), locale.getCountry(), locale.getVariant());
+        }
+    }
 
-        if (locale == null)
-            throw new NullPointerException("Parameter locale may not be null");
+    /**
+     * Returns the resource bundle for the given locale
+     * 
+     * @param language The language for this locale.
+     * @param country The language for this locale.
+     * @param variant The variant for this locale.
+     * @return The ResourceBundle containing the messages for the given locale.
+     */
+    public static void setMessageBundle(String language, String country, String variant) {
 
         messageBundle = new Properties();
 
-        String language = locale.getLanguage();
         if (!language.equals("")) {
             language = "_" + language;
         }
-        String country = locale.getCountry();
         if (!country.equals("")) {
             country = "_" + country;
+        }
+        if (!variant.equals("")) {
+            variant = "_" + variant;
         }
         String[] fileNames = {
             FILE_PREFIX + FILE_SUFFIX,
             FILE_PREFIX + language + FILE_SUFFIX,
-            FILE_PREFIX + language + country + FILE_SUFFIX
+            FILE_PREFIX + language + country + FILE_SUFFIX,
+            FILE_PREFIX + language + country + variant + FILE_SUFFIX
         };
 
         for (String fileName : fileNames) {
@@ -93,6 +107,7 @@ public class Messages {
         }
 
     }
+
 
     /**
      * Finds the message with a particular ID in the default locale and performs
