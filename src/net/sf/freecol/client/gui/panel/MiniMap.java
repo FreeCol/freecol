@@ -226,7 +226,9 @@ public final class MiniMap extends JPanel implements MouseInputListener {
                 scaledFactorX = (realMapWidth * 4) / ((float) scaledWidth);
                 scaledFactorY = realMapHeight / ((float) scaledHeight);
                 
-                Image image = bi.getScaledInstance(scaledWidth, scaledHeight, Image.SCALE_FAST);
+                final int scalingHint = (freeColClient.getClientOptions().getBoolean(ClientOptions.SMOOTH_MINIMAP_RENDERING)) 
+                        ? Image.SCALE_SMOOTH : Image.SCALE_FAST;
+                Image image = bi.getScaledInstance(scaledWidth, scaledHeight, scalingHint);                
                 graphics.drawImage(image, mapX + scaledOffsetX, mapY + scaledOffsetY, null);
             }
             paintSkin(graphics, skin);

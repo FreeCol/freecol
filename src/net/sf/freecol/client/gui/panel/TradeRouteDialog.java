@@ -7,19 +7,17 @@ import java.util.ArrayList;
 import java.util.logging.Logger;
 
 import javax.swing.DefaultListModel;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
 import javax.swing.JButton;
 import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.i18n.Messages;
-
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.TradeRoute;
-
 import cz.autel.dmi.HIGLayout;
 
 /**

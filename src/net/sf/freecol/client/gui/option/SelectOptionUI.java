@@ -1,7 +1,6 @@
 
 package net.sf.freecol.client.gui.option;
 
-import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
@@ -83,20 +82,6 @@ public final class SelectOptionUI extends JPanel implements OptionUpdater, Prope
         }
     }
     
-    /**
-     * {@inheritDoc}
-     */
-    public Dimension getPreferredSize() {
-        return new Dimension(getParent().getWidth() - getParent().getInsets().left - getParent().getInsets().right - (OptionGroupUI.H_GAP*2), super.getPreferredSize().height);
-    }
-    
-    /**
-     * {@inheritDoc}
-     */  
-    public Dimension getMinimumSize() {
-        return getPreferredSize();
-    }    
-
     /**
     * Updates the value of the {@link Option} this object keeps.
     */

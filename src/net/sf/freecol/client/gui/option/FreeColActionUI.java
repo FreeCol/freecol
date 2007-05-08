@@ -127,20 +127,6 @@ public final class FreeColActionUI extends JPanel implements OptionUpdater, Acti
 
         return new ImageIcon(bi);
     }
-
-    /**
-     * {@inheritDoc}
-     */    
-    public Dimension getPreferredSize() {
-        return new Dimension(getParent().getWidth()/2 - getParent().getInsets().left - getParent().getInsets().right - (OptionGroupUI.H_GAP*3)/2, super.getPreferredSize().height);
-    }
-    
-    /**
-     * {@inheritDoc}
-     */
-    public Dimension getMinimumSize() {
-        return getPreferredSize();
-    }
     
     /**
     * Gets a string to represent the given <code>KeyStroke</code> to the user.

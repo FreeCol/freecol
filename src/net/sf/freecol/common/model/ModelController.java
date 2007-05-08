@@ -2,6 +2,7 @@
 package net.sf.freecol.common.model;
 
 import java.util.ArrayList;
+
 import net.sf.freecol.common.PseudoRandom;
 
 /**

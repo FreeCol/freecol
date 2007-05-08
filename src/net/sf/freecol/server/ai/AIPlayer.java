@@ -241,7 +241,7 @@ public class AIPlayer extends AIObject {
         // TODO-AI-CHEATING: REMOVE WHEN THE AI IS GOOD ENOUGH:
         if (getAIMain().getFreeColServer().isSingleplayer() && player.isEuropean() && !player.isREF() && player.isAI()
                 && player.getRebellionState() == Player.REBELLION_PRE_WAR) {
-            if (getRandom().nextInt(40) == 21) {
+            if (getRandom().nextInt(10) == 1) {
                 player.modifyGold(Unit.getPrice(Unit.EXPERT_ORE_MINER));
                 player.modifyGold(player.getMarket().getBidPrice(Goods.MUSKETS, 50));
                 player.modifyGold(player.getMarket().getBidPrice(Goods.HORSES, 50));
@@ -271,7 +271,7 @@ public class AIPlayer extends AIObject {
                     sendAndWaitSafely(equipHorsesElement);
                 }
             }
-            if (getRandom().nextInt(100) == 42) {
+            if (getRandom().nextInt(40) == 21) {
                 int unitType = Unit.CARAVEL;
                 switch (getRandom().nextInt(10)) {
                 case 1:

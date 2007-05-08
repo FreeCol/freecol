@@ -1,26 +1,50 @@
 package net.sf.freecol.client;
 
-import java.awt.*;
-import java.io.*;
-import java.util.*;
+import java.awt.GraphicsDevice;
+import java.awt.GraphicsEnvironment;
+import java.awt.Rectangle;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.util.LinkedList;
 import java.util.Queue;
+import java.util.Random;
 import java.util.logging.Logger;
+
 import javax.swing.JFrame;
 import javax.swing.SwingUtilities;
-import javax.xml.transform.*;
+import javax.xml.transform.OutputKeys;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
-import net.sf.freecol.client.control.*;
-import net.sf.freecol.client.gui.*;
+
+import net.sf.freecol.client.control.ClientModelController;
+import net.sf.freecol.client.control.ConnectController;
+import net.sf.freecol.client.control.InGameController;
+import net.sf.freecol.client.control.InGameInputHandler;
+import net.sf.freecol.client.control.PreGameController;
+import net.sf.freecol.client.control.PreGameInputHandler;
 import net.sf.freecol.client.gui.Canvas;
+import net.sf.freecol.client.gui.FullScreenFrame;
+import net.sf.freecol.client.gui.GUI;
+import net.sf.freecol.client.gui.ImageLibrary;
+import net.sf.freecol.client.gui.WindowedFrame;
 import net.sf.freecol.client.gui.action.ActionManager;
-import net.sf.freecol.client.gui.sound.*;
+import net.sf.freecol.client.gui.sound.MusicLibrary;
+import net.sf.freecol.client.gui.sound.SfxLibrary;
+import net.sf.freecol.client.gui.sound.SoundPlayer;
 import net.sf.freecol.client.networking.Client;
 import net.sf.freecol.common.PseudoRandom;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.networking.Message;
 import net.sf.freecol.server.FreeColServer;
+
 import org.w3c.dom.Element;
 import org.xml.sax.SAXException;
 

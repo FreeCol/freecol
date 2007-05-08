@@ -1,10 +1,21 @@
 package net.sf.freecol.common.model;
 
-import java.util.*;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.NoSuchElementException;
+import java.util.PriorityQueue;
+import java.util.Vector;
 import java.util.logging.Logger;
-import javax.xml.stream.*;
+
+import javax.xml.stream.XMLStreamConstants;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamReader;
+import javax.xml.stream.XMLStreamWriter;
+
 import net.sf.freecol.common.FreeColException;
 import net.sf.freecol.common.PseudoRandom;
+
 import org.w3c.dom.Element;
 
 /**

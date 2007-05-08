@@ -236,6 +236,9 @@ public final class FreeCol {
         }
     }
 
+    public static FreeColClient getFreeColClient() {
+        return freeColClient;
+    }
 
     /**
     * Returns the directory where the savegames should be put.

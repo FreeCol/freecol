@@ -1,15 +1,31 @@
 package net.sf.freecol.server.ai;
 
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.ConcurrentModificationException;
+import java.util.Iterator;
+import java.util.List;
 import java.util.logging.Logger;
 
-import javax.xml.stream.*;
+import javax.xml.stream.XMLStreamConstants;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamReader;
+import javax.xml.stream.XMLStreamWriter;
 
-import net.sf.freecol.common.model.*;
+import net.sf.freecol.common.model.Building;
+import net.sf.freecol.common.model.Colony;
+import net.sf.freecol.common.model.ColonyTile;
+import net.sf.freecol.common.model.Goods;
+import net.sf.freecol.common.model.Tile;
+import net.sf.freecol.common.model.Unit;
+import net.sf.freecol.common.model.WorkLocation;
 import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.networking.Message;
-import net.sf.freecol.server.ai.mission.*;
+import net.sf.freecol.server.ai.mission.PioneeringMission;
+import net.sf.freecol.server.ai.mission.TransportMission;
+import net.sf.freecol.server.ai.mission.WorkInsideColonyMission;
 
 import org.w3c.dom.Element;
 

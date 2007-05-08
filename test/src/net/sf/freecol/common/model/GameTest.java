@@ -4,8 +4,6 @@ import java.util.Vector;
 
 import junit.framework.TestCase;
 import net.sf.freecol.common.FreeColException;
-import net.sf.freecol.common.model.Game;
-import net.sf.freecol.common.model.Player;
 import net.sf.freecol.util.test.MockModelController;
 
 public class GameTest extends TestCase {

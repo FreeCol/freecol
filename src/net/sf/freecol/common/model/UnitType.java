@@ -2,8 +2,8 @@
 package net.sf.freecol.common.model;
 
 
-import java.util.Map;
 import java.util.HashSet;
+import java.util.Map;
 
 import net.sf.freecol.common.util.Xml;
 

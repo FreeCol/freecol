@@ -28,7 +28,6 @@ import java.util.logging.Logger;
 import javax.swing.ImageIcon;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
-//import javax.swing.JLayeredPane;
 import javax.swing.JPanel;
 import javax.swing.TransferHandler;
 

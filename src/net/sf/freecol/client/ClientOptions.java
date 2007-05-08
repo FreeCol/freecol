@@ -3,10 +3,10 @@ package net.sf.freecol.client;
 
 import java.util.Comparator;
 
-import net.sf.freecol.common.model.Map;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.Europe;
 import net.sf.freecol.common.model.FreeColGameObject;
+import net.sf.freecol.common.model.Map;
 import net.sf.freecol.common.model.ModelMessage;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Unit;
@@ -134,6 +134,11 @@ public class ClientOptions extends OptionMap {
      * Option for activating autoscroll when dragging units on the mapboard.
      */
     public static final String MAP_SCROLL_ON_DRAG = "mapScrollOnDrag";
+
+    /**
+     * If selected: Enables smooth rendering of the minimap when zoomed out.
+     */
+    public static final String SMOOTH_MINIMAP_RENDERING = "smoothRendering";
     
     /** 
      * The Stock the custom house should keep when selling goods.
@@ -300,8 +305,6 @@ public class ClientOptions extends OptionMap {
         guiGroup.add(new BooleanOption(ALWAYS_CENTER, "clientOptions.gui."+ ALWAYS_CENTER +".name", "clientOptions.gui."+ ALWAYS_CENTER +".shortDescription", false));
         guiGroup.add(new BooleanOption(DISPLAY_FOG_OF_WAR, "clientOptions.gui."+ DISPLAY_FOG_OF_WAR +".name", "clientOptions.gui."+ DISPLAY_FOG_OF_WAR +".shortDescription", false));        
         guiGroup.add(new BooleanOption(MAP_SCROLL_ON_DRAG, "clientOptions.gui."+ MAP_SCROLL_ON_DRAG +".name", "clientOptions.gui."+ MAP_SCROLL_ON_DRAG +".shortDescription", true));
-        add(guiGroup);
-
         guiGroup.add(new SelectOption(COLONY_COMPARATOR,
                                       "clientOptions.gui." + COLONY_COMPARATOR + ".name",
                                       "clientOptions.gui." + COLONY_COMPARATOR + ".shortDescription",
@@ -311,8 +314,6 @@ public class ClientOptions extends OptionMap {
                                                     "clientOptions.gui." + COLONY_COMPARATOR + ".bySize",
                                                     "clientOptions.gui." + COLONY_COMPARATOR + ".bySoL"},
                                       0));
-
-
         OptionGroup messagesGroup = new OptionGroup("clientOptions.messages.name", "clientOptions.messages.shortDescription");
         messagesGroup.add(new SelectOption(MESSAGES_GROUP_BY,
                                       "clientOptions.gui." + MESSAGES_GROUP_BY + ".name", 
@@ -321,6 +322,12 @@ public class ClientOptions extends OptionMap {
                                                     "clientOptions.gui." + MESSAGES_GROUP_BY + ".type",
                                                     "clientOptions.gui." + MESSAGES_GROUP_BY + ".source"},
                                       0));
+        
+        OptionGroup minimapGroup = new OptionGroup("clientOptions.gui.minimap.name", "clientOptions.gui.minimap.shortDescription");
+        minimapGroup.add(new BooleanOption(SMOOTH_MINIMAP_RENDERING, "clientOptions.gui.minimap."+ SMOOTH_MINIMAP_RENDERING +".name", "clientOptions.gui.minimap."+ SMOOTH_MINIMAP_RENDERING +".shortDescription", false));
+        guiGroup.add(minimapGroup);
+
+        add(guiGroup);
 
         /** Boolean message display options. */
         messagesGroup.add(new BooleanOption(SHOW_WARNING,

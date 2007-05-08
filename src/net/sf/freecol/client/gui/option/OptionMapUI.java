@@ -11,7 +11,6 @@ import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
-import net.sf.freecol.client.gui.action.ActionManager;
 
 import net.sf.freecol.common.option.BooleanOption;
 import net.sf.freecol.common.option.IntegerOption;
@@ -72,19 +71,15 @@ public final class OptionMapUI extends JPanel implements OptionUpdater {
             Option o = it.next();
 
             if (o instanceof OptionGroup) {
-                JComponent c = new OptionGroupUI((OptionGroup) o, editable);
+                JComponent c = new OptionGroupUI((OptionGroup) o, editable, 1);
                 c.setOpaque(true);
                 ou.add(c);
-                if (o instanceof ActionManager) {
-                    JScrollPane scroll = new JScrollPane(c, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
-                            JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-                    scroll.setBorder(BorderFactory.createEmptyBorder());
-                    c.setBorder(BorderFactory.createEmptyBorder(OptionGroupUI.H_GAP - 5, OptionGroupUI.H_GAP, 0,
-                            OptionGroupUI.H_GAP));
-                    c = scroll;
-                } else {
-                    c.setBorder(BorderFactory.createEmptyBorder(OptionGroupUI.H_GAP - 5, 0, 0, 0));
-                }
+                JScrollPane scroll = new JScrollPane(c, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
+                        JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+                scroll.setBorder(BorderFactory.createEmptyBorder());
+                c.setBorder(BorderFactory.createEmptyBorder(OptionGroupUI.H_GAP - 5, OptionGroupUI.H_GAP, 0,
+                        OptionGroupUI.H_GAP));
+                c = scroll;
                 tb.addTab(o.getName(), null, c, o.getShortDescription());
             } else if (o instanceof BooleanOption) {
                 JComponent c = new BooleanOptionUI((BooleanOption) o, editable);
