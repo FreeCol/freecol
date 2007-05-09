@@ -293,6 +293,7 @@ public final class GUI {
                 Unit unitInFront = getUnitInFront(gameData.getMap().getTile(selectedTile));
                 if (unitInFront != null) {
                     setActiveUnit(unitInFront);
+                    updateDragPathForActiveUnit();
                 } else {
                     setFocus(selectedTile);
                 }
@@ -449,15 +450,12 @@ public final class GUI {
             if (freeColClient.getGame().getCurrentPlayer() == freeColClient.getMyPlayer()) {
                 if (activeUnit.getState() != Unit.ACTIVE) {
                     freeColClient.getInGameController().clearOrders(activeUnit);
-                    updateDragPathForActiveUnit();
                 }
             } else {
                 freeColClient.getInGameController().clearGotoOrders(activeUnit);
-                updateDragPathForActiveUnit();
             }
-        } else {
-            updateDragPathForActiveUnit();
         }
+        updateDragPathForActiveUnit();
 
         // The user activated a unit
         if(viewMode.getView() == ViewMode.VIEW_TERRAIN_MODE && activeUnit != null)
