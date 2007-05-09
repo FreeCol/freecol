@@ -544,9 +544,9 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
             skill = String.valueOf(type.skill);
         }
         int[] widths = { 0, 3 * margin, 0 };
-        int[] heights = new int[17];
-        for (int index = 0; index < 8; index++) {
-            heights[2 * index + 1] = margin;
+        int[] heights = new int[19];
+        for (int index = 1; index < heights.length; index += 2) {
+            heights[index] = margin;
         }
         int labelColumn = 1;
         int valueColumn = 3;
@@ -558,37 +558,54 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
         int row = 1;
         JLabel name = new JLabel(Unit.getName(unit), SwingConstants.CENTER);
         name.setFont(smallHeaderFont);
-        // name.setPreferredSize(new Dimension(detailPanel.getWidth(), 50));
+
         detailPanel.add(name, higConst.rcwh(row, labelColumn, widths.length, 1));
         row += 2;
 
-        detailPanel.add(new JLabel(Messages.message("colopedia.unit.offensivePower")), higConst.rc(row, labelColumn));
-        detailPanel.add(new JLabel(String.valueOf(type.offence)), higConst.rc(row, valueColumn, "r"));
+        detailPanel.add(new JLabel(Messages.message("colopedia.unit.offensivePower")),
+                        higConst.rc(row, labelColumn));
+        detailPanel.add(new JLabel(String.valueOf(type.offence)),
+                        higConst.rc(row, valueColumn, "r"));
         row += 2;
-        detailPanel.add(new JLabel(Messages.message("colopedia.unit.defensivePower")), higConst.rc(row, labelColumn));
-        detailPanel.add(new JLabel(String.valueOf(type.defence)), higConst.rc(row, valueColumn, "r"));
+        detailPanel.add(new JLabel(Messages.message("colopedia.unit.defensivePower")),
+                        higConst.rc(row, labelColumn));
+        detailPanel.add(new JLabel(String.valueOf(type.defence)), 
+                        higConst.rc(row, valueColumn, "r"));
+        row += 2;
+        detailPanel.add(new JLabel(Messages.message("colopedia.unit.movement")),
+                        higConst.rc(row, labelColumn));
+        detailPanel.add(new JLabel(String.valueOf(type.movement/3)),
+                        higConst.rc(row, valueColumn, "r"));
         row += 2;
         if (type.hasAbility("carry-goods") || type.hasAbility("naval")) {
-            detailPanel.add(new JLabel(Messages.message("colopedia.unit.capacity")), higConst.rc(row, labelColumn));
-            detailPanel.add(new JLabel(String.valueOf(Unit.getInitialSpaceLeft(unit))), higConst.rc(row, valueColumn,
-                    "r"));
+            detailPanel.add(new JLabel(Messages.message("colopedia.unit.capacity")),
+                            higConst.rc(row, labelColumn));
+            detailPanel.add(new JLabel(String.valueOf(Unit.getInitialSpaceLeft(unit))),
+                            higConst.rc(row, valueColumn, "r"));
         } else {
-            detailPanel.add(new JLabel(Messages.message("colopedia.unit.skill")), higConst.rc(row, labelColumn));
+            detailPanel.add(new JLabel(Messages.message("colopedia.unit.skill")),
+                            higConst.rc(row, labelColumn));
             detailPanel.add(new JLabel(skill), higConst.rc(row, valueColumn, "r"));
         }
         row += 2;
-        detailPanel.add(new JLabel(Messages.message("colopedia.unit.price")), higConst.rc(row, labelColumn));
+        detailPanel.add(new JLabel(Messages.message("colopedia.unit.price")),
+                        higConst.rc(row, labelColumn));
         detailPanel.add(new JLabel(price), higConst.rc(row, valueColumn, "r"));
         row += 2;
-        detailPanel.add(new JLabel(Messages.message("colopedia.unit.hammersRequired")), higConst.rc(row, labelColumn));
-        detailPanel.add(new JLabel(hammersRequired), higConst.rc(row, valueColumn, "r"));
+        detailPanel.add(new JLabel(Messages.message("colopedia.unit.hammersRequired")),
+                        higConst.rc(row, labelColumn));
+        detailPanel.add(new JLabel(hammersRequired),
+                        higConst.rc(row, valueColumn, "r"));
         row += 2;
-        detailPanel.add(new JLabel(Messages.message("colopedia.unit.toolsRequired")), higConst.rc(row, labelColumn));
-        detailPanel.add(new JLabel(toolsRequired), higConst.rc(row, valueColumn, "r"));
+        detailPanel.add(new JLabel(Messages.message("colopedia.unit.toolsRequired")),
+                        higConst.rc(row, labelColumn));
+        detailPanel.add(new JLabel(toolsRequired),
+                        higConst.rc(row, valueColumn, "r"));
         row += 2;
-        detailPanel
-                .add(new JLabel(Messages.message("colopedia.unit.description")), higConst.rc(row, labelColumn, "tl"));
-        detailPanel.add(getDefaultTextArea(Messages.message(type.id + ".description")), higConst.rc(row, valueColumn));
+        detailPanel.add(new JLabel(Messages.message("colopedia.unit.description")),
+                        higConst.rc(row, labelColumn, "tl"));
+        detailPanel.add(getDefaultTextArea(Messages.message(type.id + ".description")),
+                        higConst.rc(row, valueColumn));
 
         detailPanel.validate();
     }

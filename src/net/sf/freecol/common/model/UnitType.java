@@ -26,6 +26,7 @@ public final class UnitType
     public  int        toolsRequired;
     public  int        skill;
     public  int        price;
+    public  int        movement;
     public  GoodsType  expertProduction;
     public HashSet<String> abilityArray = new HashSet<String>();    
 
@@ -36,6 +37,7 @@ public final class UnitType
         name = Xml.attribute( xml, "name" );
         offence = Xml.intAttribute( xml, "offence" );
         defence = Xml.intAttribute( xml, "defence" );
+        movement = Xml.intAttribute( xml, "movement" );
 
         if ( Xml.hasAttribute(xml, "skill") ) {
 

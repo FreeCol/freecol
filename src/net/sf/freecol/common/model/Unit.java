@@ -2191,6 +2191,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
      * 
      * @return The amount of moves this unit has at the beginning of each turn.
      */
+    /*
     public int getInitialMovesLeft() {
         if (isNaval()) {
             int fMagellan = 0;
@@ -2231,6 +2232,17 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
             }
         }
     }
+    */
+    public int getInitialMovesLeft() {
+        if (isMounted()) {
+            return 12;
+        } else if (isMissionary()) {
+            return 6;
+        } else {
+            return unitType.movement;
+        }
+    }
+    
 
     /**
      * Gets the initial hitpoints for a given type of <code>Unit</code>. For
