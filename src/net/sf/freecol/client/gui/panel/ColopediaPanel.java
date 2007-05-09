@@ -307,7 +307,7 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
             BuildingType buildingType = FreeCol.specification.buildingType(type);
             for (int level = 0; level < buildingType.numberOfLevels(); level++) {
                 BuildingType.Level buildingLevel = buildingType.level(level);
-                JButton button = new JButton(buildingLevel.name);
+                JButton button = new JButton(Messages.message(buildingLevel.name));
                 button.setActionCommand(String.valueOf(((type << 2) | (level))));
                 button.addActionListener(this);
                 listPanel.add(button);
@@ -462,7 +462,7 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
             TileType tileType = (forested ? FreeCol.specification.tileType(type).whenForested :
                                  FreeCol.specification.tileType(type));
             id = tileType.id;
-            name = tileType.name;
+            name = Messages.message(tileType.name);
             defenseBonus = String.valueOf(tileType.defenceBonus) + "%";
         }
 
@@ -621,11 +621,11 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
 
         String madeFrom = "";
         if (type.madeFrom != null) {
-            madeFrom = type.madeFrom.name;
+            madeFrom = Messages.message(type.madeFrom.name);
         }
         String makes = "";
         if (type.makes != null) {
-            makes = type.makes.name;
+            makes = Messages.message(type.makes.name);
         }
 
         int row = 1;
@@ -716,7 +716,7 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
          * Printing press, Newspaper {15, -1, -1} // Custom house };
          */
 
-        JLabel name = new JLabel(buildingLevel.name, SwingConstants.CENTER);
+        JLabel name = new JLabel(Messages.message(buildingLevel.name), SwingConstants.CENTER);
         name.setFont(smallHeaderFont);
         // name.setPreferredSize(new Dimension(detailPanel.getWidth(), 50));
         detailPanel.add(name, higConst.rcwh(row, leftColumn, widths.length, 1));
@@ -728,7 +728,7 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
             requiresText += String.valueOf(buildingLevel.populationRequired) + " " + Messages.message("colonists");
         }
         if (level > 0) {
-            requiresText += "\n" + buildingType.level(level - 1).name;
+            requiresText += "\n" + Messages.message(buildingType.level(level - 1).name);
         }
         if (level > 1
                 && (building == Building.BLACKSMITH || building == Building.TOBACCONIST || building == Building.WEAVER

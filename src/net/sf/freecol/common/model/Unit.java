@@ -2171,7 +2171,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
      */
     public static String getName(int someType) {
 
-        return FreeCol.specification.unitType(someType).name;
+        return Messages.message(FreeCol.specification.unitType(someType).name);
     }
 
     /**

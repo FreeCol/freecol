@@ -23,7 +23,7 @@ public final class TileType
     public void readFromXmlElement( Node tileTypeXml ) {
 
         id = Xml.attribute( tileTypeXml, "name" );
-        name = Xml.messageAttribute( tileTypeXml, "name" );
+        name = Xml.attribute( tileTypeXml, "name" );
         basicMoveCost = Xml.intAttribute(tileTypeXml, "basic-move-cost");
         defenceBonus = Xml.intAttribute(tileTypeXml, "defence-bonus");
 

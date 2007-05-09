@@ -252,7 +252,7 @@ public class Goods implements Locatable, Ownable, Nameable {
     public static String getName(int type) {
 
         if ( 0 <= type  &&  type < FreeCol.specification.numberOfGoodsTypes() ) {
-            return FreeCol.specification.goodsType(type).name;
+            return Messages.message(FreeCol.specification.goodsType(type).name);
         }
         return Messages.message("model.goods.Unknown");
     }

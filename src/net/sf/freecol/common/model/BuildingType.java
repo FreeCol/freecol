@@ -92,7 +92,7 @@ public final class BuildingType {
 
 
         void readFromXmlElement(Node xml) {
-            name = Xml.messageAttribute(xml, "name");
+            name = Xml.attribute(xml, "name");
             hammersRequired = Xml.intAttribute(xml, "hammers-required");
             toolsRequired = Xml.intAttribute(xml, "tools-required");
             populationRequired = Xml.intAttribute(xml, "population-required");

@@ -33,7 +33,7 @@ public final class UnitType
     public void readFromXmlElement( Node xml, Map<String, GoodsType> goodsTypeByRef ) {
 
         id = Xml.attribute( xml, "name" );
-        name = Xml.messageAttribute( xml, "name" );
+        name = Xml.attribute( xml, "name" );
         offence = Xml.intAttribute( xml, "offence" );
         defence = Xml.intAttribute( xml, "defence" );
 

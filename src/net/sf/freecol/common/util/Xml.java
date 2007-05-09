@@ -75,12 +75,12 @@ public final class Xml
         return xmlElement.getAttributes().getNamedItem(attributeName).getNodeValue();
     }
 
-
+    /*
     public static String messageAttribute( Node xmlElement, String attributeName ) {
 
         return Messages.message( attribute(xmlElement, attributeName) );
     }
-
+    */
 
     public static int intAttribute( Node xmlElement, String attributeName ) {
 

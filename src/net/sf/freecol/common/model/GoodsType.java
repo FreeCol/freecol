@@ -40,7 +40,7 @@ public final class GoodsType
     public void readFromXmlElement( Node xml, Map<String, GoodsType> goodsTypeByRef ) {
 
         id = Xml.attribute( xml, "name" );
-        name = Xml.messageAttribute( xml, "name" );
+        name = Xml.attribute( xml, "name" );
         isFarmed = Xml.booleanAttribute( xml, "is-farmed" );
 
         if ( Xml.hasAttribute(xml, "made-from") ) {
