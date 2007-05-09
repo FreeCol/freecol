@@ -244,14 +244,14 @@ public final class InGameController implements NetworkConstants {
                 final int turnNumber = freeColClient.getGame().getTurn().getNumber();
                 final int savegamePeriod = freeColClient.getClientOptions().getInteger(ClientOptions.AUTOSAVE_PERIOD);
                 if (savegamePeriod == 1 || (savegamePeriod != 0 && turnNumber % savegamePeriod == 0)) {
-                    final String filename = Messages.message("clientOptions.savegames.autosave.fileprefix") +
-                    '-' + freeColClient.getGame().getTurn().toSaveGameString() + ".fsg";
+                    final String filename = Messages.message("clientOptions.savegames.autosave.fileprefix") + '-'
+                            + freeColClient.getGame().getTurn().toSaveGameString() + ".fsg";
                     saveGame(new File(FreeCol.getAutosaveDirectory(), filename));
                 }
             }
 
             removeUnitsOutsideLOS();
-            //freeColClient.getCanvas().closeMenus();
+            // freeColClient.getCanvas().closeMenus();
             if (currentPlayer.checkEmigrate()) {
                 if (currentPlayer.hasFather(FoundingFather.WILLIAM_BREWSTER)) {
                     emigrateUnitInEurope(freeColClient.getCanvas().showEmigrationPanel());
@@ -699,7 +699,7 @@ public final class InGameController implements NetworkConstants {
         if (stop == null) {
             return;
         }
-        
+
         Location location = unit.getLocation();
         if (location instanceof Tile) {
             logger.finer("Stopped in colony " + ((Tile) unit.getLocation()).getColony().getName());
@@ -714,13 +714,14 @@ public final class InGameController implements NetworkConstants {
 
         Stop stop = unit.getCurrentStop();
         Location location = ((Tile) unit.getLocation()).getColony();
-        
+
         GoodsContainer warehouse = location.getGoodsContainer();
         if (warehouse == null) {
             throw new IllegalStateException("No warehouse in a stop's location");
         }
-        
-        // unload cargo that should not be on board and complete loaded goods with less than 100 units
+
+        // unload cargo that should not be on board and complete loaded goods
+        // with less than 100 units
         ArrayList<Integer> goodsTypesToLoad = stop.getCargo();
         Iterator<Goods> goodsIterator = unit.getGoodsIterator();
         test: while (goodsIterator.hasNext()) {
@@ -734,8 +735,7 @@ public final class InGameController implements NetworkConstants {
                         if (amountPresent > 0) {
                             logger.finest("Automatically loading goods " + goods.getName());
                             int amountToLoad = Math.min(100 - goods.getAmount(), amountPresent);
-                            loadCargo(new Goods(freeColClient.getGame(), location, goods.getType(),
-                                    amountToLoad), unit);
+                            loadCargo(new Goods(freeColClient.getGame(), location, goods.getType(), amountToLoad), unit);
                         }
                     }
                     // remove item: other items of the same type
@@ -748,7 +748,7 @@ public final class InGameController implements NetworkConstants {
             logger.finest("Automatically unloading " + goods.getName());
             unloadCargo(goods);
         }
-        
+
         // load cargo that should be on board
         for (Integer goodsType : goodsTypesToLoad) {
             int amountPresent = warehouse.getGoodsCount(goodsType.intValue());
@@ -763,7 +763,7 @@ public final class InGameController implements NetworkConstants {
 
         // TODO: do we want to load/unload units as well?
         // if so, when?
-        
+
         // Set destination to next stop's location
         stop = unit.nextStop();
         if (stop == null) {
@@ -777,7 +777,8 @@ public final class InGameController implements NetworkConstants {
 
         Stop stop = unit.getCurrentStop();
 
-        // unload cargo that should not be on board and complete loaded goods with less than 100 units
+        // unload cargo that should not be on board and complete loaded goods
+        // with less than 100 units
         ArrayList<Integer> goodsTypesToLoad = stop.getCargo();
         Iterator<Goods> goodsIterator = unit.getGoodsIterator();
         test: while (goodsIterator.hasNext()) {
@@ -799,7 +800,7 @@ public final class InGameController implements NetworkConstants {
             logger.finest("Automatically unloading " + goods.getName());
             sellGoods(goods);
         }
-        
+
         // load cargo that should be on board
         for (Integer goodsType : goodsTypesToLoad) {
             if (unit.getSpaceLeft() > 0) {
@@ -810,7 +811,7 @@ public final class InGameController implements NetworkConstants {
 
         // TODO: do we want to load/unload units as well?
         // if so, when?
-        
+
         // Set destination to next stop's location
         stop = unit.nextStop();
         if (stop == null) {
@@ -903,7 +904,7 @@ public final class InGameController implements NetworkConstants {
         }
 
         nextModelMessage();
-        
+
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
                 freeColClient.getActionManager().update();
@@ -1338,7 +1339,7 @@ public final class InGameController implements NetworkConstants {
             // If a successful attack against a colony, we need to update the
             // tile:
             Element utElement = getChildElement(attackResultElement, Tile.getXMLElementTagName());
-            if (utElement != null) {         
+            if (utElement != null) {
                 Tile updateTile = (Tile) game.getFreeColGameObject(utElement.getAttribute("ID"));
                 updateTile.readFromXMLElement(utElement);
             }
@@ -1400,26 +1401,27 @@ public final class InGameController implements NetworkConstants {
             try {
                 unit.attack(defender, result, plunderGold);
             } catch (Exception e) {
-                // Ignore the exception (the update further down will fix any problems).
+                // Ignore the exception (the update further down will fix any
+                // problems).
                 LogRecord lr = new LogRecord(Level.WARNING, "Exception in reallyAttack");
                 lr.setThrown(e);
                 logger.log(lr);
-            }            
+            }
             if (!defender.isDisposed()
                     && ((result == Unit.ATTACK_DONE_SETTLEMENT && unitElement != null)
-                            || defender.getLocation() == null || !defender.isVisibleTo(freeColClient.getMyPlayer()))) {                  
+                            || defender.getLocation() == null || !defender.isVisibleTo(freeColClient.getMyPlayer()))) {
                 defender.dispose();
             }
 
             Element updateElement = getChildElement(attackResultElement, "update");
-            if (updateElement != null) {                
+            if (updateElement != null) {
                 freeColClient.getInGameInputHandler().handle(client.getConnection(), updateElement);
             }
             if (unit.getMovesLeft() <= 0) {
                 nextActiveUnit(unit.getTile());
             }
 
-            freeColClient.getCanvas().refresh();            
+            freeColClient.getCanvas().refresh();
         } else {
             logger.log(Level.SEVERE, "Server returned null from reallyAttack!");
         }
@@ -2116,7 +2118,10 @@ public final class InGameController implements NetworkConstants {
         Canvas canvas = freeColClient.getCanvas();
         Map map = freeColClient.getGame().getMap();
 
-        if (unit.getTile() == null || canvas.showConfirmDialog("highseas.text", "highseas.yes", "highseas.no")) {
+        // getTile() == null : Unit in europe
+
+        if (!unit.isAlreadyOnHighSea()
+                && (unit.getTile() == null || canvas.showConfirmDialog("highseas.text", "highseas.yes", "highseas.no"))) {
             moveToEurope(unit);
             nextActiveUnit();
         } else if (map.getNeighbourOrNull(direction, unit.getTile()) != null) {
@@ -2475,7 +2480,8 @@ public final class InGameController implements NetworkConstants {
 
         if ((unitType != Unit.ARTILLERY && myPlayer.getGold() < Unit.getPrice(unitType))
                 || (unitType == Unit.ARTILLERY && myPlayer.getGold() < europe.getArtilleryPrice())) {
-            //System.out.println("Price: " + Unit.getPrice(unitType) + ", Gold: " + myPlayer.getGold());
+            // System.out.println("Price: " + Unit.getPrice(unitType) + ", Gold:
+            // " + myPlayer.getGold());
             canvas.errorMessage("notEnoughGold");
             return;
         }
@@ -2606,10 +2612,10 @@ public final class InGameController implements NetworkConstants {
             throw new IllegalStateException();
         }
 
-        //System.out.println("Sent slot " + slot);
+        // System.out.println("Sent slot " + slot);
         if (!myPlayer.hasFather(FoundingFather.WILLIAM_BREWSTER)) {
             slot = Integer.parseInt(reply.getAttribute("slot"));
-            //System.out.println("Received slot " + slot);
+            // System.out.println("Received slot " + slot);
         }
 
         Element unitElement = (Element) reply.getChildNodes().item(0);
@@ -2665,7 +2671,8 @@ public final class InGameController implements NetworkConstants {
             assignTradeRouteElement.setAttribute("tradeRoute", tradeRoute.getID());
             freeColClient.getClient().sendAndWait(assignTradeRouteElement);
             Location location = unit.getLocation();
-            if (location instanceof Tile) location = ((Tile) location).getColony();
+            if (location instanceof Tile)
+                location = ((Tile) location).getColony();
             if (tradeRoute.getStops().get(0).getLocation() == location) {
                 followTradeRoute(unit);
             } else if (freeColClient.getGame().getCurrentPlayer() == freeColClient.getMyPlayer()) {
@@ -2864,7 +2871,7 @@ public final class InGameController implements NetworkConstants {
                     canvas.getGUI().setActiveUnit(null);
                     // canvas.setEnabled(false);
                     endingTurn = false;
-                    
+
                     SwingUtilities.invokeLater(new Runnable() {
                         public void run() {
                             Element endTurnElement = Message.createNewRootElement("endTurn");
@@ -2968,7 +2975,7 @@ public final class InGameController implements NetworkConstants {
         }
 
         purgeOldMessagesFromMessagesToIgnore(thisTurn);
-        
+
         Runnable uiTask = new Runnable() {
             public void run() {
                 if (messageList.size() > 1) {
@@ -2979,7 +2986,7 @@ public final class InGameController implements NetworkConstants {
                 freeColClient.getActionManager().update();
             }
         };
-        if(SwingUtilities.isEventDispatchThread()) {
+        if (SwingUtilities.isEventDispatchThread()) {
             uiTask.run();
         } else {
             try {

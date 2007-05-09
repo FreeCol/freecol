@@ -82,6 +82,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
     private int type;
 
     private UnitType unitType;
+
     private boolean naval;
 
     private boolean armed, mounted, missionary;
@@ -136,6 +137,14 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
      * @see #getVisibleGoodsCount()
      */
     private int visibleGoodsCount;
+
+    /**
+     * Describes if the unit has been moved onto high sea but not to europe.
+     * This happens if the user moves a ship onto high sea but doesn't want to
+     * send it to europe and selects to keep the ship in this waters.
+     * 
+     */
+    private boolean alreadyOnHighSea = false;
 
 
     /**
@@ -504,9 +513,8 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
      * Gets the number of turns this unit has to train to educate a student.
      * This value is only meaningful for units that can be put in a school.
      * 
-     * @return The turns of training needed to teach its current type to a
-     *         free colonist or to promote an indentured servant or a petty
-     *         criminal.
+     * @return The turns of training needed to teach its current type to a free
+     *         colonist or to promote an indentured servant or a petty criminal.
      * @see #getTurnsOfTraining
      */
     public int getNeededTurnsOfTraining() {
@@ -758,9 +766,9 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
     /**
      * Gets the cost of moving this <code>Unit</code> from the given
      * <code>Tile</code> onto the given <code>Tile</code>. A call to
-     * {@link #getMoveType(Tile, Tile, int)} will return <code>ILLEGAL_MOVE</code>,
-     * if {@link #getMoveCost} returns a move cost larger than the
-     * {@link #getMovesLeft moves left}.
+     * {@link #getMoveType(Tile, Tile, int)} will return
+     * <code>ILLEGAL_MOVE</code>, if {@link #getMoveCost} returns a move cost
+     * larger than the {@link #getMovesLeft moves left}.
      * 
      * @param from The <code>Tile</code> this <code>Unit</code> will move
      *            from.
@@ -1059,7 +1067,8 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
         if (type == REVENGER || type == FLYING_DUTCHMAN) {
             return 3;
         } else if (isScout() || type == FRIGATE || type == GALLEON || type == MAN_O_WAR || type == PRIVATEER) {
-            // TODO Confirm that in the original game this was not 3 if HERNANDO DE SOTO was in the congress.
+            // TODO Confirm that in the original game this was not 3 if HERNANDO
+            // DE SOTO was in the congress.
             return 2;
         } else if (getOwner().hasFather(FoundingFather.HERNANDO_DE_SOTO)) {
             return 2;
@@ -1113,8 +1122,8 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
     }
 
     /**
-     * Move to a given tile. Unlike {@link #move(int)} no validation is done,
-     * so this method may be called from the opponentMove-handler.
+     * Move to a given tile. Unlike {@link #move(int)} no validation is done, so
+     * this method may be called from the opponentMove-handler.
      * 
      * @param newTile The new tile.
      */
@@ -1126,6 +1135,15 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
             setLocation(newTile);
             activeAdjacentSentryUnits(newTile);
             setMovesLeft(getMovesLeft() - moveCost);
+
+            // Clear the alreadyOnHighSea flag if we move onto a non-highsea
+            // tile.
+            if (newTile.getType() == Tile.HIGH_SEAS) {
+                setAlreadyOnHighSea(true);
+            } else {
+                setAlreadyOnHighSea(false);
+            }
+
         } else {
             throw new IllegalStateException("Illegal move requested - no target tile!");
         }
@@ -1601,13 +1619,10 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
      *         location.
      */
     private boolean canBeEquipped(int equipType, int amount) {
-        return ((getGoodsDumpLocation() != null &&
-                 getGoodsDumpLocation().getGoodsCount(equipType) >= amount) ||
-                ((location instanceof Europe ||
-                  location instanceof Unit
-                  && ((Unit) location).getLocation() instanceof Europe)
-                 && getOwner().getGold() >= getOwner().getMarket().getBidPrice(equipType, amount) &&
-                 getOwner().canTrade(equipType)));
+        return ((getGoodsDumpLocation() != null && getGoodsDumpLocation().getGoodsCount(equipType) >= amount) || ((location instanceof Europe || location instanceof Unit
+                && ((Unit) location).getLocation() instanceof Europe)
+                && getOwner().getGold() >= getOwner().getMarket().getBidPrice(equipType, amount) && getOwner()
+                .canTrade(equipType)));
     }
 
     /**
@@ -2091,8 +2106,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
             case BRAVE:
                 return Messages.message("model.unit.indianDragoon");
             default:
-                return (Messages.message("model.unit.dragoon") +
-                        " (" + getName(getType()) + ")");
+                return (Messages.message("model.unit.dragoon") + " (" + getName(getType()) + ")");
             }
         } else if (isArmed()) {
             switch (getType()) {
@@ -2103,8 +2117,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
             case BRAVE:
                 return Messages.message("model.unit.armedBrave");
             default:
-                return (Messages.message("model.unit.soldier") +
-                        " (" + getName(getType()) + ")");
+                return (Messages.message("model.unit.soldier") + " (" + getName(getType()) + ")");
             }
         } else if (isMounted()) {
             switch (getType()) {
@@ -2113,15 +2126,13 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
             case BRAVE:
                 return Messages.message("model.unit.mountedBrave");
             default:
-                return (Messages.message("model.unit.scout") +
-                        " (" + getName(getType()) + ")");
+                return (Messages.message("model.unit.scout") + " (" + getName(getType()) + ")");
             }
         } else if (isMissionary()) {
             if (getType() == JESUIT_MISSIONARY) {
                 return getName(getType());
             } else {
-                return (Messages.message("model.unit.missionary") +
-                        " (" + getName(getType()) + ")");
+                return (Messages.message("model.unit.missionary") + " (" + getName(getType()) + ")");
             }
         } else if (getType() == TREASURE_TRAIN) {
             return getName(TREASURE_TRAIN) + " (" + getTreasureAmount() + " " + Messages.message("gold") + ")";
@@ -2129,8 +2140,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
             if (getType() == HARDY_PIONEER) {
                 return getName(getType());
             } else {
-                return (Messages.message("model.unit.pioneer") + 
-                        " (" + getName(getType()) + ")");
+                return (Messages.message("model.unit.pioneer") + " (" + getName(getType()) + ")");
             }
         } else {
             return getName(getType());
@@ -2342,7 +2352,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
      */
     public boolean isNaval() {
         return naval;
-//        return unitType.hasAbility("naval");
+        // return unitType.hasAbility("naval");
     }
 
     /**
@@ -2522,6 +2532,9 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
 
         setState(TO_EUROPE);
         setLocation(getOwner().getEurope());
+
+        // Clear the alreadyOnHighSea flag:
+        alreadyOnHighSea = false;
     }
 
     /**
@@ -2535,6 +2548,9 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
         }
 
         setState(TO_AMERICA);
+
+        // Clear the alreadyOnHighSea flag:
+        alreadyOnHighSea = false;
     }
 
     /**
@@ -2743,8 +2759,8 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
     }
 
     /**
-     * The status of units that are currently working (for instance on building a road, or fortifying themselves)
-     * is updated in this method.
+     * The status of units that are currently working (for instance on building
+     * a road, or fortifying themselves) is updated in this method.
      */
     public void doAssignedWork() {
         logger.finest("Entering method doAssignedWork.");
@@ -2833,7 +2849,8 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
                     expendTools(20);
                     setState(ACTIVE);
 
-                    // If we pioneer finishs the work, he has used up his moves for this turn:
+                    // If we pioneer finishs the work, he has used up his moves
+                    // for this turn:
                     setMovesLeft(0);
                     break;
                 default:
@@ -3004,8 +3021,8 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
      * <p>
      * Note! As this method is used by the AI it really means that the unit can
      * defend as is. To be specific an unarmed colonist is not defensive yet,
-     * even if Paul Revere and stockpiled muskets are available. That check
-     * is only performed on an actual attack.
+     * even if Paul Revere and stockpiled muskets are available. That check is
+     * only performed on an actual attack.
      * 
      * @return <code>true</code> if this is a defensive unit meaning it can be
      *         used to defend a <code>Colony</code>. This would normally mean
@@ -3027,9 +3044,8 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
     }
 
     /**
-     * Return the offensive power of the attacker versus the defender
-     * as an int.
-     *
+     * Return the offensive power of the attacker versus the defender as an int.
+     * 
      * @param attacker an <code>Unit</code> value
      * @param defender an <code>Unit</code> value
      * @return an <code>int</code> value
@@ -3039,11 +3055,10 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
         return modifiers.get(modifiers.size() - 1).addend;
     }
 
-
     /**
-     * Return a list of all offensive modifiers that apply to the
-     * attacker versus the defender.
-     *
+     * Return a list of all offensive modifiers that apply to the attacker
+     * versus the defender.
+     * 
      * @param attacker an <code>Unit</code> value
      * @param defender an <code>Unit</code> value
      * @return an <code>ArrayList</code> of Modifiers
@@ -3065,8 +3080,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
                 result.add(Modifier.createMultiplicativeModifier("modifiers.cargoPenalty", factor));
                 totalFactor *= factor;
             }
-            if (attacker.getType() == Unit.PRIVATEER && 
-                attacker.getOwner().hasFather(FoundingFather.FRANCIS_DRAKE)) {
+            if (attacker.getType() == Unit.PRIVATEER && attacker.getOwner().hasFather(FoundingFather.FRANCIS_DRAKE)) {
                 // Drake grants 50% attack bonus
                 factor = 1.5f;
                 result.add(Modifier.createMultiplicativeModifier("modifiers.drake", factor));
@@ -3101,7 +3115,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
 
             // 50% attack bonus
             factor = 1.5f;
-            result.add(Modifier.createMultiplicativeModifier("modifiers.attackBonus", factor)); 
+            result.add(Modifier.createMultiplicativeModifier("modifiers.attackBonus", factor));
             totalFactor *= factor;
 
             // movement penalty
@@ -3113,16 +3127,15 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
             }
 
             // In the open
-            if (defender != null &&
-                defender.getTile() != null &&
-                defender.getTile().getSettlement() == null) {
-                
-                /** Ambush bonus in the open = defender's defense
-                 * bonus, if defender is REF, or attacker is Brave.
+            if (defender != null && defender.getTile() != null && defender.getTile().getSettlement() == null) {
+
+                /**
+                 * Ambush bonus in the open = defender's defense bonus, if
+                 * defender is REF, or attacker is Brave.
                  */
-                if (attacker.getType() == Unit.BRAVE
-                        || defender.getOwner().isREF()) {
-                    // TODO: terrain defense bonus is not cumulative, probably not ambush either!
+                if (attacker.getType() == Unit.BRAVE || defender.getOwner().isREF()) {
+                    // TODO: terrain defense bonus is not cumulative, probably
+                    // not ambush either!
 
                     // A bonus of 50 means base strength plus 50% of base
                     // strength, so we need to add 100 to the bonus first.
@@ -3132,18 +3145,15 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
                 }
 
                 // 75% Artillery in the open penalty
-                if (attacker.getType() == Unit.ARTILLERY ||
-                    attacker.getType() == Unit.DAMAGED_ARTILLERY) {
+                if (attacker.getType() == Unit.ARTILLERY || attacker.getType() == Unit.DAMAGED_ARTILLERY) {
                     factor = .25f;
                     result.add(Modifier.createMultiplicativeModifier("modifiers.artilleryPenalty", factor));
                     totalFactor *= factor;
                 }
             }
-            
+
             // Attacking a settlement
-            if (defender != null &&
-                    defender.getTile() != null &&
-                    defender.getTile().getSettlement() != null) {
+            if (defender != null && defender.getTile() != null && defender.getTile().getSettlement() != null) {
                 // REF bombardment bonus
                 if (attacker.getOwner().isREF()) {
                     factor = 1.5f;
@@ -3159,9 +3169,8 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
     }
 
     /**
-     * Return the defensive power of the defender versus the attacker
-     * as an int.
-     *
+     * Return the defensive power of the defender versus the attacker as an int.
+     * 
      * @param attacker an <code>Unit</code> value
      * @param defender an <code>Unit</code> value
      * @return an <code>int</code> value
@@ -3171,11 +3180,10 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
         return modifiers.get(modifiers.size() - 1).addend;
     }
 
-
     /**
-     * Return a list of all defensive modifiers that apply to the
-     * defender versus the attacker.
-     *
+     * Return a list of all defensive modifiers that apply to the defender
+     * versus the attacker.
+     * 
      * @param attacker an <code>Unit</code> value
      * @param defender an <code>Unit</code> value
      * @return an <code>ArrayList</code> of Modifiers
@@ -3210,10 +3218,9 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
                 addend = 1;
                 result.add(Modifier.createAdditiveModifier("modifiers.armed", addend));
                 totalAddend += addend;
-            } else if (defender.getOwner().hasFather(FoundingFather.PAUL_REVERE)
-                    && defender.isColonist()
+            } else if (defender.getOwner().hasFather(FoundingFather.PAUL_REVERE) && defender.isColonist()
                     && defender.getLocation() instanceof WorkLocation) {
-                Colony colony = ((WorkLocation)defender.getLocation()).getColony();
+                Colony colony = ((WorkLocation) defender.getLocation()).getColony();
                 if (colony.getGoodsCount(Goods.MUSKETS) >= 50) {
                     addend = 1;
                     result.add(Modifier.createAdditiveModifier("modifiers.paulRevere", addend));
@@ -3226,8 +3233,8 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
                 result.add(Modifier.createAdditiveModifier("modifiers.mounted", addend));
                 totalAddend += addend;
             }
-            
-            //  50% veteran bonus
+
+            // 50% veteran bonus
             if (defender.getType() == Unit.VETERAN_SOLDIER) {
                 factor = 1.5f;
                 result.add(Modifier.createMultiplicativeModifier("modifiers.veteranBonus", factor));
@@ -3241,14 +3248,12 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
                 totalFactor *= factor;
             }
 
-            if (defender.getTile() != null
-                    && defender.getTile().getSettlement() != null) {
+            if (defender.getTile() != null && defender.getTile().getSettlement() != null) {
                 Modifier settlementModifier = getSettlementModifier(attacker, defender.getTile().getSettlement());
                 result.add(settlementModifier);
                 totalFactor *= settlementModifier.factor;
-                if ((defender.getType() == Unit.ARTILLERY || 
-                     defender.getType() == Unit.DAMAGED_ARTILLERY) &&
-                    attacker.getType() == Unit.BRAVE) {
+                if ((defender.getType() == Unit.ARTILLERY || defender.getType() == Unit.DAMAGED_ARTILLERY)
+                        && attacker.getType() == Unit.BRAVE) {
                     // 100% defense bonus against an Indian raid
                     factor = 2;
                     result.add(Modifier.createMultiplicativeModifier("modifiers.artilleryAgainstRaid", factor));
@@ -3256,17 +3261,15 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
                 }
             } else if (defender.getTile() != null) {
                 // In the open
-                if (attacker.getType() != Unit.BRAVE 
-                        && !defender.getOwner().isREF()) {
+                if (attacker.getType() != Unit.BRAVE && !defender.getOwner().isREF()) {
                     // Terrain defensive bonus.
                     // terrain defense bonus has different scale
                     factor = (defender.getTile().defenseBonus() + 100) / 100f;
                     result.add(Modifier.createMultiplicativeModifier("modifiers.terrainBonus", factor));
                     totalFactor *= factor;
                 }
-                if ((defender.getType() == Unit.ARTILLERY || 
-                     defender.getType() == Unit.DAMAGED_ARTILLERY) &&
-                    defender.getState() != Unit.FORTIFIED) {
+                if ((defender.getType() == Unit.ARTILLERY || defender.getType() == Unit.DAMAGED_ARTILLERY)
+                        && defender.getState() != Unit.FORTIFIED) {
                     // -75% Artillery in the Open penalty
                     factor = .25f;
                     result.add(Modifier.createMultiplicativeModifier("modifiers.artilleryPenalty", factor));
@@ -3281,9 +3284,9 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
     }
 
     /**
-     * Return the defensive modifier that applies to defenders in the
-     * given settlement versus the attacker.
-     *
+     * Return the defensive modifier that applies to defenders in the given
+     * settlement versus the attacker.
+     * 
      * @param attacker an <code>Unit</code> value
      * @param settlement a <code>Settlement</code> value
      * @return a <code>Modifier</code>
@@ -3293,7 +3296,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
         if (settlement instanceof Colony) {
             // Colony defensive bonus.
             Colony colony = (Colony) settlement;
-            switch(colony.getBuilding(Building.STOCKADE).getLevel()) {
+            switch (colony.getBuilding(Building.STOCKADE).getLevel()) {
             case Building.NOT_BUILT:
             default:
                 // 50% colony bonus
@@ -3316,7 +3319,6 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
         }
     }
 
-
     /**
      * Attack a unit with the given outcome.
      * 
@@ -3335,8 +3337,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
         }
 
         // make sure we are at war, unless one of both units is a privateer
-        if (getOwner().isEuropean() && enemy.isEuropean() && getType() != PRIVATEER
-                && defender.getType() != PRIVATEER) {
+        if (getOwner().isEuropean() && enemy.isEuropean() && getType() != PRIVATEER && defender.getType() != PRIVATEER) {
             getOwner().setStance(enemy, Player.WAR);
         } else if (getType() == PRIVATEER) {
             enemy.setAttackedByPrivateers();
@@ -3448,7 +3449,8 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
         String nation = owner.getNationAsString();
         Location repairLocation = getOwner().getRepairLocation(this);
         if (repairLocation == null) {
-            // This fixes a problem with enemy ships without a known repair location.
+            // This fixes a problem with enemy ships without a known repair
+            // location.
             dispose();
             return;
         }
@@ -3580,16 +3582,14 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
             setMovesLeft(getInitialMovesLeft());
         }
         String newName = getName();
-        addModelMessage(this, messageID, new String[][] {{ "%oldName%", oldName },
-                                                         { "%newName%", newName },
-                                                         { "%nation%", nation }}, type);
+        addModelMessage(this, messageID, new String[][] { { "%oldName%", oldName }, { "%newName%", newName },
+                { "%nation%", nation } }, type);
 
         if (getOwner() != enemyUnit.getOwner()) {
             // this unit hasn't been captured by enemyUnit, show message to
             // enemyUnit's owner
-            addModelMessage(enemyUnit, messageID, new String[][] {{ "%oldName%", oldName },
-                                                                  { "%newName%", newName },
-                                                                  { "%nation%", nation }}, type);
+            addModelMessage(enemyUnit, messageID, new String[][] { { "%oldName%", oldName }, { "%newName%", newName },
+                    { "%nation%", nation } }, type);
         }
     }
 
@@ -3601,7 +3601,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
      * 
      * @param teacher
      */
-    public void train(Unit teacher){
+    public void train(Unit teacher) {
         String oldName = getName();
 
         if (getType() == PETTY_CRIMINAL) {
@@ -3610,20 +3610,15 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
             setType(FREE_COLONIST);
         } else if (getType() == FREE_COLONIST) {
             setType(teacher.getType());
-        } 
+        }
 
         String newName = getName();
         if (!newName.equals(oldName)) {
-            addModelMessage(this,
-                            "model.unit.unitEducated",
-                            new String[][] {
-                                { "%oldName%", oldName },
-                                { "%newName%", newName },
-                                { "%colony%", getLocationName() } },
-                            ModelMessage.UNIT_IMPROVED);
+            addModelMessage(this, "model.unit.unitEducated", new String[][] { { "%oldName%", oldName },
+                    { "%newName%", newName }, { "%colony%", getLocationName() } }, ModelMessage.UNIT_IMPROVED);
         }
     }
-    
+
     /**
      * Promotes this unit.
      */
@@ -3643,13 +3638,8 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
 
         String newName = getName();
         if (!newName.equals(oldName)) {
-            addModelMessage(this,
-                            "model.unit.unitPromoted",
-                            new String[][] {
-                                { "%oldName%", oldName },
-                                { "%newName%", getName() },
-                                { "%nation%", nation } },
-                            ModelMessage.UNIT_IMPROVED);
+            addModelMessage(this, "model.unit.unitPromoted", new String[][] { { "%oldName%", oldName },
+                    { "%newName%", getName() }, { "%nation%", nation } }, ModelMessage.UNIT_IMPROVED);
         }
     }
 
@@ -4184,13 +4174,9 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
                 logger.finest("About to change type of unit due to experience.");
                 String oldName = getName();
                 setType(((ColonyTile) location).getExpertForProducing(workType));
-                addModelMessage(getTile().getColony(),
-                                "model.unit.experience",
-                                new String[][] {
-                                    { "%oldName%", oldName },
-                                    { "%newName%", getName() },
-                                    { "%colony%", getTile().getColony().getName() } },
-                                ModelMessage.UNIT_IMPROVED, this);
+                addModelMessage(getTile().getColony(), "model.unit.experience", new String[][] {
+                        { "%oldName%", oldName }, { "%newName%", getName() },
+                        { "%colony%", getTile().getColony().getName() } }, ModelMessage.UNIT_IMPROVED, this);
             }
         }
     }
@@ -4266,7 +4252,8 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
         }
 
         if (location != null) {
-            if (getGame().isClientTrusted() || showAll || player == getOwner() || !(location instanceof Building || location instanceof ColonyTile)) {
+            if (getGame().isClientTrusted() || showAll || player == getOwner()
+                    || !(location instanceof Building || location instanceof ColonyTile)) {
                 out.writeAttribute("location", location.getID());
             } else {
                 out.writeAttribute("location", getTile().getColony().getID());
@@ -4283,8 +4270,8 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
 
         // Do not show enemy units hidden in a carrier:
         if (isCarrier()) {
-            if (getGame().isClientTrusted() || showAll || getOwner().equals(player) || !getGameOptions().getBoolean(GameOptions.UNIT_HIDING)
-                    && player.canSee(getTile())) {
+            if (getGame().isClientTrusted() || showAll || getOwner().equals(player)
+                    || !getGameOptions().getBoolean(GameOptions.UNIT_HIDING) && player.canSee(getTile())) {
                 unitContainer.toXML(out, player, showAll, toSavedGame);
                 goodsContainer.toXML(out, player, showAll, toSavedGame);
             } else {
@@ -4501,4 +4488,23 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
         return "unit";
     }
 
+    /**
+     * Returns true if this unit has already been moved onto high seas but not
+     * to europe.
+     * 
+     * @return
+     */
+    public boolean isAlreadyOnHighSea() {
+        return alreadyOnHighSea;
+    }
+
+    /**
+     * Tells unit that it has just entered the high seas but instead of going to
+     * europe, it stays on the current side of the atlantic.
+     * 
+     * @param alreadyOnHighSea
+     */
+    public void setAlreadyOnHighSea(boolean alreadyOnHighSea) {
+        this.alreadyOnHighSea = alreadyOnHighSea;
+    }
 }
