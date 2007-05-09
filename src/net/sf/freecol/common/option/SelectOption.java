@@ -7,6 +7,8 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
+import net.sf.freecol.client.gui.i18n.Messages;
+
 
 /**
 * Represents an option where the valid choice is an integer.
@@ -20,41 +22,66 @@ public class SelectOption extends AbstractOption {
     public static final String  REVISION = "$Revision$";
 
 
-    private int value;
-    private String[] options;
+    protected int value;
+    protected String[] options;
 
+    
     /**
-    * Creates a new <code>SelectOption</code>.
-    *
-    * @param id The identifier for this option. This is used when the object should be
-    *           found in an {@link OptionGroup}.
-    * @param name The name of the <code>Option</code>. This text is used for identifying
-    *           the option for a user. Example: The text related to a checkbox.
-    * @param shortDescription Should give a short description of the <code>SelectOption</code>.
-    *           This might be used as a tooltip text.
-    * @param options All possible values.
-    * @param defaultOption The index of the default value.
-    */
+     * Creates a new <code>SelectOption</code>.
+     *
+     * @param id The identifier for this option. This is used when the object should be
+     *           found in an {@link OptionGroup}.
+     * @param name The name of the <code>Option</code>. This text is used for identifying
+     *           the option for a user. Example: The text related to a checkbox.
+     * @param shortDescription Should give a short description of the <code>SelectOption</code>.
+     *           This might be used as a tooltip text.
+     * @param options All possible values.
+     * @param defaultOption The index of the default value.
+     */
     public SelectOption(String id, String name, String shortDescription, String[] options, int defaultOption) {
+        this(id, name, shortDescription, options, defaultOption, false);
+    }
+    
+    /**
+     * Creates a new <code>SelectOption</code>.
+     *
+     * @param id The identifier for this option. This is used when the object should be
+     *           found in an {@link OptionGroup}.
+     * @param name The name of the <code>Option</code>. This text is used for identifying
+     *           the option for a user. Example: The text related to a checkbox.
+     * @param shortDescription Should give a short description of the <code>SelectOption</code>.
+     *           This might be used as a tooltip text.
+     * @param options All possible values.
+     * @param defaultOption The index of the default value.
+     */
+    protected SelectOption(String id, String name, String shortDescription, String[] options, int defaultOption, boolean doNotLocalize) {
         super(id, name, shortDescription);
 
-        this.options = options;
+        if (doNotLocalize) {
+            this.options = options;
+        } else {
+            String[] localized = new String[options.length];
+            for (int i = 0; i < options.length; i++) {
+                localized[i] = Messages.message(options[i]);
+            }        
+            this.options = localized;
+        }
+        
         this.value = defaultOption;
     }
 
     /**
-    * Gets the current value of this <code>SelectOption</code>.
-    * @return The value.
-    */
+     * Gets the current value of this <code>SelectOption</code>.
+     * @return The value.
+     */
     public int getValue() {
         return value;
     }
-
-    
+ 
     /**
-    * Sets the value of this <code>SelectOption</code>.
-    * @param value The value to be set.
-    */
+     * Sets the value of this <code>SelectOption</code>.
+     * @param value The value to be set.
+     */
     public void setValue(int value) {
         final int oldValue = this.value;
         this.value = value;
@@ -65,22 +92,44 @@ public class SelectOption extends AbstractOption {
     }
 
     /**
-    * Gets the current options of this <code>SelectOption</code>.
-    * @return The options.
-    */
+     * Gets the current options of this <code>SelectOption</code>.
+     * @return The options.
+     */
     public String[] getOptions() {
         return options;
     }
 
     
     /**
-    * Sets the options of this <code>SelectOption</code>.
-    * @param options The options to be set.
-    */
-    public void setOptions(String[] options) {
+     * Sets the options of this <code>SelectOption</code>.
+     * @param options The options to be set.
+     */
+    protected void setOptions(String[] options) {
         this.options = options;
     }
 
+    /**
+     * This method can be overwritten by subclasses to allow
+     * a custom save value.
+     * 
+     * @return The String value of the Integer.
+     * @see setValue(String)
+     */
+    protected String getStringValue() {
+        return Integer.toString(value);
+    }
+    
+    /**
+     * This method can be overwritten by subclasses to allow
+     * a custom save value.
+     * 
+     * @return The String value of the Integer.
+     * @see getSaveValue()
+     */
+    protected void setValue(String value) {
+        setValue(Integer.parseInt(value));
+    }
+    
     /**
      * This method writes an XML-representation of this object to
      * the given stream.
@@ -93,11 +142,11 @@ public class SelectOption extends AbstractOption {
         // Start element:
         out.writeStartElement(getId());
 
-        out.writeAttribute("value", Integer.toString(value));
+        out.writeAttribute("value", getStringValue());
 
         out.writeEndElement();
     }
-
+    
     /**
      * Initialize this object from an XML-representation of this object.
      * @param in The input stream with the XML.
@@ -107,7 +156,7 @@ public class SelectOption extends AbstractOption {
     protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
         final int oldValue = this.value;
         
-        value = Integer.parseInt(in.getAttributeValue(null, "value"));
+        setValue(in.getAttributeValue(null, "value"));
         in.nextTag();
         
         if (value != oldValue) {

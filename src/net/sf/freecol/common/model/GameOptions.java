@@ -154,6 +154,9 @@ public class GameOptions extends OptionMap {
         add(difficultySettings);
     }
 
+    protected boolean isCorrectTagName(String tagName) {
+        return getXMLElementTagName().equals(tagName);
+    }
 
     /**
     * Gets the tag name of the root element representing this object.

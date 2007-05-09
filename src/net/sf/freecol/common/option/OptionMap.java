@@ -1,14 +1,28 @@
 
 package net.sf.freecol.common.option;
 
+import java.io.BufferedInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.zip.InflaterInputStream;
 
+import javax.xml.stream.XMLInputFactory;
+import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
+
+import net.sf.freecol.client.ClientOptions;
 
 import org.w3c.dom.Element;
 
@@ -164,6 +178,100 @@ public abstract class OptionMap extends OptionGroup {
         }
     }
 
+    /**
+     * Creates a <code>XMLStreamReader</code> for reading the given file.
+     * Compression is automatically detected.
+     * 
+     * @param file The file to be read.
+     * @return The <code>XMLStreamReader</code>.
+     * @exception IOException if thrown while loading the game or if a
+     *                <code>XMLStreamException</code> have been thrown by the
+     *                parser.
+     */
+    private static XMLStreamReader createXMLStreamReader(File file) throws IOException {
+        InputStream in = new BufferedInputStream(new FileInputStream(file));
+        // Automatically detect compression:
+        in.mark(10);
+        byte[] buf = new byte[5];
+        in.read(buf, 0, 5);
+        in.reset();
+        if (!(new String(buf)).equals("<?xml")) {
+            in = new BufferedInputStream(new InflaterInputStream(in));
+        }
+        XMLInputFactory xif = XMLInputFactory.newInstance();
+        try {
+            return xif.createXMLStreamReader(in);
+        } catch (XMLStreamException e) {
+            StringWriter sw = new StringWriter();
+            e.printStackTrace(new PrintWriter(sw));
+            logger.warning(sw.toString());
+            throw new IOException("XMLStreamException.");
+        }
+    }
+    
+    abstract protected boolean isCorrectTagName(String tagName);
+
+    /**
+     * Reads the options from the given file.
+     * 
+     * @param loadFile The <code>File</code> to read the
+     *            options from.
+     */
+    public void load(File loadFile) {
+        if (loadFile == null || !loadFile.exists()) {
+            logger.warning("Could not find the client options file.");
+            return;
+        }
+        
+        XMLStreamReader in = null;
+        try {
+            in = createXMLStreamReader(loadFile);
+            in.nextTag();
+            while (!isCorrectTagName(in.getLocalName())) {
+                in.nextTag();
+            }
+            readFromXML(in);
+        } catch (Exception e) {
+            logger.log(Level.WARNING, "Exception while loading options.", e);
+        } finally {
+            try {
+                if (in != null) {
+                    in.close();
+                }
+            } catch (Exception e) {
+                logger.log(Level.WARNING, "Exception while closing stream.", e);
+            }
+        }
+    }
+    
+    /**
+     * Writes the options to the given file.
+     * 
+     * @param saveFile The file where the client options should be written.
+     * @see ClientOptions
+     */
+    public void save(File saveFile) {
+        XMLOutputFactory xof = XMLOutputFactory.newInstance();
+        XMLStreamWriter xsw = null;
+        try {
+            xsw = xof.createXMLStreamWriter(new FileOutputStream(saveFile));
+            xsw.writeStartDocument();
+            toXML(xsw);
+            xsw.writeEndDocument();
+            xsw.flush();
+        } catch (Exception e) {
+            logger.log(Level.WARNING, "Exception while storing options.", e);
+        } finally {
+            try {
+                if (xsw != null) {
+                    xsw.close();
+                }
+            } catch (Exception e) {
+                logger.log(Level.WARNING, "Exception while closing stream.", e);
+            }
+        }
+    }
+    
     /**
      * This method writes an XML-representation of this object to
      * the given stream.

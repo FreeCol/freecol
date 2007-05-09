@@ -6,7 +6,6 @@ import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
-import java.io.IOException;
 import java.util.logging.Logger;
 
 import javax.swing.BorderFactory;
@@ -159,12 +158,8 @@ public final class GameOptionsDialog extends FreeColDialog implements ActionList
                 File saveFile = freeColClient.getCanvas().showSaveDialog(FreeCol.getSaveDirectory(), ".fgo", filters,
                         "");
                 if (saveFile != null) {
-                    try {
-                        ui.updateOption();
-                        freeColClient.getPreGameController().saveGameOptions(saveFile);
-                    } catch (IOException e) {
-                        freeColClient.getCanvas().errorMessage("unspecifiedIOException");
-                    }
+                    ui.updateOption();
+                    freeColClient.getGame().getGameOptions().save(saveFile);
                 }
                 break;
             case LOAD:
@@ -173,11 +168,7 @@ public final class GameOptionsDialog extends FreeColDialog implements ActionList
                         new FileFilter[] { FreeColDialog.getFGOFileFilter(), FreeColDialog.getFSGFileFilter(),
                                 FreeColDialog.getGameOptionsFileFilter() });
                 if (loadFile != null) {
-                    try {
-                        freeColClient.getPreGameController().loadGameOptions(loadFile);
-                    } catch (IOException e) {
-                        freeColClient.getCanvas().errorMessage("unspecifiedIOException");
-                    }
+                    freeColClient.getGame().getGameOptions().load(loadFile);
                 }
                 break;
             default:

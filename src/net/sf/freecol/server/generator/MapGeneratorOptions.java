@@ -512,6 +512,10 @@ public class MapGeneratorOptions extends OptionMap {
         }
     }
 
+    protected boolean isCorrectTagName(String tagName) {
+        return getXMLElementTagName().equals(tagName);
+    }
+    
     /**
      * Gets the tag name of the root element representing this object.
      * @return "mapGeneratorOptions".

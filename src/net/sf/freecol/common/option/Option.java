@@ -2,6 +2,8 @@
 package net.sf.freecol.common.option;
 
 
+import java.beans.PropertyChangeListener;
+
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
@@ -55,6 +57,20 @@ public interface Option {
     */
     public String getName();
 
+    /**
+     * Adds a new <code>PropertyChangeListener</code> for monitoring state
+     * changes. Events are generated when variables are changed.
+     * 
+     * @param pcl The <code>PropertyChangeListener</code> to be added.
+     */
+    public void addPropertyChangeListener(PropertyChangeListener pcl);
+    
+    /**
+     * Remove the given <code>PropertyChangeListener</code>.
+     * 
+     * @param pcl The <code>PropertyChangeListener</code> to be removed.
+     */
+    public void removePropertyChangeListener(PropertyChangeListener pcl);
 
     /**
     * Makes an XML-representation of this object.

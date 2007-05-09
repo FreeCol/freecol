@@ -87,7 +87,6 @@ public class ActionManager extends OptionGroup {
         add(new ReportTradeAction(freeColClient));
         add(new ReportTurnAction(freeColClient));
         add(new SaveAction(freeColClient));
-        add(new SelectLanguageAction(freeColClient));
         add(new SentryAction(freeColClient));
         add(new SkipUnitAction(freeColClient));
         add(new ToggleViewModeAction(freeColClient));

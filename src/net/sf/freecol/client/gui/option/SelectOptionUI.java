@@ -10,7 +10,6 @@ import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
-import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.option.Option;
 import net.sf.freecol.common.option.SelectOption;
 
@@ -49,12 +48,8 @@ public final class SelectOptionUI extends JPanel implements OptionUpdater, Prope
         add(label);
 
         String[] strings = option.getOptions();
-        String[] localized = new String[strings.length];
-        for (int i = 0; i < strings.length; i++) {
-            localized[i] = Messages.message(strings[i]);
-        }
 
-        comboBox = new JComboBox(localized);
+        comboBox = new JComboBox(strings);
         comboBox.setSelectedIndex(option.getValue());
         add(comboBox);
         

@@ -2,8 +2,11 @@
 package net.sf.freecol;
 
 import java.awt.Rectangle;
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileReader;
 import java.io.IOException;
+import java.util.Locale;
 import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -11,8 +14,10 @@ import java.util.logging.Logger;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
+import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamReader;
 
+import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.client.gui.i18n.Messages;
@@ -23,6 +28,7 @@ import net.sf.freecol.common.FreeColException;
 import net.sf.freecol.common.Specification;
 import net.sf.freecol.common.logging.DefaultHandler;
 import net.sf.freecol.common.networking.NoRouteToServerException;
+import net.sf.freecol.common.option.LanguageOption;
 import net.sf.freecol.server.FreeColServer;
 
 
@@ -41,7 +47,7 @@ public final class FreeCol {
     public static final String  LICENSE = "http://www.gnu.org/licenses/gpl.html";
     public static final String  REVISION = "$Revision$";
 
-    public static final  Specification  specification = new Specification();
+    public static Specification specification;
 
     private  static final String FREECOL_VERSION = "0.6.2-cvs";
 
@@ -57,6 +63,7 @@ public final class FreeCol {
                             memoryCheck = true;
     private static Rectangle windowSize = new Rectangle(-1, -1);
     private static String   dataFolder = "";
+    
     private static FreeColClient freeColClient;
 
     private static boolean standAloneServer = false;
@@ -68,6 +75,8 @@ public final class FreeCol {
     private static File saveDirectory;
     
     private static File savegameFile = null;
+    
+    private static File clientOptionsFile = null;
 
     private static Level logLevel = Level.INFO;
 
@@ -80,16 +89,12 @@ public final class FreeCol {
      * @param args The command-line arguments.
      */
     public static void main(String[] args) {
-
-        // TODO: The location of the save directory should be determined by the installer.
-        saveDirectory = new File(System.getProperty("user.home"));
-        if (!saveDirectory.exists()) {
-            saveDirectory = new File("save");
-        } else {        
-            saveDirectory = new File(saveDirectory, "freecol" + FILE_SEP + "save");
-        }
-        
+        initLogging();        
+        createAndSetDirectories();
+        Locale.setDefault(getLocale());
         handleArgs(args);
+        
+        specification = new Specification();
 
         if (javaCheck && !checkJavaVersion()) {
             System.err.println("Java version " + MIN_JDK_VERSION +
@@ -103,27 +108,6 @@ public final class FreeCol {
             System.out.println("You need to assign more memory to the JVM. Restart FreeCol with:");
             System.out.println("java -Xmx" + minMemory + "M -jar FreeCol.jar");
             return;
-        }
-
-        final Logger baseLogger = Logger.getLogger("");
-        final Handler[] handlers = baseLogger.getHandlers();
-        for (int i = 0; i < handlers.length; i++) {
-            baseLogger.removeHandler(handlers[i]);
-        }
-
-        try {
-            baseLogger.addHandler(new DefaultHandler());
-            if (inDebugMode) {
-                logLevel = Level.FINEST;
-            } 
-            Logger freecolLogger = Logger.getLogger("net.sf.freecol");
-            freecolLogger.setLevel(logLevel);
-        } catch (FreeColException e) {
-            e.printStackTrace();
-        }
-        
-        if (!saveDirectory.exists()) {
-            saveDirectory.mkdirs();
         }
 
         if (standAloneServer) {
@@ -171,23 +155,19 @@ public final class FreeCol {
                 System.exit(-1);
             }
         } else {
-            SwingUtilities.invokeLater(new Runnable() {
-                public void run() {
-                    try {
-                        UIManager.setLookAndFeel(new FreeColLookAndFeel(dataFolder));
-                    } catch (UnsupportedLookAndFeelException e) {
-                        logger.warning("Could not load the \"FreeCol Look and Feel\"");
-                    } catch (FreeColException e) {
-                        e.printStackTrace();
-                        System.out.println("\nThe data files could not be found by FreeCol. Please make sure");
-                        System.out.println("they are present. If FreeCol is looking in the wrong directory");
-                        System.out.println("then run the game with a command-line parameter:");
-                        System.out.println("");
-                        printUsage();
-                        return;
-                    }
-                }
-            });
+            try {
+                UIManager.setLookAndFeel(new FreeColLookAndFeel(dataFolder));
+            } catch (UnsupportedLookAndFeelException e) {
+                logger.warning("Could not load the \"FreeCol Look and Feel\"");
+            } catch (FreeColException e) {
+                e.printStackTrace();
+                System.out.println("\nThe data files could not be found by FreeCol. Please make sure");
+                System.out.println("they are present. If FreeCol is looking in the wrong directory");
+                System.out.println("then run the game with a command-line parameter:");
+                System.out.println("");
+                printUsage();
+                return;
+            }
 
             // TODO: don't use same datafolder for both images and music because the images are best kept inside the .JAR file.
 
@@ -235,17 +215,128 @@ public final class FreeCol {
             }
         }
     }
+    
+    /**
+     * Initialize loggers.
+     */
+    private static void initLogging() {
+        final Logger baseLogger = Logger.getLogger("");
+        final Handler[] handlers = baseLogger.getHandlers();
+        for (int i = 0; i < handlers.length; i++) {
+            baseLogger.removeHandler(handlers[i]);
+        }
+        try {
+            baseLogger.addHandler(new DefaultHandler());
+            if (inDebugMode) {
+                logLevel = Level.FINEST;
+            } 
+            Logger freecolLogger = Logger.getLogger("net.sf.freecol");
+            freecolLogger.setLevel(logLevel);
+        } catch (FreeColException e) {
+            e.printStackTrace();
+        }
+    }
+    
+    /**
+     * Determines the <code>Locale</code> to be used.
+     * @return Currently this method returns the locale set by
+     *      the ClientOptions (read directly from "options.xml").
+     *      This behavior will probably be changed.
+     */
+    public static Locale getLocale() { 
+        XMLInputFactory xif = XMLInputFactory.newInstance();
 
+        XMLStreamReader in = null;
+        try {
+            in = xif.createXMLStreamReader(new BufferedReader(new FileReader(getClientOptionsFile())));
+            in.nextTag();
+            while (!ClientOptions.LANGUAGE.equals(in.getLocalName())) {
+                in.nextTag();
+            }
+            Locale l = LanguageOption.getLocale(in.getAttributeValue(null, "value"));
+            return l;
+        } catch (Exception e) {
+            logger.log(Level.WARNING, "Exception while loading options.", e);
+            return Locale.getDefault();
+        } finally {
+            try {
+                if (in != null) {
+                    in.close();
+                }
+            } catch (Exception e) {
+                logger.log(Level.WARNING, "Exception while closing stream.", e);
+                return Locale.getDefault();
+            }
+        }
+    }
+
+    /**
+     * Returns the file containing the client options.
+     * @return The file.
+     */
+    public static File getClientOptionsFile() {
+        return clientOptionsFile;
+    }
+
+    /**
+     * Gets the <code>FreeColClient</code>.
+     * @return The <code>FreeColClient</code>, or <code>null</code>
+     *      if the game is run as a standalone server. 
+     */
     public static FreeColClient getFreeColClient() {
         return freeColClient;
     }
 
     /**
-    * Returns the directory where the savegames should be put.
-    * @return The directory where the savegames should be put.
+     * Creates a freecol dir for the current user.
+     * 
+     * The directory is created within the current user's
+     * home directory. This directory will be called "freecol"
+     * and underneath that directory a "save" directory will
+     * be created.
+     */
+    private static void createAndSetDirectories() {
+        // TODO: The location of the save directory should be determined by the installer.;
+        
+        File mainUserDirectory = new File(System.getProperty("user.home"), "freecol");
+        if (mainUserDirectory.exists() && mainUserDirectory.isFile()) {
+            logger.warning("Could not create .freecol under "
+                    + System.getProperty("user.home") + " because there "
+                    + "already exists a regular file with the same name.");
+            return;
+        } else if (!mainUserDirectory.exists()) {
+            mainUserDirectory.mkdir();
+        }
+        clientOptionsFile = new File(mainUserDirectory, "options.xml");
+        saveDirectory = new File(mainUserDirectory, "save");
+        if (saveDirectory.exists() && saveDirectory.isFile()) {
+            logger.warning("Could not create freecol/save under "
+                    + System.getProperty("user.home") + " because there "
+                    + "already exists a regular file with the same name.");
+            return;
+        } else if (!saveDirectory.exists()) {
+            saveDirectory.mkdir();
+        }
+    }
+
+    /**
+     * Returns the directory where the savegames should be put.
+     * @return The directory where the savegames should be put.
     */
     public static File getSaveDirectory() {
         return saveDirectory;
+    }
+    
+    /**
+     * Returns the data directory.
+     * @return The directory where the data files are located.
+     */
+    public static File getDataDirectory() {
+        if (dataFolder.equals("")) {
+            return new File("data");
+        } else {        
+            return new File(dataFolder);
+        }
     }
     
     /**

@@ -4,10 +4,10 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.util.Locale;
 import java.util.MissingResourceException;
-import java.util.PropertyResourceBundle;
 import java.util.Properties;
-import java.util.ResourceBundle;
 import java.util.logging.Logger;
+
+import net.sf.freecol.FreeCol;
 
 /**
  * Represents a collection of messages in a particular locale. <p/>
@@ -28,7 +28,7 @@ public class Messages {
 
     private static final Logger logger = Logger.getLogger(Messages.class.getName());
 
-    public static final String DATA_DIR = "data/strings";
+    public static final String STRINGS_DIRECTORY = "strings";
     public static final String FILE_PREFIX = "FreeColMessages";
     public static final String FILE_SUFFIX = ".properties";
 
@@ -47,7 +47,6 @@ public class Messages {
      * @throws MissingResourceException if the given message could not be found.
      */
     public static String message(String messageId) {
-
         if (messageId == null) {
             throw new NullPointerException();
         }
@@ -69,6 +68,9 @@ public class Messages {
         if (locale == null) {
             throw new NullPointerException("Parameter locale must not be null");
         } else {
+            if (!Locale.getDefault().equals(locale)) {
+                Locale.setDefault(locale);
+            }
             setMessageBundle(locale.getLanguage(), locale.getCountry(), locale.getVariant());
         }
     }
@@ -81,7 +83,7 @@ public class Messages {
      * @param variant The variant for this locale.
      * @return The ResourceBundle containing the messages for the given locale.
      */
-    public static void setMessageBundle(String language, String country, String variant) {
+    private static void setMessageBundle(String language, String country, String variant) {
 
         messageBundle = new Properties();
 
@@ -102,12 +104,14 @@ public class Messages {
         };
 
         for (String fileName : fileNames) {
-            File resourceFile = new File(DATA_DIR, fileName);
+            File resourceFile = new File(getI18nDirectory(), fileName);
             loadResources(resourceFile);
         }
-
     }
 
+    public static File getI18nDirectory() {
+        return new File(FreeCol.getDataDirectory(), STRINGS_DIRECTORY);
+    }
 
     /**
      * Finds the message with a particular ID in the default locale and performs

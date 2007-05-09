@@ -2,6 +2,7 @@
 package net.sf.freecol.client;
 
 import java.util.Comparator;
+import java.util.logging.Logger;
 
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.Europe;
@@ -12,6 +13,7 @@ import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.option.BooleanOption;
 import net.sf.freecol.common.option.IntegerOption;
+import net.sf.freecol.common.option.LanguageOption;
 import net.sf.freecol.common.option.OptionGroup;
 import net.sf.freecol.common.option.OptionMap;
 import net.sf.freecol.common.option.SelectOption;
@@ -29,11 +31,17 @@ import org.w3c.dom.Element;
 * identifier (defined as a constant in this class).
 */
 public class ClientOptions extends OptionMap {
+    private static final Logger logger = Logger.getLogger(ClientOptions.class.getName());
 
     public static final String  COPYRIGHT = "Copyright (C) 2003-2005 The FreeCol Team";
     public static final String  LICENSE = "http://www.gnu.org/licenses/gpl.html";
     public static final String  REVISION = "$Revision$";
 
+    /**
+     * Option for setting the language.
+     */
+    public static final String LANGUAGE = "languageOption";
+    
     /**
      * Selected tiles always gets centered if this option is
      * enabled (even if the tile is {@link net.sf.freecol.client.gui.GUI#onScreen(Map.Position)}).
@@ -41,7 +49,7 @@ public class ClientOptions extends OptionMap {
      * @see net.sf.freecol.client.gui.GUI
      */
     public static final String ALWAYS_CENTER = "alwaysCenter";
-    
+
     /**
      * Used by GUI, the number will be displayed when a group of goods are higher than this number.
      * @see net.sf.freecol.client.gui.GUI
@@ -300,6 +308,7 @@ public class ClientOptions extends OptionMap {
         /* Add options here: */
 
         OptionGroup guiGroup = new OptionGroup("clientOptions.gui.name", "clientOptions.gui.shortDescription");
+        guiGroup.add(new LanguageOption(LANGUAGE, "clientOptions.gui." + LANGUAGE + ".name", "clientOptions.gui." + LANGUAGE + ".shortDescription"));
         guiGroup.add(new IntegerOption(MIN_NUMBER_FOR_DISPLAYING_GOODS_COUNT, "clientOptions.gui."+ MIN_NUMBER_FOR_DISPLAYING_GOODS_COUNT +".name", "clientOptions.gui."+ MIN_NUMBER_FOR_DISPLAYING_GOODS_COUNT +".shortDescription", 0, 10, 7));
         guiGroup.add(new IntegerOption(MAX_NUMBER_OF_GOODS_IMAGES, "clientOptions.gui."+ MAX_NUMBER_OF_GOODS_IMAGES +".name", "clientOptions.gui."+ MAX_NUMBER_OF_GOODS_IMAGES +".shortDescription", 1, 10, 7));
         guiGroup.add(new BooleanOption(ALWAYS_CENTER, "clientOptions.gui."+ ALWAYS_CENTER +".name", "clientOptions.gui."+ ALWAYS_CENTER +".shortDescription", false));
@@ -496,11 +505,14 @@ public class ClientOptions extends OptionMap {
         }
     }
 
-
+    protected boolean isCorrectTagName(String tagName) {
+        return getXMLElementTagName().equals(tagName);
+    }
+    
     /**
-    * Gets the tag name of the root element representing this object.
-    * @return "clientOptions".
-    */
+     * Gets the tag name of the root element representing this object.
+     * @return "clientOptions".
+     */
     public static String getXMLElementTagName() {
         return "clientOptions";
     }

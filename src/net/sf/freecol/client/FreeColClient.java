@@ -3,26 +3,19 @@ package net.sf.freecol.client;
 import java.awt.GraphicsDevice;
 import java.awt.GraphicsEnvironment;
 import java.awt.Rectangle;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.io.StringWriter;
 import java.util.LinkedList;
+import java.util.Locale;
 import java.util.Queue;
 import java.util.Random;
 import java.util.logging.Logger;
 
 import javax.swing.JFrame;
 import javax.swing.SwingUtilities;
-import javax.xml.transform.OutputKeys;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerException;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
 
+import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.control.ClientModelController;
 import net.sf.freecol.client.control.ConnectController;
 import net.sf.freecol.client.control.InGameController;
@@ -35,6 +28,7 @@ import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.client.gui.WindowedFrame;
 import net.sf.freecol.client.gui.action.ActionManager;
+import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.client.gui.sound.MusicLibrary;
 import net.sf.freecol.client.gui.sound.SfxLibrary;
 import net.sf.freecol.client.gui.sound.SoundPlayer;
@@ -43,10 +37,11 @@ import net.sf.freecol.common.PseudoRandom;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.networking.Message;
+import net.sf.freecol.common.option.LanguageOption;
+import net.sf.freecol.common.option.Option;
 import net.sf.freecol.server.FreeColServer;
 
 import org.w3c.dom.Element;
-import org.xml.sax.SAXException;
 
 /**
  * The main control class for the FreeCol client. This class both starts and
@@ -116,11 +111,9 @@ public final class FreeColClient {
 
     private boolean singleplayer;
 
-    private File clientOptionsFile;
-
-    private ClientOptions clientOptions = new ClientOptions();
-
     private final ActionManager actionManager;
+    
+    private ClientOptions clientOptions;
 
     public final Worker worker;
 
@@ -151,6 +144,8 @@ public final class FreeColClient {
         this.imageLibrary = imageLibrary;
         this.musicLibrary = musicLibrary;
         this.sfxLibrary = sfxLibrary;
+        
+        clientOptions = new ClientOptions();
         actionManager = new ActionManager(this);
         // Control:
         connectController = new ConnectController(this);
@@ -168,41 +163,22 @@ public final class FreeColClient {
         });
         worker = new Worker();
         worker.start();
-        createFreeColDirs();
-        loadClientOptions();
-    }
-
-    /**
-     * Creates a freecol dir for the current operating system user. The
-     * directory is created within the current user's home directory. This
-     * directory will be called ".freecol" and underneath that directory there
-     * will be a "save" directory created. All of this will only be done in case
-     * they don't already exist.
-     */
-    private void createFreeColDirs() {
-        String dir = System.getProperty("user.home");
-        String fileSeparator = System.getProperty("file.separator");
-        if (!dir.endsWith(fileSeparator)) {
-            dir += fileSeparator;
-        }
-        dir += ".freecol";
-        File file = new File(dir);
-        if (file.exists() && file.isFile()) {
-            logger
-                    .warning("Could not create .freecol under ~ because there already exists a regular file with the same name.");
-            return;
-        } else if (!file.exists()) {
-            file.mkdir();
-        }
-        clientOptionsFile = new File(dir, "options.xml");
-        dir += fileSeparator + "save";
-        file = new File(dir);
-        if (file.exists() && file.isFile()) {
-            logger
-                    .warning("Could not create .freecol/save under ~ because there already exists a regular file with the same name.");
-            return;
-        } else if (!file.exists()) {
-            file.mkdir();
+        
+        if (FreeCol.getClientOptionsFile() != null
+                && FreeCol.getClientOptionsFile().exists()) {
+            clientOptions.load(FreeCol.getClientOptionsFile());
+            Option o = clientOptions.getObject(ClientOptions.LANGUAGE);
+            o.addPropertyChangeListener(new PropertyChangeListener() {
+                public void propertyChange(PropertyChangeEvent e) {
+                    if (((Integer) e.getNewValue()).intValue() == 0) {
+                        canvas.showInformationMessage("autodetectLanguageSelected");
+                    } else {
+                        Locale l = LanguageOption.getLocale(((Integer) e.getNewValue()).intValue());
+                        Messages.setMessageBundle(l);
+                        canvas.showInformationMessage("newLanguageSelected", new String[][] {{"%language%", l.getDisplayName()}});
+                    }
+                }
+            });
         }
     }
 
@@ -260,7 +236,7 @@ public final class FreeColClient {
      * @see ClientOptions
      */
     public void saveClientOptions() {
-        saveClientOptions(clientOptionsFile);
+        saveClientOptions(FreeCol.getClientOptionsFile());
     }
 
     /**
@@ -270,23 +246,7 @@ public final class FreeColClient {
      * @see ClientOptions
      */
     public void saveClientOptions(File saveFile) {
-        Element element = getClientOptions().toXMLElement(Message.createNewDocument());
-        // Write the XML Element to the file:
-        try {
-            TransformerFactory factory = TransformerFactory.newInstance();
-            Transformer xmlTransformer = factory.newTransformer();
-            xmlTransformer.setOutputProperty(OutputKeys.INDENT, "yes");
-            try {
-                PrintWriter out = new PrintWriter(new FileOutputStream(saveFile));
-                xmlTransformer.transform(new DOMSource(element), new StreamResult(out));
-                out.close();
-            } catch (IOException ioe) {
-                logger.warning("Could not store client options.");
-            }
-        } catch (TransformerException e) {
-            logger.warning("TransformerException");
-            return;
-        }
+        getClientOptions().save(saveFile);
     }
 
     /**
@@ -302,7 +262,7 @@ public final class FreeColClient {
      * Reads the {@link ClientOptions} from the given file.
      */
     public void loadClientOptions() {
-        loadClientOptions(clientOptionsFile);
+        loadClientOptions(FreeCol.getClientOptionsFile());
     }
 
     /**
@@ -312,28 +272,7 @@ public final class FreeColClient {
      *            <code>ClientOptions</code> from.
      */
     public void loadClientOptions(File loadFile) {
-        if (loadFile == null || !loadFile.exists()) {
-            logger.warning("Could not find the client options file.");
-            return;
-        }
-        try {
-            Message message = new Message(new FileInputStream(loadFile));
-            Element element = message.getDocument().getDocumentElement();
-            getClientOptions().readFromXMLElement(element);
-        } catch (SAXException sxe) {
-            // Error generated during parsing
-            Exception x = sxe;
-            if (sxe.getException() != null) {
-                x = sxe.getException();
-            }
-            StringWriter sw = new StringWriter();
-            x.printStackTrace(new PrintWriter(sw));
-            logger.warning(sw.toString());
-        } catch (NullPointerException e) {
-            logger.warning("The given file does not contain client options.");
-        } catch (IOException e) {
-            logger.warning("Exception while loading client options.");
-        }
+        getClientOptions().load(loadFile);
     }
 
     /**

@@ -3,21 +3,7 @@ package net.sf.freecol.client.control;
 
 
 import java.awt.Color;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.io.StringWriter;
 import java.util.logging.Logger;
-import java.util.zip.InflaterInputStream;
-
-import javax.xml.transform.OutputKeys;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerException;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
 
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.Canvas;
@@ -34,7 +20,6 @@ import net.sf.freecol.common.networking.Message;
 import net.sf.freecol.server.generator.MapGeneratorOptions;
 
 import org.w3c.dom.Element;
-import org.xml.sax.SAXException;
 
 
 
@@ -186,83 +171,13 @@ public final class PreGameController {
          if (mapGeneratorOptions != null) {
              Element updateMapGeneratorOptionsElement = Message.createNewRootElement("updateMapGeneratorOptions");
              updateMapGeneratorOptionsElement.appendChild(mapGeneratorOptions.toXMLElement(updateMapGeneratorOptionsElement.getOwnerDocument()));
-             freeColClient.getClient().send(updateMapGeneratorOptionsElement);        
+             freeColClient.getClient().send(updateMapGeneratorOptionsElement);
          }
-     }
-    
-    /**
-    * Reads the {@link GameOptions} from the given file.
-    * *
-    * @param loadFile The <code>File</code> from which the
-    *       <code>GameOptions</code> should be loaded.
-    * @throws IOException If the exception is thrown
-    *       while opening or reading the file. 
-    */
-    public void loadGameOptions(File loadFile) throws IOException {
-        //BufferedReader in = new BufferedReader(new InputStreamReader(new FileInputStream(loadFile)));
-        Element element;
-        try {
-            if (loadFile.getName().endsWith(".fsg")) {
-                Message message = new Message(new InflaterInputStream(new FileInputStream(loadFile)));
-                element = (Element) message.getDocument().getDocumentElement().getElementsByTagName(GameOptions.getXMLElementTagName()).item(0);
-            } else {
-                Message message = new Message(new FileInputStream(loadFile));
-                element = message.getDocument().getDocumentElement();
-            }
-        } catch (SAXException sxe) {
-            // Error generated during parsing
-            Exception  x = sxe;
-            if (sxe.getException() != null) {
-                x = sxe.getException();
-            }
-            StringWriter sw = new StringWriter();
-            x.printStackTrace(new PrintWriter(sw));
-            logger.warning(sw.toString());
-            throw new IOException("SAXException while creating Message.");
-        } catch (NullPointerException e) {
-            throw new IOException("the given file does not contain game options.");
-        }
-
-        if (element != null) {
-            freeColClient.getGame().getGameOptions().readFromXMLElement(element);
-            sendGameOptions();
-        } else {
-            throw new IOException("the given file does not contain game options.");
-        }
-    }
-
+     }    
 
     /**
-    * Writes the {@link GameOptions} to the given file.
-    * 
-    * @param saveFile The <code>File</code> to which the
-    *       <code>GameOptions</code> should be written.
-    * @throws IOException If the exception is thrown
-    *       while creating or writing to the file.
-    */
-    public void saveGameOptions(File saveFile) throws IOException {
-        Element element = freeColClient.getGame().getGameOptions().toXMLElement(Message.createNewDocument());
-
-        // Write the XML Element to the file:
-        try {
-            TransformerFactory factory = TransformerFactory.newInstance();
-            Transformer xmlTransformer = factory.newTransformer();
-            //xmlTransformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
-            xmlTransformer.setOutputProperty(OutputKeys.INDENT, "yes");
-
-            PrintWriter out = new PrintWriter(new FileOutputStream(saveFile));
-            xmlTransformer.transform(new DOMSource(element), new StreamResult(out));
-            out.close();
-        } catch (TransformerException e) {
-            e.printStackTrace();
-            return;
-        }
-    }
-
-
-    /**
-    * Starts the game.
-    */
+     * Starts the game.
+     */
     public void startGame() {
         Canvas canvas = freeColClient.getCanvas();
         GUI gui = freeColClient.getGUI();

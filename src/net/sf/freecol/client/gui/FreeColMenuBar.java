@@ -63,7 +63,6 @@ import net.sf.freecol.client.gui.action.ReportTradeAction;
 import net.sf.freecol.client.gui.action.ReportTurnAction;
 import net.sf.freecol.client.gui.action.SaveAction;
 import net.sf.freecol.client.gui.action.SelectableAction;
-import net.sf.freecol.client.gui.action.SelectLanguageAction;
 import net.sf.freecol.client.gui.action.SentryAction;
 import net.sf.freecol.client.gui.action.SkipUnitAction;
 import net.sf.freecol.client.gui.action.ToggleViewModeAction;
@@ -192,7 +191,6 @@ public class FreeColMenuBar extends JMenuBar {
         menu.addSeparator();
 
         menu.add(getMenuItem(PreferencesAction.ID));
-        menu.add(getMenuItem(SelectLanguageAction.ID));
         menu.add(getMenuItem(ReconnectAction.ID));
 
         menu.addSeparator();
