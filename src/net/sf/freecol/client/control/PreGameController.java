@@ -11,6 +11,7 @@ import net.sf.freecol.client.gui.CanvasKeyListener;
 import net.sf.freecol.client.gui.CanvasMouseListener;
 import net.sf.freecol.client.gui.CanvasMouseMotionListener;
 import net.sf.freecol.client.gui.GUI;
+import net.sf.freecol.client.gui.InGameMenuBar;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.GameOptions;
 import net.sf.freecol.common.model.Player;
@@ -191,7 +192,7 @@ public final class PreGameController {
         freeColClient.getClient().setMessageHandler(inGameInputHandler);
         gui.setInGame(true);
 
-        freeColClient.getCanvas().resetFreeColMenuBar();
+        freeColClient.getCanvas().setJMenuBar(new InGameMenuBar(freeColClient));
 
         Unit activeUnit = freeColClient.getMyPlayer().getNextActiveUnit();
         //freeColClient.getMyPlayer().updateCrossesRequired();

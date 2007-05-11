@@ -57,6 +57,16 @@ public class MapEditorMenuBar extends FreeColMenuBar {
     public MapEditorMenuBar(final FreeColClient freeColClient) {
         super(freeColClient);
 
+        reset();
+    }
+    
+    
+    /**
+     * Resets this menu bar.
+     */
+    public void reset() {
+        removeAll();
+        
         buildGameMenu();
         buildViewMenu();
         buildColopediaMenu();

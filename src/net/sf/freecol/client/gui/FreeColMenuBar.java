@@ -114,6 +114,16 @@ public abstract class FreeColMenuBar extends JMenuBar {
 
     
     /**
+     * Resets this menu bar.
+     * 
+     * <br><br>
+     * <b>For subclasses:</b>
+     * This method should reset both the texts and
+     * the accelerator keys used by the menu items.
+     */
+    public abstract void reset();
+    
+    /**
      * Creates a default FreeCol JMenuItem.
      * 
      * @param actionID The ID given to the

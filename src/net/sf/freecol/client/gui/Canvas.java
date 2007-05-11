@@ -1712,14 +1712,15 @@ public final class Canvas extends JDesktopPane {
     }
 
     /**
-     * Creates and sets a <code>FreeColMenuBar</code> on this
+     * Resets <code>FreeColMenuBar</code> on this
      * <code>Canvas</code>.
      * 
      * @see FreeColMenuBar
      */
     public void resetFreeColMenuBar() {
-        FreeColMenuBar freeColMenuBar = new InGameMenuBar(freeColClient);
-        setJMenuBar(freeColMenuBar);
+        if (jMenuBar instanceof FreeColMenuBar) {
+            ((FreeColMenuBar) jMenuBar).reset();
+        }
     }
 
     /**

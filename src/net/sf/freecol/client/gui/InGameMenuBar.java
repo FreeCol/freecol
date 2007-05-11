@@ -129,6 +129,16 @@ public class InGameMenuBar extends FreeColMenuBar {
         
         super(f);
 
+        reset();
+    }
+
+    
+    /**
+     * Resets this menu bar.
+     */
+    public void reset() {
+        removeAll();
+        
         buildGameMenu();
         buildViewMenu();
         buildOrdersMenu();
@@ -142,7 +152,7 @@ public class InGameMenuBar extends FreeColMenuBar {
 
         update();
     }
-
+    
     private void buildGameMenu() {
         // --> Game
         JMenu menu = new JMenu(Messages.message("menuBar.game"));
