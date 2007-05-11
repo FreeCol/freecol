@@ -111,6 +111,10 @@ public class LanguageOption extends SelectOption {
          
          File i18nDirectory = new File(FreeCol.getDataDirectory(), Messages.STRINGS_DIRECTORY);
          File[] files = i18nDirectory.listFiles();
+         if (files == null) {
+        	 throw new RuntimeException("No language files could be found in the <" + i18nDirectory + 
+        			 "> folder. Make sure at least one is present.");
+         }
          for (File file : files) {
              if (file.getName() == null) {
                  continue;
