@@ -27,6 +27,7 @@ import net.sf.freecol.common.model.Market;
 import net.sf.freecol.common.model.ModelMessage;
 import net.sf.freecol.common.model.Nameable;
 import net.sf.freecol.common.model.Player;
+import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.option.BooleanOption;
 import cz.autel.dmi.HIGLayout;
@@ -42,6 +43,8 @@ public final class ReportTurnPanel extends ReportPanel implements ActionListener
     public static final String REVISION = "$Revision$";
 
     private final FreeColClient freeColClient;
+
+    private StyledDocument document;
 
     /**
      * The constructor that will add the items to this panel.
@@ -222,72 +225,105 @@ public final class ReportTurnPanel extends ReportPanel implements ActionListener
     private JTextPane getTextPane(ModelMessage message) {
         JTextPane textPane = new JTextPane();
         textPane.setOpaque(false);
-	textPane.setEditable(false);
+        textPane.setEditable(false);
 
-        StyledDocument doc = textPane.getStyledDocument();
+        document = textPane.getStyledDocument();
         //Initialize some styles.
         Style def = StyleContext.getDefaultStyleContext().getStyle(StyleContext.DEFAULT_STYLE);
-	
-        Style regular = doc.addStyle("regular", def);
+        
+        Style regular = document.addStyle("regular", def);
         StyleConstants.setFontFamily(def, "Dialog");
         StyleConstants.setBold(def, true);
-	StyleConstants.setFontSize(def, 12);
+        StyleConstants.setFontSize(def, 12);
 
-        Style buttonStyle = doc.addStyle("button", regular);
+        Style buttonStyle = document.addStyle("button", regular);
         StyleConstants.setForeground(buttonStyle, LINK_COLOR);
 
-        String text = Messages.message(message.getMessageID());
-        String colonyName = null;
-        String[][] data = message.getData();
-        if (data != null) {
-            for (int i = 0; i < data.length; i++) {
-                if (data[i] == null || data[i].length != 2) {
-                    logger.warning("Data has a wrong format for message: " + message);
-                } else if (data[i][0] == null || data[i][1] == null) {
-                    logger.warning("Data in model message is 'null': " + message + ", " + data[i][0] + ", "
-                            + data[i][1]);
-                } else if (data[i][0].equals("%colony%")) {
-                    colonyName = data[i][1];
-                    continue;
-                } else {
-                    text = text.replaceAll(data[i][0], data[i][1]);
-                }
-            }
-        }
-
-        int index = text.indexOf("%colony%");
-        try {
-            if (index == -1) {
-                doc.insertString(doc.getLength(),
-                                 Messages.message(message.getMessageID(), message.getData()),
-                                 doc.getStyle("regular"));
-            } else {
-                doc.insertString(doc.getLength(), 
-                                 text.substring(0, index),
-                                 doc.getStyle("regular"));
-                StyleConstants.setComponent(doc.getStyle("button"), createColonyButton(colonyName));
-                doc.insertString(doc.getLength(), " ", doc.getStyle("button"));
-                doc.insertString(doc.getLength(), 
-                                 text.substring(index + "%colony%".length()),
-                                 doc.getStyle("regular"));
-            }
-        } catch(Exception e) {
-            logger.warning(e.toString());
-        }
-
+        insertMessage(message);
         return textPane;
     }
 
 
-    private JButton createColonyButton(String colonyName) {
 
-        JButton button = new JButton(colonyName);
+    private void insertMessage(ModelMessage message) {
+
+        try {
+            String input = Messages.message(message.getMessageID());
+            int start = input.indexOf('%');
+            // output any string before the first occurence of '%'
+            if (start > 0) {
+                insertText(input.substring(0, start));
+            }
+            int end;
+
+            loop: while ((end = input.indexOf('%', start + 1)) >= 0) {
+                String var = input.substring(start, end + 1);
+                for (String[] item : message.getData()) {
+                    if (item == null || item.length != 2) {
+                        logger.warning("Data has a wrong format for message: " + message);
+                    } else if (item[0] == null || item[1] == null) {
+                        logger.warning("Data in model message is 'null': " + message + ", " +
+                                       item[0] + ", " + item[1]);
+                    } else if (var.equals(item[0])) {
+                        // found variable to replace
+                        if (var.equals("%colony%")) {
+                            insertColonyButton(item[1]);
+                        } else if ((var.equals("%unit%") ||
+                                    var.equals("%newName%")) &&
+                                   message.getSource() instanceof Unit) {
+                            insertUnitButton(item[1], (Unit) message.getSource());
+                        } else {
+                            insertText(item[1]);
+                        }
+                        start = end + 1;
+                        continue loop;
+                    }
+                }
+
+                // found no variable to replace: either a single '%', or
+                // some unnecessary variable
+                insertText(input.substring(start, end));
+                start = end;
+            }
+
+            // output any string after the last occurence of '%'
+            if (start < input.length() - 1) {
+                insertText(input.substring(start));
+            }
+        } catch(Exception e) {
+            logger.warning(e.toString());
+        }
+        
+
+    }
+
+    private void insertText(String text) throws Exception {
+        document.insertString(document.getLength(), text,
+                              document.getStyle("regular"));
+    }
+
+
+    private void insertColonyButton(String colonyName) throws Exception {
+        JButton button = createLinkButton(colonyName);
+        button.setActionCommand(colonyName);
+        StyleConstants.setComponent(document.getStyle("button"), button);
+        document.insertString(document.getLength(), " ", document.getStyle("button"));
+    }
+        
+    private void insertUnitButton(String unitName, Unit unit) throws Exception {
+        JButton button = createLinkButton(unitName);
+        button.setActionCommand(unit.getID());
+        StyleConstants.setComponent(document.getStyle("button"), button);
+        document.insertString(document.getLength(), " ", document.getStyle("button"));
+    }
+        
+    private JButton createLinkButton(String name) {
+        JButton button = new JButton(name);
         button.setMargin(new Insets(0,0,0,0));
         button.setOpaque(false);
         button.setForeground(LINK_COLOR);
         button.setAlignmentY(0.8f);
         button.setBorder(BorderFactory.createEmptyBorder());
-        button.setActionCommand(colonyName);
         button.addActionListener(this);
         return button;
     }
@@ -303,6 +339,12 @@ public final class ReportTurnPanel extends ReportPanel implements ActionListener
         String command = event.getActionCommand();
         if (command.equals("-1")) {
             super.actionPerformed(event);
+        } else if (command.startsWith("unit:")) {
+            Unit unit = (Unit) freeColClient.getGame().getFreeColGameObject(command);
+            Tile tile = unit.getTile();
+            if (tile != null) {
+                getCanvas().getGUI().setFocus(tile.getPosition());
+            }
         } else {
             getCanvas().showColonyPanel(freeColClient.getMyPlayer().getColony(command));
         }
