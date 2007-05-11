@@ -77,6 +77,20 @@ public final class InGameController extends Controller {
         
         ServerPlayer newPlayer = (ServerPlayer) nextPlayer();
 
+        /* BEGIN FIX
+         * 
+         * TODO: Remove this temporary fix for bug:
+         *       [ 1709196 ] Waiting for next turn (inifinite wait)
+         *       
+         *       This fix can be removed when FIFO ordering of
+         *       of network messages is working correctly.
+         *       (scheduled to be fixed as part of release 0.8.0)
+         */
+        try {
+            Thread.sleep(500);
+        } catch (InterruptedException e) {}
+        // END FIX
+        
         if (newPlayer != null 
                 && !newPlayer.isAI()
                 && (!newPlayer.isConnected() || debugOnlyAITurns > 0)) {
@@ -543,7 +557,7 @@ public final class InGameController extends Controller {
                 logger.finest("Colony has attack power " + attackPower);
                 Position colonyPosition = colony.getTile().getPosition();
                 for (int direction = 0; direction < Map.NUMBER_OF_DIRECTIONS; direction++) {
-                    Tile tile = map.getTile(map.getAdjacent(colonyPosition, direction));
+                    Tile tile = map.getTile(Map.getAdjacent(colonyPosition, direction));
                     if (!tile.isLand()) {
                         unitIterator = tile.getUnitIterator();
                         while (unitIterator.hasNext()) {
