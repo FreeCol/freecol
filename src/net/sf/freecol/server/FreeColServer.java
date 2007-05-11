@@ -149,7 +149,7 @@ public final class FreeColServer {
         this.name = name;
         modelController = new ServerModelController(this);
         game = new Game(modelController);
-        mapGenerator = new MapGenerator(game);
+        mapGenerator = new MapGenerator();
         userConnectionHandler = new UserConnectionHandler(this);
         preGameController = new PreGameController(this);
         preGameInputHandler = new PreGameInputHandler(this);
@@ -194,6 +194,7 @@ public final class FreeColServer {
         this.singleplayer = singleplayer;
         this.port = port;
         this.name = name;
+        mapGenerator = new MapGenerator();
         modelController = new ServerModelController(this);
         userConnectionHandler = new UserConnectionHandler(this);
         preGameController = new PreGameController(this);
@@ -278,6 +279,16 @@ public final class FreeColServer {
      */
     public MapGenerator getMapGenerator() {
         return mapGenerator;
+    }
+    
+    /**
+     * Sets the <code>MapGenerator</code> this <code>FreeColServer</code> is
+     * using when creating random maps.
+     * 
+     * @param mapGenerator The <code>MapGenerator</code>.
+     */
+    public void setMapGenerator(MapGenerator mapGenerator) {
+        this.mapGenerator = mapGenerator;
     }
 
     /**
@@ -629,7 +640,6 @@ public final class FreeColServer {
             }
             xsr.close();
             // Later, we might want to modify loaded savegames:
-            mapGenerator = new MapGenerator(game);
             return owner;
         } catch (XMLStreamException e) {
             StringWriter sw = new StringWriter();

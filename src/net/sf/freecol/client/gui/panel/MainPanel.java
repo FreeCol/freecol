@@ -34,8 +34,9 @@ public final class MainPanel extends FreeColPanel implements ActionListener {
     
     public static final int     NEW = 0,
                                 OPEN = 1,
-                                OPTIONS = 2,
-                                QUIT = 3;
+                                MAP_EDITOR = 2,
+                                OPTIONS = 3,
+                                QUIT = 4;
     
     private final Canvas parent;
     private final FreeColClient freeColClient;
@@ -54,6 +55,7 @@ public final class MainPanel extends FreeColPanel implements ActionListener {
         this.freeColClient = freeColClient;
 
         JButton         openButton = new JButton( Messages.message("menuBar.game.open") ),
+                        mapEditorButton = new JButton( Messages.message("mainPanel.editor") ),
                         optionsButton = new JButton( Messages.message("mainPanel.options") ),
                         quitButton = new JButton( Messages.message("menuBar.game.quit") );
         
@@ -61,11 +63,13 @@ public final class MainPanel extends FreeColPanel implements ActionListener {
         newButton = new JButton( Messages.message("menuBar.game.new") );
 
         newButton.setActionCommand(String.valueOf(NEW));
+        mapEditorButton.setActionCommand(String.valueOf(MAP_EDITOR));
         openButton.setActionCommand(String.valueOf(OPEN));
         optionsButton.setActionCommand(String.valueOf(OPTIONS));
         quitButton.setActionCommand(String.valueOf(QUIT));
 
         newButton.addActionListener(this);
+        mapEditorButton.addActionListener(this);
         openButton.addActionListener(this);
         optionsButton.addActionListener(this);
         quitButton.addActionListener(this);
@@ -78,10 +82,11 @@ public final class MainPanel extends FreeColPanel implements ActionListener {
             add(logoLabel, BorderLayout.CENTER);
         }
 
-        JPanel buttons = new JPanel(new GridLayout(4, 1, 50, 10));
+        JPanel buttons = new JPanel(new GridLayout(5, 1, 50, 10));
 
         buttons.add(newButton);
         buttons.add(openButton);
+        buttons.add(mapEditorButton);
         buttons.add(optionsButton);
         buttons.add(quitButton);
 
@@ -127,6 +132,9 @@ public final class MainPanel extends FreeColPanel implements ActionListener {
                     break;
                 case OPEN:
                     freeColClient.getConnectController().loadGame();
+                    break;
+                case MAP_EDITOR:
+                    freeColClient.getMapEditorController().startMapEditor();
                     break;
                 case OPTIONS:
                     parent.showClientOptionsDialog();

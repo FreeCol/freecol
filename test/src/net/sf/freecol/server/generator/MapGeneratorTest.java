@@ -17,13 +17,13 @@ import net.sf.freecol.util.test.MockModelController;
 public class MapGeneratorTest extends TestCase {
 
 	public void testWithNoIndians() {
-
+        
 		Game g = new Game(new MockModelController());
 
 		// A new game does not have a map yet
 		assertEquals(null, g.getMap());
 
-		MapGenerator gen = new MapGenerator(g);
+		MapGenerator gen = new MapGenerator();
 
 		Vector<Player> players = new Vector<Player>();
 		players.add(new Player(g, String.valueOf(Player.DUTCH), false, Player.DUTCH));
@@ -35,7 +35,7 @@ public class MapGeneratorTest extends TestCase {
 			g.addPlayer(p);
 		}
 
-		gen.createMap(players);
+		gen.createMap(g);
 
 		// Check that the map is created at all
 		assertNotNull(g.getMap());
@@ -48,7 +48,7 @@ public class MapGeneratorTest extends TestCase {
 		// A new game does not have a map yet
 		assertEquals(null, g.getMap());
 
-		MapGenerator gen = new MapGenerator(g);
+		MapGenerator gen = new MapGenerator();
 		((SelectOption) gen.getMapGeneratorOptions().getObject(MapGeneratorOptions.MAP_SIZE))
 			.setValue(MapGeneratorOptions.MAP_SIZE_SMALL);
 
@@ -58,7 +58,7 @@ public class MapGeneratorTest extends TestCase {
 		for (Player p : players) {
 			g.addPlayer(p);
 		}
-		gen.createMap(players);
+		gen.createMap(g);
 
 		// Check that the map is created at all
 		assertNotNull(g.getMap());
@@ -75,7 +75,7 @@ public class MapGeneratorTest extends TestCase {
 		// A new game does not have a map yet
 		assertEquals(null, g.getMap());
 
-		MapGenerator gen = new MapGenerator(g);
+		MapGenerator gen = new MapGenerator();
 
 		Vector<Player> players = new Vector<Player>();
 
@@ -88,7 +88,7 @@ public class MapGeneratorTest extends TestCase {
 			players.add(p);
 		}
 
-		gen.createMap(players);
+		gen.createMap(g);
 
 		// Check that the map is created at all
 		assertNotNull(g.getMap());
@@ -122,10 +122,10 @@ public class MapGeneratorTest extends TestCase {
 	 * 
 	 */
 	public void testIndianCapital() {
-
+        
 		Game g = new Game(new MockModelController());
 
-		MapGenerator gen = new MapGenerator(g);
+		MapGenerator gen = new MapGenerator();
 
 		Vector<Player> players = new Vector<Player>();
 
@@ -135,7 +135,7 @@ public class MapGeneratorTest extends TestCase {
 			players.add(p);
 		}
 
-		gen.createMap(players);
+		gen.createMap(g);
 
 		// Check that the map is created at all
 		assertNotNull(g.getMap());

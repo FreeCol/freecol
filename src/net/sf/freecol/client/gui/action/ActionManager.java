@@ -70,6 +70,7 @@ public class ActionManager extends OptionGroup {
         add(new MiniMapZoomInAction(freeColClient));
         add(new MiniMapZoomOutAction(freeColClient));
         add(new NewAction(freeColClient));
+        add(new NewEmptyMapAction(freeColClient));
         add(new OpenAction(freeColClient));
         add(new PreferencesAction(freeColClient));
         add(new PlowAction(freeColClient));
@@ -87,6 +88,7 @@ public class ActionManager extends OptionGroup {
         add(new ReportTradeAction(freeColClient));
         add(new ReportTurnAction(freeColClient));
         add(new SaveAction(freeColClient));
+        add(new ShowMainAction(freeColClient));
         add(new SentryAction(freeColClient));
         add(new SkipUnitAction(freeColClient));
         add(new ToggleViewModeAction(freeColClient));

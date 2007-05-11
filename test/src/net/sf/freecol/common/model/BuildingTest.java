@@ -2,6 +2,8 @@ package net.sf.freecol.common.model;
 
 import java.util.Iterator;
 
+import net.sf.freecol.FreeCol;
+import net.sf.freecol.common.Specification;
 import net.sf.freecol.util.test.FreeColTestCase;
 
 public class BuildingTest extends FreeColTestCase {
@@ -15,6 +17,7 @@ public class BuildingTest extends FreeColTestCase {
 
     public void testCanBuildNext() {
 
+        FreeCol.specification = new Specification();
         Colony colony = getStandardColony(1);
 
         // First check with a building that can be fully build with a normal
@@ -37,6 +40,7 @@ public class BuildingTest extends FreeColTestCase {
 
     public void testInitialColony() {
 
+        FreeCol.specification = new Specification();
         Colony colony = getStandardColony(1);
 
         Building warehouse = colony.getBuilding(Building.WAREHOUSE);

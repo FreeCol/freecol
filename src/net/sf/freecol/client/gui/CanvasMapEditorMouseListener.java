@@ -5,16 +5,16 @@ import java.awt.event.MouseListener;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import net.sf.freecol.common.model.Map;
 import net.sf.freecol.common.model.PathNode;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
+import net.sf.freecol.common.model.Map.Position;
 
 /**
  * Listens to mouse buttons being pressed at the level of the Canvas.
  */
-public final class CanvasMouseListener implements MouseListener {
-    private static final Logger logger = Logger.getLogger(CanvasMouseListener.class.getName());
+public final class CanvasMapEditorMouseListener implements MouseListener {
+    private static final Logger logger = Logger.getLogger(CanvasMapEditorMouseListener.class.getName());
 
     public static final String COPYRIGHT = "Copyright (C) 2003-2005 The FreeCol Team";
 
@@ -32,7 +32,7 @@ public final class CanvasMouseListener implements MouseListener {
      * @param canvas The component this object gets created for.
      * @param g The GUI that holds information such as screen resolution.
      */
-    public CanvasMouseListener(Canvas canvas, GUI g) {
+    public CanvasMapEditorMouseListener(Canvas canvas, GUI g) {
         this.canvas = canvas;
         gui = g;
     }
@@ -83,25 +83,19 @@ public final class CanvasMouseListener implements MouseListener {
         }
         try {
             if (e.getButton() == MouseEvent.BUTTON3 || e.isPopupTrigger()) {
-                canvas.showTilePopup(gui.convertToMapCoordinates(e.getX(), e.getY()), e.getX(), e.getY());
-            } else if (e.getButton() == MouseEvent.BUTTON2) {
-                Map.Position p = gui.convertToMapCoordinates(e.getX(), e.getY());
-                if (p == null || !canvas.getClient().getGame().getMap().isValid(p)) {
-                    return;
-                }
-
-                Tile tile = canvas.getClient().getGame().getMap().getTile(p);
-                if (tile != null) {
-                    Unit unit = gui.getActiveUnit();
-                    if (unit != null && unit.getTile() != tile) {
-                        PathNode dragPath = unit.findPath(tile);
-                        gui.startDrag();
-                        gui.setDragPath(dragPath);
-                    }
-                }
+                //canvas.showTilePopup(gui.convertToMapCoordinates(e.getX(), e.getY()), e.getX(), e.getY());
+                Position p = gui.convertToMapCoordinates(e.getX(), e.getY());
+                gui.setSelectedTile(p, true);
             } else if (e.getButton() == MouseEvent.BUTTON1) {
-                gui.setSelectedTile(gui.convertToMapCoordinates(e.getX(), e.getY()), true);
-                canvas.requestFocus();
+                if (canvas.getClient().getGame() != null
+                        && canvas.getClient().getGame().getMap() != null
+                        && gui.getFocus() != null) {
+                    Position p = gui.convertToMapCoordinates(e.getX(), e.getY());
+                    Tile t = canvas.getClient().getGame().getMap().getTile(p);
+                    canvas.getClient().getMapEditorController().transform(t);
+                    canvas.refresh();
+                    canvas.requestFocus();
+                }
             }
         } catch (Exception ex) {
             logger.log(Level.WARNING, "Error in mousePressed!", ex);

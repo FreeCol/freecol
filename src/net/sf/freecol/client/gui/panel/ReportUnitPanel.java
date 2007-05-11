@@ -17,6 +17,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 import net.sf.freecol.client.gui.Canvas;
+import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.Location;
@@ -374,7 +375,7 @@ public final class ReportUnitPanel extends JPanel implements ActionListener {
     }
 
     private JLabel createUnitTypeLabel(int unitType, boolean mounted, int count) {
-        int graphicsType = reportPanel.getLibrary().getUnitGraphicsType(unitType, true, mounted, 0, false);
+        int graphicsType = ImageLibrary.getUnitGraphicsType(unitType, true, mounted, 0, false);
         JLabel unitLabel = reportPanel.buildUnitLabel(graphicsType, 0.66f);
         unitLabel.setText(String.valueOf(count));
         if (count == 0) {

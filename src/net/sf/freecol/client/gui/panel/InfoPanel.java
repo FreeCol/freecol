@@ -1,6 +1,7 @@
 package net.sf.freecol.client.gui.panel;
 
 import java.awt.BorderLayout;
+import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Graphics;
 import java.awt.Image;
@@ -20,6 +21,7 @@ import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.client.gui.ViewMode;
 import net.sf.freecol.client.gui.i18n.Messages;
+import net.sf.freecol.client.gui.panel.MapEditorTransformPanel.MapTransform;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.Player;
@@ -58,7 +60,9 @@ public final class InfoPanel extends FreeColPanel {
     private final UnitInfoPanel unitInfoPanel;
 
     private final TileInfoPanel tileInfoPanel = new TileInfoPanel();
-
+    
+    private final JPanel mapEditorPanel;
+    
 
     /**
      * The constructor that will add the items to this panel.
@@ -89,10 +93,15 @@ public final class InfoPanel extends FreeColPanel {
             internalPanelTop = 75;
             internalPanelHeight = 100;
         }
+        
+        mapEditorPanel = new JPanel(null);
+        mapEditorPanel.setSize(130, 100);
+        mapEditorPanel.setOpaque(false);
 
         add(unitInfoPanel, internalPanelTop, internalPanelHeight);
         add(endTurnPanel, internalPanelTop, internalPanelHeight);
         add(tileInfoPanel, internalPanelTop, internalPanelHeight);
+        add(mapEditorPanel, internalPanelTop, internalPanelHeight);
     }
 
     /**
@@ -114,6 +123,28 @@ public final class InfoPanel extends FreeColPanel {
         unitInfoPanel.update(unit);
     }
 
+    /**
+     * Updates this <code>InfoPanel</code>.
+     * 
+     * @param mapTransform The current MapTransform.
+     */
+    public void update(MapTransform mapTransform) {
+        if (mapTransform != null) {
+            final JPanel p = mapTransform.getDescriptionPanel();
+            if (p != null) {
+                p.setOpaque(false);
+                final Dimension d = p.getPreferredSize();
+                p.setBounds(0, (mapEditorPanel.getHeight() - d.height)/2, mapEditorPanel.getWidth(), d.height);
+                mapEditorPanel.removeAll();
+                mapEditorPanel.add(p, BorderLayout.CENTER);
+                mapEditorPanel.validate();
+                mapEditorPanel.revalidate();
+                mapEditorPanel.repaint();
+            }
+        }
+    }
+
+    
     /**
      * Updates this <code>InfoPanel</code>.
      * 
@@ -152,33 +183,46 @@ public final class InfoPanel extends FreeColPanel {
      */
     public void paintComponent(Graphics graphics) {
         int viewMode = freeColClient.getGUI().getViewMode().getView();
-        switch (viewMode) {
-        case ViewMode.MOVE_UNITS_MODE:
-            if (unitInfoPanel.getUnit() != null) {
-                if (!unitInfoPanel.isVisible()) {
-                    unitInfoPanel.setVisible(true);
-                    endTurnPanel.setVisible(false);
-                }
-            } else if (!freeColClient.getMyPlayer().hasNextActiveUnit()) {
-                if (!endTurnPanel.isVisible()) {
-                    endTurnPanel.setVisible(true);
-                    unitInfoPanel.setVisible(false);
-                }
+        if (!freeColClient.isMapEditor()) {
+            if (mapEditorPanel.isVisible()) {
+                mapEditorPanel.setVisible(false);
             }
-            tileInfoPanel.setVisible(false);
-            break;
-        case ViewMode.VIEW_TERRAIN_MODE:
-            unitInfoPanel.setVisible(false);
-            endTurnPanel.setVisible(false);
-            tileInfoPanel.setVisible(true);
-            break;
+            switch (viewMode) {
+            case ViewMode.MOVE_UNITS_MODE:
+                if (unitInfoPanel.getUnit() != null) {
+                    if (!unitInfoPanel.isVisible()) {
+                        unitInfoPanel.setVisible(true);
+                        endTurnPanel.setVisible(false);
+                    }
+                } else if (freeColClient.getMyPlayer() != null
+                        && !freeColClient.getMyPlayer().hasNextActiveUnit()) {
+                    if (!endTurnPanel.isVisible()) {
+                        endTurnPanel.setVisible(true);
+                        unitInfoPanel.setVisible(false);
+                    }
+                }
+                tileInfoPanel.setVisible(false);
+                break;
+            case ViewMode.VIEW_TERRAIN_MODE:
+                unitInfoPanel.setVisible(false);
+                endTurnPanel.setVisible(false);
+                tileInfoPanel.setVisible(true);
+                break;
+            }
+        } else {
+            if (!mapEditorPanel.isVisible()) {
+                mapEditorPanel.setVisible(true);
+                unitInfoPanel.setVisible(false);
+                endTurnPanel.setVisible(false);
+                tileInfoPanel.setVisible(false);
+            }
         }
 
         Image skin = (Image) UIManager.get("InfoPanel.skin");
         if (skin != null) {
             graphics.drawImage(skin, 0, 0, null);
         }
-
+        
         super.paintComponent(graphics);
     }
 

@@ -18,7 +18,7 @@ public class GoodsTest extends FreeColTestCase {
     public void setUp() {
         if (updateLocale) {
             updateLocale = false;
-            Messages.setResources(Messages.getMessageBundle(Locale.US));
+            Messages.setMessageBundle(Locale.US);
         }
     }
 
@@ -56,7 +56,7 @@ public class GoodsTest extends FreeColTestCase {
 
     public void testToString() {
 
-        Messages.setResources(Messages.getMessageBundle(Locale.ENGLISH));
+        Messages.setMessageBundle(Locale.ENGLISH);
 
         Map map = getTestMap(Tile.PLAINS);
 

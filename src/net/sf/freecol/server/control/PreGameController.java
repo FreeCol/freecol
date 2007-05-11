@@ -163,7 +163,7 @@ public final class PreGameController extends Controller {
         }
         
         // Make the map:        
-        mapGenerator.createMap(game.getPlayers());
+        mapGenerator.createMap(game);
         Map map = game.getMap();
         
         // Inform the clients:
@@ -198,17 +198,10 @@ public final class PreGameController extends Controller {
      */
     public void setMap(Map map) {
         Game game = getFreeColServer().getGame();
-        
-        // Already done my the map generator:
-        //game.setMap(map);
-
-        //game.reinitialiseMarket(); // Do this here because game is restarting. -sjm
 
         Iterator<Player> playerIterator = game.getPlayerIterator();
         while (playerIterator.hasNext()) {
             ServerPlayer player = (ServerPlayer) playerIterator.next();
-
-            player.resetExploredTiles(map);
             
             if (player.isEuropean() && !player.isREF()) {
                 player.setGold(game.getGameOptions().getInteger(GameOptions.STARTING_MONEY));
@@ -217,15 +210,6 @@ public final class PreGameController extends Controller {
                 continue;
             }
 
-            /*
-            Element updateGameElement = Message.createNewRootElement("updateGame");
-            updateGameElement.appendChild(game.toXMLElement(player, updateGameElement.getOwnerDocument()));
-
-            try {
-                player.getConnection().send(updateGameElement);
-            } catch (IOException e) {
-                logger.warning("EXCEPTION: " + e);
-            }*/
             try {
                 XMLStreamWriter out = player.getConnection().send();
                 out.writeStartElement("updateGame");

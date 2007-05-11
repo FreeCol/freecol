@@ -62,8 +62,7 @@ public final class ConnectController {
         this.freeColClient = freeColClient;
     }
 
-
-
+    
     /**
     * Starts a multiplayer server and connects to it.
     *
@@ -72,6 +71,8 @@ public final class ConnectController {
     * @param port The port in which the server should listen for new clients.
     */
     public void startMultiplayerGame(boolean publicServer, String username, int port) {
+        freeColClient.setMapEditor(false);
+        
         if (freeColClient.isLoggedIn()) {
             logout(true);
         }
@@ -105,6 +106,8 @@ public final class ConnectController {
     * @param username The name to use when logging in.
     */
     public void startSingleplayerGame(String username) {
+        freeColClient.setMapEditor(false);
+        
         if (freeColClient.isLoggedIn()) {
             logout(true);
         }
@@ -150,7 +153,8 @@ public final class ConnectController {
     */
     public void joinMultiplayerGame(String username, String host, int port) {
         final Canvas canvas = freeColClient.getCanvas();
-
+        freeColClient.setMapEditor(false);
+        
         if (freeColClient.isLoggedIn()) {
             logout(true);
         }
@@ -185,7 +189,9 @@ public final class ConnectController {
     private boolean login(String username, String host, int port) {
         Client client = freeColClient.getClient();
         Canvas canvas = freeColClient.getCanvas();
-
+        
+        freeColClient.setMapEditor(false);
+        
         if (client != null) {
             client.disconnect();
         }
@@ -297,15 +303,16 @@ public final class ConnectController {
         }
     }
 
-
     /**
-    * Loads a game from the given file.
-    * @param file The <code>File</code>.
-    */
+     * Loads a game from the given file.
+     * @param file The <code>File</code>.
+     */
     public void loadGame(File file) {
         final Canvas canvas = freeColClient.getCanvas();
         final File theFile = file;
 
+        freeColClient.setMapEditor(false);
+        
         class ErrorJob implements Runnable {
             private final  String  message;
             ErrorJob( String message ) {
@@ -444,7 +451,6 @@ public final class ConnectController {
         };
         freeColClient.worker.schedule( loadGameJob );        
     }
-
 
     /**
     * Sends a logout message to the server.

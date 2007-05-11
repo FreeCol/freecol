@@ -95,6 +95,7 @@ import net.sf.freecol.common.model.TradeRoute;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.WorkLocation;
 import net.sf.freecol.common.model.Map.Position;
+import net.sf.freecol.server.generator.MapGeneratorOptions;
 
 /**
  * The main container for the other GUI components in FreeCol. This container is
@@ -663,9 +664,11 @@ public final class Canvas extends JDesktopPane {
 
         declarationDialog.initialize();
 
-        showFreeColDialog(declarationDialog);
+        addAsFrame(declarationDialog);
+        declarationDialog.requestFocus();
+
         declarationDialog.getResponseBoolean();
-        removeFreeColDialog(declarationDialog);
+        remove(declarationDialog);
 
         // remove(declarationDialog);
     }
@@ -682,6 +685,21 @@ public final class Canvas extends JDesktopPane {
      */
     public boolean showConfirmDialog(String text, String okText, String cancelText) {
         return showConfirmDialog(text, okText, cancelText, null);
+    }
+    
+    /**
+     * Displays the given dialog.
+     * 
+     * @param freeColDialog The dialog to be displayed
+     * @return The {@link FreeColDialog#getResponse reponse} returned by the dialog.
+     */
+    public Object showFreeColDialog(FreeColDialog freeColDialog) {
+        addAsFrame(freeColDialog);
+        freeColDialog.requestFocus();
+        Object response = freeColDialog.getResponse();
+        remove(freeColDialog);
+
+        return response;
     }
 
     /**
@@ -812,9 +830,12 @@ public final class Canvas extends JDesktopPane {
     public boolean isShowingSubPanel() {
         Component[] components = getComponents();
         for (Component c : components) {
-            if (c instanceof JInternalFrame)
+            if (c instanceof ToolBoxFrame) {
+                continue;
+            }
+            if (c instanceof JInternalFrame) {
                 return true;
-            else if (c instanceof JInternalFrame.JDesktopIcon) {
+            } else if (c instanceof JInternalFrame.JDesktopIcon) {
                 return true;
             }
         }
@@ -834,11 +855,12 @@ public final class Canvas extends JDesktopPane {
         // addCentered(gameOptionsDialog, GAME_OPTIONS_LAYER);
         // gameOptionsDialog.requestFocus();
 
-        showFreeColDialog(gameOptionsDialog);
+        addAsFrame(gameOptionsDialog);
+        gameOptionsDialog.requestFocus();
 
         boolean r = gameOptionsDialog.getResponseBoolean();
 
-        removeFreeColDialog(gameOptionsDialog);
+        remove(gameOptionsDialog);
 
         // remove(gameOptionsDialog);
 
@@ -870,9 +892,11 @@ public final class Canvas extends JDesktopPane {
         // addCentered(loadingSavegameDialog, GAME_OPTIONS_LAYER);
         // loadingSavegameDialog.requestFocus();
 
-        showFreeColDialog(loadingSavegameDialog);
+        addAsFrame(loadingSavegameDialog);
+        loadingSavegameDialog.requestFocus();
+
         boolean r = loadingSavegameDialog.getResponseBoolean();
-        removeFreeColDialog(loadingSavegameDialog);
+        remove(loadingSavegameDialog);
 
         // remove(loadingSavegameDialog);
 
@@ -892,11 +916,13 @@ public final class Canvas extends JDesktopPane {
         // clientOptionsDialog.requestFocus();
 
         clientOptionsDialogShowing = true;
-        showFreeColDialog(clientOptionsDialog);
+        addAsFrame(clientOptionsDialog);
+        clientOptionsDialog.requestFocus();
         boolean r = clientOptionsDialog.getResponseBoolean();
-        removeFreeColDialog(clientOptionsDialog);
+        remove(clientOptionsDialog);
         clientOptionsDialogShowing = false;
-
+        freeColClient.getActionManager().update();
+        
         // remove(clientOptionsDialog);
 
         return r;
@@ -911,15 +937,29 @@ public final class Canvas extends JDesktopPane {
      *         <code>false</code> otherwise.
      */
     public boolean showMapGeneratorOptionsDialog(boolean editable) {
+        final MapGeneratorOptions mgo = freeColClient.getPreGameController().getMapGeneratorOptions();
+        return showMapGeneratorOptionsDialog(editable, mgo);
+    }
+    
+    /**
+     * Displays a dialog for setting the map generator options.
+     * 
+     * @param editable The options are only allowed to be changed if this
+     *            variable is <code>true</code>.
+     * @return <code>true</code> if the options have been modified, and
+     *         <code>false</code> otherwise.
+     */
+    public boolean showMapGeneratorOptionsDialog(boolean editable, MapGeneratorOptions mgo) {
         MapGeneratorOptionsDialog mapGeneratorOptionsDialog = new MapGeneratorOptionsDialog(this, freeColClient);
-        mapGeneratorOptionsDialog.initialize(editable);
+        mapGeneratorOptionsDialog.initialize(editable, mgo);
 
         // addCentered(mapGeneratorOptionsDialog, CLIENT_OPTIONS_LAYER);
         // mapGeneratorOptionsDialog.requestFocus();
 
-        showFreeColDialog(mapGeneratorOptionsDialog);
+        addAsFrame(mapGeneratorOptionsDialog);
+        mapGeneratorOptionsDialog.requestFocus();
         boolean r = mapGeneratorOptionsDialog.getResponseBoolean();
-        removeFreeColDialog(mapGeneratorOptionsDialog);
+        remove(mapGeneratorOptionsDialog);
 
         // remove(mapGeneratorOptionsDialog);
 
@@ -959,7 +999,8 @@ public final class Canvas extends JDesktopPane {
         // addCentered(loadDialog, LOAD_LAYER);
         // loadDialog.requestFocus();
 
-        showFreeColDialog(loadDialog);
+        addAsFrame(loadDialog);
+        loadDialog.requestFocus();
 
         File response = (File) loadDialog.getResponse();
 
@@ -968,7 +1009,7 @@ public final class Canvas extends JDesktopPane {
             response = (File) loadDialog.getResponse();
         }
 
-        removeFreeColDialog(loadDialog);
+        remove(loadDialog);
 
         // remove(loadDialog);
 
@@ -1367,11 +1408,12 @@ public final class Canvas extends JDesktopPane {
         // setEnabled(false);
         // chooseFoundingFatherDialog.requestFocus();
 
-        showFreeColDialog(chooseFoundingFatherDialog);
+        addAsFrame(chooseFoundingFatherDialog);
+        chooseFoundingFatherDialog.requestFocus();
 
         int response = chooseFoundingFatherDialog.getResponseInt();
 
-        removeFreeColDialog(chooseFoundingFatherDialog);
+        remove(chooseFoundingFatherDialog);
 
         // remove(chooseFoundingFatherDialog);
         // setEnabled(true);
@@ -1393,11 +1435,12 @@ public final class Canvas extends JDesktopPane {
         // setEnabled(false);
         // eventPanel.requestFocus();
 
-        showFreeColDialog(eventPanel);
+        addAsFrame(eventPanel);
+        eventPanel.requestFocus();
 
         boolean response = eventPanel.getResponseBoolean();
 
-        removeFreeColDialog(eventPanel);
+        remove(eventPanel);
 
         // remove(eventPanel);
         // setEnabled(true);
@@ -1435,11 +1478,13 @@ public final class Canvas extends JDesktopPane {
 
         // addCentered(recruitDialog, INPUT_LAYER);
         // recruitDialog.requestFocus();
-        showFreeColDialog(recruitDialog);
+        
+        addAsFrame(recruitDialog);
+        recruitDialog.requestFocus();
 
         boolean response = recruitDialog.getResponseBoolean();
 
-        removeFreeColDialog(recruitDialog);
+        remove(recruitDialog);
         // remove(recruitDialog);
         // setEnabled(true);
 
@@ -1454,14 +1499,15 @@ public final class Canvas extends JDesktopPane {
         PurchaseDialog purchaseDialog = new PurchaseDialog(this);
         purchaseDialog.initialize();
 
-        showFreeColDialog(purchaseDialog);
+        addAsFrame(purchaseDialog);
+        purchaseDialog.requestFocus();
 
         // addCentered(purchaseDialog, INPUT_LAYER);
         // purchaseDialog.requestFocus();
 
         int response = purchaseDialog.getResponseInt();
 
-        removeFreeColDialog(purchaseDialog);
+        remove(purchaseDialog);
         // remove(purchaseDialog);
         // setEnabled(true);
 
@@ -1477,14 +1523,15 @@ public final class Canvas extends JDesktopPane {
         TrainDialog trainDialog = new TrainDialog(this);
         trainDialog.initialize();
 
-        showFreeColDialog(trainDialog);
+        addAsFrame(trainDialog);
+        trainDialog.requestFocus();
 
         // addCentered(trainDialog, INPUT_LAYER);
         // trainDialog.requestFocus();
 
         boolean response = trainDialog.getResponseBoolean();
 
-        removeFreeColDialog(trainDialog);
+        remove(trainDialog);
 
         // remove(trainDialog);
         // setEnabled(true);
@@ -1503,11 +1550,12 @@ public final class Canvas extends JDesktopPane {
         // addCentered(tradeRouteDialog, INPUT_LAYER - 1);
         // tradeRouteDialog.requestFocus();
 
-        showFreeColDialog(tradeRouteDialog);
+        addAsFrame(tradeRouteDialog);
+        tradeRouteDialog.requestFocus();
 
         TradeRoute response = (TradeRoute) tradeRouteDialog.getResponse();
 
-        removeFreeColDialog(tradeRouteDialog);
+        remove(tradeRouteDialog);
 
         // remove(tradeRouteDialog);
         // setEnabled(true);
@@ -1526,11 +1574,12 @@ public final class Canvas extends JDesktopPane {
         // addCentered(tradeRouteInputDialog, INPUT_LAYER);
         // tradeRouteInputDialog.requestFocus();
 
-        showFreeColDialog(tradeRouteInputDialog);
+        addAsFrame(tradeRouteInputDialog);
+        tradeRouteInputDialog.requestFocus();
 
         boolean response = tradeRouteInputDialog.getResponseBoolean();
 
-        removeFreeColDialog(tradeRouteInputDialog);
+        remove(tradeRouteInputDialog);
 
         // remove(tradeRouteInputDialog);
         // setEnabled(true);
@@ -1568,9 +1617,10 @@ public final class Canvas extends JDesktopPane {
         // addCentered(indianSettlementPanel, INDIAN_SETTLEMENT_LAYER);
         // indianSettlementPanel.requestFocus();
 
-        showFreeColDialog(indianSettlementPanel);
+        addAsFrame(indianSettlementPanel);
+        indianSettlementPanel.requestFocus();
         indianSettlementPanel.getResponseBoolean();
-        removeFreeColDialog(indianSettlementPanel);
+        remove(indianSettlementPanel);
 
         // remove(indianSettlementPanel);
     }
@@ -1582,17 +1632,16 @@ public final class Canvas extends JDesktopPane {
      * @see Tile
      */
     public void showTilePanel(Tile tile) {
-        closeMenus();
-
         TilePanel tilePanel = new TilePanel(this);
         tilePanel.initialize(tile);
 
         // addCentered(tilePanel, TILE_LAYER);
         // tilePanel.requestFocus();
 
-        showFreeColDialog(tilePanel);
+        addAsFrame(tilePanel);
+        tilePanel.requestFocus();
         tilePanel.getResponseBoolean();
-        removeFreeColDialog(tilePanel);
+        remove(tilePanel);
 
         // remove(tilePanel);
     }
@@ -1615,33 +1664,16 @@ public final class Canvas extends JDesktopPane {
 
         MonarchPanel monarchPanel = new MonarchPanel(this);
         monarchPanel.initialize(action, replace);
-        showFreeColDialog(monarchPanel);
+        addAsFrame(monarchPanel);
+        monarchPanel.requestFocus();
+
         boolean response = monarchPanel.getResponseBoolean();
-        removeFreeColDialog(monarchPanel);
+        remove(monarchPanel);
 
         // remove(monarchPanel);
         // setEnabled(true);
 
         return response;
-    }
-
-    /**
-     * Display a dialog (or panel) in front of other dialogs and keep track of
-     * it so that it can be closed by {@link #removeFreeColDialog()}.
-     * 
-     * @param dialog The dialog/panel.
-     */
-    private void showFreeColDialog(FreeColDialog dialog) {
-        addAsFrame(dialog);
-        dialog.requestFocus();
-    }
-
-    /**
-     * Remove the topmost dialog installed by
-     * {@link #showFreeColDialog(FreeColDialog)}.
-     */
-    private void removeFreeColDialog(FreeColDialog dialog) {
-        remove(dialog);
     }
 
     /**
@@ -1658,11 +1690,12 @@ public final class Canvas extends JDesktopPane {
         // addCentered(emigrationPanel, EMIGRATION_LAYER);
         // emigrationPanel.requestFocus();
 
-        showFreeColDialog(emigrationPanel);
+        addAsFrame(emigrationPanel);
+        emigrationPanel.requestFocus();
         //System.out.println("About to show emigration panel");
         int response = emigrationPanel.getResponseInt();
         //System.out.println("emigration panel returned " + response);
-        removeFreeColDialog(emigrationPanel);
+        remove(emigrationPanel);
 
         // remove(emigrationPanel);
         //System.out.println("About to return response.");
@@ -1685,7 +1718,7 @@ public final class Canvas extends JDesktopPane {
      * @see FreeColMenuBar
      */
     public void resetFreeColMenuBar() {
-        FreeColMenuBar freeColMenuBar = new FreeColMenuBar(freeColClient);
+        FreeColMenuBar freeColMenuBar = new InGameMenuBar(freeColClient);
         setJMenuBar(freeColMenuBar);
     }
 
@@ -1754,7 +1787,8 @@ public final class Canvas extends JDesktopPane {
                 takeFocus();
             }
 
-            if (freeColClient.getGame() != null) {
+            if (freeColClient.getGame() != null
+                    && !freeColClient.isMapEditor()) {
                 //System.out.println("About to get next model message.");
                 freeColClient.getInGameController().nextModelMessage();
             }
@@ -1790,14 +1824,44 @@ public final class Canvas extends JDesktopPane {
      * Adds a component centered on this Canvas inside a frame. Removes the
      * statuspanel if visible (and <code>comp != statusPanel</code>).
      * 
-     * @param comp The component to add to this ToEuropePanel.
-     * @param i The layer to add the component to (see JLayeredPane).
+     * @param comp The component to add to this JInternalFrame.
      * @return The <code>JInternalFrame</code> that was created and added.
      */
     public JInternalFrame addAsFrame(JComponent comp) {
+        return addAsFrame(comp, false);
+    }
+    
+    /**
+     * Adds a component centered on this Canvas inside a frame.
+     * The frame is considered as a tool box (not counted as a frame
+     * by the methods deciding if a panel is being displayed).
+     * 
+     * <br><br>
+     * 
+     * Removes the statuspanel if visible (and
+     * <code>comp != statusPanel</code>).
+     * 
+     * @param comp The component to add to this JInternalFrame.
+     * @return The <code>JInternalFrame</code> that was created and added.
+     */
+    public JInternalFrame addAsToolBox(JComponent comp) {
+        return addAsFrame(comp, true);
+    }
+    
+    /**
+     * Adds a component centered on this Canvas inside a frame. Removes the
+     * statuspanel if visible (and <code>comp != statusPanel</code>).
+     * 
+     * @param comp The component to add to this ToEuropePanel.
+     * @param toolBox Should be set to true if the resulting frame
+     *      is used as a toolbox (that is: it should not be counted
+     *      as a frame).
+     * @return The <code>JInternalFrame</code> that was created and added.
+     */
+    private JInternalFrame addAsFrame(JComponent comp, boolean toolBox) {
         final int FRAME_EMPTY_SPACE = 60;
 
-        final JInternalFrame f = new JInternalFrame();
+        final JInternalFrame f = (toolBox) ? new ToolBoxFrame() : new JInternalFrame();
         if (f.getContentPane() instanceof JComponent) {
             JComponent c = (JComponent) f.getContentPane();
             c.setOpaque(false);
@@ -2066,9 +2130,10 @@ public final class Canvas extends JDesktopPane {
         // setEnabled(false);
         // addCentered(errorPanel, ERROR_LAYER);
         // errorPanel.requestFocus();
-        showFreeColDialog(errorPanel);
+        addAsFrame(errorPanel);
+        errorPanel.requestFocus();
         errorPanel.getResponse();
-        removeFreeColDialog(errorPanel);
+        remove(errorPanel);
         // closeErrorPanel();
     }
 
@@ -2275,6 +2340,7 @@ public final class Canvas extends JDesktopPane {
         closeMenus();
         removeInGameComponents();
         showMainPanel();
+        repaint();
     }
 
     /**
@@ -2382,6 +2448,12 @@ public final class Canvas extends JDesktopPane {
         showNewGamePanel();
     }
 
+    /**
+     * A class for frames being used as tool boxes.
+     */
+    class ToolBoxFrame extends JInternalFrame {
+        
+    }
 
     /**
      * Handles the moving of internal frames.

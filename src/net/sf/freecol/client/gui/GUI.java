@@ -608,34 +608,39 @@ public final class GUI {
             removeOldMessages();
             displayMap(g);
         } else {
-            Image bgImage = (Image) UIManager.get("CanvasBackgroundImage");
+            if (freeColClient.isMapEditor()) {
+                g.setColor(Color.black);
+                g.fillRect(0, 0, bounds.width, bounds.height);                
+            } else {
+                Image bgImage = (Image) UIManager.get("CanvasBackgroundImage");
 
-            if (bgImage != null) {
-                if (bgImage.getWidth(null) != bounds.width || bgImage.getHeight(null) != bounds.height) {
-                    bgImage = bgImage.getScaledInstance(bounds.width, bounds.height, Image.SCALE_SMOOTH);
-                    UIManager.put("CanvasBackgroundImage", bgImage);
+                if (bgImage != null) {
+                    if (bgImage.getWidth(null) != bounds.width || bgImage.getHeight(null) != bounds.height) {
+                        bgImage = bgImage.getScaledInstance(bounds.width, bounds.height, Image.SCALE_SMOOTH);
+                        UIManager.put("CanvasBackgroundImage", bgImage);
 
-                    /*
+                        /*
                       We have to use a MediaTracker to ensure that the
                       image has been scaled before we paint it.
-                    */
-                    MediaTracker mt = new MediaTracker(freeColClient.getCanvas());
-                    mt.addImage(bgImage, 0, bounds.width, bounds.height);
+                         */
+                        MediaTracker mt = new MediaTracker(freeColClient.getCanvas());
+                        mt.addImage(bgImage, 0, bounds.width, bounds.height);
 
-                    try {
-                        mt.waitForID(0);
-                    } catch (InterruptedException e) {
-                        g.setColor(Color.black);
-                        g.fillRect(0, 0, bounds.width, bounds.height);
-                        return;
+                        try {
+                            mt.waitForID(0);
+                        } catch (InterruptedException e) {
+                            g.setColor(Color.black);
+                            g.fillRect(0, 0, bounds.width, bounds.height);
+                            return;
+                        }
+
                     }
 
+                    g.drawImage(bgImage, 0, 0, null);
+                } else {
+                    g.setColor(Color.black);
+                    g.fillRect(0, 0, bounds.width, bounds.height);
                 }
-
-                g.drawImage(bgImage, 0, 0, null);
-            } else {
-                g.setColor(Color.black);
-                g.fillRect(0, 0, bounds.width, bounds.height);
             }
         }
     }
@@ -1088,7 +1093,8 @@ public final class GUI {
         ======
         Grey out the map if it is not my turn (and a multiplayer game).
          */
-        if (freeColClient.getMyPlayer() != freeColClient.getGame().getCurrentPlayer()) {
+        if (!freeColClient.isMapEditor()
+                && freeColClient.getMyPlayer() != freeColClient.getGame().getCurrentPlayer()) {
             g.setColor(Color.BLACK);
             Composite oldComposite = g.getComposite();
             g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.6f));
@@ -1681,7 +1687,7 @@ public final class GUI {
 
 
         for (int i = 0; i < 8; i++) {
-            Map.Position p = map.getAdjacent(pos, i);
+            Map.Position p = Map.getAdjacent(pos, i);
             if (map.isValid(p)) {
                 Tile borderingTile = map.getTile(p);
 
@@ -1805,7 +1811,7 @@ public final class GUI {
 
             if (tile.isLand()) {
                 for (int i = 0; i < 8; i++) {
-                    Map.Position p = map.getAdjacent(pos, i);
+                    Map.Position p = Map.getAdjacent(pos, i);
                     if (map.isValid(p)) {
                         Tile borderingTile = map.getTile(p);
                         if (tile.getType() == borderingTile.getType() ||
@@ -1829,7 +1835,7 @@ public final class GUI {
                 long seed = Long.parseLong(Integer.toString(tile.getX()) + Integer.toString(tile.getY()));
                 boolean connectedRoad = false;
                 for (int i = 0; i < 8; i++) {
-                    Map.Position p = map.getAdjacent(pos, i);
+                    Map.Position p = Map.getAdjacent(pos, i);
                     if (map.isValid(p)) {
                         Tile borderingTile = map.getTile(p);
                         if (borderingTile.hasRoad()) {
@@ -1927,7 +1933,8 @@ public final class GUI {
                     }
 
                     // Draw the alarm chip if needed.
-                    if (freeColClient.getMyPlayer().hasContacted(((IndianSettlement)settlement).getOwner().getNation())) {
+                    if (freeColClient.getMyPlayer() != null
+                            && freeColClient.getMyPlayer().hasContacted(((IndianSettlement)settlement).getOwner().getNation())) {
                         g.drawImage(lib.getAlarmChip(((IndianSettlement)settlement).getAlarm(freeColClient.getMyPlayer()).getLevel()), x + ALARM_OFFSET_X, y + ALARM_OFFSET_Y, null);
                     }
 
@@ -1989,7 +1996,7 @@ public final class GUI {
 
         if (tile.isExplored()) {
             for (int i = 3; i < 6; i++) {
-                Map.Position p = map.getAdjacent(pos, i);
+                Map.Position p = Map.getAdjacent(pos, i);
                 if (map.isValid(p)) {
                     Tile borderingTile = map.getTile(p);
 
@@ -2336,9 +2343,9 @@ public final class GUI {
     public boolean onScreen(int x, int y) {
         if (bottomRow < 0) {
             positionMap();
-            return y - 2 > topRow && y + 4 < bottomRow && x - 1 > leftColumn && x + 1 < rightColumn;
+            return y - 2 > topRow && y + 4 < bottomRow && x - 1 > leftColumn && x + 2 < rightColumn;
         } else {
-            return y - 2 > topRow && y + 4 < bottomRow && x - 1 > leftColumn && x + 1 < rightColumn;
+            return y - 2 > topRow && y + 4 < bottomRow && x - 1 > leftColumn && x + 2 < rightColumn;
         }
     }
 

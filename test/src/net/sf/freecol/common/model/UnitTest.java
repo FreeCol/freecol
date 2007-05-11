@@ -183,7 +183,7 @@ public class UnitTest extends FreeColTestCase {
      * 
      */
     public void testDoAssignedWorkAmateurAndHardyPioneer() {
-
+        
         { // Savanna
             assertEquals(7,
                     getWorkLeftForPioneerWork(Unit.FREE_COLONIST, Tile.SAVANNAH, true, Unit.PLOW, Tile.ADD_NONE));

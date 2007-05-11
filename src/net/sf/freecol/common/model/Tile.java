@@ -219,16 +219,24 @@ public final class Tile extends FreeColGameObject implements Location, Nameable 
      * @return The name as a <code>String</code>.
      */
     public String getName() {
-        if (getAddition() == ADD_MOUNTAINS) {
+        return getName(getType(), isForested(), getAddition());
+    }
+    
+    /**
+     * Gets the name of the given tile type.
+     * 
+     * @return The name as a <code>String</code>.
+     */
+    public static String getName(int tileType, boolean forested, int addition) {
+        if (addition == ADD_MOUNTAINS) {
             return Messages.message("mountains");
-        } else if (getAddition() == ADD_HILLS) {
+        } else if (addition == ADD_HILLS) {
             return Messages.message("hills");
-        } else if (0 < getType() && getType() < FreeCol.specification.numberOfTileTypes()) {
+        } else if (0 < tileType && tileType < FreeCol.specification.numberOfTileTypes()) {
 
-            TileType t = FreeCol.specification.tileType(type);
+            TileType t = FreeCol.specification.tileType(tileType);
             return forested ? Messages.message(t.whenForested.name) : Messages.message(t.name);
         }
-
         return Messages.message("unexplored");
     }
 
@@ -658,6 +666,12 @@ public final class Tile extends FreeColGameObject implements Location, Nameable 
         if (addition == ADD_HILLS || addition == ADD_MOUNTAINS) {
             setForested(false);
         }
+        
+        if (!isLand() && addition != ADD_NONE) {
+            logger.warning("Setting addition to Ocean.");
+            type = PLAINS;
+        }
+        
         additionType = addition;
         updatePlayerExploredTiles();
     }
@@ -823,6 +837,16 @@ public final class Tile extends FreeColGameObject implements Location, Nameable 
      */
     public void setForested(boolean value) {
         forested = value;
+        if (additionType == ADD_HILLS
+                || additionType == ADD_MOUNTAINS) {
+            additionType = ADD_NONE;
+        }
+        
+        if (!isLand() && value) {
+            logger.warning("Setting forested to Ocean.");
+            type = PLAINS;
+        }
+        
         // bonus = false;
         updatePlayerExploredTiles();
     }
@@ -875,6 +899,11 @@ public final class Tile extends FreeColGameObject implements Location, Nameable 
             forested = false;
             additionType = ADD_NONE;
         }
+        
+        if (type == ARCTIC) {
+            forested = false;
+        }
+        
         updatePlayerExploredTiles();
     }
 
@@ -923,6 +952,12 @@ public final class Tile extends FreeColGameObject implements Location, Nameable 
      */
     public void setLostCityRumour(boolean rumour) {
         lostCityRumour = rumour;
+        
+        if (!isLand() && rumour) {
+            logger.warning("Setting lost city rumour to Ocean.");
+            type = PLAINS;
+        }
+        
         updatePlayerExploredTiles();
     }
 

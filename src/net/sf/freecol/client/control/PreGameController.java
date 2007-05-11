@@ -203,7 +203,7 @@ public final class PreGameController {
         }
 
         canvas.addKeyListener(new CanvasKeyListener(canvas, inGameController));
-        canvas.addMouseListener(new CanvasMouseListener(canvas, gui, freeColClient.getGame().getMap()));
+        canvas.addMouseListener(new CanvasMouseListener(canvas, gui));
         canvas.addMouseMotionListener(new CanvasMouseMotionListener(canvas, gui, freeColClient.getGame().getMap()));
 
         if (freeColClient.getMyPlayer().equals(freeColClient.getGame().getCurrentPlayer())) {

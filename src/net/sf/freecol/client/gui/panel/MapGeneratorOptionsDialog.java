@@ -86,10 +86,8 @@ public final class MapGeneratorOptionsDialog extends FreeColDialog implements Ac
         return getMinimumSize();
     }
     
-    public void initialize(boolean editable) {
+    public void initialize(boolean editable, MapGeneratorOptions mgo) {
         removeAll();
-
-        final MapGeneratorOptions mgo = freeColClient.getPreGameController().getMapGeneratorOptions();
 
         // Header:
         header = getDefaultHeader(mgo.getName());
@@ -131,8 +129,10 @@ public final class MapGeneratorOptionsDialog extends FreeColDialog implements Ac
                 ui.unregister();
                 ui.updateOption();
                 parent.remove(this);
-                freeColClient.getPreGameController().sendMapGeneratorOptions();
-                freeColClient.getCanvas().getStartGamePanel().updateMapGeneratorOptions();
+                if (!freeColClient.isMapEditor()) {
+                    freeColClient.getPreGameController().sendMapGeneratorOptions();
+                    freeColClient.getCanvas().getStartGamePanel().updateMapGeneratorOptions();
+                }
                 setResponse(new Boolean(true));
                 break;
             case CANCEL:

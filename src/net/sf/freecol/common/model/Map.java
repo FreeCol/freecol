@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 import java.util.PriorityQueue;
+import java.util.Random;
 import java.util.Vector;
 import java.util.logging.Logger;
 
@@ -1195,25 +1196,22 @@ public class Map extends FreeColGameObject {
     public WholeMapIterator getWholeMapIterator() {
         return new WholeMapIterator();
     }
-
+    
     /**
-     * Get the position adjacent to a given position, in a given direction.
-     * 
-     * @param position
-     *            The position
-     * @param direction
-     *            The direction (N, NE, E, etc.)
+     * Gets the position adjacent to a given position, in a given
+     * direction.
+     *
+     * @param position The position
+     * @param direction The direction (N, NE, E, etc.)
      * @return Adjacent position
      */
-    public Position getAdjacent(Position position, int direction) {
-        int x = position.getX()
-                + ((position.getY() & 1) != 0 ? ODD_DX[direction]
-                        : EVEN_DX[direction]);
-        int y = position.getY()
-                + ((position.getY() & 1) != 0 ? ODD_DY[direction]
-                        : EVEN_DY[direction]);
-        return new Position(x, y);
-    }
+     public static Position getAdjacent(Position position, int direction) {
+         int x = position.getX() + ((position.getY() & 1) != 0 ?
+             ODD_DX[direction] : EVEN_DX[direction]);
+         int y = position.getY() + ((position.getY() & 1) != 0 ?
+             ODD_DY[direction] : EVEN_DY[direction]);
+         return new Position(x, y);
+     }
 
     /**
      * Get an adjacent iterator.
@@ -1272,7 +1270,7 @@ public class Map extends FreeColGameObject {
      * @return True if it is valid
      */
     public boolean isValid(Position position) {
-        return isValid(position.getX(), position.getY());
+        return isValid(position.getX(), position.getY(), getWidth(), getHeight());
     }
 
     /**
@@ -1285,9 +1283,63 @@ public class Map extends FreeColGameObject {
      * @return True if it is valid
      */
     public boolean isValid(int x, int y) {
-        return ((x >= 0) && (x < getWidth()) && (y >= 0) && (y < getHeight()));
+        return isValid(x, y, getWidth(), getHeight());
     }
 
+    /**
+     * Checks whether a position is valid.
+     * 
+     * @param position The position
+     * @param width The width of the map.
+     * @param height The height of the map.
+     * @return <code>true</code> if the given position is 
+     *        within the bounds of the map and <code>false</code> otherwise
+     */
+    public static boolean isValid(Position position, int width, int height) {
+        return isValid(position.getX(), position.getY(), width, height);
+    }
+    
+    /**
+     * Checks if the given position is valid.
+     * 
+     * @param x The x-coordinate of the position.
+     * @param y The y-coordinate of the position.
+     * @param width The width of the map.
+     * @param height The height of the map.
+     * @return <code>true</code> if the given position is 
+     *        within the bounds of the map and <code>false</code> otherwise
+     */
+    public static boolean isValid(int x, int y, int width, int height) {
+        return x>=0 && x < width && y >= 0 && y < height;
+    }
+
+    /**
+     * Select a random land position on the map.
+     * 
+     * <b>Warning:</b> This method should not be used by any model
+     * object unless we have completed restructuring the model
+     * (making all model changes at the server). The reason is
+     * the use of random numbers in this method.
+     * 
+     * @param map The <code>Map</code>.
+     * @return Position selected
+     */
+    public Position getRandomLandPosition() {
+        final Random random = new Random();
+        
+        int x = (getWidth() > 20) ? random.nextInt(getWidth() - 20) + 10 : random.nextInt(getWidth());
+        int y = (getHeight() > 20) ? random.nextInt(getHeight() - 20) + 10 : random.nextInt(getHeight());
+        Position centerPosition = new Position(x, y);
+        Iterator<Position> it = getFloodFillIterator(centerPosition);
+        while (it.hasNext()) {
+            Position p = it.next();
+            if (getTile(p).isLand()) {
+                return p;
+            }
+        }
+        return null;
+    }
+    
     /**
      * Gets the distance in tiles between two map positions. With an isometric
      * map this is a non-trivial task. The formula below has been developed

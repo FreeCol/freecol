@@ -58,6 +58,10 @@ public class OpenAction extends MapboardAction {
      * @param e The <code>ActionEvent</code>.
      */
     public void actionPerformed(ActionEvent e) {
-        freeColClient.getInGameController().loadGame();
+        if (!freeColClient.isMapEditor()) {
+            freeColClient.getInGameController().loadGame();
+        } else {
+            freeColClient.getMapEditorController().loadGame();
+        }
     }
 }

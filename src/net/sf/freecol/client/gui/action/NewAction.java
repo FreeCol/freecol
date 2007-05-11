@@ -58,6 +58,10 @@ public class NewAction extends MapboardAction {
      * @param e The <code>ActionEvent</code>.
      */
     public void actionPerformed(ActionEvent e) {
-        freeColClient.getCanvas().newGame();
+        if (!freeColClient.isMapEditor()) {
+            freeColClient.getCanvas().newGame();
+        } else {
+            freeColClient.getMapEditorController().newMap();
+        }
     }
 }

@@ -20,6 +20,7 @@ import net.sf.freecol.client.control.ClientModelController;
 import net.sf.freecol.client.control.ConnectController;
 import net.sf.freecol.client.control.InGameController;
 import net.sf.freecol.client.control.InGameInputHandler;
+import net.sf.freecol.client.control.MapEditorController;
 import net.sf.freecol.client.control.PreGameController;
 import net.sf.freecol.client.control.PreGameInputHandler;
 import net.sf.freecol.client.gui.Canvas;
@@ -68,6 +69,9 @@ public final class FreeColClient {
     private InGameInputHandler inGameInputHandler;
 
     private ClientModelController modelController;
+    
+    private MapEditorController mapEditorController;
+    
 
     // Gui:
     private GraphicsDevice gd;
@@ -108,6 +112,8 @@ public final class FreeColClient {
     private FreeColServer freeColServer = null;
 
     private boolean windowed;
+    
+    private boolean mapEditor;
 
     private boolean singleplayer;
 
@@ -145,6 +151,8 @@ public final class FreeColClient {
         this.musicLibrary = musicLibrary;
         this.sfxLibrary = sfxLibrary;
         
+        mapEditor = false;
+        
         clientOptions = new ClientOptions();
         actionManager = new ActionManager(this);
         // Control:
@@ -154,6 +162,8 @@ public final class FreeColClient {
         inGameController = new InGameController(this);
         inGameInputHandler = new InGameInputHandler(this);
         modelController = new ClientModelController(this);
+        mapEditorController = new MapEditorController(this);
+        
         // Gui:
         final Rectangle theWindowSize = windowSize;
         SwingUtilities.invokeLater(new Runnable() {
@@ -239,6 +249,14 @@ public final class FreeColClient {
         saveClientOptions(FreeCol.getClientOptionsFile());
     }
 
+    public void setMapEditor(boolean mapEditor) {
+        this.mapEditor = mapEditor;
+    }
+    
+    public boolean isMapEditor() {
+        return mapEditor;
+    }
+    
     /**
      * Writes the client options to the given file.
      * 
@@ -291,6 +309,10 @@ public final class FreeColClient {
      */
     public ClientOptions getClientOptions() {
         return clientOptions;
+    }
+    
+    public MapEditorController getMapEditorController() {
+        return mapEditorController;
     }
 
     /**

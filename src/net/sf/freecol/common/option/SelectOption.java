@@ -109,22 +109,32 @@ public class SelectOption extends AbstractOption {
     }
 
     /**
+     * Gets a <code>String</code> representation of the
+     * current value.
+     * 
      * This method can be overwritten by subclasses to allow
-     * a custom save value.
+     * a custom save value, since this method is used by
+     * {@link #toXML(XMLStreamWriter)}.
      * 
      * @return The String value of the Integer.
-     * @see setValue(String)
+     * @see #setValue(String)
      */
     protected String getStringValue() {
         return Integer.toString(value);
     }
     
     /**
-     * This method can be overwritten by subclasses to allow
-     * a custom save value.
+     * Converts the given <code>String</code> to an Integer
+     * and calls {@link #setValue(int)}. 
      * 
-     * @return The String value of the Integer.
-     * @see getSaveValue()
+     * <br><br>
+     * 
+     * This method can be overwritten by subclasses to allow
+     * a custom save value, since this method is used by
+     * {@link #readFromXML(XMLStreamReader)}.
+     * 
+     * @param value The String value of the Integer.
+     * @see #getStringValue()
      */
     protected void setValue(String value) {
         setValue(Integer.parseInt(value));
@@ -166,9 +176,9 @@ public class SelectOption extends AbstractOption {
 
 
     /**
-    * Gets the tag name of the root element representing this object.
-    * @return "integerOption".
-    */
+     * Gets the tag name of the root element representing this object.
+     * @return "integerOption".
+     */
     public static String getXMLElementTagName() {
         return "selectOption";
     }

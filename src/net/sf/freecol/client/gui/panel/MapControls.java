@@ -17,6 +17,7 @@ import net.sf.freecol.client.gui.action.PlowAction;
 import net.sf.freecol.client.gui.action.SentryAction;
 import net.sf.freecol.client.gui.action.SkipUnitAction;
 import net.sf.freecol.client.gui.action.WaitAction;
+import net.sf.freecol.client.gui.panel.MapEditorTransformPanel.MapTransform;
 import net.sf.freecol.common.model.Tile;
 
 
@@ -86,6 +87,16 @@ public final class MapControls {
         }
     }
 
+    /**
+     * Updates this <code>InfoPanel</code>.
+     * 
+     * @param mapTransform The current MapTransform.
+     */
+    public void update(MapTransform mapTransform) {
+        if (infoPanel != null) {
+            infoPanel.update(mapTransform);
+        }
+    }
 
     /**
     * Adds the map controls to the given component.
@@ -115,11 +126,13 @@ public final class MapControls {
         component.add(infoPanel, JLayeredPane.DEFAULT_LAYER, false);
         component.add(miniMap, JLayeredPane.DEFAULT_LAYER, false);
 
-        for(int i=0; i<unitButton.length; i++) {
-            component.add(unitButton[i], JLayeredPane.DEFAULT_LAYER, false);
-            Action a = unitButton[i].getAction();
-            unitButton[i].setAction(null);
-            unitButton[i].setAction(a);
+        if (!freeColClient.isMapEditor()) {
+            for(int i=0; i<unitButton.length; i++) {
+                component.add(unitButton[i], JLayeredPane.DEFAULT_LAYER, false);
+                Action a = unitButton[i].getAction();
+                unitButton[i].setAction(null);
+                unitButton[i].setAction(a);
+            }
         }
     }
 

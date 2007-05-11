@@ -17,6 +17,7 @@ public class SchoolTest extends FreeColTestCase {
      * 
      */
     public void testExpertTeaching() {
+        
         Colony colony = getStandardColony(4);
 
         Iterator<Unit> units = colony.getUnitIterator();
@@ -54,6 +55,7 @@ public class SchoolTest extends FreeColTestCase {
     }
 
     public void testCollege() {
+        
         Colony colony = getStandardColony(2);
 
         Iterator<Unit> units = colony.getUnitIterator();
@@ -89,6 +91,7 @@ public class SchoolTest extends FreeColTestCase {
     }
 
     public void testUniversity() {
+        
         Colony colony = getStandardColony(2);
 
         Iterator<Unit> units = colony.getUnitIterator();
@@ -153,6 +156,7 @@ public class SchoolTest extends FreeColTestCase {
      * sorted out first.
      */
     public void testTrackerBug1616384() {
+        
         Colony colony = getStandardColony(8);
 
         // Setting the stage...
@@ -229,6 +233,7 @@ public class SchoolTest extends FreeColTestCase {
     }
 
     public void testTwoTeachersSimple() {
+        
         Colony colony = getStandardColony(8);
 
         Iterator<Unit> units = colony.getUnitIterator();
@@ -303,6 +308,7 @@ public class SchoolTest extends FreeColTestCase {
      * If there are two teachers, but just one colonist to be taught.
      */
     public void testSingleGuyTwoTeachers() {
+        
         Colony colony = getStandardColony(5);
 
         Iterator<Unit> units = colony.getUnitIterator();
@@ -356,6 +362,7 @@ public class SchoolTest extends FreeColTestCase {
      * taught, this should not mean any speed up.
      */
     public void testTwoTeachersOfSameKind() {
+        
         Colony colony = getStandardColony(3);
 
         Iterator<Unit> units = colony.getUnitIterator();

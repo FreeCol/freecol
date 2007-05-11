@@ -18,8 +18,8 @@ import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.Canvas;
-import net.sf.freecol.client.gui.FreeColMenuBar;
 import net.sf.freecol.client.gui.GUI;
+import net.sf.freecol.client.gui.InGameMenuBar;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.client.gui.panel.ChoiceItem;
 import net.sf.freecol.client.gui.panel.EventPanel;
@@ -171,7 +171,7 @@ public final class InGameController implements NetworkConstants {
 
         freeColClient.getConnectController().loadGame(file);
     }
-
+    
     /**
      * Sets the "debug mode" to be active or not. Calls
      * {@link FreeCol#setInDebugMode(boolean)} and reinitialize the
@@ -182,7 +182,7 @@ public final class InGameController implements NetworkConstants {
      */
     public void setInDebugMode(boolean debug) {
         FreeCol.setInDebugMode(debug);
-        freeColClient.getCanvas().setJMenuBar(new FreeColMenuBar(freeColClient));
+        freeColClient.getCanvas().setJMenuBar(new InGameMenuBar(freeColClient));
         freeColClient.getCanvas().updateJMenuBar();
     }
 

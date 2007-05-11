@@ -58,6 +58,10 @@ public class SaveAction extends MapboardAction {
      * @param e The <code>ActionEvent</code>.
      */
     public void actionPerformed(ActionEvent e) {
-        freeColClient.getInGameController().saveGame();
+        if (!freeColClient.isMapEditor()) {
+            freeColClient.getInGameController().saveGame();
+        } else {
+            freeColClient.getMapEditorController().saveGame();
+        }
     }
 }

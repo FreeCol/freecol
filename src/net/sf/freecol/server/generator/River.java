@@ -120,7 +120,7 @@ public class River {
         }
         drawToMap();
         if (nextRiver != null) {
-            nextRiver.grow(section, map.getAdjacent(section.position, section.direction));
+            nextRiver.grow(section, Map.getAdjacent(section.position, section.direction));
         }
     }
 
@@ -132,7 +132,7 @@ public class River {
      */
     public boolean isNextToSelf(Map.Position p) {
         for (int i = 0; i < 4; i++) {
-            Map.Position px = map.getAdjacent(p, directions[i]);
+            Map.Position px = Map.getAdjacent(p, directions[i]);
             if (this.contains(px)) {
                 return true;
             }
@@ -148,7 +148,7 @@ public class River {
      */
     public boolean isNextToWater(Map.Position p) {
         for (int i = 0; i < 4; i++) {
-            Map.Position px = map.getAdjacent(p, directions[i]);
+            Map.Position px = Map.getAdjacent(p, directions[i]);
             if (!map.getTile(px).isLand() || map.getTile(px).hasRiver()) {
                 return true;
             }
@@ -219,7 +219,7 @@ public class River {
         
         for (int i = 0; i < 3; i++) {
             int dir = newDirection(i);
-            Map.Position newPosition = map.getAdjacent(source, dir);
+            Map.Position newPosition = Map.getAdjacent(source, dir);
             Tile nextTile = map.getTile(newPosition);
             
             // is the tile suitable for this river?
@@ -237,7 +237,7 @@ public class River {
                 // find out if an adjacent tile is next to water
                 for (i = 0; i < 3; i++) {
                     int lastDir = newDirection(i, dir);
-                    Map.Position px = map.getAdjacent(newPosition, lastDir);
+                    Map.Position px = Map.getAdjacent(newPosition, lastDir);
                     Tile tile = map.getTile(px);
                     if (tile == null || !tile.isLand() || tile.hasRiver()) {
                         

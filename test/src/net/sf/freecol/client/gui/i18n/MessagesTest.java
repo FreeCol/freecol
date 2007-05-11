@@ -17,12 +17,12 @@ public class MessagesTest extends TestCase {
     public void setUp() {
         // Make sure that English is the default locale
         if (!Locale.getDefault().equals(Locale.US)) {
-            Messages.setResources(Messages.getMessageBundle(Locale.US));
+            Messages.setMessageBundle(Locale.US);
         }
     }
     
     public void tearDown(){
-        Messages.setResources(Messages.getMessageBundle(Locale.US));
+        Messages.setMessageBundle(Locale.US);
     }
 
     public void testMessageString() {
@@ -74,11 +74,11 @@ public class MessagesTest extends TestCase {
     }
 
     public void testChangeLocaleSettings() {
-        Messages.setResources(Messages.getMessageBundle(Locale.US));
+        Messages.setMessageBundle(Locale.US);
 
         assertEquals("Trade Advisor", Messages.message("menuBar.report.trade"));
 
-        Messages.setResources(Messages.getMessageBundle(Locale.GERMANY));
+        Messages.setMessageBundle(Locale.GERMANY);
 
         assertEquals("Handelsberater", Messages.message("menuBar.report.trade"));
     }
