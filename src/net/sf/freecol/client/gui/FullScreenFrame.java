@@ -6,6 +6,8 @@ import java.util.logging.Logger;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
 
+import net.sf.freecol.FreeCol;
+
 /**
  * The fullscreen frame that contains everything. If full screen mode is not
  * supported (or choosen), then the {@link WindowedFrame} will be used instead.
@@ -27,7 +29,8 @@ public final class FullScreenFrame extends JFrame {
 	 *            The context of this <code>FullScreenFrame</code>.
 	 */
 	public FullScreenFrame(GraphicsDevice gd) {
-		super("Freecol", gd.getDefaultConfiguration());
+		super("Freecol " + FreeCol.getVersion(), gd.getDefaultConfiguration());
+		
 		// TODO: Add an icon for the taskbar.
 		logger.info("FullScreenFrame's JFrame created.");
 
