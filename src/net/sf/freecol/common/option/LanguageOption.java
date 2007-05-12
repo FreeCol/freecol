@@ -113,7 +113,7 @@ public class LanguageOption extends SelectOption {
          File[] files = i18nDirectory.listFiles();
          if (files == null) {
         	 throw new RuntimeException("No language files could be found in the <" + i18nDirectory + 
-        			 "> folder. Make sure at least one is present.");
+        			 "> folder. Make sure you ran the ant correctly.");
          }
          for (File file : files) {
              if (file.getName() == null) {
