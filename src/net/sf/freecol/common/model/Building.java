@@ -242,7 +242,8 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
      *         improvement does not exist.
      */
     public String getNextName() {
-        return level < buildingType.numberOfLevels() ? buildingType.level(level).name : null;
+        return level < buildingType.numberOfLevels() ?
+               Messages.message(buildingType.level(level).name) : null;
     }
 
     /**
