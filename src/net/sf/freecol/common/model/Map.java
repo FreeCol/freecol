@@ -133,7 +133,7 @@ public class Map extends FreeColGameObject {
 
     private void initSize() {
       width = columns.size();
-      height = ((Vector) columns.get(0)).size();;
+      height = columns.get(0).size();;
     }
 
     /**

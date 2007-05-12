@@ -187,11 +187,6 @@ public final class ReportLabourPanel extends ReportPanel implements ActionListen
 
     private JPanel createUnitDetails(int unit, ReportLabourDetailPanel report) {
 
-        int tools = 0;
-        if (unit == Unit.HARDY_PIONEER) {
-            tools = 20;
-        }
-
         int maxColumns = 3;
         int columnsPerColumn = 4;
         int[] widths = new int[maxColumns * columnsPerColumn - 1];
@@ -331,7 +326,7 @@ public final class ReportLabourPanel extends ReportPanel implements ActionListen
     }
 
     /**
-     * This function analyses an event and calls the right methods to take care
+     * This function analyzes an event and calls the right methods to take care
      * of the user's requests.
      * 
      * @param event The incoming ActionEvent.
