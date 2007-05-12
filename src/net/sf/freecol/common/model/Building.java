@@ -843,7 +843,7 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
          } else {
              if (getGameOptions().getBoolean(GameOptions.EXPERTS_HAVE_CONNECTIONS)) {
                  int minimumProduction = 0;
-                 Iterator i = getUnitIterator();
+                 Iterator<Unit> i = getUnitIterator();
                  while (i.hasNext()) {
                      Unit unit = (Unit)i.next();
                      if (unit.getType() == getExpertUnitType()) {

@@ -1379,10 +1379,10 @@ public final class Colony extends Settlement implements Location, Nameable {
     }
 
     private Unit getFirstUnit() {
-        Iterator wli = getWorkLocationIterator();
+        Iterator<WorkLocation> wli = getWorkLocationIterator();
         while (wli.hasNext()) {
             WorkLocation wl = (WorkLocation) wli.next();
-            Iterator unitIterator = wl.getUnitIterator();
+            Iterator<Unit> unitIterator = wl.getUnitIterator();
             while (unitIterator.hasNext()) {
                 Object o = unitIterator.next();
                 if (o != null) {
