@@ -3030,11 +3030,17 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
     /**
      * Checks if this is an defensive unit. That is: a unit which can be used to
      * defend a <code>Settlement</code>.
-     * <p>
+     * 
+     * <br><br>
+     * 
      * Note! As this method is used by the AI it really means that the unit can
      * defend as is. To be specific an unarmed colonist is not defensive yet,
      * even if Paul Revere and stockpiled muskets are available. That check is
      * only performed on an actual attack.
+     * 
+     * <br><br>
+     * 
+     * A settlement is lost when there are no more defensive units.
      * 
      * @return <code>true</code> if this is a defensive unit meaning it can be
      *         used to defend a <code>Colony</code>. This would normally mean

@@ -883,19 +883,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
                         + attackElement.getAttribute("unit"));
             }
         } else {
-            Colony targetColony = newTile.getColony();
-            // Paul Revere present? If so, arm the defender if MUSKETS and HORSES are available
-            if (targetColony != null && targetColony.getOwner().hasFather(FoundingFather.PAUL_REVERE)) {
-                if (targetColony.getGoodsCount(Goods.MUSKETS) >= 50) {
-                    defender.setArmed(true);
-                }
-                if (targetColony.getGoodsCount(Goods.HORSES) >= 50) {
-                    defender.setMounted(true);
-                }
-            }
-
-            result = generateAttackResult(unit, defender);
-            // TODO: Shouldn't the defender be unarmed again, afterwards? 
+            result = generateAttackResult(unit, defender); 
         }
         if (result == Unit.ATTACK_DONE_SETTLEMENT) {
             // 10% of their gold
@@ -1005,41 +993,48 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
      *         {@link Unit#ATTACK_DONE_SETTLEMENT}.
      */
     private int generateAttackResult(Unit unit, Unit defender) {
-        float attackPower = unit.getOffensePower(defender);
-        float totalProbability = attackPower + defender.getDefensePower(unit);
-        int r = getPseudoRandom().nextInt(Math.round(totalProbability) + 1);
-        if (r > attackPower) {
-            int diff = Math.round(attackPower * 2 - defender.getDefensePower(unit));
-            int r2 = getPseudoRandom().nextInt((diff < 3) ? 3 : diff);
-            if (r2 == 0) {
-                return Unit.ATTACK_GREAT_LOSS;
-            } else {
-                return Unit.ATTACK_LOSS;
-            }
-        } else if (r == attackPower && defender.isNaval()) {
-            return Unit.ATTACK_EVADES;
+        double attackPower = unit.getOffensePower(defender);
+        double defensePower = unit.getDefensePower(defender);
+        double totalProbability = attackPower + defensePower;
+        double victory = attackPower / totalProbability;
+        // TODO: Use the PseudoRandom class:
+        double r = Math.random();
+        
+        final int result;
+        if (r <= victory * 0.2) {
+            // 10% of the times winning:
+            result = Unit.ATTACK_GREAT_WIN;
+        } else if (r <= victory) {
+            // 90% of the times winning:
+            result = Unit.ATTACK_WIN;
+        } else if (defender.isNaval()
+                && r <= (0.8 * victory) + 0.2) {
+            // 20% of the times loosing:
+            result = Unit.ATTACK_EVADES;
+        } else if (r <= (0.1 * victory) + 0.9) {
+            // 70% of the times loosing:
+            result = Unit.ATTACK_LOSS;
         } else {
-            if (defender.getTile().getSettlement() != null
-                    &&
-                    // Indian settlement
-                    (defender.getTile().getSettlement() instanceof IndianSettlement && ((IndianSettlement) defender
-                            .getTile().getSettlement()).getUnitCount()
-                            + defender.getTile().getUnitCount() <= 1)
-                    ||
-                    // Colony
-                    (defender.getTile().getColony() != null && !defender.isArmed() && !defender.isMounted()
-                            && defender.getType() != Unit.ARTILLERY && defender.getType() != Unit.DAMAGED_ARTILLERY)) {
-                return Unit.ATTACK_DONE_SETTLEMENT;
+            // 10% of the times loosing:
+            result = Unit.ATTACK_GREAT_LOSS;
+        }
+        
+        if (result >= 0 && defender.getTile().getSettlement() != null) {
+            final boolean lastDefender;
+            if (defender.getTile().getSettlement() instanceof Colony) {
+                lastDefender = !defender.isDefensiveUnit();
+            } else if (defender.getTile().getSettlement() instanceof IndianSettlement) {
+                final int defenders = defender.getTile().getUnitCount()
+                        + defender.getTile().getSettlement().getUnitCount();
+                lastDefender = (defenders <= 1);
             } else {
-                int diff = Math.round(defender.getDefensePower(unit) * 2 - attackPower);
-                int r2 = getPseudoRandom().nextInt((diff < 3) ? 3 : diff);
-                if (r2 == 0) {
-                    return Unit.ATTACK_GREAT_WIN;
-                } else {
-                    return Unit.ATTACK_WIN;
-                }
+                throw new IllegalStateException("Unknown Settlement.");
+            }
+            if (lastDefender) {
+                return Unit.ATTACK_DONE_SETTLEMENT;
             }
         }
+        return result;
     }
 
     /**
