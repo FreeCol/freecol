@@ -666,6 +666,8 @@ public final class Tile extends FreeColGameObject implements Location, Nameable 
     public void setAddition(int addition) {
         if (addition == ADD_HILLS || addition == ADD_MOUNTAINS) {
             setForested(false);
+        }
+        if (addition != ADD_RIVER_MINOR && addition != ADD_RIVER_MAJOR) {
             river = 0;
         }
         
