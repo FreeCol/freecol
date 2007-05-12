@@ -56,6 +56,7 @@ import net.sf.freecol.client.gui.action.SentryAction;
 import net.sf.freecol.client.gui.action.ShowMainAction;
 import net.sf.freecol.client.gui.action.SkipUnitAction;
 import net.sf.freecol.client.gui.action.ToggleViewModeAction;
+import net.sf.freecol.client.gui.action.TradeRouteAction;
 import net.sf.freecol.client.gui.action.UnloadAction;
 import net.sf.freecol.client.gui.action.WaitAction;
 import net.sf.freecol.client.gui.i18n.Messages;
@@ -198,7 +199,7 @@ public class InGameMenuBar extends FreeColMenuBar {
         menu.addSeparator();
 
         menu.add(getMenuItem(EuropeAction.ID));
-        //menu.add(getMenuItem(TradeRouteAction.ID));
+        menu.add(getMenuItem(TradeRouteAction.ID));
 
         add(menu);
     }

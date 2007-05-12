@@ -54,6 +54,11 @@ public class TradeRoute extends FreeColGameObject implements Cloneable, Ownable 
         this.owner = player;
     }
 
+    public TradeRoute(Game game, XMLStreamReader in) throws XMLStreamException {
+        super(game, in);
+        readFromXML(in);
+    }
+
     public TradeRoute(Game game, Element e) {
         super(game, e);
         readFromXMLElement(e);
@@ -232,6 +237,7 @@ public class TradeRoute extends FreeColGameObject implements Cloneable, Ownable 
             for (int cargo : readFromArrayElement("cargo", in, new int[0])) {
                 addCargo(cargo);
             }
+            in.nextTag();
         }
 
         /**

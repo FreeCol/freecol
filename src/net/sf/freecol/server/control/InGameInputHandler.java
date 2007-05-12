@@ -1,6 +1,7 @@
 package net.sf.freecol.server.control;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Vector;
 import java.util.logging.Logger;
@@ -37,6 +38,7 @@ import net.sf.freecol.server.ai.AIPlayer;
 import net.sf.freecol.server.model.ServerPlayer;
 
 import org.w3c.dom.Element;
+import org.w3c.dom.NodeList;
 
 /**
  * Handles the network messages that arrives while
@@ -366,6 +368,11 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
                 return updateTradeRoute(connection, element);
             }
         });
+        register("setTradeRoutes", new NetworkRequestHandler() {
+            public Element handle(Connection connection, Element element) {
+                return setTradeRoutes(connection, element);
+            }
+        });
         register("assignTradeRoute", new NetworkRequestHandler() {
             public Element handle(Connection connection, Element element) {
                 return assignTradeRoute(connection, element);
@@ -482,7 +489,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
     }
 
     /**
-     * Handles a "updateTradeRoute"-message from a client.
+     * Handles a "setTradeRoutes"-message from a client.
      * 
      * @param connection The connection the message came from.
      * @param element The element containing the request.
@@ -501,6 +508,34 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
             throw new IllegalStateException("Not your trade route!");
         }
         serverTradeRoute.updateFrom(clientTradeRoute);
+        return null;
+    }
+
+    /**
+     * Handles a "updateTradeRoute"-message from a client.
+     * 
+     * @param connection The connection the message came from.
+     * @param element The element containing the request.
+     */
+    private Element setTradeRoutes(Connection connection, Element element) {
+        Game game = getFreeColServer().getGame();
+        ServerPlayer player = getFreeColServer().getPlayer(connection);
+        ArrayList<TradeRoute> routes = new ArrayList<TradeRoute>();
+        
+        NodeList childElements = element.getChildNodes();
+        for(int i = 0; i < childElements.getLength(); i++) {
+            Element childElement = (Element) childElements.item(i);
+            String id = childElement.getAttribute("id");
+            TradeRoute serverTradeRoute = (TradeRoute) game.getFreeColGameObject(id);
+            if (serverTradeRoute == null) {
+                throw new IllegalArgumentException("Could not find 'TradeRoute' with specified ID: " + id);
+            }
+            if (serverTradeRoute.getOwner() != player) {
+                throw new IllegalStateException("Not your trade route!");
+            }
+            routes.add(serverTradeRoute);
+        }
+        player.setTradeRoutes(routes);
         return null;
     }
 

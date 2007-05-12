@@ -186,7 +186,7 @@ public final class TradeRouteDialog extends FreeColDialog implements ActionListe
                 for (int index = 0; index < listModel.getSize(); index++) {
                     routes.add((TradeRoute) listModel.getElementAt(index));
                 }
-                player.setTradeRoutes(routes);
+                getCanvas().getClient().getInGameController().setTradeRoutes(routes);
                 setResponse(tradeRoutes.getSelectedValue());
                 break;
             case CANCEL:

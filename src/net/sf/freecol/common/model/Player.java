@@ -2584,8 +2584,7 @@ public class Player extends FreeColGameObject implements Nameable {
                     monarch = new Monarch(getGame(), in);
                 }
             } else if (in.getLocalName().equals(TradeRoute.getXMLElementTagName())) {
-                TradeRoute route = new TradeRoute(getGame(), "", this);
-                route.readFromXML(in);
+                TradeRoute route = new TradeRoute(getGame(), in);
                 getTradeRoutes().add(route);
             } else if (in.getLocalName().equals(Market.getXMLElementTagName())) {
                 market = (Market) getGame().getFreeColGameObject(in.getAttributeValue(null, "ID"));

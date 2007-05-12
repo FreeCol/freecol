@@ -2651,6 +2651,30 @@ public final class InGameController implements NetworkConstants {
     }
 
     /**
+     * Sets the trade routes for this player
+     * 
+     * @param routes The trade routes to set.
+     */
+    public void setTradeRoutes(List<TradeRoute> routes) {
+        Player myPlayer = freeColClient.getMyPlayer();
+        myPlayer.setTradeRoutes(routes);
+        /*
+         * if (freeColClient.getGame().getCurrentPlayer() !=
+         * freeColClient.getMyPlayer()) {
+         * freeColClient.getCanvas().showInformationMessage("notYourTurn");
+         * return; }
+         */
+        Element tradeRoutesElement = Message.createNewRootElement("setTradeRoutes");
+        for(TradeRoute route : routes) {
+            Element routeElement = tradeRoutesElement.getOwnerDocument().createElement(route.getXMLElementTagName());
+            routeElement.setAttribute("id", route.getID());
+            tradeRoutesElement.appendChild(routeElement);
+        }
+        freeColClient.getClient().sendAndWait(tradeRoutesElement);
+
+    }
+
+    /**
      * Assigns a trade route to a unit.
      * 
      * @param unit The unit to assign a trade route to.
