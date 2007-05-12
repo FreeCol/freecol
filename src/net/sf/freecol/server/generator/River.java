@@ -351,6 +351,41 @@ public class River {
         }
     }
 
+    public static int updateRiver(int oldRiver, int direction, int addition) {
+        //System.out.println("old = " + oldRiver + ", direction = " + direction +
+        //", addition = " + addition);
+        int[] base = {0, 1, 0, 3, 0, 9, 0, 27};
+        if (base[direction] == 0) {
+            // ignore these directions
+            return oldRiver;
+        }
+        int branch = 0;
+        if (addition == Tile.ADD_RIVER_MINOR) {
+            branch = 1;
+        } else if (addition == Tile.ADD_RIVER_MAJOR) {
+            branch = 2;
+        }
+
+        int tmpRiver = oldRiver;
+        int value = 0;
+        for (int index = base.length - 1; index > direction ; index -= 2) {
+            value = tmpRiver / base[index];
+            tmpRiver -= value * base[index];
+        }
+        value = tmpRiver / base[direction];
+        //System.out.println("value = " + value + ", tmpRiver = " + tmpRiver);
+        if (value == branch) {
+            // no changes
+            return oldRiver;
+        } else {
+            int newRiver = oldRiver + (branch - value) * base[direction];
+            //System.out.println("new = " + newRiver);
+            return newRiver;
+        }
+    }
+        
+        
+
     /**
      * A river section.
      */

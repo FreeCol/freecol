@@ -224,7 +224,12 @@ public final class MapEditorTransformPanel extends FreeColPanel {
         }
         
         public void transform(Tile t) {
-            t.setAddition(addition);            
+            if (addition == Tile.ADD_RIVER_MAJOR ||
+                addition == Tile.ADD_RIVER_MINOR) {
+                t.addRiver(addition);
+            } else {
+                t.setAddition(addition);            
+            }
         }
     }
     

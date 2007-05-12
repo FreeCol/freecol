@@ -14,6 +14,7 @@ import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.Map.CircleIterator;
 import net.sf.freecol.common.model.Map.Position;
+import net.sf.freecol.server.generator.River;
 
 import org.w3c.dom.Element;
 
@@ -665,9 +666,10 @@ public final class Tile extends FreeColGameObject implements Location, Nameable 
     public void setAddition(int addition) {
         if (addition == ADD_HILLS || addition == ADD_MOUNTAINS) {
             setForested(false);
+            river = 0;
         }
         
-        if (!isLand() && addition != ADD_NONE) {
+        if (!isLand() && addition > ADD_RIVER_MAJOR) {
             logger.warning("Setting addition to Ocean.");
             type = PLAINS;
         }
@@ -695,6 +697,43 @@ public final class Tile extends FreeColGameObject implements Location, Nameable 
         setAddition(addition);
         this.river = river;
     }
+
+    public void updateRiver(int direction, int addition) {
+        this.river = River.updateRiver(river, direction, addition);
+    }
+
+    public void addRiver(int addition) {
+        if (addition == ADD_RIVER_MINOR ||
+            addition == ADD_RIVER_MAJOR) {
+            if (addition == getAddition()) {
+                return;
+            } else {
+                setAddition(addition);
+            }
+        } else {
+            return;
+        }
+        int[] base = {0, 1, 0, 3, 0, 9, 0, 27};
+        int[] directions = {Map.NE, Map.SE, Map.SW, Map.NW};
+        river = 0;
+        for (int i = 0; i < directions.length; i++) {
+            int branch = 0;
+            Tile t = getMap().getNeighbourOrNull(directions[i], this);
+            if (t.getAddition() == ADD_RIVER_MINOR) {
+                branch = 1;
+            } else if (t.getAddition() == ADD_RIVER_MAJOR) {
+                branch = 2;
+            } else {
+                continue;
+            }
+            river += branch * base[directions[i]];
+            int otherRiver = t.getRiver();
+            int otherDirection = getMap().getOppositeDirection(directions[i]);
+            int newRiver = River.updateRiver(otherRiver, otherDirection, addition);
+            t.addRiver(branch, newRiver);
+        }
+    }
+
 
     /**
      * Return the number of land tiles adjacent to this one.
