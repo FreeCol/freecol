@@ -57,7 +57,13 @@ public final class ReportColonyPanel extends ReportPanel implements ActionListen
         // Display Panel
         
         int widths[] = new int[] {0};
-        int heights[] = new int[colonies.size() * 2 - 1];
+        // If no colonies are defined, show an empty panel.
+        int heights[] = null;
+        if (colonies.size() == 0) {
+        	heights = new int[0];
+        } else {
+        	heights = new int[colonies.size() * 2 - 1];
+        }
         for (int i = 1; i < heights.length; i += 2) {
             heights[i] = 12;
         }
