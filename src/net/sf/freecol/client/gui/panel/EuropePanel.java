@@ -1,4 +1,3 @@
-
 package net.sf.freecol.client.gui.panel;
 
 import java.awt.Color;
@@ -14,6 +13,7 @@ import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseListener;
 import java.util.Iterator;
+import java.util.List;
 import java.util.logging.Logger;
 
 import javax.swing.BorderFactory;
@@ -40,52 +40,60 @@ import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Unit;
 import cz.autel.dmi.HIGLayout;
 
-
 /**
  * This is a panel for the Europe display. It shows the ships in Europe and
  * allows the user to send them back.
  */
 public final class EuropePanel extends FreeColPanel implements ActionListener {
-    public static final String  COPYRIGHT = "Copyright (C) 2003-2007 The FreeCol Team";
-    public static final String  LICENSE = "http://www.gnu.org/licenses/gpl.html";
-    public static final String  REVISION = "$Revision$";
+    public static final String COPYRIGHT = "Copyright (C) 2003-2007 The FreeCol Team";
+
+    public static final String LICENSE = "http://www.gnu.org/licenses/gpl.html";
+
+    public static final String REVISION = "$Revision$";
 
     private static Logger logger = Logger.getLogger(EuropePanel.class.getName());
 
-    private static final int    EXIT = 0,
-                                RECRUIT = 1,
-                                PURCHASE = 2,
-                                TRAIN = 3,
-                                UNLOAD = 4;
+    private static final int EXIT = 0, RECRUIT = 1, PURCHASE = 2, TRAIN = 3, UNLOAD = 4;
 
-    //private static final int TITLE_FONT_SIZE = 12;
-    
-    private final Canvas  parent;
+    // private static final int TITLE_FONT_SIZE = 12;
+
+    private final Canvas parent;
+
     private final FreeColClient freeColClient;
+
     private InGameController inGameController;
 
-    private final ToAmericaPanel            toAmericaPanel;
-    private final ToEuropePanel             toEuropePanel;
-    private final InPortPanel               inPortPanel;
-    private final DocksPanel                docksPanel;
-    private final CargoPanel                cargoPanel;
-    private final MarketPanel               marketPanel;
-    private final DefaultTransferHandler    defaultTransferHandler;
-    private final MouseListener             pressListener;
+    private final ToAmericaPanel toAmericaPanel;
 
-    private Europe      europe;
-    private Game        game;
-    private UnitLabel   selectedUnit;
+    private final ToEuropePanel toEuropePanel;
+
+    private final InPortPanel inPortPanel;
+
+    private final DocksPanel docksPanel;
+
+    private final CargoPanel cargoPanel;
+
+    private final MarketPanel marketPanel;
+
+    private final DefaultTransferHandler defaultTransferHandler;
+
+    private final MouseListener pressListener;
+
+    private Europe europe;
+
+    private Game game;
+
+    private UnitLabel selectedUnit;
 
     private JButton exitButton;
-    
+
 
     /**
      * The constructor for the panel.
+     * 
      * @param parent The parent of this panel
      * @param freeColClient The main controller object for the client.
-     * @param inGameController The controller object to be used when
-     *      ingame.
+     * @param inGameController The controller object to be used when ingame.
      */
     public EuropePanel(Canvas parent, FreeColClient freeColClient, InGameController inGameController) {
         this.parent = parent;
@@ -135,7 +143,7 @@ public final class EuropePanel extends FreeColPanel implements ActionListener {
         docksPanel = new DocksPanel(this);
         cargoPanel = new CargoPanel(this);
         marketPanel = new MarketPanel(this);
-        
+
         toAmericaPanel.setBackground(Color.WHITE);
         toEuropePanel.setBackground(Color.WHITE);
         inPortPanel.setBackground(Color.WHITE);
@@ -161,31 +169,36 @@ public final class EuropePanel extends FreeColPanel implements ActionListener {
         cargoPanel.addMouseListener(releaseListener);
         marketPanel.addMouseListener(releaseListener);
 
-        toAmericaPanel.setLayout(new GridLayout(0 , 2));
-        toEuropePanel.setLayout(new GridLayout(0 , 2));
-        inPortPanel.setLayout(new GridLayout(0 , 2));
-        docksPanel.setLayout(new GridLayout(0 , 2));
-        cargoPanel.setLayout(new GridLayout(1 , 0));
+        toAmericaPanel.setLayout(new GridLayout(0, 2));
+        toEuropePanel.setLayout(new GridLayout(0, 2));
+        inPortPanel.setLayout(new GridLayout(0, 2));
+        docksPanel.setLayout(new GridLayout(0, 2));
+        cargoPanel.setLayout(new GridLayout(1, 0));
 
-        JScrollPane toAmericaScroll = new JScrollPane(toAmericaPanel, ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED, ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER),
-                    toEuropeScroll = new JScrollPane(toEuropePanel, ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED, ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER),
-                    inPortScroll = new JScrollPane(inPortPanel, ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED, ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER),
-                    docksScroll = new JScrollPane(docksPanel, ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED, ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER),
-                    cargoScroll = new JScrollPane(cargoPanel, ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER, ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED),
-                    marketScroll = new JScrollPane(marketPanel, ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER, ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);                
+        JScrollPane toAmericaScroll = new JScrollPane(toAmericaPanel, ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
+                ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+        JScrollPane toEuropeScroll = new JScrollPane(toEuropePanel, ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
+                ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+        JScrollPane inPortScroll = new JScrollPane(inPortPanel, ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
+                ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+        JScrollPane docksScroll = new JScrollPane(docksPanel, ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
+                ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+        JScrollPane cargoScroll = new JScrollPane(cargoPanel, ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER,
+                ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+        JScrollPane marketScroll = new JScrollPane(marketPanel, ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER,
+                ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 
-        toAmericaPanel.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEmptyBorder(),
-                                                                  Messages.message("goingToAmerica")));
-        toEuropePanel.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEmptyBorder(),
-                                                                 Messages.message("goingToEurope")));
-        cargoPanel.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEmptyBorder(),
-                                                              Messages.message("cargo")));
-        docksPanel.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEmptyBorder(),
-                                                              Messages.message("docks")));
-        inPortPanel.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEmptyBorder(),
-                                                               Messages.message("inPort")));
-                
-        
+        toAmericaPanel.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEmptyBorder(), Messages
+                .message("goingToAmerica")));
+        toEuropePanel.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEmptyBorder(), Messages
+                .message("goingToEurope")));
+        cargoPanel.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEmptyBorder(), Messages
+                .message("cargo")));
+        docksPanel.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEmptyBorder(), Messages
+                .message("docks")));
+        inPortPanel.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEmptyBorder(), Messages
+                .message("inPort")));
+
         marketScroll.getViewport().setOpaque(false);
         marketPanel.setOpaque(false);
         cargoScroll.getViewport().setOpaque(false);
@@ -197,25 +210,24 @@ public final class EuropePanel extends FreeColPanel implements ActionListener {
         docksScroll.getViewport().setOpaque(false);
         docksPanel.setOpaque(false);
         inPortScroll.getViewport().setOpaque(false);
-        inPortPanel.setOpaque(false);        
+        inPortPanel.setOpaque(false);
         recruitButton.setOpaque(false);
         purchaseButton.setOpaque(false);
         trainButton.setOpaque(false);
         exitButton.setOpaque(false);
         unloadButton.setOpaque(false);
-        
+
         int[] widths = { 0, 315, margin, 103, margin, 198, margin, 0, 0 };
-        int[] heights = {
-            0, // top margin
-            // sailing to America, sailing to Europe
-            39, margin, // recruit button
-            39, margin, // buy button
-            39, margin, // train button
-            39, margin, // unload button
-            116, margin, // in port
-            116, margin, // cargo 
-            75, 39, // market
-            0 // bottom margin
+        int[] heights = { 0, // top margin
+                // sailing to America, sailing to Europe
+                39, margin, // recruit button
+                39, margin, // buy button
+                39, margin, // train button
+                39, margin, // unload button
+                116, margin, // in port
+                116, margin, // cargo
+                75, 39, // market
+                0 // bottom margin
         };
 
         HIGLayout layout = new HIGLayout(widths, heights);
@@ -259,33 +271,32 @@ public final class EuropePanel extends FreeColPanel implements ActionListener {
         setBorder(null);
 
         selectedUnit = null;
-        
-        // See the message of Ulf Onnen for more information about the presence of this fake mouse listener.
-        addMouseListener(new MouseAdapter() {});
+
+        // See the message of Ulf Onnen for more information about the presence
+        // of this fake mouse listener.
+        addMouseListener(new MouseAdapter() {
+        });
 
         setSize(parent.getWidth(), parent.getHeight() - parent.getMenuBarHeight());
 
     }
 
-
     public void requestFocus() {
         exitButton.requestFocus();
     }
 
-
-
     /**
-    * Refreshes this panel.
-    */
+     * Refreshes this panel.
+     */
     public void refresh() {
         repaint(0, 0, getWidth(), getHeight());
     }
 
-
     /**
-    * Paints this component.
-    * @param g The graphics context in which to paint.
-    */
+     * Paints this component.
+     * 
+     * @param g The graphics context in which to paint.
+     */
     public void paintComponent(Graphics g) {
         int width = getWidth();
         int height = getHeight();
@@ -297,9 +308,9 @@ public final class EuropePanel extends FreeColPanel implements ActionListener {
                 UIManager.put("EuropeBackgroundImage", bgImage);
 
                 /*
-                  We have to use a MediaTracker to ensure that the
-                  image has been scaled before we paint it.
-                */
+                 * We have to use a MediaTracker to ensure that the image has
+                 * been scaled before we paint it.
+                 */
                 MediaTracker mt = new MediaTracker(freeColClient.getCanvas());
                 mt.addImage(bgImage, 0, getWidth(), getHeight());
 
@@ -318,8 +329,8 @@ public final class EuropePanel extends FreeColPanel implements ActionListener {
             Image tempImage = (Image) UIManager.get("BackgroundImage");
 
             if (tempImage != null) {
-                for (int x=0; x<width; x+=tempImage.getWidth(null)) {
-                    for (int y=0; y<height; y+=tempImage.getHeight(null)) {
+                for (int x = 0; x < width; x += tempImage.getWidth(null)) {
+                    for (int y = 0; y < height; y += tempImage.getHeight(null)) {
                         g.drawImage(tempImage, x, y, null);
                     }
                 }
@@ -327,14 +338,13 @@ public final class EuropePanel extends FreeColPanel implements ActionListener {
                 g.setColor(getBackground());
                 g.fillRect(0, 0, width, height);
             }
-        }        
+        }
     }
 
-
     /**
-    * Refreshes the components on this panel that need to be refreshed after the user
-    * has recruited a new unit.
-    */
+     * Refreshes the components on this panel that need to be refreshed after
+     * the user has recruited a new unit.
+     */
     public void refreshBuyRecruit() {
         docksPanel.removeAll();
 
@@ -355,46 +365,42 @@ public final class EuropePanel extends FreeColPanel implements ActionListener {
         docksPanel.repaint(0, 0, docksPanel.getWidth(), docksPanel.getHeight());
     }
 
-
     /**
-    * Refreshes the components on this panel that need to be refreshed after the user
-    * has purchased a new unit.
-    *
-    * @param type The type of unit that was just purchased. This is needed to know which
-    *             component needs to be refreshed.
-    */
+     * Refreshes the components on this panel that need to be refreshed after
+     * the user has purchased a new unit.
+     * 
+     * @param type The type of unit that was just purchased. This is needed to
+     *            know which component needs to be refreshed.
+     */
     public void refreshBuyPurchase(int type) {
         if (type == Unit.ARTILLERY) {
             refreshBuyRecruit();
         } else {
             inPortPanel.removeAll();
 
-            Iterator<Unit> unitIterator = europe.getUnitIterator();
-            while (unitIterator.hasNext()) {
-                Unit unit = unitIterator.next();
-
+            List<Unit> unitIterator = europe.getUnitList();
+            for (Unit unit : unitIterator) {
                 if ((unit.getState() == Unit.ACTIVE) && (unit.isNaval())) {
                     UnitLabel unitLabel = new UnitLabel(unit, parent);
                     unitLabel.setTransferHandler(defaultTransferHandler);
                     unitLabel.addMouseListener(pressListener);
-
                     inPortPanel.add(unitLabel);
                 }
             }
 
             // Only one component will be repainted!
             inPortPanel.repaint(0, 0, inPortPanel.getWidth(), inPortPanel.getHeight());
+            setSelectedUnit(unitIterator.get(unitIterator.size() - 1));
         }
     }
-
 
     /**
      * Initialize the data on the window.
      * 
-     * @param europe The object of type <code>Europe</code> this panel
-     *      should display.
-     * @param game The <code>Game</code>-object the
-     *      <code>Europe</code>-object is a part of.
+     * @param europe The object of type <code>Europe</code> this panel should
+     *            display.
+     * @param game The <code>Game</code>-object the <code>Europe</code>-object
+     *            is a part of.
      */
     public void initialize(Europe europe, Game game) {
         this.europe = europe;
@@ -441,7 +447,7 @@ public final class EuropePanel extends FreeColPanel implements ActionListener {
             MarketLabel marketLabel = new MarketLabel(i, player.getMarket(), parent);
             marketLabel.setTransferHandler(defaultTransferHandler);
             marketLabel.addMouseListener(pressListener);
-            ((JPanel)marketPanel).add(marketLabel);
+            ((JPanel) marketPanel).add(marketLabel);
         }
 
         setSelectedUnitLabel(carrier);
@@ -451,42 +457,40 @@ public final class EuropePanel extends FreeColPanel implements ActionListener {
             if (newLandName == null) {
                 newLandName = player.getDefaultNewLandName();
             }
-            ((TitledBorder) toAmericaPanel.getBorder())
-               .setTitle(Messages.message("sailingTo", new String[][] {{"%location%", 
-                                                                        newLandName}}));
+            ((TitledBorder) toAmericaPanel.getBorder()).setTitle(Messages.message("sailingTo", new String[][] { {
+                    "%location%", newLandName } }));
         }
     }
 
     /**
-    * Reinitializes the panel, but keeps the currently selected unit.
-    */
+     * Reinitializes the panel, but keeps the currently selected unit.
+     */
     public void reinitialize() {
         final UnitLabel selectedUnit = this.selectedUnit;
         initialize(europe, game);
         setSelectedUnit(selectedUnit.getUnit());
     }
 
-    
     /**
-    * Selects a unit that is located somewhere on this panel.
-    * @param unit The unit that is being selected.
-    */
+     * Selects a unit that is located somewhere on this panel.
+     * 
+     * @param unit The unit that is being selected.
+     */
     public void setSelectedUnit(Unit unit) {
         Component[] components = inPortPanel.getComponents();
-        for (int i=0; i<components.length; i++) {
+        for (int i = 0; i < components.length; i++) {
             if (components[i] instanceof UnitLabel && ((UnitLabel) components[i]).getUnit() == unit) {
                 setSelectedUnitLabel((UnitLabel) components[i]);
                 break;
             }
         }
     }
-    
 
     /**
-    * Selects a unit that is located somewhere on this panel.
-    *
-    * @param unitLabel The unit that is being selected.
-    */
+     * Selects a unit that is located somewhere on this panel.
+     * 
+     * @param unitLabel The unit that is being selected.
+     */
     public void setSelectedUnitLabel(UnitLabel unitLabel) {
         if (selectedUnit != unitLabel) {
             if (selectedUnit != null) {
@@ -500,8 +504,7 @@ public final class EuropePanel extends FreeColPanel implements ActionListener {
         refresh();
     }
 
-
-    private void updateCargoPanel () {
+    private void updateCargoPanel() {
         cargoPanel.removeAll();
 
         if (selectedUnit != null) {
@@ -533,29 +536,26 @@ public final class EuropePanel extends FreeColPanel implements ActionListener {
 
     }
 
-
     /**
-    * Updates the label that is placed above the cargo panel. It shows the name
-    * of the unit whose cargo is displayed and the amount of space left on that unit.
-    */
+     * Updates the label that is placed above the cargo panel. It shows the name
+     * of the unit whose cargo is displayed and the amount of space left on that
+     * unit.
+     */
     private void updateCargoLabel() {
         if (selectedUnit != null) {
-            ((TitledBorder) cargoPanel.getBorder())
-                .setTitle(Messages.message("cargo") +
-                          " (" + selectedUnit.getUnit().getName() + ") "
-                          + Messages.message("spaceLeft") + ": " +
-                          selectedUnit.getUnit().getSpaceLeft());
+            ((TitledBorder) cargoPanel.getBorder()).setTitle(Messages.message("cargo") + " ("
+                    + selectedUnit.getUnit().getName() + ") " + Messages.message("spaceLeft") + ": "
+                    + selectedUnit.getUnit().getSpaceLeft());
         } else {
             ((TitledBorder) cargoPanel.getBorder()).setTitle(Messages.message("cargo"));
         }
     }
 
-
     /**
-    * Returns the currently select unit.
-    *
-    * @return The currently select unit.
-    */
+     * Returns the currently select unit.
+     * 
+     * @return The currently select unit.
+     */
     public Unit getSelectedUnit() {
         if (selectedUnit == null) {
             return null;
@@ -564,18 +564,16 @@ public final class EuropePanel extends FreeColPanel implements ActionListener {
         }
     }
 
-    
     /**
-    * Returns the currently select unit.
-    * @return The currently select unit.
-    */
+     * Returns the currently select unit.
+     * 
+     * @return The currently select unit.
+     */
     public UnitLabel getSelectedUnitLabel() {
         return selectedUnit;
     }
 
-
-
-    private void unload() { 
+    private void unload() {
         Unit unit = getSelectedUnit();
         if (unit != null && unit.isCarrier()) {
             Player player = freeColClient.getMyPlayer();
@@ -608,45 +606,45 @@ public final class EuropePanel extends FreeColPanel implements ActionListener {
     }
 
     /**
-     * Analyzes an event and calls the right external methods to take
-     * care of the user's request.
-     *
+     * Analyzes an event and calls the right external methods to take care of
+     * the user's request.
+     * 
      * @param event The incoming action event
      */
     public void actionPerformed(ActionEvent event) {
         String command = event.getActionCommand();
         try {
             switch (Integer.valueOf(command).intValue()) {
-                case EXIT:
-                    parent.remove(this);
-                    freeColClient.getInGameController().nextModelMessage();
-                    break;
-                case RECRUIT:
-                    boolean recruitResponse = parent.showRecruitDialog();
-                    if (recruitResponse) {
-                        refreshBuyRecruit();
-                    }
-                    revalidate();
-                    break;
-                case PURCHASE:
-                    int purchaseResponse = parent.showPurchaseDialog();
-                    if (purchaseResponse > -1) {
-                        refreshBuyPurchase(purchaseResponse);
-                    }
-                    revalidate();
-                    break;
-                case TRAIN:
-                    boolean trainResponse = parent.showTrainDialog();
-                    if (trainResponse) {
-                        refreshBuyRecruit();
-                    }
-                    revalidate();
-                    break;
-                case UNLOAD:
-                    unload();
-                    break;
-                default:
-                    logger.warning("Invalid action command");
+            case EXIT:
+                parent.remove(this);
+                freeColClient.getInGameController().nextModelMessage();
+                break;
+            case RECRUIT:
+                boolean recruitResponse = parent.showRecruitDialog();
+                if (recruitResponse) {
+                    refreshBuyRecruit();
+                }
+                revalidate();
+                break;
+            case PURCHASE:
+                int purchaseResponse = parent.showPurchaseDialog();
+                if (purchaseResponse > -1) {
+                    refreshBuyPurchase(purchaseResponse);
+                }
+                revalidate();
+                break;
+            case TRAIN:
+                boolean trainResponse = parent.showTrainDialog();
+                if (trainResponse) {
+                    refreshBuyRecruit();
+                }
+                revalidate();
+                break;
+            case UNLOAD:
+                unload();
+                break;
+            default:
+                logger.warning("Invalid action command");
             }
         } catch (NumberFormatException e) {
             logger.warning("Invalid action number");
@@ -655,6 +653,7 @@ public final class EuropePanel extends FreeColPanel implements ActionListener {
 
     /**
      * Asks for pay arrears of a type of goods, if those goods are boycotted
+     * 
      * @param typeOfGoods The type of goods for paying arrears
      */
     public void payArrears(int typeOfGoods) {
@@ -665,41 +664,41 @@ public final class EuropePanel extends FreeColPanel implements ActionListener {
         }
     }
 
+
     /**
-    * A panel that holds UnitsLabels that represent Units that are
-    * going to America.
-    */
+     * A panel that holds UnitsLabels that represent Units that are going to
+     * America.
+     */
     public final class ToAmericaPanel extends JPanel {
         private final EuropePanel europePanel;
 
 
-
         /**
-        * Creates this ToAmericaPanel.
-        * @param europePanel The panel that holds this ToAmericaPanel.
-        */
+         * Creates this ToAmericaPanel.
+         * 
+         * @param europePanel The panel that holds this ToAmericaPanel.
+         */
         public ToAmericaPanel(EuropePanel europePanel) {
             this.europePanel = europePanel;
         }
 
-
-
-
         /**
-        * Adds a component to this ToAmericaPanel and makes sure that the unit
-        * that the component represents gets modified so that it will sail to
-        * America.
-        * @param comp The component to add to this ToAmericaPanel.
-        * @param editState Must be set to 'true' if the state of the component
-        * that is added (which should be a dropped component representing a Unit)
-        * should be changed so that the underlying unit is now sailing to America.
-        * @return The component argument.
-        */
+         * Adds a component to this ToAmericaPanel and makes sure that the unit
+         * that the component represents gets modified so that it will sail to
+         * America.
+         * 
+         * @param comp The component to add to this ToAmericaPanel.
+         * @param editState Must be set to 'true' if the state of the component
+         *            that is added (which should be a dropped component
+         *            representing a Unit) should be changed so that the
+         *            underlying unit is now sailing to America.
+         * @return The component argument.
+         */
         public Component add(Component comp, boolean editState) {
             if (editState) {
                 if (comp instanceof UnitLabel) {
                     comp.getParent().remove(comp);
-                    Unit unit = ((UnitLabel)comp).getUnit();
+                    Unit unit = ((UnitLabel) comp).getUnit();
                     inGameController.moveToAmerica(unit);
                 } else {
                     logger.warning("An invalid component got dropped on this ToAmericaPanel.");
@@ -717,44 +716,40 @@ public final class EuropePanel extends FreeColPanel implements ActionListener {
         }
     }
 
-
-
-
-
     /**
-    * A panel that holds UnitsLabels that represent Units that are
-    * going to Europe.
-    */
+     * A panel that holds UnitsLabels that represent Units that are going to
+     * Europe.
+     */
     public final class ToEuropePanel extends JPanel {
         private final EuropePanel europePanel;
 
 
-
         /**
-        * Creates this ToEuropePanel.
-        * @param europePanel The panel that holds this ToEuropePanel.
-        */
+         * Creates this ToEuropePanel.
+         * 
+         * @param europePanel The panel that holds this ToEuropePanel.
+         */
         public ToEuropePanel(EuropePanel europePanel) {
             this.europePanel = europePanel;
         }
 
-
-
         /**
-        * Adds a component to this ToEuropePanel and makes sure that the unit
-        * that the component represents gets modified so that it will sail to
-        * Europe.
-        * @param comp The component to add to this ToEuropePanel.
-        * @param editState Must be set to 'true' if the state of the component
-        * that is added (which should be a dropped component representing a Unit)
-        * should be changed so that the underlying unit is now sailing to Europe.
-        * @return The component argument.
-        */
+         * Adds a component to this ToEuropePanel and makes sure that the unit
+         * that the component represents gets modified so that it will sail to
+         * Europe.
+         * 
+         * @param comp The component to add to this ToEuropePanel.
+         * @param editState Must be set to 'true' if the state of the component
+         *            that is added (which should be a dropped component
+         *            representing a Unit) should be changed so that the
+         *            underlying unit is now sailing to Europe.
+         * @return The component argument.
+         */
         public Component add(Component comp, boolean editState) {
             if (editState) {
                 if (comp instanceof UnitLabel) {
                     comp.getParent().remove(comp);
-                    Unit unit = ((UnitLabel)comp).getUnit();
+                    Unit unit = ((UnitLabel) comp).getUnit();
                     inGameController.moveToEurope(unit);
                 } else {
                     logger.warning("An invalid component got dropped on this ToEuropePanel.");
@@ -767,78 +762,66 @@ public final class EuropePanel extends FreeColPanel implements ActionListener {
             return c;
         }
 
-
         public String getUIClassID() {
             return "ToEuropePanelUI";
         }
     }
 
-
-
-
-
     /**
-    * A panel that holds UnitsLabels that represent naval Units that are
-    * waiting in Europe.
-    */
+     * A panel that holds UnitsLabels that represent naval Units that are
+     * waiting in Europe.
+     */
     public final class InPortPanel extends JPanel {
 
-
         /**
-        * Adds a component to this InPortPanel.
-        * @param comp The component to add to this InPortPanel.
-        * @return The component argument.
-        */
+         * Adds a component to this InPortPanel.
+         * 
+         * @param comp The component to add to this InPortPanel.
+         * @return The component argument.
+         */
         public Component add(Component comp) {
             return super.add(comp);
         }
-
 
         public String getUIClassID() {
             return "EuropeInPortPanelUI";
         }
     }
 
-
-
-
-
     /**
-    * A panel that holds UnitsLabels that represent Units that are
-    * waiting on the docks in Europe.
-    */
+     * A panel that holds UnitsLabels that represent Units that are waiting on
+     * the docks in Europe.
+     */
     public final class DocksPanel extends JPanel {
         private final EuropePanel europePanel;
 
 
-
         /**
-        * Creates this DocksPanel.
-        * @param europePanel The panel that holds this DocksPanel.
-        */
+         * Creates this DocksPanel.
+         * 
+         * @param europePanel The panel that holds this DocksPanel.
+         */
         public DocksPanel(EuropePanel europePanel) {
             this.europePanel = europePanel;
         }
 
-
-
         /**
-        * Adds a component to this DocksPanel and makes sure that the unit
-        * that the component represents gets modified so that it will wait
-        * on the docks in Europe.
-        *
-        * @param comp The component to add to this DocksPanel.
-        * @param editState Must be set to 'true' if the state of the component
-        *                  that is added (which should be a dropped component
-        *                  representing a Unit) should be changed so that the
-        *                  underlying unit will wait on the docks in Europe.
-        * @return The component argument.
-        */
+         * Adds a component to this DocksPanel and makes sure that the unit that
+         * the component represents gets modified so that it will wait on the
+         * docks in Europe.
+         * 
+         * @param comp The component to add to this DocksPanel.
+         * @param editState Must be set to 'true' if the state of the component
+         *            that is added (which should be a dropped component
+         *            representing a Unit) should be changed so that the
+         *            underlying unit will wait on the docks in Europe.
+         * @return The component argument.
+         */
         public Component add(Component comp, boolean editState) {
             if (editState) {
                 if (comp instanceof UnitLabel) {
                     comp.getParent().remove(comp);
-                    Unit unit = ((UnitLabel)comp).getUnit();
+                    Unit unit = ((UnitLabel) comp).getUnit();
                     inGameController.leaveShip(unit);
                 } else {
                     logger.warning("An invalid component got dropped on this DocksPanel.");
@@ -856,40 +839,36 @@ public final class EuropePanel extends FreeColPanel implements ActionListener {
         }
     }
 
-
-
-
-
     /**
-    * A panel that holds units and goods that represent Units and cargo that are
-    * on board the currently selected ship.
-    */
+     * A panel that holds units and goods that represent Units and cargo that
+     * are on board the currently selected ship.
+     */
     public final class CargoPanel extends JPanel {
         private final EuropePanel europePanel;
 
 
-
         /**
-        * Creates this CargoPanel.
-        * @param europePanel The panel that holds this CargoPanel.
-        */
+         * Creates this CargoPanel.
+         * 
+         * @param europePanel The panel that holds this CargoPanel.
+         */
         public CargoPanel(EuropePanel europePanel) {
             this.europePanel = europePanel;
         }
 
-
-
         /**
-        * Adds a component to this CargoPanel and makes sure that the unit
-        * or good that the component represents gets modified so that it is
-        * on board the currently selected ship.
-        * @param comp The component to add to this CargoPanel.
-        * @param editState Must be set to 'true' if the state of the component
-        * that is added (which should be a dropped component representing a Unit or
-        * good) should be changed so that the underlying unit or goods are
-        * on board the currently selected ship.
-        * @return The component argument.
-        */
+         * Adds a component to this CargoPanel and makes sure that the unit or
+         * good that the component represents gets modified so that it is on
+         * board the currently selected ship.
+         * 
+         * @param comp The component to add to this CargoPanel.
+         * @param editState Must be set to 'true' if the state of the component
+         *            that is added (which should be a dropped component
+         *            representing a Unit or good) should be changed so that the
+         *            underlying unit or goods are on board the currently
+         *            selected ship.
+         * @return The component argument.
+         */
         public Component add(Component comp, boolean editState) {
             if (selectedUnit == null) {
                 return null;
@@ -899,7 +878,7 @@ public final class EuropePanel extends FreeColPanel implements ActionListener {
                 Container oldParent = comp.getParent();
 
                 if (comp instanceof UnitLabel) {
-                    Unit unit = ((UnitLabel)comp).getUnit();
+                    Unit unit = ((UnitLabel) comp).getUnit();
                     if (selectedUnit.getUnit().getSpaceLeft() > 0) {
                         inGameController.boardShip(unit, selectedUnit.getUnit());
 
@@ -910,11 +889,12 @@ public final class EuropePanel extends FreeColPanel implements ActionListener {
                         return null;
                     }
                 } else if (comp instanceof GoodsLabel) {
-                    Goods g = ((GoodsLabel)comp).getGoods();
+                    Goods g = ((GoodsLabel) comp).getGoods();
 
                     Unit carrier = getSelectedUnit();
                     int newAmount = g.getAmount();
-                    if (carrier.getSpaceLeft() == 0 && carrier.getGoodsContainer().getGoodsCount(g.getType()) % 100 + g.getAmount() > 100) {
+                    if (carrier.getSpaceLeft() == 0
+                            && carrier.getGoodsContainer().getGoodsCount(g.getType()) % 100 + g.getAmount() > 100) {
                         newAmount = 100 - carrier.getGoodsContainer().getGoodsCount(g.getType()) % 100;
                     } else if (g.getAmount() > 100) {
                         newAmount = 100;
@@ -932,7 +912,7 @@ public final class EuropePanel extends FreeColPanel implements ActionListener {
                             oldParent.remove(comp);
                         }
                     }
-                    
+
                     if (!selectedUnit.getUnit().canAdd(g)) {
                         return null;
                     }
@@ -943,15 +923,13 @@ public final class EuropePanel extends FreeColPanel implements ActionListener {
                     UnitLabel t = selectedUnit;
                     selectedUnit = null;
                     setSelectedUnitLabel(t);
-                    //reinitialize();
+                    // reinitialize();
 
                     return comp;
                 } else if (comp instanceof MarketLabel) {
                     MarketLabel label = (MarketLabel) comp;
                     if (freeColClient.getMyPlayer().canTrade(label.getType())) {
-                        inGameController.buyGoods(label.getType(),
-                                                  label.getAmount(),
-                                                  selectedUnit.getUnit());
+                        inGameController.buyGoods(label.getType(), label.getAmount(), selectedUnit.getUnit());
 
                         updateCargoLabel();
 
@@ -984,42 +962,41 @@ public final class EuropePanel extends FreeColPanel implements ActionListener {
             return (getSelectedUnit() != null);
         }
 
-
         public String getUIClassID() {
             return "EuropeCargoPanelUI";
         }
     }
 
-
     /**
-    * A panel that shows goods available for purchase in Europe.
-    */
+     * A panel that shows goods available for purchase in Europe.
+     */
     public final class MarketPanel extends JPanel {
         private final EuropePanel europePanel;
 
 
         /**
-        * Creates this MarketPanel.
-        * @param europePanel The panel that holds this CargoPanel.
-        */
+         * Creates this MarketPanel.
+         * 
+         * @param europePanel The panel that holds this CargoPanel.
+         */
         public MarketPanel(EuropePanel europePanel) {
             this.europePanel = europePanel;
-            setLayout(new GridLayout(2,8));
+            setLayout(new GridLayout(2, 8));
         }
 
-
         /**
-        * If a GoodsLabel is dropped here, sell the goods.
-        * @param comp The component to add to this MarketPanel.
-        * @param editState Must be set to 'true' if the state of the component
-        * that is added (which should be a dropped component representing goods)
-        * should be sold.
-        * @return The component argument.
-        */
+         * If a GoodsLabel is dropped here, sell the goods.
+         * 
+         * @param comp The component to add to this MarketPanel.
+         * @param editState Must be set to 'true' if the state of the component
+         *            that is added (which should be a dropped component
+         *            representing goods) should be sold.
+         * @return The component argument.
+         */
         public Component add(Component comp, boolean editState) {
             if (editState) {
                 if (comp instanceof GoodsLabel) {
-                    //comp.getParent().remove(comp);
+                    // comp.getParent().remove(comp);
                     Goods goods = ((GoodsLabel) comp).getGoods();
                     Player player = freeColClient.getMyPlayer();
                     if (player.canTrade(goods)) {
@@ -1047,11 +1024,9 @@ public final class EuropePanel extends FreeColPanel implements ActionListener {
             return comp;
         }
 
-
         public void remove(Component comp) {
-          // Don't remove the marketLabel.
+            // Don't remove the marketLabel.
         }
-
 
         public String getUIClassID() {
             return "MarketPanelUI";
@@ -1060,17 +1035,19 @@ public final class EuropePanel extends FreeColPanel implements ActionListener {
 
 
     /**
-    * Returns a pointer to the <code>CargoPanel</code>-object in use.
-    * @return The <code>CargoPanel</code>.
-    */
+     * Returns a pointer to the <code>CargoPanel</code>-object in use.
+     * 
+     * @return The <code>CargoPanel</code>.
+     */
     public final CargoPanel getCargoPanel() {
         return cargoPanel;
     }
 
     /**
-    * Returns a pointer to the <code>MarketPanel</code>-object in use.
-    * @return The <code>MarketPanel</code>.
-    */
+     * Returns a pointer to the <code>MarketPanel</code>-object in use.
+     * 
+     * @return The <code>MarketPanel</code>.
+     */
     public final MarketPanel getMarketPanel() {
         return marketPanel;
     }
