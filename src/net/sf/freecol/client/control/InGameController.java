@@ -675,10 +675,13 @@ public final class InGameController implements NetworkConstants {
             setDestination(unit, null);
         }
 
-        // Display a "cash in"-dialog if a treasure train have been moved into a
-        // colony:
-        if (unit.getType() == Unit.TREASURE_TRAIN && unit.getLocation() != null && unit.getLocation() instanceof Tile
-                && unit.getLocation().getTile().getColony() != null) {
+        // Display a "cash in"-dialog if a treasure train have been
+        // moved into a coastal colony:
+        if (unit.getType() == Unit.TREASURE_TRAIN &&
+            unit.getLocation() != null &&
+            unit.getLocation() instanceof Tile &&
+            unit.getLocation().getTile().getColony() != null &&
+            !unit.getLocation().getTile().getColony().isLandLocked()) {
             String message = (unit.getOwner().hasFather(FoundingFather.HERNAN_CORTES)) ? "cashInTreasureTrain.text.free"
                     : "cashInTreasureTrain.text.pay";
             if (canvas.showConfirmDialog(message, "cashInTreasureTrain.yes", "cashInTreasureTrain.no")) {
