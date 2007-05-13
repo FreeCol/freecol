@@ -1165,7 +1165,7 @@ public final class InGameController implements NetworkConstants {
             unit.setLocation(unit.getTile());
         }
 
-        if (unit.getTile().isLand() && unit.getOwner().getNewLandName() == null) {
+        if (unit.getTile().isLand() && !unit.getOwner().isNewLandNamed()) {
             String newLandName = canvas.showInputDialog("newLand.text", unit.getOwner().getDefaultNewLandName(),
                     "newLand.yes", null);
             unit.getOwner().setNewLandName(newLandName);
