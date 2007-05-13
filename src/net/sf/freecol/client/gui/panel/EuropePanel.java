@@ -421,54 +421,48 @@ public final class EuropePanel extends FreeColPanel implements ActionListener {
         // Place new components on the panels.
         //
 
-        UnitLabel carrier = null;
-        Iterator<Unit> unitIterator = europe.getUnitIterator();
-        while (unitIterator.hasNext()) {
-            Unit unit = unitIterator.next();
-
+        UnitLabel lastCarrier = null;
+        for (Unit unit : europe.getUnitList()) {
             UnitLabel unitLabel = new UnitLabel(unit, parent);
             unitLabel.setTransferHandler(defaultTransferHandler);
             unitLabel.addMouseListener(pressListener);
 
-            if (((unit.getState() == Unit.ACTIVE) || (unit.getState() == Unit.SENTRY)) && (!unit.isNaval())) {
+            if (!unit.isNaval()) {
+                // If it's not a naval unit, it belongs on the docks.
                 docksPanel.add(unitLabel, false);
-            } else if (unit.getState() == Unit.ACTIVE) {
-                carrier = unitLabel;
-                inPortPanel.add(unitLabel);
-            } else if (unit.getState() == Unit.TO_EUROPE) {
-                toEuropePanel.add(unitLabel, false);
-            } else if (unit.getState() == Unit.TO_AMERICA) {
-                toAmericaPanel.add(unitLabel, false);
+            } else {
+                // Naval units can either be in the port, going to europe or
+                // going to america.
+                switch (unit.getState()) {
+                case Unit.ACTIVE:
+                    lastCarrier = unitLabel;
+                    inPortPanel.add(unitLabel);
+                    break;
+                case Unit.TO_EUROPE:
+                    toEuropePanel.add(unitLabel, false);
+                    break;
+                case Unit.TO_AMERICA:
+                    toAmericaPanel.add(unitLabel, false);
+                    break;
+                default:
+                    throw new RuntimeException("Naval unit in Europe is in an invalid state.");
+                }
             }
         }
+        // We set the last carrier in the list active.
+        setSelectedUnitLabel(lastCarrier);
 
         Player player = freeColClient.getMyPlayer();
         for (int i = 0; i < Goods.NUMBER_OF_TYPES; i++) {
             MarketLabel marketLabel = new MarketLabel(i, player.getMarket(), parent);
             marketLabel.setTransferHandler(defaultTransferHandler);
             marketLabel.addMouseListener(pressListener);
-            ((JPanel) marketPanel).add(marketLabel);
+            marketPanel.add(marketLabel);
         }
 
-        setSelectedUnitLabel(carrier);
-
-        if (player != null) {
-            String newLandName = player.getNewLandName();
-            if (newLandName == null) {
-                newLandName = player.getDefaultNewLandName();
-            }
-            ((TitledBorder) toAmericaPanel.getBorder()).setTitle(Messages.message("sailingTo", new String[][] { {
-                    "%location%", newLandName } }));
-        }
-    }
-
-    /**
-     * Reinitializes the panel, but keeps the currently selected unit.
-     */
-    public void reinitialize() {
-        final UnitLabel selectedUnit = this.selectedUnit;
-        initialize(europe, game);
-        setSelectedUnit(selectedUnit.getUnit());
+        String newLandName = player.getNewLandName();
+        ((TitledBorder) toAmericaPanel.getBorder()).setTitle(Messages.message("sailingTo", new String[][] { {
+                "%location%", newLandName } }));
     }
 
     /**
@@ -492,14 +486,17 @@ public final class EuropePanel extends FreeColPanel implements ActionListener {
      * @param unitLabel The unit that is being selected.
      */
     public void setSelectedUnitLabel(UnitLabel unitLabel) {
-        if (selectedUnit != unitLabel) {
-            if (selectedUnit != null) {
-                selectedUnit.setSelected(false);
-            }
-            selectedUnit = unitLabel;
-            updateCargoPanel();
-            updateCargoLabel();
+        if (selectedUnit == unitLabel) {
+            // No need to change anything
+            return;
         }
+        if (selectedUnit != null) {
+            selectedUnit.setSelected(false);
+        }
+        selectedUnit = unitLabel;
+        updateCargoPanel();
+        updateCargoLabel();
+
         cargoPanel.revalidate();
         refresh();
     }
