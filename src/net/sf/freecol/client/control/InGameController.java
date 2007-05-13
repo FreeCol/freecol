@@ -546,7 +546,7 @@ public final class InGameController implements NetworkConstants {
     }
 
     /**
-     * Sets the destination of the given unit
+     * Sets the destination of the given unit and send the server a message for this action.
      * 
      * @param unit The <code>Unit</code>.
      * @param destination The <code>Location</code>.
@@ -576,7 +576,7 @@ public final class InGameController implements NetworkConstants {
         final Location destination = unit.getDestination();
 
         if (freeColClient.getGame().getCurrentPlayer() != freeColClient.getMyPlayer()) {
-            freeColClient.getCanvas().showInformationMessage("notYourTurn");
+        	freeColClient.getCanvas().showInformationMessage("notYourTurn");
             return;
         }
 
@@ -1138,7 +1138,6 @@ public final class InGameController implements NetworkConstants {
             return;
         }
 
-        GUI gui = freeColClient.getGUI();
         Canvas canvas = freeColClient.getCanvas();
         Client client = freeColClient.getClient();
 
@@ -1150,7 +1149,7 @@ public final class InGameController implements NetworkConstants {
         // TODO: server can actually fail (illegal move)!
 
         // move before ask to server, to be in new tile in case there is a
-        // rumour
+        // rumours
         unit.move(direction);
 
         // client.send(moveElement);
@@ -1176,11 +1175,9 @@ public final class InGameController implements NetworkConstants {
         if (unit.getTile().getSettlement() != null && unit.isCarrier() && unit.getTradeRoute() == null
                 && (unit.getDestination() == null || unit.getDestination().getTile() == unit.getTile())) {
             canvas.showColonyPanel((Colony) unit.getTile().getSettlement());
-        } else if (unit.getMovesLeft() > 0 && !unit.isDisposed()) {
-            gui.setActiveUnit(unit);
-        } else {
-            nextActiveUnit(unit.getTile());
-        }
+        } else if (unit.getMovesLeft() <= 0 || unit.isDisposed()) {
+        	nextActiveUnit(unit.getTile()); 
+        } 
 
         nextModelMessage();
     }
