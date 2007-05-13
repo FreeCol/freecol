@@ -392,6 +392,7 @@ public final class FreeCol {
                     String logLevelString = args[i].toUpperCase();
                     try {
                         logLevel = Level.parse(logLevelString);
+                        initLogging();
                     } catch (IllegalArgumentException e) {
                         printUsage();
                         System.exit(1);
