@@ -116,6 +116,13 @@ public final class ReportColonyPanel extends ReportPanel implements ActionListen
             UnitLabel unitLabel = new UnitLabel(unit, getCanvas(), true, true);
             unitPanel.add(unitLabel);
         }
+        unitList = colony.getTile().getUnitList();
+        Collections.sort(unitList, getUnitTypeComparator());
+        for(Unit unit : unitList) {
+            UnitLabel unitLabel = new UnitLabel(unit, getCanvas(), true, true);
+            unitPanel.add(unitLabel);
+        }
+
         return unitPanel;
     }
 
