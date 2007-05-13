@@ -187,6 +187,7 @@ public class Player extends FreeColGameObject implements Nameable {
     // new simple schema for crosses
     // TODO: make this depend on difficulty
     public static final int CROSSES_INCREMENT = 6;
+
     private int crossesRequired = 12;
 
     // No need for a persistent storage of this variable:
@@ -312,9 +313,9 @@ public class Player extends FreeColGameObject implements Nameable {
         bells = 0;
         currentFather = FoundingFather.NONE;
         rebellionState = 0;
-        
+
         market = new Market(getGame(), this);
-        
+
         if (isEuropean(nation)) {
             europe = new Europe(game, this);
             if (!isREF(nation)) {
@@ -387,7 +388,6 @@ public class Player extends FreeColGameObject implements Nameable {
     public Player(Game game, String id) {
         super(game, id);
     }
-
 
     /**
      * Returns this Player's Market.
@@ -478,7 +478,7 @@ public class Player extends FreeColGameObject implements Nameable {
 
     /**
      * Returns all ModelMessages for this player.
-     *
+     * 
      * @return all ModelMessages for this player.
      */
     public List<ModelMessage> getModelMessages() {
@@ -487,13 +487,13 @@ public class Player extends FreeColGameObject implements Nameable {
 
     /**
      * Returns all new ModelMessages for this player.
-     *
+     * 
      * @return all new ModelMessages for this player.
      */
     public List<ModelMessage> getNewModelMessages() {
 
-        ArrayList<ModelMessage> out = new ArrayList<ModelMessage>();    
-        
+        ArrayList<ModelMessage> out = new ArrayList<ModelMessage>();
+
         for (ModelMessage message : modelMessages) {
             if (message.hasBeenDisplayed()) {
                 break;
@@ -651,13 +651,27 @@ public class Player extends FreeColGameObject implements Nameable {
      * 
      * Gets the name this player has choosen for the new land.
      * 
-     * @return The name of the new world as chosen by the
-     * 
-     * <code>Player</code>.
+     * @return The name of the new world as chosen by the <code>Player</code>.
+     *         If no land name was chosen, the default name is returned.
      * 
      */
     public String getNewLandName() {
-        return newLandName;
+        if (newLandName == null) {
+            return getDefaultNewLandName();
+        } else {
+            return newLandName;
+        }
+    }
+
+    /**
+     * Returns true if the player already selected a new name for the discovered
+     * land.
+     * 
+     * @return true if the player already set a name for the newly discovered
+     *         land, otherwise false.
+     */
+    public boolean isNewLandNamed() {
+        return newLandName != null;
     }
 
     /**
@@ -1917,40 +1931,23 @@ public class Player extends FreeColGameObject implements Nameable {
         // So every unit counts as 2 unless they're in a colony,
         // wherein they count as 4.
         /*
-        int count = 8;
-        Map map = getGame().getMap();
-        Iterator<Position> tileIterator = map.getWholeMapIterator();
-        while (tileIterator.hasNext()) {
-            Tile t = map.getTile(tileIterator.next());
-            if (t != null && t.getFirstUnit() != null && t.getFirstUnit().getOwner().equals(this)) {
-                Iterator<Unit> unitIterator = t.getUnitIterator();
-                while (unitIterator.hasNext()) {
-                    Unit u = unitIterator.next();
-                    Iterator<Unit> childUnitIterator = u.getUnitIterator();
-                    while (childUnitIterator.hasNext()) {
-                        // Unit childUnit = (Unit) childUnitIterator.next();
-                        childUnitIterator.next();
-                        count += 2;
-                    }
-                    count += 2;
-                }
-            }
-            if (t != null && t.getColony() != null && t.getColony().getOwner() == this) {
-                count += t.getColony().getUnitCount() * 4; // Units in colonies
-                // count doubly.
-                // -sjm
-            }
-        }
-        Iterator<Unit> europeUnitIterator = getEurope().getUnitIterator();
-        while (europeUnitIterator.hasNext()) {
-            europeUnitIterator.next();
-            count += 2;
-        }
-        if (nation == ENGLISH) {
-            count = (count * 2) / 3;
-        }
-        setCrossesRequired(count);
-        */
+         * int count = 8; Map map = getGame().getMap(); Iterator<Position>
+         * tileIterator = map.getWholeMapIterator(); while
+         * (tileIterator.hasNext()) { Tile t = map.getTile(tileIterator.next());
+         * if (t != null && t.getFirstUnit() != null &&
+         * t.getFirstUnit().getOwner().equals(this)) { Iterator<Unit>
+         * unitIterator = t.getUnitIterator(); while (unitIterator.hasNext()) {
+         * Unit u = unitIterator.next(); Iterator<Unit> childUnitIterator =
+         * u.getUnitIterator(); while (childUnitIterator.hasNext()) { // Unit
+         * childUnit = (Unit) childUnitIterator.next();
+         * childUnitIterator.next(); count += 2; } count += 2; } } if (t != null &&
+         * t.getColony() != null && t.getColony().getOwner() == this) { count +=
+         * t.getColony().getUnitCount() * 4; // Units in colonies // count
+         * doubly. // -sjm } } Iterator<Unit> europeUnitIterator =
+         * getEurope().getUnitIterator(); while (europeUnitIterator.hasNext()) {
+         * europeUnitIterator.next(); count += 2; } if (nation == ENGLISH) {
+         * count = (count * 2) / 3; } setCrossesRequired(count);
+         */
     }
 
     /**
@@ -2216,8 +2213,8 @@ public class Player extends FreeColGameObject implements Nameable {
             logger.finest("Calling newTurn for settlement " + settlement.toString());
             settlement.newTurn();
         }
-        
-        // CO: I reverted this, since the pioneer already finishes faster, 
+
+        // CO: I reverted this, since the pioneer already finishes faster,
         // thus changing it at both locations would double the bonus.
         for (Iterator<Unit> unitIterator = getUnitIterator(); unitIterator.hasNext();) {
             Unit unit = unitIterator.next();
@@ -2313,7 +2310,8 @@ public class Player extends FreeColGameObject implements Nameable {
 
                 case FoundingFather.THOMAS_PAINE:
                     // increase bell production by current tax rate
-                    // TODO: This probably needs to be updated each time the tax rate is increased.
+                    // TODO: This probably needs to be updated each time the tax
+                    // rate is increased.
                     bellsBonus += tax;
                     break;
 
@@ -2333,10 +2331,8 @@ public class Player extends FreeColGameObject implements Nameable {
             }
 
             /*
-            if (crossesRequired != -1) {
-                updateCrossesRequired();
-            }
-            */
+             * if (crossesRequired != -1) { updateCrossesRequired(); }
+             */
 
             int newSoL = 0;
             int numberOfColonies = settlements.size();
@@ -2382,7 +2378,6 @@ public class Player extends FreeColGameObject implements Nameable {
         }
         getGame().getModelController().exploreTiles(this, tiles);
     }
-
 
     /**
      * This method writes an XML-representation of this object to the given
