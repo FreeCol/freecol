@@ -3632,7 +3632,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
 
         String newName = getName();
         if (!newName.equals(oldName)) {
-            Colony colony = ((ColonyTile) getLocation()).getColony();
+            Colony colony = getTile().getColony();
             addModelMessage(colony, "model.unit.unitEducated",
                             new String[][] {
                                 { "%oldName%", oldName },
