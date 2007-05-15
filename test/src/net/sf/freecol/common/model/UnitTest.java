@@ -173,6 +173,8 @@ public class UnitTest extends FreeColTestCase {
         tile.setForested(forrest);
 
         Unit unit = new Unit(game, tile, dutch, unitType, Unit.ACTIVE, false, false, 100, false);
+        assertEquals(addition, unit.getLocation().getTile().getAddition());
+        
         unit.setState(whichWork);
 
         return unit.getWorkLeft();
@@ -237,16 +239,16 @@ public class UnitTest extends FreeColTestCase {
         }
 
         { // Hill
-            assertEquals(3, getWorkLeftForPioneerWork(Unit.FREE_COLONIST, Tile.TUNDRA, true, Unit.BUILD_ROAD,
+            assertEquals(3, getWorkLeftForPioneerWork(Unit.FREE_COLONIST, Tile.TUNDRA, false, Unit.BUILD_ROAD,
                     Tile.ADD_HILLS));
-            assertEquals(1, getWorkLeftForPioneerWork(Unit.HARDY_PIONEER, Tile.TUNDRA, true, Unit.BUILD_ROAD,
+            assertEquals(1, getWorkLeftForPioneerWork(Unit.HARDY_PIONEER, Tile.TUNDRA, false, Unit.BUILD_ROAD,
                     Tile.ADD_HILLS));
         }
 
         { // Mountain
-            assertEquals(6, getWorkLeftForPioneerWork(Unit.FREE_COLONIST, Tile.TUNDRA, true, Unit.BUILD_ROAD,
+            assertEquals(6, getWorkLeftForPioneerWork(Unit.FREE_COLONIST, Tile.TUNDRA, false, Unit.BUILD_ROAD,
                     Tile.ADD_MOUNTAINS));
-            assertEquals(2, getWorkLeftForPioneerWork(Unit.HARDY_PIONEER, Tile.TUNDRA, true, Unit.BUILD_ROAD,
+            assertEquals(2, getWorkLeftForPioneerWork(Unit.HARDY_PIONEER, Tile.TUNDRA, false, Unit.BUILD_ROAD,
                     Tile.ADD_MOUNTAINS));
         }
 

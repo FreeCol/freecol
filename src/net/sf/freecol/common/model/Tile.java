@@ -874,21 +874,25 @@ public final class Tile extends FreeColGameObject implements Location, Nameable 
     /**
      * Sets whether the tile is forested or not.
      * 
-     * @param value New value for forested.
+     * If a forest is set for the tile (isForested == true) 
+     * then mountains or hills will be removed.
+     * 
+     * If called on an ocean tile, the type of the tile is set to PLAINS.
+     * 
+     * @param isForested New value for forested.
      */
-    public void setForested(boolean value) {
-        forested = value;
-        if (additionType == ADD_HILLS
-                || additionType == ADD_MOUNTAINS) {
+    public void setForested(boolean isForested) {
+        forested = isForested;
+        if (forested && (additionType == ADD_HILLS
+                || additionType == ADD_MOUNTAINS)) {
             additionType = ADD_NONE;
         }
         
-        if (!isLand() && value) {
+        if (!isLand() && forested) {
             logger.warning("Setting forested to Ocean.");
             type = PLAINS;
         }
         
-        // bonus = false;
         updatePlayerExploredTiles();
     }
 
