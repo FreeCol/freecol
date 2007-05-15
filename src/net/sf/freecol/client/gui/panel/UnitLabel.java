@@ -159,6 +159,7 @@ public final class UnitLabel extends JLabel implements ActionListener {
                     .getUnitGraphicsType(unit), true));
             setDisabledIcon(new ImageIcon(disabledImageIcon.getImage().getScaledInstance(
                     (imageIcon.getIconWidth() / 3) * 2, (imageIcon.getIconHeight() / 3) * 2, Image.SCALE_SMOOTH)));
+            setBorder(BorderFactory.createEmptyBorder(0, 2, 0, 0));
         } else {
             if (unit.getLocation() instanceof ColonyTile) {
                 setSize(new Dimension(parent.getImageProvider().getTerrainImageWidth(0) / 2, parent
@@ -170,6 +171,7 @@ public final class UnitLabel extends JLabel implements ActionListener {
             setIcon(parent.getImageProvider().getUnitImageIcon(parent.getImageProvider().getUnitGraphicsType(unit)));
             setDisabledIcon(parent.getImageProvider().getUnitImageIcon(
                     parent.getImageProvider().getUnitGraphicsType(unit), true));
+            setBorder(BorderFactory.createEmptyBorder(0, 5, 0, 5));
         }
 
     }
