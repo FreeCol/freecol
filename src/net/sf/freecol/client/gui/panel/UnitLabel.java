@@ -340,7 +340,7 @@ public final class UnitLabel extends JLabel implements ActionListener {
                 Component uc = getParent();
                 while (uc != null) {
                     if (uc instanceof ColonyPanel) {
-                        if (unit.getTile() != null && unit.getTile().getColony() == null) {
+                        if (unit.getColony() == null) {
                             parent.remove(uc);
                             parent.getClient().getActionManager().update();
                         } else {

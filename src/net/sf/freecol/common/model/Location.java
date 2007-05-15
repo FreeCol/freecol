@@ -109,4 +109,12 @@ public interface Location {
      *         <code>Location</code> cannot store any goods.
      */
     public GoodsContainer getGoodsContainer();
+
+    /**
+     * Returns the <code>Colony</code> this <code>Location</code> is
+     * located in or null if this Location does not  belong to a colony.
+     *
+     * @return The <code>Colony</code> or null if not in a colony.
+     */
+     public Colony getColony();
 }

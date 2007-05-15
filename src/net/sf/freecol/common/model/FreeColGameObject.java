@@ -27,10 +27,6 @@ import org.w3c.dom.Element;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
-
-
-
-
 /**
 * The superclass of all game objects in FreeCol.
 */
@@ -41,14 +37,10 @@ abstract public class FreeColGameObject {
 
     private static final Logger logger = Logger.getLogger(FreeColGameObject.class.getName());
 
-
-
     private String id;
     private Game game;
     private boolean disposed = false;
     private boolean uninitialized;
-
-
 
     protected FreeColGameObject() {    
         logger.info("FreeColGameObject without ID created.");
@@ -854,5 +846,4 @@ abstract public class FreeColGameObject {
         in.nextTag();
         return array;
     }
-
 }

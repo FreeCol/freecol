@@ -12,7 +12,6 @@ import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.ColonyTile;
 import net.sf.freecol.common.model.Goods;
-import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
 
 /**
@@ -60,7 +59,7 @@ public final class DragListener extends MouseAdapter {
                 JPopupMenu menu = new JPopupMenu("Unit");
                 JMenuItem menuItem;
 
-                if (tempUnit.getLocation() instanceof Tile && tempUnit.getTile().getColony() != null) {
+                if (tempUnit.getColony() != null) {
                     menuItem = new JMenuItem(Messages.message("activateUnit"));
                     menuItem.setActionCommand(String.valueOf(UnitLabel.ACTIVATE_UNIT));
                     menuItem.addActionListener(unitLabel);

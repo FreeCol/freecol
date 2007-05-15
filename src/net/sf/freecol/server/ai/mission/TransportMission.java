@@ -893,7 +893,7 @@ public class TransportMission extends Mission {
                     if (au.getTransportDestination() != null
                             && au.getTransportDestination().getTile() == carrier.getTile()
                             && carrier.getState() != Unit.TO_EUROPE && carrier.getState() != Unit.TO_AMERICA) {
-                        if (u.getLocation() instanceof Europe || u.getTile() != null && u.getTile().getColony() != null) {
+                        if (u.getLocation() instanceof Europe || u.getColony() != null) {
                             Element leaveShipElement = Message.createNewRootElement("leaveShip");
                             leaveShipElement.setAttribute("unit", u.getID());
                             try {

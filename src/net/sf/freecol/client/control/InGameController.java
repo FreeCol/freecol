@@ -678,10 +678,8 @@ public final class InGameController implements NetworkConstants {
         // Display a "cash in"-dialog if a treasure train have been
         // moved into a coastal colony:
         if (unit.getType() == Unit.TREASURE_TRAIN &&
-            unit.getLocation() != null &&
-            unit.getLocation() instanceof Tile &&
-            unit.getLocation().getTile().getColony() != null &&
-            !unit.getLocation().getTile().getColony().isLandLocked()) {
+            unit.getColony() != null &&
+            !unit.getColony().isLandLocked()) {
             String message = (unit.getOwner().hasFather(FoundingFather.HERNAN_CORTES)) ? "cashInTreasureTrain.text.free"
                     : "cashInTreasureTrain.text.pay";
             if (canvas.showConfirmDialog(message, "cashInTreasureTrain.yes", "cashInTreasureTrain.no")) {
@@ -704,8 +702,9 @@ public final class InGameController implements NetworkConstants {
         }
 
         Location location = unit.getLocation();
+        // TODO: Not all instances handled?
         if (location instanceof Tile) {
-            logger.finer("Stopped in colony " + ((Tile) unit.getLocation()).getColony().getName());
+            logger.finer("Stopped in colony " + unit.getColony().getName());
             stopInColony(unit);
         } else if (location instanceof Europe) {
             logger.finer("Stopped in Europe.");
@@ -716,7 +715,7 @@ public final class InGameController implements NetworkConstants {
     private void stopInColony(Unit unit) {
 
         Stop stop = unit.getCurrentStop();
-        Location location = ((Tile) unit.getLocation()).getColony();
+        Location location = unit.getColony();
 
         GoodsContainer warehouse = location.getGoodsContainer();
         if (warehouse == null) {
@@ -897,8 +896,7 @@ public final class InGameController implements NetworkConstants {
 
         // Display a "cash in"-dialog if a treasure train have been moved into a
         // colony:
-        if (unit.getType() == Unit.TREASURE_TRAIN && unit.getLocation() != null && unit.getLocation() instanceof Tile
-                && unit.getLocation().getTile().getColony() != null) {
+        if (unit.getType() == Unit.TREASURE_TRAIN && unit.getColony() != null) {
             String message = (unit.getOwner().hasFather(FoundingFather.HERNAN_CORTES)) ? "cashInTreasureTrain.text.free"
                     : "cashInTreasureTrain.text.pay";
             if (canvas.showConfirmDialog(message, "cashInTreasureTrain.yes", "cashInTreasureTrain.no")) {
@@ -1557,13 +1555,7 @@ public final class InGameController implements NetworkConstants {
             return false;
         }
 
-        if (unit.getTile() == null
-                || unit.getTile().getColony() == null
-                || unit.getTile().getColony().getUnitCount() > 1
-                || !(unit.getLocation() instanceof Colony || unit.getLocation() instanceof Building || unit
-                        .getLocation() instanceof ColonyTile)
-                || freeColClient.getCanvas().showConfirmDialog("abandonColony.text", "abandonColony.yes",
-                        "abandonColony.no")) {
+        if (okToLeaveColony(unit)) {
 
             freeColClient.playSound(SfxLibrary.LOAD_CARGO);
 
@@ -1806,13 +1798,7 @@ public final class InGameController implements NetworkConstants {
             leaveShip(unit);
         }
 
-        if (unit.getTile() == null
-                || unit.getTile().getColony() == null
-                || unit.getTile().getColony().getUnitCount() > 1
-                || !(unit.getLocation() instanceof Colony || unit.getLocation() instanceof Building || unit
-                        .getLocation() instanceof ColonyTile)
-                || freeColClient.getCanvas().showConfirmDialog("abandonColony.text", "abandonColony.yes",
-                        "abandonColony.no")) {
+        if (okToLeaveColony(unit)) {
             // Equip the unit first.
         } else {
             return; // The user cancelled the action.
@@ -1885,6 +1871,21 @@ public final class InGameController implements NetworkConstants {
     }
 
     /**
+     * Returns true if we can move the unit out of a colony.
+     * 
+     * The function returns true if the unit is not in a colony, or
+     * if the colony would survive the move unless the user chooses it.
+     * 
+     * @param unit The <code>Unit</code> to move outside the colony.
+     * @return true if the move was safe or accepted.
+     */
+    private boolean okToLeaveColony(Unit unit) {
+        return !unit.wouldAbandonColony()
+                || freeColClient.getCanvas().showConfirmDialog("abandonColony.text", "abandonColony.yes",
+                        "abandonColony.no");
+    }
+
+    /**
      * Moves a <code>Unit</code> to a <code>WorkLocation</code>.
      * 
      * @param unit The <code>Unit</code>.
@@ -1931,18 +1932,13 @@ public final class InGameController implements NetworkConstants {
             throw new IllegalStateException("Not your turn.");
         }
 
-        Client client = freeColClient.getClient();
-        Canvas canvas = freeColClient.getCanvas();
-
-        if (skipCheck
-                || unit.getTile().getColony().getUnitCount() > 1
-                || !(unit.getLocation() instanceof Colony || unit.getLocation() instanceof Building || unit
-                        .getLocation() instanceof ColonyTile)
-                || canvas.showConfirmDialog("abandonColony.text", "abandonColony.yes", "abandonColony.no")) {
+        if (skipCheck || okToLeaveColony(unit)) {
 
             Element putOutsideColonyElement = Message.createNewRootElement("putOutsideColony");
             putOutsideColonyElement.setAttribute("unit", unit.getID());
             unit.putOutsideColony();
+
+            Client client = freeColClient.getClient();
             client.sendAndWait(putOutsideColonyElement);
 
             return true;
@@ -2666,7 +2662,7 @@ public final class InGameController implements NetworkConstants {
          */
         Element tradeRoutesElement = Message.createNewRootElement("setTradeRoutes");
         for(TradeRoute route : routes) {
-            Element routeElement = tradeRoutesElement.getOwnerDocument().createElement(route.getXMLElementTagName());
+            Element routeElement = tradeRoutesElement.getOwnerDocument().createElement(TradeRoute.getXMLElementTagName());
             routeElement.setAttribute("id", route.getID());
             tradeRoutesElement.appendChild(routeElement);
         }

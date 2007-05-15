@@ -105,11 +105,11 @@ public class ScoutingMission extends Mission {
         }
 
         if (!getUnit().isMounted()) {
-            if (getUnit().getTile().getColony() != null
-                    && getUnit().getTile().getColony().getGoodsContainer().getGoodsCount(Goods.HORSES) >= 50) {
-                if (getUnit().getTile().getColony().getFoodProduction()
-                        - getUnit().getTile().getColony().getFoodConsumption() < 2
-                        || getUnit().getTile().getColony().getGoodsContainer().getGoodsCount(Goods.HORSES) >= 52) {
+            if (getUnit().getColony() != null
+                    && getUnit().getColony().getGoodsContainer().getGoodsCount(Goods.HORSES) >= 50) {
+                if (getUnit().getColony().getFoodProduction()
+                        - getUnit().getColony().getFoodConsumption() < 2
+                        || getUnit().getColony().getGoodsContainer().getGoodsCount(Goods.HORSES) >= 52) {
                     Element equipUnitElement = Message.createNewRootElement("equipunit");
                     equipUnitElement.setAttribute("unit", getUnit().getID());
                     equipUnitElement.setAttribute("type", Integer.toString(Goods.HORSES));
@@ -200,7 +200,7 @@ public class ScoutingMission extends Mission {
             return;
         }
 
-        if (isTarget(getUnit().getTile(), getUnit()) && getUnit().getTile().getColony() != null) {
+        if (isTarget(getUnit().getTile(), getUnit()) && getUnit().getColony() != null) {
             Element equipUnitElement = Message.createNewRootElement("equipunit");
             equipUnitElement.setAttribute("unit", getUnit().getID());
             equipUnitElement.setAttribute("type", Integer.toString(Goods.HORSES));

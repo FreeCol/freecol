@@ -563,14 +563,16 @@ public class SchoolTest extends FreeColTestCase {
     /**
      * Progress in teaching is bound to the teacher and not the learner.
      * 
+     * Moving students around does not slow education. This behavior is 
+     * there to simplify gameplay.
      */
     public void testTeacherStoresProgress() {
-        Colony outsideColony = getStandardColony(1);
+        Colony outsideColony = getStandardColony(1, 10, 8);
         Iterator<Unit> outsideUnits = outsideColony.getUnitIterator();
         Unit outsider = outsideUnits.next();
         outsider.setType(Unit.FREE_COLONIST);
 
-        Colony colony = getStandardColony(2);
+        Colony colony = getStandardColony(2, 5, 8);
         Iterator<Unit> units = colony.getUnitIterator();
         Unit student = units.next();
         student.setType(Unit.FREE_COLONIST);
@@ -597,6 +599,214 @@ public class SchoolTest extends FreeColTestCase {
         school.newTurn();
         assertEquals(0, colony.getUnitList(Unit.FREE_COLONIST).size());
         assertEquals(Unit.EXPERT_ORE_MINER, outsider.getType());
+    }
+
+    /**
+     * Progress in teaching is bound to the teacher and not the learner.
+     * 
+     * Moving a teacher inside the colony should not reset its training.
+     */
+    public void testMoveTeacherInside() {
+        Colony colony = getStandardColony(4);
+        Iterator<Unit> units = colony.getUnitIterator();
+        Unit colonist = units.next();
+        colonist.setType(Unit.FREE_COLONIST);
+        Unit criminal = units.next();
+        criminal.setType(Unit.PETTY_CRIMINAL);
+        
+        Unit teacher1 = units.next();
+        teacher1.setType(Unit.EXPERT_ORE_MINER);
+        Unit teacher2 = units.next();
+        teacher2.setType(Unit.MASTER_CARPENTER);
+
+        Building school = colony.getBuilding(Building.SCHOOLHOUSE);
+        school.setLevel(Building.SHOP);
+        
+        // The ore miner is set in the school before the carpenter (note: the
+        // carpenter is the only master of skill level 1).
+        // In this case, the colonist will become a miner (and the criminal 
+        // will become a servant).
+        teacher1.setLocation(school);
+        teacher2.setLocation(school);
+
+        // wait a little
+        school.newTurn();
+        school.newTurn();
+        assertEquals(2, teacher1.getTurnsOfTraining());
+        assertEquals(2, teacher2.getTurnsOfTraining());
+        assertEquals(1, colony.getUnitList(Unit.FREE_COLONIST).size());
+        assertEquals(1, colony.getUnitList(Unit.PETTY_CRIMINAL).size());
+        assertEquals(1, colony.getUnitList(Unit.EXPERT_ORE_MINER).size());
+        assertEquals(1, colony.getUnitList(Unit.MASTER_CARPENTER).size());
+
+        // Now we want the colonist to be a carpenter. We just want to 
+        // shuffle the teachers.
+        teacher2.setLocation(colony.getVacantColonyTileFor(teacher2, Goods.FOOD));
+        // outside the colony is still considered OK (same Tile)
+        teacher1.putOutsideColony();
+
+        // Passing a turn outside school does not reset training at this time
+        school.newTurn();
+        assertEquals(2, teacher1.getTurnsOfTraining());
+        assertEquals(2, teacher2.getTurnsOfTraining());
+        assertEquals(1, colony.getUnitList(Unit.FREE_COLONIST).size());
+        assertEquals(1, colony.getUnitList(Unit.PETTY_CRIMINAL).size());
+
+        // Put them back in...
+        teacher2.setLocation(school);
+        
+        // Teacher 1 is still outside
+        school.newTurn();
+        assertEquals(2, teacher1.getTurnsOfTraining());
+        assertEquals(3, teacher2.getTurnsOfTraining());
+        assertEquals(1, colony.getUnitList(Unit.FREE_COLONIST).size());
+        assertEquals(1, colony.getUnitList(Unit.PETTY_CRIMINAL).size());
+        
+        // Now move him back
+        teacher1.setLocation(school);
+
+        school.newTurn();
+        assertEquals(3, teacher1.getTurnsOfTraining());
+        assertEquals(0, teacher2.getTurnsOfTraining());
+        
+        assertEquals(0, colony.getUnitList(Unit.FREE_COLONIST).size());
+        assertEquals(1, colony.getUnitList(Unit.PETTY_CRIMINAL).size());
+        assertEquals(0, colony.getUnitList(Unit.INDENTURED_SERVANT).size());
+        assertEquals(1, colony.getUnitList(Unit.EXPERT_ORE_MINER).size());
+        assertEquals(2, colony.getUnitList(Unit.MASTER_CARPENTER).size());
+        
+        // Watch out here! This is another special case! See {@See testCaseTwoTeachersWithDifferentExp}!
+        school.newTurn();
+        assertEquals(3, teacher1.getTurnsOfTraining());
+        assertEquals(1, teacher2.getTurnsOfTraining());
+        
+        assertEquals(0, colony.getUnitList(Unit.FREE_COLONIST).size());
+        assertEquals(1, colony.getUnitList(Unit.PETTY_CRIMINAL).size());
+        assertEquals(0, colony.getUnitList(Unit.INDENTURED_SERVANT).size());
+        assertEquals(1, colony.getUnitList(Unit.EXPERT_ORE_MINER).size());
+        assertEquals(2, colony.getUnitList(Unit.MASTER_CARPENTER).size());
+    }
+    
+    public void testCaseTwoTeachersWithDifferentExp(){
+        Colony colony = getStandardColony(3);
+        Iterator<Unit> units = colony.getUnitIterator();
+        Unit colonist = units.next();
+        colonist.setType(Unit.FREE_COLONIST);
+        Unit teacher1 = units.next();
+        teacher1.setType(Unit.EXPERT_ORE_MINER);
+        Unit teacher2 = units.next();
+        teacher2.setType(Unit.MASTER_CARPENTER);
+
+        Building school = colony.getBuilding(Building.SCHOOLHOUSE);
+        school.setLevel(Building.SHOP);
+
+        // First we let the teacher1 train for 3 turns
+        teacher1.setLocation(school);
+        school.newTurn();
+        school.newTurn();
+        school.newTurn();
+        assertEquals(3, teacher1.getTurnsOfTraining());
+        
+        // Then teacher2 for 1 turn
+        teacher1.setLocation(colony.getVacantColonyTileFor(teacher1, Goods.FOOD));
+        teacher2.setLocation(school);
+        school.newTurn();
+        assertEquals(3, teacher1.getTurnsOfTraining());
+        assertEquals(1, teacher2.getTurnsOfTraining());
+        
+        // If we now also add teacher2 to the school, then 
+        // Teacher1 will still be the teacher in charge
+        teacher1.setLocation(school);
+        school.newTurn();
+        
+        assertEquals(3, teacher1.getTurnsOfTraining());
+        assertEquals(2, teacher2.getTurnsOfTraining());
+    }
+
+    /**
+     * Progress in teaching is bound to the teacher and not the learner.
+     * 
+     * Moving a teacher outside the colony should reset its training.
+     */
+    public void testMoveTeacherOutside() {
+        Colony outsideColony = getStandardColony(1, 10, 8);
+        Iterator<Unit> outsideUnits = outsideColony.getUnitIterator();
+        Unit outsider = outsideUnits.next();
+        outsider.setType(Unit.FREE_COLONIST);
+
+        Colony colony = getStandardColony(4, 5, 8);
+        Iterator<Unit> units = colony.getUnitIterator();
+        Unit colonist = units.next();
+        colonist.setType(Unit.FREE_COLONIST);
+        Unit criminal = units.next();
+        criminal.setType(Unit.PETTY_CRIMINAL);
+        
+        Unit teacher1 = units.next();
+        teacher1.setType(Unit.EXPERT_ORE_MINER);
+        Unit teacher2 = units.next();
+        teacher2.setType(Unit.MASTER_CARPENTER);
+
+        Building school = colony.getBuilding(Building.SCHOOLHOUSE);
+        school.setLevel(Building.SHOP);
+        
+        // The ore miner is set in the school before the carpenter (note: the
+        // carpenter is the only master of skill level 1).
+        // In this case, the colonist will become a miner (and the criminal 
+        // will become a servant).
+        teacher1.setLocation(school);
+        teacher2.setLocation(school);
+
+        // wait a little
+        school.newTurn();
+        school.newTurn();
+        assertEquals(1, colony.getUnitList(Unit.FREE_COLONIST).size());
+        assertEquals(1, colony.getUnitList(Unit.PETTY_CRIMINAL).size());
+        assertEquals(1, colony.getUnitList(Unit.EXPERT_ORE_MINER).size());
+        assertEquals(1, colony.getUnitList(Unit.MASTER_CARPENTER).size());
+        assertEquals(2, teacher1.getTurnsOfTraining());
+        assertEquals(2, teacher2.getTurnsOfTraining());
+        
+        // Now we move the teachers somewhere else
+        teacher1.setLocation(getGame().getMap().getTile(6, 8));
+        teacher2.setLocation(outsideColony.getVacantColonyTileFor(teacher2, Goods.FOOD));
+        assertEquals(0, teacher1.getTurnsOfTraining());
+        assertEquals(0, teacher2.getTurnsOfTraining());
+        assertEquals(1, colony.getUnitList(Unit.FREE_COLONIST).size());
+        assertEquals(1, colony.getUnitList(Unit.PETTY_CRIMINAL).size());
+        assertEquals(0, colony.getUnitList(Unit.EXPERT_ORE_MINER).size());
+        assertEquals(0, colony.getUnitList(Unit.MASTER_CARPENTER).size());
+        
+        // Put them back here
+        teacher1.setLocation(school);
+        teacher2.setLocation(school);
+        assertEquals(0, teacher1.getTurnsOfTraining());
+        assertEquals(0, teacher2.getTurnsOfTraining());
+        
+        // Check that 2 new turns aren't enough for training
+        school.newTurn();
+        assertEquals(1, colony.getUnitList(Unit.FREE_COLONIST).size());
+        assertEquals(1, colony.getUnitList(Unit.PETTY_CRIMINAL).size());
+        assertEquals(1, colony.getUnitList(Unit.EXPERT_ORE_MINER).size());
+        assertEquals(1, colony.getUnitList(Unit.MASTER_CARPENTER).size());
+
+        school.newTurn();
+        assertEquals(1, colony.getUnitList(Unit.FREE_COLONIST).size());
+        assertEquals(1, colony.getUnitList(Unit.PETTY_CRIMINAL).size());
+        assertEquals(1, colony.getUnitList(Unit.EXPERT_ORE_MINER).size());
+        assertEquals(1, colony.getUnitList(Unit.MASTER_CARPENTER).size());
+
+        school.newTurn();
+        assertEquals(1, colony.getUnitList(Unit.FREE_COLONIST).size());
+        assertEquals(1, colony.getUnitList(Unit.PETTY_CRIMINAL).size());
+        assertEquals(1, colony.getUnitList(Unit.EXPERT_ORE_MINER).size());
+        assertEquals(1, colony.getUnitList(Unit.MASTER_CARPENTER).size());
+
+        school.newTurn();
+        assertEquals(0, colony.getUnitList(Unit.FREE_COLONIST).size());
+        assertEquals(0, colony.getUnitList(Unit.PETTY_CRIMINAL).size());
+        assertEquals(1, colony.getUnitList(Unit.INDENTURED_SERVANT).size());
+        assertEquals(2, colony.getUnitList(Unit.EXPERT_ORE_MINER).size());
+        assertEquals(1, colony.getUnitList(Unit.MASTER_CARPENTER).size());
     }
 
     /**

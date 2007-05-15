@@ -17,8 +17,7 @@ public class BuildingTest extends FreeColTestCase {
 
     public void testCanBuildNext() {
 
-        FreeCol.specification = new Specification();
-        Colony colony = getStandardColony(1);
+        Colony colony = getStandardColony();
 
         // First check with a building that can be fully build with a normal
         // colony
@@ -40,8 +39,7 @@ public class BuildingTest extends FreeColTestCase {
 
     public void testInitialColony() {
 
-        FreeCol.specification = new Specification();
-        Colony colony = getStandardColony(1);
+        Colony colony = getStandardColony();
 
         Building warehouse = colony.getBuilding(Building.WAREHOUSE);
         assertEquals(Building.NOT_BUILT, warehouse.getLevel());

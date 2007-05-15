@@ -1306,7 +1306,7 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener {
                         inGameController.putOutsideColony(unit);
                     }
 
-                    if (unit.getTile().getColony() == null) {
+                    if (unit.getColony() == null) {
                         closeColonyPanel();
                         return null;
                     } else if (!(unit.getLocation() instanceof Tile)

@@ -133,7 +133,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
                 setExplored(unit.getTile());
 
                 Iterator<Position> positionIterator;
-                if (unit.getTile().getColony() != null) {
+                if (unit.getColony() != null) {
                     positionIterator = map.getCircleIterator(unit.getTile().getPosition(), true, 2);
                 } else {
                     positionIterator = map.getCircleIterator(unit.getTile().getPosition(), true, unit.getLineOfSight());

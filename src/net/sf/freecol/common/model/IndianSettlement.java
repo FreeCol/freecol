@@ -1311,4 +1311,13 @@ public class IndianSettlement extends Settlement {
     public static String getXMLElementTagName() {
         return "indianSettlement";
     }
+
+    /**
+     * An Indian settlement is no colony.
+     * 
+     * @return null
+     */
+    public Colony getColony() {
+        return null;
+    }
 }

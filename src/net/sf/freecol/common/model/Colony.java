@@ -1884,4 +1884,11 @@ public final class Colony extends Settlement implements Location, Nameable {
     public static String getXMLElementTagName() {
         return "colony";
     }
+
+    /**
+     * Returns just this Colony itself.
+     */
+    public Colony getColony() {
+        return this;
+    }
 }

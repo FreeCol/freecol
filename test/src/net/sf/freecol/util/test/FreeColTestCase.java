@@ -3,7 +3,9 @@ package net.sf.freecol.util.test;
 import java.util.Vector;
 
 import junit.framework.TestCase;
+import net.sf.freecol.FreeCol;
 import net.sf.freecol.common.FreeColException;
+import net.sf.freecol.common.Specification;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Goods;
@@ -28,6 +30,12 @@ public class FreeColTestCase extends TestCase {
      */
     static Game game;
 
+    public void setUp() {
+
+        if (null == FreeCol.specification) {
+            FreeCol.specification = new Specification();
+        }
+    }
 
     /**
      * Get a game pseudo-singleton, i.e. the same instance will be returned
@@ -140,7 +148,7 @@ public class FreeColTestCase extends TestCase {
      * @return
      */
     public Colony getStandardColony() {
-        return getStandardColony(1);
+        return getStandardColony(1, 5, 8);
     }
 
     /**
@@ -152,6 +160,20 @@ public class FreeColTestCase extends TestCase {
      * @return
      */
     public Colony getStandardColony(int numberOfSettlers) {
+        return getStandardColony(numberOfSettlers, 5, 8);
+    }
+
+    /**
+     * Get a colony with the given number of settlers
+     * 
+     * @param numberOfSettlers The number of settlers to put into the colony.
+     *            Must be >= 1.
+     * @param tileX Coordinate of tile for the colony.
+     * @param tileY Coordinate of tile for the colony.
+     * 
+     * @return
+     */
+    public Colony getStandardColony(int numberOfSettlers, int tileX, int tileY) {
 
         if (numberOfSettlers < 1)
             throw new IllegalArgumentException();
@@ -162,15 +184,15 @@ public class FreeColTestCase extends TestCase {
         Map map = getTestMap(Tile.PLAINS, true);
         game.setMap(map);
 
-        Colony colony = new Colony(game, dutch, "New Amsterdam", map.getTile(5, 8));
+        Colony colony = new Colony(game, dutch, "New Amsterdam", map.getTile(tileX, tileY));
 
-        Unit soldier = new Unit(game, map.getTile(5, 8), dutch, Unit.FREE_COLONIST, Unit.ACTIVE, true, false, 0, false);
+        Unit soldier = new Unit(game, map.getTile(tileX, tileY), dutch, Unit.FREE_COLONIST, Unit.ACTIVE, true, false, 0, false);
 
         soldier.setWorkType(Goods.FOOD);
         soldier.buildColony(colony);
 
         for (int i = 1; i < numberOfSettlers; i++) {
-            Unit settler = new Unit(game, map.getTile(5, 8), dutch, Unit.FREE_COLONIST, Unit.ACTIVE, true, false, 0,
+            Unit settler = new Unit(game, map.getTile(tileX, tileY), dutch, Unit.FREE_COLONIST, Unit.ACTIVE, true, false, 0,
                     false);
             settler.setLocation(colony);
         }

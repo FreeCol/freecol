@@ -217,7 +217,7 @@ public class PioneeringMission extends Mission {
         if (getUnit().getTile() != null) {
             if (getUnit().getNumberOfTools() == 0) {
                 // Get tools from a Colony.
-                if (getUnit().getTile().getColony() == null) {
+                if (getUnit().getColony() == null) {
                     PathNode bestPath = findColonyWithTools();        
 
                     if (bestPath != null) {
@@ -232,8 +232,8 @@ public class PioneeringMission extends Mission {
                         skipMission = true;
                     }
                 }
-                if (getUnit().getTile().getColony() != null) {
-                    AIColony ac = (AIColony) getAIMain().getAIObject(getUnit().getTile().getColony());
+                if (getUnit().getColony() != null) {
+                    AIColony ac = (AIColony) getAIMain().getAIObject(getUnit().getColony());
                     final int tools = ac.getAvailableTools();
                     if (tools >= 20) {                    
                         Element equipUnitElement = Message.createNewRootElement("equipunit");

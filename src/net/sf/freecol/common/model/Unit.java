@@ -16,6 +16,7 @@ import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.Map.Position;
 import net.sf.freecol.common.model.TradeRoute.Stop;
 import net.sf.freecol.common.util.EmptyIterator;
+import net.sf.freecol.common.util.Utils;
 
 import org.w3c.dom.Element;
 
@@ -1207,8 +1208,8 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
             throw new IllegalStateException("It is not allowed to board a ship on another tile.");
         }
 
-        if (getTile() != null && getTile().getColony() != null && getTile().getColony().getUnitCount() <= 0) {
-            getTile().getColony().dispose();
+        if (getColony() != null && getColony().getUnitCount() <= 0) {
+            getColony().dispose();
         }
     }
 
@@ -1246,7 +1247,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
         } else if (getTile() == null) {
             // this should not happen, but it does
             return false;
-        } else if (getTile().getSettlement() != null && getTile().getSettlement() instanceof Colony) {
+        } else if (getColony() != null) {
             return true;
         } else {
             return false;
@@ -1272,7 +1273,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
      * @see #remove(Locatable)
      */
     private void spendAllMoves() {
-        if (getTile() != null && getTile().getColony() != null && getMovesLeft() < getInitialMovesLeft())
+        if (getColony() != null && getMovesLeft() < getInitialMovesLeft())
             setMovesLeft(0);
     }
 
@@ -1508,6 +1509,9 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
      * @param newLocation The new Location of the Unit.
      */
     public void setLocation(Location newLocation) {
+        
+        Colony oldColony = this.getColony();
+        
         if (location != null) {
             location.remove(this);
         }
@@ -1518,6 +1522,13 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
             location.add(this);
         }
 
+        Colony newColony = this.getColony();
+        
+        // Reset training when changing/leaving colony
+        if (!Utils.equals(oldColony, newColony)){
+            setTurnsOfTraining(0);
+        }
+        
         // Check for adjacent units owned by a player that our owner has not met
         // before:
         if (getGame().getMap() != null && location != null && location instanceof Tile && !isNaval()) {
@@ -1602,8 +1613,8 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
         setLocation(getTile());
         setMovesLeft(0);
 
-        if (getTile().getColony().getUnitCount() <= 0) {
-            getTile().getColony().dispose();
+        if (getColony().getUnitCount() <= 0) {
+            getColony().dispose();
         }
     }
 
@@ -1664,8 +1675,8 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
     public boolean canBeDressedAsMissionary() {
         return isMissionary()
                 || ((location instanceof Europe || location instanceof Unit
-                        && ((Unit) location).getLocation() instanceof Europe) || getTile() != null
-                        && getTile().getColony().getBuilding(Building.CHURCH).isBuilt());
+                        && ((Unit) location).getLocation() instanceof Europe) 
+                        || (getColony() != null && getColony().getBuilding(Building.CHURCH).isBuilt()));
     }
 
     /**
@@ -1831,7 +1842,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
         setMovesLeft(0);
 
         if (b) {
-            if (!isInEurope() && !getTile().getColony().getBuilding(Building.CHURCH).isBuilt()) {
+            if (!isInEurope() && !getColony().getBuilding(Building.CHURCH).isBuilt()) {
                 throw new IllegalStateException(
                         "Can only dress as a missionary when the unit is located in Europe or a Colony with a church.");
             } else {
@@ -2826,8 +2837,8 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
                         // Yes, the amount of lumber may exceed 100 units,
                         // but this was also true for the original game, IIRC.
                         int lumberAmount = getTile().potential(Goods.LUMBER) * 15 + 10;
-                        if (getTile().getColony() != null && getTile().getColony().getOwner().equals(getOwner())) {
-                            getTile().getColony().addGoods(Goods.LUMBER, lumberAmount);
+                        if (getColony() != null && getColony().getOwner().equals(getOwner())) {
+                            getColony().addGoods(Goods.LUMBER, lumberAmount);
                         } else {
                             Vector<Tile> surroundingTiles = getTile().getMap().getSurroundingTiles(getTile(), 1);
                             Vector<Settlement> adjacentColonies = new Vector<Settlement>();
@@ -3869,7 +3880,8 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
      * @return The Colony it's in, or null if it is not in a Colony
      */
     public Colony getColony() {
-        return getTile().getColony();
+        Location location = getLocation();
+        return (location != null ? location.getColony() : null);
     }
 
     /**
@@ -3961,8 +3973,8 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
             base *= 2;
         }
 
-        if (getTile() != null && getTile().getColony() != null) {
-            base += getTile().getColony().getProductionBonus();
+        if (getColony() != null) {
+            base += getColony().getProductionBonus();
         }
 
         return Math.max(base, 1);
@@ -4201,9 +4213,9 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
                 logger.finest("About to change type of unit due to experience.");
                 String oldName = getName();
                 setType(((ColonyTile) location).getExpertForProducing(workType));
-                addModelMessage(getTile().getColony(), "model.unit.experience", new String[][] {
+                addModelMessage(getColony(), "model.unit.experience", new String[][] {
                         { "%oldName%", oldName }, { "%newName%", getName() },
-                        { "%colony%", getTile().getColony().getName() } }, ModelMessage.UNIT_IMPROVED, this);
+                        { "%colony%", getColony().getName() } }, ModelMessage.UNIT_IMPROVED, this);
             }
         }
     }
@@ -4283,7 +4295,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
                     || !(location instanceof Building || location instanceof ColonyTile)) {
                 out.writeAttribute("location", location.getID());
             } else {
-                out.writeAttribute("location", getTile().getColony().getID());
+                out.writeAttribute("location", getColony().getID());
             }
         }
 
@@ -4533,5 +4545,20 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
      */
     public void setAlreadyOnHighSea(boolean alreadyOnHighSea) {
         this.alreadyOnHighSea = alreadyOnHighSea;
+    }
+
+    /**
+     * Checks if a unit can be safely moved outside a colony.
+     * 
+     * The function returns false if the unit is not in a colony.
+     * 
+     * @return true if moving the unit out would abandon the colony.
+     */
+    public boolean wouldAbandonColony() {
+        return getColony() != null
+                && getColony().getUnitCount() <= 1
+                && (getLocation() instanceof Colony 
+                        || getLocation() instanceof Building 
+                        || getLocation() instanceof ColonyTile);
     }
 }

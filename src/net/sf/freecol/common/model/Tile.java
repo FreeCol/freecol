@@ -730,7 +730,7 @@ public final class Tile extends FreeColGameObject implements Location, Nameable 
             }
             river += branch * base[directions[i]];
             int otherRiver = t.getRiver();
-            int otherDirection = getMap().getOppositeDirection(directions[i]);
+            int otherDirection = Map.getReverseDirection(directions[i]);
             int newRiver = River.updateRiver(otherRiver, otherDirection, addition);
             t.addRiver(branch, newRiver);
         }
@@ -833,7 +833,8 @@ public final class Tile extends FreeColGameObject implements Location, Nameable 
 
     /**
      * Gets the <code>Colony</code> located on this <code>Tile</code>. Only
-     * a convenience method for {@link #getSettlement}.
+     * a convenience method for {@link #getSettlement} that makes sure that 
+     * the settlement is a colony.
      * 
      * @return The <code>Colony</code> that is located on this
      *         <code>Tile</code> or <i>null</i> if no <code>Colony</code>

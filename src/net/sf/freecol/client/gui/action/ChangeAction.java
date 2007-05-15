@@ -58,8 +58,7 @@ public class ChangeAction extends MapboardAction {
         if (getFreeColClient().getGUI().getActiveUnit() != null) {
             Unit unit = getFreeColClient().getGUI().getActiveUnit();
             if (unit.getTile() != null) {
-                Tile tile = unit.getTile();
-                if (tile.getColony() != null) {
+                if (unit.getColony() != null) {
                     putValue(NAME, Messages.message("menuBar.orders.enterColony"));
                 } else if (unit.getLocation() instanceof Unit) {
                     putValue(NAME, Messages.message("menuBar.orders.selectCarrier"));

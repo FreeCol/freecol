@@ -321,7 +321,7 @@ public class AIPlayer extends AIObject {
             AIUnit au = it.next();
             if (!au.hasMission()
                     && (au.getUnit().getLocation() instanceof ColonyTile || au.getUnit().getLocation() instanceof Building)) {
-                AIColony ac = (AIColony) getAIMain().getAIObject(au.getUnit().getTile().getColony());
+                AIColony ac = (AIColony) getAIMain().getAIObject(au.getUnit().getColony());
                 au.setMission(new WorkInsideColonyMission(getAIMain(), au, ac));
             }
         }
@@ -1238,8 +1238,8 @@ public class AIPlayer extends AIObject {
          * which requires defenders:
          * 
          */
-        if (unit.getTile() != null && unit.getTile().getColony() != null) {
-            bestTarget = unit.getTile().getColony();
+        if (unit.getColony() != null) {
+            bestTarget = unit.getColony();
             bestValue = getDefendColonyMissionValue(unit, (Colony) bestTarget, 0);
         }
         // Checks if a nearby colony requires additional defence:

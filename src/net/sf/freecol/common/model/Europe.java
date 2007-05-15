@@ -575,4 +575,13 @@ public final class Europe extends FreeColGameObject implements Location,
         return "europe";
     }
 
+    /**
+     * Europe does not belong to a colony.
+     * 
+     * @return Always returns null.
+     */
+    public Colony getColony() {
+        return null;
+    }
+
 }
