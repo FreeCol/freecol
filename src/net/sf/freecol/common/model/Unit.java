@@ -3615,8 +3615,15 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
             setMovesLeft(getInitialMovesLeft());
         }
         String newName = getName();
-        addModelMessage(this, messageID, new String[][] { { "%oldName%", oldName }, { "%newName%", newName },
-                { "%nation%", nation } }, type);
+        FreeColGameObject source = this;
+        if (getColony() != null) {
+            source = getColony();
+        }
+        addModelMessage(source, messageID, new String[][] {
+            { "%oldName%", oldName },
+            { "%newName%", newName },
+            { "%nation%", nation }
+        }, type);
 
         if (getOwner() != enemyUnit.getOwner()) {
             // this unit hasn't been captured by enemyUnit, show message to
@@ -3866,8 +3873,10 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
                 if (victim == null) {
                     return;
                 }
-                addModelMessage(victim, "model.unit.colonistSlaughtered", new String[][] {
-                        { "%colony%", colony.getName() }, { "%unit%", victim.getName() } }, ModelMessage.UNIT_LOST);
+                addModelMessage(colony, "model.unit.colonistSlaughtered",
+                                new String[][] {
+                                    { "%colony%", colony.getName() },
+                                    { "%unit%", victim.getName() } }, ModelMessage.UNIT_LOST);
                 victim.dispose();
             }
         }

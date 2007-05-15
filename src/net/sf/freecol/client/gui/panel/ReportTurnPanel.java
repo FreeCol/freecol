@@ -131,6 +131,9 @@ public final class ReportTurnPanel extends ReportPanel implements ActionListener
                     button.addActionListener(this);
                     button.setBorder(BorderFactory.createEmptyBorder());
                     reportPanel.add(button, higConst.rc(row, imageColumn, ""));
+                } else if (message.getDisplay() instanceof Unit) {
+                    label.setIcon(getCanvas().getImageIcon(message.getDisplay(), true));
+                    reportPanel.add(label, higConst.rc(row, imageColumn, ""));
                 } else {
                     label.setIcon(getCanvas().getImageIcon(message.getDisplay(), false));
                     reportPanel.add(label, higConst.rc(row, imageColumn, ""));
