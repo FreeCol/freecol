@@ -474,20 +474,24 @@ public final class Market extends FreeColGameObject implements Ownable {
         
         priceGoods();
 
-        if (getGame().getTurn().getNumber() > 1) {
+        if (owner != null && owner.getEurope() != null && getGame().getTurn().getNumber() > 1) {
             for(int typeOfGoods = 0; typeOfGoods < dataForGoodType.length; typeOfGoods++) {
                 if (oldPrices[typeOfGoods] > dataForGoodType[typeOfGoods].costToBuy) {
                     addModelMessage(this, "model.market.priceDecrease",
-                                    new String[][] {{"%goods%", Goods.getName(typeOfGoods)},
-                                                    {"%buy%", String.valueOf(dataForGoodType[typeOfGoods].costToBuy)},
-                                                    {"%sell%", String.valueOf(dataForGoodType[typeOfGoods].paidForSale)}},
+                                    new String[][] {
+                                        {"%europe%", owner.getEurope().getName()},
+                                        {"%goods%", Goods.getName(typeOfGoods)},
+                                        {"%buy%", String.valueOf(dataForGoodType[typeOfGoods].costToBuy)},
+                                        {"%sell%", String.valueOf(dataForGoodType[typeOfGoods].paidForSale)}},
                                     ModelMessage.MARKET_PRICES,
                                     new Goods(typeOfGoods));
                 } else if (oldPrices[typeOfGoods] < dataForGoodType[typeOfGoods].costToBuy) {
                     addModelMessage(this, "model.market.priceIncrease",
-                                    new String[][] {{"%goods%", Goods.getName(typeOfGoods)},
-                                                    {"%buy%", String.valueOf(dataForGoodType[typeOfGoods].costToBuy)},
-                                                    {"%sell%", String.valueOf(dataForGoodType[typeOfGoods].paidForSale)}},
+                                    new String[][] {
+                                        {"%europe%", owner.getEurope().getName()},
+                                        {"%goods%", Goods.getName(typeOfGoods)},
+                                        {"%buy%", String.valueOf(dataForGoodType[typeOfGoods].costToBuy)},
+                                        {"%sell%", String.valueOf(dataForGoodType[typeOfGoods].paidForSale)}},
                                     ModelMessage.MARKET_PRICES,
                                     new Goods(typeOfGoods));
                 }

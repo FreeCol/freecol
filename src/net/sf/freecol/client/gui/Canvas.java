@@ -566,7 +566,7 @@ public final class Canvas extends JDesktopPane {
                 logger.warning("could not find message with id: " + modelMessages[i].getMessageID() + ".");
             }
 
-            messageIcon[i] = getImageIcon(modelMessages[i].getDisplay());
+            messageIcon[i] = getImageIcon(modelMessages[i].getDisplay(), false);
         }
 
         // source should be the same for all messages
@@ -613,15 +613,15 @@ public final class Canvas extends JDesktopPane {
      * 
      * @param display The Object to display. @return The appropriate ImageIcon.
      */
-    public ImageIcon getImageIcon(Object display) {
+    public ImageIcon getImageIcon(Object display, boolean small) {
         ImageLibrary imageLibrary = (ImageLibrary) getImageProvider();
-        ImageIcon imageIcon = null;
+        Image image = null;
         if (display == null) {
-            return imageIcon;
+            return new ImageIcon();
         } else if (display instanceof Goods) {
             Goods goods = (Goods) display;
             try {
-                imageIcon = imageLibrary.getGoodsImageIcon(goods.getType());
+                image = imageLibrary.getGoodsImage(goods.getType());
             } catch (Exception e) {
                 logger.warning("could not find image for goods " + goods.getName());
             }
@@ -629,7 +629,7 @@ public final class Canvas extends JDesktopPane {
             Unit unit = (Unit) display;
             try {
                 int unitType = imageLibrary.getUnitGraphicsType(unit);
-                imageIcon = imageLibrary.getUnitImageIcon(unitType);
+                image = imageLibrary.getUnitImage(unitType);
             } catch (Exception e) {
                 logger.warning("could not find image for unit " + unit.getName());
             }
@@ -637,18 +637,24 @@ public final class Canvas extends JDesktopPane {
             Settlement settlement = (Settlement) display;
             try {
                 int settlementType = imageLibrary.getSettlementGraphicsType(settlement);
-                imageIcon = new ImageIcon(imageLibrary.getColonyImage(settlementType));
+                image = imageLibrary.getColonyImage(settlementType);
             } catch (Exception e) {
                 logger.warning("could not find image for settlement " + settlement);
             }
         } else if (display instanceof LostCityRumour) {
             try {
-                imageIcon = new ImageIcon(imageLibrary.getMiscImage(ImageLibrary.LOST_CITY_RUMOUR));
+                image = imageLibrary.getMiscImage(ImageLibrary.LOST_CITY_RUMOUR);
             } catch (Exception e) {
                 logger.warning("could not find image for lost city rumour");
             }
         }
-        return imageIcon;
+        if (image != null && small) {
+            return new ImageIcon(image.getScaledInstance((image.getWidth(null) / 3) * 2,
+                                                         (image.getHeight(null) / 3) *2,
+                                                         Image.SCALE_SMOOTH));
+        } else {
+            return new ImageIcon(image);
+        }
     }
 
     /**
@@ -786,7 +792,7 @@ public final class Canvas extends JDesktopPane {
             } catch (MissingResourceException e) {
                 logger.warning("could not find message with id: " + ID + ".");
             }
-            images[i] = getImageIcon(messages[i].getDisplay());
+            images[i] = getImageIcon(messages[i].getDisplay(), false);
         }
 
         FreeColDialog confirmDialog = FreeColDialog.createConfirmDialog(texts, images, okText, cancelText);

@@ -401,7 +401,7 @@ public class FreeColDialog extends FreeColPanel {
             preCombatDialog.add(new JLabel(defenderName),
                                 higConst.rcwh(row, defenseLabelColumn, 3, 1));
             row += 2;
-            preCombatDialog.add(new JLabel(parent.getImageIcon(settlement)),
+            preCombatDialog.add(new JLabel(parent.getImageIcon(settlement, false)),
                                 higConst.rcwh(row, defenseLabelColumn, 3, 1));
             row += 2;
         }

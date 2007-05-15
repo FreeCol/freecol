@@ -23,6 +23,7 @@ import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.Europe;
+import net.sf.freecol.common.model.FreeColGameObject;
 import net.sf.freecol.common.model.Market;
 import net.sf.freecol.common.model.ModelMessage;
 import net.sf.freecol.common.model.Nameable;
@@ -125,13 +126,13 @@ public final class ReportTurnPanel extends ReportPanel implements ActionListener
             if (message.getDisplay() != null) {
                 if (message.getDisplay() instanceof Colony) {
                     final JButton button = new JButton();
-                    button.setIcon(getCanvas().getImageIcon(message.getDisplay()));
-                    button.setActionCommand(((Colony) message.getDisplay()).getName());
+                    button.setIcon(getCanvas().getImageIcon(message.getDisplay(), true));
+                    button.setActionCommand(((Colony) message.getDisplay()).getID());
                     button.addActionListener(this);
                     button.setBorder(BorderFactory.createEmptyBorder());
                     reportPanel.add(button, higConst.rc(row, imageColumn, ""));
                 } else {
-                    label.setIcon(getCanvas().getImageIcon(message.getDisplay()));
+                    label.setIcon(getCanvas().getImageIcon(message.getDisplay(), false));
                     reportPanel.add(label, higConst.rc(row, imageColumn, ""));
                 }
             }
@@ -176,38 +177,33 @@ public final class ReportTurnPanel extends ReportPanel implements ActionListener
             return new JLabel();
         } else if (source instanceof Player) {
             Player player = (Player) source;
-            headline = new JLabel(Messages.message("playerNation", new String[][] { { "%player%", player.getName() },
-                    { "%nation%", player.getNationAsString() } }));
+            headline = new JLabel(Messages.message("playerNation", 
+                                                   new String[][] {
+                                                       { "%player%", player.getName() },
+                                                       { "%nation%", player.getNationAsString() } }));
         } else if (source instanceof Europe) {
             Europe europe = (Europe) source;
             JButton button = new JButton(europe.getName());
-            button.addActionListener(new ActionListener() {
-                public void actionPerformed(ActionEvent event) {
-                    getCanvas().showEuropePanel();
-                }
-            });
+            button.addActionListener(this);
+            button.setActionCommand(europe.getID());
             headline = button;
         } else if (source instanceof Market) {
-            // Europe europe =
-            // getCanvas().getClient().getMyPlayer().getEurope();
             JButton button = new JButton(Messages.message("model.message.marketPrices"));
-            button.addActionListener(new ActionListener() {
-                public void actionPerformed(ActionEvent event) {
-                    getCanvas().showEuropePanel();
-                }
-            });
+            button.addActionListener(this);
+            button.setActionCommand(freeColClient.getMyPlayer().getEurope().getID());
             headline = button;
         } else if (source instanceof Colony) {
             final Colony colony = (Colony) source;
             JButton button = new JButton(colony.getName());
-            button.addActionListener(new ActionListener() {
-                public void actionPerformed(ActionEvent event) {
-                    getCanvas().showColonyPanel(colony);
-                }
-            });
+            button.addActionListener(this);
+            button.setActionCommand(colony.getID());
             headline = button;
         } else if (source instanceof Unit) {
-            headline = new JLabel(((Unit) source).getName());
+            final Unit unit = (Unit) source;
+            JButton button = new JButton(unit.getName());
+            button.addActionListener(this);
+            button.setActionCommand(unit.getTile().getID());
+            headline = button;
         } else if (source instanceof Nameable) {
             headline = new JLabel(((Nameable) source).getName());
         } else {
@@ -247,6 +243,7 @@ public final class ReportTurnPanel extends ReportPanel implements ActionListener
 
     private void insertMessage(ModelMessage message) {
 
+        Player player = freeColClient.getMyPlayer();
         try {
             String input = Messages.message(message.getMessageID());
             int start = input.indexOf('%');
@@ -271,13 +268,15 @@ public final class ReportTurnPanel extends ReportPanel implements ActionListener
                     } else if (var.equals(item[0])) {
                         // found variable to replace
                         if (var.equals("%colony%")) {
-                            insertColonyButton(item[1]);
+                            Colony colony = player.getColony(item[1]);
+                            insertLinkButton(colony, colony.getName());
                         } else if (var.equals("%europe%")) {
-                            insertEuropeButton(item[1]);
+                            insertLinkButton(player.getEurope(), player.getEurope().getName());
                         } else if ((var.equals("%unit%") ||
                                     var.equals("%newName%")) &&
                                    message.getSource() instanceof Unit) {
-                            insertUnitButton(item[1], ((Unit) message.getSource()).getTile());
+                            Unit unit = (Unit) message.getSource();
+                            insertLinkButton(unit.getTile(), unit.getName());
                         } else {
                             insertText(item[1]);
                         }
@@ -309,28 +308,7 @@ public final class ReportTurnPanel extends ReportPanel implements ActionListener
     }
 
 
-    private void insertColonyButton(String colonyName) throws Exception {
-        JButton button = createLinkButton(colonyName);
-        button.setActionCommand(colonyName);
-        StyleConstants.setComponent(document.getStyle("button"), button);
-        document.insertString(document.getLength(), " ", document.getStyle("button"));
-    }
-        
-    private void insertEuropeButton(String europeName) throws Exception {
-        JButton button = createLinkButton(europeName);
-        button.setActionCommand("europe");
-        StyleConstants.setComponent(document.getStyle("button"), button);
-        document.insertString(document.getLength(), " ", document.getStyle("button"));
-    }
-        
-    private void insertUnitButton(String unitName, Tile tile) throws Exception {
-        JButton button = createLinkButton(unitName);
-        button.setActionCommand(tile.getID());
-        StyleConstants.setComponent(document.getStyle("button"), button);
-        document.insertString(document.getLength(), " ", document.getStyle("button"));
-    }
-        
-    private JButton createLinkButton(String name) {
+    private void insertLinkButton(FreeColGameObject object, String name) throws Exception {
         JButton button = new JButton(name);
         button.setMargin(new Insets(0,0,0,0));
         button.setOpaque(false);
@@ -338,8 +316,11 @@ public final class ReportTurnPanel extends ReportPanel implements ActionListener
         button.setAlignmentY(0.8f);
         button.setBorder(BorderFactory.createEmptyBorder());
         button.addActionListener(this);
-        return button;
+        button.setActionCommand(object.getID());
+        StyleConstants.setComponent(document.getStyle("button"), button);
+        document.insertString(document.getLength(), " ", document.getStyle("button"));
     }
+
 
     /**
      * This function analyses an event and calls the right methods to take care
@@ -350,19 +331,18 @@ public final class ReportTurnPanel extends ReportPanel implements ActionListener
     @Override
     public void actionPerformed(ActionEvent event) {
         String command = event.getActionCommand();
-        System.out.println(command);
-        if (command.equals("-1")) {
+        //System.out.println(command);
+        if (command.equals(String.valueOf(OK))) {
             super.actionPerformed(event);
-        } else if (command.equals("europe")) {
-            getCanvas().showEuropePanel();
-        } else if (command.startsWith("tile:")) {
-            // TODO: make this less fragile
-            Tile tile = (Tile) freeColClient.getGame().getFreeColGameObject(command);
-            if (tile != null) {
-                getCanvas().getGUI().setFocus(tile.getPosition());
-            }
         } else {
-            getCanvas().showColonyPanel(freeColClient.getMyPlayer().getColony(command));
+            FreeColGameObject object = freeColClient.getGame().getFreeColGameObject(command);
+            if (object instanceof Europe) {
+                getCanvas().showEuropePanel();
+            } else if (object instanceof Tile) {
+                getCanvas().getGUI().setFocus(((Tile) object).getPosition());
+            } else if (object instanceof Colony) {
+                getCanvas().showColonyPanel((Colony) object);
+            }
         }
     }
 
