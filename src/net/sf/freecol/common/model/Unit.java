@@ -2806,7 +2806,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
                                     "model.unit.arriveInEurope",
                                     new String[][] {
                                         {"%europe%", getOwner().getEurope().getName()}},
-                                    ModelMessage.DEFAULT);
+                                    ModelMessage.DEFAULT, this);
                     if (getType() == GALLEON) {
                         Iterator<Unit> iter = getUnitIterator();
                         Unit u = null;
@@ -3628,8 +3628,18 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
         if (getOwner() != enemyUnit.getOwner()) {
             // this unit hasn't been captured by enemyUnit, show message to
             // enemyUnit's owner
-            addModelMessage(enemyUnit, messageID, new String[][] { { "%oldName%", oldName }, { "%newName%", newName },
-                    { "%nation%", nation } }, type);
+            /*
+              MB: Reports about Indian units being slaughtered while
+              attacking colonies end up here. Why is that?
+             */
+            source = enemyUnit;
+            if (enemyUnit.getColony() != null) {
+                source = enemyUnit.getColony();
+            }
+            addModelMessage(source, messageID, new String[][] {
+                { "%oldName%", oldName },
+                { "%newName%", newName },
+                { "%nation%", nation } }, type, this);
         }
     }
 
