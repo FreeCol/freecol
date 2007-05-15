@@ -38,12 +38,7 @@ public class MessagesTest extends TestCase {
                 .message("model.goods.Food.description"));
 
         // Message not found
-        try {
-            Messages.message("should.not.exist.and.thus.throw.exception");
-            fail();
-        } catch (MissingResourceException e) {
-            // Okay to fail.
-        }
+        assertEquals(null, Messages.message("should.not.exist.and.thus.return.null"));
     }
 
     public void testMessageStringStringArrayArray() {
@@ -64,13 +59,12 @@ public class MessagesTest extends TestCase {
         assertEquals("Gold: %gold%    |    Tax: %tax%%    |    Year: %year%", Messages.message("menuBar.statusLine",
                 new String[][] { new String[] { "%tax%" } }));
 
+        
         // Message not found
-        try {
-            Messages.message("should.not.exist.and.thus.throw.exception", new String[][] {});
-            fail();
-        } catch (MissingResourceException e) {
-            // Okay to fail.
-        }
+        assertEquals(null, Messages.message("should.not.exist.and.thus.return.null", new String[][] {}));
+        
+        assertEquals(null, Messages.message("should.not.exist.and.thus.return.null", 
+                new String[][] { new String[] { "%gold%", "silver" }, new String[] { "%tax%", "13" } }));
     }
 
     public void testChangeLocaleSettings() {

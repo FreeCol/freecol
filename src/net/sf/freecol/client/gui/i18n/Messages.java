@@ -42,9 +42,9 @@ public class Messages {
      * file.
      * 
      * @param messageId the id of the message to find
-     * @return the message with the specified id
+     * @return the message with the specified id or null if not found.
      * 
-     * @throws MissingResourceException if the given message could not be found.
+     * @throws NullPointerException if messageId is null.
      */
     public static String message(String messageId) {
         if (messageId == null) {
@@ -120,13 +120,15 @@ public class Messages {
      * @param messageId The key of the message to find
      * @param data Every occuranse of <code>data[x][0]</code> is replaced with
      *            <code>data[x][1]</code> for every <code>x</code>.
-     * @return The message with the specified id
+     * @return The message with the specified id or null if message could not be found.
+     * 
+     * @throws NullPointerException if messageId is null
      */
     public static String message(String messageId, String[][] data) {
 
         String message = Messages.message(messageId);
 
-        if (data != null) {
+        if (data != null && message != null) {
             for (int i = 0; i < data.length; i++) {
                 if (data[i] == null || data[i].length != 2) {
                     logger.warning("Data has a wrong format for message: " + message);
