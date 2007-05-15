@@ -2791,7 +2791,11 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
 
                 switch (state) {
                 case TO_EUROPE:
-                    addModelMessage(getOwner().getEurope(), "model.unit.arriveInEurope", null, ModelMessage.DEFAULT);
+                    addModelMessage(getOwner().getEurope(),
+                                    "model.unit.arriveInEurope",
+                                    new String[][] {
+                                        {"%europe%", getOwner().getEurope().getName()}},
+                                    ModelMessage.DEFAULT);
                     if (getType() == GALLEON) {
                         Iterator<Unit> iter = getUnitIterator();
                         Unit u = null;

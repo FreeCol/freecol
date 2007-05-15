@@ -663,16 +663,32 @@ public final class InGameInputHandler extends InputHandler {
 
         switch (action) {
         case Monarch.RAISE_TAX:
-            reply = Message.createNewRootElement("acceptTax");
-            String[][] replace = new String[][] { { "%replace%", element.getAttribute("amount") },
-                    { "%goods%", element.getAttribute("goods") }, };
-            if (new ShowMonarchPanelSwingTask(action, replace).confirm()) {
-                int amount = new Integer(element.getAttribute("amount")).intValue();
+            boolean force = Boolean.parseBoolean(element.getAttribute("force"));
+            final int amount = new Integer(element.getAttribute("amount")).intValue();
+            if (force) {
                 freeColClient.getMyPlayer().setTax(amount);
-                reply.setAttribute("accepted", String.valueOf(true));
-                new UpdateMenuBarSwingTask().invokeLater();
+                SwingUtilities.invokeLater(new Runnable() {
+                        public void run() {
+                            freeColClient.getCanvas().showModelMessage(
+                                    new ModelMessage(null, "model.monarch.forceTaxRaise",
+                                                     new String[][] {
+                                                         {"%replace%", String.valueOf(amount) }},
+                                                     ModelMessage.WARNING));
+                        }
+                    });
+                reply = null;
             } else {
-                reply.setAttribute("accepted", String.valueOf(false));
+                reply = Message.createNewRootElement("acceptTax");
+                String[][] replace = new String[][] {
+                    { "%replace%", element.getAttribute("amount") },
+                    { "%goods%", element.getAttribute("goods") }, };
+                if (new ShowMonarchPanelSwingTask(action, replace).confirm()) {
+                    freeColClient.getMyPlayer().setTax(amount);
+                    reply.setAttribute("accepted", String.valueOf(true));
+                    new UpdateMenuBarSwingTask().invokeLater();
+                } else {
+                    reply.setAttribute("accepted", String.valueOf(false));
+                }
             }
             return reply;
         case Monarch.ADD_TO_REF:

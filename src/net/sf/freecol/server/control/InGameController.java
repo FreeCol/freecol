@@ -396,6 +396,7 @@ public final class InGameController extends Controller {
                         }
                         monarchActionElement.setAttribute("amount", String.valueOf(newTax));
                         monarchActionElement.setAttribute("goods", goods.getName());
+                        monarchActionElement.setAttribute("force", String.valueOf(false));
                         try {
                             Element reply = nextPlayer.getConnection().ask(monarchActionElement);
                             boolean accepted = Boolean.valueOf(reply.getAttribute("accepted")).booleanValue();
@@ -414,6 +415,8 @@ public final class InGameController extends Controller {
                                     nextPlayer.getConnection().send(removeGoodsElement);
                                 } else {
                                     // player has cheated and removed goods from colony
+                                    monarchActionElement.setAttribute("force", String.valueOf(true));
+                                    nextPlayer.getConnection().send(monarchActionElement);
                                     nextPlayer.setTax(newTax);
                                 }
                             }

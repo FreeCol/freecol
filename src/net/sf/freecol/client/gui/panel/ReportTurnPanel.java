@@ -272,10 +272,12 @@ public final class ReportTurnPanel extends ReportPanel implements ActionListener
                         // found variable to replace
                         if (var.equals("%colony%")) {
                             insertColonyButton(item[1]);
+                        } else if (var.equals("%europe%")) {
+                            insertEuropeButton(item[1]);
                         } else if ((var.equals("%unit%") ||
                                     var.equals("%newName%")) &&
                                    message.getSource() instanceof Unit) {
-                            insertUnitButton(item[1], (Unit) message.getSource());
+                            insertUnitButton(item[1], ((Unit) message.getSource()).getTile());
                         } else {
                             insertText(item[1]);
                         }
@@ -314,9 +316,16 @@ public final class ReportTurnPanel extends ReportPanel implements ActionListener
         document.insertString(document.getLength(), " ", document.getStyle("button"));
     }
         
-    private void insertUnitButton(String unitName, Unit unit) throws Exception {
+    private void insertEuropeButton(String europeName) throws Exception {
+        JButton button = createLinkButton(europeName);
+        button.setActionCommand("europe");
+        StyleConstants.setComponent(document.getStyle("button"), button);
+        document.insertString(document.getLength(), " ", document.getStyle("button"));
+    }
+        
+    private void insertUnitButton(String unitName, Tile tile) throws Exception {
         JButton button = createLinkButton(unitName);
-        button.setActionCommand(unit.getID());
+        button.setActionCommand(tile.getID());
         StyleConstants.setComponent(document.getStyle("button"), button);
         document.insertString(document.getLength(), " ", document.getStyle("button"));
     }
@@ -341,11 +350,14 @@ public final class ReportTurnPanel extends ReportPanel implements ActionListener
     @Override
     public void actionPerformed(ActionEvent event) {
         String command = event.getActionCommand();
+        System.out.println(command);
         if (command.equals("-1")) {
             super.actionPerformed(event);
-        } else if (command.startsWith("unit:")) {
-            Unit unit = (Unit) freeColClient.getGame().getFreeColGameObject(command);
-            Tile tile = unit.getTile();
+        } else if (command.equals("europe")) {
+            getCanvas().showEuropePanel();
+        } else if (command.startsWith("tile:")) {
+            // TODO: make this less fragile
+            Tile tile = (Tile) freeColClient.getGame().getFreeColGameObject(command);
             if (tile != null) {
                 getCanvas().getGUI().setFocus(tile.getPosition());
             }
