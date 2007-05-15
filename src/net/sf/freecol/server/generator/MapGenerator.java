@@ -414,6 +414,7 @@ public class MapGenerator {
             }
 
             Tile startTile = map.getTile(x,y);
+            startTile.setExploredBy(player, true);
             player.setEntryLocation(startTile);
 
             int navalUnitType = (player.getNation() == ServerPlayer.DUTCH) ? Unit.MERCHANTMAN : Unit.CARAVEL;
