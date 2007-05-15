@@ -1,7 +1,6 @@
 package net.sf.freecol.client.gui.i18n;
 
 import java.util.Locale;
-import java.util.MissingResourceException;
 
 import junit.framework.TestCase;
 
