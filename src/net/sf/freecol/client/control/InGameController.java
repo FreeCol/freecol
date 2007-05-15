@@ -3000,8 +3000,10 @@ public final class InGameController implements NetworkConstants {
             public void run() {
                 if (messageList.size() > 1) {
                     freeColClient.getCanvas().showTurnReport(messageList);
+                    /*
                 } else if (messageList.size() == 1) {
                     freeColClient.getCanvas().showModelMessage(messageList.get(0));
+                    */
                 }
                 freeColClient.getActionManager().update();
             }

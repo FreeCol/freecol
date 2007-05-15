@@ -216,7 +216,7 @@ public final class ReportTurnPanel extends ReportPanel implements ActionListener
         headline.setFont(smallHeaderFont);
         headline.setOpaque(false);
         headline.setForeground(LINK_COLOR);
-        headline.setBorder(BorderFactory.createEmptyBorder());
+        headline.setBorder(BorderFactory.createEmptyBorder(5, 0, 0, 0));
         return headline;
     }
 
@@ -279,7 +279,7 @@ public final class ReportTurnPanel extends ReportPanel implements ActionListener
                                     var.equals("%newName%")) &&
                                    message.getSource() instanceof Unit) {
                             Unit unit = (Unit) message.getSource();
-                            insertLinkButton(unit.getTile(), unit.getName());
+                            insertLinkButton(unit.getTile(), item[1]);
                         } else {
                             insertText(item[1]);
                         }
