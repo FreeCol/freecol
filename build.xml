@@ -22,6 +22,7 @@
     <property name="freecol.jar.file" value="${basedir}/FreeCol.jar"/>
     <property name="freecol.metaserver.jar.file" value="${basedir}/FreeCol-metaserver.jar"/>
     <property name="freecol.overview.file" value="${freecol.src.dir}/overview.html"/>
+	<property name="test" value="AllTests"/>
 
     <path id="test.class.path">
         <fileset dir="test/lib" includes="*.jar" />
@@ -477,12 +478,13 @@
 	            <pathelement location="${basedir}/jars/jsr173_1.0_api.jar" />
 	            <pathelement location="${basedir}/jars/wstx-lgpl-4.0pr1.jar"/>
 	        </classpath>
-	        <formatter type="plain" />
-	        <test if="${test}" todir="${freecol.build.dir}" name="net.sf.freecol.${test}" />
-	        <test unless="${test}" todir="${freecol.build.dir}" name="net.sf.freecol.AllTests" />
+	       	<formatter type="brief" usefile="false" />
+        	<formatter type="plain" /> 
+        	<test todir="${freecol.build.dir}" name="net.sf.freecol.${test}" />
         </junit>
+    	<echo message="For more detailed information about this test run see:"/>
+    	<echo message="${freecol.build.dir}/TEST-net.sf.freecol.${test}.txt"/>
     </target>
-
 
     <target name="testall" depends="build-unit-tests" unless="skip.dist.test"
             description="Runs all unit tests"
