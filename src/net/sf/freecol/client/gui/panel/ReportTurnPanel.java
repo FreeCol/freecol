@@ -250,8 +250,12 @@ public final class ReportTurnPanel extends ReportPanel implements ActionListener
         try {
             String input = Messages.message(message.getMessageID());
             int start = input.indexOf('%');
-            // output any string before the first occurence of '%'
-            if (start > 0) {
+            if (start == -1) {
+                // no variables present
+                insertText(input.substring(0));
+                return;
+            } else if (start > 0) {
+                // output any string before the first occurence of '%'
                 insertText(input.substring(0, start));
             }
             int end;
@@ -287,7 +291,7 @@ public final class ReportTurnPanel extends ReportPanel implements ActionListener
             }
 
             // output any string after the last occurence of '%'
-            if (start < input.length() - 1) {
+            if (start < input.length()) {
                 insertText(input.substring(start));
             }
         } catch(Exception e) {

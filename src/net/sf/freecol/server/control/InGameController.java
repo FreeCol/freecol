@@ -402,14 +402,20 @@ public final class InGameController extends Controller {
                             if (accepted) {
                                 nextPlayer.setTax(newTax);
                             } else {
-                                Element removeGoodsElement = Message.createNewRootElement("removeGoods");
-                                if (goods != null) {
-                                    ((Colony) goods.getLocation()).removeGoods(goods);
-                                    nextPlayer.setArrears(goods);
-                                    removeGoodsElement.appendChild(goods.toXMLElement(nextPlayer, removeGoodsElement
-                                            .getOwnerDocument()));
+                                Colony colony = (Colony) goods.getLocation();
+                                if (colony.getGoodsCount(goods.getType()) >= goods.getAmount()) {
+                                    Element removeGoodsElement = Message.createNewRootElement("removeGoods");
+                                    if (goods != null) {
+                                        ((Colony) goods.getLocation()).removeGoods(goods);
+                                        nextPlayer.setArrears(goods);
+                                        removeGoodsElement.appendChild(goods.toXMLElement(nextPlayer, removeGoodsElement
+                                                                                          .getOwnerDocument()));
+                                    }
+                                    nextPlayer.getConnection().send(removeGoodsElement);
+                                } else {
+                                    // player has cheated and removed goods from colony
+                                    nextPlayer.setTax(newTax);
                                 }
-                                nextPlayer.getConnection().send(removeGoodsElement);
                             }
                         } catch (IOException e) {
                             logger.warning("Could not send message to: " + nextPlayer.getName());
