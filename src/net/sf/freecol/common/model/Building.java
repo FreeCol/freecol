@@ -56,7 +56,7 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
             PRINTING_PRESS = 14, CUSTOM_HOUSE = 15;
 
     /** The maximum number of building types. */
-    public static final int NUMBER_OF_TYPES = FreeCol.specification.numberOfBuildingTypes();
+    public static final int NUMBER_OF_TYPES = FreeCol.getSpecification().numberOfBuildingTypes();
 
     /** The level of a building. */
     public static final int NOT_BUILT = 0, HOUSE = 1, SHOP = 2, FACTORY = 3;
@@ -109,7 +109,7 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
         this.type = type;
         this.level = level;
 
-        buildingType = FreeCol.specification.buildingType(type);
+        buildingType = FreeCol.getSpecification().buildingType(type);
     }
 
     /**
@@ -124,7 +124,7 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
 
         readFromXML(in);
 
-        buildingType = FreeCol.specification.buildingType(type);
+        buildingType = FreeCol.getSpecification().buildingType(type);
     }
 
     /**
@@ -138,7 +138,7 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
 
         readFromXMLElement(e);
 
-        buildingType = FreeCol.specification.buildingType(type);
+        buildingType = FreeCol.getSpecification().buildingType(type);
     }
 
     /**

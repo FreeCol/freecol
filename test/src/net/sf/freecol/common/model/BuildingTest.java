@@ -12,7 +12,6 @@ public class BuildingTest extends FreeColTestCase {
 
     public static final String REVISION = "$Revision$";
 
-
     public void testCanBuildNext() {
 
         Colony colony = getStandardColony();

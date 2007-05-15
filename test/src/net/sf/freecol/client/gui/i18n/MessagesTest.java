@@ -2,9 +2,9 @@ package net.sf.freecol.client.gui.i18n;
 
 import java.util.Locale;
 
-import junit.framework.TestCase;
+import net.sf.freecol.util.test.FreeColTestCase;
 
-public class MessagesTest extends TestCase {
+public class MessagesTest extends FreeColTestCase {
 
     public static final String COPYRIGHT = "Copyright (C) 2003-2007 The FreeCol Team";
 
@@ -12,14 +12,6 @@ public class MessagesTest extends TestCase {
 
     public static final String REVISION = "$Revision$";
 
-
-    public void setUp() {
-        // Make sure that English is the default locale
-        if (!Locale.getDefault().equals(Locale.US)) {
-            Messages.setMessageBundle(Locale.US);
-        }
-    }
-    
     public void tearDown(){
         Messages.setMessageBundle(Locale.US);
     }

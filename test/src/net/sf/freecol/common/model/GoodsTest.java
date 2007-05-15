@@ -13,15 +13,6 @@ public class GoodsTest extends FreeColTestCase {
 
     public static final String REVISION = "$Revision$";
 
-    public static boolean updateLocale = true;
-
-    public void setUp() {
-        if (updateLocale) {
-            updateLocale = false;
-            Messages.setMessageBundle(Locale.US);
-        }
-    }
-
     public void testGoodsGameLocationIntInt() {
 
         Map map = getTestMap(Tile.PLAINS);

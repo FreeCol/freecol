@@ -41,21 +41,25 @@ import net.sf.freecol.server.FreeColServer;
 * @see net.sf.freecol.server.FreeColServer FreeColServer
 */
 public final class FreeCol {
-    private static final Logger logger = Logger.getLogger(FreeCol.class.getName());
     
     public static final String  COPYRIGHT = "Copyright (C) 2003-2005 The FreeCol Team";
     public static final String  LICENSE = "http://www.gnu.org/licenses/gpl.html";
     public static final String  REVISION = "$Revision$";
 
-    public static Specification specification;
-
-    private  static final String FREECOL_VERSION = "0.6.2-cvs";
-
     public static final String  META_SERVER_ADDRESS = "meta.freecol.org";
     public static final int     META_SERVER_PORT = 3540;
 
+    private static final Logger logger = Logger.getLogger(FreeCol.class.getName());
+    
+    /**
+     * Initialized on first access. @See #getSpecification
+     */
+    private static Specification specification;
+
+    private static final String FREECOL_VERSION = "0.6.2-cvs";
+    
     private static final String MIN_JDK_VERSION = "1.5";
-    private static final String  FILE_SEP = System.getProperty("file.separator");
+    private static final String FILE_SEP = System.getProperty("file.separator");
 
     private static boolean  windowed = false,
                             sound = true,
@@ -80,8 +84,9 @@ public final class FreeCol {
 
     private static Level logLevel = Level.INFO;
 
-    private FreeCol() {}
-
+    private FreeCol() {
+        // Hide constructor
+    }
 
     /**
      * The entrypoint.
@@ -94,8 +99,6 @@ public final class FreeCol {
         Locale.setDefault(getLocale());
         handleArgs(args);
         
-        specification = new Specification();
-
         if (javaCheck && !checkJavaVersion()) {
             System.err.println("Java version " + MIN_JDK_VERSION +
                             " or better is recommended in order to run FreeCol." +
@@ -276,6 +279,18 @@ public final class FreeCol {
      */
     public static File getClientOptionsFile() {
         return clientOptionsFile;
+    }
+    
+    /**
+     * Returns the specification object for Freecol. 
+     * 
+     * @return the specification to be used by all other classes.
+     */
+    public static Specification getSpecification() {
+        if (specification == null){
+            specification = new Specification();
+        }
+        return specification;
     }
 
     /**

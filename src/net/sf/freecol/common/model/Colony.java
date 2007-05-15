@@ -142,9 +142,9 @@ public final class Colony extends Settlement implements Location, Nameable {
             }
         }
         addWorkLocation(new ColonyTile(game, this, tile));
-        int numberOfTypes = FreeCol.specification.numberOfBuildingTypes();
+        int numberOfTypes = FreeCol.getSpecification().numberOfBuildingTypes();
         for (int type = 0; type < numberOfTypes; type++) {
-            BuildingType buildingType = FreeCol.specification.buildingType(type);
+            BuildingType buildingType = FreeCol.getSpecification().buildingType(type);
             if (buildingType.level(0).hammersRequired > 0) {
                 addWorkLocation(new Building(game, this, type, Building.NOT_BUILT));
             } else {

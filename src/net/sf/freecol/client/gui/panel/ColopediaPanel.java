@@ -288,9 +288,9 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
      */
     private void buildSkillsList() {
         listPanel.setLayout(new GridLayout(0, 1));
-        int numberOfTypes = FreeCol.specification.numberOfUnitTypes();
+        int numberOfTypes = FreeCol.getSpecification().numberOfUnitTypes();
         for (int type = 0; type < numberOfTypes; type++) {
-            UnitType unitType = FreeCol.specification.unitType(type);
+            UnitType unitType = FreeCol.getSpecification().unitType(type);
             if (unitType.skill > 0) {
                 buildUnitButton(type, 0.5f);
             }
@@ -302,9 +302,9 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
      */
     private void buildBuildingList() {
         listPanel.setLayout(new GridLayout(0, 1));
-        int numberOfTypes = FreeCol.specification.numberOfBuildingTypes();
+        int numberOfTypes = FreeCol.getSpecification().numberOfBuildingTypes();
         for (int type = 0; type < numberOfTypes; type++) {
-            BuildingType buildingType = FreeCol.specification.buildingType(type);
+            BuildingType buildingType = FreeCol.getSpecification().buildingType(type);
             for (int level = 0; level < buildingType.numberOfLevels(); level++) {
                 BuildingType.Level buildingLevel = buildingType.level(level);
                 JButton button = new JButton(Messages.message(buildingLevel.name));
@@ -459,8 +459,8 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
             defenseBonus = "200%";
             break;
         default:
-            TileType tileType = (forested ? FreeCol.specification.tileType(type).whenForested :
-                                 FreeCol.specification.tileType(type));
+            TileType tileType = (forested ? FreeCol.getSpecification().tileType(type).whenForested :
+                                 FreeCol.getSpecification().tileType(type));
             id = tileType.id;
             name = Messages.message(tileType.name);
             defenseBonus = String.valueOf(tileType.defenceBonus) + "%";
@@ -524,7 +524,7 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
         detailPanel.removeAll();
         detailPanel.repaint();
 
-        UnitType type = FreeCol.specification.unitType(unit);
+        UnitType type = FreeCol.getSpecification().unitType(unit);
         String price = "";
         if (type.id.equals("model.unit.artillery")) {
             price = String.valueOf(parent.getClient().getMyPlayer().getEurope().getArtilleryPrice());
@@ -619,7 +619,7 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
         detailPanel.removeAll();
         detailPanel.repaint();
 
-        GoodsType type = FreeCol.specification.goodsType(goods);
+        GoodsType type = FreeCol.getSpecification().goodsType(goods);
 
         String isFarmed = Messages.message(type.isFarmed ? "yes" : "no");
         int numberOfLines = type.isFarmed ? 8 : 6;
@@ -715,7 +715,7 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
         int building = action >> 2;
         int level = (action & 0x03);
 
-        BuildingType buildingType = FreeCol.specification.buildingType(building);
+        BuildingType buildingType = FreeCol.getSpecification().buildingType(building);
         BuildingType.Level buildingLevel = buildingType.level(level);
 
         /**

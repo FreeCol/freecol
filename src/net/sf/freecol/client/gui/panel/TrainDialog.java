@@ -68,9 +68,9 @@ public final class TrainDialog extends FreeColDialog implements ActionListener {
 
         ImageLibrary library = (ImageLibrary) parent.getImageProvider();
 
-        int numberOfTypes = FreeCol.specification.numberOfUnitTypes();
+        int numberOfTypes = FreeCol.getSpecification().numberOfUnitTypes();
         for (int type = 0; type < numberOfTypes; type++) {
-            UnitType unitType = FreeCol.specification.unitType(type);
+            UnitType unitType = FreeCol.getSpecification().unitType(type);
             if (unitType.price > 0 && unitType.skill > 0) {
                 trainableUnits.add(new NumberedUnitType(unitType, type));
             }

@@ -1,9 +1,11 @@
 package net.sf.freecol.util.test;
 
+import java.util.Locale;
 import java.util.Vector;
 
 import junit.framework.TestCase;
 import net.sf.freecol.FreeCol;
+import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.FreeColException;
 import net.sf.freecol.common.Specification;
 import net.sf.freecol.common.model.Colony;
@@ -30,10 +32,12 @@ public class FreeColTestCase extends TestCase {
      */
     static Game game;
 
+    static boolean updateLocale = true;
+    
     public void setUp() {
-
-        if (null == FreeCol.specification) {
-            FreeCol.specification = new Specification();
+        if (updateLocale) {
+            updateLocale = false;
+            Messages.setMessageBundle(Locale.US);
         }
     }
 

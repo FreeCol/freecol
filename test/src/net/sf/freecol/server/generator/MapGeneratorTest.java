@@ -3,7 +3,6 @@ package net.sf.freecol.server.generator;
 import java.util.Iterator;
 import java.util.Vector;
 
-import junit.framework.TestCase;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.IndianSettlement;
 import net.sf.freecol.common.model.Map;
@@ -12,9 +11,10 @@ import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Map.Position;
 import net.sf.freecol.common.option.SelectOption;
+import net.sf.freecol.util.test.FreeColTestCase;
 import net.sf.freecol.util.test.MockModelController;
 
-public class MapGeneratorTest extends TestCase {
+public class MapGeneratorTest extends FreeColTestCase {
 
 	public void testWithNoIndians() {
         

@@ -233,9 +233,9 @@ public final class Tile extends FreeColGameObject implements Location, Nameable 
             return Messages.message("mountains");
         } else if (addition == ADD_HILLS) {
             return Messages.message("hills");
-        } else if (0 < tileType && tileType < FreeCol.specification.numberOfTileTypes()) {
+        } else if (0 < tileType && tileType < FreeCol.getSpecification().numberOfTileTypes()) {
 
-            TileType t = FreeCol.specification.tileType(tileType);
+            TileType t = FreeCol.getSpecification().tileType(tileType);
             return forested ? Messages.message(t.whenForested.name) : Messages.message(t.name);
         }
         return Messages.message("unexplored");
@@ -465,7 +465,7 @@ public final class Tile extends FreeColGameObject implements Location, Nameable 
             return 6;
         }
 
-        TileType t = FreeCol.specification.tileType(type);
+        TileType t = FreeCol.getSpecification().tileType(type);
         return forested ? t.whenForested.basicMoveCost : t.basicMoveCost;
     }
 
@@ -1323,7 +1323,7 @@ public final class Tile extends FreeColGameObject implements Location, Nameable 
     public static int getTileTypePotential(int tileType, int goods, int additionType, int fishBonus, 
                                            boolean bonus, boolean forested, boolean plowed, boolean road) {
 
-        GoodsType goodsType = FreeCol.specification.goodsType(goods);
+        GoodsType goodsType = FreeCol.getSpecification().goodsType(goods);
 
         if (!goodsType.isFarmed()) {
             return 0;
@@ -1433,7 +1433,7 @@ public final class Tile extends FreeColGameObject implements Location, Nameable 
             return 150;
         }
 
-        TileType t = FreeCol.specification.tileType(type);
+        TileType t = FreeCol.getSpecification().tileType(type);
         return forested ? t.whenForested.defenceBonus : t.defenceBonus;
     }
 

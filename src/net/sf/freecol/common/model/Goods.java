@@ -212,7 +212,7 @@ public class Goods implements Locatable, Ownable, Nameable {
     *         of goods does not have a raw material.
     */
     public static int getRawMaterial(int goodsType) {
-        GoodsType  good = FreeCol.specification.goodsType( goodsType );
+        GoodsType  good = FreeCol.getSpecification().goodsType( goodsType );
         return good.isRefined() ? good.madeFrom.index : -1;        
     }
 
@@ -226,7 +226,7 @@ public class Goods implements Locatable, Ownable, Nameable {
     *         of goods does not have a manufactured goods.
     */
     public static int getManufactoredGoods(int rawMaterialGoodsType) {
-        GoodsType  good = FreeCol.specification.goodsType( rawMaterialGoodsType );
+        GoodsType  good = FreeCol.getSpecification().goodsType( rawMaterialGoodsType );
         return good.isRawMaterial() ? good.makes.index : -1;
     }
 
@@ -238,7 +238,7 @@ public class Goods implements Locatable, Ownable, Nameable {
     */
     public static boolean isFarmedGoods(int goodsType) {
 
-        return FreeCol.specification.goodsType(goodsType).isFarmed;
+        return FreeCol.getSpecification().goodsType(goodsType).isFarmed;
     }
 
 
@@ -251,8 +251,8 @@ public class Goods implements Locatable, Ownable, Nameable {
      */
     public static String getName(int type) {
 
-        if ( 0 <= type  &&  type < FreeCol.specification.numberOfGoodsTypes() ) {
-            return Messages.message(FreeCol.specification.goodsType(type).name);
+        if ( 0 <= type  &&  type < FreeCol.getSpecification().numberOfGoodsTypes() ) {
+            return Messages.message(FreeCol.getSpecification().goodsType(type).name);
         }
         return Messages.message("model.goods.Unknown");
     }

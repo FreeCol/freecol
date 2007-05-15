@@ -206,7 +206,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
 
         this.owner = owner;
         this.type = type;
-        unitType = FreeCol.specification.unitType(type);
+        unitType = FreeCol.getSpecification().unitType(type);
         naval = unitType.hasAbility("naval");
         this.armed = armed;
         this.mounted = mounted;
@@ -542,7 +542,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
      */
     public static int getSkillLevel(int unitTypeIndex) {
 
-        UnitType unitType = FreeCol.specification.unitType(unitTypeIndex);
+        UnitType unitType = FreeCol.getSpecification().unitType(unitTypeIndex);
 
         if (unitType.hasSkill()) {
             return unitType.skill;
@@ -2004,7 +2004,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
      */
     public static boolean isCarrier(int type) {
 
-        UnitType unitType = FreeCol.specification.unitType(type);
+        UnitType unitType = FreeCol.getSpecification().unitType(type);
 
         return unitType.hasAbility("naval") || unitType.hasAbility("carry-goods");
     }
@@ -2062,7 +2062,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
      */
     public void setType(int type) {
         this.type = type;
-        unitType = FreeCol.specification.unitType(type);
+        unitType = FreeCol.getSpecification().unitType(type);
         naval = unitType.hasAbility("naval");
     }
 
@@ -2182,7 +2182,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
      */
     public static String getName(int someType) {
 
-        return Messages.message(FreeCol.specification.unitType(someType).name);
+        return Messages.message(FreeCol.getSpecification().unitType(someType).name);
     }
 
     /**
@@ -2979,7 +2979,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
      */
     public static boolean isRecruitable(int type) {
 
-        return FreeCol.specification.unitType(type).hasAbility("recruitable");
+        return FreeCol.getSpecification().unitType(type).hasAbility("recruitable");
     }
 
     /**
@@ -3011,7 +3011,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
             throw new IllegalStateException();
         }
 
-        UnitType unitType = FreeCol.specification.unitType(type);
+        UnitType unitType = FreeCol.getSpecification().unitType(type);
 
         if (unitType.hasPrice()) {
 
@@ -4179,7 +4179,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
 
     public static int getNextHammers(int type) {
 
-        UnitType unitType = FreeCol.specification.unitType(type);
+        UnitType unitType = FreeCol.getSpecification().unitType(type);
 
         if (unitType.canBeBuilt()) {
 
@@ -4191,7 +4191,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
 
     public static int getNextTools(int type) {
 
-        UnitType unitType = FreeCol.specification.unitType(type);
+        UnitType unitType = FreeCol.getSpecification().unitType(type);
 
         if (unitType.canBeBuilt()) {
 
@@ -4356,7 +4356,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
 
         setName(in.getAttributeValue(null, "name"));
         type = Integer.parseInt(in.getAttributeValue(null, "type"));
-        unitType = FreeCol.specification.unitType(type);
+        unitType = FreeCol.getSpecification().unitType(type);
         naval = unitType.hasAbility("naval");
         armed = Boolean.valueOf(in.getAttributeValue(null, "armed")).booleanValue();
         mounted = Boolean.valueOf(in.getAttributeValue(null, "mounted")).booleanValue();
