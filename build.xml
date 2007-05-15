@@ -402,9 +402,14 @@
         <delete quiet="true" includeEmptyDirs="true">
             <fileset dir="${freecol.build.dir}" includes="net/**" />
             <fileset dir="${freecol.build.dir}" includes="timestamp.inf" />
+        	<fileset dir="${freecol.build.dir}" includes="report/**" />
+        	<fileset dir="${freecol.build.dir}" includes="TEST-net.sf.freecol.*" />
+            <fileset dir="${freecol.build.dir}" includes="dependencies.txt" />
         </delete>
-        <delete quiet="true" file="${freecol.jar.file}"/>
+    	<delete quiet="true" file="${freecol.jar.file}"/>
+    	<delete quiet="true" file="TESTS-TestSuites.xml"/>
         <delete quiet="true" dir="${freecol.javadoc.dir}"/>
+    	<delete quiet="true" file="Freecol.log"/>
     </target>
 
     <target name="distclean" depends="init,clean" description="Cleans the directories and removes the distribution directory.">
@@ -444,9 +449,9 @@
 
 
     <!-- example:
-        ant -lib test/lib/junit.jar -Dtest=common.model.Building test
+        ant -lib test/lib/junit.jar -Dtest=common.model.BuildingTest test
         -->
-    <target name="test" depends="build, build-unit-tests"
+    <target name="test" depends="build-unit-tests"
             description="Runs a particular unit test"
     >
         <echo message="if the next task fails then please read the build script" />
@@ -465,15 +470,16 @@
             export CLASSPATH=${CLASSPATH}:test/lib/junit.jar; ant testall
             -->
         <junit printsummary="yes">
-        <classpath>
-            <pathelement location="${freecol.build.dir}" />
-            <pathelement location="test/lib/junit.jar" />
-            <pathelement location="${basedir}/jars/higlayout.jar" />
-            <pathelement location="${basedir}/jars/jsr173_1.0_api.jar" />
-            <pathelement location="${basedir}/jars/wstx-lgpl-4.0pr1.jar"/>
-        </classpath>
-        <formatter type="plain" />
-        <test todir="${freecol.build.dir}" name="net.sf.freecol.${test}Test" />
+	        <classpath>
+	            <pathelement location="${freecol.build.dir}" />
+	            <pathelement location="test/lib/junit.jar" />
+	            <pathelement location="${basedir}/jars/higlayout.jar" />
+	            <pathelement location="${basedir}/jars/jsr173_1.0_api.jar" />
+	            <pathelement location="${basedir}/jars/wstx-lgpl-4.0pr1.jar"/>
+	        </classpath>
+	        <formatter type="plain" />
+	        <test if="${test}" todir="${freecol.build.dir}" name="net.sf.freecol.${test}" />
+	        <test unless="${test}" todir="${freecol.build.dir}" name="net.sf.freecol.AllTests" />
         </junit>
     </target>
 
@@ -505,7 +511,7 @@
                 <pathelement location="${basedir}/jars/wstx-lgpl-4.0pr1.jar"/>
             </classpath>
             <formatter type="xml" />
-            <batchtest fork="yes" todir="${freecol.build.dir}">
+            <batchtest fork="false" todir="${freecol.build.dir}">
                 <fileset dir="test/src" includes="**/*Test.java" />
             </batchtest>
         </junit>
