@@ -837,7 +837,7 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
 
         JLabel name = new JLabel(Messages.message(FoundingFather.getName(foundingFather)), SwingConstants.CENTER);
         name.setFont(smallHeaderFont);
-        name.setPreferredSize(new Dimension(detailPanel.getWidth(), 50));
+        name.setPreferredSize(new Dimension(400, 50));
         detailPanel.add(name);
 
         Image image = null;
