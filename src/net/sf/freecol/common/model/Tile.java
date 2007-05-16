@@ -894,6 +894,11 @@ public final class Tile extends FreeColGameObject implements Location, Nameable 
             type = PLAINS;
         }
         
+        if (type == ARCTIC && forested) {
+            logger.warning("Ignoring forest on ARCTIC.");
+            forested = false;
+        }
+        
         updatePlayerExploredTiles();
     }
 

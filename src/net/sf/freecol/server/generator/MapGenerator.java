@@ -1,5 +1,9 @@
 package net.sf.freecol.server.generator;
 
+import java.io.File;
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Iterator;
@@ -7,9 +11,15 @@ import java.util.Random;
 import java.util.Vector;
 import java.util.logging.Logger;
 
+import javax.xml.stream.XMLStreamConstants;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamReader;
+
+import net.sf.freecol.common.FreeColException;
 import net.sf.freecol.common.model.Building;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.ColonyTile;
+import net.sf.freecol.common.model.FreeColGameObject;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.IndianSettlement;
@@ -18,6 +28,8 @@ import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.Map.Position;
+import net.sf.freecol.common.networking.Message;
+import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.model.ServerPlayer;
 
 
@@ -73,14 +85,92 @@ public class MapGenerator {
         final int width = getMapGeneratorOptions().getWidth();
         final int height = getMapGeneratorOptions().getHeight();
         
-        boolean[][] landMap = landGenerator.createLandMap();
-        terrainGenerator.createMap(game, landMap);
-
-        Map map = game.getMap();
+        // Prepare imports:
+        final File importFile = getMapGeneratorOptions().getFile(MapGeneratorOptions.IMPORT_FILE);
+        final Game importGame;
+        if (importFile != null) {                 
+            importGame = loadSaveGame(importFile);
+        } else {
+            importGame = null;
+        }
         
+        // Create land map:
+        boolean[][] landMap;
+        if (importGame != null
+                && getMapGeneratorOptions().getBoolean(MapGeneratorOptions.IMPORT_LAND_MAP)) {
+            landMap = landGenerator.importLandMap(importGame);
+        } else {
+            landMap = landGenerator.createLandMap();
+        }
+        
+        // Create terrain:
+        terrainGenerator.createMap(game, importGame, landMap);
+
+        Map map = game.getMap();        
         createIndianSettlements(map, game.getPlayers());
-        createEuropeanUnits(map, width, height, game.getPlayers());
-        createLostCityRumours(map);        
+        createEuropeanUnits(map, game.getPlayers());
+        createLostCityRumours(map, importGame);        
+    }
+    
+    /**
+     * Loads a <code>Game</code> from the given <code>File</code>.
+     * 
+     * @param importFile The <code>File</code> to be loading the
+     *      <code>Game</code> from.
+     * @return The <code>Game</code>.
+     */
+    private Game loadSaveGame(File importFile) {        
+        /* 
+         * TODO-LATER: We are using same method in FreeColServer.
+         *       Create a framework for loading games/maps.
+         */
+        
+        try {
+            Game game = null;
+            XMLStreamReader xsr = FreeColServer.createXMLStreamReader(importFile);
+            xsr.nextTag();
+            final String version = xsr.getAttributeValue(null, "version");
+            if (!Message.getFreeColProtocolVersion().equals(version)) {
+                throw new FreeColException("incompatibleVersions");
+            }
+            ArrayList<Object> serverObjects = null;
+            while (xsr.nextTag() != XMLStreamConstants.END_ELEMENT) {
+                if (xsr.getLocalName().equals("serverObjects")) {
+                    // Reads the ServerAdditionObjects:
+                    serverObjects = new ArrayList<Object>();
+                    while (xsr.nextTag() != XMLStreamConstants.END_ELEMENT) {
+                        if (xsr.getLocalName().equals(ServerPlayer.getServerAdditionXMLElementTagName())) {
+                            serverObjects.add(new ServerPlayer(xsr));
+                        } else {
+                            throw new XMLStreamException("Unknown tag: " + xsr.getLocalName());
+                        }
+                    }
+                } else if (xsr.getLocalName().equals(Game.getXMLElementTagName())) {
+                    // Read the game model:
+                    game = new Game(null, null, xsr, serverObjects
+                            .toArray(new FreeColGameObject[0]));
+                    game.setCurrentPlayer(null);
+                    game.checkIntegrity();
+                }
+            }
+            xsr.close();
+            return game ;
+        } catch (XMLStreamException e) {
+            StringWriter sw = new StringWriter();
+            e.printStackTrace(new PrintWriter(sw));
+            logger.warning(sw.toString());
+            return null;
+        } catch (FreeColException fe) {
+            StringWriter sw = new StringWriter();
+            fe.printStackTrace(new PrintWriter(sw));
+            logger.warning(sw.toString());
+            return null;
+        } catch (Exception e) {
+            StringWriter sw = new StringWriter();
+            e.printStackTrace(new PrintWriter(sw));
+            logger.warning(sw.toString());
+            return null;
+        }
     }
 
     public LandGenerator getLandGenerator() {
@@ -106,26 +196,55 @@ public class MapGenerator {
      * @param map The map to use.
      */
     public void createLostCityRumours(Map map) {
-        int number = getMapGeneratorOptions().getNumberOfRumours();
-        int counter = 0;
-
-        for (int i = 0; i < number; i++) {
-            for (int tries=0; tries<100; tries++) {
-                Position p = new Position(random.nextInt(getMapGeneratorOptions().getWidth()), 
-                                          random.nextInt(getMapGeneratorOptions().getHeight()));
-                Tile t = map.getTile(p);
-                if (map.getTile(p).isLand()
-                        && !t.hasLostCityRumour()
-                        && t.getSettlement() == null
-                        && t.getUnitCount() == 0) { 
-                    counter++;
-                    t.setLostCityRumour(true);
-                    break;
+        createLostCityRumours(map, null);
+    }
+    
+    /**
+     * Creates lost city rumours on the given map.
+     * The number of rumours depends on the map size.
+     *
+     * @param map The map to use.
+     * @param importGame The game to lost city rumours from.
+     */
+    public void createLostCityRumours(Map map, Game importGame) {
+        final boolean importRumours = getMapGeneratorOptions().getBoolean(MapGeneratorOptions.IMPORT_RUMOURS);
+        
+        if (importGame != null && importRumours) {
+            for (Tile importTile : importGame.getMap().getAllTiles()) {
+                final Position p = importTile.getPosition();
+                if (map.isValid(p)) {
+                    final Tile t = map.getTile(p);
+                    t.setLostCityRumour(importTile.hasLostCityRumour());
                 }
             }
-        }
+        } else {
+            int number = getMapGeneratorOptions().getNumberOfRumours();
+            int counter = 0;
 
-        logger.info("Created " + counter + " lost city rumours of maximum " + number + ".");
+            // TODO: Remove temporary fix:
+            if (importGame != null) {
+                number = map.getWidth() * map.getHeight() * 25 / (100 * 35);
+            }
+            // END TODO
+
+            for (int i = 0; i < number; i++) {
+                for (int tries=0; tries<100; tries++) {
+                    Position p = new Position(random.nextInt(map.getWidth()), 
+                            random.nextInt(map.getHeight()));
+                    Tile t = map.getTile(p);
+                    if (map.getTile(p).isLand()
+                            && !t.hasLostCityRumour()
+                            && t.getSettlement() == null
+                            && t.getUnitCount() == 0) { 
+                        counter++;
+                        t.setLostCityRumour(true);
+                        break;
+                    }
+                }
+            }
+
+            logger.info("Created " + counter + " lost city rumours of maximum " + number + ".");
+        }
     }
 
     /**
@@ -330,6 +449,7 @@ public class MapGenerator {
                     case Tile.ARCTIC:
                         continue;
                     case Tile.OCEAN:
+                    case Tile.HIGH_SEAS:
                         return IndianSettlement.EXPERT_FISHERMAN;
                     default:
                         throw new IllegalArgumentException("Invalid tile provided: Tile type is invalid");
@@ -381,13 +501,13 @@ public class MapGenerator {
      * select suitable starting positions.
      * 
      * @param map The <code>Map</code> to place the european units on.
-     * @param width The width of the map to create.
-     * @param height The height of the map to create.
      * @param players The players to create <code>Settlement</code>s
      *      and starting locations for. That is; both indian and 
      *      european players.
      */
-    protected void createEuropeanUnits(Map map, int width, int height, Vector<Player> players) {
+    protected void createEuropeanUnits(Map map, Vector<Player> players) {
+        final int width = map.getWidth();
+        final int height = map.getHeight();
         int[] shipYPos = new int[NUM_STARTING_LOCATIONS];
         for (int i = 0; i < NUM_STARTING_LOCATIONS; i++) {
             shipYPos[i] = 0;
@@ -405,7 +525,7 @@ public class MapGenerator {
 
             int y = random.nextInt(height - 20) + 10;
             int x = width - 1;
-            while (isAShipTooClose(y, shipYPos)) {
+            while (isAShipTooClose(map, y, shipYPos)) {
                 y = random.nextInt(height - 20) + 10;
             }
             shipYPos[i] = y;
@@ -509,10 +629,10 @@ public class MapGenerator {
      * @param usedYPositions List of already assigned positions
      * @return True if the proposed position is too close
      */
-    protected boolean isAShipTooClose(int proposedY,
+    protected boolean isAShipTooClose(Map map, int proposedY,
                                         int[] usedYPositions) {
         for (int i = 0; i < NUM_STARTING_LOCATIONS && usedYPositions[i] != 0; i++) {
-            if (Math.abs(usedYPositions[i] - proposedY) < (getMapGeneratorOptions().getHeight() / 2) / NUM_STARTING_LOCATIONS) {
+            if (Math.abs(usedYPositions[i] - proposedY) < (map.getHeight() / 2) / NUM_STARTING_LOCATIONS) {
                 return true;
             }
         }

@@ -52,6 +52,7 @@ abstract public class AbstractOption implements Option {
     private String name;
 
     private String shortDescription;
+    
 
 
     /**
@@ -71,6 +72,7 @@ abstract public class AbstractOption implements Option {
         this.shortDescription = shortDescription;
     }
 
+    
     /**
      * Adds a new <code>PropertyChangeListener</code> for monitoring state
      * changes. Events are generated when variables are changed.

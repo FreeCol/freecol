@@ -71,7 +71,7 @@ public interface Option {
      * @param pcl The <code>PropertyChangeListener</code> to be removed.
      */
     public void removePropertyChangeListener(PropertyChangeListener pcl);
-
+    
     /**
     * Makes an XML-representation of this object.
     *

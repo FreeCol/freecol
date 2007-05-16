@@ -157,7 +157,23 @@ public abstract class OptionMap extends OptionGroup {
             throw new IllegalArgumentException("No boolean value associated with the specified option.");
         }
     }
-
+    
+    /**
+     * Gets the <code>File</code> specified by an option.
+     *
+     * @param id The id of the option.
+     * @return The value.
+     * @exception IllegalArgumentException If there is no <code>File</code>
+     *            associated with the specified option.
+     * @exception NullPointerException if the given <code>Option</code> does not exist.
+     */
+    public File getFile(String id) {
+        try {
+            return ((FileOption) values.get(id)).getValue();
+        } catch (ClassCastException e) {
+            throw new IllegalArgumentException("No File associated with the specified option.");
+        }
+    }
 
     /**
     * Adds the <code>Option</code>s from the given <code>OptionGroup</code>

@@ -13,6 +13,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 
 import net.sf.freecol.common.option.BooleanOption;
+import net.sf.freecol.common.option.FileOption;
 import net.sf.freecol.common.option.IntegerOption;
 import net.sf.freecol.common.option.Option;
 import net.sf.freecol.common.option.OptionGroup;
@@ -85,6 +86,10 @@ public final class OptionMapUI extends JPanel implements OptionUpdater {
                 JComponent c = new BooleanOptionUI((BooleanOption) o, editable);
                 northPanel.add(c);
                 ou.add(c);
+            } else if (o instanceof FileOption) {
+                final FileOptionUI iou = new FileOptionUI((FileOption) o, editable);
+                northPanel.add(iou);
+                ou.add(iou);
             } else if (o instanceof IntegerOption) {
                 JComponent c = new IntegerOptionUI((IntegerOption) o, editable);
                 northPanel.add(c);

@@ -149,7 +149,11 @@ public class River {
     public boolean isNextToWater(Map.Position p) {
         for (int i = 0; i < 4; i++) {
             Map.Position px = Map.getAdjacent(p, directions[i]);
-            if (!map.getTile(px).isLand() || map.getTile(px).hasRiver()) {
+            final Tile tile = map.getTile(px);
+            if (tile == null) {
+                continue;
+            }
+            if (!tile.isLand() || tile.hasRiver()) {
                 return true;
             }
         }

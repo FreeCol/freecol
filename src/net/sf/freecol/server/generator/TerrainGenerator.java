@@ -45,53 +45,57 @@ public class TerrainGenerator {
      * @see Map
      */
     public void createMap(Game game, boolean[][] landMap) {
+        createMap(game, null, landMap);
+    }
+    
+    /**
+     * Creates a <code>Map</code> for the given <code>Game</code>.
+     * 
+     * The <code>Map</code> is added to the <code>Game</code> after
+     * it is created.
+     * 
+     * @param game The game. 
+     * @param importGame The game to import information form.
+     * @param landMap Determines wether there should be land
+     *                or ocean on a given tile. This array also
+     *                specifies the size of the map that is going
+     *                to be created.
+     * @see Map
+     */
+    public void createMap(Game game, Game importGame, boolean[][] landMap) {
         final int width = landMap.length;
         final int height = landMap[0].length;
         
+        final boolean importTerrain = getMapGeneratorOptions().getBoolean(MapGeneratorOptions.IMPORT_TERRAIN);
+        final boolean importBonuses = getMapGeneratorOptions().getBoolean(MapGeneratorOptions.IMPORT_BONUSES);
+        final boolean importLandMap = getMapGeneratorOptions().getBoolean(MapGeneratorOptions.IMPORT_LAND_MAP);
+                
         Vector<Vector<Tile>> columns = new Vector<Vector<Tile>>(getMapGeneratorOptions().getWidth());
         for (int i = 0; i < width; i++) {
             Vector<Tile> v = new Vector<Tile>(height);
             for (int j = 0; j < height; j++) {
-                Tile t;
+                Tile t;                
+                if (importGame != null
+                        && importTerrain
+                        && importGame.getMap().isValid(i, j)) {
+                    Tile importTile = importGame.getMap().getTile(i, j);
+                    if (importLandMap || importTile.isLand() == landMap[i][j]) {
+                        t = new Tile(game, importTile.getType(), i, j);
+                        t.setForested(importTile.isForested());
+                        t.addRiver(importTile.getAddition(), importTile.getRiver());
+                        t.setAddition(importTile.getAddition());
 
-                if (landMap[i][j]) {
-                    t = new Tile(game, getRandomTileType(((Math.min(j, height - j) * 200) / height)), i, j);
-
-                    if ((t.getType() != Tile.ARCTIC) && 
-                        (random.nextInt(100) < getMapGeneratorOptions().getPercentageOfForests())) {
-                        t.setForested(true);
-                    } else if (t.getType() != Tile.ARCTIC) {
-                        int k = random.nextInt(16);
-                        if (k < 1) {
-                            t.setAddition(Tile.ADD_MOUNTAINS);
-                        } else if (k < 2) {
-                            t.setAddition(Tile.ADD_HILLS);
+                        if (importBonuses) {
+                            t.setBonus(importTile.hasBonus());
+                        } else {
+                            perhapsAddBonus(t, landMap);
                         }
-                    }
-
-                    // Terrain bonus:
-                    if (random.nextInt(100) < getMapGeneratorOptions().getPercentageOfBonusTiles()) {
-                        t.setBonus(true);
+                    } else {
+                        t = createTile(game, landMap, i, j);    
                     }
                 } else {
-                    t = new Tile(game, Tile.OCEAN, i, j);
-
-                    // Terrain bonus:
-                    int adjacentLand = 0;
-                    for (int k=0; k<8; k++) {
-                        Position mp = Map.getAdjacent(t.getPosition(), k);
-                        final boolean valid = Map.isValid(mp, width,
-                                height);
-                        if (valid && landMap[mp.getX()][mp.getY()]) {
-                            adjacentLand++;
-                        }
-                    }
-
-                    if (adjacentLand > 1 && random.nextInt(10 - adjacentLand) == 0) {
-                        t.setBonus(true);
-                    }
+                    t = createTile(game, landMap, i, j);
                 }
-
                 v.add(t);
             }
             columns.add(v);
@@ -99,11 +103,68 @@ public class TerrainGenerator {
 
         Map map = new Map(game, columns);
 
-        createHighSeas(map);
-        createMountains(map);
-        createRivers(map);
+        if (!importTerrain) {
+            createHighSeas(map);
+            createMountains(map);
+            createRivers(map);
+        }
 
         game.setMap(map);
+    }
+
+    private Tile createTile(Game game, boolean[][] landMap, int i, int j) {
+        final int width = landMap.length;
+        final int height = landMap[0].length;
+        
+        Tile t;
+        if (landMap[i][j]) {
+            t = new Tile(game, getRandomTileType(((Math.min(j, height - j) * 200) / height)), i, j);
+
+            if ((t.getType() != Tile.ARCTIC) && 
+                (random.nextInt(100) < getMapGeneratorOptions().getPercentageOfForests())) {
+                t.setForested(true);
+            } else if (t.getType() != Tile.ARCTIC) {
+                int k = random.nextInt(16);
+                if (k < 1) {
+                    t.setAddition(Tile.ADD_MOUNTAINS);
+                } else if (k < 2) {
+                    t.setAddition(Tile.ADD_HILLS);
+                }
+            }
+        } else {
+            t = new Tile(game, Tile.OCEAN, i, j);
+        }
+        perhapsAddBonus(t, landMap);
+        
+        return t;
+    }
+
+    /**
+     * Adds a terrain bonus with a probabilty determined by the
+     * <code>MapGeneratorOptions</code>.
+     * 
+     * @param t The Tile.
+     * @param landMap The landMap.
+     */
+    private void perhapsAddBonus(Tile t, boolean[][] landMap) {
+        if (t.isLand()) {
+            if (random.nextInt(100) < getMapGeneratorOptions().getPercentageOfBonusTiles()) {
+                t.setBonus(true);
+            }
+        } else {
+            int adjacentLand = 0;
+            for (int k=0; k<8; k++) {
+                Position mp = Map.getAdjacent(t.getPosition(), k);
+                final boolean valid = Map.isValid(mp, landMap.length, landMap[0].length);
+                if (valid && landMap[mp.getX()][mp.getY()]) {
+                    adjacentLand++;
+                }
+            }
+
+            if (adjacentLand > 1 && random.nextInt(10 - adjacentLand) == 0) {
+                t.setBonus(true);
+            }
+        }
     }
     
     /**

@@ -3,6 +3,9 @@ package net.sf.freecol.server.generator;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
+import net.sf.freecol.common.option.BooleanOption;
+import net.sf.freecol.common.option.FileOption;
+import net.sf.freecol.common.option.OptionGroup;
 import net.sf.freecol.common.option.OptionMap;
 import net.sf.freecol.common.option.SelectOption;
 
@@ -177,7 +180,31 @@ public class MapGeneratorOptions extends OptionMap {
                             BONUS_NUMBER_LARGE = 2,
                             BONUS_NUMBER_VERY_LARGE = 3,
                             BONUS_NUMBER_HUGE = 4;
-                                                        
+             
+    /**
+     * Option for setting a file to be imported (map etc).
+     */
+    public static final String IMPORT_FILE = "importFile";
+
+    /**
+     * Option for using the land map imported from a file.
+     */
+    public static final String IMPORT_LAND_MAP = "importLandMap";
+    
+    /**
+     * Option for using the terrain imported from a file.
+     */
+    public static final String IMPORT_TERRAIN = "importTerrain";
+
+    /**
+     * Option for using the bonuses imported from a file.
+     */
+    public static final String IMPORT_BONUSES = "importBonuses";
+
+    /**
+     * Option for using the lost city rumours imported from a file.
+     */
+    public static final String IMPORT_RUMOURS = "importRumours";
     
     /**
      * Creates a new <code>MapGeneratorOptions</code>.
@@ -260,6 +287,29 @@ public class MapGeneratorOptions extends OptionMap {
                 new String[] {"small", "medium", "large", "veryLarge", "huge"},
                 1)
         );
+        
+        final OptionGroup importGroup = new OptionGroup("mapGeneratorOptions.import.name", "mapGeneratorOptions.import.shortDescription");
+        final FileOption optionImportFile = new FileOption(IMPORT_FILE, "mapGeneratorOptions.import." + IMPORT_FILE + ".name", "mapGeneratorOptions.import." + IMPORT_FILE + ".shortDescription");
+        importGroup.add(optionImportFile);
+        final BooleanOption optionImportLandMap = new BooleanOption(IMPORT_LAND_MAP,
+                "mapGeneratorOptions.import." + IMPORT_LAND_MAP + ".name",
+                "mapGeneratorOptions.import." + IMPORT_LAND_MAP + ".shortDescription",
+                true);
+        importGroup.add(optionImportLandMap);
+        
+        importGroup.add(new BooleanOption(IMPORT_TERRAIN,
+                "mapGeneratorOptions.import." + IMPORT_TERRAIN + ".name",
+                "mapGeneratorOptions.import." + IMPORT_TERRAIN + ".shortDescription",
+                true));
+        importGroup.add(new BooleanOption(IMPORT_BONUSES,
+                "mapGeneratorOptions.import." + IMPORT_BONUSES + ".name",
+                "mapGeneratorOptions.import." + IMPORT_BONUSES + ".shortDescription",
+                false)); 
+        importGroup.add(new BooleanOption(IMPORT_RUMOURS,
+                "mapGeneratorOptions.import." + IMPORT_RUMOURS + ".name",
+                "mapGeneratorOptions.import." + IMPORT_RUMOURS + ".shortDescription",
+                false));
+        add(importGroup);
     }
 
     /**

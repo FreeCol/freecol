@@ -1,5 +1,6 @@
 package net.sf.freecol.server.generator;
 
+import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Map;
 import net.sf.freecol.common.model.Map.Position;
 
@@ -43,6 +44,22 @@ public class LandGenerator {
      }
 
 
+     /**
+      * Imports the land map from the given <code>Game</code>.
+      * 
+      * @param game The <code>Game</code> to get the land map from.
+      * @return An array where <i>true</i> means land 
+      * and <i>false</i> means ocean.
+      */
+     public boolean[][] importLandMap(Game game) {
+         boolean[][] map = new boolean[game.getMap().getWidth()][game.getMap().getHeight()];
+         for (int i=0; i<map.length; i++) {
+             for (int j=0; j<map[0].length; j++) {
+                 map[i][j] = game.getMap().getTile(i, j).isLand();
+             }
+         }
+         return map;
+     }
 
      /**
       * Creates a new land map.
