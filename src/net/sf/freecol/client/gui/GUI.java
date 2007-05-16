@@ -2130,6 +2130,8 @@ public final class GUI {
         } else {
             if (activeUnit.getDestination() instanceof Europe) {
                 currentPath = freeColClient.getGame().getMap().findPathToEurope(activeUnit, activeUnit.getTile());
+            } else if (activeUnit.getDestination().getTile() == activeUnit.getTile()) {
+                // No need to do anything as the unit has arrived, there is no path to be shown.
             } else {
                 currentPath = activeUnit.findPath(activeUnit.getDestination().getTile());
             }
