@@ -9,19 +9,29 @@ package net.sf.freecol.common.model;
  */
 public final class Modifier {
 
-    public static final  String  COPYRIGHT = "Copyright (C) 2003-2007 The FreeCol Team";
-    public static final  String  LICENSE   = "http://www.gnu.org/licenses/gpl.html";
+    public static final String  COPYRIGHT = "Copyright (C) 2003-2007 The FreeCol Team";
+    public static final String  LICENSE   = "http://www.gnu.org/licenses/gpl.html";
     public static final String  REVISION = "$Revision$";
 
+    public static final int ADDITIVE = 0;
+    public static final int MULTIPLICATIVE = 1;
+    public static final int PERCENTAGE = 2;
     
-    // the ID of the modifier, used to look up name, etc.
-    public final String id;
-    // whether this modifier is additive or multiplicative
-    private final boolean isAdditive;
-    // the addend of an additive modifier, defaults to zero
-    public final float addend;
-    // the factor of a multiplicative modifier, defaults to zero
-    public final float factor;
+    /**
+     * The ID of the modifier, used to look up name, etc.
+     */
+    private String id;
+
+    /**
+     * The type of this modifier
+     */
+    private int type;
+
+    /**
+     * The value of this modifier
+     */
+    private float value;
+
 
 
     /**
@@ -31,46 +41,92 @@ public final class Modifier {
      * @param value an <code>float</code> value
      * @param additive whether this modifier is additive
      */
-    public Modifier(String id, float value, boolean additive) {
+    public Modifier(String id, float value, int type) {
         this.id = id;
-        this.isAdditive = additive;
-        if (additive) {
-            this.addend = value;
-            this.factor = 1;
-        } else {
-            this.factor = value;
-            this.addend = 0;
+        this.value = value;
+        this.type = type;
+    }
+
+    /**
+     * Get the <code>Id</code> value.
+     *
+     * @return a <code>String</code> value
+     */
+    public String getId() {
+        return id;
+    }
+
+    /**
+     * Set the <code>Id</code> value.
+     *
+     * @param newId The new Id value.
+     */
+    public void setId(final String newId) {
+        this.id = newId;
+    }
+
+    /**
+     * Get the <code>Type</code> value.
+     *
+     * @return an <code>int</code> value
+     */
+    public int getType() {
+        return type;
+    }
+
+    /**
+     * Set the <code>Type</code> value.
+     *
+     * @param newType The new Type value.
+     */
+    public void setType(final int newType) {
+        this.type = newType;
+    }
+
+    /**
+     * Get the <code>Value</code> value.
+     *
+     * @return a <code>float</code> value
+     */
+    public float getValue() {
+        return value;
+    }
+
+    /**
+     * Set the <code>Value</code> value.
+     *
+     * @param newValue The new Value value.
+     */
+    public void setValue(final float newValue) {
+        this.value = newValue;
+    }
+
+    /**
+     * Combines this modifier with another.
+     *
+     * @param otherModifier a <code>Modifier</code> value
+     */
+    public void combine(Modifier otherModifier) {
+        switch(otherModifier.getType()) {
+        case ADDITIVE:
+            value += otherModifier.getValue();
+            return;
+        case MULTIPLICATIVE:
+            value *= otherModifier.getValue();
+            return;
+        case PERCENTAGE:
+            value += (value * otherModifier.getValue()) / 100;
+            return;
         }
     }
-
-    /**
-     * Returns a new additive <code>Modifier</code> instance.
-     *
-     * @param id a <code>String</code> value
-     * @param addend a <code>float</code> value
-     */
-    public static Modifier createAdditiveModifier(String id, float addend) {
-        return new Modifier(id, addend, true);
-    }
-
-    /**
-     * Returns a new multiplicative <code>Modifier</code> instance.
-     *
-     * @param id a <code>String</code> value
-     * @param factor an <code>float</code> value
-     */
-    public static Modifier createMultiplicativeModifier(String id, float factor) {
-        return new Modifier(id, factor, false);
-    }
-
-
-
-    /**
+ 
+     /**
      * Return a formatted string appropriate for the value this
      * modifier represents.
      *
      * @return a <code>String</code> value
      */
+    /*
     public String getFormattedResult() {
         if (isAdditive) {
             if (addend == Float.MIN_VALUE) {
@@ -89,5 +145,6 @@ public final class Modifier {
             }
         }
     }
+    */
 
 }
