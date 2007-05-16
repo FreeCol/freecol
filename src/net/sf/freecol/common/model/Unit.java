@@ -3623,7 +3623,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
             { "%oldName%", oldName },
             { "%newName%", newName },
             { "%nation%", nation }
-        }, type);
+        }, type, this);
 
         if (getOwner() != enemyUnit.getOwner()) {
             // this unit hasn't been captured by enemyUnit, show message to

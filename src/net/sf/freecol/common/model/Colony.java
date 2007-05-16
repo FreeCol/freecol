@@ -847,7 +847,7 @@ public final class Colony extends Settlement implements Location, Nameable {
     public void addHammers(int amount) {
         if (currentlyBuilding == -1) {
             addModelMessage(this, "model.colony.cannotBuild", new String[][] { { "%colony%", getName() } },
-                    ModelMessage.WARNING);
+                    ModelMessage.WARNING, this);
             return;
         }
         // Building only:
@@ -1465,7 +1465,7 @@ public final class Colony extends Settlement implements Location, Nameable {
                                                                Unit.FREE_COLONIST);
             removeGoods(Goods.FOOD, 200);
             addModelMessage(this, "model.colony.newColonist", new String[][] { { "%colony%", getName() } },
-                            ModelMessage.UNIT_ADDED);
+                            ModelMessage.UNIT_ADDED, u);
             logger.info("New colonist created in " + getName() + " with ID=" + u.getID());
         }
     }

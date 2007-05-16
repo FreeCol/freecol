@@ -122,7 +122,7 @@ public class ModelMessage {
     * @see FreeColGameObject#addModelMessage(FreeColGameObject, String, String[][], int)
     */
     public ModelMessage(FreeColGameObject source, String messageID, String[][] data) {
-        this(source, messageID, data, DEFAULT, null);
+        this(source, messageID, data, DEFAULT);
     }
 
 

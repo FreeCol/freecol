@@ -471,9 +471,7 @@ public class Player extends FreeColGameObject implements Nameable {
      * @param modelMessage The <code>ModelMessage</code>.
      */
     public void addModelMessage(ModelMessage modelMessage) {
-        // add new message to the beginning, so that new messages can
-        // be identified more efficiently
-        modelMessages.add(0, modelMessage);
+        modelMessages.add(modelMessage);
     }
 
     /**
@@ -494,11 +492,12 @@ public class Player extends FreeColGameObject implements Nameable {
 
         ArrayList<ModelMessage> out = new ArrayList<ModelMessage>();
 
-        for (ModelMessage message : modelMessages) {
+        for (int index = modelMessages.size() - 1; index >= 0; index--) {
+            ModelMessage message = modelMessages.get(index);
             if (message.hasBeenDisplayed()) {
                 break;
             } else {
-                out.add(message);
+                out.add(0, message);
             }
         }
 
