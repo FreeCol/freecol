@@ -3005,7 +3005,9 @@ public final class InGameController implements NetworkConstants {
                     freeColClient.getCanvas().showModelMessage(messageList.get(0));
                 }
                 */
-                freeColClient.getCanvas().showTurnReport(messageList);
+                if (messageList.size() > 0) {
+                    freeColClient.getCanvas().showTurnReport(messageList);
+                }
                 freeColClient.getActionManager().update();
             }
         };
