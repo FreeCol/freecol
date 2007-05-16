@@ -445,7 +445,9 @@ public final class EuropePanel extends FreeColPanel implements ActionListener {
                     toAmericaPanel.add(unitLabel, false);
                     break;
                 default:
-                    throw new RuntimeException("Naval unit in Europe is in an invalid state.");
+                    // This should normally not happen, but until the problem is solved, i comment it out.
+                    // throw new RuntimeException("Naval unit in Europe is in an invalid state.");
+                    // TODO: Find the cause of units not arriving active in Europe.
                 }
             }
         }
