@@ -18,7 +18,8 @@ public class ColonyTradeItem extends TradeItem {
     }
 
     public boolean isValid() {
-        return (colony.getOwner() == source);
+        return (colony.getOwner() == source &&
+                destination.isEuropean());
     }
 
     public void makeTrade() {
