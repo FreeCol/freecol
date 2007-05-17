@@ -68,7 +68,7 @@ public final class ColorCellEditor extends AbstractCellEditor implements TableCe
             JButton okButton = new JButton( Messages.message("ok") );
             JButton cancelButton = new JButton( Messages.message("cancel") );
 
-            setLayout(new HIGLayout(new int[] {200, 50, 200}, new int[] {350, 10, 0}));
+            setLayout(new HIGLayout(new int[] {220, 10, 220}, new int[] {350, 10, 0}));
 
             add(colorChooser, higConst.rcwh(1, 1, 3, 1));
             add(okButton, higConst.rc(3, 1));
