@@ -2901,11 +2901,15 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
         numberOfTools -= amount;
         if (numberOfTools == 0) {
             if (getType() == HARDY_PIONEER) {
-                addModelMessage(this, "model.unit.noMoreToolsPioneer", null, ModelMessage.WARNING, new Goods(
-                        Goods.TOOLS));
+                addModelMessage(this, "model.unit.noMoreToolsPioneer",
+                                new String[][] {
+                                    {"%unit%", getName()}},
+                                ModelMessage.WARNING, this);
             } else {
-                addModelMessage(this, "model.unit.noMoreTools", new String[][] { { "%name%", getName() } },
-                        ModelMessage.WARNING, new Goods(Goods.TOOLS));
+                addModelMessage(this, "model.unit.noMoreTools",
+                                new String[][] {
+                                    { "%unit%", getName() } },
+                                ModelMessage.WARNING, this);
             }
         }
     }
