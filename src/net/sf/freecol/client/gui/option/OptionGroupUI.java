@@ -119,6 +119,8 @@ public final class OptionGroupUI extends JPanel implements OptionUpdater {
             } else if (o instanceof FreeColAction) {
                 final FreeColActionUI fau = new FreeColActionUI((FreeColAction) o, this);
                 ou.add(fau);
+                add(fau);
+                /*
                 final boolean alreadyAdded = (horizontalPanel != null && !buttonAdded);
                 if (!alreadyAdded || buttonAdded) {
                     horizontalPanel = new JPanel(new GridLayout(1, 2, H_GAP, 5));
@@ -130,6 +132,7 @@ public final class OptionGroupUI extends JPanel implements OptionUpdater {
                     horizontalPanel = null;
                 }
                 buttonAdded = false;
+                */
             } else {
                 logger.warning("Unknown option.");
             }
