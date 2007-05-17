@@ -21,6 +21,8 @@ import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.Player;
 
+import cz.autel.dmi.HIGLayout;
+
 /**
 * A table cell editor that can be used to edit colors.
 */
@@ -54,7 +56,7 @@ public final class ColorCellEditor extends AbstractCellEditor implements TableCe
     * Once constructed this panel is comparable to the dialog that is returned from
     * JColorChooser::createDialog.
     */
-    private final class ColorChooserPanel extends JPanel {
+    private final class ColorChooserPanel extends FreeColPanel {
 
         /**
         * The constructor to use.
@@ -66,15 +68,11 @@ public final class ColorCellEditor extends AbstractCellEditor implements TableCe
             JButton okButton = new JButton( Messages.message("ok") );
             JButton cancelButton = new JButton( Messages.message("cancel") );
 
-            colorChooser.setSize(450, 350);
-            okButton.setSize(80, 20);
-            cancelButton.setSize(80, 20);
+            setLayout(new HIGLayout(new int[] {200, 50, 200}, new int[] {350, 10, 0}));
 
-            colorChooser.setLocation(5, 5);
-            okButton.setLocation(105, 365);
-            cancelButton.setLocation(275, 365);
-
-            setLayout(null);
+            add(colorChooser, higConst.rcwh(1, 1, 3, 1));
+            add(okButton, higConst.rc(3, 1));
+            add(cancelButton, higConst.rc(3, 3));
 
             okButton.setActionCommand(OK);
             cancelButton.setActionCommand(CANCEL);
@@ -82,17 +80,8 @@ public final class ColorCellEditor extends AbstractCellEditor implements TableCe
             okButton.addActionListener(l);
             cancelButton.addActionListener(l);
 
-            add(colorChooser);
-            add(okButton);
-            add(cancelButton);
-
-            try {
-                BevelBorder border1 = new BevelBorder(BevelBorder.RAISED);
-                setBorder(border1);
-            } catch(Exception e) {}
-
             setOpaque(true);
-            setSize(460, 400);
+            setSize(getPreferredSize());
         }
     }
 
