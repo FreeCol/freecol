@@ -3643,7 +3643,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
         }
         addModelMessage(source, messageID, new String[][] {
             { "%oldName%", oldName },
-            { "%newName%", newName },
+            { "%unit%", newName },
             { "%nation%", nation }
         }, type, this);
 
