@@ -2284,8 +2284,11 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
         this.hitpoints = hitpoints;
         if (hitpoints >= getInitialHitpoints(getType()) && getState() == FORTIFIED) {
             setState(ACTIVE);
-            addModelMessage(this, "model.unit.shipRepaired", new String[][] { { "%ship%", getName() },
-                    { "%repairLocation%", getLocation().getLocationName() } }, ModelMessage.DEFAULT, this);
+            addModelMessage(this, "model.unit.shipRepaired",
+                            new String[][] {
+                                { "%unit%", getName() },
+                                { "%repairLocation%", getLocation().getLocationName() } },
+                            ModelMessage.DEFAULT, this);
         }
     }
 
@@ -3389,10 +3392,16 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
         case ATTACK_EVADES:
             if (isNaval()) {
                 // send message to both parties
-                addModelMessage(this, "model.unit.shipEvaded", new String[][] { { "%ship%", defender.getName() },
-                        { "%nation%", enemy.getNationAsString() } }, ModelMessage.DEFAULT, this);
-                addModelMessage(defender, "model.unit.shipEvaded", new String[][] { { "%ship%", defender.getName() },
-                        { "%nation%", enemy.getNationAsString() } }, ModelMessage.DEFAULT, this);
+                addModelMessage(this, "model.unit.shipEvaded",
+                                new String[][] {
+                                    { "%unit%", defender.getName() },
+                                    { "%nation%", enemy.getNationAsString() } },
+                                ModelMessage.DEFAULT, this);
+                addModelMessage(defender, "model.unit.shipEvaded",
+                                new String[][] {
+                                    { "%unit%", defender.getName() },
+                                    { "%nation%", enemy.getNationAsString() }
+                                }, ModelMessage.DEFAULT, this);
             } else {
                 logger.warning("Non-naval unit evades!");
             }
@@ -3430,8 +3439,11 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
             if (isNaval()) {
                 captureGoods(defender);
                 defender.shipDamaged();
-                addModelMessage(this, "model.unit.enemyShipDamaged", new String[][] { { "%ship%", defender.getName() },
-                        { "%nation%", enemy.getNationAsString() } }, ModelMessage.UNIT_DEMOTED);
+                addModelMessage(this, "model.unit.enemyShipDamaged",
+                                new String[][] {
+                                    { "%unit%", defender.getName() },
+                                    { "%nation%", enemy.getNationAsString() } }, 
+                                ModelMessage.UNIT_DEMOTED);
             } else {
                 if (getOwner().hasFather(FoundingFather.GEORGE_WASHINGTON)) {
                     promote();
@@ -3443,8 +3455,11 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
             if (isNaval()) {
                 captureGoods(defender);
                 defender.shipSunk();
-                addModelMessage(this, "model.unit.shipSunk", new String[][] { { "%ship%", defender.getName() },
-                        { "%nation%", enemy.getNationAsString() } }, ModelMessage.UNIT_DEMOTED);
+                addModelMessage(this, "model.unit.shipSunk",
+                                new String[][] {
+                                    { "%unit%", defender.getName() },
+                                    { "%nation%", enemy.getNationAsString() } },
+                                ModelMessage.UNIT_DEMOTED);
             } else {
                 promote();
                 defender.demote(this, true);
@@ -3491,12 +3506,21 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
          * ((Colony) repairLocation).getName(); }
          */
         if (colony != null) {
-            addModelMessage(this, "model.unit.shipDamagedByBombardment", new String[][] {
-                    { "%colony%", colony.getName() }, { "%building%", building.getName() }, { "%ship%", getName() },
-                    { "%repairLocation%", repairLocationName }, { "%nation%", nation } }, ModelMessage.UNIT_DEMOTED);
+            addModelMessage(this, "model.unit.shipDamagedByBombardment", 
+                            new String[][] {
+                                { "%colony%", colony.getName() },
+                                { "%building%", building.getName() },
+                                { "%unit%", getName() },
+                                { "%repairLocation%", repairLocationName },
+                                { "%nation%", nation } },
+                            ModelMessage.UNIT_DEMOTED);
         } else {
-            addModelMessage(this, "model.unit.shipDamaged", new String[][] { { "%ship%", getName() },
-                    { "%repairLocation%", repairLocationName }, { "%nation%", nation } }, ModelMessage.UNIT_DEMOTED);
+            addModelMessage(this, "model.unit.shipDamaged",
+                            new String[][] {
+                                { "%unit%", getName() },
+                                { "%repairLocation%", repairLocationName },
+                                { "%nation%", nation } },
+                            ModelMessage.UNIT_DEMOTED);
         }
         setHitpoints(1);
         getUnitContainer().disposeAllUnits();
@@ -3636,7 +3660,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
             }
             addModelMessage(source, messageID, new String[][] {
                 { "%oldName%", oldName },
-                { "%newName%", newName },
+                { "%unit%", newName },
                 { "%nation%", nation } }, type, this);
         }
     }
@@ -3666,7 +3690,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
             addModelMessage(colony, "model.unit.unitEducated",
                             new String[][] {
                                 { "%oldName%", oldName },
-                                { "%newName%", newName }, 
+                                { "%unit%", newName }, 
                                 { "%colony%", colony.getName() } },
                             ModelMessage.UNIT_IMPROVED);
         }
@@ -3691,8 +3715,12 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
 
         String newName = getName();
         if (!newName.equals(oldName)) {
-            addModelMessage(this, "model.unit.unitPromoted", new String[][] { { "%oldName%", oldName },
-                    { "%newName%", getName() }, { "%nation%", nation } }, ModelMessage.UNIT_IMPROVED);
+            addModelMessage(this, "model.unit.unitPromoted",
+                            new String[][] {
+                                { "%oldName%", oldName },
+                                { "%unit%", getName() },
+                                { "%nation%", nation } },
+                            ModelMessage.UNIT_IMPROVED);
         }
     }
 
@@ -4230,9 +4258,12 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
                 logger.finest("About to change type of unit due to experience.");
                 String oldName = getName();
                 setType(((ColonyTile) location).getExpertForProducing(workType));
-                addModelMessage(getColony(), "model.unit.experience", new String[][] {
-                        { "%oldName%", oldName }, { "%newName%", getName() },
-                        { "%colony%", getColony().getName() } }, ModelMessage.UNIT_IMPROVED, this);
+                addModelMessage(getColony(), "model.unit.experience",
+                                new String[][] {
+                                    { "%oldName%", oldName },
+                                    { "%unit%", getName() },
+                                    { "%colony%", getColony().getName() } },
+                                ModelMessage.UNIT_IMPROVED, this);
             }
         }
     }

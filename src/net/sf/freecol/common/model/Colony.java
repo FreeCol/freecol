@@ -1340,24 +1340,38 @@ public final class Colony extends Settlement implements Location, Nameable {
         switch (result) {
         case Unit.ATTACK_EVADES:
             // send message to both parties
-            addModelMessage(this, "model.unit.shipEvadedBombardment", new String[][] { { "%colony%", getName() },
-                    { "%building%", building.getName() }, { "%ship%", defender.getName() },
-                    { "%nation%", defender.getOwner().getNationAsString() } }, ModelMessage.DEFAULT, this);
-            addModelMessage(defender, "model.unit.shipEvadedBombardment", new String[][] { { "%colony%", getName() },
-                    { "%building%", building.getName() }, { "%ship%", defender.getName() },
-                    { "%nation%", defender.getOwner().getNationAsString() } }, ModelMessage.DEFAULT, this);
+            addModelMessage(this, "model.unit.shipEvadedBombardment",
+                            new String[][] {
+                                { "%colony%", getName() },
+                                { "%building%", building.getName() },
+                                { "%unit%", defender.getName() },
+                                { "%nation%", defender.getOwner().getNationAsString() } }, 
+                            ModelMessage.DEFAULT, this);
+            addModelMessage(defender, "model.unit.shipEvadedBombardment",
+                            new String[][] { { "%colony%", getName() },
+                                             { "%building%", building.getName() },
+                                             { "%unit%", defender.getName() },
+                                             { "%nation%", defender.getOwner().getNationAsString() } }, 
+                            ModelMessage.DEFAULT, this);
             break;
         case Unit.ATTACK_WIN:
             defender.shipDamaged(this, building);
-            addModelMessage(this, "model.unit.enemyShipDamagedByBombardment", new String[][] {
-                    { "%colony%", getName() }, { "%building%", building.getName() }, { "%ship%", defender.getName() },
-                    { "%nation%", defender.getOwner().getNationAsString() } }, ModelMessage.UNIT_DEMOTED);
+            addModelMessage(this, "model.unit.enemyShipDamagedByBombardment",
+                            new String[][] {
+                                { "%colony%", getName() },
+                                { "%building%", building.getName() },
+                                { "%unit%", defender.getName() },
+                                { "%nation%", defender.getOwner().getNationAsString() } }, ModelMessage.UNIT_DEMOTED);
             break;
         case Unit.ATTACK_GREAT_WIN:
             defender.shipSunk(this, building);
-            addModelMessage(this, "model.unit.shipSunkByBombardment", new String[][] { { "%colony%", getName() },
-                    { "%building%", building.getName() }, { "%ship%", defender.getName() },
-                    { "%nation%", defender.getOwner().getNationAsString() } }, ModelMessage.UNIT_DEMOTED);
+            addModelMessage(this, "model.unit.shipSunkByBombardment",
+                            new String[][] {
+                                { "%colony%", getName() },
+                                { "%building%", building.getName() },
+                                { "%unit%", defender.getName() },
+                                { "%nation%", defender.getOwner().getNationAsString() } },
+                            ModelMessage.UNIT_DEMOTED);
             break;
         default:
             logger.warning("Illegal result of bombardment!");
