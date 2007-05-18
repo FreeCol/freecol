@@ -18,13 +18,20 @@ public abstract class TradeItem extends PersistentObject {
      * Describe game here.
      */
     private Game game;
+
+    /**
+     *  The player who is to provide this item.
+     */
+    private Player source;
+
+    /**
+     * The player who is to receive this item.
+     */
+    private Player destination;
     
     // the ID, used to get a name, etc.
     protected String ID;
-    // the player offering something
-    protected Player source;
-    // the player who is to receive something
-    protected Player destination;
+
         
     /**
      * Creates a new <code>TradeItem</code> instance.
@@ -60,11 +67,59 @@ public abstract class TradeItem extends PersistentObject {
     }
 
     /**
+     * Get the <code>Source</code> value.
+     *
+     * @return a <code>Player</code> value
+     */
+    public final Player getSource() {
+        return source;
+    }
+
+    /**
+     * Set the <code>Source</code> value.
+     *
+     * @param newSource The new Source value.
+     */
+    public final void setSource(final Player newSource) {
+        this.source = newSource;
+    }
+
+    /**
+     * Get the <code>Destination</code> value.
+     *
+     * @return a <code>Player</code> value
+     */
+    public final Player getDestination() {
+        return destination;
+    }
+
+    /**
+     * Set the <code>Destination</code> value.
+     *
+     * @param newDestination The new Destination value.
+     */
+    public final void setDestination(final Player newDestination) {
+        this.destination = newDestination;
+    }
+
+    /**
      * Returns whether this TradeItem is valid.
      *
      * @return a <code>boolean</code> value
      */
     public abstract boolean isValid();
+
+
+    /**
+     * Returns whether this TradeItem must be unique. This is true for
+     * the StanceTradeItem and the GoldTradeItem, and false for all
+     * others.
+     *
+     * @return a <code>boolean</code> value
+     */
+    public boolean isUnique() {
+        return false;
+    }
 
     /**
      * Concludes the trade.

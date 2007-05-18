@@ -53,6 +53,7 @@ import net.sf.freecol.client.gui.panel.LoadingSavegameDialog;
 import net.sf.freecol.client.gui.panel.MainPanel;
 import net.sf.freecol.client.gui.panel.MapGeneratorOptionsDialog;
 import net.sf.freecol.client.gui.panel.MonarchPanel;
+import net.sf.freecol.client.gui.panel.NegotiationDialog;
 import net.sf.freecol.client.gui.panel.NewPanel;
 import net.sf.freecol.client.gui.panel.PurchaseDialog;
 import net.sf.freecol.client.gui.panel.QuitDialog;
@@ -427,6 +428,21 @@ public final class Canvas extends JDesktopPane {
         // TODO: Not a standard dialog, special treatment for now.
         addAsFrame(warehouseDialog);
         warehouseDialog.requestFocus();
+    }
+
+    /**
+     * Displays the <code>NegotiationDialog</code>.
+     * 
+     * @see NegotiationDialog
+     */
+    public void showNegotiationDialog(Unit unit, Settlement settlement) {
+        NegotiationDialog negotiationDialog = new NegotiationDialog(this, unit, settlement);
+        negotiationDialog.initialize();
+
+        // TODO: Not a standard dialog, special treatment for now.
+        addAsFrame(negotiationDialog);
+        negotiationDialog.getResponse();
+        remove(negotiationDialog);
     }
 
     /**

@@ -878,8 +878,7 @@ public final class InGameController implements NetworkConstants {
             learnSkillAtIndianSettlement(unit, direction);
             break;
         case Unit.ENTER_FOREIGN_COLONY_WITH_SCOUT:
-            // TODO
-            freeColClient.playSound(SfxLibrary.ILLEGAL_MOVE);
+            negotiate(unit, direction);
             break;
         case Unit.ENTER_SETTLEMENT_WITH_CARRIER_AND_GOODS:
             tradeWithSettlement(unit, direction);
@@ -912,6 +911,14 @@ public final class InGameController implements NetworkConstants {
                 freeColClient.getCanvas().updateJMenuBar();
             }
         });
+    }
+
+
+    private void negotiate(Unit unit, int direction) {
+        Map map = freeColClient.getGame().getMap();
+        Settlement settlement = map.getNeighbourOrNull(direction, unit.getTile()).getSettlement();
+
+        freeColClient.getCanvas().showNegotiationDialog(unit, settlement);
     }
 
     /**

@@ -10,7 +10,14 @@ import javax.xml.stream.XMLStreamWriter;
 
 public class GoodsTradeItem extends TradeItem {
     
+    /**
+     * The goods to change hands.
+     */
     private Goods goods;
+
+    /**
+     * The settlement where the trade is to take place.
+     */
     private Settlement settlement;
         
     public GoodsTradeItem(Game game, Player source, Player destination, Goods goods, Settlement settlement) {
@@ -19,15 +26,51 @@ public class GoodsTradeItem extends TradeItem {
         this.settlement = settlement;
     }
 
+    /**
+     * Get the <code>Goods</code> value.
+     *
+     * @return a <code>Goods</code> value
+     */
+    public final Goods getGoods() {
+        return goods;
+    }
+
+    /**
+     * Set the <code>Goods</code> value.
+     *
+     * @param newGoods The new Goods value.
+     */
+    public final void setGoods(final Goods newGoods) {
+        this.goods = newGoods;
+    }
+
+    /**
+     * Get the <code>Settlement</code> value.
+     *
+     * @return a <code>Settlement</code> value
+     */
+    public final Settlement getSettlement() {
+        return settlement;
+    }
+
+    /**
+     * Set the <code>Settlement</code> value.
+     *
+     * @param newSettlement The new Settlement value.
+     */
+    public final void setSettlement(final Settlement newSettlement) {
+        this.settlement = newSettlement;
+    }
+
     public boolean isValid() {
         if (!(goods.getLocation() instanceof Unit)) {
             return false;
         }
         Unit unit = (Unit) goods.getLocation();
-        if (unit.getOwner() != source) {
+        if (unit.getOwner() != getSource()) {
             return false;
         }
-        if (settlement != null && settlement.getOwner() == destination) {
+        if (settlement != null && settlement.getOwner() == getDestination()) {
             return true;
         } else {
             return false;

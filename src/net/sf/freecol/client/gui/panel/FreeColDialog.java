@@ -381,9 +381,7 @@ public class FreeColDialog extends FreeColPanel {
                                 higConst.rc(row, offenseLabelColumn));
             String value = String.valueOf(modifier.getValue());
             if (modifier.getType() == Modifier.PERCENTAGE) {
-                if (modifier.getValue() < 0) {
-                    value = "-" + value;
-                } else {
+                if (modifier.getValue() > 0) {
                     value = "+" + value;
                 }
                 preCombatDialog.add(new JLabel("%"), higConst.rc(row, offensePercentageColumn));
@@ -432,9 +430,7 @@ public class FreeColDialog extends FreeColPanel {
             if (modifier.getValue() == Float.MIN_VALUE) {
                 value = "?";
             } else if (modifier.getType() == Modifier.PERCENTAGE) {
-                if (modifier.getValue() < 0) {
-                    value = "-" + value;
-                } else {
+                if (modifier.getValue() > 0) {
                     value = "+" + value;
                 }
                 preCombatDialog.add(new JLabel("%"), higConst.rc(row, defensePercentageColumn));

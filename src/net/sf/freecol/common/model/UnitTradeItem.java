@@ -10,6 +10,9 @@ import javax.xml.stream.XMLStreamWriter;
 
 public class UnitTradeItem extends TradeItem {
     
+    /**
+     * The unit to change hands.
+     */
     private Unit unit;
         
     public UnitTradeItem(Game game, Player source, Player destination, Unit unit) {
@@ -17,12 +20,30 @@ public class UnitTradeItem extends TradeItem {
         this.unit = unit;
     }
 
+    /**
+     * Get the <code>Unit</code> value.
+     *
+     * @return an <code>Unit</code> value
+     */
+    public final Unit getUnit() {
+        return unit;
+    }
+
+    /**
+     * Set the <code>Unit</code> value.
+     *
+     * @param newUnit The new Unit value.
+     */
+    public final void setUnit(final Unit newUnit) {
+        this.unit = newUnit;
+    }
+
     public boolean isValid() {
-        return (unit.getOwner() == source);
+        return (unit.getOwner() == getSource());
     }
 
     public void makeTrade() {
-        unit.setOwner(destination);
+        unit.setOwner(getDestination());
     }
 
 

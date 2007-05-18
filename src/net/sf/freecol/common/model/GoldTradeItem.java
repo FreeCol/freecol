@@ -10,6 +10,9 @@ import javax.xml.stream.XMLStreamWriter;
 
 public class GoldTradeItem extends TradeItem {
     
+    /**
+     * The amount of gold to change hands.
+     */
     private int gold;
         
     public GoldTradeItem(Game game, Player source, Player destination, int gold) {
@@ -17,13 +20,35 @@ public class GoldTradeItem extends TradeItem {
         this.gold = gold;
     }
 
+    /**
+     * Get the <code>Gold</code> value.
+     *
+     * @return an <code>int</code> value
+     */
+    public final int getGold() {
+        return gold;
+    }
+
+    /**
+     * Set the <code>Gold</code> value.
+     *
+     * @param newGold The new Gold value.
+     */
+    public final void setGold(final int newGold) {
+        this.gold = newGold;
+    }
+
     public boolean isValid() {
-        return ((gold >= 0) && (source.getGold() >= gold));
+        return ((gold >= 0) && (getSource().getGold() >= gold));
+    }
+
+    public boolean isUnique() {
+        return true;
     }
 
     public void makeTrade() {
-        source.modifyGold(-gold);
-        destination.modifyGold(gold);
+        getSource().modifyGold(-gold);
+        getDestination().modifyGold(gold);
     }
 
 

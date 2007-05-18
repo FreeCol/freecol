@@ -10,6 +10,9 @@ import javax.xml.stream.XMLStreamWriter;
 
 public class ColonyTradeItem extends TradeItem {
     
+    /**
+     * The colony to change hands.
+     */
     private Colony colony;
         
     public ColonyTradeItem(Game game, Player source, Player destination, Colony colony) {
@@ -17,13 +20,31 @@ public class ColonyTradeItem extends TradeItem {
         this.colony = colony;
     }
 
+    /**
+     * Get the <code>Colony</code> value.
+     *
+     * @return a <code>Colony</code> value
+     */
+    public final Colony getColony() {
+        return colony;
+    }
+
+    /**
+     * Set the <code>Colony</code> value.
+     *
+     * @param newColony The new Colony value.
+     */
+    public final void setColony(final Colony newColony) {
+        this.colony = newColony;
+    }
+
     public boolean isValid() {
-        return (colony.getOwner() == source &&
-                destination.isEuropean());
+        return (colony.getOwner() == getSource() &&
+                getDestination().isEuropean());
     }
 
     public void makeTrade() {
-        colony.setOwner(destination);
+        colony.setOwner(getDestination());
     }
 
     /**

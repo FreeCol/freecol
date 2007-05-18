@@ -10,6 +10,9 @@ import javax.xml.stream.XMLStreamWriter;
 
 public class StanceTradeItem extends TradeItem {
     
+    /**
+     * The stance between source and destination.
+     */
     private int stance;
         
     public StanceTradeItem(Game game, Player source, Player destination, int stance) {
@@ -17,11 +20,32 @@ public class StanceTradeItem extends TradeItem {
         this.stance = stance;
     }
 
+    /**
+     * Get the <code>Stance</code> value.
+     *
+     * @return an <code>int</code> value
+     */
+    public final int getStance() {
+        return stance;
+    }
+
+    /**
+     * Set the <code>Stance</code> value.
+     *
+     * @param newStance The new Stance value.
+     */
+    public final void setStance(final int newStance) {
+        this.stance = newStance;
+    }
     public boolean isValid() {
         return (stance == Player.WAR ||
                 stance == Player.CEASE_FIRE ||
                 stance == Player.PEACE ||
                 stance == Player.ALLIANCE);
+    }
+
+    public boolean isUnique() {
+        return true;
     }
 
     public void makeTrade() {
