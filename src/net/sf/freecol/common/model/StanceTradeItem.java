@@ -49,8 +49,8 @@ public class StanceTradeItem extends TradeItem {
     }
 
     public void makeTrade() {
-        source.setStance(destination, stance);
-        destination.setStance(source, stance);
+        getSource().setStance(getDestination(), stance);
+        getDestination().setStance(getSource(), stance);
     }
 
 
