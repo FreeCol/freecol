@@ -994,7 +994,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
      */
     private int generateAttackResult(Unit unit, Unit defender) {
         double attackPower = unit.getOffensePower(defender);
-        double defensePower = unit.getDefensePower(defender);
+        double defensePower = defender.getDefensePower(unit);
         double totalProbability = attackPower + defensePower;
         double victory = attackPower / totalProbability;
         // TODO: Use the PseudoRandom class:
