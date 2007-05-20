@@ -110,6 +110,8 @@ public final class InGameInputHandler extends InputHandler {
                 reply = setStance(element);
             } else if (type.equals("giveIndependence")) {
                 reply = giveIndependence(element);
+            } else if (type.equals("newConvert")) {
+                reply = newConvert(element);
             } else {
                 logger.warning("Message is of unsupported type \"" + type + "\".");
             }
@@ -569,6 +571,27 @@ public final class InGameInputHandler extends InputHandler {
         getFreeColClient().getMyPlayer().setCurrentFather(foundingFather);
         return reply;
     }
+
+    /**
+     * Handles a "newConvert"-request.
+     * 
+     * @param element The element (root element in a DOM-parsed XML
+     * tree) that holds all the information.
+     */
+    private Element newConvert(Element element) {
+        Tile tile = (Tile) getFreeColClient().getGame().getFreeColGameObject(element.getAttribute("colony"));
+        Colony colony = tile.getColony();
+        String nation = "indian";
+        ModelMessage message = new ModelMessage(colony,
+                                                "model.colony.newConvert",
+                                                new String[][] {
+                                                    {"%nation%", nation},
+                                                    {"%colony%", colony.getName()}},
+                                                ModelMessage.UNIT_ADDED);
+        getFreeColClient().getMyPlayer().addModelMessage(message);
+        return null;
+    }
+
 
     /**
      * Handles an "deliverGift"-request.

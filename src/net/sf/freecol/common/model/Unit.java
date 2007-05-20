@@ -3648,7 +3648,9 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
         addModelMessage(source, messageID, new String[][] {
             { "%oldName%", oldName },
             { "%unit%", newName },
-            { "%nation%", nation }
+            { "%nation%", nation },
+            { "%enemyUnit%", enemyUnit.getName() },
+            { "%enemyNation%", enemyUnit.getOwner().getNationAsString() }
         }, type, this);
 
         if (getOwner() != enemyUnit.getOwner()) {
@@ -3665,7 +3667,10 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
             addModelMessage(source, messageID, new String[][] {
                 { "%oldName%", oldName },
                 { "%unit%", newName },
-                { "%nation%", nation } }, type, this);
+                { "%enemyUnit%", enemyUnit.getName() },
+                { "%nation%", nation },
+                { "%enemyNation%", enemyUnit.getOwner().getNationAsString() }
+            }, type, this);
         }
     }
 

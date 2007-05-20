@@ -1417,7 +1417,7 @@ public final class InGameController implements NetworkConstants {
                             || defender.getLocation() == null || !defender.isVisibleTo(freeColClient.getMyPlayer()))) {
                 defender.dispose();
             }
-
+ 
             Element updateElement = getChildElement(attackResultElement, "update");
             if (updateElement != null) {
                 freeColClient.getInGameInputHandler().handle(client.getConnection(), updateElement);
