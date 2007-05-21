@@ -102,7 +102,7 @@
                     encoding="UTF-8" 
                     includes="*.properties" 
                     excludes="*_br.properties
-                              *_de_DE.properties
+                              *_de.properties
                               *_hu.properties
                               *_pt_BR.properties
                               *_pt_PT.properties
@@ -110,7 +110,7 @@
         <native2ascii src="${freecol.src.dir}/net/sf/freecol/client/gui/i18n" dest="${freecol.data.dir}/strings"
                     encoding="ISO-8859-1"
                     includes="*_br.properties
-                              *_de_DE.properties
+                              *_de.properties
                               *_hu.properties
                               *_pt_BR.properties
                               *_pt_PT.properties
