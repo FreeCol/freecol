@@ -2,6 +2,7 @@ package net.sf.freecol.common.model;
 
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
@@ -19,13 +20,67 @@ public class DiplomaticTrade extends PersistentObject {
     public static final String REVISION = "$Revision$";
 
     // the individual items the trade consists of
-    private ArrayList<TradeItem> items = new ArrayList<TradeItem>();
+    private List<TradeItem> items;
 
     @SuppressWarnings("unused")
     private final Game game;
 
-    public DiplomaticTrade(Game game) {
+    /**
+     * The player who proposed agreement.
+     */
+    private Player sender;
+
+    /**
+     * The player who is to accept this agreement.
+     */
+    private Player recipient;
+
+
+    public DiplomaticTrade(Game game, Player sender, Player recipient) {
+        this(game, sender, recipient, new ArrayList<TradeItem>());
+    }
+
+    public DiplomaticTrade(Game game, Player sender, Player recipient, List<TradeItem> items) {
         this.game = game;
+        this.sender = sender;
+        this.recipient = recipient;
+        this.items = items;
+    }
+
+    /**
+     * Get the <code>Sender</code> value.
+     *
+     * @return a <code>Player</code> value
+     */
+    public final Player getSender() {
+        return sender;
+    }
+
+    /**
+     * Set the <code>Sender</code> value.
+     *
+     * @param newSender The new Sender value.
+     */
+    public final void setSender(final Player newSender) {
+        this.sender = newSender;
+    }
+
+    /**
+     * Get the <code>Recipient</code> value.
+     *
+     * @return a <code>Player</code> value
+     */
+    public final Player getRecipient() {
+        return recipient;
+    }
+
+    /**
+     * Set the <code>Recipient</code> value.
+     *
+     * @param newRecipient The new Recipient value.
+     */
+    public final void setRecipient(final Player newRecipient) {
+        this.recipient = newRecipient;
     }
 
     /**
@@ -35,6 +90,9 @@ public class DiplomaticTrade extends PersistentObject {
      *            a <code>TradeItem</code> value
      */
     public void add(TradeItem newItem) {
+        if (newItem.isUnique()) {
+            removeType(newItem);
+        }
         items.add(newItem);
     }
 
@@ -46,6 +104,22 @@ public class DiplomaticTrade extends PersistentObject {
      */
     public void remove(TradeItem newItem) {
         items.remove(newItem);
+    }
+
+
+    /**
+     * Removes all trade items of the same class as the given
+     * argument.
+     *
+     * @param someItem a <code>TradeItem</code> value
+     */
+    public void removeType(TradeItem someItem) {
+        Iterator<TradeItem> itemIterator = items.iterator();
+        while (itemIterator.hasNext()) {
+            if (itemIterator.next().getClass() == someItem.getClass()) {
+                itemIterator.remove();
+            }
+        }
     }
 
     /**

@@ -59,6 +59,11 @@ public final class NegotiationDialog extends FreeColDialog implements ActionList
     private List<TradeItem> tradeItems;
 
     private JButton acceptButton, cancelButton, sendButton;
+    private StanceTradeItemPanel stance;
+    private GoldTradeItemPanel goldOffer, goldDemand;
+    private ColonyTradeItemPanel colonyOffer, colonyDemand;
+    private GoodsTradeItemPanel goodsOffer, goodsDemand;
+    //private UnitTradeItemPanel unitOffer, unitDemand;
     private JTextPane summary;
 
     private final Unit unit;
@@ -127,7 +132,6 @@ public final class NegotiationDialog extends FreeColDialog implements ActionList
 
         Style buttonStyle = document.addStyle("button", regular);
         StyleConstants.setForeground(buttonStyle, LINK_COLOR);
-
     }
 
     /**
@@ -162,6 +166,19 @@ public final class NegotiationDialog extends FreeColDialog implements ActionList
             tradeGoods = unit.getGoodsContainer().getGoods();
         }
 
+
+        stance = new StanceTradeItemPanel(this, player);
+        goldDemand = new GoldTradeItemPanel(this, otherPlayer);
+        goldOffer = new GoldTradeItemPanel(this, player);
+        goodsDemand = new GoodsTradeItemPanel(this, otherPlayer, tradeGoods);
+        goodsOffer = new GoodsTradeItemPanel(this, player, tradeGoods);
+        colonyDemand = new ColonyTradeItemPanel(this, otherPlayer);
+        colonyOffer = new ColonyTradeItemPanel(this, player);
+        /** TODO: UnitTrade
+            unitDemand = new UnitTradeItemPanel(this, otherPlayer);
+            unitOffer = new UnitTradeItemPanel(this, player);
+        */
+
         int numberOfTradeItems = 5;
         int extraRows = 2; // headline and buttons
 
@@ -182,30 +199,21 @@ public final class NegotiationDialog extends FreeColDialog implements ActionList
         add(new JLabel(Messages.message("negotiationDialog.offer")),
             higConst.rc(row, offerColumn));
         row += 2;
-        add(new StanceTradeItemPanel(this, player),
-            higConst.rc(row, offerColumn));
+        add(stance, higConst.rc(row, offerColumn));
         row += 2;
-        add(new GoldTradeItemPanel(this, otherPlayer),
-            higConst.rc(row, demandColumn));
-        add(new GoldTradeItemPanel(this, player),
-            higConst.rc(row, offerColumn));
+        add(goldDemand, higConst.rc(row, demandColumn));
+        add(goldOffer, higConst.rc(row, offerColumn));
         add(summary, higConst.rcwh(row, summaryColumn, 1, 5));
         row += 2;
-        add(new GoodsTradeItemPanel(this, otherPlayer, tradeGoods),
-            higConst.rc(row, demandColumn));
-        add(new GoodsTradeItemPanel(this, player, tradeGoods),
-            higConst.rc(row, offerColumn));
+        add(goodsDemand, higConst.rc(row, demandColumn));
+        add(goodsOffer, higConst.rc(row, offerColumn));
         row += 2;
-        add(new ColonyTradeItemPanel(this, otherPlayer),
-            higConst.rc(row, demandColumn));
-        add(new ColonyTradeItemPanel(this, player),
-            higConst.rc(row, offerColumn));
+        add(colonyDemand, higConst.rc(row, demandColumn));
+        add(colonyOffer, higConst.rc(row, offerColumn));
         row += 2;
         /** TODO: UnitTrade
-        add(new UnitTradeItemPanel(this, otherPlayer),
-            higConst.rc(row, demandColumn));
-        add(new UnitTradeItemPanel(this, player),
-            higConst.rc(row, offerColumn));
+            add(unitDemand, higConst.rc(row, demandColumn));
+            add(unitOffer, higConst.rc(row, offerColumn));
         */
         row += 2;
         add(sendButton, higConst.rc(row, demandColumn, ""));
@@ -245,17 +253,28 @@ public final class NegotiationDialog extends FreeColDialog implements ActionList
                     demands.add(description);
                 }
             }
-            String offerString = "";
-            for (int index = 0; index < offers.size() - 1; index++) {
-                offerString += offers.get(index) + ", ";
+
+            String offerString;
+            if (offers.isEmpty()) {
+                offerString = Messages.message("negotiationDialog.nothing");
+            } else {
+                offerString = "";
+                for (int index = 0; index < offers.size() - 1; index++) {
+                    offerString += offers.get(index) + ", ";
+                }
+                offerString += offers.get(offers.size() - 1);
             }
-            offerString += offers.get(offers.size() - 1);
 
             String demandString = "";
-            for (int index = 0; index < demands.size() - 1; index++) {
-                demandString += demands.get(index) + ", ";
+            if (demands.isEmpty()) {
+                demandString = Messages.message("negotiationDialog.nothing");
+            } else {
+                demandString = "";
+                for (int index = 0; index < demands.size() - 1; index++) {
+                    demandString += demands.get(index) + ", ";
+                }
+                demandString += demands.get(demands.size() - 1);
             }
-            demandString += demands.get(demands.size() - 1);
 
             document.insertString(document.getLength(), 
                                   Messages.message("negotiationDialog.summary",
@@ -266,7 +285,7 @@ public final class NegotiationDialog extends FreeColDialog implements ActionList
                                   document.getStyle("regular"));
 
         } catch(Exception e) {
-            logger.warning("Failed to update summary.");
+            logger.warning("Failed to update summary: " + e.toString());
         }
     }
 
@@ -419,6 +438,7 @@ public final class NegotiationDialog extends FreeColDialog implements ActionList
             String command = event.getActionCommand();
             if (command.equals("add")) {
                 negotiationDialog.addColonyTradeItem(player, (Colony) colonyBox.getSelectedItem());
+                updateSummary();
             }
 
         }
@@ -492,6 +512,7 @@ public final class NegotiationDialog extends FreeColDialog implements ActionList
             String command = event.getActionCommand();
             if (command.equals("add")) {
                 negotiationDialog.addGoodsTradeItem(player, (Goods) goodsBox.getSelectedItem());
+                updateSummary();
             }
 
         }
@@ -546,6 +567,7 @@ public final class NegotiationDialog extends FreeColDialog implements ActionList
             String command = event.getActionCommand();
             if (command.equals("add")) {
                 negotiationDialog.setStance(stanceBox.getSelectedIndex() - OFFSET);
+                updateSummary();
             }
 
         }
@@ -593,6 +615,7 @@ public final class NegotiationDialog extends FreeColDialog implements ActionList
             if (command.equals("add")) {
                 int amount = ((Integer) spinner.getValue()).intValue();
                 negotiationDialog.addGoldTradeItem(player, amount);
+                updateSummary();
             }
 
         }

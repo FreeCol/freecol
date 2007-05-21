@@ -2839,7 +2839,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
                         // Give Lumber to adjacent colony
                         // Yes, the amount of lumber may exceed 100 units,
                         // but this was also true for the original game, IIRC.
-                        int lumberAmount = getTile().potential(Goods.LUMBER) * 15 + 10;
+                        int lumberAmount = getTile().potential(Goods.LUMBER) * 10;
                         if (getColony() != null && getColony().getOwner().equals(getOwner())) {
                             getColony().addGoods(Goods.LUMBER, lumberAmount);
                         } else {
@@ -3375,7 +3375,8 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
         }
 
         // make sure we are at war, unless one of both units is a privateer
-        if (getOwner().isEuropean() && enemy.isEuropean() && getType() != PRIVATEER && defender.getType() != PRIVATEER) {
+        //getOwner().isEuropean() && enemy.isEuropean() &&
+        if (getType() != PRIVATEER && defender.getType() != PRIVATEER) {
             getOwner().setStance(enemy, Player.WAR);
         } else if (getType() == PRIVATEER) {
             enemy.setAttackedByPrivateers();
@@ -3570,7 +3571,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
         String oldName = getName();
         String messageID = "model.unit.unitDemoted";
         String nation = owner.getNationAsString();
-        int type = ModelMessage.UNIT_DEMOTED;
+        int messageType = ModelMessage.UNIT_DEMOTED;
 
         if (enemyUnit.isUndead()) {
             // this unit is captured, don't show old owner's messages to new
@@ -3579,7 +3580,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
                 message.setBeenDisplayed(true);
             }
             messageID = "model.unit.unitCaptured";
-            type = ModelMessage.UNIT_LOST;
+            messageType = ModelMessage.UNIT_LOST;
             setHitpoints(getInitialHitpoints(enemyUnit.getType()));
             setLocation(enemyUnit.getTile());
             setOwner(enemyUnit.getOwner());
@@ -3589,11 +3590,13 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
             setType(DAMAGED_ARTILLERY);
         } else if (getType() == DAMAGED_ARTILLERY) {
             messageID = "model.unit.unitDestroyed";
-            type = ModelMessage.UNIT_LOST;
+            messageType = ModelMessage.UNIT_LOST;
             dispose();
+        } else if (getType() == VETERAN_SOLDIER) {
+            setType(FREE_COLONIST);
         } else if (getType() == BRAVE || getType() == KINGS_REGULAR) {
             messageID = "model.unit.unitSlaughtered";
-            type = ModelMessage.UNIT_LOST;
+            messageType = ModelMessage.UNIT_LOST;
             dispose();
         } else if (isMounted()) {
             if (isArmed()) {
@@ -3607,7 +3610,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
             } else {
                 // scout
                 messageID = "model.unit.unitSlaughtered";
-                type = ModelMessage.UNIT_LOST;
+                messageType = ModelMessage.UNIT_LOST;
                 dispose();
             }
         } else if (isArmed()) {
@@ -3627,13 +3630,13 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
                     message.setBeenDisplayed(true);
                 }
                 messageID = "model.unit.unitCaptured";
-                type = ModelMessage.UNIT_LOST;
+                messageType = ModelMessage.UNIT_LOST;
                 setHitpoints(getInitialHitpoints(enemyUnit.getType()));
                 setLocation(enemyUnit.getTile());
                 setOwner(enemyUnit.getOwner());
             } else {
                 messageID = "model.unit.unitSlaughtered";
-                type = ModelMessage.UNIT_LOST;
+                messageType = ModelMessage.UNIT_LOST;
                 dispose();
             }
         }
@@ -3651,15 +3654,11 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
             { "%nation%", nation },
             { "%enemyUnit%", enemyUnit.getName() },
             { "%enemyNation%", enemyUnit.getOwner().getNationAsString() }
-        }, type, this);
+        }, messageType, this);
 
         if (getOwner() != enemyUnit.getOwner()) {
             // this unit hasn't been captured by enemyUnit, show message to
             // enemyUnit's owner
-            /*
-              MB: Reports about Indian units being slaughtered while
-              attacking colonies end up here. Why is that?
-             */
             source = enemyUnit;
             if (enemyUnit.getColony() != null) {
                 source = enemyUnit.getColony();
@@ -3670,7 +3669,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
                 { "%enemyUnit%", enemyUnit.getName() },
                 { "%nation%", nation },
                 { "%enemyNation%", enemyUnit.getOwner().getNationAsString() }
-            }, type, this);
+            }, messageType, this);
         }
     }
 

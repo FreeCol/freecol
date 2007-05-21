@@ -2136,9 +2136,11 @@ public class Player extends FreeColGameObject implements Nameable {
         int oldStance = stance[player.getNation()];
         // Ignore requests to change the stance when indian players are
         // involved:
+        /*
         if (isIndian() || player.isIndian()) {
             return;
         }
+        */
         if (player == this) {
             throw new IllegalStateException("Cannot set the stance towards ourselves.");
         }
@@ -2252,6 +2254,9 @@ public class Player extends FreeColGameObject implements Nameable {
                         Unit u = iter.next();
                         if (u.getType() == Unit.INDIAN_CONVERT) {
                             u.setType(Unit.FREE_COLONIST);
+                            // reset experience, otherwise they will
+                            // immediately become experts
+                            u.modifyExperience(-u.getExperience());
                         }
                     }
                     break;

@@ -15,7 +15,7 @@ import javax.xml.stream.XMLStreamWriter;
 public abstract class TradeItem extends PersistentObject {
 
     /**
-     * Describe game here.
+     * The game this TradeItem belongs to.
      */
     private Game game;
 
@@ -28,9 +28,11 @@ public abstract class TradeItem extends PersistentObject {
      * The player who is to receive this item.
      */
     private Player destination;
-    
-    // the ID, used to get a name, etc.
-    protected String ID;
+
+    /**
+     * The ID, used to get a name, etc.
+     */
+    private String ID;
 
         
     /**
@@ -46,6 +48,24 @@ public abstract class TradeItem extends PersistentObject {
         this.ID = id;
         this.source = source;
         this.destination = destination;
+    }
+
+    /**
+     * Get the <code>ID</code> value.
+     *
+     * @return a <code>String</code> value
+     */
+    public final String getID() {
+        return ID;
+    }
+
+    /**
+     * Set the <code>ID</code> value.
+     *
+     * @param newID The new ID value.
+     */
+    public final void setID(final String newID) {
+        this.ID = newID;
     }
 
     /**
@@ -117,7 +137,7 @@ public abstract class TradeItem extends PersistentObject {
      *
      * @return a <code>boolean</code> value
      */
-    public boolean isUnique() {
+    public static boolean isUnique() {
         return false;
     }
 
