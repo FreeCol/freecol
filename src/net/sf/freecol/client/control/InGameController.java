@@ -1231,6 +1231,7 @@ public final class InGameController implements NetworkConstants {
                     } else if (result.equals("disagree")) {
                         freeColClient.getCanvas().showInformationMessage("scoutSettlement.tributeDisagree");
                     }
+                    unit.setMovesLeft(0);
                 } else {
                     logger.warning("Server gave an invalid reply to an armedUnitDemandTribute message");
                     return;

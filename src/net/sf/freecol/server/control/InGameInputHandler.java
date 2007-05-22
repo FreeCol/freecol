@@ -1304,11 +1304,13 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
             throw new IllegalArgumentException("Could not find tile in direction " + direction + " from unit with ID "
                     + element.getAttribute("unit"));
         }
+        unit.setMovesLeft(0);
         IndianSettlement settlement = (IndianSettlement) newTile.getSettlement();
         Element reply = Message.createNewRootElement("armedUnitDemandTributeResult");
         demandTribute(settlement, player, reply);
         return reply;
     }
+
 
     /**
      * Demands a tribute to an <code>IndianSettlement</code>
@@ -1319,19 +1321,16 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
      * @param reply The element to add the result
      */
     private void demandTribute(IndianSettlement settlement, Player player, Element reply) {
-        // TODO: the AI needs to determine whether or not we want to pay and how
-        // much.
-        double random = Math.random();
-        if (random < 0.5 && settlement.getOwner().getGold() >= 100) {
+        int gold = settlement.getTribute(player);
+        if (gold > 0) {
             reply.setAttribute("result", "agree");
-            reply.setAttribute("amount", "100");
-            settlement.getOwner().modifyGold(-100);
-            player.modifyGold(100);
+            reply.setAttribute("amount", String.valueOf(gold));
+            player.modifyGold(gold);
         } else {
             reply.setAttribute("result", "disagree");
         }
-        settlement.getOwner().modifyTension(player, Tension.TENSION_ADD_MINOR);
     }
+
 
     /**
      * Handles a "missionaryAtSettlement"-message from a client.

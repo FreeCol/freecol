@@ -3592,8 +3592,6 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
             messageID = "model.unit.unitDestroyed";
             messageType = ModelMessage.UNIT_LOST;
             dispose();
-        } else if (getType() == VETERAN_SOLDIER) {
-            setType(FREE_COLONIST);
         } else if (getType() == BRAVE || getType() == KINGS_REGULAR) {
             messageID = "model.unit.unitSlaughtered";
             messageType = ModelMessage.UNIT_LOST;
@@ -3629,7 +3627,12 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
                 for (ModelMessage message : getOwner().getModelMessages()) {
                     message.setBeenDisplayed(true);
                 }
-                messageID = "model.unit.unitCaptured";
+                if (getType() == VETERAN_SOLDIER) {
+                    setType(FREE_COLONIST);
+                    messageID = "model.veteranUnit.unitCaptured";
+                } else {
+                    messageID = "model.unit.unitCaptured";
+                }
                 messageType = ModelMessage.UNIT_LOST;
                 setHitpoints(getInitialHitpoints(enemyUnit.getType()));
                 setLocation(enemyUnit.getTile());

@@ -48,6 +48,7 @@ public class IndianSettlement extends Settlement {
 
 
     public static final int MAX_CONVERT_DISTANCE = 10;
+    public static final int TURNS_PER_TRIBUTE = 5;
 
     /** The amount of goods a brave can produce a single turn. */
     //private static final int WORK_AMOUNT = 5;
@@ -101,9 +102,11 @@ public class IndianSettlement extends Settlement {
 
     private Unit missionary;
 
-    /** Used for moitoring the progress towards creating a convert. */
+    /** Used for monitoring the progress towards creating a convert. */
     private int  convertProgress;
 
+    /** The number of the turn during which the last tribute was paid. */
+    int lastTribute = 0;
 
     /**
     * Stores the alarm levels. <b>Only used by AI.</b>
@@ -266,6 +269,38 @@ public class IndianSettlement extends Settlement {
         }
     }
 
+
+    /**
+     * Returns the amount of gold this settlement pays as a tribute.
+     *
+     * @param player a <code>Player</code> value
+     * @return an <code>int</code> value
+     */
+    public int getTribute(Player player) {
+        // increase tension whether we pay or not
+        getOwner().modifyTension(player, Tension.TENSION_ADD_MINOR);
+
+        int gold = 0;
+        if (getGame().getTurn().getNumber() > lastTribute + TURNS_PER_TRIBUTE) {
+            switch(getOwner().getTension(player).getLevel()) {
+            case Tension.HAPPY:
+            case Tension.CONTENT:
+                gold = Math.min(getOwner().getGold() / 10, 100);
+                break;
+            case Tension.DISPLEASED:
+                gold = Math.min(getOwner().getGold() / 20, 100);
+                break;
+            case Tension.ANGRY:
+            case Tension.HATEFUL:
+            default:
+                // do nothing
+            }
+
+        }
+        getOwner().modifyGold(-gold);
+        lastTribute = getGame().getTurn().getNumber();
+        return gold;
+    }
 
     /**
     * Modifies the alarm level towards the given player.
@@ -1137,6 +1172,7 @@ public class IndianSettlement extends Settlement {
         out.writeAttribute("owner", owner.getID());
         out.writeAttribute("tribe", Integer.toString(tribe));
         out.writeAttribute("kind", Integer.toString(kind));
+        out.writeAttribute("lastTribute", Integer.toString(lastTribute));
         out.writeAttribute("isCapital", Boolean.toString(isCapital));
 
         if (getGame().isClientTrusted() || showAll || player == getOwner()) {
@@ -1222,6 +1258,11 @@ public class IndianSettlement extends Settlement {
                 }
                 ownedUnits.add(u);
             }
+        }
+
+        final String lastTributeString = in.getAttributeValue(null, "lastTribute");
+        if (lastTributeString != null) {
+            lastTribute = Integer.parseInt(lastTributeString);
         }
 
         final String learnableSkillStr = in.getAttributeValue(null, "learnableSkill");
