@@ -2261,7 +2261,7 @@ public class Player extends FreeColGameObject implements Nameable {
                     }
                     break;
 
-                case FoundingFather.FRANSISCO_DE_CORONADO:
+                case FoundingFather.FRANCISCO_DE_CORONADO:
                     exploreAllColonies();
                     break;
 

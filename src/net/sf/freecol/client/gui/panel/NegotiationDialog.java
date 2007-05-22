@@ -29,6 +29,7 @@ import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.ColonyTradeItem;
+import net.sf.freecol.common.model.DiplomaticTrade;
 import net.sf.freecol.common.model.GoldTradeItem;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.GoodsTradeItem;
@@ -56,7 +57,7 @@ public final class NegotiationDialog extends FreeColDialog implements ActionList
 
     private static FreeColClient freeColClient;
 
-    private List<TradeItem> tradeItems;
+    private DiplomaticTrade agreement;
 
     private JButton acceptButton, cancelButton, sendButton;
     private StanceTradeItemPanel stance;
@@ -81,7 +82,7 @@ public final class NegotiationDialog extends FreeColDialog implements ActionList
      * @param settlement a <code>Settlement</code> value
      */
     public NegotiationDialog(Canvas parent, Unit unit, Settlement settlement) {
-        this(parent, unit, settlement, new ArrayList<TradeItem>());
+        this(parent, unit, settlement, null);
     }
 
     /**
@@ -92,17 +93,21 @@ public final class NegotiationDialog extends FreeColDialog implements ActionList
      * @param settlement a <code>Settlement</code> value
      * @param items a <code>List</code> of <code>TradeItem</code> values.
      */
-    public NegotiationDialog(Canvas parent, Unit unit, Settlement settlement, List<TradeItem> items) {
+    public NegotiationDialog(Canvas parent, Unit unit, Settlement settlement, DiplomaticTrade agreement) {
         super(parent);
         setFocusCycleRoot(true);
 
         this.unit = unit;
         this.settlement = settlement;
-        this.tradeItems = items;
         this.freeColClient = parent.getClient();
         this.player = freeColClient.getMyPlayer();
         this.sender = unit.getOwner();
         this.recipient = settlement.getOwner();
+        if (agreement == null) {
+            this.agreement = new DiplomaticTrade(unit.getGame(), sender, recipient);
+        } else {
+            this.agreement = agreement;
+        }
         if (sender == player) {
             this.otherPlayer = recipient;
         } else {
@@ -112,8 +117,8 @@ public final class NegotiationDialog extends FreeColDialog implements ActionList
         if (player.getStance(otherPlayer) == Player.WAR) {
             if (!hasPeaceOffer()) {
                 int stance = Player.PEACE;
-                tradeItems.add(new StanceTradeItem(freeColClient.getGame(), player, otherPlayer, stance));
-                tradeItems.add(new StanceTradeItem(freeColClient.getGame(), otherPlayer, player, stance));
+                agreement.add(new StanceTradeItem(freeColClient.getGame(), player, otherPlayer, stance));
+                agreement.add(new StanceTradeItem(freeColClient.getGame(), otherPlayer, player, stance));
             }
         }
 
@@ -230,7 +235,9 @@ public final class NegotiationDialog extends FreeColDialog implements ActionList
         
             List<String> offers = new ArrayList<String>();
             List<String> demands = new ArrayList<String>();
-            for (TradeItem item : tradeItems) {
+            Iterator<TradeItem> itemIterator = agreement.iterator();
+            while (itemIterator.hasNext()) {
+                TradeItem item = itemIterator.next();
                 String description = "";
                 if (item instanceof StanceTradeItem) {
                     description = Player.getStanceAsString(((StanceTradeItem) item).getStance());
@@ -307,7 +314,7 @@ public final class NegotiationDialog extends FreeColDialog implements ActionList
         } else {
             destination = otherPlayer;
         }
-        tradeItems.add(new ColonyTradeItem(freeColClient.getGame(), source, destination, colony));
+        agreement.add(new ColonyTradeItem(freeColClient.getGame(), source, destination, colony));
     }
 
     /**
@@ -323,7 +330,7 @@ public final class NegotiationDialog extends FreeColDialog implements ActionList
         } else {
             destination = otherPlayer;
         }
-        tradeItems.add(new GoldTradeItem(freeColClient.getGame(), source, destination, amount));
+        agreement.add(new GoldTradeItem(freeColClient.getGame(), source, destination, amount));
     }
 
     /**
@@ -340,7 +347,7 @@ public final class NegotiationDialog extends FreeColDialog implements ActionList
         } else {
             destination = otherPlayer;
         }
-        tradeItems.add(new GoodsTradeItem(freeColClient.getGame(), source, destination, goods, settlement));
+        agreement.add(new GoodsTradeItem(freeColClient.getGame(), source, destination, goods, settlement));
     }
 
 
@@ -351,7 +358,9 @@ public final class NegotiationDialog extends FreeColDialog implements ActionList
      * @return an <code>int</code> value
      */
     public int getStance() {
-        for (TradeItem item : tradeItems) {
+        Iterator<TradeItem> itemIterator = agreement.iterator();
+        while (itemIterator.hasNext()) {
+            TradeItem item = itemIterator.next();
             if (item instanceof StanceTradeItem) {
                 return ((StanceTradeItem) item).getStance();
             }
@@ -365,14 +374,7 @@ public final class NegotiationDialog extends FreeColDialog implements ActionList
      * @param stance an <code>int</code> value
      */
     public void setStance(int stance) {
-        Iterator<TradeItem> tradeItemIterator = tradeItems.iterator();
-        while (tradeItemIterator.hasNext()) {
-            if (tradeItemIterator.next() instanceof StanceTradeItem) {
-                tradeItemIterator.remove();
-            }
-        }
-        tradeItems.add(new StanceTradeItem(freeColClient.getGame(), player, otherPlayer, stance));
-        tradeItems.add(new StanceTradeItem(freeColClient.getGame(), otherPlayer, player, stance));
+        agreement.add(new StanceTradeItem(freeColClient.getGame(), otherPlayer, player, stance));
     }
 
 

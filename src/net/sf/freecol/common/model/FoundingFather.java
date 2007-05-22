@@ -20,7 +20,7 @@ public class FoundingFather {
                             PETER_STUYVESANT = 3, 
                             JAN_DE_WITT = 4, //TODO
                             FERDINAND_MAGELLAN = 5,
-                            FRANSISCO_DE_CORONADO = 6,
+                            FRANCISCO_DE_CORONADO = 6,
                             HERNANDO_DE_SOTO = 7,
                             HENRY_HUDSON = 8,
                             LA_SALLE = 9,
@@ -78,7 +78,7 @@ public class FoundingFather {
             case PETER_STUYVESANT: return "foundingFather.peterStuyvesant";
             case JAN_DE_WITT: return "foundingFather.janDeWitt";
             case FERDINAND_MAGELLAN: return "foundingFather.ferdinandMagellan";
-            case FRANSISCO_DE_CORONADO: return "foundingFather.fransiscoDeCoronado";
+            case FRANCISCO_DE_CORONADO: return "foundingFather.franciscoDeCoronado";
             case HERNANDO_DE_SOTO: return "foundingFather.hernandoDeSoto";
             case HENRY_HUDSON: return "foundingFather.henryHudson";
             case LA_SALLE: return "foundingFather.laSalle";
@@ -96,7 +96,7 @@ public class FoundingFather {
             case WILLIAM_PENN: return "foundingFather.williamPenn";
             case FATHER_JEAN_DE_BREBEUF: return "foundingFather.fatherJeanDeBrebeuf";
             case JUAN_DE_SEPULVEDA: return "foundingFather.juanDeSepulveda";
-            case BARTOLOME_DE_LAS_CASAS: return "foundingFather.bartolmeDeLasCasas";
+            case BARTOLOME_DE_LAS_CASAS: return "foundingFather.bartolomeDeLasCasas";
             default:
                 throw new IllegalArgumentException("FoundingFather has invalid type.");
         }
@@ -111,7 +111,7 @@ public class FoundingFather {
             case PETER_STUYVESANT: return TRADE;
             case JAN_DE_WITT: return TRADE;
             case FERDINAND_MAGELLAN: return EXPLORATION;
-            case FRANSISCO_DE_CORONADO: return EXPLORATION;
+            case FRANCISCO_DE_CORONADO: return EXPLORATION;
             case HERNANDO_DE_SOTO: return EXPLORATION;
             case HENRY_HUDSON: return EXPLORATION;
             case LA_SALLE: return EXPLORATION;
@@ -172,7 +172,7 @@ public class FoundingFather {
             case PETER_STUYVESANT: return 2;
             case JAN_DE_WITT: return 2;
             case FERDINAND_MAGELLAN: return 2;
-            case FRANSISCO_DE_CORONADO: return 3;
+            case FRANCISCO_DE_CORONADO: return 3;
             case HERNANDO_DE_SOTO: return 5;
             case HENRY_HUDSON: return 10;
             case LA_SALLE: return 7;
@@ -205,7 +205,7 @@ public class FoundingFather {
             case PETER_STUYVESANT: return 4;
             case JAN_DE_WITT: return 6;
             case FERDINAND_MAGELLAN: return 10;
-            case FRANSISCO_DE_CORONADO: return 5;
+            case FRANCISCO_DE_CORONADO: return 5;
             case HERNANDO_DE_SOTO: return 10;
             case HENRY_HUDSON: return 1;
             case LA_SALLE: return 5;
@@ -238,7 +238,7 @@ public class FoundingFather {
             case PETER_STUYVESANT: return 8;
             case JAN_DE_WITT: return 10;
             case FERDINAND_MAGELLAN: return 10;
-            case FRANSISCO_DE_CORONADO: return 7;
+            case FRANCISCO_DE_CORONADO: return 7;
             case HERNANDO_DE_SOTO: return 5;
             case HENRY_HUDSON: return 1; // 0
             case LA_SALLE: return 3;

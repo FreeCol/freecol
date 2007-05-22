@@ -1612,7 +1612,7 @@ public class AIPlayer extends AIObject {
             case FoundingFather.FERDINAND_MAGELLAN:
                 value = 5;
                 break;
-            case FoundingFather.FRANSISCO_DE_CORONADO:
+            case FoundingFather.FRANCISCO_DE_CORONADO:
                 value = 4;
                 break;
             case FoundingFather.HERNANDO_DE_SOTO:
