@@ -9,7 +9,9 @@ clean:
 	rm -f *.out
 	rm -f *.pdf
 
-html:clean
+pdf:clean
 	pdflatex FreeCol.tex
 	pdflatex FreeCol.tex
+
+html:pdf
 	latex2html -show_section_numbers FreeCol.tex

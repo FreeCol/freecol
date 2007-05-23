@@ -626,6 +626,54 @@ abstract public class FreeColGameObject {
     }
     
     /**
+     * Return an attribute value or the default value.
+     *
+     * @param in a <code>XMLStreamReader</code> value
+     * @param defaultValue an <code>int</code> value
+     * @return an <code>int</code> value
+     */
+    public int getAttribute(XMLStreamReader in, String attributeName, int defaultValue) {
+        final String attributeString = in.getAttributeValue(null, attributeName);
+        if (attributeString != null) {
+            return Integer.parseInt(attributeString);
+        } else {
+            return defaultValue;
+        }
+    }
+
+    /**
+     * Return an attribute value or the default value.
+     *
+     * @param in a <code>XMLStreamReader</code> value
+     * @param defaultValue an <code>boolean</code> value
+     * @return an <code>boolean</code> value
+     */
+    public boolean getAttribute(XMLStreamReader in, String attributeName, boolean defaultValue) {
+        final String attributeString = in.getAttributeValue(null, attributeName);
+        if (attributeString != null) {
+            return Boolean.parseBoolean(attributeString);
+        } else {
+            return defaultValue;
+        }
+    }
+
+    /**
+     * Return an attribute value or the default value.
+     *
+     * @param in a <code>XMLStreamReader</code> value
+     * @param defaultValue an <code>String</code> value
+     * @return an <code>String</code> value
+     */
+    public String getAttribute(XMLStreamReader in, String attributeName, String defaultValue) {
+        final String attributeString = in.getAttributeValue(null, attributeName);
+        if (attributeString != null) {
+            return attributeString;
+        } else {
+            return defaultValue;
+        }
+    }
+
+    /**
     * Creates an XML-representation of an array.
     * 
     * @param tagName The tagname for the <code>Element</code>

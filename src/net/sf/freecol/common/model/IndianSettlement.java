@@ -1260,53 +1260,16 @@ public class IndianSettlement extends Settlement {
             }
         }
 
-        final String lastTributeString = in.getAttributeValue(null, "lastTribute");
-        if (lastTributeString != null) {
-            lastTribute = Integer.parseInt(lastTributeString);
-        }
-
-        final String learnableSkillStr = in.getAttributeValue(null, "learnableSkill");
-        if (learnableSkillStr != null) {
-            learnableSkill = Integer.parseInt(learnableSkillStr);
-        } else {
-            learnableSkill = UNKNOWN;
-        }
-
         // TODO: remove these as soon as there are no more old savegames floating around
-        final String wantedGoods0Str = in.getAttributeValue(null, "highlyWantedGoods");
-        if (wantedGoods0Str != null) {
-            wantedGoods[0] = Integer.parseInt(wantedGoods0Str);
-        } else {
-            wantedGoods[0] = UNKNOWN;
-        }
-        
-        final String wantedGoods1Str = in.getAttributeValue(null, "wantedGoods1");
-        if (wantedGoods1Str != null) {
-            wantedGoods[1] = Integer.parseInt(wantedGoods1Str);
-        } else {
-            wantedGoods[1] = UNKNOWN;
-        }
-        
-        final String wantedGoods2Str = in.getAttributeValue(null, "wantedGoods2");
-        if (wantedGoods2Str != null) {
-            wantedGoods[2] = Integer.parseInt(wantedGoods2Str);
-        } else {
-            wantedGoods[2] = UNKNOWN;
-        }
-        
-        final String hasBeenVisitedStr = in.getAttributeValue(null, "hasBeenVisited");
-        if (hasBeenVisitedStr != null) {
-            isVisited = Boolean.valueOf(hasBeenVisitedStr).booleanValue();            
-        } else {
-            isVisited = false;
-        }
-        
-        final String convertProgressStr = in.getAttributeValue(null, "convertProgress");
-        if (convertProgressStr != null) {
-            convertProgress = Integer.parseInt(convertProgressStr);
-        } else {
-            convertProgress = UNKNOWN;
-        }
+        wantedGoods[0] = getAttribute(in, "highlyWantedGoods", UNKNOWN);
+        wantedGoods[1] = getAttribute(in, "wantedGoods1", UNKNOWN);
+        wantedGoods[2] = getAttribute(in, "wantedGoods2", UNKNOWN);
+
+        isVisited = getAttribute(in, "hasBeenVisisted", false);
+        convertProgress = getAttribute(in, "convertProgress", UNKNOWN);
+        lastTribute = getAttribute(in, "lastTribute", 0);
+        learnableSkill = getAttribute(in, "learnableSkill", UNKNOWN);
+
 
         alarm = new Tension[Player.NUMBER_OF_NATIONS];
         while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
