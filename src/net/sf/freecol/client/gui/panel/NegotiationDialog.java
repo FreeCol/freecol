@@ -3,11 +3,11 @@ package net.sf.freecol.client.gui.panel;
 import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.logging.Logger;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
+import java.util.logging.Logger;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
@@ -23,9 +23,7 @@ import javax.swing.text.StyleContext;
 import javax.swing.text.StyledDocument;
 
 import net.sf.freecol.client.FreeColClient;
-import net.sf.freecol.client.control.InGameController;
 import net.sf.freecol.client.gui.Canvas;
-import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.ColonyTradeItem;
@@ -55,7 +53,7 @@ public final class NegotiationDialog extends FreeColDialog implements ActionList
 
     private static Logger logger = Logger.getLogger(NegotiationDialog.class.getName());
 
-    private static FreeColClient freeColClient;
+    private FreeColClient freeColClient;
 
     private DiplomaticTrade agreement;
 
