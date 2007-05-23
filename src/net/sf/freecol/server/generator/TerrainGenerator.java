@@ -66,17 +66,16 @@ public class TerrainGenerator {
         final int width = landMap.length;
         final int height = landMap[0].length;
         
-        final boolean importTerrain = getMapGeneratorOptions().getBoolean(MapGeneratorOptions.IMPORT_TERRAIN);
-        final boolean importBonuses = getMapGeneratorOptions().getBoolean(MapGeneratorOptions.IMPORT_BONUSES);
-        final boolean importLandMap = getMapGeneratorOptions().getBoolean(MapGeneratorOptions.IMPORT_LAND_MAP);
+        final boolean importTerrain = (importGame != null) && getMapGeneratorOptions().getBoolean(MapGeneratorOptions.IMPORT_TERRAIN);
+        final boolean importBonuses = (importGame != null) && getMapGeneratorOptions().getBoolean(MapGeneratorOptions.IMPORT_BONUSES);
+        final boolean importLandMap = (importGame != null) && getMapGeneratorOptions().getBoolean(MapGeneratorOptions.IMPORT_LAND_MAP);
                 
         Vector<Vector<Tile>> columns = new Vector<Vector<Tile>>(getMapGeneratorOptions().getWidth());
         for (int i = 0; i < width; i++) {
             Vector<Tile> v = new Vector<Tile>(height);
             for (int j = 0; j < height; j++) {
                 Tile t;                
-                if (importGame != null
-                        && importTerrain
+                if (importTerrain
                         && importGame.getMap().isValid(i, j)) {
                     Tile importTile = importGame.getMap().getTile(i, j);
                     if (importLandMap || importTile.isLand() == landMap[i][j]) {
