@@ -959,8 +959,17 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
                 } else if (canTradeWith(settlement)) {
                     return ENTER_SETTLEMENT_WITH_CARRIER_AND_GOODS;
                 } else if (!from.isLand()) {
-                    logger.fine("Trying to disembark into foreign colony with " + getName());
-                    return ILLEGAL_MOVE;
+                    /*
+                     * An enemy should be able to attack a colony on a 1x1
+                     * island. Therefor: All attacks on colonies from ships
+                     * are allowed. This behavior should be discussed on the
+                     * developer's mailing list before being changed.
+                     */
+                    if (isOffensiveUnit()) {
+                        return ATTACK;
+                    } else {
+                        return ILLEGAL_MOVE;
+                    }
                 } else if (settlement instanceof IndianSettlement) {
                     if (isScout()) {
                         return ENTER_INDIAN_VILLAGE_WITH_SCOUT;
@@ -993,6 +1002,9 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
                         return ILLEGAL_MOVE;
                     }
                 } else {
+                    /*
+                     * Note that attacking a settlement from a ship is allowed.
+                     */
                     logger.fine("Attempting marine assault with " + getName());
                     return ILLEGAL_MOVE;
                 }
