@@ -44,7 +44,7 @@ public final class ReportForeignAffairPanel extends ReportPanel implements Actio
         reportPanel.setLayout(new GridLayout(0, 2));
 
         int[] widths = new int[] { 0, 12, 0, 0 };
-        int[] heights = new int[] { 0, 12, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0 };
+        int[] heights = new int[] { 0, 12, 0, 0, 0, 0, 0, 0, 8, 0, 0, 0 };
         int labelColumn = 1;
         int valueColumn = 3;
         int percentColumn = 4;
@@ -62,7 +62,8 @@ public final class ReportForeignAffairPanel extends ReportPanel implements Actio
             row += 2;
             enemyPanel.add(new JLabel(Messages.message("report.stance")), higConst.rc(row, labelColumn));
             int stance = Integer.parseInt(enemyElement.getAttribute("stance"));
-            enemyPanel.add(new JLabel(Player.getStanceAsString(stance)), higConst.rc(row, valueColumn));
+            enemyPanel.add(new JLabel(Player.getStanceAsString(stance)),
+                           higConst.rc(row, valueColumn, "r"));
             row++;
             enemyPanel.add(new JLabel(Messages.message("report.numberOfColonies")), higConst.rc(row, labelColumn));
             enemyPanel.add(new JLabel(enemyElement.getAttribute("numberOfColonies"), JLabel.TRAILING), higConst.rc(row,
@@ -79,13 +80,13 @@ public final class ReportForeignAffairPanel extends ReportPanel implements Actio
             enemyPanel.add(new JLabel(Messages.message("report.navalStrength")), higConst.rc(row, labelColumn));
             enemyPanel.add(new JLabel(enemyElement.getAttribute("navalStrength"), JLabel.TRAILING), higConst.rc(row,
                     valueColumn));
+            row++;
+            enemyPanel.add(new JLabel(Messages.message("goldTitle")), higConst.rc(row, labelColumn));
+            enemyPanel.add(new JLabel(enemyElement.getAttribute("gold"), JLabel.TRAILING), 
+                           higConst.rc(row, valueColumn));
             row += 2;
 
-            if (enemyElement.hasAttribute("gold")) {
-                enemyPanel.add(new JLabel(Messages.message("goldTitle")), higConst.rc(row, labelColumn));
-                enemyPanel.add(new JLabel(enemyElement.getAttribute("gold"), JLabel.TRAILING), higConst.rc(row,
-                        valueColumn));
-                row++;
+            if (enemyElement.hasAttribute("tax")) {
                 enemyPanel.add(new JLabel(Messages.message("menuBar.colopedia.father")), higConst.rc(row, labelColumn));
                 enemyPanel.add(new JLabel(enemyElement.getAttribute("foundingFathers"), JLabel.TRAILING), higConst.rc(
                         row, valueColumn));

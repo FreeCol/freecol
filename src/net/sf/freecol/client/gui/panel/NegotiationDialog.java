@@ -37,6 +37,9 @@ import net.sf.freecol.common.model.StanceTradeItem;
 import net.sf.freecol.common.model.TradeItem;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.UnitTradeItem;
+
+import org.w3c.dom.Element;
+
 import cz.autel.dmi.HIGLayout;
 
 /**
@@ -142,6 +145,19 @@ public final class NegotiationDialog extends FreeColDialog implements ActionList
      *
      */
     public void initialize() {
+
+        int foreignGold = 0;
+        Element report = getCanvas().getClient().getInGameController().getForeignAffairsReport();
+        int number = report.getChildNodes().getLength();
+        for (int i = 0; i < number; i++) {
+            Element enemyElement = (Element) report.getChildNodes().item(i);
+            int nationID = Integer.parseInt(enemyElement.getAttribute("nation"));
+            if (nationID == otherPlayer.getNation()) {
+                foreignGold = Integer.parseInt(enemyElement.getAttribute("gold"));
+                break;
+            }
+        }
+
         sendButton = new JButton(Messages.message("negotiationDialog.send"));
         sendButton.addActionListener(this);
         sendButton.setActionCommand("send");
@@ -171,8 +187,8 @@ public final class NegotiationDialog extends FreeColDialog implements ActionList
 
 
         stance = new StanceTradeItemPanel(this, player);
-        goldDemand = new GoldTradeItemPanel(this, otherPlayer);
-        goldOffer = new GoldTradeItemPanel(this, player);
+        goldDemand = new GoldTradeItemPanel(this, otherPlayer, foreignGold);
+        goldOffer = new GoldTradeItemPanel(this, player, player.getGold());
         goodsDemand = new GoodsTradeItemPanel(this, otherPlayer, tradeGoods);
         goodsOffer = new GoodsTradeItemPanel(this, player, tradeGoods);
         colonyDemand = new ColonyTradeItemPanel(this, otherPlayer);
@@ -545,6 +561,8 @@ public final class NegotiationDialog extends FreeColDialog implements ActionList
             stanceBox.addItem(Messages.message("model.player.alliance"));
             if (parent.hasPeaceOffer()) {
                 stanceBox.setSelectedIndex(parent.getStance() + OFFSET);
+            } else {
+                stanceBox.setSelectedIndex(OFFSET);
             }
 
             setBorder(BorderFactory.createCompoundBorder(BorderFactory.createLineBorder(Color.BLACK),
@@ -575,6 +593,7 @@ public final class NegotiationDialog extends FreeColDialog implements ActionList
 
     public class GoldTradeItemPanel extends JPanel implements ActionListener {
 
+        private int gold;
         private JSpinner spinner;
         private JButton addButton;
         private Player player;
@@ -586,14 +605,14 @@ public final class NegotiationDialog extends FreeColDialog implements ActionList
          * @param parent a <code>NegotiationDialog</code> value
          * @param source a <code>Player</code> value
          */
-        public GoldTradeItemPanel(NegotiationDialog parent, Player source) {
+        public GoldTradeItemPanel(NegotiationDialog parent, Player source, int gold) {
             this.player = source;
             this.negotiationDialog = parent;
+            this.gold = gold;
             addButton = new JButton(Messages.message("negotiationDialog.add"));
             addButton.addActionListener(this);
             addButton.setActionCommand("add");
-            int gold = Math.max(0, player.getGold());
-            spinner= new JSpinner(new SpinnerNumberModel(0, 0, gold, 1));
+            spinner = new JSpinner(new SpinnerNumberModel(0, 0, gold, 1));
 
             setBorder(BorderFactory.createCompoundBorder(BorderFactory.createLineBorder(Color.BLACK),
                                                          BorderFactory.createEmptyBorder(5, 5, 5, 5)));

@@ -2788,13 +2788,13 @@ public final class InGameController implements NetworkConstants {
      * Gathers information about opponents.
      */
     public Element getForeignAffairsReport() {
+        /* can do at any time
         if (freeColClient.getGame().getCurrentPlayer() != freeColClient.getMyPlayer()) {
             freeColClient.getCanvas().showInformationMessage("notYourTurn");
             return null;
         }
-
-        Element reply = freeColClient.getClient().ask(Message.createNewRootElement("foreignAffairs"));
-        return reply;
+        */
+        return freeColClient.getClient().ask(Message.createNewRootElement("foreignAffairs"));
     }
 
     /**
