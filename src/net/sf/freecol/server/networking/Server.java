@@ -14,7 +14,6 @@ import java.util.logging.Logger;
 import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.networking.MessageHandler;
 import net.sf.freecol.server.FreeColServer;
-import net.sf.freecol.server.control.UserConnectionHandler;
 
 import org.w3c.dom.Element;
 
@@ -57,10 +56,6 @@ public final class Server extends Thread {
     /** For information about this variable see the run method. */
     private final Object shutdownLock = new Object();
 
-
-
-
-
     /**
      * Creates a new network server. Use {@link #run server.start()} to start
      * listening for new connections.
@@ -70,14 +65,12 @@ public final class Server extends Thread {
      * @throws IOException if the public socket cannot be created.
      */
     public Server(FreeColServer freeColServer, int port) throws IOException {
+        super("Server");
         this.freeColServer = freeColServer;
         this.port = port;
         //serverSocket = new ServerSocket(port, freeColServer.getMaximumPlayers());
         serverSocket = new ServerSocket(port);
     }
-
-
-
 
     /**
     * Starts the thread's processing. Contains the loop that is waiting for new
@@ -118,7 +111,6 @@ public final class Server extends Thread {
         }
     }
 
-
     /**
     * Sends a network message to all connections except <code>exceptConnection</code>
     * (if the argument is non-null).
@@ -141,7 +133,6 @@ public final class Server extends Thread {
         }
     }
 
-
     /**
     * Sends a network message to all connections.
     * @param element The root element of the message to send.
@@ -150,7 +141,6 @@ public final class Server extends Thread {
         sendToAll(element, null);
     }
 
-
     /**
     * Gets the TCP port that is beeing used for the public socket.
     * @return The TCP port.
@@ -158,7 +148,6 @@ public final class Server extends Thread {
     public int getPort() {
         return port;
     }
-
 
     /**
     * Sets the specified <code>MessageHandler</code> to all connections.
@@ -173,7 +162,6 @@ public final class Server extends Thread {
         }
     }
 
-
     /**
     * Gets an iterator of every connection to this server.
     *
@@ -183,7 +171,6 @@ public final class Server extends Thread {
     public Iterator<Connection> getConnectionIterator() {
         return connections.values().iterator();
     }
-
 
     /**
     * Shuts down the server thread.
@@ -221,7 +208,6 @@ public final class Server extends Thread {
         logger.info("Server shutdown.");
     }
 
-
     /**
     * Gets a <code>Connection</code> identified by a <code>Socket</code>.
     *
@@ -232,7 +218,6 @@ public final class Server extends Thread {
     public Connection getConnection(Socket socket) {
         return connections.get(socket);
     }
-
 
     /**
     * Adds a (usually Dummy)Connection into the hashmap.
