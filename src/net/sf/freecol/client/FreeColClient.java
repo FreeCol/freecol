@@ -237,7 +237,7 @@ public final class FreeColClient {
         frame.getContentPane().add(canvas);
         frame.setVisible(true);
         canvas.showMainPanel();
-        gui.startCursorBlinking();
+        // gui.startCursorBlinking();
     }
 
     /**
