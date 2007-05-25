@@ -30,7 +30,7 @@ public final class TradeRouteDialog extends FreeColDialog implements ActionListe
     public static final String  LICENSE = "http://www.gnu.org/licenses/gpl.html";
     public static final String  REVISION = "$Revision$";
     
-    private static final int OK = 0, CANCEL = 1;
+    private static final int OK = 0, CANCEL = 1, DEASSIGN = 2;
 
     private final JButton ok = new JButton(Messages.message("ok"));
     private final JButton cancel = new JButton(Messages.message("cancel"));
@@ -38,6 +38,7 @@ public final class TradeRouteDialog extends FreeColDialog implements ActionListe
     private final JButton editRouteButton = new JButton(Messages.message("traderouteDialog.editRoute"));
     private final JButton newRouteButton = new JButton(Messages.message("traderouteDialog.newRoute"));
     private final JButton removeRouteButton = new JButton(Messages.message("traderouteDialog.removeRoute"));
+    private final JButton deassignRouteButton = new JButton(Messages.message("traderouteDialog.deassignRoute"));
 
     private final JPanel tradeRoutePanel = new JPanel();
     private final JPanel buttonPanel = new JPanel();
@@ -57,18 +58,23 @@ public final class TradeRouteDialog extends FreeColDialog implements ActionListe
 
         ok.setActionCommand(String.valueOf(OK));
         cancel.setActionCommand(String.valueOf(CANCEL));
+        deassignRouteButton.setActionCommand(String.valueOf(DEASSIGN));
         
         ok.addActionListener(this);
         cancel.addActionListener(this);
+        deassignRouteButton.addActionListener(this);
 
         ok.setMnemonic('y');
         cancel.setMnemonic('n');
 
+        deassignRouteButton.setToolTipText(Messages.message("traderouteDialog.deassign.tooltip"));
+
         FreeColPanel.enterPressesWhenFocused(cancel);
         FreeColPanel.enterPressesWhenFocused(ok);
+        FreeColPanel.enterPressesWhenFocused(deassignRouteButton);
 
         setCancelComponent(cancel);
-        ok.setActionCommand(String.valueOf(OK));
+        //ok.setActionCommand(String.valueOf(OK));
 
         tradeRoutes.addListSelectionListener(new ListSelectionListener() {
                 public void valueChanged(ListSelectionEvent e) {
@@ -109,6 +115,7 @@ public final class TradeRouteDialog extends FreeColDialog implements ActionListe
 
         buttonPanel.add(ok);
         buttonPanel.add(cancel);
+        buttonPanel.add(deassignRouteButton);
         buttonPanel.setOpaque(false);
 
         add(getDefaultHeader(Messages.message("traderouteDialog.name")),
@@ -180,7 +187,7 @@ public final class TradeRouteDialog extends FreeColDialog implements ActionListe
             switch (Integer.valueOf(command).intValue()) {
             case OK:
                 getCanvas().remove(this);
-                setResponse(new Boolean(true));
+                //setResponse(new Boolean(true));
                 Player player = getCanvas().getClient().getMyPlayer();
                 ArrayList<TradeRoute> routes = new ArrayList<TradeRoute>();
                 for (int index = 0; index < listModel.getSize(); index++) {
@@ -192,6 +199,10 @@ public final class TradeRouteDialog extends FreeColDialog implements ActionListe
             case CANCEL:
                 getCanvas().remove(this);
                 setResponse(null);
+                break;
+            case DEASSIGN:
+                getCanvas().remove(this);
+                setResponse(TradeRoute.NO_TRADE_ROUTE);
                 break;
             default:
                 logger.warning("Invalid ActionCommand: invalid number.");

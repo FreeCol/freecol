@@ -2084,6 +2084,7 @@ public final class InGameController implements NetworkConstants {
          * received in a update message
          */
         clearGotoOrders(unit);
+        assignTradeRoute(unit, TradeRoute.NO_TRADE_ROUTE);
         changeState(unit, Unit.ACTIVE);
     }
 
@@ -2684,27 +2685,29 @@ public final class InGameController implements NetworkConstants {
      * @param unit The unit to assign a trade route to.
      */
     public void assignTradeRoute(Unit unit) {
-        logger.finest("Entering method assignTradeRoute");
-        /*
-         * if (freeColClient.getGame().getCurrentPlayer() !=
-         * freeColClient.getMyPlayer()) {
-         * freeColClient.getCanvas().showInformationMessage("notYourTurn");
-         * return; }
-         */
-        TradeRoute tradeRoute = freeColClient.getCanvas().showTradeRouteDialog();
+        assignTradeRoute(unit, freeColClient.getCanvas().showTradeRouteDialog());
+    }
+
+    public void assignTradeRoute(Unit unit, TradeRoute tradeRoute) {
         if (tradeRoute != null) {
-            unit.setTradeRoute(tradeRoute);
             Element assignTradeRouteElement = Message.createNewRootElement("assignTradeRoute");
             assignTradeRouteElement.setAttribute("unit", unit.getID());
-            assignTradeRouteElement.setAttribute("tradeRoute", tradeRoute.getID());
-            freeColClient.getClient().sendAndWait(assignTradeRouteElement);
-            Location location = unit.getLocation();
-            if (location instanceof Tile)
-                location = ((Tile) location).getColony();
-            if (tradeRoute.getStops().get(0).getLocation() == location) {
-                followTradeRoute(unit);
-            } else if (freeColClient.getGame().getCurrentPlayer() == freeColClient.getMyPlayer()) {
-                moveToDestination(unit);
+            if (tradeRoute == TradeRoute.NO_TRADE_ROUTE) {
+                unit.setTradeRoute(null);
+                freeColClient.getClient().sendAndWait(assignTradeRouteElement);
+                setDestination(unit, null);
+            } else {
+                unit.setTradeRoute(tradeRoute);
+                assignTradeRouteElement.setAttribute("tradeRoute", tradeRoute.getID());
+                freeColClient.getClient().sendAndWait(assignTradeRouteElement);
+                Location location = unit.getLocation();
+                if (location instanceof Tile)
+                    location = ((Tile) location).getColony();
+                if (tradeRoute.getStops().get(0).getLocation() == location) {
+                    followTradeRoute(unit);
+                } else if (freeColClient.getGame().getCurrentPlayer() == freeColClient.getMyPlayer()) {
+                    moveToDestination(unit);
+                }
             }
         }
     }

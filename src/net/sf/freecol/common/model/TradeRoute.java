@@ -21,6 +21,8 @@ public class TradeRoute extends FreeColGameObject implements Cloneable, Ownable 
 
     public static final String REVISION = "$Revision$";
 
+    public static final TradeRoute NO_TRADE_ROUTE = new TradeRoute();
+
     // private static final Logger logger =
     // Logger.getLogger(TradeRoute.class.getName());
 
@@ -47,6 +49,7 @@ public class TradeRoute extends FreeColGameObject implements Cloneable, Ownable 
      */
     private ArrayList<Stop> stops = new ArrayList<Stop>();
 
+    private TradeRoute() {};
 
     public TradeRoute(Game game, String name, Player player) {
         super(game);

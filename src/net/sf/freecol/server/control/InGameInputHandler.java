@@ -549,22 +549,30 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         Game game = getFreeColServer().getGame();
         ServerPlayer player = getFreeColServer().getPlayer(connection);
         Unit unit = (Unit) game.getFreeColGameObject(element.getAttribute("unit"));
-        TradeRoute tradeRoute = (TradeRoute) game.getFreeColGameObject(element.getAttribute("tradeRoute"));
+
         if (unit == null) {
             throw new IllegalArgumentException("Could not find 'Unit' with specified ID: "
                     + element.getAttribute("unit"));
-        }
-        if (tradeRoute == null) {
-            throw new IllegalArgumentException("Could not find 'TradeRoute' with specified ID: "
-                    + element.getAttribute("tradeRoute"));
-        }
-        if (tradeRoute.getOwner() != player) {
-            throw new IllegalStateException("Not your trade route!");
-        }
-        if (unit.getOwner() != player) {
+        } else if (unit.getOwner() != player) {
             throw new IllegalStateException("Not your unit!");
         }
-        unit.setTradeRoute(tradeRoute);
+
+        String tradeRouteString = element.getAttribute("tradeRoute");
+
+        if (tradeRouteString == null || tradeRouteString == "") {
+            unit.setTradeRoute(null);
+        } else {
+            TradeRoute tradeRoute = (TradeRoute) game.getFreeColGameObject(tradeRouteString);
+
+            if (tradeRoute == null) {
+                throw new IllegalArgumentException("Could not find 'TradeRoute' with specified ID: "
+                                                   + element.getAttribute("tradeRoute"));
+            }
+            if (tradeRoute.getOwner() != player) {
+                throw new IllegalStateException("Not your trade route!");
+            }
+            unit.setTradeRoute(tradeRoute);
+        }
         return null;
     }
 
