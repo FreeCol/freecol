@@ -144,6 +144,8 @@ public final class GUI {
 
     public boolean debugShowMission = false;
     public boolean debugShowMissionInfo = false;
+    
+    private volatile boolean blinkingMarqueeEnabled;
 
 
     /**
@@ -183,6 +185,8 @@ public final class GUI {
         
         viewMode = new ViewMode(this);
         logger.warning("Starting in Move Units View Mode");
+        
+        blinkingMarqueeEnabled = true;
     }
     
     /**
@@ -200,6 +204,7 @@ public final class GUI {
         final FreeColClient theFreeColClient = freeColClient; 
         ActionListener taskPerformer = new ActionListener() {
             public void actionPerformed(ActionEvent event) {
+                if (!blinkingMarqueeEnabled) return;
                 if (getActiveUnit() != null && getActiveUnit().getTile() != null) {
                     //freeColClient.getCanvas().repaint(0, 0, getWidth(), getHeight());
                     theFreeColClient.getCanvas().refreshTile(getActiveUnit().getTile());            
@@ -328,28 +333,13 @@ public final class GUI {
         }
     }
 
-
-    public void showColonyPanel(Position selectedTile) {
-        Game gameData = freeColClient.getGame();
-
-        if (selectedTile != null && !gameData.getMap().isValid(selectedTile)) {
-            return;
-        }
-
-        if (viewMode.getView() == ViewMode.MOVE_UNITS_MODE) {
-            Tile t = gameData.getMap().getTile(selectedTile);
-            if (t != null && t.getSettlement() != null && t.getSettlement() instanceof Colony
-                && t.getSettlement().getOwner().equals(freeColClient.getMyPlayer())) {
-                
-                setFocus(selectedTile);
-                
-                freeColClient.getCanvas().showColonyPanel((Colony) t.getSettlement());
-                return;
-            }
-        }
+    public void restartBlinking() {
+        blinkingMarqueeEnabled = true;
     }
-
-
+    
+    public void stopBlinking() {
+        blinkingMarqueeEnabled = false;
+    }
 
     /**
     * Gets the unit that should be displayed on the given tile.
@@ -1717,7 +1707,6 @@ public final class GUI {
                                                     tile.getX(), tile.getY()),
                                 x, y, null);
                 }
-
             }
         }
     }    
