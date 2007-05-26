@@ -49,23 +49,12 @@
     </condition>
 
 
-    <!-- TASK DEFINITIONS -->
-    <taskdef name="jsmoothgen"
-            classname="net.charabia.jsmoothgen.ant.JSmoothGen"
-            classpath="${freecol.build.dir}/jars/jsmoothgen-ant.jar"
-    />
-    <taskdef name="izpack"
-            classname="com.izforge.izpack.ant.IzPackTask"
-            classpath="${freecol.build.dir}/jars/standalone-compiler.jar"
-    />
-
-    <!-- JarBundler is a feature-rich Ant task which will create a Mac OS X
-         application bundle from a list of Jar files and a main class name.
-         (GPL-Software) -> http://informagen.com/JarBundler/  -->
-    <taskdef name="jarbundler" 
-            classname="net.sourceforge.jarbundler.JarBundler" 
-            classpath="${freecol.build.dir}/jars/jarbundler.jar"
-    />
+    <target name="define-jsmoothgen">
+        <taskdef name="jsmoothgen"
+                classname="net.charabia.jsmoothgen.ant.JSmoothGen"
+                classpath="${freecol.build.dir}/jars/jsmoothgen-ant.jar"
+        />
+    </target>
 
     <target name="init" unless="TSTAMP">
         <tstamp/>
@@ -223,7 +212,7 @@
         </copy>
     </target>
 
-    <target name="prepareWinFiles" depends="initDist">
+    <target name="prepareWinFiles" depends="initDist,define-jsmoothgen">
         <jsmoothgen project="${freecol.build.dir}/startup.jsmooth" skeletonroot="${freecol.build.dir}/skeletons"/>
         <move todir="${freecol.release.dir}/win/${freecol.name}">
             <fileset dir="${freecol.build.dir}" includes="freecol.exe"/>
@@ -264,7 +253,12 @@
     </target>
 
     <target name="javaInstallerBundle" unless="skip.dist.installer" description="Builds a platform independent installer"
-                depends="initDist,prepareWinFiles,prepareManual,prepareBaseFiles,prepareSourceFiles">
+			depends="initDist,prepareWinFiles,prepareManual,prepareBaseFiles,prepareSourceFiles">
+	    <taskdef name="izpack"
+                classname="com.izforge.izpack.ant.IzPackTask"
+                classpath="${freecol.build.dir}/jars/standalone-compiler.jar"
+        />
+
         <izpack output="${freecol.release.dir}/${freecol.release.name}-installer.jar"
                 installerType="standard" 
                 basedir="${freecol.release.dir}/"
@@ -332,7 +326,7 @@
     </target>
 
     <target name="winInstallerBundle" unless="skip.dist.installer" description="Builds a windows installer"
-            depends="initDist,javaInstallerBundle">
+            depends="initDist,javaInstallerBundle,define-jsmoothgen">
 
         <copy todir="${freecol.release.dir}">
             <fileset dir="${freecol.build.dir}" includes="installer.jsmooth"/>
@@ -349,7 +343,15 @@
     </target>
 
     <!-- Builds a doubleclickable application bundle running on Mac OS X -->
-    <target name="macJavaBundle" unless="skip.dist.mac" depends="prepareManual,prepareBaseFiles">
+	<target name="macJavaBundle" unless="skip.dist.mac" depends="prepareManual,prepareBaseFiles">
+        <!-- JarBundler is a feature-rich Ant task which will create a Mac OS X
+             application bundle from a list of Jar files and a main class name.
+             (GPL-Software) -> http://informagen.com/JarBundler/  -->
+        <taskdef name="jarbundler" 
+                classname="net.sourceforge.jarbundler.JarBundler" 
+                classpath="${freecol.build.dir}/jars/jarbundler.jar"
+        />
+
         <jarbundler dir="${freecol.release.dir}"
                             name="FreeCol"
                             mainclass="net.sf.freecol.FreeCol"
