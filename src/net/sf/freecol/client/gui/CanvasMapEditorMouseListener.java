@@ -43,15 +43,15 @@ public final class CanvasMapEditorMouseListener implements MouseListener {
      * @param e The MouseEvent that holds all the information.
      */
     public void mouseClicked(MouseEvent e) {
-//        try {
-//            if (e.getClickCount() > 1) {
-//                gui.showColonyPanel(gui.convertToMapCoordinates(e.getX(), e.getY()));
-//            } else {
-//                canvas.requestFocus();
-//            }
-//        } catch (Exception ex) {
-//            logger.log(Level.WARNING, "Error in mouseClicked!", ex);
-//        }
+        try {
+            if (e.getClickCount() > 1) {
+                gui.showColonyPanel(gui.convertToMapCoordinates(e.getX(), e.getY()));
+            } else {
+                canvas.requestFocus();
+            }
+        } catch (Exception ex) {
+            logger.log(Level.WARNING, "Error in mouseClicked!", ex);
+        }
     }
 
     /**
