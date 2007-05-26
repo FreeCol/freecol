@@ -1,6 +1,7 @@
 package net.sf.freecol.common.model;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Vector;
@@ -850,7 +851,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
      * Gets the type of a move that is made when moving to the specified
      * <code>Tile</code> from the specified <code>Tile</code>.
      * 
-     * @param target The origin tile of the move
+     * @param from The origin tile of the move
      * @param target The target tile of the move
      * @param ml The amount of moves this Unit has left
      * @return The move type. Notice: <code>Unit.ILLEGAL_MOVE</code> when
@@ -1480,6 +1481,18 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
             return goodsContainer.getGoodsIterator();
         } else {
             return EmptyIterator.getInstance();
+        }
+    }
+    
+    /**
+     * Returns a <code>List</code> containing the goods carried by this unit.
+     * @return a <code>List</code> containing the goods carried by this unit.
+     */
+    public List<Goods> getGoodsList() {
+        if (isCarrier()) {
+            return goodsContainer.getGoods();
+        } else {
+            return Collections.emptyList();
         }
     }
 
@@ -3492,6 +3505,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
 
     /**
      * Checks if this unit is an undead.
+     * @return return true if the unit is undead
      */
     public boolean isUndead() {
         return (getType() == Unit.REVENGER || getType() == Unit.FLYING_DUTCHMAN || getType() == Unit.UNDEAD);
@@ -4404,6 +4418,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
      * Initialize this object from an XML-representation of this object.
      * 
      * @param in The input stream with the XML.
+     * @throws javax.xml.stream.XMLStreamException is thrown if something goes wrong.
      */
     protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
         setID(in.getAttributeValue(null, "ID"));
