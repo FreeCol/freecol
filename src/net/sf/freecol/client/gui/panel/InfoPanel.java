@@ -363,6 +363,7 @@ public final class InfoPanel extends FreeColPanel {
 
         private final int[] heights = { 0, 0 };
 
+        private boolean unitChanged;
 
         public UnitInfoPanel() {
             super(null);
@@ -411,6 +412,7 @@ public final class InfoPanel extends FreeColPanel {
 
             setSize(226, 100);
             setOpaque(false);
+            unitChanged = false;
         }
 
         /**
@@ -419,6 +421,8 @@ public final class InfoPanel extends FreeColPanel {
          * @param graphics The Graphics context in which to draw this component.
          */
         public void paintComponent(Graphics graphics) {
+            if (!unitChanged) return;
+            unitChanged = false;
             unitCargoPanel.removeAll();
             if (unit != null) {
                 String name = unit.getName();
@@ -484,6 +488,7 @@ public final class InfoPanel extends FreeColPanel {
          */
         public void update(Unit unit) {
             this.unit = unit;
+            unitChanged = true;
         }
 
         /**
