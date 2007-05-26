@@ -1001,7 +1001,7 @@ public class Map extends FreeColGameObject {
      *         position is invalid.
      */
     public Tile getTile(int x, int y) {
-        if ((x >= 0) && (x < getWidth()) && (y >= 0) && (y < getHeight())) {
+        if ((x >= 0) && (x < width) && (y >= 0) && (y < height)) {
             return columns.get(x).get(y);
         } else {
             return null;
@@ -1206,9 +1206,9 @@ public class Map extends FreeColGameObject {
      * @return Adjacent position
      */
      public static Position getAdjacent(Position position, int direction) {
-         int x = position.getX() + ((position.getY() & 1) != 0 ?
+         int x = position.x + ((position.y & 1) != 0 ?
              ODD_DX[direction] : EVEN_DX[direction]);
-         int y = position.getY() + ((position.getY() & 1) != 0 ?
+         int y = position.y + ((position.y & 1) != 0 ?
              ODD_DY[direction] : EVEN_DY[direction]);
          return new Position(x, y);
      }
