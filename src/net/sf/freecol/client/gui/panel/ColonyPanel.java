@@ -736,6 +736,7 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener {
             parent.getGUI().setActiveUnit(null);
             freeColClient.getInGameController().nextActiveUnit();
         }
+        freeColClient.getGUI().restartBlinking();
     }
 
     /**
