@@ -239,7 +239,7 @@ public final class Canvas extends JDesktopPane {
         this.gui = gui;
 
         setBounds(bounds);
-
+        setDoubleBuffered(true);
         setOpaque(false);
         setLayout(null);
 
@@ -1620,6 +1620,7 @@ public final class Canvas extends JDesktopPane {
      * @see ColonyPanel
      */
     public void showColonyPanel(Colony colony) {
+        freeColClient.getGUI().stopBlinking();
         ColonyPanel colonyPanel = new ColonyPanel(this, freeColClient);
         colonyPanel.initialize(colony, freeColClient.getGame());
         addAsFrame(colonyPanel);
