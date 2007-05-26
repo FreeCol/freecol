@@ -1699,7 +1699,7 @@ public final class GUI {
         for (int i = 0; i < 8; i++) {
             Map.Position p = Map.getAdjacent(pos, i);
             if (map.isValid(p)) {
-                Tile borderingTile = map.getTile(p);
+                Tile borderingTile = map.getTile(p.x, p.y);
 
                 if (!drawUnexploredBorders && !borderingTile.isExplored() && i >= 3 && i <= 5) {
                     continue;
