@@ -186,9 +186,7 @@ public final class MapControls {
         int viewMode = gui.getViewMode().getView();
         switch (viewMode) {
             case ViewMode.MOVE_UNITS_MODE:
-                if (infoPanel.getUnit() != gui.getActiveUnit()) {
-                    infoPanel.update(gui.getActiveUnit());
-                }
+                infoPanel.update(gui.getActiveUnit());
                 break;
             case ViewMode.VIEW_TERRAIN_MODE:
                 if (gui.getSelectedTile() != null) {
