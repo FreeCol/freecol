@@ -8,7 +8,7 @@ import java.awt.Image;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
-import java.util.Iterator;
+
 import java.util.logging.Logger;
 
 import javax.swing.ImageIcon;
