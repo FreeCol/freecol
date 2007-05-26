@@ -1270,7 +1270,7 @@ public class Map extends FreeColGameObject {
      * @return True if it is valid
      */
     public boolean isValid(Position position) {
-        return isValid(position.getX(), position.getY(), getWidth(), getHeight());
+        return isValid(position.x, position.y, width, height);
     }
 
     /**
@@ -1296,7 +1296,7 @@ public class Map extends FreeColGameObject {
      *        within the bounds of the map and <code>false</code> otherwise
      */
     public static boolean isValid(Position position, int width, int height) {
-        return isValid(position.getX(), position.getY(), width, height);
+        return isValid(position.x, position.y, width, height);
     }
     
     /**
@@ -1386,7 +1386,7 @@ public class Map extends FreeColGameObject {
      * Represents a position on the Map.
      */
     public static final class Position {
-        private final int x, y;
+        public final int x, y;
 
         /**
          * Creates a new object with the given position.
