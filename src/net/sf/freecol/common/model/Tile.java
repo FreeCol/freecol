@@ -415,14 +415,14 @@ public final class Tile extends FreeColGameObject implements Location, Nameable 
      *         tile.
      */
     public Unit getDefendingUnit(Unit attacker) {
-        Iterator<Unit> unitIterator = getUnitIterator();
         Unit defender = null;
-        while (unitIterator.hasNext()) {
-            Unit nextUnit = unitIterator.next();
-
+        float defensePower = 0.0f;
+        for(Unit nextUnit : getUnitList()) {
+            float tmpPower = nextUnit.getDefensePower(attacker);
             if (this.isLand() != nextUnit.isNaval()
-                    && (defender == null || nextUnit.getDefensePower(attacker) > defender.getDefensePower(attacker))) {
+                    && (defender == null || tmpPower > defensePower)) {
                 defender = nextUnit;
+                defensePower = tmpPower;
             }
         }
 
