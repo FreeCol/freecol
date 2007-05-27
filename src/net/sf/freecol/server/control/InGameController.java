@@ -139,10 +139,12 @@ public final class InGameController extends Controller {
         }
         
         if (newPlayer.isEuropean()) {
-            try {
+
+            try {        
                 Market market = newPlayer.getMarket();
                 // make random change to the market
-                market.add(getPseudoRandom().nextInt(Goods.NUMBER_OF_TYPES), (50 - getPseudoRandom().nextInt(71)));
+                market.add(getPseudoRandom().nextInt(Goods.NUMBER_OF_TYPES),
+                           (-getPseudoRandom().nextInt(21)));
                 Element updateElement = Message.createNewRootElement("update");
                 updateElement.appendChild(newPlayer.getMarket().toXMLElement(newPlayer, updateElement.getOwnerDocument()));
                 newPlayer.getConnection().send(updateElement);

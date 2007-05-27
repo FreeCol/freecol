@@ -929,7 +929,7 @@ public final class EuropePanel extends FreeColPanel implements ActionListener {
                     MarketLabel label = (MarketLabel) comp;
                     if (freeColClient.getMyPlayer().canTrade(label.getType())) {
                         inGameController.buyGoods(label.getType(), label.getAmount(), selectedUnit.getUnit());
-
+                        inGameController.nextModelMessage();
                         updateCargoLabel();
 
                         // TODO: Make this look prettier :-)
@@ -1006,6 +1006,7 @@ public final class EuropePanel extends FreeColPanel implements ActionListener {
                     }
                     europePanel.getCargoPanel().revalidate();
                     revalidate();
+                    inGameController.nextModelMessage();
                     europePanel.refresh();
 
                     // TODO: Make this look prettier :-)

@@ -121,6 +121,7 @@ public final class AIInGameInputHandler implements MessageHandler, StreamedMessa
                     reply = indianDemand((DummyConnection) connection, element);
                 } else if (type.equals("giveIndependence")) {
                 } else if (type.equals("lostCityRumour")) {
+                } else if (type.equals("updateMarket")) {
                 } else {
                     logger.warning("Message is of unsupported type \"" + type + "\".");
                 }

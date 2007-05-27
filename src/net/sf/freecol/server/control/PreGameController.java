@@ -1,6 +1,7 @@
 
 package net.sf.freecol.server.control;
 
+import java.io.IOException;
 import java.util.Iterator;
 import java.util.logging.Logger;
 
@@ -177,7 +178,23 @@ public final class PreGameController extends Controller {
             p.updateCrossesRequired();
         }
         */
-        
+        Iterator<Player> playerIterator = game.getPlayerIterator();
+        while (playerIterator.hasNext()) {
+            ServerPlayer player = (ServerPlayer) playerIterator.next();
+            if (player.isEuropean()) {
+                player.getMarket().randomizeInitialPrices();
+                logger.fine("Randomized market for " + player.getName());
+                try {
+                    Element updateElement = Message.createNewRootElement("updateMarket");
+                    updateElement.appendChild(player.getMarket().toXMLElement(player, updateElement.getOwnerDocument()));
+                    player.getConnection().send(updateElement);
+                } catch (IOException e) {
+                    logger.warning("Could not send message to: " + player.getName() + " with connection "
+                                   + player.getConnection());
+                }
+            }
+        }
+
         // Start the game:
         freeColServer.setGameState(FreeColServer.IN_GAME);
         try {
