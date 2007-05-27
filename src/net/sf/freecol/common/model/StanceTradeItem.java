@@ -44,12 +44,7 @@ public class StanceTradeItem extends TradeItem {
                 stance == Player.ALLIANCE);
     }
 
-    /**
-     * Returns whether there can only be one StanceTradeItem.
-     *
-     * @return true
-     */
-    public static boolean isUnique() {
+    public boolean isUnique() {
         return true;
     }
 

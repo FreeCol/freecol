@@ -137,9 +137,7 @@ public abstract class TradeItem extends PersistentObject {
      *
      * @return a <code>boolean</code> value
      */
-    public static boolean isUnique() {
-        return false;
-    }
+    public abstract boolean isUnique();
 
     /**
      * Concludes the trade.

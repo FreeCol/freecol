@@ -42,12 +42,7 @@ public class GoldTradeItem extends TradeItem {
         return ((gold >= 0) && (getSource().getGold() >= gold));
     }
 
-    /**
-     * Returns whether there can only be one GoldTradeItem.
-     *
-     * @return true
-     */
-    public static boolean isUnique() {
+    public boolean isUnique() {
         return true;
     }
 

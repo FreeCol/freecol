@@ -42,6 +42,10 @@ public class UnitTradeItem extends TradeItem {
         return (unit.getOwner() == getSource());
     }
 
+    public boolean isUnique() {
+        return false;
+    }
+    
     public void makeTrade() {
         unit.setOwner(getDestination());
     }

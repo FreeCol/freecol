@@ -77,6 +77,10 @@ public class GoodsTradeItem extends TradeItem {
         }
 
     }
+    
+    public boolean isUnique() {
+        return false;
+    }
 
     public void makeTrade() {
         goods.getLocation().remove(goods);

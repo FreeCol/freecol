@@ -43,6 +43,10 @@ public class ColonyTradeItem extends TradeItem {
                 getDestination().isEuropean());
     }
 
+    public boolean isUnique() {
+        return false;
+    }
+    
     public void makeTrade() {
         colony.setOwner(getDestination());
     }
