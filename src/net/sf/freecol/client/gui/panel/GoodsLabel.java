@@ -1,7 +1,6 @@
 package net.sf.freecol.client.gui.panel;
 
 import java.awt.Color;
-import java.awt.Graphics;
 import java.awt.Image;
 import java.util.logging.Logger;
 

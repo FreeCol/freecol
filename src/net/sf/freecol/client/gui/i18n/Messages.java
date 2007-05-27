@@ -3,7 +3,6 @@ package net.sf.freecol.client.gui.i18n;
 import java.io.File;
 import java.io.FileInputStream;
 import java.util.Locale;
-import java.util.MissingResourceException;
 import java.util.Properties;
 import java.util.logging.Logger;
 

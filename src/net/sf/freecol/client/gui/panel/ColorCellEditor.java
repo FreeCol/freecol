@@ -14,13 +14,11 @@ import javax.swing.JColorChooser;
 import javax.swing.JLayeredPane;
 import javax.swing.JPanel;
 import javax.swing.JTable;
-import javax.swing.border.BevelBorder;
 import javax.swing.table.TableCellEditor;
 
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.Player;
-
 import cz.autel.dmi.HIGLayout;
 
 /**
