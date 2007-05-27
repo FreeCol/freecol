@@ -2864,9 +2864,10 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
                 case PLOW:
                     if (getTile().isForested()) {
                         // Give Lumber to adjacent colony
-                        // Yes, the amount of lumber may exceed 100 units,
-                        // but this was also true for the original game, IIRC.
-                        int lumberAmount = getTile().potential(Goods.LUMBER) * 10;
+                        int lumberAmount = getTile().potential(Goods.LUMBER) * 5;
+                        if (getType() == HARDY_PIONEER) {
+                            lumberAmount *= 2;
+                        }
                         if (getColony() != null && getColony().getOwner().equals(getOwner())) {
                             getColony().addGoods(Goods.LUMBER, lumberAmount);
                         } else {
