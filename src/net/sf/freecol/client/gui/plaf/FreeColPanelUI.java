@@ -19,10 +19,7 @@ public class FreeColPanelUI extends BasicPanelUI {
     
     private static FreeColPanelUI sharedInstance = new FreeColPanelUI();
     
-    private final Image tempImage;
-    
     private FreeColPanelUI() {
-        tempImage = (Image) UIManager.get("BackgroundImage");
     }
 
     public static ComponentUI createUI(JComponent c) {
@@ -34,6 +31,8 @@ public class FreeColPanelUI extends BasicPanelUI {
             int width = c.getWidth();
             int height = c.getHeight();
 
+            Image tempImage = (Image) UIManager.get("BackgroundImage");
+            
             if (tempImage != null) {
                 for (int x=0; x<width; x+=tempImage.getWidth(null)) {
                     for (int y=0; y<height; y+=tempImage.getHeight(null)) {
