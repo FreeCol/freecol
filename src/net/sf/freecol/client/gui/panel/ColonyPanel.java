@@ -740,29 +740,6 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener {
     }
 
     /**
-     * Paints this component.
-     * 
-     * @param g The graphics context in which to paint.
-     */
-    public void paintComponent(Graphics g) {
-        int width = getWidth();
-        int height = getHeight();
-
-        Image tempImage = (Image) UIManager.get("BackgroundImage");
-
-        if (tempImage != null) {
-            for (int x = 0; x < width; x += tempImage.getWidth(null)) {
-                for (int y = 0; y < height; y += tempImage.getHeight(null)) {
-                    g.drawImage(tempImage, x, y, null);
-                }
-            }
-        } else {
-            g.setColor(getBackground());
-            g.fillRect(0, 0, width, height);
-        }
-    }
-
-    /**
      * Selects a unit that is located somewhere on this panel.
      * 
      * @param unit The unit that is being selected.
