@@ -191,6 +191,7 @@ public final class GUI {
     
     /**
      *  Get the <code>View Mode</code> object
+     * @return the current view mode.
      */
     public ViewMode getViewMode(){
         return viewMode;
