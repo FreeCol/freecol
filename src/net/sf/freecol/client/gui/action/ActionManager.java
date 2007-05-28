@@ -2,6 +2,7 @@ package net.sf.freecol.client.gui.action;
 
 import java.util.Iterator;
 import java.util.logging.Logger;
+import javax.swing.SwingUtilities;
 
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.common.option.Option;
@@ -133,6 +134,10 @@ public class ActionManager extends OptionGroup {
      * @see FreeColAction
      */
     public void update() {
+        if (!SwingUtilities.isEventDispatchThread()) {
+            throw new RuntimeException("update() should only be called from the " + 
+                    "event dispatcher thread.");
+        }
         Iterator<Option> it = iterator();
         while (it.hasNext()) {
             FreeColAction fa = (FreeColAction) it.next();
