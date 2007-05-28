@@ -2,6 +2,7 @@
 package net.sf.freecol.client.control;
 
 import java.util.logging.Logger;
+import javax.swing.SwingUtilities;
 
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
@@ -319,7 +320,11 @@ public final class PreGameInputHandler extends InputHandler implements StreamedM
                     } catch (Exception ex) {}
                 }
 
-                getFreeColClient().getPreGameController().startGame();
+                SwingUtilities.invokeLater(new Runnable() {
+                    public void run() {
+                        getFreeColClient().getPreGameController().startGame();
+                    }
+                });
             }
         }.start();
         return null;
