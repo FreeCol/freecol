@@ -54,6 +54,8 @@ public final class NegotiationDialog extends FreeColDialog implements ActionList
 
     private static final int GOLD = 1, STANCE = 2;
 
+    private static final String SEND = "send", ACCEPT = "accept", CANCEL = "cancel";
+
     private static Logger logger = Logger.getLogger(NegotiationDialog.class.getName());
 
     private FreeColClient freeColClient;
@@ -119,7 +121,6 @@ public final class NegotiationDialog extends FreeColDialog implements ActionList
             if (!hasPeaceOffer()) {
                 int stance = Player.PEACE;
                 agreement.add(new StanceTradeItem(freeColClient.getGame(), player, otherPlayer, stance));
-                agreement.add(new StanceTradeItem(freeColClient.getGame(), otherPlayer, player, stance));
             }
         }
 
@@ -160,12 +161,12 @@ public final class NegotiationDialog extends FreeColDialog implements ActionList
 
         sendButton = new JButton(Messages.message("negotiationDialog.send"));
         sendButton.addActionListener(this);
-        sendButton.setActionCommand("send");
+        sendButton.setActionCommand(SEND);
         FreeColPanel.enterPressesWhenFocused(sendButton);
 
         acceptButton = new JButton(Messages.message("negotiationDialog.accept"));
         acceptButton.addActionListener(this);
-        acceptButton.setActionCommand("accept");
+        acceptButton.setActionCommand(ACCEPT);
         FreeColPanel.enterPressesWhenFocused(acceptButton);
         // we can't accept an offer we are making
         if (sender == player) {
@@ -174,7 +175,7 @@ public final class NegotiationDialog extends FreeColDialog implements ActionList
 
         cancelButton = new JButton(Messages.message("negotiationDialog.cancel"));
         cancelButton.addActionListener(this);
-        cancelButton.setActionCommand("cancel");
+        cancelButton.setActionCommand(CANCEL);
         setCancelComponent(cancelButton);
         FreeColPanel.enterPressesWhenFocused(cancelButton);
 
@@ -389,6 +390,24 @@ public final class NegotiationDialog extends FreeColDialog implements ActionList
      */
     public void setStance(int stance) {
         agreement.add(new StanceTradeItem(freeColClient.getGame(), otherPlayer, player, stance));
+    }
+
+
+    /**
+     * Analyzes an event and calls the right external methods to take care of
+     * the user's request.
+     * 
+     * @param event The incoming action event
+     */
+    public void actionPerformed(ActionEvent event) {
+        String command = event.getActionCommand();
+        if (command.equals(CANCEL)) {
+            setResponse(null);
+        } else if (command.equals(ACCEPT)) {
+            setResponse(DiplomaticTrade.ACCEPT);
+        } else {
+            setResponse(agreement);
+        }
     }
 
 
@@ -638,17 +657,6 @@ public final class NegotiationDialog extends FreeColDialog implements ActionList
             }
 
         }
-    }
-
-    /**
-     * Analyzes an event and calls the right external methods to take care of
-     * the user's request.
-     * 
-     * @param event The incoming action event
-     */
-    public void actionPerformed(ActionEvent event) {
-        String command = event.getActionCommand();
-        setResponse(command);
     }
 
 }

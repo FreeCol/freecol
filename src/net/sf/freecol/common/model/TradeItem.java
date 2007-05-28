@@ -51,6 +51,17 @@ public abstract class TradeItem extends PersistentObject {
     }
 
     /**
+     * Creates a new <code>TradeItem</code> instance.
+     *
+     * @param game a <code>Game</code> value
+     * @param in a <code>XMLStreamReader</code> value
+     */
+    public TradeItem(Game game, XMLStreamReader in) throws XMLStreamException {
+        this.game = game;
+        //readFromXMLImpl(in);
+    }
+
+    /**
      * Get the <code>ID</code> value.
      *
      * @return a <code>String</code> value

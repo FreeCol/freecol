@@ -15,9 +15,28 @@ public class ColonyTradeItem extends TradeItem {
      */
     private Colony colony;
         
+    /**
+     * Creates a new <code>ColonyTradeItem</code> instance.
+     *
+     * @param game a <code>Game</code> value
+     * @param source a <code>Player</code> value
+     * @param destination a <code>Player</code> value
+     * @param colony a <code>Colony</code> value
+     */
     public ColonyTradeItem(Game game, Player source, Player destination, Colony colony) {
         super(game, "tradeItem.colony", source, destination);
         this.colony = colony;
+    }
+
+    /**
+     * Creates a new <code>ColonyTradeItem</code> instance.
+     *
+     * @param game a <code>Game</code> value
+     * @param in a <code>XMLStreamReader</code> value
+     */
+    public ColonyTradeItem(Game game, XMLStreamReader in) throws XMLStreamException {
+        super(game, in);
+        readFromXMLImpl(in);
     }
 
     /**
@@ -58,7 +77,12 @@ public class ColonyTradeItem extends TradeItem {
      *      during parsing.
      */
     protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
-        super.readFromXMLImpl(in);
+        setID(in.getAttributeValue(null, "ID"));
+        String sourceID = in.getAttributeValue(null, "source");
+        setSource((Player) getGame().getFreeColGameObject(sourceID));
+        String destinationID = in.getAttributeValue(null, "destination");
+        setDestination((Player) getGame().getFreeColGameObject(destinationID));
+        //super.readFromXMLImpl(in);
         String colonyID = in.getAttributeValue(null, "colony");
         this.colony = (Colony) getGame().getFreeColGameObject(colonyID);
         in.nextTag();

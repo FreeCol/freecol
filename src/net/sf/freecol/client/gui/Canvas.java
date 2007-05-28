@@ -81,6 +81,7 @@ import net.sf.freecol.client.gui.panel.VictoryPanel;
 import net.sf.freecol.client.gui.panel.WarehouseDialog;
 import net.sf.freecol.common.ServerInfo;
 import net.sf.freecol.common.model.Colony;
+import net.sf.freecol.common.model.DiplomaticTrade;
 import net.sf.freecol.common.model.Europe;
 import net.sf.freecol.common.model.FreeColGameObject;
 import net.sf.freecol.common.model.Game;
@@ -435,14 +436,15 @@ public final class Canvas extends JDesktopPane {
      * 
      * @see NegotiationDialog
      */
-    public void showNegotiationDialog(Unit unit, Settlement settlement) {
-        NegotiationDialog negotiationDialog = new NegotiationDialog(this, unit, settlement);
+    public DiplomaticTrade showNegotiationDialog(Unit unit, Settlement settlement, DiplomaticTrade agreement) {
+        NegotiationDialog negotiationDialog = new NegotiationDialog(this, unit, settlement, agreement);
         negotiationDialog.initialize();
 
         // TODO: Not a standard dialog, special treatment for now.
         addAsFrame(negotiationDialog);
-        negotiationDialog.getResponse();
+        DiplomaticTrade offer = (DiplomaticTrade) negotiationDialog.getResponse();
         remove(negotiationDialog);
+        return offer;
     }
 
     /**

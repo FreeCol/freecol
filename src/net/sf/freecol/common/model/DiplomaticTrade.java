@@ -4,9 +4,12 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
+
+import org.w3c.dom.Element;
 
 /**
  * The class <code>DiplomaticTrade</code> represents an offer one player can
@@ -18,6 +21,8 @@ public class DiplomaticTrade extends PersistentObject {
     public static final String COPYRIGHT = "Copyright (C) 2003-2007 The FreeCol Team";
     public static final String LICENSE = "http://www.gnu.org/licenses/gpl.html";
     public static final String REVISION = "$Revision$";
+
+    public static final DiplomaticTrade ACCEPT = new DiplomaticTrade();
 
     // the individual items the trade consists of
     private List<TradeItem> items;
@@ -36,16 +41,58 @@ public class DiplomaticTrade extends PersistentObject {
     private Player recipient;
 
 
+    /**
+     * Creates a new <code>DiplomaticTrade</code> instance.
+     *
+     */
+    private DiplomaticTrade() {
+        this.game = null;
+    }
+
+    /**
+     * Creates a new <code>DiplomaticTrade</code> instance.
+     *
+     * @param game a <code>Game</code> value
+     * @param sender a <code>Player</code> value
+     * @param recipient a <code>Player</code> value
+     */
     public DiplomaticTrade(Game game, Player sender, Player recipient) {
         this(game, sender, recipient, new ArrayList<TradeItem>());
     }
 
+    /**
+     * Creates a new <code>DiplomaticTrade</code> instance.
+     *
+     * @param game a <code>Game</code> value
+     * @param sender a <code>Player</code> value
+     * @param recipient a <code>Player</code> value
+     */
     public DiplomaticTrade(Game game, Player sender, Player recipient, List<TradeItem> items) {
         this.game = game;
         this.sender = sender;
         this.recipient = recipient;
         this.items = items;
     }
+
+    /**
+     * Creates a new <code>DiplomaticTrade</code> instance.
+     *
+     * @param game a <code>Game</code> value
+     * @param element an <code>Element</code> value
+     */
+    public DiplomaticTrade(Game game, Element element) {
+        this.game = game;
+        readFromXMLElement(element);
+    }
+
+    /**
+     * Gets the game object this <code>DiplomaticTrade</code> belongs to.
+     * @return The <code>game</code>.
+     */
+    public Game getGame() {
+        return game;
+    }
+
 
     /**
      * Get the <code>Sender</code> value.
@@ -122,6 +169,17 @@ public class DiplomaticTrade extends PersistentObject {
         }
     }
 
+
+    /**
+     * Calls the <code>makeTrade</code> method of all TradeItems.
+     *
+     */
+    public void makeTrade() {
+        for (TradeItem item : items) {
+            item.makeTrade();
+        }
+    }
+
     /**
      * Returns an iterator for all TradeItems.
      * 
@@ -139,8 +197,33 @@ public class DiplomaticTrade extends PersistentObject {
      * @throws XMLStreamException
      *             if a problem was encountered during parsing.
      */
-    protected void readFromXMLImpl(XMLStreamReader in)
-            throws XMLStreamException {
+    protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
+        String senderString = in.getAttributeValue(null, "sender");
+        sender = (Player) getGame().getFreeColGameObject(senderString);
+
+        String recipientString = in.getAttributeValue(null, "recipient");
+        recipient = (Player) getGame().getFreeColGameObject(recipientString);
+
+        items = new ArrayList<TradeItem>();
+        TradeItem item;
+        while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
+            if (in.getLocalName().equals(StanceTradeItem.getXMLElementTagName())) {
+                item = new StanceTradeItem(getGame(), in);
+            } else if (in.getLocalName().equals(GoodsTradeItem.getXMLElementTagName())) {
+                item = new GoodsTradeItem(getGame(), in);
+            } else if (in.getLocalName().equals(GoldTradeItem.getXMLElementTagName())) {
+                item = new GoldTradeItem(getGame(), in);
+            } else if (in.getLocalName().equals(ColonyTradeItem.getXMLElementTagName())) {
+                item = new ColonyTradeItem(getGame(), in);
+            } else if (in.getLocalName().equals(UnitTradeItem.getXMLElementTagName())) {
+                item = new UnitTradeItem(getGame(), in);
+            } else {
+                logger.warning("Unknown TradeItem: " + in.getLocalName());
+                continue;
+            }
+            items.add(item);
+        }
+
     }
 
     /**
@@ -163,8 +246,14 @@ public class DiplomaticTrade extends PersistentObject {
      * @throws XMLStreamException
      *             if there are any problems writing to the stream.
      */
-    public void toXML(XMLStreamWriter out, Player player)
-            throws XMLStreamException {
+    public void toXML(XMLStreamWriter out, Player player) throws XMLStreamException {
+        out.writeStartElement(getXMLElementTagName());
+        out.writeAttribute("sender", sender.getID());
+        out.writeAttribute("recipient", recipient.getID());
+        for (TradeItem item : items) {
+            item.toXML(out, player);
+        }
+        out.writeEndElement();
     }
 
     /**

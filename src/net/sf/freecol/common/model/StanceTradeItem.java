@@ -15,9 +15,28 @@ public class StanceTradeItem extends TradeItem {
      */
     private int stance;
         
+    /**
+     * Creates a new <code>StanceTradeItem</code> instance.
+     *
+     * @param game a <code>Game</code> value
+     * @param source a <code>Player</code> value
+     * @param destination a <code>Player</code> value
+     * @param stance an <code>int</code> value
+     */
     public StanceTradeItem(Game game, Player source, Player destination, int stance) {
         super(game, "tradeItem.stance", source, destination);
         this.stance = stance;
+    }
+
+    /**
+     * Creates a new <code>StanceTradeItem</code> instance.
+     *
+     * @param game a <code>Game</code> value
+     * @param in a <code>XMLStreamReader</code> value
+     */
+    public StanceTradeItem(Game game, XMLStreamReader in) throws XMLStreamException {
+        super(game, in);
+        readFromXMLImpl(in);
     }
 
     /**
@@ -61,7 +80,12 @@ public class StanceTradeItem extends TradeItem {
      *      during parsing.
      */
     protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
-        super.readFromXMLImpl(in);
+        setID(in.getAttributeValue(null, "ID"));
+        String sourceID = in.getAttributeValue(null, "source");
+        setSource((Player) getGame().getFreeColGameObject(sourceID));
+        String destinationID = in.getAttributeValue(null, "destination");
+        setDestination((Player) getGame().getFreeColGameObject(destinationID));
+        //super.readFromXMLImpl(in);
         this.stance = Integer.parseInt(in.getAttributeValue(null, "stance"));
         in.nextTag();
     }

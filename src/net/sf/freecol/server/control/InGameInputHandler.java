@@ -8,6 +8,7 @@ import java.util.logging.Logger;
 
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.ColonyTile;
+import net.sf.freecol.common.model.DiplomaticTrade;
 import net.sf.freecol.common.model.Europe;
 import net.sf.freecol.common.model.FoundingFather;
 import net.sf.freecol.common.model.Game;
@@ -378,6 +379,11 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
                 return assignTradeRoute(connection, element);
             }
         });
+        register("diplomaticTrade", new NetworkRequestHandler() {
+            public Element handle(Connection connection, Element element) {
+                return diplomaticTrade(connection, element);
+            }
+        });
     }
 
     /**
@@ -546,6 +552,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
      * @param element The element containing the request.
      */
     private Element assignTradeRoute(Connection connection, Element element) {
+        FreeColServer freeColServer = getFreeColServer();
         Game game = getFreeColServer().getGame();
         ServerPlayer player = getFreeColServer().getPlayer(connection);
         Unit unit = (Unit) game.getFreeColGameObject(element.getAttribute("unit"));
@@ -572,6 +579,27 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
                 throw new IllegalStateException("Not your trade route!");
             }
             unit.setTradeRoute(tradeRoute);
+        }
+        return null;
+    }
+
+    /**
+     * Handles a "diplomaticTrade"-message from a client.
+     * 
+     * @param connection The connection the message came from.
+     * @param element The element containing the request.
+     */
+    private Element diplomaticTrade(Connection connection, Element element) {
+        FreeColServer freeColServer = getFreeColServer();
+        Game game = freeColServer.getGame();
+        ServerPlayer player = freeColServer.getPlayer(connection);
+        Unit unit = (Unit) game.getFreeColGameObject(element.getAttribute("unit"));
+        int direction = Integer.parseInt(element.getAttribute("direction"));
+        Settlement settlement = game.getMap().getNeighbourOrNull(direction, unit.getTile()).getSettlement();
+        NodeList childElements = element.getChildNodes();
+        Element childElement = (Element) childElements.item(0);
+        DiplomaticTrade agreement = new DiplomaticTrade(game, childElement);
+        if (agreement != null) {
         }
         return null;
     }

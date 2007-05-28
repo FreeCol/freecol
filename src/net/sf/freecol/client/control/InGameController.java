@@ -29,6 +29,7 @@ import net.sf.freecol.client.networking.Client;
 import net.sf.freecol.common.model.Building;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.ColonyTile;
+import net.sf.freecol.common.model.DiplomaticTrade;
 import net.sf.freecol.common.model.Europe;
 import net.sf.freecol.common.model.FoundingFather;
 import net.sf.freecol.common.model.FreeColGameObject;
@@ -914,11 +915,35 @@ public final class InGameController implements NetworkConstants {
     }
 
 
+    /**
+     * Initiates a negotiation with a foreign power. The player
+     * creates a DiplomaticTrade with the NegotiationDialog. The
+     * DiplomaticTrade is sent to the other player. If the other
+     * player accepts the offer, the trade is concluded. If not, this
+     * method returns, since the next offer must come from the other
+     * player.
+     *
+     * @param unit an <code>Unit</code> value
+     * @param direction an <code>int</code> value
+     */
     private void negotiate(Unit unit, int direction) {
         Map map = freeColClient.getGame().getMap();
         Settlement settlement = map.getNeighbourOrNull(direction, unit.getTile()).getSettlement();
 
-        freeColClient.getCanvas().showNegotiationDialog(unit, settlement);
+        DiplomaticTrade agreement = freeColClient.getCanvas().showNegotiationDialog(unit, settlement, null);
+        if (agreement != null) {
+            Element diplomaticElement = Message.createNewRootElement("diplomaticTrade");
+            diplomaticElement.setAttribute("unit", unit.getID());
+            diplomaticElement.setAttribute("direction", String.valueOf(direction));
+            diplomaticElement.appendChild(agreement.toXMLElement(null, diplomaticElement.getOwnerDocument()));
+            Element reply = freeColClient.getClient().ask(diplomaticElement);
+            if (reply != null) {
+                String accept = reply.getAttribute("accept");
+                if (accept != null && accept.equals("accept")) {
+                    agreement.makeTrade();
+                }
+            }
+        }
     }
 
     /**

@@ -33,7 +33,7 @@ public abstract class PersistentObject {
     public static final String  LICENSE = "http://www.gnu.org/licenses/gpl.html";
     public static final String  REVISION = "$Revision$";
 
-    private static Logger logger = Logger.getLogger(PersistentObject.class.getName());
+    protected static Logger logger = Logger.getLogger(PersistentObject.class.getName());
 
     /**
      * Initializes this object from an XML-representation of this object.

@@ -15,10 +15,30 @@ public class GoldTradeItem extends TradeItem {
      */
     private int gold;
         
+    /**
+     * Creates a new <code>GoldTradeItem</code> instance.
+     *
+     * @param game a <code>Game</code> value
+     * @param source a <code>Player</code> value
+     * @param destination a <code>Player</code> value
+     * @param gold an <code>int</code> value
+     */
     public GoldTradeItem(Game game, Player source, Player destination, int gold) {
         super(game, "tradeItem.gold", source, destination);
         this.gold = gold;
     }
+
+    /**
+     * Creates a new <code>GoldTradeItem</code> instance.
+     *
+     * @param game a <code>Game</code> value
+     * @param in a <code>XMLStreamReader</code> value
+     */
+    public GoldTradeItem(Game game, XMLStreamReader in) throws XMLStreamException {
+        super(game, in);
+        readFromXMLImpl(in);
+    }
+
 
     /**
      * Get the <code>Gold</code> value.
@@ -59,7 +79,11 @@ public class GoldTradeItem extends TradeItem {
      *      during parsing.
      */
     protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
-        super.readFromXMLImpl(in);
+        setID(in.getAttributeValue(null, "ID"));
+        String sourceID = in.getAttributeValue(null, "source");
+        setSource((Player) getGame().getFreeColGameObject(sourceID));
+        String destinationID = in.getAttributeValue(null, "destination");
+        setDestination((Player) getGame().getFreeColGameObject(destinationID));
         this.gold = Integer.parseInt(in.getAttributeValue(null, "gold"));
         in.nextTag();
     }

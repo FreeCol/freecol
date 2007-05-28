@@ -15,9 +15,28 @@ public class UnitTradeItem extends TradeItem {
      */
     private Unit unit;
         
+    /**
+     * Creates a new <code>UnitTradeItem</code> instance.
+     *
+     * @param game a <code>Game</code> value
+     * @param source a <code>Player</code> value
+     * @param destination a <code>Player</code> value
+     * @param unit an <code>Unit</code> value
+     */
     public UnitTradeItem(Game game, Player source, Player destination, Unit unit) {
         super(game, "tradeItem.unit", source, destination);
         this.unit = unit;
+    }
+
+    /**
+     * Creates a new <code>UnitTradeItem</code> instance.
+     *
+     * @param game a <code>Game</code> value
+     * @param in a <code>XMLStreamReader</code> value
+     */
+    public UnitTradeItem(Game game, XMLStreamReader in) throws XMLStreamException {
+        super(game, in);
+        readFromXMLImpl(in);
     }
 
     /**
@@ -58,7 +77,12 @@ public class UnitTradeItem extends TradeItem {
      *      during parsing.
      */
     protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
-        super.readFromXMLImpl(in);
+        setID(in.getAttributeValue(null, "ID"));
+        String sourceID = in.getAttributeValue(null, "source");
+        setSource((Player) getGame().getFreeColGameObject(sourceID));
+        String destinationID = in.getAttributeValue(null, "destination");
+        setDestination((Player) getGame().getFreeColGameObject(destinationID));
+        //super.readFromXMLImpl(in);
         String unitID = in.getAttributeValue(null, "unit");
         this.unit = (Unit) getGame().getFreeColGameObject(unitID);
         in.nextTag();
