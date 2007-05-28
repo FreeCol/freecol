@@ -262,8 +262,13 @@ public final class InGameController implements NetworkConstants {
             }
 
             displayModelMessages(true);
-            freeColClient.getGUI().setActiveUnit(null);
-            nextActiveUnit();
+            SwingUtilities.invokeLater(new Runnable() {
+                public void run() {
+                    // TODO: Why both calls ?
+                    freeColClient.getGUI().setActiveUnit(null);
+                    nextActiveUnit();
+                }
+            });
         }
         logger.finest("Exiting method setCurrentPlayer()");
     }
@@ -2928,12 +2933,9 @@ public final class InGameController implements NetworkConstants {
                     // canvas.setEnabled(false);
                     endingTurn = false;
 
-                    SwingUtilities.invokeLater(new Runnable() {
-                        public void run() {
-                            Element endTurnElement = Message.createNewRootElement("endTurn");
-                            freeColClient.getClient().sendAndWait(endTurnElement);
-                        }
-                    });
+                    Element endTurnElement = Message.createNewRootElement("endTurn");
+                    freeColClient.getClient().sendAndWait(endTurnElement);
+                        
                 } else {
                     executeGoto = false;
                 }
