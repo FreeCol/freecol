@@ -143,8 +143,8 @@ public final class InGameController extends Controller {
             try {        
                 Market market = newPlayer.getMarket();
                 // make random change to the market
-                market.add(getPseudoRandom().nextInt(Goods.NUMBER_OF_TYPES),
-                           (-getPseudoRandom().nextInt(21)));
+                market.remove(getPseudoRandom().nextInt(Goods.NUMBER_OF_TYPES),
+                           (getPseudoRandom().nextInt(21)));
                 Element updateElement = Message.createNewRootElement("update");
                 updateElement.appendChild(newPlayer.getMarket().toXMLElement(newPlayer, updateElement.getOwnerDocument()));
                 newPlayer.getConnection().send(updateElement);
