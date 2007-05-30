@@ -56,6 +56,12 @@ public class StanceTradeItem extends TradeItem {
     public final void setStance(final int newStance) {
         this.stance = newStance;
     }
+
+    /**
+     * Returns whether this TradeItem is valid.
+     *
+     * @return a <code>boolean</code> value
+     */
     public boolean isValid() {
         return (stance == Player.WAR ||
                 stance == Player.CEASE_FIRE ||
@@ -63,10 +69,21 @@ public class StanceTradeItem extends TradeItem {
                 stance == Player.ALLIANCE);
     }
 
+    /**
+     * Returns whether this TradeItem must be unique. This is true for
+     * the StanceTradeItem and the GoldTradeItem, and false for all
+     * others.
+     *
+     * @return a <code>boolean</code> value
+     */
     public boolean isUnique() {
         return true;
     }
 
+    /**
+     * Concludes the trade.
+     *
+     */
     public void makeTrade() {
         getSource().setStance(getDestination(), stance);
         getDestination().setStance(getSource(), stance);
@@ -80,12 +97,7 @@ public class StanceTradeItem extends TradeItem {
      *      during parsing.
      */
     protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
-        setID(in.getAttributeValue(null, "ID"));
-        String sourceID = in.getAttributeValue(null, "source");
-        setSource((Player) getGame().getFreeColGameObject(sourceID));
-        String destinationID = in.getAttributeValue(null, "destination");
-        setDestination((Player) getGame().getFreeColGameObject(destinationID));
-        //super.readFromXMLImpl(in);
+        super.readFromXMLImpl(in);
         this.stance = Integer.parseInt(in.getAttributeValue(null, "stance"));
         in.nextTag();
     }

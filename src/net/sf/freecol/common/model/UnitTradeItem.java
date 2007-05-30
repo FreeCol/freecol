@@ -57,14 +57,30 @@ public class UnitTradeItem extends TradeItem {
         this.unit = newUnit;
     }
 
+    /**
+     * Returns whether this TradeItem is valid.
+     *
+     * @return a <code>boolean</code> value
+     */
     public boolean isValid() {
         return (unit.getOwner() == getSource());
     }
 
+    /**
+     * Returns whether this TradeItem must be unique. This is true for
+     * the StanceTradeItem and the GoldTradeItem, and false for all
+     * others.
+     *
+     * @return a <code>boolean</code> value
+     */
     public boolean isUnique() {
         return false;
     }
     
+    /**
+     * Concludes the trade.
+     *
+     */
     public void makeTrade() {
         unit.setOwner(getDestination());
     }
@@ -77,12 +93,7 @@ public class UnitTradeItem extends TradeItem {
      *      during parsing.
      */
     protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
-        setID(in.getAttributeValue(null, "ID"));
-        String sourceID = in.getAttributeValue(null, "source");
-        setSource((Player) getGame().getFreeColGameObject(sourceID));
-        String destinationID = in.getAttributeValue(null, "destination");
-        setDestination((Player) getGame().getFreeColGameObject(destinationID));
-        //super.readFromXMLImpl(in);
+        super.readFromXMLImpl(in);
         String unitID = in.getAttributeValue(null, "unit");
         this.unit = (Unit) getGame().getFreeColGameObject(unitID);
         in.nextTag();

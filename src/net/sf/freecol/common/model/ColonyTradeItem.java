@@ -57,15 +57,31 @@ public class ColonyTradeItem extends TradeItem {
         this.colony = newColony;
     }
 
+    /**
+     * Returns whether this TradeItem is valid.
+     *
+     * @return a <code>boolean</code> value
+     */
     public boolean isValid() {
         return (colony.getOwner() == getSource() &&
                 getDestination().isEuropean());
     }
 
+    /**
+     * Returns whether this TradeItem must be unique. This is true for
+     * the StanceTradeItem and the GoldTradeItem, and false for all
+     * others.
+     *
+     * @return a <code>boolean</code> value
+     */
     public boolean isUnique() {
         return false;
     }
     
+    /**
+     * Concludes the trade.
+     *
+     */
     public void makeTrade() {
         colony.setOwner(getDestination());
     }
@@ -77,12 +93,7 @@ public class ColonyTradeItem extends TradeItem {
      *      during parsing.
      */
     protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
-        setID(in.getAttributeValue(null, "ID"));
-        String sourceID = in.getAttributeValue(null, "source");
-        setSource((Player) getGame().getFreeColGameObject(sourceID));
-        String destinationID = in.getAttributeValue(null, "destination");
-        setDestination((Player) getGame().getFreeColGameObject(destinationID));
-        //super.readFromXMLImpl(in);
+        super.readFromXMLImpl(in);
         String colonyID = in.getAttributeValue(null, "colony");
         this.colony = (Colony) getGame().getFreeColGameObject(colonyID);
         in.nextTag();

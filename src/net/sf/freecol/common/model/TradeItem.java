@@ -58,7 +58,6 @@ public abstract class TradeItem extends PersistentObject {
      */
     public TradeItem(Game game, XMLStreamReader in) throws XMLStreamException {
         this.game = game;
-        //readFromXMLImpl(in);
     }
 
     /**
