@@ -436,10 +436,14 @@ public final class InGameInputHandler extends InputHandler {
         FreeColClient freeColClient = getFreeColClient();
         Game game = freeColClient.getGame();
 
-        Player currentPlayer = (Player) game.getFreeColGameObject(setCurrentPlayerElement.getAttribute("player"));
+        final Player currentPlayer = (Player) game.getFreeColGameObject(setCurrentPlayerElement.getAttribute("player"));
 
         logger.finest("About to set currentPlayer to " + currentPlayer.getName());
-        freeColClient.getInGameController().setCurrentPlayer(currentPlayer);
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                getFreeColClient().getInGameController().setCurrentPlayer(currentPlayer);
+            }
+        });
         logger.finest("Succeeded in setting currentPlayer to " + currentPlayer.getName());
 
         new RefreshCanvasSwingTask(true).invokeLater();
