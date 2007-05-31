@@ -420,6 +420,7 @@ public final class Canvas extends JDesktopPane {
     /**
      * Displays the <code>WarehouseDialog</code>.
      * 
+     * @param colony the colony for which to show the WarehouseDialog.
      * @see WarehouseDialog
      */
     public void showWarehouseDialog(Colony colony) {
@@ -1962,7 +1963,6 @@ public final class Canvas extends JDesktopPane {
      * The frame cannot be moved or resized.
      * 
      * @param comp The component to add to this ToEuropePanel.
-     * @param i The layer to add the component to (see JLayeredPane).
      * @return The <code>JInternalFrame</code> that was created and added.
      */
     public JInternalFrame addAsSimpleFrame(JComponent comp) {
