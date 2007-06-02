@@ -700,15 +700,10 @@ public final class InGameInputHandler extends InputHandler {
             final int amount = new Integer(element.getAttribute("amount")).intValue();
             if (force) {
                 freeColClient.getMyPlayer().setTax(amount);
-                SwingUtilities.invokeLater(new Runnable() {
-                        public void run() {
-                            freeColClient.getCanvas().showModelMessage(
-                                    new ModelMessage(null, "model.monarch.forceTaxRaise",
+                new ShowModelMessageSwingTask(new ModelMessage(null, "model.monarch.forceTaxRaise",
                                                      new String[][] {
                                                          {"%replace%", String.valueOf(amount) }},
-                                                     ModelMessage.WARNING));
-                        }
-                    });
+                                                     ModelMessage.WARNING)).invokeLater();
                 reply = null;
             } else {
                 reply = Message.createNewRootElement("acceptTax");
@@ -872,15 +867,11 @@ public final class InGameInputHandler extends InputHandler {
             } else {
                 message = "model.monarch.bostonTeaParty.harbour";
             }
-            SwingUtilities.invokeLater(new Runnable() {
-                public void run() {
-                    freeColClient.getCanvas().showModelMessage(
-                            new ModelMessage(colony, message,
-                                    new String[][] { { "%colony%", colony.getName() },
-                                            { "%amount%", String.valueOf(goods.getAmount()) },
-                                            { "%goods%", goods.getName() } }, ModelMessage.WARNING));
-                }
-            });
+            new ShowModelMessageSwingTask(new ModelMessage(colony, message,
+                                             new String[][] { { "%colony%", colony.getName() },
+                                                 { "%amount%", String.valueOf(goods.getAmount()) },
+                                                 { "%goods%", goods.getName() } },
+                                             ModelMessage.WARNING)).invokeLater();
         }
 
         return null;
@@ -894,8 +885,8 @@ public final class InGameInputHandler extends InputHandler {
      */
     private Element lostCityRumour(Element element) {
         final FreeColClient freeColClient = getFreeColClient();
-        Game game = getFreeColClient().getGame();
-        Player player = freeColClient.getMyPlayer();
+        final Game game = getFreeColClient().getGame();
+        final Player player = freeColClient.getMyPlayer();
         int type = Integer.parseInt(element.getAttribute("type"));
         Unit unit = (Unit) game.getFreeColGameObject(element.getAttribute("unit"));
 
@@ -964,24 +955,52 @@ public final class InGameInputHandler extends InputHandler {
             }
             break;
         case LostCityRumour.FOUNTAIN_OF_YOUTH:
+            FreeColGameObject source = null;
             m = new ModelMessage(player.getEurope(), "lostCityRumour.FountainOfYouth", null,
-                    ModelMessage.LOST_CITY_RUMOUR);
-            unitList = element.getChildNodes();
-            for (int i = 0; i < unitList.getLength(); i++) {
-                Element unitElement = (Element) unitList.item(i);
-                newUnit = (Unit) game.getFreeColGameObject(unitElement.getAttribute("ID"));
-                if (newUnit == null) {
-                    newUnit = new Unit(game, unitElement);
-                } else {
-                    newUnit.readFromXMLElement(unitElement);
+                                 ModelMessage.LOST_CITY_RUMOUR);
+            if (player.hasFather(FoundingFather.WILLIAM_BREWSTER)) {
+                final int emigrants = Integer.parseInt(element.getAttribute("emigrants"));
+                SwingUtilities.invokeLater(new Runnable() {
+                    public void run() {
+                        for (int i = 0; i < emigrants; i++) {
+                            int slot = getFreeColClient().getCanvas().showEmigrationPanel();
+                            Element selectElement = Message.createNewRootElement("selectFromFountainYouth");
+                            selectElement.setAttribute("slot", Integer.toString(slot));
+                            Element reply = freeColClient.getClient().ask(selectElement);
+
+                            Element unitElement = (Element) reply.getChildNodes().item(0);
+                            Unit unit = (Unit) game.getFreeColGameObject(unitElement.getAttribute("ID"));
+                            if (unit == null) {
+                                unit = new Unit(game, unitElement);
+                            } else {
+                                unit.readFromXMLElement(unitElement);
+                            }
+                            player.getEurope().add(unit);
+
+                            int newRecruitable = Integer.parseInt(reply.getAttribute("newRecruitable"));
+                            player.getEurope().setRecruitable(slot, newRecruitable);
+                        }
+                    }
+                });
+           } else {
+                unitList = element.getChildNodes();
+                for (int i = 0; i < unitList.getLength(); i++) {
+                    Element unitElement = (Element) unitList.item(i);
+                    newUnit = (Unit) game.getFreeColGameObject(unitElement.getAttribute("ID"));
+                    if (newUnit == null) {
+                        newUnit = new Unit(game, unitElement);
+                    } else {
+                        newUnit.readFromXMLElement(unitElement);
+                    }
+                    player.getEurope().add(newUnit);
                 }
-                player.getEurope().add(newUnit);
             }
             break;
         default:
             throw new IllegalStateException("No such rumour.");
         }
-        player.addModelMessage(m);
+        
+        if (m != null) player.addModelMessage(m);
         return null;
     }
 
@@ -1276,6 +1295,29 @@ public final class InGameInputHandler extends InputHandler {
     }
 
     /**
+     * This class shows a model message.
+     */
+    class ShowModelMessageSwingTask extends ShowMessageSwingTask {
+
+        /**
+         * Constructor.
+         * 
+         * @param modelMessage The model message to show.
+         */
+        public ShowModelMessageSwingTask(ModelMessage modelMessage) {
+            _modelMessage = modelMessage;
+        }
+
+        protected Object doWork() {
+            getFreeColClient().getCanvas().showModelMessage(_modelMessage);
+            return null;
+        }
+
+
+        private ModelMessage _modelMessage;
+    }
+
+    /**
      * This class shows an informational dialog.
      */
     class ShowInformationMessageSwingTask extends ShowMessageSwingTask {
@@ -1333,17 +1375,7 @@ public final class InGameInputHandler extends InputHandler {
     /**
      * This class displays a dialog that lets the player pick a Founding Father.
      */
-    class ShowSelectFoundingFatherSwingTask extends SwingTask {
-
-        /**
-         * Constructor.
-         * 
-         * @param choices The possible founding fathers.
-         */
-        public ShowSelectFoundingFatherSwingTask(int[] choices) {
-            _choices = choices;
-        }
-
+    abstract class ShowSelectSwingTask extends SwingTask {
         /**
          * Show dialog and wait for selection.
          * 
@@ -1360,6 +1392,21 @@ public final class InGameInputHandler extends InputHandler {
                     throw new RuntimeException(e.getCause());
                 }
             }
+        }
+    }
+
+    /**
+     * This class displays a dialog that lets the player pick a Founding Father.
+     */
+    class ShowSelectFoundingFatherSwingTask extends ShowSelectSwingTask {
+
+        /**
+         * Constructor.
+         * 
+         * @param choices The possible founding fathers.
+         */
+        public ShowSelectFoundingFatherSwingTask(int[] choices) {
+            _choices = choices;
         }
 
         protected Object doWork() {

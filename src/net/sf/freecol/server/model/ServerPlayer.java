@@ -38,6 +38,8 @@ public class ServerPlayer extends Player implements ServerModelObject {
 
     private boolean connected = false;
 
+    /** Remaining emigrants to select due to a fountain of youth */
+    private int remainingEmigrants = 0;
 
     private String serverID;
 
@@ -115,6 +117,13 @@ public class ServerPlayer extends Player implements ServerModelObject {
         this.connected = connected;
     }
 
+    public int getRemainingEmigrants() {
+        return remainingEmigrants;
+    }
+    
+    public void setRemainingEmigrants(int emigrants) {
+        remainingEmigrants = emigrants;
+    }
 
     /**
     * Resets this player's explored tiles. This is done by setting

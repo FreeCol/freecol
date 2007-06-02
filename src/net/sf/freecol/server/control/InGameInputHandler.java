@@ -384,6 +384,11 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
                 return diplomaticTrade(connection, element);
             }
         });
+        register("selectFromFountainYouth", new NetworkRequestHandler() {
+            public Element handle(Connection connection, Element element) {
+                return selectFromFountainYouth(connection, element);
+            }
+        });
     }
 
     /**
@@ -787,10 +792,15 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
             rumourElement.appendChild(newUnit.toXMLElement(player, rumourElement.getOwnerDocument()));
             break;
         case LostCityRumour.FOUNTAIN_OF_YOUTH:
-            for (int k = 0; k < dx; k++) {
-                newUnit = new Unit(game, player.getEurope(), player, player.generateRecruitable(), Unit.SENTRY);
-                player.getEurope().add(newUnit);
-                rumourElement.appendChild(newUnit.toXMLElement(player, rumourElement.getOwnerDocument()));
+            if (player.hasFather(FoundingFather.WILLIAM_BREWSTER)) {
+                player.setRemainingEmigrants(dx);
+                rumourElement.setAttribute("emigrants", Integer.toString(dx));
+            } else {
+                for (int k = 0; k < dx; k++) {
+                    newUnit = new Unit(game, player.getEurope(), player, player.generateRecruitable(), Unit.SENTRY);
+                    rumourElement.appendChild(newUnit.toXMLElement(player, rumourElement.getOwnerDocument()));
+                    player.getEurope().add(newUnit);
+                }
             }
             break;
         default:
@@ -820,6 +830,39 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
                 }
             }
         }
+    }
+    
+    /**
+     * Handles an "selectFromFountainYouth"-message from a client.
+     * 
+     * @param connection The connection the message came from.
+     * @param element The element containing the request.
+     * @exception IllegalArgumentException If the data format of the message is
+     *                invalid.
+     * @exception IllegalStateException If the request is not accepted by the
+     *                model.
+     */
+    private Element selectFromFountainYouth(Connection connection, Element element) {
+        FreeColServer freeColServer = getFreeColServer();
+        Game game = freeColServer.getGame();
+        ServerPlayer player = freeColServer.getPlayer(connection);
+        int remaining = player.getRemainingEmigrants();
+        if (remaining == 0) {
+            throw new IllegalStateException("There is no remaining emigrants for this player.");
+        }
+        player.setRemainingEmigrants(remaining-1);
+        
+        Europe europe = player.getEurope();
+        int slot = Integer.parseInt(element.getAttribute("slot"));
+        int recruitable = europe.getRecruitable(slot);
+        int newRecruitable = player.generateRecruitable();
+        europe.setRecruitable(slot, newRecruitable);
+        
+        Unit unit = new Unit(game, player, recruitable);
+        Element reply = Message.createNewRootElement("selectFromFountainYouthConfirmed");
+        reply.setAttribute("newRecruitable", Integer.toString(newRecruitable));
+        reply.appendChild(unit.toXMLElement(player, reply.getOwnerDocument()));
+        return reply;
     }
 
     /**
