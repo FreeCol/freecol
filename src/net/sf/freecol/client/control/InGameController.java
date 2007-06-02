@@ -252,7 +252,6 @@ public final class InGameController implements NetworkConstants {
             }
 
             removeUnitsOutsideLOS();
-            // freeColClient.getCanvas().closeMenus();
             if (currentPlayer.checkEmigrate()) {
                 if (currentPlayer.hasFather(FoundingFather.WILLIAM_BREWSTER)) {
                     emigrateUnitInEurope(freeColClient.getCanvas().showEmigrationPanel());
@@ -261,9 +260,6 @@ public final class InGameController implements NetworkConstants {
                 }
             }
 
-            displayModelMessages(true);
-            // TODO: Why both calls ?
-            //freeColClient.getGUI().setActiveUnit(null);
             nextActiveUnit();
         }
         logger.finest("Exiting method setCurrentPlayer()");
