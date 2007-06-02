@@ -955,7 +955,6 @@ public final class InGameInputHandler extends InputHandler {
             }
             break;
         case LostCityRumour.FOUNTAIN_OF_YOUTH:
-            FreeColGameObject source = null;
             m = new ModelMessage(player.getEurope(), "lostCityRumour.FountainOfYouth", null,
                                  ModelMessage.LOST_CITY_RUMOUR);
             if (player.hasFather(FoundingFather.WILLIAM_BREWSTER)) {
@@ -1000,7 +999,7 @@ public final class InGameInputHandler extends InputHandler {
             throw new IllegalStateException("No such rumour.");
         }
         
-        if (m != null) player.addModelMessage(m);
+        player.addModelMessage(m);
         return null;
     }
 
