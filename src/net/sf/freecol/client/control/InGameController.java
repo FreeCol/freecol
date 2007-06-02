@@ -260,6 +260,7 @@ public final class InGameController implements NetworkConstants {
                 }
             }
 
+            displayModelMessages(true);
             nextActiveUnit();
         }
         logger.finest("Exiting method setCurrentPlayer()");
@@ -2476,15 +2477,18 @@ public final class InGameController implements NetworkConstants {
      * @param unit The unit to be moved to America.
      */
     public void moveToAmerica(Unit unit) {
+        Canvas canvas = freeColClient.getCanvas();
         Player player = freeColClient.getMyPlayer();
         if (freeColClient.getGame().getCurrentPlayer() != player) {
-            freeColClient.getCanvas().showInformationMessage("notYourTurn");
+            canvas.showInformationMessage("notYourTurn");
             return;
         }
 
         Client client = freeColClient.getClient();
 
-        if (unit.getLocation() instanceof Europe) {
+        // Ask for autoload emigrants
+        if (unit.getLocation() instanceof Europe &&
+            canvas.getClient().getClientOptions().getBoolean(ClientOptions.AUTOLOAD_EMIGRANTS)) {
             int spaceLeft = unit.getSpaceLeft();
             boolean leaveColonists = true;
             if (spaceLeft > 0) {
@@ -2492,7 +2496,8 @@ public final class InGameController implements NetworkConstants {
                 for (Unit possiblePassenger : unitsInEurope) {
                     if (possiblePassenger.getTakeSpace() <= spaceLeft) {
                         if (leaveColonists) {
-                            leaveColonists = freeColClient.getCanvas().showConfirmDialog("europe.leaveColonists", "yes", "no", new String[][] {{"%newWorld%", player.getNewLandName()}});
+                            leaveColonists = canvas.showConfirmDialog("europe.leaveColonists", "yes", "no",
+                                    new String[][] {{"%newWorld%", player.getNewLandName()}});
                             if (leaveColonists) {
                                 break;
                             }
@@ -3014,7 +3019,7 @@ public final class InGameController implements NetworkConstants {
         displayModelMessages(false);
     }
 
-    public void displayModelMessages(boolean allMessages) {
+    public void displayModelMessages(final boolean allMessages) {
 
         int thisTurn = freeColClient.getGame().getTurn().getNumber();
 
@@ -3055,15 +3060,12 @@ public final class InGameController implements NetworkConstants {
 
         Runnable uiTask = new Runnable() {
             public void run() {
-                /*
-                if (messageList.size() > 1) {
-                    freeColClient.getCanvas().showTurnReport(messageList);
-                } else if (messageList.size() == 1) {
-                    freeColClient.getCanvas().showModelMessage(messageList.get(0));
-                }
-                */
                 if (messageList.size() > 0) {
-                    freeColClient.getCanvas().showTurnReport(messageList);
+                    if (allMessages) {
+                        freeColClient.getCanvas().showTurnReport(messageList);
+                    } else {
+                        freeColClient.getCanvas().showModelMessage(messageList.get(0));
+                    }
                 }
                 freeColClient.getActionManager().update();
             }

@@ -699,6 +699,18 @@ public final class EuropePanel extends FreeColPanel implements ActionListener {
                     comp.getParent().remove(comp);
                     Unit unit = ((UnitLabel) comp).getUnit();
                     inGameController.moveToAmerica(unit);
+                    docksPanel.removeAll();
+                    for (Unit u : europe.getUnitList()) {
+                        UnitLabel unitLabel = new UnitLabel(u, parent);
+                        unitLabel.setTransferHandler(defaultTransferHandler);
+                        unitLabel.addMouseListener(pressListener);
+
+                        if (!u.isNaval()) {
+                            // If it's not a naval unit, it belongs on the docks.
+                            docksPanel.add(unitLabel, false);
+                        }
+                    }
+                    docksPanel.revalidate();
                 } else {
                     logger.warning("An invalid component got dropped on this ToAmericaPanel.");
                     return null;
@@ -706,17 +718,6 @@ public final class EuropePanel extends FreeColPanel implements ActionListener {
             }
             setSelectedUnitLabel(null);
             Component c = add(comp);
-            docksPanel.removeAll();
-            for (Unit unit : europe.getUnitList()) {
-                UnitLabel unitLabel = new UnitLabel(unit, parent);
-                unitLabel.setTransferHandler(defaultTransferHandler);
-                unitLabel.addMouseListener(pressListener);
-
-                if (!unit.isNaval()) {
-                    // If it's not a naval unit, it belongs on the docks.
-                    docksPanel.add(unitLabel, false);
-                }
-            }
             europePanel.refresh();
             return c;
         }

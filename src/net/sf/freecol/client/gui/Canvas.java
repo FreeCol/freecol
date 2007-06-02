@@ -1821,7 +1821,7 @@ public final class Canvas extends JDesktopPane {
             if (freeColClient.getGame() != null
                     && !freeColClient.isMapEditor()) {
                 //System.out.println("About to get next model message.");
-                freeColClient.getInGameController().nextModelMessage();
+                //freeColClient.getInGameController().nextModelMessage();
             }
         }
         //System.out.println("About to return from remove.");
