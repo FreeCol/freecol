@@ -1187,15 +1187,6 @@ public final class Tile extends FreeColGameObject implements Location, Nameable 
     }
 
     /**
-     * Gets a clone of the UnitContainer's <code>units</code> array.
-     * 
-     * @return The clone.
-     */
-    public ArrayList<Unit> getUnitsClone() {
-        return unitContainer.getUnitsClone();
-    }
-
-    /**
      * Checks wether or not the specified locatable may be added to this
      * <code>Location</code>.
      * 
