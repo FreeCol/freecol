@@ -2477,13 +2477,37 @@ public final class InGameController implements NetworkConstants {
      * @param unit The unit to be moved to America.
      */
     public void moveToAmerica(Unit unit) {
-        if (freeColClient.getGame().getCurrentPlayer() != freeColClient.getMyPlayer()) {
+        Player player = freeColClient.getMyPlayer();
+        if (freeColClient.getGame().getCurrentPlayer() != player) {
             freeColClient.getCanvas().showInformationMessage("notYourTurn");
             return;
         }
 
         Client client = freeColClient.getClient();
 
+        if (unit.getLocation() instanceof Europe) {
+            int spaceLeft = unit.getSpaceLeft();
+            boolean leaveColonists = true;
+            if (spaceLeft > 0) {
+                List<Unit> unitsInEurope = unit.getLocation().getUnitList();
+                for (Unit possiblePassenger : unitsInEurope) {
+                    if (possiblePassenger.getTakeSpace() <= spaceLeft) {
+                        if (leaveColonists) {
+                            leaveColonists = freeColClient.getCanvas().showConfirmDialog("europe.leaveColonists", "yes", "no", new String[][] {{"%newWorld%", player.getNewLandName()}});
+                            if (leaveColonists) {
+                                break;
+                            }
+                        }
+                        
+                        boardShip(possiblePassenger, unit);
+                        spaceLeft -= possiblePassenger.getTakeSpace();
+                        if (spaceLeft <= 0) {
+                            break;
+                        }
+                    }
+                }
+            }
+        }
         unit.moveToAmerica();
 
         Element moveToAmericaElement = Message.createNewRootElement("moveToAmerica");

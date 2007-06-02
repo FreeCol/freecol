@@ -993,7 +993,7 @@ public final class Colony extends Settlement implements Location, Nameable {
      */
     private void updateSoL() {
         int units = getUnitCount();
-        if (units == -1) {
+        if (units <= 0) {
             return;
         }
         // Update "addSol(int)" and "getMembers()" if this formula gets changed:

@@ -706,6 +706,17 @@ public final class EuropePanel extends FreeColPanel implements ActionListener {
             }
             setSelectedUnitLabel(null);
             Component c = add(comp);
+            docksPanel.removeAll();
+            for (Unit unit : europe.getUnitList()) {
+                UnitLabel unitLabel = new UnitLabel(unit, parent);
+                unitLabel.setTransferHandler(defaultTransferHandler);
+                unitLabel.addMouseListener(pressListener);
+
+                if (!unit.isNaval()) {
+                    // If it's not a naval unit, it belongs on the docks.
+                    docksPanel.add(unitLabel, false);
+                }
+            }
             europePanel.refresh();
             return c;
         }
