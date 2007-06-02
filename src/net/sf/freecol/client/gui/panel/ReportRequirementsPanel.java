@@ -81,9 +81,7 @@ public final class ReportRequirementsPanel extends ReportPanel implements Action
             Colony colony = colonies.get(index);
             for (Unit unit : colony.getUnitList()) {
                 unitCount[index][unit.getType()]++;
-                if (colony.canTrain(unit)) {
-                    canTrain[index][unit.getType()] = true;
-                }
+                canTrain[index][unit.getType()] = colony.canTrain(unit);
             }
         }
 
@@ -93,7 +91,7 @@ public final class ReportRequirementsPanel extends ReportPanel implements Action
 
             // colonyLabel
             try {
-                StyleConstants.setComponent(doc.getStyle("button"), createColonyButton(index, true));
+                StyleConstants.setComponent(doc.getStyle("button"), createColonyButton(colony, true));
                 doc.insertString(doc.getLength(), " ", doc.getStyle("button"));
                 doc.insertString(doc.getLength(), "\n\n", doc.getStyle("regular"));
             } catch(Exception e) {
@@ -179,12 +177,13 @@ public final class ReportRequirementsPanel extends ReportPanel implements Action
                                                        {"%unit%", expertName}}) + " "),
                                  doc.getStyle("regular"));
                 for (int index = 0; index < severalExperts.size() - 1; index++) {
-                    StyleConstants.setComponent(doc.getStyle("button"), createColonyButton(index, false));
+                    Colony colony = severalExperts.get(index);
+                    StyleConstants.setComponent(doc.getStyle("button"), createColonyButton(colony, false));
                     doc.insertString(doc.getLength(), " ", doc.getStyle("button"));
                     doc.insertString(doc.getLength(), ", ", doc.getStyle("regular"));
                 }
-                StyleConstants.setComponent(doc.getStyle("button"), 
-                                            createColonyButton(severalExperts.size() - 1, false));
+                Colony colony = severalExperts.get(severalExperts.size() - 1);
+                StyleConstants.setComponent(doc.getStyle("button"), createColonyButton(colony, false));
                 doc.insertString(doc.getLength(), " ", doc.getStyle("button"));
                 doc.insertString(doc.getLength(), "\n\n", doc.getStyle("regular"));
             }
@@ -196,12 +195,13 @@ public final class ReportRequirementsPanel extends ReportPanel implements Action
                                                        {"%unit%", expertName}}) + " "),
                                  doc.getStyle("regular"));
                 for (int index = 0; index < canTrainExperts.size() - 1; index++) {
-                    StyleConstants.setComponent(doc.getStyle("button"), createColonyButton(index, false));
+                    Colony colony = canTrainExperts.get(index);
+                    StyleConstants.setComponent(doc.getStyle("button"), createColonyButton(colony, false));
                     doc.insertString(doc.getLength(), " ", doc.getStyle("button"));
                     doc.insertString(doc.getLength(), ", ", doc.getStyle("regular"));
                 }
-                StyleConstants.setComponent(doc.getStyle("button"), 
-                                            createColonyButton(canTrainExperts.size() - 1, false));
+                Colony colony = canTrainExperts.get(canTrainExperts.size() - 1);
+                StyleConstants.setComponent(doc.getStyle("button"), createColonyButton(colony, false));
                 doc.insertString(doc.getLength(), " ", doc.getStyle("button"));
                 doc.insertString(doc.getLength(), "\n\n", doc.getStyle("regular"));
             }
@@ -212,10 +212,9 @@ public final class ReportRequirementsPanel extends ReportPanel implements Action
         
     }
 
+    private JButton createColonyButton(Colony colony, boolean headline) {
 
-    private JButton createColonyButton(int index, boolean headline) {
-
-        JButton button = new JButton(colonies.get(index).getName());
+        JButton button = new JButton(colony.getName());
         if (headline) {
             button.setFont(smallHeaderFont);
         }
@@ -224,7 +223,7 @@ public final class ReportRequirementsPanel extends ReportPanel implements Action
         button.setForeground(LINK_COLOR);
         button.setAlignmentY(0.8f);
         button.setBorder(BorderFactory.createEmptyBorder());
-        button.setActionCommand(String.valueOf(index));
+        button.setActionCommand(colony.getID());
         button.addActionListener(this);
         return button;
     }
@@ -253,11 +252,13 @@ public final class ReportRequirementsPanel extends ReportPanel implements Action
     @Override
     public void actionPerformed(ActionEvent event) {
         String command = event.getActionCommand();
-        int action = Integer.valueOf(command).intValue();
-        if (action == OK) {
+        if (command.equals(String.valueOf(OK))) {
             super.actionPerformed(event);
         } else {
-            getCanvas().showColonyPanel(colonies.get(action));
+            Colony colony = (Colony) getCanvas().getClient().getGame().getFreeColGameObject(command);
+            if (colony instanceof Colony) {
+                getCanvas().showColonyPanel((Colony) colony);
+            }
         }
     }
 
