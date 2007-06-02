@@ -447,6 +447,13 @@ public final class InGameController implements NetworkConstants {
 
             changeWorkType(unit, Goods.FOOD);
             unit.buildColony(colony);
+            
+            for(Unit unitInTile : tile.getUnitList()) {
+                if (unitInTile.getType() == Unit.TREASURE_TRAIN) {
+                    checkCashInTreasureTrain(unitInTile);
+                }
+            }
+            
             gui.setActiveUnit(null);
             gui.setSelectedTile(colony.getTile().getPosition());
         } else {
@@ -574,7 +581,7 @@ public final class InGameController implements NetworkConstants {
         final Location destination = unit.getDestination();
 
         if (freeColClient.getGame().getCurrentPlayer() != freeColClient.getMyPlayer()) {
-        	freeColClient.getCanvas().showInformationMessage("notYourTurn");
+        	canvas.showInformationMessage("notYourTurn");
             return;
         }
 
@@ -675,15 +682,8 @@ public final class InGameController implements NetworkConstants {
 
         // Display a "cash in"-dialog if a treasure train have been
         // moved into a coastal colony:
-        if (unit.getType() == Unit.TREASURE_TRAIN &&
-            unit.getColony() != null &&
-            !unit.getColony().isLandLocked()) {
-            String message = (unit.getOwner().hasFather(FoundingFather.HERNAN_CORTES)) ? "cashInTreasureTrain.text.free"
-                    : "cashInTreasureTrain.text.pay";
-            if (canvas.showConfirmDialog(message, "cashInTreasureTrain.yes", "cashInTreasureTrain.no")) {
-                cashInTreasureTrain(unit);
-                unit = null;
-            }
+        if (unit.getType() == Unit.TREASURE_TRAIN && checkCashInTreasureTrain(unit)) {
+            unit = null;
         }
 
         if (unit != null && unit.getMovesLeft() > 0 && unit.getTile() != null) {
@@ -893,12 +893,8 @@ public final class InGameController implements NetworkConstants {
 
         // Display a "cash in"-dialog if a treasure train have been moved into a
         // colony:
-        if (unit.getType() == Unit.TREASURE_TRAIN && unit.getColony() != null) {
-            String message = (unit.getOwner().hasFather(FoundingFather.HERNAN_CORTES)) ? "cashInTreasureTrain.text.free"
-                    : "cashInTreasureTrain.text.pay";
-            if (canvas.showConfirmDialog(message, "cashInTreasureTrain.yes", "cashInTreasureTrain.no")) {
-                cashInTreasureTrain(unit);
-            }
+        if (unit.getType() == Unit.TREASURE_TRAIN) {
+            checkCashInTreasureTrain(unit);
         }
 
         nextModelMessage();
@@ -1131,10 +1127,11 @@ public final class InGameController implements NetworkConstants {
      * @exception IllegalStateException if this unit is not a treasure train. or
      *                if it cannot be cashed in at it's current location.
      */
-    private void cashInTreasureTrain(Unit unit) {
+    private boolean checkCashInTreasureTrain(Unit unit) {
+        Canvas canvas = freeColClient.getCanvas();
         if (freeColClient.getGame().getCurrentPlayer() != freeColClient.getMyPlayer()) {
-            freeColClient.getCanvas().showInformationMessage("notYourTurn");
-            return;
+            canvas.showInformationMessage("notYourTurn");
+            return false;
         }
 
         Client client = freeColClient.getClient();
@@ -1142,18 +1139,24 @@ public final class InGameController implements NetworkConstants {
         if (unit.getType() != Unit.TREASURE_TRAIN) {
             throw new IllegalStateException("Not a treasure train");
         }
+        
+        if (unit.getColony() != null && !unit.getColony().isLandLocked()) {
+            String message = (unit.getOwner().hasFather(FoundingFather.HERNAN_CORTES)) ? "cashInTreasureTrain.text.free"
+                    : "cashInTreasureTrain.text.pay";
+            if (canvas.showConfirmDialog(message, "cashInTreasureTrain.yes", "cashInTreasureTrain.no")) {
+                // Inform the server:
+                Element cashInTreasureTrainElement = Message.createNewRootElement("cashInTreasureTrain");
+                cashInTreasureTrainElement.setAttribute("unit", unit.getID());
 
-        // Inform the server:
-        Element cashInTreasureTrainElement = Message.createNewRootElement("cashInTreasureTrain");
-        cashInTreasureTrainElement.setAttribute("unit", unit.getID());
+                client.sendAndWait(cashInTreasureTrainElement);
 
-        client.sendAndWait(cashInTreasureTrainElement);
+                unit.cashInTreasureTrain();
 
-        unit.cashInTreasureTrain();
-
-        freeColClient.getCanvas().updateGoldLabel();
-
-        nextActiveUnit();
+                freeColClient.getCanvas().updateGoldLabel();
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
