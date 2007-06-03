@@ -598,15 +598,54 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         FreeColServer freeColServer = getFreeColServer();
         Game game = freeColServer.getGame();
         ServerPlayer player = freeColServer.getPlayer(connection);
+
         Unit unit = (Unit) game.getFreeColGameObject(element.getAttribute("unit"));
+        if (unit == null) {
+            throw new IllegalArgumentException("Could not find 'Unit' with specified ID: "
+                                               + element.getAttribute("unit"));
+        }
         int direction = Integer.parseInt(element.getAttribute("direction"));
-        Settlement settlement = game.getMap().getNeighbourOrNull(direction, unit.getTile()).getSettlement();
+        Tile tile = game.getMap().getNeighbourOrNull(direction, unit.getTile());
+        if (tile == null) {
+            throw new IllegalArgumentException("Could not find 'Tile' in direction " +
+                                               direction);
+        }
+        Settlement settlement = tile.getSettlement();
+        if (settlement == null) {
+            throw new IllegalArgumentException("No settlement on 'Tile' " +
+                                               tile.getID());
+        }
         NodeList childElements = element.getChildNodes();
         Element childElement = (Element) childElements.item(0);
         DiplomaticTrade agreement = new DiplomaticTrade(game, childElement);
-        if (agreement != null) {
+        if (agreement.getSender() != player) {
+            throw new IllegalArgumentException("Sender of 'DiplomaticTrade' message is not " +
+                                               "player " + player.getName());
         }
-        return null;
+        ServerPlayer enemyPlayer = (ServerPlayer) agreement.getRecipient();
+        Element reply = null;
+        try {
+            reply = enemyPlayer.getConnection().ask(element);
+        } catch (IOException e) {
+            logger.warning("Could not send message to: " + enemyPlayer.getName() + " with connection "
+                           + enemyPlayer.getConnection());
+        }
+        if (reply != null) {
+            String accept = reply.getAttribute("accept");
+            if (accept != null && accept.equals("accept")) {
+                agreement.makeTrade();
+            } else {
+                // this is a counter-proposal
+                try {
+                    player.getConnection().send(reply);
+                } catch (IOException e) {
+                    logger.warning("Could not send message to: " + player.getName() + " with connection "
+                           + player.getConnection());
+                }
+                return null;
+            }
+        }
+        return reply;
     }
 
     /**
