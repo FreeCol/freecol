@@ -1666,37 +1666,24 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener {
                 if (colonyTile.isColonyCenterTile()) {
                     int width = lib.getTerrainImageWidth(1) * 2 / 3;
 
-                    ImageIcon goodsIcon =
-                            parent.getImageProvider().getGoodsImageIcon(
-                                    Goods.FOOD);
-                    BufferedImage productionImage =
-                            parent.getGUI().createProductionImage(goodsIcon,
+                    ImageIcon goodsIcon = parent.getImageProvider().getGoodsImageIcon(Goods.FOOD);
+                    BufferedImage productionImage = parent.getGUI().createProductionImage(goodsIcon,
                                     colonyTile.getTile().potential(Goods.FOOD),
                                     width, goodsIcon.getIconHeight());
-                    JLabel sl =
-                            new JLabel(new ImageIcon(productionImage),
+                    JLabel sl = new JLabel(new ImageIcon(productionImage),
                                     SwingConstants.CENTER);
-                    sl.setSize(lib.getTerrainImageWidth(1), goodsIcon
-                            .getIconHeight());
+                    sl.setSize(lib.getTerrainImageWidth(1), goodsIcon.getIconHeight());
                     add(sl);
 
                     if (colonyTile.getTile().potential(
                             colonyTile.getTile().secondaryGoods()) != 0) {
-                        goodsIcon =
-                                parent.getImageProvider().getGoodsImageIcon(
+                        goodsIcon = parent.getImageProvider().getGoodsImageIcon(
                                         colonyTile.getTile().secondaryGoods());
-                        productionImage =
-                                parent.getGUI().createProductionImage(
-                                        goodsIcon,
-                                        colonyTile.getTile().potential(
-                                                colonyTile.getTile()
-                                                        .secondaryGoods()),
+                        productionImage = parent.getGUI().createProductionImage(goodsIcon,
+                                        colonyTile.getTile().potential(colonyTile.getTile().secondaryGoods()),
                                         width, goodsIcon.getIconHeight());
-                        sl =
-                                new JLabel(new ImageIcon(productionImage),
-                                        SwingConstants.CENTER);
-                        sl.setSize(lib.getTerrainImageWidth(1), goodsIcon
-                                .getIconHeight());
+                        sl = new JLabel(new ImageIcon(productionImage), SwingConstants.CENTER);
+                        sl.setSize(lib.getTerrainImageWidth(1), goodsIcon.getIconHeight());
                         add(sl);
                     }
                 }
@@ -1771,8 +1758,7 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener {
                         Unit unit = ((UnitLabel) comp).getUnit();
                         if (colonyTile.getWorkTile().getOwner() != null
                                 && colonyTile.getWorkTile().getOwner() != getColony()) {
-                            if (colonyTile.getWorkTile().getOwner().getOwner()
-                                    .isEuropean()) {
+                            if (colonyTile.getWorkTile().getOwner().getOwner().isEuropean()) {
                                 parent.errorMessage("tileTakenEuro");
                             } else { // its an indian setttlement
                                 parent.errorMessage("tileTakenInd");
@@ -1780,59 +1766,29 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener {
                             return null;
                         }
                         if (colonyTile.getWorkTile().getNationOwner() != Player.NO_NATION
-                                && colonyTile.getWorkTile().getNationOwner() != unit
-                                        .getOwner().getNation()
-                                && !Player.isEuropean(colonyTile.getWorkTile()
-                                        .getNationOwner())
-                                && !unit.getOwner().hasFather(
-                                        FoundingFather.PETER_MINUIT)) {
-                            int nation =
-                                    colonyTile.getWorkTile().getNationOwner();
-                            int price =
-                                    game.getPlayer(
-                                            colonyTile.getWorkTile()
-                                                    .getNationOwner())
-                                            .getLandPrice(
-                                                    colonyTile.getWorkTile());
-                            ChoiceItem[] choices =
-                                    {
-                                            new ChoiceItem(
-                                                    Messages
-                                                            .message(
-                                                                    "indianLand.pay")
-                                                            .replaceAll(
-                                                                    "%amount%",
-                                                                    Integer
-                                                                            .toString(price)),
-                                                    1),
-                                            new ChoiceItem(
-                                                    Messages
-                                                            .message("indianLand.take"),
-                                                    2) };
-                            ChoiceItem ci =
-                                    (ChoiceItem) parent
-                                            .showChoiceDialog(
-                                                    Messages
-                                                            .message(
-                                                                    "indianLand.text")
-                                                            .replaceAll(
-                                                                    "%player%",
-                                                                    Player
-                                                                            .getNationAsString(nation)),
-                                                    Messages
-                                                            .message("indianLand.cancel"),
-                                                    choices);
+                                && colonyTile.getWorkTile().getNationOwner() != unit.getOwner().getNation()
+                                && !Player.isEuropean(colonyTile.getWorkTile().getNationOwner())
+                                && !unit.getOwner().hasFather(FoundingFather.PETER_MINUIT)) {
+                            int nation = colonyTile.getWorkTile().getNationOwner();
+                            int price = game.getPlayer(colonyTile.getWorkTile().getNationOwner()).
+                                    getLandPrice(colonyTile.getWorkTile());
+                            ChoiceItem[] choices = {
+                                new ChoiceItem(Messages.message("indianLand.pay").replaceAll("%amount%",
+                                                    Integer.toString(price)), 1),
+                                new ChoiceItem(Messages.message("indianLand.take"), 2) };
+                            ChoiceItem ci = (ChoiceItem) parent.showChoiceDialog(
+                                    Messages.message("indianLand.text").replaceAll("%player%",
+                                                Player.getNationAsString(nation)),
+                                    Messages.message("indianLand.cancel"), choices);
                             if (ci == null) {
                                 return null;
                             } else if (ci.getChoice() == 1) {
-                                if (price > freeColClient.getMyPlayer()
-                                        .getGold()) {
+                                if (price > freeColClient.getMyPlayer().getGold()) {
                                     parent.errorMessage("notEnoughGold");
                                     return null;
                                 }
 
-                                inGameController.buyLand(colonyTile
-                                        .getWorkTile());
+                                inGameController.buyLand(colonyTile.getWorkTile());
                             }
                         }
 
@@ -1860,8 +1816,7 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener {
                             return null;
                         }
                     } else {
-                        logger
-                                .warning("An invalid component got dropped on this CargoPanel.");
+                        logger.warning("An invalid component got dropped on this CargoPanel.");
                         return null;
                     }
                 }
