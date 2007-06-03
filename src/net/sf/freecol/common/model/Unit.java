@@ -468,8 +468,12 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
         if (getType() != TREASURE_TRAIN) {
             throw new IllegalStateException("Not a treasure train");
         }
-        return loc instanceof Tile && loc.getTile().getColony() != null || loc instanceof Europe
+        if (getOwner().getEurope() != null) {
+            return (loc.getColony() != null && !loc.getColony().isLandLocked()) || loc instanceof Europe
                 || (loc instanceof Unit && ((Unit) loc).getLocation() instanceof Europe);
+        } else {
+            return loc.getColony() != null;
+        }
     }
 
     /**
@@ -485,8 +489,12 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
 
         if (canCashInTreasureTrain()) {
             boolean inEurope = (getLocation() instanceof Unit && ((Unit) getLocation()).getLocation() instanceof Europe);
-            int cashInAmount = (getOwner().hasFather(FoundingFather.HERNAN_CORTES) || inEurope) ? getTreasureAmount()
-                    : getTreasureAmount() / 2;
+            int cashInAmount;
+            if (getOwner().hasFather(FoundingFather.HERNAN_CORTES) || inEurope || getOwner().getEurope() == null) {
+                cashInAmount = getTreasureAmount();
+            } else {
+                cashInAmount = getTreasureAmount() / 2;
+            }
             cashInAmount = cashInAmount * (100 - getOwner().getTax()) / 100;
             FreeColGameObject o = getOwner();
             if (inEurope) {

@@ -1137,14 +1137,17 @@ public final class InGameController implements NetworkConstants {
 
         Client client = freeColClient.getClient();
 
-        if (unit.getType() != Unit.TREASURE_TRAIN) {
-            throw new IllegalStateException("Not a treasure train");
-        }
-        
-        if (unit.getColony() != null && !unit.getColony().isLandLocked()) {
-            String message = (unit.getOwner().hasFather(FoundingFather.HERNAN_CORTES)) ? "cashInTreasureTrain.text.free"
+        if (unit.canCashInTreasureTrain()) {
+            boolean cash;
+            if (unit.getOwner().getEurope() == null) {
+                canvas.showInformationMessage("cashInTreasureTrain.text.independence");
+                cash = true;
+            } else {
+                String message = (unit.getOwner().hasFather(FoundingFather.HERNAN_CORTES)) ? "cashInTreasureTrain.text.free"
                     : "cashInTreasureTrain.text.pay";
-            if (canvas.showConfirmDialog(message, "cashInTreasureTrain.yes", "cashInTreasureTrain.no")) {
+                cash = canvas.showConfirmDialog(message, "cashInTreasureTrain.yes", "cashInTreasureTrain.no");
+            }
+            if (cash) {
                 // Inform the server:
                 Element cashInTreasureTrainElement = Message.createNewRootElement("cashInTreasureTrain");
                 cashInTreasureTrainElement.setAttribute("unit", unit.getID());
