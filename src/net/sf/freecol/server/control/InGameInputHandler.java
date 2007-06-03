@@ -831,14 +831,16 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
             rumourElement.appendChild(newUnit.toXMLElement(player, rumourElement.getOwnerDocument()));
             break;
         case LostCityRumour.FOUNTAIN_OF_YOUTH:
-            if (player.hasFather(FoundingFather.WILLIAM_BREWSTER)) {
-                player.setRemainingEmigrants(dx);
-                rumourElement.setAttribute("emigrants", Integer.toString(dx));
-            } else {
-                for (int k = 0; k < dx; k++) {
-                    newUnit = new Unit(game, player.getEurope(), player, player.generateRecruitable(), Unit.SENTRY);
-                    rumourElement.appendChild(newUnit.toXMLElement(player, rumourElement.getOwnerDocument()));
-                    player.getEurope().add(newUnit);
+            if (player.getEurope() != null) {
+                if (player.hasFather(FoundingFather.WILLIAM_BREWSTER)) {
+                    player.setRemainingEmigrants(dx);
+                    rumourElement.setAttribute("emigrants", Integer.toString(dx));
+                } else {
+                    for (int k = 0; k < dx; k++) {
+                        newUnit = new Unit(game, player.getEurope(), player, player.generateRecruitable(), Unit.SENTRY);
+                        rumourElement.appendChild(newUnit.toXMLElement(player, rumourElement.getOwnerDocument()));
+                        player.getEurope().add(newUnit);
+                    }
                 }
             }
             break;
