@@ -955,44 +955,49 @@ public final class InGameInputHandler extends InputHandler {
             }
             break;
         case LostCityRumour.FOUNTAIN_OF_YOUTH:
-            m = new ModelMessage(player.getEurope(), "lostCityRumour.FountainOfYouth", null,
-                                 ModelMessage.LOST_CITY_RUMOUR);
-            if (player.hasFather(FoundingFather.WILLIAM_BREWSTER)) {
-                final int emigrants = Integer.parseInt(element.getAttribute("emigrants"));
-                SwingUtilities.invokeLater(new Runnable() {
-                    public void run() {
-                        for (int i = 0; i < emigrants; i++) {
-                            int slot = getFreeColClient().getCanvas().showEmigrationPanel();
-                            Element selectElement = Message.createNewRootElement("selectFromFountainYouth");
-                            selectElement.setAttribute("slot", Integer.toString(slot));
-                            Element reply = freeColClient.getClient().ask(selectElement);
+            if (player.getEurope() == null) {
+                m = new ModelMessage(player.getEurope(), "lostCityRumour.FountainOfYouthWithoutEurope", null,
+                                     ModelMessage.LOST_CITY_RUMOUR);
+            } else {
+                m = new ModelMessage(player.getEurope(), "lostCityRumour.FountainOfYouth", null,
+                                     ModelMessage.LOST_CITY_RUMOUR);
+                if (player.hasFather(FoundingFather.WILLIAM_BREWSTER)) {
+                    final int emigrants = Integer.parseInt(element.getAttribute("emigrants"));
+                    SwingUtilities.invokeLater(new Runnable() {
+                        public void run() {
+                            for (int i = 0; i < emigrants; i++) {
+                                int slot = getFreeColClient().getCanvas().showEmigrationPanel();
+                                Element selectElement = Message.createNewRootElement("selectFromFountainYouth");
+                                selectElement.setAttribute("slot", Integer.toString(slot));
+                                Element reply = freeColClient.getClient().ask(selectElement);
 
-                            Element unitElement = (Element) reply.getChildNodes().item(0);
-                            Unit unit = (Unit) game.getFreeColGameObject(unitElement.getAttribute("ID"));
-                            if (unit == null) {
-                                unit = new Unit(game, unitElement);
-                            } else {
-                                unit.readFromXMLElement(unitElement);
+                                Element unitElement = (Element) reply.getChildNodes().item(0);
+                                Unit unit = (Unit) game.getFreeColGameObject(unitElement.getAttribute("ID"));
+                                if (unit == null) {
+                                    unit = new Unit(game, unitElement);
+                                } else {
+                                    unit.readFromXMLElement(unitElement);
+                                }
+                                player.getEurope().add(unit);
+
+                                int newRecruitable = Integer.parseInt(reply.getAttribute("newRecruitable"));
+                                player.getEurope().setRecruitable(slot, newRecruitable);
                             }
-                            player.getEurope().add(unit);
-
-                            int newRecruitable = Integer.parseInt(reply.getAttribute("newRecruitable"));
-                            player.getEurope().setRecruitable(slot, newRecruitable);
                         }
+                    });
+               } else {
+                    unitList = element.getChildNodes();
+                    for (int i = 0; i < unitList.getLength(); i++) {
+                        Element unitElement = (Element) unitList.item(i);
+                        newUnit = (Unit) game.getFreeColGameObject(unitElement.getAttribute("ID"));
+                        if (newUnit == null) {
+                            newUnit = new Unit(game, unitElement);
+                        } else {
+                            newUnit.readFromXMLElement(unitElement);
+                        }
+                        player.getEurope().add(newUnit);
                     }
-                });
-           } else {
-                unitList = element.getChildNodes();
-                for (int i = 0; i < unitList.getLength(); i++) {
-                    Element unitElement = (Element) unitList.item(i);
-                    newUnit = (Unit) game.getFreeColGameObject(unitElement.getAttribute("ID"));
-                    if (newUnit == null) {
-                        newUnit = new Unit(game, unitElement);
-                    } else {
-                        newUnit.readFromXMLElement(unitElement);
-                    }
-                    player.getEurope().add(newUnit);
-                }
+               }
             }
             break;
         default:
