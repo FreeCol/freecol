@@ -1554,7 +1554,11 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         if (confirmed.equals("true")) {
             Player enemy = (Player) game.getFreeColGameObject(element.getAttribute("enemy"));
             int amount = Game.getInciteAmount(player, enemy, settlement.getOwner());
-            player.modifyGold(-amount);
+            if (player.getGold() < amount) {
+                throw new IllegalStateException("Not enough gold to incite indians!");
+            } else {
+                player.modifyGold(-amount);
+            }
             // Set the indian player at war with the european player (and vice
             // versa).
             settlement.getOwner().setStance(enemy, Player.WAR);

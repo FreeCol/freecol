@@ -2425,7 +2425,11 @@ public final class InGameController implements NetworkConstants {
                 int amount = Integer.parseInt(reply.getAttribute("amount"));
 
                 boolean confirmed = canvas.showInciteDialog((Player) response.get(1), amount);
-
+                if (confirmed && unit.getOwner().getGold() < amount) {
+                    canvas.showInformationMessage("notEnoughGold");
+                    confirmed = false;
+                }
+                
                 Element inciteMessage = Message.createNewRootElement("inciteAtSettlement");
                 inciteMessage.setAttribute("unit", unit.getID());
                 inciteMessage.setAttribute("direction", Integer.toString(direction));
