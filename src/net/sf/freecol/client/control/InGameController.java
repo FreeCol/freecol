@@ -1140,7 +1140,8 @@ public final class InGameController implements NetworkConstants {
         if (unit.canCashInTreasureTrain()) {
             boolean cash;
             if (unit.getOwner().getEurope() == null) {
-                canvas.showInformationMessage("cashInTreasureTrain.text.independence");
+                canvas.showInformationMessage("cashInTreasureTrain.text.independence",
+                        new String[][] { { "%nation%", unit.getOwner().getNationAsString() } });
                 cash = true;
             } else {
                 String message = (unit.getOwner().hasFather(FoundingFather.HERNAN_CORTES)) ? "cashInTreasureTrain.text.free"

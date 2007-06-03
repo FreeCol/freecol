@@ -3637,7 +3637,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
             if (isArmed()) {
                 // dragoon
                 setMounted(false, true);
-                if (enemyUnit.getType() == BRAVE && greatDemote) {
+                if (enemyUnit.getType() == BRAVE && !enemyUnit.isMounted() && greatDemote) {
                     addModelMessage(this, "model.unit.braveMounted", new String[][] { { "%nation%",
                             enemyUnit.getOwner().getNationAsString() } }, ModelMessage.FOREIGN_DIPLOMACY);
                     enemyUnit.setMounted(true, true);
@@ -3651,7 +3651,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
         } else if (isArmed()) {
             // soldier
             setArmed(false, true);
-            if (enemyUnit.getType() == BRAVE && greatDemote) {
+            if (enemyUnit.getType() == BRAVE && !enemyUnit.isArmed() && greatDemote) {
                 addModelMessage(this, "model.unit.braveArmed", new String[][] { { "%nation%",
                         enemyUnit.getOwner().getNationAsString() } }, ModelMessage.FOREIGN_DIPLOMACY);
                 enemyUnit.setArmed(true, true);
