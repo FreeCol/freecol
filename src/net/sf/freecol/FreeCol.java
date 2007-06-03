@@ -64,7 +64,8 @@ public final class FreeCol {
     private static boolean  windowed = false,
                             sound = true,
                             javaCheck = true,
-                            memoryCheck = true;
+                            memoryCheck = true,
+                            consoleLogging = false;
     private static Rectangle windowSize = new Rectangle(-1, -1);
     private static String   dataFolder = "";
     
@@ -229,7 +230,7 @@ public final class FreeCol {
             baseLogger.removeHandler(handlers[i]);
         }
         try {
-            baseLogger.addHandler(new DefaultHandler());
+            baseLogger.addHandler(new DefaultHandler(consoleLogging));
             if (inDebugMode) {
                 logLevel = Level.FINEST;
             } 
@@ -401,6 +402,9 @@ public final class FreeCol {
                     printUsage();
                     System.exit(0);
                 }
+            } else if (args[i].equals("--log-console")) {
+                consoleLogging = true;
+                initLogging();
             } else if (args[i].equals("--log-level")) {
                 i++;
                 if (i < args.length) {

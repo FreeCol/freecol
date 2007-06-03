@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.logging.Handler;
+import java.util.logging.Level;
 import java.util.logging.LogRecord;
 
 import net.sf.freecol.FreeCol;
@@ -25,14 +26,18 @@ public final class DefaultHandler extends Handler {
 
     private FileWriter fileWriter;
 
+    private final boolean consoleLogging;
+
 
     /**
      * The constructor to use.
      * 
+     * @param consoleLogging The flag to log to the console as well.
      * @throws FreeColException In case the log file could not be
      *             created/written to.
      */
-    public DefaultHandler() throws FreeColException {
+    public DefaultHandler(boolean consoleLogging) throws FreeColException {
+        this.consoleLogging = consoleLogging;
         File file = new File(fileName);
 
         if (file.exists()) {
@@ -115,10 +120,15 @@ public final class DefaultHandler extends Handler {
         }
 
         String str = getFormatter().format(record);
+        if (consoleLogging && record.getLevel().intValue() >= Level.WARNING.intValue()) {
+            System.err.println(str);
+        }
+
         try {
             fileWriter.write(str, 0, str.length());
         } catch (IOException e) {
-            e.printStackTrace();
+            System.err.println("Failed to write log record!");
+            e.printStackTrace(System.err);
         }
 
         // Because FreeCol is still in a very early stage:
