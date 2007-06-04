@@ -723,10 +723,10 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener {
      * Closes the <code>ColonyPanel</code>.
      */
     public void closeColonyPanel() {
-        if (colony.getUnitCount() > 0
+        if (getColony().getUnitCount() > 0
                 || freeColClient.getCanvas().showConfirmDialog("abandonColony.text", "abandonColony.yes",
                 "abandonColony.no")) {
-            if (getColony() != null && getColony().getUnitCount() <= 0) {
+            if (getColony().getUnitCount() <= 0) {
                 getColony().dispose();
             }
             
