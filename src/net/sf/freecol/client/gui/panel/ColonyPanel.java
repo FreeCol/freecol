@@ -723,18 +723,26 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener {
      * Closes the <code>ColonyPanel</code>.
      */
     public void closeColonyPanel() {
-        parent.remove(this);
-        freeColClient.getInGameController().nextModelMessage();
-        Unit activeUnit = parent.getGUI().getActiveUnit();
-        if (activeUnit == null
-                || activeUnit.getTile() == null
-                || activeUnit.getMovesLeft() <= 0
-                || (!(activeUnit.getLocation() instanceof Tile) && !(activeUnit
-                        .getLocation() instanceof Unit))) {
-            parent.getGUI().setActiveUnit(null);
-            freeColClient.getInGameController().nextActiveUnit();
+        if (colony.getUnitCount() > 0
+                || freeColClient.getCanvas().showConfirmDialog("abandonColony.text", "abandonColony.yes",
+                "abandonColony.no")) {
+            if (getColony() != null && getColony().getUnitCount() <= 0) {
+                getColony().dispose();
+            }
+            
+            parent.remove(this);
+            freeColClient.getInGameController().nextModelMessage();
+            Unit activeUnit = parent.getGUI().getActiveUnit();
+            if (activeUnit == null
+                    || activeUnit.getTile() == null
+                    || activeUnit.getMovesLeft() <= 0
+                    || (!(activeUnit.getLocation() instanceof Tile) && !(activeUnit
+                            .getLocation() instanceof Unit))) {
+                parent.getGUI().setActiveUnit(null);
+                freeColClient.getInGameController().nextActiveUnit();
+            }
+            freeColClient.getGUI().restartBlinking();
         }
-        freeColClient.getGUI().restartBlinking();
     }
 
     /**

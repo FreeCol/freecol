@@ -1230,10 +1230,11 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
         } else {
             throw new IllegalStateException("It is not allowed to board a ship on another tile.");
         }
-
+        /* TODO: remove it if abandon colony on closing panel it's working
         if (getColony() != null && getColony().getUnitCount() <= 0) {
             getColony().dispose();
         }
+        */
     }
 
     /**
@@ -1647,10 +1648,11 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
 
         setLocation(getTile());
         setMovesLeft(0);
-
+        /* TODO: remove it if abandon colony on closing panel it's working
         if (getColony().getUnitCount() <= 0) {
             getColony().dispose();
         }
+        */
     }
 
     /**
@@ -4652,6 +4654,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
      * @return true if moving the unit out would abandon the colony.
      */
     public boolean wouldAbandonColony() {
+        // TODO: remove this method if abandon colony on closing panel it's working
         return getColony() != null
                 && getColony().getUnitCount() <= 1
                 && (getLocation() instanceof Colony 

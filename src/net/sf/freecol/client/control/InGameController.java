@@ -1918,9 +1918,10 @@ public final class InGameController implements NetworkConstants {
      * @return true if the move was safe or accepted.
      */
     private boolean okToLeaveColony(Unit unit) {
-        return !unit.wouldAbandonColony()
+        return true; // TODO: remove this method if abandon colony on closing panel it's working
+        /*return !unit.wouldAbandonColony()
                 || freeColClient.getCanvas().showConfirmDialog("abandonColony.text", "abandonColony.yes",
-                        "abandonColony.no");
+                        "abandonColony.no");*/
     }
 
     /**
