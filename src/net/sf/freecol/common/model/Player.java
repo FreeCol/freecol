@@ -1583,6 +1583,65 @@ public class Player extends FreeColGameObject implements Nameable {
     }
 
     /**
+     * Gets a <code>String</code> representation of a nation. This
+     * representation is not intended for internal representation.
+     * 
+     * @return A unique identifier for each nation.
+     */
+    public String getNationIdentifier() {
+        return getNationIdentifier(getNation());
+    }
+    
+    /**
+     * Gets a <code>String</code> representation of a nation. This
+     * representation is not intended for internal representation.
+     * 
+     * @param nation The nation represented as an int.
+     * @return A unique identifier for each nation.
+     */
+    public static String getNationIdentifier(int nation) {
+        switch (nation) {
+        case NO_NATION:
+            return "noNation";
+        case DUTCH:
+            return "dutch";
+        case ENGLISH:
+            return "english";
+        case FRENCH:
+            return "french";
+        case SPANISH:
+            return "spanish";
+        case INCA:
+            return "inca";
+        case AZTEC:
+            return "aztec";
+        case ARAWAK:
+            return "arawak";
+        case CHEROKEE:
+            return "cherokee";
+        case IROQUOIS:
+            return "iroquois";
+        case SIOUX:
+            return "sioux";
+        case APACHE:
+            return "apache";
+        case TUPI:
+            return "tupi";
+        case REF_DUTCH:
+            return "refDutch";
+        case REF_ENGLISH:
+            return "refEnglish";
+        case REF_FRENCH:
+            return "refFrench";
+        case REF_SPANISH:
+            return "refSpanish";
+        default:
+            logger.warning("Unknown nation: " + nation);
+            throw new IllegalArgumentException("Unknown nation: " + nation);
+        }        
+    }
+
+    /**
      * Returns the color of this player.
      * 
      * @return The color of this player.
