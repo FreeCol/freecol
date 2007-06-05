@@ -3039,7 +3039,7 @@ public final class InGameController implements NetworkConstants {
                     endingTurn = false;
 
                     Element endTurnElement = Message.createNewRootElement("endTurn");
-                    freeColClient.getClient().sendAndWait(endTurnElement);
+                    freeColClient.getClient().send(endTurnElement);
                         
                 } else {
                     executeGoto = false;
