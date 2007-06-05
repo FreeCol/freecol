@@ -2286,6 +2286,8 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
             return 12;
         } else if (isMissionary()) {
             return 6;
+        } else if (isNaval() && owner.hasFather(FoundingFather.FERDINAND_MAGELLAN)) {
+            return unitType.movement + 3;
         } else {
             return unitType.movement;
         }
