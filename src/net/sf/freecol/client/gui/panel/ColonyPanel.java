@@ -187,17 +187,8 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener {
         buildingsPanel = new BuildingsPanel(this);
 
         defaultTransferHandler = new DefaultTransferHandler(parent, this);
-        outsideColonyPanel.setTransferHandler(defaultTransferHandler);
-        inPortPanel.setTransferHandler(defaultTransferHandler);
-        cargoPanel.setTransferHandler(defaultTransferHandler);
-        warehousePanel.setTransferHandler(defaultTransferHandler);
-
         pressListener = new DragListener(this);
         releaseListener = new DropListener();
-        outsideColonyPanel.addMouseListener(releaseListener);
-        inPortPanel.addMouseListener(releaseListener);
-        cargoPanel.addMouseListener(releaseListener);
-        warehousePanel.addMouseListener(releaseListener);
 
         outsideColonyPanel.setLayout(new GridLayout(0, 2));
         inPortPanel.setLayout(new GridLayout(0, 2));
@@ -378,6 +369,36 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener {
         setColony(colony);
         this.game = game;
 
+        // Set listeners and transfer handlers
+        outsideColonyPanel.removeMouseListener(releaseListener);
+        inPortPanel.removeMouseListener(releaseListener);
+        cargoPanel.removeMouseListener(releaseListener);
+        warehousePanel.removeMouseListener(releaseListener);
+        if (isEditable()) {
+            outsideColonyPanel.setTransferHandler(defaultTransferHandler);
+            inPortPanel.setTransferHandler(defaultTransferHandler);
+            cargoPanel.setTransferHandler(defaultTransferHandler);
+            warehousePanel.setTransferHandler(defaultTransferHandler);
+
+            outsideColonyPanel.addMouseListener(releaseListener);
+            inPortPanel.addMouseListener(releaseListener);
+            cargoPanel.addMouseListener(releaseListener);
+            warehousePanel.addMouseListener(releaseListener);
+        } else {
+            outsideColonyPanel.setTransferHandler(null);
+            inPortPanel.setTransferHandler(null);
+            cargoPanel.setTransferHandler(null);
+            warehousePanel.setTransferHandler(null);
+        }
+        
+        // Enable/disable widgets
+        buyBuilding.setEnabled(isEditable());
+        unloadButton.setEnabled(isEditable());
+        renameButton.setEnabled(isEditable());
+        warehouseButton.setEnabled(isEditable());
+        buildingBox.setEnabled(isEditable());
+        nameBox.setEnabled(isEditable());
+        
         //
         // Remove the old components from the panels.
         //
@@ -403,8 +424,12 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener {
             Unit unit = tileUnitIterator.next();
 
             UnitLabel unitLabel = new UnitLabel(unit, parent);
-            unitLabel.setTransferHandler(defaultTransferHandler);
-            unitLabel.addMouseListener(pressListener);
+            if (isEditable()) {
+                unitLabel.setTransferHandler(defaultTransferHandler);
+            }
+            if (isEditable() || unit.isCarrier()) {
+                unitLabel.addMouseListener(pressListener);
+            }
 
             if (!unit.isCarrier()) {
                 outsideColonyPanel.add(unitLabel, false);
@@ -466,6 +491,7 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener {
      */
     private void updateUnloadButton() {
         unloadButton.setEnabled(false);
+        if (!isEditable()) return;
         if (selectedUnit != null) {
             Unit unit = selectedUnit.getUnit();
             if (unit != null && unit.isCarrier()
@@ -500,19 +526,10 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener {
             // Apparently this can happen
             return;
         }
-        solLabel
-                .setText(Messages.message("sonsOfLiberty")
-                        + ": "
-                        + getColony().getSoL()
-                        + "% ("
-                        + getColony().getMembers()
-                        + "), "
-                        + Messages.message("tory")
-                        + ": "
-                        + getColony().getTory()
-                        + "% ("
-                        + (getColony().getUnitCount() - getColony()
-                                .getMembers()) + ")");
+        solLabel.setText(Messages.message("sonsOfLiberty") + ": "
+                + getColony().getSoL() + "% (" + getColony().getMembers() + "), "
+                + Messages.message("tory") + ": " + getColony().getTory() + "% ("
+                + (getColony().getUnitCount() - getColony().getMembers()) + ")");
     }
 
     public void updateNameBox() {
@@ -604,9 +621,8 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener {
             hammersLabel.update(0, hammersNeeded, hammers, nextHammers);
             toolsLabel.update(0, toolsNeeded, tools, nextTools);
 
-            buyBuilding.setEnabled(getColony().getCurrentlyBuilding() >= 0
-                    && getColony().getPriceForBuilding() <= freeColClient
-                            .getMyPlayer().getGold());
+            buyBuilding.setEnabled(isEditable() && getColony().getCurrentlyBuilding() >= 0
+                    && getColony().getPriceForBuilding() <= freeColClient.getMyPlayer().getGold());
         }
     }
 
@@ -622,8 +638,10 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener {
             Unit unit = tileUnitIterator.next();
 
             UnitLabel unitLabel = new UnitLabel(unit, parent);
-            unitLabel.setTransferHandler(defaultTransferHandler);
-            unitLabel.addMouseListener(pressListener);
+            if (isEditable()) {
+                unitLabel.setTransferHandler(defaultTransferHandler);
+                unitLabel.addMouseListener(pressListener);
+            }
 
             if (!unit.isCarrier()) {
                 outsideColonyPanel.add(unitLabel, false);
@@ -793,8 +811,10 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener {
                 Unit unit = unitIterator.next();
 
                 UnitLabel label = new UnitLabel(unit, parent);
-                label.setTransferHandler(defaultTransferHandler);
-                label.addMouseListener(pressListener);
+                if (isEditable()) {
+                    label.setTransferHandler(defaultTransferHandler);
+                    label.addMouseListener(pressListener);
+                }
 
                 cargoPanel.add(label, false);
             }
@@ -804,8 +824,10 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener {
                 Goods g = goodsIterator.next();
 
                 GoodsLabel label = new GoodsLabel(g, parent);
-                label.setTransferHandler(defaultTransferHandler);
-                label.addMouseListener(pressListener);
+                if (isEditable()) {
+                    label.setTransferHandler(defaultTransferHandler);
+                    label.addMouseListener(pressListener);
+                }
 
                 cargoPanel.add(label, false);
             }
@@ -866,6 +888,7 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener {
      */
     private synchronized void setColony(Colony colony) {
         this.colony = colony;
+        editable = colony.getOwner() == freeColClient.getMyPlayer();
     }
 
     /**
@@ -913,9 +936,10 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener {
                 Building building = buildingIterator.next();
                 if (building.isBuilt()) {
                     aSingleBuildingPanel = new ASingleBuildingPanel(building);
-                    aSingleBuildingPanel.addMouseListener(releaseListener);
-                    aSingleBuildingPanel
-                            .setTransferHandler(defaultTransferHandler);
+                    if (colonyPanel.isEditable()) {
+                        aSingleBuildingPanel.addMouseListener(releaseListener);
+                        aSingleBuildingPanel.setTransferHandler(defaultTransferHandler);
+                    }
                     aSingleBuildingPanel.setOpaque(false);
                     add(aSingleBuildingPanel);
                 }
@@ -964,8 +988,10 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener {
                 while (unitIterator.hasNext()) {
                     Unit unit = unitIterator.next();
                     UnitLabel unitLabel = new UnitLabel(unit, parent, true);
-                    unitLabel.setTransferHandler(defaultTransferHandler);
-                    unitLabel.addMouseListener(pressListener);
+                    if (colonyPanel.isEditable()) {
+                        unitLabel.setTransferHandler(defaultTransferHandler);
+                        unitLabel.addMouseListener(pressListener);
+                    }
                     colonistsInBuildingPanel.add(unitLabel);
                 }
 
@@ -1419,8 +1445,10 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener {
                 Goods goods = goodsIterator.next();
 
                 GoodsLabel goodsLabel = new GoodsLabel(goods, parent);
-                goodsLabel.setTransferHandler(defaultTransferHandler);
-                goodsLabel.addMouseListener(pressListener);
+                if (colonyPanel.isEditable()) {
+                    goodsLabel.setTransferHandler(defaultTransferHandler);
+                    goodsLabel.addMouseListener(pressListener);
+                }
 
                 warehousePanel.add(goodsLabel, false);
             }
@@ -1661,8 +1689,10 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener {
                     Unit unit = colonyTile.getUnit();
 
                     UnitLabel unitLabel = new UnitLabel(unit, parent);
-                    unitLabel.setTransferHandler(defaultTransferHandler);
-                    unitLabel.addMouseListener(pressListener);
+                    if (colonyPanel.isEditable()) {
+                        unitLabel.setTransferHandler(defaultTransferHandler);
+                        unitLabel.addMouseListener(pressListener);
+                    }
 
                     add(unitLabel);
 
@@ -1696,8 +1726,10 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener {
                     }
                 }
 
-                setTransferHandler(defaultTransferHandler);
-                addMouseListener(releaseListener);
+                if (colonyPanel.isEditable()) {
+                    setTransferHandler(defaultTransferHandler);
+                    addMouseListener(releaseListener);
+                }
 
                 // Size and position:
                 setSize(lib.getTerrainImageWidth(1), lib
@@ -1924,6 +1956,35 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener {
             super.addActionListener(buildingBoxListener);
         }
 
+        public String buildingText(int type) {
+            Building building = getColony().getBuilding(type);
+            String theText = new String(building.getNextName() + " ("
+                    + Integer.toString(building.getNextHammers()) + " "
+                    + Messages.message("model.goods.Hammers").toLowerCase());
+
+            if (building.getNextTools() > 0) {
+                theText += ", " + Integer.toString(building.getNextTools()) + " "
+                        + Messages.message("model.goods.Tools").toLowerCase();
+            }
+
+            theText += ")";
+            return theText;
+        }
+
+        public String unitText(int type) {
+            String theText = new String(Unit.getName(type) + " ("
+                    + Unit.getNextHammers(type) + " "
+                    + Messages.message("model.goods.Hammers").toLowerCase());
+            
+            if (Unit.getNextTools(type) > 0) {
+                theText += ", " + Integer.toString(Unit.getNextTools(type)) + " "
+                        + Messages.message("model.goods.Tools").toLowerCase();
+            }
+
+            theText += ")";
+            return theText;
+        }
+        
         /**
          * Sets up the BuildingBox such that it contains the appropriate
          * buildings.
@@ -1937,26 +1998,7 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener {
             BuildingBoxItem toSelect = nothingItem;
             for (int i = 0; i < Building.NUMBER_OF_TYPES; i++) {
                 if (colonyPanel.getColony().getBuilding(i).canBuildNext()) {
-                    String theText =
-                            new String(getColony().getBuilding(i).getNextName()
-                                    + " ("
-                                    + Integer.toString(colonyPanel.getColony()
-                                            .getBuilding(i).getNextHammers())
-                                    + " "
-                                    + Messages.message("model.goods.Hammers")
-                                            .toLowerCase());
-
-                    if (colonyPanel.getColony().getBuilding(i).getNextTools() > 0) {
-                        theText +=
-                                ", "
-                                        + Integer.toString(getColony()
-                                                .getBuilding(i).getNextTools())
-                                        + " "
-                                        + Messages.message("model.goods.Tools")
-                                                .toLowerCase();
-                    }
-
-                    theText += ")";
+                    String theText = buildingText(i);
                     BuildingBoxItem nextItem = new BuildingBoxItem(theText, i);
                     this.addItem(nextItem);
                     if (i == colonyPanel.getColony().getCurrentlyBuilding()) {
@@ -1969,20 +2011,7 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener {
                     colonyPanel.getColony().getBuildableUnitIterator();
             while (buildableUnitIterator.hasNext()) {
                 int unitID = buildableUnitIterator.next();
-
-                String theText =
-                        new String(Unit.getName(unitID) + " ("
-                                + Unit.getNextHammers(unitID) + " "
-                                + Messages.message("model.goods.Hammers"));
-                if (Unit.getNextTools(unitID) > 0) {
-                    theText +=
-                            ", " + Integer.toString(Unit.getNextTools(unitID))
-                                    + " "
-                                    + Messages.message("model.goods.Tools");
-                }
-
-                theText += ")";
-
+                String theText = unitText(unitID);
                 int i = unitID + Colony.BUILDING_UNIT_ADDITION;
                 BuildingBoxItem uItem = new BuildingBoxItem(theText, i);
                 addItem(uItem);
@@ -1995,7 +2024,7 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener {
             super.addActionListener(buildingBoxListener);
             colonyPanel.updateProgressLabel();
         }
-
+ 
 
         /**
          * Represents a type of building, and the text of the next building in

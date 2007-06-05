@@ -67,6 +67,8 @@ public class FreeColPanel extends JPanel {
 
     // The color to use for links
     protected static final Color LINK_COLOR = new Color(122, 109, 82);
+    
+    protected boolean editable = true;
 
 
     /**
@@ -131,6 +133,13 @@ public class FreeColPanel extends JPanel {
      */
     public final Canvas getCanvas() {
         return canvas;
+    }
+
+    /**
+     * Checks if this panel is editable
+     */
+    public boolean isEditable() {
+        return editable;
     }
 
     /**

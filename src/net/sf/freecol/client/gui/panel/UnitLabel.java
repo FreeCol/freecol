@@ -218,7 +218,7 @@ public final class UnitLabel extends JLabel implements ActionListener {
 
         if (ignoreLocation || selected || (!unit.isCarrier() && unit.getState() != Unit.SENTRY)) {
             setEnabled(true);
-        } else if (unit.getOwner() != parent.getClient().getMyPlayer()) {
+        } else if (unit.getOwner() != parent.getClient().getMyPlayer() && unit.getColony() == null) {
             setEnabled(true);
         } else {
             setEnabled(false);

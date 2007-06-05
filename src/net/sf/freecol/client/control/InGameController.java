@@ -877,7 +877,7 @@ public final class InGameController implements NetworkConstants {
             learnSkillAtIndianSettlement(unit, direction);
             break;
         case Unit.ENTER_FOREIGN_COLONY_WITH_SCOUT:
-            negotiate(unit, direction);
+            scoutForeignColony(unit, direction);
             break;
         case Unit.ENTER_SETTLEMENT_WITH_CARRIER_AND_GOODS:
             tradeWithSettlement(unit, direction);
@@ -926,6 +926,7 @@ public final class InGameController implements NetworkConstants {
 
         DiplomaticTrade agreement = freeColClient.getCanvas().showNegotiationDialog(unit, settlement, null);
         if (agreement != null) {
+            unit.setMovesLeft(0);
             Element diplomaticElement = Message.createNewRootElement("diplomaticTrade");
             diplomaticElement.setAttribute("unit", unit.getID());
             diplomaticElement.setAttribute("direction", String.valueOf(direction));
@@ -937,6 +938,40 @@ public final class InGameController implements NetworkConstants {
                     agreement.makeTrade();
                 }
             }
+        }
+    }
+
+    /**
+     * Enter in a foreign colony to spy it.
+     *
+     * @param unit an <code>Unit</code> value
+     * @param direction an <code>int</code> value
+     */
+    private void spy(Unit unit, int direction) {
+        Game game = freeColClient.getGame();
+        Colony colony = game.getMap().getNeighbourOrNull(direction,
+                unit.getTile()).getColony();
+
+        Element spyElement = Message.createNewRootElement("spyColony");
+        spyElement.setAttribute("unit", unit.getID());
+        spyElement.setAttribute("direction", String.valueOf(direction));
+        Element reply = freeColClient.getClient().ask(spyElement);
+        if (reply != null) {
+            unit.setMovesLeft(0);
+            NodeList childNodes = reply.getChildNodes();
+            colony.readFromXMLElement((Element) childNodes.item(0));
+            Tile tile = colony.getTile();
+            for(int i=1; i < childNodes.getLength(); i++) {
+                Element unitElement = (Element) childNodes.item(i);
+                Unit foreignUnit = (Unit) game.getFreeColGameObject(unitElement.getAttribute("ID"));
+                if (foreignUnit == null) {
+                    foreignUnit = new Unit(game, unitElement);
+                } else {
+                    foreignUnit.readFromXMLElement(unitElement);
+                }
+                tile.add(foreignUnit);
+            }
+            freeColClient.getCanvas().showColonyPanel(colony);
         }
     }
 
@@ -2246,8 +2281,45 @@ public final class InGameController implements NetworkConstants {
 
         nextActiveUnit(unit.getTile());
     }
+   /**
+     * Ask for spy the foreign colony, negotiate with the foreign power
+     * or attack the colony
+     * 
+     * @param unit The unit that will spy, negotiate or attack.
+     * @param direction The direction in which the foreign colony lies.
+     */
+    private void scoutForeignColony(Unit unit, int direction) {
+        if (freeColClient.getGame().getCurrentPlayer() != freeColClient.getMyPlayer()) {
+            freeColClient.getCanvas().showInformationMessage("notYourTurn");
+            return;
+        }
 
-    /**
+        Canvas canvas = freeColClient.getCanvas();
+        Map map = freeColClient.getGame().getMap();
+        Tile tile = map.getNeighbourOrNull(direction, unit.getTile());
+        Colony colony = tile.getColony();
+
+        int userAction = canvas.showScoutForeignColonyDialog(colony, unit);
+
+        switch (userAction) {
+        case FreeColDialog.SCOUT_FOREIGN_COLONY_CANCEL:
+            break;
+        case FreeColDialog.SCOUT_FOREIGN_COLONY_ATTACK:
+            attack(unit, direction);
+            break;
+        case FreeColDialog.SCOUT_FOREIGN_COLONY_NEGOTIATE:
+             negotiate(unit, direction);
+            break;
+        case FreeColDialog.SCOUT_FOREIGN_COLONY_SPY:
+            spy(unit, direction);
+            break;
+        default:
+            logger.warning("Incorrect response returned from Canvas.showScoutForeignColonyDialog()");
+            return;
+        }
+    }
+
+   /**
      * Moves the specified scout into an Indian settlement to speak with the
      * chief or demand a tribute etc. Of course, the scout won't physically get
      * into the village, it will just stay where it is.

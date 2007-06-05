@@ -60,6 +60,11 @@ public class FreeColDialog extends FreeColPanel {
                             SCOUT_INDIAN_SETTLEMENT_TRIBUTE = 2,
                             SCOUT_INDIAN_SETTLEMENT_ATTACK = 3;
 
+    public static final int SCOUT_FOREIGN_COLONY_CANCEL = 0,
+                            SCOUT_FOREIGN_COLONY_NEGOTIATE = 1,
+                            SCOUT_FOREIGN_COLONY_SPY = 2,
+                            SCOUT_FOREIGN_COLONY_ATTACK = 3;
+
     public static final int MISSIONARY_CANCEL = 0,
                             MISSIONARY_ESTABLISH = 1,
                             MISSIONARY_DENOUNCE_AS_HERESY = 2,
@@ -679,6 +684,78 @@ public class FreeColDialog extends FreeColPanel {
         return confirmDialog;
     }
 
+
+    /**
+    * Creates a dialog that asks the user what he wants to do with his scout in the foreign
+    * colony. Options are: spy the colony, negotiate with foreign power, attack or cancel.
+    * The possible responses are integers that are defined in this class as finals.
+    *
+    * @param settlement The indian settlement that is being scouted.
+    * @param player The player to create the dialog for.
+    * @return The FreeColDialog that asks the question to the user.
+    */
+    public static FreeColDialog createScoutForeignColonyDialog(Colony colony, Unit unit) {
+        String mainText = Messages.message("scoutColony.text", new String [][] {
+            {"%unit%", unit.getName()}, {"%colony%", colony.getName()}});
+
+        final JTextArea question = getDefaultTextArea(mainText);
+        final JButton negotiate = new JButton(Messages.message("scoutColony.negotiate")),
+                spy = new JButton(Messages.message("scoutColony.spy")),
+                attack = new JButton(Messages.message("scoutColony.attack")),
+                cancel = new JButton(Messages.message("scoutColony.cancel"));
+
+        final FreeColDialog scoutDialog = new FreeColDialog() {
+            public void requestFocus() {
+                negotiate.requestFocus();
+            }
+        };
+
+        int[] widths = {0};
+        int[] heights = new int[9];
+        for (int index = 0; index < 4; index++) {
+            heights[2 * index + 1] = margin;
+        }
+        int textColumn = 1;
+
+        scoutDialog.setLayout(new HIGLayout(widths, heights));
+
+        negotiate.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent event) {
+                scoutDialog.setResponse(new Integer(SCOUT_FOREIGN_COLONY_NEGOTIATE));
+            }
+        });
+        spy.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent event) {
+                scoutDialog.setResponse(new Integer(SCOUT_FOREIGN_COLONY_SPY));
+            }
+        });
+        attack.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent event) {
+                scoutDialog.setResponse(new Integer(SCOUT_FOREIGN_COLONY_ATTACK));
+            }
+        });
+        cancel.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent event) {
+                scoutDialog.setResponse(new Integer(SCOUT_FOREIGN_COLONY_CANCEL));
+            }
+        });
+
+        int row = 1;
+        scoutDialog.add(question, higConst.rc(row, textColumn));
+        row += 2;
+        scoutDialog.add(negotiate, higConst.rc(row, textColumn));
+        row += 2;
+        scoutDialog.add(spy, higConst.rc(row, textColumn));
+        row += 2;
+        scoutDialog.add(attack, higConst.rc(row, textColumn));
+        row += 2;
+        scoutDialog.add(cancel, higConst.rc(row, textColumn));
+
+        scoutDialog.setSize(scoutDialog.getPreferredSize());
+        scoutDialog.setCancelComponent(cancel);
+
+        return scoutDialog;
+    }
 
     /**
     * Creates a dialog that asks the user what he wants to do with his scout in the indian

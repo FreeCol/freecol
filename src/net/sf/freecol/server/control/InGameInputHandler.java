@@ -389,6 +389,11 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
                 return selectFromFountainYouth(connection, element);
             }
         });
+        register("spyColony", new NetworkRequestHandler() {
+            public Element handle(Connection connection, Element element) {
+                return spyColony(connection, element);
+            }
+        });
     }
 
     /**
@@ -615,6 +620,8 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
             throw new IllegalArgumentException("No settlement on 'Tile' " +
                                                tile.getID());
         }
+        unit.setMovesLeft(0);
+        
         NodeList childElements = element.getChildNodes();
         Element childElement = (Element) childElements.item(0);
         DiplomaticTrade agreement = new DiplomaticTrade(game, childElement);
@@ -644,6 +651,53 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
                 }
                 return null;
             }
+        }
+        return reply;
+    }
+
+    /**
+     * Handles an "attack"-message from a client.
+     * 
+     * @param connection The connection the message came from.
+     * @param attackElement The element containing the request.
+     * @exception IllegalArgumentException If the data format of the message is
+     *                invalid.
+     * @exception IllegalStateException If the request is not accepted by the
+     *                model.
+     */
+    private Element spyColony(Connection connection, Element attackElement) {
+        FreeColServer freeColServer = getFreeColServer();
+        Game game = freeColServer.getGame();
+        ServerPlayer player = freeColServer.getPlayer(connection);
+        // Get parameters:
+        Unit unit = (Unit) game.getFreeColGameObject(attackElement.getAttribute("unit"));
+        int direction = Integer.parseInt(attackElement.getAttribute("direction"));
+        // Test the parameters:
+        if (unit == null) {
+            throw new IllegalArgumentException("Could not find 'Unit' with specified ID: "
+                    + attackElement.getAttribute("unit"));
+        }
+        if (unit.getTile() == null) {
+            throw new IllegalArgumentException("'Unit' is not on the map: " + unit.toString());
+        }
+        if (unit.getOwner() != player) {
+            throw new IllegalStateException("Not your unit!");
+        }
+        Tile newTile = game.getMap().getNeighbourOrNull(direction, unit.getTile());
+        if (newTile == null) {
+            throw new IllegalArgumentException("Could not find tile in direction " + direction + " from unit with ID "
+                    + attackElement.getAttribute("unit"));
+        }
+        Colony colony = newTile.getColony();
+        if (colony == null) {
+            throw new IllegalArgumentException("There is no colony in direction " + direction + " from unit with ID "
+                    + attackElement.getAttribute("unit"));
+        }
+        
+        Element reply = Message.createNewRootElement("foreignColony");
+        reply.appendChild(colony.toXMLElement(player, reply.getOwnerDocument(), true, false));
+        for(Unit foreignUnit : newTile.getUnitList()) {
+            reply.appendChild(foreignUnit.toXMLElement(player, reply.getOwnerDocument(), true, false));
         }
         return reply;
     }

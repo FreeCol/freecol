@@ -1103,8 +1103,34 @@ public final class Canvas extends JDesktopPane {
      *         he wants to attack the settlement.
      */
     public int showScoutIndianSettlementDialog(IndianSettlement settlement) {
-        FreeColDialog scoutDialog = FreeColDialog.createScoutIndianSettlementDialog(settlement, freeColClient
-                .getMyPlayer());
+        FreeColDialog scoutDialog = FreeColDialog.createScoutIndianSettlementDialog(settlement,
+                freeColClient.getMyPlayer());
+        addAsFrame(scoutDialog);
+        scoutDialog.requestFocus();
+
+        int response = scoutDialog.getResponseInt();
+
+        remove(scoutDialog);
+
+        return response;
+    }
+
+    /**
+     * Displays a dialog that asks the user what he wants to do with his scout
+     * in the foreign colony.
+     * 
+     * @param colony The foreign colony that is being scouted.
+     * 
+     * @return FreeColDialog.SCOUT_FOREIGN_COLONY_CANCEL if the action was
+     *         cancelled, FreeColDialog.SCOUT_FOREIGN_COLONY_NEGOTIATE if he
+     *         wants to negotaite with the foreign power,
+     *         FreeColDialog.SCOUT_FOREIGN_COLONY_SPY if he wants to
+     *         spy the colony, FreeColDialog.SCOUT_FOREIGN_COLONY_ATTACK if
+     *         he wants to attack the colony.
+     */
+    public int showScoutForeignColonyDialog(Colony colony, Unit unit) {
+        FreeColDialog scoutDialog = FreeColDialog.createScoutForeignColonyDialog(colony,
+                unit);
         addAsFrame(scoutDialog);
         scoutDialog.requestFocus();
 

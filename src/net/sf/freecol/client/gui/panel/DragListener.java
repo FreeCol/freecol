@@ -52,6 +52,9 @@ public final class DragListener extends MouseAdapter {
         // Does not work on some platforms:
         // if (e.isPopupTrigger() && (comp instanceof UnitLabel)) {
         if ((e.getButton() == MouseEvent.BUTTON3 || e.isPopupTrigger())) {
+            // Popup mustn't be shown when panel is not editable
+            if (!parentPanel.isEditable()) return;
+            
             if (comp instanceof UnitLabel) {
                 UnitLabel unitLabel = (UnitLabel) comp;
                 Unit tempUnit = unitLabel.getUnit();
@@ -301,7 +304,9 @@ public final class DragListener extends MouseAdapter {
                 }
             }
 
-            handler.exportAsDrag(comp, e, TransferHandler.COPY);
+            if (handler != null) {
+                handler.exportAsDrag(comp, e, TransferHandler.COPY);
+            }
         }
     }
 }
