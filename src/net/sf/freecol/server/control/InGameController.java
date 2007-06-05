@@ -614,17 +614,14 @@ public final class InGameController extends Controller {
                                                 .setAttribute("plunderGold", Integer.toString(plunderGold));
                                         opponentAttackElement.setAttribute("colony", colony.getID());
                                         opponentAttackElement.setAttribute("building", stockade.getID());
-                                        opponentAttackElement.setAttribute("unit", unit.getID());
+                                        opponentAttackElement.setAttribute("unit", attacker.getID());
+                                        opponentAttackElement.setAttribute("defender", unit.getID());
 
-                                        if (!unit.isVisibleTo(enemyPlayer)) {
-                                            opponentAttackElement.setAttribute("update", "unit");
-                                            if (!enemyPlayer.canSee(unit.getTile())) {
-                                                enemyPlayer.setExplored(unit.getTile());
-                                                opponentAttackElement.appendChild(unit.getTile().toXMLElement(
+                                        if (!enemyPlayer.canSee(attacker.getTile())) {
+                                            opponentAttackElement.setAttribute("update", "tile");
+                                            enemyPlayer.setExplored(attacker.getTile());
+                                            opponentAttackElement.appendChild(attacker.getTile().toXMLElement(
                                                         enemyPlayer, opponentAttackElement.getOwnerDocument()));
-                                            }
-                                            opponentAttackElement.appendChild(unit.toXMLElement(enemyPlayer,
-                                                    opponentAttackElement.getOwnerDocument()));
                                         }
 
                                         try {

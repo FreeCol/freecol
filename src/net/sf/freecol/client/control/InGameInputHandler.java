@@ -350,6 +350,16 @@ public final class InGameInputHandler extends InputHandler {
                     logger.warning("defender.getTile() == null");
                     throw new NullPointerException();
                 }
+            } else if (updateAttribute.equals("tile")) {
+                Element tileElement = Message.getChildElement(opponentAttackElement, Tile
+                        .getXMLElementTagName());
+                Tile tile = (Tile) game.getFreeColGameObject(tileElement.getAttribute("ID"));
+                if (tile == null) {
+                    tile = new Tile(game, tileElement);
+                } else {
+                    tile.readFromXMLElement(tileElement);
+                }
+                colony = tile.getColony();
             } else {
                 logger.warning("Unknown update: " + updateAttribute);
                 throw new IllegalStateException("Unknown update " + updateAttribute);
@@ -366,51 +376,13 @@ public final class InGameInputHandler extends InputHandler {
             throw new NullPointerException("defender == null");
         }
 
-        unit.attack(defender, result, plunderGold);
-
-        switch (result) {
-        case Unit.ATTACK_EVADES:
-            if (unit.isNaval()) {
-                if (colony == null) {
-                    new ShowInformationMessageSwingTask("model.unit.shipEvaded", new String[][] {
-                            { "%ship%", defender.getName() }, { "%nation%", defender.getOwner().getNationAsString() } })
-                            .show();
-                } else {
-                    new ShowInformationMessageSwingTask("model.unit.shipEvadedBombardment", new String[][] {
-                            { "%colony%", colony.getName() }, { "%building%", building.getName() },
-                            { "%ship%", defender.getName() }, { "%nation%", defender.getOwner().getNationAsString() } })
-                            .show();
-                }
+        if (colony != null) {
+            colony.bombard(defender, result);
+        } else {
+            unit.attack(defender, result, plunderGold);
+            if (!unit.isDisposed() && (unit.getLocation() == null || !unit.isVisibleTo(getFreeColClient().getMyPlayer()))) {
+                unit.dispose();
             }
-            break;
-        case Unit.ATTACK_LOSS:
-            if (unit.isNaval()) {
-                if (colony == null) {
-                    new ShowInformationMessageSwingTask("model.unit.enemyShipDamaged", new String[][] {
-                            { "%ship%", unit.getName() }, { "%nation%", unit.getOwner().getNationAsString() } }).show();
-                } else {
-                    new ShowInformationMessageSwingTask("model.unit.enemyShipDamagedByBombardment", new String[][] {
-                            { "%colony%", colony.getName() }, { "%building%", building.getName() },
-                            { "%ship%", unit.getName() }, { "%nation%", unit.getOwner().getNationAsString() } }).show();
-                }
-            }
-            break;
-        case Unit.ATTACK_GREAT_LOSS:
-            if (unit.isNaval()) {
-                if (colony == null) {
-                    new ShowInformationMessageSwingTask("model.unit.shipSunk", new String[][] {
-                            { "%ship%", unit.getName() }, { "%nation%", unit.getOwner().getNationAsString() } }).show();
-                } else {
-                    new ShowInformationMessageSwingTask("model.unit.shipSunkByBombardment", new String[][] {
-                            { "%colony%", colony.getName() }, { "%building%", building.getName() },
-                            { "%ship%", unit.getName() }, { "%nation%", unit.getOwner().getNationAsString() } }).show();
-                }
-            }
-            break;
-        }
-
-        if (!unit.isDisposed() && (unit.getLocation() == null || !unit.isVisibleTo(getFreeColClient().getMyPlayer()))) {
-            unit.dispose();
         }
 
         if (!defender.isDisposed()

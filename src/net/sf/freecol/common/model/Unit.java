@@ -3452,6 +3452,11 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
         case ATTACK_LOSS:
             if (isNaval()) {
                 shipDamaged();
+                addModelMessage(defender, "model.unit.enemyShipDamaged",
+                                new String[][] {
+                                    { "%unit%", getName() },
+                                    { "%nation%", getOwner().getNationAsString() } }, 
+                                ModelMessage.UNIT_DEMOTED);
             } else {
                 demote(defender, false);
                 if (enemy.hasFather(FoundingFather.GEORGE_WASHINGTON)) {
@@ -3462,6 +3467,11 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
         case ATTACK_GREAT_LOSS:
             if (isNaval()) {
                 shipSunk();
+                addModelMessage(defender, "model.unit.shipSunk",
+                                new String[][] {
+                                    { "%unit%", getName() },
+                                    { "%nation%", getOwner().getNationAsString() } }, 
+                                ModelMessage.UNIT_DEMOTED);
             } else {
                 demote(defender, true);
                 defender.promote();
@@ -3491,7 +3501,9 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
                 if (getOwner().hasFather(FoundingFather.GEORGE_WASHINGTON)) {
                     promote();
                 }
-                defender.demote(this, false);
+                if (!defender.isNaval()) {
+                    defender.demote(this, false);
+                }
             }
             break;
         case ATTACK_GREAT_WIN:
@@ -3505,7 +3517,9 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
                                 ModelMessage.UNIT_DEMOTED);
             } else {
                 promote();
-                defender.demote(this, true);
+                if (!defender.isNaval()) {
+                    defender.demote(this, true);
+                }
             }
             break;
         default:
@@ -3589,10 +3603,10 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
         String nation = owner.getNationAsString();
         if (colony != null) {
             addModelMessage(this, "model.unit.shipSunkByBombardment", new String[][] {
-                    { "%colony%", colony.getName() }, { "%building%", building.getName() }, { "%ship%", getName() },
+                    { "%colony%", colony.getName() }, { "%building%", building.getName() }, { "%unit%", getName() },
                     { "%nation%", nation } }, ModelMessage.UNIT_LOST);
         } else {
-            addModelMessage(this, "model.unit.shipSunk", new String[][] { { "%ship%", getName() },
+            addModelMessage(this, "model.unit.shipSunk", new String[][] { { "%unit%", getName() },
                     { "%nation%", nation } }, ModelMessage.UNIT_LOST);
         }
         dispose();
