@@ -745,7 +745,7 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener {
                 || freeColClient.getCanvas().showConfirmDialog("abandonColony.text", "abandonColony.yes",
                 "abandonColony.no")) {
             if (getColony().getUnitCount() <= 0) {
-                getColony().dispose();
+                freeColClient.getInGameController().abandonColony(getColony());
             }
             
             parent.remove(this);

@@ -394,6 +394,11 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
                 return spyColony(connection, element);
             }
         });
+        register("abandonColony", new NetworkRequestHandler() {
+            public Element handle(Connection connection, Element element) {
+                return abandonColony(connection, element);
+            }
+        });
     }
 
     /**
@@ -656,26 +661,26 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
     }
 
     /**
-     * Handles an "attack"-message from a client.
+     * Handles an "spyColony"-message from a client.
      * 
      * @param connection The connection the message came from.
-     * @param attackElement The element containing the request.
+     * @param spyElement The element containing the request.
      * @exception IllegalArgumentException If the data format of the message is
      *                invalid.
      * @exception IllegalStateException If the request is not accepted by the
      *                model.
      */
-    private Element spyColony(Connection connection, Element attackElement) {
+    private Element spyColony(Connection connection, Element spyElement) {
         FreeColServer freeColServer = getFreeColServer();
         Game game = freeColServer.getGame();
         ServerPlayer player = freeColServer.getPlayer(connection);
         // Get parameters:
-        Unit unit = (Unit) game.getFreeColGameObject(attackElement.getAttribute("unit"));
-        int direction = Integer.parseInt(attackElement.getAttribute("direction"));
+        Unit unit = (Unit) game.getFreeColGameObject(spyElement.getAttribute("unit"));
+        int direction = Integer.parseInt(spyElement.getAttribute("direction"));
         // Test the parameters:
         if (unit == null) {
             throw new IllegalArgumentException("Could not find 'Unit' with specified ID: "
-                    + attackElement.getAttribute("unit"));
+                    + spyElement.getAttribute("unit"));
         }
         if (unit.getTile() == null) {
             throw new IllegalArgumentException("'Unit' is not on the map: " + unit.toString());
@@ -686,12 +691,12 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         Tile newTile = game.getMap().getNeighbourOrNull(direction, unit.getTile());
         if (newTile == null) {
             throw new IllegalArgumentException("Could not find tile in direction " + direction + " from unit with ID "
-                    + attackElement.getAttribute("unit"));
+                    + spyElement.getAttribute("unit"));
         }
         Colony colony = newTile.getColony();
         if (colony == null) {
             throw new IllegalArgumentException("There is no colony in direction " + direction + " from unit with ID "
-                    + attackElement.getAttribute("unit"));
+                    + spyElement.getAttribute("unit"));
         }
         
         Element reply = Message.createNewRootElement("foreignColony");
@@ -700,6 +705,36 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
             reply.appendChild(foreignUnit.toXMLElement(player, reply.getOwnerDocument(), true, false));
         }
         return reply;
+    }
+
+    /**
+     * Handles an "abandonColony"-message from a client.
+     * 
+     * @param connection The connection the message came from.
+     * @param abandonElement The element containing the request.
+     * @exception IllegalArgumentException If the data format of the message is
+     *                invalid.
+     * @exception IllegalStateException If the request is not accepted by the
+     *                model.
+     */
+    private Element abandonColony(Connection connection, Element abandonElement) {
+        FreeColServer freeColServer = getFreeColServer();
+        Game game = freeColServer.getGame();
+        ServerPlayer player = freeColServer.getPlayer(connection);
+        // Get parameters:
+        Colony colony = (Colony) game.getFreeColGameObject(abandonElement.getAttribute("colony"));
+        // Test the parameters:
+        if (colony == null) {
+            throw new IllegalArgumentException("Could not find 'Colony' with specified ID: "
+                    + abandonElement.getAttribute("colony"));
+        }
+        if (colony.getOwner() != player) {
+            throw new IllegalStateException("Not your colony!");
+        }
+        Tile tile = colony.getTile();
+        colony.dispose();
+        sendUpdatedTileToAll(tile, player);
+        return null;
     }
 
     /**

@@ -3268,4 +3268,23 @@ public final class InGameController implements NetworkConstants {
 
         return null;
     }
+
+    /**
+     * Abandon a colony with no units
+     *
+     * @param colony The colony to be abandoned
+     */
+    public void abandonColony(Colony colony) {
+        if (colony == null) {
+            return;
+        }
+
+        Client client = freeColClient.getClient();
+
+        Element abandonColony = Message.createNewRootElement("abandonColony");
+        abandonColony.setAttribute("colony", colony.getID());
+
+        colony.dispose();
+        client.sendAndWait(abandonColony);
+    }
 }
