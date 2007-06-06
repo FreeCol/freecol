@@ -1733,9 +1733,11 @@ public class AIPlayer extends AIObject {
     public int tradeProposition(Unit unit, Settlement settlement, Goods goods, int gold) {
         logger.finest("Entering method tradeProposition");
         if (settlement instanceof IndianSettlement) {
+            String goldKey = "tradeGold#" + goods.getType() + "#" + goods.getAmount() + "#" + unit.getID();
+            String hagglingKey = "tradeHaggling#" + unit.getID();
             int price;
-            if (sessionRegister.containsKey("tradeGold#" + unit.getID())) {
-                price = sessionRegister.get("tradeGold#" + unit.getID()).intValue();
+            if (sessionRegister.containsKey(goldKey)) {
+                price = sessionRegister.get(goldKey).intValue();
                 if (price <= 0) {
                     return price;
                 }
@@ -1745,24 +1747,24 @@ public class AIPlayer extends AIObject {
                 if (price <= 0) {
                     return 0;
                 }
-                sessionRegister.put("tradeGold#" + unit.getID(), new Integer(price));
+                sessionRegister.put(goldKey, new Integer(price));
             }
             if (gold < 0 || price == gold) {
                 return price;
             } else if (gold > (player.getGold() * 3) / 4) {
-                sessionRegister.put("tradeGold#" + unit.getID(), new Integer(-1));
+                sessionRegister.put(goldKey, new Integer(-1));
                 return NetworkConstants.NO_TRADE;
             } else {
                 int haggling = 1;
-                if (sessionRegister.containsKey("tradeHaggling#" + unit.getID())) {
-                    haggling = sessionRegister.get("tradeHaggling#" + unit.getID()).intValue();
+                if (sessionRegister.containsKey(hagglingKey)) {
+                    haggling = sessionRegister.get(hagglingKey).intValue();
                 }
                 if (getRandom().nextInt(3 + haggling) <= 3) {
-                    sessionRegister.put("tradeGold#" + unit.getID(), new Integer(gold));
-                    sessionRegister.put("tradeHaggling#" + unit.getID(), new Integer(haggling + 1));
+                    sessionRegister.put(goldKey, new Integer(gold));
+                    sessionRegister.put(hagglingKey, new Integer(haggling + 1));
                     return gold;
                 } else {
-                    sessionRegister.put("tradeGold#" + unit.getID(), new Integer(-1));
+                    sessionRegister.put(goldKey, new Integer(-1));
                     return NetworkConstants.NO_TRADE;
                 }
             }
