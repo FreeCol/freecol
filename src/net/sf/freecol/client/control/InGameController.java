@@ -575,16 +575,15 @@ public final class InGameController implements NetworkConstants {
      * {@link Unit#getDestination()}.
      * 
      * @param unit The unit to move.
-     * @return 'true' if unit must be active
      */
-    public boolean moveToDestination(Unit unit) {
+    public void moveToDestination(Unit unit) {
         final Canvas canvas = freeColClient.getCanvas();
         final Map map = freeColClient.getGame().getMap();
         final Location destination = unit.getDestination();
 
         if (freeColClient.getGame().getCurrentPlayer() != freeColClient.getMyPlayer()) {
         	canvas.showInformationMessage("notYourTurn");
-            return false;
+            return;
         }
 
         /*
@@ -593,7 +592,7 @@ public final class InGameController implements NetworkConstants {
          */
         if (destination.getTile() == unit.getTile()) {
             clearOrders(unit);
-            return false;
+            return;
         }
 
         PathNode path;
@@ -607,7 +606,7 @@ public final class InGameController implements NetworkConstants {
             canvas.showInformationMessage("selectDestination.failed", new String[][] { { "%destination%",
                     destination.getLocationName() } });
             setDestination(unit, null);
-            return false;
+            return;
         }
 
         boolean knownEnemyOnLastTile = path != null
@@ -625,7 +624,7 @@ public final class InGameController implements NetworkConstants {
             case Unit.EXPLORE_LOST_CITY_RUMOUR:
                 exploreLostCityRumour(unit, path.getDirection());
                 if (unit.isDisposed())
-                    return false;
+                    return;
                 break;
             case Unit.MOVE_HIGH_SEAS:
                 if (destination instanceof Europe) {
@@ -657,13 +656,12 @@ public final class InGameController implements NetworkConstants {
                         // we can't go there now, but we don't want to wake up
                         unit.setMovesLeft(0);
                         nextActiveUnit();
-                        return false;
+                        return;
                     } else {
                         // Active unit to show path and permit to move it
                         // manually
-                        
                         freeColClient.getGUI().setActiveUnit(unit);
-                        return true;
+                        return;
                     }
                 }
             }
@@ -694,7 +692,7 @@ public final class InGameController implements NetworkConstants {
         } else if (freeColClient.getGUI().getActiveUnit() == unit) {
             nextActiveUnit();
         }
-        return false;
+        return;
     }
 
     private void followTradeRoute(Unit unit) {
@@ -3032,9 +3030,9 @@ public final class InGameController implements NetworkConstants {
         if (endingTurn || executeGoto) {
             while (!freeColClient.getCanvas().isShowingSubPanel() && myPlayer.hasNextGoingToUnit()) {
                 Unit unit = myPlayer.getNextGoingToUnit();
-                boolean stop = moveToDestination(unit);
+                moveToDestination(unit);
                 nextModelMessage();
-                if (stop) {
+                if (unit.getMovesLeft() > 0) {
                     if (endingTurn) {
                         unit.setMovesLeft(0);
                     } else {
