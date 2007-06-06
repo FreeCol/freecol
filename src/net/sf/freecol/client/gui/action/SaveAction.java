@@ -40,7 +40,11 @@ public class SaveAction extends MapboardAction {
      * @return true if this action should be enabled.
      */
     protected boolean shouldBeEnabled() {
-        return true;
+        if (freeColClient.isMapEditor()) {
+            return true;
+        } else {
+            return !freeColClient.getCanvas().isShowingSubPanel();
+        }
     }
 
     /**
