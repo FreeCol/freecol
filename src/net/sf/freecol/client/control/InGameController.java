@@ -1335,6 +1335,10 @@ public final class InGameController implements NetworkConstants {
                     logger.warning("Attacking, but no defender - will try!");
                     return true;
                 }
+                if (defender.getType() == Unit.PRIVATEER) {
+                    // Privateers can be attacked and remain at peace
+                    return true;
+                }
                 enemy = defender.getOwner();
             }
             switch (attacker.getOwner().getStance(enemy)) {
