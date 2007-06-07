@@ -3086,7 +3086,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
      *         attack other units.
      */
     public boolean isOffensiveUnit() {
-        return getUnitType().offence > 0 || isArmed();
+        return getUnitType().offence > 0 || isArmed() || isMounted();
     }
 
     /**
