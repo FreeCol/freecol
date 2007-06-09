@@ -1,10 +1,13 @@
 package net.sf.freecol.client.gui.panel;
 
 import java.awt.GridLayout;
+import java.awt.Image;
 import java.awt.event.ActionListener;
 
+import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.UIManager;
 
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.i18n.Messages;
@@ -43,11 +46,12 @@ public final class ReportForeignAffairPanel extends ReportPanel implements Actio
         reportPanel.removeAll();
         reportPanel.setLayout(new GridLayout(0, 2));
 
-        int[] widths = new int[] { 0, 12, 0, 0 };
+        int[] widths = new int[] { 0, 12, 0, 12, 0, 0 };
         int[] heights = new int[] { 0, 12, 0, 0, 0, 0, 0, 0, 8, 0, 0, 0 };
-        int labelColumn = 1;
-        int valueColumn = 3;
-        int percentColumn = 4;
+        int coatColumn = 1;
+        int labelColumn = 3;
+        int valueColumn = 5;
+        int percentColumn = 6;
         HIGConstraints higConst = new HIGConstraints();
 
         Element report = getCanvas().getClient().getInGameController().getForeignAffairsReport();
@@ -58,6 +62,10 @@ public final class ReportForeignAffairPanel extends ReportPanel implements Actio
             enemyPanel.setOpaque(false);
             int row = 1;
             int nationID = Integer.parseInt(enemyElement.getAttribute("nation"));
+            final String currentNation = Player.getNationIdentifier(nationID);
+            final Image coatOfArms = (Image) UIManager.get("coatOfArms." + currentNation + ".image");
+            enemyPanel.add(new JLabel(new ImageIcon(coatOfArms)),
+                           higConst.rcwh(row, coatColumn, 1, heights.length, "t"));
             enemyPanel.add(new JLabel(Player.getNationAsString(nationID)), higConst.rc(row, labelColumn));
             row += 2;
             enemyPanel.add(new JLabel(Messages.message("report.stance")), higConst.rc(row, labelColumn));
