@@ -1147,9 +1147,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         } else {
             reply.appendChild(defender.toXMLElement(player, reply.getOwnerDocument()));
         }
-        //if (!defender.isVisibleTo(player)) {
-            //reply.appendChild(defender.toXMLElement(player, reply.getOwnerDocument()));
-        //}
+        
         int[] oldGoodsCounts = new int[Goods.NUMBER_OF_TYPES];
         if (unit.canCaptureGoods() && game.getGameOptions().getBoolean(GameOptions.UNIT_HIDING)) {
             for (int i = 0; i < oldGoodsCounts.length; i++) {
@@ -1228,7 +1226,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
             result = Unit.ATTACK_GREAT_LOSS;
         }
         
-        if (result >= 0 && defender.getTile().getSettlement() != null) {
+        if (result >= Unit.ATTACK_WIN && defender.getTile().getSettlement() != null) {
             final boolean lastDefender;
             if (defender.getTile().getSettlement() instanceof Colony) {
                 lastDefender = !defender.isDefensiveUnit();
