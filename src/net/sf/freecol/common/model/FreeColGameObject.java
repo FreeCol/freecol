@@ -533,7 +533,8 @@ abstract public class FreeColGameObject {
      * @see ModelMessage
      */    
     protected void addModelMessage(FreeColGameObject source, String messageID, String[][] data, int type) {
-        addModelMessage(source, messageID, data, type, null);
+        ModelMessage message = new ModelMessage(source, messageID, data, type);
+        initializeModelMessage(message);
     }
 
     /**
@@ -563,15 +564,20 @@ abstract public class FreeColGameObject {
     protected void addModelMessage(FreeColGameObject source, String messageID, String[][] data,
                                    int type, Object display) {
         ModelMessage message = new ModelMessage(source, messageID, data, type, display);
-        if (source == null) {
-            logger.warning("ModelMessage with ID " + messageID + " has null source.");
-        } else if (source instanceof Player) {
-            ((Player) source).addModelMessage(message);
-        } else if (source instanceof Ownable) {
-            ((Ownable) source).getOwner().addModelMessage(message);
+        initializeModelMessage(message);
+    }
+
+    private void initializeModelMessage(ModelMessage message) {
+        if (message.getSource() == null) {
+            logger.warning("ModelMessage with ID " + message.getMessageID() + " has null message.getSource().");
+        } else if (message.getSource() instanceof Player) {
+            ((Player) message.getSource()).addModelMessage(message);
+        } else if (message.getSource() instanceof Ownable) {
+            ((Ownable) message.getSource()).getOwner().addModelMessage(message);
         } else {
-            logger.warning("ModelMessage with ID " + messageID + " and source " +
-                           source.toString() + " has unknown owner.");
+            logger.warning("ModelMessage with ID " + message.getMessageID() +
+                           " and message.getSource() " +
+                           message.getSource().toString() + " has unknown owner.");
         }
     }
 

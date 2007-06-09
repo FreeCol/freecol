@@ -130,14 +130,14 @@ public final class ReportTurnPanel extends ReportPanel implements ActionListener
                     button.setActionCommand(((Colony) message.getDisplay()).getID());
                     button.addActionListener(this);
                     button.setBorder(BorderFactory.createEmptyBorder());
-                    reportPanel.add(button, higConst.rc(row, imageColumn, ""));
                 } else if (message.getDisplay() instanceof Unit) {
                     label.setIcon(getCanvas().getImageIcon(message.getDisplay(), true));
-                    reportPanel.add(label, higConst.rc(row, imageColumn, ""));
+                } else if (message.getDisplay() instanceof Player) {
+                   label.setIcon(getCanvas().getImageIcon(message.getDisplay(), true));
                 } else {
                     label.setIcon(getCanvas().getImageIcon(message.getDisplay(), false));
-                    reportPanel.add(label, higConst.rc(row, imageColumn, ""));
                 }
+                reportPanel.add(label, higConst.rc(row, imageColumn, ""));
             }
 
             final JTextPane textPane = getTextPane(message);

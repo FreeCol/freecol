@@ -123,6 +123,8 @@ public class Player extends FreeColGameObject implements Nameable {
 
     private int nation;
 
+    private int score;
+
     private String newLandName = null;
 
     // Represented on the network as "color.getRGB()":
@@ -542,8 +544,6 @@ public class Player extends FreeColGameObject implements Nameable {
      * 
      * Checks if the given nation is a "royal expeditionary force.
      * 
-     * 
-     * 
      * @param nation The nation.
      * 
      * @return <code>true</code> is the given nation is a royal expeditionary
@@ -554,6 +554,16 @@ public class Player extends FreeColGameObject implements Nameable {
      */
     public static boolean isREF(int nation) {
         return nation == REF_DUTCH || nation == REF_ENGLISH || nation == REF_FRENCH || nation == REF_SPANISH;
+    }
+
+
+    /**
+     * Returns the current score of the player.
+     *
+     * @return an <code>int</code> value
+     */
+    public int getScore() {
+        return score;
     }
 
     /**
@@ -2265,13 +2275,16 @@ public class Player extends FreeColGameObject implements Nameable {
      */
     public void newTurn() {
 
-        logger.finer("Calling newTurn for Market");
-        getMarket().newTurn();
+        int newSoL = 0;
 
-        // settlements next
+        // settlements
         for (Settlement settlement : getSettlements()) {
             logger.finest("Calling newTurn for settlement " + settlement.toString());
             settlement.newTurn();
+            if (isEuropean()) {
+                Colony colony = (Colony) settlement;
+                newSoL += colony.getSoL();
+            }
         }
 
         // CO: I reverted this, since the pioneer already finishes faster,
@@ -2393,18 +2406,9 @@ public class Player extends FreeColGameObject implements Nameable {
                 bells = 0;
             }
 
-            /*
-             * if (crossesRequired != -1) { updateCrossesRequired(); }
-             */
 
-            int newSoL = 0;
-            int numberOfColonies = settlements.size();
-            if (numberOfColonies > 1) {
-                Iterator<Settlement> iterator = getSettlementIterator();
-                while (iterator.hasNext()) {
-                    Colony colony = (Colony) iterator.next();
-                    newSoL += colony.getSoL();
-                }
+            int numberOfColonies = settlements.size(); 
+            if (numberOfColonies > 0) {
                 newSoL = newSoL / numberOfColonies;
                 if (oldSoL / 10 != newSoL / 10) {
                     if (newSoL > oldSoL) {
@@ -2420,6 +2424,15 @@ public class Player extends FreeColGameObject implements Nameable {
             }
             // remember SoL for check changes at next turn
             oldSoL = newSoL;
+
+            score = 0;
+            Iterator<Unit> unitIterator = getUnitIterator();
+            while (unitIterator.hasNext()) {
+                Unit unit = unitIterator.next();
+                score += unit.getScoreValue();
+            }
+            score += (score * newSoL) / 100;
+            score += getGold() / 1000;
         }
     }
 

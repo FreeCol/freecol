@@ -2222,6 +2222,39 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
         return Messages.message(FreeCol.getSpecification().unitType(someType).name);
     }
 
+    public int getScoreValue() {
+        return getScoreValue(type, location);
+    }
+
+    public static int getScoreValue(int someType, Location someLocation) {
+        int value = 0;
+        switch(someType) {
+        case WAGON_TRAIN:
+        case DAMAGED_ARTILLERY:
+            return 1;
+        case ARTILLERY:
+            return 2;
+        case CARAVEL:
+            return 3;
+        case MERCHANTMAN:
+        case PRIVATEER:
+            return 4;
+        case GALLEON:
+            return 5;
+        case FRIGATE:
+            return 6;
+        case MAN_O_WAR:
+            return 8;
+        default:
+            value = getSkillLevel(someType) + 3;
+            if (someLocation != null && someLocation instanceof WorkLocation) {
+                value *= 2;
+            }
+        }
+        return value;
+    }
+
+
     /**
      * Returns the name of this unit in a human readable format. The return
      * value can be used when communicating with the user.

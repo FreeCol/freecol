@@ -105,6 +105,9 @@ public class ModelMessage {
         case GIFT_GOODS:
         case MISSING_GOODS:
         default:
+            if (source instanceof Player) {
+                newDisplay = source;
+            }
         }
 
         this.display = newDisplay;

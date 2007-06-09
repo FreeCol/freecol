@@ -627,10 +627,11 @@ public final class Canvas extends JDesktopPane {
         }
     }
 
-    /*
+    /**
      * Returns the appropriate ImageIcon for Object.
      * 
-     * @param display The Object to display. @return The appropriate ImageIcon.
+     * @param display The Object to display.
+     * @return The appropriate ImageIcon.
      */
     public ImageIcon getImageIcon(Object display, boolean small) {
         ImageLibrary imageLibrary = (ImageLibrary) getImageProvider();
@@ -670,7 +671,9 @@ public final class Canvas extends JDesktopPane {
             } catch (Exception e) {
                 logger.warning("could not find image for lost city rumour");
             }
-        }
+        } else if (display instanceof Player) {
+            image = (Image) UIManager.get("coatOfArms." + ((Player) display).getNationIdentifier() + ".image");
+        } 
         if (image != null && small) {
             return new ImageIcon(image.getScaledInstance((image.getWidth(null) / 3) * 2,
                                                          (image.getHeight(null) / 3) *2,

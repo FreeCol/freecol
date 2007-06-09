@@ -475,56 +475,6 @@ public final class Market extends FreeColGameObject implements Ownable {
     }
 
     /**
-     * Changes the prices in the market.
-     */
-    public void newTurn() {
-        /*
-        int goodsType = getGame().getModelController().getPseudoRandom().nextInt(dataForGoodType.length);
-        int amount = getGame().getModelController().getPseudoRandom().nextInt(20);
-        add(goodsType, -amount);
-        */
-        /*
-        int totalNormalGoods = 0;
-        for (int i = 0; i < dataForGoodType.length; i++) {            
-            int manufactoredType = Goods.getManufactoredGoods(i);
-            
-            dataForGoodType[i].amountInMarket += 10;
-            
-            // Manage dependencies:
-            if (manufactoredType >= 0
-                    && manufactoredType < Goods.NUMBER_OF_TYPES) {
-                final int rawGoodsAmount = dataForGoodType[i].amountInMarket;
-                final int manufactoredGoodsAmount = dataForGoodType[manufactoredType].amountInMarket;
-                if (rawGoodsAmount < manufactoredGoodsAmount * 2 + GOODS_STABILIZER) {
-                    int diff = manufactoredGoodsAmount * 2 + GOODS_STABILIZER - rawGoodsAmount;
-                    dataForGoodType[i].amountInMarket += Math.min(diff / 20, dataForGoodType[manufactoredType].amountInMarket);
-                    dataForGoodType[manufactoredType].amountInMarket -= Math.min(diff / 20, dataForGoodType[manufactoredType].amountInMarket);
-                } else if (rawGoodsAmount > manufactoredGoodsAmount * 2 + GOODS_STABILIZER) {
-                    int diff = rawGoodsAmount - manufactoredGoodsAmount * 2 - GOODS_STABILIZER;
-                    dataForGoodType[manufactoredType].amountInMarket += Math.min(diff / 20, dataForGoodType[i].amountInMarket);
-                    dataForGoodType[i].amountInMarket -= Math.min(diff / 20, dataForGoodType[i].amountInMarket);                    
-                }
-            }
-            if (i != Goods.FOOD && i != Goods.LUMBER) {
-                totalNormalGoods += dataForGoodType[i].amountInMarket;
-            }
-        }
-        
-        int averageGoods = totalNormalGoods / (dataForGoodType.length - 2) + GOODS_STABILIZER;
-        if (dataForGoodType[Goods.FOOD].amountInMarket < averageGoods * 2) {
-            int diff = averageGoods * 2 - dataForGoodType[Goods.FOOD].amountInMarket;
-            dataForGoodType[Goods.FOOD].amountInMarket += diff / 20;
-        }
-        if (dataForGoodType[Goods.LUMBER].amountInMarket < averageGoods * 1.5) {
-            int diff = (int) (averageGoods * 1.5 - dataForGoodType[Goods.LUMBER].amountInMarket);
-            dataForGoodType[Goods.LUMBER].amountInMarket += diff / 20;
-        }
-        
-        priceGoods();
-        */
-    }
-
-    /**
      * Initialize this object from an XML-representation of this object.
      * @param in The input stream with the XML.
      */
@@ -646,8 +596,5 @@ public final class Market extends FreeColGameObject implements Ownable {
             return "marketdata";
         }
 
-        public void newTurn() {
-            // Shift market goods around a bit?
-        }
     } // class Data
 }
