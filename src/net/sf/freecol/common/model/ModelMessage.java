@@ -31,6 +31,7 @@ public class ModelMessage {
     public static final int LOST_CITY_RUMOUR = 12;
     public static final int GIFT_GOODS = 13;
     public static final int MISSING_GOODS = 14;
+    public static final int TUTORIAL = 15;
 
     private final FreeColGameObject source;
     private final Object display;
