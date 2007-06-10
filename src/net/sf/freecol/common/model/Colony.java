@@ -884,7 +884,7 @@ public final class Colony extends Settlement implements Location, Nameable {
             buildableUnits.add(Unit.GALLEON);
             buildableUnits.add(Unit.PRIVATEER);
             buildableUnits.add(Unit.FRIGATE);
-            if (owner.getRebellionState() >= Player.REBELLION_IN_WAR) {
+            if (owner.getRebellionState() >= Player.REBELLION_POST_WAR) {
                 buildableUnits.add(Unit.MAN_O_WAR);
             }
         }
