@@ -408,9 +408,8 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
      * @param element The element containing the request.
      */
     private Element buyLand(Connection connection, Element element) {
-        Game game = getFreeColServer().getGame();
         ServerPlayer player = getFreeColServer().getPlayer(connection);
-        Tile tile = (Tile) game.getFreeColGameObject(element.getAttribute("tile"));
+        Tile tile = (Tile) getGame().getFreeColGameObject(element.getAttribute("tile"));
         if (tile == null) {
             throw new NullPointerException();
         }
@@ -438,11 +437,10 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
      * @param element The element containing the request.
      */
     private Element createUnit(Connection connection, Element element) {
-        Game game = getFreeColServer().getGame();
         logger.info("Receiving \"createUnit\"-request.");
         String taskID = element.getAttribute("taskID");
-        Location location = (Location) game.getFreeColGameObject(element.getAttribute("location"));
-        Player owner = (Player) game.getFreeColGameObject(element.getAttribute("owner"));
+        Location location = (Location) getGame().getFreeColGameObject(element.getAttribute("location"));
+        Player owner = (Player) getGame().getFreeColGameObject(element.getAttribute("owner"));
         int type = Integer.parseInt(element.getAttribute("type"));
         if (location == null) {
             throw new NullPointerException();
@@ -481,8 +479,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
      * @param element The element containing the request.
      */
     private Element getVacantEntryLocation(Connection connection, Element element) {
-        Game game = getFreeColServer().getGame();
-        Unit unit = (Unit) game.getFreeColGameObject(element.getAttribute("unit"));
+        Unit unit = (Unit) getGame().getFreeColGameObject(element.getAttribute("unit"));
         Player owner = unit.getOwner();
         ServerPlayer askingPlayer = getFreeColServer().getPlayer(connection);
         if (owner != askingPlayer) {
@@ -516,11 +513,10 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
      * @param element The element containing the request.
      */
     private Element updateTradeRoute(Connection connection, Element element) {
-        Game game = getFreeColServer().getGame();
         ServerPlayer player = getFreeColServer().getPlayer(connection);
         Element childElement = (Element) element.getChildNodes().item(0);
         TradeRoute clientTradeRoute = new TradeRoute(null, childElement);
-        TradeRoute serverTradeRoute = (TradeRoute) game.getFreeColGameObject(clientTradeRoute.getID());
+        TradeRoute serverTradeRoute = (TradeRoute) getGame().getFreeColGameObject(clientTradeRoute.getID());
         if (serverTradeRoute == null) {
             throw new IllegalArgumentException("Could not find 'TradeRoute' with specified ID: "
                     + clientTradeRoute.getID());
@@ -539,7 +535,6 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
      * @param element The element containing the request.
      */
     private Element setTradeRoutes(Connection connection, Element element) {
-        Game game = getFreeColServer().getGame();
         ServerPlayer player = getFreeColServer().getPlayer(connection);
         ArrayList<TradeRoute> routes = new ArrayList<TradeRoute>();
         
@@ -547,7 +542,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         for(int i = 0; i < childElements.getLength(); i++) {
             Element childElement = (Element) childElements.item(i);
             String id = childElement.getAttribute("id");
-            TradeRoute serverTradeRoute = (TradeRoute) game.getFreeColGameObject(id);
+            TradeRoute serverTradeRoute = (TradeRoute) getGame().getFreeColGameObject(id);
             if (serverTradeRoute == null) {
                 throw new IllegalArgumentException("Could not find 'TradeRoute' with specified ID: " + id);
             }
@@ -568,9 +563,8 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
      */
     private Element assignTradeRoute(Connection connection, Element element) {
         FreeColServer freeColServer = getFreeColServer();
-        Game game = getFreeColServer().getGame();
         ServerPlayer player = getFreeColServer().getPlayer(connection);
-        Unit unit = (Unit) game.getFreeColGameObject(element.getAttribute("unit"));
+        Unit unit = (Unit) getGame().getFreeColGameObject(element.getAttribute("unit"));
 
         if (unit == null) {
             throw new IllegalArgumentException("Could not find 'Unit' with specified ID: "
@@ -584,7 +578,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         if (tradeRouteString == null || tradeRouteString == "") {
             unit.setTradeRoute(null);
         } else {
-            TradeRoute tradeRoute = (TradeRoute) game.getFreeColGameObject(tradeRouteString);
+            TradeRoute tradeRoute = (TradeRoute) getGame().getFreeColGameObject(tradeRouteString);
 
             if (tradeRoute == null) {
                 throw new IllegalArgumentException("Could not find 'TradeRoute' with specified ID: "
@@ -606,16 +600,15 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
      */
     private Element diplomaticTrade(Connection connection, Element element) {
         FreeColServer freeColServer = getFreeColServer();
-        Game game = freeColServer.getGame();
         ServerPlayer player = freeColServer.getPlayer(connection);
 
-        Unit unit = (Unit) game.getFreeColGameObject(element.getAttribute("unit"));
+        Unit unit = (Unit) getGame().getFreeColGameObject(element.getAttribute("unit"));
         if (unit == null) {
             throw new IllegalArgumentException("Could not find 'Unit' with specified ID: "
                                                + element.getAttribute("unit"));
         }
         int direction = Integer.parseInt(element.getAttribute("direction"));
-        Tile tile = game.getMap().getNeighbourOrNull(direction, unit.getTile());
+        Tile tile = getGame().getMap().getNeighbourOrNull(direction, unit.getTile());
         if (tile == null) {
             throw new IllegalArgumentException("Could not find 'Tile' in direction " +
                                                direction);
@@ -629,7 +622,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         
         NodeList childElements = element.getChildNodes();
         Element childElement = (Element) childElements.item(0);
-        DiplomaticTrade agreement = new DiplomaticTrade(game, childElement);
+        DiplomaticTrade agreement = new DiplomaticTrade(getGame(), childElement);
         if (agreement.getSender() != player) {
             throw new IllegalArgumentException("Sender of 'DiplomaticTrade' message is not " +
                                                "player " + player.getName());
@@ -672,10 +665,9 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
      */
     private Element spyColony(Connection connection, Element spyElement) {
         FreeColServer freeColServer = getFreeColServer();
-        Game game = freeColServer.getGame();
         ServerPlayer player = freeColServer.getPlayer(connection);
         // Get parameters:
-        Unit unit = (Unit) game.getFreeColGameObject(spyElement.getAttribute("unit"));
+        Unit unit = (Unit) getGame().getFreeColGameObject(spyElement.getAttribute("unit"));
         int direction = Integer.parseInt(spyElement.getAttribute("direction"));
         // Test the parameters:
         if (unit == null) {
@@ -688,7 +680,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         if (unit.getOwner() != player) {
             throw new IllegalStateException("Not your unit!");
         }
-        Tile newTile = game.getMap().getNeighbourOrNull(direction, unit.getTile());
+        Tile newTile = getGame().getMap().getNeighbourOrNull(direction, unit.getTile());
         if (newTile == null) {
             throw new IllegalArgumentException("Could not find tile in direction " + direction + " from unit with ID "
                     + spyElement.getAttribute("unit"));
@@ -719,10 +711,9 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
      */
     private Element abandonColony(Connection connection, Element abandonElement) {
         FreeColServer freeColServer = getFreeColServer();
-        Game game = freeColServer.getGame();
         ServerPlayer player = freeColServer.getPlayer(connection);
         // Get parameters:
-        Colony colony = (Colony) game.getFreeColGameObject(abandonElement.getAttribute("colony"));
+        Colony colony = (Colony) getGame().getFreeColGameObject(abandonElement.getAttribute("colony"));
         // Test the parameters:
         if (colony == null) {
             throw new IllegalArgumentException("Could not find 'Colony' with specified ID: "
@@ -749,9 +740,8 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
      */
     private Element move(Connection connection, Element moveElement) {
         FreeColServer freeColServer = getFreeColServer();
-        Game game = freeColServer.getGame();
         ServerPlayer player = freeColServer.getPlayer(connection);
-        Unit unit = (Unit) game.getFreeColGameObject(moveElement.getAttribute("unit"));
+        Unit unit = (Unit) getGame().getFreeColGameObject(moveElement.getAttribute("unit"));
         int direction = Integer.parseInt(moveElement.getAttribute("direction"));
         if (unit == null) {
             throw new IllegalArgumentException("Could not find 'Unit' with specified ID: "
@@ -764,10 +754,10 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         if (unit.getOwner() != player) {
             throw new IllegalStateException("Not your unit!");
         }
-        Tile newTile = game.getMap().getNeighbourOrNull(direction, unit.getTile());
+        Tile newTile = getGame().getMap().getNeighbourOrNull(direction, unit.getTile());
         // boolean disembark = !unit.getTile().isLand() && newTile.isLand() &&
         // newTile.getSettlement() == null;
-        Iterator<Player> enemyPlayerIterator = game.getPlayerIterator();
+        Iterator<Player> enemyPlayerIterator = getGame().getPlayerIterator();
         while (enemyPlayerIterator.hasNext()) {
             ServerPlayer enemyPlayer = (ServerPlayer) enemyPlayerIterator.next();
             if (player.equals(enemyPlayer) || enemyPlayer.getConnection() == null) {
@@ -780,7 +770,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
                     opponentMoveElement.setAttribute("unit", unit.getID());
                     enemyPlayer.getConnection().send(opponentMoveElement);
                 } else if (enemyPlayer.canSee(newTile)
-                        && (newTile.getSettlement() == null || !game.getGameOptions().getBoolean(
+                        && (newTile.getSettlement() == null || !getGame().getGameOptions().getBoolean(
                                 GameOptions.UNIT_HIDING))) {
                     Element opponentMoveElement = Message.createNewRootElement("opponentMove");
                     opponentMoveElement.setAttribute("direction", Integer.toString(direction));
@@ -802,7 +792,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         }
         unit.move(direction);
         Element reply = Message.createNewRootElement("update");
-        Vector<Tile> surroundingTiles = game.getMap().getSurroundingTiles(unit.getTile(), unit.getLineOfSight());
+        Vector<Tile> surroundingTiles = getGame().getMap().getSurroundingTiles(unit.getTile(), unit.getLineOfSight());
         for (int i = 0; i < surroundingTiles.size(); i++) {
             Tile t = surroundingTiles.get(i);
             reply.appendChild(t.toXMLElement(player, reply.getOwnerDocument()));
@@ -823,7 +813,6 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
      * @param player The <code>ServerPlayer</code> to send a message to.
      */
     private void exploreLostCityRumour(Tile tile, Unit unit, ServerPlayer player) {
-        Game game = unit.getGame();
         // Player player = unit.getOwner();
         int type = unit.getType();
         // difficulty is in range 0-4, dx in range 2-6
@@ -890,7 +879,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         dx = 10 - player.getDifficulty(); // 6-10
         switch (rumour) {
         case LostCityRumour.BURIAL_GROUND:
-            Player indianPlayer = game.getPlayer(unit.getTile().getNationOwner());
+            Player indianPlayer = getGame().getPlayer(unit.getTile().getNationOwner());
             indianPlayer.modifyTension(player, Tension.TENSION_HATEFUL);
             break;
         case LostCityRumour.EXPEDITION_VANISHES:
@@ -907,13 +896,13 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
             rumourElement.setAttribute("amount", Integer.toString(amount));
             break;
         case LostCityRumour.COLONIST:
-            newUnit = new Unit(game, tile, player, Unit.FREE_COLONIST, Unit.ACTIVE);
+            newUnit = new Unit(getGame(), tile, player, Unit.FREE_COLONIST, Unit.ACTIVE);
             unit.getTile().add(newUnit);
             rumourElement.appendChild(newUnit.toXMLElement(player, rumourElement.getOwnerDocument()));
             break;
         case LostCityRumour.TREASURE_TRAIN:
             int treasure = getPseudoRandom().nextInt(dx * 600) + dx * 300;
-            newUnit = new Unit(game, tile, player, Unit.TREASURE_TRAIN, Unit.ACTIVE);
+            newUnit = new Unit(getGame(), tile, player, Unit.TREASURE_TRAIN, Unit.ACTIVE);
             newUnit.setTreasureAmount(treasure);
             unit.getTile().add(newUnit);
             rumourElement.setAttribute("amount", Integer.toString(treasure));
@@ -926,7 +915,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
                     rumourElement.setAttribute("emigrants", Integer.toString(dx));
                 } else {
                     for (int k = 0; k < dx; k++) {
-                        newUnit = new Unit(game, player.getEurope(), player, player.generateRecruitable(), Unit.SENTRY);
+                        newUnit = new Unit(getGame(), player.getEurope(), player, player.generateRecruitable(), Unit.SENTRY);
                         rumourElement.appendChild(newUnit.toXMLElement(player, rumourElement.getOwnerDocument()));
                         player.getEurope().add(newUnit);
                     }
@@ -944,7 +933,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
                     + player.getConnection());
         }
         // tell everyone the rumour has been explored
-        Iterator<Player> updateIterator = game.getPlayerIterator();
+        Iterator<Player> updateIterator = getGame().getPlayerIterator();
         while (updateIterator.hasNext()) {
             ServerPlayer updatePlayer = (ServerPlayer) updateIterator.next();
             if (player.equals(updatePlayer) || updatePlayer.getConnection() == null) {
@@ -974,7 +963,6 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
      */
     private Element selectFromFountainYouth(Connection connection, Element element) {
         FreeColServer freeColServer = getFreeColServer();
-        Game game = freeColServer.getGame();
         ServerPlayer player = freeColServer.getPlayer(connection);
         int remaining = player.getRemainingEmigrants();
         if (remaining == 0) {
@@ -988,7 +976,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         int newRecruitable = player.generateRecruitable();
         europe.setRecruitable(slot, newRecruitable);
         
-        Unit unit = new Unit(game, player, recruitable);
+        Unit unit = new Unit(getGame(), player, recruitable);
         Element reply = Message.createNewRootElement("selectFromFountainYouthConfirmed");
         reply.setAttribute("newRecruitable", Integer.toString(newRecruitable));
         reply.appendChild(unit.toXMLElement(player, reply.getOwnerDocument()));
@@ -1007,10 +995,9 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
      */
     private Element askSkill(Connection connection, Element element) {
         FreeColServer freeColServer = getFreeColServer();
-        Game game = freeColServer.getGame();
-        Map map = game.getMap();
+        Map map = getGame().getMap();
         ServerPlayer player = freeColServer.getPlayer(connection);
-        Unit unit = (Unit) game.getFreeColGameObject(element.getAttribute("unit"));
+        Unit unit = (Unit) getGame().getFreeColGameObject(element.getAttribute("unit"));
         int direction = Integer.parseInt(element.getAttribute("direction"));
         if (unit == null) {
             throw new IllegalArgumentException("Could not find 'Unit' with specified ID: "
@@ -1060,10 +1047,9 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
      */
     private Element attack(Connection connection, Element attackElement) {
         FreeColServer freeColServer = getFreeColServer();
-        Game game = freeColServer.getGame();
         ServerPlayer player = freeColServer.getPlayer(connection);
         // Get parameters:
-        Unit unit = (Unit) game.getFreeColGameObject(attackElement.getAttribute("unit"));
+        Unit unit = (Unit) getGame().getFreeColGameObject(attackElement.getAttribute("unit"));
         int direction = Integer.parseInt(attackElement.getAttribute("direction"));
         // Test the parameters:
         if (unit == null) {
@@ -1076,7 +1062,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         if (unit.getOwner() != player) {
             throw new IllegalStateException("Not your unit!");
         }
-        Tile newTile = game.getMap().getNeighbourOrNull(direction, unit.getTile());
+        Tile newTile = getGame().getMap().getNeighbourOrNull(direction, unit.getTile());
         if (newTile == null) {
             throw new IllegalArgumentException("Could not find tile in direction " + direction + " from unit with ID "
                     + attackElement.getAttribute("unit"));
@@ -1100,7 +1086,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         }
         // Inform the players (other then the player attacking) about
         // the attack:
-        Iterator<Player> enemyPlayerIterator = game.getPlayerIterator();
+        Iterator<Player> enemyPlayerIterator = getGame().getPlayerIterator();
         while (enemyPlayerIterator.hasNext()) {
             ServerPlayer enemyPlayer = (ServerPlayer) enemyPlayerIterator.next();
             if (player.equals(enemyPlayer) || enemyPlayer.getConnection() == null) {
@@ -1149,7 +1135,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         }
         
         int[] oldGoodsCounts = new int[Goods.NUMBER_OF_TYPES];
-        if (unit.canCaptureGoods() && game.getGameOptions().getBoolean(GameOptions.UNIT_HIDING)) {
+        if (unit.canCaptureGoods() && getGame().getGameOptions().getBoolean(GameOptions.UNIT_HIDING)) {
             for (int i = 0; i < oldGoodsCounts.length; i++) {
                 oldGoodsCounts[i] = unit.getGoodsContainer().getGoodsCount(i);
             }
@@ -1157,7 +1143,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         unit.attack(defender, result, plunderGold);
         // Send capturedGoods if UNIT_HIDING is true because when it's
         // false unit is already sent with carried goods and units
-        if (unit.canCaptureGoods() && game.getGameOptions().getBoolean(GameOptions.UNIT_HIDING)) {
+        if (unit.canCaptureGoods() && getGame().getGameOptions().getBoolean(GameOptions.UNIT_HIDING)) {
             Iterator<Goods> goodsIt = unit.getGoodsContainer().getCompactGoodsIterator();
             while (goodsIt.hasNext()) {
                 Goods newGoods = goodsIt.next();
@@ -1178,7 +1164,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
             if (result == Unit.ATTACK_DONE_SETTLEMENT && newTile.getSettlement() != null) {
                 lineOfSight = Math.max(lineOfSight, newTile.getSettlement().getLineOfSight());
             }
-            Vector<Tile> surroundingTiles = game.getMap().getSurroundingTiles(unit.getTile(), lineOfSight);
+            Vector<Tile> surroundingTiles = getGame().getMap().getSurroundingTiles(unit.getTile(), lineOfSight);
             for (int i = 0; i < surroundingTiles.size(); i++) {
                 Tile t = surroundingTiles.get(i);
                 update.appendChild(t.toXMLElement(player, update.getOwnerDocument()));
@@ -1254,13 +1240,12 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
      */
     private Element embark(Connection connection, Element embarkElement) {
         FreeColServer freeColServer = getFreeColServer();
-        Game game = freeColServer.getGame();
         ServerPlayer player = freeColServer.getPlayer(connection);
-        Unit unit = (Unit) game.getFreeColGameObject(embarkElement.getAttribute("unit"));
+        Unit unit = (Unit) getGame().getFreeColGameObject(embarkElement.getAttribute("unit"));
         int direction = Integer.parseInt(embarkElement.getAttribute("direction"));
-        Unit destinationUnit = (Unit) game.getFreeColGameObject(embarkElement.getAttribute("embarkOnto"));
+        Unit destinationUnit = (Unit) getGame().getFreeColGameObject(embarkElement.getAttribute("embarkOnto"));
         if (unit == null || destinationUnit == null
-                || game.getMap().getNeighbourOrNull(direction, unit.getTile()) != destinationUnit.getTile()) {
+                || getGame().getMap().getNeighbourOrNull(direction, unit.getTile()) != destinationUnit.getTile()) {
             throw new IllegalArgumentException("Invalid data format in client message.");
         }
         if (unit.getOwner() != player) {
@@ -1268,7 +1253,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         }
         Tile oldTile = unit.getTile();
         unit.embark(destinationUnit);
-        Iterator<Player> enemyPlayerIterator = game.getPlayerIterator();
+        Iterator<Player> enemyPlayerIterator = getGame().getPlayerIterator();
         while (enemyPlayerIterator.hasNext()) {
             ServerPlayer enemyPlayer = (ServerPlayer) enemyPlayerIterator.next();
             if (player.equals(enemyPlayer) || enemyPlayer.getConnection() == null) {
@@ -1298,10 +1283,9 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
      */
     private Element boardShip(Connection connection, Element boardShipElement) {
         FreeColServer freeColServer = getFreeColServer();
-        Game game = freeColServer.getGame();
         ServerPlayer player = freeColServer.getPlayer(connection);
-        Unit unit = (Unit) game.getFreeColGameObject(boardShipElement.getAttribute("unit"));
-        Unit carrier = (Unit) game.getFreeColGameObject(boardShipElement.getAttribute("carrier"));
+        Unit unit = (Unit) getGame().getFreeColGameObject(boardShipElement.getAttribute("unit"));
+        Unit carrier = (Unit) getGame().getFreeColGameObject(boardShipElement.getAttribute("carrier"));
         if (unit.getOwner() != player) {
             throw new IllegalStateException("Not your unit!");
         }
@@ -1316,7 +1300,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         }
         unit.boardShip(carrier);
         if (tellEnemyPlayers) {
-            Iterator<Player> enemyPlayerIterator = game.getPlayerIterator();
+            Iterator<Player> enemyPlayerIterator = getGame().getPlayerIterator();
             while (enemyPlayerIterator.hasNext()) {
                 ServerPlayer enemyPlayer = (ServerPlayer) enemyPlayerIterator.next();
                 if (player.equals(enemyPlayer) || enemyPlayer.getConnection() == null) {
@@ -1349,10 +1333,9 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
      */
     private Element learnSkillAtSettlement(Connection connection, Element element) {
         FreeColServer freeColServer = getFreeColServer();
-        Game game = freeColServer.getGame();
-        Map map = game.getMap();
+        Map map = getGame().getMap();
         ServerPlayer player = freeColServer.getPlayer(connection);
-        Unit unit = (Unit) game.getFreeColGameObject(element.getAttribute("unit"));
+        Unit unit = (Unit) getGame().getFreeColGameObject(element.getAttribute("unit"));
         int direction = Integer.parseInt(element.getAttribute("direction"));
         boolean cancelAction = false;
         if (element.getAttribute("action").equals("cancel")) {
@@ -1400,10 +1383,9 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
      */
     private Element scoutIndianSettlement(Connection connection, Element element) {
         FreeColServer freeColServer = getFreeColServer();
-        Game game = freeColServer.getGame();
-        Map map = game.getMap();
+        Map map = getGame().getMap();
         ServerPlayer player = freeColServer.getPlayer(connection);
-        Unit unit = (Unit) game.getFreeColGameObject(element.getAttribute("unit"));
+        Unit unit = (Unit) getGame().getFreeColGameObject(element.getAttribute("unit"));
         if (unit.getOwner() != player) {
             throw new IllegalStateException("Not your unit!");
         }
@@ -1490,10 +1472,9 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
      */
     private Element armedUnitDemandTribute(Connection connection, Element element) {
         FreeColServer freeColServer = getFreeColServer();
-        Game game = freeColServer.getGame();
         ServerPlayer player = freeColServer.getPlayer(connection);
         // Get parameters:
-        Unit unit = (Unit) game.getFreeColGameObject(element.getAttribute("unit"));
+        Unit unit = (Unit) getGame().getFreeColGameObject(element.getAttribute("unit"));
         int direction = Integer.parseInt(element.getAttribute("direction"));
         // Test the parameters:
         if (unit == null) {
@@ -1506,7 +1487,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         if (unit.getOwner() != player) {
             throw new IllegalStateException("Not your unit!");
         }
-        Tile newTile = game.getMap().getNeighbourOrNull(direction, unit.getTile());
+        Tile newTile = getGame().getMap().getNeighbourOrNull(direction, unit.getTile());
         if (newTile == null) {
             throw new IllegalArgumentException("Could not find tile in direction " + direction + " from unit with ID "
                     + element.getAttribute("unit"));
@@ -1547,10 +1528,9 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
      */
     private Element missionaryAtSettlement(Connection connection, Element element) {
         FreeColServer freeColServer = getFreeColServer();
-        Game game = freeColServer.getGame();
-        Map map = game.getMap();
+        Map map = getGame().getMap();
         ServerPlayer player = freeColServer.getPlayer(connection);
-        Unit unit = (Unit) game.getFreeColGameObject(element.getAttribute("unit"));
+        Unit unit = (Unit) getGame().getFreeColGameObject(element.getAttribute("unit"));
         int direction = Integer.parseInt(element.getAttribute("direction"));
         String action = element.getAttribute("action");
         IndianSettlement settlement = (IndianSettlement) map.getNeighbourOrNull(direction, unit.getTile())
@@ -1586,7 +1566,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
             return reply;
         } else if (action.equals("incite")) {
             Element reply = Message.createNewRootElement("missionaryReply");
-            Player enemy = (Player) game.getFreeColGameObject(element.getAttribute("incite"));
+            Player enemy = (Player) getGame().getFreeColGameObject(element.getAttribute("incite"));
             reply.setAttribute("amount", String.valueOf(Game.getInciteAmount(player, enemy, settlement.getOwner())));
             // Move the unit into the settlement while we wait for the client's
             // response.
@@ -1599,8 +1579,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
 
     private void sendRemoveUnitToAll(Unit unit, Player player) {
         FreeColServer freeColServer = getFreeColServer();
-        Game game = freeColServer.getGame();
-        Iterator<Player> enemyPlayerIterator = game.getPlayerIterator();
+        Iterator<Player> enemyPlayerIterator = getGame().getPlayerIterator();
         while (enemyPlayerIterator.hasNext()) {
             ServerPlayer enemyPlayer = (ServerPlayer) enemyPlayerIterator.next();
             if (player.equals(enemyPlayer) || enemyPlayer.getConnection() == null) {
@@ -1629,17 +1608,16 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
      */
     private Element inciteAtSettlement(Connection connection, Element element) {
         FreeColServer freeColServer = getFreeColServer();
-        Game game = freeColServer.getGame();
-        Map map = game.getMap();
+        Map map = getGame().getMap();
         ServerPlayer player = freeColServer.getPlayer(connection);
-        Unit unit = (Unit) game.getFreeColGameObject(element.getAttribute("unit"));
+        Unit unit = (Unit) getGame().getFreeColGameObject(element.getAttribute("unit"));
         int direction = Integer.parseInt(element.getAttribute("direction"));
         String confirmed = element.getAttribute("confirmed");
         IndianSettlement settlement = (IndianSettlement) unit.getTile().getSettlement();
         // Move the unit back to its original Tile.
         unit.setLocation(map.getNeighbourOrNull(Map.getReverseDirection(direction), unit.getTile()));
         if (confirmed.equals("true")) {
-            Player enemy = (Player) game.getFreeColGameObject(element.getAttribute("enemy"));
+            Player enemy = (Player) getGame().getFreeColGameObject(element.getAttribute("enemy"));
             int amount = Game.getInciteAmount(player, enemy, settlement.getOwner());
             if (player.getGold() < amount) {
                 throw new IllegalStateException("Not enough gold to incite indians!");
@@ -1665,9 +1643,8 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
      * @param leaveShipElement The element containing the request.
      */
     private Element leaveShip(Connection connection, Element leaveShipElement) {
-        Game game = getFreeColServer().getGame();
         ServerPlayer player = getFreeColServer().getPlayer(connection);
-        Unit unit = (Unit) game.getFreeColGameObject(leaveShipElement.getAttribute("unit"));
+        Unit unit = (Unit) getGame().getFreeColGameObject(leaveShipElement.getAttribute("unit"));
         if (unit.getOwner() != player) {
             throw new IllegalStateException("Not your unit!");
         }
@@ -1686,9 +1663,8 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
      * @param loadCargoElement The element containing the request.
      */
     private Element loadCargo(Connection connection, Element loadCargoElement) {
-        Game game = getFreeColServer().getGame();
-        Unit carrier = (Unit) game.getFreeColGameObject(loadCargoElement.getAttribute("carrier"));
-        Goods goods = new Goods(game, (Element) loadCargoElement.getChildNodes().item(0));
+        Unit carrier = (Unit) getGame().getFreeColGameObject(loadCargoElement.getAttribute("carrier"));
+        Goods goods = new Goods(getGame(), (Element) loadCargoElement.getChildNodes().item(0));
         goods.loadOnto(carrier);
         return null;
     }
@@ -1700,9 +1676,8 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
      * @param unloadCargoElement The element containing the request.
      */
     private Element unloadCargo(Connection connection, Element unloadCargoElement) {
-        Game game = getFreeColServer().getGame();
         ServerPlayer player = getFreeColServer().getPlayer(connection);
-        Goods goods = new Goods(game, (Element) unloadCargoElement.getChildNodes().item(0));
+        Goods goods = new Goods(getGame(), (Element) unloadCargoElement.getChildNodes().item(0));
         if (goods.getLocation() instanceof Unit && ((Unit) goods.getLocation()).getOwner() != player) {
             throw new IllegalStateException("Not your unit!");
         }
@@ -1717,9 +1692,8 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
      * @param buyGoodsElement The element containing the request.
      */
     private Element buyGoods(Connection connection, Element buyGoodsElement) {
-        Game game = getFreeColServer().getGame();
         ServerPlayer player = getFreeColServer().getPlayer(connection);
-        Unit carrier = (Unit) game.getFreeColGameObject(buyGoodsElement.getAttribute("carrier"));
+        Unit carrier = (Unit) getGame().getFreeColGameObject(buyGoodsElement.getAttribute("carrier"));
         int type = Integer.parseInt(buyGoodsElement.getAttribute("type"));
         int amount = Integer.parseInt(buyGoodsElement.getAttribute("amount"));
         if (carrier.getOwner() != player) {
@@ -1739,9 +1713,8 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
      * @param sellGoodsElement The element containing the request.
      */
     private Element sellGoods(Connection connection, Element sellGoodsElement) {
-        Game game = getFreeColServer().getGame();
         ServerPlayer player = getFreeColServer().getPlayer(connection);
-        Goods goods = new Goods(game, (Element) sellGoodsElement.getChildNodes().item(0));
+        Goods goods = new Goods(getGame(), (Element) sellGoodsElement.getChildNodes().item(0));
         if (goods.getLocation() instanceof Unit && ((Unit) goods.getLocation()).getOwner() != player) {
             throw new IllegalStateException("Not your unit!");
         }
@@ -1756,15 +1729,14 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
      * @param moveToEuropeElement The element containing the request.
      */
     private Element moveToEurope(Connection connection, Element moveToEuropeElement) {
-        Game game = getFreeColServer().getGame();
         ServerPlayer player = getFreeColServer().getPlayer(connection);
-        Unit unit = (Unit) game.getFreeColGameObject(moveToEuropeElement.getAttribute("unit"));
+        Unit unit = (Unit) getGame().getFreeColGameObject(moveToEuropeElement.getAttribute("unit"));
         if (unit.getOwner() != player) {
             throw new IllegalStateException("Not your unit!");
         }
         Tile oldTile = unit.getTile();
         unit.moveToEurope();
-        Iterator<Player> enemyPlayerIterator = game.getPlayerIterator();
+        Iterator<Player> enemyPlayerIterator = getGame().getPlayerIterator();
         while (enemyPlayerIterator.hasNext()) {
             ServerPlayer enemyPlayer = (ServerPlayer) enemyPlayerIterator.next();
             if (player.equals(enemyPlayer) || enemyPlayer.getConnection() == null) {
@@ -1793,9 +1765,8 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
      * @param moveToAmericaElement The element containing the request.
      */
     private Element moveToAmerica(Connection connection, Element moveToAmericaElement) {
-        Game game = getFreeColServer().getGame();
         ServerPlayer player = getFreeColServer().getPlayer(connection);
-        Unit unit = (Unit) game.getFreeColGameObject(moveToAmericaElement.getAttribute("unit"));
+        Unit unit = (Unit) getGame().getFreeColGameObject(moveToAmericaElement.getAttribute("unit"));
         if (unit.getOwner() != player) {
             throw new IllegalStateException("Not your unit!");
         }
@@ -1810,20 +1781,19 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
      * @param buildColonyElement The element containing the request.
      */
     private Element buildColony(Connection connection, Element buildColonyElement) {
-        Game game = getFreeColServer().getGame();
         ServerPlayer player = getFreeColServer().getPlayer(connection);
         String name = buildColonyElement.getAttribute("name");
-        Unit unit = (Unit) game.getFreeColGameObject(buildColonyElement.getAttribute("unit"));
+        Unit unit = (Unit) getGame().getFreeColGameObject(buildColonyElement.getAttribute("unit"));
         if (unit.getOwner() != player) {
             throw new IllegalStateException("Not your unit!");
         }
         if (unit.canBuildColony()) {
-            Colony colony = new Colony(game, player, name, unit.getTile());
+            Colony colony = new Colony(getGame(), player, name, unit.getTile());
             Element reply = Message.createNewRootElement("buildColonyConfirmed");
             reply.appendChild(colony.toXMLElement(player, reply.getOwnerDocument()));
             if (colony.getLineOfSight() > unit.getLineOfSight()) {
                 Element updateElement = reply.getOwnerDocument().createElement("update");
-                Vector<Tile> surroundingTiles = game.getMap().getSurroundingTiles(unit.getTile(),
+                Vector<Tile> surroundingTiles = getGame().getMap().getSurroundingTiles(unit.getTile(),
                         colony.getLineOfSight());
                 for (int i = 0; i < surroundingTiles.size(); i++) {
                     Tile t = surroundingTiles.get(i);
@@ -1850,13 +1820,12 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
      * @param recruitUnitInEuropeElement The element containing the request.
      */
     private Element recruitUnitInEurope(Connection connection, Element recruitUnitInEuropeElement) {
-        Game game = getFreeColServer().getGame();
         Player player = getFreeColServer().getPlayer(connection);
         Europe europe = player.getEurope();
         int slot = Integer.parseInt(recruitUnitInEuropeElement.getAttribute("slot"));
         int recruitable = europe.getRecruitable(slot);
         int newRecruitable = player.generateRecruitable();
-        Unit unit = new Unit(game, player, recruitable);
+        Unit unit = new Unit(getGame(), player, recruitable);
         Element reply = Message.createNewRootElement("recruitUnitInEuropeConfirmed");
         reply.setAttribute("newRecruitable", Integer.toString(newRecruitable));
         reply.appendChild(unit.toXMLElement(player, reply.getOwnerDocument()));
@@ -1871,7 +1840,6 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
      * @param emigrateUnitInEuropeElement The element containing the request.
      */
     private Element emigrateUnitInEurope(Connection connection, Element emigrateUnitInEuropeElement) {
-        Game game = getFreeColServer().getGame();
         Player player = getFreeColServer().getPlayer(connection);
         Europe europe = player.getEurope();
         int slot;
@@ -1882,7 +1850,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         }
         int recruitable = europe.getRecruitable(slot);
         int newRecruitable = player.generateRecruitable();
-        Unit unit = new Unit(game, player, recruitable);
+        Unit unit = new Unit(getGame(), player, recruitable);
         Element reply = Message.createNewRootElement("emigrateUnitInEuropeConfirmed");
         if (!player.hasFather(FoundingFather.WILLIAM_BREWSTER)) {
             reply.setAttribute("slot", Integer.toString(slot));
@@ -1900,11 +1868,10 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
      * @param trainUnitInEuropeElement The element containing the request.
      */
     private Element trainUnitInEurope(Connection connection, Element trainUnitInEuropeElement) {
-        Game game = getFreeColServer().getGame();
         Player player = getFreeColServer().getPlayer(connection);
         Europe europe = player.getEurope();
         int unitType = Integer.parseInt(trainUnitInEuropeElement.getAttribute("unitType"));
-        Unit unit = new Unit(game, player, unitType);
+        Unit unit = new Unit(getGame(), player, unitType);
         Element reply = Message.createNewRootElement("trainUnitInEuropeConfirmed");
         reply.appendChild(unit.toXMLElement(player, reply.getOwnerDocument()));
         europe.train(unit);
@@ -1918,9 +1885,8 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
      * @param workElement The element containing the request.
      */
     private Element equipUnit(Connection connection, Element workElement) {
-        Game game = getFreeColServer().getGame();
         ServerPlayer player = getFreeColServer().getPlayer(connection);
-        Unit unit = (Unit) game.getFreeColGameObject(workElement.getAttribute("unit"));
+        Unit unit = (Unit) getGame().getFreeColGameObject(workElement.getAttribute("unit"));
         int type = Integer.parseInt(workElement.getAttribute("type"));
         int amount = Integer.parseInt(workElement.getAttribute("amount"));
         if (unit.getOwner() != player) {
@@ -1963,10 +1929,9 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
      * @param workElement The element containing the request.
      */
     private Element work(Connection connection, Element workElement) {
-        Game game = getFreeColServer().getGame();
         ServerPlayer player = getFreeColServer().getPlayer(connection);
-        Unit unit = (Unit) game.getFreeColGameObject(workElement.getAttribute("unit"));
-        WorkLocation workLocation = (WorkLocation) game.getFreeColGameObject(workElement.getAttribute("workLocation"));
+        Unit unit = (Unit) getGame().getFreeColGameObject(workElement.getAttribute("unit"));
+        WorkLocation workLocation = (WorkLocation) getGame().getFreeColGameObject(workElement.getAttribute("workLocation"));
         if (unit.getOwner() != player) {
             throw new IllegalStateException("Not your unit!");
         }
@@ -1995,9 +1960,8 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
      * @param workElement The element containing the request.
      */
     private Element changeWorkType(Connection connection, Element workElement) {
-        Game game = getFreeColServer().getGame();
         ServerPlayer player = getFreeColServer().getPlayer(connection);
-        Unit unit = (Unit) game.getFreeColGameObject(workElement.getAttribute("unit"));
+        Unit unit = (Unit) getGame().getFreeColGameObject(workElement.getAttribute("unit"));
         int workType = Integer.parseInt(workElement.getAttribute("workType"));
         if (unit.getOwner() != player) {
             throw new IllegalStateException("Not your unit!");
@@ -2014,9 +1978,8 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
      * @param setCurrentlyBuildingElement The element containing the request.
      */
     private Element setCurrentlyBuilding(Connection connection, Element setCurrentlyBuildingElement) {
-        Game game = getFreeColServer().getGame();
         ServerPlayer player = getFreeColServer().getPlayer(connection);
-        Colony colony = (Colony) game.getFreeColGameObject(setCurrentlyBuildingElement.getAttribute("colony"));
+        Colony colony = (Colony) getGame().getFreeColGameObject(setCurrentlyBuildingElement.getAttribute("colony"));
         int type = Integer.parseInt(setCurrentlyBuildingElement.getAttribute("type"));
         if (colony.getOwner() != player) {
             throw new IllegalStateException("Not your colony!");
@@ -2038,9 +2001,8 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
      *                model.
      */
     private Element changeState(Connection connection, Element changeStateElement) {
-        Game game = getFreeColServer().getGame();
         ServerPlayer player = getFreeColServer().getPlayer(connection);
-        Unit unit = (Unit) game.getFreeColGameObjectSafely(changeStateElement.getAttribute("unit"));
+        Unit unit = (Unit) getGame().getFreeColGameObjectSafely(changeStateElement.getAttribute("unit"));
         if (unit == null) {
             throw new IllegalArgumentException("Could not find 'Unit' with specified ID: "
                     + changeStateElement.getAttribute("unit"));
@@ -2069,9 +2031,8 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
      * @param putOutsideColonyElement The element containing the request.
      */
     private Element putOutsideColony(Connection connection, Element putOutsideColonyElement) {
-        Game game = getFreeColServer().getGame();
         ServerPlayer player = getFreeColServer().getPlayer(connection);
-        Unit unit = (Unit) game.getFreeColGameObject(putOutsideColonyElement.getAttribute("unit"));
+        Unit unit = (Unit) getGame().getFreeColGameObject(putOutsideColonyElement.getAttribute("unit"));
         if (unit.getOwner() != player) {
             throw new IllegalStateException("Not your unit!");
         }
@@ -2087,9 +2048,8 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
      * @param payForBuildingElement The element containing the request.
      */
     private Element payForBuilding(Connection connection, Element payForBuildingElement) {
-        Game game = getFreeColServer().getGame();
         ServerPlayer player = getFreeColServer().getPlayer(connection);
-        Colony colony = (Colony) game.getFreeColGameObject(payForBuildingElement.getAttribute("colony"));
+        Colony colony = (Colony) getGame().getFreeColGameObject(payForBuildingElement.getAttribute("colony"));
         if (colony.getOwner() != player) {
             throw new IllegalStateException("Not your unit!");
         }
@@ -2123,9 +2083,8 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
      * @param setGoodsLevelsElement The element containing the request.
      */
     private Element setGoodsLevels(Connection connection, Element setGoodsLevelsElement) {
-        Game game = getFreeColServer().getGame();
         ServerPlayer player = getFreeColServer().getPlayer(connection);
-        Colony colony = (Colony) game.getFreeColGameObject(setGoodsLevelsElement.getAttribute("colony"));
+        Colony colony = (Colony) getGame().getFreeColGameObject(setGoodsLevelsElement.getAttribute("colony"));
         if (colony == null) {
             throw new IllegalArgumentException("Found no colony with ID " + setGoodsLevelsElement.getAttribute("colony"));
         } else if (colony.getOwner() != player) {
@@ -2156,9 +2115,8 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
      * @param clearSpecialityElement The element containing the request.
      */
     private Element clearSpeciality(Connection connection, Element clearSpecialityElement) {
-        Game game = getFreeColServer().getGame();
         ServerPlayer player = getFreeColServer().getPlayer(connection);
-        Unit unit = (Unit) game.getFreeColGameObject(clearSpecialityElement.getAttribute("unit"));
+        Unit unit = (Unit) getGame().getFreeColGameObject(clearSpecialityElement.getAttribute("unit"));
         if (unit.getOwner() != player) {
             throw new IllegalStateException("Not your unit!");
         }
@@ -2189,9 +2147,8 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
      * @param element The element containing the request.
      */
     private Element skipUnit(Connection connection, Element element) {
-        Game game = getFreeColServer().getGame();
         ServerPlayer player = getFreeColServer().getPlayer(connection);
-        Unit unit = (Unit) game.getFreeColGameObject(element.getAttribute("unit"));
+        Unit unit = (Unit) getGame().getFreeColGameObject(element.getAttribute("unit"));
         if (unit == null) {
             throw new IllegalArgumentException("Could not find 'Unit' with specified ID: "
                     + element.getAttribute("unit"));
@@ -2211,9 +2168,8 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
      * @param element The element containing the request.
      */
     private Element disbandUnit(Connection connection, Element element) {
-        Game game = getFreeColServer().getGame();
         ServerPlayer player = getFreeColServer().getPlayer(connection);
-        Unit unit = (Unit) game.getFreeColGameObject(element.getAttribute("unit"));
+        Unit unit = (Unit) getGame().getFreeColGameObject(element.getAttribute("unit"));
         if (unit == null) {
             throw new IllegalArgumentException("Could not find 'Unit' with specified ID: "
                     + element.getAttribute("unit"));
@@ -2235,9 +2191,8 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
      * @param element The element containing the request.
      */
     private Element cashInTreasureTrain(Connection connection, Element element) {
-        Game game = getFreeColServer().getGame();
         ServerPlayer player = getFreeColServer().getPlayer(connection);
-        Unit unit = (Unit) game.getFreeColGameObject(element.getAttribute("unit"));
+        Unit unit = (Unit) getGame().getFreeColGameObject(element.getAttribute("unit"));
         if (unit == null) {
             throw new IllegalArgumentException("Could not find 'Unit' with specified ID: "
                     + element.getAttribute("unit"));
@@ -2272,9 +2227,8 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
      * @param element The element containing the request.
      */
     private Element giveIndependence(Connection connection, Element element) {
-        Game game = getFreeColServer().getGame();
         ServerPlayer player = getFreeColServer().getPlayer(connection);
-        Player independent = (Player) game.getFreeColGameObject(element.getAttribute("player"));
+        Player independent = (Player) getGame().getFreeColGameObject(element.getAttribute("player"));
         if (independent.getREFPlayer() != player) {
             throw new IllegalStateException("Cannot give independence to a country we do not own.");
         }
@@ -2293,10 +2247,9 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
      * @param element The element containing the request.
      */
     private Element foreignAffairs(Connection connection, Element element) {
-        Game game = getFreeColServer().getGame();
         ServerPlayer player = getFreeColServer().getPlayer(connection);
         Element reply = Message.createNewRootElement("foreignAffairsReport");
-        Iterator<Player> enemyPlayerIterator = game.getPlayerIterator();
+        Iterator<Player> enemyPlayerIterator = getGame().getPlayerIterator();
         while (enemyPlayerIterator.hasNext()) {
             ServerPlayer enemyPlayer = (ServerPlayer) enemyPlayerIterator.next();
             if (enemyPlayer.getConnection() == null || enemyPlayer.isIndian() || enemyPlayer.isREF()) {
@@ -2394,15 +2347,14 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
      * @param element The element containing the request.
      */
     private Element setDestination(Connection connection, Element element) {
-        Game game = getFreeColServer().getGame();
         ServerPlayer player = getFreeColServer().getPlayer(connection);
-        Unit unit = (Unit) game.getFreeColGameObject(element.getAttribute("unit"));
+        Unit unit = (Unit) getGame().getFreeColGameObject(element.getAttribute("unit"));
         if (unit.getOwner() != player) {
             throw new IllegalStateException("Not the owner of the unit.");
         }
         Location destination = null;
         if (element.hasAttribute("destination")) {
-            destination = (Location) game.getFreeColGameObject(element.getAttribute("destination"));
+            destination = (Location) getGame().getFreeColGameObject(element.getAttribute("destination"));
         }
         unit.setDestination(destination);
         return null;
@@ -2416,9 +2368,8 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
      * @param element The element containing the request.
      */
     private Element rename(Connection connection, Element element) {
-        Game game = getFreeColServer().getGame();
         ServerPlayer player = getFreeColServer().getPlayer(connection);
-        Nameable object = (Nameable) game.getFreeColGameObject(element.getAttribute("nameable"));
+        Nameable object = (Nameable) getGame().getFreeColGameObject(element.getAttribute("nameable"));
         if (!(object instanceof Ownable) || ((Ownable) object).getOwner() != player) {
             throw new IllegalStateException("Not the owner of the nameable.");
         }
@@ -2434,11 +2385,10 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
      * @param element The element containing the request.
      */
     private Element tradeProposition(Connection connection, Element element) {
-        Game game = getFreeColServer().getGame();
         ServerPlayer player = getFreeColServer().getPlayer(connection);
-        Unit unit = (Unit) game.getFreeColGameObject(element.getAttribute("unit"));
-        Settlement settlement = (Settlement) game.getFreeColGameObject(element.getAttribute("settlement"));
-        Goods goods = new Goods(game, Message.getChildElement(element, Goods.getXMLElementTagName()));
+        Unit unit = (Unit) getGame().getFreeColGameObject(element.getAttribute("unit"));
+        Settlement settlement = (Settlement) getGame().getFreeColGameObject(element.getAttribute("settlement"));
+        Goods goods = new Goods(getGame(), Message.getChildElement(element, Goods.getXMLElementTagName()));
         int gold = -1;
         if (element.hasAttribute("gold")) {
             gold = Integer.parseInt(element.getAttribute("gold"));
@@ -2478,11 +2428,10 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
      * @param element The element containing the request.
      */
     private Element trade(Connection connection, Element element) {
-        Game game = getFreeColServer().getGame();
         ServerPlayer player = getFreeColServer().getPlayer(connection);
-        Unit unit = (Unit) game.getFreeColGameObject(element.getAttribute("unit"));
-        Settlement settlement = (Settlement) game.getFreeColGameObject(element.getAttribute("settlement"));
-        Goods goods = new Goods(game, Message.getChildElement(element, Goods.getXMLElementTagName()));
+        Unit unit = (Unit) getGame().getFreeColGameObject(element.getAttribute("unit"));
+        Settlement settlement = (Settlement) getGame().getFreeColGameObject(element.getAttribute("settlement"));
+        Goods goods = new Goods(getGame(), Message.getChildElement(element, Goods.getXMLElementTagName()));
         int gold = Integer.parseInt(element.getAttribute("gold"));
         if (gold <= 0) {
             throw new IllegalArgumentException();
@@ -2524,11 +2473,10 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
      * @param element The element containing the request.
      */
     private Element deliverGift(Connection connection, Element element) {
-        Game game = getFreeColServer().getGame();
         ServerPlayer player = getFreeColServer().getPlayer(connection);
-        Unit unit = (Unit) game.getFreeColGameObject(element.getAttribute("unit"));
-        Settlement settlement = (Settlement) game.getFreeColGameObject(element.getAttribute("settlement"));
-        Goods goods = new Goods(game, Message.getChildElement(element, Goods.getXMLElementTagName()));
+        Unit unit = (Unit) getGame().getFreeColGameObject(element.getAttribute("unit"));
+        Settlement settlement = (Settlement) getGame().getFreeColGameObject(element.getAttribute("settlement"));
+        Goods goods = new Goods(getGame(), Message.getChildElement(element, Goods.getXMLElementTagName()));
         if (goods.getAmount() > 100) {
             throw new IllegalArgumentException();
         }
@@ -2578,10 +2526,9 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
      * @param element The element containing the request.
      */
     private Element indianDemand(Connection connection, Element element) {
-        Game game = getFreeColServer().getGame();
         ServerPlayer player = getFreeColServer().getPlayer(connection);
-        Unit unit = (Unit) game.getFreeColGameObject(element.getAttribute("unit"));
-        Colony colony = (Colony) game.getFreeColGameObject(element.getAttribute("colony"));
+        Unit unit = (Unit) getGame().getFreeColGameObject(element.getAttribute("unit"));
+        Colony colony = (Colony) getGame().getFreeColGameObject(element.getAttribute("colony"));
         if (unit == null) {
             throw new IllegalArgumentException("Could not find 'Unit' with specified ID: "
                     + element.getAttribute("unit"));
@@ -2607,7 +2554,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
             if (goodsElement == null) {
                 gold = Integer.parseInt(element.getAttribute("gold"));
             } else {
-                goods = new Goods(game, goodsElement);
+                goods = new Goods(getGame(), goodsElement);
             }
             try {
                 Element reply = receiver.getConnection().ask(element);
@@ -2671,8 +2618,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
     }
 
     private void sendUpdatedTileToAll(Tile newTile, Player player) {
-        Game game = getFreeColServer().getGame();
-        Iterator<Player> enemyPlayerIterator = game.getPlayerIterator();
+        Iterator<Player> enemyPlayerIterator = getGame().getPlayerIterator();
         while (enemyPlayerIterator.hasNext()) {
             ServerPlayer enemyPlayer = (ServerPlayer) enemyPlayerIterator.next();
             if (player != null && player.equals(enemyPlayer) || enemyPlayer.getConnection() == null) {
@@ -2693,7 +2639,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
     /*
      * Method not used, keep in comments. private void sendErrorToAll(String
      * message, Player player) { Game game = getFreeColServer().getGame();
-     * Iterator enemyPlayerIterator = game.getPlayerIterator(); while
+     * Iterator enemyPlayerIterator = getGame().getPlayerIterator(); while
      * (enemyPlayerIterator.hasNext()) { ServerPlayer enemyPlayer =
      * (ServerPlayer) enemyPlayerIterator.next(); if ((player != null) &&
      * (player.equals(enemyPlayer)) || enemyPlayer.getConnection() == null) {

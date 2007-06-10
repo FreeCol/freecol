@@ -1,5 +1,6 @@
 package net.sf.freecol.server.control;
 
+import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.PseudoRandom;
 import net.sf.freecol.server.FreeColServer;
 
@@ -29,6 +30,15 @@ public class FreeColServerHolder {
      */
     protected FreeColServer getFreeColServer() {
         return freeColServer;
+    }
+
+    /**
+     * Returns the Game.
+     *
+     * @return a <code>Game</code> value
+     */
+    protected Game getGame() {
+        return freeColServer.getGame();
     }
 
     /**

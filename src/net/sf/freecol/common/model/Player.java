@@ -953,28 +953,30 @@ public class Player extends FreeColGameObject implements Nameable {
             for (int i = INCA; i <= TUPI; i++) {
                 if (contacted[i] == true) {
                     contactedIndians = true;
+                    break;
                 }
             }
 
             for (int i = DUTCH; i <= SPANISH; i++) {
                 if (contacted[i] == true) {
                     contactedEuro = true;
+                    break;
                 }
             }
             // these dialogs should only appear on the first event
             if (player.isEuropean()) {
                 if (!contactedEuro) {
-                    addModelMessage(this, "EventPanel.MEETING_EUROPEANS", null, ModelMessage.FOREIGN_DIPLOMACY);
+                    addModelMessage(this, "EventPanel.MEETING_EUROPEANS", null, ModelMessage.FOREIGN_DIPLOMACY, player);
                 }
             } else {
                 if (!contactedIndians) {
-                    addModelMessage(this, "EventPanel.MEETING_NATIVES", null, ModelMessage.FOREIGN_DIPLOMACY);
+                    addModelMessage(this, "EventPanel.MEETING_NATIVES", null, ModelMessage.FOREIGN_DIPLOMACY, player);
                 }
                 // special cases for Aztec/Inca
                 if (player.getNation() == Player.AZTEC) {
-                    addModelMessage(this, "EventPanel.MEETING_AZTEC", null, ModelMessage.FOREIGN_DIPLOMACY);
+                    addModelMessage(this, "EventPanel.MEETING_AZTEC", null, ModelMessage.FOREIGN_DIPLOMACY, player);
                 } else if (player.getNation() == Player.INCA) {
-                    addModelMessage(this, "EventPanel.MEETING_INCA", null, ModelMessage.FOREIGN_DIPLOMACY);
+                    addModelMessage(this, "EventPanel.MEETING_INCA", null, ModelMessage.FOREIGN_DIPLOMACY, player);
                 }
             }
         }

@@ -10,6 +10,7 @@ import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.common.model.Building;
 import net.sf.freecol.common.model.Colony;
+import net.sf.freecol.common.model.DiplomaticTrade;
 import net.sf.freecol.common.model.FoundingFather;
 import net.sf.freecol.common.model.FreeColGameObject;
 import net.sf.freecol.common.model.Game;
@@ -30,7 +31,7 @@ import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
 /**
- * Handles the network messages that arrives while in the game.
+ * Handles the network messages that arrives while in the getGame().
  */
 public final class InGameInputHandler extends InputHandler {
     private static final Logger logger = Logger.getLogger(InGameInputHandler.class.getName());
@@ -112,6 +113,8 @@ public final class InGameInputHandler extends InputHandler {
                 reply = giveIndependence(element);
             } else if (type.equals("newConvert")) {
                 reply = newConvert(element);
+            } else if (type.equals("diplomaticTrade")) {
+                reply = diplomaticTrade(element);
             } else {
                 logger.warning("Message is of unsupported type \"" + type + "\".");
             }
@@ -152,12 +155,11 @@ public final class InGameInputHandler extends InputHandler {
      * @return The reply.
      */
     public Element update(Element updateElement) {
-        Game game = getFreeColClient().getGame();
         NodeList nodeList = updateElement.getChildNodes();
 
         for (int i = 0; i < nodeList.getLength(); i++) {
             Element element = (Element) nodeList.item(i);
-            FreeColGameObject fcgo = game.getFreeColGameObjectSafely(element.getAttribute("ID"));
+            FreeColGameObject fcgo = getGame().getFreeColGameObjectSafely(element.getAttribute("ID"));
             if (fcgo != null) {
                 fcgo.readFromXMLElement(element);
             } else {
@@ -175,12 +177,11 @@ public final class InGameInputHandler extends InputHandler {
      *            that holds all the information.
      */
     private Element remove(Element removeElement) {
-        Game game = getFreeColClient().getGame();
 
         NodeList nodeList = removeElement.getChildNodes();
         for (int i = 0; i < nodeList.getLength(); i++) {
             Element element = (Element) nodeList.item(i);
-            FreeColGameObject fcgo = game.getFreeColGameObject(element.getAttribute("ID"));
+            FreeColGameObject fcgo = getGame().getFreeColGameObject(element.getAttribute("ID"));
 
             if (fcgo != null) {
                 fcgo.dispose();
@@ -200,13 +201,12 @@ public final class InGameInputHandler extends InputHandler {
      *            tree) that holds all the information.
      */
     private Element opponentMove(Element opponentMoveElement) {
-        Game game = getFreeColClient().getGame();
-        Map map = game.getMap();
+        Map map = getGame().getMap();
 
         int direction = Integer.parseInt(opponentMoveElement.getAttribute("direction"));
 
         if (!opponentMoveElement.hasAttribute("tile")) {
-            final Unit unit = (Unit) game.getFreeColGameObjectSafely(opponentMoveElement.getAttribute("unit"));
+            final Unit unit = (Unit) getGame().getFreeColGameObjectSafely(opponentMoveElement.getAttribute("unit"));
 
             if (unit == null) {
                 logger.warning("Could not find the 'unit' in 'opponentMove'. Unit ID: "
@@ -246,9 +246,9 @@ public final class InGameInputHandler extends InputHandler {
                 logger.warning("unitElement == null");
                 throw new NullPointerException("unitElement == null");
             }
-            Unit u = (Unit) game.getFreeColGameObjectSafely(unitElement.getAttribute("ID"));
+            Unit u = (Unit) getGame().getFreeColGameObjectSafely(unitElement.getAttribute("ID"));
             if (u == null) {
-                u = new Unit(game, unitElement);
+                u = new Unit(getGame(), unitElement);
             } else {
                 u.readFromXMLElement(unitElement);
             }
@@ -256,7 +256,7 @@ public final class InGameInputHandler extends InputHandler {
 
             if (opponentMoveElement.hasAttribute("inUnit")) {
                 String inUnitID = opponentMoveElement.getAttribute("inUnit");
-                Unit inUnit = (Unit) game.getFreeColGameObjectSafely(inUnitID);
+                Unit inUnit = (Unit) getGame().getFreeColGameObjectSafely(inUnitID);
 
                 NodeList units = opponentMoveElement.getElementsByTagName(Unit.getXMLElementTagName());
                 Element locationElement = null;
@@ -267,17 +267,17 @@ public final class InGameInputHandler extends InputHandler {
                 }
                 if (locationElement != null) {
                     if (inUnit == null) {
-                        inUnit = new Unit(game, locationElement);
+                        inUnit = new Unit(getGame(), locationElement);
                     } else {
                         inUnit.readFromXMLElement(locationElement);
                     }
                 }
             }
 
-            if (game.getFreeColGameObject(tileID) == null) {
+            if (getGame().getFreeColGameObject(tileID) == null) {
                 logger.warning("Could not find tile with id: " + tileID);
             }
-            unit.setLocation((Tile) game.getFreeColGameObject(tileID));
+            unit.setLocation((Tile) getGame().getFreeColGameObject(tileID));
 
             SwingUtilities.invokeLater(new Runnable() {
                 public void run() {
@@ -297,11 +297,10 @@ public final class InGameInputHandler extends InputHandler {
      *            XML tree) that holds all the information.
      */
     private Element opponentAttack(Element opponentAttackElement) {
-        Game game = getFreeColClient().getGame();
-        Unit unit = (Unit) game.getFreeColGameObject(opponentAttackElement.getAttribute("unit"));
-        Colony colony = (Colony) game.getFreeColGameObjectSafely(opponentAttackElement.getAttribute("colony"));
-        Building building = (Building) game.getFreeColGameObjectSafely(opponentAttackElement.getAttribute("building"));
-        Unit defender = (Unit) game.getFreeColGameObjectSafely(opponentAttackElement.getAttribute("defender"));
+        Unit unit = (Unit) getGame().getFreeColGameObject(opponentAttackElement.getAttribute("unit"));
+        Colony colony = (Colony) getGame().getFreeColGameObjectSafely(opponentAttackElement.getAttribute("colony"));
+        Building building = (Building) getGame().getFreeColGameObjectSafely(opponentAttackElement.getAttribute("building"));
+        Unit defender = (Unit) getGame().getFreeColGameObjectSafely(opponentAttackElement.getAttribute("defender"));
 
         int result = Integer.parseInt(opponentAttackElement.getAttribute("result"));
         int plunderGold = Integer.parseInt(opponentAttackElement.getAttribute("plunderGold"));
@@ -314,9 +313,9 @@ public final class InGameInputHandler extends InputHandler {
                     logger.warning("unitElement == null");
                     throw new NullPointerException("unitElement == null");
                 }
-                unit = (Unit) game.getFreeColGameObject(unitElement.getAttribute("ID"));
+                unit = (Unit) getGame().getFreeColGameObject(unitElement.getAttribute("ID"));
                 if (unit == null) {
-                    unit = new Unit(game, unitElement);
+                    unit = new Unit(getGame(), unitElement);
                 } else {
                     unit.readFromXMLElement(unitElement);
                 }
@@ -329,7 +328,7 @@ public final class InGameInputHandler extends InputHandler {
                 Element defenderTileElement = Message.getChildElement(opponentAttackElement, Tile
                         .getXMLElementTagName());
                 if (defenderTileElement != null) {
-                    Tile defenderTile = (Tile) game.getFreeColGameObject(defenderTileElement.getAttribute("ID"));
+                    Tile defenderTile = (Tile) getGame().getFreeColGameObject(defenderTileElement.getAttribute("ID"));
                     defenderTile.readFromXMLElement(defenderTileElement);
                 }
 
@@ -338,9 +337,9 @@ public final class InGameInputHandler extends InputHandler {
                     logger.warning("defenderElement == null");
                     throw new NullPointerException("defenderElement == null");
                 }
-                defender = (Unit) game.getFreeColGameObject(defenderElement.getAttribute("ID"));
+                defender = (Unit) getGame().getFreeColGameObject(defenderElement.getAttribute("ID"));
                 if (defender == null) {
-                    defender = new Unit(game, defenderElement);
+                    defender = new Unit(getGame(), defenderElement);
                 } else {
                     defender.readFromXMLElement(defenderElement);
                 }
@@ -353,9 +352,9 @@ public final class InGameInputHandler extends InputHandler {
             } else if (updateAttribute.equals("tile")) {
                 Element tileElement = Message.getChildElement(opponentAttackElement, Tile
                         .getXMLElementTagName());
-                Tile tile = (Tile) game.getFreeColGameObject(tileElement.getAttribute("ID"));
+                Tile tile = (Tile) getGame().getFreeColGameObject(tileElement.getAttribute("ID"));
                 if (tile == null) {
-                    tile = new Tile(game, tileElement);
+                    tile = new Tile(getGame(), tileElement);
                 } else {
                     tile.readFromXMLElement(tileElement);
                 }
@@ -406,9 +405,8 @@ public final class InGameInputHandler extends InputHandler {
      */
     private Element setCurrentPlayer(Element setCurrentPlayerElement) {
         FreeColClient freeColClient = getFreeColClient();
-        Game game = freeColClient.getGame();
 
-        final Player currentPlayer = (Player) game.getFreeColGameObject(setCurrentPlayerElement.getAttribute("player"));
+        final Player currentPlayer = (Player) getGame().getFreeColGameObject(setCurrentPlayerElement.getAttribute("player"));
 
         logger.finest("About to set currentPlayer to " + currentPlayer.getName());
         try {
@@ -435,7 +433,7 @@ public final class InGameInputHandler extends InputHandler {
      *            that holds all the information.
      */
     private Element newTurn(Element newTurnElement) {
-        getFreeColClient().getGame().newTurn();
+        getGame().newTurn();
         new UpdateMenuBarSwingTask().invokeLater();
         return null;
     }
@@ -448,8 +446,7 @@ public final class InGameInputHandler extends InputHandler {
      */
     private Element setDead(Element element) {
         FreeColClient freeColClient = getFreeColClient();
-        Game game = freeColClient.getGame();
-        Player player = (Player) game.getFreeColGameObject(element.getAttribute("player"));
+        Player player = (Player) getGame().getFreeColGameObject(element.getAttribute("player"));
         player.setDead(true);
 
         if (player == freeColClient.getMyPlayer()) {
@@ -478,9 +475,8 @@ public final class InGameInputHandler extends InputHandler {
      */
     private Element gameEnded(Element element) {
         FreeColClient freeColClient = getFreeColClient();
-        Game game = freeColClient.getGame();
 
-        Player winner = (Player) game.getFreeColGameObject(element.getAttribute("winner"));
+        Player winner = (Player) getGame().getFreeColGameObject(element.getAttribute("winner"));
         if (winner == freeColClient.getMyPlayer()) {
             new ShowVictoryPanelSwingTask().invokeLater();
         } // else: The client has already received the message of defeat.
@@ -495,8 +491,7 @@ public final class InGameInputHandler extends InputHandler {
      *            holds all the information.
      */
     private Element chat(Element element) {
-        Game game = getFreeColClient().getGame();
-        final Player sender = (Player) game.getFreeColGameObjectSafely(element.getAttribute("sender"));
+        final Player sender = (Player) getGame().getFreeColGameObjectSafely(element.getAttribute("sender"));
         final String message = element.getAttribute("message");
         final boolean privateChat = Boolean.valueOf(element.getAttribute("privateChat")).booleanValue();
         SwingUtilities.invokeLater(new Runnable() {
@@ -526,9 +521,8 @@ public final class InGameInputHandler extends InputHandler {
      *            holds all the information.
      */
     private Element setAI(Element element) {
-        Game game = getFreeColClient().getGame();
 
-        Player p = (Player) game.getFreeColGameObject(element.getAttribute("player"));
+        Player p = (Player) getGame().getFreeColGameObject(element.getAttribute("player"));
         p.setAI(Boolean.valueOf(element.getAttribute("ai")).booleanValue());
 
         return null;
@@ -561,7 +555,7 @@ public final class InGameInputHandler extends InputHandler {
      * tree) that holds all the information.
      */
     private Element newConvert(Element element) {
-        Tile tile = (Tile) getFreeColClient().getGame().getFreeColGameObject(element.getAttribute("colony"));
+        Tile tile = (Tile) getGame().getFreeColGameObject(element.getAttribute("colony"));
         Colony colony = tile.getColony();
         String nation = "indian";
         ModelMessage message = new ModelMessage(colony,
@@ -576,20 +570,72 @@ public final class InGameInputHandler extends InputHandler {
 
 
     /**
+     * Handles a "diplomaticTrade"-request. Returns either an "accept"
+     * element, if the offer was accepted, or "null", if it was not.
+     * 
+     * @param element The element (root element in a DOM-parsed XML
+     * tree) that holds all the information.
+     */
+    private Element diplomaticTrade(Element element) {
+        Unit unit = (Unit) getGame().getFreeColGameObject(element.getAttribute("unit"));
+        if (unit == null) {
+            throw new IllegalArgumentException("Could not find 'Unit' with specified ID: "
+                                               + element.getAttribute("unit"));
+        }
+        int direction = Integer.parseInt(element.getAttribute("direction"));
+        Tile tile = getGame().getMap().getNeighbourOrNull(direction, unit.getTile());
+        if (tile == null) {
+            throw new IllegalArgumentException("Could not find 'Tile' in direction " +
+                                               direction);
+        }
+        Settlement settlement = tile.getSettlement();
+        if (settlement == null) {
+            throw new IllegalArgumentException("No settlement on 'Tile' " +
+                                               tile.getID());
+        }
+        
+        NodeList childElements = element.getChildNodes();
+        Element childElement = (Element) childElements.item(0);
+        DiplomaticTrade proposal = new DiplomaticTrade(getGame(), childElement);
+
+        DiplomaticTrade agreement = getFreeColClient().getCanvas().showNegotiationDialog(unit, settlement, proposal);
+        if (agreement != null) {
+            Element diplomaticElement = Message.createNewRootElement("diplomaticTrade");
+            if (agreement == DiplomaticTrade.ACCEPT) {
+                diplomaticElement.setAttribute("accept", "accept");
+                return diplomaticElement;
+            } else {
+                diplomaticElement.setAttribute("unit", unit.getID());
+                diplomaticElement.setAttribute("direction", String.valueOf(direction));
+                diplomaticElement.appendChild(agreement.toXMLElement(null, diplomaticElement.getOwnerDocument()));
+                Element reply = getFreeColClient().getClient().ask(diplomaticElement);
+                if (reply != null) {
+                    String accept = reply.getAttribute("accept");
+                    if (accept != null && accept.equals("accept")) {
+                        agreement.makeTrade();
+                    }
+                }
+            }
+        }
+
+        return null;
+    }
+
+
+    /**
      * Handles an "deliverGift"-request.
      * 
      * @param element The element (root element in a DOM-parsed XML tree) that
      *            holds all the information.
      */
     private Element deliverGift(Element element) {
-        Game game = getFreeColClient().getGame();
         Element unitElement = Message.getChildElement(element, Unit.getXMLElementTagName());
 
-        Unit unit = (Unit) game.getFreeColGameObject(unitElement.getAttribute("ID"));
+        Unit unit = (Unit) getGame().getFreeColGameObject(unitElement.getAttribute("ID"));
         unit.readFromXMLElement(unitElement);
 
-        Settlement settlement = (Settlement) game.getFreeColGameObject(element.getAttribute("settlement"));
-        Goods goods = new Goods(game, Message.getChildElement(element, Goods.getXMLElementTagName()));
+        Settlement settlement = (Settlement) getGame().getFreeColGameObject(element.getAttribute("settlement"));
+        Goods goods = new Goods(getGame(), Message.getChildElement(element, Goods.getXMLElementTagName()));
 
         unit.deliverGift(settlement, goods);
 
@@ -603,9 +649,8 @@ public final class InGameInputHandler extends InputHandler {
      *            holds all the information.
      */
     private Element indianDemand(Element element) {
-        Game game = getFreeColClient().getGame();
-        Unit unit = (Unit) game.getFreeColGameObject(element.getAttribute("unit"));
-        Colony colony = (Colony) game.getFreeColGameObject(element.getAttribute("colony"));
+        Unit unit = (Unit) getGame().getFreeColGameObject(element.getAttribute("unit"));
+        Colony colony = (Colony) getGame().getFreeColGameObject(element.getAttribute("colony"));
         int gold = 0;
         Goods goods = null;
         boolean accepted;
@@ -613,7 +658,7 @@ public final class InGameInputHandler extends InputHandler {
         Element unitElement = Message.getChildElement(element, Unit.getXMLElementTagName());
         if (unitElement != null) {
             if (unit == null) {
-                unit = new Unit(game, unitElement);
+                unit = new Unit(getGame(), unitElement);
             } else {
                 unit.readFromXMLElement(unitElement);
             }
@@ -629,7 +674,7 @@ public final class InGameInputHandler extends InputHandler {
                 colony.getOwner().modifyGold(-gold);
             }
         } else {
-            goods = new Goods(game, goodsElement);
+            goods = new Goods(getGame(), goodsElement);
 
             if (goods.getType() == Goods.FOOD) {
                 accepted = new ShowConfirmDialogSwingTask("indianDemand.food.text", "indianDemand.food.yes",
@@ -660,7 +705,6 @@ public final class InGameInputHandler extends InputHandler {
      */
     private Element monarchAction(Element element) {
         final FreeColClient freeColClient = getFreeColClient();
-        Game game = freeColClient.getGame();
         Player player = freeColClient.getMyPlayer();
         Monarch monarch = player.getMonarch();
         final int action = Integer.parseInt(element.getAttribute("action"));
@@ -703,7 +747,7 @@ public final class InGameInputHandler extends InputHandler {
             break;
         case Monarch.DECLARE_WAR:
             int nation = Integer.parseInt(element.getAttribute("nation"));
-            player.setStance(game.getPlayer(nation), Player.WAR);
+            player.setStance(getGame().getPlayer(nation), Player.WAR);
             new ShowMonarchPanelSwingTask(action, new String[][] { { "%nation%", Player.getNationAsString(nation) } })
                     .confirm();
             break;
@@ -713,9 +757,9 @@ public final class InGameInputHandler extends InputHandler {
             NodeList unitList = element.getChildNodes();
             for (int i = 0; i < unitList.getLength(); i++) {
                 Element unitElement = (Element) unitList.item(i);
-                Unit newUnit = (Unit) game.getFreeColGameObject(unitElement.getAttribute("ID"));
+                Unit newUnit = (Unit) getGame().getFreeColGameObject(unitElement.getAttribute("ID"));
                 if (newUnit == null) {
-                    newUnit = new Unit(game, unitElement);
+                    newUnit = new Unit(getGame(), unitElement);
                 } else {
                     newUnit.readFromXMLElement(unitElement);
                 }
@@ -764,11 +808,10 @@ public final class InGameInputHandler extends InputHandler {
      */
     private Element setStance(Element element) {
         final FreeColClient freeColClient = getFreeColClient();
-        Game game = freeColClient.getGame();
         Player player = freeColClient.getMyPlayer();
         int stance = Integer.parseInt(element.getAttribute("stance"));
-        Player first = (Player) game.getFreeColGameObject(element.getAttribute("first"));
-        Player second = (Player) game.getFreeColGameObject(element.getAttribute("second"));
+        Player first = (Player) getGame().getFreeColGameObject(element.getAttribute("first"));
+        Player second = (Player) getGame().getFreeColGameObject(element.getAttribute("second"));
 
         /*
          * War declared messages are sometimes not shown, because opponentAttack
@@ -802,7 +845,7 @@ public final class InGameInputHandler extends InputHandler {
      *            holds all the information.
      */
     private Element giveIndependence(Element element) {
-        Player player = (Player) getFreeColClient().getGame().getFreeColGameObject(element.getAttribute("player"));
+        Player player = (Player) getGame().getFreeColGameObject(element.getAttribute("player"));
         player.giveIndependence();
         return null;
     }
@@ -815,7 +858,6 @@ public final class InGameInputHandler extends InputHandler {
      */
     private Element removeGoods(Element element) {
         final FreeColClient freeColClient = getFreeColClient();
-        Game game = getFreeColClient().getGame();
 
         NodeList nodeList = element.getChildNodes();
         Element goodsElement = (Element) nodeList.item(0);
@@ -824,7 +866,7 @@ public final class InGameInputHandler extends InputHandler {
             // player has no colony or nothing to trade
             new ShowMonarchPanelSwingTask(Monarch.WAIVE_TAX, null).confirm();
         } else {
-            final Goods goods = new Goods(game, goodsElement);
+            final Goods goods = new Goods(getGame(), goodsElement);
             final Colony colony = (Colony) goods.getLocation();
             colony.removeGoods(goods);
 
@@ -857,10 +899,9 @@ public final class InGameInputHandler extends InputHandler {
      */
     private Element lostCityRumour(Element element) {
         final FreeColClient freeColClient = getFreeColClient();
-        final Game game = getFreeColClient().getGame();
         final Player player = freeColClient.getMyPlayer();
         int type = Integer.parseInt(element.getAttribute("type"));
-        Unit unit = (Unit) game.getFreeColGameObject(element.getAttribute("unit"));
+        Unit unit = (Unit) getGame().getFreeColGameObject(element.getAttribute("unit"));
 
         if (unit == null) {
             throw new IllegalArgumentException("Unit is null.");
@@ -873,7 +914,7 @@ public final class InGameInputHandler extends InputHandler {
         ModelMessage m;
         switch (type) {
         case LostCityRumour.BURIAL_GROUND:
-            Player indianPlayer = game.getPlayer(tile.getNationOwner());
+            Player indianPlayer = getGame().getPlayer(tile.getNationOwner());
             indianPlayer.modifyTension(player, Tension.TENSION_HATEFUL);
             m = new ModelMessage(tile, "lostCityRumour.BurialGround", new String[][] { { "%nation%",
                     indianPlayer.getNationAsString() } }, ModelMessage.LOST_CITY_RUMOUR);
@@ -901,9 +942,9 @@ public final class InGameInputHandler extends InputHandler {
             unitList = element.getChildNodes();
             for (int i = 0; i < unitList.getLength(); i++) {
                 Element unitElement = (Element) unitList.item(i);
-                newUnit = (Unit) game.getFreeColGameObject(unitElement.getAttribute("ID"));
+                newUnit = (Unit) getGame().getFreeColGameObject(unitElement.getAttribute("ID"));
                 if (newUnit == null) {
-                    newUnit = new Unit(game, unitElement);
+                    newUnit = new Unit(getGame(), unitElement);
                 } else {
                     newUnit.readFromXMLElement(unitElement);
                 }
@@ -917,9 +958,9 @@ public final class InGameInputHandler extends InputHandler {
             unitList = element.getChildNodes();
             for (int i = 0; i < unitList.getLength(); i++) {
                 Element unitElement = (Element) unitList.item(i);
-                newUnit = (Unit) game.getFreeColGameObject(unitElement.getAttribute("ID"));
+                newUnit = (Unit) getGame().getFreeColGameObject(unitElement.getAttribute("ID"));
                 if (newUnit == null) {
-                    newUnit = new Unit(game, unitElement);
+                    newUnit = new Unit(getGame(), unitElement);
                 } else {
                     newUnit.readFromXMLElement(unitElement);
                 }
@@ -944,9 +985,9 @@ public final class InGameInputHandler extends InputHandler {
                                 Element reply = freeColClient.getClient().ask(selectElement);
 
                                 Element unitElement = (Element) reply.getChildNodes().item(0);
-                                Unit unit = (Unit) game.getFreeColGameObject(unitElement.getAttribute("ID"));
+                                Unit unit = (Unit) getGame().getFreeColGameObject(unitElement.getAttribute("ID"));
                                 if (unit == null) {
-                                    unit = new Unit(game, unitElement);
+                                    unit = new Unit(getGame(), unitElement);
                                 } else {
                                     unit.readFromXMLElement(unitElement);
                                 }
@@ -961,9 +1002,9 @@ public final class InGameInputHandler extends InputHandler {
                     unitList = element.getChildNodes();
                     for (int i = 0; i < unitList.getLength(); i++) {
                         Element unitElement = (Element) unitList.item(i);
-                        newUnit = (Unit) game.getFreeColGameObject(unitElement.getAttribute("ID"));
+                        newUnit = (Unit) getGame().getFreeColGameObject(unitElement.getAttribute("ID"));
                         if (newUnit == null) {
-                            newUnit = new Unit(game, unitElement);
+                            newUnit = new Unit(getGame(), unitElement);
                         } else {
                             newUnit.readFromXMLElement(unitElement);
                         }

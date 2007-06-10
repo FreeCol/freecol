@@ -70,8 +70,7 @@ public final class InGameController extends Controller {
         // END FIX
         
         FreeColServer freeColServer = getFreeColServer();
-        Game game = freeColServer.getGame();
-        ServerPlayer oldPlayer = (ServerPlayer) game.getCurrentPlayer();
+        ServerPlayer oldPlayer = (ServerPlayer) getGame().getCurrentPlayer();
         
         if (oldPlayer != player) {
             logger.warning("It is not " + player.getName() + "'s turn!");
@@ -105,15 +104,14 @@ public final class InGameController extends Controller {
      */
     private Player nextPlayer() {
         final FreeColServer freeColServer = getFreeColServer();
-        final Game game = freeColServer.getGame();
         
         if (!isHumanPlayersLeft()) {
-            game.setCurrentPlayer(null);
+            getGame().setCurrentPlayer(null);
             return null;
         }
         
-        if (game.isNextPlayerInNewTurn()) {
-            game.newTurn();
+        if (getGame().isNextPlayerInNewTurn()) {
+            getGame().newTurn();
             if (debugOnlyAITurns > 0) {
                 debugOnlyAITurns--;
             }
@@ -121,10 +119,10 @@ public final class InGameController extends Controller {
             freeColServer.getServer().sendToAll(newTurnElement, null);
         }
         
-        ServerPlayer newPlayer = (ServerPlayer) game.getNextPlayer();
-        game.setCurrentPlayer(newPlayer);
+        ServerPlayer newPlayer = (ServerPlayer) getGame().getNextPlayer();
+        getGame().setCurrentPlayer(newPlayer);
         if (newPlayer == null) {
-            game.setCurrentPlayer(null);
+            getGame().setCurrentPlayer(null);
             return null;
         }
         
@@ -230,13 +228,12 @@ public final class InGameController extends Controller {
      *            father from this list.
      */
     private int[] getRandomFoundingFathers(Player player) {
-        Game game = getFreeColServer().getGame();
         int[] randomFoundingFathers = new int[FoundingFather.TYPE_COUNT];
         for (int i = 0; i < FoundingFather.TYPE_COUNT; i++) {
             int weightSum = 0;
             for (int j = 0; j < FoundingFather.FATHER_COUNT; j++) {
                 if (!player.hasFather(j) && FoundingFather.getType(j) == i) {
-                    weightSum += FoundingFather.getWeight(j, game.getTurn().getAge());
+                    weightSum += FoundingFather.getWeight(j, getGame().getTurn().getAge());
                 }
             }
             if (weightSum == 0) {
@@ -246,7 +243,7 @@ public final class InGameController extends Controller {
                 weightSum = 0;
                 for (int j = 0; j < FoundingFather.FATHER_COUNT; j++) {
                     if (!player.hasFather(j) && FoundingFather.getType(j) == i) {
-                        weightSum += FoundingFather.getWeight(j, game.getTurn().getAge());
+                        weightSum += FoundingFather.getWeight(j, getGame().getTurn().getAge());
                         if (weightSum >= r) {
                             randomFoundingFathers[i] = j;
                             break;
@@ -265,10 +262,9 @@ public final class InGameController extends Controller {
      *         if the game is not finished.
      */
     private Player checkForWinner() {
-        Game game = getFreeColServer().getGame();
-        GameOptions go = game.getGameOptions();
+        GameOptions go = getGame().getGameOptions();
         if (go.getBoolean(GameOptions.VICTORY_DEFEAT_REF)) {
-            Iterator<Player> playerIterator = game.getPlayerIterator();
+            Iterator<Player> playerIterator = getGame().getPlayerIterator();
             while (playerIterator.hasNext()) {
                 Player p = playerIterator.next();
                 if (!p.isAI() && p.getRebellionState() == Player.REBELLION_POST_WAR) {
@@ -278,7 +274,7 @@ public final class InGameController extends Controller {
         }
         if (go.getBoolean(GameOptions.VICTORY_DEFEAT_EUROPEANS)) {
             Player winner = null;
-            Iterator<Player> playerIterator = game.getPlayerIterator();
+            Iterator<Player> playerIterator = getGame().getPlayerIterator();
             while (playerIterator.hasNext()) {
                 Player p = playerIterator.next();
                 if (!p.isDead() && p.isEuropean() && !p.isREF()) {
@@ -297,7 +293,7 @@ public final class InGameController extends Controller {
         }
         if (go.getBoolean(GameOptions.VICTORY_DEFEAT_HUMANS)) {
             Player winner = null;
-            Iterator<Player> playerIterator = game.getPlayerIterator();
+            Iterator<Player> playerIterator = getGame().getPlayerIterator();
             while (playerIterator.hasNext()) {
                 Player p = playerIterator.next();
                 if (!p.isDead() && !p.isAI()) {
@@ -326,8 +322,7 @@ public final class InGameController extends Controller {
     private boolean checkForDeath(Player player) {
         // Die if: (No colonies or units on map) && ((After 20 turns) || (Cannot
         // get a unit from Europe))
-        Game game = getFreeColServer().getGame();
-        Map map = game.getMap();
+        Map map = getGame().getMap();
         if (player.isREF()) {
             return false;
         }
@@ -344,12 +339,12 @@ public final class InGameController extends Controller {
         // settlements on the map.
         if (player.getNation() >= 0 && player.getNation() <= 3) {
             /*
-             * if (game.getTurn().getNumber() > 20 ||
+             * if (getGame().getTurn().getNumber() > 20 ||
              * player.getEurope().getFirstUnit() == null && player.getGold() <
              * 600 && player.getGold() < player.getRecruitPrice()) {
              * 
              */
-            if (game.getTurn().getNumber() > 20) {
+            if (getGame().getTurn().getNumber() > 20) {
                 return true;
             } else if (player.getEurope() == null) {
                 return true;
@@ -376,7 +371,6 @@ public final class InGameController extends Controller {
      */
     private void monarchAction(ServerPlayer player) {
         final ServerPlayer nextPlayer = player;
-        final Game game = getFreeColServer().getGame();
         Thread t = new Thread() {
             public void run() {
                 try {
@@ -447,7 +441,7 @@ public final class InGameController extends Controller {
                             logger.warning("Declared war on nobody.");
                             return;
                         }
-                        nextPlayer.setStance(game.getPlayer(nation), Player.WAR);
+                        nextPlayer.setStance(getGame().getPlayer(nation), Player.WAR);
                         monarchActionElement.setAttribute("nation", String.valueOf(nation));
                         try {
                             nextPlayer.getConnection().send(monarchActionElement);
@@ -465,7 +459,7 @@ public final class InGameController extends Controller {
                         }
                         break;
                     case Monarch.SUPPORT_SEA:
-                        newUnit = new Unit(game, nextPlayer.getEurope(), nextPlayer, Unit.FRIGATE, Unit.ACTIVE);
+                        newUnit = new Unit(getGame(), nextPlayer.getEurope(), nextPlayer, Unit.FRIGATE, Unit.ACTIVE);
                         nextPlayer.getEurope().add(newUnit);
                         monarchActionElement.appendChild(newUnit.toXMLElement(nextPlayer, monarchActionElement
                                 .getOwnerDocument()));
@@ -509,18 +503,17 @@ public final class InGameController extends Controller {
     }
 
     private void createUnits(int[] units, Element element, ServerPlayer nextPlayer) {
-        final Game game = getFreeColServer().getGame();
         Unit newUnit;
         for (int type = 0; type < units.length; type++) {
             for (int i = 0; i < units[type]; i++) {
                 if (type == Monarch.ARTILLERY) {
-                    newUnit = new Unit(game, nextPlayer.getEurope(), nextPlayer, Unit.ARTILLERY, Unit.ACTIVE);
+                    newUnit = new Unit(getGame(), nextPlayer.getEurope(), nextPlayer, Unit.ARTILLERY, Unit.ACTIVE);
                 } else {
                     boolean mounted = false;
                     if (type == Monarch.DRAGOON) {
                         mounted = true;
                     }
-                    newUnit = new Unit(game, nextPlayer.getEurope(), nextPlayer, Unit.VETERAN_SOLDIER, Unit.ACTIVE,
+                    newUnit = new Unit(getGame(), nextPlayer.getEurope(), nextPlayer, Unit.VETERAN_SOLDIER, Unit.ACTIVE,
                             true, mounted, 0, false);
                 }
                 nextPlayer.getEurope().add(newUnit);
