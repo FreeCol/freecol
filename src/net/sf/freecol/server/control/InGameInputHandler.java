@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Vector;
 import java.util.logging.Logger;
+import net.sf.freecol.common.model.Building;
 
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.ColonyTile;
@@ -755,8 +756,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
             throw new IllegalStateException("Not your unit!");
         }
         Tile newTile = getGame().getMap().getNeighbourOrNull(direction, unit.getTile());
-        // boolean disembark = !unit.getTile().isLand() && newTile.isLand() &&
-        // newTile.getSettlement() == null;
+        
         Iterator<Player> enemyPlayerIterator = getGame().getPlayerIterator();
         while (enemyPlayerIterator.hasNext()) {
             ServerPlayer enemyPlayer = (ServerPlayer) enemyPlayerIterator.next();
@@ -790,8 +790,67 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
                         + enemyPlayer.getConnection());
             }
         }
+        
         unit.move(direction);
+        
         Element reply = Message.createNewRootElement("update");
+        
+        // Check if ship is slowed
+        if (unit.isNaval() && unit.getMovesLeft() > 0) {
+            Iterator<Position> tileIterator = getGame().getMap().getAdjacentIterator(unit.getTile().getPosition());
+            float attackPower = 0;
+            Unit attacker = null;
+            
+            while (tileIterator.hasNext()) {
+                Tile tile = getGame().getMap().getTile(tileIterator.next());
+                Colony colony = tile.getColony();
+                // ships in settlements don't slow enemy ships
+                if (colony != null) {
+                    Player enemy = colony.getOwner();
+                    if (player != enemy && (player.getStance(enemy) == Player.WAR
+                            || unit.getType() == Unit.PRIVATEER)
+                            && colony.getBuilding(Building.STOCKADE).getLevel() > Building.HOUSE) {
+                        float bombardingPower = colony.getBombardingPower();
+                        if (bombardingPower > 0) {
+                            attackPower += bombardingPower;
+                            if (attacker == null) {
+                                attacker = colony.getBombardingAttacker();
+                            }
+                        }
+                    }
+                } else if (!tile.isLand() && tile.getFirstUnit() != null) {
+                    Player enemy = tile.getFirstUnit().getOwner();
+                    if (player == enemy) { // own units, check another tile
+                        continue;
+                    }
+                    
+                    for (Unit enemyUnit : tile.getUnitList()) {
+                        if (enemyUnit.isOffensiveUnit() && (player.getStance(enemy) == Player.WAR
+                                || enemyUnit.getType() == Unit.PRIVATEER
+                                || unit.getType() == Unit.PRIVATEER)) {
+                            attackPower += enemyUnit.getOffensePower(unit);
+                            if (attacker == null) {
+                                attacker = enemyUnit;
+                            }
+                        }
+                    }
+                }
+            }
+            
+            if (attackPower > 0) {
+                float defensePower = unit.getDefensePower(attacker);
+                float totalProbability = attackPower + defensePower;
+                int r = getPseudoRandom().nextInt(Math.round(totalProbability) + 1);
+                if (r < attackPower) {
+                    int diff = Math.max(0, Math.round(attackPower - defensePower));
+                    int moves = Math.min(9, 3 + diff / 3);
+                    unit.setMovesLeft(unit.getMovesLeft() - moves);
+                    reply.setAttribute("movesSlowed", Integer.toString(moves));
+                    reply.setAttribute("slowedBy", attacker.getID());
+                }
+            }
+        }
+        
         Vector<Tile> surroundingTiles = getGame().getMap().getSurroundingTiles(unit.getTile(), unit.getLineOfSight());
         for (int i = 0; i < surroundingTiles.size(); i++) {
             Tile t = surroundingTiles.get(i);

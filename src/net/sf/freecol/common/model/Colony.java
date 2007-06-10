@@ -1901,8 +1901,60 @@ public final class Colony extends Settlement implements Location, Nameable {
 
     /**
      * Returns just this Colony itself.
+     * 
+     * @return this colony.
      */
     public Colony getColony() {
         return this;
+    }
+    
+    /**
+     * Returns the power for bombarding
+     * 
+     * @return the power for bombarding
+     */
+    public float getBombardingPower() {
+        float attackPower = 0;
+        Iterator<Unit> unitIterator = getTile().getUnitIterator();
+        while (unitIterator.hasNext()) {
+            Unit unit = unitIterator.next();
+            switch (unit.getType()) {
+            case Unit.ARTILLERY:
+            case Unit.DAMAGED_ARTILLERY:
+                attackPower += unit.getOffensePower(unit);
+                break;
+            default:
+            }
+        }
+        if (attackPower > 48) {
+            attackPower = 48;
+        }
+        return attackPower;
+    }
+    
+    /**
+     * Returns a unit to bombard
+     *
+     * @return a unit to bombard
+     */
+    public Unit getBombardingAttacker() {
+        Unit attacker = null;
+        Iterator<Unit> unitIterator = getTile().getUnitIterator();
+        loop: while (unitIterator.hasNext()) {
+            Unit unit = unitIterator.next();
+            logger.finest("Unit is " + unit.getName());
+            switch (unit.getType()) {
+            case Unit.ARTILLERY:
+                attacker = unit;
+                break loop;
+            case Unit.DAMAGED_ARTILLERY:
+                if (attacker == null) {
+                    attacker = unit;
+                }
+                break;
+            default:
+            }
+        }
+        return attacker;
     }
 }

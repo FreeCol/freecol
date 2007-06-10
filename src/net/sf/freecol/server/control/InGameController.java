@@ -337,7 +337,7 @@ public final class InGameController extends Controller {
         }
         // At this point we know the player does not have any units or
         // settlements on the map.
-        if (player.getNation() >= 0 && player.getNation() <= 3) {
+        if (Player.isEuropeanNoREF(player.getNation())) {
             /*
              * if (getGame().getTurn().getNumber() > 20 ||
              * player.getEurope().getFirstUnit() == null && player.getGold() <
@@ -533,37 +533,17 @@ public final class InGameController extends Controller {
             Building stockade = colony.getBuilding(Building.STOCKADE);
             if (stockade.getLevel() > Building.HOUSE && !colony.isLandLocked()) {
                 logger.finest("Colony has harbour and fort.");
-                float attackPower = 0;
-                Unit attacker = null;
-                Iterator<Unit> unitIterator = colony.getTile().getUnitIterator();
-                while (unitIterator.hasNext()) {
-                    Unit unit = unitIterator.next();
-                    logger.finest("Unit is " + unit.getName());
-                    switch (unit.getType()) {
-                    case Unit.ARTILLERY:
-                        attacker = unit;
-                        attackPower += unit.getOffensePower(unit);
-                        break;
-                    case Unit.DAMAGED_ARTILLERY:
-                        if (attacker == null) {
-                            attacker = unit;
-                        }
-                        attackPower += unit.getOffensePower(unit);
-                        break;
-                    default:
-                    }
-                }
+                float attackPower = colony.getBombardingPower();
                 if (attackPower <= 0) {
                     continue;
-                } else if (attackPower > 48) {
-                    attackPower = 48;
                 }
+                Unit attacker = colony.getBombardingAttacker();
                 logger.finest("Colony has attack power " + attackPower);
                 Position colonyPosition = colony.getTile().getPosition();
                 for (int direction = 0; direction < Map.NUMBER_OF_DIRECTIONS; direction++) {
                     Tile tile = map.getTile(Map.getAdjacent(colonyPosition, direction));
                     if (!tile.isLand()) {
-                        unitIterator = tile.getUnitIterator();
+                        Iterator<Unit> unitIterator = tile.getUnitIterator();
                         while (unitIterator.hasNext()) {
                             Unit unit = unitIterator.next();
                             Player player = unit.getOwner();

@@ -54,6 +54,7 @@ import net.sf.freecol.common.model.Map.Position;
 import net.sf.freecol.common.model.TradeRoute.Stop;
 import net.sf.freecol.common.networking.Message;
 import net.sf.freecol.common.networking.NetworkConstants;
+import net.sf.freecol.common.util.Xml;
 
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
@@ -1229,6 +1230,13 @@ public final class InGameController implements NetworkConstants {
         // client.send(moveElement);
         Element reply = client.ask(moveElement);
         freeColClient.getInGameInputHandler().handle(client.getConnection(), reply);
+        if (Xml.hasAttribute(reply, "movesSlowed")) {
+            // ship slowed
+            unit.setMovesLeft(unit.getMovesLeft() - Xml.intAttribute(reply, "movesSlowed"));
+            Unit slowedBy = (Unit) freeColClient.getGame().getFreeColGameObject(reply.getAttribute("slowedBy"));
+            canvas.showInformationMessage("model.unit.slowed", new String[][] {{"%unit%", unit.getName()}, 
+                {"%enemyUnit%", slowedBy.getName()}, {"%enemyNation%", slowedBy.getOwner().getNationAsString()}});
+        }
 
         // set location again in order to meet with people player don't see
         // before move
