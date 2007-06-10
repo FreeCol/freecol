@@ -2563,37 +2563,31 @@ public final class InGameController implements NetworkConstants {
      * @param unit The unit to be moved to America.
      */
     public void moveToAmerica(Unit unit) {
-        Canvas canvas = freeColClient.getCanvas();
-        Player player = freeColClient.getMyPlayer();
+        final Canvas canvas = freeColClient.getCanvas();
+        final Player player = freeColClient.getMyPlayer();
         if (freeColClient.getGame().getCurrentPlayer() != player) {
             canvas.showInformationMessage("notYourTurn");
             return;
         }
 
-        Client client = freeColClient.getClient();
+        final Client client = freeColClient.getClient();
+        final ClientOptions co = canvas.getClient().getClientOptions();
 
         // Ask for autoload emigrants
-        if (unit.getLocation() instanceof Europe &&
-            canvas.getClient().getClientOptions().getBoolean(ClientOptions.AUTOLOAD_EMIGRANTS)) {
-            int spaceLeft = unit.getSpaceLeft();
-            boolean leaveColonists = true;
-            if (spaceLeft > 0) {
+        if (unit.getLocation() instanceof Europe) {
+            final boolean autoload = co.getBoolean(ClientOptions.AUTOLOAD_EMIGRANTS);
+            if (autoload) {
+                int spaceLeft = unit.getSpaceLeft();
                 List<Unit> unitsInEurope = unit.getLocation().getUnitList();
                 for (Unit possiblePassenger : unitsInEurope) {
+                    if (possiblePassenger.isNaval()) {
+                        continue;
+                    }
                     if (possiblePassenger.getTakeSpace() <= spaceLeft) {
-                        if (leaveColonists) {
-                            leaveColonists = canvas.showConfirmDialog("europe.leaveColonists", "yes", "no",
-                                    new String[][] {{"%newWorld%", player.getNewLandName()}});
-                            if (leaveColonists) {
-                                break;
-                            }
-                        }
-                        
                         boardShip(possiblePassenger, unit);
                         spaceLeft -= possiblePassenger.getTakeSpace();
-                        if (spaceLeft <= 0) {
-                            break;
-                        }
+                    } else {
+                        break;
                     }
                 }
             }

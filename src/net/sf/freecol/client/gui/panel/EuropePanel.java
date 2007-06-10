@@ -29,6 +29,7 @@ import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.border.TitledBorder;
 
+import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.control.InGameController;
 import net.sf.freecol.client.gui.Canvas;
@@ -696,8 +697,24 @@ public final class EuropePanel extends FreeColPanel implements ActionListener {
         public Component add(Component comp, boolean editState) {
             if (editState) {
                 if (comp instanceof UnitLabel) {
+                    final Unit unit = ((UnitLabel) comp).getUnit();
+                    final ClientOptions co = freeColClient.getClientOptions();
+                    boolean autoload = co.getBoolean(ClientOptions.AUTOLOAD_EMIGRANTS);
+                    if (!autoload && docksPanel.getUnitCount() > 0) {
+                        boolean leaveColonists = parent.showConfirmDialog(
+                                "europe.leaveColonists",
+                                "yes",
+                                "no",
+                                new String[][] {
+                                    {"%newWorld%", unit.getOwner().getNewLandName()}
+                                });
+                        if (!leaveColonists) {
+                            // Remain in Europe.
+                            return null;
+                        }
+                    }
                     comp.getParent().remove(comp);
-                    Unit unit = ((UnitLabel) comp).getUnit();
+
                     inGameController.moveToAmerica(unit);
                     docksPanel.removeAll();
                     for (Unit u : europe.getUnitList()) {
@@ -843,6 +860,16 @@ public final class EuropePanel extends FreeColPanel implements ActionListener {
             Component c = add(comp);
             europePanel.refresh();
             return c;
+        }
+        
+        public int getUnitCount() {
+            int number = 0;
+            for (Unit u : europe.getUnitList()) {
+                if (!u.isNaval()) {
+                    number++;
+                }
+            }
+            return number;
         }
 
         public String getUIClassID() {

@@ -319,7 +319,7 @@ public class ClientOptions extends OptionMap {
         guiGroup.add(new BooleanOption(ALWAYS_CENTER, "clientOptions.gui."+ ALWAYS_CENTER +".name", "clientOptions.gui."+ ALWAYS_CENTER +".shortDescription", false));
         guiGroup.add(new BooleanOption(DISPLAY_FOG_OF_WAR, "clientOptions.gui."+ DISPLAY_FOG_OF_WAR +".name", "clientOptions.gui."+ DISPLAY_FOG_OF_WAR +".shortDescription", false));        
         guiGroup.add(new BooleanOption(MAP_SCROLL_ON_DRAG, "clientOptions.gui."+ MAP_SCROLL_ON_DRAG +".name", "clientOptions.gui."+ MAP_SCROLL_ON_DRAG +".shortDescription", true));
-        guiGroup.add(new BooleanOption(AUTOLOAD_EMIGRANTS, "clientOptions.gui."+ AUTOLOAD_EMIGRANTS +".name", "clientOptions.gui."+ AUTOLOAD_EMIGRANTS +".shortDescription", true));
+        guiGroup.add(new BooleanOption(AUTOLOAD_EMIGRANTS, "clientOptions.gui."+ AUTOLOAD_EMIGRANTS +".name", "clientOptions.gui."+ AUTOLOAD_EMIGRANTS +".shortDescription", false));
         guiGroup.add(new SelectOption(COLONY_COMPARATOR,
                                       "clientOptions.gui." + COLONY_COMPARATOR + ".name",
                                       "clientOptions.gui." + COLONY_COMPARATOR + ".shortDescription",
