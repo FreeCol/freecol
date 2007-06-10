@@ -1185,7 +1185,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
             Iterator<Unit> unitIt = map.getTile(it.next()).getUnitIterator();
             while (unitIt.hasNext()) {
                 Unit unit = unitIt.next();
-                if (unit.getState() == Unit.SENTRY) {
+                if (unit.getState() == Unit.SENTRY && unit.getOwner() != getOwner()) {
                     unit.setState(Unit.ACTIVE);
                 }
             }
