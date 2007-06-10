@@ -212,6 +212,7 @@ public final class PreGameController {
 
         if (freeColClient.getMyPlayer().equals(freeColClient.getGame().getCurrentPlayer())) {
             canvas.requestFocus();
+            freeColClient.getInGameController().nextModelMessage();
         } else {
             //canvas.setEnabled(false);
         }
