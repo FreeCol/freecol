@@ -146,7 +146,7 @@ public class ClientOptions extends OptionMap {
     /**
      * Option for autoload emigrants on saling to america.
      */
-    public static final String AUTOLOAD_EMIGRANTS = "mapScrollOnDrag";
+    public static final String AUTOLOAD_EMIGRANTS = "autoloadEmigrants";
 
     /**
      * If selected: Enables smooth rendering of the minimap when zoomed out.

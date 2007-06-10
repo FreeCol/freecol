@@ -77,9 +77,9 @@ public final class OptionGroupUI extends JPanel implements OptionUpdater {
                     if ((horizontalPanel == null) || !buttonAdded) {
                         horizontalPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
                         horizontalPanel.setOpaque(false);
+                        add(horizontalPanel);
                     }
                     horizontalPanel.add(ogb);
-                    add(horizontalPanel);
                     buttonAdded = true;
                 } else {
                     final OptionGroupUI groupUI = new OptionGroupUI((OptionGroup) o, editable, level+1);
@@ -94,9 +94,9 @@ public final class OptionGroupUI extends JPanel implements OptionUpdater {
                 if (!alreadyAdded || buttonAdded) {
                     horizontalPanel = new JPanel(new GridLayout(1, 2, H_GAP, 5));
                     horizontalPanel.setOpaque(false);
+                    add(horizontalPanel);
                 }
                 horizontalPanel.add(boi);
-                add(horizontalPanel);
                 if (alreadyAdded) {
                     horizontalPanel = null;
                 }
