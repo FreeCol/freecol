@@ -700,7 +700,9 @@ public final class EuropePanel extends FreeColPanel implements ActionListener {
                     final Unit unit = ((UnitLabel) comp).getUnit();
                     final ClientOptions co = freeColClient.getClientOptions();
                     boolean autoload = co.getBoolean(ClientOptions.AUTOLOAD_EMIGRANTS);
-                    if (!autoload && docksPanel.getUnitCount() > 0) {
+                    if (!autoload
+                            && docksPanel.getUnitCount() > 0
+                            && unit.getSpaceLeft() > 0) {
                         boolean leaveColonists = parent.showConfirmDialog(
                                 "europe.leaveColonists",
                                 "yes",
