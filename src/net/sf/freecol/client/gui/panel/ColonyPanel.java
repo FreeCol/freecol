@@ -1439,11 +1439,8 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener {
 
         public void initialize() {
             warehousePanel.removeAll();
-            Iterator<Goods> goodsIterator =
-                    getColony().getGoodsContainer().getFullGoodsIterator();
-            while (goodsIterator.hasNext()) {
-                Goods goods = goodsIterator.next();
-
+            List<Goods> allGoods = getColony().getGoodsContainer().getFullGoods();
+            for (Goods goods : allGoods) {
                 GoodsLabel goodsLabel = new GoodsLabel(goods, parent);
                 if (colonyPanel.isEditable()) {
                     goodsLabel.setTransferHandler(defaultTransferHandler);

@@ -3022,9 +3022,8 @@ public class Player extends FreeColGameObject implements Nameable {
         Iterator<Settlement> colonyIterator = getSettlementIterator();
         while (colonyIterator.hasNext()) {
             Colony colony = (Colony) colonyIterator.next();
-            Iterator<Goods> goodsIterator = colony.getCompactGoodsIterator();
-            while (goodsIterator.hasNext()) {
-                Goods currentGoods = goodsIterator.next();
+            List<Goods> colonyGoods = colony.getCompactGoods();
+            for (Goods currentGoods : colonyGoods) {
                 if (getArrears(currentGoods) == 0) {
                     // never discard more than 100 units
                     if (currentGoods.getAmount() > 100) {

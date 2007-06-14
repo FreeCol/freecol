@@ -710,21 +710,6 @@ public final class Colony extends Settlement implements Location, Nameable {
         return getUnitList().iterator();
     }
 
-    public Iterator<Goods> getGoodsIterator() {
-        return goodsContainer.getGoodsIterator();
-    }
-
-    /**
-     * Gets an <code>Iterator</code> of every <code>Goods</code> in this
-     * <code>Colony</code>. There is only one <code>Goods</code> for each
-     * type of goods.
-     * 
-     * @return The <code>Iterator</code>.
-     */
-    public Iterator<Goods> getCompactGoodsIterator() {
-        return goodsContainer.getCompactGoodsIterator();
-    }
-
     /**
      * Returns true if the custom house should export this type of goods.
      * 
@@ -1517,9 +1502,8 @@ public final class Colony extends Settlement implements Location, Nameable {
     // Export goods if custom house is built
     private void exportGoods() {
         if (getBuilding(Building.CUSTOM_HOUSE).isBuilt()) {
-            Iterator<Goods> goodsIterator = getCompactGoodsIterator();
-            while (goodsIterator.hasNext()) {
-                Goods goods = goodsIterator.next();
+            List<Goods> exportGoods = getCompactGoods();
+            for (Goods goods : exportGoods) {
                 if (getExports(goods) && (owner.canTrade(goods, Market.CUSTOM_HOUSE))) {
                     int type = goods.getType();
                     int amount = goods.getAmount() - getExportLevel()[type];

@@ -1,6 +1,7 @@
 package net.sf.freecol.common.model;
 
 import java.util.Iterator;
+import java.util.List;
 import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamException;
@@ -203,6 +204,28 @@ abstract public class Settlement extends FreeColGameObject implements Location, 
 
     public GoodsContainer getGoodsContainer() {
         return goodsContainer;
+    }
+
+    /**
+     * Gets an <code>Iterator</code> of every <code>Goods</code> in this
+     * <code>GoodsContainer</code>. Each <code>Goods</code> have a maximum
+     * amount of 100.
+     *
+     * @return The <code>Iterator</code>.
+     */
+    public Iterator<Goods> getGoodsIterator() {
+        return goodsContainer.getGoodsIterator();
+    }
+
+    /**
+     * Gets an <code>List</code> with every <code>Goods</code> in this
+     * <code>Colony</code>. There is only one <code>Goods</code> for each
+     * type of goods.
+     * 
+     * @return The <code>Iterator</code>.
+     */
+    public List<Goods> getCompactGoods() {
+        return goodsContainer.getCompactGoods();
     }
 
 

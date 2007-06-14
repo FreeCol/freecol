@@ -3,6 +3,7 @@ package net.sf.freecol.server.ai.mission;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamException;
@@ -242,9 +243,8 @@ public class IndianDemandMission extends Mission {
         } else if (tension <= Tension.DISPLEASED) {
             Market market = target.getOwner().getMarket();
             int value = 0;
-            Iterator<Goods> iterator = warehouse.getCompactGoodsIterator();
-            while (iterator.hasNext()) {
-                Goods currentGoods = iterator.next();
+            List<Goods> warehouseGoods = warehouse.getCompactGoods();
+            for (Goods currentGoods : warehouseGoods) {
                 int goodsValue = market.getSalePrice(currentGoods);
                 if (currentGoods.getType() == Goods.FOOD || currentGoods.getType() == Goods.HORSES
                         || currentGoods.getType() == Goods.MUSKETS) {
