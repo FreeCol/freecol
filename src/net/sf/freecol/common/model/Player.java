@@ -2280,7 +2280,8 @@ public class Player extends FreeColGameObject implements Nameable {
         int newSoL = 0;
 
         // settlements
-        for (Settlement settlement : getSettlements()) {
+        ArrayList<Settlement> settlements = new ArrayList(getSettlements());
+        for (Settlement settlement : settlements) {
             logger.finest("Calling newTurn for settlement " + settlement.toString());
             settlement.newTurn();
             if (isEuropean()) {

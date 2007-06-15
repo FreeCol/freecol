@@ -1631,6 +1631,10 @@ public final class Colony extends Settlement implements Location, Nameable {
 
         addColonyTileProduction();
         updateFood();
+        if (getUnitCount() == 0) {
+            dispose();
+            return;
+        }
         updateHorses();
         checkForNewColonist();
 
