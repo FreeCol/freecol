@@ -3,6 +3,7 @@ package net.sf.freecol.server.control;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Vector;
 import java.util.logging.Logger;
 import net.sf.freecol.common.model.Building;
@@ -1203,9 +1204,8 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         // Send capturedGoods if UNIT_HIDING is true because when it's
         // false unit is already sent with carried goods and units
         if (unit.canCaptureGoods() && getGame().getGameOptions().getBoolean(GameOptions.UNIT_HIDING)) {
-            Iterator<Goods> goodsIt = unit.getGoodsContainer().getCompactGoodsIterator();
-            while (goodsIt.hasNext()) {
-                Goods newGoods = goodsIt.next();
+            List<Goods> goodsInUnit = unit.getGoodsContainer().getCompactGoods();
+            for (Goods newGoods : goodsInUnit) {
                 int capturedGoods = newGoods.getAmount() - oldGoodsCounts[newGoods.getType()];
                 if (capturedGoods > 0) {
                     Element captured = reply.getOwnerDocument().createElement("capturedGoods");
@@ -2521,6 +2521,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
             throw new IllegalArgumentException("This was not the price we agreed upon! Cheater?");
         }
         unit.trade(settlement, goods, gold);
+
         return null;
     }
 
