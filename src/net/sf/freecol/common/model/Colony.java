@@ -1776,69 +1776,18 @@ public final class Colony extends Settlement implements Location, Nameable {
             tile = new Tile(getGame(), in.getAttributeValue(null, "owner"));
         }
         owner.addSettlement(this);
-        final String hammersStr = in.getAttributeValue(null, "hammers");
-        if (hammersStr != null) {
-            hammers = Integer.parseInt(hammersStr);
-        } else {
-            hammers = 0;
-        }
-        final String bellsStr = in.getAttributeValue(null, "bells");
-        if (bellsStr != null) {
-            bells = Integer.parseInt(bellsStr);
-        } else {
-            bells = 0;
-        }
-        final String sonsOfLibertyStr = in.getAttributeValue(null, "sonsOfLiberty");
-        if (sonsOfLibertyStr != null) {
-            sonsOfLiberty = Integer.parseInt(sonsOfLibertyStr);
-        } else {
-            sonsOfLiberty = 0;
-        }
-        final String oldSonsOfLibertyStr = in.getAttributeValue(null, "oldSonsOfLiberty");
-        if (oldSonsOfLibertyStr != null) {
-            oldSonsOfLiberty = Integer.parseInt(oldSonsOfLibertyStr);
-        } else {
-            oldSonsOfLiberty = 0;
-        }
-        final String toriesStr = in.getAttributeValue(null, "tories");
-        if (toriesStr != null) {
-            tories = Integer.parseInt(toriesStr);
-        } else {
-            tories = 0;
-        }
-        final String oldToriesStr = in.getAttributeValue(null, "oldTories");
-        if (oldToriesStr != null) {
-            oldTories = Integer.parseInt(oldToriesStr);
-        } else {
-            oldTories = 0;
-        }
-        final String productionBonusStr = in.getAttributeValue(null, "productionBonus");
-        if (productionBonusStr != null) {
-            productionBonus = Integer.parseInt(productionBonusStr);
-        } else {
-            productionBonus = 0;
-        }
-        final String currentlyBuildingStr = in.getAttributeValue(null, "currentlyBuilding");
-        if (currentlyBuildingStr != null) {
-            currentlyBuilding = Integer.parseInt(currentlyBuildingStr);
-        } else {
-            currentlyBuilding = -1;
-        }
-        final String landLockedStr = in.getAttributeValue(null, "landLocked");
-        if (landLockedStr != null) {
-            landLocked = Boolean.valueOf(landLockedStr).booleanValue();
-        } else {
-            landLocked = true;
-        }
-        final String unitCountStr = in.getAttributeValue(null, "unitCount");
-        if (unitCountStr != null) {
-            unitCount = Integer.parseInt(unitCountStr);
-        } else {
-            unitCount = -1;
-        }
+        hammers = getAttribute(in, "hammers", 0);
+        bells = getAttribute(in, "bells", 0);
+        sonsOfLiberty = getAttribute(in, "sonsOfLiberty", 0);
+        oldSonsOfLiberty = getAttribute(in, "oldSonsOfLiberty", 0);
+        tories = getAttribute(in, "tories", 0);
+        oldTories = getAttribute(in, "oldTories", 0);
+        productionBonus = getAttribute(in, "productionBonus", 0);
+        currentlyBuilding = getAttribute(in, "currentlyBuilding", -1);
+        landLocked = getAttribute(in, "landLocked", true);
+        unitCount = getAttribute(in, "unitCount", -1);
         final String exportString = in.getAttributeValue(null, "exports");
         if (exportString != null) {
-            // exports = new boolean[Goods.NUMBER_OF_TYPES];
             for (int i = 0; i < exportString.length(); i++) {
                 exports[i] = ((exportString.charAt(i) == '1') ? true : false);
             }

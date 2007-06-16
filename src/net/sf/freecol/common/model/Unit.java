@@ -4518,12 +4518,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
             setIndianSettlement(null);
         }
 
-        final String treasureAmountStr = in.getAttributeValue(null, "treasureAmount");
-        if (treasureAmountStr != null) {
-            treasureAmount = Integer.parseInt(treasureAmountStr);
-        } else {
-            treasureAmount = 0;
-        }
+        treasureAmount = getAttribute(in, "treasureAmount", 0);
 
         final String destinationStr = in.getAttributeValue(null, "destination");
         if (destinationStr != null) {
@@ -4573,12 +4568,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
             experience = Integer.parseInt(experienceStr);
         }
 
-        final String visibleGoodsCountStr = in.getAttributeValue(null, "visibleGoodsCount");
-        if (visibleGoodsCountStr != null) {
-            visibleGoodsCount = Integer.parseInt(visibleGoodsCountStr);
-        } else {
-            visibleGoodsCount = -1;
-        }
+        visibleGoodsCount = getAttribute(in, "visibleGoodsCount", -1);
 
         final String entryLocationStr = in.getAttributeValue(null, "entryLocation");
         if (entryLocationStr != null) {

@@ -2570,18 +2570,8 @@ public class Player extends FreeColGameObject implements Nameable {
         gold = Integer.parseInt(in.getAttributeValue(null, "gold"));
         crosses = Integer.parseInt(in.getAttributeValue(null, "crosses"));
         bells = Integer.parseInt(in.getAttributeValue(null, "bells"));
-        final String oldSoLStr = in.getAttributeValue(null, "oldSoL");
-        if (oldSoLStr != null) {
-            oldSoL = Integer.parseInt(oldSoLStr);
-        } else {
-            oldSoL = 0;
-        }
-        final String bellsBonusStr = in.getAttributeValue(null, "bellsBonus");
-        if (bellsBonusStr != null) {
-            bellsBonus = Integer.parseInt(bellsBonusStr);
-        } else {
-            bellsBonus = 0;
-        }
+        oldSoL = getAttribute(in, "oldSoL", 0);
+        bellsBonus = getAttribute(in, "bellsBonus", 0);
         ready = (new Boolean(in.getAttributeValue(null, "ready"))).booleanValue();
         ai = (new Boolean(in.getAttributeValue(null, "ai"))).booleanValue();
         dead = (new Boolean(in.getAttributeValue(null, "dead"))).booleanValue();
@@ -2609,10 +2599,7 @@ public class Player extends FreeColGameObject implements Nameable {
                 fathers[i] = ((foundingFathersStr.charAt(i) == '1') ? true : false);
             }
         }
-        final String attackedByPrivateersStr = in.getAttributeValue(null, "attackedByPrivateers");
-        if (attackedByPrivateersStr != null) {
-            attackedByPrivateers = Boolean.valueOf(attackedByPrivateersStr).booleanValue();
-        }
+        attackedByPrivateers = getAttribute(in, "attackedByPrivateers", false);
         final String entryLocationStr = in.getAttributeValue(null, "entryLocation");
         if (entryLocationStr != null) {
             entryLocation = (Location) getGame().getFreeColGameObject(entryLocationStr);
