@@ -29,7 +29,7 @@ public class ReportTurnAction extends MapboardAction {
      * @param freeColClient The main controller object for the client.
      */
     ReportTurnAction(FreeColClient freeColClient) {
-        super(freeColClient, "menuBar.report.turn", null, KeyStroke.getKeyStroke(KeyEvent.VK_F10, 0));
+        super(freeColClient, "menuBar.report.turn", null, KeyStroke.getKeyStroke(KeyEvent.VK_F11, 0));
     }
     
     /**

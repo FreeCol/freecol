@@ -30,7 +30,7 @@ public class ReportRequirementsAction extends MapboardAction {
      * @param freeColClient The main controller object for the client.
      */
     ReportRequirementsAction(FreeColClient freeColClient) {
-        super(freeColClient, "menuBar.report.requirements", null, KeyStroke.getKeyStroke(KeyEvent.VK_F11, 0));
+        super(freeColClient, "menuBar.report.requirements", null, KeyStroke.getKeyStroke(KeyEvent.VK_F12, 0));
     }
     
     /**
