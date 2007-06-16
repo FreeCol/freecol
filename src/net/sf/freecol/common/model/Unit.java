@@ -2375,7 +2375,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
      */
     public void setHitpoints(int hitpoints) {
         this.hitpoints = hitpoints;
-        if (hitpoints >= getInitialHitpoints(getType()) && getState() == FORTIFIED) {
+        if (hitpoints >= getInitialHitpoints(getType())) {
             setState(ACTIVE);
             addModelMessage(this, "model.unit.shipRepaired",
                             new String[][] {
@@ -4720,5 +4720,12 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
                 && (getLocation() instanceof Colony 
                         || getLocation() instanceof Building 
                         || getLocation() instanceof ColonyTile);
+    }
+
+    /**
+     * Return how many turns left to be repaired
+     */
+    public int getTurnsForRepair() {
+        return getInitialHitpoints(getType()) - getHitpoints();
     }
 }
