@@ -36,6 +36,7 @@ import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.networking.Message;
 import net.sf.freecol.common.networking.NetworkConstants;
 import net.sf.freecol.common.networking.NoRouteToServerException;
+import net.sf.freecol.common.option.BooleanOption;
 import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.ai.AIPlayer;
 import net.sf.freecol.server.model.ServerPlayer;
@@ -411,6 +412,11 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         register("abandonColony", new NetworkRequestHandler() {
             public Element handle(Connection connection, Element element) {
                 return abandonColony(connection, element);
+            }
+        });
+        register("continuePlaying", new NetworkRequestHandler() {
+            public Element handle(Connection connection, Element element) {
+                return continuePlaying(connection, element);
             }
         });
     }
@@ -2741,6 +2747,32 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
                 logger.warning("Could not send \"demand\"-message!");
             }
         }
+        return null;
+    }
+
+    /**
+     * Handles an "continuePlaying"-message.
+     * 
+     * @param connection The <code>Connection</code> the message was received
+     *            on.
+     * @param element The element containing the request.
+     */
+    private Element continuePlaying(Connection connection, Element element) {
+        ServerPlayer player = getFreeColServer().getPlayer(connection);
+        if (!getFreeColServer().isSingleplayer()) {
+            throw new IllegalStateException("Can't continue playing in multiplayer!");
+        }
+        if (player != getFreeColServer().getInGameController().checkForWinner()) {
+            throw new IllegalStateException("Can't continue playing! Player "
+                    + player.getName() + " hasn't won the game");
+        }
+        GameOptions go = getGame().getGameOptions();
+        ((BooleanOption) go.getObject(GameOptions.VICTORY_DEFEAT_REF)).setValue(false);
+        ((BooleanOption) go.getObject(GameOptions.VICTORY_DEFEAT_EUROPEANS)).setValue(false);
+        ((BooleanOption) go.getObject(GameOptions.VICTORY_DEFEAT_HUMANS)).setValue(false);
+        
+        // victory panel is shown after end turn, end turn again to start turn of next player
+        getFreeColServer().getInGameController().endTurn(player);
         return null;
     }
 

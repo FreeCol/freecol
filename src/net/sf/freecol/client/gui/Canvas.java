@@ -413,6 +413,7 @@ public final class Canvas extends JDesktopPane {
      */
     public void showVictoryPanel() {
         closeMenus();
+        victoryPanel.initialize();
         addAsFrame(victoryPanel);
         victoryPanel.requestFocus();
     }

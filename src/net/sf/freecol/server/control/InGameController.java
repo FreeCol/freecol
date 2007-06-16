@@ -261,7 +261,7 @@ public final class InGameController extends Controller {
      * @return The <code>Player</code> who have won the game or <i>null</i>
      *         if the game is not finished.
      */
-    private Player checkForWinner() {
+    public Player checkForWinner() {
         GameOptions go = getGame().getGameOptions();
         if (go.getBoolean(GameOptions.VICTORY_DEFEAT_REF)) {
             Iterator<Player> playerIterator = getGame().getPlayerIterator();

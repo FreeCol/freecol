@@ -409,6 +409,14 @@ public final class FreeColClient {
     }
 
     /**
+     * Continue playing after win the game
+     */
+    public void continuePlaying() {
+        Element continueElement = Message.createNewRootElement("continuePlaying");
+        client.send(continueElement);
+    }
+
+    /**
      * Checks if this client is the game admin.
      * 
      * @return <i>true</i> if the client is the game admin and <i>false</i>

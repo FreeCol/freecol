@@ -4,6 +4,8 @@ import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.logging.Logger;
+import javax.swing.Box;
+import javax.swing.BoxLayout;
 
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -27,15 +29,18 @@ public final class VictoryPanel extends FreeColPanel implements ActionListener {
 
     private static final Logger logger = Logger.getLogger(VictoryPanel.class.getName());
 
-    private static final int OK = 0;
+    private static final int OK = 0, CONTINUE = 1;
 
     @SuppressWarnings("unused")
     private final Canvas parent;
 
     private final FreeColClient freeColClient;
 
+    private Box buttonsBox = Box.createHorizontalBox();
+            
     private JButton ok = new JButton(Messages.message("victory.yes"));
 
+    private JButton continueButton = new JButton(Messages.message("victory.continue"));
 
     /**
      * The constructor that will add the items to this panel.
@@ -46,7 +51,7 @@ public final class VictoryPanel extends FreeColPanel implements ActionListener {
     public VictoryPanel(Canvas parent, FreeColClient freeColClient) {
         this.parent = parent;
         this.freeColClient = freeColClient;
-
+        
         int[] widths = { 0 };
         int[] heights = { 0, margin, 0, margin, 0 };
 
@@ -66,15 +71,26 @@ public final class VictoryPanel extends FreeColPanel implements ActionListener {
 
         int row = 1;
         int column = 1;
-
+        
         add(victoryLabel, higConst.rc(row, column));
         row += 2;
         add(imageLabel, higConst.rc(row, column));
         row += 2;
-        add(ok, higConst.rc(row, column));
+        add(buttonsBox, higConst.rc(row, column));
 
         ok.setActionCommand(String.valueOf(OK));
         ok.addActionListener(this);
+        continueButton.setActionCommand(String.valueOf(CONTINUE));
+        continueButton.addActionListener(this);
+    }
+    
+    public void initialize() {
+        buttonsBox.removeAll();
+        if (freeColClient.isSingleplayer()) {
+            buttonsBox.add(continueButton);
+            buttonsBox.add(Box.createGlue());
+        }
+        buttonsBox.add(ok);
 
         setSize(getPreferredSize());
     }
@@ -95,6 +111,10 @@ public final class VictoryPanel extends FreeColPanel implements ActionListener {
             switch (Integer.valueOf(command).intValue()) {
             case OK:
                 freeColClient.quit();
+                break;
+            case CONTINUE:
+                freeColClient.continuePlaying();
+                parent.remove(this);
                 break;
             default:
                 logger.warning("Invalid ActionCommand: invalid number.");
