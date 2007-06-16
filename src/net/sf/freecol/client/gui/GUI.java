@@ -1608,10 +1608,13 @@ public final class GUI {
     public void displayColonyTile(Graphics2D g, Map map, Tile tile, int x, int y, Colony colony) {
         //displayTile(g, map, tile, x, y, false);
         displayBaseTile(g, map, tile, x, y, false);        
-        if (tile.getOwner() != null && tile.getOwner() != colony) {
+
+        Unit occupyingUnit = colony.getColonyTile(tile).getOccupyingUnit();
+        if ((tile.getOwner() != null && tile.getOwner() != colony) || occupyingUnit != null) {
             g.drawImage(lib.getMiscImage(ImageLibrary.TILE_TAKEN), x, y, null);
         }
         displayTileOverlays(g, map, tile, x, y, false);
+        
         int nation = tile.getNationOwner();
         if (nation != Player.NO_NATION
                 && !Player.isEuropean(nation)
@@ -1620,6 +1623,15 @@ public final class GUI {
                 && !colony.getOwner().hasFather(FoundingFather.PETER_MINUIT)) {
             Image image = lib.getMiscImage(ImageLibrary.TILE_OWNED_BY_INDIANS);
             g.drawImage(image, x+tileWidth/2-image.getWidth(null)/2, y+tileHeight/2-image.getHeight(null)/2, null);
+        }
+        
+        if (occupyingUnit != null) {
+            int type = lib.getUnitGraphicsType(occupyingUnit);
+            ImageIcon image = lib.getScaledUnitImageIcon(type, 0.5f);
+            g.drawImage(image.getImage(), (x + tileWidth / 4) - image.getIconWidth() / 2,
+                    (y + tileHeight / 2) - image.getIconHeight() / 2, null);
+            // Draw an occupation and nation indicator.
+            displayOccupationIndicator(g, occupyingUnit, x + STATE_OFFSET_X, y);
         }
     }
 

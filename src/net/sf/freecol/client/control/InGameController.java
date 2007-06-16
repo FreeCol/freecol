@@ -2222,6 +2222,18 @@ public final class InGameController implements NetworkConstants {
                     buyLand(unit.getTile());
                 }
             }
+        } else if (state == Unit.FORTIFYING && unit.getType() != Unit.PRIVATEER && unit.getTile() != null) {
+            Player myPlayer = unit.getOwner();
+            Iterator<Position> it = game.getMap().getAdjacentIterator(unit.getTile().getPosition());
+            while (it.hasNext()) {
+                Tile tile = game.getMap().getTile(it.next());
+                if (tile.getColony() != null && tile.getColony().getOwner() != myPlayer) {
+                    int stance = myPlayer.getStance(tile.getColony().getOwner());
+                    if (stance != Player.ALLIANCE && !confirmHostileAction(unit, tile)) {
+                        return;
+                    }
+                }
+            }
         }
 
         unit.setState(state);

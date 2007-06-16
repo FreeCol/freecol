@@ -4724,6 +4724,8 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
 
     /**
      * Return how many turns left to be repaired
+     *
+     * @return turns to be repaired
      */
     public int getTurnsForRepair() {
         return getInitialHitpoints(getType()) - getHitpoints();
