@@ -86,7 +86,7 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener {
     public static final int SCROLL_SPEED = 10;
 
     private static final int EXIT = 0, BUY_BUILDING = 1, UNLOAD = 2,
-            RENAME = 3, WAREHOUSE = 4;
+            RENAME = 3, WAREHOUSE = 4, FILL = 5;
 
     /**
      * The additional border required to make layout fit.
@@ -143,6 +143,8 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener {
 
     private JButton unloadButton = new JButton(Messages.message("unload"));
 
+    private JButton fillButton = new JButton(Messages.message("fill"));
+
     private JButton renameButton = new JButton(Messages.message("rename"));
 
     private JButton warehouseButton = new JButton(Messages.message("warehouseDialog.name"));
@@ -178,6 +180,14 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener {
         SwingUtilities.replaceUIInputMap(unloadButton,
                 JComponent.WHEN_IN_FOCUSED_WINDOW, unloadInputMap);
 
+        InputMap fillInputMap = new ComponentInputMap(fillButton);
+        fillInputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_F, 0, false),
+                "pressed");
+        fillInputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_F, 0, true),
+                "released");
+        SwingUtilities.replaceUIInputMap(fillButton,
+                JComponent.WHEN_IN_FOCUSED_WINDOW, fillInputMap);
+        
         productionPanel = new ProductionPanel(this);
         outsideColonyPanel = new OutsideColonyPanel(this);
         inPortPanel = new InPortPanel();
@@ -253,6 +263,7 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener {
         productionPanel.setBorder(correctBorder);
         solLabel.setBorder(correctBorder);
         unloadButton.setBorder(BorderFactory.createCompoundBorder(correctBorder, unloadButton.getBorder()));
+        fillButton.setBorder(BorderFactory.createCompoundBorder(correctBorder, fillButton.getBorder()));
         exitButton.setBorder(BorderFactory.createCompoundBorder(correctBorder, exitButton.getBorder()));
         warehouseButton.setBorder(BorderFactory.createCompoundBorder(correctBorder, warehouseButton.getBorder()));
         renameButton.setBorder(BorderFactory.createCompoundBorder(correctBorder, renameButton.getBorder()));
@@ -264,12 +275,14 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener {
         buyBuilding.setActionCommand(String.valueOf(BUY_BUILDING));
         exitButton.setActionCommand(String.valueOf(EXIT));
         unloadButton.setActionCommand(String.valueOf(UNLOAD));
+        fillButton.setActionCommand(String.valueOf(FILL));
         renameButton.setActionCommand(String.valueOf(RENAME));
         warehouseButton.setActionCommand(String.valueOf(WAREHOUSE));
 
         buyBuilding.addActionListener(this);
         exitButton.addActionListener(this);
         unloadButton.addActionListener(this);
+        fillButton.addActionListener(this);
         renameButton.addActionListener(this);
         warehouseButton.addActionListener(this);
 
@@ -280,7 +293,7 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener {
         addMouseListener(new MouseAdapter() {
         });
 
-        int[] widths = { 250, margin, 138, margin, 215, margin, 204 };
+        int[] widths = { 125, 125, margin, 138, margin, 215, margin, 204 };
         int[] heights = { 
             0, // colony select box
             margin, 225, // colony tiles and buildings
@@ -294,30 +307,31 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener {
         setLayout(new HIGLayout(widths, heights));
 
         int row = 1;
-        add(nameBox, higConst.rcwh(row, 1, 7, 1, ""));
+        add(nameBox, higConst.rcwh(row, 1, 8, 1, ""));
         row += 2;
-        add(tilesScroll, higConst.rcwh(row, 1, 3, 1));
-        add(buildingsScroll, higConst.rcwh(row, 5, 3, 1));
+        add(tilesScroll, higConst.rcwh(row, 1, 4, 1));
+        add(buildingsScroll, higConst.rcwh(row, 6, 3, 1));
         row += 2;
-        add(productionPanel, higConst.rcwh(row, 1, 3, 2));
+        add(productionPanel, higConst.rcwh(row, 1, 4, 2));
         row += 1;
-        add(buildingBox, higConst.rc(row, 5));
-        add(hammersLabel, higConst.rc(row, 7));
+        add(buildingBox, higConst.rc(row, 6));
+        add(hammersLabel, higConst.rc(row, 8));
         row += 2;
-        add(solLabel, higConst.rcwh(row, 1, 3, 1));
-        add(buyBuilding, higConst.rc(row, 5));
-        add(toolsLabel, higConst.rc(row, 7));
+        add(solLabel, higConst.rcwh(row, 1, 4, 1));
+        add(buyBuilding, higConst.rc(row, 6));
+        add(toolsLabel, higConst.rc(row, 8));
         row += 2;
-        add(inPortScroll, higConst.rc(row, 1));
-        add(cargoScroll, higConst.rcwh(row, 3, 3, 1));
-        add(outsideColonyScroll, higConst.rcwh(row, 7, 1, 3));
+        add(inPortScroll, higConst.rcwh(row, 1, 2, 1));
+        add(cargoScroll, higConst.rcwh(row, 4, 3, 1));
+        add(outsideColonyScroll, higConst.rcwh(row, 8, 1, 3));
         row += 2;
-        add(warehouseScroll, higConst.rcwh(row, 1, 5, 1));
+        add(warehouseScroll, higConst.rcwh(row, 1, 6, 1));
         row += 2;
         add(unloadButton, higConst.rc(row, 1, "l"));
-        add(warehouseButton, higConst.rc(row, 3, "l"));
-        add(renameButton, higConst.rc(row, 5, "r"));
-        add(exitButton, higConst.rc(row, 7, "r"));
+        add(fillButton, higConst.rc(row, 2, "l"));
+        add(warehouseButton, higConst.rc(row, 4, "l"));
+        add(renameButton, higConst.rc(row, 6, "r"));
+        add(exitButton, higConst.rc(row, 8, "r"));
 
         setSize(getPreferredSize());
 
@@ -394,6 +408,7 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener {
         // Enable/disable widgets
         buyBuilding.setEnabled(isEditable());
         unloadButton.setEnabled(isEditable());
+        fillButton.setEnabled(isEditable());
         renameButton.setEnabled(isEditable());
         warehouseButton.setEnabled(isEditable());
         buildingBox.setEnabled(isEditable());
@@ -449,7 +464,7 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener {
             setSelectedUnitLabel(preSelectedUnitLabel);
         }
 
-        updateUnloadButton();
+        updateCarrierButtons();
 
         //
         // Warehouse panel:
@@ -486,17 +501,19 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener {
     }
 
     /**
-     * Enables the unload button if the currently selected unit is a carrier
+     * Enables the unload and fill buttons if the currently selected unit is a carrier
      * with some cargo.
      */
-    private void updateUnloadButton() {
+    private void updateCarrierButtons() {
         unloadButton.setEnabled(false);
+        fillButton.setEnabled(false);
         if (!isEditable()) return;
         if (selectedUnit != null) {
             Unit unit = selectedUnit.getUnit();
             if (unit != null && unit.isCarrier()
                     && unit.getSpaceLeft() < unit.getInitialSpaceLeft()) {
                 unloadButton.setEnabled(true);
+                fillButton.setEnabled(true);
             }
         }
     }
@@ -699,6 +716,9 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener {
             case WAREHOUSE:
                 freeColClient.getCanvas().showWarehouseDialog(colony);
                 break;
+            case FILL:
+                fill();
+                break;
             default:
                 logger.warning("Invalid action");
             }
@@ -735,6 +755,30 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener {
             }
         }
         unloadButton.setEnabled(false);
+        fillButton.setEnabled(false);
+    }
+
+    /**
+     * Fill goods from the carrier currently selected until 100 units.
+     */
+    private void fill() {
+        Unit unit = getSelectedUnit();
+        if (unit != null && unit.isCarrier()) {
+            Iterator<Goods> goodsIterator = unit.getGoodsIterator();
+            while (goodsIterator.hasNext()) {
+                Goods goods = goodsIterator.next();
+                if (goods.getAmount() < 100 && colony.getGoodsCount(goods.getType()) > 0) {
+                    int amount = Math.min(100 - goods.getAmount(),
+                            colony.getGoodsCount(goods.getType()));
+                    inGameController.loadCargo(new Goods(goods.getGame(), colony,
+                            goods.getType(), amount), unit);
+                    updateWarehouse();
+                    updateCargoPanel();
+                    getCargoPanel().revalidate();
+                    refresh();
+                }
+            }
+        }
     }
 
     /**
@@ -777,7 +821,7 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener {
                 break;
             }
         }
-        updateUnloadButton();
+        updateCarrierButtons();
     }
 
     /**
@@ -794,7 +838,7 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener {
             updateCargoPanel();
             updateCargoLabel();
         }
-        updateUnloadButton();
+        updateCarrierButtons();
         cargoPanel.revalidate();
         refresh();
     }
