@@ -140,6 +140,11 @@ public class IndianDemandMission extends Mission {
                 Player enemy = target.getOwner();
                 Goods goods = selectGoods(target);
                 if (goods == null) {
+                    if (enemy.getGold() == 0) {
+                        // give up
+                        completed = true;
+                        return;
+                    }
                     demandElement.setAttribute("gold", String.valueOf(enemy.getGold() / 20));
                 } else {
                     demandElement.appendChild(goods.toXMLElement(null, demandElement.getOwnerDocument()));
@@ -239,7 +244,10 @@ public class IndianDemandMission extends Mission {
         Goods goods = null;
         GoodsContainer warehouse = target.getGoodsContainer();
         if (tension <= Tension.CONTENT && warehouse.getGoodsCount(Goods.FOOD) >= 100) {
-            goods = new Goods(getGame(), target, Goods.FOOD, (warehouse.getGoodsCount(Goods.FOOD) * dx) / 6);
+            int amount = (warehouse.getGoodsCount(Goods.FOOD) * dx) / 6;
+            if (amount > 0) {
+                return new Goods(getGame(), target, Goods.FOOD, amount);
+            }
         } else if (tension <= Tension.DISPLEASED) {
             Market market = target.getOwner().getMarket();
             int value = 0;
@@ -256,6 +264,7 @@ public class IndianDemandMission extends Mission {
             }
             if (goods != null) {
                 goods.setAmount(Math.max((goods.getAmount() * dx) / 6, 1));
+                return goods;
             }
         } else {
             int[] preferred = new int[] { Goods.MUSKETS, Goods.HORSES, Goods.TOOLS, Goods.TRADE_GOODS, Goods.RUM,
@@ -263,10 +272,25 @@ public class IndianDemandMission extends Mission {
             for (int i = 0; i < preferred.length; i++) {
                 int amount = warehouse.getGoodsCount(preferred[i]);
                 if (amount > 0) {
-                    goods = new Goods(getGame(), target, preferred[i], Math.max((amount * dx) / 6, 1));
-                    break;
+                    return new Goods(getGame(), target, preferred[i], Math.max((amount * dx) / 6, 1));
+                    
                 }
             }
+        }
+
+        // haven't found what we want
+        Market market = target.getOwner().getMarket();
+        int value = 0;
+        List<Goods> warehouseGoods = warehouse.getCompactGoods();
+        for (Goods currentGoods : warehouseGoods) {
+            int goodsValue = market.getSalePrice(currentGoods);
+            if (goodsValue > value) {
+                value = goodsValue;
+                goods = currentGoods;
+            }
+        }
+        if (goods != null) {
+            goods.setAmount(Math.max((goods.getAmount() * dx) / 6, 1));
         }
         return goods;
     }
