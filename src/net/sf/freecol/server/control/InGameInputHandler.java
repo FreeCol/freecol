@@ -295,6 +295,18 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
                 return trade(connection, element);
             }
         });
+        register("buyProposition", new CurrentPlayerNetworkRequestHandler() {
+            @Override
+            public Element handle(Player player, Connection connection, Element element) {
+                return buyProposition(connection, element);
+            }
+        });
+        register("buy", new CurrentPlayerNetworkRequestHandler() {
+            @Override
+            public Element handle(Player player, Connection connection, Element element) {
+                return buy(connection, element);
+            }
+        });
         register("deliverGift", new CurrentPlayerNetworkRequestHandler() {
             @Override
             public Element handle(Player player, Connection connection, Element element) {
@@ -2515,13 +2527,111 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         if (unit.getTile().getDistanceTo(settlement.getTile()) > 1) {
             throw new IllegalStateException("Not adjacent to settlemen!");
         }
-        int returnGold = ((AIPlayer) getFreeColServer().getAIMain().getAIObject(settlement.getOwner()))
-                .tradeProposition(unit, settlement, goods, gold);
+        AIPlayer aiPlayer = (AIPlayer) getFreeColServer().getAIMain().getAIObject(settlement.getOwner());
+        int returnGold = aiPlayer.tradeProposition(unit, settlement, goods, gold);
         if (returnGold != gold) {
             throw new IllegalArgumentException("This was not the price we agreed upon! Cheater?");
         }
         unit.trade(settlement, goods, gold);
+        
+        Element reply = null;
+        if (settlement instanceof IndianSettlement) { // offer goods to buy
+            Goods sellGoods[] = ((IndianSettlement) settlement).getSellGoods();
+            Element sellProposition = Message.createNewRootElement("sellProposition");
+            boolean offer = false;
+            for(Goods goodsToSell : sellGoods) {
+                if (goodsToSell != null) {
+                    aiPlayer.registerSellGoods(goodsToSell);
+                    sellProposition.appendChild(goodsToSell.toXMLElement(null, sellProposition.getOwnerDocument()));
+                    offer = true;
+                }
+            }
+            if (offer) {
+                reply = sellProposition;
+            }
+        }
+        
+        return reply;
+    }
 
+    /**
+     * Handles a "buyProposition"-message.
+     * 
+     * @param connection The <code>Connection</code> the message was received
+     *            on.
+     * @param element The element containing the request.
+     */
+    private Element buyProposition(Connection connection, Element element) {
+        ServerPlayer player = getFreeColServer().getPlayer(connection);
+        Unit unit = (Unit) getGame().getFreeColGameObject(element.getAttribute("unit"));
+        Goods goods = new Goods(getGame(), Message.getChildElement(element, Goods.getXMLElementTagName()));
+        IndianSettlement settlement = (IndianSettlement) goods.getLocation();
+        int gold = -1;
+        if (element.hasAttribute("gold")) {
+            gold = Integer.parseInt(element.getAttribute("gold"));
+        }
+        if (goods.getAmount() > 100) {
+            throw new IllegalArgumentException();
+        }
+        if (unit == null) {
+            throw new IllegalArgumentException("Could not find 'Unit' with specified ID: "
+                    + element.getAttribute("unit"));
+        }
+        if (settlement == null) {
+            throw new IllegalArgumentException("Goods are not in a settlement");
+        }
+        if (unit.getOwner() != player) {
+            throw new IllegalStateException("Not your unit!");
+        }
+        if (unit.getTile().getDistanceTo(settlement.getTile()) > 1) {
+            throw new IllegalStateException("Not adjacent to settlemen!");
+        }
+        int returnGold = ((AIPlayer) getFreeColServer().getAIMain().getAIObject(settlement.getOwner()))
+                .buyProposition(unit, goods, gold);
+        Element tpaElement = Message.createNewRootElement("buyPropositionAnswer");
+        tpaElement.setAttribute("gold", Integer.toString(returnGold));
+        return tpaElement;
+    }
+
+    /**
+     * Handles a "buy"-message.
+     * 
+     * @param connection The <code>Connection</code> the message was received
+     *            on.
+     * @param element The element containing the request.
+     */
+    private Element buy(Connection connection, Element element) {
+        ServerPlayer player = getFreeColServer().getPlayer(connection);
+        Unit unit = (Unit) getGame().getFreeColGameObject(element.getAttribute("unit"));
+        Goods goods = new Goods(getGame(), Message.getChildElement(element, Goods.getXMLElementTagName()));
+        IndianSettlement settlement = (IndianSettlement) goods.getLocation();
+        int gold = Integer.parseInt(element.getAttribute("gold"));
+        if (gold <= 0) {
+            throw new IllegalArgumentException();
+        }
+        if (goods.getAmount() > 100) {
+            throw new IllegalArgumentException();
+        }
+        if (unit == null) {
+            throw new IllegalArgumentException("Could not find 'Unit' with specified ID: "
+                    + element.getAttribute("unit"));
+        }
+        if (settlement == null) {
+            throw new IllegalArgumentException("Goods are not in a settlement");
+        }
+        if (unit.getOwner() != player) {
+            throw new IllegalStateException("Not your unit!");
+        }
+        if (unit.getTile().getDistanceTo(settlement.getTile()) > 1) {
+            throw new IllegalStateException("Not adjacent to settlemen!");
+        }
+        int returnGold = ((AIPlayer) getFreeColServer().getAIMain().getAIObject(settlement.getOwner()))
+                .buyProposition(unit, goods, gold);
+        if (returnGold != gold) {
+            throw new IllegalArgumentException("This was not the price we agreed upon! Cheater?");
+        }
+        unit.buy(settlement, goods, gold);
+        
         return null;
     }
 

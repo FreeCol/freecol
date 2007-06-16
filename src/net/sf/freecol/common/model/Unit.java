@@ -71,13 +71,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
             ENTER_SETTLEMENT_WITH_CARRIER_AND_GOODS = 9, EXPLORE_LOST_CITY_RUMOUR = 10, ILLEGAL_MOVE = 11;
 
     public static final int ATTACK_GREAT_LOSS = -2, ATTACK_LOSS = -1, ATTACK_EVADES = 0, ATTACK_WIN = 1,
-            ATTACK_GREAT_WIN = 2, ATTACK_DONE_SETTLEMENT = 3; // The last
-
-    // defender of
-    // the
-    // settlement
-
-    // has died.
+            ATTACK_GREAT_WIN = 2, ATTACK_DONE_SETTLEMENT = 3; // The last defender of the settlement has died.
 
     public static final int MUSKETS_TO_ARM_INDIAN = 25, HORSES_TO_MOUNT_INDIAN = 25;
 
@@ -406,6 +400,33 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
             int value = ((IndianSettlement) settlement).getPrice(goods) / 1000;
             settlement.getOwner().modifyTension(getOwner(), -value);
         }
+    }
+
+    /**
+     * Sells the given goods from the given settlement to this unit. The owner
+     * of the settlement gets the gold and the owner of the unit is charged for
+     * the deal.
+     * 
+     * @param settlement The <code>IndianSettlement</code> to trade with.
+     * @param goods The <code>Goods</code> to be traded.
+     * @param gold The money to be given for the goods.
+     */
+    public void buy(IndianSettlement settlement, Goods goods, int gold) {
+        if (getTile().getDistanceTo(settlement.getTile()) > 1) {
+            logger.warning("Unit not adjacent to settlement!");
+            throw new IllegalStateException("Unit not adjacent to settlement!");
+        }
+        if (goods.getLocation() != settlement) {
+            logger.warning("Goods not in the settlement!");
+            throw new IllegalStateException("Goods not in the settlement!");
+        }
+
+        goods.setLocation(this);
+
+        settlement.getOwner().modifyGold(gold);
+        getOwner().modifyGold(-gold);
+
+        settlement.getOwner().modifyTension(getOwner(), -gold / 100);
     }
 
     /**

@@ -3,6 +3,7 @@ package net.sf.freecol.common.model;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
@@ -121,6 +122,16 @@ public class IndianSettlement extends Settlement {
         }
     };
 
+    // sort goods descending by amount and price when amounts are equal
+    private final Comparator<Goods> exportGoodsComparator = new Comparator<Goods>() {
+        public int compare(Goods goods1, Goods goods2) {
+            if (goods2.getAmount() == goods1.getAmount()) {
+                return getPrice(goods2) - getPrice(goods1);
+            } else {
+                return goods2.getAmount() - goods1.getAmount();
+            }
+        }
+    };
 
     /**
      * The constructor to use.
@@ -728,8 +739,7 @@ public class IndianSettlement extends Settlement {
 
         if (type == Goods.MUSKETS) {
             int need = 0;
-            int supply = 0;
-            supply += goodsContainer.getGoodsCount(Goods.MUSKETS) / Unit.MUSKETS_TO_ARM_INDIAN;
+            int supply = goodsContainer.getGoodsCount(Goods.MUSKETS);
             for (int i=0; i<ownedUnits.size(); i++) {
                 need += Unit.MUSKETS_TO_ARM_INDIAN;
                 if (ownedUnits.get(i).isArmed()) {
@@ -744,12 +754,11 @@ public class IndianSettlement extends Settlement {
                 if ((startPrice-i) < 8 && (need > supply || goodsContainer.getGoodsCount(Goods.MUSKETS) < Unit.MUSKETS_TO_ARM_INDIAN * 2)) {
                     startPrice = 8+i;
                 }
-                returnPrice += 25 * (startPrice-i);
+                returnPrice += Unit.MUSKETS_TO_ARM_INDIAN * (startPrice-i);
             }
         } else if (type == Goods.HORSES) {
             int need = 0;
-            int supply = 0;
-            supply += goodsContainer.getGoodsCount(Goods.HORSES) / Unit.HORSES_TO_MOUNT_INDIAN;
+            int supply = goodsContainer.getGoodsCount(Goods.HORSES);
             for (int i=0; i<ownedUnits.size(); i++) {
                 need += Unit.HORSES_TO_MOUNT_INDIAN;
                 if (ownedUnits.get(i).isMounted()) {
@@ -765,7 +774,7 @@ public class IndianSettlement extends Settlement {
                 if ((startPrice-(i*4)) < 4 && (need > supply || goodsContainer.getGoodsCount(Goods.HORSES) < Unit.HORSES_TO_MOUNT_INDIAN * 2)) {
                     startPrice = 4+(i*4);
                 }
-                returnPrice += 25 * (startPrice-(i*4));
+                returnPrice += Unit.HORSES_TO_MOUNT_INDIAN * (startPrice-(i*4));
             }
         } else if (type == Goods.FOOD || type == Goods.LUMBER || type == Goods.SUGAR ||
                 type == Goods.TOBACCO || type == Goods.COTTON || type == Goods.FURS ||
@@ -909,6 +918,22 @@ public class IndianSettlement extends Settlement {
         return true;
     }
 
+    public int getProductionOf(int type) {
+        int potential = 0;
+        Iterator<Position> it = getGame().getMap().getCircleIterator(getTile().getPosition(), true, getRadius());
+        while (it.hasNext()) {
+            Tile workTile = getGame().getMap().getTile(it.next());
+            if (workTile.getOwner() == null || workTile.getOwner() == this) {
+                potential += workTile.potential(type);
+            }
+        }
+        
+        if (type == Goods.FOOD) {
+            potential = Math.min(potential, ownedUnits.size()*3);
+        }
+        
+        return potential;
+    }
 
     @Override
     public void newTurn() {
@@ -918,7 +943,6 @@ public class IndianSettlement extends Settlement {
         }
         
         /* Determine the maximum possible production for each type of goods: */
-        int totalGoods = 0;
         int[] potential = new int[Goods.NUMBER_OF_TYPES];
 
         Iterator<Position> it = getGame().getMap().getCircleIterator(getTile().getPosition(), true, getRadius());
@@ -926,18 +950,16 @@ public class IndianSettlement extends Settlement {
             Tile workTile = getGame().getMap().getTile(it.next());
             if (workTile.getOwner() == null || workTile.getOwner() == this) {
                 for (int i=0; i<Goods.NUMBER_OF_TYPES;i++) {
-                    potential[i] += workTile.potential(i);
-                    totalGoods += potential[i];
+                    potential[i] = getProductionOf(i);
                 }
             }
         }
 
         /* Produce the goods: */
         int workers = ownedUnits.size();
-        for (int i=1; i<Goods.NUMBER_OF_TYPES;i++) {
+        for (int i=0; i<Goods.NUMBER_OF_TYPES;i++) {
             goodsContainer.addGoods(i, potential[i]);
         }
-        goodsContainer.addGoods(Goods.FOOD, Math.min(potential[Goods.FOOD], workers*3));
 
         /* Use tools (if available) to produce manufactured goods: */
         if (goodsContainer.getGoodsCount(Goods.TOOLS) > 0) {
@@ -1323,5 +1345,73 @@ public class IndianSettlement extends Settlement {
      */
     public Colony getColony() {
         return null;
+    }
+    
+    /**
+     * Returns an array with goods to sell
+     */
+    public Goods[] getSellGoods() {
+        List<Goods> settlementGoods = getCompactGoods();
+        for(Goods goods : settlementGoods) {
+            if (goods.getAmount() > 100) {
+                goods.setAmount(100);
+            }
+        }
+        Collections.sort(settlementGoods, exportGoodsComparator);
+        Goods sellGoods[] = {null, null, null};
+        
+        int i = 0;
+        for(Goods goods : settlementGoods) {
+            // Only sell raw materials but never sell food and lumber
+            if (goods.getType() != Goods.FOOD && goods.getType() != Goods.LUMBER &&
+                    goods.getType() <= Goods.SILVER) {
+                sellGoods[i] = goods;
+                i++;
+                if (i == sellGoods.length) break;
+            }
+        }
+        
+        return sellGoods;
+    }
+
+    /**
+    * Gets the amount of gold this <code>IndianSettlment</code>
+    * is willing to pay for the given <code>Goods</code>.
+    *
+    * <br><br>
+    *
+    * It is only meaningful to call this method from the
+    * server, since the settlement's {@link GoodsContainer}
+    * is hidden from the clients.
+    *
+    * @param goods The <code>Goods</code> to price.
+    * @return The price.
+    */
+    public int getPriceToSell(Goods goods) {
+        return getPriceToSell(goods.getType(), goods.getAmount());
+    }
+
+    /**
+    * Gets the amount of gold this <code>IndianSettlment</code>
+    * is willing to pay for the given <code>Goods</code>.
+    *
+    * <br><br>
+    *
+    * It is only meaningful to call this method from the
+    * server, since the settlement's {@link GoodsContainer}
+    * is hidden from the clients.
+    *
+    * @param type The type of <code>Goods</code> to price.
+    * @param amount The amount of <code>Goods</code> to price.
+    * @return The price.
+    */
+    public int getPriceToSell(int type, int amount) {
+        if (amount > 100) {
+            throw new IllegalArgumentException();
+        }
+
+        int price = 10 - getProductionOf(type);
+        if (price < 1) price = 1;
+        return amount * price;
     }
 }

@@ -1754,6 +1754,10 @@ public class AIPlayer extends AIObject {
             } else if (gold > (player.getGold() * 3) / 4) {
                 sessionRegister.put(goldKey, new Integer(-1));
                 return NetworkConstants.NO_TRADE;
+            } else if (gold > (price * 11) / 10) {
+                logger.warning("Cheating attempt: haggling with a request too high");
+                sessionRegister.put(goldKey, new Integer(-1));
+                return NetworkConstants.NO_TRADE;
             } else {
                 int haggling = 1;
                 if (sessionRegister.containsKey(hagglingKey)) {
@@ -1988,5 +1992,68 @@ public class AIPlayer extends AIObject {
      */
     public static String getXMLElementTagName() {
         return "aiPlayer";
+    }
+
+    
+    /**
+     * Called after another <code>Player</code> sends a <code>trade</code> message
+     * 
+     * 
+     * @param goods The goods which we are going to offer
+     */
+    public void registerSellGoods(Goods goods) {
+        String goldKey = "tradeGold#" + goods.getType() + "#" + goods.getAmount()
+            + "#" + goods.getLocation().getID();
+        sessionRegister.put(goldKey, null);
+    }
+
+    /**
+     * Called when another <code>Player</code> proposes a trade.
+     * 
+     * 
+     * @param unit The foreign <code>Unit</code> trying to trade.
+     * @param settlement The <code>Settlement</code> this player owns and
+     *            which the given <code>Unit</code> if trying to sell goods.
+     * @param goods The goods the given <code>Unit</code> is trying to sell.
+     * @param gold The suggested price.
+     * @return The price this <code>AIPlayer</code> suggests or
+     *         {@link NetworkConstants#NO_TRADE}.
+     */
+    public int buyProposition(Unit unit, Goods goods, int gold) {
+        logger.finest("Entering method tradeProposition");
+        IndianSettlement settlement = (IndianSettlement) goods.getLocation();
+        String goldKey = "tradeGold#" + goods.getType() + "#" + goods.getAmount()
+            + "#" + settlement.getID();
+        String hagglingKey = "tradeHaggling#" + unit.getID();
+        
+        Integer registered = sessionRegister.get(goldKey);
+        if (registered == null) {
+            int price = settlement.getPriceToSell(goods)
+                + player.getTension(unit.getOwner()).getValue();
+            sessionRegister.put(goldKey, new Integer(price));
+            return price;
+        } else {
+            int price = registered.intValue();
+            if (price < 0 || price == gold) {
+                return price;
+            } else if (gold < (price * 9) / 10) {
+                logger.warning("Cheating attempt: sending a offer too low");
+                sessionRegister.put(goldKey, new Integer(-1));
+                return NetworkConstants.NO_TRADE;
+            } else {
+                int haggling = 1;
+                if (sessionRegister.containsKey(hagglingKey)) {
+                    haggling = sessionRegister.get(hagglingKey).intValue();
+                }
+                if (getRandom().nextInt(3 + haggling) <= 3) {
+                    sessionRegister.put(goldKey, new Integer(gold));
+                    sessionRegister.put(hagglingKey, new Integer(haggling + 1));
+                    return gold;
+                } else {
+                    sessionRegister.put(goldKey, new Integer(-1));
+                    return NetworkConstants.NO_TRADE;
+                }
+            }
+        }
     }
 }

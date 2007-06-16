@@ -1128,10 +1128,109 @@ public final class InGameController implements NetworkConstants {
         tradeElement.setAttribute("gold", Integer.toString(gold));
         tradeElement.appendChild(goods.toXMLElement(null, tradeElement.getOwnerDocument()));
 
-        client.sendAndWait(tradeElement);
+        Element reply = client.ask(tradeElement);
 
         unit.trade(settlement, goods, gold);
+
+        freeColClient.getCanvas().updateGoldLabel();
+        
+        if (reply != null) {
+            if (!reply.getTagName().equals("sellProposition")) {
+                logger.warning("Illegal reply.");
+                throw new IllegalStateException();
+            }
+            
+            ArrayList<Goods> goodsOffered = new ArrayList<Goods>();
+            NodeList childNodes = reply.getChildNodes();
+            for (int i = 0; i < childNodes.getLength(); i++) {
+                goodsOffered.add(new Goods(freeColClient.getGame(), (Element) childNodes.item(i)));
+            }
+            Goods goodsToBuy = (Goods) freeColClient.getCanvas().showChoiceDialog(Messages.message("buyProposition.text"),
+                    Messages.message("buyProposition.cancel"), goodsOffered.iterator());
+            if (goodsToBuy != null) {
+                buyFromSettlement(unit, goodsToBuy);
+            }
+        }
+        
         nextActiveUnit(unit.getTile());
+    }
+
+    /**
+     * Uses the given unit to try buying the given goods from an
+     * <code>IndianSettlement</code>.
+     */
+    private void buyFromSettlement(Unit unit, Goods goods) {
+        Canvas canvas = freeColClient.getCanvas();
+        Client client = freeColClient.getClient();
+        
+        Element buyPropositionElement = Message.createNewRootElement("buyProposition");
+        buyPropositionElement.setAttribute("unit", unit.getID());
+        buyPropositionElement.appendChild(goods.toXMLElement(null, buyPropositionElement.getOwnerDocument()));
+
+        Element reply = client.ask(buyPropositionElement);
+        while (reply != null) {
+            if (!reply.getTagName().equals("buyPropositionAnswer")) {
+                logger.warning("Illegal reply.");
+                throw new IllegalStateException();
+            }
+
+            int gold = Integer.parseInt(reply.getAttribute("gold"));
+            if (gold <= NO_TRADE) {
+                canvas.showInformationMessage("noTrade");
+                return;
+            } else {
+                ChoiceItem[] objects = { new ChoiceItem(Messages.message("buy.takeOffer"), 1),
+                        new ChoiceItem(Messages.message("buy.moreGold"), 2), };
+
+                IndianSettlement settlement = (IndianSettlement) goods.getLocation();
+                String text = Messages.message("buy.text").replaceAll("%nation%",
+                        settlement.getOwner().getNationAsString());
+                text = text.replaceAll("%goods%", goods.getName());
+                text = text.replaceAll("%gold%", Integer.toString(gold));
+                ChoiceItem ci = (ChoiceItem) canvas.showChoiceDialog(text, Messages.message("buy.cancel"), objects);
+                if (ci == null) { // == Trade aborted by the player.
+                    return;
+                }
+                int ret = ci.getChoice();
+                if (ret == 1) {
+                    buyFromSettlement(unit, goods, gold);
+                    return;
+                }
+            } // Ask for more gold (ret == 2):
+
+            buyPropositionElement = Message.createNewRootElement("buyProposition");
+            buyPropositionElement.setAttribute("unit", unit.getID());
+            buyPropositionElement.appendChild(goods.toXMLElement(null, buyPropositionElement.getOwnerDocument()));
+            buyPropositionElement.setAttribute("gold", Integer.toString((gold * 9) / 10));
+
+            reply = client.ask(buyPropositionElement);
+        }
+    }
+
+    /**
+     * Trades the given goods. The goods gets transferred from their location
+     * to the given <code>Unit</code>, and the {@link Unit#getOwner unit's owner}
+     * pays the given gold.
+     */
+    private void buyFromSettlement(Unit unit, Goods goods, int gold) {
+        if (freeColClient.getGame().getCurrentPlayer() != freeColClient.getMyPlayer()) {
+            freeColClient.getCanvas().showInformationMessage("notYourTurn");
+            return;
+        }
+
+        Client client = freeColClient.getClient();
+
+        Element buyElement = Message.createNewRootElement("buy");
+        buyElement.setAttribute("unit", unit.getID());
+        buyElement.setAttribute("gold", Integer.toString(gold));
+        buyElement.appendChild(goods.toXMLElement(null, buyElement.getOwnerDocument()));
+
+        Element reply = client.ask(buyElement);
+
+        IndianSettlement settlement = (IndianSettlement) goods.getLocation();
+        // add goods to settlement in order to client will be able to transfer the goods
+        settlement.add(goods);
+        unit.buy(settlement, goods, gold);
 
         freeColClient.getCanvas().updateGoldLabel();
     }
