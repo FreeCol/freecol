@@ -1,5 +1,6 @@
 package net.sf.freecol.client.gui.panel;
 
+import com.sun.java_cup.internal.production;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
@@ -16,6 +17,7 @@ import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.UIManager;
+import net.sf.freecol.FreeCol;
 
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.ImageLibrary;
@@ -26,6 +28,7 @@ import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Tile;
+import net.sf.freecol.common.model.TileType;
 import net.sf.freecol.common.model.Unit;
 import cz.autel.dmi.HIGLayout;
 
@@ -232,9 +235,10 @@ public final class InfoPanel extends FreeColPanel {
      */
     public class TileInfoPanel extends JPanel {
         
-        private final JLabel tileLabel, tileNameLabel, bonusLabel, riverLabel, roadLabel, plowLabel, ownerLabel;
+        private final JLabel tileLabel, tileNameLabel, bonusLabel,
+                riverRoadLabel, plowOwnerLabel, movementLabel;
         
-        private final JPanel picturePanel, labelPanel;
+        private final JPanel picturePanel, labelPanel, goodsPanel;
         
         private Tile tile;
         
@@ -250,29 +254,36 @@ public final class InfoPanel extends FreeColPanel {
             tileLabel.setHorizontalAlignment(JLabel.CENTER);
             tileLabel.setVerticalAlignment(JLabel.CENTER);
             picturePanel.add(tileLabel, BorderLayout.CENTER);
-            // tileNameLabel = new JLabel();
-            // picturePanel.add(tileNameLabel, BorderLayout.SOUTH);
             add(picturePanel);
             
+            int[] widths_goods = { 0, 0, 0 };
+            int[] heights_goods = { 0, 0 };
+            goodsPanel = new JPanel(new HIGLayout(widths_goods, heights_goods));
+            goodsPanel.setOpaque(false);
+            
             int[] widths = { 0 };
-            int[] heights = { 0, 0, 0, 0 };
+            int[] heights = new int[8];
             labelPanel = new JPanel(new HIGLayout(widths, heights));
             labelPanel.setOpaque(false);
             
             tileNameLabel = new JLabel();
             bonusLabel = new JLabel();
-            riverLabel = new JLabel(Messages.message("river"));
-            roadLabel = new JLabel(Messages.message("road"));
-            plowLabel = new JLabel(Messages.message("plowed"));
-            ownerLabel = new JLabel();
+            riverRoadLabel = new JLabel();
+            plowOwnerLabel = new JLabel();
+            movementLabel = new JLabel();
             
             tileLabel.setFocusable(false);
             tileNameLabel.setFocusable(false);
             bonusLabel.setFocusable(false);
-            roadLabel.setFocusable(false);
-            riverLabel.setFocusable(false);
-            plowLabel.setFocusable(false);
-            ownerLabel.setFocusable(false);
+            riverRoadLabel.setFocusable(false);
+            plowOwnerLabel.setFocusable(false);
+            movementLabel.setFocusable(false);
+            
+            bonusLabel.setFont(bonusLabel.getFont().deriveFont(9f));
+            riverRoadLabel.setFont(riverRoadLabel.getFont().deriveFont(9f));
+            plowOwnerLabel.setFont(plowOwnerLabel.getFont().deriveFont(9f));
+            movementLabel.setFont(movementLabel.getFont().deriveFont(9f));
+
             labelPanel.setSize(100, 100);
             labelPanel.setLocation(130, 10);// (100-labelPanel.getHeight())/2);
             add(labelPanel);
@@ -282,37 +293,111 @@ public final class InfoPanel extends FreeColPanel {
         }
         
         /**
-         * Paints this component.
-         *
-         * @param graphics The Graphics context in which to draw this component.
+         * Returns the basic movement cost of the tile
+         * @return the basic movement cost of the tile
          */
-        public void paintComponent(Graphics graphics) {
+        private int getMovementCost(Tile tile) {
+            if (tile.getAddition() == Tile.ADD_MOUNTAINS) {
+                return 9;
+            } else if (tile.getAddition() == Tile.ADD_HILLS) {
+                return 6;
+            }
+
+            TileType t = FreeCol.getSpecification().tileType(tile.getType());
+            return tile.isForested() ? t.whenForested.basicMoveCost : t.basicMoveCost;
+        }
+        
+        /**
+         * Adds the goods produced by the tile
+         */
+        private void addProducedGoods(Tile tile) {
+            int counter = 1;
+            int row = 1;
+            goodsPanel.removeAll();
+            for (int i = 0; i < Goods.NUMBER_OF_TYPES; i++) {
+                int production = tile.potential(i);
+                if (production > 0) {
+                    int type = i;
+                    if (i == Goods.FOOD && !tile.isLand()) {
+                        type = Goods.FISH;
+                    }
+                    JLabel goodsLabel = new JLabel(String.valueOf(production),
+                            library.getScaledGoodsImageIcon(type, 0.50f), JLabel.RIGHT);
+                    goodsLabel.setToolTipText(Goods.getName(type));
+                    goodsLabel.setFont(goodsLabel.getFont().deriveFont(9f));
+                    goodsPanel.add(goodsLabel, higConst.rc(row, counter));
+                    if (counter == 3) {
+                        row++;
+                        counter = 1;
+                    } else {
+                        counter++;
+                    }
+                }
+            }
+            goodsPanel.validate();
+        }
+        
+        /**
+         * Updates this <code>InfoPanel</code>.
+         *
+         * @param tile The displayed tile (or null if none)
+         */
+        public void update(Tile tile) {
+            this.tile = tile;
+            
+            labelPanel.removeAll();
             if (tile != null) {
                 tileNameLabel.setText(tile.getName());
-                labelPanel.removeAll();
                 labelPanel.add(tileNameLabel, higConst.rc(1, 1));
+                String text;
                 int row = 2;
+                
+                text = "";
                 if (tile.getAddition() == Tile.ADD_RIVER_MINOR) {
-                    riverLabel.setText(Messages.message("minorRiver"));
-                    labelPanel.add(riverLabel, higConst.rc(row, 1));
-                    row++;
+                    text = Messages.message("minorRiver");
                 } else if (tile.getAddition() == Tile.ADD_RIVER_MAJOR) {
-                    riverLabel.setText(Messages.message("majorRiver"));
-                    labelPanel.add(riverLabel, higConst.rc(row, 1));
-                    row++;
+                    text = Messages.message("majorRiver");
                 }
                 if (tile.hasRoad()) {
-                    labelPanel.add(roadLabel, higConst.rc(row, 1));
+                    if (!text.equals("")) {
+                        text += ", ";
+                    }
+                    text += Messages.message("road");
+                }
+                riverRoadLabel.setText(text);
+                if (!text.equals("")) {
+                    labelPanel.add(riverRoadLabel, higConst.rc(row, 1));
                     row++;
                 }
+
+                text = "";
                 if (tile.isPlowed()) {
-                    labelPanel.add(plowLabel, higConst.rc(row, 1));
-                    row++;
+                    text = Messages.message("plowed");
+                    if (tile.getNationOwner() != Player.NO_NATION) {
+                        text += ", ";
+                    }
                 }
                 if (tile.getNationOwner() != Player.NO_NATION) {
-                    ownerLabel.setText(Player.getNationAsString(tile.getNationOwner()));
-                    labelPanel.add(ownerLabel, higConst.rc(row, 1));
+                    text += Player.getNationAsString(tile.getNationOwner());
                 }
+                plowOwnerLabel.setText(text);
+                if (!text.equals("")) {
+                    labelPanel.add(plowOwnerLabel, higConst.rc(row, 1));
+                    row++;
+                }
+
+                bonusLabel.setText(Messages.message("colopedia.terrain.defenseBonus") +
+                        " " + tile.defenseBonus() + "%");
+                labelPanel.add(bonusLabel, higConst.rc(row, 1));
+                row++;
+
+                movementLabel.setText(Messages.message("colopedia.terrain.movementCost") +
+                        " " + String.valueOf(getMovementCost(tile)/3));
+                labelPanel.add(movementLabel, higConst.rc(row, 1));
+                row++;
+
+                labelPanel.add(goodsPanel, higConst.rc(row, 1));
+                addProducedGoods(tile);
                 
                 int width = library.getTerrainImageWidth(tile.getType());
                 int height = library.getTerrainImageHeight(tile.getType());
@@ -324,16 +409,6 @@ public final class InfoPanel extends FreeColPanel {
                 tileLabel.setIcon(null);
             }
             labelPanel.validate();
-            super.paintComponent(graphics);
-        }
-        
-        /**
-         * Updates this <code>InfoPanel</code>.
-         *
-         * @param tile The displayed tile (or null if none)
-         */
-        public void update(Tile tile) {
-            this.tile = tile;
         }
         
         /**

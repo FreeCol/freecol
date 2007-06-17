@@ -423,9 +423,9 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
         repaint();
 
         int[] widths = { 0, 3 * margin, 0 };
-        int[] heights = new int[11];
-        for (int index = 0; index < 4; index++) {
-            heights[2 * index + 1] = margin;
+        int[] heights = new int[13];
+        for (int index = 1; index < 12; index += 2) {
+            heights[index] = margin;
         }
         int row = 1;
         int leftColumn = 1;
@@ -442,6 +442,7 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
         String id = null;
         String name = null;
         String defenseBonus = null;
+        int movementCost;
 
         switch (type) {
         case ImageLibrary.HILLS:
@@ -450,6 +451,7 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
             addition = Tile.ADD_HILLS;
             productionIndex = 12;
             defenseBonus = "150%";
+            movementCost = 6;
             break;
         case ImageLibrary.MOUNTAINS:
             id = "mountains";
@@ -457,6 +459,7 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
             addition = Tile.ADD_MOUNTAINS;
             productionIndex = 13;
             defenseBonus = "200%";
+            movementCost = 9;
             break;
         default:
             TileType tileType = (forested ? FreeCol.getSpecification().tileType(type).whenForested :
@@ -464,7 +467,9 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
             id = tileType.id;
             name = Messages.message(tileType.name);
             defenseBonus = String.valueOf(tileType.defenceBonus) + "%";
+            movementCost = tileType.basicMoveCost;
         }
+        movementCost /= 3;
 
         JLabel nameLabel = new JLabel(name, SwingConstants.CENTER);
         nameLabel.setFont(smallHeaderFont);
@@ -474,6 +479,10 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
         detailPanel.add(new JLabel(Messages.message("colopedia.terrain.terrainImage")), higConst.rc(row, leftColumn));
         Image terrainImage = library.getScaledTerrainImage(type, forested, 1f);
         detailPanel.add(new JLabel(new ImageIcon(terrainImage)), higConst.rc(row, rightColumn));
+        row += 2;
+
+        detailPanel.add(new JLabel(Messages.message("colopedia.terrain.movementCost")), higConst.rc(row, leftColumn));
+        detailPanel.add(new JLabel(String.valueOf(movementCost)), higConst.rc(row, rightColumn));
         row += 2;
 
         detailPanel.add(new JLabel(Messages.message("colopedia.terrain.defenseBonus")), higConst.rc(row, leftColumn));
