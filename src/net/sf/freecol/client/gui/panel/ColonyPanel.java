@@ -793,15 +793,17 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener {
             }
             
             parent.remove(this);
-            freeColClient.getInGameController().nextModelMessage();
-            Unit activeUnit = parent.getGUI().getActiveUnit();
-            if (activeUnit == null
-                    || activeUnit.getTile() == null
-                    || activeUnit.getMovesLeft() <= 0
-                    || (!(activeUnit.getLocation() instanceof Tile) && !(activeUnit
-                            .getLocation() instanceof Unit))) {
-                parent.getGUI().setActiveUnit(null);
-                freeColClient.getInGameController().nextActiveUnit();
+            if (freeColClient.getGame().getCurrentPlayer() == freeColClient.getMyPlayer()) {
+                freeColClient.getInGameController().nextModelMessage();
+                Unit activeUnit = parent.getGUI().getActiveUnit();
+                if (activeUnit == null
+                        || activeUnit.getTile() == null
+                        || activeUnit.getMovesLeft() <= 0
+                        || (!(activeUnit.getLocation() instanceof Tile) && !(activeUnit
+                                .getLocation() instanceof Unit))) {
+                    parent.getGUI().setActiveUnit(null);
+                    freeColClient.getInGameController().nextActiveUnit();
+                }
             }
             freeColClient.getGUI().restartBlinking();
         }
