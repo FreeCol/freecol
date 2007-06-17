@@ -2222,7 +2222,8 @@ public final class InGameController implements NetworkConstants {
                     buyLand(unit.getTile());
                 }
             }
-        } else if (state == Unit.FORTIFYING && unit.getType() != Unit.PRIVATEER && unit.getTile() != null) {
+        } else if (state == Unit.FORTIFYING && unit.isOffensiveUnit() &&
+                unit.getType() != Unit.PRIVATEER && unit.getTile() != null) {
             Player myPlayer = unit.getOwner();
             Iterator<Position> it = game.getMap().getAdjacentIterator(unit.getTile().getPosition());
             while (it.hasNext()) {

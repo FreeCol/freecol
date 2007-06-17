@@ -392,7 +392,8 @@ public class ColonyTile extends FreeColGameObject implements WorkLocation, Ownab
         if (unit != null && unit.getOwner() != myPlayer
                 && myPlayer.getStance(unit.getOwner()) != Player.ALLIANCE) {
             for(Unit enemyUnit : workTile.getUnitList()) {
-                if (enemyUnit.getState() == Unit.FORTIFIED) {
+                if (enemyUnit.isOffensiveUnit() &&
+                        enemyUnit.getState() == Unit.FORTIFIED) {
                     return enemyUnit;
                 }
             }
