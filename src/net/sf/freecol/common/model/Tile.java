@@ -2359,4 +2359,32 @@ public final class Tile extends FreeColGameObject implements Location, Nameable 
             return workAmount;
         }
     }
+
+    /**
+     * Returns the unit who is occupying the tile
+     * @return the unit who is occupying the tile
+     * @see #isOccupied()
+     */
+    public Unit getOccupyingUnit() {
+        Unit unit = getFirstUnit();
+        Player owner = getOwner().getOwner();
+        if (unit != null && unit.getOwner() != owner
+                && owner.getStance(unit.getOwner()) != Player.ALLIANCE) {
+            for(Unit enemyUnit : getUnitList()) {
+                if (enemyUnit.isOffensiveUnit() && enemyUnit.getState() == Unit.FORTIFIED) {
+                    return enemyUnit;
+                }
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Checks whether there is a fortified enemy unit in the tile.
+     * Units can't produce in occupied tiles
+     * @returns <code>true</code> if an fortified enemy unit is in the tile
+     */
+    public boolean isOccupied() {
+        return getOccupyingUnit() != null;
+    }
 }

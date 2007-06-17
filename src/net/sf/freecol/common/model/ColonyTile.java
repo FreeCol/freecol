@@ -387,18 +387,7 @@ public class ColonyTile extends FreeColGameObject implements WorkLocation, Ownab
      * @see #isOccupied()
      */
     public Unit getOccupyingUnit() {
-        Unit unit = workTile.getFirstUnit();
-        Player myPlayer = colony.getOwner();
-        if (unit != null && unit.getOwner() != myPlayer
-                && myPlayer.getStance(unit.getOwner()) != Player.ALLIANCE) {
-            for(Unit enemyUnit : workTile.getUnitList()) {
-                if (enemyUnit.isOffensiveUnit() &&
-                        enemyUnit.getState() == Unit.FORTIFIED) {
-                    return enemyUnit;
-                }
-            }
-        }
-        return null;
+        return workTile.getOccupyingUnit();
     }
 
     /**
@@ -407,7 +396,7 @@ public class ColonyTile extends FreeColGameObject implements WorkLocation, Ownab
      * @returns <code>true</code> if an fortified enemy unit is in the tile
      */
     public boolean isOccupied() {
-        return getOccupyingUnit() != null;
+        return workTile.isOccupied();
     }
     
     /**

@@ -2223,16 +2223,14 @@ public final class InGameController implements NetworkConstants {
                 }
             }
         } else if (state == Unit.FORTIFYING && unit.isOffensiveUnit() &&
-                unit.getType() != Unit.PRIVATEER && unit.getTile() != null) {
-            Player myPlayer = unit.getOwner();
-            Iterator<Position> it = game.getMap().getAdjacentIterator(unit.getTile().getPosition());
-            while (it.hasNext()) {
-                Tile tile = game.getMap().getTile(it.next());
-                if (tile.getColony() != null && tile.getColony().getOwner() != myPlayer) {
-                    int stance = myPlayer.getStance(tile.getColony().getOwner());
-                    if (stance != Player.ALLIANCE && !confirmHostileAction(unit, tile)) {
-                        return;
-                    }
+                unit.getType() != Unit.PRIVATEER) { // check if it's going to occupy a work tile
+            Tile tile = unit.getTile();
+            if (tile != null && tile.getOwner() != null) { // check stance with settlement's owner
+                Player myPlayer = unit.getOwner();
+                Player enemy = tile.getOwner().getOwner();
+                if (myPlayer != enemy && myPlayer.getStance(enemy) != Player.ALLIANCE
+                        && !confirmHostileAction(unit, tile)) { // player has aborted
+                    return;
                 }
             }
         }

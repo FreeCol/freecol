@@ -923,7 +923,7 @@ public class IndianSettlement extends Settlement {
         Iterator<Position> it = getGame().getMap().getCircleIterator(getTile().getPosition(), true, getRadius());
         while (it.hasNext()) {
             Tile workTile = getGame().getMap().getTile(it.next());
-            if (workTile.getOwner() == null || workTile.getOwner() == this) {
+            if ((workTile.getOwner() == null || workTile.getOwner() == this) && !workTile.isOccupied()) {
                 potential += workTile.potential(type);
             }
         }
@@ -944,15 +944,8 @@ public class IndianSettlement extends Settlement {
         
         /* Determine the maximum possible production for each type of goods: */
         int[] potential = new int[Goods.NUMBER_OF_TYPES];
-
-        Iterator<Position> it = getGame().getMap().getCircleIterator(getTile().getPosition(), true, getRadius());
-        while (it.hasNext()) {
-            Tile workTile = getGame().getMap().getTile(it.next());
-            if (workTile.getOwner() == null || workTile.getOwner() == this) {
-                for (int i=0; i<Goods.NUMBER_OF_TYPES;i++) {
-                    potential[i] = getProductionOf(i);
-                }
-            }
+        for (int i=0; i<Goods.NUMBER_OF_TYPES;i++) {
+            potential[i] = getProductionOf(i);
         }
 
         /* Produce the goods: */
