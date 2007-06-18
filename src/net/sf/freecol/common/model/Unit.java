@@ -215,7 +215,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
         workType = Goods.FOOD;
 
         this.movesLeft = getInitialMovesLeft();
-        setHitpoints(getInitialHitpoints(getType()));
+        hitpoints = getInitialHitpoints(getType());
 
         getOwner().invalidateCanSeeTiles();
     }
