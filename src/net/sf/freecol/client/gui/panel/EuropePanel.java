@@ -23,11 +23,15 @@ import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.JTextPane;
 import javax.swing.KeyStroke;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.border.TitledBorder;
+import javax.swing.text.SimpleAttributeSet;
+import javax.swing.text.StyleConstants;
+import javax.swing.text.StyledDocument;
 
 import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.client.FreeColClient;
@@ -38,6 +42,7 @@ import net.sf.freecol.common.model.Europe;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.Player;
+import net.sf.freecol.common.model.TransactionListener;
 import net.sf.freecol.common.model.Unit;
 import cz.autel.dmi.HIGLayout;
 
@@ -75,6 +80,8 @@ public final class EuropePanel extends FreeColPanel implements ActionListener {
     private final CargoPanel cargoPanel;
 
     private final MarketPanel marketPanel;
+    
+    private final TransactionLog log;
 
     private final DefaultTransferHandler defaultTransferHandler;
 
@@ -144,6 +151,13 @@ public final class EuropePanel extends FreeColPanel implements ActionListener {
         docksPanel = new DocksPanel(this);
         cargoPanel = new CargoPanel(this);
         marketPanel = new MarketPanel(this);
+        
+        log = new TransactionLog();
+        SimpleAttributeSet attributes = new SimpleAttributeSet();
+        StyleConstants.setAlignment(attributes, StyleConstants.ALIGN_RIGHT);
+        StyleConstants.setForeground(attributes, Color.WHITE);
+        StyleConstants.setBold(attributes, true);
+        log.setParagraphAttributes(attributes, true);
 
         toAmericaPanel.setBackground(Color.WHITE);
         toEuropePanel.setBackground(Color.WHITE);
@@ -188,6 +202,8 @@ public final class EuropePanel extends FreeColPanel implements ActionListener {
                 ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
         JScrollPane marketScroll = new JScrollPane(marketPanel, ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER,
                 ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+        JScrollPane logScroll = new JScrollPane(log, ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
+                ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
 
         toAmericaPanel.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEmptyBorder(), Messages
                 .message("goingToAmerica")));
@@ -199,6 +215,7 @@ public final class EuropePanel extends FreeColPanel implements ActionListener {
                 .message("docks")));
         inPortPanel.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEmptyBorder(), Messages
                 .message("inPort")));
+        logScroll.setBorder(BorderFactory.createEmptyBorder());
 
         marketScroll.getViewport().setOpaque(false);
         marketPanel.setOpaque(false);
@@ -212,6 +229,8 @@ public final class EuropePanel extends FreeColPanel implements ActionListener {
         docksPanel.setOpaque(false);
         inPortScroll.getViewport().setOpaque(false);
         inPortPanel.setOpaque(false);
+        logScroll.getViewport().setOpaque(false);
+        log.setOpaque(false);
         recruitButton.setOpaque(false);
         purchaseButton.setOpaque(false);
         trainButton.setOpaque(false);
@@ -220,6 +239,7 @@ public final class EuropePanel extends FreeColPanel implements ActionListener {
 
         int[] widths = { 0, 315, margin, 103, margin, 198, margin, 0, 0 };
         int[] heights = { 0, // top margin
+                120, margin, // log
                 // sailing to America, sailing to Europe
                 39, margin, // recruit button
                 39, margin, // buy button
@@ -239,6 +259,8 @@ public final class EuropePanel extends FreeColPanel implements ActionListener {
         setLayout(layout);
 
         int row = 2;
+        add(logScroll, higConst.rcwh(row, 2, 6, 1));
+        row += 2;
         add(toAmericaScroll, higConst.rcwh(row, 2, 1, 7));
         add(toEuropeScroll, higConst.rcwh(row, 4, 3, 7));
         add(recruitButton, higConst.rc(row, 8));
@@ -407,6 +429,8 @@ public final class EuropePanel extends FreeColPanel implements ActionListener {
         this.europe = europe;
         this.game = game;
 
+        freeColClient.getMyPlayer().getMarket().addTransactionListener(log);
+        
         //
         // Remove the old components from the panels.
         //
@@ -417,6 +441,7 @@ public final class EuropePanel extends FreeColPanel implements ActionListener {
         cargoPanel.removeAll();
         marketPanel.removeAll();
         docksPanel.removeAll();
+        log.setText("");
 
         //
         // Place new components on the panels.
@@ -616,6 +641,7 @@ public final class EuropePanel extends FreeColPanel implements ActionListener {
         try {
             switch (Integer.valueOf(command).intValue()) {
             case EXIT:
+                freeColClient.getMyPlayer().getMarket().removeTransactionListener(log);
                 parent.remove(this);
                 freeColClient.getInGameController().nextModelMessage();
                 break;
@@ -968,7 +994,8 @@ public final class EuropePanel extends FreeColPanel implements ActionListener {
                     return comp;
                 } else if (comp instanceof MarketLabel) {
                     MarketLabel label = (MarketLabel) comp;
-                    if (freeColClient.getMyPlayer().canTrade(label.getType())) {
+                    Player player = freeColClient.getMyPlayer();
+                    if (player.canTrade(label.getType())) {
                         inGameController.buyGoods(label.getType(), label.getAmount(), selectedUnit.getUnit());
                         inGameController.nextModelMessage();
                         updateCargoLabel();
@@ -1071,6 +1098,57 @@ public final class EuropePanel extends FreeColPanel implements ActionListener {
 
         public String getUIClassID() {
             return "MarketPanelUI";
+        }
+    }
+    
+    /**
+     * To log transactions made in Europe
+     */
+    public class TransactionLog extends JTextPane implements TransactionListener {
+        public TransactionLog() {
+            setEditable(false);
+        }
+        
+        private void add(String text) {
+            StyledDocument doc = getStyledDocument();
+            try {
+                if (doc.getLength() > 0) {
+                    text = "\n\n" + text;
+                }
+                doc.insertString(doc.getLength(), text, null);
+            } catch(Exception e) {
+                logger.warning("Failed to update transaction log: " + e.toString());
+            }
+        }
+        
+        public void logPurchase(int goodsType, int amount, int price) {
+            int total = amount * price;
+            String text = Messages.message("transaction.purchase",
+                    new String[][] {{"%goods%", Goods.getName(goodsType)},
+                                    {"%amount%", String.valueOf(amount)},
+                                    {"%gold%", String.valueOf(price)}})
+                + "\n" + Messages.message("transaction.price",
+                    new String[][] {{"%gold%", String.valueOf(total)}});
+            add(text);
+        }
+
+        public void logSale(int goodsType, int amount, int price, int tax) {
+            int totalBeforeTax = amount * price;
+            int totalTax = totalBeforeTax * tax / 100;
+            int totalAfterTax = totalBeforeTax - totalTax;
+            
+            String text = Messages.message("transaction.sale",
+                    new String[][] {{"%goods%", Goods.getName(goodsType)},
+                                    {"%amount%", String.valueOf(amount)},
+                                    {"%gold%", String.valueOf(price)}})
+                + "\n" + Messages.message("transaction.price",
+                    new String[][] {{"%gold%", String.valueOf(totalBeforeTax)}})
+                + "\n" + Messages.message("transaction.tax",
+                    new String[][] {{"%tax%", String.valueOf(tax)},
+                                    {"%gold%", String.valueOf(totalTax)}})
+                + "\n" + Messages.message("transaction.net",
+                    new String[][] {{"%gold%", String.valueOf(totalAfterTax)}});
+            add(text);
         }
     }
 

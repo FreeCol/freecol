@@ -1,6 +1,7 @@
 
 package net.sf.freecol.common.model;
 
+import java.util.ArrayList;
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
@@ -90,6 +91,9 @@ public final class Market extends FreeColGameObject implements Ownable {
         1  // MUSKETS
     };
 
+    private ArrayList<TransactionListener> transactionListeners =
+            new ArrayList<TransactionListener>();
+    
     // ----------------------------------------------------------- constructors
 
     public Market(Game game, Player player) {
@@ -249,13 +253,20 @@ public final class Market extends FreeColGameObject implements Ownable {
      */
     public void sell(int type, int amount, Player player, int marketAccess) {
         if (player.canTrade(type, marketAccess)) {
+            int unitPrice = paidForSale(type);
+            int tax = player.getTax();
+            
             int incomeBeforeTaxes = getSalePrice(type, amount);
-            int incomeAfterTaxes = ((100 - player.getTax()) * incomeBeforeTaxes) / 100;
+            int incomeAfterTaxes = ((100 - tax) * incomeBeforeTaxes) / 100;
             player.modifyGold(incomeAfterTaxes);
             player.modifySales(type, amount);
             player.modifyIncomeBeforeTaxes(type, incomeBeforeTaxes);
             player.modifyIncomeAfterTaxes(type, incomeAfterTaxes);
             add(type, (player.getNation() == Player.DUTCH) ? (amount/2) : amount);
+
+            for(TransactionListener listener : transactionListeners) {
+                listener.logSale(type, amount, unitPrice, tax);
+            }
         } else {
             addModelMessage(this, "model.europe.market",
                             new String [][] {{"%goods%", Goods.getName(type)}},
@@ -297,12 +308,17 @@ public final class Market extends FreeColGameObject implements Ownable {
             throw new IllegalStateException();
         }
 
+        int unitPrice = costToBuy(type);
         int price = getBidPrice(type, amount);
         player.modifyGold(-price);
         player.modifySales(type, -amount);
         player.modifyIncomeBeforeTaxes(type, -price);
         player.modifyIncomeAfterTaxes(type, -price);
         remove(type, ((player.getNation() == Player.DUTCH) ? (amount / 2) : amount));
+        
+        for(TransactionListener listener : transactionListeners) {
+            listener.logPurchase(type, amount, unitPrice);
+        }
     }
 
 
@@ -512,6 +528,34 @@ public final class Market extends FreeColGameObject implements Ownable {
      */
     public static String getXMLElementTagName() {
         return "market";
+    }
+    
+    /**
+     * Adds a transaction listener for notification of any transaction
+     *
+     * @param listener the listener
+     */
+    public void addTransactionListener(TransactionListener listener) {
+        transactionListeners.add(listener);
+    }
+
+    /**
+     * Removes a transaction listener
+     *
+     * @param listener the listener
+     */
+    public void removeTransactionListener(TransactionListener listener) {
+        transactionListeners.remove(listener);
+    }
+
+    /**
+     * Returns an array of all the TransactionListener added to this Market.
+     *
+     * @return all of the TransactionListener added or an empty array if no
+     * listeners have been added
+     */
+    public TransactionListener[] getTransactionListener() {
+        return transactionListeners.toArray(new TransactionListener[0]);
     }
 
     
