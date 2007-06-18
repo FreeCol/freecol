@@ -393,7 +393,7 @@ public class ColonyTile extends FreeColGameObject implements WorkLocation, Ownab
     /**
      * Checks whether there is a fortified enemy unit in the tile.
      * Units can't produce in occupied tiles
-     * @returns <code>true</code> if an fortified enemy unit is in the tile
+     * @return <code>true</code> if an fortified enemy unit is in the tile
      */
     public boolean isOccupied() {
         return workTile.isOccupied();

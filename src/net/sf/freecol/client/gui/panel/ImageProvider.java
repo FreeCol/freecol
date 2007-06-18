@@ -82,8 +82,8 @@ public abstract class ImageProvider {
     /**
      * Returns the unit-ImageIcon at the given index.
      * 
-     * @param index The index of the unit-ImageIcon to return.
-     * @return The unit-ImageIcon at the given index.
+     * @param type The type of the Unit of which we need the ImageIcon.
+     * @return The unit-ImageIcon of the Unit with the given type.
      */
     public abstract ImageIcon getUnitImageIcon(int type);
 

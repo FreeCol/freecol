@@ -43,7 +43,7 @@ public class WaitAction extends MapboardAction {
     /**
      * Returns the id of this <code>Option</code>.
      * 
-     * @return
+     * @return "waitAction"
      */
     public String getId() {
         return ID;

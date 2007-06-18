@@ -69,11 +69,6 @@ public abstract class FreeColAction extends AbstractAction implements Option {
      * @param shortDescription An i18n-key to identify a short description of
      *            this action. This value can be set to <code>null</code> if
      *            the action does not have a description.
-     * @param mnemonic A mnemonic to be used for selecting this action when the
-     *            action is displaying on a menu etc.
-     * @param accelerator The keyboard accelerator to be used for selecting this
-     *            action or <code>null</code> if this action does not have an
-     *            accelerator.
      */
     protected FreeColAction(FreeColClient freeColClient, String name, String shortDescription) {
         super(Messages.message(name));
@@ -83,6 +78,17 @@ public abstract class FreeColAction extends AbstractAction implements Option {
         putValue(SHORT_DESCRIPTION, shortDescription);
     }
 
+    /**
+     * Creates a new <code>FreeColAction</code>.
+     * 
+     * @param freeColClient The main controller object for the client.
+     * @param name An i18n-key to identify the name of this action.
+     * @param shortDescription An i18n-key to identify a short description of
+     *            this action. This value can be set to <code>null</code> if
+     *            the action does not have a description.
+     * @param mnemonic A mnemonic to be used for selecting this action when the
+     *            action is displaying on a menu etc.
+     */
     protected FreeColAction(FreeColClient freeColClient, String name, String shortDescription, int mnemonic) {
         super(Messages.message(name));
 
@@ -92,6 +98,18 @@ public abstract class FreeColAction extends AbstractAction implements Option {
         putValue(MNEMONIC_KEY, new Integer(mnemonic));
     }
 
+    /**
+     * Creates a new <code>FreeColAction</code>.
+     * 
+     * @param freeColClient The main controller object for the client.
+     * @param name An i18n-key to identify the name of this action.
+     * @param shortDescription An i18n-key to identify a short description of
+     *            this action. This value can be set to <code>null</code> if
+     *            the action does not have a description.
+     * @param accelerator The keyboard accelerator to be used for selecting this
+     *            action or <code>null</code> if this action does not have an
+     *            accelerator.
+     */
     protected FreeColAction(FreeColClient freeColClient, String name, String shortDescription, KeyStroke accelerator) {
         super(Messages.message(name));
 
@@ -101,6 +119,20 @@ public abstract class FreeColAction extends AbstractAction implements Option {
         putValue(ACCELERATOR_KEY, accelerator);
     }
 
+    /**
+     * Creates a new <code>FreeColAction</code>.
+     * 
+     * @param freeColClient The main controller object for the client.
+     * @param name An i18n-key to identify the name of this action.
+     * @param shortDescription An i18n-key to identify a short description of
+     *            this action. This value can be set to <code>null</code> if
+     *            the action does not have a description.
+     * @param mnemonic A mnemonic to be used for selecting this action when the
+     *            action is displaying on a menu etc.
+     * @param accelerator The keyboard accelerator to be used for selecting this
+     *            action or <code>null</code> if this action does not have an
+     *            accelerator.
+     */
     protected FreeColAction(FreeColClient freeColClient, String name, String shortDescription, int mnemonic,
             KeyStroke accelerator) {
         super(Messages.message(name));
@@ -112,6 +144,11 @@ public abstract class FreeColAction extends AbstractAction implements Option {
         putValue(ACCELERATOR_KEY, accelerator);
     }
 
+    /**
+     * Gets the mnemonic to be used for selecting this action
+     * 
+     * @return The mnemonic of the action
+     */
     public Integer getMnemonic() {
         return (Integer) getValue(MNEMONIC_KEY);
     }

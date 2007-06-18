@@ -589,7 +589,6 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
      * @return The number of turns of training this <code>Unit</code> has
      *         given.
      * @see #setTurnsOfTraining
-     * @see #getTrainingType
      * @see #getNeededTurnsOfTraining
      */
     public int getTurnsOfTraining() {
@@ -905,7 +904,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
      * Gets the type of a move that is made when moving to the specified
      * <code>Tile</code> from the specified <code>Tile</code>.
      * 
-     * @param target The origin tile of the move
+     * @param from The origin tile of the move
      * @param target The target tile of the move
      * @param ml The amount of moves this Unit has left
      * @return The move type. Notice: <code>Unit.ILLEGAL_MOVE</code> when
@@ -969,7 +968,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
      * Gets the type of a move that is made when moving to the specified
      * <code>Tile</code> from the specified <code>Tile</code>.
      * 
-     * @param target The origin tile of the move
+     * @param from The origin tile of the move
      * @param target The target tile of the move
      * @param ml The amount of moves this Unit has left
      * @return The move type. Notice: <code>Unit.ILLEGAL_MOVE</code> when
@@ -4690,7 +4689,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
      * Returns true if this unit has already been moved onto high seas but not
      * to europe.
      * 
-     * @return
+     * @return true if the unit has already been moved onto high seas
      */
     public boolean isAlreadyOnHighSea() {
         return alreadyOnHighSea;

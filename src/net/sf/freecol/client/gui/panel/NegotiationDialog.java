@@ -94,7 +94,7 @@ public final class NegotiationDialog extends FreeColDialog implements ActionList
      * @param parent a <code>Canvas</code> value
      * @param unit an <code>Unit</code> value
      * @param settlement a <code>Settlement</code> value
-     * @param items a <code>List</code> of <code>TradeItem</code> values.
+     * @param agreement a <code>DiplomaticTrade</code> with the offer
      */
     public NegotiationDialog(Canvas parent, Unit unit, Settlement settlement, DiplomaticTrade agreement) {
         super(parent);
@@ -353,7 +353,6 @@ public final class NegotiationDialog extends FreeColDialog implements ActionList
      *
      * @param source a <code>Player</code> value
      * @param goods a <code>Goods</code> value
-     * @param settlement a <code>Settlement</code> value
      */
     public void addGoodsTradeItem(Player source, Goods goods) {
         Player destination;

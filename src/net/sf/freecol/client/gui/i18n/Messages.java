@@ -58,10 +58,9 @@ public class Messages {
     }
 
     /**
-     * Returns the resource bundle for the given locale
+     * Set the resource bundle for the given locale
      * 
      * @param locale
-     * @return The ResourceBundle containing the messages for the given locale.
      */
     public static void setMessageBundle(Locale locale) {
         if (locale == null) {
@@ -75,12 +74,11 @@ public class Messages {
     }
 
     /**
-     * Returns the resource bundle for the given locale
+     * Set the resource bundle to the given locale
      * 
      * @param language The language for this locale.
      * @param country The language for this locale.
      * @param variant The variant for this locale.
-     * @return The ResourceBundle containing the messages for the given locale.
      */
     private static void setMessageBundle(String language, String country, String variant) {
 

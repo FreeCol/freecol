@@ -45,7 +45,7 @@ public class ReportTradeAction extends MapboardAction {
     /**
      * Returns the id of this <code>Option</code>.
      * 
-     * @return 
+     * @return "reportTradeAction"
      */
     public String getId() {
         return ID;

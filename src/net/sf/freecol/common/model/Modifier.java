@@ -39,7 +39,7 @@ public final class Modifier {
      *
      * @param id a <code>String</code> value
      * @param value an <code>float</code> value
-     * @param additive whether this modifier is additive
+     * @param type the type of the modifier
      */
     public Modifier(String id, float value, int type) {
         this.id = id;

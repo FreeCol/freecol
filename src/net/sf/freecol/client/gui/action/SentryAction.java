@@ -49,7 +49,7 @@ public class SentryAction extends MapboardAction {
     
     /**
     * Returns the id of this <code>Option</code>.
-    * @return 
+    * @return "sentryAction"
     */
     public String getId() {
         return ID;
@@ -57,7 +57,7 @@ public class SentryAction extends MapboardAction {
 
     /**
      * Applies this action.
-     * @param e The <code>ActionEvent</code>.
+     * @param actionEvent The <code>ActionEvent</code>.
      */    
     public void actionPerformed(ActionEvent actionEvent) {
         getFreeColClient().getInGameController().changeState(getFreeColClient().getGUI().getActiveUnit(), Unit.SENTRY);

@@ -37,7 +37,7 @@ public class AssignTradeRouteAction extends MapboardAction {
     /**
      * Returns the id of this <code>Option</code>.
      * 
-     * @return
+     * @return "assignTradeRouteAction"
      */
     public String getId() {
         return ID;

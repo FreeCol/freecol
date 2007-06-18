@@ -52,7 +52,7 @@ public class SkipUnitAction extends MapboardAction {
     /**
      * Returns the id of this <code>Option</code>.
      * 
-     * @return
+     * @return "skipUnitAction"
      */
     public String getId() {
         return ID;

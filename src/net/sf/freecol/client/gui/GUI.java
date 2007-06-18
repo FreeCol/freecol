@@ -2016,8 +2016,6 @@ public final class GUI {
      * (in pixels).
      * @param y The y-coordinate of the location where to draw the Tile
      * (in pixels).
-     * @param drawUnexploredBorders If true; draws border between explored and
-     *        unexplored terrain.
      */
     private void displayUnexploredBorders(Graphics2D g, Map map, Tile tile, int x, int y) {  
         Map.Position pos = new Map.Position(tile.getX(), tile.getY());

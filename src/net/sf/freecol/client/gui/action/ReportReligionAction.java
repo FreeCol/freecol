@@ -45,7 +45,7 @@ public class ReportReligionAction extends MapboardAction {
     /**
      * Returns the id of this <code>Option</code>.
      * 
-     * @return 
+     * @return "reportReligionAction"
      */
     public String getId() {
         return ID;

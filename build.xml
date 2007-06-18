@@ -439,6 +439,7 @@
                 overview="${freecol.overview.file}"
                 destdir="${freecol.javadoc.dir}"
                 packagenames="net.sf.freecol.*"
+                private="true"
                 classpath="${basedir}/jars/higlayout.jar:${basedir}/jars/jsr173_1.0_api.jar:${basedir}/jars/wstx-lgpl-4.0pr1.jar"
                 Author="true"
                 Windowtitle="FreeCol Code Documentation"

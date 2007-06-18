@@ -346,7 +346,7 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
      * Builds the button for the given unit.
      * 
      * @param unit
-     * @param unitIcon
+     * @param scale
      */
     private void buildUnitButton(int unit, float scale) {
         int tools = 0;

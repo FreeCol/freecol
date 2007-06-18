@@ -43,7 +43,7 @@ public class ColopediaFatherAction extends MapboardAction {
     /**
      * Returns the id of this <code>Option</code>.
      * 
-     * @return 
+     * @return "colopediaFatherAction"
      */
     public String getId() {
         return ID;

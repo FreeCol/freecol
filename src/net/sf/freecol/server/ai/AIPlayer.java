@@ -2012,8 +2012,6 @@ public class AIPlayer extends AIObject {
      * 
      * 
      * @param unit The foreign <code>Unit</code> trying to trade.
-     * @param settlement The <code>Settlement</code> this player owns and
-     *            which the given <code>Unit</code> if trying to sell goods.
      * @param goods The goods the given <code>Unit</code> is trying to sell.
      * @param gold The suggested price.
      * @return The price this <code>AIPlayer</code> suggests or

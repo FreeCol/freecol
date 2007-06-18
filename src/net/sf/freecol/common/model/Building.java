@@ -830,8 +830,8 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
       * Calculates and returns the output of this building from the input.
       *
       * @return The production of this building from the input.
-      * @see getProduction
-      * @see getProductionNextTurn
+      * @see #getProduction
+      * @see #getProductionNextTurn
       */
      public int calculateOutput(int goodsInput) {
          int goodsOutput = 0;

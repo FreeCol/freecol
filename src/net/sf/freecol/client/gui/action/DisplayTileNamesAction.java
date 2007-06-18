@@ -47,7 +47,7 @@ public class DisplayTileNamesAction extends SelectableAction {
     /**
      * Returns the id of this <code>Option</code>.
      * 
-     * @return
+     * @return "displayTileNamesAction"
      */
     public String getId() {
         return ID;

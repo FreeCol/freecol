@@ -174,8 +174,6 @@ public class Goods implements Locatable, Ownable, Nameable {
      * This method does not do anything.
      *
      * @param newName The new Name value.
-     * 
-     * @
      */
     public void setName(String newName) {
         // this.name = newName;

@@ -1321,7 +1321,6 @@ public class Map extends FreeColGameObject {
      * (making all model changes at the server). The reason is
      * the use of random numbers in this method.
      * 
-     * @param map The <code>Map</code>.
      * @return Position selected
      */
     public Position getRandomLandPosition() {

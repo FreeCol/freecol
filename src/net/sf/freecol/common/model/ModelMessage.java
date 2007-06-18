@@ -51,7 +51,6 @@ public class ModelMessage {
     * @param data Contains data to be displayed in the message or <i>null</i>.
     * @param type The type of this model message.
     * @param display The Object to display.
-    * @see Game#addModelMessage(ModelMessage)
     * @see FreeColGameObject#addModelMessage(FreeColGameObject, String, String[][], int)
     */
     public ModelMessage(FreeColGameObject source, String messageID, String[][] data, int type, Object display) {
@@ -71,7 +70,6 @@ public class ModelMessage {
     * @param messageID The ID of the message to display.
     * @param data Contains data to be displayed in the message or <i>null</i>.
     * @param type The type of this model message.
-    * @see Game#addModelMessage(ModelMessage)
     * @see FreeColGameObject#addModelMessage(FreeColGameObject, String, String[][], int)
     */
     public ModelMessage(FreeColGameObject source, String messageID, String[][] data, int type) {
@@ -122,7 +120,6 @@ public class ModelMessage {
     *               player getting the message.
     * @param messageID The ID of the message to display.
     * @param data Contains data to be displayed in the message or <i>null</i>.
-    * @see Game#addModelMessage(ModelMessage)
     * @see FreeColGameObject#addModelMessage(FreeColGameObject, String, String[][], int)
     */
     public ModelMessage(FreeColGameObject source, String messageID, String[][] data) {

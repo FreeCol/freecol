@@ -44,7 +44,7 @@ public class ClearOrdersAction extends MapboardAction {
     /**
      * Returns the id of this <code>Option</code>.
      * 
-     * @return
+     * @return "clearOrdersAction"
      */
     public String getId() {
         return ID;

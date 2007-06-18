@@ -130,7 +130,6 @@ public class ReportPanel extends FreeColPanel implements ActionListener {
     /**
      * Builds the button for the given unit.
      * 
-     * @param unit
      * @param unitIcon
      * @param scale
      */

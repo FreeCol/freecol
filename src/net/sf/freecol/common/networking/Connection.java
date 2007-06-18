@@ -373,7 +373,6 @@ public class Connection {
     /**
      * Ends the transmission of a message or a ask/get-reply session.
      * 
-     * @return An <code>XMLStreamReader</code> for reading the incoming data.
      * @throws IOException if thrown by the underlying network stream.
      * @see #ask()
      * @see #send()
@@ -561,7 +560,7 @@ public class Connection {
     /**
      * Override the default and return socket details.
      * 
-     * @rreturn human-readable description of connection.
+     * @return human-readable description of connection.
      */
     @Override
     public String toString() {

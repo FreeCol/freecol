@@ -48,7 +48,7 @@ public class GotoAction extends MapboardAction {
     /**
      * Returns the id of this <code>Option</code>.
      * 
-     * @return
+     * @return "gotoAction"
      */
     public String getId() {
         return ID;

@@ -122,7 +122,7 @@ public class PlowAction extends MapboardAction {
     /**
      * Returns the id of this <code>Option</code>.
      * 
-     * @return
+     * @return "plowAction"
      */
     public String getId() {
         return ID;

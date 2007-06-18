@@ -690,8 +690,8 @@ public class FreeColDialog extends FreeColPanel {
     * colony. Options are: spy the colony, negotiate with foreign power, attack or cancel.
     * The possible responses are integers that are defined in this class as finals.
     *
-    * @param settlement The indian settlement that is being scouted.
-    * @param player The player to create the dialog for.
+    * @param colony The foreign colony that is being scouted.
+    * @param unit The unit which is scouting
     * @return The FreeColDialog that asks the question to the user.
     */
     public static FreeColDialog createScoutForeignColonyDialog(Colony colony, Unit unit) {

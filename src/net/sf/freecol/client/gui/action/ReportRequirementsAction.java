@@ -45,7 +45,7 @@ public class ReportRequirementsAction extends MapboardAction {
     /**
      * Returns the id of this <code>Option</code>.
      * 
-     * @return 
+     * @return "reportRequirementsAction"
      */
     public String getId() {
         return ID;

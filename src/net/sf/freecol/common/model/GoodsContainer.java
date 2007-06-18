@@ -238,7 +238,7 @@ public class GoodsContainer extends FreeColGameObject {
     * amount of 100.
     *
     * @return The <code>Iterator</code>.
-    * @see #getCompactGoodsIterator
+    * @see #getCompactGoods
     */
     public Iterator<Goods> getGoodsIterator() {
         return getGoods().iterator();

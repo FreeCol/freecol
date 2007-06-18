@@ -1946,7 +1946,7 @@ public final class InGameController implements NetworkConstants {
      * Sets the export settings of the custom house.
      * 
      * @param colony The colony with the custom house.
-     * @param goods The goods for which to set the settings.
+     * @param goodsType The goods for which to set the settings.
      */
     public void setGoodsLevels(Colony colony, int goodsType) {
         Client client = freeColClient.getClient();

@@ -62,7 +62,7 @@ public class BuildRoadAction extends MapboardAction {
     
     /**
     * Returns the id of this <code>Option</code>.
-    * @return 
+    * @return "buildRoadAction"
     */
     public String getId() {
         return ID;

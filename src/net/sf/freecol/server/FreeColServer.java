@@ -852,7 +852,7 @@ public final class FreeColServer {
     /**
      * Get multiple random numbers.
      * 
-     * @param size The size of the returned array.
+     * @param n The size of the returned array.
      * @return array with random numbers.
      */
     public int[] getRandomNumbers(int n) {

@@ -143,9 +143,6 @@ public class IndianSettlement extends Settlement {
      * @param kind Kind of settlement
      * @param isCapital True if settlement is tribe's capital
      * @param learnableSkill The skill that can be learned by Europeans at this settlement.
-     * @param highlyWantedGoods The goods that are very much wanted by the people from this settlement.
-     * @param wantedGoods[1] Goods that wanted by the people from this settlement.
-     * @param wantedGoods[2] Goods that wanted by the people from this settlement.
      * @param isVisited Indicates if any European scout has asked to speak with the chief.
      * @param missionary The missionary in this settlement (or null).
      * @exception IllegalArgumentException if an invalid tribe or kind is given

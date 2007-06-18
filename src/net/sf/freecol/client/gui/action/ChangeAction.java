@@ -92,7 +92,7 @@ public class ChangeAction extends MapboardAction {
     
     /**
     * Returns the id of this <code>Option</code>.
-    * @return 
+    * @return "changeAction"
     */
     public String getId() {
         return ID;

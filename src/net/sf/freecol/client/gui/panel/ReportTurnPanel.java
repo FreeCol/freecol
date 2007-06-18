@@ -51,7 +51,6 @@ public final class ReportTurnPanel extends ReportPanel implements ActionListener
      * The constructor that will add the items to this panel.
      * 
      * @param parent The parent of this panel.
-     * @param freeColClient The main controller object for the client.
      */
     public ReportTurnPanel(Canvas parent) {
         super(parent, Messages.message("menuBar.report.turn"));
@@ -60,6 +59,8 @@ public final class ReportTurnPanel extends ReportPanel implements ActionListener
 
     /**
      * Prepares this panel to be displayed.
+     *
+     * @param messages The messages to be displayed
      */
     public void initialize(ArrayList<ModelMessage> messages) {
 

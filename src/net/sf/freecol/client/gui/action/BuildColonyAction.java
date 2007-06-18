@@ -59,7 +59,7 @@ public class BuildColonyAction extends MapboardAction {
     /**
      * Returns the id of this <code>Option</code>.
      * 
-     * @return
+     * @return "buildColonyAction"
      */
     public String getId() {
         return ID;

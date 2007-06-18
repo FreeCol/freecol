@@ -26,7 +26,8 @@ import org.w3c.dom.Element;
 * <br><br>
 *
 * When a new client connects to the server a new {@link Connection}
-* is made, with {@link UserConnectionHandler} as the control object.
+* is made, with {@link net.sf.freecol.server.control.UserConnectionHandler}
+* as the control object.
 *
 * @see net.sf.freecol.common.networking
 */
@@ -75,8 +76,9 @@ public final class Server extends Thread {
     /**
     * Starts the thread's processing. Contains the loop that is waiting for new
     * connections to the public socket. When a new client connects to the server
-    * a new {@link Connection} is made, with {@link UserConnectionHandler} as
-    * the control object.
+    * a new {@link Connection} is made, with
+    * {@link net.sf.freecol.server.control.UserConnectionHandler} as the control
+    * object.
     */
     public void run() {
         // This method's entire body is synchronized to shutdownLock.

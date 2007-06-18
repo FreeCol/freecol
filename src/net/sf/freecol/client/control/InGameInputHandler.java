@@ -1369,8 +1369,8 @@ public final class InGameInputHandler extends InputHandler {
         /**
          * Constructor.
          * 
-         * @param messageID The i18n-keyname of the error message to display.
-         * @param message An alternativ message to display if the resource
+         * @param messageId The i18n-keyname of the error message to display.
+         * @param message An alternative message to display if the resource
          *            specified by <code>messageID</code> is unavailable.
          */
         public ShowErrorMessageSwingTask(String messageId, String message) {

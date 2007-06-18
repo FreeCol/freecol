@@ -47,7 +47,7 @@ public class DisplayGridAction extends SelectableAction {
     /**
      * Returns the id of this <code>Option</code>.
      * 
-     * @return
+     * @return "displayGridAction"
      */
     public String getId() {
         return ID;

@@ -2385,7 +2385,7 @@ public final class Tile extends FreeColGameObject implements Location, Nameable 
     /**
      * Checks whether there is a fortified enemy unit in the tile.
      * Units can't produce in occupied tiles
-     * @returns <code>true</code> if an fortified enemy unit is in the tile
+     * @return <code>true</code> if an fortified enemy unit is in the tile
      */
     public boolean isOccupied() {
         return getOccupyingUnit() != null;

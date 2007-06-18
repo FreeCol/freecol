@@ -42,7 +42,7 @@ public class TradeRouteAction extends MapboardAction {
     
     /**
     * Returns the id of this <code>Option</code>.
-    * @return 
+    * @return "tradeRouteAction"
     */
     public String getId() {
         return ID;

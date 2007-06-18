@@ -10,7 +10,6 @@ public class NoRouteToServerException extends Exception {
     
     /**
      * The constructor to use.
-     * @param message The message.
      */
     public NoRouteToServerException() {
         super();
