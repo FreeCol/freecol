@@ -2367,8 +2367,11 @@ public final class Tile extends FreeColGameObject implements Location, Nameable 
      */
     public Unit getOccupyingUnit() {
         Unit unit = getFirstUnit();
-        Player owner = getOwner().getOwner();
-        if (unit != null && unit.getOwner() != owner
+        Player owner = null;
+        if (getOwner() != null) {
+            owner = getOwner().getOwner();
+        }
+        if (owner != null && unit != null && unit.getOwner() != owner
                 && owner.getStance(unit.getOwner()) != Player.ALLIANCE) {
             for(Unit enemyUnit : getUnitList()) {
                 if (enemyUnit.isOffensiveUnit() && enemyUnit.getState() == Unit.FORTIFIED) {
