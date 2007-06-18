@@ -934,12 +934,18 @@ public final class InGameController implements NetworkConstants {
             diplomaticElement.setAttribute("direction", String.valueOf(direction));
             diplomaticElement.appendChild(agreement.toXMLElement(null, diplomaticElement.getOwnerDocument()));
             Element reply = freeColClient.getClient().ask(diplomaticElement);
+            String nation = agreement.getRecipient().getNationAsString();
             if (reply != null) {
-                String accept = reply.getAttribute("accept");
-                if (accept != null && accept.equals("accept")) {
+                DiplomaticTrade proposal = new DiplomaticTrade(freeColClient.getGame(), reply);
+                if (proposal.isAccept()) {
+                    freeColClient.getCanvas().showInformationMessage("negotiationDialog.offerAccepted",
+                                                                     new String[][] {{"%nation%", nation}});
                     agreement.makeTrade();
+                    return;
                 }
             }
+            freeColClient.getCanvas().showInformationMessage("negotiationDialog.offerRejected",
+                                                             new String[][] {{"%nation%", nation}});
         }
     }
 

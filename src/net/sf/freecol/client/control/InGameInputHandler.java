@@ -601,7 +601,7 @@ public final class InGameInputHandler extends InputHandler {
         DiplomaticTrade agreement = getFreeColClient().getCanvas().showNegotiationDialog(unit, settlement, proposal);
         if (agreement != null) {
             Element diplomaticElement = Message.createNewRootElement("diplomaticTrade");
-            if (agreement == DiplomaticTrade.ACCEPT) {
+            if (agreement.isAccept()) {
                 diplomaticElement.setAttribute("accept", "accept");
                 return diplomaticElement;
             } else {

@@ -366,22 +366,6 @@ public final class NegotiationDialog extends FreeColDialog implements ActionList
     }
 
 
-    /**
-     * Returns the stance being offered, or Integer.MIN_VALUE if none
-     * is being offered.
-     *
-     * @return an <code>int</code> value
-     */
-    public int getStance() {
-        Iterator<TradeItem> itemIterator = agreement.iterator();
-        while (itemIterator.hasNext()) {
-            TradeItem item = itemIterator.next();
-            if (item instanceof StanceTradeItem) {
-                return ((StanceTradeItem) item).getStance();
-            }
-        }
-        return Integer.MIN_VALUE;
-    }
 
     /**
      * Sets the <code>stance</code> between the players.
@@ -390,6 +374,17 @@ public final class NegotiationDialog extends FreeColDialog implements ActionList
      */
     public void setStance(int stance) {
         agreement.add(new StanceTradeItem(freeColClient.getGame(), otherPlayer, player, stance));
+    }
+
+
+    /**
+     * Returns the stance being offered, or Integer.MIN_VALUE if none
+     * is being offered.
+     *
+     * @return an <code>int</code> value
+     */
+    public int getStance() {
+        return agreement.getStance();
     }
 
 
@@ -404,7 +399,8 @@ public final class NegotiationDialog extends FreeColDialog implements ActionList
         if (command.equals(CANCEL)) {
             setResponse(null);
         } else if (command.equals(ACCEPT)) {
-            setResponse(DiplomaticTrade.ACCEPT);
+            agreement.setAccept(true);
+            setResponse(agreement);
         } else {
             setResponse(agreement);
         }

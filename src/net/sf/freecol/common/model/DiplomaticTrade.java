@@ -22,9 +22,10 @@ public class DiplomaticTrade extends PersistentObject {
     public static final String LICENSE = "http://www.gnu.org/licenses/gpl.html";
     public static final String REVISION = "$Revision$";
 
-    public static final DiplomaticTrade ACCEPT = new DiplomaticTrade();
 
-    // the individual items the trade consists of
+    /** 
+     * The individual items the trade consists of.
+     */
     private List<TradeItem> items;
 
     @SuppressWarnings("unused")
@@ -40,14 +41,10 @@ public class DiplomaticTrade extends PersistentObject {
      */
     private Player recipient;
 
-
     /**
-     * Creates a new <code>DiplomaticTrade</code> instance.
-     *
+     * Whether this is the accept instance.
      */
-    private DiplomaticTrade() {
-        this.game = null;
-    }
+    private boolean accept;
 
     /**
      * Creates a new <code>DiplomaticTrade</code> instance.
@@ -93,6 +90,23 @@ public class DiplomaticTrade extends PersistentObject {
         return game;
     }
 
+    /**
+     * Get the <code>Accept</code> value.
+     *
+     * @return a <code>boolean</code> value
+     */
+    public final boolean isAccept() {
+        return accept;
+    }
+
+    /**
+     * Set the <code>Accept</code> value.
+     *
+     * @param newAccept The new Accept value.
+     */
+    public final void setAccept(final boolean newAccept) {
+        this.accept = newAccept;
+    }
 
     /**
      * Get the <code>Sender</code> value.
@@ -171,6 +185,24 @@ public class DiplomaticTrade extends PersistentObject {
 
 
     /**
+     * Returns the stance being offered, or Integer.MIN_VALUE if none
+     * is being offered.
+     *
+     * @return an <code>int</code> value
+     */
+    public int getStance() {
+        Iterator<TradeItem> itemIterator = items.iterator();
+        while (itemIterator.hasNext()) {
+            TradeItem item = itemIterator.next();
+            if (item instanceof StanceTradeItem) {
+                return ((StanceTradeItem) item).getStance();
+            }
+        }
+        return Integer.MIN_VALUE;
+    }
+
+
+    /**
      * Calls the <code>makeTrade</code> method of all TradeItems.
      *
      */
@@ -198,6 +230,12 @@ public class DiplomaticTrade extends PersistentObject {
      *             if a problem was encountered during parsing.
      */
     protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
+        String acceptString = in.getAttributeValue(null, "accept");
+        if ("accept".equals(acceptString)) {
+            accept = true;
+            return;
+        }
+
         String senderString = in.getAttributeValue(null, "sender");
         sender = (Player) getGame().getFreeColGameObject(senderString);
 
@@ -248,6 +286,7 @@ public class DiplomaticTrade extends PersistentObject {
      */
     public void toXML(XMLStreamWriter out, Player player) throws XMLStreamException {
         out.writeStartElement(getXMLElementTagName());
+        out.writeAttribute("accept", accept ? "accept" : "");
         out.writeAttribute("sender", sender.getID());
         out.writeAttribute("recipient", recipient.getID());
         for (TradeItem item : items) {
