@@ -1133,40 +1133,36 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener {
          */
         private int paintFood(Graphics g, int usedFood, int surplus) {
             ImageIcon goodsIcon = getCanvas().getImageProvider().getGoodsImageIcon(Goods.FOOD);
+            int iconWidth = goodsIcon.getIconWidth();
             BufferedImage productionImage;
             int nextX = 0;
-            int add = 0;
+
             // Food production:
-            if (usedFood != 0) {
-                nextX = (usedFood > 12) ? goodsIcon.getIconWidth() : Math.min(usedFood, 4) * goodsIcon.getIconWidth();
-                productionImage = getCanvas().getGUI().createProductionImage(goodsIcon, usedFood, nextX, getHeight(),
-                        12);
-                g.drawImage(productionImage, BORDER_CORRECT, 0, null);
-                nextX += goodsIcon.getIconWidth() / 4;
-            }
+            int productionImageWidth = (usedFood > 12) ? goodsIcon.getIconWidth() : Math.min(usedFood, 4) * iconWidth;
+            productionImage = getCanvas().getGUI().createProductionImage(goodsIcon, usedFood, productionImageWidth,
+                    getHeight(), 12);
+            g.drawImage(productionImage, BORDER_CORRECT, 0, null);
+            nextX += productionImageWidth + iconWidth / 4;
 
             // Food surplus:
             if (surplus != 0) {
                 if (surplus > 6 || surplus < 0 || surplus == 1) {
-                    productionImage = getCanvas().getGUI().createProductionImage(goodsIcon, surplus,
-                            goodsIcon.getIconWidth(), getHeight(), 6, true);
-                    add = goodsIcon.getIconWidth();
+                    // Only draw an icon with a number
+                    productionImageWidth = iconWidth;
                 } else {
-                    productionImage = getCanvas().getGUI().createProductionImage(goodsIcon, surplus,
-                            goodsIcon.getIconWidth() * 2, getHeight(), 6, true);
-                    add = goodsIcon.getIconWidth() * 3;
+                    // Draw all icons for the production
+                    productionImageWidth = iconWidth * 2;
                 }
-
-                g.drawImage(productionImage, nextX, 0, null);
-                nextX += productionImage.getWidth() / 4 + add;
+                productionImage = getCanvas().getGUI().createProductionImage(goodsIcon, surplus, productionImageWidth,
+                        getHeight(), 6, true);
             } else {
                 // Show it even if zero surplus
-                productionImage = getCanvas().getGUI().createProductionImage(goodsIcon, surplus,
-                        goodsIcon.getIconWidth(), getHeight(), -1, 1, -1, true);
-                add = goodsIcon.getIconWidth();
-                g.drawImage(productionImage, nextX, 0, null);
-                nextX += productionImage.getWidth() / 4 + add;
+                productionImage = getCanvas().getGUI().createProductionImage(goodsIcon, surplus, iconWidth,
+                        getHeight(), -1, 1, -1, true);
             }
+            g.drawImage(productionImage, nextX, 0, null);
+            nextX += productionImage.getWidth() + iconWidth / 4;
+
             return nextX;
         }
 
