@@ -8,12 +8,10 @@ import javax.swing.SwingUtilities;
 
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.Canvas;
-import net.sf.freecol.common.model.Building;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.DiplomaticTrade;
 import net.sf.freecol.common.model.FoundingFather;
 import net.sf.freecol.common.model.FreeColGameObject;
-import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.LostCityRumour;
 import net.sf.freecol.common.model.Map;
@@ -299,7 +297,6 @@ public final class InGameInputHandler extends InputHandler {
     private Element opponentAttack(Element opponentAttackElement) {
         Unit unit = (Unit) getGame().getFreeColGameObject(opponentAttackElement.getAttribute("unit"));
         Colony colony = (Colony) getGame().getFreeColGameObjectSafely(opponentAttackElement.getAttribute("colony"));
-        Building building = (Building) getGame().getFreeColGameObjectSafely(opponentAttackElement.getAttribute("building"));
         Unit defender = (Unit) getGame().getFreeColGameObjectSafely(opponentAttackElement.getAttribute("defender"));
 
         int result = Integer.parseInt(opponentAttackElement.getAttribute("result"));
@@ -404,7 +401,6 @@ public final class InGameInputHandler extends InputHandler {
      *            XML tree) that holds all the information.
      */
     private Element setCurrentPlayer(Element setCurrentPlayerElement) {
-        FreeColClient freeColClient = getFreeColClient();
 
         final Player currentPlayer = (Player) getGame().getFreeColGameObject(setCurrentPlayerElement.getAttribute("player"));
 
