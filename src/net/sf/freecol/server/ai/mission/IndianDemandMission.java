@@ -318,7 +318,8 @@ public class IndianDemandMission extends Mission {
     public boolean isValid() {
         // The last check is to ensure that the colony have not been burned to
         // the ground.
-        return (!completed && target != null && !target.isDisposed() && target.getTile().getColony() == target);
+        return (!completed && target != null && !target.isDisposed() && target.getTile().getColony() == target &&
+                getUnit().getIndianSettlement() != null);
     }
 
     /**

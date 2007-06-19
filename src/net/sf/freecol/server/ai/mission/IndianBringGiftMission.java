@@ -207,7 +207,7 @@ public class IndianBringGiftMission extends Mission {
      */
     public boolean isValid() {
         return target != null && !target.isDisposed() && target.getTile().getColony() == target && !giftDelivered
-                && isValidMission(getUnit().getOwner(), target.getOwner());
+            && isValidMission(getUnit().getOwner(), target.getOwner()) && getUnit().getIndianSettlement() != null;
     }
 
     /**
