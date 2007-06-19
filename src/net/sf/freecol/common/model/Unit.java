@@ -3534,7 +3534,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
                                     { "%nation%", getOwner().getNationAsString() } }, 
                                 ModelMessage.UNIT_DEMOTED);
             } else {
-                demote(defender, true);
+                demote(defender, false);
                 defender.promote();
             }
             break;
@@ -3678,10 +3678,10 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
      * The enemy may plunder horses and muskets.
      * 
      * @param enemyUnit The unit we are fighting against.
-     * @param greatDemote <code>true</code> indicates that muskets/horses
+     * @param canStole <code>true</code> indicates that muskets/horses
      *            should be taken by the <code>enemyUnit</code>.
      */
-    public void demote(Unit enemyUnit, boolean greatDemote) {
+    public void demote(Unit enemyUnit, boolean canStole) {
         String oldName = getName();
         String messageID = "model.unit.unitDemoted";
         String nation = owner.getNationAsString();
@@ -3711,16 +3711,14 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
             messageType = ModelMessage.UNIT_LOST;
             dispose();
         } else if (isMounted()) {
-            if (isArmed()) {
-                // dragoon
+            if (enemyUnit.getType() == BRAVE && !enemyUnit.isMounted() && canStole) {
+                addModelMessage(this, "model.unit.braveMounted", new String[][] { { "%nation%",
+                        enemyUnit.getOwner().getNationAsString() } }, ModelMessage.FOREIGN_DIPLOMACY);
+                enemyUnit.setMounted(true, true);
+            }
+            if (isArmed()) { // dragoon
                 setMounted(false, true);
-                if (enemyUnit.getType() == BRAVE && !enemyUnit.isMounted() && greatDemote) {
-                    addModelMessage(this, "model.unit.braveMounted", new String[][] { { "%nation%",
-                            enemyUnit.getOwner().getNationAsString() } }, ModelMessage.FOREIGN_DIPLOMACY);
-                    enemyUnit.setMounted(true, true);
-                }
-            } else {
-                // scout
+            } else { // scout
                 messageID = "model.unit.unitSlaughtered";
                 messageType = ModelMessage.UNIT_LOST;
                 dispose();
@@ -3728,7 +3726,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
         } else if (isArmed()) {
             // soldier
             setArmed(false, true);
-            if (enemyUnit.getType() == BRAVE && !enemyUnit.isArmed() && greatDemote) {
+            if (enemyUnit.getType() == BRAVE && !enemyUnit.isArmed() && canStole) {
                 addModelMessage(this, "model.unit.braveArmed", new String[][] { { "%nation%",
                         enemyUnit.getOwner().getNationAsString() } }, ModelMessage.FOREIGN_DIPLOMACY);
                 enemyUnit.setArmed(true, true);
