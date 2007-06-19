@@ -19,7 +19,7 @@
 
 \begin{document}
 \author{\href{http://freecol.sourceforge.net/index.php?section=8}{The FreeCol Team}}
-\title{FreeCol Documentation\\User Guide for Version v0.6.0}
+\title{FreeCol Documentation\\User Guide for Version v0.6.2}
 \maketitle{}
 
 \tableofcontents
@@ -126,11 +126,15 @@ memory and works best with a screen resolution of at least 1024x768
 pixels.
 
 When these are installed, go to the root directory of FreeCol and type
-\verb$ant$ to build a JAR file containing the game. The game is
-started using the command \verb$java -Xmx128M -jar FreeCol.jar$.  If
-something goes wrong, leave a bug report at the
+\verb$ant$ to build a JAR file containing the game. This process
+requires the ``native2ascii'' task, which is an optional ant
+task. Some Linux distributions place optional tasks in a different
+package, so make sure you have installed all necessary packages if you
+are a Linux user. The game is started using the command
+\verb$java -Xmx128M -jar FreeCol.jar$.  If something goes wrong, leave
+a bug report at the
 \href{http://sourceforge.net/projects/freecol}{SourceForge page of
-FreeCol}. Use the command \verb$ant -projecthelp$ to find out about
+  FreeCol}. Use the command \verb$ant -projecthelp$ to find out about
 other kinds of things you can build (this manual, for example).
 
 
@@ -157,28 +161,11 @@ Finnish, French, Hungarian, (Brazilian) Portuguese and Russian (sorted
 by language key), some of which are not very complete, however. Java
 will automatically select the translation for your locale, if
 available, and English otherwise. If you should wish to select a
-different language, or if language selection fails, you can try
-setting the system property values
-\verb$user.language$ and \verb$user.country$ to the appropriate
-\href{http://www.loc.gov/standards/iso639-2/php/code_list.php}{ISO
-639} and
-\href{http://www.iso.ch/iso/en/prods-services/iso3166ma/02iso-3166-code-lists/index.html}{ISO
-3166} values. 
+different language, or if language selection fails, you can choose a
+different language from the preferences menu.
 
-To use the French translation on a machine with a German locale, for
-example, you need to specify 
-%
-\verb$-Duser.language=fr -Duser.country=FR$. 
-%
-You can also use environment variables to
-override the locale, if your operating system supports that. To use
-the French translation on a Linux system with a German locale, you
-could start FreeCol like this, for example: 
-%
-\verb$LANG=fr_FR java -Xmx128M -jar FreeCol.jar$.
-
-In addition to these general Java options, FreeCol also provides
-several specific command line options:
+FreeCol also provides several application-specific command line
+options:
 
 \begin{itemize}
 \item\verb$--freecol-data DIR$ Specify the directory that contains
@@ -271,6 +258,9 @@ auto-saving.
 First, we have general \hypertarget{display options}{display options}:
 
 \begin{itemize}
+\item The language\index{language} to use. If the translation you
+  choose is not complete, the missing strings will be taken from the
+  English language version.
 \item The minimum number of goods to display with a counter. If you
 accept the default setting of seven, for example, six hammers will be
 diplayed without a number, and seven hammers will be displayed with
@@ -415,7 +405,10 @@ example, and the build colony order is only available if the unit is
 able to build colonies and the tile it is on will support a colony.
 
 The \hypertarget{reports menu}{Reports Menu} provides access to
-various reports on the current state of your colonies:
+various reports on the current state of your colonies. Various icons,
+as well as text strings of a greyish-brown colour are links to the
+places they refer to. If you click on the name of a colony, for
+example, the \hyperlink{colony panel}{Colony Panel} will be opened. 
 
 \begin{itemize}
 \item The \Report{Religious Advisor} tells you how many crosses your
@@ -458,6 +451,13 @@ as the amount of goods present in each of your colonies. Colonies that
 have already built the \hyperlink{Custom House}{Custom House} are
 highlighted, as are all goods that are currently being automatically
 exported from these colonies.
+\item The \Report{Turn Report} presents a summary of various events
+  that have occurred during the current turn. If no such events have
+  occurred, the Turn Report will not open.
+\item The \Report{Requirements Report} gives an account of how well
+  various requirements of your colonies are met. It tells you which
+  colonies require expert units and where these units can be obtained
+  or trained, for example.
 \end{itemize}
 
 The \hypertarget{colopedia menu}{Colopedia Menu} provides access to
@@ -706,7 +706,7 @@ tasks can be assigned:
 \item Production: Drop the unit onto the relevant Buildings.
 \item Depart colony: Drop the unit onto the colony's gate.
 \item Embark on a ship: If there is a ship in port, you can embark
-  your colonist on it by dropping it onto the Cargo�section of the
+  your colonist on it by dropping it onto the Cargo section of the
   colony panel.
 \item Build a building: Drop the unit onto the carpenter's house and
   select the building you want from the building menu.
