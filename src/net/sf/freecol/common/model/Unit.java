@@ -3341,6 +3341,12 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
                 result.add(new Modifier("modifiers.cargoPenalty", percentage, Modifier.PERCENTAGE));
                 totalPercentage += percentage;
             }
+            if (defender.getType() == Unit.PRIVATEER && defender.getOwner().hasFather(FoundingFather.FRANCIS_DRAKE)) {
+                // Drake grants 50% power bonus (in colonization gives for attack and defense)
+                percentage = 50;
+                result.add(new Modifier("modifiers.drake", percentage, Modifier.PERCENTAGE));
+                totalPercentage += percentage;
+            }
         } else {
             // Paul Revere makes an unarmed colonist in a settlement pick up
             // a stock-piled musket if attacked, so the bonus should be applied
