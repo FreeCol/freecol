@@ -833,7 +833,6 @@ public final class InGameController implements NetworkConstants {
      * @param direction The direction in which to move the Unit.
      */
     public void move(Unit unit, int direction) {
-        Canvas canvas = freeColClient.getCanvas();
 
         if (freeColClient.getGame().getCurrentPlayer() != freeColClient.getMyPlayer()) {
             freeColClient.getCanvas().showInformationMessage("notYourTurn");
@@ -1231,7 +1230,7 @@ public final class InGameController implements NetworkConstants {
         buyElement.setAttribute("gold", Integer.toString(gold));
         buyElement.appendChild(goods.toXMLElement(null, buyElement.getOwnerDocument()));
 
-        Element reply = client.ask(buyElement);
+        client.ask(buyElement);
 
         IndianSettlement settlement = (IndianSettlement) goods.getLocation();
         // add goods to settlement in order to client will be able to transfer the goods
