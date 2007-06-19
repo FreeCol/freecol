@@ -162,6 +162,12 @@ public final class ReportColonyPanel extends ReportPanel implements ActionListen
             unitLabel.setForeground(Color.GRAY);
             buildingPanel.add(unitLabel);
         }
+        /* If nothing is build, show it red color */
+        if (currentType == -1) {
+            JLabel nothingLabel = new JLabel(Messages.message("nothing"));
+            nothingLabel.setForeground(Color.RED);
+            buildingPanel.add(nothingLabel);
+        }
         return buildingPanel;
     }
 
