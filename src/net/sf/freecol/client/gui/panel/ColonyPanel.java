@@ -1132,34 +1132,28 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener {
          * @return the position to put the next image at.
          */
         private int paintFood(Graphics g, int usedFood, int surplus) {
-            ImageIcon goodsIcon = getCanvas().getImageProvider().getGoodsImageIcon(Goods.FOOD);
-            int iconWidth = goodsIcon.getIconWidth();
+            ImageIcon foodIcon = getCanvas().getImageProvider().getGoodsImageIcon(Goods.FOOD);
+            int iconWidth = foodIcon.getIconWidth();
             BufferedImage productionImage;
             int nextX = 0;
 
             // Food production:
-            int productionImageWidth = (usedFood > 12) ? goodsIcon.getIconWidth() : Math.min(usedFood, 4) * iconWidth;
-            productionImage = getCanvas().getGUI().createProductionImage(goodsIcon, usedFood, productionImageWidth,
+            int productionImageWidth = (usedFood > 12) ? foodIcon.getIconWidth() : Math.min(usedFood, 4) * iconWidth;
+            productionImage = getCanvas().getGUI().createProductionImage(foodIcon, usedFood, productionImageWidth,
                     getHeight(), 12);
             g.drawImage(productionImage, BORDER_CORRECT, 0, null);
             nextX += productionImageWidth + iconWidth / 4;
 
             // Food surplus:
-            if (surplus != 0) {
-                if (surplus > 6 || surplus < 0 || surplus == 1) {
-                    // Only draw an icon with a number
-                    productionImageWidth = iconWidth;
-                } else {
-                    // Draw all icons for the production
-                    productionImageWidth = iconWidth * 2;
-                }
-                productionImage = getCanvas().getGUI().createProductionImage(goodsIcon, surplus, productionImageWidth,
-                        getHeight(), 6, true);
+            if (surplus < 2 || surplus > 6) {
+                // Only draw an icon with a number
+                productionImageWidth = iconWidth;
             } else {
-                // Show it even if zero surplus
-                productionImage = getCanvas().getGUI().createProductionImage(goodsIcon, surplus, iconWidth,
-                        getHeight(), -1, 1, -1, true);
+                // Draw all icons for the production
+                productionImageWidth = iconWidth * 2;
             }
+            productionImage = getCanvas().getGUI().createProductionImage(foodIcon, surplus, productionImageWidth,
+                    getHeight(), 6, true);
             g.drawImage(productionImage, nextX, 0, null);
             nextX += productionImage.getWidth() + iconWidth / 4;
 
