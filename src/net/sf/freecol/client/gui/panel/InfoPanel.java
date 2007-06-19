@@ -1,6 +1,5 @@
 package net.sf.freecol.client.gui.panel;
 
-import com.sun.java_cup.internal.production;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
