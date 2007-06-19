@@ -1186,20 +1186,15 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener {
             int surplusFood = foodProduction - foodConsumption - horses;
             nextX = paintFood(g, usedFood, surplusFood);
 
-            // Horses:
-            if (horses != 0) {
+            // Horses - if we have two horses, we draw them. All other cases are
+            // just a horse and maybe a number.
+            if (horses > 0) {
                 goodsIcon = getCanvas().getImageProvider().getGoodsImageIcon(Goods.HORSES);
-                if (horses > 2 || horses == 1) {
-                    productionImage = getCanvas().getGUI().createProductionImage(goodsIcon, horses,
-                            goodsIcon.getIconWidth(), getHeight(), 2);
-                    add = goodsIcon.getIconWidth();
-                } else {
-                    productionImage = getCanvas().getGUI().createProductionImage(goodsIcon, horses,
-                            goodsIcon.getIconWidth() * 2, getHeight(), 2);
-                    add = goodsIcon.getIconWidth() * 2;
-                }
+                int imageWidth = (horses != 2 ? 1 : 2) * goodsIcon.getIconWidth();
+                productionImage = getCanvas().getGUI().createProductionImage(goodsIcon, horses, imageWidth,
+                        getHeight(), 2);
                 g.drawImage(productionImage, nextX, 0, null);
-                nextX += productionImage.getWidth() / 4 + add;
+                nextX += imageWidth + goodsIcon.getIconWidth() / 4;
             }
 
             // Liberty bells:
