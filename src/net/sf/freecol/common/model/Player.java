@@ -2290,21 +2290,10 @@ public class Player extends FreeColGameObject implements Nameable {
             }
         }
 
-        // CO: I reverted this, since the pioneer already finishes faster,
-        // thus changing it at both locations would double the bonus.
-        for (Iterator<Unit> unitIterator = getUnitIterator(); unitIterator.hasNext();) {
-            Unit unit = unitIterator.next();
-            if (logger.isLoggable(Level.FINEST)) {
-                logger.finest("Calling newTurn for unit " + unit.getName() + " " + unit.getID());
-            }
-            unit.newTurn();
-        }
-
-        if (getEurope() != null) {
-            logger.finest("Calling newTurn for player " + getName() + "'s Europe");
-            getEurope().newTurn();
-        }
-
+        /*
+        * Moved founding fathers infront of units so that naval units will get thier Magellan bonus
+        * the turn Magellan joins the congress. 
+        */
         if (isEuropean()) {
             if (getBells() >= getTotalFoundingFatherCost() && currentFather != FoundingFather.NONE) {
                 fathers[currentFather] = true;
@@ -2389,8 +2378,6 @@ public class Player extends FreeColGameObject implements Nameable {
 
                 case FoundingFather.THOMAS_PAINE:
                     // increase bell production by current tax rate
-                    // TODO: This probably needs to be updated each time the tax
-                    // rate is increased.
                     bellsBonus += tax;
                     break;
 
@@ -2407,6 +2394,21 @@ public class Player extends FreeColGameObject implements Nameable {
                         ModelMessage.DEFAULT);
                 currentFather = FoundingFather.NONE;
                 bells = 0;
+            }
+            
+            // CO: since the pioneer already finishes faster, changing
+            // it at both locations would double the bonus.
+            for (Iterator<Unit> unitIterator = getUnitIterator(); unitIterator.hasNext();) {
+                Unit unit = unitIterator.next();
+                if (logger.isLoggable(Level.FINEST)) {
+                    logger.finest("Calling newTurn for unit " + unit.getName() + " " + unit.getID());
+                }
+                unit.newTurn();
+            }
+
+            if (getEurope() != null) {
+                logger.finest("Calling newTurn for player " + getName() + "'s Europe");
+                getEurope().newTurn();
             }
 
 
@@ -2917,11 +2919,15 @@ public class Player extends FreeColGameObject implements Nameable {
     }
 
     /**
-     * Sets the current tax.
+     * Sets the current tax. If Thomas Paine has already joined the
+     * Continental Congress, the bellsBonus is adjusted accordingly.
      * 
      * @param amount The new tax.
      */
     public void setTax(int amount) {
+        if (amount > tax && hasFather(FoundingFather.THOMAS_PAINE)) {
+            bellsBonus += (amount - tax);
+        }
         tax = amount;
     }
 
