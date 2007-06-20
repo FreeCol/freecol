@@ -31,6 +31,7 @@ import org.w3c.dom.Element;
 * identifier (defined as a constant in this class).
 */
 public class ClientOptions extends OptionMap {
+    @SuppressWarnings("unused")
     private static final Logger logger = Logger.getLogger(ClientOptions.class.getName());
 
     public static final String  COPYRIGHT = "Copyright (C) 2003-2005 The FreeCol Team";

@@ -34,6 +34,7 @@ import net.sf.freecol.common.model.Tile;
  */
 public final class MapEditorTransformPanel extends FreeColPanel {
 
+    @SuppressWarnings("unused")
     private static final Logger logger = Logger.getLogger(MapEditorTransformPanel.class.getName());
     
     public static final String COPYRIGHT = "Copyright (C) 2003-2007 The FreeCol Team";
@@ -46,8 +47,6 @@ public final class MapEditorTransformPanel extends FreeColPanel {
             MAJOR_RIVER = -2,
             BONUS = -3,
             LOST_CITY_RUMOUR = -4;
-    
-    private final Canvas parent;
     
     private final FreeColClient freeColClient;
 
@@ -65,7 +64,6 @@ public final class MapEditorTransformPanel extends FreeColPanel {
     public MapEditorTransformPanel(Canvas parent) {
         super(new BorderLayout());
         
-        this.parent = parent;
         this.freeColClient = parent.getClient();
         this.library = (ImageLibrary) parent.getImageProvider();
 

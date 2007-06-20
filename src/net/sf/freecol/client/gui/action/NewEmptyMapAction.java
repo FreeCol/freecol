@@ -96,8 +96,8 @@ public class NewEmptyMapAction extends MapboardAction {
         final String widthText = Messages.message("width");
         final String heightText = Messages.message("height");
         
-        final JTextField inputWidth = new JTextField(Integer.toString(28), COLUMNS);
-        final JTextField inputHeight = new JTextField(Integer.toString(128), COLUMNS);
+        final JTextField inputWidth = new JTextField(Integer.toString(DEFAULT_WIDTH), COLUMNS);
+        final JTextField inputHeight = new JTextField(Integer.toString(DEFAULT_HEIGHT), COLUMNS);
 
         final FreeColDialog inputDialog = new FreeColDialog()  {
             public void requestFocus() {

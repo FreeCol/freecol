@@ -24,10 +24,6 @@ public final class CanvasMapEditorMouseMotionListener implements MouseMotionList
 
     public static final String REVISION = "$Revision$";
 
-    // Temporary variable for checking if we need to recalculate the path when
-    // dragging units.
-    private Tile lastTile;
-
     private final Canvas canvas;
 
     private final GUI gui;

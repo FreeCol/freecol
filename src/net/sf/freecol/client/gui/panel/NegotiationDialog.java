@@ -52,8 +52,6 @@ public final class NegotiationDialog extends FreeColDialog implements ActionList
 
     public static final String REVISION = "$Revision$";
 
-    private static final int GOLD = 1, STANCE = 2;
-
     private static final String SEND = "send", ACCEPT = "accept", CANCEL = "cancel";
 
     private static Logger logger = Logger.getLogger(NegotiationDialog.class.getName());
@@ -553,7 +551,6 @@ public final class NegotiationDialog extends FreeColDialog implements ActionList
         public static final int OFFSET = 2;
         private JComboBox stanceBox;
         private JButton addButton;
-        private Player player;
         private NegotiationDialog negotiationDialog;
 
         /**
@@ -563,7 +560,6 @@ public final class NegotiationDialog extends FreeColDialog implements ActionList
          * @param source a <code>Player</code> value
          */
         public StanceTradeItemPanel(NegotiationDialog parent, Player source) {
-            this.player = source;
             this.negotiationDialog = parent;
             addButton = new JButton(Messages.message("negotiationDialog.add"));
             addButton.addActionListener(this);
@@ -607,7 +603,6 @@ public final class NegotiationDialog extends FreeColDialog implements ActionList
 
     public class GoldTradeItemPanel extends JPanel implements ActionListener {
 
-        private int gold;
         private JSpinner spinner;
         private JButton addButton;
         private Player player;
@@ -622,7 +617,6 @@ public final class NegotiationDialog extends FreeColDialog implements ActionList
         public GoldTradeItemPanel(NegotiationDialog parent, Player source, int gold) {
             this.player = source;
             this.negotiationDialog = parent;
-            this.gold = gold;
             addButton = new JButton(Messages.message("negotiationDialog.add"));
             addButton.addActionListener(this);
             addButton.setActionCommand("add");

@@ -13,7 +13,6 @@ import java.util.logging.Logger;
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
-import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.KeyStroke;
 
@@ -45,9 +44,6 @@ public final class OptionGroupUI extends JPanel implements OptionUpdater {
     public static final int H_GAP = 10;
 
     private final OptionUpdater[] optionUpdaters;
-    
-    private final int level;
-
 
     /**
      * Creates a new <code>OptionGroupUI</code> for the given
@@ -57,7 +53,6 @@ public final class OptionGroupUI extends JPanel implements OptionUpdater {
      *            for.
      */
     public OptionGroupUI(OptionGroup option, boolean editable, int level) {
-        this.level = level;
         
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
         
@@ -142,10 +137,6 @@ public final class OptionGroupUI extends JPanel implements OptionUpdater {
         setBorder(BorderFactory.createTitledBorder(option.getName()));
         setOpaque(false);
     }
-    
-    private void addToHorizontalPanel(JComponent c) {
-        
-    }
 
     /**
      * Unregister <code>PropertyChangeListener</code>s.
@@ -189,7 +180,6 @@ public final class OptionGroupUI extends JPanel implements OptionUpdater {
         private final OptionGroupUI groupUI;
         private final OptionGroupButton optionGroupButton;
         private final OptionGroupPanel optionGroupPanel;
-        private boolean displayed;
         
         /**
          * Creates a new button.
@@ -202,7 +192,6 @@ public final class OptionGroupUI extends JPanel implements OptionUpdater {
             super(name);
             
             this.groupUI = groupUI;
-            this.displayed = false;
             optionGroupButton = this;
             optionGroupPanel = new OptionGroupPanel();
             

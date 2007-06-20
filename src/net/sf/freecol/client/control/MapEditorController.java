@@ -34,6 +34,7 @@ import net.sf.freecol.server.generator.MapGeneratorOptions;
 * The map editor controller.
 */
 public final class MapEditorController {
+    @SuppressWarnings("unused")
     private static final Logger logger = Logger.getLogger(MapEditorController.class.getName());
 
     public static final String  COPYRIGHT = "Copyright (C) 2003-2005 The FreeCol Team";

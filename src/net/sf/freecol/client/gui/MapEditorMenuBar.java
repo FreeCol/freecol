@@ -39,6 +39,7 @@ import net.sf.freecol.client.gui.menu.DebugMenu;
  * @see InGameMenuBar
  */
 public class MapEditorMenuBar extends FreeColMenuBar {
+    @SuppressWarnings("unused")
     private static final Logger logger = Logger.getLogger(MapEditorMenuBar.class.getName());
 
     public static final String COPYRIGHT = "Copyright (C) 2003-2005 The FreeCol Team";

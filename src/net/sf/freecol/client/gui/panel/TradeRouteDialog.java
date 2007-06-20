@@ -188,7 +188,6 @@ public final class TradeRouteDialog extends FreeColDialog implements ActionListe
             case OK:
                 getCanvas().remove(this);
                 //setResponse(new Boolean(true));
-                Player player = getCanvas().getClient().getMyPlayer();
                 ArrayList<TradeRoute> routes = new ArrayList<TradeRoute>();
                 for (int index = 0; index < listModel.getSize(); index++) {
                     routes.add((TradeRoute) listModel.getElementAt(index));

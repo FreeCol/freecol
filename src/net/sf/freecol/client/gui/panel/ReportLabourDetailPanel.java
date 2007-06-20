@@ -2,8 +2,6 @@ package net.sf.freecol.client.gui.panel;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.HashMap;
-import java.util.List;
 
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -11,7 +9,6 @@ import javax.swing.JPanel;
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.client.gui.i18n.Messages;
-import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Unit;
 import cz.autel.dmi.HIGLayout;
@@ -24,10 +21,6 @@ public final class ReportLabourDetailPanel extends ReportPanel implements Action
     public static final String  LICENSE = "http://www.gnu.org/licenses/gpl.html";
     public static final String  REVISION = "$Revision$";
     
-    private int unitCount, unitAtSea, unitOnLand, unitInEurope;
-    private HashMap<Colony, Integer> unitLocations;
-    private List<Colony> colonies;
-
     private Player player;
 
     /**
@@ -37,7 +30,6 @@ public final class ReportLabourDetailPanel extends ReportPanel implements Action
     public ReportLabourDetailPanel(Canvas parent) {
         super(parent, Messages.message("report.labour.details"));
         player = parent.getClient().getMyPlayer();
-        colonies = player.getColonies();
     }
 
     /**
