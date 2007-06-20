@@ -677,7 +677,9 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener {
                 updateNameBox();
                 break;
             case WAREHOUSE:
-                freeColClient.getCanvas().showWarehouseDialog(colony);
+                if(freeColClient.getCanvas().showWarehouseDialog(colony)) {
+                    updateWarehouse();
+                }
                 break;
             case FILL:
                 fill();

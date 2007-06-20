@@ -116,7 +116,6 @@ public final class WarehouseDialog extends FreeColDialog implements ActionListen
         try {
             switch (Integer.valueOf(command).intValue()) {
             case OK:
-                parent.remove(this);
                 setResponse(new Boolean(true));
                 for (Component c : warehouseDialog.getComponents()) {
                     if (c instanceof WarehouseGoodsPanel) {
