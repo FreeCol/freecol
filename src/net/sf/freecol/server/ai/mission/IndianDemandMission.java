@@ -372,11 +372,15 @@ public class IndianDemandMission extends Mission {
      *         "[ColonyName] Getting gift: (x, y)".
      */
     public String getDebuggingInfo() {
+        if (getUnit().getIndianSettlement() == null) {
+            return "invalid";
+        }
+        final String targetName = (target != null) ? target.getName() : "null";
         if (!hasGift()) {
-            return "[" + target.getName() + "] Getting gift: "
+            return "[" + targetName + "] Getting gift: "
                     + getUnit().getIndianSettlement().getTile().getPosition();
         } else {
-            return "[" + target.getName() + "] " + getUnit().getGoodsIterator().next().getName();
+            return "[" + targetName + "] " + getUnit().getGoodsIterator().next().getName();
         }
     }
 }

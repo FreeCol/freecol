@@ -389,6 +389,7 @@ public class BuildColonyMission extends Mission {
      *         is lost.
      */
     public String getDebuggingInfo() {
-        return target.getPosition().toString() + " " + colonyValue + (doNotGiveUp ? "!" : "");
+        final String targetName = (target != null) ? target.getPosition().toString() : "unassigned";
+        return targetName + " " + colonyValue + (doNotGiveUp ? "!" : "");
     }
 }

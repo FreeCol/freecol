@@ -244,7 +244,7 @@ public class ScoutingMission extends Mission {
             PathNode bestPath = getGame().getMap().search(getUnit(), destinationDecider, Integer.MAX_VALUE, (Unit) getUnit().getLocation());
             if (bestPath != null) {
                 transportDestination = bestPath.getLastNode().getTile();
-                debugAction = "Transport to: " + transportDestination.getPosition();
+                debugAction = "Transport to: " + transportDestination.getPosition();                
             } else {
                 transportDestination = null;
                 valid = false;
@@ -288,8 +288,10 @@ public class ScoutingMission extends Mission {
      * @return The destination for this <code>Transportable</code>.
      */
     public Tile getTransportDestination() {
-        if (getUnit().getLocation() instanceof Unit) {
-            if (transportDestination == null) {
+        if (getUnit().getLocation() instanceof Unit
+                || getUnit().getTile() == null) {
+            if (transportDestination == null
+                    || !transportDestination.isLand()) {
                 updateTransportDestination();
             }
             return transportDestination;
