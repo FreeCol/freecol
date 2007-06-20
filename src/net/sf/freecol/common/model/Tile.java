@@ -52,15 +52,15 @@ public final class Tile extends FreeColGameObject implements Location, Nameable 
         { { 3, 2 }, { 0, 0 }, { 3, 1 }, { 0, 0 }, { 0, 2 }, { 0, 6 }, { 0, 0 }, { 0, 0 } }, // Grasslands
         { { 3, 2 }, { 0, 0 }, { 0, 0 }, { 3, 1 }, { 0, 2 }, { 0, 4 }, { 0, 0 }, { 0, 0 } }, // Prairie
         { { 4, 3 }, { 3, 1 }, { 0, 0 }, { 0, 0 }, { 0, 2 }, { 0, 4 }, { 0, 0 }, { 0, 0 } }, // Savannah
-        { { 3, 2 }, { 0, 0 }, { 0, 0 }, { 0, 0 }, { 0, 2 }, { 0, 4 }, { 2, 1 }, { 0, 0 } }, // Marsh
-        { { 3, 2 }, { 2, 1 }, { 2, 1 }, { 0, 0 }, { 0, 1 }, { 0, 4 }, { 2, 1 }, { 0, 0 } }, // Swamp
-        { { 1, 1 }, { 0, 0 }, { 0, 0 }, { 1, 1 }, { 0, 2 }, { 0, 2 }, { 2, 1 }, { 0, 0 } }, // Desert
+        { { 3, 2 }, { 0, 0 }, { 2, 1 }, { 0, 0 }, { 0, 2 }, { 0, 4 }, { 2, 1 }, { 0, 0 } }, // Marsh
+        { { 3, 2 }, { 2, 1 }, { 0, 0 }, { 0, 0 }, { 0, 1 }, { 0, 4 }, { 2, 1 }, { 0, 0 } }, // Swamp
+        { { 2, 2 }, { 0, 0 }, { 0, 0 }, { 1, 1 }, { 0, 2 }, { 0, 2 }, { 2, 1 }, { 0, 0 } }, // Desert
         { { 3, 2 }, { 0, 0 }, { 0, 0 }, { 0, 0 }, { 0, 3 }, { 0, 4 }, { 2, 1 }, { 0, 0 } }, // Tundra
         { { 0, 0 }, { 0, 0 }, { 0, 0 }, { 0, 0 }, { 0, 0 }, { 0, 0 }, { 0, 0 }, { 0, 0 } }, // Arctic
         { { 2, 0 }, { 0, 0 }, { 0, 0 }, { 0, 0 }, { 0, 0 }, { 0, 0 }, { 0, 0 }, { 0, 0 } }, // Ocean
         { { 2, 0 }, { 0, 0 }, { 0, 0 }, { 0, 0 }, { 0, 0 }, { 0, 0 }, { 0, 0 }, { 0, 0 } }, // High seas
         { { 2, 0 }, { 0, 0 }, { 0, 0 }, { 0, 0 }, { 0, 0 }, { 0, 0 }, { 4, 0 }, { 0, 0 } }, // Hills
-        { { 0, 0 }, { 0, 0 }, { 0, 0 }, { 0, 0 }, { 0, 0 }, { 0, 0 }, { 3, 0 }, { 1, 0 } } // Mountains
+        { { 0, 0 }, { 0, 0 }, { 0, 0 }, { 0, 0 }, { 0, 0 }, { 0, 0 }, { 4, 0 }, { 1, 0 } } // Mountains
     };
 
     private boolean road, plowed, forested, bonus, lostCityRumour;
@@ -1267,6 +1267,8 @@ public final class Tile extends FreeColGameObject implements Location, Nameable 
         } else if (forested) {
             if (type == Tile.GRASSLANDS || type == Tile.SAVANNAH) {
                 return Goods.LUMBER;
+            } else if (type == Tile.MARSH || type == Tile.SWAMP) {
+                return Goods.ORE;
             } else {
                 return Goods.FURS;
             }
