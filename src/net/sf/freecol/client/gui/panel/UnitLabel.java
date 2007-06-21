@@ -18,6 +18,7 @@ import javax.swing.JLabel;
 import net.sf.freecol.client.control.InGameController;
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.i18n.Messages;
+import net.sf.freecol.common.model.Building;
 import net.sf.freecol.common.model.ColonyTile;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.Unit;
@@ -39,6 +40,25 @@ public final class UnitLabel extends JLabel implements ActionListener {
             WORKTYPE_TOBACCO = 6, WORKTYPE_COTTON = 7, WORKTYPE_FURS = 8, WORKTYPE_LUMBER = 9, WORKTYPE_ORE = 10,
             WORKTYPE_SILVER = 11, CLEAR_SPECIALITY = 12, ACTIVATE_UNIT = 13, FORTIFY = 14, SENTRY = 15, COLOPEDIA = 16;
 
+    public static final int WORK_AT_SOMEWHERE = 100,
+        WORK_AT_TOWN_HALL = WORK_AT_SOMEWHERE+Building.TOWN_HALL,
+        WORK_AT_CARPENTER = WORK_AT_SOMEWHERE+Building.CARPENTER,
+        WORK_AT_BLACKSMITH = WORK_AT_SOMEWHERE+Building.BLACKSMITH,
+        WORK_AT_TOBACCONIST = WORK_AT_SOMEWHERE+Building.TOBACCONIST,
+        WORK_AT_WEAVER = WORK_AT_SOMEWHERE+Building.WEAVER,
+        WORK_AT_DISTILLER = WORK_AT_SOMEWHERE+Building.DISTILLER,
+        WORK_AT_FUR_TRADER = WORK_AT_SOMEWHERE+Building.FUR_TRADER,
+        WORK_AT_SCHOOLHOUSE = WORK_AT_SOMEWHERE+Building.SCHOOLHOUSE,
+        WORK_AT_ARMORY = WORK_AT_SOMEWHERE+Building.ARMORY,
+        WORK_AT_CHURCH = WORK_AT_SOMEWHERE+Building.CHURCH,
+        WORK_AT_STOCKADE = WORK_AT_SOMEWHERE+Building.STOCKADE,
+        WORK_AT_WAREHOUSE = WORK_AT_SOMEWHERE+Building.WAREHOUSE,
+        WORK_AT_STABLES = WORK_AT_SOMEWHERE+Building.STABLES,
+        WORK_AT_DOCK = WORK_AT_SOMEWHERE+Building.DOCK,
+        WORK_AT_PRINTING_PRESS = WORK_AT_SOMEWHERE+Building.PRINTING_PRESS,
+        WORK_AT_CUSTOM_HOUSE = WORK_AT_SOMEWHERE+Building.CUSTOM_HOUSE,
+        WORK_AT_LASTBUILDING = WORK_AT_CUSTOM_HOUSE+1;
+        
     private final Unit unit;
 
     private final Canvas parent;
@@ -268,14 +288,15 @@ public final class UnitLabel extends JLabel implements ActionListener {
     public void actionPerformed(ActionEvent event) {
         String command = event.getActionCommand();
         try {
-            if (Integer.valueOf(command).intValue() == ACTIVATE_UNIT) {
+            int intCommand = Integer.valueOf(command).intValue();
+            if (intCommand == ACTIVATE_UNIT) {
                 parent.getGUI().setActiveUnit(unit);
-            } else if (Integer.valueOf(command).intValue() == FORTIFY) {
+            } else if (intCommand == FORTIFY) {
                 inGameController.changeState(unit, Unit.FORTIFYING);
-            } else if (Integer.valueOf(command).intValue() == SENTRY) {
+            } else if (intCommand == SENTRY) {
                 inGameController.changeState(unit, Unit.SENTRY);
             } else if (!unit.isCarrier()) {
-                switch (Integer.valueOf(command).intValue()) {
+                switch (intCommand) {
                 case ARM:
                     inGameController.equipUnit(unit, Goods.MUSKETS, ((unit.isArmed()) ? 0 : 50));
                     break;
@@ -335,7 +356,13 @@ public final class UnitLabel extends JLabel implements ActionListener {
                     getCanvas().showColopediaPanel(ColopediaPanel.COLOPEDIA_UNIT, unit.getType());
                     break;
                 default:
-                    logger.warning("Invalid action");
+                    if (intCommand >= WORK_AT_SOMEWHERE && intCommand <= WORK_AT_LASTBUILDING ) {
+                        int buildingType = intCommand - WORK_AT_SOMEWHERE ;
+                        Building building = unit.getColony().getBuilding(buildingType);
+                        inGameController.work(unit, building);
+                    } else {
+                        logger.warning("Invalid action");
+                    }
                 }
                 setIcon(parent.getImageProvider().getUnitImageIcon(parent.getImageProvider().getUnitGraphicsType(unit)));
                 setDisabledIcon(parent.getImageProvider().getUnitImageIcon(

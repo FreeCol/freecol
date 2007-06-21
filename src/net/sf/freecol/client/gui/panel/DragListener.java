@@ -2,6 +2,7 @@ package net.sf.freecol.client.gui.panel;
 
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.util.Iterator;
 
 import javax.swing.JComponent;
 import javax.swing.JMenuItem;
@@ -10,6 +11,8 @@ import javax.swing.TransferHandler;
 
 import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.client.gui.i18n.Messages;
+import net.sf.freecol.common.model.Building;
+import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.ColonyTile;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.Unit;
@@ -248,6 +251,25 @@ public final class DragListener extends MouseAdapter {
                         menuItem.setActionCommand(String.valueOf(UnitLabel.CLEAR_SPECIALITY));
                         menuItem.addActionListener(unitLabel);
                         menu.add(menuItem);
+                    }
+                    
+                    if (tempUnit.getType() != Unit.INDIAN_CONVERT) {
+                        if( tempUnit.getLocation().getTile().getSettlement() !=null ) {
+                            menu.addSeparator();
+                            Colony colony = (Colony) tempUnit.getLocation().getColony();
+                            Iterator<Building> buildingIterator = colony.getBuildingIterator();
+                            while (buildingIterator.hasNext()) {
+                                Building building = buildingIterator.next();
+                                if (building.isBuilt() && building.canAdd(tempUnit)) {
+                                    String locName = building.getName();
+                                    menuItem = new JMenuItem(locName);
+                                    menuItem.setActionCommand(String.valueOf(UnitLabel.WORK_AT_SOMEWHERE+building.getType()));
+                                    menuItem.addActionListener(unitLabel);
+                                    menu.add(menuItem);
+                                }
+                            }
+                        }
+                        menu.addSeparator();
                     }
                 }
 
