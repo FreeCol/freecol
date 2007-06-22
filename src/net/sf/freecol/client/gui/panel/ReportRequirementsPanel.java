@@ -99,6 +99,7 @@ public final class ReportRequirementsPanel extends ReportPanel implements Action
             }
 
             boolean[] expertWarning = new boolean[Unit.UNIT_COUNT];
+            boolean[] productionWarning = new boolean[Goods.NUMBER_OF_ALL_TYPES];
             boolean hasWarning = false;
 
             // check if all unit requirements are met
@@ -112,20 +113,29 @@ public final class ReportRequirementsPanel extends ReportPanel implements Action
                         int workType = unit.getWorkType();
                         int expert = ((ColonyTile) workLocation).getExpertForProducing(workType);
                         if (unitCount[index][expert] == 0 && !expertWarning[expert]) {
-                            addWarning(doc, index, Goods.getName(workType), expert);
+                            addExpertWarning(doc, index, Goods.getName(workType), expert);
                             expertWarning[expert] = true;
                             hasWarning = true;
                         }
                     }
                 } else {
                     // check buildings
-                    int workType = ((Building) workLocation).getGoodsOutputType();
-                    int expert = ((Building) workLocation).getExpertUnitType();
-                    if (workType != -1 &&
-                        ((Building) workLocation).getFirstUnit() != null && !expertWarning[expert]) {
-                        if (unitCount[index][expert] == 0) {
-                            addWarning(doc, index, Goods.getName(workType), expert);
+                    Building building = (Building) workLocation;
+                    int goodsType = building.getGoodsOutputType();
+                    int expert = building.getExpertUnitType();
+                    if (goodsType != -1) {
+                        if (building.getFirstUnit() != null &&
+                            !expertWarning[expert] &&
+                            unitCount[index][expert] == 0) {
+                            addExpertWarning(doc, index, Goods.getName(goodsType), expert);
                             expertWarning[expert] = true;
+                            hasWarning = true;
+                        }
+                        if (building.getProductionNextTurn() < building.getMaximumProduction() &&
+                            !productionWarning[goodsType]) {
+                            addProductionWarning(doc, index, Goods.getName(goodsType), 
+                                                 Goods.getName(building.getGoodsInputType()));
+                            productionWarning[goodsType] = true;
                             hasWarning = true;
                         }
                     }
@@ -147,7 +157,7 @@ public final class ReportRequirementsPanel extends ReportPanel implements Action
         }
     }
 
-    private void addWarning(StyledDocument doc, int colonyIndex, String goods, int workType) {
+    private void addExpertWarning(StyledDocument doc, int colonyIndex, String goods, int workType) {
         String expertName = Unit.getName(workType);
         String colonyName = colonies.get(colonyIndex).getName();
         String newMessage = Messages.message("report.requirements.noExpert",
@@ -206,6 +216,22 @@ public final class ReportRequirementsPanel extends ReportPanel implements Action
                 doc.insertString(doc.getLength(), "\n\n", doc.getStyle("regular"));
             }
   
+        } catch(Exception e) {
+            logger.warning(e.toString());
+        }
+        
+    }
+
+    private void addProductionWarning(StyledDocument doc, int colonyIndex, String output, String input) {
+        String colonyName = colonies.get(colonyIndex).getName();
+        String newMessage = Messages.message("report.requirements.missingGoods",
+                                             new String[][] {
+                                                 {"%colony%", colonyName},
+                                                 {"%goods%", output},
+                                                 {"%input%", input}});
+
+        try {
+            doc.insertString(doc.getLength(), newMessage + "\n\n", doc.getStyle("regular"));
         } catch(Exception e) {
             logger.warning(e.toString());
         }
