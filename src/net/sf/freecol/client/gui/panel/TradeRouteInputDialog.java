@@ -390,7 +390,7 @@ public final class TradeRouteInputDialog extends FreeColDialog implements Action
                         cargoPanel.revalidate();
                         Stop stop = (Stop) stopList.getSelectedValue();
                         if (stop != null) {
-                            stop.getCargo().add(new Integer(label.getType()));
+                            stop.addCargo(new Integer(label.getType()));
                             stop.setModified(true);
                         }
                     }

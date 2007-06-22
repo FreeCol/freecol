@@ -773,6 +773,7 @@ public final class InGameController implements NetworkConstants {
             return;
         } else {
             setDestination(unit, stop.getLocation());
+            moveToDestination(unit);
         }
     }
 

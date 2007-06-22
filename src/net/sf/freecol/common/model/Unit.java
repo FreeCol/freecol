@@ -350,11 +350,44 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
             currentStop = -1;
             return null;
         }
-        currentStop++;
-        if (currentStop >= stops.size()) {
-            currentStop = 0;
+        
+        int oldStop = currentStop;
+        Stop stop;
+        do {
+            currentStop++;
+            if (currentStop >= stops.size()) {
+                currentStop = 0;
+            }
+            stop = stops.get(currentStop);
+        } while (!shouldGoToStop(stop) && currentStop != oldStop);
+        
+        if (currentStop == oldStop) {
+            // there is no valid stop
+            currentStop = -1;
+            return null;
+        } else {
+            return stop;
         }
-        return stops.get(currentStop);
+    }
+    
+    public boolean shouldGoToStop(Stop stop) {
+        ArrayList<Integer> goodsTypes = stop.getCargo();
+        for(Goods goods : getGoodsList()) {
+            boolean unload = true;
+            for (int index = 0; index < goodsTypes.size(); index++) {
+                if (goods.getType() == goodsTypes.get(index).intValue()) {
+                    goodsTypes.remove(index);
+                    unload = false;
+                    break;
+                }
+            }
+            if (unload) { // There is goods to unload
+                return true;
+            }
+        }
+        // All loaded goods are in cargo list
+        // go to stop only if there is something to load
+        return getSpaceLeft() > 0 && goodsTypes.size() > 0;
     }
 
     /**
