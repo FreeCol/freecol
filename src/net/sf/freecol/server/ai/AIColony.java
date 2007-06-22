@@ -957,8 +957,44 @@ public class AIColony extends AIObject {
         }
 
         // TODO: Move workers to temporarily improve the production.
-        // TODO: Change the production type of workers producing a cargo there
+
+        // Changes the production type of workers producing a cargo there
         // is no room for.
+        for (int goodsType = 0; goodsType < Goods.NUMBER_OF_TYPES; goodsType++) {
+        	int production = colony.getProductionNetOf(goodsType);
+        	int in_stock = colony.getGoodsCount(goodsType);
+        	if (Goods.FOOD!=goodsType && production + in_stock > colony.getWarehouseCapacity()) {
+        		Iterator<Unit> unitIterator = colony.getUnitIterator();
+        		int waste = production + in_stock - colony.getWarehouseCapacity();
+        		while (unitIterator.hasNext() && waste > 0){
+        			Unit unit = unitIterator.next();
+        			if (unit.getWorkType()==goodsType) {
+        				unit.setLocation(null);
+        				boolean working = false;
+        				waste = colony.getGoodsCount(goodsType) + colony.getProductionNetOf(goodsType)
+        					    - colony.getWarehouseCapacity();
+        				int best = 0;
+        				for(int goodsType2 = 0; goodsType2 < 8; goodsType2++){
+        					int production2 = colony.getVacantColonyTileProductionFor(unit, goodsType2);
+        					if(production2 > best && production2 + colony.getGoodsCount(goodsType2)
+        							+ colony.getProductionNetOf(goodsType2)<colony.getWarehouseCapacity()){
+        						if (working){
+        							unit.setLocation(null);
+        						}
+        						unit.setLocation(colony.getVacantColonyTileFor(unit, goodsType2));
+                                unit.setWorkType(goodsType2);
+        						best = production2;
+        						working = true;
+        					}
+        				}
+        				if (!working){
+        					units.add(unit);
+        				}
+        			}
+        		}
+        	}
+        }
+
 
         // Use any remaining food plans:
         for (int i = 0; i < workLocationPlans.size(); i++) {
