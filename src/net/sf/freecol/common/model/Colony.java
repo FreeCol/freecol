@@ -1136,7 +1136,7 @@ public final class Colony extends Settlement implements Location, Nameable {
      */
     public int getVacantColonyTileProductionFor(Unit unit, int goodsType) {
         ColonyTile bestPick = getVacantColonyTileFor(unit, goodsType);
-        return unit.getFarmedPotential(goodsType, bestPick.getWorkTile());
+        return bestPick != null ? unit.getFarmedPotential(goodsType, bestPick.getWorkTile()) : 0;
     }
 
     /**
