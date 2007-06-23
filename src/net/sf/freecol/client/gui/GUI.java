@@ -1319,6 +1319,31 @@ public final class GUI {
     * @param height      The height of the image to deliver.
     * @return The image.
     */
+    public BufferedImage createExtendedProductionImage(ImageIcon goodsIcon, int production,
+                                                       int maxProduction, int width, int height) {
+        ClientOptions co = freeColClient.getClientOptions();
+        int displayIconCutoffCount = co.getInteger(ClientOptions.MAX_NUMBER_OF_GOODS_IMAGES);
+        int displayIconsIfOverMax = 4;
+        int displayNumbersIfOverCount = Math.min(
+                co.getInteger(ClientOptions.MIN_NUMBER_FOR_DISPLAYING_GOODS_COUNT),
+                displayIconCutoffCount
+            );
+        BufferedImage image = createProductionImage(goodsIcon, production, width, height,
+                displayIconCutoffCount, displayIconsIfOverMax, displayNumbersIfOverCount,
+                true, true, Math.min(width, (goodsIcon.getIconWidth()*3)/2), maxProduction);
+        return image;
+    }
+
+
+    /**
+    * Creates an illustration for a goods production.
+    *
+    * @param goodsIcon   The icon representing the goods.
+    * @param production  The amount of goods that is being produced.
+    * @param width       The width of the image to deliver.
+    * @param height      The height of the image to deliver.
+    * @return The image.
+    */
     public BufferedImage createProductionImage(ImageIcon goodsIcon, int production,
                                                int width, int height) {
         int limit = freeColClient.getClientOptions().getInteger(
@@ -1430,6 +1455,45 @@ public final class GUI {
             int displayIconCutoffCount, int displayIconsIfOverMax,
             int displayNumbersIfOverCount, boolean drawPlus,
             boolean center, int compressedWidth) {
+        return createProductionImage(goodsIcon, production, width, height,
+                                     displayIconCutoffCount, displayIconsIfOverMax,
+                                     displayNumbersIfOverCount, drawPlus, center,
+                                     compressedWidth, production);
+    }
+
+
+    /**
+    * Creates an illustration for a goods production.
+    *
+    * @param goodsIcon The icon representing the goods.
+    * @param production The amount of goods that is beeing produced.
+    * @param width The width of the image to deliver.
+    * @param height The height of the image to deliver.
+    * @param displayIconCutoffCount If production is over this amount,
+    *        then <code>displayIconsIfOverMax</code> number of goods images
+    *        is displayed.
+    * @param displayIconsIfOverMax The amount of goods images to display
+    *        if the production is higher than
+    *        <code>displayIconCutoffCount</code>.
+    * @param displayNumbersIfOverCount If production is over this number,
+    *        then we display the production as a number as well.
+    * @param drawPlus If <code>true</code>, then a plus is drawn
+    *        preceeding non-negative numbers (<code>&gt;= 0</code>)
+    * @param center boolean When <code>false</code> everything is
+    *        left-justified. When <code>true</code>, the image is
+    *        centered.
+    * @param compressedWidth This width is used as a maximum widht
+    *        for the goods images if the
+    *        <code>production &gt; displayNumbersIfOverCount</code>.
+    * @param maxProduction The amount of goods this building could produce
+    *        if more input goods were available.
+    * @return The image.
+    */
+    public BufferedImage createProductionImage(ImageIcon goodsIcon,
+            final int production, int width, int height,
+            int displayIconCutoffCount, int displayIconsIfOverMax,
+            int displayNumbersIfOverCount, boolean drawPlus,
+            boolean center, int compressedWidth, int maxProduction) {
 
         BufferedImage bi = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
         Graphics2D g = bi.createGraphics();
@@ -1479,11 +1543,14 @@ public final class GUI {
         if (displayNumbers) {
             Color textColor = (production < 0) ? Color.RED : Color.WHITE;
             String number = Integer.toString(production);
-            if( production >= 0 && drawPlus ) {
+            if (production >= 0 && drawPlus) {
                 number = "+"+ number;
             }
+            if (maxProduction > production) {
+                number = number + "/" + String.valueOf(maxProduction);
+            }
             BufferedImage stringImage = createStringImage(
-                    g, number, textColor, goodsIcon.getIconWidth()*2, 12);
+                    g, number, textColor, width, 12);
             int textOffset = leftOffset + (coverage-stringImage.getWidth())/2;
             textOffset = (textOffset >= 0) ? textOffset : 0;
             g.drawImage(stringImage, textOffset,

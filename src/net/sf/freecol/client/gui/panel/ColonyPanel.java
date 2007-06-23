@@ -961,7 +961,7 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener {
 
             JPanel productionInBuildingPanel = new JPanel();
 
-            public final int[] widths = { 120, 140, 140 };
+            public final int[] widths = { 160, 140, 100 };
 
             public final int[] heights = { 60 };
 
@@ -1035,20 +1035,12 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener {
                 int production = building.getProductionNextTurn();
                 if (production > 0) {
                     ImageIcon goodsIcon = parent.getImageProvider().getGoodsImageIcon(building.getGoodsOutputType());
-                    int width = goodsIcon.getIconWidth() * 3;
-                    BufferedImage productionImage = parent.getGUI().createProductionImage(goodsIcon, production, width,
-                            goodsIcon.getIconHeight());
+                    //int width = goodsIcon.getIconWidth() * 3;
+                    int width = widths[2];
+                    BufferedImage productionImage = parent.getGUI().createExtendedProductionImage(goodsIcon, production,
+                         building.getMaximumProduction(), width, goodsIcon.getIconHeight());
                     JLabel productionLabel = new JLabel(new ImageIcon(productionImage));
                     productionInBuildingPanel.add(productionLabel);
-
-                    if (production != building.getMaximumProduction()) {
-                        // JLabel tl = new JLabel("(" +
-                        // (building.getMaximumProduction() - production) +
-                        // ")");
-                        // tl.setForeground(Color.RED);
-                        JLabel tl = new JLabel(Integer.toString(production - building.getMaximumProduction()));
-                        productionInBuildingPanel.add(tl);
-                    }
                 }
 
             }
