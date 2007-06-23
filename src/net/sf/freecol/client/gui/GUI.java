@@ -146,7 +146,8 @@ public final class GUI {
     public boolean debugShowMissionInfo = false;
     
     private volatile boolean blinkingMarqueeEnabled;
-
+    
+    private final Image cursorImage;
 
     /**
     * The constructor to use.
@@ -187,6 +188,8 @@ public final class GUI {
         logger.warning("Starting in Move Units View Mode");
         
         blinkingMarqueeEnabled = true;
+        
+        cursorImage = lib.getMiscImage(ImageLibrary.UNIT_SELECT);
     }
     
     /**
@@ -2402,7 +2405,7 @@ public final class GUI {
     }
     
     private void drawCursor(Graphics2D g, int x, int y) {
-        g.drawImage(lib.getMiscImage(ImageLibrary.UNIT_SELECT), x, y, null);
+        g.drawImage(cursorImage, x, y, null);
     }
 
 
