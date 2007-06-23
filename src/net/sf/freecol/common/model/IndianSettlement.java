@@ -993,6 +993,25 @@ public class IndianSettlement extends Settlement {
 
 
         // TODO: Create a unit if food>=200, but not if a maximum number of units is reaced.
+        // DONE Create Indian when enough food
+        // Alcohol also contributes to create children. 
+        if (goodsContainer.getGoodsCount(Goods.FOOD) + 4*goodsContainer.getGoodsCount(Goods.RUM) > 200+KEEP_RAW_MATERIAL ) {
+            if (workers <= 6 + getKind()) { // up to a limit. Anyway cities produce more children than camps
+                Unit u = getGame().getModelController().createUnit(getID() + "newTurn200food", getTile(),
+                                                                   getOwner(), Unit.BRAVE);
+                consumeGoods(Goods.FOOD, 200);  // All food will be consumed, even if RUM helped
+                consumeGoods(Goods.RUM, 200/4);    // Also, some available RUM is consumed
+                // I know that consumeGoods will produce gold, which is explained because children are always a gift
+                addOwnedUnit(u);    // New indians quickly go out of their city and start annoying.
+                /* Should I do something like this? Seems to work without it.
+                 addModelMessage(u, "model.colony.newColonist",
+                                    new String[][] {{"%nation%", getOwner().getNationAsString()}},
+                                    ModelMessage.UNIT_ADDED);
+                 */
+                logger.info("New indian native created in " + getTile() + " with ID=" + u.getID());
+            }
+        }
+        // end Create Indian when enough food
 
 
         /* Increase alarm: */
