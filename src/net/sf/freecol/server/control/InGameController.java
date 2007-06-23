@@ -179,7 +179,7 @@ public final class InGameController extends Controller {
 
     private void chooseFoundingFather(ServerPlayer player) {
         final ServerPlayer nextPlayer = player;
-        Thread t = new Thread() {
+        Thread t = new Thread("foundingfather-thread") {
             public void run() {
                 int[] randomFoundingFathers = getRandomFoundingFathers(nextPlayer);
                 boolean atLeastOneChoice = false;
