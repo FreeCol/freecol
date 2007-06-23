@@ -582,7 +582,6 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
      * @param element The element containing the request.
      */
     private Element assignTradeRoute(Connection connection, Element element) {
-        FreeColServer freeColServer = getFreeColServer();
         ServerPlayer player = getFreeColServer().getPlayer(connection);
         Unit unit = (Unit) getGame().getFreeColGameObject(element.getAttribute("unit"));
 
@@ -1655,7 +1654,6 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
     }
 
     private void sendRemoveUnitToAll(Unit unit, Player player) {
-        FreeColServer freeColServer = getFreeColServer();
         Iterator<Player> enemyPlayerIterator = getGame().getPlayerIterator();
         while (enemyPlayerIterator.hasNext()) {
             ServerPlayer enemyPlayer = (ServerPlayer) enemyPlayerIterator.next();

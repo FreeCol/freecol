@@ -112,7 +112,6 @@ public class TerrainGenerator {
     }
 
     private Tile createTile(Game game, boolean[][] landMap, int i, int j) {
-        final int width = landMap.length;
         final int height = landMap[0].length;
         
         Tile t;

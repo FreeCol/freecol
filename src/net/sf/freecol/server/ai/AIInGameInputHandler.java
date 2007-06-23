@@ -144,14 +144,6 @@ public final class AIInGameInputHandler implements MessageHandler, StreamedMessa
     }
 
     /**
-     * Returns the current game.
-     * @return the current game.
-     */
-    private Game getGame() {
-        return freeColServer.getGame();
-    }
-
-    /**
      * Handles the main element of an XML message.
      * 
      * @param connection The connection the message came from.

@@ -82,8 +82,6 @@ public class MapGenerator {
      * @see TerrainGenerator
      */
     public void createMap(Game game) {        
-        final int width = getMapGeneratorOptions().getWidth();
-        final int height = getMapGeneratorOptions().getHeight();
         
         // Prepare imports:
         final File importFile = getMapGeneratorOptions().getFile(MapGeneratorOptions.IMPORT_FILE);
