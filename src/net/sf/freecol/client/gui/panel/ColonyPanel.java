@@ -677,7 +677,7 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener {
                 updateNameBox();
                 break;
             case WAREHOUSE:
-                if(freeColClient.getCanvas().showWarehouseDialog(colony)) {
+                if (freeColClient.getCanvas().showWarehouseDialog(colony)) {
                     updateWarehouse();
                 }
                 break;
@@ -1035,10 +1035,10 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener {
                 int production = building.getProductionNextTurn();
                 if (production > 0) {
                     ImageIcon goodsIcon = parent.getImageProvider().getGoodsImageIcon(building.getGoodsOutputType());
-                    //int width = goodsIcon.getIconWidth() * 3;
+                    // int width = goodsIcon.getIconWidth() * 3;
                     int width = widths[2];
-                    BufferedImage productionImage = parent.getGUI().createExtendedProductionImage(goodsIcon, production,
-                         building.getMaximumProduction(), width, goodsIcon.getIconHeight());
+                    BufferedImage productionImage = parent.getGUI().createExtendedProductionImage(goodsIcon,
+                            production, building.getMaximumProduction(), width, goodsIcon.getIconHeight());
                     JLabel productionLabel = new JLabel(new ImageIcon(productionImage));
                     productionInBuildingPanel.add(productionLabel);
                 }
@@ -1600,7 +1600,9 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener {
 
 
         /**
-         * Panel for visualizing a <code>ColonyTile</code>.
+         * Panel for visualizing a <code>ColonyTile</code>. The component
+         * itself is not visible, however the content of the component is (i.e.
+         * the people working and the production)
          */
         public final class ASingleTilePanel extends JPanel {
 
@@ -1617,13 +1619,9 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener {
 
                 if (colonyTile.getUnit() != null) {
                     Unit unit = colonyTile.getUnit();
-
                     UnitLabel unitLabel = new UnitLabel(unit, parent);
-                    if (colonyPanel.isEditable()) {
-                        unitLabel.setTransferHandler(defaultTransferHandler);
-                        unitLabel.addMouseListener(pressListener);
-                    }
-
+                    unitLabel.setTransferHandler(defaultTransferHandler);
+                    unitLabel.addMouseListener(pressListener);
                     add(unitLabel);
 
                     updateDescriptionLabel(unitLabel, true);
@@ -1632,35 +1630,45 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener {
                 ImageLibrary lib = parent.getGUI().getImageLibrary();
 
                 if (colonyTile.isColonyCenterTile()) {
-                    int width = lib.getTerrainImageWidth(1) * 2 / 3;
-
-                    ImageIcon goodsIcon = parent.getImageProvider().getGoodsImageIcon(Goods.FOOD);
-                    BufferedImage productionImage = parent.getGUI().createProductionImage(goodsIcon,
-                            colonyTile.getTile().potential(Goods.FOOD), width, goodsIcon.getIconHeight());
-                    JLabel sl = new JLabel(new ImageIcon(productionImage), SwingConstants.CENTER);
-                    sl.setSize(lib.getTerrainImageWidth(1), goodsIcon.getIconHeight());
-                    add(sl);
-
-                    if (colonyTile.getTile().potential(colonyTile.getTile().secondaryGoods()) != 0) {
-                        goodsIcon = parent.getImageProvider().getGoodsImageIcon(colonyTile.getTile().secondaryGoods());
-                        productionImage = parent.getGUI().createProductionImage(goodsIcon,
-                                colonyTile.getTile().potential(colonyTile.getTile().secondaryGoods()), width,
-                                goodsIcon.getIconHeight());
-                        sl = new JLabel(new ImageIcon(productionImage), SwingConstants.CENTER);
-                        sl.setSize(lib.getTerrainImageWidth(1), goodsIcon.getIconHeight());
-                        add(sl);
-                    }
+                    initializeAsCenterTile(lib);
                 }
 
-                if (colonyPanel.isEditable()) {
-                    setTransferHandler(defaultTransferHandler);
-                    addMouseListener(releaseListener);
-                }
+                setTransferHandler(defaultTransferHandler);
+                addMouseListener(releaseListener);
 
                 // Size and position:
                 setSize(lib.getTerrainImageWidth(1), lib.getTerrainImageHeight(1));
                 setLocation(((2 - x) + y) * lib.getTerrainImageWidth(1) / 2, (x + y) * lib.getTerrainImageHeight(1) / 2);
+            }
 
+            /**
+             * Initialized the center of the colony panel tile. The one
+             * containing the city.
+             * 
+             * @param lib an ImageLibrary
+             */
+            private void initializeAsCenterTile(ImageLibrary lib) {
+                int width = lib.getTerrainImageWidth(1) * 2 / 3;
+                int height = lib.getTerrainImageHeight(1) * 2 / 3;
+
+                // A colony always produces food.
+                ImageIcon goodsIcon = parent.getImageProvider().getGoodsImageIcon(Goods.FOOD);
+                BufferedImage productionImage = parent.getGUI().createProductionImage(goodsIcon,
+                        colonyTile.getTile().potential(Goods.FOOD), width, height);
+                JLabel sl = new JLabel(new ImageIcon(productionImage), SwingConstants.CENTER);
+                sl.setSize(lib.getTerrainImageWidth(1), goodsIcon.getIconHeight());
+                add(sl);
+
+                // A colony may produce one additional good
+                int secondaryGood = colonyTile.getTile().secondaryGoods();
+                if (colonyTile.getTile().potential(secondaryGood) != 0) {
+                    goodsIcon = parent.getImageProvider().getGoodsImageIcon(secondaryGood);
+                    productionImage = parent.getGUI().createProductionImage(goodsIcon,
+                            colonyTile.getTile().potential(secondaryGood), width, goodsIcon.getIconHeight());
+                    sl = new JLabel(new ImageIcon(productionImage), SwingConstants.CENTER);
+                    sl.setSize(lib.getTerrainImageWidth(1), goodsIcon.getIconHeight());
+                    add(sl);
+                }
             }
 
             public void paintComponent(Graphics g) {
@@ -1848,7 +1856,6 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener {
                 return ((px >= 63 - activePixels) && (px <= 63 + activePixels));
             }
         }
-
     }
 
     /**

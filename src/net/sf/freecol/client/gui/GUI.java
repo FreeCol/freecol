@@ -1012,7 +1012,7 @@ public final class GUI {
                     Tile tile = map.getTile(tileX, tileY);
                     
                     // Display the Tile overlays:
-                    displayTileOverlays(g, map, tile, xx, yy, true);
+                    displayTileOverlays(g, map, tile, xx, yy, true, true);
                     
                     if(viewMode.displayTileCursor(tile,xx,yy)){
                         drawCursor(g, xx, yy);
@@ -1683,7 +1683,7 @@ public final class GUI {
         if ((tile.getOwner() != null && tile.getOwner() != colony) || occupyingUnit != null) {
             g.drawImage(lib.getMiscImage(ImageLibrary.TILE_TAKEN), x, y, null);
         }
-        displayTileOverlays(g, map, tile, x, y, false);
+        displayTileOverlays(g, map, tile, x, y, false, false);
         
         int nation = tile.getNationOwner();
         if (nation != Player.NO_NATION
@@ -1763,7 +1763,7 @@ public final class GUI {
      */
     public void displayTile(Graphics2D g, Map map, Tile tile, int x, int y, boolean drawUnexploredBorders) {
         displayBaseTile(g, map, tile, x, y, drawUnexploredBorders);
-        displayTileOverlays(g, map, tile, x, y, drawUnexploredBorders);
+        displayTileOverlays(g, map, tile, x, y, drawUnexploredBorders, true);
     }
 
     /**
@@ -1834,10 +1834,11 @@ public final class GUI {
      * (in pixels).
      * @param drawUnexploredBorders If true; draws border between explored and
      *        unexplored terrain.
+     * @param withNumber indicates if the number of inhabitants should be drawn too.
      */
-    private void displayTileOverlays(Graphics2D g, Map map, Tile tile, int x, int y, boolean drawUnexploredBorders) {  
+    private void displayTileOverlays(Graphics2D g, Map map, Tile tile, int x, int y, boolean drawUnexploredBorders, boolean withNumber) {  
         displayAdditionsAndImprovements(g, map, tile, x, y);
-        displaySettlement(g, map, tile, x, y);
+        displaySettlement(g, map, tile, x, y, withNumber);
         displayFogOfWar(g, map, tile, x, y);
         if (drawUnexploredBorders)
             displayUnexploredBorders(g, map, tile, x, y);
@@ -1977,7 +1978,7 @@ public final class GUI {
      * @param y The y-coordinate of the location where to draw the Tile
      * (in pixels).
      */
-    private void displaySettlement(Graphics2D g, Map map, Tile tile, int x, int y) {  
+    private void displaySettlement(Graphics2D g, Map map, Tile tile, int x, int y, boolean withNumber) {  
         if (tile.isExplored()) {
             Settlement settlement = tile.getSettlement();
 
@@ -1988,11 +1989,12 @@ public final class GUI {
                     // Draw image of colony in center of the tile.
                     g.drawImage(lib.getColonyImage(type), x + (lib.getTerrainImageWidth(tile.getType()) - lib.getColonyImageWidth(type)) / 2, y + (lib.getTerrainImageHeight(tile.getType()) - lib.getColonyImageHeight(type)) / 2, null);
 
-                    String populationString = Integer.toString(((Colony)settlement).getUnitCount());
-                    Color theColor = null;
+                    if (withNumber) {
+                        String populationString = Integer.toString(((Colony)settlement).getUnitCount());
+                        Color theColor = null;
 
-                    int bonus = ((Colony)settlement).getProductionBonus();
-                    switch (bonus) {
+                        int bonus = ((Colony)settlement).getProductionBonus();
+                        switch (bonus) {
                         case 2:
                             theColor = Color.BLUE;
                             break;
@@ -2007,12 +2009,12 @@ public final class GUI {
                             break;
                         default:
                             theColor = Color.WHITE;
-                            break;
+                        break;
+                        }
+
+                        BufferedImage stringImage = createStringImage(g, populationString, theColor, lib.getTerrainImageWidth(tile.getType()), 12);
+                        g.drawImage(stringImage, x + (lib.getTerrainImageWidth(tile.getType()) - stringImage.getWidth())/2 + 1, y + ((lib.getTerrainImageHeight(tile.getType()) - stringImage.getHeight()) / 2) + 1, null);
                     }
-
-                    BufferedImage stringImage = createStringImage(g, populationString, theColor, lib.getTerrainImageWidth(tile.getType()), 12);
-                    g.drawImage(stringImage, x + (lib.getTerrainImageWidth(tile.getType()) - stringImage.getWidth())/2 + 1, y + ((lib.getTerrainImageHeight(tile.getType()) - stringImage.getHeight()) / 2) + 1, null);
-
                     g.setColor(Color.BLACK);
                 } else if (settlement instanceof IndianSettlement) {
                     int type = lib.getSettlementGraphicsType(settlement);
