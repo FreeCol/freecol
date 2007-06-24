@@ -254,7 +254,8 @@ public final class DragListener extends MouseAdapter {
                     }
                     
                     if (tempUnit.getType() != Unit.INDIAN_CONVERT) {
-                        if( tempUnit.getLocation().getTile().getSettlement() !=null ) {
+                        if (tempUnit.getLocation().getTile() != null && 
+                            tempUnit.getLocation().getTile().getSettlement() != null) {
                             menu.addSeparator();
                             Colony colony = (Colony) tempUnit.getLocation().getColony();
                             Iterator<Building> buildingIterator = colony.getBuildingIterator();
