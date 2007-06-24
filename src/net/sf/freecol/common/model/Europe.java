@@ -438,6 +438,13 @@ public final class Europe extends FreeColGameObject implements Location,
             if (unit.isNaval() && unit.isUnderRepair()) {
                 unit.setHitpoints(unit.getHitpoints() + 1);
             }
+            if (unit.getHitpoints() == Unit.getInitialHitpoints(unit.getType())) {
+                addModelMessage(this, "model.unit.shipRepaired",
+                                new String[][] {
+                                    { "%unit%", unit.getName() },
+                                    { "%repairLocation%", getLocationName() } },
+                                ModelMessage.DEFAULT, this);
+            }
         }
     }
 

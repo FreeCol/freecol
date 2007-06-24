@@ -1394,10 +1394,21 @@ public final class Colony extends Settlement implements Location, Nameable {
 
 
     // Repair any damaged ships:
+    /**
+     * TODO: move this to the drydock/shipyard, and give Europe a
+     * shipyard, too.
+     */
     private void repairShips() {
         for (Unit unit : getTile().getUnitList()) {
             if (unit.isNaval() && unit.isUnderRepair()) {
                 unit.setHitpoints(unit.getHitpoints() + 1);
+            }
+            if (unit.getHitpoints() == Unit.getInitialHitpoints(unit.getType())) {
+                addModelMessage(this, "model.unit.shipRepaired",
+                                new String[][] {
+                                    { "%unit%", unit.getName() },
+                                    { "%repairLocation%", getLocationName() } },
+                                ModelMessage.DEFAULT, this);
             }
         }
     }

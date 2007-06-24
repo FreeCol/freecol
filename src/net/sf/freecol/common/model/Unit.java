@@ -2409,11 +2409,6 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
         this.hitpoints = hitpoints;
         if (hitpoints >= getInitialHitpoints(getType())) {
             setState(ACTIVE);
-            addModelMessage(this, "model.unit.shipRepaired",
-                            new String[][] {
-                                { "%unit%", getName() },
-                                { "%repairLocation%", getLocation().getLocationName() } },
-                            ModelMessage.DEFAULT, this);
         }
     }
 
