@@ -1402,13 +1402,13 @@ public final class Colony extends Settlement implements Location, Nameable {
         for (Unit unit : getTile().getUnitList()) {
             if (unit.isNaval() && unit.isUnderRepair()) {
                 unit.setHitpoints(unit.getHitpoints() + 1);
-            }
-            if (unit.getHitpoints() == Unit.getInitialHitpoints(unit.getType())) {
-                addModelMessage(this, "model.unit.shipRepaired",
-                                new String[][] {
-                                    { "%unit%", unit.getName() },
-                                    { "%repairLocation%", getLocationName() } },
+                if (unit.getHitpoints() == Unit.getInitialHitpoints(unit.getType())) {
+                    addModelMessage(this, "model.unit.shipRepaired",
+                            new String[][] {
+                                { "%unit%", unit.getName() },
+                                { "%repairLocation%", getLocationName() } },
                                 ModelMessage.DEFAULT, this);
+                }
             }
         }
     }
