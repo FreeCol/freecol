@@ -1660,7 +1660,7 @@ public final class GUI {
      * Displays the given <code>Tile</code> onto the given 
      * <code>Graphics2D</code> object at the location specified 
      * by the coordinates. The visualization of the <code>Tile</code>
-     * also includes information from the coresponding
+     * also includes information from the corresponding
      * <code>ColonyTile</code> from the given <code>Colony</code>.
      * 
      * @param g The <code>Graphics2D</code> object on which to draw 
