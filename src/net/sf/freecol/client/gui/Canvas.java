@@ -684,7 +684,7 @@ public final class Canvas extends JDesktopPane {
                                                          (image.getHeight(null) / 3) *2,
                                                          Image.SCALE_SMOOTH));
         } else {
-            return new ImageIcon(image);
+            return (image != null) ? new ImageIcon(image) : null;
         }
     }
 
