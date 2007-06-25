@@ -1283,11 +1283,6 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
         } else {
             throw new IllegalStateException("It is not allowed to board a ship on another tile.");
         }
-        /* TODO: remove it if abandon colony on closing panel it's working
-        if (getColony() != null && getColony().getUnitCount() <= 0) {
-            getColony().dispose();
-        }
-        */
     }
 
     /**
@@ -1701,11 +1696,6 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
 
         setLocation(getTile());
         setMovesLeft(0);
-        /* TODO: remove it if abandon colony on closing panel it's working
-        if (getColony().getUnitCount() <= 0) {
-            getColony().dispose();
-        }
-        */
     }
 
     /**
@@ -3546,6 +3536,8 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
                                     { "%unit%", getName() },
                                     { "%nation%", getOwner().getNationAsString() } }, 
                                 ModelMessage.UNIT_DEMOTED);
+            } else if (getType() == BRAVE && defender.getColony() != null) {
+                damageOrStealAtColony(defender.getColony());
             } else {
                 demote(defender, false);
                 if (enemy.hasFather(FoundingFather.GEORGE_WASHINGTON)) {
@@ -4738,27 +4730,73 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
     }
 
     /**
-     * Checks if a unit can be safely moved outside a colony.
-     * 
-     * The function returns false if the unit is not in a colony.
-     * 
-     * @return true if moving the unit out would abandon the colony.
-     */
-    public boolean wouldAbandonColony() {
-        // TODO: remove this method if abandon colony on closing panel it's working
-        return getColony() != null
-                && getColony().getUnitCount() <= 1
-                && (getLocation() instanceof Colony 
-                        || getLocation() instanceof Building 
-                        || getLocation() instanceof ColonyTile);
-    }
-
-    /**
      * Return how many turns left to be repaired
      *
      * @return turns to be repaired
      */
     public int getTurnsForRepair() {
         return getInitialHitpoints(getType()) - getHitpoints();
+    }
+
+    private void damageOrStealAtColony(Colony colony) {
+        ArrayList<Building> buildingList = new ArrayList<Building>();
+        ArrayList<Unit> shipList = new ArrayList<Unit>();
+        ArrayList<Goods> goodsList = colony.getGoodsContainer().getCompactGoods();
+        
+        Iterator<Building> itB = colony.getBuildingIterator();
+        while (itB.hasNext()) {
+            Building building = itB.next();
+            BuildingType bType = FreeCol.getSpecification().buildingType(building.getType());
+            if (building.isBuilt() && (bType.level(0).hammersRequired > 0 ||
+                    building.getLevel() > Building.HOUSE)) {
+                buildingList.add(building);
+            }
+        }
+        
+        List<Unit> unitList = colony.getTile().getUnitList();
+        for (Unit unit : unitList) {
+            if (unit.isNaval()) {
+                shipList.add(unit);
+            }
+        }
+        
+        String nation = getOwner().getNationAsString();
+        String unitName = getName();
+        String colonyName = colony.getName();
+        
+        int random = getGame().getModelController().getRandom(getID() + "damageOrStealColony",
+                buildingList.size() + goodsList.size() + shipList.size() + 1);
+        if (random < buildingList.size()) {
+            Building building = buildingList.get(random);
+            colony.addModelMessage(colony, "model.unit.buildingDamaged",
+                    new String[][] {
+                        {"%building%", building.getName()}, {"%colony%", colonyName},
+                        {"%enemyNation%", nation}, {"%enemyUnit%", unitName}},
+                    ModelMessage.DEFAULT, colony);
+            building.setLevel(building.getLevel() - 1);
+        } else if (random < buildingList.size() + goodsList.size()) {
+            Goods goods = goodsList.get(random - buildingList.size());
+            goods.setAmount(Math.min(goods.getAmount() / 2, 50));
+            colony.removeGoods(goods);
+            if (getSpaceLeft() > 0) add(goods);
+            colony.addModelMessage(colony, "model.unit.goodsStolen",
+                    new String[][] {
+                        {"%amount%", String.valueOf(goods.getAmount())},
+                        {"%goods%", goods.getName()}, {"%colony%", colonyName},
+                        {"%enemyNation%", nation}, {"%enemyUnit%", unitName}},
+                    ModelMessage.DEFAULT, goods);
+        } else if (random < buildingList.size() + goodsList.size() + shipList.size()) {
+            Unit ship = shipList.get(random - buildingList.size() - goodsList.size());
+            ship.shipDamaged();
+        } else { // steal gold
+            int gold = colony.getOwner().getGold() / 10;
+            colony.getOwner().modifyGold(-gold);
+            getOwner().modifyGold(gold);
+            colony.addModelMessage(colony, "model.unit.indianPlunder",
+                    new String[][] {
+                        {"%amount%", String.valueOf(gold)}, {"%colony%", colonyName},
+                        {"%enemyNation%", nation}, {"%enemyUnit%", unitName}},
+                    ModelMessage.DEFAULT, colony);
+        }
     }
 }
