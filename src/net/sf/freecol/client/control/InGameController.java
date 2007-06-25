@@ -1746,22 +1746,17 @@ public final class InGameController implements NetworkConstants {
             return false;
         }
 
-        if (okToLeaveColony(unit)) {
+        freeColClient.playSound(SfxLibrary.LOAD_CARGO);
 
-            freeColClient.playSound(SfxLibrary.LOAD_CARGO);
+        Element boardShipElement = Message.createNewRootElement("boardShip");
+        boardShipElement.setAttribute("unit", unit.getID());
+        boardShipElement.setAttribute("carrier", carrier.getID());
 
-            Element boardShipElement = Message.createNewRootElement("boardShip");
-            boardShipElement.setAttribute("unit", unit.getID());
-            boardShipElement.setAttribute("carrier", carrier.getID());
+        unit.boardShip(carrier);
 
-            unit.boardShip(carrier);
+        client.sendAndWait(boardShipElement);
 
-            client.sendAndWait(boardShipElement);
-
-            return true;
-        }
-
-        return false;
+        return true;
     }
 
     /**
@@ -1989,12 +1984,6 @@ public final class InGameController implements NetworkConstants {
             leaveShip(unit);
         }
 
-        if (okToLeaveColony(unit)) {
-            // Equip the unit first.
-        } else {
-            return; // The user cancelled the action.
-        }
-
         Element equipUnitElement = Message.createNewRootElement("equipunit");
         equipUnitElement.setAttribute("unit", unit.getID());
         equipUnitElement.setAttribute("type", Integer.toString(type));
@@ -2055,26 +2044,10 @@ public final class InGameController implements NetworkConstants {
 
         if (unit.getLocation() instanceof Colony || unit.getLocation() instanceof Building
                 || unit.getLocation() instanceof ColonyTile) {
-            putOutsideColony(unit, true);
+            putOutsideColony(unit);
         } else if (carrier != null) {
             boardShip(unit, carrier);
         }
-    }
-
-    /**
-     * Returns true if we can move the unit out of a colony.
-     * 
-     * The function returns true if the unit is not in a colony, or
-     * if the colony would survive the move unless the user chooses it.
-     * 
-     * @param unit The <code>Unit</code> to move outside the colony.
-     * @return true if the move was safe or accepted.
-     */
-    private boolean okToLeaveColony(Unit unit) {
-        return true; // TODO: remove this method if abandon colony on closing panel it's working
-        /*return !unit.wouldAbandonColony()
-                || freeColClient.getCanvas().showConfirmDialog("abandonColony.text", "abandonColony.yes",
-                        "abandonColony.no");*/
     }
 
     /**
@@ -2107,36 +2080,19 @@ public final class InGameController implements NetworkConstants {
      * @return <i>true</i> if the unit was successfully put outside the colony.
      */
     public boolean putOutsideColony(Unit unit) {
-        return putOutsideColony(unit, false);
-    }
-
-    /**
-     * Puts the specified unit outside the colony.
-     * 
-     * @param unit The <code>Unit</code>
-     * @param skipCheck The confirmation dialog for abandoning the colony will
-     *            not be displayed if this parameter is set to <code>true</code>.
-     * @return <i>true</i> if the unit was successfully put outside the colony.
-     */
-    public boolean putOutsideColony(Unit unit, boolean skipCheck) {
         if (freeColClient.getGame().getCurrentPlayer() != freeColClient.getMyPlayer()) {
             freeColClient.getCanvas().showInformationMessage("notYourTurn");
             throw new IllegalStateException("Not your turn.");
         }
 
-        if (skipCheck || okToLeaveColony(unit)) {
+        Element putOutsideColonyElement = Message.createNewRootElement("putOutsideColony");
+        putOutsideColonyElement.setAttribute("unit", unit.getID());
+        unit.putOutsideColony();
 
-            Element putOutsideColonyElement = Message.createNewRootElement("putOutsideColony");
-            putOutsideColonyElement.setAttribute("unit", unit.getID());
-            unit.putOutsideColony();
+        Client client = freeColClient.getClient();
+        client.sendAndWait(putOutsideColonyElement);
 
-            Client client = freeColClient.getClient();
-            client.sendAndWait(putOutsideColonyElement);
-
-            return true;
-        }
-
-        return false;
+        return true;
     }
 
     /**
