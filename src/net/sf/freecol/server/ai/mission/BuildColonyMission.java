@@ -318,7 +318,8 @@ public class BuildColonyMission extends Mission {
      */
     public boolean isValid() {
         return (!colonyBuilt && (doNotGiveUp || target != null
-                && colonyValue <= target.getColonyValue() + getUnit().getOwner().getColonyValue(target)));
+                && target.getSettlement() == null
+                && colonyValue <= getUnit().getOwner().getColonyValue(target)));
     }
 
     /**
