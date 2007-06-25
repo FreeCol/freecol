@@ -1623,8 +1623,10 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener {
                 if (colonyTile.getUnit() != null) {
                     Unit unit = colonyTile.getUnit();
                     UnitLabel unitLabel = new UnitLabel(unit, parent);
-                    unitLabel.setTransferHandler(defaultTransferHandler);
-                    unitLabel.addMouseListener(pressListener);
+                    if (colonyPanel.isEditable()) {
+                        unitLabel.setTransferHandler(defaultTransferHandler);
+                        unitLabel.addMouseListener(pressListener);
+                    }
                     add(unitLabel);
 
                     updateDescriptionLabel(unitLabel, true);
@@ -1636,8 +1638,10 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener {
                     initializeAsCenterTile(lib);
                 }
 
-                setTransferHandler(defaultTransferHandler);
-                addMouseListener(releaseListener);
+                if (colonyPanel.isEditable()) {
+                    setTransferHandler(defaultTransferHandler);
+                    addMouseListener(releaseListener);
+                }
 
                 // Size and position:
                 setSize(lib.getTerrainImageWidth(1), lib.getTerrainImageHeight(1));
