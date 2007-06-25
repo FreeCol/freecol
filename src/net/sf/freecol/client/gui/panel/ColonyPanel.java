@@ -961,7 +961,7 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener {
 
             JPanel productionInBuildingPanel = new JPanel();
 
-            public final int[] widths = { 160, 140, 100 };
+            public final int[] widths = { 160, 140, 90 };
 
             public final int[] heights = { 60 };
 
@@ -1006,8 +1006,11 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener {
                 updateProductionInBuildingPanel();
                 add(productionInBuildingPanel, higConst.rc(1, 3));
 
+                setSize(getPreferredSize());
+                /*
                 setPreferredSize(new Dimension(getWidth(),
                         (parent.getGUI().getImageLibrary().getUnitImageHeight(0) / 3) * 2 + 5));
+                */
             }
 
             public void autoscroll(Point p) {
@@ -1037,9 +1040,9 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener {
                     ImageIcon goodsIcon = parent.getImageProvider().getGoodsImageIcon(building.getGoodsOutputType());
                     // int width = goodsIcon.getIconWidth() * 3;
                     int width = widths[2];
-                    BufferedImage productionImage = parent.getGUI().createExtendedProductionImage(goodsIcon,
-                            production, building.getMaximumProduction(), width, goodsIcon.getIconHeight());
-                    JLabel productionLabel = new JLabel(new ImageIcon(productionImage));
+                    JLabel productionLabel = new ProductionLabel(building.getGoodsOutputType(), production,
+                                                                 building.getMaximumProduction(), parent);
+                    //productionPanel.setSize(new Dimension(widths[2], heights[0]));
                     productionInBuildingPanel.add(productionLabel);
                 }
 
