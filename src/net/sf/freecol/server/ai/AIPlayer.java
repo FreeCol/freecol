@@ -1288,7 +1288,7 @@ public class AIPlayer extends AIObject {
         Location bestExistingTarget = null;
         int smallestDifference = Integer.MAX_VALUE;
         Iterator<AIUnit> aui = getAIUnitIterator();
-        while (aui.hasNext()) {
+        while (aui.hasNext() && smallestDifference>0) {
             AIUnit coAIUnit = aui.next();
             Unit coUnit = coAIUnit.getUnit();
             if (coUnit.getTile() != null && coAIUnit.getMission() instanceof UnitSeekAndDestroyMission) {
