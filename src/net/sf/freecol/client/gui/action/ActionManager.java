@@ -5,6 +5,7 @@ import java.util.logging.Logger;
 import javax.swing.SwingUtilities;
 
 import net.sf.freecol.client.FreeColClient;
+import net.sf.freecol.client.gui.action.ReportCargoAction;
 import net.sf.freecol.common.option.Option;
 import net.sf.freecol.common.option.OptionGroup;
 
@@ -83,6 +84,7 @@ public class ActionManager extends OptionGroup {
         add(new ReportLabourAction(freeColClient));
         add(new ReportColonyAction(freeColClient));
         add(new ReportMilitaryAction(freeColClient));
+        add(new ReportCargoAction(freeColClient));
         add(new ReportNavalAction(freeColClient));
         add(new ReportReligionAction(freeColClient));
         add(new ReportRequirementsAction(freeColClient));

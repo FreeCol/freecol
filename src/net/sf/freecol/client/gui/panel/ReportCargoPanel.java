@@ -7,10 +7,10 @@ import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.i18n.Messages;
 
 /**
- * This panel displays the Military Report.
+ * This panel displays the Cargo Report.
  */
-public final class ReportMilitaryPanel extends ReportPanel implements ActionListener {
-    public static final String  COPYRIGHT = "Copyright (C) 2003-2006 The FreeCol Team";
+public final class ReportCargoPanel extends ReportPanel implements ActionListener {
+    public static final String  COPYRIGHT = "Copyright (C) 2003-2007 The FreeCol Team";
     public static final String  LICENSE = "http://www.gnu.org/licenses/gpl.html";
     public static final String  REVISION = "$Revision$";
 
@@ -20,9 +20,9 @@ public final class ReportMilitaryPanel extends ReportPanel implements ActionList
      * The constructor that will add the items to this panel.
      * @param parent The parent of this panel.
      */
-    public ReportMilitaryPanel(Canvas parent) {
-        super(parent, Messages.message("menuBar.report.military"));
-        reportUnitPanel = new ReportUnitPanel(ReportUnitPanel.MILITARY, false, getCanvas(), this);
+    public ReportCargoPanel(Canvas parent) {
+        super(parent, Messages.message("menuBar.report.cargo"));
+        reportUnitPanel = new ReportUnitPanel(ReportUnitPanel.CARGO, true, getCanvas(), this);
     }
 
     @Override
