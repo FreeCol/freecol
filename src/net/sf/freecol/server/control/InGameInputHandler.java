@@ -2730,9 +2730,6 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
             } else {
                 goods = new Goods(getGame(), goodsElement);
             }
-            if (!unit.isVisibleTo(receiver)) {
-                element.appendChild(unit.toXMLElement(receiver, element.getOwnerDocument()));
-            }
             try {
                 Element reply = receiver.getConnection().ask(element);
                 boolean accepted = Boolean.valueOf(reply.getAttribute("accepted")).booleanValue();
