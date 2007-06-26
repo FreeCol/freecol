@@ -22,12 +22,10 @@ In order to compile the game, you'll also need Apache Ant,
 get it at:
 http://ant.apache.org
 
-NOTE: technically, it may be possible to run the game on an older
-JRE (for example Java 1.3). In this case you will need jar files
-in your CLASSPATH that provide standard XML parsers and the Java
-Logging API among other things. If you feel this adventureous then
-chances are high that we won't be able to help you out if it fails.
-
+This process requires the 'native2ascii' task, which is an optional ant
+task. Some Linux distributions place optional tasks in a different
+package, so make sure you have installed all necessary packages if you
+are a Linux user.
 
 II.  Compiling FreeCol
 =================================
