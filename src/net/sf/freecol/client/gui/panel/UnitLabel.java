@@ -88,11 +88,6 @@ public final class UnitLabel extends JLabel implements ActionListener {
 
         setSmall(false);
         setIgnoreLocation(false);
-        if (unit.getLocation() instanceof ColonyTile) {
-            setBorder(BorderFactory.createEmptyBorder(0, 15, 0, 15));
-        } else {
-            setBorder(BorderFactory.createEmptyBorder(0, 5, 0, 5));
-        }
 
         this.inGameController = parent.getClient().getInGameController();
     }
@@ -195,7 +190,11 @@ public final class UnitLabel extends JLabel implements ActionListener {
             setIcon(parent.getImageProvider().getUnitImageIcon(parent.getImageProvider().getUnitGraphicsType(unit)));
             setDisabledIcon(parent.getImageProvider().getUnitImageIcon(
                     parent.getImageProvider().getUnitGraphicsType(unit), true));
-            setBorder(BorderFactory.createEmptyBorder(0, 5, 0, 5));
+            if (unit.getLocation() instanceof ColonyTile) {
+                setBorder(BorderFactory.createEmptyBorder(0, 15, 0, 15));
+            } else {
+                setBorder(BorderFactory.createEmptyBorder(0, 5, 0, 5));
+            }
         }
 
     }
