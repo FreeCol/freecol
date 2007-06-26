@@ -380,6 +380,7 @@ public final class InGameController extends Controller {
                     monarchActionElement.setAttribute("action", String.valueOf(action));
                     switch (action) {
                     case Monarch.RAISE_TAX:
+                        int oldTax = nextPlayer.getTax();
                         int newTax = monarch.getNewTax();
                         if (newTax > 100) {
                             logger.warning("Tax rate exceeds 100 percent.");
@@ -393,26 +394,24 @@ public final class InGameController extends Controller {
                         monarchActionElement.setAttribute("goods", goods.getName());
                         monarchActionElement.setAttribute("force", String.valueOf(false));
                         try {
+                            nextPlayer.setTax(newTax); // to avoid cheating
                             Element reply = nextPlayer.getConnection().ask(monarchActionElement);
                             boolean accepted = Boolean.valueOf(reply.getAttribute("accepted")).booleanValue();
-                            if (accepted) {
-                                nextPlayer.setTax(newTax);
-                            } else {
+                            
+                            if (!accepted) {
                                 Colony colony = (Colony) goods.getLocation();
                                 if (colony.getGoodsCount(goods.getType()) >= goods.getAmount()) {
+                                    nextPlayer.setTax(oldTax); // player hasn't accepted, restoring tax
                                     Element removeGoodsElement = Message.createNewRootElement("removeGoods");
-                                    if (goods != null) {
-                                        ((Colony) goods.getLocation()).removeGoods(goods);
-                                        nextPlayer.setArrears(goods);
-                                        removeGoodsElement.appendChild(goods.toXMLElement(nextPlayer, removeGoodsElement
-                                                                                          .getOwnerDocument()));
-                                    }
+                                    ((Colony) goods.getLocation()).removeGoods(goods);
+                                    nextPlayer.setArrears(goods);
+                                    removeGoodsElement.appendChild(goods.toXMLElement(nextPlayer, removeGoodsElement
+                                                                                      .getOwnerDocument()));
                                     nextPlayer.getConnection().send(removeGoodsElement);
                                 } else {
-                                    // player has cheated and removed goods from colony
+                                    // player has cheated and removed goods from colony, don't restore tax
                                     monarchActionElement.setAttribute("force", String.valueOf(true));
                                     nextPlayer.getConnection().send(monarchActionElement);
-                                    nextPlayer.setTax(newTax);
                                 }
                             }
                         } catch (IOException e) {
