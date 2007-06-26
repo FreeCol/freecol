@@ -498,7 +498,28 @@ public class AIPlayer extends AIObject {
         Iterator<AIColony> ci = getAIColonyIterator();
         while (ci.hasNext()) {
             AIColony c = ci.next();
+            ArrayList<Tile> oldWorkTiles = new ArrayList<Tile>();
+            Iterator<ColonyTile> it = c.getColony().getColonyTileIterator();
+            while (it.hasNext()) {
+                ColonyTile colonyTile = it.next();
+                if (colonyTile.getUnit() != null) {
+                    oldWorkTiles.add(colonyTile.getWorkTile());
+                }
+            }
+
             c.rearrangeWorkers(getConnection());
+            
+            ArrayList<Tile> tilesToUpdate = new ArrayList<Tile>();
+            it = c.getColony().getColonyTileIterator();
+            while (it.hasNext()) {
+                ColonyTile colonyTile = it.next();
+                boolean isOccupied = colonyTile.getUnit() != null;
+                boolean wasOccupied = oldWorkTiles.remove(colonyTile.getWorkTile());
+                if (isOccupied != wasOccupied) {
+                    tilesToUpdate.add(colonyTile.getWorkTile());
+                }
+            }
+            sendUpdatedTilesToAll(tilesToUpdate);
         }
     }
 
@@ -823,6 +844,37 @@ public class AIPlayer extends AIObject {
             }
         } catch (IOException e) {
             logger.log(Level.WARNING, "Couldn't send AI element " + element.getTagName() + "!", e);
+        }
+    }
+
+    /**
+     * Send some tiles to update to all players which can see them
+     * 
+     * @param tiles The tiles to update.
+     */
+    private void sendUpdatedTilesToAll(ArrayList<Tile> tiles) {
+        Iterator<Player> enemyPlayerIterator = getGame().getPlayerIterator();
+        while (enemyPlayerIterator.hasNext()) {
+            ServerPlayer enemyPlayer = (ServerPlayer) enemyPlayerIterator.next();
+            if (equals(enemyPlayer) || enemyPlayer.getConnection() == null) {
+                continue;
+            }
+            try {
+                Element updateElement = Message.createNewRootElement("update");
+                boolean send = false;
+                for(Tile tile : tiles) {
+                    if (enemyPlayer.canSee(tile)) {
+                        updateElement.appendChild(tile.toXMLElement(enemyPlayer, updateElement.getOwnerDocument()));
+                        send = true;
+                    }
+                }
+                if (send) {
+                    enemyPlayer.getConnection().send(updateElement);
+                }
+            } catch (IOException e) {
+                logger.warning("Could not send message to: " + enemyPlayer.getName() + " with connection "
+                        + enemyPlayer.getConnection());
+            }
         }
     }
 
