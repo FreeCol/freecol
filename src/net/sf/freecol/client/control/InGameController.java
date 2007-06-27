@@ -3114,8 +3114,7 @@ public final class InGameController implements NetworkConstants {
                     if (endingTurn) {
                         unit.setMovesLeft(0);
                     } else {
-                        executeGoto = false;
-                        break;
+                        return;
                     }
                 }
             }
@@ -3123,37 +3122,36 @@ public final class InGameController implements NetworkConstants {
             if (!myPlayer.hasNextGoingToUnit() && !freeColClient.getCanvas().isShowingSubPanel()) {
                 if (endingTurn) {
                     canvas.getGUI().setActiveUnit(null);
-                    // canvas.setEnabled(false);
                     endingTurn = false;
 
                     Element endTurnElement = Message.createNewRootElement("endTurn");
                     freeColClient.getClient().send(endTurnElement);
-                        
+                    return;
                 } else {
                     executeGoto = false;
                 }
             }
-        } else {
-            GUI gui = freeColClient.getGUI();
-            Unit nextActiveUnit = myPlayer.getNextActiveUnit();
+        }
+        
+        GUI gui = freeColClient.getGUI();
+        Unit nextActiveUnit = myPlayer.getNextActiveUnit();
 
+        if (nextActiveUnit != null) {
+            gui.setActiveUnit(nextActiveUnit);
+        } else {
+            // no more active units, so we can move the others
+            nextActiveUnit = myPlayer.getNextGoingToUnit();
             if (nextActiveUnit != null) {
-                gui.setActiveUnit(nextActiveUnit);
-            } else {
-                // no more active units, so we can move the others
-                nextActiveUnit = myPlayer.getNextGoingToUnit();
-                if (nextActiveUnit != null) {
-                    moveToDestination(nextActiveUnit);
-                } else if (tile != null) {
-                    Position p = tile.getPosition();
-                    if (p != null) {
-                        // this really shouldn't happen
-                        gui.setSelectedTile(p);
-                    }
-                    gui.setActiveUnit(null);
-                } else {
-                    gui.setActiveUnit(null);
+                moveToDestination(nextActiveUnit);
+            } else if (tile != null) {
+                Position p = tile.getPosition();
+                if (p != null) {
+                    // this really shouldn't happen
+                    gui.setSelectedTile(p);
                 }
+                gui.setActiveUnit(null);
+            } else {
+                gui.setActiveUnit(null);
             }
         }
     }

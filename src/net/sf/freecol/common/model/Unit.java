@@ -2605,6 +2605,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
             if (getOwner().hasFather(FoundingFather.FERDINAND_MAGELLAN)) {
                 workLeft--;
             }
+            movesLeft = 0;
             break;
         case TO_AMERICA:
             if ((state == ACTIVE) && (location instanceof Europe)) {
@@ -2616,6 +2617,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
             if (getOwner().hasFather(FoundingFather.FERDINAND_MAGELLAN)) {
                 workLeft--;
             }
+            movesLeft = 0;
             break;
         default:
             workLeft = -1;
