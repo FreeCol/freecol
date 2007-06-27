@@ -488,11 +488,11 @@ public class IndianSettlement extends Settlement {
     * @param missionary The missionary for this settlement.
     */
     public void setMissionary(Unit missionary) {
-        if (missionary == null) {
-            throw new NullPointerException();
-        }
-        if (!missionary.isMissionary()) {
-            throw new IllegalArgumentException("Specified unit is not a missionary.");
+        if (missionary != null) {
+            if (!missionary.isMissionary()) {
+                throw new IllegalArgumentException("Specified unit is not a missionary.");
+            }
+            missionary.setLocation(null);
         }
         if (missionary != this.missionary) {
             convertProgress = 0;
@@ -501,7 +501,6 @@ public class IndianSettlement extends Settlement {
             this.missionary.dispose();
         }
         this.missionary = missionary;
-        missionary.setLocation(null);
         getTile().updatePlayerExploredTiles();
     }
 

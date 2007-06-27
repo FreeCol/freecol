@@ -3511,6 +3511,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
 
         Tile newTile = defender.getTile();
         adjustTension(defender);
+        Settlement settlement = newTile.getSettlement();
 
         switch (result) {
         case ATTACK_EVADES:
@@ -3561,7 +3562,6 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
             }
             break;
         case ATTACK_DONE_SETTLEMENT:
-            Settlement settlement = newTile.getSettlement();
             if (settlement instanceof IndianSettlement) {
                 defender.dispose();
                 destroySettlement((IndianSettlement) settlement);
@@ -3586,6 +3586,9 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
                 }
                 if (!defender.isNaval()) {
                     defender.demote(this, false);
+                    if (settlement instanceof IndianSettlement) {
+                        getConvert((IndianSettlement) settlement);
+                    }
                 }
             }
             break;
@@ -3602,6 +3605,9 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
                 promote();
                 if (!defender.isNaval()) {
                     defender.demote(this, true);
+                    if (settlement instanceof IndianSettlement) {
+                        getConvert((IndianSettlement) settlement);
+                    }
                 }
             }
             break;
@@ -3964,13 +3970,9 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
         // Larger treasure if Hernan Cortes is present in the congress:
         int bonus = (getOwner().hasFather(FoundingFather.HERNAN_CORTES)) ? 2 : 1;
 
-        // The number of Indian converts
-        int converts = (4 - getOwner().getDifficulty());
-
-        // Incan and Aztecs give more gold and converts
+        // Incan and Aztecs give more gold
         if (enemy.getNation() == Player.INCA || enemy.getNation() == Player.AZTEC) {
             tTrain.setTreasureAmount(randomTreasure * 500 * bonus + 10000);
-            converts += 2;
         } else {
             tTrain.setTreasureAmount(randomTreasure * 50 * bonus + 300);
         }
@@ -3978,14 +3980,6 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
         // capitals give more gold
         if (wasCapital) {
             tTrain.setTreasureAmount((tTrain.getTreasureAmount() * 3) / 2);
-        }
-
-        if (!getOwner().hasFather(FoundingFather.JUAN_DE_SEPULVEDA)) {
-            converts = converts / 2;
-        }
-
-        for (int i = 0; i < converts; i++) {
-            modelController.createUnit(getID() + "indianConvert" + i, newTile, getOwner(), Unit.INDIAN_CONVERT);
         }
 
         addModelMessage(this, "model.unit.indianTreasure", new String[][] { { "%indian%", enemy.getNationAsString() },
@@ -4740,6 +4734,13 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
         return getInitialHitpoints(getType()) - getHitpoints();
     }
 
+    /**
+     * Damage a building or a ship or steal some goods or gold. It's called
+     * from attack when an indian attacks a colony and lose the combat with
+     * ATTACK_LOSS as result
+     *
+     * @param colony The attacked colony
+     */
     private void damageOrStealAtColony(Colony colony) {
         ArrayList<Building> buildingList = new ArrayList<Building>();
         ArrayList<Unit> shipList = new ArrayList<Unit>();
@@ -4799,6 +4800,48 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
                         {"%amount%", String.valueOf(gold)}, {"%colony%", colonyName},
                         {"%enemyNation%", nation}, {"%enemyUnit%", unitName}},
                     ModelMessage.DEFAULT, colony);
+        }
+    }
+
+    /**
+     * Check whether some indian converts due to the attack or they burn all missions
+     *
+     * @param indianSettlement The attacked indian settlement
+     */
+    private void getConvert(IndianSettlement indianSettlement) {
+        ModelController modelController = getGame().getModelController();
+        int random = modelController.getRandom(getID() + "getConvert", 100);
+        int convertProbability = (5 - getOwner().getDifficulty()) * 10; // 50% - 10%
+        if (getOwner().hasFather(FoundingFather.JUAN_DE_SEPULVEDA)) {
+            convertProbability += 20;
+        }
+        int burnProbability = (1 + getOwner().getDifficulty()) * 2; // 2% - 10%
+        
+        if (random < convertProbability) {
+            Unit missionary = indianSettlement.getMissionary();
+            if (missionary != null && missionary.getOwner() == getOwner() &&
+                    getGame().getViewOwner() == null && indianSettlement.getUnitCount() > 1) {
+                indianSettlement.getFirstUnit().dispose();
+                modelController.createUnit(getID() + "indianConvert", getLocation(),
+                        getOwner(), Unit.INDIAN_CONVERT);
+            }
+        } else if (random >= 100 - burnProbability) {
+            boolean burn = false;
+            List<Settlement> settlements = indianSettlement.getOwner().getSettlements();
+            for (Settlement settlement : settlements) {
+                IndianSettlement indian = (IndianSettlement) settlement;
+                Unit missionary = indian.getMissionary();
+                if (missionary != null && missionary.getOwner() == getOwner()) {
+                    burn = true;
+                    indian.setMissionary(null);
+                }
+            }
+            if (burn) {
+                addModelMessage(this, "model.unit.burnMissions", new String[][] {
+                    {"%nation%", getOwner().getNationAsString()},
+                    {"%enemyNation%", indianSettlement.getOwner().getNationAsString()}},
+                    ModelMessage.DEFAULT, indianSettlement);
+            }
         }
     }
 }

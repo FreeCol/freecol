@@ -3228,10 +3228,11 @@ public final class InGameController implements NetworkConstants {
         Runnable uiTask = new Runnable() {
             public void run() {
                 if (messageList.size() > 0) {
-                    if (allMessages) {
+                    if (allMessages || messageList.size() > 5) {
                         freeColClient.getCanvas().showTurnReport(messageList);
                     } else {
-                        freeColClient.getCanvas().showModelMessage(messageList.get(0));
+                        freeColClient.getCanvas().showModelMessages(
+                                messageList.toArray(new ModelMessage[0]));
                     }
                 }
                 freeColClient.getActionManager().update();

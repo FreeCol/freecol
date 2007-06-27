@@ -1218,6 +1218,14 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
             }
         }
         unit.attack(defender, result, plunderGold);
+        
+        if (result >= Unit.ATTACK_WIN && unit.getTile() != newTile &&
+                newTile.getSettlement() != null &&
+                newTile.getSettlement() instanceof IndianSettlement) {
+            // Unit won and didn't move, maybe an indian has converted, send updated tile
+            reply.appendChild(unit.getTile().toXMLElement(unit.getOwner(), reply.getOwnerDocument()));
+        }
+        
         // Send capturedGoods if UNIT_HIDING is true because when it's
         // false unit is already sent with carried goods and units
         if (unit.canCaptureGoods() && getGame().getGameOptions().getBoolean(GameOptions.UNIT_HIDING)) {
