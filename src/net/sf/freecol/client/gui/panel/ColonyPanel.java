@@ -959,7 +959,7 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener {
         public final class ASingleBuildingPanel extends JPanel implements Autoscroll {
             Building building;
 
-            JPanel productionInBuildingPanel = new JPanel();
+            ProductionLabel productionLabel;
 
             public final int[] widths = { 160, 140, 90 };
 
@@ -1003,8 +1003,10 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener {
                 colonistsInBuildingPanel.setOpaque(false);
                 add(colonistsInBuildingPanel, higConst.rc(1, 2));
 
-                updateProductionInBuildingPanel();
-                add(productionInBuildingPanel, higConst.rc(1, 3));
+                productionLabel = new ProductionLabel(building.getGoodsOutputType(),
+                                                      building.getProductionNextTurn(),
+                                                      building.getMaximumProduction(), parent);
+                add(productionLabel, higConst.rc(1, 3));
 
                 setSize(getPreferredSize());
                 /*
@@ -1030,22 +1032,9 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener {
                 return new Insets(r.x, r.y, r.width, r.height);
             }
 
-            public void updateProductionInBuildingPanel() {
-                productionInBuildingPanel.removeAll();
-                productionInBuildingPanel.setOpaque(false);
-                productionInBuildingPanel.setLayout(new FlowLayout());
-
-                int production = building.getProductionNextTurn();
-                if (production > 0) {
-                    ImageIcon goodsIcon = parent.getImageProvider().getGoodsImageIcon(building.getGoodsOutputType());
-                    // int width = goodsIcon.getIconWidth() * 3;
-                    int width = widths[2];
-                    JLabel productionLabel = new ProductionLabel(building.getGoodsOutputType(), production,
-                                                                 building.getMaximumProduction(), parent);
-                    //productionPanel.setSize(new Dimension(widths[2], heights[0]));
-                    productionInBuildingPanel.add(productionLabel);
-                }
-
+            public void updateProductionLabel() {
+                productionLabel.setProduction(building.getProductionNextTurn());
+                productionLabel.setMaxProduction(building.getMaximumProduction());
             }
 
             /**
@@ -1088,9 +1077,9 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener {
                 refresh();
                 colonyPanel.updateSoLLabel();
 
-                updateProductionInBuildingPanel();
+                updateProductionLabel();
                 if (oldParent.getParent() instanceof ASingleBuildingPanel) {
-                    ((ASingleBuildingPanel) oldParent.getParent()).updateProductionInBuildingPanel();
+                    ((ASingleBuildingPanel) oldParent.getParent()).updateProductionLabel();
                 }
 
                 return c;
@@ -1292,7 +1281,7 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener {
             refresh();
             colonyPanel.updateSoLLabel();
             if (oldParent != null && oldParent.getParent() instanceof BuildingsPanel.ASingleBuildingPanel) {
-                ((BuildingsPanel.ASingleBuildingPanel) oldParent.getParent()).updateProductionInBuildingPanel();
+                ((BuildingsPanel.ASingleBuildingPanel) oldParent.getParent()).updateProductionLabel();
             }
             return c;
         }
@@ -1520,7 +1509,7 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener {
 
             refresh();
             if (oldParent != null && oldParent.getParent() instanceof BuildingsPanel.ASingleBuildingPanel) {
-                ((BuildingsPanel.ASingleBuildingPanel) oldParent.getParent()).updateProductionInBuildingPanel();
+                ((BuildingsPanel.ASingleBuildingPanel) oldParent.getParent()).updateProductionLabel();
             }
             return c;
         }
@@ -1660,26 +1649,18 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener {
 
                 // A colony always produces food.
                 ImageIcon goodsIcon = parent.getImageProvider().getGoodsImageIcon(Goods.FOOD);
-                BufferedImage productionImage = parent.getGUI().createProductionImage(goodsIcon,
-                        colonyTile.getTile().potential(Goods.FOOD), width, height);
-                JLabel sl = new JLabel(new ImageIcon(productionImage), SwingConstants.CENTER);
-                sl.setSize(lib.getTerrainImageWidth(1), goodsIcon.getIconHeight());
-                add(sl);
+                ProductionLabel pl = new ProductionLabel(Goods.FOOD, colonyTile.getTile().potential(Goods.FOOD), parent);
+                pl.setSize(lib.getTerrainImageWidth(1), goodsIcon.getIconHeight());
+                add(pl);
 
                 // A colony may produce one additional good
                 int secondaryGood = colonyTile.getTile().secondaryGoods();
                 if (colonyTile.getTile().potential(secondaryGood) != 0) {
                     goodsIcon = parent.getImageProvider().getGoodsImageIcon(secondaryGood);
-                    productionImage = parent.getGUI().createProductionImage(goodsIcon,
-                            colonyTile.getTile().potential(secondaryGood), width, goodsIcon.getIconHeight());
-                    sl = new JLabel(new ImageIcon(productionImage), SwingConstants.CENTER);
+                    ProductionLabel sl = new ProductionLabel(secondaryGood, colonyTile.getTile().potential(secondaryGood), parent);
                     sl.setSize(lib.getTerrainImageWidth(1), goodsIcon.getIconHeight());
                     add(sl);
                 }
-            }
-
-            public void paintComponent(Graphics g) {
-
             }
 
             /**
@@ -1802,7 +1783,7 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener {
                 Component c = add(comp);
                 refresh();
                 if (oldParent != null && oldParent.getParent() instanceof BuildingsPanel.ASingleBuildingPanel) {
-                    ((BuildingsPanel.ASingleBuildingPanel) oldParent.getParent()).updateProductionInBuildingPanel();
+                    ((BuildingsPanel.ASingleBuildingPanel) oldParent.getParent()).updateProductionLabel();
                 }
                 return c;
             }

@@ -20,6 +20,7 @@ import net.sf.freecol.common.model.Goods;
  * This label holds production data in addition to the JLabel data.
  */
 public final class ProductionLabel extends JLabel {
+
     public static final String COPYRIGHT = "Copyright (C) 2003-2007 The FreeCol Team";
 
     public static final String LICENSE = "http://www.gnu.org/licenses/gpl.html";
@@ -33,12 +34,12 @@ public final class ProductionLabel extends JLabel {
     /**
      * Describe maxIcons here.
      */
-    private int maxIcons;
+    private int maxIcons = 7;
 
     /**
      * Describe drawPlus here.
      */
-    private boolean drawPlus = true;
+    private boolean drawPlus = false;
 
     /**
      * Describe centered here.
@@ -65,8 +66,13 @@ public final class ProductionLabel extends JLabel {
      */
     private int production;
 
-
     /**
+     * Describe productionImage here.
+     */
+    private BufferedImage productionImage;
+
+
+   /**
      * Initializes this JLabel with the given unit data.
      * 
      * @param goods The Goods that this JLabel will visually represent.
@@ -83,7 +89,6 @@ public final class ProductionLabel extends JLabel {
     public ProductionLabel(int goodsType, int amount, int maxProduction, Canvas parent) {
         super();
         this.parent = parent;
-        goodsIcon = parent.getImageProvider().getGoodsImageIcon(goodsType);
         production = amount;
         this.maxProduction = maxProduction;
         maxIcons = parent.getClient().getClientOptions().getInteger(ClientOptions.MAX_NUMBER_OF_GOODS_IMAGES);
@@ -92,9 +97,12 @@ public final class ProductionLabel extends JLabel {
         } else {
             setForeground(Color.WHITE);
         }
-        setPreferredSize(new Dimension(maxIcons * goodsIcon.getImage().getWidth(null),
-                                       goodsIcon.getImage().getHeight(null)));
-
+        if (goodsType >= 0) {
+            goodsIcon = parent.getImageProvider().getGoodsImageIcon(goodsType);
+            Dimension size = (new Dimension(maxIcons * goodsIcon.getImage().getWidth(null),
+                                            goodsIcon.getImage().getHeight(null)));
+            setPreferredSize(size);
+        }
     }
     
 
@@ -105,6 +113,24 @@ public final class ProductionLabel extends JLabel {
      */
     public Canvas getCanvas() {
         return parent;
+    }
+
+    /**
+     * Get the <code>ProductionImage</code> value.
+     *
+     * @return a <code>BufferedImage</code> value
+     */
+    public BufferedImage getProductionImage() {
+        return productionImage;
+    }
+
+    /**
+     * Set the <code>ProductionImage</code> value.
+     *
+     * @param newProductionImage The new ProductionImage value.
+     */
+    public void setProductionImage(final BufferedImage newProductionImage) {
+        this.productionImage = newProductionImage;
     }
 
     /**
@@ -240,10 +266,11 @@ public final class ProductionLabel extends JLabel {
      */
     public void paintComponent(Graphics g) {
 
-        super.paintComponent(g);
+        if (goodsIcon == null || production == 0) {
+            return;
+        }
 
-        int drawImageCount = Math.min(production, maxIcons);
-        drawImageCount = Math.max(1, drawImageCount);
+        int drawImageCount = Math.min(Math.abs(production), maxIcons);
 
         int iconWidth = goodsIcon.getIconWidth();
         int pixelsPerIcon = compressedWidth / drawImageCount;
@@ -266,6 +293,10 @@ public final class ProductionLabel extends JLabel {
             leftOffset = (getWidth() - coverage)/2;
         }
 
+        int width = Math.max(getWidth(), coverage);
+        int height = Math.max(getHeight(), goodsIcon.getImage().getHeight(null));
+        setSize(new Dimension(width, height));
+
         // Draw the icons onto the image:
         for (int i = 0; i < drawImageCount; i++) {
             goodsIcon.paintIcon(null, g, leftOffset + i*pixelsPerIcon, 0);
@@ -274,12 +305,12 @@ public final class ProductionLabel extends JLabel {
         if (production > maxIcons) {
             String number = Integer.toString(production);
             if (production >= 0 && drawPlus) {
-                number = "+"+ number;
+                number = "+" + number;
             }
             if (maxProduction > production) {
                 number = number + "/" + String.valueOf(maxProduction);
             }
-            BufferedImage stringImage = parent.getGUI().createStringImage(this, number, getForeground(), getWidth(), 12);
+            BufferedImage stringImage = parent.getGUI().createStringImage(this, number, getForeground(), width, 12);
             int textOffset = leftOffset + (coverage-stringImage.getWidth())/2;
             textOffset = (textOffset >= 0) ? textOffset : 0;
             g.drawImage(stringImage, textOffset,
