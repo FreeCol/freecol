@@ -426,12 +426,9 @@ public class ColonyTile extends FreeColGameObject implements WorkLocation, Ownab
     private void produceGoodsCenterTile() {
         int bonus = getColony().getProductionBonus();
         
-        int amount1 = workTile.potential(Goods.FOOD) + bonus;
-        colony.addGoods(Goods.FOOD, Math.max(amount1, 1));
-
+        colony.addGoods(Goods.FOOD, getProductionOf(Goods.FOOD));
         int type2 = workTile.secondaryGoods();
-        int amount2 = workTile.potential(type2) + bonus;
-        colony.addGoods(type2, Math.max(amount2, 1));
+        colony.addGoods(type2, getProductionOf(type2));
             
         if (unit != null) {
             getWorkTile().setOwner(getColony());
@@ -503,13 +500,16 @@ public class ColonyTile extends FreeColGameObject implements WorkLocation, Ownab
             return Math.max(0, amount);
         }
 
+        int production = 0;
         if (goodsType == Goods.FOOD) {
-            return workTile.potential(Goods.FOOD);
+            production = workTile.potential(Goods.FOOD);
         } else if (goodsType == workTile.secondaryGoods()) {
-            return workTile.potential(workTile.secondaryGoods());
-        } else {
-            return 0;
+            production = workTile.potential(workTile.secondaryGoods());
         }
+        if (production > 0) {
+            production = Math.max(1, production + colony.getProductionBonus());
+        }
+        return production;
     }
     
     
