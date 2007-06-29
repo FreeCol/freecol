@@ -16,6 +16,7 @@ import net.sf.freecol.client.control.InGameController;
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.common.model.Goods;
 
+//TODO: slim this down to JComponent
 /**
  * This label holds production data in addition to the JLabel data.
  */
@@ -67,10 +68,12 @@ public final class ProductionLabel extends JLabel {
     private int production;
 
     /**
-     * Describe productionImage here.
+     * Describe displayNumbers here.
      */
-    private BufferedImage productionImage;
+    private int displayNumbers;
 
+
+    private int goodsType;
 
    /**
      * Initializes this JLabel with the given unit data.
@@ -89,9 +92,11 @@ public final class ProductionLabel extends JLabel {
     public ProductionLabel(int goodsType, int amount, int maxProduction, Canvas parent) {
         super();
         this.parent = parent;
-        production = amount;
+        this.production = amount;
+        this.goodsType = goodsType;
         this.maxProduction = maxProduction;
         maxIcons = parent.getClient().getClientOptions().getInteger(ClientOptions.MAX_NUMBER_OF_GOODS_IMAGES);
+        displayNumbers = parent.getClient().getClientOptions().getInteger(ClientOptions.MIN_NUMBER_FOR_DISPLAYING_GOODS_COUNT);
         if (amount < 0) {
             setForeground(Color.RED);
         } else {
@@ -99,10 +104,9 @@ public final class ProductionLabel extends JLabel {
         }
         if (goodsType >= 0) {
             goodsIcon = parent.getImageProvider().getGoodsImageIcon(goodsType);
-            Dimension size = (new Dimension(maxIcons * goodsIcon.getImage().getWidth(null),
-                                            goodsIcon.getImage().getHeight(null)));
-            setPreferredSize(size);
+            compressedWidth = goodsIcon.getIconWidth()*2;
         }
+        setToolTipText(String.valueOf(amount) + " " + Goods.getName(goodsType));
     }
     
 
@@ -116,21 +120,21 @@ public final class ProductionLabel extends JLabel {
     }
 
     /**
-     * Get the <code>ProductionImage</code> value.
+     * Get the <code>DisplayNumbers</code> value.
      *
-     * @return a <code>BufferedImage</code> value
+     * @return an <code>int</code> value
      */
-    public BufferedImage getProductionImage() {
-        return productionImage;
+    public int getDisplayNumbers() {
+        return displayNumbers;
     }
 
     /**
-     * Set the <code>ProductionImage</code> value.
+     * Set the <code>DisplayNumbers</code> value.
      *
-     * @param newProductionImage The new ProductionImage value.
+     * @param newDisplayNumbers The new DisplayNumbers value.
      */
-    public void setProductionImage(final BufferedImage newProductionImage) {
-        this.productionImage = newProductionImage;
+    public void setDisplayNumbers(final int newDisplayNumbers) {
+        this.displayNumbers = newDisplayNumbers;
     }
 
     /**
@@ -167,6 +171,7 @@ public final class ProductionLabel extends JLabel {
      */
     public void setProduction(final int newProduction) {
         this.production = newProduction;
+        setToolTipText(String.valueOf(production) + " " + Goods.getName(goodsType));
     }
 
     /**
@@ -259,6 +264,42 @@ public final class ProductionLabel extends JLabel {
         this.compressedWidth = newCompressedWidth;
     }
 
+    public Dimension getPreferredSize() {
+
+        if (goodsIcon == null || production == 0) {
+            return new Dimension(0, 0);
+        } else {
+            return new Dimension(getWidth(), goodsIcon.getImage().getHeight(null));
+        }
+    }
+
+    public int getWidth() {
+
+        if (goodsIcon == null || production == 0) {
+            return 0;
+        }
+
+        int drawImageCount = Math.min(Math.abs(production), maxIcons);
+
+        int iconWidth = goodsIcon.getIconWidth();
+        int pixelsPerIcon = iconWidth / 2;
+        if (pixelsPerIcon - iconWidth < 0) {
+            pixelsPerIcon = (compressedWidth - iconWidth) / drawImageCount;
+        }
+        int maxSpacing = iconWidth;
+
+        /* TODO Tune this: all icons are the same width, but many
+         * do not take up the whole width, eg. bells
+         */
+        boolean iconsTooFarApart = pixelsPerIcon > maxSpacing;
+        if (iconsTooFarApart) {
+            pixelsPerIcon = maxSpacing;
+        }
+
+        return pixelsPerIcon * (drawImageCount - 1) + iconWidth;
+
+    }
+
     /**
      * Paints this ProductionLabel.
      * 
@@ -273,8 +314,8 @@ public final class ProductionLabel extends JLabel {
         int drawImageCount = Math.min(Math.abs(production), maxIcons);
 
         int iconWidth = goodsIcon.getIconWidth();
-        int pixelsPerIcon = compressedWidth / drawImageCount;
-        if (pixelsPerIcon-iconWidth < 0) {
+        int pixelsPerIcon = iconWidth / 2;
+        if (pixelsPerIcon - iconWidth < 0) {
             pixelsPerIcon = (compressedWidth - iconWidth) / drawImageCount;
         }
         int maxSpacing = iconWidth;
@@ -286,8 +327,9 @@ public final class ProductionLabel extends JLabel {
         if (iconsTooFarApart) {
             pixelsPerIcon = maxSpacing;
         }
-        int coverage = pixelsPerIcon * (drawImageCount-1) + iconWidth;
+        int coverage = pixelsPerIcon * (drawImageCount - 1) + iconWidth;
         int leftOffset = 0;
+
         boolean needToCenterImages = centered && coverage < getWidth();
         if (needToCenterImages) {
             leftOffset = (getWidth() - coverage)/2;
@@ -297,12 +339,13 @@ public final class ProductionLabel extends JLabel {
         int height = Math.max(getHeight(), goodsIcon.getImage().getHeight(null));
         setSize(new Dimension(width, height));
 
+
         // Draw the icons onto the image:
         for (int i = 0; i < drawImageCount; i++) {
             goodsIcon.paintIcon(null, g, leftOffset + i*pixelsPerIcon, 0);
         }
 
-        if (production > maxIcons) {
+        if (production >= displayNumbers) {
             String number = Integer.toString(production);
             if (production >= 0 && drawPlus) {
                 number = "+" + number;
@@ -311,7 +354,7 @@ public final class ProductionLabel extends JLabel {
                 number = number + "/" + String.valueOf(maxProduction);
             }
             BufferedImage stringImage = parent.getGUI().createStringImage(this, number, getForeground(), width, 12);
-            int textOffset = leftOffset + (coverage-stringImage.getWidth())/2;
+            int textOffset = leftOffset + (coverage - stringImage.getWidth())/2;
             textOffset = (textOffset >= 0) ? textOffset : 0;
             g.drawImage(stringImage, textOffset,
                     goodsIcon.getIconHeight()/2 - stringImage.getHeight()/2, null);

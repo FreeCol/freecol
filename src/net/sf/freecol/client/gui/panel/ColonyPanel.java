@@ -18,6 +18,7 @@ import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseListener;
 import java.awt.image.BufferedImage;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
@@ -1107,45 +1108,7 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener {
             return colonyPanel.getParentCanvas();
         }
 
-        /**
-         * Paints the icons for the used food and the food surplus.
-         * 
-         * @param g the graphics device to draw on
-         * @param usedFood the food that is being used. (if not enough is
-         *            produced, this is the complete production as it is being
-         *            used - not the consumption.)
-         * @param surplus the surplus on food.
-         * @return the position to put the next image at.
-         */
-        private int paintFood(Graphics g, int usedFood, int surplus) {
-            ImageIcon foodIcon = getCanvas().getImageProvider().getGoodsImageIcon(Goods.FOOD);
-            int iconWidth = foodIcon.getIconWidth();
-            BufferedImage productionImage;
-            int nextX = 0;
-
-            // Food production:
-            int productionImageWidth = (usedFood > 12) ? foodIcon.getIconWidth() : Math.min(usedFood, 4) * iconWidth;
-            productionImage = getCanvas().getGUI().createProductionImage(foodIcon, usedFood, productionImageWidth,
-                    getHeight(), 12);
-            g.drawImage(productionImage, BORDER_CORRECT, 0, null);
-            nextX += productionImageWidth + iconWidth / 4;
-
-            // Food surplus:
-            if (surplus < 2 || surplus > 6) {
-                // Only draw an icon with a number
-                productionImageWidth = iconWidth;
-            } else {
-                // Draw all icons for the production
-                productionImageWidth = iconWidth * 2;
-            }
-            productionImage = getCanvas().getGUI().createProductionImage(foodIcon, surplus, productionImageWidth,
-                    getHeight(), 6, true);
-            g.drawImage(productionImage, nextX, 0, null);
-            nextX += productionImage.getWidth() + iconWidth / 4;
-
-            return nextX;
-        }
-
+        // TODO: make this an ordinary panel with ProductionLabels
         public void paintComponent(Graphics g) {
             Colony currentColony = getColony();
             if (currentColony == null) {
@@ -1159,60 +1122,39 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener {
             final int bells = currentColony.getProductionOf(Goods.BELLS);
             final int crosses = currentColony.getProductionOf(Goods.CROSSES);
 
-            ImageIcon goodsIcon = null;
-            BufferedImage productionImage;
-            int nextX = 0;
-            int add;
+            ArrayList<ProductionLabel> products = new ArrayList<ProductionLabel>();
 
             // The food that is used. If not enough food is produced, the
             // complete production.
             // Horses consume 1 food each, so they need to be added to the used
             // food.
+            
             int usedFood = (foodConsumption < foodProduction ? foodConsumption : foodProduction) + horses;
+            products.add(new ProductionLabel(Goods.FOOD, usedFood, getCanvas()));
+
             int surplusFood = foodProduction - foodConsumption - horses;
-            nextX = paintFood(g, usedFood, surplusFood);
+            products.add(new ProductionLabel(Goods.FOOD, surplusFood, getCanvas()));
 
-            // Horses - if we have two horses, we draw them. All other cases are
-            // just a horse and maybe a number.
-            if (horses > 0) {
-                goodsIcon = getCanvas().getImageProvider().getGoodsImageIcon(Goods.HORSES);
-                int imageWidth = (horses != 2 ? 1 : 2) * goodsIcon.getIconWidth();
-                productionImage = getCanvas().getGUI().createProductionImage(goodsIcon, horses, imageWidth,
-                        getHeight(), 2);
-                g.drawImage(productionImage, nextX, 0, null);
-                nextX += imageWidth + goodsIcon.getIconWidth() / 4;
-            }
+            ProductionLabel horseLabel = new ProductionLabel(Goods.HORSES, horses, getCanvas());
+            horseLabel.setMaxGoodsIcons(1);
+            products.add(horseLabel);
 
-            // Liberty bells:
-            if (bells != 0) {
-                goodsIcon = getCanvas().getImageProvider().getGoodsImageIcon(Goods.BELLS);
-                if (bells > 6 || bells == 1) {
-                    productionImage = getCanvas().getGUI().createProductionImage(goodsIcon, bells,
-                            goodsIcon.getIconWidth(), getHeight(), 6);
-                    add = goodsIcon.getIconWidth();
-                } else {
-                    productionImage = getCanvas().getGUI().createProductionImage(goodsIcon, bells,
-                            goodsIcon.getIconWidth() * 2, getHeight(), 6);
-                    add = goodsIcon.getIconWidth() * 2;
-                }
-                g.drawImage(productionImage, nextX, 0, null);
-                nextX += productionImage.getWidth() / 4 + add;
-            }
+            products.add(new ProductionLabel(Goods.BELLS, bells, getCanvas()));
+            products.add(new ProductionLabel(Goods.CROSSES, crosses, getCanvas()));
 
-            // Crosses:
-            if (crosses != 0) {
-                goodsIcon = getCanvas().getImageProvider().getGoodsImageIcon(Goods.CROSSES);
-                if (crosses > 6 || crosses == 1) {
-                    productionImage = getCanvas().getGUI().createProductionImage(goodsIcon, crosses,
-                            goodsIcon.getIconWidth(), getHeight(), 6);
-                    add = goodsIcon.getIconWidth();
-                } else {
-                    productionImage = getCanvas().getGUI().createProductionImage(goodsIcon, crosses,
-                            goodsIcon.getIconWidth() * 2, getHeight(), 6);
-                    add = goodsIcon.getIconWidth() * 2;
-                }
-                g.drawImage(productionImage, nextX, 0, null);
-            }
+            int margin = 6;
+            int offset = 0;
+
+            for (ProductionLabel pl : products) {
+                pl.setDrawPlus(true);
+                pl.setDisplayNumbers(2);
+                pl.paintComponent(g);
+                int width = pl.getWidth() + margin;
+                offset += width;
+                g.translate(width, 0);
+            } 
+            g.translate(-offset, 0);
+
         }
     }
 
