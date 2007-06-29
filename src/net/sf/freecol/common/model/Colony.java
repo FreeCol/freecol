@@ -1149,9 +1149,11 @@ public final class Colony extends Settlement implements Location, Nameable {
         if (getGoodsCount(Goods.HORSES) < 2) {
             return 0;
         }
-        int maxAmount = Math.max(1, getGoodsCount(Goods.HORSES) / 10);
-        int maxSpace = Math.max(0, getWarehouseCapacity() - getGoodsCount(Goods.HORSES));
-        return Math.min(maxAmount, maxSpace);
+        int maxAmount = getGoodsCount(Goods.HORSES) / 10;
+        if (!getBuilding(Building.STABLES).isBuilt()) {
+            maxAmount /= 2;
+        }
+        return Math.max(1, maxAmount);
     }
 
     /**
@@ -1161,14 +1163,9 @@ public final class Colony extends Settlement implements Location, Nameable {
      */
     public int getHorseProduction() {
         int surplus = getFoodProduction() - getFoodConsumption();
-        int potential = getPotentialHorseProduction();
-        if (getGoodsCount(Goods.HORSES) >= 2 && surplus > 1) {
-            if (!getBuilding(Building.STABLES).isBuilt()) {
-                return Math.min(surplus / 2, potential);
-            }
-            return Math.min(surplus, potential);
-        }
-        return 0;
+        int maxSpace = getWarehouseCapacity() - getGoodsCount(Goods.HORSES);
+        int potential = Math.min(getPotentialHorseProduction(), maxSpace);
+        return Math.min(surplus / 2, potential); // store the half of surplus
     }
 
     /**
@@ -1458,13 +1455,8 @@ public final class Colony extends Settlement implements Location, Nameable {
     private void updateHorses() {
         int horseProduction = getHorseProduction();
         if (horseProduction != 0) {
-            if (!getBuilding(Building.STABLES).isBuilt()) {
-                removeGoods(Goods.FOOD, horseProduction);
-                addGoods(Goods.HORSES, horseProduction);
-            } else {
-                removeGoods(Goods.FOOD, horseProduction / 2);
-                addGoods(Goods.HORSES, horseProduction);
-            }
+            removeGoods(Goods.FOOD, horseProduction);
+            addGoods(Goods.HORSES, horseProduction);
         }
     }
 
