@@ -819,6 +819,23 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
      */
     public int getGoodsInput() {
         int goodsInput = getMaximumGoodsInput();
+        if (getGoodsInputType() > -1 && colony.getGoodsCount(getGoodsInputType()) < goodsInput) {
+            goodsInput = colony.getGoodsCount(getGoodsInputType());
+        }
+        return goodsInput;
+    }
+
+    /**
+     * Returns the amount of goods beeing used to get the current
+     * {@link #getProduction production} at the next turn.
+     * 
+     * @return The actual amount of goods that will be used to support the
+     *         production at the next turn.
+     * @see #getMaximumGoodsInput
+     * @see #getProduction
+     */
+    public int getGoodsInputNextTurn() {
+        int goodsInput = getMaximumGoodsInput();
         if (getGoodsInputType() > -1) {
             int available = colony.getGoodsCount(getGoodsInputType()) +
                 colony.getProductionOf(getGoodsInputType());

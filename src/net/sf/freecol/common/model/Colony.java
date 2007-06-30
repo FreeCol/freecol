@@ -1165,7 +1165,7 @@ public final class Colony extends Settlement implements Location, Nameable {
         int surplus = getFoodProduction() - getFoodConsumption();
         int maxSpace = getWarehouseCapacity() - getGoodsCount(Goods.HORSES);
         int potential = Math.min(getPotentialHorseProduction(), maxSpace);
-        return Math.min(surplus / 2, potential); // store the half of surplus
+        return Math.max(Math.min(surplus / 2, potential), 0); // store the half of surplus
     }
 
     /**
@@ -1187,7 +1187,7 @@ public final class Colony extends Settlement implements Location, Nameable {
         default:
             Building bldg = getBuildingForConsuming(goodsType);
             if (bldg != null) {
-                used = bldg.getGoodsInput();
+                used = bldg.getGoodsInputNextTurn();
             }
         // TODO FIXME This should also take into account tools needed for a
         // current building project
