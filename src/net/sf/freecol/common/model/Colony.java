@@ -1177,7 +1177,14 @@ public final class Colony extends Settlement implements Location, Nameable {
      *         turn.
      */
     public int getProductionNetOf(int goodsType) {
-        int count = getProductionOf(goodsType);
+        int count = 0;
+        Building building = getBuildingForProducing(goodsType);
+        if (building == null) {
+            count = getProductionOf(goodsType);
+        } else {
+            count = building.getProductionNextTurn();
+        }
+        
         int used = 0;
         switch (goodsType) {
         case Goods.FOOD:
