@@ -254,21 +254,19 @@ public final class UnitLabel extends JLabel implements ActionListener {
             int y = (getHeight() - getIcon().getIconHeight()) / 2;
             parent.getGUI().displayOccupationIndicator(g, unit, x, y);
         } else if (unit.getLocation() instanceof ColonyTile) {
-            ImageIcon goodsIcon;
-
-            if (unit.getWorkType() == Goods.FOOD && unit.getLocation() instanceof ColonyTile
-                    && !((ColonyTile) unit.getLocation()).getWorkTile().isLand()) {
-                goodsIcon = parent.getImageProvider().getGoodsImageIcon(Goods.FISH);
-            } else {
-                goodsIcon = parent.getImageProvider().getGoodsImageIcon(unit.getWorkType());
+            int workType = unit.getWorkType();
+            if (workType == Goods.FOOD && unit.getLocation() instanceof ColonyTile
+                && !((ColonyTile) unit.getLocation()).getWorkTile().isLand()) {
+                workType = Goods.FISH;
             }
 
             int production = unit.getFarmedPotential(unit.getWorkType(), ((ColonyTile) unit.getLocation())
                     .getWorkTile());
 
-            BufferedImage productionImage = parent.getGUI().createProductionImage(goodsIcon, production, getWidth(),
-                    getHeight());
-            g.drawImage(productionImage, 0, 10, null);
+            ProductionLabel pl = new ProductionLabel(workType, production, getCanvas());
+            g.translate(0, 10);
+            pl.paintComponent(g);
+            g.translate(0, -10);
         } else if (unit.isUnderRepair()) {
             BufferedImage repairImage = parent.getGUI().createStringImage((Graphics2D) g,
                     Messages.message("underRepair", new String[][]{{"%turns%", Integer.toString(unit.getTurnsForRepair())}}),

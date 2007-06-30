@@ -33,62 +33,81 @@ public final class ProductionLabel extends JLabel {
     private final Canvas parent;
 
     /**
-     * Describe maxIcons here.
+     * The maximum number of goodsIcons to display.
      */
     private int maxIcons = 7;
 
     /**
-     * Describe drawPlus here.
+     * Whether to display positive integers with a "+" sign.
      */
     private boolean drawPlus = false;
 
     /**
-     * Describe centered here.
+     * Whether the ProductionLabel should be centered.
      */
     private boolean centered = true;
 
     /**
-     * Describe compressedWidth here.
+     * The compressed width of the ProductionLabel.
      */
     private int compressedWidth = -1;
 
     /**
-     * Describe maxProduction here.
+     * The type of goods being produced.
      */
-    private int maxProduction = -1;
+    private int goodsType;
 
     /**
-     * Describe goodsIcon here.
+     * The goodsIcon for this type of production.
      */
     private ImageIcon goodsIcon;
 
     /**
-     * Describe production here.
+     * The amount of goods being produced.
      */
     private int production;
 
     /**
-     * Describe displayNumbers here.
+     * The amount of goods that could be produced.
      */
-    private int displayNumbers;
+    private int maxProduction = -1;
+
+    /**
+     * The smallest number to display above the goodsIcons.
+     */
+    private int displayNumber;
 
 
-    private int goodsType;
 
-   /**
-     * Initializes this JLabel with the given unit data.
-     * 
-     * @param goods The Goods that this JLabel will visually represent.
-     * @param parent The parent that knows more than we do.
+    /**
+     * Creates a new <code>ProductionLabel</code> instance.
+     *
+     * @param goods a <code>Goods</code> value
+     * @param parent a <code>Canvas</code> value
      */
     public ProductionLabel(Goods goods, Canvas parent) {
         this(goods.getType(), goods.getAmount(), -1, parent);
     }
 
+    /**
+     * Creates a new <code>ProductionLabel</code> instance.
+     *
+     * @param goodsType an <code>int</code> value
+     * @param amount an <code>int</code> value
+     * @param parent a <code>Canvas</code> value
+     */
     public ProductionLabel(int goodsType, int amount, Canvas parent) {
         this(goodsType, amount, -1, parent);
     }
 
+    /**
+     * Creates a new <code>ProductionLabel</code> instance.
+     *
+     * @param goodsType an <code>int</code> value
+     * @param amount an <code>int</code> value
+     * @param maxProduction an <code>int</code> value
+     * @param parent a <code>Canvas</code> value
+     */
     public ProductionLabel(int goodsType, int amount, int maxProduction, Canvas parent) {
         super();
         this.parent = parent;
@@ -96,7 +115,7 @@ public final class ProductionLabel extends JLabel {
         this.goodsType = goodsType;
         this.maxProduction = maxProduction;
         maxIcons = parent.getClient().getClientOptions().getInteger(ClientOptions.MAX_NUMBER_OF_GOODS_IMAGES);
-        displayNumbers = parent.getClient().getClientOptions().getInteger(ClientOptions.MIN_NUMBER_FOR_DISPLAYING_GOODS_COUNT);
+        displayNumber = parent.getClient().getClientOptions().getInteger(ClientOptions.MIN_NUMBER_FOR_DISPLAYING_GOODS_COUNT);
         if (amount < 0) {
             setForeground(Color.RED);
         } else {
@@ -120,21 +139,21 @@ public final class ProductionLabel extends JLabel {
     }
 
     /**
-     * Get the <code>DisplayNumbers</code> value.
+     * Get the <code>DisplayNumber</code> value.
      *
      * @return an <code>int</code> value
      */
-    public int getDisplayNumbers() {
-        return displayNumbers;
+    public int getDisplayNumber() {
+        return displayNumber;
     }
 
     /**
-     * Set the <code>DisplayNumbers</code> value.
+     * Set the <code>DisplayNumber</code> value.
      *
-     * @param newDisplayNumbers The new DisplayNumbers value.
+     * @param newDisplayNumber The new DisplayNumber value.
      */
-    public void setDisplayNumbers(final int newDisplayNumbers) {
-        this.displayNumbers = newDisplayNumbers;
+    public void setDisplayNumber(final int newDisplayNumber) {
+        this.displayNumber = newDisplayNumber;
     }
 
     /**
@@ -264,16 +283,28 @@ public final class ProductionLabel extends JLabel {
         this.compressedWidth = newCompressedWidth;
     }
 
+    /**
+     * Overrides the <code>getPreferredSize</code> method.
+     *
+     * @return a <code>Dimension</code> value
+     */
     public Dimension getPreferredSize() {
 
         if (goodsIcon == null || production == 0) {
             return new Dimension(0, 0);
         } else {
-            return new Dimension(getWidth(), goodsIcon.getImage().getHeight(null));
+            return new Dimension(getPreferredWidth(), goodsIcon.getImage().getHeight(null));
         }
     }
 
-    public int getWidth() {
+
+    // TODO: get rid of the ugly code duplication
+    /**
+     * Returns only the width component of the preferred size.
+     *
+     * @return an <code>int</code> value
+     */
+    public int getPreferredWidth() {
 
         if (goodsIcon == null || production == 0) {
             return 0;
@@ -345,7 +376,7 @@ public final class ProductionLabel extends JLabel {
             goodsIcon.paintIcon(null, g, leftOffset + i*pixelsPerIcon, 0);
         }
 
-        if (production >= displayNumbers) {
+        if (production >= displayNumber || maxIcons < production) {
             String number = Integer.toString(production);
             if (production >= 0 && drawPlus) {
                 number = "+" + number;

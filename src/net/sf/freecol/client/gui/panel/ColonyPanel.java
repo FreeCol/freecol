@@ -1133,7 +1133,9 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener {
             products.add(new ProductionLabel(Goods.FOOD, usedFood, getCanvas()));
 
             int surplusFood = foodProduction - foodConsumption - horses;
-            products.add(new ProductionLabel(Goods.FOOD, surplusFood, getCanvas()));
+            ProductionLabel surplusLabel = new ProductionLabel(Goods.FOOD, surplusFood, getCanvas());
+            surplusLabel.setDrawPlus(true);
+            products.add(surplusLabel);
 
             ProductionLabel horseLabel = new ProductionLabel(Goods.HORSES, horses, getCanvas());
             horseLabel.setMaxGoodsIcons(1);
@@ -1146,8 +1148,6 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener {
             int offset = 0;
 
             for (ProductionLabel pl : products) {
-                pl.setDrawPlus(true);
-                pl.setDisplayNumbers(2);
                 pl.paintComponent(g);
                 int width = pl.getWidth() + margin;
                 offset += width;
@@ -1586,8 +1586,8 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener {
              * @param lib an ImageLibrary
              */
             private void initializeAsCenterTile(ImageLibrary lib) {
-                int width = lib.getTerrainImageWidth(1) * 2 / 3;
-                int height = lib.getTerrainImageHeight(1) * 2 / 3;
+
+                setLayout(new GridLayout(2, 1));
 
                 // A colony always produces food.
                 ImageIcon goodsIcon = parent.getImageProvider().getGoodsImageIcon(Goods.FOOD);
