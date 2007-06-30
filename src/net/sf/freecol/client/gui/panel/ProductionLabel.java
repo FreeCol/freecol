@@ -68,7 +68,7 @@ public final class ProductionLabel extends JComponent {
     /**
      * The amount of goods that could be produced.
      */
-    private int maxProduction = -1;
+    private int maximumProduction = -1;
 
     /**
      * The smallest number to display above the goodsIcons.
@@ -103,15 +103,15 @@ public final class ProductionLabel extends JComponent {
      *
      * @param goodsType an <code>int</code> value
      * @param amount an <code>int</code> value
-     * @param maxProduction an <code>int</code> value
+     * @param maximumProduction an <code>int</code> value
      * @param parent a <code>Canvas</code> value
      */
-    public ProductionLabel(int goodsType, int amount, int maxProduction, Canvas parent) {
+    public ProductionLabel(int goodsType, int amount, int maximumProduction, Canvas parent) {
         super();
         this.parent = parent;
         this.production = amount;
         this.goodsType = goodsType;
-        this.maxProduction = maxProduction;
+        this.maximumProduction = maximumProduction;
         ClientOptions options = parent.getClient().getClientOptions();
         maxIcons = options.getInteger(ClientOptions.MAX_NUMBER_OF_GOODS_IMAGES);
         displayNumber = options.getInteger(ClientOptions.MIN_NUMBER_FOR_DISPLAYING_GOODS_COUNT);
@@ -196,21 +196,21 @@ public final class ProductionLabel extends JComponent {
     }
 
     /**
-     * Get the <code>MaxProduction</code> value.
+     * Get the <code>MaximumProduction</code> value.
      *
      * @return an <code>int</code> value
      */
-    public int getMaxProduction() {
-        return maxProduction;
+    public int getMaximumProduction() {
+        return maximumProduction;
     }
 
     /**
-     * Set the <code>MaxProduction</code> value.
+     * Set the <code>MaximumProduction</code> value.
      *
-     * @param newMaxProduction The new MaxProduction value.
+     * @param newMaximumProduction The new MaximumProduction value.
      */
-    public void setMaxProduction(final int newMaxProduction) {
-        this.maxProduction = newMaxProduction;
+    public void setMaximumProduction(final int newMaximumProduction) {
+        this.maximumProduction = newMaximumProduction;
     }
 
     /**
@@ -378,13 +378,13 @@ public final class ProductionLabel extends JComponent {
             goodsIcon.paintIcon(null, g, leftOffset + i*pixelsPerIcon, 0);
         }
 
-        if (production >= displayNumber || maxIcons < production) {
+        if (production >= displayNumber || production < 0 || maxIcons < production) {
             String number = Integer.toString(production);
             if (production >= 0 && drawPlus) {
                 number = "+" + number;
             }
-            if (maxProduction > production) {
-                number = number + "/" + String.valueOf(maxProduction);
+            if (maximumProduction > production && production > 0) {
+                number = number + "/" + String.valueOf(maximumProduction);
             }
             BufferedImage stringImage = parent.getGUI().createStringImage(this, number, getForeground(), width, 12);
             int textOffset = leftOffset + (coverage - stringImage.getWidth())/2;

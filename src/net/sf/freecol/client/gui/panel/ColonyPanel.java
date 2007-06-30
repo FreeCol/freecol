@@ -1035,7 +1035,7 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener {
 
             public void updateProductionLabel() {
                 productionLabel.setProduction(building.getProductionNextTurn());
-                productionLabel.setMaxProduction(building.getMaximumProduction());
+                productionLabel.setMaximumProduction(building.getMaximumProduction());
             }
 
             /**

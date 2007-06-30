@@ -98,6 +98,8 @@ public final class GoodsLabel extends JLabel {// implements ActionListener {
             setForeground(Color.GREEN);
         } else if (goods.getAmount() == 0) {
             setForeground(Color.GRAY);
+        } else if (goods.getAmount() < 0) {
+            setForeground(Color.RED);
         } else {
             setForeground(Color.BLACK);
         }

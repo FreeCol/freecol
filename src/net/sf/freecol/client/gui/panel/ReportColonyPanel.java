@@ -130,13 +130,18 @@ public final class ReportColonyPanel extends ReportPanel implements ActionListen
         JPanel goodsPanel = new JPanel(new GridLayout(0, 10));
         goodsPanel.setOpaque(false);
         for (int goodsType = 0; goodsType < Goods.NUMBER_OF_ALL_TYPES; goodsType++) {
-            int newValue = colony.getProductionOf(goodsType);
-            if (newValue > 0) {
+            int newValue = colony.getProductionNetOf(goodsType);
+            if (newValue != 0) {
                 Goods goods = new Goods(colony.getGame(), colony, goodsType, newValue);
-                // goods.setAmount(newValue);
-                GoodsLabel goodsLabel = new GoodsLabel(goods, getCanvas());
-                goodsLabel.setHorizontalAlignment(JLabel.LEADING);
-                goodsPanel.add(goodsLabel);
+                Building building = colony.getBuildingForProducing(goodsType);
+                ProductionLabel productionLabel = new ProductionLabel(goodsType, newValue, getCanvas());
+                if (building != null) {
+                    productionLabel.setMaximumProduction(building.getMaximumProduction());
+                }
+                if (goodsType == Goods.HORSES) {
+                    productionLabel.setMaxGoodsIcons(1);
+                }
+                goodsPanel.add(productionLabel);
             }
         }
         return goodsPanel;
