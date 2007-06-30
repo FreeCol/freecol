@@ -21,7 +21,7 @@ public class MessagesTest extends FreeColTestCase {
         assertEquals("Trade Advisor", Messages.message("menuBar.report.trade"));
 
         // With parameters
-        assertEquals("Gold: %gold%    |    Tax: %tax%%    |    Year: %year%", Messages.message("menuBar.statusLine"));
+        assertEquals("Score: %score%    |    Gold: %gold%    |    Tax: %tax%%    |    Year: %year%", Messages.message("menuBar.statusLine"));
 
         // Long String
         assertEquals("Food is necessary to feed your colonists and to breed horses. "
@@ -37,8 +37,8 @@ public class MessagesTest extends FreeColTestCase {
         assertEquals("Trade Advisor", Messages.message("menuBar.report.trade", null));
 
         // With parameters for "Gold: %gold% | Tax: %tax%% | Year: %year%"
-        assertEquals("Gold: silver    |    Tax: 13%    |    Year: %year%", Messages.message("menuBar.statusLine",
-                new String[][] { new String[] { "%gold%", "silver" }, new String[] { "%tax%", "13" } }));
+        assertEquals("Score: 1050    |    Gold: silver    |    Tax: 13%    |    Year: %year%", 
+                     Messages.message("menuBar.statusLine", new String[][] { new String[] { "%score%", "1050" }, new String[] { "%gold%", "silver" }, new String[] { "%tax%", "13" } }));
 
         // Long String
         assertEquals("Food is necessary to feed your colonists and to breed horses. "
@@ -47,7 +47,7 @@ public class MessagesTest extends FreeColTestCase {
 
         // Invalid Inputs
         assertEquals("Trade Advisor", Messages.message("menuBar.report.trade", new String[][] {}));
-        assertEquals("Gold: %gold%    |    Tax: %tax%%    |    Year: %year%", Messages.message("menuBar.statusLine",
+        assertEquals("Score: %score%    |    Gold: %gold%    |    Tax: %tax%%    |    Year: %year%", Messages.message("menuBar.statusLine",
                 new String[][] { new String[] { "%tax%" } }));
 
         
