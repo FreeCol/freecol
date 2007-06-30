@@ -1401,13 +1401,12 @@ public final class Tile extends FreeColGameObject implements Location, Nameable 
         case PRAIRIE:
         case DESERT:
             return Goods.COTTON;
-        case SWAMP:
+        case MARSH:
         case GRASSLANDS:
             return Goods.TOBACCO;
         case SAVANNAH:
+        case SWAMP:
             return Goods.SUGAR;
-        case MARSH:
-            return Goods.FURS;
         case TUNDRA:
         case ARCTIC:
         default:
