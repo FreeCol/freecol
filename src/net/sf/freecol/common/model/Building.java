@@ -819,9 +819,13 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
      */
     public int getGoodsInput() {
         int goodsInput = getMaximumGoodsInput();
-        if ((getGoodsInputType() > -1) && (colony.getGoodsCount(getGoodsInputType()) < goodsInput)) {
-            // Not enough goods to do this?
-            goodsInput = colony.getGoodsCount(getGoodsInputType());
+        if (getGoodsInputType() > -1) {
+            int available = colony.getGoodsCount(getGoodsInputType()) +
+                colony.getProductionOf(getGoodsInputType());
+            if (available < goodsInput) {
+                // Not enough goods to do this?
+                goodsInput = available;
+            }
         }
         return goodsInput;
     }
