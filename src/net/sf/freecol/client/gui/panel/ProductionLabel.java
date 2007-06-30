@@ -2,25 +2,23 @@ package net.sf.freecol.client.gui.panel;
 
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.Image;
 import java.awt.image.BufferedImage;
 import java.util.logging.Logger;
 
 import javax.swing.ImageIcon;
-import javax.swing.JLabel;
+import javax.swing.JComponent;
 
 import net.sf.freecol.client.ClientOptions;
-import net.sf.freecol.client.control.InGameController;
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.common.model.Goods;
 
-//TODO: slim this down to JComponent
 /**
- * This label holds production data in addition to the JLabel data.
+ * The ProductionLabel represents Goods that are produced in a
+ * WorkLocation or Settlement. It is similar to the GoodsLabel.
  */
-public final class ProductionLabel extends JLabel {
+public final class ProductionLabel extends JComponent {
 
     public static final String COPYRIGHT = "Copyright (C) 2003-2007 The FreeCol Team";
 
@@ -114,8 +112,12 @@ public final class ProductionLabel extends JLabel {
         this.production = amount;
         this.goodsType = goodsType;
         this.maxProduction = maxProduction;
-        maxIcons = parent.getClient().getClientOptions().getInteger(ClientOptions.MAX_NUMBER_OF_GOODS_IMAGES);
-        displayNumber = parent.getClient().getClientOptions().getInteger(ClientOptions.MIN_NUMBER_FOR_DISPLAYING_GOODS_COUNT);
+        ClientOptions options = parent.getClient().getClientOptions();
+        maxIcons = options.getInteger(ClientOptions.MAX_NUMBER_OF_GOODS_IMAGES);
+        displayNumber = options.getInteger(ClientOptions.MIN_NUMBER_FOR_DISPLAYING_GOODS_COUNT);
+
+        
+        setFont(new Font("Dialog", Font.BOLD, 12));
         if (amount < 0) {
             setForeground(Color.RED);
         } else {

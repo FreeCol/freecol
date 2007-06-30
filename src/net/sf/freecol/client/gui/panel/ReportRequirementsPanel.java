@@ -37,10 +37,25 @@ public final class ReportRequirementsPanel extends ReportPanel implements Action
 
     public static final String REVISION = "$Revision$";
 
+    /**
+     * A list of all the player's colonies.
+     */
     private List<Colony> colonies;
 
+    /**
+     * Records the number of units indexed by colony and unit type.
+     */
     private int[][] unitCount;
+
+    /**
+     * Records whether a colony can train a type of unit.
+     */
     private boolean[][] canTrain; 
+
+    /**
+     * Records surplus production indexed by colony and goods type.
+     */
+    private int[][] surplus;
 
 
     /**
@@ -75,6 +90,7 @@ public final class ReportRequirementsPanel extends ReportPanel implements Action
 
         unitCount = new int[colonies.size()][Unit.UNIT_COUNT];
         canTrain = new boolean[colonies.size()][Unit.UNIT_COUNT];
+        surplus = new int[colonies.size()][Goods.NUMBER_OF_TYPES];
 
         // check which colonies can train which units
         for (int index = 0; index < colonies.size(); index++) {
@@ -82,6 +98,9 @@ public final class ReportRequirementsPanel extends ReportPanel implements Action
             for (Unit unit : colony.getUnitList()) {
                 unitCount[index][unit.getType()]++;
                 canTrain[index][unit.getType()] = colony.canTrain(unit);
+            }
+            for (int goodsType = 0; goodsType < Goods.NUMBER_OF_TYPES; goodsType++) {
+                surplus[index][goodsType] = colony.getProductionNetOf(goodsType);
             }
         }
 
@@ -124,6 +143,7 @@ public final class ReportRequirementsPanel extends ReportPanel implements Action
                     int goodsType = building.getGoodsOutputType();
                     int expert = building.getExpertUnitType();
                     if (goodsType != -1) {
+                        // no expert
                         if (building.getFirstUnit() != null &&
                             !expertWarning[expert] &&
                             unitCount[index][expert] == 0) {
@@ -131,10 +151,10 @@ public final class ReportRequirementsPanel extends ReportPanel implements Action
                             expertWarning[expert] = true;
                             hasWarning = true;
                         }
+                        // not enough input
                         if (building.getProductionNextTurn() < building.getMaximumProduction() &&
                             !productionWarning[goodsType]) {
-                            addProductionWarning(doc, index, Goods.getName(goodsType), 
-                                                 Goods.getName(building.getGoodsInputType()));
+                            addProductionWarning(doc, index, goodsType, building.getGoodsInputType());
                             productionWarning[goodsType] = true;
                             hasWarning = true;
                         }
@@ -222,16 +242,47 @@ public final class ReportRequirementsPanel extends ReportPanel implements Action
         
     }
 
-    private void addProductionWarning(StyledDocument doc, int colonyIndex, String output, String input) {
+    private void addProductionWarning(StyledDocument doc, int colonyIndex, int output, int input) {
         String colonyName = colonies.get(colonyIndex).getName();
         String newMessage = Messages.message("report.requirements.missingGoods",
                                              new String[][] {
                                                  {"%colony%", colonyName},
-                                                 {"%goods%", output},
-                                                 {"%input%", input}});
+                                                 {"%goods%", Goods.getName(output)},
+                                                 {"%input%", Goods.getName(input)}});
 
         try {
             doc.insertString(doc.getLength(), newMessage + "\n\n", doc.getStyle("regular"));
+
+            ArrayList<Colony> withSurplus = new ArrayList<Colony>();
+            ArrayList<Integer> theSurplus = new ArrayList<Integer>();
+            for (int index = 0; index < colonies.size(); index++) {
+                if (surplus[index][input] > 0) {
+                    withSurplus.add(colonies.get(index));
+                    theSurplus.add(new Integer(surplus[index][input]));
+                }
+            }
+
+            if (!withSurplus.isEmpty()) {
+                doc.insertString(doc.getLength(),
+                                 (Messages.message("report.requirements.surplus",
+                                                   new String[][] {
+                                                       {"%goods%", Goods.getName(input)}}) + " "),
+                                 doc.getStyle("regular"));
+                for (int index = 0; index < withSurplus.size() - 1; index++) {
+                    Colony colony = withSurplus.get(index);
+                    String amount = " (" + theSurplus.get(index) + ")";
+                    StyleConstants.setComponent(doc.getStyle("button"), createColonyButton(colony, amount, false));
+                    doc.insertString(doc.getLength(), " ", doc.getStyle("button"));
+                    doc.insertString(doc.getLength(), ", ", doc.getStyle("regular"));
+                }
+                Colony colony = withSurplus.get(withSurplus.size() - 1);
+                String amount = " (" + theSurplus.get(theSurplus.size() - 1) + ")";
+                StyleConstants.setComponent(doc.getStyle("button"), createColonyButton(colony, amount, false));
+                doc.insertString(doc.getLength(), " ", doc.getStyle("button"));
+                doc.insertString(doc.getLength(), "\n\n", doc.getStyle("regular"));
+            }
+
+
         } catch(Exception e) {
             logger.warning(e.toString());
         }
@@ -239,8 +290,11 @@ public final class ReportRequirementsPanel extends ReportPanel implements Action
     }
 
     private JButton createColonyButton(Colony colony, boolean headline) {
+        return createColonyButton(colony, "", headline);
+    }
 
-        JButton button = new JButton(colony.getName());
+    private JButton createColonyButton(Colony colony, String info, boolean headline) {
+        JButton button = new JButton(colony.getName() + info);
         if (headline) {
             button.setFont(smallHeaderFont);
         }
