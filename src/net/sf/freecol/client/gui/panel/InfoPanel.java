@@ -19,6 +19,7 @@ import javax.swing.UIManager;
 import net.sf.freecol.FreeCol;
 
 import net.sf.freecol.client.FreeColClient;
+import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.client.gui.ViewMode;
 import net.sf.freecol.client.gui.i18n.Messages;
@@ -75,7 +76,7 @@ public final class InfoPanel extends FreeColPanel {
      * @param imageProvider The ImageProvider that can provide us with images to
      *            display on this panel.
      */
-    public InfoPanel(FreeColClient freeColClient, Game game, ImageProvider imageProvider) {
+    public InfoPanel(final FreeColClient freeColClient, Game game, ImageProvider imageProvider) {
         this.freeColClient = freeColClient;
         this.game = game;
         this.library = (ImageLibrary) imageProvider;
@@ -104,6 +105,16 @@ public final class InfoPanel extends FreeColPanel {
         add(endTurnPanel, internalPanelTop, internalPanelHeight);
         add(tileInfoPanel, internalPanelTop, internalPanelHeight);
         add(mapEditorPanel, internalPanelTop, internalPanelHeight);
+
+        addMouseListener(new MouseAdapter() {
+                public void mousePressed(MouseEvent e) {
+                    GUI gui = freeColClient.getGUI();
+                    Unit activeUnit = gui.getActiveUnit();
+                    if (activeUnit != null && activeUnit.getTile() != null) {
+                        gui.setFocus(activeUnit.getTile().getPosition());
+                    }
+                }
+            });
     }
     
     /**
