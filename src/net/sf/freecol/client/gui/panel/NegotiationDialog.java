@@ -1,6 +1,7 @@
 package net.sf.freecol.client.gui.panel;
 
 import java.awt.Color;
+import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
@@ -245,12 +246,72 @@ public final class NegotiationDialog extends FreeColDialog implements ActionList
         try {
             StyledDocument document = summary.getStyledDocument();
             document.remove(0, document.getLength());
-        
-            List<String> offers = new ArrayList<String>();
-            List<String> demands = new ArrayList<String>();
-            Iterator<TradeItem> itemIterator = agreement.iterator();
-            while (itemIterator.hasNext()) {
-                TradeItem item = itemIterator.next();
+
+            String input = Messages.message("negotiationDialog.summary");
+            int start = input.indexOf('%');
+            if (start == -1) {
+                // no variables present
+                insertText(input.substring(0));
+                return;
+            } else if (start > 0) {
+                // output any string before the first occurence of '%'
+                insertText(input.substring(0, start));
+            }
+            int end;
+
+            loop: while ((end = input.indexOf('%', start + 1)) >= 0) {
+                String var = input.substring(start, end + 1);
+                if (var.equals("%nation%")) {
+                    insertText(sender.getNationAsString());
+                    start = end + 1;
+                    continue loop;
+                } else if (var.equals("%offers%")) {
+                    insertOffers();
+                    start = end + 1;
+                    continue loop;
+                } else if (var.equals("%demands%")) {
+                    insertDemands();
+                    start = end + 1;
+                    continue loop;
+                } else {
+                    // found no variable to replace: either a single '%', or
+                    // some unnecessary variable
+                    insertText(input.substring(start, end));
+                    start = end;
+                }
+            }
+
+            // output any string after the last occurence of '%'
+            if (start < input.length()) {
+                insertText(input.substring(start));
+            }
+        } catch(Exception e) {
+            logger.warning("Failed to update summary: " + e.toString());
+        }
+    }
+
+    private void insertText(String text) throws Exception {
+        StyledDocument document = summary.getStyledDocument();
+        document.insertString(document.getLength(), text,
+                              document.getStyle("regular"));
+    }
+
+    private void insertOffers() {
+        insertTradeItemDescriptions(sender);
+    }
+
+    private void insertDemands() {
+        insertTradeItemDescriptions(recipient);
+    }
+
+    private void insertTradeItemDescriptions(Player itemSource) {
+        StyledDocument document = summary.getStyledDocument();
+        List<TradeItem> items = agreement.getTradeItems();
+        boolean foundItem = false;
+        for (int index = 0; index < items.size(); index++) {
+            TradeItem item = items.get(index);
+            if (item.getSource() == itemSource) {
+                foundItem = true;
                 String description = "";
                 if (item instanceof StanceTradeItem) {
                     description = Player.getStanceAsString(((StanceTradeItem) item).getStance());
@@ -267,47 +328,39 @@ public final class NegotiationDialog extends FreeColDialog implements ActionList
                 } else if (item instanceof UnitTradeItem) {
                     description = ((UnitTradeItem) item).getUnit().getName();
                 }
-                if (item.getSource() == sender) {
-                    offers.add(description);
-                } else {
-                    demands.add(description);
+                try {
+                    JButton button = new JButton(description);
+                    button.setMargin(new Insets(0,0,0,0));
+                    button.setOpaque(false);
+                    button.setForeground(LINK_COLOR);
+                    button.setAlignmentY(0.8f);
+                    button.setBorder(BorderFactory.createEmptyBorder());
+                    button.addActionListener(this);
+                    button.setActionCommand(String.valueOf(index));
+                    StyleConstants.setComponent(document.getStyle("button"), button);
+                    document.insertString(document.getLength(), " ", document.getStyle("button"));
+                    if (index < items.size() - 1) {
+                        document.insertString(document.getLength(), ", ", document.getStyle("regular"));
+                    } else {
+                        return;
+                    }
+                } catch(Exception e) {
+                    logger.warning(e.toString());
                 }
             }
+        }
 
-            String offerString;
-            if (offers.isEmpty()) {
-                offerString = Messages.message("negotiationDialog.nothing");
-            } else {
-                offerString = "";
-                for (int index = 0; index < offers.size() - 1; index++) {
-                    offerString += offers.get(index) + ", ";
-                }
-                offerString += offers.get(offers.size() - 1);
+        if (!foundItem) {
+            try {
+                document.insertString(document.getLength(), Messages.message("negotiationDialog.nothing"),
+                                      document.getStyle("regular"));
+            } catch(Exception e) {
+                logger.warning(e.toString());
             }
-
-            String demandString = "";
-            if (demands.isEmpty()) {
-                demandString = Messages.message("negotiationDialog.nothing");
-            } else {
-                demandString = "";
-                for (int index = 0; index < demands.size() - 1; index++) {
-                    demandString += demands.get(index) + ", ";
-                }
-                demandString += demands.get(demands.size() - 1);
-            }
-
-            document.insertString(document.getLength(), 
-                                  Messages.message("negotiationDialog.summary",
-                                                   new String[][] {
-                                                       {"%nation%", sender.getNationAsString()},
-                                                       {"%offers%", offerString},
-                                                       {"%demands%", demandString}}),
-                                  document.getStyle("regular"));
-
-        } catch(Exception e) {
-            logger.warning("Failed to update summary: " + e.toString());
         }
     }
+
+
 
     private boolean hasPeaceOffer() {
         return (getStance() > Integer.MIN_VALUE);
@@ -398,8 +451,12 @@ public final class NegotiationDialog extends FreeColDialog implements ActionList
         } else if (command.equals(ACCEPT)) {
             agreement.setAccept(true);
             setResponse(agreement);
-        } else {
+        } else if (command.equals(SEND)) {
             setResponse(agreement);
+        } else {
+            int index = Integer.parseInt(command);
+            agreement.remove(index);
+            initialize();
         }
     }
 
