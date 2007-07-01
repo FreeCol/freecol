@@ -169,6 +169,17 @@ public class DiplomaticTrade extends PersistentObject {
 
 
     /**
+     * Remove a TradeItem from the DiplomaticTrade.
+     * 
+     * @param newItem
+     *            a <code>TradeItem</code> value
+     */
+    public void remove(int index) {
+        items.remove(index);
+    }
+
+
+    /**
      * Removes all trade items of the same class as the given
      * argument.
      *
@@ -211,6 +222,16 @@ public class DiplomaticTrade extends PersistentObject {
             item.makeTrade();
         }
     }
+
+    /**
+     * Returns all TradeItems.
+     * 
+     * @return a List of TradeItems    
+     */
+    public List<TradeItem> getTradeItems() {
+        return items;
+    }    
+
 
     /**
      * Returns an iterator for all TradeItems.
