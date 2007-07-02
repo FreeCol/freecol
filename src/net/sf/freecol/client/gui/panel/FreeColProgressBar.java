@@ -170,7 +170,8 @@ public class FreeColProgressBar extends JPanel {
             if (dvalue > width) {
                 dvalue = width;
             }
-            g2d.setColor(PRIMARY_3);
+            //g2d.setColor(PRIMARY_3);
+            g2d.setColor(new Color(0, 0, 0, 70));
             g2d.fillRect(getInsets().left, getInsets().top, dvalue, height);
         }
 
@@ -181,7 +182,8 @@ public class FreeColProgressBar extends JPanel {
                 if (dstep + dvalue > width) {
                     dstep = width - dvalue;
                 }
-                g2d.setColor(BG_COLOR_SELECT);
+                //g2d.setColor(BG_COLOR_SELECT);
+                g2d.setColor(new Color(0, 0, 0, 40));
                 g2d.fillRect(getInsets().left + dvalue, getInsets().top, dstep, height);
             }
         }
@@ -205,7 +207,8 @@ public class FreeColProgressBar extends JPanel {
             g2d.drawImage(image, restWidth / 2, (getHeight() - iconHeight) / 2, null);
         }
 
-        g2d.setColor(PRIMARY_1);
+        //g2d.setColor(PRIMARY_1);
+        g2d.setColor(Color.BLACK);
         g2d.drawString(progressString, restWidth / 2 + iconWidth, getHeight() / 2 + stringHeight / 4);
 
         g2d.dispose();
