@@ -556,18 +556,25 @@
     <building-type id="model.building.Schoolhouse" workplaces="1" level="1" upgrade="model.building.College">
       <required-goods goods-type="model.goods.hammers" value="64"/>
       <required-population value="4"/>
+<!-- A unit needs at least skill level 1 to work in this building.
+     This could be also be used to require experts for factory level
+     buildings, for example.
+-->
+      <required-skill-level value="1"/>
       <ability id="model.ability.teachSkill" value="1"/>
     </building-type>
     <building-type id="model.building.College" workplaces="2" level="2" upgrade="model.building.University">
       <required-goods goods-type="model.goods.hammers" value="160"/>
       <required-goods goods-type="model.goods.tools" value="50"/>
       <required-population value="8"/>
+      <required-skill-level value="2"/>
       <ability id="model.ability.teachSkill" value="2"/>
     </building-type>
     <building-type id="model.building.University" workplaces="3" level="3">
       <required-goods goods-type="model.goods.hammers" value="200"/>
       <required-goods goods-type="model.goods.tools" value="100"/>
       <required-population value="10"/>
+      <required-skill-level value="3"/>
       <ability id="model.ability.teachSkill" value="3"/>
     </building-type>
     <building-type id="model.building.Armory" consumes="model.goods.tools" produces="model.goods.muskets" workplaces="3" level="1" upgrade="model.building.Magazine">
