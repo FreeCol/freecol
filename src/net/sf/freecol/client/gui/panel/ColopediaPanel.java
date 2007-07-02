@@ -549,11 +549,17 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
             toolsRequired = String.valueOf(type.toolsRequired);
         }
         String skill = "";
+        String schoolType = "";
         if (type.skill != UnitType.UNDEFINED) {
             skill = String.valueOf(type.skill);
+            int schoolLevel = 1;
+            if (type.skill > 1) {
+                schoolLevel = type.skill;
+            }
+            schoolType = Building.getName(Building.SCHOOLHOUSE, schoolLevel);
         }
         int[] widths = { 0, 3 * margin, 0 };
-        int[] heights = new int[19];
+        int[] heights = new int[21];
         for (int index = 1; index < heights.length; index += 2) {
             heights[index] = margin;
         }
@@ -595,6 +601,10 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
             detailPanel.add(new JLabel(Messages.message("colopedia.unit.skill")),
                             higConst.rc(row, labelColumn));
             detailPanel.add(new JLabel(skill), higConst.rc(row, valueColumn, "r"));
+            row += 2;
+            detailPanel.add(new JLabel(Messages.message("colopedia.unit.school")),
+                            higConst.rc(row, labelColumn));
+            detailPanel.add(new JLabel(schoolType), higConst.rc(row, valueColumn, "r"));
         }
         row += 2;
         detailPanel.add(new JLabel(Messages.message("colopedia.unit.price")),
