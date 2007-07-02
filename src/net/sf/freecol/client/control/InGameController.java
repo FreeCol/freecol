@@ -2191,7 +2191,7 @@ public final class InGameController implements NetworkConstants {
                 Player myPlayer = unit.getOwner();
                 Player enemy = tile.getOwner().getOwner();
                 if (myPlayer != enemy && myPlayer.getStance(enemy) != Player.ALLIANCE
-                        && !confirmHostileAction(unit, tile)) { // player has aborted
+                        && !confirmHostileAction(unit, tile.getOwner().getTile())) { // player has aborted
                     return;
                 }
             }
