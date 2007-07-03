@@ -254,7 +254,6 @@ public class DiplomaticTrade extends PersistentObject {
         String acceptString = in.getAttributeValue(null, "accept");
         if ("accept".equals(acceptString)) {
             accept = true;
-            return;
         }
 
         String senderString = in.getAttributeValue(null, "sender");

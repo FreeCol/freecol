@@ -951,6 +951,10 @@ public final class InGameController implements NetworkConstants {
                         DiplomaticTrade proposal = new DiplomaticTrade(freeColClient.getGame(), childElement);
                         agreement = freeColClient.getCanvas().showNegotiationDialog(unit, settlement, proposal);
                     }
+                } else if (agreement.isAccept()) {
+                    // We have accepted the contra-proposal
+                    agreement.makeTrade();
+                    return;
                 }
             } while (reply != null);
             freeColClient.getCanvas().showInformationMessage("negotiationDialog.offerRejected",

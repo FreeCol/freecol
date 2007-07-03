@@ -75,6 +75,7 @@ public final class NegotiationDialog extends FreeColDialog implements ActionList
     private Player otherPlayer;
     private Player sender;
     private Player recipient;
+    private boolean canAccept;
 
     /**
      * Creates a new <code>NegotiationDialog</code> instance.
@@ -105,6 +106,7 @@ public final class NegotiationDialog extends FreeColDialog implements ActionList
         this.player = freeColClient.getMyPlayer();
         this.sender = unit.getOwner();
         this.recipient = settlement.getOwner();
+        this.canAccept = agreement != null; // a new offer can't be accepted
         if (agreement == null) {
             this.agreement = new DiplomaticTrade(unit.getGame(), sender, recipient);
         } else {
@@ -167,10 +169,7 @@ public final class NegotiationDialog extends FreeColDialog implements ActionList
         acceptButton.addActionListener(this);
         acceptButton.setActionCommand(ACCEPT);
         FreeColPanel.enterPressesWhenFocused(acceptButton);
-        // we can't accept an offer we are making
-        if (sender == player) {
-            acceptButton.setEnabled(false);
-        }
+        acceptButton.setEnabled(canAccept);
 
         cancelButton = new JButton(Messages.message("negotiationDialog.cancel"));
         cancelButton.addActionListener(this);

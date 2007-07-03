@@ -593,20 +593,25 @@ public final class InGameInputHandler extends InputHandler {
         NodeList childElements = element.getChildNodes();
         Element childElement = (Element) childElements.item(0);
         DiplomaticTrade proposal = new DiplomaticTrade(getGame(), childElement);
-
-        DiplomaticTrade agreement = new ShowNegotiationDialogSwingTask(unit, settlement, proposal).select();
-        if (agreement != null) {
-            Element diplomaticElement = Message.createNewRootElement("diplomaticTrade");
-            if (agreement.isAccept()) {
-                diplomaticElement.setAttribute("accept", "accept");
-            } else {
-                diplomaticElement.setAttribute("unit", unit.getID());
-                diplomaticElement.setAttribute("direction", String.valueOf(direction));
-                diplomaticElement.appendChild(agreement.toXMLElement(null, diplomaticElement.getOwnerDocument()));
+        
+        if (proposal.isAccept()) {
+            new ShowInformationMessageSwingTask("negotiationDialog.offerAccepted",
+                    new String[][] {{"%nation%", unit.getOwner().getNationAsString()}}).show();
+            proposal.makeTrade();
+        } else {
+            DiplomaticTrade agreement = new ShowNegotiationDialogSwingTask(unit, settlement, proposal).select();
+            if (agreement != null) {
+                Element diplomaticElement = Message.createNewRootElement("diplomaticTrade");
+                if (agreement.isAccept()) {
+                    diplomaticElement.setAttribute("accept", "accept");
+                } else {
+                    diplomaticElement.setAttribute("unit", unit.getID());
+                    diplomaticElement.setAttribute("direction", String.valueOf(direction));
+                    diplomaticElement.appendChild(agreement.toXMLElement(null, diplomaticElement.getOwnerDocument()));
+                }
+                return diplomaticElement;
             }
-            return diplomaticElement;
         }
-
         return null;
     }
 
