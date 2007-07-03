@@ -929,21 +929,30 @@ public final class InGameController implements NetworkConstants {
         DiplomaticTrade agreement = freeColClient.getCanvas().showNegotiationDialog(unit, settlement, null);
         if (agreement != null) {
             unit.setMovesLeft(0);
-            Element diplomaticElement = Message.createNewRootElement("diplomaticTrade");
-            diplomaticElement.setAttribute("unit", unit.getID());
-            diplomaticElement.setAttribute("direction", String.valueOf(direction));
-            diplomaticElement.appendChild(agreement.toXMLElement(null, diplomaticElement.getOwnerDocument()));
-            Element reply = freeColClient.getClient().ask(diplomaticElement);
             String nation = agreement.getRecipient().getNationAsString();
-            if (reply != null) {
-                DiplomaticTrade proposal = new DiplomaticTrade(freeColClient.getGame(), reply);
-                if (proposal.isAccept()) {
-                    freeColClient.getCanvas().showInformationMessage("negotiationDialog.offerAccepted",
-                                                                     new String[][] {{"%nation%", nation}});
-                    agreement.makeTrade();
-                    return;
+            Element reply = null;
+            
+            do {
+                Element diplomaticElement = Message.createNewRootElement("diplomaticTrade");
+                diplomaticElement.setAttribute("unit", unit.getID());
+                diplomaticElement.setAttribute("direction", String.valueOf(direction));
+                diplomaticElement.appendChild(agreement.toXMLElement(null, diplomaticElement.getOwnerDocument()));
+                reply = freeColClient.getClient().ask(diplomaticElement);
+                
+                if (reply != null) {
+                    String accept = reply.getAttribute("accept");
+                    if (accept != null && accept.equals("accept")) {
+                        freeColClient.getCanvas().showInformationMessage("negotiationDialog.offerAccepted",
+                                                                         new String[][] {{"%nation%", nation}});
+                        agreement.makeTrade();
+                        return;
+                    } else {
+                        Element childElement = (Element) reply.getChildNodes().item(0);
+                        DiplomaticTrade proposal = new DiplomaticTrade(freeColClient.getGame(), childElement);
+                        agreement = freeColClient.getCanvas().showNegotiationDialog(unit, settlement, proposal);
+                    }
                 }
-            }
+            } while (reply != null);
             freeColClient.getCanvas().showInformationMessage("negotiationDialog.offerRejected",
                                                              new String[][] {{"%nation%", nation}});
         }

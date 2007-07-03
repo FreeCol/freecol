@@ -356,9 +356,8 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
                 return giveIndependence(connection, element);
             }
         });
-        register("foreignAffairs", new CurrentPlayerNetworkRequestHandler() {
-            @Override
-            public Element handle(Player player, Connection connection, Element element) {
+        register("foreignAffairs", new NetworkRequestHandler() {
+            public Element handle(Connection connection, Element element) {
                 return foreignAffairs(connection, element);
             }
         });
@@ -658,15 +657,6 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
             String accept = reply.getAttribute("accept");
             if (accept != null && accept.equals("accept")) {
                 agreement.makeTrade();
-            } else {
-                // this is a counter-proposal
-                try {
-                    player.getConnection().send(reply);
-                } catch (IOException e) {
-                    logger.warning("Could not send message to: " + player.getName() + " with connection "
-                           + player.getConnection());
-                }
-                return null;
             }
         }
         return reply;

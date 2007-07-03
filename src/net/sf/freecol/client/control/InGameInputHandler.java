@@ -594,24 +594,17 @@ public final class InGameInputHandler extends InputHandler {
         Element childElement = (Element) childElements.item(0);
         DiplomaticTrade proposal = new DiplomaticTrade(getGame(), childElement);
 
-        DiplomaticTrade agreement = getFreeColClient().getCanvas().showNegotiationDialog(unit, settlement, proposal);
+        DiplomaticTrade agreement = new ShowNegotiationDialogSwingTask(unit, settlement, proposal).select();
         if (agreement != null) {
             Element diplomaticElement = Message.createNewRootElement("diplomaticTrade");
             if (agreement.isAccept()) {
                 diplomaticElement.setAttribute("accept", "accept");
-                return diplomaticElement;
             } else {
                 diplomaticElement.setAttribute("unit", unit.getID());
                 diplomaticElement.setAttribute("direction", String.valueOf(direction));
                 diplomaticElement.appendChild(agreement.toXMLElement(null, diplomaticElement.getOwnerDocument()));
-                Element reply = getFreeColClient().getClient().ask(diplomaticElement);
-                if (reply != null) {
-                    String accept = reply.getAttribute("accept");
-                    if (accept != null && accept.equals("accept")) {
-                        agreement.makeTrade();
-                    }
-                }
             }
+            return diplomaticElement;
         }
 
         return null;
@@ -1428,6 +1421,51 @@ public final class InGameInputHandler extends InputHandler {
 
 
         private int[] _choices;
+    }
+
+    /**
+     * This class displays a negotiation dialog.
+     */
+    class ShowNegotiationDialogSwingTask extends SwingTask {
+
+        /**
+         * Constructor.
+         * 
+         * @param unit The unit which init the negotiation.
+         * @param settlement The settlement where the unit has made the proposal
+         * @param unit The proposal made by unit's owner.
+         */
+        public ShowNegotiationDialogSwingTask(Unit unit, Settlement settlement, DiplomaticTrade proposal) {
+            this.unit = unit;
+            this.settlement = settlement;
+            this.proposal = proposal;
+        }
+
+        /**
+         * Show dialog and wait for selection.
+         * 
+         * @return selection.
+         */
+        public DiplomaticTrade select() {
+            try {
+                Object result = invokeAndWait();
+                return (DiplomaticTrade) result;
+            } catch (InvocationTargetException e) {
+                if (e.getCause() instanceof RuntimeException) {
+                    throw (RuntimeException) e.getCause();
+                } else {
+                    throw new RuntimeException(e.getCause());
+                }
+            }
+        }
+
+        protected Object doWork() {
+            return getFreeColClient().getCanvas().showNegotiationDialog(unit, settlement, proposal);
+        }
+        
+        private Unit unit;
+        private Settlement settlement;
+        private DiplomaticTrade proposal;
     }
 
     /**
