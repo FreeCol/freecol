@@ -121,7 +121,7 @@ public final class NegotiationDialog extends FreeColDialog implements ActionList
         if (player.getStance(otherPlayer) == Player.WAR) {
             if (!hasPeaceOffer()) {
                 int stance = Player.PEACE;
-                agreement.add(new StanceTradeItem(freeColClient.getGame(), player, otherPlayer, stance));
+                this.agreement.add(new StanceTradeItem(freeColClient.getGame(), player, otherPlayer, stance));
             }
         }
 
@@ -185,7 +185,7 @@ public final class NegotiationDialog extends FreeColDialog implements ActionList
         }
 
 
-        stance = new StanceTradeItemPanel(this, player);
+        stance = new StanceTradeItemPanel(this, player, otherPlayer);
         goldDemand = new GoldTradeItemPanel(this, otherPlayer, foreignGold);
         goldOffer = new GoldTradeItemPanel(this, player, player.getGold());
         goodsDemand = new GoodsTradeItemPanel(this, otherPlayer, tradeGoods);
@@ -604,7 +604,28 @@ public final class NegotiationDialog extends FreeColDialog implements ActionList
 
     public class StanceTradeItemPanel extends JPanel implements ActionListener {
 
-        public static final int OFFSET = 2;
+        class StanceItem {
+            private int value;
+            StanceItem(int value) {
+                this.value = value;
+            }
+            
+            public String toString() {
+                return Player.getStanceAsString(value);
+            }
+            
+            int getValue() {
+                return value;
+            }
+            
+            public boolean equals(Object other) {
+                if (other == null || !(other instanceof StanceItem)) {
+                    return false;
+                }
+                return value == ((StanceItem) other).value;
+            }
+        }
+        
         private JComboBox stanceBox;
         private JButton addButton;
         private NegotiationDialog negotiationDialog;
@@ -615,20 +636,20 @@ public final class NegotiationDialog extends FreeColDialog implements ActionList
          * @param parent a <code>NegotiationDialog</code> value
          * @param source a <code>Player</code> value
          */
-        public StanceTradeItemPanel(NegotiationDialog parent, Player source) {
+        public StanceTradeItemPanel(NegotiationDialog parent, Player source, Player target) {
             this.negotiationDialog = parent;
             addButton = new JButton(Messages.message("negotiationDialog.add"));
             addButton.addActionListener(this);
             addButton.setActionCommand("add");
             stanceBox = new JComboBox();
-            stanceBox.addItem(Messages.message("model.player.war"));
-            stanceBox.addItem(Messages.message("model.player.ceaseFire"));
-            stanceBox.addItem(Messages.message("model.player.peace"));
-            stanceBox.addItem(Messages.message("model.player.alliance"));
+            
+            int stance = source.getStance(target);
+            if (stance != Player.WAR) stanceBox.addItem(new StanceItem(Player.WAR));
+            if (stance == Player.WAR) stanceBox.addItem(new StanceItem(Player.CEASE_FIRE));
+            if (stance != Player.PEACE) stanceBox.addItem(new StanceItem(Player.PEACE));
+            if (stance != Player.ALLIANCE) stanceBox.addItem(new StanceItem(Player.ALLIANCE));
             if (parent.hasPeaceOffer()) {
-                stanceBox.setSelectedIndex(parent.getStance() + OFFSET);
-            } else {
-                stanceBox.setSelectedIndex(OFFSET);
+                stanceBox.setSelectedItem(new StanceItem(parent.getStance()));
             }
 
             setBorder(BorderFactory.createCompoundBorder(BorderFactory.createLineBorder(Color.BLACK),
@@ -650,7 +671,8 @@ public final class NegotiationDialog extends FreeColDialog implements ActionList
         public void actionPerformed(ActionEvent event) {
             String command = event.getActionCommand();
             if (command.equals("add")) {
-                negotiationDialog.setStance(stanceBox.getSelectedIndex() - OFFSET);
+                StanceItem stance = (StanceItem) stanceBox.getSelectedItem();
+                negotiationDialog.setStance(stance.getValue());
                 updateSummary();
             }
 
