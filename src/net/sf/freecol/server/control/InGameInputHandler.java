@@ -645,6 +645,9 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
             throw new IllegalArgumentException("Sender of 'DiplomaticTrade' message is not " +
                                                "player " + player.getName());
         }
+        if (agreement.isAccept()) {
+            agreement.makeTrade();
+        }
         ServerPlayer enemyPlayer = (ServerPlayer) agreement.getRecipient();
         Element reply = null;
         try {
