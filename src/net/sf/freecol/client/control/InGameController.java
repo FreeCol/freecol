@@ -735,7 +735,8 @@ public final class InGameController implements NetworkConstants {
                 if (goods.getType() == goodsType) {
                     if (goods.getAmount() < 100) {
                         // comlete goods until 100 units
-                        int amountPresent = warehouse.getGoodsCount(goodsType) - exportLevel[goodsType];    // respect the lower limit for TradeRoute
+                        // respect the lower limit for TradeRoute
+                        int amountPresent = warehouse.getGoodsCount(goodsType) - exportLevel[goodsType];
                         if (amountPresent > 0) {
                             logger.finest("Automatically loading goods " + goods.getName());
                             int amountToLoad = Math.min(100 - goods.getAmount(), amountPresent);
@@ -748,14 +749,23 @@ public final class InGameController implements NetworkConstants {
                     continue test;
                 }
             }
-            // this type of goods was not in the cargo list
-            logger.finest("Automatically unloading " + goods.getName());
-            unloadCargo(goods);
+            // this type of goods was not in the cargo list: do not
+            // unload more than the warehouse can store
+            int capacity = ((Colony) location).getWarehouseCapacity() - warehouse.getGoodsCount(goods.getType());
+            if (capacity < goods.getAmount() &&
+                !freeColClient.getCanvas().showConfirmDialog("traderoute.warehouseCapacity", "yes", "no")) {
+                logger.finest("Automatically unloading " + capacity + " " + goods.getName());
+                unloadCargo(new Goods(freeColClient.getGame(), unit, goods.getType(), capacity));
+            } else {
+                logger.finest("Automatically unloading " + goods.getAmount() + " " + goods.getName());
+                unloadCargo(goods);
+            }
         }
 
         // load cargo that should be on board
         for (Integer goodsType : goodsTypesToLoad) {
-            int amountPresent = warehouse.getGoodsCount(goodsType.intValue()) - exportLevel[goodsType.intValue()]; // respect the lower limit for TradeRoute
+            // respect the lower limit for TradeRoute
+            int amountPresent = warehouse.getGoodsCount(goodsType.intValue()) - exportLevel[goodsType.intValue()];
             if (amountPresent > 0) {
                 if (unit.getSpaceLeft() > 0) {
                     logger.finest("Automatically loading goods " + Goods.getName(goodsType.intValue()));
