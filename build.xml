@@ -275,7 +275,11 @@
                         </authors>
                         <javaversion>1.5</javaversion>
                     </info>
-                    <guiprefs width="640" height="480" resizable="no"/>
+                    <guiprefs width="640" height="480" resizable="no">
+                        <laf name="looks">
+                            <os family="unix" />
+                        </laf>
+                    </guiprefs>
                     <locale>
                         <langpack iso3="eng"/>
                         <langpack iso3="deu"/>
