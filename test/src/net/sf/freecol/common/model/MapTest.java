@@ -50,21 +50,6 @@ public class MapTest extends FreeColTestCase {
 		}
 	}
 
-	@SuppressWarnings("deprecation")
-	public void testGetOppositeDirection() throws FreeColException {
-
-		Map map = getEmptyMap();
-
-		assertEquals(Map.getReverseDirection(Map.N), map.getOppositeDirection(Map.N));
-		assertEquals(Map.getReverseDirection(Map.S), map.getOppositeDirection(Map.S));
-		assertEquals(Map.getReverseDirection(Map.W), map.getOppositeDirection(Map.W));
-		assertEquals(Map.getReverseDirection(Map.E), map.getOppositeDirection(Map.E));
-		assertEquals(Map.getReverseDirection(Map.SW), map.getOppositeDirection(Map.SW));
-		assertEquals(Map.getReverseDirection(Map.SE), map.getOppositeDirection(Map.SE));
-		assertEquals(Map.getReverseDirection(Map.NE), map.getOppositeDirection(Map.NE));
-		assertEquals(Map.getReverseDirection(Map.NW), map.getOppositeDirection(Map.NW));
-	}
-
 	public void testGetSurroundingTiles() {
 		Game game = getStandardGame();
 
