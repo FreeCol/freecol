@@ -35,30 +35,6 @@ public class Messages {
 
     private static Properties messageBundle = null;
 
-
-    /**
-     * Finds the message with a particular id in the default locale.
-     * 
-     * The first call to this method will load the messages from the property
-     * file.
-     * 
-     * @param messageId the id of the message to find
-     * @return the message with the specified id or null if not found.
-     * 
-     * @throws NullPointerException if messageId is null.
-     */
-    public static String message(String messageId) {
-        if (messageId == null) {
-            throw new NullPointerException();
-        }
-
-        if (messageBundle == null) {
-            setMessageBundle(Locale.getDefault());
-        }
-
-        return messageBundle.getProperty(messageId);
-    }
-
     /**
      * Set the resource bundle for the given locale
      * 
@@ -151,12 +127,18 @@ public class Messages {
      *       is replaced by the second in the messages.
      */
     public static String message(String messageId, String... data) {
-        // Check that the data has a pair number of items, else there is a bug somewhere and die
+        // Check that all the values are correct.        
+        if (messageId == null) {
+            throw new NullPointerException();
+        }
         if (data.length % 2 != 0) {
             throw new RuntimeException("Programming error, the data should consist of only pairs.");
         }
+        if (messageBundle == null) {
+            setMessageBundle(Locale.getDefault());
+        }
  
-        String message = Messages.message(messageId);
+        String message = messageBundle.getProperty(messageId);
         if (data.length > 0 && message != null) {
             for (int i = 0; i < data.length; i += 2) {
                 if (data[i] == null || data[i+1] == null) {
