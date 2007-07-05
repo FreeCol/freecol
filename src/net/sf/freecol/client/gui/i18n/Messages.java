@@ -28,7 +28,9 @@ public class Messages {
     private static final Logger logger = Logger.getLogger(Messages.class.getName());
 
     public static final String STRINGS_DIRECTORY = "strings";
+
     public static final String FILE_PREFIX = "FreeColMessages";
+
     public static final String FILE_SUFFIX = ".properties";
 
     private static Properties messageBundle = null;
@@ -93,12 +95,9 @@ public class Messages {
         if (!variant.equals("")) {
             variant = "_" + variant;
         }
-        String[] fileNames = {
-            FILE_PREFIX + FILE_SUFFIX,
-            FILE_PREFIX + language + FILE_SUFFIX,
-            FILE_PREFIX + language + country + FILE_SUFFIX,
-            FILE_PREFIX + language + country + variant + FILE_SUFFIX
-        };
+        String[] fileNames = { FILE_PREFIX + FILE_SUFFIX, FILE_PREFIX + language + FILE_SUFFIX,
+                FILE_PREFIX + language + country + FILE_SUFFIX,
+                FILE_PREFIX + language + country + variant + FILE_SUFFIX };
 
         for (String fileName : fileNames) {
             File resourceFile = new File(getI18nDirectory(), fileName);
@@ -115,11 +114,13 @@ public class Messages {
      * string replacements.
      * 
      * @param messageId The key of the message to find
-     * @param data Every occuranse of <code>data[x][0]</code> is replaced with
+     * @param data Every occurrences of <code>data[x][0]</code> is replaced with
      *            <code>data[x][1]</code> for every <code>x</code>.
-     * @return The message with the specified id or null if message could not be found.
+     * @return The message with the specified id or null if message could not be
+     *         found.
      * 
      * @throws NullPointerException if messageId is null
+     * @deprecated
      */
     public static String message(String messageId, String[][] data) {
 
@@ -142,6 +143,32 @@ public class Messages {
     }
 
     /**
+     * Finds the message with a particular ID in the default locale and performs
+     * string replacements.
+     * 
+     * @param messageId The key of the message to find
+     * @data data consists of pairs of strings, each time the first of the pair
+     *       is replaced by the second in the messages.
+     */
+    public static String message(String messageId, String... data) {
+        // Check that the data has a pair number of items, else there is a bug somewhere and die
+        if (data.length % 2 != 0) {
+            throw new RuntimeException("Programming error, the data should consist of only pairs.");
+        }
+ 
+        String message = Messages.message(messageId);
+        if (data.length > 0 && message != null) {
+            for (int i = 0; i < data.length; i += 2) {
+                if (data[i] == null || data[i+1] == null) {
+                    throw new RuntimeException("Programming error,no data should be <null>.");
+                }
+                message = message.replaceAll(data[i], data[i+1]);
+            }
+        }
+        return message;
+    }
+
+    /**
      * Calling this method can be used to replace the messages used currently
      * with a new bundle. This is used only in the debugging of FreeCol.
      * 
@@ -149,11 +176,10 @@ public class Messages {
      */
     public static void loadResources(File resourceFile) {
 
-        if ((resourceFile != null) && resourceFile.exists() && resourceFile.isFile() &&
-            resourceFile.canRead()) {
+        if ((resourceFile != null) && resourceFile.exists() && resourceFile.isFile() && resourceFile.canRead()) {
             try {
                 messageBundle.load(new FileInputStream(resourceFile));
-            } catch(Exception e) {
+            } catch (Exception e) {
                 logger.warning("Unable to load resource file " + resourceFile.getPath());
             }
         }
