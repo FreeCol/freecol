@@ -424,7 +424,6 @@ public class ColonyTile extends FreeColGameObject implements WorkLocation, Ownab
     }
 
     private void produceGoodsCenterTile() {
-        int bonus = getColony().getProductionBonus();
         
         colony.addGoods(Goods.FOOD, getProductionOf(Goods.FOOD));
         int type2 = workTile.secondaryGoods();

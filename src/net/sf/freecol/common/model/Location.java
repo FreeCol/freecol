@@ -62,7 +62,7 @@ public interface Location {
     public boolean contains(Locatable locatable);
 
     /**
-     * Checks wether or not the specified locatable may be added to this
+     * Checks whether or not the specified locatable may be added to this
      * <code>Location</code>.
      * 
      * @param locatable
