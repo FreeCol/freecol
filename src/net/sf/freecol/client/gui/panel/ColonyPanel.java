@@ -3,7 +3,6 @@ package net.sf.freecol.client.gui.panel;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Container;
-import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
@@ -17,7 +16,6 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseListener;
-import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
@@ -37,7 +35,6 @@ import javax.swing.JScrollPane;
 import javax.swing.JViewport;
 import javax.swing.KeyStroke;
 import javax.swing.ScrollPaneConstants;
-import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.border.BevelBorder;
 import javax.swing.border.Border;
@@ -506,9 +503,9 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener {
     private void updateCargoLabel() {
         if (selectedUnit != null) {
             cargoPanel.getParent().setEnabled(true);
-            cargoBorder.setTitle(Messages.message("cargoOnCarrierLong", new String[][] {
-                    { "%name%", selectedUnit.getUnit().getName() },
-                    { "%space%", String.valueOf(selectedUnit.getUnit().getSpaceLeft()) } }));
+            cargoBorder.setTitle(Messages.message("cargoOnCarrierLong", 
+                    "%name%", selectedUnit.getUnit().getName(),
+                    "%space%", String.valueOf(selectedUnit.getUnit().getSpaceLeft())));
         } else {
             cargoPanel.getParent().setEnabled(false);
             cargoBorder.setTitle(Messages.message("cargoOnCarrier"));

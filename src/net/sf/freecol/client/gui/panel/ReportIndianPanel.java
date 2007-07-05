@@ -64,7 +64,7 @@ public final class ReportIndianPanel extends ReportPanel implements ActionListen
 
         int settlementCount = opponent.getSettlements().size();
         report += "<p>" + Messages.message("report.indian.knownCamps", 
-                                           new String[][] {{"%number%", String.valueOf(settlementCount)}});
+                "%number%", String.valueOf(settlementCount));
         String tensionString = opponent.getTension(player).toString();
         report += "<p>" + Messages.message("tension") + ": " + tensionString;
         report += "</html>";

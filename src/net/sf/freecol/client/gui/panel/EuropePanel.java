@@ -489,8 +489,8 @@ public final class EuropePanel extends FreeColPanel implements ActionListener {
         }
 
         String newLandName = player.getNewLandName();
-        ((TitledBorder) toAmericaPanel.getBorder()).setTitle(Messages.message("sailingTo", new String[][] { {
-                "%location%", newLandName } }));
+        ((TitledBorder) toAmericaPanel.getBorder()).setTitle(Messages.message("sailingTo", 
+                "%location%", newLandName));
     }
 
     /**
@@ -1124,11 +1124,11 @@ public final class EuropePanel extends FreeColPanel implements ActionListener {
         public void logPurchase(int goodsType, int amount, int price) {
             int total = amount * price;
             String text = Messages.message("transaction.purchase",
-                    new String[][] {{"%goods%", Goods.getName(goodsType)},
-                                    {"%amount%", String.valueOf(amount)},
-                                    {"%gold%", String.valueOf(price)}})
+                    "%goods%", Goods.getName(goodsType),
+                    "%amount%", String.valueOf(amount),
+                    "%gold%", String.valueOf(price))
                 + "\n" + Messages.message("transaction.price",
-                    new String[][] {{"%gold%", String.valueOf(total)}});
+                    "%gold%", String.valueOf(total));
             add(text);
         }
 
@@ -1138,16 +1138,16 @@ public final class EuropePanel extends FreeColPanel implements ActionListener {
             int totalAfterTax = totalBeforeTax - totalTax;
             
             String text = Messages.message("transaction.sale",
-                    new String[][] {{"%goods%", Goods.getName(goodsType)},
-                                    {"%amount%", String.valueOf(amount)},
-                                    {"%gold%", String.valueOf(price)}})
+                    "%goods%", Goods.getName(goodsType),
+                    "%amount%", String.valueOf(amount),
+                    "%gold%", String.valueOf(price))
                 + "\n" + Messages.message("transaction.price",
-                    new String[][] {{"%gold%", String.valueOf(totalBeforeTax)}})
+                    "%gold%", String.valueOf(totalBeforeTax))
                 + "\n" + Messages.message("transaction.tax",
-                    new String[][] {{"%tax%", String.valueOf(tax)},
-                                    {"%gold%", String.valueOf(totalTax)}})
+                    "%tax%", String.valueOf(tax),
+                    "%gold%", String.valueOf(totalTax))
                 + "\n" + Messages.message("transaction.net",
-                    new String[][] {{"%gold%", String.valueOf(totalAfterTax)}});
+                    "%gold%", String.valueOf(totalAfterTax));
             add(text);
         }
     }
