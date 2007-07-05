@@ -279,11 +279,16 @@
                     <locale>
                         <langpack iso3="eng"/>
                         <langpack iso3="deu"/>
-                        <langpack iso3="spa"/>
-                        <langpack iso3="hun"/>
                         <langpack iso3="fin"/>
                         <langpack iso3="fra"/>
+                        <langpack iso3="hun"/>
+                        <langpack iso3="ita"/>
+                        <langpack iso3="ned"/>
+                        <langpack iso3="pol"/>
                         <langpack iso3="por"/>
+                        <langpack iso3="rus"/>
+                        <langpack iso3="spa"/>
+                        <langpack iso3="swe"/>
                     </locale>
                     <resources>
                         <res id="LicencePanel.licence" src="base/@{freecol.name}/COPYING"/>
