@@ -717,6 +717,7 @@ public final class InGameController implements NetworkConstants {
 
         Stop stop = unit.getCurrentStop();
         Location location = unit.getColony();
+        int[] exportLevel = unit.getColony().getExportLevel();  // respect the lower limit for TradeRoute
 
         GoodsContainer warehouse = location.getGoodsContainer();
         if (warehouse == null) {
@@ -734,7 +735,7 @@ public final class InGameController implements NetworkConstants {
                 if (goods.getType() == goodsType) {
                     if (goods.getAmount() < 100) {
                         // comlete goods until 100 units
-                        int amountPresent = warehouse.getGoodsCount(goodsType);
+                        int amountPresent = warehouse.getGoodsCount(goodsType) - exportLevel[goodsType];    // respect the lower limit for TradeRoute
                         if (amountPresent > 0) {
                             logger.finest("Automatically loading goods " + goods.getName());
                             int amountToLoad = Math.min(100 - goods.getAmount(), amountPresent);
@@ -754,7 +755,7 @@ public final class InGameController implements NetworkConstants {
 
         // load cargo that should be on board
         for (Integer goodsType : goodsTypesToLoad) {
-            int amountPresent = warehouse.getGoodsCount(goodsType.intValue());
+            int amountPresent = warehouse.getGoodsCount(goodsType.intValue()) - exportLevel[goodsType.intValue()]; // respect the lower limit for TradeRoute
             if (amountPresent > 0) {
                 if (unit.getSpaceLeft() > 0) {
                     logger.finest("Automatically loading goods " + Goods.getName(goodsType.intValue()));
