@@ -279,6 +279,7 @@
                         <laf name="looks">
                             <os family="unix" />
                         </laf>
+                        <modifier key="langDisplayType" value="native"/>
                     </guiprefs>
                     <locale>
                         <langpack iso3="eng"/>
