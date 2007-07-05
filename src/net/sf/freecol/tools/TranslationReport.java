@@ -60,7 +60,7 @@ public class TranslationReport {
             ArrayList<String> missingVariables = new ArrayList<String>();
             ArrayList<String> copiedFromMaster = new ArrayList<String>();
             
-            for (Enumeration keys = master.keys() ; keys.hasMoreElements()  ;)  {
+            for (Enumeration<Object> keys = master.keys() ; keys.hasMoreElements()  ;)  {
                 String key = (String) keys.nextElement();
                 String value = properties.getProperty(key, null);
                 if (value == null) {
@@ -136,7 +136,7 @@ public class TranslationReport {
 
             ArrayList<String> superfluousKeys = new ArrayList<String>();
             ArrayList<String> superfluousVariables = new ArrayList<String>();
-            for (Enumeration keys = properties.keys() ; keys.hasMoreElements()  ;)  {
+            for (Enumeration<Object> keys = properties.keys() ; keys.hasMoreElements()  ;)  {
                 String key = (String) keys.nextElement();
                 String value = master.getProperty(key, null);
                 if (value == null) {
