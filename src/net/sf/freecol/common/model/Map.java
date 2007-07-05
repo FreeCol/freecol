@@ -17,8 +17,6 @@ import javax.xml.stream.XMLStreamWriter;
 import net.sf.freecol.common.FreeColException;
 import net.sf.freecol.common.PseudoRandom;
 
-import org.w3c.dom.Element;
-
 /**
  * An isometric map. The map is represented as a collection of tiles.
  */
@@ -134,18 +132,6 @@ public class Map extends FreeColGameObject {
     private void initSize() {
       width = columns.size();
       height = columns.get(0).size();;
-    }
-
-    /**
-     * Returns the opposite direction of the given direction.
-     * 
-     * @param direction
-     *            The direction
-     * @return The oppositre direction of the given one.
-     * @deprecated use the static method {@link #getReverseDirection(int)}
-     */
-    public int getOppositeDirection(int direction) {
-        return (direction + 4 < 8) ? direction + 4 : direction - 4;
     }
 
     /**
