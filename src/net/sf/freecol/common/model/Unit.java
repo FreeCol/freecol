@@ -874,9 +874,10 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
      *         need to be a {@link #isCarrier() carrier} and have goods onboard.
      */
     public boolean canTradeWith(Settlement settlement) {
-        return (isCarrier() && goodsContainer.getGoodsCount() > 0
-                && getOwner().getStance(settlement.getOwner()) != Player.WAR && ((settlement instanceof IndianSettlement) || getOwner()
-                .hasFather(FoundingFather.JAN_DE_WITT)));
+        return (isCarrier() && goodsContainer.getGoodsCount() > 0 &&
+                getOwner().getStance(settlement.getOwner()) != Player.WAR &&
+                ((settlement instanceof IndianSettlement) ||
+                 getOwner().hasFather(FoundingFather.JAN_DE_WITT)));
     }
 
     /**

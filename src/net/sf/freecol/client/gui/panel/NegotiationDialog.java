@@ -179,17 +179,11 @@ public final class NegotiationDialog extends FreeColDialog implements ActionList
 
         updateSummary();
 
-        List<Goods> tradeGoods = null;
-        if (unit.isCarrier()) {
-            tradeGoods = unit.getGoodsContainer().getGoods();
-        }
-
-
         stance = new StanceTradeItemPanel(this, player, otherPlayer);
         goldDemand = new GoldTradeItemPanel(this, otherPlayer, foreignGold);
         goldOffer = new GoldTradeItemPanel(this, player, player.getGold());
-        goodsDemand = new GoodsTradeItemPanel(this, otherPlayer, tradeGoods);
-        goodsOffer = new GoodsTradeItemPanel(this, player, tradeGoods);
+        goodsDemand = new GoodsTradeItemPanel(this, otherPlayer, settlement.getGoodsContainer().getGoods());
+        goodsOffer = new GoodsTradeItemPanel(this, player, unit.getGoodsContainer().getGoods());
         colonyDemand = new ColonyTradeItemPanel(this, otherPlayer);
         colonyOffer = new ColonyTradeItemPanel(this, player);
         /** TODO: UnitTrade
@@ -197,7 +191,7 @@ public final class NegotiationDialog extends FreeColDialog implements ActionList
             unitOffer = new UnitTradeItemPanel(this, player);
         */
 
-        int numberOfTradeItems = 5;
+        int numberOfTradeItems = 4;
         int extraRows = 2; // headline and buttons
 
         int[] widths = {200, 10, 300, 10, 200};
@@ -223,11 +217,13 @@ public final class NegotiationDialog extends FreeColDialog implements ActionList
         add(goldOffer, higConst.rc(row, offerColumn));
         add(summary, higConst.rcwh(row, summaryColumn, 1, 5));
         row += 2;
-        add(goodsDemand, higConst.rc(row, demandColumn));
-        add(goodsOffer, higConst.rc(row, offerColumn));
-        row += 2;
-        add(colonyDemand, higConst.rc(row, demandColumn));
-        add(colonyOffer, higConst.rc(row, offerColumn));
+        if (unit.isCarrier()) {
+            add(goodsDemand, higConst.rc(row, demandColumn));
+            add(goodsOffer, higConst.rc(row, offerColumn));
+        } else {
+            add(colonyDemand, higConst.rc(row, demandColumn));
+            add(colonyOffer, higConst.rc(row, offerColumn));
+        }
         row += 2;
         /** TODO: UnitTrade
             add(unitDemand, higConst.rc(row, demandColumn));
@@ -323,7 +319,8 @@ public final class NegotiationDialog extends FreeColDialog implements ActionList
                                                    new String[][] {
                                                        {"%colony%", ((ColonyTradeItem) item).getColony().getName()}});
                 } else if (item instanceof GoodsTradeItem) {
-                    description = ((GoodsTradeItem) item).getGoods().getName();
+                    description = String.valueOf(((GoodsTradeItem) item).getGoods().getAmount()) + " " +
+                        ((GoodsTradeItem) item).getGoods().getName();
                 } else if (item instanceof UnitTradeItem) {
                     description = ((UnitTradeItem) item).getUnit().getName();
                 }
@@ -493,6 +490,10 @@ public final class NegotiationDialog extends FreeColDialog implements ActionList
         }
 
         private void updateColonyBox() {
+
+            if (!player.isEuropean()) {
+                return;
+            }
 
             // Remove all action listeners, so the update has no effect (except
             // updating the list).

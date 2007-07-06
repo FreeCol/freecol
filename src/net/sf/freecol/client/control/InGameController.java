@@ -893,7 +893,8 @@ public final class InGameController implements NetworkConstants {
             scoutForeignColony(unit, direction);
             break;
         case Unit.ENTER_SETTLEMENT_WITH_CARRIER_AND_GOODS:
-            tradeWithSettlement(unit, direction);
+            negotiate(unit, direction);
+            //tradeWithSettlement(unit, direction);
             break;
         case Unit.EXPLORE_LOST_CITY_RUMOUR:
             exploreLostCityRumour(unit, direction);
@@ -937,11 +938,20 @@ public final class InGameController implements NetworkConstants {
         Map map = freeColClient.getGame().getMap();
         Settlement settlement = map.getNeighbourOrNull(direction, unit.getTile()).getSettlement();
 
+        Element spyElement = Message.createNewRootElement("spySettlement");
+        spyElement.setAttribute("unit", unit.getID());
+        spyElement.setAttribute("direction", String.valueOf(direction));
+        Element reply = freeColClient.getClient().ask(spyElement);
+        if (reply != null) {
+            NodeList childNodes = reply.getChildNodes();
+            settlement.readFromXMLElement((Element) childNodes.item(0));
+        }
+
         DiplomaticTrade agreement = freeColClient.getCanvas().showNegotiationDialog(unit, settlement, null);
         if (agreement != null) {
             unit.setMovesLeft(0);
             String nation = agreement.getRecipient().getNationAsString();
-            Element reply = null;
+            reply = null;
             
             do {
                 Element diplomaticElement = Message.createNewRootElement("diplomaticTrade");
@@ -984,7 +994,7 @@ public final class InGameController implements NetworkConstants {
         Colony colony = game.getMap().getNeighbourOrNull(direction,
                 unit.getTile()).getColony();
 
-        Element spyElement = Message.createNewRootElement("spyColony");
+        Element spyElement = Message.createNewRootElement("spySettlement");
         spyElement.setAttribute("unit", unit.getID());
         spyElement.setAttribute("direction", String.valueOf(direction));
         Element reply = freeColClient.getClient().ask(spyElement);

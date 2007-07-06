@@ -403,9 +403,9 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
                 return selectFromFountainYouth(connection, element);
             }
         });
-        register("spyColony", new NetworkRequestHandler() {
+        register("spySettlement", new NetworkRequestHandler() {
             public Element handle(Connection connection, Element element) {
-                return spyColony(connection, element);
+                return spySettlement(connection, element);
             }
         });
         register("abandonColony", new NetworkRequestHandler() {
@@ -666,7 +666,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
     }
 
     /**
-     * Handles an "spyColony"-message from a client.
+     * Handles an "spySettlement"-message from a client.
      * 
      * @param connection The connection the message came from.
      * @param spyElement The element containing the request.
@@ -675,7 +675,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
      * @exception IllegalStateException If the request is not accepted by the
      *                model.
      */
-    private Element spyColony(Connection connection, Element spyElement) {
+    private Element spySettlement(Connection connection, Element spyElement) {
         FreeColServer freeColServer = getFreeColServer();
         ServerPlayer player = freeColServer.getPlayer(connection);
         // Get parameters:
@@ -697,14 +697,18 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
             throw new IllegalArgumentException("Could not find tile in direction " + direction + " from unit with ID "
                     + spyElement.getAttribute("unit"));
         }
-        Colony colony = newTile.getColony();
-        if (colony == null) {
-            throw new IllegalArgumentException("There is no colony in direction " + direction + " from unit with ID "
+        Settlement settlement = newTile.getSettlement();
+        if (settlement == null) {
+            throw new IllegalArgumentException("There is no settlement in direction " + direction + " from unit with ID "
                     + spyElement.getAttribute("unit"));
         }
         
         Element reply = Message.createNewRootElement("foreignColony");
-        reply.appendChild(colony.toXMLElement(player, reply.getOwnerDocument(), true, false));
+        if (settlement instanceof Colony) {
+            reply.appendChild(((Colony) settlement).toXMLElement(player, reply.getOwnerDocument(), true, false));
+        } else if (settlement instanceof IndianSettlement) {
+            reply.appendChild(((IndianSettlement) settlement).toXMLElement(player, reply.getOwnerDocument(), true, false));
+        }
         for(Unit foreignUnit : newTile.getUnitList()) {
             reply.appendChild(foreignUnit.toXMLElement(player, reply.getOwnerDocument(), true, false));
         }
