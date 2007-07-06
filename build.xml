@@ -299,6 +299,7 @@
                         <res id="LicencePanel.licence" src="base/@{freecol.name}/COPYING"/>
                         <res id="shortcutSpec.xml" src="@{freecol.build.dir}/winShortcutSpec.xml"/>
                         <res id="Unix_shortcutSpec.xml" src="@{freecol.build.dir}/unixShortcutSpec.xml"/>
+                        <res id="installer.langsel.img" src="@{freecol.build.dir}/install.png"/>
                     </resources>
                     <native type="izpack" name="ShellLink.dll"/>
                     <panels>
@@ -311,21 +312,21 @@
                         <panel classname="SimpleFinishPanel"/>
                     </panels>
                     <packs>
-                        <pack name="FreeCol" required="yes">
-                            <description>The FreeCol game files.</description>
+                        <pack id="FreeCol" name="FreeCol" required="yes">
+                            <description>The FreeCol application and data files. This pack includes all files required to play the game.</description>
                             <fileset dir="base/@{freecol.name}" targetdir="$INSTALL_PATH"/>
                             <fileset dir="@{freecol.packaging.dir}/common/" includes="Uninstaller/**" targetdir="$INSTALL_PATH"/>
                             <fileset dir="win/@{freecol.name}" targetdir="$INSTALL_PATH" os="windows"/>
                             <executable targetfile="$INSTALL_PATH/freecol" stage="never" keep="true" />
                             <executable targetfile="$INSTALL_PATH/Uninstaller/uninstaller" stage="never" keep="true" />
                         </pack>
-                        <pack name="Game Manual" required="no" preselected="yes">
-                            <description>A game manual.</description>
+                        <pack id="GameManual" name="Game Manual" required="no" preselected="yes">
+                            <description>This pack includes the game manual.</description>
                             <fileset dir="manual/@{freecol.name}" targetdir="$INSTALL_PATH"/>
                         </pack>
                         <!--
-                        <pack name="Source Code" required="no" preselected="no">
-                            <description>The source code.</description>
+                        <pack id="SourceCode" name="Source Code" required="no" preselected="no">
+                            <description>The source code used for building this distribution. These files are intended for developers and give no extra functionality to normal users.</description>
                             <fileset dir="source/@{freecol.name}" targetdir="$INSTALL_PATH"/>
                         </pack>
                         -->
