@@ -30,6 +30,19 @@ public final class DragListener extends MouseAdapter {
 
     public static final String REVISION = "$Revision$";
 
+    private static final int[] goodsTypes = { Goods.FOOD, Goods.SUGAR, Goods.TOBACCO, Goods.COTTON, 
+                                              Goods.FURS, Goods.LUMBER, Goods.ORE, Goods.SILVER };
+
+    private static final int[] workTypes = { UnitLabel.WORKTYPE_FOOD, UnitLabel.WORKTYPE_SUGAR,
+                                             UnitLabel.WORKTYPE_TOBACCO, UnitLabel.WORKTYPE_COTTON, 
+                                             UnitLabel.WORKTYPE_FURS, UnitLabel.WORKTYPE_LUMBER,
+                                             UnitLabel.WORKTYPE_ORE, UnitLabel.WORKTYPE_SILVER };
+
+    private static final String[] messages = { "beAFarmer", "beASugarPlanter",
+                                               "beATobaccoPlanter", "beAcottonPlanter",
+                                               "beAFurTrapper", "beALumberjack",
+                                               "beAnOreMiner", "beASilverMiner"};
+
     private final FreeColPanel parentPanel;
 
 
@@ -60,6 +73,7 @@ public final class DragListener extends MouseAdapter {
             
             if (comp instanceof UnitLabel) {
                 UnitLabel unitLabel = (UnitLabel) comp;
+                ImageLibrary imageLibrary = (ImageLibrary) unitLabel.getCanvas().getImageProvider();
                 Unit tempUnit = unitLabel.getUnit();
 
                 JPopupMenu menu = new JPopupMenu("Unit");
@@ -88,66 +102,45 @@ public final class DragListener extends MouseAdapter {
                     menu.addSeparator();
                 }
 
+
                 if ((tempUnit.isColonist() || tempUnit.getType() == Unit.INDIAN_CONVERT)
                         && tempUnit.getLocation() instanceof ColonyTile) {
                     ColonyTile colonyTile = (ColonyTile) tempUnit.getLocation();
-                    menuItem = new JMenuItem(Messages.message("beAFarmer") + " ("
-                            + tempUnit.getFarmedPotential(Goods.FOOD, colonyTile.getWorkTile()) + "/"
-                            + colonyTile.getColony().getVacantColonyTileProductionFor(tempUnit, Goods.FOOD) + ")",
-                            unitLabel.getCanvas().getImageProvider().getGoodsImageIcon(ImageLibrary.GOODS_FOOD));
-                    menuItem.setActionCommand(String.valueOf(UnitLabel.WORKTYPE_FOOD));
-                    menuItem.addActionListener(unitLabel);
-                    menu.add(menuItem);
-                    menuItem = new JMenuItem(Messages.message("beASugarPlanter") + " ("
-                            + tempUnit.getFarmedPotential(Goods.SUGAR, colonyTile.getWorkTile()) + "/"
-                            + colonyTile.getColony().getVacantColonyTileProductionFor(tempUnit, Goods.SUGAR) + ")",
-                            unitLabel.getCanvas().getImageProvider().getGoodsImageIcon(ImageLibrary.GOODS_SUGAR));
-                    menuItem.setActionCommand(String.valueOf(UnitLabel.WORKTYPE_SUGAR));
-                    menuItem.addActionListener(unitLabel);
-                    menu.add(menuItem);
-                    menuItem = new JMenuItem(Messages.message("beATobaccoPlanter") + " ("
-                            + tempUnit.getFarmedPotential(Goods.TOBACCO, colonyTile.getWorkTile()) + "/"
-                            + colonyTile.getColony().getVacantColonyTileProductionFor(tempUnit, Goods.TOBACCO) + ")",
-                            unitLabel.getCanvas().getImageProvider().getGoodsImageIcon(ImageLibrary.GOODS_TOBACCO));
-                    menuItem.setActionCommand(String.valueOf(UnitLabel.WORKTYPE_TOBACCO));
-                    menuItem.addActionListener(unitLabel);
-                    menu.add(menuItem);
-                    menuItem = new JMenuItem(Messages.message("beAcottonPlanter") + " ("
-                            + tempUnit.getFarmedPotential(Goods.COTTON, colonyTile.getWorkTile()) + "/"
-                            + colonyTile.getColony().getVacantColonyTileProductionFor(tempUnit, Goods.COTTON) + ")",
-                            unitLabel.getCanvas().getImageProvider().getGoodsImageIcon(ImageLibrary.GOODS_COTTON));
-                    menuItem.setActionCommand(String.valueOf(UnitLabel.WORKTYPE_COTTON));
-                    menuItem.addActionListener(unitLabel);
-                    menu.add(menuItem);
-                    menuItem = new JMenuItem(Messages.message("beAFurTrapper") + " ("
-                            + tempUnit.getFarmedPotential(Goods.FURS, colonyTile.getWorkTile()) + "/"
-                            + colonyTile.getColony().getVacantColonyTileProductionFor(tempUnit, Goods.FURS) + ")",
-                            unitLabel.getCanvas().getImageProvider().getGoodsImageIcon(ImageLibrary.GOODS_FURS));
-                    menuItem.setActionCommand(String.valueOf(UnitLabel.WORKTYPE_FURS));
-                    menuItem.addActionListener(unitLabel);
-                    menu.add(menuItem);
-                    menuItem = new JMenuItem(Messages.message("beALumberjack") + " ("
-                            + tempUnit.getFarmedPotential(Goods.LUMBER, colonyTile.getWorkTile()) + "/"
-                            + colonyTile.getColony().getVacantColonyTileProductionFor(tempUnit, Goods.LUMBER) + ")",
-                            unitLabel.getCanvas().getImageProvider().getGoodsImageIcon(ImageLibrary.GOODS_LUMBER));
-                    menuItem.setActionCommand(String.valueOf(UnitLabel.WORKTYPE_LUMBER));
-                    menuItem.addActionListener(unitLabel);
-                    menu.add(menuItem);
-                    menuItem = new JMenuItem(Messages.message("beAnOreMiner") + " ("
-                            + tempUnit.getFarmedPotential(Goods.ORE, colonyTile.getWorkTile()) + "/"
-                            + colonyTile.getColony().getVacantColonyTileProductionFor(tempUnit, Goods.ORE) + ")",
-                            unitLabel.getCanvas().getImageProvider().getGoodsImageIcon(ImageLibrary.GOODS_ORE));
-                    menuItem.setActionCommand(String.valueOf(UnitLabel.WORKTYPE_ORE));
-                    menuItem.addActionListener(unitLabel);
-                    menu.add(menuItem);
-                    menuItem = new JMenuItem(Messages.message("beASilverMiner") + " ("
-                            + tempUnit.getFarmedPotential(Goods.SILVER, colonyTile.getWorkTile()) + "/"
-                            + colonyTile.getColony().getVacantColonyTileProductionFor(tempUnit, Goods.SILVER) + ")",
-                            unitLabel.getCanvas().getImageProvider().getGoodsImageIcon(ImageLibrary.GOODS_SILVER));
-                    menuItem.setActionCommand(String.valueOf(UnitLabel.WORKTYPE_SILVER));
-                    menuItem.addActionListener(unitLabel);
-                    menu.add(menuItem);
+                    for (int index = 0; index < goodsTypes.length; index++) {
+                        int potential = tempUnit.getFarmedPotential(goodsTypes[index], 
+                                                                    colonyTile.getWorkTile());
+                        if (potential > 0) {
+                            int maxPotential = colonyTile.getColony()
+                                .getVacantColonyTileProductionFor(tempUnit, goodsTypes[index]);
+                            menuItem = new JMenuItem(Messages.message(messages[index]) +
+                                                     " (" + potential + "/" + maxPotential + ")",
+                                                     imageLibrary.getScaledGoodsImageIcon(goodsTypes[index], 0.66f));
+                            menuItem.setActionCommand(String.valueOf(workTypes[index]));
+                            menuItem.addActionListener(unitLabel);
+                            menu.add(menuItem);
+                        }
+                    }
+                    menu.addSeparator();
+                }
 
+                if (tempUnit.getLocation().getTile() != null && 
+                    tempUnit.getLocation().getTile().getSettlement() != null) {
+                    Colony colony = (Colony) tempUnit.getLocation().getColony();
+                    Iterator<Building> buildingIterator = colony.getBuildingIterator();
+                    while (buildingIterator.hasNext()) {
+                        Building building = buildingIterator.next();
+                        if (building.isBuilt() && building.canAdd(tempUnit)) {
+                            String locName = building.getName();
+                            int goodsType = building.getGoodsOutputType();
+                            menuItem = new JMenuItem(locName);
+                            if (goodsType > -1) {
+                                menuItem.setIcon(imageLibrary.getScaledGoodsImageIcon(goodsType, 0.66f));
+                            }
+                            menuItem.setActionCommand(String.valueOf(UnitLabel.WORK_AT_SOMEWHERE+building.getType()));
+                            menuItem.addActionListener(unitLabel);
+                            menu.add(menuItem);
+                        }
+                    }
                     menu.addSeparator();
                 }
 
@@ -160,7 +153,7 @@ public final class DragListener extends MouseAdapter {
                             if (tempUnit.getTile() == null) { // -> in Europe
                                 menuItem = new JMenuItem(Messages.message("arm") + " ("
                                         + tempUnit.getOwner().getMarket().getBidPrice(Goods.MUSKETS, 50) + " gold)",
-                                        unitLabel.getCanvas().getImageProvider().getGoodsImageIcon(
+                                        imageLibrary.getGoodsImageIcon(
                                                 ImageLibrary.GOODS_MUSKETS));
                             } else {
                                 menuItem = new JMenuItem(Messages.message("arm"), unitLabel.getCanvas()
@@ -180,7 +173,7 @@ public final class DragListener extends MouseAdapter {
                             if (tempUnit.getTile() == null) { // -> in Europe
                                 menuItem = new JMenuItem(Messages.message("mount") + " ("
                                         + tempUnit.getOwner().getMarket().getBidPrice(Goods.HORSES, 50) + " gold)",
-                                        unitLabel.getCanvas().getImageProvider().getGoodsImageIcon(
+                                        imageLibrary.getGoodsImageIcon(
                                                 ImageLibrary.GOODS_HORSES));
                             } else {
                                 menuItem = new JMenuItem(Messages.message("mount"), unitLabel.getCanvas()
@@ -202,7 +195,7 @@ public final class DragListener extends MouseAdapter {
                                 int price = tempUnit.getOwner().getMarket().getBidPrice(Goods.TOOLS, amount);
                                 if (price <= tempUnit.getOwner().getGold()) {
                                     menuItem = new JMenuItem(Messages.message("equipWithTools") + " (" + price
-                                            + " gold)", unitLabel.getCanvas().getImageProvider().getGoodsImageIcon(
+                                            + " gold)", imageLibrary.getGoodsImageIcon(
                                             ImageLibrary.GOODS_TOOLS));
                                 } else {
                                     while (price > tempUnit.getOwner().getGold()) {
@@ -211,7 +204,7 @@ public final class DragListener extends MouseAdapter {
                                     }
                                     menuItem = new JMenuItem(Messages.message("equipWith") + ' ' + amount + " "
                                             + Messages.message("model.goods.Tools") + " (" + price + " "
-                                            + Messages.message("gold") + ")", unitLabel.getCanvas().getImageProvider()
+                                            + Messages.message("gold") + ")", imageLibrary
                                             .getGoodsImageIcon(ImageLibrary.GOODS_TOOLS));
 
                                 }
@@ -253,25 +246,6 @@ public final class DragListener extends MouseAdapter {
                         menu.add(menuItem);
                     }
                     
-                    if (tempUnit.getType() != Unit.INDIAN_CONVERT) {
-                        if (tempUnit.getLocation().getTile() != null && 
-                            tempUnit.getLocation().getTile().getSettlement() != null) {
-                            menu.addSeparator();
-                            Colony colony = (Colony) tempUnit.getLocation().getColony();
-                            Iterator<Building> buildingIterator = colony.getBuildingIterator();
-                            while (buildingIterator.hasNext()) {
-                                Building building = buildingIterator.next();
-                                if (building.isBuilt() && building.canAdd(tempUnit)) {
-                                    String locName = building.getName();
-                                    menuItem = new JMenuItem(locName);
-                                    menuItem.setActionCommand(String.valueOf(UnitLabel.WORK_AT_SOMEWHERE+building.getType()));
-                                    menuItem.addActionListener(unitLabel);
-                                    menu.add(menuItem);
-                                }
-                            }
-                        }
-                        menu.addSeparator();
-                    }
                 }
 
                 menuItem = new JMenuItem(Messages.message("menuBar.colopedia"));

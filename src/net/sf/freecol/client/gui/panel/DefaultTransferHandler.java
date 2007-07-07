@@ -46,7 +46,6 @@ public final class DefaultTransferHandler extends TransferHandler {
 
     private static Logger logger = Logger.getLogger(DefaultTransferHandler.class.getName());
 
-    //private static final DataFlavor flavor = DataFlavor.imageFlavor;
     public static final DataFlavor flavor = new DataFlavor(ImageSelection.class, "ImageSelection");
 
     private final Canvas canvas;
@@ -80,7 +79,11 @@ public final class DefaultTransferHandler extends TransferHandler {
     * flavor that is indicated by the second parameter, 'false' otherwise.
     */
     public boolean canImport(JComponent comp, DataFlavor[] flavor) {
-        if (!(comp instanceof UnitLabel) && !(comp instanceof GoodsLabel) && !(comp instanceof MarketLabel) && !(comp instanceof JPanel) && !(comp instanceof JLabel)) {
+        if (!(comp instanceof UnitLabel) &&
+            !(comp instanceof GoodsLabel) &&
+            !(comp instanceof MarketLabel) &&
+            !(comp instanceof JPanel) &&
+            !(comp instanceof JLabel)) {
             return false;
         }
         for (int i = 0; i < flavor.length; i++) {
