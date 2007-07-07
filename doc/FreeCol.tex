@@ -19,7 +19,7 @@
 
 \begin{document}
 \author{\href{http://freecol.sourceforge.net/index.php?section=8}{The FreeCol Team}}
-\title{FreeCol Documentation\\User Guide for Version v0.6.2}
+\title{FreeCol Documentation\\User Guide for Version v0.7.0}
 \maketitle{}
 
 \tableofcontents
@@ -116,26 +116,52 @@ providing a strong governmental system.
 
 \hypertarget{Installation}{\section{Installation}}
 
-To compile FreeCol you'll need Java and the Ant build system. FreeCol
-is known to work with Sun's Java 5, but not with projects based on GNU
-Classpath, as some font handling classes used by FreeCol have not yet
-been implemented. If you are using Linux, using Java 6 is recommended,
-as its font handling is much better. Ant can be found at \href{Ant
-homepage}{http://ant.apache.org/}. FreeCol requires at least 128 MB
-memory and works best with a screen resolution of at least 1024x768
-pixels.
+You can download a system independent installer, which should install
+FreeCol and set up the required shortcuts on your desktop. If
+everything works as planned, you will only need to double click the
+icon in order to start the game. If this is not the case, then please
+read the following paragraphs.
 
-When these are installed, go to the root directory of FreeCol and type
+\hypertarget{System Requirements}{\subsection{System Requirements}}
+
+FreeCol is written in Java. In order to run, it requires a Java
+Virtual Machine. In theory, FreeCol should run on any platform on
+which a Java Virtual Machine compatible with Sun Java 5 or 6 is
+available. In practice, however, things are less clear cut.
+
+FreeCol is known to work with Sun's Java 5 and 6 (which you can get
+\href{http://java.sun.com/}{here}, but not with projects based on GNU
+Classpath or OpenJDK, as some font handling classes used by FreeCol
+have not yet been implemented. This is expected to change in the near
+future, however. FreeCol is known to run on recent versions of Windows
+and Linux, and on MacOSX to some extent. If you are using Linux, using
+Java 6 is recommended, as its font rendering is much better. If you
+are using FreeCol on a different platform, we would like to hear about
+it.
+
+FreeCol requires at least 128 MB memory and works best with a screen
+resolution of at least 1024x768 pixels. You can still use the game
+with a smaller screen, but some dialogs will not be completely
+displayed.
+
+\hypertarget{Compiling FreeCol}{\subsection{Compiling FreeCol}}
+
+In order to compile FreeCol you will need Java and the Ant build
+system, which you can get \href{http://ant.apache.org/}{here}. When
+these are installed, go to the root directory of FreeCol and type
 \verb$ant$ to build a JAR file containing the game. This process
-requires the ``native2ascii'' task, which is an optional ant
-task. Some Linux distributions place optional tasks in a different
-package, so make sure you have installed all necessary packages if you
-are a Linux user. The game is started using the command
-\verb$java -Xmx128M -jar FreeCol.jar$.  If something goes wrong, leave
-a bug report at the
+requires the \verb$native2ascii$\index{native2ascii} task, which is an
+optional ant task. Some Linux distributions place optional tasks in a
+different package, so make sure you have installed all necessary
+packages if you are a Linux user. The game is started using the
+command \verb$java -Xmx128M -jar FreeCol.jar$.
+
+If something goes wrong, please open a bug report at the
 \href{http://sourceforge.net/projects/freecol}{SourceForge page of
-  FreeCol}. Use the command \verb$ant -projecthelp$ to find out about
-other kinds of things you can build (this manual, for example).
+  FreeCol}. Use the command \verb$ant -projecthelp$ to find out
+about other kinds of things you can build (this manual, for
+example). Note that you will require additional software to build the
+manual, however.
 
 
 \hypertarget{Interface}{\section{Interface}}
@@ -146,31 +172,38 @@ that can be used in the game.
 
 \hypertarget{Starting the game}{\subsection{Starting the game}}
 
+If you installed FreeCol with the system independent installer, or the
+Windows installer, there should be a shortcut on your desktop. Double
+click the icon in order to start the game. If that does not work, or
+if you prefer using the command line, then please read the following
+paragraphs.
+
+
 \hypertarget{Command line options}{\subsubsection{Command line options}}
 
-First of all, you need to pass the Java Virtual Machine some arguments
-that tell it how much memory to allocate and which jar file to open.
-These are the arguments \verb$-Xmx128M$ and \verb$-jar FreeCol.jar$,
-respectively. You can allocate more than 128 MB, if you like, but no
-less. Refer to the manual of your Java Virtual Machine for details.
+If you are in the directory in which FreeCol is installed, you can
+start the game with the command \verb$java -Xmx128M -jar FreeCol.jar$.
+This will tell the Virtual Machine to load the game and to set the
+maximum heap size to 128 MB. Refer to the manual of your Java Virtual
+Machine for details.
 
 There are many other Java options, but you probably won't need to
 change the default settings. FreeCol is developed in English, but it
-includes translations into Breton, German, Spanish, Farsi (Persian),
-Finnish, French, Hungarian, (Brazilian) Portuguese and Russian (sorted
-by language key), some of which are not very complete, however. Java
-will automatically select the translation for your locale, if
-available, and English otherwise. If you should wish to select a
-different language, or if language selection fails, you can choose a
-different language from the preferences menu.
+includes translations into Breton, Finnish, French, German, Hungarian,
+Italian, (Brazilian) Portuguese, Russian, Spanish and Swedish, some of
+which are not very complete, however. Java will automatically select
+the translation for your locale, if available, and English
+otherwise. If you should wish to select a different language, or if
+language selection fails, you can choose a different language from the
+\hyperlink{Client options}{preferences menu}.
 
 FreeCol also provides several application-specific command line
 options:
 
 \begin{itemize}
 \item\verb$--freecol-data DIR$ Specify the directory that contains
-FreeCol's data files. In general, you will not need to use this, as
-the jar file contains all the necessary data files.
+FreeCol's data files. In general, you will only need to use this if
+you have installed a modified copy of FreeCol's data files.
 \item\verb$--windowed[[=]WIDTHxHEIGHT]$ Run FreeCol in windowed mode
 instead of full screen mode and set the window width and height. You
 will need this if your window manager or Java Virtual Machine do not
@@ -194,7 +227,7 @@ server options.
 \end{itemize}
 
 There are several other options that you will probably only be
-intersted in if you are a developer:
+interested in if you are a developer:
 
 \begin{itemize}
 \item\verb$--no-java-check$ Skip the java version check.
@@ -208,7 +241,7 @@ intersted in if you are a developer:
 
 If you start FreeCol without command line options, the game will first
 open a dialog that allows you to start a new game, to open a saved
-game, to set various options, and to quit.
+game, to open the map editor, to set various options, and to quit.
 
 If you decide to start a new game, you will be presented with another
 dialog, which enables you to start a single-player game, to retrieve a
@@ -248,6 +281,9 @@ configure your firewall to permit connections to that server, port
 $3540$. In order to connect to a server, your client also needs to
 bind a port. Which port depends on the operating system you use.
 
+If you are running a public game server, then your firewall must also
+permit the clients to connect to the port of the game server.
+
 
 \hypertarget{Client options}{\subsection{Client options}}
 
@@ -258,13 +294,18 @@ auto-saving.
 First, we have general \hypertarget{display options}{display options}:
 
 \begin{itemize}
-\item The language\index{language} to use. If the translation you
-  choose is not complete, the missing strings will be taken from the
-  English language version.
+\item The language\index{language} to use. Some languages are spoken in
+more than one country. In this case, you might also be able to select
+a specific country. If the translation you choose is not complete, the
+missing strings will be taken from another language file. This could
+be the default translation for your language or the English language
+version. If you selected Austrian German, for example, missing strings
+would be taken from the default German translation if available, and
+the English language version otherwise.
 \item The minimum number of goods to display with a counter. If you
 accept the default setting of seven, for example, six hammers will be
 diplayed without a number, and seven hammers will be displayed with
-the number \verb$7$ on top. Note that many panels only show a single
+the number \verb$7$ on top. Note that some panels only show a single
 item with a number next to it or below it anyway.
 \item The maximum number of goods to display. If you accept the
 default setting of seven, then no more than seven items will be
@@ -306,9 +347,9 @@ of starvation.
 \item Foreign diplomatic messages about the declaration of wars and
 signing of peace treaties.
 \item Messages about the prices of goods in Europe changing.
-\item Warnings about the suitability of prospective colony
-sites. These messages are particularly useful for new players. Turn
-them on if you are unsure where to establish your colonies.
+\item Warnings about the suitability of colony sites. These messages
+  are particularly useful for new players. Turn them on if you are
+  unsure where to establish your colonies.
 \item Messages about the factors that influence combat. Turn them on
 to learn more about things like the terrain bonus, the ambush bonus,
 or the ``artillery in the open'' penalty.
@@ -322,7 +363,7 @@ settings} always, only when starting multi-player games, or
 never. These settings include the name, address and port of the game
 server you wish to connect to. If you only play single-player games,
 you can choose the option ``never''.
-\item After how many terms you want the client to create an auto-save
+\item After how many turns you want the client to create an auto-save
 file. If you select \verb$0$, then the client will never create
 auto-save files.
 \end{itemize}
@@ -351,8 +392,8 @@ coloured dots on the minimap.
 The menubar obviously contains the menu. It contains the submenus
 Game, View, Orders, Report and Colopedia, at the left hand of the
 screen, as well as a status area at the right hand of the screen. The
-status area tells you about the amount of gold you possess, your
-current tax rate and the current turn.
+status area tells you about your score, the amount of gold you
+possess, your current tax rate and the current turn.
 
 The \hypertarget{game menu}{Game Menu} allows you to:
 
@@ -405,10 +446,10 @@ example, and the build colony order is only available if the unit is
 able to build colonies and the tile it is on will support a colony.
 
 The \hypertarget{reports menu}{Reports Menu} provides access to
-various reports on the current state of your colonies. Various icons,
-as well as text strings of a greyish-brown colour are links to the
-places they refer to. If you click on the name of a colony, for
-example, the \hyperlink{colony panel}{Colony Panel} will be opened. 
+various reports on the current state of your colonies. In these
+reports, icons as well as text strings of a greyish-brown colour link
+to the places they refer to. If you click on the name of a colony, for
+example, the \hyperlink{colony panel}{Colony Panel} will be opened.
 
 \begin{itemize}
 \item The \Report{Religious Advisor} tells you how many crosses your
@@ -422,13 +463,13 @@ you can use this report to locate him.
 each of your colonies, what each colony is producing, which buildings
 have already been built, and which building is currently being built.
 \item The \Report{Foreign Affairs Advisor} tells you about your
-relations with foreign powers, the number of colonies and units they
-possess, as well as their relative naval and military strength. As
-soon as \hyperlink{Jan de Witt}{Jan de Witt} has joined the
-\hyperlink{Continental Congress}{Continental Congress}, you are also
-informed about the amount of gold, the number of Founding Fathers, the
-current tax and the current Sons of Liberty membership of your
-opponents.
+  relations with foreign powers, the number of colonies and units they
+  possess, as well as their relative naval and military strength, and
+  the amount of gold they possess. As soon as \hyperlink{Jan de
+    Witt}{Jan de Witt} has joined the \hyperlink{Continental
+    Congress}{Continental Congress}, you are also informed about the
+  number of Founding Fathers, the current tax and the current Sons of
+  Liberty membership of your opponents.
 \item The \Report{Indian Advisor} tells you about your relations with
 the various Indian nations, and the number of settlements they
 possess.
@@ -455,9 +496,11 @@ exported from these colonies.
   that have occurred during the current turn. If no such events have
   occurred, the Turn Report will not open.
 \item The \Report{Requirements Report} gives an account of how well
-  various requirements of your colonies are met. It tells you which
-  colonies require expert units and where these units can be obtained
-  or trained, for example.
+certain requirements of your colonies are met. It tells you which
+colonies require expert units and where these units can be obtained or
+trained, for example. It also tells you which colonies require raw
+materials in order to increase their production of manufactured goods,
+and which colonies produce a surplus of these materials.
 \end{itemize}
 
 The \hypertarget{colopedia menu}{Colopedia Menu} provides access to
@@ -481,14 +524,23 @@ Congress.
 
 \hypertarget{info panel}{\subsubsection{The Info Panel}}
 
-The info panel in the lower right corner of the screen either shows
-information on the currently selected unit, or contains a button to
-end the current turn if no unit is selected. If a unit is selected,
-then the info panel shows an image of the unit, as well as its name
-and the moves it has left. If the unit is a carrier unit, such as a
-ship or wagon train, the info panel also shows the units or goods on
-board of the carrier. If the unit is a pioneer, the info panel shows
-the number of tools the unit carries.
+If you are in unit view mode (the default), the info panel in the
+lower right corner of the screen either shows information on the
+currently selected unit, or contains a button to end the current turn
+if no unit is selected. If a unit is selected, then the info panel
+shows an image of the unit, as well as its name and the moves it has
+left. If the unit is a carrier unit, such as a ship or wagon train,
+the info panel also shows the units or goods on board of the
+carrier. If the unit is a pioneer, the info panel shows the number of
+tools the unit carries.
+
+If a unit is displayed, you can click on the info panel in order to
+centre the map on this unit.
+
+If you are in terrain view mode, then the info panel displays the
+name, owner, defense bonus, movement cost and potential production of
+the selected tile. You can switch between view modes by pressing
+\verb$Shift-Ctrl-V$, or by using the view menu.
 
 
 \hypertarget{minimap}{\subsubsection{The Minimap}}
@@ -581,7 +633,7 @@ Once you release the mouse button, the selected unit will begin to
 follow this path. It will awake once it has arrived at its destination
 or if it can no longer follow the path (if a unit belonging to a
 different player is in the way, for instance). You can also press the
-middle mouse button, or both mouse buttons if your mouse has two
+middle mouse button, or both mouse buttons if your mouse only has two
 buttons, in order to give the selected unit a movement order.
 
 Units are marked with small coloured shields, which may or may not
@@ -610,7 +662,7 @@ or bad. A Settlement with a European mission displays a third shield
 bearing a cross on a black or grey background. The colour of the cross
 indicates the European nation that established the mission. The
 background of the shield is black if the mission was established by a
-\hyperlink{Jesuit Missionary}{Jesuit Missionary}, and gray otherwise.
+\hyperlink{Jesuit Missionary}{Jesuit Missionary}, and grey otherwise.
 
 The order buttons represent some of the orders you can give to your
 units. You can move your mouse over the buttons to see their
@@ -664,25 +716,37 @@ If a ship has set sail for Europe or America, you can change its
 direction by dragging it from the Going to America box to the Going
 to Europe box (or vice versa).
 
-Ships that are docked at the European port can also do the following:
-\begin{itemize}
-\item Embark/Disembark units: drag and drop between the Docks
-  and Cargo sections of the Europe panel.
-\item Sell/Buy goods: drag and drop between the Cargo panel and the
-  Market panel. If you want to sell only a part of your cargo, or
-  want to buy less than 100 units of goods, press the shift key while
-  dragging. This will allow you to specify how many units you wish to
-  transfer. If any of the goods are displayed in grey, this means they
-  are being boycotted by the Crown because you refused a tax
-  raise. You must pay your tax arrears before you can trade these
-  goods. You can do this by dragging the goods as usual, in which case
-  you will be given the chance to pay your tax arrears (provided you
-  have enough money).
-\item Arm/Mount/Equip with tools/Dress as missionaries a unit: 
-  right click on the unit.
-\item Move your ship to the Going to America section of the Europe
-  panel in order to sail to the New World.
-\end{itemize}
+If a ship has docked at the European port can drag and drop units
+between the Docks and Cargo panel. You drag and drop goods between the
+Cargo panel and the Market panel. If you want to buy or sell less than
+100 units of goods, press the shift key while dragging. This will
+allow you to specify how many units you wish to transfer. If you press
+the ``Unload'' button, all goods will be unloaded.
+
+If any of the goods are displayed in grey, this means they are being
+boycotted by the Crown because you refused a tax raise. You must pay
+your tax arrears before you can trade these goods. You can do this by
+dragging the goods as usual, in which case you will be given the
+chance to pay your tax arrears (provided you have enough money). A
+small area at the top right of the screen will keep track of how much
+money you made or spent and how much taxes you paid.
+
+From time to time, new colonists eager to join you in the New World
+will appear on the European Docks. If you are unwilling to wait, you
+can also recruit new colonists by paying for their journey to the New
+World. Alternatively, you can train expert units at the Royal
+University. Paying for their education is expensive, however, and not
+all types of experts are available in Europe.
+
+Units present in Europe can also be armed, mounted, equipped with
+tools or blessed as missionaries in Europe. In order to select one of
+these actions, you need to right click on the unit. Note that you will
+have to pay for the arms, horses or tools required to equip your
+units.
+
+In order to send a ship back to the New World, you must drag it to the
+Going to America section of the Europe panel.
+
 
 \hypertarget{colony panel}{\subsection{The Colony panel}}
 
@@ -694,28 +758,54 @@ The figure \ref{colony_panel_fig} represents the Colony panel.
   \end{center}
 \end{figure}
 
-To view a colony's panel, left click on it from the main
-screen. From this panel, colonist's cultivation, production, and other
-tasks can be assigned:
+To view a colony's panel, left click on it from the main screen. In
+this panel, colonists can be assigned to cultivate tiles surrounding
+the colony, to work in buildings, defend the colony against attackers
+or wait outside of the colony.
 
-\begin{itemize}
-\item Cultivation: Drop the unit onto the appropriate plot of land in
-  the colony. You can change what a colonist cultivate by right
-  clicking on it. Note that your colonists can not go fishing on ocean
-  tiles before they have built \hyperlink{Dock}{Docks}.
-\item Production: Drop the unit onto the relevant Buildings.
-\item Depart colony: Drop the unit onto the colony's gate.
-\item Embark on a ship: If there is a ship in port, you can embark
-  your colonist on it by dropping it onto the Cargo section of the
-  colony panel.
-\item Build a building: Drop the unit onto the carpenter's house and
-  select the building you want from the building menu.
-\end{itemize}
+The colony panel consists of several panels and control elements with
+different functions. At the top of the panel, you can see a select box
+displaying the name of the colony, which can be used to select a
+different colony.
 
-You can also load a ship by dragging goods from the warehouse panel to
-the ship, and unload it by dragging goods from the ship to the
-warehouse panel. Use the shift key while dragging if you want to load
-only a portion of the goods.
+Below this select box, you can see the area surrounding the colony to
+the left and a scroll pane displaying the buildings of the colony to
+the right. You can drag and drop a unit on a tile or a building. The
+tiles surrounding the colony can produce several kinds of goods,
+however. If the unit is not producing the right kind of goods, you can
+right click on the unit to select a different kind of work.
+
+As buildings can produce only one type of goods, the unit will
+automatically do the right kind of work. Nonetheless, you can also
+right click a unit in a building in order to assign it to a different
+building.
+
+Below the surrounding area, you can see the production panel, which
+shows how much food, horses, bells and crosses your colony is
+producing. It also tells you how many colonists support the Sons of
+Liberty and how many support the crown.
+
+Below the list of buildings, you can see four elements related to
+the production of buildings and units. At the top left, a select box
+allows you to select the building or unit you wish to build. The
+button at the bottom left allows you to buy the selected building or
+unit instead of building it. The two progress bars to the right show
+you how many hammers and tools are required to finish the selected
+building or unit, how many hammers and tools you have already
+produced, how many will be produced in the next turn, and how long it
+will take until all necessary goods have been produced.
+
+Yet further below, two panels show you the ships or wagon trains in
+your colony's port. If there is at least one unit present, the cargo
+panel to the right will show you the cargo of the selected
+carrier. Below these two panels, you can see the colony's warehouse
+area. You can drag and drop goods from the warehouse to the cargo
+panel and vice versa in order to load and unload your ships or wagon
+trains. Press the shift key while selecting goods if you do not wish
+to select all the goods present, or less than one hundred units.
+
+You can also drag and drop units from one of the other areas
+to the cargo panel of a ship.
 
 The \hyperlink{Warehouse}{Warehouse} can only hold a certain amount of
 goods of each type. Its initial capacity is limited to 100 units of
@@ -731,14 +821,34 @@ to export them to Europe automatically. Goods marked to be exported
 are printed in green. Right-click on the goods again to stop exporting
 them automatically.
 
+To the right of these panels you can see the units outside of your
+colony. These can be fortified units defending your colony, or units
+just passing through, or waiting for passage elsewhere. Right clicking
+on one of these units once again allows you to give them orders. You
+can also drag and drop units from and to this area.
+
+At the bottom of the Colony Screen, you will see a row of buttons, not
+all of which are always active. From left to right, these buttons will
+allow you to
+
+\begin{itemize}
+\item Unload the active ship or wagon train
+\item Fill up all partially filled holds of the active ship or
+wagon train
+\item Open the warehouse dialog in able to change the export and
+warning levels for all types of goods
+\item Rename the colony
+\item Close the dialog
+\end{itemize}
+
 
 \hypertarget{The New World}{\section{The New World}}
 
 At the beginning of the game, you will start with a naval vessel and
 two colonists. Your first task will be to discover the New World,
-which should lie due West, although sailing North or South may prove
-quicker. As soon as you have discovered land, you can establish your
-colonies and produce goods to send home to Europe.
+which should lie due West, although sailing North West or South West
+may prove quicker. As soon as you have discovered land, you can
+establish your colonies and produce goods to send home to Europe.
 
 \hypertarget{Terrain Types}{\subsection{Terrain Types}}
 
@@ -804,8 +914,8 @@ higher prices.
 colonists consume two units of food each turn. If this demand can not
 be met, some of your colonists will starve to death.  On the other
 hand, a colony that has accumulated 200 units of food will produce a
-new \hyperlink{Free Colonist}{Free Colonist}.  Buying food in Europe
-is always expensive, but unfortunately colonial foodstuffs fetch only
+new \hyperlink{Free Colonist}{Free Colonist}. Unfortunately, buying
+food in Europe is always expensive, and colonial foodstuffs fetch only
 poor prices.
 
 Food comes in two varieties, \Goods{Grain}, which can be cultivated on
@@ -872,10 +982,12 @@ in Europe and are useful for trading with native settlements, which
 generally demand Trade Goods.
 
 
-%% \hypertarget{Resources}{\subsection{Special Resources}}
+\hypertarget{Resources}{\subsection{Special Resources}}
 
-%% Some types of terrain can also have special resources, which increase
-%% the production of one or more types of goods.
+Some types of terrain can also have special resources, which increase
+the production of a particular type of goods. These resources look
+just like the goods they will produce. These tiles are particularly
+valuable.
 
 
 \hypertarget{Native Settlements}{\subsection{Native Settlements}}
@@ -921,15 +1033,14 @@ for the first time may be to your advantage. The chief may offer you
 some gold, or tell you about nearby lands. If your Scout is not a
 \hyperlink{Seasoned Scout}{Seasoned Scout} already, he may become so.
 
-\hyperlink{Free Colonist}{Free
-Colonists} and \hyperlink{Indentured Servant}{Indentured Servants} may
-enter a settlement in order to learn the skills of the natives. And
-\hyperlink{Missionary}{Missionaries}, which may be either
-\hyperlink{Jesuit Missionary}{Jesuit Missionaries} or ordinary
-colonists blessed as missionaries in the \hyperlink{Home Port}{Home
-Port} or any colony with a \hyperlink{Church}{Church}, are able to
-establish a \Concept{Mission} or to incite the natives against another
-European nation.
+\hyperlink{Free Colonist}{Free Colonists} and \hyperlink{Indentured 
+Servant}{Indentured Servants} may enter a settlement in order to learn
+the skills of the natives. And \hyperlink{Missionary}{Missionaries},
+which may be either \hyperlink{Jesuit Missionary}{Jesuit Missionaries}
+or ordinary colonists blessed as missionaries in the \hyperlink{Home
+Port}{Home Port} or any colony with a \hyperlink{Church}{Church}, are
+able to establish a \Concept{Mission} or to incite the natives against
+another European nation.
 
 The presence of a Mission will reduce tension between the natives and
 your colonists. In time, some of the natives may also convert and join
@@ -1161,7 +1272,7 @@ have to be constructed later:
 \item The \Building{Stables} increase the production of
   \hyperlink{Horses}{Horses}.
 
-\item The \Building{Dock} allows colonists to produce
+\item The \Building{Dock} allow colonists to produce
   \hyperlink{Fish}{Fish} on ocean tiles adjacent to the colony. As
   soon as the population is at least 4, it can be upgraded to a
   \Building{Drydock}, which allows the colony to repair damaged
@@ -1187,7 +1298,7 @@ have to be constructed later:
 
 Some buildings have an immediate effect. The
 \hyperlink{Stockade}{Stockade}, for example, provides protection for
-your colony, and the \hyperlink{Docks}{Docks} enable your colonists to
+your colony, and the \hyperlink{Dock}{Docks} enable your colonists to
 go fishing. The effects of these buildings can not be increased by
 workers. In the building box at the top right of the \hyperlink{colony
 panel}{colony panel}, these buildings are shown in parentheses (like
@@ -1288,14 +1399,15 @@ type of goods. This means that you will no longer be able to trade
 these goods in the Home Port until the Boycott is lifted.
 
 You can end a Boycott by paying the outstanding tax arrears. As soon
-as \hyperlink{Jacob Fugger II}{Jacob Fugger II} joins the \hyperlink{
-Continental Congress}{Continental Congress}, all Boycotts will be 
-lifted, but the Monarch may declare further Boycotts later on. As soon
-as \hyperlink{Peter Stuyvesant}{Peter Stuyvesant} joins the \hyperlink{
-Continental Congress}{Continental Congress}, you will be able to build
-\hyperlink{Custom House}{Custom Houses} in your colonies. The original 
-Colonization game contained a bug which made the Custom House ignore 
-all Boycotts, and this behaviour is available as a rule variant.
+as \hyperlink{Jacob Fugger II}{Jacob Fugger II} joins the
+\hyperlink{Continental Congress}{Continental Congress}, all Boycotts
+will be lifted, but the Monarch may declare further Boycotts later
+on. As soon as \hyperlink{Peter Stuyvesant}{Peter Stuyvesant} joins
+the \hyperlink{Continental Congress}{Continental Congress}, you will
+be able to build \hyperlink{Custom House}{Custom Houses} in your
+colonies. The original Colonization game contained a bug which made
+the Custom House ignore all Boycotts, and this behaviour is available
+as a rule variant.
 
 Naturally, the Monarch does not trust your colonists, some of which
 are nothing but \hyperlink{Petty Criminal}{Petty Criminals}, and some
@@ -1860,7 +1972,8 @@ reconnect to the server by using the reconnect option in the
 
 
 \hypertarget{Copyright Notice}{\section{Copyright Notice}}
-Copyright � 2006
+
+Copyright \copyright 2007
 \href{http://freecol.sourceforge.net/index.php?section=8}{The FreeCol
 Team}.
 
