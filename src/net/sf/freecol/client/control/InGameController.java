@@ -893,8 +893,14 @@ public final class InGameController implements NetworkConstants {
             scoutForeignColony(unit, direction);
             break;
         case Unit.ENTER_SETTLEMENT_WITH_CARRIER_AND_GOODS:
-            negotiate(unit, direction);
-            //tradeWithSettlement(unit, direction);
+            //TODO: unify trade and negotiations
+            Map map = freeColClient.getGame().getMap();
+            Settlement settlement = map.getNeighbourOrNull(direction, unit.getTile()).getSettlement();
+            if (settlement instanceof Colony) {
+                negotiate(unit, direction);
+            } else {
+                tradeWithSettlement(unit, direction);
+            }
             break;
         case Unit.EXPLORE_LOST_CITY_RUMOUR:
             exploreLostCityRumour(unit, direction);
