@@ -25,6 +25,11 @@ public final class SfxLibrary extends SoundLibrary {
     public static final int MUSKETSHORSES = 7;
     public static final int DRAGOON = 8;
     public static final int SUNK = 9;
+    public static final int ANTHEM_BASE = 10;
+    public static final int ANTHEM_DUTCH = ANTHEM_BASE+0;
+    public static final int ANTHEM_SPANISH = ANTHEM_BASE+1;
+    public static final int ANTHEM_FRENCH = ANTHEM_BASE+2;
+    public static final int ANTHEM_ENGLISH = ANTHEM_BASE+3;
 
     
     /**

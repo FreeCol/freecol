@@ -261,6 +261,8 @@ public final class InGameController implements NetworkConstants {
                 }
             }
 
+            this.freeColClient.playSound(SfxLibrary.ANTHEM_BASE + currentPlayer.getNation());
+
             displayModelMessages(true);
             nextActiveUnit();
         }
