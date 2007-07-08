@@ -439,13 +439,9 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
 
     public boolean canAddAsTeacher(int unitType) {
         if (getType() == SCHOOLHOUSE) {
-            switch (unitType) {
-            case Unit.INDIAN_CONVERT:
-            case Unit.FREE_COLONIST:
-            case Unit.INDENTURED_SERVANT:
-            case Unit.PETTY_CRIMINAL:
+            if (Unit.getSkillLevel(unitType) <= 0) {
                 return false;
-            default:
+            } else {
                 return (getLevel() >= Unit.getSkillLevel(unitType));
             }
         } else {

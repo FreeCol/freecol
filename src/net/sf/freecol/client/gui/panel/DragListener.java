@@ -16,6 +16,7 @@ import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.ColonyTile;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.Unit;
+import net.sf.freecol.common.model.WorkLocation;
 
 /**
  * A DragListener should be attached to Swing components that have a
@@ -78,8 +79,58 @@ public final class DragListener extends MouseAdapter {
 
                 JPopupMenu menu = new JPopupMenu("Unit");
                 JMenuItem menuItem;
+                boolean separatorNeeded = false;
 
-                if (tempUnit.getColony() != null) {
+                if (//(tempUnit.isColonist() || tempUnit.getType() == Unit.INDIAN_CONVERT) &&
+                    tempUnit.getLocation() instanceof ColonyTile) {
+                    ColonyTile colonyTile = (ColonyTile) tempUnit.getLocation();
+                    for (int index = 0; index < goodsTypes.length; index++) {
+                        int potential = tempUnit.getFarmedPotential(goodsTypes[index], 
+                                                                    colonyTile.getWorkTile());
+                        if (potential > 0) {
+                            int maxPotential = colonyTile.getColony()
+                                .getVacantColonyTileProductionFor(tempUnit, goodsTypes[index]);
+                            menuItem = new JMenuItem(Messages.message(messages[index]) +
+                                                     " (" + potential + "/" + maxPotential + ")",
+                                                     imageLibrary.getScaledGoodsImageIcon(goodsTypes[index], 0.66f));
+                            menuItem.setActionCommand(String.valueOf(workTypes[index]));
+                            menuItem.addActionListener(unitLabel);
+                            menu.add(menuItem);
+                        }
+                    }
+                    separatorNeeded = true;
+                }
+
+                if (tempUnit.getLocation().getTile() != null && 
+                    tempUnit.getLocation().getTile().getSettlement() != null) {
+                    Colony colony = (Colony) tempUnit.getLocation().getColony();
+                    Iterator<Building> buildingIterator = colony.getBuildingIterator();
+                    while (buildingIterator.hasNext()) {
+                        Building building = buildingIterator.next();
+                        if (building.isBuilt() && building.canAdd(tempUnit)) {
+                            int goodsType = building.getGoodsOutputType();
+                            String locName = building.getName();
+                            menuItem = new JMenuItem(locName);
+                            if (goodsType > -1) {
+                                menuItem.setIcon(imageLibrary.getScaledGoodsImageIcon(goodsType, 0.66f));
+                                int potential = tempUnit.getProducedAmount(building.getGoodsOutputType());
+                                locName += " (" + potential + " " + Goods.getName(goodsType) + ")";
+                                menuItem.setText(locName);
+                            }
+                            menuItem.setActionCommand(String.valueOf(UnitLabel.WORK_AT_SOMEWHERE+building.getType()));
+                            menuItem.addActionListener(unitLabel);
+                            menu.add(menuItem);
+                        }
+                    }
+                    separatorNeeded = true;
+                }
+
+                if (separatorNeeded) {
+                    menu.addSeparator();
+                    separatorNeeded = false;
+                }
+
+                if (tempUnit.getColony() != null && !(tempUnit.getLocation() instanceof WorkLocation)) {
                     menuItem = new JMenuItem(Messages.message("activateUnit"));
                     menuItem.setActionCommand(String.valueOf(UnitLabel.ACTIVATE_UNIT));
                     menuItem.addActionListener(unitLabel);
@@ -103,147 +154,110 @@ public final class DragListener extends MouseAdapter {
                 }
 
 
-                if ((tempUnit.isColonist() || tempUnit.getType() == Unit.INDIAN_CONVERT)
-                        && tempUnit.getLocation() instanceof ColonyTile) {
-                    ColonyTile colonyTile = (ColonyTile) tempUnit.getLocation();
-                    for (int index = 0; index < goodsTypes.length; index++) {
-                        int potential = tempUnit.getFarmedPotential(goodsTypes[index], 
-                                                                    colonyTile.getWorkTile());
-                        if (potential > 0) {
-                            int maxPotential = colonyTile.getColony()
-                                .getVacantColonyTileProductionFor(tempUnit, goodsTypes[index]);
-                            menuItem = new JMenuItem(Messages.message(messages[index]) +
-                                                     " (" + potential + "/" + maxPotential + ")",
-                                                     imageLibrary.getScaledGoodsImageIcon(goodsTypes[index], 0.66f));
-                            menuItem.setActionCommand(String.valueOf(workTypes[index]));
-                            menuItem.addActionListener(unitLabel);
-                            menu.add(menuItem);
-                        }
-                    }
-                    menu.addSeparator();
-                }
-
-                if (tempUnit.getLocation().getTile() != null && 
-                    tempUnit.getLocation().getTile().getSettlement() != null) {
-                    Colony colony = (Colony) tempUnit.getLocation().getColony();
-                    Iterator<Building> buildingIterator = colony.getBuildingIterator();
-                    while (buildingIterator.hasNext()) {
-                        Building building = buildingIterator.next();
-                        if (building.isBuilt() && building.canAdd(tempUnit)) {
-                            String locName = building.getName();
-                            int goodsType = building.getGoodsOutputType();
-                            menuItem = new JMenuItem(locName);
-                            if (goodsType > -1) {
-                                menuItem.setIcon(imageLibrary.getScaledGoodsImageIcon(goodsType, 0.66f));
-                            }
-                            menuItem.setActionCommand(String.valueOf(UnitLabel.WORK_AT_SOMEWHERE+building.getType()));
-                            menuItem.addActionListener(unitLabel);
-                            menu.add(menuItem);
-                        }
-                    }
-                    menu.addSeparator();
-                }
-
                 if (tempUnit.isColonist()) {
                     if (tempUnit.canBeArmed()) {
                         if (tempUnit.isArmed()) {
-                            menuItem = new JMenuItem(Messages.message("disarm"), unitLabel.getCanvas()
-                                    .getImageProvider().getGoodsImageIcon(ImageLibrary.GOODS_MUSKETS));
+                            menuItem = new JMenuItem(Messages.message("disarm"));
                         } else {
                             if (tempUnit.getTile() == null) { // -> in Europe
-                                menuItem = new JMenuItem(Messages.message("arm") + " ("
-                                        + tempUnit.getOwner().getMarket().getBidPrice(Goods.MUSKETS, 50) + " gold)",
-                                        imageLibrary.getGoodsImageIcon(
-                                                ImageLibrary.GOODS_MUSKETS));
+                                int price = tempUnit.getOwner().getMarket().getBidPrice(Goods.MUSKETS, 50);
+                                menuItem = new JMenuItem(Messages.message("arm") + " (" +
+                                                         Messages.message("goldAmount", "%amount%",
+                                                                          String.valueOf(price)) + ")");
                             } else {
-                                menuItem = new JMenuItem(Messages.message("arm"), unitLabel.getCanvas()
-                                        .getImageProvider().getGoodsImageIcon(ImageLibrary.GOODS_MUSKETS));
+                                menuItem = new JMenuItem(Messages.message("arm"));
                             }
                         }
+                        menuItem.setIcon(imageLibrary.getScaledGoodsImageIcon(ImageLibrary.GOODS_MUSKETS, 0.66f));
                         menuItem.setActionCommand(String.valueOf(UnitLabel.ARM));
                         menuItem.addActionListener(unitLabel);
                         menu.add(menuItem);
+                        separatorNeeded = true;
                     }
 
                     if (tempUnit.canBeMounted()) {
                         if (tempUnit.isMounted()) {
-                            menuItem = new JMenuItem(Messages.message("removeHorses"), unitLabel.getCanvas()
-                                    .getImageProvider().getGoodsImageIcon(ImageLibrary.GOODS_HORSES));
+                            menuItem = new JMenuItem(Messages.message("removeHorses"));
                         } else {
                             if (tempUnit.getTile() == null) { // -> in Europe
-                                menuItem = new JMenuItem(Messages.message("mount") + " ("
-                                        + tempUnit.getOwner().getMarket().getBidPrice(Goods.HORSES, 50) + " gold)",
-                                        imageLibrary.getGoodsImageIcon(
-                                                ImageLibrary.GOODS_HORSES));
+                                int price = tempUnit.getOwner().getMarket().getBidPrice(Goods.HORSES, 50);
+                                menuItem = new JMenuItem(Messages.message("mount") + " (" +
+                                                         Messages.message("goldAmount", "%amount%",
+                                                                          String.valueOf(price)) + ")");
                             } else {
-                                menuItem = new JMenuItem(Messages.message("mount"), unitLabel.getCanvas()
-                                        .getImageProvider().getGoodsImageIcon(ImageLibrary.GOODS_HORSES));
+                                menuItem = new JMenuItem(Messages.message("mount"));
                             }
                         }
+                        menuItem.setIcon(imageLibrary.getScaledGoodsImageIcon(ImageLibrary.GOODS_HORSES, 0.66f));
                         menuItem.setActionCommand(String.valueOf(UnitLabel.MOUNT));
                         menuItem.addActionListener(unitLabel);
                         menu.add(menuItem);
+                        separatorNeeded = true;
                     }
 
                     if (tempUnit.canBeEquippedWithTools()) {
                         if (tempUnit.isPioneer()) {
-                            menuItem = new JMenuItem(Messages.message("removeTools"), unitLabel.getCanvas()
-                                    .getImageProvider().getGoodsImageIcon(ImageLibrary.GOODS_TOOLS));
+                            menuItem = new JMenuItem(Messages.message("removeTools"));
                         } else {
                             if (tempUnit.getTile() == null) { // -> in Europe
                                 int amount = 100;
                                 int price = tempUnit.getOwner().getMarket().getBidPrice(Goods.TOOLS, amount);
                                 if (price <= tempUnit.getOwner().getGold()) {
-                                    menuItem = new JMenuItem(Messages.message("equipWithTools") + " (" + price
-                                            + " gold)", imageLibrary.getGoodsImageIcon(
-                                            ImageLibrary.GOODS_TOOLS));
+                                    menuItem = new JMenuItem(Messages.message("equipWithTools") + " (" +
+                                                             Messages.message("goldAmount", "%amount%",
+                                                                              String.valueOf(price)) + ")");
                                 } else {
                                     while (price > tempUnit.getOwner().getGold()) {
                                         amount -= 20;
                                         price = tempUnit.getOwner().getMarket().getBidPrice(Goods.TOOLS, amount);
                                     }
-                                    menuItem = new JMenuItem(Messages.message("equipWith") + ' ' + amount + " "
-                                            + Messages.message("model.goods.Tools") + " (" + price + " "
-                                            + Messages.message("gold") + ")", imageLibrary
-                                            .getGoodsImageIcon(ImageLibrary.GOODS_TOOLS));
+                                    menuItem = new JMenuItem(Messages.message("equipWithToolsNumber", "%number%",
+                                                                              String.valueOf(amount)) + " " +
+                                                             Messages.message("goldAmount", "%amount%",
+                                                                              String.valueOf(price)) + ")");
 
                                 }
                             } else {
-                                menuItem = new JMenuItem(Messages.message("equipWithTools"), unitLabel.getCanvas()
-                                        .getImageProvider().getGoodsImageIcon(ImageLibrary.GOODS_TOOLS));
+                                menuItem = new JMenuItem(Messages.message("equipWithTools"));
                             }
                         }
+                        menuItem.setIcon(imageLibrary.getScaledGoodsImageIcon(ImageLibrary.GOODS_TOOLS, 0.66f));
                         menuItem.setActionCommand(String.valueOf(UnitLabel.TOOLS));
                         menuItem.addActionListener(unitLabel);
                         menu.add(menuItem);
+                        separatorNeeded = true;
                     }
 
                     if (tempUnit.canBeDressedAsMissionary()) {
 
                         if (tempUnit.isMissionary()) {
-                            menuItem = new JMenuItem(Messages.message("cancelMissionaryStatus"), unitLabel.getCanvas()
-                                    .getImageProvider().getGoodsImageIcon(ImageLibrary.GOODS_CROSSES));
+                            menuItem = new JMenuItem(Messages.message("cancelMissionaryStatus"));
                         } else {
-                            menuItem = new JMenuItem(Messages.message("blessAsMissionaries"), unitLabel.getCanvas()
-                                    .getImageProvider().getGoodsImageIcon(ImageLibrary.GOODS_CROSSES));
+                            menuItem = new JMenuItem(Messages.message("blessAsMissionaries"));
                         }
+                        menuItem.setIcon(imageLibrary.getScaledGoodsImageIcon(ImageLibrary.GOODS_CROSSES, 0.66f));
                         menuItem.setActionCommand(String.valueOf(UnitLabel.DRESS));
                         menuItem.addActionListener(unitLabel);
                         menu.add(menuItem);
+                        separatorNeeded = true;
                     }
 
+                    if (separatorNeeded) {
+                        menu.addSeparator();
+                        separatorNeeded = false;
+                    }
+
+                    if (tempUnit.getUnitType().skill > 0) {
+                    /*
                     if (tempUnit.getType() != Unit.INDIAN_CONVERT && tempUnit.getType() != Unit.PETTY_CRIMINAL
                             && tempUnit.getType() != Unit.INDENTURED_SERVANT
                             && tempUnit.getType() != Unit.FREE_COLONIST) {
-
-                        if (menu.getSubElements().length > 0) {
-                            menu.addSeparator();
-                        }
-
+                    */
                         menuItem = new JMenuItem(Messages.message("clearSpeciality"));
                         menuItem.setActionCommand(String.valueOf(UnitLabel.CLEAR_SPECIALITY));
                         menuItem.addActionListener(unitLabel);
                         menu.add(menuItem);
+                        menu.addSeparator();
                     }
                     
                 }
