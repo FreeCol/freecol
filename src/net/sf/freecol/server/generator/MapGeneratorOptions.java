@@ -245,49 +245,6 @@ public class MapGeneratorOptions extends OptionMap {
      */
     protected void addDefaultOptions() {
         /* Add options here: */
-        add(new SelectOption(MAP_SIZE,
-                "mapGeneratorOptions." + MAP_SIZE + ".name", 
-                "mapGeneratorOptions." + MAP_SIZE + ".shortDescription", 
-                new String[] {"small", "medium", "large", "veryLarge", "huge"},
-                0)
-        );
-        add(new SelectOption(LAND_MASS,
-                "mapGeneratorOptions." + LAND_MASS + ".name", 
-                "mapGeneratorOptions." + LAND_MASS + ".shortDescription", 
-                new String[] {"small", "medium", "large", "veryLarge", "huge"},
-                1)
-        );
-        add(new SelectOption(RIVER_NUMBER,
-                "mapGeneratorOptions." + RIVER_NUMBER + ".name", 
-                "mapGeneratorOptions." + RIVER_NUMBER + ".shortDescription", 
-                new String[] {"small", "medium", "large", "veryLarge", "huge"},
-                1)
-        );
-        add(new SelectOption(MOUNTAIN_NUMBER,
-                "mapGeneratorOptions." + MOUNTAIN_NUMBER + ".name", 
-                "mapGeneratorOptions." + MOUNTAIN_NUMBER + ".shortDescription", 
-                new String[] {"small", "medium", "large", "veryLarge", "huge"},
-                1)
-        );
-        add(new SelectOption(RUMOUR_NUMBER,
-                "mapGeneratorOptions." + RUMOUR_NUMBER + ".name", 
-                "mapGeneratorOptions." + RUMOUR_NUMBER + ".shortDescription", 
-                new String[] {"small", "medium", "large", "veryLarge", "huge"},
-                1)
-        );
-        add(new SelectOption(FOREST_NUMBER,
-                "mapGeneratorOptions." + FOREST_NUMBER + ".name", 
-                "mapGeneratorOptions." + FOREST_NUMBER + ".shortDescription", 
-                new String[] {"small", "medium", "large", "veryLarge", "huge"},
-                2)
-        );
-        add(new SelectOption(BONUS_NUMBER,
-                "mapGeneratorOptions." + BONUS_NUMBER + ".name", 
-                "mapGeneratorOptions." + BONUS_NUMBER + ".shortDescription", 
-                new String[] {"small", "medium", "large", "veryLarge", "huge"},
-                1)
-        );
-        
         final OptionGroup importGroup = new OptionGroup("mapGeneratorOptions.import.name", "mapGeneratorOptions.import.shortDescription");
         final FileOption optionImportFile = new FileOption(IMPORT_FILE, "mapGeneratorOptions.import." + IMPORT_FILE + ".name", "mapGeneratorOptions.import." + IMPORT_FILE + ".shortDescription");
         importGroup.add(optionImportFile);
@@ -310,6 +267,54 @@ public class MapGeneratorOptions extends OptionMap {
                 "mapGeneratorOptions.import." + IMPORT_RUMOURS + ".shortDescription",
                 false));
         add(importGroup);
+        
+        final OptionGroup landGeneratorGroup = new OptionGroup("mapGeneratorOptions.landGenerator.name","mapGeneratorOptions.landGenerator.shortDescription");
+        landGeneratorGroup.add(new SelectOption(MAP_SIZE,
+                "mapGeneratorOptions." + MAP_SIZE + ".name", 
+                "mapGeneratorOptions." + MAP_SIZE + ".shortDescription", 
+                new String[] {"small", "medium", "large", "veryLarge", "huge"},
+                0)
+        );
+        landGeneratorGroup.add(new SelectOption(LAND_MASS,
+                "mapGeneratorOptions." + LAND_MASS + ".name", 
+                "mapGeneratorOptions." + LAND_MASS + ".shortDescription", 
+                new String[] {"small", "medium", "large", "veryLarge", "huge"},
+                1)
+        );
+        add(landGeneratorGroup);
+        
+        final OptionGroup terrainGeneratorGroup = new OptionGroup("mapGeneratorOptions.terrainGenerator.name","mapGeneratorOptions.terrainGenerator.shortDescription");
+        terrainGeneratorGroup.add(new SelectOption(RIVER_NUMBER,
+                "mapGeneratorOptions." + RIVER_NUMBER + ".name", 
+                "mapGeneratorOptions." + RIVER_NUMBER + ".shortDescription", 
+                new String[] {"small", "medium", "large", "veryLarge", "huge"},
+                1)
+        );
+        terrainGeneratorGroup.add(new SelectOption(MOUNTAIN_NUMBER,
+                "mapGeneratorOptions." + MOUNTAIN_NUMBER + ".name", 
+                "mapGeneratorOptions." + MOUNTAIN_NUMBER + ".shortDescription", 
+                new String[] {"small", "medium", "large", "veryLarge", "huge"},
+                1)
+        );
+        terrainGeneratorGroup.add(new SelectOption(RUMOUR_NUMBER,
+                "mapGeneratorOptions." + RUMOUR_NUMBER + ".name", 
+                "mapGeneratorOptions." + RUMOUR_NUMBER + ".shortDescription", 
+                new String[] {"small", "medium", "large", "veryLarge", "huge"},
+                1)
+        );
+        terrainGeneratorGroup.add(new SelectOption(FOREST_NUMBER,
+                "mapGeneratorOptions." + FOREST_NUMBER + ".name", 
+                "mapGeneratorOptions." + FOREST_NUMBER + ".shortDescription", 
+                new String[] {"small", "medium", "large", "veryLarge", "huge"},
+                2)
+        );
+        terrainGeneratorGroup.add(new SelectOption(BONUS_NUMBER,
+                "mapGeneratorOptions." + BONUS_NUMBER + ".name", 
+                "mapGeneratorOptions." + BONUS_NUMBER + ".shortDescription", 
+                new String[] {"small", "medium", "large", "veryLarge", "huge"},
+                1)
+        );
+        add(terrainGeneratorGroup);
     }
 
     /**
