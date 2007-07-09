@@ -300,6 +300,9 @@
                         <res id="shortcutSpec.xml" src="@{freecol.build.dir}/winShortcutSpec.xml"/>
                         <res id="Unix_shortcutSpec.xml" src="@{freecol.build.dir}/unixShortcutSpec.xml"/>
                         <res id="installer.langsel.img" src="@{freecol.build.dir}/install.png"/>
+                        <res id="packsLang.xml_eng" src="@{freecol.build.dir}/installer/lang.xml_eng"/>
+                        <res id="packsLang.xml_ned" src="@{freecol.build.dir}/installer/lang.xml_ned"/>
+                        <res id="packsLang.xml_spa" src="@{freecol.build.dir}/installer/lang.xml_spa"/>
                     </resources>
                     <native type="izpack" name="ShellLink.dll"/>
                     <panels>
