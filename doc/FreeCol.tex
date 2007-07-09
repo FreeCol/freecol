@@ -241,7 +241,8 @@ interested in if you are a developer:
 
 If you start FreeCol without command line options, the game will first
 open a dialog that allows you to start a new game, to open a saved
-game, to open the map editor, to set various options, and to quit.
+game, to open the map editor, to set various \hyperlink{Client
+  options}{options}, and to quit.
 
 If you decide to start a new game, you will be presented with another
 dialog, which enables you to start a single-player game, to retrieve a
@@ -283,6 +284,25 @@ bind a port. Which port depends on the operating system you use.
 
 If you are running a public game server, then your firewall must also
 permit the clients to connect to the port of the game server.
+
+
+\hypertarget{Game options}{\subsubsection{Game options}}
+
+If you decide to start a single-player game or a game server, you will
+be able to choose which nation to play and which colour to use. The
+\hypertarget{map generator options}{map generator options} allow you
+to load a map, or to set several parameters that will influence the
+size and terrain of a randomly generated map. FreeCol includes a large
+map of the Americas, which can be selected by clicking on the map
+icon.
+
+The game options proper allow you to select several parameters that
+influence game play, such as non-standard rules, victory conditions
+and the difficulty of the game.
+
+If you join a multi-player game, you can also choose a nation and
+colour, but other players might already have selected your preferred
+nation.
 
 
 \hypertarget{Client options}{\subsection{Client options}}
@@ -647,7 +667,7 @@ orange shields. The letter indicates the current state of the unit:
 \item\verb$G$: the unit is going somewhere.
 \item\verb$P$: the unit is plowing a tile.
 \item\verb$R$: the unit is building a road.
-\item\verb$S$: the unit is a sentry.
+\item\verb$S$: the unit is a sentry (waiting for transport).
 \end{itemize}
 
 If the unit is a foreign naval unit, the shield will display a number
@@ -680,7 +700,7 @@ use the following \hypertarget{keyboard shortcuts}{keyboard shortcuts}:
 \item\verb$g$: goto some destination.
 \item\verb$p$: plow the current tile.
 \item\verb$r$: build a road on the current tile.
-\item\verb$s$: sentry (not yet implemented).
+\item\verb$s$: be a sentry (wait for something to happen).
 \item\verb$w$: wait.
 \item\verb$space$: skip for this turn.
 \item\verb$enter$: end the turn.
@@ -696,6 +716,9 @@ use the following \hypertarget{keyboard shortcuts}{keyboard shortcuts}:
 \item\verb$ctrl-s$: save a game.
 \item\verb$ctrl-t$: show the chat panel.
 \end{itemize}
+
+You can customize these settings in the preferences dialog.
+
 
 \hypertarget{The Europe panel}{\subsection{The Europe panel}}
 
@@ -1323,8 +1346,9 @@ certain kinds of units, such as \hyperlink{Artillery}{Artillery} and
 ships, you will need to produce \hyperlink{Hammers}{Hammers}, which
 represent work being done. Hammers are made from
 \hyperlink{Lumber}{Lumber}, so you need to produce lumber, either by
-cutting down forests, or by placing a lumberjack on a forested tile
-next to your colony. Then you can place a colonist in the
+cutting down forests, or by placing a colonist on a forested tile next
+to your colony and ordering him to work as a lumberjack (right click
+on the unit to give it orders). Then you can place a colonist in the
 \hyperlink{Carpenter's House}{Carpenter's House} in order to convert
 the lumber to Hammers.
 
@@ -1650,14 +1674,30 @@ work assignment, he may learn the necessary skill and become an
 expert. This does not work for the more complicated jobs within the
 colony, however. 
 
-As soon as you construct a \hyperlink{Schoolhouse}{Schoolhouse}, you
-can place a master craftsman in the Schoolhouse in order to teach
-other free colonists his skill. Petty Criminals and Indentured
-Servants can not be directly upgraded to master craftsmen.  However, a
-Petty Criminal may become an Indentured Servant, and an Indentured
-Servant may become a Free Colonist through education. Petty Criminals
-may also become Indentured Servants, and Indentured Servants may also
-become Free Colonists by winning a battle.
+The \hyperlink{Schoolhouse}{Schoolhouse} and its upgrades, the
+\hyperlink{College}{College} and the
+\hyperlink{University}{University}, allow you to train your units
+yourself by placing a skilled unit in one of these buildings. Note
+that the Master Sugar Planter, the Master Cotton Planter, the Master
+Tobacco Planter, the Expert Fur Trapper, the Master Distiller, the
+Master Weaver, the Master Tobacconist, the Master Blacksmith and the
+Master Gunsmith all require at least a \hyperlink{College}{College},
+while the Elder Statesman, the Firebrand Preacher and the Jesuit
+Missionary even require a \hyperlink{University}{University} to teach
+their profession.
+
+A Free Colonist can learn any skill or profession in this manner, but
+Petty Criminals and Indentured Servants can not.  However, a Petty
+Criminal may become an Indentured Servant, and an Indentured Servant
+may become a Free Colonist through education. Any colonist placed in a
+schoolhouse, college or university is able to provide this kind of
+education.
+
+Petty Criminals may also become Indentured Servants, and Indentured
+Servants may also become Free Colonists by winning a battle and being
+\hyperlink{promotion}{promoted}. Free Colonists can be promoted to
+Veteran Soldiers, and after the Declaration of Independence, these may
+be promoted to Colonial Regulars.
 
 Indian units are more productive than free colonists when working
 outside of the colony, and less productive when working inside a
@@ -1687,15 +1727,16 @@ defender, the attacker wins. Otherwise the defender wins. If a tile is
 occupied by more than one unit, the attacker will fight against the
 defender with the strongest defence.
 
-Most units that win a battle may be promoted, and all units that lose
-a battle will always be captured, demoted, damaged or destroyed. A
-\hyperlink{Petty Criminal}{Petty Criminal} may be promoted to an
-\hyperlink{Indentured Servant}{Indentured Servant}, and an Indentured
-Servant may be promoted to a \hyperlink{Free Colonist}{Free
-Colonist}. A Free Colonist may be promoted to a \hyperlink{Veteran
-Soldier}{Veteran Soldier}, which in turn may be promoted to a
-\hyperlink{Colonial Regular}{Colonial Regular}, but only after the
-\hyperlink{Declaration of Independence}{Declaration of Independence}.
+Most units that win a battle may be \hypertarget{promotion}{promoted},
+and all units that lose a battle will always be captured, demoted,
+damaged or destroyed. A \hyperlink{Petty Criminal}{Petty Criminal} may
+be promoted to an \hyperlink{Indentured Servant}{Indentured Servant},
+and an Indentured Servant may be promoted to a \hyperlink{Free
+  Colonist}{Free Colonist}. A Free Colonist may be promoted to a
+\hyperlink{Veteran Soldier}{Veteran Soldier}, which in turn may be
+promoted to a \hyperlink{Colonial Regular}{Colonial Regular}, but only
+after the \hyperlink{Declaration of Independence}{Declaration of
+  Independence}.
 
 A Dragoon that loses a battle will be demoted to a Soldier, and a
 Soldier that loses a battle will be demoted to an unarmed colonist. An
