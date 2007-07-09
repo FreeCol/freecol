@@ -3,18 +3,25 @@ package net.sf.freecol.client.gui.panel;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.File;
 import java.util.logging.Logger;
 
 import javax.swing.BorderFactory;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.UIManager;
 
+import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.i18n.Messages;
+import net.sf.freecol.client.gui.option.BooleanOptionUI;
+import net.sf.freecol.client.gui.option.FileOptionUI;
 import net.sf.freecol.client.gui.option.OptionMapUI;
 import net.sf.freecol.server.generator.MapGeneratorOptions;
 
@@ -78,7 +85,7 @@ public final class MapGeneratorOptionsDialog extends FreeColDialog implements Ac
 
         FreeColPanel.enterPressesWhenFocused(ok);
         setCancelComponent(cancel);
-
+        
         setSize(750, 500);
     }
 
@@ -111,6 +118,38 @@ public final class MapGeneratorOptionsDialog extends FreeColDialog implements Ac
         add(buttons, BorderLayout.SOUTH);
 
         ok.setEnabled(editable);
+        
+        /*
+         * TODO: This was a temporary hack for release 0.7.0
+         *       It should be done automatically in the future.
+         *       The image can be included in the mapfile.
+         *       The update should be solved by PropertyEvent.
+         */
+        JPanel shortcutsPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        shortcutsPanel.add(new JLabel(Messages.message("shortcuts")));
+        Image americasImage = (Image) UIManager.get("map.americas");
+        ImageIcon americasIcon = (americasImage != null) ? new ImageIcon(americasImage) : null;
+        final File americasMapFile = new File(FreeCol.getDataDirectory() + File.separator + "maps", "america-large.fsg");
+        if (americasIcon != null && americasMapFile.exists()) {
+            JButton americasButton = new JButton(Messages.message("map.americas"), americasIcon);
+            americasButton.setBorderPainted(false);
+            americasButton.setRolloverEnabled(true);
+            final OptionMapUI theUI = ui;
+            americasButton.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent e) {
+                    theUI.reset();
+                    FileOptionUI fou = (FileOptionUI) theUI.getOptionUI(MapGeneratorOptions.IMPORT_FILE);
+                    fou.setValue(americasMapFile);
+                    
+                    ((BooleanOptionUI) theUI.getOptionUI(MapGeneratorOptions.IMPORT_LAND_MAP)).setValue(true);
+                    ((BooleanOptionUI) theUI.getOptionUI(MapGeneratorOptions.IMPORT_RUMOURS)).setValue(false);
+                    ((BooleanOptionUI) theUI.getOptionUI(MapGeneratorOptions.IMPORT_TERRAIN)).setValue(true);
+                    ((BooleanOptionUI) theUI.getOptionUI(MapGeneratorOptions.IMPORT_BONUSES)).setValue(false);
+                }
+            });
+            shortcutsPanel.add(americasButton);
+        }
+        uiPanel.add(shortcutsPanel, BorderLayout.NORTH);
     }
 
     public void requestFocus() {

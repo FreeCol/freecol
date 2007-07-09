@@ -7,12 +7,14 @@ import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.logging.Logger;
 
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
+import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.KeyStroke;
 
@@ -52,7 +54,7 @@ public final class OptionGroupUI extends JPanel implements OptionUpdater {
      * @param option The <code>OptionGroup</code> to make a user interface
      *            for.
      */
-    public OptionGroupUI(OptionGroup option, boolean editable, int level) {
+    public OptionGroupUI(OptionGroup option, boolean editable, int level, HashMap<String, JComponent> optionUIs) {
         
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
         
@@ -66,7 +68,7 @@ public final class OptionGroupUI extends JPanel implements OptionUpdater {
 
             if (o instanceof OptionGroup) {
                 if (level == 2) {
-                    final OptionGroupUI groupUI = new OptionGroupUI((OptionGroup) o, editable, 1);
+                    final OptionGroupUI groupUI = new OptionGroupUI((OptionGroup) o, editable, 1, optionUIs);
                     final OptionGroupButton ogb = new OptionGroupButton(o.getName(), groupUI);
                     ou.add(ogb);
                     if ((horizontalPanel == null) || !buttonAdded) {
@@ -77,7 +79,7 @@ public final class OptionGroupUI extends JPanel implements OptionUpdater {
                     horizontalPanel.add(ogb);
                     buttonAdded = true;
                 } else {
-                    final OptionGroupUI groupUI = new OptionGroupUI((OptionGroup) o, editable, level+1);
+                    final OptionGroupUI groupUI = new OptionGroupUI((OptionGroup) o, editable, level+1, optionUIs);
                     add(groupUI);
                     ou.add(groupUI);
                     buttonAdded = false;
@@ -96,21 +98,33 @@ public final class OptionGroupUI extends JPanel implements OptionUpdater {
                     horizontalPanel = null;
                 }
                 buttonAdded = false;
+                if (!o.getId().equals(Option.NO_ID)) {
+                    optionUIs.put(o.getId(), boi);
+                }
             } else if (o instanceof IntegerOption) {
                 final IntegerOptionUI iou = new IntegerOptionUI((IntegerOption) o, editable);
                 add(iou);
                 ou.add(iou);
                 buttonAdded = false;
+                if (!o.getId().equals(Option.NO_ID)) {
+                    optionUIs.put(o.getId(), iou);
+                }
             } else if (o instanceof FileOption) {
                 final FileOptionUI iou = new FileOptionUI((FileOption) o, editable);
                 add(iou);
                 ou.add(iou);
-                buttonAdded = false;                
+                buttonAdded = false;
+                if (!o.getId().equals(Option.NO_ID)) {
+                    optionUIs.put(o.getId(), iou);
+                }
             } else if (o instanceof SelectOption) {
                 final SelectOptionUI soi = new SelectOptionUI((SelectOption) o, editable);
                 add(soi);
                 ou.add(soi);
                 buttonAdded = false;
+                if (!o.getId().equals(Option.NO_ID)) {
+                    optionUIs.put(o.getId(), soi);
+                }
             } else if (o instanceof FreeColAction) {
                 final FreeColActionUI fau = new FreeColActionUI((FreeColAction) o, this);
                 ou.add(fau);
@@ -128,6 +142,9 @@ public final class OptionGroupUI extends JPanel implements OptionUpdater {
                 }
                 buttonAdded = false;
                 */
+                if (!o.getId().equals(Option.NO_ID)) {
+                    optionUIs.put(o.getId(), fau);
+                }
             } else {
                 logger.warning("Unknown option.");
             }

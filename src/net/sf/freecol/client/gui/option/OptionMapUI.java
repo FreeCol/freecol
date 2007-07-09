@@ -2,6 +2,7 @@ package net.sf.freecol.client.gui.option;
 
 import java.awt.BorderLayout;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.logging.Logger;
 
@@ -34,6 +35,8 @@ public final class OptionMapUI extends JPanel implements OptionUpdater {
     public static final String REVISION = "$Revision$";
 
     private final OptionUpdater[] optionUpdaters;
+    
+    private final HashMap<String, JComponent> optionUIs;
 
     private final JTabbedPane tb;
 
@@ -62,6 +65,8 @@ public final class OptionMapUI extends JPanel implements OptionUpdater {
         JPanel northPanel = new JPanel();
         northPanel.setLayout(new BoxLayout(northPanel, BoxLayout.Y_AXIS));
         northPanel.setOpaque(false);
+        
+        optionUIs = new HashMap<String, JComponent>();
 
         tb = new JTabbedPane(JTabbedPane.TOP);
         tb.setOpaque(false);
@@ -72,7 +77,7 @@ public final class OptionMapUI extends JPanel implements OptionUpdater {
             Option o = it.next();
 
             if (o instanceof OptionGroup) {
-                JComponent c = new OptionGroupUI((OptionGroup) o, editable, 1);
+                JComponent c = new OptionGroupUI((OptionGroup) o, editable, 1, optionUIs);
                 c.setOpaque(true);
                 ou.add(c);
                 JScrollPane scroll = new JScrollPane(c, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
@@ -86,18 +91,30 @@ public final class OptionMapUI extends JPanel implements OptionUpdater {
                 JComponent c = new BooleanOptionUI((BooleanOption) o, editable);
                 northPanel.add(c);
                 ou.add(c);
+                if (!o.getId().equals(Option.NO_ID)) {
+                    optionUIs.put(o.getId(), c);
+                }
             } else if (o instanceof FileOption) {
                 final FileOptionUI iou = new FileOptionUI((FileOption) o, editable);
                 northPanel.add(iou);
                 ou.add(iou);
+                if (!o.getId().equals(Option.NO_ID)) {
+                    optionUIs.put(o.getId(), iou);
+                }
             } else if (o instanceof IntegerOption) {
                 JComponent c = new IntegerOptionUI((IntegerOption) o, editable);
                 northPanel.add(c);
                 ou.add(c);
+                if (!o.getId().equals(Option.NO_ID)) {
+                    optionUIs.put(o.getId(), c);
+                }
             } else if (o instanceof SelectOption) {
                 JComponent c = new SelectOptionUI((SelectOption) o, editable);
                 northPanel.add(c);
                 ou.add(c);
+                if (!o.getId().equals(Option.NO_ID)) {
+                    optionUIs.put(o.getId(), c);
+                }
             } else {
                 logger.warning("Unknown option.");
             }
@@ -128,6 +145,10 @@ public final class OptionMapUI extends JPanel implements OptionUpdater {
         for (int i = 0; i < optionUpdaters.length; i++) {
             optionUpdaters[i].updateOption();
         }
+    }
+    
+    public JComponent getOptionUI(String key) {
+        return optionUIs.get(key);
     }
 
     /**

@@ -4,6 +4,7 @@ package net.sf.freecol.client.gui.option;
 import java.awt.FlowLayout;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.io.File;
 import java.util.logging.Logger;
 
 import javax.swing.JCheckBox;
@@ -82,5 +83,12 @@ public final class BooleanOptionUI extends JPanel implements OptionUpdater, Prop
      */
     public void reset() {
         checkBox.setSelected(option.getValue());
+    }
+    
+    /**
+     * Sets the value of this component.
+     */
+    public void setValue(boolean b) {
+        checkBox.setSelected(b);
     }
 }

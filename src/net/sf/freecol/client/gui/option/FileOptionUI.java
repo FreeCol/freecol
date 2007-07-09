@@ -137,8 +137,15 @@ public final class FileOptionUI extends JPanel implements OptionUpdater, Propert
      * Reset with the value from the option.
      */
     public void reset() {
-        if (option.getValue() != null) { 
-            fileField.setText(option.getValue().getAbsolutePath());
+        setValue(option.getValue());
+    }
+    
+    /**
+     * Sets the value of this component.
+     */
+    public void setValue(File f) {
+        if (f != null) { 
+            fileField.setText(f.getAbsolutePath());
         } else {
             fileField.setText("");
         }
