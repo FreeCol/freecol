@@ -1813,7 +1813,9 @@ public final class GUI {
     private void displayFogOfWar(Graphics2D g, Map map, Tile tile, int x, int y) {  
         if (tile.isExplored()) {
             final boolean displayFogOfWar = freeColClient.getClientOptions().getBoolean(ClientOptions.DISPLAY_FOG_OF_WAR);
-            if (displayFogOfWar && !freeColClient.getMyPlayer().canSee(tile)) {
+            if (displayFogOfWar
+                    && freeColClient.getMyPlayer() != null
+                    && !freeColClient.getMyPlayer().canSee(tile)) {
                 g.setColor(Color.BLACK);
                 Composite oldComposite = g.getComposite();
                 g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.2f));
