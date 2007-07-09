@@ -7,9 +7,12 @@ import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Image;
+import java.awt.MouseInfo;
+import java.awt.Point;
 
 import javax.swing.AbstractButton;
 import javax.swing.JComponent;
+import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.plaf.ComponentUI;
 import javax.swing.plaf.metal.MetalButtonUI;
@@ -55,6 +58,16 @@ public class FreeColButtonUI extends MetalButtonUI {
             }
         }
         super.paint(g, b);
+        
+        AbstractButton a = (AbstractButton) b;
+        if (a.isRolloverEnabled()) {
+            Point p = MouseInfo.getPointerInfo().getLocation();
+            SwingUtilities.convertPointFromScreen(p, b);
+            boolean rollover = b.contains(p);
+            if (rollover) { 
+                paintButtonPressed(g, (AbstractButton) b);
+            }
+        }
     }
     
     protected void paintButtonPressed(Graphics g, AbstractButton b) {
