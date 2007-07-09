@@ -80,10 +80,16 @@ public final class IntegerOptionUI extends JPanel implements OptionUpdater, Prop
     }
     
     /**
-    * Updates the value of the {@link Option} this object keeps.
-    */
+     * Updates the value of the {@link Option} this object keeps.
+     */
     public void updateOption() {
         option.setValue(((Integer) spinner.getValue()).intValue());
     }
 
+    /**
+     * Reset with the value from the option.
+     */
+    public void reset() {
+        spinner.setValue(option.getValue());
+    }
 }

@@ -3,11 +3,11 @@ package net.sf.freecol.client.gui.option;
 
 
 /**
-* Interface for classes which temporarily stores changes for an
-* <code>Option</code>. Calling {@link #updateOption} should update
-* the {@link net.sf.freecol.common.option.Option} with that new
-* information.
-*/
+ * Interface for classes which temporarily stores changes for an
+ * <code>Option</code>. Calling {@link #updateOption} should update
+ * the {@link net.sf.freecol.common.option.Option} with that new
+ * information.
+ */
 public interface OptionUpdater {
 
     public static final  String  COPYRIGHT = "Copyright (C) 2003-2006 The FreeCol Team";
@@ -16,11 +16,16 @@ public interface OptionUpdater {
 
 
     /**
-    * Updates the value of the {@link net.sf.freecol.common.option.Option}
-    * this object keeps.
-    */
+     * Updates the value of the {@link net.sf.freecol.common.option.Option}
+     * this object keeps.
+     */
     public void updateOption();
     
+    /**
+     * Reset with the value from the option.
+     */
+    public void reset();
+
     /**
      * Unregister <code>PropertyChangeListener</code>s.
      */

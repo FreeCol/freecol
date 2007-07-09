@@ -166,6 +166,14 @@ public final class FreeColActionUI extends JPanel implements OptionUpdater, Acti
     public void updateOption() {
         option.setAccelerator(keyStroke);
     }
+    
+    /**
+     * Reset with the value from the option.
+     */
+    public void reset() {
+        keyStroke = option.getAccelerator();
+        bl.setText(getHumanKeyStrokeText(keyStroke));
+    }
 
     
     public void actionPerformed(ActionEvent evt) {

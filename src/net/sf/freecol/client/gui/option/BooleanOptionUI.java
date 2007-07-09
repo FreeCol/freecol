@@ -71,10 +71,16 @@ public final class BooleanOptionUI extends JPanel implements OptionUpdater, Prop
     }
 
     /**
-    * Updates the value of the {@link Option} this object keeps.
-    */
+     * Updates the value of the {@link Option} this object keeps.
+     */
     public void updateOption() {
         option.setValue(checkBox.isSelected());
     }
 
+    /**
+     * Reset with the value from the option.
+     */
+    public void reset() {
+        checkBox.setSelected(option.getValue());
+    }
 }

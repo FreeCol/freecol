@@ -132,4 +132,15 @@ public final class FileOptionUI extends JPanel implements OptionUpdater, Propert
             option.setValue(new File(fileField.getText()));
         }
     }
+    
+    /**
+     * Reset with the value from the option.
+     */
+    public void reset() {
+        if (option.getValue() != null) { 
+            fileField.setText(option.getValue().getAbsolutePath());
+        } else {
+            fileField.setText("");
+        }
+    }
 }

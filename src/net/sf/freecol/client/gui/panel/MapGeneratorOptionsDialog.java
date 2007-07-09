@@ -31,7 +31,7 @@ public final class MapGeneratorOptionsDialog extends FreeColDialog implements Ac
 
     public static final String REVISION = "$Revision$";
 
-    private static final int OK = 0, CANCEL = 1;
+    private static final int OK = 0, CANCEL = 1, RESET = 2;
 
     private final Canvas parent;
 
@@ -64,6 +64,12 @@ public final class MapGeneratorOptionsDialog extends FreeColDialog implements Ac
         ok.setMnemonic('O');
         buttons.add(ok);
 
+        JButton reset = new JButton(Messages.message("reset"));
+        reset.setActionCommand(String.valueOf(RESET));
+        reset.addActionListener(this);
+        reset.setMnemonic('R');
+        buttons.add(reset);
+        
         cancel = new JButton(Messages.message("cancel"));
         cancel.setActionCommand(String.valueOf(CANCEL));
         cancel.addActionListener(this);
@@ -139,6 +145,9 @@ public final class MapGeneratorOptionsDialog extends FreeColDialog implements Ac
                 ui.unregister();
                 parent.remove(this);
                 setResponse(new Boolean(false));
+                break;
+            case RESET:
+                ui.reset();
                 break;
             default:
                 logger.warning("Invalid ActionCommand: invalid number.");

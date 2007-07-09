@@ -78,10 +78,16 @@ public final class SelectOptionUI extends JPanel implements OptionUpdater, Prope
     }
     
     /**
-    * Updates the value of the {@link Option} this object keeps.
-    */
+     * Updates the value of the {@link Option} this object keeps.
+     */
     public void updateOption() {
         option.setValue(comboBox.getSelectedIndex());
     }
 
+    /**
+     * Reset with the value from the option.
+     */
+    public void reset() {
+        comboBox.setSelectedIndex(option.getValue());
+    }
 }

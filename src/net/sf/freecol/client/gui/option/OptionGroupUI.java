@@ -155,6 +155,15 @@ public final class OptionGroupUI extends JPanel implements OptionUpdater {
             optionUpdaters[i].updateOption();
         }
     }
+    
+    /**
+     * Reset with the value from the option.
+     */
+    public void reset() {
+        for (int i = 0; i < optionUpdaters.length; i++) {
+            optionUpdaters[i].reset();
+        }
+    }
 
     /**
      * Removes the given <code>KeyStroke</code> from all of this
@@ -208,6 +217,13 @@ public final class OptionGroupUI extends JPanel implements OptionUpdater {
          */
         public void updateOption() {
             groupUI.updateOption();
+        }
+        
+        /**
+         * Reset with the value from the option.
+         */
+        public void reset() {
+            groupUI.reset();
         }
         
         /**

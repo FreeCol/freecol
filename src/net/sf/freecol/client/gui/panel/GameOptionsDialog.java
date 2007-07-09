@@ -32,7 +32,7 @@ public final class GameOptionsDialog extends FreeColDialog implements ActionList
 
     public static final String REVISION = "$Revision$";
 
-    private static final int OK = 0, CANCEL = 1, SAVE = 2, LOAD = 3;
+    private static final int OK = 0, CANCEL = 1, SAVE = 2, LOAD = 3, RESET = 4;
 
     private final Canvas parent;
 
@@ -76,6 +76,12 @@ public final class GameOptionsDialog extends FreeColDialog implements ActionList
         save.addActionListener(this);
         save.setMnemonic('S');
         buttons.add(save);
+        
+        JButton reset = new JButton(Messages.message("reset"));
+        reset.setActionCommand(String.valueOf(RESET));
+        reset.addActionListener(this);
+        reset.setMnemonic('R');
+        buttons.add(reset);
 
         cancel = new JButton(Messages.message("cancel"));
         cancel.setActionCommand(String.valueOf(CANCEL));
@@ -170,6 +176,9 @@ public final class GameOptionsDialog extends FreeColDialog implements ActionList
                 if (loadFile != null) {
                     freeColClient.getGame().getGameOptions().load(loadFile);
                 }
+                break;
+            case RESET:
+                ui.reset();
                 break;
             default:
                 logger.warning("Invalid ActionCommand: invalid number.");

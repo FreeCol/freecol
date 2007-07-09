@@ -33,7 +33,8 @@ public final class ClientOptionsDialog extends FreeColDialog implements ActionLi
     public static final String  REVISION = "$Revision$";
 
     private static final int    OK = 0,
-                                CANCEL = 1;
+                                CANCEL = 1,
+                                RESET = 2;
 
     private final Canvas        parent;
     private final FreeColClient freeColClient;
@@ -62,12 +63,17 @@ public final class ClientOptionsDialog extends FreeColDialog implements ActionLi
         ok.setMnemonic('O');
         buttons.add(ok);
 
+        JButton reset = new JButton(Messages.message("reset"));
+        reset.setActionCommand(String.valueOf(RESET));
+        reset.addActionListener(this);
+        reset.setMnemonic('R');
+        buttons.add(reset);
+        
         JButton cancel = new JButton(Messages.message("cancel"));
         cancel.setActionCommand(String.valueOf(CANCEL));
         cancel.addActionListener(this);
         cancel.setMnemonic('C');
         buttons.add(cancel);
-
 
         FreeColPanel.enterPressesWhenFocused(ok);
         setCancelComponent(cancel);
@@ -136,6 +142,9 @@ public final class ClientOptionsDialog extends FreeColDialog implements ActionLi
                     ui.unregister();
                     parent.remove(this);
                     setResponse(new Boolean(false));
+                    break;
+                case RESET:
+                    ui.reset();
                     break;
                 default:
                     logger.warning("Invalid ActionCommand: invalid number.");

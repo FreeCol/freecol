@@ -130,4 +130,12 @@ public final class OptionMapUI extends JPanel implements OptionUpdater {
         }
     }
 
+    /**
+     * Reset with the value from the option.
+     */
+    public void reset() {
+        for (int i = 0; i < optionUpdaters.length; i++) {
+            optionUpdaters[i].reset();
+        }
+    }
 }
