@@ -122,7 +122,8 @@ public class LanguageOption extends SelectOption {
              if (file.getName().startsWith(Messages.FILE_PREFIX + "_")) {
                  try {
                      final String languageID = file.getName().substring(16, file.getName().indexOf("."));
-                     names.add(getLocale(languageID).getDisplayName());
+                     Locale l = getLocale(languageID);
+                     names.add(toCapitalized(l.getDisplayName(l), l));
                  } catch (Exception e) {
                      logger.log(Level.WARNING, "Exception in getLanguageNames()", e);
                      continue;
@@ -130,6 +131,27 @@ public class LanguageOption extends SelectOption {
              }
          }
          return names.toArray(new String[0]);
+     }
+     
+     /**
+      * Capitalizes the given text.
+      *
+      * @param s The String to be capitalized.
+      * @return The capitalized string.
+      */
+     private static String toCapitalized(String s) {
+         return toCapitalized(s, Locale.getDefault());
+     }
+
+     /**
+      * Capitalizes the given text.
+      *
+      * @param s The String to be capitalized.
+      * @param l The locale to use when capitalizing the word.
+      * @return The capitalized string.
+      */
+     private static String toCapitalized(String s, Locale l) {
+         return s.substring(0, 1).toUpperCase(l) + s.substring(1);
      }
      
      /**
