@@ -182,8 +182,6 @@ public final class NegotiationDialog extends FreeColDialog implements ActionList
         stance = new StanceTradeItemPanel(this, player, otherPlayer);
         goldDemand = new GoldTradeItemPanel(this, otherPlayer, foreignGold);
         goldOffer = new GoldTradeItemPanel(this, player, player.getGold());
-        goodsDemand = new GoodsTradeItemPanel(this, otherPlayer, settlement.getGoodsContainer().getGoods());
-        goodsOffer = new GoodsTradeItemPanel(this, player, unit.getGoodsContainer().getGoods());
         colonyDemand = new ColonyTradeItemPanel(this, otherPlayer);
         colonyOffer = new ColonyTradeItemPanel(this, player);
         /** TODO: UnitTrade
@@ -218,7 +216,9 @@ public final class NegotiationDialog extends FreeColDialog implements ActionList
         add(summary, higConst.rcwh(row, summaryColumn, 1, 5));
         row += 2;
         if (unit.isCarrier()) {
+            goodsDemand = new GoodsTradeItemPanel(this, otherPlayer, settlement.getGoodsContainer().getGoods());
             add(goodsDemand, higConst.rc(row, demandColumn));
+            goodsOffer = new GoodsTradeItemPanel(this, player, unit.getGoodsContainer().getGoods());
             add(goodsOffer, higConst.rc(row, offerColumn));
         } else {
             add(colonyDemand, higConst.rc(row, demandColumn));
