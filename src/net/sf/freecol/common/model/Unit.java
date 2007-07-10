@@ -3230,7 +3230,8 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
             int goodsCount = attacker.getGoodsCount();
             if (goodsCount > 0) {
                 // -12.5% penalty for every unit of cargo.
-                percentage = -12.5f * (8 - goodsCount);
+                // TODO: shouldn't this be -cargo/capacity?
+                percentage = -12.5f * goodsCount;
                 result.add(new Modifier("modifiers.cargoPenalty", percentage, Modifier.PERCENTAGE));
                 totalPercentage += percentage;
             }
@@ -3355,10 +3356,11 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
         result.add(new Modifier("modifiers.baseDefense", totalAddend, Modifier.ADDITIVE));
 
         if (defender.isNaval()) {
-            int goodsCount = defender.getGoodsCount();
+            int goodsCount = defender.getVisibleGoodsCount();
             if (goodsCount > 0) {
                 // -12.5% penalty for every unit of cargo.
-                percentage =  -12.5f * (8 - goodsCount);
+                // TODO: shouldn't this be -cargo/capacity?
+                percentage =  -12.5f * goodsCount;
                 result.add(new Modifier("modifiers.cargoPenalty", percentage, Modifier.PERCENTAGE));
                 totalPercentage += percentage;
             }
