@@ -1,5 +1,8 @@
 package net.sf.freecol.client.gui.plaf;
 
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+
 import javax.swing.JComponent;
 import javax.swing.plaf.ComponentUI;
 import javax.swing.plaf.metal.MetalLabelUI;
@@ -24,5 +27,8 @@ public class FreeColLabelUI extends MetalLabelUI {
         c.setOpaque(false);
     }
 
-
+    public void paint(Graphics g, JComponent c) {
+        LAFUtilities.setProperties(g, c);
+        super.paint(g, c);
+    }
 }

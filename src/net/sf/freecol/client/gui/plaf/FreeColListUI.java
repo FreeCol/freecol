@@ -44,7 +44,8 @@ public class FreeColListUI extends BasicListUI {
             g.setColor(c.getBackground());
             g.fillRect(0, 0, width, height);
         }
-        
+         
+        LAFUtilities.setProperties(g, c);
         super.paint(g, c);
     }
 

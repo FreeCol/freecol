@@ -40,6 +40,8 @@ public class FreeColButtonUI extends MetalButtonUI {
     
     
     public void paint(Graphics g, JComponent b) {
+        LAFUtilities.setProperties(g, b);
+        
         if (b.isOpaque()) {
             int width = b.getWidth();
             int height = b.getHeight();

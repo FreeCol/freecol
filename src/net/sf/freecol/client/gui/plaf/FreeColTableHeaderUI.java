@@ -1,5 +1,7 @@
 package net.sf.freecol.client.gui.plaf;
 
+import java.awt.Graphics;
+
 import javax.swing.JComponent;
 import javax.swing.plaf.ComponentUI;
 import javax.swing.plaf.basic.BasicTableHeaderUI;
@@ -30,4 +32,9 @@ public class FreeColTableHeaderUI extends BasicTableHeaderUI {
         dtcr.setOpaque(false);
     }
 
+    @Override
+    public void paint(Graphics g, JComponent c) { 
+        LAFUtilities.setProperties(g, c);
+        super.paint(g, c);
+    }
 }

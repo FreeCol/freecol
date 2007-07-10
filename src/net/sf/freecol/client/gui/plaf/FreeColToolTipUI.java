@@ -56,6 +56,8 @@ public class FreeColToolTipUI extends BasicToolTipUI {
                 g.fillRect(0, 0, width, height);
             }
         }
+         
+        LAFUtilities.setProperties(g, c);
 
         // Copied from "BasicToolTipUI":
         Font font = c.getFont();
