@@ -46,6 +46,7 @@ public class ActionManager extends OptionGroup {
         removeAll();
         // keep this list alphabetized.
         
+        add(new AboutAction(freeColClient));
         add(new AssignTradeRouteAction(freeColClient));
         add(new BuildColonyAction(freeColClient));
         add(new BuildRoadAction(freeColClient));

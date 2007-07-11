@@ -10,6 +10,7 @@ import javax.swing.JMenuItem;
 
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.FreeColClient;
+import net.sf.freecol.client.gui.action.AboutAction;
 import net.sf.freecol.client.gui.action.AssignTradeRouteAction;
 import net.sf.freecol.client.gui.action.BuildColonyAction;
 import net.sf.freecol.client.gui.action.BuildRoadAction;
@@ -280,8 +281,10 @@ public class InGameMenuBar extends FreeColMenuBar {
         menu.add(getMenuItem(ColopediaGoodsAction.ID));
         menu.add(getMenuItem(ColopediaSkillAction.ID));
         menu.add(getMenuItem(ColopediaBuildingAction.ID));
-        menu.add(getMenuItem(ColopediaFatherAction.ID));
-
+        menu.add(getMenuItem(ColopediaFatherAction.ID));        
+        menu.addSeparator();        
+        menu.add(getMenuItem(AboutAction.ID));
+        
         add(menu);
     }
     

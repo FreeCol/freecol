@@ -7,6 +7,7 @@ import javax.swing.JMenu;
 
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.FreeColClient;
+import net.sf.freecol.client.gui.action.AboutAction;
 import net.sf.freecol.client.gui.action.ColopediaBuildingAction;
 import net.sf.freecol.client.gui.action.ColopediaFatherAction;
 import net.sf.freecol.client.gui.action.ColopediaGoodsAction;
@@ -134,6 +135,8 @@ public class MapEditorMenuBar extends FreeColMenuBar {
         menu.add(getMenuItem(ColopediaSkillAction.ID));
         menu.add(getMenuItem(ColopediaBuildingAction.ID));
         menu.add(getMenuItem(ColopediaFatherAction.ID));
+        menu.addSeparator();        
+        menu.add(getMenuItem(AboutAction.ID));
 
         add(menu);
     }

@@ -135,11 +135,32 @@ public abstract class FreeColAction extends AbstractAction implements Option {
      */
     protected FreeColAction(FreeColClient freeColClient, String name, String shortDescription, int mnemonic,
             KeyStroke accelerator) {
-        super(Messages.message(name));
+       this(freeColClient, name, shortDescription, mnemonic, accelerator, true);
+    }
+    
+    /**
+     * Creates a new <code>FreeColAction</code>.
+     * 
+     * @param freeColClient The main controller object for the client.
+     * @param name An i18n-key or a text to identify the name of this action.
+     * @param shortDescription An i18n-key or a text to identify a short 
+     *            description of this action. This value can be set to
+     *            <code>null</code> if the action does not have a description.
+     * @param mnemonic A mnemonic to be used for selecting this action when the
+     *            action is displaying on a menu etc.
+     * @param accelerator The keyboard accelerator to be used for selecting this
+     *            action or <code>null</code> if this action does not have an
+     *            accelerator.
+     * @param localize If <code>true</code> the texts will be translated using
+     *            the i18n support. They will otherwise be used untouched.
+     */
+    protected FreeColAction(FreeColClient freeColClient, String name, String shortDescription, int mnemonic,
+            KeyStroke accelerator, boolean localize) {
+        super((localize) ? Messages.message(name) : name);
 
         this.freeColClient = freeColClient;
 
-        putValue(SHORT_DESCRIPTION, shortDescription);
+        putValue(SHORT_DESCRIPTION, (localize) ? shortDescription : shortDescription);
         putValue(MNEMONIC_KEY, new Integer(mnemonic));
         putValue(ACCELERATOR_KEY, accelerator);
     }
