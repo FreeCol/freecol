@@ -131,7 +131,15 @@ public final class ReportColonyPanel extends ReportPanel implements ActionListen
         goodsPanel.setOpaque(false);
         for (int goodsType = 0; goodsType < Goods.NUMBER_OF_ALL_TYPES; goodsType++) {
             int newValue = colony.getProductionNetOf(goodsType);
-            if (newValue != 0) {
+            int stockValue = -1;  // Show stored items in ReportColonyPanel
+            if (goodsType < Goods.NUMBER_OF_TYPES) {
+                stockValue = colony.getGoodsCount(goodsType);
+            } else if (goodsType == Goods.HAMMERS) {
+                stockValue = colony.getHammers();
+            } else if (goodsType == Goods.BELLS) {
+                stockValue = colony.getBells();
+            }
+            if (newValue != 0 || stockValue > 0) {
                 Goods goods = new Goods(colony.getGame(), colony, goodsType, newValue);
                 Building building = colony.getBuildingForProducing(goodsType);
                 ProductionLabel productionLabel = new ProductionLabel(goodsType, newValue, getCanvas());
@@ -141,6 +149,7 @@ public final class ReportColonyPanel extends ReportPanel implements ActionListen
                 if (goodsType == Goods.HORSES) {
                     productionLabel.setMaxGoodsIcons(1);
                 }
+                productionLabel.setStockNumber(stockValue);   // Show stored items in ReportColonyPanel
                 goodsPanel.add(productionLabel);
             }
         }

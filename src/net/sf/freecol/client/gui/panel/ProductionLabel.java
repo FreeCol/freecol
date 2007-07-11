@@ -75,7 +75,11 @@ public final class ProductionLabel extends JComponent {
      */
     private int displayNumber;
 
-
+    /**
+     * The smallest number to display above the goodsIcons.
+     * used to Show stored items in ReportColonyPanel
+     */
+    private int stockNumber = -1;
 
     /**
      * Creates a new <code>ProductionLabel</code> instance.
@@ -232,6 +236,26 @@ public final class ProductionLabel extends JComponent {
     }
 
     /**
+     * Get the <code>stockNumber</code> value.
+     * used to Show stored items in ReportColonyPanel
+     *
+     * @return an <code>int</code> value
+     */
+    public int getStockNumber() {
+        return stockNumber;
+    }
+
+    /**
+     * Set the <code>stockNumber</code> value.
+     * used to Show stored items in ReportColonyPanel
+     *
+     * @param newStockNumber The new StockNumber value.
+     */
+    public void setStockNumber(final int newStockNumber) {
+        this.stockNumber = newStockNumber;
+    }
+
+    /**
      * Get the <code>DrawPlus</code> value.
      *
      * @return a <code>boolean</code> value
@@ -340,11 +364,14 @@ public final class ProductionLabel extends JComponent {
      */
     public void paintComponent(Graphics g) {
 
-        if (goodsIcon == null || production == 0) {
+        if (goodsIcon == null || (production == 0 && stockNumber<0) ) {
             return;
         }
 
         int drawImageCount = Math.min(Math.abs(production), maxIcons);
+        if (drawImageCount==0) {
+            drawImageCount=1;
+        }
 
         int iconWidth = goodsIcon.getIconWidth();
         int pixelsPerIcon = iconWidth / 2;
@@ -378,10 +405,16 @@ public final class ProductionLabel extends JComponent {
             goodsIcon.paintIcon(null, g, leftOffset + i*pixelsPerIcon, 0);
         }
 
-        if (production >= displayNumber || production < 0 || maxIcons < production) {
-            String number = Integer.toString(production);
-            if (production >= 0 && drawPlus) {
-                number = "+" + number;
+        if (production >= displayNumber || production < 0 || maxIcons < production || stockNumber>0) {
+            String number = "";
+            if (stockNumber >= 0 ) {
+                number = Integer.toString(stockNumber);  // Show stored items in ReportColonyPanel
+                drawPlus = true;
+            }
+            if (production >=0 && drawPlus ) {
+                number = number + "+" + Integer.toString(production);
+            } else {
+                number = number + Integer.toString(production);
             }
             if (maximumProduction > production && production > 0) {
                 number = number + "/" + String.valueOf(maximumProduction);
