@@ -8,6 +8,8 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Vector;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -201,6 +203,57 @@ public class AIPlayer extends AIObject {
         ensureCorrectMissions();
         aiUnits.clear();
     }
+    
+    /**
+     * Gets a list of the players this REF player is currently fighting.
+     * @return The list. Empty if this is not an REF player. 
+     */
+    private List<Player> getDominionsAtWar() {
+        List<Player> dominions = new LinkedList<Player>();        
+        Iterator<Player> it = getGame().getPlayerIterator();
+        while (it.hasNext()) {
+            Player p = it.next();
+            if (p.getREFPlayer() == getPlayer()
+                    && p.getRebellionState() == Player.REBELLION_IN_WAR
+                    && p.getMonarch() == null) {
+                dominions.add(p);
+            }
+        }
+        return dominions;
+    }
+    
+    /**
+     * Checks if this player has a single Man-of-War.
+     * @return <code>true</code> if this player owns
+     *      a single Man-of-War.
+     */
+    private boolean hasManOfWar() {
+        Iterator<Unit> it = player.getUnitIterator();
+        while (it.hasNext()) {
+            Unit u = it.next();
+            if (u.getType() == Unit.MAN_O_WAR) {
+                return true;
+            }
+        }
+        return false;
+    }
+    
+    /**
+     * Gets the number of King's units.
+     * @return The number of units of type
+     *      {@link Unit#KINGS_REGULAR} this player owns.
+     */
+    private int getNumberOfKingUnits() {
+        int n = 0;
+        Iterator<Unit> it = player.getUnitIterator();
+        while (it.hasNext()) {
+            Unit u = it.next();
+            if (u.getType() == Unit.KINGS_REGULAR) {
+                n++;
+            }
+        }
+        return n;
+    }
 
     /**
      * For REF-players: Checks if we have lost the war of independence.
@@ -210,26 +263,27 @@ public class AIPlayer extends AIObject {
         if (!getPlayer().isREF()) {
             return;
         }
-        boolean defeated = true;
-        Iterator<Unit> it = getPlayer().getUnitIterator();
-        while (it.hasNext()) {
-            Unit u = it.next();
-            if (u.getType() != Unit.MAN_O_WAR) {
-                defeated = false;
-                break;
-            }
+        
+        List<Player> dominions = getDominionsAtWar();
+        
+        // Return if independence should not be granted:
+        
+        if (dominions.isEmpty()) {
+            return;
         }
-        if (defeated) {
-            Iterator<Player> it2 = getGame().getPlayerIterator();
-            while (it2.hasNext()) {
-                Player p = it2.next();
-                if (p.getREFPlayer() == getPlayer() && p.getRebellionState() == Player.REBELLION_IN_WAR
-                        && p.getMonarch() == null) {
-                    Element giveIndependenceElement = Message.createNewRootElement("giveIndependence");
-                    giveIndependenceElement.setAttribute("player", p.getID());
-                    sendAndWaitSafely(giveIndependenceElement);
-                }
-            }
+        
+        if (!getPlayer().getSettlements().isEmpty()) {
+            return;
+        }
+        
+        if (hasManOfWar() && getNumberOfKingUnits() > 6) {
+            return;
+        }
+        
+        for (Player p : dominions) {
+            Element giveIndependenceElement = Message.createNewRootElement("giveIndependence");
+            giveIndependenceElement.setAttribute("player", p.getID());
+            sendAndWaitSafely(giveIndependenceElement);
         }
     }
 

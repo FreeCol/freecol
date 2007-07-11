@@ -319,12 +319,26 @@ public final class InGameController extends Controller {
      * @return <i>true</i> if this player should die.
      */
     private boolean checkForDeath(Player player) {
-        // Die if: (No colonies or units on map) && ((After 20 turns) || (Cannot
-        // get a unit from Europe))
-        Map map = getGame().getMap();
+        /*
+         * Die if: (No colonies or units on map)
+         *         && ((After 20 turns) || (Cannot get a unit from Europe))
+         */
+        
         if (player.isREF()) {
+            /*
+             * The REF never dies. I can grant independence to
+             * dominions, see: AIPlayer.checkForREFDefeat
+             */
             return false;
         }
+        
+        Map map = getGame().getMap();
+
+        // Quick check to avoid long processing time:
+        if (!player.getSettlements().isEmpty()) {
+            return false;
+        }
+
         Iterator<Position> tileIterator = map.getWholeMapIterator();
         while (tileIterator.hasNext()) {
             Tile t = map.getTile(tileIterator.next());
@@ -334,9 +348,13 @@ public final class InGameController extends Controller {
                 return false;
             }
         }
-        // At this point we know the player does not have any units or
-        // settlements on the map.
-        if (Player.isEuropeanNoREF(player.getNation())) {
+        
+        /*
+         * At this point we know the player does not have any units or
+         * settlements on the map.
+         */
+        
+        if (player.isEuropean()) {
             /*
              * if (getGame().getTurn().getNumber() > 20 ||
              * player.getEurope().getFirstUnit() == null && player.getGold() <
