@@ -128,15 +128,27 @@ public final class TradeRouteInputDialog extends FreeColDialog implements Action
         // button for adding new Stop
         addStopButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                Stop stop = originalRoute.new Stop((Location) destinationSelector.getSelectedItem());
-                for (Component comp : cargoPanel.getComponents()) {
-                    CargoLabel label = (CargoLabel) comp;
-                    stop.addCargo(label.getType());
-                }
-                if (stopList.getSelectedIndex() == -1) {
-                    listModel.addElement(stop);
+                int startIndex = -1;
+                int endIndex = -1;
+                if (destinationSelector.getSelectedIndex()==0 ) {   // All colonies + Europe
+                    startIndex=1;
+                    endIndex=destinationSelector.getItemCount()-1;  // will use inverted order
                 } else {
-                    listModel.add(stopList.getSelectedIndex() + 1, stop);
+                    startIndex=destinationSelector.getSelectedIndex();  // just 1 colony
+                    endIndex=startIndex;
+                }
+                for(int i=startIndex;i<=endIndex;i++)
+                {
+                    Stop stop = originalRoute.new Stop((Location) destinationSelector.getItemAt(i) );
+                    for (Component comp : cargoPanel.getComponents()) {
+                        CargoLabel label = (CargoLabel) comp;
+                        stop.addCargo(label.getType());
+                    }
+                    if (stopList.getSelectedIndex() == -1) {
+                        listModel.addElement(stop);
+                    } else {
+                        listModel.add(stopList.getSelectedIndex() + 1, stop);
+                    }
                 }
             }
         });
@@ -183,6 +195,8 @@ public final class TradeRouteInputDialog extends FreeColDialog implements Action
         listModel.removeAllElements();
 
         // combo box for selecting destination
+        
+        destinationSelector.addItem(Messages.message("report.allColonies", new String[][] { { "%number%", "" } }));
         if (player.getEurope() != null) {
             destinationSelector.addItem(player.getEurope());
         }
