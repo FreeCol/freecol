@@ -2775,7 +2775,8 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         ((BooleanOption) go.getObject(GameOptions.VICTORY_DEFEAT_HUMANS)).setValue(false);
         
         // victory panel is shown after end turn, end turn again to start turn of next player
-        getFreeColServer().getInGameController().endTurn(player);
+        final ServerPlayer currentPlayer = (ServerPlayer) getFreeColServer().getGame().getCurrentPlayer();
+        getFreeColServer().getInGameController().endTurn(currentPlayer);
         return null;
     }
 

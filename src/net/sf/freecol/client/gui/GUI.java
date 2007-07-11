@@ -1108,6 +1108,7 @@ public final class GUI {
         Grey out the map if it is not my turn (and a multiplayer game).
          */
         if (!freeColClient.isMapEditor()
+                && freeColClient.getGame() != null
                 && freeColClient.getMyPlayer() != freeColClient.getGame().getCurrentPlayer()) {
             g.setColor(Color.BLACK);
             Composite oldComposite = g.getComposite();
