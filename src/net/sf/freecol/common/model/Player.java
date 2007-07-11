@@ -2702,24 +2702,24 @@ public class Player extends FreeColGameObject implements Nameable {
      * @return A random unit type of a unit that is recruitable in Europe.
      */
     public int generateRecruitable() {
-        int random;
+        // Random will be a number from 0 to 99 (never 100!):
+        int random = (int) (Math.random() * 100);
         if (hasFather(FoundingFather.WILLIAM_BREWSTER)) {
-            // Make sure random is a number from 0 to 18:
-            random = (int) (Math.random() * 19);
-        } else {
-            // Chance will be a number from 0 to 99 (never 100!):
-            int chance = (int) (Math.random() * 100);
-            if (chance < 21) {
-                return Unit.PETTY_CRIMINAL;
-            } else if (chance < 42) {
-                return Unit.INDENTURED_SERVANT;
-            } else if (chance < 62) {
+            if (random < 62) {
                 return Unit.FREE_COLONIST;
-            } else {
-                // Make sure random is a number from 0 to 18:
-                random = ((chance - 62) / 2);
+            }
+        } else {
+            if (random < 21) {
+                return Unit.PETTY_CRIMINAL;
+            } else if (random < 42) {
+                return Unit.INDENTURED_SERVANT;
+            } else if (random < 62) {
+                return Unit.FREE_COLONIST;
             }
         }
+        // Make sure random is a number from 0 to 18:
+        random = ((random - 62) / 2);
+
         switch (random) {
         default:
         case 0:
