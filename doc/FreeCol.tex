@@ -656,6 +656,12 @@ different player is in the way, for instance). You can also press the
 middle mouse button, or both mouse buttons if your mouse only has two
 buttons, in order to give the selected unit a movement order.
 
+In the original Colonization game, a unit used up all movement points
+when entering a colony. In FreeCol, this is not the case --- a unit
+can enter a colony just like any other tile. If the unit is placed in
+a building, or on a colony tile, or if a carrier is loaded or
+unloaded, however, it will lose all its movement points.
+
 Units are marked with small coloured shields, which may or may not
 display a letter. The background colour indicates the nation this unit
 belongs to. The Dutch units, for example, are usually marked with
@@ -668,6 +674,7 @@ orange shields. The letter indicates the current state of the unit:
 \item\verb$P$: the unit is plowing a tile.
 \item\verb$R$: the unit is building a road.
 \item\verb$S$: the unit is a sentry (waiting for transport).
+\item\verb$0$: the unit has no moves left.
 \end{itemize}
 
 If the unit is a foreign naval unit, the shield will display a number
@@ -1173,6 +1180,27 @@ will be delivered to your colonies. However, you can not plant new
 forests later. Once cleared, a tile will never produce lumber again.
 
 
+\hypertarget{Government Efficiency}{\subsubsection{Government Efficiency}}
+
+The efficiency of the local governments of your colonies depends on
+the colonists' support for the \hyperlink{Sons of Liberty}{Sons of
+  Liberty}. If more than 50\% of the colonists support the Sons of
+Liberty, they all produce one additional unit of goods, and if support
+for the Sons of Liberty increases to 100 \%, they even produce two
+additional units. 
+
+On the other hand, if the number of Tories exceeds a certain number
+which depends on the difficulty of the game (4 colonists by default),
+their production decreases by one unit, and if it exceeds this limit
+by four colonists, their production is decreased by two units. This
+waste may well destroy your colony and should be avoided at all
+costs.
+
+In order to prevent this kind of mismanagement, you need to increase
+the support for the Sons of Liberty. You can do this by producing
+Freedom Bells in the Town Hall.
+
+
 \hypertarget{Colony Buildings}{\subsection{Colony Buildings}}
 
 A newly established colony already includes several buildings, namely
@@ -1480,9 +1508,9 @@ through \hyperlink{Skills and Education}{Education}.
 Many early colonies failed due to a lack of food. In order to avoid a
 similar fate, you must ensure adequate food production from the very
 beginning. All your colonists can produce some amount of food,
-especially on the more fertile terrain types, but \Unit{Expert Farmer}
-and the \Unit{Expert Fisherman} will greatly increase your food
-production. But note that the Expert Fisherman requires a
+especially on the more fertile terrain types, but the \Unit{Expert
+  Farmer} and the \Unit{Expert Fisherman} will greatly increase your
+food production. But note that the Expert Fisherman requires a
 \hyperlink{Dock}{Dock} to moor his boat to, and that this requires at
 least one ocean tile adjacent to your colony.
 
@@ -1970,14 +1998,16 @@ At the beginning of the game, all your colonists will be
 \hypertarget{Tories}{\textbf{Tory Loyalists}}, who support your
 \hyperlink{Monarch}{Monarch} and are opposed to your policies. For
 this reason, colonies with more than a certain number of tories (which
-depends on the difficulty setting) suffer production penalties, which
-may well threaten their survival.
+depends on the difficulty setting and defaults to four colonists)
+suffer a production penalty of one unit. If the limit is exceeded by
+four colonists, the penalty increases to two units and may well
+threaten the survival of the colony.
 
 \hyperlink{Liberty Bells}{Liberty Bells}, however, will turn these
 Tories into \textbf{Sons of Liberty}, who support your
 policies. Colonies in which more than 50\% of the population are Sons
-of Liberty enjoy a production bonus, which is further increased as
-soon as 100\% of the population become Sons of Liberty.
+of Liberty enjoy a production bonus of one unit, which is increased to
+two units as soon as 100\% of the population become Sons of Liberty.
 
 
 \hypertarget{Declaration of Independence}{\subsection{The Declaration
@@ -1988,9 +2018,13 @@ you can declare the independence of your colonies. Your
 \hyperlink{Monarch}{Monarch} will not be amused and will send the
 \hyperlink{Royal Expeditionary Force}{Royal Expeditionary Force} to
 quell the insurrection. In order to gain independence, you must defeat
-the Royal Expeditionary Force. The European enemies of your Monarch
-may support your effort if you generate a sufficient number of Liberty
-Bells after the War of Independence has begun.
+the Royal Expeditionary Force by capturing or destroying nearly all of
+their land forces and by taking back any colonies they might have
+captured. You do not need to destroy the fleet.
+
+In the future, the European enemies of your Monarch may support your
+effort if you generate a sufficient number of Liberty Bells after the
+War of Independence has begun.
 
 
 \hypertarget{Known bugs}{\section{Known bugs}}
