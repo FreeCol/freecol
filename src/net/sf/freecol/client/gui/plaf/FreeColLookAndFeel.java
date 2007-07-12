@@ -262,6 +262,8 @@ public class FreeColLookAndFeel extends MetalLookAndFeel {
                 {"coatOfArms.apache.image", "native.png"},
                 {"coatOfArms.tupi.image", "native.png"},
                 {"map.americas", "map-americas.png"},
+                {"Colopedia.openSection.image", "open_section.png"},
+                {"Colopedia.closedSection.image", "closed_section.png"},
             };
 
             /*

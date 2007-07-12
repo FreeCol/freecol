@@ -2,9 +2,11 @@ package net.sf.freecol.client.gui.panel;
 
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.Image;
 
 import javax.swing.ImageIcon;
 import javax.swing.JTree;
+import javax.swing.UIManager;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeCellRenderer;
 
@@ -35,10 +37,22 @@ public class ColopediaTreeCellRenderer extends DefaultTreeCellRenderer {
         
         super.getTreeCellRendererComponent(tree, value, selected, expanded, leaf, row, hasFocus);
         
-        if(leaf) {
+        if (leaf) {
             ColopediaTreeItem nodeItem = (ColopediaTreeItem)node.getUserObject();
             ImageIcon icon = nodeItem.getIcon();
             setIcon(icon);
+        } else if (expanded) {
+            Image openImage = (Image) UIManager.get("Colopedia.openSection.image");
+            ImageIcon openIcon = new ImageIcon((openImage != null) ? openImage : null);
+            if (openIcon != null) {
+                setIcon(openIcon);
+            }
+        } else {
+            Image closedImage = (Image) UIManager.get("Colopedia.closedSection.image");
+            ImageIcon closedIcon = new ImageIcon((closedImage != null) ? closedImage : null);
+            if (closedIcon != null) {
+                setIcon(closedIcon);
+            }
         }
         return this;
     }
