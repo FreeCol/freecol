@@ -954,6 +954,8 @@ public class AIPlayer extends AIObject {
                 }
             }
         }
+        
+        final boolean fewColonies = hasFewColonies();
         Iterator<AIUnit> aiUnitsIterator = getAIUnitIterator();
         while (aiUnitsIterator.hasNext()) {
             AIUnit aiUnit = aiUnitsIterator.next();
@@ -978,6 +980,11 @@ public class AIPlayer extends AIObject {
                 int bestTurns = Integer.MAX_VALUE;
                 for (int i = 0; i < wishList.size(); i++) {
                     WorkerWish ww = (WorkerWish) wishList.get(i);
+                    if (ww.getTransportable() != null) {
+                        wishList.remove(i);
+                        i--;
+                        continue;
+                    }
                     int turns;
                     if (unit.getLocation().getTile() == null) {
                         // TODO-MUCH-LATER: This can be done better:
@@ -987,8 +994,8 @@ public class AIPlayer extends AIObject {
                     } else {
                         turns = Integer.MAX_VALUE;
                     }
-                    if (bestWish == null || turns < bestTurns || turns == bestTurns
-                            && ww.getValue() > bestWish.getValue()) {
+                    if (bestWish == null
+                            || ww.getValue() - (turns * 2) > bestWish.getValue() - (turns * 2)) {
                         bestWish = ww;
                         bestTurns = turns;
                     }
@@ -1006,12 +1013,18 @@ public class AIPlayer extends AIObject {
                 if (colonyTile != null) {
                     bestTurns = unit.getTurnsToReach(colonyTile);
                 }
+                
                 // Check if we can find a better site to work than a new colony:
-                if (!hasFewColonies() || colonyTile == null || bestTurns > 10) {
+                if (!fewColonies || colonyTile == null || bestTurns > 10) {
                     for (int i = 0; i < workerWishes.size(); i++) {
                         wishList = workerWishes.get(i);
                         for (int j = 0; j < wishList.size(); j++) {
                             WorkerWish ww = (WorkerWish) wishList.get(j);
+                            if (ww.getTransportable() != null) {
+                                wishList.remove(j);
+                                j--;
+                                continue;
+                            }
                             Tile source = unit.getTile();
                             if (source == null) {
                                 if (unit.getLocation() instanceof Unit) {
@@ -1504,7 +1517,7 @@ public class AIPlayer extends AIObject {
      * 
      * @return <code>true</code> if the AI should build more colonies.
      */
-    public boolean hasFewColonies() {
+    public boolean hasFewColonies() {        
         logger.finest("Entering method hasFewColonies");
         if (!getPlayer().canBuildColonies()) {
             return false;
@@ -1517,6 +1530,8 @@ public class AIPlayer extends AIObject {
             numberOfColonies++;
             numberOfWorkers += c.getUnitCount();
         }
+        
+        logger.finest("Leaving method hasFewColonies");
         return numberOfColonies <= 2 || numberOfColonies >= 3
                 && numberOfWorkers / numberOfColonies > numberOfColonies - 2;
     }

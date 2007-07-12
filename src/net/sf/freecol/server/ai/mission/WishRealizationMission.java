@@ -9,6 +9,7 @@ import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.freecol.common.model.Colony;
+import net.sf.freecol.common.model.FreeColGameObject;
 import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.Ownable;
 import net.sf.freecol.common.model.Tile;
@@ -191,7 +192,22 @@ public class WishRealizationMission extends Mission {
     */
     public boolean isValid() {
         Location l = wish.getDestination();
-        return !(l instanceof Ownable && ((Ownable) l).getOwner() != getUnit().getOwner());
+        if (l == null) {
+            return false;
+        }
+        if (((FreeColGameObject) l).isDisposed()) {
+            return false;
+        }
+        if (l instanceof Ownable && ((Ownable) l).getOwner() != getUnit().getOwner()) {
+            return false;
+        }
+        if (l instanceof Colony) {
+            Colony colony = (Colony) l;
+            if (colony.getVacantWorkLocationFor(getUnit()) == null) {
+                return false;
+            }
+        }
+        return true;
     }
 
     /**
