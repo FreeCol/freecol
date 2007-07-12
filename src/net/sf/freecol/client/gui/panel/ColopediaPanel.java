@@ -90,9 +90,9 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
 
     private JButton ok;
 
-    public int type;
+    private int type;
     
-    public JTree tree;
+    private JTree tree;
 
 
     /**
