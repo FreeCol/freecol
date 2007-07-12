@@ -896,6 +896,35 @@ public final class ImageLibrary extends ImageProvider {
         }
         return null;
     }
+    
+    /**
+     * Returns the Colopedia-specific scaled unit-ImageIcon at the given index.
+     * 
+     * @param index The index of the unit-ImageIcon to return.
+     * @param scale The scale of the unit-ImageIcon to return.
+     * @return The unit-ImageIcon at the given index.
+     */
+    public ImageIcon getColopediaUnitImageIcon(int index, float scale) {
+        if (index >= 0) {
+            ImageIcon icon = getUnitImageIcon(index);
+            if (scale != 1) {
+                Image image;
+                image = icon.getImage();
+                int width = (int) (scale * image.getWidth(null));
+                if (width > 30) {
+                    width = 30;
+                }
+                int height = (int) (scale * image.getHeight(null));
+                if (height > 30) {
+                    height = 30;
+                }
+                image = image.getScaledInstance(width, height, Image.SCALE_SMOOTH);
+                icon = new ImageIcon(image);
+            }
+            return icon;
+        }
+        return null;
+    }
 
     /**
      * Returns the scaled terrain-image at the given index (and position 0, 0).

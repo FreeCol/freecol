@@ -15,9 +15,15 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
+import javax.swing.JTree;
 import javax.swing.SwingConstants;
 import javax.swing.UIManager;
 import javax.swing.border.EmptyBorder;
+import javax.swing.event.TreeSelectionEvent;
+import javax.swing.event.TreeSelectionListener;
+import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.DefaultTreeModel;
+import javax.swing.tree.TreePath;
 
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.gui.Canvas;
@@ -37,7 +43,7 @@ import cz.autel.dmi.HIGLayout;
 /**
  * This panel displays the Colopedia.
  */
-public final class ColopediaPanel extends FreeColPanel implements ActionListener {
+public final class ColopediaPanel extends FreeColPanel implements ActionListener, TreeSelectionListener {
 
     public static final String COPYRIGHT = "Copyright (C) 2003-2007 The FreeCol Team";
 
@@ -85,6 +91,8 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
     private JButton ok;
 
     public int type;
+    
+    public JTree tree;
 
 
     /**
@@ -107,7 +115,7 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
         // listPanel.setBorder(new EmptyBorder(20, 20, 20, 20));
         JScrollPane sl = new JScrollPane(listPanel, 
                 JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,
-                JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+                JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
         sl.getViewport().setOpaque(false);
         add(sl, BorderLayout.WEST);
 
@@ -155,47 +163,48 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
         this.type = type;
         listPanel.removeAll();
         detailPanel.removeAll();
+        tree = buildTree();
         switch (type) {
         case COLOPEDIA_TERRAIN:
-            buildTerrainList();
             if (action == NO_DETAILS) {
                 action = Tile.UNEXPLORED;
             }
+            tree.expandRow(type+1);
             buildTerrainDetail(action);
             break;
         case COLOPEDIA_UNIT:
-            buildUnitList();
             if (action == NO_DETAILS) {
                 action = Unit.FREE_COLONIST;
             }
+            tree.expandRow(type+1);
             buildUnitDetail(action);
             break;
         case COLOPEDIA_GOODS:
-            buildGoodsList();
             if (action == NO_DETAILS) {
                 action = Goods.FOOD;
             }
+            tree.expandRow(type+1);
             buildGoodsDetail(action);
             break;
         case COLOPEDIA_SKILLS:
-            buildSkillsList();
             if (action == NO_DETAILS) {
                 action = Unit.EXPERT_FARMER;
             }
+            tree.expandRow(type+1);
             buildUnitDetail(action);
             break;
         case COLOPEDIA_BUILDING:
-            buildBuildingList();
             if (action == NO_DETAILS) {
                 action = Building.TOWN_HALL;
             }
+            tree.expandRow(type+1);
             buildBuildingDetail(action);
             break;
         case COLOPEDIA_FATHER:
-            buildFatherList();
             if (action == NO_DETAILS) {
                 action = FoundingFather.ADAM_SMITH;
             }
+            tree.expandRow(type+1);
             buildFatherDetail(action);
             break;
         default:
@@ -211,206 +220,216 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
     public void requestFocus() {
         ok.requestFocus();
     }
+    
+    /**
+     * Builds the JTree which represents the navigation menu and then returns it
+     * 
+     * @return The navigation tree.
+     */
+    private JTree buildTree() {
+        DefaultMutableTreeNode root;
+        root = new DefaultMutableTreeNode(new ColopediaTreeItem(Messages.message("menuBar.colopedia"),null));
+        
+        DefaultMutableTreeNode terrain;
+        terrain = new DefaultMutableTreeNode(new ColopediaTreeItem(Messages.message("menuBar.colopedia.terrain"),null));
+        buildTerrainSubtree(terrain);
+        root.add(terrain);
+        
+        DefaultMutableTreeNode units;
+        units = new DefaultMutableTreeNode(new ColopediaTreeItem(Messages.message("menuBar.colopedia.unit"),null));
+        buildUnitSubtree(units);
+        root.add(units);
+        
+        DefaultMutableTreeNode goods;
+        goods = new DefaultMutableTreeNode(new ColopediaTreeItem(Messages.message("menuBar.colopedia.goods"),null));
+        buildGoodsSubtree(goods);
+        root.add(goods);
+        
+        DefaultMutableTreeNode skills;
+        skills = new DefaultMutableTreeNode(new ColopediaTreeItem(Messages.message("menuBar.colopedia.skill"),null));
+        buildSkillsSubtree(skills);
+        root.add(skills);
+        
+        DefaultMutableTreeNode buildings;
+        buildings = new DefaultMutableTreeNode(new ColopediaTreeItem(Messages.message("menuBar.colopedia.building"),null));
+        buildBuildingSubtree(buildings);
+        root.add(buildings);
+        
+        DefaultMutableTreeNode fathers;
+        fathers = new DefaultMutableTreeNode(new ColopediaTreeItem(Messages.message("menuBar.colopedia.father"),null));
+        buildFathersSubtree(fathers);
+        root.add(fathers);
+        
+        DefaultTreeModel treeModel = new DefaultTreeModel(root);
+        tree = new JTree(treeModel);
+        tree.setCellRenderer(new ColopediaTreeCellRenderer());
+        tree.setOpaque(false);
+        tree.addTreeSelectionListener(this);
+        
+        listPanel.setLayout(new GridLayout(0, 1));
+        listPanel.add(tree);
 
+        return tree;
+    }
+    
     /**
      * Builds the buttons for all the terrains.
+     * @param parent
      */
-    private void buildTerrainList() {
-        listPanel.setLayout(new GridLayout(0, 1));
-
+    private void buildTerrainSubtree(DefaultMutableTreeNode parent) {
         // TODO: use specification for terrain list
         // If so we need to know if a certain tile should yield a single
         // call with false or two calls (false/true).
         // int numberOfTypes = FreeCol.specification.numberOfTileTypes();
 
         // type zero is unexplored
-        for (int type = 1; type < Tile.ARCTIC; type++) {
-            buildTerrainButton(type, false);
-            buildTerrainButton(type, true);
+        int numberOfTypes = FreeCol.getSpecification().numberOfTileTypes();
+        for (int type = 1; type < numberOfTypes; type++) {
+            if (type < Tile.ARCTIC) {
+                buildTerrainItem(type, false, parent);
+                buildTerrainItem(type, true, parent);
+            }
+            else buildTerrainItem(type, false, parent);
         }
-        buildTerrainButton(Tile.ARCTIC, false);
-        buildTerrainButton(ImageLibrary.HILLS, false);
-        buildTerrainButton(ImageLibrary.MOUNTAINS, false);
-        buildTerrainButton(Tile.OCEAN, false);
-        buildTerrainButton(Tile.HIGH_SEAS, false);
-
+        buildTerrainItem(ImageLibrary.HILLS, false, parent);
+        buildTerrainItem(ImageLibrary.MOUNTAINS, false, parent);
     }
-
+    
     /**
      * Builds the buttons for all the units.
+     * @param parent
      */
-    private void buildUnitList() {
-        listPanel.setLayout(new GridLayout(0, 1));
-        buildUnitButton(Unit.FREE_COLONIST, .5f);
-        buildUnitButton(Unit.INDENTURED_SERVANT, .5f);
-        buildUnitButton(Unit.PETTY_CRIMINAL, .5f);
-        buildUnitButton(Unit.INDIAN_CONVERT, .5f);
-        buildUnitButton(Unit.BRAVE, .5f);
-        buildUnitButton(Unit.COLONIAL_REGULAR, .5f);
-        buildUnitButton(Unit.KINGS_REGULAR, .5f);
-        buildUnitButton(Unit.CARAVEL, .5f);
-        buildUnitButton(Unit.FRIGATE, .5f);
-        buildUnitButton(Unit.GALLEON, .5f);
-        buildUnitButton(Unit.MAN_O_WAR, .5f);
-        buildUnitButton(Unit.MERCHANTMAN, .5f);
-        buildUnitButton(Unit.PRIVATEER, .5f);
-        buildUnitButton(Unit.ARTILLERY, .5f);
-        buildUnitButton(Unit.TREASURE_TRAIN, .5f);
-        buildUnitButton(Unit.WAGON_TRAIN, .5f);
-        // buildUnitButton(Unit.MILKMAID, .5f);
+    private void buildUnitSubtree(DefaultMutableTreeNode parent) {
+        int numberOfTypes = FreeCol.getSpecification().numberOfUnitTypes();
+        for (int type = 0; type < numberOfTypes-4; type++) { // Ugly, but needed to remove testing units like "Milkmaid"
+            UnitType unitType = FreeCol.getSpecification().unitType(type);
+            if (unitType.skill <= 0) {
+                buildUnitItem(type, 0.5f, parent);
+            }
+        }
     }
-
+    
     /**
      * Builds the buttons for all the goods.
+     * @param parent
      */
-    private void buildGoodsList() {
-        listPanel.setLayout(new GridLayout(0, 1));
-        buildGoodsButton(Goods.FOOD, ImageLibrary.GOODS_FOOD);
-        buildGoodsButton(Goods.SUGAR, ImageLibrary.GOODS_SUGAR);
-        buildGoodsButton(Goods.TOBACCO, ImageLibrary.GOODS_TOBACCO);
-        buildGoodsButton(Goods.COTTON, ImageLibrary.GOODS_COTTON);
-        buildGoodsButton(Goods.FURS, ImageLibrary.GOODS_FURS);
-        buildGoodsButton(Goods.LUMBER, ImageLibrary.GOODS_LUMBER);
-        buildGoodsButton(Goods.ORE, ImageLibrary.GOODS_ORE);
-        buildGoodsButton(Goods.SILVER, ImageLibrary.GOODS_SILVER);
-        buildGoodsButton(Goods.HORSES, ImageLibrary.GOODS_HORSES);
-        buildGoodsButton(Goods.RUM, ImageLibrary.GOODS_RUM);
-        buildGoodsButton(Goods.CIGARS, ImageLibrary.GOODS_CIGARS);
-        buildGoodsButton(Goods.CLOTH, ImageLibrary.GOODS_CLOTH);
-        buildGoodsButton(Goods.COATS, ImageLibrary.GOODS_COATS);
-        buildGoodsButton(Goods.TRADE_GOODS, ImageLibrary.GOODS_TRADE_GOODS);
-        buildGoodsButton(Goods.TOOLS, ImageLibrary.GOODS_TOOLS);
-        buildGoodsButton(Goods.MUSKETS, ImageLibrary.GOODS_MUSKETS);
+    private void buildGoodsSubtree(DefaultMutableTreeNode parent) {
+        int numberOfTypes = FreeCol.getSpecification().numberOfGoodsTypes();
+        for (int i = 0; i < numberOfTypes; i++) {
+            buildGoodsItem(i, parent);
+        }
     }
-
+    
     /**
      * Builds the buttons for all the skills.
+     * @param parent
      */
-    private void buildSkillsList() {
-        listPanel.setLayout(new GridLayout(0, 1));
+    private void buildSkillsSubtree(DefaultMutableTreeNode parent) {
         int numberOfTypes = FreeCol.getSpecification().numberOfUnitTypes();
         for (int type = 0; type < numberOfTypes; type++) {
             UnitType unitType = FreeCol.getSpecification().unitType(type);
             if (unitType.skill > 0) {
-                buildUnitButton(type, 0.5f);
+                buildUnitItem(type, 0.5f, parent);
             }
         }
     }
-
+    
     /**
      * Builds the buttons for all the buildings.
+     * @param parent
      */
-    private void buildBuildingList() {
-        listPanel.setLayout(new GridLayout(0, 1));
+    private void buildBuildingSubtree(DefaultMutableTreeNode parent) {
         int numberOfTypes = FreeCol.getSpecification().numberOfBuildingTypes();
         for (int type = 0; type < numberOfTypes; type++) {
             BuildingType buildingType = FreeCol.getSpecification().buildingType(type);
             for (int level = 0; level < buildingType.numberOfLevels(); level++) {
                 BuildingType.Level buildingLevel = buildingType.level(level);
-                JButton button = new JButton(Messages.message(buildingLevel.name));
-                button.setActionCommand(String.valueOf(((type << 2) | (level))));
-                button.addActionListener(this);
-                listPanel.add(button);
+                DefaultMutableTreeNode item = new DefaultMutableTreeNode(new ColopediaTreeItem(Messages.message(buildingLevel.name), null));
+                parent.add(item);
             }
         }
     }
-
+    
     /**
      * Builds the buttons for all the founding fathers.
+     * @param parent
      */
-    private void buildFatherList() {
-        listPanel.setLayout(new GridLayout(0, 1));
+    private void buildFathersSubtree(DefaultMutableTreeNode parent) {
         for (int i = 0; i < FoundingFather.FATHER_COUNT; i++) {
-            buildFatherButton(i);
+            buildFatherItem(i, parent);
         }
     }
-
+    
     /**
      * Builds the button for the given terrain.
      * 
      * @param terrain the type of terrain
      * @param forested whether it is forested
+     * @param parent the parent node
      */
-    private void buildTerrainButton(int terrain, boolean forested) {
-        Image scaledImage = library.getScaledTerrainImage(terrain, forested, 0.5f);
-        ImageIcon icon = new ImageIcon(scaledImage);
-        JButton button = new JButton(icon);
-        button.setVerticalTextPosition(SwingConstants.BOTTOM);
-        button.setHorizontalTextPosition(SwingConstants.CENTER);
-        button.setActionCommand(String.valueOf(terrain * 2 + (forested ? 1 : 0)));
-        button.addActionListener(this);
-        listPanel.add(button);
+    private void buildTerrainItem(int terrain, boolean forested, DefaultMutableTreeNode parent) {
+        String name;
+        ImageIcon icon;
+        DefaultMutableTreeNode item;
+        
+        //Get name of terrain type
+        switch (terrain) {
+        case ImageLibrary.HILLS:
+            name = Messages.message("hills");
+            break;
+        case ImageLibrary.MOUNTAINS:
+            name = Messages.message("mountains");
+            break;
+        default:
+            TileType tileType = (forested ? FreeCol.getSpecification().tileType(terrain).whenForested :
+                                 FreeCol.getSpecification().tileType(terrain));
+            name = Messages.message(tileType.name);
+        }
+        icon = new ImageIcon(library.getScaledTerrainImage(terrain, forested, 0.25f));
+        item = new DefaultMutableTreeNode(new ColopediaTreeItem(name, icon));
+        parent.add(item);
     }
-
+    
     /**
      * Builds the button for the given unit.
      * 
      * @param unit
      * @param scale
+     * @param parent
      */
-    private void buildUnitButton(int unit, float scale) {
-        int tools = 0;
-        if (unit == Unit.HARDY_PIONEER) {
-            tools = 100;
-        }
-        int unitIcon = ImageLibrary.getUnitGraphicsType(unit, false, false, tools, false);
+    private void buildUnitItem(int unit, float scale, DefaultMutableTreeNode parent) {
         String name = Unit.getName(unit);
-        JButton button;
-        if (unitIcon >= 0) {
-            ImageIcon icon = library.getScaledUnitImageIcon(unitIcon, scale);
-            button = new JButton(name, icon);
-            button.setVerticalAlignment(SwingConstants.TOP);
-            button.setVerticalTextPosition(SwingConstants.TOP);
-        } else {
-            button = new JButton(name);
-        }
-        button.setHorizontalAlignment(SwingConstants.LEFT);
-        button.setActionCommand(String.valueOf(unit));
-        button.addActionListener(this);
-        listPanel.add(button);
+        int unitIcon = ImageLibrary.getUnitGraphicsType(unit, false, false, 0, false);
+        ImageIcon icon = library.getColopediaUnitImageIcon(unitIcon, 0.5f);
+        DefaultMutableTreeNode item;
+        item = new DefaultMutableTreeNode(new ColopediaTreeItem(name, icon));
+        parent.add(item);
     }
-
+    
     /**
      * Builds the button for the given goods.
      * 
      * @param goods
      * @param goodsIcon
+     * @param parent
      */
-    private void buildGoodsButton(int goods, int goodsIcon) {
+    private void buildGoodsItem(int goods, DefaultMutableTreeNode parent) {
         String name = Goods.getName(goods);
-        ImageIcon icon = library.getGoodsImageIcon(goodsIcon);
-        JButton button = new JButton(name, icon);
-        button.setHorizontalAlignment(SwingConstants.LEFT);
-        button.setActionCommand(String.valueOf(goods));
-        button.addActionListener(this);
-        listPanel.add(button);
+        ImageIcon icon = library.getScaledGoodsImageIcon(goods, 0.75f);
+        DefaultMutableTreeNode item = new DefaultMutableTreeNode(new ColopediaTreeItem(name, icon));
+        parent.add(item);
     }
-
-    /**
-     * Builds the button for the given building.
-     * 
-     * @param building
-     * @param level
-     */
-    /*
-     * private void buildBuildingButton(int building, int level) { String name =
-     * Messages.message("colopedia.buildings.name." +
-     * buildingCalls[building][level-1]); JButton button = new JButton(name);
-     * button.setActionCommand(String.valueOf(((building << 2) | (level-1))));
-     * button.addActionListener(this); listPanel.add(button); }
-     */
-
+    
     /**
      * Builds the button for the given founding father.
      * 
      * @param foundingFather
+     * @param parent
      */
-    private void buildFatherButton(int foundingFather) {
+    private void buildFatherItem(int foundingFather, DefaultMutableTreeNode parent) {
         String name = Messages.message(FoundingFather.getName(foundingFather));
-        JButton button = new JButton(name);
-        button.setActionCommand(String.valueOf(foundingFather));
-        button.addActionListener(this);
-        listPanel.add(button);
+        DefaultMutableTreeNode item = new DefaultMutableTreeNode(new ColopediaTreeItem(name, null));
+        parent.add(item);
     }
 
     /**
@@ -667,7 +686,6 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
         int row = 1;
         JLabel name = new JLabel(Goods.getName(goods), SwingConstants.CENTER);
         name.setFont(smallHeaderFont);
-        // name.setPreferredSize(new Dimension(detailPanel.getWidth(), 50));
         detailPanel.add(name, higConst.rcwh(row, labelColumn, widths.length, 1));
         row += 2;
 
@@ -737,7 +755,7 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
         BuildingType buildingType = FreeCol.getSpecification().buildingType(building);
         BuildingType.Level buildingLevel = buildingType.level(level);
 
-        /**
+        /*
          * don't need this at the moment int[][] buildingUpkeep = { {0, -1, -1}, //
          * Town hall {0, 10, -1}, // Carpenter's house, Lumber mill {0, 5, 15}, //
          * Blacksmith's house, Blacksmith's shop, Iron works {0, 5, 15}, //
@@ -892,13 +910,11 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
         JTextArea description = getDefaultTextArea(text);
         description.setColumns(32);
         description.setSize(description.getPreferredSize());
-        // description.setSize(detailPanel.getWidth(),
-        // super.getPreferredSize().height);
         detailPanel.add(description);
 
         detailPanel.validate();
     }
-
+    
     /**
      * This function analyses an event and calls the right methods to take care
      * of the user's requests.
@@ -910,29 +926,97 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
         int action = Integer.valueOf(command).intValue();
         if (action == OK) {
             parent.remove(this);
-        } else {
-            switch (type) {
-            case COLOPEDIA_TERRAIN:
-                buildTerrainDetail(action);
-                break;
-            case COLOPEDIA_UNIT:
-                buildUnitDetail(action);
-                break;
-            case COLOPEDIA_GOODS:
-                buildGoodsDetail(action);
-                break;
-            case COLOPEDIA_SKILLS:
-                buildUnitDetail(action);
-                break;
-            case COLOPEDIA_BUILDING:
-                buildBuildingDetail(action);
-                break;
-            case COLOPEDIA_FATHER:
-                buildFatherDetail(action);
-                break;
-            default:
-                logger.warning("Invalid ActionCommand: invalid type " + type);
-                break;
+        }
+    }
+    
+    /**
+     * This function analyses a tree selection event and calls the right methods to take care
+     * of building the requested unit's details.
+     * 
+     * @param event The incoming TreeSelectionEvent.
+     */
+    public void valueChanged(TreeSelectionEvent event) {
+        if(event.getSource() == tree) {
+            TreePath path = tree.getSelectionPath();
+            if (path == null) {
+                return;
+            }
+            
+            DefaultMutableTreeNode node = (DefaultMutableTreeNode)path.getLastPathComponent();
+            DefaultMutableTreeNode parent = (DefaultMutableTreeNode)path.getParentPath().getLastPathComponent();
+            ColopediaTreeItem parentItem = (ColopediaTreeItem)parent.getUserObject();
+            ColopediaTreeItem nodeItem = (ColopediaTreeItem)node.getUserObject();
+            String parentTitle = parentItem.toString();
+            String nodeTitle = nodeItem.toString();
+            
+            if (parentTitle.equals(Messages.message("menuBar.colopedia.terrain"))) {
+                // Terrain
+                int numberOfTypes = FreeCol.getSpecification().numberOfTileTypes();
+                for (int type = 0; type < numberOfTypes; type++) {
+                    if (type < Tile.ARCTIC) {
+                        if(nodeTitle.equals(Tile.getName(type,false,0))) {
+                            buildTerrainDetail(type*2);
+                        }
+                        else if (nodeTitle.equals(Tile.getName(type,true,0))) {
+                            buildTerrainDetail(type*2+1);
+                        }
+                    }
+                    else if (nodeTitle.equals(Tile.getName(type,false,0))) {
+                        buildTerrainDetail(type*2);
+                    }
+                }
+                if (nodeTitle.equals(Messages.message("hills"))) {
+                    buildTerrainDetail(ImageLibrary.HILLS*2);
+                } else if (nodeTitle.equals(Messages.message("mountains"))) {
+                    buildTerrainDetail(ImageLibrary.MOUNTAINS*2);
+                }
+            } else if (parentTitle.equals(Messages.message("menuBar.colopedia.unit"))) {
+                // Units
+                int numberOfTypes = FreeCol.getSpecification().numberOfUnitTypes();
+                for (int i = 0; i < numberOfTypes; i++) {
+                    if (nodeTitle.equals(Unit.getName(i))) {
+                        buildUnitDetail(i);
+                    }
+                }
+            } else if (parentTitle.equals(Messages.message("menuBar.colopedia.goods"))) {
+                //Goods
+                int numberOfTypes = FreeCol.getSpecification().numberOfGoodsTypes();
+                for (int i = 0; i < numberOfTypes; i++) {
+                    if (nodeTitle.equals(Goods.getName(i))) {
+                        buildGoodsDetail(i);
+                    }
+                }
+            } else if (parentTitle.equals(Messages.message("menuBar.colopedia.skill"))) {
+                // Skills
+                int numberOfTypes = FreeCol.getSpecification().numberOfUnitTypes();
+                for (int type = 0; type < numberOfTypes; type++) {
+                    UnitType unitType = FreeCol.getSpecification().unitType(type);
+                    if (unitType.skill > 0) {
+                        if (nodeTitle.equals(Unit.getName(type))) { 
+                            buildUnitDetail(type);
+                        }
+                    }
+                }
+            } else if (parentTitle.equals(Messages.message("menuBar.colopedia.building"))) {
+                // Buildings
+                int numberOfTypes = FreeCol.getSpecification().numberOfBuildingTypes();
+                for (int type = 0; type < numberOfTypes; type++) {
+                    BuildingType buildingType = FreeCol.getSpecification().buildingType(type);
+                    for (int level = 0; level < buildingType.numberOfLevels(); level++) {
+                        BuildingType.Level buildingLevel = buildingType.level(level);
+                        if (nodeTitle.equals(Messages.message(buildingLevel.name))) {
+                            buildBuildingDetail(((type << 2) | (level)));
+                        }
+                    }
+                }
+            } else if (parentTitle.equals(Messages.message("menuBar.colopedia.father"))) {
+                // Founding Fathers
+                for (int i = 0; i < FoundingFather.FATHER_COUNT; i++) {
+                    if (nodeTitle.equals(Messages.message(FoundingFather.getName(i)))) {
+                        buildFatherDetail(i);
+                    }
+                }
+                
             }
         }
     }
