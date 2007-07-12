@@ -169,42 +169,42 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
             if (action == NO_DETAILS) {
                 action = Tile.UNEXPLORED;
             }
-            tree.expandRow(type+1);
+            tree.expandRow(type);
             buildTerrainDetail(action);
             break;
         case COLOPEDIA_UNIT:
             if (action == NO_DETAILS) {
                 action = Unit.FREE_COLONIST;
             }
-            tree.expandRow(type+1);
+            tree.expandRow(type);
             buildUnitDetail(action);
             break;
         case COLOPEDIA_GOODS:
             if (action == NO_DETAILS) {
                 action = Goods.FOOD;
             }
-            tree.expandRow(type+1);
+            tree.expandRow(type);
             buildGoodsDetail(action);
             break;
         case COLOPEDIA_SKILLS:
             if (action == NO_DETAILS) {
                 action = Unit.EXPERT_FARMER;
             }
-            tree.expandRow(type+1);
+            tree.expandRow(type);
             buildUnitDetail(action);
             break;
         case COLOPEDIA_BUILDING:
             if (action == NO_DETAILS) {
                 action = Building.TOWN_HALL;
             }
-            tree.expandRow(type+1);
+            tree.expandRow(type);
             buildBuildingDetail(action);
             break;
         case COLOPEDIA_FATHER:
             if (action == NO_DETAILS) {
                 action = FoundingFather.ADAM_SMITH;
             }
-            tree.expandRow(type+1);
+            tree.expandRow(type);
             buildFatherDetail(action);
             break;
         default:
