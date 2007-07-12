@@ -304,6 +304,7 @@
                         <res id="packsLang.xml_ned" src="@{freecol.build.dir}/installer/lang.xml_ned"/>
                         <res id="packsLang.xml_spa" src="@{freecol.build.dir}/installer/lang.xml_spa"/>
                         <res id="packsLang.xml_deu" src="@{freecol.build.dir}/installer/lang.xml_deu"/>
+                        <res id="packsLang.xml_fra" src="@{freecol.build.dir}/installer/lang.xml_fra"/>
                     </resources>
                     <native type="izpack" name="ShellLink.dll"/>
                     <panels>
