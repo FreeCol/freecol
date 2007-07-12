@@ -261,7 +261,13 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
         root.add(fathers);
         
         DefaultTreeModel treeModel = new DefaultTreeModel(root);
-        tree = new JTree(treeModel);
+        tree = new JTree(treeModel) {
+            @Override
+            public Dimension getPreferredSize() {
+                return new Dimension(200, super.getPreferredSize().height);
+            }
+        };
+        tree.setRootVisible(false);
         tree.setCellRenderer(new ColopediaTreeCellRenderer());
         tree.setOpaque(false);
         tree.addTreeSelectionListener(this);
