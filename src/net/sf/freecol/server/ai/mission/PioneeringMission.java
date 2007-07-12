@@ -270,6 +270,7 @@ public class PioneeringMission extends Mission {
                     }
                 }
                 if (getUnit().getTile() == tileImprovement.getTarget()
+                        && getUnit().getState() != tileImprovement.getType()
                         && getUnit().checkSetState(tileImprovement.getType())) {
                     Element changeStateElement = Message.createNewRootElement("changeState");
                     changeStateElement.setAttribute("unit", getUnit().getID());
