@@ -855,7 +855,7 @@ public class FreeColDialog extends FreeColPanel {
     */
     public static FreeColDialog createArmedUnitIndianSettlementDialog(IndianSettlement settlement, Player player) {
         String introText = Messages.message(settlement.getAlarmLevelMessage(player),
-                                            new String [][] {{"%nation%", settlement.getOwner().getNationAsString()}});
+                "%nation%", settlement.getOwner().getNationAsString());
         final JTextArea intro = getDefaultTextArea(introText);
         final JButton attack = new JButton(Messages.message("scoutSettlement.attack")),
                 demand = new JButton(Messages.message("scoutSettlement.tribute")),
@@ -921,7 +921,7 @@ public class FreeColDialog extends FreeColPanel {
     public static FreeColDialog createUseMissionaryDialog(IndianSettlement settlement, Player player) {
 
         String introText = Messages.message(settlement.getAlarmLevelMessage(player),
-                                        new String [][] {{"%nation%", settlement.getOwner().getNationAsString()}});
+                                        "%nation%", settlement.getOwner().getNationAsString());
         String mainText = Messages.message("missionarySettlement.question");
 
         JTextArea intro = getDefaultTextArea(introText);

@@ -180,11 +180,8 @@ public final class ReportRequirementsPanel extends ReportPanel implements Action
     private void addExpertWarning(StyledDocument doc, int colonyIndex, String goods, int workType) {
         String expertName = Unit.getName(workType);
         String colonyName = colonies.get(colonyIndex).getName();
-        String newMessage = Messages.message("report.requirements.noExpert",
-                                             new String[][] {
-                                                 {"%colony%", colonyName},
-                                                 {"%goods%", goods},
-                                                 {"%unit%", expertName}});
+        String newMessage = Messages.message("report.requirements.noExpert", "%colony%", colonyName, "%goods%", goods,
+                "%unit%", expertName);
 
         try {
             doc.insertString(doc.getLength(), newMessage + "\n\n", doc.getStyle("regular"));
@@ -201,11 +198,9 @@ public final class ReportRequirementsPanel extends ReportPanel implements Action
             }
 
             if (!severalExperts.isEmpty()) {
-                doc.insertString(doc.getLength(),
-                                 (Messages.message("report.requirements.severalExperts",
-                                                   new String[][] {
-                                                       {"%unit%", expertName}}) + " "),
-                                 doc.getStyle("regular"));
+                doc.insertString(doc.getLength(), 
+                        Messages.message("report.requirements.severalExperts", "%unit%", expertName), 
+                        doc.getStyle("regular"));
                 for (int index = 0; index < severalExperts.size() - 1; index++) {
                     Colony colony = severalExperts.get(index);
                     StyleConstants.setComponent(doc.getStyle("button"), createColonyButton(colony, false));
@@ -219,11 +214,9 @@ public final class ReportRequirementsPanel extends ReportPanel implements Action
             }
 
             if (!canTrainExperts.isEmpty()) {
-                doc.insertString(doc.getLength(),
-                                 (Messages.message("report.requirements.canTrainExperts",
-                                                   new String[][] {
-                                                       {"%unit%", expertName}}) + " "),
-                                 doc.getStyle("regular"));
+                doc.insertString(doc.getLength(), 
+                        Messages.message("report.requirements.canTrainExperts", "%unit%", expertName), 
+                        doc.getStyle("regular"));
                 for (int index = 0; index < canTrainExperts.size() - 1; index++) {
                     Colony colony = canTrainExperts.get(index);
                     StyleConstants.setComponent(doc.getStyle("button"), createColonyButton(colony, false));
@@ -245,10 +238,9 @@ public final class ReportRequirementsPanel extends ReportPanel implements Action
     private void addProductionWarning(StyledDocument doc, int colonyIndex, int output, int input) {
         String colonyName = colonies.get(colonyIndex).getName();
         String newMessage = Messages.message("report.requirements.missingGoods",
-                                             new String[][] {
-                                                 {"%colony%", colonyName},
-                                                 {"%goods%", Goods.getName(output)},
-                                                 {"%input%", Goods.getName(input)}});
+                "%colony%", colonyName,
+                "%goods%", Goods.getName(output),
+                "%input%", Goods.getName(input));
 
         try {
             doc.insertString(doc.getLength(), newMessage + "\n\n", doc.getStyle("regular"));
@@ -264,10 +256,8 @@ public final class ReportRequirementsPanel extends ReportPanel implements Action
 
             if (!withSurplus.isEmpty()) {
                 doc.insertString(doc.getLength(),
-                                 (Messages.message("report.requirements.surplus",
-                                                   new String[][] {
-                                                       {"%goods%", Goods.getName(input)}}) + " "),
-                                 doc.getStyle("regular"));
+                        Messages.message("report.requirements.surplus", "%goods%", Goods.getName(input)) + " ",
+                        doc.getStyle("regular"));
                 for (int index = 0; index < withSurplus.size() - 1; index++) {
                     Colony colony = withSurplus.get(index);
                     String amount = " (" + theSurplus.get(index) + ")";

@@ -245,8 +245,8 @@ public final class ReportProductionPanel extends JPanel implements ActionListene
 
         row = 3;
         // summary
-        JLabel allColonies = new JLabel(Messages.message("report.allColonies", new String[][] { { "%number%",
-                String.valueOf(numberOfColonies) } }));
+        JLabel allColonies = new JLabel(Messages.message("report.allColonies", "%number%",
+                String.valueOf(numberOfColonies)));
         allColonies.setForeground(Color.BLUE);
         add(allColonies, higConst.rc(row, colonyColumn));
 

@@ -100,8 +100,7 @@ public final class RecruitDialog extends FreeColDialog implements ActionListener
             ImageLibrary library = (ImageLibrary) getCanvas().getImageProvider();
             recruitPrice = player.getRecruitPrice();
 
-            question.setText(Messages.message("recruitDialog.clickOn", new String[][] { { "%money%",
-                    String.valueOf(recruitPrice) } }));
+            question.setText(Messages.message("recruitDialog.clickOn", "%money%", String.valueOf(recruitPrice)));
 
             for (int index = 0; index < NUMBER_OF_PERSONS; index++) {
                 int unitType = player.getEurope().getRecruitable(index);

@@ -311,12 +311,10 @@ public final class NegotiationDialog extends FreeColDialog implements ActionList
                     description = Player.getStanceAsString(((StanceTradeItem) item).getStance());
                 } else if (item instanceof GoldTradeItem) {
                     String gold = String.valueOf(((GoldTradeItem) item).getGold());
-                    description = Messages.message("tradeItem.gold.long",
-                                                   new String[][] {{"%amount%", gold}});
+                    description = Messages.message("tradeItem.gold.long", "%amount%", gold);
                 } else if (item instanceof ColonyTradeItem) {
-                    description = Messages.message("tradeItem.colony.long",
-                                                   new String[][] {
-                                                       {"%colony%", ((ColonyTradeItem) item).getColony().getName()}});
+                    description = Messages.message("tradeItem.colony.long", 
+                            "%colony%", ((ColonyTradeItem) item).getColony().getName());
                 } else if (item instanceof GoodsTradeItem) {
                     description = String.valueOf(((GoodsTradeItem) item).getGoods().getAmount()) + " " +
                         ((GoodsTradeItem) item).getGoods().getName();

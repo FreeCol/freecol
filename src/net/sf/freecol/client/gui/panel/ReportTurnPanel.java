@@ -157,8 +157,8 @@ public final class ReportTurnPanel extends ReportPanel implements ActionListener
                 reportPanel.add(ignoreButton, higConst.rc(row, button1Column, ""));
             }
             JButton filterButton = new JButton("X");
-            filterButton.setToolTipText(Messages.message("model.message.filter", new String[][] { { "%type%",
-                    message.getTypeName() } }));
+            filterButton.setToolTipText(Messages.message("model.message.filter", 
+                    "%type%", message.getTypeName()));
             final BooleanOption filterOption = options.getBooleanOption(message);
             filterButton.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent event) {
