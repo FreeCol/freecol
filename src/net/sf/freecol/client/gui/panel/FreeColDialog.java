@@ -398,10 +398,8 @@ public class FreeColDialog extends FreeColPanel {
         // right hand side: defender
         if (defender != null) {
             String defenderName = Messages.message("model.unit.nationUnit",
-                                                   new String[][] {
-                                                       {"%nation%", defender.getOwner().getNationAsString()},
-                                                       {"%unit%", defender.getName()}
-                                                   });
+                        "%nation%", defender.getOwner().getNationAsString(),
+                        "%unit%", defender.getName());
             preCombatDialog.add(new JLabel(defenderName),
                                 higConst.rc(row, defenseLabelColumn));
             row += 2;
@@ -414,8 +412,7 @@ public class FreeColDialog extends FreeColPanel {
                 defenderName = ((Colony) settlement).getName();
             } else {
                 defenderName = Messages.message("indianSettlement", 
-                                                new String[][] {{"%nation%", 
-                                                                 settlement.getOwner().getNationAsString()}});
+                            "%nation%", settlement.getOwner().getNationAsString());
             }
             preCombatDialog.add(new JLabel(defenderName),
                                 higConst.rc(row, defenseLabelColumn));
@@ -693,8 +690,9 @@ public class FreeColDialog extends FreeColPanel {
     * @return The FreeColDialog that asks the question to the user.
     */
     public static FreeColDialog createScoutForeignColonyDialog(Colony colony, Unit unit) {
-        String mainText = Messages.message("scoutColony.text", new String [][] {
-            {"%unit%", unit.getName()}, {"%colony%", colony.getName()}});
+        String mainText = Messages.message("scoutColony.text", 
+                "%unit%", unit.getName(), 
+                "%colony%", colony.getName());
 
         final JTextArea question = getDefaultTextArea(mainText);
         final JButton negotiate = new JButton(Messages.message("scoutColony.negotiate")),
@@ -766,7 +764,7 @@ public class FreeColDialog extends FreeColPanel {
     */
     public static FreeColDialog createScoutIndianSettlementDialog(IndianSettlement settlement, Player player) {
         String introText = Messages.message(settlement.getAlarmLevelMessage(player),
-                                            new String [][] {{"%nation%", settlement.getOwner().getNationAsString()}});
+                "%nation%", settlement.getOwner().getNationAsString());
         int skill = settlement.getLearnableSkill();
         String messageID;
         String skillName = "";
@@ -776,11 +774,11 @@ public class FreeColDialog extends FreeColPanel {
         } else {
             messageID = "scoutSettlement.question2";
         }
-        String [][] data = new String [][] {
-            {"%replace_skill%", skillName},
-            {"%replace_good1%", Goods.getName(settlement.getHighlyWantedGoods())},
-            {"%replace_good2%", Goods.getName(settlement.getWantedGoods1())},
-            {"%replace_good3%", Goods.getName(settlement.getWantedGoods2())}};
+        String[] data = new String [] {
+            "%replace_skill%", skillName,
+            "%replace_good1%", Goods.getName(settlement.getHighlyWantedGoods()),
+            "%replace_good2%", Goods.getName(settlement.getWantedGoods1()),
+            "%replace_good3%", Goods.getName(settlement.getWantedGoods2())};
     
         String mainText = Messages.message(messageID, data);
 

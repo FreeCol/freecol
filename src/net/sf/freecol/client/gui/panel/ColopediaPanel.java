@@ -74,6 +74,7 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
             { "Warehouse", "WarehouseExpansion", null }, { "Stables", null, null }, { "Docks", "Drydock", "Shipyard" },
             { "PrintingPress", "Newspaper", null }, { "CustomHouse", null, null } };
 
+    @SuppressWarnings("unused")
     private static final Logger logger = Logger.getLogger(ColopediaPanel.class.getName());
 
     private static final int OK = -1;
@@ -89,8 +90,6 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
     private JPanel detailPanel;
 
     private JButton ok;
-
-    private int type;
     
     private JTree tree;
 
@@ -160,7 +159,6 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
      * @param action - the details
      */
     public void initialize(int type, int action) {
-        this.type = type;
         listPanel.removeAll();
         detailPanel.removeAll();
         tree = buildTree();
