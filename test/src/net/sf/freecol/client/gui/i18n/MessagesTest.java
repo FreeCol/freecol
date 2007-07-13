@@ -32,6 +32,7 @@ public class MessagesTest extends FreeColTestCase {
         assertEquals(null, Messages.message("should.not.exist.and.thus.return.null"));
     }
 
+    @SuppressWarnings("deprecation")
     public void testMessageStringStringArrayArray() {
 
         assertEquals("Trade Advisor", Messages.message("menuBar.report.trade", new String[][] {} ));
