@@ -293,6 +293,18 @@ public class AIColony extends AIObject {
                 Iterator<WorkLocationPlan> wlpIterator = workLocationPlans.iterator();
                 while (wlpIterator.hasNext()) {
                     WorkLocationPlan wlp = wlpIterator.next();
+                    // Do not use tiles taken by other colonies:
+                    if (wlp.getWorkLocation() instanceof ColonyTile
+                            && ((ColonyTile) wlp.getWorkLocation()).getWorkTile().getSettlement() != null) {
+                        continue;
+                    }
+                    // Do not request fishermen until Docks have been completed:
+                    // TODO: Check if docks are currently being built (and a carpenter with lumber is available)
+                    if (wlp.getWorkLocation() instanceof ColonyTile
+                            && !((ColonyTile) wlp.getWorkLocation()).getWorkTile().isLand()
+                            && !colony.getBuilding(Building.DOCK).isBuilt()) {
+                        continue;
+                    }
                     if (wlp.getGoodsType() == Goods.FOOD) {
                         production[Goods.FOOD] += wlp.getProductionOf(Goods.FOOD);
                         production[Goods.FOOD] -= 2;
