@@ -154,7 +154,7 @@ public final class MessageMerge
     }
 
 
-    private static void saveLinesToFile( List lineList, String pathToFile )
+    private static void saveLinesToFile( List<String> lineList, String pathToFile )
     {
         try {
             FileOutputStream  out = new FileOutputStream( pathToFile );
