@@ -308,6 +308,7 @@
                         <res id="packsLang.xml_pol" src="@{freecol.build.dir}/installer/lang.xml_pol"/>
                         <res id="packsLang.xml_ita" src="@{freecol.build.dir}/installer/lang.xml_ita"/>
                         <res id="packsLang.xml_por" src="@{freecol.build.dir}/installer/lang.xml_por"/>
+                        <res id="packsLang.xml_swe" src="@{freecol.build.dir}/installer/lang.xml_swe"/>
                     </resources>
                     <native type="izpack" name="ShellLink.dll"/>
                     <panels>
