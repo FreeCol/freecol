@@ -132,7 +132,7 @@ public class Messages {
             throw new NullPointerException();
         }
         if (data.length % 2 != 0) {
-            throw new RuntimeException("Programming error, the data should consist of only pairs.");
+            throw new IllegalArgumentException("Programming error, the data should consist of only pairs.");
         }
         if (messageBundle == null) {
             setMessageBundle(Locale.getDefault());
@@ -142,7 +142,7 @@ public class Messages {
         if (data.length > 0 && message != null) {
             for (int i = 0; i < data.length; i += 2) {
                 if (data[i] == null || data[i+1] == null) {
-                    throw new RuntimeException("Programming error,no data should be <null>.");
+                    throw new IllegalArgumentException("Programming error,no data should be <null>.");
                 }
                 message = message.replaceAll(data[i], data[i+1]);
             }

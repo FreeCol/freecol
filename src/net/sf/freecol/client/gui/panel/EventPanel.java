@@ -87,8 +87,8 @@ public final class EventPanel extends FreeColDialog implements ActionListener {
         if (eventID == FIRST_LANDING) {
             Image image = (Image) UIManager.get("EventImage.firstLanding");
             imageLabel.setIcon(new ImageIcon(image));
-            header.setText(Messages.message("event.firstLanding", new String[][] { { "%name%",
-                    freeColClient.getMyPlayer().getNewLandName() } }));
+            header.setText(Messages.message("event.firstLanding", "%name%",
+                    freeColClient.getMyPlayer().getNewLandName()));
         } else if (eventID == MEETING_NATIVES) {
             Image image = (Image) UIManager.get("EventImage.meetingNatives");
             imageLabel.setIcon(new ImageIcon(image));

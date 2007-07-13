@@ -1,7 +1,6 @@
 package net.sf.freecol.client.gui.plaf;
 
 import java.awt.Graphics;
-import java.awt.Graphics2D;
 
 import javax.swing.JComponent;
 import javax.swing.plaf.ComponentUI;

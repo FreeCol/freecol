@@ -294,11 +294,11 @@ public class InGameMenuBar extends FreeColMenuBar {
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
         
-        String displayString = Messages.message("menuBar.statusLine", new String[][] {
-                { "%gold%", Integer.toString(freeColClient.getMyPlayer().getGold()) },
-                { "%tax%", Integer.toString(freeColClient.getMyPlayer().getTax()) },
-                { "%score%", Integer.toString(freeColClient.getMyPlayer().getScore()) },
-                { "%year%", freeColClient.getGame().getTurn().toString() }});
+        String displayString = Messages.message("menuBar.statusLine",
+                "%gold%", Integer.toString(freeColClient.getMyPlayer().getGold()),
+                "%tax%", Integer.toString(freeColClient.getMyPlayer().getTax()),
+                "%score%", Integer.toString(freeColClient.getMyPlayer().getScore()),
+                "%year%", freeColClient.getGame().getTurn().toString());
         Rectangle2D displayStringBounds = g.getFontMetrics().getStringBounds(displayString, g);
         int y = 15 + getInsets().top;
         g.drawString(displayString, getWidth() - 10 - (int) displayStringBounds.getWidth(), y);

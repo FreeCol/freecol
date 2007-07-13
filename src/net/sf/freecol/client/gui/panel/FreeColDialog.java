@@ -370,10 +370,8 @@ public class FreeColDialog extends FreeColPanel {
 
         // left hand side: attacker
         String attackerName = Messages.message("model.unit.nationUnit",
-                                               new String[][] {
-                                                   {"%nation%", attacker.getOwner().getNationAsString()},
-                                                   {"%unit%", attacker.getName()}
-                                               });
+                    "%nation%", attacker.getOwner().getNationAsString(),
+                    "%unit%", attacker.getName());
         preCombatDialog.add(new JLabel(attackerName),
                             higConst.rc(row, offenseLabelColumn));
         row += 2;
