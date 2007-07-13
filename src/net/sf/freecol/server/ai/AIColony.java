@@ -18,6 +18,7 @@ import net.sf.freecol.common.model.Building;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.ColonyTile;
 import net.sf.freecol.common.model.Goods;
+import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.WorkLocation;
@@ -975,12 +976,13 @@ public class AIColony extends AIObject {
         for (int goodsType = 0; goodsType < Goods.NUMBER_OF_TYPES; goodsType++) {
         	int production = colony.getProductionNetOf(goodsType);
         	int in_stock = colony.getGoodsCount(goodsType);
-        	if (Goods.FOOD!=goodsType && production + in_stock > colony.getWarehouseCapacity()) {
+        	if (Goods.FOOD != goodsType && production + in_stock > colony.getWarehouseCapacity()) {
         		Iterator<Unit> unitIterator = colony.getUnitIterator();
         		int waste = production + in_stock - colony.getWarehouseCapacity();
         		while (unitIterator.hasNext() && waste > 0){
         			Unit unit = unitIterator.next();
-        			if (unit.getWorkType()==goodsType) {
+        			if (unit.getWorkType() == goodsType) {
+                        final Location oldLocation = unit.getLocation();
         				unit.setLocation(null);
         				boolean working = false;
         				waste = colony.getGoodsCount(goodsType) + colony.getProductionNetOf(goodsType)
@@ -1000,7 +1002,13 @@ public class AIColony extends AIObject {
         					}
         				}
         				if (!working){
-        					units.add(unit);
+        					//units.add(unit);
+                            /*
+                             * Keep the unit inside the colony. Units outside
+                             * colonies are assigned Missions.
+                             */
+                            // TODO: Create a Mission for units temporarily moved outside colonies.
+                            unit.setLocation(oldLocation);
         				}
         			}
         		}
