@@ -5,6 +5,7 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Vector;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamConstants;
@@ -811,6 +812,46 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
         }
 
         return Integer.MAX_VALUE;
+    }
+    
+    /**
+     * Returns the number of turns this <code>Unit</code> will have to use in
+     * order to reach the given <code>Location</code>.
+     * 
+     * @param destination The destination for this unit.
+     * @return The number of turns it will take to reach the <code>destination</code>,
+     *         or <code>Integer.MAX_VALUE</code> if no path can be found.
+     */
+    public int getTurnsToReach(Location destination) {
+        if (destination == null) {
+            logger.log(Level.WARNING, "destination == null", new Throwable());
+        }
+        
+        if (getTile() == null) {
+            if (destination.getTile() == null) {
+                return 0;
+            }
+            final PathNode p;
+            if (getLocation() instanceof Unit) {
+                final Unit carrier = (Unit) getLocation();
+                p = getGame().getMap().findPath(this, (Tile) carrier.getEntryLocation(), destination.getTile(), carrier);
+            } else {
+                // TODO: Use a standard carrier with four move points as a the unit's carrier:
+                p = getGame().getMap().findPath((Tile) getOwner().getEntryLocation(), destination.getTile(), Map.BOTH_LAND_AND_SEA);
+            }
+            if (p != null) {
+                return p.getTotalTurns();
+            } else {
+                return Integer.MAX_VALUE;
+            }
+        }
+        
+        if (destination.getTile() == null) {
+            // TODO: Find a path (and determine distance) to Europe:
+            return 10;
+        }
+        
+        return getTurnsToReach(destination.getTile());
     }
 
     /**
