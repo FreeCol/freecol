@@ -271,9 +271,9 @@ public class IndianSettlement extends Settlement {
      */
     public String getLocationName() {
         if (isCapital()){
-            return Messages.message("indianCapital", new String[][] {{"%nation%", getOwner().getNationAsString()}});
+            return Messages.message("indianCapital", "%nation%", getOwner().getNationAsString());
         } else {
-            return Messages.message("indianSettlement", new String[][] {{"%nation%", getOwner().getNationAsString()}});
+            return Messages.message("indianSettlement", "%nation%", getOwner().getNationAsString());
         }
     }
 

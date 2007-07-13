@@ -196,7 +196,7 @@ public final class TradeRouteInputDialog extends FreeColDialog implements Action
 
         // combo box for selecting destination
         
-        destinationSelector.addItem(Messages.message("report.allColonies", new String[][] { { "%number%", "" } }));
+        destinationSelector.addItem(Messages.message("report.allColonies", "%number%", ""));
         if (player.getEurope() != null) {
             destinationSelector.addItem(player.getEurope());
         }

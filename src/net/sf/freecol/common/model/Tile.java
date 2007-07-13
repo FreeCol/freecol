@@ -264,7 +264,7 @@ public final class Tile extends FreeColGameObject implements Location, Nameable 
                 if (nearSettlement != null && nearSettlement instanceof Colony) {
                     String name = ((Colony) nearSettlement).getName();
                     return getName() + " ("
-                            + Messages.message("nearLocation", new String[][] { { "%location%", name } }) + ")";
+                            + Messages.message("nearLocation","%location%", name) + ")";
                 }
             }
             return getName();

@@ -265,7 +265,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
      * @return A name for this unit, as a location.
      */
     public String getLocationName() {
-        return Messages.message("onBoard", new String[][] { { "%unit%", getName() } });
+        return Messages.message("onBoard", "%unit%", getName());
     }
 
     /**

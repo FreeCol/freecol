@@ -132,16 +132,6 @@ public class LanguageOption extends SelectOption {
          }
          return names.toArray(new String[0]);
      }
-     
-     /**
-      * Capitalizes the given text.
-      *
-      * @param s The String to be capitalized.
-      * @return The capitalized string.
-      */
-     private static String toCapitalized(String s) {
-         return toCapitalized(s, Locale.getDefault());
-     }
 
      /**
       * Capitalizes the given text.

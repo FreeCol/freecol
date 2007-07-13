@@ -182,9 +182,8 @@ public final class ReportTurnPanel extends ReportPanel implements ActionListener
         } else if (source instanceof Player) {
             Player player = (Player) source;
             headline = new JLabel(Messages.message("playerNation", 
-                                                   new String[][] {
-                                                       { "%player%", player.getName() },
-                                                       { "%nation%", player.getNationAsString() } }));
+                    "%player%", player.getName(),
+                    "%nation%", player.getNationAsString()));
         } else if (source instanceof Europe) {
             Europe europe = (Europe) source;
             JButton button = new JButton(europe.getName());

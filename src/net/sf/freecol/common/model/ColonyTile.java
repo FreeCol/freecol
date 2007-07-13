@@ -105,7 +105,7 @@ public class ColonyTile extends FreeColGameObject implements WorkLocation, Ownab
         if (isColonyCenterTile()) {
             return name;
         } else {
-            return Messages.message("nearLocation", new String[][] {{"%location%", name}});
+            return Messages.message("nearLocation", "%location%", name);
         }
     }
     

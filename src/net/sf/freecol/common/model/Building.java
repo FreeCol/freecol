@@ -246,7 +246,7 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
      * @return The name of this location.
      */
     public String getLocationName() {
-        return Messages.message("inLocation", new String[][] { { "%location%", getName() } });
+        return Messages.message("inLocation", "%location%", getName());
     }
 
     /**

@@ -224,8 +224,8 @@ public final class ReportUnitPanel extends JPanel implements ActionListener {
                 capacity += unit.getInitialSpaceLeft();
                 Location location = unit.getLocation();
                 if (unit.getDestination() != null) {
-                    locationName = Messages.message("goingTo", new String[][] {
-                        {"%location%", unit.getDestination().getLocationName()}});
+                    locationName = Messages.message("goingTo", 
+                            "%location%", unit.getDestination().getLocationName());
                 } else {
                     locationName = location.getLocationName();
                 }
@@ -238,8 +238,8 @@ public final class ReportUnitPanel extends JPanel implements ActionListener {
                 } else if (unit.getState() == Unit.TO_EUROPE) {
                     locationName = Messages.message("goingToEurope");
                 } else if (unit.getDestination() != null) {
-                    locationName = Messages.message("sailingTo", new String[][] { { "%location%",
-                            unit.getDestination().getLocationName() } });
+                    locationName = Messages.message("sailingTo", "%location%",
+                            unit.getDestination().getLocationName());
                 } else {
                     locationName = location.getLocationName();
                 }
@@ -276,8 +276,8 @@ public final class ReportUnitPanel extends JPanel implements ActionListener {
 
                 Location location = unit.getLocation();
                 if (unit.getDestination() != null) {
-                    locationName = Messages.message("goingTo", new String[][] { { "%location%",
-                            unit.getDestination().getLocationName() } });
+                    locationName = Messages.message("goingTo", "%location%",
+                            unit.getDestination().getLocationName());
                 } else {
                     locationName = location.getLocationName();
                 }
