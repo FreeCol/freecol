@@ -257,7 +257,24 @@ public class AIColony extends AIObject {
      * Creates the wishes for the <code>Colony</code>.
      */
     private void createWishes() {
+        logger.finest("Entering method createWishes");
         List<WorkLocationPlan> workLocationPlans = colonyPlan.getSortedWorkLocationPlans();
+        Iterator<WorkLocationPlan> rit = workLocationPlans.iterator();
+        while (rit.hasNext()) {
+            WorkLocationPlan wlp = rit.next();
+            // Do not use tiles taken by other colonies:
+            if (wlp.getWorkLocation() instanceof ColonyTile
+                    && ((ColonyTile) wlp.getWorkLocation()).getWorkTile().getSettlement() != null) {
+                rit.remove();
+            }
+            // Do not request fishermen unless Docks have been completed:
+            if (wlp.getWorkLocation() instanceof ColonyTile
+                    && !((ColonyTile) wlp.getWorkLocation()).getWorkTile().isLand()
+                    && !colony.getBuilding(Building.DOCK).isBuilt()) {
+                // TODO: Check if docks are currently being built (and a carpenter with lumber is available)
+                rit.remove();
+            }
+        }
 
         int[] production = new int[Goods.NUMBER_OF_TYPES];
         ArrayList<Unit> nonExpertUnits = new ArrayList<Unit>();
@@ -294,18 +311,6 @@ public class AIColony extends AIObject {
                 Iterator<WorkLocationPlan> wlpIterator = workLocationPlans.iterator();
                 while (wlpIterator.hasNext()) {
                     WorkLocationPlan wlp = wlpIterator.next();
-                    // Do not use tiles taken by other colonies:
-                    if (wlp.getWorkLocation() instanceof ColonyTile
-                            && ((ColonyTile) wlp.getWorkLocation()).getWorkTile().getSettlement() != null) {
-                        continue;
-                    }
-                    // Do not request fishermen until Docks have been completed:
-                    // TODO: Check if docks are currently being built (and a carpenter with lumber is available)
-                    if (wlp.getWorkLocation() instanceof ColonyTile
-                            && !((ColonyTile) wlp.getWorkLocation()).getWorkTile().isLand()
-                            && !colony.getBuilding(Building.DOCK).isBuilt()) {
-                        continue;
-                    }
                     if (wlp.getGoodsType() == Goods.FOOD) {
                         production[Goods.FOOD] += wlp.getProductionOf(Goods.FOOD);
                         production[Goods.FOOD] -= 2;
@@ -318,25 +323,27 @@ public class AIColony extends AIObject {
                 }
             }
             if (unitType == -1) {
+                if (production[Goods.FOOD] < 2) {
+                    // Not enough food.
+                    break;
+                }
                 Iterator<WorkLocationPlan> wlpIterator = workLocationPlans.iterator();
                 while (wlpIterator.hasNext()) {
                     WorkLocationPlan wlp = wlpIterator.next();
                     // TODO: Check if the production of the raw material is
                     // sufficient.
-                    if (true) {
-                        if (wlp.getGoodsType() < production.length) {
-                            production[wlp.getGoodsType()] += wlp.getProductionOf(wlp.getGoodsType());
-                        }
-                        production[Goods.FOOD] -= 2;
-                        wlpIterator.remove();
-
-                        if (wlp.getWorkLocation() instanceof ColonyTile) {
-                            unitType = ((ColonyTile) wlp.getWorkLocation()).getExpertForProducing(wlp.getGoodsType());
-                        } else {
-                            unitType = ((Building) wlp.getWorkLocation()).getExpertUnitType();
-                        }
-                        break;
+                    if (wlp.getGoodsType() < production.length) {
+                        production[wlp.getGoodsType()] += wlp.getProductionOf(wlp.getGoodsType());
                     }
+                    production[Goods.FOOD] -= 2;
+                    wlpIterator.remove();
+
+                    if (wlp.getWorkLocation() instanceof ColonyTile) {
+                        unitType = ((ColonyTile) wlp.getWorkLocation()).getExpertForProducing(wlp.getGoodsType());
+                    } else {
+                        unitType = ((Building) wlp.getWorkLocation()).getExpertUnitType();
+                    }
+                    break;
                 }
             }
             if (unitType >= 0) {
