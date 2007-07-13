@@ -345,12 +345,15 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
      * @param parent
      */
     private void buildBuildingSubtree(DefaultMutableTreeNode parent) {
+        Image buildingImage = (Image) UIManager.get("Colopedia.buildingSection.image");
+        ImageIcon buildingIcon = new ImageIcon((buildingImage != null) ? buildingImage : null);
+
         int numberOfTypes = FreeCol.getSpecification().numberOfBuildingTypes();
         for (int type = 0; type < numberOfTypes; type++) {
             BuildingType buildingType = FreeCol.getSpecification().buildingType(type);
             for (int level = 0; level < buildingType.numberOfLevels(); level++) {
                 BuildingType.Level buildingLevel = buildingType.level(level);
-                DefaultMutableTreeNode item = new DefaultMutableTreeNode(new ColopediaTreeItem(Messages.message(buildingLevel.name), null));
+                DefaultMutableTreeNode item = new DefaultMutableTreeNode(new ColopediaTreeItem(Messages.message(buildingLevel.name), buildingIcon));
                 parent.add(item);
             }
         }
@@ -434,7 +437,8 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
      */
     private void buildFatherItem(int foundingFather, DefaultMutableTreeNode parent) {
         String name = Messages.message(FoundingFather.getName(foundingFather));
-        DefaultMutableTreeNode item = new DefaultMutableTreeNode(new ColopediaTreeItem(name, null));
+        ImageIcon icon = library.getScaledGoodsImageIcon(Goods.BELLS, 0.75f);
+        DefaultMutableTreeNode item = new DefaultMutableTreeNode(new ColopediaTreeItem(name, icon));
         parent.add(item);
     }
 
