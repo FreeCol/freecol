@@ -1005,10 +1005,9 @@ public class AIPlayer extends AIObject {
                         if (ww.getDestination().getTile() == null) {
                             turns = 5;
                         } else {
-                            continue;
+                            turns = 10;
                         }
-                    }
-                    if (turns > 5) {
+                    } else if (turns > 5) {
                         turns = 5;
                     }
                     if (bestWish == null
@@ -1047,10 +1046,9 @@ public class AIPlayer extends AIObject {
                                 if (ww.getDestination().getTile() == null) {
                                     turns = 5;
                                 } else {
-                                    continue;
+                                    turns = 10;
                                 }
-                            }
-                            if (turns > 5) {
+                            } else if (turns > 5) {
                                 turns = 5;
                             }
                             // TODO: Choose to build colony if the value of the
