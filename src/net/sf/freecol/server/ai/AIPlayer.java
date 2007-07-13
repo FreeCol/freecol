@@ -937,6 +937,7 @@ public class AIPlayer extends AIObject {
      */
     private void giveNormalMissions() {
         logger.finest("Entering method giveNormalMissions");
+        
         // Create a datastructure for the worker wishes:
         Vector<ArrayList<Wish>> workerWishes = new Vector<ArrayList<Wish>>(Unit.UNIT_COUNT);
         for (int i = 0; i < Unit.UNIT_COUNT; i++) {
@@ -953,7 +954,7 @@ public class AIPlayer extends AIObject {
                     }
                 }
             }
-        }
+        } 
         
         final boolean fewColonies = hasFewColonies();
         Iterator<AIUnit> aiUnitsIterator = getAIUnitIterator();
@@ -962,6 +963,7 @@ public class AIPlayer extends AIObject {
             if (aiUnit.hasMission()) {
                 continue;
             }
+            
             Unit unit = aiUnit.getUnit();
             if (unit.getType() == Unit.TREASURE_TRAIN) {
                 aiUnit.setMission(new CashInTreasureTrainMission(getAIMain(), aiUnit));
@@ -972,7 +974,20 @@ public class AIPlayer extends AIObject {
                 giveMilitaryMission(aiUnit);
             } else if (unit.getNumberOfTools() > 0 && PioneeringMission.isValid(aiUnit)) {
                 aiUnit.setMission(new PioneeringMission(getAIMain(), aiUnit));
-            } else if (unit.isColonist()) {
+            } else if (unit.isColonist()) {                
+                /*
+                 * Motivated by (speed) performance: This map stores the
+                 * distance between the unit and the destination of a Wish:
+                 */
+                HashMap<Location, Integer> distances = new HashMap<Location, Integer>(121);
+                for (ArrayList<Wish> al : workerWishes) {
+                    for (Wish w : al) {
+                        if (!distances.containsKey(w.getDestination())) {
+                            distances.put(w.getDestination(), unit.getTurnsToReach(w.getDestination()));
+                        }
+                    }
+                }
+
                 // Check if this unit is needed as an expert (using:
                 // "WorkerWish"):
                 ArrayList<Wish> wishList = workerWishes.get(unit.getType());
@@ -985,17 +1000,19 @@ public class AIPlayer extends AIObject {
                         i--;
                         continue;
                     }
-                    int turns;
-                    if (unit.getLocation().getTile() == null) {
-                        // TODO-MUCH-LATER: This can be done better:
-                        turns = ((Tile) player.getEntryLocation()).getDistanceTo(ww.getDestination().getTile()) * 3;
-                    } else if (unit.getLocation() instanceof Tile || unit.getLocation() instanceof Unit) {
-                        turns = unit.getTurnsToReach(ww.getDestination().getTile());
-                    } else {
-                        turns = Integer.MAX_VALUE;
+                    int turns = distances.get(ww.getDestination());
+                    if (turns == Integer.MAX_VALUE) {
+                        if (ww.getDestination().getTile() == null) {
+                            turns = 5;
+                        } else {
+                            continue;
+                        }
+                    }
+                    if (turns > 5) {
+                        turns = 5;
                     }
                     if (bestWish == null
-                            || ww.getValue() - (turns * 2) > bestWish.getValue() - (turns * 2)) {
+                            || ww.getValue() - (turns * 2) > bestWish.getValue() - (bestTurns * 2)) {
                         bestWish = ww;
                         bestTurns = turns;
                     }
@@ -1025,19 +1042,21 @@ public class AIPlayer extends AIObject {
                                 j--;
                                 continue;
                             }
-                            Tile source = unit.getTile();
-                            if (source == null) {
-                                if (unit.getLocation() instanceof Unit) {
-                                    source = (Tile) ((Unit) unit.getLocation()).getEntryLocation();
+                            int turns = distances.get(ww.getDestination());
+                            if (turns == Integer.MAX_VALUE) {
+                                if (ww.getDestination().getTile() == null) {
+                                    turns = 5;
                                 } else {
-                                    source = (Tile) unit.getOwner().getEntryLocation();
+                                    continue;
                                 }
                             }
-                            int turns = unit.getTurnsToReach(source, ww.getDestination().getTile());
+                            if (turns > 5) {
+                                turns = 5;
+                            }
                             // TODO: Choose to build colony if the value of the
                             // wish is low.
-                            if (bestWish == null && turns < bestTurns || bestWish != null
-                                    && (turns < bestTurns || turns == bestTurns && ww.getValue() > bestWish.getValue())) {
+                            if (bestWish == null
+                                    || ww.getValue() - (turns * 2) > bestWish.getValue() - (bestTurns * 2)) {
                                 bestWish = ww;
                                 bestTurns = turns;
                             }
