@@ -1077,7 +1077,7 @@ public class FreeColDialog extends FreeColPanel {
     */
     public static FreeColDialog createInputDialog(String text, String defaultValue, String okText, String cancelText) {
         final JTextField input = new JTextField(defaultValue);
-
+        
         final FreeColDialog inputDialog = new FreeColDialog()  {
             public void requestFocus() {
                 input.requestFocus();
@@ -1116,6 +1116,8 @@ public class FreeColDialog extends FreeColPanel {
                 inputDialog.setResponse(input.getText());
             }
         });
+        
+        input.selectAll();
 
         int row = 1;
         int textColumn = 1;
