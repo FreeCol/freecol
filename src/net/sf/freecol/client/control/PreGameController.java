@@ -195,8 +195,10 @@ public final class PreGameController {
         gui.setInGame(true);
 
         freeColClient.getCanvas().setJMenuBar(new InGameMenuBar(freeColClient));
-        Player player = freeColClient.getMyPlayer();
-        player.addModelMessage(new ModelMessage(player, "tutorial.startGame", null, ModelMessage.TUTORIAL, player));
+        if (freeColClient.getGame().getTurn().getNumber() == 1) {
+            Player player = freeColClient.getMyPlayer();
+            player.addModelMessage(new ModelMessage(player, "tutorial.startGame", null, ModelMessage.TUTORIAL, player));
+        }
 
         Unit activeUnit = freeColClient.getMyPlayer().getNextActiveUnit();
         //freeColClient.getMyPlayer().updateCrossesRequired();
