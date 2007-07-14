@@ -56,7 +56,7 @@ public final class FreeCol {
      */
     private static Specification specification;
 
-    private static final String FREECOL_VERSION = "0.6.2-cvs";
+    private static final String FREECOL_VERSION = "0.7.0";
     
     private static final String MIN_JDK_VERSION = "1.5";
     private static final String FILE_SEP = System.getProperty("file.separator");

@@ -1391,11 +1391,15 @@ public final class Tile extends FreeColGameObject implements Location, Nameable 
      * @return The type of secondary good best produced by this tile.
      */
     public int secondaryGoods() {
-        if (isForested())
+        return secondaryGoods(getType(), isForested(), getAddition());
+    }
+
+    public static int secondaryGoods(int type, boolean forested, int addition) {
+        if (forested)
             return Goods.FURS;
-        if (getAddition() >= ADD_HILLS)
+        if (addition >= ADD_HILLS)
             return Goods.ORE;
-        switch (getType()) {
+        switch (type) {
         case PLAINS:
         case PRAIRIE:
         case DESERT:
@@ -1408,8 +1412,9 @@ public final class Tile extends FreeColGameObject implements Location, Nameable 
             return Goods.SUGAR;
         case TUNDRA:
         case ARCTIC:
-        default:
             return Goods.ORE;
+        default:
+            return -1;
         }
     }
 

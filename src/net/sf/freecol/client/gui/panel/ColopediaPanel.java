@@ -1,6 +1,7 @@
 package net.sf.freecol.client.gui.panel;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.GridLayout;
@@ -498,6 +499,8 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
         }
         movementCost /= 3;
 
+        int secondaryGoodsType = Tile.secondaryGoods(type, forested, addition);
+
         JLabel nameLabel = new JLabel(name, SwingConstants.CENTER);
         nameLabel.setFont(smallHeaderFont);
         detailPanel.add(nameLabel, higConst.rcwh(row, leftColumn, widths.length, 1));
@@ -535,6 +538,9 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
             for (int index = 0; index < Goods.NUMBER_OF_TYPES; index++) {
                 if (Goods.isFarmedGoods(index)) {
                     JLabel goodsLabel = new JLabel(library.getGoodsImageIcon(index));
+                    if (index == secondaryGoodsType) {
+                        goodsLabel.setForeground(Color.GREEN);
+                    }
                     goodsLabel.setText(String.valueOf(Tile.potentialtable[productionIndex][index][(forested ? 1 : 0)]));
                     goodsPanel.add(goodsLabel);
                 }
