@@ -3813,7 +3813,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
                 }
                 if (getType() == VETERAN_SOLDIER) {
                     setType(FREE_COLONIST);
-                    messageID = "model.veteranUnit.unitCaptured";
+                    messageID = "model.unit.veteranUnitCaptured";
                 } else {
                     messageID = "model.unit.unitCaptured";
                 }
