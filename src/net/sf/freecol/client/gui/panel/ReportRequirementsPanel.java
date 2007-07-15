@@ -175,6 +175,8 @@ public final class ReportRequirementsPanel extends ReportPanel implements Action
             reportPanel.add(textPane, higConst.rc(1, 1));
 
         }
+        textPane.setCaretPosition(0);
+
     }
 
     private void addExpertWarning(StyledDocument doc, int colonyIndex, String goods, int workType) {
