@@ -256,6 +256,13 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener {
         fillButton.setActionCommand(String.valueOf(FILL));
         renameButton.setActionCommand(String.valueOf(RENAME));
         warehouseButton.setActionCommand(String.valueOf(WAREHOUSE));
+        
+        enterPressesWhenFocused(buyBuilding);
+        enterPressesWhenFocused(exitButton);
+        enterPressesWhenFocused(unloadButton);
+        enterPressesWhenFocused(fillButton);
+        enterPressesWhenFocused(renameButton);
+        enterPressesWhenFocused(warehouseButton);
 
         buyBuilding.addActionListener(this);
         exitButton.addActionListener(this);

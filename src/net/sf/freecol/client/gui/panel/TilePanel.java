@@ -98,11 +98,13 @@ public final class TilePanel extends FreeColDialog implements ActionListener {
         colopediaButton = new JButton(Messages.message("menuBar.colopedia"));
         colopediaButton.setActionCommand(String.valueOf(COLOPEDIA));
         colopediaButton.addActionListener(this);
+        enterPressesWhenFocused(colopediaButton);
 
         okButton = new JButton(Messages.message("ok"));
         okButton.setActionCommand(String.valueOf(OK));
         okButton.addActionListener(this);
         okButton.setAlignmentX(Component.CENTER_ALIGNMENT);
+        enterPressesWhenFocused(okButton);
 
         // Use ESCAPE for closing the panel:
         InputMap inputMap = new ComponentInputMap(okButton);

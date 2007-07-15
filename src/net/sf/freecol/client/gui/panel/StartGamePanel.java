@@ -162,6 +162,9 @@ public final class StartGamePanel extends FreeColPanel implements ActionListener
         mapGeneratorOptions.setActionCommand(String.valueOf(MAP_GENERATOR_OPTIONS));
         chat.setActionCommand(String.valueOf(CHAT));
 
+        enterPressesWhenFocused(start);
+        enterPressesWhenFocused(cancel);
+        
         start.addActionListener(this);
         cancel.addActionListener(this);
         readyBox.addActionListener(this);

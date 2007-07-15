@@ -72,6 +72,7 @@ public final class PurchaseDialog extends FreeColDialog implements ActionListene
         cancel = new JButton(Messages.message("cancel"));
         cancel.setActionCommand(String.valueOf(PURCHASE_CANCEL));
         cancel.addActionListener(this);
+        enterPressesWhenFocused(cancel);
         setCancelComponent(cancel);
 
         int graphicsType;
@@ -81,12 +82,14 @@ public final class PurchaseDialog extends FreeColDialog implements ActionListene
         artilleryButton.setIconTextGap(margin);
         artilleryButton.addActionListener(this);
         artilleryButton.setActionCommand(String.valueOf(PURCHASE_ARTILLERY));
+        enterPressesWhenFocused(artilleryButton);
 
         graphicsType = ImageLibrary.getUnitGraphicsType(Unit.CARAVEL, false, false, 0, false);
         caravelButton = new JButton(Unit.getName(Unit.CARAVEL), library.getScaledUnitImageIcon(graphicsType, 0.66f));
         caravelButton.setIconTextGap(margin);
         caravelButton.addActionListener(this);
         caravelButton.setActionCommand(String.valueOf(PURCHASE_CARAVEL));
+        enterPressesWhenFocused(caravelButton);
 
         graphicsType = ImageLibrary.getUnitGraphicsType(Unit.MERCHANTMAN, false, false, 0, false);
         merchantmanButton = new JButton(Unit.getName(Unit.MERCHANTMAN), library.getScaledUnitImageIcon(graphicsType,
@@ -94,24 +97,28 @@ public final class PurchaseDialog extends FreeColDialog implements ActionListene
         merchantmanButton.setIconTextGap(margin);
         merchantmanButton.addActionListener(this);
         merchantmanButton.setActionCommand(String.valueOf(PURCHASE_MERCHANTMAN));
+        enterPressesWhenFocused(merchantmanButton);
 
         graphicsType = ImageLibrary.getUnitGraphicsType(Unit.GALLEON, false, false, 0, false);
         galleonButton = new JButton(Unit.getName(Unit.GALLEON), library.getScaledUnitImageIcon(graphicsType, 0.66f));
         galleonButton.setIconTextGap(margin);
         galleonButton.addActionListener(this);
         galleonButton.setActionCommand(String.valueOf(PURCHASE_GALLEON));
+        enterPressesWhenFocused(galleonButton);
 
         graphicsType = ImageLibrary.getUnitGraphicsType(Unit.PRIVATEER, false, false, 0, false);
         privateerButton = new JButton(Unit.getName(Unit.PRIVATEER), library.getScaledUnitImageIcon(graphicsType, 0.66f));
         privateerButton.setIconTextGap(margin);
         privateerButton.addActionListener(this);
         privateerButton.setActionCommand(String.valueOf(PURCHASE_PRIVATEER));
+        enterPressesWhenFocused(privateerButton);
 
         graphicsType = ImageLibrary.getUnitGraphicsType(Unit.FRIGATE, false, false, 0, false);
         frigateButton = new JButton(Unit.getName(Unit.FRIGATE), library.getScaledUnitImageIcon(graphicsType, 0.66f));
         frigateButton.setIconTextGap(margin);
         frigateButton.addActionListener(this);
         frigateButton.setActionCommand(String.valueOf(PURCHASE_FRIGATE));
+        enterPressesWhenFocused(frigateButton);
 
         int[] widths = new int[] { 0, margin, 0 };
         int[] heights = new int[11];

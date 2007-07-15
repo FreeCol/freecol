@@ -43,6 +43,7 @@ public final class EmigrationPanel extends FreeColDialog implements ActionListen
             person[index] = new JButton();
             person[index].setActionCommand(String.valueOf(index));
             person[index].addActionListener(this);
+            enterPressesWhenFocused(person[index]);
         }
     }
 

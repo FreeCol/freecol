@@ -115,6 +115,8 @@ public final class NewPanel extends FreeColPanel implements ActionListener {
         buttonPanel.setOpaque(false);
         buttonPanel.add(ok);
         buttonPanel.add(cancel);
+        enterPressesWhenFocused(ok);
+        enterPressesWhenFocused(cancel);
 
         group.add(single);
         group.add(join);

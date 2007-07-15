@@ -104,6 +104,7 @@ public final class TrainDialog extends FreeColDialog implements ActionListener {
             newButton.setActionCommand(String.valueOf(unitType.index));
             newButton.addActionListener(this);
             newButton.setIconTextGap(margin);
+            enterPressesWhenFocused(newButton);
             buttons.add(newButton);
             trainPanel.add(new JLabel(String.valueOf(unitType.type.price)), higConst.rc(row, labelColumn[counter]));
             trainPanel.add(newButton, higConst.rc(row, buttonColumn[counter]));
@@ -119,6 +120,7 @@ public final class TrainDialog extends FreeColDialog implements ActionListener {
 
         cancel.setActionCommand(String.valueOf(TRAIN_CANCEL));
         cancel.addActionListener(this);
+        enterPressesWhenFocused(cancel);
 
         add(question, higConst.rc(1, 1, ""));
         add(trainPanel, higConst.rc(3, 1));

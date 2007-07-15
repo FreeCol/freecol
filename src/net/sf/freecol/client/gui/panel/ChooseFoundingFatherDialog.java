@@ -207,6 +207,7 @@ public final class ChooseFoundingFatherDialog extends FreeColDialog implements A
             ok = new JButton(Messages.message("chooseThisFoundingFather"));
             ok.addActionListener(chooseFoundingFatherDialog);
             ok.setSize(ok.getPreferredSize());
+            enterPressesWhenFocused(ok);
             p3.add(ok, BorderLayout.CENTER);
 
             p1.add(p2, BorderLayout.CENTER);

@@ -73,6 +73,12 @@ public final class MainPanel extends FreeColPanel implements ActionListener {
         openButton.addActionListener(this);
         optionsButton.addActionListener(this);
         quitButton.addActionListener(this);
+        
+        enterPressesWhenFocused(newButton);
+        enterPressesWhenFocused(mapEditorButton);
+        enterPressesWhenFocused(openButton);
+        enterPressesWhenFocused(optionsButton);
+        enterPressesWhenFocused(quitButton);
 
         Image tempImage = (Image) UIManager.get("TitleImage");
 

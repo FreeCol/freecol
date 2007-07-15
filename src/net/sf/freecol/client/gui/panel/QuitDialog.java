@@ -56,6 +56,7 @@ public final class QuitDialog extends FreeColDialog implements ActionListener {
 
         ok.setMnemonic('y');
         cancel.setMnemonic('n');
+    
 
         FreeColPanel.enterPressesWhenFocused(cancel);
         FreeColPanel.enterPressesWhenFocused(ok);

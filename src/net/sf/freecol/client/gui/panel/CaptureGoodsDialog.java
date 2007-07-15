@@ -85,6 +85,10 @@ public final class CaptureGoodsDialog extends FreeColDialog implements ActionLis
         allButton.setSize(65, 20);
         noneButton.setSize(64, 20);
         acceptButton.setSize(80, 20);
+        
+        enterPressesWhenFocused(allButton);
+        enterPressesWhenFocused(noneButton);
+        enterPressesWhenFocused(acceptButton);
 
         add(goodsListScroll);
         add(allButton);

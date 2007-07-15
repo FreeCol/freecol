@@ -58,12 +58,14 @@ public final class RecruitDialog extends FreeColDialog implements ActionListener
         for (int index = 0; index < NUMBER_OF_PERSONS; index++) {
             person[index] = new JButton();
             person[index].setActionCommand(String.valueOf(index));
+            enterPressesWhenFocused(person[index]);
             person[index].addActionListener(this);
             person[index].setIconTextGap(margin);
         }
 
         cancel = new JButton(Messages.message("cancel"));
         cancel.setActionCommand(String.valueOf(RECRUIT_CANCEL));
+        enterPressesWhenFocused(cancel);
         cancel.addActionListener(this);
         setCancelComponent(cancel);
 

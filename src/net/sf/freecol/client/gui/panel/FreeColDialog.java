@@ -213,6 +213,7 @@ public class FreeColDialog extends FreeColPanel {
     */
     public static FreeColDialog createInformationDialog(String text, String okText, ImageIcon image) {
         final JButton okButton = new JButton(okText);
+        enterPressesWhenFocused(okButton);
 
         final FreeColDialog informationDialog = new FreeColDialog() {
             public void requestFocus() {
@@ -272,6 +273,7 @@ public class FreeColDialog extends FreeColPanel {
         }
 
         final JButton theButton = new JButton(Messages.message("ok"));
+        enterPressesWhenFocused(theButton);
         final FreeColDialog informationDialog = new FreeColDialog() {
             public void requestFocus() {
                 theButton.requestFocus();
@@ -356,7 +358,9 @@ public class FreeColDialog extends FreeColPanel {
         };
         final JButton cancelButton = new JButton(cancelAction);
 
-
+        enterPressesWhenFocused(okButton);
+        enterPressesWhenFocused(cancelButton);
+        
         preCombatDialog.setLayout(new HIGLayout(widths, heights));
 
         okButton.addActionListener(new ActionListener() {
@@ -509,6 +513,9 @@ public class FreeColDialog extends FreeColPanel {
                 choiceDialog.setResponse(null);
             }
         });
+        
+        enterPressesWhenFocused(firstButton);
+        enterPressesWhenFocused(cancelButton);
 
         choiceDialog.setLayout(new BorderLayout());
         JLabel l = new JLabel(text, JLabel.CENTER);
@@ -538,6 +545,7 @@ public class FreeColDialog extends FreeColPanel {
                     choiceDialog.setResponse(object);
                 }
             });
+            enterPressesWhenFocused(objectButton);
             objectsPanel.add(objectButton);
             height += objectButton.getMinimumSize().height;
         }
@@ -670,6 +678,9 @@ public class FreeColDialog extends FreeColPanel {
         buttonPanel.add(okButton);
         buttonPanel.add(cancelButton);
 
+        enterPressesWhenFocused(okButton);
+        enterPressesWhenFocused(cancelButton);
+        
         // finish building the dialog
         confirmDialog.add(mainPanel, higConst.rc(1, 1));
         confirmDialog.add(buttonPanel, higConst.rc(3, 1));

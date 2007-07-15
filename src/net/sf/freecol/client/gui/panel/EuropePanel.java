@@ -285,6 +285,12 @@ public final class EuropePanel extends FreeColPanel implements ActionListener {
         purchaseButton.setActionCommand(String.valueOf(PURCHASE));
         trainButton.setActionCommand(String.valueOf(TRAIN));
         unloadButton.setActionCommand(String.valueOf(UNLOAD));
+        
+        enterPressesWhenFocused(exitButton);
+        enterPressesWhenFocused(recruitButton);
+        enterPressesWhenFocused(purchaseButton);
+        enterPressesWhenFocused(trainButton);
+        enterPressesWhenFocused(unloadButton);
 
         exitButton.addActionListener(this);
         recruitButton.addActionListener(this);
