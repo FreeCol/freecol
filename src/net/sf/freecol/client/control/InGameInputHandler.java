@@ -820,12 +820,16 @@ public final class InGameInputHandler extends InputHandler {
 
         if (stance == Player.WAR) {
             if (player.equals(second)) {
-                new ShowInformationMessageSwingTask("model.diplomacy.war.declared", new String[][] { { "%nation%",
-                        first.getNationAsString() } }).show();
+                player.addModelMessage(new ModelMessage(first, "model.diplomacy.war.declared",
+                                                        new String[][] {
+                                                            {"%nation%", first.getNationAsString()}},
+                                                        ModelMessage.FOREIGN_DIPLOMACY));
             } else {
-                new ShowInformationMessageSwingTask("model.diplomacy.war.others", new String[][] {
-                        { "%attacker%", first.getNationAsString() }, { "%defender%", second.getNationAsString() } })
-                        .show();
+                player.addModelMessage(new ModelMessage(first, "model.diplomacy.war.others",
+                                                        new String[][] {
+                                                            { "%attacker%", first.getNationAsString() },
+                                                            { "%defender%", second.getNationAsString() } },
+                                                        ModelMessage.FOREIGN_DIPLOMACY));
             }
         }
 
