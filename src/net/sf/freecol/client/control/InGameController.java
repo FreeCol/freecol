@@ -754,7 +754,12 @@ public final class InGameController implements NetworkConstants {
             // unload more than the warehouse can store
             int capacity = ((Colony) location).getWarehouseCapacity() - warehouse.getGoodsCount(goods.getType());
             if (capacity < goods.getAmount() &&
-                !freeColClient.getCanvas().showConfirmDialog("traderoute.warehouseCapacity", "yes", "no")) {
+                !freeColClient.getCanvas().showConfirmDialog(Messages.message("traderoute.warehouseCapacity",
+                                                                              "%unit%", unit.getName(),
+                                                                              "%colony%", ((Colony) location).getName(),
+                                                                              "%amount%", String.valueOf(capacity),
+                                                                              "%goods%", goods.getName()),
+                                                             "yes", "no")) {
                 logger.finest("Automatically unloading " + capacity + " " + goods.getName());
                 unloadCargo(new Goods(freeColClient.getGame(), unit, goods.getType(), capacity));
             } else {
