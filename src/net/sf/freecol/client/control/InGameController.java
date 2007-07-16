@@ -409,10 +409,7 @@ public final class InGameController implements NetworkConstants {
             }
 
             if (messages.size() > 0) {
-                ModelMessage[] modelMessages = new ModelMessage[messages.size()];
-                for (int i = 0; i < messages.size(); i++) {
-                    modelMessages[i] = messages.get(i);
-                }
+                ModelMessage[] modelMessages = messages.toArray(new ModelMessage[0]);
                 if (!freeColClient.getCanvas().showConfirmDialog(modelMessages, "buildColony.yes", "buildColony.no")) {
                     return;
                 }
@@ -3215,7 +3212,7 @@ public final class InGameController implements NetworkConstants {
             }
         }
         if (flag) {
-            markMessageIgnored(key, freeColClient.getGame().getTurn().getNumber());
+            startIgnoringMessage(key, freeColClient.getGame().getTurn().getNumber());
         } else {
             stopIgnoringMessage(key);
         }
@@ -3255,7 +3252,7 @@ public final class InGameController implements NetworkConstants {
 
                     Integer turn = getTurnForMessageIgnored(key);
                     if (turn != null && turn.intValue() == thisTurn - 1) {
-                        markMessageIgnored(key, thisTurn);
+                        startIgnoringMessage(key, thisTurn);
                         message.setBeenDisplayed(true);
                         continue;
                     }
@@ -3299,7 +3296,7 @@ public final class InGameController implements NetworkConstants {
         return messagesToIgnore.get(key);
     }
 
-    private synchronized void markMessageIgnored(String key, int turn) {
+    private synchronized void startIgnoringMessage(String key, int turn) {
         logger.finer("Ignoring model message with key " + key);
         messagesToIgnore.put(key, new Integer(turn));
     }
