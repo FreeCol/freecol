@@ -648,10 +648,12 @@ public final class EuropePanel extends FreeColPanel implements ActionListener {
             switch (Integer.valueOf(command).intValue()) {
             case EXIT:
                 freeColClient.getMyPlayer().getMarket().removeTransactionListener(log);
+                parent.hideEuropeDialogs();
                 parent.remove(this);
                 freeColClient.getInGameController().nextModelMessage();
                 break;
             case RECRUIT:
+                parent.hideEuropeDialogs();
                 boolean recruitResponse = parent.showRecruitDialog();
                 if (recruitResponse) {
                     refreshBuyRecruit();
@@ -659,6 +661,7 @@ public final class EuropePanel extends FreeColPanel implements ActionListener {
                 revalidate();
                 break;
             case PURCHASE:
+                parent.hideEuropeDialogs();
                 int purchaseResponse = parent.showPurchaseDialog();
                 if (purchaseResponse > -1) {
                     refreshBuyPurchase(purchaseResponse);
@@ -666,6 +669,7 @@ public final class EuropePanel extends FreeColPanel implements ActionListener {
                 revalidate();
                 break;
             case TRAIN:
+                parent.hideEuropeDialogs();
                 boolean trainResponse = parent.showTrainDialog();
                 if (trainResponse) {
                     refreshBuyRecruit();

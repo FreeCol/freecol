@@ -141,6 +141,19 @@ public final class Canvas extends JDesktopPane {
     // private static final Integer EUROPE_LAYER = JLayeredPane.DEFAULT_LAYER;
     private static final Integer STATUS_LAYER = JLayeredPane.POPUP_LAYER;
 
+    private static final int NULL = 0, RECRUIT = 1, PURCHASE = 2, TRAIN = 3;
+
+    /**
+     * To save the most recently open dialog in Europe
+     * (<code>RecruitDialog</code>, <code>PurchaseDialog</code>, <code>TrainDialog</code>)
+     */
+    private FreeColDialog europeOpenDialog = null;
+
+    /**
+     * To save the type of the Europe open dialog for setResponse
+     */
+    private Integer europeOpenDialogType = null;
+
     private final FreeColClient freeColClient;
 
     private final MainPanel mainPanel;
@@ -1535,11 +1548,41 @@ public final class Canvas extends JDesktopPane {
     }
 
     /**
+     * To hide the <code>RecruitDialog</code>, <code>PurchaseDialog</code> and
+     * <code>TrainDialog</code> if they are open.
+     * To be used upon changing views or exiting Europe.
+     */
+    public void hideEuropeDialogs() {
+        try {
+            if (europeOpenDialog != null) {
+                switch (europeOpenDialogType) {
+                    case NULL:
+                        logger.warning("Null europeOpenDialogType with europeOpenDialog");
+                        break;
+                    case RECRUIT:
+                    case TRAIN:
+                        europeOpenDialog.setResponse(new Boolean(false));
+                        break;
+                    case PURCHASE:
+                        europeOpenDialog.setResponse(new Integer(-1));
+                        break;
+                    default:
+                        logger.warning("Invalid Europe Open Dialog Type");
+                }
+            }
+        } catch (NumberFormatException e) {
+            logger.warning("Invalid Europe Open Dialog");
+        }
+    }
+
+    /**
      * Displays the <code>RecruitDialog</code>. Does not return from this
      * method before the panel is closed.
      */
     public boolean showRecruitDialog() {
         RecruitDialog recruitDialog = new RecruitDialog(this);
+        europeOpenDialog = recruitDialog;
+        europeOpenDialogType = RECRUIT;
         recruitDialog.initialize();
 
         // addCentered(recruitDialog, INPUT_LAYER);
@@ -1549,6 +1592,9 @@ public final class Canvas extends JDesktopPane {
         recruitDialog.requestFocus();
 
         boolean response = recruitDialog.getResponseBoolean();
+
+        europeOpenDialog = null;
+        europeOpenDialogType = NULL;
 
         remove(recruitDialog);
         // remove(recruitDialog);
@@ -1563,6 +1609,8 @@ public final class Canvas extends JDesktopPane {
      */
     public int showPurchaseDialog() {
         PurchaseDialog purchaseDialog = new PurchaseDialog(this);
+        europeOpenDialog = purchaseDialog;
+        europeOpenDialogType = PURCHASE;
         purchaseDialog.initialize();
 
         addAsFrame(purchaseDialog);
@@ -1572,6 +1620,9 @@ public final class Canvas extends JDesktopPane {
         // purchaseDialog.requestFocus();
 
         int response = purchaseDialog.getResponseInt();
+
+        europeOpenDialog = null;
+        europeOpenDialogType = NULL;
 
         remove(purchaseDialog);
         // remove(purchaseDialog);
@@ -1587,6 +1638,8 @@ public final class Canvas extends JDesktopPane {
      */
     public boolean showTrainDialog() {
         TrainDialog trainDialog = new TrainDialog(this);
+        europeOpenDialog = trainDialog;
+        europeOpenDialogType = TRAIN;
         trainDialog.initialize();
 
         addAsFrame(trainDialog);
@@ -1596,6 +1649,9 @@ public final class Canvas extends JDesktopPane {
         // trainDialog.requestFocus();
 
         boolean response = trainDialog.getResponseBoolean();
+
+        europeOpenDialog = null;
+        europeOpenDialogType = NULL;
 
         remove(trainDialog);
 
