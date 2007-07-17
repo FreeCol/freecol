@@ -710,10 +710,10 @@ public final class InGameInputHandler extends InputHandler {
             final int amount = new Integer(element.getAttribute("amount")).intValue();
             if (force) {
                 freeColClient.getMyPlayer().setTax(amount);
-                new ShowModelMessageSwingTask(new ModelMessage(null, "model.monarch.forceTaxRaise",
-                                                     new String[][] {
-                                                         {"%replace%", String.valueOf(amount) }},
-                                                     ModelMessage.WARNING)).invokeLater();
+                player.addModelMessage(new ModelMessage(player, "model.monarch.forceTaxRaise",
+                                                        new String[][] {
+                                                            {"%replace%", String.valueOf(amount) }},
+                                                        ModelMessage.WARNING));
                 reply = null;
             } else {
                 reply = Message.createNewRootElement("acceptTax");
@@ -736,14 +736,18 @@ public final class InGameInputHandler extends InputHandler {
                 units[x] = Integer.parseInt(arrayElement.getAttribute("x" + Integer.toString(x)));
             }
             monarch.addToREF(units);
-            new ShowMonarchPanelSwingTask(action, new String[][] { { "%addition%", monarch.getName(units) } })
-                    .confirm();
+            player.addModelMessage(new ModelMessage(player, "model.monarch.addToREF",
+                                                    new String[][] {
+                                                        { "%addition%", monarch.getName(units) }},
+                                                    ModelMessage.WARNING));
             break;
         case Monarch.DECLARE_WAR:
             int nation = Integer.parseInt(element.getAttribute("nation"));
             player.setStance(getGame().getPlayer(nation), Player.WAR);
-            new ShowMonarchPanelSwingTask(action, new String[][] { { "%nation%", Player.getNationAsString(nation) } })
-                    .confirm();
+            player.addModelMessage(new ModelMessage(player, "model.monarch.declareWar",
+                                                    new String[][] {
+                                                        { "%nation%", Player.getNationAsString(nation) }},
+                                                    ModelMessage.WARNING));
             break;
         case Monarch.SUPPORT_LAND:
         case Monarch.SUPPORT_SEA:
