@@ -138,7 +138,6 @@ public final class Canvas extends JDesktopPane {
 
     private static final Integer MAIN_LAYER = JLayeredPane.DEFAULT_LAYER;
 
-    // private static final Integer EUROPE_LAYER = JLayeredPane.DEFAULT_LAYER;
     private static final Integer STATUS_LAYER = JLayeredPane.POPUP_LAYER;
 
     private static final int NULL = 0, RECRUIT = 1, PURCHASE = 2, TRAIN = 3;
@@ -160,29 +159,9 @@ public final class Canvas extends JDesktopPane {
 
     private final NewPanel newPanel;
 
-    // private final ErrorPanel errorPanel;
-
     private final StartGamePanel startGamePanel;
 
-    // private final QuitDialog quitDialog;
-
-    // private final IndianSettlementPanel indianSettlementPanel;
-
-    // private final TilePanel tilePanel;
-
-    // private final MonarchPanel monarchPanel;
-
     private final EuropePanel europePanel;
-
-    // private final RecruitDialog recruitDialog;
-
-    // private final PurchaseDialog purchaseDialog;
-
-    // private final TrainDialog trainDialog;
-
-    // private final TradeRouteDialog tradeRouteDialog;
-
-    // private final TradeRouteInputDialog tradeRouteInputDialog;
 
     private final StatusPanel statusPanel;
 
@@ -190,50 +169,11 @@ public final class Canvas extends JDesktopPane {
 
     private final GUI gui;
 
-    // private final ChatDisplayThread chatDisplayThread;
-
     private final VictoryPanel victoryPanel;
-
-    // private final WarehouseDialog warehouseDialog;
-
-    // private final ChooseFoundingFatherDialog chooseFoundingFatherDialog;
-
-    // private final EventPanel eventPanel;
-
-    // private final EmigrationPanel emigrationPanel;
-
-    // private final ColopediaPanel colopediaPanel;
-
-    // private final ReportReligiousPanel reportReligiousPanel;
-
-    // private final ReportTradePanel reportTradePanel;
-
-    // private final ReportTurnPanel reportTurnPanel;
-
-    // private final ReportLabourPanel reportLabourPanel;
-
-    // private final ReportColonyPanel reportColonyPanel;
-
-    // private final ReportMilitaryPanel reportMilitaryPanel;
-
-    // private final ReportNavalPanel reportNavalPanel;
-
-    // private final ReportForeignAffairPanel reportForeignAffairPanel;
-
-    // private final ReportIndianPanel reportIndianPanel;
-
-    // private final ReportContinentalCongressPanel
-    // reportContinentalCongressPanel;
 
     private final ServerListPanel serverListPanel;
 
-    // private final GameOptionsDialog gameOptionsDialog;
-
     private final ClientOptionsDialog clientOptionsDialog;
-
-    // private final MapGeneratorOptionsDialog mapGeneratorOptionsDialog;
-
-    // private final DeclarationDialog declarationDialog;
 
     private final LoadingSavegameDialog loadingSavegameDialog;
 
@@ -260,33 +200,13 @@ public final class Canvas extends JDesktopPane {
 
         mainPanel = new MainPanel(this, freeColClient);
         newPanel = new NewPanel(this, freeColClient.getConnectController());
-        // errorPanel = new ErrorPanel(this);
         startGamePanel = new StartGamePanel(this, freeColClient);
         serverListPanel = new ServerListPanel(this, freeColClient, freeColClient.getConnectController());
-        // quitDialog = new QuitDialog(this);
-        // indianSettlementPanel = new IndianSettlementPanel();
-        // tilePanel = new TilePanel(this);
-        // monarchPanel = new MonarchPanel(this);
-        // declarationDialog = new DeclarationDialog(this, freeColClient);
-
         europePanel = new EuropePanel(this, freeColClient, freeColClient.getInGameController());
-        // recruitDialog = new RecruitDialog(this);
-        // purchaseDialog = new PurchaseDialog(this);
-        // trainDialog = new TrainDialog(this);
-        // tradeRouteDialog = new TradeRouteDialog(this);
-        // tradeRouteInputDialog = new TradeRouteInputDialog(this);
         statusPanel = new StatusPanel(this);
-
         chatPanel = new ChatPanel(this, freeColClient);
         victoryPanel = new VictoryPanel(this, freeColClient);
-        // warehouseDialog = new WarehouseDialog(this);
-        // chooseFoundingFatherDialog = new ChooseFoundingFatherDialog(this);
-        // eventPanel = new EventPanel(this, freeColClient);
-        // emigrationPanel = new EmigrationPanel(this);
-        // gameOptionsDialog = new GameOptionsDialog(this, freeColClient);
         clientOptionsDialog = new ClientOptionsDialog(this, freeColClient);
-        // mapGeneratorOptionsDialog = new MapGeneratorOptionsDialog(this,
-        // freeColClient);
         loadingSavegameDialog = new LoadingSavegameDialog(this, freeColClient);
 
         setFocusable(true);
@@ -710,9 +630,6 @@ public final class Canvas extends JDesktopPane {
     public void showDeclarationDialog() {
         DeclarationDialog declarationDialog = new DeclarationDialog(this, freeColClient);
 
-        // addCentered(declarationDialog, CONFIRM_LAYER);
-        // declarationDialog.requestFocus();
-
         declarationDialog.initialize();
 
         addAsFrame(declarationDialog);
@@ -721,7 +638,6 @@ public final class Canvas extends JDesktopPane {
         declarationDialog.getResponseBoolean();
         remove(declarationDialog);
 
-        // remove(declarationDialog);
     }
 
     /**
@@ -940,16 +856,11 @@ public final class Canvas extends JDesktopPane {
     public boolean showLoadingSavegameDialog(boolean publicServer, boolean singleplayer) {
         loadingSavegameDialog.initialize(publicServer, singleplayer);
 
-        // addCentered(loadingSavegameDialog, GAME_OPTIONS_LAYER);
-        // loadingSavegameDialog.requestFocus();
-
         addAsFrame(loadingSavegameDialog);
         loadingSavegameDialog.requestFocus();
 
         boolean r = loadingSavegameDialog.getResponseBoolean();
         remove(loadingSavegameDialog);
-
-        // remove(loadingSavegameDialog);
 
         return r;
     }
@@ -963,9 +874,6 @@ public final class Canvas extends JDesktopPane {
     public boolean showClientOptionsDialog() {
         clientOptionsDialog.initialize();
 
-        // addCentered(clientOptionsDialog, CLIENT_OPTIONS_LAYER);
-        // clientOptionsDialog.requestFocus();
-
         clientOptionsDialogShowing = true;
         addAsFrame(clientOptionsDialog);
         clientOptionsDialog.requestFocus();
@@ -973,8 +881,6 @@ public final class Canvas extends JDesktopPane {
         remove(clientOptionsDialog);
         clientOptionsDialogShowing = false;
         freeColClient.getActionManager().update();
-        
-        // remove(clientOptionsDialog);
 
         return r;
     }
@@ -1004,15 +910,10 @@ public final class Canvas extends JDesktopPane {
         MapGeneratorOptionsDialog mapGeneratorOptionsDialog = new MapGeneratorOptionsDialog(this, freeColClient);
         mapGeneratorOptionsDialog.initialize(editable, mgo);
 
-        // addCentered(mapGeneratorOptionsDialog, CLIENT_OPTIONS_LAYER);
-        // mapGeneratorOptionsDialog.requestFocus();
-
         addAsFrame(mapGeneratorOptionsDialog);
         mapGeneratorOptionsDialog.requestFocus();
         boolean r = mapGeneratorOptionsDialog.getResponseBoolean();
         remove(mapGeneratorOptionsDialog);
-
-        // remove(mapGeneratorOptionsDialog);
 
         return r;
     }
@@ -1047,9 +948,6 @@ public final class Canvas extends JDesktopPane {
     public File showLoadDialog(File directory, FileFilter[] fileFilters) {
         FreeColDialog loadDialog = FreeColDialog.createLoadDialog(directory, fileFilters);
 
-        // addCentered(loadDialog, LOAD_LAYER);
-        // loadDialog.requestFocus();
-
         addAsFrame(loadDialog);
         loadDialog.requestFocus();
 
@@ -1061,8 +959,6 @@ public final class Canvas extends JDesktopPane {
         }
 
         remove(loadDialog);
-
-        // remove(loadDialog);
 
         return response;
     }
@@ -1483,19 +1379,12 @@ public final class Canvas extends JDesktopPane {
 
         chooseFoundingFatherDialog.initialize(possibleFoundingFathers);
 
-        // addCentered(chooseFoundingFatherDialog, CHOOSE_FOUNDING_FATHER);
-        // setEnabled(false);
-        // chooseFoundingFatherDialog.requestFocus();
-
         addAsFrame(chooseFoundingFatherDialog);
         chooseFoundingFatherDialog.requestFocus();
 
         int response = chooseFoundingFatherDialog.getResponseInt();
 
         remove(chooseFoundingFatherDialog);
-
-        // remove(chooseFoundingFatherDialog);
-        // setEnabled(true);
 
         return response;
     }
@@ -1509,20 +1398,12 @@ public final class Canvas extends JDesktopPane {
     public boolean showEventDialog(int eventID) {
         EventPanel eventPanel = new EventPanel(this, freeColClient);
         eventPanel.initialize(eventID);
-
-        // addCentered(eventPanel, EVENT_LAYER);
-        // setEnabled(false);
-        // eventPanel.requestFocus();
-
         addAsFrame(eventPanel);
         eventPanel.requestFocus();
 
         boolean response = eventPanel.getResponseBoolean();
 
         remove(eventPanel);
-
-        // remove(eventPanel);
-        // setEnabled(true);
 
         return response;
     }
@@ -1585,9 +1466,6 @@ public final class Canvas extends JDesktopPane {
         europeOpenDialogType = RECRUIT;
         recruitDialog.initialize();
 
-        // addCentered(recruitDialog, INPUT_LAYER);
-        // recruitDialog.requestFocus();
-        
         addAsFrame(recruitDialog);
         recruitDialog.requestFocus();
 
@@ -1597,8 +1475,6 @@ public final class Canvas extends JDesktopPane {
         europeOpenDialogType = NULL;
 
         remove(recruitDialog);
-        // remove(recruitDialog);
-        // setEnabled(true);
 
         return response;
     }
@@ -1616,17 +1492,12 @@ public final class Canvas extends JDesktopPane {
         addAsFrame(purchaseDialog);
         purchaseDialog.requestFocus();
 
-        // addCentered(purchaseDialog, INPUT_LAYER);
-        // purchaseDialog.requestFocus();
-
         int response = purchaseDialog.getResponseInt();
 
         europeOpenDialog = null;
         europeOpenDialogType = NULL;
 
         remove(purchaseDialog);
-        // remove(purchaseDialog);
-        // setEnabled(true);
 
         return response;
 
@@ -1645,18 +1516,12 @@ public final class Canvas extends JDesktopPane {
         addAsFrame(trainDialog);
         trainDialog.requestFocus();
 
-        // addCentered(trainDialog, INPUT_LAYER);
-        // trainDialog.requestFocus();
-
         boolean response = trainDialog.getResponseBoolean();
 
         europeOpenDialog = null;
         europeOpenDialogType = NULL;
 
         remove(trainDialog);
-
-        // remove(trainDialog);
-        // setEnabled(true);
 
         return response;
     }
@@ -1669,18 +1534,12 @@ public final class Canvas extends JDesktopPane {
         TradeRouteDialog tradeRouteDialog = new TradeRouteDialog(this);
         tradeRouteDialog.initialize();
 
-        // addCentered(tradeRouteDialog, INPUT_LAYER - 1);
-        // tradeRouteDialog.requestFocus();
-
         addAsFrame(tradeRouteDialog);
         tradeRouteDialog.requestFocus();
 
         TradeRoute response = (TradeRoute) tradeRouteDialog.getResponse();
 
         remove(tradeRouteDialog);
-
-        // remove(tradeRouteDialog);
-        // setEnabled(true);
 
         return response;
     }
@@ -1693,18 +1552,12 @@ public final class Canvas extends JDesktopPane {
         TradeRouteInputDialog tradeRouteInputDialog = new TradeRouteInputDialog(this);
         tradeRouteInputDialog.initialize(route);
 
-        // addCentered(tradeRouteInputDialog, INPUT_LAYER);
-        // tradeRouteInputDialog.requestFocus();
-
         addAsFrame(tradeRouteInputDialog);
         tradeRouteInputDialog.requestFocus();
 
         boolean response = tradeRouteInputDialog.getResponseBoolean();
 
         remove(tradeRouteInputDialog);
-
-        // remove(tradeRouteInputDialog);
-        // setEnabled(true);
 
         return response;
     }
@@ -1737,15 +1590,11 @@ public final class Canvas extends JDesktopPane {
         IndianSettlementPanel indianSettlementPanel = new IndianSettlementPanel();
         indianSettlementPanel.initialize(settlement);
 
-        // addCentered(indianSettlementPanel, INDIAN_SETTLEMENT_LAYER);
-        // indianSettlementPanel.requestFocus();
-
         addAsFrame(indianSettlementPanel);
         indianSettlementPanel.requestFocus();
         indianSettlementPanel.getResponseBoolean();
         remove(indianSettlementPanel);
 
-        // remove(indianSettlementPanel);
     }
 
     /**
@@ -1758,15 +1607,11 @@ public final class Canvas extends JDesktopPane {
         TilePanel tilePanel = new TilePanel(this);
         tilePanel.initialize(tile);
 
-        // addCentered(tilePanel, TILE_LAYER);
-        // tilePanel.requestFocus();
-
         addAsFrame(tilePanel);
         tilePanel.requestFocus();
         tilePanel.getResponseBoolean();
         remove(tilePanel);
 
-        // remove(tilePanel);
     }
 
     /**
@@ -1780,11 +1625,6 @@ public final class Canvas extends JDesktopPane {
     public boolean showMonarchPanel(int action, String[][] replace) {
         closeStatusPanel();
 
-        // setEnabled(false);
-        // monarchPanel.initialize(action, replace);
-        // addCentered(monarchPanel, MONARCH_LAYER);
-        // monarchPanel.requestFocus();
-
         MonarchPanel monarchPanel = new MonarchPanel(this);
         monarchPanel.initialize(action, replace);
         addAsFrame(monarchPanel);
@@ -1792,9 +1632,6 @@ public final class Canvas extends JDesktopPane {
 
         boolean response = monarchPanel.getResponseBoolean();
         remove(monarchPanel);
-
-        // remove(monarchPanel);
-        // setEnabled(true);
 
         return response;
     }
@@ -1810,18 +1647,13 @@ public final class Canvas extends JDesktopPane {
         EmigrationPanel emigrationPanel = new EmigrationPanel(this);
         emigrationPanel.initialize(freeColClient.getMyPlayer().getEurope());
 
-        // addCentered(emigrationPanel, EMIGRATION_LAYER);
-        // emigrationPanel.requestFocus();
-
         addAsFrame(emigrationPanel);
         emigrationPanel.requestFocus();
-        //System.out.println("About to show emigration panel");
+
         int response = emigrationPanel.getResponseInt();
-        //System.out.println("emigration panel returned " + response);
+
         remove(emigrationPanel);
 
-        // remove(emigrationPanel);
-        //System.out.println("About to return response.");
         return response;
     }
 
@@ -1903,21 +1735,12 @@ public final class Canvas extends JDesktopPane {
 
         final boolean takeFocus = (comp != statusPanel);
         if (update) {
-            //System.out.println("About to update menu bar.");
             updateJMenuBar();
-            //System.out.println("About to update action manager.");
             freeColClient.getActionManager().update();
             if (takeFocus && !isShowingSubPanel()) {
                 takeFocus();
             }
-
-            if (freeColClient.getGame() != null
-                    && !freeColClient.isMapEditor()) {
-                //System.out.println("About to get next model message.");
-                //freeColClient.getInGameController().nextModelMessage();
-            }
         }
-        //System.out.println("About to return from remove.");
     }
 
     /**
@@ -2159,17 +1982,6 @@ public final class Canvas extends JDesktopPane {
      * while even its request doesn't get granted immediately.
      */
     private void takeFocus() {
-        // JComponent c = this;
-
-        /*
-         * if (startGamePanel.isShowing()) { c = startGamePanel; } else if
-         * (newPanel.isShowing()) { c = newPanel; } else if
-         * (mainPanel.isShowing()) { c = mainPanel; } else if
-         * (europePanel.isShowing()) { c = europePanel; } else if
-         * (colonyPanel.isShowing()) { c = colonyPanel; }
-         */
-
-        // c.requestFocus();
         if (!isShowingSubPanel()) {
             requestFocus();
         }
@@ -2250,14 +2062,10 @@ public final class Canvas extends JDesktopPane {
         ErrorPanel errorPanel = new ErrorPanel(this);
 
         errorPanel.initialize(message);
-        // setEnabled(false);
-        // addCentered(errorPanel, ERROR_LAYER);
-        // errorPanel.requestFocus();
         addAsFrame(errorPanel);
         errorPanel.requestFocus();
         errorPanel.getResponse();
         remove(errorPanel);
-        // closeErrorPanel();
     }
 
     /**
@@ -2268,19 +2076,6 @@ public final class Canvas extends JDesktopPane {
     public void showInformationMessage(String messageId) {
         showInformationMessage(messageId, null);
     }
-
-    /**
-     * Shows a message with some information and an "OK"-button.
-     * 
-     * @param messageId The messageId of the message to display.
-     * @param replaceString The string that we need to use to replace all
-     *            occurences of %replace% in the message.
-     */
-    /*
-     * public void showInformationMessage(String messageId, String
-     * replaceString) { showInformationDialog(messageId, {{"%replace%",
-     * replaceString}}); }
-     */
 
     /**
      * Shows a message with some information and an "OK"-button.
@@ -2363,11 +2158,6 @@ public final class Canvas extends JDesktopPane {
      * Closes all the menus that are currently open.
      */
     public void closeMenus() {
-        /*
-         * remove(newPanel, false); remove(startGamePanel, false);
-         * remove(serverListPanel, false); remove(colonyPanel, false);
-         * remove(europePanel, false); remove(statusPanel);
-         */
         for (JInternalFrame frame : getAllFrames()) {
             frame.dispose();
         }
@@ -2454,11 +2244,9 @@ public final class Canvas extends JDesktopPane {
      * Closes all panels, changes the background and shows the main menu.
      */
     public void returnToTitle() {
-        // TODO: check if the GUI object knows that we're not inGame. (Retrieve
-        // value
-        // of GUI::inGame.)
-        // If GUI thinks we're still in the game then log an error because at
-        // this
+        // TODO: check if the GUI object knows that we're not
+        // inGame. (Retrieve value of GUI::inGame.)  If GUI thinks
+        // we're still in the game then log an error because at this
         // point the GUI should have been informed.
         closeMenus();
         removeInGameComponents();
