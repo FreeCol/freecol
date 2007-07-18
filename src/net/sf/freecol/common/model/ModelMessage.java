@@ -262,14 +262,28 @@ public class ModelMessage {
     * Checks if this <code>ModelMessage</code> is equal to another <code>ModelMessage</code>.
     * @return <i>true</i> if the sources, message IDs and data are equal.
     */
+    @Override
     public boolean equals(Object o) {
-
         if ( ! (o instanceof ModelMessage) ) { return false; }
-
         ModelMessage m = (ModelMessage) o;
-        return ( getSource() == m.getSource()
-                 && getMessageID().equals(m.getMessageID())
-                 && Arrays.equals(getData(), m.getData())
-                 && getType() == m.getType() );
+        // Check that the content of the data array is equal
+        if (!(data == m.data)) {
+            if (data != null && m.data != null && data.length == m.data.length) {
+                for (int i = 0 ; i < data.length ; i++) {
+                    if (!Arrays.equals(data[i], m.data[i]))
+                        return false;
+                }
+            } else {
+                return false;
+            }
+        }
+        return ( source.equals(m.source)
+                && messageID.equals(m.messageID)
+                && type == m.type );
+    }
+    
+    @Override
+    public int hashCode() {
+        return 0;
     }
 }
