@@ -284,6 +284,29 @@ public class ModelMessage {
     
     @Override
     public int hashCode() {
-        return 0;
+        int value = 1;
+        value = 37 * value + source.hashCode();
+        value = 37 * value + messageID.hashCode();
+        if (data != null) {
+            for (String[] s : data) {
+                value = 37 * value + s[0].hashCode();
+                value = 37 * value + s[1].hashCode();
+            }
+        }
+        value = 37 * value + type;
+        return value;
+    }
+    
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder("ModelMessage<");
+        sb.append(hashCode() + ", " + source.getID() + ", " + messageID + ", ");
+        if (data != null) {
+            for (String[] s : data) {
+                sb.append(Arrays.toString(s) + "/");
+            }
+        }
+        sb.append(", " + type + " >");
+        return sb.toString();
     }
 }
