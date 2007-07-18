@@ -1,5 +1,6 @@
 package net.sf.freecol.client.gui.panel;
 
+import java.awt.Image;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -8,6 +9,7 @@ import java.util.Collections;
 import java.util.Comparator;
 
 import javax.swing.BorderFactory;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
@@ -125,19 +127,30 @@ public final class ReportTurnPanel extends ReportPanel implements ActionListener
 
             final JLabel label = new JLabel();
             if (message.getDisplay() != null) {
+
+                // TODO Scale icons relative to fond size.
+                ImageIcon icon = getCanvas().getImageIcon(message.getDisplay(), false);
+                if (icon != null && icon.getIconHeight() > 40) {
+                    Image image = icon.getImage();
+                    int newWidth = (int)((double)image.getWidth(null)/image.getHeight(null)*40.0);
+                    image = image.getScaledInstance(newWidth, 40, Image.SCALE_SMOOTH);
+                    icon.setImage(image);
+                }
+
                 if (message.getDisplay() instanceof Colony) {
                     final JButton button = new JButton();
-                    button.setIcon(getCanvas().getImageIcon(message.getDisplay(), true));
+                    button.setIcon(icon);
                     button.setActionCommand(((Colony) message.getDisplay()).getID());
                     button.addActionListener(this);
                     button.setBorder(BorderFactory.createEmptyBorder());
                 } else if (message.getDisplay() instanceof Unit) {
-                    label.setIcon(getCanvas().getImageIcon(message.getDisplay(), true));
+                    label.setIcon(icon);
                 } else if (message.getDisplay() instanceof Player) {
-                   label.setIcon(getCanvas().getImageIcon(message.getDisplay(), true));
+                    label.setIcon(icon);
                 } else {
-                    label.setIcon(getCanvas().getImageIcon(message.getDisplay(), false));
+                    label.setIcon(icon);
                 }
+
                 reportPanel.add(label, higConst.rc(row, imageColumn, ""));
             }
 
