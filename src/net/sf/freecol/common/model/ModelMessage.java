@@ -59,6 +59,26 @@ public class ModelMessage {
         this.data = data;
         this.type = type;
         this.display = display;
+        verifyFields();
+    }
+    
+    /**
+     * Checks that all the fields as they are set in the constructor are valid.
+     */
+    private void verifyFields() {
+        if (source == null) {
+            throw new IllegalArgumentException("The source cannot be null.");
+        }
+        if (messageID == null) {
+            throw new IllegalArgumentException("The messageID cannot be null.");
+        }
+        if (data != null) {
+            for (String[] s : data) {
+                if (s == null || s.length != 2) {
+                    throw new IllegalArgumentException("The data can only contain arrays of size 2.");
+                }
+            }
+        }
     }
 
     /**
@@ -73,12 +93,32 @@ public class ModelMessage {
     * @see FreeColGameObject#addModelMessage(FreeColGameObject, String, String[][], int)
     */
     public ModelMessage(FreeColGameObject source, String messageID, String[][] data, int type) {
-        this.source = source;
-        this.messageID = messageID;
-        this.data = data;
-        this.type = type;
-        Object newDisplay = null;
+        this(source, messageID, data, type, getDefaultDisplay(type, source));
 
+    }
+
+    /**
+    * Creates a new <code>ModelMessage</code>.
+    *
+    * @param source The source of the message. This is what the message should be
+    *               associated with. In addition, the owner of the source is the
+    *               player getting the message.
+    * @param messageID The ID of the message to display.
+    * @param data Contains data to be displayed in the message or <i>null</i>.
+    * @see FreeColGameObject#addModelMessage(FreeColGameObject, String, String[][], int)
+    */
+    public ModelMessage(FreeColGameObject source, String messageID, String[][] data) {
+        this(source, messageID, data, DEFAULT);
+    }
+    
+    /**
+     * Returns the default display object for the given type.
+     * @param type the type for which to find the default display object.
+     * @param source the source object
+     * @return an object to be displayed for the message. 
+     */
+    static private Object getDefaultDisplay(int type, FreeColGameObject source) {
+        Object newDisplay = null;
         switch(type) {
         case SONS_OF_LIBERTY:
         case GOVERNMENT_EFFICIENCY:
@@ -108,22 +148,7 @@ public class ModelMessage {
                 newDisplay = source;
             }
         }
-
-        this.display = newDisplay;
-    }
-
-    /**
-    * Creates a new <code>ModelMessage</code>.
-    *
-    * @param source The source of the message. This is what the message should be
-    *               associated with. In addition, the owner of the source is the
-    *               player getting the message.
-    * @param messageID The ID of the message to display.
-    * @param data Contains data to be displayed in the message or <i>null</i>.
-    * @see FreeColGameObject#addModelMessage(FreeColGameObject, String, String[][], int)
-    */
-    public ModelMessage(FreeColGameObject source, String messageID, String[][] data) {
-        this(source, messageID, data, DEFAULT);
+        return newDisplay;
     }
 
 
