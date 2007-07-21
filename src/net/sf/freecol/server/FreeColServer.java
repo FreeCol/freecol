@@ -21,8 +21,8 @@ import java.util.Timer;
 import java.util.TimerTask;
 import java.util.Vector;
 import java.util.logging.Logger;
-import java.util.zip.DeflaterOutputStream;
-import java.util.zip.InflaterInputStream;
+import java.util.zip.GZIPOutputStream;
+import java.util.zip.GZIPInputStream;
 
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLOutputFactory;
@@ -75,7 +75,7 @@ public final class FreeColServer {
 
     private static Logger logger = Logger.getLogger(FreeColServer.class.getName());
 
-    private static final boolean DISABLE_SAVEGAME_COMPRESSION = true;
+    private static final boolean DISABLE_SAVEGAME_COMPRESSION = false;
 
     private static final int META_SERVER_UPDATE_INTERVAL = 60000;
 
@@ -470,12 +470,14 @@ public final class FreeColServer {
         XMLOutputFactory xof = XMLOutputFactory.newInstance();
         try {
             XMLStreamWriter xsw;
+            GZIPOutputStream gzip;
             if (DISABLE_SAVEGAME_COMPRESSION) {
                 // No compression
                 xsw = xof.createXMLStreamWriter(new FileOutputStream(file));
             } else {
                 // Compression
-                xsw = xof.createXMLStreamWriter(new DeflaterOutputStream(new FileOutputStream(file)));
+                gzip = new GZIPOutputStream(new FileOutputStream(file));
+                xsw = xof.createXMLStreamWriter(gzip);
             }
             xsw.writeStartDocument();
             xsw.writeStartElement("savedGame");
@@ -503,6 +505,9 @@ public final class FreeColServer {
             }
             xsw.writeEndElement();
             xsw.writeEndDocument();
+            if (!DISABLE_SAVEGAME_COMPRESSION) {
+                gzip.finish();
+            }
             xsw.flush();
             xsw.close();
         } catch (XMLStreamException e) {
@@ -536,7 +541,7 @@ public final class FreeColServer {
         in.read(buf, 0, 5);
         in.reset();
         if (!(new String(buf)).equals("<?xml")) {
-            in = new BufferedInputStream(new InflaterInputStream(in));
+            in = new BufferedInputStream(new GZIPInputStream(in));
         }
         XMLInputFactory xif = XMLInputFactory.newInstance();
         try {
