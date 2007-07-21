@@ -138,17 +138,17 @@ public final class RecruitDialog extends FreeColDialog implements ActionListener
         try {
             int action = Integer.valueOf(command).intValue();
             if (action == RECRUIT_CANCEL) {
-                setResponse(new Boolean(false));
+                setResponse(new Integer(-1));
             } else if (action >= 0 && action < NUMBER_OF_PERSONS) {
                 inGameController.recruitUnitInEurope(action);
-                setResponse(new Boolean(true));
+                setResponse(new Integer(0));
             } else {
                 logger.warning("Invalid action command");
-                setResponse(new Boolean(false));
+                setResponse(new Integer(-1));
             }
         } catch (NumberFormatException e) {
             logger.warning("Invalid action number");
-            setResponse(new Boolean(false));
+            setResponse(new Integer(-1));
         }
     }
 }

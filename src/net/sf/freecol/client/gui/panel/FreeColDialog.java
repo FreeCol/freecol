@@ -1302,4 +1302,9 @@ public class FreeColDialog extends FreeColPanel {
         }
     }
 
+    /**
+     * Used for Polymorphism in Recruit, Purchase, Train Dialogs
+     */
+    public void initialize() {}
+
 }

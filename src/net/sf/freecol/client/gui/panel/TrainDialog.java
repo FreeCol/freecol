@@ -161,14 +161,14 @@ public final class TrainDialog extends FreeColDialog implements ActionListener {
         try {
             int value = Integer.valueOf(command).intValue();
             if (value == TRAIN_CANCEL) {
-                setResponse(new Boolean(false));
+                setResponse(new Integer(-1));
             } else {
                 inGameController.trainUnitInEurope(value);
-                setResponse(new Boolean(true));
+                setResponse(new Integer(0));
             }
         } catch (NumberFormatException e) {
             logger.warning("Invalid action number");
-            setResponse(new Boolean(false));
+            setResponse(new Integer(-1));
         }
     }
     

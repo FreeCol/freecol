@@ -645,34 +645,29 @@ public final class EuropePanel extends FreeColPanel implements ActionListener {
     public void actionPerformed(ActionEvent event) {
         String command = event.getActionCommand();
         try {
-            switch (Integer.valueOf(command).intValue()) {
+            // Get Command
+            int intCommand = Integer.valueOf(command).intValue();
+            // Close any open Europe Dialog, and show new one if required
+            int Response = parent.showEuropeDialog(intCommand);
+            // Process Command
+            switch (intCommand) {
             case EXIT:
                 freeColClient.getMyPlayer().getMarket().removeTransactionListener(log);
-                parent.hideEuropeDialogs();
+                //parent.hideEuropeDialogs();
                 parent.remove(this);
                 freeColClient.getInGameController().nextModelMessage();
                 break;
             case RECRUIT:
-                parent.hideEuropeDialogs();
-                boolean recruitResponse = parent.showRecruitDialog();
-                if (recruitResponse) {
-                    refreshBuyRecruit();
-                }
-                revalidate();
-                break;
             case PURCHASE:
-                parent.hideEuropeDialogs();
-                int purchaseResponse = parent.showPurchaseDialog();
-                if (purchaseResponse > -1) {
-                    refreshBuyPurchase(purchaseResponse);
-                }
-                revalidate();
-                break;
             case TRAIN:
-                parent.hideEuropeDialogs();
-                boolean trainResponse = parent.showTrainDialog();
-                if (trainResponse) {
-                    refreshBuyRecruit();
+                if (intCommand == PURCHASE) {
+                    if (Response > -1) {
+                        refreshBuyPurchase(Response);
+                    }
+                } else {
+                    if (Response == 0) {
+                        refreshBuyRecruit();
+                    }
                 }
                 revalidate();
                 break;

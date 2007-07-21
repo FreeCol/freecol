@@ -140,18 +140,13 @@ public final class Canvas extends JDesktopPane {
 
     private static final Integer STATUS_LAYER = JLayeredPane.POPUP_LAYER;
 
-    private static final int NULL = 0, RECRUIT = 1, PURCHASE = 2, TRAIN = 3;
+    private static final int EXIT = 0, RECRUIT = 1, PURCHASE = 2, TRAIN = 3, UNLOAD = 4;
 
     /**
      * To save the most recently open dialog in Europe
      * (<code>RecruitDialog</code>, <code>PurchaseDialog</code>, <code>TrainDialog</code>)
      */
     private FreeColDialog europeOpenDialog = null;
-
-    /**
-     * To save the type of the Europe open dialog for setResponse
-     */
-    private Integer europeOpenDialogType = null;
 
     private final FreeColClient freeColClient;
 
@@ -1429,100 +1424,55 @@ public final class Canvas extends JDesktopPane {
     }
 
     /**
-     * To hide the <code>RecruitDialog</code>, <code>PurchaseDialog</code> and
-     * <code>TrainDialog</code> if they are open.
-     * To be used upon changing views or exiting Europe.
+     * Displays one of the Europe Dialogs for Recruit, Purchase, Train.
+     * Closes any currently open Dialogs. 
+     * Does not return from this method before the panel is closed.
+     * @param intCommand One of {ExIT, RECRUIT, PURCHASE, TRAIN, UNLOAD}
+     * @return <code>FreeColDialog.getResponseInt</code>.
      */
-    public void hideEuropeDialogs() {
+    public int showEuropeDialog(int intCommand) {
+        // Close any open Europe Dialog (Recruit, Purchase, Train)       
         try {
             if (europeOpenDialog != null) {
-                switch (europeOpenDialogType) {
-                    case NULL:
-                        logger.warning("Null europeOpenDialogType with europeOpenDialog");
-                        break;
-                    case RECRUIT:
-                    case TRAIN:
-                        europeOpenDialog.setResponse(new Boolean(false));
-                        break;
-                    case PURCHASE:
-                        europeOpenDialog.setResponse(new Integer(-1));
-                        break;
-                    default:
-                        logger.warning("Invalid Europe Open Dialog Type");
-                }
+                europeOpenDialog.setResponse(new Integer(-1));
             }
         } catch (NumberFormatException e) {
-            logger.warning("Invalid Europe Open Dialog");
+            logger.warning("Canvas.showEuropeDialog: Invalid europeDialogType");
         }
-    }
+        
+        FreeColDialog localDialog = null;
 
-    /**
-     * Displays the <code>RecruitDialog</code>. Does not return from this
-     * method before the panel is closed.
-     */
-    public boolean showRecruitDialog() {
-        RecruitDialog recruitDialog = new RecruitDialog(this);
-        europeOpenDialog = recruitDialog;
-        europeOpenDialogType = RECRUIT;
-        recruitDialog.initialize();
+        // Open new Dialog
+        switch (intCommand) {
+            case EXIT:
+            case UNLOAD:
+                return -1;
+            case RECRUIT:
+                localDialog = new RecruitDialog(this);
+                break;
+            case PURCHASE:
+                localDialog = new PurchaseDialog(this);
+                break;
+            case TRAIN:
+                localDialog = new TrainDialog(this);
+                break;
+            default:
+                logger.warning("Canvas.showEuropeDialog: Invalid intCommand");
+                return -1;
+        }
+        localDialog.initialize();
+        europeOpenDialog = localDialog; // Set the open dialog to the class variable
+        
+        addAsFrame(localDialog);
+        localDialog.requestFocus();
 
-        addAsFrame(recruitDialog);
-        recruitDialog.requestFocus();
+        int response = localDialog.getResponseInt();
 
-        boolean response = recruitDialog.getResponseBoolean();
-
-        europeOpenDialog = null;
-        europeOpenDialogType = NULL;
-
-        remove(recruitDialog);
-
-        return response;
-    }
-
-    /**
-     * Displays the <code>PurchaseDialog</code>. Does not return from this
-     * method before the panel is closed.
-     */
-    public int showPurchaseDialog() {
-        PurchaseDialog purchaseDialog = new PurchaseDialog(this);
-        europeOpenDialog = purchaseDialog;
-        europeOpenDialogType = PURCHASE;
-        purchaseDialog.initialize();
-
-        addAsFrame(purchaseDialog);
-        purchaseDialog.requestFocus();
-
-        int response = purchaseDialog.getResponseInt();
-
-        europeOpenDialog = null;
-        europeOpenDialogType = NULL;
-
-        remove(purchaseDialog);
-
-        return response;
-
-    }
-
-    /**
-     * Displays the <code>TrainDialog</code>. Does not return from this
-     * method before the panel is closed.
-     */
-    public boolean showTrainDialog() {
-        TrainDialog trainDialog = new TrainDialog(this);
-        europeOpenDialog = trainDialog;
-        europeOpenDialogType = TRAIN;
-        trainDialog.initialize();
-
-        addAsFrame(trainDialog);
-        trainDialog.requestFocus();
-
-        boolean response = trainDialog.getResponseBoolean();
-
-        europeOpenDialog = null;
-        europeOpenDialogType = NULL;
-
-        remove(trainDialog);
-
+        remove(localDialog);
+        if (europeOpenDialog == localDialog) {
+            europeOpenDialog = null;    // Clear class variable when it's closed
+        }
+        
         return response;
     }
 
