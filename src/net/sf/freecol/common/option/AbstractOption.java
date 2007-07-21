@@ -47,12 +47,8 @@ abstract public class AbstractOption implements Option {
 
     private ArrayList<PropertyChangeListener> propertyChangeListeners = new ArrayList<PropertyChangeListener>();
 
-    private String id;
-
-    private String name;
-
-    private String shortDescription;
-    
+    private final String id;
+    private final String group;
 
 
     /**
@@ -60,16 +56,19 @@ abstract public class AbstractOption implements Option {
      * 
      * @param id The identifier for this option. This is used when the object
      *            should be found in an {@link OptionGroup}.
-     * @param name The name of the <code>AbstractOption</code>. This text is
-     *            used for identifying the option for a user. Example: The text
-     *            related to a checkbox.
-     * @param shortDescription Should give a short description of the
-     *            <code>Option</code>. This might be used as a tooltip text.
      */
-    public AbstractOption(String id, String name, String shortDescription) {
+    public AbstractOption(String id) {
+        this(id, null);
+    }
+
+    public AbstractOption(String id, OptionGroup optionGroup) {
         this.id = id;
-        this.name = name;
-        this.shortDescription = shortDescription;
+        if (optionGroup == null) {
+            this.group = "";
+        } else {
+            this.group = optionGroup.getId() + ".";
+            optionGroup.add(this);
+        }
     }
 
     
@@ -113,7 +112,7 @@ abstract public class AbstractOption implements Option {
      * @return A short description of this <code>Option</code>.
      */
     public String getShortDescription() {
-        return Messages.message(shortDescription);
+        return Messages.message(group + id + ".shortDescription");
     }
 
     /**
@@ -136,12 +135,22 @@ abstract public class AbstractOption implements Option {
     }
 
     /**
+     * Returns the string prefix that identifies the group of this
+     * <code>Option</code>.
+     * 
+     * @return The string prefix provided by the OptionGroup.
+     */
+    public String getGroup() {
+        return group;
+    }
+
+    /**
      * Returns the name of this <code>Option</code>.
      * 
      * @return The name as provided in the constructor.
      */
     public String getName() {
-        return Messages.message(name);
+        return Messages.message(group + id + ".name");
     }
 
     /**

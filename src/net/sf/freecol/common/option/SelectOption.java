@@ -38,8 +38,12 @@ public class SelectOption extends AbstractOption {
      * @param options All possible values.
      * @param defaultOption The index of the default value.
      */
-    public SelectOption(String id, String name, String shortDescription, String[] options, int defaultOption) {
-        this(id, name, shortDescription, options, defaultOption, false);
+    public SelectOption(String id, String[] options, int defaultOption) {
+        this(id, null, options, defaultOption, false);
+    }
+    
+    public SelectOption(String id, OptionGroup optionGroup, String[] options, int defaultOption) {
+        this(id, optionGroup, options, defaultOption, false);
     }
     
     /**
@@ -54,15 +58,15 @@ public class SelectOption extends AbstractOption {
      * @param options All possible values.
      * @param defaultOption The index of the default value.
      */
-    protected SelectOption(String id, String name, String shortDescription, String[] options, int defaultOption, boolean doNotLocalize) {
-        super(id, name, shortDescription);
+    public SelectOption(String id, OptionGroup optionGroup, String[] options, int defaultOption, boolean doNotLocalize) {
+        super(id, optionGroup);
 
         if (doNotLocalize) {
             this.options = options;
         } else {
             String[] localized = new String[options.length];
             for (int i = 0; i < options.length; i++) {
-                localized[i] = Messages.message(options[i]);
+                localized[i] = Messages.message(getGroup() + id + "." + options[i]);
             }        
             this.options = localized;
         }
@@ -177,7 +181,7 @@ public class SelectOption extends AbstractOption {
 
     /**
      * Gets the tag name of the root element representing this object.
-     * @return "integerOption".
+     * @return "selectOption".
      */
     public static String getXMLElementTagName() {
         return "selectOption";

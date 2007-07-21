@@ -31,16 +31,13 @@ public class IntegerOption extends AbstractOption {
     *
     * @param id The identifier for this option. This is used when the object should be
     *           found in an {@link OptionGroup}.
-    * @param name The name of the <code>Option</code>. This text is used for identifying
-    *           the option for a user. Example: The text related to a checkbox.
-    * @param shortDescription Should give a short description of the <code>IntegerOption</code>.
-    *           This might be used as a tooltip text.
+    * @param optionGroup The OptionGroup this option belongs to. 
     * @param minimumValue The minimum allowed value.
     * @param maximumValue The maximum allowed value.
     * @param defaultValue The default value of this option.
     */
-    public IntegerOption(String id, String name, String shortDescription, int minimumValue, int maximumValue, int defaultValue) {
-        super(id, name, shortDescription);
+    public IntegerOption(String id, OptionGroup optionGroup, int minimumValue, int maximumValue, int defaultValue) {
+        super(id, optionGroup);
 
         this.value = defaultValue;
         this.minimumValue = minimumValue;

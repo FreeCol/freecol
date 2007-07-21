@@ -73,7 +73,7 @@ public class GameOptions extends OptionMap {
     * Creates a new <code>GameOptions</code>.
     */
     public GameOptions() {
-        super(getXMLElementTagName(), "gameOptions.name", "gameOptions.shortDescription");
+        super(getXMLElementTagName());
     }
 
 
@@ -86,7 +86,7 @@ public class GameOptions extends OptionMap {
     * @throws XMLStreamException if an error occured during parsing.
     */
     public GameOptions(XMLStreamReader in) throws XMLStreamException {
-        super(in, getXMLElementTagName(), "gameOptions.name", "gameOptions.shortDescription");
+        super(in, getXMLElementTagName());
     }
     
     /**
@@ -98,7 +98,7 @@ public class GameOptions extends OptionMap {
      *      this object.
      */
     public GameOptions(Element e) {
-        super(e, getXMLElementTagName(), "gameOptions.name", "gameOptions.shortDescription");
+        super(e, getXMLElementTagName());
     }
 
 
@@ -111,46 +111,44 @@ public class GameOptions extends OptionMap {
         /* Add options here: */
 
         /* Initial values: */
-        OptionGroup starting = new OptionGroup("gameOptions.starting.name", "gameOptions.starting.shortDescription");
+        OptionGroup starting = new OptionGroup("gameOptions.starting");
         if (FreeCol.isInDebugMode()) {
-            starting.add(new IntegerOption(STARTING_MONEY, "gameOptions.startingMoney.name", "gameOptions.startingMoney.shortDescription", 0, 50000, 10000));
+            new IntegerOption(STARTING_MONEY, starting, 0, 50000, 10000);
         } else {
-            starting.add(new IntegerOption(STARTING_MONEY, "gameOptions.startingMoney.name", "gameOptions.startingMoney.shortDescription", 0, 50000, 0));
+            new IntegerOption(STARTING_MONEY, starting, 0, 50000, 0);
         }
         add(starting);
 
         /* Map options: */
-        OptionGroup map = new OptionGroup("gameOptions.map.name", "gameOptions.map.shortDescription");
-        map.add(new BooleanOption(FOG_OF_WAR, "gameOptions.fogOfWar.name", "gameOptions.fogOfWar.shortDescription", true));
-        map.add(new BooleanOption(UNIT_HIDING, "gameOptions.unitHiding.name", "gameOptions.unitHiding.shortDescription", true));
+        OptionGroup map = new OptionGroup("gameOptions.map");
+        new BooleanOption(FOG_OF_WAR, map, true);
+        new BooleanOption(UNIT_HIDING, map, true);
         add(map);        
 
         /* Colony options: */
-        OptionGroup colony = new OptionGroup("gameOptions.colony.name", "gameOptions.colony.shortDescription");
-        colony.add(new IntegerOption(HAMMER_PRICE, "gameOptions.hammerPrice.name", "gameOptions.hammerPrice.shortDescription", 0, 50, 20));
-        colony.add(new BooleanOption(CUSTOM_IGNORE_BOYCOTT, "gameOptions.customIgnoreBoycott.name", "gameOptions.customIgnoreBoycott.shortDescription", false));
-        colony.add(new BooleanOption(EXPERTS_HAVE_CONNECTIONS, "gameOptions.expertsHaveConnections.name", "gameOptions.expertsHaveConnections.shortDescription", false));
+        OptionGroup colony = new OptionGroup("gameOptions.colony");
+        new IntegerOption(HAMMER_PRICE, colony, 0, 50, 20);
+        new BooleanOption(CUSTOM_IGNORE_BOYCOTT, colony, false);
+        new BooleanOption(EXPERTS_HAVE_CONNECTIONS, colony, false);
 
         add(colony);
 
         /* Victory Conditions */
-        OptionGroup victoryConditions = new OptionGroup("gameOptions.victoryConditions.name", "gameOptions.victoryConditions.shortDescription");
-        victoryConditions.add(new BooleanOption(VICTORY_DEFEAT_REF, "gameOptions.victoryDefeatREF.name", "gameOptions.victoryDefeatREF.shortDescription", true));
-        victoryConditions.add(new BooleanOption(VICTORY_DEFEAT_EUROPEANS, "gameOptions.victoryDefeatEuropeans.name", "gameOptions.victoryDefeatEuropeans.shortDescription", true));
-        victoryConditions.add(new BooleanOption(VICTORY_DEFEAT_HUMANS, "gameOptions.victoryDefeatHumans.name", "gameOptions.victoryDefeatHumans.shortDescription", false));
+        OptionGroup victoryConditions = new OptionGroup("gameOptions.victoryConditions");
+        new BooleanOption(VICTORY_DEFEAT_REF, victoryConditions, true);
+        new BooleanOption(VICTORY_DEFEAT_EUROPEANS, victoryConditions, true);
+        new BooleanOption(VICTORY_DEFEAT_HUMANS, victoryConditions, false);
         add(victoryConditions);
 
         /* Difficulty settings */
-        OptionGroup difficultySettings = new OptionGroup("gameOptions.difficultySettings.name",
-                                                         "gameOptions.difficultySettings.shortDescription");
-        difficultySettings.add(new SelectOption(DIFFICULTY, "gameOptions.difficulty.name",
-                                                "gameOptions.difficulty.shortDescription",
-                                                new String[] {"gameOptions.difficulty.veryEasy", 
-                                                              "gameOptions.difficulty.easy", 
-                                                              "gameOptions.difficulty.normal", 
-                                                              "gameOptions.difficulty.hard", 
-                                                              "gameOptions.difficulty.veryHard"}, 
-                                                2));
+        OptionGroup difficultySettings = new OptionGroup("gameOptions.difficultySettings");
+        new SelectOption(DIFFICULTY, difficultySettings,
+                         new String[] {"veryEasy", 
+                                       "easy", 
+                                       "normal", 
+                                       "hard", 
+                                       "veryHard"}, 
+                         2);
         add(difficultySettings);
     }
 

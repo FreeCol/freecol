@@ -27,8 +27,12 @@ public class LanguageOption extends SelectOption {
      * @param id The identifier for this option. This is used when the object should be
      *           found in an {@link OptionGroup}.
      */
-    public LanguageOption(String id, String name, String shortDescription) {
-        super(id, name, shortDescription, getLanguageNames(), 0, true);
+    public LanguageOption(String id) {
+        super(id, null, getLanguageNames(), 0, true);
+    }
+
+    public LanguageOption(String id, OptionGroup optionGroup) {
+        super(id, optionGroup, getLanguageNames(), 0, true);
     }
 
 

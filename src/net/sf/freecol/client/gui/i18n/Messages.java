@@ -101,6 +101,9 @@ public class Messages {
     public static String message(String messageId, String[][] data) {
 
         String message = Messages.message(messageId);
+        if (message == null) {
+            return messageId;
+        }
 
         if (data != null && message != null) {
             for (int i = 0; i < data.length; i++) {
@@ -139,6 +142,10 @@ public class Messages {
         }
  
         String message = messageBundle.getProperty(messageId);
+        if (message == null) {
+            return messageId;
+        }
+
         if (data.length > 0 && message != null) {
             for (int i = 0; i < data.length; i += 2) {
                 if (data[i] == null || data[i+1] == null) {

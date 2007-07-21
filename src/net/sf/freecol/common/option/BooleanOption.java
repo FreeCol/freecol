@@ -29,14 +29,23 @@ public class BooleanOption extends AbstractOption {
     *
     * @param id The identifier for this option. This is used when the object should be
     *           found in an {@link OptionGroup}.
-    * @param name The name of the <code>Option</code>. This text is used for identifying
-    *           the option for a user. Example: The text related to a checkbox.
-    * @param shortDescription Should give a short description of the <code>BooleanOption</code>.
-    *           This might be used as a tooltip text.
     * @param defaultValue The default value of this option.
     */
-    public BooleanOption(String id, String name, String shortDescription, boolean defaultValue) {
-        super(id, name, shortDescription);
+    public BooleanOption(String id, boolean defaultValue) {
+        super(id);
+        this.value = defaultValue;
+    }
+
+    /**
+    * Creates a new <code>BooleanOption</code>.
+    *
+    * @param id The identifier for this option. This is used when the object should be
+    *           found in an {@link OptionGroup}.
+    * @param optionGroup the OptionGroup this option belongs to.
+    * @param defaultValue The default value of this option.
+    */
+    public BooleanOption(String id, OptionGroup optionGroup, boolean defaultValue) {
+        super(id, optionGroup);
         this.value = defaultValue;
     }
 

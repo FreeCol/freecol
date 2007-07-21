@@ -31,11 +31,14 @@ public class OptionGroup extends AbstractOption {
     * @param shortDescription Should give a short description of the <code>OptionGroup</code>.
     *           This might be used as a tooltip text.
     */
-    public OptionGroup(String name, String shortDescription) {
-        super(NO_ID, name, shortDescription);
-        options = new ArrayList<Option>();
+    public OptionGroup() {
+        this(NO_ID);
     }
 
+    public OptionGroup(String id) {
+        super(id);
+        options = new ArrayList<Option>();
+    }
 
 
     /**

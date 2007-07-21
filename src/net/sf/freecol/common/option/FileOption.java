@@ -30,13 +30,13 @@ public class FileOption extends AbstractOption {
      *
      * @param id The identifier for this option. This is used when the object should be
      *           found in an {@link OptionGroup}.
-     * @param name The name of the <code>Option</code>. This text is used for identifying
-     *           the option for a user. Example: The text related to a checkbox.
-     * @param shortDescription Should give a short description of the <code>IntegerOption</code>.
-     *           This might be used as a tooltip text.
      */
-    public FileOption(String id, String name, String shortDescription) {
-        this(id, name, shortDescription, null);
+    public FileOption(String id) {
+        super(id);
+    }
+    
+    public FileOption(String id, OptionGroup optionGroup) {
+        super(id, optionGroup);
     }
     
     /**
@@ -44,14 +44,10 @@ public class FileOption extends AbstractOption {
      *
      * @param id The identifier for this option. This is used when the object should be
      *           found in an {@link OptionGroup}.
-     * @param name The name of the <code>Option</code>. This text is used for identifying
-     *           the option for a user. Example: The text related to a checkbox.
-     * @param shortDescription Should give a short description of the <code>IntegerOption</code>.
-     *           This might be used as a tooltip text.
      * @param value The default value of this <code>FileOption</code>.
      */
-    public FileOption(String id, String name, String shortDescription, File value) {
-        super(id, name, shortDescription);
+    public FileOption(String id, OptionGroup optionGroup, File value) {
+        super(id, optionGroup);
         this.value = value;
     }
 

@@ -32,7 +32,7 @@ public class ActionManager extends OptionGroup {
      * @param freeColClient The main client controller.
      */
     public ActionManager(FreeColClient freeColClient) {
-        super("actionManager.name", "actionManager.shortDescription");
+        super("actionManager");
 
         this.freeColClient = freeColClient;
         initializeActions();

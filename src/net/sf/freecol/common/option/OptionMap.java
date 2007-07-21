@@ -53,8 +53,8 @@ public abstract class OptionMap extends OptionGroup {
     * @param shortDescription Should give a short description of the <code>OptionGroup</code>.
     *           This might be used as a tooltip text.
     */
-    public OptionMap(String xmlTagName, String name, String shortDescription) {
-        super(name, shortDescription);
+    public OptionMap(String xmlTagName) {
+        super();
         this.xmlTagName = xmlTagName;
         
         values = new HashMap<String, Option>();
@@ -77,8 +77,8 @@ public abstract class OptionMap extends OptionGroup {
      *           This might be used as a tooltip text.
      * @throws XMLStreamException if an error occured during parsing.          
      */
-     public OptionMap(XMLStreamReader in, String xmlTagName, String name, String shortDescription) throws XMLStreamException {
-         this(xmlTagName, name, shortDescription);
+     public OptionMap(XMLStreamReader in, String xmlTagName) throws XMLStreamException {
+         this(xmlTagName);
          readFromXML(in);
      }
 
@@ -96,8 +96,8 @@ public abstract class OptionMap extends OptionGroup {
     * @param shortDescription Should give a short description of the <code>OptionGroup</code>.
     *           This might be used as a tooltip text.
     */
-    public OptionMap(Element element, String xmlTagName, String name, String shortDescription) {
-        this(xmlTagName, name, shortDescription);
+    public OptionMap(Element element, String xmlTagName) {
+        this(xmlTagName);
         readFromXMLElement(element);
     }
 
