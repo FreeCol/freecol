@@ -135,6 +135,12 @@ public class ClientOptions extends OptionMap {
     public static final String AUTOSAVE_PERIOD = "autosavePeriod"; 
 
     /**
+     * Option for setting the number of autosaves to keep. If set to
+     * 0, all autosaves are kept.
+     */
+    public static final String AUTOSAVE_GENERATIONS = "autosaveGenerations";
+
+    /**
      * Option for setting wether or not the fog of war should be displayed.
      */
     public static final String DISPLAY_FOG_OF_WAR = "displayFogOfWar";
@@ -366,6 +372,7 @@ public class ClientOptions extends OptionMap {
                                        "always"},
                          1);
         new IntegerOption(AUTOSAVE_PERIOD, savegamesGroup, 0, 100, 0);
+        new IntegerOption(AUTOSAVE_GENERATIONS, savegamesGroup, 0, 100, 10);
         add(savegamesGroup);          
 
         OptionGroup warehouseGroup = new OptionGroup("clientOptions.warehouse");

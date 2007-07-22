@@ -88,6 +88,10 @@ public final class InGameController implements NetworkConstants {
      */
     private HashMap<String, Integer> messagesToIgnore = new HashMap<String, Integer>();
 
+    /**
+     * A list of save game files.
+     */
+    private ArrayList<File> allSaveGames = new ArrayList<File>();
 
     /**
      * The constructor to use.
@@ -248,7 +252,16 @@ public final class InGameController implements NetworkConstants {
                 if (savegamePeriod == 1 || (savegamePeriod != 0 && turnNumber % savegamePeriod == 0)) {
                     final String filename = Messages.message("clientOptions.savegames.autosave.fileprefix") + '-'
                             + freeColClient.getGame().getTurn().toSaveGameString() + ".fsg";
-                    saveGame(new File(FreeCol.getAutosaveDirectory(), filename));
+                    File saveGameFile = new File(FreeCol.getAutosaveDirectory(), filename);
+                    saveGame(saveGameFile);
+                    int generations = freeColClient.getClientOptions().getInteger(ClientOptions.AUTOSAVE_GENERATIONS);
+                    if (generations > 0) {
+                        allSaveGames.add(saveGameFile);
+                        if (allSaveGames.size() > generations) {
+                            File fileToDelete = allSaveGames.remove(0);
+                            fileToDelete.delete();
+                        }
+                    }
                 }
             }
 

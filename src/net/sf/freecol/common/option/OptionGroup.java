@@ -24,17 +24,17 @@ public class OptionGroup extends AbstractOption {
 
 
     /**
-    * Creates a new <code>OptionGroup</code>.
-    *
-    * @param name The name of the <code>Option</code>. This text is used for identifying
-    *           the option for a user. Example: The text related to a checkbox.
-    * @param shortDescription Should give a short description of the <code>OptionGroup</code>.
-    *           This might be used as a tooltip text.
-    */
+     * Creates a new <code>OptionGroup</code>.
+     */
     public OptionGroup() {
         this(NO_ID);
     }
 
+    /**
+     * Creates a new <code>OptionGroup</code>.
+     * @param id The identifier for this option. This is used when the object should be
+     *           found in an {@link OptionGroup}.
+     */
     public OptionGroup(String id) {
         super(id);
         options = new ArrayList<Option>();

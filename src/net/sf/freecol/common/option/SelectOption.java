@@ -11,8 +11,17 @@ import net.sf.freecol.client.gui.i18n.Messages;
 
 
 /**
-* Represents an option where the valid choice is an integer.
-*/
+ * Represents an option where the valid choice is an integer and the
+ * choices are represented by strings. In general, these strings are
+ * localized by looking up the key of the choice, which consists of
+ * the id of the AbstractObject followed by a "." followed by the
+ * value of the option string. The automatic localization can be
+ * suppressed with the doNotLocalize parameter, however. There are two
+ * reasons to do this: either the option strings should not be
+ * localized at all (because they are language names, for example), or
+ * the option strings have already been localized (because they do not
+ * use the default keys, for example).
+ */
 public class SelectOption extends AbstractOption {
     @SuppressWarnings("unused")
     private static Logger logger = Logger.getLogger(SelectOption.class.getName());
@@ -31,10 +40,6 @@ public class SelectOption extends AbstractOption {
      *
      * @param id The identifier for this option. This is used when the object should be
      *           found in an {@link OptionGroup}.
-     * @param name The name of the <code>Option</code>. This text is used for identifying
-     *           the option for a user. Example: The text related to a checkbox.
-     * @param shortDescription Should give a short description of the <code>SelectOption</code>.
-     *           This might be used as a tooltip text.
      * @param options All possible values.
      * @param defaultOption The index of the default value.
      */
@@ -42,6 +47,15 @@ public class SelectOption extends AbstractOption {
         this(id, null, options, defaultOption, false);
     }
     
+    /**
+     * Creates a new <code>SelectOption</code>.
+     *
+     * @param id The identifier for this option. This is used when the object should be
+     *           found in an {@link OptionGroup}.
+     * @param optionGroup The OptionGroup this Option belongs to.
+     * @param options All possible values.
+     * @param defaultOption The index of the default value.
+     */
     public SelectOption(String id, OptionGroup optionGroup, String[] options, int defaultOption) {
         this(id, optionGroup, options, defaultOption, false);
     }
@@ -51,12 +65,10 @@ public class SelectOption extends AbstractOption {
      *
      * @param id The identifier for this option. This is used when the object should be
      *           found in an {@link OptionGroup}.
-     * @param name The name of the <code>Option</code>. This text is used for identifying
-     *           the option for a user. Example: The text related to a checkbox.
-     * @param shortDescription Should give a short description of the <code>SelectOption</code>.
-     *           This might be used as a tooltip text.
+     * @param optionGroup The OptionGroup this Option belongs to.
      * @param options All possible values.
      * @param defaultOption The index of the default value.
+     * @param doNotLocalize Suppress the default localization of options.
      */
     public SelectOption(String id, OptionGroup optionGroup, String[] options, int defaultOption, boolean doNotLocalize) {
         super(id, optionGroup);

@@ -32,7 +32,12 @@ import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
 /**
- * The super class of all options.
+ * The super class of all options. GUI components making use of this
+ * class can refer to its name and shortDescription properties. The
+ * complete keys of these properties consist of the id of the option
+ * group (if any), followed by a "." unless the option group is null,
+ * followed by the id of the option object, followed by a ".",
+ * followed by "name" or "shortDescription".
  */
 abstract public class AbstractOption implements Option {
     public static final String COPYRIGHT = "Copyright (C) 2003-2005 The FreeCol Team";
@@ -61,6 +66,13 @@ abstract public class AbstractOption implements Option {
         this(id, null);
     }
 
+    /**
+     * Creates a new <code>AbstractOption</code>.
+     * 
+     * @param id The identifier for this option. This is used when the object
+     *            should be found in an {@link OptionGroup}.
+     * @param optionGroup The OptionGroup this Option belongs to.
+     */
     public AbstractOption(String id, OptionGroup optionGroup) {
         this.id = id;
         if (optionGroup == null) {

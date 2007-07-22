@@ -48,13 +48,9 @@ public abstract class OptionMap extends OptionGroup {
     *
     * @param xmlTagName The tag name that should be used for the parent XML-element
     *           returned by {@link Option#toXMLElement}.
-    * @param name The name of the <code>Option</code>. This text is used for identifying
-    *           the option for a user. Example: The text related to a checkbox.
-    * @param shortDescription Should give a short description of the <code>OptionGroup</code>.
-    *           This might be used as a tooltip text.
     */
     public OptionMap(String xmlTagName) {
-        super();
+        super(xmlTagName);
         this.xmlTagName = xmlTagName;
         
         values = new HashMap<String, Option>();
@@ -71,10 +67,6 @@ public abstract class OptionMap extends OptionGroup {
      * @param in The XML stream to read the data from.
      * @param xmlTagName The tag name that should be used for the parent XML-element
      *           returned by {@link Option#toXMLElement}.
-     * @param name The name of the <code>Option</code>. This text is used for identifying
-     *           the option for a user. Example: The text related to a checkbox.
-     * @param shortDescription Should give a short description of the <code>OptionGroup</code>.
-     *           This might be used as a tooltip text.
      * @throws XMLStreamException if an error occured during parsing.          
      */
      public OptionMap(XMLStreamReader in, String xmlTagName) throws XMLStreamException {
@@ -91,10 +83,6 @@ public abstract class OptionMap extends OptionGroup {
     *                should be constructed.
     * @param xmlTagName The tag name that should be used for the parent XML-element
     *           returned by {@link Option#toXMLElement}.
-    * @param name The name of the <code>Option</code>. This text is used for identifying
-    *           the option for a user. Example: The text related to a checkbox.
-    * @param shortDescription Should give a short description of the <code>OptionGroup</code>.
-    *           This might be used as a tooltip text.
     */
     public OptionMap(Element element, String xmlTagName) {
         this(xmlTagName);
