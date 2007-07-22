@@ -81,53 +81,56 @@ public final class DragListener extends MouseAdapter {
                 JMenuItem menuItem;
                 boolean separatorNeeded = false;
 
-                if (//(tempUnit.isColonist() || tempUnit.getType() == Unit.INDIAN_CONVERT) &&
-                    tempUnit.getLocation() instanceof ColonyTile) {
-                    ColonyTile colonyTile = (ColonyTile) tempUnit.getLocation();
+                if (tempUnit.getLocation().getTile() != null && 
+                    tempUnit.getLocation().getTile().getSettlement() != null) {
+                    Colony colony = (Colony) tempUnit.getLocation().getColony();
+                    
+                    // Work in Field - automatically find the best location
                     for (int index = 0; index < goodsTypes.length; index++) {
-                        int potential = tempUnit.getFarmedPotential(goodsTypes[index], 
-                                                                    colonyTile.getWorkTile());
-                        if (potential > 0) {
-                            int maxPotential = colonyTile.getColony()
-                                .getVacantColonyTileProductionFor(tempUnit, goodsTypes[index]);
+                        int maxpotential = colony.getVacantColonyTileProductionFor(tempUnit, goodsTypes[index]);
+                        if (maxpotential > 0) {
                             menuItem = new JMenuItem(Messages.message(messages[index]) +
-                                                     " (" + potential + "/" + maxPotential + ")",
+                                                     " (" + maxpotential + " " + Goods.getName(index) + ")",
                                                      imageLibrary.getScaledGoodsImageIcon(goodsTypes[index], 0.66f));
                             menuItem.setActionCommand(String.valueOf(workTypes[index]));
                             menuItem.addActionListener(unitLabel);
                             menu.add(menuItem);
                         }
                     }
-                    separatorNeeded = true;
-                }
-
-                if (tempUnit.getLocation().getTile() != null && 
-                    tempUnit.getLocation().getTile().getSettlement() != null) {
-                    Colony colony = (Colony) tempUnit.getLocation().getColony();
+                    
+                    // Work at Building - show both max potential and realistic projection
                     Iterator<Building> buildingIterator = colony.getBuildingIterator();
                     while (buildingIterator.hasNext()) {
                         Building building = buildingIterator.next();
-                        if (building.isBuilt() && building.canAdd(tempUnit)) {
-                            int goodsType = building.getGoodsOutputType();
-                            String locName = building.getName();
-                            menuItem = new JMenuItem(locName);
-                            if (goodsType > -1) {
-                                menuItem.setIcon(imageLibrary.getScaledGoodsImageIcon(goodsType, 0.66f));
-                                int maxPotential = building.getMaximumProductionAdding(tempUnit) - building.getMaximumProduction();
-                                int potential = building.getProductionAdding(tempUnit) - building.getProduction();
-                                if(maxPotential == potential) {
-                                    locName += " (" + potential + " " + Goods.getName(goodsType) + ")";
+                        if (tempUnit.getWorkLocation() != building) { // Skip if currently working at this location
+                            if (building.isBuilt() && building.canAdd(tempUnit)) {
+                                int goodsType = building.getGoodsOutputType();
+                                String locName = building.getName();
+                                menuItem = new JMenuItem(locName);
+                                if (goodsType > -1) {
+                                    menuItem.setIcon(imageLibrary.getScaledGoodsImageIcon(goodsType, 0.66f));
+                                    int addOutput = building.getAdditionalProductionNextTurn(tempUnit);
+                                    locName += " (" + addOutput;
+                                    int potential = building.getAdditionalProduction(tempUnit);
+                                    if (addOutput < potential) {
+                                        // Not reaching full potential, show full potential
+                                        locName += "/" + potential;
+                                    }
+                                    locName +=  " " + Goods.getName(goodsType)+")";
+                                    menuItem.setText(locName);
                                 }
-                                else {
-                                    locName += " (" + potential + "/" + maxPotential + " " + Goods.getName(goodsType) + ")";
-                                }
-                                menuItem.setText(locName);
+                                menuItem.setActionCommand(String.valueOf(UnitLabel.WORK_AT_SOMEWHERE+building.getType()));
+                                menuItem.addActionListener(unitLabel);
+                                menu.add(menuItem);
                             }
-                            menuItem.setActionCommand(String.valueOf(UnitLabel.WORK_AT_SOMEWHERE+building.getType()));
-                            menuItem.addActionListener(unitLabel);
-                            menu.add(menuItem);
                         }
                     }
+                    
+                    menuItem = new JMenuItem(Messages.message("leaveTown"));
+                    menuItem.setActionCommand(String.valueOf(UnitLabel.LEAVE_TOWN));
+                    menuItem.addActionListener(unitLabel);
+                    menu.add(menuItem);
+
                     separatorNeeded = true;
                 }
 

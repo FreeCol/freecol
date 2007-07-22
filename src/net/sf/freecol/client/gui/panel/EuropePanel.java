@@ -653,7 +653,6 @@ public final class EuropePanel extends FreeColPanel implements ActionListener {
             switch (intCommand) {
             case EXIT:
                 freeColClient.getMyPlayer().getMarket().removeTransactionListener(log);
-                //parent.hideEuropeDialogs();
                 parent.remove(this);
                 freeColClient.getInGameController().nextModelMessage();
                 break;

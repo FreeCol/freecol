@@ -38,7 +38,8 @@ public final class UnitLabel extends JLabel implements ActionListener {
 
     public static final int ARM = 0, MOUNT = 1, TOOLS = 2, DRESS = 3, WORKTYPE_FOOD = 4, WORKTYPE_SUGAR = 5,
             WORKTYPE_TOBACCO = 6, WORKTYPE_COTTON = 7, WORKTYPE_FURS = 8, WORKTYPE_LUMBER = 9, WORKTYPE_ORE = 10,
-            WORKTYPE_SILVER = 11, CLEAR_SPECIALITY = 12, ACTIVATE_UNIT = 13, FORTIFY = 14, SENTRY = 15, COLOPEDIA = 16;
+            WORKTYPE_SILVER = 11, CLEAR_SPECIALITY = 12, ACTIVATE_UNIT = 13, FORTIFY = 14, SENTRY = 15, COLOPEDIA = 16,
+            LEAVE_TOWN = 17;
 
     public static final int WORK_AT_SOMEWHERE = 100,
         WORK_AT_TOWN_HALL = WORK_AT_SOMEWHERE+Building.TOWN_HALL,
@@ -323,28 +324,23 @@ public final class UnitLabel extends JLabel implements ActionListener {
                     inGameController.equipUnit(unit, Goods.CROSSES, ((unit.isMissionary()) ? 0 : 1));
                     break;
                 case WORKTYPE_FOOD:
-                    inGameController.changeWorkType(unit, Goods.FOOD);
-                    break;
                 case WORKTYPE_SUGAR:
-                    inGameController.changeWorkType(unit, Goods.SUGAR);
-                    break;
                 case WORKTYPE_TOBACCO:
-                    inGameController.changeWorkType(unit, Goods.TOBACCO);
-                    break;
                 case WORKTYPE_COTTON:
-                    inGameController.changeWorkType(unit, Goods.COTTON);
-                    break;
                 case WORKTYPE_FURS:
-                    inGameController.changeWorkType(unit, Goods.FURS);
-                    break;
                 case WORKTYPE_LUMBER:
-                    inGameController.changeWorkType(unit, Goods.LUMBER);
-                    break;
                 case WORKTYPE_ORE:
-                    inGameController.changeWorkType(unit, Goods.ORE);
-                    break;
                 case WORKTYPE_SILVER:
-                    inGameController.changeWorkType(unit, Goods.SILVER);
+                    // Gets goodsType relative to FOOD
+                    int goodsType = intCommand - WORKTYPE_FOOD + Goods.FOOD;
+                    // Move unit to best producing ColonyTile
+                    ColonyTile bestTile = unit.getColony().getVacantColonyTileFor(unit, goodsType);
+                    inGameController.work(unit, bestTile);
+                    // Change workType
+                    inGameController.changeWorkType(unit, goodsType);
+                    break;
+                case LEAVE_TOWN:
+                    inGameController.putOutsideColony(unit);
                     break;
                 case CLEAR_SPECIALITY:
                     inGameController.clearSpeciality(unit);

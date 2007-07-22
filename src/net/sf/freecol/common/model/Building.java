@@ -828,7 +828,7 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
     }
 
     /**
-     * Returns the amount of goods beeing used to get the current
+     * Returns the amount of goods being used to get the current
      * {@link #getProduction production}.
      * 
      * @return The actual amount of goods that is being used to support the
@@ -845,7 +845,28 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
     }
 
     /**
-     * Returns the amount of goods beeing used to get the current
+     * Returns the amount of goods being used to get a desired
+     * {@link #getProduction production}.
+     * 
+     * @return The actual amount of goods that is being used to support the
+     *         desired production.
+     * @see #getMaximumGoodsInput
+     * @see #getProduction
+     */
+    public int getGoodsInput(int goodsOutput) {
+        int goodsInput = goodsOutput;
+        if (level > SHOP) {
+            goodsInput = (goodsInput * 2) / 3; // Factories don't need the
+                                                // extra 3 units.
+        }
+        if (getGoodsInputType() > -1 && colony.getGoodsCount(getGoodsInputType()) < goodsInput) {
+            goodsInput = colony.getGoodsCount(getGoodsInputType());
+        }
+        return goodsInput;
+    }
+
+    /**
+     * Returns the amount of goods being used to get the current
      * {@link #getProduction production} at the next turn.
      * 
      * @return The actual amount of goods that will be used to support the
@@ -867,8 +888,39 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
     }
 
     /**
+     * Returns the amount of goods being used to get the desired
+     * {@link #getProduction production} at the next turn.
+     * 
+     * @return The actual amount of goods that will be used to support the
+     *         desired production at the next turn.
+     * @see #getMaximumGoodsInput
+     * @see #getProduction
+     */
+    public int getGoodsInputNextTurn(int goodsOutput) {
+        int goodsInput = goodsOutput;
+        if (level > SHOP) {
+            goodsInput = (goodsInput * 2) / 3; // Factories don't need the
+                                                // extra 3 units.
+        }
+        if (getGoodsInputType() > -1) {
+            int available = colony.getGoodsCount(getGoodsInputType()) +
+                colony.getProductionOf(getGoodsInputType());
+            if (available < goodsInput) {
+                // Not enough goods to do this?
+                goodsInput = available;
+            }
+        }
+        return goodsInput;
+    }
+
+    /**
      * Calculates the output of this building from the input if
      * <code>Unit</code> was added.
+     *
+     * @param new_unit The Unit that was added, to check for Expertise.
+     *        <code>null</code> if not applicable
+     * @param goodsInput Number of input goods,
+     *        including those contributed by the new_unit, if applicable.
      */
     public int calculateOutputAdding(int goodsInput, Unit new_unit) {
         int goodsOutput = 0;
@@ -885,7 +937,7 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
                         minimumProduction += 4;
                     }
                 }
-                if (new_unit != null && new_unit.getType() == getExpertUnitType()) {
+                if (new_unit != null && canAdd(new_unit) && new_unit.getType() == getExpertUnitType()) {
                     minimumProduction += 4;
                 }
                 if (goodsOutput < minimumProduction) {
@@ -966,6 +1018,51 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
     }
 
     /**
+     * Returns the additional production of new <code>Unit</code> at this building for next turn.
+     * 
+     * @return The production of this building the next turn.
+     * @see #getProduction
+     */
+    public int getAdditionalProductionNextTurn(Unit addUnit) {
+        if (getGoodsOutputType() == -1) {
+            return 0;
+        }
+        if (addUnit == null || !canAdd(addUnit)) {
+            return 0;
+        }
+
+        int addGoodsOutput = getAdditionalProduction(addUnit);
+
+        if (getGoodsInputType() > -1) {
+            // addGoodsInput = total available stock + new production - current requirements
+            //               = remaining input goods to support additional output
+            int addGoodsInput = colony.getGoodsCount(getGoodsInputType())
+                                + colony.getProductionOf(getGoodsInputType())
+                                - getGoodsInput();
+            // Additional input goods need = Additional goods output (with modifier for FACTORY)
+            int neededGoodsInput = addGoodsOutput;
+            if (level > SHOP) {
+                neededGoodsInput = (neededGoodsInput * 2) / 3;
+            }
+            if (addGoodsInput < neededGoodsInput) {
+                // Not enough additional input goods to support desired output
+                if (level < FACTORY) {
+                    addGoodsOutput = addGoodsInput;
+                } else {
+                    addGoodsOutput = (addGoodsInput * 3) / 2;
+                    if (getGameOptions().getBoolean(GameOptions.EXPERTS_HAVE_CONNECTIONS)
+                        && addUnit.getType() == getExpertUnitType()
+                        && addGoodsOutput < 4) {
+                        addGoodsOutput = 4;
+                    }
+                }
+            }
+        }
+
+        return addGoodsOutput;
+    }
+
+    /**
      * Returns the production of the given type of goods.
      * 
      * @param goodsType The type of goods to get the production for.
@@ -982,44 +1079,106 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
         return 0;
     }
 
-    /** 
-     * Returns the maximum production of this building if the given
-     * <code>Unit</code> was added.
+    /**
+     * Returns the maximum productivity of worker/s
+     * currently working in this building.
+     *
+     * @return The maximum returns from workers in this building,
+     *         assuming enough "input goods".
      */
-    public int getMaximumProductionAdding(Unit unit) {
+    public int getProductivity() {
         if (getGoodsOutputType() == -1) {
             return 0;
         }
 
-        int goodsOutput = 0;
+        int totProductivity = 0;
+        Iterator<Unit> unitIterator = getUnitIterator();
+        while (unitIterator.hasNext()) {
+            int productivity = unitIterator.next().getProducedAmount(getGoodsOutputType());
+            if (productivity > 0) {
+                productivity += colony.getProductionBonus();
+                if (productivity < 1)
+                    productivity = 1;
+            }
+            totProductivity += productivity;
+        }
+        return totProductivity;
+    }
+
+    /**
+     * Returns the maximum productivity of a unit working in this building.
+     *
+     * @return The maximum returns from this unit if in this <code>Building</code>,
+     *         assuming enough "input goods".
+     */
+    public int getProductivity(Unit prodUnit) {
+        if (getGoodsOutputType() == -1) {
+            return 0;
+        }
+        if (prodUnit == null) {
+            return 0;
+        }
+
+        int productivity = prodUnit.getProducedAmount(getGoodsOutputType());
+        if (productivity > 0) {
+            productivity += colony.getProductionBonus();
+            if (productivity < 1)
+                productivity = 1;
+        }
+        return productivity;
+    }
+
+    /**
+     * Returns the maximum production of this building.
+     * 
+     * @return The production of this building, with the current amount of
+     *         workers, when there is enough "input goods".
+     */
+    public int getMaximumProduction() {
+        return getProductionFromProductivity(getProductivity());
+    }
+
+    /**
+     * Returns the maximum production with a given unit to be added to this building.
+     *
+     * @return Maximum production potential from all workers
+     *         with additional worker if valid.
+     */
+    public int getMaximumProductionAdding(Unit addUnit) {
+        if (addUnit == null || !canAdd(addUnit)) {
+            return getMaximumProduction();
+        }
+        return getProductionFromProductivity(getProductivity() +
+                                              getProductivity(addUnit));
+    }
+
+    /**
+     * Returns the maximum production of a given unit to be added to this building.
+     *
+     * @return If unit can be added, will return the maximum production potential
+     *         if it cannot be added, will return <code>0</code>.
+     */
+    public int getAdditionalProduction(Unit addUnit) {
+        if (addUnit == null || !canAdd(addUnit)) {
+            return 0;
+        }
+        return getProductionFromProductivity(getProductivity(addUnit));
+    }
+
+    /**
+     * Returns the Production from this building given the productivity of the worker(s).
+     *
+     * @param productivity From {@link #getProductivity}
+     * @return Maximum Production based on Productivity
+     */
+    public int getProductionFromProductivity(int productivity) {
         int goodsOutputType = getGoodsOutputType();
         Player player = colony.getOwner();
 
+        int goodsOutput = productivity;
         if (getType() == CHURCH || getType() == TOWN_HALL) {
-            goodsOutput = 1;
+            goodsOutput++;
         }
-
-        Iterator<Unit> unitIterator = getUnitIterator();
-        while (unitIterator.hasNext()) {
-            int productivity = unitIterator.next().getProducedAmount(goodsOutputType);
-            if (productivity > 0) {
-                productivity += colony.getProductionBonus();
-                if (productivity < 1)
-                    productivity = 1;
-            }
-            goodsOutput += productivity;
-        }
-
-        if (unit != null) {
-            int productivity = unit.getProducedAmount(goodsOutputType);
-            if (productivity > 0) {
-                productivity += colony.getProductionBonus();
-                if (productivity < 1)
-                    productivity = 1;
-            }
-            goodsOutput += productivity;
-        }
-
         goodsOutput *= (type == CHURCH) ? level + 1 : level;
 
         if (goodsOutputType == Goods.BELLS) {
@@ -1035,16 +1194,6 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
         }
 
         return goodsOutput;
-    }
-
-    /**
-     * Returns the maximum production of this building.
-     * 
-     * @return The production of this building, with the current amount of
-     *         workers, when there is enough "input goods".
-     */
-    public int getMaximumProduction() {
-        return getMaximumProductionAdding(null);
     }
 
     /**
