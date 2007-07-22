@@ -611,7 +611,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
         UnitType unitType = FreeCol.getSpecification().unitType(unitTypeIndex);
 
         if (unitType.hasSkill()) {
-            return unitType.skill;
+            return unitType.getSkill();
         }
 
         return 0;
@@ -719,7 +719,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
      */
     public int getExpertWorkType() {
 
-        GoodsType expertProduction = unitType.expertProduction;
+        GoodsType expertProduction = unitType.getExpertProduction();
         return (expertProduction != null) ? expertProduction.index : -1;
     }
 
@@ -2324,7 +2324,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
      */
     public static String getName(int someType) {
 
-        return Messages.message(FreeCol.getSpecification().unitType(someType).name);
+        return Messages.message(FreeCol.getSpecification().unitType(someType).getName());
     }
 
     public int getScoreValue() {
@@ -2425,9 +2425,9 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
         } else if (isMissionary()) {
             return 6;
         } else if (isNaval() && owner.hasFather(FoundingFather.FERDINAND_MAGELLAN)) {
-            return unitType.movement + 3;
+            return unitType.getMovement() + 3;
         } else {
-            return unitType.movement;
+            return unitType.getMovement();
         }
     }
     
@@ -3197,7 +3197,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
 
         if (unitType.hasPrice()) {
 
-            return unitType.price;
+            return unitType.getPrice();
         }
 
         return -1;
@@ -3221,7 +3221,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
      *         attack other units.
      */
     public boolean isOffensiveUnit() {
-        return getUnitType().offence > 0 || isArmed() || isMounted();
+        return getUnitType().getOffence() > 0 || isArmed() || isMounted();
     }
 
     /**
@@ -3245,7 +3245,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
      *         {@link #isOffensiveUnit offensive}.
      */
     public boolean isDefensiveUnit() {
-        return (getUnitType().defence > 1 || isArmed() || isMounted()) && !isNaval();
+        return (getUnitType().getDefence() > 1 || isArmed() || isMounted()) && !isNaval();
     }
 
     /**
@@ -3282,7 +3282,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
         ArrayList<Modifier> result = new ArrayList<Modifier>();
 
         float addend, percentage;
-        float totalAddend = attacker.getUnitType().offence;
+        float totalAddend = attacker.getUnitType().getOffence();
         float totalPercentage = 100;
 
         result.add(new Modifier("modifiers.baseOffense", totalAddend, Modifier.ADDITIVE));
@@ -3411,7 +3411,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
         }
 
         float addend, percentage;
-        float totalAddend = defender.getUnitType().defence;
+        float totalAddend = defender.getUnitType().getDefence();
         float totalPercentage = 100;
 
         result.add(new Modifier("modifiers.baseDefense", totalAddend, Modifier.ADDITIVE));
@@ -4412,7 +4412,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
 
         if (unitType.canBeBuilt()) {
 
-            return unitType.hammersRequired;
+            return unitType.getHammersRequired();
         }
 
         return -1;
@@ -4424,7 +4424,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
 
         if (unitType.canBeBuilt()) {
 
-            return unitType.toolsRequired;
+            return unitType.getToolsRequired();
         }
 
         return -1;

@@ -256,12 +256,7 @@ public final class DragListener extends MouseAdapter {
                         separatorNeeded = false;
                     }
 
-                    if (tempUnit.getUnitType().skill > 0) {
-                    /*
-                    if (tempUnit.getType() != Unit.INDIAN_CONVERT && tempUnit.getType() != Unit.PETTY_CRIMINAL
-                            && tempUnit.getType() != Unit.INDENTURED_SERVANT
-                            && tempUnit.getType() != Unit.FREE_COLONIST) {
-                    */
+                    if (tempUnit.getUnitType().getSkill() > 0) {
                         menuItem = new JMenuItem(Messages.message("clearSpeciality"));
                         menuItem.setActionCommand(String.valueOf(UnitLabel.CLEAR_SPECIALITY));
                         menuItem.addActionListener(unitLabel);

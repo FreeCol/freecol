@@ -38,7 +38,7 @@ public final class TrainDialog extends FreeColDialog implements ActionListener {
 
     private static final Comparator<NumberedUnitType> priceComparator = new Comparator<NumberedUnitType>() {
         public int compare(NumberedUnitType type1, NumberedUnitType type2) {
-            return type1.type.price - type2.type.price;
+            return type1.type.getPrice() - type2.type.getPrice();
         }
     };
     
@@ -71,7 +71,7 @@ public final class TrainDialog extends FreeColDialog implements ActionListener {
         int numberOfTypes = FreeCol.getSpecification().numberOfUnitTypes();
         for (int type = 0; type < numberOfTypes; type++) {
             UnitType unitType = FreeCol.getSpecification().unitType(type);
-            if (unitType.price > 0 && unitType.skill > 0) {
+            if (unitType.getPrice() > 0 && unitType.getSkill() > 0) {
                 trainableUnits.add(new NumberedUnitType(unitType, type));
             }
         }
@@ -99,14 +99,15 @@ public final class TrainDialog extends FreeColDialog implements ActionListener {
         int counter = 0;
         for (NumberedUnitType unitType : trainableUnits) {
             int graphicsType = ImageLibrary.getUnitGraphicsType(unitType.index, false, false, 0, false);
-            JButton newButton = new JButton(Messages.message(unitType.type.name), 
+            JButton newButton = new JButton(Messages.message(unitType.type.getName()), 
                                             library.getScaledUnitImageIcon(graphicsType, 0.66f));
             newButton.setActionCommand(String.valueOf(unitType.index));
             newButton.addActionListener(this);
             newButton.setIconTextGap(margin);
             enterPressesWhenFocused(newButton);
             buttons.add(newButton);
-            trainPanel.add(new JLabel(String.valueOf(unitType.type.price)), higConst.rc(row, labelColumn[counter]));
+            trainPanel.add(new JLabel(String.valueOf(unitType.type.getPrice())),
+                           higConst.rc(row, labelColumn[counter]));
             trainPanel.add(newButton, higConst.rc(row, buttonColumn[counter]));
             if (counter == 1) {
                 counter = 0;
@@ -142,7 +143,7 @@ public final class TrainDialog extends FreeColDialog implements ActionListener {
         Player player = freeColClient.getMyPlayer();
         int numberOfTypes = trainableUnits.size();
         for (int index = 0; index < numberOfTypes; index++) {
-            if (trainableUnits.get(index).type.price > player.getGold()) {
+            if (trainableUnits.get(index).type.getPrice() > player.getGold()) {
                 buttons.get(index).setEnabled(false);
             } else {
                 buttons.get(index).setEnabled(true);

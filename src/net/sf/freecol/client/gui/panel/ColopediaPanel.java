@@ -308,7 +308,7 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
         int numberOfTypes = FreeCol.getSpecification().numberOfUnitTypes();
         for (int type = 0; type < numberOfTypes-4; type++) { // Ugly, but needed to remove testing units like "Milkmaid"
             UnitType unitType = FreeCol.getSpecification().unitType(type);
-            if (unitType.skill <= 0) {
+            if (unitType.getSkill() <= 0) {
                 buildUnitItem(type, 0.5f, parent);
             }
         }
@@ -333,7 +333,7 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
         int numberOfTypes = FreeCol.getSpecification().numberOfUnitTypes();
         for (int type = 0; type < numberOfTypes; type++) {
             UnitType unitType = FreeCol.getSpecification().unitType(type);
-            if (unitType.skill > 0) {
+            if (unitType.getSkill() > 0) {
                 buildUnitItem(type, 0.5f, parent);
             }
         }
@@ -568,26 +568,26 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
 
         UnitType type = FreeCol.getSpecification().unitType(unit);
         String price = "";
-        if (type.id.equals("model.unit.artillery")) {
+        if (type.getId().equals("model.unit.artillery")) {
             price = String.valueOf(parent.getClient().getMyPlayer().getEurope().getArtilleryPrice());
-        } else if (type.price > 0) {
-            price = String.valueOf(type.price);
+        } else if (type.getPrice() > 0) {
+            price = String.valueOf(type.getPrice());
         }
         String hammersRequired = "";
-        if (type.hammersRequired > 0) {
-            hammersRequired = String.valueOf(type.hammersRequired);
+        if (type.getHammersRequired() > 0) {
+            hammersRequired = String.valueOf(type.getHammersRequired());
         }
         String toolsRequired = "";
-        if (type.toolsRequired > 0) {
-            toolsRequired = String.valueOf(type.toolsRequired);
+        if (type.getToolsRequired() > 0) {
+            toolsRequired = String.valueOf(type.getToolsRequired());
         }
         String skill = "";
         String schoolType = "";
-        if (type.skill != UnitType.UNDEFINED) {
-            skill = String.valueOf(type.skill);
+        if (type.getSkill() != UnitType.UNDEFINED) {
+            skill = String.valueOf(type.getSkill());
             int schoolLevel = 1;
-            if (type.skill > 1) {
-                schoolLevel = type.skill;
+            if (type.getSkill() > 1) {
+                schoolLevel = type.getSkill();
             }
             schoolType = Building.getName(Building.SCHOOLHOUSE, schoolLevel);
         }
@@ -612,17 +612,17 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
 
         detailPanel.add(new JLabel(Messages.message("colopedia.unit.offensivePower")),
                         higConst.rc(row, labelColumn));
-        detailPanel.add(new JLabel(String.valueOf(type.offence)),
+        detailPanel.add(new JLabel(String.valueOf(type.getOffence())),
                         higConst.rc(row, valueColumn, "r"));
         row += 2;
         detailPanel.add(new JLabel(Messages.message("colopedia.unit.defensivePower")),
                         higConst.rc(row, labelColumn));
-        detailPanel.add(new JLabel(String.valueOf(type.defence)), 
+        detailPanel.add(new JLabel(String.valueOf(type.getDefence())), 
                         higConst.rc(row, valueColumn, "r"));
         row += 2;
         detailPanel.add(new JLabel(Messages.message("colopedia.unit.movement")),
                         higConst.rc(row, labelColumn));
-        detailPanel.add(new JLabel(String.valueOf(type.movement/3)),
+        detailPanel.add(new JLabel(String.valueOf(type.getMovement()/3)),
                         higConst.rc(row, valueColumn, "r"));
         row += 2;
         if (type.hasAbility("carry-goods") || type.hasAbility("naval")) {
@@ -656,7 +656,7 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
         row += 2;
         detailPanel.add(new JLabel(Messages.message("colopedia.unit.description")),
                         higConst.rc(row, labelColumn, "tl"));
-        detailPanel.add(getDefaultTextArea(Messages.message(type.id + ".description")),
+        detailPanel.add(getDefaultTextArea(Messages.message(type.getId() + ".description")),
                         higConst.rc(row, valueColumn));
 
         detailPanel.validate();
@@ -1005,7 +1005,7 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
                 int numberOfTypes = FreeCol.getSpecification().numberOfUnitTypes();
                 for (int type = 0; type < numberOfTypes; type++) {
                     UnitType unitType = FreeCol.getSpecification().unitType(type);
-                    if (unitType.skill > 0) {
+                    if (unitType.getSkill() > 0) {
                         if (nodeTitle.equals(Unit.getName(type))) { 
                             buildUnitDetail(type);
                         }
