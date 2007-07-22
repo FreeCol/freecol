@@ -1530,7 +1530,7 @@ public final class Colony extends Settlement implements Location, Nameable {
     // Warn about levels that will be exceeded next turn
     private void createWarehouseCapacityWarning() {
         for (int goodsType = 1; goodsType < Goods.NUMBER_OF_TYPES; goodsType++) {
-            if (getExports(goodsType)) {
+            if (getExports(goodsType)  && (owner.canTrade(goodsType, Market.CUSTOM_HOUSE))) {
                 // capacity will never be exceeded
                 continue;
             } else if (goodsContainer.getGoodsCount(goodsType) < getWarehouseCapacity()) {
