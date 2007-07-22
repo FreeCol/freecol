@@ -798,6 +798,20 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
     }
 
     /**
+     * Returns the amount of goods needed to have a full production if
+     * <code>Unit</code> was added.
+     */
+    public int getMaximumGoodsInputAdding(Unit unit){
+        int goodsInput = getMaximumProductionAdding(unit);
+        if (level > SHOP) {
+            goodsInput = (goodsInput * 2) / 3; // Factories don't need the
+                                                // extra 3 units.
+        }
+
+        return goodsInput;
+    }
+
+    /**
      * Returns the amount of goods needed to have a full production.
      * 
      * @return The maximum level of goods needed in order to have the maximum
@@ -810,13 +824,7 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
      * @see #getProduction
      */
     public int getMaximumGoodsInput() {
-        int goodsInput = getMaximumProduction();
-        if (level > SHOP) {
-            goodsInput = (goodsInput * 2) / 3; // Factories don't need the
-                                                // extra 3 units.
-        }
-
-        return goodsInput;
+        return getMaximumGoodsInputAdding(null);
     }
 
     /**
@@ -858,6 +866,36 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
         return goodsInput;
     }
 
+    /**
+     * Calculates the output of this building from the input if
+     * <code>Unit</code> was added.
+     */
+    public int calculateOutputAdding(int goodsInput, Unit new_unit) {
+        int goodsOutput = 0;
+        if (level < FACTORY) {
+            goodsOutput = goodsInput;
+        } else {
+            goodsOutput = (goodsInput * 3) / 2;
+            if (getGameOptions().getBoolean(GameOptions.EXPERTS_HAVE_CONNECTIONS)) {
+                int minimumProduction = 0;
+                Iterator<Unit> i = getUnitIterator();
+                while (i.hasNext()) {
+                    Unit unit = (Unit)i.next();
+                    if (unit.getType() == getExpertUnitType()) {
+                        minimumProduction += 4;
+                    }
+                }
+                if (new_unit != null && new_unit.getType() == getExpertUnitType()) {
+                    minimumProduction += 4;
+                }
+                if (goodsOutput < minimumProduction) {
+                    goodsOutput = minimumProduction;
+                }
+            }
+        }
+        return goodsOutput;
+    }
+
      /**
       * Calculates and returns the output of this building from the input.
       *
@@ -866,27 +904,30 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
       * @see #getProductionNextTurn
       */
      public int calculateOutput(int goodsInput) {
-         int goodsOutput = 0;
-         if (level < FACTORY) {
-             goodsOutput = goodsInput;
-         } else {
-             goodsOutput = (goodsInput * 3) / 2;
-             if (getGameOptions().getBoolean(GameOptions.EXPERTS_HAVE_CONNECTIONS)) {
-                 int minimumProduction = 0;
-                 Iterator<Unit> i = getUnitIterator();
-                 while (i.hasNext()) {
-                     Unit unit = (Unit)i.next();
-                     if (unit.getType() == getExpertUnitType()) {
-                         minimumProduction += 4;
-                     }
-                 }
-                 if (goodsOutput < minimumProduction) {
-                     goodsOutput = minimumProduction;
-                 }
-             }
-         }
-         return goodsOutput;
+         return calculateOutputAdding(goodsInput, null);
      }
+
+    /**
+     * Returns the actual production of this building if
+     * <Code>Unit</code> was added.
+     *
+     */
+    public int getProductionAdding(Unit unit) {
+        if (getGoodsOutputType() == -1) {
+            return 0;
+        }
+
+        int goodsOutput = getMaximumProductionAdding(unit);
+
+        if (getGoodsInputType() > -1) {
+            int goodsInput = colony.getGoodsCount(getGoodsInputType());
+            if (goodsInput < getMaximumGoodsInputAdding(unit)) {
+                goodsOutput = calculateOutputAdding(goodsInput, unit);
+            }
+        }
+
+        return goodsOutput;
+    }
 
     /**
      * Returns the actual production of this building.
@@ -898,20 +939,7 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
      * @see #getMaximumProduction
      */
     public int getProduction() {
-        if (getGoodsOutputType() == -1) {
-            return 0;
-        }
-
-        int goodsOutput = getMaximumProduction();
-
-        if (getGoodsInputType() > -1) {
-            int goodsInput = colony.getGoodsCount(getGoodsInputType());
-            if (goodsInput < getMaximumGoodsInput()) {
-                goodsOutput = calculateOutput(goodsInput);
-            }
-        }
-
-        return goodsOutput;
+        return getProductionAdding(null);
     }
 
     /**
@@ -954,13 +982,11 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
         return 0;
     }
 
-    /**
-     * Returns the maximum production of this building.
-     * 
-     * @return The production of this building, with the current amount of
-     *         workers, when there is enough "input goods".
+    /** 
+     * Returns the maximum production of this building if the given
+     * <code>Unit</code> was added.
      */
-    public int getMaximumProduction() {
+    public int getMaximumProductionAdding(Unit unit) {
         if (getGoodsOutputType() == -1) {
             return 0;
         }
@@ -984,6 +1010,16 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
             goodsOutput += productivity;
         }
 
+        if (unit != null) {
+            int productivity = unit.getProducedAmount(goodsOutputType);
+            if (productivity > 0) {
+                productivity += colony.getProductionBonus();
+                if (productivity < 1)
+                    productivity = 1;
+            }
+            goodsOutput += productivity;
+        }
+
         goodsOutput *= (type == CHURCH) ? level + 1 : level;
 
         if (goodsOutputType == Goods.BELLS) {
@@ -999,6 +1035,16 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
         }
 
         return goodsOutput;
+    }
+
+    /**
+     * Returns the maximum production of this building.
+     * 
+     * @return The production of this building, with the current amount of
+     *         workers, when there is enough "input goods".
+     */
+    public int getMaximumProduction() {
+        return getMaximumProductionAdding(null);
     }
 
     /**

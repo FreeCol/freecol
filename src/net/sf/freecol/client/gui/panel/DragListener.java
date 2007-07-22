@@ -113,8 +113,14 @@ public final class DragListener extends MouseAdapter {
                             menuItem = new JMenuItem(locName);
                             if (goodsType > -1) {
                                 menuItem.setIcon(imageLibrary.getScaledGoodsImageIcon(goodsType, 0.66f));
-                                int potential = tempUnit.getProducedAmount(building.getGoodsOutputType());
-                                locName += " (" + potential + " " + Goods.getName(goodsType) + ")";
+                                int maxPotential = building.getMaximumProductionAdding(tempUnit) - building.getMaximumProduction();
+                                int potential = building.getProductionAdding(tempUnit) - building.getProduction();
+                                if(maxPotential == potential) {
+                                    locName += " (" + potential + " " + Goods.getName(goodsType) + ")";
+                                }
+                                else {
+                                    locName += " (" + potential + "/" + maxPotential + " " + Goods.getName(goodsType) + ")";
+                                }
                                 menuItem.setText(locName);
                             }
                             menuItem.setActionCommand(String.valueOf(UnitLabel.WORK_AT_SOMEWHERE+building.getType()));
