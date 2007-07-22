@@ -1063,6 +1063,14 @@ public class AIColony extends AIObject {
             }
         }
 
+        // FIXME: should be executed just once, when the custom house is built
+        if (colony.getBuilding(Building.CUSTOM_HOUSE).getLevel() != Building.NOT_BUILT) {
+            colony.setExports(Goods.SILVER, true);
+            colony.setExports(Goods.RUM, true);
+            colony.setExports(Goods.CIGARS, true);
+            colony.setExports(Goods.CLOTH, true);
+            colony.setExports(Goods.COATS, true);
+        }
         decideBuildable(connection);
         createTileImprovements();
         createWishes();
