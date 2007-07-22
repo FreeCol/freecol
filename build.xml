@@ -93,6 +93,7 @@
                     excludes="*_br.properties
                               *_de.properties
                               *_hu.properties
+                              *_nl_BE.properties
                               *_pt_BR.properties
                               *_pt_PT.properties
                               *_sv_SE.properties"/>
@@ -101,6 +102,7 @@
                     includes="*_br.properties
                               *_de.properties
                               *_hu.properties
+                              *_nl_BE.properties
                               *_pt_BR.properties
                               *_pt_PT.properties
                               *_sv_SE.properties"/>
