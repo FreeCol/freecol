@@ -1071,6 +1071,18 @@ public class AIColony extends AIObject {
             colony.setExports(Goods.CLOTH, true);
             colony.setExports(Goods.COATS, true);
         }
+
+        // temporarily move units from carpenter to blacksmith if the current building needs no lumber but more tools
+        // TODO: mine ore if needed
+        Building nowbuilding = colony.getBuilding(colony.getCurrentlyBuilding());
+        if ( nowbuilding != null && nowbuilding.getNextHammers() <= colony.getHammers() &&
+             nowbuilding.getNextTools() > colony.getGoodsCount(Goods.TOOLS)) {
+            while (colony.getBuilding(Building.CARPENTER).getUnitCount() > 0 && 
+                   colony.getBuilding(Building.BLACKSMITH).getUnitCount() < colony.getBuilding(Building.BLACKSMITH).getMaxUnits()) {
+                logger.info("i wanna move a unit!");
+                colony.getBuilding(Building.CARPENTER).getFirstUnit().setLocation(colony.getBuilding(Building.BLACKSMITH));
+            }
+        }
         decideBuildable(connection);
         createTileImprovements();
         createWishes();
