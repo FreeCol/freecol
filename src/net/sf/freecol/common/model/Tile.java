@@ -720,6 +720,9 @@ public final class Tile extends FreeColGameObject implements Location, Nameable 
         for (int i = 0; i < directions.length; i++) {
             int branch = 0;
             Tile t = getMap().getNeighbourOrNull(directions[i], this);
+            if (t == null) {
+                continue;
+            }
             if (t.getAddition() == ADD_RIVER_MINOR) {
                 branch = 1;
             } else if (t.getAddition() == ADD_RIVER_MAJOR) {
