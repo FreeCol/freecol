@@ -758,6 +758,10 @@ public final class ImageLibrary extends ImageProvider {
         }
     }
 
+    //TODO: IMPORTANT: This method duplicates a similar method in the
+    //Tile class and errors were introduced because the two changed
+    //independently. We really need to put the bonus information in
+    //the TileType (and make hills and mountains TileTypes too).
     public static int getBonusImageType(int type, int addition, boolean forested) {
         if (addition == Tile.ADD_MOUNTAINS) {
             return BONUS_SILVER;
@@ -766,15 +770,15 @@ public final class ImageLibrary extends ImageProvider {
         } else if (forested) {
             if (type == Tile.GRASSLANDS || type == Tile.SAVANNAH) {
                 return BONUS_LUMBER;
+            } else if (type == Tile.MARSH || type == Tile.SWAMP) {
+                return BONUS_ORE;
             } else {
                 return BONUS_FURS;
             }
         } else {
-            // Warnings were logged here all the time, make sure that we
-            // handle all possible alternatives!
             switch(type) {
                 case Tile.UNEXPLORED:
-                    return BONUS_NONE;
+                    return -1;
                 case Tile.PLAINS:
                     return BONUS_FOOD;
                 case Tile.GRASSLANDS:
@@ -792,14 +796,14 @@ public final class ImageLibrary extends ImageProvider {
                 case Tile.TUNDRA:
                     return BONUS_ORE;                    
                 case Tile.ARCTIC:
-                    return BONUS_NONE;
+                    return -1;
                 case Tile.OCEAN:
-                    return BONUS_FISH;
+                    return BONUS_FOOD;
                 case Tile.HIGH_SEAS:
-                    return BONUS_NONE;
+                    return -1;
                 default:
                     // Should never happen
-                    throw new IllegalArgumentException("Unknown tile type " + type + " for getBonusImageType!");
+                    throw new IllegalArgumentException("Unknown tile type " + type + " for getBonusType!");
             }
         }
     }
