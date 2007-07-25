@@ -83,7 +83,7 @@ public class UnitWanderMission extends Mission {
             int j;
             for (j = 8; j > 0 && ((unit.getGame().getMap().getNeighbourOrNull(direction, thisTile) == null)
                     || (unit.getMoveType(direction) != Unit.MOVE)
-                    || (unit.getMoveType(direction) != Unit.DISEMBARK));
+                        && (unit.getMoveType(direction) != Unit.DISEMBARK));
                     j--) {
                 direction = (int) (Math.random() * 8);
             }

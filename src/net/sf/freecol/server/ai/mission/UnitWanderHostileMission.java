@@ -115,12 +115,14 @@ public class UnitWanderHostileMission extends Mission {
             int direction = directions[0];
             int j;
             for (j = 0; j < 8 && (map.getNeighbourOrNull(direction, thisTile) == null 
-                    || unit.getMoveType(direction) != Unit.MOVE
-                    || unit.getMoveType(direction) != Unit.DISEMBARK);
+                    || (unit.getMoveType(direction) != Unit.MOVE
+                       && unit.getMoveType(direction) != Unit.DISEMBARK));
                     j++) {
                 direction = directions[j];
             }
-            if (j == 8) return; // Not possible to move in any directions.
+            if (j == 8) {
+                return; // Not possible to move in any directions.
+            }
             thisTile = map.getNeighbourOrNull(direction, thisTile);
 
             Element element = Message.createNewRootElement("move");

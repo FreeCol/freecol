@@ -2438,6 +2438,14 @@ public class Player extends FreeColGameObject implements Nameable {
             }
             score += (score * newSoL) / 100;
             score += getGold() / 1000;
+        } else {
+            for (Iterator<Unit> unitIterator = getUnitIterator(); unitIterator.hasNext();) {
+                Unit unit = unitIterator.next();
+                if (logger.isLoggable(Level.FINEST)) {
+                    logger.finest("Calling newTurn for unit " + unit.getName() + " " + unit.getID());
+                }
+                unit.newTurn();
+            }
         }
     }
 
