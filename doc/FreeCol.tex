@@ -868,10 +868,28 @@ allow you to
 \item Fill up all partially filled holds of the active ship or
 wagon train
 \item Open the warehouse dialog in able to change the export and
-warning levels for all types of goods
+warning levels for all types of goods (see below)
 \item Rename the colony
 \item Close the dialog
 \end{itemize}
+
+
+\hypertarget{The Warehouse Dialog}{\subsubsection{The Warehouse Dialog}}
+
+The warehouse dialog allows you to set the warning levels for all
+types of goods. If you have turned on the warnings about goods levels,
+you will receive a warning if the number of goods drops below the
+lower level or rises above the higher level. In a warehouse with a
+capacity of 100 units of each type of goods, the lower level is set to
+10 and the higher level is set to 90 by default.
+
+The export level allows you to specify how many goods should be kept
+in reserve if goods are automatically exported from this colony,
+either through the \hyperlink{Custom House}{Custom House}, or by a
+carrier following a \hyperlink{Trade Routes}{Trade Route}. A checkbox
+indicates whether this type of goods should be exported through the
+Custom House or not. If you have not yet built a Custom House in this
+colony, the checkbox is disabled.
 
 
 \hypertarget{The New World}{\section{The New World}}
@@ -934,7 +952,15 @@ and Broadleaf Forest into Prairie.
 
 \hypertarget{Goods}{\subsection{Goods}}
 
-The New World produces many goods, which can be traded in Europe.
+The New World produces many goods, which can be traded in Europe. In
+order to this, you must use your ships to transport them to your
+\hyperlink{Home Port}{Home Port}. As soon as the ship arrives in
+Europe, you can sell the goods, and buy others, in the
+\hyperlink{Europe Panel}{Europe Panel}. Later in the game, after you
+have built \hyperlink{Custom House}{Custom Houses}, goods can be
+exported automatically. Until then, you can partially automate this
+process by establishing \hyperlink{Trade Routes}{Trade Routes}.
+
 Exporting these goods to Europe will be one of your most important
 sources of income. At the beginning of the game, you will probably
 want to export raw materials, such as \textbf{Sugar} and
@@ -1012,6 +1038,36 @@ Crosses attract further colonists.
 but they can not be produced in your colonies. They are only available
 in Europe and are useful for trading with native settlements, which
 generally demand Trade Goods.
+
+
+\hypertarget{Trade Routes}{\subsubsection{Trade Routes}}
+
+The \hyperlink{orders menu}{orders menu} allows you to assign a Trade
+Route to a ship or wagon train. If you select this order, the trade
+route dialog, which enables you to select a trade route or create a
+new trade route, will open. If you have not created a trade route, you
+must use the edit trade route dialog to do so first.
+
+A trade route consists of two or more stops, which may either be the
+\hyperlink{Home Port}{Home Port}, or one of your colonies. Select a
+destination from the select box and press the \texttt{add new stop}
+button. If you select the special destination \texttt{all colonies},
+then your Home Port and all your colonies will be added to the list of
+stops.
+
+If you have selected a destination, you can drag and drop goods from
+the goods panel to the cargo panel. These are the goods your ship or
+wagon train should have on board when leaving this stop. If the ship
+or wagon train arrives at the destination with other goods on board,
+these goods will be unloaded.
+
+Note that the ships and wagon trains will take the capacity and
+settings of the warehouses in your colonies into account. They will
+not unload cargo that would be wasted and they will only load goods
+that should not be kept in reserve.
+
+As soon as a ship or wagon train reaches the last destination of the
+trade route, it will continue at the first destination.
 
 
 \hypertarget{Resources}{\subsection{Special Resources}}
