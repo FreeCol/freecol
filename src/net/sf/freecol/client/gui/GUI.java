@@ -1644,7 +1644,8 @@ public final class GUI {
                 g.drawImage(lib.getMiscImage(ImageLibrary.PLOWED), x, y, null);
             }
 
-            if (tile.getRiver() != 0) {
+            if (tile.getAddition() == Tile.ADD_RIVER_MAJOR
+                    || tile.getAddition() == Tile.ADD_RIVER_MINOR) {
                 g.drawImage(lib.getRiverImage(tile.getRiver()), x, y, null);
             }
             if (tile.isForested()) {

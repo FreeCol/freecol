@@ -550,6 +550,15 @@ public final class Tile extends FreeColGameObject implements Location, Nameable 
      * @return 'true' if this Tile is a land Tile, 'false' otherwise.
      */
     public boolean isLand() {
+        return isLand(type);
+    }
+    
+    /**
+     * Returns 'true' if this Tile is a land Tile, 'false' otherwise.
+     * 
+     * @return 'true' if this Tile is a land Tile, 'false' otherwise.
+     */
+    public static boolean isLand(int type) {
         return (type != OCEAN) && (type != HIGH_SEAS);
     }
 

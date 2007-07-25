@@ -14,6 +14,7 @@ import net.sf.freecol.client.gui.action.ColopediaGoodsAction;
 import net.sf.freecol.client.gui.action.ColopediaSkillAction;
 import net.sf.freecol.client.gui.action.ColopediaTerrainAction;
 import net.sf.freecol.client.gui.action.ColopediaUnitAction;
+import net.sf.freecol.client.gui.action.DetermineHighSeasAction;
 import net.sf.freecol.client.gui.action.DisplayGridAction;
 import net.sf.freecol.client.gui.action.DisplayTileNamesAction;
 import net.sf.freecol.client.gui.action.DisplayTileOwnersAction;
@@ -24,6 +25,7 @@ import net.sf.freecol.client.gui.action.OpenAction;
 import net.sf.freecol.client.gui.action.PreferencesAction;
 import net.sf.freecol.client.gui.action.QuitAction;
 import net.sf.freecol.client.gui.action.SaveAction;
+import net.sf.freecol.client.gui.action.ScaleMapAction;
 import net.sf.freecol.client.gui.action.ShowMainAction;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.client.gui.menu.DebugMenu;
@@ -71,6 +73,7 @@ public class MapEditorMenuBar extends FreeColMenuBar {
         
         buildGameMenu();
         buildViewMenu();
+        buildToolsMenu();
         buildColopediaMenu();
 
         // --> Debug
@@ -119,6 +122,19 @@ public class MapEditorMenuBar extends FreeColMenuBar {
         menu.add(getCheckBoxMenuItem(DisplayTileOwnersAction.ID));
         menu.add(getCheckBoxMenuItem(DisplayGridAction.ID));
 
+        add(menu);
+    }
+    
+    private void buildToolsMenu() {
+        // --> Tools
+        
+        JMenu menu = new JMenu(Messages.message("menuBar.tools"));
+        menu.setOpaque(false);
+        menu.setMnemonic(KeyEvent.VK_T);
+        
+        menu.add(getMenuItem(ScaleMapAction.ID));
+        menu.add(getMenuItem(DetermineHighSeasAction.ID));
+        
         add(menu);
     }
     

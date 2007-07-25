@@ -2,10 +2,10 @@ package net.sf.freecol.client.gui.action;
 
 import java.util.Iterator;
 import java.util.logging.Logger;
+
 import javax.swing.SwingUtilities;
 
 import net.sf.freecol.client.FreeColClient;
-import net.sf.freecol.client.gui.action.ReportCargoAction;
 import net.sf.freecol.common.option.Option;
 import net.sf.freecol.common.option.OptionGroup;
 
@@ -60,6 +60,7 @@ public class ActionManager extends OptionGroup {
         add(new ColopediaTerrainAction(freeColClient));
         add(new ColopediaUnitAction(freeColClient));
         add(new DeclareIndependenceAction(freeColClient));
+        add(new DetermineHighSeasAction(freeColClient));
         add(new DisbandUnitAction(freeColClient));
         add(new DisplayGridAction(freeColClient));
         add(new DisplayTileNamesAction(freeColClient));
@@ -92,6 +93,7 @@ public class ActionManager extends OptionGroup {
         add(new ReportTradeAction(freeColClient));
         add(new ReportTurnAction(freeColClient));
         add(new SaveAction(freeColClient));
+        add(new ScaleMapAction(freeColClient));
         add(new ShowMainAction(freeColClient));
         add(new SentryAction(freeColClient));
         add(new SkipUnitAction(freeColClient));
