@@ -798,7 +798,7 @@ public final class ImageLibrary extends ImageProvider {
                 case Tile.ARCTIC:
                     return -1;
                 case Tile.OCEAN:
-                    return BONUS_FOOD;
+                    return BONUS_FISH;
                 case Tile.HIGH_SEAS:
                     return -1;
                 default:
