@@ -7,9 +7,11 @@ import java.awt.event.ActionListener;
 import java.util.Collections;
 import java.util.List;
 
+import javax.swing.border.Border;
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JLabel;
+import javax.swing.SwingConstants;
 
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.i18n.Messages;
@@ -43,17 +45,8 @@ public final class ReportTradePanel extends ReportPanel implements ActionListene
     /** How many columns are defined all together. */
     private static final int columns = columnsPerLabel * Goods.NUMBER_OF_TYPES + extraColumns;
 
-    /** How much space to leave between labels. */
-    private static final int columnSeparatorWidth = 5;
-
     /** How wide the margins should be. */
     private static final int marginWidth = 12;
-
-    /** The widths of the columns. */
-    private static final int[] widths = new int[columns];
-
-    /** The heights of the rows. */
-    private static int[] heights;
 
     private final JLabel salesLabel;
 
@@ -62,6 +55,20 @@ public final class ReportTradePanel extends ReportPanel implements ActionListene
     private final JLabel afterTaxesLabel;
 
     private List<Colony> colonies;
+
+    private static final Border border1 =
+        BorderFactory.createCompoundBorder(BorderFactory.createMatteBorder(1, 0, 1, 1, LINK_COLOR),
+                                           BorderFactory.createEmptyBorder(2, 2, 2, 2));
+    private static final Border border2 = 
+        BorderFactory.createCompoundBorder(BorderFactory.createMatteBorder(0, 0, 1, 1, LINK_COLOR),
+                                           BorderFactory.createEmptyBorder(2, 2, 2, 2));
+    private static final Border border3 = 
+        BorderFactory.createCompoundBorder(BorderFactory.createMatteBorder(0, 1, 1, 1, LINK_COLOR),
+                                           BorderFactory.createEmptyBorder(2, 2, 2, 2));
+    private static final Border border4 = 
+        BorderFactory.createCompoundBorder(BorderFactory.createMatteBorder(1, 1, 1, 1, LINK_COLOR),
+                                           BorderFactory.createEmptyBorder(2, 2, 2, 2));
+
 
 
     /**
@@ -73,17 +80,11 @@ public final class ReportTradePanel extends ReportPanel implements ActionListene
         super(parent, Messages.message("menuBar.report.trade"));
 
         salesLabel = new JLabel(Messages.message("report.trade.unitsSold"), JLabel.TRAILING);
+        salesLabel.setBorder(border3);
         beforeTaxesLabel = new JLabel(Messages.message("report.trade.beforeTaxes"), JLabel.TRAILING);
+        beforeTaxesLabel.setBorder(border3);
         afterTaxesLabel = new JLabel(Messages.message("report.trade.afterTaxes"), JLabel.TRAILING);
-
-        // indexed from 1
-        widths[0] = 0; // labels
-        for (int label = 0; label < Goods.NUMBER_OF_TYPES; label++) {
-            widths[columnsPerLabel * label + extraColumns] = columnSeparatorWidth;
-            widths[columnsPerLabel * label + extraColumns + 1] = 0;
-        }
-
-        heights = null;
+        afterTaxesLabel.setBorder(border3);
     }
 
     /**
@@ -99,42 +100,50 @@ public final class ReportTradePanel extends ReportPanel implements ActionListene
         colonies = player.getColonies();
         Collections.sort(colonies, getCanvas().getClient().getClientOptions().getColonyComparator());
 
-        heights = new int[colonies.size() + extraRows + extraBottomRows];
+        int[] widths = new int[columns];
+        int[] heights = new int[colonies.size() + extraRows + extraBottomRows];
+
         int labelColumn = 1;
 
         heights[extraRows - 1] = marginWidth; // separator
         heights[heights.length - 2] = marginWidth;
 
         reportPanel.setLayout(new HIGLayout(widths, heights));
-
+        JLabel emptyLabel = new JLabel();
+        emptyLabel.setBorder(border4);
+        reportPanel.add(emptyLabel, higConst.rc(1, labelColumn));
         reportPanel.add(salesLabel, higConst.rc(2, labelColumn));
         reportPanel.add(beforeTaxesLabel, higConst.rc(3, labelColumn));
         reportPanel.add(afterTaxesLabel, higConst.rc(4, labelColumn));
 
         JLabel currentLabel;
         for (int goodsType = 0; goodsType < Goods.NUMBER_OF_TYPES; goodsType++) {
-            int column = columnsPerLabel * (goodsType + 1) + extraColumns;
+            int column = goodsType + extraColumns + 1;
             int sales = player.getSales(goodsType);
             int beforeTaxes = player.getIncomeBeforeTaxes(goodsType);
             int afterTaxes = player.getIncomeAfterTaxes(goodsType);
             MarketLabel marketLabel = new MarketLabel(goodsType, market, getCanvas());
+            marketLabel.setBorder(border1);
             marketLabel.setVerticalTextPosition(JLabel.BOTTOM);
             marketLabel.setHorizontalTextPosition(JLabel.CENTER);
             reportPanel.add(marketLabel, higConst.rc(1, column));
 
             currentLabel = new JLabel(String.valueOf(sales), JLabel.TRAILING);
+            currentLabel.setBorder(border2);
             if (sales < 0) {
                 currentLabel.setForeground(Color.RED);
             }
             reportPanel.add(currentLabel, higConst.rc(2, column));
 
             currentLabel = new JLabel(String.valueOf(beforeTaxes), JLabel.TRAILING);
+            currentLabel.setBorder(border2);
             if (beforeTaxes < 0) {
                 currentLabel.setForeground(Color.RED);
             }
             reportPanel.add(currentLabel, higConst.rc(3, column));
 
             currentLabel = new JLabel(String.valueOf(afterTaxes), JLabel.TRAILING);
+            currentLabel.setBorder(border2);
             if (afterTaxes < 0) {
                 currentLabel.setForeground(Color.RED);
             }
@@ -146,23 +155,19 @@ public final class ReportTradePanel extends ReportPanel implements ActionListene
         for (int colonyIndex = 0; colonyIndex < colonies.size(); colonyIndex++) {
             Colony colony = colonies.get(colonyIndex);
             JButton colonyButton = createColonyButton(colonyIndex);
-            reportPanel.add(colonyButton, higConst.rc(row, labelColumn, "l"));
-            /*
-             * int adjustment = colony.getWarehouseCapacity() / 100; int[]
-             * lowLevel = colony.getLowLevel(); int[] highLevel =
-             * colony.getHighLevel();
-             */
+            reportPanel.add(colonyButton, higConst.rc(row, labelColumn));
             for (int goodsType = 0; goodsType < Goods.NUMBER_OF_TYPES; goodsType++) {
-                int column = columnsPerLabel * (goodsType + 1) + extraColumns;
+                int column = goodsType + 1 + extraColumns;
                 int amount = colony.getGoodsCount(goodsType);
                 JLabel goodsLabel = new JLabel(String.valueOf(amount), JLabel.TRAILING);
+                if (colonyIndex == 0) {
+                    goodsLabel.setBorder(border1);
+                } else {
+                    goodsLabel.setBorder(border2);
+                }
                 if (colony.getExports(goodsType)) {
                     goodsLabel.setText("*" + String.valueOf(amount));
                 }
-                /* too much color
-                if (amount < lowLevel[goodsType] * adjustment || amount > highLevel[goodsType] * adjustment) {
-                    goodsLabel.setForeground(Color.RED);
-                    } else */
                 if (amount > 200) {
                     goodsLabel.setForeground(Color.BLUE);
                 } else if (amount > 100) {
@@ -186,11 +191,16 @@ public final class ReportTradePanel extends ReportPanel implements ActionListene
         } else {
             button.setText(colonies.get(index).getName());
         }
-        button.setMargin(new Insets(0,0,0,0));
         button.setOpaque(false);
         button.setForeground(LINK_COLOR);
+        button.setHorizontalAlignment(SwingConstants.LEADING);
         button.setAlignmentY(0.8f);
-        button.setBorder(BorderFactory.createEmptyBorder());
+        if (index == 0) {
+            button.setBorder(border4);
+        } else {
+            button.setBorder(border3);
+        }
+
         button.setActionCommand(String.valueOf(index));
         button.addActionListener(this);
         return button;
