@@ -1655,6 +1655,11 @@ public final class InGameController implements NetworkConstants {
                 lr.setThrown(e);
                 logger.log(lr);
             }
+            
+            if (defender.getType() == Unit.TREASURE_TRAIN && result >= Unit.ATTACK_WIN) {
+                checkCashInTreasureTrain(defender);
+            }
+                
             if (!defender.isDisposed()
                     && ((result == Unit.ATTACK_DONE_SETTLEMENT && unitElement != null)
                             || defender.getLocation() == null || !defender.isVisibleTo(freeColClient.getMyPlayer()))) {
