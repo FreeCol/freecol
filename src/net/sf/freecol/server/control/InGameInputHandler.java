@@ -1051,6 +1051,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         europe.setRecruitable(slot, newRecruitable);
         
         Unit unit = new Unit(getGame(), player, recruitable);
+        player.getEurope().add(unit);
         Element reply = Message.createNewRootElement("selectFromFountainYouthConfirmed");
         reply.setAttribute("newRecruitable", Integer.toString(newRecruitable));
         reply.appendChild(unit.toXMLElement(player, reply.getOwnerDocument()));
