@@ -4879,6 +4879,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
         if (getOwner().hasFather(FoundingFather.JUAN_DE_SEPULVEDA)) {
             convertProbability += 20;
         }
+        // TODO: it should be bigger when tension is high
         int burnProbability = (1 + getOwner().getDifficulty()) * 2; // 2% - 10%
         
         if (random < convertProbability) {

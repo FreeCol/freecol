@@ -1658,6 +1658,26 @@ public final class InGameController implements NetworkConstants {
                 lr.setThrown(e);
                 logger.log(lr);
             }
+
+            // Get the convert:
+            Element convertElement = getChildElement(attackResultElement, "convert");
+            Unit convert;
+            if (convertElement != null) {
+                unitElement = (Element) convertElement.getFirstChild();
+                convert = (Unit) game.getFreeColGameObject(unitElement.getAttribute("ID"));
+                if (convert == null) {
+                    convert = new Unit(game, unitElement);
+                } else {
+                    convert.readFromXMLElement(unitElement);
+                }
+                convert.setLocation(convert.getLocation());
+                
+                String nation = defender.getOwner().getNationAsString();
+                ModelMessage message = new ModelMessage(convert,
+                                                "model.unit.newConvertFromAttack",
+                                                new String[][] {{"%nation%", nation}},
+                                                ModelMessage.UNIT_ADDED);
+            }
             
             if (defender.getType() == Unit.TREASURE_TRAIN && result >= Unit.ATTACK_WIN) {
                 checkCashInTreasureTrain(defender);

@@ -553,7 +553,7 @@ public final class InGameInputHandler extends InputHandler {
     private Element newConvert(Element element) {
         Tile tile = (Tile) getGame().getFreeColGameObject(element.getAttribute("colony"));
         Colony colony = tile.getColony();
-        String nation = "indian";
+        String nation = colony.getOwner().getNationAsString();
         ModelMessage message = new ModelMessage(colony,
                                                 "model.colony.newConvert",
                                                 new String[][] {

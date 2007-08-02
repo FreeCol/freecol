@@ -1215,13 +1215,16 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
                 oldGoodsCounts[i] = unit.getGoodsContainer().getGoodsCount(i);
             }
         }
+        int oldUnits = unit.getTile().getUnitCount();
         unit.attack(defender, result, plunderGold);
         
         if (result >= Unit.ATTACK_WIN && unit.getTile() != newTile &&
-                newTile.getSettlement() != null &&
-                newTile.getSettlement() instanceof IndianSettlement) {
-            // Unit won and didn't move, maybe an indian has converted, send updated tile
-            reply.appendChild(unit.getTile().toXMLElement(unit.getOwner(), reply.getOwnerDocument()));
+                oldUnits < unit.getTile().getUnitCount()) {
+            // Unit won and didn't move, there are more units and last is a convert, send last one
+            Unit lastUnit = unit.getTile().getLastUnit();
+            Element convertElement = reply.getOwnerDocument().createElement("convert");
+            convertElement.appendChild(lastUnit.toXMLElement(unit.getOwner(), reply.getOwnerDocument()));
+            reply.appendChild(convertElement);
         }
         
         // Send capturedGoods if UNIT_HIDING is true because when it's
