@@ -935,6 +935,9 @@ public final class InGameController implements NetworkConstants {
         // colony:
         if (unit.getType() == Unit.TREASURE_TRAIN) {
             checkCashInTreasureTrain(unit);
+            if (unit.isDisposed()) {
+                nextActiveUnit();
+            }
         }
 
         nextModelMessage();
