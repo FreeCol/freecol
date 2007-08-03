@@ -4206,7 +4206,6 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
         }
 
         int base = tile.potential(goods);
-        base = getProductionUsing(getType(), goods, base, tile);
 
         if (getLocation() instanceof ColonyTile && !((ColonyTile) getLocation()).getWorkTile().isLand()
                 && !((ColonyTile) getLocation()).getColony().getBuilding(Building.DOCK).isBuilt()) {
@@ -4216,6 +4215,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
         if (base == 0) {
             return 0;
         }
+        base = getProductionUsing(getType(), goods, base, tile);
 
         if (goods == Goods.FURS && getOwner().hasFather(FoundingFather.HENRY_HUDSON)) {
             base *= 2;
