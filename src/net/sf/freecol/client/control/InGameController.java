@@ -492,6 +492,7 @@ public final class InGameController implements NetworkConstants {
         }
 
         if (unit != null) {
+            clearGotoOrders(unit);
             move(unit, direction);
         } // else: nothing: There is no active unit that can be moved.
     }
