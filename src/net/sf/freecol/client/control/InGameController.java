@@ -615,6 +615,11 @@ public final class InGameController implements NetworkConstants {
         if (destination instanceof Europe) {
             path = map.findPathToEurope(unit, unit.getTile());
         } else {
+            if (destination.getTile() == null) {
+                // Destination is an abandoned colony, for example
+                clearGotoOrders(unit);
+                return;
+            }
             path = map.findPath(unit, unit.getTile(), destination.getTile());
         }
 
