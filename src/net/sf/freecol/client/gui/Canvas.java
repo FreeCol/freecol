@@ -2231,6 +2231,9 @@ public final class Canvas extends JDesktopPane {
         for (Component c : getComponents()) {
             remove(c, false);
         }
+        
+        // change to default view mode
+        getGUI().getViewMode().changeViewMode(ViewMode.MOVE_UNITS_MODE);
     }
 
     /**
