@@ -1480,9 +1480,10 @@ public final class Canvas extends JDesktopPane {
      * Displays the <code>TradeRouteDialog</code>. Does not return from this
      * method before the panel is closed.
      */
-    public TradeRoute showTradeRouteDialog() {
+    public TradeRoute showTradeRouteDialog(TradeRoute selectedRoute) {
         TradeRouteDialog tradeRouteDialog = new TradeRouteDialog(this);
         tradeRouteDialog.initialize();
+        tradeRouteDialog.setSelectedRoute(selectedRoute);
 
         addAsFrame(tradeRouteDialog);
         tradeRouteDialog.requestFocus();

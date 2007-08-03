@@ -349,6 +349,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
         ArrayList<Stop> stops = getTradeRoute().getStops();
         if (stops.size() == 0) {
             currentStop = -1;
+            setDestination(null);
             return null;
         }
         
@@ -362,13 +363,9 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
             stop = stops.get(currentStop);
         } while (!shouldGoToStop(stop) && currentStop != oldStop);
         
-        if (currentStop == oldStop) {
-            // there is no valid stop
-            currentStop = -1;
-            return null;
-        } else {
-            return stop;
-        }
+        setDestination(stop.getLocation());
+        // if there is no valid stop, keep in current stop waiting to load
+        return stop;
     }
     
     public boolean shouldGoToStop(Stop stop) {

@@ -160,6 +160,10 @@ public final class TradeRouteDialog extends FreeColDialog implements ActionListe
         setSize(getPreferredSize());
 
     }
+    
+    public void setSelectedRoute(TradeRoute selectedRoute) {
+        tradeRoutes.setSelectedValue(selectedRoute, true);
+    }
 
     public void requestFocus() {
         ok.requestFocus();

@@ -1983,6 +1983,7 @@ public final class GUI {
                 currentPath = freeColClient.getGame().getMap().findPathToEurope(activeUnit, activeUnit.getTile());
             } else if (activeUnit.getDestination().getTile() == activeUnit.getTile()) {
                 // No need to do anything as the unit has arrived, there is no path to be shown.
+                currentPath = null;
             } else {
                 currentPath = activeUnit.findPath(activeUnit.getDestination().getTile());
             }

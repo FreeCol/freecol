@@ -601,12 +601,12 @@ public final class InGameController implements NetworkConstants {
             return;
         }
 
-        /*
-         * Fix a bug I don't know what caused it. Sometimes a unit have a goto
-         * order but it's already in destination
-         */
+        // Unit can be waiting to load and continuing with a trade route
         if (destination.getTile() == unit.getTile()) {
-            clearOrders(unit);
+            // try to load and follow the trade route
+            if (unit.getTradeRoute() != null) {
+                followTradeRoute(unit);
+            }
             return;
         }
 
@@ -797,12 +797,18 @@ public final class InGameController implements NetworkConstants {
         // TODO: do we want to load/unload units as well?
         // if so, when?
 
+        updateCurrentStop(unit);
+    }
+    
+    private void updateCurrentStop(Unit unit) {
         // Set destination to next stop's location
-        stop = unit.nextStop();
-        if (stop == null) {
-            return;
-        } else {
-            setDestination(unit, stop.getLocation());
+        Element updateCurrentStopElement = Message.createNewRootElement("updateCurrentStop");
+        updateCurrentStopElement.setAttribute("unit", unit.getID());
+        freeColClient.getClient().sendAndWait(updateCurrentStopElement);
+        
+        Stop stop = unit.nextStop();
+        // go to next stop, unit can already be there waiting to load
+        if (stop != null && stop.getLocation() != unit.getColony()) {
             moveToDestination(unit);
         }
     }
@@ -2986,7 +2992,8 @@ public final class InGameController implements NetworkConstants {
      * @param unit The unit to assign a trade route to.
      */
     public void assignTradeRoute(Unit unit) {
-        assignTradeRoute(unit, freeColClient.getCanvas().showTradeRouteDialog());
+        assignTradeRoute(unit,
+                freeColClient.getCanvas().showTradeRouteDialog(unit.getTradeRoute()));
     }
 
     public void assignTradeRoute(Unit unit, TradeRoute tradeRoute) {

@@ -393,6 +393,11 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
                 return assignTradeRoute(connection, element);
             }
         });
+        register("updateCurrentStop", new NetworkRequestHandler() {
+            public Element handle(Connection connection, Element element) {
+                return updateCurrentStop(connection, element);
+            }
+        });
         register("diplomaticTrade", new NetworkRequestHandler() {
             public Element handle(Connection connection, Element element) {
                 return diplomaticTrade(connection, element);
@@ -571,6 +576,27 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
             routes.add(serverTradeRoute);
         }
         player.setTradeRoutes(routes);
+        return null;
+    }
+
+    /**
+     * Handles a "updateCurrentStop"-message from a client.
+     * 
+     * @param connection The connection the message came from.
+     * @param element The element containing the request.
+     */
+    private Element updateCurrentStop(Connection connection, Element element) {
+        ServerPlayer player = getFreeColServer().getPlayer(connection);
+        Unit unit = (Unit) getGame().getFreeColGameObject(element.getAttribute("unit"));
+
+        if (unit == null) {
+            throw new IllegalArgumentException("Could not find 'Unit' with specified ID: "
+                    + element.getAttribute("unit"));
+        } else if (unit.getOwner() != player) {
+            throw new IllegalStateException("Not your unit!");
+        }
+        
+        unit.nextStop();
         return null;
     }
 
