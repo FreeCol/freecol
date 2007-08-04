@@ -403,8 +403,14 @@ public final class Market extends FreeColGameObject implements Ownable {
     /**
      * Adjusts the prices for all goods.
      */
-    private void priceGoods() {        
+    private void priceGoods() {
+        priceGoods(true);
+    }
 
+    /**
+     * Adjusts the prices for all goods.
+     */
+    private void priceGoods(boolean addMessages) {        
         int[] oldPrices = new int[dataForGoodType.length];
         for(int i = 0; i < dataForGoodType.length; i++) {
             if (dataForGoodType[i] != null) {
@@ -428,7 +434,7 @@ public final class Market extends FreeColGameObject implements Ownable {
                 data.paidForSale = newPrice;
                 data.costToBuy = data.paidForSale + priceDifferences[goodsType];
             }
-            if (owner != null && owner.getEurope() != null && getGame().getTurn().getNumber() > 1) {
+            if (addMessages && owner != null && owner.getEurope() != null) {
                 if (oldPrices[goodsType] > dataForGoodType[goodsType].costToBuy) {
                     addModelMessage(owner.getEurope(), "model.market.priceDecrease",
                                     new String[][] {
@@ -517,7 +523,7 @@ public final class Market extends FreeColGameObject implements Ownable {
             }
         }
         
-        priceGoods();
+        priceGoods(false);
 
     }
 
