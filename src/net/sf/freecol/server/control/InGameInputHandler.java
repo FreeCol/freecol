@@ -1015,7 +1015,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
                     rumourElement.setAttribute("emigrants", Integer.toString(dx));
                 } else {
                     for (int k = 0; k < dx; k++) {
-                        newUnit = new Unit(getGame(), player.getEurope(), player, player.generateRecruitable(), Unit.SENTRY);
+                        newUnit = new Unit(getGame(), player.getEurope(), player, player.generateRecruitable(), Unit.ACTIVE);
                         rumourElement.appendChild(newUnit.toXMLElement(player, rumourElement.getOwnerDocument()));
                         player.getEurope().add(newUnit);
                     }
@@ -1076,7 +1076,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         int newRecruitable = player.generateRecruitable();
         europe.setRecruitable(slot, newRecruitable);
         
-        Unit unit = new Unit(getGame(), player, recruitable);
+        Unit unit = new Unit(getGame(), europe, player, recruitable, Unit.ACTIVE);
         player.getEurope().add(unit);
         Element reply = Message.createNewRootElement("selectFromFountainYouthConfirmed");
         reply.setAttribute("newRecruitable", Integer.toString(newRecruitable));
