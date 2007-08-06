@@ -776,7 +776,7 @@ public final class InGameController implements NetworkConstants {
                 !freeColClient.getCanvas().showConfirmDialog(Messages.message("traderoute.warehouseCapacity",
                                                                               "%unit%", unit.getName(),
                                                                               "%colony%", ((Colony) location).getName(),
-                                                                              "%amount%", String.valueOf(capacity),
+                                                                              "%amount%", String.valueOf(goods.getAmount() - capacity),
                                                                               "%goods%", goods.getName()),
                                                              "yes", "no")) {
                 logger.finest("Automatically unloading " + capacity + " " + goods.getName());
