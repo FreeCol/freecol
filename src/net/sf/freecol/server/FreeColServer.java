@@ -479,7 +479,7 @@ public final class FreeColServer {
                 gzip = new GZIPOutputStream(new FileOutputStream(file));
                 xsw = xof.createXMLStreamWriter(gzip);
             }
-            xsw.writeStartDocument();
+            xsw.writeStartDocument("UTF-8", "1.0");
             xsw.writeStartElement("savedGame");
             // Add the attributes:
             xsw.writeAttribute("owner", username);

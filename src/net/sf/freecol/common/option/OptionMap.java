@@ -259,7 +259,7 @@ public abstract class OptionMap extends OptionGroup {
         XMLStreamWriter xsw = null;
         try {
             xsw = xof.createXMLStreamWriter(new FileOutputStream(saveFile));
-            xsw.writeStartDocument();
+            xsw.writeStartDocument("UTF-8", "1.0");
             toXML(xsw);
             xsw.writeEndDocument();
             xsw.flush();
