@@ -10,6 +10,7 @@ import java.awt.event.MouseAdapter;
 import java.util.logging.Logger;
 
 import javax.swing.AbstractButton;
+import javax.swing.border.Border;
 import javax.swing.BorderFactory;
 import javax.swing.ComponentInputMap;
 import javax.swing.InputMap;
@@ -67,7 +68,21 @@ public class FreeColPanel extends JPanel {
 
     // The color to use for links
     protected static final Color LINK_COLOR = new Color(122, 109, 82);
-    
+
+    // The borders to use for table cells
+    public static final Border TOPCELLBORDER =
+        BorderFactory.createCompoundBorder(BorderFactory.createMatteBorder(1, 0, 1, 1, LINK_COLOR),
+                                           BorderFactory.createEmptyBorder(2, 2, 2, 2));
+    public static final Border CELLBORDER = 
+        BorderFactory.createCompoundBorder(BorderFactory.createMatteBorder(0, 0, 1, 1, LINK_COLOR),
+                                           BorderFactory.createEmptyBorder(2, 2, 2, 2));
+    public static final Border LEFTCELLBORDER = 
+        BorderFactory.createCompoundBorder(BorderFactory.createMatteBorder(0, 1, 1, 1, LINK_COLOR),
+                                           BorderFactory.createEmptyBorder(2, 2, 2, 2));
+    public static final Border TOPLEFTCELLBORDER = 
+        BorderFactory.createCompoundBorder(BorderFactory.createMatteBorder(1, 1, 1, 1, LINK_COLOR),
+                                           BorderFactory.createEmptyBorder(2, 2, 2, 2));
+
     protected boolean editable = true;
 
 

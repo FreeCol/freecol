@@ -7,8 +7,6 @@ import java.awt.event.ActionListener;
 import java.util.Collections;
 import java.util.List;
 
-import javax.swing.border.Border;
-import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.SwingConstants;
@@ -56,20 +54,6 @@ public final class ReportTradePanel extends ReportPanel implements ActionListene
 
     private List<Colony> colonies;
 
-    private static final Border border1 =
-        BorderFactory.createCompoundBorder(BorderFactory.createMatteBorder(1, 0, 1, 1, LINK_COLOR),
-                                           BorderFactory.createEmptyBorder(2, 2, 2, 2));
-    private static final Border border2 = 
-        BorderFactory.createCompoundBorder(BorderFactory.createMatteBorder(0, 0, 1, 1, LINK_COLOR),
-                                           BorderFactory.createEmptyBorder(2, 2, 2, 2));
-    private static final Border border3 = 
-        BorderFactory.createCompoundBorder(BorderFactory.createMatteBorder(0, 1, 1, 1, LINK_COLOR),
-                                           BorderFactory.createEmptyBorder(2, 2, 2, 2));
-    private static final Border border4 = 
-        BorderFactory.createCompoundBorder(BorderFactory.createMatteBorder(1, 1, 1, 1, LINK_COLOR),
-                                           BorderFactory.createEmptyBorder(2, 2, 2, 2));
-
-
 
     /**
      * The constructor that will add the items to this panel.
@@ -80,11 +64,11 @@ public final class ReportTradePanel extends ReportPanel implements ActionListene
         super(parent, Messages.message("menuBar.report.trade"));
 
         salesLabel = new JLabel(Messages.message("report.trade.unitsSold"), JLabel.TRAILING);
-        salesLabel.setBorder(border3);
+        salesLabel.setBorder(FreeColPanel.LEFTCELLBORDER);
         beforeTaxesLabel = new JLabel(Messages.message("report.trade.beforeTaxes"), JLabel.TRAILING);
-        beforeTaxesLabel.setBorder(border3);
+        beforeTaxesLabel.setBorder(FreeColPanel.LEFTCELLBORDER);
         afterTaxesLabel = new JLabel(Messages.message("report.trade.afterTaxes"), JLabel.TRAILING);
-        afterTaxesLabel.setBorder(border3);
+        afterTaxesLabel.setBorder(FreeColPanel.LEFTCELLBORDER);
     }
 
     /**
@@ -110,7 +94,7 @@ public final class ReportTradePanel extends ReportPanel implements ActionListene
 
         reportPanel.setLayout(new HIGLayout(widths, heights));
         JLabel emptyLabel = new JLabel();
-        emptyLabel.setBorder(border4);
+        emptyLabel.setBorder(FreeColPanel.TOPLEFTCELLBORDER);
         reportPanel.add(emptyLabel, higConst.rc(1, labelColumn));
         reportPanel.add(salesLabel, higConst.rc(2, labelColumn));
         reportPanel.add(beforeTaxesLabel, higConst.rc(3, labelColumn));
@@ -123,27 +107,27 @@ public final class ReportTradePanel extends ReportPanel implements ActionListene
             int beforeTaxes = player.getIncomeBeforeTaxes(goodsType);
             int afterTaxes = player.getIncomeAfterTaxes(goodsType);
             MarketLabel marketLabel = new MarketLabel(goodsType, market, getCanvas());
-            marketLabel.setBorder(border1);
+            marketLabel.setBorder(FreeColPanel.TOPCELLBORDER);
             marketLabel.setVerticalTextPosition(JLabel.BOTTOM);
             marketLabel.setHorizontalTextPosition(JLabel.CENTER);
             reportPanel.add(marketLabel, higConst.rc(1, column));
 
             currentLabel = new JLabel(String.valueOf(sales), JLabel.TRAILING);
-            currentLabel.setBorder(border2);
+            currentLabel.setBorder(FreeColPanel.CELLBORDER);
             if (sales < 0) {
                 currentLabel.setForeground(Color.RED);
             }
             reportPanel.add(currentLabel, higConst.rc(2, column));
 
             currentLabel = new JLabel(String.valueOf(beforeTaxes), JLabel.TRAILING);
-            currentLabel.setBorder(border2);
+            currentLabel.setBorder(FreeColPanel.CELLBORDER);
             if (beforeTaxes < 0) {
                 currentLabel.setForeground(Color.RED);
             }
             reportPanel.add(currentLabel, higConst.rc(3, column));
 
             currentLabel = new JLabel(String.valueOf(afterTaxes), JLabel.TRAILING);
-            currentLabel.setBorder(border2);
+            currentLabel.setBorder(FreeColPanel.CELLBORDER);
             if (afterTaxes < 0) {
                 currentLabel.setForeground(Color.RED);
             }
@@ -161,9 +145,9 @@ public final class ReportTradePanel extends ReportPanel implements ActionListene
                 int amount = colony.getGoodsCount(goodsType);
                 JLabel goodsLabel = new JLabel(String.valueOf(amount), JLabel.TRAILING);
                 if (colonyIndex == 0) {
-                    goodsLabel.setBorder(border1);
+                    goodsLabel.setBorder(FreeColPanel.TOPCELLBORDER);
                 } else {
-                    goodsLabel.setBorder(border2);
+                    goodsLabel.setBorder(FreeColPanel.CELLBORDER);
                 }
                 if (colony.getExports(goodsType)) {
                     goodsLabel.setText("*" + String.valueOf(amount));
@@ -196,9 +180,9 @@ public final class ReportTradePanel extends ReportPanel implements ActionListene
         button.setHorizontalAlignment(SwingConstants.LEADING);
         button.setAlignmentY(0.8f);
         if (index == 0) {
-            button.setBorder(border4);
+            button.setBorder(FreeColPanel.TOPLEFTCELLBORDER);
         } else {
-            button.setBorder(border3);
+            button.setBorder(FreeColPanel.LEFTCELLBORDER);
         }
 
         button.setActionCommand(String.valueOf(index));
