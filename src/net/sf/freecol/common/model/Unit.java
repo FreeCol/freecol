@@ -3639,7 +3639,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
                                     { "%unit%", defender.getName() },
                                     { "%nation%", enemy.getNationAsString() } }, 
                                 ModelMessage.UNIT_DEMOTED);
-            } else if (getType() == BRAVE && !defender.isOffensive() && defender.getColony() != null) {
+            } else if (getType() == BRAVE && !defender.isOffensiveUnit() && defender.getColony() != null) {
                 damageOrStealAtColony(defender.getColony());
             } else {
                 if (getOwner().hasFather(FoundingFather.GEORGE_WASHINGTON)) {

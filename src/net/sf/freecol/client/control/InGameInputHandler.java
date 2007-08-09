@@ -409,6 +409,7 @@ public final class InGameInputHandler extends InputHandler {
             SwingUtilities.invokeAndWait(new Runnable() {
                 public void run() {
                     getFreeColClient().getInGameController().setCurrentPlayer(currentPlayer);
+                    getFreeColClient().getActionManager().update();
                 }
             });
         } catch (InterruptedException e) {
@@ -1221,7 +1222,7 @@ public final class InGameInputHandler extends InputHandler {
     }
 
     /**
-     * This task updates the menu bar.
+     * This task shows the victory panel.
      */
     class ShowVictoryPanelSwingTask extends NoResultCanvasSwingTask {
         protected void doWork(Canvas canvas) {
