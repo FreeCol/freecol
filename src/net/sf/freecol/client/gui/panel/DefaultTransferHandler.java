@@ -279,16 +279,16 @@ public final class DefaultTransferHandler extends TransferHandler {
 
                 // Check if the unit can be dragged to comp.
 
-                //Goods g = ((GoodsLabel)data).getGoods();
+                GoodsLabel label = ((GoodsLabel)data);
 
                 // Import the data.
 
-                if (((GoodsLabel) data).isPartialChosen()) {
-                    int amount = getAmount();
+                if (label.isPartialChosen()) {
+                    int amount = getAmount(label.getGoods().getAmount());
                     if (amount == -1) {
                         return false;
                     }
-                    ((GoodsLabel) data).getGoods().setAmount(amount);
+                    label.getGoods().setAmount(amount);
                 }
 
                 if (!(comp instanceof ColonyPanel.WarehousePanel || comp instanceof ColonyPanel.CargoPanel
@@ -335,16 +335,16 @@ public final class DefaultTransferHandler extends TransferHandler {
 
                 // Check if the unit can be dragged to comp.
 
-                //Goods g = ((GoodsLabel)data).getGoods();
+                MarketLabel label = ((MarketLabel)data);
 
                 // Import the data.
 
-                if (((MarketLabel) data).isPartialChosen()) {
-                    int amount = getAmount();
+                if (label.isPartialChosen()) {
+                    int amount = getAmount(label.getAmount());
                     if (amount == -1) {
                         return false;
                     }
-                    ((MarketLabel) data).setAmount(amount);
+                    label.setAmount(amount);
                 }
 
 
@@ -383,8 +383,9 @@ public final class DefaultTransferHandler extends TransferHandler {
     /**
     * Displays an input dialog box where the user should specify a goods transfer amount.
     */
-    private int getAmount() {
-        String s = canvas.showInputDialog("goodsTransfer.text", "100", "ok", "cancel");
+    private int getAmount(int available) {
+        String defaultValue = String.valueOf(Math.min(available, 100));
+        String s = canvas.showInputDialog("goodsTransfer.text", defaultValue, "ok", "cancel");
         int amount = -1;
 
         while (s != null && amount == -1) {
@@ -392,7 +393,7 @@ public final class DefaultTransferHandler extends TransferHandler {
                 amount = Integer.parseInt(s);
             } catch (NumberFormatException e) {
                 canvas.errorMessage("notANumber");
-                s = canvas.showInputDialog("goodsTransfer.text", "100", "ok", "cancel");
+                s = canvas.showInputDialog("goodsTransfer.text", defaultValue, "ok", "cancel");
             }
         }
 
