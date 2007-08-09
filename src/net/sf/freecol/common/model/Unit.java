@@ -3600,8 +3600,6 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
                                     { "%unit%", getName() },
                                     { "%nation%", getOwner().getNationAsString() } }, 
                                 ModelMessage.UNIT_DEMOTED);
-            } else if (getType() == BRAVE && defender.getColony() != null) {
-                damageOrStealAtColony(defender.getColony());
             } else {
                 demote(defender, false);
                 if (enemy.hasFather(FoundingFather.GEORGE_WASHINGTON)) {
@@ -3641,6 +3639,8 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
                                     { "%unit%", defender.getName() },
                                     { "%nation%", enemy.getNationAsString() } }, 
                                 ModelMessage.UNIT_DEMOTED);
+            } else if (getType() == BRAVE && !defender.isOffensive() && defender.getColony() != null) {
+                damageOrStealAtColony(defender.getColony());
             } else {
                 if (getOwner().hasFather(FoundingFather.GEORGE_WASHINGTON)) {
                     promote();
