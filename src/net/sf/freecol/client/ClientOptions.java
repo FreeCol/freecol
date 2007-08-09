@@ -64,6 +64,11 @@ public class ClientOptions extends OptionMap {
     public static final String MAX_NUMBER_OF_GOODS_IMAGES = "guiMaxNumberOfGoodsImages";
 
     /**
+     * Whether to display a compass rose or not.
+     */
+    public static final String DISPLAY_COMPASS_ROSE = "displayCompassRose";
+
+    /**
      * Used by GUI, this defines the grouping of ModelMessages.
      * Possible values include nothing, type and source.
      *
@@ -325,6 +330,7 @@ public class ClientOptions extends OptionMap {
         new BooleanOption(ALWAYS_CENTER, guiGroup, false);
         new BooleanOption(DISPLAY_FOG_OF_WAR, guiGroup, false);
         new BooleanOption(MAP_SCROLL_ON_DRAG, guiGroup, true);
+        new BooleanOption(DISPLAY_COMPASS_ROSE, guiGroup, false);
         new BooleanOption(AUTOLOAD_EMIGRANTS, guiGroup, false);
         new SelectOption(COLONY_COMPARATOR, guiGroup,
                          new String[] {"byName",

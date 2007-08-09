@@ -1,9 +1,15 @@
 
 package net.sf.freecol.client.gui.panel;
 
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+
 import javax.swing.Action;
+import javax.swing.ImageIcon;
+import javax.swing.JLabel;
 import javax.swing.JLayeredPane;
 
+import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.GUI;
@@ -19,6 +25,7 @@ import net.sf.freecol.client.gui.action.SkipUnitAction;
 import net.sf.freecol.client.gui.action.WaitAction;
 import net.sf.freecol.client.gui.panel.MapEditorTransformPanel.MapTransform;
 import net.sf.freecol.common.model.Tile;
+import net.sf.freecol.common.model.Unit;
 
 
 /**
@@ -37,13 +44,14 @@ public final class MapControls {
     public static final int EUROPE = 2;
     public static final int UNITBUTTON = 3;
     
-    private FreeColClient freeColClient;
+    private final FreeColClient freeColClient;
 
     private final InfoPanel        infoPanel;
     private final MiniMap          miniMap;
     private final UnitButton[]     unitButton;   
+    private final JLabel compassRose;
     @SuppressWarnings("unused")
-    private GUI                    gui;
+    private final GUI                    gui;
 
 
 
@@ -53,7 +61,7 @@ public final class MapControls {
     * @param freeColClient The main controller object for the client
     * @param gui An object that contains useful GUI-related methods.
     */
-    public MapControls(FreeColClient freeColClient, GUI gui) {
+    public MapControls(final FreeColClient freeColClient, final GUI gui) {
         this.freeColClient = freeColClient;
         this.gui = gui;
 
@@ -63,6 +71,7 @@ public final class MapControls {
 
         infoPanel = new InfoPanel(freeColClient, freeColClient.getGame(), freeColClient.getGUI().getImageLibrary());
         miniMap = new MiniMap(freeColClient, freeColClient.getGUI().getImageLibrary());
+        compassRose = new JLabel(freeColClient.getGUI().getImageLibrary().getMiscImageIcon(9));
         
         final ActionManager am = freeColClient.getActionManager();
         unitButton = new UnitButton[] {
@@ -82,9 +91,27 @@ public final class MapControls {
 
         infoPanel.setFocusable(false);
         miniMap.setFocusable(false);
+        compassRose.setFocusable(false);
+
         for(int i=0; i<unitButton.length; i++) {
             unitButton[i].setFocusable(false);
         }
+
+        compassRose.setSize(compassRose.getPreferredSize());
+        compassRose.addMouseListener(new MouseAdapter() {
+                public void mouseClicked(MouseEvent e) {
+                    Unit activeUnit = gui.getActiveUnit();
+                    int x = e.getX() - compassRose.getWidth()/2;
+                    int y = e.getY() - compassRose.getHeight()/2;
+                    double theta = Math.atan2(y, x) + Math.PI/2 + Math.PI/8;
+                    if (theta < 0) {
+                        theta += 2*Math.PI;
+                    }
+                    int direction = (int) Math.floor(theta / (Math.PI/4));
+                    freeColClient.getInGameController().moveActiveUnit(direction);
+                }
+            });
+
     }
 
     /**
@@ -114,10 +141,16 @@ public final class MapControls {
 
         infoPanel.setLocation(component.getWidth() - infoPanel.getWidth(), component.getHeight() - infoPanel.getHeight());
         miniMap.setLocation(0, component.getHeight() - miniMap.getHeight());
+        compassRose.setLocation(component.getWidth() - compassRose.getWidth() - 20,
+                                component.getMenuBarHeight() + 20);
         
         final int SPACE = unitButton[0].getWidth() + 5;
         for(int i=0; i<unitButton.length; i++) {            
-            unitButton[i].setLocation(miniMap.getWidth() + (infoPanel.getX() - miniMap.getWidth() - unitButton.length*SPACE)/2 + i*SPACE, component.getHeight() - 40);
+            unitButton[i].setLocation(miniMap.getWidth() +
+                                      (infoPanel.getX() - miniMap.getWidth() - 
+                                       unitButton.length*SPACE)/2 +
+                                      i*SPACE,
+                                      component.getHeight() - 40);
         }
 
         //
@@ -125,6 +158,9 @@ public final class MapControls {
         //
         component.add(infoPanel, JLayeredPane.DEFAULT_LAYER, false);
         component.add(miniMap, JLayeredPane.DEFAULT_LAYER, false);
+        if (freeColClient.getClientOptions().getBoolean(ClientOptions.DISPLAY_COMPASS_ROSE)) {
+            component.add(compassRose, JLayeredPane.DEFAULT_LAYER, false);
+        }
 
         if (!freeColClient.isMapEditor()) {
             for(int i=0; i<unitButton.length; i++) {
@@ -143,6 +179,7 @@ public final class MapControls {
     public void removeFromComponent(Canvas canvas) {
         canvas.remove(infoPanel, false);
         canvas.remove(miniMap, false);
+        canvas.remove(compassRose, false);
 
         for(int i=0; i<unitButton.length; i++) {
             canvas.remove(unitButton[i], false);

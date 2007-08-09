@@ -43,7 +43,7 @@ public final class ImageLibrary extends ImageProvider {
     public static final String REVISION = "$Revision$";
 
     public static final int UNIT_SELECT = 0, PLOWED = 4, TILE_TAKEN = 5, TILE_OWNED_BY_INDIANS = 6,
-            LOST_CITY_RUMOUR = 7, DARKNESS = 8, MISC_COUNT = 9;
+            LOST_CITY_RUMOUR = 7, DARKNESS = 8, MISC_COUNT = 10;
 
     /**
      * These finals represent the EXTRA terrain graphics; the ones that can not
