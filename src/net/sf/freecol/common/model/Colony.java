@@ -1904,4 +1904,13 @@ public final class Colony extends Settlement implements Location, Nameable {
         }
         return attacker;
     }
+    
+    /**
+     * Returns true when colony has a stockade
+     *
+     * @return whether the colony has a stockade
+     */
+    boolean hasStockade() {
+        return getBuilding(Building.STOCKADE).getLevel() >= Building.HOUSE;
+    }
 }
