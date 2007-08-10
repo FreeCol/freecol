@@ -304,6 +304,12 @@ public class ColonyTile extends FreeColGameObject implements WorkLocation, Ownab
             if (u.getNumberOfTools() > 0) {
                 u.setNumberOfTools(0);
             }
+
+            Unit student = u.getStudent();
+            if (student != null) {
+                student.setTeacher(null);
+                u.setStudent(null);
+            }
         }
 
         setUnit(u);

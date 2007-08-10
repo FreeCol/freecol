@@ -480,6 +480,20 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
             unit.setNumberOfTools(0);
         }
 
+        Unit student = unit.getStudent();
+        if (getType() == SCHOOLHOUSE) {
+            if (student == null) {
+                student = findStudent();
+                if (student != null) {
+                    unit.setStudent(student);
+                    student.setTeacher(unit);
+                }
+            }
+        } else if (student != null) {
+            student.setTeacher(null);
+            unit.setStudent(null);
+        }
+
         units.add(unit);
         getColony().updatePopulation();
     }
@@ -667,50 +681,49 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
         }
     }
 
+    private Unit findStudent() {
+        Unit student = null;
+        int training = -2;
+        for (Unit potentialStudent : getColony().getUnitList()) {
+            if (potentialStudent.canBeStudent() &&
+                potentialStudent.getTeacher() == null) {
+                if (potentialStudent.getTurnsOfTraining() > training) {
+                    student = potentialStudent;
+                    training = student.getTurnsOfTraining();
+                }
+            }
+        }
+        return student;
+    }
+
+
     private void trainStudents() {
         
-        // Nothing to do if there is nobody in the building
-        if (getUnitCount() == 0) {
-            return;
-        }
-        
-        // Gather the potential students
-        ArrayList<Unit> potentialStudents = new ArrayList<Unit>();
-        potentialStudents.addAll(colony.getUnitList(Unit.FREE_COLONIST));
-        potentialStudents.addAll(colony.getUnitList(Unit.INDENTURED_SERVANT));
-        potentialStudents.addAll(colony.getUnitList(Unit.PETTY_CRIMINAL));
-
-        // Update the progress of each teacher for whom we have a student
         Iterator<Unit> teachers = getUnitIterator();
-        Iterator<Unit> actualStudents = potentialStudents.iterator();
-        
-        for (int i = 0; i < potentialStudents.size(); i++) {
-            if (!teachers.hasNext()) {
-                break;
-            }
-
+        while (teachers.hasNext()) {
             Unit teacher = teachers.next();
+            if (teacher.getStudent() == null) {
+                Unit student = findStudent();
+                if (student == null) {
+                    addModelMessage(getColony(), "model.building.noStudent",
+                                    new String[][] {
+                                        { "%teacher%", teacher.getName() },
+                                        { "%colony%", colony.getName() } },
+                                    ModelMessage.WARNING, teacher);
+                    continue;
+                } else {
+                    teacher.setStudent(student);
+                    student.setTeacher(teacher);
+                }                
+            }
             int training = teacher.getTurnsOfTraining() + 1;
             if (training < teacher.getNeededTurnsOfTraining()) {
                 teacher.setTurnsOfTraining(training);
             } else {
                 teacher.setTurnsOfTraining(0);
-                actualStudents.next().train(teacher);
+                teacher.getStudent().train(teacher);
+                teacher.setStudent(null);
             }
-        }
-
-        // Other teachers will get a warning message
-        while (teachers.hasNext()) {
-            Unit teacher = teachers.next();
-
-            // We could reset teaching potential for these teachers
-            // to make education more difficult.
-            // Note: education is not reset when moving a teacher so
-            // that the player can reorganize its education order.
-            // teacher.setTurnsOfTraining(0);
-            addModelMessage(getColony(), "model.building.noStudent",
-                    new String[][] { { "%teacher%", teacher.getName() }, { "%colony%", colony.getName() } },
-                    ModelMessage.WARNING, teacher);
         }
     }
 

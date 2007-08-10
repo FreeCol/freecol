@@ -12,6 +12,8 @@ public class MessagesTest extends FreeColTestCase {
 
     public static final String REVISION = "$Revision$";
 
+    public static final String noSuchKey = "should.not.exist.and.thus.return.null";
+
     public void tearDown(){
         Messages.setMessageBundle(Locale.US);
     }
@@ -21,15 +23,16 @@ public class MessagesTest extends FreeColTestCase {
         assertEquals("Trade Advisor", Messages.message("menuBar.report.trade"));
 
         // With parameters
-        assertEquals("Score: %score%    |    Gold: %gold%    |    Tax: %tax%%    |    Year: %year%", Messages.message("menuBar.statusLine"));
+        assertEquals("Score: %score%    |    Gold: %gold%    |    Tax: %tax%%    |    Year: %year%", 
+                     Messages.message("menuBar.statusLine"));
 
         // Long String
         assertEquals("Food is necessary to feed your colonists and to breed horses. "
-                + "A new colonist is born whenever a colony has 200 units of food or more.", Messages
-                .message("model.goods.Food.description"));
+                + "A new colonist is born whenever a colony has 200 units of food or more.",
+                     Messages.message("model.goods.Food.description"));
 
         // Message not found
-        assertEquals(null, Messages.message("should.not.exist.and.thus.return.null"));
+        assertEquals(noSuchKey, Messages.message(noSuchKey));
     }
 
     @SuppressWarnings("deprecation")
@@ -39,23 +42,28 @@ public class MessagesTest extends FreeColTestCase {
 
         // With parameters for "Gold: %gold% | Tax: %tax%% | Year: %year%"
         assertEquals("Score: 1050    |    Gold: silver    |    Tax: 13%    |    Year: %year%", 
-                     Messages.message("menuBar.statusLine", new String[][] { new String[] { "%score%", "1050" }, new String[] { "%gold%", "silver" }, new String[] { "%tax%", "13" } }));
+                     Messages.message("menuBar.statusLine",
+                                      new String[][] {
+                                          { "%score%", "1050" }, 
+                                          { "%gold%", "silver" }, 
+                                          { "%tax%", "13" } }));
 
         // Long String
         assertEquals("Food is necessary to feed your colonists and to breed horses. "
-                + "A new colonist is born whenever a colony has 200 units of food or more.", Messages.message(
-                "model.goods.Food.description", new String[][] {}));
+                + "A new colonist is born whenever a colony has 200 units of food or more.", 
+                     Messages.message("model.goods.Food.description", new String[][] {}));
 
         // Invalid Inputs
         assertEquals("Trade Advisor", Messages.message("menuBar.report.trade", new String[][] {}));
-        assertEquals("Score: %score%    |    Gold: %gold%    |    Tax: %tax%%    |    Year: %year%", Messages.message("menuBar.statusLine",
-                new String[][] { new String[] { "%tax%" } }));
+        assertEquals("Score: %score%    |    Gold: %gold%    |    Tax: %tax%%    |    Year: %year%", 
+                     Messages.message("menuBar.statusLine",
+                                      new String[][] { new String[] { "%tax%" } }));
 
         
         // Message not found
-        assertEquals(null, Messages.message("should.not.exist.and.thus.return.null", new String[][] {}));
+        assertEquals(noSuchKey, Messages.message(noSuchKey, new String[][] {}));
         
-        assertEquals(null, Messages.message("should.not.exist.and.thus.return.null", 
+        assertEquals(noSuchKey, Messages.message(noSuchKey, 
                 new String[][] { new String[] { "%gold%", "silver" }, new String[] { "%tax%", "13" } }));
     }
     
@@ -88,10 +96,10 @@ public class MessagesTest extends FreeColTestCase {
 
         
         // Message not found
-        assertEquals(null, Messages.message("should.not.exist.and.thus.return.null"));
+        assertEquals(noSuchKey, Messages.message(noSuchKey));
         
-        assertEquals(null, Messages.message("should.not.exist.and.thus.return.null", 
-                "%gold%", "silver", "%tax%", "13"));
+        assertEquals(noSuchKey, Messages.message(noSuchKey, 
+                                            "%gold%", "silver", "%tax%", "13"));
     }
 
     public void testChangeLocaleSettings() {

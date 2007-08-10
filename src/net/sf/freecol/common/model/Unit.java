@@ -117,9 +117,9 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
     // to be used only for type == TREASURE_TRAIN
     private int treasureAmount;
 
-    private int workType; // What type of goods this unit produces in its
+    // What type of goods this unit produces in its occupation.
+    private int workType;
 
-    // occupation.
     private int experience = 0;
 
     private int turnsOfTraining = 0;
@@ -142,6 +142,16 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
      * 
      */
     private boolean alreadyOnHighSea = false;
+
+    /**
+     * Describe student here.
+     */
+    private Unit student;
+
+    /**
+     * Describe teacher here.
+     */
+    private Unit teacher;
 
 
     /**
@@ -658,6 +668,84 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
      */
     public void modifyExperience(int value) {
         experience += value;
+    }
+
+    /**
+     * Returns true if this unit can be a student.
+     *
+     * @return a <code>boolean</code> value
+     */
+    public boolean canBeStudent() {
+        return canBeStudent(getType());
+    }
+
+    /**
+     * Returns true if this type of unit can be a student.
+     *
+     * @param unitType an <code>int</code> value
+     * @return a <code>boolean</code> value
+     */
+    public static boolean canBeStudent(int unitType) {
+        switch(unitType) {
+        case PETTY_CRIMINAL:
+        case INDENTURED_SERVANT:
+        case FREE_COLONIST:
+            return true;
+        default:
+            return false;
+        }
+    }
+
+    /**
+     * Get the <code>Student</code> value.
+     *
+     * @return an <code>Unit</code> value
+     */
+    public final Unit getStudent() {
+        return student;
+    }
+
+    /**
+     * Set the <code>Student</code> value.
+     *
+     * @param newStudent The new Student value.
+     */
+    public final void setStudent(final Unit newStudent) {
+        if (newStudent == null) {
+            this.student = null;
+        } else if (newStudent.getColony() != null &&
+                   newStudent.getColony() == getColony() &&
+                   newStudent.canBeStudent()) {
+            this.student = newStudent;
+        } else {
+            throw new IllegalStateException("unit can not be student: " + newStudent.getName());
+        }
+    }
+
+    /**
+     * Get the <code>Teacher</code> value.
+     *
+     * @return an <code>Unit</code> value
+     */
+    public final Unit getTeacher() {
+        return teacher;
+    }
+
+    /**
+     * Set the <code>Teacher</code> value.
+     *
+     * @param newTeacher The new Teacher value.
+     */
+    public final void setTeacher(final Unit newTeacher) {
+        if (newTeacher == null) {
+            this.teacher = null;
+        } else if (newTeacher.getColony() != null &&
+                   newTeacher.getColony() == getColony() &&
+                   getColony().getBuilding(Building.SCHOOLHOUSE).canAddAsTeacher(newTeacher)) {
+            this.teacher = newTeacher;
+        } else {
+            throw new IllegalStateException("unit can not be teacher: " + newTeacher.getName());
+        }
     }
 
     /**
@@ -4529,6 +4617,14 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
         out.writeAttribute("treasureAmount", Integer.toString(treasureAmount));
         out.writeAttribute("hitpoints", Integer.toString(hitpoints));
 
+        if (student != null) {
+            out.writeAttribute("student", student.getID());
+        }
+
+        if (teacher != null) {
+            out.writeAttribute("teacher", teacher.getID());
+        }
+
         if (indianSettlement != null) {
             if (getGame().isClientTrusted() || showAll || player == getOwner()) {
                 out.writeAttribute("indianSettlement", indianSettlement.getID());
@@ -4609,6 +4705,22 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
 
         turnsOfTraining = Integer.parseInt(in.getAttributeValue(null, "turnsOfTraining"));
         hitpoints = Integer.parseInt(in.getAttributeValue(null, "hitpoints"));
+
+        final String teacherString = in.getAttributeValue(null, "teacher");
+        if (teacherString != null) {
+            teacher = (Unit) getGame().getFreeColGameObject(teacherString);
+            if (teacher == null) {
+                teacher = new Unit(getGame(), teacherString);
+            }
+        }
+
+        final String studentString = in.getAttributeValue(null, "student");
+        if (studentString != null) {
+            student = (Unit) getGame().getFreeColGameObject(studentString);
+            if (student == null) {
+                student = new Unit(getGame(), studentString);
+            }
+        }
 
         final String indianSettlementStr = in.getAttributeValue(null, "indianSettlement");
         if (indianSettlementStr != null) {
