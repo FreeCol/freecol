@@ -71,6 +71,7 @@ import net.sf.freecol.client.gui.panel.ReportReligiousPanel;
 import net.sf.freecol.client.gui.panel.ReportRequirementsPanel;
 import net.sf.freecol.client.gui.panel.ReportTradePanel;
 import net.sf.freecol.client.gui.panel.ReportTurnPanel;
+import net.sf.freecol.client.gui.panel.SelectAmountDialog;
 import net.sf.freecol.client.gui.panel.ServerListPanel;
 import net.sf.freecol.client.gui.panel.StartGamePanel;
 import net.sf.freecol.client.gui.panel.StatusPanel;
@@ -403,6 +404,24 @@ public final class Canvas extends JDesktopPane {
         addAsFrame(newPanel);
         newPanel.requestFocus();
     }
+
+    /**
+     * Displays the <code>SelectAmountDialog</code>.
+     * @param goodsType an <code>int</code> value
+     * @param available an <code>int</code> value
+     * @param needToPay a <code>boolean</code> value
+     * @return an <code>int</code> value
+     */
+    public int showSelectAmountDialog(int goodsType, int available, boolean needToPay) {
+        SelectAmountDialog dialog = new SelectAmountDialog(this, goodsType, available, needToPay);
+        dialog.initialize();
+        addAsFrame(dialog);
+        dialog.requestFocus();
+        int amount = dialog.getResponseInt();
+        remove(dialog);
+        return amount;
+    }
+
 
     /**
      * Displays a <code>ModelMessage</code> in a modal dialog. The message is

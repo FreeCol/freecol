@@ -284,7 +284,7 @@ public final class DefaultTransferHandler extends TransferHandler {
                 // Import the data.
 
                 if (label.isPartialChosen()) {
-                    int amount = getAmount(label.getGoods().getAmount());
+                    int amount = getAmount(label.getGoods().getType(), label.getGoods().getAmount(), false);
                     if (amount == -1) {
                         return false;
                     }
@@ -340,7 +340,7 @@ public final class DefaultTransferHandler extends TransferHandler {
                 // Import the data.
 
                 if (label.isPartialChosen()) {
-                    int amount = getAmount(label.getAmount());
+                    int amount = getAmount(label.getType(), label.getAmount(), true);
                     if (amount == -1) {
                         return false;
                     }
@@ -383,25 +383,8 @@ public final class DefaultTransferHandler extends TransferHandler {
     /**
     * Displays an input dialog box where the user should specify a goods transfer amount.
     */
-    private int getAmount(int available) {
-        String defaultValue = String.valueOf(Math.min(available, 100));
-        String s = canvas.showInputDialog("goodsTransfer.text", defaultValue, "ok", "cancel");
-        int amount = -1;
-
-        while (s != null && amount == -1) {
-            try {
-                amount = Integer.parseInt(s);
-            } catch (NumberFormatException e) {
-                canvas.errorMessage("notANumber");
-                s = canvas.showInputDialog("goodsTransfer.text", defaultValue, "ok", "cancel");
-            }
-        }
-
-        if (s == null) {
-            return -1;
-        }
-
-        return amount;
+    private int getAmount(int goodsType, int available, boolean needToPay) {
+        return canvas.showSelectAmountDialog(goodsType, available, needToPay);
     }
 
 
