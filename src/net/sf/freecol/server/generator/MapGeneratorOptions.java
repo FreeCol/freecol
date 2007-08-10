@@ -259,9 +259,20 @@ public class MapGeneratorOptions extends OptionMap {
         for (int index = 0; index < sizes.length; index++) {
             sizes[index] = Messages.message(sizes[index]);
         }
+
         final OptionGroup landGeneratorGroup = new OptionGroup("mapGeneratorOptions.landGenerator");
-        new SelectOption(MAP_SIZE, landGeneratorGroup, sizes, 0, true);
-        new SelectOption(LAND_MASS, landGeneratorGroup, sizes, 1, true);
+        String[] mapSizes = new String[sizes.length];
+        for (int index = 0; index < sizes.length; index++) {
+            mapSizes[index] = sizes[index] + " (" + getWidth(index) + "x" +
+                getHeight(index) + ")";
+        }
+        new SelectOption(MAP_SIZE, landGeneratorGroup, mapSizes, 0, true);
+
+        String[] landMasses = new String[sizes.length];
+        for (int index = 0; index < sizes.length; index++) {
+            landMasses[index] = sizes[index] + " (" + getLandMass(index) + "%)";
+        }
+        new SelectOption(LAND_MASS, landGeneratorGroup, landMasses, 1, true);
         add(landGeneratorGroup);
         
         final OptionGroup terrainGeneratorGroup = new OptionGroup("mapGeneratorOptions.terrainGenerator");
@@ -278,7 +289,10 @@ public class MapGeneratorOptions extends OptionMap {
      * @return The width of the map.
      */
     public int getWidth() {
-        final int size = getInteger(MAP_SIZE);
+        return getWidth(getInteger(MAP_SIZE));
+    }
+        
+    private int getWidth(final int size) {
         switch (size) {
         case MAP_SIZE_SMALL:
             return 28;
@@ -300,7 +314,10 @@ public class MapGeneratorOptions extends OptionMap {
      * @return The height of the map.
      */
     public int getHeight() {
-        final int size = getInteger(MAP_SIZE);
+        return getHeight(getInteger(MAP_SIZE));
+    }
+
+    private int getHeight(int size) {
         switch (size) {
         case MAP_SIZE_SMALL:
             return 65;
@@ -322,7 +339,10 @@ public class MapGeneratorOptions extends OptionMap {
      * @return The percentage of land.
      */
     public int getLandMass() {
-        final int landMass = getInteger(LAND_MASS);
+        return getLandMass(getInteger(LAND_MASS));
+    }
+
+    private int getLandMass(int landMass) {
         switch (landMass) {
         case LAND_MASS_SMALL:
             return 15;
@@ -352,7 +372,10 @@ public class MapGeneratorOptions extends OptionMap {
      * @return The number of rivers.
      */
     public int getNumberOfRivers() {
-        final int number = getInteger(RIVER_NUMBER);
+        return getNumberOfRivers(getInteger(RIVER_NUMBER));
+    }
+
+    private int getNumberOfRivers(int number) {
         switch (number) {
         case RIVER_NUMBER_SMALL:
             return getLand() / 50;
@@ -374,7 +397,10 @@ public class MapGeneratorOptions extends OptionMap {
      * @return The number of mountain tiles.
      */
     public int getNumberOfMountainTiles() {
-        final int number = getInteger(MOUNTAIN_NUMBER);
+        return getNumberOfMountainTiles(getInteger(MOUNTAIN_NUMBER));
+    }
+
+    private int getNumberOfMountainTiles(int number) {
         switch (number) {
         case MOUNTAIN_NUMBER_SMALL:
             return getLand() / 20;
@@ -396,7 +422,10 @@ public class MapGeneratorOptions extends OptionMap {
      * @return The number of rumours..
      */
     public int getNumberOfRumours() {
-        final int number = getInteger(RUMOUR_NUMBER);
+        return getNumberOfRumours(getInteger(RUMOUR_NUMBER));
+    }
+
+    private int getNumberOfRumours(int number) {
         switch (number) {
         case RUMOUR_NUMBER_SMALL:
             return getLand() / 50;
@@ -418,7 +447,10 @@ public class MapGeneratorOptions extends OptionMap {
      * @return The percentage of forests.
      */
     public int getPercentageOfForests() {
-        final int number = getInteger(FOREST_NUMBER);
+        return getPercentageOfForests(getInteger(FOREST_NUMBER));
+    }
+
+    private int getPercentageOfForests(int number) {
         switch (number) {
         case FOREST_NUMBER_SMALL:
             return 10;
@@ -440,7 +472,10 @@ public class MapGeneratorOptions extends OptionMap {
      * @return The percentage of bonus tiles.
      */
     public int getPercentageOfBonusTiles() {
-        final int number = getInteger(BONUS_NUMBER);
+        return getPercentageOfBonusTiles(getInteger(BONUS_NUMBER));
+    }
+
+    private int getPercentageOfBonusTiles(int number) {
         switch (number) {
         case BONUS_NUMBER_SMALL:
             return 5;
