@@ -1776,6 +1776,17 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
         if (!Utils.equals(oldColony, newColony)){
             setTurnsOfTraining(0);
         }
+
+        if (!(newLocation instanceof WorkLocation)) {
+            if (teacher != null) {
+                teacher.setStudent(null);
+                teacher = null;
+            }
+            if (student != null) {
+                student.setTeacher(null);
+                student = null;
+            }
+        }
         
         // Check for adjacent units owned by a player that our owner has not met
         // before:

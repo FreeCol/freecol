@@ -12,6 +12,19 @@ public class SchoolTest extends FreeColTestCase {
 
     public static final String REVISION = "$Revision$";
 
+
+    private void trainForTurns(Colony colony, int requiredTurns) {
+        trainForTurns(colony, requiredTurns, Unit.FREE_COLONIST);
+    }
+
+    private void trainForTurns(Colony colony, int requiredTurns, int unitType) {
+        for (int turn = 0; turn < requiredTurns; turn++) {
+            assertEquals("wrong number of units in turn " + turn + ": " + Unit.getName(unitType),
+                         1, colony.getUnitList(unitType).size());
+            colony.getBuilding(Building.SCHOOLHOUSE).newTurn();
+        }
+    }
+
     /**
      * Check that a free colonist can be taught something.
      * 
@@ -35,22 +48,10 @@ public class SchoolTest extends FreeColTestCase {
         ore.setType(Unit.EXPERT_ORE_MINER);
 
         Building school = colony.getBuilding(Building.SCHOOLHOUSE);
-
         school.setLevel(Building.HOUSE);
 
         ore.setLocation(school);
-
-        // It should take 4 turns to train a EXPERT
-        assertEquals(1, colony.getUnitList(Unit.FREE_COLONIST).size());
-        school.newTurn(); // 1
-        assertEquals(1, colony.getUnitList(Unit.FREE_COLONIST).size());
-        school.newTurn(); // 2
-        assertEquals(1, colony.getUnitList(Unit.FREE_COLONIST).size());
-        school.newTurn(); // 3
-        assertEquals(1, colony.getUnitList(Unit.FREE_COLONIST).size());
-        school.newTurn(); // 4
-        assertEquals(0, colony.getUnitList(Unit.FREE_COLONIST).size());
-
+        trainForTurns(colony, ore.getNeededTurnsOfTraining());
         assertEquals(Unit.EXPERT_ORE_MINER, colonist.getType());
     }
 
@@ -67,26 +68,10 @@ public class SchoolTest extends FreeColTestCase {
         blackSmith.setType(Unit.MASTER_BLACKSMITH);
 
         Building school = colony.getBuilding(Building.SCHOOLHOUSE);
-
         school.setLevel(Building.SHOP);
 
         blackSmith.setLocation(school);
-
-        // It should take 6 turns to train a MASTER, i.e. college level
-        assertEquals(1, colony.getUnitList(Unit.FREE_COLONIST).size());
-        school.newTurn(); // 1
-        assertEquals(1, colony.getUnitList(Unit.FREE_COLONIST).size());
-        school.newTurn(); // 2
-        assertEquals(1, colony.getUnitList(Unit.FREE_COLONIST).size());
-        school.newTurn(); // 3
-        assertEquals(1, colony.getUnitList(Unit.FREE_COLONIST).size());
-        school.newTurn(); // 4
-        assertEquals(1, colony.getUnitList(Unit.FREE_COLONIST).size());
-        school.newTurn(); // 5
-        assertEquals(1, colony.getUnitList(Unit.FREE_COLONIST).size());
-        school.newTurn(); // 6
-        assertEquals(0, colony.getUnitList(Unit.FREE_COLONIST).size());
-
+        trainForTurns(colony, blackSmith.getNeededTurnsOfTraining());
         assertEquals(Unit.MASTER_BLACKSMITH, colonist.getType());
     }
 
@@ -103,30 +88,10 @@ public class SchoolTest extends FreeColTestCase {
         elder.setType(Unit.ELDER_STATESMAN);
 
         Building school = colony.getBuilding(Building.SCHOOLHOUSE);
-
         school.setLevel(Building.FACTORY);
 
         elder.setLocation(school);
-
-        // It should take 8 turns to train a person at university level
-        assertEquals(1, colony.getUnitList(Unit.FREE_COLONIST).size());
-        school.newTurn(); // 1
-        assertEquals(1, colony.getUnitList(Unit.FREE_COLONIST).size());
-        school.newTurn(); // 2
-        assertEquals(1, colony.getUnitList(Unit.FREE_COLONIST).size());
-        school.newTurn(); // 3
-        assertEquals(1, colony.getUnitList(Unit.FREE_COLONIST).size());
-        school.newTurn(); // 4
-        assertEquals(1, colony.getUnitList(Unit.FREE_COLONIST).size());
-        school.newTurn(); // 5
-        assertEquals(1, colony.getUnitList(Unit.FREE_COLONIST).size());
-        school.newTurn(); // 6
-        assertEquals(1, colony.getUnitList(Unit.FREE_COLONIST).size());
-        school.newTurn(); // 7
-        assertEquals(1, colony.getUnitList(Unit.FREE_COLONIST).size());
-        school.newTurn(); // 8
-        assertEquals(0, colony.getUnitList(Unit.FREE_COLONIST).size());
-
+        trainForTurns(colony, elder.getNeededTurnsOfTraining());
         assertEquals(Unit.ELDER_STATESMAN, colonist.getType());
     }
 
@@ -339,19 +304,7 @@ public class SchoolTest extends FreeColTestCase {
         black.setLocation(school);
         lumber.setLocation(school);
 
-        assertEquals(1, colony.getUnitList(Unit.FREE_COLONIST).size());
-        school.newTurn(); // 1
-        assertEquals(1, colony.getUnitList(Unit.FREE_COLONIST).size());
-        school.newTurn(); // 2
-        assertEquals(1, colony.getUnitList(Unit.FREE_COLONIST).size());
-        school.newTurn(); // 3
-        assertEquals(1, colony.getUnitList(Unit.FREE_COLONIST).size());
-        school.newTurn(); // 4
-        assertEquals(1, colony.getUnitList(Unit.FREE_COLONIST).size());
-        school.newTurn(); // 5
-        assertEquals(1, colony.getUnitList(Unit.FREE_COLONIST).size());
-        school.newTurn(); // 6
-
+        trainForTurns(colony, black.getNeededTurnsOfTraining());
         assertEquals(0, colony.getUnitList(Unit.FREE_COLONIST).size());
         assertEquals(1, colony.getUnitList(Unit.EXPERT_LUMBER_JACK).size());
         assertEquals(2, colony.getUnitList(Unit.MASTER_BLACKSMITH).size());
@@ -383,15 +336,7 @@ public class SchoolTest extends FreeColTestCase {
         lumberjack1.setLocation(school);
         lumberjack2.setLocation(school);
 
-        assertEquals(1, colony.getUnitList(Unit.FREE_COLONIST).size());
-        school.newTurn(); // 1
-        assertEquals(1, colony.getUnitList(Unit.FREE_COLONIST).size());
-        school.newTurn(); // 2
-        assertEquals(1, colony.getUnitList(Unit.FREE_COLONIST).size());
-        school.newTurn(); // 3
-        assertEquals(1, colony.getUnitList(Unit.FREE_COLONIST).size());
-        school.newTurn(); // 4
-
+        trainForTurns(colony, lumberjack1.getNeededTurnsOfTraining());
         assertEquals(0, colony.getUnitList(Unit.FREE_COLONIST).size());
         assertEquals(3, colony.getUnitList(Unit.EXPERT_LUMBER_JACK).size());
     }
@@ -476,14 +421,7 @@ public class SchoolTest extends FreeColTestCase {
         teacher.setLocation(school);
 
         // PETTY_CRIMINALS become INDENTURED_SERVANTS
-        assertEquals(1, colony.getUnitList(Unit.PETTY_CRIMINAL).size());
-        school.newTurn();
-        assertEquals(1, colony.getUnitList(Unit.PETTY_CRIMINAL).size());
-        school.newTurn();
-        assertEquals(1, colony.getUnitList(Unit.PETTY_CRIMINAL).size());
-        school.newTurn();
-        assertEquals(1, colony.getUnitList(Unit.PETTY_CRIMINAL).size());
-        school.newTurn();
+        trainForTurns(colony, teacher.getNeededTurnsOfTraining(), Unit.PETTY_CRIMINAL);
         assertEquals(0, colony.getUnitList(Unit.PETTY_CRIMINAL).size());
         assertEquals(Unit.INDENTURED_SERVANT, criminal.getType());
     }
@@ -510,19 +448,7 @@ public class SchoolTest extends FreeColTestCase {
 
         // It takes two turns longer to train a petty criminal by a master than
         // by an expert!
-        assertEquals(1, colony.getUnitList(Unit.PETTY_CRIMINAL).size());
-        school.newTurn();
-        assertEquals(1, colony.getUnitList(Unit.PETTY_CRIMINAL).size());
-        school.newTurn();
-        assertEquals(1, colony.getUnitList(Unit.PETTY_CRIMINAL).size());
-        school.newTurn();
-        assertEquals(1, colony.getUnitList(Unit.PETTY_CRIMINAL).size());
-        school.newTurn();
-        assertEquals(1, colony.getUnitList(Unit.PETTY_CRIMINAL).size());
-        school.newTurn();
-        assertEquals(1, colony.getUnitList(Unit.PETTY_CRIMINAL).size());
-        school.newTurn();
-        assertEquals(0, colony.getUnitList(Unit.PETTY_CRIMINAL).size());
+        trainForTurns(colony, teacher.getNeededTurnsOfTraining(), Unit.PETTY_CRIMINAL);
         assertEquals(Unit.INDENTURED_SERVANT, criminal.getType());
     }
 
@@ -539,24 +465,15 @@ public class SchoolTest extends FreeColTestCase {
         indenturedServant.setType(Unit.INDENTURED_SERVANT);
 
         Unit teacher = units.next();
-        teacher.setType(Unit.EXPERT_ORE_MINER);
+        //teacher.setType(Unit.EXPERT_ORE_MINER);
+        teacher.setType(Unit.MASTER_BLACKSMITH);
 
         Building school = colony.getBuilding(Building.SCHOOLHOUSE);
         school.setLevel(Building.SHOP);
 
         teacher.setLocation(school);
-
+        trainForTurns(colony, teacher.getNeededTurnsOfTraining(), Unit.INDENTURED_SERVANT);
         // Train to become free colonist
-        assertEquals(1, colony.getUnitList(Unit.INDENTURED_SERVANT).size());
-        school.newTurn();
-        assertEquals(1, colony.getUnitList(Unit.INDENTURED_SERVANT).size());
-        school.newTurn();
-        assertEquals(1, colony.getUnitList(Unit.INDENTURED_SERVANT).size());
-        school.newTurn();
-        assertEquals(1, colony.getUnitList(Unit.INDENTURED_SERVANT).size());
-        school.newTurn();
-        assertEquals(0, colony.getUnitList(Unit.INDENTURED_SERVANT).size());
-
         assertEquals(Unit.FREE_COLONIST, indenturedServant.getType());
     }
 
@@ -584,12 +501,7 @@ public class SchoolTest extends FreeColTestCase {
         teacher.setLocation(school);
 
         // Train to become free colonist
-        assertEquals(1, colony.getUnitList(Unit.FREE_COLONIST).size());
-        school.newTurn();
-        assertEquals(1, colony.getUnitList(Unit.FREE_COLONIST).size());
-        school.newTurn();
-        assertEquals(1, colony.getUnitList(Unit.FREE_COLONIST).size());
-        school.newTurn();
+        trainForTurns(colony, teacher.getNeededTurnsOfTraining() - 1);
 
         // We swap the colonist with another one
         student.setLocation(outsideColony);
@@ -652,39 +564,55 @@ public class SchoolTest extends FreeColTestCase {
         assertEquals(1, colony.getUnitList(Unit.FREE_COLONIST).size());
         assertEquals(1, colony.getUnitList(Unit.PETTY_CRIMINAL).size());
 
-        // Put them back in...
+        // Move teacher2 back to school
         teacher2.setLocation(school);
-        
-        // Teacher 1 is still outside
+
         school.newTurn();
         assertEquals(2, teacher1.getTurnsOfTraining());
         assertEquals(3, teacher2.getTurnsOfTraining());
         assertEquals(1, colony.getUnitList(Unit.FREE_COLONIST).size());
         assertEquals(1, colony.getUnitList(Unit.PETTY_CRIMINAL).size());
         
-        // Now move him back
+        // Move teacher1 back to school
         teacher1.setLocation(school);
+        System.out.println("teacher1's student is " + teacher1.getStudent());
+        System.out.println("teacher2's student is " + teacher2.getStudent());
 
         school.newTurn();
         assertEquals(3, teacher1.getTurnsOfTraining());
         assertEquals(0, teacher2.getTurnsOfTraining());
-        
+
+        // Teacher1's student (petty criminal) should still be a petty criminal
+        // Teacher2's student (free colonist) should have been promoted to master carpenter
         assertEquals(0, colony.getUnitList(Unit.FREE_COLONIST).size());
         assertEquals(1, colony.getUnitList(Unit.PETTY_CRIMINAL).size());
         assertEquals(0, colony.getUnitList(Unit.INDENTURED_SERVANT).size());
         assertEquals(1, colony.getUnitList(Unit.EXPERT_ORE_MINER).size());
         assertEquals(2, colony.getUnitList(Unit.MASTER_CARPENTER).size());
-        
-        // Watch out here! This is another special case! See {@See testCaseTwoTeachersWithDifferentExp}!
+
         school.newTurn();
-        assertEquals(3, teacher1.getTurnsOfTraining());
-        assertEquals(1, teacher2.getTurnsOfTraining());
-        
+        assertEquals(0, teacher1.getTurnsOfTraining());
+        assertEquals(0, teacher2.getTurnsOfTraining());
+        assertEquals(null, teacher2.getStudent());
+
+        // Teacher1's student (petty criminal) should have been promoted to indentured servant
         assertEquals(0, colony.getUnitList(Unit.FREE_COLONIST).size());
-        assertEquals(1, colony.getUnitList(Unit.PETTY_CRIMINAL).size());
-        assertEquals(0, colony.getUnitList(Unit.INDENTURED_SERVANT).size());
+        assertEquals(0, colony.getUnitList(Unit.PETTY_CRIMINAL).size());
+        assertEquals(1, colony.getUnitList(Unit.INDENTURED_SERVANT).size());
         assertEquals(1, colony.getUnitList(Unit.EXPERT_ORE_MINER).size());
         assertEquals(2, colony.getUnitList(Unit.MASTER_CARPENTER).size());
+        
+        /**
+         * Since teacher2 was move back to school first, it is
+         * actually the first teacher in the unit list. Therefore
+         * teacher2 will get the new student (indentured servant), and
+         * teacher1 will get none.
+         */
+        school.newTurn();
+        assertEquals(0, teacher1.getTurnsOfTraining());
+        assertEquals(1, teacher2.getTurnsOfTraining());
+        assertEquals(Unit.INDENTURED_SERVANT, teacher2.getStudent().getType());
+
     }
     
     public void testCaseTwoTeachersWithDifferentExp(){
@@ -829,16 +757,7 @@ public class SchoolTest extends FreeColTestCase {
         school.setLevel(Building.SHOP);
 
         lumberjack.setLocation(school);
-
-        assertEquals(1, colony.getUnitList(Unit.FREE_COLONIST).size());
-        school.newTurn(); // 1
-        assertEquals(1, colony.getUnitList(Unit.FREE_COLONIST).size());
-        school.newTurn(); // 2
-        assertEquals(1, colony.getUnitList(Unit.FREE_COLONIST).size());
-        school.newTurn(); // 3
-        assertEquals(1, colony.getUnitList(Unit.FREE_COLONIST).size());
-        school.newTurn(); // 4
-
+        trainForTurns(colony, lumberjack.getNeededTurnsOfTraining());
         assertEquals(0, colony.getUnitList(Unit.FREE_COLONIST).size());
         assertEquals(2, colony.getUnitList(Unit.EXPERT_LUMBER_JACK).size());
     }
@@ -869,29 +788,12 @@ public class SchoolTest extends FreeColTestCase {
 
         // Put LumberJack in School
         lumberjack.setLocation(school);
-
-        assertEquals(1, colony.getUnitList(Unit.FREE_COLONIST).size());
-        school.newTurn();
-
-        assertEquals(1, colony.getUnitList(Unit.FREE_COLONIST).size());
-        school.newTurn();
+        trainForTurns(colony, 2);
 
         // After 2 turns replace by miner. Progress starts from scratch.
         lumberjack.setLocation(colony.getVacantColonyTileFor(lumberjack, Goods.FOOD));
         miner.setLocation(school);
-
-        assertEquals(1, colony.getUnitList(Unit.FREE_COLONIST).size());
-        school.newTurn();
-
-        assertEquals(1, colony.getUnitList(Unit.FREE_COLONIST).size());
-        school.newTurn();
-
-        assertEquals(1, colony.getUnitList(Unit.FREE_COLONIST).size());
-        school.newTurn();
-
-        assertEquals(1, colony.getUnitList(Unit.FREE_COLONIST).size());
-        school.newTurn();
-
+        trainForTurns(colony, miner.getNeededTurnsOfTraining());
         assertEquals(0, colony.getUnitList(Unit.FREE_COLONIST).size());
         assertEquals(2, colony.getUnitList(Unit.EXPERT_ORE_MINER).size());
     }
@@ -969,17 +871,19 @@ public class SchoolTest extends FreeColTestCase {
 
         Unit teacher1 = units.next();
         teacher1.setType(Unit.EXPERT_ORE_MINER);
-        teacher1.setLocation(school);
 
         Unit teacher2 = units.next();
         teacher2.setType(Unit.EXPERT_LUMBER_JACK);
+
+        // set location only AFTER all types have been set!
+        teacher1.setLocation(school);
         teacher2.setLocation(school);
 
         // Training time
-        school.newTurn();
-        school.newTurn();
-        school.newTurn();
-        school.newTurn();
+        trainForTurns(colony, teacher1.getNeededTurnsOfTraining(), Unit.PETTY_CRIMINAL);
+
+        // indentured servant should have been promoted to free colonist
+        // petty criminal should have been promoted to indentured servant
         assertEquals(1, colony.getUnitList(Unit.EXPERT_ORE_MINER).size());
         assertEquals(1, colony.getUnitList(Unit.EXPERT_LUMBER_JACK).size());
         assertEquals(1, colony.getUnitList(Unit.FREE_COLONIST).size());

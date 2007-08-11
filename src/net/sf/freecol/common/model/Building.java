@@ -683,13 +683,14 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
 
     private Unit findStudent() {
         Unit student = null;
-        int training = -2;
+        int skill = Integer.MIN_VALUE;
         for (Unit potentialStudent : getColony().getUnitList()) {
             if (potentialStudent.canBeStudent() &&
                 potentialStudent.getTeacher() == null) {
-                if (potentialStudent.getTurnsOfTraining() > training) {
+                // prefer students with higher skill levels
+                if (potentialStudent.getSkillLevel() > skill) {
                     student = potentialStudent;
-                    training = student.getTurnsOfTraining();
+                    skill = student.getSkillLevel();
                 }
             }
         }
@@ -722,6 +723,7 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
             } else {
                 teacher.setTurnsOfTraining(0);
                 teacher.getStudent().train(teacher);
+                teacher.getStudent().setTeacher(null);
                 teacher.setStudent(null);
             }
         }
