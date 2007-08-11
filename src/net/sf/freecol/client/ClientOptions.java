@@ -69,6 +69,11 @@ public class ClientOptions extends OptionMap {
     public static final String DISPLAY_COMPASS_ROSE = "displayCompassRose";
 
     /**
+     * Whether to display the grid by default or not.
+     */
+    public static final String DISPLAY_GRID = "displayGrid";
+
+    /**
      * Used by GUI, this defines the grouping of ModelMessages.
      * Possible values include nothing, type and source.
      *
@@ -164,6 +169,11 @@ public class ClientOptions extends OptionMap {
      */
     public static final String SMOOTH_MINIMAP_RENDERING = "smoothRendering";
     
+    /**
+     * Default zoom level of the minimap.
+     */
+    public static final String DEFAULT_MINIMAP_ZOOM = "defaultZoomLevel";
+
     /** 
      * The Stock the custom house should keep when selling goods.
      */
@@ -331,7 +341,7 @@ public class ClientOptions extends OptionMap {
         new BooleanOption(DISPLAY_FOG_OF_WAR, guiGroup, false);
         new BooleanOption(MAP_SCROLL_ON_DRAG, guiGroup, true);
         new BooleanOption(DISPLAY_COMPASS_ROSE, guiGroup, false);
-        new BooleanOption(AUTOLOAD_EMIGRANTS, guiGroup, false);
+        new BooleanOption(DISPLAY_GRID, guiGroup, false);
         new SelectOption(COLONY_COMPARATOR, guiGroup,
                          new String[] {"byName",
                                        "byAge",
@@ -349,8 +359,10 @@ public class ClientOptions extends OptionMap {
         
         OptionGroup minimapGroup = new OptionGroup("clientOptions.minimap");
         new BooleanOption(SMOOTH_MINIMAP_RENDERING, minimapGroup, false);
-        guiGroup.add(minimapGroup);
+        new SelectOption(DEFAULT_MINIMAP_ZOOM, minimapGroup,
+                         new String[] {"1", "2", "3", "4", "5"}, 2, true);
 
+        guiGroup.add(minimapGroup);
         add(guiGroup);
 
         /** Boolean message display options. */
@@ -385,6 +397,10 @@ public class ClientOptions extends OptionMap {
         new IntegerOption(LOW_LEVEL, warehouseGroup, 0, 100, 10);
         new IntegerOption(HIGH_LEVEL, warehouseGroup, 0, 100, 90);
         add(warehouseGroup);
+
+        OptionGroup otherGroup = new OptionGroup("clientOptions.other");
+        new BooleanOption(AUTOLOAD_EMIGRANTS, otherGroup, false);
+        add(otherGroup);
 
     }
 

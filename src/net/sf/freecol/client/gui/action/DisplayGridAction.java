@@ -7,6 +7,7 @@ import java.util.logging.Logger;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.KeyStroke;
 
+import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.client.FreeColClient;
 
 /**
@@ -33,6 +34,7 @@ public class DisplayGridAction extends SelectableAction {
     DisplayGridAction(FreeColClient freeColClient) {
         super(freeColClient, "menuBar.view.displayGrid", null, KeyStroke.getKeyStroke('G', Toolkit.getDefaultToolkit()
                 .getMenuShortcutKeyMask()));
+        setSelected(freeColClient.getClientOptions().getBoolean(ClientOptions.DISPLAY_GRID));
     }
 
     /**

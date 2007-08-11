@@ -83,7 +83,7 @@ public final class MiniMap extends JPanel implements MouseInputListener {
         this.freeColClient = freeColClient;
         this.imageProvider = imageProvider;
 
-        tileSize = 12;
+        tileSize = 4 * (freeColClient.getClientOptions().getInteger(ClientOptions.DEFAULT_MINIMAP_ZOOM) + 1);
 
         addMouseListener(this);
         addMouseMotionListener(this);

@@ -30,6 +30,7 @@ import javax.swing.UIManager;
 
 import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.client.FreeColClient;
+import net.sf.freecol.client.gui.action.SelectableAction;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.Europe;
@@ -186,6 +187,8 @@ public final class GUI {
         
         viewMode = new ViewMode(this);
         logger.warning("Starting in Move Units View Mode");
+
+        displayGrid = freeColClient.getClientOptions().getBoolean(ClientOptions.DISPLAY_GRID);
         
         blinkingMarqueeEnabled = true;
         
