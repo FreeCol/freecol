@@ -126,11 +126,6 @@ public final class DragListener extends MouseAdapter {
                         }
                     }
                     
-                    menuItem = new JMenuItem(Messages.message("leaveTown"));
-                    menuItem.setActionCommand(String.valueOf(UnitLabel.LEAVE_TOWN));
-                    menuItem.addActionListener(unitLabel);
-                    menu.add(menuItem);
-
                     separatorNeeded = true;
                 }
 
@@ -246,6 +241,14 @@ public final class DragListener extends MouseAdapter {
                         }
                         menuItem.setIcon(imageLibrary.getScaledGoodsImageIcon(ImageLibrary.GOODS_CROSSES, 0.66f));
                         menuItem.setActionCommand(String.valueOf(UnitLabel.DRESS));
+                        menuItem.addActionListener(unitLabel);
+                        menu.add(menuItem);
+                        separatorNeeded = true;
+                    }
+
+                    if (tempUnit.getLocation() instanceof WorkLocation) {
+                        menuItem = new JMenuItem(Messages.message("leaveTown"));
+                        menuItem.setActionCommand(String.valueOf(UnitLabel.LEAVE_TOWN));
                         menuItem.addActionListener(unitLabel);
                         menu.add(menuItem);
                         separatorNeeded = true;
