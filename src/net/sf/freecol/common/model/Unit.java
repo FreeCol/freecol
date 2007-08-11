@@ -593,8 +593,25 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
      */
     public int getNeededTurnsOfTraining() {
         // number of turns is 4/6/8 for skill 1/2/3
-        return 2 * (getSkillLevel() + 1);
+        return getNeededTurnsOfTraining(getType());
     }
+
+    /**
+     * Gets the number of turns this unit has to train to educate a student.
+     * This value is only meaningful for units that can be put in a school.
+     * 
+     * @return The turns of training needed to teach its current type to a free
+     *         colonist or to promote an indentured servant or a petty criminal.
+     * @see #getTurnsOfTraining
+     *
+     * @param unitType an <code>int</code> value
+     * @return an <code>int</code> value
+     */
+    public static int getNeededTurnsOfTraining(int unitType) {
+        // number of turns is 4/6/8 for skill 1/2/3
+        return 2 * (getSkillLevel(unitType) + 1);
+    }
+
 
     /**
      * Gets the skill level.
@@ -4527,6 +4544,16 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
 
         if (location != null) {
             location.remove(this);
+        }
+
+        if (teacher != null) {
+            teacher.setStudent(null);
+            teacher = null;
+        }
+
+        if (student != null) {
+            student.setTeacher(null);
+            student = null;
         }
 
         setIndianSettlement(null);
