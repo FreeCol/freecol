@@ -3995,14 +3995,14 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
     }
 
     /**
-     * Train the current unit in the job of the given teacher.
+     * Train the current unit in the job of its teacher.
      * 
      * The type of the unit is updated from petty criminal to indentured
      * servant, from servant to free colonist and then to the teachers type.
      * 
      * @param teacher
      */
-    public void train(Unit teacher) {
+    public void train() {
         String oldName = getName();
 
         if (getType() == PETTY_CRIMINAL) {
