@@ -1475,7 +1475,8 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
                 break;
             default:
                 unit.setType(settlement.getLearnableSkill());
-                settlement.setLearnableSkill(IndianSettlement.NONE);
+                if (!settlement.isCapital())
+                    settlement.setLearnableSkill(IndianSettlement.NONE);
                 // Set the Tile.PlayerExploredTile attribute.
                 settlement.getTile().updateIndianSettlementSkill(player);
                 reply.setAttribute("result", "success");

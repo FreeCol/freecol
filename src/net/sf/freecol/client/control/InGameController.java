@@ -2452,7 +2452,8 @@ public final class InGameController implements NetworkConstants {
                     canvas.showInformationMessage("learnSkill.leave");
                 } else if (result.equals("success")) {
                     unit.setType(skill);
-                    settlement.setLearnableSkill(IndianSettlement.NONE);
+                    if (!settlement.isCapital())
+                        settlement.setLearnableSkill(IndianSettlement.NONE);
                 } else if (result.equals("cancelled")) {
                     // do nothing
                 } else {
