@@ -914,7 +914,7 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
     private int calculateGoodsInput(int goodsInput) {
         if (getGoodsInputType() > -1) {
             int available = colony.getGoodsCount(getGoodsInputType()) +
-                colony.getProductionOf(getGoodsInputType());
+                colony.getProductionNextTurn(getGoodsInputType());
             if (available < goodsInput) {
                 // Not enough goods to do this?
                 goodsInput = available;
@@ -1018,7 +1018,7 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
         int goodsOutput = getMaximumProduction();
 
         if (getGoodsInputType() > -1) {
-            int goodsInput = colony.getGoodsCount(getGoodsInputType()) + colony.getProductionOf(getGoodsInputType());
+            int goodsInput = colony.getGoodsCount(getGoodsInputType()) + colony.getProductionNextTurn(getGoodsInputType());
             if (goodsInput < getMaximumGoodsInput()) {
                 goodsOutput = calculateOutput(goodsInput);
             }

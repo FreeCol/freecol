@@ -1169,6 +1169,23 @@ public final class Colony extends Settlement implements Location, Nameable {
     }
 
     /**
+     * Returns how much of a Good will be produced by this colony this turn
+     * 
+     * @param goodsType The goods' type.
+     * @return The amount of the given goods will be produced for next turn.
+     */
+    public int getProductionNextTurn(int goodsType) {
+        int count = 0;
+        Building building = getBuildingForProducing(goodsType);
+        if (building == null) {
+            count = getProductionOf(goodsType);
+        } else {
+            count = building.getProductionNextTurn();
+        }
+        return count;
+    }
+
+    /**
      * Returns how much of a Good will be produced by this colony this turn,
      * taking into account how much is consumed - by workers, horses, etc.
      * 
@@ -1177,14 +1194,7 @@ public final class Colony extends Settlement implements Location, Nameable {
      *         turn.
      */
     public int getProductionNetOf(int goodsType) {
-        int count = 0;
-        Building building = getBuildingForProducing(goodsType);
-        if (building == null) {
-            count = getProductionOf(goodsType);
-        } else {
-            count = building.getProductionNextTurn();
-        }
-        
+        int count = getProductionNextTurn(goodsType);
         int used = 0;
         switch (goodsType) {
         case Goods.FOOD:
