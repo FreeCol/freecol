@@ -890,16 +890,7 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
      * @see #getProduction
      */
     public int getGoodsInputNextTurn() {
-        int goodsInput = getMaximumGoodsInput();
-        if (getGoodsInputType() > -1) {
-            int available = colony.getGoodsCount(getGoodsInputType()) +
-                colony.getProductionOf(getGoodsInputType());
-            if (available < goodsInput) {
-                // Not enough goods to do this?
-                goodsInput = available;
-            }
-        }
-        return goodsInput;
+        return calculateGoodsInput(getMaximumGoodsInput());
     }
 
     /**
@@ -914,9 +905,13 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
     public int getGoodsInputNextTurn(int goodsOutput) {
         int goodsInput = goodsOutput;
         if (level > SHOP) {
-            goodsInput = (goodsInput * 2) / 3; // Factories don't need the
-                                                // extra 3 units.
+            // Factories don't need the extra 3 units.
+            goodsInput = (goodsInput * 2) / 3; 
         }
+        return calculateGoodsInput(goodsInput);
+    }
+
+    private int calculateGoodsInput(int goodsInput) {
         if (getGoodsInputType() > -1) {
             int available = colony.getGoodsCount(getGoodsInputType()) +
                 colony.getProductionOf(getGoodsInputType());
@@ -1106,18 +1101,12 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
             return 0;
         }
 
-        int totProductivity = 0;
+        int productivity = 0;
         Iterator<Unit> unitIterator = getUnitIterator();
         while (unitIterator.hasNext()) {
-            int productivity = unitIterator.next().getProducedAmount(getGoodsOutputType());
-            if (productivity > 0) {
-                productivity += colony.getProductionBonus();
-                if (productivity < 1)
-                    productivity = 1;
-            }
-            totProductivity += productivity;
+            productivity += getProductivity(unitIterator.next());
         }
-        return totProductivity;
+        return productivity;
     }
 
     /**
