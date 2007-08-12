@@ -1,6 +1,7 @@
 package net.sf.freecol.common.model;
 
 import java.util.Iterator;
+import java.util.List;
 
 import net.sf.freecol.util.test.FreeColTestCase;
 
@@ -11,6 +12,10 @@ public class BuildingTest extends FreeColTestCase {
     public static final String LICENSE = "http://www.gnu.org/licenses/gpl.html";
 
     public static final String REVISION = "$Revision$";
+
+    private static int levels[] = {Building.NOT_BUILT, Building.HOUSE, Building.SHOP, Building.FACTORY};
+
+
 
     public void testCanBuildNext() {
 
@@ -47,8 +52,38 @@ public class BuildingTest extends FreeColTestCase {
         // Check dock -> only possible if not landlocked...
 
     }
+
+    public void testCanAddToBuilding() {
+        
+        Colony colony = getStandardColony(6);
+        List<Unit> units = colony.getUnitList();
+
+        Iterator<Building> buildingIterator = colony.getBuildingIterator();
+        while (buildingIterator.hasNext()) {
+            Building building = buildingIterator.next();
+            // schoolhouse is special, see testCanAddToSchool
+            if (building.getType() == Building.SCHOOLHOUSE) continue;
+            for (int level = 0; level < levels.length; level++) {
+                building.setLevel(level);
+                int maxUnits = building.getMaxUnits();
+                for (int index = 0; index < maxUnits; index++) {
+                    assertTrue("unable to add unit " + index + " to building type " +
+                               building.getType() + " level " + level,
+                               building.canAdd(units.get(index)));
+                    building.add(units.get(index));
+                }
+                assertFalse("able to add unit " + maxUnits + " to building type " +
+                            building.getType() + " level " + level,
+                            building.canAdd(units.get(maxUnits)));
+                for (int index = 0; index < maxUnits; index++) {
+                    building.remove(building.getFirstUnit());
+                }
+            }
+        }
+    }
     
-    public void testCanAdd(){
+    
+    public void testCanAddToSchool(){
         
         Colony colony = getStandardColony(8);
         
@@ -74,56 +109,81 @@ public class BuildingTest extends FreeColTestCase {
         
         Unit elder = units.next();
         elder.setType(Unit.ELDER_STATESMAN);
-        
+
+        Unit carpenter = units.next();
+        carpenter.setType(Unit.MASTER_CARPENTER);
         
         // Check school
         Building school = colony.getBuilding(Building.SCHOOLHOUSE);
-        
-        assertFalse(school.canAdd(colonist));
-        assertFalse(school.canAdd(criminal));
-        assertFalse(school.canAdd(servant));
-        assertFalse(school.canAdd(indian));
-        
-        assertFalse(school.canAdd(farmer));
-        assertFalse(school.canAdd(distiller));
-        assertFalse(school.canAdd(elder));
-        
-        school.setLevel(Building.HOUSE);
-        
-        assertFalse(school.canAdd(colonist));
-        assertFalse(school.canAdd(criminal));
-        assertFalse(school.canAdd(servant));
-        assertFalse(school.canAdd(indian));
-        
-        assertTrue(school.canAdd(farmer));
-        assertFalse(school.canAdd(distiller));
-        assertFalse(school.canAdd(elder));
-        
-        school.setLevel(Building.SHOP);
-        
-        assertFalse(school.canAdd(colonist));
-        assertFalse(school.canAdd(criminal));
-        assertFalse(school.canAdd(servant));
-        assertFalse(school.canAdd(indian));
-        
-        assertTrue(school.canAdd(farmer));
-        assertTrue(school.canAdd(distiller));
-        assertFalse(school.canAdd(elder));
 
-        school.setLevel(Building.FACTORY);
+        for (int level : levels) {
+
+            school.setLevel(level);
         
-        assertFalse(school.canAdd(colonist));
-        assertFalse(school.canAdd(criminal));
-        assertFalse(school.canAdd(servant));
-        assertFalse(school.canAdd(indian));
+            // these can never teach
+            assertFalse("able to add free colonist to school level " + level,
+                        school.canAdd(colonist));
+            assertFalse("able to add petty criminal to school level " + level,
+                        school.canAdd(criminal));
+            assertFalse("able to add indentured servant to school level " + level,
+                        school.canAdd(servant));
+            assertFalse("able to add indian convert to school level " + level,
+                        school.canAdd(indian));
         
-        assertTrue(school.canAdd(farmer));
-        assertTrue(school.canAdd(distiller));
-        assertTrue(school.canAdd(elder));
-        
-        // Check other buildings...
-        
-        
+            switch(level) {
+            case Building.NOT_BUILT:
+                assertFalse("able to add elder statesman to Schoolhouse (not built)",
+                            school.canAdd(elder));
+                assertFalse("able to add master distiller to Schoolhouse (not built)",
+                            school.canAdd(distiller));
+                assertFalse("able to add master farmer to Schoolhouse (not built)",
+                            school.canAdd(farmer));
+                break;
+            case Building.HOUSE:
+                assertFalse("able to add elder statesman to Schoolhouse",
+                            school.canAdd(elder));
+                assertFalse("able to add master distiller to Schoolhouse",
+                            school.canAdd(distiller));
+                assertTrue("unable to add master farmer to Schoolhouse",
+                           school.canAdd(farmer));
+                school.add(farmer);
+                assertFalse("able to add master carpenter to Schoolhouse",
+                            school.canAdd(carpenter));
+                school.remove(farmer);
+                break;
+            case Building.SHOP:
+                assertFalse("able to add elder statesman to College",
+                            school.canAdd(elder));
+                assertTrue("unable to add master distiller to College",
+                           school.canAdd(distiller));
+                school.add(distiller);
+                assertTrue("unable to add master farmer to College",
+                           school.canAdd(farmer));
+                school.add(farmer);
+                assertFalse("able to add master carpenter to College",
+                            school.canAdd(carpenter));
+                school.remove(distiller);
+                school.remove(farmer);
+                break;
+            case Building.FACTORY:
+                assertTrue("unable to add elder statesman to University",
+                           school.canAdd(elder));
+                school.add(elder);
+                assertTrue("unable to add master distiller to University",
+                           school.canAdd(distiller));
+                school.add(distiller);
+                assertTrue("unable to add master farmer to University",
+                           school.canAdd(farmer));
+                school.add(farmer);
+                assertFalse("able to add master carpenter to University",
+                            school.canAdd(carpenter));
+                school.remove(elder);
+                school.remove(distiller);
+                school.remove(farmer);
+                break;
+            }
+        }
     }
-    
+
+
 }
