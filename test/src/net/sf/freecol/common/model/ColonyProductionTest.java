@@ -7,80 +7,80 @@ import net.sf.freecol.util.test.MockModelController;
 
 public class ColonyProductionTest extends TestCase {
 
-	public static Game getStandardGame() {
-		Game game = new Game(new MockModelController());
+    public static Game getStandardGame() {
+        Game game = new Game(new MockModelController());
+        
+        Vector<Player> players = new Vector<Player>();
+        
+        for (int i = 0; i < Player.NUMBER_OF_NATIONS; i++) {
+            Player p = new Player(game, String.valueOf(i), false, i);
+            game.addPlayer(p);
+            players.add(p);
+        }
+        return game;
+    }
 
-		Vector<Player> players = new Vector<Player>();
+    public void testProductionOne() {
 
-		for (int i = 0; i < Player.NUMBER_OF_NATIONS; i++) {
-			Player p = new Player(game, String.valueOf(i), false, i);
-			game.addPlayer(p);
-			players.add(p);
-		}
-		return game;
-	}
+        Game game = getStandardGame();
 
-	public void testProductionOne() {
+        Player dutch = game.getPlayer(Player.DUTCH);
 
-		Game game = getStandardGame();
+        Vector<Vector<Tile>> tiles = new Vector<Vector<Tile>>(10);
 
-		Player dutch = game.getPlayer(Player.DUTCH);
+        for (int x = 0; x < 10; x++) {
+            tiles.add(new Vector<Tile>(15));
+        }
 
-		Vector<Vector<Tile>> tiles = new Vector<Vector<Tile>>(10);
+        for (int x = 0; x < 10; x++) {
+            for (int y = 0; y < 15; y++) {
+                tiles.get(x).add(new Tile(game, Tile.PLAINS, x, y));
+            }
+        }
 
-		for (int x = 0; x < 10; x++) {
-			tiles.add(new Vector<Tile>(15));
-		}
+        Map map = new Map(game, tiles);
 
-		for (int x = 0; x < 10; x++) {
-			for (int y = 0; y < 15; y++) {
-				tiles.get(x).add(new Tile(game, Tile.PLAINS, x, y));
-			}
-		}
+        map.getTile(5, 8).setBonus(true);
+        map.getTile(5, 8).setExploredBy(dutch, true);
+        map.getTile(6, 8).setExploredBy(dutch, true);
+                
+        game.setMap(map);
+                
+        Unit soldier = new Unit(game, map.getTile(6, 8), dutch, Unit.VETERAN_SOLDIER, Unit.ACTIVE,
+                                true, false, 0, false);
+                
+        Colony colony = new Colony(game, dutch, "New Amsterdam", soldier.getTile());
+        soldier.setWorkType(Goods.FOOD);
+        soldier.buildColony(colony);
 
-		Map map = new Map(game, tiles);
+        { // Test the colony
+            assertEquals(map.getTile(6, 8), colony.getTile());
 
-		map.getTile(5, 8).setBonus(true);
-		map.getTile(5, 8).setExploredBy(dutch, true);
-		map.getTile(6, 8).setExploredBy(dutch, true);
-		
-		game.setMap(map);
-		
-		Unit soldier = new Unit(game, map.getTile(6, 8), dutch, Unit.VETERAN_SOLDIER, Unit.ACTIVE,
-			true, false, 0, false);
-		
-		Colony colony = new Colony(game, dutch, "New Amsterdam", soldier.getTile());
-		soldier.setWorkType(Goods.FOOD);
-		soldier.buildColony(colony);
+            assertEquals("New Amsterdam", colony.getLocationName());
 
-		{ // Test the colony
-			assertEquals(map.getTile(6, 8), colony.getTile());
+            assertEquals(colony, colony.getTile().getSettlement());
 
-			assertEquals("New Amsterdam", colony.getLocationName());
+            assertEquals(dutch.getNation(), colony.getTile().getNationOwner());
 
-			assertEquals(colony, colony.getTile().getSettlement());
+            // Should have 50 Muskets and nothing else
+            for (int i = 0; i < Goods.NUMBER_OF_TYPES; i++) {
+                if (Goods.MUSKETS == i)
+                    assertEquals(50, colony.getGoodsCount(i));
+                else
+                    assertEquals(0, colony.getGoodsCount(i));
+            }
+        }
 
-			assertEquals(dutch.getNation(), colony.getTile().getNationOwner());
+        { // Test the state of the soldier
+            // Soldier should be working on the field with the bonus
+            assertEquals(Goods.FOOD, soldier.getWorkType());
 
-			// Should have 50 Muskets and nothing else
-			for (int i = 0; i < Goods.NUMBER_OF_TYPES; i++) {
-				if (Goods.MUSKETS == i)
-					assertEquals(50, colony.getGoodsCount(i));
-				else
-					assertEquals(0, colony.getGoodsCount(i));
-			}
-		}
+            assertEquals(colony.getColonyTile(map.getTile(5,8)), soldier.getLocation());
 
-		{ // Test the state of the soldier
-			// Soldier should be working on the field with the bonus
-			assertEquals(Goods.FOOD, soldier.getWorkType());
+            assertEquals(0, soldier.getMovesLeft());
 
-			assertEquals(colony.getColonyTile(map.getTile(5,8)), soldier.getLocation());
-
-			assertEquals(0, soldier.getMovesLeft());
-
-			assertEquals(false, soldier.isArmed());
-		}
-	}
+            assertEquals(false, soldier.isArmed());
+        }
+    }
 
 }
