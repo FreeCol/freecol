@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.logging.Logger;
 
 import javax.swing.BorderFactory;
+import javax.swing.BoxLayout;
 import javax.swing.ComponentInputMap;
 import javax.swing.ImageIcon;
 import javax.swing.InputMap;
@@ -924,7 +925,8 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener {
          * @param colonyPanel The panel that holds this BuildingsPanel.
          */
         public BuildingsPanel(ColonyPanel colonyPanel) {
-            super(new GridLayout(0, 1));
+            //super(new HIGLayout(new int[] {0}, new int[] {0}));
+            setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
             this.colonyPanel = colonyPanel;
         }
 
@@ -968,7 +970,7 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener {
 
             public final int[] widths = { 160, 140, 90 };
 
-            public final int[] heights = { 60 };
+            public final int[] heights = { 60, 0 };
 
 
             /**
@@ -979,14 +981,24 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener {
             public ASingleBuildingPanel(Building building) {
                 this.building = building;
 
-                removeAll();
                 setBackground(Color.WHITE);
-
+                
                 setLayout(new HIGLayout(widths, heights));
+
+                initialize();
+            }
+
+            public void initialize() {
+
+                removeAll();
 
                 JPanel colonistsInBuildingPanel = new JPanel();
                 colonistsInBuildingPanel.setLayout(new FlowLayout(FlowLayout.LEFT));
                 colonistsInBuildingPanel.setBackground(Color.WHITE);
+
+                JPanel studentPanel = new JPanel();
+                studentPanel.setLayout(new FlowLayout(FlowLayout.LEFT));
+                studentPanel.setBackground(Color.WHITE);
 
                 if (building.getMaxUnits() == 0) {
                     add(new JLabel("(" + building.getName() + ")"), higConst.rc(1, 1));
@@ -1003,10 +1015,20 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener {
                         unitLabel.addMouseListener(pressListener);
                     }
                     colonistsInBuildingPanel.add(unitLabel);
+                    if (building.getType() == Building.SCHOOLHOUSE) {
+                        if (unit.getStudent() != null) {
+                            UnitLabel studentLabel = new UnitLabel(unit.getStudent(), parent, true);
+                            studentLabel.setIgnoreLocation(true);
+                            studentPanel.add(studentLabel);
+                        }
+                    }
                 }
 
                 colonistsInBuildingPanel.setOpaque(false);
                 add(colonistsInBuildingPanel, higConst.rc(1, 2));
+
+                studentPanel.setOpaque(false);
+                add(studentPanel, higConst.rc(2, 2));
 
                 productionLabel = new ProductionLabel(building.getGoodsOutputType(),
                                                       building.getProductionNextTurn(),
@@ -1076,10 +1098,12 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener {
                         return null;
                     }
                 }
-
+                /*
                 ((UnitLabel) comp).setSmall(true);
                 c = ((JPanel) getComponent(1)).add(comp);
                 refresh();
+                */
+                initialize();
                 colonyPanel.updateSoLLabel();
 
                 updateProductionLabel();
@@ -1087,7 +1111,7 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener {
                     ((ASingleBuildingPanel) oldParent.getParent()).updateProductionLabel();
                 }
 
-                return c;
+                return null;
             }
         }
     }
@@ -1214,6 +1238,7 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener {
                     }
 
                     oldParent.remove(comp);
+                    updateBuildingsPanel();
                     updateBuildingBox();
                 } else {
                     logger.warning("An invalid component got dropped on this ColonistsPanel.");
