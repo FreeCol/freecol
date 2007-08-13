@@ -2027,18 +2027,30 @@ public class Player extends FreeColGameObject implements Nameable {
      * @param addToTension The amount to add to the current tension level.
      */
     public void modifyTension(Player player, int addToTension) {
-        modifyTension(player.getNation(), addToTension);
+        modifyTension(player.getNation(), addToTension, null);
     }
 
     public void modifyTension(int nation, int addToTension) {
+        modifyTension(nation, addToTension, null);
+    }
+
+    public void modifyTension(int nation, int addToTension, IndianSettlement origin) {
         if (getNation() == nation || nation == NO_NATION) {
             return;
         }
         tension[nation].modify(addToTension);
+        
+        if (origin != null && isIndian() && origin.getTribe() == nation) {
+                for (Settlement settlement: settlements) {
+                    if (settlement instanceof IndianSettlement && !origin.equals(settlement)) {
+                    ((IndianSettlement) settlement).propagatedAlarm(nation, addToTension);
+                        }
+                }
+        }
     }
 
-    /**
-     * Sets the hostiliy against the given player.
+        /**
+     * Sets the hostility against the given player.
      * 
      * @param player The <code>Player</code>.
      * @param newTension The <code>Tension</code>.
@@ -2278,6 +2290,15 @@ public class Player extends FreeColGameObject implements Nameable {
     public void newTurn() {
 
         int newSoL = 0;
+
+        // reducing tension levels if nation is native
+        if (isIndian()) {
+            for (int i = 0; i < tension.length; i++) {
+                if (tension[i] != null && tension[i].getValue() > 0) {
+                    tension[i].modify( -(4 + tension[i].getValue()/100));
+                }
+            }
+        }
 
         // settlements
         ArrayList<Settlement> settlements = new ArrayList<Settlement>(getSettlements());

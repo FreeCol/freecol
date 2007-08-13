@@ -1739,7 +1739,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
             // versa).
             settlement.getOwner().setStance(enemy, Player.WAR);
             // Increase tension levels:
-            settlement.getOwner().modifyTension(enemy, 500);
+            settlement.modifyAlarm(enemy, 1000); // let propagation works
             enemy.modifyTension(settlement.getOwner(), 500);
             enemy.modifyTension(player, 250);
         }

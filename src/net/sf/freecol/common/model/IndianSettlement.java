@@ -47,7 +47,7 @@ public class IndianSettlement extends Settlement {
     public static final int CITY = 2;
     public static final int LAST_KIND = 2;
 
-
+    public static final int MISSIONARY_TENSION = -3;
     public static final int MAX_CONVERT_DISTANCE = 10;
     public static final int TURNS_PER_TRIBUTE = 5;
 
@@ -286,7 +286,8 @@ public class IndianSettlement extends Settlement {
      */
     public int getTribute(Player player) {
         // increase tension whether we pay or not
-        getOwner().modifyTension(player, Tension.TENSION_ADD_MINOR);
+        // apply tension directly to this settlement and let propagation works
+        modifyAlarm(player, Tension.TENSION_ADD_NORMAL);
 
         int gold = 0;
         if (getGame().getTurn().getNumber() > lastTribute + TURNS_PER_TRIBUTE) {
@@ -327,7 +328,26 @@ public class IndianSettlement extends Settlement {
         }
         // propagate alarm upwards
         if(owner != null) {
-            owner.modifyTension(nation, addToAlarm/2);            
+                if (isCapital())
+                        // capital has a greater impact
+                    owner.modifyTension(nation, addToAlarm, this); 
+                else
+                owner.modifyTension(nation, addToAlarm/2, this);            
+        }
+    }
+
+    /**
+     * Propagates the tension felt towards a given nation 
+     * from the tribe down to each settlement that has already met that nation.
+     * 
+     * @param nation The nation towards whom the alarm is felt.
+     * @param addToAlarm The amount to add to the current alarm level.
+     */
+    public void propagatedAlarm(int nation, int addToAlarm) {
+        Tension tension = alarm[nation];
+        // only applies tension if settlement has met europeans
+        if(tension != null && isVisited) {
+            tension.modify(addToAlarm);            
         }
     }
 
@@ -1043,27 +1063,37 @@ public class IndianSettlement extends Settlement {
                 // Settlement:
                 if (t.getSettlement() != null && t.getSettlement().getOwner().isEuropean()) {
                     extraAlarm[t.getSettlement().getOwner().getNation()] += t.getSettlement().getUnitCount();
-                }                
-            }
-            
-            for (int i=0; i<extraAlarm.length; i++) {
-                Player p = getGame().getPlayer(i);
-                if (p.isEuropean()) {
-                    int d = (p.hasFather(FoundingFather.POCAHONTAS)) ? 2 : 1;
-                    if (p.getNation() == Player.FRENCH) {
-                        d *= 2;
-                    }
-                    modifyAlarm(p, extraAlarm[i] / d);                  
                 }
             }
 
-            /* Decrease alarm slightly: */
-            /*
-            for (int i=0; i<alarm.length; i++) {
-                int newAlarm = 4 + alarm[i].getValue()/100;
-                modifyAlarm(i, -newAlarm);
+            // Missionary helps reducing alarm a bit, here and to the tribe as a whole.
+            // No reduction effect on other settlements (1/4 of this) unless this is capital. 
+            if (missionary != null) {
+                extraAlarm[missionary.getOwner().getNation()] += MISSIONARY_TENSION;
             }
-            */
+
+            for (int i=0; i<extraAlarm.length; i++) {
+                Player p = getGame().getPlayer(i);
+                if (p.isEuropean() && extraAlarm[i] != 0) {
+                    if (extraAlarm[i] > 0) {
+                        int d = (p.hasFather(FoundingFather.POCAHONTAS)) ? 2 : 1;
+                        if (p.getNation() == Player.FRENCH) {
+                            d *= 2;
+                        }
+                        modifyAlarm(p, extraAlarm[i] / d);
+                    } else {
+                        modifyAlarm(p, extraAlarm[i]);
+                    }
+                }
+            }
+
+            /* Decrease alarm slightly - independent from nation level */
+            for (int i=0; i<alarm.length; i++) {
+                if (alarm[i] != null && alarm[i].getValue() > 0) {
+                    int newAlarm = 4 + alarm[i].getValue()/100;
+                    alarm[i].modify(-newAlarm);
+                }
+            }
         }
 
         /* Increase convert progress and generate convert if needed. */

@@ -438,8 +438,9 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
         getOwner().modifyIncomeAfterTaxes(goods.getType(), gold);
 
         if (settlement instanceof IndianSettlement) {
-            int value = ((IndianSettlement) settlement).getPrice(goods) / 1000;
-            settlement.getOwner().modifyTension(getOwner(), -value);
+            IndianSettlement nativeSettlement = ((IndianSettlement) settlement);
+                        int value = nativeSettlement.getPrice(goods) / 1000;
+                        nativeSettlement.modifyAlarm(getOwner(), -value*2);
         }
     }
 
@@ -467,7 +468,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
         settlement.getOwner().modifyGold(gold);
         getOwner().modifyGold(-gold);
 
-        settlement.getOwner().modifyTension(getOwner(), -gold / 100);
+        settlement.modifyAlarm(getOwner(), -gold / 50);
     }
 
     /**
@@ -498,7 +499,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
 
         if (settlement instanceof IndianSettlement) {
             int value = ((IndianSettlement) settlement).getPrice(goods) / 100;
-            settlement.getOwner().modifyTension(getOwner(), -value);
+            ((IndianSettlement)settlement).modifyAlarm(getOwner(), -value*2);
         } else {
             addModelMessage(settlement, "model.unit.gift", new String[][] {
                     { "%player%", getOwner().getNationAsString() }, { "%type%", Goods.getName(goodsType) },
@@ -4070,26 +4071,29 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
         // Increases the enemy's tension levels:
         if (enemy.isAI()) {
             Settlement settlement = enemyUnit.getTile().getSettlement();
-            IndianSettlement homeTown = enemyUnit.getIndianSettlement();
             if (settlement != null) {
-                // we are attacking a settlement
-                if (settlement instanceof IndianSettlement && ((IndianSettlement) settlement).isCapital()) {
-                    enemy.modifyTension(myPlayer, Tension.TENSION_ADD_MAJOR);
-                } else {
-                    enemy.modifyTension(myPlayer, Tension.TENSION_ADD_NORMAL);
-                }
-                if (homeTown != null) {
-                    homeTown.modifyAlarm(myPlayer, Tension.TENSION_ADD_SETTLEMENT_ATTACKED);
+                // we are attacking an indian settlement - let propagation take care of the effects on the tribe
+                if (settlement instanceof IndianSettlement) {
+                        IndianSettlement indianSettlement = (IndianSettlement) settlement;
+                        if (indianSettlement.isCapital()){
+                                indianSettlement.modifyAlarm(myPlayer, Tension.TENSION_ADD_CAPITAL_ATTACKED);
+                        } else {
+                                indianSettlement.modifyAlarm(myPlayer, Tension.TENSION_ADD_SETTLEMENT_ATTACKED);
+                        }
+                } else { // we are attacking an european settlement
+                        enemy.modifyTension(myPlayer, Tension.TENSION_ADD_NORMAL);
                 }
             } else {
                 // we are attacking an enemy unit in the open
-                enemy.modifyTension(myPlayer, Tension.TENSION_ADD_MINOR);
+                // only one effect - at the home town if there's one or directly to the enemy nation
+                IndianSettlement homeTown = enemyUnit.getIndianSettlement();
                 if (homeTown != null) {
                     homeTown.modifyAlarm(myPlayer, Tension.TENSION_ADD_UNIT_DESTROYED);
+                } else {
+                    enemy.modifyTension(myPlayer, Tension.TENSION_ADD_MINOR);
                 }
             }
         }
-
     }
 
     /**
@@ -4294,16 +4298,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
      * @return The potential amount of goods to be manufactured.
      */
     public int getProducedAmount(int goods) {
-        int base = 0;
-
-        base = getProductionUsing(getType(), goods, base);
-
-        if (base == 0) {
-            return 0;
-        }
-
-        // base += getTile().getColony().getProductionBonus();
-        return Math.max(base, 1);
+        return getProductionUsing(getType(), goods, 0);
     }
 
     /**
