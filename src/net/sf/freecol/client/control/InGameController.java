@@ -2218,6 +2218,45 @@ public final class InGameController implements NetworkConstants {
     }
 
     /**
+     * Assigns a unit to a teacher <code>Unit</code>.
+     * 
+     * @param student an <code>Unit</code> value
+     * @param teacher an <code>Unit</code> value
+     */
+    public void assignTeacher(Unit student, Unit teacher) {
+        Player player = freeColClient.getMyPlayer();
+
+        if (freeColClient.getGame().getCurrentPlayer() != player) {
+            freeColClient.getCanvas().showInformationMessage("notYourTurn");
+            return;
+        }
+        if (!student.canBeStudent()) {
+            throw new IllegalStateException("Unit can not be student!");
+        }
+        if (!teacher.getColony().getBuilding(Building.SCHOOLHOUSE).canAddAsTeacher(teacher)) {
+            throw new IllegalStateException("Unit can not be teacher!");
+        }
+        if (student.getOwner() != player) {
+            throw new IllegalStateException("Student is not your unit!");
+        }
+        if (teacher.getOwner() != player) {
+            throw new IllegalStateException("Teacher is not your unit!");
+        }
+        if (student.getColony() != teacher.getColony()) {
+            throw new IllegalStateException("Student and teacher are not in the same colony!");
+        }
+
+        Element assignTeacherElement = Message.createNewRootElement("assignTeacher");
+        assignTeacherElement.setAttribute("student", student.getID());
+        assignTeacherElement.setAttribute("teacher", teacher.getID());
+
+        student.setTeacher(teacher);
+        teacher.setStudent(student);
+
+        freeColClient.getClient().sendAndWait(assignTeacherElement);
+    }
+
+    /**
      * Changes the current construction project of a <code>Colony</code>.
      * 
      * @param colony The <code>Colony</code>

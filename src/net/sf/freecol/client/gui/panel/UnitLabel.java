@@ -286,6 +286,19 @@ public final class UnitLabel extends JLabel implements ActionListener {
     public void actionPerformed(ActionEvent event) {
         String command = event.getActionCommand();
         try {
+            if (command.startsWith("assign")) {
+                Unit teacher = (Unit) unit.getGame().getFreeColGameObject(command.substring(6));
+                inGameController.assignTeacher(unit, teacher);
+                Component uc = getParent();
+                while (uc != null) {
+                    if (uc instanceof ColonyPanel) {
+                        ((ColonyPanel) uc).reinitialize();
+                        break;
+                    }
+                    uc = uc.getParent();
+                }
+                return;
+            }
             int intCommand = Integer.valueOf(command).intValue();
             if (intCommand == ACTIVATE_UNIT) {
                 parent.getGUI().setActiveUnit(unit);

@@ -134,6 +134,25 @@ public final class DragListener extends MouseAdapter {
                     separatorNeeded = false;
                 }
 
+                if (tempUnit.getColony() != null) {
+                    Building schoolhouse = tempUnit.getColony().getBuilding(Building.SCHOOLHOUSE);
+                    for (Unit teacher : schoolhouse.getUnitList()) {
+                        if (tempUnit.canBeStudent() &&
+                            teacher.getStudent() != tempUnit) {
+                            menuItem = new JMenuItem(Messages.message("assignToTeacher"));
+                            menuItem.setActionCommand("assign" + teacher.getID());
+                            menuItem.addActionListener(unitLabel);
+                            menu.add(menuItem);
+                            separatorNeeded = true;
+                        }
+                    }
+                }
+
+                if (separatorNeeded) {
+                    menu.addSeparator();
+                    separatorNeeded = false;
+                }
+
                 if (tempUnit.getColony() != null && !(tempUnit.getLocation() instanceof WorkLocation)) {
                     menuItem = new JMenuItem(Messages.message("activateUnit"));
                     menuItem.setActionCommand(String.valueOf(UnitLabel.ACTIVATE_UNIT));

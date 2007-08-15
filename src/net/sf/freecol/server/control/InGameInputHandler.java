@@ -423,6 +423,11 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
                 return continuePlaying(connection, element);
             }
         });
+        register("assignTeacher", new NetworkRequestHandler() {
+            public Element handle(Connection connection, Element element) {
+                return assignTeacher(connection, element);
+            }
+        });
     }
 
     /**
@@ -2079,6 +2084,38 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         }
         // No reason to send an update to other players: this is always hidden.
         unit.setWorkType(workType);
+        return null;
+    }
+
+    /**
+     * Handles a "assignTeacher"-request from a client.
+     * 
+     * @param connection The connection the message came from.
+     * @param workElement The element containing the request.
+     */
+    private Element assignTeacher(Connection connection, Element workElement) {
+        ServerPlayer player = getFreeColServer().getPlayer(connection);
+        Unit student = (Unit) getGame().getFreeColGameObject(workElement.getAttribute("student"));
+        Unit teacher = (Unit) getGame().getFreeColGameObject(workElement.getAttribute("teacher"));
+
+        if (!student.canBeStudent()) {
+            throw new IllegalStateException("Unit can not be student!");
+        }
+        if (!teacher.getColony().getBuilding(Building.SCHOOLHOUSE).canAddAsTeacher(teacher)) {
+            throw new IllegalStateException("Unit can not be teacher!");
+        }
+        if (student.getOwner() != player) {
+            throw new IllegalStateException("Student is not your unit!");
+        }
+        if (teacher.getOwner() != player) {
+            throw new IllegalStateException("Teacher is not your unit!");
+        }
+        if (student.getColony() != teacher.getColony()) {
+            throw new IllegalStateException("Student and teacher are not in the same colony!");
+        }
+        // No reason to send an update to other players: this is always hidden.
+        student.setTeacher(teacher);
+        teacher.setStudent(student);
         return null;
     }
 
