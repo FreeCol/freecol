@@ -139,7 +139,8 @@ public final class DragListener extends MouseAdapter {
                     for (Unit teacher : schoolhouse.getUnitList()) {
                         if (tempUnit.canBeStudent() &&
                             teacher.getStudent() != tempUnit) {
-                            menuItem = new JMenuItem(Messages.message("assignToTeacher"));
+                            menuItem = new JMenuItem(Messages.message("assignToTeacher"),
+                                                     imageLibrary.getScaledUnitImageIcon(teacher.getType(), 0.5f));
                             menuItem.setActionCommand("assign" + teacher.getID());
                             menuItem.addActionListener(unitLabel);
                             menu.add(menuItem);
