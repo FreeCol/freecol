@@ -2,15 +2,16 @@
 package net.sf.freecol.common.model;
 
 
-import java.util.HashSet;
+import java.util.Hashtable;
 import java.util.Map;
 
 import net.sf.freecol.common.util.Xml;
 
 import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 
-public final class UnitType {
+public final class UnitType implements Abilities {
     public static final  String  COPYRIGHT = "Copyright (C) 2003-2007 The FreeCol Team";
     public static final  String  LICENSE   = "http://www.gnu.org/licenses/gpl.html";
     public static final  String  REVISION  = "$Revision$";
@@ -66,7 +67,11 @@ public final class UnitType {
      * Describe expertProduction here.
      */
     private GoodsType expertProduction;
-    private HashSet<String> abilityArray = new HashSet<String>();    
+
+    /**
+     * Stores the abilities of this Type.
+     */
+    private Hashtable<String, Boolean> abilities = new Hashtable<String, Boolean>();    
 
     /**
      * Get the <code>Id</code> value.
@@ -290,14 +295,28 @@ public final class UnitType {
         else {
             expertProduction = null;
         }
+/*
+        if (Xml.hasAttribute(xml, "abilities")) {
+            String[] array = Xml.attribute(xml, "abilities").split(",");
 
-        String[] array = Xml.attribute(xml, "abilities").split(",");
-        if (array != null)
-        {
-            for (int i = 0; i < array.length; i++) {
-                abilityArray.add(array[i]);
+            if (array != null) {
+                for (int i = 0; i < array.length; i++) {
+                    setAbility(array[i], true);
+                }
             }
         }
+*/
+
+        Xml.Method method = new Xml.Method() {
+                public void invokeOn(Node node) {
+                    if ("ability".equals(node.getNodeName())) {
+                        String abilityId = Xml.attribute(node, "id");
+                        boolean value = Xml.booleanAttribute(node, "value");
+                        setAbility(abilityId, value);
+                    }
+                }
+            };
+        Xml.forEachChild(xml, method);
 
     }
 
@@ -320,8 +339,25 @@ public final class UnitType {
     }
 
 
-    public boolean hasAbility(String abilityName) {
-        return abilityArray.contains(abilityName);
+    /**
+     * Returns true if this Type has the ability with the given ID.
+     *
+     * @param id a <code>String</code> value
+     * @return a <code>boolean</code> value
+     */
+    public boolean hasAbility(String id) {
+        return abilities.containsKey(id) && abilities.get(id);
     }
+
+    /**
+     * Sets the ability to newValue;
+     *
+     * @param id a <code>String</code> value
+     * @param newValue a <code>boolean</code> value
+     */
+    public void setAbility(String id, boolean newValue) {
+        abilities.put(id, newValue);
+    }
+
 
 }

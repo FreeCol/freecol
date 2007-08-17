@@ -194,77 +194,98 @@
      to the Spanish and French nations.
 -->
   <founding-fathers>
-    <founding-father id="model.foundingFather.adamSmith">
+    <founding-father id="model.foundingFather.adamSmith" type="trade"
+                     weight1="2" weight2="8" weight3="6">
       <ability id="model.ability.buildFactory"/>
     </founding-father>
-    <founding-father id="model.foundingFather.jacobFugger">
+    <founding-father id="model.foundingFather.jacobFugger" type="trade"
+                     weight1="0" weight2="5" weight3="8">
       <event id="model.event.boycottsLifted"/>
     </founding-father>
-    <founding-father id="model.foundingFather.peterMinuit">
+    <founding-father id="model.foundingFather.peterMinuit" type="trade"
+                     weight1="9" weight2="1" weight3="1">
 <!-- Player saves 100% percent, i.e. pays nothing. -->
       <ability id="model.ability.landPaymentBonus" value="100"/>
     </founding-father>
-    <founding-father id="model.foundingFather.peterStuyvesant">
+    <founding-father id="model.foundingFather.peterStuyvesant" type="trade"
+                     weight1="2" weight2="4" weight3="8">
       <ability id="model.ability.buildCustomHouse"/>
     </founding-father>
-    <founding-father id="model.foundingFather.janDeWitt">
+    <founding-father id="model.foundingFather.janDeWitt" type="trade"
+                     weight1="2" weight2="6" weight3="10">
       <ability id="model.ability.tradeWithForeignColonies"/>
     </founding-father>
-    <founding-father id="model.foundingFather.ferdinandMagellan">
+    <founding-father id="model.foundingFather.ferdinandMagellan" type="exploration"
+                     weight1="2" weight2="10" weight3="10">
       <ability id="model.ability.navalMovementBonus" value="1"/>
     </founding-father>
-    <founding-father id="model.foundingFather.fransiscoDeCoronado">
+    <founding-father id="model.foundingFather.fransiscoDeCoronado" type="exploration"
+                     weight1="3" weight2="5" weight3="7">
       <ability id="model.ability.seeAllColonies"/>
     </founding-father>
-    <founding-father id="model.foundingFather.hernandoDeSoto">
+    <founding-father id="model.foundingFather.hernandoDeSoto" type="exploration"
+                     weight1="5" weight2="10" weight3="5">
       <ability id="model.ability.lineOfSightBonus" value="2"/>
       <ability id="model.ability.navalLineOfSightBonus" value="2"/>
       <ability id="model.ability.rumoursAlwaysPositive"/>
     </founding-father>
-    <founding-father id="model.foundingFather.henryHudson">
+    <founding-father id="model.foundingFather.henryHudson" type="exploration"
+                     weight1="10" weight2="1" weight3="1">
       <production-bonus goods-type="model.goods.furs" factor="200"/>
     </founding-father>
-    <founding-father id="model.foundingFather.laSalle">
+    <founding-father id="model.foundingFather.laSalle" type="exploration"
+                     weight1="7" weight2="5" weight3="3">
       <event id="model.event.freeBuilding" value="model.building.stockade"/>
       <modify-type id="model.building.stockade">
         <required-goods goods-type="model.goods.hammers" value="0"/>
       </modify-type>
     </founding-father>
-    <founding-father id="model.foundingFather.hernanCortes">
+    <founding-father id="model.foundingFather.hernanCortes" type="military"
+                     weight1="6" weight2="5" weight3="1">
       <ability id="model.ability.nativeTreasureBonus" value="300"/>
       <ability id="model.ability.freeTreasureTransport"/>
     </founding-father>
-    <founding-father id="model.foundingFather.georgeWashington">
+    <founding-father id="model.foundingFather.georgeWashington" type="military"
+                     weight1="0" weight2="4" weight3="10">
       <ability id="model.ability.automaticPromotion"/>
     </founding-father>
-    <founding-father id="model.foundingFather.paulRevere">
+    <founding-father id="model.foundingFather.paulRevere" type="military"
+                     weight1="10" weight2="2" weight3="1">
       <ability id="model.ability.automaticDefense"/>
     </founding-father>
-    <founding-father id="model.foundingFather.francisDrake">
+    <founding-father id="model.foundingFather.francisDrake" type="military"
+                     weight1="4" weight2="8" weight3="6">
       <modify-type id="model.unit.privateer">
         <offense-bonus value="150"/>
       </modify-type>
     </founding-father>
-    <founding-father id="model.foundingFather.johnPaulJones">
+    <founding-father id="model.foundingFather.johnPaulJones" type="military"
+                     weight1="0" weight2="6" weight3="7">
       <unit id="model.unit.frigate"/>
     </founding-father>
-    <founding-father id="model.foundingFather.thomasJefferson">
+    <founding-father id="model.foundingFather.thomasJefferson" type="political"
+                     weight1="4" weight2="5" weight3="6">
       <production-bonus goods-type="model.goods.bells" factor="150"/>
     </founding-father>
-    <founding-father id="model.foundingFather.pocahontas">
+    <founding-father id="model.foundingFather.pocahontas" type="political"
+                     weight1="7" weight2="5" weight3="3">
       <ability id="model.ability.nativeAlarmBonus" value="50"/>
     </founding-father>
-    <founding-father id="model.foundingFather.thomasPaine">
+    <founding-father id="model.foundingFather.thomasPaine" type="political"
+                     weight1="1" weight2="2" weight3="8">
       <production-bonus goods-type="model.goods.bells" factor="%tax%"/>
     </founding-father>
-    <founding-father id="model.foundingFather.simonBolivar">
+    <founding-father id="model.foundingFather.simonBolivar" type="political"
+                     weight1="0" weight2="4" weight3="6">
       <event id="model.event.sonsOfLiberty" value="20"/>
     </founding-father>
-    <founding-father id="model.foundingFather.benjaminFranklin">
+    <founding-father id="model.foundingFather.benjaminFranklin" type="political"
+                     weight1="5" weight2="5" weight3="5">
       <ability id="model.ability.ignoreEuropeanWars"/>
       <ability id="model.ability.alwaysOfferedPeace"/>
     </founding-father>
-    <founding-father id="model.foundingFather.williamBrewster">
+    <founding-father id="model.foundingFather.williamBrewster" type="religious"
+                     weight1="7" weight2="4" weight3="1">
       <modify-type id="model.unit.indenturedServant">
         <ability id="model.ability.recruitable" value="false"/>
       </modify-type>
@@ -272,18 +293,22 @@
         <ability id="model.ability.recruitable" value="false"/>
       </modify-type>
     </founding-father>
-    <founding-father id="model.foundingFather.williamPenn">
+    <founding-father id="model.foundingFather.williamPenn" type="religious"
+                     weight1="8" weight2="5" weight3="2">
       <production-bonus goods-type="model.goods.crosses" factor="150"/>
     </founding-father>
-    <founding-father id="model.foundingFather.fatherJeanDeBrebeuf">
+    <founding-father id="model.foundingFather.fatherJeanDeBrebeuf" type="religious"
+                     weight1="6" weight2="6" weight3="1">
       <modify-type id="model.role.missionary">
         <ability id="model.ability.expertMissionary"/>
       </modify-type>
     </founding-father>
-    <founding-father id="model.foundingFather.juanDeSepulveda">
+    <founding-father id="model.foundingFather.juanDeSepulveda" type="religious"
+                     weight1="3" weight2="8" weight3="3">
       <ability id="model.ability.nativeConvertBonus" value="200"/>
     </founding-father>
-    <founding-father id="model.foundingFather.bartolmeDeLasCasas">
+    <founding-father id="model.foundingFather.bartolmeDeLasCasas" type="religious"
+                     weight1="0" weight2="5" weight3="10">
       <event id="model.event.nativesConvert"/>
     </founding-father>
   </founding-fathers>
