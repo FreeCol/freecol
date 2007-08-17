@@ -213,7 +213,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
         this.owner = owner;
         this.type = type;
         unitType = FreeCol.getSpecification().unitType(type);
-        naval = unitType.hasAbility("naval");
+        naval = unitType.hasAbility("model.ability.navalUnit");
         this.armed = armed;
         this.mounted = mounted;
         this.numberOfTools = numberOfTools;
@@ -581,7 +581,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
      *         otherwise.
      */
     public boolean isColonist() {
-        return unitType.hasAbility("found-colony");
+        return unitType.hasAbility("model.ability.foundColony");
     }
 
     /**
@@ -2262,7 +2262,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
 
         UnitType unitType = FreeCol.getSpecification().unitType(type);
 
-        return unitType.hasAbility("naval") || unitType.hasAbility("carry-goods");
+        return unitType.hasAbility("model.ability.carryGoods");
     }
 
     /**
@@ -2319,7 +2319,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
     public void setType(int type) {
         this.type = type;
         unitType = FreeCol.getSpecification().unitType(type);
-        naval = unitType.hasAbility("naval");
+        naval = unitType.hasAbility("model.ability.naval");
     }
 
     /**
@@ -2664,7 +2664,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
      */
     public boolean isNaval() {
         return naval;
-        // return unitType.hasAbility("naval");
+        // return unitType.hasAbility("model.ability.naval");
     }
 
     /**
@@ -3275,7 +3275,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
      */
     public static boolean isRecruitable(int type) {
 
-        return FreeCol.getSpecification().unitType(type).hasAbility("recruitable");
+        return FreeCol.getSpecification().unitType(type).hasAbility("model.ability.recruitable");
     }
 
     /**
@@ -4105,7 +4105,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
      */
     public boolean canCaptureGoods() {
 
-        return unitType.hasAbility("capture-goods");
+        return unitType.hasAbility("model.ability.captureGoods");
     }
 
     /**
@@ -4717,7 +4717,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
         setName(in.getAttributeValue(null, "name"));
         type = Integer.parseInt(in.getAttributeValue(null, "type"));
         unitType = FreeCol.getSpecification().unitType(type);
-        naval = unitType.hasAbility("naval");
+        naval = unitType.hasAbility("model.ability.navalUnit");
         armed = Boolean.valueOf(in.getAttributeValue(null, "armed")).booleanValue();
         mounted = Boolean.valueOf(in.getAttributeValue(null, "mounted")).booleanValue();
         missionary = Boolean.valueOf(in.getAttributeValue(null, "missionary")).booleanValue();
