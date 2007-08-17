@@ -1344,6 +1344,7 @@ public class Unit extends FreeColGameObject implements Abilities, Locatable, Loc
             if (getOwner().hasFather(FoundingFather.HERNANDO_DE_SOTO)) {
                 line++;
             }
+            return line;
         } else {
             return 1;
         }
