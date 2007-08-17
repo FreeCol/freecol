@@ -1333,12 +1333,17 @@ public class Unit extends FreeColGameObject implements Abilities, Locatable, Loc
     public int getLineOfSight() {
         if (type == REVENGER || type == FLYING_DUTCHMAN) {
             return 3;
-        } else if (isScout() || type == FRIGATE || type == GALLEON || type == MAN_O_WAR || type == PRIVATEER) {
-            // TODO Confirm that in the original game this was not 3 if HERNANDO
-            // DE SOTO was in the congress.
+        } else if (type == FRIGATE || type == GALLEON || type == MAN_O_WAR || type == PRIVATEER) {
             return 2;
-        } else if (getOwner().hasFather(FoundingFather.HERNANDO_DE_SOTO)) {
-            return 2;
+        } else if (!isNaval()) {
+            // Hernado de Soto didn't increase line of sight of naval units in colonization
+            int line = 1;
+            if (isScout()) {
+                line = 2;
+            }
+            if (getOwner().hasFather(FoundingFather.HERNANDO_DE_SOTO)) {
+                line++;
+            }
         } else {
             return 1;
         }
