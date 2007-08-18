@@ -4701,19 +4701,25 @@ public class Unit extends FreeColGameObject implements Abilities, Locatable, Loc
         }
 
         // Do not show enemy units hidden in a carrier:
-        if (hasAbility("model.ability.carryUnits")) {
-            if (getGame().isClientTrusted() || showAll || getOwner().equals(player)
-                    || !getGameOptions().getBoolean(GameOptions.UNIT_HIDING) && player.canSee(getTile())) {
+        if (getGame().isClientTrusted() || showAll || getOwner().equals(player)
+                || !getGameOptions().getBoolean(GameOptions.UNIT_HIDING) && player.canSee(getTile())) {
+            if (hasAbility("model.ability.carryUnits")) {
                 unitContainer.toXML(out, player, showAll, toSavedGame);
+            }
+            if (hasAbility("model.ability.carryGoods")) {
                 goodsContainer.toXML(out, player, showAll, toSavedGame);
-            } else {
+            }
+        } else {
+            if (hasAbility("model.ability.carryGoods")) {
                 out.writeAttribute("visibleGoodsCount", Integer.toString(getGoodsCount()));
-                UnitContainer emptyUnitContainer = new UnitContainer(getGame(), this);
-                emptyUnitContainer.setFakeID(unitContainer.getID());
-                emptyUnitContainer.toXML(out, player, showAll, toSavedGame);
                 GoodsContainer emptyGoodsContainer = new GoodsContainer(getGame(), this);
                 emptyGoodsContainer.setFakeID(goodsContainer.getID());
                 emptyGoodsContainer.toXML(out, player, showAll, toSavedGame);
+            }
+            if (hasAbility("model.ability.carryUnits")) {
+                UnitContainer emptyUnitContainer = new UnitContainer(getGame(), this);
+                emptyUnitContainer.setFakeID(unitContainer.getID());
+                emptyUnitContainer.toXML(out, player, showAll, toSavedGame);
             }
         }
 
@@ -4882,37 +4888,33 @@ public class Unit extends FreeColGameObject implements Abilities, Locatable, Loc
             }
         }
 
-        if (isCarrier()) {
-            while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
-                if (in.getLocalName().equals(UnitContainer.getXMLElementTagName())) {
-                    unitContainer = (UnitContainer) getGame().getFreeColGameObject(in.getAttributeValue(null, "ID"));
-                    if (unitContainer != null) {
-                        unitContainer.readFromXML(in);
-                    } else {
-                        unitContainer = new UnitContainer(getGame(), this, in);
-                    }
-                } else if (in.getLocalName().equals(GoodsContainer.getXMLElementTagName())) {
-                    goodsContainer = (GoodsContainer) getGame().getFreeColGameObject(in.getAttributeValue(null, "ID"));
-                    if (goodsContainer != null) {
-                        goodsContainer.readFromXML(in);
-                    } else {
-                        goodsContainer = new GoodsContainer(getGame(), this, in);
-                    }
-
+        while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
+            if (in.getLocalName().equals(UnitContainer.getXMLElementTagName())) {
+                unitContainer = (UnitContainer) getGame().getFreeColGameObject(in.getAttributeValue(null, "ID"));
+                if (unitContainer != null) {
+                    unitContainer.readFromXML(in);
+                } else {
+                    unitContainer = new UnitContainer(getGame(), this, in);
                 }
-            }
-            if (unitContainer == null) {
-                logger.warning("Carrier did not have a \"unitContainer\"-tag.");
-                unitContainer = new UnitContainer(getGame(), this);
+            } else if (in.getLocalName().equals(GoodsContainer.getXMLElementTagName())) {
+                goodsContainer = (GoodsContainer) getGame().getFreeColGameObject(in.getAttributeValue(null, "ID"));
+                if (goodsContainer != null) {
+                    goodsContainer.readFromXML(in);
+                } else {
+                    goodsContainer = new GoodsContainer(getGame(), this, in);
+                }
 
             }
-            if (goodsContainer == null) {
-                logger.warning("Carrier did not have a \"goodsContainer\"-tag.");
-                goodsContainer = new GoodsContainer(getGame(), this);
+        }
+        
+        if (unitContainer == null && hasAbility("model.ability.carryUnits")) {
+            logger.warning("Carrier did not have a \"unitContainer\"-tag.");
+            unitContainer = new UnitContainer(getGame(), this);
 
-            }
-        } else {
-            in.nextTag();
+        }
+        if (goodsContainer == null && hasAbility("model.ability.carryGoods")) {
+            logger.warning("Carrier did not have a \"goodsContainer\"-tag.");
+            goodsContainer = new GoodsContainer(getGame(), this);
         }
 
         getOwner().invalidateCanSeeTiles();
