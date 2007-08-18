@@ -2205,7 +2205,7 @@ public final class Tile extends FreeColGameObject implements Location, Nameable 
             }
             if (missionary != null) {
                 out.writeStartElement("missionary");
-                missionary.toXML(out, player, false, false);
+                missionary.toXML(out, player, showAll, toSavedGame);
                 out.writeEndElement();
             }
             out.writeEndElement();
