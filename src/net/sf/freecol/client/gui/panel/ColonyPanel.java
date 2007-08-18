@@ -1109,6 +1109,8 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener {
                 updateProductionLabel();
                 if (oldParent.getParent() instanceof ASingleBuildingPanel) {
                     ((ASingleBuildingPanel) oldParent.getParent()).updateProductionLabel();
+                } else if (oldParent instanceof TilePanel.ASingleTilePanel) {
+                    updateBuildingsPanel();
                 }
 
                 return null;
