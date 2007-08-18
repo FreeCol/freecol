@@ -4228,8 +4228,11 @@ public class Unit extends FreeColGameObject implements Abilities, Locatable, Loc
             if (colony.getUnitCount() <= 1) {
                 myPlayer.modifyGold(plunderGold);
                 enemy.modifyGold(-plunderGold);
-                addModelMessage(enemy, "model.unit.colonyBurning", new String[][] { { "%colony%", colony.getName() },
-                        { "%amount%", Integer.toString(plunderGold) } }, ModelMessage.DEFAULT);
+                addModelMessage(enemy, "model.unit.colonyBurning",
+                        new String[][] { { "%colony%", colony.getName() },
+                        { "%amount%", Integer.toString(plunderGold) },
+                        { "%nation%", myPlayer.getNationAsString() },
+                        { "%unit%", getName() } }, ModelMessage.DEFAULT);
                 colony.damageAllShips();
                 colony.dispose();
             } else {
@@ -4240,7 +4243,9 @@ public class Unit extends FreeColGameObject implements Abilities, Locatable, Loc
                 addModelMessage(colony, "model.unit.colonistSlaughtered",
                                 new String[][] {
                                     { "%colony%", colony.getName() },
-                                    { "%unit%", victim.getName() } }, ModelMessage.UNIT_LOST);
+                                    { "%unit%", victim.getName() },
+                                    { "%nation%", myPlayer.getNationAsString() },
+                                    { "%enemyUnit%", getName() } }, ModelMessage.UNIT_LOST);
                 victim.dispose();
             }
         }
