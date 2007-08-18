@@ -62,6 +62,11 @@ public final class UnitType implements Abilities {
      * Describe movement here.
      */
     private int movement;
+    
+    /**
+     * Describe lineOfSight here.
+     */
+    private int lineOfSight;
 
     /**
      * Describe expertProduction here.
@@ -143,6 +148,24 @@ public final class UnitType implements Abilities {
      */
     public void setDefence(final int newDefence) {
         this.defence = newDefence;
+    }
+
+    /**
+     * Get the <code>LineOfSight</code> value.
+     *
+     * @return an <code>int</code> value
+     */
+    public int getLineOfSight() {
+        return lineOfSight;
+    }
+
+    /**
+     * Set the <code>Defence</code> value.
+     *
+     * @param newDefence The new Defence value.
+     */
+    public void setLineOfSight(final int newLineOfSight) {
+        this.lineOfSight = newLineOfSight;
     }
 
     /**
@@ -260,6 +283,7 @@ public final class UnitType implements Abilities {
         offence = Xml.intAttribute(xml, "offence");
         defence = Xml.intAttribute(xml, "defence");
         movement = Xml.intAttribute(xml, "movement");
+        lineOfSight = Xml.intAttribute(xml, "lineOfSight");
 
         if (Xml.hasAttribute(xml, "skill")) {
 

@@ -1331,23 +1331,14 @@ public class Unit extends FreeColGameObject implements Abilities, Locatable, Loc
      * @return The line of sight of this <code>Unit</code>.
      */
     public int getLineOfSight() {
-        if (type == REVENGER || type == FLYING_DUTCHMAN) {
-            return 3;
-        } else if (type == FRIGATE || type == GALLEON || type == MAN_O_WAR || type == PRIVATEER) {
-            return 2;
-        } else if (!isNaval()) {
-            // Hernado de Soto didn't increase line of sight of naval units in colonization
-            int line = 1;
-            if (isScout()) {
-                line = 2;
-            }
-            if (getOwner().hasFather(FoundingFather.HERNANDO_DE_SOTO)) {
-                line++;
-            }
-            return line;
-        } else {
-            return 1;
+        int line = unitType.getLineOfSight();
+        if (isScout()) {
+            line = 2;
         }
+        if (!isNaval() && getOwner().hasFather(FoundingFather.HERNANDO_DE_SOTO)) {
+            line++;
+        }
+        return line;
     }
 
     /**
@@ -4865,6 +4856,9 @@ public class Unit extends FreeColGameObject implements Abilities, Locatable, Loc
 
         final String locationStr = in.getAttributeValue(null, "location");
         if (locationStr != null) {
+            if (location != null) {
+                location.remove(this);
+            }
             location = (Location) getGame().getFreeColGameObject(locationStr);
             if (location == null) {
                 if (locationStr.startsWith(Tile.getXMLElementTagName())) {
