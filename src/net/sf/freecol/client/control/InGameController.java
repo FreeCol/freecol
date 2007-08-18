@@ -383,7 +383,20 @@ public final class InGameController implements NetworkConstants {
                     ore += newTile.potential(Goods.ORE);
                     int tileOwner = newTile.getNationOwner();
                     if (tileOwner == unit.getNation()) {
-                        ownedBySelf = true;
+                        if (newTile.getOwner() != null) {
+                            // we are using newTile
+                            ownedBySelf = true;
+                        } else {
+                            Iterator<Position> ownTileIt = map.getAdjacentIterator(newTile.getPosition());
+                            while (ownTileIt.hasNext()) {
+                                Colony colony = map.getTile(ownTileIt.next()).getColony();
+                                if (colony != null && colony.getOwner() == unit.getOwner()) {
+                                    // newTile can be used from an own colony
+                                    ownedBySelf = true;
+                                    break;
+                                }
+                            }
+                        }
                     } else if (Player.isEuropean(tileOwner)) {
                         ownedByEuropeans = true;
                     } else if (tileOwner != Player.NO_NATION) {
