@@ -39,6 +39,21 @@ public final class UnitType implements Abilities {
     private int defence;
 
     /**
+     * Describe space here.
+     */
+    private int space;
+
+    /**
+     * Describe hitPoints here.
+     */
+    private int hitPoints;
+
+    /**
+     * Describe spaceTaken here.
+     */
+    private int spaceTaken;
+
+    /**
      * Describe hammersRequired here.
      */
     private int hammersRequired;
@@ -160,12 +175,66 @@ public final class UnitType implements Abilities {
     }
 
     /**
-     * Set the <code>Defence</code> value.
+     * Set the <code>LineOfSight</code> value.
      *
-     * @param newDefence The new Defence value.
+     * @param newLineOfSight The new Defence value.
      */
     public void setLineOfSight(final int newLineOfSight) {
         this.lineOfSight = newLineOfSight;
+    }
+
+    /**
+     * Get the <code>Space</code> value.
+     *
+     * @return an <code>int</code> value
+     */
+    public int getSpace() {
+        return space;
+    }
+
+    /**
+     * Set the <code>Space</code> value.
+     *
+     * @param newSpace The new Space value.
+     */
+    public void setSpace(final int newSpace) {
+        this.space = newSpace;
+    }
+
+    /**
+     * Get the <code>HitPoints</code> value.
+     *
+     * @return an <code>int</code> value
+     */
+    public int getHitPoints() {
+        return hitPoints;
+    }
+
+    /**
+     * Set the <code>HitPoints</code> value.
+     *
+     * @param newHitPoints The new HitPoints value.
+     */
+    public void setHitPoints(final int newHitPoints) {
+        this.hitPoints = newHitPoints;
+    }
+
+    /**
+     * Get the <code>SpaceTaken</code> value.
+     *
+     * @return an <code>int</code> value
+     */
+    public int getSpaceTaken() {
+        return spaceTaken;
+    }
+
+    /**
+     * Set the <code>SpaceTaken</code> value.
+     *
+     * @param newSpaceTaken The new SpaceTaken value.
+     */
+    public void setSpaceTaken(final int newSpaceTaken) {
+        this.spaceTaken = newSpaceTaken;
     }
 
     /**
@@ -284,6 +353,17 @@ public final class UnitType implements Abilities {
         defence = Xml.intAttribute(xml, "defence");
         movement = Xml.intAttribute(xml, "movement");
         lineOfSight = Xml.intAttribute(xml, "lineOfSight");
+        if (Xml.hasAttribute(xml, "space")) {
+            space = Xml.intAttribute(xml, "space");
+        }
+        if (Xml.hasAttribute(xml, "hitPoints")) {
+            hitPoints = Xml.intAttribute(xml, "hitPoints");
+        }
+        if (Xml.hasAttribute(xml, "spaceTaken")) {
+            spaceTaken = Xml.intAttribute(xml, "spaceTaken");
+        } else {
+            spaceTaken = 1;
+        }
 
         if (Xml.hasAttribute(xml, "skill")) {
 

@@ -1315,13 +1315,7 @@ public class Unit extends FreeColGameObject implements Abilities, Locatable, Loc
      * @return The space this <code>Unit</code> takes.
      */
     public int getTakeSpace() {
-        if (getType() == TREASURE_TRAIN) {
-            return 6;
-        } else if (isCarrier()) {
-            return 100000; // Not possible to put on a carrier.
-        } else {
-            return 1;
-        }
+        return FreeCol.getSpecification().unitType(type).getSpaceTaken();
     }
 
     /**
@@ -1610,7 +1604,8 @@ public class Unit extends FreeColGameObject implements Abilities, Locatable, Loc
      * @return The result.
      */
     public boolean canAdd(Locatable locatable) {
-        if (locatable instanceof Unit && hasAbility("model.ability.carryUnits")) {
+        if (locatable instanceof Unit && !((Unit) locatable).isCarrier() &&
+                hasAbility("model.ability.carryUnits")) {
             return getSpaceLeft() >= locatable.getTakeSpace();
         } else if (locatable instanceof Goods && hasAbility("model.ability.carryGoods")) {
             Goods g = (Goods) locatable;
@@ -2560,7 +2555,7 @@ public class Unit extends FreeColGameObject implements Abilities, Locatable, Loc
      * @return 6
      */
     public static int getInitialHitpoints(int type) {
-        return 6;
+        return FreeCol.getSpecification().unitType(type).getHitPoints();
     }
 
     /**
@@ -3021,33 +3016,7 @@ public class Unit extends FreeColGameObject implements Abilities, Locatable, Loc
      * @return The amount of units/cargo that this unit can carry.
      */
     public static int getInitialSpaceLeft(int type) {
-        switch (type) {
-        case CARAVEL:
-            return 2;
-        case FRIGATE:
-            // I've got an official reference sheet from Colonization (came with
-            // the game)
-            // that says that the cargo space for a frigate is 2 but I'm almost
-            // 100% sure
-            // that it was 4 in the Colonization version that I used to play.
-            return 4;
-        case GALLEON:
-            return 6;
-        case MAN_O_WAR:
-            return 6;
-        case MERCHANTMAN:
-            return 4;
-        case PRIVATEER:
-            return 2;
-        case WAGON_TRAIN:
-            return 2;
-        case BRAVE:
-            return 1;
-        case FLYING_DUTCHMAN:
-            return 6;
-        default:
-            return 0;
-        }
+        return FreeCol.getSpecification().unitType(type).getSpace();
     }
 
     /**

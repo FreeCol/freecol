@@ -277,7 +277,7 @@
     </unit-type>
     <unit-type name="model.unit.indianConvert"        offence="0"  defence="1" movement="3" lineOfSight="1"               
                skill="0" />
-    <unit-type name="model.unit.brave"                offence="1"  defence="1" movement="3" lineOfSight="1">
+    <unit-type name="model.unit.brave"                offence="1"  defence="1" movement="3" lineOfSight="1" space="1">
       <ability id="model.ability.carryGoods" value="yes"/>
     </unit-type>
     <unit-type name="model.unit.colonialRegular"      offence="3"  defence="3" movement="3" lineOfSight="1">
@@ -286,34 +286,34 @@
     <unit-type name="model.unit.kingsRegular"         offence="4"  defence="4" movement="3" lineOfSight="1">
       <ability id="model.ability.foundColony" value="yes"/>
     </unit-type>
-    <unit-type name="model.unit.caravel"              offence="0"  defence="2"  movement="12" lineOfSight="1" price="1000" hammers="128" tools="40">
+    <unit-type name="model.unit.caravel"              offence="0"  defence="2"  movement="12" lineOfSight="1" space="2" hitPoints="6" price="1000" hammers="128" tools="40">
       <ability id="model.ability.navalUnit" value="yes"/>
       <ability id="model.ability.carryGoods" value="yes"/>
       <ability id="model.ability.carryUnits" value="yes"/>
     </unit-type>
-    <unit-type name="model.unit.frigate"              offence="16" defence="16" movement="18" lineOfSight="2" price="5000" hammers="512" tools="200">
-      <ability id="model.ability.navalUnit" value="yes"/>
-      <ability id="model.ability.carryGoods" value="yes"/>
-      <ability id="model.ability.carryUnits" value="yes"/>
-      <ability id="model.ability.captureGoods" value="yes"/>
-    </unit-type>
-    <unit-type name="model.unit.galleon"              offence="0"  defence="10" movement="18" lineOfSight="2" price="3000" hammers="320" tools="100">
-      <ability id="model.ability.navalUnit" value="yes"/>
-      <ability id="model.ability.carryGoods" value="yes"/>
-      <ability id="model.ability.carryUnits" value="yes"/>
-    </unit-type>
-    <unit-type name="model.unit.manOWar"              offence="24" defence="24" movement="18" lineOfSight="2">
+    <unit-type name="model.unit.frigate"              offence="16" defence="16" movement="18" lineOfSight="2" space="4" hitPoints="6" price="5000" hammers="512" tools="200">
       <ability id="model.ability.navalUnit" value="yes"/>
       <ability id="model.ability.carryGoods" value="yes"/>
       <ability id="model.ability.carryUnits" value="yes"/>
       <ability id="model.ability.captureGoods" value="yes"/>
     </unit-type>
-    <unit-type name="model.unit.merchantman"          offence="0"  defence="6" movement="15" lineOfSight="1" price="2000" hammers="192" tools="80">
+    <unit-type name="model.unit.galleon"              offence="0"  defence="10" movement="18" lineOfSight="2" space="6" hitPoints="6" price="3000" hammers="320" tools="100">
       <ability id="model.ability.navalUnit" value="yes"/>
       <ability id="model.ability.carryGoods" value="yes"/>
       <ability id="model.ability.carryUnits" value="yes"/>
     </unit-type>
-    <unit-type name="model.unit.privateer"            offence="8"  defence="8" movement="24" lineOfSight="2" price="2000" hammers="256" tools="120">
+    <unit-type name="model.unit.manOWar"              offence="24" defence="24" movement="18" lineOfSight="2" space="6" hitPoints="6">
+      <ability id="model.ability.navalUnit" value="yes"/>
+      <ability id="model.ability.carryGoods" value="yes"/>
+      <ability id="model.ability.carryUnits" value="yes"/>
+      <ability id="model.ability.captureGoods" value="yes"/>
+    </unit-type>
+    <unit-type name="model.unit.merchantman"          offence="0"  defence="6" movement="15" lineOfSight="1" space="4" hitPoints="6" price="2000" hammers="192" tools="80">
+      <ability id="model.ability.navalUnit" value="yes"/>
+      <ability id="model.ability.carryGoods" value="yes"/>
+      <ability id="model.ability.carryUnits" value="yes"/>
+    </unit-type>
+    <unit-type name="model.unit.privateer"            offence="8"  defence="8" movement="24" lineOfSight="2" space="2" hitPoints="6" price="2000" hammers="256" tools="120">
       <ability id="model.ability.navalUnit" value="yes"/>
       <ability id="model.ability.carryGoods" value="yes"/>
       <ability id="model.ability.carryUnits" value="yes"/>
@@ -321,15 +321,15 @@
     </unit-type>
     <unit-type name="model.unit.artillery"            offence="7"  defence="5" movement="3" lineOfSight="1" hammers="192" tools="40" />
     <unit-type name="model.unit.damagedArtillery"     offence="5"  defence="3" movement="3" lineOfSight="1"                        />
-    <unit-type name="model.unit.treasureTrain"        offence="0"  defence="0" movement="3" lineOfSight="1"                        />
-    <unit-type name="model.unit.wagonTrain"           offence="0"  defence="1" movement="6" lineOfSight="1" hammers="40" tools="0">
+    <unit-type name="model.unit.treasureTrain"        offence="0"  defence="0" movement="3" lineOfSight="1" spaceTaken="6"         />
+    <unit-type name="model.unit.wagonTrain"           offence="0"  defence="1" movement="6" lineOfSight="1" space="2" hammers="40" tools="0">
       <ability id="model.ability.carryGoods" value="yes"/>
     </unit-type>
     <unit-type name="model.unit.milkmaid"             offence="0"  defence="1" movement="3"  lineOfSight="1"         expert-production="food">
       <ability id="model.ability.foundColony" value="yes"/>
     </unit-type>
     <unit-type name="model.unit.revenger"             offence="666"  defence="666" movement="18" lineOfSight="3" />
-    <unit-type name="model.unit.flyingDutchman"       offence="666"  defence="666" movement="36" lineOfSight="3">
+    <unit-type name="model.unit.flyingDutchman"       offence="666"  defence="666" movement="36" lineOfSight="3" space="6" hitPoints="6">
       <ability id="model.ability.navalUnit" value="yes"/>
       <ability id="model.ability.carryGoods" value="yes"/>
       <ability id="model.ability.carryUnits" value="yes"/>
