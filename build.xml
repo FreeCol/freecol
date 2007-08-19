@@ -121,7 +121,7 @@
             basedir="${freecol.build.dir}"
             manifest="${basedir}/src/MANIFEST.MF"
             includes="net/**, org/**"
-            excludes="**/CVS/**, **/metaserver/**"
+            excludes="**/.svn/**, **/metaserver/**"
         />
     </target>
 
@@ -132,7 +132,7 @@
             basedir="${freecol.build.dir}"
             manifest="${basedir}/src/MANIFEST.MF"
             includes="net/**, org/**"
-            excludes="**/CVS/**"
+            excludes="**/.svn/**"
         />
     </target>
 
@@ -174,7 +174,7 @@
     </target>
 
     <target name="setReleaseVersion" unless="freecol.version">
-        <input message="Please specify the release version (default: cvs-${DSTAMP}): " addproperty="freecol.version" defaultvalue="cvs-${DSTAMP}" />
+        <input message="Please specify the release version (default: svn-${DSTAMP}): " addproperty="freecol.version" defaultvalue="svn-${DSTAMP}" />
         <property name="freecol.release.name" value="${freecol.name}-${freecol.version}"/>  
         <echo message="Creating Distribution of ${freecol.release.name}"/>
         <replaceregexp file="${freecol.src.dir}/net/sf/freecol/FreeCol.java"
@@ -201,8 +201,8 @@
             <fileset dir="${freecol.packaging.dir}/common" includes="README"/>
             <fileset dir="${freecol.packaging.dir}/common" includes="freecol"/>
             <fileset dir="${freecol.packaging.dir}/common" includes="freecol.xpm"/>
-            <fileset dir="${basedir}" includes="data/**" excludes="**/CVS/**"/>
-            <fileset dir="${basedir}" includes="jars/**" excludes="**/CVS/**"/>
+            <fileset dir="${basedir}" includes="data/**" excludes="**/.svn/**"/>
+            <fileset dir="${basedir}" includes="jars/**" excludes="**/.svn/**"/>
         </copy>
     </target>
 
@@ -210,7 +210,7 @@
         <antcall target="clean"/>
         <mkdir dir="${freecol.release.dir}/source/${freecol.name}"/>
         <copy todir="${freecol.release.dir}/source/${freecol.name}">
-            <fileset dir="${basedir}" excludes="**/CVS/**,dist/**,data/**,jars/**"/>
+            <fileset dir="${basedir}" excludes="**/.svn/**,dist/**,data/**,jars/**"/>
         </copy>
     </target>
 
