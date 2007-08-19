@@ -41,7 +41,7 @@ public class FoundingFather implements Abilities {
                             JACOB_FUGGER = 1,
                             PETER_MINUIT = 2,
                             PETER_STUYVESANT = 3, 
-                            JAN_DE_WITT = 4, //TODO
+                            JAN_DE_WITT = 4,
                             FERDINAND_MAGELLAN = 5,
                             FRANCISCO_DE_CORONADO = 6,
                             HERNANDO_DE_SOTO = 7,
@@ -60,7 +60,7 @@ public class FoundingFather implements Abilities {
                             WILLIAM_BREWSTER = 20,
                             WILLIAM_PENN = 21,
                             FATHER_JEAN_DE_BREBEUF = 22,
-                            JUAN_DE_SEPULVEDA = 23,//TODO
+                            JUAN_DE_SEPULVEDA = 23,
                             BARTOLOME_DE_LAS_CASAS = 24,
 
                             FATHER_COUNT = 25;
@@ -195,8 +195,7 @@ public class FoundingFather implements Abilities {
 
     public static int getWeight(int foundingFather, int age) {
         // This is the list of the founding fathers without effects:
-        if (foundingFather == BENJAMIN_FRANKLIN ||
-            foundingFather == JUAN_DE_SEPULVEDA) {
+        if (foundingFather == BENJAMIN_FRANKLIN) {
             return 0;
         }
         if (age == 1) {
