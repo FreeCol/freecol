@@ -1,5 +1,6 @@
 package net.sf.freecol.common;
 
+import net.sf.freecol.common.model.FoundingFather;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.UnitType;
 
@@ -19,7 +20,7 @@ public final class SpecificationTest extends TestCase {
     /**
      * Test for some typical abilities.
      */
-    public void testAbilities() {
+    public void testUnitAbilities() {
         Specification spec = new Specification();
 
         UnitType colonist = spec.unitType(Unit.FREE_COLONIST);
@@ -63,4 +64,27 @@ public final class SpecificationTest extends TestCase {
         assertTrue(privateer.hasAbility("model.ability.captureGoods"));
 
     }
+
+    public void testFoundingFathers() {
+
+        Specification spec = new Specification();
+
+        FoundingFather smith = spec.getFoundingFather("model.foundingFather.adamSmith");
+        assertFalse(smith == null);
+        assertTrue(smith.getType() == FoundingFather.TRADE);
+        // weight is some value in [0, 10]
+        assertTrue(smith.getWeight(1) >= 0);
+        assertTrue(smith.getWeight(2) >= 0);
+        assertTrue(smith.getWeight(3) >= 0);
+        assertTrue(smith.getWeight(1) <= 10);
+        assertTrue(smith.getWeight(2) <= 10);
+        assertTrue(smith.getWeight(3) <= 10);
+        // weight 3 is the default
+        assertTrue(smith.getWeight(3) == smith.getWeight(0));
+        assertTrue(smith.getWeight(3) == smith.getWeight(34));
+        // check for ability
+        assertTrue(smith.hasAbility("model.ability.buildFactory"));
+    }
+
+
 }

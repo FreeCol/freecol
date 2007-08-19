@@ -2260,7 +2260,8 @@ public class Unit extends FreeColGameObject implements Abilities, Locatable, Loc
 
         UnitType unitType = FreeCol.getSpecification().unitType(type);
 
-        return unitType.hasAbility("model.ability.carryGoods");
+        return unitType.hasAbility("model.ability.carryGoods") ||
+            unitType.hasAbility("model.ability.carryUnits");
     }
 
     /**

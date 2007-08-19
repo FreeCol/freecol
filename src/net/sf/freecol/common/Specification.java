@@ -3,10 +3,12 @@ package net.sf.freecol.common;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 
 import net.sf.freecol.common.model.BuildingType;
+import net.sf.freecol.common.model.FoundingFather;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.TileType;
 import net.sf.freecol.common.model.UnitType;
@@ -36,6 +38,7 @@ public final class Specification {
 
     private final List<UnitType> unitTypeList;
 
+    private final Hashtable<String, FoundingFather> foundingFathers;
 
     public Specification() {
 
@@ -43,6 +46,7 @@ public final class Specification {
         tileTypeList = new ArrayList<TileType>();
         goodsTypeList = new ArrayList<GoodsType>();
         unitTypeList = new ArrayList<UnitType>();
+        foundingFathers = new Hashtable<String, FoundingFather>();
 
         InputStream in = Specification.class.getResourceAsStream("specification.xml");
         Document specificationDocument = Xml.documentFrom(in);
@@ -102,6 +106,17 @@ public final class Specification {
                     };
 
                     unitTypeList.addAll(makeListFromXml(xml, factory));
+                } else if ("founding-fathers".equals(childName)) {
+
+                    Xml.Method method = new Xml.Method() {
+                            public void invokeOn(Node xml) {
+                                FoundingFather foundingFather = new FoundingFather();
+                                foundingFather.readFromXmlElement(xml, goodsTypeByRef);
+                                foundingFathers.put(foundingFather.getId(), foundingFather);
+                            }
+                        };
+                    Xml.forEachChild(xml, method);
+
                 } else {
                     throw new RuntimeException("unexpected: " + xml);
                 }
@@ -164,6 +179,10 @@ public final class Specification {
     public UnitType unitType(int unitTypeIndex) {
 
         return unitTypeList.get(unitTypeIndex);
+    }
+
+    public FoundingFather getFoundingFather(String id) {
+        return foundingFathers.get(id);
     }
 
     /**

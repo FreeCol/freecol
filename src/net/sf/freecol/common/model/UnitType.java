@@ -319,17 +319,6 @@ public final class UnitType implements Abilities {
         else {
             expertProduction = null;
         }
-/*
-        if (Xml.hasAttribute(xml, "abilities")) {
-            String[] array = Xml.attribute(xml, "abilities").split(",");
-
-            if (array != null) {
-                for (int i = 0; i < array.length; i++) {
-                    setAbility(array[i], true);
-                }
-            }
-        }
-*/
 
         Xml.Method method = new Xml.Method() {
                 public void invokeOn(Node node) {
@@ -364,7 +353,7 @@ public final class UnitType implements Abilities {
 
 
     /**
-     * Returns true if this Type has the ability with the given ID.
+     * Returns true if this UnitType has the ability with the given ID.
      *
      * @param id a <code>String</code> value
      * @return a <code>boolean</code> value
