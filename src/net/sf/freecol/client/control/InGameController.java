@@ -478,7 +478,7 @@ public final class InGameController implements NetworkConstants {
             unit.buildColony(colony);
             
             for(Unit unitInTile : tile.getUnitList()) {
-                if (unitInTile.getType() == Unit.TREASURE_TRAIN) {
+                if (unitInTile.canCarryTreasure()) {
                     checkCashInTreasureTrain(unitInTile);
                 }
             }
@@ -717,7 +717,7 @@ public final class InGameController implements NetworkConstants {
 
         // Display a "cash in"-dialog if a treasure train have been
         // moved into a coastal colony:
-        if (unit.getType() == Unit.TREASURE_TRAIN && checkCashInTreasureTrain(unit)) {
+        if (unit.canCarryTreasure() && checkCashInTreasureTrain(unit)) {
             unit = null;
         }
 
@@ -958,7 +958,7 @@ public final class InGameController implements NetworkConstants {
 
         // Display a "cash in"-dialog if a treasure train have been moved into a
         // colony:
-        if (unit.getType() == Unit.TREASURE_TRAIN) {
+        if (unit.canCarryTreasure()) {
             checkCashInTreasureTrain(unit);
             if (unit.isDisposed()) {
                 nextActiveUnit();
@@ -1704,7 +1704,7 @@ public final class InGameController implements NetworkConstants {
                                                 ModelMessage.UNIT_ADDED);
             }
             
-            if (defender.getType() == Unit.TREASURE_TRAIN && result >= Unit.ATTACK_WIN) {
+            if (defender.canCarryTreasure() && result >= Unit.ATTACK_WIN) {
                 checkCashInTreasureTrain(defender);
             }
                 

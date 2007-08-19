@@ -300,7 +300,7 @@ public final class Tile extends FreeColGameObject implements Location, Nameable 
         Iterator<Unit> ui = getUnitIterator();
         while (ui.hasNext()) {
             Unit u = ui.next();
-            if (u.getType() == Unit.TREASURE_TRAIN) {
+            if (u.canCarryTreasure()) {
                 amount += u.getTreasureAmount();
             }
         }
@@ -321,7 +321,7 @@ public final class Tile extends FreeColGameObject implements Location, Nameable 
         Iterator<Unit> ui = getUnitIterator();
         while (ui.hasNext()) {
             Unit u = ui.next();
-            if (u.getType() == Unit.TREASURE_TRAIN
+            if (u.canCarryTreasure()
                     && (bestTreasureTrain == null || bestTreasureTrain.getTreasureAmount() < u.getTreasureAmount())) {
                 bestTreasureTrain = u;
             }

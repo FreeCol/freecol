@@ -514,7 +514,7 @@ public final class InfoPanel extends FreeColPanel {
                 if (unit.isPioneer()) {
                     unitToolsLabel.setText(String.valueOf(unit.getNumberOfTools()));
                     unitCargoPanel.add(unitToolsLabel, higConst.rc(1, 1));
-                } else if (unit.getType() == Unit.TREASURE_TRAIN) {
+                } else if (unit.canCarryTreasure()) {
                     goldLabel.setText(unit.getTreasureAmount() + " " + Messages.message("gold"));
                     unitCargoPanel.add(goldLabel, higConst.rc(1, 1));
                 } else if (unit.isCarrier()) {

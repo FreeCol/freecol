@@ -321,7 +321,9 @@
     </unit-type>
     <unit-type name="model.unit.artillery"            offence="7"  defence="5" movement="3" lineOfSight="1" hammers="192" tools="40" />
     <unit-type name="model.unit.damagedArtillery"     offence="5"  defence="3" movement="3" lineOfSight="1"                        />
-    <unit-type name="model.unit.treasureTrain"        offence="0"  defence="0" movement="3" lineOfSight="1" spaceTaken="6"         />
+    <unit-type name="model.unit.treasureTrain"        offence="0"  defence="0" movement="3" lineOfSight="1" spaceTaken="6">
+      <ability id="model.ability.carryTreasure" value="yes"/>
+    </unit-type>
     <unit-type name="model.unit.wagonTrain"           offence="0"  defence="1" movement="6" lineOfSight="1" space="2" hammers="40" tools="0">
       <ability id="model.ability.carryGoods" value="yes"/>
     </unit-type>

@@ -203,7 +203,7 @@ public abstract class Mission extends AIObject {
                     if (unit.getIndianSettlement() != null) {
                         tension += unit.getIndianSettlement().getAlarm(newTile.getDefendingUnit(unit).getOwner()).getValue();
                     }
-                    if (newTile.getDefendingUnit(unit).getType() == Unit.TREASURE_TRAIN) {
+                    if (newTile.getDefendingUnit(unit).canCarryTreasure()) {
                         tension += Math.min(newTile.getDefendingUnit(unit).getTreasureAmount() / 10, 600);
                     }
                     if (newTile.getDefendingUnit(unit).getType() == Unit.ARTILLERY && newTile.getSettlement() == null) {

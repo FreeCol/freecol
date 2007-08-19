@@ -294,11 +294,10 @@ public class Unit extends FreeColGameObject implements Abilities, Locatable, Loc
      * @return The amount of treasure.
      */
     public int getTreasureAmount() {
-        // TODO: TreasureTrain should subclass if method is illegal for Unit!
-        if (getType() == TREASURE_TRAIN) {
+        if (canCarryTreasure()) {
             return treasureAmount;
         }
-        throw new IllegalStateException("Only treasure trains have treasure");
+        throw new IllegalStateException("Unit can't carry treasure");
     }
 
     /**
@@ -308,11 +307,10 @@ public class Unit extends FreeColGameObject implements Abilities, Locatable, Loc
      * @param amt The amount of treasure
      */
     public void setTreasureAmount(int amt) {
-        // TODO: TreasureTrain should subclass if method is illegal for Unit!
-        if (getType() == TREASURE_TRAIN) {
+        if (canCarryTreasure()) {
             this.treasureAmount = amt;
         } else {
-            throw new IllegalStateException("Only treasure trains have treasure");
+            throw new IllegalStateException("Unit can't carry treasure");
         }
     }
 
@@ -528,8 +526,8 @@ public class Unit extends FreeColGameObject implements Abilities, Locatable, Loc
      * @exception IllegalStateException if this unit is not a treasure train.
      */
     public boolean canCashInTreasureTrain(Location loc) {
-        if (getType() != TREASURE_TRAIN) {
-            throw new IllegalStateException("Not a treasure train");
+        if (!canCarryTreasure()) {
+            throw new IllegalStateException("Can't carry treasure");
         }
         if (getOwner().getEurope() != null) {
             return (loc.getColony() != null && !loc.getColony().isLandLocked()) || loc instanceof Europe
@@ -546,8 +544,8 @@ public class Unit extends FreeColGameObject implements Abilities, Locatable, Loc
      *                if it cannot be cashed in at it's current location.
      */
     public void cashInTreasureTrain() {
-        if (getType() != TREASURE_TRAIN) {
-            throw new IllegalStateException("Not a treasure train");
+        if (!canCarryTreasure()) {
+            throw new IllegalStateException("Can't carry a treasure");
         }
 
         if (canCashInTreasureTrain()) {
@@ -2395,8 +2393,8 @@ public class Unit extends FreeColGameObject implements Abilities, Locatable, Loc
             } else {
                 return (Messages.message("model.unit.missionary") + " (" + getName(getType()) + ")");
             }
-        } else if (getType() == TREASURE_TRAIN) {
-            return getName(TREASURE_TRAIN) + " (" + getTreasureAmount() + " " + Messages.message("gold") + ")";
+        } else if (canCarryTreasure()) {
+            return getName(getType()) + " (" + getTreasureAmount() + " " + Messages.message("gold") + ")";
         } else if (isPioneer()) {
             if (getType() == HARDY_PIONEER) {
                 return getName(getType());
@@ -3066,12 +3064,10 @@ public class Unit extends FreeColGameObject implements Abilities, Locatable, Loc
                                     new String[][] {
                                         {"%europe%", getOwner().getEurope().getName()}},
                                     ModelMessage.DEFAULT, this);
-                    if (getType() == GALLEON) {
-                        Iterator<Unit> iter = getUnitIterator();
-                        Unit u = null;
-                        while (iter.hasNext() && (u = iter.next()) != null && u.getType() != TREASURE_TRAIN)
-                            ;
-                        if (u != null && u.getType() == TREASURE_TRAIN) {
+                    Iterator<Unit> iter = getUnitIterator();
+                    while (iter.hasNext()) {
+                        Unit u = iter.next();
+                        if (u.canCarryTreasure()) {
                             u.cashInTreasureTrain();
                         }
                     }
@@ -4062,6 +4058,17 @@ public class Unit extends FreeColGameObject implements Abilities, Locatable, Loc
                 }
             }
         }
+    }
+
+    /**
+     * Returns true if this unit can carry treasure (like a treasure train)
+     * 
+     * @return <code>true</code> if this <code>Unit</code> is capable of
+     *         carrying treasure.
+     */
+    public boolean canCarryTreasure() {
+
+        return unitType.hasAbility("model.ability.carryTreasure");
     }
 
     /**
