@@ -378,8 +378,14 @@
     </founding-father>
     <founding-father id="model.foundingFather.hernandoDeSoto" type="exploration"
                      weight1="5" weight2="10" weight3="5">
-      <ability id="model.ability.lineOfSightBonus" value="yes"/>
-      <ability id="model.ability.navalLineOfSightBonus" value="yes"/>
+      <modify-type>
+        <requirements>
+          <required-ability id="model.ability.navalUnit" value="no"/>
+        </requirements>
+        <modifications>
+          <attribute id="lineOfSight" value="2"/>
+        </modifications>
+      </modify-type>
       <ability id="model.ability.rumoursAlwaysPositive" value="yes"/>
     </founding-father>
     <founding-father id="model.foundingFather.henryHudson" type="exploration"
@@ -389,8 +395,13 @@
     <founding-father id="model.foundingFather.laSalle" type="exploration"
                      weight1="7" weight2="5" weight3="3">
       <event id="model.event.freeBuilding" value="model.building.stockade"/>
-      <modify-type id="model.building.stockade">
-        <required-goods goods-type="model.goods.hammers" value="0"/>
+      <modify-type>
+        <requirements>
+          <required-id id="model.building.stockade"/>
+        </requirements>
+        <modifications>
+          <required-goods goods-type="model.goods.hammers" value="0"/>
+        </modifications>
       </modify-type>
     </founding-father>
     <founding-father id="model.foundingFather.hernanCortes" type="military"
@@ -408,8 +419,13 @@
     </founding-father>
     <founding-father id="model.foundingFather.francisDrake" type="military"
                      weight1="4" weight2="8" weight3="6">
-      <modify-type id="model.unit.privateer">
-        <offense-bonus value="150"/>
+      <modify-type>
+        <requirements>
+          <required-id id="model.unit.privateer"/>
+        </requirements>
+        <modifications>
+          <offense-bonus value="150"/>
+        </modifications>
       </modify-type>
     </founding-father>
     <founding-father id="model.foundingFather.johnPaulJones" type="military"
@@ -439,11 +455,21 @@
     </founding-father>
     <founding-father id="model.foundingFather.williamBrewster" type="religious"
                      weight1="7" weight2="4" weight3="1">
-      <modify-type id="model.unit.indenturedServant">
-        <ability id="model.ability.recruitable" value="false"/>
+      <modify-type>
+        <requirements>
+          <required-id id="model.unit.indenturedServant"/>
+        </requirements>
+        <modifications>
+          <ability id="model.ability.recruitable" value="no"/>
+        </modifications>
       </modify-type>
-      <modify-type id="model.unit.pettyCriminal">
-        <ability id="model.ability.recruitable" value="false"/>
+      <modify-type>
+        <requirements>
+          <required-id id="model.unit.pettyCriminal"/>
+        </requirements>
+        <modifications>
+          <ability id="model.ability.recruitable" value="no"/>
+        </modifications>
       </modify-type>
     </founding-father>
     <founding-father id="model.foundingFather.williamPenn" type="religious"
@@ -452,8 +478,13 @@
     </founding-father>
     <founding-father id="model.foundingFather.fatherJeanDeBrebeuf" type="religious"
                      weight1="6" weight2="6" weight3="1">
-      <modify-type id="model.role.missionary">
-        <ability id="model.ability.expertMissionary" value="yes"/>
+      <modify-type>
+        <requirements>
+          <required-id id="model.role.missionary"/>
+        </requirements>
+        <modifications>
+          <ability id="model.ability.expertMissionary" value="yes"/>
+        </modifications>
       </modify-type>
     </founding-father>
     <founding-father id="model.foundingFather.juanDeSepulveda" type="religious"
