@@ -446,8 +446,7 @@ public class SchoolTest extends FreeColTestCase {
 
         teacher.setLocation(school);
 
-        // It takes two turns longer to train a petty criminal by a master than
-        // by an expert!
+        assertEquals(teacher.getNeededTurnsOfTraining(), 4);
         trainForTurns(colony, teacher.getNeededTurnsOfTraining(), Unit.PETTY_CRIMINAL);
         assertEquals(Unit.INDENTURED_SERVANT, criminal.getType());
     }
@@ -472,6 +471,7 @@ public class SchoolTest extends FreeColTestCase {
         school.setLevel(Building.SHOP);
 
         teacher.setLocation(school);
+        assertEquals(teacher.getNeededTurnsOfTraining(), 4);
         trainForTurns(colony, teacher.getNeededTurnsOfTraining(), Unit.INDENTURED_SERVANT);
         // Train to become free colonist
         assertEquals(Unit.FREE_COLONIST, indenturedServant.getType());

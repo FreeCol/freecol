@@ -592,6 +592,10 @@ public class Unit extends FreeColGameObject implements Abilities, Locatable, Loc
      */
     public int getNeededTurnsOfTraining() {
         // number of turns is 4/6/8 for skill 1/2/3
+        if (student != null && (student.getType() == PETTY_CRIMINAL ||
+                                student.getType() == INDENTURED_SERVANT)) {
+            return 4;
+        }
         return getNeededTurnsOfTraining(getType());
     }
 
