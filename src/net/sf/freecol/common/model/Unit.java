@@ -4837,6 +4837,7 @@ public class Unit extends FreeColGameObject implements Abilities, Locatable, Loc
 
         final String locationStr = in.getAttributeValue(null, "location");
         if (locationStr != null) {
+            // TODO: Fix properly bug #1755566 and remove this
             if (location != null) {
                 location.remove(this);
             }
