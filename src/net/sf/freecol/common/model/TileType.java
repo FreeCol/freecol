@@ -1,5 +1,6 @@
 package net.sf.freecol.common.model;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
@@ -33,10 +34,10 @@ public final class TileType
     public final int attackFactor;
     public final int defenceFactor;
     
-    public final int[2] humidity;
-    public final int[2] temperature;
-    public final int[2] altitude;
-    public final int[2] latitude
+    public final int[] humidity;
+    public final int[] temperature;
+    public final int[] altitude;
+    public final int[] latitude;
 
     private List<GoodsType> producedType;
     private List<Integer> producedAmount;
@@ -121,7 +122,7 @@ public final class TileType
     }
 
     public ResourceType getRandomResourceType() {
-        int size = resourceType.size()
+        int size = resourceType.size();
         if (size <= 0) {
             return null;
         }
@@ -131,7 +132,7 @@ public final class TileType
             totalProb += resourceProbability;
             prob[i] = totalProb;
         }
-        Random rand = new Random;
+        Random rand = new Random();
         int decision = rand.nextInt(totalProb);
         for (i = 0; i < size; i++) {
             if (decision <= prob[i]) {
@@ -168,12 +169,12 @@ public final class TileType
                     artUnexplored = Xml.attribute(xml, "unexplored", "model.tile.unexplored");
                     artCoast = Xml.attribute(xml, "coast", "");
                 } else if ("gen".equals(childName)) {
-                    int[2] defaultArray = {-3, 3};
+                    int[] defaultArray = new int[] {-3, 3};
                     humidity = Xml.intArrayAttribute(xml, "humidity", defaultArray);
                     temperature = Xml.intArrayAttribute(xml, "temperature", defaultArray);
-                    defaultArray = {0, 0};
+                    defaultArray = new int[] {0, 0};
                     altitude = Xml.intArrayAttribute(xml, "altitude", defaultArray);
-                    defaultArray = {-1, -1};
+                    defaultArray = new int[] {-1, -1};
                     latitude = Xml.intArrayAttribute(xml, "latitude", defaultArray);
                 } else if ("skirmish".equals(childName)) {
                     attackFactor = Xml.intAttribute(xml, "attack-factor", 100);

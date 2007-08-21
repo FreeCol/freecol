@@ -321,7 +321,7 @@ public class TileItemContainer extends FreeColGameObject {
         }
         if (hasRiver()) {
             // Already have a river here, see if magnitude is correct, return existing river.
-            if (river.getMagnitude <> magnitude) {
+            if (river.getMagnitude != magnitude) {
                 setRiverMagnitude(magnitude);
             }
             return river;

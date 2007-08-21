@@ -20,7 +20,7 @@ import org.w3c.dom.Element;
  *
  * @see Tile
  */
-public class TileImprovement extends AIObject {
+public class TileImprovementPlan extends AIObject {
     @SuppressWarnings("unused")
     private static final Logger logger = Logger.getLogger(TileImprovement.class.getName());
 
