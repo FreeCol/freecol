@@ -1,5 +1,11 @@
 package net.sf.freecol.common.model;
 
+import javax.xml.stream.XMLStreamReader;
+import javax.xml.stream.XMLStreamWriter;
+import javax.xml.stream.XMLStreamException;
+
+import org.w3c.dom.Element;
+
 /**
 * Represents a <code>TileItem</code> item on a <code>Tile</code>.
 */

@@ -50,7 +50,7 @@ public final class Specification {
         goodsTypeList = new ArrayList<GoodsType>();
         resourceTypeList = new ArrayList<ResourceType>();
         tileTypeList = new ArrayList<TileType>();
-        tileImprovementTypeList = new ArrayList<TileImprovementType>();
+        //tileImprovementTypeList = new ArrayList<TileImprovementType>();
         unitTypeList = new ArrayList<UnitType>();
 
         final Map<String, GoodsType> goodsTypeByRef = new HashMap<String, GoodsType>();
@@ -103,8 +103,8 @@ public final class Specification {
                         int resIndex = 0;
                         public ResourceType objectFrom(Node xml) {
                             ResourceType resourceType = new ResourceType(resIndex++);
-                            ResourceType.readFromXmlElement(xml, goodsTypeByRef);
-                            resouceTypeByRef.put(Xml.attribute(xml, "ref"), resouceType);
+                            resourceType.readFromXmlElement(xml, goodsTypeByRef);
+                            resourceTypeByRef.put(Xml.attribute(xml, "ref"), resourceType);
                             return resourceType;
                         }
                     };

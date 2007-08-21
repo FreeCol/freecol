@@ -138,7 +138,7 @@ public class TileItemContainer extends FreeColGameObject {
      * @return The <code>List</code>.
      * @see #getImprovementIterator
      */
-    public List<TileImprovements> getImprovements() {
+    public List<TileImprovement> getImprovements() {
         return improvements;
     }
 
@@ -445,10 +445,12 @@ public class TileItemContainer extends FreeColGameObject {
     /**
      * Removes all references to this object.
      */
+    /*
     public void dispose() {
         disposeAllTileItems();
         super.dispose();
     }
+    */
 
     /**
      * Disposes all <code>TileItem</code>s in this <code>TileItemContainer</code>.

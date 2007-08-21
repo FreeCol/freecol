@@ -2245,7 +2245,7 @@ break;
         // All known TileItems
         private Resource resource;
         private List<TileImprovement> improvements;
-        private TileImprovement road;
+        //private TileImprovement road;
         private TileImprovement river;
 
         // Colony data:
