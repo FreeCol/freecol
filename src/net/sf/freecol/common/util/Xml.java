@@ -75,7 +75,7 @@ public final class Xml
 
     public static String attribute( Node xmlElement, String attributeName, String otherwise ) {
         if (hasAttribute(xmlElement, attributeName)) {
-            return xmlElement.getAttributes().getNamedItem(attributeName).getNodeValue();
+            return attribute(xmlElement, attributeName);
         } else {
             return otherwise;
         }
@@ -113,14 +113,14 @@ public final class Xml
 
     public static int intAttribute( Node xmlElement, String attributeName, int otherwise ) {
         if (hasAttribute(xmlElement, attributeName)) {
-            return Integer.parseInt( attribute(xmlElement, attributeName) );
+            return intAttribute(xmlElement, attributeName);
         } else {
             return otherwise;
         }
     }
 
     public static int[] intArrayAttribute( Node xmlElement, String attributeName, String separator ) {
-        String[] array = attribute(xmlElement, attributeName).split(separator);
+        String[] array = arrayAttribute(xmlElement, attributeName, separator);
         /*  For testing
         for (int k = 0; k < array.length; k++)
             logger.info(array[k]);    
@@ -152,7 +152,7 @@ public final class Xml
 
     public static boolean booleanAttribute( Node xmlElement, String attributeName, boolean otherwise ) {
         if (hasAttribute(xmlElement, attributeName)) {
-            return parseTruth( attribute(xmlElement, attributeName) );
+            return booleanAttribute(xmlElement, attributeName);
         } else {
             return otherwise;
         }
