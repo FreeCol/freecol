@@ -32,7 +32,7 @@ import org.w3c.dom.Element;
  * Every <code>Unit</code> is owned by a {@link Player} and has a
  * {@link Location}.
  */
-public class Unit extends FreeColGameObject implements Location, Locatable, Ownable, Nameable {
+public class Unit extends FreeColGameObject implements Abilities, Locatable, Location, Ownable, Nameable {
 
     public static final String COPYRIGHT = "Copyright (C) 2003-2005 The FreeCol Team";
 
@@ -121,7 +121,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
     // to be used only for PIONEERs - where they are working
     private TileImprovement workImprovement;
 
-    // What type of goods this unit produces in its occupation
+    // What type of goods this unit produces in its occupation.
     private GoodsType workType;
 
     private int experience = 0;
@@ -217,7 +217,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
         this.owner = owner;
         this.type = type;
         unitType = FreeCol.getSpecification().unitType(type);
-        naval = unitType.hasAbility("naval");
+        naval = unitType.hasAbility("model.ability.navalUnit");
         this.armed = armed;
         this.mounted = mounted;
         this.numberOfTools = numberOfTools;
@@ -298,11 +298,10 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
      * @return The amount of treasure.
      */
     public int getTreasureAmount() {
-        // TODO: TreasureTrain should subclass if method is illegal for Unit!
-        if (getType() == TREASURE_TRAIN) {
+        if (canCarryTreasure()) {
             return treasureAmount;
         }
-        throw new IllegalStateException("Only treasure trains have treasure");
+        throw new IllegalStateException("Unit can't carry treasure");
     }
 
     /**
@@ -312,11 +311,10 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
      * @param amt The amount of treasure
      */
     public void setTreasureAmount(int amt) {
-        // TODO: TreasureTrain should subclass if method is illegal for Unit!
-        if (getType() == TREASURE_TRAIN) {
+        if (canCarryTreasure()) {
             this.treasureAmount = amt;
         } else {
-            throw new IllegalStateException("Only treasure trains have treasure");
+            throw new IllegalStateException("Unit can't carry treasure");
         }
     }
 
@@ -532,8 +530,8 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
      * @exception IllegalStateException if this unit is not a treasure train.
      */
     public boolean canCashInTreasureTrain(Location loc) {
-        if (getType() != TREASURE_TRAIN) {
-            throw new IllegalStateException("Not a treasure train");
+        if (!canCarryTreasure()) {
+            throw new IllegalStateException("Can't carry treasure");
         }
         if (getOwner().getEurope() != null) {
             return (loc.getColony() != null && !loc.getColony().isLandLocked()) || loc instanceof Europe
@@ -550,8 +548,8 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
      *                if it cannot be cashed in at it's current location.
      */
     public void cashInTreasureTrain() {
-        if (getType() != TREASURE_TRAIN) {
-            throw new IllegalStateException("Not a treasure train");
+        if (!canCarryTreasure()) {
+            throw new IllegalStateException("Can't carry a treasure");
         }
 
         if (canCashInTreasureTrain()) {
@@ -585,7 +583,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
      *         otherwise.
      */
     public boolean isColonist() {
-        return unitType.hasAbility("found-colony");
+        return unitType.hasAbility("model.ability.foundColony");
     }
 
     /**
@@ -598,6 +596,10 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
      */
     public int getNeededTurnsOfTraining() {
         // number of turns is 4/6/8 for skill 1/2/3
+        if (student != null && (student.getType() == PETTY_CRIMINAL ||
+                                student.getType() == INDENTURED_SERVANT)) {
+            return 4;
+        }
         return getNeededTurnsOfTraining(getType());
     }
 
@@ -691,6 +693,30 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
     public void modifyExperience(int value) {
         experience += value;
     }
+
+    /**
+     * Returns true if the Unit has the ability identified by
+     * <code>id</code.
+     *
+     * @param id a <code>String</code> value
+     * @return a <code>boolean</code> value
+     */
+    public boolean hasAbility(String id) {
+        // TODO: implement role and unit abilities
+        return unitType.hasAbility(id);
+    }
+
+    /**
+     * Sets the ability identified by <code>id</code.
+     *
+     * @param id a <code>String</code> value
+     * @param newValue a <code>boolean</code> value
+     */
+    public void setAbility(String id, boolean newValue) {
+        // TODO: implement unit abilities
+    };
+
+
 
     /**
      * Returns true if this unit can be a student.
@@ -1056,7 +1082,8 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
      *         need to be a {@link #isCarrier() carrier} and have goods onboard.
      */
     public boolean canTradeWith(Settlement settlement) {
-        return (isCarrier() && goodsContainer.getGoodsCount() > 0 &&
+        return (hasAbility("model.ability.carryGoods") &&
+                goodsContainer.getGoodsCount() > 0 &&
                 getOwner().getStance(settlement.getOwner()) != Player.WAR &&
                 ((settlement instanceof IndianSettlement) ||
                  getOwner().hasFather(FoundingFather.JAN_DE_WITT)));
@@ -1308,13 +1335,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
      * @return The space this <code>Unit</code> takes.
      */
     public int getTakeSpace() {
-        if (getType() == TREASURE_TRAIN) {
-            return 6;
-        } else if (isCarrier()) {
-            return 100000; // Not possible to put on a carrier.
-        } else {
-            return 1;
-        }
+        return FreeCol.getSpecification().unitType(type).getSpaceTaken();
     }
 
     /**
@@ -1324,17 +1345,14 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
      * @return The line of sight of this <code>Unit</code>.
      */
     public int getLineOfSight() {
-        if (type == REVENGER || type == FLYING_DUTCHMAN) {
-            return 3;
-        } else if (isScout() || type == FRIGATE || type == GALLEON || type == MAN_O_WAR || type == PRIVATEER) {
-            // TODO Confirm that in the original game this was not 3 if HERNANDO
-            // DE SOTO was in the congress.
-            return 2;
-        } else if (getOwner().hasFather(FoundingFather.HERNANDO_DE_SOTO)) {
-            return 2;
-        } else {
-            return 1;
+        int line = unitType.getLineOfSight();
+        if (isScout()) {
+            line = 2;
         }
+        if (!isNaval() && getOwner().hasFather(FoundingFather.HERNANDO_DE_SOTO)) {
+            line++;
+        }
+        return line;
     }
 
     /**
@@ -1515,7 +1533,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
      * @param state The state.
      */
     public void setStateToAllChildren(int state) {
-        if (isCarrier()) {
+        if (hasAbility("model.ability.carryUnits")) {
             for (Unit u : getUnitList())
                 u.setState(state);
         }
@@ -1539,23 +1557,19 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
      *            <code>Unit</code>.
      */
     public void add(Locatable locatable) {
-        if (isCarrier()) {
-            if (locatable instanceof Unit) {
-                if (getSpaceLeft() <= 0 || getType() == WAGON_TRAIN) {
-                    throw new IllegalStateException();
-                }
-
-                unitContainer.addUnit((Unit) locatable);
-                spendAllMoves();
-            } else if (locatable instanceof Goods) {
-                goodsContainer.addGoods((Goods) locatable);
-                if (getSpaceLeft() < 0) {
-                    throw new IllegalStateException("Not enough space for the given locatable!");
-                }
-                spendAllMoves();
-            } else {
-                logger.warning("Tried to add an unrecognized 'Locatable' to a unit.");
+        if (locatable instanceof Unit && hasAbility("model.ability.carryUnits")) {
+            if (getSpaceLeft() <= 0) {
+                throw new IllegalStateException();
             }
+
+            unitContainer.addUnit((Unit) locatable);
+            spendAllMoves();
+        } else if (locatable instanceof Goods && hasAbility("model.ability.carryGoods")) {
+            goodsContainer.addGoods((Goods) locatable);
+            if (getSpaceLeft() < 0) {
+                throw new IllegalStateException("Not enough space for the given locatable!");
+            }
+            spendAllMoves();
         } else {
             logger.warning("Tried to add a 'Locatable' to a non-carrier unit.");
         }
@@ -1568,16 +1582,12 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
      *            <code>Unit</code>.
      */
     public void remove(Locatable locatable) {
-        if (isCarrier()) {
-            if (locatable instanceof Unit) {
-                unitContainer.removeUnit((Unit) locatable);
-                spendAllMoves();
-            } else if (locatable instanceof Goods) {
-                goodsContainer.removeGoods((Goods) locatable);
-                spendAllMoves();
-            } else {
-                logger.warning("Tried to remove an unrecognized 'Locatable' from a unit.");
-            }
+        if (locatable instanceof Unit && hasAbility("model.ability.carryUnits")) {
+            unitContainer.removeUnit((Unit) locatable);
+            spendAllMoves();
+        } else if (locatable instanceof Goods && hasAbility("model.ability.carryGoods")) {
+            goodsContainer.removeGoods((Goods) locatable);
+            spendAllMoves();
         } else {
             logger.warning("Tried to remove a 'Locatable' from a non-carrier unit.");
         }
@@ -1596,16 +1606,11 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
      *            </ul>
      */
     public boolean contains(Locatable locatable) {
-        if (isCarrier()) {
-            if (locatable instanceof Unit) {
-                return unitContainer.contains((Unit) locatable);
-            } else if (locatable instanceof Goods) {
-                return goodsContainer.contains((Goods) locatable);
-            } else {
-                return false;
-            }
+        if (locatable instanceof Unit && hasAbility("model.ability.carryUnits")) {
+            return unitContainer.contains((Unit) locatable);
+        } else if (locatable instanceof Goods && hasAbility("model.ability.carryGoods")) {
+            return goodsContainer.contains((Goods) locatable);
         } else {
-            logger.warning("Tried to remove a 'Locatable' from a non-carrier unit.");
             return false;
         }
     }
@@ -1619,23 +1624,15 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
      * @return The result.
      */
     public boolean canAdd(Locatable locatable) {
-        if (isCarrier()) {
-            if ((getType() == WAGON_TRAIN || getType() == BRAVE) && locatable instanceof Unit) {
-                return false;
-            }
-
-            if (locatable instanceof Unit) {
-                return getSpaceLeft() >= locatable.getTakeSpace();
-            } else if (locatable instanceof Goods) {
-                Goods g = (Goods) locatable;
-                return getSpaceLeft() > 0
-                        || (getGoodsContainer().getGoodsCount(g.getType()) % 100 != 0 && getGoodsContainer()
-                                .getGoodsCount(g.getType())
-                                % 100 + g.getAmount() <= 100);
-            } else { // Is there another class that implements Locatable ??
-                logger.warning("Oops, not implemented...");
-                return false;
-            }
+        if (locatable instanceof Unit && !((Unit) locatable).isCarrier() &&
+                hasAbility("model.ability.carryUnits")) {
+            return getSpaceLeft() >= locatable.getTakeSpace();
+        } else if (locatable instanceof Goods && hasAbility("model.ability.carryGoods")) {
+            Goods g = (Goods) locatable;
+            return getSpaceLeft() > 0
+                || (getGoodsContainer().getGoodsCount(g.getType()) % 100 != 0 && getGoodsContainer()
+                    .getGoodsCount(g.getType())
+                    % 100 + g.getAmount() <= 100);
         } else {
             return false;
         }
@@ -1647,8 +1644,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
      * @return The amount of Units at this Location.
      */
     public int getUnitCount() {
-
-        return isCarrier() ? unitContainer.getUnitCount() : 0;
+        return hasAbility("model.ability.carryUnits") ? unitContainer.getUnitCount() : 0;
     }
 
     /**
@@ -1658,8 +1654,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
      * @return The <code>Unit</code>.
      */
     public Unit getFirstUnit() {
-
-        return isCarrier() ? unitContainer.getFirstUnit() : null;
+        return hasAbility("model.ability.carryUnits") ? unitContainer.getFirstUnit() : null;
     }
 
     /**
@@ -1688,8 +1683,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
      * @return The <code>Unit</code>.
      */
     public Unit getLastUnit() {
-
-        return isCarrier() ? unitContainer.getLastUnit() : null;
+        return hasAbility("model.ability.carryUnits") ? unitContainer.getLastUnit() : null;
     }
 
     /**
@@ -1703,7 +1697,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
     }
 
     public List<Unit> getUnitList() {
-        if (isCarrier() && getType() != WAGON_TRAIN) {
+        if (hasAbility("model.ability.carryUnits")) {
             return unitContainer.getUnitsClone();
         } else {
             return new ArrayList<Unit>();
@@ -1717,7 +1711,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
      * @return The <code>Iterator</code>.
      */
     public Iterator<Goods> getGoodsIterator() {
-        if (isCarrier()) {
+        if (hasAbility("model.ability.carryGoods")) {
             return goodsContainer.getGoodsIterator();
         } else {
             return EmptyIterator.getInstance();
@@ -1729,7 +1723,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
      * @return a <code>List</code> containing the goods carried by this unit.
      */
     public List<Goods> getGoodsList() {
-        if (isCarrier()) {
+        if (hasAbility("model.ability.carryGoods")) {
             return goodsContainer.getGoods();
         } else {
             return Collections.emptyList();
@@ -2176,7 +2170,8 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
      * @param amount The amount of goods to buy.
      */
     public void buyGoods(int goodsType, int amount) {
-        if (!isCarrier() || !(getLocation() instanceof Europe && getState() != TO_EUROPE && getState() != TO_AMERICA)) {
+        if (!hasAbility("model.ability.carryGoods") ||
+            !(getLocation() instanceof Europe && getState() != TO_EUROPE && getState() != TO_AMERICA)) {
             throw new IllegalStateException("Cannot buy goods when not a carrier or in Europe.");
         }
 
@@ -2300,7 +2295,8 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
 
         UnitType unitType = FreeCol.getSpecification().unitType(type);
 
-        return unitType.hasAbility("naval") || unitType.hasAbility("carry-goods");
+        return unitType.hasAbility("model.ability.carryGoods") ||
+            unitType.hasAbility("model.ability.carryUnits");
     }
 
     /**
@@ -2357,7 +2353,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
     public void setType(int type) {
         this.type = type;
         unitType = FreeCol.getSpecification().unitType(type);
-        naval = unitType.hasAbility("naval");
+        naval = unitType.hasAbility("model.ability.naval");
     }
 
     /**
@@ -2439,8 +2435,8 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
             } else {
                 return (Messages.message("model.unit.missionary") + " (" + getName(getType()) + ")");
             }
-        } else if (getType() == TREASURE_TRAIN) {
-            return getName(TREASURE_TRAIN) + " (" + getTreasureAmount() + " " + Messages.message("gold") + ")";
+        } else if (canCarryTreasure()) {
+            return getName(getType()) + " (" + getTreasureAmount() + " " + Messages.message("gold") + ")";
         } else if (isPioneer()) {
             if (getType() == HARDY_PIONEER) {
                 return getName(getType());
@@ -2599,7 +2595,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
      * @return 6
      */
     public static int getInitialHitpoints(int type) {
-        return 6;
+        return FreeCol.getSpecification().unitType(type).getHitPoints();
     }
 
     /**
@@ -2702,7 +2698,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
      */
     public boolean isNaval() {
         return naval;
-        // return unitType.hasAbility("naval");
+        // return unitType.hasAbility("model.ability.naval");
     }
 
     /**
@@ -2948,6 +2944,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
         }
         switch (s) {
         case ACTIVE:
+            return true;
         case IMPROVING:     // Check should be done before
             return true;
 /*
@@ -3082,33 +3079,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
      * @return The amount of units/cargo that this unit can carry.
      */
     public static int getInitialSpaceLeft(int type) {
-        switch (type) {
-        case CARAVEL:
-            return 2;
-        case FRIGATE:
-            // I've got an official reference sheet from Colonization (came with
-            // the game)
-            // that says that the cargo space for a frigate is 2 but I'm almost
-            // 100% sure
-            // that it was 4 in the Colonization version that I used to play.
-            return 4;
-        case GALLEON:
-            return 6;
-        case MAN_O_WAR:
-            return 6;
-        case MERCHANTMAN:
-            return 4;
-        case PRIVATEER:
-            return 2;
-        case WAGON_TRAIN:
-            return 2;
-        case BRAVE:
-            return 1;
-        case FLYING_DUTCHMAN:
-            return 6;
-        default:
-            return 0;
-        }
+        return FreeCol.getSpecification().unitType(type).getSpace();
     }
 
     /**
@@ -3118,7 +3089,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
      * @param u The unit to move to the front.
      */
     public void moveToFront(Unit u) {
-        if (isCarrier() && unitContainer.removeUnit(u)) {
+        if (hasAbility("model.ability.carryUnits") && unitContainer.removeUnit(u)) {
             unitContainer.addUnit(0, u);
         }
     }
@@ -3169,12 +3140,10 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
                                     new String[][] {
                                         {"%europe%", getOwner().getEurope().getName()}},
                                     ModelMessage.DEFAULT, this);
-                    if (getType() == GALLEON) {
-                        Iterator<Unit> iter = getUnitIterator();
-                        Unit u = null;
-                        while (iter.hasNext() && (u = iter.next()) != null && u.getType() != TREASURE_TRAIN)
-                            ;
-                        if (u != null && u.getType() == TREASURE_TRAIN) {
+                    Iterator<Unit> iter = getUnitIterator();
+                    while (iter.hasNext()) {
+                        Unit u = iter.next();
+                        if (u.canCarryTreasure()) {
                             u.cashInTreasureTrain();
                         }
                     }
@@ -3338,7 +3307,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
      */
     public static boolean isRecruitable(int type) {
 
-        return FreeCol.getSpecification().unitType(type).hasAbility("recruitable");
+        return FreeCol.getSpecification().unitType(type).hasAbility("model.ability.recruitable");
     }
 
     /**
@@ -4160,6 +4129,17 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
     }
 
     /**
+     * Returns true if this unit can carry treasure (like a treasure train)
+     * 
+     * @return <code>true</code> if this <code>Unit</code> is capable of
+     *         carrying treasure.
+     */
+    public boolean canCarryTreasure() {
+
+        return unitType.hasAbility("model.ability.carryTreasure");
+    }
+
+    /**
      * Returns true if this unit is a ship that can capture enemy goods. That
      * is, a privateer, frigate or man-o-war.
      * 
@@ -4168,7 +4148,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
      */
     public boolean canCaptureGoods() {
 
-        return unitType.hasAbility("capture-goods");
+        return unitType.hasAbility("model.ability.captureGoods");
     }
 
     /**
@@ -4284,8 +4264,11 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
             if (colony.getUnitCount() <= 1) {
                 myPlayer.modifyGold(plunderGold);
                 enemy.modifyGold(-plunderGold);
-                addModelMessage(enemy, "model.unit.colonyBurning", new String[][] { { "%colony%", colony.getName() },
-                        { "%amount%", Integer.toString(plunderGold) } }, ModelMessage.DEFAULT);
+                addModelMessage(enemy, "model.unit.colonyBurning",
+                        new String[][] { { "%colony%", colony.getName() },
+                        { "%amount%", Integer.toString(plunderGold) },
+                        { "%nation%", myPlayer.getNationAsString() },
+                        { "%unit%", getName() } }, ModelMessage.DEFAULT);
                 colony.damageAllShips();
                 colony.dispose();
             } else {
@@ -4296,7 +4279,9 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
                 addModelMessage(colony, "model.unit.colonistSlaughtered",
                                 new String[][] {
                                     { "%colony%", colony.getName() },
-                                    { "%unit%", victim.getName() } }, ModelMessage.UNIT_LOST);
+                                    { "%unit%", victim.getName() },
+                                    { "%nation%", myPlayer.getNationAsString() },
+                                    { "%enemyUnit%", getName() } }, ModelMessage.UNIT_LOST);
                 victim.dispose();
             }
         }
@@ -4608,8 +4593,11 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
      * Removes all references to this object.
      */
     public void dispose() {
-        if (isCarrier()) {
+        if (hasAbility("model.ability.carryUnits")) {
             unitContainer.dispose();
+        }
+
+        if (hasAbility("model.ability.carryGoods")) {
             goodsContainer.dispose();
         }
 
@@ -4751,19 +4739,25 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
         }
 
         // Do not show enemy units hidden in a carrier:
-        if (isCarrier()) {
-            if (getGame().isClientTrusted() || showAll || getOwner().equals(player)
-                    || !getGameOptions().getBoolean(GameOptions.UNIT_HIDING) && player.canSee(getTile())) {
+        if (getGame().isClientTrusted() || showAll || getOwner().equals(player)
+                || !getGameOptions().getBoolean(GameOptions.UNIT_HIDING) && player.canSee(getTile())) {
+            if (hasAbility("model.ability.carryUnits")) {
                 unitContainer.toXML(out, player, showAll, toSavedGame);
+            }
+            if (hasAbility("model.ability.carryGoods")) {
                 goodsContainer.toXML(out, player, showAll, toSavedGame);
-            } else {
+            }
+        } else {
+            if (hasAbility("model.ability.carryGoods")) {
                 out.writeAttribute("visibleGoodsCount", Integer.toString(getGoodsCount()));
-                UnitContainer emptyUnitContainer = new UnitContainer(getGame(), this);
-                emptyUnitContainer.setFakeID(unitContainer.getID());
-                emptyUnitContainer.toXML(out, player, showAll, toSavedGame);
                 GoodsContainer emptyGoodsContainer = new GoodsContainer(getGame(), this);
                 emptyGoodsContainer.setFakeID(goodsContainer.getID());
                 emptyGoodsContainer.toXML(out, player, showAll, toSavedGame);
+            }
+            if (hasAbility("model.ability.carryUnits")) {
+                UnitContainer emptyUnitContainer = new UnitContainer(getGame(), this);
+                emptyUnitContainer.setFakeID(unitContainer.getID());
+                emptyUnitContainer.toXML(out, player, showAll, toSavedGame);
             }
         }
 
@@ -4782,7 +4776,7 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
         setName(in.getAttributeValue(null, "name"));
         type = Integer.parseInt(in.getAttributeValue(null, "type"));
         unitType = FreeCol.getSpecification().unitType(type);
-        naval = unitType.hasAbility("naval");
+        naval = unitType.hasAbility("model.ability.navalUnit");
         armed = Boolean.valueOf(in.getAttributeValue(null, "armed")).booleanValue();
         mounted = Boolean.valueOf(in.getAttributeValue(null, "mounted")).booleanValue();
         missionary = Boolean.valueOf(in.getAttributeValue(null, "missionary")).booleanValue();
@@ -4909,6 +4903,10 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
 
         final String locationStr = in.getAttributeValue(null, "location");
         if (locationStr != null) {
+            // TODO: Fix properly bug #1755566 and remove this
+            if (location != null) {
+                location.remove(this);
+            }
             location = (Location) getGame().getFreeColGameObject(locationStr);
             if (location == null) {
                 if (locationStr.startsWith(Tile.getXMLElementTagName())) {
@@ -4932,37 +4930,33 @@ public class Unit extends FreeColGameObject implements Location, Locatable, Owna
             }
         }
 
-        if (isCarrier()) {
-            while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
-                if (in.getLocalName().equals(UnitContainer.getXMLElementTagName())) {
-                    unitContainer = (UnitContainer) getGame().getFreeColGameObject(in.getAttributeValue(null, "ID"));
-                    if (unitContainer != null) {
-                        unitContainer.readFromXML(in);
-                    } else {
-                        unitContainer = new UnitContainer(getGame(), this, in);
-                    }
-                } else if (in.getLocalName().equals(GoodsContainer.getXMLElementTagName())) {
-                    goodsContainer = (GoodsContainer) getGame().getFreeColGameObject(in.getAttributeValue(null, "ID"));
-                    if (goodsContainer != null) {
-                        goodsContainer.readFromXML(in);
-                    } else {
-                        goodsContainer = new GoodsContainer(getGame(), this, in);
-                    }
-
+        while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
+            if (in.getLocalName().equals(UnitContainer.getXMLElementTagName())) {
+                unitContainer = (UnitContainer) getGame().getFreeColGameObject(in.getAttributeValue(null, "ID"));
+                if (unitContainer != null) {
+                    unitContainer.readFromXML(in);
+                } else {
+                    unitContainer = new UnitContainer(getGame(), this, in);
                 }
-            }
-            if (unitContainer == null) {
-                logger.warning("Carrier did not have a \"unitContainer\"-tag.");
-                unitContainer = new UnitContainer(getGame(), this);
+            } else if (in.getLocalName().equals(GoodsContainer.getXMLElementTagName())) {
+                goodsContainer = (GoodsContainer) getGame().getFreeColGameObject(in.getAttributeValue(null, "ID"));
+                if (goodsContainer != null) {
+                    goodsContainer.readFromXML(in);
+                } else {
+                    goodsContainer = new GoodsContainer(getGame(), this, in);
+                }
 
             }
-            if (goodsContainer == null) {
-                logger.warning("Carrier did not have a \"goodsContainer\"-tag.");
-                goodsContainer = new GoodsContainer(getGame(), this);
+        }
+        
+        if (unitContainer == null && hasAbility("model.ability.carryUnits")) {
+            logger.warning("Carrier did not have a \"unitContainer\"-tag.");
+            unitContainer = new UnitContainer(getGame(), this);
 
-            }
-        } else {
-            in.nextTag();
+        }
+        if (goodsContainer == null && hasAbility("model.ability.carryGoods")) {
+            logger.warning("Carrier did not have a \"goodsContainer\"-tag.");
+            goodsContainer = new GoodsContainer(getGame(), this);
         }
 
         getOwner().invalidateCanSeeTiles();
