@@ -1780,9 +1780,9 @@ public final class GUI {
                     g.drawImage(lib.getColorChip(((IndianSettlement)settlement).getOwner().getColor()), x + STATE_OFFSET_X, y + STATE_OFFSET_Y, null);
 
                     // Draw the mission chip if needed.
-                    if (((IndianSettlement)settlement).getMissionary() != null) {
-                        Unit missionary = ((IndianSettlement)settlement).getMissionary();
-                        boolean expert = (missionary.getType() == Unit.JESUIT_MISSIONARY);
+                    Unit missionary = ((IndianSettlement)settlement).getMissionary();
+                    if (missionary != null) {
+                        boolean expert = missionary.hasAbility("model.ability.expertMissionary");
                         g.drawImage(lib.getMissionChip(missionary.getOwner().getColor(), expert), x + MISSION_OFFSET_X, y + MISSION_OFFSET_Y, null);
                     }
 

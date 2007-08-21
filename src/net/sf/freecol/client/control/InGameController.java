@@ -1531,7 +1531,7 @@ public final class InGameController implements NetworkConstants {
      * @return true to attack, false to abort.
      */
     private boolean confirmHostileAction(Unit attacker, Tile target) {
-        if (attacker.getType() != Unit.PRIVATEER) {
+        if (!attacker.hasAbility("model.ability.piracy")) {
             Player enemy;
             if (target.getSettlement() != null) {
                 enemy = target.getSettlement().getOwner();
@@ -1541,7 +1541,7 @@ public final class InGameController implements NetworkConstants {
                     logger.warning("Attacking, but no defender - will try!");
                     return true;
                 }
-                if (defender.getType() == Unit.PRIVATEER) {
+                if (defender.hasAbility("model.ability.piracy")) {
                     // Privateers can be attacked and remain at peace
                     return true;
                 }
@@ -1604,7 +1604,7 @@ public final class InGameController implements NetworkConstants {
         Game game = freeColClient.getGame();
         Tile target = game.getMap().getNeighbourOrNull(direction, unit.getTile());
 
-        if (unit.getType() == Unit.ARTILLERY || unit.getType() == Unit.DAMAGED_ARTILLERY || unit.isNaval()) {
+        if (unit.hasAbility("model.ability.bombard") || unit.isNaval()) {
             freeColClient.playSound(SfxLibrary.ARTILLERY);
         }
 
@@ -2342,7 +2342,7 @@ public final class InGameController implements NetworkConstants {
                 }
             }
         } else if (state == Unit.FORTIFYING && unit.isOffensiveUnit() &&
-                unit.getType() != Unit.PRIVATEER) { // check if it's going to occupy a work tile
+                !unit.hasAbility("model.ability.piracy")) { // check if it's going to occupy a work tile
             Tile tile = unit.getTile();
             if (tile != null && tile.getOwner() != null) { // check stance with settlement's owner
                 Player myPlayer = unit.getOwner();
