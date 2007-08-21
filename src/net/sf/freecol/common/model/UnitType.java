@@ -18,6 +18,7 @@ public final class UnitType implements Abilities {
     public static final  String  REVISION  = "$Revision$";
 
     public static final  int  UNDEFINED = Integer.MIN_VALUE;
+    public final int index;
 
     /**
      * Describe id here.
@@ -75,6 +76,11 @@ public final class UnitType implements Abilities {
     private int price;
 
     /**
+     * Describe price here.
+     */
+    private int increasingPrice;
+
+    /**
      * Describe movement here.
      */
     private int movement;
@@ -109,6 +115,14 @@ public final class UnitType implements Abilities {
      */
     private Hashtable<String, Boolean> abilities = new Hashtable<String, Boolean>();
 
+    public UnitType(int index) {
+        this.index = index;
+    }
+
+    public int getIndex() {
+        return index;
+    }
+    
     /**
      * Get the <code>Id</code> value.
      *
@@ -326,6 +340,24 @@ public final class UnitType implements Abilities {
     }
 
     /**
+     * Get the <code>IncreasingPrice</code> value.
+     *
+     * @return an <code>int</code> value
+     */
+    public int getIncreasingPrice() {
+        return increasingPrice;
+    }
+
+    /**
+     * Set the <code>IncreasingPrice</code> value.
+     *
+     * @param newIncreasingPrice The new IncreasingPrice value.
+     */
+    public void setIncreasingPrice(final int newIncreasingPrice) {
+        this.increasingPrice = newIncreasingPrice;
+    }
+
+    /**
      * Get the <code>Movement</code> value.
      *
      * @return an <code>int</code> value
@@ -434,6 +466,7 @@ public final class UnitType implements Abilities {
         toolsRequired = Xml.intAttribute(xml, "tools", UNDEFINED);
 
         price = Xml.intAttribute(xml, "price", UNDEFINED);
+        increasingPrice = Xml.intAttribute(xml, "increasingPrice", UNDEFINED);
 
         if (Xml.hasAttribute(xml, "expert-production")) {
             String goodsTypeRef = Xml.attribute(xml, "expert-production");

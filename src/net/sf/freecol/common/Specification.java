@@ -40,6 +40,7 @@ public final class Specification {
     private final List<ResourceType> resourceTypeList;
 
     private final List<TileType> tileTypeList;
+    private final List<TileImprovementType> tileImprovementTypeList;
 
     private final List<UnitType> unitTypeList;
 
@@ -50,7 +51,7 @@ public final class Specification {
         goodsTypeList = new ArrayList<GoodsType>();
         resourceTypeList = new ArrayList<ResourceType>();
         tileTypeList = new ArrayList<TileType>();
-        //tileImprovementTypeList = new ArrayList<TileImprovementType>();
+        tileImprovementTypeList = new ArrayList<TileImprovementType>();
         unitTypeList = new ArrayList<UnitType>();
 
         final Map<String, GoodsType> goodsTypeByRef = new HashMap<String, GoodsType>();
@@ -130,7 +131,7 @@ public final class Specification {
                         public TileImprovementType objectFrom(Node xml) {
                             TileImprovementType tileImprovementType = new TileImprovementType(impIndex++);
                             tileImprovementType.readFromXmlElement(xml, tileTypeList, tileTypeByRef, goodsTypeByRef);
-                            return tileType;
+                            return tileImprovementType;
                         }
                     };
                     tileImprovementTypeList.addAll(makeListFromXml(xml, factory));
@@ -138,8 +139,9 @@ public final class Specification {
                 } else if ("unit-types".equals(childName)) {
 
                     ObjectFactory<UnitType> factory = new ObjectFactory<UnitType>() {
+                        int unitIndex = 0;
                         public UnitType objectFrom(Node xml) {
-                            UnitType unitType = new UnitType();
+                            UnitType unitType = new UnitType(unitIndex++);
                             unitType.readFromXmlElement(xml, goodsTypeByRef);
                             return unitType;
                         }
@@ -322,6 +324,15 @@ public final class Specification {
         for (UnitType u : unitTypeList) {
             if (u.getName().equals(name)) {
                 return u;
+            }
+        }
+        return null;
+    }
+    
+    public UnitType getExpertForProducing(GoodsType goodsType) {
+        for (UnitType unitType : getUnitTypeList()) {
+            if (unitType.getExpertProduction() == goodsType) {
+                return unitType;
             }
         }
         return null;

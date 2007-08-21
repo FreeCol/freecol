@@ -1179,7 +1179,7 @@ public final class Colony extends Settlement implements Location, Nameable {
      * @param goodsType The goods' type.
      * @return The amount of the given goods will be produced for next turn.
      */
-    public int getProductionNextTurn(int goodsType) {
+    public int getProductionNextTurn(GoodsType goodsType) {
         int count = 0;
         Building building = getBuildingForProducing(goodsType);
         if (building == null) {
@@ -1530,8 +1530,8 @@ public final class Colony extends Settlement implements Location, Nameable {
             List<Goods> exportGoods = getCompactGoods();
             for (Goods goods : exportGoods) {
                 if (getExports(goods) && (owner.canTrade(goods, Market.CUSTOM_HOUSE))) {
-                    int type = goods.getType();
-                    int amount = goods.getAmount() - getExportLevel()[type];
+                    GoodsType type = goods.getType();
+                    int amount = goods.getAmount() - getExportLevel()[type.getIndex()];
                     if (amount > 0) {
                         removeGoods(type, amount);
                         getOwner().getMarket().sell(type, amount, owner, Market.CUSTOM_HOUSE);

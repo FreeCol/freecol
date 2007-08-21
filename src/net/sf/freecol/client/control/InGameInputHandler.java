@@ -5,6 +5,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.swing.SwingUtilities;
+import net.sf.freecol.FreeCol;
 
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.Canvas;
@@ -22,6 +23,7 @@ import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.Tension;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
+import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.networking.Message;
 
@@ -996,7 +998,8 @@ public final class InGameInputHandler extends InputHandler {
                                 }
                                 player.getEurope().add(unit);
 
-                                int newRecruitable = Integer.parseInt(reply.getAttribute("newRecruitable"));
+                                String newRecruitableStr = reply.getAttribute("newRecruitable");
+                                UnitType newRecruitable = FreeCol.getSpecification().getUnitType(newRecruitableStr);
                                 player.getEurope().setRecruitable(slot, newRecruitable);
                             }
                         }

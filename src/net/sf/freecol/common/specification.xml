@@ -672,7 +672,7 @@
       <ability id="model.ability.captureGoods" value="yes"/>
       <ability id="model.ability.piracy" value="yes"/>
     </unit-type>
-    <unit-type name="model.unit.artillery"            offence="7"  defence="5" movement="3" lineOfSight="1" hammers="192" tools="40">
+    <unit-type name="model.unit.artillery"            offence="7"  defence="5" movement="3" lineOfSight="1" hammers="192" tools="40" price="500" increasingPrice="100">
       <ability id="model.ability.bombard"/>
     </unit-type>
     <unit-type name="model.unit.damagedArtillery"     offence="5"  defence="3" movement="3" lineOfSight="1">

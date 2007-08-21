@@ -13,6 +13,7 @@ import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.Europe;
 import net.sf.freecol.common.model.Unit;
 import cz.autel.dmi.HIGLayout;
+import net.sf.freecol.common.model.UnitType;
 
 /**
  * The panel that allows a user to choose which unit will emigrate from Europe.
@@ -73,8 +74,8 @@ public final class EmigrationPanel extends FreeColDialog implements ActionListen
         row += 2;
 
         for (int index = 0; index < NUMBER_OF_PERSONS; index++) {
-            int unitType = europe.getRecruitable(index);
-            int graphicsType = ImageLibrary.getUnitGraphicsType(unitType, false, false, 0, false);
+            UnitType unitType = europe.getRecruitable(index);
+            int graphicsType = ImageLibrary.getUnitGraphicsType(unitType.getIndex(), false, false, 0, false);
             person[index].setText(Unit.getName(unitType));
             person[index].setIcon(library.getScaledUnitImageIcon(graphicsType, 0.66f));
 

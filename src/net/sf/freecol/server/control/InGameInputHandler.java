@@ -2,10 +2,12 @@ package net.sf.freecol.server.control;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Vector;
 import java.util.logging.Logger;
+import net.sf.freecol.FreeCol;
 import net.sf.freecol.common.model.Building;
 
 import net.sf.freecol.common.model.Colony;
@@ -17,6 +19,7 @@ import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.GameOptions;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.GoodsContainer;
+import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.IndianSettlement;
 import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.LostCityRumour;
@@ -30,6 +33,7 @@ import net.sf.freecol.common.model.Tension;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.TradeRoute;
 import net.sf.freecol.common.model.Unit;
+import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.model.WorkLocation;
 import net.sf.freecol.common.model.Map.Position;
 import net.sf.freecol.common.networking.Connection;
@@ -1077,14 +1081,14 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         
         Europe europe = player.getEurope();
         int slot = Integer.parseInt(element.getAttribute("slot"));
-        int recruitable = europe.getRecruitable(slot);
-        int newRecruitable = player.generateRecruitable();
+        UnitType recruitable = europe.getRecruitable(slot);
+        UnitType newRecruitable = player.generateRecruitable();
         europe.setRecruitable(slot, newRecruitable);
         
         Unit unit = new Unit(getGame(), europe, player, recruitable, Unit.ACTIVE);
         player.getEurope().add(unit);
         Element reply = Message.createNewRootElement("selectFromFountainYouthConfirmed");
-        reply.setAttribute("newRecruitable", Integer.toString(newRecruitable));
+        reply.setAttribute("newRecruitable", newRecruitable.getId());
         reply.appendChild(unit.toXMLElement(player, reply.getOwnerDocument()));
         return reply;
     }
@@ -1240,10 +1244,11 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
             reply.appendChild(defender.toXMLElement(player, reply.getOwnerDocument()));
         }
         
-        int[] oldGoodsCounts = new int[Goods.NUMBER_OF_TYPES];
+        Hashtable<String, Integer> oldGoodsCounts = new Hashtable<String, Integer>();
         if (unit.canCaptureGoods() && getGame().getGameOptions().getBoolean(GameOptions.UNIT_HIDING)) {
-            for (int i = 0; i < oldGoodsCounts.length; i++) {
-                oldGoodsCounts[i] = unit.getGoodsContainer().getGoodsCount(i);
+            List<Goods> goodsInUnit = unit.getGoodsContainer().getFullGoods();
+            for (Goods goods : goodsInUnit) {
+                oldGoodsCounts.put(goods.getType().getName(), goods.getAmount());
             }
         }
         int oldUnits = unit.getTile().getUnitCount();
@@ -1263,10 +1268,10 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         if (unit.canCaptureGoods() && getGame().getGameOptions().getBoolean(GameOptions.UNIT_HIDING)) {
             List<Goods> goodsInUnit = unit.getGoodsContainer().getCompactGoods();
             for (Goods newGoods : goodsInUnit) {
-                int capturedGoods = newGoods.getAmount() - oldGoodsCounts[newGoods.getType()];
+                int capturedGoods = newGoods.getAmount() - oldGoodsCounts.get(newGoods.getType().getName()).intValue();
                 if (capturedGoods > 0) {
                     Element captured = reply.getOwnerDocument().createElement("capturedGoods");
-                    captured.setAttribute("type", Integer.toString(newGoods.getType()));
+                    captured.setAttribute("type", newGoods.getType().getName());
                     captured.setAttribute("amount", Integer.toString(capturedGoods));
                     reply.appendChild(captured);
                 }
@@ -1524,10 +1529,10 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
             // Just return the skill and wanted goods.
             reply.setAttribute("skill", Integer.toString(settlement.getLearnableSkill()));
             settlement.updateWantedGoods();
-            int[] wantedGoods = settlement.getWantedGoods();
-            reply.setAttribute("highlyWantedGoods", Integer.toString(wantedGoods[0]));
-            reply.setAttribute("wantedGoods1", Integer.toString(wantedGoods[1]));
-            reply.setAttribute("wantedGoods2", Integer.toString(wantedGoods[2]));
+            GoodsType[] wantedGoods = settlement.getWantedGoods();
+            reply.setAttribute("highlyWantedGoods", Integer.toString(wantedGoods[0].getIndex()));
+            reply.setAttribute("wantedGoods1", Integer.toString(wantedGoods[1].getIndex()));
+            reply.setAttribute("wantedGoods2", Integer.toString(wantedGoods[2].getIndex()));
             // Set the Tile.PlayerExploredTile attribute.
             settlement.getTile().updateIndianSettlementInformation(player);
         } else if (action.equals("cancel")) {
@@ -1939,11 +1944,11 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         Player player = getFreeColServer().getPlayer(connection);
         Europe europe = player.getEurope();
         int slot = Integer.parseInt(recruitUnitInEuropeElement.getAttribute("slot"));
-        int recruitable = europe.getRecruitable(slot);
-        int newRecruitable = player.generateRecruitable();
+        UnitType recruitable = europe.getRecruitable(slot);
+        UnitType newRecruitable = player.generateRecruitable();
         Unit unit = new Unit(getGame(), player, recruitable);
         Element reply = Message.createNewRootElement("recruitUnitInEuropeConfirmed");
-        reply.setAttribute("newRecruitable", Integer.toString(newRecruitable));
+        reply.setAttribute("newRecruitable", newRecruitable.getId());
         reply.appendChild(unit.toXMLElement(player, reply.getOwnerDocument()));
         europe.recruit(slot, unit, newRecruitable);
         return reply;
@@ -1964,14 +1969,14 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         } else {
             slot = (int) (Math.random() * 3);
         }
-        int recruitable = europe.getRecruitable(slot);
-        int newRecruitable = player.generateRecruitable();
+        UnitType recruitable = europe.getRecruitable(slot);
+        UnitType newRecruitable = player.generateRecruitable();
         Unit unit = new Unit(getGame(), player, recruitable);
         Element reply = Message.createNewRootElement("emigrateUnitInEuropeConfirmed");
         if (!player.hasFather(FoundingFather.WILLIAM_BREWSTER)) {
             reply.setAttribute("slot", Integer.toString(slot));
         }
-        reply.setAttribute("newRecruitable", Integer.toString(newRecruitable));
+        reply.setAttribute("newRecruitable", newRecruitable.getId());
         reply.appendChild(unit.toXMLElement(player, reply.getOwnerDocument()));
         europe.emigrate(slot, unit, newRecruitable);
         return reply;
@@ -1986,7 +1991,8 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
     private Element trainUnitInEurope(Connection connection, Element trainUnitInEuropeElement) {
         Player player = getFreeColServer().getPlayer(connection);
         Europe europe = player.getEurope();
-        int unitType = Integer.parseInt(trainUnitInEuropeElement.getAttribute("unitType"));
+        String unitTypeStr = trainUnitInEuropeElement.getAttribute("unitType");
+        UnitType unitType = FreeCol.getSpecification().getUnitType(unitTypeStr);
         Unit unit = new Unit(getGame(), player, unitType);
         Element reply = Message.createNewRootElement("trainUnitInEuropeConfirmed");
         reply.appendChild(unit.toXMLElement(player, reply.getOwnerDocument()));

@@ -51,14 +51,6 @@ public final class GoodsType
         return name;
     }
 
-    public String getName(boolean sellable) {
-        if (sellable) {
-            return name;
-        } else {
-            return name + " (" + Messages.message("model.goods.Boycotted") + ")";
-        }
-    }
-
     public boolean isRawMaterial() {
         return makes != null;
     }

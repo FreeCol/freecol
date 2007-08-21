@@ -5,6 +5,7 @@ import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.List;
 import java.util.logging.Logger;
 
 import javax.swing.JButton;
@@ -17,7 +18,9 @@ import net.sf.freecol.client.control.InGameController;
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.client.gui.i18n.Messages;
+import net.sf.freecol.common.model.Europe;
 import net.sf.freecol.common.model.Player;
+import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.UnitType;
 import cz.autel.dmi.HIGLayout;
 
@@ -36,9 +39,9 @@ public final class TrainDialog extends FreeColDialog implements ActionListener {
 
     private static final int TRAIN_CANCEL = -1;
 
-    private static final Comparator<NumberedUnitType> priceComparator = new Comparator<NumberedUnitType>() {
-        public int compare(NumberedUnitType type1, NumberedUnitType type2) {
-            return type1.type.getPrice() - type2.type.getPrice();
+    private final Comparator<UnitType> priceComparator = new Comparator<UnitType>() {
+        public int compare(UnitType type1, UnitType type2) {
+            return type1.getPrice() - type2.getPrice();
         }
     };
     
@@ -51,9 +54,13 @@ public final class TrainDialog extends FreeColDialog implements ActionListener {
     
     private final JButton cancel = new JButton(Messages.message("trainDialog.cancel"));
 
-    private final ArrayList<NumberedUnitType> trainableUnits = new ArrayList<NumberedUnitType>();
+    private final ArrayList<UnitType> trainableUnits = new ArrayList<UnitType>();
+
+    private final ArrayList<JLabel> prices = new ArrayList<JLabel>();
 
     private final ArrayList<JButton> buttons = new ArrayList<JButton>();
+    
+    private final Europe europe;
 
 
     /**
@@ -68,11 +75,10 @@ public final class TrainDialog extends FreeColDialog implements ActionListener {
 
         ImageLibrary library = (ImageLibrary) parent.getImageProvider();
 
-        int numberOfTypes = FreeCol.getSpecification().numberOfUnitTypes();
-        for (int type = 0; type < numberOfTypes; type++) {
-            UnitType unitType = FreeCol.getSpecification().unitType(type);
-            if (unitType.getPrice() > 0 && unitType.getSkill() > 0) {
-                trainableUnits.add(new NumberedUnitType(unitType, type));
+        List<UnitType> unitTypes = FreeCol.getSpecification().getUnitTypeList();
+        for(UnitType unitType : unitTypes) {
+            if (unitType.getSkill() > 0 && unitType.hasPrice()) {
+                trainableUnits.add(unitType);
             }
         }
         Collections.sort(trainableUnits, priceComparator);
@@ -97,17 +103,19 @@ public final class TrainDialog extends FreeColDialog implements ActionListener {
 
         int row = 1;
         int counter = 0;
-        for (NumberedUnitType unitType : trainableUnits) {
-            int graphicsType = ImageLibrary.getUnitGraphicsType(unitType.index, false, false, 0, false);
-            JButton newButton = new JButton(Messages.message(unitType.type.getName()), 
+        for (UnitType unitType : trainableUnits) {
+            int graphicsType = ImageLibrary.getUnitGraphicsType(unitType.getIndex(), false, false, 0, false);
+            JButton newButton = new JButton(Unit.getName(unitType), 
                                             library.getScaledUnitImageIcon(graphicsType, 0.66f));
-            newButton.setActionCommand(String.valueOf(unitType.index));
+            newButton.setActionCommand(unitType.getId());
             newButton.addActionListener(this);
             newButton.setIconTextGap(margin);
             enterPressesWhenFocused(newButton);
             buttons.add(newButton);
-            trainPanel.add(new JLabel(String.valueOf(unitType.type.getPrice())),
-                           higConst.rc(row, labelColumn[counter]));
+            
+            JLabel newLabel = new JLabel();
+            prices.add(newLabel);
+            trainPanel.add(newLabel, higConst.rc(row, labelColumn[counter]));
             trainPanel.add(newButton, higConst.rc(row, buttonColumn[counter]));
             if (counter == 1) {
                 counter = 0;
@@ -143,10 +151,15 @@ public final class TrainDialog extends FreeColDialog implements ActionListener {
         Player player = freeColClient.getMyPlayer();
         int numberOfTypes = trainableUnits.size();
         for (int index = 0; index < numberOfTypes; index++) {
-            if (trainableUnits.get(index).type.getPrice() > player.getGold()) {
-                buttons.get(index).setEnabled(false);
+            JButton button = buttons.get(index);
+            UnitType unitType = FreeCol.getSpecification().getUnitType(button.getActionCommand());
+            
+            int price = player.getEurope().getUnitPrice(unitType);
+            prices.get(index).setText(String.valueOf(price));
+            if (trainableUnits.get(index).getPrice() > player.getGold()) {
+                button.setEnabled(false);
             } else {
-                buttons.get(index).setEnabled(true);
+                button.setEnabled(true);
             }
         }
     }
@@ -159,30 +172,12 @@ public final class TrainDialog extends FreeColDialog implements ActionListener {
      */
     public void actionPerformed(ActionEvent event) {
         String command = event.getActionCommand();
-        try {
-            int value = Integer.valueOf(command).intValue();
-            if (value == TRAIN_CANCEL) {
-                setResponse(new Integer(-1));
-            } else {
-                inGameController.trainUnitInEurope(value);
-                setResponse(new Integer(0));
-            }
-        } catch (NumberFormatException e) {
-            logger.warning("Invalid action number");
+        UnitType unitType = FreeCol.getSpecification().getUnitType(command);
+        if (unitType != null) {
+            inGameController.trainUnitInEurope(unitType);
+            setResponse(new Integer(0));
+        } else {
             setResponse(new Integer(-1));
-        }
-    }
-    
-    private class NumberedUnitType {
-
-        public final UnitType type;
-
-        public final int index;
-
-
-        public NumberedUnitType(UnitType type, int index) {
-            this.type = type;
-            this.index = index;
         }
     }
 }

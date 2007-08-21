@@ -1,5 +1,7 @@
 package net.sf.freecol.common.model;
 
+import java.util.Enumeration;
+import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
 import java.util.logging.Logger;
@@ -8,8 +10,10 @@ import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
+import net.sf.freecol.FreeCol;
 
 import net.sf.freecol.client.gui.i18n.Messages;
+import net.sf.freecol.common.Specification;
 
 import org.w3c.dom.Element;
 
@@ -39,9 +43,9 @@ public final class Europe extends FreeColGameObject implements Location,
      * can be used to communicate with the server/client. The array holds
      * exactly 3 elements and element 0 corresponds to recruit slot 1.
      */
-    private int[] recruitables = { -1, -1, -1 };
+    private UnitType[] recruitables = { null, null, null };
 
-    private int artilleryPrice;
+    private Hashtable<String, Integer> unitPrices = new Hashtable<String, Integer>();
     private int recruitPrice;
     private static final int RECRUIT_PRICE_INITIAL = 200;
 
@@ -71,7 +75,6 @@ public final class Europe extends FreeColGameObject implements Location,
         setRecruitable(1, owner.generateRecruitable());
         setRecruitable(2, owner.generateRecruitable());
 
-        artilleryPrice = 500;
         recruitPrice = RECRUIT_PRICE_INITIAL;
     }
 
@@ -132,7 +135,7 @@ public final class Europe extends FreeColGameObject implements Location,
      * @exception IllegalArgumentException
      *                if the given <code>slot</code> does not exist.
      */
-    public int getRecruitable(int slot) {
+    public UnitType getRecruitable(int slot) {
         if ((slot >= 0) && (slot < 3)) {
             return recruitables[slot];
         }
@@ -151,13 +154,12 @@ public final class Europe extends FreeColGameObject implements Location,
      *            The new type for the unit at the given slot in Europe. Should
      *            be a valid unit type.
      */
-    public void setRecruitable(int slot, int type) {
+    public void setRecruitable(int slot, UnitType type) {
         // Note - changed in order to match getRecruitable
-        if (slot >= 0 && slot < 3 && type >= 0 && type < Unit.UNIT_COUNT) {
+        if (slot >= 0 && slot < 3) {
             recruitables[slot] = type;
         } else {
-            logger.warning("setRecruitable: invalid slot(" + slot
-                    + ") or type(" + type + ") given.");
+            logger.warning("setRecruitable: invalid slot(" + slot + ") given.");
         }
     }
 
@@ -176,7 +178,7 @@ public final class Europe extends FreeColGameObject implements Location,
      * @exception IllegalStateException
      *                if the player recruiting the unit cannot afford the price.
      */
-    public void recruit(int slot, Unit unit, int newRecruitable) {
+    public void recruit(int slot, Unit unit, UnitType newRecruitable) {
         if (unit == null) {
             throw new NullPointerException();
         }
@@ -210,7 +212,7 @@ public final class Europe extends FreeColGameObject implements Location,
      *                If there is not enough crosses to emigrate the
      *                <code>Unit</code>.
      */
-    public void emigrate(int slot, Unit unit, int newRecruitable) {
+    public void emigrate(int slot, Unit unit, UnitType newRecruitable) {
         if (unit == null) {
             throw new NullPointerException();
         }
@@ -358,12 +360,30 @@ public final class Europe extends FreeColGameObject implements Location,
     }
 
     /**
+     * Returns the price of a unit in Europe.
+     * 
+     * @param unitType The type of unit of which you need the price.
+     * @return The price of this unit when trained in Europe. 'UnitType.UNDEFINED' is returned
+     *         in case the unit cannot be bought.
+     */
+    public int getUnitPrice(UnitType unitType) {
+        Integer price = unitPrices.get(unitType.getId());
+        if (price != null) {
+            return price.intValue();
+        } else {
+            return unitType.getPrice();
+        }
+    }
+
+    /**
      * Trains a unit in Europe.
      * 
      * @param unit
      *            The trained unit.
      * @exception NullPointerException
      *                if <code>unit == null</code>.
+     * @exception IllegalArgumentException
+     *                if the unit to be trained doesn't have price
      * @exception IllegalStateException
      *                if the player recruiting the unit cannot afford the price.
      */
@@ -372,25 +392,22 @@ public final class Europe extends FreeColGameObject implements Location,
             throw new NullPointerException();
         }
 
-        if (unit.getPrice() > unit.getOwner().getGold()) {
+        int price = getUnitPrice(unit.getUnitType());
+        if (price <= 0) {
+            throw new IllegalArgumentException();
+        }
+        
+        if (getUnitPrice(unit.getUnitType()) > unit.getOwner().getGold()) {
             throw new IllegalStateException();
         }
 
-        unit.getOwner().modifyGold(-unit.getPrice());
+        unit.getOwner().modifyGold(price);
         unit.setLocation(this);
 
-        if (unit.getType() == Unit.ARTILLERY) {
-            artilleryPrice += 100;
+        int increasingPrice = unit.getUnitType().getIncreasingPrice();
+        if (increasingPrice > 0) {
+            unitPrices.put(unit.getUnitType().getId(), new Integer(price + increasingPrice));
         }
-    }
-
-    /**
-     * Gets the current price for an artillery.
-     * 
-     * @return The current price of the artillery in this <code>Europe</code>.
-     */
-    public int getArtilleryPrice() {
-        return artilleryPrice;
     }
 
     /**
@@ -437,7 +454,7 @@ public final class Europe extends FreeColGameObject implements Location,
         for (Unit unit : getUnitList()) {
             if (unit.isNaval() && unit.isUnderRepair()) {
                 unit.setHitpoints(unit.getHitpoints() + 1);
-                if (unit.getHitpoints() == Unit.getInitialHitpoints(unit.getType())) {
+                if (!unit.isUnderRepair()) {
                     addModelMessage(this, "model.unit.shipRepaired",
                                     new String[][] {
                                         { "%unit%", unit.getName() },
@@ -517,12 +534,19 @@ public final class Europe extends FreeColGameObject implements Location,
         out.writeStartElement(getXMLElementTagName());
 
         out.writeAttribute("ID", getID());
-        out.writeAttribute("recruit0", Integer.toString(recruitables[0]));
-        out.writeAttribute("recruit1", Integer.toString(recruitables[1]));
-        out.writeAttribute("recruit2", Integer.toString(recruitables[2]));
-        out.writeAttribute("artilleryPrice", Integer.toString(artilleryPrice));
+        out.writeAttribute("recruit0", Integer.toString(recruitables[0].getIndex()));
+        out.writeAttribute("recruit1", Integer.toString(recruitables[1].getIndex()));
+        out.writeAttribute("recruit2", Integer.toString(recruitables[2].getIndex()));
         out.writeAttribute("recruitPrice", Integer.toString(recruitPrice));
         out.writeAttribute("owner", owner.getID());
+        Enumeration<String> keys = unitPrices.keys();
+        while (keys.hasMoreElements()) {
+            String unitType = keys.nextElement();
+            out.writeStartElement("unitPrice");
+            out.writeAttribute("unitType", unitType);
+            out.writeAttribute("price", unitPrices.get(unitType).toString());
+            out.writeEndElement();
+        }
 
         unitContainer.toXML(out, player, showAll, toSavedGame);
 
@@ -541,14 +565,10 @@ public final class Europe extends FreeColGameObject implements Location,
             throws XMLStreamException {
         setID(in.getAttributeValue(null, "ID"));
 
-        recruitables[0] = Integer.parseInt(in.getAttributeValue(null,
-                "recruit0"));
-        recruitables[1] = Integer.parseInt(in.getAttributeValue(null,
-                "recruit1"));
-        recruitables[2] = Integer.parseInt(in.getAttributeValue(null,
-                "recruit2"));
-        artilleryPrice = Integer.parseInt(in.getAttributeValue(null,
-                "artilleryPrice"));
+        Specification spec = FreeCol.getSpecification();
+        recruitables[0] = spec.unitType(Integer.parseInt(in.getAttributeValue(null, "recruit0")));
+        recruitables[1] = spec.unitType(Integer.parseInt(in.getAttributeValue(null, "recruit1")));
+        recruitables[2] = spec.unitType(Integer.parseInt(in.getAttributeValue(null, "recruit2")));
         String recruitPriceString = in.getAttributeValue(null, "recruitPrice");
         owner = (Player) getGame().getFreeColGameObject(
                 in.getAttributeValue(null, "owner"));
@@ -560,6 +580,7 @@ public final class Europe extends FreeColGameObject implements Location,
         else
             recruitPrice = RECRUIT_PRICE_INITIAL;
 
+        unitPrices.clear();
         while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
             if (in.getLocalName().equals(UnitContainer.getXMLElementTagName())) {
                 unitContainer = (UnitContainer) getGame().getFreeColGameObject(
@@ -569,6 +590,10 @@ public final class Europe extends FreeColGameObject implements Location,
                 } else {
                     unitContainer = new UnitContainer(getGame(), this, in);
                 }
+            } else if (in.getLocalName().equals("unitPrice")) {
+                String unitType = in.getAttributeValue(null, "unitType");
+                Integer price = new Integer(in.getAttributeValue(null, "price"));
+                unitPrices.put(unitType, price);
             }
         }
     }

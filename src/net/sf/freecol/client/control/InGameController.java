@@ -50,6 +50,7 @@ import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.TradeRoute;
 import net.sf.freecol.common.model.Unit;
+import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.model.WorkLocation;
 import net.sf.freecol.common.model.Map.Position;
 import net.sf.freecol.common.model.TradeRoute.Stop;
@@ -1631,7 +1632,7 @@ public final class InGameController implements NetworkConstants {
             NodeList capturedGoods = attackResultElement.getElementsByTagName("capturedGoods");
             for (int i = 0; i < capturedGoods.getLength(); ++i) {
                 Element goods = (Element) capturedGoods.item(i);
-                int type = Integer.parseInt(goods.getAttribute("type"));
+                GoodsType type = FreeCol.getSpecification().getGoodsType(goods.getAttribute("type"));
                 int amount = Integer.parseInt(goods.getAttribute("amount"));
                 unit.getGoodsContainer().addGoods(type, amount);
             }
@@ -2844,7 +2845,7 @@ public final class InGameController implements NetworkConstants {
      * 
      * @param unitType The type of unit to be trained.
      */
-    public void trainUnitInEurope(int unitType) {
+    public void trainUnitInEurope(UnitType unitType) {
         if (freeColClient.getGame().getCurrentPlayer() != freeColClient.getMyPlayer()) {
             freeColClient.getCanvas().showInformationMessage("notYourTurn");
             return;
@@ -2856,8 +2857,7 @@ public final class InGameController implements NetworkConstants {
         Player myPlayer = freeColClient.getMyPlayer();
         Europe europe = myPlayer.getEurope();
 
-        if ((unitType != Unit.ARTILLERY && myPlayer.getGold() < Unit.getPrice(unitType))
-                || (unitType == Unit.ARTILLERY && myPlayer.getGold() < europe.getArtilleryPrice())) {
+        if (myPlayer.getGold() < europe.getUnitPrice(unitType)) {
             // System.out.println("Price: " + Unit.getPrice(unitType) + ", Gold:
             // " + myPlayer.getGold());
             canvas.errorMessage("notEnoughGold");
@@ -2865,7 +2865,7 @@ public final class InGameController implements NetworkConstants {
         }
 
         Element trainUnitInEuropeElement = Message.createNewRootElement("trainUnitInEurope");
-        trainUnitInEuropeElement.setAttribute("unitType", Integer.toString(unitType));
+        trainUnitInEuropeElement.setAttribute("unitType", unitType.getId());
 
         Element reply = client.ask(trainUnitInEuropeElement);
         if (reply.getTagName().equals("trainUnitInEuropeConfirmed")) {
@@ -2950,7 +2950,8 @@ public final class InGameController implements NetworkConstants {
             } else {
                 unit.readFromXMLElement(unitElement);
             }
-            europe.recruit(slot, unit, Integer.parseInt(reply.getAttribute("newRecruitable")));
+            UnitType unitType = FreeCol.getSpecification().getUnitType(reply.getAttribute("newRecruitable"));
+            europe.recruit(slot, unit, unitType);
         } else {
             logger.warning("Could not recruit the specified unit in europe.");
             return;
@@ -3003,7 +3004,7 @@ public final class InGameController implements NetworkConstants {
         } else {
             unit.readFromXMLElement(unitElement);
         }
-        int newRecruitable = Integer.parseInt(reply.getAttribute("newRecruitable"));
+        UnitType newRecruitable = FreeCol.getSpecification().getUnitType(reply.getAttribute("newRecruitable"));
         europe.emigrate(slot, unit, newRecruitable);
 
         freeColClient.getCanvas().updateGoldLabel();
@@ -3132,7 +3133,7 @@ public final class InGameController implements NetworkConstants {
      * 
      * @param unitType The type of unit to be purchased.
      */
-    public void purchaseUnitFromEurope(int unitType) {
+    public void purchaseUnitFromEurope(UnitType unitType) {
         trainUnitInEurope(unitType);
     }
 

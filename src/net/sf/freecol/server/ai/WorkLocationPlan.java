@@ -2,6 +2,7 @@
 package net.sf.freecol.server.ai;
 
 import java.util.logging.Logger;
+import net.sf.freecol.FreeCol;
 
 import net.sf.freecol.common.model.Building;
 import net.sf.freecol.common.model.ColonyTile;
@@ -9,8 +10,10 @@ import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.Tile;
+import net.sf.freecol.common.model.TileImprovement;
 import net.sf.freecol.common.model.TileImprovementType;
 import net.sf.freecol.common.model.Unit;
+import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.model.WorkLocation;
 
 import org.w3c.dom.Document;
@@ -195,13 +198,13 @@ public class WorkLocationPlan {
         }
         
         if (workLocation instanceof ColonyTile) {
-            if (!Goods.isFarmedGoods(goodsType)) {
+            if (!goodsType.isFarmed()) {
                 return 0;
             }
 
             ColonyTile ct = (ColonyTile) workLocation;
             Tile t = ct.getWorkTile();
-            int expertUnitType = ct.getExpertForProducing(goodsType);
+            UnitType expertUnitType = FreeCol.getSpecification().getExpertForProducing(goodsType);
 
             int base = t.getMaximumPotential(goodsType);
 
@@ -267,7 +270,7 @@ public class WorkLocationPlan {
 
         element.setAttribute("ID", workLocation.getID());
         element.setAttribute("priority", Integer.toString(priority));
-        element.setAttribute("goodsType", Integer.toString(goodsType));
+        element.setAttribute("goodsType", Integer.toString(goodsType.getIndex()));
 
         return element;
     }
@@ -282,7 +285,7 @@ public class WorkLocationPlan {
     public void readFromXMLElement(Element element) {
         workLocation = (WorkLocation) getAIMain().getFreeColGameObject(element.getAttribute("ID"));
         priority = Integer.parseInt(element.getAttribute("priority"));
-        goodsType = Integer.parseInt(element.getAttribute("goodsType"));
+        goodsType = FreeCol.getSpecification().getGoodsType(Integer.parseInt(element.getAttribute("goodsType")));
     }
 
 

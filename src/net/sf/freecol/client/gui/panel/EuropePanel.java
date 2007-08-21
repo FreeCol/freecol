@@ -41,6 +41,7 @@ import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.Europe;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Goods;
+import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.TransactionListener;
 import net.sf.freecol.common.model.Unit;
@@ -374,7 +375,7 @@ public final class EuropePanel extends FreeColPanel implements ActionListener {
      * Refreshes the components on this panel that need to be refreshed after
      * the user has recruited a new unit.
      */
-    public void refreshBuyRecruit() {
+    public void refreshDocks() {
         docksPanel.removeAll();
 
         Iterator<Unit> unitIterator = europe.getUnitIterator();
@@ -401,26 +402,22 @@ public final class EuropePanel extends FreeColPanel implements ActionListener {
      * @param type The type of unit that was just purchased. This is needed to
      *            know which component needs to be refreshed.
      */
-    public void refreshBuyPurchase(int type) {
-        if (type == Unit.ARTILLERY) {
-            refreshBuyRecruit();
-        } else {
-            inPortPanel.removeAll();
+    public void refreshInPort() {
+        inPortPanel.removeAll();
 
-            List<Unit> unitIterator = europe.getUnitList();
-            for (Unit unit : unitIterator) {
-                if ((unit.getState() == Unit.ACTIVE) && (unit.isNaval())) {
-                    UnitLabel unitLabel = new UnitLabel(unit, parent);
-                    unitLabel.setTransferHandler(defaultTransferHandler);
-                    unitLabel.addMouseListener(pressListener);
-                    inPortPanel.add(unitLabel);
-                }
+        List<Unit> unitIterator = europe.getUnitList();
+        for (Unit unit : unitIterator) {
+            if ((unit.getState() == Unit.ACTIVE) && (unit.isNaval())) {
+                UnitLabel unitLabel = new UnitLabel(unit, parent);
+                unitLabel.setTransferHandler(defaultTransferHandler);
+                unitLabel.addMouseListener(pressListener);
+                inPortPanel.add(unitLabel);
             }
-
-            // Only one component will be repainted!
-            inPortPanel.repaint(0, 0, inPortPanel.getWidth(), inPortPanel.getHeight());
-            setSelectedUnit(unitIterator.get(unitIterator.size() - 1));
         }
+
+        // Only one component will be repainted!
+        inPortPanel.repaint(0, 0, inPortPanel.getWidth(), inPortPanel.getHeight());
+        setSelectedUnit(unitIterator.get(unitIterator.size() - 1));
     }
 
     /**
@@ -629,7 +626,7 @@ public final class EuropePanel extends FreeColPanel implements ActionListener {
                 updateCargoPanel();
                 getCargoPanel().revalidate();
                 // update docks panel
-                refreshBuyRecruit();
+                refreshDocks();
                 docksPanel.revalidate();
                 refresh();
             }
@@ -648,7 +645,7 @@ public final class EuropePanel extends FreeColPanel implements ActionListener {
             // Get Command
             int intCommand = Integer.valueOf(command).intValue();
             // Close any open Europe Dialog, and show new one if required
-            int Response = parent.showEuropeDialog(intCommand);
+            int response = parent.showEuropeDialog(intCommand);
             // Process Command
             switch (intCommand) {
             case EXIT:
@@ -659,14 +656,9 @@ public final class EuropePanel extends FreeColPanel implements ActionListener {
             case RECRUIT:
             case PURCHASE:
             case TRAIN:
-                if (intCommand == PURCHASE) {
-                    if (Response > -1) {
-                        refreshBuyPurchase(Response);
-                    }
-                } else {
-                    if (Response == 0) {
-                        refreshBuyRecruit();
-                    }
+                if (response > -1) {
+                    refreshDocks();
+                    refreshInPort();
                 }
                 revalidate();
                 break;
@@ -1125,7 +1117,7 @@ public final class EuropePanel extends FreeColPanel implements ActionListener {
             }
         }
         
-        public void logPurchase(int goodsType, int amount, int price) {
+        public void logPurchase(GoodsType goodsType, int amount, int price) {
             int total = amount * price;
             String text = Messages.message("transaction.purchase",
                     "%goods%", Goods.getName(goodsType),
@@ -1136,7 +1128,7 @@ public final class EuropePanel extends FreeColPanel implements ActionListener {
             add(text);
         }
 
-        public void logSale(int goodsType, int amount, int price, int tax) {
+        public void logSale(GoodsType goodsType, int amount, int price, int tax) {
             int totalBeforeTax = amount * price;
             int totalTax = totalBeforeTax * tax / 100;
             int totalAfterTax = totalBeforeTax - totalTax;

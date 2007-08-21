@@ -15,6 +15,7 @@ import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Unit;
 import cz.autel.dmi.HIGLayout;
+import net.sf.freecol.common.model.UnitType;
 
 /**
  * The panel that allows a user to recruit people in Europe.
@@ -105,8 +106,8 @@ public final class RecruitDialog extends FreeColDialog implements ActionListener
             question.setText(Messages.message("recruitDialog.clickOn", "%money%", String.valueOf(recruitPrice)));
 
             for (int index = 0; index < NUMBER_OF_PERSONS; index++) {
-                int unitType = player.getEurope().getRecruitable(index);
-                int graphicsType = ImageLibrary.getUnitGraphicsType(unitType, false, false, 0, false);
+                UnitType unitType = player.getEurope().getRecruitable(index);
+                int graphicsType = ImageLibrary.getUnitGraphicsType(unitType.getIndex(), false, false, 0, false);
                 person[index].setText(Unit.getName(unitType));
                 person[index].setIcon(library.getScaledUnitImageIcon(graphicsType, 0.66f));
 

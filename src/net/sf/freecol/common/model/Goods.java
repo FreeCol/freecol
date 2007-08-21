@@ -207,7 +207,7 @@ public class Goods implements Locatable, Ownable, Nameable {
      * @return The name of this type of goods.
      */
     public String getName() {
-        return type.getName();
+        return getName(type);
     }
 
     /**
@@ -226,7 +226,7 @@ public class Goods implements Locatable, Ownable, Nameable {
      * @return The name of this type of goods.
      */
     public String getName(boolean sellable) {
-        return type.getName(sellable);
+        return getName(type, sellable);
     }
 
     /**
@@ -288,27 +288,18 @@ public class Goods implements Locatable, Ownable, Nameable {
      * @param type  The type of good to return
      * @return
      *
-     * TODO - needs to be completed
      */
-    /*
-    public static String getName(int type) {
-
-        if ( 0 <= type  &&  type < FreeCol.getSpecification().numberOfGoodsTypes() ) {
-            return Messages.message(FreeCol.getSpecification().goodsType(type).name);
-        }
-        return Messages.message("model.goods.Unknown");
+    public static String getName(GoodsType type) {
+        return Messages.message(type.getName());
     }
 
-
-    public static String getName(int type, boolean sellable) {
-
+    public static String getName(GoodsType type, boolean sellable) {
         if (sellable) {
             return getName(type);
         } else {
             return getName(type) + " (" + Messages.message("model.goods.Boycotted") + ")";
         }
     }
-    */
 
     /**
     * Sets the location of the goods.

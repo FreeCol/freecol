@@ -2738,7 +2738,7 @@ public class Player extends FreeColGameObject implements Nameable {
      * 
      * @return A random unit type of a unit that is recruitable in Europe.
      */
-    public int generateRecruitable() {
+    public UnitType generateRecruitable() {
         // Random will be a number from 0 to 99 (never 100!):
         int random = (int) (Math.random() * 100);
         if (hasFather(FoundingFather.WILLIAM_BREWSTER)) {
@@ -2869,7 +2869,7 @@ public class Player extends FreeColGameObject implements Nameable {
      * @param goodsIndex The index of the goods.
      */
     public void setArrears(int goodsIndex) {
-        arrears[goodsIndex] = (getDifficulty() + 3) * 100 * getMarket().paidForSale(typeOfGoods);
+        arrears[goodsIndex] = (getDifficulty() + 3) * 100 * getMarket().paidForSale(goodsIndex);
     }
 
     /**

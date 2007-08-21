@@ -412,7 +412,7 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
             return false;
         }
 
-        if (!((Unit) locatable).isColonist() && ((Unit) locatable).getType() != Unit.INDIAN_CONVERT) {
+        if (!((Unit) locatable).getUnitType().hasSkill()) {
             return false;
         }
 
@@ -434,10 +434,10 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
      * @return <code>true</code> if this unit could be added.
     */
     public boolean canAddAsTeacher(Unit unit) {
-        return canAddAsTeacher(unit.getType());
+        return canAddAsTeacher(unit.getUnitType());
     }
 
-    public boolean canAddAsTeacher(int unitType) {
+    public boolean canAddAsTeacher(UnitType unitType) {
         if (getType() == SCHOOLHOUSE) {
             if (Unit.getSkillLevel(unitType) <= 0) {
                 return false;
@@ -643,7 +643,7 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
             return; 
         } else if (type == SCHOOLHOUSE) {
             trainStudents();
-        } else if (getGoodsOutputType() != -1) {
+        } else if (getGoodsOutputType() != null) {
             produceGoods();
         }
     }

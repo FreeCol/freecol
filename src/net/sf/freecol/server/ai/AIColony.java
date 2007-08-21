@@ -13,15 +13,18 @@ import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
+import net.sf.freecol.FreeCol;
 
 import net.sf.freecol.common.model.Building;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.ColonyTile;
 import net.sf.freecol.common.model.Goods;
+import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.TileImprovement;
 import net.sf.freecol.common.model.Unit;
+import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.model.WorkLocation;
 import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.networking.Message;
@@ -283,14 +286,14 @@ public class AIColony extends AIObject {
         Iterator<Unit> unitIterator = colony.getUnitIterator();
         while (unitIterator.hasNext()) {
             Unit u = unitIterator.next();
-            int workType = u.getExpertWorkType();
-            if (workType >= 0) {
+            GoodsType workType = u.getExpertWorkType();
+            if (workType != null) {
                 Iterator<WorkLocationPlan> wlpIterator = workLocationPlans.iterator();
                 while (wlpIterator.hasNext()) {
                     WorkLocationPlan wlp = wlpIterator.next();
                     if (wlp.getGoodsType() == workType) {
-                        if (workType < production.length) {
-                            production[workType] += wlp.getProductionOf(workType);
+                        if (workType.getIndex() < production.length) {
+                            production[workType.getIndex()] += wlp.getProductionOf(workType);
                         }
                         production[(Goods.FOOD).getIndex()] -= 2;
                         wlpIterator.remove();
@@ -306,7 +309,7 @@ public class AIColony extends AIObject {
         int value = 120; // TODO: Better method for determining the value of
         // the wish.
         while (workLocationPlans.size() > 0) {
-            int unitType = -1;
+            UnitType unitType = null;
 
             // Farmer/fisherman wishes:
             if (production[(Goods.FOOD).getIndex()] < 2) {
@@ -318,13 +321,16 @@ public class AIColony extends AIObject {
                         production[(Goods.FOOD).getIndex()] -= 2;
                         wlpIterator.remove();
 
-                        unitType = ((ColonyTile) wlp.getWorkLocation()).getWorkTile().isLand() ? Unit.EXPERT_FARMER
-                                : Unit.EXPERT_FISHERMAN;
+                        if (((ColonyTile) wlp.getWorkLocation()).getWorkTile().isLand()) {
+                            FreeCol.getSpecification().getExpertForProducing(Goods.FOOD);
+                        } else {
+                            FreeCol.getSpecification().getExpertForProducing(Goods.FISH);
+                        }
                         break;
                     }
                 }
             }
-            if (unitType == -1) {
+            if (unitType == null) {
                 if (production[(Goods.FOOD).getIndex()] < 2) {
                     // Not enough food.
                     break;
@@ -334,21 +340,21 @@ public class AIColony extends AIObject {
                     WorkLocationPlan wlp = wlpIterator.next();
                     // TODO: Check if the production of the raw material is
                     // sufficient.
-                    if (wlp.getGoodsType() < production.length) {
+                    if (wlp.getGoodsType().getIndex() < production.length) {
                         production[wlp.getGoodsType().getIndex()] += wlp.getProductionOf(wlp.getGoodsType());
                     }
                     production[(Goods.FOOD).getIndex()] -= 2;
                     wlpIterator.remove();
 
                     if (wlp.getWorkLocation() instanceof ColonyTile) {
-                        unitType = ((ColonyTile) wlp.getWorkLocation()).getExpertForProducing(wlp.getGoodsType());
+                        unitType = FreeCol.getSpecification().getExpertForProducing(wlp.getGoodsType());
                     } else {
                         unitType = ((Building) wlp.getWorkLocation()).getExpertUnitType();
                     }
                     break;
                 }
             }
-            if (unitType >= 0) {
+            if (unitType != null) {
                 boolean expert = (nonExpertUnits.size() <= 0);
 
                 boolean wishFound = false;

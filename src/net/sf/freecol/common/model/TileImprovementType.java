@@ -57,7 +57,7 @@ public final class TileImprovementType
         return name;
     }
 
-    public String isNatural() {
+    public boolean isNatural() {
         return natural;
     }
 

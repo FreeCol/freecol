@@ -259,7 +259,7 @@ public class ColonyTile extends FreeColGameObject implements WorkLocation, Ownab
             return false;
         }
         
-        if (!((Unit) locatable).isColonist() && ((Unit) locatable).getType() != Unit.INDIAN_CONVERT) {
+        if (!((Unit) locatable).getUnitType().hasSkill()) {
             return false;
         }
 
@@ -414,7 +414,7 @@ public class ColonyTile extends FreeColGameObject implements WorkLocation, Ownab
         } else if (getUnit() != null && !isOccupied()) {
             produceGoods();
         }
-        workTile.expendResource(getUnit.getWorkType(), colony);
+        workTile.expendResource(getUnit().getWorkType(), colony);
     }
 
     private void produceGoods() {
