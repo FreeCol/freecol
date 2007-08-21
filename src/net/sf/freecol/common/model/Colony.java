@@ -1421,7 +1421,7 @@ public final class Colony extends Settlement implements Location, Nameable {
         for (Unit unit : getTile().getUnitList()) {
             if (unit.isNaval() && unit.isUnderRepair()) {
                 unit.setHitpoints(unit.getHitpoints() + 1);
-                if (unit.getHitpoints() == Unit.getInitialHitpoints(unit.getType())) {
+                if (!unit.isUnderRepair()) {
                     addModelMessage(this, "model.unit.shipRepaired",
                             new String[][] {
                                 { "%unit%", unit.getName() },
@@ -1880,12 +1880,8 @@ public final class Colony extends Settlement implements Location, Nameable {
         Iterator<Unit> unitIterator = getTile().getUnitIterator();
         while (unitIterator.hasNext()) {
             Unit unit = unitIterator.next();
-            switch (unit.getType()) {
-            case Unit.ARTILLERY:
-            case Unit.DAMAGED_ARTILLERY:
-                attackPower += unit.getOffensePower(unit);
-                break;
-            default:
+            if (unit.hasAbility("model.ability.bombard")) {
+                attackPower += unit.getUnitType().getOffence();
             }
         }
         if (attackPower > 48) {
@@ -1902,19 +1898,16 @@ public final class Colony extends Settlement implements Location, Nameable {
     public Unit getBombardingAttacker() {
         Unit attacker = null;
         Iterator<Unit> unitIterator = getTile().getUnitIterator();
-        loop: while (unitIterator.hasNext()) {
+        int maxPower = -1;
+        while (unitIterator.hasNext()) {
             Unit unit = unitIterator.next();
             logger.finest("Unit is " + unit.getName());
-            switch (unit.getType()) {
-            case Unit.ARTILLERY:
-                attacker = unit;
-                break loop;
-            case Unit.DAMAGED_ARTILLERY:
-                if (attacker == null) {
+            if (unit.hasAbility("model.ability.bombard")) {
+                int power = unit.getUnitType().getOffence();
+                if (power > maxPower) {
+                    power = maxPower;
                     attacker = unit;
                 }
-                break;
-            default:
             }
         }
         return attacker;
