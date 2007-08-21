@@ -8,9 +8,6 @@ import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.freecol.common.model.Tile;
-import net.sf.freecol.common.model.TileType;
-import net.sf.freecol.common.model.TileImprovement;
-import net.sf.freecol.common.model.TileImprovementType;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.server.ai.mission.PioneeringMission;
 
@@ -23,13 +20,13 @@ import org.w3c.dom.Element;
  *
  * @see Tile
  */
-public class TileImprovementPlan extends AIObject {
+public class TileImprovement extends AIObject {
     @SuppressWarnings("unused")
-    private static final Logger logger = Logger.getLogger(TileImprovementPlan.class.getName());
+    private static final Logger logger = Logger.getLogger(TileImprovement.class.getName());
 
     public static final String  COPYRIGHT = "Copyright (C) 2003-2005 The FreeCol Team";
     public static final String  LICENSE = "http://www.gnu.org/licenses/gpl.html";
-    public static final String  REVISION = "$Revision: 1862 $";
+    public static final String  REVISION = "$Revision$";
 /*
     public static final int PLOW = Unit.PLOW;
     public static final int BUILD_ROAD = Unit.BUILD_ROAD;
