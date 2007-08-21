@@ -131,6 +131,7 @@ public class GoodsTradeItem extends TradeItem {
      */
     protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
         super.readFromXMLImpl(in);
+        this.settlement = (Settlement) getGame().getFreeColGameObject(in.getAttributeValue(null, "settlement"));
         while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
             if (in.getLocalName().equals(Goods.getXMLElementTagName())) {
                 this.goods = new Goods(getGame(), in);
@@ -159,6 +160,7 @@ public class GoodsTradeItem extends TradeItem {
     public void toXML(XMLStreamWriter out, Player player) throws XMLStreamException {
         out.writeStartElement(getXMLElementTagName());
         super.toXML(out, player);
+        out.writeAttribute("settlement", settlement.getID());
         this.goods.toXML(out, player);
         out.writeEndElement();
     }
