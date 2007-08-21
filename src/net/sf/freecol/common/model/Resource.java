@@ -80,9 +80,11 @@ public class Resource implements TileItem {
      * @param game The <code>Game</code> in which this object belong.
      * @param id The unique identifier for this object.
      */
+    /*
     public TileImprovement(Game game, String id) {
         super(game, id);
     }
+    */
 
     /**
     * Returns a textual representation of this object.
@@ -157,6 +159,7 @@ public class Resource implements TileItem {
             quantity -= usedQuantity;
         } else {
             logger.warning("Insufficient quantity in " + this);
+        }
         return quantity;
     }
 

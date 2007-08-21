@@ -1769,7 +1769,7 @@ public class Map extends FreeColGameObject {
         int n = 1;
         for (int i = 0; i < NUMBER_OF_DIRECTIONS; i++) {
             base[i] = 0;
-            for (int j : directions)
+            for (int j : directions) {
                 if (j == i) {
                     base[i] = n;
                     n *= baseNumber;

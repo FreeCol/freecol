@@ -28,13 +28,13 @@ public final class Market extends FreeColGameObject implements Ownable {
      * {@link #sell(int, int, Player, int) selling} goods.
      */
     public static final int EUROPE = 0,
-                            CUSTOM_HOUSE = 1;
+        CUSTOM_HOUSE = 1;
     
     private static final int GOODS_STABILIZER = 750;
 
     private final Data[]  dataForGoodType;
-/*  Depreciated - now in Specification
-    private static final int[] initialAmounts = {
+    /*  Depreciated - now in Specification
+        private static final int[] initialAmounts = {
         10000, // FOOD
         1500, // SUGAR
         1500, // TOBACCO
@@ -51,9 +51,9 @@ public final class Market extends FreeColGameObject implements Ownable {
         1000, // TRADE_GOODS
         500, // TOOLS
         500  // MUSKETS
-    };
+        };
 
-    private static final int[] priceDifferences = {
+        private static final int[] priceDifferences = {
         7, // FOOD
         2, // SUGAR
         2, // TOBACCO
@@ -70,9 +70,9 @@ public final class Market extends FreeColGameObject implements Ownable {
         1, // TRADE_GOODS
         1, // TOOLS
         1  // MUSKETS
-    };
+        };
 
-    private int[] initialPrices = {
+        private int[] initialPrices = {
         1, // FOOD
         4, // SUGAR
         4, // TOBACCO
@@ -89,10 +89,10 @@ public final class Market extends FreeColGameObject implements Ownable {
         1, // TRADE_GOODS
         1, // TOOLS
         1  // MUSKETS
-    };
-*/
+        };
+    */
     private ArrayList<TransactionListener> transactionListeners =
-            new ArrayList<TransactionListener>();
+        new ArrayList<TransactionListener>();
     
     // ----------------------------------------------------------- constructors
 
@@ -192,22 +192,22 @@ public final class Market extends FreeColGameObject implements Ownable {
     // ------------------------------------------------------------ API methods
 
     /**
-    * Gets the owner of this <code>Market</code>.
-    *
-    * @return The owner of this <code>Market</code>.
-    * @see #setOwner
-    */
+     * Gets the owner of this <code>Market</code>.
+     *
+     * @return The owner of this <code>Market</code>.
+     * @see #setOwner
+     */
     public Player getOwner() {
         return owner;
     }
 
     
     /**
-    * Sets the owner of this <code>Market</code>.
-    *
-    * @param owner The <code>Player</code> that shall own this <code>Market</code>.
-    * @see #getOwner
-    */
+     * Sets the owner of this <code>Market</code>.
+     *
+     * @param owner The <code>Player</code> that shall own this <code>Market</code>.
+     * @see #getOwner
+     */
     public void setOwner(Player owner) {
         this.owner = owner;
     }
@@ -353,10 +353,10 @@ public final class Market extends FreeColGameObject implements Ownable {
     public void add(int goodsIndex, int amount) {
         Data  data = dataForGoodType[goodsIndex];
         /*
-        switch(goodsIndex) {
+          switch(goodsIndex) {
           case Goods.SILVER:
-               amount *= 4; // No bitshifts in Java? Should be << 2 - sjm
-               break;
+          amount *= 4; // No bitshifts in Java? Should be << 2 - sjm
+          break;
           case Goods.SUGAR:
           case Goods.TOBACCO:
           case Goods.COTTON:
@@ -365,11 +365,11 @@ public final class Market extends FreeColGameObject implements Ownable {
           case Goods.CIGARS:
           case Goods.CLOTH:
           case Goods.COATS:
-              amount *= 2;
+          amount *= 2;
           break;
           default:
-              break;
-        }
+          break;
+          }
         */
         data.amountInMarket += amount;
         priceGoods();
@@ -456,49 +456,49 @@ public final class Market extends FreeColGameObject implements Ownable {
          * the relative availability of that type of goods */
         for (int index = 0; index < dataForGoodType.length; index++) {
 
-        List<GoodsType> goodsList = FreeCol.getSpecification().getGoodsTypeList();
-        for (GoodsType g : goodsList) {
-            int index = g.getIndex();
-            Data data = dataForGoodType[index];
-            if (!data.isTradeable) {
-                continue;
-            }
-            int newPrice = Math.round(g.getInitialAmount() * g.getInitialSellPrice() /
-                                      (float) data.amountInMarket);
-            if (newPrice + g.getPriceDifference() > 19) {
-                data.costToBuy = 19;
-                data.paidForSale = 19 - g.getPriceDifference();
-            } else {
-                if (newPrice < 1) {
-                    newPrice = 1;
+            List<GoodsType> goodsList = FreeCol.getSpecification().getGoodsTypeList();
+            for (GoodsType g : goodsList) {
+                int index = g.getIndex();
+                Data data = dataForGoodType[index];
+                if (!data.isTradeable) {
+                    continue;
                 }
-                data.paidForSale = newPrice;
-                data.costToBuy = data.paidForSale + g.getPriceDifference();
-            }
-            if (addMessages && owner != null && owner.getEurope() != null) {
-                if (oldPrices[index] > dataForGoodType[index].costToBuy) {
-                    addModelMessage(owner.getEurope(), "model.market.priceDecrease",
-                                    new String[][] {
-                                        {"%europe%", owner.getEurope().getName()},
-                                        {"%goods%", g.getName()},
-                                        {"%buy%", String.valueOf(dataForGoodType[index].costToBuy)},
-                                        {"%sell%", String.valueOf(dataForGoodType[index].paidForSale)}},
-                                    ModelMessage.MARKET_PRICES,
-                                    new Goods(g));
-                } else if (oldPrices[index] < dataForGoodType[index].costToBuy) {
-                    addModelMessage(owner.getEurope(), "model.market.priceIncrease",
-                                    new String[][] {
-                                        {"%europe%", owner.getEurope().getName()},
-                                        {"%goods%", g.getName()},
-                                        {"%buy%", String.valueOf(dataForGoodType[index].costToBuy)},
-                                        {"%sell%", String.valueOf(dataForGoodType[index].paidForSale)}},
-                                    ModelMessage.MARKET_PRICES,
-                                    new Goods(g));
+                int newPrice = Math.round(g.getInitialAmount() * g.getInitialSellPrice() /
+                                          (float) data.amountInMarket);
+                if (newPrice + g.getPriceDifference() > 19) {
+                    data.costToBuy = 19;
+                    data.paidForSale = 19 - g.getPriceDifference();
+                } else {
+                    if (newPrice < 1) {
+                        newPrice = 1;
+                    }
+                    data.paidForSale = newPrice;
+                    data.costToBuy = data.paidForSale + g.getPriceDifference();
+                }
+                if (addMessages && owner != null && owner.getEurope() != null) {
+                    if (oldPrices[index] > dataForGoodType[index].costToBuy) {
+                        addModelMessage(owner.getEurope(), "model.market.priceDecrease",
+                                        new String[][] {
+                                            {"%europe%", owner.getEurope().getName()},
+                                            {"%goods%", g.getName()},
+                                            {"%buy%", String.valueOf(dataForGoodType[index].costToBuy)},
+                                            {"%sell%", String.valueOf(dataForGoodType[index].paidForSale)}},
+                                        ModelMessage.MARKET_PRICES,
+                                        new Goods(g));
+                    } else if (oldPrices[index] < dataForGoodType[index].costToBuy) {
+                        addModelMessage(owner.getEurope(), "model.market.priceIncrease",
+                                        new String[][] {
+                                            {"%europe%", owner.getEurope().getName()},
+                                            {"%goods%", g.getName()},
+                                            {"%buy%", String.valueOf(dataForGoodType[index].costToBuy)},
+                                            {"%sell%", String.valueOf(dataForGoodType[index].paidForSale)}},
+                                        ModelMessage.MARKET_PRICES,
+                                        new Goods(g));
+                    }
                 }
             }
         }
     }
-
 
     /**
      * This method writes an XML-representation of this object to

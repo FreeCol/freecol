@@ -81,7 +81,7 @@ public final class ResourceType
         String s = new String("");
         for (int i = 0; i < bonusGoods.size(); i++) {
             if (i > 0) {
-                s += ", "
+                s += ", ";
             }
             s += bonusAmount.get(i).toString() + " " + bonusGoods.get(i);
         }
@@ -109,7 +109,7 @@ public final class ResourceType
                 String goods = Xml.attribute(xml, "goods-type");
                 GoodsType g = goodsTypeByRef.get(goods);
                 bonusGoods.add(g);
-                bonusAmount.add(Xml.intAttribute(xml, "bonus");
+                bonusAmount.add(Xml.intAttribute(xml, "bonus"));
             }
         };
         Xml.forEachChild(xml, method);

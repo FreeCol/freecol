@@ -270,8 +270,8 @@ public final class Tile extends FreeColGameObject implements Location, Nameable 
         NUMBER_OF_TYPES = numberOfTypes;
     }
 
-    public isViewShared() {
-        return (getGame().getViewOwner() != null)
+    public boolean isViewShared() {
+        return (getGame().getViewOwner() != null);
     }
 
     /**
