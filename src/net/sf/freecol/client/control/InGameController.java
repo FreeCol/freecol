@@ -710,7 +710,13 @@ public final class InGameController implements NetworkConstants {
 
         // we have reached our destination
         if (unit.getTradeRoute() != null) {
-            followTradeRoute(unit);
+            if (unit.getCurrentStop().getLocation() != unit.getLocation()) {
+                setDestination(unit, unit.getCurrentStop().getLocation());
+                moveToDestination(unit);
+                return;
+            } else {
+                followTradeRoute(unit);
+            }
         } else {
             setDestination(unit, null);
         }

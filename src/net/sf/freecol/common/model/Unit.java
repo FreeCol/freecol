@@ -349,7 +349,12 @@ public class Unit extends FreeColGameObject implements Abilities, Locatable, Loc
      * @return the current stop.
      */
     public Stop getCurrentStop() {
-        return getTradeRoute().getStops().get(currentStop);
+        ArrayList<Stop> stops = getTradeRoute().getStops();
+        if (currentStop < 0 || currentStop >= stops.size()) {
+            // currentStop can be out of range if trade route is modified
+            currentStop = 0;
+        }
+        return stops.get(currentStop);
     }
 
     /**
