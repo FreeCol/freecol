@@ -7,6 +7,7 @@ import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
+import net.sf.freecol.FreeCol;
 
 import org.w3c.dom.Element;
 
@@ -232,7 +233,7 @@ public class TradeRoute extends FreeColGameObject implements Cloneable, Ownable 
          */
         private Stop(Stop other) {
             this.locationId = other.locationId;
-            this.cargo = new ArrayList<Integer>(other.cargo);
+            this.cargo = new ArrayList<GoodsType>(other.cargo);
         }
 
         private Stop(XMLStreamReader in) throws XMLStreamException {
@@ -309,10 +310,10 @@ public class TradeRoute extends FreeColGameObject implements Cloneable, Ownable 
             out.writeStartElement(getStopXMLElementTagName());
             out.writeAttribute("location", this.locationId);
             int[] cargoIndexArray = new int[cargo.size()];
-            for (int index = 0; index < cargoArray.length; index++) {
+            for (int index = 0; index < cargoIndexArray.length; index++) {
                 cargoIndexArray[index] = cargo.get(index).getIndex();
             }
-            toArrayElement("cargo", cargoArray, out);
+            toArrayElement("cargo", cargoIndexArray, out);
             out.writeEndElement();
         }
     }
