@@ -8,6 +8,7 @@ import java.util.logging.Logger;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
+import net.sf.freecol.FreeCol;
 
 import org.w3c.dom.Element;
 
@@ -359,7 +360,7 @@ public class GoodsContainer extends FreeColGameObject {
 
         List<GoodsType> goodsTypeList = FreeCol.getSpecification().getGoodsTypeList();
         for (GoodsType g : goodsTypeList) {
-            if (g.limitignored() || !g.isStorable()) {
+            if (g.limitIgnored() || !g.isStorable()) {
                 continue;
             }
             int index = g.getIndex();
