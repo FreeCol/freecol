@@ -3,14 +3,16 @@ package net.sf.freecol.common;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 
+import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.BuildingType;
-import net.sf.freecol.common.model.FoundingFather;
 import net.sf.freecol.common.model.GoodsType;
+import net.sf.freecol.common.model.ResourceType;
+import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.TileType;
+import net.sf.freecol.common.model.TileImprovementType;
 import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.util.Xml;
 
@@ -32,26 +34,35 @@ public final class Specification {
 
     private final List<BuildingType> buildingTypeList;
 
-    private final List<TileType> tileTypeList;
-
     private final List<GoodsType> goodsTypeList;
+    private final List<GoodsType> farmedGoodsTypeList;
+
+    private final List<ResourceType> resourceTypeList;
+
+    private final List<TileType> tileTypeList;
 
     private final List<UnitType> unitTypeList;
 
-    private final Hashtable<String, FoundingFather> foundingFathers;
 
     public Specification() {
 
         buildingTypeList = new ArrayList<BuildingType>();
-        tileTypeList = new ArrayList<TileType>();
         goodsTypeList = new ArrayList<GoodsType>();
+        resourceTypeList = new ArrayList<ResourceType>();
+        tileTypeList = new ArrayList<TileType>();
+        tileImprovementTypeList = new ArrayList<TileImprovementType>();
         unitTypeList = new ArrayList<UnitType>();
-        foundingFathers = new Hashtable<String, FoundingFather>();
+
+        final Map<String, GoodsType> goodsTypeByRef = new HashMap<String, GoodsType>();
+        final Map<String, ResourceType> resourceTypeByRef = new HashMap<String, ResourceType>();
+        final Map<String, TileType> tileTypeByRef = new HashMap<String, TileType>();
 
         InputStream in = Specification.class.getResourceAsStream("specification.xml");
         Document specificationDocument = Xml.documentFrom(in);
 
+        /*  Moved into main class for referencing
         final Map<String, GoodsType> goodsTypeByRef = new HashMap<String, GoodsType>();
+        */
 
         /* this method is invoked for each child element of the root element */
         final Xml.Method method = new Xml.Method() {
@@ -63,25 +74,13 @@ public final class Specification {
 
                     ObjectFactory<BuildingType> factory = new ObjectFactory<BuildingType>() {
                         public BuildingType objectFrom(Node xml) {
-
                             BuildingType buildingType = new BuildingType();
                             buildingType.readFromXmlElement(xml);
                             return buildingType;
                         }
                     };
-
                     buildingTypeList.addAll(makeListFromXml(xml, factory));
-                } else if ("tile-types".equals(childName)) {
 
-                    ObjectFactory<TileType> factory = new ObjectFactory<TileType>() {
-                        public TileType objectFrom(Node xml) {
-                            TileType tileType = new TileType();
-                            tileType.readFromXmlElement(xml);
-                            return tileType;
-                        }
-                    };
-
-                    tileTypeList.addAll(makeListFromXml(xml, factory));
                 } else if ("goods-types".equals(childName)) {
 
                     ObjectFactory<GoodsType> factory = new ObjectFactory<GoodsType>() {
@@ -90,11 +89,52 @@ public final class Specification {
                             GoodsType goodsType = new GoodsType(goodsIndex++);
                             goodsType.readFromXmlElement(xml, goodsTypeByRef);
                             goodsTypeByRef.put(Xml.attribute(xml, "ref"), goodsType);
+                            if (goodsType.isFarmed()) {
+                                farmedGoodsTypeList.add(goodsType);
+                            }
                             return goodsType;
                         }
                     };
-
                     goodsTypeList.addAll(makeListFromXml(xml, factory));
+
+                } else if ("resource-types".equals(childName)) {
+
+                    ObjectFactory<ResourceType> factory = new ObjectFactory<ResourceType>() {
+                        int resIndex = 0;
+                        public ResourceType objectFrom(Node xml) {
+                            ResourceType resourceType = new ResourceType(resIndex++);
+                            ResourceType.readFromXmlElement(xml, goodsTypeByRef);
+                            resouceTypeByRef.put(Xml.attribute(xml, "ref"), resouceType);
+                            return resourceType;
+                        }
+                    };
+                    resourceTypeList.addAll(makeListFromXml(xml, factory));
+
+                } else if ("tile-types".equals(childName)) {
+
+                    ObjectFactory<TileType> factory = new ObjectFactory<TileType>() {
+                        int tileIndex = 0;
+                        public TileType objectFrom(Node xml) {
+                            TileType tileType = new TileType(tileIndex++);
+                            tileType.readFromXmlElement(xml, goodsTypeByRef, resourceTypeByRef);
+                            tileTypeByRef.put(Xml.attribute(xml, "ref"), tileType);
+                            return tileType;
+                        }
+                    };
+                    tileTypeList.addAll(makeListFromXml(xml, factory));
+
+                } else if ("tileimprovement-types".equals(childName)) {
+
+                    ObjectFactory<TileImprovementType> factory = new ObjectFactory<TileImprovementType>() {
+                        int impIndex = 0;
+                        public TileImprovementType objectFrom(Node xml) {
+                            TileImprovementType tileImprovementType = new TileImprovementType(impIndex++);
+                            tileImprovementType.readFromXmlElement(xml, tileTypeList, tileTypeByRef, goodsTypeByRef);
+                            return tileType;
+                        }
+                    };
+                    tileImprovementTypeList.addAll(makeListFromXml(xml, factory));
+
                 } else if ("unit-types".equals(childName)) {
 
                     ObjectFactory<UnitType> factory = new ObjectFactory<UnitType>() {
@@ -104,18 +144,7 @@ public final class Specification {
                             return unitType;
                         }
                     };
-
                     unitTypeList.addAll(makeListFromXml(xml, factory));
-                } else if ("founding-fathers".equals(childName)) {
-
-                    Xml.Method method = new Xml.Method() {
-                            public void invokeOn(Node xml) {
-                                FoundingFather foundingFather = new FoundingFather();
-                                foundingFather.readFromXmlElement(xml, goodsTypeByRef);
-                                foundingFathers.put(foundingFather.getId(), foundingFather);
-                            }
-                        };
-                    Xml.forEachChild(xml, method);
 
                 } else {
                     throw new RuntimeException("unexpected: " + xml);
@@ -139,50 +168,163 @@ public final class Specification {
         };
 
         Xml.forEachChild(specificationDocument, documentMethod);
+        
+        // Post specification actions
+        // Get Food, Bells, Crosses and Hammers
+        Goods.initialize(getGoodsTypeList(), numberOfGoodsTypes());
+        Tile.initialize(numberOfTileTypes());
+    }
+
+    // ---------------------------------------------------------- retrieval methods
+    
+    // -- Buildings --
+    public List<BuildingType> getBuildingTypeList() {
+        return buildingTypeList;
     }
 
     public int numberOfBuildingTypes() {
-
         return buildingTypeList.size();
     }
 
     public BuildingType buildingType(int buildingTypeIndex) {
-
         return buildingTypeList.get(buildingTypeIndex);
     }
 
-    public int numberOfTileTypes() {
-
-        return tileTypeList.size();
+    public int getBuildingIndex(BuildingType b) {
+        return buildingTypeList.indexOf(b);
     }
 
-    public TileType tileType(int tileTypeIndex) {
+    public BuildingType getBuildingType(String name) {
+        for (BuildingType b : buildingTypeList) {
+            if (b.getName().equals(name)) {
+                return b;
+            }
+        }
+        return null;
+    }
 
-        return tileTypeList.get(tileTypeIndex);
+    // -- Goods --
+    public List<GoodsType> getGoodsTypeList() {
+        return goodsTypeList;
     }
 
     public int numberOfGoodsTypes() {
-
         return goodsTypeList.size();
     }
 
-    public GoodsType goodsType(int goodsTypeIndex) {
+    public int numberOfStoredGoodsTypes() {
+        int n = 0;
+        for (GoodsType g : goodsTypeList) {
+            if (g.getStoreable()) {
+                n++;
+            }
+        }
+        return n;
+    }
 
+    public List<GoodsType> getFarmedGoodsTypeList() {
+        return farmedGoodsTypeList;
+    }
+
+    public int numberOfFarmedGoodsTypes() {
+        return farmedGoodsTypeList.size();
+    }
+
+    public GoodsType getGoodsType(int goodsTypeIndex) {
         return goodsTypeList.get(goodsTypeIndex);
     }
 
-    public int numberOfUnitTypes() {
+    public GoodsType getGoodsType(String name) {
+        for (GoodsType g : goodsTypeList) {
+            if (g.getName().equals(name)) {
+                return g;
+            }
+        }
+        return null;
+    }
 
+    // -- Resources --
+    public List<ResourceType> getResourceTypeList() {
+        return resourceTypeList;
+    }
+
+    public ResourceType getResourceType(int index) {
+        return resourceTypeList.get(index);
+    }
+
+    public ResourceType getResourceType(String name) {
+        for (ResourceType r : resourceTypeList) {
+            if (r.getName().equals(name)) {
+                return r;
+            }
+        }
+        return null;
+    }
+
+    // -- Tiles --
+    public List<TileType> getTileTypeList() {
+        return tileTypeList;
+    }
+
+    public int numberOfTileTypes() {
+        return tileTypeList.size();
+    }
+
+    public TileType getTileType(int index) {
+        return tileTypeList.get(index);
+    }
+
+    public TileType getTileType(String name) {
+        for (TileType t : tileTypeList) {
+            if (t.getName().equals(name)) {
+                return t;
+            }
+        }
+        return null;
+    }
+
+    // -- Improvements --
+    public List<TileImprovementType> getTileImprovementTypeList() {
+        return tileImprovementTypeList;
+    }
+
+    public TileImprovementType getTileImprovementType(int index) {
+        return tileImprovementTypeList.get(index);
+    }
+
+    public TileImprovementType getTileImprovementType(String name) {
+        for (TileImprovementType ti : tileImprovementTypeList) {
+            if (ti.getName().equals(name)) {
+                return ti;
+            }
+        }
+        return null;
+    }
+
+    // -- Units --
+    public List<UnitType> getUnitTypeList() {
+        return unitTypeList;
+    }
+
+    public int numberOfUnitTypes() {
         return unitTypeList.size();
     }
 
     public UnitType unitType(int unitTypeIndex) {
-
         return unitTypeList.get(unitTypeIndex);
     }
 
-    public FoundingFather getFoundingFather(String id) {
-        return foundingFathers.get(id);
+    public int getUnitIndex(UnitType b) {
+        return unitTypeList.indexOf(b);
+    }
+
+    public UnitType getUnitType(String name) {
+        for (UnitType u : unitTypeList) {
+            if (u.getName().equals(name)) {
+                return u;
+            }
+        }
+        return null;
     }
 
     /**
