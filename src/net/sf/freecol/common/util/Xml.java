@@ -73,6 +73,32 @@ public final class Xml
         return xmlElement.getAttributes().getNamedItem(attributeName).getNodeValue();
     }
 
+    public static String attribute( Node xmlElement, String attributeName, String otherwise ) {
+        if (hasAttribute(xmlElement, attributeName)) {
+            return xmlElement.getAttributes().getNamedItem(attributeName).getNodeValue();
+        } else {
+            return otherwise;
+        }
+    }
+
+    public static String[] arrayAttribute( Node xmlElement, String attributeName, String separator ) {
+
+        return attribute(xmlElement, attributeName).split(separator);
+    }
+
+    public static String[] arrayAttribute( Node xmlElement, String attributeName ) {
+
+        return arrayAttribute(xmlElement, attributeName, ",");
+    }
+
+    public static String[] arrayAttribute( Node xmlElement, String attributeName, String[] otherwise ) {
+        if (hasAttribute(xmlElement, attributeName)) {
+            return arrayAttribute(xmlElement, attributeName, ",");
+        } else {
+            return otherwise;
+        }
+    }
+
     /*
     public static String messageAttribute( Node xmlElement, String attributeName ) {
 
@@ -85,12 +111,52 @@ public final class Xml
         return Integer.parseInt( attribute(xmlElement, attributeName) );
     }
 
+    public static int intAttribute( Node xmlElement, String attributeName, int otherwise ) {
+        if (hasAttribute(xmlElement, attributeName)) {
+            return Integer.parseInt( attribute(xmlElement, attributeName) );
+        } else {
+            return otherwise;
+        }
+    }
+
+    public static int[] intArrayAttribute( Node xmlElement, String attributeName, String separator ) {
+        String[] array = attribute(xmlElement, attributeName).split(separator);
+        /*  For testing
+        for (int k = 0; k < array.length; k++)
+            logger.info(array[k]);    
+        */
+        int[] output = new int[array.length];
+        for (int i = 0; i < array.length ; i++) {
+            output[i] = Integer.parseInt(array[i]);
+        }
+        return output;
+    }
+    
+    public static int[] intArrayAttribute( Node xmlElement, String attributeName ) {
+
+        return intArrayAttribute(xmlElement, attributeName, ",");
+    }
+
+    public static int[] intArrayAttribute( Node xmlElement, String attributeName, int[] otherwise ) {
+        if (hasAttribute(xmlElement, attributeName)) {
+            return intArrayAttribute(xmlElement, attributeName, ",");
+        } else {
+            return otherwise;
+        }
+    }
 
     public static boolean booleanAttribute( Node xmlElement, String attributeName ) {
 
         return parseTruth( attribute(xmlElement, attributeName) );
     }
 
+    public static boolean booleanAttribute( Node xmlElement, String attributeName, boolean otherwise ) {
+        if (hasAttribute(xmlElement, attributeName)) {
+            return parseTruth( attribute(xmlElement, attributeName) );
+        } else {
+            return otherwise;
+        }
+    }
 
     public static void forEachChild( Node xml, Method method ) {
 
