@@ -333,7 +333,8 @@ public class PioneeringMission extends Mission {
      */
     public boolean isValid() {  
         updateTileImprovement();
-        return !skipMission && (tileImprovement != null) && (getUnit().isPioneer() || getUnit().getType() == Unit.HARDY_PIONEER);
+        return !skipMission && tileImprovement != null &&
+                (getUnit().isPioneer() || getUnit().hasAbility("model.ability.expertPioneer"));
     }
 
     /**

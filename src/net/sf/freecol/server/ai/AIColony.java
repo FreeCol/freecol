@@ -505,7 +505,7 @@ public class AIColony extends AIObject {
         while (ui.hasNext()) {
             Unit u = ui.next();
             AIUnit au = (AIUnit) getAIMain().getAIObject(u);
-            if (u.getType() == Unit.HARDY_PIONEER) {
+            if (u.hasAbility("model.ability.expertPioneer")) {
                 return au;
             }
         }

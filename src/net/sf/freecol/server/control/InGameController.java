@@ -564,7 +564,7 @@ public final class InGameController extends Controller {
                             Unit unit = unitIterator.next();
                             Player player = unit.getOwner();
                             if (player != currentPlayer
-                                    && (currentPlayer.getStance(player) == Player.WAR || unit.getType() == Unit.PRIVATEER)) {
+                                    && (currentPlayer.getStance(player) == Player.WAR || unit.hasAbility("model.ability.piracy"))) {
                                 logger.finest("Found enemy unit " + unit.getOwner().getNationAsString() + " "
                                         + unit.getName());
                                 // generate bombardment result

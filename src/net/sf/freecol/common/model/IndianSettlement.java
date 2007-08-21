@@ -1122,7 +1122,8 @@ public class IndianSettlement extends Settlement {
             int increment = 8;
 
             // Update increment if missionary is an expert.
-            if (missionary.getType() == Unit.JESUIT_MISSIONARY || missionary.getOwner().hasFather(FoundingFather.FATHER_JEAN_DE_BREBEUF)) {
+            if (missionary.hasAbility("model.ability.expertMissionary") ||
+                    missionary.getOwner().hasFather(FoundingFather.FATHER_JEAN_DE_BREBEUF)) {
                 increment = 13;
             }
 

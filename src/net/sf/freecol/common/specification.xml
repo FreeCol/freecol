@@ -479,57 +479,135 @@
   </tileimprovement-types>
 
   <unit-types>
-    <unit-type name="model.unit.freeColonist"         offence="0"  defence="1" movement="3"               
-               skill="0"                                           abilities="found-colony,recruitable" />
-    <unit-type name="model.unit.expertFarmer"         offence="0"  defence="1" movement="3"  price="1100" 
-               skill="1"  expert-production="model.goods.food"                 abilities="found-colony,recruitable" />
+    <unit-type name="model.unit.freeColonist"         offence="0"  defence="1" movement="3" lineOfSight="1"
+               skill="0" promotion="model.unit.veteranSoldier">
+      <ability id="model.ability.foundColony" value="yes"/>
+      <ability id="model.ability.recruitable" value="yes"/>
+      <ability id="model.ability.learnFromNatives" value="yes"/>
+      <ability id="model.ability.learnFromTeacher" value="yes"/>
+      <ability id="model.ability.learnFromExperience" value="yes"/>
+    </unit-type>
+    <unit-type name="model.unit.expertFarmer"         offence="0"  defence="1" movement="3" lineOfSight="1" price="1100" 
+               skill="1"  expert-production="food">
+      <ability id="model.ability.foundColony" value="yes"/>
+      <ability id="model.ability.recruitable" value="yes"/>
+    </unit-type>
         <!-- should be something like this: 
 22        <production-bonus goods-type="food" bonus="+3" />
         -->
-    <unit-type name="model.unit.expertFisherman"      offence="0"  defence="1" movement="3"  price="1000" 
-               skill="1"  expert-production="model.goods.food"           abilities="found-colony,recruitable" />
-    <unit-type name="model.unit.expertFurTrapper"     offence="0"  defence="1" movement="3"               
-               skill="1"  expert-production="model.goods.furs"           abilities="found-colony" />
-    <unit-type name="model.unit.expertSilverMiner"    offence="0"  defence="1" movement="3"  price="900"  
-               skill="1"  expert-production="model.goods.silver"         abilities="found-colony,recruitable" />
-    <unit-type name="model.unit.expertLumberJack"     offence="0"  defence="1" movement="3"  price="700"  
-               skill="1"  expert-production="model.goods.lumber"         abilities="found-colony,recruitable" />
-    <unit-type name="model.unit.expertOreMiner"       offence="0"  defence="1" movement="3"  price="600"  
-               skill="1"  expert-production="model.goods.ore"            abilities="found-colony,recruitable" />
-    <unit-type name="model.unit.masterSugarPlanter"   offence="0"  defence="1" movement="3"               
-               skill="2"  expert-production="model.goods.sugar"          abilities="found-colony" />
-    <unit-type name="model.unit.masterCottonPlanter"  offence="0"  defence="1" movement="3"               
-               skill="2"  expert-production="model.goods.cotton"         abilities="found-colony" />
-    <unit-type name="model.unit.masterTobaccoPlanter" offence="0"  defence="1" movement="3"               
-               skill="2"  expert-production="model.goods.tobacco"        abilities="found-colony" />
-    <unit-type name="model.unit.firebrandPreacher"    offence="0"  defence="1" movement="3"  price="1500" 
-               skill="3"  expert-production="model.goods.crosses"        abilities="found-colony,recruitable" />
-    <unit-type name="model.unit.elderStatesman"       offence="0"  defence="1" movement="3"  price="1900" 
-               skill="3"  expert-production="model.goods.bells"          abilities="found-colony,recruitable" />
-    <unit-type name="model.unit.masterCarpenter"      offence="0"  defence="1" movement="3"  price="1000" 
-               skill="1"  expert-production="model.goods.hammers"        abilities="found-colony,recruitable" />
-    <unit-type name="model.unit.masterDistiller"      offence="0"  defence="1" movement="3"  price="1100" 
-               skill="2"  expert-production="model.goods.rum"            abilities="found-colony,recruitable" />
-    <unit-type name="model.unit.masterWeaver"         offence="0"  defence="1" movement="3"  price="1300" 
-               skill="2"  expert-production="model.goods.cloth"          abilities="found-colony,recruitable" />
-    <unit-type name="model.unit.masterTobacconist"    offence="0"  defence="1" movement="3"  price="1200" 
-               skill="2"  expert-production="model.goods.cigars"         abilities="found-colony,recruitable" />
-    <unit-type name="model.unit.masterFurTrader"      offence="0"  defence="1" movement="3"  price="950"  
-               skill="2"  expert-production="model.goods.coats"          abilities="found-colony,recruitable" />
-    <unit-type name="model.unit.masterBlacksmith"     offence="0"  defence="1" movement="3"  price="1050" 
-               skill="2"  expert-production="model.goods.tools"          abilities="found-colony,recruitable" />
-    <unit-type name="model.unit.masterGunsmith"       offence="0"  defence="1" movement="3"  price="850"  
-               skill="2"  expert-production="model.goods.muskets"        abilities="found-colony,recruitable" />
-    <unit-type name="model.unit.seasonedScout"        offence="0"  defence="1" movement="3"               
-               skill="1"                                           abilities="found-colony,recruitable" />
-    <unit-type name="model.unit.hardyPioneer"         offence="0"  defence="1" movement="3"  price="1100" 
-               skill="1"                                           abilities="found-colony,recruitable" />
-    <unit-type name="model.unit.veteranSoldier"       offence="0"  defence="1" movement="3"  price="2000" 
-               skill="2"                                           abilities="found-colony,recruitable" />
-    <unit-type name="model.unit.jesuitMissionary"     offence="0"  defence="1" movement="3"  price="1400" 
-               skill="3"                                           abilities="found-colony,recruitable" />
-    <unit-type name="model.unit.indenturedServant"    offence="0"  defence="1" movement="3"               
-               skill="-1" abilities="found-colony,recruitable" />
+    <unit-type name="model.unit.expertFisherman"      offence="0"  defence="1" movement="3" lineOfSight="1" price="1000" 
+               skill="1"  expert-production="food">
+      <ability id="model.ability.foundColony" value="yes"/>
+      <ability id="model.ability.recruitable" value="yes"/>
+    </unit-type>
+    <unit-type name="model.unit.expertFurTrapper"     offence="0"  defence="1" movement="3" lineOfSight="1"               
+               skill="1"               expert-production="furs">
+      <ability id="model.ability.foundColony" value="yes"/>
+    </unit-type>
+    <unit-type name="model.unit.expertSilverMiner"    offence="0"  defence="1" movement="3" lineOfSight="1" price="900"  
+               skill="1"  expert-production="silver">
+      <ability id="model.ability.foundColony" value="yes"/>
+      <ability id="model.ability.recruitable" value="yes"/>
+    </unit-type>
+    <unit-type name="model.unit.expertLumberJack"     offence="0"  defence="1" movement="3" lineOfSight="1" price="700"  
+               skill="1"  expert-production="lumber">
+      <ability id="model.ability.foundColony" value="yes"/>
+      <ability id="model.ability.recruitable" value="yes"/>
+    </unit-type>
+    <unit-type name="model.unit.expertOreMiner"       offence="0"  defence="1" movement="3" lineOfSight="1" price="600"  
+               skill="1"  expert-production="ore">
+      <ability id="model.ability.foundColony" value="yes"/>
+      <ability id="model.ability.recruitable" value="yes"/>
+    </unit-type>
+    <unit-type name="model.unit.masterSugarPlanter"   offence="0"  defence="1" movement="3" lineOfSight="1"               
+               skill="2"               expert-production="sugar">
+      <ability id="model.ability.foundColony" value="yes"/>
+    </unit-type>
+    <unit-type name="model.unit.masterCottonPlanter"  offence="0"  defence="1" movement="3" lineOfSight="1"               
+               skill="2"               expert-production="cotton">
+      <ability id="model.ability.foundColony" value="yes"/>
+    </unit-type>
+    <unit-type name="model.unit.masterTobaccoPlanter" offence="0"  defence="1" movement="3" lineOfSight="1"               
+               skill="2"               expert-production="tobacco">
+      <ability id="model.ability.foundColony" value="yes"/>
+    </unit-type>
+    <unit-type name="model.unit.firebrandPreacher"    offence="0"  defence="1" movement="3" lineOfSight="1" price="1500" 
+               skill="3"  expert-production="crosses">
+      <ability id="model.ability.foundColony" value="yes"/>
+      <ability id="model.ability.recruitable" value="yes"/>
+    </unit-type>
+    <unit-type name="model.unit.elderStatesman"       offence="0"  defence="1" movement="3" lineOfSight="1" price="1900" 
+               skill="3"  expert-production="bells">
+      <ability id="model.ability.foundColony" value="yes"/>
+      <ability id="model.ability.recruitable" value="yes"/>
+    </unit-type>
+    <unit-type name="model.unit.masterCarpenter"      offence="0"  defence="1" movement="3" lineOfSight="1" price="1000" 
+               skill="1"  expert-production="hammers">
+      <ability id="model.ability.foundColony" value="yes"/>
+      <ability id="model.ability.recruitable" value="yes"/>
+    </unit-type>
+    <unit-type name="model.unit.masterDistiller"      offence="0"  defence="1" movement="3" lineOfSight="1" price="1100" 
+               skill="2"  expert-production="rum">
+      <ability id="model.ability.foundColony" value="yes"/>
+      <ability id="model.ability.recruitable" value="yes"/>
+    </unit-type>
+    <unit-type name="model.unit.masterWeaver"         offence="0"  defence="1" movement="3" lineOfSight="1" price="1300" 
+               skill="2"  expert-production="cloth">
+      <ability id="model.ability.foundColony" value="yes"/>
+      <ability id="model.ability.recruitable" value="yes"/>
+    </unit-type>
+    <unit-type name="model.unit.masterTobacconist"    offence="0"  defence="1" movement="3" lineOfSight="1" price="1200" 
+               skill="2"  expert-production="cigars">
+      <ability id="model.ability.foundColony" value="yes"/>
+      <ability id="model.ability.recruitable" value="yes"/>
+    </unit-type>
+    <unit-type name="model.unit.masterFurTrader"      offence="0"  defence="1" movement="3" lineOfSight="1" price="950"  
+               skill="2"  expert-production="coats">
+      <ability id="model.ability.foundColony" value="yes"/>
+      <ability id="model.ability.recruitable" value="yes"/>
+    </unit-type>
+    <unit-type name="model.unit.masterBlacksmith"     offence="0"  defence="1" movement="3" lineOfSight="1" price="1050" 
+               skill="2"  expert-production="tools">
+      <ability id="model.ability.foundColony" value="yes"/>
+      <ability id="model.ability.recruitable" value="yes"/>
+    </unit-type>
+    <unit-type name="model.unit.masterGunsmith"       offence="0"  defence="1" movement="3" lineOfSight="1" price="850"  
+               skill="2"  expert-production="muskets">
+      <ability id="model.ability.foundColony" value="yes"/>
+      <ability id="model.ability.recruitable" value="yes"/>
+    </unit-type>
+    <unit-type name="model.unit.seasonedScout"        offence="0"  defence="1" movement="3" lineOfSight="1"               
+               skill="1">
+      <ability id="model.ability.foundColony" value="yes"/>
+      <ability id="model.ability.recruitable" value="yes"/>
+      <ability id="model.ability.expertScout" value="yes"/>
+    </unit-type>
+    <unit-type name="model.unit.hardyPioneer"         offence="0"  defence="1" movement="3" lineOfSight="1" price="1100" 
+               skill="1">
+      <ability id="model.ability.foundColony" value="yes"/>
+      <ability id="model.ability.recruitable" value="yes"/>
+      <ability id="model.ability.expertPioneer" value="yes"/>
+    </unit-type>
+    <unit-type name="model.unit.veteranSoldier"       offence="0"  defence="1" movement="3" lineOfSight="1" price="2000" 
+               skill="2" promotion="model.unit.colonialRegular">
+      <ability id="model.ability.foundColony" value="yes"/>
+      <ability id="model.ability.recruitable" value="yes"/>
+      <ability id="model.ability.expertSoldier" value="yes"/>
+    </unit-type>
+    <unit-type name="model.unit.jesuitMissionary"     offence="0"  defence="1" movement="3" lineOfSight="1" price="1400" 
+               skill="3">
+      <ability id="model.ability.foundColony" value="yes"/>
+      <ability id="model.ability.recruitable" value="yes"/>
+      <ability id="model.ability.expertMissionary" value="yes"/>
+    </unit-type>
+    <unit-type name="model.unit.indenturedServant"    offence="0"  defence="1" movement="3" lineOfSight="1"              
+               skill="-1" promotion="model.unit.freeColonist">
+      <ability id="model.ability.foundColony" value="yes"/>
+      <ability id="model.ability.recruitable" value="yes"/>
+      <ability id="model.ability.learnFromNatives" value="yes"/>
+      <ability id="model.ability.learnFromTeacher" value="yes"/>
+      <education unit="model.unit.freeColonist" turns="4"/>
+    </unit-type>
         <!-- should be something like this: 
         <production-bonus goods-type="rum" bonus="-1" />
         <production-bonus goods-type="cigars" bonus="-1" />
@@ -541,27 +619,89 @@
         <production-bonus goods-type="hammers" bonus="-1" />
         <production-bonus goods-type="tools" bonus="-1" />
         -->
-    <unit-type name="model.unit.pettyCriminal"        offence="0"  defence="1" movement="3"               
-               skill="-2" abilities="found-colony,recruitable" />
-    <unit-type name="model.unit.indianConvert"        offence="0"  defence="1" movement="3"               
-               skill="0" abilities="" />
-    <unit-type name="model.unit.brave"                offence="1"  defence="1" movement="3"                                                                   abilities="carry-goods" />
-    <unit-type name="model.unit.colonialRegular"      offence="3"  defence="3" movement="3"                                                                   abilities="found-colony" />
-    <unit-type name="model.unit.kingsRegular"         offence="4"  defence="4" movement="3"                                                                   abilities="found-colony" />
-    <unit-type name="model.unit.caravel"              offence="0"  defence="2" movement="12"  price="1000" hammers="128" tools="40"                            abilities="naval" />
-    <unit-type name="model.unit.frigate"              offence="16" defence="16" movement="18" price="5000" hammers="512" tools="200"                           abilities="naval,capture-goods" />
-    <unit-type name="model.unit.galleon"              offence="0"  defence="10" movement="18" price="3000" hammers="320" tools="100"                           abilities="naval" />
-    <unit-type name="model.unit.manOWar"              offence="24" defence="24" movement="18"                                                                  abilities="naval,capture-goods" />
-    <unit-type name="model.unit.merchantman"          offence="0"  defence="6" movement="15"  price="2000" hammers="192" tools="80"                            abilities="naval" />
-    <unit-type name="model.unit.privateer"            offence="8"  defence="8" movement="24"  price="2000" hammers="256" tools="120"                           abilities="naval,capture-goods" />
-    <unit-type name="model.unit.artillery"            offence="7"  defence="5" movement="3"               hammers="192" tools="40"                            abilities="" />
-    <unit-type name="model.unit.damagedArtillery"     offence="5"  defence="3" movement="3"                                                                   abilities="" />
-    <unit-type name="model.unit.treasureTrain"        offence="0"  defence="0" movement="3"                                                                   abilities="" />
-    <unit-type name="model.unit.wagonTrain"           offence="0"  defence="1" movement="6"               hammers="40" tools="0"                              abilities="carry-goods" />
-    <unit-type name="model.unit.milkmaid"             offence="0"  defence="1" movement="3"                          expert-production="model.goods.food"           abilities="found-colony" />
-    <unit-type name="model.unit.revenger"             offence="666"  defence="666" movement="18" abilities="" />
-    <unit-type name="model.unit.flyingDutchman"       offence="666"  defence="666" movement="36" abilities="naval,capture-goods" />    
-    <unit-type name="model.unit.undead"               offence="18"  defence="4" movement="3" abilities="found-colony" />    
+    <unit-type name="model.unit.pettyCriminal"        offence="0"  defence="1" movement="3" lineOfSight="1"               
+               skill="-2" promotion="model.unit.indenturedServant">
+      <ability id="model.ability.foundColony" value="yes"/>
+      <ability id="model.ability.recruitable" value="yes"/>
+      <ability id="model.ability.learnFromTeacher" value="yes"/>
+      <education unit="model.unit.indenturedServant" turns="4"/>
+    </unit-type>
+    <unit-type name="model.unit.indianConvert"        offence="0"  defence="1" movement="3" lineOfSight="1"               
+               skill="0" />
+    <unit-type name="model.unit.brave"                offence="1"  defence="1" movement="3" lineOfSight="1" space="1">
+      <ability id="model.ability.carryGoods" value="yes"/>
+    </unit-type>
+    <unit-type name="model.unit.colonialRegular"      offence="3"  defence="3" movement="3" lineOfSight="1">
+      <ability id="model.ability.foundColony" value="yes"/>
+      <required-ability id="model.ability.independence"/>
+    </unit-type>
+    <unit-type name="model.unit.kingsRegular"         offence="4"  defence="4" movement="3" lineOfSight="1">
+      <ability id="model.ability.foundColony" value="yes"/>
+    </unit-type>
+    <unit-type name="model.unit.caravel"              offence="0"  defence="2"  movement="12" lineOfSight="1" space="2" hitPoints="6" price="1000" hammers="128" tools="40">
+      <ability id="model.ability.navalUnit" value="yes"/>
+      <ability id="model.ability.carryGoods" value="yes"/>
+      <ability id="model.ability.carryUnits" value="yes"/>
+    </unit-type>
+    <unit-type name="model.unit.frigate"              offence="16" defence="16" movement="18" lineOfSight="2" space="4" hitPoints="6" price="5000" hammers="512" tools="200">
+      <ability id="model.ability.navalUnit" value="yes"/>
+      <ability id="model.ability.carryGoods" value="yes"/>
+      <ability id="model.ability.carryUnits" value="yes"/>
+      <ability id="model.ability.captureGoods" value="yes"/>
+    </unit-type>
+    <unit-type name="model.unit.galleon"              offence="0"  defence="10" movement="18" lineOfSight="2" space="6" hitPoints="6" price="3000" hammers="320" tools="100">
+      <ability id="model.ability.navalUnit" value="yes"/>
+      <ability id="model.ability.carryGoods" value="yes"/>
+      <ability id="model.ability.carryUnits" value="yes"/>
+    </unit-type>
+    <unit-type name="model.unit.manOWar"              offence="24" defence="24" movement="18" lineOfSight="2" space="6" hitPoints="6">
+      <ability id="model.ability.navalUnit" value="yes"/>
+      <ability id="model.ability.carryGoods" value="yes"/>
+      <ability id="model.ability.carryUnits" value="yes"/>
+      <ability id="model.ability.captureGoods" value="yes"/>
+    </unit-type>
+    <unit-type name="model.unit.merchantman"          offence="0"  defence="6" movement="15" lineOfSight="1" space="4" hitPoints="6" price="2000" hammers="192" tools="80">
+      <ability id="model.ability.navalUnit" value="yes"/>
+      <ability id="model.ability.carryGoods" value="yes"/>
+      <ability id="model.ability.carryUnits" value="yes"/>
+    </unit-type>
+    <unit-type name="model.unit.privateer"            offence="8"  defence="8" movement="24" lineOfSight="2" space="2" hitPoints="6" price="2000" hammers="256" tools="120">
+      <ability id="model.ability.navalUnit" value="yes"/>
+      <ability id="model.ability.carryGoods" value="yes"/>
+      <ability id="model.ability.carryUnits" value="yes"/>
+      <ability id="model.ability.captureGoods" value="yes"/>
+      <ability id="model.ability.piracy" value="yes"/>
+    </unit-type>
+    <unit-type name="model.unit.artillery"            offence="7"  defence="5" movement="3" lineOfSight="1" hammers="192" tools="40">
+      <ability id="model.ability.bombard"/>
+    </unit-type>
+    <unit-type name="model.unit.damagedArtillery"     offence="5"  defence="3" movement="3" lineOfSight="1">
+      <ability id="model.ability.bombard"/>
+    </unit-type>
+    <unit-type name="model.unit.treasureTrain"        offence="0"  defence="0" movement="3" lineOfSight="1" spaceTaken="6">
+      <ability id="model.ability.carryTreasure" value="yes"/>
+    </unit-type>
+    <unit-type name="model.unit.wagonTrain"           offence="0"  defence="1" movement="6" lineOfSight="1" space="2" hammers="40" tools="0">
+      <ability id="model.ability.carryGoods" value="yes"/>
+    </unit-type>
+    <unit-type name="model.unit.milkmaid"             offence="0"  defence="1" movement="3"  lineOfSight="1"         expert-production="food">
+      <ability id="model.ability.foundColony" value="yes"/>
+    </unit-type>
+    <unit-type name="model.unit.revenger"             offence="666"  defence="666" movement="18" lineOfSight="3">
+        <ability id="model.ability.undead" value="yes"/>
+        <ability id="model.ability.multipleAttacks" value="yes"/>
+    </unit-type>
+    <unit-type name="model.unit.flyingDutchman"       offence="666"  defence="666" movement="36" lineOfSight="3" space="6" hitPoints="6">
+      <ability id="model.ability.navalUnit" value="yes"/>
+      <ability id="model.ability.carryGoods" value="yes"/>
+      <ability id="model.ability.carryUnits" value="yes"/>
+      <ability id="model.ability.captureGoods" value="yes"/>
+      <ability id="model.ability.undead" value="yes"/>
+    </unit-type>    
+    <unit-type name="model.unit.undead"               offence="18"  defence="4" movement="3" lineOfSight="1">
+      <ability id="model.ability.foundColony" value="yes"/>
+      <ability id="model.ability.undead" value="yes"/>
+    </unit-type>
   </unit-types>
 
   <founding-fathers>

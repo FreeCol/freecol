@@ -854,7 +854,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
                 if (colony != null) {
                     Player enemy = colony.getOwner();
                     if (player != enemy && (player.getStance(enemy) == Player.WAR
-                            || unit.getType() == Unit.PRIVATEER)
+                            || unit.hasAbility("model.ability.piracy"))
                             && colony.getBuilding(Building.STOCKADE).getLevel() > Building.HOUSE) {
                         float bombardingPower = colony.getBombardingPower();
                         if (bombardingPower > 0) {
@@ -872,8 +872,8 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
                     
                     for (Unit enemyUnit : tile.getUnitList()) {
                         if (enemyUnit.isOffensiveUnit() && (player.getStance(enemy) == Player.WAR
-                                || enemyUnit.getType() == Unit.PRIVATEER
-                                || unit.getType() == Unit.PRIVATEER)) {
+                                || enemyUnit.hasAbility("model.ability.piracy")
+                                || unit.hasAbility("model.ability.piracy"))) {
                             attackPower += enemyUnit.getOffensePower(unit);
                             if (attacker == null) {
                                 attacker = enemyUnit;
@@ -924,7 +924,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         int dx = player.getDifficulty() + 2;
         // seasoned scouts should be more successful
         int bonus = 0;
-        if (type == Unit.SEASONED_SCOUT && unit.isScout()) {
+        if (unit.hasAbility("model.ability.expertScout") && unit.isScout()) {
             bonus += 3;
             dx--;
         }
@@ -1564,7 +1564,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
                     reply.appendChild(update);
                 } else {
                     int beadsGold = (int) (Math.random() * (400 * settlement.getBonusMultiplier())) + 50;
-                    if (unit.getType() == Unit.SEASONED_SCOUT) {
+                    if (unit.hasAbility("model.ability.expertScout")) {
                         beadsGold = (beadsGold * 11) / 10;
                     }
                     reply.setAttribute("result", "beads");
@@ -1665,11 +1665,11 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
             // TODO: chance needs to depend on amount of crosses that the
             // players who are involved have.
             double random = Math.random();
-            if (settlement.getMissionary().getType() == Unit.JESUIT_MISSIONARY
+            if (settlement.getMissionary().hasAbility("model.ability.expertMissionary")
                     || settlement.getMissionary().getOwner().hasFather(FoundingFather.FATHER_JEAN_DE_BREBEUF)) {
                 random += 0.2;
             }
-            if (unit.getType() == Unit.JESUIT_MISSIONARY
+            if (unit.hasAbility("model.ability.expertMissionary")
                     || unit.getOwner().hasFather(FoundingFather.FATHER_JEAN_DE_BREBEUF)) {
                 random -= 0.2;
             }

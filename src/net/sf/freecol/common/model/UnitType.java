@@ -4,6 +4,7 @@ package net.sf.freecol.common.model;
 
 import java.util.Hashtable;
 import java.util.Map;
+import net.sf.freecol.FreeCol;
 
 import net.sf.freecol.common.util.Xml;
 
@@ -89,9 +90,24 @@ public final class UnitType implements Abilities {
     private GoodsType expertProduction;
 
     /**
+     * Describe promotion here.
+     */
+    private String promotion;
+
+    /**
+     * Describe educationUnit here.
+     */
+    private String educationUnit = null;
+
+    /**
+     * Describe educationTurns here.
+     */
+    private int educationTurns;
+    
+    /**
      * Stores the abilities of this Type.
      */
-    private Hashtable<String, Boolean> abilities = new Hashtable<String, Boolean>();    
+    private Hashtable<String, Boolean> abilities = new Hashtable<String, Boolean>();
 
     /**
      * Get the <code>Id</code> value.
@@ -345,6 +361,60 @@ public final class UnitType implements Abilities {
         this.expertProduction = newExpertProduction;
     }
 
+    /**
+     * Get the <code>Promotion</code> value.
+     *
+     * @return a <code>UnitType</code> value
+     */
+    public UnitType getPromotion() {
+        return FreeCol.getSpecification().getUnitType(promotion);
+    }
+
+    /**
+     * Set the <code>Promotion</code> value.
+     *
+     * @param newPromotion The new Promotion value.
+     */
+    public void setPromotion(final String newPromotion) {
+        this.promotion = newPromotion;
+    }
+
+    /**
+     * Get the <code>EducationUnit</code> value.
+     *
+     * @return a <code>UnitType</code> value
+     */
+    public UnitType getEducationUnit() {
+        return FreeCol.getSpecification().getUnitType(educationUnit);
+    }
+
+    /**
+     * Set the <code>EducationUnit</code> value.
+     *
+     * @param newEducationUnit The new EducationUnit value.
+     */
+    public void setEducationUnit(final String newEducationUnit) {
+        this.educationUnit = newEducationUnit;
+    }
+
+    /**
+     * Get the <code>EducationTurns</code> value.
+     *
+     * @return a <code>int</code> value
+     */
+    public int getEducationTurns() {
+        return educationTurns;
+    }
+
+    /**
+     * Set the <code>EducationTurns</code> value.
+     *
+     * @param newEducationTurns The new EducationUnit value.
+     */
+    public void setEducationTurns(final int newEducationTurns) {
+        this.educationTurns = newEducationTurns;
+    }
+
     public void readFromXmlElement(Node xml, Map<String, GoodsType> goodsTypeByRef) {
 
         id = Xml.attribute(xml, "name");
@@ -353,59 +423,35 @@ public final class UnitType implements Abilities {
         defence = Xml.intAttribute(xml, "defence");
         movement = Xml.intAttribute(xml, "movement");
         lineOfSight = Xml.intAttribute(xml, "lineOfSight");
-        if (Xml.hasAttribute(xml, "space")) {
-            space = Xml.intAttribute(xml, "space");
-        }
-        if (Xml.hasAttribute(xml, "hitPoints")) {
-            hitPoints = Xml.intAttribute(xml, "hitPoints");
-        }
-        if (Xml.hasAttribute(xml, "spaceTaken")) {
-            spaceTaken = Xml.intAttribute(xml, "spaceTaken");
-        } else {
-            spaceTaken = 1;
-        }
+        space = Xml.intAttribute(xml, "space", 0);
+        hitPoints = Xml.intAttribute(xml, "hitPoints", 0);
+        spaceTaken = Xml.intAttribute(xml, "spaceTaken", 1);
+        promotion = Xml.attribute(xml, "promotion", null);
 
-        if (Xml.hasAttribute(xml, "skill")) {
+        skill = Xml.intAttribute(xml, "skill", UNDEFINED);
 
-            skill = Xml.intAttribute(xml, "skill");
-        }
-        else {
-            skill = UNDEFINED;
-        }
+        hammersRequired = Xml.intAttribute(xml, "hammers", UNDEFINED);
+        toolsRequired = Xml.intAttribute(xml, "tools", UNDEFINED);
 
-        if (Xml.hasAttribute(xml, "hammers")) {
-
-            hammersRequired = Xml.intAttribute(xml, "hammers");
-            toolsRequired = Xml.intAttribute(xml, "tools");
-        }
-        else {
-            hammersRequired = UNDEFINED;
-            toolsRequired = UNDEFINED;
-        }
-
-        if (Xml.hasAttribute(xml, "price")) {
-
-            price = Xml.intAttribute(xml, "price");
-        }
-        else {
-            price = UNDEFINED;
-        }
+        price = Xml.intAttribute(xml, "price", UNDEFINED);
 
         if (Xml.hasAttribute(xml, "expert-production")) {
-
-            String  goodsTypeRef = Xml.attribute(xml, "expert-production");
+            String goodsTypeRef = Xml.attribute(xml, "expert-production");
             expertProduction = goodsTypeByRef.get(goodsTypeRef);
-        }
-        else {
+        } else {
             expertProduction = null;
         }
 
         Xml.Method method = new Xml.Method() {
                 public void invokeOn(Node node) {
-                    if ("ability".equals(node.getNodeName())) {
+                    String nodeName = node.getNodeName();
+                    if ("ability".equals(nodeName)) {
                         String abilityId = Xml.attribute(node, "id");
                         boolean value = Xml.booleanAttribute(node, "value");
                         setAbility(abilityId, value);
+                    } else if ("education".equals(nodeName)) {
+                        educationUnit = Xml.attribute(node, "unit");
+                        educationTurns = Xml.intAttribute(node, "turns");
                     }
                 }
             };
