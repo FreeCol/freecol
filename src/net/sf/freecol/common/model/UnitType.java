@@ -2,16 +2,15 @@
 package net.sf.freecol.common.model;
 
 
-import java.util.Hashtable;
+import java.util.HashSet;
 import java.util.Map;
 
 import net.sf.freecol.common.util.Xml;
 
 import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 
 
-public final class UnitType implements Abilities {
+public final class UnitType {
     public static final  String  COPYRIGHT = "Copyright (C) 2003-2007 The FreeCol Team";
     public static final  String  LICENSE   = "http://www.gnu.org/licenses/gpl.html";
     public static final  String  REVISION  = "$Revision$";
@@ -39,21 +38,6 @@ public final class UnitType implements Abilities {
     private int defence;
 
     /**
-     * Describe space here.
-     */
-    private int space;
-
-    /**
-     * Describe hitPoints here.
-     */
-    private int hitPoints;
-
-    /**
-     * Describe spaceTaken here.
-     */
-    private int spaceTaken;
-
-    /**
      * Describe hammersRequired here.
      */
     private int hammersRequired;
@@ -77,21 +61,12 @@ public final class UnitType implements Abilities {
      * Describe movement here.
      */
     private int movement;
-    
-    /**
-     * Describe lineOfSight here.
-     */
-    private int lineOfSight;
 
     /**
      * Describe expertProduction here.
      */
     private GoodsType expertProduction;
-
-    /**
-     * Stores the abilities of this Type.
-     */
-    private Hashtable<String, Boolean> abilities = new Hashtable<String, Boolean>();    
+    private HashSet<String> abilityArray = new HashSet<String>();    
 
     /**
      * Get the <code>Id</code> value.
@@ -163,78 +138,6 @@ public final class UnitType implements Abilities {
      */
     public void setDefence(final int newDefence) {
         this.defence = newDefence;
-    }
-
-    /**
-     * Get the <code>LineOfSight</code> value.
-     *
-     * @return an <code>int</code> value
-     */
-    public int getLineOfSight() {
-        return lineOfSight;
-    }
-
-    /**
-     * Set the <code>LineOfSight</code> value.
-     *
-     * @param newLineOfSight The new Defence value.
-     */
-    public void setLineOfSight(final int newLineOfSight) {
-        this.lineOfSight = newLineOfSight;
-    }
-
-    /**
-     * Get the <code>Space</code> value.
-     *
-     * @return an <code>int</code> value
-     */
-    public int getSpace() {
-        return space;
-    }
-
-    /**
-     * Set the <code>Space</code> value.
-     *
-     * @param newSpace The new Space value.
-     */
-    public void setSpace(final int newSpace) {
-        this.space = newSpace;
-    }
-
-    /**
-     * Get the <code>HitPoints</code> value.
-     *
-     * @return an <code>int</code> value
-     */
-    public int getHitPoints() {
-        return hitPoints;
-    }
-
-    /**
-     * Set the <code>HitPoints</code> value.
-     *
-     * @param newHitPoints The new HitPoints value.
-     */
-    public void setHitPoints(final int newHitPoints) {
-        this.hitPoints = newHitPoints;
-    }
-
-    /**
-     * Get the <code>SpaceTaken</code> value.
-     *
-     * @return an <code>int</code> value
-     */
-    public int getSpaceTaken() {
-        return spaceTaken;
-    }
-
-    /**
-     * Set the <code>SpaceTaken</code> value.
-     *
-     * @param newSpaceTaken The new SpaceTaken value.
-     */
-    public void setSpaceTaken(final int newSpaceTaken) {
-        this.spaceTaken = newSpaceTaken;
     }
 
     /**
@@ -352,18 +255,6 @@ public final class UnitType implements Abilities {
         offence = Xml.intAttribute(xml, "offence");
         defence = Xml.intAttribute(xml, "defence");
         movement = Xml.intAttribute(xml, "movement");
-        lineOfSight = Xml.intAttribute(xml, "lineOfSight");
-        if (Xml.hasAttribute(xml, "space")) {
-            space = Xml.intAttribute(xml, "space");
-        }
-        if (Xml.hasAttribute(xml, "hitPoints")) {
-            hitPoints = Xml.intAttribute(xml, "hitPoints");
-        }
-        if (Xml.hasAttribute(xml, "spaceTaken")) {
-            spaceTaken = Xml.intAttribute(xml, "spaceTaken");
-        } else {
-            spaceTaken = 1;
-        }
 
         if (Xml.hasAttribute(xml, "skill")) {
 
@@ -400,16 +291,13 @@ public final class UnitType implements Abilities {
             expertProduction = null;
         }
 
-        Xml.Method method = new Xml.Method() {
-                public void invokeOn(Node node) {
-                    if ("ability".equals(node.getNodeName())) {
-                        String abilityId = Xml.attribute(node, "id");
-                        boolean value = Xml.booleanAttribute(node, "value");
-                        setAbility(abilityId, value);
-                    }
-                }
-            };
-        Xml.forEachChild(xml, method);
+        String[] array = Xml.attribute(xml, "abilities").split(",");
+        if (array != null)
+        {
+            for (int i = 0; i < array.length; i++) {
+                abilityArray.add(array[i]);
+            }
+        }
 
     }
 
@@ -432,25 +320,8 @@ public final class UnitType implements Abilities {
     }
 
 
-    /**
-     * Returns true if this UnitType has the ability with the given ID.
-     *
-     * @param id a <code>String</code> value
-     * @return a <code>boolean</code> value
-     */
-    public boolean hasAbility(String id) {
-        return abilities.containsKey(id) && abilities.get(id);
+    public boolean hasAbility(String abilityName) {
+        return abilityArray.contains(abilityName);
     }
-
-    /**
-     * Sets the ability to newValue;
-     *
-     * @param id a <code>String</code> value
-     * @param newValue a <code>boolean</code> value
-     */
-    public void setAbility(String id, boolean newValue) {
-        abilities.put(id, newValue);
-    }
-
 
 }

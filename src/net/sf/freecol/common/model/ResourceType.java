@@ -1,0 +1,118 @@
+package net.sf.freecol.common.model;
+
+import java.util.Map;
+import java.util.Random;
+
+import net.sf.freecol.common.util.Xml;
+
+import org.w3c.dom.Node;
+
+
+public final class ResourceType
+{
+    public static final  String  COPYRIGHT = "Copyright (C) 2003-2006 The FreeCol Team";
+    public static final  String  LICENSE = "http://www.gnu.org/licenses/gpl.html";
+    public static final  String  REVISION = "$Revision: 1.00 $";
+
+    public final int       index;
+    public final String     id;
+    public final String     name;
+    
+    public final int       minValue;
+    public final int       maxValue;
+    
+    private List<GoodsType> bonusGoods;
+    private List<Integer>   bonusAmount;
+
+    // ------------------------------------------------------------ constructors
+
+    public ResourceType(int index) {
+        this.index = index;
+    }
+
+    // ------------------------------------------------------------ retrieval methods
+
+    public int getIndex() {
+        return index;
+    }
+
+    public String getName() {
+        return Message.message(name);
+    }
+
+    public int getRandomValue() {
+        if (minValue == maxValue)
+            return maxValue;
+
+        Random rand = new Random();
+        return (minValue + rand.nextInt(maxValue-minValue+1));
+    }
+    
+    public int getBonus(GoodsType g) {
+        int bonusIndex = bonusGoods.indexOf(g);
+        if (bonusIndex >= 0) {
+            return bonusAmount.get(bonusIndex);
+        }
+        return 0;
+    }
+
+    public GoodsType getBestGoodsType() {
+        if (bonusGoods.size() == 1) {
+            return bonusGoods.get(0);
+        }
+        GoodsType bestType = null;
+        int bestValue = 0;
+        for (int i = 0; i < bonusGoods.size(); i++) {
+            GoodsType g = bonusGoods.get(i);
+            if (bestType == null || g.getInitialPrice() * bonusAmount.get(i) > value) {
+                bestType = g;
+            }
+        }
+        return bestType;
+    }
+
+    /**
+     * Returns a <code>String</code> with the output/s of this ResourceType.
+     */
+    public String getOutputString() {
+        if (bonusGoods.size() == 0) {
+            return (new String("No Bonus"));
+        }
+        String s = new String("");
+        for (int i = 0; i < bonusGoods.size(); i++) {
+            if (i > 0) {
+                s += ", "
+            }
+            s += bonusAmount.get(i).toString() + " " + bonusGoods.get(i);
+        }
+        return s;
+    }
+
+    // ------------------------------------------------------------ API methods
+
+    public void readFromXmlElement(Node xml, Map<String, GoodsType> goodsTypeByRef) {
+
+        id = Xml.attribute(xml, "name");
+        name = Xml.attribute(xml, "name");
+
+        if ( Xml.hasAttribute(xml, "maximum-value") ) {
+            maxValue = Xml.intAttribute(xml, "maximum-value");
+            minValue = Xml.intAttribute(xml, "minimum-value", 0);
+        } else {
+            maxValue = -1;
+            minValue = -1;
+        }
+
+        // Only expected child is 'production-bonus'
+        Xml.Method method = new Xml.Method() {
+            public void invokeOn(Node xml) {
+                String goods = Xml.attribute(xml, "goods-type");
+                GoodsType g = goodsTypeByRef.get(goods);
+                bonusGoods.add(g);
+                bonusAmount.add(Xml.intAttribute(xml, "bonus");
+            }
+        };
+        Xml.forEachChild(xml, method);
+    }
+    
+}

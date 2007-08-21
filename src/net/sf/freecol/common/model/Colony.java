@@ -82,26 +82,15 @@ public final class Colony extends Settlement implements Location, Nameable {
     // Temporary variable:
     private int lastVisited = -1;
 
-    /**
-     * High levels for warehouse warnings.
-     */
+    private int[] highLevel, lowLevel, exportLevel;
+    private boolean[] exports;
+
+    /** Cannot do it this way as NUMBER_OF_TYPES is not a constant
     private int[] highLevel = new int[Goods.NUMBER_OF_TYPES];
-
-    /**
-     * Low levels for warehouse warnings.
-     */
     private int[] lowLevel = new int[Goods.NUMBER_OF_TYPES];
-
-    /**
-     * Export levels for custom house.
-     */
     private int[] exportLevel = new int[Goods.NUMBER_OF_TYPES];
-
-    /**
-     * Export settings for custom house.
-     */
     private boolean[] exports = new boolean[Goods.NUMBER_OF_TYPES];
-
+    */
 
     /**
      * Creates a new <code>Colony</code>.
@@ -155,6 +144,11 @@ public final class Colony extends Settlement implements Location, Nameable {
             currentlyBuilding = Building.WAREHOUSE;
         else
             currentlyBuilding = Building.DOCK;
+
+        highLevel = new int[Goods.NUMBER_OF_TYPES];
+        lowLevel = new int[Goods.NUMBER_OF_TYPES];
+        exportLevel = new int[Goods.NUMBER_OF_TYPES];
+        exports = new boolean[Goods.NUMBER_OF_TYPES];
     }
 
     /**
@@ -205,11 +199,11 @@ public final class Colony extends Settlement implements Location, Nameable {
      * Initializes warehouse/export settings.
      */
     private void initializeWarehouseSettings() {
-        for (int goodsType = 0; goodsType < Goods.NUMBER_OF_TYPES; goodsType++) {
-            exports[goodsType] = false;
-            lowLevel[goodsType] = 10;
-            highLevel[goodsType] = 90;
-            exportLevel[goodsType] = 50;
+        for (int goodsIndex = 0; goodsIndex < Goods.NUMBER_OF_TYPES; goodsIndex++) {
+            exports[goodsIndex] = false;
+            lowLevel[goodsIndex] = 10;
+            highLevel[goodsIndex] = 90;
+            exportLevel[goodsIndex] = 50;
         }
     }
 
@@ -355,14 +349,14 @@ public final class Colony extends Settlement implements Location, Nameable {
         }
     }
 
-    /**
+    /** COMEBACHERE
      * Returns the building for producing the given type of goods.
      * 
      * @param goodsType The type of goods.
      * @return The <code>Building</code> which produces the given type of
      *         goods, or <code>null</code> if such a building cannot be found.
      */
-    public Building getBuildingForProducing(int goodsType) {
+    public Building getBuildingForProducing(GoodsType goodsType) {
         Building b;
         switch (goodsType) {
         case Goods.MUSKETS:
@@ -398,7 +392,7 @@ public final class Colony extends Settlement implements Location, Nameable {
         return (b != null && b.isBuilt()) ? b : null;
     }
 
-    /**
+    /** COMEBACKHEREs
      * Returns the colony's existing building for the given goods type.
      * 
      * @param goodsType The goods type.
@@ -406,7 +400,7 @@ public final class Colony extends Settlement implements Location, Nameable {
      *         <code>null</code> if not exists or not fully built.
      * @see Goods
      */
-    public Building getBuildingForConsuming(int goodsType) {
+    public Building getBuildingForConsuming(GoodsType goodsType) {
         Building b;
         switch (goodsType) {
         case Goods.TOOLS:
@@ -655,8 +649,11 @@ public final class Colony extends Settlement implements Location, Nameable {
      * @param type The type of goods to look for.
      * @return The amount of this type of Goods at this Location.
      */
-    public int getGoodsCount(int type) {
+    public int getGoodsCount(GoodsType type) {
         return goodsContainer.getGoodsCount(type);
+    }
+    public int getGoodsCount(int goodsIndex) {
+        return goodsContainer.getGoodsCount(goodsIndex);
     }
 
     /**
@@ -665,7 +662,7 @@ public final class Colony extends Settlement implements Location, Nameable {
      * @param type The type of Goods to remove from this container.
      * @param amount The amount of Goods to remove from this container.
      */
-    public void removeGoods(int type, int amount) {
+    public void removeGoods(GoodsType type, int amount) {
         goodsContainer.removeGoods(type, amount);
     }
 
@@ -673,7 +670,7 @@ public final class Colony extends Settlement implements Location, Nameable {
         goodsContainer.removeGoods(goods.getType(), goods.getAmount());
     }
 
-    public void addGoods(int type, int amount) {
+    public void addGoods(GoodsType type, int amount) {
         goodsContainer.addGoods(type, amount);
     }
 
@@ -716,8 +713,11 @@ public final class Colony extends Settlement implements Location, Nameable {
      * @param type The type of goods.
      * @return True if the custom house should export this type of goods.
      */
-    public boolean getExports(int type) {
-        return exports[type];
+    public boolean getExports(GoodsType type) {
+        return exports[type.getIndex()];
+    }
+    public boolean getExports(int goodsIndex) {
+        return exports[goodsIndex];
     }
 
     /**
@@ -727,7 +727,7 @@ public final class Colony extends Settlement implements Location, Nameable {
      * @return True if the custom house should export these goods.
      */
     public boolean getExports(Goods goods) {
-        return exports[goods.getType()];
+        return exports[goods.getType().getIndex()];
     }
 
     /**
@@ -736,8 +736,11 @@ public final class Colony extends Settlement implements Location, Nameable {
      * @param type the type of goods.
      * @param value a <code>boolean</code> value
      */
-    public void setExports(int type, boolean value) {
-        exports[type] = value;
+    public void setExports(GoodsType type, boolean value) {
+        exports[type.getIndex()] = value;
+    }
+    public void setExports(int goodsIndex, boolean value) {
+        exports[goodsIndex] = value;
     }
 
     /**
@@ -747,7 +750,7 @@ public final class Colony extends Settlement implements Location, Nameable {
      * @param value a <code>boolean</code> value
      */
     public void setExports(Goods goods, boolean value) {
-        setExports(goods.getType(), value);
+        setExports(goods.getType().getIndex(), value);
     }
 
     @Override
@@ -759,6 +762,8 @@ public final class Colony extends Settlement implements Location, Nameable {
     public boolean canAdd(Locatable locatable) {
         // throw new UnsupportedOperationException();
         if (locatable instanceof Unit && ((Unit) locatable).getOwner() == getOwner()) {
+            return true;
+        } else if (locatable instanceof Goods) {
             return true;
         }
         return false;
@@ -1073,7 +1078,7 @@ public final class Colony extends Settlement implements Location, Nameable {
      *         of the <code>Colony</code>'s {@link Building buildings} and
      *         {@link ColonyTile tiles}.
      */
-    public int getProductionOf(int goodsType) {
+    public int getProductionOf(GoodsType goodsType) {
         int amount = 0;
         if (goodsType == Goods.HORSES) {
             return getHorseProduction();
@@ -1098,7 +1103,7 @@ public final class Colony extends Settlement implements Location, Nameable {
      *         there is no available <code>ColonyTile</code> for producing
      *         that goods.
      */
-    public ColonyTile getVacantColonyTileFor(Unit unit, int goodsType) {
+    public ColonyTile getVacantColonyTileFor(Unit unit, GoodsType goodsType) {
         ColonyTile bestPick = null;
         int highestProduction = -2;
         Iterator<ColonyTile> colonyTileIterator = getColonyTileIterator();
@@ -1134,7 +1139,7 @@ public final class Colony extends Settlement implements Location, Nameable {
      * @return The highest possible production on a vacant
      *         <code>ColonyTile</code> for the given goods and the given unit.
      */
-    public int getVacantColonyTileProductionFor(Unit unit, int goodsType) {
+    public int getVacantColonyTileProductionFor(Unit unit, GoodsType goodsType) {
         ColonyTile bestPick = getVacantColonyTileFor(unit, goodsType);
         return bestPick != null ? unit.getFarmedPotential(goodsType, bestPick.getWorkTile()) : 0;
     }

@@ -60,7 +60,7 @@ public class IndianSettlement extends Settlement {
     // These are the learnable skills for an Indian settlement.
     // They are fully compatible with the types from the Unit class!
     //
-    // Note: UNKNOWN is used for both 'skill' and 'wanted goods'
+    // Note: UNKNOWN is used for both 'skill' and 'wanted goods' - Depreciated
     public static final int UNKNOWN = -2,
                             NONE = -1,
                             EXPERT_FARMER = Unit.EXPERT_FARMER,
@@ -92,7 +92,7 @@ public class IndianSettlement extends Settlement {
     */
     private int learnableSkill = UNKNOWN;
 
-    private int[] wantedGoods = new int[] {UNKNOWN, UNKNOWN, UNKNOWN};
+    private GoodsType[] wantedGoods = new GoodsType[] {null, null, null};
 
     private boolean isCapital,
                     isVisited; /* true if a European player has asked to speak with the chief. */
@@ -210,9 +210,9 @@ public class IndianSettlement extends Settlement {
 
         // The client doesn't know a lot at first.
         this.learnableSkill = UNKNOWN;
-        this.wantedGoods[0] = UNKNOWN;
-        this.wantedGoods[1] = UNKNOWN;
-        this.wantedGoods[2] = UNKNOWN;
+        this.wantedGoods[0] = null;
+        this.wantedGoods[1] = null;
+        this.wantedGoods[2] = null;
         isVisited = false;
         missionary = null;
         convertProgress = 0;
@@ -232,9 +232,9 @@ public class IndianSettlement extends Settlement {
 
         // The client doesn't know a lot at first.
         this.learnableSkill = UNKNOWN;
-        this.wantedGoods[0] = UNKNOWN;
-        this.wantedGoods[1] = UNKNOWN;
-        this.wantedGoods[2] = UNKNOWN;
+        this.wantedGoods[0] = null;
+        this.wantedGoods[1] = null;
+        this.wantedGoods[2] = null;
         isVisited = false;
         missionary = null;
         convertProgress = 0;
@@ -257,9 +257,9 @@ public class IndianSettlement extends Settlement {
         
         // The client doesn't know a lot at first.
         this.learnableSkill = UNKNOWN;
-        this.wantedGoods[0] = UNKNOWN;
-        this.wantedGoods[1] = UNKNOWN;
-        this.wantedGoods[2] = UNKNOWN;
+        this.wantedGoods[0] = null;
+        this.wantedGoods[1] = null;
+        this.wantedGoods[2] = null;
         isVisited = false;
         missionary = null;
         convertProgress = 0;
@@ -471,7 +471,7 @@ public class IndianSettlement extends Settlement {
     * Returns this settlement's highly wanted goods.
     * @return This settlement's highly wanted goods.
     */
-    public int getHighlyWantedGoods() {
+    public GoodsType getHighlyWantedGoods() {
         return wantedGoods[0];
     }
 
@@ -480,7 +480,7 @@ public class IndianSettlement extends Settlement {
     * Returns this settlement's wanted goods 1.
     * @return This settlement's wanted goods 1.
     */
-    public int getWantedGoods1() {
+    public GoodsType getWantedGoods1() {
         return wantedGoods[1];
     }
 
@@ -489,7 +489,7 @@ public class IndianSettlement extends Settlement {
     * Returns this settlement's wanted goods 2.
     * @return This settlement's wanted goods 2.
     */
-    public int getWantedGoods2() {
+    public GoodsType getWantedGoods2() {
         return wantedGoods[2];
     }
 
@@ -526,11 +526,17 @@ public class IndianSettlement extends Settlement {
 
 
 
-    public int[] getWantedGoods() {
+    public GoodsType[] getWantedGoods() {
         return wantedGoods;
     }
 
-    public void setWantedGoods(int index, int type) {
+    public void setWantedGoods(int index, int goodsIndex) {
+        if (0 <= index && index <= 2) {
+            wantedGoods[index] = FreeCol.getSpecification().getGoodsType(goodsIndex);
+        }
+    }
+
+    public void setWantedGoods(int index, GoodsType type) {
         if (0 <= index && index <= 2) {
             wantedGoods[index] = type;
         }
@@ -746,7 +752,7 @@ public class IndianSettlement extends Settlement {
     * @param amount The amount of <code>Goods</code> to price.
     * @return The price.
     */
-    public int getPrice(int type, int amount) {
+    public int getPrice(GoodsType type, int amount) {
         int returnPrice = 0;
 
         if (amount > 100) {
@@ -800,8 +806,8 @@ public class IndianSettlement extends Settlement {
             int currentGoods = goodsContainer.getGoodsCount(type);
 
             // Increase amount if raw materials are produced:
-            int rawType = Goods.getRawMaterial(type);
-            if (rawType != -1) {
+            GoodsType rawType = type.getRawMaterial();
+            if (rawType != null) {
                 int rawProduction = getMaximumProduction(rawType);
                 if (currentGoods < 100) {
                     if (rawProduction < 5) {
@@ -846,7 +852,7 @@ public class IndianSettlement extends Settlement {
     * @return The maximum amount, of the given type of goods, that can
     *         be produced in one turn.
     */
-    public int getMaximumProduction(int goodsType) {
+    public int getMaximumProduction(GoodsType goodsType) {
         int amount = 0;
         Iterator<Position> it = getGame().getMap().getCircleIterator(getTile().getPosition(), true, getRadius());
         while (it.hasNext()) {
@@ -875,14 +881,14 @@ public class IndianSettlement extends Settlement {
         /* TODO: Try the different types goods in "random" order 
          * (based on the numbers of units on this tile etc): */
         Goods[] goodsType = new Goods[Goods.NUMBER_OF_TYPES];
-        for (int type = 0; type < Goods.NUMBER_OF_TYPES; type++) {
-            goodsType[type] = new Goods(type);
-            goodsType[type].setAmount(100);
+        for (int index = 0; index < Goods.NUMBER_OF_TYPES; index++) {
+            goodsType[index] = new Goods(index);
+            goodsType[index].setAmount(100);
         }
         Arrays.sort(goodsType, wantedGoodsComparator);
         int wantedIndex = 0;
         for (int index = 0; index < goodsType.length; index++) {
-            int type = goodsType[index].getType();
+            GoodsType type = goodsType[index].getType();
             if (type != Goods.HORSES && type != Goods.MUSKETS) {
                 if (wantedIndex < wantedGoods.length) {
                     wantedGoods[wantedIndex] = type;
@@ -934,7 +940,7 @@ public class IndianSettlement extends Settlement {
         return true;
     }
 
-    public int getProductionOf(int type) {
+    public int getProductionOf(GoodsType type) {
         int potential = 0;
         Iterator<Position> it = getGame().getMap().getCircleIterator(getTile().getPosition(), true, getRadius());
         while (it.hasNext()) {
@@ -951,28 +957,43 @@ public class IndianSettlement extends Settlement {
         return potential;
     }
 
+    public int getProductionOf(int goodsIndex) {
+        return getProductionOf(FreeCol.getSpecification().getGoodsType(goodsIndex));
+    }
+
+
     @Override
     public void newTurn() {
         if (isUninitialized()) {
             logger.warning("Uninitialized when calling newTurn");
             return;
         }
-        
-        /* Determine the maximum possible production for each type of goods: */
-        int[] potential = new int[Goods.NUMBER_OF_TYPES];
-        for (int i=0; i<Goods.NUMBER_OF_TYPES;i++) {
-            potential[i] = getProductionOf(i);
-        }
 
-        /* Produce the goods: */
+        List<GoodsType> goodsList = FreeCol.getSpecification().getGoodsTypeList();
+        int[] potential = new int[Goods.NUMBER_OF_TYPES];
         int workers = ownedUnits.size();
-        for (int i=0; i<Goods.NUMBER_OF_TYPES;i++) {
-            goodsContainer.addGoods(i, potential[i]);
+        for (GoodsType g : goodsList) {
+            int index = g.getIndex();
+            /* Determine the maximum possible production for each type of goods: */
+            potential[index] = getProductionOf(g);
+            /* Produce the goods: */
+            goodsContainer.addGoods(g, potential[index]);
         }
 
         /* Use tools (if available) to produce manufactured goods: */
         if (goodsContainer.getGoodsCount(Goods.TOOLS) > 0) {
-            int typeWithSmallestAmount = -1;
+            GoodsType typeWithSmallestAmount = null;
+            for (GoodsType g : goodsList) {
+                if (g == Goods.FOOD || g == Goods.LUMBER || g == Goods.ORE || g == Goods.TOOLS)
+                    continue;
+                if (g.isRawMaterial() && goodsContainer.getGoodsCount(g) > KEEP_RAW_MATERIAL) {
+                    if (typeWithSmallestAmount == null ||
+                        goodsContainer.getGoodsCount(g.getProducedMaterial()) < goodsContainer.getGoodsCount(typeWithSmallestAmount)) {
+                        typeWithSmallestAmount = g.getProducedMaterial();
+                    }
+                }
+            }
+/*
             if (potential[Goods.SUGAR]-KEEP_RAW_MATERIAL > 0) {
                 typeWithSmallestAmount = Goods.RUM;
             }
@@ -985,8 +1006,8 @@ public class IndianSettlement extends Settlement {
             if (potential[Goods.FURS]-KEEP_RAW_MATERIAL > 0 && goodsContainer.getGoodsCount(Goods.COATS) < goodsContainer.getGoodsCount(typeWithSmallestAmount)) {
                 typeWithSmallestAmount = Goods.COATS;
             }
-
-            if (typeWithSmallestAmount != -1) {
+*/
+            if (typeWithSmallestAmount != null) {
                 int production = Math.min(goodsContainer.getGoodsCount(Goods.getRawMaterial(typeWithSmallestAmount)), Math.min(10, goodsContainer.getGoodsCount(Goods.TOOLS)));
                 goodsContainer.removeGoods(Goods.TOOLS, production);
                 goodsContainer.removeGoods(Goods.getRawMaterial(typeWithSmallestAmount), production);
@@ -1144,7 +1165,7 @@ public class IndianSettlement extends Settlement {
     }
 
 
-    private void consumeGoods(int type, int amount) {
+    private void consumeGoods(GoodsType type, int amount) {
         if (goodsContainer.getGoodsCount(type) > 0) {
             amount = Math.min(amount, goodsContainer.getGoodsCount(type));
             getOwner().modifyGold(amount);
@@ -1250,7 +1271,12 @@ public class IndianSettlement extends Settlement {
             out.writeAttribute("hasBeenVisited", Boolean.toString(isVisited));
             out.writeAttribute("convertProgress", Integer.toString(convertProgress));
             out.writeAttribute("learnableSkill", Integer.toString(learnableSkill));
-            toArrayElement("wantedGoods", wantedGoods, out);
+//            toArrayElement("wantedGoods", wantedGoods, out);
+            for (int i = 0; i < wantedGoods.length; i++) {
+                String tag = "wantedGoods" + Integer.toString(i);
+                out.writeAttribute(tag, wantedGoods[i].getIndex());
+            }
+
         }
         
         int[] tensionArray = new int[alarm.length];
@@ -1321,9 +1347,15 @@ public class IndianSettlement extends Settlement {
         }
 
         // TODO: remove these as soon as there are no more old savegames floating around
-        wantedGoods[0] = getAttribute(in, "highlyWantedGoods", UNKNOWN);
-        wantedGoods[1] = getAttribute(in, "wantedGoods1", UNKNOWN);
-        wantedGoods[2] = getAttribute(in, "wantedGoods2", UNKNOWN);
+/*
+        wantedGoods[0] = getAttribute(in, "highlyWantedGoods", null);
+        wantedGoods[1] = getAttribute(in, "wantedGoods1", null);
+        wantedGoods[2] = getAttribute(in, "wantedGoods2", null);
+*/
+        for (int i = 0; i < wantedGoods.length; i++) {
+            String tag = "wantedGoods" + Integer.toString(i);
+            wantedGoods[i] = FreeCol.getSpecification().getGoodsType(Integer.parseInt(getAttribute(in, tag, null)));
+        }
 
         isVisited = getAttribute(in, "hasBeenVisisted", false);
         convertProgress = getAttribute(in, "convertProgress", UNKNOWN);
@@ -1339,7 +1371,12 @@ public class IndianSettlement extends Settlement {
                     alarm[i] = new Tension(tensionArray[i]);
                 }
             } else if (in.getLocalName().equals("wantedGoods")) {
-                wantedGoods = readFromArrayElement("wantedGoods", in, new int[0]);
+                int[] wantedGoodsIndex = readFromArrayElement("wantedGoods", in, new int[0]);
+                for (int i = 0; i < wantedGoodsIndex.length; i++) {
+                    if (i == 3)
+                        break;
+                    wantedGoods[i] = FreeCol.getSpecification().getGoodsType(wantedGoodsIndex[i]);
+                }
             } else if (in.getLocalName().equals("missionary")) {
                 in.nextTag();
                 missionary = (Unit) getGame().getFreeColGameObject(in.getAttributeValue(null, "ID"));
@@ -1402,7 +1439,7 @@ public class IndianSettlement extends Settlement {
         for(Goods goods : settlementGoods) {
             // Only sell raw materials but never sell food and lumber
             if (goods.getType() != Goods.FOOD && goods.getType() != Goods.LUMBER &&
-                    goods.getType() <= Goods.SILVER) {
+                    goods.getType().isStorable) {
                 sellGoods[i] = goods;
                 i++;
                 if (i == sellGoods.length) break;
@@ -1443,7 +1480,7 @@ public class IndianSettlement extends Settlement {
     * @param amount The amount of <code>Goods</code> to price.
     * @return The price.
     */
-    public int getPriceToSell(int type, int amount) {
+    public int getPriceToSell(GoodsType type, int amount) {
         if (amount > 100) {
             throw new IllegalArgumentException();
         }

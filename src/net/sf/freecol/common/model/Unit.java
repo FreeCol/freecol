@@ -32,7 +32,7 @@ import org.w3c.dom.Element;
  * Every <code>Unit</code> is owned by a {@link Player} and has a
  * {@link Location}.
  */
-public class Unit extends FreeColGameObject implements Abilities, Locatable, Location, Ownable, Nameable {
+public class Unit extends FreeColGameObject implements Location, Locatable, Ownable, Nameable {
 
     public static final String COPYRIGHT = "Copyright (C) 2003-2005 The FreeCol Team";
 
@@ -58,7 +58,8 @@ public class Unit extends FreeColGameObject implements Abilities, Locatable, Loc
             FLYING_DUTCHMAN = 41, UNDEAD = 42, UNIT_COUNT = 43;
 
     /** A state a Unit can have. */
-    public static final int ACTIVE = 0, FORTIFIED = 1, SENTRY = 2, IN_COLONY = 3, PLOW = 4, BUILD_ROAD = 5,
+    public static final int ACTIVE = 0, FORTIFIED = 1, SENTRY = 2, IN_COLONY = 3, /*PLOW = 4, BUILD_ROAD = 5,*/
+            IMPROVING = 4,      // All TileImprovements use state of IMPROVING
             TO_EUROPE = 6, IN_EUROPE = 7, TO_AMERICA = 8, FORTIFYING = 9, NUMBER_OF_STATES = 10;
 
     /**
@@ -117,8 +118,11 @@ public class Unit extends FreeColGameObject implements Abilities, Locatable, Loc
     // to be used only for type == TREASURE_TRAIN
     private int treasureAmount;
 
-    // What type of goods this unit produces in its occupation.
-    private int workType;
+    // to be used only for PIONEERs - where they are working
+    private TileImprovement workImprovement;
+
+    // What type of goods this unit produces in its occupation
+    private GoodsType workType;
 
     private int experience = 0;
 
@@ -213,7 +217,7 @@ public class Unit extends FreeColGameObject implements Abilities, Locatable, Loc
         this.owner = owner;
         this.type = type;
         unitType = FreeCol.getSpecification().unitType(type);
-        naval = unitType.hasAbility("model.ability.navalUnit");
+        naval = unitType.hasAbility("naval");
         this.armed = armed;
         this.mounted = mounted;
         this.numberOfTools = numberOfTools;
@@ -294,10 +298,11 @@ public class Unit extends FreeColGameObject implements Abilities, Locatable, Loc
      * @return The amount of treasure.
      */
     public int getTreasureAmount() {
-        if (canCarryTreasure()) {
+        // TODO: TreasureTrain should subclass if method is illegal for Unit!
+        if (getType() == TREASURE_TRAIN) {
             return treasureAmount;
         }
-        throw new IllegalStateException("Unit can't carry treasure");
+        throw new IllegalStateException("Only treasure trains have treasure");
     }
 
     /**
@@ -307,10 +312,11 @@ public class Unit extends FreeColGameObject implements Abilities, Locatable, Loc
      * @param amt The amount of treasure
      */
     public void setTreasureAmount(int amt) {
-        if (canCarryTreasure()) {
+        // TODO: TreasureTrain should subclass if method is illegal for Unit!
+        if (getType() == TREASURE_TRAIN) {
             this.treasureAmount = amt;
         } else {
-            throw new IllegalStateException("Unit can't carry treasure");
+            throw new IllegalStateException("Only treasure trains have treasure");
         }
     }
 
@@ -526,8 +532,8 @@ public class Unit extends FreeColGameObject implements Abilities, Locatable, Loc
      * @exception IllegalStateException if this unit is not a treasure train.
      */
     public boolean canCashInTreasureTrain(Location loc) {
-        if (!canCarryTreasure()) {
-            throw new IllegalStateException("Can't carry treasure");
+        if (getType() != TREASURE_TRAIN) {
+            throw new IllegalStateException("Not a treasure train");
         }
         if (getOwner().getEurope() != null) {
             return (loc.getColony() != null && !loc.getColony().isLandLocked()) || loc instanceof Europe
@@ -544,8 +550,8 @@ public class Unit extends FreeColGameObject implements Abilities, Locatable, Loc
      *                if it cannot be cashed in at it's current location.
      */
     public void cashInTreasureTrain() {
-        if (!canCarryTreasure()) {
-            throw new IllegalStateException("Can't carry a treasure");
+        if (getType() != TREASURE_TRAIN) {
+            throw new IllegalStateException("Not a treasure train");
         }
 
         if (canCashInTreasureTrain()) {
@@ -579,7 +585,7 @@ public class Unit extends FreeColGameObject implements Abilities, Locatable, Loc
      *         otherwise.
      */
     public boolean isColonist() {
-        return unitType.hasAbility("model.ability.foundColony");
+        return unitType.hasAbility("found-colony");
     }
 
     /**
@@ -592,10 +598,6 @@ public class Unit extends FreeColGameObject implements Abilities, Locatable, Loc
      */
     public int getNeededTurnsOfTraining() {
         // number of turns is 4/6/8 for skill 1/2/3
-        if (student != null && (student.getType() == PETTY_CRIMINAL ||
-                                student.getType() == INDENTURED_SERVANT)) {
-            return 4;
-        }
         return getNeededTurnsOfTraining(getType());
     }
 
@@ -689,30 +691,6 @@ public class Unit extends FreeColGameObject implements Abilities, Locatable, Loc
     public void modifyExperience(int value) {
         experience += value;
     }
-
-    /**
-     * Returns true if the Unit has the ability identified by
-     * <code>id</code.
-     *
-     * @param id a <code>String</code> value
-     * @return a <code>boolean</code> value
-     */
-    public boolean hasAbility(String id) {
-        // TODO: implement role and unit abilities
-        return unitType.hasAbility(id);
-    }
-
-    /**
-     * Sets the ability identified by <code>id</code.
-     *
-     * @param id a <code>String</code> value
-     * @param newValue a <code>boolean</code> value
-     */
-    public void setAbility(String id, boolean newValue) {
-        // TODO: implement unit abilities
-    };
-
-
 
     /**
      * Returns true if this unit can be a student.
@@ -817,7 +795,7 @@ public class Unit extends FreeColGameObject implements Abilities, Locatable, Loc
      * 
      * @return The type of goods this unit would produce.
      */
-    public int getWorkType() {
+    public GoodsType getWorkType() {
         if (getLocation() instanceof Building) {
             return ((Building) getLocation()).getGoodsOutputType();
         }
@@ -829,8 +807,8 @@ public class Unit extends FreeColGameObject implements Abilities, Locatable, Loc
      * 
      * @param type The type of goods to attempt to produce.
      */
-    public void setWorkType(int type) {
-        if (!Goods.isFarmedGoods(type)) {
+    public void setWorkType(GoodsType type) {
+        if (!type.isFarmed()) {
             return;
         }
         if (workType != type) {
@@ -840,16 +818,30 @@ public class Unit extends FreeColGameObject implements Abilities, Locatable, Loc
     }
 
     /**
+     * Gets the TileImprovement that this pioneer is contributing to.
+     * @returns The <code>TileImprovement</code>
+     */
+    public TileImprovement getWorkImprovement() {
+        return workImprovement;
+    }
+
+    /**
+     * Sets the TileImprovement that this pioneer is contributing to.
+     * @returns The <code>TileImprovement</code>
+     */
+    public void setWorkImprovement(TileImprovement imp) {
+        workImprovement = imp;
+    }
+
+    /**
      * Gets the type of goods this unit is an expert at producing.
      * 
      * @return The type of goods or <code>-1</code> if this unit is not an
      *         expert at producing any type of goods.
      * @see ColonyTile#getExpertForProducing
      */
-    public int getExpertWorkType() {
-
-        GoodsType expertProduction = unitType.getExpertProduction();
-        return (expertProduction != null) ? expertProduction.index : -1;
+    public GoodsType getExpertWorkType() {
+        return unitType.getExpertProduction();
     }
 
     /**
@@ -1064,8 +1056,7 @@ public class Unit extends FreeColGameObject implements Abilities, Locatable, Loc
      *         need to be a {@link #isCarrier() carrier} and have goods onboard.
      */
     public boolean canTradeWith(Settlement settlement) {
-        return (hasAbility("model.ability.carryGoods") &&
-                goodsContainer.getGoodsCount() > 0 &&
+        return (isCarrier() && goodsContainer.getGoodsCount() > 0 &&
                 getOwner().getStance(settlement.getOwner()) != Player.WAR &&
                 ((settlement instanceof IndianSettlement) ||
                  getOwner().hasFather(FoundingFather.JAN_DE_WITT)));
@@ -1177,7 +1168,7 @@ public class Unit extends FreeColGameObject implements Abilities, Locatable, Loc
             } else {
                 return ILLEGAL_MOVE;
             }
-        } else if (target.getType() == Tile.HIGH_SEAS) {
+        } else if (target.getType().canSailToEurope()) {
             if (getOwner().canMoveToEurope()) {
                 return MOVE_HIGH_SEAS;
             } else {
@@ -1317,7 +1308,13 @@ public class Unit extends FreeColGameObject implements Abilities, Locatable, Loc
      * @return The space this <code>Unit</code> takes.
      */
     public int getTakeSpace() {
-        return FreeCol.getSpecification().unitType(type).getSpaceTaken();
+        if (getType() == TREASURE_TRAIN) {
+            return 6;
+        } else if (isCarrier()) {
+            return 100000; // Not possible to put on a carrier.
+        } else {
+            return 1;
+        }
     }
 
     /**
@@ -1327,14 +1324,17 @@ public class Unit extends FreeColGameObject implements Abilities, Locatable, Loc
      * @return The line of sight of this <code>Unit</code>.
      */
     public int getLineOfSight() {
-        int line = unitType.getLineOfSight();
-        if (isScout()) {
-            line = 2;
+        if (type == REVENGER || type == FLYING_DUTCHMAN) {
+            return 3;
+        } else if (isScout() || type == FRIGATE || type == GALLEON || type == MAN_O_WAR || type == PRIVATEER) {
+            // TODO Confirm that in the original game this was not 3 if HERNANDO
+            // DE SOTO was in the congress.
+            return 2;
+        } else if (getOwner().hasFather(FoundingFather.HERNANDO_DE_SOTO)) {
+            return 2;
+        } else {
+            return 1;
         }
-        if (!isNaval() && getOwner().hasFather(FoundingFather.HERNANDO_DE_SOTO)) {
-            line++;
-        }
-        return line;
     }
 
     /**
@@ -1515,7 +1515,7 @@ public class Unit extends FreeColGameObject implements Abilities, Locatable, Loc
      * @param state The state.
      */
     public void setStateToAllChildren(int state) {
-        if (hasAbility("model.ability.carryUnits")) {
+        if (isCarrier()) {
             for (Unit u : getUnitList())
                 u.setState(state);
         }
@@ -1539,19 +1539,23 @@ public class Unit extends FreeColGameObject implements Abilities, Locatable, Loc
      *            <code>Unit</code>.
      */
     public void add(Locatable locatable) {
-        if (locatable instanceof Unit && hasAbility("model.ability.carryUnits")) {
-            if (getSpaceLeft() <= 0) {
-                throw new IllegalStateException();
-            }
+        if (isCarrier()) {
+            if (locatable instanceof Unit) {
+                if (getSpaceLeft() <= 0 || getType() == WAGON_TRAIN) {
+                    throw new IllegalStateException();
+                }
 
-            unitContainer.addUnit((Unit) locatable);
-            spendAllMoves();
-        } else if (locatable instanceof Goods && hasAbility("model.ability.carryGoods")) {
-            goodsContainer.addGoods((Goods) locatable);
-            if (getSpaceLeft() < 0) {
-                throw new IllegalStateException("Not enough space for the given locatable!");
+                unitContainer.addUnit((Unit) locatable);
+                spendAllMoves();
+            } else if (locatable instanceof Goods) {
+                goodsContainer.addGoods((Goods) locatable);
+                if (getSpaceLeft() < 0) {
+                    throw new IllegalStateException("Not enough space for the given locatable!");
+                }
+                spendAllMoves();
+            } else {
+                logger.warning("Tried to add an unrecognized 'Locatable' to a unit.");
             }
-            spendAllMoves();
         } else {
             logger.warning("Tried to add a 'Locatable' to a non-carrier unit.");
         }
@@ -1564,12 +1568,16 @@ public class Unit extends FreeColGameObject implements Abilities, Locatable, Loc
      *            <code>Unit</code>.
      */
     public void remove(Locatable locatable) {
-        if (locatable instanceof Unit && hasAbility("model.ability.carryUnits")) {
-            unitContainer.removeUnit((Unit) locatable);
-            spendAllMoves();
-        } else if (locatable instanceof Goods && hasAbility("model.ability.carryGoods")) {
-            goodsContainer.removeGoods((Goods) locatable);
-            spendAllMoves();
+        if (isCarrier()) {
+            if (locatable instanceof Unit) {
+                unitContainer.removeUnit((Unit) locatable);
+                spendAllMoves();
+            } else if (locatable instanceof Goods) {
+                goodsContainer.removeGoods((Goods) locatable);
+                spendAllMoves();
+            } else {
+                logger.warning("Tried to remove an unrecognized 'Locatable' from a unit.");
+            }
         } else {
             logger.warning("Tried to remove a 'Locatable' from a non-carrier unit.");
         }
@@ -1588,11 +1596,16 @@ public class Unit extends FreeColGameObject implements Abilities, Locatable, Loc
      *            </ul>
      */
     public boolean contains(Locatable locatable) {
-        if (locatable instanceof Unit && hasAbility("model.ability.carryUnits")) {
-            return unitContainer.contains((Unit) locatable);
-        } else if (locatable instanceof Goods && hasAbility("model.ability.carryGoods")) {
-            return goodsContainer.contains((Goods) locatable);
+        if (isCarrier()) {
+            if (locatable instanceof Unit) {
+                return unitContainer.contains((Unit) locatable);
+            } else if (locatable instanceof Goods) {
+                return goodsContainer.contains((Goods) locatable);
+            } else {
+                return false;
+            }
         } else {
+            logger.warning("Tried to remove a 'Locatable' from a non-carrier unit.");
             return false;
         }
     }
@@ -1606,15 +1619,23 @@ public class Unit extends FreeColGameObject implements Abilities, Locatable, Loc
      * @return The result.
      */
     public boolean canAdd(Locatable locatable) {
-        if (locatable instanceof Unit && !((Unit) locatable).isCarrier() &&
-                hasAbility("model.ability.carryUnits")) {
-            return getSpaceLeft() >= locatable.getTakeSpace();
-        } else if (locatable instanceof Goods && hasAbility("model.ability.carryGoods")) {
-            Goods g = (Goods) locatable;
-            return getSpaceLeft() > 0
-                || (getGoodsContainer().getGoodsCount(g.getType()) % 100 != 0 && getGoodsContainer()
-                    .getGoodsCount(g.getType())
-                    % 100 + g.getAmount() <= 100);
+        if (isCarrier()) {
+            if ((getType() == WAGON_TRAIN || getType() == BRAVE) && locatable instanceof Unit) {
+                return false;
+            }
+
+            if (locatable instanceof Unit) {
+                return getSpaceLeft() >= locatable.getTakeSpace();
+            } else if (locatable instanceof Goods) {
+                Goods g = (Goods) locatable;
+                return getSpaceLeft() > 0
+                        || (getGoodsContainer().getGoodsCount(g.getType()) % 100 != 0 && getGoodsContainer()
+                                .getGoodsCount(g.getType())
+                                % 100 + g.getAmount() <= 100);
+            } else { // Is there another class that implements Locatable ??
+                logger.warning("Oops, not implemented...");
+                return false;
+            }
         } else {
             return false;
         }
@@ -1626,7 +1647,8 @@ public class Unit extends FreeColGameObject implements Abilities, Locatable, Loc
      * @return The amount of Units at this Location.
      */
     public int getUnitCount() {
-        return hasAbility("model.ability.carryUnits") ? unitContainer.getUnitCount() : 0;
+
+        return isCarrier() ? unitContainer.getUnitCount() : 0;
     }
 
     /**
@@ -1636,7 +1658,8 @@ public class Unit extends FreeColGameObject implements Abilities, Locatable, Loc
      * @return The <code>Unit</code>.
      */
     public Unit getFirstUnit() {
-        return hasAbility("model.ability.carryUnits") ? unitContainer.getFirstUnit() : null;
+
+        return isCarrier() ? unitContainer.getFirstUnit() : null;
     }
 
     /**
@@ -1665,7 +1688,8 @@ public class Unit extends FreeColGameObject implements Abilities, Locatable, Loc
      * @return The <code>Unit</code>.
      */
     public Unit getLastUnit() {
-        return hasAbility("model.ability.carryUnits") ? unitContainer.getLastUnit() : null;
+
+        return isCarrier() ? unitContainer.getLastUnit() : null;
     }
 
     /**
@@ -1679,7 +1703,7 @@ public class Unit extends FreeColGameObject implements Abilities, Locatable, Loc
     }
 
     public List<Unit> getUnitList() {
-        if (hasAbility("model.ability.carryUnits")) {
+        if (isCarrier() && getType() != WAGON_TRAIN) {
             return unitContainer.getUnitsClone();
         } else {
             return new ArrayList<Unit>();
@@ -1693,7 +1717,7 @@ public class Unit extends FreeColGameObject implements Abilities, Locatable, Loc
      * @return The <code>Iterator</code>.
      */
     public Iterator<Goods> getGoodsIterator() {
-        if (hasAbility("model.ability.carryGoods")) {
+        if (isCarrier()) {
             return goodsContainer.getGoodsIterator();
         } else {
             return EmptyIterator.getInstance();
@@ -1705,7 +1729,7 @@ public class Unit extends FreeColGameObject implements Abilities, Locatable, Loc
      * @return a <code>List</code> containing the goods carried by this unit.
      */
     public List<Goods> getGoodsList() {
-        if (hasAbility("model.ability.carryGoods")) {
+        if (isCarrier()) {
             return goodsContainer.getGoods();
         } else {
             return Collections.emptyList();
@@ -1744,6 +1768,26 @@ public class Unit extends FreeColGameObject implements Abilities, Locatable, Loc
         setState(Unit.IN_COLONY);
 
         setLocation(workLocation);
+    }
+
+    /**
+     * Sets this <code>Unit</code> to work at this <code>TileImprovement</code>
+     * @param impType The <code>TileImprovement</code> that this Unit will work at.
+     * @exception IllegalStateException If the <code>TileImprovement</code> is on
+     *                another {@link Tile} than this <code>Unit</code> or is not
+     *                a valid pioneer.
+     */
+    public void work(TileImprovement improvement) {
+        if (improvement.getTile() != getTile()) {
+            throw new IllegalStateException("Can only set a 'Unit' to work at a 'TileImprovement' that is on the same 'Tile'.");
+        }
+        if (!isPioneer()) {
+            throw new IllegalStateException("Only 'Pioneers' can perform TileImprovement.");
+        }
+
+        setWorkImprovement(improvement);
+        setState(Unit.IMPROVING);
+        // No need to set Location, stay at the tile it is on.
     }
 
     /**
@@ -1879,7 +1923,7 @@ public class Unit extends FreeColGameObject implements Abilities, Locatable, Loc
      * @return whether this unit can be equipped with goods at the current
      *         location.
      */
-    private boolean canBeEquipped(int equipType, int amount) {
+    private boolean canBeEquipped(GoodsType equipType, int amount) {
         return ((getGoodsDumpLocation() != null && getGoodsDumpLocation().getGoodsCount(equipType) >= amount) || ((location instanceof Europe || location instanceof Unit
                 && ((Unit) location).getLocation() instanceof Europe)
                 && getOwner().getGold() >= getOwner().getMarket().getBidPrice(equipType, amount) && getOwner()
@@ -2132,8 +2176,7 @@ public class Unit extends FreeColGameObject implements Abilities, Locatable, Loc
      * @param amount The amount of goods to buy.
      */
     public void buyGoods(int goodsType, int amount) {
-        if (!hasAbility("model.ability.carryGoods") ||
-            !(getLocation() instanceof Europe && getState() != TO_EUROPE && getState() != TO_AMERICA)) {
+        if (!isCarrier() || !(getLocation() instanceof Europe && getState() != TO_EUROPE && getState() != TO_AMERICA)) {
             throw new IllegalStateException("Cannot buy goods when not a carrier or in Europe.");
         }
 
@@ -2257,8 +2300,7 @@ public class Unit extends FreeColGameObject implements Abilities, Locatable, Loc
 
         UnitType unitType = FreeCol.getSpecification().unitType(type);
 
-        return unitType.hasAbility("model.ability.carryGoods") ||
-            unitType.hasAbility("model.ability.carryUnits");
+        return unitType.hasAbility("naval") || unitType.hasAbility("carry-goods");
     }
 
     /**
@@ -2315,7 +2357,7 @@ public class Unit extends FreeColGameObject implements Abilities, Locatable, Loc
     public void setType(int type) {
         this.type = type;
         unitType = FreeCol.getSpecification().unitType(type);
-        naval = unitType.hasAbility("model.ability.naval");
+        naval = unitType.hasAbility("naval");
     }
 
     /**
@@ -2397,8 +2439,8 @@ public class Unit extends FreeColGameObject implements Abilities, Locatable, Loc
             } else {
                 return (Messages.message("model.unit.missionary") + " (" + getName(getType()) + ")");
             }
-        } else if (canCarryTreasure()) {
-            return getName(getType()) + " (" + getTreasureAmount() + " " + Messages.message("gold") + ")";
+        } else if (getType() == TREASURE_TRAIN) {
+            return getName(TREASURE_TRAIN) + " (" + getTreasureAmount() + " " + Messages.message("gold") + ")";
         } else if (isPioneer()) {
             if (getType() == HARDY_PIONEER) {
                 return getName(getType());
@@ -2557,7 +2599,7 @@ public class Unit extends FreeColGameObject implements Abilities, Locatable, Loc
      * @return 6
      */
     public static int getInitialHitpoints(int type) {
-        return FreeCol.getSpecification().unitType(type).getHitPoints();
+        return 6;
     }
 
     /**
@@ -2660,7 +2702,7 @@ public class Unit extends FreeColGameObject implements Abilities, Locatable, Loc
      */
     public boolean isNaval() {
         return naval;
-        // return unitType.hasAbility("model.ability.naval");
+        // return unitType.hasAbility("naval");
     }
 
     /**
@@ -2687,11 +2729,16 @@ public class Unit extends FreeColGameObject implements Abilities, Locatable, Loc
         case Unit.IN_COLONY:
             occupationString = "B";
             break;
+/*
         case Unit.PLOW:
             occupationString = "P";
             break;
         case Unit.BUILD_ROAD:
             occupationString = "R";
+            break;
+*/
+        case Unit.IMPROVING:
+            occupationString = "I"; // Use a generic identifier
             break;
         case Unit.TO_AMERICA:
         case Unit.TO_EUROPE:
@@ -2749,23 +2796,12 @@ public class Unit extends FreeColGameObject implements Abilities, Locatable, Loc
             movesLeft = 0;
             workLeft = 1;
             break;
-        case BUILD_ROAD:
-        case PLOW:
-
-            workLeft = getTile().getWorkAmount(s);
-
-            getTile().takeOwnership(getOwner());
-
-            // Hardy Pioneers finish in half the time
-            if (getType() == HARDY_PIONEER)
-                workLeft = Math.max(1, workLeft / 2);
-
-            state = s;
-
-            doAssignedWork();
-
+        case IMPROVING:
             movesLeft = 0;
-
+            getTile().takeOwnership(getOwner());
+            workLeft = getWorkImprovement().getTurnsToComplete();
+            state = s;
+            doAssignedWork();
             return;
         case TO_EUROPE:
             if (state == ACTIVE && !(location instanceof Europe)) {
@@ -2817,7 +2853,7 @@ public class Unit extends FreeColGameObject implements Abilities, Locatable, Loc
         } else {
             for (int i = 0; i < surroundingTiles.size(); i++) {
                 Tile tile = surroundingTiles.get(i);
-                if (tile == null || tile.getType() == Tile.HIGH_SEAS) {
+                if (tile == null || tile.getType().canSailToEurope()) {
                     return true;
                 }
             }
@@ -2864,15 +2900,40 @@ public class Unit extends FreeColGameObject implements Abilities, Locatable, Loc
     }
 
     /**
+     * Checks whether this unit can create or contribute to a TileImprovement of this Type here
+     * @return The result.
+     */
+    public boolean canPerformImprovement(TileImprovementType impType) {
+        // Is this a valid ImprovementType?
+        if (impType == null || impType.isNatural()){
+            return false;
+        }
+        // Check if improvement can be performed on this TileType
+        if (!impType.isTileTypeAllowed(getTile().getType())) {
+            return false;
+        }
+        // Check if improvement is already present and completed
+        if (getTile().getTileItemContainer().findTileImprovementType(impType).isComplete()) {
+            return false;
+        }
+        // Fulfills requirements
+        // Quick fix, replace later
+        if (impType.getExpendedGoodsType() == Goods.TOOLS) {
+            return (getNumberOfTools() >= impType.getExpendedAmount());
+        }
+        return true;
+    }
+
+    /**
      * Checks wether this unit can plow the <code>Tile</code> it is currently
      * located on or not.
      * 
      * @return The result.
-     */
+     *//*
     public boolean canPlow() {
         return getTile().canBePlowed() && getNumberOfTools() >= 20;
     }
-
+*/
     /**
      * Checks if a <code>Unit</code> can get the given state set.
      * 
@@ -2882,12 +2943,14 @@ public class Unit extends FreeColGameObject implements Abilities, Locatable, Loc
      *         'false' otherwise.
      */
     public boolean checkSetState(int s) {
-        if (movesLeft <= 0 && (s == PLOW || s == BUILD_ROAD || s == FORTIFYING)) {
+        if (movesLeft <= 0 && (/*s == PLOW || s == BUILD_ROAD || */s == IMPROVING || s == FORTIFYING)) {
             return false;
         }
         switch (s) {
         case ACTIVE:
+        case IMPROVING:     // Check should be done before
             return true;
+/*
         case PLOW:
             return canPlow();
         case BUILD_ROAD:
@@ -2895,6 +2958,7 @@ public class Unit extends FreeColGameObject implements Abilities, Locatable, Loc
                 return false;
             }
             return (getNumberOfTools() >= 20);
+*/
         case IN_COLONY:
             return !isNaval();
         case FORTIFIED:
@@ -3018,7 +3082,33 @@ public class Unit extends FreeColGameObject implements Abilities, Locatable, Loc
      * @return The amount of units/cargo that this unit can carry.
      */
     public static int getInitialSpaceLeft(int type) {
-        return FreeCol.getSpecification().unitType(type).getSpace();
+        switch (type) {
+        case CARAVEL:
+            return 2;
+        case FRIGATE:
+            // I've got an official reference sheet from Colonization (came with
+            // the game)
+            // that says that the cargo space for a frigate is 2 but I'm almost
+            // 100% sure
+            // that it was 4 in the Colonization version that I used to play.
+            return 4;
+        case GALLEON:
+            return 6;
+        case MAN_O_WAR:
+            return 6;
+        case MERCHANTMAN:
+            return 4;
+        case PRIVATEER:
+            return 2;
+        case WAGON_TRAIN:
+            return 2;
+        case BRAVE:
+            return 1;
+        case FLYING_DUTCHMAN:
+            return 6;
+        default:
+            return 0;
+        }
     }
 
     /**
@@ -3028,7 +3118,7 @@ public class Unit extends FreeColGameObject implements Abilities, Locatable, Loc
      * @param u The unit to move to the front.
      */
     public void moveToFront(Unit u) {
-        if (hasAbility("model.ability.carryUnits") && unitContainer.removeUnit(u)) {
+        if (isCarrier() && unitContainer.removeUnit(u)) {
             unitContainer.addUnit(0, u);
         }
     }
@@ -3049,7 +3139,18 @@ public class Unit extends FreeColGameObject implements Abilities, Locatable, Loc
     public void doAssignedWork() {
         logger.finest("Entering method doAssignedWork.");
         if (workLeft > 0) {
-            workLeft--;
+            if (state == IMPROVING) {
+                // Has the improvement been completed already? Do nothing.
+                if (getWorkImprovement().isComplete()) {
+                    setState(ACTIVE);
+                    return;
+                }
+                // Otherwise do work
+                getWorkImprovement().doWork(getType() == HARDY_PIONEER ? 2 : 1);
+                workLeft = getWorkImprovement().getTurnsToComplete();
+            } else {
+                workLeft--;
+            }
 
             // Shorter travel time to America for the REF:
             if (state == TO_AMERICA && getOwner().isREF()) {
@@ -3068,10 +3169,12 @@ public class Unit extends FreeColGameObject implements Abilities, Locatable, Loc
                                     new String[][] {
                                         {"%europe%", getOwner().getEurope().getName()}},
                                     ModelMessage.DEFAULT, this);
-                    Iterator<Unit> iter = getUnitIterator();
-                    while (iter.hasNext()) {
-                        Unit u = iter.next();
-                        if (u.canCarryTreasure()) {
+                    if (getType() == GALLEON) {
+                        Iterator<Unit> iter = getUnitIterator();
+                        Unit u = null;
+                        while (iter.hasNext() && (u = iter.next()) != null && u.getType() != TREASURE_TRAIN)
+                            ;
+                        if (u != null && u.getType() == TREASURE_TRAIN) {
                             u.cashInTreasureTrain();
                         }
                     }
@@ -3084,21 +3187,20 @@ public class Unit extends FreeColGameObject implements Abilities, Locatable, Loc
                 case FORTIFYING:
                     setState(FORTIFIED);
                     break;
-                case BUILD_ROAD:
-                    getTile().setRoad(true);
-                    expendTools(20);
-                    setState(ACTIVE);
-                    setMovesLeft(0);
-                    break;
-                case PLOW:
-                    if (getTile().isForested()) {
-                        // Give Lumber to adjacent colony
-                        int lumberAmount = getTile().potential(Goods.LUMBER) * 5;
+                case IMPROVING:
+                    // Spend Goods - Quick fix, replace later
+                    if (getWorkImprovement().getExpendedGoodsType() == Goods.TOOLS) {
+                        expendTools(getWorkImprovement().getExpendedAmount());
+                    }
+                    // Deliver Goods if any
+                    GoodsType deliverType = getWorkImprovement().getDeliverGoodsType();
+                    if (deliverType != null) {
+                        int deliverAmount = getTile().potential(deliverType) * getWorkImprovement().getDeliverAmount();
                         if (getType() == HARDY_PIONEER) {
-                            lumberAmount *= 2;
+                            deliverAmount *= 2;
                         }
                         if (getColony() != null && getColony().getOwner().equals(getOwner())) {
-                            getColony().addGoods(Goods.LUMBER, lumberAmount);
+                            getColony().addGoods(deliverType, deliverAmount);
                         } else {
                             Vector<Tile> surroundingTiles = getTile().getMap().getSurroundingTiles(getTile(), 1);
                             Vector<Settlement> adjacentColonies = new Vector<Settlement>();
@@ -3109,35 +3211,28 @@ public class Unit extends FreeColGameObject implements Abilities, Locatable, Loc
                                 }
                             }
                             if (adjacentColonies.size() > 0) {
-                                int lumberPerCity = (lumberAmount / adjacentColonies.size());
+                                int deliverPerCity = (deliverAmount / adjacentColonies.size());
                                 for (int i = 0; i < adjacentColonies.size(); i++) {
                                     Colony c = (Colony) adjacentColonies.get(i);
                                     // Make sure the lumber lost is being added
                                     // again to the first adjacent colony:
                                     if (i == 0) {
-                                        c.addGoods(Goods.LUMBER, lumberPerCity
-                                                + (lumberAmount % adjacentColonies.size()));
+                                        c.addGoods(deliverType, deliverPerCity
+                                                + (deliverAmount % adjacentColonies.size()));
                                     } else {
-                                        c.addGoods(Goods.LUMBER, lumberPerCity);
+                                        c.addGoods(deliverType, deliverPerCity);
                                     }
                                 }
                             }
                         }
-                        getTile().setForested(false);
-                        // TODO: check map generator options
-                        logger.finest("Checking for bonus on cleared land");
-                        if (getGame().getModelController().getRandom(getID() + "doAssignedWork:plow", 10) == 0) {
-                            logger.finest("Received bonus on cleared land");
-                            getTile().setBonus(true);
-                        }
-                    } else {
-                        getTile().setPlowed(true);
                     }
-                    expendTools(20);
+                    // Perform TileType change if any
+                    TileType changeType = getWorkImprovement().getChange(getTile().getType());
+                    if (changeType != null) {
+                        getTile().setType(changeType);
+                    }
+                    // Finish up
                     setState(ACTIVE);
-
-                    // If we pioneer finishs the work, he has used up his moves
-                    // for this turn:
                     setMovesLeft(0);
                     break;
                 default:
@@ -3243,7 +3338,7 @@ public class Unit extends FreeColGameObject implements Abilities, Locatable, Loc
      */
     public static boolean isRecruitable(int type) {
 
-        return FreeCol.getSpecification().unitType(type).hasAbility("model.ability.recruitable");
+        return FreeCol.getSpecification().unitType(type).hasAbility("recruitable");
     }
 
     /**
@@ -4065,17 +4160,6 @@ public class Unit extends FreeColGameObject implements Abilities, Locatable, Loc
     }
 
     /**
-     * Returns true if this unit can carry treasure (like a treasure train)
-     * 
-     * @return <code>true</code> if this <code>Unit</code> is capable of
-     *         carrying treasure.
-     */
-    public boolean canCarryTreasure() {
-
-        return unitType.hasAbility("model.ability.carryTreasure");
-    }
-
-    /**
      * Returns true if this unit is a ship that can capture enemy goods. That
      * is, a privateer, frigate or man-o-war.
      * 
@@ -4084,7 +4168,7 @@ public class Unit extends FreeColGameObject implements Abilities, Locatable, Loc
      */
     public boolean canCaptureGoods() {
 
-        return unitType.hasAbility("model.ability.captureGoods");
+        return unitType.hasAbility("capture-goods");
     }
 
     /**
@@ -4200,11 +4284,8 @@ public class Unit extends FreeColGameObject implements Abilities, Locatable, Loc
             if (colony.getUnitCount() <= 1) {
                 myPlayer.modifyGold(plunderGold);
                 enemy.modifyGold(-plunderGold);
-                addModelMessage(enemy, "model.unit.colonyBurning",
-                        new String[][] { { "%colony%", colony.getName() },
-                        { "%amount%", Integer.toString(plunderGold) },
-                        { "%nation%", myPlayer.getNationAsString() },
-                        { "%unit%", getName() } }, ModelMessage.DEFAULT);
+                addModelMessage(enemy, "model.unit.colonyBurning", new String[][] { { "%colony%", colony.getName() },
+                        { "%amount%", Integer.toString(plunderGold) } }, ModelMessage.DEFAULT);
                 colony.damageAllShips();
                 colony.dispose();
             } else {
@@ -4215,9 +4296,7 @@ public class Unit extends FreeColGameObject implements Abilities, Locatable, Loc
                 addModelMessage(colony, "model.unit.colonistSlaughtered",
                                 new String[][] {
                                     { "%colony%", colony.getName() },
-                                    { "%unit%", victim.getName() },
-                                    { "%nation%", myPlayer.getNationAsString() },
-                                    { "%enemyUnit%", getName() } }, ModelMessage.UNIT_LOST);
+                                    { "%unit%", victim.getName() } }, ModelMessage.UNIT_LOST);
                 victim.dispose();
             }
         }
@@ -4289,16 +4368,16 @@ public class Unit extends FreeColGameObject implements Abilities, Locatable, Loc
      * Given a type of goods to produce in the field and a tile, returns the
      * unit's potential to produce goods.
      * 
-     * @param goods The type of goods to be produced.
+     * @param goodsType The type of goods to be produced.
      * @param tile The tile which is being worked.
      * @return The potential amount of goods to be farmed.
      */
-    public int getFarmedPotential(int goods, Tile tile) {
+    public int getFarmedPotential(GoodsType goodsType, Tile tile) {
         if (tile == null) {
             throw new NullPointerException();
         }
 
-        int base = tile.potential(goods);
+        int base = tile.potential(goodsType);
 
         if (getLocation() instanceof ColonyTile && !((ColonyTile) getLocation()).getWorkTile().isLand()
                 && !((ColonyTile) getLocation()).getColony().getBuilding(Building.DOCK).isBuilt()) {
@@ -4308,9 +4387,9 @@ public class Unit extends FreeColGameObject implements Abilities, Locatable, Loc
         if (base == 0) {
             return 0;
         }
-        base = getProductionUsing(getType(), goods, base, tile);
+        base = getProductionUsing(getType(), goodsType, base, tile);
 
-        if (goods == Goods.FURS && getOwner().hasFather(FoundingFather.HENRY_HUDSON)) {
+        if (goodsType == Goods.FURS && getOwner().hasFather(FoundingFather.HENRY_HUDSON)) {
             base *= 2;
         }
 
@@ -4322,6 +4401,7 @@ public class Unit extends FreeColGameObject implements Abilities, Locatable, Loc
     }
 
     /**
+     * ** This method should be completely redone after Unit specification rework. **
      * Applies unit-type specific bonuses to a goods production in a
      * <code>Building</code>.
      * 
@@ -4418,6 +4498,7 @@ public class Unit extends FreeColGameObject implements Abilities, Locatable, Loc
     }
 
     /**
+     * ** This method should be completely redone after Unit specification rework. **
      * Applies unit-type specific bonuses to a goods production on a
      * <code>Tile</code>.
      * 
@@ -4428,7 +4509,7 @@ public class Unit extends FreeColGameObject implements Abilities, Locatable, Loc
      *            being produced.
      * @return The production.
      */
-    public static int getProductionUsing(int unitType, int goodsType, int base, Tile tile) {
+    public static int getProductionUsing(int unitType, GoodsType goodsType, int base, Tile tile) {
         if (!Goods.isFarmedGoods(goodsType)) {
             throw new IllegalArgumentException("\"goodsType\" is produced in buildings and not on tiles.");
         }
@@ -4527,11 +4608,8 @@ public class Unit extends FreeColGameObject implements Abilities, Locatable, Loc
      * Removes all references to this object.
      */
     public void dispose() {
-        if (hasAbility("model.ability.carryUnits")) {
+        if (isCarrier()) {
             unitContainer.dispose();
-        }
-
-        if (hasAbility("model.ability.carryGoods")) {
             goodsContainer.dispose();
         }
 
@@ -4632,7 +4710,7 @@ public class Unit extends FreeColGameObject implements Abilities, Locatable, Loc
         String ownerID = (getOwner().equals(player) || getType() != PRIVATEER || showAll) ? owner.getID() : "unknown";
         out.writeAttribute("owner", ownerID);
         out.writeAttribute("turnsOfTraining", Integer.toString(turnsOfTraining));
-        out.writeAttribute("workType", Integer.toString(workType));
+        out.writeAttribute("workType", Integer.toString(workType.getIndex()));
         out.writeAttribute("experience", Integer.toString(experience));
         out.writeAttribute("treasureAmount", Integer.toString(treasureAmount));
         out.writeAttribute("hitpoints", Integer.toString(hitpoints));
@@ -4673,25 +4751,19 @@ public class Unit extends FreeColGameObject implements Abilities, Locatable, Loc
         }
 
         // Do not show enemy units hidden in a carrier:
-        if (getGame().isClientTrusted() || showAll || getOwner().equals(player)
-                || !getGameOptions().getBoolean(GameOptions.UNIT_HIDING) && player.canSee(getTile())) {
-            if (hasAbility("model.ability.carryUnits")) {
+        if (isCarrier()) {
+            if (getGame().isClientTrusted() || showAll || getOwner().equals(player)
+                    || !getGameOptions().getBoolean(GameOptions.UNIT_HIDING) && player.canSee(getTile())) {
                 unitContainer.toXML(out, player, showAll, toSavedGame);
-            }
-            if (hasAbility("model.ability.carryGoods")) {
                 goodsContainer.toXML(out, player, showAll, toSavedGame);
-            }
-        } else {
-            if (hasAbility("model.ability.carryGoods")) {
+            } else {
                 out.writeAttribute("visibleGoodsCount", Integer.toString(getGoodsCount()));
-                GoodsContainer emptyGoodsContainer = new GoodsContainer(getGame(), this);
-                emptyGoodsContainer.setFakeID(goodsContainer.getID());
-                emptyGoodsContainer.toXML(out, player, showAll, toSavedGame);
-            }
-            if (hasAbility("model.ability.carryUnits")) {
                 UnitContainer emptyUnitContainer = new UnitContainer(getGame(), this);
                 emptyUnitContainer.setFakeID(unitContainer.getID());
                 emptyUnitContainer.toXML(out, player, showAll, toSavedGame);
+                GoodsContainer emptyGoodsContainer = new GoodsContainer(getGame(), this);
+                emptyGoodsContainer.setFakeID(goodsContainer.getID());
+                emptyGoodsContainer.toXML(out, player, showAll, toSavedGame);
             }
         }
 
@@ -4710,7 +4782,7 @@ public class Unit extends FreeColGameObject implements Abilities, Locatable, Loc
         setName(in.getAttributeValue(null, "name"));
         type = Integer.parseInt(in.getAttributeValue(null, "type"));
         unitType = FreeCol.getSpecification().unitType(type);
-        naval = unitType.hasAbility("model.ability.navalUnit");
+        naval = unitType.hasAbility("naval");
         armed = Boolean.valueOf(in.getAttributeValue(null, "armed")).booleanValue();
         mounted = Boolean.valueOf(in.getAttributeValue(null, "mounted")).booleanValue();
         missionary = Boolean.valueOf(in.getAttributeValue(null, "missionary")).booleanValue();
@@ -4800,7 +4872,7 @@ public class Unit extends FreeColGameObject implements Abilities, Locatable, Loc
 
         final String workTypeStr = in.getAttributeValue(null, "workType");
         if (workTypeStr != null) {
-            workType = Integer.parseInt(workTypeStr);
+            workType = FreeCol.getSpecification().getGoodsType(Integer.parseInt(workTypeStr));
         }
 
         final String experienceStr = in.getAttributeValue(null, "experience");
@@ -4837,10 +4909,6 @@ public class Unit extends FreeColGameObject implements Abilities, Locatable, Loc
 
         final String locationStr = in.getAttributeValue(null, "location");
         if (locationStr != null) {
-            // TODO: Fix properly bug #1755566 and remove this
-            if (location != null) {
-                location.remove(this);
-            }
             location = (Location) getGame().getFreeColGameObject(locationStr);
             if (location == null) {
                 if (locationStr.startsWith(Tile.getXMLElementTagName())) {
@@ -4864,33 +4932,37 @@ public class Unit extends FreeColGameObject implements Abilities, Locatable, Loc
             }
         }
 
-        while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
-            if (in.getLocalName().equals(UnitContainer.getXMLElementTagName())) {
-                unitContainer = (UnitContainer) getGame().getFreeColGameObject(in.getAttributeValue(null, "ID"));
-                if (unitContainer != null) {
-                    unitContainer.readFromXML(in);
-                } else {
-                    unitContainer = new UnitContainer(getGame(), this, in);
+        if (isCarrier()) {
+            while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
+                if (in.getLocalName().equals(UnitContainer.getXMLElementTagName())) {
+                    unitContainer = (UnitContainer) getGame().getFreeColGameObject(in.getAttributeValue(null, "ID"));
+                    if (unitContainer != null) {
+                        unitContainer.readFromXML(in);
+                    } else {
+                        unitContainer = new UnitContainer(getGame(), this, in);
+                    }
+                } else if (in.getLocalName().equals(GoodsContainer.getXMLElementTagName())) {
+                    goodsContainer = (GoodsContainer) getGame().getFreeColGameObject(in.getAttributeValue(null, "ID"));
+                    if (goodsContainer != null) {
+                        goodsContainer.readFromXML(in);
+                    } else {
+                        goodsContainer = new GoodsContainer(getGame(), this, in);
+                    }
+
                 }
-            } else if (in.getLocalName().equals(GoodsContainer.getXMLElementTagName())) {
-                goodsContainer = (GoodsContainer) getGame().getFreeColGameObject(in.getAttributeValue(null, "ID"));
-                if (goodsContainer != null) {
-                    goodsContainer.readFromXML(in);
-                } else {
-                    goodsContainer = new GoodsContainer(getGame(), this, in);
-                }
+            }
+            if (unitContainer == null) {
+                logger.warning("Carrier did not have a \"unitContainer\"-tag.");
+                unitContainer = new UnitContainer(getGame(), this);
 
             }
-        }
-        
-        if (unitContainer == null && hasAbility("model.ability.carryUnits")) {
-            logger.warning("Carrier did not have a \"unitContainer\"-tag.");
-            unitContainer = new UnitContainer(getGame(), this);
+            if (goodsContainer == null) {
+                logger.warning("Carrier did not have a \"goodsContainer\"-tag.");
+                goodsContainer = new GoodsContainer(getGame(), this);
 
-        }
-        if (goodsContainer == null && hasAbility("model.ability.carryGoods")) {
-            logger.warning("Carrier did not have a \"goodsContainer\"-tag.");
-            goodsContainer = new GoodsContainer(getGame(), this);
+            }
+        } else {
+            in.nextTag();
         }
 
         getOwner().invalidateCanSeeTiles();

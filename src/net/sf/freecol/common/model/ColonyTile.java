@@ -117,7 +117,7 @@ public class ColonyTile extends FreeColGameObject implements WorkLocation, Ownab
     public String getLabel() {
         
         Tile tile = getWorkTile();
-        
+/*        
         String label = tile.getName();
         
         if(tile.hasRiver())
@@ -128,8 +128,8 @@ public class ColonyTile extends FreeColGameObject implements WorkLocation, Ownab
         
         if(tile.isPlowed())
             label += "/"+ Messages.message("plowed");
-        
-        return label;
+*/        
+        return tile.getLabel();
     }
 
 
@@ -414,6 +414,7 @@ public class ColonyTile extends FreeColGameObject implements WorkLocation, Ownab
         } else if (getUnit() != null && !isOccupied()) {
             produceGoods();
         }
+        workTile.expendResource(getUnit.getWorkType(), colony);
     }
 
     private void produceGoods() {
@@ -430,11 +431,11 @@ public class ColonyTile extends FreeColGameObject implements WorkLocation, Ownab
     }
 
     private void produceGoodsCenterTile() {
-        
-        colony.addGoods(Goods.FOOD, getProductionOf(Goods.FOOD));
-        int type2 = workTile.secondaryGoods();
+        GoodsType goodsFood = FreeCol.getSpecification().goodsFood;
+        colony.addGoods(goodsFood, getProductionOf(goodsFood));
+        GoodsType type2 = workTile.secondaryGoods();
         colony.addGoods(type2, getProductionOf(type2));
-            
+
         if (unit != null) {
             getWorkTile().setOwner(getColony());
         } else {

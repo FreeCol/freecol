@@ -651,12 +651,12 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
     private void produceGoods() {
         int goodsInput = getGoodsInput();
         int goodsOutput = getProduction();
-        int goodsInputType = getGoodsInputType();
-        int goodsOutputType = getGoodsOutputType();
+        GoodsType goodsInputType = getGoodsInputType();
+        GoodsType goodsOutputType = getGoodsOutputType();
 
         if (goodsInput == 0 && getMaximumGoodsInput() > 0) {
             addModelMessage(getColony(), "model.building.notEnoughInput", new String[][] {
-                { "%inputGoods%", Goods.getName(goodsInputType) }, { "%building%", getName() },
+                { "%inputGoods%", goodsInputType.getName() }, { "%building%", getName() },
                 { "%colony%", colony.getName() } }, ModelMessage.MISSING_GOODS, new Goods(goodsInputType));
         }
 
@@ -737,7 +737,7 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
      *         <code>-1</code> if there is no goods production by this
      *         <code>Building</code>.
      */
-    public int getGoodsOutputType() {
+    public GoodsType getGoodsOutputType() {
         return getGoodsOutputType(getType());
     }
 
@@ -749,7 +749,7 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
      *         <code>-1</code> if there is no goods production by this
      *         <code>Building</code>.
      */
-    public static int getGoodsOutputType(int type) {
+    public static GoodsType getGoodsOutputType(int type) {
         switch (type) {
         case BLACKSMITH:
             return Goods.TOOLS;
@@ -770,7 +770,7 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
         case CARPENTER:
             return Goods.HAMMERS;
         default:
-            return -1;
+            return null;
         }
     }
 
@@ -780,7 +780,7 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
      * @return The type of goods this <code>Building</code> requires as input
      *         in order to produce it's {@link #getGoodsOutputType output}.
      */
-    public int getGoodsInputType() {
+    public GoodsType getGoodsInputType() {
         return getGoodsInputType(getType());
     }
 
@@ -791,7 +791,7 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
      * @return The type of goods this <code>Building</code> requires as input
      *         in order to produce it's {@link #getGoodsOutputType output}.
      */
-    public static int getGoodsInputType(int type) {
+    public static GoodsType getGoodsInputType(int type) {
         switch (type) {
         case BLACKSMITH:
             return Goods.ORE;
@@ -808,7 +808,7 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
         case CARPENTER:
             return Goods.LUMBER;
         default:
-            return -1;
+            return null;
         }
     }
 
@@ -853,7 +853,7 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
      */
     public int getGoodsInput() {
         int goodsInput = getMaximumGoodsInput();
-        if (getGoodsInputType() > -1 && colony.getGoodsCount(getGoodsInputType()) < goodsInput) {
+        if (getGoodsInputType() != null && colony.getGoodsCount(getGoodsInputType()) < goodsInput) {
             goodsInput = colony.getGoodsCount(getGoodsInputType());
         }
         return goodsInput;
@@ -874,7 +874,7 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
             goodsInput = (goodsInput * 2) / 3; // Factories don't need the
                                                 // extra 3 units.
         }
-        if (getGoodsInputType() > -1 && colony.getGoodsCount(getGoodsInputType()) < goodsInput) {
+        if (getGoodsInputType() != null && colony.getGoodsCount(getGoodsInputType()) < goodsInput) {
             goodsInput = colony.getGoodsCount(getGoodsInputType());
         }
         return goodsInput;
@@ -912,7 +912,7 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
     }
 
     private int calculateGoodsInput(int goodsInput) {
-        if (getGoodsInputType() > -1) {
+        if (getGoodsInputType() != null) {
             int available = colony.getGoodsCount(getGoodsInputType()) +
                 colony.getProductionNextTurn(getGoodsInputType());
             if (available < goodsInput) {
@@ -975,13 +975,13 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
      *
      */
     public int getProductionAdding(Unit unit) {
-        if (getGoodsOutputType() == -1) {
+        if (getGoodsOutputType() == null) {
             return 0;
         }
 
         int goodsOutput = getMaximumProductionAdding(unit);
 
-        if (getGoodsInputType() > -1) {
+        if (getGoodsInputType() != null) {
             int goodsInput = colony.getGoodsCount(getGoodsInputType());
             if (goodsInput < getMaximumGoodsInputAdding(unit)) {
                 goodsOutput = calculateOutputAdding(goodsInput, unit);
@@ -1011,13 +1011,13 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
      * @see #getProduction
      */
     public int getProductionNextTurn() {
-        if (getGoodsOutputType() == -1) {
+        if (getGoodsOutputType() == null) {
             return 0;
         }
 
         int goodsOutput = getMaximumProduction();
 
-        if (getGoodsInputType() > -1) {
+        if (getGoodsInputType() != null) {
             int goodsInput = colony.getGoodsCount(getGoodsInputType()) + colony.getProductionNextTurn(getGoodsInputType());
             if (goodsInput < getMaximumGoodsInput()) {
                 goodsOutput = calculateOutput(goodsInput);
@@ -1034,7 +1034,7 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
      * @see #getProduction
      */
     public int getAdditionalProductionNextTurn(Unit addUnit) {
-        if (getGoodsOutputType() == -1) {
+        if (getGoodsOutputType() == null) {
             return 0;
         }
         if (addUnit == null || !canAdd(addUnit)) {
@@ -1043,7 +1043,7 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
 
         int addGoodsOutput = getAdditionalProduction(addUnit);
 
-        if (getGoodsInputType() > -1) {
+        if (getGoodsInputType() != null) {
             // addGoodsInput = total available stock + new production - current requirements
             //               = remaining input goods to support additional output
             int addGoodsInput = colony.getGoodsCount(getGoodsInputType())
@@ -1081,7 +1081,7 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
      *         goods is the same as {@link #getGoodsOutputType} and
      *         <code>0</code> otherwise.
      */
-    public int getProductionOf(int goodsType) {
+    public int getProductionOf(GoodsType goodsType) {
         if (goodsType == getGoodsOutputType()) {
             return getProduction();
         }
@@ -1097,7 +1097,7 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
      *         assuming enough "input goods".
      */
     public int getProductivity() {
-        if (getGoodsOutputType() == -1) {
+        if (getGoodsOutputType() == null) {
             return 0;
         }
 
@@ -1116,7 +1116,7 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
      *         assuming enough "input goods".
      */
     public int getProductivity(Unit prodUnit) {
-        if (getGoodsOutputType() == -1) {
+        if (getGoodsOutputType() == null) {
             return 0;
         }
         if (prodUnit == null) {
@@ -1176,7 +1176,7 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
      * @return Maximum Production based on Productivity
      */
     public int getProductionFromProductivity(int productivity) {
-        int goodsOutputType = getGoodsOutputType();
+        GoodsType goodsOutputType = getGoodsOutputType();
         Player player = colony.getOwner();
 
         int goodsOutput = productivity;

@@ -1756,6 +1756,29 @@ public class Map extends FreeColGameObject {
         }
     }
 
+    /**
+     * Returns an int[NUMBER_OF_DIRECTIONS] array based on the baseNumber and the 'active' directions given.
+     * @param directions An int[] that gives the active directions
+              eg {Map.N, Map.NE, Map.E, Map.SE, Map.S, Map.SW, Map.W, Map.NW},
+              or {Map.E, Map.SW};
+     * @param baseNumber The base to be used to create the base array.
+     * @return A base array that can create unique identifiers for any combination
+     */
+    public static int[] getBase(int[] directions, int baseNumber) {
+        int[] base = new int[NUMBER_OF_DIRECTIONS];
+        int n = 1;
+        for (int i = 0; i < NUMBER_OF_DIRECTIONS; i++) {
+            base[i] = 0;
+            for (int j : directions)
+                if (j == i) {
+                    base[i] = n;
+                    n *= baseNumber;
+                    break;
+                }
+            }
+        }
+        return base;
+    }
 
     /**
      * This method writes an XML-representation of this object to the given

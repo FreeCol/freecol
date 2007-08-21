@@ -31,16 +31,20 @@ public final class Tile extends FreeColGameObject implements Location, Nameable 
 
     public static final String REVISION = "$Revision$";
 
-    // The type of a Tile can be one of the following.
+/*    // The type of a Tile can be one of the following.
     public static final int UNEXPLORED = 0, PLAINS = 1, GRASSLANDS = 2, PRAIRIE = 3, SAVANNAH = 4, MARSH = 5,
-            SWAMP = 6, DESERT = 7, TUNDRA = 8, ARCTIC = 9, OCEAN = 10, HIGH_SEAS = 11;
-
-    // An addition onto the tile can be one of the following:
-    public static final int ADD_NONE = 0, ADD_RIVER_MINOR = 1, ADD_RIVER_MAJOR = 2, ADD_HILLS = 3, ADD_MOUNTAINS = 4;
-
+            SWAMP = 6, DESERT = 7, TUNDRA = 8, ARCTIC = 9, OCEAN = 10, HIGH_SEAS = 11, HILLS = 12, MOUNTAINS = 13,
+            TILE_COUNT = 14,
+            // These types are extra terrain types that are used in ImageLibrary
+            BEACH = 14, FOREST = 15, TERRAIN_COUNT = 16;
+*/
+/*    // An addition onto the tile can be one of the following:
+    public static final int ADD_NONE = 0, ADD_RIVER_MINOR = 1, ADD_RIVER_MAJOR = 2,
+                                ADD_HILLS = 3, ADD_MOUNTAINS = 4;    // Depreciated, but left for legacy
+*/
     // Indians' claims on the tile may be one of the following:
     public static final int CLAIM_NONE = 0, CLAIM_VISITED = 1, CLAIM_CLAIMED = 2;
-
+/*  Depreciated
     // Please someone tell me they want to put this data into a separate file...
     // -sjm
     // Twelve tile types, sixteen goods types, and unforested/forested.
@@ -61,17 +65,19 @@ public final class Tile extends FreeColGameObject implements Location, Nameable 
         { { 2, 0 }, { 0, 0 }, { 0, 0 }, { 0, 0 }, { 0, 0 }, { 0, 0 }, { 4, 0 }, { 0, 0 } }, // Hills
         { { 0, 0 }, { 0, 0 }, { 0, 0 }, { 0, 0 }, { 0, 0 }, { 0, 0 }, { 4, 0 }, { 1, 0 } } // Mountains
     };
+*/
+    private TileType type;
+    
+//    private boolean road, plowed, forested, bonus, lostCityRumour;
 
-    private boolean road, plowed, forested, bonus, lostCityRumour;
-
-    private int type;
-
+//    private int type;
+    
     /**
      * The type of river on this tile.
      */
-    private int river = 0;
+//    private int river = 0;
 
-    private int additionType;
+//    private int additionType;
 
     private int x, y;
 
@@ -88,6 +94,11 @@ public final class Tile extends FreeColGameObject implements Location, Nameable 
      */
     private Settlement settlement;
 
+    /**
+     * Stores all Improvements and Resources (if any)
+     */
+    private TileItemContainer tileItemContainer;
+    
     private UnitContainer unitContainer;
 
     /** The number of adjacent land tiles, if this is an ocean tile */
@@ -109,15 +120,22 @@ public final class Tile extends FreeColGameObject implements Location, Nameable 
      */
     private PlayerExploredTile[] playerExploredTiles = null;
 
-
     /**
-     * Creates a new object with the type <code>UNEXPLORED</code>.
+     * Decides whether to show the tile or the unexplored version
+     */
+    public boolean explored;
+
+    public static final int NUMBER_OF_TYPES;
+
+/*
+    /**
+     * Creates a new object with the type <code>UNEXPLORED</code>. (Depreciated)
      * 
      * @param game The <code>Game</code> this <code>Tile</code> belongs to.
      * @param locX The x-position of this tile on the map.
      * @param locY The y-position of this tile on the map.
      */
-    public Tile(Game game, int locX, int locY) {
+/*    public Tile(Game game, int locX, int locY) {
         this(game, UNEXPLORED, locX, locY);
 
         if (getGame().getViewOwner() == null) {
@@ -126,14 +144,14 @@ public final class Tile extends FreeColGameObject implements Location, Nameable 
     }
 
     /**
-     * A constructor to use.
+     * A constructor to use. (Depreciated)
      * 
      * @param game The <code>Game</code> this <code>Tile</code> belongs to.
      * @param type The type.
      * @param locX The x-position of this tile on the map.
      * @param locY The y-position of this tile on the map.
      */
-    public Tile(Game game, int type, int locX, int locY) {
+/*    public Tile(Game game, int type, int locX, int locY) {
         super(game);
 
         unitContainer = new UnitContainer(game, this);
@@ -158,6 +176,37 @@ public final class Tile extends FreeColGameObject implements Location, Nameable 
             playerExploredTiles = new PlayerExploredTile[Player.NUMBER_OF_NATIONS];
         }
     }
+*/
+    /**
+     * A constructor to use.
+     * 
+     * @param game The <code>Game</code> this <code>Tile</code> belongs to.
+     * @param type The type.
+     * @param locX The x-position of this tile on the map.
+     * @param locY The y-position of this tile on the map.
+     */
+    public Tile(Game game, TileType type, int locX, int locY) {
+        super(game);
+
+        unitContainer = new UnitContainer(game, this);
+        this.type = type;
+        this.indianClaim = CLAIM_NONE;
+
+        tileItemContainer = new TileItemContainer(game, this);
+        lostCityRumour = false;
+        explored = false;
+
+        x = locX;
+        y = locY;
+        position = new Position(x, y);
+
+        owner = null;
+        settlement = null;
+
+        if (!isViewShared()) {
+            playerExploredTiles = new PlayerExploredTile[Player.NUMBER_OF_NATIONS];
+        }
+    }
 
     /**
      * Initialize this object from an XML-representation of this object.
@@ -170,7 +219,7 @@ public final class Tile extends FreeColGameObject implements Location, Nameable 
     public Tile(Game game, XMLStreamReader in) throws XMLStreamException {
         super(game, in);
 
-        if (getGame().getViewOwner() == null) {
+        if (!isViewShared()) {
             playerExploredTiles = new PlayerExploredTile[Player.NUMBER_OF_NATIONS];
         }
 
@@ -187,7 +236,7 @@ public final class Tile extends FreeColGameObject implements Location, Nameable 
     public Tile(Game game, Element e) {
         super(game, e);
 
-        if (getGame().getViewOwner() == null) {
+        if (!isViewShared()) {
             playerExploredTiles = new PlayerExploredTile[Player.NUMBER_OF_NATIONS];
         }
 
@@ -206,49 +255,91 @@ public final class Tile extends FreeColGameObject implements Location, Nameable 
     public Tile(Game game, String id) {
         super(game, id);
 
-        if (getGame().getViewOwner() == null) {
+        if (!isViewShared()) {
             playerExploredTiles = new PlayerExploredTile[Player.NUMBER_OF_NATIONS];
         }
     }
 
+    // ------------------------------------------------------------ static methods
+
     /**
-     * Gets the name of this tile. The value of the name depends on the
-     * {@link #getType type}, {@link #isForested forested} and
-     * {@link #getAddition addition} of the tile.
+     * Initializes the important Types for quick reference - performed by Specification.java
+     * @param numberOfTypes Initializer for NUMBER_OF_TYPES
+     */
+    public static void initialize(int numberOfTypes) {
+        NUMBER_OF_TYPES = numberOfTypes;
+    }
+
+    public isViewShared() {
+        return (getGame().getViewOwner() != null)
+    }
+
+    /**
+     * Gets the name of this tile, or shows "unexplored" if not explored by player.
      * 
      * @return The name as a <code>String</code>.
      */
     public String getName() {
-        return getName(getType(), isForested(), getAddition());
+        if (isViewShared()) {
+            if (explored) {
+                return Messages.message(getType().getName());
+            } else {
+                return Messages.message("unexplored");
+            }
+        } else {
+            Player player = getGame().getCurrentPlayer();
+            if (player != null) {
+                if (playerExploredTiles[player.getNation()] != null) {
+                    PlayerExploredTile pet = playerExploredTiles[player.getNation()];
+                    if (pet.explored) {
+                        return Messages.message(getType().getName());
+                    } else {
+                        return Messages.message("unexplored");
+                    }
+                }
+            } else {
+                logger.warning("player == null");
+            }
+        }
+    }
+
+    /**
+     * Returns a description of the <code>Tile</code>, with the name of the tile
+     * and any improvements on it (road/plow/etc) from <code>TileItemContainer</code>.
+     * @return The description label for this tile
+     */
+    public String getLabel() {
+        return getName() + tileItemContainer.getLabel();
     }
     
     /**
-     * Gets the name of the given tile type.
+     * Gets the name of the given tile type. (Depreciated)
      * 
      * @return The name as a <code>String</code>.
-     */
-    public static String getName(int tileType, boolean forested, int addition) {
+     *//*
+    public static String getName(int type, boolean forested, int addition) {
+/*      Depreciated
         if (addition == ADD_MOUNTAINS) {
             return Messages.message("mountains");
         } else if (addition == ADD_HILLS) {
             return Messages.message("hills");
-        } else if (0 < tileType && tileType < FreeCol.getSpecification().numberOfTileTypes()) {
-
-            TileType t = FreeCol.getSpecification().tileType(tileType);
-            return forested ? Messages.message(t.whenForested.name) : Messages.message(t.name);
+        } else *//*
+        if (0 < type && type < FreeCol.getSpecification().numberOfTileTypes()) {
+            TileType tileType = FreeCol.getSpecification().tileType(type);
+            return forested ? Messages.message(tileType.whenForested.name) : Messages.message(tileType.name);
         }
         return Messages.message("unexplored");
     }
-
+*/
     /**
      * Set the <code>Name</code> value.
      * 
      * @param newName The new Name value.
-     */
+     *//*
     public void setName(String newName) {
         // this.name = newName;
     }
-
+*/
     /**
      * Returns the name of this location.
      * 
@@ -288,6 +379,10 @@ public final class Tile extends FreeColGameObject implements Location, Nameable 
         return null;
     }
 
+    public TileItemContainer getTileItemContainer() {
+        return tileItemContainer;
+    }
+
     /**
      * Gets the total value of all treasure trains on this <code>Tile</code>.
      * 
@@ -300,7 +395,7 @@ public final class Tile extends FreeColGameObject implements Location, Nameable 
         Iterator<Unit> ui = getUnitIterator();
         while (ui.hasNext()) {
             Unit u = ui.next();
-            if (u.canCarryTreasure()) {
+            if (u.getType() == Unit.TREASURE_TRAIN) {
                 amount += u.getTreasureAmount();
             }
         }
@@ -321,7 +416,7 @@ public final class Tile extends FreeColGameObject implements Location, Nameable 
         Iterator<Unit> ui = getUnitIterator();
         while (ui.hasNext()) {
             Unit u = ui.next();
-            if (u.canCarryTreasure()
+            if (u.getType() == Unit.TREASURE_TRAIN
                     && (bestTreasureTrain == null || bestTreasureTrain.getTreasureAmount() < u.getTreasureAmount())) {
                 bestTreasureTrain = u;
             }
@@ -330,7 +425,7 @@ public final class Tile extends FreeColGameObject implements Location, Nameable 
         return bestTreasureTrain;
     }
 
-    /**
+    /**COMEBACKHERE
      * Calculates the value of a future colony at this tile.
      * 
      * @return The value of a future colony located on this tile. This value is
@@ -368,7 +463,7 @@ public final class Tile extends FreeColGameObject implements Location, Nameable 
                         nearbyTileIsOcean = true;
                         value += tile.potential(Goods.FOOD);
                     }
-                    if (tile.hasBonus()) {
+                    if (tile.hasResource()) {
                         value += 20;
                     }
 
@@ -384,7 +479,7 @@ public final class Tile extends FreeColGameObject implements Location, Nameable 
                 }
             }
 
-            if (hasBonus()) {
+            if (hasResource()) {
                 value -= 10;
             }
 
@@ -451,21 +546,7 @@ public final class Tile extends FreeColGameObject implements Location, Nameable 
      * @see Unit#getMoveCost
      */
     public int getMoveCost(Tile fromTile) {
-
-        if (hasRoad() && fromTile.hasRoad()) {
-            return 1;
-        } else if (hasRiver() && fromTile.hasRiver()) {
-            return 1;
-        } else if (getSettlement() != null) {
-            return 3;
-        } else if (getAddition() == ADD_MOUNTAINS) {
-            return 9;
-        } else if (getAddition() == ADD_HILLS) {
-            return 6;
-        }
-
-        TileType t = FreeCol.getSpecification().tileType(type);
-        return forested ? t.whenForested.basicMoveCost : t.basicMoveCost;
+        return tileItemContainer.getMoveCost(getTileType().basicMoveCost, fromTile);
     }
 
     /**
@@ -519,6 +600,8 @@ public final class Tile extends FreeColGameObject implements Location, Nameable 
     public boolean contains(Locatable locatable) {
         if (locatable instanceof Unit) {
             return unitContainer.contains((Unit) locatable);
+        } else if (locatable instanceof TileItem) {
+            return tileItemContainer.contains((TileItem) locatable);
         }
 
         logger.warning("Tile.contains(" + locatable + ") Not implemented yet!");
@@ -541,7 +624,7 @@ public final class Tile extends FreeColGameObject implements Location, Nameable 
      * @return true iff tile is known.
      */
     public boolean isExplored() {
-        return getType() != UNEXPLORED;
+        return explored;
     }
 
     /**
@@ -550,39 +633,7 @@ public final class Tile extends FreeColGameObject implements Location, Nameable 
      * @return 'true' if this Tile is a land Tile, 'false' otherwise.
      */
     public boolean isLand() {
-        return isLand(type);
-    }
-    
-    /**
-     * Returns 'true' if this Tile is a land Tile, 'false' otherwise.
-     * 
-     * @return 'true' if this Tile is a land Tile, 'false' otherwise.
-     */
-    public static boolean isLand(int type) {
-        return (type != OCEAN) && (type != HIGH_SEAS);
-    }
-
-    /**
-     * Returns 'true' if this Tile has a road.
-     * 
-     * @return 'true' if this Tile has a road.
-     */
-    public boolean hasRoad() {
-        return road || (getSettlement() != null);
-    }
-
-    public boolean hasRiver() {
-
-        return ADD_RIVER_MINOR == additionType || ADD_RIVER_MAJOR == additionType;
-    }
-
-    /**
-     * Returns 'true' if this Tile has been plowed.
-     * 
-     * @return 'true' if this Tile has been plowed.
-     */
-    public boolean isPlowed() {
-        return plowed;
+        return !type.isWater();
     }
 
     /**
@@ -591,16 +642,38 @@ public final class Tile extends FreeColGameObject implements Location, Nameable 
      * @return 'true' if this Tile is forested.
      */
     public boolean isForested() {
-        return forested;
+        return type.isForested();
+    }
+
+   /**
+     * Returns 'true' if this Tile has a road.
+     * 
+     * @return 'true' if this Tile has a road.
+     */
+    public boolean hasRoad() {
+        return getTileItemContainer().hasRoad() || (getSettlement() != null);
+    }
+
+    public boolean hasRiver() {
+        return getTileItemContainer().hasRiver();
     }
 
     /**
-     * Returns 'true' if this Tile has a bonus (an extra resource) on it.
+     * Returns 'true' if this Tile has been plowed.
      * 
-     * @return 'true' if this Tile has a bonus (an extra resource) on it.
+     * @return 'true' if this Tile has been plowed.
+     *//*
+    public boolean isPlowed() {
+        return plowed;
+    }
+*/
+    /**
+     * Returns 'true' if this Tile has a resource on it.
+     * 
+     * @return 'true' if this Tile has a resource on it.
      */
-    public boolean hasBonus() {
-        return bonus;
+    public boolean hasResource() {
+        return getTileItemContainer().hasResource();
     }
 
     /**
@@ -609,10 +682,17 @@ public final class Tile extends FreeColGameObject implements Location, Nameable 
      * 
      * @return The type of this Tile.
      */
-    public int getType() {
+    public TileType getType() {
         return type;
     }
 
+    /**
+     * Returns the TileType of this Tile.
+     *//*
+    public TileType getTileType() {
+        return FreeCol.getSpecification().tileType(type);
+    }
+*/
     /**
      * The nation that consider this tile to be their property.
      * 
@@ -661,19 +741,24 @@ public final class Tile extends FreeColGameObject implements Location, Nameable 
      * Returns the addition on this Tile.
      * 
      * @return The addition on this Tile.
-     */
+     *//*   Depreciated
     public int getAddition() {
         return additionType;
     }
-
+*/
     /**
      * Sets the addition on this Tile.
      * 
      * @param addition The addition on this Tile.
-     */
+     *//*   Depreciated
     public void setAddition(int addition) {
-        if (addition == ADD_HILLS || addition == ADD_MOUNTAINS) {
+        //  Depreciated, but left as legacy
+        if (addition == ADD_HILLS) {
             setForested(false);
+            type = HILLS;
+        } else if (addition == ADD_MOUNTAINS) {
+            setForested(false);
+            type = MOUNTAINS;
         }
         if (addition != ADD_RIVER_MINOR && addition != ADD_RIVER_MAJOR) {
             river = 0;
@@ -687,66 +772,40 @@ public final class Tile extends FreeColGameObject implements Location, Nameable 
         additionType = addition;
         updatePlayerExploredTiles();
     }
+*/
+    /**
+     * Returns the river on this <code>Tile</code> if any
+     * @return River <code>TileImprovement</code>
+     */
+    public TileImprovement getRiver() {
+        return tileItemContainer.getRiver();
+    }
 
     /**
-     * Returns the type of river on this tile.
+     * Returns the style of a river <code>TileImprovement</code> on this <code>Tile</code>.
      * 
      * @return an <code>int</code> value
      */
-    public int getRiver() {
-        return this.river;
+    public int getRiverStyle() {
+        return tileItemContainer.getRiverStyle();
     }
 
     /**
      * Adds a river to this tile.
      * 
-     * @param addition an <code>int</code> value
-     * @param river an <code>int</code> value
+     * @param magnitude The magnitude of the river at this point
      */
-    public void addRiver(int addition, int river) {
-        setAddition(addition);
-        this.river = river;
+    public void addRiver(int magnitude) {
+        tileItemContainer.addRiver(magnitude);
     }
 
-    public void updateRiver(int direction, int addition) {
-        this.river = River.updateRiver(river, direction, addition);
+    public void setRiverMagnitude(int magnitude) {
+        tileItemContainer.setRiverMagnitude(magnitude);
     }
 
-    public void addRiver(int addition) {
-        if (addition == ADD_RIVER_MINOR ||
-            addition == ADD_RIVER_MAJOR) {
-            if (addition == getAddition()) {
-                return;
-            } else {
-                setAddition(addition);
-            }
-        } else {
-            return;
-        }
-        int[] base = {0, 1, 0, 3, 0, 9, 0, 27};
-        int[] directions = {Map.NE, Map.SE, Map.SW, Map.NW};
-        river = 0;
-        for (int i = 0; i < directions.length; i++) {
-            int branch = 0;
-            Tile t = getMap().getNeighbourOrNull(directions[i], this);
-            if (t == null) {
-                continue;
-            }
-            if (t.getAddition() == ADD_RIVER_MINOR) {
-                branch = 1;
-            } else if (t.getAddition() == ADD_RIVER_MAJOR) {
-                branch = 2;
-            } else {
-                continue;
-            }
-            river += branch * base[directions[i]];
-            int otherRiver = t.getRiver();
-            int otherDirection = Map.getReverseDirection(directions[i]);
-            int newRiver = River.updateRiver(otherRiver, otherDirection, addition);
-            t.addRiver(branch, newRiver);
-        }
+    public void updateRiver() {
+        tileItemContainer.updateRiver();
     }
-
 
     /**
      * Return the number of land tiles adjacent to this one.
@@ -783,10 +842,8 @@ public final class Tile extends FreeColGameObject implements Location, Nameable 
                     if (t.isLand()) {
                         fishBonus++;
                     }
-                    if (t.getAddition() == ADD_RIVER_MAJOR) {
-                        fishBonus += 2;
-                    } else if (t.getAddition() == ADD_RIVER_MINOR) {
-                        fishBonus += 1;
+                    if (t.hasRiver()) {
+                        fishbonus += t.getRiver().getMagnitude();
                     }
                 }
             }
@@ -887,14 +944,17 @@ public final class Tile extends FreeColGameObject implements Location, Nameable 
      * Sets whether the tile is forested or not.
      * 
      * If a forest is set for the tile (isForested == true) 
-     * then mountains or hills will be removed.
+     * then mountains or hills will be removed. (depreciated)
+     *
+     * Forests are ignored/rejected if on Arctic, Hills or Mountains
      * 
      * If called on an ocean tile, the type of the tile is set to PLAINS.
      * 
      * @param isForested New value for forested.
-     */
+     *//*
     public void setForested(boolean isForested) {
         forested = isForested;
+        /*  Depreciated
         if (forested && (additionType == ADD_HILLS
                 || additionType == ADD_MOUNTAINS)) {
             additionType = ADD_NONE;
@@ -905,51 +965,63 @@ public final class Tile extends FreeColGameObject implements Location, Nameable 
             type = PLAINS;
         }
         
-        if (type == ARCTIC && forested) {
-            logger.warning("Ignoring forest on ARCTIC.");
+        if ((type == ARCTIC || type == HILLS || type == MOUNTAINS) && forested) {
+            logger.warning("Ignoring forest on ARCTIC, HILLS or MOUNTAINS.");
             forested = false;
         }
         
         updatePlayerExploredTiles();
     }
-
-    /**
+*/
+    /**COMEBACKHERE
      * Sets whether the tile is plowed or not.
      * 
      * @param value New value.
-     */
+     *//*
     public void setPlowed(boolean value) {
         plowed = value;
         updatePlayerExploredTiles();
     }
-
-    /**
+*/
+    /**COMEBACKHERE
      * Sets whether the tile has a road or not.
      * 
      * @param value New value.
-     */
+     *//*
     public void setRoad(boolean value) {
         road = value;
         updatePlayerExploredTiles();
     }
-
-    /**
+*/
+    /**COMEBACKHERE
      * Sets whether the tile has a bonus or not.
      * 
      * @param value New value for bonus
-     */
+     *//*
     public void setBonus(boolean value) {
         bonus = value;
         updatePlayerExploredTiles();
     }
-
+*/
     /**
      * Sets the type for this Tile.
      * 
-     * @param t The new type for this Tile.
+     * @param t The new TileType for this Tile.
      */
+    public void setType(TileType t) {
+        if (t == null) {
+            throw new IllegalStateException("Tile type must be valid");
+        }
+        type = t;
+        getTileItemContainer().clear();
+        if (!isLand()) {
+            settlement = null;
+        }
+        updatePlayerExploredTiles();
+    }
+/*
     public void setType(int t) {
-        if (t < UNEXPLORED || t > HIGH_SEAS)
+        if (t < UNEXPLORED || t >= TILE_COUNT)
             throw new IllegalStateException("Tile type must be valid");
         type = t;
         bonus = false;
@@ -962,13 +1034,13 @@ public final class Tile extends FreeColGameObject implements Location, Nameable 
             additionType = ADD_NONE;
         }
         
-        if (type == ARCTIC) {
+        if (type == ARCTIC || type == HILLS || type == MOUNTAINS) {
             forested = false;
         }
         
         updatePlayerExploredTiles();
     }
-
+*/
     /**
      * Returns the x-coordinate of this Tile.
      * 
@@ -1026,18 +1098,11 @@ public final class Tile extends FreeColGameObject implements Location, Nameable 
     /**
      * Check if the tile type is suitable for a <code>Settlement</code>,
      * either by a <code>Colony</code> or an <code>IndianSettlement</code>.
-     * What are unsuitable tile types are Arctic or water tiles.
      * 
      * @return true if tile suitable for settlement
      */
     public boolean isSettleable() {
-        int type = getType();
-
-        if (type == ARCTIC || type == OCEAN || type == HIGH_SEAS || getAddition() == ADD_MOUNTAINS) {
-            return false;
-        }
-
-        return true;
+        return getType().canSettle();
     }
 
     /**
@@ -1139,6 +1204,8 @@ public final class Tile extends FreeColGameObject implements Location, Nameable 
     public void add(Locatable locatable) {
         if (locatable instanceof Unit) {
             unitContainer.addUnit((Unit) locatable);
+        } else if (locatable instanceof TileItem) {
+            tileItemContainer.addTileItem((TileItem) locatable);
         } else {
             logger.warning("Tried to add an unrecognized 'Locatable' to a tile.");
         }
@@ -1154,6 +1221,8 @@ public final class Tile extends FreeColGameObject implements Location, Nameable 
     public void remove(Locatable locatable) {
         if (locatable instanceof Unit) {
             unitContainer.removeUnit((Unit) locatable);
+        } else if (locatable instanceof TileItem) {
+            tileItemContainer.addTileItem((TileItem) locatable);
         } else {
             logger.warning("Tried to remove an unrecognized 'Locatable' from a tile.");
         }
@@ -1198,7 +1267,26 @@ public final class Tile extends FreeColGameObject implements Location, Nameable 
     }
 
     /**
-     * Checks wether or not the specified locatable may be added to this
+     * Gets a <code>List/code> of every <code>TileItem</code> located on this <code>Tile</code>.
+     *
+     * @return The <code>List</code>.
+     */
+    public List<TileItem> getTileItemList() {
+        return tileItems;
+    }
+
+    /**
+     * Gets an <code>Iterator</code> of every <code>TileImprovement</code>
+     * located on this <code>Tile</code>.
+     * 
+     * @return The <code>Iterator</code>.
+     */
+    public Iterator<TileItem> getTileItemIterator() {
+        return getTileItemList().iterator();
+    }
+
+    /**
+     * Checks whether or not the specified locatable may be added to this
      * <code>Location</code>.
      * 
      * @param locatable The <code>Locatable</code> to test the addabillity of.
@@ -1211,14 +1299,30 @@ public final class Tile extends FreeColGameObject implements Location, Nameable 
     /**
      * The potential of this tile to produce a certain type of goods.
      * 
-     * @param goods The type of goods to check the potential for.
+     * @param goodsType The type of goods to check the potential for.
      * @return The normal potential of this tile to produce that amount of
      *         goods.
      */
-    public int potential(int goods) {
-        return getTileTypePotential(getType(), goods, getAddition(), getFishBonus(), 
-                                    hasBonus(), isForested(), isPlowed(), hasRoad());
+    public int potential(GoodsType goodsType) {
+        return getTileTypePotential(getType(), goodsType, getTileItemContainer(), getFishBonus());
     }
+
+    /**
+     * The potential of this tile to produce a certain type of goods.
+     * 
+     * @param goodsIndex The index of the goods to check the potential for.
+     * @return The normal potential of this tile to produce that amount of
+     *         goods.
+     */
+    public int potential(int goodsIndex) {
+        return potential(FreeCol.getSpecification().getGoodsType(goods));
+    }
+
+/*
+        return getTileTypePotential(getType(), goods, getAddition(), getFishBonus(), 
+                                    hasResource(), isForested(), isPlowed(), hasRoad());
+    }
+*/
 
     /**
      * Gets the maximum potential for producing the given type of goods. The
@@ -1227,15 +1331,14 @@ public final class Tile extends FreeColGameObject implements Location, Nameable 
      * 
      * @param goodsType The type of goods.
      * @return The maximum potential.
-     */
+     *//*
     public int getMaximumPotential(int goodsType) {
-        if (potentialtable[getType()][goodsType][0] < 
-            potentialtable[getType()][goodsType][1]) {
+        if (getTileType().getPotential(goodsType) < getTileType().getPotential(goodsType, forested)) {
             return getTileTypePotential(getType(), goodsType, getAddition(), 0,
-                                        hasBonus(), isForested(), false, true);
+                                        hasResource(), isForested(), false, true);
         } else {
             return getTileTypePotential(getType(), goodsType, getAddition(), getFishBonus(), 
-                                        hasBonus(), false, true, true);
+                                        hasResource(), false, true, true);
         }
     }
 
@@ -1245,32 +1348,43 @@ public final class Tile extends FreeColGameObject implements Location, Nameable 
      * 
      * @return The result.
      * @see Unit#canPlow()
-     */
+     *//*
     public boolean canBePlowed() {
-        return (!isPlowed() && isLand() && getAddition() != Tile.ADD_HILLS && 
-                getAddition() != Tile.ADD_MOUNTAINS && getType() != Tile.ARCTIC);
+        return (!isPlowed() && isLand() && getType() != Tile.ARCTIC
+                && getType() != Tile.HILLS && getType() != Tile.MOUNTAINS);
     }
-
+*/
     /**
-     * Checks wether this <code>Tile</code> can have a road or not. This
+     * Checks whether this <code>Tile</code> can have a road or not. This
      * method will return <code>false</code> if a road has already been built.
      * 
      * @return The result.
      */
     public boolean canGetRoad() {
-        return isLand() && !hasRoad();
+        return isLand() && !tileItemContainer.hasRoad();
     }
 
     /**
-     * Return the type of bonus a certain tile type can have. TODO:
-     * put all this in TileType.
+     * Finds the TileImprovement of a given Type, or null if there is no match.
+     */
+    public TileImprovement findTileImprovementType(TileImprovementType type) {
+        return tileItemContainer.findTileImprovementType(type);
+    }
+
+    /**
+     * Return the type of bonus a certain tile type can have.
      *
      * @param type The tile type.
      * @param addition The addition.
      * @param forested Whether the tile is forested.
      * @return the type of bonus.
-     */
+     *//*
+     // Is this still used?
     public static int getBonusType(int type, int addition, boolean forested) {
+        TileType t = FreeCol.getSpecification().tileType(type);
+        return forested ? t.whenForested.bonusType : t.bonusType;
+        
+        /* Depreciated
         if (addition == Tile.ADD_MOUNTAINS) {
             return Goods.SILVER;
         } else if (addition == Tile.ADD_HILLS) {
@@ -1315,11 +1429,36 @@ public final class Tile extends FreeColGameObject implements Location, Nameable 
             }
         }
     }
+        */
 
     /**
+     * Calculates the potential of a certain <code>GoodsType</code>.
+     * 
+     * @param tileType The <code>TileType</code>.
+     * @param goodsType The <code>GoodsType</code> to check the potential for.
+     * @param tiContainer The <code>TileItemContainer</code> with any TileItems to give bonuses.
+     * @param fishbonus The Bonus Fish to be considered if valid
+     * @return The amount of goods.
+     */
+    public static int getTileTypePotential(TileType tileType, GoodsType goodsType, TileItemContainer tiContainer, int fishBonus) {
+        if (!goodsType.isFarmed()) {
+            return 0;
+        }
+        // Get tile potential + bonus if any
+        int potential = tileType.getPotential(goodsType);
+        if (tiContainer != null) {
+            potential += tiContainer.getBonus(goodsType);
+        }
+        if (tileType.isWater() && goodsType == Goods.FISH) {
+            potential += fishBonus;
+        }
+        return potential;
+    }
+
+    /**COMEBACKHERE
      * The potential of a given type of tile to produce a certain type of goods.
      * 
-     * @param tileType The type of tile
+     * @param type The type of tile
      * @param goods The type of goods to check the potential for.
      * @param additionType The type of addition (mountains, hills etc).
      * @param bonus Should be <code>true</code> to indicate that a bonus is
@@ -1328,8 +1467,8 @@ public final class Tile extends FreeColGameObject implements Location, Nameable 
      * @param plowed <code>true</code> to indicate that it is plowed.
      * @param road <code>true</code> to indicate a road
      * @return The amount of goods.
-     */
-    public static int getTileTypePotential(int tileType, int goods, int additionType, int fishBonus, 
+     *//*
+    public static int getTileTypePotential(int type, int goods, int additionType, int fishBonus, 
                                            boolean bonus, boolean forested, boolean plowed, boolean road) {
 
         GoodsType goodsType = FreeCol.getSpecification().goodsType(goods);
@@ -1338,8 +1477,17 @@ public final class Tile extends FreeColGameObject implements Location, Nameable 
             return 0;
         }
 
+        TileType tileType = FreeCol.getSpecification().tileType(type);
+        if (forested) {
+            tileType = tileType.whenForested;   // Get forested tiletype
+        }
 
-        int basepotential = 0;
+        // Get tile potential + bonus if any
+        int basepotential = tileType.getFullPotential(goods, bonus);
+        if (type == OCEAN && goods == Goods.FOOD) {
+            basepotential = basepotential + fishBonus;
+
+        /*  Depreciated
         switch (additionType) {
         case ADD_HILLS:
             basepotential = potentialtable[12][goods][0];
@@ -1355,6 +1503,7 @@ public final class Tile extends FreeColGameObject implements Location, Nameable 
             }
             break;
         }
+        *//*
 
         if (basepotential > 0) {
             if (goodsType.isImprovedByPlowing() && plowed) {
@@ -1372,7 +1521,8 @@ public final class Tile extends FreeColGameObject implements Location, Nameable 
             }
         }
 
-        if (bonus && goods == getBonusType(tileType, additionType, forested)) {
+//        if (bonus && goods == getBonusType(tileType, additionType, forested)) {   // Depreciated
+            /*  Depreciated
             switch (goods) {
             case Goods.LUMBER:
             case Goods.FURS:
@@ -1391,26 +1541,100 @@ public final class Tile extends FreeColGameObject implements Location, Nameable 
                 basepotential += 2;
                 break;
             }
+            *//*
         }
 
         return basepotential;
     }
+*/
+    /**
+     * Finds the top three outputs based on TileType, TileItemContainer and FishBonus if any
+     * @param tileType The <code>TileType/code>
+     * @param tiContainer The <code>TileItemContainer</code>
+     * @param fishbonus The Bonus Fish to be considered if valid
+     * @return The sorted top three of the outputs.
+     */
+    public GoodsType[] getSortedGoodsTop(TileType tileType, TileItemContainer tiContainer, int fishBonus) {
+        GoodsType[] top = new GoodsType[3];
+        int[] val = new int[3];
+        List<GoodsType> goodsTypeList = FreeCol.getSpecification().getGoodsTypeList();
+        for (GoodsType g : goodsTypeList) {
+            int potential = getTileTypePotential(tileType, g, tiContainer, fishBonus);
+            // Higher than the lowest saved value (which is 0 by default)
+            if (potential > val[2]) {
+                // Find highest spot to put this item
+                for (int i = 0; i < 3; i++) {
+                    if (potential > val[i]) {
+                        // Shift and move down
+                        for (int j = 2; j > i; j--) {
+                            top[j] = top[j-1];
+                            val[j] = val[j-1];
+                        }
+                        top[i] = g;
+                        val[i] = potential;
+                    }
+                }
+            }
+        }
+        return top;
+    }
+
+    public List<GoodsType> getSortedGoodsList(TileType tileType, TileItemContainer tiContainer, int fishBonus) {
+        List<GoodsType> goodsTypeList = FreeCol.getSpecification().getGoodsTypeList();
+        Collections.sort(goodsTypeList, new Comparator<GoodsType>() {
+            public int compare(GoodsType o, GoodsType p) {
+                return getTileTypePotential(tileType, p, tiContainer, fishBonus) - getTileTypePotential(tileType, o, tiContainer, fishBonus);
+            }
+        });
+        return goodsTypeList;
+    }
 
     /**
-     * The type of secondary good this tile produces best (used for Town Commons
+     * The type of secondary good (non-food) this tile produces best (used for Town Commons
      * squares).
      * 
      * @return The type of secondary good best produced by this tile.
      */
-    public int secondaryGoods() {
-        return secondaryGoods(getType(), isForested(), getAddition());
+    public GoodsType secondaryGoods() {
+        GoodsType[] top = getSortedGoodsTop(tileType, tileItemContainer, getFishBonus());
+        for (GoodsType g : top) {
+            if (g != null || !g.isFoodType()) {
+                return g;
+            }
+        }
+        return null;
     }
 
+    /**
+     * The type of secondary good (non-food) this <code>TileType</code> produces best.
+     * (used for Colopedia)
+     * 
+     * @return The type of secondary good best produced by this tile.
+     */
+    public static GoodsType secondaryGoods(TileType type) {
+        GoodsType top = null;
+        int val = 0;
+        List<GoodsType> goodsTypeList = FreeCol.getSpecification().getGoodsTypeList();
+        for (GoodsType g : goodsTypeList) {
+            if (!g.isFoodType) {
+                int potential = type.getPotential(g);
+                if (potential > val) {
+                    val = potential;
+                    top = g;
+                }
+            }
+        }
+        return top;
+    }
+
+/*
     public static int secondaryGoods(int type, boolean forested, int addition) {
         if (forested)
             return Goods.FURS;
+        /*  Depreciated
         if (addition >= ADD_HILLS)
             return Goods.ORE;
+        *//*
         switch (type) {
         case PLAINS:
         case PRAIRIE:
@@ -1424,12 +1648,14 @@ public final class Tile extends FreeColGameObject implements Location, Nameable 
             return Goods.SUGAR;
         case TUNDRA:
         case ARCTIC:
+        case HILLS:
+        case MOUNTAINS:
             return Goods.ORE;
         default:
             return -1;
         }
     }
-
+*/
     /**
      * The defense/ambush bonus of this tile.
      * <p>
@@ -1439,17 +1665,32 @@ public final class Tile extends FreeColGameObject implements Location, Nameable 
      * @return The defense modifier (in percent) of this tile.
      */
     public int defenseBonus() {
-
+        return (type.getDefenceFactor() - 100);
+        /*  Depreciated
         if (additionType == ADD_HILLS) {
             return 100;
         } else if (additionType == ADD_MOUNTAINS) {
             return 150;
         }
-
-        TileType t = FreeCol.getSpecification().tileType(type);
-        return forested ? t.whenForested.defenceBonus : t.defenceBonus;
+        return forested ? getTileType().whenForested.defenceBonus : getTileType().defenceBonus;
+        */
     }
 
+    /**
+     * This method is called only when a new turn is beginning. It will reduce the quantity of
+     * the bonus <code>Resource</code> that is on the tile, if any and if applicable.
+     * @see ResourceType
+     * @see ColonyTile#newTurn
+     */
+    public void expendResource(GoodsType goodsType, Settlement settlement) {
+        if (hasResource()) {
+            Resource resource = tileItemContainer.getResource();
+            if (resource.useQuantity(goodsType) == 0) {
+                addModelMessage(this, "model.tile.resourceExhausted", new String[][] { { "%resource%", resource.getName() },
+                { "%colony%", settlement.getName() } }, ModelMessage.WARNING);
+            }
+        }
+    }
 
     /**
      * This method writes an XML-representation of this object to the given
@@ -1499,8 +1740,12 @@ public final class Tile extends FreeColGameObject implements Location, Nameable 
         out.writeAttribute("ID", getID());
         out.writeAttribute("x", Integer.toString(x));
         out.writeAttribute("y", Integer.toString(y));
-        out.writeAttribute("type", Integer.toString(type));
+        out.writeAttribute("type", Integer.toString(type.getIndex()));
+//        out.writeAttribute("type", Integer.toString(type));
 
+        if (pet == null) {
+
+/*
         if (river != 0) {
             out.writeAttribute("river", Integer.toString(river));
         }
@@ -1508,13 +1753,13 @@ public final class Tile extends FreeColGameObject implements Location, Nameable 
         if (additionType != ADD_NONE) {
             out.writeAttribute("addition", Integer.toString(additionType));
         }
-
-        final String[] names = new String[] { "road", "plowed", "forested", "bonus", "lostCityRumour" };
+*/
+        final String[] names = new String[] { /*"road", "plowed", "forested", "bonus", */"lostCityRumour" };
         boolean[] values;
         if (pet == null) {
-            values = new boolean[] { road, plowed, forested, bonus, lostCityRumour };
+            values = new boolean[] { /*road, plowed, forested, bonus, */lostCityRumour };
         } else {
-            values = new boolean[] { pet.hasRoad(), pet.isPlowed(), pet.isForested(), pet.hasBonus(),
+            values = new boolean[] { /*pet.hasRoad(), pet.isPlowed(), pet.isForested(), pet.hasResource(),*/
                     pet.hasLostCityRumour() };
         }
         for (int i = 0; i < names.length; i++) {
@@ -1609,16 +1854,20 @@ public final class Tile extends FreeColGameObject implements Location, Nameable 
             }
         }
 
-        // Check if the player can see the tile: Do not show enemy units on a
-        // tile out-of-sight.
+        // Check if the player can see the tile:
+        // Do not show enemy units or any tileitems on a tile out-of-sight.
         if (getGame().isClientTrusted() || showAll
                 || (player.canSee(this) && (settlement == null || settlement.getOwner() == player))
                 || !getGameOptions().getBoolean(GameOptions.UNIT_HIDING) && player.canSee(this)) {
             unitContainer.toXML(out, player, showAll, toSavedGame);
+            tileItemContainer.toXML(out, player, showAll, toSavedGame);
         } else {
             UnitContainer emptyUnitContainer = new UnitContainer(getGame(), this);
             emptyUnitContainer.setFakeID(unitContainer.getID());
             emptyUnitContainer.toXML(out, player, showAll, toSavedGame);
+            TileItemContainer emptyTileItemContainer = new TileItemContainer(getGame(), this);
+            emptyTileItemContainer.setFakeID(tileItemContainer.getID());
+            emptyTileItemContainer.toXML(out, player, showAll, toSavedGame);
         }
 
         if (toSavedGame) {
@@ -1643,8 +1892,8 @@ public final class Tile extends FreeColGameObject implements Location, Nameable 
         x = Integer.parseInt(in.getAttributeValue(null, "x"));
         y = Integer.parseInt(in.getAttributeValue(null, "y"));
         position = new Position(x, y);
-        type = Integer.parseInt(in.getAttributeValue(null, "type"));
-
+        type = FreeCol.getSpecification().getTileType(Integer.parseInt(in.getAttributeValue(null, "type")));
+/*
         final String riverStr = in.getAttributeValue(null, "river");
         if (riverStr != null) {
             river = Integer.parseInt(riverStr);
@@ -1686,7 +1935,7 @@ public final class Tile extends FreeColGameObject implements Location, Nameable 
         } else {
             bonus = false;
         }
-
+*/
         final String lostCityRumourStr = in.getAttributeValue(null, "lostCityRumour");
         if (lostCityRumourStr != null) {
             lostCityRumour = Boolean.valueOf(lostCityRumourStr).booleanValue();
@@ -1741,6 +1990,13 @@ public final class Tile extends FreeColGameObject implements Location, Nameable 
                     unitContainer.readFromXML(in);
                 } else {
                     unitContainer = new UnitContainer(getGame(), this, in);
+                }
+            } else if (in.getLocalName().equals(TileItemContainer.getXMLElementTagName())) {
+                tileItemContainer = (TileItemContainer) getGame().getFreeColGameObject(in.getAttributeValue(null, "ID"));
+                if (tileItemContainer != null) {
+                    tileItemContainer.readFromXML(in);
+                } else {
+                    tileItemContainer = new TileItemContainer(getGame(), this, in);
                 }
             } else if (in.getLocalName().equals("playerExploredTile")) {
                 // Only from a savegame:
@@ -1843,10 +2099,14 @@ public final class Tile extends FreeColGameObject implements Location, Nameable 
                     + isExploredBy(getGame().getPlayer(nation)) + " ::: " + getPosition());
         }
 
+/*
         playerExploredTiles[nation].setRoad(road);
         playerExploredTiles[nation].setPlowed(plowed);
         playerExploredTiles[nation].setForested(forested);
         playerExploredTiles[nation].setBonus(bonus);
+*/
+        playerExploredTiles[nation].getTileItemInfo(tileItemContainer);
+
         playerExploredTiles[nation].setLostCityRumour(lostCityRumour);
         playerExploredTiles[nation].setNationOwner(nationOwner);
 
@@ -1981,6 +2241,12 @@ public final class Tile extends FreeColGameObject implements Location, Nameable 
 
         private int nationOwner;
 
+        // All known TileItems
+        private Resource resource;
+        private List<TileImprovement> improvements;
+        private TileImprovement road;
+        private TileImprovement river;
+
         // Colony data:
         private int colonyUnitCount = 0, colonyStockadeLevel;
 
@@ -2000,8 +2266,9 @@ public final class Tile extends FreeColGameObject implements Location, Nameable 
          * 
          * @param nation The nation.
          */
-        public PlayerExploredTile(int nation) {
+        public PlayerExploredTile(int nation, TileItemContainer tic) {
             this.nation = nation;
+            getTileItemInfo(tic);
         }
 
         /**
@@ -2012,6 +2279,17 @@ public final class Tile extends FreeColGameObject implements Location, Nameable 
          */
         public PlayerExploredTile(XMLStreamReader in) throws XMLStreamException {
             readFromXML(in);
+        }
+
+        /**
+         * Copies given TileItemContainer
+         * @param tic The <code>TileItemContainer</code> to copy from
+         */
+        public void getTileItemInfo(TileItemContainer tic) {
+            resource = tic.getResource();
+            improvements = tic.getImprovements();
+            road = tic.getRoad();
+            river = tic.getRiver();
         }
 
         public void setColonyUnitCount(int colonyUnitCount) {
@@ -2029,15 +2307,27 @@ public final class Tile extends FreeColGameObject implements Location, Nameable 
         public int getColonyStockadeLevel() {
             return colonyStockadeLevel;
         }
-
+/*
         public void setRoad(boolean road) {
             this.road = road;
         }
-
+*/
         public boolean hasRoad() {
+            return (road != null);
+        }
+
+        public TileImprovement getRoad() {
             return road;
         }
 
+        public boolean hasRiver() {
+            return (river != null);
+        }
+
+        public TileImprovement getRiver() {
+            return river;
+        }
+/*
         public void setPlowed(boolean plowed) {
             this.plowed = plowed;
         }
@@ -2058,10 +2348,10 @@ public final class Tile extends FreeColGameObject implements Location, Nameable 
             this.bonus = bonus;
         }
 
-        public boolean hasBonus() {
+        public boolean hasResource() {
             return bonus;
         }
-
+*/
         public void setLostCityRumour(boolean lostCityRumour) {
             this.lostCityRumour = lostCityRumour;
         }
@@ -2173,6 +2463,7 @@ public final class Tile extends FreeColGameObject implements Location, Nameable 
             if (!explored) {
                 out.writeAttribute("explored", Boolean.toString(explored));
             }
+/*
             if (theTile.hasRoad() != road) {
                 out.writeAttribute("road", Boolean.toString(road));
             }
@@ -2182,9 +2473,10 @@ public final class Tile extends FreeColGameObject implements Location, Nameable 
             if (theTile.isForested() != forested) {
                 out.writeAttribute("forested", Boolean.toString(forested));
             }
-            if (theTile.hasBonus() != bonus) {
+            if (theTile.hasResource() != bonus) {
                 out.writeAttribute("bonus", Boolean.toString(bonus));
             }
+*/
             if (theTile.hasLostCityRumour()) {
                 out.writeAttribute("lostCityRumour", Boolean.toString(lostCityRumour));
             }
@@ -2205,9 +2497,18 @@ public final class Tile extends FreeColGameObject implements Location, Nameable 
             }
             if (missionary != null) {
                 out.writeStartElement("missionary");
-                missionary.toXML(out, player, showAll, toSavedGame);
+                missionary.toXML(out, player, false, false);
                 out.writeEndElement();
             }
+            if (hasResource()) {
+                resource.toXML(out, player, showAll, toSavedGame);
+            }
+            Iterator<TileImprovement> ti = getImprovementIterator();
+            while (ti.hasNext()) {
+                TileImprovement t = ti.next();
+                t.toXML(out, player, showAll, toSavedGame);
+            }
+
             out.writeEndElement();
         }
 
@@ -2252,7 +2553,7 @@ public final class Tile extends FreeColGameObject implements Location, Nameable 
             if (bonusStr != null) {
                 bonus = Boolean.valueOf(bonusStr).booleanValue();
             } else {
-                bonus = theTile.hasBonus();
+                bonus = theTile.hasResource();
             }
 
             final String lostCityRumourStr = in.getAttributeValue(null, "lostCityRumour");
@@ -2295,19 +2596,43 @@ public final class Tile extends FreeColGameObject implements Location, Nameable 
                 wantedGoods2 = IndianSettlement.UNKNOWN;
             }
 
-            in.nextTag(); // <missionary> | </playerExploredTile>
-            if (in.getLocalName().equals("missionary")) {
-                in.nextTag();
-                missionary = (Unit) getGame().getFreeColGameObject(in.getAttributeValue(null, "ID"));
-                if (missionary == null) {
-                    missionary = new Unit(getGame(), in);
-                } else {
-                    missionary.readFromXML(in);
+            missionary = null;
+            improvements.clear();
+            road = null;
+            river = null;
+            while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
+                if (in.getLocalName().equals("missionary")) {
+                    in.nextTag();
+                    missionary = (Unit) getGame().getFreeColGameObject(in.getAttributeValue(null, "ID"));
+                    if (missionary == null) {
+                        missionary = new Unit(getGame(), in);
+                    } else {
+                        missionary.readFromXML(in);
+                    }
+                } else if (in.getLocalName().equals(Resource.getXMLElementTagName())) {
+                    resource = (Resource) getGame().getFreeColGameObject(in.getAttributeValue(null, "ID"));
+                    if (resource != null) {
+                        resource.readFromXML(in);
+                    } else {
+                        resource = new Resource(getGame(), tile, in);
+                    }
+                } else if (in.getLocalName().equals(TileImprovement.getXMLElementTagName())) {
+                    TileImprovement ti = (TileImprovement) getGame().getFreeColGameObject(in.getAttributeValue(null, "ID"));
+                    if (ti != null) {
+                        ti.readFromXML(in);
+                        if (!improvements.contains(ti)) {
+                            improvements.add(ti);
+                        }
+                    } else {
+                        ti = new TileImprovement(getGame(), tile, in);
+                        improvements.add(ti);
+                    }
+                    if (ti.isRoad()) {
+                        road = ti;
+                    } else if (ti.isRiver()) {
+                        river = ti;
+                    }
                 }
-                in.nextTag(); // </missionary>
-                in.nextTag(); // </playerExploredTile>
-            } else {
-                missionary = null;
             }
         }
 
@@ -2323,20 +2648,27 @@ public final class Tile extends FreeColGameObject implements Location, Nameable 
     }
 
     /**
-     * Returns the number of turns it takes for a non-expert pioneer to either
-     * PLOW or BUILD_ROAD on the current tile.
+     * Returns the number of turns it takes for a non-expert pioneer to perform
+     * the given <code>TileImprovementType</code>. It will check if it is valid
+     * for this <code>TileType</code>.
      * 
-     * This function was extracted by playing the original game and writing down
-     * how many turns it took for a regular pioneer to finish.
-     * 
-     * @param workType either Unit.PLOW or Unit.BUILD_ROAD. This function
-     *            expects a valid workType and does not check it for validity.
+     * @param workType The <code>TileImprovementType</code>
      * 
      * @return The number of turns it should take a non-expert pioneer to finish
      *         the work.
      */
-    public int getWorkAmount(int workType) {
+    public int getWorkAmount(TileImprovementType workType) {
+        if (workType == null) {
+            return -1;
+        }
+        if (!workType.isTileTypeAllowed(getType())) {
+            return -1;
+        }
+        // Return the basic work turns + additional work turns
+        return (getType().getBasicWorkTurns() + workType.getAddWorkTurns());
+    }
 
+    /*  Depreciated
         if (getTile().getAddition() == Tile.ADD_HILLS) {
             return 4;
         }
@@ -2344,7 +2676,6 @@ public final class Tile extends FreeColGameObject implements Location, Nameable 
         if (getTile().getAddition() == Tile.ADD_MOUNTAINS) {
             return 7;
         }
-
         int workAmount;
         switch (getType()) {
         case Tile.SAVANNAH:
@@ -2360,10 +2691,12 @@ public final class Tile extends FreeColGameObject implements Location, Nameable 
             workAmount = isForested() ? 8 : 7;
             break;
         case Tile.SWAMP:
+        case Tile.MOUNTAINS:
             workAmount = 9;
             break;
         case Tile.ARCTIC:
         case Tile.TUNDRA:
+        case Tile.HILLS:
             workAmount = 6;
             break;
         default:
@@ -2376,6 +2709,7 @@ public final class Tile extends FreeColGameObject implements Location, Nameable 
             return workAmount;
         }
     }
+    */
 
     /**
      * Returns the unit who is occupying the tile

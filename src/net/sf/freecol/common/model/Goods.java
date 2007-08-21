@@ -42,6 +42,14 @@ public class Goods implements Locatable, Ownable, Nameable {
 
     private static Logger logger = Logger.getLogger(Goods.class.getName());
 
+//    public static final GoodsType FOOD, BELLS, CROSSES, HAMMERS, HORSES, TOOLS, MUSKETS, TRADE_GOODS, FURS, FISH;
+    // Need to change Units to the new specification to remove reliance on these static quick links.
+    // Only the essential should have a quick link.
+    public static final GoodsType FOOD, SUGAR, TOBACCO, COTTON, FURS, LUMBER, ORE, SILVER, HORSES, 
+                                    RUM, CIGARS, CLOTH, COATS, TRADE_GOODS, TOOLS, MUSKETS, 
+                                    FISH, BELLS, CROSSES, HAMMERS;
+    public static final int NUMBER_OF_TYPES;
+/*
     public static final int FOOD = 0,
                             SUGAR = 1,
                             TOBACCO = 2,
@@ -60,7 +68,6 @@ public class Goods implements Locatable, Ownable, Nameable {
                             MUSKETS = 15;
 
     public static final int NUMBER_OF_TYPES = 16;
-
     // Unstorable goods:
     public static final int FISH = 16, // Stored as food.
                             BELLS = 17,
@@ -68,11 +75,14 @@ public class Goods implements Locatable, Ownable, Nameable {
                             HAMMERS = 19;
 
     public static final int NUMBER_OF_ALL_TYPES = 20;
+*/
 
     private Game game;
     private Location location;
-    private int type;
+    private GoodsType type;
     private int amount;
+
+    // ------------------------------------------------------------ constructor
 
     /**
      * Creates a standard <code>Goods</code>-instance given the place where
@@ -89,7 +99,7 @@ public class Goods implements Locatable, Ownable, Nameable {
      * 
      * @throws IllegalArgumentException if the location cannot store any goods.
      */
-    public Goods(Game game, Location location, int type, int amount) {
+    public Goods(Game game, Location location, GoodsType type, int amount) {
         if (game == null) {
             throw new NullPointerException();
         }
@@ -98,12 +108,19 @@ public class Goods implements Locatable, Ownable, Nameable {
             throw new IllegalArgumentException("This location cannot store goods");
         }
 
+        if (type == null) {
+            throw new NullPointerException();
+        }
+
         this.game = game;
         this.location = location;
         this.type = type;
         this.amount = amount;
     }
 
+    public Goods(Game game, Location location, int goodsIndex, int amount) {
+        this(game, location, FreeCol.getSpecification().getGoodsType(goodsIndex), amount);
+    }
 
     public Goods(Game game, XMLStreamReader in) throws XMLStreamException {
         this.game = game;
@@ -121,12 +138,34 @@ public class Goods implements Locatable, Ownable, Nameable {
      * 
      * @param type
      */
-    public Goods(int type) {
+    public Goods(GoodsType type) {
         this.game = null;
         this.location = null;
         this.type = type;
         this.amount = 0;
     }
+    public Goods(int goodsIndex) {
+        this(FreeCol.getSpecification().getGoodsType(goodsIndex));
+    }
+
+    // ------------------------------------------------------------ static methods
+
+    /**
+     * Initializes the important Types for quick reference - performed by Specification.java
+     * Should be softcoded as much as possible, and this should be amended later
+     * @param numberOfTypes Initializer for NUMBER_OF_TYPES
+     */
+    public static void initialize(List<GoodsType> goodsList, int numberOfTypes) {
+        GoodsType[] gt = {FOOD, SUGAR, TOBACCO, COTTON, FURS, LUMBER, ORE, SILVER, HORSES, 
+                        RUM, CIGARS, CLOTH, COATS, TRADE_GOODS, TOOLS, MUSKETS, 
+                        FISH, BELLS, CROSSES, HAMMERS};
+        for (GoodsType g : goodsList) {
+            gt[g.getIndex()] = g;
+        }
+        NUMBER_OF_TYPES = numberOfTypes;
+    }
+
+    // ------------------------------------------------------------ retrieval methods
 
     /**
     * Gets the owner of this <code>Ownable</code>.
@@ -167,7 +206,7 @@ public class Goods implements Locatable, Ownable, Nameable {
      * @return The name of this type of goods.
      */
     public String getName() {
-        return getName(type);
+        return type.getName();
     }
 
     /**
@@ -186,7 +225,7 @@ public class Goods implements Locatable, Ownable, Nameable {
      * @return The name of this type of goods.
      */
     public String getName(boolean sellable) {
-        return getName(type, sellable);
+        return type.getName(sellable);
     }
 
     /**
@@ -209,11 +248,12 @@ public class Goods implements Locatable, Ownable, Nameable {
     * @return The type of raw material or <code>-1</code> if the given type
     *         of goods does not have a raw material.
     */
+    /* Depreciated
     public static int getRawMaterial(int goodsType) {
         GoodsType  good = FreeCol.getSpecification().goodsType( goodsType );
         return good.isRefined() ? good.madeFrom.index : -1;        
     }
-
+    */
 
     /**
     * Gets the type of goods which can be produced by the given
@@ -223,22 +263,24 @@ public class Goods implements Locatable, Ownable, Nameable {
     * @return The type of manufactured goods or <code>-1</code> if the given type
     *         of goods does not have a manufactured goods.
     */
+    /* Depreciated
     public static int getManufactoredGoods(int rawMaterialGoodsType) {
         GoodsType  good = FreeCol.getSpecification().goodsType( rawMaterialGoodsType );
         return good.isRawMaterial() ? good.makes.index : -1;
     }
-
+    */
 
     /**
     * Checks if the given type of goods can be produced on a {@link ColonyTile}.
     * @param goodsType The type of goods to test.
     * @return The result.
     */
+    /*  Depreciated
     public static boolean isFarmedGoods(int goodsType) {
 
         return FreeCol.getSpecification().goodsType(goodsType).isFarmed;
     }
-
+    */
 
     /**
      * Returns a textual representation of the Good of type <code>type</code>.
@@ -247,6 +289,7 @@ public class Goods implements Locatable, Ownable, Nameable {
      *
      * TODO - needs to be completed
      */
+    /*
     public static String getName(int type) {
 
         if ( 0 <= type  &&  type < FreeCol.getSpecification().numberOfGoodsTypes() ) {
@@ -264,7 +307,7 @@ public class Goods implements Locatable, Ownable, Nameable {
             return getName(type) + " (" + Messages.message("model.goods.Boycotted") + ")";
         }
     }
-
+    */
 
     /**
     * Sets the location of the goods.
@@ -334,7 +377,7 @@ public class Goods implements Locatable, Ownable, Nameable {
     * Gets the value <code>type</code>. Note that type of goods should NEVER change.
     * @return The current value of type.
     */
-    public int getType() {
+    public GoodsType getType() {
         return type;
     }
 

@@ -169,6 +169,7 @@ public class Player extends FreeColGameObject implements Nameable {
     private int tax = 0;
 
     /** Specifies the cost of removing a boycot for each type of goods. */
+    /* Cannot be done this way because NUMBER_OF_TYPES is not a constant.
     private int[] arrears = new int[Goods.NUMBER_OF_TYPES];
 
     private int[] sales = new int[Goods.NUMBER_OF_TYPES];
@@ -176,6 +177,8 @@ public class Player extends FreeColGameObject implements Nameable {
     private int[] incomeBeforeTaxes = new int[Goods.NUMBER_OF_TYPES];
 
     private int[] incomeAfterTaxes = new int[Goods.NUMBER_OF_TYPES];
+*/
+    private int[] arrears, sales, incomeBeforeTaxes, incomeAfterTaxes;
 
     // 0 = pre-rebels; 1 = in rebellion; 2 = independence granted
     private int rebellionState;
@@ -324,6 +327,11 @@ public class Player extends FreeColGameObject implements Nameable {
                 monarch = new Monarch(game, this, "");
             }
         }
+
+        arrears = new int[Goods.NUMBER_OF_TYPES];
+        sales = new int[Goods.NUMBER_OF_TYPES];
+        incomeBeforeTaxes = new int[Goods.NUMBER_OF_TYPES];
+        incomeAfterTaxes = new int[Goods.NUMBER_OF_TYPES];
     }
 
     /**
@@ -2404,8 +2412,8 @@ public class Player extends FreeColGameObject implements Nameable {
 
                 case FoundingFather.JACOB_FUGGER:
                     // lift all current boycotts
-                    for (int typeOfGoods = 0; typeOfGoods < Goods.NUMBER_OF_TYPES; typeOfGoods++) {
-                        resetArrears(typeOfGoods);
+                    for (int index = 0; index < Goods.NUMBER_OF_TYPES; index++) {
+                        resetArrears(index);
                     }
                     break;
                 }
@@ -2838,11 +2846,11 @@ public class Player extends FreeColGameObject implements Nameable {
     /**
      * Returns the arrears due for a type of goods.
      * 
-     * @param typeOfGoods The type of goods.
+     * @param goodsIndex The index of the goods.
      * @return The arrears due for this type of goods.
      */
-    public int getArrears(int typeOfGoods) {
-        return arrears[typeOfGoods];
+    public int getArrears(int goodsIndex) {
+        return arrears[goodsIndex];
     }
 
     /**
@@ -2852,16 +2860,16 @@ public class Player extends FreeColGameObject implements Nameable {
      * @return The arrears due for this type of goods.
      */
     public int getArrears(Goods goods) {
-        return arrears[goods.getType()];
+        return arrears[goods.getType().getIndex()];
     }
 
     /**
      * Sets the arrears for a type of goods.
      * 
-     * @param typeOfGoods The type of goods.
+     * @param goodsIndex The index of the goods.
      */
-    public void setArrears(int typeOfGoods) {
-        arrears[typeOfGoods] = (getDifficulty() + 3) * 100 * getMarket().paidForSale(typeOfGoods);
+    public void setArrears(int goodsIndex) {
+        arrears[goodsIndex] = (getDifficulty() + 3) * 100 * getMarket().paidForSale(typeOfGoods);
     }
 
     /**
@@ -2870,16 +2878,16 @@ public class Player extends FreeColGameObject implements Nameable {
      * @param goods The goods.
      */
     public void setArrears(Goods goods) {
-        setArrears(goods.getType());
+        setArrears(goods.getType().getIndex());
     }
 
     /**
      * Resets the arrears for this type of goods to zero.
      * 
-     * @param typeOfGoods The type of goods to reset the arrears for.
+     * @param goodsIndex The index of the goods to reset the arrears for.
      */
-    public void resetArrears(int typeOfGoods) {
-        arrears[typeOfGoods] = 0;
+    public void resetArrears(int goodsIndex) {
+        arrears[goodsIndex] = 0;
     }
 
     /**
@@ -2892,29 +2900,35 @@ public class Player extends FreeColGameObject implements Nameable {
      * @see #resetArrears(int)
      */
     public void resetArrears(Goods goods) {
-        resetArrears(goods.getType());
+        resetArrears(goods.getType().getIndex());
     }
 
     /**
      * Returns true if type of goods can be traded in Europe.
      * 
-     * @param typeOfGoods The type of goods.
+     * @param goodsIndex The index of the goods.
      * @return True if there are no arrears due for this type of goods.
      */
-    public boolean canTrade(int typeOfGoods) {
-        return canTrade(typeOfGoods, Market.EUROPE);
+    public boolean canTrade(int goodsIndex) {
+        return canTrade(goodsIndex, Market.EUROPE);
+    }
+    public boolean canTrade(GoodsType type) {
+        return canTrade(type.getIndex(), Market.EUROPE);
     }
 
     /**
      * Returns true if type of goods can be traded at specified place.
      * 
-     * @param typeOfGoods The type of goods.
+     * @param goodsIndex The index of the goods.
      * @param marketAccess Way the goods are traded (Europe OR Custom)
      * @return <code>true</code> if type of goods can be traded.
      */
-    public boolean canTrade(int typeOfGoods, int marketAccess) {
-        return (arrears[typeOfGoods] == 0 || (marketAccess == Market.CUSTOM_HOUSE && getGameOptions().getBoolean(
+    public boolean canTrade(int goodsIndex, int marketAccess) {
+        return (arrears[goodsIndex] == 0 || (marketAccess == Market.CUSTOM_HOUSE && getGameOptions().getBoolean(
                 GameOptions.CUSTOM_IGNORE_BOYCOTT)));
+    }
+    public boolean canTrade(GoodsType type, int marketAccess) {
+        return canTrade(type.getIndex(), marketAccess);
     }
 
     /**
@@ -2925,7 +2939,7 @@ public class Player extends FreeColGameObject implements Nameable {
      * @return True if type of goods can be traded.
      */
     public boolean canTrade(Goods goods, int marketAccess) {
-        return canTrade(goods.getType(), marketAccess);
+        return canTrade(goods.getType().getIndex(), marketAccess);
     }
 
     /**
@@ -2963,61 +2977,61 @@ public class Player extends FreeColGameObject implements Nameable {
     /**
      * Returns the current sales.
      * 
-     * @param type The type of goods.
+     * @param goodsIndex The index of the goods.
      * @return The current sales.
      */
-    public int getSales(int type) {
-        return sales[type];
+    public int getSales(int goodsIndex) {
+        return sales[goodsIndex];
     }
 
     /**
      * Modifies the current sales.
      * 
-     * @param type The type of goods.
+     * @param goodsIndex The index of the goods.
      * @param amount The new sales.
      */
-    public void modifySales(int type, int amount) {
-        sales[type] += amount;
+    public void modifySales(int goodsIndex, int amount) {
+        sales[goodsIndex] += amount;
     }
 
     /**
      * Returns the current incomeBeforeTaxes.
      * 
-     * @param type The type of goods.
+     * @param goodsIndex The index of the goods.
      * @return The current incomeBeforeTaxes.
      */
-    public int getIncomeBeforeTaxes(int type) {
-        return incomeBeforeTaxes[type];
+    public int getIncomeBeforeTaxes(int goodsIndex) {
+        return incomeBeforeTaxes[goodsIndex];
     }
 
     /**
      * Modifies the current incomeBeforeTaxes.
      * 
-     * @param type The type of goods.
+     * @param goodsIndex The index of the goods.
      * @param amount The new incomeBeforeTaxes.
      */
-    public void modifyIncomeBeforeTaxes(int type, int amount) {
-        incomeBeforeTaxes[type] += amount;
+    public void modifyIncomeBeforeTaxes(int goodsIndex, int amount) {
+        incomeBeforeTaxes[goodsIndex] += amount;
     }
 
     /**
      * Returns the current incomeAfterTaxes.
      * 
-     * @param type The type of goods.
+     * @param goodsIndex The index of the goods.
      * @return The current incomeAfterTaxes.
      */
-    public int getIncomeAfterTaxes(int type) {
-        return incomeAfterTaxes[type];
+    public int getIncomeAfterTaxes(int goodsIndex) {
+        return incomeAfterTaxes[goodsIndex];
     }
 
     /**
      * Modifies the current incomeAfterTaxes.
      * 
-     * @param type The type of goods.
+     * @param goodsIndex The index of the goods.
      * @param amount The new incomeAfterTaxes.
      */
-    public void modifyIncomeAfterTaxes(int type, int amount) {
-        incomeAfterTaxes[type] += amount;
+    public void modifyIncomeAfterTaxes(int goodsIndex, int amount) {
+        incomeAfterTaxes[goodsIndex] += amount;
     }
 
     /**

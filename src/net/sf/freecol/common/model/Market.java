@@ -32,8 +32,8 @@ public final class Market extends FreeColGameObject implements Ownable {
     
     private static final int GOODS_STABILIZER = 750;
 
-    private final Data[]  dataForGoodType = new Data[Goods.NUMBER_OF_TYPES];
-
+    private final Data[]  dataForGoodType;
+/*  Depreciated - now in Specification
     private static final int[] initialAmounts = {
         10000, // FOOD
         1500, // SUGAR
@@ -90,7 +90,7 @@ public final class Market extends FreeColGameObject implements Ownable {
         1, // TOOLS
         1  // MUSKETS
     };
-
+*/
     private ArrayList<TransactionListener> transactionListeners =
             new ArrayList<TransactionListener>();
     
@@ -103,12 +103,15 @@ public final class Market extends FreeColGameObject implements Ownable {
         /* create the objects to hold the market data for each type of
          * goods and seed these objects with the initial amount of
          * each type of goods */
-        for (int goodsType = 0; goodsType < dataForGoodType.length; goodsType++) {
+        List<GoodsType> goodsList = FreeCol.getSpecification().getGoodsTypeList();
+        dataForGoodType = new Data[goodsList.size()];
+        for (GoodsType g : goodsList) {
             Data data = new Data(getGame());
-            data.amountInMarket = initialAmounts[goodsType];
-            data.paidForSale = initialPrices[goodsType];
-            data.costToBuy = initialPrices[goodsType] + priceDifferences[goodsType];
-            dataForGoodType[goodsType] = data;
+            data.isTradeable = g.isStorable();
+            data.amountInMarket = g.getInitialAmount();
+            data.paidForSale = g.getInitialSellPrice();
+            data.costToBuy = g.getInitialBuyPrice();
+            dataForGoodType[g.getIndex()] = data;
         }
 
     }
@@ -118,8 +121,12 @@ public final class Market extends FreeColGameObject implements Ownable {
      *
      */
     public void randomizeInitialPrices() {
-        for (int goodsType = 0; goodsType < dataForGoodType.length; goodsType++) {
-            switch(goodsType) {
+        List<GoodsType> goodsList = FreeCol.getSpecification().getGoodsTypeList();
+        for (GoodsType g : goodsList) {
+            if (!g.isStorable()) {
+                continue;
+            }
+            switch(g) {
             case Goods.TOOLS:
             case Goods.MUSKETS:
             case Goods.TRADE_GOODS:
@@ -128,10 +135,10 @@ public final class Market extends FreeColGameObject implements Ownable {
             default:
                 switch (getGame().getModelController().getPseudoRandom().nextInt(5)) {
                 case 1:
-                    initialPrices[goodsType]++;
+                    initialPrices[g.getIndex()]++;
                     break;
                 case 2:
-                    initialPrices[goodsType] += 2;
+                    initialPrices[g.getIndex()] += 2;
                     break;
                 default:
                 }
@@ -208,25 +215,31 @@ public final class Market extends FreeColGameObject implements Ownable {
     /**
      * Determines the cost to buy a single unit of a particular type of good.
      *
-     * @param typeOfGood  the type of good for which to obtain a price
+     * @param goodsIndex  The index of the Goods for which to obtain a price
      * @return The cost to buy a single unit of the given type of goods.
      * @throws NullPointerException  if the argument is <TT>null</TT>
      */
-    public int costToBuy(int typeOfGood) {
-        return dataForGoodType[typeOfGood].costToBuy;
+    public int costToBuy(int goodsIndex) {
+        return dataForGoodType[goodsIndex].costToBuy;
+    }
+    public int costToBuy(GoodsType type) {
+        return costToBuy(type.getIndex());
     }
 
     /**
      * Determines the price paid for the sale of a single unit of a particular
      * type of good.
      *
-     * @param typeOfGood  The Goods for which to obtain a price.
+     * @param goodsIndex  The index of the Goods for which to obtain a price
      * @return The price for a single unit of the given type of goods
      *      if being sold. 
      * @throws NullPointerException  if the argument is <TT>null</TT>
      */
-    public int paidForSale(int typeOfGood) {
-        return dataForGoodType[typeOfGood].paidForSale;
+    public int paidForSale(int goodsIndex) {
+        return dataForGoodType[goodsIndex].paidForSale;
+    }
+    public int paidForSale(GoodsType type) {
+        return paidForSale(type.getIndex());
     }
 
     /**
@@ -238,8 +251,11 @@ public final class Market extends FreeColGameObject implements Ownable {
      * @param  amount The amount of goods to be sold.
      * @param  player The player selling the goods
      */
-    public void sell(int type, int amount, Player player) {
-        sell(type, amount, player, Market.EUROPE);
+    public void sell(int goodsIndex, int amount, Player player) {
+        sell(goodsIndex, amount, player, Market.EUROPE);
+    }
+    public void sell(GoodsType type, int amount, Player player) {
+        sell(type.getIndex(), amount, player, Market.EUROPE);
     }
     
     /**
@@ -273,6 +289,9 @@ public final class Market extends FreeColGameObject implements Ownable {
                             ModelMessage.WARNING);
         }
     }
+    public void sell(GoodsType type, int amount, Player player, int marketAccess) {
+        sell(type.getIndex(), amount, player, marketAccess);
+    }
 
     /**
      * Sells a particular amount of a particular type of good with the proceeds
@@ -297,28 +316,31 @@ public final class Market extends FreeColGameObject implements Ownable {
      * Buys a particular amount of a particular type of good with the cost
      * being met by a particular player.
      *
-     * @param  type  the type of good that is being bought
+     * @param  goodsIndex  the index of the good that is being bought
      * @param  amount      the number of units of goods that are being bought
      * @param  player      the player buying the goods
      * @throws IllegalStateException If the <code>player</code> cannot afford
      *                               to buy the goods.
      */
-    public void buy(int type, int amount, Player player) {
-        if (getBidPrice(type, amount) > player.getGold()) {
+    public void buy(int goodsIndex, int amount, Player player) {
+        if (getBidPrice(goodsIndex, amount) > player.getGold()) {
             throw new IllegalStateException();
         }
 
-        int unitPrice = costToBuy(type);
-        int price = getBidPrice(type, amount);
+        int unitPrice = costToBuy(goodsIndex);
+        int price = getBidPrice(goodsIndex, amount);
         player.modifyGold(-price);
-        player.modifySales(type, -amount);
-        player.modifyIncomeBeforeTaxes(type, -price);
-        player.modifyIncomeAfterTaxes(type, -price);
-        remove(type, ((player.getNation() == Player.DUTCH) ? (amount / 2) : amount));
+        player.modifySales(goodsIndex, -amount);
+        player.modifyIncomeBeforeTaxes(goodsIndex, -price);
+        player.modifyIncomeAfterTaxes(goodsIndex, -price);
+        remove(goodsIndex, ((player.getNation() == Player.DUTCH) ? (amount / 2) : amount));
         
         for(TransactionListener listener : transactionListeners) {
-            listener.logPurchase(type, amount, unitPrice);
+            listener.logPurchase(goodsIndex, amount, unitPrice);
         }
+    }
+    public void buy(GoodsType type, int amount, Player player) {
+        buy(type.getIndex(), amount, player);
     }
 
 
@@ -328,10 +350,10 @@ public final class Market extends FreeColGameObject implements Ownable {
      * @param type The type of goods.
      * @param amount The amount of goods.
      */
-    public void add(int type, int amount) {
-        Data  data = dataForGoodType[type];
+    public void add(int goodsIndex, int amount) {
+        Data  data = dataForGoodType[goodsIndex];
         /*
-        switch(type) {
+        switch(goodsIndex) {
           case Goods.SILVER:
                amount *= 4; // No bitshifts in Java? Should be << 2 - sjm
                break;
@@ -352,14 +374,17 @@ public final class Market extends FreeColGameObject implements Ownable {
         data.amountInMarket += amount;
         priceGoods();
     }
+    public void add(GoodsType type, int amount) {
+        add(type.getIndex(), amount);
+    }
 
     /**
      * Remove the given <code>Goods</code> from this <code>Market</code>.
      * @param type The type of goods.
      * @param amount The amount of goods.
      */
-    public void remove(int type, int amount) {
-        Data data = dataForGoodType[type];
+    public void remove(int goodsIndex, int amount) {
+        Data data = dataForGoodType[goodsIndex];
         data.amountInMarket -= amount;
 
         /* this is a bottomless market: goods cannot be owed by the market */
@@ -369,29 +394,38 @@ public final class Market extends FreeColGameObject implements Ownable {
 
         priceGoods();
     }
+    public void remove(GoodsType type, int amount) {
+        remove(type.getIndex(), amount);
+    }
 
     /**
      * Gets the price of a given goods when the <code>Player</code> buys.
      *
-     * @param type The type of goods.
+     * @param goodsIndex The index of the goods.
      * @param amount The amount of goods.
      * @return The bid price of the given goods.
      */
-    public int getBidPrice(int type, int amount) {
-        Data data = dataForGoodType[type];
+    public int getBidPrice(int goodsIndex, int amount) {
+        Data data = dataForGoodType[goodsIndex];
         return (amount * data.costToBuy);
+    }
+    public int getBidPrice(GoodsType type, int amount) {
+        return getBidPrice(type.getIndex(), amount);
     }
 
     /**
      * Gets the price of a given goods when the <code>Player</code> sells.
      *
-     * @param type The type of goods.
+     * @param goodsIndex The index of the goods.
      * @param amount The amount of goods.
      * @return The sale price of the given goods.
      */
-    public int getSalePrice(int type, int amount) {
-        Data data = dataForGoodType[type];
+    public int getSalePrice(int goodsIndex, int amount) {
+        Data data = dataForGoodType[goodsIndex];
         return (amount * data.paidForSale);
+    }
+    public int getSalePrice(GoodsType type, int amount) {
+        return getSalePrice(type.getIndex(), amount);
     }
 
     public int getSalePrice(Goods goods) {
@@ -420,39 +454,46 @@ public final class Market extends FreeColGameObject implements Ownable {
 
         /* choose a price for each type of good in the market based on
          * the relative availability of that type of goods */
-        for (int goodsType = 0; goodsType < dataForGoodType.length; goodsType++) {
-            Data data = dataForGoodType[goodsType];
-            int newPrice = Math.round(initialAmounts[goodsType] * initialPrices[goodsType] /
+        for (int index = 0; index < dataForGoodType.length; index++) {
+
+        List<GoodsType> goodsList = FreeCol.getSpecification().getGoodsTypeList();
+        for (GoodsType g : goodsList) {
+            int index = g.getIndex();
+            Data data = dataForGoodType[index];
+            if (!data.isTradeable) {
+                continue;
+            }
+            int newPrice = Math.round(g.getInitialAmount() * g.getInitialSellPrice() /
                                       (float) data.amountInMarket);
-            if (newPrice + priceDifferences[goodsType] > 19) {
+            if (newPrice + g.getPriceDifference() > 19) {
                 data.costToBuy = 19;
-                data.paidForSale = 19 - priceDifferences[goodsType];
+                data.paidForSale = 19 - g.getPriceDifference();
             } else {
                 if (newPrice < 1) {
                     newPrice = 1;
                 }
                 data.paidForSale = newPrice;
-                data.costToBuy = data.paidForSale + priceDifferences[goodsType];
+                data.costToBuy = data.paidForSale + g.getPriceDifference();
             }
             if (addMessages && owner != null && owner.getEurope() != null) {
-                if (oldPrices[goodsType] > dataForGoodType[goodsType].costToBuy) {
+                if (oldPrices[index] > dataForGoodType[index].costToBuy) {
                     addModelMessage(owner.getEurope(), "model.market.priceDecrease",
                                     new String[][] {
                                         {"%europe%", owner.getEurope().getName()},
-                                        {"%goods%", Goods.getName(goodsType)},
-                                        {"%buy%", String.valueOf(dataForGoodType[goodsType].costToBuy)},
-                                        {"%sell%", String.valueOf(dataForGoodType[goodsType].paidForSale)}},
+                                        {"%goods%", g.getName()},
+                                        {"%buy%", String.valueOf(dataForGoodType[index].costToBuy)},
+                                        {"%sell%", String.valueOf(dataForGoodType[index].paidForSale)}},
                                     ModelMessage.MARKET_PRICES,
-                                    new Goods(goodsType));
-                } else if (oldPrices[goodsType] < dataForGoodType[goodsType].costToBuy) {
+                                    new Goods(g));
+                } else if (oldPrices[index] < dataForGoodType[index].costToBuy) {
                     addModelMessage(owner.getEurope(), "model.market.priceIncrease",
                                     new String[][] {
                                         {"%europe%", owner.getEurope().getName()},
-                                        {"%goods%", Goods.getName(goodsType)},
-                                        {"%buy%", String.valueOf(dataForGoodType[goodsType].costToBuy)},
-                                        {"%sell%", String.valueOf(dataForGoodType[goodsType].paidForSale)}},
+                                        {"%goods%", g.getName()},
+                                        {"%buy%", String.valueOf(dataForGoodType[index].costToBuy)},
+                                        {"%sell%", String.valueOf(dataForGoodType[index].paidForSale)}},
                                     ModelMessage.MARKET_PRICES,
-                                    new Goods(goodsType));
+                                    new Goods(g));
                 }
             }
         }
@@ -487,7 +528,6 @@ public final class Market extends FreeColGameObject implements Ownable {
 
         out.writeAttribute("ID", getID());
         out.writeAttribute("owner", owner.getID());
-        toArrayElement("initialPrices", initialPrices, out);
         
         for (int i=0; i<dataForGoodType.length;i++) {
             dataForGoodType[i].toXML(out, player, showAll, toSavedGame);
@@ -510,9 +550,7 @@ public final class Market extends FreeColGameObject implements Ownable {
 
         int i = 0;
         while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
-            if (in.getLocalName().equals("initialPrices")) {
-                initialPrices = readFromArrayElement("initialPrices", in, new int[0]);
-            } else if (in.getLocalName().equals(Data.getXMLElementTagName())) {
+            if (in.getLocalName().equals(Data.getXMLElementTagName())) {
                 dataForGoodType[i] = (Data) getGame().getFreeColGameObject(in.getAttributeValue(null, "ID"));
                 if (dataForGoodType[i] != null) {
                     dataForGoodType[i].readFromXML(in);    
@@ -573,6 +611,7 @@ public final class Market extends FreeColGameObject implements Ownable {
      */
     private static final class Data extends FreeColGameObject {
 
+        boolean isTradeable;
         int  costToBuy;
         int  paidForSale;
         int  amountInMarket;
@@ -620,6 +659,7 @@ public final class Market extends FreeColGameObject implements Ownable {
             out.writeStartElement(getXMLElementTagName());
 
             out.writeAttribute("ID", getID());
+            out.writeAttribute("tradeable", Boolean.toString(isTradeable));
             out.writeAttribute("amount", Integer.toString(amountInMarket));
 
             out.writeEndElement();
@@ -631,7 +671,7 @@ public final class Market extends FreeColGameObject implements Ownable {
          */
         protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
             setID(in.getAttributeValue(null, "ID"));
-
+            isTradeable = Boolean.valueOf(in.getAttributeValue(null, "tradeable")).booleanValue();
             amountInMarket = Integer.parseInt(in.getAttributeValue(null, "amount"));
             
             in.nextTag();

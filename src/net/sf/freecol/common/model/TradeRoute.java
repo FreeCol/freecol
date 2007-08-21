@@ -212,7 +212,7 @@ public class TradeRoute extends FreeColGameObject implements Cloneable, Ownable 
 
         private String locationId;
 
-        private ArrayList<Integer> cargo = new ArrayList<Integer>();
+        private ArrayList<GoodsType> cargo = new ArrayList<GoodsType>();
 
         /**
          * Whether the stop has been modified. This is of interest only to the
@@ -237,8 +237,9 @@ public class TradeRoute extends FreeColGameObject implements Cloneable, Ownable 
 
         private Stop(XMLStreamReader in) throws XMLStreamException {
             locationId = in.getAttributeValue(null, "location");
-            for (int cargo : readFromArrayElement("cargo", in, new int[0])) {
-                addCargo(cargo);
+            List<GoodsType> goodsList = FreeCol.getSpecification().getGoodsTypeList();
+            for (int cargoIndex : readFromArrayElement("cargo", in, new int[0])) {
+                addCargo(goodsList.get(cargoIndex));
             }
             in.nextTag();
         }
@@ -277,8 +278,8 @@ public class TradeRoute extends FreeColGameObject implements Cloneable, Ownable 
          * @return a cloned <code>ArrayList<Integer></code> value
          */
         @SuppressWarnings("unchecked")
-        public final ArrayList<Integer> getCargo() {
-            return (ArrayList<Integer>) cargo.clone();
+        public final ArrayList<GoodsType> getCargo() {
+            return (ArrayList<GoodsType>) cargo.clone();
         }
 
         /**
@@ -286,13 +287,17 @@ public class TradeRoute extends FreeColGameObject implements Cloneable, Ownable 
          * 
          * @param cargo and arraylist of cargo values.
          */
-        public final void setCargo(ArrayList<Integer> cargo) {
+        public final void setCargo(ArrayList<GoodsType> cargo) {
             this.cargo.clear();
             this.cargo.addAll(cargo);
         }
 
-        public void addCargo(int newCargo) {
+        public void addCargo(GoodsType newCargo) {
             cargo.add(newCargo);
+        }
+
+        public void addCargo(int newCargoIndex) {
+            cargo.add(FreeCol.getSpecification().getGoodsType(newCargoIndex));
         }
 
         public String toString() {
@@ -303,9 +308,9 @@ public class TradeRoute extends FreeColGameObject implements Cloneable, Ownable 
         public void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
             out.writeStartElement(getStopXMLElementTagName());
             out.writeAttribute("location", this.locationId);
-            int[] cargoArray = new int[cargo.size()];
+            int[] cargoIndexArray = new int[cargo.size()];
             for (int index = 0; index < cargoArray.length; index++) {
-                cargoArray[index] = cargo.get(index).intValue();
+                cargoIndexArray[index] = cargo.get(index).getIndex();
             }
             toArrayElement("cargo", cargoArray, out);
             out.writeEndElement();
