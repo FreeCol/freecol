@@ -2498,7 +2498,7 @@ break;
             }
             if (missionary != null) {
                 out.writeStartElement("missionary");
-                missionary.toXML(out, player, false, false);
+                missionary.toXML(out, player, showAll, toSavedGame;
                 out.writeEndElement();
             }
             if (hasResource()) {
