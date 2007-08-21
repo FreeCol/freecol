@@ -4604,7 +4604,7 @@ public class Unit extends FreeColGameObject implements Abilities, Locatable, Loc
         }
         out.writeAttribute("owner", ownerID);
         out.writeAttribute("turnsOfTraining", Integer.toString(turnsOfTraining));
-        out.writeAttribute("workType", Integer.toString(workType));
+        out.writeAttribute("workType", Integer.toString(workType.getIndex()));
         out.writeAttribute("experience", Integer.toString(experience));
         out.writeAttribute("treasureAmount", Integer.toString(treasureAmount));
         out.writeAttribute("hitpoints", Integer.toString(hitpoints));
