@@ -965,7 +965,7 @@ public class AIPlayer extends AIObject {
             }
             
             Unit unit = aiUnit.getUnit();
-            if (unit.getType() == Unit.TREASURE_TRAIN) {
+            if (unit.canCarryTreasure()) {
                 aiUnit.setMission(new CashInTreasureTrainMission(getAIMain(), aiUnit));
             } else if (unit.isScout() && ScoutingMission.isValid(aiUnit)) {
                 aiUnit.setMission(new ScoutingMission(getAIMain(), aiUnit));
