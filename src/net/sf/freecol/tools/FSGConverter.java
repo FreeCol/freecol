@@ -10,7 +10,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.zip.InflaterInputStream;
+import java.util.zip.GZIPInputStream;
 
 /**
  * Class for converting FreeCol Savegames (fsg-files).
@@ -94,7 +94,7 @@ public class FSGConverter {
             in.read(buf, 0, 5);
             in.reset();
             if (!(new String(buf)).equals("<?xml")) {                
-                in =  new BufferedInputStream(new InflaterInputStream(in));
+                in =  new BufferedInputStream(new GZIPInputStream(in));
             }
 
             // Support for XML comments has not been added:
@@ -182,6 +182,7 @@ public class FSGConverter {
                 fsgc.convertToXML(in, out);
             } catch (IOException e) {
                 System.out.println("An error occured while converting the file.");
+                e.printStackTrace();
                 System.exit(1);
             }
         } else {
