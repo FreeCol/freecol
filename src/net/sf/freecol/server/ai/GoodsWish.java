@@ -26,7 +26,7 @@ public class GoodsWish extends Wish {
     public static final String  LICENSE = "http://www.gnu.org/licenses/gpl.html";
     public static final String  REVISION = "$Revision$";
     
-    private int goodsType;
+    private GoodsType goodsType;
 
     /**
     * Creates a new <code>GoodsWish</code>.
@@ -92,7 +92,7 @@ public class GoodsWish extends Wish {
       * Returns the type of unit needed for releasing this wish.
       * @return The {@link Unit#getType type of unit}.
       */
-     public int getGoodsType() {
+     public GoodsType getGoodsType() {
          return goodsType;
      }
      

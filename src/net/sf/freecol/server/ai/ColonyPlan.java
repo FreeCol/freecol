@@ -244,11 +244,12 @@ public class ColonyPlan {
         }
 
         // Determine the primary and secondary types of goods:
-        int primaryRawMaterial = -1;
+        GoodsType primaryRawMaterial;
         int primaryRawMaterialProduction = 0;
-        int secondaryRawMaterial = -1;
+        GoodsType secondaryRawMaterial;
         int secondaryRawMaterialProduction = 0;
-        for (int goodsType = 0; goodsType < Goods.NUMBER_OF_TYPES; goodsType++) {
+        List<GoodsType> goodsTypeList = FreeCol.getSpecification().getGoodsTypeList();
+        for (GoodsType goodsType : goodsTypeList) {
             if (goodsType != Goods.SUGAR && goodsType != Goods.TOBACCO && goodsType != Goods.COTTON
                     && goodsType != Goods.FURS && goodsType != Goods.ORE) {
                 continue;
@@ -301,7 +302,7 @@ public class ColonyPlan {
         workLocationPlans.add(townHallWlp);
 
         // Place a colonist to manufacture the primary goods:
-        if (primaryRawMaterial > -1) {
+        if (primaryRawMaterial != null) {
             Building b = colony.getBuildingForProducing(Goods.getManufactoredGoods(primaryRawMaterial));
             if (b != null) {
                 WorkLocationPlan wlp = new WorkLocationPlan(getAIMain(), b, Goods
@@ -479,7 +480,7 @@ public class ColonyPlan {
      * @return The maximum possible production of the given type of goods
      *         according to this <code>ColonyPlan</code>.
      */
-    public int getProductionOf(int goodsType) {
+    public int getProductionOf(GoodsType goodsType) {
         int amount = 0;
 
         Iterator<WorkLocationPlan> wlpIterator = workLocationPlans.iterator();
@@ -505,7 +506,14 @@ public class ColonyPlan {
      * @param t The <code>Tile</code>.
      * @return The type of goods.
      */
-    private int getBestGoodsToProduce(Tile t) {
+    private GoodsType getBestGoodsToProduce(Tile t) {
+        if (t.hasResource()) {
+            return t.getTileItemContainer().getResource().getBestGoodsType();
+        }
+        GoodsType[] top = getSortedGoodsTop(t.getType(), t.getTileItemContainer(), t.getFishBonus());
+        return top[0];
+    }
+/*
         if (t.isForested() && t.hasBonus()) {
             if (t.getType() == Tile.GRASSLANDS || t.getType() == Tile.SAVANNAH) {
                 return Goods.LUMBER;
@@ -550,6 +558,7 @@ public class ColonyPlan {
             return Goods.ORE;
         }
     }
+*/
 
     /**
      * Gets the <code>Colony</code> this <code>ColonyPlan</code> controls.

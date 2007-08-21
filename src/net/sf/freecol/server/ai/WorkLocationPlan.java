@@ -8,6 +8,7 @@ import net.sf.freecol.common.model.ColonyTile;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.Tile;
+import net.sf.freecol.common.model.TileImprovementType;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.WorkLocation;
 
@@ -34,7 +35,7 @@ public class WorkLocationPlan {
     */
     private WorkLocation workLocation;
     private int priority;
-    private int goodsType;
+    private GoodsType goodsType;
 
 
     /**
@@ -46,7 +47,7 @@ public class WorkLocationPlan {
      * @param goodsType The goodsType to be produced on the 
      *      <code>workLocation</code> using this plan.
      */
-    public WorkLocationPlan(AIMain aiMain, WorkLocation workLocation, int goodsType) {
+    public WorkLocationPlan(AIMain aiMain, WorkLocation workLocation, GoodsType goodsType) {
         this.aiMain = aiMain;
         this.workLocation = workLocation;
         this.goodsType = goodsType;
@@ -84,38 +85,56 @@ public class WorkLocationPlan {
     }
     
     /**
-     * Gets a <code>TileImprovement</code> which will improve
+     * Gets a <code>TileImprovementPlan</code> which will improve
      * the production of the goods type specified by this
      * <code>WorkLocationPlan</code>.
      * 
-     * @return The <code>TileImprovement</code> if there is an
+     * @return The <code>TileImprovementPlan</code> if there is an
      *      improvement, plow or build road, which will increase
      *      the production of the goods type specified by this 
      *      plan. <code>null</code> gets returned if this plan is 
      *      for a <code>Building</code> or that the <code>Tile</code> 
      *      does not have an improvement.
      */
-    public TileImprovement createTileImprovement() {   
-        return updateTileImprovement(null);
+    public TileImprovementPlan createTileImprovementPlan() {   
+        return updateTileImprovementPlan(null);
     }
         
     /**
-     * Updates the given <code>TileImprovement</code>.
+     * Updates the given <code>TileImprovementPlan</code>.
      * 
-     * @param ti The <code>TileImprovement</code> to update.
-     * @return The same <code>TileImprovement</code>-object
+     * @param ti The <code>TileImprovementPlan</code> to update.
+     * @return The same <code>TileImprovementPlan</code>-object
      *      as provided to the method or <code>null</code> if 
      *      there is no more need for the improvement. 
      */
-    public TileImprovement updateTileImprovement(TileImprovement ti) {
+    public TileImprovementPlan updateTileImprovementPlan(TileImprovementPlan tip) {
         if (workLocation instanceof ColonyTile) {
             Tile tile = ((ColonyTile) workLocation).getWorkTile();
             
-            if (ti != null && ti.getTarget() != tile) {
-                throw new IllegalArgumentException("The given TileImprovement was not created for this Tile.");
+            if (tip != null && tip.getTarget() != tile) {
+                throw new IllegalArgumentException("The given TileImprovementPlan was not created for this Tile.");
             }
             
+            // Update to find the best thing to do now
+            TileImprovementType impType = TileImprovement.findBestTileImprovementType(tile, goodsType);
+            if (impType != null) {
+                int value = impType.getValue(tile.getType(), goodsType);
+                if (tip == null) {
+                    return new TileImprovementPlan(getAIMain(), tile, impType, value);
+                } else {
+                    tip.setType(impType);
+                    tip.setValue(value);
+                    return tip;
+                }
+            }
+        }
+        return null;
+    }
+/*
             int gain = tile.getMaximumPotential(goodsType) - tile.potential(goodsType);
+            TileImprovementType impType = tip.getType();
+            int gain = impType.getValue(
             if (gain > 0) {
                 int value = gain;
                 if (tile.hasBonus()) {
@@ -128,12 +147,12 @@ public class WorkLocationPlan {
                         || goodsType == Goods.LUMBER 
                         || goodsType == Goods.ORE 
                         || goodsType == Goods.SILVER;
-                int type = (roadIsImprovement) ? TileImprovement.BUILD_ROAD : TileImprovement.PLOW;
+                int type = (roadIsImprovement) ? TileImprovementPlan.BUILD_ROAD : TileImprovementPlan.PLOW;
                 
-                if (type == TileImprovement.BUILD_ROAD && tile.canGetRoad()
-                        || type == TileImprovement.PLOW && tile.canBePlowed()) {
+                if (type == TileImprovementPlan.BUILD_ROAD && tile.canGetRoad()
+                        || type == TileImprovementPlan.PLOW && tile.canBePlowed()) {
                     if (ti == null) {
-                        return new TileImprovement(getAIMain(), tile, type, value);
+                        return new TileImprovementPlan(getAIMain(), tile, type, value);
                     } else {
                         ti.setType(type);
                         ti.setValue(value);
@@ -145,6 +164,7 @@ public class WorkLocationPlan {
         
         return null;
     }
+*/
 
     /**
     * Gets the <code>WorkLocation</code> this 
@@ -168,7 +188,7 @@ public class WorkLocationPlan {
     * @param goodsType The type of goods to get the production for.
     * @return The production.
     */
-    public int getProductionOf(int goodsType) {
+    public int getProductionOf(GoodsType goodsType) {
         if (goodsType != this.goodsType) {
             return 0;
         }
@@ -190,7 +210,7 @@ public class WorkLocationPlan {
 
             return Unit.getProductionUsing(expertUnitType, goodsType, base, t) * ((goodsType == Goods.FURS) ? 2 : 1);
         } else {
-            if (Goods.isFarmedGoods(goodsType)) {
+            if (goodsType.isFarmed()) {
                 return 0;
             } else {
                 /* These values are not really the production, but are
@@ -218,7 +238,7 @@ public class WorkLocationPlan {
     * @see Goods
     * @see WorkLocation
     */
-    public int getGoodsType() {
+    public GoodsType getGoodsType() {
         return goodsType;
     }
     
@@ -230,7 +250,7 @@ public class WorkLocationPlan {
     * @see Goods
     * @see WorkLocation
     */
-    public void setGoodsType(int goodsType) {
+    public void setGoodsType(GoodsType goodsType) {
         this.goodsType = goodsType;
     }
 

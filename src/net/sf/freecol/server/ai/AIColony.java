@@ -20,6 +20,7 @@ import net.sf.freecol.common.model.ColonyTile;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.Tile;
+import net.sf.freecol.common.model.TileImprovement;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.WorkLocation;
 import net.sf.freecol.common.networking.Connection;
@@ -53,7 +54,7 @@ public class AIColony extends AIObject {
 
     private ArrayList<Wish> wishes = new ArrayList<Wish>();
 
-    private ArrayList<TileImprovement> tileImprovements = new ArrayList<TileImprovement>();
+    private ArrayList<TileImprovementPlan> TileImprovementPlans = new ArrayList<TileImprovementPlan>();
 
 
     /**
@@ -125,7 +126,7 @@ public class AIColony extends AIObject {
         for(Wish w : wishes) {
             disposeList.add(w);
         }
-        for(TileImprovement ti : tileImprovements) {
+        for(TileImprovementPlan ti : TileImprovementPlans) {
             disposeList.add(ti);
         }
         for(AIObject o : disposeList) {
@@ -171,9 +172,9 @@ public class AIColony extends AIObject {
      * Creates a list of the <code>Tile</code>-improvements which will
      * increase the production by this <code>Colony</code>.
      * 
-     * @see TileImprovement
+     * @see TileImprovementPlan
      */
-    public void createTileImprovements() {
+    public void createTileImprovementPlans() {
         /*
          * TODO: This method has to be implemented properly. For instance, tiles
          * we are currently using should be improved before the ones which will
@@ -190,35 +191,36 @@ public class AIColony extends AIObject {
             }
             Tile target = ((ColonyTile) wlp.getWorkLocation()).getWorkTile();
 
-            // Update the TileImprovement if it already exist:
-            boolean tileImprovementUpdated = false;
-            Iterator<TileImprovement> tiIterator = tileImprovements.iterator();
+            // Update the TileImprovementPlan if it already exist:
+            boolean TileImprovementPlanUpdated = false;
+            Iterator<TileImprovementPlan> tiIterator = TileImprovementPlans.iterator();
             while (tiIterator.hasNext()) {
-                TileImprovement ti = tiIterator.next();
+                TileImprovementPlan ti = tiIterator.next();
                 if (ti.getTarget() == target) {
-                    if (wlp.updateTileImprovement(ti) == null) {
+                    if (wlp.updateTileImprovementPlan(ti) == null) {
                         ti.dispose();
                         tiIterator.remove();
                     }
-                    tileImprovementUpdated = true;
+                    TileImprovementPlanUpdated = true;
                     break;
                 }
             }
 
-            // Create a new TileImprovement if it did not exist already:
-            if (!tileImprovementUpdated) {
-                TileImprovement ti = wlp.createTileImprovement();
+            // Create a new TileImprovementPlan if it did not exist already:
+            if (!TileImprovementPlanUpdated) {
+                TileImprovementPlan ti = wlp.createTileImprovementPlan();
                 if (ti != null) {
-                    tileImprovements.add(ti);
+                    TileImprovementPlans.add(ti);
                 }
             }
         }
 
-        // Create a TileImprovement for the center tile:
-        Iterator<TileImprovement> tiIterator = tileImprovements.iterator();
+        // Create a TileImprovementPlan for the center tile: - not sure if it's allowed - ryan
+/*
+        Iterator<TileImprovementPlan> tiIterator = TileImprovementPlans.iterator();
         boolean centerTileFound = false;
         while (tiIterator.hasNext()) {
-            TileImprovement ti = tiIterator.next();
+            TileImprovementPlan ti = tiIterator.next();
             if (ti.getTarget() == colony.getTile()) {
                 if (!colony.getTile().canBePlowed()) {
                     ti.dispose();
@@ -229,11 +231,11 @@ public class AIColony extends AIObject {
             }
         }
         if (!centerTileFound && colony.getTile().canBePlowed()) {
-            tileImprovements.add(new TileImprovement(getAIMain(), colony.getTile(), TileImprovement.PLOW, 15));
+            TileImprovementPlans.add(new TileImprovementPlan(getAIMain(), colony.getTile(), TileImprovementPlan.PLOW, 15));
         }
-
-        Collections.sort(tileImprovements, new Comparator<TileImprovement>() {
-            public int compare(TileImprovement o, TileImprovement p) {
+*/
+        Collections.sort(TileImprovementPlans, new Comparator<TileImprovementPlan>() {
+            public int compare(TileImprovementPlan o, TileImprovementPlan p) {
                 Integer i = o.getValue();
                 Integer j = p.getValue();
 
@@ -244,13 +246,13 @@ public class AIColony extends AIObject {
 
     /**
      * Returns an <code>Iterator</code> over all the
-     * <code>TileImprovement</code>s needed by this colony.
+     * <code>TileImprovementPlan</code>s needed by this colony.
      * 
      * @return The <code>Iterator</code>.
-     * @see TileImprovement
+     * @see TileImprovementPlan
      */
-    public Iterator<TileImprovement> getTileImprovementIterator() {
-        return tileImprovements.iterator();
+    public Iterator<TileImprovementPlan> getTileImprovementPlanIterator() {
+        return TileImprovementPlans.iterator();
     }
 
     /**
@@ -290,7 +292,7 @@ public class AIColony extends AIObject {
                         if (workType < production.length) {
                             production[workType] += wlp.getProductionOf(workType);
                         }
-                        production[Goods.FOOD] -= 2;
+                        production[(Goods.FOOD).getIndex()] -= 2;
                         wlpIterator.remove();
                         break;
                     }
@@ -307,13 +309,13 @@ public class AIColony extends AIObject {
             int unitType = -1;
 
             // Farmer/fisherman wishes:
-            if (production[Goods.FOOD] < 2) {
+            if (production[(Goods.FOOD).getIndex()] < 2) {
                 Iterator<WorkLocationPlan> wlpIterator = workLocationPlans.iterator();
                 while (wlpIterator.hasNext()) {
                     WorkLocationPlan wlp = wlpIterator.next();
                     if (wlp.getGoodsType() == Goods.FOOD) {
-                        production[Goods.FOOD] += wlp.getProductionOf(Goods.FOOD);
-                        production[Goods.FOOD] -= 2;
+                        production[(Goods.FOOD).getIndex()] += wlp.getProductionOf(Goods.FOOD);
+                        production[(Goods.FOOD).getIndex()] -= 2;
                         wlpIterator.remove();
 
                         unitType = ((ColonyTile) wlp.getWorkLocation()).getWorkTile().isLand() ? Unit.EXPERT_FARMER
@@ -323,7 +325,7 @@ public class AIColony extends AIObject {
                 }
             }
             if (unitType == -1) {
-                if (production[Goods.FOOD] < 2) {
+                if (production[(Goods.FOOD).getIndex()] < 2) {
                     // Not enough food.
                     break;
                 }
@@ -333,9 +335,9 @@ public class AIColony extends AIObject {
                     // TODO: Check if the production of the raw material is
                     // sufficient.
                     if (wlp.getGoodsType() < production.length) {
-                        production[wlp.getGoodsType()] += wlp.getProductionOf(wlp.getGoodsType());
+                        production[wlp.getGoodsType().getIndex()] += wlp.getProductionOf(wlp.getGoodsType());
                     }
-                    production[Goods.FOOD] -= 2;
+                    production[(Goods.FOOD).getIndex()] -= 2;
                     wlpIterator.remove();
 
                     if (wlp.getWorkLocation() instanceof ColonyTile) {
@@ -381,7 +383,7 @@ public class AIColony extends AIObject {
 
         // We might need more tools for a building or a pioneer:
         AIUnit unequippedHardyPioneer = getUnequippedHardyPioneer();
-        final boolean needsPioneer = (tileImprovements.size() > 0 || unequippedHardyPioneer != null
+        final boolean needsPioneer = (TileImprovementPlans.size() > 0 || unequippedHardyPioneer != null
                 && PioneeringMission.isValid(unequippedHardyPioneer));
         int toolsRequiredForBuilding = 0;
         if (colony.getCurrentlyBuilding() >= 0) {
@@ -393,7 +395,7 @@ public class AIColony extends AIObject {
                 || toolsRequiredForBuilding > colony.getGoodsCount(Goods.TOOLS)) {
             int goodsWishValue = AIGoods.TOOLS_FOR_COLONY_PRIORITY
                     + AIGoods.TOOLS_FOR_IMPROVEMENT
-                    * tileImprovements.size()
+                    * TileImprovementPlans.size()
                     + ((unequippedHardyPioneer != null) ? AIGoods.TOOLS_FOR_PIONEER : 0)
                     + ((toolsRequiredForBuilding > colony.getGoodsCount(Goods.TOOLS)) ? AIGoods.TOOLS_FOR_BUILDING
                             + (toolsRequiredForBuilding - colony.getGoodsCount(Goods.TOOLS)) : 0);
@@ -556,7 +558,8 @@ public class AIColony extends AIObject {
 
         // TODO: Do not sell raw material we are lacking.
 
-        for (int goodsType = 0; goodsType < Goods.NUMBER_OF_TYPES; goodsType++) {
+        List<GoodsType> goodsList = FreeCol.getSpecification().getGoodsTypeList();
+        for (GoodsType goodsType : goodsList) {
             // Never export food and lumber
             if (goodsType == Goods.FOOD || goodsType == Goods.LUMBER) {
                 continue;
@@ -980,7 +983,8 @@ public class AIColony extends AIObject {
 
         // Changes the production type of workers producing a cargo there
         // is no room for.
-        for (int goodsType = 0; goodsType < Goods.NUMBER_OF_TYPES; goodsType++) {
+        List<GoodsType> goodsList = FreeCol.getSpecification().getGoodsTypeList();
+        for (GoodsType goodsType : goodsList) {
         	int production = colony.getProductionNetOf(goodsType);
         	int in_stock = colony.getGoodsCount(goodsType);
         	if (Goods.FOOD != goodsType && production + in_stock > colony.getWarehouseCapacity()) {
@@ -995,10 +999,12 @@ public class AIColony extends AIObject {
         				waste = colony.getGoodsCount(goodsType) + colony.getProductionNetOf(goodsType)
         					    - colony.getWarehouseCapacity();
         				int best = 0;
-        				for(int goodsType2 = 0; goodsType2 < 8; goodsType2++){
+                        for (GoodsType goodsType2 : goodsList) {
+                            if (!goodsType2.isFarmed)
+                                continue;
         					int production2 = colony.getVacantColonyTileProductionFor(unit, goodsType2);
-        					if(production2 > best && production2 + colony.getGoodsCount(goodsType2)
-        							+ colony.getProductionNetOf(goodsType2)<colony.getWarehouseCapacity()){
+        					if (production2 > best && production2 + colony.getGoodsCount(goodsType2)
+        							+ colony.getProductionNetOf(goodsType2) < colony.getWarehouseCapacity()){
         						if (working){
         							unit.setLocation(null);
         						}
@@ -1084,7 +1090,7 @@ public class AIColony extends AIObject {
             }
         }
         decideBuildable(connection);
-        createTileImprovements();
+        createTileImprovementPlans();
         createWishes();
     }
 
@@ -1215,10 +1221,10 @@ public class AIColony extends AIObject {
             out.writeEndElement();
         }
 
-        Iterator<TileImprovement> tileImprovementIterator = tileImprovements.iterator();
-        while (tileImprovementIterator.hasNext()) {
-            TileImprovement ti = tileImprovementIterator.next();
-            out.writeStartElement(TileImprovement.getXMLElementTagName() + "ListElement");
+        Iterator<TileImprovementPlan> TileImprovementPlanIterator = TileImprovementPlans.iterator();
+        while (TileImprovementPlanIterator.hasNext()) {
+            TileImprovementPlan ti = TileImprovementPlanIterator.next();
+            out.writeStartElement(TileImprovementPlan.getXMLElementTagName() + "ListElement");
             out.writeAttribute("ID", ti.getID());
             out.writeEndElement();
         }
@@ -1267,12 +1273,12 @@ public class AIColony extends AIObject {
                 }
                 wishes.add(w);
                 in.nextTag();
-            } else if (in.getLocalName().equals(TileImprovement.getXMLElementTagName() + "ListElement")) {
-                TileImprovement ti = (TileImprovement) getAIMain().getAIObject(in.getAttributeValue(null, "ID"));
+            } else if (in.getLocalName().equals(TileImprovementPlan.getXMLElementTagName() + "ListElement")) {
+                TileImprovementPlan ti = (TileImprovementPlan) getAIMain().getAIObject(in.getAttributeValue(null, "ID"));
                 if (ti == null) {
-                    ti = new TileImprovement(getAIMain(), in.getAttributeValue(null, "ID"));
+                    ti = new TileImprovementPlan(getAIMain(), in.getAttributeValue(null, "ID"));
                 }
-                tileImprovements.add(ti);
+                TileImprovementPlans.add(ti);
                 in.nextTag();
             } else {
                 logger.warning("Unknown tag name: " + in.getLocalName());
