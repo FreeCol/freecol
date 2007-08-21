@@ -877,7 +877,7 @@ public class Map extends FreeColGameObject {
             public boolean check(Unit u, PathNode pathNode) {
                 Map map = u.getGame().getMap();
 
-                if (pathNode.getTile().getType() == Tile.HIGH_SEAS) {
+                if (pathNode.getTile().getType().canSailToEurope()) {
                     goal = pathNode;
                     return true;
                 }

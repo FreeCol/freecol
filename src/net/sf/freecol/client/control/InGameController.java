@@ -37,6 +37,7 @@ import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.GoalDecider;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.GoodsContainer;
+import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.IndianSettlement;
 import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.Map;
@@ -527,7 +528,7 @@ public final class InGameController implements NetworkConstants {
                 int turns = path.getTotalTurns();
                 destinations.add(new ChoiceItem(player.getEurope() + " (" + turns + ")", player.getEurope()));
             } else if (unit.getTile() != null
-                    && (unit.getTile().getType() == Tile.HIGH_SEAS || map.isAdjacentToMapEdge(unit.getTile()))) {
+                    && (unit.getTile().getType().canSailToEurope() || map.isAdjacentToMapEdge(unit.getTile()))) {
                 destinations.add(new ChoiceItem(player.getEurope() + " (0)", player.getEurope()));
             }
         }
@@ -571,7 +572,7 @@ public final class InGameController implements NetworkConstants {
         }
 
         if (destination instanceof Europe && unit.getTile() != null
-                && (unit.getTile().getType() == Tile.HIGH_SEAS || map.isAdjacentToMapEdge(unit.getTile()))) {
+                && (unit.getTile().getType().canSailToEurope() || map.isAdjacentToMapEdge(unit.getTile()))) {
             moveToEurope(unit);
             nextActiveUnit();
         } else {
@@ -765,12 +766,12 @@ public final class InGameController implements NetworkConstants {
 
         // unload cargo that should not be on board and complete loaded goods
         // with less than 100 units
-        ArrayList<Integer> goodsTypesToLoad = stop.getCargo();
+        ArrayList<GoodsType> goodsTypesToLoad = stop.getCargo();
         Iterator<Goods> goodsIterator = unit.getGoodsIterator();
         test: while (goodsIterator.hasNext()) {
             Goods goods = goodsIterator.next();
             for (int index = 0; index < goodsTypesToLoad.size(); index++) {
-                int goodsType = goodsTypesToLoad.get(index).intValue();
+                GoodsType goodsType = goodsTypesToLoad.get(index);
                 if (goods.getType() == goodsType) {
                     if (goods.getAmount() < 100) {
                         // comlete goods until 100 units
