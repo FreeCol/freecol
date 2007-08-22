@@ -1793,7 +1793,12 @@ public final class GUI {
                     }
 
                     g.setColor(Color.BLACK);
-                    g.drawString("-", x + TEXT_OFFSET_X + STATE_OFFSET_X, y + STATE_OFFSET_Y + TEXT_OFFSET_Y);
+                    if (((IndianSettlement) settlement).isCapital()) {
+                        // TODO: make this look nicer
+                        g.drawString("*", x + TEXT_OFFSET_X + STATE_OFFSET_X, y + STATE_OFFSET_Y + TEXT_OFFSET_Y);
+                    } else {
+                        g.drawString("-", x + TEXT_OFFSET_X + STATE_OFFSET_X, y + STATE_OFFSET_Y + TEXT_OFFSET_Y);
+                    }
                 } else {
                     logger.warning("Requested to draw unknown settlement type.");
                 }
