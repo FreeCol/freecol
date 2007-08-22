@@ -23,6 +23,8 @@ public final class Market extends FreeColGameObject implements Ownable {
     public static final String  REVISION = "$Revision$";
 
     private Player owner;
+    
+    private boolean initialized = false;
 
     /**
      * Constant for specifying the access to this <code>Market</code>
@@ -436,7 +438,8 @@ public final class Market extends FreeColGameObject implements Ownable {
      * Adjusts the prices for all goods.
      */
     private void priceGoods() {
-        priceGoods(true);
+        priceGoods(initialized);
+        initialized = true;
     }
 
     /**
@@ -556,7 +559,7 @@ public final class Market extends FreeColGameObject implements Ownable {
             }
         }
         
-        priceGoods(false);
+        priceGoods();
 
     }
 
