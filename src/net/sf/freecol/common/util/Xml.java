@@ -106,6 +106,19 @@ public final class Xml
     }
     */
 
+    public static float floatAttribute( Node xmlElement, String attributeName ) {
+
+        return Float.parseFloat( attribute(xmlElement, attributeName) );
+    }
+
+    public static float floatAttribute( Node xmlElement, String attributeName, float otherwise ) {
+        if (hasAttribute(xmlElement, attributeName)) {
+            return floatAttribute(xmlElement, attributeName);
+        } else {
+            return otherwise;
+        }
+    }
+
     public static int intAttribute( Node xmlElement, String attributeName ) {
 
         return Integer.parseInt( attribute(xmlElement, attributeName) );

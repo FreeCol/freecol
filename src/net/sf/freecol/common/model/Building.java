@@ -505,41 +505,8 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
      * @see Unit#getExpertWorkType
      * @see ColonyTile#getExpertForProducing
      */
-    public int getExpertUnitType() {
-        return getExpertUnitType(getType());
-    }
-
-    /**
-     * Returns the unit type being an expert in this <code>Building</code>.
-     * 
-     * @param type The type of building.
-     * @return The {@link Unit#getType unit type}.
-     * @see Unit#getExpertWorkType
-     * @see ColonyTile#getExpertForProducing
-     */
-    public static int getExpertUnitType(int type) {
-        switch (type) {
-        case TOWN_HALL:
-            return Unit.ELDER_STATESMAN;
-        case CARPENTER:
-            return Unit.MASTER_CARPENTER;
-        case BLACKSMITH:
-            return Unit.MASTER_BLACKSMITH;
-        case TOBACCONIST:
-            return Unit.MASTER_TOBACCONIST;
-        case WEAVER:
-            return Unit.MASTER_WEAVER;
-        case DISTILLER:
-            return Unit.MASTER_DISTILLER;
-        case FUR_TRADER:
-            return Unit.MASTER_FUR_TRADER;
-        case ARMORY:
-            return Unit.MASTER_GUNSMITH;
-        case CHURCH:
-            return Unit.FIREBRAND_PREACHER;
-        default:
-            return -1;
-        }
+    public UnitType getExpertUnitType() {
+        return FreeCol.getSpecification().getExpertForProducing(getGoodsOutputType());
     }
 
     /**
@@ -943,11 +910,11 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
                 Iterator<Unit> i = getUnitIterator();
                 while (i.hasNext()) {
                     Unit unit = (Unit)i.next();
-                    if (unit.getType() == getExpertUnitType()) {
+                    if (unit.getUnitType() == getExpertUnitType()) {
                         minimumProduction += 4;
                     }
                 }
-                if (new_unit != null && canAdd(new_unit) && new_unit.getType() == getExpertUnitType()) {
+                if (new_unit != null && canAdd(new_unit) && new_unit.getUnitType() == getExpertUnitType()) {
                     minimumProduction += 4;
                 }
                 if (goodsOutput < minimumProduction) {
@@ -1061,7 +1028,7 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
                 } else {
                     addGoodsOutput = (addGoodsInput * 3) / 2;
                     if (getGameOptions().getBoolean(GameOptions.EXPERTS_HAVE_CONNECTIONS)
-                        && addUnit.getType() == getExpertUnitType()
+                        && addUnit.getUnitType() == getExpertUnitType()
                         && addGoodsOutput < 4) {
                         addGoodsOutput = 4;
                     }
@@ -1123,7 +1090,7 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
             return 0;
         }
 
-        int productivity = prodUnit.getProducedAmount(getGoodsOutputType());
+        int productivity = prodUnit.getUnitType().getProductionFor(getGoodsOutputType(), 3);
         if (productivity > 0) {
             productivity += colony.getProductionBonus();
             if (productivity < 1)

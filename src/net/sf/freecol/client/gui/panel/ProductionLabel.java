@@ -13,6 +13,7 @@ import javax.swing.JComponent;
 import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.common.model.Goods;
+import net.sf.freecol.common.model.GoodsType;
 
 /**
  * The ProductionLabel represents Goods that are produced in a
@@ -53,7 +54,7 @@ public final class ProductionLabel extends JComponent {
     /**
      * The type of goods being produced.
      */
-    private int goodsType;
+    private GoodsType goodsType;
 
     /**
      * The goodsIcon for this type of production.
@@ -98,7 +99,7 @@ public final class ProductionLabel extends JComponent {
      * @param amount an <code>int</code> value
      * @param parent a <code>Canvas</code> value
      */
-    public ProductionLabel(int goodsType, int amount, Canvas parent) {
+    public ProductionLabel(GoodsType goodsType, int amount, Canvas parent) {
         this(goodsType, amount, -1, parent);
     }
 
@@ -110,7 +111,7 @@ public final class ProductionLabel extends JComponent {
      * @param maximumProduction an <code>int</code> value
      * @param parent a <code>Canvas</code> value
      */
-    public ProductionLabel(int goodsType, int amount, int maximumProduction, Canvas parent) {
+    public ProductionLabel(GoodsType goodsType, int amount, int maximumProduction, Canvas parent) {
         super();
         this.parent = parent;
         this.production = amount;
@@ -127,8 +128,8 @@ public final class ProductionLabel extends JComponent {
         } else {
             setForeground(Color.WHITE);
         }
-        if (goodsType >= 0) {
-            goodsIcon = parent.getImageProvider().getGoodsImageIcon(goodsType);
+        if (goodsType != null) {
+            goodsIcon = parent.getImageProvider().getGoodsImageIcon(goodsType.getIndex());
             compressedWidth = goodsIcon.getIconWidth()*2;
         }
         setToolTipText(String.valueOf(amount) + " " + Goods.getName(goodsType));

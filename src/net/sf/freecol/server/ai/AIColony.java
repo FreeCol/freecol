@@ -843,11 +843,12 @@ public class AIColony extends AIObject {
                         while (unitIterator.hasNext()) {
                             Unit unit = unitIterator.next();
                             int production;
-                            if (wlp.getWorkLocation() instanceof ColonyTile) {
+                            WorkLocation location = wlp.getWorkLocation();
+                            if (location instanceof ColonyTile) {
                                 production = unit.getFarmedPotential(wlp.getGoodsType(), ((ColonyTile) wlp
                                         .getWorkLocation()).getWorkTile());
                             } else { // Building
-                                production = unit.getProducedAmount(wlp.getGoodsType());
+                                production = ((Building) location).getProductivity(unit);
                             }
                             if (bestUnit == null || production > bestProduction || production == bestProduction
                                     && unit.getSkillLevel() < bestUnit.getSkillLevel()) {

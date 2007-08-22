@@ -212,7 +212,7 @@ public class WorkLocationPlan {
                 base++;
             }
 
-            return Unit.getProductionUsing(expertUnitType, goodsType, base, t) * ((goodsType == Goods.FURS) ? 2 : 1);
+            return expertUnitType.getProductionFor(goodsType, base) * ((goodsType == Goods.FURS) ? 2 : 1);
         } else {
             if (goodsType.isFarmed()) {
                 return 0;

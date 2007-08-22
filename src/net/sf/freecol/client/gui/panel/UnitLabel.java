@@ -21,6 +21,7 @@ import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.Building;
 import net.sf.freecol.common.model.ColonyTile;
 import net.sf.freecol.common.model.Goods;
+import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.Unit;
 
 /**
@@ -255,7 +256,7 @@ public final class UnitLabel extends JLabel implements ActionListener {
             int y = (getHeight() - getIcon().getIconHeight()) / 2;
             parent.getGUI().displayOccupationIndicator(g, unit, x, y);
         } else if (unit.getLocation() instanceof ColonyTile) {
-            int workType = unit.getWorkType();
+            GoodsType workType = unit.getWorkType();
             if (workType == Goods.FOOD && unit.getLocation() instanceof ColonyTile
                 && !((ColonyTile) unit.getLocation()).getWorkTile().isLand()) {
                 workType = Goods.FISH;

@@ -114,7 +114,17 @@ public final class UnitType implements Abilities {
      * Stores the abilities of this Type.
      */
     private Hashtable<String, Boolean> abilities = new Hashtable<String, Boolean>();
-
+    
+    /**
+     * Stores the production bonuses of this Type
+     */
+    private Hashtable<String, Integer> prodBonuses = new Hashtable<String, Integer>();
+    
+    /**
+     * Stores the production factors of this Type
+     */
+    private Hashtable<String, Float> prodFactors = new Hashtable<String, Float>();
+    
     public UnitType(int index) {
         this.index = index;
     }
@@ -447,7 +457,7 @@ public final class UnitType implements Abilities {
         this.educationTurns = newEducationTurns;
     }
 
-    public void readFromXmlElement(Node xml, Map<String, GoodsType> goodsTypeByRef) {
+    public void readFromXmlElement(Node xml, final Map<String, GoodsType> goodsTypeByRef) {
 
         id = Xml.attribute(xml, "name");
         name = Xml.attribute(xml, "name");
@@ -485,6 +495,17 @@ public final class UnitType implements Abilities {
                     } else if ("education".equals(nodeName)) {
                         educationUnit = Xml.attribute(node, "unit");
                         educationTurns = Xml.intAttribute(node, "turns");
+                    } else if ("production-bonus".equals(nodeName)) {
+                        String goodsType = Xml.attribute(node, "goods-type");
+                        if (goodsTypeByRef.containsKey(goodsType)) {
+                            if (Xml.hasAttribute(node, "bonus")) {
+                                int bonus = Xml.intAttribute(node, "bonus");
+                                prodBonuses.put(goodsType, new Integer(bonus));
+                            } else if (Xml.hasAttribute(node, "factor")) {
+                                float factor = Xml.floatAttribute(node, "factor");
+                                prodFactors.put(goodsType, new Float(factor));
+                            }
+                        }
                     }
                 }
             };
@@ -531,5 +552,20 @@ public final class UnitType implements Abilities {
         abilities.put(id, newValue);
     }
 
-
+    public int getProductionFor(GoodsType goodsType, int base) {
+        if (base == 0) {
+            return 0;
+        }
+        
+        Integer bonus = prodBonuses.get(goodsType.getName());
+        if (bonus != null) {
+            base += bonus.intValue();
+        } else {
+            Float factor = prodFactors.get(goodsType.getName());
+            if (factor != null) {
+                base *= factor.floatValue();
+            }
+        }
+        return Math.min(base, 1);
+    }
 }

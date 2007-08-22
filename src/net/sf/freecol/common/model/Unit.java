@@ -4243,17 +4243,6 @@ public class Unit extends FreeColGameObject implements Abilities, Locatable, Loc
     }
 
     /**
-     * Given a type of goods to produce in a building, returns the unit's
-     * potential to do so.
-     * 
-     * @param goods The type of goods to be produced.
-     * @return The potential amount of goods to be manufactured.
-     */
-    public int getProducedAmount(int goods) {
-        return getProductionUsing(getType(), goods, 0);
-    }
-
-    /**
      * Given a type of goods to produce in the field and a tile, returns the
      * unit's potential to produce goods.
      * 
@@ -4276,7 +4265,7 @@ public class Unit extends FreeColGameObject implements Abilities, Locatable, Loc
         if (base == 0) {
             return 0;
         }
-        base = getProductionUsing(getType(), goodsType, base, tile);
+        base = getUnitType().getProductionFor(goodsType, base);
 
         if (goodsType == Goods.FURS && getOwner().hasFather(FoundingFather.HENRY_HUDSON)) {
             base *= 2;
@@ -4287,186 +4276,6 @@ public class Unit extends FreeColGameObject implements Abilities, Locatable, Loc
         }
 
         return Math.max(base, 1);
-    }
-
-    /**
-     * ** This method should be completely redone after Unit and Building specification rework. **
-     * Applies unit-type specific bonuses to a goods production in a
-     * <code>Building</code>.
-     * 
-     * @param unitType The {@link #getType type} of the unit.
-     * @param goodsType The type of goods that is being produced.
-     * @param base The production not including the unit-type specific bonuses.
-     * @return The production.
-     */
-    public static int getProductionUsing(int unitType, int goodsType, int base) {
-        if (Goods.isFarmedGoods(goodsType)) {
-            throw new IllegalArgumentException("\"goodsType\" is not produced in buildings.");
-        }
-
-        switch (unitType) {
-        case MASTER_DISTILLER:
-            if (goodsType == Goods.RUM) {
-                base = 6;
-            } else {
-                base = 3;
-            }
-            break;
-        case MASTER_WEAVER:
-            if (goodsType == Goods.CLOTH) {
-                base = 6;
-            } else {
-                base = 3;
-            }
-            break;
-        case MASTER_TOBACCONIST:
-            if (goodsType == Goods.CIGARS) {
-                base = 6;
-            } else {
-                base = 3;
-            }
-            break;
-        case MASTER_FUR_TRADER:
-            if (goodsType == Goods.COATS) {
-                base = 6;
-            } else {
-                base = 3;
-            }
-            break;
-        case MASTER_BLACKSMITH:
-            if (goodsType == Goods.TOOLS) {
-                base = 6;
-            } else {
-                base = 3;
-            }
-            break;
-        case MASTER_GUNSMITH:
-            if (goodsType == Goods.MUSKETS) {
-                base = 6;
-            } else {
-                base = 3;
-            }
-            break;
-        case ELDER_STATESMAN:
-            if (goodsType == Goods.BELLS) {
-                base = 6;
-            } else {
-                base = 3;
-            }
-            break;
-        case FIREBRAND_PREACHER:
-            if (goodsType == Goods.CROSSES) {
-                base = 6;
-            } else {
-                base = 3;
-            }
-            break;
-        case MASTER_CARPENTER:
-            if (goodsType == Goods.HAMMERS) {
-                base = 6;
-            } else {
-                base = 3;
-            }
-            break;
-        case FREE_COLONIST:
-            base = 3;
-            break;
-        case INDENTURED_SERVANT:
-            base = 2;
-            break;
-        case PETTY_CRIMINAL:
-        case INDIAN_CONVERT:
-            base = 1;
-            break;
-        default: // Beats me who or what is working here, but he doesn't get
-            // a bonus.
-            base = 3;
-        }
-
-        return base;
-    }
-
-    /**
-     * ** This method should be completely redone after Unit specification rework. **
-     * Applies unit-type specific bonuses to a goods production on a
-     * <code>Tile</code>.
-     * 
-     * @param unitType The {@link #getType type} of the unit.
-     * @param goodsType The type of goods that is being produced.
-     * @param base The production not including the unit-type specific bonuses.
-     * @param tile The <code>Tile</code> in which the given type of goods is
-     *            being produced.
-     * @return The production.
-     */
-    public static int getProductionUsing(UnitType unitType, GoodsType goodsType, int base, Tile tile) {
-        if (!goodsType.isFarmed()) {
-            throw new IllegalArgumentException("\"goodsType\" is produced in buildings and not on tiles.");
-        }
-        int value = base;
-
-        switch (unitType) {
-        case EXPERT_FARMER:
-            if ((goodsType == Goods.FOOD) && tile.isLand()) {
-                // TODO: Special tile stuff. He gets +6/+4 for wheat/deer tiles
-                value += 2;
-            }
-            break;
-        case EXPERT_FISHERMAN:
-            if ((goodsType == Goods.FOOD) && !tile.isLand()) {
-                // TODO: Special tile stuff. He gets +6 for a fishery tile.
-                value += 2;
-            }
-            break;
-        case EXPERT_FUR_TRAPPER:
-            if (goodsType == Goods.FURS) {
-                value *= 2;
-            }
-            break;
-        case EXPERT_SILVER_MINER:
-            if (goodsType == Goods.SILVER) {
-                // TODO: Mountain should be +1, not *2, but mountain didn't
-                // exist at type of writing.
-                value *= 2;
-            }
-            break;
-        case EXPERT_LUMBER_JACK:
-            if (goodsType == Goods.LUMBER) {
-                value *= 2;
-            }
-            break;
-        case EXPERT_ORE_MINER:
-            if (goodsType == Goods.ORE) {
-                value *= 2;
-            }
-            break;
-        case MASTER_SUGAR_PLANTER:
-            if (goodsType == Goods.SUGAR) {
-                value *= 2;
-            }
-            break;
-        case MASTER_COTTON_PLANTER:
-            if (goodsType == Goods.COTTON) {
-                value *= 2;
-            }
-            break;
-        case MASTER_TOBACCO_PLANTER:
-            if (goodsType == Goods.TOBACCO) {
-                value *= 2;
-            }
-            break;
-        case INDIAN_CONVERT:
-            if ((goodsType == Goods.FOOD || goodsType == Goods.SUGAR || goodsType == Goods.COTTON
-                    || goodsType == Goods.TOBACCO || goodsType == Goods.FURS || goodsType == Goods.ORE || goodsType == Goods.SILVER)
-                    && value > 0) {
-                value += 1;
-            }
-            break;
-        default:
-            // Beats me who or what is working here, but he doesn't get a bonus
-            break;
-        }
-
-        return value;
     }
 
     public static int getNextHammers(int type) {

@@ -150,42 +150,45 @@
 
   <resource-types>
     <resource-type id="model.resource.Game">
-      <production-bonus goods-type="model.goods.food" bonus="4"/>
-      <production-bonus goods-type="model.goods.furs" bonus="2"/>
+      <production-bonus goods-type="model.goods.Food" bonus="2"/>
+      <!-- in colonization game gives 2 food (4 for expert farmer) -->
+      <production-bonus goods-type="model.goods.Furs" bonus="2"/>
     </resource-type>
-    <resource-type id="model.resource.Minerals" minimum-value="40" maximum-value="400">
-      <production-bonus goods-type="model.goods.ore" bonus="4"/>
-      <production-bonus goods-type="model.goods.silver" bonus="2"/>
+    <resource-type id="model.resource.Minerals"> <!-- not in colonization minimum-value="40" maximum-value="400" -->
+      <production-bonus goods-type="model.goods.Ore" bonus="3"/>
     </resource-type>
     <resource-type id="model.resource.Ore" minimum-value="40" maximum-value="4000">
-      <production-bonus goods-type="model.goods.ore" bonus="2"/>
+      <production-bonus goods-type="model.goods.Ore" bonus="2"/>
     </resource-type>
     <resource-type id="model.resource.Silver" minimum-value="40" maximum-value="800">
-      <production-bonus goods-type="model.goods.silver" bonus="2"/>
+      <production-bonus goods-type="model.goods.Silver" bonus="2"/>
     </resource-type>
     <resource-type id="model.resource.Lumber">
-      <production-bonus goods-type="model.goods.lumber" bonus="4"/>
+      <production-bonus goods-type="model.goods.Lumber" bonus="4"/>
     </resource-type>
     <resource-type id="model.resource.Furs">
-      <production-bonus goods-type="model.goods.furs" bonus="4"/>
+      <production-bonus goods-type="model.goods.Furs" bonus="3"/>
     </resource-type>
     <resource-type id="model.resource.Tobacco">
-      <production-bonus goods-type="model.goods.tobacco" bonus="6"/>
+      <production-bonus goods-type="model.goods.Tobacco" factor="2"/>
     </resource-type>
     <resource-type id="model.resource.Sugar">
-      <production-bonus goods-type="model.goods.sugar" bonus="7"/>
+      <production-bonus goods-type="model.goods.Sugar" factor="2"/>
     </resource-type>
     <resource-type id="model.resource.Cotton">
-      <production-bonus goods-type="model.goods.cotton" bonus="6"/>
+      <production-bonus goods-type="model.goods.Cotton" factor="2"/>
     </resource-type>
     <resource-type id="model.resource.Oasis">
-      <production-bonus goods-type="model.goods.food" bonus="4"/>
+      <production-bonus goods-type="model.goods.Food" bonus="2"/>
+      <!-- in colonization game gives 2 food (4 for expert farmer) -->
     </resource-type>
     <resource-type id="model.resource.Grain">
-      <production-bonus goods-type="model.goods.food" bonus="4"/>
+      <production-bonus goods-type="model.goods.Food" bonus="2"/>
+      <!-- in colonization game gives 2 food (4 for expert farmer) -->
     </resource-type>
     <resource-type id="model.resource.Fish">
-      <production-bonus goods-type="model.goods.fish" bonus="4"/>
+      <production-bonus goods-type="model.goods.Fish" bonus="3"/>
+      <!-- in colonization game gives 3 food (6 for expert fisherman) -->
     </resource-type>
   </resource-types>
 
@@ -230,160 +233,167 @@
     <tile-type    id="model.tile.plains"            basic-move-cost="3" basic-work-turns="3">
       <art basic="model.tile.plains" unexplored="model.tile.unexplored" coast="model.tile.beach"/>
       <gen humidity="-2,2" temperature="-2,2" altitude="1,2" latitude="0,2"/>
-      <production goods-type="model.goods.food"       value="5"/>
-      <production goods-type="model.goods.cotton"     value="2"/>
-      <production goods-type="model.goods.ore"        value="1"/>
-      <resource   type="model.resource.grain"         probability="100"/>
+      <production goods-type="model.goods.Food"       value="5"/>
+      <production goods-type="model.goods.Cotton"     value="2"/>
+      <production goods-type="model.goods.Ore"        value="1"/>
+      <resource   type="model.resource.Grain"         probability="100"/>
     </tile-type>
     <tile-type    id="model.tile.grassland"         basic-move-cost="3" basic-work-turns="3">
       <art basic="model.tile.grassland" unexplored="model.tile.unexplored" coast="model.tile.beach"/>
       <gen humidity="-2,2" temperature="-2,2" altitude="1,2" latitude="0,2"/>
-      <production goods-type="model.goods.food"       value="3"/>
-      <production goods-type="model.goods.tobacco"    value="3"/>
-      <resource   type="model.resource.tobacco"       probability="100"/>
+      <production goods-type="model.goods.Food"       value="3"/>
+      <production goods-type="model.goods.Tobacco"    value="3"/>
+      <resource   type="model.resource.Tobacco"       probability="100"/>
     </tile-type>
     <tile-type    id="model.tile.prairie"           basic-move-cost="3" basic-work-turns="3">
       <art basic="model.tile.prairie" unexplored="model.tile.unexplored" coast="model.tile.beach"/>
       <gen humidity="-2,2" temperature="-2,2" altitude="1,2" latitude="0,2"/>
-      <production goods-type="model.goods.food"       value="3"/>
-      <production goods-type="model.goods.cotton"     value="3"/>
-      <resource   type="model.resource.cotton"        probability="100"/>
+      <production goods-type="model.goods.Food"       value="3"/>
+      <production goods-type="model.goods.Cotton"     value="3"/>
+      <resource   type="model.resource.Cotton"        probability="100"/>
     </tile-type>
     <tile-type    id="model.tile.savannah"          basic-move-cost="3" basic-work-turns="3">
       <art basic="model.tile.savannah" unexplored="model.tile.unexplored" coast="model.tile.beach"/>
       <gen humidity="-2,2" temperature="-2,2" altitude="1,2" latitude="0,2"/>
-      <production goods-type="model.goods.food"       value="4"/>
-      <production goods-type="model.goods.sugar"      value="3"/>
-      <resource   type="model.resource.sugar"         probability="100"/>
+      <production goods-type="model.goods.Food"       value="4"/>
+      <production goods-type="model.goods.Sugar"      value="3"/>
+      <resource   type="model.resource.Sugar"         probability="100"/>
     </tile-type>
     <tile-type    id="model.tile.marsh"             basic-move-cost="6" basic-work-turns="5">
       <art basic="model.tile.marsh" unexplored="model.tile.unexplored" coast="model.tile.beach"/>
       <gen humidity="1,3" temperature="-1,3" altitude="1,2" latitude="0,2"/>
       <skirmish defence-factor="125"/>
-      <production goods-type="model.goods.food"       value="3"/>
-      <production goods-type="model.goods.tobacco"    value="2"/>
-      <production goods-type="model.goods.ore"        value="2"/>
+      <production goods-type="model.goods.Food"       value="3"/>
+      <production goods-type="model.goods.Tobacco"    value="2"/>
+      <production goods-type="model.goods.Ore"        value="2"/>
+      <resource   type="model.resource.Minerals"         probability="100"/>
     </tile-type>
     <tile-type    id="model.tile.swamp"             basic-move-cost="6" basic-work-turns="7">
       <art basic="model.tile.swamp" unexplored="model.tile.unexplored" coast="model.tile.beach"/>
       <gen humidity="1,3" temperature="-1,3" altitude="1,2" latitude="0,2"/>
       <skirmish defence-factor="125"/>
-      <production goods-type="model.goods.food"       value="3"/>
-      <production goods-type="model.goods.sugar"      value="2"/>
-      <production goods-type="model.goods.ore"        value="2"/>
-      <resource   type="model.resource.minerals"      probability="100"/>
+      <production goods-type="model.goods.Food"       value="3"/>
+      <production goods-type="model.goods.Sugar"      value="2"/>
+      <production goods-type="model.goods.Ore"        value="2"/>
+      <resource   type="model.resource.Minerals"      probability="100"/>
     </tile-type>
     <tile-type    id="model.tile.desert"            basic-move-cost="3" basic-work-turns="3">
       <art basic="model.tile.desert" unexplored="model.tile.unexplored" coast="model.tile.beach"/>
       <gen humidity="-3,-1" temperature="-1,3" altitude="0,3" latitude="0,3"/>
-      <production goods-type="model.goods.food"       value="2"/>
-      <production goods-type="model.goods.cotton"     value="1"/>
-      <production goods-type="model.goods.ore"        value="2"/>
-      <resource   type="model.resource.oasis"         probability="100"/>
+      <production goods-type="model.goods.Food"       value="2"/>
+      <production goods-type="model.goods.Cotton"     value="1"/>
+      <production goods-type="model.goods.Ore"        value="2"/>
+      <resource   type="model.resource.Oasis"         probability="100"/>
     </tile-type>
     <tile-type    id="model.tile.tundra"            basic-move-cost="3" basic-work-turns="4">
       <art basic="model.tile.tundra" unexplored="model.tile.unexplored" coast="model.tile.beach"/>
       <gen humidity="-3,3" temperature="-3,1" altitude="1,3" latitude="1,3"/>
-      <production goods-type="model.goods.food"       value="3"/>
-      <production goods-type="model.goods.ore"        value="2"/>
+      <production goods-type="model.goods.Food"       value="3"/>
+      <production goods-type="model.goods.Ore"        value="2"/>
+      <resource   type="model.resource.Minerals"         probability="100"/>
     </tile-type>
     <tile-type    id="model.tile.mixedForest"       basic-move-cost="6" basic-work-turns="4" is-forest="yes">
       <art basic="model.tile.plains" overlay="model.tile.forest.plains" unexplored="model.tile.unexplored" coast="model.tile.beach"/>
       <gen humidity="-2,2" temperature="-2,2" altitude="1,2" latitude="0,2"/>
       <skirmish defence-factor="150"/>
-      <production goods-type="model.goods.food"       value="3"/>
-      <production goods-type="model.goods.cotton"     value="1"/>
-      <production goods-type="model.goods.furs"       value="3"/>
-      <production goods-type="model.goods.lumber"     value="6"/>
-      <resource   type="model.resource.lumber"        probability="33"/>
-      <resource   type="model.resource.furs"          probability="33"/>
-      <resource   type="model.resource.game"          probability="34"/>
+      <production goods-type="model.goods.Food"       value="3"/>
+      <production goods-type="model.goods.Cotton"     value="1"/>
+      <production goods-type="model.goods.Furs"       value="3"/>
+      <production goods-type="model.goods.Lumber"     value="6"/>
+      <resource   type="model.resource.Furs"          probability="100"/>
+    <!-- not in colonization
+      <resource   type="model.resource.Lumber"        probability="33"/>
+      <resource   type="model.resource.Game"          probability="34"/>
+    -->
     </tile-type>
     <tile-type    id="model.tile.coniferForest"     basic-move-cost="6" basic-work-turns="4" is-forest="yes">
       <art basic="model.tile.grassland" overlay="model.tile.forest.grassland" unexplored="model.tile.unexplored" coast="model.tile.beach"/>
       <gen humidity="-2,2" temperature="-2,2" altitude="1,2" latitude="0,2"/>
       <skirmish defence-factor="150"/>
-      <production goods-type="model.goods.food"       value="2"/>
-      <production goods-type="model.goods.tobacco"    value="1"/>
-      <production goods-type="model.goods.furs"       value="2"/>
-      <production goods-type="model.goods.lumber"     value="4"/>
-      <resource   type="model.resource.lumber"        probability="100"/>
+      <production goods-type="model.goods.Food"       value="2"/>
+      <production goods-type="model.goods.Tobacco"    value="1"/>
+      <production goods-type="model.goods.Furs"       value="2"/>
+      <production goods-type="model.goods.Lumber"     value="6"/>
+      <resource   type="model.resource.Lumber"        probability="100"/>
     </tile-type>
     <tile-type    id="model.tile.broadleafForest"   basic-move-cost="6" basic-work-turns="4" is-forest="yes">
       <art basic="model.tile.prairie" overlay="model.tile.forest.prairie" unexplored="model.tile.unexplored" coast="model.tile.beach"/>
       <gen humidity="-2,2" temperature="-2,2" altitude="1,2" latitude="0,2"/>
       <skirmish defence-factor="150"/>
-      <production goods-type="model.goods.food"       value="2"/>
-      <production goods-type="model.goods.cotton"     value="1"/>
-      <production goods-type="model.goods.furs"       value="2"/>
-      <production goods-type="model.goods.lumber"     value="4"/>
-      <resource   type="model.resource.game"          probability="100"/>
+      <production goods-type="model.goods.Food"       value="2"/>
+      <production goods-type="model.goods.Cotton"     value="1"/>
+      <production goods-type="model.goods.Furs"       value="2"/>
+      <production goods-type="model.goods.Lumber"     value="4"/>
+      <resource   type="model.resource.Game"          probability="100"/>
     </tile-type>
     <tile-type    id="model.tile.tropicalForest"    basic-move-cost="6" basic-work-turns="6" is-forest="yes">
       <art basic="model.tile.savannah" overlay="model.tile.forest.savannah" unexplored="model.tile.unexplored" coast="model.tile.beach"/>
       <skirmish defence-factor="150"/>
       <gen humidity="-2,2" temperature="-2,2" altitude="1,2" latitude="0,2"/>
-      <production goods-type="model.goods.food"       value="2"/>
-      <production goods-type="model.goods.tobacco"    value="1"/>
-      <production goods-type="model.goods.furs"       value="2"/>
-      <production goods-type="model.goods.lumber"     value="4"/>
-      <resource   type="model.resource.lumber"        probability="100"/>
+      <production goods-type="model.goods.Food"       value="3"/>
+      <production goods-type="model.goods.Tobacco"    value="1"/>
+      <production goods-type="model.goods.Furs"       value="2"/>
+      <production goods-type="model.goods.Lumber"     value="4"/>
+      <resource   type="model.resource.Lumber"        probability="100"/>
     </tile-type>
     <tile-type    id="model.tile.wetlandForest"     basic-move-cost="9" basic-work-turns="6" is-forest="yes">
       <art basic="model.tile.marsh" overlay="model.tile.forest.marsh" unexplored="model.tile.unexplored" coast="model.tile.beach"/>
       <gen humidity="1,3" temperature="-1,3" altitude="1,2" latitude="0,2"/>
       <skirmish defence-factor="150"/>
-      <production goods-type="model.goods.food"       value="2"/>
-      <production goods-type="model.goods.tobacco"    value="1"/>
-      <production goods-type="model.goods.furs"       value="2"/>
-      <production goods-type="model.goods.lumber"     value="4"/>
-      <production goods-type="model.goods.ore"        value="1"/>
+      <production goods-type="model.goods.Food"       value="2"/>
+      <production goods-type="model.goods.Tobacco"    value="1"/>
+      <production goods-type="model.goods.Furs"       value="2"/>
+      <production goods-type="model.goods.Lumber"     value="4"/>
+      <production goods-type="model.goods.Ore"        value="1"/>
+      <resource   type="model.resource.Minerals"      probability="100"/>
     </tile-type>
     <tile-type    id="model.tile.rainForest"        basic-move-cost="9" basic-work-turns="7" is-forest="yes">
       <art basic="model.tile.swamp" overlay="model.tile.forest.swamp" unexplored="model.tile.unexplored" coast="model.tile.beach"/>
       <gen humidity="1,3" temperature="-1,3" altitude="1,2" latitude="0,2"/>
       <skirmish defence-factor="175"/>
-      <production goods-type="model.goods.food"       value="2"/>
-      <production goods-type="model.goods.sugar"      value="1"/>
-      <production goods-type="model.goods.furs"       value="1"/>
-      <production goods-type="model.goods.lumber"     value="4"/>
-      <production goods-type="model.goods.ore"        value="1"/>
+      <production goods-type="model.goods.Food"       value="2"/>
+      <production goods-type="model.goods.Sugar"      value="1"/>
+      <production goods-type="model.goods.Furs"       value="1"/>
+      <production goods-type="model.goods.Lumber"     value="4"/>
+      <production goods-type="model.goods.Ore"        value="1"/>
+      <resource   type="model.resource.Minerals"      probability="100"/>
     </tile-type>
     <tile-type    id="model.tile.scrubForest"       basic-move-cost="3" basic-work-turns="4" is-forest="yes">
       <art basic="model.tile.desert" overlay="model.tile.forest.desert" unexplored="model.tile.unexplored" coast="model.tile.beach"/>
       <gen humidity="-3,-1" temperature="-1,3" altitude="0,3" latitude="0,3"/>
       <skirmish defence-factor="150"/>
-      <production goods-type="model.goods.food"       value="2"/>
-      <production goods-type="model.goods.cotton"     value="1"/>
-      <production goods-type="model.goods.furs"       value="2"/>
-      <production goods-type="model.goods.lumber"     value="2"/>
-      <production goods-type="model.goods.ore"        value="1"/>
+      <production goods-type="model.goods.Food"       value="2"/>
+      <production goods-type="model.goods.Cotton"     value="1"/>
+      <production goods-type="model.goods.Furs"       value="2"/>
+      <production goods-type="model.goods.Lumber"     value="2"/>
+      <production goods-type="model.goods.Ore"        value="1"/>
+      <resource   type="model.resource.Oasis"         probability="100"/>
     </tile-type>
     <tile-type    id="model.tile.borealForest"      basic-move-cost="6" basic-work-turns="4" is-forest="yes">
       <art basic="model.tile.tundra" overlay="model.tile.forest.tundra" unexplored="model.tile.unexplored" coast="model.tile.beach"/>
       <gen humidity="-3,3" temperature="-3,1" altitude="1,3" latitude="1,3"/>
       <skirmish defence-factor="150"/>
-      <production goods-type="model.goods.food"       value="2"/>
-      <production goods-type="model.goods.furs"       value="3"/>
-      <production goods-type="model.goods.lumber"     value="4"/>
-      <production goods-type="model.goods.ore"        value="1"/>
-      <resource   type="model.resource.furs"          probability="100"/>
+      <production goods-type="model.goods.Food"       value="2"/>
+      <production goods-type="model.goods.Furs"       value="3"/>
+      <production goods-type="model.goods.Lumber"     value="4"/>
+      <production goods-type="model.goods.Ore"        value="1"/>
+      <resource   type="model.resource.Game"          probability="100"/>
     </tile-type>
     <tile-type    id="model.tile.hills"             basic-move-cost="6" basic-work-turns="4">
       <art basic="model.tile.plains" overlay="model.tile.hills" unexplored="model.tile.unexplored" coast="model.tile.beach"/>
       <gen humidity="-3,3" temperature="-3,3" altitude="1,3" latitude="0,3"/>
       <skirmish defence-factor="200"/>
-      <production goods-type="model.goods.food"       value="2"/>
-      <production goods-type="model.goods.ore"        value="4"/>
-      <resource   type="model.resource.ore"           probability="100"/>
+      <production goods-type="model.goods.Food"       value="2"/>
+      <production goods-type="model.goods.Ore"        value="4"/>
+      <resource   type="model.resource.Ore"           probability="100"/>
     </tile-type>
     <tile-type    id="model.tile.mountains"         basic-move-cost="9" basic-work-turns="7" can-settle="no">
       <art basic="model.tile.plains" overlay="model.tile.mountains" unexplored="model.tile.unexplored" coast="model.tile.beach"/>
       <gen humidity="-3,3" temperature="-3,3" altitude="2,3" latitude="0,3"/>
       <skirmish defence-factor="250"/>
-      <production goods-type="model.goods.ore"        value="4"/>
-      <production goods-type="model.goods.silver"     value="1"/>
-      <resource   type="model.resource.silver"        probability="100"/>
+      <production goods-type="model.goods.Ore"        value="4"/>
+      <production goods-type="model.goods.Silver"     value="1"/>
+      <resource   type="model.resource.Silver"        probability="100"/>
     </tile-type>
     <tile-type    id="model.tile.arctic"            basic-move-cost="6" basic-work-turns="4" can-settle="no">
       <art basic="model.tile.arctic" unexplored="model.tile.unexplored" coast="model.tile.beach"/>
@@ -392,13 +402,13 @@
     <tile-type    id="model.tile.ocean"             basic-move-cost="3" basic-work-turns="4" is-water="yes">
       <art basic="model.tile.ocean" unexplored="model.tile.unexplored"/>
       <gen humidity="-3,3" temperature="-3,3" altitude="-2,-1" latitude="0,3"/>
-      <production goods-type="model.goods.fish"       value="2"/>
-      <resource   type="model.resource.fish"          probability="100"/>
+      <production goods-type="model.goods.Fish"       value="2"/>
+      <resource   type="model.resource.Fish"          probability="100"/>
     </tile-type>
     <tile-type    id="model.tile.highSeas"          basic-move-cost="3" basic-work-turns="4" is-water="yes" sail-to-europe="yes">
       <art basic="model.tile.highseas" unexplored="model.tile.unexplored"/>
       <gen humidity="-3,3" temperature="-3,3" altitude="-3,-2" latitude="0,3"/>
-      <production goods-type="model.goods.fish"       value="2"/>
+      <production goods-type="model.goods.Fish"       value="4"/>
     </tile-type>
 <!--
     <tile-type    ref="tile.beach"           name="model.tile.beach"
@@ -464,17 +474,17 @@
               value="1">
     </tileimprovement-type>
     <tileimprovement-type name="model.improvement.removeforest" add-work-turns="2"
-            expended-goods-type="model.goods.tools" expended-amount="20"
-            deliver-goods-type="model.goods.lumber" deliver-amount="5">
+            expended-goods-type="model.goods.Tools" expended-amount="20"
+            deliver-goods-type="model.goods.Lumber" deliver-amount="5">
       <tiles all-forest-tiles="yes">
-      <change from="tile.mixedForest"     to="tile.plains">
-      <change from="tile.coniferForest"   to="tile.grassland">
-      <change from="tile.broadleafForest" to="tile.prairie">
-      <change from="tile.tropicalForest"  to="tile.savannah">
-      <change from="tile.wetlandForest"   to="tile.marsh">
-      <change from="tile.rainForest"      to="tile.swamp">
-      <change from="tile.scrubForest"     to="tile.desert">
-      <change from="tile.borealForest"    to="tile.tundra">
+      <change from="model.tile.mixedForest"     to="model.tile.plains">
+      <change from="model.tile.coniferForest"   to="model.tile.grassland">
+      <change from="model.tile.broadleafForest" to="model.tile.prairie">
+      <change from="model.tile.tropicalForest"  to="model.tile.savannah">
+      <change from="model.tile.wetlandForest"   to="model.tile.marsh">
+      <change from="model.tile.rainForest"      to="model.tile.swamp">
+      <change from="model.tile.scrubForest"     to="model.tile.desert">
+      <change from="model.tile.borealForest"    to="model.tile.tundra">
     </tileimprovement-type>
   </tileimprovement-types>
 
@@ -488,93 +498,108 @@
       <ability id="model.ability.learnFromExperience" value="yes"/>
     </unit-type>
     <unit-type name="model.unit.expertFarmer"         offence="0"  defence="1" movement="3" lineOfSight="1" price="1100" 
-               skill="1"  expert-production="food">
+               skill="1"  expert-production="model.goods.Food">
       <ability id="model.ability.foundColony" value="yes"/>
       <ability id="model.ability.recruitable" value="yes"/>
+      <production-bonus goods-type="model.goods.Food" bonus="3"/>
     </unit-type>
-        <!-- should be something like this: 
-22        <production-bonus goods-type="food" bonus="+3" />
-        -->
     <unit-type name="model.unit.expertFisherman"      offence="0"  defence="1" movement="3" lineOfSight="1" price="1000" 
-               skill="1"  expert-production="food">
+               skill="1"  expert-production="model.goods.Fish">
       <ability id="model.ability.foundColony" value="yes"/>
       <ability id="model.ability.recruitable" value="yes"/>
+      <production-bonus goods-type="model.goods.Fish" bonus="3"/>
     </unit-type>
     <unit-type name="model.unit.expertFurTrapper"     offence="0"  defence="1" movement="3" lineOfSight="1"               
-               skill="1"               expert-production="furs">
+               skill="1"  expert-production="model.goods.Furs">
       <ability id="model.ability.foundColony" value="yes"/>
+      <production-bonus goods-type="model.goods.Furs" factor="2"/>
     </unit-type>
     <unit-type name="model.unit.expertSilverMiner"    offence="0"  defence="1" movement="3" lineOfSight="1" price="900"  
-               skill="1"  expert-production="silver">
+               skill="1"  expert-production="model.goods.Silver">
       <ability id="model.ability.foundColony" value="yes"/>
       <ability id="model.ability.recruitable" value="yes"/>
+      <production-bonus goods-type="model.goods.Silver" factor="2"/>
     </unit-type>
     <unit-type name="model.unit.expertLumberJack"     offence="0"  defence="1" movement="3" lineOfSight="1" price="700"  
-               skill="1"  expert-production="lumber">
+               skill="1"  expert-production="model.goods.Lumber">
       <ability id="model.ability.foundColony" value="yes"/>
       <ability id="model.ability.recruitable" value="yes"/>
+      <production-bonus goods-type="model.goods.Lumber" factor="2"/>
     </unit-type>
     <unit-type name="model.unit.expertOreMiner"       offence="0"  defence="1" movement="3" lineOfSight="1" price="600"  
-               skill="1"  expert-production="ore">
+               skill="1"  expert-production="model.goods.Ore">
       <ability id="model.ability.foundColony" value="yes"/>
       <ability id="model.ability.recruitable" value="yes"/>
+      <production-bonus goods-type="model.goods.Ore" factor="2"/>
     </unit-type>
     <unit-type name="model.unit.masterSugarPlanter"   offence="0"  defence="1" movement="3" lineOfSight="1"               
-               skill="2"               expert-production="sugar">
+               skill="2"  expert-production="model.goods.Sugar">
       <ability id="model.ability.foundColony" value="yes"/>
+      <production-bonus goods-type="model.goods.Sugar" factor="2"/>
     </unit-type>
     <unit-type name="model.unit.masterCottonPlanter"  offence="0"  defence="1" movement="3" lineOfSight="1"               
-               skill="2"               expert-production="cotton">
+               skill="2"  expert-production="model.goods.Cotton">
       <ability id="model.ability.foundColony" value="yes"/>
+      <production-bonus goods-type="model.goods.Cotton" factor="2"/>
     </unit-type>
     <unit-type name="model.unit.masterTobaccoPlanter" offence="0"  defence="1" movement="3" lineOfSight="1"               
-               skill="2"               expert-production="tobacco">
+               skill="2"  expert-production="model.goods.Tobacco">
       <ability id="model.ability.foundColony" value="yes"/>
+      <production-bonus goods-type="model.goods.Tobacco" factor="2"/>
     </unit-type>
     <unit-type name="model.unit.firebrandPreacher"    offence="0"  defence="1" movement="3" lineOfSight="1" price="1500" 
-               skill="3"  expert-production="crosses">
+               skill="3"  expert-production="model.goods.Crosses">
       <ability id="model.ability.foundColony" value="yes"/>
       <ability id="model.ability.recruitable" value="yes"/>
+      <production-bonus goods-type="model.goods.Crosses" factor="2"/>
     </unit-type>
     <unit-type name="model.unit.elderStatesman"       offence="0"  defence="1" movement="3" lineOfSight="1" price="1900" 
-               skill="3"  expert-production="bells">
+               skill="3"  expert-production="model.goods.Bells">
       <ability id="model.ability.foundColony" value="yes"/>
       <ability id="model.ability.recruitable" value="yes"/>
+      <production-bonus goods-type="model.goods.Bells" factor="2"/>
     </unit-type>
     <unit-type name="model.unit.masterCarpenter"      offence="0"  defence="1" movement="3" lineOfSight="1" price="1000" 
-               skill="1"  expert-production="hammers">
+               skill="1"  expert-production="model.goods.Hammers">
       <ability id="model.ability.foundColony" value="yes"/>
       <ability id="model.ability.recruitable" value="yes"/>
+      <production-bonus goods-type="model.goods.Hammers" factor="2"/>
     </unit-type>
     <unit-type name="model.unit.masterDistiller"      offence="0"  defence="1" movement="3" lineOfSight="1" price="1100" 
-               skill="2"  expert-production="rum">
+               skill="2"  expert-production="model.goods.Rum">
       <ability id="model.ability.foundColony" value="yes"/>
       <ability id="model.ability.recruitable" value="yes"/>
+      <production-bonus goods-type="model.goods.Rum" factor="2"/>
     </unit-type>
     <unit-type name="model.unit.masterWeaver"         offence="0"  defence="1" movement="3" lineOfSight="1" price="1300" 
-               skill="2"  expert-production="cloth">
+               skill="2"  expert-production="model.goods.Cloth">
       <ability id="model.ability.foundColony" value="yes"/>
       <ability id="model.ability.recruitable" value="yes"/>
+      <production-bonus goods-type="model.goods.Cloth" factor="2"/>
     </unit-type>
     <unit-type name="model.unit.masterTobacconist"    offence="0"  defence="1" movement="3" lineOfSight="1" price="1200" 
-               skill="2"  expert-production="cigars">
+               skill="2"  expert-production="model.goods.Cigars">
       <ability id="model.ability.foundColony" value="yes"/>
       <ability id="model.ability.recruitable" value="yes"/>
+      <production-bonus goods-type="model.goods.Cigars" factor="2"/>
     </unit-type>
     <unit-type name="model.unit.masterFurTrader"      offence="0"  defence="1" movement="3" lineOfSight="1" price="950"  
-               skill="2"  expert-production="coats">
+               skill="2"  expert-production="model.goods.Coats">
       <ability id="model.ability.foundColony" value="yes"/>
       <ability id="model.ability.recruitable" value="yes"/>
+      <production-bonus goods-type="model.goods.Coats" factor="2"/>
     </unit-type>
     <unit-type name="model.unit.masterBlacksmith"     offence="0"  defence="1" movement="3" lineOfSight="1" price="1050" 
-               skill="2"  expert-production="tools">
+               skill="2"  expert-production="model.goods.Tools">
       <ability id="model.ability.foundColony" value="yes"/>
       <ability id="model.ability.recruitable" value="yes"/>
+      <production-bonus goods-type="model.goods.Tools" factor="2"/>
     </unit-type>
     <unit-type name="model.unit.masterGunsmith"       offence="0"  defence="1" movement="3" lineOfSight="1" price="850"  
-               skill="2"  expert-production="muskets">
+               skill="2"  expert-production="model.goods.Muskets">
       <ability id="model.ability.foundColony" value="yes"/>
       <ability id="model.ability.recruitable" value="yes"/>
+      <production-bonus goods-type="model.goods.Muskets" factor="2"/>
     </unit-type>
     <unit-type name="model.unit.seasonedScout"        offence="0"  defence="1" movement="3" lineOfSight="1"               
                skill="1">
@@ -607,27 +632,50 @@
       <ability id="model.ability.learnFromNatives" value="yes"/>
       <ability id="model.ability.learnFromTeacher" value="yes"/>
       <education unit="model.unit.freeColonist" turns="4"/>
+      <production-bonus goods-type="model.goods.Rum" bonus="-1" />
+      <production-bonus goods-type="model.goods.Cigars" bonus="-1" />
+      <production-bonus goods-type="model.goods.Cloth" bonus="-1" />
+      <production-bonus goods-type="model.goods.Coats" bonus="-1" />
+      <production-bonus goods-type="model.goods.Muskets" bonus="-1" />
+      <production-bonus goods-type="model.goods.Bells" bonus="-1" />
+      <production-bonus goods-type="model.goods.Crosses" bonus="-1" />
+      <production-bonus goods-type="model.goods.Hammers" bonus="-1" />
+      <production-bonus goods-type="model.goods.Tools" bonus="-1" />
     </unit-type>
-        <!-- should be something like this: 
-        <production-bonus goods-type="rum" bonus="-1" />
-        <production-bonus goods-type="cigars" bonus="-1" />
-        <production-bonus goods-type="cloth" bonus="-1" />
-        <production-bonus goods-type="coats" bonus="-1" />
-        <production-bonus goods-type="muskets" bonus="-1" />
-        <production-bonus goods-type="bells" bonus="-1" />
-        <production-bonus goods-type="crosses" bonus="-1" />
-        <production-bonus goods-type="hammers" bonus="-1" />
-        <production-bonus goods-type="tools" bonus="-1" />
-        -->
     <unit-type name="model.unit.pettyCriminal"        offence="0"  defence="1" movement="3" lineOfSight="1"               
                skill="-2" promotion="model.unit.indenturedServant">
       <ability id="model.ability.foundColony" value="yes"/>
       <ability id="model.ability.recruitable" value="yes"/>
       <ability id="model.ability.learnFromTeacher" value="yes"/>
       <education unit="model.unit.indenturedServant" turns="4"/>
+      <production-bonus goods-type="model.goods.Rum" bonus="-2" />
+      <production-bonus goods-type="model.goods.Cigars" bonus="-2" />
+      <production-bonus goods-type="model.goods.Cloth" bonus="-2" />
+      <production-bonus goods-type="model.goods.Coats" bonus="-2" />
+      <production-bonus goods-type="model.goods.Muskets" bonus="-2" />
+      <production-bonus goods-type="model.goods.Bells" bonus="-2" />
+      <production-bonus goods-type="model.goods.Crosses" bonus="-2" />
+      <production-bonus goods-type="model.goods.Hammers" bonus="-2" />
+      <production-bonus goods-type="model.goods.Tools" bonus="-2" />
     </unit-type>
     <unit-type name="model.unit.indianConvert"        offence="0"  defence="1" movement="3" lineOfSight="1"               
-               skill="0" />
+               skill="0">
+      <production-bonus goods-type="model.goods.Food" bonus="1"/>
+      <production-bonus goods-type="model.goods.Sugar" bonus="1"/>
+      <production-bonus goods-type="model.goods.Tobacco" bonus="1"/>
+      <production-bonus goods-type="model.goods.Cotton" bonus="1"/>
+      <production-bonus goods-type="model.goods.Furs" bonus="1"/>
+        <production-bonus goods-type="model.goods.Fish" bonus="1" />
+      <production-bonus goods-type="model.goods.Rum" bonus="-2" />
+      <production-bonus goods-type="model.goods.Cigars" bonus="-2" />
+      <production-bonus goods-type="model.goods.Cloth" bonus="-2" />
+      <production-bonus goods-type="model.goods.Coats" bonus="-2" />
+      <production-bonus goods-type="model.goods.Muskets" bonus="-2" />
+      <production-bonus goods-type="model.goods.Bells" bonus="-2" />
+      <production-bonus goods-type="model.goods.Crosses" bonus="-2" />
+      <production-bonus goods-type="model.goods.Hammers" bonus="-2" />
+      <production-bonus goods-type="model.goods.Tools" bonus="-2" />
+    </unit-type>
     <unit-type name="model.unit.brave"                offence="1"  defence="1" movement="3" lineOfSight="1" space="1">
       <ability id="model.ability.carryGoods" value="yes"/>
     </unit-type>

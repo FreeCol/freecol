@@ -1119,8 +1119,9 @@ public final class Colony extends Settlement implements Location, Nameable {
                 boolean ourLand = workTile.getNationOwner() == Player.NO_NATION
                         || Player.isEuropean(workTile.getNationOwner())
                         || unit.getOwner().hasFather(FoundingFather.PETER_MINUIT);
-                if (ourLand && unit.getFarmedPotential(goodsType, colonyTile.getWorkTile()) > highestProduction) {
-                    highestProduction = unit.getFarmedPotential(goodsType, colonyTile.getWorkTile());
+                int potential = unit.getFarmedPotential(goodsType, colonyTile.getWorkTile());
+                if (ourLand && potential > highestProduction) {
+                    highestProduction = potential;
                     bestPick = colonyTile;
                 }
             }

@@ -15,6 +15,7 @@ import javax.swing.text.Style;
 import javax.swing.text.StyleConstants;
 import javax.swing.text.StyleContext;
 import javax.swing.text.StyledDocument;
+import net.sf.freecol.FreeCol;
 
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.i18n.Messages;
@@ -22,8 +23,10 @@ import net.sf.freecol.common.model.Building;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.ColonyTile;
 import net.sf.freecol.common.model.Goods;
+import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Unit;
+import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.model.WorkLocation;
 import cz.autel.dmi.HIGLayout;
 
@@ -129,33 +132,37 @@ public final class ReportRequirementsPanel extends ReportPanel implements Action
                 if (workLocation instanceof ColonyTile) {
                     Unit unit = ((ColonyTile) workLocation).getUnit();
                     if (unit != null) {
-                        int workType = unit.getWorkType();
-                        int expert = ((ColonyTile) workLocation).getExpertForProducing(workType);
-                        if (unitCount[index][expert] == 0 && !expertWarning[expert]) {
+                        GoodsType workType = unit.getWorkType();
+                        UnitType expert = FreeCol.getSpecification().getExpertForProducing(workType);
+                        int expertIndex = expert.getIndex();
+                        if (unitCount[index][expertIndex] == 0 && !expertWarning[expertIndex]) {
                             addExpertWarning(doc, index, Goods.getName(workType), expert);
-                            expertWarning[expert] = true;
+                            expertWarning[expertIndex] = true;
                             hasWarning = true;
                         }
                     }
                 } else {
                     // check buildings
                     Building building = (Building) workLocation;
-                    int goodsType = building.getGoodsOutputType();
-                    int expert = building.getExpertUnitType();
-                    if (goodsType != -1) {
+                    GoodsType goodsType = building.getGoodsOutputType();
+                    UnitType expert = building.getExpertUnitType();
+                    
+                    int expertIndex = expert.getIndex();
+                    int goodsIndex = goodsType.getIndex();
+                    if (goodsType != null) {
                         // no expert
                         if (building.getFirstUnit() != null &&
-                            !expertWarning[expert] &&
-                            unitCount[index][expert] == 0) {
+                            !expertWarning[expertIndex] &&
+                            unitCount[index][expertIndex] == 0) {
                             addExpertWarning(doc, index, Goods.getName(goodsType), expert);
-                            expertWarning[expert] = true;
+                            expertWarning[expertIndex] = true;
                             hasWarning = true;
                         }
                         // not enough input
                         if (building.getProductionNextTurn() < building.getMaximumProduction() &&
-                            !productionWarning[goodsType]) {
+                            !productionWarning[goodsIndex]) {
                             addProductionWarning(doc, index, goodsType, building.getGoodsInputType());
-                            productionWarning[goodsType] = true;
+                            productionWarning[goodsIndex] = true;
                             hasWarning = true;
                         }
                     }
@@ -179,7 +186,7 @@ public final class ReportRequirementsPanel extends ReportPanel implements Action
 
     }
 
-    private void addExpertWarning(StyledDocument doc, int colonyIndex, String goods, int workType) {
+    private void addExpertWarning(StyledDocument doc, int colonyIndex, String goods, UnitType workType) {
         String expertName = Unit.getName(workType);
         String colonyName = colonies.get(colonyIndex).getName();
         String newMessage = Messages.message("report.requirements.noExpert", "%colony%", colonyName, "%goods%", goods,
@@ -191,10 +198,10 @@ public final class ReportRequirementsPanel extends ReportPanel implements Action
             ArrayList<Colony> severalExperts = new ArrayList<Colony>();
             ArrayList<Colony> canTrainExperts = new ArrayList<Colony>();
             for (int index = 0; index < colonies.size(); index++) {
-                if (unitCount[index][workType] > 1) {
+                if (unitCount[index][workType.getIndex()] > 1) {
                     severalExperts.add(colonies.get(index));
                 }
-                if (canTrain[index][workType]) {
+                if (canTrain[index][workType.getIndex()]) {
                     canTrainExperts.add(colonies.get(index));
                 }
             }
@@ -237,7 +244,7 @@ public final class ReportRequirementsPanel extends ReportPanel implements Action
         
     }
 
-    private void addProductionWarning(StyledDocument doc, int colonyIndex, int output, int input) {
+    private void addProductionWarning(StyledDocument doc, int colonyIndex, GoodsType output, GoodsType input) {
         String colonyName = colonies.get(colonyIndex).getName();
         String newMessage = Messages.message("report.requirements.missingGoods",
                 "%colony%", colonyName,
@@ -250,9 +257,9 @@ public final class ReportRequirementsPanel extends ReportPanel implements Action
             ArrayList<Colony> withSurplus = new ArrayList<Colony>();
             ArrayList<Integer> theSurplus = new ArrayList<Integer>();
             for (int index = 0; index < colonies.size(); index++) {
-                if (surplus[index][input] > 0) {
+                if (surplus[index][input.getIndex()] > 0) {
                     withSurplus.add(colonies.get(index));
-                    theSurplus.add(new Integer(surplus[index][input]));
+                    theSurplus.add(new Integer(surplus[index][input.getIndex()]));
                 }
             }
 

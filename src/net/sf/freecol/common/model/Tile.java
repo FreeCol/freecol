@@ -1315,7 +1315,7 @@ public final class Tile extends FreeColGameObject implements Location, Nameable 
      *         goods.
      */
     public int potential(int goodsIndex) {
-        return potential(FreeCol.getSpecification().getGoodsType(goods));
+        return potential(FreeCol.getSpecification().getGoodsType(goodsIndex));
     }
 
     /*

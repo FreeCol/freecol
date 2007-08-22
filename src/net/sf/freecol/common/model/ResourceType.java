@@ -24,6 +24,7 @@ public final class ResourceType
     
     private List<GoodsType> bonusGoods;
     private List<Integer>   bonusAmount;
+    private List<Float>     bonusFactor;
 
     // ------------------------------------------------------------ constructors
 
@@ -56,6 +57,14 @@ public final class ResourceType
         }
         return 0;
     }
+    
+    public float getFactor(GoodsType g) {
+        int bonusIndex = bonusGoods.indexOf(g);
+        if (bonusIndex >= 0) {
+            return bonusFactor.get(bonusIndex);
+        }
+        return 1;
+    }
 
     public GoodsType getBestGoodsType() {
         if (bonusGoods.size() == 1) {
@@ -65,8 +74,10 @@ public final class ResourceType
         int bestValue = 0;
         for (int i = 0; i < bonusGoods.size(); i++) {
             GoodsType g = bonusGoods.get(i);
-            if (bestType == null || g.getInitialPrice() * bonusAmount.get(i) > value) {
+            // TODO: Use bonusFactor too
+            if (bestType == null || g.getInitialSellPrice() * bonusAmount.get(i) > bestValue) {
                 bestType = g;
+                bestValue = g.getInitialSellPrice() * bonusAmount.get(i);
             }
         }
         return bestType;
@@ -91,7 +102,7 @@ public final class ResourceType
 
     // ------------------------------------------------------------ API methods
 
-    public void readFromXmlElement(Node xml, Map<String, GoodsType> goodsTypeByRef) {
+    public void readFromXmlElement(Node xml, final Map<String, GoodsType> goodsTypeByRef) {
 
         id = Xml.attribute(xml, "name");
         name = Xml.attribute(xml, "name");
@@ -110,7 +121,8 @@ public final class ResourceType
                 String goods = Xml.attribute(xml, "goods-type");
                 GoodsType g = goodsTypeByRef.get(goods);
                 bonusGoods.add(g);
-                bonusAmount.add(Xml.intAttribute(xml, "bonus"));
+                bonusAmount.add(Xml.intAttribute(xml, "bonus", 0));
+                bonusFactor.add(Xml.floatAttribute(xml, "factor", 1));
             }
         };
         Xml.forEachChild(xml, method);

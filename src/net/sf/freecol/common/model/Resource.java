@@ -68,7 +68,7 @@ public class Resource extends TileItem {
     }
 
     public Resource(Game game, Element e) {
-        super(game, in);
+        super(game, e);
         readFromXMLElement(e);
     }
 

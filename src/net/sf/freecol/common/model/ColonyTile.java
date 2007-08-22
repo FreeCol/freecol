@@ -12,6 +12,7 @@ import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
+import net.sf.freecol.FreeCol;
 
 import net.sf.freecol.client.gui.i18n.Messages;
 
@@ -449,17 +450,16 @@ public class ColonyTile extends FreeColGameObject implements WorkLocation, Ownab
      * @param unit a <code>Unit</code> value
      * @return a workType
      */
-    public int getWorkType(Unit unit) {
-        int workType = unit.getWorkType();
+    public GoodsType getWorkType(Unit unit) {
+        GoodsType workType = unit.getWorkType();
         int amount = unit.getFarmedPotential(workType, workTile);
         if (amount == 0) {
-            for (int goods = 0; goods < Goods.NUMBER_OF_TYPES; goods++) {
-                if (Goods.isFarmedGoods(goods)) {
-                    int newAmount = unit.getFarmedPotential(goods, workTile);
-                    if (newAmount > amount) {
-                        amount = newAmount;
-                        workType = goods;
-                    }
+            List<GoodsType> farmedGoodsTypes = FreeCol.getSpecification().getFarmedGoodsTypeList();
+            for(GoodsType farmedGoods : farmedGoodsTypes) {
+                int newAmount = unit.getFarmedPotential(farmedGoods, workTile);
+                if (newAmount > amount) {
+                    amount = newAmount;
+                    workType = farmedGoods;
                 }
             }
         }
@@ -469,7 +469,7 @@ public class ColonyTile extends FreeColGameObject implements WorkLocation, Ownab
     /**
     * Returns the production of the given type of goods.
     */
-    public int getProductionOf(int goodsType) {
+    public int getProductionOf(GoodsType goodsType) {
         if ((getUnit() == null) && !(isColonyCenterTile())) {
             return 0; // Produce nothing if there's nobody to work the terrain.
         }
@@ -484,10 +484,6 @@ public class ColonyTile extends FreeColGameObject implements WorkLocation, Ownab
             if (!workTile.isLand() && !colony.getBuilding(Building.DOCK).isBuilt()) {
                 amount = 0;
             }
-
-            /*if (amount > 0) {
-                amount += colony.getProductionBonus();
-            }*/
             
             return Math.max(0, amount);
         }
@@ -502,42 +498,6 @@ public class ColonyTile extends FreeColGameObject implements WorkLocation, Ownab
             production = Math.max(1, production + colony.getProductionBonus());
         }
         return production;
-    }
-    
-    
-    /**
-    * Returns the unit type producing the greatest amount of the
-    * given goods at this tile.
-    *
-    * @param goodsType The type of goods.
-    * @return The {@link Unit#getType unit type}.
-    * @see Unit#getExpertWorkType
-    * @see Building#getExpertUnitType
-    */
-    public int getExpertForProducing(int goodsType) {
-        switch (goodsType) {
-            case Goods.FOOD:
-                return ( getWorkTile().isLand() )
-                    ? Unit.EXPERT_FARMER
-                    : Unit.EXPERT_FISHERMAN;
-            case Goods.FURS:
-                return Unit.EXPERT_FUR_TRAPPER;
-            case Goods.SILVER:
-                return Unit.EXPERT_SILVER_MINER;
-            case Goods.LUMBER:
-                return Unit.EXPERT_LUMBER_JACK;
-            case Goods.ORE:
-                return Unit.EXPERT_ORE_MINER;
-            case Goods.SUGAR:
-                return Unit.MASTER_SUGAR_PLANTER;
-            case Goods.COTTON:
-                return Unit.MASTER_COTTON_PLANTER;
-            case Goods.TOBACCO:
-                return Unit.MASTER_TOBACCO_PLANTER;
-            default:
-                logger.warning("Unknown type of goods.");
-                return Unit.FREE_COLONIST;
-            }
     }
 
 
