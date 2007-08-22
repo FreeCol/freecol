@@ -974,7 +974,7 @@ public final class InGameInputHandler extends InputHandler {
             break;
         case LostCityRumour.FOUNTAIN_OF_YOUTH:
             if (player.getEurope() == null) {
-                m = new ModelMessage(player.getEurope(), "lostCityRumour.FountainOfYouthWithoutEurope", null,
+                m = new ModelMessage(player, "lostCityRumour.FountainOfYouthWithoutEurope", null,
                                      ModelMessage.LOST_CITY_RUMOUR);
             } else {
                 m = new ModelMessage(player.getEurope(), "lostCityRumour.FountainOfYouth", null,
