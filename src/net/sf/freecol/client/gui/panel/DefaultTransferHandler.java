@@ -198,8 +198,7 @@ public final class DefaultTransferHandler extends TransferHandler {
 
                 Unit unit = ((UnitLabel)data).getUnit();
 
-                // TODO: ensure that other units are never under repair
-                if (unit.isNaval() && unit.isUnderRepair()) {
+                if (unit.isUnderRepair()) {
                     return false;
                 }
                 
