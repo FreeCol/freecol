@@ -2458,15 +2458,7 @@ public class Player extends FreeColGameObject implements Nameable {
             }
             // remember SoL for check changes at next turn
             oldSoL = newSoL;
-
-            score = 0;
-            Iterator<Unit> unitIterator = getUnitIterator();
-            while (unitIterator.hasNext()) {
-                Unit unit = unitIterator.next();
-                score += unit.getScoreValue();
-            }
-            score += (score * newSoL) / 100;
-            score += getGold() / 1000;
+            calculateScore();
         } else {
             for (Iterator<Unit> unitIterator = getUnitIterator(); unitIterator.hasNext();) {
                 Unit unit = unitIterator.next();
@@ -2476,6 +2468,21 @@ public class Player extends FreeColGameObject implements Nameable {
                 unit.newTurn();
             }
         }
+    }
+
+    /**
+     * Calculate the player's score.
+     *
+     */
+    public void calculateScore() {
+        score = 0;
+        Iterator<Unit> unitIterator = getUnitIterator();
+        while (unitIterator.hasNext()) {
+            Unit unit = unitIterator.next();
+            score += unit.getScoreValue();
+        }
+        score += (score * oldSoL) / 100;
+        score += getGold() / 1000;
     }
 
     private void exploreAllColonies() {
@@ -2544,6 +2551,7 @@ public class Player extends FreeColGameObject implements Nameable {
             out.writeAttribute("crossesRequired", Integer.toString(crossesRequired));
             out.writeAttribute("attackedByPrivateers", Boolean.toString(attackedByPrivateers));
             out.writeAttribute("oldSoL", Integer.toString(oldSoL));
+            out.writeAttribute("score", Integer.toString(score));
             char[] fatherCharArray = new char[FoundingFather.FATHER_COUNT];
             for (int i = 0; i < fathers.length; i++) {
                 fatherCharArray[i] = (fathers[i] ? '1' : '0');
@@ -2610,6 +2618,7 @@ public class Player extends FreeColGameObject implements Nameable {
         crosses = Integer.parseInt(in.getAttributeValue(null, "crosses"));
         bells = Integer.parseInt(in.getAttributeValue(null, "bells"));
         oldSoL = getAttribute(in, "oldSoL", 0);
+        score = getAttribute(in, "score", 0);
         bellsBonus = getAttribute(in, "bellsBonus", 0);
         ready = (new Boolean(in.getAttributeValue(null, "ready"))).booleanValue();
         ai = (new Boolean(in.getAttributeValue(null, "ai"))).booleanValue();
