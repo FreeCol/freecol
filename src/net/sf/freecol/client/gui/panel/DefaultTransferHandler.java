@@ -198,7 +198,8 @@ public final class DefaultTransferHandler extends TransferHandler {
 
                 Unit unit = ((UnitLabel)data).getUnit();
 
-                if (unit.isUnderRepair()) {
+                // TODO: ensure that other units are never under repair
+                if (unit.isNaval() && unit.isUnderRepair()) {
                     return false;
                 }
                 
@@ -233,7 +234,6 @@ public final class DefaultTransferHandler extends TransferHandler {
                         || comp instanceof ColonyPanel.CargoPanel)) {
                     return false;
                 }
-
 
                 if (comp instanceof JLabel) {
                     logger.warning("Oops, I thought we didn't have to write this part.");

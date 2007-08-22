@@ -268,7 +268,7 @@ public final class UnitLabel extends JLabel implements ActionListener {
             g.translate(0, 10);
             pl.paintComponent(g);
             g.translate(0, -10);
-        } else if (unit.isUnderRepair()) {
+        } else if (unit.isNaval() && unit.isUnderRepair()) {
             BufferedImage repairImage = parent.getGUI().createStringImage((Graphics2D) g,
                     Messages.message("underRepair", "%turns%", Integer.toString(unit.getTurnsForRepair())),
                     Color.RED, getWidth(), 12);
