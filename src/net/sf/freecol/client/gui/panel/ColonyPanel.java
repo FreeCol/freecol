@@ -1509,6 +1509,7 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener {
                 selectedUnit = null;
                 setSelectedUnitLabel(t);
             }
+            updateCargoLabel();
         }
     }
 
