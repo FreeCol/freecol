@@ -279,6 +279,8 @@ public final class InGameController implements NetworkConstants {
             if (!freeColClient.isSingleplayer()) {
                 freeColClient.playSound(SfxLibrary.ANTHEM_BASE + currentPlayer.getNation());
             }
+            
+            checkTradeRoutesInEurope();
 
             displayModelMessages(true);
             nextActiveUnit();
@@ -737,6 +739,19 @@ public final class InGameController implements NetworkConstants {
         return;
     }
 
+    private void checkTradeRoutesInEurope() {
+        Europe europe = freeColClient.getMyPlayer().getEurope();
+        if (europe == null) {
+            return;
+        }
+        List<Unit> units = europe.getUnitList();
+        for(Unit unit : units) {
+            if (unit.getTradeRoute() != null) {
+                followTradeRoute(unit);
+            }
+        }
+    }
+    
     private void followTradeRoute(Unit unit) {
         Stop stop = unit.getCurrentStop();
         if (stop == null) {
@@ -748,7 +763,7 @@ public final class InGameController implements NetworkConstants {
         if (location instanceof Tile) {
             logger.finer("Stopped in colony " + unit.getColony().getName());
             stopInColony(unit);
-        } else if (location instanceof Europe) {
+        } else if (location instanceof Europe && unit.isInEurope()) {
             logger.finer("Stopped in Europe.");
             stopInEurope(unit);
         }
@@ -836,7 +851,11 @@ public final class InGameController implements NetworkConstants {
         Stop stop = unit.nextStop();
         // go to next stop, unit can already be there waiting to load
         if (stop != null && stop.getLocation() != unit.getColony()) {
-            moveToDestination(unit);
+            if (unit.isInEurope()) {
+                moveToAmerica(unit);
+            } else {
+                moveToDestination(unit);
+            }
         }
     }
 
@@ -879,14 +898,7 @@ public final class InGameController implements NetworkConstants {
         // TODO: do we want to load/unload units as well?
         // if so, when?
 
-        // Set destination to next stop's location
-        stop = unit.nextStop();
-        if (stop == null) {
-            return;
-        } else {
-            setDestination(unit, stop.getLocation());
-            moveToAmerica(unit);
-        }
+        updateCurrentStop(unit);
     }
 
     /**
