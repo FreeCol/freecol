@@ -1474,7 +1474,7 @@ public class Unit extends FreeColGameObject implements Abilities, Locatable, Loc
             throw new IllegalStateException("A carrier cannot board another carrier!");
         }
 
-        if (getTile() == carrier.getTile() && carrier.getState() != TO_EUROPE && carrier.getState() != TO_AMERICA) {
+        if (getTile() == carrier.getTile() && isInEurope() == carrier.isInEurope()) {
             setLocation(carrier);
             setState(SENTRY);
         } else {
@@ -1493,7 +1493,7 @@ public class Unit extends FreeColGameObject implements Abilities, Locatable, Loc
         Unit carrier = (Unit) getLocation();
         Location l = carrier.getLocation();
 
-        if (l instanceof Europe && carrier.getState() != TO_EUROPE && carrier.getState() != TO_AMERICA) {
+        if (carrier.isInEurope()) {
             setLocation(l);
         } else if (getTile().getSettlement() != null) {
             setLocation(getTile());
@@ -1511,7 +1511,7 @@ public class Unit extends FreeColGameObject implements Abilities, Locatable, Loc
      */
     public boolean canUnload() {
         Location l = getLocation();
-        if (l instanceof Europe && getState() != TO_EUROPE && getState() != TO_AMERICA) {
+        if (isInEurope()) {
             return true;
         } else if (getTile() == null) {
             // this should not happen, but it does
@@ -2112,7 +2112,11 @@ public class Unit extends FreeColGameObject implements Abilities, Locatable, Loc
      * @return The result.
      */
     public boolean isInEurope() {
-        return getTile() == null;
+        if (location instanceof Unit) {
+            return ((Unit) location).isInEurope();
+        } else {
+            return getLocation() instanceof Europe && getState() != TO_EUROPE && getState() != TO_AMERICA;
+        }
     }
 
     /**
@@ -2166,8 +2170,7 @@ public class Unit extends FreeColGameObject implements Abilities, Locatable, Loc
      * @param amount The amount of goods to buy.
      */
     public void buyGoods(GoodsType goodsType, int amount) {
-        if (!hasAbility("model.ability.carryGoods") ||
-            !(getLocation() instanceof Europe && getState() != TO_EUROPE && getState() != TO_AMERICA)) {
+        if (!hasAbility("model.ability.carryGoods") || !isInEurope()) {
             throw new IllegalStateException("Cannot buy goods when not a carrier or in Europe.");
         }
 

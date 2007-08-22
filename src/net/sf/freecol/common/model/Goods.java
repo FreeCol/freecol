@@ -410,8 +410,7 @@ public class Goods implements Locatable, Ownable, Nameable {
             Unit source = (Unit)getLocation();
 
             // Make sure that both carriers are in a port in Europe.
-            if ((carrier.getLocation() instanceof Europe && (carrier.getState() == Unit.TO_EUROPE || carrier.getState() == Unit.TO_AMERICA)) ||
-                (source.getLocation() instanceof Europe && (source.getState() == Unit.TO_EUROPE || source.getState() == Unit.TO_AMERICA))){
+            if (!carrier.isInEurope() || !source.isInEurope()){
                 throw new IllegalStateException("Loading cargo onto a ship that is not in port in Europe.");
             }
         }
