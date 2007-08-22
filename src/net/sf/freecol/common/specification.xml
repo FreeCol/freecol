@@ -154,7 +154,7 @@
       <!-- in colonization game gives 2 food (4 for expert farmer) -->
       <production-bonus goods-type="model.goods.Furs" bonus="2"/>
     </resource-type>
-    <resource-type id="model.resource.Minerals"> <!-- not in colonization minimum-value="40" maximum-value="400" -->
+    <resource-type id="model.resource.Minerals" minimum-value="40" maximum-value="400">
       <production-bonus goods-type="model.goods.Ore" bonus="3"/>
     </resource-type>
     <resource-type id="model.resource.Ore" minimum-value="40" maximum-value="4000">
@@ -501,13 +501,13 @@
                skill="1"  expert-production="model.goods.Food">
       <ability id="model.ability.foundColony" value="yes"/>
       <ability id="model.ability.recruitable" value="yes"/>
-      <production-bonus goods-type="model.goods.Food" bonus="3"/>
+      <production-bonus goods-type="model.goods.Food" bonus="2"/>
     </unit-type>
     <unit-type name="model.unit.expertFisherman"      offence="0"  defence="1" movement="3" lineOfSight="1" price="1000" 
                skill="1"  expert-production="model.goods.Fish">
       <ability id="model.ability.foundColony" value="yes"/>
       <ability id="model.ability.recruitable" value="yes"/>
-      <production-bonus goods-type="model.goods.Fish" bonus="3"/>
+      <production-bonus goods-type="model.goods.Fish" bonus="2"/>
     </unit-type>
     <unit-type name="model.unit.expertFurTrapper"     offence="0"  defence="1" movement="3" lineOfSight="1"               
                skill="1"  expert-production="model.goods.Furs">
