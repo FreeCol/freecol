@@ -126,7 +126,7 @@ public final class Colony extends Settlement implements Location, Nameable {
                 // t.setOwner(this);
             }
             addWorkLocation(new ColonyTile(game, this, t));
-            if (t.getType() == Tile.OCEAN) {
+            if (t.getType().isWater()) {
                 landLocked = false;
             }
         }
@@ -784,7 +784,7 @@ public final class Colony extends Settlement implements Location, Nameable {
         return getBuilding(Building.SCHOOLHOUSE).canAddAsTeacher(unit);
     }
 
-    public boolean canTrain(int unitType) {
+    public boolean canTrain(UnitType unitType) {
         return getBuilding(Building.SCHOOLHOUSE).canAddAsTeacher(unitType);
     }
 
@@ -1199,7 +1199,7 @@ public final class Colony extends Settlement implements Location, Nameable {
      * @return The amount of the given goods currently unallocated for next
      *         turn.
      */
-    public int getProductionNetOf(int goodsType) {
+    public int getProductionNetOf(GoodsType goodsType) {
         int count = getProductionNextTurn(goodsType);
         int used = 0;
         switch (goodsType) {
@@ -1486,12 +1486,16 @@ public final class Colony extends Settlement implements Location, Nameable {
     // Create a new colonist if there is enough food:
     private void checkForNewColonist() {
         if (getGoodsCount(Goods.FOOD) >= 200) {
-            Unit u = getGame().getModelController().createUnit(getID() + "newTurn200food", getTile(), getOwner(),
-                                                               Unit.FREE_COLONIST);
-            removeGoods(Goods.FOOD, 200);
-            addModelMessage(this, "model.colony.newColonist", new String[][] { { "%colony%", getName() } },
-                            ModelMessage.UNIT_ADDED, u);
-            logger.info("New colonist created in " + getName() + " with ID=" + u.getID());
+            List<UnitType> unitTypes = FreeCol.getSpecification().getUnitTypesWithAbility("model.ability.bornInColony");
+            if (unitTypes.size() > 0) {
+                int random = getGame().getModelController().getRandom(getID() + "bornInColony", 11);
+                Unit u = getGame().getModelController().createUnit(getID() + "newTurn200food", getTile(), getOwner(),
+                                                                   unitTypes.get(random));
+                removeGoods(Goods.FOOD, 200);
+                addModelMessage(this, "model.colony.newColonist", new String[][] { { "%colony%", getName() } },
+                                ModelMessage.UNIT_ADDED, u);
+                logger.info("New colonist created in " + getName() + " with ID=" + u.getID());
+            }
         }
     }
 
@@ -1545,20 +1549,20 @@ public final class Colony extends Settlement implements Location, Nameable {
 
     // Warn about levels that will be exceeded next turn
     private void createWarehouseCapacityWarning() {
-        for (int goodsType = 1; goodsType < Goods.NUMBER_OF_TYPES; goodsType++) {
-            if (getExports(goodsType)  && (owner.canTrade(goodsType, Market.CUSTOM_HOUSE))) {
+        List<Goods> storedGoods = getGoodsContainer().getFullGoods();
+        for (Goods goods : storedGoods) {
+            if (getExports(goods)  && (owner.canTrade(goods, Market.CUSTOM_HOUSE))) {
                 // capacity will never be exceeded
                 continue;
-            } else if (goodsContainer.getGoodsCount(goodsType) < getWarehouseCapacity()) {
-                int waste = (goodsContainer.getGoodsCount(goodsType) + getProductionNetOf(goodsType) -
+            } else if (goods.getAmount() < getWarehouseCapacity()) {
+                int waste = (goods.getAmount() + getProductionNetOf(goods.getType()) -
                              getWarehouseCapacity());
                 if (waste > 0) {
                     addModelMessage(this, "model.building.warehouseSoonFull",
-                                    new String [][] {{"%goods%", Goods.getName(goodsType)},
+                                    new String [][] {{"%goods%", goods.getName()},
                                                      {"%colony%", getName()},
                                                      {"%amount%", String.valueOf(waste)}},
-                                    ModelMessage.WAREHOUSE_CAPACITY,
-                                    new Goods(goodsType));
+                                    ModelMessage.WAREHOUSE_CAPACITY, goods);
                 }
             }
         }

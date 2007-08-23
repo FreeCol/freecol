@@ -493,6 +493,7 @@
                skill="0" promotion="model.unit.veteranSoldier">
       <ability id="model.ability.foundColony" value="yes"/>
       <ability id="model.ability.recruitable" value="yes"/>
+      <ability id="model.ability.bornInColony" value="yes"/>
       <ability id="model.ability.foundInLostCity" value="yes"/>
       <upgrade unit="model.unit.expertFarmer" turnsToLearn="4" learnFromNatives="yes" learnFromExperience="yes"/>
       <upgrade unit="model.unit.expertFisherman" turnsToLearn="4" learnFromNatives="yes" learnFromExperience="yes"/>
