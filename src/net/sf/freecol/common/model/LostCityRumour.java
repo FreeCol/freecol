@@ -14,10 +14,10 @@ public class LostCityRumour {
         BURIAL_GROUND = 0,
         EXPEDITION_VANISHES = 1, 
         NOTHING = 2,
-        SEASONED_SCOUT = 3,
+        LEARN = 3,
         TRIBAL_CHIEF = 4,
         COLONIST = 5,
-        TREASURE_TRAIN = 6,
+        TREASURE = 6,
         FOUNTAIN_OF_YOUTH = 7;
 
     public static final int NUMBER_OF_RUMOURS = 8;

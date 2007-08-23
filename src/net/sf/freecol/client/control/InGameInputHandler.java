@@ -931,7 +931,7 @@ public final class InGameInputHandler extends InputHandler {
         case LostCityRumour.NOTHING:
             m = new ModelMessage(tile, "lostCityRumour.Nothing", null, ModelMessage.LOST_CITY_RUMOUR);
             break;
-        case LostCityRumour.SEASONED_SCOUT:
+        case LostCityRumour.LEARN:
             m = new ModelMessage(tile, "lostCityRumour.SeasonedScout", new String[][] { { "%unit%", unit.getName() } },
                     ModelMessage.LOST_CITY_RUMOUR);
             unit.setType(FreeCol.getSpecification().getUnitType(element.getAttribute("unitType")));
@@ -956,7 +956,7 @@ public final class InGameInputHandler extends InputHandler {
                 tile.add(newUnit);
             }
             break;
-        case LostCityRumour.TREASURE_TRAIN:
+        case LostCityRumour.TREASURE:
             String treasure = element.getAttribute("amount");
             m = new ModelMessage(tile, "lostCityRumour.TreasureTrain", new String[][] { { "%money%", treasure } },
                     ModelMessage.LOST_CITY_RUMOUR);

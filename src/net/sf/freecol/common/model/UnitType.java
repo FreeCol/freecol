@@ -2,8 +2,10 @@
 package net.sf.freecol.common.model;
 
 
+import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import net.sf.freecol.FreeCol;
@@ -475,6 +477,36 @@ public final class UnitType implements Abilities {
     }
 
     /**
+     * Whether can learn in lost city rumour the given UnitType
+     *
+     * @param unitType the UnitType to learn
+     * @return <code>true</code> if can learn the given UnitType
+     */
+    public boolean canLearnInLostCity(UnitType unitType) {
+        Upgrade upgrade = upgrades.get(unitType.getId());
+        return upgrade != null && upgrade.learnInLostCity;
+    }
+
+    /**
+     * Get a list of UnitType which can learn in a lost city rumour
+     *
+     * @param maximumSkill the maximum level skill which we are searching for
+     * @return <code>UnitType</code> with a skill equal or less than given
+     * maximum
+     */
+    public List<UnitType> getUnitTypesLearntInLostCity() {
+        Iterator<Entry<String, Upgrade>> iterator = upgrades.entrySet().iterator();
+        ArrayList<UnitType> unitTypes = new ArrayList<UnitType>();
+        while (iterator.hasNext()) {
+            Entry<String, Upgrade> pair = iterator.next();
+            if (pair.getValue().learnInLostCity) {
+                unitTypes.add(FreeCol.getSpecification().getUnitType(pair.getKey()));
+            }
+        }
+        return unitTypes;
+    }
+
+    /**
      * Get a UnitType to learn with a level skill less or equal than given level
      *
      * @param maximumSkill the maximum level skill which we are searching for
@@ -550,6 +582,7 @@ public final class UnitType implements Abilities {
                         upgrade.turnsToLearn = Xml.intAttribute(node, "turnsToLearn", UNDEFINED);
                         upgrade.learnFromNatives = Xml.booleanAttribute(node, "learnFromNatives", false);
                         upgrade.learnFromExperience = Xml.booleanAttribute(node, "learnFromExperience", false);
+                        upgrade.learnInLostCity = Xml.booleanAttribute(node, "learnInLostCity", false);
                         upgrades.put(educationUnit, upgrade);
                     } else if ("production-bonus".equals(nodeName)) {
                         String goodsType = Xml.attribute(node, "goods-type");
@@ -627,7 +660,7 @@ public final class UnitType implements Abilities {
     
     private class Upgrade {
         protected int turnsToLearn;
-        protected boolean learnFromNatives, learnFromExperience;
+        protected boolean learnFromNatives, learnFromExperience, learnInLostCity;
         
         public boolean canBeTeached() {
             return turnsToLearn > 0;

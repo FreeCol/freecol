@@ -936,16 +936,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         // dx is now in range 1-6
         int max = 7; // maximum dx + 1
         
-        Specification specification = FreeCol.getSpecification();
-        List<UnitType> expertScouts = specification.getUnitTypesWithAbility("model.ability.expertScout");
-        Iterator<UnitType> iterator = expertScouts.iterator();
-        while (iterator.hasNext()) {
-            UnitType scoutType = iterator.next();
-            if (!unit.getUnitType().canLearnFromExperience(scoutType)) {
-                iterator.remove();
-            }
-        }
-        
+        List<UnitType> learntUnitTypes = unit.getUnitType().getUnitTypesLearntInLostCity();
         List<UnitType> newUnitTypes = specification.getUnitTypesWithAbility("model.ability.foundInLostCity");
         List<UnitType> treasureUnitTypes = specification.getUnitTypesWithAbility("model.ability.carryTreasure");
         
@@ -957,10 +948,10 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         probability[LostCityRumour.EXPEDITION_VANISHES] = dx * 2;
         probability[LostCityRumour.NOTHING] = dx * 5;
         // only these units can be promoted
-        if (expertScouts.isEmpty()) {
-            probability[LostCityRumour.SEASONED_SCOUT] = 0;
+        if (learntUnitTypes.isEmpty()) {
+            probability[LostCityRumour.LEARN] = 0;
         } else {
-            probability[LostCityRumour.SEASONED_SCOUT] = (max - dx) * 3;
+            probability[LostCityRumour.LEARN] = (max - dx) * 3;
         }
         /**
          * The higher the difficulty, the less likely good things are to happen.
@@ -972,9 +963,9 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
             probability[LostCityRumour.COLONIST] = (max - dx) * 2;
         }
         if (treasureUnitTypes.isEmpty()) {
-            probability[LostCityRumour.TREASURE_TRAIN] = 0;
+            probability[LostCityRumour.TREASURE] = 0;
         } else {
-            probability[LostCityRumour.TREASURE_TRAIN] = (max - dx) * 2 + bonus;
+            probability[LostCityRumour.TREASURE] = (max - dx) * 2 + bonus;
         }
         probability[LostCityRumour.FOUNTAIN_OF_YOUTH] = (max - dx) + bonus / 2;
         int start;
@@ -1020,10 +1011,10 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
             break;
         case LostCityRumour.NOTHING:
             break;
-        case LostCityRumour.SEASONED_SCOUT:
-            random = getPseudoRandom().nextInt(expertScouts.size());
-            unit.setType(expertScouts.get(random));
-            rumourElement.setAttribute("unitType", expertScouts.get(random).getId());
+        case LostCityRumour.LEARN:
+            random = getPseudoRandom().nextInt(learntUnitTypes.size());
+            unit.setType(learntUnitTypes.get(random));
+            rumourElement.setAttribute("unitType", learntUnitTypes.get(random).getId());
             break;
         case LostCityRumour.TRIBAL_CHIEF:
             int amount = getPseudoRandom().nextInt(dx * 10) + dx * 5;
@@ -1036,7 +1027,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
             unit.getTile().add(newUnit);
             rumourElement.appendChild(newUnit.toXMLElement(player, rumourElement.getOwnerDocument()));
             break;
-        case LostCityRumour.TREASURE_TRAIN:
+        case LostCityRumour.TREASURE:
             int treasure = getPseudoRandom().nextInt(dx * 600) + dx * 300;
             random = getPseudoRandom().nextInt(treasureUnitTypes.size());
             newUnit = new Unit(getGame(), tile, player, treasureUnitTypes.get(random), Unit.ACTIVE);
