@@ -338,6 +338,7 @@ public class ColonyTile extends FreeColGameObject implements WorkLocation, Ownab
             return;
         }
 
+        getUnit().setMovesLeft(0);
         getWorkTile().setOwner(null);
         setUnit(null);
         getColony().updatePopulation();

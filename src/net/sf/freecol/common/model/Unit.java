@@ -1933,7 +1933,6 @@ public class Unit extends FreeColGameObject implements Abilities, Locatable, Loc
         }
 
         setLocation(getTile());
-        setMovesLeft(0);
     }
 
     /**

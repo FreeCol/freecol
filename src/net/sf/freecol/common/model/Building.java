@@ -524,6 +524,7 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
         int index = units.indexOf(locatable);
 
         if (index != -1) {
+            ((Unit) locatable).setMovesLeft(0);
             units.remove(index);
             getColony().updatePopulation();
         }
