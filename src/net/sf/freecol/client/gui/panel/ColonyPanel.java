@@ -1048,6 +1048,9 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener {
             public void updateProductionLabel() {
                 productionLabel.setProduction(building.getProductionNextTurn());
                 productionLabel.setMaximumProduction(building.getMaximumProduction());
+                if (building.getType() == Building.SCHOOLHOUSE) {
+                    initialize();
+                }
             }
 
             /**
@@ -1093,8 +1096,8 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener {
                 colonyPanel.updateSoLLabel();
 
                 updateProductionLabel();
-                if (oldParent.getParent() instanceof ASingleBuildingPanel) {
-                    ((ASingleBuildingPanel) oldParent.getParent()).updateProductionLabel();
+                if (oldParent instanceof ASingleBuildingPanel) {
+                    ((ASingleBuildingPanel) oldParent).updateProductionLabel();
                 } else if (oldParent instanceof TilePanel.ASingleTilePanel) {
                     updateBuildingsPanel();
                 }
@@ -1742,8 +1745,8 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener {
                 updateCargoLabel();
                 Component c = add(comp);
                 refresh();
-                if (oldParent != null && oldParent.getParent() instanceof BuildingsPanel.ASingleBuildingPanel) {
-                    ((BuildingsPanel.ASingleBuildingPanel) oldParent.getParent()).updateProductionLabel();
+                if (oldParent != null && oldParent instanceof BuildingsPanel.ASingleBuildingPanel) {
+                    ((BuildingsPanel.ASingleBuildingPanel) oldParent).updateProductionLabel();
                 }
                 return c;
             }
