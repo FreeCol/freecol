@@ -936,6 +936,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         // dx is now in range 1-6
         int max = 7; // maximum dx + 1
         
+        Specification specification = FreeCol.getSpecification();
         List<UnitType> learntUnitTypes = unit.getUnitType().getUnitTypesLearntInLostCity();
         List<UnitType> newUnitTypes = specification.getUnitTypesWithAbility("model.ability.foundInLostCity");
         List<UnitType> treasureUnitTypes = specification.getUnitTypesWithAbility("model.ability.carryTreasure");
@@ -1143,9 +1144,12 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         }
         IndianSettlement settlement = (IndianSettlement) map.getNeighbourOrNull(direction, unit.getTile())
                 .getSettlement();
-        if (settlement.getLearnableSkill() != IndianSettlement.UNKNOWN) {
-            unit.setMovesLeft(0);
-            if (settlement.getLearnableSkill() != IndianSettlement.NONE) {
+        
+        unit.setMovesLeft(0);
+        Element reply = Message.createNewRootElement("provideSkill");
+        if (settlement.getLearnableSkill() != null) {
+            reply.setAttribute("skill", settlement.getLearnableSkill().getId());
+            if (unit.getUnitType().canLearnFromNatives(settlement.getLearnableSkill())) {
                 // We now put the unit on the indian settlement.
                 // Normally we shouldn't have to this, but the
                 // movesLeft are set to 0 for unit and if the player
@@ -1154,14 +1158,10 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
                 // able to check if the unit can learn the skill.
                 unit.setLocation(settlement);
             }
-            Element reply = Message.createNewRootElement("provideSkill");
-            reply.setAttribute("skill", Integer.toString(settlement.getLearnableSkill()));
-            // Set the Tile.PlayerExploredTile attribute.
-            settlement.getTile().updateIndianSettlementSkill(player);
-            return reply;
-        } else {
-            throw new IllegalStateException("Learnable skill from Indian settlement is unknown at server.");
         }
+        // Set the Tile.PlayerExploredTile attribute.
+        settlement.getTile().updateIndianSettlementSkill(player);
+        return reply;
     }
 
     /**
@@ -1491,6 +1491,10 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         // The unit was relocated to the indian settlement. See askSkill for
         // more info.
         IndianSettlement settlement = (IndianSettlement) unit.getLocation();
+        if (!unit.getUnitType().canLearnFromNatives(settlement.getLearnableSkill())) {
+            throw new IllegalStateException("Unit can't learn that skill from settlement!");
+        }
+        
         Tile tile = map.getNeighbourOrNull(Map.getReverseDirection(direction), unit.getTile());
         unit.setLocation(tile);
         if (!cancelAction) {
@@ -1505,7 +1509,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
             default:
                 unit.setType(settlement.getLearnableSkill());
                 if (!settlement.isCapital())
-                    settlement.setLearnableSkill(IndianSettlement.NONE);
+                    settlement.setLearnableSkill(null);
                 // Set the Tile.PlayerExploredTile attribute.
                 settlement.getTile().updateIndianSettlementSkill(player);
                 reply.setAttribute("result", "success");
@@ -1546,7 +1550,10 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         Element reply = Message.createNewRootElement("scoutIndianSettlementResult");
         if (action.equals("basic")) {
             // Just return the skill and wanted goods.
-            reply.setAttribute("skill", Integer.toString(settlement.getLearnableSkill()));
+            UnitType skill = settlement.getLearnableSkill();
+            if (skill != null) {
+                reply.setAttribute("skill", skill.getId());
+            }
             settlement.updateWantedGoods();
             GoodsType[] wantedGoods = settlement.getWantedGoods();
             reply.setAttribute("highlyWantedGoods", Integer.toString(wantedGoods[0].getIndex()));
@@ -1835,6 +1842,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         ServerPlayer player = getFreeColServer().getPlayer(connection);
         Unit carrier = (Unit) getGame().getFreeColGameObject(buyGoodsElement.getAttribute("carrier"));
         int type = Integer.parseInt(buyGoodsElement.getAttribute("type"));
+        GoodsType goodsType = FreeCol.getSpecification().getGoodsType(type);
         int amount = Integer.parseInt(buyGoodsElement.getAttribute("amount"));
         if (carrier.getOwner() != player) {
             throw new IllegalStateException("Not your unit!");
@@ -1842,7 +1850,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         if (carrier.getOwner() != player) {
             throw new IllegalStateException();
         }
-        carrier.buyGoods(type, amount);
+        carrier.buyGoods(goodsType, amount);
         return null;
     }
 
@@ -2103,7 +2111,8 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
     private Element changeWorkType(Connection connection, Element workElement) {
         ServerPlayer player = getFreeColServer().getPlayer(connection);
         Unit unit = (Unit) getGame().getFreeColGameObject(workElement.getAttribute("unit"));
-        int workType = Integer.parseInt(workElement.getAttribute("workType"));
+        int workTypeIndex = Integer.parseInt(workElement.getAttribute("workType"));
+        GoodsType workType = FreeCol.getSpecification().getGoodsType(workTypeIndex);
         if (unit.getOwner() != player) {
             throw new IllegalStateException("Not your unit!");
         }

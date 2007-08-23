@@ -26,6 +26,7 @@ import net.sf.freecol.client.gui.panel.EventPanel;
 import net.sf.freecol.client.gui.panel.FreeColDialog;
 import net.sf.freecol.client.gui.sound.SfxLibrary;
 import net.sf.freecol.client.networking.Client;
+import net.sf.freecol.common.Specification;
 import net.sf.freecol.common.model.Building;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.ColonyTile;
@@ -824,14 +825,14 @@ public final class InGameController implements NetworkConstants {
         }
 
         // load cargo that should be on board
-        for (Integer goodsType : goodsTypesToLoad) {
+        for (GoodsType goodsType : goodsTypesToLoad) {
             // respect the lower limit for TradeRoute
-            int amountPresent = warehouse.getGoodsCount(goodsType.intValue()) - exportLevel[goodsType.intValue()];
+            int amountPresent = warehouse.getGoodsCount(goodsType) - exportLevel[goodsType];
             if (amountPresent > 0) {
                 if (unit.getSpaceLeft() > 0) {
-                    logger.finest("Automatically loading goods " + Goods.getName(goodsType.intValue()));
-                    loadCargo(new Goods(freeColClient.getGame(), location, goodsType.intValue(), Math.min(
-                            amountPresent, 100)), unit);
+                    logger.finest("Automatically loading goods " + Goods.getName(goodsType));
+                    loadCargo(new Goods(freeColClient.getGame(), location, goodsType,
+                            Math.min(amountPresent, 100)), unit);
                 }
             }
         }
@@ -865,12 +866,12 @@ public final class InGameController implements NetworkConstants {
 
         // unload cargo that should not be on board and complete loaded goods
         // with less than 100 units
-        ArrayList<Integer> goodsTypesToLoad = stop.getCargo();
+        ArrayList<GoodsType> goodsTypesToLoad = stop.getCargo();
         Iterator<Goods> goodsIterator = unit.getGoodsIterator();
         test: while (goodsIterator.hasNext()) {
             Goods goods = goodsIterator.next();
             for (int index = 0; index < goodsTypesToLoad.size(); index++) {
-                int goodsType = goodsTypesToLoad.get(index).intValue();
+                GoodsType goodsType = goodsTypesToLoad.get(index);
                 if (goods.getType() == goodsType) {
                     if (goods.getAmount() < 100) {
                         logger.finest("Automatically loading goods " + goods.getName());
@@ -888,10 +889,10 @@ public final class InGameController implements NetworkConstants {
         }
 
         // load cargo that should be on board
-        for (Integer goodsType : goodsTypesToLoad) {
+        for (GoodsType goodsType : goodsTypesToLoad) {
             if (unit.getSpaceLeft() > 0) {
-                logger.finest("Automatically loading goods " + Goods.getName(goodsType.intValue()));
-                buyGoods(goodsType.intValue(), 100, unit);
+                logger.finest("Automatically loading goods " + Goods.getName(goodsType));
+                buyGoods(goodsType, 100, unit);
             }
         }
 
@@ -2000,7 +2001,7 @@ public final class InGameController implements NetworkConstants {
      * @param amount The amount of goods to buy.
      * @param carrier The carrier.
      */
-    public void buyGoods(int type, int amount, Unit carrier) {
+    public void buyGoods(GoodsType type, int amount, Unit carrier) {
         if (freeColClient.getGame().getCurrentPlayer() != freeColClient.getMyPlayer()) {
             freeColClient.getCanvas().showInformationMessage("notYourTurn");
             return;
@@ -2032,7 +2033,7 @@ public final class InGameController implements NetworkConstants {
 
         Element buyGoodsElement = Message.createNewRootElement("buyGoods");
         buyGoodsElement.setAttribute("carrier", carrier.getID());
-        buyGoodsElement.setAttribute("type", Integer.toString(type));
+        buyGoodsElement.setAttribute("type", Integer.toString(type.getIndex()));
         buyGoodsElement.setAttribute("amount", Integer.toString(amount));
 
         carrier.buyGoods(type, amount);
@@ -2233,7 +2234,7 @@ public final class InGameController implements NetworkConstants {
      * @param unit The <code>Unit</code>
      * @param workType The new work type.
      */
-    public void changeWorkType(Unit unit, int workType) {
+    public void changeWorkType(Unit unit, GoodsType workType) {
         if (freeColClient.getGame().getCurrentPlayer() != freeColClient.getMyPlayer()) {
             freeColClient.getCanvas().showInformationMessage("notYourTurn");
             return;
@@ -2243,7 +2244,7 @@ public final class InGameController implements NetworkConstants {
 
         Element changeWorkTypeElement = Message.createNewRootElement("changeWorkType");
         changeWorkTypeElement.setAttribute("unit", unit.getID());
-        changeWorkTypeElement.setAttribute("workType", Integer.toString(workType));
+        changeWorkTypeElement.setAttribute("workType", Integer.toString(workType.getIndex()));
 
         unit.setWorkType(workType);
 
@@ -2485,7 +2486,8 @@ public final class InGameController implements NetworkConstants {
         IndianSettlement settlement = (IndianSettlement) map.getNeighbourOrNull(direction, unit.getTile())
                 .getSettlement();
 
-        if (settlement.getLearnableSkill() != IndianSettlement.NONE) {
+        if (settlement.getLearnableSkill() != null || !settlement.hasBeenVisited()) {
+            unit.setMovesLeft(0);
             String skillName;
 
             Element askSkill = Message.createNewRootElement("askSkill");
@@ -2493,11 +2495,11 @@ public final class InGameController implements NetworkConstants {
             askSkill.setAttribute("direction", Integer.toString(direction));
 
             Element reply = client.ask(askSkill);
-            int skill;
+            UnitType skill;
 
             if (reply.getTagName().equals("provideSkill")) {
-                skill = Integer.parseInt(reply.getAttribute("skill"));
-                if (skill < 0) {
+                skill = FreeCol.getSpecification().getUnitType(reply.getAttribute("skill"));
+                if (skill != null) {
                     skillName = null;
                 } else {
                     skillName = Unit.getName(skill);
@@ -2508,6 +2510,7 @@ public final class InGameController implements NetworkConstants {
             }
 
             settlement.setLearnableSkill(skill);
+            settlement.setVisited();
 
             if (skillName == null) {
                 canvas.errorMessage("indianSettlement.noMoreSkill");
@@ -2515,8 +2518,6 @@ public final class InGameController implements NetworkConstants {
                 canvas.showInformationMessage("indianSettlement.cantLearnSkill",
                         new String[][] { {"%unit%", unit.getName()}, {"%skill%", skillName} });
             } else {
-                unit.setMovesLeft(0);
-                
                 Element learnSkill = Message.createNewRootElement("learnSkillAtSettlement");
                 learnSkill.setAttribute("unit", unit.getID());
                 learnSkill.setAttribute("direction", Integer.toString(direction));
@@ -2537,7 +2538,7 @@ public final class InGameController implements NetworkConstants {
                 } else if (result.equals("success")) {
                     unit.setType(skill);
                     if (!settlement.isCapital())
-                        settlement.setLearnableSkill(IndianSettlement.NONE);
+                        settlement.setLearnableSkill(null);
                 } else if (result.equals("cancelled")) {
                     // do nothing
                 } else {
@@ -2621,10 +2622,12 @@ public final class InGameController implements NetworkConstants {
         Element reply = client.ask(scoutMessage);
 
         if (reply.getTagName().equals("scoutIndianSettlementResult")) {
-            settlement.setLearnableSkill(Integer.parseInt(reply.getAttribute("skill")));
+            Specification spec = FreeCol.getSpecification();
+            settlement.setLearnableSkill(spec.getUnitType(reply.getAttribute("skill")));
             settlement.setWantedGoods(0, Integer.parseInt(reply.getAttribute("highlyWantedGoods")));
             settlement.setWantedGoods(1, Integer.parseInt(reply.getAttribute("wantedGoods1")));
             settlement.setWantedGoods(2, Integer.parseInt(reply.getAttribute("wantedGoods2")));
+            settlement.setVisited();
         } else {
             logger.warning("Server gave an invalid reply to an askSkill message");
             return;
@@ -3117,7 +3120,7 @@ public final class InGameController implements NetworkConstants {
      * @param goods The goods for which to pay arrears.
      */
     public void payArrears(Goods goods) {
-        payArrears(goods.getType());
+        payArrears(goods.getType().getIndex());
     }
 
     /**

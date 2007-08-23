@@ -1268,14 +1268,17 @@ public class Unit extends FreeColGameObject implements Abilities, Locatable, Loc
                         return ILLEGAL_MOVE;
                     }
                 } else if (settlement instanceof IndianSettlement) {
+                    IndianSettlement indian = (IndianSettlement) settlement;
                     if (isScout()) {
                         return ENTER_INDIAN_VILLAGE_WITH_SCOUT;
                     } else if (isMissionary()) {
                         return ENTER_INDIAN_VILLAGE_WITH_MISSIONARY;
                     } else if (isOffensiveUnit()) {
                         return ATTACK;
-                    } else {
+                    } else if (indian.getLearnableSkill() != null || !indian.hasBeenVisited()) {
                         return ENTER_INDIAN_VILLAGE_WITH_FREE_COLONIST;
+                    } else {
+                        return ILLEGAL_MOVE;
                     }
                 } else if (settlement instanceof Colony) {
                     if (isScout()) {
@@ -1810,6 +1813,9 @@ public class Unit extends FreeColGameObject implements Abilities, Locatable, Loc
      * @param newLocation The new Location of the Unit.
      */
     public void setLocation(Location newLocation) {
+        if (location != newLocation) {
+            experience = 0;
+        }
         
         Colony oldColony = this.getColony();
         
@@ -4120,27 +4126,31 @@ public class Unit extends FreeColGameObject implements Abilities, Locatable, Loc
 
         enemy.modifyTension(getOwner(), Tension.TENSION_ADD_MAJOR);
 
-        int randomTreasure = modelController.getRandom(getID() + "indianTreasureRandom" + getID(), 11);
-        Unit tTrain = modelController.createUnit(getID() + "indianTreasure" + getID(), newTile, getOwner(),
-                Unit.TREASURE_TRAIN);
+        List<UnitType> treasureUnitTypes = FreeCol.getSpecification().getUnitTypesWithAbility("model.ability.carryTreasure");
+        if (treasureUnitTypes.size() > 0) {
+            int randomTreasure = modelController.getRandom(getID() + "indianTreasureRandom" + getID(), 11);
+            int random = modelController.getRandom(getID() + "newUnitForTreasure" + getID(), treasureUnitTypes.size());
+            Unit tTrain = modelController.createUnit(getID() + "indianTreasure" + getID(), newTile, getOwner(),
+                    treasureUnitTypes.get(random));
 
-        // Larger treasure if Hernan Cortes is present in the congress:
-        int bonus = (getOwner().hasFather(FoundingFather.HERNAN_CORTES)) ? 2 : 1;
+            // Larger treasure if Hernan Cortes is present in the congress:
+            int bonus = (getOwner().hasFather(FoundingFather.HERNAN_CORTES)) ? 2 : 1;
 
-        // Incan and Aztecs give more gold
-        if (enemy.getNation() == Player.INCA || enemy.getNation() == Player.AZTEC) {
-            tTrain.setTreasureAmount(randomTreasure * 500 * bonus + 10000);
-        } else {
-            tTrain.setTreasureAmount(randomTreasure * 50 * bonus + 300);
+            // Incan and Aztecs give more gold
+            if (enemy.getNation() == Player.INCA || enemy.getNation() == Player.AZTEC) {
+                tTrain.setTreasureAmount(randomTreasure * 500 * bonus + 10000);
+            } else {
+                tTrain.setTreasureAmount(randomTreasure * 50 * bonus + 300);
+            }
+
+            // capitals give more gold
+            if (wasCapital) {
+                tTrain.setTreasureAmount((tTrain.getTreasureAmount() * 3) / 2);
+            }
+
+            addModelMessage(this, "model.unit.indianTreasure", new String[][] { { "%indian%", enemy.getNationAsString() },
+                    { "%amount%", Integer.toString(tTrain.getTreasureAmount()) } }, ModelMessage.DEFAULT);
         }
-
-        // capitals give more gold
-        if (wasCapital) {
-            tTrain.setTreasureAmount((tTrain.getTreasureAmount() * 3) / 2);
-        }
-
-        addModelMessage(this, "model.unit.indianTreasure", new String[][] { { "%indian%", enemy.getNationAsString() },
-                { "%amount%", Integer.toString(tTrain.getTreasureAmount()) } }, ModelMessage.DEFAULT);
         setLocation(newTile);
     }
 
@@ -4367,14 +4377,19 @@ public class Unit extends FreeColGameObject implements Abilities, Locatable, Loc
      * Checks if a colonist can get promoted by experience.
      */
     private void checkExperiencePromotion() {
-        UnitType learnType = FreeCol.getSpecification().getExpertForProducing(workType);
-        if (unitType.canLearnFromExperience(learnType)) {
+        GoodsType goodsType = getWorkType();
+        if (goodsType == null) {
+            return;
+        }
+        
+        UnitType learnType = FreeCol.getSpecification().getExpertForProducing(goodsType);
+        if (learnType != null && unitType.canLearnFromExperience(learnType)) {
             logger.finest("About to call getRandom for experience");
             int random = getGame().getModelController().getRandom(getID() + "experience", 5000);
             if (random < Math.min(experience, 200)) {
                 logger.finest("About to change type of unit due to experience.");
                 String oldName = getName();
-                setType();
+                setType(learnType);
                 addModelMessage(getColony(), "model.unit.experience",
                                 new String[][] {
                                     { "%oldName%", oldName },

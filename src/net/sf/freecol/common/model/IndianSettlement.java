@@ -86,15 +86,19 @@ public class IndianSettlement extends Settlement {
 
     /**
     * This is the skill that can be learned by Europeans at this settlement.
-    * At the server side its value will always be NONE or any of the skills above.
-    * At the client side the value UNKNOWN is also possible in case the player hasn't
+    * At the server side its value will be null when the skill has already been 
+    * taught to a European.
+    * At the client side the value null is also possible in case the player hasn't
     * checked out the settlement yet.
-    * The value NONE is used when the skill has already been taught to a European.
     */
-    private int learnableSkill = UNKNOWN;
+    private UnitType learnableSkill = null;
 
     private GoodsType[] wantedGoods = new GoodsType[] {null, null, null};
 
+    /**
+    * At the client side isVisited is true in case the player has visited
+    * the settlement.
+    */
     private boolean isCapital,
                     isVisited; /* true if a European player has asked to speak with the chief. */
 
@@ -149,7 +153,7 @@ public class IndianSettlement extends Settlement {
      * @exception IllegalArgumentException if an invalid tribe or kind is given
      */
     public IndianSettlement(Game game, Player player, Tile tile, int tribe, int kind,
-            boolean isCapital, int learnableSkill, boolean isVisited, Unit missionary) {
+            boolean isCapital, UnitType learnableSkill, boolean isVisited, Unit missionary) {
         super(game, player, tile);
 
         if (tile == null) {
@@ -210,7 +214,7 @@ public class IndianSettlement extends Settlement {
         super(game, in);
 
         // The client doesn't know a lot at first.
-        this.learnableSkill = UNKNOWN;
+        this.learnableSkill = null;
         this.wantedGoods[0] = null;
         this.wantedGoods[1] = null;
         this.wantedGoods[2] = null;
@@ -232,7 +236,7 @@ public class IndianSettlement extends Settlement {
         super(game, e);
 
         // The client doesn't know a lot at first.
-        this.learnableSkill = UNKNOWN;
+        this.learnableSkill = null;
         this.wantedGoods[0] = null;
         this.wantedGoods[1] = null;
         this.wantedGoods[2] = null;
@@ -257,7 +261,7 @@ public class IndianSettlement extends Settlement {
         super(game, id);
         
         // The client doesn't know a lot at first.
-        this.learnableSkill = UNKNOWN;
+        this.learnableSkill = null;
         this.wantedGoods[0] = null;
         this.wantedGoods[1] = null;
         this.wantedGoods[2] = null;
@@ -463,7 +467,7 @@ public class IndianSettlement extends Settlement {
     * Returns the skill that can be learned at this settlement.
     * @return The skill that can be learned at this settlement.
     */
-    public int getLearnableSkill() {
+    public UnitType getLearnableSkill() {
         return learnableSkill;
     }
 
@@ -547,7 +551,7 @@ public class IndianSettlement extends Settlement {
     * Sets the learnable skill for this Indian settlement.
     * @param skill The new learnable skill for this Indian settlement.
     */
-    public void setLearnableSkill(int skill) {
+    public void setLearnableSkill(UnitType skill) {
         learnableSkill = skill;
     }
 
@@ -1279,11 +1283,12 @@ public class IndianSettlement extends Settlement {
 
             out.writeAttribute("hasBeenVisited", Boolean.toString(isVisited));
             out.writeAttribute("convertProgress", Integer.toString(convertProgress));
-            out.writeAttribute("learnableSkill", Integer.toString(learnableSkill));
-//            toArrayElement("wantedGoods", wantedGoods, out);
+            if (learnableSkill != null) {
+                out.writeAttribute("learnableSkill", learnableSkill.getId());
+            }
             for (int i = 0; i < wantedGoods.length; i++) {
                 String tag = "wantedGoods" + Integer.toString(i);
-                out.writeAttribute(tag, wantedGoods[i].getIndex());
+                out.writeAttribute(tag, wantedGoods[i].getName());
             }
 
         }
@@ -1355,22 +1360,16 @@ public class IndianSettlement extends Settlement {
             }
         }
 
-        // TODO: remove these as soon as there are no more old savegames floating around
-/*
-        wantedGoods[0] = getAttribute(in, "highlyWantedGoods", null);
-        wantedGoods[1] = getAttribute(in, "wantedGoods1", null);
-        wantedGoods[2] = getAttribute(in, "wantedGoods2", null);
-*/
         for (int i = 0; i < wantedGoods.length; i++) {
             String tag = "wantedGoods" + Integer.toString(i);
-            wantedGoods[i] = FreeCol.getSpecification().getGoodsType(Integer.parseInt(getAttribute(in, tag, null)));
+            wantedGoods[i] = FreeCol.getSpecification().getGoodsType(getAttribute(in, tag, null));
         }
 
         isVisited = getAttribute(in, "hasBeenVisisted", false);
         convertProgress = getAttribute(in, "convertProgress", UNKNOWN);
         lastTribute = getAttribute(in, "lastTribute", 0);
-        learnableSkill = getAttribute(in, "learnableSkill", UNKNOWN);
-
+        String learnableSkillId = getAttribute(in, "learnableSkill", null);
+        learnableSkill = FreeCol.getSpecification().getUnitType(learnableSkillId);
 
         alarm = new Tension[Player.NUMBER_OF_NATIONS];
         while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {

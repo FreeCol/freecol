@@ -11,6 +11,7 @@ import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.gui.i18n.Messages;
+import net.sf.freecol.common.Specification;
 import net.sf.freecol.common.model.Map.CircleIterator;
 import net.sf.freecol.common.model.Map.Position;
 import net.sf.freecol.server.generator.River;
@@ -68,6 +69,7 @@ public final class Tile extends FreeColGameObject implements Location, Nameable 
     */
     private TileType type;
     
+    private boolean lostCityRumour;
     //    private boolean road, plowed, forested, bonus, lostCityRumour;
 
     //    private int type;
@@ -1767,119 +1769,124 @@ break;
                     out.writeAttribute(names[i], Boolean.toString(values[i]));
                 }
             }
-
-            if (nationOwner != Player.NO_NATION) {
-                if (getGame().isClientTrusted() || showAll || player.canSee(this)) {
-                    out.writeAttribute("nationOwner", Integer.toString(nationOwner));
-                } else if (pet != null) {
-                    out.writeAttribute("nationOwner", Integer.toString(pet.getNationOwner()));
-                }
-            }
-
-            if ((getGame().isClientTrusted() || showAll || player.canSee(this)) && (owner != null)) {
-                out.writeAttribute("owner", owner.getID());
-            }
-
-            // if ((settlement != null) && (showAll || player.canSee(this))) {
-            if (settlement != null) {
-                if (pet == null || getGame().isClientTrusted() || showAll || settlement.getOwner() == player) {
-                    settlement.toXML(out, player, showAll, toSavedGame);
-                } else {
-                    if (getColony() != null) {
-                        if (!player.canSee(getTile())) {
-                            if (pet.getColonyUnitCount() != 0) {
-                                out.writeStartElement(Colony.getXMLElementTagName());
-                                out.writeAttribute("ID", getColony().getID());
-                                out.writeAttribute("name", getColony().getName());
-                                out.writeAttribute("owner", getColony().getOwner().getID());
-                                out.writeAttribute("tile", getID());
-                                out.writeAttribute("unitCount", Integer.toString(pet.getColonyUnitCount()));
-
-                                Building b = getColony().getBuilding(Building.STOCKADE);
-                                out.writeStartElement(Building.getXMLElementTagName());
-                                out.writeAttribute("ID", b.getID());
-                                out.writeAttribute("level", Integer.toString(pet.getColonyStockadeLevel()));
-                                out.writeAttribute("colony", getColony().getID());
-                                out.writeAttribute("type", Integer.toString(Building.STOCKADE));
-                                out.writeEndElement();
-
-                                GoodsContainer emptyGoodsContainer = new GoodsContainer(getGame(), getColony());
-                                emptyGoodsContainer.setFakeID(getColony().getGoodsContainer().getID());
-                                emptyGoodsContainer.toXML(out, player, showAll, toSavedGame);
-
-                                out.writeEndElement();
-                            } // Else: Colony not discovered.
-                        } else {
-                            settlement.toXML(out, player, showAll, toSavedGame);
-                        }
-                    } else if (getSettlement() instanceof IndianSettlement) {
-                        final IndianSettlement is = (IndianSettlement) getSettlement();
-
-                        out.writeStartElement(IndianSettlement.getXMLElementTagName());
-                        out.writeAttribute("ID", getSettlement().getID());
-                        out.writeAttribute("tile", getID());
-                        out.writeAttribute("owner", getSettlement().getOwner().getID());
-                        out.writeAttribute("tribe", Integer.toString(is.getTribe()));
-                        out.writeAttribute("kind", Integer.toString(is.getKind()));
-                        out.writeAttribute("isCapital", Boolean.toString(is.isCapital()));
-                        out.writeAttribute("learnableSkill", Integer.toString(pet.getSkill()));
-                        out.writeAttribute("highlyWantedGoods", Integer.toString(pet.getHighlyWantedGoods()));
-                        out.writeAttribute("wantedGoods1", Integer.toString(pet.getWantedGoods1()));
-                        out.writeAttribute("wantedGoods2", Integer.toString(pet.getWantedGoods2()));
-
-                        int[] tensionArray = new int[Player.NUMBER_OF_NATIONS];
-                        for (int i = 0; i < tensionArray.length; i++) {
-                            tensionArray[i] = is.getAlarm(i).getValue();
-                        }
-                        toArrayElement("alarm", tensionArray, out);
-
-                        if (pet.getMissionary() != null) {
-                            out.writeStartElement("missionary");
-                            pet.getMissionary().toXML(out, player, false, false);
-                            out.writeEndElement();
-                        }
-
-                        UnitContainer emptyUnitContainer = new UnitContainer(getGame(), getSettlement());
-                        emptyUnitContainer.setFakeID(is.getUnitContainer().getID());
-                        emptyUnitContainer.toXML(out, player, showAll, toSavedGame);
-
-                        GoodsContainer emptyGoodsContainer = new GoodsContainer(getGame(), is);
-                        emptyGoodsContainer.setFakeID(is.getGoodsContainer().getID());
-                        emptyGoodsContainer.toXML(out, player, showAll, toSavedGame);
-
-                        out.writeEndElement();
-                    } else {
-                        logger.warning("Unknown type of settlement: " + getSettlement());
-                    }
-                }
-            }
-
-            // Check if the player can see the tile:
-            // Do not show enemy units or any tileitems on a tile out-of-sight.
-            if (getGame().isClientTrusted() || showAll
-                || (player.canSee(this) && (settlement == null || settlement.getOwner() == player))
-                || !getGameOptions().getBoolean(GameOptions.UNIT_HIDING) && player.canSee(this)) {
-                unitContainer.toXML(out, player, showAll, toSavedGame);
-                tileItemContainer.toXML(out, player, showAll, toSavedGame);
-            } else {
-                UnitContainer emptyUnitContainer = new UnitContainer(getGame(), this);
-                emptyUnitContainer.setFakeID(unitContainer.getID());
-                emptyUnitContainer.toXML(out, player, showAll, toSavedGame);
-                TileItemContainer emptyTileItemContainer = new TileItemContainer(getGame(), this);
-                emptyTileItemContainer.setFakeID(tileItemContainer.getID());
-                emptyTileItemContainer.toXML(out, player, showAll, toSavedGame);
-            }
-
-            if (toSavedGame) {
-                for (int i = 0; i < playerExploredTiles.length; i++) {
-                    if (playerExploredTiles[i] != null && playerExploredTiles[i].isExplored()) {
-                        playerExploredTiles[i].toXML(out, player, showAll, toSavedGame);
-                    }
-                }
-            }
-
-            out.writeEndElement();
         }
+
+        if (nationOwner != Player.NO_NATION) {
+            if (getGame().isClientTrusted() || showAll || player.canSee(this)) {
+                out.writeAttribute("nationOwner", Integer.toString(nationOwner));
+            } else if (pet != null) {
+                out.writeAttribute("nationOwner", Integer.toString(pet.getNationOwner()));
+            }
+        }
+
+        if ((getGame().isClientTrusted() || showAll || player.canSee(this)) && (owner != null)) {
+            out.writeAttribute("owner", owner.getID());
+        }
+
+        // if ((settlement != null) && (showAll || player.canSee(this))) {
+        if (settlement != null) {
+            if (pet == null || getGame().isClientTrusted() || showAll || settlement.getOwner() == player) {
+                settlement.toXML(out, player, showAll, toSavedGame);
+            } else {
+                if (getColony() != null) {
+                    if (!player.canSee(getTile())) {
+                        if (pet.getColonyUnitCount() != 0) {
+                            out.writeStartElement(Colony.getXMLElementTagName());
+                            out.writeAttribute("ID", getColony().getID());
+                            out.writeAttribute("name", getColony().getName());
+                            out.writeAttribute("owner", getColony().getOwner().getID());
+                            out.writeAttribute("tile", getID());
+                            out.writeAttribute("unitCount", Integer.toString(pet.getColonyUnitCount()));
+
+                            Building b = getColony().getBuilding(Building.STOCKADE);
+                            out.writeStartElement(Building.getXMLElementTagName());
+                            out.writeAttribute("ID", b.getID());
+                            out.writeAttribute("level", Integer.toString(pet.getColonyStockadeLevel()));
+                            out.writeAttribute("colony", getColony().getID());
+                            out.writeAttribute("type", Integer.toString(Building.STOCKADE));
+                            out.writeEndElement();
+
+                            GoodsContainer emptyGoodsContainer = new GoodsContainer(getGame(), getColony());
+                            emptyGoodsContainer.setFakeID(getColony().getGoodsContainer().getID());
+                            emptyGoodsContainer.toXML(out, player, showAll, toSavedGame);
+
+                            out.writeEndElement();
+                        } // Else: Colony not discovered.
+                    } else {
+                        settlement.toXML(out, player, showAll, toSavedGame);
+                    }
+                } else if (getSettlement() instanceof IndianSettlement) {
+                    final IndianSettlement is = (IndianSettlement) getSettlement();
+
+                    out.writeStartElement(IndianSettlement.getXMLElementTagName());
+                    out.writeAttribute("ID", getSettlement().getID());
+                    out.writeAttribute("tile", getID());
+                    out.writeAttribute("owner", getSettlement().getOwner().getID());
+                    out.writeAttribute("tribe", Integer.toString(is.getTribe()));
+                    out.writeAttribute("kind", Integer.toString(is.getKind()));
+                    out.writeAttribute("isCapital", Boolean.toString(is.isCapital()));
+                    if (pet.getSkill() != null) {
+                        out.writeAttribute("learnableSkill", pet.getSkill().getId());
+                    }
+                    if (pet.getHighlyWantedGoods() != null) {
+                        out.writeAttribute("highlyWantedGoods", pet.getHighlyWantedGoods().getName());
+                        out.writeAttribute("wantedGoods1", pet.getWantedGoods1().getName());
+                        out.writeAttribute("wantedGoods2", pet.getWantedGoods2().getName());
+                    }
+                    out.writeAttribute("hasBeenVisited", Boolean.toString(pet.hasBeenVisited()));
+
+                    int[] tensionArray = new int[Player.NUMBER_OF_NATIONS];
+                    for (int i = 0; i < tensionArray.length; i++) {
+                        tensionArray[i] = is.getAlarm(i).getValue();
+                    }
+                    toArrayElement("alarm", tensionArray, out);
+
+                    if (pet.getMissionary() != null) {
+                        out.writeStartElement("missionary");
+                        pet.getMissionary().toXML(out, player, false, false);
+                        out.writeEndElement();
+                    }
+
+                    UnitContainer emptyUnitContainer = new UnitContainer(getGame(), getSettlement());
+                    emptyUnitContainer.setFakeID(is.getUnitContainer().getID());
+                    emptyUnitContainer.toXML(out, player, showAll, toSavedGame);
+
+                    GoodsContainer emptyGoodsContainer = new GoodsContainer(getGame(), is);
+                    emptyGoodsContainer.setFakeID(is.getGoodsContainer().getID());
+                    emptyGoodsContainer.toXML(out, player, showAll, toSavedGame);
+
+                    out.writeEndElement();
+                } else {
+                    logger.warning("Unknown type of settlement: " + getSettlement());
+                }
+            }
+        }
+
+        // Check if the player can see the tile:
+        // Do not show enemy units or any tileitems on a tile out-of-sight.
+        if (getGame().isClientTrusted() || showAll
+            || (player.canSee(this) && (settlement == null || settlement.getOwner() == player))
+            || !getGameOptions().getBoolean(GameOptions.UNIT_HIDING) && player.canSee(this)) {
+            unitContainer.toXML(out, player, showAll, toSavedGame);
+            tileItemContainer.toXML(out, player, showAll, toSavedGame);
+        } else {
+            UnitContainer emptyUnitContainer = new UnitContainer(getGame(), this);
+            emptyUnitContainer.setFakeID(unitContainer.getID());
+            emptyUnitContainer.toXML(out, player, showAll, toSavedGame);
+            TileItemContainer emptyTileItemContainer = new TileItemContainer(getGame(), this);
+            emptyTileItemContainer.setFakeID(tileItemContainer.getID());
+            emptyTileItemContainer.toXML(out, player, showAll, toSavedGame);
+        }
+
+        if (toSavedGame) {
+            for (int i = 0; i < playerExploredTiles.length; i++) {
+                if (playerExploredTiles[i] != null && playerExploredTiles[i].isExplored()) {
+                    playerExploredTiles[i].toXML(out, player, showAll, toSavedGame);
+                }
+            }
+        }
+
+        out.writeEndElement();
     }
 
     /**
@@ -2182,7 +2189,9 @@ break;
      */
     public void updateIndianSettlementSkill(Player player) {
         IndianSettlement is = (IndianSettlement) getSettlement();
-        getPlayerExploredTile(player).setSkill(is.getLearnableSkill());
+        PlayerExploredTile pet = getPlayerExploredTile(player);
+        pet.setSkill(is.getLearnableSkill());
+        pet.setVisited();
     }
 
     /**
@@ -2209,6 +2218,7 @@ break;
         playerExploredTile.setHighlyWantedGoods(is.getHighlyWantedGoods());
         playerExploredTile.setWantedGoods1(is.getWantedGoods1());
         playerExploredTile.setWantedGoods2(is.getWantedGoods2());
+        playerExploredTile.setVisited();
     }
 
 
@@ -2238,22 +2248,23 @@ break;
         private boolean explored = false;
 
         // Tile data:
-        private boolean road, plowed, forested, bonus;
+        private boolean plowed, forested, bonus;
 
         private int nationOwner;
 
         // All known TileItems
         private Resource resource;
         private List<TileImprovement> improvements;
-        //private TileImprovement road;
+        private TileImprovement road;
         private TileImprovement river;
 
         // Colony data:
         private int colonyUnitCount = 0, colonyStockadeLevel;
 
         // IndianSettlement data:
-        private int skill = IndianSettlement.UNKNOWN, highlyWantedGoods = IndianSettlement.UNKNOWN,
-            wantedGoods1 = IndianSettlement.UNKNOWN, wantedGoods2 = IndianSettlement.UNKNOWN;
+        private UnitType skill = null;
+        private GoodsType highlyWantedGoods = null, wantedGoods1 = null, wantedGoods2 = null;
+        private boolean settlementVisited = false;
 
         private Unit missionary = null;
 
@@ -2365,11 +2376,11 @@ break;
             this.explored = explored;
         }
 
-        public void setSkill(int newSkill) {
+        public void setSkill(UnitType newSkill) {
             this.skill = newSkill;
         }
 
-        public int getSkill() {
+        public UnitType getSkill() {
             return skill;
         }
 
@@ -2381,27 +2392,27 @@ break;
             return nationOwner;
         }
 
-        public void setHighlyWantedGoods(int highlyWantedGoods) {
+        public void setHighlyWantedGoods(GoodsType highlyWantedGoods) {
             this.highlyWantedGoods = highlyWantedGoods;
         }
 
-        public int getHighlyWantedGoods() {
+        public GoodsType getHighlyWantedGoods() {
             return highlyWantedGoods;
         }
 
-        public void setWantedGoods1(int wantedGoods1) {
+        public void setWantedGoods1(GoodsType wantedGoods1) {
             this.wantedGoods1 = wantedGoods1;
         }
 
-        public int getWantedGoods1() {
+        public GoodsType getWantedGoods1() {
             return wantedGoods1;
         }
 
-        public void setWantedGoods2(int wantedGoods2) {
+        public void setWantedGoods2(GoodsType wantedGoods2) {
             this.wantedGoods2 = wantedGoods2;
         }
 
-        public int getWantedGoods2() {
+        public GoodsType getWantedGoods2() {
             return wantedGoods2;
         }
 
@@ -2411,6 +2422,14 @@ break;
 
         public Unit getMissionary() {
             return missionary;
+        }
+
+        private void setVisited() {
+            settlementVisited = true;
+        }
+
+        private boolean hasBeenVisited() {
+            return settlementVisited;
         }
 
         /**
@@ -2488,13 +2507,14 @@ break;
                 out.writeAttribute("colonyUnitCount", Integer.toString(colonyUnitCount));
                 out.writeAttribute("colonyStockadeLevel", Integer.toString(colonyStockadeLevel));
             }
-            if (skill != IndianSettlement.UNKNOWN) {
-                out.writeAttribute("learnableSkill", Integer.toString(skill));
+            if (skill != null) {
+                out.writeAttribute("learnableSkill", Integer.toString(skill.getIndex()));
             }
-            if (highlyWantedGoods != IndianSettlement.UNKNOWN) {
-                out.writeAttribute("highlyWantedGoods", Integer.toString(highlyWantedGoods));
-                out.writeAttribute("wantedGoods1", Integer.toString(wantedGoods1));
-                out.writeAttribute("wantedGoods2", Integer.toString(wantedGoods2));
+            out.writeAttribute("settlementVisited", Boolean.toString(settlementVisited));
+            if (highlyWantedGoods != null) {
+                out.writeAttribute("highlyWantedGoods", Integer.toString(highlyWantedGoods.getIndex()));
+                out.writeAttribute("wantedGoods1", Integer.toString(wantedGoods1.getIndex()));
+                out.writeAttribute("wantedGoods2", Integer.toString(wantedGoods2.getIndex()));
             }
             if (missionary != null) {
                 out.writeStartElement("missionary");
@@ -2504,7 +2524,7 @@ break;
             if (hasResource()) {
                 resource.toXML(out, player, showAll, toSavedGame);
             }
-            Iterator<TileImprovement> ti = getImprovementIterator();
+            Iterator<TileImprovement> ti = getTileImprovementIterator();
             while (ti.hasNext()) {
                 TileImprovement t = ti.next();
                 t.toXML(out, player, showAll, toSavedGame);
@@ -2579,22 +2599,24 @@ break;
                 colonyUnitCount = 0;
             }
 
+            Specification spec = FreeCol.getSpecification();
             final String learnableSkillStr = in.getAttributeValue(null, "learnableSkill");
             if (learnableSkillStr != null) {
-                skill = Integer.parseInt(learnableSkillStr);
+                skill = spec.unitType(Integer.parseInt(learnableSkillStr));
             } else {
-                skill = IndianSettlement.UNKNOWN;
+                skill = null;
             }
+            settlementVisited = Boolean.valueOf(in.getAttributeValue(null, "settlementVisited")).booleanValue();
 
             final String highlyWantedGoodsStr = in.getAttributeValue(null, "highlyWantedGoods");
             if (highlyWantedGoodsStr != null) {
-                highlyWantedGoods = Integer.parseInt(highlyWantedGoodsStr);
-                wantedGoods1 = Integer.parseInt(in.getAttributeValue(null, "wantedGoods1"));
-                wantedGoods2 = Integer.parseInt(in.getAttributeValue(null, "wantedGoods2"));
+                highlyWantedGoods = spec.getGoodsType(Integer.parseInt(highlyWantedGoodsStr));
+                wantedGoods1 = spec.getGoodsType(Integer.parseInt(in.getAttributeValue(null, "wantedGoods1")));
+                wantedGoods2 = spec.getGoodsType(Integer.parseInt(in.getAttributeValue(null, "wantedGoods2")));
             } else {
-                highlyWantedGoods = IndianSettlement.UNKNOWN;
-                wantedGoods1 = IndianSettlement.UNKNOWN;
-                wantedGoods2 = IndianSettlement.UNKNOWN;
+                highlyWantedGoods = null;
+                wantedGoods1 = null;
+                wantedGoods2 = null;
             }
 
             missionary = null;
