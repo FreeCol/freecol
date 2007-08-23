@@ -1,6 +1,9 @@
 package net.sf.freecol.common;
 
 import java.io.InputStream;
+import java.sql.Array;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -336,6 +339,16 @@ public final class Specification {
             }
         }
         return null;
+    }
+    
+    public List<UnitType> getUnitTypesWithAbility(String ability) {
+        ArrayList<UnitType> unitTypes = new ArrayList<UnitType>();
+        for (UnitType unitType : getUnitTypeList()) {
+            if (unitType.hasAbility(ability)) {
+                unitTypes.add(unitType);
+            }
+        }
+        return unitTypes;
     }
 
     /**

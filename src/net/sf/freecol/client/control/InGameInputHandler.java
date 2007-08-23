@@ -934,7 +934,7 @@ public final class InGameInputHandler extends InputHandler {
         case LostCityRumour.SEASONED_SCOUT:
             m = new ModelMessage(tile, "lostCityRumour.SeasonedScout", new String[][] { { "%unit%", unit.getName() } },
                     ModelMessage.LOST_CITY_RUMOUR);
-            unit.setType(Unit.SEASONED_SCOUT);
+            unit.setType(FreeCol.getSpecification().getUnitType(element.getAttribute("unitType")));
             break;
         case LostCityRumour.TRIBAL_CHIEF:
             String amount = element.getAttribute("amount");

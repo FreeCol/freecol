@@ -493,6 +493,7 @@
                skill="0" promotion="model.unit.veteranSoldier">
       <ability id="model.ability.foundColony" value="yes"/>
       <ability id="model.ability.recruitable" value="yes"/>
+      <ability id="model.ability.foundInLostCity" value="yes"/>
       <upgrade unit="model.unit.expertFarmer" turnsToLearn="4" learnFromNatives="yes" learnFromExperience="yes"/>
       <upgrade unit="model.unit.expertFisherman" turnsToLearn="4" learnFromNatives="yes" learnFromExperience="yes"/>
       <upgrade unit="model.unit.expertFurTrapper" turnsToLearn="4" learnFromNatives="yes" learnFromExperience="yes"/>
@@ -511,7 +512,7 @@
       <upgrade unit="model.unit.masterFurTrader" turnsToLearn="6"/>
       <upgrade unit="model.unit.masterBlacksmith" turnsToLearn="6"/>
       <upgrade unit="model.unit.masterGunsmith" turnsToLearn="6"/>
-      <upgrade unit="model.unit.seasonedScout" turnsToLearn="4"/>
+      <upgrade unit="model.unit.seasonedScout" turnsToLearn="4" learnFromNatives="yes" learnFromExperience="yes"/>
       <upgrade unit="model.unit.hardyPioneer" turnsToLearn="4"/>
       <upgrade unit="model.unit.veteranSoldier" turnsToLearn="6"/>
       <upgrade unit="model.unit.jesuitMissionary" turnsToLearn="8"/>
@@ -658,6 +659,7 @@
       <upgrade unit="model.unit.masterSugarPlanter" learnFromNatives="yes"/>
       <upgrade unit="model.unit.masterCottonPlanter" learnFromNatives="yes"/>
       <upgrade unit="model.unit.masterTobaccoPlanter" learnFromNatives="yes"/>
+      <upgrade unit="model.unit.seasonedScout" learnFromNatives="yes" learnFromExperience="yes"/>
       <production-bonus goods-type="model.goods.Rum" bonus="-1" />
       <production-bonus goods-type="model.goods.Cigars" bonus="-1" />
       <production-bonus goods-type="model.goods.Cloth" bonus="-1" />
@@ -673,6 +675,7 @@
       <ability id="model.ability.foundColony" value="yes"/>
       <ability id="model.ability.recruitable" value="yes"/>
       <upgrade unit="model.unit.indenturedServant" turnsToLearn="4"/>
+      <upgrade unit="model.unit.seasonedScout" learnFromExperience="yes"/>
       <production-bonus goods-type="model.goods.Rum" bonus="-2" />
       <production-bonus goods-type="model.goods.Cigars" bonus="-2" />
       <production-bonus goods-type="model.goods.Cloth" bonus="-2" />
@@ -685,6 +688,7 @@
     </unit-type>
     <unit-type name="model.unit.indianConvert"        offence="0"  defence="1" movement="3" lineOfSight="1"               
                skill="0">
+      <ability id="model.ability.convert" value="yes"/>
       <production-bonus goods-type="model.goods.Food" bonus="1"/>
       <production-bonus goods-type="model.goods.Sugar" bonus="1"/>
       <production-bonus goods-type="model.goods.Tobacco" bonus="1"/>
