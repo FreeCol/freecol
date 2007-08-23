@@ -1833,7 +1833,17 @@ public class Unit extends FreeColGameObject implements Abilities, Locatable, Loc
             setTurnsOfTraining(0);
         }
 
-        if (!(newLocation instanceof WorkLocation)) {
+        if (newLocation instanceof WorkLocation) {
+            if (canBeStudent() && teacher == null) {
+                for (Unit teacher : getColony().getBuilding(Building.SCHOOLHOUSE).getUnitList()) {
+                    if (teacher.getStudent() == null) {
+                        teacher.setStudent(this);
+                        this.setTeacher(teacher);
+                        break;
+                    }
+                }
+            }
+        } else {
             if (teacher != null) {
                 teacher.setStudent(null);
                 teacher = null;

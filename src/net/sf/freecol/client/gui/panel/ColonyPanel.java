@@ -968,9 +968,13 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener {
 
             ProductionLabel productionLabel;
 
-            public final int[] widths = { 160, 140, 90 };
+            public final int[] widths = { 162, 46, 46, 46, 90 };
 
             public final int[] heights = { 60, 0 };
+
+            public static final int labelColumn = 1;
+            public static final int unitColumn = 2;
+            public static final int productionColumn = 5;
 
 
             /**
@@ -992,54 +996,36 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener {
 
                 removeAll();
 
-                JPanel colonistsInBuildingPanel = new JPanel();
-                colonistsInBuildingPanel.setLayout(new FlowLayout(FlowLayout.LEFT));
-                colonistsInBuildingPanel.setBackground(Color.WHITE);
-
-                JPanel studentPanel = new JPanel();
-                studentPanel.setLayout(new FlowLayout(FlowLayout.LEFT));
-                studentPanel.setBackground(Color.WHITE);
-
                 if (building.getMaxUnits() == 0) {
                     add(new JLabel("(" + building.getName() + ")"), higConst.rc(1, 1));
                 } else {
-                    add(new JLabel(building.getName()), higConst.rc(1, 1));
+                    add(new JLabel(building.getName()), higConst.rc(1, labelColumn));
                 }
 
-                Iterator<Unit> unitIterator = building.getUnitIterator();
-                while (unitIterator.hasNext()) {
-                    Unit unit = unitIterator.next();
+                List<Unit> unitList = building.getUnitList();
+                for (int index = 0; index < unitList.size(); index++) {
+                    Unit unit = unitList.get(index);
                     UnitLabel unitLabel = new UnitLabel(unit, parent, true);
                     if (colonyPanel.isEditable()) {
                         unitLabel.setTransferHandler(defaultTransferHandler);
                         unitLabel.addMouseListener(pressListener);
                     }
-                    colonistsInBuildingPanel.add(unitLabel);
+                    add(unitLabel, higConst.rc(1, unitColumn + index));
                     if (building.getType() == Building.SCHOOLHOUSE) {
                         if (unit.getStudent() != null) {
                             UnitLabel studentLabel = new UnitLabel(unit.getStudent(), parent, true);
                             studentLabel.setIgnoreLocation(true);
-                            studentPanel.add(studentLabel);
+                            add(studentLabel, higConst.rc(2, unitColumn + index));
                         }
                     }
                 }
 
-                colonistsInBuildingPanel.setOpaque(false);
-                add(colonistsInBuildingPanel, higConst.rc(1, 2));
-
-                studentPanel.setOpaque(false);
-                add(studentPanel, higConst.rc(2, 2));
-
                 productionLabel = new ProductionLabel(building.getGoodsOutputType(),
                                                       building.getProductionNextTurn(),
                                                       building.getMaximumProduction(), parent);
-                add(productionLabel, higConst.rc(1, 3));
+                add(productionLabel, higConst.rc(1, productionColumn));
 
                 setSize(getPreferredSize());
-                /*
-                setPreferredSize(new Dimension(getWidth(),
-                        (parent.getGUI().getImageLibrary().getUnitImageHeight(0) / 3) * 2 + 5));
-                */
             }
 
             public void autoscroll(Point p) {

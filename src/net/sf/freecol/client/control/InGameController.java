@@ -2278,12 +2278,21 @@ public final class InGameController implements NetworkConstants {
         if (student.getColony() != teacher.getColony()) {
             throw new IllegalStateException("Student and teacher are not in the same colony!");
         }
+        if (!(student.getLocation() instanceof WorkLocation)) {
+            throw new IllegalStateException("Student is not in a WorkLocation!");
+        }
 
         Element assignTeacherElement = Message.createNewRootElement("assignTeacher");
         assignTeacherElement.setAttribute("student", student.getID());
         assignTeacherElement.setAttribute("teacher", teacher.getID());
 
+        if (student.getTeacher() != null) {
+            student.getTeacher().setStudent(null);
+        }
         student.setTeacher(teacher);
+        if (teacher.getStudent() != null) {
+            teacher.getStudent().setTeacher(null);
+        }
         teacher.setStudent(student);
 
         freeColClient.getClient().sendAndWait(assignTeacherElement);

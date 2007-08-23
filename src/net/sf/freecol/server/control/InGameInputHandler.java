@@ -2119,8 +2119,17 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         if (student.getColony() != teacher.getColony()) {
             throw new IllegalStateException("Student and teacher are not in the same colony!");
         }
+        if (!(student.getLocation() instanceof WorkLocation)) {
+            throw new IllegalStateException("Student is not in a WorkLocation!");
+        }
         // No reason to send an update to other players: this is always hidden.
+        if (student.getTeacher() != null) {
+            student.getTeacher().setStudent(null);
+        }
         student.setTeacher(teacher);
+        if (teacher.getStudent() != null) {
+            teacher.getStudent().setTeacher(null);
+        }
         teacher.setStudent(student);
         return null;
     }
