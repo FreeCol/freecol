@@ -603,10 +603,11 @@ public class Unit extends FreeColGameObject implements Abilities, Locatable, Loc
      */
     public int getNeededTurnsOfTraining() {
         // number of turns is 4/6/8 for skill 1/2/3
-        if (student != null && student.getUnitType().getEducationUnit() != null) {
-            return student.getUnitType().getEducationTurns();
+        if (student != null) {
+            return getNeededTurnsOfTraining(getUnitType(), student.getUnitType());
+        } else {
+            throw new IllegalStateException();
         }
-        return getNeededTurnsOfTraining(getUnitType());
     }
 
     /**
@@ -617,14 +618,38 @@ public class Unit extends FreeColGameObject implements Abilities, Locatable, Loc
      *         colonist or to promote an indentured servant or a petty criminal.
      * @see #getTurnsOfTraining
      *
-     * @param unitType an <code>int</code> value
+     * @param typeTeacher the unit type of the teacher
+     * @param typeStudent the unit type of the student
      * @return an <code>int</code> value
      */
-    public static int getNeededTurnsOfTraining(UnitType unitType) {
-        // number of turns is 4/6/8 for skill 1/2/3
-        return 2 * (getSkillLevel(unitType) + 1);
+    public static int getNeededTurnsOfTraining(UnitType typeTeacher, UnitType typeStudent) {
+        UnitType teaching = getUnitTypeTeaching(typeTeacher, typeStudent);
+        if (teaching != null) {
+            return typeStudent.getEducationTurns(teaching);
+        } else {
+            throw new IllegalStateException();
+        }
     }
 
+    /**
+     * Gets the UnitType which is teaching a teacher to a student
+     * This value is only meaningful for teachers that can be put in a school.
+     * 
+     * @return The turns of training needed to teach its current type to a free
+     *         colonist or to promote an indentured servant or a petty criminal.
+     * @see #getTurnsOfTraining
+     *
+     * @param typeTeacher the unit type of the teacher
+     * @param typeStudent the unit type of the student
+     * @return an <code>UnitType</code> value
+     */
+    public static UnitType getUnitTypeTeaching(UnitType typeTeacher, UnitType typeStudent) {
+        if (typeStudent.hasEducation(typeTeacher)) {
+            return typeTeacher;
+        } else {
+            return typeStudent.getEducationUnit(0);
+        }
+    }
 
     /**
      * Gets the skill level.
@@ -724,20 +749,22 @@ public class Unit extends FreeColGameObject implements Abilities, Locatable, Loc
     /**
      * Returns true if this unit can be a student.
      *
+     * @param teacher the teacher which is trying to teach it
      * @return a <code>boolean</code> value
      */
-    public boolean canBeStudent() {
-        return canBeStudent(getUnitType());
+    public boolean canBeStudent(Unit teacher) {
+        return canBeStudent(getUnitType(), teacher.getUnitType());
     }
 
     /**
      * Returns true if this type of unit can be a student.
      *
-     * @param unitType an <code>int</code> value
+     * @param typeStudent the unit type of the student
+     * @param typeTeacher the unit type of the teacher which is trying to teach it
      * @return a <code>boolean</code> value
      */
-    public static boolean canBeStudent(UnitType unitType) {
-        return unitType.hasAbility("model.ability.learnFromTeacher");
+    public static boolean canBeStudent(UnitType typeStudent, UnitType typeTeacher) {
+        return getUnitTypeTeaching(typeTeacher, typeStudent) != null;
     }
 
     /**
@@ -759,7 +786,7 @@ public class Unit extends FreeColGameObject implements Abilities, Locatable, Loc
             this.student = null;
         } else if (newStudent.getColony() != null &&
                    newStudent.getColony() == getColony() &&
-                   newStudent.canBeStudent()) {
+                   newStudent.canBeStudent(this)) {
             this.student = newStudent;
         } else {
             throw new IllegalStateException("unit can not be student: " + newStudent.getName());
@@ -3941,19 +3968,13 @@ public class Unit extends FreeColGameObject implements Abilities, Locatable, Loc
     /**
      * Train the current unit in the job of its teacher.
      * 
-     * The type of the unit is updated from petty criminal to indentured
-     * servant, from servant to free colonist and then to the teachers type.
-     * 
-     * @param teacher
      */
     public void train() {
         String oldName = getName();
-        UnitType newType = unitType.getEducationUnit();
+        UnitType learning = getUnitTypeTeaching(getTeacher().getUnitType(), unitType);
 
-        if (newType != null) {
-            setType(newType);
-        } else {
-            setType(teacher.getUnitType());
+        if (learning != null) {
+            setType(learning);
         }
 
         String newName = getName();
@@ -4204,12 +4225,13 @@ public class Unit extends FreeColGameObject implements Abilities, Locatable, Loc
     }
 
     /**
-     * Clear the speciality of a <code>Unit</code>. That is, makes it a
-     * <code>FREE_COLONIST</code>
+     * Clear the speciality of a <code>Unit</code> changing the UnitType
+     * to the UnitType specified for clearing
      */
     public void clearSpeciality() {
-        if (getSkillLevel() > 0) {
-            setType(FREE_COLONIST);
+        UnitType newType = unitType.getClearSpeciality();
+        if (newType != null) {
+            setType(newType);
         }
     }
 

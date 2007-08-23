@@ -2263,7 +2263,7 @@ public final class InGameController implements NetworkConstants {
             freeColClient.getCanvas().showInformationMessage("notYourTurn");
             return;
         }
-        if (!student.canBeStudent()) {
+        if (!student.canBeStudent(teacher)) {
             throw new IllegalStateException("Unit can not be student!");
         }
         if (!teacher.getColony().getBuilding(Building.SCHOOLHOUSE).canAddAsTeacher(teacher)) {

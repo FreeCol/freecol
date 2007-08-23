@@ -2104,7 +2104,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         Unit student = (Unit) getGame().getFreeColGameObject(workElement.getAttribute("student"));
         Unit teacher = (Unit) getGame().getFreeColGameObject(workElement.getAttribute("teacher"));
 
-        if (!student.canBeStudent()) {
+        if (!student.canBeStudent(teacher)) {
             throw new IllegalStateException("Unit can not be student!");
         }
         if (!teacher.getColony().getBuilding(Building.SCHOOLHOUSE).canAddAsTeacher(teacher)) {

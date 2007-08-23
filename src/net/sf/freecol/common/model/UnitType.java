@@ -2,6 +2,7 @@
 package net.sf.freecol.common.model;
 
 
+import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Map;
 import net.sf.freecol.FreeCol;
@@ -101,14 +102,14 @@ public final class UnitType implements Abilities {
     private String promotion;
 
     /**
-     * Describe educationUnit here.
+     * Describe clearSpeciality here.
      */
-    private String educationUnit = null;
+    private String clearSpeciality;
 
     /**
-     * Describe educationTurns here.
+     * Describe education here.
      */
-    private int educationTurns;
+    private Hashtable<String, Integer> education = new Hashtable<String, Integer>();
     
     /**
      * Stores the abilities of this Type.
@@ -422,21 +423,49 @@ public final class UnitType implements Abilities {
     }
 
     /**
-     * Get the <code>EducationUnit</code> value.
+     * Get the <code>ClearSpeciality</code> value.
      *
      * @return a <code>UnitType</code> value
      */
-    public UnitType getEducationUnit() {
-        return FreeCol.getSpecification().getUnitType(educationUnit);
+    public UnitType getClearSpeciality() {
+        return FreeCol.getSpecification().getUnitType(clearSpeciality);
     }
 
     /**
-     * Set the <code>EducationUnit</code> value.
+     * Set the <code>ClearSpeciality</code> value.
      *
-     * @param newEducationUnit The new EducationUnit value.
+     * @param newClearSpeciality The new ClearSpeciality value.
      */
-    public void setEducationUnit(final String newEducationUnit) {
-        this.educationUnit = newEducationUnit;
+    public void setClearSpeciality(final String newClearSpeciality) {
+        this.clearSpeciality = newClearSpeciality;
+    }
+
+    /**
+     * Whether can learn the given UnitType
+     *
+     * @param unitType the UnitType to learn
+     * @return <code>true</code> if can learn the given UnitType
+     */
+    public boolean hasEducation(UnitType unitType) {
+        return education.contains(unitType.getId());
+    }
+
+    /**
+     * Get a UnitType to learn with a level skill less or equal than given level
+     *
+     * @param maximumSkill the maximum level skill which we are searching for
+     * @return <code>UnitType</code> with a skill equal or less than given
+     * maximum
+     */
+    public UnitType getEducationUnit(int maximumSkill) {
+        Enumeration<String> unitTypes = education.keys();
+        while (unitTypes.hasMoreElements()) {
+            UnitType unitType = FreeCol.getSpecification().getUnitType(unitTypes.nextElement());
+            if (unitType.hasSkill() && unitType.getSkill() <= maximumSkill) {
+                return unitType;
+            }
+        }
+        return null;
     }
 
     /**
@@ -444,21 +473,16 @@ public final class UnitType implements Abilities {
      *
      * @return a <code>int</code> value
      */
-    public int getEducationTurns() {
-        return educationTurns;
-    }
-
-    /**
-     * Set the <code>EducationTurns</code> value.
-     *
-     * @param newEducationTurns The new EducationUnit value.
-     */
-    public void setEducationTurns(final int newEducationTurns) {
-        this.educationTurns = newEducationTurns;
+    public int getEducationTurns(UnitType unitType) {
+        Integer turns = education.get(unitType.getId());
+        if (turns != null) {
+            return turns.intValue();
+        } else {
+            return UNDEFINED;
+        }
     }
 
     public void readFromXmlElement(Node xml, final Map<String, GoodsType> goodsTypeByRef) {
-
         id = Xml.attribute(xml, "name");
         name = Xml.attribute(xml, "name");
         offence = Xml.intAttribute(xml, "offence");
@@ -469,6 +493,7 @@ public final class UnitType implements Abilities {
         hitPoints = Xml.intAttribute(xml, "hitPoints", 0);
         spaceTaken = Xml.intAttribute(xml, "spaceTaken", 1);
         promotion = Xml.attribute(xml, "promotion", null);
+        clearSpeciality = Xml.attribute(xml, "clearSpeciality", null);
 
         skill = Xml.intAttribute(xml, "skill", UNDEFINED);
 
@@ -493,17 +518,18 @@ public final class UnitType implements Abilities {
                         boolean value = Xml.booleanAttribute(node, "value");
                         setAbility(abilityId, value);
                     } else if ("education".equals(nodeName)) {
-                        educationUnit = Xml.attribute(node, "unit");
-                        educationTurns = Xml.intAttribute(node, "turns");
+                        String educationUnit = Xml.attribute(node, "unit");
+                        int educationTurns = Xml.intAttribute(node, "turns");
+                        education.put(educationUnit, educationTurns);
                     } else if ("production-bonus".equals(nodeName)) {
                         String goodsType = Xml.attribute(node, "goods-type");
                         if (goodsTypeByRef.containsKey(goodsType)) {
                             if (Xml.hasAttribute(node, "bonus")) {
                                 int bonus = Xml.intAttribute(node, "bonus");
-                                prodBonuses.put(goodsType, new Integer(bonus));
+                                prodBonuses.put(goodsType, bonus);
                             } else if (Xml.hasAttribute(node, "factor")) {
                                 float factor = Xml.floatAttribute(node, "factor");
-                                prodFactors.put(goodsType, new Float(factor));
+                                prodFactors.put(goodsType, factor);
                             }
                         }
                     }

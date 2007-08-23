@@ -3,11 +3,13 @@ package net.sf.freecol.client.gui.panel;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.Iterator;
+import java.util.List;
 
 import javax.swing.JComponent;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 import javax.swing.TransferHandler;
+import net.sf.freecol.FreeCol;
 
 import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.client.gui.i18n.Messages;
@@ -15,6 +17,7 @@ import net.sf.freecol.common.model.Building;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.ColonyTile;
 import net.sf.freecol.common.model.Goods;
+import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.WorkLocation;
 
@@ -30,9 +33,6 @@ public final class DragListener extends MouseAdapter {
     public static final String LICENSE = "http://www.gnu.org/licenses/gpl.html";
 
     public static final String REVISION = "$Revision$";
-
-    private static final int[] goodsTypes = { Goods.FOOD, Goods.SUGAR, Goods.TOBACCO, Goods.COTTON, 
-                                              Goods.FURS, Goods.LUMBER, Goods.ORE, Goods.SILVER };
 
     private static final int[] workTypes = { UnitLabel.WORKTYPE_FOOD, UnitLabel.WORKTYPE_SUGAR,
                                              UnitLabel.WORKTYPE_TOBACCO, UnitLabel.WORKTYPE_COTTON, 
@@ -85,13 +85,14 @@ public final class DragListener extends MouseAdapter {
                     tempUnit.getLocation().getTile().getSettlement() != null) {
                     Colony colony = (Colony) tempUnit.getLocation().getColony();
                     
+                    List<GoodsType> farmedGoods = FreeCol.getSpecification().getFarmedGoodsTypeList();
                     // Work in Field - automatically find the best location
-                    for (int index = 0; index < goodsTypes.length; index++) {
-                        int maxpotential = colony.getVacantColonyTileProductionFor(tempUnit, goodsTypes[index]);
+                    for (GoodsType goodsType : farmedGoods) {
+                        int maxpotential = colony.getVacantColonyTileProductionFor(tempUnit, goodsType);
                         if (maxpotential > 0) {
                             menuItem = new JMenuItem(Messages.message(messages[index]) +
-                                                     " (" + maxpotential + " " + Goods.getName(index) + ")",
-                                                     imageLibrary.getScaledGoodsImageIcon(goodsTypes[index], 0.66f));
+                                                     " (" + maxpotential + " " + Goods.getName(goodsType) + ")",
+                                                     imageLibrary.getScaledGoodsImageIcon(goodsType.getIndex(), 0.66f));
                             menuItem.setActionCommand(String.valueOf(workTypes[index]));
                             menuItem.addActionListener(unitLabel);
                             menu.add(menuItem);
@@ -104,11 +105,11 @@ public final class DragListener extends MouseAdapter {
                         Building building = buildingIterator.next();
                         if (tempUnit.getWorkLocation() != building) { // Skip if currently working at this location
                             if (building.isBuilt() && building.canAdd(tempUnit)) {
-                                int goodsType = building.getGoodsOutputType();
+                                GoodsType goodsType = building.getGoodsOutputType();
                                 String locName = building.getName();
                                 menuItem = new JMenuItem(locName);
-                                if (goodsType > -1) {
-                                    menuItem.setIcon(imageLibrary.getScaledGoodsImageIcon(goodsType, 0.66f));
+                                if (goodsType != null) {
+                                    menuItem.setIcon(imageLibrary.getScaledGoodsImageIcon(goodsType.getIndex(), 0.66f));
                                     int addOutput = building.getAdditionalProductionNextTurn(tempUnit);
                                     locName += " (" + addOutput;
                                     int potential = building.getAdditionalProduction(tempUnit);
@@ -137,7 +138,7 @@ public final class DragListener extends MouseAdapter {
                 if (tempUnit.getColony() != null) {
                     Building schoolhouse = tempUnit.getColony().getBuilding(Building.SCHOOLHOUSE);
                     for (Unit teacher : schoolhouse.getUnitList()) {
-                        if (tempUnit.canBeStudent() &&
+                        if (tempUnit.canBeStudent(teacher) &&
                             teacher.getStudent() != tempUnit) {
                             menuItem = new JMenuItem(Messages.message("assignToTeacher"),
                                                      imageLibrary.getScaledUnitImageIcon(teacher.getType(), 0.5f));
@@ -279,7 +280,7 @@ public final class DragListener extends MouseAdapter {
                         separatorNeeded = false;
                     }
 
-                    if (tempUnit.getUnitType().getSkill() > 0) {
+                    if (tempUnit.getUnitType().getClearSpeciality() != null) {
                         menuItem = new JMenuItem(Messages.message("clearSpeciality"));
                         menuItem.setActionCommand(String.valueOf(UnitLabel.CLEAR_SPECIALITY));
                         menuItem.addActionListener(unitLabel);

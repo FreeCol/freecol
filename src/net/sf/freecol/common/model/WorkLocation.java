@@ -16,7 +16,7 @@ public interface WorkLocation extends Location {
      * @param goodsType The type of goods to get the production of.
      * @return The production of the given type of goods.
      */
-    public int getProductionOf(int goodsType);
+    public int getProductionOf(GoodsType goodsType);
 
     /**
      * Returns the <code>Colony</code> this <code>WorkLocation</code> is

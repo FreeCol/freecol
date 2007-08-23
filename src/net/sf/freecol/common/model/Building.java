@@ -483,7 +483,7 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
         Unit student = unit.getStudent();
         if (getType() == SCHOOLHOUSE) {
             if (student == null) {
-                student = findStudent();
+                student = findStudent(unit);
                 if (student != null) {
                     unit.setStudent(student);
                     student.setTeacher(unit);
@@ -648,11 +648,11 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
         }
     }
 
-    private Unit findStudent() {
+    private Unit findStudent(Unit teacher) {
         Unit student = null;
         int skill = Integer.MIN_VALUE;
         for (Unit potentialStudent : getColony().getUnitList()) {
-            if (potentialStudent.canBeStudent() &&
+            if (potentialStudent.canBeStudent(teacher) &&
                 potentialStudent.getTeacher() == null) {
                 // prefer students with higher skill levels
                 if (potentialStudent.getSkillLevel() > skill) {
@@ -671,7 +671,7 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
         while (teachers.hasNext()) {
             Unit teacher = teachers.next();
             if (teacher.getStudent() == null) {
-                Unit student = findStudent();
+                Unit student = findStudent(teacher);
                 if (student == null) {
                     addModelMessage(getColony(), "model.building.noStudent",
                                     new String[][] {
