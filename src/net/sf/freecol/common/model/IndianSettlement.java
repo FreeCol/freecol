@@ -1013,9 +1013,10 @@ public class IndianSettlement extends Settlement {
             }
 */
             if (typeWithSmallestAmount != null) {
-                int production = Math.min(goodsContainer.getGoodsCount(Goods.getRawMaterial(typeWithSmallestAmount)), Math.min(10, goodsContainer.getGoodsCount(Goods.TOOLS)));
+                int production = Math.min(goodsContainer.getGoodsCount(typeWithSmallestAmount.getRawMaterial()),
+                        Math.min(10, goodsContainer.getGoodsCount(Goods.TOOLS)));
                 goodsContainer.removeGoods(Goods.TOOLS, production);
-                goodsContainer.removeGoods(Goods.getRawMaterial(typeWithSmallestAmount), production);
+                goodsContainer.removeGoods(typeWithSmallestAmount.getRawMaterial(), production);
                 goodsContainer.addGoods(typeWithSmallestAmount, production * 5);
             }
         }
