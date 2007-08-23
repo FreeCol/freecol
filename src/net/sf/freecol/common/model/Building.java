@@ -642,10 +642,13 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
 
             if (goodsOutputType == Goods.HAMMERS) {
                 colony.addHammers(goodsOutput);
-                return;
+            } else {
+                colony.addGoods(goodsOutputType, goodsOutput);
             }
-
-            colony.addGoods(goodsOutputType, goodsOutput);
+        }
+        int experience = goodsOutput / getUnitCount();
+        for (Unit unit : getUnitList()) {
+            unit.modifyExperience(experience);
         }
     }
 
