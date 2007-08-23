@@ -2486,8 +2486,6 @@ public final class InGameController implements NetworkConstants {
                 .getSettlement();
 
         if (settlement.getLearnableSkill() != IndianSettlement.NONE) {
-            unit.setMovesLeft(0);
-
             String skillName;
 
             Element askSkill = Message.createNewRootElement("askSkill");
@@ -2513,7 +2511,12 @@ public final class InGameController implements NetworkConstants {
 
             if (skillName == null) {
                 canvas.errorMessage("indianSettlement.noMoreSkill");
+            } else if (!unit.getUnitType().canLearnFromNatives(skill)) {
+                canvas.showInformationMessage("indianSettlement.cantLearnSkill",
+                        new String[][] { {"%unit%", unit.getName()}, {"%skill%", skillName} });
             } else {
+                unit.setMovesLeft(0);
+                
                 Element learnSkill = Message.createNewRootElement("learnSkillAtSettlement");
                 learnSkill.setAttribute("unit", unit.getID());
                 learnSkill.setAttribute("direction", Integer.toString(direction));

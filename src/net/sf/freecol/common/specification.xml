@@ -493,30 +493,28 @@
                skill="0" promotion="model.unit.veteranSoldier">
       <ability id="model.ability.foundColony" value="yes"/>
       <ability id="model.ability.recruitable" value="yes"/>
-      <ability id="model.ability.learnFromNatives" value="yes"/>
-      <ability id="model.ability.learnFromExperience" value="yes"/>
-      <education unit="model.unit.expertFarmer" turns="4"/>
-      <education unit="model.unit.expertFisherman" turns="4"/>
-      <education unit="model.unit.expertFurTrapper" turns="4"/>
-      <education unit="model.unit.expertSilverMiner" turns="4"/>
-      <education unit="model.unit.expertLumberJack" turns="4"/>
-      <education unit="model.unit.expertOreMiner" turns="4"/>
-      <education unit="model.unit.masterSugarPlanter" turns="6"/>
-      <education unit="model.unit.masterCottonPlanter" turns="6"/>
-      <education unit="model.unit.masterTobaccoPlanter" turns="6"/>
-      <education unit="model.unit.firebrandPreacher" turns="8"/>
-      <education unit="model.unit.elderStatesman" turns="8"/>
-      <education unit="model.unit.masterCarpenter" turns="4"/>
-      <education unit="model.unit.masterDistiller" turns="6"/>
-      <education unit="model.unit.masterWeaver" turns="6"/>
-      <education unit="model.unit.masterTobacconist" turns="6"/>
-      <education unit="model.unit.masterFurTrader" turns="6"/>
-      <education unit="model.unit.masterBlacksmith" turns="6"/>
-      <education unit="model.unit.masterGunsmith" turns="6"/>
-      <education unit="model.unit.seasonedScout" turns="4"/>
-      <education unit="model.unit.hardyPioneer" turns="4"/>
-      <education unit="model.unit.veteranSoldier" turns="6"/>
-      <education unit="model.unit.jesuitMissionary" turns="8"/>
+      <upgrade unit="model.unit.expertFarmer" turnsToLearn="4" learnFromNatives="yes" learnFromExperience="yes"/>
+      <upgrade unit="model.unit.expertFisherman" turnsToLearn="4" learnFromNatives="yes" learnFromExperience="yes"/>
+      <upgrade unit="model.unit.expertFurTrapper" turnsToLearn="4" learnFromNatives="yes" learnFromExperience="yes"/>
+      <upgrade unit="model.unit.expertSilverMiner" turnsToLearn="4" learnFromNatives="yes" learnFromExperience="yes"/>
+      <upgrade unit="model.unit.expertLumberJack" turnsToLearn="4" learnFromNatives="yes" learnFromExperience="yes"/>
+      <upgrade unit="model.unit.expertOreMiner" turnsToLearn="4" learnFromNatives="yes" learnFromExperience="yes"/>
+      <upgrade unit="model.unit.masterSugarPlanter" turnsToLearn="6" learnFromNatives="yes" learnFromExperience="yes"/>
+      <upgrade unit="model.unit.masterCottonPlanter" turnsToLearn="6" learnFromNatives="yes" learnFromExperience="yes"/>
+      <upgrade unit="model.unit.masterTobaccoPlanter" turnsToLearn="6" learnFromNatives="yes" learnFromExperience="yes"/>
+      <upgrade unit="model.unit.firebrandPreacher" turnsToLearn="8"/>
+      <upgrade unit="model.unit.elderStatesman" turnsToLearn="8"/>
+      <upgrade unit="model.unit.masterCarpenter" turnsToLearn="4"/>
+      <upgrade unit="model.unit.masterDistiller" turnsToLearn="6"/>
+      <upgrade unit="model.unit.masterWeaver" turnsToLearn="6"/>
+      <upgrade unit="model.unit.masterTobacconist" turnsToLearn="6"/>
+      <upgrade unit="model.unit.masterFurTrader" turnsToLearn="6"/>
+      <upgrade unit="model.unit.masterBlacksmith" turnsToLearn="6"/>
+      <upgrade unit="model.unit.masterGunsmith" turnsToLearn="6"/>
+      <upgrade unit="model.unit.seasonedScout" turnsToLearn="4"/>
+      <upgrade unit="model.unit.hardyPioneer" turnsToLearn="4"/>
+      <upgrade unit="model.unit.veteranSoldier" turnsToLearn="6"/>
+      <upgrade unit="model.unit.jesuitMissionary" turnsToLearn="8"/>
     </unit-type>
     <unit-type name="model.unit.expertFarmer"         offence="0"  defence="1" movement="3" lineOfSight="1" price="1100" 
                skill="1"  expert-production="model.goods.Food" clearSpeciality="model.unit.freeColonist">
@@ -650,8 +648,16 @@
                skill="-1" promotion="model.unit.freeColonist">
       <ability id="model.ability.foundColony" value="yes"/>
       <ability id="model.ability.recruitable" value="yes"/>
-      <ability id="model.ability.learnFromNatives" value="yes"/>
-      <education unit="model.unit.freeColonist" turns="4"/>
+      <upgrade unit="model.unit.freeColonist" turnsToLearn="4"/>
+      <upgrade unit="model.unit.expertFarmer" learnFromNatives="yes"/>
+      <upgrade unit="model.unit.expertFisherman" learnFromNatives="yes"/>
+      <upgrade unit="model.unit.expertFurTrapper" learnFromNatives="yes"/>
+      <upgrade unit="model.unit.expertSilverMiner" learnFromNatives="yes"/>
+      <upgrade unit="model.unit.expertLumberJack" learnFromNatives="yes"/>
+      <upgrade unit="model.unit.expertOreMiner" learnFromNatives="yes"/>
+      <upgrade unit="model.unit.masterSugarPlanter" learnFromNatives="yes"/>
+      <upgrade unit="model.unit.masterCottonPlanter" learnFromNatives="yes"/>
+      <upgrade unit="model.unit.masterTobaccoPlanter" learnFromNatives="yes"/>
       <production-bonus goods-type="model.goods.Rum" bonus="-1" />
       <production-bonus goods-type="model.goods.Cigars" bonus="-1" />
       <production-bonus goods-type="model.goods.Cloth" bonus="-1" />
@@ -666,7 +672,7 @@
                skill="-2" promotion="model.unit.indenturedServant">
       <ability id="model.ability.foundColony" value="yes"/>
       <ability id="model.ability.recruitable" value="yes"/>
-      <education unit="model.unit.indenturedServant" turns="4"/>
+      <upgrade unit="model.unit.indenturedServant" turnsToLearn="4"/>
       <production-bonus goods-type="model.goods.Rum" bonus="-2" />
       <production-bonus goods-type="model.goods.Cigars" bonus="-2" />
       <production-bonus goods-type="model.goods.Cloth" bonus="-2" />
@@ -684,7 +690,7 @@
       <production-bonus goods-type="model.goods.Tobacco" bonus="1"/>
       <production-bonus goods-type="model.goods.Cotton" bonus="1"/>
       <production-bonus goods-type="model.goods.Furs" bonus="1"/>
-        <production-bonus goods-type="model.goods.Fish" bonus="1" />
+      <production-bonus goods-type="model.goods.Fish" bonus="1" />
       <production-bonus goods-type="model.goods.Rum" bonus="-2" />
       <production-bonus goods-type="model.goods.Cigars" bonus="-2" />
       <production-bonus goods-type="model.goods.Cloth" bonus="-2" />

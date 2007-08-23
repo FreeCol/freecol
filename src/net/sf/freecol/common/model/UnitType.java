@@ -2,9 +2,10 @@
 package net.sf.freecol.common.model;
 
 
-import java.util.Enumeration;
 import java.util.Hashtable;
+import java.util.Iterator;
 import java.util.Map;
+import java.util.Map.Entry;
 import net.sf.freecol.FreeCol;
 
 import net.sf.freecol.common.util.Xml;
@@ -109,7 +110,7 @@ public final class UnitType implements Abilities {
     /**
      * Describe education here.
      */
-    private Hashtable<String, Integer> education = new Hashtable<String, Integer>();
+    private Hashtable<String, Upgrade> upgrades = new Hashtable<String, Upgrade>();
     
     /**
      * Stores the abilities of this Type.
@@ -441,13 +442,36 @@ public final class UnitType implements Abilities {
     }
 
     /**
-     * Whether can learn the given UnitType
+     * Whether the given UnitType can be teached
      *
      * @param unitType the UnitType to learn
      * @return <code>true</code> if can learn the given UnitType
      */
-    public boolean hasEducation(UnitType unitType) {
-        return education.contains(unitType.getId());
+    public boolean canBeTeached(UnitType unitType) {
+        Upgrade upgrade = upgrades.get(unitType.getId());
+        return upgrade != null && upgrade.canBeTeached();
+    }
+
+    /**
+     * Whether can learn from experience the given UnitType
+     *
+     * @param unitType the UnitType to learn
+     * @return <code>true</code> if can learn the given UnitType
+     */
+    public boolean canLearnFromExperience(UnitType unitType) {
+        Upgrade upgrade = upgrades.get(unitType.getId());
+        return upgrade != null && upgrade.learnFromExperience;
+    }
+
+    /**
+     * Whether can learn from natives the given UnitType
+     *
+     * @param unitType the UnitType to learn
+     * @return <code>true</code> if can learn the given UnitType
+     */
+    public boolean canLearnFromNatives(UnitType unitType) {
+        Upgrade upgrade = upgrades.get(unitType.getId());
+        return upgrade != null && upgrade.learnFromNatives;
     }
 
     /**
@@ -458,11 +482,14 @@ public final class UnitType implements Abilities {
      * maximum
      */
     public UnitType getEducationUnit(int maximumSkill) {
-        Enumeration<String> unitTypes = education.keys();
-        while (unitTypes.hasMoreElements()) {
-            UnitType unitType = FreeCol.getSpecification().getUnitType(unitTypes.nextElement());
-            if (unitType.hasSkill() && unitType.getSkill() <= maximumSkill) {
-                return unitType;
+        Iterator<Entry<String, Upgrade>> unitTypes = upgrades.entrySet().iterator();
+        while (unitTypes.hasNext()) {
+            Entry<String, Upgrade> pair = unitTypes.next();
+            if (pair.getValue().canBeTeached()) {
+                UnitType unitType = FreeCol.getSpecification().getUnitType(pair.getKey());
+                if (unitType.hasSkill() && unitType.getSkill() <= maximumSkill) {
+                    return unitType;
+                }
             }
         }
         return null;
@@ -474,9 +501,9 @@ public final class UnitType implements Abilities {
      * @return a <code>int</code> value
      */
     public int getEducationTurns(UnitType unitType) {
-        Integer turns = education.get(unitType.getId());
-        if (turns != null) {
-            return turns.intValue();
+        Upgrade upgrade = upgrades.get(unitType.getId());
+        if (upgrade != null) {
+            return upgrade.turnsToLearn;
         } else {
             return UNDEFINED;
         }
@@ -517,10 +544,13 @@ public final class UnitType implements Abilities {
                         String abilityId = Xml.attribute(node, "id");
                         boolean value = Xml.booleanAttribute(node, "value");
                         setAbility(abilityId, value);
-                    } else if ("education".equals(nodeName)) {
+                    } else if ("upgrade".equals(nodeName)) {
+                        Upgrade upgrade = new Upgrade();
                         String educationUnit = Xml.attribute(node, "unit");
-                        int educationTurns = Xml.intAttribute(node, "turns");
-                        education.put(educationUnit, educationTurns);
+                        upgrade.turnsToLearn = Xml.intAttribute(node, "turnsToLearn", UNDEFINED);
+                        upgrade.learnFromNatives = Xml.booleanAttribute(node, "learnFromNatives", false);
+                        upgrade.learnFromExperience = Xml.booleanAttribute(node, "learnFromExperience", false);
+                        upgrades.put(educationUnit, upgrade);
                     } else if ("production-bonus".equals(nodeName)) {
                         String goodsType = Xml.attribute(node, "goods-type");
                         if (goodsTypeByRef.containsKey(goodsType)) {
@@ -593,5 +623,14 @@ public final class UnitType implements Abilities {
             }
         }
         return Math.min(base, 1);
+    }
+    
+    private class Upgrade {
+        protected int turnsToLearn;
+        protected boolean learnFromNatives, learnFromExperience;
+        
+        public boolean canBeTeached() {
+            return turnsToLearn > 0;
+        }
     }
 }

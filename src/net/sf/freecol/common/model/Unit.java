@@ -644,7 +644,7 @@ public class Unit extends FreeColGameObject implements Abilities, Locatable, Loc
      * @return an <code>UnitType</code> value
      */
     public static UnitType getUnitTypeTeaching(UnitType typeTeacher, UnitType typeStudent) {
-        if (typeStudent.hasEducation(typeTeacher)) {
+        if (typeStudent.canBeTeached(typeTeacher)) {
             return typeTeacher;
         } else {
             return typeStudent.getEducationUnit(0);
@@ -1274,11 +1274,8 @@ public class Unit extends FreeColGameObject implements Abilities, Locatable, Loc
                         return ENTER_INDIAN_VILLAGE_WITH_MISSIONARY;
                     } else if (isOffensiveUnit()) {
                         return ATTACK;
-                    } else if (hasAbility("model.ability.learnFromNatives")) {
-                        return ENTER_INDIAN_VILLAGE_WITH_FREE_COLONIST;
                     } else {
-                        logger.fine("Trying to enter Indian settlement with " + getName());
-                        return ILLEGAL_MOVE;
+                        return ENTER_INDIAN_VILLAGE_WITH_FREE_COLONIST;
                     }
                 } else if (settlement instanceof Colony) {
                     if (isScout()) {
@@ -4371,13 +4368,14 @@ public class Unit extends FreeColGameObject implements Abilities, Locatable, Loc
      * Checks if a colonist can get promoted by experience.
      */
     private void checkExperiencePromotion() {
-        if (hasAbility("model.ability.learnFromExperience") && location instanceof ColonyTile) {
+        UnitType learnType = FreeCol.getSpecification().getExpertForProducing(workType);
+        if (unitType.canLearnFromExperience(learnType)) {
             logger.finest("About to call getRandom for experience");
             int random = getGame().getModelController().getRandom(getID() + "experience", 5000);
             if (random < Math.min(experience, 200)) {
                 logger.finest("About to change type of unit due to experience.");
                 String oldName = getName();
-                setType(FreeCol.getSpecification().getExpertForProducing(workType));
+                setType();
                 addModelMessage(getColony(), "model.unit.experience",
                                 new String[][] {
                                     { "%oldName%", oldName },
