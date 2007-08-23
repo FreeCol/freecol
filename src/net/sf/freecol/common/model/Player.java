@@ -2345,7 +2345,7 @@ public class Player extends FreeColGameObject implements Nameable {
                     // make all converts free colonists
                     for (Iterator<Unit> iter = getUnitIterator(); iter.hasNext();) {
                         Unit u = iter.next();
-                        if (u.getType() == Unit.INDIAN_CONVERT) {
+                        if (u.hasAbility("model.unit.convert")) {
                             u.setType(Unit.FREE_COLONIST);
                             // reset experience, otherwise they will
                             // immediately become experts

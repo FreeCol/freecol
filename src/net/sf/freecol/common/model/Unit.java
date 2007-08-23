@@ -4835,9 +4835,13 @@ public class Unit extends FreeColGameObject implements Abilities, Locatable, Loc
             Unit missionary = indianSettlement.getMissionary();
             if (missionary != null && missionary.getOwner() == getOwner() &&
                     getGame().getViewOwner() == null && indianSettlement.getUnitCount() > 1) {
-                indianSettlement.getFirstUnit().dispose();
-                modelController.createUnit(getID() + "indianConvert", getLocation(),
-                        getOwner(), Unit.INDIAN_CONVERT);
+                List<UnitType> converts = FreeCol.getSpecification().getUnitTypesWithAbility("model.ability.convert");
+                if (converts.size() > 0) {
+                    indianSettlement.getFirstUnit().dispose();
+                    random = modelController.getRandom(getID() + "getConvertType", converts.size());
+                    modelController.createUnit(getID() + "indianConvert", getLocation(),
+                            getOwner(), converts.get(random));
+                }
             }
         } else if (random >= 100 - burnProbability) {
             boolean burn = false;

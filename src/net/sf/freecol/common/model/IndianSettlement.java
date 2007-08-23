@@ -1151,14 +1151,21 @@ public class IndianSettlement extends Settlement {
                 }
 
                 if (targetTile != null) {
-                    getUnitIterator().next().dispose();
                     convertProgress = 0;
+                    
+                    List<UnitType> converts = FreeCol.getSpecification().getUnitTypesWithAbility("model.ability.convert");
+                    if (converts.size() > 0) {
+                        getUnitIterator().next().dispose();
 
-                    Unit u = getGame().getModelController().createUnit(getID() + "newTurn100missionary", targetTile, missionary.getOwner(), Unit.INDIAN_CONVERT);
-                    addModelMessage(u, "model.colony.newConvert",
-                                    new String[][] {{"%nation%", getOwner().getNationAsString()}},
-                                    ModelMessage.UNIT_ADDED);
-                    logger.info("New convert created for " + missionary.getOwner().getName() + " with ID=" + u.getID());
+                        ModelController modelController = getGame().getModelController();
+                        int random = modelController.getRandom(getID() + "getNewConvertType", converts.size());
+                        Unit u = modelController.createUnit(getID() + "newTurn100missionary", targetTile,
+                                missionary.getOwner(), converts.get(random));
+                        addModelMessage(u, "model.colony.newConvert",
+                                        new String[][] {{"%nation%", getOwner().getNationAsString()}},
+                                        ModelMessage.UNIT_ADDED);
+                        logger.info("New convert created for " + missionary.getOwner().getName() + " with ID=" + u.getID());
+                    }
                 }
             }
         }
@@ -1441,7 +1448,7 @@ public class IndianSettlement extends Settlement {
         for(Goods goods : settlementGoods) {
             // Only sell raw materials but never sell food and lumber
             if (goods.getType() != Goods.FOOD && goods.getType() != Goods.LUMBER &&
-                    goods.getType().isStorable) {
+                    goods.getType().isStorable()) {
                 sellGoods[i] = goods;
                 i++;
                 if (i == sellGoods.length) break;

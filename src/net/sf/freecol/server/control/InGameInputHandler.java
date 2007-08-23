@@ -475,7 +475,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         String taskID = element.getAttribute("taskID");
         Location location = (Location) getGame().getFreeColGameObject(element.getAttribute("location"));
         Player owner = (Player) getGame().getFreeColGameObject(element.getAttribute("owner"));
-        int type = Integer.parseInt(element.getAttribute("type"));
+        UnitType type = FreeCol.getSpecification().getUnitType(element.getAttribute("type"));
         if (location == null) {
             throw new NullPointerException();
         }

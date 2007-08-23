@@ -17,6 +17,7 @@ import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.TradeRoute;
 import net.sf.freecol.common.model.Unit;
+import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.networking.Message;
 import net.sf.freecol.server.FreeColServer;
@@ -129,7 +130,7 @@ public class ServerModelController implements ModelController {
      * @param type The type of unit (Unit.FREE_COLONIST...).
      * @return A reference to the <code>Unit</code> which has been created.
      */
-    public synchronized Unit createUnit(String taskID, Location location, Player owner, int type) {
+    public synchronized Unit createUnit(String taskID, Location location, Player owner, UnitType type) {
         return createUnit(taskID, location, owner, type, true, null);
     }
 
@@ -154,7 +155,7 @@ public class ServerModelController implements ModelController {
      *            or null if this request is internal to the server.
      * @return A reference to the <code>Unit</code> which has been created.
      */
-    public synchronized Unit createUnit(String taskID, Location location, Player owner, int type, boolean secure,
+    public synchronized Unit createUnit(String taskID, Location location, Player owner, UnitType type, boolean secure,
             Connection connection) {
         String extendedTaskID = taskID + owner.getID()
                 + Integer.toString(freeColServer.getGame().getTurn().getNumber());
@@ -168,13 +169,13 @@ public class ServerModelController implements ModelController {
             unit = (Unit) taskEntry.entry;
 
             if (unit.getLocation().getTile() != location.getTile() || unit.getOwner() != owner
-                    || unit.getType() != type) {
+                    || unit.getUnitType() != type) {
                 logger
                         .warning("Unsynchronization between the client and the server. Maybe a cheating attempt! Differences: "
                                 + ((unit.getLocation().getTile() != location.getTile()) ? "location: "
                                         + unit.getLocation().getTile() + "!=" + location.getTile() : "")
                                 + ((unit.getOwner() != owner) ? "owner: " + unit.getOwner() + "!=" + owner : "")
-                                + ((unit.getType() != type) ? "type: " + unit.getType() + "!=" + type : ""));
+                                + ((unit.getUnitType() != type) ? "type: " + unit.getUnitType() + "!=" + type : ""));
 
                 taskRegister.remove(extendedTaskID);
                 unit.dispose();

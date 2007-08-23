@@ -15,6 +15,7 @@ import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.TradeRoute;
 import net.sf.freecol.common.model.Unit;
+import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.networking.Message;
 
 import org.w3c.dom.Element;
@@ -92,14 +93,14 @@ public class ClientModelController implements ModelController {
      * @param type The type of unit (Unit.FREE_COLONIST...).
      * @return The created <code>Unit</code>.
      */
-    public Unit createUnit(String taskID, Location location, Player owner, int type) {
+    public Unit createUnit(String taskID, Location location, Player owner, UnitType type) {
         Client client = freeColClient.getClient();
 
         Element createUnitElement = Message.createNewRootElement("createUnit");
         createUnitElement.setAttribute("taskID", taskID);
         createUnitElement.setAttribute("location", location.getID());
         createUnitElement.setAttribute("owner", owner.getID());
-        createUnitElement.setAttribute("type", Integer.toString(type));
+        createUnitElement.setAttribute("type", type.getId());
 
         logger.info("Waiting for the server to reply...");
         Element reply = client.ask(createUnitElement);

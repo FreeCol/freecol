@@ -42,7 +42,7 @@ public interface ModelController {
     * @param type   The type of unit (Unit.FREE_COLONIST...).
     * @return The created <code>Unit</code>.
     */
-    public Unit createUnit(String taskID, Location location, Player owner, int type);
+    public Unit createUnit(String taskID, Location location, Player owner, UnitType type);
 
     /**
     * Puts the specified <code>Unit</code> in America.
