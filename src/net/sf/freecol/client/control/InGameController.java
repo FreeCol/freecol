@@ -2342,7 +2342,7 @@ public final class InGameController implements NetworkConstants {
             return; // Don't bother (and don't log, this is not exceptional)
         }
 
-        if (state == Unit.PLOW || state == Unit.BUILD_ROAD) {
+        if (state == Unit.IMPROVING) {
             if (unit.getTile().getNationOwner() != Player.NO_NATION
                     && unit.getTile().getNationOwner() != unit.getOwner().getNation()
                     && !Player.isEuropean(unit.getTile().getNationOwner())
