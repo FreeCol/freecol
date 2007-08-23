@@ -222,27 +222,9 @@ public final class ReportUnitPanel extends JPanel implements ActionListener {
             if (reportType == CARGO && unit.isCarrier()) {
                 unitCounts[type][0]++;
                 capacity += unit.getInitialSpaceLeft();
-                Location location = unit.getLocation();
-                if (unit.getDestination() != null) {
-                    locationName = Messages.message("goingTo", 
-                            "%location%", unit.getDestination().getLocationName());
-                } else {
-                    locationName = location.getLocationName();
-                }
             } else if (reportType == NAVAL && unit.isNaval()) {
                 unitCounts[type][0]++;
                 capacity += unit.getInitialSpaceLeft();
-                Location location = unit.getLocation();
-                if (unit.getState() == Unit.TO_AMERICA) {
-                    locationName = Messages.message("goingToAmerica");
-                } else if (unit.getState() == Unit.TO_EUROPE) {
-                    locationName = Messages.message("goingToEurope");
-                } else if (unit.getDestination() != null) {
-                    locationName = Messages.message("sailingTo", "%location%",
-                            unit.getDestination().getLocationName());
-                } else {
-                    locationName = location.getLocationName();
-                }
             } else if (reportType == MILITARY) {
                 switch (type) {
                 case Unit.ARTILLERY:
@@ -273,29 +255,29 @@ public final class ReportUnitPanel extends JPanel implements ActionListener {
                     }
                     break;
                 }                    
-
-                Location location = unit.getLocation();
-                if (unit.getDestination() != null) {
-                    locationName = Messages.message("goingTo", "%location%",
-                            unit.getDestination().getLocationName());
-                } else {
-                    locationName = location.getLocationName();
-                }
+            } else {
+                continue;
             }
 
-            if (locationName != null) {
-                ArrayList<Unit> unitList = locations.get(locationName);
-                if (unitList == null) {
-                    unitList = new ArrayList<Unit>();
-                    locations.put(locationName, unitList);
-                }
-                unitList.add(unit);
-                if (!(colonyNames.contains(locationName) || otherNames.contains(locationName))) {
-                    otherNames.add(locationName);
-                }
+            if (unit.getState() == Unit.TO_AMERICA) {
+                locationName = Messages.message("goingToAmerica");
+            } else if (unit.getState() == Unit.TO_EUROPE) {
+                locationName = Messages.message("goingToEurope");
+            } else {
+                locationName = unit.getLocation().getLocationName();
+            }
+            
+            ArrayList<Unit> unitList = locations.get(locationName);
+            if (unitList == null) {
+                unitList = new ArrayList<Unit>();
+                locations.put(locationName, unitList);
+            }
+            unitList.add(unit);
+            if (!(colonyNames.contains(locationName) || otherNames.contains(locationName))) {
+                otherNames.add(locationName);
             }
         }
-}
+    }
 
     private JPanel createREFPanel() {
         Element refUnits = parent.getClient().getInGameController().getREFUnits();
@@ -400,6 +382,11 @@ public final class ReportUnitPanel extends JPanel implements ActionListener {
                 while (unitIterator.hasNext()) {
                     Unit unit = unitIterator.next();
                     UnitLabel unitLabel = new UnitLabel(unit, parent, true);
+                    if (unit.getDestination() != null) {
+                        unitLabel.setToolTipText("<html>" + unitLabel.getToolTipText()
+                                + "<br>" + Messages.message("goingTo", "%location%",
+                                unit.getDestination().getLocationName()) + "</html>");
+                    }
                     // this is necessary because UnitLabel deselects carriers
                     unitLabel.setSelected(true);
                     unitPanel.add(unitLabel);
