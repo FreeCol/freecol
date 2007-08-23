@@ -501,7 +501,6 @@
       <education unit="model.unit.expertSilverMiner" turns="4"/>
       <education unit="model.unit.expertLumberJack" turns="4"/>
       <education unit="model.unit.expertOreMiner" turns="4"/>
-      <education unit="model.unit.expertFarmer" turns="4"/>
       <education unit="model.unit.masterSugarPlanter" turns="6"/>
       <education unit="model.unit.masterCottonPlanter" turns="6"/>
       <education unit="model.unit.masterTobaccoPlanter" turns="6"/>
