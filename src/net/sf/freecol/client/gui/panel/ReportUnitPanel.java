@@ -288,10 +288,12 @@ public final class ReportUnitPanel extends JPanel implements ActionListener {
             refPanel.add(createUnitTypeLabel(Unit.MAN_O_WAR, false, menOfWar));
         } else if (reportType == MILITARY) {
             int artillery = Integer.parseInt(refUnits.getAttribute("artillery"));
+            int damagedArtillery = Integer.parseInt(refUnits.getAttribute("damagedArtillery"));
             int dragoons = Integer.parseInt(refUnits.getAttribute("dragoons"));
             int infantry = Integer.parseInt(refUnits.getAttribute("infantry"));
             refPanel = new JPanel(new GridLayout(1, 8));
             refPanel.add(createUnitTypeLabel(Unit.ARTILLERY, false, artillery));
+            refPanel.add(createUnitTypeLabel(Unit.DAMAGED_ARTILLERY, false, damagedArtillery));
             refPanel.add(createUnitTypeLabel(Unit.KINGS_REGULAR, true, dragoons));
             refPanel.add(createUnitTypeLabel(Unit.KINGS_REGULAR, false, infantry));
         }

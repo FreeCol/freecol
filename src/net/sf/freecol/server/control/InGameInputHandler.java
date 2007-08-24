@@ -2488,6 +2488,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         ServerPlayer player = getFreeColServer().getPlayer(connection);
         Element reply = Message.createNewRootElement("REFUnits");
         int artillery = 0;
+        int damagedArtillery = 0;
         int menOfWar = 0;
         int dragoons = 0;
         int infantry = 0;
@@ -2507,6 +2508,9 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
                 case Unit.ARTILLERY:
                     artillery++;
                     break;
+                case Unit.DAMAGED_ARTILLERY:
+                    damagedArtillery++;
+                    break;
                 case Unit.MAN_O_WAR:
                     menOfWar++;
                     break;
@@ -2523,6 +2527,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
             }
         }
         reply.setAttribute("artillery", String.valueOf(artillery));
+        reply.setAttribute("damagedArtillery", String.valueOf(damagedArtillery));
         reply.setAttribute("menOfWar", String.valueOf(menOfWar));
         reply.setAttribute("dragoons", String.valueOf(dragoons));
         reply.setAttribute("infantry", String.valueOf(infantry));
