@@ -388,20 +388,7 @@ public final class InGameController implements NetworkConstants {
                     ore += newTile.potential(Goods.ORE);
                     int tileOwner = newTile.getNationOwner();
                     if (tileOwner == unit.getNation()) {
-                        if (newTile.getOwner() != null) {
-                            // we are using newTile
-                            ownedBySelf = true;
-                        } else {
-                            Iterator<Position> ownTileIt = map.getAdjacentIterator(newTile.getPosition());
-                            while (ownTileIt.hasNext()) {
-                                Colony colony = map.getTile(ownTileIt.next()).getColony();
-                                if (colony != null && colony.getOwner() == unit.getOwner()) {
-                                    // newTile can be used from an own colony
-                                    ownedBySelf = true;
-                                    break;
-                                }
-                            }
-                        }
+                        ownedBySelf = true;
                     } else if (Player.isEuropean(tileOwner)) {
                         ownedByEuropeans = true;
                     } else if (tileOwner != Player.NO_NATION) {
@@ -483,7 +470,7 @@ public final class InGameController implements NetworkConstants {
             unit.buildColony(colony);
             
             for(Unit unitInTile : tile.getUnitList()) {
-                if (unitInTile.canCarryTreasure()) {
+                if (unitInTile.getType() == Unit.TREASURE_TRAIN) {
                     checkCashInTreasureTrain(unitInTile);
                 }
             }
@@ -728,7 +715,7 @@ public final class InGameController implements NetworkConstants {
 
         // Display a "cash in"-dialog if a treasure train have been
         // moved into a coastal colony:
-        if (unit.canCarryTreasure() && checkCashInTreasureTrain(unit)) {
+        if (unit.getType() == Unit.TREASURE_TRAIN && checkCashInTreasureTrain(unit)) {
             unit = null;
         }
 
@@ -793,7 +780,7 @@ public final class InGameController implements NetworkConstants {
                     if (goods.getAmount() < 100) {
                         // comlete goods until 100 units
                         // respect the lower limit for TradeRoute
-                        int amountPresent = warehouse.getGoodsCount(goodsType) - exportLevel[goodsType];
+                        int amountPresent = warehouse.getGoodsCount(goodsIndex) - exportLevel[goodsIndex];
                         if (amountPresent > 0) {
                             logger.finest("Automatically loading goods " + goods.getName());
                             int amountToLoad = Math.min(100 - goods.getAmount(), amountPresent);
@@ -827,7 +814,7 @@ public final class InGameController implements NetworkConstants {
         // load cargo that should be on board
         for (GoodsType goodsType : goodsTypesToLoad) {
             // respect the lower limit for TradeRoute
-            int amountPresent = warehouse.getGoodsCount(goodsType) - exportLevel[goodsType];
+            int amountPresent = warehouse.getGoodsCount(goodsType) - exportLevel[goodsType.getIndex()];
             if (amountPresent > 0) {
                 if (unit.getSpaceLeft() > 0) {
                     logger.finest("Automatically loading goods " + Goods.getName(goodsType));
@@ -979,7 +966,7 @@ public final class InGameController implements NetworkConstants {
 
         // Display a "cash in"-dialog if a treasure train have been moved into a
         // colony:
-        if (unit.canCarryTreasure()) {
+        if (unit.getType() == Unit.TREASURE_TRAIN) {
             checkCashInTreasureTrain(unit);
             if (unit.isDisposed()) {
                 nextActiveUnit();
@@ -1645,7 +1632,7 @@ public final class InGameController implements NetworkConstants {
             NodeList capturedGoods = attackResultElement.getElementsByTagName("capturedGoods");
             for (int i = 0; i < capturedGoods.getLength(); ++i) {
                 Element goods = (Element) capturedGoods.item(i);
-                GoodsType type = FreeCol.getSpecification().getGoodsType(goods.getAttribute("type"));
+                GoodsType type = FreeCol.getSpecification().getGoodsType(Integer.parseInt(goods.getAttribute("type")));
                 int amount = Integer.parseInt(goods.getAttribute("amount"));
                 unit.getGoodsContainer().addGoods(type, amount);
             }
@@ -1725,7 +1712,7 @@ public final class InGameController implements NetworkConstants {
                                                 ModelMessage.UNIT_ADDED);
             }
             
-            if (defender.canCarryTreasure() && result >= Unit.ATTACK_WIN) {
+            if (defender.getType() == Unit.TREASURE_TRAIN && result >= Unit.ATTACK_WIN) {
                 checkCashInTreasureTrain(defender);
             }
                 
@@ -2076,16 +2063,16 @@ public final class InGameController implements NetworkConstants {
      * @param colony The colony with the custom house.
      * @param goodsType The goods for which to set the settings.
      */
-    public void setGoodsLevels(Colony colony, int goodsType) {
+    public void setGoodsLevels(Colony colony, GoodsType goodsType) {
         Client client = freeColClient.getClient();
         boolean export = colony.getExports(goodsType);
-        int exportLevel = colony.getExportLevel()[goodsType];
-        int highLevel = colony.getHighLevel()[goodsType];
-        int lowLevel = colony.getLowLevel()[goodsType];
+        int exportLevel = colony.getExportLevel()[goodsType.getIndex()];
+        int highLevel = colony.getHighLevel()[goodsType.getIndex()];
+        int lowLevel = colony.getLowLevel()[goodsType.getIndex()];
 
         Element setGoodsLevelsElement = Message.createNewRootElement("setGoodsLevels");
         setGoodsLevelsElement.setAttribute("colony", colony.getID());
-        setGoodsLevelsElement.setAttribute("goods", String.valueOf(goodsType));
+        setGoodsLevelsElement.setAttribute("goods", String.valueOf(goodsType.getIndex()));
         setGoodsLevelsElement.setAttribute("export", String.valueOf(export));
         setGoodsLevelsElement.setAttribute("exportLevel", String.valueOf(exportLevel));
         setGoodsLevelsElement.setAttribute("highLevel", String.valueOf(highLevel));
@@ -2102,7 +2089,7 @@ public final class InGameController implements NetworkConstants {
      * @param type The type of <code>Goods</code>.
      * @param amount How many of these goods the unit should have.
      */
-    public void equipUnit(Unit unit, int type, int amount) {
+    public void equipUnit(Unit unit, GoodsType type, int amount) {
         if (freeColClient.getGame().getCurrentPlayer() != freeColClient.getMyPlayer()) {
             freeColClient.getCanvas().showInformationMessage("notYourTurn");
             return;
@@ -2119,7 +2106,7 @@ public final class InGameController implements NetworkConstants {
 
         Element equipUnitElement = Message.createNewRootElement("equipunit");
         equipUnitElement.setAttribute("unit", unit.getID());
-        equipUnitElement.setAttribute("type", Integer.toString(type));
+        equipUnitElement.setAttribute("type", Integer.toString(type.getIndex()));
         equipUnitElement.setAttribute("amount", Integer.toString(amount));
 
         switch (type) {
@@ -2232,7 +2219,7 @@ public final class InGameController implements NetworkConstants {
      * Changes the work type of this <code>Unit</code>.
      * 
      * @param unit The <code>Unit</code>
-     * @param workType The new work type.
+     * @param workType The new <code>GoodsType</code> to produce.
      */
     public void changeWorkType(Unit unit, GoodsType workType) {
         if (freeColClient.getGame().getCurrentPlayer() != freeColClient.getMyPlayer()) {
@@ -3128,7 +3115,7 @@ public final class InGameController implements NetworkConstants {
      * 
      * @param type The type of goods for which to pay arrears.
      */
-    public void payArrears(int type) {
+    public void payArrears(GoodsType type) {
         if (freeColClient.getGame().getCurrentPlayer() != freeColClient.getMyPlayer()) {
             freeColClient.getCanvas().showInformationMessage("notYourTurn");
             return;
@@ -3146,7 +3133,7 @@ public final class InGameController implements NetworkConstants {
                 player.resetArrears(type);
                 // send to server
                 Element payArrearsElement = Message.createNewRootElement("payArrears");
-                payArrearsElement.setAttribute("goodsType", String.valueOf(type));
+                payArrearsElement.setAttribute("goodsType", String.valueOf(type.getIndex()));
                 client.sendAndWait(payArrearsElement);
             }
         } else {
