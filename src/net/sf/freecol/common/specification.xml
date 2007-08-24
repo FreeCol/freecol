@@ -732,7 +732,7 @@
       <ability id="model.ability.carryGoods" value="yes"/>
       <ability id="model.ability.carryUnits" value="yes"/>
     </unit-type>
-    <unit-type name="model.unit.manOWar"              offence="24" defence="24" movement="18" lineOfSight="2" space="6" hitPoints="6">
+    <unit-type name="model.unit.manOWar"              offence="24" defence="24" movement="18" lineOfSight="2" space="6" hitPoints="6" hammers="1024" tools="300">
       <ability id="model.ability.navalUnit" value="yes"/>
       <ability id="model.ability.carryGoods" value="yes"/>
       <ability id="model.ability.carryUnits" value="yes"/>
