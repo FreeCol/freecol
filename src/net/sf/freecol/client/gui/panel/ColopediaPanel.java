@@ -32,6 +32,7 @@ import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.Building;
 import net.sf.freecol.common.model.BuildingType;
+import net.sf.freecol.common.model.Europe;
 import net.sf.freecol.common.model.FoundingFather;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.GoodsType;
@@ -566,10 +567,11 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
         detailPanel.removeAll();
         detailPanel.repaint();
 
+        Europe europe = parent.getClient().getMyPlayer().getEurope();
         UnitType type = FreeCol.getSpecification().unitType(unit);
         String price = "";
-        if (type.getId().equals("model.unit.artillery")) {
-            price = String.valueOf(parent.getClient().getMyPlayer().getEurope().getArtilleryPrice());
+        if (europe != null) {
+            price = String.valueOf(europe.getUnitPrice(type));
         } else if (type.getPrice() > 0) {
             price = String.valueOf(type.getPrice());
         }
