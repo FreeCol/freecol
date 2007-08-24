@@ -18,6 +18,7 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
+import net.sf.freecol.FreeCol;
 import net.sf.freecol.common.model.Building;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.ColonyTile;
@@ -1707,153 +1708,19 @@ public class AIPlayer extends AIObject {
      * @return The founding father selected.
      */
     public int selectFoundingFather(int[] foundingFathers) {
-        int choice = -1;
-        int bestValue = -1;
-        for (int i = 0; i < FoundingFather.TYPE_COUNT; i++) {
-            int value = -1;
-            switch (foundingFathers[i]) {
-            case FoundingFather.ADAM_SMITH:
-                if (strategy == STRATEGY_TRADE) {
-                    value = 10;
-                } else {
-                    value = 5;
-                }
-                break;
-            case FoundingFather.JACOB_FUGGER:
-                if (strategy == STRATEGY_TRADE) {
-                    value = 6;
-                } else {
-                    value = 3;
-                }
-                break;
-            case FoundingFather.PETER_MINUIT:
-                if (strategy == STRATEGY_CONQUEST) {
-                    value = 1;
-                } else {
-                    value = 6;
-                }
-                break;
-            case FoundingFather.PETER_STUYVESANT:
-                if (strategy == STRATEGY_TRADE) {
-                    value = 8;
-                } else {
-                    value = 4;
-                }
-                break;
-            case FoundingFather.JAN_DE_WITT:
-                if (strategy == STRATEGY_TRADE) {
-                    value = 6;
-                } else {
-                    value = 3;
-                }
-                break;
-            case FoundingFather.FERDINAND_MAGELLAN:
-                value = 5;
-                break;
-            case FoundingFather.FRANCISCO_DE_CORONADO:
-                value = 4;
-                break;
-            case FoundingFather.HERNANDO_DE_SOTO:
-                value = 7;
-                break;
-            case FoundingFather.HENRY_HUDSON:
-                if (strategy == STRATEGY_TRADE) {
-                    value = 8;
-                } else {
-                    value = 4;
-                }
-                break;
-            case FoundingFather.LA_SALLE:
-                value = 3;
-                break;
-            case FoundingFather.HERNAN_CORTES:
-                if (strategy == STRATEGY_CONQUEST) {
-                    value = 10;
-                } else if (strategy == STRATEGY_COOPERATION) {
-                    value = 1;
-                } else {
-                    value = 3;
-                }
-                break;
-            case FoundingFather.GEORGE_WASHINGTON:
-                value = 5;
-                break;
-            case FoundingFather.PAUL_REVERE:
-                value = 2;
-                break;
-            case FoundingFather.FRANCIS_DRAKE:
-                value = 3;
-                break;
-            case FoundingFather.JOHN_PAUL_JONES:
-                value = 3;
-                break;
-            case FoundingFather.THOMAS_JEFFERSON:
-                value = 10;
-                break;
-            case FoundingFather.POCAHONTAS:
-                if (strategy == STRATEGY_CONQUEST) {
-                    value = 1;
-                } else if (strategy == STRATEGY_COOPERATION) {
-                    value = 7;
-                } else {
-                    value = 3;
-                }
-                break;
-            case FoundingFather.THOMAS_PAINE:
-                value = Math.max(1, player.getTax() / 10);
-                break;
-            case FoundingFather.SIMON_BOLIVAR:
-                value = 6;
-                break;
-            case FoundingFather.BENJAMIN_FRANKLIN:
-                value = 5;
-                break;
-            case FoundingFather.WILLIAM_BREWSTER:
-                if (strategy == STRATEGY_IMMIGRATION) {
-                    value = 7;
-                } else {
-                    value = 5;
-                }
-                break;
-            case FoundingFather.WILLIAM_PENN:
-                if (strategy == STRATEGY_IMMIGRATION) {
-                    value = 5;
-                } else {
-                    value = 3;
-                }
-                break;
-            case FoundingFather.FATHER_JEAN_DE_BREBEUF:
-                if (strategy == STRATEGY_CONQUEST) {
-                    value = 2;
-                } else {
-                    value = 4;
-                }
-                break;
-            case FoundingFather.JUAN_DE_SEPULVEDA:
-                if (strategy == STRATEGY_CONQUEST) {
-                    value = 7;
-                } else {
-                    value = 3;
-                }
-                break;
-            case FoundingFather.BARTOLOME_DE_LAS_CASAS:
-                if (strategy == STRATEGY_CONQUEST) {
-                    value = 6;
-                } else {
-                    value = 5;
-                }
-                break;
-            case FoundingFather.NONE:
-                break;
-            default:
-                throw new IllegalArgumentException("FoundingFather has invalid type.");
-            }
-            if (value > bestValue) {
-                bestValue = value;
-                choice = foundingFathers[i];
+        // TODO: improve choice
+        int age = getGame().getTurn().getAge();
+        int bestFather = -1;
+        int bestWeight = -1;
+        for (int father : foundingFathers) {
+            if (father < 0) continue;
+            int weight = FreeCol.getSpecification().getFoundingFather(father).getWeight(age);
+            if (weight > bestWeight) {
+                bestWeight = weight;
+                bestFather = father;
             }
         }
-        return choice;
+        return bestFather;
     }
 
     /**

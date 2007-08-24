@@ -9,6 +9,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import net.sf.freecol.common.model.FoundingFather;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.BuildingType;
 import net.sf.freecol.common.model.GoodsType;
@@ -47,6 +48,7 @@ public final class Specification {
 
     private final List<UnitType> unitTypeList;
 
+    private final List<FoundingFather> foundingFathers;
 
     public Specification() {
 
@@ -56,6 +58,7 @@ public final class Specification {
         tileTypeList = new ArrayList<TileType>();
         tileImprovementTypeList = new ArrayList<TileImprovementType>();
         unitTypeList = new ArrayList<UnitType>();
+        foundingFathers = new ArrayList<FoundingFather>();
 
         final Map<String, GoodsType> goodsTypeByRef = new HashMap<String, GoodsType>();
         final Map<String, ResourceType> resourceTypeByRef = new HashMap<String, ResourceType>();
@@ -151,6 +154,18 @@ public final class Specification {
                     };
                     unitTypeList.addAll(makeListFromXml(xml, factory));
 
+                } else if ("founding-fathers".equals(childName)) {
+
+                    ObjectFactory<FoundingFather> factory = new ObjectFactory<FoundingFather>() {
+                        int fatherIndex = 0;
+                        public FoundingFather objectFrom(Node xml) {
+                            FoundingFather foundingFather = new FoundingFather(fatherIndex++);
+                            foundingFather.readFromXmlElement(xml, goodsTypeByRef);
+                            return foundingFather;
+                        }
+                    };
+                    foundingFathers.addAll(makeListFromXml(xml, factory));
+ 
                 } else {
                     throw new RuntimeException("unexpected: " + xml);
                 }
@@ -349,6 +364,33 @@ public final class Specification {
             }
         }
         return unitTypes;
+    }
+
+    // -- Founding Fathers --
+
+    public List<FoundingFather> getFoundingFathers() {
+        return foundingFathers;
+    }
+
+    public int numberOfFoundingFathers() {
+        return foundingFathers.size();
+    }
+
+    public FoundingFather foundingFather(int foundingFatherIndex) {
+        return foundingFathers.get(foundingFatherIndex);
+    }
+
+    public int getFoundingFatherIndex(FoundingFather father) {
+        return foundingFathers.indexOf(father);
+    }
+
+    public FoundingFather getFoundingFather(String id) {
+        for (FoundingFather father : foundingFathers) {
+            if (father.getId().equals(id)) {
+                return father;
+            }
+        }
+        return null;
     }
 
     /**

@@ -794,9 +794,7 @@
     <founding-father id="model.foundingFather.peterMinuit" type="trade"
                      weight1="9" weight2="1" weight3="1">
 <!-- Player saves 100% percent, i.e. pays nothing. -->
-<!--
-      <ability id="model.ability.landPaymentBonus" value="100"/>
--->
+      <bonus id="model.bonus.landPaymentBonus" type="percentage" value="-100"/>
     </founding-father>
     <founding-father id="model.foundingFather.peterStuyvesant" type="trade"
                      weight1="2" weight2="4" weight3="8">
@@ -808,9 +806,14 @@
     </founding-father>
     <founding-father id="model.foundingFather.ferdinandMagellan" type="exploration"
                      weight1="2" weight2="10" weight3="10">
-<!--
-      <ability id="model.ability.navalMovementBonus" value="1"/>
--->
+      <modify-type>
+        <requirements>
+          <required-ability id="model.ability.navalUnit" value="yes"/>
+        </requirements>
+        <modifications>
+          <attribute id="movement" value="1" increment="yes"/>
+        </modifications>
+      </modify-type>
     </founding-father>
     <founding-father id="model.foundingFather.fransiscoDeCoronado" type="exploration"
                      weight1="3" weight2="5" weight3="7">
@@ -830,7 +833,7 @@
     </founding-father>
     <founding-father id="model.foundingFather.henryHudson" type="exploration"
                      weight1="10" weight2="1" weight3="1">
-      <production-bonus goods-type="model.goods.furs" factor="200"/>
+      <production-bonus goods-type="model.goods.furs" type="percentage" value="100"/>
     </founding-father>
     <founding-father id="model.foundingFather.laSalle" type="exploration"
                      weight1="7" weight2="5" weight3="3">
@@ -846,8 +849,8 @@
     </founding-father>
     <founding-father id="model.foundingFather.hernanCortes" type="military"
                      weight1="6" weight2="5" weight3="1">
-      <ability id="model.ability.nativeTreasureBonus" value="yes"/>
-      <ability id="model.ability.freeTreasureTransport" value="yes"/>
+      <bonus id="model.bonus.nativeTreasureBonus" type="percentage" value="200"/>
+      <bonus id="model.bonus.treasureTransportFee" type="percentage" value="-100"/>
     </founding-father>
     <founding-father id="model.foundingFather.georgeWashington" type="military"
                      weight1="0" weight2="4" weight3="10">
@@ -864,7 +867,7 @@
           <required-id id="model.unit.privateer"/>
         </requirements>
         <modifications>
-          <offense-bonus value="150"/>
+          <offense-bonus id="model.bonus.francisDrake" type="percentage" value="50"/>
         </modifications>
       </modify-type>
     </founding-father>
@@ -874,19 +877,19 @@
     </founding-father>
     <founding-father id="model.foundingFather.thomasJefferson" type="political"
                      weight1="4" weight2="5" weight3="6">
-      <production-bonus goods-type="model.goods.bells" factor="150"/>
+      <production-bonus goods-type="model.goods.bells" type="percentage" value="50"/>
     </founding-father>
     <founding-father id="model.foundingFather.pocahontas" type="political"
                      weight1="7" weight2="5" weight3="3">
-      <ability id="model.ability.nativeAlarmBonus" value="yes"/>
+      <bonus id="model.bonus.nativeAlarmBonus" type="percentage" value="-50"/>
     </founding-father>
     <founding-father id="model.foundingFather.thomasPaine" type="political"
                      weight1="1" weight2="2" weight3="8">
-      <production-bonus goods-type="model.goods.bells" factor="%tax%"/>
+      <ability id="model.ability.addTaxToBells" value="true"/>
     </founding-father>
     <founding-father id="model.foundingFather.simonBolivar" type="political"
                      weight1="0" weight2="4" weight3="6">
-      <event id="model.event.sonsOfLiberty" value="20"/>
+      <event id="model.event.increaseSonsOfLiberty" value="20"/>
     </founding-father>
     <founding-father id="model.foundingFather.benjaminFranklin" type="political"
                      weight1="5" weight2="5" weight3="5">
@@ -914,7 +917,7 @@
     </founding-father>
     <founding-father id="model.foundingFather.williamPenn" type="religious"
                      weight1="8" weight2="5" weight3="2">
-      <production-bonus goods-type="model.goods.crosses" factor="150"/>
+      <production-bonus goods-type="model.goods.crosses" type="percentage" value="50"/>
     </founding-father>
     <founding-father id="model.foundingFather.fatherJeanDeBrebeuf" type="religious"
                      weight1="6" weight2="6" weight3="1">

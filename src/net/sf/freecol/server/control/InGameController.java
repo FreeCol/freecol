@@ -219,32 +219,34 @@ public final class InGameController extends Controller {
 
     /**
      * 
-     * Returns an <code>int[]</code> with the size of
-     * {@link FoundingFather#TYPE_COUNT}, containing random founding fathers
-     * (not including the founding fathers the player has already) of each type.
+     * Returns an <code>int[]</code> with the size of {@link
+     * FoundingFather#TYPE_COUNT}, containing the indices of random
+     * founding fathers (not including the founding fathers the player
+     * has already) of each type.
      * 
      * @param player The <code>Player</code> that should pick a founding
      *            father from this list.
      */
     private int[] getRandomFoundingFathers(Player player) {
+        int age = getGame().getTurn().getAge();
         int[] randomFoundingFathers = new int[FoundingFather.TYPE_COUNT];
-        for (int i = 0; i < FoundingFather.TYPE_COUNT; i++) {
+        for (int type = 0; type < FoundingFather.TYPE_COUNT; type++) {
             int weightSum = 0;
-            for (int j = 0; j < FoundingFather.FATHER_COUNT; j++) {
-                if (!player.hasFather(j) && FoundingFather.getType(j) == i) {
-                    weightSum += FoundingFather.getWeight(j, getGame().getTurn().getAge());
+            for (FoundingFather father : FreeCol.getSpecification().getFoundingFathers()) {
+                if (!player.hasFather(father.getIndex()) && father.getType() == type) {
+                    weightSum += father.getWeight(age);
                 }
             }
             if (weightSum == 0) {
-                randomFoundingFathers[i] = -1;
+                randomFoundingFathers[type] = -1;
             } else {
                 int r = getPseudoRandom().nextInt(weightSum) + 1;
                 weightSum = 0;
-                for (int j = 0; j < FoundingFather.FATHER_COUNT; j++) {
-                    if (!player.hasFather(j) && FoundingFather.getType(j) == i) {
-                        weightSum += FoundingFather.getWeight(j, getGame().getTurn().getAge());
+                for (FoundingFather father : FreeCol.getSpecification().getFoundingFathers()) {
+                    if (!player.hasFather(father.getIndex()) && father.getType() == type) {
+                        weightSum += father.getWeight(age);
                         if (weightSum >= r) {
-                            randomFoundingFathers[i] = j;
+                            randomFoundingFathers[type] = father.getIndex();
                             break;
                         }
                     }
