@@ -428,11 +428,6 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
                 return continuePlaying(connection, element);
             }
         });
-        register("assignTeacher", new NetworkRequestHandler() {
-            public Element handle(Connection connection, Element element) {
-                return assignTeacher(connection, element);
-            }
-        });
     }
 
     /**
@@ -1290,7 +1285,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
                 int capturedGoods = newGoods.getAmount() - oldGoodsCounts.get(newGoods.getType().getName()).intValue();
                 if (capturedGoods > 0) {
                     Element captured = reply.getOwnerDocument().createElement("capturedGoods");
-                    captured.setAttribute("type", newGoods.getType().getName());
+                    captured.setAttribute("type", Integer.toString(newGoods.getType().getIndex()));
                     captured.setAttribute("amount", Integer.toString(capturedGoods));
                     reply.appendChild(captured);
                 }
@@ -1841,7 +1836,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
     private Element buyGoods(Connection connection, Element buyGoodsElement) {
         ServerPlayer player = getFreeColServer().getPlayer(connection);
         Unit carrier = (Unit) getGame().getFreeColGameObject(buyGoodsElement.getAttribute("carrier"));
-        int type = Integer.parseInt(buyGoodsElement.getAttribute("type"));
+        GoodsType type = FreeCol.getSpecification().getGoodsType(Integer.parseInt(buyGoodsElement.getAttribute("type")));
         GoodsType goodsType = FreeCol.getSpecification().getGoodsType(type);
         int amount = Integer.parseInt(buyGoodsElement.getAttribute("amount"));
         if (carrier.getOwner() != player) {
@@ -2036,7 +2031,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
     private Element equipUnit(Connection connection, Element workElement) {
         ServerPlayer player = getFreeColServer().getPlayer(connection);
         Unit unit = (Unit) getGame().getFreeColGameObject(workElement.getAttribute("unit"));
-        int type = Integer.parseInt(workElement.getAttribute("type"));
+        GoodsType type = FreeCol.getSpecification().getGoodsType(Integer.parseInt(buyGoodsElement.getAttribute("type")));
         int amount = Integer.parseInt(workElement.getAttribute("amount"));
         if (unit.getOwner() != player) {
             throw new IllegalStateException("Not your unit!");
@@ -2256,13 +2251,13 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
      */
     private Element payArrears(Connection connection, Element payArrearsElement) {
         ServerPlayer player = getFreeColServer().getPlayer(connection);
-        int goods = new Integer(payArrearsElement.getAttribute("goodsType")).intValue();
-        int arrears = player.getArrears(goods);
+        int goodsIndex = new Integer(payArrearsElement.getAttribute("goodsType")).intValue();
+        int arrears = player.getArrears(goodsIndex);
         if (player.getGold() < arrears) {
             throw new IllegalStateException("Not enough gold to pay tax arrears!");
         } else {
             player.modifyGold(-arrears);
-            player.resetArrears(goods);
+            player.resetArrears(goodsIndex);
         }
         return null;
     }
@@ -2286,16 +2281,16 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
              * new IllegalStateException("Colony has no custom house!");
              */
         }
-        int goods = Integer.valueOf(setGoodsLevelsElement.getAttribute("goods")).intValue();
+        int goodsIndex = Integer.valueOf(setGoodsLevelsElement.getAttribute("goods")).intValue();
         boolean export = Boolean.valueOf(setGoodsLevelsElement.getAttribute("export")).booleanValue();
         int exportLevel = Integer.valueOf(setGoodsLevelsElement.getAttribute("exportLevel")).intValue();
         int highLevel = Integer.valueOf(setGoodsLevelsElement.getAttribute("highLevel")).intValue();
         int lowLevel = Integer.valueOf(setGoodsLevelsElement.getAttribute("lowLevel")).intValue();
 
-        colony.setExports(goods, export);
-        colony.getExportLevel()[goods] = exportLevel;
-        colony.getHighLevel()[goods] = highLevel;
-        colony.getLowLevel()[goods] = lowLevel;
+        colony.setExports(goodsIndex, export);
+        colony.getExportLevel()[goodsIndex] = exportLevel;
+        colony.getHighLevel()[goodsIndex] = highLevel;
+        colony.getLowLevel()[goodsIndex] = lowLevel;
         return null;
     }
 
