@@ -388,7 +388,20 @@ public final class InGameController implements NetworkConstants {
                     ore += newTile.potential(Goods.ORE);
                     int tileOwner = newTile.getNationOwner();
                     if (tileOwner == unit.getNation()) {
-                        ownedBySelf = true;
+                        if (newTile.getOwner() != null) {
+                            // we are using newTile
+                            ownedBySelf = true;
+                        } else {
+                            Iterator<Position> ownTileIt = map.getAdjacentIterator(newTile.getPosition());
+                            while (ownTileIt.hasNext()) {
+                                Colony colony = map.getTile(ownTileIt.next()).getColony();
+                                if (colony != null && colony.getOwner() == unit.getOwner()) {
+                                    // newTile can be used from an own colony
+                                    ownedBySelf = true;
+                                    break;
+                                }
+                            }
+                        }
                     } else if (Player.isEuropean(tileOwner)) {
                         ownedByEuropeans = true;
                     } else if (tileOwner != Player.NO_NATION) {
@@ -470,7 +483,7 @@ public final class InGameController implements NetworkConstants {
             unit.buildColony(colony);
             
             for(Unit unitInTile : tile.getUnitList()) {
-                if (unitInTile.getType() == Unit.TREASURE_TRAIN) {
+                if (unitInTile.canCarryTreasure()) {
                     checkCashInTreasureTrain(unitInTile);
                 }
             }
@@ -715,7 +728,7 @@ public final class InGameController implements NetworkConstants {
 
         // Display a "cash in"-dialog if a treasure train have been
         // moved into a coastal colony:
-        if (unit.getType() == Unit.TREASURE_TRAIN && checkCashInTreasureTrain(unit)) {
+        if (unit.canCarryTreasure() && checkCashInTreasureTrain(unit)) {
             unit = null;
         }
 
@@ -780,7 +793,7 @@ public final class InGameController implements NetworkConstants {
                     if (goods.getAmount() < 100) {
                         // comlete goods until 100 units
                         // respect the lower limit for TradeRoute
-                        int amountPresent = warehouse.getGoodsCount(goodsIndex) - exportLevel[goodsIndex];
+                        int amountPresent = warehouse.getGoodsCount(goodsType) - exportLevel[goodsType.getIndex()];
                         if (amountPresent > 0) {
                             logger.finest("Automatically loading goods " + goods.getName());
                             int amountToLoad = Math.min(100 - goods.getAmount(), amountPresent);
@@ -966,7 +979,7 @@ public final class InGameController implements NetworkConstants {
 
         // Display a "cash in"-dialog if a treasure train have been moved into a
         // colony:
-        if (unit.getType() == Unit.TREASURE_TRAIN) {
+        if (unit.canCarryTreasure()) {
             checkCashInTreasureTrain(unit);
             if (unit.isDisposed()) {
                 nextActiveUnit();
@@ -1712,7 +1725,7 @@ public final class InGameController implements NetworkConstants {
                                                 ModelMessage.UNIT_ADDED);
             }
             
-            if (defender.getType() == Unit.TREASURE_TRAIN && result >= Unit.ATTACK_WIN) {
+            if (defender.canCarryTreasure() && result >= Unit.ATTACK_WIN) {
                 checkCashInTreasureTrain(defender);
             }
                 
@@ -3107,7 +3120,7 @@ public final class InGameController implements NetworkConstants {
      * @param goods The goods for which to pay arrears.
      */
     public void payArrears(Goods goods) {
-        payArrears(goods.getType().getIndex());
+        payArrears(goods.getType());
     }
 
     /**

@@ -428,6 +428,11 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
                 return continuePlaying(connection, element);
             }
         });
+        register("assignTeacher", new NetworkRequestHandler() {
+            public Element handle(Connection connection, Element element) {
+                return assignTeacher(connection, element);
+            }
+        });
     }
 
     /**
@@ -1837,7 +1842,6 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         ServerPlayer player = getFreeColServer().getPlayer(connection);
         Unit carrier = (Unit) getGame().getFreeColGameObject(buyGoodsElement.getAttribute("carrier"));
         GoodsType type = FreeCol.getSpecification().getGoodsType(Integer.parseInt(buyGoodsElement.getAttribute("type")));
-        GoodsType goodsType = FreeCol.getSpecification().getGoodsType(type);
         int amount = Integer.parseInt(buyGoodsElement.getAttribute("amount"));
         if (carrier.getOwner() != player) {
             throw new IllegalStateException("Not your unit!");
@@ -1845,7 +1849,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         if (carrier.getOwner() != player) {
             throw new IllegalStateException();
         }
-        carrier.buyGoods(goodsType, amount);
+        carrier.buyGoods(type, amount);
         return null;
     }
 
@@ -2031,7 +2035,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
     private Element equipUnit(Connection connection, Element workElement) {
         ServerPlayer player = getFreeColServer().getPlayer(connection);
         Unit unit = (Unit) getGame().getFreeColGameObject(workElement.getAttribute("unit"));
-        GoodsType type = FreeCol.getSpecification().getGoodsType(Integer.parseInt(buyGoodsElement.getAttribute("type")));
+        GoodsType type = FreeCol.getSpecification().getGoodsType(Integer.parseInt(workElement.getAttribute("type")));
         int amount = Integer.parseInt(workElement.getAttribute("amount"));
         if (unit.getOwner() != player) {
             throw new IllegalStateException("Not your unit!");
