@@ -19,10 +19,11 @@ public final class TileType
     public String id;
     public String name;
     
-    private String artBasic;
-    private String artOverlay;
-    private String artUnexplored;
-    private String artCoast;
+    public int artBasic;
+    public int artOverlay;
+    public int artForest;
+    public int artUnexplored;
+    public int artCoast;
     
     public boolean forest;
     public boolean water;
@@ -58,14 +59,6 @@ public final class TileType
 
     public String getName() {
         return name;
-    }
-
-    public String getArtBasic() {
-        return artBasic;
-    }
-
-    public String getArtOverlay() {
-        return artOverlay;
     }
 
     public boolean isForested() {
@@ -148,26 +141,30 @@ public final class TileType
     public void readFromXmlElement(Node xml, Map<String, GoodsType> goodsTypeByRef,
                                     Map<String, ResourceType> resourceTypeByRef) {
 
-        id = Xml.attribute(xml, "name");
-        name = Xml.attribute(xml, "name");
+        name = Xml.attribute(xml, "id");
+        String[] buffer = name.separator(".");
+        id = buffer[buffer.length - 1];
+        basicMoveCost = Xml.intArrayAttribute(xml, "basic-move-cost");
+        basicWorkTurns = Xml.intArrayAttribute(xml, "basic-work-turns");
         forest = Xml.booleanAttribute(xml, "is-forest", false);
         water = Xml.booleanAttribute(xml, "is-water", false);
         canSettle = Xml.booleanAttribute(xml, "can-settle", (water) ? false : true);
-        basicMoveCost = Xml.intArrayAttribute(xml, "basic-move-cost");
-        basicWorkTurns = Xml.intArrayAttribute(xml, "basic-work-turns");
         canSailToEurope = Xml.booleanAttribute(xml, "sail-to-europe", false);
         attackFactor = 100;
         defenceFactor = 100;
+        boolean hasArt = false;
 
         Xml.Method method = new Xml.Method() {
             public void invokeOn(Node xml) {
                 String childName = xml.getNodeName();
 
                 if ("art".equals(childName)) {
-                    artBasic = Xml.attribute(xml, "basic");
-                    artOverlay = Xml.attribute(xml, "overlay", "");
-                    artUnexplored = Xml.attribute(xml, "unexplored", "model.tile.unexplored");
-                    artCoast = Xml.attribute(xml, "coast", "");
+                    hasArt = true;
+                    artBasic = Xml.intAttribute(xml, "basic");
+                    artOverlay = Xml.intAttribute(xml, "overlay", -1);
+                    artForest = Xml.intAttribute(xml, "forest", -1);
+                    artUnexplored = Xml.intAttribute(xml, "unexplored", 0);
+                    artCoast = Xml.intAttribute(xml, "coast", -1);
                 } else if ("gen".equals(childName)) {
                     int[] defaultArray = new int[] {-3, 3};
                     humidity = Xml.intArrayAttribute(xml, "humidity", defaultArray);
@@ -195,6 +192,9 @@ public final class TileType
             }
         };
         Xml.forEachChild(xml, method);
+        if (!hasArt) {
+            throw new RuntimeException("TileType "+name+" has no art defined!");
+        }
     }
 
 }

@@ -2855,6 +2855,9 @@ public class Player extends FreeColGameObject implements Abilities, Nameable {
     public int getArrears(int goodsIndex) {
         return arrears[goodsIndex];
     }
+    public int getArrears(GoodsType type) {
+        return arrears[type.getIndex()];
+    }
 
     /**
      * Returns the arrears due for a type of goods.
@@ -2874,6 +2877,9 @@ public class Player extends FreeColGameObject implements Abilities, Nameable {
     public void setArrears(int goodsIndex) {
         arrears[goodsIndex] = (getDifficulty() + 3) * 100 * getMarket().paidForSale(goodsIndex);
     }
+    public void setArrears(GoodsType type) {
+        setArrears(type.getIndex());
+    }
 
     /**
      * Sets the arrears for these goods.
@@ -2891,6 +2897,9 @@ public class Player extends FreeColGameObject implements Abilities, Nameable {
      */
     public void resetArrears(int goodsIndex) {
         arrears[goodsIndex] = 0;
+    }
+    public void resetArrears(GoodsType type) {
+        arrears[type.getIndex()] = 0;
     }
 
     /**

@@ -35,7 +35,7 @@ public class DefaultCostDecider implements CostDecider {
         movesLeft = ml;
         newTurn = false;
         
-        if (newTile.getType() == Tile.UNEXPLORED) {
+        if (!newTile.isExplored) {
             // Not allowed to use an unexplored tile for a path:
             return ILLEGAL_MOVE;
         } else if (newTile.isLand() && unit.isNaval() && (newTile.getSettlement() == null

@@ -109,20 +109,28 @@ public class TileItemContainer extends FreeColGameObject {
         return (resource != null);
     }
 
-    public boolean getRoad() {
+    public TileImprovement getRoad() {
         return road;
     }
 
-    public boolean getRiver() {
+    public TileImprovement getRiver() {
         return river;
     }
 
-    public boolean getResource() {
+    public Resource getResource() {
         return resource;
     }
 
     public void clear() {
+        if (hasResource()) {
+            resource.dispose();
+        }
+        for (TileImprovement t : improvements) {
+            t.dispose();
+        }
         improvements.clear();
+        road = null;
+        river = null;
     }
 
     /**
@@ -147,17 +155,35 @@ public class TileItemContainer extends FreeColGameObject {
     }
 
     /**
-     * Determine the total bonus for a GoodsType. Checks Resource and all Improvements.
+     * Determine the total bonus from all Improvements
      * @return The total bonus
      */
-    public int getBonus(GoodsType g) {
+    public int getImprovementBonusPotential(GoodsType g) {
         int bonus = 0;
-        if (hasResource()) {
-            bonus += resource.getBonus(g);
-        }
         for (TileImprovement ti : improvements) {
             bonus += ti.getBonus(g);
         }
+        return bonus;
+    }
+
+    /**
+     * Determine the total bonus from Resource if any
+     * @return The total bonus
+     */
+    public int getResourceBonusPotential(GoodsType g, int potential) {
+        if (hasResource()) {
+            potential = resource.getBonus(g, potential);
+        }
+        return potential;
+    }
+
+    /**
+     * Determine the total bonus for a GoodsType. Checks Resource and all Improvements.
+     * @return The total bonus
+     */
+    public int getTotalBonusPotential(GoodsType g, int tilePotential) {
+        int potential = tilePotential + getImprovementBonusPotential(g);
+        potential = getResourceBonusPotential(g, potential);
         return bonus;
     }
 
@@ -205,7 +231,10 @@ public class TileItemContainer extends FreeColGameObject {
             return null;
         }
         if (t instanceof Resource) {
-            // Overwrites existing resource
+            // Disposes existing resource and replaces with new one
+            if (resource != null) {
+                resource.dispose();
+            }
             resource = t;
             return t;
         } else if (t instanceof TileImprovement) {

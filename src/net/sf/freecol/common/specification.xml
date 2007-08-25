@@ -149,44 +149,44 @@
   </goods-types>
 
   <resource-types>
-    <resource-type id="model.resource.Game">
+    <resource-type id="model.resource.Game" art="7">
       <production-bonus goods-type="model.goods.Food" bonus="2"/>
       <!-- in colonization game gives 2 food (4 for expert farmer) -->
       <production-bonus goods-type="model.goods.Furs" bonus="2"/>
     </resource-type>
-    <resource-type id="model.resource.Minerals" minimum-value="40" maximum-value="400">
+    <resource-type id="model.resource.Minerals" art="6" minimum-value="40" maximum-value="400">
       <production-bonus goods-type="model.goods.Ore" bonus="3"/>
     </resource-type>
-    <resource-type id="model.resource.Ore" minimum-value="40" maximum-value="4000">
+    <resource-type id="model.resource.Ore" art="6" minimum-value="40" maximum-value="4000">
       <production-bonus goods-type="model.goods.Ore" bonus="2"/>
     </resource-type>
-    <resource-type id="model.resource.Silver" minimum-value="40" maximum-value="800">
+    <resource-type id="model.resource.Silver" art="0" minimum-value="40" maximum-value="800">
       <production-bonus goods-type="model.goods.Silver" bonus="2"/>
     </resource-type>
-    <resource-type id="model.resource.Lumber">
+    <resource-type id="model.resource.Lumber" art="8">
       <production-bonus goods-type="model.goods.Lumber" bonus="4"/>
     </resource-type>
-    <resource-type id="model.resource.Furs">
+    <resource-type id="model.resource.Furs" art="7">
       <production-bonus goods-type="model.goods.Furs" bonus="3"/>
     </resource-type>
-    <resource-type id="model.resource.Tobacco">
+    <resource-type id="model.resource.Tobacco" art="2">
       <production-bonus goods-type="model.goods.Tobacco" factor="2"/>
     </resource-type>
-    <resource-type id="model.resource.Sugar">
+    <resource-type id="model.resource.Sugar" art="4">
       <production-bonus goods-type="model.goods.Sugar" factor="2"/>
     </resource-type>
-    <resource-type id="model.resource.Cotton">
+    <resource-type id="model.resource.Cotton" art="3">
       <production-bonus goods-type="model.goods.Cotton" factor="2"/>
     </resource-type>
-    <resource-type id="model.resource.Oasis">
+    <resource-type id="model.resource.Oasis" art="1">
       <production-bonus goods-type="model.goods.Food" bonus="2"/>
       <!-- in colonization game gives 2 food (4 for expert farmer) -->
     </resource-type>
-    <resource-type id="model.resource.Grain">
+    <resource-type id="model.resource.Grain" art="1">
       <production-bonus goods-type="model.goods.Food" bonus="2"/>
       <!-- in colonization game gives 2 food (4 for expert farmer) -->
     </resource-type>
-    <resource-type id="model.resource.Fish">
+    <resource-type id="model.resource.Fish" art="5">
       <production-bonus goods-type="model.goods.Fish" bonus="3"/>
       <!-- in colonization game gives 3 food (6 for expert fisherman) -->
     </resource-type>
@@ -231,7 +231,7 @@
     </tile-type>
 -->
     <tile-type    id="model.tile.plains"            basic-move-cost="3" basic-work-turns="3">
-      <art basic="model.tile.plains" unexplored="model.tile.unexplored" coast="model.tile.beach"/>
+      <art basic="1" unexplored="0" coast="12"/>
       <gen humidity="-2,2" temperature="-2,2" altitude="1,2" latitude="0,2"/>
       <production goods-type="model.goods.Food"       value="5"/>
       <production goods-type="model.goods.Cotton"     value="2"/>
@@ -239,28 +239,28 @@
       <resource   type="model.resource.Grain"         probability="100"/>
     </tile-type>
     <tile-type    id="model.tile.grassland"         basic-move-cost="3" basic-work-turns="3">
-      <art basic="model.tile.grassland" unexplored="model.tile.unexplored" coast="model.tile.beach"/>
+      <art basic="2" unexplored="0" coast="12"/>
       <gen humidity="-2,2" temperature="-2,2" altitude="1,2" latitude="0,2"/>
       <production goods-type="model.goods.Food"       value="3"/>
       <production goods-type="model.goods.Tobacco"    value="3"/>
       <resource   type="model.resource.Tobacco"       probability="100"/>
     </tile-type>
     <tile-type    id="model.tile.prairie"           basic-move-cost="3" basic-work-turns="3">
-      <art basic="model.tile.prairie" unexplored="model.tile.unexplored" coast="model.tile.beach"/>
+      <art basic="3" unexplored="0" coast="12"/>
       <gen humidity="-2,2" temperature="-2,2" altitude="1,2" latitude="0,2"/>
       <production goods-type="model.goods.Food"       value="3"/>
       <production goods-type="model.goods.Cotton"     value="3"/>
       <resource   type="model.resource.Cotton"        probability="100"/>
     </tile-type>
     <tile-type    id="model.tile.savannah"          basic-move-cost="3" basic-work-turns="3">
-      <art basic="model.tile.savannah" unexplored="model.tile.unexplored" coast="model.tile.beach"/>
+      <art basic="4" unexplored="0" coast="12"/>
       <gen humidity="-2,2" temperature="-2,2" altitude="1,2" latitude="0,2"/>
       <production goods-type="model.goods.Food"       value="4"/>
       <production goods-type="model.goods.Sugar"      value="3"/>
       <resource   type="model.resource.Sugar"         probability="100"/>
     </tile-type>
     <tile-type    id="model.tile.marsh"             basic-move-cost="6" basic-work-turns="5">
-      <art basic="model.tile.marsh" unexplored="model.tile.unexplored" coast="model.tile.beach"/>
+      <art basic="5" unexplored="0" coast="12"/>
       <gen humidity="1,3" temperature="-1,3" altitude="1,2" latitude="0,2"/>
       <skirmish defence-factor="125"/>
       <production goods-type="model.goods.Food"       value="3"/>
@@ -269,7 +269,7 @@
       <resource   type="model.resource.Minerals"         probability="100"/>
     </tile-type>
     <tile-type    id="model.tile.swamp"             basic-move-cost="6" basic-work-turns="7">
-      <art basic="model.tile.swamp" unexplored="model.tile.unexplored" coast="model.tile.beach"/>
+      <art basic="6" unexplored="0" coast="12"/>
       <gen humidity="1,3" temperature="-1,3" altitude="1,2" latitude="0,2"/>
       <skirmish defence-factor="125"/>
       <production goods-type="model.goods.Food"       value="3"/>
@@ -278,7 +278,7 @@
       <resource   type="model.resource.Minerals"      probability="100"/>
     </tile-type>
     <tile-type    id="model.tile.desert"            basic-move-cost="3" basic-work-turns="3">
-      <art basic="model.tile.desert" unexplored="model.tile.unexplored" coast="model.tile.beach"/>
+      <art basic="7" unexplored="0" coast="12"/>
       <gen humidity="-3,-1" temperature="-1,3" altitude="0,3" latitude="0,3"/>
       <production goods-type="model.goods.Food"       value="2"/>
       <production goods-type="model.goods.Cotton"     value="1"/>
@@ -286,14 +286,14 @@
       <resource   type="model.resource.Oasis"         probability="100"/>
     </tile-type>
     <tile-type    id="model.tile.tundra"            basic-move-cost="3" basic-work-turns="4">
-      <art basic="model.tile.tundra" unexplored="model.tile.unexplored" coast="model.tile.beach"/>
+      <art basic="8" unexplored="0" coast="12"/>
       <gen humidity="-3,3" temperature="-3,1" altitude="1,3" latitude="1,3"/>
       <production goods-type="model.goods.Food"       value="3"/>
       <production goods-type="model.goods.Ore"        value="2"/>
       <resource   type="model.resource.Minerals"         probability="100"/>
     </tile-type>
     <tile-type    id="model.tile.mixedForest"       basic-move-cost="6" basic-work-turns="4" is-forest="yes">
-      <art basic="model.tile.plains" overlay="model.tile.forest.plains" unexplored="model.tile.unexplored" coast="model.tile.beach"/>
+      <art basic="1" forest="1" unexplored="0" coast="12"/>
       <gen humidity="-2,2" temperature="-2,2" altitude="1,2" latitude="0,2"/>
       <skirmish defence-factor="150"/>
       <production goods-type="model.goods.Food"       value="3"/>
@@ -307,7 +307,7 @@
     -->
     </tile-type>
     <tile-type    id="model.tile.coniferForest"     basic-move-cost="6" basic-work-turns="4" is-forest="yes">
-      <art basic="model.tile.grassland" overlay="model.tile.forest.grassland" unexplored="model.tile.unexplored" coast="model.tile.beach"/>
+      <art basic="2" forest="2" unexplored="0" coast="12"/>
       <gen humidity="-2,2" temperature="-2,2" altitude="1,2" latitude="0,2"/>
       <skirmish defence-factor="150"/>
       <production goods-type="model.goods.Food"       value="2"/>
@@ -317,7 +317,7 @@
       <resource   type="model.resource.Lumber"        probability="100"/>
     </tile-type>
     <tile-type    id="model.tile.broadleafForest"   basic-move-cost="6" basic-work-turns="4" is-forest="yes">
-      <art basic="model.tile.prairie" overlay="model.tile.forest.prairie" unexplored="model.tile.unexplored" coast="model.tile.beach"/>
+      <art basic="3" forest="3" unexplored="0" coast="12"/>
       <gen humidity="-2,2" temperature="-2,2" altitude="1,2" latitude="0,2"/>
       <skirmish defence-factor="150"/>
       <production goods-type="model.goods.Food"       value="2"/>
@@ -327,7 +327,7 @@
       <resource   type="model.resource.Game"          probability="100"/>
     </tile-type>
     <tile-type    id="model.tile.tropicalForest"    basic-move-cost="6" basic-work-turns="6" is-forest="yes">
-      <art basic="model.tile.savannah" overlay="model.tile.forest.savannah" unexplored="model.tile.unexplored" coast="model.tile.beach"/>
+      <art basic="4" forest="4" unexplored="0" coast="12"/>
       <skirmish defence-factor="150"/>
       <gen humidity="-2,2" temperature="-2,2" altitude="1,2" latitude="0,2"/>
       <production goods-type="model.goods.Food"       value="3"/>
@@ -337,7 +337,7 @@
       <resource   type="model.resource.Lumber"        probability="100"/>
     </tile-type>
     <tile-type    id="model.tile.wetlandForest"     basic-move-cost="9" basic-work-turns="6" is-forest="yes">
-      <art basic="model.tile.marsh" overlay="model.tile.forest.marsh" unexplored="model.tile.unexplored" coast="model.tile.beach"/>
+      <art basic="5" forest="5" unexplored="0" coast="12"/>
       <gen humidity="1,3" temperature="-1,3" altitude="1,2" latitude="0,2"/>
       <skirmish defence-factor="150"/>
       <production goods-type="model.goods.Food"       value="2"/>
@@ -348,7 +348,7 @@
       <resource   type="model.resource.Minerals"      probability="100"/>
     </tile-type>
     <tile-type    id="model.tile.rainForest"        basic-move-cost="9" basic-work-turns="7" is-forest="yes">
-      <art basic="model.tile.swamp" overlay="model.tile.forest.swamp" unexplored="model.tile.unexplored" coast="model.tile.beach"/>
+      <art basic="6" forest="6" unexplored="0" coast="12"/>
       <gen humidity="1,3" temperature="-1,3" altitude="1,2" latitude="0,2"/>
       <skirmish defence-factor="175"/>
       <production goods-type="model.goods.Food"       value="2"/>
@@ -359,7 +359,7 @@
       <resource   type="model.resource.Minerals"      probability="100"/>
     </tile-type>
     <tile-type    id="model.tile.scrubForest"       basic-move-cost="3" basic-work-turns="4" is-forest="yes">
-      <art basic="model.tile.desert" overlay="model.tile.forest.desert" unexplored="model.tile.unexplored" coast="model.tile.beach"/>
+      <art basic="7" forest="7" unexplored="0" coast="12"/>
       <gen humidity="-3,-1" temperature="-1,3" altitude="0,3" latitude="0,3"/>
       <skirmish defence-factor="150"/>
       <production goods-type="model.goods.Food"       value="2"/>
@@ -370,7 +370,7 @@
       <resource   type="model.resource.Oasis"         probability="100"/>
     </tile-type>
     <tile-type    id="model.tile.borealForest"      basic-move-cost="6" basic-work-turns="4" is-forest="yes">
-      <art basic="model.tile.tundra" overlay="model.tile.forest.tundra" unexplored="model.tile.unexplored" coast="model.tile.beach"/>
+      <art basic="8" forest="8" unexplored="0" coast="12"/>
       <gen humidity="-3,3" temperature="-3,1" altitude="1,3" latitude="1,3"/>
       <skirmish defence-factor="150"/>
       <production goods-type="model.goods.Food"       value="2"/>
@@ -380,7 +380,7 @@
       <resource   type="model.resource.Game"          probability="100"/>
     </tile-type>
     <tile-type    id="model.tile.hills"             basic-move-cost="6" basic-work-turns="4">
-      <art basic="model.tile.plains" overlay="model.tile.hills" unexplored="model.tile.unexplored" coast="model.tile.beach"/>
+      <art basic="1" overlay="14" unexplored="0" coast="12"/>
       <gen humidity="-3,3" temperature="-3,3" altitude="1,3" latitude="0,3"/>
       <skirmish defence-factor="200"/>
       <production goods-type="model.goods.Food"       value="2"/>
@@ -388,7 +388,7 @@
       <resource   type="model.resource.Ore"           probability="100"/>
     </tile-type>
     <tile-type    id="model.tile.mountains"         basic-move-cost="9" basic-work-turns="7" can-settle="no">
-      <art basic="model.tile.plains" overlay="model.tile.mountains" unexplored="model.tile.unexplored" coast="model.tile.beach"/>
+      <art basic="1" overlay="15" unexplored="0" coast="12"/>
       <gen humidity="-3,3" temperature="-3,3" altitude="2,3" latitude="0,3"/>
       <skirmish defence-factor="250"/>
       <production goods-type="model.goods.Ore"        value="4"/>
@@ -396,17 +396,17 @@
       <resource   type="model.resource.Silver"        probability="100"/>
     </tile-type>
     <tile-type    id="model.tile.arctic"            basic-move-cost="6" basic-work-turns="4" can-settle="no">
-      <art basic="model.tile.arctic" unexplored="model.tile.unexplored" coast="model.tile.beach"/>
+      <art basic="9" unexplored="0" coast="12"/>
       <gen humidity="-3,3" temperature="-3,-1" altitude="1,3" latitude="2,3"/>
     </tile-type>
     <tile-type    id="model.tile.ocean"             basic-move-cost="3" basic-work-turns="4" is-water="yes">
-      <art basic="model.tile.ocean" unexplored="model.tile.unexplored"/>
+      <art basic="10" unexplored="0"/>
       <gen humidity="-3,3" temperature="-3,3" altitude="-2,-1" latitude="0,3"/>
       <production goods-type="model.goods.Fish"       value="2"/>
       <resource   type="model.resource.Fish"          probability="100"/>
     </tile-type>
     <tile-type    id="model.tile.highSeas"          basic-move-cost="3" basic-work-turns="4" is-water="yes" sail-to-europe="yes">
-      <art basic="model.tile.highseas" unexplored="model.tile.unexplored"/>
+      <art basic="11" unexplored="0"/>
       <gen humidity="-3,3" temperature="-3,3" altitude="-3,-2" latitude="0,3"/>
       <production goods-type="model.goods.Fish"       value="4"/>
     </tile-type>
@@ -418,7 +418,7 @@
     </tile-type>
     <tile-type    ref="tile.forest"          name="model.tile.forest"
                     basic-move-cost="6" basic-work-turns="-1">
-      <art basic="model.tile.plains"    overlay="model.tile.forest.plains"/>
+      <art basic="model.tile.plains"    forest="plains"/>
       <gen humidity="-3,3" temperature="-3,3" altitude="0,0" latitude="0,2"/>
     </tile-type>
 -->
@@ -453,24 +453,24 @@
             add-work-turns="0" overlay="model.tile.improvement.river">
       <type id="river" magnitude="1">
       <tiles all-land-tiles="yes">
-      <effect goods-types="model.goods.food,goods.sugar,goods.tobacco,goods.cotton,goods.furs,goods.lumber,goods.ore,goods.silver"
+      <effect goods-types="model.goods.food,model.goods.sugar,model.goods.tobacco,model.goods.cotton,model.goods.furs,model.goods.lumber,model.goods.ore,model.goods.silver"
               value="1">
       <effect movement-cost="1">
     </tileimprovement-type>
     <tileimprovement-type name="model.improvement.road"
-            add-work-turns="0" overlay="model.tile.improvement.road"
+            add-work-turns="0" over-trees="yes"
             expended-goods-type="model.goods.tools" expended-amount="20">
       <type id="road" magnitude="1">
       <tiles all-land-tiles="yes">
-      <effect goods-types="model.goods.furs,goods.lumber,goods.ore,goods.silver"
+      <effect goods-types="model.goods.furs,model.goods.lumber,model.goods.ore,model.goods.silver"
               value="1">
       <effect movement-cost="1">
     </tileimprovement-type>
     <tileimprovement-type name="model.improvement.plow"
-            add-work-turns="2" overlay="model.tile.improvement.plow"
+            add-work-turns="2" overlay="4"
             expended-goods-type="model.goods.tools" expended-amount="20">
       <tiles all-land-tiles="yes" all-forest-tiles="no">
-      <effect goods-types="model.goods.food,goods.sugar,goods.tobacco,goods.cotton"
+      <effect goods-types="model.goods.food,model.goods.sugar,model.goods.tobacco,model.goods.cotton"
               value="1">
     </tileimprovement-type>
     <tileimprovement-type name="model.improvement.removeforest" add-work-turns="2"

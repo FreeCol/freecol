@@ -104,11 +104,18 @@ public class Resource extends TileItem {
     }
 
     /**
-     * Returns the name of this type of goods.
-     * @return The name of this type of goods.
+     * Returns the name of this type of Resource.
+     * @return The name of this type of Resource.
      */
     public String getName() {
         return getName(type);
+    }
+
+    /**
+     * Returns the <code>ResourceType</code> of this Resource.
+     */
+    public ResourceType getType() {
+        return type;
     }
 
     /**
@@ -134,20 +141,24 @@ public class Resource extends TileItem {
 
     /**
      * Returns the bonus (checking available stock) for next turn.
+     * @param goodsType The GoodsType to check
+     * @param potential Potential of Tile + Improvements
      */
-    public int getBonus(GoodsType goodsType) {
-        bonusAmount = type.getBonus(goodsType);
+    public int getBonus(GoodsType goodsType, int potential) {
+        int bonusAmount = (potential + type.getBonus(goodsType)) * type.getFactor(goodsType) - potential;
         if (bonusAmount < quantity) {
             bonusAmount = quantity;
         }
-        return bonusAmount;
+        return potential + bonusAmount;
     }
 
     /**
      * Reduces the available quantity by the bonus output of <code>GoodsType</code>.
+     * @param goodsType The GoodsType to check
+     * @param potential Potential of Tile + Improvements
      */
-    public int useQuantity(GoodsType goodsType) {
-        return useQuantity(getBonus(goodsType));
+    public int useQuantity(GoodsType goodsType, int potential) {
+        return useQuantity(getBonus(goodsType, potential) - potential);
     }    
 
     /**

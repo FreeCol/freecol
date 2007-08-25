@@ -402,29 +402,21 @@ public final class Colony extends Settlement implements Location, Nameable {
      */
     public Building getBuildingForConsuming(GoodsType goodsType) {
         Building b;
-        switch (goodsType) {
-        case Goods.TOOLS:
+        if (goodsType == Goods.TOOLS) {
             b = getBuilding(Building.ARMORY);
-            break;
-        case Goods.LUMBER:
+        } else if (goodsType == Goods.LUMBER) {
             b = getBuilding(Building.CARPENTER);
-            break;
-        case Goods.SUGAR:
+        } else if (goodsType == Goods.SUGAR) {
             b = getBuilding(Building.DISTILLER);
-            break;
-        case Goods.TOBACCO:
+        } else if (goodsType == Goods.TOBACCO) {
             b = getBuilding(Building.TOBACCONIST);
-            break;
-        case Goods.COTTON:
+        } else if (goodsType == Goods.COTTON) {
             b = getBuilding(Building.WEAVER);
-            break;
-        case Goods.FURS:
+        } else if (goodsType == Goods.FURS) {
             b = getBuilding(Building.FUR_TRADER);
-            break;
-        case Goods.ORE:
+        } else if (goodsType == Goods.ORE) {
             b = getBuilding(Building.BLACKSMITH);
-            break;
-        default:
+        } else {
             b = null;
         }
         if (b != null && b.isBuilt()) {
@@ -650,10 +642,22 @@ public final class Colony extends Settlement implements Location, Nameable {
      * @return The amount of this type of Goods at this Location.
      */
     public int getGoodsCount(GoodsType type) {
-        return goodsContainer.getGoodsCount(type);
+        if (type.isStorable()) {
+            return goodsContainer.getGoodsCount(type);
+        } else if (type.storedAs != null) {
+            return goodsContainer.getGoodsCount(type.storedAs);
+        } else {
+            if (type == Goods.HAMMERS) {
+                return getHammers();
+            } else if (type == Goods.BELLS) {
+                return getBells();
+            } else {
+                logger.warning(Goods.getName(type) + " is not stored in this Colony!");
+            }
+        }
     }
     public int getGoodsCount(int goodsIndex) {
-        return goodsContainer.getGoodsCount(goodsIndex);
+        return getGoodsCount(FreeCol.getSpecification().getGoodsType(goodsIndex));
     }
 
     /**
@@ -671,7 +675,19 @@ public final class Colony extends Settlement implements Location, Nameable {
     }
 
     public void addGoods(GoodsType type, int amount) {
-        goodsContainer.addGoods(type, amount);
+        if (type.isStorable()) {
+            goodsContainer.addGoods(type, amount);
+        } else if (type.storedAs != null) {
+                goodsContainer.addGoods(type.storedAs, amount);
+        } else {
+            if (type == Goods.HAMMERS) {
+                addHammers(amount);
+            } else if (type == Goods.BELLS) {
+                addBells(amount);
+            } else {
+                logger.warning(Goods.getName(type) + " cannot be stored in this Colony!");
+            }
+        }
     }
 
     public List<Unit> getUnitList() {
@@ -1202,12 +1218,10 @@ public final class Colony extends Settlement implements Location, Nameable {
     public int getProductionNetOf(GoodsType goodsType) {
         int count = getProductionNextTurn(goodsType);
         int used = 0;
-        switch (goodsType) {
-        case Goods.FOOD:
+        if (goodsType == Goods.FOOD ) {
             used = getFoodConsumption();
             used += getHorseProduction();
-            break;
-        default:
+        } else {
             Building bldg = getBuildingForConsuming(goodsType);
             if (bldg != null) {
                 used = bldg.getGoodsInputNextTurn();
@@ -1226,10 +1240,11 @@ public final class Colony extends Settlement implements Location, Nameable {
         }
         lastVisited = getGame().getTurn().getNumber();
         if (getCurrentlyBuilding() >= Colony.BUILDING_UNIT_ADDITION) {
-            int unitType = getCurrentlyBuilding() - BUILDING_UNIT_ADDITION;
-            if (canBuildUnit(unitType) && Unit.getNextHammers(unitType) <= getHammers()
-                    && Unit.getNextHammers(unitType) != -1) {
-                if (Unit.getNextTools(unitType) <= getGoodsCount(Goods.TOOLS)) {
+            int unitTypeIndex = getCurrentlyBuilding() - BUILDING_UNIT_ADDITION;
+            UnitType unitType = FreeCol.getSpecification().getUnitType(unitTypeIndex);
+            if (canBuildUnit(unitTypeIndex) && Unit.getNextHammers(unitTypeIndex) <= getHammers()
+                    && Unit.getNextHammers(unitTypeIndex) != -1) {
+                if (Unit.getNextTools(unitTypeIndex) <= getGoodsCount(Goods.TOOLS)) {
                     Unit unit = getGame().getModelController().createUnit(getID() + "buildUnit", getTile(), getOwner(),
                             unitType);
                     hammers = 0;

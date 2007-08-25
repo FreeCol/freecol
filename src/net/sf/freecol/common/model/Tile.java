@@ -315,6 +315,18 @@ public final class Tile extends FreeColGameObject implements Location, Nameable 
     }
 
     /**
+     * Gets the name of a given type of tile, not checking for ability to see this tile.
+     */
+    public static String getName(TileType type) {
+        if (type == null) 
+            return null;
+        return Messages.message(type.getName());
+    }
+    public static String getName(int tileIndex) {
+        return getName(FreeCol.getSpecification().getTileType(tileIndex));
+    }
+
+    /**
      * Returns a description of the <code>Tile</code>, with the name of the tile
      * and any improvements on it (road/plow/etc) from <code>TileItemContainer</code>.
      * @return The description label for this tile
@@ -557,7 +569,7 @@ public final class Tile extends FreeColGameObject implements Location, Nameable 
      * @see Unit#getMoveCost
      */
     public int getMoveCost(Tile fromTile) {
-        return tileItemContainer.getMoveCost(getTileType().basicMoveCost, fromTile);
+        return tileItemContainer.getMoveCost(getType().basicMoveCost, fromTile);
     }
 
     /**
@@ -1016,6 +1028,19 @@ public final class Tile extends FreeColGameObject implements Location, Nameable 
          updatePlayerExploredTiles();
          }
        */
+    
+    /**
+     * Sets the <code>Resource</code> for this <code>Tile</code>
+     */
+    public void setResource(ResourceType r) {
+        if (r == null) {
+            return;
+        }
+        Resource resource = new Resource(getGame(), this, r);
+        tileItemContainer.addTileItem(resource);
+        updatePlayerExploredTiles();
+    }
+    
     /**
      * Sets the type for this Tile.
      * 
@@ -1102,7 +1127,13 @@ public final class Tile extends FreeColGameObject implements Location, Nameable 
         
         if (!isLand() && rumour) {
             logger.warning("Setting lost city rumour to Ocean.");
-            type = PLAINS;
+            // Get the first land type from TileTypeList
+            for (TileType t : FreeCol.getSpecification().getTileTypeList()) {
+                if (!t.isWater()) {
+                    setType(t);
+                    break;
+                }
+            }
         }
         
         updatePlayerExploredTiles();
@@ -1459,11 +1490,11 @@ public final class Tile extends FreeColGameObject implements Location, Nameable 
         }
         // Get tile potential + bonus if any
         int potential = tileType.getPotential(goodsType);
-        if (tiContainer != null) {
-            potential += tiContainer.getBonus(goodsType);
-        }
         if (tileType.isWater() && goodsType == Goods.FISH) {
             potential += fishBonus;
+        }
+        if (tiContainer != null) {
+            potential = tiContainer.getTotalBonusPotential(goodsType, potential);
         }
         return potential;
     }
@@ -1698,7 +1729,10 @@ break;
     public void expendResource(GoodsType goodsType, Settlement settlement) {
         if (hasResource()) {
             Resource resource = tileItemContainer.getResource();
-            if (resource.useQuantity(goodsType) == 0) {
+            // Potential of this Tile and Improvements
+            int potential = getTileTypePotential(getType(), goodsType, null, getFishBonus())
+                           + tileItemContainer.getImprovementBonusPotential(goodsType);
+            if (resource.useQuantity(goodsType, potential) == 0) {
                 addModelMessage(this, "model.tile.resourceExhausted", 
                                 new String[][] { 
                                     { "%resource%", resource.getName() },
@@ -2066,7 +2100,7 @@ break;
      * @see PlayerExploredTile
      */
     private void createPlayerExploredTile(Player player) {
-        playerExploredTiles[player.getNation()] = new PlayerExploredTile(player.getNation());
+        playerExploredTiles[player.getNation()] = new PlayerExploredTile(player.getNation(), getTileItemContainer());
     }
 
     /**
@@ -2538,9 +2572,7 @@ break;
             if (hasResource()) {
                 resource.toXML(out, player, showAll, toSavedGame);
             }
-            Iterator<TileImprovement> ti = getTileImprovementIterator();
-            while (ti.hasNext()) {
-                TileImprovement t = ti.next();
+            for (TileImprovement t : improvements) { 
                 t.toXML(out, player, showAll, toSavedGame);
             }
 
@@ -2562,7 +2594,7 @@ break;
             } else {
                 explored = true;
             }
-
+/*
             final String roadStr = in.getAttributeValue(null, "road");
             if (roadStr != null) {
                 road = Boolean.valueOf(roadStr).booleanValue();
@@ -2590,7 +2622,7 @@ break;
             } else {
                 bonus = theTile.hasResource();
             }
-
+*/
             final String lostCityRumourStr = in.getAttributeValue(null, "lostCityRumour");
             if (lostCityRumourStr != null) {
                 lostCityRumour = Boolean.valueOf(lostCityRumourStr).booleanValue();
@@ -2634,9 +2666,7 @@ break;
             }
 
             missionary = null;
-            improvements.clear();
-            road = null;
-            river = null;
+            tileItemContainer.clear();
             while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
                 if (in.getLocalName().equals("missionary")) {
                     in.nextTag();
@@ -2647,28 +2677,21 @@ break;
                         missionary.readFromXML(in);
                     }
                 } else if (in.getLocalName().equals(Resource.getXMLElementTagName())) {
-                    resource = (Resource) getGame().getFreeColGameObject(in.getAttributeValue(null, "ID"));
+                    Resource resource = (Resource) getGame().getFreeColGameObject(in.getAttributeValue(null, "ID"));
                     if (resource != null) {
                         resource.readFromXML(in);
                     } else {
                         resource = new Resource(getGame(), this, in);
                     }
+                    tileItemContainer.addTileItem(resource);
                 } else if (in.getLocalName().equals(TileImprovement.getXMLElementTagName())) {
                     TileImprovement ti = (TileImprovement) getGame().getFreeColGameObject(in.getAttributeValue(null, "ID"));
                     if (ti != null) {
                         ti.readFromXML(in);
-                        if (!improvements.contains(ti)) {
-                            improvements.add(ti);
-                        }
                     } else {
                         ti = new TileImprovement(getGame(), this, in);
-                        improvements.add(ti);
                     }
-                    if (ti.isRoad()) {
-                        road = ti;
-                    } else if (ti.isRiver()) {
-                        river = ti;
-                    }
+                    tileItemContainer.addTileItem(ti);
                 }
             }
         }

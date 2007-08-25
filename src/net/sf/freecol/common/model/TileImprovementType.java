@@ -15,15 +15,16 @@ public final class TileImprovementType
     public static final  String  LICENSE = "http://www.gnu.org/licenses/gpl.html";
     public static final  String  REVISION = "$Revision: 1.00 $";
 
-    public int     index;
-    public String  id;
-    public String  name;
-    public boolean natural;
-    public String  typeId;
-    public int     magnitude;
-    public int     addWorkTurns;
+    public  int     index;
+    public  String  id;
+    public  String  name;
+    public  boolean natural;
+    public  String  typeId;
+    public  int     magnitude;
+    public  int     addWorkTurns;
 
-    private String  artOverlay;
+    public  int     artOverlay;
+    public  boolean artOverTrees;
     
     private List<TileType>  allowedTileTypes;
     private TileImprovementType requiredImprovement;
@@ -39,9 +40,8 @@ public final class TileImprovementType
     private List<TileType>  tileTypeChangeFrom;
     private List<TileType>  tileTypeChangeTo;
 
-    public int     movementCost;
-    public int     movementCostFactor;
-    public int     movementCostReduction = 0;
+    public  int     movementCost;
+    public  int     movementCostFactor;
     
     // ------------------------------------------------------------ constructors
 
@@ -71,10 +71,6 @@ public final class TileImprovementType
         return magnitude;
     }
 
-    public String getArt() {
-        return artOverlay;
-    }
-    
     public int getAddWorkTurns() {
         return addWorkTurns;
     }
@@ -214,10 +210,10 @@ public final class TileImprovementType
      */
     public int getMovementCost(int moveCost) {
         int cost = moveCost;
-        if (movementCostReduction >= 0) {
-            int cost2 = cost * movementCostReduction;
-            cost = cost2 / 100;
-            if (cost * 100 < cost2) {
+        if (movementCostFactor >= 0) {
+            float cost2 = (float)cost * movementCostFactor;
+            cost = (int)cost2;
+            if (cost < cost2) {
                 cost++;
             }
         }
@@ -237,15 +233,22 @@ public final class TileImprovementType
                                    Map<String, TileType> tileTypeByRef, Map<String, GoodsType> goodsTypeByRef,
                                    Map<String, TileImprovementType> improvementByRef) {
 
-        id = Xml.attribute(xml, "name");
-        name = Xml.attribute(xml, "name");
+        name = Xml.attribute(xml, "id");
+        String[] buffer = name.separator(".");
+        id = buffer[buffer.length - 1];
         addWorkTurns = Xml.intAttribute(xml, "add-works-turns");
         movementCost = -1;
-        movementCostReduction = -1;
+        movementCostFactor = -1f;
         natural = Xml.booleanAttribute(xml, "natural", false);
         
         allowedWorkers = Xml.arrayAttribute(xml, "workers", new String[] {});
         String g = Xml.attribute(xml, "expended-goods-type", "");
+
+        String t = Xml.attribute(xml, "required-improvement", "");
+        requiredImprovement = improvementByRef.get(t);
+        artOverlay = Xml.intAttribute(xml, "overlay", -1);
+        artOverTrees = Xml.booleanAttribute(xml, "over-trees", false);
+
         expendedGoodsType = goodsTypeByRef.get(g);
         expendedAmount = Xml.intAttribute(xml, "expended-amount", 0);
         g = Xml.attribute(xml, "deliver-goods-type", "");
@@ -254,7 +257,6 @@ public final class TileImprovementType
 
         String t = Xml.attribute(xml, "required-improvement", "");
         requiredImprovement = improvementByRef.get(t);
-        artOverlay = Xml.attribute(xml, "overlay", "");
 
         Xml.Method method = new Xml.Method() {
                 public void invokeOn(Node xml) {
@@ -306,7 +308,7 @@ public final class TileImprovementType
                             }
                         }
                         movementCost = Xml.intAttribute(xml, "movement-cost", -1);
-                        movementCostReduction = Xml.intAttribute(xml, "movement-cost-factor", -1);
+                        movementCostFactor = Xml.floatAttribute(xml, "movement-cost-factor", -1f);
                     } else if ("change".equals(childName)) {
                         tileTypeChangeFrom.add(Xml.attribute(xml, "from"));
                         tileTypeChangeTo.add(Xml.attribute(xml, "to"));

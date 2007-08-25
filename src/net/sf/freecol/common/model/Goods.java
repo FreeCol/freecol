@@ -46,7 +46,7 @@ public class Goods implements Locatable, Ownable, Nameable {
 //    public static final GoodsType FOOD, BELLS, CROSSES, HAMMERS, HORSES, TOOLS, MUSKETS, TRADE_GOODS, FURS, FISH;
     // Need to change Units to the new specification to remove reliance on these static quick links.
     // Only the essential should have a quick link.
-    public static final GoodsType FOOD, SUGAR, TOBACCO, COTTON, FURS, LUMBER, ORE, SILVER, HORSES, 
+    public static GoodsType FOOD, SUGAR, TOBACCO, COTTON, FURS, LUMBER, ORE, SILVER, HORSES, 
                                     RUM, CIGARS, CLOTH, COATS, TRADE_GOODS, TOOLS, MUSKETS, 
                                     FISH, BELLS, CROSSES, HAMMERS;
     public static int NUMBER_OF_TYPES;

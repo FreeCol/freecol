@@ -18,10 +18,12 @@ public final class ResourceType
     public int       index;
     public String     id;
     public String     name;
-    
+
+    public int       art;
+
     public int       minValue;
     public int       maxValue;
-    
+
     private List<GoodsType> bonusGoods;
     private List<Integer>   bonusAmount;
     private List<Float>     bonusFactor;
@@ -66,6 +68,14 @@ public final class ResourceType
         return 1;
     }
 
+    public List<GoodsType> getBonusTypeList() {
+        return bonusGoods;
+    }
+
+    public List<Integer> getBonusAmountList() {
+        return bonusAmount;
+    }
+
     public GoodsType getBestGoodsType() {
         if (bonusGoods.size() == 1) {
             return bonusGoods.get(0);
@@ -104,9 +114,10 @@ public final class ResourceType
 
     public void readFromXmlElement(Node xml, final Map<String, GoodsType> goodsTypeByRef) {
 
-        id = Xml.attribute(xml, "name");
-        name = Xml.attribute(xml, "name");
-
+        name = Xml.attribute(xml, "id");
+        String[] buffer = name.separator(".");
+        id = buffer[buffer.length - 1];
+        art = Xml.intAttribute(xml, "art");
         if ( Xml.hasAttribute(xml, "maximum-value") ) {
             maxValue = Xml.intAttribute(xml, "maximum-value");
             minValue = Xml.intAttribute(xml, "minimum-value", 0);
@@ -122,7 +133,7 @@ public final class ResourceType
                 GoodsType g = goodsTypeByRef.get(goods);
                 bonusGoods.add(g);
                 bonusAmount.add(Xml.intAttribute(xml, "bonus", 0));
-                bonusFactor.add(Xml.floatAttribute(xml, "factor", 1));
+                bonusFactor.add(Xml.floatAttribute(xml, "factor", 1f));
             }
         };
         Xml.forEachChild(xml, method);

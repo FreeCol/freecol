@@ -4306,9 +4306,11 @@ public class Unit extends FreeColGameObject implements Abilities, Locatable, Loc
         return Math.max(base, 1);
     }
 
-    public static int getNextHammers(int type) {
+    public static int getNextHammers(int index) {
+        return getNextHamemrs(FreeCol.getSpecification().unitType(index));
+    }
 
-        UnitType unitType = FreeCol.getSpecification().unitType(type);
+    public static int getNextHammers(UnitType type) {
 
         if (unitType.canBeBuilt()) {
 
@@ -4318,9 +4320,11 @@ public class Unit extends FreeColGameObject implements Abilities, Locatable, Loc
         return -1;
     }
 
-    public static int getNextTools(int type) {
+    public static int getNextTools(int index) {
+        return getNextTools(FreeCol.getSpecification().unitType(index));
+    }
 
-        UnitType unitType = FreeCol.getSpecification().unitType(type);
+    public static int getNextTools(UnitType type) {
 
         if (unitType.canBeBuilt()) {
 

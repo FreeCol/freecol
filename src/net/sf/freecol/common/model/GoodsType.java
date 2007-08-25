@@ -15,7 +15,7 @@ public final class GoodsType
     public static final  String  LICENSE = "http://www.gnu.org/licenses/gpl.html";
     public static final  String  REVISION = "$Revision$";
 
-    public final int        index;
+    public int        index;
     public String     id;
     public String     name;
     public boolean   isFarmed;
@@ -25,8 +25,8 @@ public final class GoodsType
     public boolean improvedByRiver = false;
     public boolean improvedByRoad = false;
 */
-    public        GoodsType  madeFrom;
-    public        GoodsType  makes;
+    public GoodsType  madeFrom;
+    public GoodsType  makes;
     
     public GoodsType  storedAs;
     public boolean   storable;
@@ -123,15 +123,11 @@ public final class GoodsType
 
     public void readFromXmlElement( Node xml, Map<String, GoodsType> goodsTypeByRef ) {
 
-        id = Xml.attribute(xml, "name");
-        name = Xml.attribute(xml, "name");
+        name = Xml.attribute(xml, "id");
+        String[] buffer = name.separator(".");
+        id = buffer[buffer.length - 1];
         isFarmed = Xml.booleanAttribute(xml, "is-farmed");
         ignoreLimit = Xml.booleanAttribute(xml, "ignore-limit", false);
-        storable = Xml.booleanAttribute(xml, "storable", true);
-
-        if (Xml.hasAttribute(xml, "stored-as")) {
-            storedAs = goodsTypeByRef.get(Xml.attribute(xml, "stored-as"));
-        }
 
         if (Xml.hasAttribute(xml, "made-from")) {
             String  madeFromRef = Xml.attribute(xml, "made-from");
@@ -139,6 +135,12 @@ public final class GoodsType
             madeFrom = rawMaterial;
             rawMaterial.makes = this;
         }
+
+        storable = Xml.booleanAttribute(xml, "storable", true);
+        if (Xml.hasAttribute(xml, "stored-as")) {
+            storedAs = goodsTypeByRef.get(Xml.attribute(xml, "stored-as"));
+        }
+
 /*
         if (Xml.hasAttribute(xml, "improved-by-plowing") &&
             Xml.booleanAttribute(xml, "improved-by-plowing")) {
