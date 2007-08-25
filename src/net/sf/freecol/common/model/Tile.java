@@ -40,10 +40,11 @@ public final class Tile extends FreeColGameObject implements Location, Nameable 
           // These types are extra terrain types that are used in ImageLibrary
           BEACH = 14, FOREST = 15, TERRAIN_COUNT = 16;
     */
-    /*    // An addition onto the tile can be one of the following:
-          public static final int ADD_NONE = 0, ADD_RIVER_MINOR = 1, ADD_RIVER_MAJOR = 2,
-          ADD_HILLS = 3, ADD_MOUNTAINS = 4;    // Depreciated, but left for legacy
-    */
+    // TODO: remove
+    // An addition onto the tile can be one of the following:
+    public static final int ADD_NONE = 0, ADD_RIVER_MINOR = 1, ADD_RIVER_MAJOR = 2,
+        ADD_HILLS = 3, ADD_MOUNTAINS = 4;    // Depreciated, but left for legacy
+    
     // Indians' claims on the tile may be one of the following:
     public static final int CLAIM_NONE = 0, CLAIM_VISITED = 1, CLAIM_CLAIMED = 2;
     /*  Depreciated
@@ -128,7 +129,7 @@ public final class Tile extends FreeColGameObject implements Location, Nameable 
      */
     public boolean explored;
 
-    public static final int NUMBER_OF_TYPES;
+    public static int NUMBER_OF_TYPES;
 
     /*
       /**
@@ -745,10 +746,12 @@ public final class Tile extends FreeColGameObject implements Location, Nameable 
      * 
      * @return The addition on this Tile.
      *//*   Depreciated
-            public int getAddition() {
-            return additionType;
-            }
+            TODO: remove
        */
+    public int getAddition() {
+        return 0;
+    }
+
     /**
      * Sets the addition on this Tile.
      * 

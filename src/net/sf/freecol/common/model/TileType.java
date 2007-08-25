@@ -134,7 +134,7 @@ public final class TileType
         }
         Random rand = new Random();
         int decision = rand.nextInt(totalProb);
-        for (i = 0; i < size; i++) {
+        for (int i = 0; i < size; i++) {
             if (decision <= prob[i]) {
                 return resourceType.get(i);
             }

@@ -1547,7 +1547,7 @@ public final class GUI {
                     continue;
                 }
 
-                if (tile.getType() == borderingTile.getType() ||
+                if (tile.getType().getIndex() == borderingTile.getType() ||
                     !borderingTile.isLand() && !borderingTile.getType().isWater()){
                     // Equal tiles and sea tiles have no effect
                     continue;
@@ -1654,7 +1654,7 @@ public final class GUI {
                 g.drawImage(lib.getRiverImage(tile.getRiver()), x, y, null);
             }
             if (tile.isForested()) {
-                g.drawImage(lib.getForestImage(tile.getType()), x, y, null);
+                g.drawImage(lib.getForestImage(tile.getType().getIndex()), x, y, null);
             }
 
             if (tile.hasBonus()) {
@@ -1669,10 +1669,10 @@ public final class GUI {
                     Map.Position p = Map.getAdjacent(pos, i);
                     if (map.isValid(p)) {
                         Tile borderingTile = map.getTile(p);
-                        if (tile.getType() == borderingTile.getType() ||
+                        if (tile.getType().getIndex() == borderingTile.getType() ||
                             !borderingTile.isLand() ||
                             !tile.isLand() ||
-                            !(borderingTile.getType() < tile.getType()) ||
+                            !(borderingTile.getType() < tile.getType().getIndex()) ||
                             !borderingTile.isExplored()) {
                             // Equal tiles, sea tiles and unexplored tiles have no effect
                             continue;
@@ -1743,7 +1743,7 @@ public final class GUI {
                     int type = lib.getSettlementGraphicsType(settlement);
 
                     // Draw image of colony in center of the tile.
-                    g.drawImage(lib.getColonyImage(type), x + (lib.getTerrainImageWidth(tile.getType()) - lib.getColonyImageWidth(type)) / 2, y + (lib.getTerrainImageHeight(tile.getType()) - lib.getColonyImageHeight(type)) / 2, null);
+                    g.drawImage(lib.getColonyImage(type), x + (lib.getTerrainImageWidth(tile.getType().getIndex()) - lib.getColonyImageWidth(type)) / 2, y + (lib.getTerrainImageHeight(tile.getType().getIndex()) - lib.getColonyImageHeight(type)) / 2, null);
 
                     if (withNumber) {
                         String populationString = Integer.toString(((Colony)settlement).getUnitCount());
@@ -1768,15 +1768,15 @@ public final class GUI {
                         break;
                         }
 
-                        BufferedImage stringImage = createStringImage(g, populationString, theColor, lib.getTerrainImageWidth(tile.getType()), 12);
-                        g.drawImage(stringImage, x + (lib.getTerrainImageWidth(tile.getType()) - stringImage.getWidth())/2 + 1, y + ((lib.getTerrainImageHeight(tile.getType()) - stringImage.getHeight()) / 2) + 1, null);
+                        BufferedImage stringImage = createStringImage(g, populationString, theColor, lib.getTerrainImageWidth(tile.getType().getIndex()), 12);
+                        g.drawImage(stringImage, x + (lib.getTerrainImageWidth(tile.getType().getIndex()) - stringImage.getWidth())/2 + 1, y + ((lib.getTerrainImageHeight(tile.getType().getIndex()) - stringImage.getHeight()) / 2) + 1, null);
                     }
                     g.setColor(Color.BLACK);
                 } else if (settlement instanceof IndianSettlement) {
                     int type = lib.getSettlementGraphicsType(settlement);
 
                     // Draw image of indian settlement in center of the tile.
-                    g.drawImage(lib.getIndianSettlementImage(type), x + (lib.getTerrainImageWidth(tile.getType()) - lib.getIndianSettlementImageWidth(type)) / 2, y + (lib.getTerrainImageHeight(tile.getType()) - lib.getIndianSettlementImageHeight(type)) / 2, null);
+                    g.drawImage(lib.getIndianSettlementImage(type), x + (lib.getTerrainImageWidth(tile.getType().getIndex()) - lib.getIndianSettlementImageWidth(type)) / 2, y + (lib.getTerrainImageHeight(tile.getType().getIndex()) - lib.getIndianSettlementImageHeight(type)) / 2, null);
 
                     // Draw the color chip for the settlement.
                     g.drawImage(lib.getColorChip(((IndianSettlement)settlement).getOwner().getColor()), x + STATE_OFFSET_X, y + STATE_OFFSET_Y, null);
@@ -1890,19 +1890,19 @@ public final class GUI {
             g.setColor(Color.BLACK);
             int b = getBreakingPoint(tileName);
             if (b == -1) {
-                g.drawString(tileName, x + (lib.getTerrainImageWidth(tile.getType()) - g.getFontMetrics().stringWidth(tileName))/2, y + (lib.getTerrainImageHeight(tile.getType())/2));
+                g.drawString(tileName, x + (lib.getTerrainImageWidth(tile.getType().getIndex()) - g.getFontMetrics().stringWidth(tileName))/2, y + (lib.getTerrainImageHeight(tile.getType().getIndex())/2));
                 /* Takes to much resources:
-                BufferedImage stringImage = createStringImage(g, tileName, Color.BLACK, lib.getTerrainImageWidth(tile.getType()), 10);
-                g.drawImage(stringImage, x + (lib.getTerrainImageWidth(tile.getType()) - stringImage.getWidth())/2 + 1, y + lib.getTerrainImageHeight(tile.getType())/2 - stringImage.getHeight()/2, null);
+                BufferedImage stringImage = createStringImage(g, tileName, Color.BLACK, lib.getTerrainImageWidth(tile.getType().getIndex()), 10);
+                g.drawImage(stringImage, x + (lib.getTerrainImageWidth(tile.getType().getIndex()) - stringImage.getWidth())/2 + 1, y + lib.getTerrainImageHeight(tile.getType().getIndex())/2 - stringImage.getHeight()/2, null);
                 */
             } else {
-                g.drawString(tileName.substring(0, b), x + (lib.getTerrainImageWidth(tile.getType()) - g.getFontMetrics().stringWidth(tileName.substring(0, b)))/2, y + lib.getTerrainImageHeight(tile.getType())/2 - (g.getFontMetrics().getAscent()*2)/3);
-                g.drawString(tileName.substring(b+1), x + (lib.getTerrainImageWidth(tile.getType()) - g.getFontMetrics().stringWidth(tileName.substring(b+1)))/2, y + lib.getTerrainImageHeight(tile.getType())/2 + (g.getFontMetrics().getAscent()*2)/3);
+                g.drawString(tileName.substring(0, b), x + (lib.getTerrainImageWidth(tile.getType().getIndex()) - g.getFontMetrics().stringWidth(tileName.substring(0, b)))/2, y + lib.getTerrainImageHeight(tile.getType().getIndex())/2 - (g.getFontMetrics().getAscent()*2)/3);
+                g.drawString(tileName.substring(b+1), x + (lib.getTerrainImageWidth(tile.getType().getIndex()) - g.getFontMetrics().stringWidth(tileName.substring(b+1)))/2, y + lib.getTerrainImageHeight(tile.getType().getIndex())/2 + (g.getFontMetrics().getAscent()*2)/3);
                 /* Takes to much resources:
-                BufferedImage stringImage = createStringImage(g, tileName.substring(0, b), Color.BLACK, lib.getTerrainImageWidth(tile.getType()), 10);
-                g.drawImage(stringImage, x + (lib.getTerrainImageWidth(tile.getType()) - stringImage.getWidth())/2 + 1, y + lib.getTerrainImageHeight(tile.getType())/2 - (stringImage.getHeight()) - 5, null);
-                stringImage = createStringImage(g, tileName.substring(b+1), Color.BLACK, lib.getTerrainImageWidth(tile.getType()), 10);
-                g.drawImage(stringImage, x + (lib.getTerrainImageWidth(tile.getType()) - stringImage.getWidth())/2 + 1, y + lib.getTerrainImageHeight(tile.getType())/2 - 5, null);
+                BufferedImage stringImage = createStringImage(g, tileName.substring(0, b), Color.BLACK, lib.getTerrainImageWidth(tile.getType().getIndex()), 10);
+                g.drawImage(stringImage, x + (lib.getTerrainImageWidth(tile.getType().getIndex()) - stringImage.getWidth())/2 + 1, y + lib.getTerrainImageHeight(tile.getType().getIndex())/2 - (stringImage.getHeight()) - 5, null);
+                stringImage = createStringImage(g, tileName.substring(b+1), Color.BLACK, lib.getTerrainImageWidth(tile.getType().getIndex()), 10);
+                g.drawImage(stringImage, x + (lib.getTerrainImageWidth(tile.getType().getIndex()) - stringImage.getWidth())/2 + 1, y + lib.getTerrainImageHeight(tile.getType().getIndex())/2 - 5, null);
                 */
             }
         }
@@ -1912,19 +1912,19 @@ public final class GUI {
             g.setColor(Color.BLACK);
             int b = getBreakingPoint(tileOwner);
             if (b == -1) {
-                g.drawString(tileOwner, x + (lib.getTerrainImageWidth(tile.getType()) - g.getFontMetrics().stringWidth(tileOwner))/2, y + (lib.getTerrainImageHeight(tile.getType())/2));
+                g.drawString(tileOwner, x + (lib.getTerrainImageWidth(tile.getType().getIndex()) - g.getFontMetrics().stringWidth(tileOwner))/2, y + (lib.getTerrainImageHeight(tile.getType().getIndex())/2));
                 /* Takes to much resources:
-                BufferedImage stringImage = createStringImage(g, tileOwner, Color.BLACK, lib.getTerrainImageWidth(tile.getType()), 10);
-                g.drawImage(stringImage, x + (lib.getTerrainImageWidth(tile.getType()) - stringImage.getWidth())/2 + 1, y + lib.getTerrainImageHeight(tile.getType())/2 - stringImage.getHeight()/2, null);
+                BufferedImage stringImage = createStringImage(g, tileOwner, Color.BLACK, lib.getTerrainImageWidth(tile.getType().getIndex()), 10);
+                g.drawImage(stringImage, x + (lib.getTerrainImageWidth(tile.getType().getIndex()) - stringImage.getWidth())/2 + 1, y + lib.getTerrainImageHeight(tile.getType().getIndex())/2 - stringImage.getHeight()/2, null);
                 */
             } else {
-                g.drawString(tileOwner.substring(0, b), x + (lib.getTerrainImageWidth(tile.getType()) - g.getFontMetrics().stringWidth(tileOwner.substring(0, b)))/2, y + lib.getTerrainImageHeight(tile.getType())/2 - (g.getFontMetrics().getAscent()*2)/3);
-                g.drawString(tileOwner.substring(b+1), x + (lib.getTerrainImageWidth(tile.getType()) - g.getFontMetrics().stringWidth(tileOwner.substring(b+1)))/2, y + lib.getTerrainImageHeight(tile.getType())/2 + (g.getFontMetrics().getAscent()*2)/3);
+                g.drawString(tileOwner.substring(0, b), x + (lib.getTerrainImageWidth(tile.getType().getIndex()) - g.getFontMetrics().stringWidth(tileOwner.substring(0, b)))/2, y + lib.getTerrainImageHeight(tile.getType().getIndex())/2 - (g.getFontMetrics().getAscent()*2)/3);
+                g.drawString(tileOwner.substring(b+1), x + (lib.getTerrainImageWidth(tile.getType().getIndex()) - g.getFontMetrics().stringWidth(tileOwner.substring(b+1)))/2, y + lib.getTerrainImageHeight(tile.getType().getIndex())/2 + (g.getFontMetrics().getAscent()*2)/3);
                 /* Takes to much resources:
-                BufferedImage stringImage = createStringImage(g, tileOwner.substring(0, b), Color.BLACK, lib.getTerrainImageWidth(tile.getType()), 10);
-                g.drawImage(stringImage, x + (lib.getTerrainImageWidth(tile.getType()) - stringImage.getWidth())/2 + 1, y + lib.getTerrainImageHeight(tile.getType())/2 - (stringImage.getHeight()) - 5, null);
-                stringImage = createStringImage(g, tileOwner.substring(b+1), Color.BLACK, lib.getTerrainImageWidth(tile.getType()), 10);
-                g.drawImage(stringImage, x + (lib.getTerrainImageWidth(tile.getType()) - stringImage.getWidth())/2 + 1, y + lib.getTerrainImageHeight(tile.getType())/2 - 5, null);
+                BufferedImage stringImage = createStringImage(g, tileOwner.substring(0, b), Color.BLACK, lib.getTerrainImageWidth(tile.getType().getIndex()), 10);
+                g.drawImage(stringImage, x + (lib.getTerrainImageWidth(tile.getType().getIndex()) - stringImage.getWidth())/2 + 1, y + lib.getTerrainImageHeight(tile.getType().getIndex())/2 - (stringImage.getHeight()) - 5, null);
+                stringImage = createStringImage(g, tileOwner.substring(b+1), Color.BLACK, lib.getTerrainImageWidth(tile.getType().getIndex()), 10);
+                g.drawImage(stringImage, x + (lib.getTerrainImageWidth(tile.getType().getIndex()) - stringImage.getWidth())/2 + 1, y + lib.getTerrainImageHeight(tile.getType().getIndex())/2 - 5, null);
                 */
             }
         }
@@ -1938,16 +1938,16 @@ public final class GUI {
 
         if (displayCoordinates) {
             String posString = tile.getX() + ", " + tile.getY();
-            g.drawString(posString, x + (lib.getTerrainImageWidth(tile.getType()) - g.getFontMetrics().stringWidth(posString))/2, y + (lib.getTerrainImageHeight(tile.getType()) - g.getFontMetrics().getAscent())/2);
+            g.drawString(posString, x + (lib.getTerrainImageWidth(tile.getType().getIndex()) - g.getFontMetrics().stringWidth(posString))/2, y + (lib.getTerrainImageHeight(tile.getType().getIndex()) - g.getFontMetrics().getAscent())/2);
         }
-        if (displayColonyValue && tile.getType() != Tile.UNEXPLORED && tile.isLand()) {
+        if (displayColonyValue && tile.getType().getIndex() != Tile.UNEXPLORED && tile.isLand()) {
             String valueString;
             if (displayColonyValuePlayer == null) {
                 valueString = Integer.toString(tile.getColonyValue());
             } else {
                 valueString = Integer.toString(displayColonyValuePlayer.getColonyValue(tile));
             }
-            g.drawString(valueString, x + (lib.getTerrainImageWidth(tile.getType()) - g.getFontMetrics().stringWidth(valueString))/2, y + (lib.getTerrainImageHeight(tile.getType()) - g.getFontMetrics().getAscent())/2);
+            g.drawString(valueString, x + (lib.getTerrainImageWidth(tile.getType().getIndex()) - g.getFontMetrics().stringWidth(valueString))/2, y + (lib.getTerrainImageHeight(tile.getType().getIndex()) - g.getFontMetrics().getAscent())/2);
         }
     }
 

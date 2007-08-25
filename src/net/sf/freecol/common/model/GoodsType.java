@@ -28,12 +28,12 @@ public final class GoodsType
     public        GoodsType  madeFrom;
     public        GoodsType  makes;
     
-    public final GoodsType  storedAs;
-    public final boolean   storable;
+    public GoodsType  storedAs;
+    public boolean   storable;
 
-    public final int initialAmount;
-    public final int initialPrice;
-    public final int priceDiff;
+    public int initialAmount;
+    public int initialPrice;
+    public int priceDiff;
 
     // ----------------------------------------------------------- constructors
 

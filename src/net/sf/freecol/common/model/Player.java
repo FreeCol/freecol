@@ -2,6 +2,7 @@ package net.sf.freecol.common.model;
 
 import java.awt.Color;
 import java.util.ArrayList;
+import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
 import java.util.MissingResourceException;
@@ -30,10 +31,10 @@ import org.w3c.dom.Element;
  * various defaults for the player. One example of this is the
  * {@link #getEntryLocation entry location}.
  */
-public class Player extends FreeColGameObject implements Nameable {
+public class Player extends FreeColGameObject implements Abilities, Nameable {
     private static final Logger logger = Logger.getLogger(Player.class.getName());
 
-    public static final String COPYRIGHT = "Copyright (C) 2003-2006 The FreeCol Team";
+    public static final String COPYRIGHT = "Copyright (C) 2003-2007 The FreeCol Team";
 
     public static final String LICENSE = "http://www.gnu.org/licenses/gpl.html";
 
@@ -217,6 +218,10 @@ public class Player extends FreeColGameObject implements Nameable {
     // Temporary variables:
     protected boolean[][] canSeeTiles = null;
 
+    /**
+     * Stores the abilities of this Player.
+     */
+    private Hashtable<String, Boolean> abilities = new Hashtable<String, Boolean>();    
 
     /**
      * 
@@ -2294,6 +2299,27 @@ public class Player extends FreeColGameObject implements Nameable {
     }
 
     /**
+     * Returns true if this Player has the ability with the given ID.
+     *
+     * @param id a <code>String</code> value
+     * @return a <code>boolean</code> value
+     */
+    public boolean hasAbility(String id) {
+        return abilities.containsKey(id) && abilities.get(id);
+    }
+
+    /**
+     * Sets the ability to newValue;
+     *
+     * @param id a <code>String</code> value
+     * @param newValue a <code>boolean</code> value
+     */
+    public void setAbility(String id, boolean newValue) {
+        abilities.put(id, newValue);
+    }
+
+
+    /**
      * Prepares this <code>Player</code> for a new turn.
      */
     public void newTurn() {
@@ -2328,6 +2354,7 @@ public class Player extends FreeColGameObject implements Nameable {
             if (getBells() >= getTotalFoundingFatherCost() && currentFather != FoundingFather.NONE) {
                 fathers[currentFather] = true;
                 FoundingFather father = FreeCol.getSpecification().foundingFather(currentFather);
+                abilities.putAll(father.getAbilities());
 
                 /** TODO: restore effects of founding fathers as soon as possible
                 switch (currentFather) {

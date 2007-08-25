@@ -163,6 +163,15 @@ public class FoundingFather implements Abilities {
     }
 
     /**
+     * Returns a copy of this FoundingFather's abilities.
+     *
+     * @return a <code>Map</code> value
+     */
+    public Map getAbilities() {
+        return ((Map) abilities.clone());
+    }
+
+    /**
      * Sets the ability to newValue;
      *
      * @param id a <code>String</code> value
