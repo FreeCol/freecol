@@ -15,29 +15,29 @@ public final class TileType
     public static final  String  LICENSE = "http://www.gnu.org/licenses/gpl.html";
     public static final  String  REVISION = "$Revision$";
 
-    public final int index;
-    public final String id;
-    public final String name;
+    public int index;
+    public String id;
+    public String name;
     
-    private final String artBasic;
-    private final String artOverlay;
-    private final String artUnexplored;
-    private final String artCoast;
+    private String artBasic;
+    private String artOverlay;
+    private String artUnexplored;
+    private String artCoast;
     
-    public final boolean forest;
-    public final boolean water;
-    public final boolean canSettle;
-    public final boolean canSailToEurope;
-    public final int basicMoveCost;
-    public final int basicWorkTurns;
+    public boolean forest;
+    public boolean water;
+    public boolean canSettle;
+    public boolean canSailToEurope;
+    public int basicMoveCost;
+    public int basicWorkTurns;
 
-    public final int attackFactor;
-    public final int defenceFactor;
+    public int attackFactor;
+    public int defenceFactor;
     
-    public final int[] humidity;
-    public final int[] temperature;
-    public final int[] altitude;
-    public final int[] latitude;
+    public int[] humidity;
+    public int[] temperature;
+    public int[] altitude;
+    public int[] latitude;
 
     private List<GoodsType> producedType;
     private List<Integer> producedAmount;
@@ -117,7 +117,7 @@ public final class TileType
         return producedAmount;
     }
 
-    public List<Resource> getResourceTypeList() {
+    public List<ResourceType> getResourceTypeList() {
         return resourceType;
     }
 
@@ -129,7 +129,7 @@ public final class TileType
         int totalProb = 0;
         int[] prob = new int[size];
         for (int i = 0; i < size; i++) {
-            totalProb += resourceProbability;
+            totalProb += resourceProbability.intValue();
             prob[i] = totalProb;
         }
         Random rand = new Random();

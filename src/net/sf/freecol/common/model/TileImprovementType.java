@@ -41,6 +41,7 @@ public final class TileImprovementType
 
     public int     movementCost;
     public int     movementCostFactor;
+    public int     movementCostReduction = 0;
     
     // ------------------------------------------------------------ constructors
 
@@ -232,7 +233,7 @@ public final class TileImprovementType
 
     // ------------------------------------------------------------ API methods
 
-    public void readFromXmlElement(Node xml, List<TileType> tileTypeList,
+    public void readFromXmlElement(Node xml, final List<TileType> tileTypeList,
                                    Map<String, TileType> tileTypeByRef, Map<String, GoodsType> goodsTypeByRef,
                                    Map<String, TileImprovementType> improvementByRef) {
 
@@ -253,7 +254,7 @@ public final class TileImprovementType
 
         String t = Xml.attribute(xml, "required-improvement", "");
         requiredImprovement = improvementByRef.get(t);
-        artOverlay = Xml.Attribute(xml, "overlay", "");
+        artOverlay = Xml.attribute(xml, "overlay", "");
 
         Xml.Method method = new Xml.Method() {
                 public void invokeOn(Node xml) {
@@ -304,8 +305,8 @@ public final class TileImprovementType
                                 }
                             }
                         }
-                        movementCost = intAttribute(xml, "movement-cost", -1);
-                        movementCostReduction = intAttribute(xml, "movement-cost-factor", -1);
+                        movementCost = Xml.intAttribute(xml, "movement-cost", -1);
+                        movementCostReduction = Xml.intAttribute(xml, "movement-cost-factor", -1);
                     } else if ("change".equals(childName)) {
                         tileTypeChangeFrom.add(Xml.attribute(xml, "from"));
                         tileTypeChangeTo.add(Xml.attribute(xml, "to"));

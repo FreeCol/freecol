@@ -2651,7 +2651,7 @@ break;
                     if (resource != null) {
                         resource.readFromXML(in);
                     } else {
-                        resource = new Resource(getGame(), tile, in);
+                        resource = new Resource(getGame(), this, in);
                     }
                 } else if (in.getLocalName().equals(TileImprovement.getXMLElementTagName())) {
                     TileImprovement ti = (TileImprovement) getGame().getFreeColGameObject(in.getAttributeValue(null, "ID"));
@@ -2661,7 +2661,7 @@ break;
                             improvements.add(ti);
                         }
                     } else {
-                        ti = new TileImprovement(getGame(), tile, in);
+                        ti = new TileImprovement(getGame(), this, in);
                         improvements.add(ti);
                     }
                     if (ti.isRoad()) {

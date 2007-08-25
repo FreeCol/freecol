@@ -1237,8 +1237,11 @@ public final class Colony extends Settlement implements Location, Nameable {
                     addModelMessage(this, "model.colony.unitReady", new String[][] { { "%colony%", getName() },
                             { "%unit%", unit.getName() } }, ModelMessage.UNIT_ADDED, unit);
                 } else {
-                    addModelMessage(this, "model.colony.itemNeedTools", new String[][] { { "%colony%", getName() },
-                            { "%item%", Unit.getName(unitType) } }, ModelMessage.MISSING_GOODS, new Goods(Goods.TOOLS));
+                    addModelMessage(this, "model.colony.itemNeedTools",
+                                    new String[][] {
+                                        { "%colony%", getName() },
+                                        { "%item%", Unit.getName(unitType) } },
+                                    ModelMessage.MISSING_GOODS, new Goods(Goods.TOOLS));
                 }
             }
         } else if (currentlyBuilding != -1) {

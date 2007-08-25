@@ -481,7 +481,7 @@ public class Goods implements Locatable, Ownable, Nameable {
         // Start element:
         out.writeStartElement(getXMLElementTagName());
 
-        out.writeAttribute("type", Integer.toString(type));
+        out.writeAttribute("type", type.getName());
         out.writeAttribute("amount", Integer.toString(amount));
 
         if (location != null) {
@@ -583,7 +583,7 @@ public class Goods implements Locatable, Ownable, Nameable {
      *      during parsing.
      */
     protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {        
-        type = Integer.parseInt(in.getAttributeValue(null, "type"));
+        type = FreeCol.getSpecification().getGoodsType(in.getAttributeValue(null, "type"));
         amount = Integer.parseInt(in.getAttributeValue(null, "amount"));
 
         final String locationStr = in.getAttributeValue(null, "location");

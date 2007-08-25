@@ -15,12 +15,12 @@ public final class ResourceType
     public static final  String  LICENSE = "http://www.gnu.org/licenses/gpl.html";
     public static final  String  REVISION = "$Revision: 1.00 $";
 
-    public final int       index;
-    public final String     id;
-    public final String     name;
+    public int       index;
+    public String     id;
+    public String     name;
     
-    public final int       minValue;
-    public final int       maxValue;
+    public int       minValue;
+    public int       maxValue;
     
     private List<GoodsType> bonusGoods;
     private List<Integer>   bonusAmount;
