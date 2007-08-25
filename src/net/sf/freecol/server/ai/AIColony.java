@@ -776,7 +776,7 @@ public class AIColony extends AIObject {
         Iterator<Unit> uit = units.iterator();
         while (uit.hasNext()) {
             Unit unit = uit.next();
-            if (unit.getExpertWorkType() >= 0) {
+            if (unit.getExpertWorkType() != null) {
                 Iterator<WorkLocationPlan> wlpIterator = workLocationPlans.iterator();
                 while (wlpIterator.hasNext()) {
                     WorkLocationPlan wlp = wlpIterator.next();
@@ -961,8 +961,8 @@ public class AIColony extends AIObject {
                         break;
                     }
                 }
-                int rawMaterial = Goods.getRawMaterial(bestPick.getWorkType());
-                ColonyTile ct = (rawMaterial >= 0) ? colony.getVacantColonyTileFor(bestPick, rawMaterial) : null;
+                GoodsType rawMaterial = bestPick.getWorkType().getRawMaterial();
+                ColonyTile ct = (rawMaterial != null) ? colony.getVacantColonyTileFor(bestPick, rawMaterial) : null;
                 if (ct != null) {
                     bestPick.setLocation(ct);
                     bestPick.setWorkType(rawMaterial);

@@ -6,9 +6,11 @@ import java.util.logging.Logger;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
+import net.sf.freecol.FreeCol;
 
 import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.Unit;
+import net.sf.freecol.common.model.UnitType;
 
 import org.w3c.dom.Element;
 
@@ -24,7 +26,7 @@ public class WorkerWish extends Wish {
     public static final String  LICENSE = "http://www.gnu.org/licenses/gpl.html";
     public static final String  REVISION = "$Revision$";
 
-    private int unitType;
+    private UnitType unitType;
     private boolean expertNeeded;
 
 
@@ -42,7 +44,7 @@ public class WorkerWish extends Wish {
     * @param expertNeeded Determines wether the <code>unitType</code> is
     *       required or not.
     */
-    public WorkerWish(AIMain aiMain, Location destination, int value, int unitType, boolean expertNeeded) {
+    public WorkerWish(AIMain aiMain, Location destination, int value, UnitType unitType, boolean expertNeeded) {
         super(aiMain, getXMLElementTagName() + ":" + aiMain.getNextID());
 
         if (destination == null) {
@@ -105,7 +107,7 @@ public class WorkerWish extends Wish {
      * @param expertNeeded Determines wether the <code>unitType</code> is
      *       required or not.
      */
-    public void update(int value, int unitType, boolean expertNeeded) {
+    public void update(int value, UnitType unitType, boolean expertNeeded) {
         this.value = value;
         this.unitType = unitType;
         this.expertNeeded = expertNeeded;
@@ -115,7 +117,7 @@ public class WorkerWish extends Wish {
     * Returns the type of unit needed for releasing this wish.
     * @return The {@link Unit#getType type of unit}.
     */
-    public int getUnitType() {
+    public UnitType getUnitType() {
         return unitType;
     }
 
@@ -136,7 +138,7 @@ public class WorkerWish extends Wish {
         }
         out.writeAttribute("value", Integer.toString(value));
 
-        out.writeAttribute("unitType", Integer.toString(unitType));
+        out.writeAttribute("unitType", Integer.toString(unitType.getIndex()));
         out.writeAttribute("expertNeeded", Boolean.toString(expertNeeded));
 
         out.writeEndElement();
@@ -163,7 +165,8 @@ public class WorkerWish extends Wish {
         }
         value = Integer.parseInt(in.getAttributeValue(null, "value"));
 
-        unitType = Integer.parseInt(in.getAttributeValue(null, "unitType"));
+        int unitTypeIndex = Integer.parseInt(in.getAttributeValue(null, "unitType"));
+        unitType = FreeCol.getSpecification().unitType(unitTypeIndex);
         expertNeeded = Boolean.valueOf(in.getAttributeValue(null, "expertNeeded")).booleanValue();
         in.nextTag();
     }

@@ -10,6 +10,7 @@ import javax.xml.stream.XMLStreamWriter;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.Europe;
 import net.sf.freecol.common.model.Goods;
+import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.Locatable;
 import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.Tile;
@@ -75,7 +76,7 @@ public class AIGoods extends AIObject implements Transportable {
      * @param destination The destination of the goods. This is the
      *      <code>Location</code> to which the goods should be transported.
      */
-    public AIGoods(AIMain aiMain, Location location, int type, int amount, Location destination) {
+    public AIGoods(AIMain aiMain, Location location, GoodsType type, int amount, Location destination) {
         super(aiMain, getXMLElementTagName() + ":" + aiMain.getNextID());
 
         goods = new Goods(aiMain.getGame(), location, type, amount);

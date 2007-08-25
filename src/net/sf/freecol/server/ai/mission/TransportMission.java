@@ -11,10 +11,12 @@ import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
+import net.sf.freecol.FreeCol;
 
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.Europe;
 import net.sf.freecol.common.model.Goods;
+import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.Locatable;
 import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.Market;
@@ -22,6 +24,7 @@ import net.sf.freecol.common.model.PathNode;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
+import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.networking.Message;
 import net.sf.freecol.server.ai.AIColony;
@@ -573,7 +576,7 @@ public class TransportMission extends Mission {
      *            be transported.
      * @return The goods.
      */
-    public AIGoods buyGoodsInEurope(Connection connection, int type, int amount, Location destination) {
+    public AIGoods buyGoodsInEurope(Connection connection, GoodsType type, int amount, Location destination) {
         AIPlayer aiPlayer = (AIPlayer) getAIMain().getAIObject(getUnit().getOwner().getID());
         Player player = aiPlayer.getPlayer();
         Market market = player.getMarket();
@@ -581,7 +584,7 @@ public class TransportMission extends Mission {
         if (player.getGold() >= market.getBidPrice(type, amount)) {
             Element buyGoodsElement = Message.createNewRootElement("buyGoods");
             buyGoodsElement.setAttribute("carrier", getUnit().getID());
-            buyGoodsElement.setAttribute("type", Integer.toString(type));
+            buyGoodsElement.setAttribute("type", Integer.toString(type.getIndex()));
             buyGoodsElement.setAttribute("amount", Integer.toString(amount));
             try {
                 connection.sendAndWait(buyGoodsElement);
@@ -620,7 +623,7 @@ public class TransportMission extends Mission {
      * @param unitType The type of {@link Unit} to be found/recuited/trained.
      * @return The <code>AIUnit</code>.
      */
-    private AIUnit getUnitInEurope(Connection connection, int unitType) {
+    private AIUnit getUnitInEurope(Connection connection, UnitType unitType) {
         AIPlayer aiPlayer = (AIPlayer) getAIMain().getAIObject(getUnit().getOwner().getID());
         Player player = aiPlayer.getPlayer();
         Europe europe = player.getEurope();
@@ -633,7 +636,7 @@ public class TransportMission extends Mission {
         Iterator<Unit> ui = europe.getUnitIterator();
         while (ui.hasNext()) {
             Unit u = ui.next();
-            if (unitType == -1 || unitType == u.getType()) {
+            if (unitType == null || unitType == u.getUnitType()) {
                 return (AIUnit) getAIMain().getAIObject(u.getID());
             }
         }
@@ -663,10 +666,10 @@ public class TransportMission extends Mission {
         }
 
         // Try training the unit:
-        if (unitType != Unit.ARTILLERY && Unit.getPrice(unitType) >= 0 && player.getGold() >= Unit.getPrice(unitType)
-                || unitType == Unit.ARTILLERY && player.getGold() >= europe.getArtilleryPrice()) {
+        if (unitType.hasPrice() && europe.getUnitPrice(unitType) >= 0 &&
+                player.getGold() >= europe.getUnitPrice(unitType)) {
             Element trainUnitInEuropeElement = Message.createNewRootElement("trainUnitInEurope");
-            trainUnitInEuropeElement.setAttribute("unitType", Integer.toString(unitType));
+            trainUnitInEuropeElement.setAttribute("unitType", unitType.getId());
             try {
                 Element reply = connection.ask(trainUnitInEuropeElement);
                 if (reply.getTagName().equals("trainUnitInEuropeConfirmed")) {
@@ -708,9 +711,21 @@ public class TransportMission extends Mission {
             }
         }
 
+        int priceTrained = 0;
+        UnitType cheapestTrained = null;
+        List<UnitType> unitTypes = FreeCol.getSpecification().getUnitTypeList();
+        for (UnitType unitType : unitTypes) {
+            if (unitType.hasPrice() && unitType.hasSkill()) {
+                int price = europe.getUnitPrice(unitType);
+                if (cheapestTrained == null || price < priceTrained) {
+                    cheapestTrained = unitType;
+                    priceTrained = price;
+                }
+            }
+        }
         // Try recruiting the unit:
-        if (player.getGold() >= player.getRecruitPrice()
-                && player.getRecruitPrice() < Unit.getPrice(Unit.EXPERT_ORE_MINER)) {
+        if (player.getGold() >= player.getRecruitPrice() && cheapestTrained != null
+                && player.getRecruitPrice() < priceTrained) {
             Element recruitUnitInEuropeElement = Message.createNewRootElement("recruitUnitInEurope");
             // TODO: Take the best unit (Seasoned scout, pioneer, soldier etc):
             recruitUnitInEuropeElement.setAttribute("slot", Integer.toString(1));
@@ -728,9 +743,9 @@ public class TransportMission extends Mission {
         }
 
         // Try training the unit:
-        if (player.getGold() >= Unit.getPrice(Unit.EXPERT_ORE_MINER)) {
+        if (cheapestTrained != null && player.getGold() >= priceTrained) {
             Element trainUnitInEuropeElement = Message.createNewRootElement("trainUnitInEurope");
-            trainUnitInEuropeElement.setAttribute("unitType", Integer.toString(Unit.EXPERT_ORE_MINER));
+            trainUnitInEuropeElement.setAttribute("unitType", cheapestTrained.getId());
             try {
                 Element reply = connection.ask(trainUnitInEuropeElement);
                 if (reply.getTagName().equals("trainUnitInEuropeConfirmed")) {
@@ -1038,7 +1053,7 @@ public class TransportMission extends Mission {
                     if (carrier.getLocation() instanceof Europe) {
                         Element buyGoodsElement = Message.createNewRootElement("buyGoods");
                         buyGoodsElement.setAttribute("carrier", carrier.getID());
-                        buyGoodsElement.setAttribute("type", Integer.toString(ag.getGoods().getType()));
+                        buyGoodsElement.setAttribute("type", Integer.toString(ag.getGoods().getType().getIndex()));
                         buyGoodsElement.setAttribute("amount", Integer.toString(ag.getGoods().getAmount()));
                         try {
                             connection.sendAndWait(buyGoodsElement);

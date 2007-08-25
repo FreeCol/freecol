@@ -954,8 +954,9 @@ public class AIPlayer extends AIObject {
     private void giveNormalMissions() {
         logger.finest("Entering method giveNormalMissions");
         
+        int numberOfUnits = FreeCol.getSpecification().numberOfUnitTypes();
         // Create a datastructure for the worker wishes:
-        Vector<ArrayList<Wish>> workerWishes = new Vector<ArrayList<Wish>>(Unit.UNIT_COUNT);
+        Vector<ArrayList<Wish>> workerWishes = new Vector<ArrayList<Wish>>(numberOfUnits);
         for (int i = 0; i < Unit.UNIT_COUNT; i++) {
             workerWishes.add(new ArrayList<Wish>());
         }
@@ -966,7 +967,7 @@ public class AIPlayer extends AIObject {
                 while (wIterator.hasNext()) {
                     Wish w = wIterator.next();
                     if (w instanceof WorkerWish && w.getTransportable() == null) {
-                        workerWishes.get(((WorkerWish) w).getUnitType()).add(w);
+                        workerWishes.get(((WorkerWish) w).getUnitType().getIndex()).add(w);
                     }
                 }
             }
@@ -1006,7 +1007,7 @@ public class AIPlayer extends AIObject {
 
                 // Check if this unit is needed as an expert (using:
                 // "WorkerWish"):
-                ArrayList<Wish> wishList = workerWishes.get(unit.getType());
+                ArrayList<Wish> wishList = workerWishes.get(unit.getUnitType().getIndex());
                 WorkerWish bestWish = null;
                 int bestTurns = Integer.MAX_VALUE;
                 for (int i = 0; i < wishList.size(); i++) {
