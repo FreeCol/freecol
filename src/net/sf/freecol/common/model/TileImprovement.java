@@ -302,12 +302,12 @@ public class TileImprovement extends TileItem implements Locatable, Nameable {
     }
 
     public void compileStyleBreakdown(int[] base, int[] breakdown) {
-        if (base.length() != breakdown.length()) {
+        if (base.length != breakdown.length) {
             logger.warning("base.length != breakdown.length");
             return;
         }
         style = 0;
-        for (int i = 0; i < base.length(); i++) {
+        for (int i = 0; i < base.length; i++) {
             style += base[i] * breakdown[i];
         }
     }

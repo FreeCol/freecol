@@ -1087,8 +1087,8 @@ public final class GUI {
                     Tile tile = map.getTile(tileX, tileY);
                     if (tile.getSettlement() instanceof Colony) {
                         Colony colony = (Colony) map.getTile(tileX, tileY).getSettlement();
-                        BufferedImage stringImage = createStringImage(g, colony.getName(), colony.getOwner().getColor(), lib.getTerrainImageWidth(tile.getType()) * 4/3, 16);
-                        g.drawImage(stringImage, xx + (lib.getTerrainImageWidth(tile.getType()) - stringImage.getWidth())/2 + 1, yy + (lib.getColonyImageHeight(lib.getSettlementGraphicsType(colony))) + 1, null);
+                        BufferedImage stringImage = createStringImage(g, colony.getName(), colony.getOwner().getColor(), lib.getTerrainImageWidth(tile.getType().getIndex()) * 4/3, 16);
+                        g.drawImage(stringImage, xx + (lib.getTerrainImageWidth(tile.getType().getIndex()) - stringImage.getWidth())/2 + 1, yy + (lib.getColonyImageHeight(lib.getSettlementGraphicsType(colony))) + 1, null);
                     }
                 }
                 xx += tileWidth;
@@ -1533,7 +1533,7 @@ public final class GUI {
      *        unexplored terrain.
      */
     private void displayBaseTile(Graphics2D g, Map map, Tile tile, int x, int y, boolean drawUnexploredBorders) {
-        g.drawImage(lib.getTerrainImage(tile.getType(), tile.getX(), tile.getY()), x, y, null);
+        g.drawImage(lib.getTerrainImage(tile.getType().getIndex(), tile.getX(), tile.getY()), x, y, null);
 
         Map.Position pos = new Map.Position(tile.getX(), tile.getY());
 
@@ -1547,24 +1547,26 @@ public final class GUI {
                     continue;
                 }
 
-                if (tile.getType() == borderingTile.getType() || !borderingTile.isLand() && borderingTile.getType() != Tile.OCEAN){
+                if (tile.getType() == borderingTile.getType() ||
+                    !borderingTile.isLand() && !borderingTile.getType().isWater()){
                     // Equal tiles and sea tiles have no effect
                     continue;
                 }
 
-                if (!tile.isLand() && borderingTile.isExplored() && borderingTile.getType() != Tile.OCEAN) {
+                if (!tile.isLand() && borderingTile.isExplored() && 
+                    borderingTile.getType().isWater()) {
                     // Draw a beach overlayed with bordering land type
                     g.drawImage(lib.getTerrainImage(ImageLibrary.BEACH,
                                                     i,
                                                     tile.getX(), tile.getY()),
                                 x, y, null);
-                    g.drawImage(lib.getTerrainImage(borderingTile.getType(),
+                    g.drawImage(lib.getTerrainImage(borderingTile.getType().getIndex(),
                                                     i,
                                                     tile.getX(), tile.getY()),
                                 x, y, null);
-                } else if (borderingTile.getType() < tile.getType()) {
+                } else if (borderingTile.getType().getIndex() < tile.getType().getIndex()) {
                     // Draw land terrain with bordering land type
-                    g.drawImage(lib.getTerrainImage(borderingTile.getType(),
+                    g.drawImage(lib.getTerrainImage(borderingTile.getType().getIndex(),
                                                     i,
                                                     tile.getX(), tile.getY()),
                                 x, y, null);
@@ -1614,7 +1616,7 @@ public final class GUI {
         Map.Position pos = new Map.Position(tile.getX(), tile.getY());
 
         if (!tile.isExplored()) {
-            g.drawImage(lib.getTerrainImage(tile.getType(), tile.getX(), tile.getY()), x, y, null);
+            g.drawImage(lib.getTerrainImage(tile.getType().getIndex(), tile.getX(), tile.getY()), x, y, null);
         } else {
             // Until the mountain/hill bordering tiles are done... -sjm
 /*            if (tile.isLand()) {

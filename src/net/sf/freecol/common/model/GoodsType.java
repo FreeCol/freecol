@@ -11,15 +11,15 @@ import org.w3c.dom.Node;
 
 public final class GoodsType
 {
-    public static final  String  COPYRIGHT = "Copyright (C) 2003-2006 The FreeCol Team";
+    public static final  String  COPYRIGHT = "Copyright (C) 2003-2007 The FreeCol Team";
     public static final  String  LICENSE = "http://www.gnu.org/licenses/gpl.html";
     public static final  String  REVISION = "$Revision$";
 
     public final int        index;
-    public final String     id;
-    public final String     name;
-    public final boolean   isFarmed;
-    public final boolean   ignoreLimit;
+    public String     id;
+    public String     name;
+    public boolean   isFarmed;
+    public boolean   ignoreLimit;
 /*
     public boolean improvedByPlowing = false;
     public boolean improvedByRiver = false;
