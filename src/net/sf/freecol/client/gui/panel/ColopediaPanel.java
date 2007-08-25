@@ -151,7 +151,7 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
      * @param type - the panel type
      */
     public void initialize(int type) {
-        initialize(type, NO_DETAILS);
+        initialize(type, null);
     }
 
     /**
@@ -160,49 +160,51 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
      * @param type - the panel type
      * @param action - the details
      */
-    public void initialize(int type, int action) {
+    public void initialize(int type, Object action) {
         listPanel.removeAll();
         detailPanel.removeAll();
         tree = buildTree();
         switch (type) {
         case COLOPEDIA_TERRAIN:
-            if (action == NO_DETAILS) {
-                action = Tile.UNEXPLORED;
+            if (action == null) {
+                action = FreeCol.getSpecification().getTileType(0);
             }
             tree.expandRow(type);
             buildTerrainDetail(action);
             break;
         case COLOPEDIA_UNIT:
-            if (action == NO_DETAILS) {
-                action = Unit.FREE_COLONIST;
+            if (action == null) {
+                // TODO: get first non-expert unit
+                action = FreeCol.getSpecification().unitType(0);
             }
             tree.expandRow(type);
             buildUnitDetail(action);
             break;
         case COLOPEDIA_GOODS:
-            if (action == NO_DETAILS) {
-                action = Goods.FOOD;
+            if (action == null) {
+                action = FreeCol.getSpecification().getGoodsType(0);
             }
             tree.expandRow(type);
             buildGoodsDetail(action);
             break;
         case COLOPEDIA_SKILLS:
-            if (action == NO_DETAILS) {
-                action = Unit.EXPERT_FARMER;
+            if (action == null) {
+                // TODO: get first expert unit
+                action = FreeCol.getSpecification().unitType(0);
             }
             tree.expandRow(type);
             buildUnitDetail(action);
             break;
         case COLOPEDIA_BUILDING:
-            if (action == NO_DETAILS) {
-                action = Building.TOWN_HALL;
+            if (action == null) {
+                action = FreeCol.getSpecification().getBuildingTypeList().get(0);
             }
             tree.expandRow(type);
             buildBuildingDetail(action);
             break;
         case COLOPEDIA_FATHER:
-            if (action == NO_DETAILS) {
-                action = FoundingFather.ADAM_SMITH;
+            if (action == null) {
+                action = FreeCol.getSpecification().getFoundingFathers().get(0);
             }
             tree.expandRow(type);
             buildFatherDetail(action);

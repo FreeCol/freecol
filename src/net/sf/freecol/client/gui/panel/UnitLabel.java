@@ -14,6 +14,7 @@ import java.util.logging.Logger;
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
+import net.sf.freecol.FreeCol;
 
 import net.sf.freecol.client.control.InGameController;
 import net.sf.freecol.client.gui.Canvas;
@@ -346,7 +347,8 @@ public final class UnitLabel extends JLabel implements ActionListener {
                 case WORKTYPE_ORE:
                 case WORKTYPE_SILVER:
                     // Gets goodsType relative to FOOD
-                    int goodsType = intCommand - WORKTYPE_FOOD + Goods.FOOD;
+                    int goodsIndex = intCommand - WORKTYPE_FOOD + Goods.FOOD.getIndex();
+                    GoodsType goodsType = FreeCol.getSpecification().getGoodsType(goodsIndex);
                     // Move unit to best producing ColonyTile
                     ColonyTile bestTile = unit.getColony().getVacantColonyTileFor(unit, goodsType);
                     inGameController.work(unit, bestTile);

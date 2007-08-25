@@ -594,7 +594,7 @@ public final class Canvas extends JDesktopPane {
         } else if (display instanceof Goods) {
             Goods goods = (Goods) display;
             try {
-                image = imageLibrary.getGoodsImage(goods.getType());
+                image = imageLibrary.getGoodsImage(goods.getType().getIndex());
             } catch (Exception e) {
                 logger.warning("could not find image for goods " + goods.getName());
             }
@@ -1328,7 +1328,7 @@ public final class Canvas extends JDesktopPane {
      * @param type The type of colopedia panel to display.
      * @param action The details to display.
      */
-    public void showColopediaPanel(int type, int action) {
+    public void showColopediaPanel(int type, Object action) {
         ColopediaPanel colopediaPanel = new ColopediaPanel(this);
         colopediaPanel.initialize(type, action);
         addAsFrame(colopediaPanel);
@@ -1997,7 +1997,7 @@ public final class Canvas extends JDesktopPane {
                 TilePopup tp = new TilePopup(t, freeColClient, this, getGUI());
                 if (tp.hasItem()) {
                     showPopup(tp, x, y);
-                } else if (t.getType() != Tile.UNEXPLORED) {
+                } else if (t.isExplored()) {
                     showTilePanel(t);
                 }
             }

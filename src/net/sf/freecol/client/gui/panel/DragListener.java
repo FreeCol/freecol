@@ -34,11 +34,6 @@ public final class DragListener extends MouseAdapter {
 
     public static final String REVISION = "$Revision$";
 
-    private static final int[] workTypes = { UnitLabel.WORKTYPE_FOOD, UnitLabel.WORKTYPE_SUGAR,
-                                             UnitLabel.WORKTYPE_TOBACCO, UnitLabel.WORKTYPE_COTTON, 
-                                             UnitLabel.WORKTYPE_FURS, UnitLabel.WORKTYPE_LUMBER,
-                                             UnitLabel.WORKTYPE_ORE, UnitLabel.WORKTYPE_SILVER };
-
     private static final String[] messages = { "beAFarmer", "beASugarPlanter",
                                                "beATobaccoPlanter", "beAcottonPlanter",
                                                "beAFurTrapper", "beALumberjack",
@@ -90,10 +85,10 @@ public final class DragListener extends MouseAdapter {
                     for (GoodsType goodsType : farmedGoods) {
                         int maxpotential = colony.getVacantColonyTileProductionFor(tempUnit, goodsType);
                         if (maxpotential > 0) {
-                            menuItem = new JMenuItem(Messages.message(messages[index]) +
+                            menuItem = new JMenuItem(Messages.message(messages[goodsType.getIndex()]) +
                                                      " (" + maxpotential + " " + Goods.getName(goodsType) + ")",
                                                      imageLibrary.getScaledGoodsImageIcon(goodsType.getIndex(), 0.66f));
-                            menuItem.setActionCommand(String.valueOf(workTypes[index]));
+                            menuItem.setActionCommand(String.valueOf(goodsType.getIndex()));
                             menuItem.addActionListener(unitLabel);
                             menu.add(menuItem);
                         }
