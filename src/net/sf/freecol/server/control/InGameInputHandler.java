@@ -2040,27 +2040,22 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         if (unit.getOwner() != player) {
             throw new IllegalStateException("Not your unit!");
         }
-        switch (type) {
-        case Goods.CROSSES:
+        if (type == Goods.CROSSES) {
             unit.setMissionary((amount > 0));
-            break;
-        case Goods.MUSKETS:
+        } else if (type == Goods.MUSKETS) {
             unit.setArmed((amount > 0)); // So give them muskets if the
             // amount we want is greater than
             // zero.
-            break;
-        case Goods.HORSES:
+        } else if (type == Goods.HORSES) {
             unit.setMounted((amount > 0)); // As above.
-            break;
-        case Goods.TOOLS:
+        } else if (type == Goods.TOOLS) {
             int actualAmount = amount;
             if ((actualAmount % 20) > 0) {
                 logger.warning("Trying to set a number of tools that is not a multiple of 20.");
                 actualAmount -= (actualAmount % 20);
             }
             unit.setNumberOfTools(actualAmount);
-            break;
-        default:
+        } else {
             logger.warning("Invalid type of goods to equip.");
             return null;
         }
