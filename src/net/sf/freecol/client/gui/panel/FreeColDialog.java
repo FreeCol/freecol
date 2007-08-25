@@ -42,6 +42,7 @@ import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.Unit;
 import cz.autel.dmi.HIGLayout;
+import net.sf.freecol.common.model.UnitType;
 
 
 /**
@@ -776,10 +777,10 @@ public class FreeColDialog extends FreeColPanel {
     public static FreeColDialog createScoutIndianSettlementDialog(IndianSettlement settlement, Player player) {
         String introText = Messages.message(settlement.getAlarmLevelMessage(player),
                 "%nation%", settlement.getOwner().getNationAsString());
-        int skill = settlement.getLearnableSkill();
+        UnitType skill = settlement.getLearnableSkill();
         String messageID;
         String skillName = "";
-        if (skill >= 0) {
+        if (skill != null) {
             messageID = "scoutSettlement.question1";
             skillName = Unit.getName(skill).toLowerCase();
         } else {
