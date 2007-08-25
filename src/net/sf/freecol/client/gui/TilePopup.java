@@ -166,7 +166,7 @@ public final class TilePopup extends JPopupMenu implements ActionListener {
      */
     private void addUnit(Unit unit, boolean enabled, boolean indent) {
         String text;
-        if(unit.getState() == Unit.BUILD_ROAD || unit.getState() == Unit.PLOW) {
+        if(unit.getState() == Unit.IMPROVING) {
             text = ((indent ? "    " : "") + 
                     Messages.message("model.unit.nationUnit", 
                             "%nation%", unit.getOwner().getNationAsString(),
