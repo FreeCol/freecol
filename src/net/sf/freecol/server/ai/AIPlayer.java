@@ -27,6 +27,7 @@ import net.sf.freecol.common.model.FoundingFather;
 import net.sf.freecol.common.model.FreeColGameObject;
 import net.sf.freecol.common.model.GoalDecider;
 import net.sf.freecol.common.model.Goods;
+import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.IndianSettlement;
 import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.Map;
@@ -39,6 +40,7 @@ import net.sf.freecol.common.model.Tension;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.Map.Position;
+import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.networking.Message;
 import net.sf.freecol.common.networking.NetworkConstants;
@@ -296,21 +298,38 @@ public class AIPlayer extends AIObject {
         // TODO-AI-CHEATING: REMOVE WHEN THE AI IS GOOD ENOUGH:
         if (getAIMain().getFreeColServer().isSingleplayer() && player.isEuropean() && !player.isREF() && player.isAI()
                 && player.getRebellionState() == Player.REBELLION_PRE_WAR) {
+            Europe europe = player.getEurope();
+            List<UnitType> unitTypes = FreeCol.getSpecification().getUnitTypeList();
+            
             if (getRandom().nextInt(10) == 1) {
-                player.modifyGold(Unit.getPrice(Unit.EXPERT_ORE_MINER));
-                player.modifyGold(player.getMarket().getBidPrice(Goods.MUSKETS, 50));
-                player.modifyGold(player.getMarket().getBidPrice(Goods.HORSES, 50));
+                int price = 0;
+                UnitType unitToTrain = null;
+                for (UnitType unitType : unitTypes) {
+                    if (unitType.hasPrice()) {
+                        int unitPrice = europe.getUnitPrice(unitType);
+                        if (unitToTrain == null || unitPrice < price) {
+                            unitToTrain = unitType;
+                            price = unitPrice;
+                        }
+                    }
+                }
                 Unit unit = null;
-                try {
-                    Element trainUnitInEuropeElement = Message.createNewRootElement("trainUnitInEurope");
-                    trainUnitInEuropeElement.setAttribute("unitType", Integer.toString(Unit.EXPERT_ORE_MINER));
-                    Element reply = getConnection().ask(trainUnitInEuropeElement);
-                    unit = (Unit) getGame().getFreeColGameObject(
-                            ((Element) reply.getChildNodes().item(0)).getAttribute("ID"));
-                } catch (IOException e) {
-                    logger.warning("Could not train expert miner in order to create dragoon!");
+                if (unitToTrain != null) {
+                    player.modifyGold(price);
+                    try {
+                        Element trainUnitInEuropeElement = Message.createNewRootElement("trainUnitInEurope");
+                        trainUnitInEuropeElement.setAttribute("unitType", unitToTrain.getId());
+                        Element reply = getConnection().ask(trainUnitInEuropeElement);
+                        unit = (Unit) getGame().getFreeColGameObject(
+                                ((Element) reply.getChildNodes().item(0)).getAttribute("ID"));
+                    } catch (IOException e) {
+                        logger.warning("Could not train expert miner in order to create dragoon!");
+                    }
                 }
                 if (unit != null) {
+                    player.modifyGold(player.getMarket().getBidPrice(Goods.MUSKETS, 50));
+                    player.modifyGold(player.getMarket().getBidPrice(Goods.HORSES, 50));
+                    
                     Element clearSpecialityElement = Message.createNewRootElement("clearSpeciality");
                     clearSpecialityElement.setAttribute("unit", unit.getID());
                     sendAndWaitSafely(clearSpecialityElement);
@@ -327,32 +346,28 @@ public class AIPlayer extends AIObject {
                 }
             }
             if (getRandom().nextInt(40) == 21) {
-                int unitType = Unit.CARAVEL;
-                switch (getRandom().nextInt(10)) {
-                case 1:
-                case 2:
-                case 3:
-                case 4:
-                    unitType = Unit.CARAVEL;
-                    break;
-                case 5:
-                case 6:
-                case 7:
-                    unitType = Unit.MERCHANTMAN;
-                    break;
-                case 8:
-                    unitType = Unit.GALLEON;
-                    break;
-                case 9:
-                    unitType = Unit.PRIVATEER;
-                    break;
-                case 10:
-                    unitType = Unit.FRIGATE;
-                    break;
+                int total = 0;
+                ArrayList<UnitType> navalUnits = new ArrayList<UnitType>();
+                for (UnitType unitType : unitTypes) {
+                    if (unitType.hasAbility("model.unit.navalUnit") && unitType.hasPrice()) {
+                        navalUnits.add(unitType);
+                        total += europe.getUnitPrice(unitType);
+                    }
                 }
-                player.modifyGold(Unit.getPrice(unitType));
+                
+                UnitType unitToPurchase = null;
+                int random = getRandom().nextInt(total);
+                total = 0;
+                for (UnitType unitType : navalUnits) {
+                    total += unitType.getPrice();
+                    if (random < total) {
+                        unitToPurchase = unitType;
+                        break;
+                    }
+                }
+                player.modifyGold(europe.getUnitPrice(unitToPurchase));
                 Element trainUnitInEuropeElement = Message.createNewRootElement("trainUnitInEurope");
-                trainUnitInEuropeElement.setAttribute("unitType", Integer.toString(unitType));
+                trainUnitInEuropeElement.setAttribute("unitType", unitToPurchase.getId());
                 try {
                     getConnection().ask(trainUnitInEuropeElement);
                 } catch (IOException e) {
@@ -476,8 +491,8 @@ public class AIPlayer extends AIObject {
                         logger.warning("Unsupported REF-unit.");
                         continue;
                     }
-                    new Unit(getGame(), getPlayer().getEurope(), getPlayer(), unitType, Unit.ACTIVE, armed, mounted, 0,
-                            false);
+                    new Unit(getGame(), getPlayer().getEurope(), getPlayer(),
+                            unitType, Unit.ACTIVE, armed, mounted, 0, false);
                     ref[i]--;
                     totalNumber--;
                 }
@@ -1714,7 +1729,7 @@ public class AIPlayer extends AIObject {
         int bestWeight = -1;
         for (int father : foundingFathers) {
             if (father < 0) continue;
-            int weight = FreeCol.getSpecification().getFoundingFather(father).getWeight(age);
+            int weight = FreeCol.getSpecification().foundingFather(father).getWeight(age);
             if (weight > bestWeight) {
                 bestWeight = weight;
                 bestFather = father;
@@ -1810,15 +1825,14 @@ public class AIPlayer extends AIObject {
         if (toBeDestroyed == null) {
             return false;
         }
-        switch (toBeDestroyed.getType()) {
-        case Goods.FOOD:
-        case Goods.HORSES:
+        
+        GoodsType goodsType = toBeDestroyed.getType();
+        if (goodsType == Goods.FOOD || goodsType == Goods.HORSES) {
             // we should be able to produce goods and horses
             // ourselves
             return false;
-        case Goods.TRADE_GOODS:
-        case Goods.TOOLS:
-        case Goods.MUSKETS:
+        } else if (goodsType == Goods.TRADE_GOODS || goodsType == Goods.TOOLS
+                || goodsType == Goods.MUSKETS) {
             if (getGame().getTurn().getAge() == 3) {
                 // by this time, we should be able to produce
                 // enough ourselves
@@ -1826,13 +1840,18 @@ public class AIPlayer extends AIObject {
             } else {
                 return true;
             }
-        default:
+        } else {
             int averageIncome = 0;
-            for (int i = 0; i < Goods.NUMBER_OF_TYPES; i++) {
-                averageIncome += player.getIncomeAfterTaxes(i);
+            int numberOfGoods = 0;
+            List<GoodsType> goodsTypes = FreeCol.getSpecification().getGoodsTypeList();
+            for (GoodsType type : goodsTypes) {
+                if (type.isStorable()) {
+                    averageIncome += player.getIncomeAfterTaxes(type.getIndex());
+                    numberOfGoods++;
+                }
             }
-            averageIncome = averageIncome / Goods.NUMBER_OF_TYPES;
-            if (player.getIncomeAfterTaxes(toBeDestroyed.getType()) > averageIncome) {
+            averageIncome = averageIncome / numberOfGoods;
+            if (player.getIncomeAfterTaxes(toBeDestroyed.getType().getIndex()) > averageIncome) {
                 // this is a more valuable type of goods
                 return false;
             } else {

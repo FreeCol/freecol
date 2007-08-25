@@ -6,6 +6,7 @@ import java.util.logging.Logger;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
+import net.sf.freecol.FreeCol;
 
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.Location;
@@ -41,7 +42,7 @@ public class GoodsWish extends Wish {
     * @param goodsType The type of goods needed for releasing this wish
     *       completly.
     */
-    public GoodsWish(AIMain aiMain, Location destination, int value, int goodsType) {
+    public GoodsWish(AIMain aiMain, Location destination, int value, GoodsType goodsType) {
         super(aiMain, getXMLElementTagName() + ":" + aiMain.getNextID());
 
         if (destination == null) {
@@ -115,7 +116,7 @@ public class GoodsWish extends Wish {
          }
          out.writeAttribute("value", Integer.toString(value));
          
-         out.writeAttribute("goodsType", Integer.toString(goodsType));
+         out.writeAttribute("goodsType", Integer.toString(goodsType.getIndex()));
          
          out.writeEndElement();
      }
@@ -141,7 +142,8 @@ public class GoodsWish extends Wish {
          }
          value = Integer.parseInt(in.getAttributeValue(null, "value"));
          
-         goodsType = Integer.parseInt(in.getAttributeValue(null, "goodsType"));
+         int goodsTypeIndex = Integer.parseInt(in.getAttributeValue(null, "goodsType"));
+         goodsType = FreeCol.getSpecification().getGoodsType(goodsTypeIndex);
          
          in.nextTag();
      }
