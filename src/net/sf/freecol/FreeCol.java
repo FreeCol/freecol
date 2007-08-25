@@ -173,6 +173,9 @@ public final class FreeCol {
                 return;
             }
 
+            // This needs to be initialized before ImageLibrary
+            getSpecification();
+
             // TODO: don't use same datafolder for both images and music because the images are best kept inside the .JAR file.
 
             logger.info("Now starting to load images.");
