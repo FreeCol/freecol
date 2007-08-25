@@ -7,6 +7,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Logger;
 
 import javax.swing.BoxLayout;
@@ -23,8 +24,10 @@ import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.Goods;
+import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Tile;
+import net.sf.freecol.common.model.TileType;
 
 /**
  * This panel is used to show information about a tile.
@@ -39,19 +42,14 @@ public final class TilePanel extends FreeColDialog implements ActionListener {
     private static final int OK = 0;
     private static final int COLOPEDIA = 1;
     private final Canvas canvas;
-
-    private final int[] goods;
-    private final int number;
     
     private final JPanel goodsPanel;
     private final JLabel tileNameLabel;
     private final JLabel ownerLabel;
     private final JButton okButton;
     private final JButton colopediaButton;
-    private final JLabel[] labels;
-    private final JLabel fishLabel;
 
-    private Tile tile;
+    private TileType tileType;
 
     /**
      * The constructor that will add the items to this panel.
@@ -70,28 +68,9 @@ public final class TilePanel extends FreeColDialog implements ActionListener {
         ownerLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
         add(ownerLabel);        
         
-        ArrayList<Integer> farmedGoods = new ArrayList<Integer>();
-        for (int i = 0; i < Goods.NUMBER_OF_TYPES; i++) {
-            if (Goods.isFarmedGoods(i)) {
-                farmedGoods.add(i);
-            }
-
-        }
-        number = farmedGoods.size();
-
         goodsPanel = new JPanel();
         goodsPanel.setLayout(new FlowLayout());
 
-        goods = new int[number];
-        labels = new JLabel[number];
-        for (int k = 0; k < number; k++) {
-            int index = farmedGoods.get(k).intValue();
-            goods[k] = index;
-            labels[k] = new JLabel(canvas.getImageProvider().getGoodsImageIcon(index));
-            //goodsPanel.add(labels[k]);
-        }
-        fishLabel = new JLabel(canvas.getImageProvider().getGoodsImageIcon(Goods.FISH));
-        
         goodsPanel.setSize(goodsPanel.getPreferredSize());
         add(goodsPanel);
 
@@ -132,7 +111,7 @@ public final class TilePanel extends FreeColDialog implements ActionListener {
      * @param tile The Tile whose information should be displayed.
      */
     public void initialize(Tile tile) {
-        this.tile = tile;
+        this.tileType = tile.getType();
         tileNameLabel.setText(tile.getName() + " (" + tile.getX() + ", " +
                               tile.getY() + ")");
         if (tile.getNationOwner() == Player.NO_NATION) {
@@ -147,14 +126,11 @@ public final class TilePanel extends FreeColDialog implements ActionListener {
         }
         
         goodsPanel.removeAll();
-        if (tile.isLand()) {
-            for (int i = 0; i < number; i++) {
-                labels[i].setText(String.valueOf(tile.potential(goods[i])));
-                goodsPanel.add(labels[i]);
-            }
-        } else {
-            fishLabel.setText(String.valueOf(tile.potential(Goods.FOOD)));
-            goodsPanel.add(fishLabel);
+        List<GoodsType> production = tileType.getPotentialTypeList();
+        for (GoodsType goodsType : production) {
+            JLabel label = new JLabel(canvas.getImageProvider().getGoodsImageIcon(goodsType.getIndex()));
+            label.setText(String.valueOf(tileType.getPotential(goodsType)));
+            goodsPanel.add(label);
         }
         setSize(getPreferredSize());
 
@@ -174,7 +150,7 @@ public final class TilePanel extends FreeColDialog implements ActionListener {
                 setResponse(new Boolean(true));
                 break;
             case COLOPEDIA:
-                int type = tile.getType().getIndex();
+                int type = tileType.getIndex();
                 setResponse(new Boolean(true));
                 canvas.showColopediaPanel(ColopediaPanel.COLOPEDIA_TERRAIN, type);
                 break;

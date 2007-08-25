@@ -246,14 +246,15 @@ public class TileItemContainer extends FreeColGameObject {
             resource = (Resource) t;
             return t;
         } else if (t instanceof TileImprovement) {
+            TileImprovement improvement = (TileImprovement) t;
             // Check all improvements to find any to replace
-            String typeId = ((TileImprovement) t).getTypeId();
+            String typeId = improvement.getTypeId();
             if (typeId != null) {
                 Iterator<TileImprovement> ti = improvements.iterator();
                 while (ti.hasNext()) {
                     TileImprovement imp = ti.next();
                     if (imp.getTypeId().equals(typeId)) {
-                        if (imp.getMagnitude() < ((TileImprovement) t).getMagnitude()) {
+                        if (imp.getMagnitude() < improvement.getMagnitude()) {
                             removeTileItem(imp);
                             break;
                         } else {
@@ -263,12 +264,13 @@ public class TileItemContainer extends FreeColGameObject {
                     }
                 }
             }
-            if (t.hasRoad()) {
-                road = (TileImprovement) t;
-            } else if (t.isRiver()) {
-                river = (TileImprovement) t;
+            if (improvement.isRoad()) {
+                road = improvement;
+            } else if (improvement.isRiver()) {
+                river = improvement;
             }
-            improvements.add((TileImprovement) t);
+            improvements.add(improvement);
+            return improvement;
         } else {
             logger.warning("TileItem " + t.getClass().getSimpleName() + " has not be implemented yet.");
             return null;
@@ -371,7 +373,7 @@ public class TileItemContainer extends FreeColGameObject {
         List<TileImprovementType> tiTypeList = FreeCol.getSpecification().getTileImprovementTypeList();
         // Get the first river that matches or is below
         for (TileImprovementType tiType : tiTypeList) {
-            if ("river".equals(tiType.getTypeId()) && tiType.getMagnitude() <= magnitude) {
+            if ("river".equals(tiType.getType()) && tiType.getMagnitude() <= magnitude) {
                 TileImprovement river = new TileImprovement(getGame(), tile, tiType);
                 this.river = river;
                 adjustNeighbourRiverStyle(0);
@@ -418,7 +420,7 @@ public class TileItemContainer extends FreeColGameObject {
         List<TileImprovementType> tiTypeList = FreeCol.getSpecification().getTileImprovementTypeList();
         // Check if there is another river type defined for this magnitude
         for (TileImprovementType tiType : tiTypeList) {
-            if ("river".equals(tiType.getTypeId()) && tiType.getMagnitude() <= magnitude) {
+            if ("river".equals(tiType.getType()) && tiType.getMagnitude() <= magnitude) {
                 if (tiType != river.getType()) {
                     // Has a different river type for this magnitude
                     TileImprovement r = new TileImprovement(getGame(), tile, tiType);
@@ -583,7 +585,7 @@ public class TileItemContainer extends FreeColGameObject {
                         improvements.add(ti);
                     }
                 } else {
-                    ti = new TileImprovement(getGame(), tile, in);
+                    ti = new TileImprovement(getGame(), in);
                     improvements.add(ti);
                 }
                 if (ti.isRoad()) {

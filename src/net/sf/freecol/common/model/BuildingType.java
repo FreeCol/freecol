@@ -74,7 +74,6 @@ public final class BuildingType {
         return levelList.get(levelIndex);
     }
 
-
     /**
      * Gives informations about the different levels a building can have.
      */

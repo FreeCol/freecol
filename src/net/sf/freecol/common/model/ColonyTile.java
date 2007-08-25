@@ -433,7 +433,7 @@ public class ColonyTile extends FreeColGameObject implements WorkLocation, Ownab
     }
 
     private void produceGoodsCenterTile() {
-        GoodsType goodsFood = FreeCol.getSpecification().goodsFood;
+        GoodsType goodsFood = FreeCol.getSpecification().getGoodsFood().get(0);
         colony.addGoods(goodsFood, getProductionOf(goodsFood));
         GoodsType type2 = workTile.secondaryGoods();
         colony.addGoods(type2, getProductionOf(type2));

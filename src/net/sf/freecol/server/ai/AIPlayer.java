@@ -1514,12 +1514,12 @@ public class AIPlayer extends AIObject {
      * @return The <code>Iterator</code>.
      * @see TileImprovement
      */
-    public Iterator<TileImprovement> getTileImprovementIterator() {
-        ArrayList<TileImprovement> tileImprovements = new ArrayList<TileImprovement>();
+    public Iterator<TileImprovementPlan> getTileImprovementPlanIterator() {
+        ArrayList<TileImprovementPlan> tileImprovements = new ArrayList<TileImprovementPlan>();
         Iterator<AIColony> acIterator = getAIColonyIterator();
         while (acIterator.hasNext()) {
             AIColony ac = acIterator.next();
-            Iterator<TileImprovement> it = ac.getTileImprovementIterator();
+            Iterator<TileImprovementPlan> it = ac.getTileImprovementPlanIterator();
             while (it.hasNext()) {
                 tileImprovements.add(it.next());
             }

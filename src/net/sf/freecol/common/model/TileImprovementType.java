@@ -1,5 +1,6 @@
 package net.sf.freecol.common.model;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
@@ -19,7 +20,7 @@ public final class TileImprovementType
     public  String  id;
     public  String  name;
     public  boolean natural;
-    public  String  typeId;
+    public  String  type;
     public  int     magnitude;
     public  int     addWorkTurns;
 
@@ -27,9 +28,9 @@ public final class TileImprovementType
     public  boolean artOverTrees;
     
     private List<TileType>  allowedTileTypes;
-    private TileImprovementType requiredImprovement;
+    private String requiredImprovement;
 
-    private List<UnitType>  allowedWorkers;
+    private HashSet<String>  allowedWorkers;
     private GoodsType       expendedGoodsType;
     private int             expendedAmount;   
     private GoodsType       deliverGoodsType;
@@ -41,7 +42,7 @@ public final class TileImprovementType
     private List<TileType>  tileTypeChangeTo;
 
     public  int     movementCost;
-    public  int     movementCostFactor;
+    public  float   movementCostFactor;
     
     // ------------------------------------------------------------ constructors
 
@@ -63,8 +64,8 @@ public final class TileImprovementType
         return natural;
     }
 
-    public String getTypeId() {
-        return typeId;
+    public String getType() {
+        return type;
     }
 
     public int getMagnitude() {
@@ -92,10 +93,7 @@ public final class TileImprovementType
     }
 
     public boolean isWorkerTypeAllowed(UnitType unitType) {
-        if (allowedWorkers.size() == 0) {
-            return true;
-        }
-        return (allowedWorkers.indexOf(unitType) >= 0);
+        return allowedWorkers.contains(unitType.getName());
     }
 
     /**
@@ -223,29 +221,32 @@ public final class TileImprovementType
             } else {
                 return cost;
             }
-            return cost;
         }
+        return cost;
     }
 
     // ------------------------------------------------------------ API methods
 
     public void readFromXmlElement(Node xml, final List<TileType> tileTypeList,
-                                   Map<String, TileType> tileTypeByRef, Map<String, GoodsType> goodsTypeByRef,
-                                   Map<String, TileImprovementType> improvementByRef) {
+                                   final Map<String, TileType> tileTypeByRef,
+                                   final Map<String, GoodsType> goodsTypeByRef) {
 
         name = Xml.attribute(xml, "id");
-        String[] buffer = name.split(".");
+        String[] buffer = name.split("\\.");
         id = buffer[buffer.length - 1];
         addWorkTurns = Xml.intAttribute(xml, "add-works-turns");
         movementCost = -1;
         movementCostFactor = -1;
         natural = Xml.booleanAttribute(xml, "natural", false);
         
-        allowedWorkers = Xml.arrayAttribute(xml, "workers", new String[] {});
+        allowedWorkers = new HashSet<String>();
+        String[] workers = Xml.arrayAttribute(xml, "workers", new String[] {});
+        for(int i = 0; i < workers.length; i++) {
+            allowedWorkers.add(workers[i]);
+        }
         String g = Xml.attribute(xml, "expended-goods-type", "");
 
-        String t = Xml.attribute(xml, "required-improvement", "");
-        requiredImprovement = improvementByRef.get(t);
+        requiredImprovement = Xml.attribute(xml, "required-improvement", "");
         artOverlay = Xml.intAttribute(xml, "overlay", -1);
         artOverTrees = Xml.booleanAttribute(xml, "over-trees", false);
 
@@ -254,9 +255,6 @@ public final class TileImprovementType
         g = Xml.attribute(xml, "deliver-goods-type", "");
         deliverGoodsType = goodsTypeByRef.get(g);
         deliverAmount = Xml.intAttribute(xml, "deliver-amount", 0);
-
-        t = Xml.attribute(xml, "required-improvement", "");
-        requiredImprovement = improvementByRef.get(t);
 
         Xml.Method method = new Xml.Method() {
                 public void invokeOn(Node xml) {
@@ -270,8 +268,7 @@ public final class TileImprovementType
                         boolean allForest = Xml.booleanAttribute(xml, "all-forest-tiles", false);
                         boolean allWater = Xml.booleanAttribute(xml, "all-water-tiles", false);
 
-                        for (int i = 0; i < tileTypeList.size(); i++) {
-                            TileType t = tileTypeList.get(i);
+                        for (TileType t : tileTypeList) {
                             if (!allLand && !t.isWater() || !allForest && t.isForested()
                                 || !allWater && t.isWater()) {
                                 continue;
@@ -302,17 +299,21 @@ public final class TileImprovementType
                             int[] bonus = Xml.intArrayAttribute(xml, "values");
                             for (int i = 0; i < goods.length; i++) {
                                 GoodsType gt = goodsTypeByRef.get(goods[i]);
-                                if (gt != null && goodsEffect.get(gt) < 0) {
+                                if (gt != null && !goodsEffect.contains(gt)) {
                                     goodsEffect.add(gt);
                                     goodsBonus.add(bonus[i]);
                                 }
                             }
                         }
-                        movementCost = Xml.intAttribute(xml, "movement-cost", -1);
-                        movementCostFactor = Xml.floatAttribute(xml, "movement-cost-factor", -1);
+                        if (Xml.hasAttribute(xml, "movement-cost")) {
+                            movementCost = Xml.intAttribute(xml, "movement-cost");
+                        }
+                        if (Xml.hasAttribute(xml, "movement-cost-factor")) {
+                            movementCostFactor = Xml.intAttribute(xml, "movement-cost-factor");
+                        }
                     } else if ("change".equals(childName)) {
-                        tileTypeChangeFrom.add(Xml.attribute(xml, "from"));
-                        tileTypeChangeTo.add(Xml.attribute(xml, "to"));
+                        tileTypeChangeFrom.add(tileTypeByRef.get(Xml.attribute(xml, "from")));
+                        tileTypeChangeTo.add(tileTypeByRef.get(Xml.attribute(xml, "to")));
                     } else {
                         throw new RuntimeException("unexpected: " + xml);
                     }

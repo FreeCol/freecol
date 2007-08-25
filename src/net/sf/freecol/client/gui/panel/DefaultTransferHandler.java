@@ -32,6 +32,7 @@ import javax.swing.JPanel;
 import javax.swing.TransferHandler;
 
 import net.sf.freecol.client.gui.Canvas;
+import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.Unit;
 
 /**
@@ -382,7 +383,7 @@ public final class DefaultTransferHandler extends TransferHandler {
     /**
     * Displays an input dialog box where the user should specify a goods transfer amount.
     */
-    private int getAmount(int goodsType, int available, boolean needToPay) {
+    private int getAmount(GoodsType goodsType, int available, boolean needToPay) {
         return canvas.showSelectAmountDialog(goodsType, available, needToPay);
     }
 

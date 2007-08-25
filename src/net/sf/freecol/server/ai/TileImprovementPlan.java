@@ -6,6 +6,7 @@ import java.util.logging.Logger;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
+import net.sf.freecol.FreeCol;
 
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.TileImprovementType;
@@ -23,7 +24,7 @@ import org.w3c.dom.Element;
  */
 public class TileImprovementPlan extends AIObject {
     @SuppressWarnings("unused")
-    private static final Logger logger = Logger.getLogger(TileImprovement.class.getName());
+    private static final Logger logger = Logger.getLogger(TileImprovementPlan.class.getName());
 
     public static final String  COPYRIGHT = "Copyright (C) 2003-2005 The FreeCol Team";
     public static final String  LICENSE = "http://www.gnu.org/licenses/gpl.html";
@@ -234,7 +235,7 @@ public class TileImprovementPlan extends AIObject {
      */
     protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
         id = in.getAttributeValue(null, "ID");
-        type = FreeCol.getSpecification().getTileImprovemenType(Integer.parseInt(in.getAttributeValue(null, "type")));
+        type = FreeCol.getSpecification().getTileImprovementType(Integer.parseInt(in.getAttributeValue(null, "type")));
         value = Integer.parseInt(in.getAttributeValue(null, "value"));
         
         final String pioneerStr = in.getAttributeValue(null, "pioneer");

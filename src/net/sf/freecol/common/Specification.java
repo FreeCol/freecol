@@ -63,13 +63,10 @@ public final class Specification {
         final Map<String, GoodsType> goodsTypeByRef = new HashMap<String, GoodsType>();
         final Map<String, ResourceType> resourceTypeByRef = new HashMap<String, ResourceType>();
         final Map<String, TileType> tileTypeByRef = new HashMap<String, TileType>();
+        farmedGoodsTypeList = new ArrayList<GoodsType>();
 
         InputStream in = Specification.class.getResourceAsStream("specification.xml");
         Document specificationDocument = Xml.documentFrom(in);
-
-        /*  Moved into main class for referencing
-        final Map<String, GoodsType> goodsTypeByRef = new HashMap<String, GoodsType>();
-        */
 
         /* this method is invoked for each child element of the root element */
         final Xml.Method method = new Xml.Method() {
@@ -213,7 +210,7 @@ public final class Specification {
     public int getBuildingIndex(BuildingType b) {
         return buildingTypeList.indexOf(b);
     }
-
+/*
     public BuildingType getBuildingType(String name) {
         for (BuildingType b : buildingTypeList) {
             if (b.getName().equals(name)) {
@@ -222,7 +219,7 @@ public final class Specification {
         }
         return null;
     }
-
+*/
     // -- Goods --
     public List<GoodsType> getGoodsTypeList() {
         return goodsTypeList;
@@ -235,7 +232,7 @@ public final class Specification {
     public int numberOfStoredGoodsTypes() {
         int n = 0;
         for (GoodsType g : goodsTypeList) {
-            if (g.getStoreable()) {
+            if (g.isStorable()) {
                 n++;
             }
         }
@@ -261,6 +258,16 @@ public final class Specification {
             }
         }
         return null;
+    }
+
+    public List<GoodsType> getGoodsFood() {
+        ArrayList<GoodsType> goods = new ArrayList<GoodsType>();
+        for (GoodsType g : goodsTypeList) {
+            if (g.isFoodType()) {
+                goods.add(g);
+            }
+        }
+        return goods;
     }
 
     // -- Resources --

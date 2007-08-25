@@ -88,6 +88,7 @@ import net.sf.freecol.common.model.Europe;
 import net.sf.freecol.common.model.FreeColGameObject;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Goods;
+import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.IndianSettlement;
 import net.sf.freecol.common.model.LostCityRumour;
 import net.sf.freecol.common.model.Map;
@@ -412,7 +413,7 @@ public final class Canvas extends JDesktopPane {
      * @param needToPay a <code>boolean</code> value
      * @return an <code>int</code> value
      */
-    public int showSelectAmountDialog(int goodsType, int available, boolean needToPay) {
+    public int showSelectAmountDialog(GoodsType goodsType, int available, boolean needToPay) {
         SelectAmountDialog dialog = new SelectAmountDialog(this, goodsType, available, needToPay);
         dialog.initialize();
         addAsFrame(dialog);

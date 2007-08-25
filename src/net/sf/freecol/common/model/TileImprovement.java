@@ -75,7 +75,7 @@ public class TileImprovement extends TileItem implements Locatable, Nameable {
             throw new NullPointerException();
         }
         this.type = type;
-        this.turnsToComplete = tile.getBasicWorkTurns() + type.getAddWorksTurns();
+        this.turnsToComplete = tile.getBasicWorkTurns() + type.getAddWorkTurns();
         this.magnitude = type.getMagnitude();
     }
 
@@ -104,8 +104,12 @@ public class TileImprovement extends TileItem implements Locatable, Nameable {
 
     // ------------------------------------------------------------ retrieval methods
 
+    public TileImprovementType getType() {
+        return type;
+    }
+
     public String getTypeId() {
-        return type.getTypeId();
+        return type.getType();
     }
 
     public int getMagnitude() {
@@ -224,7 +228,7 @@ public class TileImprovement extends TileItem implements Locatable, Nameable {
         if (!isComplete()) {
             return moveCost;
         }
-        String typeId = type.getTypeId();
+        String typeId = type.getType();
         if (typeId == null) {
             // No checking for matching type
             return type.getMovementCost(moveCost);

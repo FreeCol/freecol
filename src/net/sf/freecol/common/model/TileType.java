@@ -138,11 +138,11 @@ public final class TileType
 
     // ------------------------------------------------------------ API methods
 
-    public void readFromXmlElement(Node xml, Map<String, GoodsType> goodsTypeByRef,
-                                    Map<String, ResourceType> resourceTypeByRef) {
+    public void readFromXmlElement(Node xml, final Map<String, GoodsType> goodsTypeByRef,
+                                    final Map<String, ResourceType> resourceTypeByRef) {
 
         name = Xml.attribute(xml, "id");
-        String[] buffer = name.split(".");
+        String[] buffer = name.split("\\.");
         id = buffer[buffer.length - 1];
         basicMoveCost = Xml.intAttribute(xml, "basic-move-cost");
         basicWorkTurns = Xml.intAttribute(xml, "basic-work-turns");
@@ -152,14 +152,13 @@ public final class TileType
         canSailToEurope = Xml.booleanAttribute(xml, "sail-to-europe", false);
         attackFactor = 100;
         defenceFactor = 100;
-        boolean hasArt = false;
-
+        
+        artBasic = -1;
         Xml.Method method = new Xml.Method() {
             public void invokeOn(Node xml) {
                 String childName = xml.getNodeName();
 
                 if ("art".equals(childName)) {
-                    hasArt = true;
                     artBasic = Xml.intAttribute(xml, "basic");
                     artOverlay = Xml.intAttribute(xml, "overlay", -1);
                     artForest = Xml.intAttribute(xml, "forest", -1);
@@ -192,7 +191,7 @@ public final class TileType
             }
         };
         Xml.forEachChild(xml, method);
-        if (!hasArt) {
+        if (artBasic < 0) {
             throw new RuntimeException("TileType "+name+" has no art defined!");
         }
     }

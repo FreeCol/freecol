@@ -19,6 +19,7 @@ public final class GoodsType
     public String     id;
     public String     name;
     public boolean   isFarmed;
+    public boolean   isFood;
     public boolean   ignoreLimit;
 /*
     public boolean improvedByPlowing = false;
@@ -97,7 +98,7 @@ public final class GoodsType
 
     // TODO: give this some meaning
     public boolean isFoodType() {
-        return false;
+        return isFood;
     }
 
 /*
@@ -124,9 +125,10 @@ public final class GoodsType
     public void readFromXmlElement( Node xml, Map<String, GoodsType> goodsTypeByRef ) {
 
         name = Xml.attribute(xml, "id");
-        String[] buffer = name.split(".");
+        String[] buffer = name.split("\\.");
         id = buffer[buffer.length - 1];
         isFarmed = Xml.booleanAttribute(xml, "is-farmed");
+        isFood = Xml.booleanAttribute(xml, "is-food", false);
         ignoreLimit = Xml.booleanAttribute(xml, "ignore-limit", false);
 
         if (Xml.hasAttribute(xml, "made-from")) {

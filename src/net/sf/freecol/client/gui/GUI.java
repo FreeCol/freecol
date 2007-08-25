@@ -1651,7 +1651,7 @@ public final class GUI {
 
             if (tile.getAddition() == Tile.ADD_RIVER_MAJOR
                     || tile.getAddition() == Tile.ADD_RIVER_MINOR) {
-                g.drawImage(lib.getRiverImage(tile.getRiver()), x, y, null);
+                g.drawImage(lib.getRiverImage(tile.getRiverStyle()), x, y, null);
             }
             if (tile.isForested()) {
                 g.drawImage(lib.getForestImage(tile.getType().getIndex()), x, y, null);
@@ -1865,7 +1865,7 @@ public final class GUI {
                         continue;
                     }
 
-                    g.drawImage(lib.getTerrainImage(borderingTile.getType(), i, tile.getX(), tile.getY()), x, y, null);
+                    g.drawImage(lib.getTerrainImage(borderingTile.getType().getIndex(), i, tile.getX(), tile.getY()), x, y, null);
                 }
             }
         }

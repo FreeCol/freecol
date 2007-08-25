@@ -15,6 +15,7 @@ import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import net.sf.freecol.FreeCol;
 
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.gui.Canvas;
@@ -25,6 +26,7 @@ import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Unit;
+import net.sf.freecol.common.model.UnitType;
 
 import org.w3c.dom.Element;
 
@@ -414,14 +416,14 @@ public final class ReportUnitPanel extends JPanel implements ActionListener {
         locationIndex++;
     }
 
-    private JLabel createUnitTypeLabel(int unitType, boolean mounted, int count) {
-        int graphicsType = ImageLibrary.getUnitGraphicsType(unitType, true, mounted, 0, false);
+    private JLabel createUnitTypeLabel(int unitTypeIndex, boolean mounted, int count) {
+        int graphicsType = ImageLibrary.getUnitGraphicsType(unitTypeIndex, true, mounted, 0, false);
         JLabel unitLabel = reportPanel.buildUnitLabel(graphicsType, 0.66f);
         unitLabel.setText(String.valueOf(count));
         if (count == 0) {
             unitLabel.setForeground(Color.GRAY);
         }
-        switch (unitType) {
+        switch (unitTypeIndex) {
         case Unit.ARTILLERY:
         case Unit.DAMAGED_ARTILLERY:
         case Unit.CARAVEL:
@@ -431,7 +433,8 @@ public final class ReportUnitPanel extends JPanel implements ActionListener {
         case Unit.MAN_O_WAR:
         case Unit.PRIVATEER:
         case Unit.WAGON_TRAIN:
-            unitLabel.setToolTipText(FreeCol.getSpecification().unitType(unitType).getName());
+            UnitType unitType = FreeCol.getSpecification().unitType(unitTypeIndex);
+            unitLabel.setToolTipText(Unit.getName(unitType));
             break;
         case Unit.VETERAN_SOLDIER:
             if (mounted) {

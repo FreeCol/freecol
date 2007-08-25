@@ -499,8 +499,8 @@ public class AIMain implements FreeColGameObjectListener {
                     new WorkerWish(this, in);
                 } else if (tagName.equals(GoodsWish.getXMLElementTagName())) {
                     new GoodsWish(this, in);
-                } else if (tagName.equals(TileImprovement.getXMLElementTagName())) {
-                    new TileImprovement(this, in);                
+                } else if (tagName.equals(TileImprovementPlan.getXMLElementTagName())) {
+                    new TileImprovementPlan(this, in);                
                 } else {
                     logger.warning("Unkown AI-object read: " + tagName + "(" + lastTag + ")");
                 }

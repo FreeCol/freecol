@@ -13,6 +13,7 @@ import javax.swing.JLabel;
 
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.common.model.Goods;
+import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.Market;
 import net.sf.freecol.common.model.Player;
 
@@ -27,7 +28,7 @@ public final class MarketLabel extends JLabel implements ActionListener {
 
     private static Logger logger = Logger.getLogger(MarketLabel.class.getName());
 
-    private final int type;
+    private final GoodsType type;
     private int amount;
     private final Market market;
     private final Canvas parent;
@@ -40,8 +41,8 @@ public final class MarketLabel extends JLabel implements ActionListener {
     *       and sell <code>Goods</code>.
     * @param parent The parent that knows more than we do.
     */
-    public MarketLabel(int type, Market market, Canvas parent) {
-        super(parent.getImageProvider().getGoodsImageIcon(type));
+    public MarketLabel(GoodsType type, Market market, Canvas parent) {
+        super(parent.getImageProvider().getGoodsImageIcon(type.getIndex()));
         
         this.type = type;
         setToolTipText(Goods.getName(type));
@@ -65,7 +66,7 @@ public final class MarketLabel extends JLabel implements ActionListener {
     * @param parent The parent that knows more than we do.
     * @param isSmall The image will be smaller if set to <code>true</code>.
     */
-    public MarketLabel(int type, Market market, Canvas parent, boolean isSmall) {
+    public MarketLabel(GoodsType type, Market market, Canvas parent, boolean isSmall) {
         this(type, market, parent);
         setSmall(true);
     }
@@ -85,7 +86,7 @@ public final class MarketLabel extends JLabel implements ActionListener {
     * Returns this MarketLabel's goods type.
     * @return This MarketLabel's goods type.
     */
-    public int getType() {
+    public GoodsType getType() {
         return type;
     }
 
@@ -120,10 +121,10 @@ public final class MarketLabel extends JLabel implements ActionListener {
     */
     public void setSmall(boolean isSmall) {
         if (isSmall) {
-            ImageIcon imageIcon = (parent.getImageProvider().getGoodsImageIcon(type));
+            ImageIcon imageIcon = (parent.getImageProvider().getGoodsImageIcon(type.getIndex()));
             setIcon(new ImageIcon(imageIcon.getImage().getScaledInstance(imageIcon.getIconWidth() / 2, imageIcon.getIconHeight() / 2, Image.SCALE_DEFAULT)));
         } else {
-            setIcon(parent.getImageProvider().getGoodsImageIcon(type));
+            setIcon(parent.getImageProvider().getGoodsImageIcon(type.getIndex()));
         }
     }
 
@@ -159,7 +160,7 @@ public final class MarketLabel extends JLabel implements ActionListener {
                     default:
                         logger.warning("Invalid action");
                 }
-                setIcon(parent.getImageProvider().getGoodsImageIcon(type));
+                setIcon(parent.getImageProvider().getGoodsImageIcon(type.getIndex()));
                 repaint(0, 0, getWidth(), getHeight());
                 
                 // TODO: Refresh the gold label when goods have prices.

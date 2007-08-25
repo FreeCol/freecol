@@ -32,6 +32,7 @@ import javax.swing.border.TitledBorder;
 import javax.swing.text.SimpleAttributeSet;
 import javax.swing.text.StyleConstants;
 import javax.swing.text.StyledDocument;
+import net.sf.freecol.FreeCol;
 
 import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.client.FreeColClient;
@@ -484,11 +485,14 @@ public final class EuropePanel extends FreeColPanel implements ActionListener {
         setSelectedUnitLabel(lastCarrier);
 
         Player player = freeColClient.getMyPlayer();
-        for (int i = 0; i < Goods.NUMBER_OF_TYPES; i++) {
-            MarketLabel marketLabel = new MarketLabel(i, player.getMarket(), parent);
-            marketLabel.setTransferHandler(defaultTransferHandler);
-            marketLabel.addMouseListener(pressListener);
-            marketPanel.add(marketLabel);
+        List<GoodsType> goodsTypes = FreeCol.getSpecification().getGoodsTypeList();
+        for (GoodsType goodsType : goodsTypes) {
+            if (goodsType.isStorable()) {
+                MarketLabel marketLabel = new MarketLabel(goodsType, player.getMarket(), parent);
+                marketLabel.setTransferHandler(defaultTransferHandler);
+                marketLabel.addMouseListener(pressListener);
+                marketPanel.add(marketLabel);
+            }
         }
 
         String newLandName = player.getNewLandName();
@@ -678,7 +682,7 @@ public final class EuropePanel extends FreeColPanel implements ActionListener {
      * 
      * @param typeOfGoods The type of goods for paying arrears
      */
-    public void payArrears(int typeOfGoods) {
+    public void payArrears(GoodsType typeOfGoods) {
         if (freeColClient.getMyPlayer().getArrears(typeOfGoods) > 0) {
             inGameController.payArrears(typeOfGoods);
             getMarketPanel().revalidate();

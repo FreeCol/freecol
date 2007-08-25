@@ -13,6 +13,7 @@ import javax.swing.UIManager;
 
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.i18n.Messages;
+import net.sf.freecol.common.model.GoodsType;
 
 /**
  * Implements a simple progress bar suitable for use with FreeCol. Unlike
@@ -53,7 +54,7 @@ public class FreeColProgressBar extends JPanel {
      * The type of goods this progress bar is for. The default value of -1
      * indicates no goods type.
      */
-    private int goodsType = -1;
+    private GoodsType goodsType = null;
 
     @SuppressWarnings("unused")
     private final Canvas parent;
@@ -67,7 +68,7 @@ public class FreeColProgressBar extends JPanel {
      * @param parent a <code>Canvas</code> value
      * @param goodsType the type of goods produced
      */
-    public FreeColProgressBar(Canvas parent, int goodsType) {
+    public FreeColProgressBar(Canvas parent, GoodsType goodsType) {
         this(parent, goodsType, 0, 100, 0, 0);
     }
 
@@ -79,7 +80,7 @@ public class FreeColProgressBar extends JPanel {
      * @param min the minimum value of the progress bar
      * @param max the maximum value of the progress bar
      */
-    public FreeColProgressBar(Canvas parent, int goodsType, int min, int max) {
+    public FreeColProgressBar(Canvas parent, GoodsType goodsType, int min, int max) {
         this(parent, goodsType, min, max, 0, 0);
     }
 
@@ -93,7 +94,7 @@ public class FreeColProgressBar extends JPanel {
      * @param value the current value of the progress bar
      * @param step the expected increase next turn
      */
-    public FreeColProgressBar(Canvas parent, int goodsType, int min, int max, int value, int step) {
+    public FreeColProgressBar(Canvas parent, GoodsType goodsType, int min, int max, int value, int step) {
         this.parent = parent;
         this.goodsType = goodsType;
         this.min = min;
@@ -102,7 +103,7 @@ public class FreeColProgressBar extends JPanel {
         this.step = step;
 
         setBorder(BorderFactory.createLineBorder(PRIMARY_1));
-        ImageIcon icon = parent.getGUI().getImageLibrary().getGoodsImageIcon(goodsType);
+        ImageIcon icon = parent.getGUI().getImageLibrary().getGoodsImageIcon(goodsType.getIndex());
         // scale to a height of 16px, preserving aspect ratio
         image = icon.getImage().getScaledInstance(-1, iconHeight, Image.SCALE_SMOOTH);
         iconWidth = image.getWidth(this);
@@ -201,8 +202,7 @@ public class FreeColProgressBar extends JPanel {
         int stringHeight = g2d.getFontMetrics().getAscent() + g2d.getFontMetrics().getDescent();
         int restWidth = getWidth() - stringWidth;
 
-        if (goodsType >= 0) {
-
+        if (goodsType != null) {
             restWidth -= iconWidth;
             g2d.drawImage(image, restWidth / 2, (getHeight() - iconHeight) / 2, null);
         }

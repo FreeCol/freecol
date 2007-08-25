@@ -40,6 +40,7 @@ import javax.swing.SwingUtilities;
 import javax.swing.border.BevelBorder;
 import javax.swing.border.Border;
 import javax.swing.border.TitledBorder;
+import net.sf.freecol.FreeCol;
 
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.control.InGameController;
@@ -53,11 +54,13 @@ import net.sf.freecol.common.model.ColonyTile;
 import net.sf.freecol.common.model.FoundingFather;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Goods;
+import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
 import cz.autel.dmi.HIGLayout;
+import net.sf.freecol.common.model.UnitType;
 
 /**
  * This is a panel for the Colony display. It shows the units that are working
@@ -1611,15 +1614,15 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener {
                 setLayout(new GridLayout(2, 1));
 
                 // A colony always produces food.
-                ImageIcon goodsIcon = parent.getImageProvider().getGoodsImageIcon(Goods.FOOD);
+                ImageIcon goodsIcon = parent.getImageProvider().getGoodsImageIcon(Goods.FOOD.getIndex());
                 ProductionLabel pl = new ProductionLabel(Goods.FOOD, colonyTile.getProductionOf(Goods.FOOD), parent);
                 pl.setSize(lib.getTerrainImageWidth(1), goodsIcon.getIconHeight());
                 add(pl);
 
                 // A colony may produce one additional good
-                int secondaryGood = colonyTile.getTile().secondaryGoods();
+                GoodsType secondaryGood = colonyTile.getTile().secondaryGoods();
                 if (colonyTile.getProductionOf(secondaryGood) != 0) {
-                    goodsIcon = parent.getImageProvider().getGoodsImageIcon(secondaryGood);
+                    goodsIcon = parent.getImageProvider().getGoodsImageIcon(secondaryGood.getIndex());
                     ProductionLabel sl = new ProductionLabel(secondaryGood, colonyTile.getProductionOf(secondaryGood), parent);
                     sl.setSize(lib.getTerrainImageWidth(1), goodsIcon.getIconHeight());
                     add(sl);
@@ -1719,7 +1722,7 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener {
                             inGameController.work(unit, colonyTile);
 
                             // check whether worktype is suitable
-                            int workType = colonyTile.getWorkType(unit);
+                            GoodsType workType = colonyTile.getWorkType(unit);
                             if (workType != unit.getWorkType()) {
                                 inGameController.changeWorkType(unit, workType);
                             }
@@ -1848,7 +1851,8 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener {
             return theText;
         }
 
-        public String unitText(int type) {
+        public String unitText(int index) {
+            UnitType type = FreeCol.getSpecification().unitType(index);
             String theText = new String(Unit.getName(type) + " (" + Unit.getNextHammers(type) + " "
                     + Messages.message("model.goods.Hammers").toLowerCase());
 

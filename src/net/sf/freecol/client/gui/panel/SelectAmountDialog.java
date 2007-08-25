@@ -14,6 +14,7 @@ import net.sf.freecol.client.control.InGameController;
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.client.gui.i18n.Messages;
+import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Unit;
 import cz.autel.dmi.HIGLayout;
@@ -46,7 +47,7 @@ public final class SelectAmountDialog extends FreeColDialog implements ActionLis
     /**
      * The constructor to use.
      */
-    public SelectAmountDialog(Canvas parent, int goodsType, int available, boolean needToPay) {
+    public SelectAmountDialog(Canvas parent, GoodsType goodsType, int available, boolean needToPay) {
         super(parent);
 
         this.freeColClient = parent.getClient();

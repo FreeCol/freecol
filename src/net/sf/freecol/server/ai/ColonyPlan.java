@@ -511,7 +511,7 @@ public class ColonyPlan {
         if (t.hasResource()) {
             return t.getTileItemContainer().getResource().getBestGoodsType();
         }
-        GoodsType[] top = getSortedGoodsTop(t.getType(), t.getTileItemContainer(), t.getFishBonus());
+        GoodsType[] top = Tile.getSortedGoodsTop(t.getType(), t.getTileItemContainer(), t.getFishBonus());
         return top[0];
     }
 /*

@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.Iterator;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import net.sf.freecol.FreeCol;
 
 import net.sf.freecol.common.model.Building;
 import net.sf.freecol.common.model.Colony;
@@ -233,7 +234,7 @@ public final class InGameController extends Controller {
         for (int type = 0; type < FoundingFather.TYPE_COUNT; type++) {
             int weightSum = 0;
             for (FoundingFather father : FreeCol.getSpecification().getFoundingFathers()) {
-                if (!player.hasFather(father.getIndex()) && father.getType() == type) {
+                if (!player.hasFather(father.getType()) && father.getType() == type) {
                     weightSum += father.getWeight(age);
                 }
             }
@@ -243,10 +244,10 @@ public final class InGameController extends Controller {
                 int r = getPseudoRandom().nextInt(weightSum) + 1;
                 weightSum = 0;
                 for (FoundingFather father : FreeCol.getSpecification().getFoundingFathers()) {
-                    if (!player.hasFather(father.getIndex()) && father.getType() == type) {
+                    if (!player.hasFather(father.getType()) && father.getType() == type) {
                         weightSum += father.getWeight(age);
                         if (weightSum >= r) {
-                            randomFoundingFathers[type] = father.getIndex();
+                            randomFoundingFathers[type] = father.getType();
                             break;
                         }
                     }

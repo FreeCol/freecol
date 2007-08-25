@@ -94,7 +94,7 @@
 
   <!-- types of goods.  an element must be defined before it is referenced -->
   <goods-types>
-    <goods-type id="model.goods.Food"       is-farmed="yes" ignore-limit="yes">
+    <goods-type id="model.goods.Food"       is-farmed="yes" ignore-limit="yes" is-food="yes">
       <market initial-amount="10000" initial-price="1"  price-difference="7"/>
     </goods-type>
     <goods-type id="model.goods.Sugar"      is-farmed="yes">

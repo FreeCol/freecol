@@ -1043,8 +1043,9 @@ public class IndianSettlement extends Settlement {
         // Alcohol also contributes to create children. 
         if (goodsContainer.getGoodsCount(Goods.FOOD) + 4*goodsContainer.getGoodsCount(Goods.RUM) > 200+KEEP_RAW_MATERIAL ) {
             if (workers <= 6 + getKind()) { // up to a limit. Anyway cities produce more children than camps
+                // TODO: search in specification units which can be born in a settlement and choose one
                 Unit u = getGame().getModelController().createUnit(getID() + "newTurn200food", getTile(),
-                                            getOwner(), FreeCol.getSpecification().getUnitType(Unit.BRAVE));
+                                            getOwner(), FreeCol.getSpecification().unitType(Unit.BRAVE));
                 consumeGoods(Goods.FOOD, 200);  // All food will be consumed, even if RUM helped
                 consumeGoods(Goods.RUM, 200/4);    // Also, some available RUM is consumed
                 // I know that consumeGoods will produce gold, which is explained because children are always a gift

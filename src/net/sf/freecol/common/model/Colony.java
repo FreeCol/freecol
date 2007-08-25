@@ -358,35 +358,25 @@ public final class Colony extends Settlement implements Location, Nameable {
      */
     public Building getBuildingForProducing(GoodsType goodsType) {
         Building b;
-        switch (goodsType) {
-        case Goods.MUSKETS:
+        if (goodsType == Goods.MUSKETS) {
             b = getBuilding(Building.ARMORY);
-            break;
-        case Goods.RUM:
+        } else if (goodsType == Goods.RUM) {
             b = getBuilding(Building.DISTILLER);
-            break;
-        case Goods.CIGARS:
+        } else if (goodsType == Goods.CIGARS) {
             b = getBuilding(Building.TOBACCONIST);
-            break;
-        case Goods.CLOTH:
+        } else if (goodsType == Goods.CLOTH) {
             b = getBuilding(Building.WEAVER);
-            break;
-        case Goods.COATS:
+        } else if (goodsType == Goods.COATS) {
             b = getBuilding(Building.FUR_TRADER);
-            break;
-        case Goods.TOOLS:
+        } else if (goodsType == Goods.TOOLS) {
             b = getBuilding(Building.BLACKSMITH);
-            break;
-        case Goods.CROSSES:
+        } else if (goodsType == Goods.CROSSES) {
             b = getBuilding(Building.CHURCH);
-            break;
-        case Goods.HAMMERS:
+        } else if (goodsType == Goods.HAMMERS) {
             b = getBuilding(Building.CARPENTER);
-            break;
-        case Goods.BELLS:
+        } else if (goodsType == Goods.BELLS) {
             b = getBuilding(Building.TOWN_HALL);
-            break;
-        default:
+        } else {
             b = null;
         }
         return (b != null && b.isBuilt()) ? b : null;
@@ -653,9 +643,11 @@ public final class Colony extends Settlement implements Location, Nameable {
                 return getBells();
             } else {
                 logger.warning(Goods.getName(type) + " is not stored in this Colony!");
+                return 0;
             }
         }
     }
+    
     public int getGoodsCount(int goodsIndex) {
         return getGoodsCount(FreeCol.getSpecification().getGoodsType(goodsIndex));
     }

@@ -18,7 +18,6 @@ import net.sf.freecol.client.control.InGameController;
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.client.gui.i18n.Messages;
-import net.sf.freecol.common.model.Europe;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.UnitType;
@@ -60,8 +59,6 @@ public final class TrainDialog extends FreeColDialog implements ActionListener {
 
     private final ArrayList<JButton> buttons = new ArrayList<JButton>();
     
-    private final Europe europe;
-
 
     /**
      * The constructor to use.

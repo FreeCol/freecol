@@ -285,12 +285,7 @@ public final class Tile extends FreeColGameObject implements Location, Nameable 
 
     // TODO: what's this supposed to do?
     public int getBasicWorkTurns() {
-        return 0;
-    }
-
-    // TODO: what's this supposed to do?
-    public int getAddWorkTurns() {
-        return 0;
+        return type.getBasicWorkTurns();
     }
 
 
@@ -313,12 +308,12 @@ public final class Tile extends FreeColGameObject implements Location, Nameable 
                     PlayerExploredTile pet = playerExploredTiles[player.getNation()];
                     if (pet.explored) {
                         return Messages.message(getType().getName());
-                    } else {
-                        return Messages.message("unexplored");
                     }
                 }
+                return Messages.message("unexplored");
             } else {
                 logger.warning("player == null");
+                return null;
             }
         }
     }
@@ -416,6 +411,10 @@ public final class Tile extends FreeColGameObject implements Location, Nameable 
 
     public TileItemContainer getTileItemContainer() {
         return tileItemContainer;
+    }
+
+    public List<TileImprovement> getTileImprovements() {
+        return tileItemContainer.getImprovements();
     }
 
     /**
@@ -1614,7 +1613,7 @@ break;
      * @param fishbonus The Bonus Fish to be considered if valid
      * @return The sorted top three of the outputs.
      */
-    public GoodsType[] getSortedGoodsTop(TileType tileType, TileItemContainer tiContainer, int fishBonus) {
+    public static GoodsType[] getSortedGoodsTop(TileType tileType, TileItemContainer tiContainer, int fishBonus) {
         GoodsType[] top = new GoodsType[3];
         int[] val = new int[3];
         List<GoodsType> goodsTypeList = FreeCol.getSpecification().getGoodsTypeList();

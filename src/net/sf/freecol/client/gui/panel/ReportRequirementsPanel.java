@@ -95,6 +95,7 @@ public final class ReportRequirementsPanel extends ReportPanel implements Action
         canTrain = new boolean[colonies.size()][Unit.UNIT_COUNT];
         surplus = new int[colonies.size()][Goods.NUMBER_OF_TYPES];
 
+        List<GoodsType> goodsTypes = FreeCol.getSpecification().getGoodsTypeList();
         // check which colonies can train which units
         for (int index = 0; index < colonies.size(); index++) {
             Colony colony = colonies.get(index);
@@ -102,8 +103,8 @@ public final class ReportRequirementsPanel extends ReportPanel implements Action
                 unitCount[index][unit.getType()]++;
                 canTrain[index][unit.getType()] = colony.canTrain(unit);
             }
-            for (int goodsType = 0; goodsType < Goods.NUMBER_OF_TYPES; goodsType++) {
-                surplus[index][goodsType] = colony.getProductionNetOf(goodsType);
+            for (GoodsType goodsType : goodsTypes) {
+                surplus[index][goodsType.getIndex()] = colony.getProductionNetOf(goodsType);
             }
         }
 
