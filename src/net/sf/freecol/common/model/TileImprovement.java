@@ -384,7 +384,7 @@ public class TileImprovement extends TileItem implements Locatable, Nameable {
 
         // Add attributes:
         out.writeAttribute("ID", getID());
-        out.writeAttribute("tile", tile.getID());
+        out.writeAttribute("tile", getTile().getID());
         out.writeAttribute("type", Integer.toString(type.getIndex()));
         out.writeAttribute("turns", Integer.toString(turnsToComplete));
         out.writeAttribute("magnitude", Integer.toString(magnitude));

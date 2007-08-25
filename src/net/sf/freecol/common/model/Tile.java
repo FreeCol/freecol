@@ -1,5 +1,6 @@
 package net.sf.freecol.common.model;
 
+import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 import java.util.logging.Logger;
@@ -845,7 +846,7 @@ public final class Tile extends FreeColGameObject implements Location, Nameable 
                         fishBonus++;
                     }
                     if (t.hasRiver()) {
-                        fishbonus += t.getRiver().getMagnitude();
+                        fishBonus += t.getRiver().getMagnitude();
                     }
                 }
             }

@@ -15,7 +15,7 @@ public class TileItem extends FreeColGameObject implements Locatable, Nameable {
     public static final String  LICENSE = "http://www.gnu.org/licenses/gpl.html";
     public static final String  REVISION = "$Revision: 1.00 $";
 
-    private Tile tile;
+    protected Tile tile;
     
     /**
     * Creates a new <code>TileItem</code>.

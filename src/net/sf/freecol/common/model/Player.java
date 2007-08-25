@@ -13,6 +13,7 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
+import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.Map.Position;
 import net.sf.freecol.common.util.EmptyIterator;
@@ -2326,6 +2327,7 @@ public class Player extends FreeColGameObject implements Nameable {
         if (isEuropean()) {
             if (getBells() >= getTotalFoundingFatherCost() && currentFather != FoundingFather.NONE) {
                 fathers[currentFather] = true;
+                FoundingFather father = FreeCol.getSpecification().foundingFather(currentFather);
 
                 /** TODO: restore effects of founding fathers as soon as possible
                 switch (currentFather) {
@@ -2420,8 +2422,8 @@ public class Player extends FreeColGameObject implements Nameable {
                 }
                 */
                 addModelMessage(this, "model.player.foundingFatherJoinedCongress", new String[][] {
-                        { "%foundingFather%", Messages.message(FoundingFather.getName(currentFather)) },
-                        { "%description%", Messages.message(FoundingFather.getDescription(currentFather)) } },
+                        { "%foundingFather%", Messages.message(father.getName()) },
+                        { "%description%", Messages.message(father.getDescription()) } },
                         ModelMessage.DEFAULT);
                 currentFather = FoundingFather.NONE;
                 bells = 0;
@@ -2770,7 +2772,7 @@ public class Player extends FreeColGameObject implements Nameable {
             probabilities[index] = totalProbability;
         }
 
-        int random = (int) (Math.random(totalProbability));
+        int random = (int) (Math.random() * totalProbability);
         for (int index = 0; index < probabilities.length; index++) {
             if (probabilities[index] < random) {
                 return recruitables.get(index);
