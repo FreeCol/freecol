@@ -415,10 +415,10 @@ public class TileItemContainer extends FreeColGameObject {
         }
         int oldMagnitude = river.getMagnitude();
         // Get the list of ImprovementTypes
-        List<TileImprovementType> tiTypeList = FreeCol.getSpecification().getTileImprovementList();
+        List<TileImprovementType> tiTypeList = FreeCol.getSpecification().getTileImprovementTypeList();
         // Check if there is another river type defined for this magnitude
         for (TileImprovementType tiType : tiTypeList) {
-            if ("river".equals(tiType.getTypeId()) && tiType.getMagnitude <= magnitude) {
+            if ("river".equals(tiType.getTypeId()) && tiType.getMagnitude() <= magnitude) {
                 if (tiType != river.getType()) {
                     // Has a different river type for this magnitude
                     TileImprovement r = new TileImprovement(getGame(), tile, tiType);
@@ -451,7 +451,7 @@ public class TileItemContainer extends FreeColGameObject {
             if (t == null) {
                 continue;
             }
-            int otherRiver = t.getRiver();
+            TileImprovement otherRiver = t.getRiver();
             if (otherRiver == null) {   // This tile doesn't have a river   
                 continue;
             }
@@ -473,7 +473,7 @@ public class TileItemContainer extends FreeColGameObject {
         }
         int[] directions = {Map.NE, Map.SE, Map.SW, Map.NW};
         int[] base = Map.getBase(directions, 3);
-        style = 0;
+        int style = 0;
         for (int i = 0; i < directions.length; i++) {
             Tile t = getTile().getMap().getNeighbourOrNull(directions[i], this);
             if (t == null) {

@@ -493,8 +493,8 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
             movementCost = 9;
             break;
         default:
-            TileType tileType = (forested ? FreeCol.getSpecification().tileType(type).whenForested :
-                                 FreeCol.getSpecification().tileType(type));
+            TileType tileType = (forested ? FreeCol.getSpecification().getTileType(type).whenForested :
+                                 FreeCol.getSpecification().getTileType(type));
             id = tileType.id;
             name = Messages.message(tileType.name);
             defenseBonus = String.valueOf(tileType.getDefenceFactor()) + "%";

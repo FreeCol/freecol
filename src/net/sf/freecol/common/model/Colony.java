@@ -1241,7 +1241,7 @@ public final class Colony extends Settlement implements Location, Nameable {
         lastVisited = getGame().getTurn().getNumber();
         if (getCurrentlyBuilding() >= Colony.BUILDING_UNIT_ADDITION) {
             int unitTypeIndex = getCurrentlyBuilding() - BUILDING_UNIT_ADDITION;
-            UnitType unitType = FreeCol.getSpecification().getUnitType(unitTypeIndex);
+            UnitType unitType = FreeCol.getSpecification().unitType(unitTypeIndex);
             if (canBuildUnit(unitTypeIndex) && Unit.getNextHammers(unitTypeIndex) <= getHammers()
                     && Unit.getNextHammers(unitTypeIndex) != -1) {
                 if (Unit.getNextTools(unitTypeIndex) <= getGoodsCount(Goods.TOOLS)) {

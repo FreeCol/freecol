@@ -255,7 +255,7 @@ public final class TileImprovementType
         deliverGoodsType = goodsTypeByRef.get(g);
         deliverAmount = Xml.intAttribute(xml, "deliver-amount", 0);
 
-        String t = Xml.attribute(xml, "required-improvement", "");
+        t = Xml.attribute(xml, "required-improvement", "");
         requiredImprovement = improvementByRef.get(t);
 
         Xml.Method method = new Xml.Method() {
