@@ -2327,6 +2327,7 @@ public class Player extends FreeColGameObject implements Nameable {
             if (getBells() >= getTotalFoundingFatherCost() && currentFather != FoundingFather.NONE) {
                 fathers[currentFather] = true;
 
+                /** TODO: restore effects of founding fathers as soon as possible
                 switch (currentFather) {
                 case FoundingFather.HERNANDO_DE_SOTO:
                     Iterator<Unit> ui = getUnitIterator();
@@ -2417,6 +2418,7 @@ public class Player extends FreeColGameObject implements Nameable {
                     }
                     break;
                 }
+                */
                 addModelMessage(this, "model.player.foundingFatherJoinedCongress", new String[][] {
                         { "%foundingFather%", Messages.message(FoundingFather.getName(currentFather)) },
                         { "%description%", Messages.message(FoundingFather.getDescription(currentFather)) } },
@@ -2748,65 +2750,34 @@ public class Player extends FreeColGameObject implements Nameable {
      * @return A random unit type of a unit that is recruitable in Europe.
      */
     public UnitType generateRecruitable() {
-        // Random will be a number from 0 to 99 (never 100!):
-        int random = (int) (Math.random() * 100);
-        if (hasFather(FoundingFather.WILLIAM_BREWSTER)) {
-            if (random < 62) {
-                return Unit.FREE_COLONIST;
+        List<UnitType> recruitables = FreeCol.getSpecification().getUnitTypesWithAbility("model.ability.recruitable");
+        int[] probabilities = new int[recruitables.size()];
+        int totalProbability = 0;
+        for (int index = 0; index < probabilities.length; index++) {
+            // TODO: remove hard-coded skill-levels
+            switch(recruitables.get(index).getSkill()) {
+            case -2:
+            case -1:
+            case 0:
+                totalProbability+= 10; break;
+            case 1:
+                totalProbability+= 3; break;
+            case 2:
+                totalProbability+= 2; break;
+            default:
+                totalProbability+= 1; break;
             }
-        } else {
-            if (random < 21) {
-                return Unit.PETTY_CRIMINAL;
-            } else if (random < 42) {
-                return Unit.INDENTURED_SERVANT;
-            } else if (random < 62) {
-                return Unit.FREE_COLONIST;
-            }
+            probabilities[index] = totalProbability;
         }
-        // Make sure random is a number from 0 to 18:
-        random = ((random - 62) / 2);
 
-        switch (random) {
-        default:
-        case 0:
-            return Unit.FREE_COLONIST;
-        case 1:
-            return Unit.EXPERT_ORE_MINER;
-        case 2:
-            return Unit.EXPERT_LUMBER_JACK;
-        case 3:
-            return Unit.MASTER_GUNSMITH;
-        case 4:
-            return Unit.EXPERT_SILVER_MINER;
-        case 5:
-            return Unit.MASTER_FUR_TRADER;
-        case 6:
-            return Unit.MASTER_CARPENTER;
-        case 7:
-            return Unit.EXPERT_FISHERMAN;
-        case 8:
-            return Unit.MASTER_BLACKSMITH;
-        case 9:
-            return Unit.EXPERT_FARMER;
-        case 10:
-            return Unit.MASTER_DISTILLER;
-        case 11:
-            return Unit.HARDY_PIONEER;
-        case 12:
-            return Unit.MASTER_TOBACCONIST;
-        case 13:
-            return Unit.MASTER_WEAVER;
-        case 14:
-            return Unit.JESUIT_MISSIONARY;
-        case 15:
-            return Unit.FIREBRAND_PREACHER;
-        case 16:
-            return Unit.ELDER_STATESMAN;
-        case 17:
-            return Unit.VETERAN_SOLDIER;
-        case 18:
-            return Unit.SEASONED_SCOUT;
+        int random = (int) (Math.random(totalProbability));
+        for (int index = 0; index < probabilities.length; index++) {
+            if (probabilities[index] < random) {
+                return recruitables.get(index);
+            }
         }
+        // this should never happen
+        return null;
     }
 
     /**

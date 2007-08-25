@@ -2122,11 +2122,9 @@ public final class InGameController implements NetworkConstants {
         equipUnitElement.setAttribute("type", Integer.toString(type.getIndex()));
         equipUnitElement.setAttribute("amount", Integer.toString(amount));
 
-        switch (type) {
-        case Goods.CROSSES:
+        if (type == Goods.CROSSES) {
             unit.setMissionary((amount > 0));
-            break;
-        case Goods.MUSKETS:
+        } else if (type == Goods.MUSKETS) {
             if (unit.isInEurope()) {
                 if (!myPlayer.canTrade(type)) {
                     payArrears(type);
@@ -2138,8 +2136,7 @@ public final class InGameController implements NetworkConstants {
             unit.setArmed((amount > 0)); // So give them muskets if the
             // amount we want is greater than
             // zero.
-            break;
-        case Goods.HORSES:
+        } else if (type == Goods.HORSES) {
             if (unit.isInEurope()) {
                 if (!myPlayer.canTrade(type)) {
                     payArrears(type);
@@ -2149,8 +2146,7 @@ public final class InGameController implements NetworkConstants {
                 }
             }
             unit.setMounted((amount > 0)); // As above.
-            break;
-        case Goods.TOOLS:
+        } else if (type == Goods.TOOLS) {
             if (unit.isInEurope()) {
                 if (!myPlayer.canTrade(type)) {
                     payArrears(type);
@@ -2165,8 +2161,7 @@ public final class InGameController implements NetworkConstants {
                 actualAmount -= (actualAmount % 20);
             }
             unit.setNumberOfTools(actualAmount);
-            break;
-        default:
+        } else {
             logger.warning("Invalid type of goods to equip.");
             return;
         }
@@ -3137,13 +3132,13 @@ public final class InGameController implements NetworkConstants {
         Client client = freeColClient.getClient();
         Player player = freeColClient.getMyPlayer();
 
-        int arrears = player.getArrears(type);
+        int arrears = player.getArrears(type.getIndex());
         if (player.getGold() >= arrears) {
             if (freeColClient.getCanvas().showConfirmDialog("model.europe.payArrears", "ok", "cancel",
                     new String[][] { { "%replace%", String.valueOf(arrears) } })) {
                 player.modifyGold(-arrears);
                 freeColClient.getCanvas().updateGoldLabel();
-                player.resetArrears(type);
+                player.resetArrears(type.getIndex());
                 // send to server
                 Element payArrearsElement = Message.createNewRootElement("payArrears");
                 payArrearsElement.setAttribute("goodsType", String.valueOf(type.getIndex()));

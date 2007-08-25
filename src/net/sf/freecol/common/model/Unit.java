@@ -2543,7 +2543,9 @@ public class Unit extends FreeColGameObject implements Abilities, Locatable, Loc
         case MAN_O_WAR:
             return 8;
         default:
-            value = getSkillLevel(someType) + 3;
+            // TODO: restore
+            //value = getSkillLevel(someType) + 3;
+            value = 3;
             if (someLocation != null && someLocation instanceof WorkLocation) {
                 value *= 2;
             }

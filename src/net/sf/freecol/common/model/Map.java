@@ -957,7 +957,7 @@ public class Map extends FreeColGameObject {
         for (int i = 0; i < width; i++) {
             Vector<Tile> v = new Vector<Tile>(height);
             for (int j = 0; j < height; j++) {
-                Tile t = new Tile(getGame(), i, j);
+                Tile t = new Tile(getGame(), null, i, j);
                 v.add(t);
             }
             columns.add(v);
@@ -1824,7 +1824,7 @@ public class Map extends FreeColGameObject {
             if (showAll || player.hasExplored(tile)) {
                 tile.toXML(out, player, showAll, toSavedGame);
             } else {
-                Tile hiddenTile = new Tile(getGame(), tile.getX(), tile.getY());
+                Tile hiddenTile = new Tile(getGame(), null, tile.getX(), tile.getY());
                 hiddenTile.setFakeID(tile.getID());
                 hiddenTile.toXML(out, player, showAll, toSavedGame);
             }
