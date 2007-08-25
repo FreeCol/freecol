@@ -238,7 +238,7 @@ public final class TileImprovementType
         id = buffer[buffer.length - 1];
         addWorkTurns = Xml.intAttribute(xml, "add-works-turns");
         movementCost = -1;
-        movementCostFactor = -1f;
+        movementCostFactor = -1;
         natural = Xml.booleanAttribute(xml, "natural", false);
         
         allowedWorkers = Xml.arrayAttribute(xml, "workers", new String[] {});
@@ -309,7 +309,7 @@ public final class TileImprovementType
                             }
                         }
                         movementCost = Xml.intAttribute(xml, "movement-cost", -1);
-                        movementCostFactor = Xml.floatAttribute(xml, "movement-cost-factor", -1f);
+                        movementCostFactor = Xml.floatAttribute(xml, "movement-cost-factor", -1);
                     } else if ("change".equals(childName)) {
                         tileTypeChangeFrom.add(Xml.attribute(xml, "from"));
                         tileTypeChangeTo.add(Xml.attribute(xml, "to"));

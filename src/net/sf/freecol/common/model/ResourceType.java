@@ -41,7 +41,7 @@ public final class ResourceType
     }
 
     public String getName() {
-        return Message.message(name);
+        return Messages.message(name);
     }
 
     public int getRandomValue() {
