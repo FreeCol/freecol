@@ -15,6 +15,7 @@ import javax.swing.JTabbedPane;
 import javax.swing.JTextArea;
 import javax.swing.UIManager;
 import javax.swing.border.EmptyBorder;
+import net.sf.freecol.FreeCol;
 
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.i18n.Messages;
@@ -232,11 +233,12 @@ public final class ChooseFoundingFatherDialog extends FreeColDialog implements A
         public void initialize(int foundingFather) {
             this.foundingFather = foundingFather;
 
+            FoundingFather father = FreeCol.getSpecification().foundingFather(foundingFather);
             if (foundingFather != -1) {
-                header.setText(Messages.message(FoundingFather.getName(foundingFather)));
-                description.setText(Messages.message(FoundingFather.getDescription(foundingFather)));
-                text.setText("\n" + "[" + Messages.message(FoundingFather.getBirthAndDeath(foundingFather)) + "] "
-                        + Messages.message(FoundingFather.getText(foundingFather)));
+                header.setText(Messages.message(father.getName()));
+                description.setText(Messages.message(father.getDescription()));
+                text.setText("\n" + "[" + Messages.message(father.getBirthAndDeath()) + "] "
+                        + Messages.message(father.getText()));
                 ok.setActionCommand(Integer.toString(foundingFather));
             }
         }

@@ -119,8 +119,12 @@ public class FoundingFather implements Abilities {
     public int getType() {
         return type;
     }
-
+    
     public String getTypeAsString() {
+        return getTypeAsString(type);
+    }
+
+    public static String getTypeAsString(int type) {
         switch (type) {
             case TRADE: return Messages.message("foundingFather.trade");
             case EXPLORATION: return Messages.message("foundingFather.exploration");

@@ -47,7 +47,7 @@ public final class GoodsLabel extends JLabel {// implements ActionListener {
      * @param parent The parent that knows more than we do.
      */
     public GoodsLabel(Goods goods, Canvas parent) {
-        super(parent.getImageProvider().getGoodsImageIcon(goods.getType()));
+        super(parent.getImageProvider().getGoodsImageIcon(goods.getType().getIndex()));
         this.goods = goods;
         setToolTipText(goods.getName());
         this.parent = parent;
@@ -79,7 +79,7 @@ public final class GoodsLabel extends JLabel {// implements ActionListener {
             player = ((Ownable) location).getOwner();
         }
         if (player == null
-                || goods.getType() >= Goods.NUMBER_OF_TYPES
+                || !goods.getType().isStorable()
                 || player.canTrade(goods)
                 || (location instanceof Colony && player.getGameOptions().getBoolean(GameOptions.CUSTOM_IGNORE_BOYCOTT) && ((Colony) location)
                 .getBuilding(Building.CUSTOM_HOUSE).getLevel() != Building.NOT_BUILT)) {
@@ -93,7 +93,7 @@ public final class GoodsLabel extends JLabel {// implements ActionListener {
         if (goods.getType() != Goods.FOOD && location instanceof Colony
                 && ((Colony) location).getWarehouseCapacity() < goods.getAmount()) {
             setForeground(Color.RED);
-        } else if (location instanceof Colony && location != null && goods.getType() < Goods.NUMBER_OF_TYPES
+        } else if (location instanceof Colony && location != null && goods.getType().isStorable()
                 && ((Colony) location).getExports(goods)) {
             setForeground(Color.GREEN);
         } else if (goods.getAmount() == 0) {
@@ -149,11 +149,11 @@ public final class GoodsLabel extends JLabel {// implements ActionListener {
      */
     public void setSmall(boolean isSmall) {
         if (isSmall) {
-            ImageIcon imageIcon = (parent.getImageProvider().getGoodsImageIcon(goods.getType()));
+            ImageIcon imageIcon = (parent.getImageProvider().getGoodsImageIcon(goods.getType().getIndex()));
             setIcon(new ImageIcon(imageIcon.getImage().getScaledInstance(imageIcon.getIconWidth() / 2,
                     imageIcon.getIconHeight() / 2, Image.SCALE_DEFAULT)));
         } else {
-            setIcon(parent.getImageProvider().getGoodsImageIcon(goods.getType()));
+            setIcon(parent.getImageProvider().getGoodsImageIcon(goods.getType().getIndex()));
         }
     }
 }

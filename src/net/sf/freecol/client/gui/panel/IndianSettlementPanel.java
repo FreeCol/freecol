@@ -9,6 +9,7 @@ import javax.swing.JLabel;
 
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.Goods;
+import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.IndianSettlement;
 import cz.autel.dmi.HIGLayout;
 
@@ -68,49 +69,11 @@ public final class IndianSettlementPanel extends FreeColDialog implements Action
      *            displayed.
      */
     public void initialize(IndianSettlement settlement) {
+        // TODO: fix message for learnable skill
+        String[] parts = settlement.getLearnableSkill().getId().split("\\.");
+        skillLabel.setText(Messages.message("indianSettlement.skill." + parts[parts.length-1]));
 
-        switch (settlement.getLearnableSkill()) {
-        case IndianSettlement.UNKNOWN:
-            skillLabel.setText(Messages.message("indianSettlement.skillUnknown"));
-            break;
-        case IndianSettlement.NONE:
-            skillLabel.setText(Messages.message("indianSettlement.skillNone"));
-            break;
-        case IndianSettlement.EXPERT_FARMER:
-            skillLabel.setText(Messages.message("indianSettlement.skillExpertFarmer"));
-            break;
-        case IndianSettlement.EXPERT_FISHERMAN:
-            skillLabel.setText(Messages.message("indianSettlement.skillExpertFisherman"));
-            break;
-        case IndianSettlement.EXPERT_SILVER_MINER:
-            skillLabel.setText(Messages.message("indianSettlement.skillExpertSilverMiner"));
-            break;
-        case IndianSettlement.MASTER_SUGAR_PLANTER:
-            skillLabel.setText(Messages.message("indianSettlement.skillMasterSugarPlanter"));
-            break;
-        case IndianSettlement.MASTER_COTTON_PLANTER:
-            skillLabel.setText(Messages.message("indianSettlement.skillMasterCottonPlanter"));
-            break;
-        case IndianSettlement.MASTER_TOBACCO_PLANTER:
-            skillLabel.setText(Messages.message("indianSettlement.skillMasterTobaccoPlanter"));
-            break;
-        case IndianSettlement.SEASONED_SCOUT:
-            skillLabel.setText(Messages.message("indianSettlement.skillSeasonedScout"));
-            break;
-        case IndianSettlement.EXPERT_ORE_MINER:
-            skillLabel.setText(Messages.message("indianSettlement.skillExpertOreMiner"));
-            break;
-        case IndianSettlement.EXPERT_LUMBER_JACK:
-            skillLabel.setText(Messages.message("indianSettlement.skillExpertLumberJack"));
-            break;
-        case IndianSettlement.EXPERT_FUR_TRAPPER:
-            skillLabel.setText(Messages.message("indianSettlement.skillExpertFurTrapper"));
-            break;
-        default:
-            logger.warning("Invalid learnable skill returned from settlement.");
-        }
-        int[] wantedGoods = settlement.getWantedGoods();
-
+        GoodsType[] wantedGoods = settlement.getWantedGoods();
         highlyWantedLabel.setText(Goods.getName(wantedGoods[0]));
         otherWantedLabel.setText(Goods.getName(wantedGoods[1]) + ", " + Goods.getName(wantedGoods[2]));
         setSize(getPreferredSize());
