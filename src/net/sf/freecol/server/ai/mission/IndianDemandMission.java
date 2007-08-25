@@ -12,6 +12,7 @@ import javax.xml.stream.XMLStreamWriter;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.GoodsContainer;
+import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.IndianSettlement;
 import net.sf.freecol.common.model.Market;
 import net.sf.freecol.common.model.Player;
@@ -266,7 +267,8 @@ public class IndianDemandMission extends Mission {
                 return goods;
             }
         } else {
-            int[] preferred = new int[] { Goods.MUSKETS, Goods.HORSES, Goods.TOOLS, Goods.TRADE_GOODS, Goods.RUM,
+            // TODO: change hardcoded list the preferred GoodsType
+            GoodsType[] preferred = new GoodsType[] { Goods.MUSKETS, Goods.HORSES, Goods.TOOLS, Goods.TRADE_GOODS, Goods.RUM,
                     Goods.CLOTH, Goods.COATS, Goods.CIGARS };
             for (int i = 0; i < preferred.length; i++) {
                 int amount = warehouse.getGoodsCount(preferred[i]);
