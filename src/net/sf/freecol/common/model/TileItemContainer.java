@@ -12,6 +12,7 @@ import javax.xml.stream.XMLStreamWriter;
 import org.w3c.dom.Element;
 
 import net.sf.freecol.FreeCol;
+import net.sf.freecol.client.gui.i18n.Messages;
 
 /**
 * Contains <code>TileItem</code>s and can be used by a {@link Tile}
@@ -191,7 +192,7 @@ public class TileItemContainer extends FreeColGameObject {
     public int getTotalBonusPotential(GoodsType g, int tilePotential) {
         int potential = tilePotential + getImprovementBonusPotential(g);
         potential = getResourceBonusPotential(g, potential);
-        return bonus;
+        return potential;
     }
 
     /**
@@ -242,7 +243,7 @@ public class TileItemContainer extends FreeColGameObject {
             if (resource != null) {
                 resource.dispose();
             }
-            resource = t;
+            resource = (Resource) t;
             return t;
         } else if (t instanceof TileImprovement) {
             // Check all improvements to find any to replace
