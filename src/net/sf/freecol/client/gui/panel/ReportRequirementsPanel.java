@@ -121,7 +121,8 @@ public final class ReportRequirementsPanel extends ReportPanel implements Action
             }
 
             boolean[] expertWarning = new boolean[Unit.UNIT_COUNT];
-            boolean[] productionWarning = new boolean[Goods.NUMBER_OF_ALL_TYPES];
+            int numberOfGoodsTypes = FreeCol.getSpecification().numberOfGoodsTypes();
+            boolean[] productionWarning = new boolean[numberOfGoodsTypes];
             boolean hasWarning = false;
 
             // check if all unit requirements are met

@@ -2496,6 +2496,16 @@ break;
             return settlementVisited;
         }
 
+        // TODO: find out what this is supposed to do
+        public int getBasicWorkTurns() {
+            return 0;
+        }
+
+        // TODO: find out what this is supposed to do
+        public int getAddWorkTurns() {
+            return 0;
+        }
+
         /**
          * Checks if this <code>Tile</code> has been explored.
          * 
@@ -2697,7 +2707,7 @@ break;
                     if (resource != null) {
                         resource.readFromXML(in);
                     } else {
-                        resource = new Resource(getGame(), this, in);
+                        resource = new Resource(getGame(), in);
                     }
                     tileItemContainer.addTileItem(resource);
                 } else if (in.getLocalName().equals(TileImprovement.getXMLElementTagName())) {
@@ -2705,7 +2715,7 @@ break;
                     if (ti != null) {
                         ti.readFromXML(in);
                     } else {
-                        ti = new TileImprovement(getGame(), this, in);
+                        ti = new TileImprovement(getGame(), in);
                     }
                     tileItemContainer.addTileItem(ti);
                 }

@@ -1940,7 +1940,7 @@ public final class GUI {
             String posString = tile.getX() + ", " + tile.getY();
             g.drawString(posString, x + (lib.getTerrainImageWidth(tile.getType().getIndex()) - g.getFontMetrics().stringWidth(posString))/2, y + (lib.getTerrainImageHeight(tile.getType().getIndex()) - g.getFontMetrics().getAscent())/2);
         }
-        if (displayColonyValue && tile.getType().getIndex() != Tile.UNEXPLORED && tile.isLand()) {
+        if (displayColonyValue && tile.isExplored() && tile.isLand()) {
             String valueString;
             if (displayColonyValuePlayer == null) {
                 valueString = Integer.toString(tile.getColonyValue());

@@ -3150,6 +3150,11 @@ public final class InGameController implements NetworkConstants {
         }
     }
 
+    // TODO: make this unnecessary
+    public void payArrears(int typeIndex) {
+        payArrears(FreeCol.getSpecification().getGoodsType(typeIndex));
+    }
+
     /**
      * Purchases a unit of a specified type in Europe.
      * 

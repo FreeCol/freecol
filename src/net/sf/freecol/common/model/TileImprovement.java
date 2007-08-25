@@ -147,7 +147,7 @@ public class TileImprovement extends TileItem implements Locatable, Nameable {
      * @return The name of this type of Improvement.
      */
     public String getName() {
-        return getName(type);
+        return ""; //getName(type);
     }
 
     /**

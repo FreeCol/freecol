@@ -124,7 +124,7 @@ public final class GoodsType
     public void readFromXmlElement( Node xml, Map<String, GoodsType> goodsTypeByRef ) {
 
         name = Xml.attribute(xml, "id");
-        String[] buffer = name.separator(".");
+        String[] buffer = name.split(".");
         id = buffer[buffer.length - 1];
         isFarmed = Xml.booleanAttribute(xml, "is-farmed");
         ignoreLimit = Xml.booleanAttribute(xml, "ignore-limit", false);

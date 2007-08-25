@@ -142,10 +142,10 @@ public final class TileType
                                     Map<String, ResourceType> resourceTypeByRef) {
 
         name = Xml.attribute(xml, "id");
-        String[] buffer = name.separator(".");
+        String[] buffer = name.split(".");
         id = buffer[buffer.length - 1];
-        basicMoveCost = Xml.intArrayAttribute(xml, "basic-move-cost");
-        basicWorkTurns = Xml.intArrayAttribute(xml, "basic-work-turns");
+        basicMoveCost = Xml.intAttribute(xml, "basic-move-cost");
+        basicWorkTurns = Xml.intAttribute(xml, "basic-work-turns");
         forest = Xml.booleanAttribute(xml, "is-forest", false);
         water = Xml.booleanAttribute(xml, "is-water", false);
         canSettle = Xml.booleanAttribute(xml, "can-settle", (water) ? false : true);

@@ -234,7 +234,7 @@ public final class TileImprovementType
                                    Map<String, TileImprovementType> improvementByRef) {
 
         name = Xml.attribute(xml, "id");
-        String[] buffer = name.separator(".");
+        String[] buffer = name.split(".");
         id = buffer[buffer.length - 1];
         addWorkTurns = Xml.intAttribute(xml, "add-works-turns");
         movementCost = -1;

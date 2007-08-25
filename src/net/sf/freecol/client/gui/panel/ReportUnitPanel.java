@@ -16,6 +16,7 @@ import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
+import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.client.gui.i18n.Messages;
@@ -430,7 +431,7 @@ public final class ReportUnitPanel extends JPanel implements ActionListener {
         case Unit.MAN_O_WAR:
         case Unit.PRIVATEER:
         case Unit.WAGON_TRAIN:
-            unitLabel.setToolTipText(Unit.getName(unitType));
+            unitLabel.setToolTipText(FreeCol.getSpecification().unitType(unitType).getName());
             break;
         case Unit.VETERAN_SOLDIER:
             if (mounted) {

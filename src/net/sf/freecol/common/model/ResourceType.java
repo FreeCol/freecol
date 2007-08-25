@@ -116,7 +116,7 @@ public final class ResourceType
     public void readFromXmlElement(Node xml, final Map<String, GoodsType> goodsTypeByRef) {
 
         name = Xml.attribute(xml, "id");
-        String[] buffer = name.separator(".");
+        String[] buffer = name.split(".");
         id = buffer[buffer.length - 1];
         art = Xml.intAttribute(xml, "art");
         if ( Xml.hasAttribute(xml, "maximum-value") ) {

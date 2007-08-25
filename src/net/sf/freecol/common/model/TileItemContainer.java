@@ -264,9 +264,9 @@ public class TileItemContainer extends FreeColGameObject {
                 }
             }
             if (t.hasRoad()) {
-                road = t;
+                road = (TileImprovement) t;
             } else if (t.isRiver()) {
-                river = t;
+                river = (TileImprovement) t;
             }
             improvements.add((TileImprovement) t);
         } else {
@@ -368,7 +368,7 @@ public class TileItemContainer extends FreeColGameObject {
             return river;
         }
         // Get the list of ImprovementTypes
-        List<TileImprovementType> tiTypeList = FreeCol.getSpecification().getTileImprovementList();
+        List<TileImprovementType> tiTypeList = FreeCol.getSpecification().getTileImprovementTypeList();
         // Get the first river that matches or is below
         for (TileImprovementType tiType : tiTypeList) {
             if ("river".equals(tiType.getTypeId()) && tiType.getMagnitude() <= magnitude) {
@@ -447,7 +447,7 @@ public class TileItemContainer extends FreeColGameObject {
         int[] directions = {Map.NE, Map.SE, Map.SW, Map.NW};
         int[] base = Map.getBase(directions, 3);
         for (int i = 0; i < directions.length; i++) {
-            Tile t = getTile().getMap().getNeighbourOrNull(directions[i], this);
+            Tile t = getTile().getMap().getNeighbourOrNull(directions[i], getTile());
             if (t == null) {
                 continue;
             }
@@ -475,7 +475,7 @@ public class TileItemContainer extends FreeColGameObject {
         int[] base = Map.getBase(directions, 3);
         int style = 0;
         for (int i = 0; i < directions.length; i++) {
-            Tile t = getTile().getMap().getNeighbourOrNull(directions[i], this);
+            Tile t = getTile().getMap().getNeighbourOrNull(directions[i], getTile());
             if (t == null) {
                 continue;
             }
@@ -573,7 +573,7 @@ public class TileItemContainer extends FreeColGameObject {
                 if (resource != null) {
                     resource.readFromXML(in);
                 } else {
-                    resource = new Resource(getGame(), tile, in);
+                    resource = new Resource(getGame(), in);
                 }
             } else if (in.getLocalName().equals(TileImprovement.getXMLElementTagName())) {
                 TileImprovement ti = (TileImprovement) getGame().getFreeColGameObject(in.getAttributeValue(null, "ID"));
