@@ -1390,16 +1390,18 @@ public final class Tile extends FreeColGameObject implements Location, Nameable 
      * 
      * @param goodsType The type of goods.
      * @return The maximum potential.
-     *//*
-         public int getMaximumPotential(int goodsType) {
-         if (getTileType().getPotential(goodsType) < getTileType().getPotential(goodsType, forested)) {
-         return getTileTypePotential(getType(), goodsType, getAddition(), 0,
-         hasResource(), isForested(), false, true);
+     */
+     public int getMaximumPotential(GoodsType goodsType) {
+         // TODO: make it
+         return potential(goodsType);
+         /*if (getTileType().getPotential(goodsType) < getTileType().getPotential(goodsType, forested)) {
+             return getTileTypePotential(getType(), goodsType, getAddition(), 0,
+             hasResource(), isForested(), false, true);
          } else {
-         return getTileTypePotential(getType(), goodsType, getAddition(), getFishBonus(), 
-         hasResource(), false, true, true);
-         }
-         }
+             return getTileTypePotential(getType(), goodsType, getAddition(), getFishBonus(), 
+             hasResource(), false, true, true);
+         }*/
+     }
 
          /**
          * Checks wether this <code>Tile</code> can be plowed or not. This method

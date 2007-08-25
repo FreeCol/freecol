@@ -6,6 +6,7 @@ import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 import java.util.logging.Logger;
+import net.sf.freecol.FreeCol;
 
 import net.sf.freecol.common.model.Building;
 import net.sf.freecol.common.model.Colony;
@@ -220,7 +221,7 @@ public class ColonyPlan {
                 continue;
             }
 
-            int goodsType = getBestGoodsToProduce(ct.getWorkTile());
+            GoodsType goodsType = getBestGoodsToProduce(ct.getWorkTile());
             WorkLocationPlan wlp = new WorkLocationPlan(getAIMain(), ct, goodsType);
             workLocationPlans.add(wlp);
         }
@@ -245,14 +246,13 @@ public class ColonyPlan {
         }
 
         // Determine the primary and secondary types of goods:
-        GoodsType primaryRawMaterial;
+        GoodsType primaryRawMaterial = null;
         int primaryRawMaterialProduction = 0;
-        GoodsType secondaryRawMaterial;
+        GoodsType secondaryRawMaterial = null;
         int secondaryRawMaterialProduction = 0;
         List<GoodsType> goodsTypeList = FreeCol.getSpecification().getGoodsTypeList();
         for (GoodsType goodsType : goodsTypeList) {
-            if (goodsType != Goods.SUGAR && goodsType != Goods.TOBACCO && goodsType != Goods.COTTON
-                    && goodsType != Goods.FURS && goodsType != Goods.ORE) {
+            if (goodsType.getProducedMaterial() == null) {
                 continue;
             }
             if (getProductionOf(goodsType) > primaryRawMaterialProduction) {
@@ -304,10 +304,10 @@ public class ColonyPlan {
 
         // Place a colonist to manufacture the primary goods:
         if (primaryRawMaterial != null) {
-            Building b = colony.getBuildingForProducing(Goods.getManufactoredGoods(primaryRawMaterial));
+            GoodsType producedGoods = primaryRawMaterial.getProducedMaterial();
+            Building b = colony.getBuildingForProducing(producedGoods);
             if (b != null) {
-                WorkLocationPlan wlp = new WorkLocationPlan(getAIMain(), b, Goods
-                        .getManufactoredGoods(primaryRawMaterial));
+                WorkLocationPlan wlp = new WorkLocationPlan(getAIMain(), b, producedGoods);
                 workLocationPlans.add(wlp);
             }
         }
@@ -407,13 +407,13 @@ public class ColonyPlan {
             boolean blacksmithAdded = false;
 
             // Add a manufacturer for the secondary type of goods:
-            if (getProductionOf(Goods.FOOD) >= workLocationPlans.size() * 2 + 2 && secondaryRawMaterial > -1
+            if (getProductionOf(Goods.FOOD) >= workLocationPlans.size() * 2 + 2 && secondaryRawMaterial != null
                     && 12 * secondaryWorkers + 6 <= getProductionOf(secondaryRawMaterial)
                     && secondaryWorkers <= Building.MAX_LEVEL) {
-                Building b = colony.getBuildingForProducing(Goods.getManufactoredGoods(secondaryRawMaterial));
+                GoodsType producedGoods = secondaryRawMaterial.getProducedMaterial();
+                Building b = colony.getBuildingForProducing(producedGoods);
                 if (b != null) {
-                    WorkLocationPlan wlp = new WorkLocationPlan(getAIMain(), b, Goods
-                            .getManufactoredGoods(secondaryRawMaterial));
+                    WorkLocationPlan wlp = new WorkLocationPlan(getAIMain(), b, producedGoods);
                     workLocationPlans.add(wlp);
                     colonistAdded = true;
                     secondaryWorkers++;
@@ -424,13 +424,13 @@ public class ColonyPlan {
             }
 
             // Add a manufacturer for the primary type of goods:
-            if (getProductionOf(Goods.FOOD) >= workLocationPlans.size() * 2 + 2 && primaryRawMaterial > -1
+            if (getProductionOf(Goods.FOOD) >= workLocationPlans.size() * 2 + 2 && primaryRawMaterial != null
                     && 12 * primaryWorkers + 6 <= getProductionOf(primaryRawMaterial)
                     && primaryWorkers <= Building.MAX_LEVEL) {
-                Building b = colony.getBuildingForProducing(Goods.getManufactoredGoods(primaryRawMaterial));
+                GoodsType producedGoods = primaryRawMaterial.getProducedMaterial();
+                Building b = colony.getBuildingForProducing(producedGoods);
                 if (b != null) {
-                    WorkLocationPlan wlp = new WorkLocationPlan(getAIMain(), b, Goods
-                            .getManufactoredGoods(primaryRawMaterial));
+                    WorkLocationPlan wlp = new WorkLocationPlan(getAIMain(), b, producedGoods);
                     workLocationPlans.add(wlp);
                     colonistAdded = true;
                     primaryWorkers++;
