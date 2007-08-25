@@ -3290,18 +3290,6 @@ public class Unit extends FreeColGameObject implements Abilities, Locatable, Loc
     }
 
     /**
-     * Checks if the given unit can be recruited in <code>Europe</code>.
-     * 
-     * @param type The type of <code>Unit</code> to be tested.
-     * @return <code>true</code> if the given type is the type of a
-     *         recruitable unit and <code>false</code> otherwise.
-     */
-    public static boolean isRecruitable(UnitType type) {
-
-        return type.hasAbility("model.ability.recruitable");
-    }
-
-    /**
      * Returns the current defensive power of this unit. The tile on which this
      * unit is located will be taken into account.
      * 

@@ -13,6 +13,7 @@ import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
+import net.sf.freecol.FreeCol;
 
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.gui.i18n.Messages;
@@ -2423,7 +2424,7 @@ public class Player extends FreeColGameObject implements Abilities, Nameable {
                 case FoundingFather.WILLIAM_BREWSTER:
                     // don't recruit any more criminals or servants
                     for (int i = 0; i < 3; i++) {
-                        int recruitType = getEurope().getRecruitable(i);
+                        UnitType recruitType = getEurope().getRecruitable(i);
                         if (recruitType == Unit.PETTY_CRIMINAL || recruitType == Unit.INDENTURED_SERVANT) {
                             getEurope().setRecruitable(i, Unit.FREE_COLONIST);
                         }
@@ -2779,34 +2780,27 @@ public class Player extends FreeColGameObject implements Abilities, Nameable {
      * @return A random unit type of a unit that is recruitable in Europe.
      */
     public UnitType generateRecruitable() {
-        List<UnitType> recruitables = FreeCol.getSpecification().getUnitTypesWithAbility("model.ability.recruitable");
-        int[] probabilities = new int[recruitables.size()];
-        int totalProbability = 0;
-        for (int index = 0; index < probabilities.length; index++) {
-            // TODO: remove hard-coded skill-levels
-            switch(recruitables.get(index).getSkill()) {
-            case -2:
-            case -1:
-            case 0:
-                totalProbability+= 10; break;
-            case 1:
-                totalProbability+= 3; break;
-            case 2:
-                totalProbability+= 2; break;
-            default:
-                totalProbability+= 1; break;
-            }
-            probabilities[index] = totalProbability;
-        }
-
-        int random = (int) (Math.random() * totalProbability);
-        for (int index = 0; index < probabilities.length; index++) {
-            if (probabilities[index] < random) {
-                return recruitables.get(index);
+        ArrayList<UnitType> recruitableUnits = new ArrayList<UnitType>();
+        List<UnitType> unitTypes = FreeCol.getSpecification().getUnitTypeList();
+        int total = 0;
+        for (UnitType unitType : unitTypes) {
+            if (unitType.isRecruitable()) {
+                recruitableUnits.add(unitType);
+                total += unitType.getRecruitProbability();
             }
         }
-        // this should never happen
-        return null;
+        
+        int random = getGame().getModelController().getRandom(getID() + "newRecruitableUnit", total);
+        UnitType recruitable = null;
+        total = 0;
+        for (UnitType unitType : recruitableUnits) {
+            total += unitType.getRecruitProbability();
+            if (random < total) {
+                recruitable = unitType;
+                break;
+            }
+        }
+        return recruitable;
     }
 
     /**

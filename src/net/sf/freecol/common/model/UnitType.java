@@ -95,6 +95,11 @@ public final class UnitType implements Abilities {
     private int lineOfSight;
 
     /**
+     * Describe recruitProbability here.
+     */
+    private int recruitProbability;
+
+    /**
      * Describe expertProduction here.
      */
     private GoodsType expertProduction;
@@ -279,6 +284,33 @@ public final class UnitType implements Abilities {
      */
     public void setSpaceTaken(final int newSpaceTaken) {
         this.spaceTaken = newSpaceTaken;
+    }
+
+    /**
+     * If this UnitType is recruitable in Europe
+     *
+     * @return an <code>boolean</code> value
+     */
+    public boolean isRecruitable() {
+        return recruitProbability > 0;
+    }
+
+    /**
+     * Get the <code>RecruitProbability</code> value.
+     *
+     * @return an <code>int</code> value
+     */
+    public int getRecruitProbability() {
+        return recruitProbability;
+    }
+
+    /**
+     * Set the <code>RecruitProbability</code> value.
+     *
+     * @param newRecruitProbability The new RecruitProbability value.
+     */
+    public void setRecruitProbability(final int newRecruitProbability) {
+        this.recruitProbability = newRecruitProbability;
     }
 
     /**
@@ -554,6 +586,7 @@ public final class UnitType implements Abilities {
         promotion = Xml.attribute(xml, "promotion", null);
         clearSpeciality = Xml.attribute(xml, "clearSpeciality", null);
 
+        recruitProbability = Xml.intAttribute(xml, "recruitProbability", 0);
         skill = Xml.intAttribute(xml, "skill", UNDEFINED);
 
         hammersRequired = Xml.intAttribute(xml, "hammers", UNDEFINED);

@@ -490,9 +490,8 @@
 
   <unit-types>
     <unit-type name="model.unit.freeColonist"         offence="0"  defence="1" movement="3" lineOfSight="1"
-               skill="0" promotion="model.unit.veteranSoldier">
+               skill="0" promotion="model.unit.veteranSoldier" recruitProbability="20">
       <ability id="model.ability.foundColony" value="yes"/>
-      <ability id="model.ability.recruitable" value="yes"/>
       <ability id="model.ability.bornInColony" value="yes"/>
       <ability id="model.ability.foundInLostCity" value="yes"/>
       <upgrade unit="model.unit.expertFarmer" turnsToLearn="4" learnFromNatives="yes" learnFromExperience="yes"/>
@@ -519,15 +518,13 @@
       <upgrade unit="model.unit.jesuitMissionary" turnsToLearn="8"/>
     </unit-type>
     <unit-type name="model.unit.expertFarmer"         offence="0"  defence="1" movement="3" lineOfSight="1" price="1100" 
-               skill="1"  expert-production="model.goods.Food" clearSpeciality="model.unit.freeColonist">
+               skill="1" recruitProbability="1" expert-production="model.goods.Food" clearSpeciality="model.unit.freeColonist">
       <ability id="model.ability.foundColony" value="yes"/>
-      <ability id="model.ability.recruitable" value="yes"/>
       <production-bonus goods-type="model.goods.Food" bonus="2"/>
     </unit-type>
     <unit-type name="model.unit.expertFisherman"      offence="0"  defence="1" movement="3" lineOfSight="1" price="1000" 
-               skill="1"  expert-production="model.goods.Fish" clearSpeciality="model.unit.freeColonist">
+               skill="1" recruitProbability="1" expert-production="model.goods.Fish" clearSpeciality="model.unit.freeColonist">
       <ability id="model.ability.foundColony" value="yes"/>
-      <ability id="model.ability.recruitable" value="yes"/>
       <production-bonus goods-type="model.goods.Fish" bonus="2"/>
     </unit-type>
     <unit-type name="model.unit.expertFurTrapper"     offence="0"  defence="1" movement="3" lineOfSight="1"               
@@ -536,21 +533,18 @@
       <production-bonus goods-type="model.goods.Furs" factor="2"/>
     </unit-type>
     <unit-type name="model.unit.expertSilverMiner"    offence="0"  defence="1" movement="3" lineOfSight="1" price="900"  
-               skill="1"  expert-production="model.goods.Silver" clearSpeciality="model.unit.freeColonist">
+               skill="1" recruitProbability="1" expert-production="model.goods.Silver" clearSpeciality="model.unit.freeColonist">
       <ability id="model.ability.foundColony" value="yes"/>
-      <ability id="model.ability.recruitable" value="yes"/>
       <production-bonus goods-type="model.goods.Silver" factor="2"/>
     </unit-type>
     <unit-type name="model.unit.expertLumberJack"     offence="0"  defence="1" movement="3" lineOfSight="1" price="700"  
-               skill="1"  expert-production="model.goods.Lumber" clearSpeciality="model.unit.freeColonist">
+               skill="1" recruitProbability="1" expert-production="model.goods.Lumber" clearSpeciality="model.unit.freeColonist">
       <ability id="model.ability.foundColony" value="yes"/>
-      <ability id="model.ability.recruitable" value="yes"/>
       <production-bonus goods-type="model.goods.Lumber" factor="2"/>
     </unit-type>
     <unit-type name="model.unit.expertOreMiner"       offence="0"  defence="1" movement="3" lineOfSight="1" price="600"  
-               skill="1"  expert-production="model.goods.Ore" clearSpeciality="model.unit.freeColonist">
+               skill="1" recruitProbability="1" expert-production="model.goods.Ore" clearSpeciality="model.unit.freeColonist">
       <ability id="model.ability.foundColony" value="yes"/>
-      <ability id="model.ability.recruitable" value="yes"/>
       <production-bonus goods-type="model.goods.Ore" factor="2"/>
     </unit-type>
     <unit-type name="model.unit.masterSugarPlanter"   offence="0"  defence="1" movement="3" lineOfSight="1"               
@@ -569,87 +563,73 @@
       <production-bonus goods-type="model.goods.Tobacco" factor="2"/>
     </unit-type>
     <unit-type name="model.unit.firebrandPreacher"    offence="0"  defence="1" movement="3" lineOfSight="1" price="1500" 
-               skill="3"  expert-production="model.goods.Crosses" clearSpeciality="model.unit.freeColonist">
+               skill="3" recruitProbability="1" expert-production="model.goods.Crosses" clearSpeciality="model.unit.freeColonist">
       <ability id="model.ability.foundColony" value="yes"/>
-      <ability id="model.ability.recruitable" value="yes"/>
       <production-bonus goods-type="model.goods.Crosses" factor="2"/>
     </unit-type>
     <unit-type name="model.unit.elderStatesman"       offence="0"  defence="1" movement="3" lineOfSight="1" price="1900" 
-               skill="3"  expert-production="model.goods.Bells" clearSpeciality="model.unit.freeColonist">
+               skill="3" recruitProbability="1" expert-production="model.goods.Bells" clearSpeciality="model.unit.freeColonist">
       <ability id="model.ability.foundColony" value="yes"/>
-      <ability id="model.ability.recruitable" value="yes"/>
       <production-bonus goods-type="model.goods.Bells" factor="2"/>
     </unit-type>
     <unit-type name="model.unit.masterCarpenter"      offence="0"  defence="1" movement="3" lineOfSight="1" price="1000" 
-               skill="1"  expert-production="model.goods.Hammers" clearSpeciality="model.unit.freeColonist">
+               skill="1" recruitProbability="1" expert-production="model.goods.Hammers" clearSpeciality="model.unit.freeColonist">
       <ability id="model.ability.foundColony" value="yes"/>
-      <ability id="model.ability.recruitable" value="yes"/>
       <production-bonus goods-type="model.goods.Hammers" factor="2"/>
     </unit-type>
     <unit-type name="model.unit.masterDistiller"      offence="0"  defence="1" movement="3" lineOfSight="1" price="1100" 
-               skill="2"  expert-production="model.goods.Rum" clearSpeciality="model.unit.freeColonist">
+               skill="2" recruitProbability="1" expert-production="model.goods.Rum" clearSpeciality="model.unit.freeColonist">
       <ability id="model.ability.foundColony" value="yes"/>
-      <ability id="model.ability.recruitable" value="yes"/>
       <production-bonus goods-type="model.goods.Rum" factor="2"/>
     </unit-type>
     <unit-type name="model.unit.masterWeaver"         offence="0"  defence="1" movement="3" lineOfSight="1" price="1300" 
-               skill="2"  expert-production="model.goods.Cloth" clearSpeciality="model.unit.freeColonist">
+               skill="2" recruitProbability="1" expert-production="model.goods.Cloth" clearSpeciality="model.unit.freeColonist">
       <ability id="model.ability.foundColony" value="yes"/>
-      <ability id="model.ability.recruitable" value="yes"/>
       <production-bonus goods-type="model.goods.Cloth" factor="2"/>
     </unit-type>
     <unit-type name="model.unit.masterTobacconist"    offence="0"  defence="1" movement="3" lineOfSight="1" price="1200" 
-               skill="2"  expert-production="model.goods.Cigars" clearSpeciality="model.unit.freeColonist">
+               skill="2" recruitProbability="1" expert-production="model.goods.Cigars" clearSpeciality="model.unit.freeColonist">
       <ability id="model.ability.foundColony" value="yes"/>
-      <ability id="model.ability.recruitable" value="yes"/>
       <production-bonus goods-type="model.goods.Cigars" factor="2"/>
     </unit-type>
     <unit-type name="model.unit.masterFurTrader"      offence="0"  defence="1" movement="3" lineOfSight="1" price="950"  
-               skill="2"  expert-production="model.goods.Coats" clearSpeciality="model.unit.freeColonist">
+               skill="2" recruitProbability="1" expert-production="model.goods.Coats" clearSpeciality="model.unit.freeColonist">
       <ability id="model.ability.foundColony" value="yes"/>
-      <ability id="model.ability.recruitable" value="yes"/>
       <production-bonus goods-type="model.goods.Coats" factor="2"/>
     </unit-type>
     <unit-type name="model.unit.masterBlacksmith"     offence="0"  defence="1" movement="3" lineOfSight="1" price="1050" 
-               skill="2"  expert-production="model.goods.Tools" clearSpeciality="model.unit.freeColonist">
+               skill="2" recruitProbability="1" expert-production="model.goods.Tools" clearSpeciality="model.unit.freeColonist">
       <ability id="model.ability.foundColony" value="yes"/>
-      <ability id="model.ability.recruitable" value="yes"/>
       <production-bonus goods-type="model.goods.Tools" factor="2"/>
     </unit-type>
     <unit-type name="model.unit.masterGunsmith"       offence="0"  defence="1" movement="3" lineOfSight="1" price="850"  
-               skill="2"  expert-production="model.goods.Muskets" clearSpeciality="model.unit.freeColonist">
+               skill="2" recruitProbability="1" expert-production="model.goods.Muskets" clearSpeciality="model.unit.freeColonist">
       <ability id="model.ability.foundColony" value="yes"/>
-      <ability id="model.ability.recruitable" value="yes"/>
       <production-bonus goods-type="model.goods.Muskets" factor="2"/>
     </unit-type>
     <unit-type name="model.unit.seasonedScout"        offence="0"  defence="1" movement="3" lineOfSight="1"               
-               skill="1" clearSpeciality="model.unit.freeColonist">
+               skill="1" recruitProbability="1" clearSpeciality="model.unit.freeColonist">
       <ability id="model.ability.foundColony" value="yes"/>
-      <ability id="model.ability.recruitable" value="yes"/>
       <ability id="model.ability.expertScout" value="yes"/>
     </unit-type>
     <unit-type name="model.unit.hardyPioneer"         offence="0"  defence="1" movement="3" lineOfSight="1" price="1100" 
-               skill="1" clearSpeciality="model.unit.freeColonist">
+               skill="1" recruitProbability="1" clearSpeciality="model.unit.freeColonist">
       <ability id="model.ability.foundColony" value="yes"/>
-      <ability id="model.ability.recruitable" value="yes"/>
       <ability id="model.ability.expertPioneer" value="yes"/>
     </unit-type>
     <unit-type name="model.unit.veteranSoldier"       offence="0"  defence="1" movement="3" lineOfSight="1" price="2000" 
-               skill="2" promotion="model.unit.colonialRegular" clearSpeciality="model.unit.freeColonist">
+               skill="2" recruitProbability="1" promotion="model.unit.colonialRegular" clearSpeciality="model.unit.freeColonist">
       <ability id="model.ability.foundColony" value="yes"/>
-      <ability id="model.ability.recruitable" value="yes"/>
       <ability id="model.ability.expertSoldier" value="yes"/>
     </unit-type>
     <unit-type name="model.unit.jesuitMissionary"     offence="0"  defence="1" movement="3" lineOfSight="1" price="1400" 
-               skill="3" clearSpeciality="model.unit.freeColonist">
+               skill="3" recruitProbability="1" clearSpeciality="model.unit.freeColonist">
       <ability id="model.ability.foundColony" value="yes"/>
-      <ability id="model.ability.recruitable" value="yes"/>
       <ability id="model.ability.expertMissionary" value="yes"/>
     </unit-type>
     <unit-type name="model.unit.indenturedServant"    offence="0"  defence="1" movement="3" lineOfSight="1"              
-               skill="-1" promotion="model.unit.freeColonist">
+               skill="-1" recruitProbability="20" promotion="model.unit.freeColonist">
       <ability id="model.ability.foundColony" value="yes"/>
-      <ability id="model.ability.recruitable" value="yes"/>
       <upgrade unit="model.unit.freeColonist" turnsToLearn="4"/>
       <upgrade unit="model.unit.expertFarmer" learnFromNatives="yes"/>
       <upgrade unit="model.unit.expertFisherman" learnFromNatives="yes"/>
@@ -672,9 +652,8 @@
       <production-bonus goods-type="model.goods.Tools" bonus="-1" />
     </unit-type>
     <unit-type name="model.unit.pettyCriminal"        offence="0"  defence="1" movement="3" lineOfSight="1"               
-               skill="-2" promotion="model.unit.indenturedServant">
+               skill="-2" recruitProbability="20" promotion="model.unit.indenturedServant">
       <ability id="model.ability.foundColony" value="yes"/>
-      <ability id="model.ability.recruitable" value="yes"/>
       <upgrade unit="model.unit.indenturedServant" turnsToLearn="4"/>
       <upgrade unit="model.unit.seasonedScout" learnInLostCity="yes"/>
       <production-bonus goods-type="model.goods.Rum" bonus="-2" />
@@ -903,7 +882,7 @@
           <required-id id="model.unit.indenturedServant"/>
         </requirements>
         <modifications>
-          <ability id="model.ability.recruitable" value="no"/>
+          <attribute id="recruitProbability" value="0"/>
         </modifications>
       </modify-type>
       <modify-type>
@@ -911,7 +890,15 @@
           <required-id id="model.unit.pettyCriminal"/>
         </requirements>
         <modifications>
-          <ability id="model.ability.recruitable" value="no"/>
+          <attribute id="recruitProbability" value="0"/>
+        </modifications>
+      </modify-type>
+      <modify-type>
+        <requirements>
+          <required-id id="model.unit.freeColonist"/>
+        </requirements>
+        <modifications>
+          <attribute id="recruitProbability" value="60"/>
         </modifications>
       </modify-type>
     </founding-father>
