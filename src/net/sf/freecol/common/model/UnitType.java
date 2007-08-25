@@ -481,9 +481,9 @@ public final class UnitType implements Abilities {
      * @param unitType the UnitType to learn
      * @return <code>true</code> if can learn the given UnitType
      */
-    public boolean canBeTeached(UnitType unitType) {
+    public boolean canBeTaught(UnitType unitType) {
         Upgrade upgrade = upgrades.get(unitType.getId());
-        return upgrade != null && upgrade.canBeTeached();
+        return upgrade != null && upgrade.canBeTaught();
     }
 
     /**
@@ -549,7 +549,7 @@ public final class UnitType implements Abilities {
         Iterator<Entry<String, Upgrade>> unitTypes = upgrades.entrySet().iterator();
         while (unitTypes.hasNext()) {
             Entry<String, Upgrade> pair = unitTypes.next();
-            if (pair.getValue().canBeTeached()) {
+            if (pair.getValue().canBeTaught()) {
                 UnitType unitType = FreeCol.getSpecification().getUnitType(pair.getKey());
                 if (unitType.hasSkill() && unitType.getSkill() <= maximumSkill) {
                     return unitType;
@@ -695,7 +695,7 @@ public final class UnitType implements Abilities {
         protected int turnsToLearn;
         protected boolean learnFromNatives, learnFromExperience, learnInLostCity;
         
-        public boolean canBeTeached() {
+        public boolean canBeTaught() {
             return turnsToLearn > 0;
         }
     }

@@ -644,7 +644,7 @@ public class Unit extends FreeColGameObject implements Abilities, Locatable, Loc
      * @return an <code>UnitType</code> value
      */
     public static UnitType getUnitTypeTeaching(UnitType typeTeacher, UnitType typeStudent) {
-        if (typeStudent.canBeTeached(typeTeacher)) {
+        if (typeStudent.canBeTaught(typeTeacher)) {
             return typeTeacher;
         } else {
             return typeStudent.getEducationUnit(0);
