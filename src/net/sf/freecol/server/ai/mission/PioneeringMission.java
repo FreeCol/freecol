@@ -418,7 +418,7 @@ public class PioneeringMission extends Mission {
      */
     public String getDebuggingInfo() {
         if (tileImprovementPlan != null) {
-            final String action = (tileImprovementPlan.getType() == Unit.PLOW) ? "P" : "R";
+            final String action = tileImprovementPlan.getType().getName();
             return tileImprovementPlan.getTarget().getPosition().toString() + " " + action;
         } else {
             PathNode bestPath = findColonyWithTools();
