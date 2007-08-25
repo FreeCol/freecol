@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
+import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.util.Xml;
 
 import org.w3c.dom.Node;

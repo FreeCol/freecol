@@ -5,6 +5,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.logging.Logger;
 
+import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
@@ -35,7 +36,7 @@ public class TileItemContainer extends FreeColGameObject {
     private TileImprovement river = null;
 
     /** The owner of this <code>TileItemContainer</code>. */
-    private Tile parent;
+    private Tile tile;
 
     // ------------------------------------------------------------ constructor
 
@@ -43,16 +44,16 @@ public class TileItemContainer extends FreeColGameObject {
      * Creates an empty <code>TileItemContainer</code>.
      *
      * @param game The <code>Game</code> in which this <code>TileItemContainer</code> belong.
-     * @param parent The <code>Tile</code> this <code>TileItemContainer</code> will be containg TileItems for.
+     * @param tile The <code>Tile</code> this <code>TileItemContainer</code> will be containg TileItems for.
      */
-    public TileItemContainer(Game game, Tile parent) {
+    public TileItemContainer(Game game, Tile tile) {
         super(game);
 
-        if (parent == null) {
+        if (tile == null) {
             throw new NullPointerException();
         }
 
-        this.parent = parent;
+        this.tile = tile;
     }
 
     /**
@@ -60,20 +61,20 @@ public class TileItemContainer extends FreeColGameObject {
      *
      * @param game The <code>Game</code> in which this <code>TileItemContainer</code>
      *       belong.
-     * @param parent The <code>Tile</code> using this <code>TileItemContainer</code>
+     * @param tile The <code>Tile</code> using this <code>TileItemContainer</code>
      *       for storing it's TileItem.
      * @param in The input stream containing the XML.
      * @throws XMLStreamException if a problem was encountered
      *      during parsing.
      */
-    public TileItemContainer(Game game, Tile parent, XMLStreamReader in) throws XMLStreamException {
+    public TileItemContainer(Game game, Tile tile, XMLStreamReader in) throws XMLStreamException {
         super(game, in);
 
-        if (parent == null) {
+        if (tile == null) {
             throw new NullPointerException();
         }
 
-        this.parent = parent;
+        this.tile = tile;
         readFromXML(in);
     }
 
@@ -82,26 +83,25 @@ public class TileItemContainer extends FreeColGameObject {
      *
      * @param game The <code>Game</code> in which this <code>TileItemContainer</code>
      *       belong.
-     * @param parent The <code>Tile</code> using this <code>TileItemContainer</code>
+     * @param tile The <code>Tile</code> using this <code>TileItemContainer</code>
      *       for storing it's TileItem.
      * @param e An XML-element that will be used to initialize
      *      this object.
      */
-    public TileItemContainer(Game game, Tile parent, Element e) {
+    public TileItemContainer(Game game, Tile tile, Element e) {
         super(game, e);
 
-        if (parent == null) {
+        if (tile == null) {
             throw new NullPointerException();
         }
 
-        this.parent = parent;
+        this.tile = tile;
         readFromXMLElement(e);
     }
 
     // ------------------------------------------------------------ checking/retrieval functions
 
-    // TODO: change name to getTile
-    public Tile getParent() {
+    public Tile getTile() {
         return tile;
     }
 
@@ -372,7 +372,7 @@ public class TileItemContainer extends FreeColGameObject {
         // Get the first river that matches or is below
         for (TileImprovementType tiType : tiTypeList) {
             if ("river".equals(tiType.getTypeId()) && tiType.getMagnitude() <= magnitude) {
-                TileImprovement river = new TileImprovement(getGame(), parent, tiType);
+                TileImprovement river = new TileImprovement(getGame(), tile, tiType);
                 this.river = river;
                 adjustNeighbourRiverStyle(0);
                 return addTileItem(river);
@@ -421,7 +421,7 @@ public class TileItemContainer extends FreeColGameObject {
             if ("river".equals(tiType.getTypeId()) && tiType.getMagnitude <= magnitude) {
                 if (tiType != river.getType()) {
                     // Has a different river type for this magnitude
-                    TileImprovement r = new TileImprovement(getGame(), parent, tiType);
+                    TileImprovement r = new TileImprovement(getGame(), tile, tiType);
                     this.river = river;
                 } else {
                     // Same river type, adjust magnitude
@@ -447,7 +447,7 @@ public class TileItemContainer extends FreeColGameObject {
         int[] directions = {Map.NE, Map.SE, Map.SW, Map.NW};
         int[] base = Map.getBase(directions, 3);
         for (int i = 0; i < directions.length; i++) {
-            Tile t = getParent().getMap().getNeighbourOrNull(directions[i], this);
+            Tile t = getTile().getMap().getNeighbourOrNull(directions[i], this);
             if (t == null) {
                 continue;
             }
@@ -475,7 +475,7 @@ public class TileItemContainer extends FreeColGameObject {
         int[] base = Map.getBase(directions, 3);
         style = 0;
         for (int i = 0; i < directions.length; i++) {
-            Tile t = getParent().getMap().getNeighbourOrNull(directions[i], this);
+            Tile t = getTile().getMap().getNeighbourOrNull(directions[i], this);
             if (t == null) {
                 continue;
             }

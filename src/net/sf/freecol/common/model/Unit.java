@@ -4312,9 +4312,9 @@ public class Unit extends FreeColGameObject implements Abilities, Locatable, Loc
 
     public static int getNextHammers(UnitType type) {
 
-        if (unitType.canBeBuilt()) {
+        if (type.canBeBuilt()) {
 
-            return unitType.getHammersRequired();
+            return type.getHammersRequired();
         }
 
         return -1;
@@ -4326,9 +4326,9 @@ public class Unit extends FreeColGameObject implements Abilities, Locatable, Loc
 
     public static int getNextTools(UnitType type) {
 
-        if (unitType.canBeBuilt()) {
+        if (type.canBeBuilt()) {
 
-            return unitType.getToolsRequired();
+            return type.getToolsRequired();
         }
 
         return -1;

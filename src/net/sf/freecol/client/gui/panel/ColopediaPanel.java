@@ -497,7 +497,7 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
                                  FreeCol.getSpecification().tileType(type));
             id = tileType.id;
             name = Messages.message(tileType.name);
-            defenseBonus = String.valueOf(tileType.defenceBonus) + "%";
+            defenseBonus = String.valueOf(tileType.getDefenceFactor()) + "%";
             movementCost = tileType.basicMoveCost;
         }
         movementCost /= 3;
