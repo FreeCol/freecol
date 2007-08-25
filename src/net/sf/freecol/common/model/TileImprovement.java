@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringReader;
 import java.io.StringWriter;
+import java.util.Iterator;
+import java.util.List;
 import java.util.logging.Logger;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -74,7 +76,7 @@ public class TileImprovement extends TileItem implements Locatable, Nameable {
         }
         this.type = type;
         this.turnsToComplete = tile.getBasicWorkTurns() + type.getAddWorksTurns();
-        this.magnitude = type.getMagnitude;
+        this.magnitude = type.getMagnitude();
     }
 
     public TileImprovement(Game game, XMLStreamReader in) throws XMLStreamException {

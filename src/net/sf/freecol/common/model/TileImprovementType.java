@@ -3,6 +3,7 @@ package net.sf.freecol.common.model;
 import java.util.List;
 import java.util.Map;
 
+import net.sf.freecol.FreeCol;
 import net.sf.freecol.common.util.Xml;
 
 import org.w3c.dom.Node;
@@ -14,13 +15,13 @@ public final class TileImprovementType
     public static final  String  LICENSE = "http://www.gnu.org/licenses/gpl.html";
     public static final  String  REVISION = "$Revision: 1.00 $";
 
-    public  final int     index;
-    public  final String  id;
-    public  final String  name;
-    public  final boolean natural;
-    public  final String  typeId;
-    public  final int     magnitude;
-    public  final int     addWorkTurns;
+    public int     index;
+    public String  id;
+    public String  name;
+    public boolean natural;
+    public String  typeId;
+    public int     magnitude;
+    public int     addWorkTurns;
 
     private String  artOverlay;
     
@@ -38,8 +39,8 @@ public final class TileImprovementType
     private List<TileType>  tileTypeChangeFrom;
     private List<TileType>  tileTypeChangeTo;
 
-    public  final int     movementCost;
-    public  final int     movementCostFactor;
+    public int     movementCost;
+    public int     movementCostFactor;
     
     // ------------------------------------------------------------ constructors
 
@@ -94,7 +95,7 @@ public final class TileImprovementType
     }
 
     public boolean isWorkerTypeAllowed(UnitType unitType) {
-        if (allowedWorkers.size() = 0) {
+        if (allowedWorkers.size() == 0) {
             return true;
         }
         return (allowedWorkers.indexOf(unitType) >= 0);

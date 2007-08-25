@@ -1,5 +1,7 @@
 package net.sf.freecol.common.model;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
@@ -102,6 +104,8 @@ public final class Tile extends FreeColGameObject implements Location, Nameable 
      * Stores all Improvements and Resources (if any)
      */
     private TileItemContainer tileItemContainer;
+    // is this redundant?
+    List tileItems = new ArrayList();
     
     private UnitContainer unitContainer;
 
@@ -305,6 +309,9 @@ public final class Tile extends FreeColGameObject implements Location, Nameable 
                 logger.warning("player == null");
             }
         }
+    }
+
+    public void setName(String newName) {
     }
 
     /**
@@ -1585,7 +1592,7 @@ break;
         return top;
     }
 
-    public List<GoodsType> getSortedGoodsList(TileType tileType, TileItemContainer tiContainer, int fishBonus) {
+    public List<GoodsType> getSortedGoodsList(final TileType tileType, final TileItemContainer tiContainer, final int fishBonus) {
         List<GoodsType> goodsTypeList = FreeCol.getSpecification().getGoodsTypeList();
         Collections.sort(goodsTypeList, new Comparator<GoodsType>() {
                 public int compare(GoodsType o, GoodsType p) {
@@ -1602,7 +1609,7 @@ break;
      * @return The type of secondary good best produced by this tile.
      */
     public GoodsType secondaryGoods() {
-        GoodsType[] top = getSortedGoodsTop(tileType, tileItemContainer, getFishBonus());
+        GoodsType[] top = getSortedGoodsTop(type, tileItemContainer, getFishBonus());
         for (GoodsType g : top) {
             if (g != null || !g.isFoodType()) {
                 return g;
@@ -1622,7 +1629,7 @@ break;
         int val = 0;
         List<GoodsType> goodsTypeList = FreeCol.getSpecification().getGoodsTypeList();
         for (GoodsType g : goodsTypeList) {
-            if (!g.isFoodType) {
+            if (!g.isFoodType()) {
                 int potential = type.getPotential(g);
                 if (potential > val) {
                     val = potential;
@@ -1692,8 +1699,11 @@ break;
         if (hasResource()) {
             Resource resource = tileItemContainer.getResource();
             if (resource.useQuantity(goodsType) == 0) {
-                addModelMessage(this, "model.tile.resourceExhausted", new String[][] { { "%resource%", resource.getName() },
-                                                                                       { "%colony%", settlement.getName() } }, ModelMessage.WARNING);
+                addModelMessage(this, "model.tile.resourceExhausted", 
+                                new String[][] { 
+                                    { "%resource%", resource.getName() },
+                                    { "%colony%", ((Colony) settlement).getName() } },
+                                ModelMessage.WARNING);
             }
         }
     }

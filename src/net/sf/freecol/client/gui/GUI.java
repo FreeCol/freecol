@@ -1547,7 +1547,7 @@ public final class GUI {
                     continue;
                 }
 
-                if (tile.getType().getIndex() == borderingTile.getType() ||
+                if (tile.getType() == borderingTile.getType() ||
                     !borderingTile.isLand() && !borderingTile.getType().isWater()){
                     // Equal tiles and sea tiles have no effect
                     continue;
@@ -1669,10 +1669,10 @@ public final class GUI {
                     Map.Position p = Map.getAdjacent(pos, i);
                     if (map.isValid(p)) {
                         Tile borderingTile = map.getTile(p);
-                        if (tile.getType().getIndex() == borderingTile.getType() ||
+                        if (tile.getType() == borderingTile.getType() ||
                             !borderingTile.isLand() ||
                             !tile.isLand() ||
-                            !(borderingTile.getType() < tile.getType().getIndex()) ||
+                            !(borderingTile.getType().getIndex() < tile.getType().getIndex()) ||
                             !borderingTile.isExplored()) {
                             // Equal tiles, sea tiles and unexplored tiles have no effect
                             continue;

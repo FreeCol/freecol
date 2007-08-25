@@ -121,6 +121,10 @@ public class TileItemContainer extends FreeColGameObject {
         return resource;
     }
 
+    public void clear() {
+        improvements.clear();
+    }
+
     /**
      * Gets an <code>Iterator</code> of every <code>TileImprovement</code> in this
      * <code>TileItemContainer</code>.

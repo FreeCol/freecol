@@ -95,6 +95,11 @@ public final class GoodsType
         return priceDiff;
     }
 
+    // TODO: give this some meaning
+    public boolean isFoodType() {
+        return false;
+    }
+
 /*
     public boolean isImprovedByPlowing() {
 

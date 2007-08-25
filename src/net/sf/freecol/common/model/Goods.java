@@ -49,7 +49,7 @@ public class Goods implements Locatable, Ownable, Nameable {
     public static final GoodsType FOOD, SUGAR, TOBACCO, COTTON, FURS, LUMBER, ORE, SILVER, HORSES, 
                                     RUM, CIGARS, CLOTH, COATS, TRADE_GOODS, TOOLS, MUSKETS, 
                                     FISH, BELLS, CROSSES, HAMMERS;
-    public static final int NUMBER_OF_TYPES;
+    public static int NUMBER_OF_TYPES;
 /*
     public static final int FOOD = 0,
                             SUGAR = 1,
