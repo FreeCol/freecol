@@ -129,7 +129,7 @@ public final class TilePanel extends FreeColDialog implements ActionListener {
         List<GoodsType> production = tileType.getPotentialTypeList();
         for (GoodsType goodsType : production) {
             JLabel label = new JLabel(canvas.getImageProvider().getGoodsImageIcon(goodsType.getIndex()));
-            label.setText(String.valueOf(tileType.getPotential(goodsType)));
+            label.setText(String.valueOf(tile.potential(goodsType)));
             goodsPanel.add(label);
         }
         setSize(getPreferredSize());

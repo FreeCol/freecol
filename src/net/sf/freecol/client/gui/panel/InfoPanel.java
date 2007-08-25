@@ -8,6 +8,7 @@ import java.awt.Image;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
+import java.util.List;
 
 import java.util.logging.Logger;
 
@@ -26,6 +27,7 @@ import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.client.gui.panel.MapEditorTransformPanel.MapTransform;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Goods;
+import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.TileType;
@@ -307,14 +309,7 @@ public final class InfoPanel extends FreeColPanel {
          * @return the basic movement cost of the tile
          */
         private int getMovementCost(Tile tile) {
-            if (tile.getAddition() == Tile.ADD_MOUNTAINS) {
-                return 9;
-            } else if (tile.getAddition() == Tile.ADD_HILLS) {
-                return 6;
-            }
-
-            TileType t = FreeCol.getSpecification().tileType(tile.getType());
-            return tile.isForested() ? t.whenForested.basicMoveCost : t.basicMoveCost;
+            return tile.getType().getBasicMoveCost();
         }
         
         /**
@@ -324,25 +319,20 @@ public final class InfoPanel extends FreeColPanel {
             int counter = 1;
             int row = 1;
             goodsPanel.removeAll();
-            for (int i = 0; i < Goods.NUMBER_OF_TYPES; i++) {
-                int production = tile.potential(i);
-                if (production > 0) {
-                    int type = i;
-                    if (i == Goods.FOOD && !tile.isLand()) {
-                        type = Goods.FISH;
-                    }
-                    JLabel goodsLabel = new JLabel(String.valueOf(production),
-                            library.getScaledGoodsImageIcon(type, 0.50f), JLabel.RIGHT);
-                    goodsLabel.setToolTipText(Goods.getName(type));
-                    goodsLabel.setFont(goodsLabel.getFont().deriveFont(9f));
-                    goodsPanel.add(goodsLabel, higConst.rc(row, counter));
-                    if (counter == 3) {
-                        row++;
-                        counter = 1;
-                    } else {
-                        counter++;
-                    }
+            List<GoodsType> production = tile.getType().getPotentialTypeList();
+            for (GoodsType goodsType : production) {
+                JLabel goodsLabel = new JLabel(String.valueOf(tile.potential(goodsType)),
+                        library.getScaledGoodsImageIcon(tile.getType().getIndex(), 0.50f), JLabel.RIGHT);
+                goodsLabel.setToolTipText(Goods.getName(goodsType));
+                goodsLabel.setFont(goodsLabel.getFont().deriveFont(9f));
+                goodsPanel.add(goodsLabel, higConst.rc(row, counter));
+                if (counter == 3) {
+                    row++;
+                    counter = 1;
+                } else {
+                    counter++;
                 }
+                goodsPanel.add(goodsLabel);
             }
             goodsPanel.validate();
         }
@@ -409,8 +399,8 @@ public final class InfoPanel extends FreeColPanel {
                 labelPanel.add(goodsPanel, higConst.rc(row, 1));
                 addProducedGoods(tile);
                 
-                int width = library.getTerrainImageWidth(tile.getType());
-                int height = library.getTerrainImageHeight(tile.getType());
+                int width = library.getTerrainImageWidth(tile.getType().getIndex());
+                int height = library.getTerrainImageHeight(tile.getType().getIndex());
                 BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
                 freeColClient.getGUI().displayTerrain(image.createGraphics(), freeColClient.getGame().getMap(), tile,
                         0, 0);
@@ -451,7 +441,7 @@ public final class InfoPanel extends FreeColPanel {
         public UnitInfoPanel() {
             super(null);
             
-            Image tools = library.getGoodsImageIcon(Goods.TOOLS).getImage();
+            Image tools = library.getGoodsImageIcon(Goods.TOOLS.getIndex()).getImage();
             ImageIcon toolsIcon = new ImageIcon(tools.getScaledInstance(tools.getWidth(null) * 2 / 3, tools
                     .getHeight(null) * 2 / 3, Image.SCALE_SMOOTH));
             unitToolsLabel = new JLabel(toolsIcon);
@@ -560,7 +550,7 @@ public final class InfoPanel extends FreeColPanel {
             int counter = 1;
             int row = 1;
             for (Goods goods : unit.getGoodsList()) {
-                JLabel goodsLabel = new JLabel(library.getScaledGoodsImageIcon(goods.getType(), 0.66f));
+                JLabel goodsLabel = new JLabel(library.getScaledGoodsImageIcon(goods.getType().getIndex(), 0.66f));
                 goodsLabel.setToolTipText(String.valueOf(goods.getAmount()) + " " + goods.getName());
                 unitCargoPanel.add(goodsLabel, higConst.rc(row, counter));
                 if (counter == 4) {
