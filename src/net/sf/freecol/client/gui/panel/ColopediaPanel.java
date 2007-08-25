@@ -392,8 +392,8 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
             name = Messages.message("mountains");
             break;
         default:
-            TileType tileType = (forested ? FreeCol.getSpecification().tileType(terrain).whenForested :
-                                 FreeCol.getSpecification().tileType(terrain));
+            TileType tileType = (forested ? FreeCol.getSpecification().getTileType(terrain).whenForested :
+                                 FreeCol.getSpecification().getTileType(terrain));
             name = Messages.message(tileType.name);
         }
         icon = new ImageIcon(library.getScaledTerrainImage(terrain, forested, 0.25f));

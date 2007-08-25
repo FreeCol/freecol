@@ -122,7 +122,7 @@ public final class TileType
         int totalProb = 0;
         int[] prob = new int[size];
         for (int i = 0; i < size; i++) {
-            totalProb += resourceProbability.intValue();
+            totalProb += resourceProbability.get(i);
             prob[i] = totalProb;
         }
         Random rand = new Random();

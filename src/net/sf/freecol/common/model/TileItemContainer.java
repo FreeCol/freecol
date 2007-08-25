@@ -11,6 +11,8 @@ import javax.xml.stream.XMLStreamWriter;
 
 import org.w3c.dom.Element;
 
+import net.sf.freecol.FreeCol;
+
 /**
 * Contains <code>TileItem</code>s and can be used by a {@link Tile}
 * to make certain tasks easier.
@@ -96,6 +98,11 @@ public class TileItemContainer extends FreeColGameObject {
     }
 
     // ------------------------------------------------------------ checking/retrieval functions
+
+    // TODO: change name to getTile
+    public Tile getParent() {
+        return tile;
+    }
 
     public boolean hasRoad() {
         return (road != null && road.isComplete());
@@ -255,7 +262,7 @@ public class TileItemContainer extends FreeColGameObject {
                     }
                 }
             }
-            if (t.isRoad()) {
+            if (t.hasRoad()) {
                 road = t;
             } else if (t.isRiver()) {
                 river = t;
@@ -288,7 +295,7 @@ public class TileItemContainer extends FreeColGameObject {
             }
             return (improvements.remove(t)) ? t : null;
         } else {
-            logger.warning("TileItem " + t.class.name() + " has not be implemented yet.");
+            logger.warning("TileItem " + t.getClass().name() + " has not be implemented yet.");
             return null;
         }
     }
@@ -354,7 +361,7 @@ public class TileItemContainer extends FreeColGameObject {
         }
         if (hasRiver()) {
             // Already have a river here, see if magnitude is correct, return existing river.
-            if (river.getMagnitude != magnitude) {
+            if (river.getMagnitude() != magnitude) {
                 setRiverMagnitude(magnitude);
             }
             return river;
@@ -363,7 +370,7 @@ public class TileItemContainer extends FreeColGameObject {
         List<TileImprovementType> tiTypeList = FreeCol.getSpecification().getTileImprovementList();
         // Get the first river that matches or is below
         for (TileImprovementType tiType : tiTypeList) {
-            if ("river".equals(tiType.getTypeId()) && tiType.getMagnitude <= magnitude) {
+            if ("river".equals(tiType.getTypeId()) && tiType.getMagnitude() <= magnitude) {
                 TileImprovement river = new TileImprovement(getGame(), parent, tiType);
                 this.river = river;
                 adjustNeighbourRiverStyle(0);

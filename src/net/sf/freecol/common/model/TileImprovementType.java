@@ -135,7 +135,7 @@ public final class TileImprovementType
         if (!isTileTypeAllowed(tile.getType())) {
             return false;
         }
-        if (requiredImprovement != null && tile.tileImprovements.indexOf(requiredImprovement) < 0) {
+        if (requiredImprovement != null && tile.getTileImprovements().indexOf(requiredImprovement) < 0) {
             return false;
         }
         return true;
@@ -272,7 +272,8 @@ public final class TileImprovementType
 
                         for (int i = 0; i < tileTypeList.size(); i++) {
                             TileType t = tileTypeList.get(i);
-                            if (!allLand && !t.isWater() || !allForest && t.isForest() || !allWater && t.isWater()) {
+                            if (!allLand && !t.isWater() || !allForest && t.isForested()
+                                || !allWater && t.isWater()) {
                                 continue;
                             }
                             allowedTileTypes.add(t);
@@ -297,7 +298,7 @@ public final class TileImprovementType
                             }
                         }
                         if (Xml.hasAttribute(xml, "goods-types")) {
-                            string[] goods = Xml.arrayAttribute(xml, "goods-types");
+                            String[] goods = Xml.arrayAttribute(xml, "goods-types");
                             int[] bonus = Xml.intArrayAttribute(xml, "values");
                             for (int i = 0; i < goods.length; i++) {
                                 GoodsType gt = goodsTypeByRef.get(goods[i]);

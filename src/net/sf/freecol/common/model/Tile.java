@@ -677,6 +677,10 @@ public final class Tile extends FreeColGameObject implements Location, Nameable 
         return getTileItemContainer().hasRoad() || (getSettlement() != null);
     }
 
+    public TileImprovement getRoad() {
+        return getTileItemContainer().getRoad();
+    }
+
     public boolean hasRiver() {
         return getTileItemContainer().hasRiver();
     }
@@ -685,11 +689,11 @@ public final class Tile extends FreeColGameObject implements Location, Nameable 
      * Returns 'true' if this Tile has been plowed.
      * 
      * @return 'true' if this Tile has been plowed.
-     *//*
-         public boolean isPlowed() {
-         return plowed;
-         }
-       */
+     */
+    // TODO: remove as soon as alternative is clear
+    public boolean isPlowed() {
+        return false; //plowed;
+    }
     /**
      * Returns 'true' if this Tile has a resource on it.
      * 
@@ -2599,7 +2603,7 @@ break;
             if (roadStr != null) {
                 road = Boolean.valueOf(roadStr).booleanValue();
             } else {
-                road = theTile.hasRoad();
+                road = theTile.getRoad();
             }
 
             final String plowedStr = in.getAttributeValue(null, "plowed");

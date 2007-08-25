@@ -1657,7 +1657,7 @@ public final class GUI {
                 g.drawImage(lib.getForestImage(tile.getType().getIndex()), x, y, null);
             }
 
-            if (tile.hasBonus()) {
+            if (tile.hasResource()) {
                 Image bonusImage = lib.getBonusImage(tile);
                 if (bonusImage != null) {
                     g.drawImage(bonusImage, x + tileWidth/2 - bonusImage.getWidth(null)/2, y + tileHeight/2 - bonusImage.getHeight(null)/2, null);
