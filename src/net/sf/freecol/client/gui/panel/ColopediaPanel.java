@@ -409,7 +409,8 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
      * @param parent
      */
     private void buildUnitItem(int unit, float scale, DefaultMutableTreeNode parent) {
-        String name = Unit.getName(unit);
+        UnitType unitType = FreeCol.getSpecification().unitType(unit);
+        String name = unitType.getName();
         int unitIcon = ImageLibrary.getUnitGraphicsType(unit, false, false, 0, false);
         ImageIcon icon = library.getColopediaUnitImageIcon(unitIcon, 0.5f);
         DefaultMutableTreeNode item;
@@ -425,7 +426,8 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
      * @param parent
      */
     private void buildGoodsItem(int goods, DefaultMutableTreeNode parent) {
-        String name = Goods.getName(goods);
+        GoodsType goodsType = FreeCol.getSpecification().getGoodsType(goods);
+        String name = goodsType.getName();
         ImageIcon icon = library.getScaledGoodsImageIcon(goods, 0.75f);
         DefaultMutableTreeNode item = new DefaultMutableTreeNode(new ColopediaTreeItem(name, icon));
         parent.add(item);
@@ -438,7 +440,8 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
      * @param parent
      */
     private void buildFatherItem(int foundingFather, DefaultMutableTreeNode parent) {
-        String name = Messages.message(FoundingFather.getName(foundingFather));
+        FoundingFather father = FreeCol.getSpecification().foundingFather(foundingFather);
+        String name = Messages.message(father.getName());
         ImageIcon icon = library.getScaledGoodsImageIcon(Goods.BELLS, 0.75f);
         DefaultMutableTreeNode item = new DefaultMutableTreeNode(new ColopediaTreeItem(name, icon));
         parent.add(item);
@@ -675,7 +678,7 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
         detailPanel.removeAll();
         detailPanel.repaint();
 
-        GoodsType type = FreeCol.getSpecification().goodsType(goods);
+        GoodsType type = FreeCol.getSpecification().getGoodsType(goods);
 
         String isFarmed = Messages.message(type.isFarmed ? "yes" : "no");
         int numberOfLines = type.isFarmed ? 8 : 6;
@@ -890,13 +893,15 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
         detailPanel.repaint();
         detailPanel.setLayout(new FlowLayout());
 
-        JLabel name = new JLabel(Messages.message(FoundingFather.getName(foundingFather)), SwingConstants.CENTER);
+        FoundingFather father = FreeCol.getSpecification().foundingFather(foundingFather);
+
+        JLabel name = new JLabel(Messages.message(father.getName()), SwingConstants.CENTER);
         name.setFont(smallHeaderFont);
         name.setPreferredSize(new Dimension(400, 50));
         detailPanel.add(name);
 
         Image image = null;
-        switch (FoundingFather.getType(foundingFather)) {
+        switch (father.getType()) {
         case FoundingFather.TRADE:
             image = (Image) UIManager.get("FoundingFather.trade");
             break;
@@ -922,9 +927,9 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
         }
         detailPanel.add(imageLabel);
 
-        String text = Messages.message(FoundingFather.getDescription(foundingFather)) + "\n\n" + "["
-                + Messages.message(FoundingFather.getBirthAndDeath(foundingFather)) + "] "
-                + Messages.message(FoundingFather.getText(foundingFather));
+        String text = Messages.message(father.getDescription()) + "\n\n" + "["
+                + Messages.message(father.getBirthAndDeath()) + "] "
+                + Messages.message(father.getText());
         JTextArea description = getDefaultTextArea(text);
         description.setColumns(32);
         description.setSize(description.getPreferredSize());

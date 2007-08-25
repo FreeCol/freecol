@@ -268,9 +268,9 @@ public class TileItemContainer extends FreeColGameObject {
             } else if (t.isRiver()) {
                 river = t;
             }
-            improvements.add(t);
+            improvements.add((TileImprovement) t);
         } else {
-            logger.warning("TileItem " + t.class.name() + " has not be implemented yet.");
+            logger.warning("TileItem " + t.getClass().getSimpleName() + " has not be implemented yet.");
             return null;
         }
     }
@@ -296,7 +296,7 @@ public class TileItemContainer extends FreeColGameObject {
             }
             return (improvements.remove(t)) ? t : null;
         } else {
-            logger.warning("TileItem " + t.getClass().name() + " has not be implemented yet.");
+            logger.warning("TileItem " + t.getClass().getSimpleName() + " has not be implemented yet.");
             return null;
         }
     }
@@ -375,7 +375,7 @@ public class TileItemContainer extends FreeColGameObject {
                 TileImprovement river = new TileImprovement(getGame(), tile, tiType);
                 this.river = river;
                 adjustNeighbourRiverStyle(0);
-                return addTileItem(river);
+                return (TileImprovement) addTileItem(river);
             }
         }
         // Don't have any river ImprovementTypes? Throw exception
@@ -387,7 +387,7 @@ public class TileItemContainer extends FreeColGameObject {
      * Change neighbours' River Style with {@link #adjustNeighbourRiverStyle}.
      */
     public TileImprovement removeRiver() {
-        return removeTileItem(river);
+        return (TileImprovement) removeTileItem(river);
     }
 
     /**

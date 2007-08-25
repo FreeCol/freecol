@@ -282,6 +282,18 @@ public final class Tile extends FreeColGameObject implements Location, Nameable 
         return (getGame().getViewOwner() != null);
     }
 
+
+    // TODO: what's this supposed to do?
+    public int getBasicWorkTurns() {
+        return 0;
+    }
+
+    // TODO: what's this supposed to do?
+    public int getAddWorkTurns() {
+        return 0;
+    }
+
+
     /**
      * Gets the name of this tile, or shows "unexplored" if not explored by player.
      * 

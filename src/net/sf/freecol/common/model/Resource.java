@@ -107,8 +107,9 @@ public class Resource extends TileItem {
      * Returns the name of this type of Resource.
      * @return The name of this type of Resource.
      */
+    // TODO: make this work!
     public String getName() {
-        return getName(type);
+        return ""; //getName(type);
     }
 
     /**
@@ -145,7 +146,7 @@ public class Resource extends TileItem {
      * @param potential Potential of Tile + Improvements
      */
     public int getBonus(GoodsType goodsType, int potential) {
-        int bonusAmount = (potential + type.getBonus(goodsType)) * type.getFactor(goodsType) - potential;
+        int bonusAmount = (int) (potential + type.getBonus(goodsType)) * type.getFactor(goodsType) - potential;
         if (bonusAmount < quantity) {
             bonusAmount = quantity;
         }
