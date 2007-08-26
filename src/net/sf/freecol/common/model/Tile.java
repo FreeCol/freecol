@@ -1805,7 +1805,9 @@ break;
         out.writeAttribute("ID", getID());
         out.writeAttribute("x", Integer.toString(x));
         out.writeAttribute("y", Integer.toString(y));
-        out.writeAttribute("type", Integer.toString(type.getIndex()));
+        if (type != null) {
+            out.writeAttribute("type", Integer.toString(type.getIndex()));
+        }
         //        out.writeAttribute("type", Integer.toString(type));
 
         if (pet == null) {
@@ -1963,7 +1965,10 @@ break;
         x = Integer.parseInt(in.getAttributeValue(null, "x"));
         y = Integer.parseInt(in.getAttributeValue(null, "y"));
         position = new Position(x, y);
-        type = FreeCol.getSpecification().getTileType(Integer.parseInt(in.getAttributeValue(null, "type")));
+        String typeStr = in.getAttributeValue(null, "type");
+        if (typeStr != null) {
+            type = FreeCol.getSpecification().getTileType(Integer.parseInt(typeStr));
+        }
         /*
           final String riverStr = in.getAttributeValue(null, "river");
           if (riverStr != null) {

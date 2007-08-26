@@ -90,7 +90,7 @@ public final class MapControls {
         }
         ubList.add(new UnitButton(am.getFreeColAction(BuildColonyAction.ID)));
         ubList.add(new UnitButton(am.getFreeColAction(DisbandUnitAction.ID)));
-        unitButton = ((UnitButton[]) ubList.toArray());
+        unitButton = (ubList.toArray(new UnitButton[0]));
         /*  Depreciated
         unitButton = new UnitButton[] {
             new UnitButton(am.getFreeColAction(WaitAction.ID)),

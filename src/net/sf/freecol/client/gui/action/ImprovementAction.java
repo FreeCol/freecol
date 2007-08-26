@@ -38,8 +38,8 @@ public class ImprovementAction extends MapboardAction {
     public ImprovementAction(FreeColClient freeColClient, ImprovementActionType iaType) {
         super(freeColClient, iaType.names.get(0), null, KeyStroke.getKeyStroke(iaType.accelerator, 0));
         this.iaType = iaType;
-        actionID = 0;
-        updateValues(actionID);
+        actionID = -1;
+        updateValues(0);
     }
 
     /**
