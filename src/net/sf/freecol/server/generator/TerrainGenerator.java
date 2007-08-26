@@ -87,7 +87,7 @@ public class TerrainGenerator {
                     if (importLandMap || importTile.isLand() == landMap[i][j]) {
                         t = new Tile(game, importTile.getType(), i, j);
                         // TileItemContainer copies everything including Resource unless importBonuses == false
-                        t.getTileItemContainer.copyFrom(importTile.getTileItemContainer(), importBonuses);
+                        t.getTileItemContainer().copyFrom(importTile.getTileItemContainer(), importBonuses);
                         if (!importBonuses) {
                             // In which case, we may add a Bonus Resource
                             perhapsAddBonus(t, landMap);
@@ -120,7 +120,7 @@ public class TerrainGenerator {
         Tile t;
         if (landMap[i][j]) {
             t = new Tile(game, 
-                          getRandomTileType( ((Math.min(j, height - j) * 200) / height),
+                          getRandomLandTileType( ((Math.min(j, height - j) * 200) / height),
                                             getMapGeneratorOptions().getPercentageOfForests() ),
                           i, j);
 /*
@@ -137,7 +137,8 @@ public class TerrainGenerator {
             }
 */
         } else {
-            t = new Tile(game, Tile.OCEAN, i, j);
+            TileType ocean = FreeCol.getSpecification().getTileType("model.tile.ocean");
+            t = new Tile(game, ocean, i, j);
         }
         perhapsAddBonus(t, landMap);
         
@@ -189,7 +190,7 @@ public class TerrainGenerator {
      *        the y-axis and 0% is on the top/bottom of the map.
      * @param forestChance The percentage chance of forests in this area
      */
-    private int getRandomLandTileType(int percent, int forestChance) {
+    private TileType getRandomLandTileType(int percent, int forestChance) {
         // latRanges correspond to 0,1,2,3 from TileType.latitude (100-0)
         int[] latRanges = { 75, 50, 25, 0 };
         // altRanges correspond to 1,2,3 from TileType.altitude (1-10)

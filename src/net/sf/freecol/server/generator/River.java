@@ -5,10 +5,12 @@ import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.logging.Logger;
 
+import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.PseudoRandom;
 import net.sf.freecol.common.model.Map;
 import net.sf.freecol.common.model.Tile;
+import net.sf.freecol.common.model.TileType;
 import net.sf.freecol.common.model.Map.Position;
 
 
@@ -361,8 +363,9 @@ public class River {
                 logger.fine("Added river (magnitude: " + section.size + ") to tile at " + section.position);
                 break;
             default:
-                tile.setType(Tile.OCEAN);
-            logger.fine("Created fjord at " + section.position);
+                TileType ocean = FreeCol.getSpecification().getTileType("model.tile.ocean");
+                tile.setType(ocean);
+                logger.fine("Created fjord at " + section.position);
             }
             oldSection = section;
         }
