@@ -14,6 +14,7 @@ import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import net.sf.freecol.FreeCol;
 
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.ImageLibrary;
@@ -24,6 +25,7 @@ import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
+import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.model.WorkLocation;
 import cz.autel.dmi.HIGLayout;
 
@@ -156,7 +158,8 @@ public final class ReportLabourPanel extends ReportPanel implements ActionListen
                     reportPanel.add(new JLabel(String.valueOf(unitCount[unitTypes[row][column]])),
                                     higConst.rc(2 * row + 1, columnsPerUnit * column + countColumn, "tr"));
                 } else {
-                    JLabel unitNameLabel = new JLabel(Unit.getName(unitTypes[row][column])); 
+                    UnitType unitType = FreeCol.getSpecification().getUnitType(unitTypes[row][column]);
+                    JLabel unitNameLabel = new JLabel(Unit.getName(unitType)); 
                     unitNameLabel.setForeground(Color.GRAY);
                     reportPanel.add(unitNameLabel,
                                     higConst.rc(2 * row + 1, columnsPerUnit * column + nameColumn, "tl"));
@@ -166,7 +169,8 @@ public final class ReportLabourPanel extends ReportPanel implements ActionListen
     }
     
 
-    private JButton createUnitNameButton(int unitType) {
+    private JButton createUnitNameButton(int unitIndex) {
+        UnitType unitType = FreeCol.getSpecification().getUnitType(unitIndex);
         JButton button = new JButton(Unit.getName(unitType));
         button.setMargin(new Insets(0,0,0,0));
         button.setOpaque(false);
@@ -185,8 +189,8 @@ public final class ReportLabourPanel extends ReportPanel implements ActionListen
         return unitLabel;
     }
 
-    private JPanel createUnitDetails(int unit, ReportLabourDetailPanel report) {
-
+    private JPanel createUnitDetails(UnitType unitType, ReportLabourDetailPanel report) {
+        int unitIndex = unitType.getIndex();
         int maxColumns = 3;
         int columnsPerColumn = 4;
         int[] widths = new int[maxColumns * columnsPerColumn - 1];
@@ -194,17 +198,17 @@ public final class ReportLabourPanel extends ReportPanel implements ActionListen
             widths[index] = 12;
         }
         int keys = 0;
-        if (unitCount[unit] > 0) {
+        if (unitCount[unitIndex] > 0) {
             if (unitLocations != null) {
-                keys = unitLocations.get(unit).size();
+                keys = unitLocations.get(unitIndex).size();
             }
-            if (unitInEurope[unit] > 0) {
+            if (unitInEurope[unitIndex] > 0) {
                 keys++;
             }
-            if (unitAtSea[unit] > 0) {
+            if (unitAtSea[unitIndex] > 0) {
                 keys++;
             }
-            if (unitOnLand[unit] > 0) {
+            if (unitOnLand[unitIndex] > 0) {
                 keys++;
             }
         }
@@ -229,18 +233,18 @@ public final class ReportLabourPanel extends ReportPanel implements ActionListen
 
         // summary
         int row = 1;
-        detailPanel.add(new JLabel(Unit.getName(unit)),
+        detailPanel.add(new JLabel(Unit.getName(unitType)),
                         higConst.rc(row, colonyColumn));
-        detailPanel.add(new JLabel(String.valueOf(unitCount[unit])),
+        detailPanel.add(new JLabel(String.valueOf(unitCount[unitIndex])),
                         higConst.rc(row, countColumn));
 
         row = startRow;
         int column = 0;
         for (Colony colony : colonies) {
-            if (unitLocations.get(unit).get(colony) != null) {
-                detailPanel.add(createColonyButton(colony, unit, report),
+            if (unitLocations.get(unitIndex).get(colony) != null) {
+                detailPanel.add(createColonyButton(colony, unitType, report),
                                 higConst.rc(row, column * columnsPerColumn + colonyColumn, "l"));
-                JLabel countLabel = new JLabel(unitLocations.get(unit).get(colony).toString());
+                JLabel countLabel = new JLabel(unitLocations.get(unitIndex).get(colony).toString());
                 countLabel.setForeground(LINK_COLOR);
                 detailPanel.add(countLabel, 
                                 higConst.rc(row, column * columnsPerColumn + countColumn, "r"));
@@ -252,7 +256,7 @@ public final class ReportLabourPanel extends ReportPanel implements ActionListen
                 }
             }
         }
-        if (unitInEurope[unit] > 0) {
+        if (unitInEurope[unitIndex] > 0) {
             JButton button = new JButton(player.getEurope().getName());
             button.setMargin(new Insets(0,0,0,0));
             button.setOpaque(false);
@@ -262,7 +266,7 @@ public final class ReportLabourPanel extends ReportPanel implements ActionListen
             button.addActionListener(this);
             detailPanel.add(button,
                             higConst.rc(row, column * columnsPerColumn + colonyColumn, "l"));
-            JLabel countLabel = new JLabel(String.valueOf(unitInEurope[unit]));
+            JLabel countLabel = new JLabel(String.valueOf(unitInEurope[unitIndex]));
             countLabel.setForeground(LINK_COLOR);
             detailPanel.add(countLabel,
                             higConst.rc(row, column * columnsPerColumn + countColumn, "r"));
@@ -273,12 +277,12 @@ public final class ReportLabourPanel extends ReportPanel implements ActionListen
                 row++;
             }
         }
-        if (unitOnLand[unit] > 0) {
+        if (unitOnLand[unitIndex] > 0) {
             JLabel onLandLabel = new JLabel(Messages.message("report.onLand"));
             onLandLabel.setForeground(Color.GRAY);
             detailPanel.add(onLandLabel,
                             higConst.rc(row, column * columnsPerColumn + colonyColumn, "l"));
-            JLabel countLabel = new JLabel(String.valueOf(unitOnLand[unit]));
+            JLabel countLabel = new JLabel(String.valueOf(unitOnLand[unitIndex]));
             countLabel.setForeground(Color.GRAY);
             detailPanel.add(countLabel,
                             higConst.rc(row, column * columnsPerColumn + countColumn, "r"));
@@ -289,12 +293,12 @@ public final class ReportLabourPanel extends ReportPanel implements ActionListen
                 row++;
             }
         }
-        if (unitAtSea[unit] > 0) {
+        if (unitAtSea[unitIndex] > 0) {
             JLabel atSeaLabel = new JLabel(Messages.message("report.atSea"));
             atSeaLabel.setForeground(Color.GRAY);
             detailPanel.add(atSeaLabel,
                             higConst.rc(row, column * columnsPerColumn + colonyColumn, "l"));
-            JLabel countLabel = new JLabel(String.valueOf(unitAtSea[unit]));
+            JLabel countLabel = new JLabel(String.valueOf(unitAtSea[unitIndex]));
             countLabel.setForeground(Color.GRAY);
             detailPanel.add(countLabel, 
                             higConst.rc(row, column * columnsPerColumn + countColumn, "r"));
@@ -308,7 +312,7 @@ public final class ReportLabourPanel extends ReportPanel implements ActionListen
         return detailPanel;
     }
 
-    private JButton createColonyButton(Colony colony, int unit, ReportLabourDetailPanel report) {
+    private JButton createColonyButton(Colony colony, UnitType unit, ReportLabourDetailPanel report) {
 
         JButton button = new JButton();
         if (colony.canTrain(unit)) {
@@ -339,7 +343,8 @@ public final class ReportLabourPanel extends ReportPanel implements ActionListen
             super.actionPerformed(event);
         } else if (action < unitCount.length) {
             ReportLabourDetailPanel details = new ReportLabourDetailPanel(getCanvas());
-            JPanel detailPanel = createUnitDetails(action, details);
+            UnitType unitType = FreeCol.getSpecification().getUnitType(action);
+            JPanel detailPanel = createUnitDetails(unitType, details);
             details.initialize(detailPanel, action);
             getCanvas().addAsFrame(details);
             details.requestFocus();

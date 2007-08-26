@@ -16,6 +16,7 @@ import java.io.StringWriter;
 import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Random;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -38,6 +39,7 @@ import net.sf.freecol.common.model.FreeColGameObject;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Unit;
+import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.networking.Message;
 import net.sf.freecol.common.networking.NoRouteToServerException;
@@ -255,18 +257,34 @@ public final class FreeColServer {
         }
         final ServerPlayer p = (ServerPlayer) getGame().getPlayerByName(username);
         synchronized (p) {
-            Unit theFlyingDutchman = new Unit(game, p.getEntryLocation(), p, Unit.FLYING_DUTCHMAN, Unit.ACTIVE);
-            new Unit(game, theFlyingDutchman, p, Unit.REVENGER, Unit.SENTRY);
-            p.setDead(false);
-            p.setColor(Color.BLACK);
-            Element updateElement = Message.createNewRootElement("update");
-            updateElement.appendChild(((FreeColGameObject) p.getEntryLocation()).toXMLElement(p, updateElement
-                    .getOwnerDocument()));
-            updateElement.appendChild(p.toXMLElement(p, updateElement.getOwnerDocument()));
-            try {
-                p.getConnection().send(updateElement);
-            } catch (IOException e) {
-                logger.warning("Could not send update");
+            List<UnitType> undeads = FreeCol.getSpecification().getUnitTypesWithAbility("model.ability.undead");
+            ArrayList<UnitType> navalUnits = new ArrayList<UnitType>();
+            ArrayList<UnitType> landUnits = new ArrayList<UnitType>();
+            for (UnitType undead : undeads) {
+                if (undead.hasAbility("model.ability.navalUnit")) {
+                    navalUnits.add(undead);
+                } else if (undead.getId().equals("model.unit.revenger")) { // TODO: softcode this
+                    landUnits.add(undead);
+                }
+            }
+            if (navalUnits.size() > 0) {
+                UnitType navalType = navalUnits.get(getPseudoRandom().nextInt(navalUnits.size()));
+                Unit theFlyingDutchman = new Unit(game, p.getEntryLocation(), p, navalType, Unit.ACTIVE);
+                if (landUnits.size() > 0) {
+                    UnitType landType = landUnits.get(getPseudoRandom().nextInt(landUnits.size()));
+                    new Unit(game, theFlyingDutchman, p, landType, Unit.SENTRY);
+                }
+                p.setDead(false);
+                p.setColor(Color.BLACK);
+                Element updateElement = Message.createNewRootElement("update");
+                updateElement.appendChild(((FreeColGameObject) p.getEntryLocation()).toXMLElement(p, updateElement
+                        .getOwnerDocument()));
+                updateElement.appendChild(p.toXMLElement(p, updateElement.getOwnerDocument()));
+                try {
+                    p.getConnection().send(updateElement);
+                } catch (IOException e) {
+                    logger.warning("Could not send update");
+                }
             }
         }
     }
