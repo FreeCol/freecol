@@ -2490,13 +2490,14 @@ public final class InGameController implements NetworkConstants {
             askSkill.setAttribute("direction", Integer.toString(direction));
 
             Element reply = client.ask(askSkill);
-            UnitType skill;
+            UnitType skill = null;
 
             if (reply.getTagName().equals("provideSkill")) {
-                skill = FreeCol.getSpecification().getUnitType(reply.getAttribute("skill"));
-                if (skill != null) {
+                String skillStr = reply.getAttribute("skill");
+                if (skillStr == null) {
                     skillName = null;
                 } else {
+                    skill = FreeCol.getSpecification().getUnitType(Integer.parseInt(skillStr));
                     skillName = Unit.getName(skill);
                 }
             } else {
@@ -2618,7 +2619,13 @@ public final class InGameController implements NetworkConstants {
 
         if (reply.getTagName().equals("scoutIndianSettlementResult")) {
             Specification spec = FreeCol.getSpecification();
-            settlement.setLearnableSkill(spec.getUnitType(reply.getAttribute("skill")));
+
+            UnitType skill = null;
+            String skillStr = reply.getAttribute("skill");
+            if (skillStr != null) {
+                skill = spec.getUnitType(Integer.parseInt(skillStr));
+            }
+            settlement.setLearnableSkill(skill);
             settlement.setWantedGoods(0, Integer.parseInt(reply.getAttribute("highlyWantedGoods")));
             settlement.setWantedGoods(1, Integer.parseInt(reply.getAttribute("wantedGoods1")));
             settlement.setWantedGoods(2, Integer.parseInt(reply.getAttribute("wantedGoods2")));
@@ -2887,7 +2894,7 @@ public final class InGameController implements NetworkConstants {
         }
 
         Element trainUnitInEuropeElement = Message.createNewRootElement("trainUnitInEurope");
-        trainUnitInEuropeElement.setAttribute("unitType", unitType.getId());
+        trainUnitInEuropeElement.setAttribute("unitType", Integer.toString(unitType.getIndex()));
 
         Element reply = client.ask(trainUnitInEuropeElement);
         if (reply.getTagName().equals("trainUnitInEuropeConfirmed")) {
@@ -2972,7 +2979,8 @@ public final class InGameController implements NetworkConstants {
             } else {
                 unit.readFromXMLElement(unitElement);
             }
-            UnitType unitType = FreeCol.getSpecification().getUnitType(reply.getAttribute("newRecruitable"));
+            int unitIndex = Integer.parseInt(reply.getAttribute("newRecruitable"));
+            UnitType unitType = FreeCol.getSpecification().getUnitType(unitIndex);
             europe.recruit(slot, unit, unitType);
         } else {
             logger.warning("Could not recruit the specified unit in europe.");
@@ -3026,7 +3034,8 @@ public final class InGameController implements NetworkConstants {
         } else {
             unit.readFromXMLElement(unitElement);
         }
-        UnitType newRecruitable = FreeCol.getSpecification().getUnitType(reply.getAttribute("newRecruitable"));
+        int unitIndex = Integer.parseInt(reply.getAttribute("newRecruitable"));
+        UnitType newRecruitable = FreeCol.getSpecification().getUnitType(unitIndex);
         europe.emigrate(slot, unit, newRecruitable);
 
         freeColClient.getCanvas().updateGoldLabel();

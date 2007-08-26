@@ -63,6 +63,10 @@ public final class TileType
     public int getIndex() {
         return index;
     }
+    
+    public String getId() {
+        return id;
+    }
 
     public String getName() {
         return name;

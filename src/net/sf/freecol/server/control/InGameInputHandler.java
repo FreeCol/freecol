@@ -475,7 +475,8 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         String taskID = element.getAttribute("taskID");
         Location location = (Location) getGame().getFreeColGameObject(element.getAttribute("location"));
         Player owner = (Player) getGame().getFreeColGameObject(element.getAttribute("owner"));
-        UnitType type = FreeCol.getSpecification().getUnitType(element.getAttribute("type"));
+        int unitIndex = Integer.parseInt(element.getAttribute("type"));
+        UnitType type = FreeCol.getSpecification().getUnitType(unitIndex);
         if (location == null) {
             throw new NullPointerException();
         }
@@ -1108,7 +1109,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         Unit unit = new Unit(getGame(), europe, player, recruitable, Unit.ACTIVE);
         player.getEurope().add(unit);
         Element reply = Message.createNewRootElement("selectFromFountainYouthConfirmed");
-        reply.setAttribute("newRecruitable", newRecruitable.getId());
+        reply.setAttribute("newRecruitable", Integer.toString(newRecruitable.getIndex()));
         reply.appendChild(unit.toXMLElement(player, reply.getOwnerDocument()));
         return reply;
     }
@@ -1148,7 +1149,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         unit.setMovesLeft(0);
         Element reply = Message.createNewRootElement("provideSkill");
         if (settlement.getLearnableSkill() != null) {
-            reply.setAttribute("skill", settlement.getLearnableSkill().getId());
+            reply.setAttribute("skill", Integer.toString(settlement.getLearnableSkill().getIndex()));
             if (unit.getUnitType().canLearnFromNatives(settlement.getLearnableSkill())) {
                 // We now put the unit on the indian settlement.
                 // Normally we shouldn't have to this, but the
@@ -1552,7 +1553,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
             // Just return the skill and wanted goods.
             UnitType skill = settlement.getLearnableSkill();
             if (skill != null) {
-                reply.setAttribute("skill", skill.getId());
+                reply.setAttribute("skill", Integer.toString(skill.getIndex()));
             }
             settlement.updateWantedGoods();
             GoodsType[] wantedGoods = settlement.getWantedGoods();
@@ -1974,7 +1975,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         UnitType newRecruitable = player.generateRecruitable();
         Unit unit = new Unit(getGame(), player, recruitable);
         Element reply = Message.createNewRootElement("recruitUnitInEuropeConfirmed");
-        reply.setAttribute("newRecruitable", newRecruitable.getId());
+        reply.setAttribute("newRecruitable", Integer.toString(newRecruitable.getIndex()));
         reply.appendChild(unit.toXMLElement(player, reply.getOwnerDocument()));
         europe.recruit(slot, unit, newRecruitable);
         return reply;
@@ -2002,7 +2003,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         if (!player.hasFather(FoundingFather.WILLIAM_BREWSTER)) {
             reply.setAttribute("slot", Integer.toString(slot));
         }
-        reply.setAttribute("newRecruitable", newRecruitable.getId());
+        reply.setAttribute("newRecruitable", Integer.toString(newRecruitable.getIndex()));
         reply.appendChild(unit.toXMLElement(player, reply.getOwnerDocument()));
         europe.emigrate(slot, unit, newRecruitable);
         return reply;
@@ -2017,8 +2018,8 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
     private Element trainUnitInEurope(Connection connection, Element trainUnitInEuropeElement) {
         Player player = getFreeColServer().getPlayer(connection);
         Europe europe = player.getEurope();
-        String unitTypeStr = trainUnitInEuropeElement.getAttribute("unitType");
-        UnitType unitType = FreeCol.getSpecification().getUnitType(unitTypeStr);
+        int unitIndex = Integer.parseInt(trainUnitInEuropeElement.getAttribute("unitType"));
+        UnitType unitType = FreeCol.getSpecification().getUnitType(unitIndex);
         Unit unit = new Unit(getGame(), player, unitType);
         Element reply = Message.createNewRootElement("trainUnitInEuropeConfirmed");
         reply.appendChild(unit.toXMLElement(player, reply.getOwnerDocument()));

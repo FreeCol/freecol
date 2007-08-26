@@ -673,7 +673,7 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
         row += 2;
         detailPanel.add(new JLabel(Messages.message("colopedia.unit.description")),
                         higConst.rc(row, labelColumn, "tl"));
-        detailPanel.add(getDefaultTextArea(Messages.message(type.getId() + ".description")),
+        detailPanel.add(getDefaultTextArea(Messages.message(type.getDescription())),
                         higConst.rc(row, valueColumn));
 
         detailPanel.validate();

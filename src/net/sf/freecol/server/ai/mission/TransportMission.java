@@ -669,7 +669,7 @@ public class TransportMission extends Mission {
         if (unitType.hasPrice() && europe.getUnitPrice(unitType) >= 0 &&
                 player.getGold() >= europe.getUnitPrice(unitType)) {
             Element trainUnitInEuropeElement = Message.createNewRootElement("trainUnitInEurope");
-            trainUnitInEuropeElement.setAttribute("unitType", unitType.getId());
+            trainUnitInEuropeElement.setAttribute("unitType", Integer.toString(unitType.getIndex()));
             try {
                 Element reply = connection.ask(trainUnitInEuropeElement);
                 if (reply.getTagName().equals("trainUnitInEuropeConfirmed")) {
@@ -745,7 +745,7 @@ public class TransportMission extends Mission {
         // Try training the unit:
         if (cheapestTrained != null && player.getGold() >= priceTrained) {
             Element trainUnitInEuropeElement = Message.createNewRootElement("trainUnitInEurope");
-            trainUnitInEuropeElement.setAttribute("unitType", cheapestTrained.getId());
+            trainUnitInEuropeElement.setAttribute("unitType", Integer.toString(cheapestTrained.getIndex()));
             try {
                 Element reply = connection.ask(trainUnitInEuropeElement);
                 if (reply.getTagName().equals("trainUnitInEuropeConfirmed")) {

@@ -95,7 +95,7 @@ public final class PurchaseDialog extends FreeColDialog implements ActionListene
             JButton button = new JButton(Unit.getName(unitType), library.getScaledUnitImageIcon(graphicsType, 0.66f));
             button.setIconTextGap(margin);
             button.addActionListener(this);
-            button.setActionCommand(unitType.getId());
+            button.setActionCommand(unitType.getName());
             enterPressesWhenFocused(button);
             buttons.add(button);
             purchasePanel.add(button, higConst.rc(row, buttonColumn));

@@ -318,7 +318,7 @@ public class AIPlayer extends AIObject {
                     player.modifyGold(price);
                     try {
                         Element trainUnitInEuropeElement = Message.createNewRootElement("trainUnitInEurope");
-                        trainUnitInEuropeElement.setAttribute("unitType", unitToTrain.getId());
+                        trainUnitInEuropeElement.setAttribute("unitType", Integer.toString(unitToTrain.getIndex()));
                         Element reply = getConnection().ask(trainUnitInEuropeElement);
                         unit = (Unit) getGame().getFreeColGameObject(
                                 ((Element) reply.getChildNodes().item(0)).getAttribute("ID"));
@@ -367,7 +367,7 @@ public class AIPlayer extends AIObject {
                 }
                 player.modifyGold(europe.getUnitPrice(unitToPurchase));
                 Element trainUnitInEuropeElement = Message.createNewRootElement("trainUnitInEurope");
-                trainUnitInEuropeElement.setAttribute("unitType", unitToPurchase.getId());
+                trainUnitInEuropeElement.setAttribute("unitType", Integer.toString(unitToPurchase.getIndex()));
                 try {
                     getConnection().ask(trainUnitInEuropeElement);
                 } catch (IOException e) {

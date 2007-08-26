@@ -1895,7 +1895,7 @@ break;
                     out.writeAttribute("kind", Integer.toString(is.getKind()));
                     out.writeAttribute("isCapital", Boolean.toString(is.isCapital()));
                     if (pet.getSkill() != null) {
-                        out.writeAttribute("learnableSkill", pet.getSkill().getId());
+                        out.writeAttribute("learnableSkill", Integer.toString(pet.getSkill().getIndex()));
                     }
                     if (pet.getHighlyWantedGoods() != null) {
                         out.writeAttribute("highlyWantedGoods", pet.getHighlyWantedGoods().getName());

@@ -100,7 +100,7 @@ public class ClientModelController implements ModelController {
         createUnitElement.setAttribute("taskID", taskID);
         createUnitElement.setAttribute("location", location.getID());
         createUnitElement.setAttribute("owner", owner.getID());
-        createUnitElement.setAttribute("type", type.getId());
+        createUnitElement.setAttribute("type", Integer.toString(type.getIndex()));
 
         logger.info("Waiting for the server to reply...");
         Element reply = client.ask(createUnitElement);

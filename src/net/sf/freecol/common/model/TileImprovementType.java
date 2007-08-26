@@ -56,6 +56,10 @@ public final class TileImprovementType
     public int getIndex() {
         return index;
     }
+    
+    public String getId() {
+        return id;
+    }
 
     public String getName() {
         return name;

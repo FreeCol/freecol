@@ -178,6 +178,10 @@ public final class UnitType implements Abilities {
         this.name = newName;
     }
 
+    public String getDescription() {
+        return name + ".description";
+    }
+
     /**
      * Get the <code>Offence</code> value.
      *
@@ -482,7 +486,7 @@ public final class UnitType implements Abilities {
      * @return <code>true</code> if can learn the given UnitType
      */
     public boolean canBeTaught(UnitType unitType) {
-        Upgrade upgrade = upgrades.get(unitType.getId());
+        Upgrade upgrade = upgrades.get(unitType.getName());
         return upgrade != null && upgrade.canBeTaught();
     }
 
@@ -493,7 +497,7 @@ public final class UnitType implements Abilities {
      * @return <code>true</code> if can learn the given UnitType
      */
     public boolean canLearnFromExperience(UnitType unitType) {
-        Upgrade upgrade = upgrades.get(unitType.getId());
+        Upgrade upgrade = upgrades.get(unitType.getName());
         return upgrade != null && upgrade.learnFromExperience;
     }
 
@@ -504,7 +508,7 @@ public final class UnitType implements Abilities {
      * @return <code>true</code> if can learn the given UnitType
      */
     public boolean canLearnFromNatives(UnitType unitType) {
-        Upgrade upgrade = upgrades.get(unitType.getId());
+        Upgrade upgrade = upgrades.get(unitType.getName());
         return upgrade != null && upgrade.learnFromNatives;
     }
 
@@ -515,7 +519,7 @@ public final class UnitType implements Abilities {
      * @return <code>true</code> if can learn the given UnitType
      */
     public boolean canLearnInLostCity(UnitType unitType) {
-        Upgrade upgrade = upgrades.get(unitType.getId());
+        Upgrade upgrade = upgrades.get(unitType.getName());
         return upgrade != null && upgrade.learnInLostCity;
     }
 
@@ -565,7 +569,7 @@ public final class UnitType implements Abilities {
      * @return a <code>int</code> value
      */
     public int getEducationTurns(UnitType unitType) {
-        Upgrade upgrade = upgrades.get(unitType.getId());
+        Upgrade upgrade = upgrades.get(unitType.getName());
         if (upgrade != null) {
             return upgrade.turnsToLearn;
         } else {
@@ -574,8 +578,9 @@ public final class UnitType implements Abilities {
     }
 
     public void readFromXmlElement(Node xml, final Map<String, GoodsType> goodsTypeByRef) {
-        id = Xml.attribute(xml, "name");
         name = Xml.attribute(xml, "name");
+        String[] buffer = name.split("\\.");
+        id = buffer[buffer.length - 1];
         offence = Xml.intAttribute(xml, "offence");
         defence = Xml.intAttribute(xml, "defence");
         movement = Xml.intAttribute(xml, "movement");

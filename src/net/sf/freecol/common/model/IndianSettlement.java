@@ -1286,7 +1286,7 @@ public class IndianSettlement extends Settlement {
             out.writeAttribute("hasBeenVisited", Boolean.toString(isVisited));
             out.writeAttribute("convertProgress", Integer.toString(convertProgress));
             if (learnableSkill != null) {
-                out.writeAttribute("learnableSkill", learnableSkill.getId());
+                out.writeAttribute("learnableSkill", Integer.toString(learnableSkill.getIndex()));
             }
             for (int i = 0; i < wantedGoods.length; i++) {
                 String tag = "wantedGoods" + Integer.toString(i);
@@ -1370,8 +1370,10 @@ public class IndianSettlement extends Settlement {
         isVisited = getAttribute(in, "hasBeenVisisted", false);
         convertProgress = getAttribute(in, "convertProgress", UNKNOWN);
         lastTribute = getAttribute(in, "lastTribute", 0);
-        String learnableSkillId = getAttribute(in, "learnableSkill", null);
-        learnableSkill = FreeCol.getSpecification().getUnitType(learnableSkillId);
+        String learnableSkillStr = getAttribute(in, "learnableSkill", null);
+        if (learnableSkillStr != null) {
+            learnableSkill = FreeCol.getSpecification().getUnitType(Integer.parseInt(learnableSkillStr));
+        }
 
         alarm = new Tension[Player.NUMBER_OF_NATIONS];
         while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {

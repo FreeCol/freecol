@@ -104,7 +104,7 @@ public final class TrainDialog extends FreeColDialog implements ActionListener {
             int graphicsType = ImageLibrary.getUnitGraphicsType(unitType.getIndex(), false, false, 0, false);
             JButton newButton = new JButton(Unit.getName(unitType), 
                                             library.getScaledUnitImageIcon(graphicsType, 0.66f));
-            newButton.setActionCommand(unitType.getId());
+            newButton.setActionCommand(unitType.getName());
             newButton.addActionListener(this);
             newButton.setIconTextGap(margin);
             enterPressesWhenFocused(newButton);
