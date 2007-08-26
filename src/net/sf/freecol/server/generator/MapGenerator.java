@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Random;
 import java.util.Vector;
 import java.util.logging.Logger;
@@ -15,6 +16,7 @@ import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
+import net.sf.freecol.FreeCol;
 import net.sf.freecol.common.FreeColException;
 import net.sf.freecol.common.model.Building;
 import net.sf.freecol.common.model.Colony;
@@ -22,11 +24,15 @@ import net.sf.freecol.common.model.ColonyTile;
 import net.sf.freecol.common.model.FreeColGameObject;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Goods;
+import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.IndianSettlement;
 import net.sf.freecol.common.model.Map;
 import net.sf.freecol.common.model.Player;
+import net.sf.freecol.common.model.ResourceType;
 import net.sf.freecol.common.model.Tile;
+import net.sf.freecol.common.model.TileType;
 import net.sf.freecol.common.model.Unit;
+import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.model.Map.Position;
 import net.sf.freecol.common.networking.Message;
 import net.sf.freecol.server.FreeColServer;
@@ -386,112 +392,60 @@ public class MapGenerator {
     * @param tile The tile where the settlement will be located.
     * @return A skill that can be taught to Europeans.
     */
-    private int generateSkillForLocation(Map map, Tile tile) {
+    private UnitType generateSkillForLocation(Map map, Tile tile) {
         int rand = random.nextInt(2);
-        int[] potentials = new int[Goods.HORSES];
+        List<GoodsType> farmedList = FreeCol.getSpecification().getFarmedGoodsTypeList();
+        int[] potentials = new int[farmedList.size()];
+        int[] bonuses = new int[farmedList.size()];
+        int bonusMultiplier = 3;
 
         Iterator<Position> iter = map.getAdjacentIterator(tile.getPosition());
         while (iter.hasNext()) {
             Map.Position p = iter.next();
             Tile t = map.getTile(p);
-
-            if (t.hasBonus()) {
-                if (t.getAddition() == Tile.ADD_HILLS) {
-                    return IndianSettlement.EXPERT_ORE_MINER;
-                } else if (t.getAddition() == Tile.ADD_MOUNTAINS) {
-                    return IndianSettlement.EXPERT_SILVER_MINER;
-                } else if (t.isForested()) {
-                    switch (t.getType()) {
-                    case Tile.PLAINS:
-                    case Tile.PRAIRIE:
-                    case Tile.TUNDRA:
-                        return IndianSettlement.EXPERT_FUR_TRAPPER;
-                    case Tile.GRASSLANDS:
-                    case Tile.SAVANNAH:
-                        return IndianSettlement.EXPERT_LUMBER_JACK;
-                    case Tile.MARSH:
-                        return (rand==0 ? IndianSettlement.EXPERT_SILVER_MINER : IndianSettlement.EXPERT_ORE_MINER);
-                    case Tile.SWAMP:
-                        return (rand==0 ? IndianSettlement.EXPERT_SILVER_MINER : IndianSettlement.EXPERT_ORE_MINER);
-                    case Tile.DESERT:
-                        return (rand==0 ? IndianSettlement.EXPERT_LUMBER_JACK : IndianSettlement.EXPERT_FARMER);
-                    default:
-                        throw new IllegalArgumentException("Invalid tile provided: Tile type is invalid");
-                    }
-                } else {
-                    switch (t.getType()) {
-                    case Tile.PLAINS:
-                        return IndianSettlement.MASTER_COTTON_PLANTER;
-                    case Tile.GRASSLANDS:
-                        return IndianSettlement.MASTER_TOBACCO_PLANTER;
-                    case Tile.PRAIRIE:
-                        return IndianSettlement.MASTER_COTTON_PLANTER;
-                    case Tile.SAVANNAH:
-                        return IndianSettlement.MASTER_SUGAR_PLANTER;
-                    case Tile.MARSH:
-                        return IndianSettlement.EXPERT_ORE_MINER;
-                    case Tile.SWAMP:
-                        if (rand == 0) {
-                            return IndianSettlement.MASTER_TOBACCO_PLANTER;
-                        } else {
-                            return IndianSettlement.MASTER_SUGAR_PLANTER;
-                        }
-                    case Tile.DESERT:
-                        return IndianSettlement.SEASONED_SCOUT;
-                    case Tile.TUNDRA:
-                        if (rand == 0) {
-                            return IndianSettlement.EXPERT_SILVER_MINER;
-                        } else {
-                            return IndianSettlement.EXPERT_ORE_MINER;
-                        }
-                    case Tile.ARCTIC:
-                        continue;
-                    case Tile.OCEAN:
-                    case Tile.HIGH_SEAS:
-                        return IndianSettlement.EXPERT_FISHERMAN;
-                    default:
-                        throw new IllegalArgumentException("Invalid tile provided: Tile type is invalid");
+            // If it has a resource, take the resource, and ignore the other things produced there
+            if (t.hasResource()) {
+                ResourceType r = t.getTileItemContainer().getResource().getType();
+                for (GoodsType g : r.getBonusTypeList) {
+                    int index = farmedList.indexOf(g);
+                    if (index >= 0) {
+                        potentials[index]++;
+                        bonuses[index]++;
                     }
                 }
             } else {
-                for (int goodsType = Goods.FOOD; goodsType < Goods.HORSES; goodsType++) {
-                    potentials[goodsType] += t.potential(goodsType);
+                TileType t = t.getType();
+                for (GoodsType g : t.getPotentialTypeList()) {
+                    int index = farmedList.indexOf(g);
+                    if (index >= 0) {
+                        potentials[index]++;
+                    }
                 }
             }
         }
 
         int counter = 0;
-        for (int goodsType = Goods.FOOD; goodsType < Goods.HORSES; goodsType++) {
-            counter += potentials[goodsType];
-            potentials[goodsType] = counter;
+        for (int index = 0; index < farmedList.size(); index++) {
+            if (bonuses[index] > 0) {
+                potentials[index] *= bonuses[index] * bonusMultiplier;
+            }
+            counter += potentials[index];
+            potentials[index] = counter;
         }
         int newRand = random.nextInt(counter);
-        for (int goodsType = Goods.FOOD; goodsType < Goods.HORSES; goodsType++) {
-            if (newRand < potentials[goodsType]) {
-                switch (goodsType) {
-                case Goods.FOOD:
-                    return IndianSettlement.EXPERT_FARMER;
-                case Goods.SUGAR:
-                    return IndianSettlement.MASTER_SUGAR_PLANTER;
-                case Goods.TOBACCO:
-                    return IndianSettlement.MASTER_TOBACCO_PLANTER;
-                case Goods.COTTON:
-                    return IndianSettlement.MASTER_COTTON_PLANTER;
-                case Goods.FURS:
-                    return IndianSettlement.EXPERT_FUR_TRAPPER;
-                case Goods.LUMBER:
-                    return IndianSettlement.EXPERT_LUMBER_JACK;
-                case Goods.ORE:
-                    return IndianSettlement.EXPERT_ORE_MINER;
-                case Goods.SILVER:
-                    return IndianSettlement.EXPERT_SILVER_MINER;
-                default:
-                    return IndianSettlement.SEASONED_SCOUT;
+        for (int index = 0; index < farmedList.size(); index++) {
+            if (newRand < potentials[index]) {
+                UnitType expert = FreeCol.getSpecification().getExpertForProducing(farmedList.get(index));
+                if (expert == null) {
+                    // Seasoned Scout
+                    List<UnitType> unitList = FreeCol.getSpecification().getUnitTypesWithAbility("model.ability.expertScout");
+                    expert = unitList.get(random.nextInt(unitList.size()));
                 }
+                return expert;
             }
-
         }
-        return IndianSettlement.SEASONED_SCOUT;   
+        List<UnitType> unitList = FreeCol.getSpecification().getUnitTypesWithAbility("model.ability.expertScout");
+        return unitList.get(random.nextInt(unitList.size()));
     }
 
     /**
@@ -545,7 +499,7 @@ public class MapGenerator {
             @SuppressWarnings("unused") Unit unit3 = new Unit(map.getGame(), unit1, player, soldierUnitType, Unit.SENTRY, true, false, 0, false);
 
             // START DEBUG:
-            if (net.sf.freecol.FreeCol.isInDebugMode()) {
+            if (FreeCol.isInDebugMode()) {
                 Unit unit4 = new Unit(map.getGame(), startTile, player, Unit.GALLEON, Unit.ACTIVE);
                 @SuppressWarnings("unused") Unit unit5 = new Unit(map.getGame(), unit4, player, Unit.FREE_COLONIST, Unit.SENTRY);
                 @SuppressWarnings("unused") Unit unit6 = new Unit(map.getGame(), unit4, player, Unit.VETERAN_SOLDIER, Unit.SENTRY);
@@ -562,20 +516,24 @@ public class MapGenerator {
                 }
 
                 if (colonyTile != null) {
-                    colonyTile.setType(Tile.PRAIRIE);
-                    colonyTile.setForested(false);
-                    colonyTile.setPlowed(true);
-                    colonyTile.setAddition(Tile.ADD_NONE);
+                    for (TileType t : FreeCol.getSpecification().getTileTypeList()) {
+                        if (!t.isWater) {
+                            colonyTile.setType(t);
+                            break;
+                        }
+                    }
 
                     Unit buildColonyUnit = new Unit(map.getGame(), colonyTile, player, Unit.EXPERT_FARMER, Unit.ACTIVE);
                     Colony colony = new Colony(map.getGame(), player, "Colony for Testing", colonyTile);
                     buildColonyUnit.buildColony(colony);
                     if (buildColonyUnit.getLocation() instanceof ColonyTile) {
                         Tile ct = ((ColonyTile) buildColonyUnit.getLocation()).getWorkTile();
-                        ct.setType(Tile.PLAINS);
-                        ct.setForested(false);
-                        ct.setPlowed(true);
-                        ct.setAddition(Tile.ADD_NONE);
+                        for (TileType t : FreeCol.getSpecification().getTileTypeList()) {
+                            if (!t.isWater) {
+                                ct.setType(t);
+                                break;
+                            }
+                        }
                     }
                     colony.getBuilding(Building.SCHOOLHOUSE).setLevel(Building.SHOP);
 
@@ -588,10 +546,12 @@ public class MapGenerator {
                     Unit lumberjack = new Unit(map.getGame(), colony, player, Unit.EXPERT_LUMBER_JACK, Unit.ACTIVE);
                     if (lumberjack.getLocation() instanceof ColonyTile) {
                         Tile lt = ((ColonyTile) lumberjack.getLocation()).getWorkTile();
-                        lt.setType(Tile.PLAINS);
-                        lt.setForested(true);
-                        lt.setRoad(true);
-                        lt.setAddition(Tile.ADD_NONE);
+                        for (TileType t : FreeCol.getSpecification().getTileTypeList()) {
+                            if (t.isForest) {
+                                lt.setType(t);
+                                break;
+                            }
+                        }
                         lumberjack.setWorkType(Goods.LUMBER);
                     }
 

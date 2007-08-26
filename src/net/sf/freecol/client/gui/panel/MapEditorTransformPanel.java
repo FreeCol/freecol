@@ -15,11 +15,15 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
+import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.control.MapEditorController;
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.ImageLibrary;
+import net.sf.freecol.common.model.Resource;
+import net.sf.freecol.common.model.ResourceType;
 import net.sf.freecol.common.model.Tile;
+import net.sf.freecol.common.model.TileType;
 
 /**
  * A panel for choosing the current <code>MapTransform</code>.
@@ -45,7 +49,7 @@ public final class MapEditorTransformPanel extends FreeColPanel {
 
     private static final int MINOR_RIVER = -1,
             MAJOR_RIVER = -2,
-            BONUS = -3,
+            RESOURCE = -3,
             LOST_CITY_RUMOUR = -4;
     
     private final FreeColClient freeColClient;
@@ -84,46 +88,36 @@ public final class MapEditorTransformPanel extends FreeColPanel {
      * Builds the buttons for all the terrains.
      */
     private void buildList() {
-        buildButton(Tile.OCEAN, false, Tile.getName(Tile.OCEAN, false, Tile.ADD_NONE), new TileTypeTransform(Tile.OCEAN));
-        buildButton(Tile.HIGH_SEAS, false, Tile.getName(Tile.HIGH_SEAS, false, Tile.ADD_NONE), new TileTypeTransform(Tile.HIGH_SEAS));
-        for (int type = 1; type < Tile.ARCTIC; type++) {
-            buildButton(type, false, Tile.getName(type, false, Tile.ADD_NONE), new TileTypeTransform(type));
+        List<TileType> tileList = FreeCol.getSpecification().getTileTypeList();
+        for (TileType type : tileList) {
+            buildButton(type.index, Tile.getName(type), new TileTypeTransform(type));
         }
-        buildButton(Tile.ARCTIC, false, Tile.getName(Tile.ARCTIC, false, Tile.ADD_NONE), new TileTypeTransform(Tile.ARCTIC));
-        buildButton(Tile.PLAINS, true, Tile.getName(Tile.PLAINS, true, Tile.ADD_NONE), new ForestTransform());
-        buildButton(ImageLibrary.HILLS, false, Tile.getName(Tile.PLAINS, false, Tile.ADD_HILLS), new AdditionTransform(Tile.ADD_HILLS));
-        buildButton(ImageLibrary.MOUNTAINS, false, Tile.getName(Tile.PLAINS, false, Tile.ADD_MOUNTAINS), new AdditionTransform(Tile.ADD_MOUNTAINS));
-        buildButton(MINOR_RIVER, false, "Minor River", new AdditionTransform(Tile.ADD_RIVER_MINOR));
-        buildButton(MAJOR_RIVER, false, "Major River", new AdditionTransform(Tile.ADD_RIVER_MAJOR));
-        buildButton(BONUS, false, "Bonus", new BonusTransform());
-        buildButton(LOST_CITY_RUMOUR, false, "Lost City Rumour", new LostCityRumourTransform());
+        buildButton(MINOR_RIVER, "Minor River", new RiverTransform(MINOR_RIVER));
+        buildButton(MAJOR_RIVER, "Major River", new RiverTransform(MAJOR_RIVER));
+        buildButton(RESOURCE, "Change/Remove Resource", new ResourceTransform());
+        buildButton(LOST_CITY_RUMOUR, "Lost City Rumour", new LostCityRumourTransform());
     }
 
     /**
      * Builds the button for the given terrain.
      * 
-     * @param terrain the type of terrain
-     * @param forested whether it is forested
+     * @param index the index of terrain or one of {MINOR_RIVER, MAJOR_RIVER, BONUS, LOST_CITY_RUMOUR}
      */
-    private void buildButton(int terrain, boolean forested, String text, final MapTransform mt) {
+    private void buildButton(int index, String text, final MapTransform mt) {
         Image scaledImage;
         Image image;
-        if (terrain == MINOR_RIVER) {
+        if (index == MINOR_RIVER) {
             image = library.getRiverImage(10);
-            scaledImage = image.getScaledInstance((int) (image.getWidth(null) * 0.5f), (int) (image.getHeight(null) * 0.5f), Image.SCALE_SMOOTH);
-        } else if (terrain == MAJOR_RIVER) {
+        } else if (index == MAJOR_RIVER) {
             image = library.getRiverImage(10);
-            scaledImage = image.getScaledInstance((int) (image.getWidth(null) * 0.5f), (int) (image.getHeight(null) * 0.5f), Image.SCALE_SMOOTH);
-        } else if (terrain == BONUS) {
+        } else if (index == RESOURCE) {
             image = library.getGoodsImage(2);
-            scaledImage = image.getScaledInstance((int) (image.getWidth(null) * 0.9f), (int) (image.getHeight(null) * 0.9f), Image.SCALE_SMOOTH);
-        } else if (terrain == LOST_CITY_RUMOUR) {
+        } else if (index == LOST_CITY_RUMOUR) {
             image = library.getMiscImage(ImageLibrary.LOST_CITY_RUMOUR);
-            scaledImage = image.getScaledInstance((int) (image.getWidth(null) * 0.5f), (int) (image.getHeight(null) * 0.5f), Image.SCALE_SMOOTH);
         } else {
-            image = library.getScaledTerrainImage(terrain, forested, 1.0f);
-            scaledImage = library.getScaledTerrainImage(terrain, forested, 0.5f);
+            image = library.getScaledTerrainImage(FreeCol.getSpecification().getTileType(index), 1.0f);
         }
+        scaledImage = image.getScaledInstance((int) (image.getWidth(null) * 0.5f), (int) (image.getHeight(null) * 0.5f), Image.SCALE_SMOOTH);
         
         JPanel descriptionPanel = new JPanel(new BorderLayout());
         descriptionPanel.add(new JLabel(new ImageIcon(image)), BorderLayout.CENTER);
@@ -193,27 +187,24 @@ public final class MapEditorTransformPanel extends FreeColPanel {
     }
     
     private class TileTypeTransform extends MapTransform {
-        private int tileType;
+        private TileType tileType;
         
-        private TileTypeTransform(int tileType) {
+        private TileTypeTransform(TileType tileType) {
             this.tileType = tileType;    
         }
         
         public void transform(Tile t) {
             t.setType(tileType);     
-            t.setForested(false);
-            t.setAddition(Tile.ADD_NONE);
             t.setLostCityRumour(false);
-            t.setBonus(false);
         }
     }
-    
+/*  Depreciated    
     private class ForestTransform extends MapTransform {
         public void transform(Tile t) {
             t.setForested(true);            
         }
     }
-    
+
     private class AdditionTransform extends MapTransform {
         private int addition;
         
@@ -230,10 +221,44 @@ public final class MapEditorTransformPanel extends FreeColPanel {
             }
         }
     }
+*/
     
-    private class BonusTransform extends MapTransform {
+    private class RiverTransform extends MapTransform {
+        private int magnitude;
+        
+        private RiverTransform(int magnitude) {
+            this.magnitude = magnitude;
+        }
+        
         public void transform(Tile t) {
-            t.setBonus(true);           
+            t.addRiver(magnitude);
+        }
+    }
+
+    /**
+     * Adds, Removes or Cycles through the available resources for this Tile
+     * Cycles through the ResourceTypeList and picks the next valid, or removes if end of list
+     */
+    private class ResourceTransform extends MapTransform {
+        public void transform(Tile t) {
+            TileType tileType = t.getType();
+            List<ResourceType> resList = tileType.getResourceTypeList();
+            // Check if there is a resource already
+            if (t.hasResource()) {
+                // Get the index for this Resource in the resList
+                int index = resList.indexOf(t.getTileItemContainer().getResource().getType());
+                ResourceType resType = null;
+                if (++index < resList.size()) {
+                    // Valid resource after this one, otherwise remain null
+                    resType = resList.get(index);
+                }
+                t.setResource(resType);
+            } else {
+                if (resList.size() > 0) {
+                    // Take first valid in ResourceList
+                    t.setResource(resList.get(0));
+                }
+            }
         }
     }
     

@@ -134,6 +134,13 @@ public class Resource extends TileItem {
     }
 
     /**
+     * Returns the current quantity.
+     */
+    public void setQuantity(int newQuantity) {
+        quantity = newQuantity;
+    }
+
+    /**
      * Returns the best GoodsType
      */
     public GoodsType getBestGoodsType() {

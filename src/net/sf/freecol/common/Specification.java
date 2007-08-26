@@ -207,6 +207,10 @@ public final class Specification {
         return buildingTypeList.get(buildingTypeIndex);
     }
 
+    public BuildingType getBuildingType(int buildingTypeIndex) {
+        return buildingTypeList.get(buildingTypeIndex);
+    }
+
     public int getBuildingIndex(BuildingType b) {
         return buildingTypeList.indexOf(b);
     }
@@ -273,6 +277,10 @@ public final class Specification {
     // -- Resources --
     public List<ResourceType> getResourceTypeList() {
         return resourceTypeList;
+    }
+
+    public int numberOfResourceTypes() {
+        return resourceTypeList.size();
     }
 
     public ResourceType getResourceType(int index) {
@@ -343,6 +351,10 @@ public final class Specification {
 
     public int getUnitIndex(UnitType b) {
         return unitTypeList.indexOf(b);
+    }
+
+    public UnitType getUnitType(int unitTypeIndex) {
+        return unitTypeList.get(unitTypeIndex);
     }
 
     public UnitType getUnitType(String name) {

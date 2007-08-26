@@ -302,15 +302,29 @@ public class TileItemContainer extends FreeColGameObject {
             return null;
         }
     }
-    
+
+    public void copyFrom(TileItemContainer tic, boolean importBonuses) {
+        clear();
+        if (tic.hasResource() && importBonuses) {
+            Resource ticR = tic.getResource();
+            Resource r = new Resource(getGame(), tile, ticR.getType());
+            r.setQuantity(ticR.getQuantity());
+            addTileItem(r);
+        }
+        for (TileImprovement ti : tic.getImprovements()) {
+            TileImprovement newTI = new TileImprovement(getGame(), tile, ti.getType());
+            newTI.setMagnitude(ti.getMagnitude());
+            newTI.setStyle(ti.getStyle());
+            newTI.setTurnsToComplete(ti.getTurnsToComplete());
+            addTileItem(r);
+        }
+    }
+
     /**
      * Removes all TileItems.
      */
     public void removeAll() {
-        resource = null;
-        road = null;
-        river = null;
-        improvements.clear();
+        clear();
     }
 
     /**
@@ -347,6 +361,7 @@ public class TileItemContainer extends FreeColGameObject {
      * Removes all references to this object.
      */
     public void dispose() {
+        clear();
         super.dispose();
     }
 

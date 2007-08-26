@@ -6,9 +6,13 @@ import java.util.Random;
 import java.util.Vector;
 import java.util.logging.Logger;
 
+import net.sf.freecol.FreeCol;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Map;
+import net.sf.freecol.common.model.Resource;
+import net.sf.freecol.common.model.ResourceType;
 import net.sf.freecol.common.model.Tile;
+import net.sf.freecol.common.model.TileType;
 import net.sf.freecol.common.model.Map.Position;
 
 /**
@@ -20,7 +24,7 @@ public class TerrainGenerator {
     private final MapGeneratorOptions mapGeneratorOptions;
     private final Random random = new Random();
 
-
+    public List<TileType>[] latTileTypes = new List<TileType>[4];
     /**
      * Creates a new <code>TerrainGenerator</code>.
      * 
@@ -80,13 +84,10 @@ public class TerrainGenerator {
                     Tile importTile = importGame.getMap().getTile(i, j);
                     if (importLandMap || importTile.isLand() == landMap[i][j]) {
                         t = new Tile(game, importTile.getType(), i, j);
-                        t.setForested(importTile.isForested());
-                        t.addRiver(importTile.getAddition(), importTile.getRiver());
-                        t.setAddition(importTile.getAddition());
-
-                        if (importBonuses) {
-                            t.setBonus(importTile.hasBonus());
-                        } else {
+                        // TileItemContainer copies everything including Resource unless importBonuses == false
+                        t.getTileItemContainer.copyFrom(importTile.getTileItemContainer(), importBonuses);
+                        if (!importBonuses) {
+                            // In which case, we may add a Bonus Resource
                             perhapsAddBonus(t, landMap);
                         }
                     } else {
@@ -116,8 +117,11 @@ public class TerrainGenerator {
         
         Tile t;
         if (landMap[i][j]) {
-            t = new Tile(game, getRandomTileType(((Math.min(j, height - j) * 200) / height)), i, j);
-
+            t = new Tile(game, 
+                          getRandomTileType( ((Math.min(j, height - j) * 200) / height),
+                                            getMapGeneratorOptions().getPercentageOfForests() ),
+                          i, j);
+/*
             if ((t.getType() != Tile.ARCTIC) && 
                 (random.nextInt(100) < getMapGeneratorOptions().getPercentageOfForests())) {
                 t.setForested(true);
@@ -129,6 +133,7 @@ public class TerrainGenerator {
                     t.setAddition(Tile.ADD_HILLS);
                 }
             }
+*/
         } else {
             t = new Tile(game, Tile.OCEAN, i, j);
         }
@@ -147,7 +152,8 @@ public class TerrainGenerator {
     private void perhapsAddBonus(Tile t, boolean[][] landMap) {
         if (t.isLand()) {
             if (random.nextInt(100) < getMapGeneratorOptions().getPercentageOfBonusTiles()) {
-                t.setBonus(true);
+                // Create random Bonus Resource
+                t.setResource(t.getType().getRandomResourceType());
             }
         } else {
             int adjacentLand = 0;
@@ -160,7 +166,7 @@ public class TerrainGenerator {
             }
 
             if (adjacentLand > 1 && random.nextInt(10 - adjacentLand) == 0) {
-                t.setBonus(true);
+                t.setResource(t.getType().getRandomResourceType());
             }
         }
     }
@@ -175,12 +181,110 @@ public class TerrainGenerator {
     }
 
     /**
-     * Gets a random tile type based on the given percentage.
+     * Gets a random land tile type based on the given percentage.
      *
      * @param percent The location of the tile, where 100% is the center on
      *        the y-axis and 0% is on the top/bottom of the map.
+     * @param forestChance The percentage chance of forests in this area
      */
-    private int getRandomTileType(int percent) {
+    private int getRandomLandTileType(int percent, int forestChance) {
+        // latRanges correspond to 0,1,2,3 from TileType.latitude (100-0)
+        int[] latRanges = { 75, 50, 25, 0 };
+        // altRanges correspond to 1,2,3 from TileType.altitude (1-10)
+        int[] altRanges = { 6, 8, 10};
+        int lat = 3;
+        for (int i = 0; i <= 3; i++) {
+            if (latRanges[i] < percent) {
+                lat = i;
+                break;
+            }
+        }
+        // Fill the list of latitude TileTypes the first time you use it
+        if (latTileTypes[lat].size() == 0) {
+            for (TileType tileType : FreeCol.getSpecification().getTileTypeList()) {
+                if (!tileType.isWater && tileType.withinRange(TileType.LATITUDE, lat)) {
+                    // Within range, add it
+                    latTileTypes[lat].add(tileType);
+                }
+            }
+            if (latTileTypes[lat].size() == 0) {
+                // If it is still 0 after adding all relevant types, throw error
+                throw new RuntimeException("No TileType within latitude == " + lat);
+            }
+        }
+        // Scope the type of tiles to be used and choose one
+        TileType chosen = null;
+        List<TileType> acceptable = latTileTypes[lat].clone();
+        // Choose based on altitude
+        int altitude = random.nextInt(10);
+        for (int i = 0; i < 3; i++) {
+            if (altRanges[i] > altitude) {
+                altitude = i;
+                break;
+            }
+        }
+        Iterator<TileType> it = acceptable.iterator();
+        while (it.hasNext()) {
+            TileType t = it.next();
+            if (t.withinRange(TileType.ALTITUDE, altitude)) {
+                if (acceptable.size() == 1) {
+                    chosen = t;
+                    break;
+                }
+                acceptable.remove(t);
+            }
+        }
+        // Choose based on forested/unforested
+        if (chosen == null) {
+            boolean forested = random.nextInt(100) < forestChance;
+            Iterator<TileType> it = acceptable.iterator();
+            while (it.hasNext()) {
+                TileType t = it.next();
+                if (t.isForested != forested) {
+                    if (acceptable.size() == 1) {
+                        chosen = t;
+                        break;
+                    }
+                    acceptable.remove(t);
+                }
+            }
+        }
+        // Choose based on humidity - later use MapGeneratorOptions to help define these
+        if (chosen == null) {
+            int humidity = random.nextInt(7) - 3;   // To get -3 to 3, 0 inclusive
+            Iterator<TileType> it = acceptable.iterator();
+            while (it.hasNext()) {
+                TileType t = it.next();
+                if (!t.withinRange(TileType.HUMIDITY, humidity)) {
+                    if (acceptable.size() == 1) {
+                        chosen = t;
+                        break;
+                    }
+                    acceptable.remove(t);
+                }
+            }
+        }
+        // Choose based on temperature - later use MapGeneratorOptions to help define these
+        if (chosen == null) {
+            int temperature = random.nextInt(7) - 3;   // To get -3 to 3, 0 inclusive
+            Iterator<TileType> it = acceptable.iterator();
+            while (it.hasNext()) {
+                TileType t = it.next();
+                if (!t.withinRange(TileType.TEMPERATURE, temperature)) {
+                    if (acceptable.size() == 1) {
+                        chosen = t;
+                        break;
+                    }
+                    acceptable.remove(t);
+                }
+            }
+        }
+        // All scoped, if none have been selected by elimination, randomly choose one
+        if (chosen == null) {
+            chosen = acceptable.get(random.nextInt(acceptable.size()));
+        }
+        return chosen;
+/*
         int thisValue = Math.max(((percent - random.nextInt(20) - 1)) / 10, 0);
 
         int minWoD = 0;
@@ -205,6 +309,7 @@ public class TerrainGenerator {
             case 2: return Tile.SWAMP;
         }
         }
+*/
     }
 
     /**
@@ -234,9 +339,32 @@ public class TerrainGenerator {
     public static void determineHighSeas(Map map,
             int distToLandFromHighSeas,
             int maxDistanceToEdge) {
+        TileType ocean = null, highSeas = null;
+        for (TileType t : FreeCol.getSpecification().getTileTypeList()) {
+            if (t.isWater()) {
+                if (t.canSailToEurope()) {
+                    if (highSeas == null) {
+                        highSeas = t;
+                        if (ocean != null) {
+                            break;
+                        }
+                    }
+                } else {
+                    if (ocean == null) {
+                        ocean = t;
+                        if (highSeas != null) {
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+        if (highSeas == null || ocean == null) {
+            throw new RuntimeException("Both Ocean and HighSeas TileTypes must be defined");
+        }
         for (Tile t : map.getAllTiles()) {
-            if (t.getType() == Tile.HIGH_SEAS) {
-                t.setType(Tile.OCEAN);
+            if (t.getType() == highSeas) {
+                t.setType(ocean);
             }
         }
         createHighSeas(map, distToLandFromHighSeas, maxDistanceToEdge);
@@ -259,17 +387,30 @@ public class TerrainGenerator {
                 || maxDistanceToEdge < 0) {
             throw new IllegalArgumentException("The integer arguments cannot be negative.");
         }
-        
+
+        TileType highSeas = null;
+        for (TileType t : FreeCol.getSpecification().getTileTypeList()) {
+            if (t.isWater()) {
+                if (t.canSailToEurope()) {
+                    highSeas = t;
+                    break;
+                }
+            }
+        }
+        if (highSeas == null) {
+            throw new RuntimeException("HighSeas TileType is defined by the 'sail-to-europe' attribute");
+        }
+
         for (int y = 0; y < map.getHeight(); y++) {
             for (int x=0; x<maxDistanceToEdge && !map.isLandWithinDistance(x, y, distToLandFromHighSeas); x++) {
                 if (map.isValid(x, y)) {
-                    map.getTile(x, y).setType(Tile.HIGH_SEAS);
+                    map.getTile(x, y).setType(highSeas);
                 }
             }
 
             for (int x=1; x<=maxDistanceToEdge && !map.isLandWithinDistance(map.getWidth()-x, y, distToLandFromHighSeas); x++) {
                 if (map.isValid(map.getWidth()-x, y)) {
-                    map.getTile(map.getWidth()-x, y).setType(Tile.HIGH_SEAS);
+                    map.getTile(map.getWidth()-x, y).setType(highSeas);
                 }
             }
         }
@@ -288,6 +429,22 @@ public class TerrainGenerator {
         logger.info("Number of land tiles is " + getMapGeneratorOptions().getLand() +
                     ", number of mountain tiles is " + number);
         logger.fine("Maximum length of mountain ranges is " + maximumLength);
+        TileType hills = null, mountains = null;
+        // To identify hills and mountains look for their overlay imagetype (14 and 15 respectively)
+        for (TileType t : FreeCol.getSpecification().getTileTypeList()) {
+            if (t.artOverlay == 14 && hills == null) {
+                hills = t;
+                if (mountains != null)
+                    break;
+            } else if (t.artOverlay == 15 && mountains == null) {
+                mountains = t;
+                if (hills != null)
+                    break;
+            }
+        }
+        if (hills == null || mountains == null) {
+            throw new RuntimeException("Both Hills and Mountains TileTypes must be defined");
+        }
         for (int tries = 0; tries < 100; tries++) {
             if (counter < number) {
                 Position p = map.getRandomLandPosition();
@@ -301,19 +458,19 @@ public class TerrainGenerator {
                         p = Map.getAdjacent(p, direction);
                         Tile t = map.getTile(p);
                         if (t != null && t.isLand()) {
-                            t.setAddition(Tile.ADD_MOUNTAINS);
+                            t.setType(mountains);
                             counter++;
                             Iterator<Position> it = map.getCircleIterator(p, false, 1);
                             while (it.hasNext()) {
                                 t = map.getTile(it.next());
                                 if (t.isLand() &&
-                                        t.getAddition() != Tile.ADD_MOUNTAINS) {
+                                        t.getType() != mountains) {
                                     int r = random.nextInt(8);
                                     if (r == 0) {
-                                        t.setAddition(Tile.ADD_MOUNTAINS);
+                                        t.setType(mountains);
                                         counter++;
                                     } else if (r > 2) {
-                                        t.setAddition(Tile.ADD_HILLS);
+                                        t.setType(hills);
                                     }
                                 }
                             }

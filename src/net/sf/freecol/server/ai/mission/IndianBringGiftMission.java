@@ -119,9 +119,11 @@ public class IndianBringGiftMission extends Mission {
                 // Load the goods:
                 List<Goods> goodsList = new ArrayList<Goods>();
                 GoodsContainer gc = getUnit().getIndianSettlement().getGoodsContainer();
+                // Come back to change - takes SUGAR, TOBACCO, COTTON, FURS
                 for (int i = 1; i <= 4; i++) {
                     if (gc.getGoodsCount(i) >= IndianSettlement.KEEP_RAW_MATERIAL + 25) {
-                        goodsList.add(new Goods(getGame(), getUnit().getIndianSettlement(), i,
+                        goodsList.add(new Goods(getGame(), getUnit().getIndianSettlement(),
+                                FreeCol.getSpecification().getGoodsType(i),
                                 getRandom().nextInt(15) + 10));
                     }
                 }

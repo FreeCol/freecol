@@ -34,6 +34,7 @@ import javax.swing.text.StyleConstants;
 import javax.swing.text.StyledDocument;
 import net.sf.freecol.FreeCol;
 
+import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.control.InGameController;
@@ -680,11 +681,11 @@ public final class EuropePanel extends FreeColPanel implements ActionListener {
     /**
      * Asks for pay arrears of a type of goods, if those goods are boycotted
      * 
-     * @param typeOfGoods The type of goods for paying arrears
+     * @param goodsType The type of goods for paying arrears
      */
-    public void payArrears(GoodsType typeOfGoods) {
-        if (freeColClient.getMyPlayer().getArrears(typeOfGoods) > 0) {
-            inGameController.payArrears(typeOfGoods);
+    public void payArrears(GoodsType goodsType) {
+        if (freeColClient.getMyPlayer().getArrears(goodsType) > 0) {
+            inGameController.payArrears(goodsType);
             getMarketPanel().revalidate();
             refresh();
         }

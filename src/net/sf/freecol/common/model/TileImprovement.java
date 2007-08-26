@@ -168,7 +168,11 @@ public class TileImprovement extends TileItem implements Locatable, Nameable {
     public int getTurnsToComplete() {
         return turnsToComplete;
     }
-    
+
+    public void setTurnsToComplete(int turns) {
+        turnsToComplete = turns;
+    }
+
     public boolean isComplete() {
         return (turnsToComplete == 0);
     }

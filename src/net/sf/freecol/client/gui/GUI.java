@@ -40,8 +40,11 @@ import net.sf.freecol.common.model.IndianSettlement;
 import net.sf.freecol.common.model.Map;
 import net.sf.freecol.common.model.PathNode;
 import net.sf.freecol.common.model.Player;
+import net.sf.freecol.common.model.Resource;
 import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.Tile;
+import net.sf.freecol.common.model.TileItemContainer;
+import net.sf.freecol.common.model.TileImprovement;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.Map.Position;
 
@@ -1533,10 +1536,9 @@ public final class GUI {
      *        unexplored terrain.
      */
     private void displayBaseTile(Graphics2D g, Map map, Tile tile, int x, int y, boolean drawUnexploredBorders) {
-        g.drawImage(lib.getTerrainImage(tile.getType().getIndex(), tile.getX(), tile.getY()), x, y, null);
+        g.drawImage(lib.getTerrainImage(tile.getType().artBasic, tile.getX(), tile.getY()), x, y, null);
 
         Map.Position pos = new Map.Position(tile.getX(), tile.getY());
-
 
         for (int i = 0; i < 8; i++) {
             Map.Position p = Map.getAdjacent(pos, i);
@@ -1547,29 +1549,29 @@ public final class GUI {
                     continue;
                 }
 
-                if (tile.getType() == borderingTile.getType() ||
-                    !borderingTile.isLand() && !borderingTile.getType().isWater()){
+                if (tile.getType() == borderingTile.getType() || tile.isLand() && !borderingTile.isLand()){
                     // Equal tiles and sea tiles have no effect
                     continue;
                 }
 
-                if (!tile.isLand() && borderingTile.isExplored() && 
-                    borderingTile.getType().isWater()) {
-                    // Draw a beach overlayed with bordering land type
-                    g.drawImage(lib.getTerrainImage(ImageLibrary.BEACH,
+                if (!tile.isLand() && borderingTile.isLand() && borderingTile.isExplored()) {
+                    // If there is a Coast image (eg. beach) defined, use it, otherwise skip
+                    if (borderingTile.getType().artCoast >= 0) {
+                        g.drawImage(lib.getTerrainImage(borderingTile.getType().artCoast,
+                                                        i,
+                                                        tile.getX(), tile.getY()),
+                                                        x, y, null);
+                    }
+                    g.drawImage(lib.getTerrainImage(borderingTile.getType().artBasic,
                                                     i,
                                                     tile.getX(), tile.getY()),
-                                x, y, null);
-                    g.drawImage(lib.getTerrainImage(borderingTile.getType().getIndex(),
-                                                    i,
-                                                    tile.getX(), tile.getY()),
-                                x, y, null);
+                                                    x, y, null);
                 } else if (borderingTile.getType().getIndex() < tile.getType().getIndex()) {
                     // Draw land terrain with bordering land type
-                    g.drawImage(lib.getTerrainImage(borderingTile.getType().getIndex(),
+                    g.drawImage(lib.getTerrainImage(borderingTile.getType().artBasic,
                                                     i,
                                                     tile.getX(), tile.getY()),
-                                x, y, null);
+                                                    x, y, null);
                 }
             }
         }
@@ -1616,9 +1618,10 @@ public final class GUI {
         Map.Position pos = new Map.Position(tile.getX(), tile.getY());
 
         if (!tile.isExplored()) {
-            g.drawImage(lib.getTerrainImage(tile.getType().getIndex(), tile.getX(), tile.getY()), x, y, null);
+            g.drawImage(lib.getTerrainImage(tile.getType().artUnexplored, tile.getX(), tile.getY()), x, y, null);
         } else {
             // Until the mountain/hill bordering tiles are done... -sjm
+            // When that happens, use normal bordering method - ryan
 /*            if (tile.isLand()) {
                 for (int i = 0; i < 8; i++) {
                     Map.Position p = map.getAdjacent(pos, i);
@@ -1633,37 +1636,63 @@ public final class GUI {
                 }
             } */
 
-            // Do this after the basic terrain is done or it looks funny. -sjm
-            /*
-            if (tile.isForested()) {
-                //g.drawImage(lib.getTerrainImage(ImageLibrary.FOREST, tile.getX(), tile.getY()), x, y - 32, null);
-            } else
-            */
-            if (tile.getAddition() == Tile.ADD_HILLS) {
-                g.drawImage(lib.getTerrainImage(ImageLibrary.HILLS, tile.getX(), tile.getY()), x, y - 32, null);
-            } else if (tile.getAddition() == Tile.ADD_MOUNTAINS) {
-                g.drawImage(lib.getTerrainImage(ImageLibrary.MOUNTAINS, tile.getX(), tile.getY()), x, y - 32, null);
+            // Tile Overlays first (eg. hills and mountains)
+            if (tile.getType().artOverlay >= 0) {
+                g.drawImage(lib.getTerrainImage(tile.getType().artOverlay, tile.getX(), tile.getY()), x, y - 32, null);
             }
-
+            
+            TileItemContainer tic = tile.getTileItemContainer();
+            List<TileImprovement> tiList = tic.getImprovements();
+            List<TileImprovement> tiList2;
+            // Go through improvements and add those that are drawn over trees to another list for later
+            // Skip roads and rivers
+            for (TileImprovement ti : tiList) {
+                if (ti == tic.getRiver() || ti == tic.getRoad())
+                    continue;
+                if (!ti.getType().artOverTrees) {
+                    tiList2.add(ti);
+                } else if (ti.getType().artOverlay > 0) {
+                    // Has its own Overlay Image in Misc, use it
+                    g.drawImage(lib.getMiscImage(ti.getType().artOverlay), x, y, null);
+                }
+            }
+/*
             if (tile.isPlowed()) {
                 g.drawImage(lib.getMiscImage(ImageLibrary.PLOWED), x, y, null);
             }
-
+*/
+            // Draw River if any
+            if (tic.hasRiver()) {
+                g.drawImage(lib.getRiverImage(tic.getRiverStyle()), x, y, null);
+            }
+/*
             if (tile.getAddition() == Tile.ADD_RIVER_MAJOR
                     || tile.getAddition() == Tile.ADD_RIVER_MINOR) {
                 g.drawImage(lib.getRiverImage(tile.getRiverStyle()), x, y, null);
             }
+*/
             if (tile.isForested()) {
-                g.drawImage(lib.getForestImage(tile.getType().getIndex()), x, y, null);
+                g.drawImage(lib.getForestImage(tile.getType().artForest), x, y, null);
+            }
+
+            for (TileImprovement ti : tiList2) {
+                if (ti == tic.getRiver() || ti == tic.getRoad())
+                    continue;
+                if (ti.getType().artOverlay > 0) {
+                    // Has its own Overlay Image in Misc, use it
+                    g.drawImage(lib.getMiscImage(ti.getType().artOverlay), x, y, null);
+                }
             }
 
             if (tile.hasResource()) {
-                Image bonusImage = lib.getBonusImage(tile);
+                Image bonusImage = lib.getBonusImage(tic.getResource().getType());
                 if (bonusImage != null) {
                     g.drawImage(bonusImage, x + tileWidth/2 - bonusImage.getWidth(null)/2, y + tileHeight/2 - bonusImage.getHeight(null)/2, null);
                 }
             }
 
+            /* Until the forest bordering tils are done... -sjm
+            // When that happens, use normal bordering method. - ryan
             if (tile.isLand()) {
                 for (int i = 0; i < 8; i++) {
                     Map.Position p = Map.getAdjacent(pos, i);
@@ -1677,13 +1706,13 @@ public final class GUI {
                             // Equal tiles, sea tiles and unexplored tiles have no effect
                             continue;
                         }
-                        // Until the forest bordering tils are done... -sjm
-                        /*if (borderingTile.isForested()) {
+                        if (borderingTile.isForested()) {
                             g.drawImage(lib.getTerrainImage(ImageLibrary.FOREST, i, tile.getX(), tile.getY()), x, y - 32, null);
-                        } else */
+                        } else 
                     }
                 }
             }
+            */
 
             // Paint the roads:
             if (tile.hasRoad()) {
@@ -1865,7 +1894,7 @@ public final class GUI {
                         continue;
                     }
 
-                    g.drawImage(lib.getTerrainImage(borderingTile.getType().getIndex(), i, tile.getX(), tile.getY()), x, y, null);
+                    g.drawImage(lib.getTerrainImage(borderingTile.getType().artBasic, i, tile.getX(), tile.getY()), x, y, null);
                 }
             }
         }

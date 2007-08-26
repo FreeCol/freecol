@@ -26,7 +26,12 @@ import net.sf.freecol.common.model.Building;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.Tension;
+import net.sf.freecol.common.model.Resource;
+import net.sf.freecol.common.model.ResourceType;
 import net.sf.freecol.common.model.Tile;
+import net.sf.freecol.common.model.TileImprovement;
+import net.sf.freecol.common.model.TileImprovementType;
+import net.sf.freecol.common.model.TileType;
 import net.sf.freecol.common.model.Unit;
 
 /**
@@ -46,11 +51,9 @@ public final class ImageLibrary extends ImageProvider {
             LOST_CITY_RUMOUR = 7, DARKNESS = 8, MISC_COUNT = 10;
 
     /**
-     * These finals represent the EXTRA terrain graphics; the ones that can not
-     * be found in the Tile class. These finals together with the ones from Tile
-     * make up all the different types of terrain graphics.
+     * These finals are for quick reference. These should be made softcoded when next possible.
      */
-    public static final int BEACH = 12, FOREST = 13, HILLS = 14, MOUNTAINS = 15, TERRAIN_COUNT = 16;
+    public static final int TERRAIN_COUNT = 16, BONUS_COUNT = 9, GOODS_COUNT = 20, FOREST_COUNT = 9;
 
     /**
      * These finals represent the different parts of a tile and its
@@ -76,10 +79,10 @@ public final class ImageLibrary extends ImageProvider {
             LAND_NORTH_EAST = 7, // border tile, some 'land' can be found in
                                     // north-east of this tile
             LAND_CENTER = 8; // ordinary tile, filled entirely with 'land'
-
+/*
     public static final int BONUS_NONE = -1, BONUS_SILVER = 0, BONUS_FOOD = 1, BONUS_TOBACCO = 2, BONUS_COTTON = 3,
             BONUS_SUGAR = 4, BONUS_FISH = 5, BONUS_ORE = 6, BONUS_FURS = 7, BONUS_LUMBER = 8, BONUS_COUNT = 9;
-
+*/
     public static final int MONARCH_COUNT = 4;
 
     /**
@@ -137,12 +140,12 @@ public final class ImageLibrary extends ImageProvider {
             // INDIAN_SETTLEMENT_INCA = 3,
 
             INDIAN_COUNT = 4;
-
+/*
     public static final int GOODS_FOOD = 0, GOODS_SUGAR = 1, GOODS_TOBACCO = 2, GOODS_COTTON = 3, GOODS_FURS = 4,
             GOODS_LUMBER = 5, GOODS_ORE = 6, GOODS_SILVER = 7, GOODS_HORSES = 8, GOODS_RUM = 9, GOODS_CIGARS = 10,
             GOODS_CLOTH = 11, GOODS_COATS = 12, GOODS_TRADE_GOODS = 13, GOODS_TOOLS = 14, GOODS_MUSKETS = 15,
             GOODS_FISH = 16, GOODS_BELLS = 17, GOODS_CROSSES = 18, GOODS_HAMMERS = 19, GOODS_COUNT = 20;
-
+*/
     /**
      * The filename of the graphical representation of a specific unit is the
      * following: homeDirectory + path + unitsDirectory + unitsName + UNITTYPE +
@@ -345,7 +348,7 @@ public final class ImageLibrary extends ImageProvider {
             }
 
             char lastChar;
-            if (i == BEACH) {
+            if (i == 12) {  // Special - the beach terrain has only 8 pairs of images
                 lastChar = 'h';
                 tempVector1 = new Vector<ImageIcon>(8);
                 tempVector2 = new Vector<ImageIcon>(8);
@@ -409,9 +412,9 @@ public final class ImageLibrary extends ImageProvider {
     private void loadForests(GraphicsConfiguration gc, Class<FreeCol> resourceLocator, boolean doLookup)
             throws FreeColException {
 
-        forests = new Vector<ImageIcon>(Tile.ARCTIC);
+        forests = new Vector<ImageIcon>(FOREST_COUNT);
         forests.add(null);
-        for (int i = Tile.PLAINS; i < Tile.ARCTIC; i++) {
+        for (int i = 1; i < FOREST_COUNT; i++) {
             String filePath = dataDirectory + path + forestDirectory + forestName + i + extension;
             forests.add(findImage(filePath, resourceLocator, doLookup));
         }
@@ -750,14 +753,17 @@ public final class ImageLibrary extends ImageProvider {
      * @return the bonus-image for the given tile.
      */
     public Image getBonusImage(Tile tile) {
-        int imageType = getBonusImageType(tile.getType(), tile.getAddition(), tile.isForested());
-        if (imageType == BONUS_NONE) {
-            return null;
+        if (tile.hasResource()) {
+            return getBonusImage(tile.getTileItemContainer().getResource().getType());
         } else {
-            return bonus.get(imageType).getImage();
+            return null;
         }
     }
 
+    public Image getBonusImage(ResourceType type) {
+        return bonus.get(type.art).getImage();
+    }
+/*  Depreciated
     //TODO: IMPORTANT: This method duplicates a similar method in the
     //Tile class and errors were introduced because the two changed
     //independently. We really need to put the bonus information in
@@ -807,7 +813,7 @@ public final class ImageLibrary extends ImageProvider {
             }
         }
     }
-
+*/
     /**
      * Returns the bonus-ImageIcon at the given index.
      * 
@@ -816,6 +822,10 @@ public final class ImageLibrary extends ImageProvider {
      */
     public ImageIcon getBonusImageIcon(int index) {
         return bonus.get(index);
+    }
+
+    public ImageIcon getBonusImageIcon(ResourceType type) {
+        return bonus.get(type.art);
     }
 
     /**
@@ -938,17 +948,28 @@ public final class ImageLibrary extends ImageProvider {
      * @param scale The scale of the terrain image to return.
      * @return The terrain-image at the given index.
      */
-    public Image getScaledTerrainImage(int index, boolean forested, float scale) {
+    public Image getScaledTerrainImage(TileType type, float scale) {
+        // Index used for drawing the base is the artBasic value
+        int index = type.artBasic;
         GraphicsConfiguration gc = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice()
                 .getDefaultConfiguration();
         Image terrainImage = getTerrainImage(index, 0, 0);
         int width = getTerrainImageWidth(index);
         int height = getTerrainImageHeight(index);
-        if (index > Tile.UNEXPLORED && index < Tile.ARCTIC && forested) {
+        // Currently used for hills and mountains
+        if (type.artOverlay > -1) {
             BufferedImage compositeImage = gc.createCompatibleImage(width, height, Transparency.TRANSLUCENT);
             Graphics2D g = compositeImage.createGraphics();
             g.drawImage(terrainImage, 0, 0, null);
-            g.drawImage(getForestImage(index), 0, 0, null);
+            g.drawImage(getTerrainImage(type.artOverlay, 0, 0), 0, 0);
+            g.dispose();
+            terrainImage = compositeImage;
+        }
+        if (type.isForested()) {
+            BufferedImage compositeImage = gc.createCompatibleImage(width, height, Transparency.TRANSLUCENT);
+            Graphics2D g = compositeImage.createGraphics();
+            g.drawImage(terrainImage, 0, 0, null);
+            g.drawImage(getForestImage(type.artForest), 0, 0, null);
             g.dispose();
             terrainImage = compositeImage;
         }
@@ -1070,6 +1091,9 @@ public final class ImageLibrary extends ImageProvider {
     public Image getGoodsImage(int index) {
         return goods.get(index).getImage();
     }
+    public Image getGoodsImage(GoodsType g) {
+        return goods.get(g.index).getImage();
+    }
 
     /**
      * Returns the goods-image at the given index.
@@ -1079,6 +1103,9 @@ public final class ImageLibrary extends ImageProvider {
      */
     public ImageIcon getGoodsImageIcon(int index) {
         return goods.get(index);
+    }
+    public ImageIcon getGoodsImageIcon(GoodsType g) {
+        return goods.get(g.index);
     }
 
     /**
@@ -1102,6 +1129,9 @@ public final class ImageLibrary extends ImageProvider {
             return icon;
         }
         return null;
+    }
+    public ImageIcon getScaledGoodsImageIcon(GoodsType g, float scale) {
+        return getScaledGoodsImageIcon(g.index, scale);
     }
 
     /**
@@ -1188,6 +1218,9 @@ public final class ImageLibrary extends ImageProvider {
     public int getTerrainImageWidth(int index) {
         return terrain1.get(index).get(LAND_CENTER).getIconWidth();
     }
+    public int getTerrainImageWidth(TileType type) {
+        return terrain1.get(type.index).get(LAND_CENTER).getIconWidth();
+    }
 
     /**
      * Returns the height of the terrain-image at the given index.
@@ -1197,6 +1230,9 @@ public final class ImageLibrary extends ImageProvider {
      */
     public int getTerrainImageHeight(int index) {
         return terrain1.get(index).get(LAND_CENTER).getIconHeight();
+    }
+    public int getTerrainImageHeight(TileType type) {
+        return terrain1.get(type.index).get(LAND_CENTER).getIconHeight();
     }
 
     /**

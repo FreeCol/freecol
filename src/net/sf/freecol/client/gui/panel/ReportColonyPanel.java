@@ -14,13 +14,16 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.border.Border;
 
+import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.Building;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.Goods;
+import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Unit;
+import net.sf.freecol.common.model.UnitType;
 import cz.autel.dmi.HIGLayout;
 
 /**
@@ -129,16 +132,12 @@ public final class ReportColonyPanel extends ReportPanel implements ActionListen
     private JPanel createProductionPanel(Colony colony) {
         JPanel goodsPanel = new JPanel(new GridLayout(0, 10));
         goodsPanel.setOpaque(false);
-        for (int goodsType = 0; goodsType < Goods.NUMBER_OF_ALL_TYPES; goodsType++) {
+        List<GoodsType> goodsList = FreeCol.getSpecification().getGoodsTypeList();
+        for (GoodsType goodsType : goodsList) {
             int newValue = colony.getProductionNetOf(goodsType);
             int stockValue = -1;  // Show stored items in ReportColonyPanel
-            if (goodsType < Goods.NUMBER_OF_TYPES) {
-                stockValue = colony.getGoodsCount(goodsType);
-            } else if (goodsType == Goods.HAMMERS) {
-                stockValue = colony.getHammers();
-            } else if (goodsType == Goods.BELLS) {
-                stockValue = colony.getBells();
-            }
+            // getGoodsCount will return either the amount in storage or the Hammmer/Bell quantity
+            stockValue = colony.getGoodsCount(goodsType);
             if (newValue != 0 || stockValue > 0) {
                 Goods goods = new Goods(colony.getGame(), colony, goodsType, newValue);
                 Building building = colony.getBuildingForProducing(goodsType);
@@ -172,7 +171,8 @@ public final class ReportColonyPanel extends ReportPanel implements ActionListen
             }
         }
         if (currentType >= Colony.BUILDING_UNIT_ADDITION) {
-            JLabel unitLabel = new JLabel(Unit.getName(currentType - Colony.BUILDING_UNIT_ADDITION));
+            UnitType unitType = FreeCol.getSpecification().unitType(currentType - Colony.BUILDING_UNIT_ADDITION);
+            JLabel unitLabel = new JLabel(Unit.getName(unitType));
             unitLabel.setForeground(Color.GRAY);
             buildingPanel.add(unitLabel);
         }

@@ -22,6 +22,7 @@ import net.sf.freecol.client.gui.action.MiniMapZoomOutAction;
 import net.sf.freecol.common.model.Map;
 import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.Tile;
+import net.sf.freecol.common.model.TileType;
 
 
 
@@ -327,7 +328,10 @@ public final class MiniMap extends JPanel implements MouseInputListener {
                 Settlement settlement = (tile != null ? tile.getSettlement() : null);
                 int units = (tile != null ? tile.getUnitCount() : 0);
                 g.setColor(Color.BLACK); //Default
-
+                if (tile != null && tile.isExplored()) {
+                    g.setColor(tile.getType().getMinimapColor());
+                }
+                /*  Depreciated
                 if (tile == null) {
                     g.setColor(Color.BLACK);
                 } else if (tile.getAddition() == Tile.ADD_HILLS) {
@@ -378,7 +382,7 @@ public final class MiniMap extends JPanel implements MouseInputListener {
                   // Tile is forested, so display color of the forest
                   g.setColor(new Color(0.14f, 0.45f, 0.12f)); // Darker green
                 }
-
+                */
                 if (tileSize == 4) {
                     int extra = (((tileY + yOffset) % 2) == 0) ? 0 : 2;
                     g.drawLine(x+extra+ 4*tileX, y+tileY, x+2+extra+4*tileX, y+tileY);

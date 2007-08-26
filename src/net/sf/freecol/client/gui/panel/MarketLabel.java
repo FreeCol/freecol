@@ -45,7 +45,7 @@ public final class MarketLabel extends JLabel implements ActionListener {
         super(parent.getImageProvider().getGoodsImageIcon(type.getIndex()));
         
         this.type = type;
-        setToolTipText(Goods.getName(type));
+        setToolTipText(type.getName());
 
         if (market == null) {
             throw new NullPointerException();

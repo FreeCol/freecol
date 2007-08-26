@@ -53,7 +53,7 @@ public final class ReportProductionPanel extends JPanel implements ActionListene
 
     private List<Colony> colonies;
 
-    private final int goodsType;
+    private final GoodsType goodsType;
 
     private final ReportPanel reportPanel;
 
@@ -65,7 +65,7 @@ public final class ReportProductionPanel extends JPanel implements ActionListene
      * 
      * @param parent The parent of this panel.
      */
-    public ReportProductionPanel(int goodsType, Canvas parent, ReportPanel reportPanel) {
+    public ReportProductionPanel(GoodsType goodsType, Canvas parent, ReportPanel reportPanel) {
         this.goodsType = goodsType;
         this.parent = parent;
         this.reportPanel = reportPanel;

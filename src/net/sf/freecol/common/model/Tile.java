@@ -104,8 +104,6 @@ public final class Tile extends FreeColGameObject implements Location, Nameable 
      * Stores all Improvements and Resources (if any)
      */
     private TileItemContainer tileItemContainer;
-    // is this redundant?
-    List tileItems = new ArrayList();
     
     private UnitContainer unitContainer;
 

@@ -777,12 +777,12 @@ public class FreeColDialog extends FreeColPanel {
     public static FreeColDialog createScoutIndianSettlementDialog(IndianSettlement settlement, Player player) {
         String introText = Messages.message(settlement.getAlarmLevelMessage(player),
                 "%nation%", settlement.getOwner().getNationAsString());
-        UnitType skill = settlement.getLearnableSkill();
+        UnitType skillType = settlement.getLearnableSkill();
         String messageID;
         String skillName = "";
-        if (skill != null) {
+        if (skillType != null) {
             messageID = "scoutSettlement.question1";
-            skillName = Unit.getName(skill).toLowerCase();
+            skillName = Unit.getName(skillType).toLowerCase();
         } else {
             messageID = "scoutSettlement.question2";
         }

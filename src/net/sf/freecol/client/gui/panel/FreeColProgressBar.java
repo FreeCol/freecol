@@ -51,7 +51,7 @@ public class FreeColProgressBar extends JPanel {
     private int iconHeight = 16;
 
     /**
-     * The type of goods this progress bar is for. The default value of -1
+     * The type of goods this progress bar is for. The default value of null
      * indicates no goods type.
      */
     private GoodsType goodsType = null;

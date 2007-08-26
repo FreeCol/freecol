@@ -101,12 +101,12 @@ public final class ReportTradePanel extends ReportPanel implements ActionListene
         reportPanel.add(afterTaxesLabel, higConst.rc(4, labelColumn));
 
         JLabel currentLabel;
-        for (int goodsType = 0; goodsType < Goods.NUMBER_OF_TYPES; goodsType++) {
-            int column = goodsType + extraColumns + 1;
-            int sales = player.getSales(goodsType);
-            int beforeTaxes = player.getIncomeBeforeTaxes(goodsType);
-            int afterTaxes = player.getIncomeAfterTaxes(goodsType);
-            MarketLabel marketLabel = new MarketLabel(goodsType, market, getCanvas());
+        for (int goodsIndex = 0; goodsIndex < Goods.NUMBER_OF_TYPES; goodsIndex++) {
+            int column = goodsIndex + extraColumns + 1;
+            int sales = player.getSales(goodsIndex);
+            int beforeTaxes = player.getIncomeBeforeTaxes(goodsIndex);
+            int afterTaxes = player.getIncomeAfterTaxes(goodsIndex);
+            MarketLabel marketLabel = new MarketLabel(FreeCol.getSpecification().getGoodsType(goodsIndex), market, getCanvas());
             marketLabel.setBorder(FreeColPanel.TOPCELLBORDER);
             marketLabel.setVerticalTextPosition(JLabel.BOTTOM);
             marketLabel.setHorizontalTextPosition(JLabel.CENTER);
@@ -140,16 +140,16 @@ public final class ReportTradePanel extends ReportPanel implements ActionListene
             Colony colony = colonies.get(colonyIndex);
             JButton colonyButton = createColonyButton(colonyIndex);
             reportPanel.add(colonyButton, higConst.rc(row, labelColumn));
-            for (int goodsType = 0; goodsType < Goods.NUMBER_OF_TYPES; goodsType++) {
-                int column = goodsType + 1 + extraColumns;
-                int amount = colony.getGoodsCount(goodsType);
+            for (int goodsIndex = 0; goodsIndex < Goods.NUMBER_OF_TYPES; goodsIndex++) {
+                int column = goodsIndex + 1 + extraColumns;
+                int amount = colony.getGoodsCount(goodsIndex);
                 JLabel goodsLabel = new JLabel(String.valueOf(amount), JLabel.TRAILING);
                 if (colonyIndex == 0) {
                     goodsLabel.setBorder(FreeColPanel.TOPCELLBORDER);
                 } else {
                     goodsLabel.setBorder(FreeColPanel.CELLBORDER);
                 }
-                if (colony.getExports(goodsType)) {
+                if (colony.getExports(goodsIndex)) {
                     goodsLabel.setText("*" + String.valueOf(amount));
                 }
                 if (amount > 200) {

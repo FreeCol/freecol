@@ -119,6 +119,29 @@ public final class Xml
         }
     }
 
+    public static float[] floatArrayAttribute( Node xmlElement, String attributeName, String separator ) {
+        String[] array = arrayAttribute(xmlElement, attributeName, separator);
+        float[] output = new float[array.length];
+        for (int i = 0; i < array.length ; i++) {
+            output[i] = Float.parseFloat(array[i]);
+        }
+        return output;
+    }
+    
+    public static float[] floatArrayAttribute( Node xmlElement, String attributeName ) {
+
+        return floatArrayAttribute(xmlElement, attributeName, ",");
+    }
+
+    public static float[] floatArrayAttribute( Node xmlElement, String attributeName, float[] otherwise ) {
+        if (hasAttribute(xmlElement, attributeName)) {
+            return floatArrayAttribute(xmlElement, attributeName, ",");
+        } else {
+            return otherwise;
+        }
+    }
+
+
     public static int intAttribute( Node xmlElement, String attributeName ) {
 
         return Integer.parseInt( attribute(xmlElement, attributeName) );

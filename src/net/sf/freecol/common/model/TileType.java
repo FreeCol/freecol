@@ -1,5 +1,7 @@
 package net.sf.freecol.common.model;
 
+import java.awt.Color;
+
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
@@ -24,16 +26,20 @@ public final class TileType
     public int artForest;
     public int artUnexplored;
     public int artCoast;
-    
+    public Color minimapColor;
+
     public boolean forest;
     public boolean water;
     public boolean canSettle;
     public boolean canSailToEurope;
+    public boolean canHaveRiver;
     public int basicMoveCost;
     public int basicWorkTurns;
 
     public int attackFactor;
     public int defenceFactor;
+    
+    public static final int HUMIDITY = 0, TEMPERATURE = 1, ALTITUDE = 2, LATITUDE = 3;
     
     public int[] humidity;
     public int[] temperature;
@@ -77,6 +83,10 @@ public final class TileType
         return canSailToEurope;
     }
 
+    public boolean canHaveRiver() {
+        return canHaveRiver;
+    }
+
     public int getBasicMoveCost() {
         return basicMoveCost;
     }
@@ -91,6 +101,10 @@ public final class TileType
 
     public int getDefenceFactor() {
         return defenceFactor;
+    }
+
+    public Color getMinimapColor() {
+        return minimapColor;
     }
 
     public int getPotential(GoodsType goodsType) {
@@ -136,6 +150,21 @@ public final class TileType
         return null;
     }
 
+    public boolean withinRange(int rangeType, int value) {
+        switch (rangeType) {
+        case HUMIDITY:
+            return (humidity[0] <= value && value <= humidity[1]);
+        case TEMPERATURE:
+            return (temperature[0] <= value && value <= temperature[1]);
+        case ALTITUDE:
+            return (altitude[0] <= value && value <= altitude[1]);
+        case LATITUDE:
+            return (latitude[0] <= value && (latitude[1] == -1 || value <= latitude[1]));
+        default:
+            return false;
+        }
+    }
+    
     // ------------------------------------------------------------ API methods
 
     public void readFromXmlElement(Node xml, final Map<String, GoodsType> goodsTypeByRef,
@@ -150,6 +179,7 @@ public final class TileType
         water = Xml.booleanAttribute(xml, "is-water", false);
         canSettle = Xml.booleanAttribute(xml, "can-settle", (water) ? false : true);
         canSailToEurope = Xml.booleanAttribute(xml, "sail-to-europe", false);
+        canHaveRiver = !(Xml.booleanAttribute(xml, "no-river", !water));
         attackFactor = 100;
         defenceFactor = 100;
         
@@ -164,6 +194,9 @@ public final class TileType
                     artForest = Xml.intAttribute(xml, "forest", -1);
                     artUnexplored = Xml.intAttribute(xml, "unexplored", 0);
                     artCoast = Xml.intAttribute(xml, "coast", -1);
+                    float[] defaultArray = new float[] {0.0f, 0.0f, 0.0f};
+                    float[] colorValues = Xml.floatArrayAttribute(xml, "minimap-color", defaultArray);
+                    minimapColor = new Color(colorValues[0], colorValues[1], colorValues[2]);
                 } else if ("gen".equals(childName)) {
                     int[] defaultArray = new int[] {-3, 3};
                     humidity = Xml.intArrayAttribute(xml, "humidity", defaultArray);

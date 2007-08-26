@@ -42,6 +42,9 @@ public final class TilePanel extends FreeColDialog implements ActionListener {
     private static final int OK = 0;
     private static final int COLOPEDIA = 1;
     private final Canvas canvas;
+
+    private final GoodsType[] goodsTypes;
+    private final int number;
     
     private final JPanel goodsPanel;
     private final JLabel tileNameLabel;
@@ -67,10 +70,30 @@ public final class TilePanel extends FreeColDialog implements ActionListener {
         ownerLabel = new JLabel("", JLabel.CENTER);
         ownerLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
         add(ownerLabel);        
-        
+/*        
+        ArrayList<Integer> farmedGoods = new ArrayList<Integer>();
+        for (int i = 0; i < Goods.NUMBER_OF_TYPES; i++) {
+            if (Goods.isFarmedGoods(i)) {
+                farmedGoods.add(i);
+            }
+
+        }
+*/
+        List<GoodsType> farmedGoods = FreeCol.getSpecification().getFarmedGoodsIndexList();
+        number = farmedGoods.size();
+
         goodsPanel = new JPanel();
         goodsPanel.setLayout(new FlowLayout());
 
+        goodsTypes = new GoodsType[number];
+        labels = new JLabel[number];
+        for (int k = 0; k < number; k++) {
+            goodsTypes[k] = armedGoods.get(k);
+            labels[k] = new JLabel(canvas.getImageProvider().getGoodsImageIcon(goodsTypes[k].getIndex()));
+            //goodsPanel.add(labels[k]);
+        }
+//        fishLabel = new JLabel(canvas.getImageProvider().getGoodsImageIcon((Goods.FISH).getIndex());
+        
         goodsPanel.setSize(goodsPanel.getPreferredSize());
         add(goodsPanel);
 
@@ -150,9 +173,8 @@ public final class TilePanel extends FreeColDialog implements ActionListener {
                 setResponse(new Boolean(true));
                 break;
             case COLOPEDIA:
-                int type = tileType.getIndex();
                 setResponse(new Boolean(true));
-                canvas.showColopediaPanel(ColopediaPanel.COLOPEDIA_TERRAIN, type);
+                canvas.showColopediaPanel(ColopediaPanel.COLOPEDIA_TERRAIN, tile.getType().getIndex());
                 break;
             default:
                 logger.warning("Invalid Actioncommand: invalid number.");

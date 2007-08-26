@@ -33,7 +33,7 @@ import org.w3c.dom.Element;
  */
 public class PioneeringMission extends Mission {
     /* 
-     * TODO-LATER: "updateTileImprovement" should be called
+     * TODO-LATER: "updateTileImprovementPlan" should be called
      *             only once (in the beginning of the turn).
      */
     
@@ -102,16 +102,16 @@ public class PioneeringMission extends Mission {
     }
 
     /**
-     * Sets the <code>TileImprovement</code> which should
+     * Sets the <code>TileImprovementPlan</code> which should
      * be the next target.
      * 
-     * @param tileImprovement The <code>TileImprovement</code>.
+     * @param tileImprovementPlan The <code>TileImprovementPlan</code>.
      */
     public void setTileImprovementPlan(TileImprovementPlan tileImprovementPlan) {
         this.tileImprovementPlan = tileImprovementPlan;
     }
 
-    private void updateTileImprovement() {
+    private void updateTileImprovementPlan() {
         if (tileImprovementPlan != null) {
             return;
         }
@@ -143,7 +143,7 @@ public class PioneeringMission extends Mission {
                         value = ti.getValue() + 10000 - (path.getTotalTurns()*5);
                         
                         /*
-                         * Avoid picking a TileImprovement with a path being blocked 
+                         * Avoid picking a TileImprovementPlan with a path being blocked 
                          * by an enemy unit (apply a penalty to the value):
                          */
                         PathNode pn = path;
@@ -254,7 +254,7 @@ public class PioneeringMission extends Mission {
         }
         
         if (tileImprovementPlan == null) {
-            updateTileImprovement();
+            updateTileImprovementPlan();
         }
         
         if (tileImprovementPlan != null) {
@@ -296,7 +296,7 @@ public class PioneeringMission extends Mission {
      * @return The destination for this <code>Transportable</code>.
      */    
     public Tile getTransportDestination() {
-        updateTileImprovement();
+        updateTileImprovementPlan();
         if (tileImprovementPlan == null) {
             return null;
         }
@@ -332,7 +332,7 @@ public class PioneeringMission extends Mission {
      *         and <code>false</code> otherwise.
      */
     public boolean isValid() {  
-        updateTileImprovement();
+        updateTileImprovementPlan();
         return !skipMission && tileImprovementPlan != null &&
                 (getUnit().isPioneer() || getUnit().hasAbility("model.ability.expertPioneer"));
     }
@@ -369,7 +369,7 @@ public class PioneeringMission extends Mission {
         
         out.writeAttribute("unit", getUnit().getID());
         if (tileImprovementPlan != null) {
-            out.writeAttribute("tileImprovement", tileImprovementPlan.getID());
+            out.writeAttribute("tileImprovementPlan", tileImprovementPlan.getID());
         }
 
         out.writeEndElement();
@@ -383,11 +383,11 @@ public class PioneeringMission extends Mission {
     protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
         setAIUnit((AIUnit) getAIMain().getAIObject(in.getAttributeValue(null, "unit")));
         
-        final String tileImprovementStr = in.getAttributeValue(null, "tileImprovement");
-        if (tileImprovementStr != null) {
-            tileImprovementPlan = (TileImprovementPlan) getAIMain().getAIObject(tileImprovementStr);
+        final String tileImprovementPlanStr = in.getAttributeValue(null, "tileImprovementPlan");
+        if (tileImprovementPlanStr != null) {
+            tileImprovementPlan = (TileImprovementPlan) getAIMain().getAIObject(tileImprovementPlanStr);
             if (tileImprovementPlan == null) {
-                tileImprovementPlan = new TileImprovementPlan(getAIMain(), tileImprovementStr);
+                tileImprovementPlan = new TileImprovementPlan(getAIMain(), tileImprovementPlanStr);
             }
         } else {
             tileImprovementPlan = null;
@@ -401,7 +401,7 @@ public class PioneeringMission extends Mission {
      * @return The <code>String</code> "wishRealizationMission".
      */
     public static String getXMLElementTagName() {
-        return "tileImprovementMission";
+        return "tileImprovementPlanMission";
     }
     
     /**

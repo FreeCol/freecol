@@ -185,6 +185,11 @@ public class River {
      */
     public boolean flowFromSource(Map.Position position) {
         Tile tile = map.getTile(position);
+        if (!tile.getType().canHaveRiver()) {
+            logger.fine("Tile (" + Messages.message(Tile.getName(tile.getType())) + ") at "
+                        + position + " cannot have rivers.");
+            return false;
+/*
         if (!tile.isLand()) {
             logger.fine("Tile at " + position + " is water.");
             return false;
@@ -197,6 +202,7 @@ public class River {
         } else if (tile.getType() == Tile.ARCTIC) {
             logger.fine("Tile at " + position + " is arctic.");
             return false;
+*/
         } else if (isNextToWater(position)) {
             logger.fine("Tile at " + position + " is next to water.");
             return false;
@@ -227,10 +233,16 @@ public class River {
             Tile nextTile = map.getTile(newPosition);
             
             // is the tile suitable for this river?
+            if (!nextTile.getType().canHaveRiver()) {
+                logger.fine("Tile (" + Messages.message(Tile.getName(nextTile.getType())) + ") at "
+                            + newPosition + " cannot have rivers.");
+                continue;
+            /*  Depreciated
             if (nextTile.getAddition() == Tile.ADD_HILLS ||
                     nextTile.getAddition() == Tile.ADD_MOUNTAINS) {
                 logger.fine("Tile at " + newPosition + " too high.");
                 continue;
+            */
             } else if (this.contains(newPosition)) {
                 logger.fine("Tile at " + newPosition + " is already in river.");
                 continue;
@@ -338,14 +350,14 @@ public class River {
                         oldSection.size);
             }
             Tile tile = map.getTile(section.position);
+            
             switch (section.size) {
             case 1:
-                tile.addRiver(Tile.ADD_RIVER_MINOR, section.getBranches());
-                logger.fine("Added minor river to tile at " + section.position);
-                break;
             case 2:
-                tile.addRiver(Tile.ADD_RIVER_MAJOR, section.getBranches());
-                logger.fine("Added major river to tile at " + section.position);
+                // tile.addRiver(Tile.ADD_RIVER_MAJOR, section.getBranches()); // Depreciated
+                // tile.addRiver will process the neighbouring branches as well 
+                tile.addRiver(section.size);
+                logger.fine("Added river (magnitude: " + section.size + ") to tile at " + section.position);
                 break;
             default:
                 tile.setType(Tile.OCEAN);
@@ -354,7 +366,7 @@ public class River {
             oldSection = section;
         }
     }
-
+/*  Depreciated
     public static int updateRiver(int oldRiver, int direction, int addition) {
         //System.out.println("old = " + oldRiver + ", direction = " + direction +
         //", addition = " + addition);
@@ -389,7 +401,7 @@ public class River {
     }
         
         
-
+*/
     /**
      * A river section.
      */

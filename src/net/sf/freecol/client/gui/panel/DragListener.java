@@ -189,7 +189,7 @@ public final class DragListener extends MouseAdapter {
                                 menuItem = new JMenuItem(Messages.message("arm"));
                             }
                         }
-                        menuItem.setIcon(imageLibrary.getScaledGoodsImageIcon(ImageLibrary.GOODS_MUSKETS, 0.66f));
+                        menuItem.setIcon(imageLibrary.getScaledGoodsImageIcon(Goods.MUSKETS.getIndex(), 0.66f));
                         menuItem.setActionCommand(String.valueOf(UnitLabel.ARM));
                         menuItem.addActionListener(unitLabel);
                         menu.add(menuItem);
@@ -209,7 +209,7 @@ public final class DragListener extends MouseAdapter {
                                 menuItem = new JMenuItem(Messages.message("mount"));
                             }
                         }
-                        menuItem.setIcon(imageLibrary.getScaledGoodsImageIcon(ImageLibrary.GOODS_HORSES, 0.66f));
+                        menuItem.setIcon(imageLibrary.getScaledGoodsImageIcon(Goods.HORSES.getIndex(), 0.66f));
                         menuItem.setActionCommand(String.valueOf(UnitLabel.MOUNT));
                         menuItem.addActionListener(unitLabel);
                         menu.add(menuItem);
@@ -242,7 +242,7 @@ public final class DragListener extends MouseAdapter {
                                 menuItem = new JMenuItem(Messages.message("equipWithTools"));
                             }
                         }
-                        menuItem.setIcon(imageLibrary.getScaledGoodsImageIcon(ImageLibrary.GOODS_TOOLS, 0.66f));
+                        menuItem.setIcon(imageLibrary.getScaledGoodsImageIcon(Goods.TOOLS, 0.66f));
                         menuItem.setActionCommand(String.valueOf(UnitLabel.TOOLS));
                         menuItem.addActionListener(unitLabel);
                         menu.add(menuItem);
@@ -256,7 +256,7 @@ public final class DragListener extends MouseAdapter {
                         } else {
                             menuItem = new JMenuItem(Messages.message("blessAsMissionaries"));
                         }
-                        menuItem.setIcon(imageLibrary.getScaledGoodsImageIcon(ImageLibrary.GOODS_CROSSES, 0.66f));
+                        menuItem.setIcon(imageLibrary.getScaledGoodsImageIcon(Goods.CROSSES, 0.66f));
                         menuItem.setActionCommand(String.valueOf(UnitLabel.DRESS));
                         menuItem.addActionListener(unitLabel);
                         menu.add(menuItem);

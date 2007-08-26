@@ -112,7 +112,7 @@ public class ScoutingMission extends Mission {
                         || getUnit().getColony().getGoodsContainer().getGoodsCount(Goods.HORSES) >= 52) {
                     Element equipUnitElement = Message.createNewRootElement("equipunit");
                     equipUnitElement.setAttribute("unit", getUnit().getID());
-                    equipUnitElement.setAttribute("type", Integer.toString(Goods.HORSES));
+                    equipUnitElement.setAttribute("type", Integer.toString((Goods.HORSES).getIndex()));
                     equipUnitElement.setAttribute("amount", Integer.toString(50));
                     try {
                         connection.ask(equipUnitElement);
@@ -203,7 +203,7 @@ public class ScoutingMission extends Mission {
         if (isTarget(getUnit().getTile(), getUnit()) && getUnit().getColony() != null) {
             Element equipUnitElement = Message.createNewRootElement("equipunit");
             equipUnitElement.setAttribute("unit", getUnit().getID());
-            equipUnitElement.setAttribute("type", Integer.toString(Goods.HORSES));
+            equipUnitElement.setAttribute("type", Integer.toString((Goods.HORSES).getIndex()));
             equipUnitElement.setAttribute("amount", Integer.toString(0));
             try {
                 connection.ask(equipUnitElement);
