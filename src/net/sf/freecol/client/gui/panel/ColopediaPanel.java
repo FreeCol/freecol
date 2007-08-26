@@ -354,7 +354,7 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
     private void buildFathersSubtree(DefaultMutableTreeNode parent) {
         List<FoundingFather> foundingFathers = FreeCol.getSpecification().getFoundingFathers();
         for (FoundingFather foundingFather : foundingFathers) {
-            buildFatherItem(foundingFather.getType(), parent);
+            buildFatherItem(foundingFather, parent);
         }
     }
     
@@ -428,9 +428,8 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
      * @param foundingFather
      * @param parent
      */
-    private void buildFatherItem(int foundingFather, DefaultMutableTreeNode parent) {
-        FoundingFather father = FreeCol.getSpecification().foundingFather(foundingFather);
-        String name = Messages.message(father.getName());
+    private void buildFatherItem(FoundingFather foundingFather, DefaultMutableTreeNode parent) {
+        String name = Messages.message(foundingFather.getName());
         ImageIcon icon = library.getScaledGoodsImageIcon(Goods.BELLS.getIndex(), 0.75f);
         DefaultMutableTreeNode item = new DefaultMutableTreeNode(new ColopediaTreeItem(name, icon));
         parent.add(item);
@@ -1035,7 +1034,7 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
                 List<FoundingFather> foundingFathers = FreeCol.getSpecification().getFoundingFathers();
                 for (FoundingFather foundingFather : foundingFathers) {
                     if (nodeTitle.equals(Messages.message(foundingFather.getName()))) {
-                        buildFatherDetail(foundingFather.getType());
+                        buildFatherDetail(foundingFather.getIndex());
                     }
                 }
             }

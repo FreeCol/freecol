@@ -6,6 +6,7 @@ import java.awt.event.ActionListener;
 import javax.swing.BorderFactory;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import net.sf.freecol.FreeCol;
 
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.i18n.Messages;
@@ -71,9 +72,9 @@ public final class ReportContinentalCongressPanel extends ReportPanel implements
         if (player.getCurrentFather() == FoundingFather.NONE) {
             summaryPanel.add(new JLabel(none), higConst.rc(1, 3));
         } else {
-            JLabel currentFatherLabel = new JLabel(Messages.message(FoundingFather.getName(player.getCurrentFather())));
-            currentFatherLabel.setToolTipText(Messages
-                    .message(FoundingFather.getDescription(player.getCurrentFather())));
+            FoundingFather father = FreeCol.getSpecification().foundingFather(player.getCurrentFather());
+            JLabel currentFatherLabel = new JLabel(Messages.message(father.getName()));
+            currentFatherLabel.setToolTipText(Messages.message(father.getDescription()));
             summaryPanel.add(currentFatherLabel, higConst.rc(1, 3));
             int bells = player.getBells();
             int required = player.getTotalFoundingFatherCost();
@@ -90,10 +91,10 @@ public final class ReportContinentalCongressPanel extends ReportPanel implements
             fatherLabel.setBorder(BorderFactory.createEmptyBorder(5, 10, 5, 10));
             fatherPanel.add(fatherLabel);
         } else {
-            for (int fatherId = 0; fatherId < FoundingFather.FATHER_COUNT; fatherId++) {
-                if (player.hasFather(fatherId)) {
-                    JLabel fatherLabel = new JLabel(Messages.message(FoundingFather.getName(fatherId)));
-                    fatherLabel.setToolTipText(Messages.message(FoundingFather.getDescription(fatherId)));
+            for (FoundingFather father : FreeCol.getSpecification().getFoundingFathers()) {
+                if (player.hasFather(father.getIndex())) {
+                    JLabel fatherLabel = new JLabel(Messages.message(father.getName()));
+                    fatherLabel.setToolTipText(Messages.message(father.getDescription()));
                     fatherLabel.setBorder(BorderFactory.createEmptyBorder(5, 10, 5, 10));
                     fatherPanel.add(fatherLabel);
                 }

@@ -235,7 +235,7 @@ public final class InGameController extends Controller {
         for (int type = 0; type < FoundingFather.TYPE_COUNT; type++) {
             int weightSum = 0;
             for (FoundingFather father : FreeCol.getSpecification().getFoundingFathers()) {
-                if (!player.hasFather(father.getType()) && father.getType() == type) {
+                if (!player.hasFather(father.getIndex()) && father.getType() == type) {
                     weightSum += father.getWeight(age);
                 }
             }
@@ -245,10 +245,10 @@ public final class InGameController extends Controller {
                 int r = getPseudoRandom().nextInt(weightSum) + 1;
                 weightSum = 0;
                 for (FoundingFather father : FreeCol.getSpecification().getFoundingFathers()) {
-                    if (!player.hasFather(father.getType()) && father.getType() == type) {
+                    if (!player.hasFather(father.getIndex()) && father.getType() == type) {
                         weightSum += father.getWeight(age);
                         if (weightSum >= r) {
-                            randomFoundingFathers[type] = father.getType();
+                            randomFoundingFathers[type] = father.getIndex();
                             break;
                         }
                     }

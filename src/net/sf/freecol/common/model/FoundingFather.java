@@ -81,6 +81,9 @@ public class FoundingFather implements Abilities {
         this.index = newIndex;
     }
 
+    public final int getIndex() {
+        return index;
+    }
 
     /**
      * Get the <code>Id</code> value.
