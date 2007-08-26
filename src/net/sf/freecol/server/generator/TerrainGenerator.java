@@ -195,8 +195,12 @@ public class TerrainGenerator {
         int[] latRanges = { 75, 50, 25, 0 };
         // altRanges correspond to 1,2,3 from TileType.altitude (1-10)
         int[] altRanges = { 6, 8, 10};
-        int lat = 3;
-        for (int i = 0; i <= 3; i++) {
+        // Create the lists of TileType the first time you use it
+        while (latTileTypes.size() < latRanges.length) {
+            latTileTypes.add(new ArrayList<TileType>());
+        }
+        int lat = latRanges.length - 1;
+        for (int i = 0; i < latRanges.length; i++) {
             if (latRanges[i] < percent) {
                 lat = i;
                 break;
@@ -236,7 +240,7 @@ public class TerrainGenerator {
                     chosen = t;
                     break;
                 }
-                acceptable.remove(t);
+                it.remove();
             }
         }
         // Choose based on forested/unforested
@@ -250,7 +254,7 @@ public class TerrainGenerator {
                         chosen = t;
                         break;
                     }
-                    acceptable.remove(t);
+                    it.remove();
                 }
             }
         }
@@ -265,7 +269,7 @@ public class TerrainGenerator {
                         chosen = t;
                         break;
                     }
-                    acceptable.remove(t);
+                    it.remove();
                 }
             }
         }
@@ -280,7 +284,7 @@ public class TerrainGenerator {
                         chosen = t;
                         break;
                     }
-                    acceptable.remove(t);
+                    it.remove();
                 }
             }
         }
@@ -322,8 +326,7 @@ public class TerrainGenerator {
      * @param map The <code>Map</code> to create high seas on.
      */
     private void createHighSeas(Map map) {
-        createHighSeas(
-            map,
+        createHighSeas(map,
             getMapGeneratorOptions().getDistLandHighSea(),
             getMapGeneratorOptions().getMaxDistToEdge()
         );

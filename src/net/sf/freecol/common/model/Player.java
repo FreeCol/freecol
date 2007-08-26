@@ -300,10 +300,6 @@ public class Player extends FreeColGameObject implements Abilities, Nameable {
         this.admin = admin;
         this.nation = nation;
         color = (nation == NO_NATION) ? noNationColor : getDefaultNationColor(nation);
-        /** No initial arrears. */
-        for (int i = 0; i < arrears.length; i++) {
-            arrears[i] = 0;
-        }
         for (int k = 0; k < tension.length; k++) {
             tension[k] = new Tension(0);
         }
@@ -339,6 +335,10 @@ public class Player extends FreeColGameObject implements Abilities, Nameable {
         sales = new int[Goods.NUMBER_OF_TYPES];
         incomeBeforeTaxes = new int[Goods.NUMBER_OF_TYPES];
         incomeAfterTaxes = new int[Goods.NUMBER_OF_TYPES];
+        /** No initial arrears. */
+        for (int i = 0; i < arrears.length; i++) {
+            arrears[i] = 0;
+        }
     }
 
     /**

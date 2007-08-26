@@ -271,7 +271,7 @@ public class IndianDemandMission extends Mission {
             }
         } else {
             // TODO: change hardcoded list the preferred GoodsType
-            GoodsType[] preferred = new GoodsType[] { Goods.MUSKETS, Goods.HORSES, Goods.TOOLS, Goods.TRADE_GOODS, Goods.RUM,
+            GoodsType[] preferred = new GoodsType[] { Goods.MUSKETS, Goods.HORSES, Goods.TOOLS, Goods.TRADEGOODS, Goods.RUM,
                     Goods.CLOTH, Goods.COATS, Goods.CIGARS };
             for (int i = 0; i < preferred.length; i++) {
                 int amount = warehouse.getGoodsCount(preferred[i]);

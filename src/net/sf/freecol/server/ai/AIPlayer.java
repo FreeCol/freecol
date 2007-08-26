@@ -1833,7 +1833,7 @@ public class AIPlayer extends AIObject {
             // we should be able to produce goods and horses
             // ourselves
             return false;
-        } else if (goodsType == Goods.TRADE_GOODS || goodsType == Goods.TOOLS
+        } else if (goodsType == Goods.TRADEGOODS || goodsType == Goods.TOOLS
                 || goodsType == Goods.MUSKETS) {
             if (getGame().getTurn().getAge() == 3) {
                 // by this time, we should be able to produce

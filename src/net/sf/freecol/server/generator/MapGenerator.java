@@ -350,8 +350,7 @@ public class MapGenerator {
                                        Position position, Map map, Vector<Player> players) {
         final int kind = IndianSettlement.getKind(tribe);
         final Tile tile = map.getTile(position);
-        IndianSettlement settlement = 
-            new IndianSettlement(map.getGame(), player,
+        IndianSettlement settlement = new IndianSettlement(map.getGame(), player,
                     tile, tribe, kind, capital,
                     generateSkillForLocation(map, map.getTile(position)),
                     false, null);

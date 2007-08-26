@@ -47,7 +47,7 @@ public class Goods implements Locatable, Ownable, Nameable {
     // Need to change Units to the new specification to remove reliance on these static quick links.
     // Only the essential should have a quick link.
     public static GoodsType FOOD, SUGAR, TOBACCO, COTTON, FURS, LUMBER, ORE, SILVER, HORSES, 
-                                    RUM, CIGARS, CLOTH, COATS, TRADE_GOODS, TOOLS, MUSKETS, 
+                                    RUM, CIGARS, CLOTH, COATS, TRADEGOODS, TOOLS, MUSKETS, 
                                     FISH, BELLS, CROSSES, HAMMERS;
     public static int NUMBER_OF_TYPES;
 /*
@@ -157,11 +157,13 @@ public class Goods implements Locatable, Ownable, Nameable {
      * @param numberOfTypes Initializer for NUMBER_OF_TYPES
      */
     public static void initialize(List<GoodsType> goodsList, int numberOfTypes) {
-        GoodsType[] gt = {FOOD, SUGAR, TOBACCO, COTTON, FURS, LUMBER, ORE, SILVER, HORSES, 
-                        RUM, CIGARS, CLOTH, COATS, TRADE_GOODS, TOOLS, MUSKETS, 
-                        FISH, BELLS, CROSSES, HAMMERS};
         for (GoodsType g : goodsList) {
-            gt[g.getIndex()] = g;
+            try {
+                Goods.class.getDeclaredField(g.getId().toUpperCase()).set(null, g);
+            } catch (Exception e) {
+                logger.warning("Error assigning a GoodsType to Goods." +
+                        g.getId().toUpperCase() + "\n" + e.toString());
+            }
         }
         NUMBER_OF_TYPES = numberOfTypes;
     }

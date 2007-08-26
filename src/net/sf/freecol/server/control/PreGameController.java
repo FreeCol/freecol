@@ -2,7 +2,10 @@
 package net.sf.freecol.server.control;
 
 import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.Iterator;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamWriter;
@@ -234,7 +237,7 @@ public final class PreGameController extends Controller {
                 out.writeEndElement();
                 player.getConnection().endTransmission(null);
             } catch (Exception e) {
-                logger.warning("EXCEPTION: " + e);
+                logger.log(Level.SEVERE, "EXCEPTION: ", e);
             }
         }
     }

@@ -826,7 +826,7 @@ public class IndianSettlement extends Settlement {
                     }
                 }
             }
-            if (type == Goods.TRADE_GOODS) {
+            if (type == Goods.TRADEGOODS) {
                 currentGoods += 20;
             }
 
@@ -1033,7 +1033,7 @@ public class IndianSettlement extends Settlement {
             consumeGoods(Goods.CIGARS, 1);
             consumeGoods(Goods.COATS, 1);
             consumeGoods(Goods.CLOTH, 1);
-            consumeGoods(Goods.TRADE_GOODS, 2);
+            consumeGoods(Goods.TRADEGOODS, 2);
         }
         goodsContainer.removeAbove(500);
 

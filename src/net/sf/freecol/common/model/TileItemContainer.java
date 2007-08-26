@@ -28,7 +28,7 @@ public class TileItemContainer extends FreeColGameObject {
     public static final String  REVISION = "$Revision: 1.00 $";
 
     /** The list of TileItems stored in this <code>TileItemContainer</code>. */
-    private List<TileImprovement> improvements;
+    private List<TileImprovement> improvements = new ArrayList<TileImprovement>();
     private Resource resource = null;
 
     /** Quick Pointers */
