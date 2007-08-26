@@ -449,44 +449,65 @@
   change child options: from, to
   -->
   <tileimprovement-types>
-    <tileimprovement-type name="model.improvement.river" natural="yes"
-            add-work-turns="0" overlay="model.tile.improvement.river">
-      <type id="river" magnitude="1">
-      <tiles all-land-tiles="yes">
+    <tileimprovement-type id="model.improvement.River" natural="yes"
+            add-work-turns="0">
+      <type id="river" magnitude="1"/>
+      <tiles all-land-tiles="yes"/>
       <effect goods-types="model.goods.food,model.goods.sugar,model.goods.tobacco,model.goods.cotton,model.goods.furs,model.goods.lumber,model.goods.ore,model.goods.silver"
-              value="1">
-      <effect movement-cost="1">
+              value="1"/>
+      <effect movement-cost="1"/>
     </tileimprovement-type>
-    <tileimprovement-type name="model.improvement.road"
+    <tileimprovement-type id="model.improvement.Road"
             add-work-turns="0" over-trees="yes"
             expended-goods-type="model.goods.tools" expended-amount="20">
-      <type id="road" magnitude="1">
-      <tiles all-land-tiles="yes">
+      <type id="road" magnitude="1"/>
+      <tiles all-land-tiles="yes"/>
       <effect goods-types="model.goods.furs,model.goods.lumber,model.goods.ore,model.goods.silver"
-              value="1">
-      <effect movement-cost="1">
+              value="1"/>
+      <effect movement-cost="1"/>
     </tileimprovement-type>
-    <tileimprovement-type name="model.improvement.plow"
+    <tileimprovement-type id="model.improvement.Plow"
             add-work-turns="2" overlay="4"
             expended-goods-type="model.goods.tools" expended-amount="20">
-      <tiles all-land-tiles="yes" all-forest-tiles="no">
+      <tiles all-land-tiles="yes" all-forest-tiles="no"/>
       <effect goods-types="model.goods.food,model.goods.sugar,model.goods.tobacco,model.goods.cotton"
-              value="1">
+              value="1"/>
     </tileimprovement-type>
-    <tileimprovement-type name="model.improvement.removeforest" add-work-turns="2"
+    <tileimprovement-type id="model.improvement.ClearForest" add-work-turns="2"
             expended-goods-type="model.goods.Tools" expended-amount="20"
             deliver-goods-type="model.goods.Lumber" deliver-amount="5">
-      <tiles all-forest-tiles="yes">
-      <change from="model.tile.mixedForest"     to="model.tile.plains">
-      <change from="model.tile.coniferForest"   to="model.tile.grassland">
-      <change from="model.tile.broadleafForest" to="model.tile.prairie">
-      <change from="model.tile.tropicalForest"  to="model.tile.savannah">
-      <change from="model.tile.wetlandForest"   to="model.tile.marsh">
-      <change from="model.tile.rainForest"      to="model.tile.swamp">
-      <change from="model.tile.scrubForest"     to="model.tile.desert">
-      <change from="model.tile.borealForest"    to="model.tile.tundra">
+      <tiles all-forest-tiles="yes"/>
+      <change from="model.tile.mixedForest"     to="model.tile.plains"/>
+      <change from="model.tile.coniferForest"   to="model.tile.grassland"/>
+      <change from="model.tile.broadleafForest" to="model.tile.prairie"/>
+      <change from="model.tile.tropicalForest"  to="model.tile.savannah"/>
+      <change from="model.tile.wetlandForest"   to="model.tile.marsh"/>
+      <change from="model.tile.rainForest"      to="model.tile.swamp"/>
+      <change from="model.tile.scrubForest"     to="model.tile.desert"/>
+      <change from="model.tile.borealForest"    to="model.tile.tundra"/>
     </tileimprovement-type>
   </tileimprovement-types>
+
+  <!--
+  Improvement Actions are handled by client/gui/action/ImprovementAction.java and compiled directly from
+  Specification.java rather than have a ImprovementActionType.java and class as it would be redundant.
+  For each improvement-action, there is a single accelerator. So in the event that two improvement-types
+    share the same accelerator, like Plow and RemoveForest. The valid TileTypes for the actions are
+    referenced from the Improvement List above, so the onus is on the person modifying to declare the
+    previous section.
+  All actions sharing an accelerator should be mutually exclusive, but the first action takes priority
+    during checking. If the first action cannot be performed, the second and subsequent actions will be
+    considered.
+  -->
+  <improvement-actions>
+    <improvement-action accelerator='R'>
+      <action tileimprovement-type="model.improvement.Road" name="model.improvement.Road.action"/>
+    </improvement-action>
+    <improvement-action accelerator='P'>
+      <action tileimprovement-type="model.improvement.Plow" name="model.improvement.Plow.action"/>
+      <action tileimprovement-type="model.improvement.ClearForest" name="model.improvement.ClearForest.action"/>
+    </improvement-action>
+  </improvement-actions>
 
   <unit-types>
     <unit-type name="model.unit.freeColonist"         offence="0"  defence="1" movement="3" lineOfSight="1"

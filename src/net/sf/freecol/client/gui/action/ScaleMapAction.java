@@ -224,9 +224,7 @@ public class ScaleMapAction extends FreeColAction {
                 
                 // Copy values to the new tile:
                 Tile t = new Tile(game, oldTile.getType(), i, j);
-                t.setForested(oldTile.isForested());
-                t.setAddition(oldTile.getAddition());
-                t.setBonus(oldTile.hasBonus());
+                t.getTileItemContainer().copyFrom(oldTile.getTileItemContainer());
                 v.add(t);
             }
             columns.add(v);
@@ -237,10 +235,7 @@ public class ScaleMapAction extends FreeColAction {
         
         // Update river directions
         for (Tile t : map.getAllTiles()) {
-            int addition = t.getAddition();
-            t.setAddition(Tile.ADD_NONE);
-            t.addRiver(addition);
-            t.setAddition(addition);
+            t.getTileItemContainer().updateRiver();
         }
         
         freeColClient.getGUI().setSelectedTile(new Position(0, 0));

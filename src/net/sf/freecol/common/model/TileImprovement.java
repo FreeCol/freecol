@@ -109,7 +109,7 @@ public class TileImprovement extends TileItem implements Locatable, Nameable {
     }
 
     public String getTypeId() {
-        return type.getType();
+        return type.getTypeId();
     }
 
     public int getMagnitude() {

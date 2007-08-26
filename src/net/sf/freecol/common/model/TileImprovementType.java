@@ -20,7 +20,7 @@ public final class TileImprovementType
     public  String  id;
     public  String  name;
     public  boolean natural;
-    public  String  type;
+    public  String  typeId;
     public  int     magnitude;
     public  int     addWorkTurns;
 
@@ -64,8 +64,8 @@ public final class TileImprovementType
         return natural;
     }
 
-    public String getType() {
-        return type;
+    public String getTypeId() {
+        return typeId;
     }
 
     public int getMagnitude() {
@@ -261,7 +261,8 @@ public final class TileImprovementType
                     String childName = xml.getNodeName();
 
                     if ("type".equals(childName)) {
-                        type = Xml.attribute(xml, "type", null);
+                        typeId = Xml.attribute(xml, "id", null);
+                        magnitude = Xml.intAttribute(xml, "magnitude", 1);
 
                     } else if ("tiles".equals(childName)) {
                         boolean allLand = Xml.booleanAttribute(xml, "all-land-tiles", false);
