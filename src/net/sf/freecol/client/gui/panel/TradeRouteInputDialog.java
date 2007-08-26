@@ -27,9 +27,11 @@ import javax.swing.TransferHandler;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
+import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.Goods;
+import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Settlement;
@@ -313,17 +315,17 @@ public final class TradeRouteInputDialog extends FreeColDialog implements Action
      * AbstractGoodsLabel and a CargoLabel (its current function).
      */
     public class CargoLabel extends JLabel {
-        private final int goodsType;
+        private final GoodsType goodsType;
 
 
-        public CargoLabel(int type) {
-            super(getCanvas().getImageProvider().getGoodsImageIcon(type));
+        public CargoLabel(GoodsType type) {
+            super(getCanvas().getImageProvider().getGoodsImageIcon(type.getIndex()));
             setTransferHandler(cargoHandler);
             addMouseListener(dragListener);
             this.goodsType = type;
         }
 
-        public int getType() {
+        public GoodsType getType() {
             return this.goodsType;
         }
 
@@ -336,8 +338,8 @@ public final class TradeRouteInputDialog extends FreeColDialog implements Action
 
         public GoodsPanel() {
             super(new GridLayout(4, 4, margin, margin));
-            for (int goods = 0; goods < Goods.NUMBER_OF_TYPES; goods++) {
-                CargoLabel label = new CargoLabel(goods);
+            for (GoodsType goodsType : FreeCol.getSpecification().getGoodsTypeList()) {
+                CargoLabel label = new CargoLabel(goodsType);
                 add(label);
             }
             setOpaque(false);
@@ -369,8 +371,8 @@ public final class TradeRouteInputDialog extends FreeColDialog implements Action
             removeAll();
             if (newStop != null) {
                 // stop = newStop;
-                for (Integer cargo : newStop.getCargo()) {
-                    add(new CargoLabel(cargo.intValue()));
+                for (GoodsType goodsType : newStop.getCargo()) {
+                    add(new CargoLabel(goodsType));
                 }
             }
             revalidate();
@@ -404,7 +406,7 @@ public final class TradeRouteInputDialog extends FreeColDialog implements Action
                         cargoPanel.revalidate();
                         Stop stop = (Stop) stopList.getSelectedValue();
                         if (stop != null) {
-                            stop.addCargo(new Integer(label.getType()));
+                            stop.addCargo(label.getType());
                             stop.setModified(true);
                         }
                     }
@@ -426,9 +428,9 @@ public final class TradeRouteInputDialog extends FreeColDialog implements Action
                     cargoPanel.remove(label);
                     Stop stop = (Stop) stopList.getSelectedValue();
                     if (stop != null) {
-                        ArrayList<Integer> cargo = stop.getCargo();
+                        ArrayList<GoodsType> cargo = stop.getCargo();
                         for (int index = 0; index < cargo.size(); index++) {
-                            if (cargo.get(index).intValue() == label.getType()) {
+                            if (cargo.get(index) == label.getType()) {
                                 cargo.remove(index);
                                 stop.setModified(true);
                                 break;
