@@ -12,6 +12,7 @@ import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.IndianSettlement;
 import cz.autel.dmi.HIGLayout;
+import net.sf.freecol.common.model.UnitType;
 
 /**
  * This panel is used to show information about an Indian settlement.
@@ -69,9 +70,14 @@ public final class IndianSettlementPanel extends FreeColDialog implements Action
      *            displayed.
      */
     public void initialize(IndianSettlement settlement) {
-        // TODO: fix message for learnable skill
-        String[] parts = settlement.getLearnableSkill().getId().split("\\.");
-        skillLabel.setText(Messages.message("indianSettlement.skill." + parts[parts.length-1]));
+        UnitType skill = settlement.getLearnableSkill();
+        String skillName;
+        if (skill != null) {
+            skillName = settlement.getLearnableSkill().getId();
+        } else {
+            skillName = settlement.hasBeenVisited() ? "none" : "unknown";
+        }
+        skillLabel.setText(Messages.message("indianSettlement.skill." + skillName));
 
         GoodsType[] wantedGoods = settlement.getWantedGoods();
         highlyWantedLabel.setText(Goods.getName(wantedGoods[0]));
