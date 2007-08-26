@@ -73,11 +73,11 @@ public final class IndianSettlementPanel extends FreeColDialog implements Action
         UnitType skill = settlement.getLearnableSkill();
         String skillName;
         if (skill != null) {
-            skillName = settlement.getLearnableSkill().getId();
+            skillName = skill.getName();
         } else {
-            skillName = settlement.hasBeenVisited() ? "none" : "unknown";
+            skillName = "indianSettlement.skill" + (settlement.hasBeenVisited() ? "None" : "Unknown");
         }
-        skillLabel.setText(Messages.message("indianSettlement.skill." + skillName));
+        skillLabel.setText(Messages.message(skillName));
 
         GoodsType[] wantedGoods = settlement.getWantedGoods();
         highlyWantedLabel.setText(Goods.getName(wantedGoods[0]));
