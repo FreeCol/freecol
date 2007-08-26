@@ -135,7 +135,9 @@ public final class GoodsType
             String  madeFromRef = Xml.attribute(xml, "made-from");
             GoodsType  rawMaterial = goodsTypeByRef.get(madeFromRef);
             madeFrom = rawMaterial;
-            rawMaterial.makes = this;
+            if (rawMaterial != null) {
+                rawMaterial.makes = this;
+            }
         }
 
         storable = Xml.booleanAttribute(xml, "storable", true);

@@ -1,6 +1,7 @@
 package net.sf.freecol.common.model;
 
 import java.awt.Color;
+import java.util.ArrayList;
 
 import java.util.List;
 import java.util.Map;
@@ -184,6 +185,11 @@ public final class TileType
         defenceFactor = 100;
         
         artBasic = -1;
+        producedType = new ArrayList<GoodsType>();
+        producedAmount = new ArrayList<Integer>();
+        resourceType = new ArrayList<ResourceType>();
+        resourceProbability = new ArrayList<Integer>();
+        
         Xml.Method method = new Xml.Method() {
             public void invokeOn(Node xml) {
                 String childName = xml.getNodeName();

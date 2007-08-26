@@ -1,5 +1,6 @@
 package net.sf.freecol.common.model;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
@@ -127,6 +128,9 @@ public final class ResourceType
             minValue = -1;
         }
 
+        bonusGoods = new ArrayList<GoodsType>();
+        bonusAmount = new ArrayList<Integer>();
+        bonusFactor = new ArrayList<Float>();
         // Only expected child is 'production-bonus'
         Xml.Method method = new Xml.Method() {
             public void invokeOn(Node xml) {

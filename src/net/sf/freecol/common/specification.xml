@@ -512,7 +512,7 @@
     </improvementaction-type>
     <improvementaction-type id="impRoadAction" accelerator='R'>
       <action tileimprovement-type="model.improvement.Road" name="model.improvement.Road.action" image-id="6"/>
-    </improvement-action>
+    </improvementaction-type>
   </improvementaction-types>
 
   <unit-types>
@@ -757,10 +757,10 @@
       <ability id="model.ability.piracy" value="yes"/>
     </unit-type>
     <unit-type name="model.unit.artillery"            offence="7"  defence="5" movement="3" lineOfSight="1" hammers="192" tools="40" price="500" increasingPrice="100">
-      <ability id="model.ability.bombard"/>
+      <ability id="model.ability.bombard" value="yes"/>
     </unit-type>
     <unit-type name="model.unit.damagedArtillery"     offence="5"  defence="3" movement="3" lineOfSight="1">
-      <ability id="model.ability.bombard"/>
+      <ability id="model.ability.bombard" value="yes"/>
     </unit-type>
     <unit-type name="model.unit.treasureTrain"        offence="0"  defence="0" movement="3" lineOfSight="1" spaceTaken="6">
       <ability id="model.ability.carryTreasure" value="yes"/>
@@ -891,7 +891,7 @@
     </founding-father>
     <founding-father id="model.foundingFather.thomasPaine" type="political"
                      weight1="1" weight2="2" weight3="8">
-      <ability id="model.ability.addTaxToBells" value="true"/>
+      <ability id="model.ability.addTaxToBells" value="yes"/>
     </founding-father>
     <founding-father id="model.foundingFather.simonBolivar" type="political"
                      weight1="0" weight2="4" weight3="6">

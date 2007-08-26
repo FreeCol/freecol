@@ -78,18 +78,7 @@ public final class Specification {
 
                 String childName = xml.getNodeName();
 
-                if ("building-types".equals(childName)) {
-
-                    ObjectFactory<BuildingType> factory = new ObjectFactory<BuildingType>() {
-                        public BuildingType objectFrom(Node xml) {
-                            BuildingType buildingType = new BuildingType();
-                            buildingType.readFromXmlElement(xml);
-                            return buildingType;
-                        }
-                    };
-                    buildingTypeList.addAll(makeListFromXml(xml, factory));
-
-                } else if ("goods-types".equals(childName)) {
+                if ("goods-types".equals(childName)) {
 
                     ObjectFactory<GoodsType> factory = new ObjectFactory<GoodsType>() {
                         int goodsIndex = 0;
@@ -104,6 +93,17 @@ public final class Specification {
                         }
                     };
                     goodsTypeList.addAll(makeListFromXml(xml, factory));
+
+                } else if ("building-types".equals(childName)) {
+
+                    ObjectFactory<BuildingType> factory = new ObjectFactory<BuildingType>() {
+                        public BuildingType objectFrom(Node xml) {
+                            BuildingType buildingType = new BuildingType();
+                            buildingType.readFromXmlElement(xml);
+                            return buildingType;
+                        }
+                    };
+                    buildingTypeList.addAll(makeListFromXml(xml, factory));
 
                 } else if ("resource-types".equals(childName)) {
 

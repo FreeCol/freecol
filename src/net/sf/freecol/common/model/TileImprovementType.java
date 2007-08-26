@@ -1,5 +1,6 @@
 package net.sf.freecol.common.model;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -234,7 +235,7 @@ public final class TileImprovementType
         name = Xml.attribute(xml, "id");
         String[] buffer = name.split("\\.");
         id = buffer[buffer.length - 1];
-        addWorkTurns = Xml.intAttribute(xml, "add-works-turns");
+        addWorkTurns = Xml.intAttribute(xml, "add-works-turns", 0);
         movementCost = -1;
         movementCostFactor = -1;
         natural = Xml.booleanAttribute(xml, "natural", false);
@@ -255,6 +256,12 @@ public final class TileImprovementType
         g = Xml.attribute(xml, "deliver-goods-type", "");
         deliverGoodsType = goodsTypeByRef.get(g);
         deliverAmount = Xml.intAttribute(xml, "deliver-amount", 0);
+
+        allowedTileTypes = new ArrayList<TileType>();
+        goodsEffect = new ArrayList<GoodsType>();
+        goodsBonus = new ArrayList<Integer>();
+        tileTypeChangeFrom = new ArrayList<TileType>();
+        tileTypeChangeTo = new ArrayList<TileType>();
 
         Xml.Method method = new Xml.Method() {
                 public void invokeOn(Node xml) {
@@ -297,7 +304,7 @@ public final class TileImprovementType
                         }
                         if (Xml.hasAttribute(xml, "goods-types")) {
                             String[] goods = Xml.arrayAttribute(xml, "goods-types");
-                            int[] bonus = Xml.intArrayAttribute(xml, "values");
+                            int[] bonus = Xml.intArrayAttribute(xml, "values", new int[] {});
                             for (int i = 0; i < goods.length; i++) {
                                 GoodsType gt = goodsTypeByRef.get(goods[i]);
                                 if (gt != null && !goodsEffect.contains(gt)) {
