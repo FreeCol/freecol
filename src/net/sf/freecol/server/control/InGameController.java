@@ -4,8 +4,8 @@ import java.io.IOException;
 import java.util.Iterator;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import net.sf.freecol.FreeCol;
 
+import net.sf.freecol.FreeCol;
 import net.sf.freecol.common.model.Building;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.FoundingFather;
@@ -18,6 +18,7 @@ import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
+import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.model.Map.Position;
 import net.sf.freecol.common.networking.Message;
 import net.sf.freecol.server.FreeColServer;
@@ -478,7 +479,9 @@ public final class InGameController extends Controller {
                         }
                         break;
                     case Monarch.SUPPORT_SEA:
-                        newUnit = new Unit(getGame(), nextPlayer.getEurope(), nextPlayer, Unit.FRIGATE, Unit.ACTIVE);
+                        // TODO: make this generic
+                        UnitType unitType = FreeCol.getSpecification().getUnitType("model.unit.frigate");
+                        newUnit = new Unit(getGame(), nextPlayer.getEurope(), nextPlayer, unitType, Unit.ACTIVE);
                         nextPlayer.getEurope().add(newUnit);
                         monarchActionElement.appendChild(newUnit.toXMLElement(nextPlayer, monarchActionElement
                                 .getOwnerDocument()));
@@ -526,13 +529,15 @@ public final class InGameController extends Controller {
         for (int type = 0; type < units.length; type++) {
             for (int i = 0; i < units[type]; i++) {
                 if (type == Monarch.ARTILLERY) {
-                    newUnit = new Unit(getGame(), nextPlayer.getEurope(), nextPlayer, Unit.ARTILLERY, Unit.ACTIVE);
+                    UnitType unitType = FreeCol.getSpecification().getUnitType("model.unit.artillery");
+                    newUnit = new Unit(getGame(), nextPlayer.getEurope(), nextPlayer, unitType, Unit.ACTIVE);
                 } else {
                     boolean mounted = false;
                     if (type == Monarch.DRAGOON) {
                         mounted = true;
                     }
-                    newUnit = new Unit(getGame(), nextPlayer.getEurope(), nextPlayer, Unit.VETERAN_SOLDIER, Unit.ACTIVE,
+                    UnitType unitType = FreeCol.getSpecification().getUnitType("model.unit.veteranSoldier");
+                    newUnit = new Unit(getGame(), nextPlayer.getEurope(), nextPlayer, unitType, Unit.ACTIVE,
                             true, mounted, 0, false);
                 }
                 nextPlayer.getEurope().add(newUnit);
