@@ -5,6 +5,7 @@ import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.logging.Logger;
 
+import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.PseudoRandom;
 import net.sf.freecol.common.model.Map;
 import net.sf.freecol.common.model.Tile;

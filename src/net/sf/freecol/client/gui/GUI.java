@@ -1643,7 +1643,7 @@ public final class GUI {
             
             TileItemContainer tic = tile.getTileItemContainer();
             List<TileImprovement> tiList = tic.getImprovements();
-            List<TileImprovement> tiList2;
+            List<TileImprovement> tiList2 = new ArrayList<TileImprovement>();
             // Go through improvements and add those that are drawn over trees to another list for later
             // Skip roads and rivers
             for (TileImprovement ti : tiList) {

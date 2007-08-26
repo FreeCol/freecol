@@ -316,7 +316,7 @@ public class TileItemContainer extends FreeColGameObject {
             newTI.setMagnitude(ti.getMagnitude());
             newTI.setStyle(ti.getStyle());
             newTI.setTurnsToComplete(ti.getTurnsToComplete());
-            addTileItem(r);
+            addTileItem(newTI);
         }
     }
 

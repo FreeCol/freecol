@@ -20,6 +20,7 @@ import javax.swing.JPanel;
 import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 
+import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.client.gui.i18n.Messages;
@@ -79,16 +80,16 @@ public final class TilePanel extends FreeColDialog implements ActionListener {
 
         }
 */
-        List<GoodsType> farmedGoods = FreeCol.getSpecification().getFarmedGoodsIndexList();
+        List<GoodsType> farmedGoods = FreeCol.getSpecification().getFarmedGoodsTypeList();
         number = farmedGoods.size();
 
         goodsPanel = new JPanel();
         goodsPanel.setLayout(new FlowLayout());
 
         goodsTypes = new GoodsType[number];
-        labels = new JLabel[number];
+        JLabel[] labels = new JLabel[number];
         for (int k = 0; k < number; k++) {
-            goodsTypes[k] = armedGoods.get(k);
+            goodsTypes[k] = farmedGoods.get(k);
             labels[k] = new JLabel(canvas.getImageProvider().getGoodsImageIcon(goodsTypes[k].getIndex()));
             //goodsPanel.add(labels[k]);
         }
@@ -174,7 +175,7 @@ public final class TilePanel extends FreeColDialog implements ActionListener {
                 break;
             case COLOPEDIA:
                 setResponse(new Boolean(true));
-                canvas.showColopediaPanel(ColopediaPanel.COLOPEDIA_TERRAIN, tile.getType().getIndex());
+                canvas.showColopediaPanel(ColopediaPanel.COLOPEDIA_TERRAIN, tileType.getIndex());
                 break;
             default:
                 logger.warning("Invalid Actioncommand: invalid number.");

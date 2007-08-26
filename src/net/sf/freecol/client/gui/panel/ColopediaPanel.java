@@ -385,7 +385,7 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
         String name = Messages.message(resType.name);
         ImageIcon icon;
         DefaultMutableTreeNode item;
-        icon = new ImageIcon(library.getBonusImageIcon(resType));
+        icon = library.getBonusImageIcon(resType);
         item = new DefaultMutableTreeNode(new ColopediaTreeItem(name, icon));
         parent.add(item);
     }

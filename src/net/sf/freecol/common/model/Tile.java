@@ -133,6 +133,8 @@ public final class Tile extends FreeColGameObject implements Location, Nameable 
 
     public static int NUMBER_OF_TYPES;
 
+    private List<TileItem> tileItems;
+
     /*
       /**
       * Creates a new object with the type <code>UNEXPLORED</code>. (Depreciated)

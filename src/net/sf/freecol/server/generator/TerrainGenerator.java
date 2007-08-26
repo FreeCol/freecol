@@ -1,7 +1,9 @@
 package net.sf.freecol.server.generator;
 
+import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Random;
 import java.util.Vector;
 import java.util.logging.Logger;
@@ -24,7 +26,7 @@ public class TerrainGenerator {
     private final MapGeneratorOptions mapGeneratorOptions;
     private final Random random = new Random();
 
-    public List<TileType>[] latTileTypes = new List<TileType>[4];
+    public ArrayList<ArrayList<TileType>> latTileTypes = new ArrayList<ArrayList<TileType>>();
     /**
      * Creates a new <code>TerrainGenerator</code>.
      * 
@@ -200,21 +202,23 @@ public class TerrainGenerator {
             }
         }
         // Fill the list of latitude TileTypes the first time you use it
-        if (latTileTypes[lat].size() == 0) {
+        if (latTileTypes.get(lat).size() == 0) {
             for (TileType tileType : FreeCol.getSpecification().getTileTypeList()) {
-                if (!tileType.isWater && tileType.withinRange(TileType.LATITUDE, lat)) {
+                if (!tileType.isWater() && tileType.withinRange(TileType.LATITUDE, lat)) {
                     // Within range, add it
-                    latTileTypes[lat].add(tileType);
+                    latTileTypes.get(lat).add(tileType);
                 }
             }
-            if (latTileTypes[lat].size() == 0) {
+            if (latTileTypes.get(lat).size() == 0) {
                 // If it is still 0 after adding all relevant types, throw error
                 throw new RuntimeException("No TileType within latitude == " + lat);
             }
         }
         // Scope the type of tiles to be used and choose one
         TileType chosen = null;
-        List<TileType> acceptable = latTileTypes[lat].clone();
+        //List<TileType> acceptable = latTileTypes.get(lat).clone();
+        List<TileType> acceptable = new ArrayList<TileType>();
+        acceptable.addAll(latTileTypes.get(lat));
         // Choose based on altitude
         int altitude = random.nextInt(10);
         for (int i = 0; i < 3; i++) {
@@ -237,10 +241,10 @@ public class TerrainGenerator {
         // Choose based on forested/unforested
         if (chosen == null) {
             boolean forested = random.nextInt(100) < forestChance;
-            Iterator<TileType> it = acceptable.iterator();
+            it = acceptable.iterator();
             while (it.hasNext()) {
                 TileType t = it.next();
-                if (t.isForested != forested) {
+                if (t.isForested() != forested) {
                     if (acceptable.size() == 1) {
                         chosen = t;
                         break;
@@ -252,7 +256,7 @@ public class TerrainGenerator {
         // Choose based on humidity - later use MapGeneratorOptions to help define these
         if (chosen == null) {
             int humidity = random.nextInt(7) - 3;   // To get -3 to 3, 0 inclusive
-            Iterator<TileType> it = acceptable.iterator();
+            it = acceptable.iterator();
             while (it.hasNext()) {
                 TileType t = it.next();
                 if (!t.withinRange(TileType.HUMIDITY, humidity)) {
@@ -267,7 +271,7 @@ public class TerrainGenerator {
         // Choose based on temperature - later use MapGeneratorOptions to help define these
         if (chosen == null) {
             int temperature = random.nextInt(7) - 3;   // To get -3 to 3, 0 inclusive
-            Iterator<TileType> it = acceptable.iterator();
+            it = acceptable.iterator();
             while (it.hasNext()) {
                 TileType t = it.next();
                 if (!t.withinRange(TileType.TEMPERATURE, temperature)) {

@@ -406,7 +406,7 @@ public class MapGenerator {
             // If it has a resource, take the resource, and ignore the other things produced there
             if (t.hasResource()) {
                 ResourceType r = t.getTileItemContainer().getResource().getType();
-                for (GoodsType g : r.getBonusTypeList) {
+                for (GoodsType g : r.getBonusTypeList()) {
                     int index = farmedList.indexOf(g);
                     if (index >= 0) {
                         potentials[index]++;
@@ -414,8 +414,8 @@ public class MapGenerator {
                     }
                 }
             } else {
-                TileType t = t.getType();
-                for (GoodsType g : t.getPotentialTypeList()) {
+                TileType tileType = t.getType();
+                for (GoodsType g : tileType.getPotentialTypeList()) {
                     int index = farmedList.indexOf(g);
                     if (index >= 0) {
                         potentials[index]++;
@@ -517,7 +517,7 @@ public class MapGenerator {
 
                 if (colonyTile != null) {
                     for (TileType t : FreeCol.getSpecification().getTileTypeList()) {
-                        if (!t.isWater) {
+                        if (!t.isWater()) {
                             colonyTile.setType(t);
                             break;
                         }
@@ -529,7 +529,7 @@ public class MapGenerator {
                     if (buildColonyUnit.getLocation() instanceof ColonyTile) {
                         Tile ct = ((ColonyTile) buildColonyUnit.getLocation()).getWorkTile();
                         for (TileType t : FreeCol.getSpecification().getTileTypeList()) {
-                            if (!t.isWater) {
+                            if (!t.isWater()) {
                                 ct.setType(t);
                                 break;
                             }
@@ -547,7 +547,7 @@ public class MapGenerator {
                     if (lumberjack.getLocation() instanceof ColonyTile) {
                         Tile lt = ((ColonyTile) lumberjack.getLocation()).getWorkTile();
                         for (TileType t : FreeCol.getSpecification().getTileTypeList()) {
-                            if (t.isForest) {
+                            if (t.isForested()) {
                                 lt.setType(t);
                                 break;
                             }
