@@ -13,7 +13,7 @@ import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.action.AboutAction;
 import net.sf.freecol.client.gui.action.AssignTradeRouteAction;
 import net.sf.freecol.client.gui.action.BuildColonyAction;
-import net.sf.freecol.client.gui.action.BuildRoadAction;
+//import net.sf.freecol.client.gui.action.BuildRoadAction;
 import net.sf.freecol.client.gui.action.ChangeAction;
 import net.sf.freecol.client.gui.action.ChatAction;
 import net.sf.freecol.client.gui.action.ClearOrdersAction;
@@ -33,10 +33,12 @@ import net.sf.freecol.client.gui.action.EuropeAction;
 import net.sf.freecol.client.gui.action.ExecuteGotoOrdersAction;
 import net.sf.freecol.client.gui.action.FortifyAction;
 import net.sf.freecol.client.gui.action.GotoAction;
+// Replaced BuildRoad and Plow Actions with ImprovementAction
+import net.sf.freecol.client.gui.action.ImprovementActionType;
 import net.sf.freecol.client.gui.action.MapControlsAction;
 import net.sf.freecol.client.gui.action.NewAction;
 import net.sf.freecol.client.gui.action.OpenAction;
-import net.sf.freecol.client.gui.action.PlowAction;
+//import net.sf.freecol.client.gui.action.PlowAction;
 import net.sf.freecol.client.gui.action.PreferencesAction;
 import net.sf.freecol.client.gui.action.QuitAction;
 import net.sf.freecol.client.gui.action.ReconnectAction;
@@ -94,11 +96,11 @@ public class InGameMenuBar extends FreeColMenuBar {
     public static final int UNIT_ORDER_CLEAR_ORDERS = 3;
 
     public static final int UNIT_ORDER_BUILD_COL = 5;
-
+/*
     public static final int UNIT_ORDER_PLOW = 6;
 
     public static final int UNIT_ORDER_BUILD_ROAD = 7;
-
+*/
     public static final int UNIT_ORDER_SKIP = 9;
 
     public static final int UNIT_ORDER_DISBAND = 11;
@@ -222,8 +224,14 @@ public class InGameMenuBar extends FreeColMenuBar {
         menu.addSeparator();
 
         menu.add(getMenuItem(BuildColonyAction.ID));
+        // Insert all Improvements here:
+        for (ImprovementActionType iaType : FreeCol.getSpecification().getImprovementActionTypeList()) {
+            menu.add(getMenuItem(iaType.ID));
+        }
+        /*  Depreciated
         menu.add(getMenuItem(PlowAction.ID));
         menu.add(getMenuItem(BuildRoadAction.ID));
+        */
         menu.add(getMenuItem(UnloadAction.ID));
 
         menu.addSeparator();

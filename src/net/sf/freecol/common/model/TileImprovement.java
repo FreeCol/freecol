@@ -232,7 +232,7 @@ public class TileImprovement extends TileItem implements Locatable, Nameable {
         if (!isComplete()) {
             return moveCost;
         }
-        String typeId = type.getType();
+        String typeId = type.getTypeId();
         if (typeId == null) {
             // No checking for matching type
             return type.getMovementCost(moveCost);

@@ -489,8 +489,6 @@
   </tileimprovement-types>
 
   <!--
-  Improvement Actions are handled by client/gui/action/ImprovementAction.java and compiled directly from
-  Specification.java rather than have a ImprovementActionType.java and class as it would be redundant.
   For each improvement-action, there is a single accelerator. So in the event that two improvement-types
     share the same accelerator, like Plow and RemoveForest. The valid TileTypes for the actions are
     referenced from the Improvement List above, so the onus is on the person modifying to declare the
@@ -498,16 +496,24 @@
   All actions sharing an accelerator should be mutually exclusive, but the first action takes priority
     during checking. If the first action cannot be performed, the second and subsequent actions will be
     considered.
+  Structure:
+  <improvementaction-type id="plowAction" accelerator='P'>
+    <action tileimprovement-type="model.improvement.Plow" name="model.improvement.Plow.action" image-id="5"/>
+    <action tileimprovement-type="model.improvement.ClearForest" name="model.improvement.ClearForest.action" image-id="4"/>
+  </improvementaction-type>
+  Notes:
+    image-id is the reference for the unit-button index in ImageLibrary.java
+    Keep the ids in alphabetical order. Not mandatory, but neater.
   -->
-  <improvement-actions>
-    <improvement-action accelerator='R'>
-      <action tileimprovement-type="model.improvement.Road" name="model.improvement.Road.action"/>
+  <improvementaction-types>
+    <improvementaction-type id="impPlowAction" accelerator='P'>
+      <action tileimprovement-type="model.improvement.Plow" name="model.improvement.Plow.action" image-id="5"/>
+      <action tileimprovement-type="model.improvement.ClearForest" name="model.improvement.ClearForest.action" image-id="4"/>
+    </improvementaction-type>
+    <improvementaction-type id="impRoadAction" accelerator='R'>
+      <action tileimprovement-type="model.improvement.Road" name="model.improvement.Road.action" image-id="6"/>
     </improvement-action>
-    <improvement-action accelerator='P'>
-      <action tileimprovement-type="model.improvement.Plow" name="model.improvement.Plow.action"/>
-      <action tileimprovement-type="model.improvement.ClearForest" name="model.improvement.ClearForest.action"/>
-    </improvement-action>
-  </improvement-actions>
+  </improvementaction-types>
 
   <unit-types>
     <unit-type name="model.unit.freeColonist"         offence="0"  defence="1" movement="3" lineOfSight="1"

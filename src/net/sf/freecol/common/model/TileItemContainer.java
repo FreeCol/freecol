@@ -303,6 +303,9 @@ public class TileItemContainer extends FreeColGameObject {
         }
     }
 
+    public void copyFrom(TileItemContainer tic) {
+        copyFrom(tic, true);
+    }
     public void copyFrom(TileItemContainer tic, boolean importBonuses) {
         clear();
         if (tic.hasResource() && importBonuses) {
@@ -388,7 +391,7 @@ public class TileItemContainer extends FreeColGameObject {
         List<TileImprovementType> tiTypeList = FreeCol.getSpecification().getTileImprovementTypeList();
         // Get the first river that matches or is below
         for (TileImprovementType tiType : tiTypeList) {
-            if ("river".equals(tiType.getType()) && tiType.getMagnitude() <= magnitude) {
+            if ("river".equals(tiType.getTypeId()) && tiType.getMagnitude() <= magnitude) {
                 TileImprovement river = new TileImprovement(getGame(), tile, tiType);
                 this.river = river;
                 adjustNeighbourRiverStyle(0);
@@ -435,7 +438,7 @@ public class TileItemContainer extends FreeColGameObject {
         List<TileImprovementType> tiTypeList = FreeCol.getSpecification().getTileImprovementTypeList();
         // Check if there is another river type defined for this magnitude
         for (TileImprovementType tiType : tiTypeList) {
-            if ("river".equals(tiType.getType()) && tiType.getMagnitude() <= magnitude) {
+            if ("river".equals(tiType.getTypeId()) && tiType.getMagnitude() <= magnitude) {
                 if (tiType != river.getType()) {
                     // Has a different river type for this magnitude
                     TileImprovement r = new TileImprovement(getGame(), tile, tiType);

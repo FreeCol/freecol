@@ -5,6 +5,7 @@ import java.util.logging.Logger;
 
 import javax.swing.SwingUtilities;
 
+import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.common.option.Option;
 import net.sf.freecol.common.option.OptionGroup;
@@ -49,7 +50,7 @@ public class ActionManager extends OptionGroup {
         add(new AboutAction(freeColClient));
         add(new AssignTradeRouteAction(freeColClient));
         add(new BuildColonyAction(freeColClient));
-        add(new BuildRoadAction(freeColClient));
+        // add(new BuildRoadAction(freeColClient));         // Depreciated
         add(new ChangeAction(freeColClient));
         add(new ChatAction(freeColClient));
         add(new ClearOrdersAction(freeColClient));
@@ -70,6 +71,10 @@ public class ActionManager extends OptionGroup {
         add(new ExecuteGotoOrdersAction(freeColClient));
         add(new FortifyAction(freeColClient));
         add(new GotoAction(freeColClient));
+        // Initialize ImprovementActions
+        for (ImprovementActionType ia : FreeCol.getSpecification().getImprovementActionTypeList()) {
+            add(new ImprovementAction(freeColClient, ia));
+        }
         add(new MapControlsAction(freeColClient));
         add(new MiniMapZoomInAction(freeColClient));
         add(new MiniMapZoomOutAction(freeColClient));
@@ -77,7 +82,7 @@ public class ActionManager extends OptionGroup {
         add(new NewEmptyMapAction(freeColClient));
         add(new OpenAction(freeColClient));
         add(new PreferencesAction(freeColClient));
-        add(new PlowAction(freeColClient));
+        // add(new PlowAction(freeColClient));              // Depreciated
         add(new ReconnectAction(freeColClient));
         add(new RenameAction(freeColClient));
         add(new ReportContinentalCongressAction(freeColClient));

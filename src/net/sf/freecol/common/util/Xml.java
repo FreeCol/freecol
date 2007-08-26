@@ -99,6 +99,11 @@ public final class Xml
         }
     }
 
+    public static char charAttribute( Node xmlElement, String attributeName ) {
+
+        return attribute(xmlElement, attributeName).charAt(0);
+    }
+
     /*
     public static String messageAttribute( Node xmlElement, String attributeName ) {
 

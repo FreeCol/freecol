@@ -9,6 +9,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import net.sf.freecol.client.gui.action.ImprovementActionType;
 import net.sf.freecol.common.model.FoundingFather;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.BuildingType;
@@ -45,6 +46,7 @@ public final class Specification {
 
     private final List<TileType> tileTypeList;
     private final List<TileImprovementType> tileImprovementTypeList;
+    private final List<ImprovementActionType> improvementActionTypeList;
 
     private final List<UnitType> unitTypeList;
 
@@ -57,12 +59,14 @@ public final class Specification {
         resourceTypeList = new ArrayList<ResourceType>();
         tileTypeList = new ArrayList<TileType>();
         tileImprovementTypeList = new ArrayList<TileImprovementType>();
+        improvementActionTypeList = new ArrayList<ImprovementActionType>();
         unitTypeList = new ArrayList<UnitType>();
         foundingFathers = new ArrayList<FoundingFather>();
 
         final Map<String, GoodsType> goodsTypeByRef = new HashMap<String, GoodsType>();
         final Map<String, ResourceType> resourceTypeByRef = new HashMap<String, ResourceType>();
         final Map<String, TileType> tileTypeByRef = new HashMap<String, TileType>();
+        final Map<String, TileImprovementType> tileImprovementTypeByRef = new HashMap<String, TileImprovementType>();
         farmedGoodsTypeList = new ArrayList<GoodsType>();
 
         InputStream in = Specification.class.getResourceAsStream("specification.xml");
@@ -92,7 +96,7 @@ public final class Specification {
                         public GoodsType objectFrom(Node xml) {
                             GoodsType goodsType = new GoodsType(goodsIndex++);
                             goodsType.readFromXmlElement(xml, goodsTypeByRef);
-                            goodsTypeByRef.put(Xml.attribute(xml, "ref"), goodsType);
+                            goodsTypeByRef.put(Xml.attribute(xml, "id"), goodsType);
                             if (goodsType.isFarmed()) {
                                 farmedGoodsTypeList.add(goodsType);
                             }
@@ -108,7 +112,7 @@ public final class Specification {
                         public ResourceType objectFrom(Node xml) {
                             ResourceType resourceType = new ResourceType(resIndex++);
                             resourceType.readFromXmlElement(xml, goodsTypeByRef);
-                            resourceTypeByRef.put(Xml.attribute(xml, "ref"), resourceType);
+                            resourceTypeByRef.put(Xml.attribute(xml, "id"), resourceType);
                             return resourceType;
                         }
                     };
@@ -121,23 +125,36 @@ public final class Specification {
                         public TileType objectFrom(Node xml) {
                             TileType tileType = new TileType(tileIndex++);
                             tileType.readFromXmlElement(xml, goodsTypeByRef, resourceTypeByRef);
-                            tileTypeByRef.put(Xml.attribute(xml, "ref"), tileType);
+                            tileTypeByRef.put(Xml.attribute(xml, "id"), tileType);
                             return tileType;
                         }
                     };
                     tileTypeList.addAll(makeListFromXml(xml, factory));
 
                 } else if ("tileimprovement-types".equals(childName)) {
-
+                    
                     ObjectFactory<TileImprovementType> factory = new ObjectFactory<TileImprovementType>() {
                         int impIndex = 0;
                         public TileImprovementType objectFrom(Node xml) {
                             TileImprovementType tileImprovementType = new TileImprovementType(impIndex++);
                             tileImprovementType.readFromXmlElement(xml, tileTypeList, tileTypeByRef, goodsTypeByRef);
+                            tileImprovementTypeByRef.put(Xml.attribute(xml, "id"), tileImprovementType);
                             return tileImprovementType;
                         }
                     };
                     tileImprovementTypeList.addAll(makeListFromXml(xml, factory));
+
+                } else if ("improvementaction-types".equals(childName)) {
+
+                    ObjectFactory<ImprovementActionType> factory = new ObjectFactory<ImprovementActionType>() {
+                        
+                        public ImprovementActionType objectFrom(Node xml) {
+                            ImprovementActionType impActionType = new ImprovementActionType();
+                            impActionType.readFromXmlElement(xml, tileImprovementTypeByRef);
+                            return impActionType;
+                        }
+                    };
+                    improvementActionTypeList.addAll(makeListFromXml(xml, factory));
 
                 } else if ("unit-types".equals(childName)) {
 
@@ -331,6 +348,24 @@ public final class Specification {
         for (TileImprovementType ti : tileImprovementTypeList) {
             if (ti.getName().equals(name)) {
                 return ti;
+            }
+        }
+        return null;
+    }
+
+    // -- Improvement Actions --
+    public List<ImprovementActionType> getImprovementActionTypeList() {
+        return improvementActionTypeList;
+    }
+
+    public ImprovementActionType getImprovementActionType(int index) {
+        return improvementActionTypeList.get(index);
+    }
+
+    public ImprovementActionType getImprovementActionType(String id) {
+        for (ImprovementActionType ia : improvementActionTypeList) {
+            if (ia.ID.equals(id)) {
+                return ia;
             }
         }
         return null;

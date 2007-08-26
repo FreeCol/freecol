@@ -219,9 +219,7 @@ public class DetermineHighSeasAction extends FreeColAction {
                  */
                 Tile importTile = oldMap.getTile(oldX, oldY);
                 Tile t = new Tile(game, importTile.getType(), i, j);
-                t.setForested(importTile.isForested());
-                t.setAddition(importTile.getAddition());
-                t.setBonus(importTile.hasBonus());
+                t.getTileItemContainer().copyFrom(importTile.getTileItemContainer());
                 v.add(t);
             }
             columns.add(v);
@@ -232,10 +230,7 @@ public class DetermineHighSeasAction extends FreeColAction {
         
         // Update river directions
         for (Tile t : map.getAllTiles()) {
-            int addition = t.getAddition();
-            t.setAddition(Tile.ADD_NONE);
-            t.addRiver(addition);
-            t.setAddition(addition);
+            t.getTileItemContainer().updateRiver();
         }
         
         freeColClient.getGUI().setSelectedTile(new Position(0, 0));

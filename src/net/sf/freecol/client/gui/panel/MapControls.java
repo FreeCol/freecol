@@ -3,12 +3,15 @@ package net.sf.freecol.client.gui.panel;
 
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.swing.Action;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.JLayeredPane;
 
+import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.Canvas;
@@ -16,10 +19,12 @@ import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.ViewMode;
 import net.sf.freecol.client.gui.action.ActionManager;
 import net.sf.freecol.client.gui.action.BuildColonyAction;
-import net.sf.freecol.client.gui.action.BuildRoadAction;
+// import net.sf.freecol.client.gui.action.BuildRoadAction;
 import net.sf.freecol.client.gui.action.DisbandUnitAction;
 import net.sf.freecol.client.gui.action.FortifyAction;
-import net.sf.freecol.client.gui.action.PlowAction;
+// Replaced BuildRoad and Plow Actions with ImprovementAction
+import net.sf.freecol.client.gui.action.ImprovementActionType;
+// import net.sf.freecol.client.gui.action.PlowAction;
 import net.sf.freecol.client.gui.action.SentryAction;
 import net.sf.freecol.client.gui.action.SkipUnitAction;
 import net.sf.freecol.client.gui.action.WaitAction;
@@ -74,6 +79,19 @@ public final class MapControls {
         compassRose = new JLabel(freeColClient.getGUI().getImageLibrary().getMiscImageIcon(9));
         
         final ActionManager am = freeColClient.getActionManager();
+        
+        List<UnitButton> ubList = new ArrayList<UnitButton>();
+        ubList.add(new UnitButton(am.getFreeColAction(WaitAction.ID)));
+        ubList.add(new UnitButton(am.getFreeColAction(SkipUnitAction.ID)));
+        ubList.add(new UnitButton(am.getFreeColAction(SentryAction.ID)));
+        ubList.add(new UnitButton(am.getFreeColAction(FortifyAction.ID)));
+        for (ImprovementActionType iaType : FreeCol.getSpecification().getImprovementActionTypeList()) {
+            ubList.add(new UnitButton(am.getFreeColAction(iaType.ID)));
+        }
+        ubList.add(new UnitButton(am.getFreeColAction(BuildColonyAction.ID)));
+        ubList.add(new UnitButton(am.getFreeColAction(DisbandUnitAction.ID)));
+        unitButton = ((UnitButton[]) ubList.toArray());
+        /*  Depreciated
         unitButton = new UnitButton[] {
             new UnitButton(am.getFreeColAction(WaitAction.ID)),
             new UnitButton(am.getFreeColAction(SkipUnitAction.ID)),
@@ -84,6 +102,7 @@ public final class MapControls {
             new UnitButton(am.getFreeColAction(BuildColonyAction.ID)),
             new UnitButton(am.getFreeColAction(DisbandUnitAction.ID))
         };
+        */
         
         //
         // Don't allow them to gain focus
