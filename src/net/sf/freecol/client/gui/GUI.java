@@ -1536,7 +1536,11 @@ public final class GUI {
      *        unexplored terrain.
      */
     private void displayBaseTile(Graphics2D g, Map map, Tile tile, int x, int y, boolean drawUnexploredBorders) {
-        g.drawImage(lib.getTerrainImage(tile.getType().artBasic, tile.getX(), tile.getY()), x, y, null);
+        int index = 0;
+        if (tile.isExplored()) {
+            index = tile.getType().artBasic;
+        }
+        g.drawImage(lib.getTerrainImage(index, tile.getX(), tile.getY()), x, y, null);
 
         Map.Position pos = new Map.Position(tile.getX(), tile.getY());
 
@@ -1549,7 +1553,7 @@ public final class GUI {
                     continue;
                 }
 
-                if (tile.getType() == borderingTile.getType() || tile.isLand() && !borderingTile.isLand()){
+                if (tile.getType() == borderingTile.getType() || !borderingTile.isLand()){
                     // Equal tiles and sea tiles have no effect
                     continue;
                 }
@@ -1566,7 +1570,8 @@ public final class GUI {
                                                     i,
                                                     tile.getX(), tile.getY()),
                                                     x, y, null);
-                } else if (borderingTile.getType().getIndex() < tile.getType().getIndex()) {
+                } else if (tile.isExplored() && borderingTile.isExplored() &&
+                        borderingTile.getType().getIndex() < tile.getType().getIndex()) {
                     // Draw land terrain with bordering land type
                     g.drawImage(lib.getTerrainImage(borderingTile.getType().artBasic,
                                                     i,
@@ -1618,7 +1623,7 @@ public final class GUI {
         Map.Position pos = new Map.Position(tile.getX(), tile.getY());
 
         if (!tile.isExplored()) {
-            g.drawImage(lib.getTerrainImage(tile.getType().artUnexplored, tile.getX(), tile.getY()), x, y, null);
+            g.drawImage(lib.getTerrainImage(0, tile.getX(), tile.getY()), x, y, null);
         } else {
             // Until the mountain/hill bordering tiles are done... -sjm
             // When that happens, use normal bordering method - ryan
@@ -1882,10 +1887,10 @@ public final class GUI {
      * (in pixels).
      */
     private void displayUnexploredBorders(Graphics2D g, Map map, Tile tile, int x, int y) {  
-        Map.Position pos = new Map.Position(tile.getX(), tile.getY());
-
         if (tile.isExplored()) {
-            for (int i = 3; i < 6; i++) {
+            Map.Position pos = new Map.Position(tile.getX(), tile.getY());
+
+            for (int i = 0; i < 8; i++) {
                 Map.Position p = Map.getAdjacent(pos, i);
                 if (map.isValid(p)) {
                     Tile borderingTile = map.getTile(p);
@@ -1894,7 +1899,7 @@ public final class GUI {
                         continue;
                     }
 
-                    g.drawImage(lib.getTerrainImage(borderingTile.getType().artBasic, i, tile.getX(), tile.getY()), x, y, null);
+                    g.drawImage(lib.getTerrainImage(0, i, tile.getX(), tile.getY()), x, y, null);
                 }
             }
         }

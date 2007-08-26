@@ -124,11 +124,6 @@ public final class Tile extends FreeColGameObject implements Location, Nameable 
      */
     private PlayerExploredTile[] playerExploredTiles = null;
 
-    /**
-     * Decides whether to show the tile or the unexplored version
-     */
-    public boolean explored;
-
     public static int NUMBER_OF_TYPES;
 
     private List<TileItem> tileItems;
@@ -200,7 +195,6 @@ public final class Tile extends FreeColGameObject implements Location, Nameable 
 
         tileItemContainer = new TileItemContainer(game, this);
         lostCityRumour = false;
-        explored = false;
 
         x = locX;
         y = locY;
@@ -283,6 +277,9 @@ public final class Tile extends FreeColGameObject implements Location, Nameable 
 
     // TODO: what's this supposed to do?
     public int getBasicWorkTurns() {
+        if (type == null) {
+            return 0;
+        }
         return type.getBasicWorkTurns();
     }
 
@@ -294,7 +291,7 @@ public final class Tile extends FreeColGameObject implements Location, Nameable 
      */
     public String getName() {
         if (isViewShared()) {
-            if (explored) {
+            if (isExplored()) {
                 return Messages.message(getType().getName());
             } else {
                 return Messages.message("unexplored");
@@ -656,7 +653,7 @@ public final class Tile extends FreeColGameObject implements Location, Nameable 
      * @return true iff tile is known.
      */
     public boolean isExplored() {
-        return explored;
+        return type != null;
     }
 
     /**
@@ -665,7 +662,7 @@ public final class Tile extends FreeColGameObject implements Location, Nameable 
      * @return 'true' if this Tile is a land Tile, 'false' otherwise.
      */
     public boolean isLand() {
-        return !type.isWater();
+        return type != null && !type.isWater();
     }
 
     /**
@@ -674,7 +671,7 @@ public final class Tile extends FreeColGameObject implements Location, Nameable 
      * @return 'true' if this Tile is forested.
      */
     public boolean isForested() {
-        return type.isForested();
+        return type != null && type.isForested();
     }
 
     /**
@@ -1655,6 +1652,10 @@ break;
      * @return The type of secondary good best produced by this tile.
      */
     public GoodsType secondaryGoods() {
+        if (type == null) {
+            return null;
+        }
+        
         GoodsType[] top = getSortedGoodsTop(type, tileItemContainer, getFishBonus());
         for (GoodsType g : top) {
             if (g != null || !g.isFoodType()) {
@@ -1724,6 +1725,9 @@ break;
      * @return The defense modifier (in percent) of this tile.
      */
     public int defenseBonus() {
+        if (type == null) {
+            return 0;
+        }
         return (type.getDefenceFactor() - 100);
         /*  Depreciated
             if (additionType == ADD_HILLS) {
