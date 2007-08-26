@@ -1,6 +1,5 @@
 package net.sf.freecol.common.model;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Iterator;
@@ -17,7 +16,6 @@ import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.Specification;
 import net.sf.freecol.common.model.Map.CircleIterator;
 import net.sf.freecol.common.model.Map.Position;
-import net.sf.freecol.server.generator.River;
 
 import org.w3c.dom.Element;
 
