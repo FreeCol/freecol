@@ -433,7 +433,15 @@ public class ColonyTile extends FreeColGameObject implements WorkLocation, Ownab
     }
 
     private void produceGoodsCenterTile() {
-        GoodsType goodsFood = FreeCol.getSpecification().getGoodsFood().get(0);
+        int maxFoodProduction = -1;
+        GoodsType goodsFood = null;
+        List<GoodsType> goodsAreFood = FreeCol.getSpecification().getGoodsFood();
+        for (GoodsType goodsType : goodsAreFood) {
+            int production = getProductionOf(goodsType);
+            if (maxFoodProduction < production) {
+                goodsFood = goodsType;
+            }
+        }
         colony.addGoods(goodsFood, getProductionOf(goodsFood));
         GoodsType type2 = workTile.secondaryGoods();
         colony.addGoods(type2, getProductionOf(type2));

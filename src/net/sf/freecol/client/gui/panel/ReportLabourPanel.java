@@ -4,6 +4,7 @@ import java.awt.Color;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -64,12 +65,13 @@ public final class ReportLabourPanel extends ReportPanel implements ActionListen
     public void gatherData() {
 
         // Count Units
-        unitCount = new int[Unit.UNIT_COUNT];
-        unitAtSea = new int[Unit.UNIT_COUNT];
-        unitOnLand = new int[Unit.UNIT_COUNT];
-        unitInEurope = new int[Unit.UNIT_COUNT];
-        unitLocations = new Vector<HashMap<Colony,Integer>>(Unit.UNIT_COUNT);
-        for (int index = 0; index < Unit.UNIT_COUNT; index++) {
+        int numberUnits = FreeCol.getSpecification().numberOfUnitTypes();
+        unitCount = new int[numberUnits];
+        unitAtSea = new int[numberUnits];
+        unitOnLand = new int[numberUnits];
+        unitInEurope = new int[numberUnits];
+        unitLocations = new Vector<HashMap<Colony,Integer>>(numberUnits);
+        for (int index = 0; index < numberUnits; index++) {
             unitLocations.add(new HashMap<Colony, Integer>());
         }
 
@@ -78,7 +80,7 @@ public final class ReportLabourPanel extends ReportPanel implements ActionListen
         Iterator<Unit> units = player.getUnitIterator();
         while (units.hasNext()) {
             Unit unit = units.next();
-            int type = unit.getType();
+            int type = unit.getUnitType().getIndex();
             Location location = unit.getLocation();
 
             unitCount[type]++;
@@ -122,69 +124,66 @@ public final class ReportLabourPanel extends ReportPanel implements ActionListen
         int nameColumn = 3;
         int countColumn = 5;
 
-        int[][] unitTypes = new int[][] {
-            {Unit.FREE_COLONIST, Unit.INDENTURED_SERVANT, Unit.PETTY_CRIMINAL},
-            {Unit.INDIAN_CONVERT, Unit.EXPERT_FARMER, Unit.EXPERT_FISHERMAN},
-            {Unit.MASTER_SUGAR_PLANTER, Unit.MASTER_DISTILLER, Unit.EXPERT_LUMBER_JACK},
-            {Unit.MASTER_CARPENTER, Unit.MASTER_TOBACCO_PLANTER, Unit.MASTER_TOBACCONIST},
-            {Unit.EXPERT_FUR_TRAPPER, Unit.MASTER_FUR_TRADER, Unit.MASTER_COTTON_PLANTER},
-            {Unit.MASTER_WEAVER, Unit.EXPERT_ORE_MINER, Unit.MASTER_BLACKSMITH},
-            {Unit.MASTER_GUNSMITH, Unit.EXPERT_SILVER_MINER, Unit.HARDY_PIONEER},
-            {Unit.VETERAN_SOLDIER, Unit.SEASONED_SCOUT, Unit.JESUIT_MISSIONARY},
-            {Unit.ELDER_STATESMAN, Unit.FIREBRAND_PREACHER, -1}
-        };
-
-        int[] heights = new int[2 * unitTypes.length - 1];
-        for (int index = 1; index < heights.length; index += 2) {
+        List<UnitType> unitTypes = FreeCol.getSpecification().getUnitTypeList();
+        ArrayList<UnitType> colonists = new ArrayList<UnitType>();
+        for (UnitType unitType : unitTypes) {
+            if (unitType.hasSkill()) {
+                colonists.add(unitType);
+            }
+        }
+        int lines = (int) Math.ceil(colonists.size() / 3.0);
+        int[] heights = new int[2 * lines - 1];
+        for (int index = 1; index < lines; index += 2) {
             heights[index] = 12;
         }
 
         reportPanel.setLayout(new HIGLayout(widths, heights));
-
-        for (int row = 0; row < unitTypes.length; row++) {
-            for (int column = 0; column < unitTypes[0].length; column++) {
-                int tools = 0;
-                if (unitTypes[row][column] < 0) {
-                    continue;
-                } else if (unitTypes[row][column] == Unit.HARDY_PIONEER) {
-                    tools = 20;
-                }
-
-                reportPanel.add(createUnitLabel(unitTypes[row][column], tools),
-                                higConst.rc(2 * row + 1, columnsPerUnit * column + buttonColumn, "t"));
-                if (unitCount[unitTypes[row][column]] > 0) {
-                    reportPanel.add(createUnitNameButton(unitTypes[row][column]),
-                                    higConst.rc(2 * row + 1, columnsPerUnit * column + nameColumn, "tl"));
-                    reportPanel.add(new JLabel(String.valueOf(unitCount[unitTypes[row][column]])),
-                                    higConst.rc(2 * row + 1, columnsPerUnit * column + countColumn, "tr"));
-                } else {
-                    UnitType unitType = FreeCol.getSpecification().getUnitType(unitTypes[row][column]);
-                    JLabel unitNameLabel = new JLabel(Unit.getName(unitType)); 
-                    unitNameLabel.setForeground(Color.GRAY);
-                    reportPanel.add(unitNameLabel,
-                                    higConst.rc(2 * row + 1, columnsPerUnit * column + nameColumn, "tl"));
-                }
+        
+        int row = 0, column = 0;
+        for (UnitType unitType : colonists) {
+            int tools = 0;
+            if (unitType.hasAbility("model.ability.expertPioneer")) {
+                tools = 20;
+            }
+            
+            reportPanel.add(createUnitLabel(unitType, tools),
+                            higConst.rc(2 * row + 1, columnsPerUnit * column + buttonColumn, "t"));
+            if (unitCount[unitType.getIndex()] > 0) {
+                reportPanel.add(createUnitNameButton(unitType),
+                                higConst.rc(2 * row + 1, columnsPerUnit * column + nameColumn, "tl"));
+                reportPanel.add(new JLabel(String.valueOf(unitCount[unitType.getIndex()])),
+                                higConst.rc(2 * row + 1, columnsPerUnit * column + countColumn, "tr"));
+            } else {
+                JLabel unitNameLabel = new JLabel(Unit.getName(unitType)); 
+                unitNameLabel.setForeground(Color.GRAY);
+                reportPanel.add(unitNameLabel,
+                                higConst.rc(2 * row + 1, columnsPerUnit * column + nameColumn, "tl"));
+            }
+            
+            column++;
+            if (column == 3) {
+                column = 0;
+                row++;
             }
         }
     }
     
 
-    private JButton createUnitNameButton(int unitIndex) {
-        UnitType unitType = FreeCol.getSpecification().getUnitType(unitIndex);
+    private JButton createUnitNameButton(UnitType unitType) {
         JButton button = new JButton(Unit.getName(unitType));
         button.setMargin(new Insets(0,0,0,0));
         button.setOpaque(false);
         button.setForeground(LINK_COLOR);
         button.setAlignmentY(0.8f);
         button.setBorder(BorderFactory.createEmptyBorder());
-        button.setActionCommand(String.valueOf(unitType));
+        button.setActionCommand(String.valueOf(unitType.getIndex()));
         button.addActionListener(this);
         return button;
 
     }
 
-    private JLabel createUnitLabel(int unitType, int tools) {
-        int imageType = ImageLibrary.getUnitGraphicsType(unitType, false, false, tools, false);
+    private JLabel createUnitLabel(UnitType unitType, int tools) {
+        int imageType = ImageLibrary.getUnitGraphicsType(unitType.getIndex(), false, false, tools, false);
         JLabel unitLabel = new JLabel(getLibrary().getUnitImageIcon(imageType));
         return unitLabel;
     }
@@ -345,7 +344,7 @@ public final class ReportLabourPanel extends ReportPanel implements ActionListen
             ReportLabourDetailPanel details = new ReportLabourDetailPanel(getCanvas());
             UnitType unitType = FreeCol.getSpecification().getUnitType(action);
             JPanel detailPanel = createUnitDetails(unitType, details);
-            details.initialize(detailPanel, action);
+            details.initialize(detailPanel, unitType);
             getCanvas().addAsFrame(details);
             details.requestFocus();
         } else {

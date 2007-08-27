@@ -958,7 +958,7 @@ public class AIPlayer extends AIObject {
         int numberOfUnits = FreeCol.getSpecification().numberOfUnitTypes();
         // Create a datastructure for the worker wishes:
         Vector<ArrayList<Wish>> workerWishes = new Vector<ArrayList<Wish>>(numberOfUnits);
-        for (int i = 0; i < Unit.UNIT_COUNT; i++) {
+        for (int i = 0; i < numberOfUnits; i++) {
             workerWishes.add(new ArrayList<Wish>());
         }
         if (player.isEuropean()) {

@@ -59,9 +59,9 @@ public class IndianDemandMission extends Mission {
 
         this.target = target;
 
-        if (getUnit().getType() != Unit.BRAVE) {
-            logger.warning("Only an indian brave can be given the mission: IndianDemandMission");
-            throw new IllegalArgumentException("Only an indian brave can be given the mission: IndianDemandMission");
+        if (!getUnit().getOwner().isIndian() || !getUnit().hasAbility("model.ability.carryGoods")) {
+            logger.warning("Only an indian which can carry goods can be given the mission: IndianBringGiftMission");
+            throw new IllegalArgumentException("Only an indian which can carry goods can be given the mission: IndianBringGiftMission");
         }
     }
 

@@ -12,6 +12,7 @@ import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Unit;
 import cz.autel.dmi.HIGLayout;
+import net.sf.freecol.common.model.UnitType;
 
 /**
  * This panel displays the Labour Report.
@@ -35,21 +36,21 @@ public final class ReportLabourDetailPanel extends ReportPanel implements Action
     /**
      * Prepares this panel to be displayed.
      */
-    public void initialize(JPanel detailPanel, int unit) {
+    public void initialize(JPanel detailPanel, UnitType unitType) {
         reportPanel.setLayout(new HIGLayout(new int[] {0, 12, 0}, new int[] {0, 12, 0}));
 
-        reportPanel.add(createUnitLabel(unit), higConst.rc(1, 1, "t"));
+        reportPanel.add(createUnitLabel(unitType), higConst.rc(1, 1, "t"));
         reportPanel.add(detailPanel, higConst.rc(1, 3));
         reportPanel.add(new JLabel(Messages.message("report.labour.canTrain")),
                         higConst.rc(3, 3, "l"));
     }
 
-    private JLabel createUnitLabel(int unitType) {
+    private JLabel createUnitLabel(UnitType unitType) {
         int tools = 0;
-        if (unitType == Unit.HARDY_PIONEER) {
+        if (unitType.hasAbility("model.ability.expertPioneer")) {
             tools = 20;
         }
-        int imageType = ImageLibrary.getUnitGraphicsType(unitType, false, false, tools, false);
+        int imageType = ImageLibrary.getUnitGraphicsType(unitType.getIndex(), false, false, tools, false);
         JLabel unitLabel = new JLabel(getLibrary().getUnitImageIcon(imageType));
         return unitLabel;
     }

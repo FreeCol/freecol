@@ -142,7 +142,7 @@
     <goods-type id="model.goods.Muskets" art="goods/muskets.png" is-farmed="no" made-from="tools">
       <market initial-amount="500"   initial-price="1"  price-difference="1"/>
     </goods-type>
-    <goods-type id="model.goods.Fish" art="goods/fish.png" is-farmed="yes" storable="no" stored-as="model.goods.food" />
+    <goods-type id="model.goods.Fish" art="goods/fish.png" is-farmed="yes" storable="no" stored-as="model.goods.food" is-food="yes" />
     <goods-type id="model.goods.Bells" art="goods/bells.png" is-farmed="no" storable="no"/>
     <goods-type id="model.goods.Crosses" art="goods/crosses.png" is-farmed="no" storable="no"/>
     <goods-type id="model.goods.Hammers" art="goods/hammers.png" is-farmed="no" made-from="lumber" storable="no"/>
