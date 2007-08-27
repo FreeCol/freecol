@@ -58,24 +58,6 @@ public class IndianSettlement extends Settlement {
     /** The amount of raw material that should be available before producing manufactured goods. */
     public static final int KEEP_RAW_MATERIAL = 50;
 
-    // These are the learnable skills for an Indian settlement.
-    // They are fully compatible with the types from the Unit class!
-    //
-    // Note: UNKNOWN is used for both 'skill' and 'wanted goods' - Depreciated
-    public static final int UNKNOWN = -2,
-                            NONE = -1,
-                            EXPERT_FARMER = Unit.EXPERT_FARMER,
-                            EXPERT_FISHERMAN = Unit.EXPERT_FISHERMAN,
-                            EXPERT_SILVER_MINER = Unit.EXPERT_SILVER_MINER,
-                            MASTER_SUGAR_PLANTER = Unit.MASTER_SUGAR_PLANTER,
-                            MASTER_COTTON_PLANTER = Unit.MASTER_COTTON_PLANTER,
-                            MASTER_TOBACCO_PLANTER = Unit.MASTER_TOBACCO_PLANTER,
-                            SEASONED_SCOUT = Unit.SEASONED_SCOUT,
-                            EXPERT_ORE_MINER = Unit.EXPERT_ORE_MINER,
-                            EXPERT_LUMBER_JACK = Unit.EXPERT_LUMBER_JACK,
-                            EXPERT_FUR_TRAPPER = Unit.EXPERT_FUR_TRAPPER;
-
-
     /** The kind of settlement this is.
         TODO: this information should be moved to the IndianPlayer class (that doesn't
               exist yet). */
@@ -1037,29 +1019,7 @@ public class IndianSettlement extends Settlement {
         }
         goodsContainer.removeAbove(500);
 
-
-        // TODO: Create a unit if food>=200, but not if a maximum number of units is reaced.
-        // DONE Create Indian when enough food
-        // Alcohol also contributes to create children. 
-        if (goodsContainer.getGoodsCount(Goods.FOOD) + 4*goodsContainer.getGoodsCount(Goods.RUM) > 200+KEEP_RAW_MATERIAL ) {
-            if (workers <= 6 + getKind()) { // up to a limit. Anyway cities produce more children than camps
-                // TODO: search in specification units which can be born in a settlement and choose one
-                Unit u = getGame().getModelController().createUnit(getID() + "newTurn200food", getTile(),
-                                            getOwner(), FreeCol.getSpecification().unitType(Unit.BRAVE));
-                consumeGoods(Goods.FOOD, 200);  // All food will be consumed, even if RUM helped
-                consumeGoods(Goods.RUM, 200/4);    // Also, some available RUM is consumed
-                // I know that consumeGoods will produce gold, which is explained because children are always a gift
-                addOwnedUnit(u);    // New indians quickly go out of their city and start annoying.
-                /* Should I do something like this? Seems to work without it.
-                 addModelMessage(u, "model.colony.newColonist",
-                                    new String[][] {{"%nation%", getOwner().getNationAsString()}},
-                                    ModelMessage.UNIT_ADDED);
-                 */
-                logger.info("New indian native created in " + getTile() + " with ID=" + u.getID());
-            }
-        }
-        // end Create Indian when enough food
-
+        checkForNewIndian();
 
         /* Increase alarm: */
         if (getUnitCount() > 0) {
@@ -1179,6 +1139,26 @@ public class IndianSettlement extends Settlement {
         updateWantedGoods();
     }
 
+    // Create a new colonist if there is enough food:
+    private void checkForNewIndian() {
+        // Alcohol also contributes to create children. 
+        if (goodsContainer.getGoodsCount(Goods.FOOD) + 4*goodsContainer.getGoodsCount(Goods.RUM) > 200+KEEP_RAW_MATERIAL ) {
+            if (ownedUnits.size() <= 6 + getKind()) { // up to a limit. Anyway cities produce more children than camps
+                List<UnitType> unitTypes = FreeCol.getSpecification().getUnitTypesWithAbility("model.ability.bornInIndianSettlement");
+                if (unitTypes.size() > 0) {
+                    int random = getGame().getModelController().getRandom(getID() + "bornInIndianSettlement", unitTypes.size());
+                    Unit u = getGame().getModelController().createUnit(getID() + "newTurn200food",
+                                            getTile(), getOwner(), unitTypes.get(random));
+                    consumeGoods(Goods.FOOD, 200);  // All food will be consumed, even if RUM helped
+                    consumeGoods(Goods.RUM, 200/4);    // Also, some available RUM is consumed
+                    // I know that consumeGoods will produce gold, which is explained because children are always a gift
+
+                    addOwnedUnit(u);    // New indians quickly go out of their city and start annoying.
+                    logger.info("New indian native created in " + getTile() + " with ID=" + u.getID());
+                }
+            }
+        }
+    }
 
     private void consumeGoods(GoodsType type, int amount) {
         if (goodsContainer.getGoodsCount(type) > 0) {
@@ -1368,7 +1348,7 @@ public class IndianSettlement extends Settlement {
         }
 
         isVisited = getAttribute(in, "hasBeenVisisted", false);
-        convertProgress = getAttribute(in, "convertProgress", UNKNOWN);
+        convertProgress = getAttribute(in, "convertProgress", 0);
         lastTribute = getAttribute(in, "lastTribute", 0);
         String learnableSkillStr = getAttribute(in, "learnableSkill", null);
         if (learnableSkillStr != null) {

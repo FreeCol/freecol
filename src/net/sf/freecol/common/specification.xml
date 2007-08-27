@@ -723,6 +723,7 @@
     </unit-type>
     <unit-type name="model.unit.brave"                offence="1"  defence="1" movement="3" lineOfSight="1" space="1">
       <ability id="model.ability.carryGoods" value="yes"/>
+      <ability id="model.ability.bornInIndianSettlement" value="yes"/>
       <ability id="model.ability.pillageUnprotectedColony" value="yes"/>
     </unit-type>
     <unit-type name="model.unit.colonialRegular"      offence="3"  defence="3" movement="3" lineOfSight="1"

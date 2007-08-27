@@ -1489,9 +1489,9 @@ public final class Colony extends Settlement implements Location, Nameable {
         if (getGoodsCount(Goods.FOOD) >= 200) {
             List<UnitType> unitTypes = FreeCol.getSpecification().getUnitTypesWithAbility("model.ability.bornInColony");
             if (unitTypes.size() > 0) {
-                int random = getGame().getModelController().getRandom(getID() + "bornInColony", 11);
-                Unit u = getGame().getModelController().createUnit(getID() + "newTurn200food", getTile(), getOwner(),
-                                                                   unitTypes.get(random));
+                int random = getGame().getModelController().getRandom(getID() + "bornInColony", unitTypes.size());
+                Unit u = getGame().getModelController().createUnit(getID() + "newTurn200food",
+                                                getTile(), getOwner(), unitTypes.get(random));
                 removeGoods(Goods.FOOD, 200);
                 addModelMessage(this, "model.colony.newColonist", new String[][] { { "%colony%", getName() } },
                                 ModelMessage.UNIT_ADDED, u);
