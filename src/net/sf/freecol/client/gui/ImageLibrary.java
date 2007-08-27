@@ -172,7 +172,7 @@ public final class ImageLibrary extends ImageProvider {
      */
     private Vector<ImageIcon> units, // Holds ImageIcon objects
             unitsGrayscale, // Holds ImageIcon objects of units in grayscale
-            forests, // Holds ImageIcon objects
+            //forests, // Holds ImageIcon objects
             rivers, // Holds ImageIcon objects
             misc, // Holds ImageIcon objects
             colonies, // Holds ImageIcon objects
@@ -180,8 +180,10 @@ public final class ImageLibrary extends ImageProvider {
             goods, // Holds ImageIcon objects
             bonus, // Holds ImageIcon objects
             monarch; // Holds ImageIcon objects
+    private Hashtable<String, ImageIcon> terrain1, terrain2, forests, overlay1, overlay2;
 
-    private Vector<Vector<ImageIcon>> terrain1, terrain2;
+    //private Vector<Vector<ImageIcon>> terrain1, terrain2;
+    private Hashtable<String, Vector<ImageIcon>> border1, border2, coast1, coast2;
 
     private Vector<Vector<ImageIcon>> unitButtons; // Holds the unit-order
                                                     // buttons
@@ -338,9 +340,79 @@ public final class ImageLibrary extends ImageProvider {
      */
     private void loadTerrain(GraphicsConfiguration gc, Class<FreeCol> resourceLocator, boolean doLookup)
             throws FreeColException {
+        terrain1 = new Hashtable<String, ImageIcon>();
+        terrain2 = new Hashtable<String, ImageIcon>();
+        overlay1 = new Hashtable<String, ImageIcon>();
+        overlay2 = new Hashtable<String, ImageIcon>();
+        border1 = new Hashtable<String, Vector<ImageIcon>>();
+        border2 = new Hashtable<String, Vector<ImageIcon>>();
+        coast1 = new Hashtable<String, Vector<ImageIcon>>();
+        coast2 = new Hashtable<String, Vector<ImageIcon>>();
+        
+        for (TileType type : FreeCol.getSpecification().getTileTypeList()) {
+            String filePath = dataDirectory + path + type.artBasic + "i0" + extension;
+            terrain1.put(type.getName(), findImage(filePath, resourceLocator, doLookup));
+            filePath = dataDirectory + path + type.artBasic + "i1" + extension;
+            terrain2.put(type.getName(), findImage(filePath, resourceLocator, doLookup));
+
+            if (type.artOverlay != null) {
+                filePath = dataDirectory + path + type.artOverlay + "i0" + extension;
+                overlay1.put(type.getName(), findImage(filePath, resourceLocator, doLookup));
+                filePath = dataDirectory + path + type.artOverlay + "i1" + extension;
+                overlay2.put(type.getName(), findImage(filePath, resourceLocator, doLookup));
+            }
+            
+            Vector<ImageIcon> tempVector1 = new Vector<ImageIcon>();
+            Vector<ImageIcon> tempVector2 = new Vector<ImageIcon>();
+            for (char c = 'a'; c <= 'h'; c++) {
+                filePath = dataDirectory + path + type.artBasic + c + "0" + extension;
+                tempVector1.add(findImage(filePath, resourceLocator, doLookup));
+
+                filePath = dataDirectory + path + type.artBasic + c + "1" + extension;
+                tempVector2.add(findImage(filePath, resourceLocator, doLookup));
+            }
+
+            border1.put(type.getName(), tempVector1);
+            border2.put(type.getName(), tempVector2);
+            
+            if (type.artCoast != null) {
+                tempVector1 = new Vector<ImageIcon>();
+                tempVector2 = new Vector<ImageIcon>();
+                for (char c = 'a'; c <= 'h'; c++) {
+                    filePath = dataDirectory + path + type.artCoast + c + "0" + extension;
+                    tempVector1.add(findImage(filePath, resourceLocator, doLookup));
+
+                    filePath = dataDirectory + path + type.artCoast + c + "1" + extension;
+                    tempVector2.add(findImage(filePath, resourceLocator, doLookup));
+                }
+                
+                coast1.put(type.getName(), tempVector1);
+                coast2.put(type.getName(), tempVector2);
+            }
+        }
+        
+        String unexploredPath = dataDirectory + path + "terrain/unexplored/terrain00i0.png";
+        terrain1.put("unexplored", findImage(unexploredPath, resourceLocator, doLookup));
+        unexploredPath = dataDirectory + path + "terrain/unexplored/terrain00i1.png";
+        terrain2.put("unexplored", findImage(unexploredPath, resourceLocator, doLookup));
+        
+        Vector<ImageIcon> unexploredVector1 = new Vector<ImageIcon>();
+        Vector<ImageIcon> unexploredVector2 = new Vector<ImageIcon>();
+        for (char c = 'a'; c <= 'h'; c++) {
+            unexploredPath = dataDirectory + path + "terrain/unexplored/terrain00" + c + "0" + extension;
+            unexploredVector1.add(findImage(unexploredPath, resourceLocator, doLookup));
+
+            unexploredPath = dataDirectory + path + "terrain/unexplored/terrain00" + c + "1" + extension;
+            unexploredVector2.add(findImage(unexploredPath, resourceLocator, doLookup));
+        }
+
+        border1.put("unexplored", unexploredVector1);
+        border2.put("unexplored", unexploredVector2);
+        
+/*
+        
         terrain1 = new Vector<Vector<ImageIcon>>(TERRAIN_COUNT);
         terrain2 = new Vector<Vector<ImageIcon>>(TERRAIN_COUNT);
-
         for (int i = 0; i < TERRAIN_COUNT; i++) {
             Vector<ImageIcon> tempVector1, tempVector2;
             String numberString = String.valueOf(i);
@@ -371,7 +443,7 @@ public final class ImageLibrary extends ImageProvider {
 
             terrain1.add(tempVector1);
             terrain2.add(tempVector2);
-        }
+        }*/
     }
 
     /**
@@ -412,13 +484,20 @@ public final class ImageLibrary extends ImageProvider {
      */
     private void loadForests(GraphicsConfiguration gc, Class<FreeCol> resourceLocator, boolean doLookup)
             throws FreeColException {
-
-        forests = new Vector<ImageIcon>(FOREST_COUNT);
+        forests = new Hashtable<String, ImageIcon>();
+        
+        for (TileType type : FreeCol.getSpecification().getTileTypeList()) {
+            if (type.artForest != null) {
+                String filePath = dataDirectory + path + type.artForest;
+                forests.put(type.getName(), findImage(filePath, resourceLocator, doLookup));
+            }
+        }
+        /*forests = new Vector<ImageIcon>(FOREST_COUNT);
         forests.add(null);
         for (int i = 1; i < FOREST_COUNT; i++) {
             String filePath = dataDirectory + path + forestDirectory + forestName + i + extension;
             forests.add(findImage(filePath, resourceLocator, doLookup));
-        }
+        }*/
     }
 
     /**
@@ -951,18 +1030,17 @@ public final class ImageLibrary extends ImageProvider {
      */
     public Image getScaledTerrainImage(TileType type, float scale) {
         // Index used for drawing the base is the artBasic value
-        int index = type.artBasic;
         GraphicsConfiguration gc = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice()
                 .getDefaultConfiguration();
-        Image terrainImage = getTerrainImage(index, 0, 0);
-        int width = getTerrainImageWidth(index);
-        int height = getTerrainImageHeight(index);
+        Image terrainImage = getTerrainImage(type, 0, 0);
+        int width = getTerrainImageWidth(type);
+        int height = getTerrainImageHeight(type);
         // Currently used for hills and mountains
-        if (type.artOverlay > -1) {
+        if (type.artOverlay != null) {
             BufferedImage compositeImage = gc.createCompatibleImage(width, height, Transparency.TRANSLUCENT);
             Graphics2D g = compositeImage.createGraphics();
             g.drawImage(terrainImage, 0, 0, null);
-            g.drawImage(getTerrainImage(type.artOverlay, 0, 0), 0, 0, null);
+            g.drawImage(getOverlayImage(type, 0, 0), 0, 0, null);
             g.dispose();
             terrainImage = compositeImage;
         }
@@ -970,7 +1048,7 @@ public final class ImageLibrary extends ImageProvider {
             BufferedImage compositeImage = gc.createCompatibleImage(width, height, Transparency.TRANSLUCENT);
             Graphics2D g = compositeImage.createGraphics();
             g.drawImage(terrainImage, 0, 0, null);
-            g.drawImage(getForestImage(type.artForest), 0, 0, null);
+            g.drawImage(getForestImage(type), 0, 0, null);
             g.dispose();
             terrainImage = compositeImage;
         }
@@ -982,23 +1060,51 @@ public final class ImageLibrary extends ImageProvider {
     }
 
     /**
-     * Returns the terrain-image at the given index.
+     * Returns the overlay-image for the given type.
      * 
-     * @param index The index of the terrain-image to return.
+     * @param type The type of the terrain-image to return.
      * @param x The x-coordinate of the location of the tile that is being
      *            drawn.
      * @param y The x-coordinate of the location of the tile that is being
      *            drawn.
      * @return The terrain-image at the given index.
      */
-    public Image getTerrainImage(int index, int x, int y) {
-        return getTerrainImage(index, LAND_CENTER, x, y);
+    public Image getOverlayImage(TileType type, int x, int y) {
+        if ((x + y) % 2 == 0) {
+            return overlay1.get(type.getName()).getImage();
+        } else {
+            return overlay2.get(type.getName()).getImage();
+        }
     }
 
     /**
-     * Returns the terrain-image at the given index with the specified type.
+     * Returns the terrain-image for the given type.
      * 
-     * @param index The index of the terrain-image to return.
+     * @param type The type of the terrain-image to return.
+     * @param x The x-coordinate of the location of the tile that is being
+     *            drawn.
+     * @param y The x-coordinate of the location of the tile that is being
+     *            drawn.
+     * @return The terrain-image at the given index.
+     */
+    public Image getTerrainImage(TileType type, int x, int y) {
+        String key;
+        if (type != null) {
+            key = type.getName();
+        } else {
+            key = "unexplored";
+        }
+        if ((x + y) % 2 == 0) {
+            return terrain1.get(key).getImage();
+        } else {
+            return terrain2.get(key).getImage();
+        }
+    }
+
+    /**
+     * Returns the border terrain-image for the given type.
+     * 
+     * @param type The type of the terrain-image to return.
      * @param borderType The border type.
      * @param x The x-coordinate of the location of the tile that is being
      *            drawn.
@@ -1006,19 +1112,58 @@ public final class ImageLibrary extends ImageProvider {
      *            drawn.
      * @return The terrain-image at the given index.
      */
-    public Image getTerrainImage(int index, int borderType, int x, int y) {
+    public Image getBorderImage(TileType type, int borderType, int x, int y) {
 
         final int[] directionsAndImageLibOffsets = new int[] { ImageLibrary.LAND_NORTH, ImageLibrary.LAND_NORTH_EAST,
                 ImageLibrary.LAND_EAST, ImageLibrary.LAND_SOUTH_EAST, ImageLibrary.LAND_SOUTH,
-                ImageLibrary.LAND_SOUTH_WEST, ImageLibrary.LAND_WEST, ImageLibrary.LAND_NORTH_WEST,
-                ImageLibrary.LAND_CENTER };
+                ImageLibrary.LAND_SOUTH_WEST, ImageLibrary.LAND_WEST, ImageLibrary.LAND_NORTH_WEST };
 
         borderType = directionsAndImageLibOffsets[borderType];
+        
+        String key;
+        if (type != null) {
+            key = type.getName();
+        } else {
+            key = "unexplored";
+        }
 
         if ((x + y) % 2 == 0) {
-            return terrain1.get(index).get(borderType).getImage();
+            return border1.get(key).get(borderType).getImage();
         } else {
-            return terrain2.get(index).get(borderType).getImage();
+            return border2.get(key).get(borderType).getImage();
+        }
+    }
+
+    /**
+     * Returns the coast terrain-image for the given type.
+     * 
+     * @param type The type of the terrain-image to return.
+     * @param borderType The border type.
+     * @param x The x-coordinate of the location of the tile that is being
+     *            drawn.
+     * @param y The x-coordinate of the location of the tile that is being
+     *            drawn.
+     * @return The terrain-image at the given index.
+     */
+    public Image getCoastImage(TileType type, int borderType, int x, int y) {
+
+        final int[] directionsAndImageLibOffsets = new int[] { ImageLibrary.LAND_NORTH, ImageLibrary.LAND_NORTH_EAST,
+                ImageLibrary.LAND_EAST, ImageLibrary.LAND_SOUTH_EAST, ImageLibrary.LAND_SOUTH,
+                ImageLibrary.LAND_SOUTH_WEST, ImageLibrary.LAND_WEST, ImageLibrary.LAND_NORTH_WEST };
+
+        borderType = directionsAndImageLibOffsets[borderType];
+        
+        String key;
+        if (type != null) {
+            key = type.getName();
+        } else {
+            key = "unexplored";
+        }
+
+        if ((x + y) % 2 == 0) {
+            return coast1.get(key).get(borderType).getImage();
+        } else {
+            return coast2.get(key).get(borderType).getImage();
         }
     }
 
@@ -1038,8 +1183,8 @@ public final class ImageLibrary extends ImageProvider {
      * @param index The index of the image to return.
      * @return The image at the given index.
      */
-    public Image getForestImage(int index) {
-        return forests.get(index).getImage();
+    public Image getForestImage(TileType type) {
+        return forests.get(type.getName()).getImage();
     }
 
     /**
@@ -1216,11 +1361,8 @@ public final class ImageLibrary extends ImageProvider {
      * @param index The index of the terrain-image.
      * @return The width of the terrain-image at the given index.
      */
-    public int getTerrainImageWidth(int index) {
-        return terrain1.get(index).get(LAND_CENTER).getIconWidth();
-    }
     public int getTerrainImageWidth(TileType type) {
-        return terrain1.get(type.index).get(LAND_CENTER).getIconWidth();
+        return terrain1.get(type.getName()).getIconWidth();
     }
 
     /**
@@ -1229,11 +1371,8 @@ public final class ImageLibrary extends ImageProvider {
      * @param index The index of the terrain-image.
      * @return The height of the terrain-image at the given index.
      */
-    public int getTerrainImageHeight(int index) {
-        return terrain1.get(index).get(LAND_CENTER).getIconHeight();
-    }
     public int getTerrainImageHeight(TileType type) {
-        return terrain1.get(type.index).get(LAND_CENTER).getIconHeight();
+        return terrain1.get(type.getName()).getIconHeight();
     }
 
     /**

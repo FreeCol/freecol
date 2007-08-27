@@ -58,6 +58,7 @@ import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.Tile;
+import net.sf.freecol.common.model.TileType;
 import net.sf.freecol.common.model.Unit;
 import cz.autel.dmi.HIGLayout;
 import net.sf.freecol.common.model.UnitType;
@@ -1547,8 +1548,9 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener {
             if (getColony() != null) {
                 for (int x = 0; x < 3; x++) {
                     for (int y = 0; y < 3; y++) {
+                        TileType tileType = getColony().getTile().getType();
                         gui.displayColonyTile((Graphics2D) g, game.getMap(), getColony().getTile(x, y), ((2 - x) + y)
-                                * lib.getTerrainImageWidth(1) / 2, (x + y) * lib.getTerrainImageHeight(1) / 2,
+                                * lib.getTerrainImageWidth(tileType) / 2, (x + y) * lib.getTerrainImageHeight(tileType) / 2,
                                 getColony());
 
                     }
@@ -1598,9 +1600,10 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener {
                     addMouseListener(releaseListener);
                 }
 
+                TileType tileType = colonyTile.getTile().getType();
                 // Size and position:
-                setSize(lib.getTerrainImageWidth(1), lib.getTerrainImageHeight(1));
-                setLocation(((2 - x) + y) * lib.getTerrainImageWidth(1) / 2, (x + y) * lib.getTerrainImageHeight(1) / 2);
+                setSize(lib.getTerrainImageWidth(tileType), lib.getTerrainImageHeight(tileType));
+                setLocation(((2 - x) + y) * lib.getTerrainImageWidth(tileType) / 2, (x + y) * lib.getTerrainImageHeight(tileType) / 2);
             }
 
             /**
@@ -1613,10 +1616,11 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener {
 
                 setLayout(new GridLayout(2, 1));
 
+                TileType tileType = colonyTile.getTile().getType();
                 // A colony always produces food.
                 ImageIcon goodsIcon = parent.getImageProvider().getGoodsImageIcon(Goods.FOOD.getIndex());
                 ProductionLabel pl = new ProductionLabel(Goods.FOOD, colonyTile.getProductionOf(Goods.FOOD), parent);
-                pl.setSize(lib.getTerrainImageWidth(1), goodsIcon.getIconHeight());
+                pl.setSize(lib.getTerrainImageWidth(tileType), goodsIcon.getIconHeight());
                 add(pl);
 
                 // A colony may produce one additional good
@@ -1624,7 +1628,7 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener {
                 if (colonyTile.getProductionOf(secondaryGood) != 0) {
                     goodsIcon = parent.getImageProvider().getGoodsImageIcon(secondaryGood.getIndex());
                     ProductionLabel sl = new ProductionLabel(secondaryGood, colonyTile.getProductionOf(secondaryGood), parent);
-                    sl.setSize(lib.getTerrainImageWidth(1), goodsIcon.getIconHeight());
+                    sl.setSize(lib.getTerrainImageWidth(tileType), goodsIcon.getIconHeight());
                     add(sl);
                 }
             }

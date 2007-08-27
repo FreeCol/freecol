@@ -14,6 +14,7 @@ import javax.swing.JPanel;
 import javax.swing.UIManager;
 import javax.swing.border.BevelBorder;
 import javax.swing.event.MouseInputListener;
+import net.sf.freecol.FreeCol;
 
 import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.client.FreeColClient;
@@ -445,10 +446,11 @@ public final class MiniMap extends JPanel implements MouseInputListener {
          * miniRectX/Y are the center of the rectangle.
          * Use miniRectWidth/Height / 2 to get the upper left corner.
          * x/yTiles are the number of tiles that fit on the large map */
+        TileType tileType = FreeCol.getSpecification().getTileType(0);
         int miniRectX = (freeColClient.getGUI().getFocus().getX() - xOffset) * tileSize;
         int miniRectY = (freeColClient.getGUI().getFocus().getY() - yOffset) * tileSize / 4;
-        int miniRectWidth = (getParent().getWidth() / imageProvider.getTerrainImageWidth(0) + 1) * tileSize;
-        int miniRectHeight = (getParent().getHeight() / imageProvider.getTerrainImageHeight(0) + 1) * tileSize / 2;
+        int miniRectWidth = (getParent().getWidth() / imageProvider.getTerrainImageWidth(tileType) + 1) * tileSize;
+        int miniRectHeight = (getParent().getHeight() / imageProvider.getTerrainImageHeight(tileType) + 1) * tileSize / 2;
         if (miniRectX + miniRectWidth / 2 > width) {
             miniRectX = width - miniRectWidth / 2 - 1;
         } else if (miniRectX - miniRectWidth / 2 < 0) {

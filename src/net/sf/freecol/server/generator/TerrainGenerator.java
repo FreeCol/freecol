@@ -438,13 +438,14 @@ public class TerrainGenerator {
                     ", number of mountain tiles is " + number);
         logger.fine("Maximum length of mountain ranges is " + maximumLength);
         TileType hills = null, mountains = null;
-        // To identify hills and mountains look for their overlay imagetype (14 and 15 respectively)
+        // TODO: Change it with a better way to identify hills and mountains look for their overlay imagetype (14 and 15 respectively)
+        // To identify hills and mountains look for their id
         for (TileType t : FreeCol.getSpecification().getTileTypeList()) {
-            if (t.artOverlay == 14 && hills == null) {
+            if (t.getName().equals("model.tile.hills") && hills == null) {
                 hills = t;
                 if (mountains != null)
                     break;
-            } else if (t.artOverlay == 15 && mountains == null) {
+            } else if (t.getName().equals("model.tile.mountains") && mountains == null) {
                 mountains = t;
                 if (hills != null)
                     break;

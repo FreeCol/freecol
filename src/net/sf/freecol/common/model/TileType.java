@@ -22,11 +22,11 @@ public final class TileType
     public String id;
     public String name;
     
-    public int artBasic;
-    public int artOverlay;
-    public int artForest;
+    public String artBasic;
+    public String artOverlay;
+    public String artForest;
     public int artUnexplored;
-    public int artCoast;
+    public String artCoast;
     public Color minimapColor;
 
     public boolean forest;
@@ -188,7 +188,7 @@ public final class TileType
         attackFactor = 100;
         defenceFactor = 100;
         
-        artBasic = -1;
+        artBasic = null;
         producedType = new ArrayList<GoodsType>();
         producedAmount = new ArrayList<Integer>();
         resourceType = new ArrayList<ResourceType>();
@@ -199,11 +199,11 @@ public final class TileType
                 String childName = xml.getNodeName();
 
                 if ("art".equals(childName)) {
-                    artBasic = Xml.intAttribute(xml, "basic");
-                    artOverlay = Xml.intAttribute(xml, "overlay", -1);
-                    artForest = Xml.intAttribute(xml, "forest", -1);
+                    artBasic = Xml.attribute(xml, "basic");
+                    artOverlay = Xml.attribute(xml, "overlay", null);
+                    artForest = Xml.attribute(xml, "forest", null);
                     artUnexplored = Xml.intAttribute(xml, "unexplored", 0);
-                    artCoast = Xml.intAttribute(xml, "coast", -1);
+                    artCoast = Xml.attribute(xml, "coast", null);
                     float[] defaultArray = new float[] {0.0f, 0.0f, 0.0f};
                     float[] colorValues = Xml.floatArrayAttribute(xml, "minimap-color", defaultArray);
                     minimapColor = new Color(colorValues[0], colorValues[1], colorValues[2]);
@@ -234,7 +234,7 @@ public final class TileType
             }
         };
         Xml.forEachChild(xml, method);
-        if (artBasic < 0) {
+        if (artBasic == null) {
             throw new RuntimeException("TileType "+name+" has no art defined!");
         }
     }

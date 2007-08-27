@@ -400,8 +400,8 @@ public final class InfoPanel extends FreeColPanel {
                 labelPanel.add(goodsPanel, higConst.rc(row, 1));
                 addProducedGoods(tile);
                 
-                int width = library.getTerrainImageWidth(tile.getType().getIndex());
-                int height = library.getTerrainImageHeight(tile.getType().getIndex());
+                int width = library.getTerrainImageWidth(tile.getType());
+                int height = library.getTerrainImageHeight(tile.getType());
                 BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
                 freeColClient.getGUI().displayTerrain(image.createGraphics(), freeColClient.getGame().getMap(), tile,
                         0, 0);

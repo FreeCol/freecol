@@ -23,6 +23,7 @@ import net.sf.freecol.common.model.Building;
 import net.sf.freecol.common.model.ColonyTile;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.GoodsType;
+import net.sf.freecol.common.model.TileType;
 import net.sf.freecol.common.model.Unit;
 
 /**
@@ -184,7 +185,8 @@ public final class UnitLabel extends JLabel implements ActionListener {
             setBorder(BorderFactory.createEmptyBorder(0, 2, 0, 0));
         } else {
             if (unit.getLocation() instanceof ColonyTile) {
-                setSize(new Dimension(parent.getImageProvider().getTerrainImageWidth(0) / 2, parent
+                TileType tileType = ((ColonyTile) unit.getLocation()).getTile().getType();
+                setSize(new Dimension(parent.getImageProvider().getTerrainImageWidth(tileType) / 2, parent
                         .getImageProvider().getUnitImageHeight(parent.getImageProvider().getUnitGraphicsType(unit))));
             } else {
                 setPreferredSize(null);

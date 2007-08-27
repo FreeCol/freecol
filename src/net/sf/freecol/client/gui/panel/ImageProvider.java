@@ -4,6 +4,7 @@ import java.awt.Color;
 import java.awt.Image;
 
 import javax.swing.ImageIcon;
+import net.sf.freecol.common.model.TileType;
 
 import net.sf.freecol.common.model.Unit;
 
@@ -28,7 +29,7 @@ public abstract class ImageProvider {
      *            drawn.
      * @return The Image of the terrain with the given type.
      */
-    public abstract Image getTerrainImage(int type, int x, int y);
+    public abstract Image getTerrainImage(TileType type, int x, int y);
 
     /**
      * Should return the Image of the graphic with the given type.
@@ -111,7 +112,7 @@ public abstract class ImageProvider {
      * @param index The index of the terrain-image.
      * @return The width of the terrain-image at the given index.
      */
-    public abstract int getTerrainImageWidth(int index);
+    public abstract int getTerrainImageWidth(TileType type);
 
     /**
      * Should return the height of the terrain-image at the given index.
@@ -119,7 +120,7 @@ public abstract class ImageProvider {
      * @param index The index of the terrain-image.
      * @return The height of the terrain-image at the given index.
      */
-    public abstract int getTerrainImageHeight(int index);
+    public abstract int getTerrainImageHeight(TileType type);
 
     /**
      * Should return the width of the unit-image at the given index.
