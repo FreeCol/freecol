@@ -32,6 +32,8 @@ public final class GoodsType
     public GoodsType  storedAs;
     public boolean   storable;
 
+    private String art;
+    
     public int initialAmount;
     public int initialPrice;
     public int priceDiff;
@@ -104,6 +106,10 @@ public final class GoodsType
     public boolean isFoodType() {
         return isFood;
     }
+    
+    public String getArt() {
+        return art;
+    }
 
 /*
     public boolean isImprovedByPlowing() {
@@ -134,6 +140,7 @@ public final class GoodsType
         isFarmed = Xml.booleanAttribute(xml, "is-farmed");
         isFood = Xml.booleanAttribute(xml, "is-food", false);
         ignoreLimit = Xml.booleanAttribute(xml, "ignore-limit", false);
+        art = Xml.attribute(xml, "art");
 
         if (Xml.hasAttribute(xml, "made-from")) {
             String  madeFromRef = Xml.attribute(xml, "made-from");

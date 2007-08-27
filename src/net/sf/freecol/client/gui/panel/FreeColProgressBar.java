@@ -103,7 +103,7 @@ public class FreeColProgressBar extends JPanel {
         this.step = step;
 
         setBorder(BorderFactory.createLineBorder(PRIMARY_1));
-        ImageIcon icon = parent.getGUI().getImageLibrary().getGoodsImageIcon(goodsType.getIndex());
+        ImageIcon icon = parent.getGUI().getImageLibrary().getGoodsImageIcon(goodsType);
         // scale to a height of 16px, preserving aspect ratio
         image = icon.getImage().getScaledInstance(-1, iconHeight, Image.SCALE_SMOOTH);
         iconWidth = image.getWidth(this);

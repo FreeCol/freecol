@@ -323,7 +323,7 @@ public final class InfoPanel extends FreeColPanel {
             List<GoodsType> production = tile.getType().getPotentialTypeList();
             for (GoodsType goodsType : production) {
                 JLabel goodsLabel = new JLabel(String.valueOf(tile.potential(goodsType)),
-                        library.getScaledGoodsImageIcon(tile.getType().getIndex(), 0.50f), JLabel.RIGHT);
+                        library.getScaledGoodsImageIcon(goodsType, 0.50f), JLabel.RIGHT);
                 goodsLabel.setToolTipText(Goods.getName(goodsType));
                 goodsLabel.setFont(goodsLabel.getFont().deriveFont(9f));
                 goodsPanel.add(goodsLabel, higConst.rc(row, counter));
@@ -442,7 +442,7 @@ public final class InfoPanel extends FreeColPanel {
         public UnitInfoPanel() {
             super(null);
             
-            Image tools = library.getGoodsImageIcon(Goods.TOOLS.getIndex()).getImage();
+            Image tools = library.getGoodsImage(Goods.TOOLS);
             ImageIcon toolsIcon = new ImageIcon(tools.getScaledInstance(tools.getWidth(null) * 2 / 3, tools
                     .getHeight(null) * 2 / 3, Image.SCALE_SMOOTH));
             unitToolsLabel = new JLabel(toolsIcon);
@@ -551,7 +551,7 @@ public final class InfoPanel extends FreeColPanel {
             int counter = 1;
             int row = 1;
             for (Goods goods : unit.getGoodsList()) {
-                JLabel goodsLabel = new JLabel(library.getScaledGoodsImageIcon(goods.getType().getIndex(), 0.66f));
+                JLabel goodsLabel = new JLabel(library.getScaledGoodsImageIcon(goods.getType(), 0.66f));
                 goodsLabel.setToolTipText(String.valueOf(goods.getAmount()) + " " + goods.getName());
                 unitCargoPanel.add(goodsLabel, higConst.rc(row, counter));
                 if (counter == 4) {

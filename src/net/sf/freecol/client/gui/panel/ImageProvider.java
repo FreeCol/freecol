@@ -4,6 +4,7 @@ import java.awt.Color;
 import java.awt.Image;
 
 import javax.swing.ImageIcon;
+import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.TileType;
 
 import net.sf.freecol.common.model.Unit;
@@ -37,7 +38,7 @@ public abstract class ImageProvider {
      * @param type The type of the graphic of which we need the Image.
      * @return The Image of the graphic with the given type.
      */
-    public abstract Image getGoodsImage(int type);
+    public abstract Image getGoodsImage(GoodsType type);
 
     /**
      * Should return the Image of the graphic with the given type.
@@ -45,7 +46,7 @@ public abstract class ImageProvider {
      * @param type The type of the graphic of which we need the Image.
      * @return The Image of the graphic with the given type.
      */
-    public abstract ImageIcon getGoodsImageIcon(int type);
+    public abstract ImageIcon getGoodsImageIcon(GoodsType type);
 
     /**
      * Should return the Image of the graphic with the given type.

@@ -112,7 +112,7 @@ public final class MapEditorTransformPanel extends FreeColPanel {
         } else if (index == MAJOR_RIVER) {
             image = library.getRiverImage(10);
         } else if (index == RESOURCE) {
-            image = library.getGoodsImage(2);
+            image = library.getBonusImage(FreeCol.getSpecification().getResourceType(0));
         } else if (index == LOST_CITY_RUMOUR) {
             image = library.getMiscImage(ImageLibrary.LOST_CITY_RUMOUR);
         } else {

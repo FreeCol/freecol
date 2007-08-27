@@ -177,11 +177,11 @@ public final class ImageLibrary extends ImageProvider {
             misc, // Holds ImageIcon objects
             colonies, // Holds ImageIcon objects
             indians, // Holds ImageIcon objects
-            goods, // Holds ImageIcon objects
+            //goods, // Holds ImageIcon objects
             //bonus, // Holds ImageIcon objects
             monarch; // Holds ImageIcon objects
     private Hashtable<String, ImageIcon> terrain1, terrain2, overlay1, overlay2,
-            forests, bonus;
+            forests, bonus, goods;
 
     //private Vector<Vector<ImageIcon>> terrain1, terrain2;
     private Hashtable<String, Vector<ImageIcon>> border1, border2, coast1, coast2;
@@ -632,12 +632,16 @@ public final class ImageLibrary extends ImageProvider {
      */
     private void loadGoods(GraphicsConfiguration gc, Class<FreeCol> resourceLocator, boolean doLookup)
             throws FreeColException {
-        goods = new Vector<ImageIcon>(GOODS_COUNT);
-
-        for (int i = 0; i < GOODS_COUNT; i++) {
+        goods = new Hashtable<String, ImageIcon>();
+        
+        for (GoodsType type : FreeCol.getSpecification().getGoodsTypeList()) {
+            String filePath = dataDirectory + path + type.getArt();
+            goods.put(type.getName(), findImage(filePath, resourceLocator, doLookup));
+        }
+        /*for (int i = 0; i < GOODS_COUNT; i++) {
             String filePath = dataDirectory + path + goodsDirectory + goodsName + i + extension;
             goods.add(findImage(filePath, resourceLocator, doLookup));
-        }
+        }*/
 
         /*
          * If all units are patched together in one graphics file then this is
@@ -1185,11 +1189,8 @@ public final class ImageLibrary extends ImageProvider {
      * @param index The index of the goods-image to return.
      * @return The goods-image at the given index.
      */
-    public Image getGoodsImage(int index) {
-        return goods.get(index).getImage();
-    }
     public Image getGoodsImage(GoodsType g) {
-        return goods.get(g.index).getImage();
+        return getGoodsImageIcon(g).getImage();
     }
 
     /**
@@ -1198,11 +1199,8 @@ public final class ImageLibrary extends ImageProvider {
      * @param index The index of the goods-image to return.
      * @return The goods-image at the given index.
      */
-    public ImageIcon getGoodsImageIcon(int index) {
-        return goods.get(index);
-    }
     public ImageIcon getGoodsImageIcon(GoodsType g) {
-        return goods.get(g.index);
+        return goods.get(g.getName());
     }
 
     /**
@@ -1212,9 +1210,9 @@ public final class ImageLibrary extends ImageProvider {
      * @param scale The scale of the goods-ImageIcon to return.
      * @return The goods-ImageIcon at the given index.
      */
-    public ImageIcon getScaledGoodsImageIcon(int index, float scale) {
-        if (index >= 0) {
-            ImageIcon icon = getGoodsImageIcon(index);
+    public ImageIcon getScaledGoodsImageIcon(GoodsType type, float scale) {
+        if (type != null) {
+            ImageIcon icon = getGoodsImageIcon(type);
             if (scale != 1) {
                 Image image;
                 image = icon.getImage();
@@ -1226,9 +1224,6 @@ public final class ImageLibrary extends ImageProvider {
             return icon;
         }
         return null;
-    }
-    public ImageIcon getScaledGoodsImageIcon(GoodsType g, float scale) {
-        return getScaledGoodsImageIcon(g.index, scale);
     }
 
     /**

@@ -417,7 +417,7 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
     private void buildGoodsItem(int goodsIndex, DefaultMutableTreeNode parent) {
         GoodsType goodsType = FreeCol.getSpecification().getGoodsType(goodsIndex);
         String name = goodsType.getName();
-        ImageIcon icon = library.getScaledGoodsImageIcon(goodsIndex, 0.75f);
+        ImageIcon icon = library.getScaledGoodsImageIcon(goodsType, 0.75f);
         DefaultMutableTreeNode item = new DefaultMutableTreeNode(new ColopediaTreeItem(name, icon));
         parent.add(item);
     }
@@ -430,7 +430,7 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
      */
     private void buildFatherItem(FoundingFather foundingFather, DefaultMutableTreeNode parent) {
         String name = Messages.message(foundingFather.getName());
-        ImageIcon icon = library.getScaledGoodsImageIcon(Goods.BELLS.getIndex(), 0.75f);
+        ImageIcon icon = library.getScaledGoodsImageIcon(Goods.BELLS, 0.75f);
         DefaultMutableTreeNode item = new DefaultMutableTreeNode(new ColopediaTreeItem(name, icon));
         parent.add(item);
     }
@@ -506,7 +506,7 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
         goodsPanel.setOpaque(false);
         List<GoodsType> productionTypes = tileType.getPotentialTypeList();
         for(GoodsType goodsType : productionTypes) {
-            JLabel goodsLabel = new JLabel(library.getGoodsImageIcon(goodsType.getIndex()));
+            JLabel goodsLabel = new JLabel(library.getGoodsImageIcon(goodsType));
             goodsLabel.setText(String.valueOf(tileType.getPotential(goodsType)));
             detailPanel.add(goodsLabel, higConst.rc(row, rightColumn));
         }
@@ -558,7 +558,7 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
         JPanel goodsPanel = new JPanel(new GridLayout(0, goodsList.size(), margin, 0));
         goodsPanel.setOpaque(false);
         for (int i = 0; i < goodsList.size(); i++) {
-            JLabel goodsLabel = new JLabel(library.getGoodsImageIcon(goodsList.get(i).getIndex()));
+            JLabel goodsLabel = new JLabel(library.getGoodsImageIcon(goodsList.get(i)));
             goodsLabel.setText(String.valueOf(amountList.get(i)));
             goodsPanel.add(goodsLabel);
         }
@@ -864,14 +864,14 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
         GoodsType inputType = Building.getGoodsInputType(building);
         if (inputType != null) {
             JLabel label = new JLabel(Messages.message("colopedia.buildings.needs"), library
-                    .getGoodsImageIcon(inputType.getIndex()), SwingConstants.LEADING);
+                    .getGoodsImageIcon(inputType), SwingConstants.LEADING);
             label.setHorizontalTextPosition(SwingConstants.LEADING);
             production.add(label);
         }
         GoodsType outputType = Building.getGoodsOutputType(building);
         if (outputType != null) {
             JLabel label = new JLabel(Messages.message("colopedia.buildings.produces"), library
-                    .getGoodsImageIcon(outputType.getIndex()), SwingConstants.LEADING);
+                    .getGoodsImageIcon(outputType), SwingConstants.LEADING);
             label.setHorizontalTextPosition(SwingConstants.LEADING);
             production.add(label);
         }

@@ -87,7 +87,7 @@ public final class DragListener extends MouseAdapter {
                         if (maxpotential > 0) {
                             menuItem = new JMenuItem(Messages.message(messages[goodsType.getIndex()]) +
                                                      " (" + maxpotential + " " + Goods.getName(goodsType) + ")",
-                                                     imageLibrary.getScaledGoodsImageIcon(goodsType.getIndex(), 0.66f));
+                                                     imageLibrary.getScaledGoodsImageIcon(goodsType, 0.66f));
                             menuItem.setActionCommand(String.valueOf(goodsType.getIndex()));
                             menuItem.addActionListener(unitLabel);
                             menu.add(menuItem);
@@ -104,7 +104,7 @@ public final class DragListener extends MouseAdapter {
                                 String locName = building.getName();
                                 menuItem = new JMenuItem(locName);
                                 if (goodsType != null) {
-                                    menuItem.setIcon(imageLibrary.getScaledGoodsImageIcon(goodsType.getIndex(), 0.66f));
+                                    menuItem.setIcon(imageLibrary.getScaledGoodsImageIcon(goodsType, 0.66f));
                                     int addOutput = building.getAdditionalProductionNextTurn(tempUnit);
                                     locName += " (" + addOutput;
                                     int potential = building.getAdditionalProduction(tempUnit);
@@ -189,7 +189,7 @@ public final class DragListener extends MouseAdapter {
                                 menuItem = new JMenuItem(Messages.message("arm"));
                             }
                         }
-                        menuItem.setIcon(imageLibrary.getScaledGoodsImageIcon(Goods.MUSKETS.getIndex(), 0.66f));
+                        menuItem.setIcon(imageLibrary.getScaledGoodsImageIcon(Goods.MUSKETS, 0.66f));
                         menuItem.setActionCommand(String.valueOf(UnitLabel.ARM));
                         menuItem.addActionListener(unitLabel);
                         menu.add(menuItem);
@@ -209,7 +209,7 @@ public final class DragListener extends MouseAdapter {
                                 menuItem = new JMenuItem(Messages.message("mount"));
                             }
                         }
-                        menuItem.setIcon(imageLibrary.getScaledGoodsImageIcon(Goods.HORSES.getIndex(), 0.66f));
+                        menuItem.setIcon(imageLibrary.getScaledGoodsImageIcon(Goods.HORSES, 0.66f));
                         menuItem.setActionCommand(String.valueOf(UnitLabel.MOUNT));
                         menuItem.addActionListener(unitLabel);
                         menu.add(menuItem);

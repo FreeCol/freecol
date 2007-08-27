@@ -129,7 +129,7 @@ public final class ProductionLabel extends JComponent {
             setForeground(Color.WHITE);
         }
         if (goodsType != null) {
-            goodsIcon = parent.getImageProvider().getGoodsImageIcon(goodsType.getIndex());
+            goodsIcon = parent.getImageProvider().getGoodsImageIcon(goodsType);
             compressedWidth = goodsIcon.getIconWidth()*2;
         }
         setToolTipText(String.valueOf(amount) + " " + Goods.getName(goodsType));
