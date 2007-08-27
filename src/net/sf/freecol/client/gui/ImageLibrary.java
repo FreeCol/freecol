@@ -356,9 +356,9 @@ public final class ImageLibrary extends ImageProvider {
             terrain2.put(type.getName(), findImage(filePath, resourceLocator, doLookup));
 
             if (type.artOverlay != null) {
-                filePath = dataDirectory + path + type.artOverlay + "i0" + extension;
+                filePath = dataDirectory + path + type.artOverlay + "0" + extension;
                 overlay1.put(type.getName(), findImage(filePath, resourceLocator, doLookup));
-                filePath = dataDirectory + path + type.artOverlay + "i1" + extension;
+                filePath = dataDirectory + path + type.artOverlay + "1" + extension;
                 overlay2.put(type.getName(), findImage(filePath, resourceLocator, doLookup));
             }
             
@@ -391,9 +391,9 @@ public final class ImageLibrary extends ImageProvider {
             }
         }
         
-        String unexploredPath = dataDirectory + path + "terrain/unexplored/terrain00i0.png";
+        String unexploredPath = dataDirectory + path + "terrain/unexplored/center0.png";
         terrain1.put("unexplored", findImage(unexploredPath, resourceLocator, doLookup));
-        unexploredPath = dataDirectory + path + "terrain/unexplored/terrain00i1.png";
+        unexploredPath = dataDirectory + path + "terrain/unexplored/center1.png";
         terrain2.put("unexplored", findImage(unexploredPath, resourceLocator, doLookup));
         
         Vector<ImageIcon> unexploredVector1 = new Vector<ImageIcon>();
