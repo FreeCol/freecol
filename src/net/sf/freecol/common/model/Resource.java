@@ -104,12 +104,19 @@ public class Resource extends TileItem {
     }
 
     /**
-     * Returns the name of this type of Resource.
-     * @return The name of this type of Resource.
+     * Returns the name of this <code>Resource</code>.
+     * @return The name of this Resource.
      */
-    // TODO: make this work!
     public String getName() {
-        return ""; //getName(type);
+        return Messages.message(getType().getName());
+    }
+
+    /**
+     * Returns the name of a given <code>ResourceType</code>.
+     * @return The name of this ResourceType.
+     */
+    public static String getName(ResourceType resType) {
+        return Messages.message(resType.getName());
     }
 
     /**

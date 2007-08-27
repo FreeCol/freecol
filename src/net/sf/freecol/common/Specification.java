@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Logger;
 
 import net.sf.freecol.client.gui.action.ImprovementActionType;
 import net.sf.freecol.common.model.FoundingFather;
@@ -30,6 +31,7 @@ import org.w3c.dom.Node;
  * resource named "specification.xml" in the same package as this class.
  */
 public final class Specification {
+    private static final Logger logger = Logger.getLogger(Specification.class.getName());
 
     public static final String COPYRIGHT = "Copyright (C) 2006-2007 The FreeCol Team";
 
@@ -53,6 +55,7 @@ public final class Specification {
     private final List<FoundingFather> foundingFathers;
 
     public Specification() {
+        logger.info("Initializing Specification");
 
         buildingTypeList = new ArrayList<BuildingType>();
         goodsTypeList = new ArrayList<GoodsType>();
@@ -207,6 +210,7 @@ public final class Specification {
         // Get Food, Bells, Crosses and Hammers
         Goods.initialize(getGoodsTypeList(), numberOfGoodsTypes());
         Tile.initialize(numberOfTileTypes());
+        logger.info("Specification initialization complete");
     }
 
     // ---------------------------------------------------------- retrieval methods

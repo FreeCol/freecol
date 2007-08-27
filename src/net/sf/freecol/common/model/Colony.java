@@ -144,11 +144,6 @@ public final class Colony extends Settlement implements Location, Nameable {
             currentlyBuilding = Building.WAREHOUSE;
         else
             currentlyBuilding = Building.DOCK;
-
-        highLevel = new int[Goods.NUMBER_OF_TYPES];
-        lowLevel = new int[Goods.NUMBER_OF_TYPES];
-        exportLevel = new int[Goods.NUMBER_OF_TYPES];
-        exports = new boolean[Goods.NUMBER_OF_TYPES];
     }
 
     /**
@@ -199,6 +194,10 @@ public final class Colony extends Settlement implements Location, Nameable {
      * Initializes warehouse/export settings.
      */
     private void initializeWarehouseSettings() {
+        highLevel = new int[Goods.NUMBER_OF_TYPES];
+        lowLevel = new int[Goods.NUMBER_OF_TYPES];
+        exportLevel = new int[Goods.NUMBER_OF_TYPES];
+        exports = new boolean[Goods.NUMBER_OF_TYPES];
         for (int goodsIndex = 0; goodsIndex < Goods.NUMBER_OF_TYPES; goodsIndex++) {
             exports[goodsIndex] = false;
             lowLevel[goodsIndex] = 10;

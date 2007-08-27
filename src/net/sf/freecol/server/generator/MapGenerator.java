@@ -556,7 +556,7 @@ public class MapGenerator {
                     Unit statesman = new Unit(map.getGame(), colonyTile, player, unitType, Unit.ACTIVE);
                     statesman.setLocation(colony.getBuilding(Building.TOWN_HALL));
 
-                    unitType = FreeCol.getSpecification().getUnitType("model.unit.expertLumberjack");
+                    unitType = FreeCol.getSpecification().getUnitType("model.unit.expertLumberJack");
                     Unit lumberjack = new Unit(map.getGame(), colony, player, unitType, Unit.ACTIVE);
                     if (lumberjack.getLocation() instanceof ColonyTile) {
                         Tile lt = ((ColonyTile) lumberjack.getLocation()).getWorkTile();
