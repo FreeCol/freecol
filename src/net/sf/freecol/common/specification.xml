@@ -440,8 +440,7 @@
   tiles child options: all-land-tiles, all-forest-tiles, all-water-tiles, tiles="tile1,tile2,etc"
     - putting all-water-tiles="no" is redundant, but serves as a reminder
     - putting all-land-tiles="yes" all-forest-tiles="no" will result in all non-forested land tiles.
-  effect child options: goods-type, value, goods-types (takes multiple), values (takes multiple)
-                        movement-cost, movement-cost-factor
+  effect child options: goods-type and value, movement-cost, movement-cost-factor
     - use goods-type & value, or goods-types & values.
     - both goods-types & values should have the same number of inputs
     - movement-cost will set the movement cost to that amount in thirds.
@@ -453,25 +452,35 @@
             add-work-turns="0">
       <type id="river" magnitude="1"/>
       <tiles all-land-tiles="yes"/>
-      <effect goods-types="model.goods.food,model.goods.sugar,model.goods.tobacco,model.goods.cotton,model.goods.furs,model.goods.lumber,model.goods.ore,model.goods.silver"
-              value="1"/>
+      <effect goods-types="model.goods.Food" value="1"/>
+      <effect goods-types="model.goods.Sugar" value="1"/>
+      <effect goods-types="model.goods.Tobacco" value="1"/>
+      <effect goods-types="model.goods.Cotton" value="1"/>
+      <effect goods-types="model.goods.Furs" value="1"/>
+      <effect goods-types="model.goods.Lumber" value="1"/>
+      <effect goods-types="model.goods.Ore" value="1"/>
+      <effect goods-types="model.goods.Silver" value="1"/>
       <effect movement-cost="1"/>
     </tileimprovement-type>
     <tileimprovement-type id="model.improvement.Road"
             add-work-turns="0" over-trees="yes"
-            expended-goods-type="model.goods.tools" expended-amount="20">
+            expended-goods-type="model.goods.Tools" expended-amount="20">
       <type id="road" magnitude="1"/>
       <tiles all-land-tiles="yes"/>
-      <effect goods-types="model.goods.furs,model.goods.lumber,model.goods.ore,model.goods.silver"
-              value="1"/>
+      <effect goods-types="model.goods.Furs" value="1"/>
+      <effect goods-types="model.goods.Lumber" value="1"/>
+      <effect goods-types="model.goods.Ore" value="1"/>
+      <effect goods-types="model.goods.Silver" value="1"/>
       <effect movement-cost="1"/>
     </tileimprovement-type>
     <tileimprovement-type id="model.improvement.Plow"
             add-work-turns="2" overlay="4"
-            expended-goods-type="model.goods.tools" expended-amount="20">
+            expended-goods-type="model.goods.Tools" expended-amount="20">
       <tiles all-land-tiles="yes" all-forest-tiles="no"/>
-      <effect goods-types="model.goods.food,model.goods.sugar,model.goods.tobacco,model.goods.cotton"
-              value="1"/>
+      <effect goods-types="model.goods.Food" value="1"/>
+      <effect goods-types="model.goods.Sugar" value="1"/>
+      <effect goods-types="model.goods.Tobacco" value="1"/>
+      <effect goods-types="model.goods.Cotton" value="1"/>
     </tileimprovement-type>
     <tileimprovement-type id="model.improvement.ClearForest" add-work-turns="2"
             expended-goods-type="model.goods.Tools" expended-amount="20"

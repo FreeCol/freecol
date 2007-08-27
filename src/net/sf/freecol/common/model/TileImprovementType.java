@@ -306,17 +306,6 @@ public final class TileImprovementType
                                 goodsBonus.add(Xml.intAttribute(xml, "value"));
                             }
                         }
-                        if (Xml.hasAttribute(xml, "goods-types")) {
-                            String[] goods = Xml.arrayAttribute(xml, "goods-types");
-                            int[] bonus = Xml.intArrayAttribute(xml, "values", new int[] {});
-                            for (int i = 0; i < goods.length; i++) {
-                                GoodsType gt = goodsTypeByRef.get(goods[i]);
-                                if (gt != null && !goodsEffect.contains(gt)) {
-                                    goodsEffect.add(gt);
-                                    goodsBonus.add(bonus[i]);
-                                }
-                            }
-                        }
                         if (Xml.hasAttribute(xml, "movement-cost")) {
                             movementCost = Xml.intAttribute(xml, "movement-cost");
                         }
