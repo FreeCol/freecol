@@ -350,9 +350,9 @@ public final class ImageLibrary extends ImageProvider {
         coast2 = new Hashtable<String, Vector<ImageIcon>>();
         
         for (TileType type : FreeCol.getSpecification().getTileTypeList()) {
-            String filePath = dataDirectory + path + type.artBasic + "i0" + extension;
+            String filePath = dataDirectory + path + type.artBasic + "center0" + extension;
             terrain1.put(type.getName(), findImage(filePath, resourceLocator, doLookup));
-            filePath = dataDirectory + path + type.artBasic + "i1" + extension;
+            filePath = dataDirectory + path + type.artBasic + "center1" + extension;
             terrain2.put(type.getName(), findImage(filePath, resourceLocator, doLookup));
 
             if (type.artOverlay != null) {
@@ -364,11 +364,11 @@ public final class ImageLibrary extends ImageProvider {
             
             Vector<ImageIcon> tempVector1 = new Vector<ImageIcon>();
             Vector<ImageIcon> tempVector2 = new Vector<ImageIcon>();
-            for (char c = 'a'; c <= 'h'; c++) {
-                filePath = dataDirectory + path + type.artBasic + c + "0" + extension;
+            for (int c = 1; c <= 8; c++) {
+                filePath = dataDirectory + path + type.artBasic + "border" + c + "0" + extension;
                 tempVector1.add(findImage(filePath, resourceLocator, doLookup));
 
-                filePath = dataDirectory + path + type.artBasic + c + "1" + extension;
+                filePath = dataDirectory + path + type.artBasic + "border" + c + "1" + extension;
                 tempVector2.add(findImage(filePath, resourceLocator, doLookup));
             }
 
@@ -378,11 +378,11 @@ public final class ImageLibrary extends ImageProvider {
             if (type.artCoast != null) {
                 tempVector1 = new Vector<ImageIcon>();
                 tempVector2 = new Vector<ImageIcon>();
-                for (char c = 'a'; c <= 'h'; c++) {
-                    filePath = dataDirectory + path + type.artCoast + c + "0" + extension;
+                for (int c = 1; c <= 8; c++) {
+                    filePath = dataDirectory + path + type.artCoast + "border" + c + "0" + extension;
                     tempVector1.add(findImage(filePath, resourceLocator, doLookup));
 
-                    filePath = dataDirectory + path + type.artCoast + c + "1" + extension;
+                    filePath = dataDirectory + path + type.artCoast + "border" + c + "1" + extension;
                     tempVector2.add(findImage(filePath, resourceLocator, doLookup));
                 }
                 
@@ -398,11 +398,11 @@ public final class ImageLibrary extends ImageProvider {
         
         Vector<ImageIcon> unexploredVector1 = new Vector<ImageIcon>();
         Vector<ImageIcon> unexploredVector2 = new Vector<ImageIcon>();
-        for (char c = 'a'; c <= 'h'; c++) {
-            unexploredPath = dataDirectory + path + "terrain/unexplored/terrain00" + c + "0" + extension;
+        for (int c = 1; c <= 8; c++) {
+            unexploredPath = dataDirectory + path + "terrain/unexplored/border" + c + "0" + extension;
             unexploredVector1.add(findImage(unexploredPath, resourceLocator, doLookup));
 
-            unexploredPath = dataDirectory + path + "terrain/unexplored/terrain00" + c + "1" + extension;
+            unexploredPath = dataDirectory + path + "terrain/unexplored/border" + c + "1" + extension;
             unexploredVector2.add(findImage(unexploredPath, resourceLocator, doLookup));
         }
 
