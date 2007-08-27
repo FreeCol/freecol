@@ -178,9 +178,10 @@ public final class ImageLibrary extends ImageProvider {
             colonies, // Holds ImageIcon objects
             indians, // Holds ImageIcon objects
             goods, // Holds ImageIcon objects
-            bonus, // Holds ImageIcon objects
+            //bonus, // Holds ImageIcon objects
             monarch; // Holds ImageIcon objects
-    private Hashtable<String, ImageIcon> terrain1, terrain2, forests, overlay1, overlay2;
+    private Hashtable<String, ImageIcon> terrain1, terrain2, overlay1, overlay2,
+            forests, bonus;
 
     //private Vector<Vector<ImageIcon>> terrain1, terrain2;
     private Hashtable<String, Vector<ImageIcon>> border1, border2, coast1, coast2;
@@ -665,12 +666,16 @@ public final class ImageLibrary extends ImageProvider {
      */
     private void loadBonus(GraphicsConfiguration gc, Class<FreeCol> resourceLocator, boolean doLookup)
             throws FreeColException {
-        bonus = new Vector<ImageIcon>(BONUS_COUNT);
-
-        for (int i = 0; i < BONUS_COUNT; i++) {
+        bonus = new Hashtable<String, ImageIcon>();
+        
+        for (ResourceType type : FreeCol.getSpecification().getResourceTypeList()) {
+            String filePath = dataDirectory + path + type.art;
+            bonus.put(type.getName(), findImage(filePath, resourceLocator, doLookup));
+        }
+        /*for (int i = 0; i < BONUS_COUNT; i++) {
             String filePath = dataDirectory + path + bonusDirectory + bonusName + i + extension;
             bonus.add(findImage(filePath, resourceLocator, doLookup));
-        }
+        }*/
     }
 
     /**
@@ -841,71 +846,17 @@ public final class ImageLibrary extends ImageProvider {
     }
 
     public Image getBonusImage(ResourceType type) {
-        return bonus.get(type.art).getImage();
+        return getBonusImageIcon(type).getImage();
     }
-/*  Depreciated
-    //TODO: IMPORTANT: This method duplicates a similar method in the
-    //Tile class and errors were introduced because the two changed
-    //independently. We really need to put the bonus information in
-    //the TileType (and make hills and mountains TileTypes too).
-    public static int getBonusImageType(int type, int addition, boolean forested) {
-        if (addition == Tile.ADD_MOUNTAINS) {
-            return BONUS_SILVER;
-        } else if (addition == Tile.ADD_HILLS) {
-            return BONUS_ORE;
-        } else if (forested) {
-            if (type == Tile.GRASSLANDS || type == Tile.SAVANNAH) {
-                return BONUS_LUMBER;
-            } else if (type == Tile.MARSH || type == Tile.SWAMP) {
-                return BONUS_ORE;
-            } else {
-                return BONUS_FURS;
-            }
-        } else {
-            switch(type) {
-                case Tile.UNEXPLORED:
-                    return -1;
-                case Tile.PLAINS:
-                    return BONUS_FOOD;
-                case Tile.GRASSLANDS:
-                    return BONUS_TOBACCO;
-                case Tile.PRAIRIE:
-                    return BONUS_COTTON;
-                case Tile.SAVANNAH:
-                    return BONUS_SUGAR;
-                case Tile.MARSH:
-                    return BONUS_ORE;
-                case Tile.SWAMP:
-                    return BONUS_SILVER;
-                case Tile.DESERT:
-                    return BONUS_FOOD;
-                case Tile.TUNDRA:
-                    return BONUS_ORE;                    
-                case Tile.ARCTIC:
-                    return -1;
-                case Tile.OCEAN:
-                    return BONUS_FISH;
-                case Tile.HIGH_SEAS:
-                    return -1;
-                default:
-                    // Should never happen
-                    throw new IllegalArgumentException("Unknown tile type " + type + " for getBonusType!");
-            }
-        }
-    }
-*/
+
     /**
      * Returns the bonus-ImageIcon at the given index.
      * 
      * @param index The index of the bonus-ImageIcon to return.
      * @return The bonus-ImageIcon at the given index.
      */
-    public ImageIcon getBonusImageIcon(int index) {
-        return bonus.get(index);
-    }
-
     public ImageIcon getBonusImageIcon(ResourceType type) {
-        return bonus.get(type.art);
+        return bonus.get(type.getName());
     }
 
     /**

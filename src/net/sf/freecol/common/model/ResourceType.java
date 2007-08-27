@@ -18,10 +18,10 @@ public final class ResourceType
     public static final  String  REVISION = "$Revision: 1.00 $";
 
     public int       index;
-    public String     id;
-    public String     name;
+    public String    id;
+    public String    name;
 
-    public int       art;
+    public String    art;
 
     public int       minValue;
     public int       maxValue;
@@ -123,7 +123,7 @@ public final class ResourceType
         name = Xml.attribute(xml, "id");
         String[] buffer = name.split("\\.");
         id = buffer[buffer.length - 1];
-        art = Xml.intAttribute(xml, "art");
+        art = Xml.attribute(xml, "art");
         if ( Xml.hasAttribute(xml, "maximum-value") ) {
             maxValue = Xml.intAttribute(xml, "maximum-value");
             minValue = Xml.intAttribute(xml, "minimum-value", 0);

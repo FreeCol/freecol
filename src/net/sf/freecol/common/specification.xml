@@ -149,44 +149,44 @@
   </goods-types>
 
   <resource-types>
-    <resource-type id="model.resource.Game" art="7">
+    <resource-type id="model.resource.Game" art="bonus/Bonus7.png">
       <production-bonus goods-type="model.goods.Food" bonus="2"/>
       <!-- in colonization game gives 2 food (4 for expert farmer) -->
       <production-bonus goods-type="model.goods.Furs" bonus="2"/>
     </resource-type>
-    <resource-type id="model.resource.Minerals" art="6" minimum-value="40" maximum-value="400">
+    <resource-type id="model.resource.Minerals" art="bonus/Bonus6.png" minimum-value="40" maximum-value="400">
       <production-bonus goods-type="model.goods.Ore" bonus="3"/>
     </resource-type>
-    <resource-type id="model.resource.Ore" art="6" minimum-value="40" maximum-value="4000">
+    <resource-type id="model.resource.Ore" art="bonus/Bonus6.png" minimum-value="40" maximum-value="4000">
       <production-bonus goods-type="model.goods.Ore" bonus="2"/>
     </resource-type>
-    <resource-type id="model.resource.Silver" art="0" minimum-value="40" maximum-value="800">
+    <resource-type id="model.resource.Silver" art="bonus/Bonus0.png" minimum-value="40" maximum-value="800">
       <production-bonus goods-type="model.goods.Silver" bonus="2"/>
     </resource-type>
-    <resource-type id="model.resource.Lumber" art="8">
+    <resource-type id="model.resource.Lumber" art="bonus/Bonus8.png">
       <production-bonus goods-type="model.goods.Lumber" bonus="4"/>
     </resource-type>
-    <resource-type id="model.resource.Furs" art="7">
+    <resource-type id="model.resource.Furs" art="bonus/Bonus7.png">
       <production-bonus goods-type="model.goods.Furs" bonus="3"/>
     </resource-type>
-    <resource-type id="model.resource.Tobacco" art="2">
+    <resource-type id="model.resource.Tobacco" art="bonus/Bonus2.png">
       <production-bonus goods-type="model.goods.Tobacco" factor="2"/>
     </resource-type>
-    <resource-type id="model.resource.Sugar" art="4">
+    <resource-type id="model.resource.Sugar" art="bonus/Bonus4.png">
       <production-bonus goods-type="model.goods.Sugar" factor="2"/>
     </resource-type>
-    <resource-type id="model.resource.Cotton" art="3">
+    <resource-type id="model.resource.Cotton" art="bonus/Bonus3.png">
       <production-bonus goods-type="model.goods.Cotton" factor="2"/>
     </resource-type>
-    <resource-type id="model.resource.Oasis" art="1">
+    <resource-type id="model.resource.Oasis" art="bonus/Bonus1.png">
       <production-bonus goods-type="model.goods.Food" bonus="2"/>
       <!-- in colonization game gives 2 food (4 for expert farmer) -->
     </resource-type>
-    <resource-type id="model.resource.Grain" art="1">
+    <resource-type id="model.resource.Grain" art="bonus/Bonus1.png">
       <production-bonus goods-type="model.goods.Food" bonus="2"/>
       <!-- in colonization game gives 2 food (4 for expert farmer) -->
     </resource-type>
-    <resource-type id="model.resource.Fish" art="5">
+    <resource-type id="model.resource.Fish" art="bonus/Bonus5.png">
       <production-bonus goods-type="model.goods.Fish" bonus="3"/>
       <!-- in colonization game gives 3 food (6 for expert fisherman) -->
     </resource-type>
