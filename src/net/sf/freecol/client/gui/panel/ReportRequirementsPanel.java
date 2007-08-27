@@ -91,9 +91,11 @@ public final class ReportRequirementsPanel extends ReportPanel implements Action
         StyledDocument doc = textPane.getStyledDocument();
         defineStyles(doc);
 
-        unitCount = new int[colonies.size()][Unit.UNIT_COUNT];
-        canTrain = new boolean[colonies.size()][Unit.UNIT_COUNT];
-        surplus = new int[colonies.size()][Goods.NUMBER_OF_TYPES];
+        int numberUnitTypes = FreeCol.getSpecification().numberOfUnitTypes();
+        int numberGoodsTypes = FreeCol.getSpecification().numberOfGoodsTypes();
+        unitCount = new int[colonies.size()][numberUnitTypes];
+        canTrain = new boolean[colonies.size()][numberUnitTypes];
+        surplus = new int[colonies.size()][numberGoodsTypes];
 
         List<GoodsType> goodsTypes = FreeCol.getSpecification().getGoodsTypeList();
         // check which colonies can train which units
@@ -121,9 +123,8 @@ public final class ReportRequirementsPanel extends ReportPanel implements Action
                 logger.warning(e.toString());
             }
 
-            boolean[] expertWarning = new boolean[Unit.UNIT_COUNT];
-            int numberOfGoodsTypes = FreeCol.getSpecification().numberOfGoodsTypes();
-            boolean[] productionWarning = new boolean[numberOfGoodsTypes];
+            boolean[] expertWarning = new boolean[numberUnitTypes];
+            boolean[] productionWarning = new boolean[numberGoodsTypes];
             boolean hasWarning = false;
 
             // check if all unit requirements are met
