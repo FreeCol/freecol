@@ -95,7 +95,7 @@ public final class ReportUnitPanel extends JPanel implements ActionListener {
     /**
      * Records the number of units of each type.
      */
-    private int[][] unitCounts = new int[Unit.UNIT_COUNT][2];
+    private int[][] unitCounts;
 
     /**
      * Records the total cargo capacity of the fleet (currently
@@ -121,7 +121,7 @@ public final class ReportUnitPanel extends JPanel implements ActionListener {
      * Prepares this panel to be displayed.
      */
     public void initialize() {
-
+        unitCounts = new int[FreeCol.getSpecification().numberOfUnitTypes()][2];
         gatherData();
 
         int rowsREF = (reportType == CARGO ? 0 : 1);
@@ -310,24 +310,19 @@ public final class ReportUnitPanel extends JPanel implements ActionListener {
     private JPanel createUnitPanel() {
         JPanel unitPanel = null;
         if (reportType == CARGO) {
-            int[] unitTypes = new int[] {
-                Unit.WAGON_TRAIN, Unit.CARAVEL, Unit.MERCHANTMAN, Unit.GALLEON,
-                Unit.FRIGATE, Unit.MAN_O_WAR, Unit.PRIVATEER
-            };
-            unitPanel = new JPanel(new GridLayout(1, unitTypes.length));
-            for (int index = 0; index < unitTypes.length; index++) {
-                int count = unitCounts[unitTypes[index]][0];
-                unitPanel.add(createUnitTypeLabel(unitTypes[index], false, count));
+            String[] abilities = new String[] {"model.ability.carryUnits", "model.ability.carryGoods"};
+            List<UnitType> unitTypes = FreeCol.getSpecification().getUnitTypesWithAnyAbility(abilities);
+            unitPanel = new JPanel(new GridLayout(1, unitTypes.size()));
+            for (UnitType unitType : unitTypes) {
+                int count = unitCounts[unitType.getIndex()][0];
+                unitPanel.add(createUnitTypeLabel(unitType, false, count));
             }
         } else if (reportType == NAVAL) {
-            int[] unitTypes = new int[] {
-                Unit.CARAVEL, Unit.MERCHANTMAN, Unit.GALLEON,
-                Unit.FRIGATE, Unit.MAN_O_WAR, Unit.PRIVATEER
-            };
-            unitPanel = new JPanel(new GridLayout(1, unitTypes.length));
-            for (int index = 0; index < unitTypes.length; index++) {
-                int count = unitCounts[unitTypes[index]][0];
-                unitPanel.add(createUnitTypeLabel(unitTypes[index], false, count));
+            List<UnitType> unitTypes = FreeCol.getSpecification().getUnitTypesWithAbility("model.ability.navalUnit");
+            unitPanel = new JPanel(new GridLayout(1, unitTypes.size()));
+            for (UnitType unitType : unitTypes) {
+                int count = unitCounts[unitType.getIndex()][0];
+                unitPanel.add(createUnitTypeLabel(unitType, false, count));
             }
         } else if (reportType == MILITARY) {
             int[] unitTypes = new int[] {
@@ -338,14 +333,16 @@ public final class ReportUnitPanel extends JPanel implements ActionListener {
             unitPanel = new JPanel(new GridLayout(1, unitTypes.length));
             // artillery can not be mounted
             for (int index = 0; index < 2; index++) {
-                int count = unitCounts[unitTypes[index]][0];
-                unitPanel.add(createUnitTypeLabel(unitTypes[index], false, count));
+                UnitType unitType = FreeCol.getSpecification().getUnitType(unitTypes[index]);
+                int count = unitCounts[unitType.getIndex()][0];
+                unitPanel.add(createUnitTypeLabel(unitType, false, count));
             }
             // other units can be mounted
             for (int mounted = 1; mounted >= 0; mounted--) {
                 for (int index = 2; index < unitTypes.length; index++) {
-                    int count = unitCounts[unitTypes[index]][mounted];
-                    unitPanel.add(createUnitTypeLabel(unitTypes[index], (mounted == 1), count));
+                    UnitType unitType = FreeCol.getSpecification().getUnitType(unitTypes[index]);
+                    int count = unitCounts[unitType.getIndex()][mounted];
+                    unitPanel.add(createUnitTypeLabel(unitType, false, count));
                 }
             }
         }
@@ -417,6 +414,11 @@ public final class ReportUnitPanel extends JPanel implements ActionListener {
     }
 
     private JLabel createUnitTypeLabel(int unitTypeIndex, boolean mounted, int count) {
+        return createUnitTypeLabel(FreeCol.getSpecification().getUnitType(unitTypeIndex), mounted, count);
+    }
+    
+    private JLabel createUnitTypeLabel(UnitType unitType, boolean mounted, int count) {
+        int unitTypeIndex = unitType.getIndex();
         int graphicsType = ImageLibrary.getUnitGraphicsType(unitTypeIndex, true, mounted, 0, false);
         JLabel unitLabel = reportPanel.buildUnitLabel(graphicsType, 0.66f);
         unitLabel.setText(String.valueOf(count));
@@ -433,7 +435,6 @@ public final class ReportUnitPanel extends JPanel implements ActionListener {
         case Unit.MAN_O_WAR:
         case Unit.PRIVATEER:
         case Unit.WAGON_TRAIN:
-            UnitType unitType = FreeCol.getSpecification().unitType(unitTypeIndex);
             unitLabel.setToolTipText(Unit.getName(unitType));
             break;
         case Unit.VETERAN_SOLDIER:

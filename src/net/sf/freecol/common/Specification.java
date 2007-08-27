@@ -414,14 +414,27 @@ public final class Specification {
         return null;
     }
     
-    public List<UnitType> getUnitTypesWithAbility(String ability) {
+    /**
+     * Return the unit types which have any of the given abilities
+     *
+     * @param abilities The abilities for the search
+     * @return a <code>List</code> of <code>UnitType</code>
+     */
+    public List<UnitType> getUnitTypesWithAnyAbility(String[] abilities) {
         ArrayList<UnitType> unitTypes = new ArrayList<UnitType>();
         for (UnitType unitType : getUnitTypeList()) {
-            if (unitType.hasAbility(ability)) {
-                unitTypes.add(unitType);
+            for (int i = 0; i < abilities.length; i++) {
+                if (unitType.hasAbility(abilities[i])) {
+                    unitTypes.add(unitType);
+                    break;
+                }
             }
         }
         return unitTypes;
+    }
+
+    public List<UnitType> getUnitTypesWithAbility(String ability) {
+        return getUnitTypesWithAnyAbility(new String[] { ability });
     }
 
     // -- Founding Fathers --
