@@ -1169,14 +1169,10 @@ public final class GUI {
      * @return The <code>Image</code>.
      */
     private Image getPathImage(Unit u) {
-        if (u == null || u.isNaval()) {
-            return (Image) UIManager.get("path.naval.image");
-        } else if (u.isMounted()) {
-            return (Image) UIManager.get("path.horse.image");
-        } else if (u.getType() == Unit.WAGON_TRAIN || u.getType() == Unit.TREASURE_TRAIN || u.getType() == Unit.ARTILLERY || u.getType() == Unit.DAMAGED_ARTILLERY) {
-            return (Image) UIManager.get("path.wagon.image");
+        if (u == null) {
+            return null;
         } else {
-            return (Image) UIManager.get("path.foot.image");
+            return (Image) UIManager.get("path." + u.getPathTypeImage() + ".image");
         }
     }
     
@@ -1206,14 +1202,10 @@ public final class GUI {
      * @return The <code>Image</code>.
      */
     private Image getPathNextTurnImage(Unit u) {
-        if (u == null || u.isNaval()) {
-            return (Image) UIManager.get("path.naval.nextTurn.image");
-        } else if (u.isMounted()) {
-            return (Image) UIManager.get("path.horse.nextTurn.image");
-        } else if (u.getType() == Unit.WAGON_TRAIN || u.getType() == Unit.TREASURE_TRAIN || u.getType() == Unit.ARTILLERY || u.getType() == Unit.DAMAGED_ARTILLERY) {
-            return (Image) UIManager.get("path.wagon.nextTurn.image");
+        if (u == null) {
+            return null;
         } else {
-            return (Image) UIManager.get("path.foot.nextTurn.image");
+            return (Image) UIManager.get("path." + u.getPathTypeImage() + ".nextTurn.image");
         }
     }
 

@@ -1855,8 +1855,7 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener {
             return theText;
         }
 
-        public String unitText(int index) {
-            UnitType type = FreeCol.getSpecification().unitType(index);
+        public String unitText(UnitType type) {
             String theText = new String(Unit.getName(type) + " (" + Unit.getNextHammers(type) + " "
                     + Messages.message("model.goods.Hammers").toLowerCase());
 
@@ -1890,11 +1889,10 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener {
                 }
             }
 
-            Iterator<Integer> buildableUnitIterator = colonyPanel.getColony().getBuildableUnitIterator();
-            while (buildableUnitIterator.hasNext()) {
-                int unitID = buildableUnitIterator.next();
-                String theText = unitText(unitID);
-                int i = unitID + Colony.BUILDING_UNIT_ADDITION;
+            List<UnitType> buildableUnits = colonyPanel.getColony().getBuildableUnits();
+            for (UnitType buildable : buildableUnits) {
+                String theText = unitText(buildable);
+                int i = buildable.getIndex() + Colony.BUILDING_UNIT_ADDITION;
                 BuildingBoxItem uItem = new BuildingBoxItem(theText, i);
                 addItem(uItem);
                 if (i == colonyPanel.getColony().getCurrentlyBuilding()) {

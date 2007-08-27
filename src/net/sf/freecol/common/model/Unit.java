@@ -3156,7 +3156,7 @@ public class Unit extends FreeColGameObject implements Abilities, Locatable, Loc
                     GoodsType deliverType = getWorkImprovement().getDeliverGoodsType();
                     if (deliverType != null) {
                         int deliverAmount = getTile().potential(deliverType) * getWorkImprovement().getDeliverAmount();
-                        if (getType() == HARDY_PIONEER) {
+                        if (getUnitType().hasAbility("model.ability.expertPioneer")) {
                             deliverAmount *= 2;
                         }
                         if (getColony() != null && getColony().getOwner().equals(getOwner())) {
@@ -3437,16 +3437,17 @@ public class Unit extends FreeColGameObject implements Abilities, Locatable, Loc
 
                 /**
                  * Ambush bonus in the open = defender's defense bonus, if
-                 * defender is REF, or attacker is Brave.
+                 * defender is REF, or attacker is indian.
                  */
-                if (attacker.getType() == Unit.BRAVE || defender.getOwner().isREF()) {
+                if (attacker.getOwner().isIndian() || defender.getOwner().isREF()) {
                     percentage = defender.getTile().defenseBonus();
                     result.add(new Modifier("modifiers.ambushBonus", percentage, Modifier.PERCENTAGE));
                     totalPercentage += percentage;
                 }
 
                 // 75% Artillery in the open penalty
-                if (attacker.getType() == Unit.ARTILLERY || attacker.getType() == Unit.DAMAGED_ARTILLERY) {
+                // TODO: is it right? or should it be another ability?
+                if (attacker.hasAbility("model.ability.bombard")) {
                     percentage = -75;
                     result.add(new Modifier("modifiers.artilleryPenalty", percentage, Modifier.PERCENTAGE));
                     totalPercentage += percentage;
@@ -3560,8 +3561,8 @@ public class Unit extends FreeColGameObject implements Abilities, Locatable, Loc
                 Modifier settlementModifier = getSettlementModifier(attacker, defender.getTile().getSettlement());
                 result.add(settlementModifier);
                 totalPercentage += settlementModifier.getValue();
-                if ((defender.getType() == Unit.ARTILLERY || defender.getType() == Unit.DAMAGED_ARTILLERY)
-                        && attacker.getType() == Unit.BRAVE) {
+                // TODO: is it right? or should it be another ability?
+                if (defender.hasAbility("model.ability.bombard") && attacker.getOwner().isIndian()) {
                     // 100% defense bonus against an Indian raid
                     percentage = 100;
                     result.add(new Modifier("modifiers.artilleryAgainstRaid", percentage, Modifier.PERCENTAGE));
@@ -3569,14 +3570,14 @@ public class Unit extends FreeColGameObject implements Abilities, Locatable, Loc
                 }
             } else if (defender.getTile() != null) {
                 // In the open
-                if (attacker.getType() != Unit.BRAVE && !defender.getOwner().isREF()) {
+                if (!attacker.getOwner().isIndian() && !defender.getOwner().isREF()) {
                     // Terrain defensive bonus.
                     percentage = defender.getTile().defenseBonus();
                     result.add(new Modifier("modifiers.terrainBonus", percentage, Modifier.PERCENTAGE));
                     totalPercentage += percentage;
                 }
-                if ((defender.getType() == Unit.ARTILLERY || defender.getType() == Unit.DAMAGED_ARTILLERY)
-                        && defender.getState() != Unit.FORTIFIED) {
+                // TODO: is it right? or should it be another ability?
+                if (defender.hasAbility("model.ability.bombard") && defender.getState() != Unit.FORTIFIED) {
                     // -75% Artillery in the Open penalty
                     percentage = -75;
                     result.add(new Modifier("modifiers.artilleryPenalty", percentage, Modifier.PERCENTAGE));
@@ -3728,9 +3729,9 @@ public class Unit extends FreeColGameObject implements Abilities, Locatable, Loc
                                     { "%unit%", defender.getName() },
                                     { "%nation%", enemy.getNationAsString() } }, 
                                 ModelMessage.UNIT_DEMOTED);
-            } else if (getType() == BRAVE && !defender.isOffensiveUnit() &&
+            } else if (hasAbility("model.ability.pillageUnprotectedColony") && !defender.isDefensiveUnit() &&
                     defender.getColony() != null && !defender.getColony().hasStockade()) {
-                damageOrStealAtColony(defender.getColony());
+                pillageColony(defender.getColony());
             } else {
                 if (getOwner().hasFather(FoundingFather.GEORGE_WASHINGTON)) {
                     promote();
@@ -3919,7 +3920,7 @@ public class Unit extends FreeColGameObject implements Abilities, Locatable, Loc
                     message.setBeenDisplayed(true);
                 }
                 if (getType() == VETERAN_SOLDIER) {
-                    setType(FREE_COLONIST);
+                    clearSpeciality();
                     messageID = "model.unit.veteranUnitCaptured";
                 } else {
                     messageID = "model.unit.unitCaptured";
@@ -4175,7 +4176,7 @@ public class Unit extends FreeColGameObject implements Abilities, Locatable, Loc
                 Unit u = it.next();
                 if (u.getType() == Unit.VETERAN_SOLDIER || u.getType() == Unit.KINGS_REGULAR
                         || u.getType() == Unit.COLONIAL_REGULAR) {
-                    u.setType(Unit.FREE_COLONIST);
+                    u.clearSpeciality();
                 }
                 u.setState(Unit.ACTIVE);
                 if (isUndead()) {
@@ -4755,6 +4756,19 @@ public class Unit extends FreeColGameObject implements Abilities, Locatable, Loc
     public int getTurnsForRepair() {
         return getInitialHitpoints(getUnitType()) - getHitpoints();
     }
+    
+    /**
+     * Return the type of the image which will be used to draw the path
+     *
+     * @returns a <code>String</code> to form the resource key
+     */
+    public String getPathTypeImage() {
+        if (isMounted()) {
+            return "horse";
+        } else {
+            return unitType.getPathImage();
+        }
+    }
 
     /**
      * Damage a building or a ship or steal some goods or gold. It's called
@@ -4763,7 +4777,7 @@ public class Unit extends FreeColGameObject implements Abilities, Locatable, Loc
      *
      * @param colony The attacked colony
      */
-    private void damageOrStealAtColony(Colony colony) {
+    private void pillageColony(Colony colony) {
         ArrayList<Building> buildingList = new ArrayList<Building>();
         ArrayList<Unit> shipList = new ArrayList<Unit>();
         ArrayList<Goods> goodsList = colony.getGoodsContainer().getCompactGoods();
@@ -4789,7 +4803,7 @@ public class Unit extends FreeColGameObject implements Abilities, Locatable, Loc
         String unitName = getName();
         String colonyName = colony.getName();
         
-        int random = getGame().getModelController().getRandom(getID() + "damageOrStealColony",
+        int random = getGame().getModelController().getRandom(getID() + "pillageColony",
                 buildingList.size() + goodsList.size() + shipList.size() + 1);
         if (random < buildingList.size()) {
             Building building = buildingList.get(random);

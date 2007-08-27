@@ -115,6 +115,11 @@ public final class UnitType implements Abilities {
     private String clearSpeciality;
 
     /**
+     * Describe pathImage here.
+     */
+    private String pathImage;
+
+    /**
      * Describe education here.
      */
     private Hashtable<String, Upgrade> upgrades = new Hashtable<String, Upgrade>();
@@ -480,6 +485,24 @@ public final class UnitType implements Abilities {
     }
 
     /**
+     * Get the <code>PathImage</code> value.
+     *
+     * @return a <code>String</code> value
+     */
+    public String getPathImage() {
+        return pathImage;
+    }
+
+    /**
+     * Set the <code>PathImage</code> value.
+     *
+     * @param newPathImage The new PathImage value.
+     */
+    public void setPathImage(final String newPathImage) {
+        this.pathImage = newPathImage;
+    }
+
+    /**
      * Whether the given UnitType can be teached
      *
      * @param unitType the UnitType to learn
@@ -585,9 +608,12 @@ public final class UnitType implements Abilities {
         defence = Xml.intAttribute(xml, "defence");
         movement = Xml.intAttribute(xml, "movement");
         lineOfSight = Xml.intAttribute(xml, "lineOfSight");
+        
         space = Xml.intAttribute(xml, "space", 0);
         hitPoints = Xml.intAttribute(xml, "hitPoints", 0);
         spaceTaken = Xml.intAttribute(xml, "spaceTaken", 1);
+        
+        pathImage = Xml.attribute(xml, "pathImage", null);
         promotion = Xml.attribute(xml, "promotion", null);
         clearSpeciality = Xml.attribute(xml, "clearSpeciality", null);
 

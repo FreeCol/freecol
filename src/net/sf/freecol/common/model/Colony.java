@@ -863,29 +863,21 @@ public final class Colony extends Settlement implements Location, Nameable {
     }
 
     /**
-     * Returns an <code>Iterator</code> of every unit type this colony may
+     * Returns a <code>List</code> with every unit type this colony may
      * build.
      * 
-     * @return An <code>Iterator</code> on <code>Integer</code> -objects
-     *         where the values are the unit type values.
+     * @return A <code>List</code> with <code>UnitType</code>
      */
-    public Iterator<Integer> getBuildableUnitIterator() {
-        ArrayList<Integer> buildableUnits = new ArrayList<Integer>();
-        buildableUnits.add(Unit.WAGON_TRAIN);
-        if (getBuilding(Building.ARMORY).isBuilt()) {
-            buildableUnits.add(Unit.ARTILLERY);
-        }
-        if (getBuilding(Building.DOCK).getLevel() >= Building.FACTORY) {
-            buildableUnits.add(Unit.CARAVEL);
-            buildableUnits.add(Unit.MERCHANTMAN);
-            buildableUnits.add(Unit.GALLEON);
-            buildableUnits.add(Unit.PRIVATEER);
-            buildableUnits.add(Unit.FRIGATE);
-            if (owner.getRebellionState() >= Player.REBELLION_POST_WAR) {
-                buildableUnits.add(Unit.MAN_O_WAR);
+    public List<UnitType> getBuildableUnits() {
+        ArrayList<UnitType> buildableUnits = new ArrayList<UnitType>();
+        List<UnitType> unitTypes = FreeCol.getSpecification().getUnitTypeList();
+        for (UnitType unitType : unitTypes) {
+            if (unitType.getHammersRequired() > 0) {
+                // TODO: check requirements
+                buildableUnits.add(unitType);
             }
         }
-        return buildableUnits.iterator();
+        return buildableUnits;
     }
 
     /**
@@ -894,10 +886,10 @@ public final class Colony extends Settlement implements Location, Nameable {
      * @param unitType The unit type to test against.
      * @return The result.
      */
-    public boolean canBuildUnit(int unitType) {
-        Iterator<Integer> buildableUnitIterator = getBuildableUnitIterator();
-        while (buildableUnitIterator.hasNext()) {
-            if (unitType == buildableUnitIterator.next()) {
+    public boolean canBuildUnit(UnitType unitType) {
+        List<UnitType> buildableUnits = getBuildableUnits();
+        for (UnitType buildable : buildableUnits) {
+            if (unitType == buildable) {
                 return true;
             }
         }
@@ -1233,8 +1225,8 @@ public final class Colony extends Settlement implements Location, Nameable {
         if (getCurrentlyBuilding() >= Colony.BUILDING_UNIT_ADDITION) {
             int unitTypeIndex = getCurrentlyBuilding() - BUILDING_UNIT_ADDITION;
             UnitType unitType = FreeCol.getSpecification().unitType(unitTypeIndex);
-            if (canBuildUnit(unitTypeIndex) && Unit.getNextHammers(unitTypeIndex) <= getHammers()
-                    && Unit.getNextHammers(unitTypeIndex) != -1) {
+            if (canBuildUnit(unitType) && Unit.getNextHammers(unitType) <= getHammers()
+                    && Unit.getNextHammers(unitType) != -1) {
                 if (Unit.getNextTools(unitTypeIndex) <= getGoodsCount(Goods.TOOLS)) {
                     Unit unit = getGame().getModelController().createUnit(getID() + "buildUnit", getTile(), getOwner(),
                             unitType);
@@ -1322,10 +1314,10 @@ public final class Colony extends Settlement implements Location, Nameable {
         int hammersRemaining = 0;
         int toolsRemaining = 0;
         if (getCurrentlyBuilding() >= Colony.BUILDING_UNIT_ADDITION) {
-            int unitType = getCurrentlyBuilding() - BUILDING_UNIT_ADDITION;
-            hammersRemaining = Math.max(Unit.getNextHammers(unitType) - hammers, 0);
-            toolsRemaining = Math.max(Unit.getNextTools(unitType) - getGoodsCount(Goods.TOOLS), 0);
-            hammers = Math.max(Unit.getNextHammers(unitType), hammers);
+            int unitIndex = getCurrentlyBuilding() - BUILDING_UNIT_ADDITION;
+            hammersRemaining = Math.max(Unit.getNextHammers(unitIndex) - hammers, 0);
+            toolsRemaining = Math.max(Unit.getNextTools(unitIndex) - getGoodsCount(Goods.TOOLS), 0);
+            hammers = Math.max(Unit.getNextHammers(unitIndex), hammers);
         } else if (getCurrentlyBuilding() != -1) {
             hammersRemaining = Math.max(getBuilding(currentlyBuilding).getNextHammers() - hammers, 0);
             toolsRemaining = Math.max(getBuilding(currentlyBuilding).getNextTools() - getGoodsCount(Goods.TOOLS), 0);
