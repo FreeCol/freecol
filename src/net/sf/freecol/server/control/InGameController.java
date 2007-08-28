@@ -152,7 +152,7 @@ public final class InGameController extends Controller {
                         + newPlayer.getConnection());
             }
 
-            if (newPlayer.getCurrentFather() == -1 && newPlayer.getSettlements().size() > 0) {
+            if (newPlayer.getCurrentFather() == null && newPlayer.getSettlements().size() > 0) {
                 chooseFoundingFather(newPlayer);
             }
             if (newPlayer.getMonarch() != null) {
@@ -194,7 +194,7 @@ public final class InGameController extends Controller {
                     }
                 }
                 if (!atLeastOneChoice) {
-                    nextPlayer.setCurrentFather(-1);
+                    nextPlayer.setCurrentFather(null);
                 } else {
                     try {
                         Element reply = nextPlayer.getConnection().ask(chooseFoundingFatherElement);
@@ -209,7 +209,7 @@ public final class InGameController extends Controller {
                         if (!foundIt) {
                             throw new IllegalArgumentException();
                         }
-                        nextPlayer.setCurrentFather(foundingFather);
+                        nextPlayer.setCurrentFather(FreeCol.getSpecification().foundingFather(foundingFather));
                     } catch (IOException e) {
                         logger.warning("Could not send message to: " + nextPlayer.getName());
                     }
@@ -235,7 +235,7 @@ public final class InGameController extends Controller {
         for (int type = 0; type < FoundingFather.TYPE_COUNT; type++) {
             int weightSum = 0;
             for (FoundingFather father : FreeCol.getSpecification().getFoundingFathers()) {
-                if (!player.hasFather(father.getIndex()) && father.getType() == type) {
+                if (!player.hasFather(father) && father.getType() == type) {
                     weightSum += father.getWeight(age);
                 }
             }
@@ -245,7 +245,7 @@ public final class InGameController extends Controller {
                 int r = getPseudoRandom().nextInt(weightSum) + 1;
                 weightSum = 0;
                 for (FoundingFather father : FreeCol.getSpecification().getFoundingFathers()) {
-                    if (!player.hasFather(father.getIndex()) && father.getType() == type) {
+                    if (!player.hasFather(father) && father.getType() == type) {
                         weightSum += father.getWeight(age);
                         if (weightSum >= r) {
                             randomFoundingFathers[type] = father.getIndex();

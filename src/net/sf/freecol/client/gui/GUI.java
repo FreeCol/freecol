@@ -1441,7 +1441,7 @@ public final class GUI {
                 && !Player.isEuropean(nation)
                 && nation != colony.getOwner().getNation()
                 && tile.getSettlement() == null
-                && !colony.getOwner().hasFather(FoundingFather.PETER_MINUIT)) {
+            && !colony.getOwner().hasFather(FreeCol.getSpecification().getFoundingFather("model.foundingFather.peterMinuit"))) {
             Image image = lib.getMiscImage(ImageLibrary.TILE_OWNED_BY_INDIANS);
             g.drawImage(image, x+tileWidth/2-image.getWidth(null)/2, y+tileHeight/2-image.getHeight(null)/2, null);
         }

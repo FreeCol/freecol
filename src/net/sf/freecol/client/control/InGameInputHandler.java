@@ -543,7 +543,7 @@ public final class InGameInputHandler extends InputHandler {
 
         Element reply = Message.createNewRootElement("chosenFoundingFather");
         reply.setAttribute("foundingFather", Integer.toString(foundingFather));
-        getFreeColClient().getMyPlayer().setCurrentFather(foundingFather);
+        getFreeColClient().getMyPlayer().setCurrentFather(FreeCol.getSpecification().foundingFather(foundingFather));
         return reply;
     }
 
@@ -979,7 +979,7 @@ public final class InGameInputHandler extends InputHandler {
             } else {
                 m = new ModelMessage(player.getEurope(), "lostCityRumour.FountainOfYouth", null,
                                      ModelMessage.LOST_CITY_RUMOUR);
-                if (player.hasFather(FoundingFather.WILLIAM_BREWSTER)) {
+                if (player.hasFather(FreeCol.getSpecification().getFoundingFather("model.foundingFather.williamBrewster"))) {
                     final int emigrants = Integer.parseInt(element.getAttribute("emigrants"));
                     SwingUtilities.invokeLater(new Runnable() {
                         public void run() {

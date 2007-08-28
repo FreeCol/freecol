@@ -971,7 +971,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         }
         probability[LostCityRumour.FOUNTAIN_OF_YOUTH] = (max - dx) + bonus / 2;
         int start;
-        if (player.hasFather(FoundingFather.HERNANDO_DE_SOTO)) {
+        if (player.hasFather(FreeCol.getSpecification().getFoundingFather("model.foundingFather.hernandoDeSoto"))) {
             // rumours are always positive
             start = 3;
         } else {
@@ -1040,7 +1040,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
             break;
         case LostCityRumour.FOUNTAIN_OF_YOUTH:
             if (player.getEurope() != null) {
-                if (player.hasFather(FoundingFather.WILLIAM_BREWSTER)) {
+                if (player.hasFather(FreeCol.getSpecification().getFoundingFather("model.foundingFather.williamBrewster"))) {
                     player.setRemainingEmigrants(dx);
                     rumourElement.setAttribute("emigrants", Integer.toString(dx));
                 } else {
@@ -1698,11 +1698,11 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
             // players who are involved have.
             double random = Math.random();
             if (settlement.getMissionary().hasAbility("model.ability.expertMissionary")
-                    || settlement.getMissionary().getOwner().hasFather(FoundingFather.FATHER_JEAN_DE_BREBEUF)) {
+                || settlement.getMissionary().getOwner().hasFather(FreeCol.getSpecification().getFoundingFather("model.foundingFather.fatherJeanDeBrebeuf"))) {
                 random += 0.2;
             }
             if (unit.hasAbility("model.ability.expertMissionary")
-                    || unit.getOwner().hasFather(FoundingFather.FATHER_JEAN_DE_BREBEUF)) {
+                || unit.getOwner().hasFather(FreeCol.getSpecification().getFoundingFather("model.foundingFather.fatherJeanDeBrebeuf"))) {
                 random -= 0.2;
             }
             if (random < 0.5) {
@@ -1991,7 +1991,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         Player player = getFreeColServer().getPlayer(connection);
         Europe europe = player.getEurope();
         int slot;
-        if (player.hasFather(FoundingFather.WILLIAM_BREWSTER)) {
+        if (player.hasFather(FreeCol.getSpecification().getFoundingFather("model.foundingFather.williamBrewster"))) {
             slot = Integer.parseInt(emigrateUnitInEuropeElement.getAttribute("slot"));
         } else {
             slot = (int) (Math.random() * 3);
@@ -2000,7 +2000,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         UnitType newRecruitable = player.generateRecruitable();
         Unit unit = new Unit(getGame(), player, recruitable);
         Element reply = Message.createNewRootElement("emigrateUnitInEuropeConfirmed");
-        if (!player.hasFather(FoundingFather.WILLIAM_BREWSTER)) {
+        if (!player.hasFather(FreeCol.getSpecification().getFoundingFather("model.foundingFather.williamBrewster"))) {
             reply.setAttribute("slot", Integer.toString(slot));
         }
         reply.setAttribute("newRecruitable", Integer.toString(newRecruitable.getIndex()));
@@ -2463,7 +2463,8 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
             enemyElement.setAttribute("navalStrength", String.valueOf(navalStrength));
             enemyElement.setAttribute("stance", String.valueOf(enemyPlayer.getStance(player)));
             enemyElement.setAttribute("gold", String.valueOf(enemyPlayer.getGold()));
-            if (player.equals(enemyPlayer) || player.hasFather(FoundingFather.JAN_DE_WITT)) {
+            if (player.equals(enemyPlayer) ||
+                player.hasFather(FreeCol.getSpecification().getFoundingFather("model.foundingFather.janDeWitt"))) {
                 enemyElement.setAttribute("SoL", String.valueOf(enemyPlayer.getSoL()));
                 enemyElement.setAttribute("foundingFathers", String.valueOf(enemyPlayer.getFatherCount()));
                 enemyElement.setAttribute("tax", String.valueOf(enemyPlayer.getTax()));

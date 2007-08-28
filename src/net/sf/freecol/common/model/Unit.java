@@ -3695,7 +3695,7 @@ public class Unit extends FreeColGameObject implements Abilities, Locatable, Loc
                                 ModelMessage.UNIT_DEMOTED);
             } else {
                 demote(defender, false);
-                if (enemy.hasFather(FoundingFather.GEORGE_WASHINGTON)) {
+                if (enemy.hasAbility("model.ability.automaticPromotion")) {
                     defender.promote();
                 }
             }
@@ -3736,7 +3736,7 @@ public class Unit extends FreeColGameObject implements Abilities, Locatable, Loc
                     defender.getColony() != null && !defender.getColony().hasStockade()) {
                 pillageColony(defender.getColony());
             } else {
-                if (getOwner().hasFather(FoundingFather.GEORGE_WASHINGTON)) {
+                if (getOwner().hasAbility("model.ability.automaticPromotion")) {
                     promote();
                 }
                 if (!defender.isNaval()) {
@@ -4128,7 +4128,7 @@ public class Unit extends FreeColGameObject implements Abilities, Locatable, Loc
                     treasureUnitTypes.get(random));
 
             // Larger treasure if Hernan Cortes is present in the congress:
-            int bonus = (getOwner().hasFather(FoundingFather.HERNAN_CORTES)) ? 2 : 1;
+            int bonus = (getOwner().hasFather(FreeCol.getSpecification().getFoundingFather("model.foundingFather.hernanCortes"))) ? 2 : 1;
 
             // Incan and Aztecs give more gold
             if (enemy.getNation() == Player.INCA || enemy.getNation() == Player.AZTEC) {
@@ -4299,7 +4299,8 @@ public class Unit extends FreeColGameObject implements Abilities, Locatable, Loc
         }
         base = getUnitType().getProductionFor(goodsType, base);
 
-        if (goodsType == Goods.FURS && getOwner().hasFather(FoundingFather.HENRY_HUDSON)) {
+        if (goodsType == Goods.FURS && 
+            getOwner().hasFather(FreeCol.getSpecification().getFoundingFather("model.foundingFather.henryHudson"))) {
             base *= 2;
         }
 
@@ -4851,7 +4852,7 @@ public class Unit extends FreeColGameObject implements Abilities, Locatable, Loc
         ModelController modelController = getGame().getModelController();
         int random = modelController.getRandom(getID() + "getConvert", 100);
         int convertProbability = (5 - getOwner().getDifficulty()) * 10; // 50% - 10%
-        if (getOwner().hasFather(FoundingFather.JUAN_DE_SEPULVEDA)) {
+        if (getOwner().hasFather(FreeCol.getSpecification().getFoundingFather("model.foundingFather.juanDeSepulveda"))) {
             convertProbability += 20;
         }
         // TODO: it should be bigger when tension is high

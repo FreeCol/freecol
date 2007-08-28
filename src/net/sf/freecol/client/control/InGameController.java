@@ -270,7 +270,7 @@ public final class InGameController implements NetworkConstants {
 
             removeUnitsOutsideLOS();
             if (currentPlayer.checkEmigrate()) {
-                if (currentPlayer.hasFather(FoundingFather.WILLIAM_BREWSTER)) {
+                if (currentPlayer.hasFather(FreeCol.getSpecification().getFoundingFather("model.foundingFather.williamBrewster"))) {
                     emigrateUnitInEurope(freeColClient.getCanvas().showEmigrationPanel());
                 } else {
                     emigrateUnitInEurope(0);
@@ -1394,7 +1394,7 @@ public final class InGameController implements NetworkConstants {
                         new String[][] { { "%nation%", unit.getOwner().getNationAsString() } });
                 cash = true;
             } else {
-                String message = (unit.getOwner().hasFather(FoundingFather.HERNAN_CORTES)) ? "cashInTreasureTrain.text.free"
+                String message = (unit.getOwner().hasFather(FreeCol.getSpecification().getFoundingFather("model.foundingFather.hernanCortes"))) ? "cashInTreasureTrain.text.free"
                     : "cashInTreasureTrain.text.pay";
                 cash = canvas.showConfirmDialog(message, "cashInTreasureTrain.yes", "cashInTreasureTrain.no");
             }
@@ -2341,7 +2341,7 @@ public final class InGameController implements NetworkConstants {
             if (unit.getTile().getNationOwner() != Player.NO_NATION
                     && unit.getTile().getNationOwner() != unit.getOwner().getNation()
                     && !Player.isEuropean(unit.getTile().getNationOwner())
-                    && !unit.getOwner().hasFather(FoundingFather.PETER_MINUIT)) {
+                && !unit.getOwner().hasFather(FreeCol.getSpecification().getFoundingFather("model.foundingFather.peterMinuit"))) {
                 int nation = unit.getTile().getNationOwner();
                 int price = game.getPlayer(unit.getTile().getNationOwner()).getLandPrice(unit.getTile());
                 ChoiceItem[] choices = {
@@ -3010,7 +3010,7 @@ public final class InGameController implements NetworkConstants {
         Europe europe = myPlayer.getEurope();
 
         Element emigrateUnitInEuropeElement = Message.createNewRootElement("emigrateUnitInEurope");
-        if (myPlayer.hasFather(FoundingFather.WILLIAM_BREWSTER)) {
+        if (myPlayer.hasFather(FreeCol.getSpecification().getFoundingFather("model.foundingFather.williamBrewster"))) {
             emigrateUnitInEuropeElement.setAttribute("slot", Integer.toString(slot));
         }
 
@@ -3022,7 +3022,7 @@ public final class InGameController implements NetworkConstants {
         }
 
         // System.out.println("Sent slot " + slot);
-        if (!myPlayer.hasFather(FoundingFather.WILLIAM_BREWSTER)) {
+        if (!myPlayer.hasFather(FreeCol.getSpecification().getFoundingFather("model.foundingFather.williamBrewster"))) {
             slot = Integer.parseInt(reply.getAttribute("slot"));
             // System.out.println("Received slot " + slot);
         }

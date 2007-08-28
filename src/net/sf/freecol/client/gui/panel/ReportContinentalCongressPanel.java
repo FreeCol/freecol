@@ -69,10 +69,10 @@ public final class ReportContinentalCongressPanel extends ReportPanel implements
 
         // summary
         summaryPanel.add(new JLabel(Messages.message("report.continentalCongress.recruiting")), higConst.rc(1, 1));
-        if (player.getCurrentFather() == FoundingFather.NONE) {
+        if (player.getCurrentFather() == null) {
             summaryPanel.add(new JLabel(none), higConst.rc(1, 3));
         } else {
-            FoundingFather father = FreeCol.getSpecification().foundingFather(player.getCurrentFather());
+            FoundingFather father = player.getCurrentFather();
             JLabel currentFatherLabel = new JLabel(Messages.message(father.getName()));
             currentFatherLabel.setToolTipText(Messages.message(father.getDescription()));
             summaryPanel.add(currentFatherLabel, higConst.rc(1, 3));
@@ -92,7 +92,7 @@ public final class ReportContinentalCongressPanel extends ReportPanel implements
             fatherPanel.add(fatherLabel);
         } else {
             for (FoundingFather father : FreeCol.getSpecification().getFoundingFathers()) {
-                if (player.hasFather(father.getIndex())) {
+                if (player.hasFather(father)) {
                     JLabel fatherLabel = new JLabel(Messages.message(father.getName()));
                     fatherLabel.setToolTipText(Messages.message(father.getDescription()));
                     fatherLabel.setBorder(BorderFactory.createEmptyBorder(5, 10, 5, 10));

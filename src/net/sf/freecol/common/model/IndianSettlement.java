@@ -1064,7 +1064,7 @@ public class IndianSettlement extends Settlement {
                 Player p = getGame().getPlayer(i);
                 if (p.isEuropean() && extraAlarm[i] != 0) {
                     if (extraAlarm[i] > 0) {
-                        int d = (p.hasFather(FoundingFather.POCAHONTAS)) ? 2 : 1;
+                        int d = (p.hasFather(FreeCol.getSpecification().getFoundingFather("model.foundingFather.pocahontas"))) ? 2 : 1;
                         if (p.getNation() == Player.FRENCH) {
                             d *= 2;
                         }
@@ -1090,7 +1090,7 @@ public class IndianSettlement extends Settlement {
 
             // Update increment if missionary is an expert.
             if (missionary.hasAbility("model.ability.expertMissionary") ||
-                    missionary.getOwner().hasFather(FoundingFather.FATHER_JEAN_DE_BREBEUF)) {
+                missionary.getOwner().hasFather(FreeCol.getSpecification().getFoundingFather("model.foundingFather.fatherJeanDeBrebeuf"))) {
                 increment = 13;
             }
 

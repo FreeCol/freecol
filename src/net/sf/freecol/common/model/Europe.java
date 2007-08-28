@@ -231,7 +231,7 @@ public final class Europe extends FreeColGameObject implements Location,
         unit.getOwner().updateCrossesRequired();
         unit.getOwner().setCrosses(0);
 
-        if (!unit.getOwner().hasFather(FoundingFather.WILLIAM_BREWSTER)) {
+        if (!unit.getOwner().hasFather(FreeCol.getSpecification().getFoundingFather("model.foundingFather.williamBrewster"))) {
             addModelMessage(this, "model.europe.emigrate", new String[][] { {
                     "%unit%", unit.getName() } }, ModelMessage.UNIT_ADDED, unit);
         }

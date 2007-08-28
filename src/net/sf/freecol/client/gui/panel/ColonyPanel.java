@@ -1697,7 +1697,7 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener {
                         if (colonyTile.getWorkTile().getNationOwner() != Player.NO_NATION
                                 && colonyTile.getWorkTile().getNationOwner() != unit.getOwner().getNation()
                                 && !Player.isEuropean(colonyTile.getWorkTile().getNationOwner())
-                                && !unit.getOwner().hasFather(FoundingFather.PETER_MINUIT)) {
+                            && !unit.getOwner().hasFather(FreeCol.getSpecification().getFoundingFather("model.foundingFather.peterMinuit"))) {
                             int nation = colonyTile.getWorkTile().getNationOwner();
                             int price = game.getPlayer(colonyTile.getWorkTile().getNationOwner()).getLandPrice(
                                     colonyTile.getWorkTile());

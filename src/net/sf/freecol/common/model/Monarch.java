@@ -158,7 +158,7 @@ public final class Monarch extends FreeColGameObject {
         boolean canDeclareWar = false;
         boolean atWar = false;
         // Benjamin Franklin puts an end to the monarch's interference
-        if (!player.hasFather(FoundingFather.BENJAMIN_FRANKLIN)) {
+        if (!player.hasAbility("model.ability.ignoreEuropeanWars")) {
             for (int i = 0; i < Player.NUMBER_OF_NATIONS; i++) {
                 if (!getGame().getPlayer(i).isEuropean() || getGame().getPlayer(i).isREF()) {
                     continue;

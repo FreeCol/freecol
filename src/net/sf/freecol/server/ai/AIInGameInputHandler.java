@@ -8,6 +8,7 @@ import java.util.logging.Logger;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
+import net.sf.freecol.FreeCol;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.ColonyTradeItem;
 import net.sf.freecol.common.model.DiplomaticTrade;
@@ -221,7 +222,7 @@ public final class AIInGameInputHandler implements MessageHandler, StreamedMessa
         int foundingFather = getAIPlayer().selectFoundingFather(possibleFoundingFathers);
         Element reply = Message.createNewRootElement("chosenFoundingFather");
         reply.setAttribute("foundingFather", Integer.toString(foundingFather));
-        serverPlayer.setCurrentFather(foundingFather);
+        serverPlayer.setCurrentFather(FreeCol.getSpecification().foundingFather(foundingFather));
 
         return reply;
     }
@@ -339,7 +340,7 @@ public final class AIInGameInputHandler implements MessageHandler, StreamedMessa
 
         boolean accept = false;
         if (stance == Player.PEACE) {
-            if (agreement.getSender().hasFather(FoundingFather.BENJAMIN_FRANKLIN) &&
+            if (agreement.getSender().hasAbility("model.ability.alwaysOfferedPeace") &&
                 value >= 0) {
                 // TODO: introduce some kind of counter in order to avoid
                 // Benjamin Franklin exploit
