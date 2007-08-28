@@ -43,7 +43,7 @@ public class Player extends FreeColGameObject implements Abilities, Nameable {
 
     /**
      * 
-     * Contants for describing the stance towards a player.
+     * Constants for describing the stance towards a player.
      * 
      */
     public static final int WAR = -2, CEASE_FIRE = -1, PEACE = 0, ALLIANCE = 1;
@@ -164,9 +164,9 @@ public class Player extends FreeColGameObject implements Abilities, Nameable {
     private boolean dead = false;
 
     // any founding fathers in this Player's congress
-    private boolean[] fathers = new boolean[FoundingFather.FATHER_COUNT];
+    private List<FoundingFather> allFathers = new ArrayList<FoundingFather>();
 
-    private int currentFather;
+    private FoundingFather currentFather;
 
     /** The current tax rate for this player. */
     private int tax = 0;
@@ -319,7 +319,7 @@ public class Player extends FreeColGameObject implements Abilities, Nameable {
         }
         crosses = 0;
         bells = 0;
-        currentFather = FoundingFather.NONE;
+        currentFather = null;
         rebellionState = 0;
 
         market = new Market(getGame(), this);
@@ -1248,6 +1248,7 @@ public class Player extends FreeColGameObject implements Abilities, Nameable {
      *         independence.
      */
     public boolean canHaveFoundingFathers() {
+        // TODO: player.hasAbility("model.ability.electFoundingFather");
         return isEuropean() && getRebellionState() != REBELLION_IN_WAR && !isREF();
     }
 
@@ -1264,22 +1265,22 @@ public class Player extends FreeColGameObject implements Abilities, Nameable {
     /**
      * Adds a founding father to this players continental congress.
      * 
-     * @param type The type of Founding Father to add
+     * @param newFather a <code>FoundingFather</code> value
      * @see FoundingFather
      */
-    public void addFather(int type) {
-        fathers[type] = true;
+    public void addFather(FoundingFather newFather) {
+        allFathers.add(newFather);
     }
 
     /**
      * Determines whether this player has a certain Founding father.
      * 
-     * @param type The ID of the founding father.
-     * @return Whether this player has a Founding father of <code>type</code>
+     * @param someFather a <code>FoundingFather</code> value
+     * @return Whether this player has this Founding father
      * @see FoundingFather
      */
-    public boolean hasFather(int type) {
-        return fathers[type];
+    public boolean hasFather(FoundingFather someFather) {
+        return allFathers.contains(someFather);
     }
 
     /**
@@ -1289,36 +1290,29 @@ public class Player extends FreeColGameObject implements Abilities, Nameable {
      * @return The number of founding fathers in this players congress
      */
     public int getFatherCount() {
-        int count = 0;
-        for (int i = 0; i < fathers.length; i++) {
-            if (fathers[i] == true) {
-                count++;
-            }
-        }
-        return count;
+        return allFathers.size();
     }
 
     /**
-     * 
      * Sets this players liberty bell production to work towards recruiting
      * <code>father</code> to its congress.
      * 
-     * @param father The type of FoundingFather to recruit
+     * @param someFather a <code>FoundingFather</code> value
      * @see FoundingFather
      */
-    public void setCurrentFather(int father) {
-        currentFather = father;
+    public void setCurrentFather(FoundingFather someFather) {
+        currentFather = someFather;
     }
 
     /**
      * Gets the {@link FoundingFather founding father} this player is working
      * towards.
      * 
-     * @return The ID of the founding father or <code>-1</code> if none.
+     * @return The current FoundingFather or null if there is none
      * @see #setCurrentFather
      * @see FoundingFather
      */
-    public int getCurrentFather() {
+    public FoundingFather getCurrentFather() {
         return currentFather;
     }
 
@@ -2352,10 +2346,9 @@ public class Player extends FreeColGameObject implements Abilities, Nameable {
         * the turn Magellan joins the congress. 
         */
         if (isEuropean()) {
-            if (getBells() >= getTotalFoundingFatherCost() && currentFather != FoundingFather.NONE) {
-                fathers[currentFather] = true;
-                FoundingFather father = FreeCol.getSpecification().foundingFather(currentFather);
-                abilities.putAll(father.getAbilities());
+            if (getBells() >= getTotalFoundingFatherCost() && currentFather != null) {
+                addFather(currentFather);
+                abilities.putAll(currentFather.getAbilities());
 
                 /** TODO: restore effects of founding fathers as soon as possible
                 switch (currentFather) {
@@ -2450,10 +2443,10 @@ public class Player extends FreeColGameObject implements Abilities, Nameable {
                 }
                 */
                 addModelMessage(this, "model.player.foundingFatherJoinedCongress", new String[][] {
-                        { "%foundingFather%", Messages.message(father.getName()) },
-                        { "%description%", Messages.message(father.getDescription()) } },
+                        { "%foundingFather%", currentFather.getName() },
+                        { "%description%", currentFather.getDescription() } },
                         ModelMessage.DEFAULT);
-                currentFather = FoundingFather.NONE;
+                currentFather = null;
                 bells = 0;
             }
             
@@ -2579,14 +2572,16 @@ public class Player extends FreeColGameObject implements Abilities, Nameable {
             out.writeAttribute("gold", Integer.toString(gold));
             out.writeAttribute("crosses", Integer.toString(crosses));
             out.writeAttribute("bells", Integer.toString(bells));
-            out.writeAttribute("currentFather", Integer.toString(currentFather));
+            out.writeAttribute("currentFather", currentFather.getId());
             out.writeAttribute("crossesRequired", Integer.toString(crossesRequired));
             out.writeAttribute("attackedByPrivateers", Boolean.toString(attackedByPrivateers));
             out.writeAttribute("oldSoL", Integer.toString(oldSoL));
             out.writeAttribute("score", Integer.toString(score));
-            char[] fatherCharArray = new char[FoundingFather.FATHER_COUNT];
-            for (int i = 0; i < fathers.length; i++) {
-                fatherCharArray[i] = (fathers[i] ? '1' : '0');
+            // TODO: review this data structure
+            char[] fatherCharArray = new char[FreeCol.getSpecification().numberOfFoundingFathers()];
+            for (FoundingFather father : allFathers) {
+                int index = father.getIndex();
+                fatherCharArray[index] = '1';
             }
             out.writeAttribute("foundingFathers", new String(fatherCharArray));
             StringBuffer sb = new StringBuffer(contacted.length);
@@ -2657,7 +2652,7 @@ public class Player extends FreeColGameObject implements Abilities, Nameable {
         dead = (new Boolean(in.getAttributeValue(null, "dead"))).booleanValue();
         tax = Integer.parseInt(in.getAttributeValue(null, "tax"));
         rebellionState = Integer.parseInt(in.getAttributeValue(null, "rebellionState"));
-        currentFather = Integer.parseInt(in.getAttributeValue(null, "currentFather"));
+        currentFather = FreeCol.getSpecification().getFoundingFather(in.getAttributeValue(null, "currentFather"));
         crossesRequired = Integer.parseInt(in.getAttributeValue(null, "crossesRequired"));
         final String contactedStr = in.getAttributeValue(null, "contacted");
         if (contactedStr != null) {
@@ -2673,10 +2668,13 @@ public class Player extends FreeColGameObject implements Abilities, Nameable {
         if (newLandNameStr != null) {
             newLandName = newLandNameStr;
         }
+        // TODO: review this data structure
         final String foundingFathersStr = in.getAttributeValue(null, "foundingFathers");
         if (foundingFathersStr != null) {
             for (int i = 0; i < foundingFathersStr.length(); i++) {
-                fathers[i] = ((foundingFathersStr.charAt(i) == '1') ? true : false);
+                if (foundingFathersStr.charAt(i) == '1') {
+                    addFather(FreeCol.getSpecification().foundingFather(i));
+                }
             }
         }
         attackedByPrivateers = getAttribute(in, "attackedByPrivateers", false);
@@ -2980,7 +2978,7 @@ public class Player extends FreeColGameObject implements Abilities, Nameable {
      * @param amount The new tax.
      */
     public void setTax(int amount) {
-        if (amount > tax && hasFather(FoundingFather.THOMAS_PAINE)) {
+        if (amount > tax && hasAbility("model.ability.addTaxToBells")) {
             bellsBonus += (amount - tax);
         }
         tax = amount;

@@ -1,9 +1,12 @@
 package net.sf.freecol.common;
 
 import java.io.InputStream;
+import java.lang.reflect.Method;
+/*
 import java.sql.Array;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+*/
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -294,6 +297,19 @@ public final class Specification {
         }
         return goods;
     }
+
+    public List<GoodsType> getMatchingGoodsTypes(String methodName) throws Exception {
+        Method method = GoodsType.class.getDeclaredMethod(methodName, new Class[] {Boolean.TYPE});
+        method.setAccessible(true);
+        ArrayList<GoodsType> goodsTypes = new ArrayList<GoodsType>();
+        for (GoodsType goodsType : goodsTypeList) {
+            if ((Boolean) method.invoke(goodsType)) {
+                goodsTypes.add(goodsType);
+            }
+        }
+        return goodsTypes;
+    }   
+
 
     // -- Resources --
     public List<ResourceType> getResourceTypeList() {

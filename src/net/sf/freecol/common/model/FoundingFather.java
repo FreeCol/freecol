@@ -1,7 +1,7 @@
 
 package net.sf.freecol.common.model;
 
-import java.util.Hashtable;
+import java.util.HashMap;
 import java.util.Map;
 
 import org.w3c.dom.Node;
@@ -63,7 +63,7 @@ public class FoundingFather implements Abilities {
     /**
      * Stores the abilities of this Type.
      */
-    private Hashtable<String, Boolean> abilities = new Hashtable<String, Boolean>();    
+    private HashMap<String, Boolean> abilities = new HashMap<String, Boolean>();    
 
     public static final int TRADE = 0,
                             EXPLORATION = 1,
@@ -104,19 +104,19 @@ public class FoundingFather implements Abilities {
     }
 
     public String getName() {
-        return id + ".name";
+        return Messages.message(id + ".name");
     }
 
     public String getDescription() {
-        return id + ".description";
+        return Messages.message(id + ".description");
     }
 
     public String getText() {
-        return id + ".text";
+        return Messages.message(id + ".text");
     }
 
     public String getBirthAndDeath() {
-        return id + ".birthAndDeath";
+        return Messages.message(id + ".birthAndDeath");
     }
 
     public int getType() {
@@ -174,8 +174,8 @@ public class FoundingFather implements Abilities {
      *
      * @return a <code>Map</code> value
      */
-    public Map getAbilities() {
-        return ((Map) abilities.clone());
+    public Map<String, Boolean> getAbilities() {
+        return new HashMap<String, Boolean>(abilities);
     }
 
     /**
