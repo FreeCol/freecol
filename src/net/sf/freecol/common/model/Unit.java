@@ -562,7 +562,8 @@ public class Unit extends FreeColGameObject implements Abilities, Locatable, Loc
         if (canCashInTreasureTrain()) {
             boolean inEurope = (getLocation() instanceof Unit && ((Unit) getLocation()).getLocation() instanceof Europe);
             int cashInAmount;
-            if (getOwner().hasFather(FoundingFather.HERNAN_CORTES) || inEurope || getOwner().getEurope() == null) {
+            if (getOwner().hasFather(FreeCol.getSpecification().getFoundingFather("model.foundingFather.hernanCcortes")) ||
+                inEurope || getOwner().getEurope() == null) {
                 cashInAmount = getTreasureAmount();
             } else {
                 cashInAmount = getTreasureAmount() / 2;
@@ -1109,7 +1110,7 @@ public class Unit extends FreeColGameObject implements Abilities, Locatable, Loc
                 goodsContainer.getGoodsCount() > 0 &&
                 getOwner().getStance(settlement.getOwner()) != Player.WAR &&
                 ((settlement instanceof IndianSettlement) ||
-                 getOwner().hasFather(FoundingFather.JAN_DE_WITT)));
+                 getOwner().hasAbility("model.ability.tradeWithForeignColonies")));
     }
 
     /**
@@ -1372,7 +1373,7 @@ public class Unit extends FreeColGameObject implements Abilities, Locatable, Loc
         if (isScout()) {
             line = 2;
         }
-        if (!isNaval() && getOwner().hasFather(FoundingFather.HERNANDO_DE_SOTO)) {
+        if (!isNaval() && getOwner().hasFather(FreeCol.getSpecification().getFoundingFather("model.foundingFather.hernandoDeSoto"))) {
             line++;
         }
         return line;
@@ -2564,7 +2565,7 @@ public class Unit extends FreeColGameObject implements Abilities, Locatable, Loc
             return 12;
         } else if (isMissionary()) {
             return 6;
-        } else if (isNaval() && owner.hasFather(FoundingFather.FERDINAND_MAGELLAN)) {
+        } else if (isNaval() && owner.hasFather(FreeCol.getSpecification().getFoundingFather("model.foundingFather.ferdinandMagellan"))) {
             return unitType.getMovement() + 3;
         } else {
             return unitType.getMovement();
@@ -2797,7 +2798,7 @@ public class Unit extends FreeColGameObject implements Abilities, Locatable, Loc
                 // I think '4' was also used in the original game.
                 workLeft = 4 - workLeft;
             }
-            if (getOwner().hasFather(FoundingFather.FERDINAND_MAGELLAN)) {
+            if (getOwner().hasFather(FreeCol.getSpecification().getFoundingFather("model.foundingFather.ferdinandMagellan"))) {
                 workLeft--;
             }
             movesLeft = 0;
@@ -2809,7 +2810,7 @@ public class Unit extends FreeColGameObject implements Abilities, Locatable, Loc
                 // I think '4' was also used in the original game.
                 workLeft = 4 - workLeft;
             }
-            if (getOwner().hasFather(FoundingFather.FERDINAND_MAGELLAN)) {
+            if (getOwner().hasFather(FreeCol.getSpecification().getFoundingFather("model.foundingFather.ferdinandMagellan"))) {
                 workLeft--;
             }
             movesLeft = 0;
@@ -3382,7 +3383,8 @@ public class Unit extends FreeColGameObject implements Abilities, Locatable, Loc
                 result.add(new Modifier("modifiers.cargoPenalty", percentage, Modifier.PERCENTAGE));
                 totalPercentage += percentage;
             }
-            if (attacker.hasAbility("model.ability.piracy") && attacker.getOwner().hasFather(FoundingFather.FRANCIS_DRAKE)) {
+            if (attacker.hasAbility("model.ability.piracy") && 
+                attacker.getOwner().hasFather(FreeCol.getSpecification().getFoundingFather("model.foundingFather.francisDrake"))) {
                 // Drake grants 50% attack bonus
                 percentage = 50;
                 result.add(new Modifier("modifiers.drake", percentage, Modifier.PERCENTAGE));
@@ -3512,7 +3514,8 @@ public class Unit extends FreeColGameObject implements Abilities, Locatable, Loc
                 result.add(new Modifier("modifiers.cargoPenalty", percentage, Modifier.PERCENTAGE));
                 totalPercentage += percentage;
             }
-            if (defender.hasAbility("model.ability.piracy") && defender.getOwner().hasFather(FoundingFather.FRANCIS_DRAKE)) {
+            if (defender.hasAbility("model.ability.piracy") && 
+                defender.getOwner().hasFather(FreeCol.getSpecification().getFoundingFather("model.foundingFather.francisDrake"))) {
                 // Drake grants 50% power bonus (in colonization gives for attack and defense)
                 percentage = 50;
                 result.add(new Modifier("modifiers.drake", percentage, Modifier.PERCENTAGE));
@@ -3527,7 +3530,7 @@ public class Unit extends FreeColGameObject implements Abilities, Locatable, Loc
                 addend = 1;
                 result.add(new Modifier("modifiers.armed", addend, Modifier.ADDITIVE));
                 totalAddend += addend;
-            } else if (defender.getOwner().hasFather(FoundingFather.PAUL_REVERE) && defender.isColonist()
+            } else if (defender.getOwner().hasAbility("model.ability.automaticDefense") && defender.isColonist()
                     && defender.getLocation() instanceof WorkLocation) {
                 Colony colony = ((WorkLocation) defender.getLocation()).getColony();
                 if (colony.getGoodsCount(Goods.MUSKETS) >= 50) {

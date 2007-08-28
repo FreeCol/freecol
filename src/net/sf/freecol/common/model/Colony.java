@@ -210,7 +210,7 @@ public final class Colony extends Settlement implements Location, Nameable {
      * Updates SoL and builds stockade if possible.
      */
     public void updatePopulation() {
-        if (getUnitCount() >= 3 && getOwner().hasFather(FoundingFather.LA_SALLE)) {
+        if (getUnitCount() >= 3 && getOwner().hasFather(FreeCol.getSpecification().getFoundingFather("model.foundingFather.laSalle"))) {
             if (!getBuilding(Building.STOCKADE).isBuilt()) {
                 getBuilding(Building.STOCKADE).setLevel(Building.HOUSE);
             }
@@ -1116,8 +1116,8 @@ public final class Colony extends Settlement implements Location, Nameable {
                  * unit's owner has the founding father Peter Minuit
                  */
                 boolean ourLand = workTile.getNationOwner() == Player.NO_NATION
-                        || Player.isEuropean(workTile.getNationOwner())
-                        || unit.getOwner().hasFather(FoundingFather.PETER_MINUIT);
+                    || Player.isEuropean(workTile.getNationOwner())
+                    || unit.getOwner().hasFather(FreeCol.getSpecification().getFoundingFather("model.foundingFather.peterMminuit"));
                 int potential = unit.getFarmedPotential(goodsType, colonyTile.getWorkTile());
                 if (ourLand && potential > highestProduction) {
                     highestProduction = potential;

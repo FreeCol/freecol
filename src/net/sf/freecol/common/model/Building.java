@@ -316,9 +316,9 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
             return false;
         }
         if (level + 1 >= FACTORY
-                && !getColony().getOwner().hasFather(FoundingFather.ADAM_SMITH)
-                && (type == BLACKSMITH || type == TOBACCONIST || type == WEAVER || type == DISTILLER
-                        || type == FUR_TRADER || type == ARMORY)) {
+            && !getColony().getOwner().hasAbility("model.ability.buildFactory")
+            && (type == BLACKSMITH || type == TOBACCONIST || type == WEAVER || type == DISTILLER
+                || type == FUR_TRADER || type == ARMORY)) {
             return false;
         }
 
@@ -335,7 +335,7 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
             return false;
         }
 
-        if (getType() == CUSTOM_HOUSE && !getColony().getOwner().hasFather(FoundingFather.PETER_STUYVESANT)) {
+        if (getType() == CUSTOM_HOUSE && !getColony().getOwner().hasAbility("model.ability.buildCustomHouse")) {
             return false;
         }
 
@@ -1158,13 +1158,11 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
 
         if (goodsOutputType == Goods.BELLS) {
             goodsOutput += goodsOutput * colony.getBuilding(Building.PRINTING_PRESS).getLevel();
-
-            if (player.hasFather(FoundingFather.THOMAS_JEFFERSON) || player.hasFather(FoundingFather.THOMAS_PAINE)) {
-                goodsOutput = (goodsOutput * (100 + player.getBellsBonus())) / 100;
-            }
+            goodsOutput = (goodsOutput * (100 + player.getBellsBonus())) / 100;
         }
 
-        if (goodsOutputType == Goods.CROSSES && player.hasFather(FoundingFather.WILLIAM_PENN)) {
+        if (goodsOutputType == Goods.CROSSES &&
+            player.hasFather(FreeCol.getSpecification().getFoundingFather("model.foundingFather.williamPenn"))) {
             goodsOutput += goodsOutput / 2;
         }
 
