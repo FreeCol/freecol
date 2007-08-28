@@ -223,18 +223,41 @@ public final class Specification {
         return buildingTypeList;
     }
 
+    /**
+     * Describe <code>numberOfBuildingTypes</code> method here.
+     *
+     * @return an <code>int</code> value
+     */
     public int numberOfBuildingTypes() {
         return buildingTypeList.size();
     }
 
+    /**
+     * Describe <code>buildingType</code> method here.
+     *
+     * @param buildingTypeIndex an <code>int</code> value
+     * @return a <code>BuildingType</code> value
+     */
     public BuildingType buildingType(int buildingTypeIndex) {
         return buildingTypeList.get(buildingTypeIndex);
     }
 
+    /**
+     * Describe <code>getBuildingType</code> method here.
+     *
+     * @param buildingTypeIndex an <code>int</code> value
+     * @return a <code>BuildingType</code> value
+     */
     public BuildingType getBuildingType(int buildingTypeIndex) {
         return buildingTypeList.get(buildingTypeIndex);
     }
 
+    /**
+     * Describe <code>getBuildingIndex</code> method here.
+     *
+     * @param b a <code>BuildingType</code> value
+     * @return an <code>int</code> value
+     */
     public int getBuildingIndex(BuildingType b) {
         return buildingTypeList.indexOf(b);
     }
@@ -253,6 +276,11 @@ public final class Specification {
         return goodsTypeList;
     }
 
+    /**
+     * Describe <code>numberOfGoodsTypes</code> method here.
+     *
+     * @return an <code>int</code> value
+     */
     public int numberOfGoodsTypes() {
         return goodsTypeList.size();
     }
@@ -271,14 +299,31 @@ public final class Specification {
         return farmedGoodsTypeList;
     }
 
+    /**
+     * Describe <code>numberOfFarmedGoodsTypes</code> method here.
+     *
+     * @return an <code>int</code> value
+     */
     public int numberOfFarmedGoodsTypes() {
         return farmedGoodsTypeList.size();
     }
 
+    /**
+     * Describe <code>getGoodsType</code> method here.
+     *
+     * @param goodsTypeIndex an <code>int</code> value
+     * @return a <code>GoodsType</code> value
+     */
     public GoodsType getGoodsType(int goodsTypeIndex) {
         return goodsTypeList.get(goodsTypeIndex);
     }
 
+    /**
+     * Describe <code>getGoodsType</code> method here.
+     *
+     * @param name a <code>String</code> value
+     * @return a <code>GoodsType</code> value
+     */
     public GoodsType getGoodsType(String name) {
         for (GoodsType g : goodsTypeList) {
             if (g.getName().equals(name)) {
@@ -298,8 +343,19 @@ public final class Specification {
         return goods;
     }
 
+
+    /**
+     * Returns a list of GoodsTypes for which the given predicate
+     * obtains. For example, getMatchingGoodsTypes("isFarmed")
+     * returns a list of all GoodsTypes g for which g.isFarmed()
+     * returns true.
+     *
+     * @param methodName the name of the method to invoke on the GoodsType
+     * @return a list of <code>GoodsType</code>s for which the given
+     * predicate returns true
+    */
     public List<GoodsType> getMatchingGoodsTypes(String methodName) throws Exception {
-        Method method = GoodsType.class.getDeclaredMethod(methodName, new Class[] {Boolean.TYPE});
+        Method method = GoodsType.class.getDeclaredMethod(methodName);
         method.setAccessible(true);
         ArrayList<GoodsType> goodsTypes = new ArrayList<GoodsType>();
         for (GoodsType goodsType : goodsTypeList) {
