@@ -3,6 +3,8 @@ package net.sf.freecol.common.model;
 import java.util.Vector;
 
 import junit.framework.TestCase;
+
+import net.sf.freecol.FreeCol;
 import net.sf.freecol.util.test.MockModelController;
 
 public class ColonyProductionTest extends TestCase {
@@ -34,20 +36,21 @@ public class ColonyProductionTest extends TestCase {
 
         for (int x = 0; x < 10; x++) {
             for (int y = 0; y < 15; y++) {
-                tiles.get(x).add(new Tile(game, Tile.PLAINS, x, y));
+                tiles.get(x).add(new Tile(game, FreeCol.getSpecification().getTileType("model.tile.plains"), x, y));
             }
         }
 
         Map map = new Map(game, tiles);
 
-        map.getTile(5, 8).setBonus(true);
+        map.getTile(5, 8).setResource(FreeCol.getSpecification().getResourceType("model.resource.grain"));
         map.getTile(5, 8).setExploredBy(dutch, true);
         map.getTile(6, 8).setExploredBy(dutch, true);
                 
         game.setMap(map);
                 
-        Unit soldier = new Unit(game, map.getTile(6, 8), dutch, Unit.VETERAN_SOLDIER, Unit.ACTIVE,
-                                true, false, 0, false);
+        Unit soldier = new Unit(game, map.getTile(6, 8), dutch, 
+                                FreeCol.getSpecification().getUnitType("model.unit.veteranSoldier"), 
+                                Unit.ACTIVE, true, false, 0, false);
                 
         Colony colony = new Colony(game, dutch, "New Amsterdam", soldier.getTile());
         soldier.setWorkType(Goods.FOOD);
@@ -63,8 +66,9 @@ public class ColonyProductionTest extends TestCase {
             assertEquals(dutch.getNation(), colony.getTile().getNationOwner());
 
             // Should have 50 Muskets and nothing else
+            GoodsType muskets = FreeCol.getSpecification().getGoodsType("model.goods.muskets");
             for (int i = 0; i < Goods.NUMBER_OF_TYPES; i++) {
-                if (Goods.MUSKETS == i)
+                if (FreeCol.getSpecification().getGoodsType(i) == muskets)
                     assertEquals(50, colony.getGoodsCount(i));
                 else
                     assertEquals(0, colony.getGoodsCount(i));

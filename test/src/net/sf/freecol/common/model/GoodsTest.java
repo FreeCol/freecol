@@ -2,6 +2,7 @@ package net.sf.freecol.common.model;
 
 import java.util.Locale;
 
+import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.util.test.FreeColTestCase;
 
@@ -13,12 +14,15 @@ public class GoodsTest extends FreeColTestCase {
 
     public static final String REVISION = "$Revision$";
 
+    public static TileType plainsType = FreeCol.getSpecification().getTileType("model.tile.plains");
+
     public void testGoodsGameLocationIntInt() {
 
-        Map map = getTestMap(Tile.PLAINS);
+        Map map = getTestMap(plainsType);
 
-        Unit wagon = new Unit(getGame(), map.getTile(9, 10), getGame().getPlayer(Player.DUTCH), Unit.WAGON_TRAIN,
-                Unit.ACTIVE);
+        Unit wagon = new Unit(getGame(), map.getTile(9, 10), getGame().getPlayer(Player.DUTCH),
+                              FreeCol.getSpecification().getUnitType("model.unit.wagonTrain"),
+                              Unit.ACTIVE);
 
         Goods g = new Goods(getGame(), wagon, Goods.COTTON, 75);
 
@@ -30,10 +34,11 @@ public class GoodsTest extends FreeColTestCase {
     public void testSetOwner() {
 
         try {
-            Map map = getTestMap(Tile.PLAINS);
+            Map map = getTestMap(plainsType);
 
-            Unit wagon = new Unit(getGame(), map.getTile(9, 10), getGame().getPlayer(Player.DUTCH), Unit.WAGON_TRAIN,
-                    Unit.ACTIVE);
+            Unit wagon = new Unit(getGame(), map.getTile(9, 10), getGame().getPlayer(Player.DUTCH), 
+                                  FreeCol.getSpecification().getUnitType("model.unit.wagonTrain"),
+                                  Unit.ACTIVE);
 
             Goods g = new Goods(getGame(), wagon, Goods.COTTON, 75);
 
@@ -49,7 +54,7 @@ public class GoodsTest extends FreeColTestCase {
 
         Messages.setMessageBundle(Locale.ENGLISH);
 
-        Map map = getTestMap(Tile.PLAINS);
+        Map map = getTestMap(plainsType);
 
         Unit wagon = new Unit(getGame(), map.getTile(9, 10), getGame().getPlayer(Player.DUTCH), Unit.WAGON_TRAIN,
                 Unit.ACTIVE);
@@ -85,7 +90,7 @@ public class GoodsTest extends FreeColTestCase {
     public void testGetTile() {
         Game game = getStandardGame();
         Player dutch = getGame().getPlayer(Player.DUTCH);
-        Map map = getTestMap(Tile.PLAINS);
+        Map map = getTestMap(plainsType);
         game.setMap(map);
 
         // Check in a colony
@@ -136,7 +141,7 @@ public class GoodsTest extends FreeColTestCase {
     public void testSetGetLocation() {
         Game game = getStandardGame();
         Player dutch = getGame().getPlayer(Player.DUTCH);
-        Map map = getTestMap(Tile.PLAINS, true);
+        Map map = getTestMap(plainsType, true);
         game.setMap(map);
         Colony colony = getStandardColony();
 
@@ -161,7 +166,7 @@ public class GoodsTest extends FreeColTestCase {
     }
 
     public void testGetTakeSpace() {
-        Map map = getTestMap(Tile.PLAINS, true);
+        Map map = getTestMap(plainsType, true);
 
         Unit wagon = new Unit(getGame(), map.getTile(9, 10), getGame().getPlayer(Player.DUTCH), Unit.WAGON_TRAIN,
                 Unit.ACTIVE);
@@ -172,7 +177,7 @@ public class GoodsTest extends FreeColTestCase {
     }
 
     public void testSetGetAmount() {
-        Map map = getTestMap(Tile.PLAINS, true);
+        Map map = getTestMap(plainsType, true);
 
         Unit wagon = new Unit(getGame(), map.getTile(9, 10), getGame().getPlayer(Player.DUTCH), Unit.WAGON_TRAIN,
                 Unit.ACTIVE);
@@ -193,7 +198,7 @@ public class GoodsTest extends FreeColTestCase {
 
     public void testAdjustAmount() {
 
-        Map map = getTestMap(Tile.PLAINS, true);
+        Map map = getTestMap(plainsType, true);
 
         Unit wagon = new Unit(getGame(), map.getTile(9, 10), getGame().getPlayer(Player.DUTCH), Unit.WAGON_TRAIN,
                 Unit.ACTIVE);
@@ -216,7 +221,7 @@ public class GoodsTest extends FreeColTestCase {
 
     public void testLoadOnto() {
         Game game = getStandardGame();
-        Map map = getTestMap(Tile.PLAINS, true);
+        Map map = getTestMap(plainsType, true);
         game.setMap(map);
         Colony colony = getStandardColony();
 
@@ -346,7 +351,7 @@ public class GoodsTest extends FreeColTestCase {
 
     public void testUnload() {
         Game game = getStandardGame();
-        Map map = getTestMap(Tile.PLAINS, true);
+        Map map = getTestMap(plainsType, true);
         game.setMap(map);
         Colony colony = getStandardColony();
 

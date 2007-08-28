@@ -4,6 +4,8 @@ import java.util.Locale;
 import java.util.Vector;
 
 import junit.framework.TestCase;
+
+import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.FreeColException;
 import net.sf.freecol.common.model.Colony;
@@ -12,7 +14,9 @@ import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.Map;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Tile;
+import net.sf.freecol.common.model.TileType;
 import net.sf.freecol.common.model.Unit;
+import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.server.generator.MapGeneratorOptions;
 
 /**
@@ -77,6 +81,12 @@ public class FreeColTestCase extends TestCase {
         return game;
     }
 
+    /**
+     * Returns an empty Map object, i.e. one that does not yet contain
+     * any tiles.
+     *
+     * @return a <code>Map</code> value
+     */
     public static Map getEmptyMap() {
         Game game = getGame();
 
@@ -88,7 +98,7 @@ public class FreeColTestCase extends TestCase {
         }
     }
 
-    public static Vector<Vector<Tile>> getTestTiles(Game game, int width, int height, int type) {
+    public static Vector<Vector<Tile>> getTestTiles(Game game, int width, int height, TileType tileType) {
         Vector<Vector<Tile>> tiles = new Vector<Vector<Tile>>(10);
 
         for (int x = 0; x < width; x++) {
@@ -97,13 +107,26 @@ public class FreeColTestCase extends TestCase {
 
         for (int x = 0; x < width; x++) {
             for (int y = 0; y < height; y++) {
-                tiles.get(x).add(new Tile(game, type, x, y));
+                tiles.get(x).add(new Tile(game, tileType, x, y));
             }
         }
         return tiles;
     }
 
     
+    /**
+     * Creates a standardized map on which all fields have the plains type.
+     * 
+     * Uses the getGame() method to access the currently running game.
+     * 
+     * Does not call Game.setMap(Map) with the returned map. The map is unexplored.
+     * 
+     * @return The map created as described above.
+     */
+    public static Map getTestMap() {
+        return getTestMap(FreeCol.getSpecification().getTileType("model.tile.plains"), false);
+    }
+
     /**
      * Creates a standardized map on which all fields have the same given type.
      * 
@@ -115,8 +138,8 @@ public class FreeColTestCase extends TestCase {
      * 
      * @return The map created as described above.
      */
-    public static Map getTestMap(int type) {
-        return getTestMap(type, false);
+    public static Map getTestMap(TileType tileType) {
+        return getTestMap(tileType, false);
     }
     
     /**
@@ -132,8 +155,8 @@ public class FreeColTestCase extends TestCase {
      * 
      * @return The map created as described above.
      */
-    public static Map getTestMap(int type, boolean explored) {
-        Map m = new Map(getGame(), getTestTiles(getGame(), 20, 15, type));
+    public static Map getTestMap(TileType tileType, boolean explored) {
+        Map m = new Map(getGame(), getTestTiles(getGame(), 20, 15, tileType));
         if (explored) {
             for (Player player : getGame().getPlayers()) {
                 for (Tile tile : m.getAllTiles()) {
@@ -183,18 +206,19 @@ public class FreeColTestCase extends TestCase {
         Game game = getGame();
         Player dutch = game.getPlayer(Player.DUTCH);
 
-        Map map = getTestMap(Tile.PLAINS, true);
+        Map map = getTestMap(FreeCol.getSpecification().getTileType("model.tile.plains"), true);
         game.setMap(map);
 
         Colony colony = new Colony(game, dutch, "New Amsterdam", map.getTile(tileX, tileY));
 
-        Unit soldier = new Unit(game, map.getTile(tileX, tileY), dutch, Unit.FREE_COLONIST, Unit.ACTIVE, true, false, 0, false);
+        UnitType unitType = FreeCol.getSpecification().getUnitType("model.unit.freeColonist");
+        Unit soldier = new Unit(game, map.getTile(tileX, tileY), dutch, unitType, Unit.ACTIVE, true, false, 0, false);
 
         soldier.setWorkType(Goods.FOOD);
         soldier.buildColony(colony);
 
         for (int i = 1; i < numberOfSettlers; i++) {
-            Unit settler = new Unit(game, map.getTile(tileX, tileY), dutch, Unit.FREE_COLONIST, Unit.ACTIVE, true, false, 0,
+            Unit settler = new Unit(game, map.getTile(tileX, tileY), dutch, unitType, Unit.ACTIVE, true, false, 0,
                     false);
             settler.setLocation(colony);
         }
