@@ -2572,7 +2572,9 @@ public class Player extends FreeColGameObject implements Abilities, Nameable {
             out.writeAttribute("gold", Integer.toString(gold));
             out.writeAttribute("crosses", Integer.toString(crosses));
             out.writeAttribute("bells", Integer.toString(bells));
-            out.writeAttribute("currentFather", currentFather.getId());
+            if (currentFather != null) {
+                out.writeAttribute("currentFather", currentFather.getId());
+            }
             out.writeAttribute("crossesRequired", Integer.toString(crossesRequired));
             out.writeAttribute("attackedByPrivateers", Boolean.toString(attackedByPrivateers));
             out.writeAttribute("oldSoL", Integer.toString(oldSoL));
