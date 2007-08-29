@@ -159,7 +159,8 @@ public class Goods implements Locatable, Ownable, Named {
     public static void initialize(List<GoodsType> goodsList, int numberOfTypes) {
         for (GoodsType g : goodsList) {
             try {
-                Goods.class.getDeclaredField(g.getID().toUpperCase()).set(null, g);
+                String fieldName = g.getID().substring(g.getID().lastIndexOf('.') + 1).toUpperCase();
+                Goods.class.getDeclaredField(fieldName).set(null, g);
             } catch (Exception e) {
                 logger.warning("Error assigning a GoodsType to Goods." +
                         g.getID().toUpperCase() + "\n" + e.toString());
