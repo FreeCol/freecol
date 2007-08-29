@@ -1,7 +1,9 @@
 package net.sf.freecol.server.control;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -183,33 +185,30 @@ public final class InGameController extends Controller {
         final ServerPlayer nextPlayer = player;
         Thread t = new Thread("foundingfather-thread") {
             public void run() {
-                int[] randomFoundingFathers = getRandomFoundingFathers(nextPlayer);
+                List<FoundingFather> randomFoundingFathers = getRandomFoundingFathers(nextPlayer);
                 boolean atLeastOneChoice = false;
                 Element chooseFoundingFatherElement = Message.createNewRootElement("chooseFoundingFather");
-                for (int i = 0; i < randomFoundingFathers.length; i++) {
-                    chooseFoundingFatherElement.setAttribute("foundingFather" + Integer.toString(i), Integer
-                            .toString(randomFoundingFathers[i]));
-                    if (randomFoundingFathers[i] != -1) {
+                for (int i = 0; i < randomFoundingFathers.size(); i++) {
+                    if (randomFoundingFathers.get(i) != null) {
+                        chooseFoundingFatherElement.setAttribute("foundingFather" + Integer.toString(i), 
+                                                                 randomFoundingFathers.get(i).getId());
                         atLeastOneChoice = true;
+                    } else {
+                        chooseFoundingFatherElement.setAttribute("foundingFather" + Integer.toString(i), "");
                     }
+
                 }
                 if (!atLeastOneChoice) {
                     nextPlayer.setCurrentFather(null);
                 } else {
                     try {
                         Element reply = nextPlayer.getConnection().ask(chooseFoundingFatherElement);
-                        int foundingFather = Integer.parseInt(reply.getAttribute("foundingFather"));
-                        boolean foundIt = false;
-                        for (int i = 0; i < randomFoundingFathers.length; i++) {
-                            if (randomFoundingFathers[i] == foundingFather) {
-                                foundIt = true;
-                                break;
-                            }
-                        }
-                        if (!foundIt) {
+                        FoundingFather father = FreeCol.getSpecification().
+                            getFoundingFather(reply.getAttribute("foundingFather"));
+                        if (!randomFoundingFathers.contains(father)) {
                             throw new IllegalArgumentException();
                         }
-                        nextPlayer.setCurrentFather(FreeCol.getSpecification().foundingFather(foundingFather));
+                        nextPlayer.setCurrentFather(father);
                     } catch (IOException e) {
                         logger.warning("Could not send message to: " + nextPlayer.getName());
                     }
@@ -221,17 +220,16 @@ public final class InGameController extends Controller {
 
     /**
      * 
-     * Returns an <code>int[]</code> with the size of {@link
-     * FoundingFather#TYPE_COUNT}, containing the indices of random
-     * founding fathers (not including the founding fathers the player
-     * has already) of each type.
+     * Returns a List of FoundingFathers, not including the founding
+     * fathers the player already has, one of each type, or null if no
+     * FoundingFather of that type is available.
      * 
      * @param player The <code>Player</code> that should pick a founding
      *            father from this list.
      */
-    private int[] getRandomFoundingFathers(Player player) {
+    private List<FoundingFather> getRandomFoundingFathers(Player player) {
         int age = getGame().getTurn().getAge();
-        int[] randomFoundingFathers = new int[FoundingFather.TYPE_COUNT];
+        List<FoundingFather> randomFoundingFathers = new ArrayList<FoundingFather>();
         for (int type = 0; type < FoundingFather.TYPE_COUNT; type++) {
             int weightSum = 0;
             for (FoundingFather father : FreeCol.getSpecification().getFoundingFathers()) {
@@ -240,7 +238,7 @@ public final class InGameController extends Controller {
                 }
             }
             if (weightSum == 0) {
-                randomFoundingFathers[type] = -1;
+                randomFoundingFathers.add(null);
             } else {
                 int r = getPseudoRandom().nextInt(weightSum) + 1;
                 weightSum = 0;
@@ -248,7 +246,7 @@ public final class InGameController extends Controller {
                     if (!player.hasFather(father) && father.getType() == type) {
                         weightSum += father.getWeight(age);
                         if (weightSum >= r) {
-                            randomFoundingFathers[type] = father.getIndex();
+                            randomFoundingFathers.add(father);
                             break;
                         }
                     }

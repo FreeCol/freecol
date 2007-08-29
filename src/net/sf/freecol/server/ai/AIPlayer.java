@@ -1724,14 +1724,14 @@ public class AIPlayer extends AIObject {
      * @param foundingFathers The founding fathers on offer.
      * @return The founding father selected.
      */
-    public int selectFoundingFather(int[] foundingFathers) {
+    public FoundingFather selectFoundingFather(FoundingFather[] foundingFathers) {
         // TODO: improve choice
         int age = getGame().getTurn().getAge();
-        int bestFather = -1;
+        FoundingFather bestFather = null;
         int bestWeight = -1;
-        for (int father : foundingFathers) {
-            if (father < 0) continue;
-            int weight = FreeCol.getSpecification().foundingFather(father).getWeight(age);
+        for (FoundingFather father : foundingFathers) {
+            if (father == null) continue;
+            int weight = father.getWeight(age);
             if (weight > bestWeight) {
                 bestWeight = weight;
                 bestFather = father;

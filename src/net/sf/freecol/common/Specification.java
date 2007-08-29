@@ -2,11 +2,6 @@ package net.sf.freecol.common;
 
 import java.io.InputStream;
 import java.lang.reflect.Method;
-/*
-import java.sql.Array;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-*/
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;

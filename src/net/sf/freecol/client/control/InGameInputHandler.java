@@ -534,16 +534,22 @@ public final class InGameInputHandler extends InputHandler {
      *            holds all the information.
      */
     private Element chooseFoundingFather(Element element) {
-        final int[] possibleFoundingFathers = new int[FoundingFather.TYPE_COUNT];
+        final FoundingFather[] possibleFoundingFathers = new FoundingFather[FoundingFather.TYPE_COUNT];
         for (int i = 0; i < FoundingFather.TYPE_COUNT; i++) {
-            possibleFoundingFathers[i] = Integer.parseInt(element.getAttribute("foundingFather" + Integer.toString(i)));
+            String id = element.getAttribute("foundingFather" + Integer.toString(i));
+            if ("".equals(id)) {
+                possibleFoundingFathers[i] = null;
+            } else {
+                possibleFoundingFathers[i] = FreeCol.getSpecification().getFoundingFather(id);
+            }
         }
 
-        int foundingFather = new ShowSelectFoundingFatherSwingTask(possibleFoundingFathers).select();
+        int selected = new ShowSelectFoundingFatherSwingTask(possibleFoundingFathers).select();
+        FoundingFather foundingFather = possibleFoundingFathers[selected];
 
         Element reply = Message.createNewRootElement("chosenFoundingFather");
-        reply.setAttribute("foundingFather", Integer.toString(foundingFather));
-        getFreeColClient().getMyPlayer().setCurrentFather(FreeCol.getSpecification().foundingFather(foundingFather));
+        reply.setAttribute("foundingFather", foundingFather.getId());
+        getFreeColClient().getMyPlayer().setCurrentFather(foundingFather);
         return reply;
     }
 
@@ -1428,16 +1434,16 @@ public final class InGameInputHandler extends InputHandler {
          * 
          * @param choices The possible founding fathers.
          */
-        public ShowSelectFoundingFatherSwingTask(int[] choices) {
-            _choices = choices;
+        public ShowSelectFoundingFatherSwingTask(FoundingFather[] choices) {
+            this.choices = choices;
         }
 
         protected Object doWork() {
-            return Integer.valueOf(getFreeColClient().getCanvas().showChooseFoundingFatherDialog(_choices));
+            return Integer.valueOf(getFreeColClient().getCanvas().showChooseFoundingFatherDialog(choices));
         }
 
 
-        private int[] _choices;
+        private FoundingFather[] choices;
     }
 
     /**

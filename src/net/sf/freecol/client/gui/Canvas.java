@@ -85,6 +85,7 @@ import net.sf.freecol.common.ServerInfo;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.DiplomaticTrade;
 import net.sf.freecol.common.model.Europe;
+import net.sf.freecol.common.model.FoundingFather;
 import net.sf.freecol.common.model.FreeColGameObject;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Goods;
@@ -1387,7 +1388,7 @@ public final class Canvas extends JDesktopPane {
      * @return The founding father the player has chosen.
      * @see net.sf.freecol.common.model.FoundingFather
      */
-    public int showChooseFoundingFatherDialog(int[] possibleFoundingFathers) {
+    public int showChooseFoundingFatherDialog(FoundingFather[] possibleFoundingFathers) {
         closeStatusPanel();
 
         ChooseFoundingFatherDialog chooseFoundingFatherDialog = new ChooseFoundingFatherDialog(this);

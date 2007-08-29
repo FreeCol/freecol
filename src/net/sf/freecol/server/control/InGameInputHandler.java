@@ -2464,7 +2464,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
             enemyElement.setAttribute("stance", String.valueOf(enemyPlayer.getStance(player)));
             enemyElement.setAttribute("gold", String.valueOf(enemyPlayer.getGold()));
             if (player.equals(enemyPlayer) ||
-                player.hasFather(FreeCol.getSpecification().getFoundingFather("model.foundingFather.janDeWitt"))) {
+                player.hasAbility("model.ability.betterForeignAffairsReport")) {
                 enemyElement.setAttribute("SoL", String.valueOf(enemyPlayer.getSoL()));
                 enemyElement.setAttribute("foundingFathers", String.valueOf(enemyPlayer.getFatherCount()));
                 enemyElement.setAttribute("tax", String.valueOf(enemyPlayer.getTax()));

@@ -78,10 +78,10 @@ public final class ChooseFoundingFatherDialog extends FreeColDialog implements A
      *            identifies a <code>FoundingFather</code> to be picked in
      *            each of those categories.
      */
-    public void initialize(int[] possibleFoundingFathers) {
+    public void initialize(FoundingFather[] possibleFoundingFathers) {
         boolean hasSelectedTab = false;
         for (int i = 0; i < possibleFoundingFathers.length; i++) {
-            foundingFatherPanels[i].initialize(possibleFoundingFathers[i]);
+            foundingFatherPanels[i].initialize(possibleFoundingFathers[i], i);
             tb.setEnabledAt(i, foundingFatherPanels[i].isEnabled());
             if (!hasSelectedTab && foundingFatherPanels[i].isEnabled()) {
                 tb.setSelectedIndex(i);
@@ -118,8 +118,7 @@ public final class ChooseFoundingFatherDialog extends FreeColDialog implements A
      */
     protected class FoundingFatherPanel extends JPanel {
 
-        // private final int type;
-        private int foundingFather = -1;
+        private FoundingFather foundingFather = null;
 
         private JLabel header;
 
@@ -230,25 +229,20 @@ public final class ChooseFoundingFatherDialog extends FreeColDialog implements A
          * @param foundingFather The founding father to be displayed or
          *            <code>-1</code> if there is none.
          */
-        public void initialize(int foundingFather) {
-            this.foundingFather = foundingFather;
+        public void initialize(FoundingFather father, int index) {
+            this.foundingFather = father;
 
-            FoundingFather father = FreeCol.getSpecification().foundingFather(foundingFather);
-            if (foundingFather != -1) {
+            if (father != null) {
                 header.setText(Messages.message(father.getName()));
                 description.setText(Messages.message(father.getDescription()));
                 text.setText("\n" + "[" + Messages.message(father.getBirthAndDeath()) + "] "
                         + Messages.message(father.getText()));
-                ok.setActionCommand(Integer.toString(foundingFather));
+                ok.setActionCommand(Integer.toString(index));
             }
         }
 
         public boolean isEnabled() {
-            if (foundingFather != -1) {
-                return true;
-            } else {
-                return false;
-            }
+            return (foundingFather != null);
         }
     }
 }

@@ -214,15 +214,20 @@ public final class AIInGameInputHandler implements MessageHandler, StreamedMessa
      * 
      */
     private Element chooseFoundingFather(DummyConnection connection, Element element) {
-        int[] possibleFoundingFathers = new int[FoundingFather.TYPE_COUNT];
+        FoundingFather[] possibleFoundingFathers = new FoundingFather[FoundingFather.TYPE_COUNT];
         for (int i = 0; i < FoundingFather.TYPE_COUNT; i++) {
-            possibleFoundingFathers[i] = Integer.parseInt(element.getAttribute("foundingFather" + Integer.toString(i)));
+            String id = element.getAttribute("foundingFather" + Integer.toString(i));
+            if ("".equals(id)) {
+                possibleFoundingFathers[i] = null;
+            } else {
+                possibleFoundingFathers[i] = FreeCol.getSpecification().getFoundingFather(id);
+            }
         }
 
-        int foundingFather = getAIPlayer().selectFoundingFather(possibleFoundingFathers);
+        FoundingFather foundingFather = getAIPlayer().selectFoundingFather(possibleFoundingFathers);
         Element reply = Message.createNewRootElement("chosenFoundingFather");
-        reply.setAttribute("foundingFather", Integer.toString(foundingFather));
-        serverPlayer.setCurrentFather(FreeCol.getSpecification().foundingFather(foundingFather));
+        reply.setAttribute("foundingFather", foundingFather.getId());
+        serverPlayer.setCurrentFather(foundingFather);
 
         return reply;
     }
