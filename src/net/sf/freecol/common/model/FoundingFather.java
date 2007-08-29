@@ -14,7 +14,7 @@ import net.sf.freecol.common.util.Xml;
 * Represents one founding father to be contained in a Player object.
 * Stateful information is in the Player object.
 */
-public class FoundingFather extends FreeColGameObjectType implements Abilities {
+public class FoundingFather extends FreeColGameObjectType implements Abilities, Modifiers {
 
     public static final String  COPYRIGHT = "Copyright (C) 2003-2005 The FreeCol Team";
     public static final String  LICENSE = "http://www.gnu.org/licenses/gpl.html";
@@ -27,7 +27,33 @@ public class FoundingFather extends FreeColGameObjectType implements Abilities {
     /**
      * Stores the abilities of this Type.
      */
-    private HashMap<String, Boolean> abilities = new HashMap<String, Boolean>();    
+    private HashMap<String, Boolean> abilities = new HashMap<String, Boolean>();
+
+    /**
+     * Stores the Modifiers of this type.
+     */
+    private HashMap<String, Modifier> modifiers = new HashMap<String, Modifier>();
+
+
+    /**
+     * Get the <code>Modifier</code> value.
+     *
+     * @param id a <code>String</code> value
+     * @return a <code>Modifier</code> value
+     */
+    public final Modifier getModifier(String id) {
+        return modifiers.get(id);
+    }
+
+    /**
+     * Set the <code>Modifier</code> value.
+     *
+     * @param id a <code>String</code> value
+     * @param newModifier a <code>Modifier</code> value
+     */
+    public final void setModifier(String id, final Modifier newModifier) {
+        modifiers.put(id, newModifier);
+    }
 
     public static final int TRADE = 0,
                             EXPLORATION = 1,
@@ -177,6 +203,11 @@ public class FoundingFather extends FreeColGameObjectType implements Abilities {
                         String abilityId = Xml.attribute(node, "id");
                         boolean value = Xml.booleanAttribute(node, "value");
                         setAbility(abilityId, value);
+                    } else if ("modifier".equals(node.getNodeName())) {
+                        String modifierId = Xml.attribute(node, "id");
+                        String type = Xml.attribute(node, "type");
+                        Float value = Float.valueOf(Xml.attribute(node, "value"));
+                        setModifier(modifierId, new Modifier(modifierId, value, type));
                     }
                 }
             };

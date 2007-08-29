@@ -48,6 +48,25 @@ public final class Modifier {
     }
 
     /**
+     * Creates a new <code>Modifier</code> instance.
+     *
+     * @param id a <code>String</code> value
+     * @param value an <code>float</code> value
+     * @param type the type of the modifier
+     */
+    public Modifier(String id, float value, String type) {
+        this.id = id;
+        this.value = value;
+        if ("additive".equals(type)) {
+            this.type = ADDITIVE;
+        } else if ("multiplicative".equals(type)) {
+            this.type = MULTIPLICATIVE;
+        } else if ("percentage".equals(type)) {
+            this.type = PERCENTAGE;
+        }
+    }
+
+    /**
      * Get the <code>Id</code> value.
      *
      * @return a <code>String</code> value
@@ -120,31 +139,4 @@ public final class Modifier {
         }
     }
  
-     /**
-     * Return a formatted string appropriate for the value this
-     * modifier represents.
-     *
-     * @return a <code>String</code> value
-     */
-    /*
-    public String getFormattedResult() {
-        if (isAdditive) {
-            if (addend == Float.MIN_VALUE) {
-                return "?";
-            } else if (addend > 0) {
-                return "+" + String.valueOf(addend);
-            } else {
-                return String.valueOf(addend);
-            }
-        } else {
-            float modifier = (100 * factor) - 100;
-            if (modifier > 0) {
-                return "+" + String.valueOf(modifier) + "%";
-            } else {
-                return String.valueOf(modifier) + "%";
-            }
-        }
-    }
-    */
-
 }

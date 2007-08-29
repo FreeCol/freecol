@@ -827,7 +827,7 @@
     <founding-father id="model.foundingFather.peterMinuit" type="trade"
                      weight1="9" weight2="1" weight3="1">
 <!-- Player saves 100% percent, i.e. pays nothing. -->
-      <bonus id="model.bonus.landPaymentBonus" type="percentage" value="-100"/>
+      <modifier id="model.modifier.landPaymentModifier" type="percentage" value="-100"/>
     </founding-father>
     <founding-father id="model.foundingFather.peterStuyvesant" type="trade"
                      weight1="2" weight2="4" weight3="8">
@@ -883,8 +883,8 @@
     </founding-father>
     <founding-father id="model.foundingFather.hernanCortes" type="military"
                      weight1="6" weight2="5" weight3="1">
-      <bonus id="model.bonus.nativeTreasureBonus" type="percentage" value="200"/>
-      <bonus id="model.bonus.treasureTransportFee" type="percentage" value="-100"/>
+      <modifier id="model.modifier.nativeTreasureModifier" type="percentage" value="200"/>
+      <modifier id="model.modifier.treasureTransportFee" type="percentage" value="-100"/>
     </founding-father>
     <founding-father id="model.foundingFather.georgeWashington" type="military"
                      weight1="0" weight2="4" weight3="10">
@@ -901,7 +901,7 @@
           <required-id id="model.unit.privateer"/>
         </requirements>
         <modifications>
-          <offense-bonus id="model.bonus.francisDrake" type="percentage" value="50"/>
+          <offense-modifier id="model.modifier.francisDrake" type="percentage" value="50"/>
         </modifications>
       </modify-type>
     </founding-father>
@@ -915,7 +915,7 @@
     </founding-father>
     <founding-father id="model.foundingFather.pocahontas" type="political"
                      weight1="7" weight2="5" weight3="3">
-      <bonus id="model.bonus.nativeAlarmBonus" type="percentage" value="-50"/>
+      <modifier id="model.modifier.nativeAlarmModifier" type="percentage" value="-50"/>
     </founding-father>
     <founding-father id="model.foundingFather.thomasPaine" type="political"
                      weight1="1" weight2="2" weight3="8">
