@@ -20,35 +20,6 @@ public class FoundingFather extends FreeColGameObjectType implements Abilities {
     public static final String  LICENSE = "http://www.gnu.org/licenses/gpl.html";
     public static final String  REVISION = "$Revision$";
     
-    public static final int NONE = -1,
-                            ADAM_SMITH = 0,
-                            JACOB_FUGGER = 1,
-                            PETER_MINUIT = 2,
-                            PETER_STUYVESANT = 3, 
-                            JAN_DE_WITT = 4,
-                            FERDINAND_MAGELLAN = 5,
-                            FRANCISCO_DE_CORONADO = 6,
-                            HERNANDO_DE_SOTO = 7,
-                            HENRY_HUDSON = 8,
-                            LA_SALLE = 9,
-                            HERNAN_CORTES = 10,
-                            GEORGE_WASHINGTON = 11,
-                            PAUL_REVERE = 12,
-                            FRANCIS_DRAKE = 13,
-                            JOHN_PAUL_JONES = 14,
-                            THOMAS_JEFFERSON = 15,
-                            POCAHONTAS = 16,
-                            THOMAS_PAINE = 17,
-                            SIMON_BOLIVAR = 18,
-                            BENJAMIN_FRANKLIN = 19,//TODO
-                            WILLIAM_BREWSTER = 20,
-                            WILLIAM_PENN = 21,
-                            FATHER_JEAN_DE_BREBEUF = 22,
-                            JUAN_DE_SEPULVEDA = 23,
-                            BARTOLOME_DE_LAS_CASAS = 24,
-
-                            FATHER_COUNT = 25;
-
     private int[] weight = new int[4];
 
     private int type;
@@ -74,22 +45,48 @@ public class FoundingFather extends FreeColGameObjectType implements Abilities {
         setIndex(newIndex);
     }
 
+    /**
+     * Return the localized text of this FoundingFather.
+     *
+     * @return a <code>String</code> value
+     */
     public String getText() {
         return Messages.message(getID() + ".text");
     }
 
+    /**
+     * Return the localized birth and death dates of this FoundingFather.
+     *
+     * @return a <code>String</code> value
+     */
     public String getBirthAndDeath() {
         return Messages.message(getID() + ".birthAndDeath");
     }
 
+    /**
+     * Return the type of this FoundingFather.
+     *
+     * @return an <code>int</code> value
+     */
     public int getType() {
         return type;
     }
     
+    /**
+     * Return the localized type of this FoundingFather.
+     *
+     * @return a <code>String</code> value
+     */
     public String getTypeAsString() {
         return getTypeAsString(type);
     }
 
+    /**
+     * Return the localized type of the given FoundingFather.
+     *
+     * @param type an <code>int</code> value
+     * @return a <code>String</code> value
+     */
     public static String getTypeAsString(int type) {
         switch (type) {
             case TRADE: return Messages.message("foundingFather.trade");

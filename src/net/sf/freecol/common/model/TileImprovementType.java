@@ -323,7 +323,9 @@ public final class TileImprovementType extends FreeColGameObjectType
                             GoodsType gt = goodsTypeByRef.get(goods[i]);
                             if (gt != null && !goodsEffect.contains(gt)) {
                                 goodsEffect.add(gt);
-                                goodsBonus.add(bonus[i]);
+                                if (i < bonus.length) {
+                                    goodsBonus.add(bonus[i]);
+                                }
                             }
                         }
                     }

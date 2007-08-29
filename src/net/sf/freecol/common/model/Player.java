@@ -2342,9 +2342,10 @@ public class Player extends FreeColGameObject implements Abilities, Nameable {
         }
 
         /*
-        * Moved founding fathers infront of units so that naval units will get thier Magellan bonus
-        * the turn Magellan joins the congress. 
-        */
+         * Moved founding fathers infront of units so that naval units
+         * will get their Magellan bonus the turn Magellan joins the
+         * congress.
+         */
         if (isEuropean()) {
             if (getBells() >= getTotalFoundingFatherCost() && currentFather != null) {
                 addFather(currentFather);
