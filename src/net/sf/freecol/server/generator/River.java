@@ -189,7 +189,7 @@ public class River {
     public boolean flowFromSource(Map.Position position) {
         Tile tile = map.getTile(position);
         if (!tile.getType().canHaveRiver()) {
-            logger.fine("Tile (" + Messages.message(Tile.getName(tile.getType())) + ") at "
+            logger.fine("Tile (" + tile.getType().getName() + ") at "
                         + position + " cannot have rivers.");
             return false;
 /*
@@ -237,7 +237,7 @@ public class River {
             
             // is the tile suitable for this river?
             if (!nextTile.getType().canHaveRiver()) {
-                logger.fine("Tile (" + Messages.message(Tile.getName(nextTile.getType())) + ") at "
+                logger.fine("Tile (" + nextTile.getType().getName() + ") at "
                             + newPosition + " cannot have rivers.");
                 continue;
             /*  Depreciated

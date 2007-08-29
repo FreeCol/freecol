@@ -1007,7 +1007,7 @@ public class AIColony extends AIObject {
         					    - colony.getWarehouseCapacity();
         				int best = 0;
                         for (GoodsType goodsType2 : goodsList) {
-                            if (!goodsType2.isFarmed)
+                            if (!goodsType2.isFarmed())
                                 continue;
         					int production2 = colony.getVacantColonyTileProductionFor(unit, goodsType2);
         					if (production2 > best && production2 + colony.getGoodsCount(goodsType2)

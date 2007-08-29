@@ -191,7 +191,7 @@ public final class InGameController extends Controller {
                 for (int i = 0; i < randomFoundingFathers.size(); i++) {
                     if (randomFoundingFathers.get(i) != null) {
                         chooseFoundingFatherElement.setAttribute("foundingFather" + Integer.toString(i), 
-                                                                 randomFoundingFathers.get(i).getId());
+                                                                 randomFoundingFathers.get(i).getID());
                         atLeastOneChoice = true;
                     } else {
                         chooseFoundingFatherElement.setAttribute("foundingFather" + Integer.toString(i), "");

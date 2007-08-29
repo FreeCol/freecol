@@ -166,7 +166,7 @@ public class WorkerWish extends Wish {
         value = Integer.parseInt(in.getAttributeValue(null, "value"));
 
         int unitTypeIndex = Integer.parseInt(in.getAttributeValue(null, "unitType"));
-        unitType = FreeCol.getSpecification().unitType(unitTypeIndex);
+        unitType = FreeCol.getSpecification().getUnitType(unitTypeIndex);
         expertNeeded = Boolean.valueOf(in.getAttributeValue(null, "expertNeeded")).booleanValue();
         in.nextTag();
     }
@@ -181,6 +181,6 @@ public class WorkerWish extends Wish {
     }
     
     public String toString() {
-        return "WorkerWish: " + Unit.getName(unitType) + " (" + expertNeeded + ")";
+        return "WorkerWish: " + unitType.getName() + " (" + expertNeeded + ")";
     }
 }

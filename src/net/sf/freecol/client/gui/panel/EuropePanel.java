@@ -1125,7 +1125,7 @@ public final class EuropePanel extends FreeColPanel implements ActionListener {
         public void logPurchase(GoodsType goodsType, int amount, int price) {
             int total = amount * price;
             String text = Messages.message("transaction.purchase",
-                    "%goods%", Goods.getName(goodsType),
+                    "%goods%", goodsType.getName(),
                     "%amount%", String.valueOf(amount),
                     "%gold%", String.valueOf(price))
                 + "\n" + Messages.message("transaction.price",
@@ -1139,7 +1139,7 @@ public final class EuropePanel extends FreeColPanel implements ActionListener {
             int totalAfterTax = totalBeforeTax - totalTax;
             
             String text = Messages.message("transaction.sale",
-                    "%goods%", Goods.getName(goodsType),
+                    "%goods%", goodsType.getName(),
                     "%amount%", String.valueOf(amount),
                     "%gold%", String.valueOf(price))
                 + "\n" + Messages.message("transaction.price",

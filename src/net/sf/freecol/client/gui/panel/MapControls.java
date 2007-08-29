@@ -86,7 +86,7 @@ public final class MapControls {
         ubList.add(new UnitButton(am.getFreeColAction(SentryAction.ID)));
         ubList.add(new UnitButton(am.getFreeColAction(FortifyAction.ID)));
         for (ImprovementActionType iaType : FreeCol.getSpecification().getImprovementActionTypeList()) {
-            ubList.add(new UnitButton(am.getFreeColAction(iaType.ID)));
+            ubList.add(new UnitButton(am.getFreeColAction(iaType.getID())));
         }
         ubList.add(new UnitButton(am.getFreeColAction(BuildColonyAction.ID)));
         ubList.add(new UnitButton(am.getFreeColAction(DisbandUnitAction.ID)));

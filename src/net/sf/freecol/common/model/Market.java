@@ -290,7 +290,7 @@ public final class Market extends FreeColGameObject implements Ownable {
             }
         } else {
             addModelMessage(this, "model.europe.market",
-                            new String [][] {{"%goods%", Goods.getName(type)}},
+                            new String [][] {{"%goods%", type.getName()}},
                             ModelMessage.WARNING);
         }
     }

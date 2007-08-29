@@ -354,7 +354,7 @@ public class MapGenerator {
                     tile, tribe, kind, capital,
                     generateSkillForLocation(map, map.getTile(position)),
                     false, null);
-        logger.fine("Generated skill: " + Unit.getName(settlement.getLearnableSkill()));
+        logger.fine("Generated skill: " + settlement.getLearnableSkill().getName());
 
         tile.setSettlement(settlement);
         

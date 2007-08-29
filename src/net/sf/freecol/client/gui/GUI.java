@@ -1551,7 +1551,7 @@ public final class GUI {
 
                 if (!tile.isLand() && borderingTile.isLand() && borderingTile.isExplored()) {
                     // If there is a Coast image (eg. beach) defined, use it, otherwise skip
-                    if (borderingTile.getType().artCoast != null) {
+                    if (borderingTile.getType().getArtCoast() != null) {
                         g.drawImage(lib.getCoastImage(borderingTile.getType(), i,
                                                         tile.getX(), tile.getY()),
                                                         x, y, null);
@@ -1630,7 +1630,7 @@ public final class GUI {
             } */
 
             // Tile Overlays first (eg. hills and mountains)
-            if (tile.getType().artOverlay != null) {
+            if (tile.getType().getArtOverlay() != null) {
                 g.drawImage(lib.getOverlayImage(tile.getType(), tile.getX(), tile.getY()), x, y - 32, null);
             }
             
@@ -1642,11 +1642,11 @@ public final class GUI {
             for (TileImprovement ti : tiList) {
                 if (ti == tic.getRiver() || ti == tic.getRoad())
                     continue;
-                if (!ti.getType().artOverTrees) {
+                if (!ti.getType().isArtOverTrees()) {
                     tiList2.add(ti);
-                } else if (ti.getType().artOverlay > 0) {
+                } else if (ti.getType().getArtOverlay() > 0) {
                     // Has its own Overlay Image in Misc, use it
-                    g.drawImage(lib.getMiscImage(ti.getType().artOverlay), x, y, null);
+                    g.drawImage(lib.getMiscImage(ti.getType().getArtOverlay()), x, y, null);
                 }
             }
 /*
@@ -1671,9 +1671,9 @@ public final class GUI {
             for (TileImprovement ti : tiList2) {
                 if (ti == tic.getRiver() || ti == tic.getRoad())
                     continue;
-                if (ti.getType().artOverlay > 0) {
+                if (ti.getType().getArtOverlay() > 0) {
                     // Has its own Overlay Image in Misc, use it
-                    g.drawImage(lib.getMiscImage(ti.getType().artOverlay), x, y, null);
+                    g.drawImage(lib.getMiscImage(ti.getType().getArtOverlay()), x, y, null);
                 }
             }
 

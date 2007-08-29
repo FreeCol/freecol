@@ -108,17 +108,17 @@ public class Resource extends TileItem {
      * @return The name of this Resource.
      */
     public String getName() {
-        return Messages.message(getType().getName());
+        return getType().getName();
     }
 
     /**
      * Returns the name of a given <code>ResourceType</code>.
      * @return The name of this ResourceType.
-     */
+     *//*
     public static String getName(ResourceType resType) {
         return Messages.message(resType.getName());
     }
-
+*/
     /**
      * Returns the <code>ResourceType</code> of this Resource.
      */
@@ -231,8 +231,8 @@ public class Resource extends TileItem {
 
         // Add attributes:
         out.writeAttribute("ID", getID());
-        out.writeAttribute("tile", tile.getID());
-        out.writeAttribute("type", Integer.toString(type.getIndex()));
+        out.writeAttribute("tile", getTile().getID());
+        out.writeAttribute("type", getType().getID());
         out.writeAttribute("quantity", Integer.toString(quantity));
 
         // End element:
@@ -253,7 +253,7 @@ public class Resource extends TileItem {
         if (tile == null) {
             tile = new Tile(getGame(), in.getAttributeValue(null, "tile"));
         }
-        type = FreeCol.getSpecification().getResourceType(Integer.parseInt(in.getAttributeValue(null, "type")));
+        type = FreeCol.getSpecification().getResourceType(in.getAttributeValue(null, "type"));
         quantity = Integer.parseInt(in.getAttributeValue(null, "quantity"));
     }
 

@@ -435,7 +435,7 @@ public final class ReportUnitPanel extends JPanel implements ActionListener {
         case Unit.MAN_O_WAR:
         case Unit.PRIVATEER:
         case Unit.WAGON_TRAIN:
-            unitLabel.setToolTipText(Unit.getName(unitType));
+            unitLabel.setToolTipText(unitType.getName());
             break;
         case Unit.VETERAN_SOLDIER:
             if (mounted) {

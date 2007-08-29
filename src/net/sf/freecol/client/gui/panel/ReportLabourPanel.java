@@ -154,7 +154,7 @@ public final class ReportLabourPanel extends ReportPanel implements ActionListen
                 reportPanel.add(new JLabel(String.valueOf(unitCount[unitType.getIndex()])),
                                 higConst.rc(2 * row + 1, columnsPerUnit * column + countColumn, "tr"));
             } else {
-                JLabel unitNameLabel = new JLabel(Unit.getName(unitType)); 
+                JLabel unitNameLabel = new JLabel(unitType.getName()); 
                 unitNameLabel.setForeground(Color.GRAY);
                 reportPanel.add(unitNameLabel,
                                 higConst.rc(2 * row + 1, columnsPerUnit * column + nameColumn, "tl"));
@@ -170,7 +170,7 @@ public final class ReportLabourPanel extends ReportPanel implements ActionListen
     
 
     private JButton createUnitNameButton(UnitType unitType) {
-        JButton button = new JButton(Unit.getName(unitType));
+        JButton button = new JButton(unitType.getName());
         button.setMargin(new Insets(0,0,0,0));
         button.setOpaque(false);
         button.setForeground(LINK_COLOR);
@@ -232,7 +232,7 @@ public final class ReportLabourPanel extends ReportPanel implements ActionListen
 
         // summary
         int row = 1;
-        detailPanel.add(new JLabel(Unit.getName(unitType)),
+        detailPanel.add(new JLabel(unitType.getName()),
                         higConst.rc(row, colonyColumn));
         detailPanel.add(new JLabel(String.valueOf(unitCount[unitIndex])),
                         higConst.rc(row, countColumn));

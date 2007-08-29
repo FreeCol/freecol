@@ -36,7 +36,7 @@ public class ImprovementAction extends MapboardAction {
      * @param freeColClient The main controller object for the client.
      */
     public ImprovementAction(FreeColClient freeColClient, ImprovementActionType iaType) {
-        super(freeColClient, iaType.names.get(0), null, KeyStroke.getKeyStroke(iaType.accelerator, 0));
+        super(freeColClient, iaType.getNames().get(0), null, KeyStroke.getKeyStroke(iaType.getAccelerator(), 0));
         this.iaType = iaType;
         actionID = -1;
         updateValues(0);
@@ -54,14 +54,14 @@ public class ImprovementAction extends MapboardAction {
         actionID = newActionID;
 
         putValue(BUTTON_IMAGE, getFreeColClient().getImageLibrary().getUnitButtonImageIcon(
-                 iaType.imageIDs.get(actionID), 0));
+                 iaType.getImageIDs().get(actionID), 0));
         putValue(BUTTON_ROLLOVER_IMAGE, getFreeColClient().getImageLibrary().getUnitButtonImageIcon(
-                 iaType.imageIDs.get(actionID), 1));
+                 iaType.getImageIDs().get(actionID), 1));
         putValue(BUTTON_PRESSED_IMAGE, getFreeColClient().getImageLibrary().getUnitButtonImageIcon(
-                 iaType.imageIDs.get(actionID), 2));
+                 iaType.getImageIDs().get(actionID), 2));
         putValue(BUTTON_DISABLED_IMAGE, getFreeColClient().getImageLibrary().getUnitButtonImageIcon(
-                 iaType.imageIDs.get(actionID), 3));
-        putValue(NAME, Messages.message(iaType.names.get(actionID)));
+                 iaType.getImageIDs().get(actionID), 3));
+        putValue(NAME, Messages.message(iaType.getNames().get(actionID)));
 
     }
 
@@ -78,7 +78,7 @@ public class ImprovementAction extends MapboardAction {
             if (enabled && selectedOne != null && selectedOne.getTile() != null) {
                 Tile tile = selectedOne.getTile();
                 int newActionID = 0;
-                for (TileImprovementType impType : iaType.impTypes) {
+                for (TileImprovementType impType : iaType.getImpTypes()) {
                     if (!impType.isTileTypeAllowed(tile.getType())) {
                         continue;
                     }
@@ -88,7 +88,7 @@ public class ImprovementAction extends MapboardAction {
                     if (tile.findTileImprovementType(impType) != null) {
                         continue;
                     }
-                    newActionID = iaType.impTypes.indexOf(impType);
+                    newActionID = iaType.getImpTypes().indexOf(impType);
                     break;
                 }
                 updateValues(newActionID);
@@ -122,7 +122,7 @@ public class ImprovementAction extends MapboardAction {
             return false;
         
         // Check if there is an ImprovementType that can be performed by this unit on this tile
-        for (TileImprovementType impType : iaType.impTypes) {
+        for (TileImprovementType impType : iaType.getImpTypes()) {
             if (!impType.isTileTypeAllowed(tile.getType())) {
                 continue;
             }
@@ -145,7 +145,7 @@ public class ImprovementAction extends MapboardAction {
      * @return "ImprovementAction"
      */
     public String getId() {
-        return iaType.ID;
+        return iaType.getID();
     }
 
     /**

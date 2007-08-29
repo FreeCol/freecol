@@ -367,7 +367,7 @@ public final class Europe extends FreeColGameObject implements Location,
      *         in case the unit cannot be bought.
      */
     public int getUnitPrice(UnitType unitType) {
-        Integer price = unitPrices.get(unitType.getId());
+        Integer price = unitPrices.get(unitType.getID());
         if (price != null) {
             return price.intValue();
         } else {
@@ -406,7 +406,7 @@ public final class Europe extends FreeColGameObject implements Location,
 
         int increasingPrice = unit.getUnitType().getIncreasingPrice();
         if (increasingPrice > 0) {
-            unitPrices.put(unit.getUnitType().getId(), new Integer(price + increasingPrice));
+            unitPrices.put(unit.getUnitType().getID(), new Integer(price + increasingPrice));
         }
     }
 
@@ -566,9 +566,9 @@ public final class Europe extends FreeColGameObject implements Location,
         setID(in.getAttributeValue(null, "ID"));
 
         Specification spec = FreeCol.getSpecification();
-        recruitables[0] = spec.unitType(Integer.parseInt(in.getAttributeValue(null, "recruit0")));
-        recruitables[1] = spec.unitType(Integer.parseInt(in.getAttributeValue(null, "recruit1")));
-        recruitables[2] = spec.unitType(Integer.parseInt(in.getAttributeValue(null, "recruit2")));
+        recruitables[0] = spec.getUnitType(Integer.parseInt(in.getAttributeValue(null, "recruit0")));
+        recruitables[1] = spec.getUnitType(Integer.parseInt(in.getAttributeValue(null, "recruit1")));
+        recruitables[2] = spec.getUnitType(Integer.parseInt(in.getAttributeValue(null, "recruit2")));
         String recruitPriceString = in.getAttributeValue(null, "recruitPrice");
         owner = (Player) getGame().getFreeColGameObject(
                 in.getAttributeValue(null, "owner"));

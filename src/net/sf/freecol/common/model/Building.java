@@ -109,7 +109,7 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
         this.type = type;
         this.level = level;
 
-        buildingType = FreeCol.getSpecification().buildingType(type);
+        buildingType = FreeCol.getSpecification().getBuildingType(type);
     }
 
     /**
@@ -124,7 +124,7 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
 
         readFromXML(in);
 
-        buildingType = FreeCol.getSpecification().buildingType(type);
+        buildingType = FreeCol.getSpecification().getBuildingType(type);
     }
 
     /**
@@ -138,7 +138,7 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
 
         readFromXMLElement(e);
 
-        buildingType = FreeCol.getSpecification().buildingType(type);
+        buildingType = FreeCol.getSpecification().getBuildingType(type);
     }
 
     /**
@@ -227,8 +227,7 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
      * @return a <code>String</code> value
      */
     public static String getName(int someType, int someLevel) {
-        String id = FreeCol.getSpecification().buildingType(someType).level(someLevel - 1).name;
-        return Messages.message(id);
+        return FreeCol.getSpecification().getBuildingType(someType).level(someLevel - 1).getName();
     }
 
     /**
@@ -249,7 +248,7 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
      */
     public String getNextName() {
         return level < buildingType.numberOfLevels() ?
-               Messages.message(buildingType.level(level).name) : null;
+               buildingType.level(level).getName() : null;
     }
 
     /**
@@ -264,7 +263,7 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
             return -1;
         }
 
-        return level < buildingType.numberOfLevels() ? buildingType.level(level).hammersRequired : -1;
+        return level < buildingType.numberOfLevels() ? buildingType.level(level).getHammersRequired() : -1;
     }
 
     /**
@@ -279,7 +278,7 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
             return -1;
         }
 
-        return level < buildingType.numberOfLevels() ? buildingType.level(level).toolsRequired : -1;
+        return level < buildingType.numberOfLevels() ? buildingType.level(level).getToolsRequired() : -1;
     }
 
     /**
@@ -290,7 +289,7 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
      *         same type, or <code>-1</code> if the building does not exist.
      */
     public int getNextPop() {
-        return level < buildingType.numberOfLevels() ? buildingType.level(level).populationRequired : -1;
+        return level < buildingType.numberOfLevels() ? buildingType.level(level).getPopulationRequired() : -1;
     }
 
     /**
@@ -322,7 +321,7 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
             return false;
         }
 
-        if (buildingType.level(level).populationRequired > colony.getUnitCount()) {
+        if (buildingType.level(level).getPopulationRequired() > colony.getUnitCount()) {
             return false;
         }
 

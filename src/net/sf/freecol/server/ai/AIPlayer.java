@@ -491,7 +491,7 @@ public class AIPlayer extends AIObject {
                         logger.warning("Unsupported REF-unit.");
                         continue;
                     }
-                    UnitType type = FreeCol.getSpecification().unitType(unitType);
+                    UnitType type = FreeCol.getSpecification().getUnitType(unitType);
                     new Unit(getGame(), getPlayer().getEurope(), getPlayer(),
                             type, Unit.ACTIVE, armed, mounted, 0, false);
                     ref[i]--;

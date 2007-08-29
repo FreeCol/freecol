@@ -112,7 +112,7 @@ public class GoodsContainer extends FreeColGameObject {
         int index = type.getIndex();
         if (storedGoods[index] + amount < 0) {
             throw new IllegalStateException("Operation would leave " + (storedGoods[index] - amount) + " goods of type " 
-                    + Goods.getName(type) + " (" + type + ") here. Location: " + parent);
+                    + type.getName() + " (" + type + ") here. Location: " + parent);
         }
         storedGoods[index] += amount;
     }

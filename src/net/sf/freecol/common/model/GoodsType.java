@@ -4,58 +4,48 @@ package net.sf.freecol.common.model;
 
 import java.util.Map;
 
+import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.util.Xml;
 
 import org.w3c.dom.Node;
 
 
-public final class GoodsType
+public final class GoodsType extends FreeColGameObjectType
 {
     public static final  String  COPYRIGHT = "Copyright (C) 2003-2007 The FreeCol Team";
     public static final  String  LICENSE = "http://www.gnu.org/licenses/gpl.html";
     public static final  String  REVISION = "$Revision$";
 
-    public int        index;
-    public String     id;
-    public String     name;
-    public boolean   isFarmed;
-    public boolean   isFood;
-    public boolean   ignoreLimit;
-/*
-    public boolean improvedByPlowing = false;
-    public boolean improvedByRiver = false;
-    public boolean improvedByRoad = false;
-*/
-    public GoodsType  madeFrom;
-    public GoodsType  makes;
+    private boolean isFarmed;
+    private boolean isFood;
+    private boolean ignoreLimit;
+
+    private GoodsType madeFrom;
+    private GoodsType makes;
     
-    public GoodsType  storedAs;
-    public boolean   storable;
+    private GoodsType storedAs;
+    private boolean storable;
 
     private String art;
     
-    public int initialAmount;
-    public int initialPrice;
-    public int priceDiff;
+    private int initialAmount;
+    private int initialPrice;
+    private int priceDiff;
 
     // ----------------------------------------------------------- constructors
 
     public GoodsType(int index) {
-        this.index = index;
+        setIndex(index);
     }
 
     // ----------------------------------------------------------- retriveal methods
 
-    public int getIndex() {
-        return index;
-    }
-
-    public String getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
+    public String getName(boolean sellable) {
+        if (sellable) {
+            return getName();
+        } else {
+            return getName() + " (" + Messages.message("model.goods.Boycotted") + ")";
+        }
     }
 
     public boolean isRawMaterial() {
@@ -86,6 +76,10 @@ public final class GoodsType
         return storable;
     }
 
+    public GoodsType getStoredAs() {
+        return storedAs;
+    }
+
     public int getInitialAmount() {
         return initialAmount;
     }
@@ -103,6 +97,7 @@ public final class GoodsType
     }
 
     // TODO: give this some meaning
+    // Originally intended for when there are no static variables
     public boolean isFoodType() {
         return isFood;
     }
@@ -111,32 +106,19 @@ public final class GoodsType
         return art;
     }
 
-/*
-    public boolean isImprovedByPlowing() {
-
-        return improvedByPlowing;
-
+    public GoodsType outputType() {
+        return makes;
     }
 
-    public boolean isImprovedByRoad() {
-
-        return improvedByRoad;
-
+    public GoodsType inputType() {
+        return madeFrom;
     }
 
-    public boolean isImprovedByRiver() {
-
-        return improvedByRiver;
-
-    }
-*/
     // ------------------------------------------------------------ API methods
 
     public void readFromXmlElement( Node xml, Map<String, GoodsType> goodsTypeByRef ) {
 
-        name = Xml.attribute(xml, "id");
-        String[] buffer = name.split("\\.");
-        id = buffer[buffer.length - 1];
+        setID(Xml.attribute(xml, "id"));
         isFarmed = Xml.booleanAttribute(xml, "is-farmed");
         isFood = Xml.booleanAttribute(xml, "is-food", false);
         ignoreLimit = Xml.booleanAttribute(xml, "ignore-limit", false);
@@ -156,20 +138,6 @@ public final class GoodsType
             storedAs = goodsTypeByRef.get(Xml.attribute(xml, "stored-as"));
         }
 
-/*
-        if (Xml.hasAttribute(xml, "improved-by-plowing") &&
-            Xml.booleanAttribute(xml, "improved-by-plowing")) {
-            improvedByPlowing = true;
-        }
-        if (Xml.hasAttribute(xml, "improved-by-river") &&
-            Xml.booleanAttribute(xml, "improved-by-river")) {
-            improvedByRiver = true;
-        }
-        if (Xml.hasAttribute(xml, "improved-by-road") &&
-            Xml.booleanAttribute(xml, "improved-by-road")) {
-            improvedByRoad = true;
-        }
-*/
         // Only expected child is 'market'
         Xml.Method method = new Xml.Method() {
             public void invokeOn(Node xml) {

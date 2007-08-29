@@ -92,7 +92,7 @@ public final class PurchaseDialog extends FreeColDialog implements ActionListene
         int row = 1;
         for(UnitType unitType : unitTypesForPurchasing) {
             int graphicsType = ImageLibrary.getUnitGraphicsType(unitType.getIndex(), false, false, 0, false);
-            JButton button = new JButton(Unit.getName(unitType), library.getScaledUnitImageIcon(graphicsType, 0.66f));
+            JButton button = new JButton(unitType.getName(), library.getScaledUnitImageIcon(graphicsType, 0.66f));
             button.setIconTextGap(margin);
             button.addActionListener(this);
             button.setActionCommand(unitType.getName());

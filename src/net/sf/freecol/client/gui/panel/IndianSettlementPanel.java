@@ -80,8 +80,8 @@ public final class IndianSettlementPanel extends FreeColDialog implements Action
         skillLabel.setText(Messages.message(skillName));
 
         GoodsType[] wantedGoods = settlement.getWantedGoods();
-        highlyWantedLabel.setText(Goods.getName(wantedGoods[0]));
-        otherWantedLabel.setText(Goods.getName(wantedGoods[1]) + ", " + Goods.getName(wantedGoods[2]));
+        highlyWantedLabel.setText(wantedGoods[0].getName());
+        otherWantedLabel.setText(wantedGoods[1].getName() + ", " + wantedGoods[2].getName());
         setSize(getPreferredSize());
     }
 

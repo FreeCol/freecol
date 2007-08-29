@@ -7,45 +7,42 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
+import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.util.Xml;
 
 import org.w3c.dom.Node;
 
 
-public final class TileType
+public final class TileType extends FreeColGameObjectType
 {
     public static final  String  COPYRIGHT = "Copyright (C) 2003-2006 The FreeCol Team";
     public static final  String  LICENSE = "http://www.gnu.org/licenses/gpl.html";
     public static final  String  REVISION = "$Revision$";
 
-    public int index;
-    public String id;
-    public String name;
-    
-    public String artBasic;
-    public String artOverlay;
-    public String artForest;
-    public int artUnexplored;
-    public String artCoast;
-    public Color minimapColor;
+    private String artBasic;
+    private String artOverlay;
+    private String artForest;
+    private String artUnexplored;
+    private String artCoast;
+    private Color minimapColor;
 
-    public boolean forest;
-    public boolean water;
-    public boolean canSettle;
-    public boolean canSailToEurope;
-    public boolean canHaveRiver;
-    public int basicMoveCost;
-    public int basicWorkTurns;
+    private boolean forest;
+    private boolean water;
+    private boolean canSettle;
+    private boolean canSailToEurope;
+    private boolean canHaveRiver;
 
-    public int attackFactor;
-    public int defenceFactor;
+    private int basicMoveCost;
+    private int basicWorkTurns;
+    private int attackFactor;
+    private int defenceFactor;
     
     public static final int HUMIDITY = 0, TEMPERATURE = 1, ALTITUDE = 2, LATITUDE = 3;
     
-    public int[] humidity;
-    public int[] temperature;
-    public int[] altitude;
-    public int[] latitude;
+    private int[] humidity;
+    private int[] temperature;
+    private int[] altitude;
+    private int[] latitude;
 
     private List<GoodsType> producedType;
     private List<Integer> producedAmount;
@@ -55,21 +52,33 @@ public final class TileType
     // ------------------------------------------------------------ constructor
 
     public TileType(int index) {
-        this.index = index;
+        setIndex(index);
     }
 
     // ------------------------------------------------------------ retrieval methods
 
-    public int getIndex() {
-        return index;
-    }
-    
-    public String getId() {
-        return id;
+    public String getArtBasic() {
+        return artBasic;
     }
 
-    public String getName() {
-        return name;
+    public String getArtOverlay() {
+        return artOverlay;
+    }
+
+    public String getArtForest() {
+        return artForest;
+    }
+
+    public String getArtUnexplored() {
+        return artUnexplored;
+    }
+
+    public String getArtCoast() {
+        return artCoast;
+    }
+
+    public Color getMinimapColor() {
+        return minimapColor;
     }
 
     public boolean isForested() {
@@ -106,10 +115,6 @@ public final class TileType
 
     public int getDefenceFactor() {
         return defenceFactor;
-    }
-
-    public Color getMinimapColor() {
-        return minimapColor;
     }
 
     public int getPotential(GoodsType goodsType) {
@@ -175,9 +180,7 @@ public final class TileType
     public void readFromXmlElement(Node xml, final Map<String, GoodsType> goodsTypeByRef,
                                     final Map<String, ResourceType> resourceTypeByRef) {
 
-        name = Xml.attribute(xml, "id");
-        String[] buffer = name.split("\\.");
-        id = buffer[buffer.length - 1];
+        setID(Xml.attribute(xml, "id"));
         basicMoveCost = Xml.intAttribute(xml, "basic-move-cost");
         basicWorkTurns = Xml.intAttribute(xml, "basic-work-turns");
         forest = Xml.booleanAttribute(xml, "is-forest", false);
@@ -199,11 +202,11 @@ public final class TileType
                 String childName = xml.getNodeName();
 
                 if ("art".equals(childName)) {
-                    artBasic = Xml.attribute(xml, "basic");
+                    artBasic = Xml.attribute(xml, "basic", null);
                     artOverlay = Xml.attribute(xml, "overlay", null);
                     artForest = Xml.attribute(xml, "forest", null);
-                    artUnexplored = Xml.intAttribute(xml, "unexplored", 0);
-                    artCoast = Xml.attribute(xml, "coast", null);
+                    artUnexplored = Xml.attribute(xml, "unexplored", "terrain/unexplored/");
+                    artCoast = Xml.attribute(xml, "coast", (water ? null : "terrain/beach/"));
                     float[] defaultArray = new float[] {0.0f, 0.0f, 0.0f};
                     float[] colorValues = Xml.floatArrayAttribute(xml, "minimap-color", defaultArray);
                     minimapColor = new Color(colorValues[0], colorValues[1], colorValues[2]);
@@ -235,7 +238,7 @@ public final class TileType
         };
         Xml.forEachChild(xml, method);
         if (artBasic == null) {
-            throw new RuntimeException("TileType "+name+" has no art defined!");
+            throw new RuntimeException("TileType " + getName() + " has no art defined!");
         }
     }
 

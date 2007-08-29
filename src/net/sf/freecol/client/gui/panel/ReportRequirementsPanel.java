@@ -139,7 +139,7 @@ public final class ReportRequirementsPanel extends ReportPanel implements Action
                         UnitType expert = FreeCol.getSpecification().getExpertForProducing(workType);
                         int expertIndex = expert.getIndex();
                         if (unitCount[index][expertIndex] == 0 && !expertWarning[expertIndex]) {
-                            addExpertWarning(doc, index, Goods.getName(workType), expert);
+                            addExpertWarning(doc, index, workType.getName(), expert);
                             expertWarning[expertIndex] = true;
                             hasWarning = true;
                         }
@@ -157,7 +157,7 @@ public final class ReportRequirementsPanel extends ReportPanel implements Action
                         if (building.getFirstUnit() != null &&
                             !expertWarning[expertIndex] &&
                             unitCount[index][expertIndex] == 0) {
-                            addExpertWarning(doc, index, Goods.getName(goodsType), expert);
+                            addExpertWarning(doc, index, goodsType.getName(), expert);
                             expertWarning[expertIndex] = true;
                             hasWarning = true;
                         }
@@ -190,7 +190,7 @@ public final class ReportRequirementsPanel extends ReportPanel implements Action
     }
 
     private void addExpertWarning(StyledDocument doc, int colonyIndex, String goods, UnitType workType) {
-        String expertName = Unit.getName(workType);
+        String expertName = workType.getName();
         String colonyName = colonies.get(colonyIndex).getName();
         String newMessage = Messages.message("report.requirements.noExpert", "%colony%", colonyName, "%goods%", goods,
                 "%unit%", expertName);
@@ -251,8 +251,8 @@ public final class ReportRequirementsPanel extends ReportPanel implements Action
         String colonyName = colonies.get(colonyIndex).getName();
         String newMessage = Messages.message("report.requirements.missingGoods",
                 "%colony%", colonyName,
-                "%goods%", Goods.getName(output),
-                "%input%", Goods.getName(input));
+                "%goods%", output.getName(),
+                "%input%", input.getName());
 
         try {
             doc.insertString(doc.getLength(), newMessage + "\n\n", doc.getStyle("regular"));
@@ -268,7 +268,7 @@ public final class ReportRequirementsPanel extends ReportPanel implements Action
 
             if (!withSurplus.isEmpty()) {
                 doc.insertString(doc.getLength(),
-                        Messages.message("report.requirements.surplus", "%goods%", Goods.getName(input)) + " ",
+                        Messages.message("report.requirements.surplus", "%goods%", input.getName()) + " ",
                         doc.getStyle("regular"));
                 for (int index = 0; index < withSurplus.size() - 1; index++) {
                     Colony colony = withSurplus.get(index);

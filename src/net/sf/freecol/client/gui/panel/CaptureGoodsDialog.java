@@ -218,7 +218,7 @@ public final class CaptureGoodsDialog extends FreeColDialog implements ActionLis
         }
 
         public String toString() {
-            return good.getAmount() + " " + Goods.getName(good.getType());
+            return good.getAmount() + " " + good.getType().getName();
         }
     }
 }

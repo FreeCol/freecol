@@ -99,6 +99,21 @@ public class TileItemContainer extends FreeColGameObject {
         readFromXMLElement(e);
     }
 
+    /**
+     * Clone functions for making a clone of this TileItemContainer
+     */
+    public TileItemContainer clone() {
+        return clone(true, false);
+    }
+    public TileItemContainer clone(boolean importBonuses) {
+        return clone(importBonuses, false);
+    }
+    public TileItemContainer clone(boolean importBonuses, boolean copyOnlyNatural) {
+        TileItemContainer ticClone = new TileItemContainer(getGame(), getTile());
+        ticClone.copyFrom(this, importBonuses, copyOnlyNatural);
+        return ticClone;
+    }
+
     // ------------------------------------------------------------ checking/retrieval functions
 
     public Tile getTile() {
@@ -302,11 +317,14 @@ public class TileItemContainer extends FreeColGameObject {
             return null;
         }
     }
-
+    
     public void copyFrom(TileItemContainer tic) {
-        copyFrom(tic, true);
+        copyFrom(tic, true, false);
     }
     public void copyFrom(TileItemContainer tic, boolean importBonuses) {
+        copyFrom(tic, importBonuses, false);
+    }
+    public void copyFrom(TileItemContainer tic, boolean importBonuses, boolean copyOnlyNatural) {
         clear();
         if (tic.hasResource() && importBonuses) {
             Resource ticR = tic.getResource();
@@ -315,11 +333,13 @@ public class TileItemContainer extends FreeColGameObject {
             addTileItem(r);
         }
         for (TileImprovement ti : tic.getImprovements()) {
-            TileImprovement newTI = new TileImprovement(getGame(), tile, ti.getType());
-            newTI.setMagnitude(ti.getMagnitude());
-            newTI.setStyle(ti.getStyle());
-            newTI.setTurnsToComplete(ti.getTurnsToComplete());
-            addTileItem(newTI);
+            if (!copyOnlyNatural || ti.getType().isNatural()) {
+                TileImprovement newTI = new TileImprovement(getGame(), tile, ti.getType());
+                newTI.setMagnitude(ti.getMagnitude());
+                newTI.setStyle(ti.getStyle());
+                newTI.setTurnsToComplete(ti.getTurnsToComplete());
+                addTileItem(newTI);
+            }
         }
     }
 

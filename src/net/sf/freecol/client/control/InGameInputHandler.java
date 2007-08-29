@@ -548,7 +548,7 @@ public final class InGameInputHandler extends InputHandler {
         FoundingFather foundingFather = possibleFoundingFathers[selected];
 
         Element reply = Message.createNewRootElement("chosenFoundingFather");
-        reply.setAttribute("foundingFather", foundingFather.getId());
+        reply.setAttribute("foundingFather", foundingFather.getID());
         getFreeColClient().getMyPlayer().setCurrentFather(foundingFather);
         return reply;
     }

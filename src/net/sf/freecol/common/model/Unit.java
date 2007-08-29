@@ -2387,7 +2387,7 @@ public class Unit extends FreeColGameObject implements Abilities, Locatable, Loc
      * @param type The new type of the unit.
      */
     public void setType(int type) {
-        setType(FreeCol.getSpecification().unitType(type));
+        setType(FreeCol.getSpecification().getUnitType(type));
     }
 
     /**
@@ -2453,50 +2453,50 @@ public class Unit extends FreeColGameObject implements Abilities, Locatable, Loc
             case BRAVE:
                 return Messages.message("model.unit.indianDragoon");
             default:
-                return (Messages.message("model.unit.dragoon") + " (" + getName(getUnitType()) + ")");
+                return (Messages.message("model.unit.dragoon") + " (" + getUnitType().getName() + ")");
             }
         } else if (isArmed()) {
             switch (getType()) {
             case KINGS_REGULAR:
             case COLONIAL_REGULAR:
             case VETERAN_SOLDIER:
-                return getName(getUnitType());
+                return getUnitType().getName();
             case BRAVE:
                 return Messages.message("model.unit.armedBrave");
             default:
-                return (Messages.message("model.unit.soldier") + " (" + getName(getUnitType()) + ")");
+                return (Messages.message("model.unit.soldier") + " (" + getUnitType().getName() + ")");
             }
         } else if (isMounted()) {
             if (hasAbility("model.ability.expertScout")) {
-                return getName(getUnitType());
+                return getUnitType().getName();
             } else if (getType() == BRAVE) {
                 return Messages.message("model.unit.mountedBrave");
             } else {
-                return (Messages.message("model.unit.scout") + " (" + getName(getUnitType()) + ")");
+                return (Messages.message("model.unit.scout") + " (" + getUnitType().getName() + ")");
             }
         } else if (isMissionary()) {
             if (hasAbility("model.ability.expertMissionary")) {
-                return getName(getUnitType());
+                return getUnitType().getName();
             } else {
-                return (Messages.message("model.unit.missionary") + " (" + getName(getUnitType()) + ")");
+                return (Messages.message("model.unit.missionary") + " (" + getUnitType().getName() + ")");
             }
         } else if (canCarryTreasure()) {
-            return getName(getUnitType()) + " (" + getTreasureAmount() + " " + Messages.message("gold") + ")";
+            return getUnitType().getName() + " (" + getTreasureAmount() + " " + Messages.message("gold") + ")";
         } else if (isPioneer()) {
             if (hasAbility("model.ability.expertPioneer")) {
-                return getName(getUnitType());
+                return getUnitType().getName();
             } else {
-                return (Messages.message("model.unit.pioneer") + " (" + getName(getUnitType()) + ")");
+                return (Messages.message("model.unit.pioneer") + " (" + getUnitType().getName() + ")");
             }
         } else {
-            return getName(getUnitType());
+            return getUnitType().getName();
         }
 
     }
 
     /**
      * Set the <code>Name</code> value.
-     * 
+     * TODO: Should we still allow this?
      * @param newName The new Name value.
      */
     public void setName(String newName) {
@@ -2514,12 +2514,12 @@ public class Unit extends FreeColGameObject implements Abilities, Locatable, Loc
      * @param someType The type of <code>Unit</code>.
      * @return The given unit type as a String
      * @throws IllegalArgumentException
-     */
+     *//*
     public static String getName(UnitType someType) {
 
         return Messages.message(someType.getName());
     }
-
+*/
     public int getScoreValue() {
         return getScoreValue(type, location);
     }
@@ -2717,16 +2717,8 @@ public class Unit extends FreeColGameObject implements Abilities, Locatable, Loc
         case Unit.IN_COLONY:
             occupationString = "B";
             break;
-/*
-        case Unit.PLOW:
-            occupationString = "P";
-            break;
-        case Unit.BUILD_ROAD:
-            occupationString = "R";
-            break;
-*/
         case Unit.IMPROVING:
-            occupationString = "I"; // Use a generic identifier
+            occupationString = workImprovement.getOccupationString();
             break;
         case Unit.TO_AMERICA:
         case Unit.TO_EUROPE:
@@ -2893,23 +2885,22 @@ public class Unit extends FreeColGameObject implements Abilities, Locatable, Loc
      */
     public boolean canPerformImprovement(TileImprovementType impType) {
         // Is this a valid ImprovementType?
-        if (impType == null || impType.isNatural()){
+        if (impType == null || impType.isNatural()) {
             return false;
         }
         // Check if improvement can be performed on this TileType
         if (!impType.isTileTypeAllowed(getTile().getType())) {
             return false;
         }
-        // Check if improvement is already present and completed
-        if (getTile().getTileItemContainer().findTileImprovementType(impType).isComplete()) {
-            return false;
+        // Check if there is an existing Improvement of this type
+        TileImprovement improvement = getTile().findTileImprovementType(impType);
+        if (improvement == null) {
+            // No improvement found, check if worker can do it
+            return impType.isWorkerAllowed(this);
+        } else {
+            // Has improvement, check if worker can contribute to it
+            return improvement.isWorkerAllowed(this);
         }
-        // Fulfills requirements
-        // Quick fix, replace later
-        if (impType.getExpendedGoodsType() == Goods.TOOLS) {
-            return (getNumberOfTools() >= impType.getExpendedAmount());
-        }
-        return true;
     }
 
     /**
@@ -4312,7 +4303,7 @@ public class Unit extends FreeColGameObject implements Abilities, Locatable, Loc
     }
 
     public static int getNextHammers(int index) {
-        return getNextHammers(FreeCol.getSpecification().unitType(index));
+        return getNextHammers(FreeCol.getSpecification().getUnitType(index));
     }
 
     public static int getNextHammers(UnitType type) {
@@ -4326,7 +4317,7 @@ public class Unit extends FreeColGameObject implements Abilities, Locatable, Loc
     }
 
     public static int getNextTools(int index) {
-        return getNextTools(FreeCol.getSpecification().unitType(index));
+        return getNextTools(FreeCol.getSpecification().getUnitType(index));
     }
 
     public static int getNextTools(UnitType type) {
@@ -4533,10 +4524,9 @@ public class Unit extends FreeColGameObject implements Abilities, Locatable, Loc
      */
     protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
         setID(in.getAttributeValue(null, "ID"));
-
         setName(in.getAttributeValue(null, "name"));
         type = Integer.parseInt(in.getAttributeValue(null, "type"));
-        unitType = FreeCol.getSpecification().unitType(type);
+        unitType = FreeCol.getSpecification().getUnitType(type);
         naval = unitType.hasAbility("model.ability.navalUnit");
         armed = Boolean.valueOf(in.getAttributeValue(null, "armed")).booleanValue();
         mounted = Boolean.valueOf(in.getAttributeValue(null, "mounted")).booleanValue();
@@ -4789,8 +4779,8 @@ public class Unit extends FreeColGameObject implements Abilities, Locatable, Loc
         Iterator<Building> itB = colony.getBuildingIterator();
         while (itB.hasNext()) {
             Building building = itB.next();
-            BuildingType bType = FreeCol.getSpecification().buildingType(building.getType());
-            if (building.isBuilt() && (bType.level(0).hammersRequired > 0 ||
+            BuildingType bType = FreeCol.getSpecification().getBuildingType(building.getType());
+            if (building.isBuilt() && (bType.level(0).getHammersRequired() > 0 ||
                     building.getLevel() > Building.HOUSE)) {
                 buildingList.add(building);
             }

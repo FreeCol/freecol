@@ -108,7 +108,7 @@ public final class RecruitDialog extends FreeColDialog implements ActionListener
             for (int index = 0; index < NUMBER_OF_PERSONS; index++) {
                 UnitType unitType = player.getEurope().getRecruitable(index);
                 int graphicsType = ImageLibrary.getUnitGraphicsType(unitType.getIndex(), false, false, 0, false);
-                person[index].setText(Unit.getName(unitType));
+                person[index].setText(unitType.getName());
                 person[index].setIcon(library.getScaledUnitImageIcon(graphicsType, 0.66f));
 
                 if (recruitPrice > player.getGold()) {

@@ -1856,7 +1856,7 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener {
         }
 
         public String unitText(UnitType type) {
-            String theText = new String(Unit.getName(type) + " (" + Unit.getNextHammers(type) + " "
+            String theText = new String(type.getName() + " (" + Unit.getNextHammers(type) + " "
                     + Messages.message("model.goods.Hammers").toLowerCase());
 
             if (Unit.getNextTools(type) > 0) {

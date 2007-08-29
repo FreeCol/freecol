@@ -16,23 +16,12 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 
-public final class UnitType implements Abilities {
+public final class UnitType extends FreeColGameObjectType implements Abilities {
     public static final  String  COPYRIGHT = "Copyright (C) 2003-2007 The FreeCol Team";
     public static final  String  LICENSE   = "http://www.gnu.org/licenses/gpl.html";
     public static final  String  REVISION  = "$Revision$";
 
     public static final  int  UNDEFINED = Integer.MIN_VALUE;
-    public final int index;
-
-    /**
-     * Describe id here.
-     */
-    private String id;
-
-    /**
-     * Describe name here.
-     */
-    private String name;
 
     /**
      * Describe offence here.
@@ -140,51 +129,7 @@ public final class UnitType implements Abilities {
     private Hashtable<String, Float> prodFactors = new Hashtable<String, Float>();
     
     public UnitType(int index) {
-        this.index = index;
-    }
-
-    public int getIndex() {
-        return index;
-    }
-    
-    /**
-     * Get the <code>Id</code> value.
-     *
-     * @return a <code>String</code> value
-     */
-    public String getId() {
-        return id;
-    }
-
-    /**
-     * Set the <code>Id</code> value.
-     *
-     * @param newId The new Id value.
-     */
-    public void setId(final String newId) {
-        this.id = newId;
-    }
-
-    /**
-     * Get the <code>Name</code> value.
-     *
-     * @return a <code>String</code> value
-     */
-    public String getName() {
-        return name;
-    }
-
-    /**
-     * Set the <code>Name</code> value.
-     *
-     * @param newName The new Name value.
-     */
-    public void setName(final String newName) {
-        this.name = newName;
-    }
-
-    public String getDescription() {
-        return name + ".description";
+        setIndex(index);
     }
 
     /**
@@ -509,7 +454,7 @@ public final class UnitType implements Abilities {
      * @return <code>true</code> if can learn the given UnitType
      */
     public boolean canBeTaught(UnitType unitType) {
-        Upgrade upgrade = upgrades.get(unitType.getName());
+        Upgrade upgrade = upgrades.get(unitType.getID());
         return upgrade != null && upgrade.canBeTaught();
     }
 
@@ -520,7 +465,7 @@ public final class UnitType implements Abilities {
      * @return <code>true</code> if can learn the given UnitType
      */
     public boolean canLearnFromExperience(UnitType unitType) {
-        Upgrade upgrade = upgrades.get(unitType.getName());
+        Upgrade upgrade = upgrades.get(unitType.getID());
         return upgrade != null && upgrade.learnFromExperience;
     }
 
@@ -531,7 +476,7 @@ public final class UnitType implements Abilities {
      * @return <code>true</code> if can learn the given UnitType
      */
     public boolean canLearnFromNatives(UnitType unitType) {
-        Upgrade upgrade = upgrades.get(unitType.getName());
+        Upgrade upgrade = upgrades.get(unitType.getID());
         return upgrade != null && upgrade.learnFromNatives;
     }
 
@@ -542,7 +487,7 @@ public final class UnitType implements Abilities {
      * @return <code>true</code> if can learn the given UnitType
      */
     public boolean canLearnInLostCity(UnitType unitType) {
-        Upgrade upgrade = upgrades.get(unitType.getName());
+        Upgrade upgrade = upgrades.get(unitType.getID());
         return upgrade != null && upgrade.learnInLostCity;
     }
 
@@ -592,7 +537,7 @@ public final class UnitType implements Abilities {
      * @return a <code>int</code> value
      */
     public int getEducationTurns(UnitType unitType) {
-        Upgrade upgrade = upgrades.get(unitType.getName());
+        Upgrade upgrade = upgrades.get(unitType.getID());
         if (upgrade != null) {
             return upgrade.turnsToLearn;
         } else {
@@ -601,9 +546,7 @@ public final class UnitType implements Abilities {
     }
 
     public void readFromXmlElement(Node xml, final Map<String, GoodsType> goodsTypeByRef) {
-        name = Xml.attribute(xml, "name");
-        String[] buffer = name.split("\\.");
-        id = buffer[buffer.length - 1];
+        setID(Xml.attribute(xml, "id"));
         offence = Xml.intAttribute(xml, "offence");
         defence = Xml.intAttribute(xml, "defence");
         movement = Xml.intAttribute(xml, "movement");
@@ -649,14 +592,14 @@ public final class UnitType implements Abilities {
                         upgrade.learnInLostCity = Xml.booleanAttribute(node, "learnInLostCity", false);
                         upgrades.put(educationUnit, upgrade);
                     } else if ("production-bonus".equals(nodeName)) {
-                        String goodsType = Xml.attribute(node, "goods-type");
-                        if (goodsTypeByRef.containsKey(goodsType)) {
+                        String goodsID = Xml.attribute(node, "goods-type");
+                        if (goodsTypeByRef.containsKey(goodsID)) {
                             if (Xml.hasAttribute(node, "bonus")) {
                                 int bonus = Xml.intAttribute(node, "bonus");
-                                prodBonuses.put(goodsType, bonus);
+                                prodBonuses.put(goodsID, bonus);
                             } else if (Xml.hasAttribute(node, "factor")) {
                                 float factor = Xml.floatAttribute(node, "factor");
-                                prodFactors.put(goodsType, factor);
+                                prodFactors.put(goodsID, factor);
                             }
                         }
                     }
@@ -710,11 +653,11 @@ public final class UnitType implements Abilities {
             return 0;
         }
         
-        Integer bonus = prodBonuses.get(goodsType.getName());
+        Integer bonus = prodBonuses.get(goodsType.getID());
         if (bonus != null) {
             base += bonus.intValue();
         } else {
-            Float factor = prodFactors.get(goodsType.getName());
+            Float factor = prodFactors.get(goodsType.getID());
             if (factor != null) {
                 base *= factor.floatValue();
             }

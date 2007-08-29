@@ -226,7 +226,7 @@ public class InGameMenuBar extends FreeColMenuBar {
         menu.add(getMenuItem(BuildColonyAction.ID));
         // Insert all Improvements here:
         for (ImprovementActionType iaType : FreeCol.getSpecification().getImprovementActionTypeList()) {
-            menu.add(getMenuItem(iaType.ID));
+            menu.add(getMenuItem(iaType.getID()));
         }
         /*  Depreciated
         menu.add(getMenuItem(PlowAction.ID));

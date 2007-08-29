@@ -77,21 +77,34 @@ public final class BuildingType {
     /**
      * Gives informations about the different levels a building can have.
      */
-    public static final class Level {
+    public static final class Level extends FreeColGameObjectType {
 
-        public String name;
+        private int hammersRequired;
 
-        public int hammersRequired;
+        private int toolsRequired;
 
-        public int toolsRequired;
+        private int populationRequired;
 
-        public int populationRequired;
+        private int workPlaces;
 
-        public int workPlaces;
+        public int getHammersRequired() {
+            return hammersRequired;
+        }
 
+        public int getToolsRequired() {
+            return toolsRequired;
+        }
+
+        public int getPopulationRequired() {
+            return populationRequired;
+        }
+
+        public int getWorkPlaces() {
+            return workPlaces;
+        }
 
         void readFromXmlElement(Node xml) {
-            name = Xml.attribute(xml, "name");
+            setID(Xml.attribute(xml, "id"));
             hammersRequired = Xml.intAttribute(xml, "hammers-required");
             toolsRequired = Xml.intAttribute(xml, "tools-required");
             populationRequired = Xml.intAttribute(xml, "population-required");

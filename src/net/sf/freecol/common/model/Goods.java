@@ -159,10 +159,10 @@ public class Goods implements Locatable, Ownable, Named {
     public static void initialize(List<GoodsType> goodsList, int numberOfTypes) {
         for (GoodsType g : goodsList) {
             try {
-                Goods.class.getDeclaredField(g.getId().toUpperCase()).set(null, g);
+                Goods.class.getDeclaredField(g.getID().toUpperCase()).set(null, g);
             } catch (Exception e) {
                 logger.warning("Error assigning a GoodsType to Goods." +
-                        g.getId().toUpperCase() + "\n" + e.toString());
+                        g.getID().toUpperCase() + "\n" + e.toString());
             }
         }
         NUMBER_OF_TYPES = numberOfTypes;
@@ -209,7 +209,7 @@ public class Goods implements Locatable, Ownable, Named {
      * @return The name of this type of goods.
      */
     public String getName() {
-        return getName(type);
+        return getType().getName();
     }
 
     /**
@@ -219,9 +219,27 @@ public class Goods implements Locatable, Ownable, Named {
      * @return The name of this type of goods.
      */
     public String getName(boolean sellable) {
-        return getName(type, sellable);
+        return getType().getName(sellable);
     }
 
+    /**
+     * Returns a textual representation of the Good of type <code>type</code>.
+     * @param type  The type of good to return
+     * @return
+     *
+     *//*   COMEBACKHERE
+    public static String getName(GoodsType type) {
+        return type.getName();
+    }
+
+    public static String getName(GoodsType type, boolean sellable) {
+        if (sellable) {
+            return type.getName();
+        } else {
+            return type.getName() + " (" + Messages.message("model.goods.Boycotted") + ")";
+        }
+    }
+*/
     /**
     * Returns the <code>Tile</code> where this <code>Goods</code> is located,
     * or <code>null</code> if it's location is <code>Europe</code>.
@@ -277,24 +295,6 @@ public class Goods implements Locatable, Ownable, Named {
     */
 
     /**
-     * Returns a textual representation of the Good of type <code>type</code>.
-     * @param type  The type of good to return
-     * @return
-     *
-     */
-    public static String getName(GoodsType type) {
-        return Messages.message(type.getName());
-    }
-
-    public static String getName(GoodsType type, boolean sellable) {
-        if (sellable) {
-            return getName(type);
-        } else {
-            return getName(type) + " (" + Messages.message("model.goods.Boycotted") + ")";
-        }
-    }
-
-    /**
     * Sets the location of the goods.
     * @param location The new location of the goods,
     */
@@ -316,7 +316,7 @@ public class Goods implements Locatable, Ownable, Named {
             this.location = location;
         } catch (IllegalStateException e) {
             throw new IllegalStateException("Could not move the goods of type: "
-                    + getName(getType()) + " (" + type + ") with amount: " + getAmount() + " from "
+                    + getType().getName() + " (" + type + ") with amount: " + getAmount() + " from "
                     + this.location + " to " + location, e);
         }
     }

@@ -1016,7 +1016,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         case LostCityRumour.LEARN:
             random = getPseudoRandom().nextInt(learntUnitTypes.size());
             unit.setType(learntUnitTypes.get(random));
-            rumourElement.setAttribute("unitType", learntUnitTypes.get(random).getId());
+            rumourElement.setAttribute("unitType", learntUnitTypes.get(random).getID());
             break;
         case LostCityRumour.TRIBAL_CHIEF:
             int amount = getPseudoRandom().nextInt(dx * 10) + dx * 5;

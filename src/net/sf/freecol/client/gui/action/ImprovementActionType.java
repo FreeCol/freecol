@@ -23,12 +23,12 @@ public final class ImprovementActionType
 
     public static final  String  REVISION = "$Revision: 2889 $";
 
-    public String ID;
-    public char accelerator;
+    private String id;
+    private char accelerator;
     
-    public final List<String> names;
-    public final List<TileImprovementType> impTypes;
-    public final List<Integer> imageIDs;
+    private final List<String> names;
+    private final List<TileImprovementType> impTypes;
+    private final List<Integer> imageIDs;
     
     // ------------------------------------------------------------ constructors
     
@@ -40,10 +40,30 @@ public final class ImprovementActionType
 
     // ------------------------------------------------------------ retrieval methods
 
+    public String getID() {
+        return id;
+    }
+
+    public char getAccelerator() {
+        return accelerator;
+    }
+
+    public List<String> getNames() {
+        return names;
+    }
+
+    public List<TileImprovementType> getImpTypes() {
+        return impTypes;
+    }
+    
+    public List<Integer> getImageIDs() {
+        return imageIDs;
+    }
+
     // ------------------------------------------------------------ API methods
 
     public void readFromXmlElement(Node xml, final Map<String, TileImprovementType> tileImprovementTypeByRef) {
-        ID = Xml.attribute(xml, "id");
+        id = Xml.attribute(xml, "id");
         accelerator = Xml.charAttribute(xml, "accelerator");
 
         Xml.Method method = new Xml.Method() {

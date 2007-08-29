@@ -133,8 +133,8 @@ public final class Colony extends Settlement implements Location, Nameable {
         addWorkLocation(new ColonyTile(game, this, tile));
         int numberOfTypes = FreeCol.getSpecification().numberOfBuildingTypes();
         for (int type = 0; type < numberOfTypes; type++) {
-            BuildingType buildingType = FreeCol.getSpecification().buildingType(type);
-            if (buildingType.level(0).hammersRequired > 0) {
+            BuildingType buildingType = FreeCol.getSpecification().getBuildingType(type);
+            if (buildingType.level(0).getHammersRequired() > 0) {
                 addWorkLocation(new Building(game, this, type, Building.NOT_BUILT));
             } else {
                 addWorkLocation(new Building(game, this, type, Building.HOUSE));
@@ -633,15 +633,15 @@ public final class Colony extends Settlement implements Location, Nameable {
     public int getGoodsCount(GoodsType type) {
         if (type.isStorable()) {
             return goodsContainer.getGoodsCount(type);
-        } else if (type.storedAs != null) {
-            return goodsContainer.getGoodsCount(type.storedAs);
+        } else if (type.getStoredAs() != null) {
+            return goodsContainer.getGoodsCount(type.getStoredAs());
         } else {
             if (type == Goods.HAMMERS) {
                 return getHammers();
             } else if (type == Goods.BELLS) {
                 return getBells();
             } else {
-                logger.warning(Goods.getName(type) + " is not stored in this Colony!");
+                logger.warning(type.getName() + " is not stored in this Colony!");
                 return 0;
             }
         }
@@ -668,15 +668,15 @@ public final class Colony extends Settlement implements Location, Nameable {
     public void addGoods(GoodsType type, int amount) {
         if (type.isStorable()) {
             goodsContainer.addGoods(type, amount);
-        } else if (type.storedAs != null) {
-                goodsContainer.addGoods(type.storedAs, amount);
+        } else if (type.getStoredAs() != null) {
+                goodsContainer.addGoods(type.getStoredAs(), amount);
         } else {
             if (type == Goods.HAMMERS) {
                 addHammers(amount);
             } else if (type == Goods.BELLS) {
                 addBells(amount);
             } else {
-                logger.warning(Goods.getName(type) + " cannot be stored in this Colony!");
+                logger.warning(type.getName() + " cannot be stored in this Colony!");
             }
         }
     }
@@ -1224,7 +1224,7 @@ public final class Colony extends Settlement implements Location, Nameable {
         lastVisited = getGame().getTurn().getNumber();
         if (getCurrentlyBuilding() >= Colony.BUILDING_UNIT_ADDITION) {
             int unitTypeIndex = getCurrentlyBuilding() - BUILDING_UNIT_ADDITION;
-            UnitType unitType = FreeCol.getSpecification().unitType(unitTypeIndex);
+            UnitType unitType = FreeCol.getSpecification().getUnitType(unitTypeIndex);
             if (canBuildUnit(unitType) && Unit.getNextHammers(unitType) <= getHammers()
                     && Unit.getNextHammers(unitType) != -1) {
                 if (Unit.getNextTools(unitTypeIndex) <= getGoodsCount(Goods.TOOLS)) {
@@ -1238,7 +1238,7 @@ public final class Colony extends Settlement implements Location, Nameable {
                     addModelMessage(this, "model.colony.itemNeedTools",
                                     new String[][] {
                                         { "%colony%", getName() },
-                                        { "%item%", Unit.getName(unitType) } },
+                                        { "%item%", unitType.getName() } },
                                     ModelMessage.MISSING_GOODS, new Goods(Goods.TOOLS));
                 }
             }

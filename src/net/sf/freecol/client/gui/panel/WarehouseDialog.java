@@ -161,7 +161,7 @@ public final class WarehouseDialog extends FreeColDialog implements ActionListen
 
             setLayout(new HIGLayout(widths, heights));
             setOpaque(false);
-            setBorder(BorderFactory.createCompoundBorder(BorderFactory.createTitledBorder(Goods.getName(goodsType)),
+            setBorder(BorderFactory.createCompoundBorder(BorderFactory.createTitledBorder(goodsType.getName()),
                     BorderFactory.createEmptyBorder(6, 6, 6, 6)));
 
             // goods label

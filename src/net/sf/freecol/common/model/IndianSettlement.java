@@ -1270,7 +1270,7 @@ public class IndianSettlement extends Settlement {
             }
             for (int i = 0; i < wantedGoods.length; i++) {
                 String tag = "wantedGoods" + Integer.toString(i);
-                out.writeAttribute(tag, wantedGoods[i].getName());
+                out.writeAttribute(tag, wantedGoods[i].getID());
             }
 
         }
@@ -1363,11 +1363,11 @@ public class IndianSettlement extends Settlement {
                     alarm[i] = new Tension(tensionArray[i]);
                 }
             } else if (in.getLocalName().equals("wantedGoods")) {
-                int[] wantedGoodsIndex = readFromArrayElement("wantedGoods", in, new int[0]);
-                for (int i = 0; i < wantedGoodsIndex.length; i++) {
+                String[] wantedGoodsID = readFromArrayElement("wantedGoods", in, new String[0]);
+                for (int i = 0; i < wantedGoodsID.length; i++) {
                     if (i == 3)
                         break;
-                    wantedGoods[i] = FreeCol.getSpecification().getGoodsType(wantedGoodsIndex[i]);
+                    wantedGoods[i] = FreeCol.getSpecification().getGoodsType(wantedGoodsID[i]);
                 }
             } else if (in.getLocalName().equals("missionary")) {
                 in.nextTag();

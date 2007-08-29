@@ -138,7 +138,8 @@ public final class Specification {
                         int impIndex = 0;
                         public TileImprovementType objectFrom(Node xml) {
                             TileImprovementType tileImprovementType = new TileImprovementType(impIndex++);
-                            tileImprovementType.readFromXmlElement(xml, tileTypeList, tileTypeByRef, goodsTypeByRef);
+                            tileImprovementType.readFromXmlElement(xml, tileTypeList,
+                                                    tileTypeByRef, goodsTypeByRef, tileImprovementTypeByRef);
                             tileImprovementTypeByRef.put(Xml.attribute(xml, "id"), tileImprovementType);
                             return tileImprovementType;
                         }
@@ -228,16 +229,6 @@ public final class Specification {
     }
 
     /**
-     * Describe <code>buildingType</code> method here.
-     *
-     * @param buildingTypeIndex an <code>int</code> value
-     * @return a <code>BuildingType</code> value
-     */
-    public BuildingType buildingType(int buildingTypeIndex) {
-        return buildingTypeList.get(buildingTypeIndex);
-    }
-
-    /**
      * Describe <code>getBuildingType</code> method here.
      *
      * @param buildingTypeIndex an <code>int</code> value
@@ -319,9 +310,9 @@ public final class Specification {
      * @param name a <code>String</code> value
      * @return a <code>GoodsType</code> value
      */
-    public GoodsType getGoodsType(String name) {
+    public GoodsType getGoodsType(String id) {
         for (GoodsType g : goodsTypeList) {
-            if (g.getName().equals(name)) {
+            if (g.getID().equals(id)) {
                 return g;
             }
         }
@@ -375,9 +366,9 @@ public final class Specification {
         return resourceTypeList.get(index);
     }
 
-    public ResourceType getResourceType(String name) {
+    public ResourceType getResourceType(String id) {
         for (ResourceType r : resourceTypeList) {
-            if (r.getName().equals(name)) {
+            if (r.getID().equals(id)) {
                 return r;
             }
         }
@@ -397,9 +388,9 @@ public final class Specification {
         return tileTypeList.get(index);
     }
 
-    public TileType getTileType(String name) {
+    public TileType getTileType(String id) {
         for (TileType t : tileTypeList) {
-            if (t.getName().equals(name)) {
+            if (t.getID().equals(id)) {
                 return t;
             }
         }
@@ -415,9 +406,9 @@ public final class Specification {
         return tileImprovementTypeList.get(index);
     }
 
-    public TileImprovementType getTileImprovementType(String name) {
+    public TileImprovementType getTileImprovementType(String id) {
         for (TileImprovementType ti : tileImprovementTypeList) {
-            if (ti.getName().equals(name)) {
+            if (ti.getID().equals(id)) {
                 return ti;
             }
         }
@@ -435,7 +426,7 @@ public final class Specification {
 
     public ImprovementActionType getImprovementActionType(String id) {
         for (ImprovementActionType ia : improvementActionTypeList) {
-            if (ia.ID.equals(id)) {
+            if (ia.getID().equals(id)) {
                 return ia;
             }
         }
@@ -451,7 +442,7 @@ public final class Specification {
         return unitTypeList.size();
     }
 
-    public UnitType unitType(int unitTypeIndex) {
+    public UnitType getUnitType(int unitTypeIndex) {
         return unitTypeList.get(unitTypeIndex);
     }
 
@@ -459,13 +450,9 @@ public final class Specification {
         return unitTypeList.indexOf(b);
     }
 
-    public UnitType getUnitType(int unitTypeIndex) {
-        return unitTypeList.get(unitTypeIndex);
-    }
-
-    public UnitType getUnitType(String name) {
+    public UnitType getUnitType(String id) {
         for (UnitType u : unitTypeList) {
-            if (u.getName().equals(name)) {
+            if (u.getID().equals(id)) {
                 return u;
             }
         }
@@ -514,7 +501,7 @@ public final class Specification {
         return foundingFathers.size();
     }
 
-    public FoundingFather foundingFather(int foundingFatherIndex) {
+    public FoundingFather getFoundingFather(int foundingFatherIndex) {
         return foundingFathers.get(foundingFatherIndex);
     }
 
@@ -524,7 +511,7 @@ public final class Specification {
 
     public FoundingFather getFoundingFather(String id) {
         for (FoundingFather father : foundingFathers) {
-            if (father.getId().equals(id)) {
+            if (father.getID().equals(id)) {
                 return father;
             }
         }

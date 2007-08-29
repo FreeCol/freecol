@@ -171,8 +171,8 @@ public final class ReportColonyPanel extends ReportPanel implements ActionListen
             }
         }
         if (currentType >= Colony.BUILDING_UNIT_ADDITION) {
-            UnitType unitType = FreeCol.getSpecification().unitType(currentType - Colony.BUILDING_UNIT_ADDITION);
-            JLabel unitLabel = new JLabel(Unit.getName(unitType));
+            UnitType unitType = FreeCol.getSpecification().getUnitType(currentType - Colony.BUILDING_UNIT_ADDITION);
+            JLabel unitLabel = new JLabel(unitType.getName());
             unitLabel.setForeground(Color.GRAY);
             buildingPanel.add(unitLabel);
         }

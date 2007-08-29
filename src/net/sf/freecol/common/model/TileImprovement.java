@@ -134,7 +134,7 @@ public class TileImprovement extends TileItem implements Locatable, Named {
     * Returns a textual representation of this object.
     * @return A <code>String</code> of either:
     * <ol>
-    * <li>NAME (TURNS turns left) (eg. Road (2 turns left) ) if it is under construction
+    * <li>NAME (#TURNS turns left) (eg. Road (2 turns left) ) if it is under construction
     * <li>NAME (eg. Road) if it is complete
     * </ol>
     */
@@ -147,11 +147,15 @@ public class TileImprovement extends TileItem implements Locatable, Named {
     }
 
     /**
-     * Returns the name of this type of Improvement.
-     * @return The name of this type of Improvement.
+     * Returns the name of this TileImprovement.
+     * @return The name of this TileImprovement.
      */
     public String getName() {
-        return ""; //getName(type);
+        return getType().getName();
+    }
+
+    public String getOccupationString() {
+        return type.getOccupationString();
     }
 
     /**
@@ -346,6 +350,19 @@ public class TileImprovement extends TileItem implements Locatable, Named {
     }
 
     /**
+     * Checks if a given worker can work at this Improvement
+     */
+    public boolean isWorkerAllowed(Unit unit) {
+        if (unit == null) {
+            return false;
+        }
+        if (isComplete()) {
+            return false;
+        }
+        return type.isWorkerAllowed(unit);
+    }
+
+    /**
      * Disposes this improvement.
      */
     @Override
@@ -387,7 +404,7 @@ public class TileImprovement extends TileItem implements Locatable, Named {
         // Add attributes:
         out.writeAttribute("ID", getID());
         out.writeAttribute("tile", getTile().getID());
-        out.writeAttribute("type", Integer.toString(type.getIndex()));
+        out.writeAttribute("type", getType().getID());
         out.writeAttribute("turns", Integer.toString(turnsToComplete));
         out.writeAttribute("magnitude", Integer.toString(magnitude));
         out.writeAttribute("style", Integer.toString(style));
@@ -410,7 +427,7 @@ public class TileImprovement extends TileItem implements Locatable, Named {
         if (tile == null) {
             tile = new Tile(getGame(), in.getAttributeValue(null, "tile"));
         }
-        type = FreeCol.getSpecification().getTileImprovementType(Integer.parseInt(in.getAttributeValue(null, "type")));
+        type = FreeCol.getSpecification().getTileImprovementType(in.getAttributeValue(null, "type"));
         turnsToComplete = Integer.parseInt(in.getAttributeValue(null, "turns"));
         magnitude = Integer.parseInt(in.getAttributeValue(null, "magnitude"));
         style = Integer.parseInt(in.getAttributeValue(null, "style"));

@@ -782,15 +782,15 @@ public class FreeColDialog extends FreeColPanel {
         String skillName = "";
         if (skillType != null) {
             messageID = "scoutSettlement.question1";
-            skillName = Unit.getName(skillType).toLowerCase();
+            skillName = skillType.getName().toLowerCase();
         } else {
             messageID = "scoutSettlement.question2";
         }
         String[] data = new String [] {
             "%replace_skill%", skillName,
-            "%replace_good1%", Goods.getName(settlement.getHighlyWantedGoods()),
-            "%replace_good2%", Goods.getName(settlement.getWantedGoods1()),
-            "%replace_good3%", Goods.getName(settlement.getWantedGoods2())};
+            "%replace_good1%", settlement.getHighlyWantedGoods().getName(),
+            "%replace_good2%", settlement.getWantedGoods1().getName(),
+            "%replace_good3%", settlement.getWantedGoods2().getName()};
     
         String mainText = Messages.message(messageID, data);
 

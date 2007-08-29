@@ -104,6 +104,14 @@ public final class Xml
         return attribute(xmlElement, attributeName).charAt(0);
     }
 
+    public static char charAttribute( Node xmlElement, String attributeName, char otherwise ) {
+        if (hasAttribute(xmlElement, attributeName)) {
+            return charAttribute(xmlElement, attributeName);
+        } else {
+            return otherwise;
+        }
+    }
+
     /*
     public static String messageAttribute( Node xmlElement, String attributeName ) {
 

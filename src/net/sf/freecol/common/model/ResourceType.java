@@ -11,43 +11,31 @@ import net.sf.freecol.common.util.Xml;
 import org.w3c.dom.Node;
 
 
-public final class ResourceType
+public final class ResourceType extends FreeColGameObjectType
 {
     public static final  String  COPYRIGHT = "Copyright (C) 2003-2006 The FreeCol Team";
     public static final  String  LICENSE = "http://www.gnu.org/licenses/gpl.html";
     public static final  String  REVISION = "$Revision: 1.00 $";
 
-    public int       index;
-    public String    id;
-    public String    name;
+    private String art;
 
-    public String    art;
-
-    public int       minValue;
-    public int       maxValue;
+    private int minValue;
+    private int maxValue;
 
     private List<GoodsType> bonusGoods;
-    private List<Integer>   bonusAmount;
-    private List<Float>     bonusFactor;
+    private List<Integer> bonusAmount;
+    private List<Float> bonusFactor;
 
     // ------------------------------------------------------------ constructors
 
     public ResourceType(int index) {
-        this.index = index;
+        setIndex(index);
     }
 
     // ------------------------------------------------------------ retrieval methods
 
-    public int getIndex() {
-        return index;
-    }
-    
-    public String getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
+    public String getArt() {
+        return art;
     }
 
     public int getRandomValue() {
@@ -80,6 +68,10 @@ public final class ResourceType
 
     public List<Integer> getBonusAmountList() {
         return bonusAmount;
+    }
+
+    public List<Float> getBonusFactorList() {
+        return bonusFactor;
     }
 
     public GoodsType getBestGoodsType() {
@@ -120,9 +112,7 @@ public final class ResourceType
 
     public void readFromXmlElement(Node xml, final Map<String, GoodsType> goodsTypeByRef) {
 
-        name = Xml.attribute(xml, "id");
-        String[] buffer = name.split("\\.");
-        id = buffer[buffer.length - 1];
+        setID(Xml.attribute(xml, "id"));
         art = Xml.attribute(xml, "art");
         if ( Xml.hasAttribute(xml, "maximum-value") ) {
             maxValue = Xml.intAttribute(xml, "maximum-value");

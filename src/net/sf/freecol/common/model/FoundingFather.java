@@ -14,7 +14,7 @@ import net.sf.freecol.common.util.Xml;
 * Represents one founding father to be contained in a Player object.
 * Stateful information is in the Player object.
 */
-public class FoundingFather implements Abilities {
+public class FoundingFather extends FreeColGameObjectType implements Abilities {
 
     public static final String  COPYRIGHT = "Copyright (C) 2003-2005 The FreeCol Team";
     public static final String  LICENSE = "http://www.gnu.org/licenses/gpl.html";
@@ -49,13 +49,6 @@ public class FoundingFather implements Abilities {
 
                             FATHER_COUNT = 25;
 
-    /**
-     * Describe id here.
-     */
-    private String id;
-
-    private final int index;
-
     private int[] weight = new int[4];
 
     private int type;
@@ -78,45 +71,15 @@ public class FoundingFather implements Abilities {
      * @param newIndex an <code>int</code> value
      */
     public FoundingFather(int newIndex) {
-        this.index = newIndex;
-    }
-
-    public final int getIndex() {
-        return index;
-    }
-
-    /**
-     * Get the <code>Id</code> value.
-     *
-     * @return a <code>String</code> value
-     */
-    public final String getId() {
-        return id;
-    }
-
-    /**
-     * Set the <code>Id</code> value.
-     *
-     * @param newId The new Id value.
-     */
-    public final void setId(final String newId) {
-        this.id = newId;
-    }
-
-    public String getName() {
-        return Messages.message(id + ".name");
-    }
-
-    public String getDescription() {
-        return Messages.message(id + ".description");
+        setIndex(newIndex);
     }
 
     public String getText() {
-        return Messages.message(id + ".text");
+        return Messages.message(getID() + ".text");
     }
 
     public String getBirthAndDeath() {
-        return Messages.message(id + ".birthAndDeath");
+        return Messages.message(getID() + ".birthAndDeath");
     }
 
     public int getType() {
@@ -191,7 +154,7 @@ public class FoundingFather implements Abilities {
 
     public void readFromXmlElement(Node xml, Map<String, GoodsType> goodsTypeByRef) {
 
-        id = Xml.attribute(xml, "id");
+        setID(Xml.attribute(xml, "id"));
         String typeString = Xml.attribute(xml, "type");
         if ("trade".equals(typeString)) {
             type = TRADE;

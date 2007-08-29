@@ -2573,7 +2573,7 @@ public class Player extends FreeColGameObject implements Abilities, Nameable {
             out.writeAttribute("crosses", Integer.toString(crosses));
             out.writeAttribute("bells", Integer.toString(bells));
             if (currentFather != null) {
-                out.writeAttribute("currentFather", currentFather.getId());
+                out.writeAttribute("currentFather", currentFather.getID());
             }
             out.writeAttribute("crossesRequired", Integer.toString(crossesRequired));
             out.writeAttribute("attackedByPrivateers", Boolean.toString(attackedByPrivateers));
@@ -2675,7 +2675,7 @@ public class Player extends FreeColGameObject implements Abilities, Nameable {
         if (foundingFathersStr != null) {
             for (int i = 0; i < foundingFathersStr.length(); i++) {
                 if (foundingFathersStr.charAt(i) == '1') {
-                    addFather(FreeCol.getSpecification().foundingFather(i));
+                    addFather(FreeCol.getSpecification().getFoundingFather(i));
                 }
             }
         }

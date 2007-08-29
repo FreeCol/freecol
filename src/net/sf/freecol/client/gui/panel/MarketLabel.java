@@ -137,10 +137,10 @@ public final class MarketLabel extends JLabel implements ActionListener {
 
         Player player = market.getGame().getViewOwner();
         if (player == null || player.canTrade(type)) {
-            setToolTipText(Goods.getName(type));
+            setToolTipText(type.getName());
             setEnabled(true);
         } else {
-            setToolTipText(Goods.getName(type, false));
+            setToolTipText(type.getName(false));
             setEnabled(false);
         }
 

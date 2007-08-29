@@ -226,7 +226,7 @@ public final class AIInGameInputHandler implements MessageHandler, StreamedMessa
 
         FoundingFather foundingFather = getAIPlayer().selectFoundingFather(possibleFoundingFathers);
         Element reply = Message.createNewRootElement("chosenFoundingFather");
-        reply.setAttribute("foundingFather", foundingFather.getId());
+        reply.setAttribute("foundingFather", foundingFather.getID());
         serverPlayer.setCurrentFather(foundingFather);
 
         return reply;

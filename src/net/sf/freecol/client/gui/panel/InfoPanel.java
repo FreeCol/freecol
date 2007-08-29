@@ -324,7 +324,7 @@ public final class InfoPanel extends FreeColPanel {
             for (GoodsType goodsType : production) {
                 JLabel goodsLabel = new JLabel(String.valueOf(tile.potential(goodsType)),
                         library.getScaledGoodsImageIcon(goodsType, 0.50f), JLabel.RIGHT);
-                goodsLabel.setToolTipText(Goods.getName(goodsType));
+                goodsLabel.setToolTipText(goodsType.getName());
                 goodsLabel.setFont(goodsLabel.getFont().deriveFont(9f));
                 goodsPanel.add(goodsLabel, higConst.rc(row, counter));
                 if (counter == 3) {

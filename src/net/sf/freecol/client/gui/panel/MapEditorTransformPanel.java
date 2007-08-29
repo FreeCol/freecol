@@ -91,7 +91,7 @@ public final class MapEditorTransformPanel extends FreeColPanel {
     private void buildList() {
         List<TileType> tileList = FreeCol.getSpecification().getTileTypeList();
         for (TileType type : tileList) {
-            buildButton(type.index, Tile.getName(type), new TileTypeTransform(type));
+            buildButton(type.getIndex(), type.getName(), new TileTypeTransform(type));
         }
         buildButton(MINOR_RIVER, "Minor River", new RiverTransform(MINOR_RIVER));
         buildButton(MAJOR_RIVER, "Major River", new RiverTransform(MAJOR_RIVER));

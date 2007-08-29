@@ -86,7 +86,7 @@ public final class DragListener extends MouseAdapter {
                         int maxpotential = colony.getVacantColonyTileProductionFor(tempUnit, goodsType);
                         if (maxpotential > 0) {
                             menuItem = new JMenuItem(Messages.message(messages[goodsType.getIndex()]) +
-                                                     " (" + maxpotential + " " + Goods.getName(goodsType) + ")",
+                                                     " (" + maxpotential + " " + goodsType.getName() + ")",
                                                      imageLibrary.getScaledGoodsImageIcon(goodsType, 0.66f));
                             menuItem.setActionCommand(String.valueOf(goodsType.getIndex()));
                             menuItem.addActionListener(unitLabel);
@@ -112,7 +112,7 @@ public final class DragListener extends MouseAdapter {
                                         // Not reaching full potential, show full potential
                                         locName += "/" + potential;
                                     }
-                                    locName +=  " " + Goods.getName(goodsType)+")";
+                                    locName +=  " " + goodsType.getName()+")";
                                     menuItem.setText(locName);
                                 }
                                 menuItem.setActionCommand(String.valueOf(UnitLabel.WORK_AT_SOMEWHERE+building.getType()));

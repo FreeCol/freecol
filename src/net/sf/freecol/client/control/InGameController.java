@@ -830,7 +830,7 @@ public final class InGameController implements NetworkConstants {
             int amountPresent = warehouse.getGoodsCount(goodsType) - exportLevel[goodsType.getIndex()];
             if (amountPresent > 0) {
                 if (unit.getSpaceLeft() > 0) {
-                    logger.finest("Automatically loading goods " + Goods.getName(goodsType));
+                    logger.finest("Automatically loading goods " + goodsType.getName());
                     loadCargo(new Goods(freeColClient.getGame(), location, goodsType,
                             Math.min(amountPresent, 100)), unit);
                 }
@@ -891,7 +891,7 @@ public final class InGameController implements NetworkConstants {
         // load cargo that should be on board
         for (GoodsType goodsType : goodsTypesToLoad) {
             if (unit.getSpaceLeft() > 0) {
-                logger.finest("Automatically loading goods " + Goods.getName(goodsType));
+                logger.finest("Automatically loading goods " + goodsType.getName());
                 buyGoods(goodsType, 100, unit);
             }
         }
@@ -2498,7 +2498,7 @@ public final class InGameController implements NetworkConstants {
                     skillName = null;
                 } else {
                     skill = FreeCol.getSpecification().getUnitType(Integer.parseInt(skillStr));
-                    skillName = Unit.getName(skill);
+                    skillName = skill.getName();
                 }
             } else {
                 logger.warning("Server gave an invalid reply to an askSkill message");

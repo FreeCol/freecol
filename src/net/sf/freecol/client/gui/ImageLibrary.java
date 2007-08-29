@@ -351,39 +351,39 @@ public final class ImageLibrary extends ImageProvider {
         coast2 = new Hashtable<String, Vector<ImageIcon>>();
         
         for (TileType type : FreeCol.getSpecification().getTileTypeList()) {
-            String filePath = dataDirectory + path + type.artBasic + "center0" + extension;
+            String filePath = dataDirectory + path + type.getArtBasic() + "center0" + extension;
             terrain1.put(type.getName(), findImage(filePath, resourceLocator, doLookup));
-            filePath = dataDirectory + path + type.artBasic + "center1" + extension;
+            filePath = dataDirectory + path + type.getArtBasic() + "center1" + extension;
             terrain2.put(type.getName(), findImage(filePath, resourceLocator, doLookup));
 
-            if (type.artOverlay != null) {
-                filePath = dataDirectory + path + type.artOverlay + "0" + extension;
+            if (type.getArtOverlay() != null) {
+                filePath = dataDirectory + path + type.getArtOverlay() + "0" + extension;
                 overlay1.put(type.getName(), findImage(filePath, resourceLocator, doLookup));
-                filePath = dataDirectory + path + type.artOverlay + "1" + extension;
+                filePath = dataDirectory + path + type.getArtOverlay() + "1" + extension;
                 overlay2.put(type.getName(), findImage(filePath, resourceLocator, doLookup));
             }
             
             Vector<ImageIcon> tempVector1 = new Vector<ImageIcon>();
             Vector<ImageIcon> tempVector2 = new Vector<ImageIcon>();
             for (int c = 1; c <= 8; c++) {
-                filePath = dataDirectory + path + type.artBasic + "border" + c + "0" + extension;
+                filePath = dataDirectory + path + type.getArtBasic() + "border" + c + "0" + extension;
                 tempVector1.add(findImage(filePath, resourceLocator, doLookup));
 
-                filePath = dataDirectory + path + type.artBasic + "border" + c + "1" + extension;
+                filePath = dataDirectory + path + type.getArtBasic() + "border" + c + "1" + extension;
                 tempVector2.add(findImage(filePath, resourceLocator, doLookup));
             }
 
             border1.put(type.getName(), tempVector1);
             border2.put(type.getName(), tempVector2);
             
-            if (type.artCoast != null) {
+            if (type.getArtCoast() != null) {
                 tempVector1 = new Vector<ImageIcon>();
                 tempVector2 = new Vector<ImageIcon>();
                 for (int c = 1; c <= 8; c++) {
-                    filePath = dataDirectory + path + type.artCoast + "border" + c + "0" + extension;
+                    filePath = dataDirectory + path + type.getArtCoast() + "border" + c + "0" + extension;
                     tempVector1.add(findImage(filePath, resourceLocator, doLookup));
 
-                    filePath = dataDirectory + path + type.artCoast + "border" + c + "1" + extension;
+                    filePath = dataDirectory + path + type.getArtCoast() + "border" + c + "1" + extension;
                     tempVector2.add(findImage(filePath, resourceLocator, doLookup));
                 }
                 
@@ -488,8 +488,8 @@ public final class ImageLibrary extends ImageProvider {
         forests = new Hashtable<String, ImageIcon>();
         
         for (TileType type : FreeCol.getSpecification().getTileTypeList()) {
-            if (type.artForest != null) {
-                String filePath = dataDirectory + path + type.artForest;
+            if (type.getArtForest() != null) {
+                String filePath = dataDirectory + path + type.getArtForest();
                 forests.put(type.getName(), findImage(filePath, resourceLocator, doLookup));
             }
         }
@@ -673,7 +673,7 @@ public final class ImageLibrary extends ImageProvider {
         bonus = new Hashtable<String, ImageIcon>();
         
         for (ResourceType type : FreeCol.getSpecification().getResourceTypeList()) {
-            String filePath = dataDirectory + path + type.art;
+            String filePath = dataDirectory + path + type.getArt();
             bonus.put(type.getName(), findImage(filePath, resourceLocator, doLookup));
         }
         /*for (int i = 0; i < BONUS_COUNT; i++) {
@@ -991,7 +991,7 @@ public final class ImageLibrary extends ImageProvider {
         int width = getTerrainImageWidth(type);
         int height = getTerrainImageHeight(type);
         // Currently used for hills and mountains
-        if (type.artOverlay != null) {
+        if (type.getArtOverlay() != null) {
             BufferedImage compositeImage = gc.createCompatibleImage(width, height, Transparency.TRANSLUCENT);
             Graphics2D g = compositeImage.createGraphics();
             g.drawImage(terrainImage, 0, 0, null);

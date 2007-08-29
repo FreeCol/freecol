@@ -132,7 +132,7 @@ public final class ProductionLabel extends JComponent {
             goodsIcon = parent.getImageProvider().getGoodsImageIcon(goodsType);
             compressedWidth = goodsIcon.getIconWidth()*2;
         }
-        setToolTipText(String.valueOf(amount) + " " + Goods.getName(goodsType));
+        setToolTipText(String.valueOf(amount) + " " + goodsType.getName());
     }
     
 
@@ -197,7 +197,7 @@ public final class ProductionLabel extends JComponent {
      */
     public void setProduction(final int newProduction) {
         this.production = newProduction;
-        setToolTipText(String.valueOf(production) + " " + Goods.getName(goodsType));
+        setToolTipText(String.valueOf(production) + " " + goodsType.getName());
     }
 
     /**
