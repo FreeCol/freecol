@@ -449,7 +449,10 @@ public class GoodsContainer extends FreeColGameObject {
         storedGoods = new int[FreeCol.getSpecification().numberOfGoodsTypes()];
 
         for (int i=0; i<storedGoods.length; i++) {
-            storedGoods[i] = Integer.parseInt(in.getAttributeValue(null, "goods" + Integer.toString(i)));
+            String goodsString = in.getAttributeValue(null, "goods" + Integer.toString(i));
+            if (goodsString != null) {
+                storedGoods[i] = Integer.parseInt(goodsString);
+            }
         }
 
         in.nextTag();
