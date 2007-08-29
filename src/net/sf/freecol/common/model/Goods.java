@@ -35,7 +35,7 @@ import org.xml.sax.SAXException;
 /**
 * Represents a locatable goods of a specified type and amount.
 */
-public class Goods implements Locatable, Ownable, Nameable {
+public class Goods implements Locatable, Ownable, Named {
 
     public static final String  COPYRIGHT = "Copyright (C) 2003-2005 The FreeCol Team";
     public static final String  LICENSE = "http://www.gnu.org/licenses/gpl.html";
@@ -210,15 +210,6 @@ public class Goods implements Locatable, Ownable, Nameable {
      */
     public String getName() {
         return getName(type);
-    }
-
-    /**
-     * This method does not do anything.
-     *
-     * @param newName The new Name value.
-     */
-    public void setName(String newName) {
-        // this.name = newName;
     }
 
     /**

@@ -34,7 +34,7 @@ import org.xml.sax.SAXException;
 /**
 * Represents a locatable goods of a specified type and quantity.
 */
-public class TileImprovement extends TileItem implements Locatable, Nameable {
+public class TileImprovement extends TileItem implements Locatable, Named {
 
     public static final String  COPYRIGHT = "Copyright (C) 2003-2005 The FreeCol Team";
     public static final String  LICENSE = "http://www.gnu.org/licenses/gpl.html";
@@ -152,14 +152,6 @@ public class TileImprovement extends TileItem implements Locatable, Nameable {
      */
     public String getName() {
         return ""; //getName(type);
-    }
-
-    /**
-    * Does nothing.
-    * @param newName The new name for the <code>Nameable</code>.
-    */
-    public void setName(String newName) {
-        // this.name = newName;
     }
 
     /**

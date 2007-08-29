@@ -24,7 +24,7 @@ import org.w3c.dom.Element;
  * 
  * @see Map
  */
-public final class Tile extends FreeColGameObject implements Location, Nameable {
+public final class Tile extends FreeColGameObject implements Location, Named {
     private static final Logger logger = Logger.getLogger(Tile.class.getName());
 
     public static final String COPYRIGHT = "Copyright (C) 2003-2005 The FreeCol Team";
@@ -33,13 +33,6 @@ public final class Tile extends FreeColGameObject implements Location, Nameable 
 
     public static final String REVISION = "$Revision$";
 
-    /*    // The type of a Tile can be one of the following.
-          public static final int UNEXPLORED = 0, PLAINS = 1, GRASSLANDS = 2, PRAIRIE = 3, SAVANNAH = 4, MARSH = 5,
-          SWAMP = 6, DESERT = 7, TUNDRA = 8, ARCTIC = 9, OCEAN = 10, HIGH_SEAS = 11, HILLS = 12, MOUNTAINS = 13,
-          TILE_COUNT = 14,
-          // These types are extra terrain types that are used in ImageLibrary
-          BEACH = 14, FOREST = 15, TERRAIN_COUNT = 16;
-    */
     // TODO: remove
     // An addition onto the tile can be one of the following:
     public static final int ADD_NONE = 0, ADD_RIVER_MINOR = 1, ADD_RIVER_MAJOR = 2,
@@ -47,41 +40,10 @@ public final class Tile extends FreeColGameObject implements Location, Nameable 
     
     // Indians' claims on the tile may be one of the following:
     public static final int CLAIM_NONE = 0, CLAIM_VISITED = 1, CLAIM_CLAIMED = 2;
-    /*  Depreciated
-    // Please someone tell me they want to put this data into a separate file...
-    // -sjm
-    // Twelve tile types, sixteen goods types, and unforested/forested.
-    public static final int[][][] potentialtable = {
-    //  Food      Sugar    Tobacco   Cotton     Furs      Wood      Ore      Silver
-    { { 0, 0 }, { 0, 0 }, { 0, 0 }, { 0, 0 }, { 0, 0 }, { 0, 0 }, { 0, 0 }, { 0, 0 } }, // Unexp
-    { { 5, 3 }, { 0, 0 }, { 0, 0 }, { 2, 1 }, { 0, 3 }, { 0, 6 }, { 1, 0 }, { 0, 0 } }, // Plains
-    { { 3, 2 }, { 0, 0 }, { 3, 1 }, { 0, 0 }, { 0, 2 }, { 0, 6 }, { 0, 0 }, { 0, 0 } }, // Grasslands
-    { { 3, 2 }, { 0, 0 }, { 0, 0 }, { 3, 1 }, { 0, 2 }, { 0, 4 }, { 0, 0 }, { 0, 0 } }, // Prairie
-    { { 4, 3 }, { 3, 1 }, { 0, 0 }, { 0, 0 }, { 0, 2 }, { 0, 4 }, { 0, 0 }, { 0, 0 } }, // Savannah
-    { { 3, 2 }, { 0, 0 }, { 2, 1 }, { 0, 0 }, { 0, 2 }, { 0, 4 }, { 2, 1 }, { 0, 0 } }, // Marsh
-    { { 3, 2 }, { 2, 1 }, { 0, 0 }, { 0, 0 }, { 0, 1 }, { 0, 4 }, { 2, 1 }, { 0, 0 } }, // Swamp
-    { { 2, 2 }, { 0, 0 }, { 0, 0 }, { 1, 1 }, { 0, 2 }, { 0, 2 }, { 2, 1 }, { 0, 0 } }, // Desert
-    { { 3, 2 }, { 0, 0 }, { 0, 0 }, { 0, 0 }, { 0, 3 }, { 0, 4 }, { 2, 1 }, { 0, 0 } }, // Tundra
-    { { 0, 0 }, { 0, 0 }, { 0, 0 }, { 0, 0 }, { 0, 0 }, { 0, 0 }, { 0, 0 }, { 0, 0 } }, // Arctic
-    { { 2, 0 }, { 0, 0 }, { 0, 0 }, { 0, 0 }, { 0, 0 }, { 0, 0 }, { 0, 0 }, { 0, 0 } }, // Ocean
-    { { 2, 0 }, { 0, 0 }, { 0, 0 }, { 0, 0 }, { 0, 0 }, { 0, 0 }, { 0, 0 }, { 0, 0 } }, // High seas
-    { { 2, 0 }, { 0, 0 }, { 0, 0 }, { 0, 0 }, { 0, 0 }, { 0, 0 }, { 4, 0 }, { 0, 0 } }, // Hills
-    { { 0, 0 }, { 0, 0 }, { 0, 0 }, { 0, 0 }, { 0, 0 }, { 0, 0 }, { 4, 0 }, { 1, 0 } } // Mountains
-    };
-    */
+
     private TileType type;
     
     private boolean lostCityRumour;
-    //    private boolean road, plowed, forested, bonus, lostCityRumour;
-
-    //    private int type;
-    
-    /**
-     * The type of river on this tile.
-     */
-    //    private int river = 0;
-
-    //    private int additionType;
 
     private int x, y;
 
@@ -128,56 +90,6 @@ public final class Tile extends FreeColGameObject implements Location, Nameable 
 
     private List<TileItem> tileItems;
 
-    /*
-      /**
-      * Creates a new object with the type <code>UNEXPLORED</code>. (Depreciated)
-      * 
-      * @param game The <code>Game</code> this <code>Tile</code> belongs to.
-      * @param locX The x-position of this tile on the map.
-      * @param locY The y-position of this tile on the map.
-      */
-    /*    public Tile(Game game, int locX, int locY) {
-          this(game, UNEXPLORED, locX, locY);
-
-          if (getGame().getViewOwner() == null) {
-          playerExploredTiles = new PlayerExploredTile[Player.NUMBER_OF_NATIONS];
-          }
-          }
-
-          /**
-          * A constructor to use. (Depreciated)
-          * 
-          * @param game The <code>Game</code> this <code>Tile</code> belongs to.
-          * @param type The type.
-          * @param locX The x-position of this tile on the map.
-          * @param locY The y-position of this tile on the map.
-          */
-    /*    public Tile(Game game, int type, int locX, int locY) {
-          super(game);
-
-          unitContainer = new UnitContainer(game, this);
-          this.type = type;
-          this.additionType = ADD_NONE;
-          this.indianClaim = CLAIM_NONE;
-
-          road = false;
-          plowed = false;
-          forested = false;
-          bonus = false;
-          lostCityRumour = false;
-
-          x = locX;
-          y = locY;
-          position = new Position(x, y);
-
-          owner = null;
-          settlement = null;
-
-          if (getGame().getViewOwner() == null) {
-          playerExploredTiles = new PlayerExploredTile[Player.NUMBER_OF_NATIONS];
-          }
-          }
-    */
     /**
      * A constructor to use.
      * 
@@ -320,9 +232,6 @@ public final class Tile extends FreeColGameObject implements Location, Nameable 
                 return null;
             }
         }
-    }
-
-    public void setName(String newName) {
     }
 
     /**

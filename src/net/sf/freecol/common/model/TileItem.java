@@ -9,7 +9,7 @@ import org.w3c.dom.Element;
 /**
 * Represents a <code>TileItem</code> item on a <code>Tile</code>.
 */
-public abstract class TileItem extends FreeColGameObject implements Locatable, Nameable {
+public abstract class TileItem extends FreeColGameObject implements Locatable, Named {
 
     public static final String  COPYRIGHT = "Copyright (C) 2003-2007 The FreeCol Team";
     public static final String  LICENSE = "http://www.gnu.org/licenses/gpl.html";

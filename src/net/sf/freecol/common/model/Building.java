@@ -34,7 +34,7 @@ import org.w3c.dom.Element;
  * Level {@link #FACTORY}: "Fortress"
  * 
  */
-public final class Building extends FreeColGameObject implements WorkLocation, Ownable, Nameable {
+public final class Building extends FreeColGameObject implements WorkLocation, Ownable, Named {
     
     public static final String COPYRIGHT = "Copyright (C) 2003-2006 The FreeCol Team";
 
@@ -229,15 +229,6 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
     public static String getName(int someType, int someLevel) {
         String id = FreeCol.getSpecification().buildingType(someType).level(someLevel - 1).name;
         return Messages.message(id);
-    }
-
-    /**
-     * Set the <code>Name</code> value.
-     * 
-     * @param newName The new Name value.
-     */
-    public void setName(String newName) {
-        // this.name = newName;
     }
 
     /**
