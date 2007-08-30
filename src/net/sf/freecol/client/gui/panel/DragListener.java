@@ -19,6 +19,7 @@ import net.sf.freecol.common.model.ColonyTile;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.Unit;
+import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.model.WorkLocation;
 
 /**
@@ -33,11 +34,6 @@ public final class DragListener extends MouseAdapter {
     public static final String LICENSE = "http://www.gnu.org/licenses/gpl.html";
 
     public static final String REVISION = "$Revision$";
-
-    private static final String[] messages = { "beAFarmer", "beASugarPlanter",
-                                               "beATobaccoPlanter", "beAcottonPlanter",
-                                               "beAFurTrapper", "beALumberjack",
-                                               "beAnOreMiner", "beASilverMiner"};
 
     private final FreeColPanel parentPanel;
 
@@ -85,10 +81,11 @@ public final class DragListener extends MouseAdapter {
                     for (GoodsType goodsType : farmedGoods) {
                         int maxpotential = colony.getVacantColonyTileProductionFor(tempUnit, goodsType);
                         if (maxpotential > 0) {
-                            menuItem = new JMenuItem(Messages.message(messages[goodsType.getIndex()]) +
-                                                     " (" + maxpotential + " " + goodsType.getName() + ")",
+                            UnitType expert = FreeCol.getSpecification().getExpertForProducing(goodsType);
+                            menuItem = new JMenuItem(Messages.message("beAExpert", "%expert%", expert.getName())
+                                                     + " (" + maxpotential + " " + goodsType.getName() + ")",
                                                      imageLibrary.getScaledGoodsImageIcon(goodsType, 0.66f));
-                            menuItem.setActionCommand(String.valueOf(goodsType.getIndex()));
+                            menuItem.setActionCommand(String.valueOf(UnitLabel.WORK_FARMING+goodsType.getIndex()));
                             menuItem.addActionListener(unitLabel);
                             menu.add(menuItem);
                         }
@@ -115,7 +112,7 @@ public final class DragListener extends MouseAdapter {
                                     locName +=  " " + goodsType.getName()+")";
                                     menuItem.setText(locName);
                                 }
-                                menuItem.setActionCommand(String.valueOf(UnitLabel.WORK_AT_SOMEWHERE+building.getType().getIndex()));
+                                menuItem.setActionCommand(String.valueOf(UnitLabel.WORK_AT_BUILDING+building.getType().getIndex()));
                                 menuItem.addActionListener(unitLabel);
                                 menu.add(menuItem);
                             }

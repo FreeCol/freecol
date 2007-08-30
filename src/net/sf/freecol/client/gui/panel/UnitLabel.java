@@ -40,13 +40,15 @@ public final class UnitLabel extends JLabel implements ActionListener {
 
     private static Logger logger = Logger.getLogger(UnitLabel.class.getName());
 
-    public static final int ARM = 0, MOUNT = 1, TOOLS = 2, DRESS = 3, WORKTYPE_FOOD = 4, WORKTYPE_SUGAR = 5,
-            WORKTYPE_TOBACCO = 6, WORKTYPE_COTTON = 7, WORKTYPE_FURS = 8, WORKTYPE_LUMBER = 9, WORKTYPE_ORE = 10,
-            WORKTYPE_SILVER = 11, CLEAR_SPECIALITY = 12, ACTIVATE_UNIT = 13, FORTIFY = 14, SENTRY = 15, COLOPEDIA = 16,
-            LEAVE_TOWN = 17;
+    public static final int ARM = 0, MOUNT = 1, TOOLS = 2, DRESS = 3,
+            CLEAR_SPECIALITY = 4, ACTIVATE_UNIT = 5, FORTIFY = 6, SENTRY = 7,
+            COLOPEDIA = 8, LEAVE_TOWN = 9;
 
-    public static final int WORK_AT_SOMEWHERE = 100,
-        WORK_AT_LASTBUILDING = WORK_AT_SOMEWHERE+FreeCol.getSpecification().numberOfBuildingTypes();
+    public static final int WORK_FARMING = 1000,
+        WORK_LASTFARMING = WORK_FARMING + FreeCol.getSpecification().numberOfGoodsTypes();
+    
+    public static final int WORK_AT_BUILDING = 2000,
+        WORK_AT_LASTBUILDING = WORK_AT_BUILDING + FreeCol.getSpecification().numberOfBuildingTypes();
         
     private final Unit unit;
 
@@ -319,23 +321,6 @@ public final class UnitLabel extends JLabel implements ActionListener {
                 case DRESS:
                     inGameController.equipUnit(unit, Goods.CROSSES, ((unit.isMissionary()) ? 0 : 1));
                     break;
-                case WORKTYPE_FOOD:
-                case WORKTYPE_SUGAR:
-                case WORKTYPE_TOBACCO:
-                case WORKTYPE_COTTON:
-                case WORKTYPE_FURS:
-                case WORKTYPE_LUMBER:
-                case WORKTYPE_ORE:
-                case WORKTYPE_SILVER:
-                    // Gets goodsType relative to FOOD
-                    int goodsIndex = intCommand - WORKTYPE_FOOD + Goods.FOOD.getIndex();
-                    GoodsType goodsType = FreeCol.getSpecification().getGoodsType(goodsIndex);
-                    // Move unit to best producing ColonyTile
-                    ColonyTile bestTile = unit.getColony().getVacantColonyTileFor(unit, goodsType);
-                    inGameController.work(unit, bestTile);
-                    // Change workType
-                    inGameController.changeWorkType(unit, goodsType);
-                    break;
                 case LEAVE_TOWN:
                     inGameController.putOutsideColony(unit);
                     break;
@@ -346,8 +331,15 @@ public final class UnitLabel extends JLabel implements ActionListener {
                     getCanvas().showColopediaPanel(ColopediaPanel.COLOPEDIA_UNIT, unit.getUnitType().getIndex());
                     break;
                 default:
-                    if (intCommand >= WORK_AT_SOMEWHERE && intCommand <= WORK_AT_LASTBUILDING ) {
-                        BuildingType buildingType = FreeCol.getSpecification().getBuildingType(intCommand - WORK_AT_SOMEWHERE);
+                    if (intCommand >= WORK_FARMING && intCommand <= WORK_LASTFARMING) {
+                        GoodsType goodsType = FreeCol.getSpecification().getGoodsType(intCommand - WORK_FARMING);
+                        // Move unit to best producing ColonyTile
+                        ColonyTile bestTile = unit.getColony().getVacantColonyTileFor(unit, goodsType);
+                        inGameController.work(unit, bestTile);
+                        // Change workType
+                        inGameController.changeWorkType(unit, goodsType);
+                    } else if (intCommand >= WORK_AT_BUILDING && intCommand <= WORK_AT_LASTBUILDING) {
+                        BuildingType buildingType = FreeCol.getSpecification().getBuildingType(intCommand - WORK_AT_BUILDING);
                         Building building = unit.getColony().getBuilding(buildingType);
                         inGameController.work(unit, building);
                     } else {
