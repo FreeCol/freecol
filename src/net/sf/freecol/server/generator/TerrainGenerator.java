@@ -441,11 +441,11 @@ public class TerrainGenerator {
         // TODO: Change it with a better way to identify hills and mountains look for their overlay imagetype (14 and 15 respectively)
         // To identify hills and mountains look for their id
         for (TileType t : FreeCol.getSpecification().getTileTypeList()) {
-            if (t.getName().equals("model.tile.hills") && hills == null) {
+            if (t.getID().equals("model.tile.hills") && hills == null) {
                 hills = t;
                 if (mountains != null)
                     break;
-            } else if (t.getName().equals("model.tile.mountains") && mountains == null) {
+            } else if (t.getID().equals("model.tile.mountains") && mountains == null) {
                 mountains = t;
                 if (hills != null)
                     break;

@@ -2618,9 +2618,11 @@ public class Player extends FreeColGameObject implements Abilities, Nameable {
             out.writeAttribute("score", Integer.toString(score));
             // TODO: review this data structure
             char[] fatherCharArray = new char[FreeCol.getSpecification().numberOfFoundingFathers()];
+            for (int i = 0; i < fatherCharArray.length; i++) {
+                fatherCharArray[i] = '0';
+            }
             for (FoundingFather father : allFathers) {
-                int index = father.getIndex();
-                fatherCharArray[index] = '1';
+                fatherCharArray[father.getIndex()] = '1';
             }
             out.writeAttribute("foundingFathers", new String(fatherCharArray));
             StringBuffer sb = new StringBuffer(contacted.length);
