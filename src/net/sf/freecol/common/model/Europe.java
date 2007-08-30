@@ -448,6 +448,7 @@ public final class Europe extends FreeColGameObject implements Location,
 
     /**
      * Prepares this object for a new turn.
+     * TODO: give Europe a shipyard and remove this
      */
     public void newTurn() {
         // Repair any damaged ships:

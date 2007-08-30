@@ -6,6 +6,7 @@ import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 
 import javax.swing.BorderFactory;
@@ -18,6 +19,7 @@ import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.Building;
+import net.sf.freecol.common.model.BuildingType;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.GoodsType;
@@ -158,26 +160,27 @@ public final class ReportColonyPanel extends ReportPanel implements ActionListen
     private JPanel createBuildingPanel(Colony colony) {
         JPanel buildingPanel = new JPanel(new GridLayout(0, 5, 12, 0));
         buildingPanel.setOpaque(false);
-        int currentType = colony.getCurrentlyBuilding();
-        for (int buildingType = 0; buildingType < Building.NUMBER_OF_TYPES; buildingType++) {
-            Building building = colony.getBuilding(buildingType);
-            if (building.getLevel() != Building.NOT_BUILT) {
+
+        Iterator<Building> buildingIterator = colony.getBuildingIterator();
+        while (buildingIterator.hasNext()) {
+            Building building = buildingIterator.next();
+            if (building.isBuilt()) {
                 buildingPanel.add(new JLabel(building.getName()));
             }
-            if (buildingType == currentType) {
-                JLabel buildingLabel = new JLabel(building.getNextName());
-                buildingLabel.setForeground(Color.GRAY);
-                buildingPanel.add(buildingLabel);
-            }
         }
+        
+        int currentType = colony.getCurrentlyBuilding();
         if (currentType >= Colony.BUILDING_UNIT_ADDITION) {
             UnitType unitType = FreeCol.getSpecification().getUnitType(currentType - Colony.BUILDING_UNIT_ADDITION);
             JLabel unitLabel = new JLabel(unitType.getName());
             unitLabel.setForeground(Color.GRAY);
             buildingPanel.add(unitLabel);
-        }
-        /* If nothing is build, show it red color */
-        if (currentType == -1) {
+        } else  if (currentType != -1) {
+            JLabel buildingLabel = new JLabel(FreeCol.getSpecification().getBuildingType(currentType).getName());
+            buildingLabel.setForeground(Color.GRAY);
+            buildingPanel.add(buildingLabel);
+        } else {
+            /* If nothing is build, show it red color */
             JLabel nothingLabel = new JLabel(Messages.message("nothing"));
             nothingLabel.setForeground(Color.RED);
             buildingPanel.add(nothingLabel);

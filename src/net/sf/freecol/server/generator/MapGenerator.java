@@ -547,14 +547,17 @@ public class MapGenerator {
                             }
                         }
                     }
-                    colony.getBuilding(Building.SCHOOLHOUSE).setLevel(Building.SHOP);
+                    Building schoolhouse = colony.getBuilding(FreeCol.getSpecification().getBuildingType("model.unit.Schoolhouse"));
                     unitType = FreeCol.getSpecification().getUnitType("model.unit.masterCarpenter");
+                    while (!schoolhouse.canAdd(unitType)) {
+                        schoolhouse.upgrade();
+                    }
                     Unit carpenter = new Unit(map.getGame(), colonyTile, player, unitType, Unit.ACTIVE);
-                    carpenter.setLocation(colony.getBuilding(Building.CARPENTER));
+                    carpenter.setLocation(colony.getBuildingForProducing(carpenter.getExpertWorkType()));
 
                     unitType = FreeCol.getSpecification().getUnitType("model.unit.elderStatesman");
                     Unit statesman = new Unit(map.getGame(), colonyTile, player, unitType, Unit.ACTIVE);
-                    statesman.setLocation(colony.getBuilding(Building.TOWN_HALL));
+                    statesman.setLocation(colony.getBuildingForProducing(statesman.getExpertWorkType()));
 
                     unitType = FreeCol.getSpecification().getUnitType("model.unit.expertLumberJack");
                     Unit lumberjack = new Unit(map.getGame(), colony, player, unitType, Unit.ACTIVE);

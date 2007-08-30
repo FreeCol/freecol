@@ -104,7 +104,7 @@ public final class TileImprovementType extends FreeColGameObjectType
     }
 
     public boolean isWorkerTypeAllowed(UnitType unitType) {
-        return allowedWorkers.contains(unitType.getName());
+        return allowedWorkers.contains(unitType.getID());
     }
 
     /**

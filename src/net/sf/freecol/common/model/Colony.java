@@ -21,7 +21,7 @@ import org.w3c.dom.Element;
  * {@link ColonyTile}s. The latter represents the tiles around the
  * <code>Colony</code> where working is possible.
  */
-public final class Colony extends Settlement implements Location, Nameable {
+public final class Colony extends Settlement implements Abilities, Location, Nameable {
     private static final Logger logger = Logger.getLogger(Colony.class.getName());
 
     public static final String COPYRIGHT = "Copyright (C) 2003-2007 The FreeCol Team";
@@ -43,7 +43,7 @@ public final class Colony extends Settlement implements Location, Nameable {
      */
     private ArrayList<WorkLocation> workLocations = new ArrayList<WorkLocation>();
 
-    private HashMap<Integer, Building> buildingMap = new HashMap<Integer, Building>();
+    private HashMap<String, Building> buildingMap = new HashMap<String, Building>();
 
     private int hammers;
 
@@ -84,6 +84,12 @@ public final class Colony extends Settlement implements Location, Nameable {
 
     private int[] highLevel, lowLevel, exportLevel;
     private boolean[] exports;
+    
+    // TODO: add bonus and factor from founding fathers to colony when they join
+    private float productionFactors[];
+    private int productionIncrements[];
+    
+    private HashMap<String, Boolean> abilities = new HashMap<String, Boolean>();
 
     /** Cannot do it this way as NUMBER_OF_TYPES is not a constant
     private int[] highLevel = new int[Goods.NUMBER_OF_TYPES];
@@ -110,7 +116,7 @@ public final class Colony extends Settlement implements Location, Nameable {
         }
         owner.invalidateCanSeeTiles();
         goodsContainer = new GoodsContainer(game, this);
-        initializeWarehouseSettings();
+        initializeGoodsTypeArrays();
         this.name = name;
         hammers = 0;
         bells = 0;
@@ -131,19 +137,20 @@ public final class Colony extends Settlement implements Location, Nameable {
             }
         }
         addWorkLocation(new ColonyTile(game, this, tile));
-        int numberOfTypes = FreeCol.getSpecification().numberOfBuildingTypes();
-        for (int type = 0; type < numberOfTypes; type++) {
-            BuildingType buildingType = FreeCol.getSpecification().getBuildingType(type);
-            if (buildingType.level(0).getHammersRequired() > 0) {
-                addWorkLocation(new Building(game, this, type, Building.NOT_BUILT));
-            } else {
-                addWorkLocation(new Building(game, this, type, Building.HOUSE));
+        List<BuildingType> buildingTypes = FreeCol.getSpecification().getBuildingTypeList();
+        for (BuildingType buildingType : buildingTypes) {
+            if (buildingType.getUpgradesFrom() == null) {
+                boolean built = buildingType.getHammersRequired() == 0;
+                addWorkLocation(new Building(game, this, buildingType, built));
             }
         }
+        currentlyBuilding = -1;
+        /*
         if (landLocked)
             currentlyBuilding = Building.WAREHOUSE;
         else
             currentlyBuilding = Building.DOCK;
+         */
     }
 
     /**
@@ -186,23 +193,30 @@ public final class Colony extends Settlement implements Location, Nameable {
         workLocations.add(workLocation);
         if (workLocation instanceof Building) {
             Building building = (Building) workLocation;
-            buildingMap.put(building.getType(), building);
+            BuildingType buildingType = building.getType().getFirstLevel();
+            buildingMap.put(buildingType.getID(), building);
         }
     }
 
     /**
      * Initializes warehouse/export settings.
      */
-    private void initializeWarehouseSettings() {
-        highLevel = new int[Goods.NUMBER_OF_TYPES];
-        lowLevel = new int[Goods.NUMBER_OF_TYPES];
-        exportLevel = new int[Goods.NUMBER_OF_TYPES];
-        exports = new boolean[Goods.NUMBER_OF_TYPES];
-        for (int goodsIndex = 0; goodsIndex < Goods.NUMBER_OF_TYPES; goodsIndex++) {
+    private void initializeGoodsTypeArrays() {
+        int numberOfGoods = FreeCol.getSpecification().numberOfGoodsTypes();
+        highLevel = new int[numberOfGoods];
+        lowLevel = new int[numberOfGoods];
+        exportLevel = new int[numberOfGoods];
+        exports = new boolean[numberOfGoods];
+        productionFactors = new float[numberOfGoods];
+        productionIncrements = new int[numberOfGoods];
+        
+        for (int goodsIndex = 0; goodsIndex < numberOfGoods; goodsIndex++) {
             exports[goodsIndex] = false;
             lowLevel[goodsIndex] = 10;
             highLevel[goodsIndex] = 90;
             exportLevel[goodsIndex] = 50;
+            productionFactors[goodsIndex] = 1;
+            productionIncrements[goodsIndex] = 0;
         }
     }
 
@@ -211,8 +225,8 @@ public final class Colony extends Settlement implements Location, Nameable {
      */
     public void updatePopulation() {
         if (getUnitCount() >= 3 && getOwner().hasFather(FreeCol.getSpecification().getFoundingFather("model.foundingFather.laSalle"))) {
-            if (!getBuilding(Building.STOCKADE).isBuilt()) {
-                getBuilding(Building.STOCKADE).setLevel(Building.HOUSE);
+            if (!hasStockade()) {
+                getStockade().upgrade();
             }
         }
         getTile().updatePlayerExploredTiles();
@@ -348,7 +362,7 @@ public final class Colony extends Settlement implements Location, Nameable {
         }
     }
 
-    /** COMEBACHERE
+    /**
      * Returns the building for producing the given type of goods.
      * 
      * @param goodsType The type of goods.
@@ -356,29 +370,15 @@ public final class Colony extends Settlement implements Location, Nameable {
      *         goods, or <code>null</code> if such a building cannot be found.
      */
     public Building getBuildingForProducing(GoodsType goodsType) {
-        Building b;
-        if (goodsType == Goods.MUSKETS) {
-            b = getBuilding(Building.ARMORY);
-        } else if (goodsType == Goods.RUM) {
-            b = getBuilding(Building.DISTILLER);
-        } else if (goodsType == Goods.CIGARS) {
-            b = getBuilding(Building.TOBACCONIST);
-        } else if (goodsType == Goods.CLOTH) {
-            b = getBuilding(Building.WEAVER);
-        } else if (goodsType == Goods.COATS) {
-            b = getBuilding(Building.FUR_TRADER);
-        } else if (goodsType == Goods.TOOLS) {
-            b = getBuilding(Building.BLACKSMITH);
-        } else if (goodsType == Goods.CROSSES) {
-            b = getBuilding(Building.CHURCH);
-        } else if (goodsType == Goods.HAMMERS) {
-            b = getBuilding(Building.CARPENTER);
-        } else if (goodsType == Goods.BELLS) {
-            b = getBuilding(Building.TOWN_HALL);
-        } else {
-            b = null;
+        // TODO: it should search for more than one building?
+        Iterator<Building> buildingIterator = getBuildingIterator();
+        while (buildingIterator.hasNext()) {
+            Building building = buildingIterator.next();
+            if (building.isBuilt() && building.getGoodsOutputType() == goodsType) {
+                return building;
+            }
         }
-        return (b != null && b.isBuilt()) ? b : null;
+        return null;
     }
 
     /** COMEBACKHEREs
@@ -390,26 +390,13 @@ public final class Colony extends Settlement implements Location, Nameable {
      * @see Goods
      */
     public Building getBuildingForConsuming(GoodsType goodsType) {
-        Building b;
-        if (goodsType == Goods.TOOLS) {
-            b = getBuilding(Building.ARMORY);
-        } else if (goodsType == Goods.LUMBER) {
-            b = getBuilding(Building.CARPENTER);
-        } else if (goodsType == Goods.SUGAR) {
-            b = getBuilding(Building.DISTILLER);
-        } else if (goodsType == Goods.TOBACCO) {
-            b = getBuilding(Building.TOBACCONIST);
-        } else if (goodsType == Goods.COTTON) {
-            b = getBuilding(Building.WEAVER);
-        } else if (goodsType == Goods.FURS) {
-            b = getBuilding(Building.FUR_TRADER);
-        } else if (goodsType == Goods.ORE) {
-            b = getBuilding(Building.BLACKSMITH);
-        } else {
-            b = null;
-        }
-        if (b != null && b.isBuilt()) {
-            return b;
+        // TODO: it should search for more than one building?
+        Iterator<Building> buildingIterator = getBuildingIterator();
+        while (buildingIterator.hasNext()) {
+            Building building = buildingIterator.next();
+            if (building.isBuilt() && building.getGoodsInputType() == goodsType) {
+                return building;
+            }
         }
         return null;
     }
@@ -465,14 +452,11 @@ public final class Colony extends Settlement implements Location, Nameable {
      * @param type The type of building to get.
      * @return The <code>Building</code>.
      */
-    public Building getBuilding(int type) {
-        return buildingMap.get(new Integer(type));
-        /*
-         * Iterator<Building> buildingIterator = getBuildingIterator(); while
-         * (buildingIterator.hasNext()) { Building building =
-         * buildingIterator.next(); if (building.getType() == type) { return
-         * building; } } return null;
-         */
+    public Building getBuilding(int typeIndex) {
+        return buildingMap.get(FreeCol.getSpecification().getBuildingType(typeIndex).getFirstLevel().getID());
+    }
+    public Building getBuilding(BuildingType type) {
+        return buildingMap.get(type.getFirstLevel().getID());
     }
 
     /**
@@ -675,6 +659,8 @@ public final class Colony extends Settlement implements Location, Nameable {
                 addHammers(amount);
             } else if (type == Goods.BELLS) {
                 addBells(amount);
+            } else if (type == Goods.CROSSES) {
+                getOwner().incrementCrosses(amount);
             } else {
                 logger.warning(type.getName() + " cannot be stored in this Colony!");
             }
@@ -777,22 +763,64 @@ public final class Colony extends Settlement implements Location, Nameable {
     }
 
     /**
-     * Returns true if this colony has a schoolhouse and the unit is a
-     * skilled unit with a skill level not exceeding the level of the
-     * schoolhouse. The number of units already in the schoolhouse and
-     * the availability of pupils are not taken into account. @see
-     * Building#canAddAsTeacher
+     * Returns true if this colony has a schoolhouse and the unit type is a
+     * skilled unit type with a skill level not exceeding the level of the
+     * schoolhouse. @see Building#canAdd
      * 
-     * @param unit The unit to add as a teacher.
-     * @return <code>true</code> if this unit could be added.
+     * @param unitType The unit type to add as a teacher.
+     * @return <code>true</code> if this unit type could be added.
     */
-
     public boolean canTrain(Unit unit) {
-        return getBuilding(Building.SCHOOLHOUSE).canAddAsTeacher(unit);
+        if (!hasAbility("model.ability.teach")) {
+            return false;
+        }
+        
+        Iterator<Building> buildingIterator = getBuildingIterator();
+        while (buildingIterator.hasNext()) {
+            Building building = buildingIterator.next();
+            if (building.hasAbility("model.ability.teach") && building.canAdd(unit)) {
+                return true;
+            }
+        }
+        return false;
     }
 
+    /**
+     * Returns true if this colony has a schoolhouse and the unit type is a
+     * skilled unit type with a skill level not exceeding the level of the
+     * schoolhouse. The number of units already in the schoolhouse and
+     * the availability of pupils are not taken into account. @see
+     * Building#canAdd
+     * 
+     * @param unitType The unit type to add as a teacher.
+     * @return <code>true</code> if this unit type could be added.
+    */
     public boolean canTrain(UnitType unitType) {
-        return getBuilding(Building.SCHOOLHOUSE).canAddAsTeacher(unitType);
+        if (!hasAbility("model.ability.teach")) {
+            return false;
+        }
+        
+        Iterator<Building> buildingIterator = getBuildingIterator();
+        while (buildingIterator.hasNext()) {
+            Building building = buildingIterator.next();
+            if (building.isBuilt() && building.hasAbility("model.ability.teach") &&
+                    building.canAdd(unitType)) {
+                return true;
+            }
+        }
+        return false;
+    }
+    
+    public List<Unit> getTeachers() {
+        List<Unit> teachers = new ArrayList<Unit>();
+        Iterator<Building> buildingIterator = getBuildingIterator();
+        while (buildingIterator.hasNext()) {
+            Building building = buildingIterator.next();
+            if (building.isBuilt() && building.hasAbility("model.ability.teach")) {
+                teachers.addAll(building.getUnitList());
+            }
+        }
+        return teachers;
     }
 
     /**
@@ -936,6 +964,7 @@ public final class Colony extends Settlement implements Location, Nameable {
      * @param amount The number of bells to add.
      */
     public void addBells(int amount) {
+        getOwner().incrementBells(amount);
         if (getMembers() <= getUnitCount() + 1) {
             bells += amount;
         }
@@ -1117,7 +1146,7 @@ public final class Colony extends Settlement implements Location, Nameable {
                  */
 
                 boolean ourLand = (owner.getLandPrice(workTile) == 0);
-                int potential = unit.getFarmedPotential(goodsType, colonyTile.getWorkTile());
+                int potential = colonyTile.getProductionOf(unit, goodsType);
                 if (ourLand && potential > highestProduction) {
                     highestProduction = potential;
                     bestPick = colonyTile;
@@ -1140,7 +1169,7 @@ public final class Colony extends Settlement implements Location, Nameable {
      */
     public int getVacantColonyTileProductionFor(Unit unit, GoodsType goodsType) {
         ColonyTile bestPick = getVacantColonyTileFor(unit, goodsType);
-        return bestPick != null ? unit.getFarmedPotential(goodsType, bestPick.getWorkTile()) : 0;
+        return bestPick != null ? bestPick.getProductionOf(unit, goodsType) : 0;
     }
 
     /**
@@ -1154,11 +1183,17 @@ public final class Colony extends Settlement implements Location, Nameable {
             return 0;
         }
         int maxAmount = getGoodsCount(Goods.HORSES) / 10;
-        if (!getBuilding(Building.STABLES).isBuilt()) {
+        // TODO: put production bonus for horses in specification
+        if (!getStables().isBuilt()) {
             maxAmount /= 2;
         }
         return Math.max(1, maxAmount);
     }
+    
+    public Building getStables() {
+        // TODO: put production in specification and remove this
+        return getBuilding(FreeCol.getSpecification().getBuildingType("model.building.Stables"));
+    }   
 
     /**
      * Gets the production of horses in this <code>Colony</code>.
@@ -1254,7 +1289,7 @@ public final class Colony extends Settlement implements Location, Nameable {
                         removeGoods(Goods.TOOLS, toolsRequired);
                     }
                     hammers = 0;
-                    getBuilding(currentlyBuilding).setLevel(getBuilding(currentlyBuilding).getLevel() + 1);
+                    getBuilding(currentlyBuilding).upgrade();
                     addModelMessage(this, "model.colony.buildingReady", new String[][] { { "%colony%", getName() },
                             { "%building%", getBuilding(currentlyBuilding).getName() } },
                             ModelMessage.BUILDING_COMPLETED, this);
@@ -1341,39 +1376,35 @@ public final class Colony extends Settlement implements Location, Nameable {
         if (defender == null) {
             throw new NullPointerException();
         }
-        Building building = getBuilding(Building.STOCKADE);
+        
         switch (result) {
         case Unit.ATTACK_EVADES:
             // send message to both parties
             addModelMessage(this, "model.unit.shipEvadedBombardment",
                             new String[][] {
                                 { "%colony%", getName() },
-                                { "%building%", building.getName() },
                                 { "%unit%", defender.getName() },
                                 { "%nation%", defender.getOwner().getNationAsString() } }, 
                             ModelMessage.DEFAULT, this);
             addModelMessage(defender, "model.unit.shipEvadedBombardment",
                             new String[][] { { "%colony%", getName() },
-                                             { "%building%", building.getName() },
                                              { "%unit%", defender.getName() },
                                              { "%nation%", defender.getOwner().getNationAsString() } }, 
                             ModelMessage.DEFAULT, this);
             break;
         case Unit.ATTACK_WIN:
-            defender.shipDamaged(this, building);
+            defender.shipDamaged(this);
             addModelMessage(this, "model.unit.enemyShipDamagedByBombardment",
                             new String[][] {
                                 { "%colony%", getName() },
-                                { "%building%", building.getName() },
                                 { "%unit%", defender.getName() },
                                 { "%nation%", defender.getOwner().getNationAsString() } }, ModelMessage.UNIT_DEMOTED);
             break;
         case Unit.ATTACK_GREAT_WIN:
-            defender.shipSunk(this, building);
+            defender.shipSunk(this);
             addModelMessage(this, "model.unit.shipSunkByBombardment",
                             new String[][] {
                                 { "%colony%", getName() },
-                                { "%building%", building.getName() },
                                 { "%unit%", defender.getName() },
                                 { "%nation%", defender.getOwner().getNationAsString() } },
                             ModelMessage.UNIT_DEMOTED);
@@ -1410,27 +1441,6 @@ public final class Colony extends Settlement implements Location, Nameable {
             }
         }
         return null;
-    }
-
-
-    // Repair any damaged ships:
-    /**
-     * TODO: move this to the drydock/shipyard, and give Europe a
-     * shipyard, too.
-     */
-    private void repairShips() {
-        for (Unit unit : getTile().getUnitList()) {
-            if (unit.isNaval() && unit.isUnderRepair()) {
-                unit.setHitpoints(unit.getHitpoints() + 1);
-                if (!unit.isUnderRepair()) {
-                    addModelMessage(this, "model.unit.shipRepaired",
-                            new String[][] {
-                                { "%unit%", unit.getName() },
-                                { "%repairLocation%", getLocationName() } },
-                                ModelMessage.DEFAULT, this);
-                }
-            }
-        }
     }
 
     // Save state of warehouse
@@ -1502,12 +1512,15 @@ public final class Colony extends Settlement implements Location, Nameable {
 
     // Update carpenter and blacksmith
     private void addHammersAndTools() {
-        Building building = getBuilding(Building.CARPENTER);
-        logger.finest("Calling newTurn for building " + building.getName());
-        building.newTurn();
-        building = getBuilding(Building.BLACKSMITH);
-        logger.finest("Calling newTurn for building " + building.getName());
-        building.newTurn();
+        Iterator<Building> buildingIterator = getBuildingIterator();
+        while (buildingIterator.hasNext()) {
+            Building building = buildingIterator.next();
+            GoodsType output = building.getGoodsOutputType();
+            if (output == Goods.HAMMERS || output == Goods.TOOLS) {
+                logger.finest("Calling newTurn for building " + building.getName());
+                building.newTurn();
+            }
+        }
     }
 
 
@@ -1517,11 +1530,8 @@ public final class Colony extends Settlement implements Location, Nameable {
         Iterator<Building> buildingIterator = getBuildingIterator();
         while (buildingIterator.hasNext()) {
             Building building = buildingIterator.next();
-            switch (building.getType()) {
-            case Building.CARPENTER:
-            case Building.BLACKSMITH:
-                continue;
-            default:
+            GoodsType output = building.getGoodsOutputType();
+            if (output != Goods.HAMMERS && output != Goods.TOOLS) {
                 logger.finest("Calling newTurn for building " + building.getName());
                 building.newTurn();
             }
@@ -1531,7 +1541,7 @@ public final class Colony extends Settlement implements Location, Nameable {
 
     // Export goods if custom house is built
     private void exportGoods() {
-        if (getBuilding(Building.CUSTOM_HOUSE).isBuilt()) {
+        if (hasAbility("model.ability.export")) {
             List<Goods> exportGoods = getCompactGoods();
             for (Goods goods : exportGoods) {
                 if (getExports(goods) && (owner.canTrade(goods, Market.CUSTOM_HOUSE))) {
@@ -1676,7 +1686,6 @@ public final class Colony extends Settlement implements Location, Nameable {
 
         // The following tasks consume hammers/tools,
         // or may do so in the future
-        repairShips();
         checkBuildingComplete();
 
         addBuildingProduction();
@@ -1710,7 +1719,13 @@ public final class Colony extends Settlement implements Location, Nameable {
      * @return The capacity of this <code>Colony</code>'s warehouse.
      */
     public int getWarehouseCapacity() {
-        return 100 + getBuilding(Building.WAREHOUSE).getLevel() * 100;
+        // TODO: put warehouse capacity in specification
+        return getWarehouse().getLevel() * 100;
+    }
+    
+    public Building getWarehouse() {
+        // TODO: change to search for a building which gives warehouse capacity
+        return getBuilding(FreeCol.getSpecification().getBuildingType("model.building.Depot"));
     }
 
     /**
@@ -1774,13 +1789,15 @@ public final class Colony extends Settlement implements Location, Nameable {
             toArrayElement("lowLevel", lowLevel, out);
             toArrayElement("highLevel", highLevel, out);
             toArrayElement("exportLevel", exportLevel, out);
+            toArrayElement("productionFactors", productionFactors, out);
+            toArrayElement("productionIncrements", productionIncrements, out);
             Iterator<WorkLocation> workLocationIterator = workLocations.iterator();
             while (workLocationIterator.hasNext()) {
                 ((FreeColGameObject) workLocationIterator.next()).toXML(out, player, showAll, toSavedGame);
             }
         } else {
             out.writeAttribute("unitCount", Integer.toString(getUnitCount()));
-            getBuilding(Building.STOCKADE).toXML(out, player, showAll, toSavedGame);
+            getStockade().toXML(out, player, showAll, toSavedGame);
         }
         goodsContainer.toXML(out, player, showAll, toSavedGame);
         // End element:
@@ -1794,7 +1811,7 @@ public final class Colony extends Settlement implements Location, Nameable {
      */
     @Override
     protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
-        initializeWarehouseSettings();
+        initializeGoodsTypeArrays();
         setID(in.getAttributeValue(null, "ID"));
         name = in.getAttributeValue(null, "name");
         owner = (Player) getGame().getFreeColGameObject(in.getAttributeValue(null, "owner"));
@@ -1851,6 +1868,10 @@ public final class Colony extends Settlement implements Location, Nameable {
                 highLevel = readFromArrayElement("highLevel", in, new int[0]);
             } else if (in.getLocalName().equals("exportLevel")) {
                 exportLevel = readFromArrayElement("exportLevel", in, new int[0]);
+            } else if (in.getLocalName().equals("exportLevel")) {
+                productionFactors = readFromArrayElement("productionFactors", in, new float[0]);
+            } else if (in.getLocalName().equals("exportLevel")) {
+                productionIncrements = readFromArrayElement("productionIncrements", in, new int[0]);
             } else {
                 logger.warning("Unknown tag: " + in.getLocalName() + " loading colony " + name);
             }
@@ -1923,7 +1944,72 @@ public final class Colony extends Settlement implements Location, Nameable {
      *
      * @return whether the colony has a stockade
      */
-    boolean hasStockade() {
-        return getBuilding(Building.STOCKADE).getLevel() >= Building.HOUSE;
+    public boolean hasStockade() {
+        return getStockade().isBuilt();
+    }
+    
+    /**
+     * Returns the stockade building
+     *
+     * @return a <code>Building</code>
+     */ 
+    public Building getStockade() {
+        // TODO: change to search for a building which gives defense bonus
+        return getBuilding(FreeCol.getSpecification().getBuildingType("model.unit.Stockade"));
+    }
+    
+    public float getProductionFactorFor(GoodsType goodsType) {
+        return productionFactors[goodsType.getIndex()];
+    }
+
+    public void addProductionFactorFor(GoodsType goodsType, float factor) {
+        productionFactors[goodsType.getIndex()] += factor;
+    }
+
+    public void removeProductionFactorFor(GoodsType goodsType, float factor) {
+        productionFactors[goodsType.getIndex()] -= factor;
+    }
+
+    public int getProductionBonusFor(GoodsType goodsType) {
+        return productionIncrements[goodsType.getIndex()];
+    }
+
+    public void addProductionBonusFor(GoodsType goodsType, int bonus) {
+        productionIncrements[goodsType.getIndex()] += bonus;
+    }
+
+    public void removeProductionBonusFor(GoodsType goodsType, int bonus) {
+        productionIncrements[goodsType.getIndex()] -= bonus;
+    }
+
+    /**
+     * Returns true if the Building has the ability identified by
+     * <code>id</code.
+     *
+     * @param id a <code>String</code> value
+     * @return a <code>boolean</code> value
+     */
+    public boolean hasAbility(String id) {
+        // TODO: search player abilities too
+        return abilities.containsKey(id) && abilities.get(id);
+    }
+
+    /**
+     * Sets the ability identified by <code>id</code.
+     *
+     * @param id a <code>String</code> value
+     * @param newValue a <code>boolean</code> value
+     */
+    public void setAbility(String id, boolean newValue) {
+        abilities.put(id, newValue);
+    }
+
+    /**
+     * Sets the abilities given
+     *
+     * @param abilities the new abilities
+     */
+    public void putAbilities(java.util.Map<String, Boolean> abilities) {
+        this.abilities.putAll(abilities);
     }
 }

@@ -275,7 +275,7 @@ public class AIColony extends AIObject {
             // Do not request fishermen unless Docks have been completed:
             if (wlp.getWorkLocation() instanceof ColonyTile
                     && !((ColonyTile) wlp.getWorkLocation()).getWorkTile().isLand()
-                    && !colony.getBuilding(Building.DOCK).isBuilt()) {
+                    && !colony.hasAbility("model.ability.produceInWater")) {
                 // TODO: Check if docks are currently being built (and a carpenter with lumber is available)
                 rit.remove();
             }
@@ -785,8 +785,8 @@ public class AIColony extends AIObject {
                             && wlp.getWorkLocation().canAdd(unit)
                             && (wlp.getGoodsType() != Goods.FOOD || !((ColonyTile) wl).getWorkTile().isLand()
                                     && unit.getType() == Unit.EXPERT_FISHERMAN
-                                    && colony.getBuilding(Building.DOCK).isBuilt() || ((ColonyTile) wl).getWorkTile()
-                                    .isLand()
+                                    && colony.hasAbility("model.ability.produceInWater")
+                                    || ((ColonyTile) wl).getWorkTile().isLand()
                                     && unit.getType() != Unit.EXPERT_FISHERMAN)) {
                         unit.setLocation(wlp.getWorkLocation());
                         unit.setWorkType(wlp.getGoodsType());
@@ -807,14 +807,15 @@ public class AIColony extends AIObject {
                 WorkLocationPlan wlp = workLocationPlans.get(i);
                 WorkLocation wl = wlp.getWorkLocation();
                 if (wlp.getGoodsType() == Goods.FOOD
-                        && (((ColonyTile) wl).getWorkTile().isLand() || colony.getBuilding(Building.DOCK).isBuilt())) {
+                        && (((ColonyTile) wl).getWorkTile().isLand()
+                        || colony.hasAbility("model.ability.produceInWater"))) {
                     Unit bestUnit = null;
                     int bestProduction = 0;
                     Iterator<Unit> unitIterator = units.iterator();
                     while (unitIterator.hasNext()) {
                         Unit unit = unitIterator.next();
-                        int production = unit.getFarmedPotential(Goods.FOOD, ((ColonyTile) wlp.getWorkLocation())
-                                .getWorkTile());
+                        int production = ((ColonyTile) wlp.getWorkLocation()).getProductionOf(unit,
+                                Goods.FOOD);
                         if (production > 1
                                 && (bestUnit == null || production > bestProduction || production == bestProduction
                                         && unit.getSkillLevel() < bestUnit.getSkillLevel())) {
@@ -845,8 +846,8 @@ public class AIColony extends AIObject {
                             int production;
                             WorkLocation location = wlp.getWorkLocation();
                             if (location instanceof ColonyTile) {
-                                production = unit.getFarmedPotential(wlp.getGoodsType(), ((ColonyTile) wlp
-                                        .getWorkLocation()).getWorkTile());
+                                production = ((ColonyTile) wlp.getWorkLocation()).getProductionOf(unit,
+                                        wlp.getGoodsType());
                             } else { // Building
                                 production = ((Building) location).getProductivity(unit);
                             }
@@ -881,14 +882,13 @@ public class AIColony extends AIObject {
                         ColonyTile ct = (ColonyTile) wl;
                         Unit u = ct.getUnit();
                         if (ct.getUnit().getWorkType() != Goods.FOOD) {
-                            int uProduction = u.getFarmedPotential(Goods.FOOD, ct.getWorkTile());
+                            int uProduction = ct.getProductionOf(u, Goods.FOOD);
                             if (uProduction > 1) {
                                 if (bestPick == null || bestPick instanceof Building) {
                                     bestPick = wl;
                                 } else {
                                     ColonyTile bpct = (ColonyTile) bestPick;
-                                    int bestPickProduction = bpct.getUnit().getFarmedPotential(Goods.FOOD,
-                                            bpct.getWorkTile());
+                                    int bestPickProduction = bpct.getProductionOf(bpct.getUnit(), Goods.FOOD);
                                     if (uProduction > bestPickProduction
                                             || (uProduction == bestPickProduction && u.getSkillLevel() < bpct.getUnit()
                                                     .getSkillLevel())) {
@@ -917,7 +917,7 @@ public class AIColony extends AIObject {
             if (bestPick instanceof ColonyTile) {
                 ColonyTile ct = (ColonyTile) bestPick;
                 Unit u = ct.getUnit();
-                if (u.getFarmedPotential(Goods.FOOD, ct.getWorkTile()) > 1) {
+                if (ct.getProductionOf(u, Goods.FOOD) > 1) {
                     u.setWorkType(Goods.FOOD);
                 } else {
                     u.setLocation(colony.getTile());
@@ -967,7 +967,7 @@ public class AIColony extends AIObject {
                     bestPick.setLocation(ct);
                     bestPick.setWorkType(rawMaterial);
                 } else {
-                    Building th = colony.getBuilding(Building.TOWN_HALL);
+                    Building th = colony.getBuildingForProducing(Goods.BELLS);
                     if (th.canAdd(bestPick)) {
                         bestPick.setLocation(th);
                     } else {
@@ -1041,14 +1041,15 @@ public class AIColony extends AIObject {
             WorkLocationPlan wlp = workLocationPlans.get(i);
             WorkLocation wl = wlp.getWorkLocation();
             if (wlp.getGoodsType() == Goods.FOOD
-                    && (((ColonyTile) wl).getWorkTile().isLand() || colony.getBuilding(Building.DOCK).isBuilt())) {
+                    && (((ColonyTile) wl).getWorkTile().isLand()
+                    || colony.hasAbility("model.ability.produceInWater"))) {
                 Unit bestUnit = null;
                 int bestProduction = 0;
                 Iterator<Unit> unitIterator = units.iterator();
                 while (unitIterator.hasNext()) {
                     Unit unit = unitIterator.next();
-                    int production = unit.getFarmedPotential(Goods.FOOD, ((ColonyTile) wlp.getWorkLocation())
-                            .getWorkTile());
+                    int production = ((ColonyTile) wlp.getWorkLocation()).getProductionOf(unit,
+                            Goods.FOOD);
                     if (production > 1
                             && (bestUnit == null || production > bestProduction || production == bestProduction
                                     && unit.getSkillLevel() < bestUnit.getSkillLevel())) {
@@ -1077,7 +1078,7 @@ public class AIColony extends AIObject {
         }
 
         // FIXME: should be executed just once, when the custom house is built
-        if (colony.getBuilding(Building.CUSTOM_HOUSE).getLevel() != Building.NOT_BUILT) {
+        if (colony.hasAbility("model.ability.export")) {
             colony.setExports(Goods.SILVER, true);
             colony.setExports(Goods.RUM, true);
             colony.setExports(Goods.CIGARS, true);
@@ -1090,10 +1091,12 @@ public class AIColony extends AIObject {
         Building nowbuilding = colony.getBuilding(colony.getCurrentlyBuilding());
         if ( nowbuilding != null && nowbuilding.getNextHammers() <= colony.getHammers() &&
              nowbuilding.getNextTools() > colony.getGoodsCount(Goods.TOOLS)) {
-            while (colony.getBuilding(Building.CARPENTER).getUnitCount() > 0 && 
-                   colony.getBuilding(Building.BLACKSMITH).getUnitCount() < colony.getBuilding(Building.BLACKSMITH).getMaxUnits()) {
-                logger.info("i wanna move a unit!");
-                colony.getBuilding(Building.CARPENTER).getFirstUnit().setLocation(colony.getBuilding(Building.BLACKSMITH));
+            Building carpenter = colony.getBuildingForProducing(Goods.HAMMERS);
+            Building blacksmith = colony.getBuildingForProducing(Goods.TOOLS);
+            for (Unit unit : carpenter.getUnitList()) {
+                if (carpenter.getUnitCount() > 0 && blacksmith.canAdd(carpenter.getFirstUnit())) {
+                    carpenter.getFirstUnit().setLocation(blacksmith);
+                }
             }
         }
         decideBuildable(connection);
@@ -1109,35 +1112,35 @@ public class AIColony extends AIObject {
      */
     private void decideBuildable(Connection connection) {
         // TODO: Request tools if needed.
-        Iterator<Integer> bi = colonyPlan.getBuildable();
-        while (bi.hasNext()) {
-            int buildable = bi.next();
+        int hammersOld = 0;
+        if (colony.getCurrentlyBuilding() >= Colony.BUILDING_UNIT_ADDITION) {
+            hammersOld = Unit.getNextHammers(colony.getCurrentlyBuilding() - Colony.BUILDING_UNIT_ADDITION);
+        } else if (colony.getCurrentlyBuilding() > -1) {
+            hammersOld = colony.getBuilding(colony.getCurrentlyBuilding()).getNextHammers();
+        }
 
-            if (buildable == colony.getCurrentlyBuilding()) {
+        boolean isOldValid = true;
+        if (colony.getCurrentlyBuilding() < 0) {
+            isOldValid = false;
+        } else if (colony.getCurrentlyBuilding() < Colony.BUILDING_UNIT_ADDITION) {
+            isOldValid = colony.getBuilding(colony.getCurrentlyBuilding()).canBuildNext();
+        }
+        
+        Iterator<Building> bi = colonyPlan.getBuildable();
+        while (bi.hasNext()) {
+            Building buildable = bi.next();
+            int index = buildable.getType().getIndex();
+
+            if (index == colony.getCurrentlyBuilding()) {
                 // We are building the right item already:
                 break;
             }
 
-            int hammersNew = (buildable >= Colony.BUILDING_UNIT_ADDITION) ? Unit.getNextHammers(buildable
-                    - Colony.BUILDING_UNIT_ADDITION) : colony.getBuilding(buildable).getNextHammers();
-            int hammersOld = 0;
-            if (colony.getCurrentlyBuilding() >= Colony.BUILDING_UNIT_ADDITION) {
-                hammersOld = Unit.getNextHammers(colony.getCurrentlyBuilding() - Colony.BUILDING_UNIT_ADDITION);
-            } else if (colony.getCurrentlyBuilding() > -1) {
-                hammersOld = colony.getBuilding(colony.getCurrentlyBuilding()).getNextHammers();
-            }
-
-            boolean isOldValid = true;
-            if (colony.getCurrentlyBuilding() < 0) {
-                isOldValid = false;
-            } else if (colony.getCurrentlyBuilding() < Colony.BUILDING_UNIT_ADDITION) {
-                isOldValid = colony.getBuilding(colony.getCurrentlyBuilding()).canBuildNext();
-            }
-
+            int hammersNew = buildable.getNextHammers();
             if (hammersNew > colony.getHammers() || hammersNew > hammersOld || !isOldValid) {
                 Element setCurrentlyBuildingElement = Message.createNewRootElement("setCurrentlyBuilding");
                 setCurrentlyBuildingElement.setAttribute("colony", colony.getID());
-                setCurrentlyBuildingElement.setAttribute("type", Integer.toString(buildable));
+                setCurrentlyBuildingElement.setAttribute("type", Integer.toString(index));
 
                 try {
                     connection.sendAndWait(setCurrentlyBuildingElement);

@@ -103,7 +103,7 @@ public final class ReportRequirementsPanel extends ReportPanel implements Action
             Colony colony = colonies.get(index);
             for (Unit unit : colony.getUnitList()) {
                 unitCount[index][unit.getType()]++;
-                canTrain[index][unit.getType()] = colony.canTrain(unit);
+                canTrain[index][unit.getType()] = colony.canTrain(unit.getUnitType());
             }
             for (GoodsType goodsType : goodsTypes) {
                 surplus[index][goodsType.getIndex()] = colony.getProductionNetOf(goodsType);

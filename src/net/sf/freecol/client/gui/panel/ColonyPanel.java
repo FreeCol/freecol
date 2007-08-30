@@ -1015,7 +1015,7 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener {
                         unitLabel.addMouseListener(pressListener);
                     }
                     add(unitLabel, higConst.rc(1, unitColumn + index));
-                    if (building.getType() == Building.SCHOOLHOUSE) {
+                    if (building.hasAbility("model.ability.teach")) {
                         if (unit.getStudent() != null) {
                             UnitLabel studentLabel = new UnitLabel(unit.getStudent(), parent, true);
                             studentLabel.setIgnoreLocation(true);
@@ -1052,7 +1052,7 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener {
             public void updateProductionLabel() {
                 productionLabel.setProduction(building.getProductionNextTurn());
                 productionLabel.setMaximumProduction(building.getMaximumProduction());
-                if (building.getType() == Building.SCHOOLHOUSE) {
+                if (building.hasAbility("model.ability.teach")) {
                     initialize();
                 }
             }
@@ -1618,8 +1618,9 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener {
 
                 TileType tileType = colonyTile.getTile().getType();
                 // A colony always produces food.
-                ImageIcon goodsIcon = parent.getImageProvider().getGoodsImageIcon(Goods.FOOD);
-                ProductionLabel pl = new ProductionLabel(Goods.FOOD, colonyTile.getProductionOf(Goods.FOOD), parent);
+                GoodsType primaryGood = colonyTile.getTile().primaryGoods();
+                ImageIcon goodsIcon = parent.getImageProvider().getGoodsImageIcon(primaryGood);
+                ProductionLabel pl = new ProductionLabel(primaryGood, colonyTile.getProductionOf(primaryGood), parent);
                 pl.setSize(lib.getTerrainImageWidth(tileType), goodsIcon.getIconHeight());
                 add(pl);
 
@@ -1837,8 +1838,7 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener {
             super.addActionListener(buildingBoxListener);
         }
 
-        public String buildingText(int type) {
-            Building building = getColony().getBuilding(type);
+        public String buildingText(Building building) {
             String theText = new String(building.getNextName() + " (" + Integer.toString(building.getNextHammers())
                     + " " + Messages.message("model.goods.Hammers").toLowerCase());
 
@@ -1874,9 +1874,13 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener {
             BuildingBoxItem nothingItem = new BuildingBoxItem(Messages.message("nothing"), -1);
             this.addItem(nothingItem);
             BuildingBoxItem toSelect = nothingItem;
-            for (int i = 0; i < Building.NUMBER_OF_TYPES; i++) {
-                if (colonyPanel.getColony().getBuilding(i).canBuildNext()) {
-                    String theText = buildingText(i);
+
+            Iterator<Building> buildingIterator = colonyPanel.getColony().getBuildingIterator();
+            while (buildingIterator.hasNext()) {
+                Building building = buildingIterator.next();
+                if (building.canBuildNext()) {
+                    String theText = buildingText(building);
+                    int i = building.getType().getIndex();
                     BuildingBoxItem nextItem = new BuildingBoxItem(theText, i);
                     this.addItem(nextItem);
                     if (i == colonyPanel.getColony().getCurrentlyBuilding()) {

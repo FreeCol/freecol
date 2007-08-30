@@ -256,7 +256,7 @@ public class ColonyTile extends FreeColGameObject implements WorkLocation, Ownab
             return false;
         }
 
-        if (!(workTile.isLand() || getColony().getBuilding(Building.DOCK).isBuilt())) {
+        if (!(workTile.isLand() || getColony().hasAbility("model.ability.produceInWater"))) {
             return false;
         }
         
@@ -420,12 +420,8 @@ public class ColonyTile extends FreeColGameObject implements WorkLocation, Ownab
     }
 
     private void produceGoods() {
-        int amount = getUnit().getFarmedPotential(getUnit().getWorkType(), workTile);
+        int amount = getProductionOf(getUnit().getWorkType());
 
-        if (!workTile.isLand() && !colony.getBuilding(Building.DOCK).isBuilt()) {
-            amount = 0;
-        }
-        
         if (amount > 0) {
             colony.addGoods(getUnit().getWorkType(), amount);
             unit.modifyExperience(amount);
@@ -433,15 +429,7 @@ public class ColonyTile extends FreeColGameObject implements WorkLocation, Ownab
     }
 
     private void produceGoodsCenterTile() {
-        int maxFoodProduction = -1;
-        GoodsType goodsFood = null;
-        List<GoodsType> goodsAreFood = FreeCol.getSpecification().getGoodsFood();
-        for (GoodsType goodsType : goodsAreFood) {
-            int production = getProductionOf(goodsType);
-            if (maxFoodProduction < production) {
-                goodsFood = goodsType;
-            }
-        }
+        GoodsType goodsFood = workTile.primaryGoods();
         colony.addGoods(goodsFood, getProductionOf(goodsFood));
         GoodsType type2 = workTile.secondaryGoods();
         colony.addGoods(type2, getProductionOf(type2));
@@ -461,11 +449,11 @@ public class ColonyTile extends FreeColGameObject implements WorkLocation, Ownab
      */
     public GoodsType getWorkType(Unit unit) {
         GoodsType workType = unit.getWorkType();
-        int amount = unit.getFarmedPotential(workType, workTile);
+        int amount = getProductionOf(unit, workType);
         if (amount == 0) {
             List<GoodsType> farmedGoodsTypes = FreeCol.getSpecification().getFarmedGoodsTypeList();
             for(GoodsType farmedGoods : farmedGoodsTypes) {
-                int newAmount = unit.getFarmedPotential(farmedGoods, workTile);
+                int newAmount = getProductionOf(unit, farmedGoods);
                 if (newAmount > amount) {
                     amount = newAmount;
                     workType = farmedGoods;
@@ -482,27 +470,25 @@ public class ColonyTile extends FreeColGameObject implements WorkLocation, Ownab
         if ((getUnit() == null) && !(isColonyCenterTile())) {
             return 0; // Produce nothing if there's nobody to work the terrain.
         }
+        return getProductionOf(getUnit(), goodsType);
+    }
 
+    /**
+    * Returns the production of the given type of goods which would be
+    * produced by the given unit
+    */
+    public int getProductionOf(Unit unit, GoodsType goodsType) {
+        int production = 0;
         if (!(isColonyCenterTile())) {
-            if (getUnit().getWorkType() != goodsType) {
+            if (!workTile.isLand() && !colony.hasAbility("model.ability.produceInWater")) {
                 return 0;
             }
 
-            int amount = getUnit().getFarmedPotential(getUnit().getWorkType(), workTile);
-
-            if (!workTile.isLand() && !colony.getBuilding(Building.DOCK).isBuilt()) {
-                amount = 0;
-            }
-            
-            return Math.max(0, amount);
+            production = getUnit().getProductionOf(goodsType, workTile.potential(goodsType));
+        } else if (goodsType.isFoodType() || goodsType == workTile.secondaryGoods()) {
+            production = workTile.potential(goodsType);
         }
-
-        int production = 0;
-        if (goodsType == Goods.FOOD) {
-            production = workTile.potential(Goods.FOOD);
-        } else if (goodsType == workTile.secondaryGoods()) {
-            production = workTile.potential(workTile.secondaryGoods());
-        }
+        
         if (production > 0) {
             production = Math.max(1, production + colony.getProductionBonus());
         }

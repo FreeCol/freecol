@@ -174,7 +174,7 @@ public final class WarehouseDialog extends FreeColDialog implements ActionListen
             // export checkbox
             export = new JCheckBox(Messages.message("warehouseDialog.export"), colony.getExports(goodsType));
             export.setToolTipText(Messages.message("warehouseDialog.export.shortDescription"));
-            if (colony.getBuilding(Building.CUSTOM_HOUSE).getLevel() == Building.NOT_BUILT) {
+            if (!colony.hasAbility("model.ability.export")) {
                 export.setEnabled(false);
             }
             add(export, higConst.rc(5, labelColumn));

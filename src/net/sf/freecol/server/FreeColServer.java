@@ -263,7 +263,7 @@ public final class FreeColServer {
             for (UnitType undead : undeads) {
                 if (undead.hasAbility("model.ability.navalUnit")) {
                     navalUnits.add(undead);
-                } else if (undead.getName().equals("model.unit.revenger")) { // TODO: softcode this
+                } else if (undead.getID().equals("model.unit.revenger")) { // TODO: softcode this
                     landUnits.add(undead);
                 }
             }

@@ -3,6 +3,8 @@ package net.sf.freecol.common.model;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
@@ -34,26 +36,19 @@ import org.w3c.dom.Element;
  * Level {@link #FACTORY}: "Fortress"
  * 
  */
-public final class Building extends FreeColGameObject implements WorkLocation, Ownable, Named {
+public final class Building extends FreeColGameObject implements Abilities, WorkLocation, Ownable, Named {
     
     public static final String COPYRIGHT = "Copyright (C) 2003-2006 The FreeCol Team";
 
     public static final String LICENSE = "http://www.gnu.org/licenses/gpl.html";
 
     public static final String REVISION = "$Revision$";
-
-    /**
-     * The maximum level.
-     */
+    
+    // TODO: Remove when it isn't used in AI code
     public static final int MAX_LEVEL = 3;
 
     /** The type of a building. */
-    public static final int NONE = -1, TOWN_HALL = 0, CARPENTER = 1, BLACKSMITH = 2, TOBACCONIST = 3, WEAVER = 4,
-            DISTILLER = 5, FUR_TRADER = 6, SCHOOLHOUSE = 7, // 10
-            ARMORY = 8, CHURCH = 9, // 13
-            STOCKADE = 10, // 7
-            WAREHOUSE = 11, STABLES = 12, DOCK = 13, // 9
-            PRINTING_PRESS = 14, CUSTOM_HOUSE = 15;
+    public static final int NONE = -1;
 
     /** The maximum number of building types. */
     public static final int NUMBER_OF_TYPES = FreeCol.getSpecification().numberOfBuildingTypes();
@@ -61,28 +56,8 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
     /** The level of a building. */
     public static final int NOT_BUILT = 0, HOUSE = 1, SHOP = 2, FACTORY = 3;
 
-    /**
-     * Sets the maximum number of units in one building. This will become a
-     * non-constant later so always use the {@link #getMaxUnits()}.
-     */
-    private static final int MAX_UNITS = 3;
-
     /** The colony containing this building. */
     private Colony colony;
-
-    /** The type of this building. */
-    private int type;
-
-    /**
-     * The level this building has. This should be on of:
-     * <ul>
-     * <li>{@link #NOT_BUILT}</li>
-     * <li>{@link #HOUSE}</li>
-     * <li>{@link #SHOP}</li>
-     * <li>{@link #FACTORY}</li>
-     * </ul>
-     */
-    private int level;
 
     /**
      * List of the units which have this <code>Building</code> as it's
@@ -91,6 +66,8 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
     private ArrayList<Unit> units = new ArrayList<Unit>();
 
     private BuildingType buildingType;
+    
+    private boolean isBuilt;
 
 
     /**
@@ -99,17 +76,14 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
      * @param game The <code>Game</code> this object belongs to.
      * @param colony The colony in which this building is located.
      * @param type The type of building.
-     * @param level The level of the building: {@link #NOT_BUILT},
-     *            {@link #HOUSE}, {@link #SHOP} or {@link #FACTORY}.
      */
-    public Building(Game game, Colony colony, int type, int level) {
+    public Building(Game game, Colony colony, BuildingType type, boolean built) {
         super(game);
 
         this.colony = colony;
-        this.type = type;
-        this.level = level;
+        this.isBuilt = built;
 
-        buildingType = FreeCol.getSpecification().getBuildingType(type);
+        buildingType = type;
     }
 
     /**
@@ -123,8 +97,6 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
         super(game, in);
 
         readFromXML(in);
-
-        buildingType = FreeCol.getSpecification().getBuildingType(type);
     }
 
     /**
@@ -137,8 +109,6 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
         super(game, e);
 
         readFromXMLElement(e);
-
-        buildingType = FreeCol.getSpecification().getBuildingType(type);
     }
 
     /**
@@ -185,49 +155,25 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
     }
 
     /**
-     * Gets the level of the building. One of {@link #NOT_BUILT},
-     * {@link #HOUSE}, {@link #SHOP} and {@link #FACTORY}.
-     * 
-     * @return The current level.
-     */
-    public int getLevel() {
-        return level;
-    }
-
-    /**
-     * Sets the level of the building.
-     * 
-     * @param level The new level of the building. This should be one of
-     *            {@link #NOT_BUILT}, {@link #HOUSE}, {@link #SHOP} and
-     *            {@link #FACTORY}.
-     */
-    public void setLevel(int level) {
-        this.level = level;
-    }
-
-    /**
      * Gets the name of a building.
      * 
      * @return The name of the <code>Building</code> or <i>null</i> if the
      *         building has not been built.
      */
     public String getName() {
-        if (isBuilt()) {
-            return getName(type, level);
-        } else {
+        if (isBuilt) {
             return null;
+        } else {
+            return buildingType.getName();
         }
     }
 
-    /**
-     * Gets the name of a building.
-     *
-     * @param someType the type of building
-     * @param someLevel the level of the building
-     * @return a <code>String</code> value
-     */
-    public static String getName(int someType, int someLevel) {
-        return FreeCol.getSpecification().getBuildingType(someType).level(someLevel - 1).getName();
+    public int getLevel() {
+        if (isBuilt) {
+            return buildingType.getLevel();
+        } else {
+            return 0;
+        }
     }
 
     /**
@@ -247,8 +193,8 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
      *         improvement does not exist.
      */
     public String getNextName() {
-        return level < buildingType.numberOfLevels() ?
-               buildingType.level(level).getName() : null;
+        BuildingType next = buildingType.getUpgradesTo();
+        return next != null ? next.getName() : null;
     }
 
     /**
@@ -263,7 +209,7 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
             return -1;
         }
 
-        return level < buildingType.numberOfLevels() ? buildingType.level(level).getHammersRequired() : -1;
+        return buildingType.getUpgradesTo().getHammersRequired();
     }
 
     /**
@@ -278,7 +224,7 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
             return -1;
         }
 
-        return level < buildingType.numberOfLevels() ? buildingType.level(level).getToolsRequired() : -1;
+        return buildingType.getUpgradesTo().getToolsRequired();
     }
 
     /**
@@ -289,7 +235,11 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
      *         same type, or <code>-1</code> if the building does not exist.
      */
     public int getNextPop() {
-        return level < buildingType.numberOfLevels() ? buildingType.level(level).getPopulationRequired() : -1;
+        if (!canBuildNext()) {
+            return -1;
+        }
+
+        return buildingType.getUpgradesTo().getPopulationRequired();
     }
 
     /**
@@ -302,30 +252,34 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
      *         population.
      */
     public boolean canBuildNext() {
-        if (level >= MAX_LEVEL) {
-            return false;
+        if (isBuilt) {
+            return canBuild(buildingType.getUpgradesTo());
+        } else {
+            return canBuild(buildingType);
         }
-        if (level + 1 >= FACTORY
-            && !getColony().getOwner().hasAbility("model.ability.buildFactory")
-            && (type == BLACKSMITH || type == TOBACCONIST || type == WEAVER || type == DISTILLER
-                || type == FUR_TRADER || type == ARMORY)) {
-            return false;
-        }
+    }
+    
 
-        // if there are no more improvements available for this building type..
-        if (buildingType.numberOfLevels() < level + 1) {
+    /**
+     * Checks if the given building type can be built.
+     * 
+     * @return If this <code>Building</code> can have a higher level, that
+     *         {@link FoundingFather Adam Smith} is present for manufactoring
+     *         factory level buildings and that the <code>Colony</code>
+     *         containing this <code>Building</code> has a sufficiently high
+     *         population.
+     */
+    public boolean canBuild(BuildingType next) {
+        if (next == null) {
             return false;
         }
-
-        if (getType() == DOCK && getColony().isLandLocked()) {
+        /* TODO: check required abilities for next
+        if () {
             return false;
         }
+         */
 
-        if (buildingType.level(level).getPopulationRequired() > colony.getUnitCount()) {
-            return false;
-        }
-
-        if (getType() == CUSTOM_HOUSE && !getColony().getOwner().hasAbility("model.ability.buildCustomHouse")) {
+        if (next.getPopulationRequired() > colony.getUnitCount()) {
             return false;
         }
 
@@ -338,8 +292,7 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
      * @return The result.
      */
     public boolean isBuilt() {
-
-        return 0 < level;
+        return isBuilt;
     }
 
     /**
@@ -356,23 +309,100 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
      * 
      * @return The type.
      */
-    public int getType() {
-        return type;
+    public BuildingType getType() {
+        return buildingType;
     }
-
+    
+    /**
+     * Returns whether this building can be damaged
+     *
+     * @return <code>true</code> if can be damaged
+     * @see #damage
+     */
+    public boolean canBeDamaged() {
+        return isBuilt() && buildingType.getHammersRequired() > 0;
+    }
+    
+    /**
+     * Reduces this building to previous level (is set to UpgradesFrom
+     * attribute in BuildingType) or is destroyed if it's the first level
+     */
+    public void damage() {
+        if (canBeDamaged()) {
+            setType(buildingType.getUpgradesFrom());
+        }
+    }
+    
+    /**
+     * Upgrades this building to next level (is set to UpgradesTo
+     * attribute in BuildingType)
+     */
+    public void upgrade() {
+        if (canBuildNext()) {
+            if (isBuilt) {
+                setType(buildingType.getUpgradesTo());
+            } else {
+                setType(buildingType);
+            }
+        }
+    }
+    
+    private void setType(BuildingType newBuildingType) {
+        if (isBuilt) {
+            // remove production bonus, factors and abilities from current type
+            for(Entry<GoodsType, Float> factor : buildingType.getProductionFactors()) {
+                colony.removeProductionFactorFor(factor.getKey(), factor.getValue());
+            }
+            for(Entry<GoodsType, Integer> bonus : buildingType.getProductionBonuses()) {
+                colony.removeProductionBonusFor(bonus.getKey(), bonus.getValue());
+            }
+            
+            Map<String, Boolean> abilities = buildingType.getAbilities();
+            for(Entry<String, Boolean> ability : abilities.entrySet()) {
+                abilities.put(ability.getKey(), !ability.getValue());
+            }
+            colony.putAbilities(abilities);
+        }
+        
+        if (newBuildingType != null) {
+            isBuilt = true;
+            buildingType = newBuildingType;
+            
+            // add new production bonus, factors and abilities from new type
+            for(Entry<GoodsType, Float> factor : buildingType.getProductionFactors()) {
+                colony.addProductionFactorFor(factor.getKey(), factor.getValue());
+            }
+            for(Entry<GoodsType, Integer> bonus : buildingType.getProductionBonuses()) {
+                colony.addProductionBonusFor(bonus.getKey(), bonus.getValue());
+            }
+            colony.putAbilities(buildingType.getAbilities());
+            
+            // Colonists which can't work here must be put outside
+            for (Unit unit : units) {
+                if (!canAdd(unit.getUnitType())) {
+                    unit.setLocation(getTile());
+                }
+            }
+        } else {
+            isBuilt = false;
+        }
+        
+        // Colonists exceding units limit must be put outside
+        while (units.size() > getMaxUnits()) {
+            getLastUnit().setLocation(getTile());
+        }
+    }
+    
     /**
      * Gets the maximum number of units allowed in this <code>Building</code>.
      * 
      * @return The number.
      */
     public int getMaxUnits() {
-        if (type == STOCKADE || type == DOCK || type == WAREHOUSE || type == STABLES || type == PRINTING_PRESS
-                || type == CUSTOM_HOUSE) {
-            return 0;
-        } else if (type == SCHOOLHOUSE) {
-            return getLevel();
+        if (isBuilt) {
+            return buildingType.getWorkPlaces();
         } else {
-            return MAX_UNITS;
+            return 0;
         }
     }
 
@@ -394,6 +424,10 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
      *         otherwise.
      */
     public boolean canAdd(Locatable locatable) {
+        if (locatable.getLocation() == this) {
+            return true;
+        }
+        
         if (getUnitCount() >= getMaxUnits()) {
             return false;
         }
@@ -401,42 +435,19 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
         if (!(locatable instanceof Unit)) {
             return false;
         }
-
-        if (!((Unit) locatable).getUnitType().hasSkill()) {
-            return false;
-        }
-
-        if (getType() == SCHOOLHOUSE) {
-            return canAddAsTeacher((Unit) locatable);
-        }
-
-        return true;
+        return canAdd(((Unit) locatable).getUnitType());
     }
-
 
     /**
-     * Returns true if this building is a schoolhouse and the unit is
-     * a skilled unit with a skill level not exceeding the level of
-     * the schoolhouse. The number of units already in the schoolhouse
-     * is not taken into account. @see #canAdd
+     * Checks if the specified <code>UnitType</code> may be added to this
+     * <code>WorkLocation</code>. Whether is built is  not taken into account.
      * 
-     * @param unit The unit to add as a teacher.
-     * @return <code>true</code> if this unit could be added.
-    */
-    public boolean canAddAsTeacher(Unit unit) {
-        return canAddAsTeacher(unit.getUnitType());
-    }
-
-    public boolean canAddAsTeacher(UnitType unitType) {
-        if (getType() == SCHOOLHOUSE) {
-            if (Unit.getSkillLevel(unitType) <= 0) {
-                return false;
-            } else {
-                return (getLevel() >= Unit.getSkillLevel(unitType));
-            }
-        } else {
-            return false;
-        }
+     * @param unitType the <code>UnitTYpe</code>.
+     * @return <i>true</i> if the <i>UnitType</i> may be added and <i>false</i>
+     *         otherwise.
+     */
+    public boolean canAdd(UnitType unitType) {
+        return buildingType.canAdd(unitType);
     }
 
 
@@ -471,7 +482,7 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
         }
 
         Unit student = unit.getStudent();
-        if (getType() == SCHOOLHOUSE) {
+        if (hasAbility("model.ability.teach")) {
             if (student == null) {
                 student = findStudent(unit);
                 if (student != null) {
@@ -486,6 +497,26 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
 
         units.add(unit);
         getColony().updatePopulation();
+    }
+
+    /**
+     * Returns true if the Building has the ability identified by
+     * <code>id</code.
+     *
+     * @param id a <code>String</code> value
+     * @return a <code>boolean</code> value
+     */
+    public boolean hasAbility(String id) {
+        return buildingType.hasAbility(id);
+    }
+
+    /**
+     * Sets the ability identified by <code>id</code.
+     *
+     * @param id a <code>String</code> value
+     * @param newValue a <code>boolean</code> value
+     */
+    public void setAbility(String id, boolean newValue) {
     }
 
     /**
@@ -535,8 +566,7 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
      */
     public boolean contains(Locatable locatable) {
         if (locatable instanceof Unit) {
-            int index = units.indexOf(locatable);
-            return (index != -1) ? true : false;
+            return units.contains(locatable);
         }
 
         return false;
@@ -596,13 +626,34 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
      * Prepares this <code>Building</code> for a new turn.
      */
     public void newTurn() {
-        if ((level == NOT_BUILT) && (type != CHURCH)) {
+        if (!isBuilt()) {
             // Don't do anything if the building does not exist.
             return; 
-        } else if (type == SCHOOLHOUSE) {
+        }
+        if (hasAbility("model.ability.teach")) {
             trainStudents();
-        } else if (getGoodsOutputType() != null) {
+        }
+        if (hasAbility("model.ability.repairShips")) {
+            repairShips();
+        }
+        if (getGoodsOutputType() != null) {
             produceGoods();
+        }
+    }
+
+    // Repair any damaged ships:
+    private void repairShips() {
+        for (Unit unit : getTile().getUnitList()) {
+            if (unit.isNaval() && unit.isUnderRepair()) {
+                unit.setHitpoints(unit.getHitpoints() + 1);
+                if (!unit.isUnderRepair()) {
+                    addModelMessage(this, "model.unit.shipRepaired",
+                            new String[][] {
+                                { "%unit%", unit.getName() },
+                                { "%repairLocation%", getLocationName() } },
+                                ModelMessage.DEFAULT, this);
+                }
+            }
         }
     }
 
@@ -622,20 +673,11 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
             return;
 
         // Actually produce the goods:
-        if (goodsOutputType == Goods.CROSSES) {
-            colony.getOwner().incrementCrosses(goodsOutput);
-        } else if (goodsOutputType == Goods.BELLS) {
-            colony.getOwner().incrementBells(goodsOutput);
-            colony.addBells(goodsOutput);
-        } else {
+        if (goodsInputType != null) {
             colony.removeGoods(goodsInputType, goodsInput);
-
-            if (goodsOutputType == Goods.HAMMERS) {
-                colony.addHammers(goodsOutput);
-            } else {
-                colony.addGoods(goodsOutputType, goodsOutput);
-            }
         }
+        colony.addGoods(goodsOutputType, goodsOutput);
+
         int experience = goodsOutput / getUnitCount();
         for (Unit unit : getUnitList()) {
             unit.modifyExperience(experience);
@@ -660,7 +702,6 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
 
 
     private void trainStudents() {
-        
         Iterator<Unit> teachers = getUnitIterator();
         while (teachers.hasNext()) {
             Unit teacher = teachers.next();
@@ -699,40 +740,7 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
      *         <code>Building</code>.
      */
     public GoodsType getGoodsOutputType() {
-        return getGoodsOutputType(getType());
-    }
-
-    /**
-     * Returns the type of goods this <code>Building</code> produces.
-     * 
-     * @param type The type of building.
-     * @return The type of goods this <code>Building</code> produces or
-     *         <code>-1</code> if there is no goods production by this
-     *         <code>Building</code>.
-     */
-    public static GoodsType getGoodsOutputType(int type) {
-        switch (type) {
-        case BLACKSMITH:
-            return Goods.TOOLS;
-        case TOBACCONIST:
-            return Goods.CIGARS;
-        case WEAVER:
-            return Goods.CLOTH;
-        case DISTILLER:
-            return Goods.RUM;
-        case FUR_TRADER:
-            return Goods.COATS;
-        case ARMORY:
-            return Goods.MUSKETS;
-        case CHURCH:
-            return Goods.CROSSES;
-        case TOWN_HALL:
-            return Goods.BELLS;
-        case CARPENTER:
-            return Goods.HAMMERS;
-        default:
-            return null;
-        }
+        return getType().getProducedGoodsType();
     }
 
     /**
@@ -742,49 +750,18 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
      *         in order to produce it's {@link #getGoodsOutputType output}.
      */
     public GoodsType getGoodsInputType() {
-        return getGoodsInputType(getType());
-    }
-
-    /**
-     * Returns the type of goods this building needs for input.
-     * 
-     * @param type The type of building.
-     * @return The type of goods this <code>Building</code> requires as input
-     *         in order to produce it's {@link #getGoodsOutputType output}.
-     */
-    public static GoodsType getGoodsInputType(int type) {
-        switch (type) {
-        case BLACKSMITH:
-            return Goods.ORE;
-        case TOBACCONIST:
-            return Goods.TOBACCO;
-        case WEAVER:
-            return Goods.COTTON;
-        case DISTILLER:
-            return Goods.SUGAR;
-        case FUR_TRADER:
-            return Goods.FURS;
-        case ARMORY:
-            return Goods.TOOLS;
-        case CARPENTER:
-            return Goods.LUMBER;
-        default:
-            return null;
-        }
+        return getType().getConsumedGoodsType();
     }
 
     /**
      * Returns the amount of goods needed to have a full production if
      * <code>Unit</code> was added.
      */
-    public int getMaximumGoodsInputAdding(Unit unit){
-        int goodsInput = getMaximumProductionAdding(unit);
-        if (level > SHOP) {
-            goodsInput = (goodsInput * 2) / 3; // Factories don't need the
-                                                // extra 3 units.
+    public int getMaximumGoodsInputAdding(Unit unit) {
+        if (getGoodsInputType() == null) {
+            return 0;
         }
-
-        return goodsInput;
+        return getProductivityAdding(unit);
     }
 
     /**
@@ -813,32 +790,7 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
      * @see #getProduction
      */
     public int getGoodsInput() {
-        int goodsInput = getMaximumGoodsInput();
-        if (getGoodsInputType() != null && colony.getGoodsCount(getGoodsInputType()) < goodsInput) {
-            goodsInput = colony.getGoodsCount(getGoodsInputType());
-        }
-        return goodsInput;
-    }
-
-    /**
-     * Returns the amount of goods being used to get a desired
-     * {@link #getProduction production}.
-     * 
-     * @return The actual amount of goods that is being used to support the
-     *         desired production.
-     * @see #getMaximumGoodsInput
-     * @see #getProduction
-     */
-    public int getGoodsInput(int goodsOutput) {
-        int goodsInput = goodsOutput;
-        if (level > SHOP) {
-            goodsInput = (goodsInput * 2) / 3; // Factories don't need the
-                                                // extra 3 units.
-        }
-        if (getGoodsInputType() != null && colony.getGoodsCount(getGoodsInputType()) < goodsInput) {
-            goodsInput = colony.getGoodsCount(getGoodsInputType());
-        }
-        return goodsInput;
+        return calculateGoodsInput(getMaximumGoodsInput(), 0);
     }
 
     /**
@@ -851,31 +803,13 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
      * @see #getProduction
      */
     public int getGoodsInputNextTurn() {
-        return calculateGoodsInput(getMaximumGoodsInput());
+        return calculateGoodsInput(getMaximumGoodsInput(),
+                colony.getProductionNextTurn(getGoodsInputType()));
     }
 
-    /**
-     * Returns the amount of goods being used to get the desired
-     * {@link #getProduction production} at the next turn.
-     * 
-     * @return The actual amount of goods that will be used to support the
-     *         desired production at the next turn.
-     * @see #getMaximumGoodsInput
-     * @see #getProduction
-     */
-    public int getGoodsInputNextTurn(int goodsOutput) {
-        int goodsInput = goodsOutput;
-        if (level > SHOP) {
-            // Factories don't need the extra 3 units.
-            goodsInput = (goodsInput * 2) / 3; 
-        }
-        return calculateGoodsInput(goodsInput);
-    }
-
-    private int calculateGoodsInput(int goodsInput) {
+    private int calculateGoodsInput(int goodsInput, int addToWarehouse) {
         if (getGoodsInputType() != null) {
-            int available = colony.getGoodsCount(getGoodsInputType()) +
-                colony.getProductionNextTurn(getGoodsInputType());
+            int available = colony.getGoodsCount(getGoodsInputType()) + addToWarehouse;
             if (available < goodsInput) {
                 // Not enough goods to do this?
                 goodsInput = available;
@@ -894,46 +828,45 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
      *        including those contributed by the new_unit, if applicable.
      */
     public int calculateOutputAdding(int goodsInput, Unit new_unit) {
-        int goodsOutput = 0;
-        if (level < FACTORY) {
-            goodsOutput = goodsInput;
-        } else {
-            goodsOutput = (goodsInput * 3) / 2;
-            if (getGameOptions().getBoolean(GameOptions.EXPERTS_HAVE_CONNECTIONS)) {
-                int minimumProduction = 0;
-                Iterator<Unit> i = getUnitIterator();
-                while (i.hasNext()) {
-                    Unit unit = (Unit)i.next();
-                    if (unit.getUnitType() == getExpertUnitType()) {
-                        minimumProduction += 4;
-                    }
-                }
-                if (new_unit != null && canAdd(new_unit) && new_unit.getUnitType() == getExpertUnitType()) {
+        int goodsOutput = getProductionFromProductivity(goodsInput);
+        if (hasAbility("model.ability.expertsUseConnections") &&
+                getGameOptions().getBoolean(GameOptions.EXPERTS_HAVE_CONNECTIONS)) {
+            int minimumProduction = 0;
+            Iterator<Unit> i = getUnitIterator();
+            while (i.hasNext()) {
+                Unit unit = (Unit)i.next();
+                if (unit.getUnitType() == getExpertUnitType()) {
                     minimumProduction += 4;
                 }
-                if (goodsOutput < minimumProduction) {
-                    goodsOutput = minimumProduction;
-                }
+            }
+            if (new_unit != null && canAdd(new_unit) && new_unit.getUnitType() == getExpertUnitType()) {
+                minimumProduction += 4;
+            }
+            if (goodsOutput < minimumProduction) {
+                goodsOutput = minimumProduction;
             }
         }
         return goodsOutput;
     }
 
-     /**
-      * Calculates and returns the output of this building from the input.
-      *
-      * @return The production of this building from the input.
-      * @see #getProduction
-      * @see #getProductionNextTurn
-      */
-     public int calculateOutput(int goodsInput) {
-         return calculateOutputAdding(goodsInput, null);
-     }
+    /**
+     * Calculates and returns the output of this building from the input.
+     *
+     * @param goodsInput The quantity of consumed goods
+     * @return The production of this building from the input.
+     * @see #getProduction
+     * @see #getProductionNextTurn
+     */
+    public int calculateOutput(int goodsInput) {
+        return calculateOutputAdding(goodsInput, null);
+    }
 
     /**
      * Returns the actual production of this building if
      * <Code>Unit</code> was added.
      *
+     * @param unit The Unit that was added
+     * @return The amount of goods being produced by this <code>Building</code>
      */
     public int getProductionAdding(Unit unit) {
         if (getGoodsOutputType() == null) {
@@ -943,9 +876,9 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
         int goodsOutput = getMaximumProductionAdding(unit);
 
         if (getGoodsInputType() != null) {
-            int goodsInput = colony.getGoodsCount(getGoodsInputType());
-            if (goodsInput < getMaximumGoodsInputAdding(unit)) {
-                goodsOutput = calculateOutputAdding(goodsInput, unit);
+            int available = colony.getGoodsCount(getGoodsInputType());
+            if (available < getMaximumGoodsInputAdding(unit)) {
+                goodsOutput = calculateOutputAdding(available, unit);
             }
         }
 
@@ -972,16 +905,28 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
      * @see #getProduction
      */
     public int getProductionNextTurn() {
+        return getProductionNextTurnAdding(null);
+    }
+
+    /**
+     * Returns the actual production of this building for next turn.
+     * 
+     * @param unit The Unit that was added
+     * @return The production of this building the next turn.
+     * @see #getProduction
+     */
+    public int getProductionNextTurnAdding(Unit unit) {
         if (getGoodsOutputType() == null) {
             return 0;
         }
 
-        int goodsOutput = getMaximumProduction();
+        int goodsOutput = getMaximumProductionAdding(unit);
 
         if (getGoodsInputType() != null) {
-            int goodsInput = colony.getGoodsCount(getGoodsInputType()) + colony.getProductionNextTurn(getGoodsInputType());
-            if (goodsInput < getMaximumGoodsInput()) {
-                goodsOutput = calculateOutput(goodsInput);
+            int available = colony.getGoodsCount(getGoodsInputType()) + 
+                    colony.getProductionNextTurn(getGoodsInputType());
+            if (available < getMaximumGoodsInputAdding(unit)) {
+                goodsOutput = calculateOutputAdding(available, unit);
             }
         }
 
@@ -995,42 +940,7 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
      * @see #getProduction
      */
     public int getAdditionalProductionNextTurn(Unit addUnit) {
-        if (getGoodsOutputType() == null) {
-            return 0;
-        }
-        if (addUnit == null || !canAdd(addUnit)) {
-            return 0;
-        }
-
-        int addGoodsOutput = getAdditionalProduction(addUnit);
-
-        if (getGoodsInputType() != null) {
-            // addGoodsInput = total available stock + new production - current requirements
-            //               = remaining input goods to support additional output
-            int addGoodsInput = colony.getGoodsCount(getGoodsInputType())
-                                + colony.getProductionOf(getGoodsInputType())
-                                - getGoodsInput();
-            // Additional input goods need = Additional goods output (with modifier for FACTORY)
-            int neededGoodsInput = addGoodsOutput;
-            if (level > SHOP) {
-                neededGoodsInput = (neededGoodsInput * 2) / 3;
-            }
-            if (addGoodsInput < neededGoodsInput) {
-                // Not enough additional input goods to support desired output
-                if (level < FACTORY) {
-                    addGoodsOutput = addGoodsInput;
-                } else {
-                    addGoodsOutput = (addGoodsInput * 3) / 2;
-                    if (getGameOptions().getBoolean(GameOptions.EXPERTS_HAVE_CONNECTIONS)
-                        && addUnit.getUnitType() == getExpertUnitType()
-                        && addGoodsOutput < 4) {
-                        addGoodsOutput = 4;
-                    }
-                }
-            }
-        }
-
-        return addGoodsOutput;
+        return getProductionNextTurnAdding(addUnit) - getProductionNextTurn();
     }
 
     /**
@@ -1051,8 +961,26 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
     }
 
     /**
-     * Returns the maximum productivity of worker/s
-     * currently working in this building.
+     * Returns the maximum productivity of worker/s working 
+     * in this building after adding the given unit
+     *
+     * @param addUnit A unit to guess productivity adding it
+     * @return The maximum returns from workers in this building,
+     *         assuming enough "input goods".
+     */
+    public int getProductivityAdding(Unit addUnit) {
+        int productivity = getProductivity();
+        if (addUnit != null && canAdd(addUnit)) {
+            productivity += getProductivity(addUnit);
+        }
+        return productivity;
+    }
+    
+    /**
+     * Returns the maximum productivity of worker/s currently working
+     * in this building.
+     *
+     * It doesn't add production bonus of colony
      *
      * @return The maximum returns from workers in this building,
      *         assuming enough "input goods".
@@ -1084,7 +1012,8 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
             return 0;
         }
 
-        int productivity = prodUnit.getUnitType().getProductionFor(getGoodsOutputType(), 3);
+        int base = buildingType.getBasicProduction();
+        int productivity = prodUnit.getProductionOf(getGoodsOutputType(), base);
         if (productivity > 0) {
             productivity += colony.getProductionBonus();
             if (productivity < 1)
@@ -1100,7 +1029,7 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
      *         workers, when there is enough "input goods".
      */
     public int getMaximumProduction() {
-        return getProductionFromProductivity(getProductivity());
+        return getMaximumProductionAdding(null);
     }
 
     /**
@@ -1110,11 +1039,8 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
      *         with additional worker if valid.
      */
     public int getMaximumProductionAdding(Unit addUnit) {
-        if (addUnit == null || !canAdd(addUnit)) {
-            return getMaximumProduction();
-        }
-        return getProductionFromProductivity(getProductivity() +
-                                              getProductivity(addUnit));
+        int maximumProductivity = getProductivityAdding(addUnit);
+        return getProductionFromProductivity(maximumProductivity);
     }
 
     /**
@@ -1124,28 +1050,25 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
      *         if it cannot be added, will return <code>0</code>.
      */
     public int getAdditionalProduction(Unit addUnit) {
-        if (addUnit == null || !canAdd(addUnit)) {
-            return 0;
-        }
-        return getProductionFromProductivity(getProductivity(addUnit));
+        return getProductionAdding(addUnit) - getProduction();
     }
 
     /**
-     * Returns the Production from this building given the productivity of the worker(s).
+     * Returns the Production from this building applying the production bonus
+     * of the colony to the given productivity of the worker(s).
      *
      * @param productivity From {@link #getProductivity}
-     * @return Maximum Production based on Productivity
+     * @return Production based on Productivity
      */
     public int getProductionFromProductivity(int productivity) {
         GoodsType goodsOutputType = getGoodsOutputType();
         Player player = colony.getOwner();
 
-        int goodsOutput = productivity;
-        if (getType() == CHURCH || getType() == TOWN_HALL) {
-            goodsOutput++;
-        }
-        goodsOutput *= (type == CHURCH) ? level + 1 : level;
+        float factor = colony.getProductionFactorFor(goodsOutputType);
+        int bonus = colony.getProductionBonusFor(goodsOutputType);
+        int goodsOutput = (int) (productivity * factor) + bonus;
 
+        /* TODO: Be sure this bonus are in colony and remove
         if (goodsOutputType == Goods.BELLS) {
             goodsOutput += goodsOutput * colony.getBuilding(Building.PRINTING_PRESS).getLevel();
             goodsOutput = (goodsOutput * (100 + player.getBellsBonus())) / 100;
@@ -1155,6 +1078,7 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
             player.hasFather(FreeCol.getSpecification().getFoundingFather("model.foundingFather.williamPenn"))) {
             goodsOutput += goodsOutput / 2;
         }
+         */
 
         return goodsOutput;
     }
@@ -1204,8 +1128,7 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
         // Add attributes:
         out.writeAttribute("ID", getID());
         out.writeAttribute("colony", colony.getID());
-        out.writeAttribute("type", Integer.toString(type));
-        out.writeAttribute("level", Integer.toString(level));
+        out.writeAttribute("buildingType", Integer.toString(buildingType.getIndex()));
 
         // Add child elements:
         Iterator<Unit> unitIterator = getUnitIterator();
@@ -1231,8 +1154,8 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
         if (colony == null) {
             colony = new Colony(getGame(), in.getAttributeValue(null, "colony"));
         }
-        type = Integer.parseInt(in.getAttributeValue(null, "type"));
-        level = Integer.parseInt(in.getAttributeValue(null, "level"));
+        int buildingTypeIndex = Integer.parseInt(in.getAttributeValue(null, "buildingType"));
+        buildingType = FreeCol.getSpecification().getBuildingType(buildingTypeIndex);
 
         units.clear();
 

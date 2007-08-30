@@ -1861,11 +1861,13 @@ public class Player extends FreeColGameObject implements Abilities, Nameable {
         Iterator<Settlement> colonyIterator = getSettlementIterator();
         while (colonyIterator.hasNext()) {
             Colony colony = (Colony) colonyIterator.next();
-            if (colony == null || colony.getBuilding(Building.DOCK) == null || colony.getTile() == unit.getTile()) {
-                continue; // This has happened before, oddly ~ smelenchuk
+            if (colony == null || colony.getTile() == unit.getTile()) {
+                // This happens when is called from damageAllShips because
+                // the colony is being captured and can't be repaired in that colony
+                continue;
             }
             int distance;
-            if (colony.getBuilding(Building.DOCK).getLevel() >= Building.SHOP
+            if (colony.hasAbility("model.ability.repairShips")
                     && (distance = unit.getTile().getDistanceTo(colony.getTile())) < shortestDistance) {
                 closestLocation = colony;
                 shortestDistance = distance;
@@ -2960,9 +2962,6 @@ public class Player extends FreeColGameObject implements Abilities, Nameable {
      * @param goodsIndex The index of the goods.
      * @return True if there are no arrears due for this type of goods.
      */
-    public boolean canTrade(int goodsIndex) {
-        return canTrade(goodsIndex, Market.EUROPE);
-    }
     public boolean canTrade(GoodsType type) {
         return canTrade(type.getIndex(), Market.EUROPE);
     }

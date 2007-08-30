@@ -552,8 +552,7 @@ public final class InGameController extends Controller {
         for (Settlement settlement : currentPlayer.getSettlements()) {
             Colony colony = (Colony) settlement;
             logger.finest("Colony is " + colony.getName());
-            Building stockade = colony.getBuilding(Building.STOCKADE);
-            if (stockade.getLevel() > Building.HOUSE && !colony.isLandLocked()) {
+            if (colony.hasAbility("model.ability.bombardShips") && !colony.isLandLocked()) {
                 logger.finest("Colony has harbour and fort.");
                 float attackPower = colony.getBombardingPower();
                 if (attackPower <= 0) {
@@ -608,7 +607,6 @@ public final class InGameController extends Controller {
                                         opponentAttackElement
                                                 .setAttribute("plunderGold", Integer.toString(plunderGold));
                                         opponentAttackElement.setAttribute("colony", colony.getID());
-                                        opponentAttackElement.setAttribute("building", stockade.getID());
                                         opponentAttackElement.setAttribute("unit", attacker.getID());
                                         opponentAttackElement.setAttribute("defender", unit.getID());
 

@@ -718,8 +718,8 @@ public class AIPlayer extends AIObject {
                 }
             }
             olddefenders = defenders;
-            if (colony.getBuilding(Building.STOCKADE).isBuilt()) {
-                defenders += (defenders * (colony.getBuilding(Building.STOCKADE).getLevel()) / 2);
+            if (colony.hasStockade()) {
+                defenders += (defenders * (colony.getStockade().getLevel()) / 2);
             }
             if (threat > defenders) {
                 // We're under attaaaaaaaaack! Man the stockade!
@@ -867,8 +867,8 @@ public class AIPlayer extends AIObject {
                     }
                 }
                 defenders = olddefenders;
-                if (colony.getBuilding(Building.STOCKADE).isBuilt()) {
-                    defenders += (defenders * (colony.getBuilding(Building.STOCKADE).getLevel()) / 2);
+                if (colony.hasStockade()) {
+                    defenders += (defenders * (colony.getStockade().getLevel()) / 2);
                 }
             }
             if (defenders > (threat * 2)) {
@@ -1303,7 +1303,7 @@ public class AIPlayer extends AIObject {
                 return 0;
             }
         }
-        if (colony != null && numberOfDefendingUnits > colony.getBuilding(Building.STOCKADE).getLevel() + 1) {
+        if (colony != null && numberOfDefendingUnits > colony.getStockade().getLevel() + 1) {
             return Math.max(0, value - 9000);
         }
         return value;

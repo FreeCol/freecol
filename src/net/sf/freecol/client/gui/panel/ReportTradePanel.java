@@ -171,11 +171,11 @@ public final class ReportTradePanel extends ReportPanel implements ActionListene
     private JButton createColonyButton(int index) {
 
         JButton button = new JButton();
-        if (colonies.get(index).getBuilding(Building.CUSTOM_HOUSE).isBuilt()) {
-            button.setText(colonies.get(index).getName() + "*");
-        } else {
-            button.setText(colonies.get(index).getName());
+        String name = colonies.get(index).getName();
+        if (colonies.get(index).hasAbility("model.ability.export")) {
+            name += "*";
         }
+        button.setText(name);
         button.setOpaque(false);
         button.setForeground(LINK_COLOR);
         button.setHorizontalAlignment(SwingConstants.LEADING);

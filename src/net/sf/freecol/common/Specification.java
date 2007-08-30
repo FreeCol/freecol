@@ -68,6 +68,7 @@ public final class Specification {
         final Map<String, ResourceType> resourceTypeByRef = new HashMap<String, ResourceType>();
         final Map<String, TileType> tileTypeByRef = new HashMap<String, TileType>();
         final Map<String, TileImprovementType> tileImprovementTypeByRef = new HashMap<String, TileImprovementType>();
+        final Map<String, BuildingType> buildingTypeByRef = new HashMap<String, BuildingType>();
         farmedGoodsTypeList = new ArrayList<GoodsType>();
 
         InputStream in = Specification.class.getResourceAsStream("specification.xml");
@@ -98,9 +99,11 @@ public final class Specification {
                 } else if ("building-types".equals(childName)) {
 
                     ObjectFactory<BuildingType> factory = new ObjectFactory<BuildingType>() {
+                        int buildingIndex = 0;
                         public BuildingType objectFrom(Node xml) {
-                            BuildingType buildingType = new BuildingType();
-                            buildingType.readFromXmlElement(xml);
+                            BuildingType buildingType = new BuildingType(buildingIndex++);
+                            buildingType.readFromXmlElement(xml, goodsTypeByRef, buildingTypeByRef);
+                            buildingTypeByRef.put(Xml.attribute(xml, "id"), buildingType);
                             return buildingType;
                         }
                     };
@@ -247,16 +250,16 @@ public final class Specification {
     public int getBuildingIndex(BuildingType b) {
         return buildingTypeList.indexOf(b);
     }
-/*
-    public BuildingType getBuildingType(String name) {
+
+    public BuildingType getBuildingType(String id) {
         for (BuildingType b : buildingTypeList) {
-            if (b.getName().equals(name)) {
+            if (b.getID().equals(id)) {
                 return b;
             }
         }
         return null;
     }
-*/
+
     // -- Goods --
     public List<GoodsType> getGoodsTypeList() {
         return goodsTypeList;

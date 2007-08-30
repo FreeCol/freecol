@@ -238,7 +238,7 @@ public final class TileType extends FreeColGameObjectType
         };
         Xml.forEachChild(xml, method);
         if (artBasic == null) {
-            throw new RuntimeException("TileType " + getName() + " has no art defined!");
+            throw new RuntimeException("TileType " + getID() + " has no art defined!");
         }
     }
 

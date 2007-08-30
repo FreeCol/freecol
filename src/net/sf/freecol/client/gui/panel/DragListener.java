@@ -115,7 +115,7 @@ public final class DragListener extends MouseAdapter {
                                     locName +=  " " + goodsType.getName()+")";
                                     menuItem.setText(locName);
                                 }
-                                menuItem.setActionCommand(String.valueOf(UnitLabel.WORK_AT_SOMEWHERE+building.getType()));
+                                menuItem.setActionCommand(String.valueOf(UnitLabel.WORK_AT_SOMEWHERE+building.getType().getIndex()));
                                 menuItem.addActionListener(unitLabel);
                                 menu.add(menuItem);
                             }
@@ -131,11 +131,10 @@ public final class DragListener extends MouseAdapter {
                 }
 
                 if (tempUnit.getColony() != null) {
-                    Building schoolhouse = tempUnit.getColony().getBuilding(Building.SCHOOLHOUSE);
-                    for (Unit teacher : schoolhouse.getUnitList()) {
+                    for (Unit teacher : tempUnit.getColony().getTeachers()) {
                         if (tempUnit.canBeStudent(teacher) &&
-                            tempUnit.getLocation() instanceof WorkLocation &&
-                            teacher.getStudent() != tempUnit) {
+                                tempUnit.getLocation() instanceof WorkLocation &&
+                                teacher.getStudent() != tempUnit) {
                             menuItem = new JMenuItem(Messages.message("assignToTeacher"),
                                                      imageLibrary.getScaledUnitImageIcon(teacher.getType(), 0.5f));
                             menuItem.setActionCommand("assign" + teacher.getID());

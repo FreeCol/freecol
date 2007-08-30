@@ -1,97 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- $Revision$ -->
 <freecol-specification>
-
-  <building-types>
-
-    <building-type>
-      <building-level id="colopedia.buildings.name.TownHall" hammers-required="0" tools-required="0" population-required="1" workplaces="3" />
-    </building-type>
-
-    <building-type>
-      <building-level id="colopedia.buildings.name.CarpenterHouse" hammers-required="0"  tools-required="0" population-required="1" workplaces="3" />
-      <building-level id="colopedia.buildings.name.LumberMill"     hammers-required="52" tools-required="0" population-required="3" workplaces="3" />
-    </building-type>
-
-    <building-type>
-      <building-level id="colopedia.buildings.name.BlacksmithHouse" hammers-required="0"   tools-required="0"   population-required="1" workplaces="3" />
-      <building-level id="colopedia.buildings.name.BlacksmithShop"  hammers-required="64"  tools-required="20"  population-required="1" workplaces="3" />
-      <building-level id="colopedia.buildings.name.IronWorks"       hammers-required="240" tools-required="100" population-required="8" workplaces="3" />
-    </building-type>
-
-    <building-type>
-      <building-level id="colopedia.buildings.name.TobacconistHouse" hammers-required="0"   tools-required="0"   population-required="1" workplaces="3" />
-      <building-level id="colopedia.buildings.name.TobacconistShop"  hammers-required="64"  tools-required="20"  population-required="1" workplaces="3" />
-      <building-level id="colopedia.buildings.name.CigarFactory"     hammers-required="160" tools-required="100" population-required="8" workplaces="3" />
-    </building-type>
-
-    <building-type>
-      <building-level id="colopedia.buildings.name.WeaverHouse" hammers-required="0"   tools-required="0"   population-required="1" workplaces="3" />
-      <building-level id="colopedia.buildings.name.WeaverShop"  hammers-required="64"  tools-required="20"  population-required="1" workplaces="3" />
-      <building-level id="colopedia.buildings.name.TextileMill" hammers-required="160" tools-required="100" population-required="8" workplaces="3" />
-    </building-type>
-
-    <building-type>
-      <building-level id="colopedia.buildings.name.DistillerHouse" hammers-required="0"   tools-required="0"   population-required="1" workplaces="3" />
-      <building-level id="colopedia.buildings.name.RumDistillery"  hammers-required="64"  tools-required="20"  population-required="1" workplaces="3" />
-      <building-level id="colopedia.buildings.name.RumFactory"     hammers-required="160" tools-required="100" population-required="8" workplaces="3" />
-    </building-type>
-
-    <building-type>
-      <building-level id="colopedia.buildings.name.FurTraderHouse" hammers-required="0"   tools-required="0"   population-required="1" workplaces="3" />
-      <building-level id="colopedia.buildings.name.FurTradingPost" hammers-required="56"  tools-required="20"  population-required="1" workplaces="3" />
-      <building-level id="colopedia.buildings.name.FurFactory"     hammers-required="160" tools-required="100" population-required="6" workplaces="3" />
-    </building-type>
-
-    <building-type>
-      <building-level id="colopedia.buildings.name.Schoolhouse" hammers-required="64"  tools-required="0"   population-required="4" workplaces="1" />
-      <building-level id="colopedia.buildings.name.College"     hammers-required="160" tools-required="50"  population-required="8" workplaces="2" />
-      <building-level id="colopedia.buildings.name.University"  hammers-required="200" tools-required="100" population-required="10" workplaces="3" />
-    </building-type>
-
-    <building-type>
-      <building-level id="colopedia.buildings.name.Armory"   hammers-required="52"  tools-required="0"   population-required="1" workplaces="3" />
-      <building-level id="colopedia.buildings.name.Magazine" hammers-required="120" tools-required="50"  population-required="8" workplaces="3" />
-      <building-level id="colopedia.buildings.name.Arsenal"  hammers-required="240" tools-required="100" population-required="8" workplaces="3" />
-    </building-type>
-
-    <building-type>
-      <building-level id="colopedia.buildings.name.Church"    hammers-required="64"  tools-required="0"   population-required="3" workplaces="1" />
-      <building-level id="colopedia.buildings.name.Cathedral" hammers-required="176" tools-required="100" population-required="8" workplaces="3" />
-    </building-type>
-
-    <building-type>
-      <building-level id="colopedia.buildings.name.Stockade" hammers-required="64"  tools-required="0"   population-required="3" workplaces="0" />
-      <building-level id="colopedia.buildings.name.Fort"     hammers-required="120" tools-required="100" population-required="3" workplaces="0" />
-      <building-level id="colopedia.buildings.name.Fortress" hammers-required="320" tools-required="200" population-required="8" workplaces="0" />
-    </building-type>
-
-    <building-type>
-      <building-level id="colopedia.buildings.name.Warehouse"          hammers-required="80" tools-required="0"  population-required="1" workplaces="0" />
-      <building-level id="colopedia.buildings.name.WarehouseExpansion" hammers-required="80" tools-required="20" population-required="1" workplaces="0" />
-    </building-type>
-
-    <building-type>
-      <building-level id="colopedia.buildings.name.Stables" hammers-required="64" tools-required="0" population-required="1" workplaces="0" />
-    </building-type>
-
-    <building-type>
-      <building-level id="colopedia.buildings.name.Docks"    hammers-required="52"  tools-required="0"   population-required="1" workplaces="0" />
-      <building-level id="colopedia.buildings.name.Drydock"  hammers-required="80"  tools-required="50"  population-required="4" workplaces="0" />
-      <building-level id="colopedia.buildings.name.Shipyard" hammers-required="240" tools-required="100" population-required="8" workplaces="0" />
-    </building-type>
-
-    <building-type>
-      <building-level id="colopedia.buildings.name.PrintingPress" hammers-required="52"  tools-required="20" population-required="1" workplaces="0" />
-      <building-level id="colopedia.buildings.name.Newspaper"     hammers-required="120" tools-required="50" population-required="4" workplaces="0" />
-    </building-type>
-
-    <building-type>
-      <building-level id="colopedia.buildings.name.CustomHouse" hammers-required="160" tools-required="50" population-required="1" workplaces="0" />
-    </building-type>
-
-  </building-types>
-
   <!-- types of goods.  an element must be defined before it is referenced -->
   <goods-types>
     <goods-type id="model.goods.Food" art="goods/food.png" is-farmed="yes" ignore-limit="yes" is-food="yes">
@@ -738,7 +647,7 @@
       <ability id="model.ability.navalUnit" value="yes"/>
       <ability id="model.ability.carryGoods" value="yes"/>
       <ability id="model.ability.carryUnits" value="yes"/>
-      <required-id id="model.building.shipyard"/>
+      <required-ability id="model.ability.buildShips"/>
     </unit-type>
     <unit-type id="model.unit.frigate"              offence="16" defence="16" movement="18" lineOfSight="2" space="4"
                hitPoints="6" price="5000" hammers="512" tools="200" pathImage="naval">
@@ -746,14 +655,14 @@
       <ability id="model.ability.carryGoods" value="yes"/>
       <ability id="model.ability.carryUnits" value="yes"/>
       <ability id="model.ability.captureGoods" value="yes"/>
-      <required-id id="model.building.shipyard"/>
+      <required-ability id="model.ability.buildShips"/>
     </unit-type>
     <unit-type id="model.unit.galleon"              offence="0"  defence="10" movement="18" lineOfSight="2" space="6"
                hitPoints="6" price="3000" hammers="320" tools="100" pathImage="naval">
       <ability id="model.ability.navalUnit" value="yes"/>
       <ability id="model.ability.carryGoods" value="yes"/>
       <ability id="model.ability.carryUnits" value="yes"/>
-      <required-id id="model.building.shipyard"/>
+      <required-ability id="model.ability.buildShips"/>
     </unit-type>
     <unit-type id="model.unit.manOWar"              offence="24" defence="24" movement="18" lineOfSight="2" space="6"
                hitPoints="6" hammers="1024" tools="300" pathImage="naval">
@@ -761,7 +670,7 @@
       <ability id="model.ability.carryGoods" value="yes"/>
       <ability id="model.ability.carryUnits" value="yes"/>
       <ability id="model.ability.captureGoods" value="yes"/>
-      <required-id id="model.building.shipyard"/>
+      <required-ability id="model.ability.buildShips"/>
       <required-ability id="model.ability.independence"/>
     </unit-type>
     <unit-type id="model.unit.merchantman"          offence="0"  defence="6" movement="15" lineOfSight="1" space="4"
@@ -769,7 +678,7 @@
       <ability id="model.ability.navalUnit" value="yes"/>
       <ability id="model.ability.carryGoods" value="yes"/>
       <ability id="model.ability.carryUnits" value="yes"/>
-      <required-id id="model.building.shipyard"/>
+      <required-ability id="model.ability.buildShips"/>
     </unit-type>
     <unit-type id="model.unit.privateer"            offence="8"  defence="8" movement="24" lineOfSight="2" space="2"
                hitPoints="6" price="2000" hammers="256" tools="120" pathImage="naval">
@@ -778,12 +687,12 @@
       <ability id="model.ability.carryUnits" value="yes"/>
       <ability id="model.ability.captureGoods" value="yes"/>
       <ability id="model.ability.piracy" value="yes"/>
-      <required-id id="model.building.shipyard"/>
+      <required-ability id="model.ability.buildShips"/>
     </unit-type>
     <unit-type id="model.unit.artillery"            offence="7"  defence="5" movement="3" lineOfSight="1"
                hammers="192" tools="40" price="500" increasingPrice="100" pathImage="wagon">
       <ability id="model.ability.bombard" value="yes"/>
-      <required-id id="model.building.armory"/>
+      <required-ability id="model.ability.buildArtillery"/>
     </unit-type>
     <unit-type id="model.unit.damagedArtillery"     offence="5"  defence="3" movement="3" lineOfSight="1" pathImage="wagon">
       <ability id="model.ability.bombard" value="yes"/>
@@ -814,6 +723,150 @@
       <ability id="model.ability.undead" value="yes"/>
     </unit-type>
   </unit-types>
+  
+  <building-types>
+    <building-type id="model.building.TownHall" basicProduction="3" workplaces="3" produces="model.goods.Bells">
+    </building-type>
+    <building-type id="model.building.CarpenterHouse" basicProduction="3" workplaces="3" consumes="model.goods.Lumber" produces="model.goods.Hammers">
+    </building-type>
+    <building-type id="model.building.LumberMill"     hammers-required="52" tools-required="0" basicProduction="6" workplaces="3" consumes="model.goods.Lumber" produces="model.goods.Hammers">
+      <required-population value="3"/>
+    </building-type>
+    <building-type id="model.building.BlacksmithHouse" basicProduction="3" workplaces="3" consumes="model.goods.Ore" produces="model.goods.Tools">
+    </building-type>
+    <building-type id="model.building.BlacksmithShop"  hammers-required="64"  tools-required="20"  basicProduction="6" workplaces="3" consumes="model.goods.Ore" produces="model.goods.Tools">
+    </building-type>
+    <building-type id="model.building.IronWorks"       hammers-required="240" tools-required="100" basicProduction="6" workplaces="3" consumes="model.goods.Ore" produces="model.goods.Tools">
+      <required-population value="8"/>
+      <required-ability id="model.ability.buildFactory"/>
+      <production-bonus goods-type="model.goods.Tools" factor="1.5"/>
+      <ability id="model.ability.expertsUseConnections" value="yes"/>
+    </building-type>
+    <building-type id="model.building.TobacconistHouse" basicProduction="3" workplaces="3" consumes="model.goods.Tobacco" produces="model.goods.Cigars">
+    </building-type>
+    <building-type id="model.building.TobacconistShop"  hammers-required="64"  tools-required="20"  basicProduction="6" workplaces="3" consumes="model.goods.Tobacco" produces="model.goods.Cigars">
+    </building-type>
+    <building-type id="model.building.CigarFactory"     hammers-required="160" tools-required="100" basicProduction="6" workplaces="3" consumes="model.goods.Tobacco" produces="model.goods.Cigars">
+      <required-population value="8"/>
+      <required-ability id="model.ability.buildFactory"/>
+      <production-bonus goods-type="model.goods.Cigars" factor="1.5"/>
+      <ability id="model.ability.expertsUseConnections" value="yes"/>
+    </building-type>
+    <building-type id="model.building.WeaverHouse" basicProduction="3" workplaces="3" consumes="model.goods.Cotton" produces="model.goods.Cloth">
+    </building-type>
+    <building-type id="model.building.WeaverShop"  hammers-required="64"  tools-required="20"  basicProduction="6" workplaces="3" consumes="model.goods.Cotton" produces="model.goods.Cloth">
+    </building-type>
+    <building-type id="model.building.TextileMill" hammers-required="160" tools-required="100" basicProduction="6" workplaces="3" consumes="model.goods.Cotton" produces="model.goods.Cloth">
+      <required-population value="8"/>
+      <required-ability id="model.ability.buildFactory"/>
+      <production-bonus goods-type="model.goods.Cloth" factor="1.5"/>
+      <ability id="model.ability.expertsUseConnections" value="yes"/>
+    </building-type>
+    <building-type id="model.building.DistillerHouse" basicProduction="3" workplaces="3" consumes="model.goods.Sugar" produces="model.goods.Rum">
+    </building-type>
+    <building-type id="model.building.RumDistillery"  hammers-required="64"  tools-required="20"  basicProduction="6" workplaces="3" consumes="model.goods.Sugar" produces="model.goods.Rum">
+    </building-type>
+    <building-type id="model.building.RumFactory"     hammers-required="160" tools-required="100" basicProduction="6" workplaces="3" consumes="model.goods.Sugar" produces="model.goods.Rum">
+      <required-population value="8"/>
+      <required-ability id="model.ability.buildFactory"/>
+      <production-bonus goods-type="model.goods.Rum" factor="1.5"/>
+      <ability id="model.ability.expertsUseConnections" value="yes"/>
+    </building-type>
+    <building-type id="model.building.FurTraderHouse" basicProduction="3" workplaces="3" consumes="model.goods.Furs" produces="model.goods.Coats">
+    </building-type>
+    <building-type id="model.building.FurTradingPost" hammers-required="56"  tools-required="20"  basicProduction="6" workplaces="3" consumes="model.goods.Furs" produces="model.goods.Coats">
+    </building-type>
+    <building-type id="model.building.FurFactory"     hammers-required="160" tools-required="100" basicProduction="6" workplaces="3" consumes="model.goods.Furs" produces="model.goods.Coats">
+      <required-population value="6"/>
+      <required-ability id="model.ability.buildFactory"/>
+      <production-bonus goods-type="model.goods.Coats" factor="1.5"/>
+      <ability id="model.ability.expertsUseConnections" value="yes"/>
+    </building-type>
+    <building-type id="model.building.Schoolhouse" hammers-required="64"  tools-required="0"   workplaces="1" minSkill="1" maxSkill="1">
+      <required-population value="4"/>
+      <ability id="model.ability.teach" value="yes"/>
+    </building-type>
+    <building-type id="model.building.College"     hammers-required="160" tools-required="50"  workplaces="2" minSkill="1" maxSkill="2">
+      <required-population value="8"/>
+      <ability id="model.ability.teach" value="yes"/>
+    </building-type>
+    <building-type id="model.building.University"  hammers-required="200" tools-required="100" workplaces="3" minSkill="1" maxSkill="3">
+      <required-population value="10"/>
+      <ability id="model.ability.teach" value="yes"/>
+    </building-type>
+    <building-type id="model.building.Armory"   hammers-required="52"  tools-required="0"   basicProduction="3" workplaces="3" consumes="model.goods.Tools" produces="model.goods.Muskets">
+      <ability id="model.ability.buildArtillery" value="yes"/>
+    </building-type>
+    <building-type id="model.building.Magazine" hammers-required="120" tools-required="50"  basicProduction="6" workplaces="3" consumes="model.goods.Tools" produces="model.goods.Muskets">
+      <required-population value="8"/>
+      <ability id="model.ability.buildArtillery" value="yes"/>
+    </building-type>
+    <building-type id="model.building.Arsenal"  hammers-required="240" tools-required="100" basicProduction="6" workplaces="3" consumes="model.goods.Tools" produces="model.goods.Muskets">
+      <required-population value="8"/>
+      <required-ability id="model.ability.buildFactory"/>
+      <production-bonus goods-type="model.goods.Muskets" factor="1.5"/>
+      <ability id="model.ability.buildArtillery" value="yes"/>
+      <ability id="model.ability.expertsUseConnections" value="yes"/>
+    </building-type>
+    <building-type id="model.building.Chapel"    workplaces="0" produces="model.goods.Crosses">
+      <production-bonus goods-type="model.goods.Crosses" bonus="1"/>
+    </building-type>
+    <building-type id="model.building.Church"    hammers-required="64"  tools-required="0"   basicProduction="3" workplaces="3" produces="model.goods.Crosses">
+      <required-population value="3"/>
+      <production-bonus goods-type="model.goods.Crosses" bonus="2"/>
+      <ability id="model.ability.dressMissionary" value="yes"/>
+    </building-type>
+    <building-type id="model.building.Cathedral" hammers-required="176" tools-required="100" basicProduction="6" workplaces="3" produces="model.goods.Crosses">
+      <required-population value="8"/>
+      <production-bonus goods-type="model.goods.crosses" bonus="3"/>
+      <ability id="model.ability.dressMissionary" value="yes"/>
+    </building-type>
+    <building-type id="model.building.Stockade" hammers-required="64"  tools-required="0"   workplaces="0">
+      <required-population value="3"/>
+    </building-type>
+    <building-type id="model.building.Fort"     hammers-required="120" tools-required="100" workplaces="0">
+      <required-population value="3"/>
+      <ability id="model.ability.bombardShips" value="yes"/>
+    </building-type>
+    <building-type id="model.building.Fortress" hammers-required="320" tools-required="200" workplaces="0">
+      <required-population value="8"/>
+      <ability id="model.ability.bombardShips" value="yes"/>
+    </building-type>
+    <building-type id="model.building.Depot"              workplaces="0">
+    </building-type>
+    <building-type id="model.building.Warehouse"          hammers-required="80" tools-required="0"  workplaces="0" upgradesFrom="model.building.Depot">
+    </building-type>
+    <building-type id="model.building.WarehouseExpansion" hammers-required="80" tools-required="20" workplaces="0" upgradesFrom="model.building.Warehouse">
+    </building-type>
+    <building-type id="model.building.Stables" hammers-required="64" tools-required="0" workplaces="0">
+    </building-type>
+    <building-type id="model.building.Docks"    hammers-required="52"  tools-required="0"   workplaces="0">
+      <!-- TODO: add requirement for not land-locked colony -->
+      <ability id="model.ability.produceInWater" value="yes"/>
+    </building-type>
+    <building-type id="model.building.Drydock"  hammers-required="80"  tools-required="50"  workplaces="0" upgradesFrom="model.building.Docks">
+      <required-population value="4"/>
+      <ability id="model.ability.produceInWater" value="yes"/>
+      <ability id="model.ability.repairShips" value="yes"/>
+    </building-type>
+    <building-type id="model.building.Shipyard" hammers-required="240" tools-required="100" workplaces="0" upgradesFrom="model.building.Drydock">
+      <required-population value="8"/>
+      <ability id="model.ability.produceInWater" value="yes"/>
+      <ability id="model.ability.repairShips" value="yes"/>
+      <ability id="model.ability.buildShips" value="yes"/>
+    </building-type>
+    <building-type id="model.building.PrintingPress" hammers-required="52"  tools-required="20"  workplaces="0">
+      <production-bonus goods-type="model.goods.Bells" factor="1.5"/>
+    </building-type>
+    <building-type id="model.building.Newspaper"     hammers-required="120" tools-required="50" workplaces="0">
+      <required-population value="4"/>
+      <production-bonus goods-type="model.goods.Bells" factor="2"/>
+    </building-type>
+    <building-type id="model.building.CustomHouse" hammers-required="160" tools-required="50" workplaces="0">
+      <required-ability id="model.ability.buildCustomHouse"/>
+      <ability id="model.ability.export" value="yes"/>
+    </building-type>
+  </building-types>
 
   <founding-fathers>
     <founding-father id="model.foundingFather.adamSmith" type="trade"

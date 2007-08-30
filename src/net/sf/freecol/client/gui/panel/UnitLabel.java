@@ -20,6 +20,7 @@ import net.sf.freecol.client.control.InGameController;
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.Building;
+import net.sf.freecol.common.model.BuildingType;
 import net.sf.freecol.common.model.ColonyTile;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.GoodsType;
@@ -45,23 +46,7 @@ public final class UnitLabel extends JLabel implements ActionListener {
             LEAVE_TOWN = 17;
 
     public static final int WORK_AT_SOMEWHERE = 100,
-        WORK_AT_TOWN_HALL = WORK_AT_SOMEWHERE+Building.TOWN_HALL,
-        WORK_AT_CARPENTER = WORK_AT_SOMEWHERE+Building.CARPENTER,
-        WORK_AT_BLACKSMITH = WORK_AT_SOMEWHERE+Building.BLACKSMITH,
-        WORK_AT_TOBACCONIST = WORK_AT_SOMEWHERE+Building.TOBACCONIST,
-        WORK_AT_WEAVER = WORK_AT_SOMEWHERE+Building.WEAVER,
-        WORK_AT_DISTILLER = WORK_AT_SOMEWHERE+Building.DISTILLER,
-        WORK_AT_FUR_TRADER = WORK_AT_SOMEWHERE+Building.FUR_TRADER,
-        WORK_AT_SCHOOLHOUSE = WORK_AT_SOMEWHERE+Building.SCHOOLHOUSE,
-        WORK_AT_ARMORY = WORK_AT_SOMEWHERE+Building.ARMORY,
-        WORK_AT_CHURCH = WORK_AT_SOMEWHERE+Building.CHURCH,
-        WORK_AT_STOCKADE = WORK_AT_SOMEWHERE+Building.STOCKADE,
-        WORK_AT_WAREHOUSE = WORK_AT_SOMEWHERE+Building.WAREHOUSE,
-        WORK_AT_STABLES = WORK_AT_SOMEWHERE+Building.STABLES,
-        WORK_AT_DOCK = WORK_AT_SOMEWHERE+Building.DOCK,
-        WORK_AT_PRINTING_PRESS = WORK_AT_SOMEWHERE+Building.PRINTING_PRESS,
-        WORK_AT_CUSTOM_HOUSE = WORK_AT_SOMEWHERE+Building.CUSTOM_HOUSE,
-        WORK_AT_LASTBUILDING = WORK_AT_CUSTOM_HOUSE+1;
+        WORK_AT_LASTBUILDING = WORK_AT_SOMEWHERE+FreeCol.getSpecification().numberOfBuildingTypes();
         
     private final Unit unit;
 
@@ -260,13 +245,7 @@ public final class UnitLabel extends JLabel implements ActionListener {
             parent.getGUI().displayOccupationIndicator(g, unit, x, y);
         } else if (unit.getLocation() instanceof ColonyTile) {
             GoodsType workType = unit.getWorkType();
-            if (workType == Goods.FOOD && unit.getLocation() instanceof ColonyTile
-                && !((ColonyTile) unit.getLocation()).getWorkTile().isLand()) {
-                workType = Goods.FISH;
-            }
-
-            int production = unit.getFarmedPotential(unit.getWorkType(), ((ColonyTile) unit.getLocation())
-                    .getWorkTile());
+            int production = ((ColonyTile) unit.getLocation()).getProductionOf(workType);
 
             ProductionLabel pl = new ProductionLabel(workType, production, getCanvas());
             g.translate(0, 10);
@@ -368,7 +347,7 @@ public final class UnitLabel extends JLabel implements ActionListener {
                     break;
                 default:
                     if (intCommand >= WORK_AT_SOMEWHERE && intCommand <= WORK_AT_LASTBUILDING ) {
-                        int buildingType = intCommand - WORK_AT_SOMEWHERE ;
+                        BuildingType buildingType = FreeCol.getSpecification().getBuildingType(intCommand - WORK_AT_SOMEWHERE);
                         Building building = unit.getColony().getBuilding(buildingType);
                         inGameController.work(unit, building);
                     } else {

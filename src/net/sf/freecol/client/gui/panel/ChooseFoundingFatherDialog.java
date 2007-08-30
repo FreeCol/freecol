@@ -233,10 +233,10 @@ public final class ChooseFoundingFatherDialog extends FreeColDialog implements A
             this.foundingFather = father;
 
             if (father != null) {
-                header.setText(Messages.message(father.getName()));
-                description.setText(Messages.message(father.getDescription()));
-                text.setText("\n" + "[" + Messages.message(father.getBirthAndDeath()) + "] "
-                        + Messages.message(father.getText()));
+                header.setText(father.getName());
+                description.setText(father.getDescription());
+                text.setText("\n" + "[" + father.getBirthAndDeath() + "] "
+                        + father.getText());
                 ok.setActionCommand(Integer.toString(index));
             }
         }

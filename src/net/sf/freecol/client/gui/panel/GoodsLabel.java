@@ -81,8 +81,8 @@ public final class GoodsLabel extends JLabel {// implements ActionListener {
         if (player == null
                 || !goods.getType().isStorable()
                 || player.canTrade(goods)
-                || (location instanceof Colony && player.getGameOptions().getBoolean(GameOptions.CUSTOM_IGNORE_BOYCOTT) && ((Colony) location)
-                .getBuilding(Building.CUSTOM_HOUSE).getLevel() != Building.NOT_BUILT)) {
+                || (location instanceof Colony && player.getGameOptions().getBoolean(GameOptions.CUSTOM_IGNORE_BOYCOTT) &&
+                    ((Colony) location).hasAbility("model.ability.export"))) {
             setToolTipText(goods.getName());
             setEnabled(true);
         } else {

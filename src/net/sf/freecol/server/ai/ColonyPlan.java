@@ -113,12 +113,18 @@ public class ColonyPlan {
      * @return An iterator containing all the <code>Buildable</code> sorted by
      *         priority (highest priority first).
      */
-    public Iterator<Integer> getBuildable() {
-        ArrayList<Integer> buildList = new ArrayList<Integer>();
+    public Iterator<Building> getBuildable() {
+        ArrayList<Building> buildList = new ArrayList<Building>();
 
-        if (!colony.getBuilding(Building.DOCK).isBuilt() && !colony.isLandLocked()
-                && colony.getBuilding(Building.DOCK).canBuildNext()) {
-            buildList.add(Building.DOCK);
+        String ability = "model.ability.produceInWater";
+        if (!colony.hasAbility(ability)) {
+            Iterator<Building> iterator = colony.getBuildingIterator();
+            while (iterator.hasNext()) {
+                Building building = iterator.next();
+                if (building.hasAbility(ability) && building.canBuildNext()) {
+                    buildList.add(building);
+                }
+            }
         }
 
         Iterator<WorkLocationPlan> wlpIt = getSortedWorkLocationPlans().iterator();
@@ -126,57 +132,80 @@ public class ColonyPlan {
             WorkLocationPlan wlp = wlpIt.next();
             if (wlp.getWorkLocation() instanceof Building) {
                 Building b = (Building) wlp.getWorkLocation();
-                if (b.getType() == Building.TOWN_HALL) {
-                    if (colony.getBuilding(Building.PRINTING_PRESS).canBuildNext()) {
-                        buildList.add(new Integer(Building.PRINTING_PRESS));
-                    }
-                } else {
-                    if (b.canBuildNext()) {
-                        buildList.add(new Integer(b.getType()));
+                if (b.canBuildNext()) {
+                    buildList.add(b);
+                }
+
+                GoodsType outputType = b.getGoodsOutputType();
+                if (outputType != null) {
+                    Iterator<Building> iterator = colony.getBuildingIterator();
+                    while (iterator.hasNext()) {
+                        Building building = iterator.next();
+                        if (building.getType().hasProductionModifierFor(outputType)
+                                && building.canBuildNext()) {
+                            buildList.add(building);
+                        }
                     }
                 }
             }
         }
 
-        if (colony.getBuilding(Building.CUSTOM_HOUSE).canBuildNext()) {
-            if (colony.getGoodsContainer().hasReachedCapacity(colony.getWarehouseCapacity())) {
-                buildList.add(0, new Integer(Building.CUSTOM_HOUSE));
+        Building buildingForExport = null;
+        ability = "model.ability.export";
+        if (!colony.hasAbility(ability)) {
+            Iterator<Building> iterator = colony.getBuildingIterator();
+            while (iterator.hasNext()) {
+                Building building = iterator.next();
+                if (building.hasAbility(ability)) {
+                    buildingForExport = building;
+                    if (building.canBuildNext() &&
+                            colony.getGoodsContainer().hasReachedCapacity(colony.getWarehouseCapacity())) {
+                        buildList.add(building);
+                    }
+                }
             }
         }
 
         // Check if we should improve the warehouse:
-        if (colony.getBuilding(Building.WAREHOUSE).canBuildNext()) {
+        Building building = colony.getWarehouse();
+        if (building.canBuildNext()) {
             if (colony.getGoodsContainer().hasReachedCapacity(colony.getWarehouseCapacity())) {
-                buildList.add(0, new Integer(Building.WAREHOUSE));
+                buildList.add(0, building);
             } else {
-                buildList.add(new Integer(Building.WAREHOUSE));
+                buildList.add(building);
             }
         }
 
-        if (buildList.size() > 3 && colony.getBuilding(Building.CARPENTER).canBuildNext()) {
-            buildList.add(0, new Integer(Building.CARPENTER));
+        building = colony.getBuildingForProducing(Goods.HAMMERS);
+        if (buildList.size() > 3 && building.canBuildNext()) {
+            buildList.add(0, building);
         }
 
-        if (colony.getHorseProduction() > 2 && colony.getBuilding(Building.STABLES).canBuildNext()) {
-            buildList.add(new Integer(Building.STABLES));
+        building = colony.getStables();
+        if (colony.getHorseProduction() > 2 && building.canBuildNext()) {
+            buildList.add(building);
         }
 
-        if (colony.getBuilding(Building.STOCKADE).canBuildNext()) {
-            buildList.add(new Integer(Building.STOCKADE));
+        building = colony.getStockade();
+        if (building.canBuildNext()) {
+            buildList.add(building);
         }
 
-        if (colony.getBuilding(Building.ARMORY).canBuildNext() && !colony.getBuilding(Building.ARMORY).isBuilt()) {
-            buildList.add(new Integer(Building.ARMORY));
+        building = colony.getBuildingForProducing(Goods.MUSKETS);
+        if (building.canBuildNext() && !building.isBuilt()) {
+            buildList.add(building);
         }
-        buildList.add(new Integer(Colony.BUILDING_UNIT_ADDITION + Unit.ARTILLERY));
+        
+        // TODO: create a interface buildable and add artillery to buildList
+        //buildList.add(new Integer(Colony.BUILDING_UNIT_ADDITION + Unit.ARTILLERY));
 
         // buildList.add(new Integer(Building.SCHOOLHOUSE));
 
-        if (colony.getBuilding(Building.CUSTOM_HOUSE).canBuildNext()) {
-            buildList.add(new Integer(Building.CUSTOM_HOUSE));
+        if (buildingForExport.canBuildNext()) {
+            buildList.add(buildingForExport);
         }
 
-        buildList.add(new Integer(-1));
+        buildList.add(null);
 
         return buildList.iterator();
     }
@@ -211,6 +240,8 @@ public class ColonyPlan {
         // resources, buildings and specialists
         
         workLocationPlans.clear();
+        Building carpenter = colony.getBuildingForProducing(Goods.HAMMERS);
+        Building townHall = colony.getBuildingForProducing(Goods.BELLS);
 
         // Choose the best production for each tile:
         Iterator<ColonyTile> colonyTileIterator = getColony().getColonyTileIterator();
@@ -292,14 +323,13 @@ public class ColonyPlan {
 
         // Place a carpenter:
         if (getProductionOf(Goods.LUMBER) > 0) {
-            WorkLocationPlan wlp = new WorkLocationPlan(getAIMain(), colony.getBuilding(Building.CARPENTER),
-                    Goods.HAMMERS);
+            WorkLocationPlan wlp = new WorkLocationPlan(getAIMain(),
+                    colony.getBuildingForProducing(Goods.HAMMERS), Goods.HAMMERS);
             workLocationPlans.add(wlp);
         }
 
         // Place a statesman:
-        WorkLocationPlan townHallWlp = new WorkLocationPlan(getAIMain(), colony.getBuilding(Building.TOWN_HALL),
-                Goods.BELLS);
+        WorkLocationPlan townHallWlp = new WorkLocationPlan(getAIMain(), townHall, Goods.BELLS);
         workLocationPlans.add(townHallWlp);
 
         // Place a colonist to manufacture the primary goods:
@@ -354,7 +384,7 @@ public class ColonyPlan {
                 WorkLocationPlan wlp = wlpIterator2.next();
                 if (wlp.getWorkLocation() instanceof Building) {
                     Building b = (Building) wlp.getWorkLocation();
-                    if (b.getType() != Building.CARPENTER && b.getType() != Building.TOWN_HALL) {
+                    if (b != carpenter && b != townHall) {
                         wlpIterator2.remove();
                     }
                 }
@@ -380,7 +410,7 @@ public class ColonyPlan {
                 WorkLocationPlan wlp = wlpIterator2.next();
                 if (wlp.getWorkLocation() instanceof Building) {
                     Building b = (Building) wlp.getWorkLocation();
-                    if (b.getType() == Building.CARPENTER) {
+                    if (b == carpenter) {
                         wlpIterator2.remove();
                     }
                 }
@@ -455,9 +485,8 @@ public class ColonyPlan {
             // Add carpenters:
             if (getProductionOf(Goods.FOOD) >= workLocationPlans.size() * 2 + 2
                     && 12 * carpenters + 6 <= getProductionOf(Goods.LUMBER) && carpenters <= Building.MAX_LEVEL) {
-                Building b = colony.getBuilding(Building.CARPENTER);
-                if (b != null) {
-                    WorkLocationPlan wlp = new WorkLocationPlan(getAIMain(), b, Goods.HAMMERS);
+                if (carpenter != null) {
+                    WorkLocationPlan wlp = new WorkLocationPlan(getAIMain(), carpenter, Goods.HAMMERS);
                     workLocationPlans.add(wlp);
                     colonistAdded = true;
                     carpenters++;

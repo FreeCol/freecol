@@ -861,7 +861,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
                     Player enemy = colony.getOwner();
                     if (player != enemy && (player.getStance(enemy) == Player.WAR
                             || unit.hasAbility("model.ability.piracy"))
-                            && colony.getBuilding(Building.STOCKADE).getLevel() > Building.HOUSE) {
+                            && colony.hasAbility("model.ability.bombardShips")) {
                         float bombardingPower = colony.getBombardingPower();
                         if (bombardingPower > 0) {
                             attackPower += bombardingPower;
@@ -1268,7 +1268,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         if (unit.canCaptureGoods() && getGame().getGameOptions().getBoolean(GameOptions.UNIT_HIDING)) {
             List<Goods> goodsInUnit = unit.getGoodsContainer().getFullGoods();
             for (Goods goods : goodsInUnit) {
-                oldGoodsCounts.put(goods.getType().getName(), goods.getAmount());
+                oldGoodsCounts.put(goods.getType().getID(), goods.getAmount());
             }
         }
         int oldUnits = unit.getTile().getUnitCount();
@@ -1288,7 +1288,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         if (unit.canCaptureGoods() && getGame().getGameOptions().getBoolean(GameOptions.UNIT_HIDING)) {
             List<Goods> goodsInUnit = unit.getGoodsContainer().getCompactGoods();
             for (Goods newGoods : goodsInUnit) {
-                int capturedGoods = newGoods.getAmount() - oldGoodsCounts.get(newGoods.getType().getName()).intValue();
+                int capturedGoods = newGoods.getAmount() - oldGoodsCounts.get(newGoods.getType().getID()).intValue();
                 if (capturedGoods > 0) {
                     Element captured = reply.getOwnerDocument().createElement("capturedGoods");
                     captured.setAttribute("type", Integer.toString(newGoods.getType().getIndex()));
@@ -2130,7 +2130,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         if (!student.canBeStudent(teacher)) {
             throw new IllegalStateException("Unit can not be student!");
         }
-        if (!teacher.getColony().getBuilding(Building.SCHOOLHOUSE).canAddAsTeacher(teacher)) {
+        if (!teacher.getColony().canTrain(teacher)) {
             throw new IllegalStateException("Unit can not be teacher!");
         }
         if (student.getOwner() != player) {

@@ -1495,6 +1495,26 @@ break;
     }
 
     /**
+     * The type of primary good (food) this tile produces best (used for Town Commons
+     * squares).
+     * 
+     * @return The type of primary good best produced by this tile.
+     */
+    public GoodsType primaryGoods() {
+        if (type == null) {
+            return null;
+        }
+        
+        GoodsType[] top = getSortedGoodsTop(type, tileItemContainer, getFishBonus());
+        for (GoodsType g : top) {
+            if (g != null || g.isFoodType()) {
+                return g;
+            }
+        }
+        return null;
+    }
+
+    /**
      * The type of secondary good (non-food) this tile produces best (used for Town Commons
      * squares).
      * 
@@ -1692,12 +1712,11 @@ break;
                             out.writeAttribute("tile", getID());
                             out.writeAttribute("unitCount", Integer.toString(pet.getColonyUnitCount()));
 
-                            Building b = getColony().getBuilding(Building.STOCKADE);
+                            Building b = getColony().getStockade();
                             out.writeStartElement(Building.getXMLElementTagName());
                             out.writeAttribute("ID", b.getID());
-                            out.writeAttribute("level", Integer.toString(pet.getColonyStockadeLevel()));
                             out.writeAttribute("colony", getColony().getID());
-                            out.writeAttribute("type", Integer.toString(Building.STOCKADE));
+                            out.writeAttribute("buildingType", Integer.toString(pet.getColonyStockadeLevel()));
                             out.writeEndElement();
 
                             GoodsContainer emptyGoodsContainer = new GoodsContainer(getGame(), getColony());
@@ -1723,9 +1742,9 @@ break;
                         out.writeAttribute("learnableSkill", Integer.toString(pet.getSkill().getIndex()));
                     }
                     if (pet.getHighlyWantedGoods() != null) {
-                        out.writeAttribute("highlyWantedGoods", pet.getHighlyWantedGoods().getName());
-                        out.writeAttribute("wantedGoods1", pet.getWantedGoods1().getName());
-                        out.writeAttribute("wantedGoods2", pet.getWantedGoods2().getName());
+                        out.writeAttribute("highlyWantedGoods", pet.getHighlyWantedGoods().getID());
+                        out.writeAttribute("wantedGoods1", pet.getWantedGoods1().getID());
+                        out.writeAttribute("wantedGoods2", pet.getWantedGoods2().getID());
                     }
                     out.writeAttribute("hasBeenVisited", Boolean.toString(pet.hasBeenVisited()));
 
@@ -1969,7 +1988,7 @@ break;
 
         if (getColony() != null) {
             playerExploredTiles[nation].setColonyUnitCount(getSettlement().getUnitCount());
-            playerExploredTiles[nation].setColonyStockadeLevel(getColony().getBuilding(Building.STOCKADE).getLevel());
+            playerExploredTiles[nation].setColonyStockadeLevel(getColony().getStockade().getType().getIndex());
         } else if (getSettlement() != null) {
             playerExploredTiles[nation].setMissionary(((IndianSettlement) getSettlement()).getMissionary());
 

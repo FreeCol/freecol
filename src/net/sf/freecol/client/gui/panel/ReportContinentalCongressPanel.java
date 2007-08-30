@@ -73,8 +73,8 @@ public final class ReportContinentalCongressPanel extends ReportPanel implements
             summaryPanel.add(new JLabel(none), higConst.rc(1, 3));
         } else {
             FoundingFather father = player.getCurrentFather();
-            JLabel currentFatherLabel = new JLabel(Messages.message(father.getName()));
-            currentFatherLabel.setToolTipText(Messages.message(father.getDescription()));
+            JLabel currentFatherLabel = new JLabel(father.getName());
+            currentFatherLabel.setToolTipText(father.getDescription());
             summaryPanel.add(currentFatherLabel, higConst.rc(1, 3));
             int bells = player.getBells();
             int required = player.getTotalFoundingFatherCost();

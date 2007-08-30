@@ -743,7 +743,7 @@ public class Unit extends FreeColGameObject implements Abilities, Locatable, Loc
      */
     public void setAbility(String id, boolean newValue) {
         // TODO: implement unit abilities
-    };
+    }
 
 
 
@@ -813,7 +813,7 @@ public class Unit extends FreeColGameObject implements Abilities, Locatable, Loc
             this.teacher = null;
         } else if (newTeacher.getColony() != null &&
                    newTeacher.getColony() == getColony() &&
-                   getColony().getBuilding(Building.SCHOOLHOUSE).canAddAsTeacher(newTeacher)) {
+                   getColony().canTrain(newTeacher)) {
             this.teacher = newTeacher;
         } else {
             throw new IllegalStateException("unit can not be teacher: " + newTeacher.getName());
@@ -1839,7 +1839,7 @@ public class Unit extends FreeColGameObject implements Abilities, Locatable, Loc
 
         if (newLocation instanceof WorkLocation) {
             if (teacher == null) {
-                for (Unit teacher : getColony().getBuilding(Building.SCHOOLHOUSE).getUnitList()) {
+                for (Unit teacher : getColony().getTeachers()) {
                     if (teacher.getStudent() == null && canBeStudent(teacher)) {
                         teacher.setStudent(this);
                         this.setTeacher(teacher);
@@ -2000,7 +2000,7 @@ public class Unit extends FreeColGameObject implements Abilities, Locatable, Loc
         return isMissionary()
                 || ((location instanceof Europe || location instanceof Unit
                         && ((Unit) location).getLocation() instanceof Europe) 
-                        || (getColony() != null && getColony().getBuilding(Building.CHURCH).isBuilt()));
+                        || (getColony() != null && getColony().hasAbility("model.ability.dressMissionary")));
     }
 
     /**
@@ -2170,7 +2170,7 @@ public class Unit extends FreeColGameObject implements Abilities, Locatable, Loc
         setMovesLeft(0);
 
         if (b) {
-            if (!isInEurope() && !getColony().getBuilding(Building.CHURCH).isBuilt()) {
+            if (!isInEurope() && !getColony().hasAbility("model.ability.dressMissionary")) {
                 throw new IllegalStateException(
                         "Can only dress as a missionary when the unit is located in Europe or a Colony with a church.");
             } else {
@@ -3598,20 +3598,22 @@ public class Unit extends FreeColGameObject implements Abilities, Locatable, Loc
         if (settlement instanceof Colony) {
             // Colony defensive bonus.
             Colony colony = (Colony) settlement;
-            switch (colony.getBuilding(Building.STOCKADE).getLevel()) {
-            case Building.NOT_BUILT:
-            default:
+            // TODO: move bonus of stockade to colony class
+            Building stockade = colony.getStockade();
+            if (!stockade.isBuilt()) {
                 // 50% colony bonus
                 return new Modifier("modifiers.inColony", 50, Modifier.PERCENTAGE);
-            case Building.HOUSE:
+            } else {
+                // TODO: return bonus according to level (put in specification)
+                return new Modifier("modifiers.stockade", 100, Modifier.PERCENTAGE);
+                /*
                 // 100% stockade bonus
                 return new Modifier("modifiers.stockade", 100, Modifier.PERCENTAGE);
-            case Building.SHOP:
                 // 150% fort bonus
                 return new Modifier("modifiers.fort", 150, Modifier.PERCENTAGE);
-            case Building.FACTORY:
                 // 200% fortress bonus
                 return new Modifier("modifiers.fortress", 200, Modifier.PERCENTAGE);
+                 */
             }
         } else if (settlement instanceof IndianSettlement) {
             // Indian settlement defensive bonus.
@@ -3775,16 +3777,15 @@ public class Unit extends FreeColGameObject implements Abilities, Locatable, Loc
      * Sets the damage to this ship and sends it to its repair location.
      */
     public void shipDamaged() {
-        shipDamaged(null, null);
+        shipDamaged(null);
     }
 
     /**
      * Sets the damage to this ship and sends it to its repair location.
      * 
      * @param colony The colony that opened fire on this unit.
-     * @param building The building that opened fire on this unit.
      */
-    public void shipDamaged(Colony colony, Building building) {
+    public void shipDamaged(Colony colony) {
         String nation = owner.getNationAsString();
         Location repairLocation = getOwner().getRepairLocation(this);
         if (repairLocation == null) {
@@ -3802,7 +3803,6 @@ public class Unit extends FreeColGameObject implements Abilities, Locatable, Loc
             addModelMessage(this, "model.unit.shipDamagedByBombardment", 
                             new String[][] {
                                 { "%colony%", colony.getName() },
-                                { "%building%", building.getName() },
                                 { "%unit%", getName() },
                                 { "%repairLocation%", repairLocationName },
                                 { "%nation%", nation } },
@@ -3825,20 +3825,19 @@ public class Unit extends FreeColGameObject implements Abilities, Locatable, Loc
      * Sinks this ship.
      */
     public void shipSunk() {
-        shipSunk(null, null);
+        shipSunk(null);
     }
 
     /**
      * Sinks this ship.
      * 
      * @param colony The colony that opened fire on this unit.
-     * @param building The building that opened fire on this unit.
      */
-    public void shipSunk(Colony colony, Building building) {
+    public void shipSunk(Colony colony) {
         String nation = owner.getNationAsString();
         if (colony != null) {
             addModelMessage(this, "model.unit.shipSunkByBombardment", new String[][] {
-                    { "%colony%", colony.getName() }, { "%building%", building.getName() }, { "%unit%", getName() },
+                    { "%colony%", colony.getName() }, { "%unit%", getName() },
                     { "%nation%", nation } }, ModelMessage.UNIT_LOST);
         } else {
             addModelMessage(this, "model.unit.shipSunk", new String[][] { { "%unit%", getName() },
@@ -4273,21 +4272,11 @@ public class Unit extends FreeColGameObject implements Abilities, Locatable, Loc
      * @param tile The tile which is being worked.
      * @return The potential amount of goods to be farmed.
      */
-    public int getFarmedPotential(GoodsType goodsType, Tile tile) {
-        if (tile == null) {
-            throw new NullPointerException();
-        }
-
-        int base = tile.potential(goodsType);
-
-        if (getLocation() instanceof ColonyTile && !((ColonyTile) getLocation()).getWorkTile().isLand()
-                && !((ColonyTile) getLocation()).getColony().getBuilding(Building.DOCK).isBuilt()) {
-            base = 0;
-        }
-
+    public int getProductionOf(GoodsType goodsType, int base) {
         if (base == 0) {
             return 0;
         }
+        
         base = getUnitType().getProductionFor(goodsType, base);
 
         if (goodsType == Goods.FURS && 
@@ -4295,11 +4284,7 @@ public class Unit extends FreeColGameObject implements Abilities, Locatable, Loc
             base *= 2;
         }
 
-        if (getColony() != null) {
-            base += getColony().getProductionBonus();
-        }
-
-        return Math.max(base, 1);
+        return base;
     }
 
     public static int getNextHammers(int index) {
@@ -4779,9 +4764,7 @@ public class Unit extends FreeColGameObject implements Abilities, Locatable, Loc
         Iterator<Building> itB = colony.getBuildingIterator();
         while (itB.hasNext()) {
             Building building = itB.next();
-            BuildingType bType = FreeCol.getSpecification().getBuildingType(building.getType());
-            if (building.isBuilt() && (bType.level(0).getHammersRequired() > 0 ||
-                    building.getLevel() > Building.HOUSE)) {
+            if (building.canBeDamaged()) {
                 buildingList.add(building);
             }
         }
@@ -4806,7 +4789,7 @@ public class Unit extends FreeColGameObject implements Abilities, Locatable, Loc
                         {"%building%", building.getName()}, {"%colony%", colonyName},
                         {"%enemyNation%", nation}, {"%enemyUnit%", unitName}},
                     ModelMessage.DEFAULT, colony);
-            building.setLevel(building.getLevel() - 1);
+            building.damage();
         } else if (random < buildingList.size() + goodsList.size()) {
             Goods goods = goodsList.get(random - buildingList.size());
             goods.setAmount(Math.min(goods.getAmount() / 2, 50));
