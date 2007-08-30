@@ -2338,12 +2338,9 @@ public final class InGameController implements NetworkConstants {
         }
 
         if (state == Unit.IMPROVING) {
-            if (unit.getTile().getNationOwner() != Player.NO_NATION
-                    && unit.getTile().getNationOwner() != unit.getOwner().getNation()
-                    && !Player.isEuropean(unit.getTile().getNationOwner())
-                && !unit.getOwner().hasFather(FreeCol.getSpecification().getFoundingFather("model.foundingFather.peterMinuit"))) {
+            int price = unit.getOwner().getLandPrice(unit.getTile());
+            if (price > 0) {
                 int nation = unit.getTile().getNationOwner();
-                int price = game.getPlayer(unit.getTile().getNationOwner()).getLandPrice(unit.getTile());
                 ChoiceItem[] choices = {
                         new ChoiceItem(Messages.message("indianLand.pay").replaceAll("%amount%",
                                 Integer.toString(price)), 1), new ChoiceItem(Messages.message("indianLand.take"), 2) };

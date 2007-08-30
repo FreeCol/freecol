@@ -139,4 +139,20 @@ public final class Modifier {
         }
     }
  
+    /**
+     * Applies this modifier to a number.
+     *
+     */
+    public float applyTo(float number) {
+        switch(getType()) {
+        case ADDITIVE:
+            return number + value;
+        case MULTIPLICATIVE:
+            return number * value;
+        case PERCENTAGE:
+            return number + (number * value) / 100;
+        default:
+            return number;
+        }
+    }
 }

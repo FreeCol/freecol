@@ -1694,13 +1694,9 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener {
                             }
                             return null;
                         }
-                        if (colonyTile.getWorkTile().getNationOwner() != Player.NO_NATION
-                                && colonyTile.getWorkTile().getNationOwner() != unit.getOwner().getNation()
-                                && !Player.isEuropean(colonyTile.getWorkTile().getNationOwner())
-                            && !unit.getOwner().hasFather(FreeCol.getSpecification().getFoundingFather("model.foundingFather.peterMinuit"))) {
+                        int price = unit.getOwner().getLandPrice(colonyTile.getWorkTile());
+                        if (price > 0) {
                             int nation = colonyTile.getWorkTile().getNationOwner();
-                            int price = game.getPlayer(colonyTile.getWorkTile().getNationOwner()).getLandPrice(
-                                    colonyTile.getWorkTile());
                             ChoiceItem[] choices = {
                                     new ChoiceItem(Messages.message("indianLand.pay").replaceAll("%amount%",
                                             Integer.toString(price)), 1),

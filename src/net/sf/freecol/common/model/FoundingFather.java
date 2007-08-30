@@ -34,27 +34,6 @@ public class FoundingFather extends FreeColGameObjectType implements Abilities, 
      */
     private HashMap<String, Modifier> modifiers = new HashMap<String, Modifier>();
 
-
-    /**
-     * Get the <code>Modifier</code> value.
-     *
-     * @param id a <code>String</code> value
-     * @return a <code>Modifier</code> value
-     */
-    public final Modifier getModifier(String id) {
-        return modifiers.get(id);
-    }
-
-    /**
-     * Set the <code>Modifier</code> value.
-     *
-     * @param id a <code>String</code> value
-     * @param newModifier a <code>Modifier</code> value
-     */
-    public final void setModifier(String id, final Modifier newModifier) {
-        modifiers.put(id, newModifier);
-    }
-
     public static final int TRADE = 0,
                             EXPLORATION = 1,
                             MILITARY = 2,
@@ -174,6 +153,34 @@ public class FoundingFather extends FreeColGameObjectType implements Abilities, 
         abilities.put(id, newValue);
     }
 
+    /**
+     * Get the <code>Modifier</code> value.
+     *
+     * @param id a <code>String</code> value
+     * @return a <code>Modifier</code> value
+     */
+    public final Modifier getModifier(String id) {
+        return modifiers.get(id);
+    }
+
+    /**
+     * Set the <code>Modifier</code> value.
+     *
+     * @param id a <code>String</code> value
+     * @param newModifier a <code>Modifier</code> value
+     */
+    public final void setModifier(String id, final Modifier newModifier) {
+        modifiers.put(id, newModifier);
+    }
+
+    /**
+     * Returns a copy of this FoundingFather's modifiers.
+     *
+     * @return a <code>Map</code> value
+     */
+    public Map<String, Modifier> getModifiers() {
+        return new HashMap<String, Modifier>(modifiers);
+    }
 
     public void readFromXmlElement(Node xml, Map<String, GoodsType> goodsTypeByRef) {
 

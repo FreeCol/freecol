@@ -1115,9 +1115,8 @@ public final class Colony extends Settlement implements Location, Nameable {
                  * so unit can work in it if it's owned by none, by europeans or
                  * unit's owner has the founding father Peter Minuit
                  */
-                boolean ourLand = workTile.getNationOwner() == Player.NO_NATION
-                    || Player.isEuropean(workTile.getNationOwner())
-                    || unit.getOwner().hasFather(FreeCol.getSpecification().getFoundingFather("model.foundingFather.peterMminuit"));
+
+                boolean ourLand = (owner.getLandPrice(workTile) == 0);
                 int potential = unit.getFarmedPotential(goodsType, colonyTile.getWorkTile());
                 if (ourLand && potential > highestProduction) {
                     highestProduction = potential;

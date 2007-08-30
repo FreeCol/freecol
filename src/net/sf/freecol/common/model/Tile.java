@@ -674,8 +674,7 @@ public final class Tile extends FreeColGameObject implements Location, Named {
      * @param player The <code>Player</code>.
      */
     public void takeOwnership(Player player) {
-        if (getNationOwner() != Player.NO_NATION && getNationOwner() != player.getNation()
-            && !player.hasFather(FreeCol.getSpecification().getFoundingFather("model.foundingFather.peterMinuit"))) {
+        if (player.getLandPrice(this) > 0) {
             Player otherPlayer = getGame().getPlayer(getNationOwner());
             if (otherPlayer != null) {
                 if (!otherPlayer.isEuropean()) {

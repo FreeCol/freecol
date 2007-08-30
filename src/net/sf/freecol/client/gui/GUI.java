@@ -1437,11 +1437,8 @@ public final class GUI {
         displayTileOverlays(g, map, tile, x, y, false, false);
         
         int nation = tile.getNationOwner();
-        if (nation != Player.NO_NATION
-                && !Player.isEuropean(nation)
-                && nation != colony.getOwner().getNation()
-                && tile.getSettlement() == null
-            && !colony.getOwner().hasFather(FreeCol.getSpecification().getFoundingFather("model.foundingFather.peterMinuit"))) {
+        int price = colony.getOwner().getLandPrice(tile);
+        if (price > 0 && tile.getSettlement() == null) {
             Image image = lib.getMiscImage(ImageLibrary.TILE_OWNED_BY_INDIANS);
             g.drawImage(image, x+tileWidth/2-image.getWidth(null)/2, y+tileHeight/2-image.getHeight(null)/2, null);
         }

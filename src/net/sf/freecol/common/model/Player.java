@@ -2,7 +2,7 @@ package net.sf.freecol.common.model;
 
 import java.awt.Color;
 import java.util.ArrayList;
-import java.util.Hashtable;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.MissingResourceException;
@@ -171,16 +171,6 @@ public class Player extends FreeColGameObject implements Abilities, Nameable {
     /** The current tax rate for this player. */
     private int tax = 0;
 
-    /** Specifies the cost of removing a boycot for each type of goods. */
-    /* Cannot be done this way because NUMBER_OF_TYPES is not a constant.
-    private int[] arrears = new int[Goods.NUMBER_OF_TYPES];
-
-    private int[] sales = new int[Goods.NUMBER_OF_TYPES];
-
-    private int[] incomeBeforeTaxes = new int[Goods.NUMBER_OF_TYPES];
-
-    private int[] incomeAfterTaxes = new int[Goods.NUMBER_OF_TYPES];
-*/
     private int[] arrears, sales, incomeBeforeTaxes, incomeAfterTaxes;
 
     // 0 = pre-rebels; 1 = in rebellion; 2 = independence granted
@@ -222,7 +212,13 @@ public class Player extends FreeColGameObject implements Abilities, Nameable {
     /**
      * Stores the abilities of this Player.
      */
-    private Hashtable<String, Boolean> abilities = new Hashtable<String, Boolean>();    
+    private HashMap<String, Boolean> abilities = new HashMap<String, Boolean>();    
+
+    /**
+     * Stores the Modifiers of this Player.
+     */
+    private HashMap<String, Modifier> modifiers = new HashMap<String, Modifier>();
+
 
     /**
      * 
@@ -859,11 +855,23 @@ public class Player extends FreeColGameObject implements Abilities, Nameable {
      * 
      */
     public int getLandPrice(Tile tile) {
+        if (tile.getNationOwner() == Player.NO_NATION ||
+            tile.getNationOwner() == getNation() ||
+            Player.isEuropean(tile.getNationOwner())) {
+            return 0;
+        }
         int price = 0;
         for (int i = 0; i < Goods.NUMBER_OF_TYPES; i++) {
             price += tile.potential(i);
         }
-        return price * 40 + 100;
+        // TODO: make this depend on difficulty
+        price = price * 40 + 100;
+        Modifier modifier = getModifier("model.modifier.landPaymentModifier");
+        if (modifier == null) {
+            return price;
+        } else {
+            return (int) modifier.applyTo(price);
+        }
     }
 
     /**
@@ -885,7 +893,7 @@ public class Player extends FreeColGameObject implements Abilities, Nameable {
         if (owner.isEuropean()) {
             throw new IllegalStateException("The owner is an european player");
         }
-        int price = owner.getLandPrice(tile);
+        int price = getLandPrice(tile);
         modifyGold(-price);
         owner.modifyGold(price);
         tile.setNationOwner(getNation());
@@ -2313,6 +2321,26 @@ public class Player extends FreeColGameObject implements Abilities, Nameable {
         abilities.put(id, newValue);
     }
 
+    /**
+     * Get the <code>Modifier</code> value.
+     *
+     * @param id a <code>String</code> value
+     * @return a <code>Modifier</code> value
+     */
+    public final Modifier getModifier(String id) {
+        return modifiers.get(id);
+    }
+
+    /**
+     * Set the <code>Modifier</code> value.
+     *
+     * @param id a <code>String</code> value
+     * @param newModifier a <code>Modifier</code> value
+     */
+    public final void setModifier(String id, final Modifier newModifier) {
+        modifiers.put(id, newModifier);
+    }
+
 
     /**
      * Prepares this <code>Player</code> for a new turn.
@@ -2350,6 +2378,14 @@ public class Player extends FreeColGameObject implements Abilities, Nameable {
             if (getBells() >= getTotalFoundingFatherCost() && currentFather != null) {
                 addFather(currentFather);
                 abilities.putAll(currentFather.getAbilities());
+                java.util.Map<String, Modifier> newModifiers = currentFather.getModifiers();
+                for (String key : newModifiers.keySet()) {
+                    if (getModifier(key) == null) {
+                        setModifier(key, newModifiers.get(key));
+                    } else {
+                        getModifier(key).combine(newModifiers.get(key));
+                    }
+                }
 
                 /** TODO: restore effects of founding fathers as soon as possible
                 switch (currentFather) {
