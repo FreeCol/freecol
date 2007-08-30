@@ -50,12 +50,6 @@ public final class Building extends FreeColGameObject implements Abilities, Work
     /** The type of a building. */
     public static final int NONE = -1;
 
-    /** The maximum number of building types. */
-    public static final int NUMBER_OF_TYPES = FreeCol.getSpecification().numberOfBuildingTypes();
-
-    /** The level of a building. */
-    public static final int NOT_BUILT = 0, HOUSE = 1, SHOP = 2, FACTORY = 3;
-
     /** The colony containing this building. */
     private Colony colony;
 
@@ -356,6 +350,7 @@ public final class Building extends FreeColGameObject implements Abilities, Work
             for(Entry<GoodsType, Integer> bonus : buildingType.getProductionBonuses()) {
                 colony.removeProductionBonusFor(bonus.getKey(), bonus.getValue());
             }
+            colony.setDefenseBonus(colony.getDefenseBonus() - buildingType.getDefenseBonus());
             
             Map<String, Boolean> abilities = buildingType.getAbilities();
             for(Entry<String, Boolean> ability : abilities.entrySet()) {
@@ -375,6 +370,7 @@ public final class Building extends FreeColGameObject implements Abilities, Work
             for(Entry<GoodsType, Integer> bonus : buildingType.getProductionBonuses()) {
                 colony.addProductionBonusFor(bonus.getKey(), bonus.getValue());
             }
+            colony.setDefenseBonus(colony.getDefenseBonus() + buildingType.getDefenseBonus());
             colony.putAbilities(buildingType.getAbilities());
             
             // Colonists which can't work here must be put outside

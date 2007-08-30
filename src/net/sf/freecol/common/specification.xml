@@ -814,22 +814,25 @@
     <building-type id="model.building.Church"    hammers-required="64"  tools-required="0"   basicProduction="3" workplaces="3" produces="model.goods.Crosses">
       <required-population value="3"/>
       <production-bonus goods-type="model.goods.Crosses" bonus="2"/>
-      <ability id="model.ability.dressMissionary" value="yes"/>
+      <ability id="model.ability.dressMissionary" value="yes"/> <!-- maybe it will be changed with equipment implementation -->
     </building-type>
     <building-type id="model.building.Cathedral" hammers-required="176" tools-required="100" basicProduction="6" workplaces="3" produces="model.goods.Crosses">
       <required-population value="8"/>
       <production-bonus goods-type="model.goods.crosses" bonus="3"/>
-      <ability id="model.ability.dressMissionary" value="yes"/>
+      <ability id="model.ability.dressMissionary" value="yes"/> <!-- maybe it will be changed with equipment implementation -->
     </building-type>
     <building-type id="model.building.Stockade" hammers-required="64"  tools-required="0"   workplaces="0">
       <required-population value="3"/>
+      <skirmish defense-bonus="100"/>
     </building-type>
     <building-type id="model.building.Fort"     hammers-required="120" tools-required="100" workplaces="0">
       <required-population value="3"/>
+      <skirmish defense-bonus="150"/>
       <ability id="model.ability.bombardShips" value="yes"/>
     </building-type>
     <building-type id="model.building.Fortress" hammers-required="320" tools-required="200" workplaces="0">
       <required-population value="8"/>
+      <skirmish defense-bonus="200"/>
       <ability id="model.ability.bombardShips" value="yes"/>
     </building-type>
     <building-type id="model.building.Depot"              workplaces="0">

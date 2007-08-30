@@ -3598,22 +3598,14 @@ public class Unit extends FreeColGameObject implements Abilities, Locatable, Loc
         if (settlement instanceof Colony) {
             // Colony defensive bonus.
             Colony colony = (Colony) settlement;
-            // TODO: move bonus of stockade to colony class
             Building stockade = colony.getStockade();
             if (!stockade.isBuilt()) {
                 // 50% colony bonus
                 return new Modifier("modifiers.inColony", 50, Modifier.PERCENTAGE);
             } else {
-                // TODO: return bonus according to level (put in specification)
-                return new Modifier("modifiers.stockade", 100, Modifier.PERCENTAGE);
-                /*
-                // 100% stockade bonus
-                return new Modifier("modifiers.stockade", 100, Modifier.PERCENTAGE);
-                // 150% fort bonus
-                return new Modifier("modifiers.fort", 150, Modifier.PERCENTAGE);
-                // 200% fortress bonus
-                return new Modifier("modifiers.fortress", 200, Modifier.PERCENTAGE);
-                 */
+                String modifier = stockade.getType().getID();
+                modifier = "modifiers." + modifier.substring(modifier.lastIndexOf(".") + 1);
+                return new Modifier(modifier, colony.getDefenseBonus(), Modifier.PERCENTAGE);
             }
         } else if (settlement instanceof IndianSettlement) {
             // Indian settlement defensive bonus.

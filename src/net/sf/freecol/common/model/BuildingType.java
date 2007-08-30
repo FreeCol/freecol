@@ -24,7 +24,7 @@ public final class BuildingType extends FreeColGameObjectType implements Abiliti
 
     public static final String REVISION = "$Revision$";
     
-    private int level;
+    private int level, defenseBonus;
     private int hammersRequired, toolsRequired, populationRequired;
   
     private int workPlaces, basicProduction, minSkill, maxSkill;
@@ -97,6 +97,10 @@ public final class BuildingType extends FreeColGameObjectType implements Abiliti
     public int getLevel() {
         return level;
     }
+    
+    public int getDefenseBonus() {
+        return defenseBonus;
+    }
 
     /**
      * Reads the content of this BuildingType object from the given XML node.
@@ -115,6 +119,7 @@ public final class BuildingType extends FreeColGameObjectType implements Abiliti
             level = 1;
         }
         
+        defenseBonus = Xml.intAttribute(xml, "defense-bonus", 0);
         hammersRequired = Xml.intAttribute(xml, "hammers-required", 0);
         toolsRequired = Xml.intAttribute(xml, "tools-required", 0);
         

@@ -88,6 +88,8 @@ public final class Colony extends Settlement implements Abilities, Location, Nam
     // TODO: add bonus and factor from founding fathers to colony when they join
     private float productionFactors[];
     private int productionIncrements[];
+
+    private int defenseBonus;
     
     private HashMap<String, Boolean> abilities = new HashMap<String, Boolean>();
 
@@ -1771,6 +1773,7 @@ public final class Colony extends Settlement implements Abilities, Location, Nam
         out.writeAttribute("name", name);
         out.writeAttribute("owner", owner.getID());
         out.writeAttribute("tile", tile.getID());
+        out.writeAttribute("defenseBonus", Integer.toString(defenseBonus));
         if (getGame().isClientTrusted() || showAll || player == getOwner()) {
             out.writeAttribute("hammers", Integer.toString(hammers));
             out.writeAttribute("bells", Integer.toString(bells));
@@ -1830,6 +1833,7 @@ public final class Colony extends Settlement implements Abilities, Location, Nam
         tories = getAttribute(in, "tories", 0);
         oldTories = getAttribute(in, "oldTories", 0);
         productionBonus = getAttribute(in, "productionBonus", 0);
+        defenseBonus = getAttribute(in, "productionBonus", 0);
         currentlyBuilding = getAttribute(in, "currentlyBuilding", -1);
         landLocked = getAttribute(in, "landLocked", true);
         unitCount = getAttribute(in, "unitCount", -1);
@@ -1945,7 +1949,8 @@ public final class Colony extends Settlement implements Abilities, Location, Nam
      * @return whether the colony has a stockade
      */
     public boolean hasStockade() {
-        return getStockade().isBuilt();
+        Building stockade = getStockade();
+        return stockade != null && stockade.isBuilt();
     }
     
     /**
@@ -1954,8 +1959,14 @@ public final class Colony extends Settlement implements Abilities, Location, Nam
      * @return a <code>Building</code>
      */ 
     public Building getStockade() {
-        // TODO: change to search for a building which gives defense bonus
-        return getBuilding(FreeCol.getSpecification().getBuildingType("model.unit.Stockade"));
+        Iterator<Building> buildingIterator = getBuildingIterator();
+        while (buildingIterator.hasNext()) {
+            Building building = buildingIterator.next();
+            if (building.getType().getDefenseBonus() > 0) {
+                return building;
+            }
+        }
+        return null;
     }
     
     public float getProductionFactorFor(GoodsType goodsType) {
@@ -2011,5 +2022,13 @@ public final class Colony extends Settlement implements Abilities, Location, Nam
      */
     public void putAbilities(java.util.Map<String, Boolean> abilities) {
         this.abilities.putAll(abilities);
+    }
+    
+    public int getDefenseBonus() {
+        return defenseBonus;
+    }
+
+    public void setDefenseBonus(int newDefenseBonus) {
+        defenseBonus = newDefenseBonus;
     }
 }
