@@ -132,9 +132,6 @@ public final class Tile extends FreeColGameObject implements Location, Named {
     public Tile(Game game, XMLStreamReader in) throws XMLStreamException {
         super(game, in);
 
-        unitContainer = new UnitContainer(game, this);
-        tileItemContainer = new TileItemContainer(game, this);
-
         if (!isViewShared()) {
             playerExploredTiles = new PlayerExploredTile[Player.NUMBER_OF_NATIONS];
         }
@@ -151,9 +148,6 @@ public final class Tile extends FreeColGameObject implements Location, Named {
      */
     public Tile(Game game, Element e) {
         super(game, e);
-
-        unitContainer = new UnitContainer(game, this);
-        tileItemContainer = new TileItemContainer(game, this);
 
         if (!isViewShared()) {
             playerExploredTiles = new PlayerExploredTile[Player.NUMBER_OF_NATIONS];
@@ -173,9 +167,6 @@ public final class Tile extends FreeColGameObject implements Location, Named {
      */
     public Tile(Game game, String id) {
         super(game, id);
-
-        unitContainer = new UnitContainer(game, this);
-        tileItemContainer = new TileItemContainer(game, this);
 
         if (!isViewShared()) {
             playerExploredTiles = new PlayerExploredTile[Player.NUMBER_OF_NATIONS];
