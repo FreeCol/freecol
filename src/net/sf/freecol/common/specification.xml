@@ -939,7 +939,7 @@
     </founding-father>
     <founding-father id="model.foundingFather.hernanCortes" type="military"
                      weight1="6" weight2="5" weight3="1">
-      <modifier id="model.modifier.nativeTreasureModifier" type="percentage" value="200"/>
+      <modifier id="model.modifier.nativeTreasureModifier" type="percentage" value="100"/>
       <modifier id="model.modifier.treasureTransportFee" type="percentage" value="-100"/>
     </founding-father>
     <founding-father id="model.foundingFather.georgeWashington" type="military"

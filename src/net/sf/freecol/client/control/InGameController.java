@@ -1394,8 +1394,10 @@ public final class InGameController implements NetworkConstants {
                         new String[][] { { "%nation%", unit.getOwner().getNationAsString() } });
                 cash = true;
             } else {
-                String message = (unit.getOwner().hasFather(FreeCol.getSpecification().getFoundingFather("model.foundingFather.hernanCortes"))) ? "cashInTreasureTrain.text.free"
-                    : "cashInTreasureTrain.text.pay";
+                int transportFee = unit.getTransportFee();
+                String message = (transportFee == 0) ? 
+                    "cashInTreasureTrain.text.free" :
+                    "cashInTreasureTrain.text.pay";
                 cash = canvas.showConfirmDialog(message, "cashInTreasureTrain.yes", "cashInTreasureTrain.no");
             }
             if (cash) {

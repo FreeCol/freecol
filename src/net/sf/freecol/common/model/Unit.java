@@ -549,6 +549,25 @@ public class Unit extends FreeColGameObject implements Abilities, Locatable, Loc
     }
 
     /**
+     * Return the fee that would have to be paid to transport this
+     * treasure to Europe.
+     *
+     * @return an <code>int</code> value
+     */
+    public int getTransportFee() {
+        if (canCashInTreasureTrain()) {
+            if (!isInEurope() && getOwner().getEurope() != null) {
+                int transportFee = getTreasureAmount() / 2;
+                Modifier modifier = getOwner().getModifier("model.modifier.treasureTransportFee");
+                if (modifier != null) {
+                    return (int) modifier.applyTo(transportFee);
+                }
+            }
+        }
+        return 0;
+    }
+
+    /**
      * Transfers the gold carried by this unit to the {@link Player owner}.
      * 
      * @exception IllegalStateException if this unit is not a treasure train. or
@@ -560,17 +579,10 @@ public class Unit extends FreeColGameObject implements Abilities, Locatable, Loc
         }
 
         if (canCashInTreasureTrain()) {
-            boolean inEurope = (getLocation() instanceof Unit && ((Unit) getLocation()).getLocation() instanceof Europe);
-            int cashInAmount;
-            if (getOwner().hasFather(FreeCol.getSpecification().getFoundingFather("model.foundingFather.hernanCcortes")) ||
-                inEurope || getOwner().getEurope() == null) {
-                cashInAmount = getTreasureAmount();
-            } else {
-                cashInAmount = getTreasureAmount() / 2;
-            }
+            int cashInAmount = getTreasureAmount() - getTransportFee();
             cashInAmount = cashInAmount * (100 - getOwner().getTax()) / 100;
             FreeColGameObject o = getOwner();
-            if (inEurope) {
+            if (isInEurope()) {
                 o = getOwner().getEurope();
             }
             getOwner().modifyGold(cashInAmount);
@@ -4110,13 +4122,17 @@ public class Unit extends FreeColGameObject implements Abilities, Locatable, Loc
                     treasureUnitTypes.get(random));
 
             // Larger treasure if Hernan Cortes is present in the congress:
-            int bonus = (getOwner().hasFather(FreeCol.getSpecification().getFoundingFather("model.foundingFather.hernanCortes"))) ? 2 : 1;
+            Modifier modifier = getOwner().getModifier("model.modifier.nativeTreasureModifier");
+            if (modifier != null) {
+                randomTreasure = (int) modifier.applyTo(randomTreasure);
+            }
 
             // Incan and Aztecs give more gold
+            // TODO: make this part of the NationType
             if (enemy.getNation() == Player.INCA || enemy.getNation() == Player.AZTEC) {
-                tTrain.setTreasureAmount(randomTreasure * 500 * bonus + 10000);
+                tTrain.setTreasureAmount(randomTreasure * 500 + 10000);
             } else {
-                tTrain.setTreasureAmount(randomTreasure * 50 * bonus + 300);
+                tTrain.setTreasureAmount(randomTreasure * 50  + 300);
             }
 
             // capitals give more gold
