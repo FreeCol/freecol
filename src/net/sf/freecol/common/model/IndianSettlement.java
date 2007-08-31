@@ -1064,14 +1064,16 @@ public class IndianSettlement extends Settlement {
                 Player p = getGame().getPlayer(i);
                 if (p.isEuropean() && extraAlarm[i] != 0) {
                     if (extraAlarm[i] > 0) {
-                        int d = (p.hasFather(FreeCol.getSpecification().getFoundingFather("model.foundingFather.pocahontas"))) ? 2 : 1;
-                        if (p.getNation() == Player.FRENCH) {
-                            d *= 2;
+                        Modifier modifier = p.getModifier("model.modifier.nativeAlarmModifier");
+                        if (modifier != null) {
+                            extraAlarm[i] = (int) modifier.applyTo(extraAlarm[i]);
                         }
-                        modifyAlarm(p, extraAlarm[i] / d);
-                    } else {
-                        modifyAlarm(p, extraAlarm[i]);
+                        // TODO: make this depend on NationType
+                        if (p.getNation() == Player.FRENCH) {
+                            extraAlarm[i] /= 2;
+                        }
                     }
+                    modifyAlarm(p, extraAlarm[i]);
                 }
             }
 

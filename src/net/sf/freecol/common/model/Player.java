@@ -2387,6 +2387,24 @@ public class Player extends FreeColGameObject implements Abilities, Nameable {
                     } else {
                         getModifier(key).combine(newModifiers.get(key));
                     }
+
+                    // TODO: this should better be an Event
+                    if (key.equals("model.modifier.nativeAlarmModifier")) {
+                        // reduce indian tension and alarm
+                        Iterator<Player> pi = getGame().getPlayerIterator();
+                        while (pi.hasNext()) {
+                            Player p = pi.next();
+                            if (!p.isEuropean()) {
+                                p.getTension(this).setValue(0);
+                                Iterator<Settlement> isi = p.getIndianSettlementIterator();
+                                while (isi.hasNext()) {
+                                    IndianSettlement is = (IndianSettlement) isi.next();
+                                    is.getAlarm(this).setValue(0);
+                                }
+                            }
+                        }
+                    }
+
                 }
 
                 /** TODO: restore effects of founding fathers as soon as possible
@@ -2434,22 +2452,6 @@ public class Player extends FreeColGameObject implements Abilities, Nameable {
                     Iterator<Settlement> colonyIterator2 = getSettlementIterator();
                     while (colonyIterator2.hasNext()) {
                         ((Colony) colonyIterator2.next()).addSoL(20);
-                    }
-                    break;
-
-                case FoundingFather.POCAHONTAS:
-                    // reduce indian tension and alarm
-                    Iterator<Player> pi = getGame().getPlayerIterator();
-                    while (pi.hasNext()) {
-                        Player p = pi.next();
-                        if (!p.isEuropean()) {
-                            p.getTension(this).setValue(0);
-                            Iterator<Settlement> isi = p.getIndianSettlementIterator();
-                            while (isi.hasNext()) {
-                                IndianSettlement is = (IndianSettlement) isi.next();
-                                is.getAlarm(this).setValue(0);
-                            }
-                        }
                     }
                     break;
 
