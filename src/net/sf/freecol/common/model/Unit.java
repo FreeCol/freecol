@@ -3985,7 +3985,7 @@ public class Unit extends FreeColGameObject implements Abilities, Locatable, Loc
                                 { "%oldName%", oldName },
                                 { "%unit%", newName }, 
                                 { "%colony%", colony.getName() } },
-                            ModelMessage.UNIT_IMPROVED);
+                            ModelMessage.UNIT_IMPROVED, this);
         }
     }
 
