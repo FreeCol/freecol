@@ -181,8 +181,8 @@ public class ColonyPlan {
             buildList.add(0, building);
         }
 
-        building = colony.getStables();
-        if (colony.getHorseProduction() > 2 && building.canBuildNext()) {
+        building = colony.getBuildingForProducing(Goods.HORSES);
+        if (colony.getProductionOf(Goods.HORSES) > 2 && building.canBuildNext()) {
             buildList.add(building);
         }
 

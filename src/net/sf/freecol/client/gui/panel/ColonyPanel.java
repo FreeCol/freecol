@@ -1147,7 +1147,7 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener {
 
             final int foodProduction = currentColony.getFoodProduction();
             final int foodConsumption = currentColony.getFoodConsumption();
-            final int horses = currentColony.getHorseProduction();
+            final int horses = currentColony.getProductionOf(Goods.HORSES);
             final int bells = currentColony.getProductionOf(Goods.BELLS);
             final int crosses = currentColony.getProductionOf(Goods.CROSSES);
 

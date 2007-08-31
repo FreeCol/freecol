@@ -61,7 +61,7 @@ public final class Building extends FreeColGameObject implements Abilities, Work
 
     private BuildingType buildingType;
     
-    private boolean isBuilt;
+    private boolean isBuilt = false;
 
 
     /**
@@ -75,9 +75,8 @@ public final class Building extends FreeColGameObject implements Abilities, Work
         super(game);
 
         this.colony = colony;
+        setType(type);
         this.isBuilt = built;
-
-        buildingType = type;
     }
 
     /**
@@ -674,9 +673,11 @@ public final class Building extends FreeColGameObject implements Abilities, Work
         }
         colony.addGoods(goodsOutputType, goodsOutput);
 
-        int experience = goodsOutput / getUnitCount();
-        for (Unit unit : getUnitList()) {
-            unit.modifyExperience(experience);
+        if (getUnitCount() > 0) {
+            int experience = goodsOutput / getUnitCount();
+            for (Unit unit : getUnitList()) {
+                unit.modifyExperience(experience);
+            }
         }
     }
 
@@ -773,7 +774,11 @@ public final class Building extends FreeColGameObject implements Abilities, Work
      * @see #getProduction
      */
     public int getMaximumGoodsInput() {
-        return getMaximumGoodsInputAdding(null);
+        if (hasAbility("model.ability.autoProduction")) {
+            return getGoodsInputAuto();
+        } else {
+            return getMaximumGoodsInputAdding(null);
+        }
     }
 
     /**
@@ -786,7 +791,23 @@ public final class Building extends FreeColGameObject implements Abilities, Work
      * @see #getProduction
      */
     public int getGoodsInput() {
-        return calculateGoodsInput(getMaximumGoodsInput(), 0);
+        if (hasAbility("model.ability.autoProduction")) {
+            return getGoodsInputAuto();
+        } else {
+            return calculateGoodsInput(getMaximumGoodsInput(), 0);
+        }
+    }
+    
+    private int getGoodsInputAuto() {
+        if (getGoodsInputType() == null) {
+            return 0;
+        }
+        GoodsType inputType = getGoodsInputType();
+        int surplus = colony.getProductionOf(inputType);
+        if (inputType.isFoodType()) {
+            surplus -= colony.getFoodConsumption();
+        }
+        return surplus / 2; // store the half of surplus
     }
 
     /**
@@ -799,8 +820,12 @@ public final class Building extends FreeColGameObject implements Abilities, Work
      * @see #getProduction
      */
     public int getGoodsInputNextTurn() {
-        return calculateGoodsInput(getMaximumGoodsInput(),
-                colony.getProductionNextTurn(getGoodsInputType()));
+        if (hasAbility("model.ability.autoProduction")) {
+            return getGoodsInputAutoNextTurn();
+        } else {
+            return calculateGoodsInput(getMaximumGoodsInput(),
+                    colony.getProductionNextTurn(getGoodsInputType()));
+        }
     }
 
     private int calculateGoodsInput(int goodsInput, int addToWarehouse) {
@@ -812,6 +837,18 @@ public final class Building extends FreeColGameObject implements Abilities, Work
             }
         }
         return goodsInput;
+    }
+    
+    private int getGoodsInputAutoNextTurn() {
+        if (getGoodsInputType() == null) {
+            return 0;
+        }
+        GoodsType inputType = getGoodsInputType();
+        int surplus = colony.getProductionNextTurn(inputType);
+        if (inputType.isFoodType()) {
+            surplus -= colony.getFoodConsumption();
+        }
+        return surplus / 2; // store the half of surplus
     }
 
     /**
@@ -891,7 +928,31 @@ public final class Building extends FreeColGameObject implements Abilities, Work
      * @see #getMaximumProduction
      */
     public int getProduction() {
-        return getProductionAdding(null);
+        if (hasAbility("model.ability.autoProduction")) {
+            return getAutoProduction();
+        } else {
+            return getProductionAdding(null);
+        }
+    }
+    
+    /**
+     * Returns the actual production of a buliding with 0 workplaces
+     */
+    private int getAutoProduction() {
+        if (getGoodsOutputType() == null) {
+            return 0;
+        }
+
+        int goodsOutput = getMaximumAutoProduction();
+
+        if (getGoodsInputType() != null) {
+            int available = getGoodsInput();
+            if (available < goodsOutput) {
+                goodsOutput = available;
+            }
+        }
+
+        return getProductionFromProductivity(goodsOutput);
     }
 
     /**
@@ -901,7 +962,11 @@ public final class Building extends FreeColGameObject implements Abilities, Work
      * @see #getProduction
      */
     public int getProductionNextTurn() {
-        return getProductionNextTurnAdding(null);
+        if (hasAbility("model.ability.autoProduction")) {
+            return getAutoProductionNextTurn();
+        } else {
+            return getProductionNextTurnAdding(null);
+        }
     }
 
     /**
@@ -927,6 +992,26 @@ public final class Building extends FreeColGameObject implements Abilities, Work
         }
 
         return goodsOutput;
+    }
+    
+    /**
+     * Returns the actual production of a buliding with 0 workplaces for next turn
+     */
+    private int getAutoProductionNextTurn() {
+        if (getGoodsOutputType() == null) {
+            return 0;
+        }
+
+        int goodsOutput = getMaximumAutoProduction();
+
+        if (getGoodsInputType() != null) {
+            int available = getGoodsInputNextTurn();
+            if (available < goodsOutput) {
+                goodsOutput = available;
+            }
+        }
+
+        return getProductionFromProductivity(goodsOutput);
     }
 
     /**
@@ -1025,7 +1110,22 @@ public final class Building extends FreeColGameObject implements Abilities, Work
      *         workers, when there is enough "input goods".
      */
     public int getMaximumProduction() {
-        return getMaximumProductionAdding(null);
+        if (hasAbility("model.ability.autoProduction")) {
+            return getMaximumAutoProduction();
+        } else {
+            return getMaximumProductionAdding(null);
+        }
+    }
+    
+    /**
+     * Returns the maximum production of a buliding with 0 workplaces
+     */
+    private int getMaximumAutoProduction() {
+        int available = colony.getGoodsCount(getGoodsOutputType());
+        if (available < 2) {
+            return 0;
+        }
+        return Math.max(1, available / 10);
     }
 
     /**
@@ -1060,16 +1160,13 @@ public final class Building extends FreeColGameObject implements Abilities, Work
         GoodsType goodsOutputType = getGoodsOutputType();
         Player player = colony.getOwner();
 
-        float factor = colony.getProductionFactorFor(goodsOutputType);
-        int bonus = colony.getProductionBonusFor(goodsOutputType);
-        int goodsOutput = (int) (productivity * factor) + bonus;
-
-        /* TODO: Be sure this bonus are in colony and remove
-        if (goodsOutputType == Goods.BELLS) {
-            goodsOutput += goodsOutput * colony.getBuilding(Building.PRINTING_PRESS).getLevel();
-            goodsOutput = (goodsOutput * (100 + player.getBellsBonus())) / 100;
+        int goodsOutput = productivity + colony.getProductionBonusFor(goodsOutputType);
+        if (goodsOutput > 0) {
+            float factor = colony.getProductionFactorFor(goodsOutputType);
+            goodsOutput = Math.max(1, (int) (productivity * factor));
         }
 
+        /* TODO: Be sure this bonus are in colony and remove
         if (goodsOutputType == Goods.CROSSES &&
             player.hasFather(FreeCol.getSpecification().getFoundingFather("model.foundingFather.williamPenn"))) {
             goodsOutput += goodsOutput / 2;

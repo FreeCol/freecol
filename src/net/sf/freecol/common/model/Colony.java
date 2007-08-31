@@ -44,6 +44,8 @@ public final class Colony extends Settlement implements Abilities, Location, Nam
     private ArrayList<WorkLocation> workLocations = new ArrayList<WorkLocation>();
 
     private HashMap<String, Building> buildingMap = new HashMap<String, Building>();
+    
+    private List<Building> delayedProduction = new ArrayList<Building>();
 
     private int hammers;
 
@@ -415,6 +417,23 @@ public final class Colony extends Settlement implements Abilities, Location, Nam
     }
 
     /**
+     * Gets a <code>List</code> of every {@link Building} in this
+     * <code>Colony</code>.
+     * 
+     * @return The <code>List</code>.
+     * @see Building
+     */
+    public List<Building> getBuildingList() {
+        ArrayList<Building> b = new ArrayList<Building>();
+        for (WorkLocation location : workLocations) {
+            if (location instanceof Building) {
+                b.add((Building) location);
+            }
+        }
+        return b;
+    }
+
+    /**
      * Gets an <code>Iterator</code> of every {@link Building} in this
      * <code>Colony</code>.
      * 
@@ -422,13 +441,7 @@ public final class Colony extends Settlement implements Abilities, Location, Nam
      * @see Building
      */
     public Iterator<Building> getBuildingIterator() {
-        ArrayList<Building> b = new ArrayList<Building>();
-        for (WorkLocation location : workLocations) {
-            if (location instanceof Building) {
-                b.add((Building) location);
-            }
-        }
-        return b.iterator();
+        return getBuildingList().iterator();
     }
 
     /**
@@ -655,7 +668,7 @@ public final class Colony extends Settlement implements Abilities, Location, Nam
         if (type.isStorable()) {
             goodsContainer.addGoods(type, amount);
         } else if (type.getStoredAs() != null) {
-                goodsContainer.addGoods(type.getStoredAs(), amount);
+            goodsContainer.addGoods(type.getStoredAs(), amount);
         } else {
             if (type == Goods.HAMMERS) {
                 addHammers(amount);
@@ -1110,9 +1123,6 @@ public final class Colony extends Settlement implements Abilities, Location, Nam
      */
     public int getProductionOf(GoodsType goodsType) {
         int amount = 0;
-        if (goodsType == Goods.HORSES) {
-            return getHorseProduction();
-        }
         Iterator<WorkLocation> workLocationIterator = getWorkLocationIterator();
         while (workLocationIterator.hasNext()) {
             amount += workLocationIterator.next().getProductionOf(goodsType);
@@ -1179,7 +1189,7 @@ public final class Colony extends Settlement implements Abilities, Location, Nam
      * and a sufficient storage capacity).
      * 
      * @return The number of producable horses.
-     */
+     *//* deprecated
     public int getPotentialHorseProduction() {
         if (getGoodsCount(Goods.HORSES) < 2) {
             return 0;
@@ -1190,7 +1200,7 @@ public final class Colony extends Settlement implements Abilities, Location, Nam
             maxAmount /= 2;
         }
         return Math.max(1, maxAmount);
-    }
+    }*/
     
     public Building getStables() {
         // TODO: put production in specification and remove this
@@ -1201,13 +1211,13 @@ public final class Colony extends Settlement implements Abilities, Location, Nam
      * Gets the production of horses in this <code>Colony</code>.
      * 
      * @return The total production of horses in this <code>Colony</code>.
-     */
+     *//* deprecated
     public int getHorseProduction() {
         int surplus = getFoodProduction() - getFoodConsumption();
         int maxSpace = getWarehouseCapacity() - getGoodsCount(Goods.HORSES);
         int potential = Math.min(getPotentialHorseProduction(), maxSpace);
         return Math.max(Math.min(surplus / 2, potential), 0); // store the half of surplus
-    }
+    }*/
 
     /**
      * Returns how much of a Good will be produced by this colony this turn
@@ -1237,21 +1247,43 @@ public final class Colony extends Settlement implements Abilities, Location, Nam
     public int getProductionNetOf(GoodsType goodsType) {
         int count = getProductionNextTurn(goodsType);
         int used = 0;
-        if (goodsType == Goods.FOOD ) {
-            used = getFoodConsumption();
-            used += getHorseProduction();
-        } else {
-            Building bldg = getBuildingForConsuming(goodsType);
-            if (bldg != null) {
-                used = bldg.getGoodsInputNextTurn();
-            }
+        Building bldg = getBuildingForConsuming(goodsType);
+        if (bldg != null) {
+            used = bldg.getGoodsInputNextTurn();
+        }
         // TODO FIXME This should also take into account tools needed for a
         // current building project
+        if (goodsType == Goods.FOOD ) {
+            used += getFoodConsumption();
         }
         count -= used;
         return count;
     }
 
+    private int getNextHammersForBuilding() {
+        if (getCurrentlyBuilding() >= Colony.BUILDING_UNIT_ADDITION) {
+            int unitTypeIndex = getCurrentlyBuilding() - BUILDING_UNIT_ADDITION;
+            UnitType unitType = FreeCol.getSpecification().getUnitType(unitTypeIndex);
+            return Unit.getNextHammers(unitType);
+        } else if (currentlyBuilding != -1) {
+            return getBuilding(currentlyBuilding).getNextHammers();
+        } else {
+            return -1;
+        }
+    }
+
+    private int getNextToolsForBuilding() {
+        if (getCurrentlyBuilding() >= Colony.BUILDING_UNIT_ADDITION) {
+            int unitTypeIndex = getCurrentlyBuilding() - BUILDING_UNIT_ADDITION;
+            UnitType unitType = FreeCol.getSpecification().getUnitType(unitTypeIndex);
+            return Unit.getNextTools(unitType);
+        } else if (currentlyBuilding != -1) {
+            return getBuilding(currentlyBuilding).getNextTools();
+        } else {
+            return -1;
+        }
+    }
+    
     private void checkBuildingComplete() {
         // In order to avoid duplicate messages:
         if (lastVisited == getGame().getTurn().getNumber()) {
@@ -1485,7 +1517,7 @@ public final class Colony extends Settlement implements Abilities, Location, Nam
         }
     }
 
-
+    /* deprecated
     // Breed horses:
     private void updateHorses() {
         int horseProduction = getHorseProduction();
@@ -1493,7 +1525,7 @@ public final class Colony extends Settlement implements Abilities, Location, Nam
             removeGoods(Goods.FOOD, horseProduction);
             addGoods(Goods.HORSES, horseProduction);
         }
-    }
+    }*/
 
     // Create a new colonist if there is enough food:
     private void checkForNewColonist() {
@@ -1527,15 +1559,30 @@ public final class Colony extends Settlement implements Abilities, Location, Nam
 
 
 
-    // Update all buildings except carpenter and blacksmith
-    private void addBuildingProduction() {
-        Iterator<Building> buildingIterator = getBuildingIterator();
-        while (buildingIterator.hasNext()) {
-            Building building = buildingIterator.next();
-            GoodsType output = building.getGoodsOutputType();
-            if (output != Goods.HAMMERS && output != Goods.TOOLS) {
-                logger.finest("Calling newTurn for building " + building.getName());
-                building.newTurn();
+    /**
+     * Update all buildings in given list which produce goods in
+     * producedGoods. Buildings which don't produce goods in producedGoods
+     * are added to delayedProduction.
+     *
+     * If producedGoods is null, update all buildings in given iterator
+     */
+    private void addBuildingProduction(List<Building> list, List<GoodsType> producedGoods) {
+        // First auto production buildings
+        addBuildingProduction(list, producedGoods, true);
+        addBuildingProduction(list, producedGoods, false);
+    }
+    
+    private void addBuildingProduction(List<Building> list,
+            List<GoodsType> producedGoods, boolean autoProduction) {
+        for (Building building : list) {
+            if (building.hasAbility("model.ability.autoProduction") == autoProduction) {
+                GoodsType output = building.getGoodsOutputType();
+                if (producedGoods == null || producedGoods.contains(output)) {
+                    logger.finest("Calling newTurn for building " + building.getName());
+                    building.newTurn();
+                } else {
+                    delayedProduction.add(building);
+                }
             }
         }
     }
@@ -1677,20 +1724,29 @@ public final class Colony extends Settlement implements Abilities, Location, Nam
             dispose();
             return;
         }
-        updateHorses();
-        checkForNewColonist();
 
         // TODO: this needs to be made future-proof by considering all
         // materials that might be used for construction work. This
         // will require a Buildable interface, and suitable methods
         // for the *Type classes.
-        addHammersAndTools();
+        List<GoodsType> goodsForBuilding = new ArrayList<GoodsType>();
+        if (getNextHammersForBuilding() > 0) {
+            goodsForBuilding.add(Goods.HAMMERS);
+        }
+        if (getNextToolsForBuilding() > 0) {
+            goodsForBuilding.add(Goods.TOOLS);
+        }
+        
+        delayedProduction.clear();
+        addBuildingProduction(getBuildingList(), goodsForBuilding);
 
         // The following tasks consume hammers/tools,
         // or may do so in the future
         checkBuildingComplete();
 
-        addBuildingProduction();
+        addBuildingProduction(delayedProduction, null);
+
+        checkForNewColonist(); // must be after building production because horse production consumes some food
         exportGoods();
         // Throw away goods there is no room for.
         goodsContainer.cleanAndReport(getWarehouseCapacity(), getLowLevel(), getHighLevel());
