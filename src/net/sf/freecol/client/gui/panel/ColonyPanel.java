@@ -590,6 +590,7 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener {
         if (getColony().getCurrentlyBuilding() == Building.NONE) {
             hammersLabel.update(0, 0, 0, 0);
             toolsLabel.update(0, 0, 0, 0);
+            buyBuilding.setEnabled(false);
         } else {
             final int hammers = getColony().getHammers();
             final int tools = getColony().getGoodsCount(Goods.TOOLS);
@@ -611,8 +612,13 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener {
             hammersLabel.update(0, hammersNeeded, hammers, nextHammers);
             toolsLabel.update(0, toolsNeeded, tools, nextTools);
 
-            buyBuilding.setEnabled(isEditable() && getColony().getCurrentlyBuilding() >= 0
-                    && getColony().getPriceForBuilding() <= freeColClient.getMyPlayer().getGold());
+            // The buy button should only be active if:
+            //    - the panel is active,
+            //    - the building isnt finished,
+            //    - the player has enough money
+            buyBuilding.setEnabled(isEditable() &&
+            		(hammers < hammersNeeded || tools < toolsNeeded)  &&
+                    getColony().getPriceForBuilding() <= freeColClient.getMyPlayer().getGold());
         }
     }
 
