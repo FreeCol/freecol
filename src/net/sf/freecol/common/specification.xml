@@ -729,14 +729,14 @@
     </building-type>
     <building-type id="model.building.CarpenterHouse" basicProduction="3" workplaces="3" consumes="model.goods.Lumber" produces="model.goods.Hammers">
     </building-type>
-    <building-type id="model.building.LumberMill"     hammers-required="52" tools-required="0" basicProduction="6" workplaces="3" consumes="model.goods.Lumber" produces="model.goods.Hammers">
+    <building-type id="model.building.LumberMill"     hammers-required="52" tools-required="0" basicProduction="6" workplaces="3" consumes="model.goods.Lumber" produces="model.goods.Hammers" upgradesFrom="model.building.CarpenterHouse">
       <required-population value="3"/>
     </building-type>
     <building-type id="model.building.BlacksmithHouse" basicProduction="3" workplaces="3" consumes="model.goods.Ore" produces="model.goods.Tools">
     </building-type>
-    <building-type id="model.building.BlacksmithShop"  hammers-required="64"  tools-required="20"  basicProduction="6" workplaces="3" consumes="model.goods.Ore" produces="model.goods.Tools">
+    <building-type id="model.building.BlacksmithShop"  hammers-required="64"  tools-required="20"  basicProduction="6" workplaces="3" consumes="model.goods.Ore" produces="model.goods.Tools" upgradesFrom="model.building.BlacksmithHouse">
     </building-type>
-    <building-type id="model.building.IronWorks"       hammers-required="240" tools-required="100" basicProduction="6" workplaces="3" consumes="model.goods.Ore" produces="model.goods.Tools">
+    <building-type id="model.building.IronWorks"       hammers-required="240" tools-required="100" basicProduction="6" workplaces="3" consumes="model.goods.Ore" produces="model.goods.Tools" upgradesFrom="model.building.IronWorks">
       <required-population value="8"/>
       <required-ability id="model.ability.buildFactory"/>
       <production-bonus goods-type="model.goods.Tools" factor="1.5"/>
@@ -744,9 +744,9 @@
     </building-type>
     <building-type id="model.building.TobacconistHouse" basicProduction="3" workplaces="3" consumes="model.goods.Tobacco" produces="model.goods.Cigars">
     </building-type>
-    <building-type id="model.building.TobacconistShop"  hammers-required="64"  tools-required="20"  basicProduction="6" workplaces="3" consumes="model.goods.Tobacco" produces="model.goods.Cigars">
+    <building-type id="model.building.TobacconistShop"  hammers-required="64"  tools-required="20"  basicProduction="6" workplaces="3" consumes="model.goods.Tobacco" produces="model.goods.Cigars" upgradesFrom="model.building.TobacconistHouse">
     </building-type>
-    <building-type id="model.building.CigarFactory"     hammers-required="160" tools-required="100" basicProduction="6" workplaces="3" consumes="model.goods.Tobacco" produces="model.goods.Cigars">
+    <building-type id="model.building.CigarFactory"     hammers-required="160" tools-required="100" basicProduction="6" workplaces="3" consumes="model.goods.Tobacco" produces="model.goods.Cigars" upgradesFrom="model.building.TobacconistShop">
       <required-population value="8"/>
       <required-ability id="model.ability.buildFactory"/>
       <production-bonus goods-type="model.goods.Cigars" factor="1.5"/>
@@ -754,9 +754,9 @@
     </building-type>
     <building-type id="model.building.WeaverHouse" basicProduction="3" workplaces="3" consumes="model.goods.Cotton" produces="model.goods.Cloth">
     </building-type>
-    <building-type id="model.building.WeaverShop"  hammers-required="64"  tools-required="20"  basicProduction="6" workplaces="3" consumes="model.goods.Cotton" produces="model.goods.Cloth">
+    <building-type id="model.building.WeaverShop"  hammers-required="64"  tools-required="20"  basicProduction="6" workplaces="3" consumes="model.goods.Cotton" produces="model.goods.Cloth" upgradesFrom="model.building.WeaverHouse">
     </building-type>
-    <building-type id="model.building.TextileMill" hammers-required="160" tools-required="100" basicProduction="6" workplaces="3" consumes="model.goods.Cotton" produces="model.goods.Cloth">
+    <building-type id="model.building.TextileMill" hammers-required="160" tools-required="100" basicProduction="6" workplaces="3" consumes="model.goods.Cotton" produces="model.goods.Cloth" upgradesFrom="model.building.TextileMill">
       <required-population value="8"/>
       <required-ability id="model.ability.buildFactory"/>
       <production-bonus goods-type="model.goods.Cloth" factor="1.5"/>
@@ -764,9 +764,9 @@
     </building-type>
     <building-type id="model.building.DistillerHouse" basicProduction="3" workplaces="3" consumes="model.goods.Sugar" produces="model.goods.Rum">
     </building-type>
-    <building-type id="model.building.RumDistillery"  hammers-required="64"  tools-required="20"  basicProduction="6" workplaces="3" consumes="model.goods.Sugar" produces="model.goods.Rum">
+    <building-type id="model.building.RumDistillery"  hammers-required="64"  tools-required="20"  basicProduction="6" workplaces="3" consumes="model.goods.Sugar" produces="model.goods.Rum" upgradesFrom="model.building.DistillerHouse">
     </building-type>
-    <building-type id="model.building.RumFactory"     hammers-required="160" tools-required="100" basicProduction="6" workplaces="3" consumes="model.goods.Sugar" produces="model.goods.Rum">
+    <building-type id="model.building.RumFactory"     hammers-required="160" tools-required="100" basicProduction="6" workplaces="3" consumes="model.goods.Sugar" produces="model.goods.Rum" upgradesFrom="model.building.RumDistillery">
       <required-population value="8"/>
       <required-ability id="model.ability.buildFactory"/>
       <production-bonus goods-type="model.goods.Rum" factor="1.5"/>
@@ -774,9 +774,9 @@
     </building-type>
     <building-type id="model.building.FurTraderHouse" basicProduction="3" workplaces="3" consumes="model.goods.Furs" produces="model.goods.Coats">
     </building-type>
-    <building-type id="model.building.FurTradingPost" hammers-required="56"  tools-required="20"  basicProduction="6" workplaces="3" consumes="model.goods.Furs" produces="model.goods.Coats">
+    <building-type id="model.building.FurTradingPost" hammers-required="56"  tools-required="20"  basicProduction="6" workplaces="3" consumes="model.goods.Furs" produces="model.goods.Coats" upgradesFrom="model.building.FurTraderHouse">
     </building-type>
-    <building-type id="model.building.FurFactory"     hammers-required="160" tools-required="100" basicProduction="6" workplaces="3" consumes="model.goods.Furs" produces="model.goods.Coats">
+    <building-type id="model.building.FurFactory"     hammers-required="160" tools-required="100" basicProduction="6" workplaces="3" consumes="model.goods.Furs" produces="model.goods.Coats" upgradesFrom="model.building.FurTradingPost">
       <required-population value="6"/>
       <required-ability id="model.ability.buildFactory"/>
       <production-bonus goods-type="model.goods.Coats" factor="1.5"/>
@@ -786,22 +786,22 @@
       <required-population value="4"/>
       <ability id="model.ability.teach" value="yes"/>
     </building-type>
-    <building-type id="model.building.College"     hammers-required="160" tools-required="50"  workplaces="2" minSkill="1" maxSkill="2">
+    <building-type id="model.building.College"     hammers-required="160" tools-required="50"  workplaces="2" minSkill="1" maxSkill="2" upgradesFrom="model.building.Schoolhouse">
       <required-population value="8"/>
       <ability id="model.ability.teach" value="yes"/>
     </building-type>
-    <building-type id="model.building.University"  hammers-required="200" tools-required="100" workplaces="3" minSkill="1" maxSkill="3">
+    <building-type id="model.building.University"  hammers-required="200" tools-required="100" workplaces="3" minSkill="1" maxSkill="3" upgradesFrom="model.building.College">
       <required-population value="10"/>
       <ability id="model.ability.teach" value="yes"/>
     </building-type>
     <building-type id="model.building.Armory"   hammers-required="52"  tools-required="0"   basicProduction="3" workplaces="3" consumes="model.goods.Tools" produces="model.goods.Muskets">
       <ability id="model.ability.buildArtillery" value="yes"/>
     </building-type>
-    <building-type id="model.building.Magazine" hammers-required="120" tools-required="50"  basicProduction="6" workplaces="3" consumes="model.goods.Tools" produces="model.goods.Muskets">
+    <building-type id="model.building.Magazine" hammers-required="120" tools-required="50"  basicProduction="6" workplaces="3" consumes="model.goods.Tools" produces="model.goods.Muskets" upgradesFrom="model.building.Armory">
       <required-population value="8"/>
       <ability id="model.ability.buildArtillery" value="yes"/>
     </building-type>
-    <building-type id="model.building.Arsenal"  hammers-required="240" tools-required="100" basicProduction="6" workplaces="3" consumes="model.goods.Tools" produces="model.goods.Muskets">
+    <building-type id="model.building.Arsenal"  hammers-required="240" tools-required="100" basicProduction="6" workplaces="3" consumes="model.goods.Tools" produces="model.goods.Muskets" upgradesFrom="model.building.Magazine">
       <required-population value="8"/>
       <required-ability id="model.ability.buildFactory"/>
       <production-bonus goods-type="model.goods.Muskets" factor="1.5"/>
@@ -811,12 +811,12 @@
     <building-type id="model.building.Chapel"    workplaces="0" produces="model.goods.Crosses">
       <production-bonus goods-type="model.goods.Crosses" bonus="1"/>
     </building-type>
-    <building-type id="model.building.Church"    hammers-required="64"  tools-required="0"   basicProduction="3" workplaces="3" produces="model.goods.Crosses">
+    <building-type id="model.building.Church"    hammers-required="64"  tools-required="0"   basicProduction="3" workplaces="3" produces="model.goods.Crosses" upgradesFrom="model.building.Chapel">
       <required-population value="3"/>
       <production-bonus goods-type="model.goods.Crosses" bonus="2"/>
       <ability id="model.ability.dressMissionary" value="yes"/> <!-- maybe it will be changed with equipment implementation -->
     </building-type>
-    <building-type id="model.building.Cathedral" hammers-required="176" tools-required="100" basicProduction="6" workplaces="3" produces="model.goods.Crosses">
+    <building-type id="model.building.Cathedral" hammers-required="176" tools-required="100" basicProduction="6" workplaces="3" produces="model.goods.Crosses" upgradesFrom="model.building.Church">
       <required-population value="8"/>
       <production-bonus goods-type="model.goods.crosses" bonus="3"/>
       <ability id="model.ability.dressMissionary" value="yes"/> <!-- maybe it will be changed with equipment implementation -->
@@ -825,12 +825,12 @@
       <required-population value="3"/>
       <skirmish defense-bonus="100"/>
     </building-type>
-    <building-type id="model.building.Fort"     hammers-required="120" tools-required="100" workplaces="0">
+    <building-type id="model.building.Fort"     hammers-required="120" tools-required="100" workplaces="0" upgradesFrom="model.building.Stockade">
       <required-population value="3"/>
       <skirmish defense-bonus="150"/>
       <ability id="model.ability.bombardShips" value="yes"/>
     </building-type>
-    <building-type id="model.building.Fortress" hammers-required="320" tools-required="200" workplaces="0">
+    <building-type id="model.building.Fortress" hammers-required="320" tools-required="200" workplaces="0" upgradesFrom="model.building.Fort">
       <required-population value="8"/>
       <skirmish defense-bonus="200"/>
       <ability id="model.ability.bombardShips" value="yes"/>
@@ -861,7 +861,7 @@
     <building-type id="model.building.PrintingPress" hammers-required="52"  tools-required="20"  workplaces="0">
       <production-bonus goods-type="model.goods.Bells" factor="1.5"/>
     </building-type>
-    <building-type id="model.building.Newspaper"     hammers-required="120" tools-required="50" workplaces="0">
+    <building-type id="model.building.Newspaper"     hammers-required="120" tools-required="50" workplaces="0" upgradesFrom="model.building.PrintingPress">
       <required-population value="4"/>
       <production-bonus goods-type="model.goods.Bells" factor="2"/>
     </building-type>
