@@ -4833,8 +4833,9 @@ public class Unit extends FreeColGameObject implements Abilities, Locatable, Loc
         ModelController modelController = getGame().getModelController();
         int random = modelController.getRandom(getID() + "getConvert", 100);
         int convertProbability = (5 - getOwner().getDifficulty()) * 10; // 50% - 10%
-        if (getOwner().hasFather(FreeCol.getSpecification().getFoundingFather("model.foundingFather.juanDeSepulveda"))) {
-            convertProbability += 20;
+        Modifier modifier = getOwner().getModifier("model.ability.nativeConvertBonus");
+        if (modifier != null) {
+            convertProbability += modifier.getValue();
         }
         // TODO: it should be bigger when tension is high
         int burnProbability = (1 + getOwner().getDifficulty()) * 2; // 2% - 10%

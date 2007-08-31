@@ -972,6 +972,7 @@
     <founding-father id="model.foundingFather.pocahontas" type="political"
                      weight1="7" weight2="5" weight3="3">
       <modifier id="model.modifier.nativeAlarmModifier" type="percentage" value="-50"/>
+      <event id="model.event.resetNativeAlarm"/>
     </founding-father>
     <founding-father id="model.foundingFather.thomasPaine" type="political"
                      weight1="1" weight2="2" weight3="8">
@@ -1030,7 +1031,7 @@
     </founding-father>
     <founding-father id="model.foundingFather.juanDeSepulveda" type="religious"
                      weight1="3" weight2="8" weight3="3">
-      <ability id="model.ability.nativeConvertBonus" value="yes"/>
+      <modifier id="model.ability.nativeConvertBonus" type="percentage" value="20"/>
     </founding-father>
     <founding-father id="model.foundingFather.bartolmeDeLasCasas" type="religious"
                      weight1="0" weight2="5" weight3="10">
