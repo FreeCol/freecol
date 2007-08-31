@@ -736,7 +736,7 @@
     </building-type>
     <building-type id="model.building.BlacksmithShop"  hammers-required="64"  tools-required="20"  basicProduction="6" workplaces="3" consumes="model.goods.Ore" produces="model.goods.Tools" upgradesFrom="model.building.BlacksmithHouse">
     </building-type>
-    <building-type id="model.building.IronWorks"       hammers-required="240" tools-required="100" basicProduction="6" workplaces="3" consumes="model.goods.Ore" produces="model.goods.Tools" upgradesFrom="model.building.IronWorks">
+    <building-type id="model.building.IronWorks"       hammers-required="240" tools-required="100" basicProduction="6" workplaces="3" consumes="model.goods.Ore" produces="model.goods.Tools" upgradesFrom="model.building.BlacksmithShop">
       <required-population value="8"/>
       <required-ability id="model.ability.buildFactory"/>
       <production-bonus goods-type="model.goods.Tools" factor="1.5"/>
@@ -756,7 +756,7 @@
     </building-type>
     <building-type id="model.building.WeaverShop"  hammers-required="64"  tools-required="20"  basicProduction="6" workplaces="3" consumes="model.goods.Cotton" produces="model.goods.Cloth" upgradesFrom="model.building.WeaverHouse">
     </building-type>
-    <building-type id="model.building.TextileMill" hammers-required="160" tools-required="100" basicProduction="6" workplaces="3" consumes="model.goods.Cotton" produces="model.goods.Cloth" upgradesFrom="model.building.TextileMill">
+    <building-type id="model.building.TextileMill" hammers-required="160" tools-required="100" basicProduction="6" workplaces="3" consumes="model.goods.Cotton" produces="model.goods.Cloth" upgradesFrom="model.building.WeaverShop">
       <required-population value="8"/>
       <required-ability id="model.ability.buildFactory"/>
       <production-bonus goods-type="model.goods.Cloth" factor="1.5"/>
