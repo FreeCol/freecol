@@ -1201,11 +1201,6 @@ public final class Colony extends Settlement implements Abilities, Location, Nam
         }
         return Math.max(1, maxAmount);
     }*/
-    
-    public Building getStables() {
-        // TODO: put production in specification and remove this
-        return getBuilding(FreeCol.getSpecification().getBuildingType("model.building.Stables"));
-    }   
 
     /**
      * Gets the production of horses in this <code>Colony</code>.
