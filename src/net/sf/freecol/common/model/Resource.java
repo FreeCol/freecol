@@ -255,6 +255,8 @@ public class Resource extends TileItem {
         }
         type = FreeCol.getSpecification().getResourceType(in.getAttributeValue(null, "type"));
         quantity = Integer.parseInt(in.getAttributeValue(null, "quantity"));
+        
+        in.nextTag();
     }
 
     /**

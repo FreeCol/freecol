@@ -431,6 +431,8 @@ public class TileImprovement extends TileItem implements Locatable, Named {
         turnsToComplete = Integer.parseInt(in.getAttributeValue(null, "turns"));
         magnitude = Integer.parseInt(in.getAttributeValue(null, "magnitude"));
         style = Integer.parseInt(in.getAttributeValue(null, "style"));
+        
+        in.nextTag();
     }
 
     /**
