@@ -102,10 +102,10 @@ public class IndianSettlement extends Settlement {
     */
     private Tension[] alarm = new Tension[Player.NUMBER_OF_NATIONS];
 
-    // sort goods descending by price
-    private final Comparator<Goods> wantedGoodsComparator = new Comparator<Goods>() {
-        public int compare(Goods goods1, Goods goods2) {
-            return getPrice(goods2) - getPrice(goods1);
+    // sort goods types descending by price
+    private final Comparator<GoodsType> wantedGoodsComparator = new Comparator<GoodsType>() {
+        public int compare(GoodsType goodsType1, GoodsType goodsType2) {
+            return getPrice(goodsType2, 100) - getPrice(goodsType1, 100);
         }
     };
 
@@ -867,18 +867,13 @@ public class IndianSettlement extends Settlement {
     public void updateWantedGoods() {
         /* TODO: Try the different types goods in "random" order 
          * (based on the numbers of units on this tile etc): */
-        Goods[] goodsType = new Goods[Goods.NUMBER_OF_TYPES];
-        for (int index = 0; index < Goods.NUMBER_OF_TYPES; index++) {
-            goodsType[index] = new Goods(index);
-            goodsType[index].setAmount(100);
-        }
-        Arrays.sort(goodsType, wantedGoodsComparator);
+        List<GoodsType> goodsTypes = new ArrayList(FreeCol.getSpecification().getGoodsTypeList());
+        Collections.sort(goodsTypes, wantedGoodsComparator);
         int wantedIndex = 0;
-        for (int index = 0; index < goodsType.length; index++) {
-            GoodsType type = goodsType[index].getType();
-            if (type != Goods.HORSES && type != Goods.MUSKETS) {
+        for (GoodsType goodsType : goodsTypes) {
+            if (goodsType != Goods.HORSES && goodsType != Goods.MUSKETS) {
                 if (wantedIndex < wantedGoods.length) {
-                    wantedGoods[wantedIndex] = type;
+                    wantedGoods[wantedIndex] = goodsType;
                     wantedIndex++;
                 } else {
                     break;

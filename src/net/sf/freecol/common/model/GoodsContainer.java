@@ -374,32 +374,28 @@ public class GoodsContainer extends FreeColGameObject {
                                 new String [][] {{"%goods%", g.getName()},
                                                  {"%waste%", String.valueOf(waste)},
                                                  {"%colony%", ((Colony) parent).getName()}},
-                                ModelMessage.WAREHOUSE_CAPACITY,
-                                new Goods(g));
+                                ModelMessage.WAREHOUSE_CAPACITY, g);
             } else if (storedGoods[index] == limit && 
                        oldStoredGoods[index] < limit) {
                 // limit has been reached during this turn
                 addModelMessage(source, "model.building.warehouseOverfull",
                                 new String [][] {{"%goods%", g.getName()},
                                                  {"%colony%", ((Colony) parent).getName()}},
-                                ModelMessage.WAREHOUSE_CAPACITY,
-                                new Goods(g));
+                                ModelMessage.WAREHOUSE_CAPACITY, g);
             } else if (storedGoods[index] > high &&
                        oldStoredGoods[index] <= high) {
                 addModelMessage(source, "model.building.warehouseFull",
                                 new String [][] {{"%goods%", g.getName()},
                                                  {"%level%", String.valueOf(high)},
                                                  {"%colony%", ((Colony) parent).getName()}},
-                                ModelMessage.WAREHOUSE_CAPACITY,
-                                new Goods(g));
+                                ModelMessage.WAREHOUSE_CAPACITY, g);
             } else if (storedGoods[index] < low &&
                        oldStoredGoods[index] >= low) {
                 addModelMessage(source, "model.building.warehouseEmpty",
                                 new String [][] {{"%goods%", g.getName()},
                                                  {"%level%", String.valueOf(low)},
                                                  {"%colony%", ((Colony) parent).getName()}},
-                                ModelMessage.WAREHOUSE_CAPACITY,
-                                new Goods(g));
+                                ModelMessage.WAREHOUSE_CAPACITY, g);
             }
         }
 

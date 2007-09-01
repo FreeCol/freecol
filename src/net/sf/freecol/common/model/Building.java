@@ -656,8 +656,9 @@ public final class Building extends FreeColGameObject implements Abilities, Work
 
         if (goodsInput == 0 && getMaximumGoodsInput() > 0) {
             addModelMessage(getColony(), "model.building.notEnoughInput", new String[][] {
-                { "%inputGoods%", goodsInputType.getName() }, { "%building%", getName() },
-                { "%colony%", colony.getName() } }, ModelMessage.MISSING_GOODS, new Goods(goodsInputType));
+                    { "%inputGoods%", goodsInputType.getName() }, { "%building%", getName() },
+                    { "%colony%", colony.getName() } }, ModelMessage.MISSING_GOODS,
+                goodsInputType);
         }
 
         if (goodsOutput <= 0)

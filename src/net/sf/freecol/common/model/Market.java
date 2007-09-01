@@ -482,8 +482,7 @@ public final class Market extends FreeColGameObject implements Ownable {
                                         {"%goods%", g.getName()},
                                         {"%buy%", String.valueOf(dataForGoodType[index].costToBuy)},
                                         {"%sell%", String.valueOf(dataForGoodType[index].paidForSale)}},
-                                    ModelMessage.MARKET_PRICES,
-                                    new Goods(g));
+                                    ModelMessage.MARKET_PRICES, g);
                 } else if (oldPrices[index] < dataForGoodType[index].costToBuy) {
                     addModelMessage(owner.getEurope(), "model.market.priceIncrease",
                                     new String[][] {
@@ -491,8 +490,7 @@ public final class Market extends FreeColGameObject implements Ownable {
                                         {"%goods%", g.getName()},
                                         {"%buy%", String.valueOf(dataForGoodType[index].costToBuy)},
                                         {"%sell%", String.valueOf(dataForGoodType[index].paidForSale)}},
-                                    ModelMessage.MARKET_PRICES,
-                                    new Goods(g));
+                                    ModelMessage.MARKET_PRICES, g);
                 }
             }
         }

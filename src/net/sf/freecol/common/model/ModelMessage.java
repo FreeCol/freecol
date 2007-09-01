@@ -4,11 +4,12 @@ package net.sf.freecol.common.model;
 
 import java.util.Arrays;
 
+import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.gui.i18n.Messages;
 
 /**
-* Contains a message about a change in the model.
-*/
+ * Contains a message about a change in the model.
+ */
 public class ModelMessage {
 
     public static final String  COPYRIGHT = "Copyright (C) 2003-2006 The FreeCol Team";
@@ -72,6 +73,11 @@ public class ModelMessage {
         if (messageID == null) {
             throw new IllegalArgumentException("The messageID cannot be null.");
         }
+        if (!(display instanceof FreeColGameObject ||
+              display instanceof FreeColGameObjectType)) {
+            throw new IllegalArgumentException("The display must be a FreeColGameObject or FreeColGameObjectType or LostCityRumour!");
+        }
+
         if (data != null) {
             for (String[] s : data) {
                 if (s == null || s.length != 2) {
@@ -122,7 +128,7 @@ public class ModelMessage {
         switch(type) {
         case SONS_OF_LIBERTY:
         case GOVERNMENT_EFFICIENCY:
-            newDisplay = new Goods(Goods.BELLS);
+            newDisplay = FreeCol.getSpecification().getGoodsType("model.goods.bells");
             break;
         case LOST_CITY_RUMOUR:
             newDisplay = new LostCityRumour();
@@ -134,7 +140,7 @@ public class ModelMessage {
             newDisplay = source;
             break;
         case BUILDING_COMPLETED:
-            newDisplay = new Goods(Goods.HAMMERS);
+            newDisplay = FreeCol.getSpecification().getGoodsType("model.goods.hammers");
             break;
         case DEFAULT:
         case WARNING:

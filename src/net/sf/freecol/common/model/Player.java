@@ -2417,7 +2417,7 @@ public class Player extends FreeColGameObject implements Abilities, Nameable, Mo
                                 building.upgrade();
                             }
                         }
-                    } else if (event.equals("model.ability.seeAllColonies")) {
+                    } else if (event.equals("model.event.seeAllColonies")) {
                         exploreAllColonies();
                     } else if (event.equals("model.event.increaseSonsOfLiberty")) {
                         int value = Integer.parseInt(currentFather.getEvents().get(event));

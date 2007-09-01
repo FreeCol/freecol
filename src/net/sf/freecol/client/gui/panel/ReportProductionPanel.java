@@ -200,10 +200,9 @@ public final class ReportProductionPanel extends JPanel implements ActionListene
             add(createColonyButton(colonyIndex), higConst.rc(row, colonyColumn));
 
             // production
-            Goods goods = new Goods(goodsType);
             int newValue = colony.getProductionOf(goodsType);
-            goods.setAmount(newValue);
             totalProduction += newValue;
+            Goods goods = new Goods(colony.getGame(), colony, goodsType, newValue);
             GoodsLabel goodsLabel = new GoodsLabel(goods, parent);
             goodsLabel.setHorizontalAlignment(JLabel.LEADING);
             goodsLabel.setBorder(FreeColPanel.CELLBORDER);
@@ -272,8 +271,7 @@ public final class ReportProductionPanel extends JPanel implements ActionListene
         allColonies.setBorder(FreeColPanel.LEFTCELLBORDER);
         add(allColonies, higConst.rc(row, colonyColumn));
 
-        Goods allGoods = new Goods(goodsType);
-        allGoods.setAmount(totalProduction);
+        Goods allGoods = new Goods(parent.getClient().getGame(), null, goodsType, totalProduction);
         GoodsLabel allGoodsLabel = new GoodsLabel(allGoods, parent);
         allGoodsLabel.setHorizontalAlignment(JLabel.LEADING);
         allGoodsLabel.setBorder(FreeColPanel.CELLBORDER);

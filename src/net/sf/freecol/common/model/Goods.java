@@ -133,21 +133,6 @@ public class Goods implements Locatable, Ownable, Named {
         readFromXMLElement(e);
     }
 
-    /**
-     * This constructor should be used to get an object that represents a goods
-     * type (and not an actual amoutn of goods of that type).
-     * 
-     * @param type
-     */
-    public Goods(GoodsType type) {
-        this.game = null;
-        this.location = null;
-        this.type = type;
-        this.amount = 0;
-    }
-    public Goods(int goodsIndex) {
-        this(FreeCol.getSpecification().getGoodsType(goodsIndex));
-    }
 
     // ------------------------------------------------------------ static methods
 

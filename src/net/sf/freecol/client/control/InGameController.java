@@ -415,19 +415,19 @@ public final class InGameController implements NetworkConstants {
             ArrayList<ModelMessage> messages = new ArrayList<ModelMessage>();
             if (landLocked) {
                 messages.add(new ModelMessage(unit, "buildColony.landLocked", null, ModelMessage.MISSING_GOODS,
-                        new Goods(Goods.FISH)));
+                                              FreeCol.getSpecification().getGoodsType("model.goods.fish")));
             }
             if (food < 8) {
-                messages.add(new ModelMessage(unit, "buildColony.noFood", null, ModelMessage.MISSING_GOODS, new Goods(
-                        Goods.FOOD)));
+                messages.add(new ModelMessage(unit, "buildColony.noFood", null, ModelMessage.MISSING_GOODS, 
+                                              FreeCol.getSpecification().getGoodsType("model.goods.food")));
             }
             if (lumber < 4) {
                 messages.add(new ModelMessage(unit, "buildColony.noLumber", null, ModelMessage.MISSING_GOODS,
-                        new Goods(Goods.LUMBER)));
+                                              FreeCol.getSpecification().getGoodsType("model.goods.lumber")));
             }
             if (ore < 2) {
-                messages.add(new ModelMessage(unit, "buildColony.noOre", null, ModelMessage.MISSING_GOODS, new Goods(
-                        Goods.ORE)));
+                messages.add(new ModelMessage(unit, "buildColony.noOre", null, ModelMessage.MISSING_GOODS, 
+                                              FreeCol.getSpecification().getGoodsType("model.goods.ore")));
             }
             if (ownedBySelf) {
                 messages.add(new ModelMessage(unit, "buildColony.ownLand", null, ModelMessage.WARNING));

@@ -513,7 +513,7 @@ public class Unit extends FreeColGameObject implements Abilities, Locatable, Loc
             addModelMessage(settlement, "model.unit.gift", new String[][] {
                     { "%player%", getOwner().getNationAsString() }, { "%type%", goods.getName() },
                     { "%amount%", Integer.toString(amount) }, { "%colony%", ((Colony) settlement).getName() } },
-                    ModelMessage.GIFT_GOODS, new Goods(goods.getType()));
+                    ModelMessage.GIFT_GOODS, goods.getType());
         }
     }
 

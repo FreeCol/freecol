@@ -1299,7 +1299,8 @@ public final class Colony extends Settlement implements Abilities, Location, Nam
                                     new String[][] {
                                         { "%colony%", getName() },
                                         { "%item%", unitType.getName() } },
-                                    ModelMessage.MISSING_GOODS, new Goods(Goods.TOOLS));
+                                    ModelMessage.MISSING_GOODS, 
+                                    FreeCol.getSpecification().getGoodsType("model.goods.tools"));
                 }
             }
         } else if (currentlyBuilding != -1) {
@@ -1324,9 +1325,12 @@ public final class Colony extends Settlement implements Abilities, Location, Nam
                     }
                     getTile().updatePlayerExploredTiles();
                 } else {
-                    addModelMessage(this, "model.colony.itemNeedTools", new String[][] { { "%colony%", getName() },
-                            { "%item%", getBuilding(currentlyBuilding).getNextName() } }, ModelMessage.MISSING_GOODS,
-                            new Goods(Goods.TOOLS));
+                    addModelMessage(this, "model.colony.itemNeedTools", 
+                                    new String[][] {
+                                        { "%colony%", getName() },
+                                        { "%item%", getBuilding(currentlyBuilding).getNextName() }
+                                    }, ModelMessage.MISSING_GOODS,
+                                    FreeCol.getSpecification().getGoodsType("model.goods.tools"));
                 }
             }
         }
@@ -1629,12 +1633,15 @@ public final class Colony extends Settlement implements Abilities, Location, Nam
                 addModelMessage(this, "model.colony.SoLIncrease", new String[][] {
                         { "%oldSoL%", String.valueOf(oldSonsOfLiberty) },
                         { "%newSoL%", String.valueOf(sonsOfLiberty) }, { "%colony%", getName() } },
-                        ModelMessage.SONS_OF_LIBERTY, new Goods(Goods.BELLS));
+                    ModelMessage.SONS_OF_LIBERTY,
+                    FreeCol.getSpecification().getGoodsType("model.goods.bells"));
             } else {
                 addModelMessage(this, "model.colony.SoLDecrease", new String[][] {
                         { "%oldSoL%", String.valueOf(oldSonsOfLiberty) },
                         { "%newSoL%", String.valueOf(sonsOfLiberty) }, { "%colony%", getName() } },
-                        ModelMessage.SONS_OF_LIBERTY, new Goods(Goods.BELLS));
+                    ModelMessage.SONS_OF_LIBERTY,
+                    FreeCol.getSpecification().getGoodsType("model.goods.bells"));
+
             }
         }
 
@@ -1644,14 +1651,16 @@ public final class Colony extends Settlement implements Abilities, Location, Nam
             bonus = 2;
             if (oldSonsOfLiberty < 100) {
                 addModelMessage(this, "model.colony.SoL100", new String[][] { { "%colony%", getName() } },
-                        ModelMessage.SONS_OF_LIBERTY, new Goods(Goods.BELLS));
+                                ModelMessage.SONS_OF_LIBERTY,
+                                FreeCol.getSpecification().getGoodsType("model.goods.bells"));
             }
         } else {
             if (sonsOfLiberty >= 50) {
                 bonus += 1;
                 if (oldSonsOfLiberty < 50) {
                     addModelMessage(this, "model.colony.SoL50", new String[][] { { "%colony%", getName() } },
-                            ModelMessage.SONS_OF_LIBERTY, new Goods(Goods.BELLS));
+                                    ModelMessage.SONS_OF_LIBERTY,
+                                    FreeCol.getSpecification().getGoodsType("model.goods.bells"));
                 }
             }
             if (tories > veryBadGovernment) {
@@ -1660,24 +1669,27 @@ public final class Colony extends Settlement implements Abilities, Location, Nam
                     // government has become very bad
                     addModelMessage(this, "model.colony.veryBadGovernment",
                             new String[][] { { "%colony%", getName() } }, ModelMessage.GOVERNMENT_EFFICIENCY,
-                            new Goods(Goods.BELLS));
+                                    FreeCol.getSpecification().getGoodsType("model.goods.bells"));
                 }
             } else if (tories > badGovernment) {
                 bonus -= 1;
                 if (oldTories <= badGovernment) {
                     // government has become bad
                     addModelMessage(this, "model.colony.badGovernment", new String[][] { { "%colony%", getName() } },
-                            ModelMessage.GOVERNMENT_EFFICIENCY, new Goods(Goods.BELLS));
+                                    ModelMessage.GOVERNMENT_EFFICIENCY, 
+                                    FreeCol.getSpecification().getGoodsType("model.goods.bells"));
                 } else if (oldTories > veryBadGovernment) {
                     // government has improved, but is still bad
                     addModelMessage(this, "model.colony.governmentImproved1",
-                            new String[][] { { "%colony%", getName() } }, ModelMessage.GOVERNMENT_EFFICIENCY,
-                            new Goods(Goods.BELLS));
+                                    new String[][] { { "%colony%", getName() } }, 
+                                    ModelMessage.GOVERNMENT_EFFICIENCY,
+                    FreeCol.getSpecification().getGoodsType("model.goods.bells"));
                 }
             } else if (oldTories > badGovernment) {
                 // government was bad, but has improved
                 addModelMessage(this, "model.colony.governmentImproved2", new String[][] { { "%colony%", getName() } },
-                        ModelMessage.GOVERNMENT_EFFICIENCY, new Goods(Goods.BELLS));
+                                ModelMessage.GOVERNMENT_EFFICIENCY, 
+                                FreeCol.getSpecification().getGoodsType("model.goods.bells"));
             }
         }
 
