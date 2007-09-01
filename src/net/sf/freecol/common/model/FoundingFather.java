@@ -11,28 +11,25 @@ import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.util.Xml;
 
 /**
-* Represents one founding father to be contained in a Player object.
-* Stateful information is in the Player object.
-*/
+ * Represents one FoundingFather to be contained in a Player object.
+ * The FoundingFather is able to grant new abilities or bonuses to the
+ * player, or to cause certain events.
+ */
 public class FoundingFather extends FreeColGameObjectType implements Abilities, Modifiers {
 
     public static final String  COPYRIGHT = "Copyright (C) 2003-2005 The FreeCol Team";
     public static final String  LICENSE = "http://www.gnu.org/licenses/gpl.html";
     public static final String  REVISION = "$Revision$";
     
+    /**
+     * The probability of this FoundingFather being offered for selection.
+     */
     private int[] weight = new int[4];
 
+    /**
+     * The type of this FoundingFather. One of the following constants.
+     */
     private int type;
-
-    /**
-     * Stores the abilities of this Type.
-     */
-    private HashMap<String, Boolean> abilities = new HashMap<String, Boolean>();
-
-    /**
-     * Stores the Modifiers of this type.
-     */
-    private HashMap<String, Modifier> modifiers = new HashMap<String, Modifier>();
 
     public static final int TRADE = 0,
                             EXPLORATION = 1,
@@ -40,6 +37,21 @@ public class FoundingFather extends FreeColGameObjectType implements Abilities, 
                             POLITICAL = 3,
                             RELIGIOUS = 4,
                             TYPE_COUNT = 5;
+
+    /**
+     * Stores the abilities of this Type.
+     */
+    private HashMap<String, Boolean> abilities = new HashMap<String, Boolean>();
+
+    /**
+     * Stores the Modifiers of this Type.
+     */
+    private HashMap<String, Modifier> modifiers = new HashMap<String, Modifier>();
+
+    /**
+     * Stores the Events of this Type.
+     */
+    private HashMap<String, String> events = new HashMap<String, String>();
 
     /**
      * Creates a new <code>FoundingFather</code> instance.
@@ -174,6 +186,15 @@ public class FoundingFather extends FreeColGameObjectType implements Abilities, 
     }
 
     /**
+     * Returns all events.
+     *
+     * @return a <code>List</code> of Events.
+     */
+    public Map<String, String> getEvents() {
+        return events;
+    }
+
+    /**
      * Returns a copy of this FoundingFather's modifiers.
      *
      * @return a <code>Map</code> value
@@ -215,6 +236,13 @@ public class FoundingFather extends FreeColGameObjectType implements Abilities, 
                         String type = Xml.attribute(node, "type");
                         Float value = Float.valueOf(Xml.attribute(node, "value"));
                         setModifier(modifierId, new Modifier(modifierId, value, type));
+                    } else if ("event".equals(node.getNodeName())) {
+                        String eventId = Xml.attribute(node, "id");
+                        String value = null;
+                        if (Xml.hasAttribute(node, "value")) {
+                            value = Xml.attribute(node, "value");
+                        }
+                        events.put(eventId, value);
                     }
                 }
             };

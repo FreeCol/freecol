@@ -2387,9 +2387,10 @@ public class Player extends FreeColGameObject implements Abilities, Nameable {
                     } else {
                         getModifier(key).combine(newModifiers.get(key));
                     }
+                }
 
-                    // TODO: this should better be an Event
-                    if (key.equals("model.modifier.nativeAlarmModifier")) {
+                for (String event : currentFather.getEvents().keySet()) {
+                    if (event.equals("model.event.resetNativeAlarm")) {
                         // reduce indian tension and alarm
                         Iterator<Player> pi = getGame().getPlayerIterator();
                         while (pi.hasNext()) {
@@ -2403,7 +2404,28 @@ public class Player extends FreeColGameObject implements Abilities, Nameable {
                                 }
                             }
                         }
+                    } else if (event.equals("model.event.boycottsLifted")) {
+                        for (int index = 0; index < Goods.NUMBER_OF_TYPES; index++) {
+                            resetArrears(index);
+                        }
+                    } else if (event.equals("model.event.freeBuilding")) {
+                        BuildingType type = FreeCol.getSpecification().getBuildingType(currentFather.getEvents()
+                                                                                       .get(event));
+                        for (Colony colony : getColonies()) {
+                            Building building = colony.getBuilding(type);
+                            if (building != null && !building.isBuilt()) {
+                                building.build();
+                            }
+                        }
+                    } else if (event.equals("model.ability.seeAllColonies")) {
+                        exploreAllColonies();
+                    } else if (event.equals("model.event.increaseSonsOfLiberty")) {
+                        int value = Integer.parseInt(currentFather.getEvents().get(event));
+                        for (Colony colony : getColonies()) {
+                            colony.addSoL(value);
+                        }
                     }
+
 
                 }
 
@@ -2436,15 +2458,7 @@ public class Player extends FreeColGameObject implements Abilities, Nameable {
                     break;
 
                 case FoundingFather.FRANCISCO_DE_CORONADO:
-                    exploreAllColonies();
-                    break;
 
-                case FoundingFather.LA_SALLE:
-                    // all colonies get a stockade for free
-                    Iterator<Settlement> colonyIterator = getSettlementIterator();
-                    while (colonyIterator.hasNext()) {
-                        ((Colony) colonyIterator.next()).updatePopulation();
-                    }
                     break;
 
                 case FoundingFather.SIMON_BOLIVAR:
@@ -2475,12 +2489,6 @@ public class Player extends FreeColGameObject implements Abilities, Nameable {
                     bellsBonus += tax;
                     break;
 
-                case FoundingFather.JACOB_FUGGER:
-                    // lift all current boycotts
-                    for (int index = 0; index < Goods.NUMBER_OF_TYPES; index++) {
-                        resetArrears(index);
-                    }
-                    break;
                 }
                 */
                 addModelMessage(this, "model.player.foundingFatherJoinedCongress", new String[][] {

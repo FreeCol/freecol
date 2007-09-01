@@ -288,6 +288,11 @@ public final class Building extends FreeColGameObject implements Abilities, Work
         return isBuilt;
     }
 
+    // TODO: check whether this can be removed; at the moment it is needed for LaSalle
+    public void build() {
+        isBuilt = true;
+    }
+
     /**
      * Gets a pointer to the colony containing this building.
      * 
