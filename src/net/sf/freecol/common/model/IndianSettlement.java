@@ -867,7 +867,7 @@ public class IndianSettlement extends Settlement {
     public void updateWantedGoods() {
         /* TODO: Try the different types goods in "random" order 
          * (based on the numbers of units on this tile etc): */
-        List<GoodsType> goodsTypes = new ArrayList(FreeCol.getSpecification().getGoodsTypeList());
+        List<GoodsType> goodsTypes = new ArrayList<GoodsType>(FreeCol.getSpecification().getGoodsTypeList());
         Collections.sort(goodsTypes, wantedGoodsComparator);
         int wantedIndex = 0;
         for (GoodsType goodsType : goodsTypes) {
