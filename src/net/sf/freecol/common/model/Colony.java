@@ -2048,7 +2048,21 @@ public final class Colony extends Settlement implements Abilities, Location, Nam
      * @return a <code>Modifier</code> value
      */
     public final Modifier getModifier(String id) {
-        return modifiers.get(id);
+        Modifier result;
+        Modifier modifier = modifiers.get(id);
+        Modifier playerModifier = owner.getModifier(id);
+        if (modifier != null) {
+            if (playerModifier != null) {
+                result = new Modifier(modifier);
+                result.combine(playerModifier);
+            } else {
+                result = modifier;
+            }
+        } else {
+            result = playerModifier;
+        }
+        
+        return result;
     }
 
     /**
@@ -2062,16 +2076,16 @@ public final class Colony extends Settlement implements Abilities, Location, Nam
     }
     
     public void addModifier(String id, final Modifier newModifier) {
-        if (getModifier(id) == null) {
+        if (modifiers.get(id) == null) {
             setModifier(id, newModifier);
         } else {
-            getModifier(id).combine(newModifier);
+            modifiers.get(id).combine(newModifier);
         }
     }
     
     public void removeModifier(String id, final Modifier newModifier) {
-        if (getModifier(id) != null) {
-            getModifier(id).combine(newModifier.getInverse());
+        if (modifiers.get(id) != null) {
+            modifiers.get(id).combine(newModifier.getInverse());
         }
     }
 

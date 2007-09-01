@@ -74,6 +74,14 @@ public final class Modifier extends FreeColObject implements Cloneable {
         readFromXML(in);
     }
     
+    public Modifier(Modifier modifier) {
+        id = modifier.id;
+        type = modifier.type;
+        for (int i = 0; i < values.length; i++) {
+            values[i] = modifier.values[i];
+        }
+    }
+    
     private int getTypeFromString(String type) {
         if ("additive".equals(type)) {
             return ADDITIVE;
@@ -218,19 +226,14 @@ public final class Modifier extends FreeColObject implements Cloneable {
      * @return a inverse <code>Modifier</code>
      */
     public Modifier getInverse() {
-        Modifier newModifier = null;
-        try {
-            newModifier = (Modifier) this.clone();
+        Modifier newModifier = new Modifier(this);
 
-            if (type == COMBINED) {
-                for (int i = 0; i < values.length; i++) {
-                    newModifier.values[i] = getInverse(i);
-                }
-            } else {
-                newModifier.values[type] = getInverse(type);
+        if (type == COMBINED) {
+            for (int i = 0; i < values.length; i++) {
+                newModifier.values[i] = getInverse(i);
             }
-        } catch(CloneNotSupportedException e) {
-            // No deberia suceder
+        } else {
+            newModifier.values[type] = getInverse(type);
         }
         return newModifier;
     }
