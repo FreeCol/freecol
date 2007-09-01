@@ -16,7 +16,7 @@ import org.w3c.dom.Element;
  * make another.
  * 
  */
-public class DiplomaticTrade extends PersistentObject {
+public class DiplomaticTrade extends FreeColObject {
 
     public static final String COPYRIGHT = "Copyright (C) 2003-2007 The FreeCol Team";
     public static final String LICENSE = "http://www.gnu.org/licenses/gpl.html";
@@ -304,13 +304,13 @@ public class DiplomaticTrade extends PersistentObject {
      * @throws XMLStreamException
      *             if there are any problems writing to the stream.
      */
-    public void toXML(XMLStreamWriter out, Player player) throws XMLStreamException {
+    public void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
         out.writeStartElement(getXMLElementTagName());
         out.writeAttribute("accept", accept ? "accept" : "");
         out.writeAttribute("sender", sender.getID());
         out.writeAttribute("recipient", recipient.getID());
         for (TradeItem item : items) {
-            item.toXML(out, player);
+            item.toXML(out);
         }
         out.writeEndElement();
     }

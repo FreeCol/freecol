@@ -1,49 +1,34 @@
 
 package net.sf.freecol.server.ai;
 
-import java.io.IOException;
 import java.io.PrintWriter;
-import java.io.StringReader;
 import java.io.StringWriter;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.logging.Logger;
 
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.stream.XMLInputFactory;
-import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerException;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
 
 import net.sf.freecol.common.PseudoRandom;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.FreeColGameObject;
 import net.sf.freecol.common.model.FreeColGameObjectListener;
+import net.sf.freecol.common.model.FreeColObject;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.model.ServerPlayer;
 
-import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-import org.xml.sax.InputSource;
-import org.xml.sax.SAXException;
-
 
 /**
 * The main AI-class. Keeps references to all other AI-classes.
 */
-public class AIMain implements FreeColGameObjectListener {
+public class AIMain extends FreeColObject implements FreeColGameObjectListener {
     private static final Logger logger = Logger.getLogger(AIMain.class.getName());
 
     public static final String  COPYRIGHT = "Copyright (C) 2003-2005 The FreeCol Team";
@@ -325,88 +310,6 @@ public class AIMain implements FreeColGameObjectListener {
     }
 
     /**
-     * This method writes an XML-representation of this object to
-     * the given stream.
-     * 
-     * <br><br>
-     *  
-     * @param document The <code>Document</code>.
-     * @return An XML-representation of this object.
-     */    
-    public Element toXMLElement(Document document) {
-        try {
-            StringWriter sw = new StringWriter();
-            XMLOutputFactory xif = XMLOutputFactory.newInstance();
-            XMLStreamWriter xsw = xif.createXMLStreamWriter(sw);
-            toXML(xsw);      
-            
-            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-            Document tempDocument = null;
-            try {
-                DocumentBuilder builder = factory.newDocumentBuilder();
-                tempDocument = builder.parse(new InputSource(new StringReader(sw.toString())));;
-                return (Element) document.importNode(tempDocument.getDocumentElement(), true);
-            } catch (ParserConfigurationException pce) {
-                // Parser with specified options can't be built
-                StringWriter swe = new StringWriter();
-                pce.printStackTrace(new PrintWriter(swe));
-                logger.warning(swe.toString());
-                IllegalStateException ex = new IllegalStateException("ParserConfigurationException");
-                ex.initCause(pce);
-                throw ex;
-            } catch (SAXException se) {
-                StringWriter swe = new StringWriter();
-                se.printStackTrace(new PrintWriter(swe));
-                logger.warning(swe.toString());
-                IllegalStateException ex = new IllegalStateException("SAXException");
-                ex.initCause(se);
-                throw ex;
-            } catch (IOException ie) {
-                StringWriter swe = new StringWriter();
-                ie.printStackTrace(new PrintWriter(swe));
-                logger.warning(swe.toString());
-                IllegalStateException ex = new IllegalStateException("IOException");
-                ex.initCause(ie);
-                throw ex;
-            }                                    
-        } catch (XMLStreamException e) {
-            logger.warning(e.toString());
-            IllegalStateException ex = new IllegalStateException("XMLStreamException");
-            ex.initCause(e);
-            throw ex;
-        }
-    }
-    
-    /**
-     * Initialize this object from an XML-representation of this object.
-     * @param element An XML-element that will be used to initialize
-     *      this object.
-     */
-    public void readFromXMLElement(Element element) {
-        XMLInputFactory xif = XMLInputFactory.newInstance();        
-        try {
-            try {
-                TransformerFactory factory = TransformerFactory.newInstance();
-                Transformer xmlTransformer = factory.newTransformer();
-                StringWriter stringWriter = new StringWriter();
-                xmlTransformer.transform(new DOMSource(element), new StreamResult(stringWriter));
-                String xml = stringWriter.toString();
-                XMLStreamReader xsr = xif.createXMLStreamReader(new StringReader(xml));
-                xsr.nextTag();
-                readFromXML(xsr);
-            } catch (TransformerException e) {
-                StringWriter sw = new StringWriter();
-                e.printStackTrace(new PrintWriter(sw));
-                logger.warning(sw.toString());
-                throw new IllegalStateException("TransformerException");
-            }
-        } catch (XMLStreamException e) {
-            logger.warning(e.toString());
-            throw new IllegalStateException("XMLStreamException");
-        }
-    }
-
-    /**
      * Writes all of the <code>AIObject</code>s and other AI-related 
      * information to an XML-stream.
      *
@@ -439,28 +342,6 @@ public class AIMain implements FreeColGameObjectListener {
         }
 
         out.writeEndElement();
-    }
-
-    /**
-     * Writes all of the <code>AIObject</code>s and other AI-related 
-     * information to an XML-stream.
-     *
-     * @param out The target stream.
-     * @throws XMLStreamException if there are any problems writing
-     *      to the stream.
-     */
-    public void toXML(XMLStreamWriter out) throws XMLStreamException {
-        toXMLImpl(out);
-    }
-    
-    /**
-     * Reads all the <code>AIObject</code>s and other AI-related information
-     * from XML data.
-     * @param in The input stream with the XML.
-     * @throws XMLStreamException if an error occured during parsing.
-     */
-    public void readFromXML(XMLStreamReader in) throws XMLStreamException {
-        readFromXMLImpl(in);
     }
 
     /**

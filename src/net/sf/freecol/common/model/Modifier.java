@@ -12,7 +12,7 @@ import org.w3c.dom.Element;
  * that can be applied to any action within the game, most obviously
  * combat.
  */
-public final class Modifier extends PersistentObject implements Cloneable {
+public final class Modifier extends FreeColObject implements Cloneable {
 
     public static final String  COPYRIGHT = "Copyright (C) 2003-2007 The FreeCol Team";
     public static final String  LICENSE   = "http://www.gnu.org/licenses/gpl.html";
@@ -139,7 +139,7 @@ public final class Modifier extends PersistentObject implements Cloneable {
      * @throws XMLStreamException if there are any problems writing
      *      to the stream.
      */
-    public void toXML(XMLStreamWriter out, Player player) throws XMLStreamException {
+    public void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
         // Start element:
         out.writeStartElement(getXMLElementTagName());
 

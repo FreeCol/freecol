@@ -12,7 +12,7 @@ import javax.xml.stream.XMLStreamWriter;
  * One of the items a DiplomaticTrade consists of.
  *
  */
-public abstract class TradeItem extends PersistentObject {
+public abstract class TradeItem extends FreeColObject {
 
     /**
      * The game this TradeItem belongs to.
@@ -186,7 +186,7 @@ public abstract class TradeItem extends PersistentObject {
      * @throws XMLStreamException if there are any problems writing
      *      to the stream.
      */
-    public void toXML(XMLStreamWriter out, Player player) throws XMLStreamException {
+    public void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
         out.writeAttribute("ID", this.ID);
         out.writeAttribute("source", this.source.getID());
         out.writeAttribute("destination", this.destination.getID());

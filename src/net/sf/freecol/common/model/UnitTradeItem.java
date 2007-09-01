@@ -116,9 +116,9 @@ public class UnitTradeItem extends TradeItem {
      * @throws XMLStreamException if there are any problems writing
      *      to the stream.
      */
-    public void toXML(XMLStreamWriter out, Player player) throws XMLStreamException {
+    public void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
         out.writeStartElement(getXMLElementTagName());
-        super.toXML(out, player);
+        super.toXML(out);
         out.writeAttribute("unit", this.unit.getID());
         out.writeEndElement();
     }

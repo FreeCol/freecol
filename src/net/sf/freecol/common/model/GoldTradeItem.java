@@ -117,9 +117,9 @@ public class GoldTradeItem extends TradeItem {
      * @throws XMLStreamException if there are any problems writing
      *      to the stream.
      */
-    public void toXML(XMLStreamWriter out, Player player) throws XMLStreamException {
+    public void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
         out.writeStartElement(getXMLElementTagName());
-        super.toXML(out, player);
+        super.toXML(out);
         out.writeAttribute("gold", Integer.toString(this.gold));
         out.writeEndElement();
     }
