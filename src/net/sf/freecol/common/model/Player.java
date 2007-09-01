@@ -2414,7 +2414,7 @@ public class Player extends FreeColGameObject implements Abilities, Nameable {
                         for (Colony colony : getColonies()) {
                             Building building = colony.getBuilding(type);
                             if (building != null && !building.isBuilt()) {
-                                building.build();
+                                building.upgrade();
                             }
                         }
                     } else if (event.equals("model.ability.seeAllColonies")) {
