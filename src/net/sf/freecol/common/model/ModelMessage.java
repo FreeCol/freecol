@@ -340,4 +340,10 @@ public class ModelMessage {
         sb.append(", " + type + " >");
         return sb.toString();
     }
+
+    // TODO: make this serializable; can we avoid passing Game in Constructor?
+    
+    public static String getXMLElementTagName() {
+        return "modelMessage";
+    }
 }
