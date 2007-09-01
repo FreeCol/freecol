@@ -3,6 +3,7 @@ package net.sf.freecol.common.model;
 import java.util.Iterator;
 import java.util.List;
 
+import net.sf.freecol.FreeCol;
 import net.sf.freecol.util.test.FreeColTestCase;
 
 public class BuildingTest extends FreeColTestCase {
@@ -13,9 +14,6 @@ public class BuildingTest extends FreeColTestCase {
 
     public static final String REVISION = "$Revision$";
 
-    private static int levels[] = {Building.NOT_BUILT, Building.HOUSE, Building.SHOP, Building.FACTORY};
-
-
 
     public void testCanBuildNext() {
 
@@ -23,10 +21,15 @@ public class BuildingTest extends FreeColTestCase {
 
         // First check with a building that can be fully build with a normal
         // colony
-        assertTrue(new Building(getGame(), colony, Building.WAREHOUSE, Building.NOT_BUILT).canBuildNext());
-        assertTrue(new Building(getGame(), colony, Building.WAREHOUSE, Building.HOUSE).canBuildNext());
-        assertFalse(new Building(getGame(), colony, Building.WAREHOUSE, Building.SHOP).canBuildNext());
-        assertFalse(new Building(getGame(), colony, Building.WAREHOUSE, Building.FACTORY).canBuildNext());
+        BuildingType warehouseType = FreeCol.getSpecification().getBuildingType("model.building.warehouse");
+        Building warehouse = new Building(getGame(), colony, warehouseType, false);
+        assertTrue(warehouse.canBuildNext());
+        warehouse.upgrade();
+        assertTrue(warehouse.canBuildNext());
+        warehouse.upgrade();
+        assertFalse(warehouse.canBuildNext());
+        warehouse.upgrade();
+        assertFalse(warehouse.canBuildNext());
 
         // Check whether it is population restriction work
 
@@ -43,8 +46,9 @@ public class BuildingTest extends FreeColTestCase {
 
         Colony colony = getStandardColony();
 
-        Building warehouse = colony.getBuilding(Building.WAREHOUSE);
-        assertEquals(Building.NOT_BUILT, warehouse.getLevel());
+        BuildingType warehouseType = FreeCol.getSpecification().getBuildingType("model.building.warehouse");
+        Building warehouse = colony.getBuilding(warehouseType);
+        assertFalse(warehouse.isBuilt());
         assertTrue(warehouse.canBuildNext());
 
         // Check other building...
@@ -62,22 +66,18 @@ public class BuildingTest extends FreeColTestCase {
         while (buildingIterator.hasNext()) {
             Building building = buildingIterator.next();
             // schoolhouse is special, see testCanAddToSchool
-            if (building.getType() == Building.SCHOOLHOUSE) continue;
-            for (int level = 0; level < levels.length; level++) {
-                building.setLevel(level);
-                int maxUnits = building.getMaxUnits();
-                for (int index = 0; index < maxUnits; index++) {
-                    assertTrue("unable to add unit " + index + " to building type " +
-                               building.getType() + " level " + level,
-                               building.canAdd(units.get(index)));
-                    building.add(units.get(index));
-                }
-                assertFalse("able to add unit " + maxUnits + " to building type " +
-                            building.getType() + " level " + level,
-                            building.canAdd(units.get(maxUnits)));
-                for (int index = 0; index < maxUnits; index++) {
-                    building.remove(building.getFirstUnit());
-                }
+            if (building.getType().hasAbility("model.ability.teach")) continue;
+            int maxUnits = building.getMaxUnits();
+            for (int index = 0; index < maxUnits; index++) {
+                assertTrue("unable to add unit " + index + " to building type " +
+                           building.getType(), building.canAdd(units.get(index)));
+                building.add(units.get(index));
+            }
+            assertFalse("able to add unit " + maxUnits + " to building type " +
+                        building.getType(),
+                        building.canAdd(units.get(maxUnits)));
+            for (int index = 0; index < maxUnits; index++) {
+                building.remove(building.getFirstUnit());
             }
         }
     }
