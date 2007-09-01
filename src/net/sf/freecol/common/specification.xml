@@ -739,7 +739,7 @@
     <building-type id="model.building.IronWorks"       hammers-required="240" tools-required="100" basicProduction="6" workplaces="3" consumes="model.goods.Ore" produces="model.goods.Tools" upgradesFrom="model.building.BlacksmithShop">
       <required-population value="8"/>
       <required-ability id="model.ability.buildFactory"/>
-      <production-bonus goods-type="model.goods.Tools" factor="0.5"/>
+      <modifier id="model.goods.Tools" type="percentage" value="50"/>
       <ability id="model.ability.expertsUseConnections" value="yes"/>
     </building-type>
     <building-type id="model.building.TobacconistHouse" basicProduction="3" workplaces="3" consumes="model.goods.Tobacco" produces="model.goods.Cigars">
@@ -749,7 +749,7 @@
     <building-type id="model.building.CigarFactory"     hammers-required="160" tools-required="100" basicProduction="6" workplaces="3" consumes="model.goods.Tobacco" produces="model.goods.Cigars" upgradesFrom="model.building.TobacconistShop">
       <required-population value="8"/>
       <required-ability id="model.ability.buildFactory"/>
-      <production-bonus goods-type="model.goods.Cigars" factor="0.5"/>
+      <modifier id="model.goods.Cigars" type="percentage" value="50"/>
       <ability id="model.ability.expertsUseConnections" value="yes"/>
     </building-type>
     <building-type id="model.building.WeaverHouse" basicProduction="3" workplaces="3" consumes="model.goods.Cotton" produces="model.goods.Cloth">
@@ -759,7 +759,7 @@
     <building-type id="model.building.TextileMill" hammers-required="160" tools-required="100" basicProduction="6" workplaces="3" consumes="model.goods.Cotton" produces="model.goods.Cloth" upgradesFrom="model.building.WeaverShop">
       <required-population value="8"/>
       <required-ability id="model.ability.buildFactory"/>
-      <production-bonus goods-type="model.goods.Cloth" factor="0.5"/>
+      <modifier id="model.goods.Cloth" type="percentage" value="50"/>
       <ability id="model.ability.expertsUseConnections" value="yes"/>
     </building-type>
     <building-type id="model.building.DistillerHouse" basicProduction="3" workplaces="3" consumes="model.goods.Sugar" produces="model.goods.Rum">
@@ -769,7 +769,7 @@
     <building-type id="model.building.RumFactory"     hammers-required="160" tools-required="100" basicProduction="6" workplaces="3" consumes="model.goods.Sugar" produces="model.goods.Rum" upgradesFrom="model.building.RumDistillery">
       <required-population value="8"/>
       <required-ability id="model.ability.buildFactory"/>
-      <production-bonus goods-type="model.goods.Rum" factor="0.5"/>
+      <modifier id="model.goods.Rum" type="percentage" value="50"/>
       <ability id="model.ability.expertsUseConnections" value="yes"/>
     </building-type>
     <building-type id="model.building.FurTraderHouse" basicProduction="3" workplaces="3" consumes="model.goods.Furs" produces="model.goods.Coats">
@@ -779,7 +779,7 @@
     <building-type id="model.building.FurFactory"     hammers-required="160" tools-required="100" basicProduction="6" workplaces="3" consumes="model.goods.Furs" produces="model.goods.Coats" upgradesFrom="model.building.FurTradingPost">
       <required-population value="6"/>
       <required-ability id="model.ability.buildFactory"/>
-      <production-bonus goods-type="model.goods.Coats" factor="0.5"/>
+      <modifier id="model.goods.Coats" type="percentage" value="50"/>
       <ability id="model.ability.expertsUseConnections" value="yes"/>
     </building-type>
     <building-type id="model.building.Schoolhouse" hammers-required="64"  tools-required="0"   workplaces="1" minSkill="1" maxSkill="1">
@@ -804,21 +804,21 @@
     <building-type id="model.building.Arsenal"  hammers-required="240" tools-required="100" basicProduction="6" workplaces="3" consumes="model.goods.Tools" produces="model.goods.Muskets" upgradesFrom="model.building.Magazine">
       <required-population value="8"/>
       <required-ability id="model.ability.buildFactory"/>
-      <production-bonus goods-type="model.goods.Muskets" factor="0.5"/>
+      <modifier id="model.goods.Muskets" type="percentage" value="50"/>
       <ability id="model.ability.buildArtillery" value="yes"/>
       <ability id="model.ability.expertsUseConnections" value="yes"/>
     </building-type>
     <building-type id="model.building.Chapel"    workplaces="0" produces="model.goods.Crosses">
-      <production-bonus goods-type="model.goods.Crosses" bonus="1"/>
+      <modifier id="model.goods.Crosses" type="additive" value="1"/>
     </building-type>
     <building-type id="model.building.Church"    hammers-required="64"  tools-required="0"   basicProduction="3" workplaces="3" produces="model.goods.Crosses" upgradesFrom="model.building.Chapel">
       <required-population value="3"/>
-      <production-bonus goods-type="model.goods.Crosses" bonus="2"/>
+      <modifier id="model.goods.Crosses" type="additive" value="2"/>
       <ability id="model.ability.dressMissionary" value="yes"/> <!-- maybe it will be changed with equipment implementation -->
     </building-type>
     <building-type id="model.building.Cathedral" hammers-required="176" tools-required="100" basicProduction="6" workplaces="3" produces="model.goods.Crosses" upgradesFrom="model.building.Church">
       <required-population value="8"/>
-      <production-bonus goods-type="model.goods.crosses" bonus="3"/>
+      <modifier id="model.goods.Crosses" type="additive" value="3"/>
       <ability id="model.ability.dressMissionary" value="yes"/> <!-- maybe it will be changed with equipment implementation -->
     </building-type>
     <building-type id="model.building.Stockade" hammers-required="64"  tools-required="0"   workplaces="0">
@@ -836,13 +836,16 @@
       <ability id="model.ability.bombardShips" value="yes"/>
     </building-type>
     <building-type id="model.building.Depot"              workplaces="0">
+      <modifier id="model.modifier.warehouseStorage" type="additive" value="100"/>
     </building-type>
     <building-type id="model.building.Warehouse"          hammers-required="80" tools-required="0"  workplaces="0" upgradesFrom="model.building.Depot">
+      <modifier id="model.modifier.warehouseStorage" type="additive" value="200"/>
     </building-type>
     <building-type id="model.building.WarehouseExpansion" hammers-required="80" tools-required="20" workplaces="0" upgradesFrom="model.building.Warehouse">
+      <modifier id="model.modifier.warehouseStorage" type="additive" value="300"/>
     </building-type>
     <building-type id="model.building.Country" workplaces="0" consumes="model.goods.Food" produces="model.goods.Horses">
-      <production-bonus goods-type="model.goods.Horses" factor="-0.5"/>
+      <modifier id="model.goods.Horses" type="percentage" value="-50"/>
       <ability id="model.ability.autoProduction" value="yes" />
     </building-type>
     <building-type id="model.building.Stables" hammers-required="64" tools-required="0" workplaces="0" consumes="model.goods.Food" produces="model.goods.Horses" upgradesFrom="model.building.Country">
@@ -864,11 +867,11 @@
       <ability id="model.ability.buildShips" value="yes"/>
     </building-type>
     <building-type id="model.building.PrintingPress" hammers-required="52"  tools-required="20"  workplaces="0">
-      <production-bonus goods-type="model.goods.Bells" factor="0.5"/>
+      <modifier id="model.goods.Bells" type="percentage" value="50"/>
     </building-type>
     <building-type id="model.building.Newspaper"     hammers-required="120" tools-required="50" workplaces="0" upgradesFrom="model.building.PrintingPress">
       <required-population value="4"/>
-      <production-bonus goods-type="model.goods.Bells" factor="1"/>
+      <modifier id="model.goods.Bells" type="percentage" value="100"/>
     </building-type>
     <building-type id="model.building.CustomHouse" hammers-required="160" tools-required="50" workplaces="0">
       <required-ability id="model.ability.buildCustomHouse"/>
@@ -928,17 +931,17 @@
     </founding-father>
     <founding-father id="model.foundingFather.henryHudson" type="exploration"
                      weight1="10" weight2="1" weight3="1">
-      <production-bonus goods-type="model.goods.furs" type="percentage" value="100"/>
+      <production-bonus goods-type="model.goods.Furs" type="percentage" value="100"/>
     </founding-father>
     <founding-father id="model.foundingFather.laSalle" type="exploration"
                      weight1="7" weight2="5" weight3="3">
-      <event id="model.event.freeBuilding" value="model.building.stockade"/>
+      <event id="model.event.freeBuilding" value="model.building.Stockade"/>
       <modify-type>
         <requirements>
-          <required-id id="model.building.stockade"/>
+          <required-id id="model.building.Stockade"/>
         </requirements>
         <modifications>
-          <required-goods goods-type="model.goods.hammers" value="0"/>
+          <required-goods goods-type="model.goods.Hammers" value="0"/>
         </modifications>
       </modify-type>
     </founding-father>
@@ -972,7 +975,7 @@
     </founding-father>
     <founding-father id="model.foundingFather.thomasJefferson" type="political"
                      weight1="4" weight2="5" weight3="6">
-      <production-bonus goods-type="model.goods.bells" type="percentage" value="50"/>
+      <production-bonus goods-type="model.goods.Bells" type="percentage" value="50"/>
     </founding-father>
     <founding-father id="model.foundingFather.pocahontas" type="political"
                      weight1="7" weight2="5" weight3="3">
@@ -1021,7 +1024,7 @@
     </founding-father>
     <founding-father id="model.foundingFather.williamPenn" type="religious"
                      weight1="8" weight2="5" weight3="2">
-      <production-bonus goods-type="model.goods.crosses" type="percentage" value="50"/>
+      <production-bonus goods-type="model.goods.Crosses" type="percentage" value="50"/>
     </founding-father>
     <founding-father id="model.foundingFather.fatherJeanDeBrebeuf" type="religious"
                      weight1="6" weight2="6" weight3="1">

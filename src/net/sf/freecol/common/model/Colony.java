@@ -21,7 +21,7 @@ import org.w3c.dom.Element;
  * {@link ColonyTile}s. The latter represents the tiles around the
  * <code>Colony</code> where working is possible.
  */
-public final class Colony extends Settlement implements Abilities, Location, Nameable {
+public final class Colony extends Settlement implements Abilities, Location, Nameable, Modifiers {
     private static final Logger logger = Logger.getLogger(Colony.class.getName());
 
     public static final String COPYRIGHT = "Copyright (C) 2003-2007 The FreeCol Team";
@@ -86,10 +86,11 @@ public final class Colony extends Settlement implements Abilities, Location, Nam
 
     private int[] highLevel, lowLevel, exportLevel;
     private boolean[] exports;
-    
-    // TODO: add bonus and factor from founding fathers to colony when they join
-    private float productionFactors[];
-    private int productionIncrements[];
+
+    /**
+     * Stores the Modifiers of this Player.
+     */
+    private HashMap<String, Modifier> modifiers = new HashMap<String, Modifier>();
 
     private int defenseBonus;
     
@@ -211,16 +212,12 @@ public final class Colony extends Settlement implements Abilities, Location, Nam
         lowLevel = new int[numberOfGoods];
         exportLevel = new int[numberOfGoods];
         exports = new boolean[numberOfGoods];
-        productionFactors = new float[numberOfGoods];
-        productionIncrements = new int[numberOfGoods];
         
         for (int goodsIndex = 0; goodsIndex < numberOfGoods; goodsIndex++) {
             exports[goodsIndex] = false;
             lowLevel[goodsIndex] = 10;
             highLevel[goodsIndex] = 90;
             exportLevel[goodsIndex] = 50;
-            productionFactors[goodsIndex] = 1;
-            productionIncrements[goodsIndex] = 0;
         }
     }
 
@@ -1772,13 +1769,24 @@ public final class Colony extends Settlement implements Abilities, Location, Nam
      * @return The capacity of this <code>Colony</code>'s warehouse.
      */
     public int getWarehouseCapacity() {
-        // TODO: put warehouse capacity in specification
-        return getWarehouse().getLevel() * 100;
+        int basicStorage = 0;
+        Modifier storage = getModifier("model.modifier.warehouseStorage");
+        if (storage != null) {
+            basicStorage = (int) storage.applyTo(basicStorage);
+        }
+        return basicStorage;
     }
     
     public Building getWarehouse() {
-        // TODO: change to search for a building which gives warehouse capacity
-        return getBuilding(FreeCol.getSpecification().getBuildingType("model.building.Depot"));
+        // TODO: it should search for more than one building?
+        Iterator<Building> buildingIterator = getBuildingIterator();
+        while (buildingIterator.hasNext()) {
+            Building building = buildingIterator.next();
+            if (building.getType().getModifier("model.modifier.warehouseStorage") != null) {
+                return building;
+            }
+        }
+        return null;
     }
 
     /**
@@ -1843,8 +1851,9 @@ public final class Colony extends Settlement implements Abilities, Location, Nam
             toArrayElement("lowLevel", lowLevel, out);
             toArrayElement("highLevel", highLevel, out);
             toArrayElement("exportLevel", exportLevel, out);
-            toArrayElement("productionFactors", productionFactors, out);
-            toArrayElement("productionIncrements", productionIncrements, out);
+            for (Modifier modifier : modifiers.values()) {
+                modifier.toXML(out, player);
+            }
             Iterator<WorkLocation> workLocationIterator = workLocations.iterator();
             while (workLocationIterator.hasNext()) {
                 ((FreeColGameObject) workLocationIterator.next()).toXML(out, player, showAll, toSavedGame);
@@ -1923,10 +1932,9 @@ public final class Colony extends Settlement implements Abilities, Location, Nam
                 highLevel = readFromArrayElement("highLevel", in, new int[0]);
             } else if (in.getLocalName().equals("exportLevel")) {
                 exportLevel = readFromArrayElement("exportLevel", in, new int[0]);
-            } else if (in.getLocalName().equals("exportLevel")) {
-                productionFactors = readFromArrayElement("productionFactors", in, new float[0]);
-            } else if (in.getLocalName().equals("exportLevel")) {
-                productionIncrements = readFromArrayElement("productionIncrements", in, new int[0]);
+            } else if (in.getLocalName().equals(Modifier.getXMLElementTagName())) {
+                Modifier modifier = new Modifier(in);
+                modifiers.put(modifier.getId(), modifier);
             } else {
                 logger.warning("Unknown tag: " + in.getLocalName() + " loading colony " + name);
             }
@@ -2010,6 +2018,7 @@ public final class Colony extends Settlement implements Abilities, Location, Nam
      * @return a <code>Building</code>
      */ 
     public Building getStockade() {
+        // TODO: it should search for more than one building?
         Iterator<Building> buildingIterator = getBuildingIterator();
         while (buildingIterator.hasNext()) {
             Building building = buildingIterator.next();
@@ -2019,29 +2028,39 @@ public final class Colony extends Settlement implements Abilities, Location, Nam
         }
         return null;
     }
+
+    /**
+     * Get the <code>Modifier</code> value.
+     *
+     * @param id a <code>String</code> value
+     * @return a <code>Modifier</code> value
+     */
+    public final Modifier getModifier(String id) {
+        return modifiers.get(id);
+    }
+
+    /**
+     * Set the <code>Modifier</code> value.
+     *
+     * @param id a <code>String</code> value
+     * @param newModifier a <code>Modifier</code> value
+     */
+    public final void setModifier(String id, final Modifier newModifier) {
+        modifiers.put(id, newModifier);
+    }
     
-    public float getProductionFactorFor(GoodsType goodsType) {
-        return productionFactors[goodsType.getIndex()];
+    public void addModifier(String id, final Modifier newModifier) {
+        if (getModifier(id) == null) {
+            setModifier(id, newModifier);
+        } else {
+            getModifier(id).combine(newModifier);
+        }
     }
-
-    public void addProductionFactorFor(GoodsType goodsType, float factor) {
-        productionFactors[goodsType.getIndex()] += factor;
-    }
-
-    public void removeProductionFactorFor(GoodsType goodsType, float factor) {
-        productionFactors[goodsType.getIndex()] -= factor;
-    }
-
-    public int getProductionBonusFor(GoodsType goodsType) {
-        return productionIncrements[goodsType.getIndex()];
-    }
-
-    public void addProductionBonusFor(GoodsType goodsType, int bonus) {
-        productionIncrements[goodsType.getIndex()] += bonus;
-    }
-
-    public void removeProductionBonusFor(GoodsType goodsType, int bonus) {
-        productionIncrements[goodsType.getIndex()] -= bonus;
+    
+    public void removeModifier(String id, final Modifier newModifier) {
+        if (getModifier(id) != null) {
+            getModifier(id).combine(newModifier.getInverse());
+        }
     }
 
     /**

@@ -1,13 +1,18 @@
 
 package net.sf.freecol.common.model;
 
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamReader;
+import javax.xml.stream.XMLStreamWriter;
+import org.w3c.dom.Element;
+
 
 /**
  * The <code>Modifier</code> class encapsulates a bonus or penalty
  * that can be applied to any action within the game, most obviously
  * combat.
  */
-public final class Modifier {
+public final class Modifier extends PersistentObject implements Cloneable {
 
     public static final String  COPYRIGHT = "Copyright (C) 2003-2007 The FreeCol Team";
     public static final String  LICENSE   = "http://www.gnu.org/licenses/gpl.html";
@@ -16,6 +21,7 @@ public final class Modifier {
     public static final int ADDITIVE = 0;
     public static final int MULTIPLICATIVE = 1;
     public static final int PERCENTAGE = 2;
+    public static final int COMBINED = 3;
     
     /**
      * The ID of the modifier, used to look up name, etc.
@@ -30,7 +36,7 @@ public final class Modifier {
     /**
      * The value of this modifier
      */
-    private float value;
+    private float values[] = {0, 1, 0};
 
 
 
@@ -43,8 +49,8 @@ public final class Modifier {
      */
     public Modifier(String id, float value, int type) {
         this.id = id;
-        this.value = value;
         this.type = type;
+        this.values[this.type] = value;
     }
 
     /**
@@ -56,14 +62,100 @@ public final class Modifier {
      */
     public Modifier(String id, float value, String type) {
         this.id = id;
-        this.value = value;
+        this.type = getTypeFromString(type);
+        this.values[this.type] = value;
+    }
+    
+    public Modifier(Element element) {
+        readFromXMLElement(element);
+    }
+    
+    public Modifier(XMLStreamReader in) throws XMLStreamException {
+        readFromXML(in);
+    }
+    
+    private int getTypeFromString(String type) {
         if ("additive".equals(type)) {
-            this.type = ADDITIVE;
+            return ADDITIVE;
         } else if ("multiplicative".equals(type)) {
-            this.type = MULTIPLICATIVE;
+            return MULTIPLICATIVE;
         } else if ("percentage".equals(type)) {
-            this.type = PERCENTAGE;
+            return PERCENTAGE;
+        } else if ("combined".equals(type)) {
+            return COMBINED;
+        } else {
+            throw new IllegalArgumentException("Unknown type");
         }
+    }
+    
+    private String getTypeAsString() {
+        switch(getType()) {
+        case ADDITIVE:
+            return "additive";
+        case MULTIPLICATIVE:
+            return "multiplicative";
+        case PERCENTAGE:
+            return "percentage";
+        case COMBINED:
+            return "combined";
+        default:
+            // It can't happen
+            return null;
+        }
+    }
+    
+    /**
+     * Initialize this object from an XML-representation of this object.
+     * @param in The input stream with the XML.
+     * @throws XMLStreamException if a problem was encountered
+     *      during parsing.
+     */
+    public void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
+        id = in.getAttributeValue(null, "id");
+        type = getTypeFromString(in.getAttributeValue(null, "type"));
+        if (type == COMBINED) {
+            values = readFromArrayElement("values", in, new float[0]);
+        } else {
+            values[type] = Float.parseFloat(in.getAttributeValue(null, "value"));
+        }
+        
+        in.nextTag();
+    }
+    
+    /**
+     * This method writes an XML-representation of this object to
+     * the given stream.
+     * 
+     * <br><br>
+     * 
+     * Only attributes visible to the given <code>Player</code> will 
+     * be added to that representation if <code>showAll</code> is
+     * set to <code>false</code>.
+     *  
+     * @param out The target stream.
+     * @param player The <code>Player</code> this XML-representation 
+     *      should be made for, or <code>null</code> if
+     *      <code>showAll == true</code>.
+     * @throws XMLStreamException if there are any problems writing
+     *      to the stream.
+     */
+    public void toXML(XMLStreamWriter out, Player player) throws XMLStreamException {
+        // Start element:
+        out.writeStartElement(getXMLElementTagName());
+
+        out.writeAttribute("id", id);
+        out.writeAttribute("type", getTypeAsString());
+        if (type == COMBINED) {
+            toArrayElement("values", values, out);
+        } else {
+            out.writeAttribute("value", Float.toString(values[type]));
+        }
+
+        out.writeEndElement();
+    }
+    
+    public static String getXMLElementTagName() {
+        return "modifier";
     }
 
     /**
@@ -108,7 +200,7 @@ public final class Modifier {
      * @return a <code>float</code> value
      */
     public float getValue() {
-        return value;
+        return values[type];
     }
 
     /**
@@ -117,24 +209,72 @@ public final class Modifier {
      * @param newValue The new Value value.
      */
     public void setValue(final float newValue) {
-        this.value = newValue;
+        this.values[type] = newValue;
     }
 
+    /**
+     * Returns the inverse modifier of this one
+     *
+     * @return a inverse <code>Modifier</code>
+     */
+    public Modifier getInverse() {
+        Modifier newModifier = null;
+        try {
+            newModifier = (Modifier) this.clone();
+
+            if (type == COMBINED) {
+                for (int i = 0; i < values.length; i++) {
+                    newModifier.values[i] = getInverse(i);
+                }
+            } else {
+                newModifier.values[type] = getInverse(type);
+            }
+        } catch(CloneNotSupportedException e) {
+            // No deberia suceder
+        }
+        return newModifier;
+    }
+    
+    private float getInverse(int type) {
+        switch(type) {
+        case ADDITIVE:
+        case PERCENTAGE:
+            return -values[type];
+        case MULTIPLICATIVE:
+            return 1 / values[type];
+        default:
+            // It can't happen
+            return values[type];
+        }
+    }
+    
     /**
      * Combines this modifier with another.
      *
      * @param otherModifier a <code>Modifier</code> value
      */
     public void combine(Modifier otherModifier) {
-        switch(otherModifier.getType()) {
+        if (type != otherModifier.getType()) {
+            type = COMBINED;
+        }
+        
+        if (otherModifier.getType() != COMBINED) {
+            combine(otherModifier, otherModifier.getType());
+        } else {
+            for (int i = 0; i < values.length; i++) {
+                combine(otherModifier, i);
+            }
+        }
+    }
+    
+    private void combine(Modifier otherModifier, int type) {
+        switch(type) {
         case ADDITIVE:
-            value += otherModifier.getValue();
+        case PERCENTAGE:
+            values[type] += otherModifier.values[type];
             return;
         case MULTIPLICATIVE:
-            value *= otherModifier.getValue();
-            return;
-        case PERCENTAGE:
-            value += (value * otherModifier.getValue()) / 100;
+            values[type] *= otherModifier.values[type];
             return;
         }
     }
@@ -144,13 +284,24 @@ public final class Modifier {
      *
      */
     public float applyTo(float number) {
-        switch(getType()) {
+        if (type == COMBINED) {
+            for (int i = 0; i < values.length; i++) {
+                number = applyTo(number, i);
+            }
+            return number;
+        } else {
+            return applyTo(number, type);
+        }
+    }
+    
+    private float applyTo(float number, int type) {
+        switch(type) {
         case ADDITIVE:
-            return number + value;
+            return number + values[type];
         case MULTIPLICATIVE:
-            return number * value;
+            return number * values[type];
         case PERCENTAGE:
-            return number + (number * value) / 100;
+            return number + (number * values[type]) / 100;
         default:
             return number;
         }

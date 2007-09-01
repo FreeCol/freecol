@@ -107,7 +107,7 @@ public final class ReportProductionPanel extends JPanel implements ActionListene
         List<BuildingType> buildingTypes = new ArrayList<BuildingType>();
         for (BuildingType buildingType : FreeCol.getSpecification().getBuildingTypeList()) {
             if ((buildingType.getProducedGoodsType() == goodsType ||
-                    buildingType.hasProductionModifierFor(goodsType)) &&
+                    buildingType.getModifier(goodsType.getID()) != null) &&
                     buildingType.getHammersRequired() > 0) {
                 buildingTypes.add(buildingType);
                 buildingCount[buildingType.getIndex()] = 0;

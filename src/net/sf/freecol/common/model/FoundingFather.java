@@ -3,6 +3,7 @@ package net.sf.freecol.common.model;
 
 import java.util.HashMap;
 import java.util.Map;
+import org.w3c.dom.Element;
 
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -231,11 +232,9 @@ public class FoundingFather extends FreeColGameObjectType implements Abilities, 
                         String abilityId = Xml.attribute(node, "id");
                         boolean value = Xml.booleanAttribute(node, "value");
                         setAbility(abilityId, value);
-                    } else if ("modifier".equals(node.getNodeName())) {
-                        String modifierId = Xml.attribute(node, "id");
-                        String type = Xml.attribute(node, "type");
-                        Float value = Float.valueOf(Xml.attribute(node, "value"));
-                        setModifier(modifierId, new Modifier(modifierId, value, type));
+                    } else if (Modifier.getXMLElementTagName().equals(node.getNodeName())) {
+                        Modifier modifier = new Modifier((Element) node);
+                        setModifier(modifier.getId(), modifier);
                     } else if ("event".equals(node.getNodeName())) {
                         String eventId = Xml.attribute(node, "id");
                         String value = null;

@@ -288,11 +288,6 @@ public final class Building extends FreeColGameObject implements Abilities, Work
         return isBuilt;
     }
 
-    // TODO: check whether this can be removed; at the moment it is needed for LaSalle
-    public void build() {
-        isBuilt = true;
-    }
-
     /**
      * Gets a pointer to the colony containing this building.
      * 
@@ -347,12 +342,10 @@ public final class Building extends FreeColGameObject implements Abilities, Work
     
     private void setType(BuildingType newBuildingType) {
         if (isBuilt) {
-            // remove production bonus, factors and abilities from current type
-            for(Entry<GoodsType, Float> factor : buildingType.getProductionFactors()) {
-                colony.removeProductionFactorFor(factor.getKey(), factor.getValue());
-            }
-            for(Entry<GoodsType, Integer> bonus : buildingType.getProductionBonuses()) {
-                colony.removeProductionBonusFor(bonus.getKey(), bonus.getValue());
+            // remove modifiers and abilities from current type
+            Map<String, Modifier> oldModifiers = buildingType.getModifiers();
+            for (Entry<String, Modifier> entry : oldModifiers.entrySet()) {
+                colony.removeModifier(entry.getKey(), entry.getValue());
             }
             colony.setDefenseBonus(colony.getDefenseBonus() - buildingType.getDefenseBonus());
             
@@ -367,12 +360,10 @@ public final class Building extends FreeColGameObject implements Abilities, Work
             isBuilt = true;
             buildingType = newBuildingType;
             
-            // add new production bonus, factors and abilities from new type
-            for(Entry<GoodsType, Float> factor : buildingType.getProductionFactors()) {
-                colony.addProductionFactorFor(factor.getKey(), factor.getValue());
-            }
-            for(Entry<GoodsType, Integer> bonus : buildingType.getProductionBonuses()) {
-                colony.addProductionBonusFor(bonus.getKey(), bonus.getValue());
+            // add new modifiers and abilities from new type
+            Map<String, Modifier> newModifiers = buildingType.getModifiers();
+            for (Entry<String, Modifier> entry : newModifiers.entrySet()) {
+                colony.addModifier(entry.getKey(), entry.getValue());
             }
             colony.setDefenseBonus(colony.getDefenseBonus() + buildingType.getDefenseBonus());
             colony.putAbilities(buildingType.getAbilities());
@@ -1165,20 +1156,19 @@ public final class Building extends FreeColGameObject implements Abilities, Work
         GoodsType goodsOutputType = getGoodsOutputType();
         Player player = colony.getOwner();
 
-        int goodsOutput = productivity + colony.getProductionBonusFor(goodsOutputType);
-        if (goodsOutput > 0) {
-            float factor = colony.getProductionFactorFor(goodsOutputType);
-            goodsOutput = Math.max(1, (int) (productivity * factor));
+        float goodsOutput = productivity;
+        Modifier modifier = colony.getModifier(goodsOutputType.getID());
+        if (modifier != null) {
+            goodsOutput = modifier.applyTo(productivity);
         }
 
-        /* TODO: Be sure this bonus are in colony and remove
+        // TODO: Be sure this bonus is returned with colony.getModifier and remove
         if (goodsOutputType == Goods.CROSSES &&
             player.hasFather(FreeCol.getSpecification().getFoundingFather("model.foundingFather.williamPenn"))) {
             goodsOutput += goodsOutput / 2;
         }
-         */
 
-        return goodsOutput;
+        return (int) goodsOutput;
     }
 
     /**

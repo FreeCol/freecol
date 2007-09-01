@@ -9,6 +9,7 @@ import java.util.Set;
 import net.sf.freecol.FreeCol;
 
 import net.sf.freecol.common.util.Xml;
+import org.w3c.dom.Element;
 
 import org.w3c.dom.Node;
 
@@ -17,7 +18,7 @@ import org.w3c.dom.Node;
  * given building type can have. The levels contain the information about the
  * name of the building in a given level and what is needed to build it.
  */
-public final class BuildingType extends FreeColGameObjectType implements Abilities {
+public final class BuildingType extends FreeColGameObjectType implements Abilities, Modifiers {
     public static final String COPYRIGHT = "Copyright (C) 2003-2007 The FreeCol Team";
 
     public static final String LICENSE = "http://www.gnu.org/licenses/gpl.html";
@@ -35,15 +36,7 @@ public final class BuildingType extends FreeColGameObjectType implements Abiliti
     
     private HashMap<String, Boolean> abilities = new HashMap<String, Boolean>();
     
-    /**
-     * Stores the production bonuses of this Type
-     */
-    private HashMap<GoodsType, Integer> prodBonuses = new HashMap<GoodsType, Integer>();
-    
-    /**
-     * Stores the production factors of this Type
-     */
-    private HashMap<GoodsType, Float> prodFactors = new HashMap<GoodsType, Float>();
+    private HashMap<String, Modifier> modifiers = new HashMap<String, Modifier>();
   
 
     public BuildingType(int index) {
@@ -143,17 +136,9 @@ public final class BuildingType extends FreeColGameObjectType implements Abiliti
                     setAbility(abilityId, value);
                 } else if ("required-population".equals(childName)) {
                     populationRequired = Xml.intAttribute(node, "value");
-                } else if ("production-bonus".equals(childName)) {
-                    GoodsType goodsType = goodsTypeByRef.get(Xml.attribute(node, "goods-type"));
-                    if (goodsType != null) {
-                        if (Xml.hasAttribute(node, "bonus")) {
-                            int bonus = Xml.intAttribute(node, "bonus");
-                            prodBonuses.put(goodsType, bonus);
-                        } else if (Xml.hasAttribute(node, "factor")) {
-                            float factor = Xml.floatAttribute(node, "factor");
-                            prodFactors.put(goodsType, factor);
-                        }
-                    }
+                } else if (Modifier.getXMLElementTagName().equals(childName)) {
+                    Modifier modifier = new Modifier((Element) node);
+                    setModifier(modifier.getId(), modifier);
                 }
               }
           };
@@ -195,30 +180,31 @@ public final class BuildingType extends FreeColGameObjectType implements Abiliti
     }
 
     /**
-     * Returns a copy of this building's production bonuses
+     * Get the <code>Modifier</code> value.
      *
-     * @return a <code>Map</code> value
+     * @param id a <code>String</code> value
+     * @return a <code>Modifier</code> value
      */
-    public Set<Entry<GoodsType, Integer>> getProductionBonuses() {
-        return prodBonuses.entrySet();
+    public final Modifier getModifier(String id) {
+        return modifiers.get(id);
     }
 
     /**
-     * Returns whether this building has a modifier to production of given goods
+     * Set the <code>Modifier</code> value.
      *
-     * @param goodsType A goods type
-     * @return a <code>Boolean</code> value
+     * @param id a <code>String</code> value
+     * @param newModifier a <code>Modifier</code> value
      */
-    public boolean hasProductionModifierFor(GoodsType goodsType) {
-        return prodBonuses.containsKey(goodsType) || prodFactors.containsKey(goodsType);
+    public final void setModifier(String id, final Modifier newModifier) {
+        modifiers.put(id, newModifier);
     }
 
     /**
-     * Returns a copy of this building's production factors
+     * Returns a copy of this FoundingFather's modifiers.
      *
      * @return a <code>Map</code> value
      */
-    public Set<Entry<GoodsType, Float>> getProductionFactors() {
-        return prodFactors.entrySet();
+    public Map<String, Modifier> getModifiers() {
+        return new HashMap<String, Modifier>(modifiers);
     }
 }

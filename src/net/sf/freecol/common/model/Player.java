@@ -32,7 +32,7 @@ import org.w3c.dom.Element;
  * various defaults for the player. One example of this is the
  * {@link #getEntryLocation entry location}.
  */
-public class Player extends FreeColGameObject implements Abilities, Nameable {
+public class Player extends FreeColGameObject implements Abilities, Nameable, Modifiers {
     private static final Logger logger = Logger.getLogger(Player.class.getName());
 
     public static final String COPYRIGHT = "Copyright (C) 2003-2007 The FreeCol Team";

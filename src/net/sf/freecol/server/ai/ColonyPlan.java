@@ -141,7 +141,7 @@ public class ColonyPlan {
                     Iterator<Building> iterator = colony.getBuildingIterator();
                     while (iterator.hasNext()) {
                         Building building = iterator.next();
-                        if (building.getType().hasProductionModifierFor(outputType)
+                        if (building.getType().getModifier(outputType.getID()) != null
                                 && building.canBuildNext()) {
                             buildList.add(building);
                         }
