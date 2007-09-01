@@ -147,6 +147,7 @@ public class TileItemContainer extends FreeColGameObject {
     public void clear() {
         if (hasResource()) {
             resource.dispose();
+            resource = null;
         }
         for (TileImprovement t : improvements) {
             t.dispose();
@@ -537,16 +538,7 @@ public class TileItemContainer extends FreeColGameObject {
      * Disposes all <code>TileItem</code>s in this <code>TileItemContainer</code>.
      */
     public void disposeAllTileItems() {
-        if (hasResource()) {
-            resource.dispose();
-            resource = null;
-        }
-        while(! improvements.isEmpty()) {
-            TileImprovement ti = improvements.remove(improvements.size() - 1);
-            ti.dispose();
-        }
-        road = null;
-        river = null;
+        clear();
     }
 
     // ------------------------------------------------------------ API methods

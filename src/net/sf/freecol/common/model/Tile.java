@@ -2430,7 +2430,7 @@ break;
             }
 
             missionary = null;
-            tileItemContainer.clear();
+            TileItemContainer tileItemContainer = new TileItemContainer(getGame(), theTile);
             while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
                 if (in.getLocalName().equals("missionary")) {
                     in.nextTag();
@@ -2458,6 +2458,7 @@ break;
                     tileItemContainer.addTileItem(ti);
                 }
             }
+            getTileItemInfo(tileItemContainer);
         }
 
         /**
