@@ -463,92 +463,92 @@
     <unit-type id="model.unit.expertFarmer"         offence="0"  defence="1" movement="3" lineOfSight="1" price="1100" 
                skill="1" recruitProbability="1" expert-production="model.goods.Food" clearSpeciality="model.unit.freeColonist" pathImage="foot">
       <ability id="model.ability.foundColony" value="yes"/>
-      <production-bonus goods-type="model.goods.Food" bonus="2"/>
+      <modifier id="model.goods.Food" type="additive" value="2"/>
     </unit-type>
     <unit-type id="model.unit.expertFisherman"      offence="0"  defence="1" movement="3" lineOfSight="1" price="1000" 
                skill="1" recruitProbability="1" expert-production="model.goods.Fish" clearSpeciality="model.unit.freeColonist" pathImage="foot">
       <ability id="model.ability.foundColony" value="yes"/>
-      <production-bonus goods-type="model.goods.Fish" bonus="2"/>
+      <modifier id="model.goods.Fish" type="additive" value="2"/>
     </unit-type>
     <unit-type id="model.unit.expertFurTrapper"     offence="0"  defence="1" movement="3" lineOfSight="1"               
                skill="1"  expert-production="model.goods.Furs" clearSpeciality="model.unit.freeColonist" pathImage="foot">
       <ability id="model.ability.foundColony" value="yes"/>
-      <production-bonus goods-type="model.goods.Furs" factor="2"/>
+      <modifier id="model.goods.Furs" type="multiplicative" value="2"/>
     </unit-type>
     <unit-type id="model.unit.expertSilverMiner"    offence="0"  defence="1" movement="3" lineOfSight="1" price="900"  
                skill="1" recruitProbability="1" expert-production="model.goods.Silver" clearSpeciality="model.unit.freeColonist" pathImage="foot">
       <ability id="model.ability.foundColony" value="yes"/>
-      <production-bonus goods-type="model.goods.Silver" factor="2"/>
+      <modifier id="model.goods.Silver" type="multiplicative" value="2"/>
     </unit-type>
     <unit-type id="model.unit.expertLumberJack"     offence="0"  defence="1" movement="3" lineOfSight="1" price="700"  
                skill="1" recruitProbability="1" expert-production="model.goods.Lumber" clearSpeciality="model.unit.freeColonist" pathImage="foot">
       <ability id="model.ability.foundColony" value="yes"/>
-      <production-bonus goods-type="model.goods.Lumber" factor="2"/>
+      <modifier id="model.goods.Lumber" type="multiplicative" value="2"/>
     </unit-type>
     <unit-type id="model.unit.expertOreMiner"       offence="0"  defence="1" movement="3" lineOfSight="1" price="600"  
                skill="1" recruitProbability="1" expert-production="model.goods.Ore" clearSpeciality="model.unit.freeColonist" pathImage="foot">
       <ability id="model.ability.foundColony" value="yes"/>
-      <production-bonus goods-type="model.goods.Ore" factor="2"/>
+      <modifier id="model.goods.Ore" type="multiplicative" value="2"/>
     </unit-type>
     <unit-type id="model.unit.masterSugarPlanter"   offence="0"  defence="1" movement="3" lineOfSight="1"               
                skill="2"  expert-production="model.goods.Sugar" clearSpeciality="model.unit.freeColonist" pathImage="foot">
       <ability id="model.ability.foundColony" value="yes"/>
-      <production-bonus goods-type="model.goods.Sugar" factor="2"/>
+      <modifier id="model.goods.Sugar" type="multiplicative" value="2"/>
     </unit-type>
     <unit-type id="model.unit.masterCottonPlanter"  offence="0"  defence="1" movement="3" lineOfSight="1"               
                skill="2"  expert-production="model.goods.Cotton" clearSpeciality="model.unit.freeColonist" pathImage="foot">
       <ability id="model.ability.foundColony" value="yes"/>
-      <production-bonus goods-type="model.goods.Cotton" factor="2"/>
+      <modifier id="model.goods.Cotton" type="multiplicative" value="2"/>
     </unit-type>
     <unit-type id="model.unit.masterTobaccoPlanter" offence="0"  defence="1" movement="3" lineOfSight="1"               
                skill="2"  expert-production="model.goods.Tobacco" clearSpeciality="model.unit.freeColonist" pathImage="foot">
       <ability id="model.ability.foundColony" value="yes"/>
-      <production-bonus goods-type="model.goods.Tobacco" factor="2"/>
+      <modifier id="model.goods.Tobacco" type="multiplicative" value="2"/>
     </unit-type>
     <unit-type id="model.unit.firebrandPreacher"    offence="0"  defence="1" movement="3" lineOfSight="1" price="1500" 
                skill="3" recruitProbability="1" expert-production="model.goods.Crosses" clearSpeciality="model.unit.freeColonist" pathImage="foot">
       <ability id="model.ability.foundColony" value="yes"/>
-      <production-bonus goods-type="model.goods.Crosses" factor="2"/>
+      <modifier id="model.goods.Crosses" type="multiplicative" value="2"/>
     </unit-type>
     <unit-type id="model.unit.elderStatesman"       offence="0"  defence="1" movement="3" lineOfSight="1" price="1900" 
                skill="3" recruitProbability="1" expert-production="model.goods.Bells" clearSpeciality="model.unit.freeColonist" pathImage="foot">
       <ability id="model.ability.foundColony" value="yes"/>
-      <production-bonus goods-type="model.goods.Bells" factor="2"/>
+      <modifier id="model.goods.Bells" type="multiplicative" value="2"/>
     </unit-type>
     <unit-type id="model.unit.masterCarpenter"      offence="0"  defence="1" movement="3" lineOfSight="1" price="1000" 
                skill="1" recruitProbability="1" expert-production="model.goods.Hammers" clearSpeciality="model.unit.freeColonist" pathImage="foot">
       <ability id="model.ability.foundColony" value="yes"/>
-      <production-bonus goods-type="model.goods.Hammers" factor="2"/>
+      <modifier id="model.goods.Hammers" type="multiplicative" value="2"/>
     </unit-type>
     <unit-type id="model.unit.masterDistiller"      offence="0"  defence="1" movement="3" lineOfSight="1" price="1100" 
                skill="2" recruitProbability="1" expert-production="model.goods.Rum" clearSpeciality="model.unit.freeColonist" pathImage="foot">
       <ability id="model.ability.foundColony" value="yes"/>
-      <production-bonus goods-type="model.goods.Rum" factor="2"/>
+      <modifier id="model.goods.Rum" type="multiplicative" value="2"/>
     </unit-type>
     <unit-type id="model.unit.masterWeaver"         offence="0"  defence="1" movement="3" lineOfSight="1" price="1300" 
                skill="2" recruitProbability="1" expert-production="model.goods.Cloth" clearSpeciality="model.unit.freeColonist" pathImage="foot">
       <ability id="model.ability.foundColony" value="yes"/>
-      <production-bonus goods-type="model.goods.Cloth" factor="2"/>
+      <modifier id="model.goods.Cloth" type="multiplicative" value="2"/>
     </unit-type>
     <unit-type id="model.unit.masterTobacconist"    offence="0"  defence="1" movement="3" lineOfSight="1" price="1200" 
                skill="2" recruitProbability="1" expert-production="model.goods.Cigars" clearSpeciality="model.unit.freeColonist" pathImage="foot">
       <ability id="model.ability.foundColony" value="yes"/>
-      <production-bonus goods-type="model.goods.Cigars" factor="2"/>
+      <modifier id="model.goods.Cigars" type="multiplicative" value="2"/>
     </unit-type>
     <unit-type id="model.unit.masterFurTrader"      offence="0"  defence="1" movement="3" lineOfSight="1" price="950"  
                skill="2" recruitProbability="1" expert-production="model.goods.Coats" clearSpeciality="model.unit.freeColonist" pathImage="foot">
       <ability id="model.ability.foundColony" value="yes"/>
-      <production-bonus goods-type="model.goods.Coats" factor="2"/>
+      <modifier id="model.goods.Coats" type="multiplicative" value="2"/>
     </unit-type>
     <unit-type id="model.unit.masterBlacksmith"     offence="0"  defence="1" movement="3" lineOfSight="1" price="1050" 
                skill="2" recruitProbability="1" expert-production="model.goods.Tools" clearSpeciality="model.unit.freeColonist" pathImage="foot">
       <ability id="model.ability.foundColony" value="yes"/>
-      <production-bonus goods-type="model.goods.Tools" factor="2"/>
+      <modifier id="model.goods.Tools" type="multiplicative" value="2"/>
     </unit-type>
     <unit-type id="model.unit.masterGunsmith"       offence="0"  defence="1" movement="3" lineOfSight="1" price="850"  
                skill="2" recruitProbability="1" expert-production="model.goods.Muskets" clearSpeciality="model.unit.freeColonist" pathImage="foot">
       <ability id="model.ability.foundColony" value="yes"/>
-      <production-bonus goods-type="model.goods.Muskets" factor="2"/>
+      <modifier id="model.goods.Muskets" type="multiplicative" value="2"/>
     </unit-type>
     <unit-type id="model.unit.seasonedScout"        offence="0"  defence="1" movement="3" lineOfSight="1"               
                skill="1" recruitProbability="1" clearSpeciality="model.unit.freeColonist" pathImage="foot">
@@ -584,49 +584,49 @@
       <upgrade unit="model.unit.masterCottonPlanter" learnFromNatives="yes"/>
       <upgrade unit="model.unit.masterTobaccoPlanter" learnFromNatives="yes"/>
       <upgrade unit="model.unit.seasonedScout" learnFromNatives="yes" learnInLostCity="yes"/>
-      <production-bonus goods-type="model.goods.Rum" bonus="-1" />
-      <production-bonus goods-type="model.goods.Cigars" bonus="-1" />
-      <production-bonus goods-type="model.goods.Cloth" bonus="-1" />
-      <production-bonus goods-type="model.goods.Coats" bonus="-1" />
-      <production-bonus goods-type="model.goods.Muskets" bonus="-1" />
-      <production-bonus goods-type="model.goods.Bells" bonus="-1" />
-      <production-bonus goods-type="model.goods.Crosses" bonus="-1" />
-      <production-bonus goods-type="model.goods.Hammers" bonus="-1" />
-      <production-bonus goods-type="model.goods.Tools" bonus="-1" />
+      <modifier id="model.goods.Rum" type="additive" value="-1" />
+      <modifier id="model.goods.Cigars" type="additive" value="-1" />
+      <modifier id="model.goods.Cloth" type="additive" value="-1" />
+      <modifier id="model.goods.Coats" type="additive" value="-1" />
+      <modifier id="model.goods.Muskets" type="additive" value="-1" />
+      <modifier id="model.goods.Bells" type="additive" value="-1" />
+      <modifier id="model.goods.Crosses" type="additive" value="-1" />
+      <modifier id="model.goods.Hammers" type="additive" value="-1" />
+      <modifier id="model.goods.Tools" type="additive" value="-1" />
     </unit-type>
     <unit-type id="model.unit.pettyCriminal"        offence="0"  defence="1" movement="3" lineOfSight="1"               
                skill="-2" recruitProbability="20" promotion="model.unit.indenturedServant" pathImage="foot">
       <ability id="model.ability.foundColony" value="yes"/>
       <upgrade unit="model.unit.indenturedServant" turnsToLearn="4"/>
       <upgrade unit="model.unit.seasonedScout" learnInLostCity="yes"/>
-      <production-bonus goods-type="model.goods.Rum" bonus="-2" />
-      <production-bonus goods-type="model.goods.Cigars" bonus="-2" />
-      <production-bonus goods-type="model.goods.Cloth" bonus="-2" />
-      <production-bonus goods-type="model.goods.Coats" bonus="-2" />
-      <production-bonus goods-type="model.goods.Muskets" bonus="-2" />
-      <production-bonus goods-type="model.goods.Bells" bonus="-2" />
-      <production-bonus goods-type="model.goods.Crosses" bonus="-2" />
-      <production-bonus goods-type="model.goods.Hammers" bonus="-2" />
-      <production-bonus goods-type="model.goods.Tools" bonus="-2" />
+      <modifier id="model.goods.Rum" type="additive" value="-2" />
+      <modifier id="model.goods.Cigars" type="additive" value="-2" />
+      <modifier id="model.goods.Cloth" type="additive" value="-2" />
+      <modifier id="model.goods.Coats" type="additive" value="-2" />
+      <modifier id="model.goods.Muskets" type="additive" value="-2" />
+      <modifier id="model.goods.Bells" type="additive" value="-2" />
+      <modifier id="model.goods.Crosses" type="additive" value="-2" />
+      <modifier id="model.goods.Hammers" type="additive" value="-2" />
+      <modifier id="model.goods.Tools" type="additive" value="-2" />
     </unit-type>
     <unit-type id="model.unit.indianConvert"        offence="0"  defence="1" movement="3" lineOfSight="1"               
                skill="0" pathImage="foot">
       <ability id="model.ability.convert" value="yes"/>
-      <production-bonus goods-type="model.goods.Food" bonus="1"/>
-      <production-bonus goods-type="model.goods.Sugar" bonus="1"/>
-      <production-bonus goods-type="model.goods.Tobacco" bonus="1"/>
-      <production-bonus goods-type="model.goods.Cotton" bonus="1"/>
-      <production-bonus goods-type="model.goods.Furs" bonus="1"/>
-      <production-bonus goods-type="model.goods.Fish" bonus="1" />
-      <production-bonus goods-type="model.goods.Rum" bonus="-2" />
-      <production-bonus goods-type="model.goods.Cigars" bonus="-2" />
-      <production-bonus goods-type="model.goods.Cloth" bonus="-2" />
-      <production-bonus goods-type="model.goods.Coats" bonus="-2" />
-      <production-bonus goods-type="model.goods.Muskets" bonus="-2" />
-      <production-bonus goods-type="model.goods.Bells" bonus="-2" />
-      <production-bonus goods-type="model.goods.Crosses" bonus="-2" />
-      <production-bonus goods-type="model.goods.Hammers" bonus="-2" />
-      <production-bonus goods-type="model.goods.Tools" bonus="-2" />
+      <modifier id="model.goods.Food" type="additive" value="1"/>
+      <modifier id="model.goods.Sugar" type="additive" value="1"/>
+      <modifier id="model.goods.Tobacco" type="additive" value="1"/>
+      <modifier id="model.goods.Cotton" type="additive" value="1"/>
+      <modifier id="model.goods.Furs" type="additive" value="1"/>
+      <modifier id="model.goods.Fish" type="additive" value="1" />
+      <modifier id="model.goods.Rum" type="additive" value="-2" />
+      <modifier id="model.goods.Cigars" type="additive" value="-2" />
+      <modifier id="model.goods.Cloth" type="additive" value="-2" />
+      <modifier id="model.goods.Coats" type="additive" value="-2" />
+      <modifier id="model.goods.Muskets" type="additive" value="-2" />
+      <modifier id="model.goods.Bells" type="additive" value="-2" />
+      <modifier id="model.goods.Crosses" type="additive" value="-2" />
+      <modifier id="model.goods.Hammers" type="additive" value="-2" />
+      <modifier id="model.goods.Tools" type="additive" value="-2" />
     </unit-type>
     <unit-type id="model.unit.brave"                offence="1"  defence="1" movement="3" lineOfSight="1" space="1">
       <ability id="model.ability.carryGoods" value="yes"/>

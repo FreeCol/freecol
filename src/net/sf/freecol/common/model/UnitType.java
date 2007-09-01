@@ -3,7 +3,7 @@ package net.sf.freecol.common.model;
 
 
 import java.util.ArrayList;
-import java.util.Hashtable;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -11,12 +11,13 @@ import java.util.Map.Entry;
 import net.sf.freecol.FreeCol;
 
 import net.sf.freecol.common.util.Xml;
+import org.w3c.dom.Element;
 
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 
-public final class UnitType extends FreeColGameObjectType implements Abilities {
+public final class UnitType extends FreeColGameObjectType implements Abilities, Modifiers {
     public static final  String  COPYRIGHT = "Copyright (C) 2003-2007 The FreeCol Team";
     public static final  String  LICENSE   = "http://www.gnu.org/licenses/gpl.html";
     public static final  String  REVISION  = "$Revision$";
@@ -111,22 +112,17 @@ public final class UnitType extends FreeColGameObjectType implements Abilities {
     /**
      * Describe education here.
      */
-    private Hashtable<String, Upgrade> upgrades = new Hashtable<String, Upgrade>();
+    private HashMap<String, Upgrade> upgrades = new HashMap<String, Upgrade>();
     
     /**
      * Stores the abilities of this Type.
      */
-    private Hashtable<String, Boolean> abilities = new Hashtable<String, Boolean>();
+    private HashMap<String, Boolean> abilities = new HashMap<String, Boolean>();
     
     /**
-     * Stores the production bonuses of this Type
+     * Stores the production modifiers of this Type
      */
-    private Hashtable<String, Integer> prodBonuses = new Hashtable<String, Integer>();
-    
-    /**
-     * Stores the production factors of this Type
-     */
-    private Hashtable<String, Float> prodFactors = new Hashtable<String, Float>();
+    private HashMap<String, Modifier> modifiers = new HashMap<String, Modifier>();
     
     public UnitType(int index) {
         setIndex(index);
@@ -591,17 +587,9 @@ public final class UnitType extends FreeColGameObjectType implements Abilities {
                         upgrade.learnFromExperience = Xml.booleanAttribute(node, "learnFromExperience", false);
                         upgrade.learnInLostCity = Xml.booleanAttribute(node, "learnInLostCity", false);
                         upgrades.put(educationUnit, upgrade);
-                    } else if ("production-bonus".equals(nodeName)) {
-                        String goodsID = Xml.attribute(node, "goods-type");
-                        if (goodsTypeByRef.containsKey(goodsID)) {
-                            if (Xml.hasAttribute(node, "bonus")) {
-                                int bonus = Xml.intAttribute(node, "bonus");
-                                prodBonuses.put(goodsID, bonus);
-                            } else if (Xml.hasAttribute(node, "factor")) {
-                                float factor = Xml.floatAttribute(node, "factor");
-                                prodFactors.put(goodsID, factor);
-                            }
-                        }
+                    } else if (Modifier.getXMLElementTagName().equals(nodeName)) {
+                        Modifier modifier = new Modifier((Element) node);
+                        setModifier(modifier.getId(), modifier);
                     }
                 }
             };
@@ -648,20 +636,45 @@ public final class UnitType extends FreeColGameObjectType implements Abilities {
         abilities.put(id, newValue);
     }
 
+    /**
+     * Get the <code>Modifier</code> value.
+     *
+     * @param id a <code>String</code> value
+     * @return a <code>Modifier</code> value
+     */
+    public final Modifier getModifier(String id) {
+        return modifiers.get(id);
+    }
+
+    /**
+     * Set the <code>Modifier</code> value.
+     *
+     * @param id a <code>String</code> value
+     * @param newModifier a <code>Modifier</code> value
+     */
+    public final void setModifier(String id, final Modifier newModifier) {
+        modifiers.put(id, newModifier);
+    }
+
+    /**
+     * Returns a copy of this FoundingFather's modifiers.
+     *
+     * @return a <code>Map</code> value
+     */
+    public Map<String, Modifier> getModifiers() {
+        return new HashMap<String, Modifier>(modifiers);
+    }
+
     public int getProductionFor(GoodsType goodsType, int base) {
         if (base == 0) {
             return 0;
         }
         
-        Integer bonus = prodBonuses.get(goodsType.getID());
-        if (bonus != null) {
-            base += bonus.intValue();
-        } else {
-            Float factor = prodFactors.get(goodsType.getID());
-            if (factor != null) {
-                base *= factor.floatValue();
-            }
+        Modifier modifier = getModifier(goodsType.getID());
+        if (modifier != null) {
+            base = (int) modifier.applyTo(base);
         }
+        
         return Math.min(base, 1);
     }
     
