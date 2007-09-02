@@ -22,7 +22,6 @@ public final class TileType extends FreeColGameObjectType
     private String artBasic;
     private String artOverlay;
     private String artForest;
-    private String artUnexplored;
     private String artCoast;
     private Color minimapColor;
 
@@ -67,10 +66,6 @@ public final class TileType extends FreeColGameObjectType
 
     public String getArtForest() {
         return artForest;
-    }
-
-    public String getArtUnexplored() {
-        return artUnexplored;
     }
 
     public String getArtCoast() {
@@ -205,7 +200,6 @@ public final class TileType extends FreeColGameObjectType
                     artBasic = Xml.attribute(xml, "basic", null);
                     artOverlay = Xml.attribute(xml, "overlay", null);
                     artForest = Xml.attribute(xml, "forest", null);
-                    artUnexplored = Xml.attribute(xml, "unexplored", "terrain/unexplored/");
                     artCoast = Xml.attribute(xml, "coast", (water ? null : "terrain/beach/"));
                     float[] defaultArray = new float[] {0.0f, 0.0f, 0.0f};
                     float[] colorValues = Xml.floatArrayAttribute(xml, "minimap-color", defaultArray);

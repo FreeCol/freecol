@@ -105,9 +105,8 @@
     Notes:
     Parent options: ref, name, basic-move-cost, basic-work-turns, sail-to-europe
     Children: art, gen, skirmish, production, resource
-    art child options: basic, overlay, unexplored, coast
+    art child options: basic, overlay, coast
     - all tiles must have at least basic. overlay will be drawn after all the base tiles are drawn
-    - default for unexplored = "terrain/unexplored/"
     - coast is for land tiles drawing their overlap on water tiles. default for coast = "terrain/beach/" for land tiles
     gen child options: humidity, temperature, altitude, latitude
     - all children have the format "min,max" eg. humidity="1,3" or altitude="-2,0"

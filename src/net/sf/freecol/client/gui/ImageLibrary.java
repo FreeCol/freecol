@@ -153,17 +153,17 @@ public final class ImageLibrary extends ImageProvider {
      * extension where '+' is the concatenation of Strings. and UNITTYPE is the
      * type of the unit (as in the Unit class).
      */
-    private static final String path = new String("images/"), unitsDirectory = new String("units/"),
-            unitsName = new String("Unit"), terrainDirectory = new String("terrain/"), terrainName = new String(
-                    "terrain"), forestDirectory = new String("forest/"), forestName = new String("forest"),
+    private static final String path = new String("images/"), extension = new String(".png"),
+            unitsDirectory = new String("units/"), unitsName = new String("Unit"),
+            terrainDirectory = new String("terrain/"),
+            tileName = new String("center/"), borderName = new String("border"),
+            unexploredDirectory = new String("unexplored/"), unexploredName = new String("unexplored"),
             riverDirectory = new String("river/"), riverName = new String("river"),
-            miscDirectory = new String("misc/"), miscName = new String("Misc"), unitButtonDirectory = new String(
-                    "order-buttons/"), unitButtonName = new String("button"),
-            colonyDirectory = new String("colonies/"), colonyName = new String("Colony"), indianDirectory = new String(
-                    "indians/"), indianName = new String("Indians"), goodsDirectory = new String("goods/"),
-            goodsName = new String("Goods"), bonusDirectory = new String("bonus/"), bonusName = new String("Bonus"),
-            monarchDirectory = new String("monarch/"), monarchName = new String("Monarch"), extension = new String(
-                    ".png");
+            miscDirectory = new String("misc/"), miscName = new String("Misc"),
+            unitButtonDirectory = new String("order-buttons/"), unitButtonName = new String("button"),
+            colonyDirectory = new String("colonies/"), colonyName = new String("Colony"),
+            indianDirectory = new String("indians/"), indianName = new String("Indians"),
+            monarchDirectory = new String("monarch/"), monarchName = new String("Monarch");
 
     private final String dataDirectory;
 
@@ -351,26 +351,22 @@ public final class ImageLibrary extends ImageProvider {
         coast2 = new Hashtable<String, Vector<ImageIcon>>();
         
         for (TileType type : FreeCol.getSpecification().getTileTypeList()) {
-            String filePath = dataDirectory + path + type.getArtBasic() + "center0" + extension;
-            terrain1.put(type.getID(), findImage(filePath, resourceLocator, doLookup));
-            filePath = dataDirectory + path + type.getArtBasic() + "center1" + extension;
-            terrain2.put(type.getID(), findImage(filePath, resourceLocator, doLookup));
+            String filePath = dataDirectory + path + type.getArtBasic() + tileName;
+            terrain1.put(type.getID(), findImage(filePath + "0" + extension, resourceLocator, doLookup));
+            terrain2.put(type.getID(), findImage(filePath + "1" + extension, resourceLocator, doLookup));
 
             if (type.getArtOverlay() != null) {
-                filePath = dataDirectory + path + type.getArtOverlay() + "0" + extension;
-                overlay1.put(type.getID(), findImage(filePath, resourceLocator, doLookup));
-                filePath = dataDirectory + path + type.getArtOverlay() + "1" + extension;
-                overlay2.put(type.getID(), findImage(filePath, resourceLocator, doLookup));
+                filePath = dataDirectory + path + type.getArtOverlay();
+                overlay1.put(type.getID(), findImage(filePath + "0" + extension, resourceLocator, doLookup));
+                overlay2.put(type.getID(), findImage(filePath + "1" + extension, resourceLocator, doLookup));
             }
             
             Vector<ImageIcon> tempVector1 = new Vector<ImageIcon>();
             Vector<ImageIcon> tempVector2 = new Vector<ImageIcon>();
             for (int c = 1; c <= 8; c++) {
-                filePath = dataDirectory + path + type.getArtBasic() + "border" + c + "0" + extension;
-                tempVector1.add(findImage(filePath, resourceLocator, doLookup));
-
-                filePath = dataDirectory + path + type.getArtBasic() + "border" + c + "1" + extension;
-                tempVector2.add(findImage(filePath, resourceLocator, doLookup));
+                filePath = dataDirectory + path + type.getArtBasic() + borderName + c;
+                tempVector1.add(findImage(filePath + "0" + extension, resourceLocator, doLookup));
+                tempVector2.add(findImage(filePath + "1" + extension, resourceLocator, doLookup));
             }
 
             border1.put(type.getID(), tempVector1);
@@ -380,11 +376,9 @@ public final class ImageLibrary extends ImageProvider {
                 tempVector1 = new Vector<ImageIcon>();
                 tempVector2 = new Vector<ImageIcon>();
                 for (int c = 1; c <= 8; c++) {
-                    filePath = dataDirectory + path + type.getArtCoast() + "border" + c + "0" + extension;
-                    tempVector1.add(findImage(filePath, resourceLocator, doLookup));
-
-                    filePath = dataDirectory + path + type.getArtCoast() + "border" + c + "1" + extension;
-                    tempVector2.add(findImage(filePath, resourceLocator, doLookup));
+                    filePath = dataDirectory + path + type.getArtCoast() + borderName + c;
+                    tempVector1.add(findImage(filePath + "0" + extension, resourceLocator, doLookup));
+                    tempVector2.add(findImage(filePath + "1" + extension, resourceLocator, doLookup));
                 }
                 
                 coast1.put(type.getID(), tempVector1);
@@ -392,59 +386,20 @@ public final class ImageLibrary extends ImageProvider {
             }
         }
         
-        String unexploredPath = dataDirectory + path + "terrain/unexplored/center0.png";
-        terrain1.put("unexplored", findImage(unexploredPath, resourceLocator, doLookup));
-        unexploredPath = dataDirectory + path + "terrain/unexplored/center1.png";
-        terrain2.put("unexplored", findImage(unexploredPath, resourceLocator, doLookup));
+        String unexploredPath = dataDirectory + path + terrainDirectory + unexploredDirectory + tileName;
+        terrain1.put(unexploredName, findImage(unexploredPath + "0" + extension, resourceLocator, doLookup));
+        terrain2.put(unexploredName, findImage(unexploredPath + "1" + extension, resourceLocator, doLookup));
         
         Vector<ImageIcon> unexploredVector1 = new Vector<ImageIcon>();
         Vector<ImageIcon> unexploredVector2 = new Vector<ImageIcon>();
         for (int c = 1; c <= 8; c++) {
-            unexploredPath = dataDirectory + path + "terrain/unexplored/border" + c + "0" + extension;
-            unexploredVector1.add(findImage(unexploredPath, resourceLocator, doLookup));
-
-            unexploredPath = dataDirectory + path + "terrain/unexplored/border" + c + "1" + extension;
-            unexploredVector2.add(findImage(unexploredPath, resourceLocator, doLookup));
+            unexploredPath = dataDirectory + path + terrainDirectory + unexploredDirectory + borderName + c;
+            unexploredVector1.add(findImage(unexploredPath + "0" + extension, resourceLocator, doLookup));
+            unexploredVector2.add(findImage(unexploredPath + "1" + extension, resourceLocator, doLookup));
         }
 
-        border1.put("unexplored", unexploredVector1);
-        border2.put("unexplored", unexploredVector2);
-        
-/*
-        
-        terrain1 = new Vector<Vector<ImageIcon>>(TERRAIN_COUNT);
-        terrain2 = new Vector<Vector<ImageIcon>>(TERRAIN_COUNT);
-        for (int i = 0; i < TERRAIN_COUNT; i++) {
-            Vector<ImageIcon> tempVector1, tempVector2;
-            String numberString = String.valueOf(i);
-            if (i < 10) {
-                numberString = "0" + numberString;
-            }
-
-            char lastChar;
-            if (i == 12) {  // Special - the beach terrain has only 8 pairs of images
-                lastChar = 'h';
-                tempVector1 = new Vector<ImageIcon>(8);
-                tempVector2 = new Vector<ImageIcon>(8);
-            } else {
-                lastChar = 'i';
-                tempVector1 = new Vector<ImageIcon>(9);
-                tempVector2 = new Vector<ImageIcon>(9);
-            }
-
-            for (char c = 'a'; c <= lastChar; c++) {
-                String filePath = dataDirectory + path + terrainDirectory + terrainName + numberString + "/"
-                        + terrainName + numberString + c + "0" + extension;
-                tempVector1.add(findImage(filePath, resourceLocator, doLookup));
-
-                filePath = dataDirectory + path + terrainDirectory + terrainName + numberString + "/" + terrainName
-                        + numberString + c + "1" + extension;
-                tempVector2.add(findImage(filePath, resourceLocator, doLookup));
-            }
-
-            terrain1.add(tempVector1);
-            terrain2.add(tempVector2);
-        }*/
+        border1.put(unexploredName, unexploredVector1);
+        border2.put(unexploredName, unexploredVector2);
     }
 
     /**
@@ -1047,7 +1002,7 @@ public final class ImageLibrary extends ImageProvider {
         if (type != null) {
             key = type.getID();
         } else {
-            key = "unexplored";
+            key = unexploredName;
         }
         if ((x + y) % 2 == 0) {
             return terrain1.get(key).getImage();
@@ -1079,7 +1034,7 @@ public final class ImageLibrary extends ImageProvider {
         if (type != null) {
             key = type.getID();
         } else {
-            key = "unexplored";
+            key = unexploredName;
         }
 
         if ((x + y) % 2 == 0) {
@@ -1112,7 +1067,7 @@ public final class ImageLibrary extends ImageProvider {
         if (type != null) {
             key = type.getID();
         } else {
-            key = "unexplored";
+            key = unexploredName;
         }
 
         if ((x + y) % 2 == 0) {
