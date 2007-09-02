@@ -9,15 +9,17 @@ import java.util.Map;
 import java.util.logging.Logger;
 
 import net.sf.freecol.client.gui.action.ImprovementActionType;
+import net.sf.freecol.common.model.BuildingType;
+import net.sf.freecol.common.model.EuropeanNationType;
 import net.sf.freecol.common.model.FoundingFather;
 import net.sf.freecol.common.model.Goods;
-import net.sf.freecol.common.model.BuildingType;
 import net.sf.freecol.common.model.GoodsType;
+import net.sf.freecol.common.model.IndianNationType;
 import net.sf.freecol.common.model.NationType;
 import net.sf.freecol.common.model.ResourceType;
 import net.sf.freecol.common.model.Tile;
-import net.sf.freecol.common.model.TileType;
 import net.sf.freecol.common.model.TileImprovementType;
+import net.sf.freecol.common.model.TileType;
 import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.util.Xml;
 
@@ -73,6 +75,7 @@ public final class Specification {
         final Map<String, TileType> tileTypeByRef = new HashMap<String, TileType>();
         final Map<String, TileImprovementType> tileImprovementTypeByRef = new HashMap<String, TileImprovementType>();
         final Map<String, BuildingType> buildingTypeByRef = new HashMap<String, BuildingType>();
+        final Map<String, UnitType> unitTypeByRef = new HashMap<String, UnitType>();
         farmedGoodsTypeList = new ArrayList<GoodsType>();
 
         InputStream in = Specification.class.getResourceAsStream("specification.xml");
@@ -197,14 +200,27 @@ public final class Specification {
                     };
                     foundingFathers.addAll(makeListFromXml(xml, factory));
  
-                } else if ("nation-types".equals(childName)) {
+                } else if ("european-nation-types".equals(childName)) {
 
                     logger.finest("Found child named " + childName);
-                    ObjectFactory<NationType> factory = new ObjectFactory<NationType>() {
+                    ObjectFactory<EuropeanNationType> factory = new ObjectFactory<EuropeanNationType>() {
                         int nationIndex = 0;
-                        public NationType objectFrom(Node xml) {
-                            NationType nationType = new NationType(nationIndex++);
-                            nationType.readFromXmlElement(xml, goodsTypeByRef);
+                        public EuropeanNationType objectFrom(Node xml) {
+                            EuropeanNationType nationType = new EuropeanNationType(nationIndex++);
+                            nationType.readFromXmlElement(xml, unitTypeByRef);
+                            return nationType;
+                        }
+                    };
+                    nationTypes.addAll(makeListFromXml(xml, factory));
+
+                } else if ("indian-nation-types".equals(childName)) {
+
+                    logger.finest("Found child named " + childName);
+                    ObjectFactory<IndianNationType> factory = new ObjectFactory<IndianNationType>() {
+                        int nationIndex = 0;
+                        public IndianNationType objectFrom(Node xml) {
+                            IndianNationType nationType = new IndianNationType(nationIndex++);
+                            nationType.readFromXmlElement(xml, unitTypeByRef);
                             return nationType;
                         }
                     };
