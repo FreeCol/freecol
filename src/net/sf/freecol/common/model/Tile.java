@@ -1597,15 +1597,7 @@ break;
         if (type == null) {
             return 0;
         }
-        return (type.getDefenceFactor() - 100);
-        /*  Depreciated
-            if (additionType == ADD_HILLS) {
-            return 100;
-            } else if (additionType == ADD_MOUNTAINS) {
-            return 150;
-            }
-            return forested ? getTileType().whenForested.defenceBonus : getTileType().defenceBonus;
-        */
+        return type.getDefenceBonus();
     }
 
     /**

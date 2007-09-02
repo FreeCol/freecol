@@ -8,14 +8,10 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import javax.xml.stream.XMLStreamConstants;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamReader;
 import net.sf.freecol.FreeCol;
-
-import net.sf.freecol.common.util.Xml;
-import org.w3c.dom.Element;
-
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
 
 public final class UnitType extends FreeColGameObjectType implements Abilities, Modifiers {
     public static final  String  COPYRIGHT = "Copyright (C) 2003-2007 The FreeCol Team";
@@ -541,60 +537,65 @@ public final class UnitType extends FreeColGameObjectType implements Abilities, 
         }
     }
 
-    public void readFromXmlElement(Node xml, final Map<String, GoodsType> goodsTypeByRef) {
-        setID(Xml.attribute(xml, "id"));
-        offence = Xml.intAttribute(xml, "offence");
-        defence = Xml.intAttribute(xml, "defence");
-        movement = Xml.intAttribute(xml, "movement");
-        lineOfSight = Xml.intAttribute(xml, "lineOfSight");
+    protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
+        readFromXML(in, null);
+    }
+
+    public void readFromXML(XMLStreamReader in, final Map<String, GoodsType> goodsTypeByRef)
+            throws XMLStreamException {
+        setID(in.getAttributeValue(null, "id"));
+        offence = getAttribute(in, "offence", 0);
+        defence = getAttribute(in, "defence", 1);
+        movement = Integer.parseInt(in.getAttributeValue(null, "movement"));
+        lineOfSight = getAttribute(in, "lineOfSight", 1);
         
-        space = Xml.intAttribute(xml, "space", 0);
-        hitPoints = Xml.intAttribute(xml, "hitPoints", 0);
-        spaceTaken = Xml.intAttribute(xml, "spaceTaken", 1);
+        space = getAttribute(in, "space", 0);
+        hitPoints = getAttribute(in, "hitPoints", 0);
+        spaceTaken = getAttribute(in, "spaceTaken", 1);
         
-        pathImage = Xml.attribute(xml, "pathImage", null);
-        promotion = Xml.attribute(xml, "promotion", null);
-        clearSpeciality = Xml.attribute(xml, "clearSpeciality", null);
+        pathImage = in.getAttributeValue(null, "pathImage");
+        promotion = in.getAttributeValue(null, "promotion");
+        clearSpeciality = in.getAttributeValue(null, "clearSpeciality");
 
-        recruitProbability = Xml.intAttribute(xml, "recruitProbability", 0);
-        skill = Xml.intAttribute(xml, "skill", UNDEFINED);
+        recruitProbability = getAttribute(in, "recruitProbability", 0);
+        skill = getAttribute(in, "skill", UNDEFINED);
 
-        hammersRequired = Xml.intAttribute(xml, "hammers", UNDEFINED);
-        toolsRequired = Xml.intAttribute(xml, "tools", UNDEFINED);
+        hammersRequired = getAttribute(in, "hammers", UNDEFINED);
+        toolsRequired = getAttribute(in, "tools", UNDEFINED);
 
-        price = Xml.intAttribute(xml, "price", UNDEFINED);
-        increasingPrice = Xml.intAttribute(xml, "increasingPrice", UNDEFINED);
+        price = getAttribute(in, "price", UNDEFINED);
+        increasingPrice = getAttribute(in, "increasingPrice", UNDEFINED);
 
-        if (Xml.hasAttribute(xml, "expert-production")) {
-            String goodsTypeRef = Xml.attribute(xml, "expert-production");
-            expertProduction = goodsTypeByRef.get(goodsTypeRef);
-        } else {
-            expertProduction = null;
-        }
+        String goodsTypeRef = in.getAttributeValue(null, "expert-production");
+        expertProduction = goodsTypeByRef.get(goodsTypeRef);
 
-        Xml.Method method = new Xml.Method() {
-                public void invokeOn(Node node) {
-                    String nodeName = node.getNodeName();
-                    if ("ability".equals(nodeName)) {
-                        String abilityId = Xml.attribute(node, "id");
-                        boolean value = Xml.booleanAttribute(node, "value");
-                        setAbility(abilityId, value);
-                    } else if ("upgrade".equals(nodeName)) {
-                        Upgrade upgrade = new Upgrade();
-                        String educationUnit = Xml.attribute(node, "unit");
-                        upgrade.turnsToLearn = Xml.intAttribute(node, "turnsToLearn", UNDEFINED);
-                        upgrade.learnFromNatives = Xml.booleanAttribute(node, "learnFromNatives", false);
-                        upgrade.learnFromExperience = Xml.booleanAttribute(node, "learnFromExperience", false);
-                        upgrade.learnInLostCity = Xml.booleanAttribute(node, "learnInLostCity", false);
-                        upgrades.put(educationUnit, upgrade);
-                    } else if (Modifier.getXMLElementTagName().equals(nodeName)) {
-                        Modifier modifier = new Modifier((Element) node);
-                        setModifier(modifier.getId(), modifier);
-                    }
+        while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
+            String nodeName = in.getLocalName();
+            if ("ability".equals(nodeName)) {
+                String abilityId = in.getAttributeValue(null, "id");
+                boolean value = getAttribute(in, "value", true);
+                setAbility(abilityId, value);
+                in.nextTag(); // close this element
+            } else if ("upgrade".equals(nodeName)) {
+                Upgrade upgrade = new Upgrade();
+                String educationUnit = in.getAttributeValue(null, "unit");
+                upgrade.turnsToLearn = getAttribute(in, "turnsToLearn", UNDEFINED);
+                upgrade.learnFromNatives = getAttribute(in, "learnFromNatives", false);
+                upgrade.learnFromExperience = getAttribute(in, "learnFromExperience", false);
+                upgrade.learnInLostCity = getAttribute(in, "learnInLostCity", false);
+                upgrades.put(educationUnit, upgrade);
+                in.nextTag(); // close this element
+            } else if (Modifier.getXMLElementTagName().equals(nodeName)) {
+                Modifier modifier = new Modifier(in); // Modifier close the element
+                setModifier(modifier.getId(), modifier);
+            } else {
+                logger.finest("Parsing of " + nodeName + " is not implemented yet");
+                while (in.nextTag() != XMLStreamConstants.END_ELEMENT ||
+                        !in.getLocalName().equals(nodeName)) {
+                    in.nextTag();
                 }
-            };
-        Xml.forEachChild(xml, method);
-
+            }
+        }
     }
 
 

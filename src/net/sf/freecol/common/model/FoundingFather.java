@@ -3,13 +3,11 @@ package net.sf.freecol.common.model;
 
 import java.util.HashMap;
 import java.util.Map;
-import org.w3c.dom.Element;
-
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
+import javax.xml.stream.XMLStreamConstants;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamReader;
 
 import net.sf.freecol.client.gui.i18n.Messages;
-import net.sf.freecol.common.util.Xml;
 
 /**
  * Represents one FoundingFather to be contained in a Player object.
@@ -204,10 +202,14 @@ public class FoundingFather extends FreeColGameObjectType implements Abilities, 
         return new HashMap<String, Modifier>(modifiers);
     }
 
-    public void readFromXmlElement(Node xml, Map<String, GoodsType> goodsTypeByRef) {
+    protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
+        readFromXML(in, null);
+    }
 
-        setID(Xml.attribute(xml, "id"));
-        String typeString = Xml.attribute(xml, "type");
+    public void readFromXML(XMLStreamReader in, final Map<String, GoodsType> goodsTypeByRef)
+            throws XMLStreamException {
+        setID(in.getAttributeValue(null, "id"));
+        String typeString = in.getAttributeValue(null, "type");
         if ("trade".equals(typeString)) {
             type = TRADE;
         } else if ("exploration".equals(typeString)) {
@@ -219,33 +221,36 @@ public class FoundingFather extends FreeColGameObjectType implements Abilities, 
         } else if ("religious".equals(typeString)) {
             type = RELIGIOUS;
         } else {
-            throw new IllegalArgumentException("FoundingFather has unknown type " + typeString);
+            throw new IllegalArgumentException("FoundingFather " + getID() + " has unknown type " + typeString);
         }                           
 
-        weight[1] = Xml.intAttribute(xml, "weight1");
-        weight[2] = Xml.intAttribute(xml, "weight2");
-        weight[3] = Xml.intAttribute(xml, "weight3");
+        weight[1] = Integer.parseInt(in.getAttributeValue(null, "weight1"));
+        weight[2] = Integer.parseInt(in.getAttributeValue(null, "weight2"));
+        weight[3] = Integer.parseInt(in.getAttributeValue(null, "weight3"));
 
-        Xml.Method method = new Xml.Method() {
-                public void invokeOn(Node node) {
-                    if ("ability".equals(node.getNodeName())) {
-                        String abilityId = Xml.attribute(node, "id");
-                        boolean value = Xml.booleanAttribute(node, "value");
-                        setAbility(abilityId, value);
-                    } else if (Modifier.getXMLElementTagName().equals(node.getNodeName())) {
-                        Modifier modifier = new Modifier((Element) node);
-                        setModifier(modifier.getId(), modifier);
-                    } else if ("event".equals(node.getNodeName())) {
-                        String eventId = Xml.attribute(node, "id");
-                        String value = null;
-                        if (Xml.hasAttribute(node, "value")) {
-                            value = Xml.attribute(node, "value");
-                        }
-                        events.put(eventId, value);
-                    }
+        while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
+            String childName = in.getLocalName();
+            if ("ability".equals(childName)) {
+                String abilityId = in.getAttributeValue(null, "id");
+                boolean value = getAttribute(in, "value", true);
+                setAbility(abilityId, value);
+                in.nextTag(); // close this element
+            } else if (Modifier.getXMLElementTagName().equals(childName)) {
+                Modifier modifier = new Modifier(in);
+                setModifier(modifier.getId(), modifier); // close this element
+            } else if ("event".equals(childName)) {
+                String eventId = in.getAttributeValue(null, "id");
+                String value = in.getAttributeValue(null, "value");
+                events.put(eventId, value);
+                in.nextTag(); // close this element
+            } else {
+                logger.finest("Parsing of " + childName + " is not implemented yet");
+                while (in.nextTag() != XMLStreamConstants.END_ELEMENT ||
+                        !in.getLocalName().equals(childName)) {
+                    in.nextTag();
                 }
-            };
-        Xml.forEachChild(xml, method);
+            }
+        }
 
     }
 

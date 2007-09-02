@@ -6,12 +6,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
-
-import net.sf.freecol.client.gui.i18n.Messages;
-import net.sf.freecol.common.util.Xml;
-
-import org.w3c.dom.Node;
-
+import javax.xml.stream.XMLStreamConstants;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamReader;
 
 public final class TileType extends FreeColGameObjectType
 {
@@ -33,15 +30,15 @@ public final class TileType extends FreeColGameObjectType
 
     private int basicMoveCost;
     private int basicWorkTurns;
-    private int attackFactor;
-    private int defenceFactor;
+    private int attackBonus;
+    private int defenceBonus;
     
     public static final int HUMIDITY = 0, TEMPERATURE = 1, ALTITUDE = 2, LATITUDE = 3;
     
-    private int[] humidity;
-    private int[] temperature;
-    private int[] altitude;
-    private int[] latitude;
+    private int[] humidity = new int[2];
+    private int[] temperature = new int[2];
+    private int[] altitude = new int[2];
+    private int[] latitude = new int[2];
 
     private List<GoodsType> producedType;
     private List<Integer> producedAmount;
@@ -104,12 +101,12 @@ public final class TileType extends FreeColGameObjectType
         return basicWorkTurns;
     }
 
-    public int getAttackFactor() {
-        return attackFactor;
+    public int getAttackBonus() {
+        return attackBonus;
     }
 
-    public int getDefenceFactor() {
-        return defenceFactor;
+    public int getDefenceBonus() {
+        return defenceBonus;
     }
 
     public int getPotential(GoodsType goodsType) {
@@ -172,65 +169,70 @@ public final class TileType extends FreeColGameObjectType
     
     // ------------------------------------------------------------ API methods
 
-    public void readFromXmlElement(Node xml, final Map<String, GoodsType> goodsTypeByRef,
-                                    final Map<String, ResourceType> resourceTypeByRef) {
+    protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
+        readFromXML(in, null, null);
+    }
 
-        setID(Xml.attribute(xml, "id"));
-        basicMoveCost = Xml.intAttribute(xml, "basic-move-cost");
-        basicWorkTurns = Xml.intAttribute(xml, "basic-work-turns");
-        forest = Xml.booleanAttribute(xml, "is-forest", false);
-        water = Xml.booleanAttribute(xml, "is-water", false);
-        canSettle = Xml.booleanAttribute(xml, "can-settle", (water) ? false : true);
-        canSailToEurope = Xml.booleanAttribute(xml, "sail-to-europe", false);
-        canHaveRiver = !(Xml.booleanAttribute(xml, "no-river", !water));
-        attackFactor = 100;
-        defenceFactor = 100;
+    public void readFromXML(XMLStreamReader in, final Map<String, GoodsType> goodsTypeByRef,
+            final Map<String, ResourceType> resourceTypeByRef) throws XMLStreamException {
+        setID(in.getAttributeValue(null, "id"));
+        basicMoveCost = Integer.parseInt(in.getAttributeValue(null, "basic-move-cost"));
+        basicWorkTurns = Integer.parseInt(in.getAttributeValue(null, "basic-work-turns"));
+        forest = getAttribute(in, "is-forest", false);
+        water = getAttribute(in, "is-water", false);
+        canSettle = getAttribute(in, "can-settle", !water);
+        canSailToEurope = getAttribute(in, "sail-to-europe", false);
+        canHaveRiver = !(getAttribute(in, "no-river", water));
+        attackBonus = 0;
+        defenceBonus = 0;
         
         artBasic = null;
         producedType = new ArrayList<GoodsType>();
         producedAmount = new ArrayList<Integer>();
         resourceType = new ArrayList<ResourceType>();
         resourceProbability = new ArrayList<Integer>();
-        
-        Xml.Method method = new Xml.Method() {
-            public void invokeOn(Node xml) {
-                String childName = xml.getNodeName();
 
-                if ("art".equals(childName)) {
-                    artBasic = Xml.attribute(xml, "basic", null);
-                    artOverlay = Xml.attribute(xml, "overlay", null);
-                    artForest = Xml.attribute(xml, "forest", null);
-                    artCoast = Xml.attribute(xml, "coast", (water ? null : "terrain/beach/"));
-                    float[] defaultArray = new float[] {0.0f, 0.0f, 0.0f};
-                    float[] colorValues = Xml.floatArrayAttribute(xml, "minimap-color", defaultArray);
-                    minimapColor = new Color(colorValues[0], colorValues[1], colorValues[2]);
-                } else if ("gen".equals(childName)) {
-                    int[] defaultArray = new int[] {-3, 3};
-                    humidity = Xml.intArrayAttribute(xml, "humidity", defaultArray);
-                    temperature = Xml.intArrayAttribute(xml, "temperature", defaultArray);
-                    defaultArray = new int[] {0, 0};
-                    altitude = Xml.intArrayAttribute(xml, "altitude", defaultArray);
-                    defaultArray = new int[] {-1, -1};
-                    latitude = Xml.intArrayAttribute(xml, "latitude", defaultArray);
-                } else if ("skirmish".equals(childName)) {
-                    attackFactor = Xml.intAttribute(xml, "attack-factor", 100);
-                    defenceFactor = Xml.intAttribute(xml, "defence-factor", 100);
-                } else if ("production".equals(childName)) {
-                    String g = Xml.attribute(xml, "goods-type");
-                    GoodsType gt = goodsTypeByRef.get(g);
-                    producedType.add(gt);
-                    producedAmount.add(Xml.intAttribute(xml, "value"));
-                } else if ("resource".equals(childName)) {
-                    String r = Xml.attribute(xml, "type");
-                    ResourceType rt = resourceTypeByRef.get(r);
-                    resourceType.add(rt);
-                    resourceProbability.add(Xml.intAttribute(xml, "probability"));
-                } else {
-                    throw new RuntimeException("unexpected: " + xml);
-                }
+        while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
+            String childName = in.getLocalName();
+            if ("art".equals(childName)) {
+                artBasic = in.getAttributeValue(null, "basic");
+                artOverlay = in.getAttributeValue(null, "overlay");
+                artForest = in.getAttributeValue(null, "forest");
+                artCoast = getAttribute(in, "coast", (water ? null : "terrain/beach/"));
+                float[] defaultArray = new float[] {0.0f, 0.0f, 0.0f};
+                minimapColor = new Color(Integer.parseInt(in.getAttributeValue(null, "minimap-color"), 16));
+                in.nextTag(); // close this element
+            } else if ("gen".equals(childName)) {
+                humidity[0] = getAttribute(in, "humidityMin", -3);
+                humidity[1] = getAttribute(in, "humidityMax", 3);
+                temperature[0] = getAttribute(in, "temperatureMin", -3);
+                temperature[1] = getAttribute(in, "temperatureMax", 3);
+                altitude[0] = getAttribute(in, "altitudeMin", 0);
+                altitude[1] = getAttribute(in, "altitudeMax", 0);
+                latitude[0] = getAttribute(in, "latitudeMin", -1);
+                latitude[1] = getAttribute(in, "latitudeMax", -1);
+                in.nextTag(); // close this element
+            } else if ("skirmish".equals(childName)) {
+                attackBonus = getAttribute(in, "attack-factor", 0);
+                defenceBonus = getAttribute(in, "defence-factor", 0);
+                in.nextTag(); // close this element
+            } else if ("production".equals(childName)) {
+                String g = in.getAttributeValue(null, "goods-type");
+                GoodsType gt = goodsTypeByRef.get(g);
+                producedType.add(gt);
+                producedAmount.add(Integer.parseInt(in.getAttributeValue(null, "value")));
+                in.nextTag(); // close this element
+            } else if ("resource".equals(childName)) {
+                String r = in.getAttributeValue(null, "type");
+                ResourceType rt = resourceTypeByRef.get(r);
+                resourceType.add(rt);
+                resourceProbability.add(getAttribute(in, "probability", 100));
+                in.nextTag(); // close this element
+            } else {
+                throw new RuntimeException("unexpected: " + childName);
             }
-        };
-        Xml.forEachChild(xml, method);
+        }
+        
         if (artBasic == null) {
             throw new RuntimeException("TileType " + getID() + " has no art defined!");
         }

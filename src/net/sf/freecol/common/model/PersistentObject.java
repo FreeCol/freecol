@@ -482,6 +482,27 @@ public abstract class PersistentObject {
         in.nextTag();
         return array;
     }
+
+    public boolean parseTruth(String truthAsString) {
+        if ("yes".equals(truthAsString) || "true".equals(truthAsString)) {
+            return true;
+        } else if ("no".equals(truthAsString) || "false".equals(truthAsString)) {
+            return false;
+        }
+        throw new RuntimeException( "mus be 'yes', 'true', 'no' or 'false': " + truthAsString );
+    }
+    
+    /**
+     * Return an attribute value or the default value.
+     *
+     * @param in a <code>XMLStreamReader</code> value
+     * @param defaultValue an <code>int</code> value
+     * @return an <code>int</code> value
+     */
+    public boolean hasAttribute(XMLStreamReader in, String attributeName) {
+        final String attributeString = in.getAttributeValue(null, attributeName);
+        return attributeString != null;
+    }
     
     /**
      * Return an attribute value or the default value.
@@ -525,7 +546,7 @@ public abstract class PersistentObject {
     public boolean getAttribute(XMLStreamReader in, String attributeName, boolean defaultValue) {
         final String attributeString = in.getAttributeValue(null, attributeName);
         if (attributeString != null) {
-            return Boolean.parseBoolean(attributeString);
+            return parseTruth(attributeString);
         } else {
             return defaultValue;
         }

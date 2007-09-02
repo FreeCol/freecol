@@ -2,17 +2,10 @@
 package net.sf.freecol.common.model;
 
 import java.awt.Color;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-import org.w3c.dom.Element;
-
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
-import net.sf.freecol.client.gui.i18n.Messages;
-import net.sf.freecol.common.util.Xml;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamReader;
 
 /**
  * Represents one of the nations present in the game.
@@ -124,6 +117,11 @@ public abstract class NationType extends FreeColGameObjectType implements Abilit
     }
 
 
-    public abstract void readFromXmlElement(Node xml, Map<String, UnitType> unitTypeByRef);
+    protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
+        readFromXML(in, null);
+    }
+
+    public abstract void readFromXML(XMLStreamReader in, final Map<String, UnitType> unitTypeByRef)
+        throws XMLStreamException;
 
 }

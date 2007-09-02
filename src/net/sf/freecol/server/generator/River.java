@@ -235,6 +235,9 @@ public class River {
             Map.Position newPosition = Map.getAdjacent(source, dir);
             Tile nextTile = map.getTile(newPosition);
             
+            if (nextTile == null) {
+                continue;
+            }
             // is the tile suitable for this river?
             if (!nextTile.getType().canHaveRiver()) {
                 logger.fine("Tile (" + nextTile.getType().getName() + ") at "

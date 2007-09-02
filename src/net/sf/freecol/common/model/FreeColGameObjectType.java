@@ -1,9 +1,11 @@
 package net.sf.freecol.common.model;
 
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamReader;
+import javax.xml.stream.XMLStreamWriter;
 import net.sf.freecol.client.gui.i18n.Messages;
 
-public class FreeColGameObjectType
-{
+public abstract class FreeColGameObjectType extends FreeColObject {
     public static final  String  COPYRIGHT = "Copyright (C) 2003-2007 The FreeCol Team";
     public static final  String  LICENSE   = "http://www.gnu.org/licenses/gpl.html";
     public static final  String  REVISION  = "$Revision: 2916 $";
@@ -35,4 +37,6 @@ public class FreeColGameObjectType
         return Messages.message(id + ".description");
     }
 
+    protected void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
+    }
 }

@@ -108,8 +108,7 @@
     art child options: basic, overlay, coast
     - all tiles must have at least basic. overlay will be drawn after all the base tiles are drawn
     - coast is for land tiles drawing their overlap on water tiles. default for coast = "terrain/beach/" for land tiles
-    gen child options: humidity, temperature, altitude, latitude
-    - all children have the format "min,max" eg. humidity="1,3" or altitude="-2,0"
+    gen child options: humidityMin, humidityMax, temperatureMin, temperatureMax, altitudeMin, altitudeMax, latitudeMin, latitudeMax
     - humidity is the wetness (values of -3 to 3, default "-3,3")
     - temperature (values of -3 to 3, default "-3,3")
     - altitude (values of -3 to 3)
@@ -127,9 +126,9 @@
     - attack-factor is a percentage modifier for the attacker (default = 100)
     - defence-factor is a percentage modifier for the defender (default = 100)
     production if any must have the following structure:
-      <production goods-type="model.goods.goodname" value="X"
+      <production goods-type="model.goods.goodname" value="X"/>
     resource if any must have the following structure:
-      <resource type="model.resource.resourcename" probability="X"
+      <resource type="model.resource.resourcename" probability="X"/>
       - X is a relative probability, not necessarily a percentage value    
   -->
   <tile-types>
@@ -140,71 +139,71 @@
     </tile-type>
 -->
     <tile-type    id="model.tile.plains"            basic-move-cost="3" basic-work-turns="3">
-      <art basic="terrain/plains/" minimap-color="0.14,0.50,0.12"/>
-      <gen humidity="-2,2" temperature="-2,2" altitude="1,2" latitude="0,2"/>
+      <art basic="terrain/plains/" minimap-color="24801f"/>
+      <gen humidityMin="-2" humidityMax="2" temperatureMin="-2" temperatureMax="2" altitudeMin="1" altitudeMax="2" latitudeMin="0" latitudeMax="2"/>
       <production goods-type="model.goods.Food"       value="5"/>
       <production goods-type="model.goods.Cotton"     value="2"/>
       <production goods-type="model.goods.Ore"        value="1"/>
       <resource   type="model.resource.Grain"         probability="100"/>
     </tile-type>
     <tile-type    id="model.tile.grassland"         basic-move-cost="3" basic-work-turns="3">
-      <art basic="terrain/grassland/" minimap-color="0.14,0.50,0.12"/>
-      <gen humidity="-2,2" temperature="-2,2" altitude="1,1" latitude="0,2"/>
+      <art basic="terrain/grassland/" minimap-color="24801f"/>
+      <gen humidityMin="-2" humidityMax="2" temperatureMin="-2" temperatureMax="2" altitudeMin="1" altitudeMax="1" latitudeMin="0" latitudeMax="2"/>
       <production goods-type="model.goods.Food"       value="3"/>
       <production goods-type="model.goods.Tobacco"    value="3"/>
       <resource   type="model.resource.Tobacco"       probability="100"/>
     </tile-type>
     <tile-type    id="model.tile.prairie"           basic-move-cost="3" basic-work-turns="3">
-      <art basic="terrain/prairie/" minimap-color="0.14,0.50,0.12"/>
-      <gen humidity="-2,2" temperature="-2,2" altitude="1,1" latitude="0,2"/>
+      <art basic="terrain/prairie/" minimap-color="24801f"/>
+      <gen humidityMin="-2" humidityMax="2" temperatureMin="-2" temperatureMax="2" altitudeMin="1" altitudeMax="1" latitudeMin="0" latitudeMax="2"/>
       <production goods-type="model.goods.Food"       value="3"/>
       <production goods-type="model.goods.Cotton"     value="3"/>
       <resource   type="model.resource.Cotton"        probability="100"/>
     </tile-type>
     <tile-type    id="model.tile.savannah"          basic-move-cost="3" basic-work-turns="3">
-      <art basic="terrain/savannah/" minimap-color="0.14,0.50,0.12"/>
-      <gen humidity="-2,2" temperature="-2,2" altitude="1,1" latitude="0,2"/>
+      <art basic="terrain/savannah/" minimap-color="24801f"/>
+      <gen humidityMin="-2" humidityMax="2" temperatureMin="-2" temperatureMax="2" altitudeMin="1" altitudeMax="1" latitudeMin="0" latitudeMax="2"/>
       <production goods-type="model.goods.Food"       value="4"/>
       <production goods-type="model.goods.Sugar"      value="3"/>
       <resource   type="model.resource.Sugar"         probability="100"/>
     </tile-type>
     <tile-type    id="model.tile.marsh"             basic-move-cost="6" basic-work-turns="5">
-      <art basic="terrain/marsh/" minimap-color="0.14,0.50,0.24"/>
-      <gen humidity="1,3" temperature="-1,3" altitude="2,2" latitude="0,2"/>
-      <skirmish defence-factor="125"/>
+      <art basic="terrain/marsh/" minimap-color="24803d"/>
+      <gen humidityMin="1" humidityMax="3" temperatureMin="-1" temperatureMax="3" altitudeMin="2" altitudeMax="2" latitudeMin="0" latitudeMax="2"/>
+      <skirmish defence-factor="25"/>
       <production goods-type="model.goods.Food"       value="3"/>
       <production goods-type="model.goods.Tobacco"    value="2"/>
       <production goods-type="model.goods.Ore"        value="2"/>
       <resource   type="model.resource.Minerals"         probability="100"/>
     </tile-type>
     <tile-type    id="model.tile.swamp"             basic-move-cost="6" basic-work-turns="7">
-      <art basic="terrain/swamp/" minimap-color="0.14,0.50,0.24"/>
-      <gen humidity="1,3" temperature="-1,3" altitude="1,1" latitude="0,2"/>
-      <skirmish defence-factor="125"/>
+      <art basic="terrain/swamp/" minimap-color="24803d"/>
+      <gen humidityMin="1" humidityMax="3" temperatureMin="-1" temperatureMax="3" altitudeMin="1" altitudeMax="1" latitudeMin="0" latitudeMax="2"/>
+      <skirmish defence-factor="25"/>
       <production goods-type="model.goods.Food"       value="3"/>
       <production goods-type="model.goods.Sugar"      value="2"/>
       <production goods-type="model.goods.Ore"        value="2"/>
       <resource   type="model.resource.Minerals"      probability="100"/>
     </tile-type>
     <tile-type    id="model.tile.desert"            basic-move-cost="3" basic-work-turns="3">
-      <art basic="terrain/desert/" minimap-color="0.39,0.45,0.17"/>
-      <gen humidity="-3,-1" temperature="-1,3" altitude="1,2" latitude="0,2"/>
+      <art basic="terrain/desert/" minimap-color="63732b"/><!--0.39,0.45,0.17"-->
+      <gen humidityMin="-3" humidityMax="-1" temperatureMin="-1" temperatureMax="3" altitudeMin="1" altitudeMax="2" latitudeMin="0" latitudeMax="2"/>
       <production goods-type="model.goods.Food"       value="2"/>
       <production goods-type="model.goods.Cotton"     value="1"/>
       <production goods-type="model.goods.Ore"        value="2"/>
       <resource   type="model.resource.Oasis"         probability="100"/>
     </tile-type>
     <tile-type    id="model.tile.tundra"            basic-move-cost="3" basic-work-turns="4">
-      <art basic="terrain/tundra/" minimap-color="0.39,0.62,0.37"/>
-      <gen humidity="-3,3" temperature="-3,1" altitude="1,3" latitude="1,3"/>
+      <art basic="terrain/tundra/" minimap-color="639e5e"/><!--0.39,0.62,0.37"-->
+      <gen humidityMin="-3" humidityMax="3" temperatureMin="-3" temperatureMax="1" altitudeMin="1" altitudeMax="3" latitudeMin="1" latitudeMax="3"/>
       <production goods-type="model.goods.Food"       value="3"/>
       <production goods-type="model.goods.Ore"        value="2"/>
       <resource   type="model.resource.Minerals"         probability="100"/>
     </tile-type>
     <tile-type    id="model.tile.mixedForest"       basic-move-cost="6" basic-work-turns="4" is-forest="yes">
-      <art basic="terrain/plains/" forest="forest/mixed.png" minimap-color="0.14,0.45,0.12"/>
-      <gen humidity="-2,2" temperature="-2,2" altitude="1,2" latitude="0,2"/>
-      <skirmish defence-factor="150"/>
+      <art basic="terrain/plains/" forest="forest/mixed.png" minimap-color="24731f"/>
+      <gen humidityMin="-2" humidityMax="2" temperatureMin="-2" temperatureMax="2" altitudeMin="1" altitudeMax="2" latitudeMin="0" latitudeMax="2"/>
+      <skirmish defence-factor="50"/>
       <production goods-type="model.goods.Food"       value="3"/>
       <production goods-type="model.goods.Cotton"     value="1"/>
       <production goods-type="model.goods.Furs"       value="3"/>
@@ -216,9 +215,9 @@
     -->
     </tile-type>
     <tile-type    id="model.tile.coniferForest"     basic-move-cost="6" basic-work-turns="4" is-forest="yes">
-      <art basic="terrain/grassland/" forest="forest/conifer.png" minimap-color="0.14,0.45,0.12"/>
-      <gen humidity="-2,2" temperature="-2,2" altitude="1,1" latitude="0,2"/>
-      <skirmish defence-factor="150"/>
+      <art basic="terrain/grassland/" forest="forest/conifer.png" minimap-color="24731f"/>
+      <gen humidityMin="-2" humidityMax="2" temperatureMin="-2" temperatureMax="2" altitudeMin="1" altitudeMax="1" latitudeMin="0" latitudeMax="2"/>
+      <skirmish defence-factor="50"/>
       <production goods-type="model.goods.Food"       value="2"/>
       <production goods-type="model.goods.Tobacco"    value="1"/>
       <production goods-type="model.goods.Furs"       value="2"/>
@@ -226,9 +225,9 @@
       <resource   type="model.resource.Lumber"        probability="100"/>
     </tile-type>
     <tile-type    id="model.tile.broadleafForest"   basic-move-cost="6" basic-work-turns="4" is-forest="yes">
-      <art basic="terrain/prairie/" forest="forest/broadleaf.png" minimap-color="0.14,0.45,0.12"/>
-      <gen humidity="-2,2" temperature="-2,2" altitude="1,1" latitude="0,2"/>
-      <skirmish defence-factor="150"/>
+      <art basic="terrain/prairie/" forest="forest/broadleaf.png" minimap-color="24731f"/>
+      <gen humidityMin="-2" humidityMax="2" temperatureMin="-2" temperatureMax="2" altitudeMin="1" altitudeMax="1" latitudeMin="0" latitudeMax="2"/>
+      <skirmish defence-factor="50"/>
       <production goods-type="model.goods.Food"       value="2"/>
       <production goods-type="model.goods.Cotton"     value="1"/>
       <production goods-type="model.goods.Furs"       value="2"/>
@@ -236,9 +235,9 @@
       <resource   type="model.resource.Game"          probability="100"/>
     </tile-type>
     <tile-type    id="model.tile.tropicalForest"    basic-move-cost="6" basic-work-turns="6" is-forest="yes">
-      <art basic="terrain/savannah/" forest="forest/tropical.png" minimap-color="0.14,0.45,0.12"/>
-      <skirmish defence-factor="150"/>
-      <gen humidity="-2,2" temperature="-2,2" altitude="1,1" latitude="0,2"/>
+      <art basic="terrain/savannah/" forest="forest/tropical.png" minimap-color="24731f"/>
+      <skirmish defence-factor="50"/>
+      <gen humidityMin="-2" humidityMax="2" temperatureMin="-2" temperatureMax="2" altitudeMin="1" altitudeMax="1" latitudeMin="0" latitudeMax="2"/>
       <production goods-type="model.goods.Food"       value="3"/>
       <production goods-type="model.goods.Tobacco"    value="1"/>
       <production goods-type="model.goods.Furs"       value="2"/>
@@ -246,9 +245,9 @@
       <resource   type="model.resource.Lumber"        probability="100"/>
     </tile-type>
     <tile-type    id="model.tile.wetlandForest"     basic-move-cost="9" basic-work-turns="6" is-forest="yes">
-      <art basic="terrain/marsh/" forest="forest/wetland.png" minimap-color="0.14,0.45,0.12"/>
-      <gen humidity="1,3" temperature="-1,3" altitude="2,2" latitude="0,2"/>
-      <skirmish defence-factor="150"/>
+      <art basic="terrain/marsh/" forest="forest/wetland.png" minimap-color="24731f"/>
+      <gen humidityMin="1" humidityMax="3" temperatureMin="-1" temperatureMax="3" altitudeMin="2" altitudeMax="2" latitudeMin="0" latitudeMax="2"/>
+      <skirmish defence-factor="50"/>
       <production goods-type="model.goods.Food"       value="2"/>
       <production goods-type="model.goods.Tobacco"    value="1"/>
       <production goods-type="model.goods.Furs"       value="2"/>
@@ -257,9 +256,9 @@
       <resource   type="model.resource.Minerals"      probability="100"/>
     </tile-type>
     <tile-type    id="model.tile.rainForest"        basic-move-cost="9" basic-work-turns="7" is-forest="yes">
-      <art basic="terrain/swamp/" forest="forest/rain.png" minimap-color="0.14,0.45,0.12"/>
-      <gen humidity="1,3" temperature="-1,3" altitude="1,1" latitude="0,2"/>
-      <skirmish defence-factor="175"/>
+      <art basic="terrain/swamp/" forest="forest/rain.png" minimap-color="24731f"/>
+      <gen humidityMin="1" humidityMax="3" temperatureMin="-1" temperatureMax="3" altitudeMin="1" altitudeMax="1" latitudeMin="0" latitudeMax="2"/>
+      <skirmish defence-factor="75"/>
       <production goods-type="model.goods.Food"       value="2"/>
       <production goods-type="model.goods.Sugar"      value="1"/>
       <production goods-type="model.goods.Furs"       value="1"/>
@@ -268,9 +267,9 @@
       <resource   type="model.resource.Minerals"      probability="100"/>
     </tile-type>
     <tile-type    id="model.tile.scrubForest"       basic-move-cost="3" basic-work-turns="4" is-forest="yes">
-      <art basic="terrain/desert/" forest="forest/scrub.png" minimap-color="0.14,0.45,0.12"/>
-      <gen humidity="-3,-1" temperature="-1,3" altitude="1,2" latitude="0,2"/>
-      <skirmish defence-factor="150"/>
+      <art basic="terrain/desert/" forest="forest/scrub.png" minimap-color="24731f"/>
+      <gen humidityMin="-3" humidityMax="-1" temperatureMin="-1" temperatureMax="3" altitudeMin="1" altitudeMax="2" latitudeMin="0" latitudeMax="2"/>
+      <skirmish defence-factor="50"/>
       <production goods-type="model.goods.Food"       value="2"/>
       <production goods-type="model.goods.Cotton"     value="1"/>
       <production goods-type="model.goods.Furs"       value="2"/>
@@ -279,9 +278,9 @@
       <resource   type="model.resource.Oasis"         probability="100"/>
     </tile-type>
     <tile-type    id="model.tile.borealForest"      basic-move-cost="6" basic-work-turns="4" is-forest="yes">
-      <art basic="terrain/tundra/" forest="forest/boreal.png" minimap-color="0.14,0.45,0.12"/>
-      <gen humidity="-3,3" temperature="-3,1" altitude="1,3" latitude="1,3"/>
-      <skirmish defence-factor="150"/>
+      <art basic="terrain/tundra/" forest="forest/boreal.png" minimap-color="24731f"/>
+      <gen humidityMin="-3" humidityMax="3" temperatureMin="-3" temperatureMax="1" altitudeMin="1" altitudeMax="3" latitudeMin="1" latitudeMax="3"/>
+      <skirmish defence-factor="50"/>
       <production goods-type="model.goods.Food"       value="2"/>
       <production goods-type="model.goods.Furs"       value="3"/>
       <production goods-type="model.goods.Lumber"     value="4"/>
@@ -289,69 +288,70 @@
       <resource   type="model.resource.Game"          probability="100"/>
     </tile-type>
     <tile-type    id="model.tile.hills"             basic-move-cost="6" basic-work-turns="4" no-river="yes">
-      <art basic="terrain/plains/" overlay="terrain/hills/hills" minimap-color="0.44,0.50,0.32"/>
-      <gen humidity="-3,3" temperature="-3,3" altitude="2,3" latitude="0,3"/>
-      <skirmish defence-factor="200"/>
+      <art basic="terrain/plains/" overlay="terrain/hills/hills" minimap-color="708052"/>
+      <gen humidityMin="-3" humidityMax="3" temperatureMin="-3" temperatureMax="3" altitudeMin="2" altitudeMax="3" latitudeMin="0" latitudeMax="3"/>
+      <skirmish defence-factor="100"/>
       <production goods-type="model.goods.Food"       value="2"/>
       <production goods-type="model.goods.Ore"        value="4"/>
       <resource   type="model.resource.Ore"           probability="100"/>
     </tile-type>
     <tile-type    id="model.tile.mountains"         basic-move-cost="9" basic-work-turns="7" can-settle="no" no-river="yes">
-      <art basic="terrain/plains/" overlay="terrain/mountains/mountains" minimap-color="0.34,0.45,0.32"/>
-      <gen humidity="-3,3" temperature="-3,3" altitude="3,3" latitude="0,3"/>
-      <skirmish defence-factor="250"/>
+      <art basic="terrain/plains/" overlay="terrain/mountains/mountains" minimap-color="577352"/>
+      <gen humidityMin="-3" humidityMax="3" temperatureMin="-3" temperatureMax="3" altitudeMin="3" altitudeMax="3" latitudeMin="0" latitudeMax="3"/>
+      <skirmish defence-factor="150"/>
       <production goods-type="model.goods.Ore"        value="4"/>
       <production goods-type="model.goods.Silver"     value="1"/>
       <resource   type="model.resource.Silver"        probability="100"/>
     </tile-type>
     <tile-type    id="model.tile.arctic"            basic-move-cost="6" basic-work-turns="4" can-settle="no" no-river="yes">
-      <art basic="terrain/arctic/" minimap-color="1.00,1.00,1.00"/>
-      <gen humidity="-3,3" temperature="-3,-1" altitude="1,3" latitude="2,3"/>
+      <art basic="terrain/arctic/" minimap-color="ffffff"/>
+      <gen humidityMin="-3" humidityMax="3" temperatureMin="-3" temperatureMax="-1" altitudeMin="1" altitudeMax="3" latitudeMin="2" latitudeMax="3"/>
     </tile-type>
     <tile-type    id="model.tile.ocean"             basic-move-cost="3" basic-work-turns="4" is-water="yes">
-      <art basic="terrain/ocean/" minimap-color="0.00,0.00,1.00"/>
-      <gen humidity="-3,3" temperature="-3,3" altitude="-2,-1" latitude="0,3"/>
+      <art basic="terrain/ocean/" minimap-color="0000ff"/>
+      <gen humidityMin="-3" humidityMax="3" temperatureMin="-3" temperatureMax="3" altitudeMin="-2" altitudeMax="-1" latitudeMin="0" latitudeMax="3"/>
       <production goods-type="model.goods.Fish"       value="2"/>
       <resource   type="model.resource.Fish"          probability="100"/>
     </tile-type>
     <tile-type    id="model.tile.highSeas"          basic-move-cost="3" basic-work-turns="4" is-water="yes" sail-to-europe="yes">
-      <art basic="terrain/highSeas/" minimap-color="0.00,0.00,0.80"/>
-      <gen humidity="-3,3" temperature="-3,3" altitude="-3,-2" latitude="0,3"/>
+      <art basic="terrain/highSeas/" minimap-color="0000cc"/>
+      <gen humidityMin="-3" humidityMax="3" temperatureMin="-3" temperatureMax="3" altitudeMin="-3" altitudeMax="-2" latitudeMin="0" latitudeMax="3"/>
       <production goods-type="model.goods.Fish"       value="4"/>
     </tile-type>
 <!--
     <tile-type    ref="tile.beach"           name="model.tile.beach"
                     basic-move-cost="3" basic-work-turns="-1">
       <art basic="model.tile.beach"/>
-      <gen humidity="-3,3" temperature="-3,3" altitude="0,0" latitude="0,3"/>
+      <gen humidityMin="-3" humidityMax="3" temperatureMin="-3" temperatureMax="3" altitudeMin="3" altitudeMax="0" latitudeMin="0" latitudeMax="3"/>
     </tile-type>
     <tile-type    ref="tile.forest"          name="model.tile.forest"
                     basic-move-cost="6" basic-work-turns="-1">
       <art basic="model.tile.plains"    forest="plains"/>
-      <gen humidity="-3,3" temperature="-3,3" altitude="0,0" latitude="0,2"/>
+      <gen humidityMin="-3" humidityMax="3" temperatureMin="-3" temperatureMax="3" altitudeMin="3" altitudeMax="0" latitudeMin="0" latitudeMax="2"/>
     </tile-type>
 -->
   </tile-types>
 
   <!--
-  Parent options: name, add-work-turns, overlay, natural, type, required-improvement, workers="worker1,worker2,etc",
+  Parent options: name, add-work-turns, overlay, natural, type, required-improvement,
                   expended-goods-type, expended-amount, deliver-goods-type, deliver-amount
     - natural="yes" means that this improvement cannot be built, but may be present on its own
     - expended goods/amount are the 'cost' of building this improvement
     - deliver goods/amount are the instant reward that will be given to the nearby colony (eg. lumber from deforestation)
       - deliver-amount is a factor to multiply the base production of that tile to give.
-  Children: type, tiles, effect, change
+  Children: worker, type, tiles, tile, effect, change
+  worker child options: id
   type child options: id, magnitude
     - id is a string identifier, there must be a "river" and a "road" id among the tileimprovement-types
       - to get the movement-bonus, must travel from a similar 'id' to this id
     - magnitude is a number to decide overwriting,
       a similar id tileimprovement will be replaced with one with a higher magnitude
-  tiles child options: all-land-tiles, all-forest-tiles, all-water-tiles, tiles="tile1,tile2,etc"
+  tiles child options: all-land-tiles, all-forest-tiles, all-water-tiles
     - putting all-water-tiles="no" is redundant, but serves as a reminder
     - putting all-land-tiles="yes" all-forest-tiles="no" will result in all non-forested land tiles.
+  tile child options: id
   effect child options: goods-type and value, movement-cost, movement-cost-factor
-    - use goods-type & value, or goods-types & values.
-    - both goods-types & values should have the same number of inputs
+    - use goods-type & value.
     - movement-cost will set the movement cost to that amount in thirds.
     - movement-cost-factor multiplies movement cost by a percentage factor (ie a value of 75 will result in a (100-75) = 25% reduction)
   change child options: from, to
@@ -360,33 +360,33 @@
     <tileimprovement-type id="model.improvement.River" natural="yes" add-work-turns="0">
       <type id="river" magnitude="1"/>
       <tiles all-land-tiles="yes"/>
-      <effect goods-types="model.goods.Food" value="1"/>
-      <effect goods-types="model.goods.Sugar" value="1"/>
-      <effect goods-types="model.goods.Tobacco" value="1"/>
-      <effect goods-types="model.goods.Cotton" value="1"/>
-      <effect goods-types="model.goods.Furs" value="1"/>
-      <effect goods-types="model.goods.Lumber" value="1"/>
-      <effect goods-types="model.goods.Ore" value="1"/>
-      <effect goods-types="model.goods.Silver" value="1"/>
+      <effect goods-type="model.goods.Food" value="1"/>
+      <effect goods-type="model.goods.Sugar" value="1"/>
+      <effect goods-type="model.goods.Tobacco" value="1"/>
+      <effect goods-type="model.goods.Cotton" value="1"/>
+      <effect goods-type="model.goods.Furs" value="1"/>
+      <effect goods-type="model.goods.Lumber" value="1"/>
+      <effect goods-type="model.goods.Ore" value="1"/>
+      <effect goods-type="model.goods.Silver" value="1"/>
       <effect movement-cost="1"/>
     </tileimprovement-type>
     <tileimprovement-type id="model.improvement.Road" occupation-string="R" add-work-turns="0" over-trees="yes"
             expended-goods-type="model.goods.Tools" expended-amount="20">
       <type id="road" magnitude="1"/>
       <tiles all-land-tiles="yes"/>
-      <effect goods-types="model.goods.Furs" value="1"/>
-      <effect goods-types="model.goods.Lumber" value="1"/>
-      <effect goods-types="model.goods.Ore" value="1"/>
-      <effect goods-types="model.goods.Silver" value="1"/>
+      <effect goods-type="model.goods.Furs" value="1"/>
+      <effect goods-type="model.goods.Lumber" value="1"/>
+      <effect goods-type="model.goods.Ore" value="1"/>
+      <effect goods-type="model.goods.Silver" value="1"/>
       <effect movement-cost="1"/>
     </tileimprovement-type>
     <tileimprovement-type id="model.improvement.Plow" occupation-string="P" add-work-turns="2" overlay="4"
             expended-goods-type="model.goods.Tools" expended-amount="20">
       <tiles all-land-tiles="yes" all-forest-tiles="no"/>
-      <effect goods-types="model.goods.Food" value="1"/>
-      <effect goods-types="model.goods.Sugar" value="1"/>
-      <effect goods-types="model.goods.Tobacco" value="1"/>
-      <effect goods-types="model.goods.Cotton" value="1"/>
+      <effect goods-type="model.goods.Food" value="1"/>
+      <effect goods-type="model.goods.Sugar" value="1"/>
+      <effect goods-type="model.goods.Tobacco" value="1"/>
+      <effect goods-type="model.goods.Cotton" value="1"/>
     </tileimprovement-type>
     <tileimprovement-type id="model.improvement.ClearForest" occupation-string="P" add-work-turns="2"
             expended-goods-type="model.goods.Tools" expended-amount="20"
@@ -1066,7 +1066,7 @@
       <unit id="model.unit.caravel"/>
     </european-nation-type>
     <european-nation-type id="model.nation.english" color="ff0000">
-      <production-bonus goods-type="model.goods.crosses" factor="150"/>
+      <modifier id="model.goods.Crosses" type="percentage" value="50"/>
       <unit id="model.unit.freeColonist" tools="100"/>
       <unit id="model.unit.freeColonist" armed="yes"/>
       <unit id="model.unit.caravel"/>

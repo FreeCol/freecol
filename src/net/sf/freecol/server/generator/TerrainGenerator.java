@@ -104,14 +104,13 @@ public class TerrainGenerator {
         }
 
         Map map = new Map(game, columns);
+        game.setMap(map);
 
         if (!importTerrain) {
             createHighSeas(map);
             createMountains(map);
             createRivers(map);
         }
-
-        game.setMap(map);
     }
 
     private Tile createTile(Game game, boolean[][] landMap, int i, int j) {

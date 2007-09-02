@@ -1,17 +1,10 @@
 package net.sf.freecol.common.model;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
-import net.sf.freecol.FreeCol;
-
-import net.sf.freecol.common.util.Xml;
-import org.w3c.dom.Element;
-
-import org.w3c.dom.Node;
+import javax.xml.stream.XMLStreamConstants;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamReader;
 
 /**
  * Contains information on building types, like the number of upgrade levels a
@@ -95,55 +88,57 @@ public final class BuildingType extends FreeColGameObjectType implements Abiliti
         return defenseBonus;
     }
 
-    /**
-     * Reads the content of this BuildingType object from the given XML node.
-     * 
-     * @param xml an XML node from which to fill this BuildingType's fields.
-     */
-    public void readFromXmlElement(Node xml, final Map<String, GoodsType> goodsTypeByRef,
-                                             final Map<String, BuildingType> buildingTypeByRef) {
-        setID(Xml.attribute(xml, "id"));
+    protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
+        readFromXML(in, null, null);
+    }
+
+    public void readFromXML(XMLStreamReader in, final Map<String, GoodsType> goodsTypeByRef,
+           final Map<String, BuildingType> buildingTypeByRef) throws XMLStreamException {
+        setID(in.getAttributeValue(null, "id"));
         
-        if (Xml.hasAttribute(xml, "upgradesFrom")) {
-            upgradesFrom = buildingTypeByRef.get(Xml.attribute(xml, "upgradesFrom"));
+        if (hasAttribute(in, "upgradesFrom")) {
+            upgradesFrom = buildingTypeByRef.get(in.getAttributeValue(null, "upgradesFrom"));
             upgradesFrom.upgradesTo = this;
             level = upgradesFrom.level + 1;
         } else {
             level = 1;
         }
         
-        defenseBonus = Xml.intAttribute(xml, "defense-bonus", 0);
-        hammersRequired = Xml.intAttribute(xml, "hammers-required", 0);
-        toolsRequired = Xml.intAttribute(xml, "tools-required", 0);
+        defenseBonus = getAttribute(in, "defense-bonus", 0);
+        hammersRequired = getAttribute(in, "hammers-required", 0);
+        toolsRequired = getAttribute(in, "tools-required", 0);
         
-        workPlaces = Xml.intAttribute(xml, "workplaces");
-        basicProduction = Xml.intAttribute(xml, "basicProduction", 0);
+        workPlaces = getAttribute(in, "workplaces", 0);
+        basicProduction = getAttribute(in, "basicProduction", 0);
         
-        consumes = goodsTypeByRef.get(Xml.attribute(xml, "consumes", null));
-        produces = goodsTypeByRef.get(Xml.attribute(xml, "produces", null));
+        consumes = goodsTypeByRef.get(in.getAttributeValue(null, "consumes"));
+        produces = goodsTypeByRef.get(in.getAttributeValue(null, "produces"));
         
-        minSkill = Xml.intAttribute(xml, "minSkill", Integer.MIN_VALUE);
-        maxSkill = Xml.intAttribute(xml, "maxSkill", Integer.MAX_VALUE);
+        minSkill = getAttribute(in, "minSkill", Integer.MIN_VALUE);
+        maxSkill = getAttribute(in, "maxSkill", Integer.MAX_VALUE);
         populationRequired = 1;
 
-          Xml.Method method = new Xml.Method() {
-            public void invokeOn(Node node) {
-                String childName = node.getNodeName();
-
-                if ("ability".equals(childName)) {
-                    String abilityId = Xml.attribute(node, "id");
-                    boolean value = Xml.booleanAttribute(node, "value");
-                    setAbility(abilityId, value);
-                } else if ("required-population".equals(childName)) {
-                    populationRequired = Xml.intAttribute(node, "value");
-                } else if (Modifier.getXMLElementTagName().equals(childName)) {
-                    Modifier modifier = new Modifier((Element) node);
-                    setModifier(modifier.getId(), modifier);
+        while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
+            String childName = in.getLocalName();
+            if ("ability".equals(childName)) {
+                String abilityId = in.getAttributeValue(null, "id");
+                boolean value = getAttribute(in, "value", true);
+                setAbility(abilityId, value);
+                in.nextTag(); // close this element
+            } else if ("required-population".equals(childName)) {
+                populationRequired = getAttribute(in, "value", 1);
+                in.nextTag(); // close this element
+            } else if (Modifier.getXMLElementTagName().equals(childName)) {
+                Modifier modifier = new Modifier(in);
+                setModifier(modifier.getId(), modifier); // Modifier close the element
+            } else {
+                logger.finest("Parsing of " + childName + " is not implemented yet");
+                while (in.nextTag() != XMLStreamConstants.END_ELEMENT ||
+                        !in.getLocalName().equals(childName)) {
+                    in.nextTag();
                 }
-              }
-          };
-  
-          Xml.forEachChild(xml, method);
+            }
+        }
     }
     
     public boolean canAdd(UnitType unitType) {

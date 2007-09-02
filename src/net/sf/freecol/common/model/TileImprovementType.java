@@ -1,17 +1,14 @@
 package net.sf.freecol.common.model;
 
-import java.lang.String;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import javax.xml.stream.XMLStreamConstants;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamReader;
 
 import net.sf.freecol.FreeCol;
-import net.sf.freecol.client.gui.i18n.Messages;
-import net.sf.freecol.common.util.Xml;
-
-import org.w3c.dom.Node;
-
 
 public final class TileImprovementType extends FreeColGameObjectType
 {
@@ -240,105 +237,95 @@ public final class TileImprovementType extends FreeColGameObjectType
 
     // ------------------------------------------------------------ API methods
 
-    public void readFromXmlElement(Node xml, final List<TileType> tileTypeList,
-                                   final Map<String, TileType> tileTypeByRef,
-                                   final Map<String, GoodsType> goodsTypeByRef,
-                                   final Map<String, TileImprovementType> tileImprovementTypeByRef) {
+    protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
+        readFromXML(in, null, null, null, null);
+    }
 
-        setID(Xml.attribute(xml, "id"));
-        natural = Xml.booleanAttribute(xml, "natural", false);
-        String s = Xml.attribute(xml, "occupation-string", "I");
+    public void readFromXML(XMLStreamReader in, final List<TileType> tileTypeList,
+           final Map<String, TileType> tileTypeByRef, final Map<String, GoodsType> goodsTypeByRef,
+           final Map<String, TileImprovementType> tileImprovementTypeByRef) throws XMLStreamException {
+        setID(in.getAttributeValue(null, "id"));
+        natural = getAttribute(in, "natural", false);
+        String s = getAttribute(in, "occupation-string", "I");
         occupationString = s.substring(0, 1);
-        addWorkTurns = Xml.intAttribute(xml, "add-works-turns", 0);
+        addWorkTurns = getAttribute(in, "add-works-turns", 0);
         movementCost = -1;
         movementCostFactor = -1;
         
-        String req = Xml.attribute(xml, "required-improvement", "");
+        String req = in.getAttributeValue(null, "required-improvement");
         requiredImprovementType = tileImprovementTypeByRef.get(req);
-        artOverlay = Xml.intAttribute(xml, "overlay", -1);
-        artOverTrees = Xml.booleanAttribute(xml, "over-trees", false);
+        artOverlay = getAttribute(in, "overlay", -1);
+        artOverTrees = getAttribute(in, "over-trees", false);
+
+        String g = in.getAttributeValue(null, "expended-goods-type");
+        expendedGoodsType = goodsTypeByRef.get(g);
+        expendedAmount = getAttribute(in, "expended-amount", 0);
+        g = in.getAttributeValue(null, "deliver-goods-type");
+        deliverGoodsType = goodsTypeByRef.get(g);
+        deliverAmount = getAttribute(in, "deliver-amount", 0);
 
         allowedWorkers = new HashSet<String>();
-        String[] workers = Xml.arrayAttribute(xml, "workers", new String[] {});
-        for(int i = 0; i < workers.length; i++) {
-            allowedWorkers.add(workers[i]);
-        }
-
-        String g = Xml.attribute(xml, "expended-goods-type", "");
-        expendedGoodsType = goodsTypeByRef.get(g);
-        expendedAmount = Xml.intAttribute(xml, "expended-amount", 0);
-        g = Xml.attribute(xml, "deliver-goods-type", "");
-        deliverGoodsType = goodsTypeByRef.get(g);
-        deliverAmount = Xml.intAttribute(xml, "deliver-amount", 0);
-
         allowedTileTypes = new ArrayList<TileType>();
         goodsEffect = new ArrayList<GoodsType>();
         goodsBonus = new ArrayList<Integer>();
         tileTypeChangeFrom = new ArrayList<TileType>();
         tileTypeChangeTo = new ArrayList<TileType>();
 
-        Xml.Method method = new Xml.Method() {
-            public void invokeOn(Node xml) {
-                String childName = xml.getNodeName();
+        while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
+            String childName = in.getLocalName();
+            if ("type".equals(childName)) {
+                typeId = in.getAttributeValue(null, "id");
+                magnitude = getAttribute(in, "magnitude", 1);
+                in.nextTag(); // close this element
 
-                if ("type".equals(childName)) {
-                    typeId = Xml.attribute(xml, "id", null);
-                    magnitude = Xml.intAttribute(xml, "magnitude", 1);
+            } else if ("tiles".equals(childName)) {
+                boolean allLand = getAttribute(in, "all-land-tiles", false);
+                boolean allForest = getAttribute(in, "all-forest-tiles", false);
+                boolean allWater = getAttribute(in, "all-water-tiles", false);
 
-                } else if ("tiles".equals(childName)) {
-                    boolean allLand = Xml.booleanAttribute(xml, "all-land-tiles", false);
-                    boolean allForest = Xml.booleanAttribute(xml, "all-forest-tiles", false);
-                    boolean allWater = Xml.booleanAttribute(xml, "all-water-tiles", false);
-
-                    for (TileType t : tileTypeList) {
-                        if (!allLand && !t.isWater() || !allForest && t.isForested()
-                            || !allWater && t.isWater()) {
-                            continue;
-                        }
-                        allowedTileTypes.add(t);
+                for (TileType t : tileTypeList) {
+                    if (!allLand && !t.isWater() || !allForest && t.isForested()
+                        || !allWater && t.isWater()) {
+                        continue;
                     }
-
-                    if (Xml.hasAttribute(xml, "tiles")) {
-                        String[] tiles = Xml.arrayAttribute(xml, "tiles");
-                        for (int j = 0; j < tiles.length; j++) {
-                            TileType t = tileTypeByRef.get(tiles[j]);
-                            if (t != null && allowedTileTypes.indexOf(t) < 0) {
-                                allowedTileTypes.add(t);
-                            }
-                        }
-                    }
-                } else if ("effect".equals(childName)) {
-                    if (Xml.hasAttribute(xml, "goods-type")) {
-                        String g = Xml.attribute(xml, "goods-type");
-                        GoodsType gt = goodsTypeByRef.get(g);
-                        if (gt != null) {
-                            goodsEffect.add(gt);
-                            goodsBonus.add(Xml.intAttribute(xml, "value"));
-                        }
-                    }
-                    if (Xml.hasAttribute(xml, "goods-types")) {
-                        String[] goods = Xml.arrayAttribute(xml, "goods-types");
-                        int[] bonus = Xml.intArrayAttribute(xml, "values", new int[] {});
-                        for (int i = 0; i < goods.length; i++) {
-                            GoodsType gt = goodsTypeByRef.get(goods[i]);
-                            if (gt != null && !goodsEffect.contains(gt)) {
-                                goodsEffect.add(gt);
-                                if (i < bonus.length) {
-                                    goodsBonus.add(bonus[i]);
-                                }
-                            }
-                        }
-                    }
-                    movementCost = Xml.intAttribute(xml, "movement-cost", -1);
-                    movementCostFactor = Xml.intAttribute(xml, "movement-cost-factor", -1);
-                } else if ("change".equals(childName)) {
-                    tileTypeChangeFrom.add(tileTypeByRef.get(Xml.attribute(xml, "from")));
-                    tileTypeChangeTo.add(tileTypeByRef.get(Xml.attribute(xml, "to")));
-                } else {
-                    throw new RuntimeException("unexpected: " + xml);
+                    allowedTileTypes.add(t);
                 }
+                in.nextTag(); // close this element
+                
+            } else if ("tile".equals(childName)) {
+                String tileId = in.getAttributeValue(null, "id");
+                allowedTileTypes.add(tileTypeByRef.get(tileId));
+                in.nextTag(); // close this element
+
+            } else if ("worker".equals(childName)) {
+                allowedWorkers.add(in.getAttributeValue(null, "id"));
+                in.nextTag(); // close this element
+
+            } else if ("effect".equals(childName)) {
+                if (hasAttribute(in, "goods-type")) {
+                    g = in.getAttributeValue(null, "goods-type");
+                    GoodsType gt = goodsTypeByRef.get(g);
+                    if (gt != null) {
+                        goodsEffect.add(gt);
+                        goodsBonus.add(Integer.parseInt(in.getAttributeValue(null, "value")));
+                    }
+                }
+                if (hasAttribute(in, "movement-cost")) {
+                    movementCost = getAttribute(in, "movement-cost", -1);
+                }
+                if (hasAttribute(in, "movement-cost-factor")) {
+                    movementCostFactor = getAttribute(in, "movement-cost-factor", -1);
+                }
+                in.nextTag(); // close this element
+                
+            } else if ("change".equals(childName)) {
+                tileTypeChangeFrom.add(tileTypeByRef.get(in.getAttributeValue(null, "from")));
+                tileTypeChangeTo.add(tileTypeByRef.get(in.getAttributeValue(null, "to")));
+                in.nextTag(); // close this element
+
+            } else {
+                throw new RuntimeException("unexpected: " + childName);
             }
-        };
-        Xml.forEachChild(xml, method);
+        }
     }   
 }

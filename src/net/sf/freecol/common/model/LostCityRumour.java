@@ -1,5 +1,8 @@
 package net.sf.freecol.common.model;
 
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamReader;
+
 
 /**
  * Represents a lost city rumour.
@@ -21,6 +24,9 @@ public class LostCityRumour extends FreeColGameObjectType {
         FOUNTAIN_OF_YOUTH = 7;
 
     public static final int NUMBER_OF_RUMOURS = 8;
+
+    protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
+    }
 }
 
 

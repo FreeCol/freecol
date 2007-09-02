@@ -434,7 +434,7 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
         detailPanel.setLayout(layout);
 
         String movementCost = String.valueOf(tileType.getBasicMoveCost() / 3);
-        String defenseBonus = String.valueOf(tileType.getDefenceFactor()-100) + "%";
+        String defenseBonus = String.valueOf(tileType.getDefenceBonus()) + "%";
 
         GoodsType secondaryGoodsType = Tile.secondaryGoods(tileType);
 

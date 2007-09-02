@@ -4,12 +4,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
-
-import net.sf.freecol.client.gui.i18n.Messages;
-import net.sf.freecol.common.util.Xml;
-
-import org.w3c.dom.Node;
-
+import javax.xml.stream.XMLStreamConstants;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamReader;
 
 public final class ResourceType extends FreeColGameObjectType
 {
@@ -110,13 +107,17 @@ public final class ResourceType extends FreeColGameObjectType
 
     // ------------------------------------------------------------ API methods
 
-    public void readFromXmlElement(Node xml, final Map<String, GoodsType> goodsTypeByRef) {
+    protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
+        readFromXML(in, null);
+    }
 
-        setID(Xml.attribute(xml, "id"));
-        art = Xml.attribute(xml, "art");
-        if ( Xml.hasAttribute(xml, "maximum-value") ) {
-            maxValue = Xml.intAttribute(xml, "maximum-value");
-            minValue = Xml.intAttribute(xml, "minimum-value", 0);
+    public void readFromXML(XMLStreamReader in, final Map<String, GoodsType> goodsTypeByRef)
+            throws XMLStreamException {
+        setID(in.getAttributeValue(null, "id"));
+        art = in.getAttributeValue(null, "art");
+        if (hasAttribute(in, "maximum-value")) {
+            maxValue = Integer.parseInt(in.getAttributeValue(null, "maximum-value"));
+            minValue = getAttribute(in, "minimum-value", 0);
         } else {
             maxValue = -1;
             minValue = -1;
@@ -126,16 +127,14 @@ public final class ResourceType extends FreeColGameObjectType
         bonusAmount = new ArrayList<Integer>();
         bonusFactor = new ArrayList<Float>();
         // Only expected child is 'production-bonus'
-        Xml.Method method = new Xml.Method() {
-            public void invokeOn(Node xml) {
-                String goods = Xml.attribute(xml, "goods-type");
-                GoodsType g = goodsTypeByRef.get(goods);
-                bonusGoods.add(g);
-                bonusAmount.add(Xml.intAttribute(xml, "bonus", 0));
-                bonusFactor.add(Xml.floatAttribute(xml, "factor", 1f));
-            }
-        };
-        Xml.forEachChild(xml, method);
+        while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
+            String goods = in.getAttributeValue(null, "goods-type");
+            GoodsType g = goodsTypeByRef.get(goods);
+            bonusGoods.add(g);
+            bonusAmount.add(getAttribute(in, "bonus", 0));
+            bonusFactor.add(getAttribute(in, "factor", 1f));
+            in.nextTag(); // close this element
+        }
     }
     
 }

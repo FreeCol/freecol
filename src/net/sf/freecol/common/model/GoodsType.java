@@ -3,12 +3,11 @@ package net.sf.freecol.common.model;
 
 
 import java.util.Map;
+import javax.xml.stream.XMLStreamConstants;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamReader;
 
 import net.sf.freecol.client.gui.i18n.Messages;
-import net.sf.freecol.common.util.Xml;
-
-import org.w3c.dom.Node;
-
 
 public final class GoodsType extends FreeColGameObjectType
 {
@@ -116,16 +115,20 @@ public final class GoodsType extends FreeColGameObjectType
 
     // ------------------------------------------------------------ API methods
 
-    public void readFromXmlElement( Node xml, Map<String, GoodsType> goodsTypeByRef ) {
+    protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
+        readFromXML(in, null);
+    }
 
-        setID(Xml.attribute(xml, "id"));
-        isFarmed = Xml.booleanAttribute(xml, "is-farmed");
-        isFood = Xml.booleanAttribute(xml, "is-food", false);
-        ignoreLimit = Xml.booleanAttribute(xml, "ignore-limit", false);
-        art = Xml.attribute(xml, "art");
+    public void readFromXML(XMLStreamReader in, final Map<String, GoodsType> goodsTypeByRef)
+            throws XMLStreamException {
+        setID(in.getAttributeValue(null, "id"));
+        isFarmed = parseTruth(in.getAttributeValue(null, "is-farmed"));
+        isFood = getAttribute(in, "is-food", false);
+        ignoreLimit = getAttribute(in, "ignore-limit", false);
+        art = in.getAttributeValue(null, "art");
 
-        if (Xml.hasAttribute(xml, "made-from")) {
-            String  madeFromRef = Xml.attribute(xml, "made-from");
+        if (hasAttribute(in, "made-from")) {
+            String  madeFromRef = in.getAttributeValue(null, "made-from");
             GoodsType  rawMaterial = goodsTypeByRef.get(madeFromRef);
             madeFrom = rawMaterial;
             if (rawMaterial != null) {
@@ -133,20 +136,18 @@ public final class GoodsType extends FreeColGameObjectType
             }
         }
 
-        storable = Xml.booleanAttribute(xml, "storable", true);
-        if (Xml.hasAttribute(xml, "stored-as")) {
-            storedAs = goodsTypeByRef.get(Xml.attribute(xml, "stored-as"));
+        storable = getAttribute(in, "storable", true);
+        if (hasAttribute(in, "stored-as")) {
+            storedAs = goodsTypeByRef.get(in.getAttributeValue(null, "stored-as"));
         }
 
         // Only expected child is 'market'
-        Xml.Method method = new Xml.Method() {
-            public void invokeOn(Node xml) {
-                initialAmount = Xml.intAttribute(xml, "initial-amount");
-                initialPrice = Xml.intAttribute(xml, "initial-price");
-                priceDiff = Xml.intAttribute(xml, "price-difference");
-            }
-        };
-        Xml.forEachChild(xml, method);
+        while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
+            initialAmount = Integer.parseInt(in.getAttributeValue(null, "initial-amount"));
+            initialPrice = getAttribute(in, "initial-price", 1);
+            priceDiff = getAttribute(in, "price-difference", 1);
+            in.nextTag(); // close this element
+        }
     }
 
 }

@@ -5,13 +5,9 @@ import java.awt.Color;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import org.w3c.dom.Element;
-
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
-import net.sf.freecol.client.gui.i18n.Messages;
-import net.sf.freecol.common.util.Xml;
+import javax.xml.stream.XMLStreamConstants;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamReader;
 
 /**
  * Represents one of the Indian nations present in the game.
@@ -116,12 +112,12 @@ public class IndianNationType extends NationType {
         return skills;
     }
 
-    public void readFromXmlElement(Node xml, Map<String, UnitType> unitTypeByRef) {
+    public void readFromXML(XMLStreamReader in, final Map<String, UnitType> unitTypeByRef)
+            throws XMLStreamException {
+        setID(in.getAttributeValue(null, "id"));
+        setColor(new Color(Integer.parseInt(in.getAttributeValue(null, "color"), 16)));
 
-        setID(Xml.attribute(xml, "id"));
-        setColor(new Color(Integer.parseInt(Xml.attribute(xml, "color"), 16)));
-
-        String valueString = Xml.attribute(xml, "number-of-settlements");
+        String valueString = in.getAttributeValue(null, "number-of-settlements");
         if ("low".equals(valueString)) {
             numberOfSettlements = LOW;
         } else if ("average".equals(valueString)) {
@@ -133,7 +129,7 @@ public class IndianNationType extends NationType {
                                                valueString);
         }
 
-        valueString = Xml.attribute(xml, "aggression");
+        valueString = in.getAttributeValue(null, "aggression");
         if ("low".equals(valueString)) {
             aggression = LOW;
         } else if ("average".equals(valueString)) {
@@ -145,7 +141,7 @@ public class IndianNationType extends NationType {
                                                valueString);
         }
 
-        valueString = Xml.attribute(xml, "type-of-settlement");
+        valueString = in.getAttributeValue(null, "type-of-settlement");
         if ("teepee".equals(valueString)) {
             typeOfSettlement = TEEPEE;
         } else if ("longhouse".equals(valueString)) {
@@ -157,21 +153,21 @@ public class IndianNationType extends NationType {
                                                valueString);
         }
 
-        Xml.Method method = new Xml.Method() {
-                public void invokeOn(Node node) {
-                    if ("ability".equals(node.getNodeName())) {
-                        String abilityId = Xml.attribute(node, "id");
-                        boolean value = Xml.booleanAttribute(node, "value");
-                        setAbility(abilityId, value);
-                    } else if (Modifier.getXMLElementTagName().equals(node.getNodeName())) {
-                        Modifier modifier = new Modifier((Element) node);
-                        setModifier(modifier.getId(), modifier);
-                    } else if ("skill".equals(node.getNodeName())) {
-                        skills.add(Xml.attribute(node, "id"));
-                    }
-                }
-            };
-        Xml.forEachChild(xml, method);
+        while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
+            String childName = in.getLocalName();
+            if ("ability".equals(childName)) {
+                String abilityId = in.getAttributeValue(null, "id");
+                boolean value = getAttribute(in, "value", true);
+                setAbility(abilityId, value);
+                in.nextTag(); // close this element
+            } else if (Modifier.getXMLElementTagName().equals(childName)) {
+                Modifier modifier = new Modifier(in); // Modifier close the element
+                setModifier(modifier.getId(), modifier);
+            } else if ("skill".equals(childName)) {
+                skills.add(in.getAttributeValue(null, "id"));
+                in.nextTag(); // close this element
+            }
+        }
     }
 
 }

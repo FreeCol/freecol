@@ -1,21 +1,19 @@
 package net.sf.freecol.client.gui.action;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-
-import net.sf.freecol.FreeCol;
+import javax.xml.stream.XMLStreamConstants;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamReader;
+import net.sf.freecol.common.model.FreeColGameObjectType;
 import net.sf.freecol.common.model.TileImprovementType;
-import net.sf.freecol.common.util.Xml;
-
-import org.w3c.dom.Node;
 
 /**
  * A storage class for ImprovementActionType used to create ImprovementActions.
  * Filled by Specification.java, utilized by ActionManager.java
  */
-public final class ImprovementActionType
+public final class ImprovementActionType extends FreeColGameObjectType
 {
     public static final  String  COPYRIGHT = "Copyright (C) 2003-2006 The FreeCol Team";
 
@@ -23,7 +21,6 @@ public final class ImprovementActionType
 
     public static final  String  REVISION = "$Revision: 2889 $";
 
-    private String id;
     private char accelerator;
     
     private final List<String> names;
@@ -39,10 +36,6 @@ public final class ImprovementActionType
     }
 
     // ------------------------------------------------------------ retrieval methods
-
-    public String getID() {
-        return id;
-    }
 
     public char getAccelerator() {
         return accelerator;
@@ -62,18 +55,21 @@ public final class ImprovementActionType
 
     // ------------------------------------------------------------ API methods
 
-    public void readFromXmlElement(Node xml, final Map<String, TileImprovementType> tileImprovementTypeByRef) {
-        id = Xml.attribute(xml, "id");
-        accelerator = Xml.charAttribute(xml, "accelerator");
+    protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
+        readFromXML(in, null);
+    }
 
-        Xml.Method method = new Xml.Method() {
-            public void invokeOn(Node xml) {
-                names.add(Xml.attribute(xml, "name"));
-                String t = Xml.attribute(xml, "tileimprovement-type");
-                impTypes.add(tileImprovementTypeByRef.get(t));
-                imageIDs.add(Xml.intAttribute(xml, "image-id"));
-            }
-        };
-        Xml.forEachChild(xml, method);
+    public void readFromXML(XMLStreamReader in, final Map<String, TileImprovementType> tileImprovementTypeByRef)
+           throws XMLStreamException {
+        setID(in.getAttributeValue(null, "id"));
+        accelerator = in.getAttributeValue(null, "accelerator").charAt(0);
+
+        while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
+            names.add(in.getAttributeValue(null, "name"));
+            String t = in.getAttributeValue(null, "tileimprovement-type");
+            impTypes.add(tileImprovementTypeByRef.get(t));
+            imageIDs.add(Integer.parseInt(in.getAttributeValue(null, "image-id")));
+            in.nextTag(); // close this element
+        }
     }   
 }

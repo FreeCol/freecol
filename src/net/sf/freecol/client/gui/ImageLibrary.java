@@ -156,7 +156,7 @@ public final class ImageLibrary extends ImageProvider {
     private static final String path = new String("images/"), extension = new String(".png"),
             unitsDirectory = new String("units/"), unitsName = new String("Unit"),
             terrainDirectory = new String("terrain/"),
-            tileName = new String("center/"), borderName = new String("border"),
+            tileName = new String("center"), borderName = new String("border"),
             unexploredDirectory = new String("unexplored/"), unexploredName = new String("unexplored"),
             riverDirectory = new String("river/"), riverName = new String("river"),
             miscDirectory = new String("misc/"), miscName = new String("Misc"),
