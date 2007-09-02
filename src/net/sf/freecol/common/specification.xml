@@ -1047,4 +1047,32 @@
     </founding-father>
   </founding-fathers>
 
+  <nation-types>
+    <nation-type id="model.nation.dutch" color="ff9d3c">
+      <modifier id="model.modifier.tradeBonus" type="percentage" value="50"/>
+      <unit id="model.unit.freeColonist" tools="100"/>
+      <unit id="model.unit.freeColonist" armed="yes"/>
+      <unit id="model.unit.merchantman"/>
+    </nation-type>
+    <nation-type id="model.nation.french" color="0000ff">
+      <modifier id="model.modifier.nativeAlarmBonus" type="percentage" value="-50"/>
+      <unit id="model.unit.hardyPionieer" tools="100"/>
+      <unit id="model.unit.freeColonist" armed="yes"/>
+      <unit id="model.unit.caravel"/>
+    </nation-type>
+    <nation-type id="model.nation.english" color="ff0000">
+      <production-bonus goods-type="model.goods.crosses" factor="150"/>
+      <unit id="model.unit.freeColonist" tools="100"/>
+      <unit id="model.unit.freeColonist" armed="yes"/>
+      <unit id="model.unit.caravel"/>
+    </nation-type>
+    <nation-type id="model.nation.spanish" color="ffff00">
+      <modifier id="model.modifier.nativeConvertBonus" type="percentage" value="200"/>
+      <modifier id="model.modifier.nativeTreasureBonus" type="percentage" value="200"/>
+      <unit id="model.unit.freeColonist" tools="100"/>
+      <unit id="model.unit.veteranSoldier" armed="yes" mounted="yes"/>
+      <unit id="model.unit.caravel"/>
+    </nation-type>
+  </nation-types>
+
 </freecol-specification>

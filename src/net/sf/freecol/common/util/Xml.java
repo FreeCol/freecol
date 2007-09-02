@@ -246,7 +246,8 @@ public final class Xml
 
     private static boolean parseTruth( String truthAsString )
     {
-        if ( "yes".equals(truthAsString) ) {
+        if ( "yes".equals(truthAsString) ||
+             "true".equals(truthAsString) ) {
             return true;
         }
         else if ( "no".equals(truthAsString) ) {

@@ -13,6 +13,7 @@ import net.sf.freecol.common.model.FoundingFather;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.BuildingType;
 import net.sf.freecol.common.model.GoodsType;
+import net.sf.freecol.common.model.NationType;
 import net.sf.freecol.common.model.ResourceType;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.TileType;
@@ -52,6 +53,8 @@ public final class Specification {
 
     private final List<FoundingFather> foundingFathers;
 
+    private final List<NationType> nationTypes;
+
     public Specification() {
         logger.info("Initializing Specification");
 
@@ -63,6 +66,7 @@ public final class Specification {
         improvementActionTypeList = new ArrayList<ImprovementActionType>();
         unitTypeList = new ArrayList<UnitType>();
         foundingFathers = new ArrayList<FoundingFather>();
+        nationTypes = new ArrayList<NationType>();
 
         final Map<String, GoodsType> goodsTypeByRef = new HashMap<String, GoodsType>();
         final Map<String, ResourceType> resourceTypeByRef = new HashMap<String, ResourceType>();
@@ -82,6 +86,7 @@ public final class Specification {
 
                 if ("goods-types".equals(childName)) {
 
+                    logger.finest("Found child named " + childName);
                     ObjectFactory<GoodsType> factory = new ObjectFactory<GoodsType>() {
                         int goodsIndex = 0;
                         public GoodsType objectFrom(Node xml) {
@@ -98,6 +103,7 @@ public final class Specification {
 
                 } else if ("building-types".equals(childName)) {
 
+                    logger.finest("Found child named " + childName);
                     ObjectFactory<BuildingType> factory = new ObjectFactory<BuildingType>() {
                         int buildingIndex = 0;
                         public BuildingType objectFrom(Node xml) {
@@ -111,6 +117,7 @@ public final class Specification {
 
                 } else if ("resource-types".equals(childName)) {
 
+                    logger.finest("Found child named " + childName);
                     ObjectFactory<ResourceType> factory = new ObjectFactory<ResourceType>() {
                         int resIndex = 0;
                         public ResourceType objectFrom(Node xml) {
@@ -124,6 +131,7 @@ public final class Specification {
 
                 } else if ("tile-types".equals(childName)) {
 
+                    logger.finest("Found child named " + childName);
                     ObjectFactory<TileType> factory = new ObjectFactory<TileType>() {
                         int tileIndex = 0;
                         public TileType objectFrom(Node xml) {
@@ -137,6 +145,7 @@ public final class Specification {
 
                 } else if ("tileimprovement-types".equals(childName)) {
                     
+                    logger.finest("Found child named " + childName);
                     ObjectFactory<TileImprovementType> factory = new ObjectFactory<TileImprovementType>() {
                         int impIndex = 0;
                         public TileImprovementType objectFrom(Node xml) {
@@ -151,6 +160,7 @@ public final class Specification {
 
                 } else if ("improvementaction-types".equals(childName)) {
 
+                    logger.finest("Found child named " + childName);
                     ObjectFactory<ImprovementActionType> factory = new ObjectFactory<ImprovementActionType>() {
                         
                         public ImprovementActionType objectFrom(Node xml) {
@@ -163,6 +173,7 @@ public final class Specification {
 
                 } else if ("unit-types".equals(childName)) {
 
+                    logger.finest("Found child named " + childName);
                     ObjectFactory<UnitType> factory = new ObjectFactory<UnitType>() {
                         int unitIndex = 0;
                         public UnitType objectFrom(Node xml) {
@@ -175,6 +186,7 @@ public final class Specification {
 
                 } else if ("founding-fathers".equals(childName)) {
 
+                    logger.finest("Found child named " + childName);
                     ObjectFactory<FoundingFather> factory = new ObjectFactory<FoundingFather>() {
                         int fatherIndex = 0;
                         public FoundingFather objectFrom(Node xml) {
@@ -184,6 +196,19 @@ public final class Specification {
                         }
                     };
                     foundingFathers.addAll(makeListFromXml(xml, factory));
+ 
+                } else if ("nation-types".equals(childName)) {
+
+                    logger.finest("Found child named " + childName);
+                    ObjectFactory<NationType> factory = new ObjectFactory<NationType>() {
+                        int nationIndex = 0;
+                        public NationType objectFrom(Node xml) {
+                            NationType nationType = new NationType(nationIndex++);
+                            nationType.readFromXmlElement(xml, goodsTypeByRef);
+                            return nationType;
+                        }
+                    };
+                    nationTypes.addAll(makeListFromXml(xml, factory));
  
                 } else {
                     throw new RuntimeException("unexpected: " + xml);
@@ -519,6 +544,12 @@ public final class Specification {
             }
         }
         return null;
+    }
+
+    // -- NationTypes --
+
+    public List<NationType> getNationTypes() {
+        return nationTypes;
     }
 
     /**

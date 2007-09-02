@@ -75,7 +75,7 @@ public class ModelMessage {
         }
         if (!(display instanceof FreeColGameObject ||
               display instanceof FreeColGameObjectType)) {
-            throw new IllegalArgumentException("The display must be a FreeColGameObject or FreeColGameObjectType or LostCityRumour!");
+            throw new IllegalArgumentException("The display must be a FreeColGameObject or FreeColGameObjectType!");
         }
 
         if (data != null) {
