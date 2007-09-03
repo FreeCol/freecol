@@ -1,15 +1,18 @@
 package net.sf.freecol.common.model;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.Vector;
+import java.util.List;
 import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
+
+import net.sf.freecol.FreeCol;
 
 /**
  * The main component of the game model.
@@ -32,10 +35,10 @@ public class Game extends FreeColGameObject {
 
     /** A virtual player to use with enemy privateers */
     // TODO: Using null here throws a warning. A Player should belong to a Game.
-    public static final Player unknownEnemy = new Player(null, "", false, Player.NO_NATION);
+    public static final Player unknownEnemy = new Player(null, "", false, null);
 
     /** Contains all the players in the game. */
-    private Vector<Player> players = new Vector<Player>();
+    private List<Player> players = new ArrayList<Player>();
 
     private Map map;
 
@@ -435,24 +438,20 @@ public class Game extends FreeColGameObject {
      * 
      * @return A vacant nation.
      */
-    public int getVacantNation() {
-        boolean[] nationTaken = new boolean[4];
-
-        Iterator<Player> playerIterator = getPlayerIterator();
-        while (playerIterator.hasNext()) {
-            Player player = playerIterator.next();
-            if (player.getNation() < 4) {
-                nationTaken[player.getNation()] = true;
+    public EuropeanNationType getVacantNation() {
+        for (EuropeanNationType nation : FreeCol.getSpecification().getEuropeanNationTypes()) {
+            boolean taken = false;
+            for (Player player : getPlayers()) {
+                if (player.getNation() == nation) {
+                    taken = true;
+                    break;
+                }
+            }
+            if (!taken) {
+                return nation;
             }
         }
-
-        for (int i = 0; i < nationTaken.length; i++) {
-            if (!nationTaken[i]) {
-                return i;
-            }
-        }
-
-        return -1;
+        return null;
     }
 
     /**
@@ -461,7 +460,7 @@ public class Game extends FreeColGameObject {
      * @param nation The nation.
      * @return The <code>Player</code> of the given nation.
      */
-    public Player getPlayer(int nation) {
+    public Player getPlayer(NationType nation) {
         Iterator<Player> playerIterator = getPlayerIterator();
         while (playerIterator.hasNext()) {
             Player player = playerIterator.next();
@@ -471,6 +470,10 @@ public class Game extends FreeColGameObject {
         }
 
         return null;
+    }
+
+    public Player getPlayer(int index) {
+        return players.get(index);
     }
 
     /**
@@ -644,7 +647,7 @@ public class Game extends FreeColGameObject {
      * 
      * @return The <code>Vector</code>.
      */
-    public Vector<Player> getPlayers() {
+    public List<Player> getPlayers() {
         return players;
     }
 
@@ -653,15 +656,15 @@ public class Game extends FreeColGameObject {
      * 
      * @return All the European players known by the player of this game.
      */
-    public Vector<Player> getEuropeanPlayers() {
-        Vector<Player> europeans = new Vector<Player>();
+    public List<Player> getEuropeanPlayers() {
+        List<Player> europeans = new ArrayList<Player>();
         Iterator<Player> playerIterator = getPlayerIterator();
 
         while (playerIterator.hasNext()) {
             Player player = playerIterator.next();
 
             if (player.isEuropean()) {
-                europeans.addElement(player);
+                europeans.add(player);
             }
         }
         return europeans;

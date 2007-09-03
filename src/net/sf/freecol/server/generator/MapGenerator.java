@@ -21,6 +21,7 @@ import net.sf.freecol.common.FreeColException;
 import net.sf.freecol.common.model.Building;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.ColonyTile;
+import net.sf.freecol.common.model.EuropeanNationType;
 import net.sf.freecol.common.model.FreeColGameObject;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Goods;
@@ -261,14 +262,14 @@ public class MapGenerator {
      *       european players. If players does not contain any indian players, 
      *       no settlements are added.
      */
-    protected void createIndianSettlements(Map map, Vector<Player> players) {
+    protected void createIndianSettlements(Map map, List<Player> players) {
         Collections.sort(players, new Comparator<Player>() {
             public int compare(Player o, Player p) {
-                return o.getNation() - p.getNation();
+                return o.getIndex() - p.getIndex();
             }
         });
 
-        Vector<Player> indians = new Vector<Player>();
+        List<Player> indians = new ArrayList<Player>();
 
         for (Player player : players) {
             if (player.isIndian())
@@ -347,7 +348,7 @@ public class MapGenerator {
      *      on the map.
      */
     private IndianSettlement placeIndianSettlement(Player player, int tribe, boolean capital,
-                                       Position position, Map map, Vector<Player> players) {
+                                       Position position, Map map, List<Player> players) {
         final int kind = IndianSettlement.getKind(tribe);
         final Tile tile = map.getTile(position);
         IndianSettlement settlement = new IndianSettlement(map.getGame(), player,
@@ -365,7 +366,7 @@ public class MapGenerator {
         while (circleIterator.hasNext()) {
             Position adjPos = circleIterator.next();
             map.getTile(adjPos).setClaim(Tile.CLAIM_CLAIMED);
-            map.getTile(adjPos).setNationOwner(player.getNation());
+            map.getTile(adjPos).setNationOwner(player);
         }
 
         for (int i = 0; i < (kind * 2) + 4; i++) {
@@ -457,7 +458,7 @@ public class MapGenerator {
      *      and starting locations for. That is; both indian and 
      *      european players.
      */
-    protected void createEuropeanUnits(Map map, Vector<Player> players) {
+    protected void createEuropeanUnits(Map map, List<Player> players) {
         final int width = map.getWidth();
         final int height = map.getHeight();
         int[] shipYPos = new int[NUM_STARTING_LOCATIONS];
@@ -466,7 +467,7 @@ public class MapGenerator {
         }
 
         for (int i = 0; i < players.size(); i++) {
-            Player player = players.elementAt(i);
+            Player player = players.get(i);
             if (player.isREF()) {
                 player.setEntryLocation(map.getTile(width - 2, random.nextInt(height - 20) + 10));
                 continue;
@@ -489,6 +490,26 @@ public class MapGenerator {
             startTile.setExploredBy(player, true);
             player.setEntryLocation(startTile);
 
+            Unit carrier = null;
+            List<Unit> units = new ArrayList<Unit>();
+            List<EuropeanNationType.StartingUnit> unitList = ((EuropeanNationType) player.getNation()).getStartingUnits();
+            for (EuropeanNationType.StartingUnit startingUnit : unitList) {
+                Unit newUnit = new Unit(map.getGame(), startTile, player, startingUnit.unitType,
+                                        Unit.SENTRY, startingUnit.armed, startingUnit.mounted,
+                                        startingUnit.tools, startingUnit.missionary);
+                if (newUnit.isNaval()) {
+                    carrier = newUnit;
+                }
+            }
+            if (carrier != null) {
+                for (Unit unit : units) {
+                    if (!unit.isNaval()) {
+                        unit.setLocation(carrier);
+                    }
+                }
+            }
+            
+            /**
             // TODO: make this generic!
             UnitType navalUnitType = (player.getNation() == ServerPlayer.DUTCH) ?
                 FreeCol.getSpecification().getUnitType("model.unit.merchantman") :
@@ -504,6 +525,7 @@ public class MapGenerator {
             //unit1.setName(Messages.message("shipName." + player.getNation() + ".0"));
             @SuppressWarnings("unused") Unit unit2 = new Unit(map.getGame(), unit1, player, pioneerUnitType, Unit.SENTRY, false, false, 100, false);
             @SuppressWarnings("unused") Unit unit3 = new Unit(map.getGame(), unit1, player, soldierUnitType, Unit.SENTRY, true, false, 0, false);
+            */
 
             // START DEBUG:
             if (FreeCol.isInDebugMode()) {

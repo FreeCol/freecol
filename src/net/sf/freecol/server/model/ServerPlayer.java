@@ -11,6 +11,7 @@ import javax.xml.stream.XMLStreamWriter;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.GameOptions;
 import net.sf.freecol.common.model.Map;
+import net.sf.freecol.common.model.NationType;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
@@ -78,7 +79,8 @@ public class ServerPlayer extends Player implements ServerModelObject {
     * @param connection The <code>Connection</code> for the above mentioned socket.
     * @param nation The nation of the <code>Player</code>.
     */
-    public ServerPlayer(Game game, String name, boolean admin, boolean ai, Socket socket, Connection connection, int nation) {
+    public ServerPlayer(Game game, String name, boolean admin, boolean ai, Socket socket, Connection connection,
+                        NationType nation) {
         super(game, name, admin, ai, nation);
 
         this.socket = socket;

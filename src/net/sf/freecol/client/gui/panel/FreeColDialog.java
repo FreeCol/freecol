@@ -14,7 +14,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Vector;
+import java.util.List;
 import java.util.logging.Logger;
 
 import javax.swing.AbstractAction;
@@ -1020,7 +1020,7 @@ public class FreeColDialog extends FreeColPanel {
     *
     * @return The FreeColDialog that asks the question to the user.
     */
-    public static FreeColDialog createInciteDialog(Vector<Player> allPlayers, Player thisUser) {
+    public static FreeColDialog createInciteDialog(List<Player> allPlayers, Player thisUser) {
         String mainText = Messages.message("missionarySettlement.inciteQuestion");
 
         final JTextArea question = getDefaultTextArea(mainText);

@@ -1066,7 +1066,7 @@
       <unit id="model.unit.caravel"/>
     </european-nation-type>
     <european-nation-type id="model.nation.english" color="ff0000">
-      <modifier id="model.goods.Crosses" type="percentage" value="50"/>
+      <modifier id="model.modifier.religiousUnrestBonus" type="percentage" value="-33"/>
       <unit id="model.unit.freeColonist" tools="100"/>
       <unit id="model.unit.freeColonist" armed="yes"/>
       <unit id="model.unit.caravel"/>

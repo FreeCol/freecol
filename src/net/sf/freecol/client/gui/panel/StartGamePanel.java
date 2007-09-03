@@ -4,7 +4,8 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.Vector;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Logger;
 
 import javax.swing.JButton;
@@ -18,6 +19,7 @@ import javax.swing.table.AbstractTableModel;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableColumn;
 
+import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.control.PreGameController;
 import net.sf.freecol.client.gui.Canvas;
@@ -351,7 +353,7 @@ class PlayersTableModel extends AbstractTableModel {
     @SuppressWarnings("unused")
     private FreeColClient freeColClient;
 
-    private Vector<Player> players;
+    private List<Player> players;
 
     private Player thisPlayer;
 
@@ -370,7 +372,7 @@ class PlayersTableModel extends AbstractTableModel {
      */
     public PlayersTableModel(FreeColClient freeColClient, PreGameController pgc) {
         this.freeColClient = freeColClient;
-        players = new Vector<Player>();
+        players = new ArrayList<Player>();
         thisPlayer = null;
         preGameController = pgc;
     }
@@ -384,7 +386,7 @@ class PlayersTableModel extends AbstractTableModel {
      * @param owningPlayer The player running the client that is displaying the
      *            table.
      */
-    public void setData(Vector<Player> myPlayers, Player owningPlayer) {
+    public void setData(List<Player> myPlayers, Player owningPlayer) {
         players = myPlayers;
         thisPlayer = owningPlayer;
     }
@@ -450,7 +452,7 @@ class PlayersTableModel extends AbstractTableModel {
             case 0:
                 return player.getName();
             case 1:
-                return new Integer(player.getNation());
+                return new Integer(player.getIndex());
             default:
                 return player.getColor();
             }
@@ -487,8 +489,8 @@ class PlayersTableModel extends AbstractTableModel {
 
             if (column == 1) {
                 int nation = ((Integer) value).intValue();
-                preGameController.setNation(nation);
-                preGameController.setColor(Player.getDefaultNationColor(nation));
+                preGameController.setNation(FreeCol.getSpecification().getNationType(nation));
+                preGameController.setColor(FreeCol.getSpecification().getNationType(nation).getColor());
                 fireTableCellUpdated(row, 2);
             } else if (column == 2) {
                 preGameController.setColor((Color) value);

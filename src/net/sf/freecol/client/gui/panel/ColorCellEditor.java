@@ -5,7 +5,7 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.Vector;
+import java.util.List;
 import java.util.logging.Logger;
 
 import javax.swing.AbstractCellEditor;
@@ -44,7 +44,7 @@ public final class ColorCellEditor extends AbstractCellEditor implements TableCe
     private final Canvas               canvas;
 
     private Color currentColor;
-    private Vector<Player> players;
+    private List<Player> players;
     private int lastRow;
     private Player thisPlayer;
 
@@ -112,7 +112,7 @@ public final class ColorCellEditor extends AbstractCellEditor implements TableCe
     * @param players The players that should be edited in the table.
     * @param owningPlayer The player running the client that is displaying the table.
     */
-    public void setData(Vector<Player> players, Player owningPlayer) {
+    public void setData(List<Player> players, Player owningPlayer) {
         this.players = players;
         thisPlayer = owningPlayer;
     }

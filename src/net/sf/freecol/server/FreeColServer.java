@@ -433,7 +433,7 @@ public final class FreeColServer {
      *         includes european players currently controlled by the AI.
      */
     public int getSlotsAvailable() {
-        Vector<Player> players = game.getPlayers();
+        List<Player> players = game.getPlayers();
         int n = game.getMaximumPlayers();
         for (int i = 0; i < players.size(); i++) {
             ServerPlayer p = (ServerPlayer) players.get(i);
@@ -453,7 +453,7 @@ public final class FreeColServer {
      * @return The number.
      */
     public int getNumberOfLivingHumanPlayers() {
-        Vector<Player> players = game.getPlayers();
+        List<Player> players = game.getPlayers();
         int n = 0;
         for (int i = 0; i < players.size(); i++) {
             if (!((ServerPlayer) players.get(i)).isAI() && !((ServerPlayer) players.get(i)).isDead()

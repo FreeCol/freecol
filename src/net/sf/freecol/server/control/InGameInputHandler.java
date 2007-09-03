@@ -981,7 +981,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
          * It should not be possible to find an indian burial ground outside
          * indian territory:
          */
-        if (tile.getNationOwner() == Player.NO_NATION || Player.isEuropean(tile.getNationOwner())) {
+        if (tile.getNationOwner() == null || tile.getNationOwner().isEuropean()) {
             probability[LostCityRumour.BURIAL_GROUND] = 0;
         }
         int accumulator = 0;
@@ -1005,7 +1005,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         dx = 10 - player.getDifficulty(); // 6-10
         switch (rumour) {
         case LostCityRumour.BURIAL_GROUND:
-            Player indianPlayer = getGame().getPlayer(unit.getTile().getNationOwner());
+            Player indianPlayer = unit.getTile().getNationOwner();
             indianPlayer.modifyTension(player, Tension.TENSION_HATEFUL);
             break;
         case LostCityRumour.EXPEDITION_VANISHES:
@@ -1499,7 +1499,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         Tile tile = map.getNeighbourOrNull(Map.getReverseDirection(direction), unit.getTile());
         unit.setLocation(tile);
         if (!cancelAction) {
-            switch (settlement.getAlarm(player.getNation()).getLevel()) {
+            switch (settlement.getAlarm(player).getLevel()) {
             case Tension.HATEFUL:
                 reply.setAttribute("result", "die");
                 unit.dispose();
@@ -1571,7 +1571,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
             // do it.
             unit.setMovesLeft(1);
             return null;
-        } else if (settlement.getAlarm(player.getNation()).getLevel() == Tension.HATEFUL) {
+        } else if (settlement.getAlarm(player).getLevel() == Tension.HATEFUL) {
             reply.setAttribute("result", "die");
             unit.dispose();
         } else if (action.equals("speak")) {

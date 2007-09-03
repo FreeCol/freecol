@@ -488,18 +488,7 @@ public final class Europe extends FreeColGameObject implements Location,
      * Returns a suitable name.
      */
     public String toString() {
-        switch (getOwner().getNation()) {
-        case Player.DUTCH:
-            return Messages.message("model.nation.Dutch.Europe");
-        case Player.ENGLISH:
-            return Messages.message("model.nation.English.Europe");
-        case Player.FRENCH:
-            return Messages.message("model.nation.French.Europe");
-        case Player.SPANISH:
-            return Messages.message("model.nation.Spanish.Europe");
-        default:
-            return "Europe";
-        }
+        return ((EuropeanNationType) getOwner().getNation()).getEuropeName();
     }
 
     /**

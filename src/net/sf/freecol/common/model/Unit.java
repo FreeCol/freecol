@@ -1886,11 +1886,11 @@ public class Unit extends FreeColGameObject implements Abilities, Locatable, Loc
                     throw new NullPointerException();
                 }
 
-                if (t.getSettlement() != null && !t.getSettlement().getOwner().hasContacted(getOwner().getNation())) {
+                if (t.getSettlement() != null && !t.getSettlement().getOwner().hasContacted(getOwner())) {
                     t.getSettlement().getOwner().setContacted(getOwner(), true);
                     getOwner().setContacted(t.getSettlement().getOwner(), true);
                 } else if (t.isLand() && t.getFirstUnit() != null
-                        && !t.getFirstUnit().getOwner().hasContacted(getOwner().getNation())) {
+                        && !t.getFirstUnit().getOwner().hasContacted(getOwner())) {
                     t.getFirstUnit().getOwner().setContacted(getOwner(), true);
                     getOwner().setContacted(t.getFirstUnit().getOwner(), true);
                 }
@@ -2380,7 +2380,7 @@ public class Unit extends FreeColGameObject implements Abilities, Locatable, Loc
      * 
      * @return The nation the unit is serving.
      */
-    public int getNation() {
+    public NationType getNation() {
         return owner.getNation();
     }
 
@@ -2997,7 +2997,7 @@ public class Unit extends FreeColGameObject implements Abilities, Locatable, Loc
             throw new IllegalStateException("A Unit can only build a colony if on the same tile as the colony");
         }
 
-        getTile().setNationOwner(owner.getNation());
+        getTile().setNationOwner(owner);
         getTile().setSettlement(colony);
         setLocation(colony);
 
@@ -4127,9 +4127,7 @@ public class Unit extends FreeColGameObject implements Abilities, Locatable, Loc
                 randomTreasure = (int) modifier.applyTo(randomTreasure);
             }
 
-            // Incan and Aztecs give more gold
-            // TODO: make this part of the NationType
-            if (enemy.getNation() == Player.INCA || enemy.getNation() == Player.AZTEC) {
+            if (((IndianNationType) enemy.getNation()).getTypeOfSettlement() == IndianNationType.CITY) {
                 tTrain.setTreasureAmount(randomTreasure * 500 + 10000);
             } else {
                 tTrain.setTreasureAmount(randomTreasure * 50  + 300);

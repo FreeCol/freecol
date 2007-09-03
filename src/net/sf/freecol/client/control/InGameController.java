@@ -277,7 +277,7 @@ public final class InGameController implements NetworkConstants {
             }
 
             if (!freeColClient.isSingleplayer()) {
-                freeColClient.playSound(SfxLibrary.ANTHEM_BASE + currentPlayer.getNation());
+                freeColClient.playSound(SfxLibrary.ANTHEM_BASE + currentPlayer.getNation().getIndex());
             }
             
             checkTradeRoutesInEurope();
@@ -385,8 +385,8 @@ public final class InGameController implements NetworkConstants {
                     lumber += newTile.potential(Goods.LUMBER);
                     food += newTile.potential(Goods.FOOD);
                     ore += newTile.potential(Goods.ORE);
-                    int tileOwner = newTile.getNationOwner();
-                    if (tileOwner == unit.getNation()) {
+                    Player tileOwner = newTile.getNationOwner();
+                    if (tileOwner == unit.getOwner()) {
                         if (newTile.getOwner() != null) {
                             // we are using newTile
                             ownedBySelf = true;
@@ -401,9 +401,9 @@ public final class InGameController implements NetworkConstants {
                                 }
                             }
                         }
-                    } else if (Player.isEuropean(tileOwner)) {
+                    } else if (tileOwner.isEuropean()) {
                         ownedByEuropeans = true;
-                    } else if (tileOwner != Player.NO_NATION) {
+                    } else if (tileOwner != null) {
                         ownedByIndians = true;
                     }
                 } else {
@@ -2341,12 +2341,14 @@ public final class InGameController implements NetworkConstants {
         if (state == Unit.IMPROVING) {
             int price = unit.getOwner().getLandPrice(unit.getTile());
             if (price > 0) {
-                int nation = unit.getTile().getNationOwner();
+                Player nation = unit.getTile().getNationOwner();
                 ChoiceItem[] choices = {
-                        new ChoiceItem(Messages.message("indianLand.pay").replaceAll("%amount%",
-                                Integer.toString(price)), 1), new ChoiceItem(Messages.message("indianLand.take"), 2) };
-                ChoiceItem ci = (ChoiceItem) canvas.showChoiceDialog(Messages.message("indianLand.text").replaceAll(
-                        "%player%", Player.getNationAsString(nation)), Messages.message("indianLand.cancel"), choices);
+                    new ChoiceItem(Messages.message("indianLand.pay" ,"%amount%",
+                                                    Integer.toString(price)), 1),
+                    new ChoiceItem(Messages.message("indianLand.take"), 2) };
+                ChoiceItem ci = (ChoiceItem) canvas.showChoiceDialog(Messages.message("indianLand.text",
+                                                                                      "%player%", nation.getName()),
+                                                                     Messages.message("indianLand.cancel"), choices);
                 if (ci == null) {
                     return;
                 } else if (ci.getChoice() == 1) {

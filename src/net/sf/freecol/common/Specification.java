@@ -58,6 +58,9 @@ public final class Specification {
     private final List<FoundingFather> foundingFathers;
 
     private final List<NationType> nationTypes;
+    private final List<EuropeanNationType> europeanNationTypes;
+    private final List<EuropeanNationType> refNationTypes;
+    private final List<IndianNationType> indianNationTypes;
 
     public Specification() {
         logger.info("Initializing Specification");
@@ -71,6 +74,9 @@ public final class Specification {
         unitTypeList = new ArrayList<UnitType>();
         foundingFathers = new ArrayList<FoundingFather>();
         nationTypes = new ArrayList<NationType>();
+        europeanNationTypes = new ArrayList<EuropeanNationType>();
+        refNationTypes = new ArrayList<EuropeanNationType>();
+        indianNationTypes = new ArrayList<IndianNationType>();
 
         final Map<String, GoodsType> goodsTypeByRef = new HashMap<String, GoodsType>();
         final Map<String, ResourceType> resourceTypeByRef = new HashMap<String, ResourceType>();
@@ -79,6 +85,7 @@ public final class Specification {
         final Map<String, BuildingType> buildingTypeByRef = new HashMap<String, BuildingType>();
         final Map<String, UnitType> unitTypeByRef = new HashMap<String, UnitType>();
         farmedGoodsTypeList = new ArrayList<GoodsType>();
+
 
         try {
             InputStream in = Specification.class.getResourceAsStream("specification.xml");
@@ -212,7 +219,8 @@ public final class Specification {
                             return nationType;
                         }
                     };
-                    nationTypes.addAll(makeListFromXml(xsr, factory));
+                    europeanNationTypes.addAll(makeListFromXml(xsr, factory));
+                    nationTypes.addAll(europeanNationTypes);
 
                 } else if ("indian-nation-types".equals(childName)) {
 
@@ -225,7 +233,8 @@ public final class Specification {
                             return nationType;
                         }
                     };
-                    nationTypes.addAll(makeListFromXml(xsr, factory));
+                    indianNationTypes.addAll(makeListFromXml(xsr, factory));
+                    nationTypes.addAll(indianNationTypes);
 
                 } else {
                     throw new RuntimeException("unexpected: " + childName);
@@ -236,6 +245,15 @@ public final class Specification {
             // Get Food, Bells, Crosses and Hammers
             Goods.initialize(getGoodsTypeList(), numberOfGoodsTypes());
             Tile.initialize(numberOfTileTypes());
+            for (EuropeanNationType nation: europeanNationTypes) {
+                refNationTypes.add(new EuropeanNationType(0, nation.getID() + "REF"));
+            }
+            nationTypes.addAll(refNationTypes);
+            // TODO: fix this somehow
+            for (int index = 0; index < nationTypes.size(); index++) {
+                nationTypes.get(index).setIndex(index);
+            }
+
             logger.info("Specification initialization complete");
         } catch (XMLStreamException e) {
             StringWriter sw = new StringWriter();
@@ -555,6 +573,39 @@ public final class Specification {
 
     public List<NationType> getNationTypes() {
         return nationTypes;
+    }
+
+    public List<EuropeanNationType> getEuropeanNationTypes() {
+        return europeanNationTypes;
+    }
+
+    public List<EuropeanNationType> getREFNationTypes() {
+        return refNationTypes;
+    }
+
+    public List<IndianNationType> getIndianNationTypes() {
+        return indianNationTypes;
+    }
+
+    public int numberOfNationTypes() {
+        return nationTypes.size();
+    }
+
+    public NationType getNationType(int nationIndex) {
+        return nationTypes.get(nationIndex);
+    }
+
+    public int getNationTypeIndex(NationType nation) {
+        return nationTypes.indexOf(nation);
+    }
+
+    public NationType getNationType(String id) {
+        for (NationType nation : nationTypes) {
+            if (nation.getID().equals(id)) {
+                return nation;
+            }
+        }
+        return null;
     }
 
     /**

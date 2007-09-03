@@ -258,8 +258,6 @@ abstract public class Settlement extends FreeColGameObject implements Location, 
 
     public void dispose() {
         
-        int nation = owner.getNation();
-        
         Tile settlementTile = getTile();
         
         Player temp = owner;
@@ -269,11 +267,11 @@ abstract public class Settlement extends FreeColGameObject implements Location, 
         Position position = settlementTile.getPosition();
         Iterator<Position> circleIterator = map.getCircleIterator(position, true, getRadius());
         
-        settlementTile.setNationOwner(Player.NO_NATION);
+        settlementTile.setNationOwner(null);
         while (circleIterator.hasNext()) {
             Tile tile = map.getTile(circleIterator.next());
-            if (tile.getNationOwner() == nation) {
-                tile.setNationOwner(Player.NO_NATION);
+            if (tile.getNationOwner() == owner) {
+                tile.setNationOwner(null);
             }
         }
         

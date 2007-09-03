@@ -1436,7 +1436,6 @@ public final class GUI {
         }
         displayTileOverlays(g, map, tile, x, y, false, false);
         
-        int nation = tile.getNationOwner();
         int price = colony.getOwner().getLandPrice(tile);
         if (price > 0 && tile.getSettlement() == null) {
             Image image = lib.getMiscImage(ImageLibrary.TILE_OWNED_BY_INDIANS);
@@ -1809,7 +1808,7 @@ public final class GUI {
 
                     // Draw the alarm chip if needed.
                     if (freeColClient.getMyPlayer() != null
-                            && freeColClient.getMyPlayer().hasContacted(((IndianSettlement)settlement).getOwner().getNation())) {
+                            && freeColClient.getMyPlayer().hasContacted(((IndianSettlement)settlement).getOwner())) {
                         g.drawImage(lib.getAlarmChip(((IndianSettlement)settlement).getAlarm(freeColClient.getMyPlayer()).getLevel()), x + ALARM_OFFSET_X, y + ALARM_OFFSET_Y, null);
                     }
 
@@ -1926,8 +1925,8 @@ public final class GUI {
             }
         }
         
-        if (displayTileOwners && tile.getNationOwner() != Player.NO_NATION) {
-            String tileOwner = Player.getNationAsString(tile.getNationOwner());
+        if (displayTileOwners && tile.getNationOwner() != null) {
+            String tileOwner = tile.getNationOwner().getNation().getName();
             g.setColor(Color.BLACK);
             int b = getBreakingPoint(tileOwner);
             if (b == -1) {

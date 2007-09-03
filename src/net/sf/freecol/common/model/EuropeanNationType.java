@@ -9,6 +9,8 @@ import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
+import net.sf.freecol.client.gui.i18n.Messages;
+
 /**
  * Represents one of the European nations present in the game.
  */
@@ -19,17 +21,74 @@ public class EuropeanNationType extends NationType {
     public static final String  REVISION = "$Revision$";
 
     /**
+     * Whether this is an REF Nation.
+     */
+    private boolean ref;
+
+    /**
      * Stores the starting units of this Nation.
      */
     private List<StartingUnit> startingUnits = new ArrayList<StartingUnit>();
 
     /**
-     * Sole constructor.
+     * Constructor.
      */
     public EuropeanNationType(int index) {
         super(index);
     }
 
+    /**
+     * Constructor.
+     */
+    public EuropeanNationType(int index, String id) {
+        super(index);
+        setID(id);
+    }
+
+    /**
+     * Returns the name of this Nation's Home Port.
+     *
+     * @return a <code>String</code> value
+     */
+    public String getEuropeName() {
+        return Messages.message(getID() + ".europe");
+    }
+
+    /**
+     * Returns the name of this Nation's REF.
+     *
+     * @return a <code>String</code> value
+     */
+    public String getREFName() {
+        return Messages.message(getID() + ".ref");
+    }
+
+    /**
+     * Get the <code>REF</code> value.
+     *
+     * @return a <code>boolean</code> value
+     */
+    public final boolean isREF() {
+        return ref;
+    }
+
+    /**
+     * Set the <code>REF</code> value.
+     *
+     * @param newREF The new REF value.
+     */
+    public final void setREF(final boolean newREF) {
+        this.ref = newREF;
+    }
+
+    /**
+     * Returns true.
+     *
+     * @return a <code>boolean</code> value
+     */
+    public boolean isEuropean() {
+        return true;
+    }
 
     /**
      * Returns a list of this Nation's starting units.

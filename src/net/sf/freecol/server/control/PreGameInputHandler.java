@@ -5,6 +5,8 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.logging.Logger;
 
+import net.sf.freecol.FreeCol;
+import net.sf.freecol.common.model.NationType;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.networking.Message;
@@ -140,11 +142,11 @@ public final class PreGameInputHandler extends InputHandler {
     private Element nation(Connection connection, Element element) {
         ServerPlayer player = getFreeColServer().getPlayer(connection);
         if (player != null) {
-            int nation = Integer.parseInt(element.getAttribute("value"));
+            NationType nation = FreeCol.getSpecification().getNationType(element.getAttribute("value"));
             player.setNation(nation);
             Element updateNation = Message.createNewRootElement("updateNation");
             updateNation.setAttribute("player", player.getID());
-            updateNation.setAttribute("value", Integer.toString(nation));
+            updateNation.setAttribute("value", nation.getID());
             getFreeColServer().getServer().sendToAll(updateNation, player.getConnection());
         } else {
             logger.warning("Nation from unknown connection.");
@@ -191,15 +193,15 @@ public final class PreGameInputHandler extends InputHandler {
         }
         // Check that no two players have the same color or nation
         Iterator<Player> playerIterator = freeColServer.getGame().getPlayerIterator();
-        LinkedList<Integer> nations = new LinkedList<Integer>();
+        LinkedList<NationType> nations = new LinkedList<NationType>();
         LinkedList<Color> colors = new LinkedList<Color>();
         while (playerIterator.hasNext()) {
             ServerPlayer player = (ServerPlayer) playerIterator.next();
-            final int nation = player.getNation();
+            final NationType nation = player.getNation();
             final Color color = player.getColor();
             // Check the nation.
             for (int i = 0; i < nations.size(); i++) {
-                if (nations.get(i).intValue() == nation) {
+                if (nations.get(i) == nation) {
                     Element reply = Message.createNewRootElement("error");
                     reply
                             .setAttribute("message",
@@ -208,7 +210,7 @@ public final class PreGameInputHandler extends InputHandler {
                     return reply;
                 }
             }
-            nations.add(new Integer(nation));
+            nations.add(nation);
             // Check the color.
             for (int i = 0; i < colors.size(); i++) {
                 if (colors.get(i).equals(color)) {

@@ -159,12 +159,12 @@ public final class Monarch extends FreeColGameObject {
         boolean atWar = false;
         // Benjamin Franklin puts an end to the monarch's interference
         if (!player.hasAbility("model.ability.ignoreEuropeanWars")) {
-            for (int i = 0; i < Player.NUMBER_OF_NATIONS; i++) {
-                if (!getGame().getPlayer(i).isEuropean() || getGame().getPlayer(i).isREF()) {
+            for (Player enemy : getGame().getPlayers()) {
+                if (!enemy.isEuropean() || enemy.isREF()) {
                     continue;
                 }
-                if (player.hasContacted(i)) {
-                    switch (player.getStance(i)) {
+                if (player.hasContacted(enemy)) {
+                    switch (player.getStance(enemy)) {
                     case Player.WAR:
                         atWar = true;
                         break;
@@ -412,24 +412,25 @@ public final class Monarch extends FreeColGameObject {
      *
      * @return The enemy nation.
      */
-    public int declareWar() {
+    public Player declareWar() {
         int offset = getGame().getModelController().getPseudoRandom().nextInt(Player.NUMBER_OF_NATIONS);
         for (int i = 0; i < Player.NUMBER_OF_NATIONS; i++) {
             int nation = (i + offset) % Player.NUMBER_OF_NATIONS;
-            if (nation == player.getNation()) {
+            Player enemy = getGame().getPlayer(nation);
+            if (enemy == player) {
                 continue;
-            } else if (!player.hasContacted(nation)) {
+            } else if (!player.hasContacted(enemy)) {
                 continue;
-            } else if (!getGame().getPlayer(i).isEuropean() || getGame().getPlayer(i).isREF()) {
+            } else if (!enemy.isEuropean() || enemy.isREF()) {
                 continue;
             }
-            int stance = player.getStance(nation);
+            int stance = player.getStance(enemy);
             if (stance == Player.PEACE || stance == Player.CEASE_FIRE) {
-                player.setStance(getGame().getPlayer(nation), Player.WAR);
-                return nation;
+                player.setStance(enemy, Player.WAR);
+                return enemy;
             }
         }
-        return Player.NO_NATION;
+        return null;
     }
 
     /**

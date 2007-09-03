@@ -10,6 +10,7 @@ import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamWriter;
 
+import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.GameOptions;
@@ -148,7 +149,7 @@ public final class PreGameController extends Controller {
                                                     true,
                                                     null,
                                                     theConnection,
-                                                    i);
+                                                     FreeCol.getSpecification().getNationType(i));
             DummyConnection aiConnection = new DummyConnection(
                     "AI connection - " + name,
                     new AIInGameInputHandler(freeColServer, aiPlayer, aiMain));

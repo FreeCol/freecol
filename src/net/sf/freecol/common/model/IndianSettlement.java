@@ -142,7 +142,7 @@ public class IndianSettlement extends Settlement {
             throw new NullPointerException();
         }
         
-        tile.setNationOwner(player.getNation());
+        tile.setNationOwner(player);
 
         unitContainer = new UnitContainer(game, this);
         goodsContainer = new GoodsContainer(game, this);
@@ -305,10 +305,7 @@ public class IndianSettlement extends Settlement {
     * @param addToAlarm The amount to add to the current alarm level.
     */
     public void modifyAlarm(Player player, int addToAlarm) {
-        modifyAlarm(player.getNation(), addToAlarm);
-    }
-
-    public void modifyAlarm(int nation, int addToAlarm) {
+        int nation = player.getIndex();
         Tension tension = alarm[nation];
         if(tension != null) {
             tension.modify(addToAlarm);            
@@ -317,9 +314,9 @@ public class IndianSettlement extends Settlement {
         if(owner != null) {
                 if (isCapital())
                         // capital has a greater impact
-                    owner.modifyTension(nation, addToAlarm, this); 
+                    owner.modifyTension(player, addToAlarm, this); 
                 else
-                owner.modifyTension(nation, addToAlarm/2, this);            
+                owner.modifyTension(player, addToAlarm/2, this);            
         }
     }
 
@@ -346,7 +343,7 @@ public class IndianSettlement extends Settlement {
     * @param newAlarm The new alarm value.
     */
     public void setAlarm(Player player, Tension newAlarm) {
-        alarm[player.getNation()] = newAlarm;
+        alarm[player.getIndex()] = newAlarm;
     }
 
 
@@ -366,7 +363,7 @@ public class IndianSettlement extends Settlement {
      * @return An object representing the alarm level.
      */    
     public Tension getAlarm(Player player) {
-        return getAlarm(player.getNation());
+        return getAlarm(player.getIndex());
     }
 
     /**
@@ -377,7 +374,7 @@ public class IndianSettlement extends Settlement {
      * @return The ID of an alarm level message.
      */
     public String getAlarmLevelMessage(Player player) {
-        return "indianSettlement.alarm." + alarm[player.getNation()].getCodeString();
+        return "indianSettlement.alarm." + alarm[player.getIndex()].getCodeString();
     }
 
     /**
@@ -1033,26 +1030,26 @@ public class IndianSettlement extends Settlement {
                     while (ui.hasNext()) {
                         Unit u = ui.next();
                         if (u.isOffensiveUnit() && !u.isNaval()) {                          
-                            extraAlarm[u.getOwner().getNation()] += u.getOffensePower(getTile().getDefendingUnit(u));
+                            extraAlarm[u.getOwner().getIndex()] += u.getOffensePower(getTile().getDefendingUnit(u));
                         }
                     }
                 }
                 
                 // Land being used by another settlement:
                 if (t.getOwner() != null && t.getOwner().getOwner().isEuropean()) {                    
-                    extraAlarm[t.getOwner().getOwner().getNation()] += 2;
+                    extraAlarm[t.getOwner().getOwner().getIndex()] += 2;
                 }
 
                 // Settlement:
                 if (t.getSettlement() != null && t.getSettlement().getOwner().isEuropean()) {
-                    extraAlarm[t.getSettlement().getOwner().getNation()] += t.getSettlement().getUnitCount();
+                    extraAlarm[t.getSettlement().getOwner().getIndex()] += t.getSettlement().getUnitCount();
                 }
             }
 
             // Missionary helps reducing alarm a bit, here and to the tribe as a whole.
             // No reduction effect on other settlements (1/4 of this) unless this is capital. 
             if (missionary != null) {
-                extraAlarm[missionary.getOwner().getNation()] += MISSIONARY_TENSION;
+                extraAlarm[missionary.getOwner().getIndex()] += MISSIONARY_TENSION;
             }
 
             for (int i=0; i<extraAlarm.length; i++) {
@@ -1062,10 +1059,6 @@ public class IndianSettlement extends Settlement {
                         Modifier modifier = p.getModifier("model.modifier.nativeAlarmModifier");
                         if (modifier != null) {
                             extraAlarm[i] = (int) modifier.applyTo(extraAlarm[i]);
-                        }
-                        // TODO: make this depend on NationType
-                        if (p.getNation() == Player.FRENCH) {
-                            extraAlarm[i] /= 2;
                         }
                     }
                     modifyAlarm(p, extraAlarm[i]);
@@ -1092,7 +1085,7 @@ public class IndianSettlement extends Settlement {
             }
 
             // Increase increment if alarm level is high.
-            increment += 2 * alarm[missionary.getOwner().getNation()].getValue() / 100;
+            increment += 2 * alarm[missionary.getOwner().getIndex()].getValue() / 100;
             convertProgress += increment;
 
             int extra = Math.max(0, 8-getUnitCount()*getUnitCount());
@@ -1176,8 +1169,6 @@ public class IndianSettlement extends Settlement {
         }
         unitContainer.dispose();
 
-        int nation = owner.getNation();
-        
         Tile settlementTile = getTile();     
         
         Map map = getGame().getMap();
@@ -1187,7 +1178,7 @@ public class IndianSettlement extends Settlement {
         settlementTile.setClaim(Tile.CLAIM_NONE);
         while (circleIterator.hasNext()) {
             Tile tile = map.getTile(circleIterator.next());
-            if (tile.getNationOwner() == nation) {
+            if (tile.getNationOwner() == owner) {
                 tile.setClaim(Tile.CLAIM_NONE);
             }
         }

@@ -86,7 +86,7 @@ public final class MonarchPanel extends FreeColDialog implements ActionListener 
     public void initialize(int action, String[][] replace) {
         removeAll();
 
-        int nation = parent.getClient().getMyPlayer().getNation();
+        int nation = parent.getClient().getMyPlayer().getIndex();
         imageLabel.setIcon(parent.getGUI().getImageLibrary().getMonarchImageIcon(nation));
 
         int[] widths = { -3, 3 * margin, -1 };

@@ -50,6 +50,23 @@ public class IndianNationType extends NationType {
 
 
     /**
+     * Returns false.
+     *
+     * @return a <code>boolean</code> value
+     */
+    public boolean isEuropean() {
+        return false;
+    }
+
+    /**
+     * Returns false.
+     *
+     * @return a <code>boolean</code> value
+     */
+    public boolean isREF() {
+        return false;
+    }
+    /**
      * Get the <code>NumberOfSettlements</code> value.
      *
      * @return an <code>int</code> value

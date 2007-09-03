@@ -8,11 +8,13 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
+import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.GameOptions;
 import net.sf.freecol.common.model.Market;
+import net.sf.freecol.common.model.NationType;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.networking.StreamedMessageHandler;
@@ -255,7 +257,7 @@ public final class PreGameInputHandler extends InputHandler implements StreamedM
         Game game = getFreeColClient().getGame();
 
         Player player = (Player) game.getFreeColGameObject(element.getAttribute("player"));
-        int nation = Integer.parseInt(element.getAttribute("value"));
+        NationType nation = FreeCol.getSpecification().getNationType(element.getAttribute("value"));
 
         player.setNation(nation);
         getFreeColClient().getCanvas().getStartGamePanel().refreshPlayersTable();

@@ -56,7 +56,7 @@ public final class ReportIndianPanel extends ReportPanel implements ActionListen
         if (opponent.isDead()) {
           return;
         }
-        if (!player.hasContacted(opponent.getNation())) {
+        if (!player.hasContacted(opponent)) {
           return;
         }
         String report = "<html><p align=center><b>" +

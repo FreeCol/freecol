@@ -751,11 +751,11 @@ public final class InGameInputHandler extends InputHandler {
                                                     ModelMessage.WARNING));
             break;
         case Monarch.DECLARE_WAR:
-            int nation = Integer.parseInt(element.getAttribute("nation"));
-            player.setStance(getGame().getPlayer(nation), Player.WAR);
+            Player enemy = (Player) getGame().getFreeColGameObject(element.getAttribute("nation"));
+            player.setStance(enemy, Player.WAR);
             player.addModelMessage(new ModelMessage(player, "model.monarch.declareWar",
                                                     new String[][] {
-                                                        { "%nation%", Player.getNationAsString(nation) }},
+                                                        {"%nation%", enemy.getName()}},
                                                     ModelMessage.WARNING));
             break;
         case Monarch.SUPPORT_LAND:
@@ -925,7 +925,7 @@ public final class InGameInputHandler extends InputHandler {
         ModelMessage m;
         switch (type) {
         case LostCityRumour.BURIAL_GROUND:
-            Player indianPlayer = getGame().getPlayer(tile.getNationOwner());
+            Player indianPlayer = tile.getNationOwner();
             indianPlayer.modifyTension(player, Tension.TENSION_HATEFUL);
             m = new ModelMessage(tile, "lostCityRumour.BurialGround", new String[][] { { "%nation%",
                     indianPlayer.getNationAsString() } }, ModelMessage.LOST_CITY_RUMOUR);

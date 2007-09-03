@@ -1703,14 +1703,15 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener {
                         }
                         int price = unit.getOwner().getLandPrice(colonyTile.getWorkTile());
                         if (price > 0) {
-                            int nation = colonyTile.getWorkTile().getNationOwner();
+                            Player player = colonyTile.getWorkTile().getNationOwner();
                             ChoiceItem[] choices = {
                                     new ChoiceItem(Messages.message("indianLand.pay").replaceAll("%amount%",
                                             Integer.toString(price)), 1),
                                     new ChoiceItem(Messages.message("indianLand.take"), 2) };
-                            ChoiceItem ci = (ChoiceItem) parent.showChoiceDialog(Messages.message("indianLand.text")
-                                    .replaceAll("%player%", Player.getNationAsString(nation)), Messages
-                                    .message("indianLand.cancel"), choices);
+                            ChoiceItem ci = (ChoiceItem) parent.
+                                showChoiceDialog(Messages.message("indianLand.text",
+                                                                  "%player%", player.getNation().getName()),
+                                                 Messages.message("indianLand.cancel"), choices);
                             if (ci == null) {
                                 return null;
                             } else if (ci.getChoice() == 1) {

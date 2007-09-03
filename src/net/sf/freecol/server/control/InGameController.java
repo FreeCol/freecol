@@ -453,14 +453,14 @@ public final class InGameController extends Controller {
                         }
                         break;
                     case Monarch.DECLARE_WAR:
-                        int nation = monarch.declareWar();
-                        if (nation == Player.NO_NATION) {
+                        Player enemy = monarch.declareWar();
+                        if (enemy == null) {
                             // this should not happen
                             logger.warning("Declared war on nobody.");
                             return;
                         }
-                        nextPlayer.setStance(getGame().getPlayer(nation), Player.WAR);
-                        monarchActionElement.setAttribute("nation", String.valueOf(nation));
+                        nextPlayer.setStance(enemy, Player.WAR);
+                        monarchActionElement.setAttribute("enemy", enemy.getID());
                         try {
                             nextPlayer.getConnection().send(monarchActionElement);
                         } catch (IOException e) {

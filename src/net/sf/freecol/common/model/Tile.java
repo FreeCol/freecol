@@ -52,8 +52,8 @@ public final class Tile extends FreeColGameObject implements Location, Named {
 
     private int indianClaim;
 
-    /** The nation that consider this tile to be their land. */
-    private int nationOwner = Player.NO_NATION;
+    /** The player that consider this tile to be their land. */
+    private Player nationOwner;
 
     /**
      * A pointer to the settlement located on this tile or 'null' if there is no
@@ -212,8 +212,8 @@ public final class Tile extends FreeColGameObject implements Location, Named {
         } else {
             Player player = getGame().getCurrentPlayer();
             if (player != null) {
-                if (playerExploredTiles[player.getNation()] != null) {
-                    PlayerExploredTile pet = playerExploredTiles[player.getNation()];
+                if (playerExploredTiles[player.getIndex()] != null) {
+                    PlayerExploredTile pet = playerExploredTiles[player.getIndex()];
                     if (pet.explored) {
                         return getType().getName();
                     }
@@ -406,10 +406,10 @@ public final class Tile extends FreeColGameObject implements Location, Named {
                         value += 20;
                     }
 
-                    if (tile.getNationOwner() != Player.NO_NATION
-                        && tile.getNationOwner() != getGame().getCurrentPlayer().getNation()) {
+                    if (tile.getNationOwner() != null &&
+                        tile.getNationOwner() != getGame().getCurrentPlayer()) {
                         // tile is already owned by someone (and not by us!)
-                        if (Player.isEuropean(tile.getNationOwner())) {
+                        if (tile.getNationOwner().isEuropean()) {
                             value -= 20;
                         } else {
                             value -= 5;
@@ -642,7 +642,7 @@ public final class Tile extends FreeColGameObject implements Location, Named {
      * @return The nation or {@link Player#NO_NATION} is there is no nation
      *         owning this tile.
      */
-    public int getNationOwner() {
+    public Player getNationOwner() {
         return nationOwner;
     }
 
@@ -653,7 +653,7 @@ public final class Tile extends FreeColGameObject implements Location, Named {
      *            nation owning this tile.
      * @see #getNationOwner
      */
-    public void setNationOwner(int nationOwner) {
+    public void setNationOwner(Player nationOwner) {
         this.nationOwner = nationOwner;
         updatePlayerExploredTiles();
     }
@@ -666,7 +666,7 @@ public final class Tile extends FreeColGameObject implements Location, Named {
      */
     public void takeOwnership(Player player) {
         if (player.getLandPrice(this) > 0) {
-            Player otherPlayer = getGame().getPlayer(getNationOwner());
+            Player otherPlayer = getNationOwner();
             if (otherPlayer != null) {
                 if (!otherPlayer.isEuropean()) {
                     otherPlayer.modifyTension(player, Tension.TENSION_ADD_LAND_TAKEN);
@@ -675,7 +675,7 @@ public final class Tile extends FreeColGameObject implements Location, Named {
                 logger.warning("Could not find player with nation: " + getNationOwner());
             }
         }
-        setNationOwner(player.getNation());
+        setNationOwner(player);
         updatePlayerExploredTiles();
     }
 
@@ -1659,8 +1659,8 @@ break;
             // We're sending the Tile from the server to the client and showAll
             // is false.
             if (player != null) {
-                if (playerExploredTiles[player.getNation()] != null) {
-                    pet = playerExploredTiles[player.getNation()];
+                if (playerExploredTiles[player.getIndex()] != null) {
+                    pet = playerExploredTiles[player.getIndex()];
                 }
             } else {
                 logger.warning("player == null");
@@ -1677,11 +1677,11 @@ break;
         boolean lostCity = (pet == null) ? lostCityRumour : pet.hasLostCityRumour();
         out.writeAttribute("lostCityRumour", Boolean.toString(lostCity));
 
-        if (nationOwner != Player.NO_NATION) {
+        if (nationOwner != null) {
             if (getGame().isClientTrusted() || showAll || player.canSee(this)) {
-                out.writeAttribute("nationOwner", Integer.toString(nationOwner));
+                out.writeAttribute("nationOwner", nationOwner.getID());
             } else if (pet != null) {
-                out.writeAttribute("nationOwner", Integer.toString(pet.getNationOwner()));
+                out.writeAttribute("nationOwner", pet.getNationOwner().getID());
             }
         }
 
@@ -1819,9 +1819,9 @@ break;
 
         final String nationOwnerStr = in.getAttributeValue(null, "nationOwner");
         if (nationOwnerStr != null) {
-            nationOwner = Integer.parseInt(nationOwnerStr);
+            nationOwner = (Player) getGame().getFreeColGameObject(nationOwnerStr);
         } else {
-            nationOwner = Player.NO_NATION;
+            nationOwner = null;
         }
 
         final String ownerStr = in.getAttributeValue(null, "owner");
@@ -1907,7 +1907,7 @@ break;
         if (playerExploredTiles == null) {
             return null;
         }
-        return playerExploredTiles[player.getNation()];
+        return playerExploredTiles[player.getIndex()];
     }
 
     /**
@@ -1918,7 +1918,7 @@ break;
      * @see PlayerExploredTile
      */
     private void createPlayerExploredTile(Player player) {
-        playerExploredTiles[player.getNation()] = new PlayerExploredTile(player.getNation(), getTileItemContainer());
+        playerExploredTiles[player.getIndex()] = new PlayerExploredTile(player.getIndex(), getTileItemContainer());
     }
 
     /**
@@ -1928,49 +1928,18 @@ break;
      * @param player The <code>Player</code>.
      */
     public void updatePlayerExploredTile(Player player) {
-        updatePlayerExploredTile(player.getNation());
-    }
-
-    /**
-     * Updates the <code>PlayerExploredTile</code> for each player. This
-     * update will only be performed if the player
-     * {@link Player#canSee(Tile) can see} this <code>Tile</code>.
-     */
-    public void updatePlayerExploredTiles() {
+        int nation = player.getIndex();
         if (playerExploredTiles == null || getGame().getViewOwner() != null) {
             return;
         }
-        Iterator<Player> it = getGame().getPlayerIterator();
-        while (it.hasNext()) {
-            Player p = it.next();
-            if (playerExploredTiles[p.getNation()] == null && !p.isEuropean()) {
-                continue;
-            }
-            if (p.canSee(this)) {
-                updatePlayerExploredTile(p);
-            }
-        }
-    }
-
-    /**
-     * Updates the information about this <code>Tile</code> for the given
-     * <code>Player</code>.
-     * 
-     * @param nation The {@link Player#getNation nation} identifying the
-     *            <code>Player</code>.
-     */
-    public void updatePlayerExploredTile(int nation) {
-        if (playerExploredTiles == null || getGame().getViewOwner() != null) {
-            return;
-        }
-        if (playerExploredTiles[nation] == null && !Player.isEuropean(nation)) {
+        if (playerExploredTiles[nation] == null && !player.isEuropean()) {
             return;
         }
         if (playerExploredTiles[nation] == null) {
-            logger.warning("'playerExploredTiles' for " + Player.getNationAsString(nation) + " is 'null'.");
-            throw new IllegalStateException("'playerExploredTiles' for " + Player.getNationAsString(nation)
-                                            + " is 'null'. " + getGame().getPlayer(nation).canSee(this) + ", "
-                                            + isExploredBy(getGame().getPlayer(nation)) + " ::: " + getPosition());
+            logger.warning("'playerExploredTiles' for " + player.getName() + " is 'null'.");
+            throw new IllegalStateException("'playerExploredTiles' for " + player.getName()
+                                            + " is 'null'. " + player.canSee(this) + ", "
+                                            + isExploredBy(player) + " ::: " + getPosition());
         }
 
         playerExploredTiles[nation].getTileItemInfo(tileItemContainer);
@@ -1994,6 +1963,38 @@ break;
     }
 
     /**
+     * Updates the <code>PlayerExploredTile</code> for each player. This
+     * update will only be performed if the player
+     * {@link Player#canSee(Tile) can see} this <code>Tile</code>.
+     */
+    public void updatePlayerExploredTiles() {
+        if (playerExploredTiles == null || getGame().getViewOwner() != null) {
+            return;
+        }
+        Iterator<Player> it = getGame().getPlayerIterator();
+        while (it.hasNext()) {
+            Player p = it.next();
+            if (playerExploredTiles[p.getIndex()] == null && !p.isEuropean()) {
+                continue;
+            }
+            if (p.canSee(this)) {
+                updatePlayerExploredTile(p);
+            }
+        }
+    }
+
+    /**
+     * Updates the information about this <code>Tile</code> for the given
+     * <code>Player</code>.
+     * 
+     * @param nation The {@link Player#getNation nation} identifying the
+     *            <code>Player</code>.
+     */
+    public void updatePlayerExploredTile(int nation) {
+        updatePlayerExploredTile(getGame().getPlayer(nation));
+    }
+
+    /**
      * Checks if this <code>Tile</code> has been explored by the given
      * <code>Player</code>.
      * 
@@ -2006,7 +2007,7 @@ break;
         if (player.isIndian()) {
             return true;
         }
-        if (playerExploredTiles[player.getNation()] == null || !isExplored()) {
+        if (playerExploredTiles[player.getIndex()] == null || !isExplored()) {
             return false;
         }
 
@@ -2026,7 +2027,7 @@ break;
         if (player.isIndian()) {
             return;
         }
-        if (playerExploredTiles[player.getNation()] == null) {
+        if (playerExploredTiles[player.getIndex()] == null) {
             createPlayerExploredTile(player);
         }
         getPlayerExploredTile(player).setExplored(explored);
@@ -2110,7 +2111,7 @@ break;
         // Tile data:
         private boolean plowed, forested, bonus;
 
-        private int nationOwner;
+        private Player nationOwner;
 
         // All known TileItems
         private Resource resource;
@@ -2220,11 +2221,11 @@ break;
             return skill;
         }
 
-        public void setNationOwner(int nationOwner) {
+        public void setNationOwner(Player nationOwner) {
             this.nationOwner = nationOwner;
         }
 
-        public int getNationOwner() {
+        public Player getNationOwner() {
             return nationOwner;
         }
 
@@ -2333,7 +2334,7 @@ break;
                 out.writeAttribute("lostCityRumour", Boolean.toString(lostCityRumour));
             }
             if (theTile.getNationOwner() != nationOwner) {
-                out.writeAttribute("nationOwner", Integer.toString(nationOwner));
+                out.writeAttribute("nationOwner", nationOwner.getID());
             }
             if (colonyUnitCount != 0) {
                 out.writeAttribute("colonyUnitCount", Integer.toString(colonyUnitCount));
@@ -2388,7 +2389,7 @@ break;
 
             final String nationOwnerStr = in.getAttributeValue(null, "nationOwner");
             if (nationOwnerStr != null) {
-                nationOwner = Integer.parseInt(nationOwnerStr);
+                nationOwner = (Player) getGame().getFreeColGameObject(nationOwnerStr);
             } else {
                 nationOwner = theTile.getNationOwner();
             }

@@ -7,6 +7,8 @@ import java.util.Map;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
+import net.sf.freecol.client.gui.i18n.Messages;
+
 /**
  * Represents one of the nations present in the game.
  */
@@ -39,6 +41,14 @@ public abstract class NationType extends FreeColGameObjectType implements Abilit
         setIndex(index);
     }
 
+    /**
+     * Get the <code>RulerName</code> value.
+     *
+     * @return a <code>String</code> value
+     */
+    public final String getRulerName() {
+        return Messages.message(getID() + ".ruler");
+    }
 
     /**
      * Get the <code>Color</code> value.
@@ -57,6 +67,18 @@ public abstract class NationType extends FreeColGameObjectType implements Abilit
     public final void setColor(final Color newColor) {
         this.color = newColor;
     }
+
+    /**
+     * Whether this is a EuropeanNation.
+     *
+     */
+    public abstract boolean isEuropean();
+
+    /**
+     * Whether this is a EuropeanREFNation.
+     *
+     */
+    public abstract boolean isREF();
 
     /**
      * Returns true if this Nation has the ability with the given ID.

@@ -160,6 +160,7 @@ public class AIPlayer extends AIObject {
      */
     public void startWorking() {
         logger.fine("Entering AI code for: " + player.getNationAsString());
+        /** TODO: find some intelligent solution
         switch (player.getNation()) {
         case Player.DUTCH:
             this.strategy = STRATEGY_TRADE;
@@ -174,6 +175,8 @@ public class AIPlayer extends AIObject {
             this.strategy = STRATEGY_CONQUEST;
             break;
         }
+        */
+        this.strategy = STRATEGY_TRADE;
         sessionRegister.clear();
         aiUnits.clear();
         if (getPlayer().isREF()) {
