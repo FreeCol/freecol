@@ -1833,6 +1833,12 @@ public class Unit extends FreeColGameObject implements Abilities, Locatable, Loc
         Colony oldColony = this.getColony();
         
         if (location != null) {
+        	// the unit is leaving a colony tile
+        	// reset the ownership of the tile, so that
+        	//others may claim it
+        	if (location instanceof ColonyTile){
+        		((ColonyTile)location).getWorkTile().setNationOwner(null);
+        	}
             location.remove(this);
         }
 
