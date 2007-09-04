@@ -1657,7 +1657,7 @@ break;
         }
 
         if ((getGame().isClientTrusted() || showAll || player.canSee(this)) && (owningSettlement != null)) {
-            out.writeAttribute("owner", owningSettlement.getID());
+            out.writeAttribute("owningSettlement", owningSettlement.getID());
         }
 
         if (settlement != null) {
