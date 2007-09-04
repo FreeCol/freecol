@@ -62,7 +62,7 @@ public final class ReportForeignAffairPanel extends ReportPanel implements Actio
             enemyPanel.setOpaque(false);
             int row = 1;
             Player enemy = (Player) getCanvas().getClient().getGame().getFreeColGameObject(enemyElement.getAttribute("nation"));
-            final Image coatOfArms = (Image) UIManager.get(enemy.getID() + ".coatOfArms.image");
+            final Image coatOfArms = (Image) UIManager.get(enemy.getNation().getID() + ".coatOfArms.image");
             enemyPanel.add(new JLabel(new ImageIcon(coatOfArms)),
                            higConst.rcwh(row, coatColumn, 1, heights.length, "t"));
             enemyPanel.add(new JLabel(enemy.getNation().getName()), higConst.rc(row, labelColumn));
