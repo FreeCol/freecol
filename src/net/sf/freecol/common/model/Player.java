@@ -823,11 +823,6 @@ public class Player extends FreeColGameObject implements Abilities, Nameable, Mo
         tile.setOwner(this);
     }
 
-    //TODO: fix this
-    public String getNationIdentifier() {
-        return getID().substring(getID().lastIndexOf('.') + 1);
-    }
-
     /**
      * 
      * Returns the default color for the given <code>nation</code>.

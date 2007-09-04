@@ -627,7 +627,7 @@ public final class Canvas extends JDesktopPane {
                 logger.warning("could not find image for lost city rumour");
             }
         } else if (display instanceof Player) {
-            image = (Image) UIManager.get("coatOfArms." + ((Player) display).getNationIdentifier() + ".image");
+            image = (Image) UIManager.get(((Player) display).getID() + ".coatOfArms.image");
         } 
         if (image != null && small) {
             return new ImageIcon(image.getScaledInstance((image.getWidth(null) / 3) * 2,
