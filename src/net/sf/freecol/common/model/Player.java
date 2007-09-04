@@ -41,9 +41,12 @@ public class Player extends FreeColGameObject implements Abilities, Nameable, Mo
 
     public static final String REVISION = "$Revision$";
 
+    // TODO: this must be fixed!
     public static final int NUMBER_OF_NATIONS = FreeCol.getSpecification().numberOfNationTypes();
 
-
+    /**
+     * The index counter for this class.
+     */
     private static int lastIndex = 0;
 
     private int index;
@@ -372,6 +375,11 @@ public class Player extends FreeColGameObject implements Abilities, Nameable, Mo
         super(game, id);
     }
 
+    /**
+     * Returns the index of this Player.
+     *
+     * @return an <code>int</code> value
+     */
     public int getIndex() {
         return index;
     }
@@ -753,8 +761,8 @@ public class Player extends FreeColGameObject implements Abilities, Nameable, Mo
      * 
      */
     public boolean isAtWar() {
-        for (NationType nation : FreeCol.getSpecification().getNationTypes()) {
-            if (getStance(nation) == WAR) {
+        for (Player player : getGame().getPlayers()) {
+            if (getStance(player) == WAR) {
                 return true;
             }
         }
@@ -845,11 +853,11 @@ public class Player extends FreeColGameObject implements Abilities, Nameable, Mo
      * @return <code>true</code> if this <code>Player</code> has contacted
      *         the given nation.
      */
-    public boolean hasContacted(Player nation) {
-        if (nation == null) {
+    public boolean hasContacted(Player player) {
+        if (player == null) {
             return true;
         } else {
-            return contacted[nation.getIndex()];
+            return contacted[player.getIndex()];
         }
     }
 
@@ -885,18 +893,18 @@ public class Player extends FreeColGameObject implements Abilities, Nameable, Mo
      * 
      */
     public void setContacted(Player player, boolean b) {
-        NationType type = player.getNation();
-        if (type == getNation() || type == null) {
+
+        if (player == null || player == this) {
             return;
         }
 
-        if (b == true && b != contacted[type.getIndex()]) {
+        if (b == true && b != contacted[player.getIndex()]) {
             boolean contactedIndians = false;
             boolean contactedEuro = false;
 
-            for (int i = 0; i < FreeCol.getSpecification().numberOfNationTypes(); i++) {
+            for (int i = 0; i < getGame().getPlayers().size(); i++) {
                 if (contacted[i]) {
-                    if (FreeCol.getSpecification().getNationTypes().get(i).isEuropean()) {
+                    if (getGame().getPlayer(i).isEuropean()) {
                         contactedEuro = true;
                     } else {
                         contactedIndians = true;
@@ -921,23 +929,9 @@ public class Player extends FreeColGameObject implements Abilities, Nameable, Mo
             }
         }
 
-        setContacted(type, b);
+        contacted[player.getIndex()] = b;
     }
 
-    /**
-     * Sets whether this player has contacted <code>Player</code> of the given
-     * nation.
-     * 
-     * @param nation The nation.
-     * @param b <code>true</code> if this <code>Player</code> has contacted
-     *            the given <code>Player</code>.
-     */
-    public void setContacted(NationType nation, boolean b) {
-        if (nation == getNation() || nation == null) {
-            return;
-        }
-        contacted[nation.getIndex()] = b;
-    }
 
     /**
      * Gets the default <code>Location</code> where the units arriving from
@@ -2000,14 +1994,10 @@ public class Player extends FreeColGameObject implements Abilities, Nameable, Mo
      * @return The stance.
      */
     public int getStance(Player player) {
-        return getStance(player.getNation());
-    }
-
-    public int getStance(NationType nation) {
-        if (nation == null) {
+        if (player == null) {
             return 0;
         } else {
-            return stance[nation.getIndex()];
+            return stance[player.getIndex()];
         }
     }
 
