@@ -981,7 +981,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
          * It should not be possible to find an indian burial ground outside
          * indian territory:
          */
-        if (tile.getNationOwner() == null || tile.getNationOwner().isEuropean()) {
+        if (tile.getOwner() == null || tile.getOwner().isEuropean()) {
             probability[LostCityRumour.BURIAL_GROUND] = 0;
         }
         int accumulator = 0;
@@ -1005,7 +1005,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         dx = 10 - player.getDifficulty(); // 6-10
         switch (rumour) {
         case LostCityRumour.BURIAL_GROUND:
-            Player indianPlayer = unit.getTile().getNationOwner();
+            Player indianPlayer = unit.getTile().getOwner();
             indianPlayer.modifyTension(player, Tension.TENSION_HATEFUL);
             break;
         case LostCityRumour.EXPEDITION_VANISHES:

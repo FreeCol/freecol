@@ -1703,7 +1703,7 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener {
                         }
                         int price = unit.getOwner().getLandPrice(colonyTile.getWorkTile());
                         if (price > 0) {
-                            Player player = colonyTile.getWorkTile().getNationOwner();
+                            Player player = colonyTile.getWorkTile().getOwner();
                             ChoiceItem[] choices = {
                                     new ChoiceItem(Messages.message("indianLand.pay").replaceAll("%amount%",
                                             Integer.toString(price)), 1),

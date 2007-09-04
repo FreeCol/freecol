@@ -771,7 +771,7 @@ public class Player extends FreeColGameObject implements Abilities, Nameable, Mo
      * 
      */
     public int getLandPrice(Tile tile) {
-        Player nationOwner = tile.getNationOwner();
+        Player nationOwner = tile.getOwner();
         if (nationOwner == null ||
             nationOwner == this ||
             nationOwner.isEuropean()) {
@@ -799,7 +799,7 @@ public class Player extends FreeColGameObject implements Abilities, Nameable, Mo
      * 
      */
     public void buyLand(Tile tile) {
-        Player owner = tile.getNationOwner();
+        Player owner = tile.getOwner();
         if (owner == null) {
             throw new IllegalStateException("The Tile is not owned by any nation!");
         }
@@ -812,7 +812,7 @@ public class Player extends FreeColGameObject implements Abilities, Nameable, Mo
         int price = getLandPrice(tile);
         modifyGold(-price);
         owner.modifyGold(price);
-        tile.setNationOwner(this);
+        tile.setOwner(this);
     }
 
     //TODO: fix this

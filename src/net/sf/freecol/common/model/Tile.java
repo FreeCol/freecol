@@ -25,7 +25,7 @@ import org.w3c.dom.Element;
  * 
  * @see Map
  */
-public final class Tile extends FreeColGameObject implements Location, Named {
+public final class Tile extends FreeColGameObject implements Location, Named, Ownable {
     private static final Logger logger = Logger.getLogger(Tile.class.getName());
 
     public static final String COPYRIGHT = "Copyright (C) 2003-2005 The FreeCol Team";
@@ -53,7 +53,7 @@ public final class Tile extends FreeColGameObject implements Location, Named {
     private int indianClaim;
 
     /** The player that consider this tile to be their land. */
-    private Player nationOwner;
+    private Player owner;
 
     /**
      * A pointer to the settlement located on this tile or 'null' if there is no
@@ -406,10 +406,10 @@ public final class Tile extends FreeColGameObject implements Location, Named {
                         value += 20;
                     }
 
-                    if (tile.getNationOwner() != null &&
-                        tile.getNationOwner() != getGame().getCurrentPlayer()) {
+                    if (tile.getOwner() != null &&
+                        tile.getOwner() != getGame().getCurrentPlayer()) {
                         // tile is already owned by someone (and not by us!)
-                        if (tile.getNationOwner().isEuropean()) {
+                        if (tile.getOwner().isEuropean()) {
                             value -= 20;
                         } else {
                             value -= 5;
@@ -642,19 +642,19 @@ public final class Tile extends FreeColGameObject implements Location, Named {
      * @return The nation or {@link Player#NO_NATION} is there is no nation
      *         owning this tile.
      */
-    public Player getNationOwner() {
-        return nationOwner;
+    public Player getOwner() {
+        return owner;
     }
 
     /**
      * Sets the nation that should consider this tile to be their property.
      * 
-     * @param nationOwner The nation or {@link Player#NO_NATION} is there is no
+     * @param owner The nation or {@link Player#NO_NATION} is there is no
      *            nation owning this tile.
-     * @see #getNationOwner
+     * @see #getOwner
      */
-    public void setNationOwner(Player nationOwner) {
-        this.nationOwner = nationOwner;
+    public void setOwner(Player owner) {
+        this.owner = owner;
         updatePlayerExploredTiles();
     }
 
@@ -666,16 +666,16 @@ public final class Tile extends FreeColGameObject implements Location, Named {
      */
     public void takeOwnership(Player player) {
         if (player.getLandPrice(this) > 0) {
-            Player otherPlayer = getNationOwner();
+            Player otherPlayer = getOwner();
             if (otherPlayer != null) {
                 if (!otherPlayer.isEuropean()) {
                     otherPlayer.modifyTension(player, Tension.TENSION_ADD_LAND_TAKEN);
                 }
             } else {
-                logger.warning("Could not find player with nation: " + getNationOwner());
+                logger.warning("Could not find player with nation: " + getOwner());
             }
         }
-        setNationOwner(player);
+        setOwner(player);
         updatePlayerExploredTiles();
     }
 
@@ -1648,11 +1648,11 @@ break;
         boolean lostCity = (pet == null) ? lostCityRumour : pet.hasLostCityRumour();
         out.writeAttribute("lostCityRumour", Boolean.toString(lostCity));
 
-        if (nationOwner != null) {
+        if (owner != null) {
             if (getGame().isClientTrusted() || showAll || player.canSee(this)) {
-                out.writeAttribute("nationOwner", nationOwner.getID());
+                out.writeAttribute("owner", owner.getID());
             } else if (pet != null) {
-                out.writeAttribute("nationOwner", pet.getNationOwner().getID());
+                out.writeAttribute("owner", pet.getOwner().getID());
             }
         }
 
@@ -1787,21 +1787,21 @@ break;
             lostCityRumour = false;
         }
 
-        final String nationOwnerStr = in.getAttributeValue(null, "nationOwner");
-        if (nationOwnerStr != null) {
-            nationOwner = (Player) getGame().getFreeColGameObject(nationOwnerStr);
+        final String ownerStr = in.getAttributeValue(null, "owner");
+        if (ownerStr != null) {
+            owner = (Player) getGame().getFreeColGameObject(ownerStr);
         } else {
-            nationOwner = null;
+            owner = null;
         }
 
-        final String ownerStr = in.getAttributeValue(null, "owningSettlement");
-        if (ownerStr != null) {
-            owningSettlement = (Settlement) getGame().getFreeColGameObject(ownerStr);
+        final String owningSettlementStr = in.getAttributeValue(null, "owningSettlement");
+        if (owningSettlementStr != null) {
+            owningSettlement = (Settlement) getGame().getFreeColGameObject(owningSettlementStr);
             if (owningSettlement == null) {
-                if (ownerStr.startsWith(IndianSettlement.getXMLElementTagName())) {
-                    owningSettlement = new IndianSettlement(getGame(), ownerStr);
-                } else if (ownerStr.startsWith(Colony.getXMLElementTagName())) {
-                    owningSettlement = new Colony(getGame(), ownerStr);
+                if (owningSettlementStr.startsWith(IndianSettlement.getXMLElementTagName())) {
+                    owningSettlement = new IndianSettlement(getGame(), owningSettlementStr);
+                } else if (owningSettlementStr.startsWith(Colony.getXMLElementTagName())) {
+                    owningSettlement = new Colony(getGame(), owningSettlementStr);
                 } else {
                     logger.warning("Unknown type of Settlement.");
                 }
@@ -1915,7 +1915,7 @@ break;
         playerExploredTiles[nation].getTileItemInfo(tileItemContainer);
 
         playerExploredTiles[nation].setLostCityRumour(lostCityRumour);
-        playerExploredTiles[nation].setNationOwner(nationOwner);
+        playerExploredTiles[nation].setOwner(owner);
 
         if (getColony() != null) {
             playerExploredTiles[nation].setColonyUnitCount(getSettlement().getUnitCount());
@@ -2081,7 +2081,7 @@ break;
         // Tile data:
         private boolean plowed, forested, bonus;
 
-        private Player nationOwner;
+        private Player owner;
 
         // All known TileItems
         private Resource resource;
@@ -2191,12 +2191,12 @@ break;
             return skill;
         }
 
-        public void setNationOwner(Player nationOwner) {
-            this.nationOwner = nationOwner;
+        public void setOwner(Player owner) {
+            this.owner = owner;
         }
 
-        public Player getNationOwner() {
-            return nationOwner;
+        public Player getOwner() {
+            return owner;
         }
 
         public void setHighlyWantedGoods(GoodsType highlyWantedGoods) {
@@ -2303,8 +2303,8 @@ break;
             if (theTile.hasLostCityRumour()) {
                 out.writeAttribute("lostCityRumour", Boolean.toString(lostCityRumour));
             }
-            if (theTile.getNationOwner() != nationOwner) {
-                out.writeAttribute("nationOwner", nationOwner.getID());
+            if (theTile.getOwner() != owner) {
+                out.writeAttribute("owner", owner.getID());
             }
             if (colonyUnitCount != 0) {
                 out.writeAttribute("colonyUnitCount", Integer.toString(colonyUnitCount));
@@ -2357,11 +2357,11 @@ break;
                 lostCityRumour = theTile.hasLostCityRumour();
             }
 
-            final String nationOwnerStr = in.getAttributeValue(null, "nationOwner");
-            if (nationOwnerStr != null) {
-                nationOwner = (Player) getGame().getFreeColGameObject(nationOwnerStr);
+            final String ownerStr = in.getAttributeValue(null, "owner");
+            if (ownerStr != null) {
+                owner = (Player) getGame().getFreeColGameObject(ownerStr);
             } else {
-                nationOwner = theTile.getNationOwner();
+                owner = theTile.getOwner();
             }
 
             final String colonyUnitCountStr = in.getAttributeValue(null, "colonyUnitCount");

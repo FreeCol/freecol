@@ -366,7 +366,7 @@ public class MapGenerator {
         while (circleIterator.hasNext()) {
             Position adjPos = circleIterator.next();
             map.getTile(adjPos).setClaim(Tile.CLAIM_CLAIMED);
-            map.getTile(adjPos).setNationOwner(player);
+            map.getTile(adjPos).setOwner(player);
         }
 
         for (int i = 0; i < (kind * 2) + 4; i++) {

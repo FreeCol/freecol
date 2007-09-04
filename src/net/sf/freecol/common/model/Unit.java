@@ -1837,7 +1837,7 @@ public class Unit extends FreeColGameObject implements Abilities, Locatable, Loc
         	// reset the ownership of the tile, so that
         	//others may claim it
         	if (location instanceof ColonyTile){
-        		((ColonyTile)location).getWorkTile().setNationOwner(null);
+        		((ColonyTile)location).getWorkTile().setOwner(null);
         	}
             location.remove(this);
         }
@@ -3003,7 +3003,7 @@ public class Unit extends FreeColGameObject implements Abilities, Locatable, Loc
             throw new IllegalStateException("A Unit can only build a colony if on the same tile as the colony");
         }
 
-        getTile().setNationOwner(owner);
+        getTile().setOwner(owner);
         getTile().setSettlement(colony);
         setLocation(colony);
 

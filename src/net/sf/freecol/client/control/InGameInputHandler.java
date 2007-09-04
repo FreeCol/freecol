@@ -925,7 +925,7 @@ public final class InGameInputHandler extends InputHandler {
         ModelMessage m;
         switch (type) {
         case LostCityRumour.BURIAL_GROUND:
-            Player indianPlayer = tile.getNationOwner();
+            Player indianPlayer = tile.getOwner();
             indianPlayer.modifyTension(player, Tension.TENSION_HATEFUL);
             m = new ModelMessage(tile, "lostCityRumour.BurialGround", new String[][] { { "%nation%",
                     indianPlayer.getNationAsString() } }, ModelMessage.LOST_CITY_RUMOUR);

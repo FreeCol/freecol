@@ -1925,8 +1925,8 @@ public final class GUI {
             }
         }
         
-        if (displayTileOwners && tile.getNationOwner() != null) {
-            String tileOwner = tile.getNationOwner().getNation().getName();
+        if (displayTileOwners && tile.getOwner() != null) {
+            String tileOwner = tile.getOwner().getNation().getName();
             g.setColor(Color.BLACK);
             int b = getBreakingPoint(tileOwner);
             if (b == -1) {

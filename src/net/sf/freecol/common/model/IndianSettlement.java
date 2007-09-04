@@ -142,7 +142,7 @@ public class IndianSettlement extends Settlement {
             throw new NullPointerException();
         }
         
-        tile.setNationOwner(player);
+        tile.setOwner(player);
 
         unitContainer = new UnitContainer(game, this);
         goodsContainer = new GoodsContainer(game, this);
@@ -1178,7 +1178,7 @@ public class IndianSettlement extends Settlement {
         settlementTile.setClaim(Tile.CLAIM_NONE);
         while (circleIterator.hasNext()) {
             Tile tile = map.getTile(circleIterator.next());
-            if (tile.getNationOwner() == owner) {
+            if (tile.getOwner() == owner) {
                 tile.setClaim(Tile.CLAIM_NONE);
             }
         }

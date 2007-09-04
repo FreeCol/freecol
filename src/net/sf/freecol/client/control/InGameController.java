@@ -385,7 +385,7 @@ public final class InGameController implements NetworkConstants {
                     lumber += newTile.potential(Goods.LUMBER);
                     food += newTile.potential(Goods.FOOD);
                     ore += newTile.potential(Goods.ORE);
-                    Player tileOwner = newTile.getNationOwner();
+                    Player tileOwner = newTile.getOwner();
                     if (tileOwner == unit.getOwner()) {
                         if (newTile.getOwningSettlement() != null) {
                             // we are using newTile
@@ -2341,7 +2341,7 @@ public final class InGameController implements NetworkConstants {
         if (state == Unit.IMPROVING) {
             int price = unit.getOwner().getLandPrice(unit.getTile());
             if (price > 0) {
-                Player nation = unit.getTile().getNationOwner();
+                Player nation = unit.getTile().getOwner();
                 ChoiceItem[] choices = {
                     new ChoiceItem(Messages.message("indianLand.pay" ,"%amount%",
                                                     Integer.toString(price)), 1),

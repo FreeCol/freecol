@@ -267,11 +267,11 @@ abstract public class Settlement extends FreeColGameObject implements Location, 
         Position position = settlementTile.getPosition();
         Iterator<Position> circleIterator = map.getCircleIterator(position, true, getRadius());
         
-        settlementTile.setNationOwner(null);
+        settlementTile.setOwner(null);
         while (circleIterator.hasNext()) {
             Tile tile = map.getTile(circleIterator.next());
-            if (tile.getNationOwner() == owner) {
-                tile.setNationOwner(null);
+            if (tile.getOwner() == owner) {
+                tile.setOwner(null);
             }
         }
         

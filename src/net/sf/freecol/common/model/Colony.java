@@ -128,11 +128,11 @@ public final class Colony extends Settlement implements Abilities, Location, Nam
         sonsOfLiberty = 0;
         oldSonsOfLiberty = 0;
         Map map = game.getMap();
-        tile.setNationOwner(owner);
+        tile.setOwner(owner);
         for (int direction = 0; direction < Map.NUMBER_OF_DIRECTIONS; direction++) {
             Tile t = map.getNeighbourOrNull(direction, tile);
-            if (t.getNationOwner() == null) {
-                t.setNationOwner(owner);
+            if (t.getOwner() == null) {
+                t.setOwner(owner);
             }
             addWorkLocation(new ColonyTile(game, this, t));
             if (t.getType().isWater()) {
@@ -320,11 +320,11 @@ public final class Colony extends Settlement implements Abilities, Location, Nam
     public void setOwner(Player owner) {
         // TODO: Erik - this only works if called on the server!
         super.setOwner(owner);
-        tile.setNationOwner(owner);
+        tile.setOwner(owner);
         for (Unit unit : getUnitList()) {
             unit.setOwner(owner);
             if (unit.getLocation() instanceof ColonyTile) {
-                ((ColonyTile) unit.getLocation()).getWorkTile().setNationOwner(owner);
+                ((ColonyTile) unit.getLocation()).getWorkTile().setOwner(owner);
             }
         }
         for (Unit target : tile.getUnitList()) {
