@@ -1431,7 +1431,7 @@ public final class GUI {
         displayBaseTile(g, map, tile, x, y, false);        
 
         Unit occupyingUnit = colony.getColonyTile(tile).getOccupyingUnit();
-        if ((tile.getOwner() != null && tile.getOwner() != colony) || occupyingUnit != null) {
+        if ((tile.getOwningSettlement() != null && tile.getOwningSettlement() != colony) || occupyingUnit != null) {
             g.drawImage(lib.getMiscImage(ImageLibrary.TILE_TAKEN), x, y, null);
         }
         displayTileOverlays(g, map, tile, x, y, false, false);

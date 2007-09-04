@@ -387,7 +387,7 @@ public final class InGameController implements NetworkConstants {
                     ore += newTile.potential(Goods.ORE);
                     Player tileOwner = newTile.getNationOwner();
                     if (tileOwner == unit.getOwner()) {
-                        if (newTile.getOwner() != null) {
+                        if (newTile.getOwningSettlement() != null) {
                             // we are using newTile
                             ownedBySelf = true;
                         } else {
@@ -2363,11 +2363,11 @@ public final class InGameController implements NetworkConstants {
         } else if (state == Unit.FORTIFYING && unit.isOffensiveUnit() &&
                 !unit.hasAbility("model.ability.piracy")) { // check if it's going to occupy a work tile
             Tile tile = unit.getTile();
-            if (tile != null && tile.getOwner() != null) { // check stance with settlement's owner
+            if (tile != null && tile.getOwningSettlement() != null) { // check stance with settlement's owner
                 Player myPlayer = unit.getOwner();
-                Player enemy = tile.getOwner().getOwner();
+                Player enemy = tile.getOwningSettlement().getOwner();
                 if (myPlayer != enemy && myPlayer.getStance(enemy) != Player.ALLIANCE
-                        && !confirmHostileAction(unit, tile.getOwner().getTile())) { // player has aborted
+                    && !confirmHostileAction(unit, tile.getOwningSettlement().getTile())) { // player has aborted
                     return;
                 }
             }

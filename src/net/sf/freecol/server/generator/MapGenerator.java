@@ -360,7 +360,7 @@ public class MapGenerator {
         tile.setSettlement(settlement);
         
         tile.setClaim(Tile.CLAIM_CLAIMED);
-        tile.setOwner(settlement);
+        tile.setOwningSettlement(settlement);
         
         Iterator<Position> circleIterator = map.getCircleIterator(position, true, IndianSettlement.getRadius(kind));
         while (circleIterator.hasNext()) {

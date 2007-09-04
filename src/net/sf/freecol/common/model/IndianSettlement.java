@@ -841,7 +841,7 @@ public class IndianSettlement extends Settlement {
         Iterator<Position> it = getGame().getMap().getCircleIterator(getTile().getPosition(), true, getRadius());
         while (it.hasNext()) {
             Tile workTile = getGame().getMap().getTile(it.next());
-            if (workTile.getOwner() == null || workTile.getOwner() == this) {
+            if (workTile.getOwningSettlement() == null || workTile.getOwningSettlement() == this) {
                 amount += workTile.potential(goodsType);
             }
         }
@@ -924,7 +924,7 @@ public class IndianSettlement extends Settlement {
         Iterator<Position> it = getGame().getMap().getCircleIterator(getTile().getPosition(), true, getRadius());
         while (it.hasNext()) {
             Tile workTile = getGame().getMap().getTile(it.next());
-            if ((workTile.getOwner() == null || workTile.getOwner() == this) && !workTile.isOccupied()) {
+            if ((workTile.getOwningSettlement() == null || workTile.getOwningSettlement() == this) && !workTile.isOccupied()) {
                 potential += workTile.potential(type);
             }
         }
@@ -1036,8 +1036,8 @@ public class IndianSettlement extends Settlement {
                 }
                 
                 // Land being used by another settlement:
-                if (t.getOwner() != null && t.getOwner().getOwner().isEuropean()) {                    
-                    extraAlarm[t.getOwner().getOwner().getIndex()] += 2;
+                if (t.getOwningSettlement() != null && t.getOwningSettlement().getOwner().isEuropean()) {
+                    extraAlarm[t.getOwningSettlement().getOwner().getIndex()] += 2;
                 }
 
                 // Settlement:

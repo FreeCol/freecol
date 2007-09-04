@@ -46,9 +46,9 @@ abstract public class Settlement extends FreeColGameObject implements Location, 
         this.owner = owner;
         
         // Relocate any worker already on the Tile (from another Settlement):
-        if (tile.getOwner() != null) {
-            if (tile.getOwner() instanceof Colony) {
-                Colony oc = (Colony) tile.getOwner();
+        if (tile.getOwningSettlement() != null) {
+            if (tile.getOwningSettlement() instanceof Colony) {
+                Colony oc = tile.getColony();
                 ColonyTile ct = oc.getColonyTile(tile);
                 ct.relocateWorkers();
             } else {

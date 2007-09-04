@@ -80,7 +80,7 @@ public final class Tile extends FreeColGameObject implements Location, Named {
      * tile with a worker on it. Note that while units and settlements are owned
      * by a player, a tile is owned by a settlement.
      */
-    private Settlement owner;
+    private Settlement owningSettlement;
 
     /**
      * Stores each player's image of this tile. Only initialized when needed.
@@ -113,7 +113,7 @@ public final class Tile extends FreeColGameObject implements Location, Named {
         y = locY;
         position = new Position(x, y);
 
-        owner = null;
+        owningSettlement = null;
         settlement = null;
 
         if (!isViewShared()) {
@@ -826,7 +826,7 @@ public final class Tile extends FreeColGameObject implements Location, Named {
      */
     public void setSettlement(Settlement s) {
         settlement = s;
-        owner = s;
+        owningSettlement = s;
         setLostCityRumour(false);
         updatePlayerExploredTiles();
     }
@@ -869,8 +869,8 @@ public final class Tile extends FreeColGameObject implements Location, Named {
      * @param owner The Settlement that owns this tile.
      * @see #getOwner
      */
-    public void setOwner(Settlement owner) {
-        this.owner = owner;
+    public void setOwningSettlement(Settlement owner) {
+        this.owningSettlement = owner;
         updatePlayerExploredTiles();
     }
 
@@ -880,8 +880,8 @@ public final class Tile extends FreeColGameObject implements Location, Named {
      * @return The Settlement that owns this tile.
      * @see #setOwner
      */
-    public Settlement getOwner() {
-        return owner;
+    public Settlement getOwningSettlement() {
+        return owningSettlement;
     }
 
     /**
@@ -1556,35 +1556,6 @@ break;
         return top;
     }
 
-    /*
-      public static int secondaryGoods(int type, boolean forested, int addition) {
-      if (forested)
-      return Goods.FURS;
-      /*  Depreciated
-      if (addition >= ADD_HILLS)
-      return Goods.ORE;
-    *//*
-        switch (type) {
-        case PLAINS:
-        case PRAIRIE:
-        case DESERT:
-        return Goods.COTTON;
-        case MARSH:
-        case GRASSLANDS:
-        return Goods.TOBACCO;
-        case SAVANNAH:
-        case SWAMP:
-        return Goods.SUGAR;
-        case TUNDRA:
-        case ARCTIC:
-        case HILLS:
-        case MOUNTAINS:
-        return Goods.ORE;
-        default:
-        return -1;
-        }
-        }
-      */
     /**
      * The defense/ambush bonus of this tile.
      * <p>
@@ -1685,11 +1656,10 @@ break;
             }
         }
 
-        if ((getGame().isClientTrusted() || showAll || player.canSee(this)) && (owner != null)) {
-            out.writeAttribute("owner", owner.getID());
+        if ((getGame().isClientTrusted() || showAll || player.canSee(this)) && (owningSettlement != null)) {
+            out.writeAttribute("owner", owningSettlement.getID());
         }
 
-        // if ((settlement != null) && (showAll || player.canSee(this))) {
         if (settlement != null) {
             if (pet == null || getGame().isClientTrusted() || showAll || settlement.getOwner() == player) {
                 settlement.toXML(out, player, showAll, toSavedGame);
@@ -1824,20 +1794,20 @@ break;
             nationOwner = null;
         }
 
-        final String ownerStr = in.getAttributeValue(null, "owner");
+        final String ownerStr = in.getAttributeValue(null, "owningSettlement");
         if (ownerStr != null) {
-            owner = (Settlement) getGame().getFreeColGameObject(ownerStr);
-            if (owner == null) {
+            owningSettlement = (Settlement) getGame().getFreeColGameObject(ownerStr);
+            if (owningSettlement == null) {
                 if (ownerStr.startsWith(IndianSettlement.getXMLElementTagName())) {
-                    owner = new IndianSettlement(getGame(), ownerStr);
+                    owningSettlement = new IndianSettlement(getGame(), ownerStr);
                 } else if (ownerStr.startsWith(Colony.getXMLElementTagName())) {
-                    owner = new Colony(getGame(), ownerStr);
+                    owningSettlement = new Colony(getGame(), ownerStr);
                 } else {
                     logger.warning("Unknown type of Settlement.");
                 }
             }
         } else {
-            owner = null;
+            owningSettlement = null;
         }
 
         boolean settlementSent = false;
@@ -2537,8 +2507,8 @@ break;
     public Unit getOccupyingUnit() {
         Unit unit = getFirstUnit();
         Player owner = null;
-        if (getOwner() != null) {
-            owner = getOwner().getOwner();
+        if (owningSettlement != null) {
+            owner = owningSettlement.getOwner();
         }
         if (owner != null && unit != null && unit.getOwner() != owner
             && owner.getStance(unit.getOwner()) != Player.ALLIANCE) {

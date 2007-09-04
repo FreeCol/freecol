@@ -252,7 +252,7 @@ public class ColonyTile extends FreeColGameObject implements WorkLocation, Ownab
     * @return <code>true</code> if the <code>Unit</code> may be added and <code>false</code> otherwise.
     */
     public boolean canAdd(Locatable locatable) {
-        if (getWorkTile().getOwner() != null && getWorkTile().getOwner() != getColony()) {
+        if (getWorkTile().getOwningSettlement() != null && getWorkTile().getOwningSettlement() != getColony()) {
             return false;
         }
 
@@ -279,7 +279,7 @@ public class ColonyTile extends FreeColGameObject implements WorkLocation, Ownab
         }
 
         if (!canAdd(locatable)) {
-            if (getWorkTile().getOwner() != null && getWorkTile().getOwner() != getColony()) {
+            if (getWorkTile().getOwningSettlement() != null && getWorkTile().getOwningSettlement() != getColony()) {
                 throw new IllegalArgumentException("Cannot add locatable to this location: somebody else owns this land!");
             }
             throw new IllegalArgumentException("Cannot add locatable to this location: there is a unit here already!");
@@ -318,9 +318,9 @@ public class ColonyTile extends FreeColGameObject implements WorkLocation, Ownab
         getColony().updatePopulation();
 
         if (unit != null) {
-            getWorkTile().setOwner(getColony());
+            getWorkTile().setOwningSettlement(getColony());
         } else {
-            getWorkTile().setOwner(null);
+            getWorkTile().setOwningSettlement(null);
         }
     }
     
@@ -339,7 +339,7 @@ public class ColonyTile extends FreeColGameObject implements WorkLocation, Ownab
         }
 
         getUnit().setMovesLeft(0);
-        getWorkTile().setOwner(null);
+        getWorkTile().setOwningSettlement(null);
         setUnit(null);
         getColony().updatePopulation();
     }
@@ -435,9 +435,9 @@ public class ColonyTile extends FreeColGameObject implements WorkLocation, Ownab
         colony.addGoods(type2, getProductionOf(type2));
 
         if (unit != null) {
-            getWorkTile().setOwner(getColony());
+            getWorkTile().setOwningSettlement(getColony());
         } else {
-            getWorkTile().setOwner(null);
+            getWorkTile().setOwningSettlement(null);
         }
     }
    
@@ -498,7 +498,7 @@ public class ColonyTile extends FreeColGameObject implements WorkLocation, Ownab
 
     public void dispose() {
         if (unit != null) {
-            getWorkTile().setOwner(null);
+            getWorkTile().setOwningSettlement(null);
             unit.dispose();
         }
 

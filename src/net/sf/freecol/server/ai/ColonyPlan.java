@@ -248,7 +248,8 @@ public class ColonyPlan {
         while (colonyTileIterator.hasNext()) {
             ColonyTile ct = colonyTileIterator.next();
 
-            if (ct.getWorkTile().getOwner() != null && ct.getWorkTile().getOwner() != colony || ct.isColonyCenterTile()) {
+            if (ct.getWorkTile().getOwningSettlement() != null &&
+                ct.getWorkTile().getOwningSettlement() != colony || ct.isColonyCenterTile()) {
                 continue;
             }
 
