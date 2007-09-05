@@ -41,8 +41,12 @@ public class Player extends FreeColGameObject implements Abilities, Nameable, Mo
 
     public static final String REVISION = "$Revision$";
 
-    // TODO: this must be fixed!
-    public static final int NUMBER_OF_NATIONS = FreeCol.getSpecification().numberOfNationTypes();
+    /**
+     * The number of players. At the moment, we have 16 players: 4
+     * Europeans + 4 REF + 8 native. In the future, we might wish to
+     * extend that to 8 Europeans (mainly for multi-player games).
+     */
+    public static final int NUMBER_OF_PLAYERS = 16;
 
     /**
      * The index counter for this class.
@@ -70,7 +74,7 @@ public class Player extends FreeColGameObject implements Abilities, Nameable, Mo
      * Contains booleans to see which tribes this player has met.
      * 
      */
-    private boolean[] contacted = new boolean[NUMBER_OF_NATIONS];
+    private boolean[] contacted = new boolean[NUMBER_OF_PLAYERS];
 
     /**
      * 
@@ -79,7 +83,7 @@ public class Player extends FreeColGameObject implements Abilities, Nameable, Mo
      * 0-1000 with 1000 maximum hostility.
      * 
      */
-    private Tension[] tension = new Tension[NUMBER_OF_NATIONS];
+    private Tension[] tension = new Tension[NUMBER_OF_PLAYERS];
 
     /**
      * 
@@ -88,7 +92,7 @@ public class Player extends FreeColGameObject implements Abilities, Nameable, Mo
      * WAR, CEASE_FIRE, PEACE and ALLIANCE.
      * 
      */
-    private int[] stance = new int[NUMBER_OF_NATIONS];
+    private int[] stance = new int[NUMBER_OF_PLAYERS];
 
     private static final Color noNationColor = Color.BLACK;
 
@@ -2542,7 +2546,7 @@ public class Player extends FreeColGameObject implements Abilities, Nameable, Mo
         incomeAfterTaxes = null;
         while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
             if (in.getLocalName().equals("tension")) {
-                tension = new Tension[NUMBER_OF_NATIONS];
+                tension = new Tension[NUMBER_OF_PLAYERS];
                 int[] tensionArray = readFromArrayElement("tension", in, new int[0]);
                 for (int i = 0; i < tensionArray.length; i++) {
                     tension[i] = new Tension(tensionArray[i]);
@@ -2588,13 +2592,13 @@ public class Player extends FreeColGameObject implements Abilities, Nameable, Mo
             market = new Market(getGame(), this);
         }
         if (tension == null) {
-            tension = new Tension[NUMBER_OF_NATIONS];
+            tension = new Tension[NUMBER_OF_PLAYERS];
             for (int i = 0; i < tension.length; i++) {
                 tension[i] = new Tension(0);
             }
         }
         if (stance == null) {
-            stance = new int[NUMBER_OF_NATIONS];
+            stance = new int[NUMBER_OF_PLAYERS];
         }
         if (arrears == null) {
             arrears = new int[Goods.NUMBER_OF_TYPES];

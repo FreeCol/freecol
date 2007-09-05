@@ -85,7 +85,7 @@ public final class PreGameController extends Controller {
         game.setFreeColGameObjectListener(aiMain);        
 
         // Add AI players:
-        for (int i = 0; i < Player.NUMBER_OF_NATIONS; i++) {
+        for (int i = 0; i < Player.NUMBER_OF_PLAYERS; i++) {
             if (game.getPlayer(i) != null) {
                 continue;
             }

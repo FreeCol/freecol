@@ -117,7 +117,7 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
         settlement = null;
 
         if (!isViewShared()) {
-            playerExploredTiles = new PlayerExploredTile[Player.NUMBER_OF_NATIONS];
+            playerExploredTiles = new PlayerExploredTile[Player.NUMBER_OF_PLAYERS];
         }
     }
 
@@ -133,7 +133,7 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
         super(game, in);
 
         if (!isViewShared()) {
-            playerExploredTiles = new PlayerExploredTile[Player.NUMBER_OF_NATIONS];
+            playerExploredTiles = new PlayerExploredTile[Player.NUMBER_OF_PLAYERS];
         }
 
         readFromXML(in);
@@ -150,7 +150,7 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
         super(game, e);
 
         if (!isViewShared()) {
-            playerExploredTiles = new PlayerExploredTile[Player.NUMBER_OF_NATIONS];
+            playerExploredTiles = new PlayerExploredTile[Player.NUMBER_OF_PLAYERS];
         }
 
         readFromXMLElement(e);
@@ -169,7 +169,7 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
         super(game, id);
 
         if (!isViewShared()) {
-            playerExploredTiles = new PlayerExploredTile[Player.NUMBER_OF_NATIONS];
+            playerExploredTiles = new PlayerExploredTile[Player.NUMBER_OF_PLAYERS];
         }
     }
 
@@ -1710,7 +1710,7 @@ break;
                     }
                     out.writeAttribute("hasBeenVisited", Boolean.toString(pet.hasBeenVisited()));
 
-                    int[] tensionArray = new int[Player.NUMBER_OF_NATIONS];
+                    int[] tensionArray = new int[Player.NUMBER_OF_PLAYERS];
                     for (int i = 0; i < tensionArray.length; i++) {
                         tensionArray[i] = is.getAlarm(i).getValue();
                     }

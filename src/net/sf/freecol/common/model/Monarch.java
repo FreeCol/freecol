@@ -413,9 +413,9 @@ public final class Monarch extends FreeColGameObject {
      * @return The enemy nation.
      */
     public Player declareWar() {
-        int offset = getGame().getModelController().getPseudoRandom().nextInt(Player.NUMBER_OF_NATIONS);
-        for (int i = 0; i < Player.NUMBER_OF_NATIONS; i++) {
-            int nation = (i + offset) % Player.NUMBER_OF_NATIONS;
+        int offset = getGame().getModelController().getPseudoRandom().nextInt(Player.NUMBER_OF_PLAYERS);
+        for (int i = 0; i < Player.NUMBER_OF_PLAYERS; i++) {
+            int nation = (i + offset) % Player.NUMBER_OF_PLAYERS;
             Player enemy = getGame().getPlayer(nation);
             if (enemy == player) {
                 continue;

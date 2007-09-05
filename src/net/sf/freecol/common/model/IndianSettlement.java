@@ -100,7 +100,7 @@ public class IndianSettlement extends Settlement {
     * Stores the alarm levels. <b>Only used by AI.</b>
     * 0-1000 with 1000 as the maximum alarm level.
     */
-    private Tension[] alarm = new Tension[Player.NUMBER_OF_NATIONS];
+    private Tension[] alarm = new Tension[Player.NUMBER_OF_PLAYERS];
 
     // sort goods types descending by price
     private final Comparator<GoodsType> wantedGoodsComparator = new Comparator<GoodsType>() {
@@ -1015,7 +1015,7 @@ public class IndianSettlement extends Settlement {
 
         /* Increase alarm: */
         if (getUnitCount() > 0) {
-            int[] extraAlarm = new int[Player.NUMBER_OF_NATIONS];
+            int[] extraAlarm = new int[Player.NUMBER_OF_PLAYERS];
             
             int alarmRadius = getRadius() + 2; // the radius in which Europeans cause alarm
             Iterator<Position> ci = getGame().getMap().getCircleIterator(getTile().getPosition(), true, alarmRadius);
@@ -1343,7 +1343,7 @@ public class IndianSettlement extends Settlement {
             learnableSkill = FreeCol.getSpecification().getUnitType(Integer.parseInt(learnableSkillStr));
         }
 
-        alarm = new Tension[Player.NUMBER_OF_NATIONS];
+        alarm = new Tension[Player.NUMBER_OF_PLAYERS];
         while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
             if (in.getLocalName().equals("alarm")) {
                 int[] tensionArray = readFromArrayElement("alarm", in, new int[0]);
