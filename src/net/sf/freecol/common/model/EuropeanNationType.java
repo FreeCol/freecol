@@ -103,6 +103,7 @@ public class EuropeanNationType extends NationType {
             throws XMLStreamException {
         setID(in.getAttributeValue(null, "id"));
         setColor(new Color(Integer.parseInt(in.getAttributeValue(null, "color"), 16)));
+        ref = getAttribute(in, "ref", false);
 
         while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
             String childName = in.getLocalName();

@@ -276,7 +276,7 @@ public class Player extends FreeColGameObject implements Abilities, Nameable, Mo
         for (int k = 0; k < tension.length; k++) {
             tension[k] = new Tension(0);
         }
-        if (nation.isEuropean()) {
+        if (nation != null && nation.isEuropean()) {
             /*
              * 
              * Setting the amount of gold to
@@ -297,7 +297,7 @@ public class Player extends FreeColGameObject implements Abilities, Nameable, Mo
 
         market = new Market(getGame(), this);
 
-        if (nation.isEuropean()) {
+        if (nation != null && nation.isEuropean()) {
             europe = new Europe(game, this);
             if (!nation.isREF()) {
                 monarch = new Monarch(game, this, "");

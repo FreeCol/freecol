@@ -1054,7 +1054,7 @@
       <unit id="model.unit.caravel"/>
     </european-nation-type>
     <!-- default REF nation -->
-    <european-nation-type id="model.nation.ref" color="b4b4b4">
+    <european-nation-type id="model.nation.ref" color="b4b4b4" ref="yes">
       <modifier id="model.modifier.bombardBonus" type="percentage" value="50"/>
     </european-nation-type>
     <european-nation-type id="model.nation.dutch" color="ff9d3c">
