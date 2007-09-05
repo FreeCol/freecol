@@ -497,13 +497,13 @@ public class MapGenerator {
                 Unit newUnit = new Unit(map.getGame(), startTile, player, startingUnit.unitType,
                                         Unit.SENTRY, startingUnit.armed, startingUnit.mounted,
                                         startingUnit.tools, startingUnit.missionary);
-                if (newUnit.isNaval()) {
+                if (newUnit.hasAbility("model.ability.carryUnits")) {
                     carrier = newUnit;
                 }
             }
             if (carrier != null) {
                 for (Unit unit : units) {
-                    if (!unit.isNaval()) {
+                    if (!unit.hasAbility("model.ability.carryUnits")) {
                         unit.setLocation(carrier);
                     }
                 }
