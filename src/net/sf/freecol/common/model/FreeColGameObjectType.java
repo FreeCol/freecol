@@ -17,8 +17,7 @@ public abstract class FreeColGameObjectType extends FreeColObject {
         this.id = id;
     }
 
-    // TODO: change this back to protected
-    public final void setIndex(final int index) {
+    protected final void setIndex(final int index) {
         this.index = index;
     }
 

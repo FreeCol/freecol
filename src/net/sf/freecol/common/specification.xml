@@ -1046,12 +1046,16 @@
     </founding-father>
   </founding-fathers>
 
-  <european-nation-types>
+  <nation-types>
     <!-- default nation for multi-player games -->
     <european-nation-type id="model.nation.default" color="b4b4b4">
       <unit id="model.unit.freeColonist" tools="100"/>
       <unit id="model.unit.freeColonist" armed="yes"/>
       <unit id="model.unit.caravel"/>
+    </european-nation-type>
+    <!-- default REF nation -->
+    <european-nation-type id="model.nation.ref" color="b4b4b4">
+      <modifier id="model.modifier.bombardBonus" type="percentage" value="50"/>
     </european-nation-type>
     <european-nation-type id="model.nation.dutch" color="ff9d3c">
       <modifier id="model.modifier.tradeBonus" type="percentage" value="50"/>
@@ -1078,9 +1082,7 @@
       <unit id="model.unit.veteranSoldier" armed="yes" mounted="yes"/>
       <unit id="model.unit.caravel"/>
     </european-nation-type>
-  </european-nation-types>
 
-  <indian-nation-types>
     <indian-nation-type id="model.nation.apache" color="900000" number-of-settlements="average" aggression="high" type-of-settlement="teepee">
       <skill id="model.unit.expertScout"/>
       <skill id="model.unit.expertFurTrapper"/>
@@ -1116,6 +1118,6 @@
       <skill id="model.unit.expertFarmer"/>
       <skill id="model.unit.expertFisherman"/>
     </indian-nation-type>
-  </indian-nation-types>
+  </nation-types>
 
 </freecol-specification>

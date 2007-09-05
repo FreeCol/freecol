@@ -58,9 +58,6 @@ public final class Specification {
     private final List<FoundingFather> foundingFathers;
 
     private final List<NationType> nationTypes;
-    private final List<EuropeanNationType> europeanNationTypes;
-    private final List<EuropeanNationType> refNationTypes;
-    private final List<IndianNationType> indianNationTypes;
 
     public Specification() {
         logger.info("Initializing Specification");
@@ -74,9 +71,6 @@ public final class Specification {
         unitTypeList = new ArrayList<UnitType>();
         foundingFathers = new ArrayList<FoundingFather>();
         nationTypes = new ArrayList<NationType>();
-        europeanNationTypes = new ArrayList<EuropeanNationType>();
-        refNationTypes = new ArrayList<EuropeanNationType>();
-        indianNationTypes = new ArrayList<IndianNationType>();
 
         final Map<String, GoodsType> goodsTypeByRef = new HashMap<String, GoodsType>();
         final Map<String, ResourceType> resourceTypeByRef = new HashMap<String, ResourceType>();
@@ -208,33 +202,24 @@ public final class Specification {
                     };
                     foundingFathers.addAll(makeListFromXml(xsr, factory));
 
-                } else if ("european-nation-types".equals(childName)) {
+                } else if ("nation-types".equals(childName)) {
 
                     logger.finest("Found child named " + childName);
-                    ObjectFactory<EuropeanNationType> factory = new ObjectFactory<EuropeanNationType>() {
+                    ObjectFactory<NationType> factory = new ObjectFactory<NationType>() {
                         int nationIndex = 0;
-                        public EuropeanNationType objectFrom(XMLStreamReader in) throws XMLStreamException {
-                            EuropeanNationType nationType = new EuropeanNationType(nationIndex++);
-                            nationType.readFromXML(in, unitTypeByRef);
-                            return nationType;
+                        public NationType objectFrom(XMLStreamReader in) throws XMLStreamException {
+                            if ("european-nation-type".equals(in.getLocalName())) {
+                                EuropeanNationType nationType = new EuropeanNationType(nationIndex++);
+                                nationType.readFromXML(in, unitTypeByRef);
+                                return nationType;
+                            } else {
+                                IndianNationType nationType = new IndianNationType(nationIndex++);
+                                nationType.readFromXML(in, unitTypeByRef);
+                                return nationType;
+                            }
                         }
                     };
-                    europeanNationTypes.addAll(makeListFromXml(xsr, factory));
-                    nationTypes.addAll(europeanNationTypes);
-
-                } else if ("indian-nation-types".equals(childName)) {
-
-                    logger.finest("Found child named " + childName);
-                    ObjectFactory<IndianNationType> factory = new ObjectFactory<IndianNationType>() {
-                        int nationIndex = 0;
-                        public IndianNationType objectFrom(XMLStreamReader in) throws XMLStreamException {
-                            IndianNationType nationType = new IndianNationType(nationIndex++);
-                            nationType.readFromXML(in, unitTypeByRef);
-                            return nationType;
-                        }
-                    };
-                    indianNationTypes.addAll(makeListFromXml(xsr, factory));
-                    nationTypes.addAll(indianNationTypes);
+                    nationTypes.addAll(makeListFromXml(xsr, factory));
 
                 } else {
                     throw new RuntimeException("unexpected: " + childName);
@@ -245,14 +230,12 @@ public final class Specification {
             // Get Food, Bells, Crosses and Hammers
             Goods.initialize(getGoodsTypeList(), numberOfGoodsTypes());
             Tile.initialize(numberOfTileTypes());
+            /**
             for (EuropeanNationType nation: europeanNationTypes) {
                 refNationTypes.add(new EuropeanNationType(0, nation.getID() + "REF"));
             }
             nationTypes.addAll(refNationTypes);
-            // TODO: fix this somehow
-            for (int index = 0; index < nationTypes.size(); index++) {
-                nationTypes.get(index).setIndex(index);
-            }
+            */
 
             logger.info("Specification initialization complete");
         } catch (XMLStreamException e) {
@@ -576,15 +559,33 @@ public final class Specification {
     }
 
     public List<EuropeanNationType> getEuropeanNationTypes() {
-        return europeanNationTypes;
+        List<EuropeanNationType> result = new ArrayList<EuropeanNationType>();
+        for (NationType nationType : nationTypes) {
+            if (nationType.isEuropean() && !nationType.isREF()) {
+                result.add((EuropeanNationType) nationType);
+            }
+        }
+        return result;
     }
 
     public List<EuropeanNationType> getREFNationTypes() {
-        return refNationTypes;
+        List<EuropeanNationType> result = new ArrayList<EuropeanNationType>();
+        for (NationType nationType : nationTypes) {
+            if (nationType.isEuropean() && nationType.isREF()) {
+                result.add((EuropeanNationType) nationType);
+            }
+        }
+        return result;
     }
 
     public List<IndianNationType> getIndianNationTypes() {
-        return indianNationTypes;
+        List<IndianNationType> result = new ArrayList<IndianNationType>();
+        for (NationType nationType : nationTypes) {
+            if (!nationType.isEuropean()) {
+                result.add((IndianNationType) nationType);
+            }
+        }
+        return result;
     }
 
     public int numberOfNationTypes() {
