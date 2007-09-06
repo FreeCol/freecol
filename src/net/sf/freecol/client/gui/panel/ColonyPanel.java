@@ -597,10 +597,10 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener {
             final int nextHammers = getColony().getBuildingForProducing(Goods.HAMMERS).getProductionNextTurn();
             int nextTools = getColony().getBuildingForProducing(Goods.TOOLS).getProductionNextTurn();
 
-            // subtract the tools needed for musket production
-            Building musketsProducer = getColony().getBuildingForProducing(Goods.MUSKETS);
-            if(musketsProducer != null){
-            	nextTools -= musketsProducer.getProductionNextTurn();
+            // subtract the tools used for production
+            GoodsType produced = Goods.TOOLS.getProducedMaterial();
+            if (produced != null) {
+                nextTools -= getColony().getProductionNextTurn(produced);
             }
             
             int hammersNeeded = 0;
