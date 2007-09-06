@@ -115,6 +115,10 @@ public abstract class NationType extends FreeColGameObjectType implements Abilit
     }
 
 
+    public String toString() {
+        return getName();
+    }
+
     protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
         readFromXML(in, null);
     }

@@ -13,6 +13,7 @@ import javax.swing.table.TableCellRenderer;
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.common.model.EuropeanNationType;
 import net.sf.freecol.common.model.IndianNationType;
+import net.sf.freecol.common.model.Nation;
 import net.sf.freecol.common.model.Player;
 
 /**
@@ -25,8 +26,8 @@ public final class NationCellRenderer implements TableCellRenderer {
     public static final String  LICENSE = "http://www.gnu.org/licenses/gpl.html";
     public static final String  REVISION = "$Revision$";
 
-    private static Vector<EuropeanNationType> europeans = 
-        new Vector<EuropeanNationType>(FreeCol.getSpecification().getEuropeanNationTypes());
+    private static Vector<Nation> europeans = 
+        new Vector<Nation>(FreeCol.getSpecification().getClassicNations());
     private static Vector<IndianNationType> indians = 
         new Vector<IndianNationType>(FreeCol.getSpecification().getIndianNationTypes());
     private static Vector<EuropeanNationType> refs = 
@@ -111,6 +112,7 @@ public final class NationCellRenderer implements TableCellRenderer {
         }
         component.setBackground(table.getBackground());
 
+        /*
         int index = player.getIndex();
         if (player.isIndian() || player.isREF()) {
             index -= FreeCol.getSpecification().getEuropeanNationTypes().size();
@@ -119,6 +121,7 @@ public final class NationCellRenderer implements TableCellRenderer {
             index -= FreeCol.getSpecification().getIndianNationTypes().size();
         }        
         component.setSelectedIndex(index);
+        */
         return component;
     }
 }

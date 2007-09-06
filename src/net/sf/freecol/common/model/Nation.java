@@ -183,6 +183,10 @@ public class Nation extends FreeColGameObjectType {
         return new HashMap<String, Modifier>(type.getModifiers());
     }
 
+    public String toString() {
+        return getName();
+    }
+
     protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
         readFromXML(in, null);
     }

@@ -1423,6 +1423,10 @@ public class Player extends FreeColGameObject implements Abilities, Nameable, Mo
         return name;
     }
 
+    public String toString() {
+        return getName();
+    }
+
     /**
      * Set the <code>Name</code> value.
      * 

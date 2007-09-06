@@ -637,6 +637,15 @@ public final class Specification {
         return null;
     }
 
+    public List<Nation> getClassicNations() {
+        ArrayList<Nation> result = new ArrayList<Nation>();
+        for (Nation nation : nations) {
+            if (nation.isClassic()) {
+                result.add(nation);
+            }
+        }
+        return result;
+    }
 
     /**
      * Takes an XML node with child nodes that represent objects of the type
