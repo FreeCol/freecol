@@ -499,7 +499,11 @@ public class MapGenerator {
                                         startingUnit.tools, startingUnit.missionary);
                 if (newUnit.hasAbility("model.ability.carryUnits")) {
                     carrier = newUnit;
+                    carrier.setState(Unit.ACTIVE);
+                } else {
+                    units.add(newUnit);
                 }
+                
             }
             if (carrier != null) {
                 for (Unit unit : units) {
@@ -509,24 +513,6 @@ public class MapGenerator {
                 }
             }
             
-            /**
-            // TODO: make this generic!
-            UnitType navalUnitType = (player.getNation() == ServerPlayer.DUTCH) ?
-                FreeCol.getSpecification().getUnitType("model.unit.merchantman") :
-                FreeCol.getSpecification().getUnitType("model.unit.caravel");
-            UnitType pioneerUnitType = (player.getNation() == ServerPlayer.FRENCH) ?
-                FreeCol.getSpecification().getUnitType("model.unit.hardyPioneer") :
-                FreeCol.getSpecification().getUnitType("model.unit.freeColonist");
-            UnitType soldierUnitType = (player.getNation() == ServerPlayer.SPANISH) ?
-                FreeCol.getSpecification().getUnitType("model.unit.veteranSoldier") :
-                FreeCol.getSpecification().getUnitType("model.unit.freeColonist");
-
-            Unit unit1 = new Unit(map.getGame(), startTile, player, navalUnitType, Unit.ACTIVE);
-            //unit1.setName(Messages.message("shipName." + player.getNation() + ".0"));
-            @SuppressWarnings("unused") Unit unit2 = new Unit(map.getGame(), unit1, player, pioneerUnitType, Unit.SENTRY, false, false, 100, false);
-            @SuppressWarnings("unused") Unit unit3 = new Unit(map.getGame(), unit1, player, soldierUnitType, Unit.SENTRY, true, false, 0, false);
-            */
-
             // START DEBUG:
             if (FreeCol.isInDebugMode()) {
                 UnitType unitType = FreeCol.getSpecification().getUnitType("model.unit.galleon");
