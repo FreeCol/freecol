@@ -1,6 +1,7 @@
 package net.sf.freecol.client.gui;
 
 import java.awt.Component;
+import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Image;
@@ -33,6 +34,8 @@ import javax.swing.filechooser.FileFilter;
 import javax.swing.plaf.basic.BasicInternalFrameUI;
 
 import net.sf.freecol.client.FreeColClient;
+import net.sf.freecol.client.gui.action.ActionManager;
+import net.sf.freecol.client.gui.action.MapControlsAction;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.client.gui.panel.ChatPanel;
 import net.sf.freecol.client.gui.panel.ChooseFoundingFatherDialog;
@@ -51,6 +54,7 @@ import net.sf.freecol.client.gui.panel.ImageProvider;
 import net.sf.freecol.client.gui.panel.IndianSettlementPanel;
 import net.sf.freecol.client.gui.panel.LoadingSavegameDialog;
 import net.sf.freecol.client.gui.panel.MainPanel;
+import net.sf.freecol.client.gui.panel.MapControls;
 import net.sf.freecol.client.gui.panel.MapGeneratorOptionsDialog;
 import net.sf.freecol.client.gui.panel.MonarchPanel;
 import net.sf.freecol.client.gui.panel.NegotiationDialog;
@@ -179,19 +183,29 @@ public final class Canvas extends JDesktopPane {
 
     private boolean clientOptionsDialogShowing = false;
 
+    /**
+     * Variable used for detecting resizing.
+     */
+    private Dimension oldSize = null;
+    
+    private Dimension initialSize = null;
 
     /**
      * The constructor to use.
      * 
      * @param client main control class.
-     * @param bounds The bounds of this <code>Canvas</code>.
+     * @param size The bounds of this <code>Canvas</code>.
      * @param gui The object responsible of drawing the map onto this component.
      */
-    public Canvas(FreeColClient client, Rectangle bounds, GUI gui) {
+    public Canvas(FreeColClient client, Dimension size, GUI gui) {
         this.freeColClient = client;
         this.gui = gui;
 
-        setBounds(bounds);
+        initialSize = size;
+
+        setLocation(0, 0);
+        setSize(size);
+        
         setDoubleBuffered(true);
         setOpaque(false);
         setLayout(null);
@@ -224,6 +238,16 @@ public final class Canvas extends JDesktopPane {
         });
 
         logger.info("Canvas created.");
+    }
+
+    @Override
+    public Dimension getMinimumSize() {
+        return new Dimension(640, 480);
+    }
+
+    @Override
+    public Dimension getPreferredSize() {
+        return initialSize;
     }
 
     /**
@@ -281,6 +305,30 @@ public final class Canvas extends JDesktopPane {
      */
     @Override
     public void paintComponent(Graphics g) {
+        // Fixes resizing of frame:
+        if (oldSize == null) {
+            oldSize = getSize();
+        }
+        if (oldSize.width != getWidth() || oldSize.height != getHeight()) {
+            if (jMenuBar != null) {
+                jMenuBar.setSize(getWidth(), (int) jMenuBar.getPreferredSize().getHeight());
+            }
+            MapControlsAction mca = (MapControlsAction) freeColClient.getActionManager().getFreeColAction(MapControlsAction.ID);
+            MapControls mc = mca.getMapControls();
+            if (mc != null && mc.isShowing()) {
+                mc.removeFromComponent(this);
+                mc.addToComponent(this);
+            }
+            if (europePanel != null) {
+                JInternalFrame f = getInternalFrame(europePanel);
+                if (f != null) {
+                    f.setSize(getWidth(), getHeight() - getMenuBarHeight());
+                    f.setLocation(0, getMenuBarHeight());
+                }
+            }
+            gui.setSize(getSize());
+        }
+
         Graphics2D g2d = (Graphics2D) g;
         gui.display(g2d);
     }

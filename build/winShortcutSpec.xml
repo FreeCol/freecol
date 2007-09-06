@@ -8,7 +8,7 @@
     
     <shortcut name="FreeCol"
               target="$INSTALL_PATH\freecol.exe"
-              commandLine=""
+              commandLine="--splash"
               workingDirectory="$INSTALL_PATH"
               description="FreeCol"
               iconFile="$INSTALL_PATH\freecol.exe"
@@ -23,7 +23,7 @@
     
     <shortcut name="FreeCol (windowed)"
               target="$INSTALL_PATH\freecol.exe"
-              commandLine="--windowed"
+              commandLine="--splash --windowed"
               workingDirectory="$INSTALL_PATH"
               description="FreeCol - Windowed"
               iconFile="$INSTALL_PATH\freecol.exe"

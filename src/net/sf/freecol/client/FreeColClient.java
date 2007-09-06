@@ -1,5 +1,6 @@
 package net.sf.freecol.client;
 
+import java.awt.Dimension;
 import java.awt.GraphicsDevice;
 import java.awt.GraphicsEnvironment;
 import java.awt.Rectangle;
@@ -139,12 +140,12 @@ public final class FreeColClient {
      *            displayed within a <code>JFrame</code> (when
      *            <code>true</code>) or in fullscreen mode (when
      *            <code>false</code>).
-     * @param windowSize The size of the window if not in fullscreen mode.
+     * @param innerWindowSize The inner size of the window (borders not included).
      * @param imageLibrary The object holding the images.
      * @param musicLibrary The object holding the music.
      * @param sfxLibrary The object holding the sound effects.
      */
-    public FreeColClient(boolean windowed, Rectangle windowSize, ImageLibrary imageLibrary, MusicLibrary musicLibrary,
+    public FreeColClient(boolean windowed, final Dimension innerWindowSize, ImageLibrary imageLibrary, MusicLibrary musicLibrary,
             SfxLibrary sfxLibrary) {
         this.windowed = windowed;
         this.imageLibrary = imageLibrary;
@@ -165,10 +166,9 @@ public final class FreeColClient {
         mapEditorController = new MapEditorController(this);
         
         // Gui:
-        final Rectangle theWindowSize = windowSize;
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
-                startGUI(theWindowSize);
+                startGUI(innerWindowSize);
             }
         });
         worker = new Worker();
@@ -195,7 +195,7 @@ public final class FreeColClient {
     /**
      * Starts the GUI by creating and displaying the GUI-objects.
      */
-    private void startGUI(Rectangle windowSize) {
+    private void startGUI(Dimension innerWindowSize) {
         if (musicLibrary != null) {
             musicPlayer = new SoundPlayer(false, true, true);
         } else {
@@ -212,11 +212,12 @@ public final class FreeColClient {
         }
         gd = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice();
         if (windowed) {
-            frame = new WindowedFrame(windowSize);
+            frame = new WindowedFrame();
         } else {
             if (!gd.isFullScreenSupported()) {
-                logger
-                        .info("It seems that full screen mode is not fully supported for this GraphicsDevice. Please try the \"--windowed\" option if you experience any graphical problems while running FreeCol.");
+                String fullscreenNotSupported = "\nIt seems that full screen mode is not fully supported for this\nGraphicsDevice. Please try the \"--windowed\" option if you\nexperience any graphical problems while running FreeCol.";
+                logger.info(fullscreenNotSupported);
+                System.out.println(fullscreenNotSupported);
                 /*
                  * We might want this behavior later: logger.warning("It seems
                  * that full screen mode is not supported for this
@@ -226,15 +227,18 @@ public final class FreeColClient {
                  */
             }
             frame = new FullScreenFrame(gd);
+            innerWindowSize = frame.getSize();
         }
-        gui = new GUI(this, frame.getBounds(), imageLibrary);
-        canvas = new Canvas(this, frame.getBounds(), gui);
+        gui = new GUI(this, innerWindowSize, imageLibrary);
+        canvas = new Canvas(this, innerWindowSize, gui);
         if (frame instanceof WindowedFrame) {
             ((WindowedFrame) frame).setCanvas(canvas);
+            frame.getContentPane().add(canvas);
+            frame.pack();
         } else if (frame instanceof FullScreenFrame) {
             ((FullScreenFrame) frame).setCanvas(canvas);
+            frame.getContentPane().add(canvas);
         }
-        frame.getContentPane().add(canvas);
         frame.setVisible(true);
         canvas.showMainPanel();
         gui.startCursorBlinking();

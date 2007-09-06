@@ -333,24 +333,28 @@ public final class EuropePanel extends FreeColPanel implements ActionListener {
         int width = getWidth();
         int height = getHeight();
 
-        Image bgImage = (Image) UIManager.get("EuropeBackgroundImage");
+        Image bgImage = (Image) UIManager.get("EuropeBackgroundImage.scaled");
+        if (bgImage == null) {
+            bgImage = (Image) UIManager.get("EuropeBackgroundImage");
+        }
         if (bgImage != null) {
-            if (bgImage.getWidth(null) != getWidth() || bgImage.getHeight(null) != getHeight()) {
-                bgImage = bgImage.getScaledInstance(getWidth(), getHeight(), Image.SCALE_SMOOTH);
-                UIManager.put("EuropeBackgroundImage", bgImage);
+            if (bgImage.getWidth(null) != parent.getWidth() || bgImage.getHeight(null) != parent.getHeight()) {
+                final Image fullSizeBgImage = (Image) UIManager.get("EuropeBackgroundImage");
+                bgImage = fullSizeBgImage.getScaledInstance(parent.getWidth(), parent.getHeight(), Image.SCALE_SMOOTH);
+                UIManager.put("EuropeBackgroundImage.scaled", bgImage);
 
                 /*
                  * We have to use a MediaTracker to ensure that the image has
                  * been scaled before we paint it.
                  */
                 MediaTracker mt = new MediaTracker(freeColClient.getCanvas());
-                mt.addImage(bgImage, 0, getWidth(), getHeight());
+                mt.addImage(bgImage, 0, parent.getWidth(), parent.getHeight());
 
                 try {
                     mt.waitForID(0);
                 } catch (InterruptedException e) {
                     g.setColor(Color.black);
-                    g.fillRect(0, 0, getWidth(), getHeight());
+                    g.fillRect(0, 0, parent.getWidth(), parent.getHeight());
                     return;
                 }
 

@@ -3,6 +3,7 @@ package net.sf.freecol.client.gui;
 import java.awt.AlphaComposite;
 import java.awt.Color;
 import java.awt.Composite;
+import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.Graphics;
@@ -66,7 +67,7 @@ public final class GUI {
 
 
     private final FreeColClient freeColClient;
-    private final Rectangle bounds;
+    private Dimension size;
     private final ImageLibrary lib;
     private TerrainCursor cursor;
     private ViewMode viewMode;
@@ -159,12 +160,12 @@ public final class GUI {
     * The constructor to use.
     *
     * @param freeColClient The main control class.
-    * @param bounds The bounds of the GUI (= the entire screen if the app is displayed in full-screen).
+    * @param size The size of the GUI (= the entire screen if the app is displayed in full-screen).
     * @param lib The library of images needed to display certain things visually.
     */
-    public GUI(FreeColClient freeColClient, Rectangle bounds, ImageLibrary lib) {
+    public GUI(FreeColClient freeColClient, Dimension size, ImageLibrary lib) {
         this.freeColClient = freeColClient;
-        this.bounds = bounds;
+        this.size = size;
         this.lib = lib;
 
         cursor = new net.sf.freecol.client.gui.TerrainCursor();
@@ -174,7 +175,7 @@ public final class GUI {
         tileWidth = lib.getTerrainImageWidth(tileType);
 
         // Calculate the amount of rows that will be drawn above the central Tile
-        topSpace = ((int) bounds.getHeight() - tileHeight) / 2;
+        topSpace = ((int) size.height - tileHeight) / 2;
         //bottomSpace = topSpace;
 
         if ((topSpace % (tileHeight / 2)) != 0) {
@@ -184,7 +185,7 @@ public final class GUI {
         }
         bottomRows = topRows;
 
-        leftSpace = ((int) bounds.getWidth() - tileWidth) / 2;
+        leftSpace = ((int) size.width - tileWidth) / 2;
         rightSpace = leftSpace;
         inGame = false;
         logger.info("GUI created.");
@@ -232,6 +233,10 @@ public final class GUI {
     
     public TerrainCursor getCursor(){
         return cursor;
+    }
+    
+    public void setSize(Dimension size) {
+        this.size = size;
     }
     
     public void moveTileCursor(int direction){
@@ -606,7 +611,7 @@ public final class GUI {
      * @return The width of this GUI.
      */
     public int getWidth() {
-        return (int) bounds.getWidth();
+        return size.width;
     }
 
 
@@ -615,7 +620,7 @@ public final class GUI {
      * @return The height of this GUI.
      */
     public int getHeight() {
-        return (int) bounds.getHeight();
+        return size.height;
     }
 
 
@@ -633,27 +638,29 @@ public final class GUI {
         } else {
             if (freeColClient.isMapEditor()) {
                 g.setColor(Color.black);
-                g.fillRect(0, 0, bounds.width, bounds.height);                
+                g.fillRect(0, 0, size.width, size.height);                
             } else {
-                Image bgImage = (Image) UIManager.get("CanvasBackgroundImage");
-
+                Image bgImage = (Image) UIManager.get("CanvasBackgroundImage.scaled");
+                if (bgImage == null) {
+                    bgImage = (Image) UIManager.get("CanvasBackgroundImage");
+                }
                 if (bgImage != null) {
-                    if (bgImage.getWidth(null) != bounds.width || bgImage.getHeight(null) != bounds.height) {
-                        bgImage = bgImage.getScaledInstance(bounds.width, bounds.height, Image.SCALE_SMOOTH);
-                        UIManager.put("CanvasBackgroundImage", bgImage);
-
+                    if (bgImage.getWidth(null) != size.width || bgImage.getHeight(null) != size.height) {
+                        final Image fullSizeBgImage = (Image) UIManager.get("CanvasBackgroundImage");
+                        bgImage = fullSizeBgImage.getScaledInstance(size.width, size.height, Image.SCALE_SMOOTH);
+                        UIManager.put("CanvasBackgroundImage.scaled", bgImage);
                         /*
                       We have to use a MediaTracker to ensure that the
                       image has been scaled before we paint it.
                          */
                         MediaTracker mt = new MediaTracker(freeColClient.getCanvas());
-                        mt.addImage(bgImage, 0, bounds.width, bounds.height);
+                        mt.addImage(bgImage, 0, size.width, size.height);
 
                         try {
                             mt.waitForID(0);
                         } catch (InterruptedException e) {
                             g.setColor(Color.black);
-                            g.fillRect(0, 0, bounds.width, bounds.height);
+                            g.fillRect(0, 0, size.width, size.height);
                             return;
                         }
 
@@ -662,7 +669,7 @@ public final class GUI {
                     g.drawImage(bgImage, 0, 0, null);
                 } else {
                     g.setColor(Color.black);
-                    g.fillRect(0, 0, bounds.width, bounds.height);
+                    g.fillRect(0, 0, size.width, size.height);
                 }
             }
         }
@@ -771,8 +778,8 @@ public final class GUI {
 
         if (y < topRows) {
             // We are at the top of the map
-            bottomRow = ((int) bounds.getHeight() / (tileHeight / 2)) - 1;
-            if ((bounds.getHeight() % (tileHeight / 2)) != 0) {
+            bottomRow = (size.height / (tileHeight / 2)) - 1;
+            if ((size.height % (tileHeight / 2)) != 0) {
                 bottomRow++;
             }
             topRow = 0;
@@ -782,13 +789,13 @@ public final class GUI {
             // We are at the bottom of the map
             bottomRow = gameData.getMap().getHeight() - 1;
 
-            topRow = (int) bounds.getHeight() / (tileHeight / 2);
-            if (((int) bounds.getHeight() % (tileHeight / 2)) > 0) {
+            topRow = size.height / (tileHeight / 2);
+            if ((size.height % (tileHeight / 2)) > 0) {
                 topRow++;
             }
             topRow = gameData.getMap().getHeight() - topRow;
 
-            bottomRowY = (int) bounds.getHeight() - tileHeight;
+            bottomRowY = size.height - tileHeight;
             topRowY = bottomRowY - (bottomRow - topRow) * (tileHeight / 2);
         } else {
             // We are not at the top of the map and not at the bottom
@@ -813,8 +820,8 @@ public final class GUI {
             // We are at the left side of the map
             leftColumn = 0;
 
-            rightColumn = (int) bounds.getWidth() / tileWidth - 1;
-            if (((int) bounds.getWidth() % tileWidth) > 0) {
+            rightColumn = size.width / tileWidth - 1;
+            if ((size.width % tileWidth) > 0) {
                 rightColumn++;
             }
 
@@ -823,19 +830,19 @@ public final class GUI {
             // We are at the right side of the map
             rightColumn = gameData.getMap().getWidth() - 1;
 
-            leftColumn = (int) bounds.getWidth() / tileWidth;
-            if (((int) bounds.getWidth() % tileWidth) > 0) {
+            leftColumn = size.width / tileWidth;
+            if ((size.width % tileWidth) > 0) {
                 leftColumn++;
             }
 
-            leftColumnX = (int) bounds.getWidth() - tileWidth - tileWidth / 2 -
+            leftColumnX = size.width - tileWidth - tileWidth / 2 -
                 leftColumn * tileWidth;
             leftColumn = rightColumn - leftColumn;
         } else {
             // We are not at the left side of the map and not at the right side
             leftColumn = x - leftColumns;
             rightColumn = x + rightColumns;
-            leftColumnX = ((int) bounds.getWidth() - tileWidth) / 2 - leftColumns * tileWidth;
+            leftColumnX = (size.width - tileWidth) / 2 - leftColumns * tileWidth;
         }
     }
 
@@ -1122,7 +1129,7 @@ public final class GUI {
             g.setColor(Color.BLACK);
             Composite oldComposite = g.getComposite();
             g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.6f));
-            g.fill(new Rectangle(0, 0, bounds.width, bounds.height));
+            g.fill(new Rectangle(0, 0, size.width, size.height));
             g.setComposite(oldComposite);
             
             final Color currentPlayerColor = freeColClient.getGame().getCurrentPlayer().getColor();
@@ -1135,9 +1142,9 @@ public final class GUI {
             final String currentNationID = freeColClient.getGame().getCurrentPlayer().getNation().getID();
             final Image coatOfArms = (Image) UIManager.get(currentNationID + ".coatOfArms.image");
             final int cHeight = (coatOfArms != null) ? coatOfArms.getHeight(null) : 0;
-            g.drawImage(im, (bounds.width - im.getWidth(null)) / 2, (bounds.height - im.getHeight(null) - cHeight) / 2, null);
+            g.drawImage(im, (size.width - im.getWidth(null)) / 2, (size.height - im.getHeight(null) - cHeight) / 2, null);
             if (coatOfArms != null) {
-                g.drawImage(coatOfArms, (bounds.width - coatOfArms.getWidth(null)) / 2, (bounds.height - cHeight) / 2 + im.getHeight(null), null);
+                g.drawImage(coatOfArms, (size.width - coatOfArms.getWidth(null)) / 2, (size.height - cHeight) / 2 + im.getHeight(null), null);
             }
         }
 
@@ -1149,14 +1156,14 @@ public final class GUI {
 
         // Don't edit the list of messages while I'm drawing them.
         synchronized (this) {
-            BufferedImage si = createStringImage(g, "getSizes", Color.WHITE, bounds.width, 12);
+            BufferedImage si = createStringImage(g, "getSizes", Color.WHITE, size.width, 12);
 
-            yy = (int) bounds.getHeight() - 300 - getMessageCount() * si.getHeight();// 200 ;
+            yy = size.height - 300 - getMessageCount() * si.getHeight();// 200 ;
             xx = 40;
 
             for (int i = 0; i < getMessageCount(); i++) {
                 GUIMessage message = getMessage(i);
-                g.drawImage(createStringImage(g, message.getMessage(), message.getColor(), bounds.width, 12), xx, yy, null);
+                g.drawImage(createStringImage(g, message.getMessage(), message.getColor(), size.width, 12), xx, yy, null);
                 yy += si.getHeight();
             }
         }
@@ -2273,15 +2280,15 @@ public final class GUI {
         } else if (focus.getX() >= (gameData.getMap().getWidth() - getRightColumns())) {
             // we are at the right side of the map
             if ((focus.getY() % 2) == 0) {
-                leftOffset = (int) bounds.getWidth() - (gameData.getMap().getWidth() - focus.getX()) * tileWidth;
+                leftOffset = size.width - (gameData.getMap().getWidth() - focus.getX()) * tileWidth;
             } else {
-                leftOffset = (int) bounds.getWidth() - (gameData.getMap().getWidth() - focus.getX() - 1) * tileWidth - tileWidth / 2;
+                leftOffset = size.width - (gameData.getMap().getWidth() - focus.getX() - 1) * tileWidth - tileWidth / 2;
             }
         } else {
             if ((focus.getY() % 2) == 0) {
-                leftOffset = (int) (bounds.getWidth() / 2);
+                leftOffset = (int) (size.width / 2);
             } else {
-                leftOffset = (int) (bounds.getWidth() / 2) + tileWidth / 2;;
+                leftOffset = (int) (size.width / 2) + tileWidth / 2;;
             }
         }
 
@@ -2291,9 +2298,9 @@ public final class GUI {
             topOffset = (focus.getY() + 1) * (tileHeight / 2);
         } else if (focus.getY() >= (gameData.getMap().getHeight() - bottomRows)) {
             // we are at the bottom of the map
-            topOffset = (int) bounds.getHeight() - (gameData.getMap().getHeight() - focus.getY()) * (tileHeight / 2);
+            topOffset = size.height - (gameData.getMap().getHeight() - focus.getY()) * (tileHeight / 2);
         } else {
-            topOffset = (int) (bounds.getHeight() / 2);
+            topOffset = (int) (size.height / 2);
         }
 
         // At this point (leftOffset, topOffset) is the center pixel of the Tile
@@ -2839,7 +2846,7 @@ public final class GUI {
      * @return The bounds rectangle
      */
     public Rectangle getTileBounds(int x, int y) {
-        Rectangle result = new Rectangle(0, 0, bounds.width, bounds.height);
+        Rectangle result = new Rectangle(0, 0, size.width, size.height);
         if (y >= topRow && y <= bottomRow && x >= leftColumn && x <= rightColumn) {
             result.y = ((y - topRow) * tileHeight / 2) + topRowY - tileHeight;
             result.x = ((x - leftColumn) * tileWidth) + leftColumnX;

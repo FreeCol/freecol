@@ -1,7 +1,12 @@
 
 package net.sf.freecol;
 
+import java.awt.Dimension;
+import java.awt.GraphicsEnvironment;
+import java.awt.Image;
+import java.awt.Point;
 import java.awt.Rectangle;
+import java.awt.Toolkit;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
@@ -11,6 +16,9 @@ import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.swing.ImageIcon;
+import javax.swing.JLabel;
+import javax.swing.JWindow;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
@@ -32,7 +40,6 @@ import net.sf.freecol.common.option.LanguageOption;
 import net.sf.freecol.server.FreeColServer;
 
 
-
 /**
 * This class is responsible for handling the command-line arguments
 * and starting either the stand-alone server or the client-GUI.
@@ -49,6 +56,11 @@ public final class FreeCol {
     public static final String  META_SERVER_ADDRESS = "meta.freecol.org";
     public static final int     META_SERVER_PORT = 3540;
 
+    /**
+     * The space not being used in windowed mode.
+     */
+    private static final int     DEFAULT_WINDOW_SPACE = 100;
+
     private static final Logger logger = Logger.getLogger(FreeCol.class.getName());
     
     /**
@@ -56,17 +68,19 @@ public final class FreeCol {
      */
     private static Specification specification;
 
-    private static final String FREECOL_VERSION = "0.7.0";
+    private static final String FREECOL_VERSION = "0.7.2";
     
     private static final String MIN_JDK_VERSION = "1.5";
     private static final String FILE_SEP = System.getProperty("file.separator");
+
+    private static final String DEFAULT_SPLASH_FILE = "splash.jpg";
 
     private static boolean  windowed = false,
                             sound = true,
                             javaCheck = true,
                             memoryCheck = true,
                             consoleLogging = false;
-    private static Rectangle windowSize = new Rectangle(-1, -1);
+    private static Dimension windowSize = new Dimension(-1, -1);
     private static String   dataFolder = "";
     
     private static FreeColClient freeColClient;
@@ -95,7 +109,21 @@ public final class FreeCol {
      * @param args The command-line arguments.
      */
     public static void main(String[] args) {
-        initLogging();        
+        initLogging();
+        
+        // Display splash screen:
+        JWindow splash = null;
+        for (int i=0; i<args.length; i++) {
+            if (args[i].startsWith("--splash")) {
+                String splashFile = DEFAULT_SPLASH_FILE;
+                if (args[i].indexOf('=') > 0) {
+                    splashFile = args[i].substring(args[i].indexOf('=') + 1);
+                }
+                splash = displaySplash(splashFile);
+                break;
+            }
+        }
+
         createAndSetDirectories();
         Locale.setDefault(getLocale());
         handleArgs(args);
@@ -159,8 +187,21 @@ public final class FreeCol {
                 System.exit(-1);
             }
         } else {
+            final Rectangle bounds = GraphicsEnvironment.getLocalGraphicsEnvironment().getMaximumWindowBounds();
+            if (windowSize.width == -1 || windowSize.height == -1) {
+                // Allow room for frame handles, taskbar etc if using windowed mode:
+                windowSize.width = bounds.width - DEFAULT_WINDOW_SPACE;
+                windowSize.height = bounds.height - DEFAULT_WINDOW_SPACE;
+            }
+            final Dimension preloadSize;
+            if (windowed) {
+                preloadSize = windowSize;
+            } else {
+                preloadSize = new Dimension(bounds.width, bounds.height);
+            }
+
             try {
-                UIManager.setLookAndFeel(new FreeColLookAndFeel(dataFolder));
+                UIManager.setLookAndFeel(new FreeColLookAndFeel(dataFolder, preloadSize));
             } catch (UnsupportedLookAndFeelException e) {
                 logger.warning("Could not load the \"FreeCol Look and Feel\"");
             } catch (FreeColException e) {
@@ -220,6 +261,32 @@ public final class FreeCol {
                     }
                 });
             }
+        }
+        
+        if (splash != null) {
+            splash.setVisible(false);
+            splash.dispose();
+        }
+    }
+
+    /**
+     * Displays a splash screen.
+     * @return The splash screen. It should be removed by the caller
+     *      when no longer needed.
+     */
+    private static JWindow displaySplash(String filename) {
+        try {
+            Image im = Toolkit.getDefaultToolkit().getImage(filename);
+            JWindow f = new JWindow();
+            f.getContentPane().add(new JLabel(new ImageIcon(im)));
+            f.pack();
+            Point center = GraphicsEnvironment.getLocalGraphicsEnvironment().getCenterPoint();
+            f.setLocation(center.x - f.getWidth() / 2, center.y - f.getHeight() / 2);
+            f.setVisible(true);
+            return f;
+        } catch (Exception e) {
+            logger.log(Level.WARNING, "Exception while displaying splash screen", e);
+            return null;
         }
     }
     
@@ -446,7 +513,7 @@ public final class FreeCol {
                             y *= 10;
                             y += Character.digit(args[i].charAt(j), 10);
                         }
-                        windowSize = new Rectangle(x, y);
+                        windowSize = new Dimension(x, y);
                     } catch (Exception e) {
                         printUsage();
                         System.exit(0);
@@ -515,6 +582,8 @@ public final class FreeCol {
                     System.exit(1);
                 }
                 serverName = args[i];
+            } else if (args[i].startsWith("--splash")) {
+                // Ignore - already handled;
             } else {
                 printUsage();
                 System.exit(1);
@@ -589,6 +658,8 @@ public final class FreeCol {
         System.out.println("  runs FreeCol in windowed mode instead of full screen mode");
         System.out.println("--load-savegame SAVEGAME_FILE");
         System.out.println("  loads the given savegame.");
+        System.out.println("--splash[=SPLASH_IMAGE_FILE]");
+        System.out.println("  displays a splash screen while loading the game");
         System.out.println("--no-sound");
         System.out.println("  runs FreeCol without sound");
         System.out.println("--no-java-check");

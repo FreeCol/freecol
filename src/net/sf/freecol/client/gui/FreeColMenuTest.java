@@ -2,6 +2,7 @@ package net.sf.freecol.client.gui;
 
 import java.awt.BorderLayout;
 import java.awt.Container;
+import java.awt.Dimension;
 import java.awt.GraphicsEnvironment;
 import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
@@ -30,7 +31,7 @@ public class FreeColMenuTest implements ActionListener, ItemListener {
 
         try {
             ImageLibrary lib = new ImageLibrary("/home/johnathanj/work/freecol/freecol/data/");
-            FreeColClient client = new FreeColClient(true, new Rectangle(-1, -1), lib, null, null); 
+            FreeColClient client = new FreeColClient(true, new Dimension(-1, -1), lib, null, null); 
             
             //Create the menu bar.
             menuBar = new InGameMenuBar(client);

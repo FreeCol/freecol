@@ -3,11 +3,13 @@ package net.sf.freecol.client.gui.plaf;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Cursor;
+import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.FontFormatException;
 import java.awt.Image;
 import java.awt.MediaTracker;
 import java.awt.Point;
+import java.awt.Rectangle;
 import java.awt.Toolkit;
 import java.io.File;
 import java.io.FileInputStream;
@@ -48,16 +50,17 @@ public class FreeColLookAndFeel extends MetalLookAndFeel {
                                DISABLED_COLOR = new Color(166, 144, 95),
                                BG_COLOR = new Color(216, 194, 145);
                                
-                               
+    private final Dimension windowSize;
 
 
     /**
      * Initiates a new "FreeCol Look and Feel".
      *
      * @exception FreeColException If the ui directory could not be found.
+     * @param windowSize The size of the application window.
      */
-    public FreeColLookAndFeel() throws FreeColException {
-        this("");
+    public FreeColLookAndFeel(Dimension windowSize) throws FreeColException {
+        this("", windowSize);
     }
     
 
@@ -65,11 +68,14 @@ public class FreeColLookAndFeel extends MetalLookAndFeel {
     * Initiates a new "FreeCol Look and Feel".
     *
     * @param dataFolder The home of the FreeCol data files.
+    * @param windowSize The size of the application window.
     * @exception FreeColException If the ui directory could not be found.
     */
-    public FreeColLookAndFeel(String dataFolder) throws FreeColException {
+    public FreeColLookAndFeel(String dataFolder, Dimension windowSize) throws FreeColException {
         super();
-         
+        
+        this.windowSize = windowSize;
+        
         if(dataFolder.equals("")) { // lookup is necessary
             dataDirectory = new File("data");// + System.getProperty("file.separator"));            
 
@@ -294,11 +300,25 @@ public class FreeColLookAndFeel extends MetalLookAndFeel {
                 }
             }
             
+            // Resize background image:
+            String[] fullscreenImages = new String[] {
+                "CanvasBackgroundImage",
+                "EuropeBackgroundImage"
+            };
+            for (String imageID : fullscreenImages) {
+                Image bgImage = (Image) u.get(imageID);
+                if (bgImage.getWidth(null) != windowSize.width || bgImage.getHeight(null) != windowSize.height) {
+                    bgImage = bgImage.getScaledInstance(windowSize.width, windowSize.height, Image.SCALE_SMOOTH);
+                    u.put(imageID + ".scaled", bgImage);
+                    mt.addImage(bgImage, 0, windowSize.width, windowSize.height);
+                }
+            }
+                
             try {
-                mt.waitForID(0, 15000); // Wait a maximum of 15 seconds for the images to load.
+                mt.waitForID(0, 30000); // Wait a maximum of 30 seconds for the images to load.
             } catch (InterruptedException e) {
                 logger.warning("Interrupted while loading resources!");
-            }    
+            }
             
             // Add font UI resources:
             resources = new String[][] {                

@@ -33,21 +33,13 @@ public final class WindowedFrame extends JFrame {
 
     /**
     * The constructor to use.
-    * @param windowSize The size of the frame to be created.
     */
-    public WindowedFrame(Rectangle windowSize) {
+    public WindowedFrame() {
         super("FreeCol " + FreeCol.getVersion());
         logger.info("WindowedFrame's JFrame created.");
 
         setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
-        setResizable(false);
-        Rectangle bounds = GraphicsEnvironment.getLocalGraphicsEnvironment().getMaximumWindowBounds();
-        
-        if (windowSize.width == -1 || windowSize.height == -1) {
-            setSize((int)bounds.getWidth() - 10, (int)bounds.getHeight() - 10); // allow room for frame handles
-        } else {
-            setSize((int)windowSize.getWidth(), (int)windowSize.getHeight()); // allow room for frame handles
-        }
+        setResizable(true);
 
         logger.info("WindowedFrame created.");
     }
