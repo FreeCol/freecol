@@ -2386,7 +2386,7 @@ public class Unit extends FreeColGameObject implements Abilities, Locatable, Loc
      * 
      * @return The nation the unit is serving.
      */
-    public NationType getNation() {
+    public Nation getNation() {
         return owner.getNation();
     }
 
@@ -4133,7 +4133,7 @@ public class Unit extends FreeColGameObject implements Abilities, Locatable, Loc
                 randomTreasure = (int) modifier.applyTo(randomTreasure);
             }
 
-            if (((IndianNationType) enemy.getNation()).getTypeOfSettlement() == IndianNationType.CITY) {
+            if (((IndianNationType) enemy.getNation().getType()).getTypeOfSettlement() == IndianNationType.CITY) {
                 tTrain.setTreasureAmount(randomTreasure * 500 + 10000);
             } else {
                 tTrain.setTreasureAmount(randomTreasure * 50  + 300);

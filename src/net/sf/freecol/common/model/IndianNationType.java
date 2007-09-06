@@ -132,7 +132,6 @@ public class IndianNationType extends NationType {
     public void readFromXML(XMLStreamReader in, final Map<String, UnitType> unitTypeByRef)
             throws XMLStreamException {
         setID(in.getAttributeValue(null, "id"));
-        setColor(new Color(Integer.parseInt(in.getAttributeValue(null, "color"), 16)));
 
         String valueString = in.getAttributeValue(null, "number-of-settlements");
         if ("low".equals(valueString)) {

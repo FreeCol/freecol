@@ -1048,34 +1048,34 @@
 
   <nation-types>
     <!-- default nation for multi-player games -->
-    <european-nation-type id="model.nation.default" color="b4b4b4">
+    <european-nation-type id="model.nationType.default">
       <unit id="model.unit.freeColonist" tools="100"/>
       <unit id="model.unit.freeColonist" armed="yes"/>
       <unit id="model.unit.caravel"/>
     </european-nation-type>
     <!-- default REF nation -->
-    <european-nation-type id="model.nation.ref" color="b4b4b4" ref="yes">
+    <european-nation-type id="model.nationType.ref" ref="yes">
       <modifier id="model.modifier.bombardBonus" type="percentage" value="50"/>
     </european-nation-type>
-    <european-nation-type id="model.nation.dutch" color="ff9d3c">
+    <european-nation-type id="model.nationType.dutch">
       <modifier id="model.modifier.tradeBonus" type="percentage" value="50"/>
       <unit id="model.unit.freeColonist" tools="100"/>
       <unit id="model.unit.freeColonist" armed="yes"/>
       <unit id="model.unit.merchantman"/>
     </european-nation-type>
-    <european-nation-type id="model.nation.french" color="0000ff">
+    <european-nation-type id="model.nationType.french">
       <modifier id="model.modifier.nativeAlarmBonus" type="percentage" value="-50"/>
-      <unit id="model.unit.hardyPionieer" tools="100"/>
+      <unit id="model.unit.hardyPioneer" tools="100"/>
       <unit id="model.unit.freeColonist" armed="yes"/>
       <unit id="model.unit.caravel"/>
     </european-nation-type>
-    <european-nation-type id="model.nation.english" color="ff0000">
+    <european-nation-type id="model.nationType.english">
       <modifier id="model.modifier.religiousUnrestBonus" type="percentage" value="-33"/>
       <unit id="model.unit.freeColonist" tools="100"/>
       <unit id="model.unit.freeColonist" armed="yes"/>
       <unit id="model.unit.caravel"/>
     </european-nation-type>
-    <european-nation-type id="model.nation.spanish" color="ffff00">
+    <european-nation-type id="model.nationType.spanish">
       <modifier id="model.modifier.nativeConvertBonus" type="percentage" value="200"/>
       <modifier id="model.modifier.nativeTreasureBonus" type="percentage" value="200"/>
       <unit id="model.unit.freeColonist" tools="100"/>
@@ -1083,41 +1083,70 @@
       <unit id="model.unit.caravel"/>
     </european-nation-type>
 
-    <indian-nation-type id="model.nation.apache" color="900000" number-of-settlements="average" aggression="high" type-of-settlement="teepee">
+    <indian-nation-type id="model.nationType.apache" number-of-settlements="average" aggression="high" type-of-settlement="teepee">
       <skill id="model.unit.expertScout"/>
       <skill id="model.unit.expertFurTrapper"/>
     </indian-nation-type>
-    <indian-nation-type id="model.nation.sioux" color="c0ac84" number-of-settlements="average" aggression="high" type-of-settlement="teepee">
+    <indian-nation-type id="model.nationType.sioux" number-of-settlements="average" aggression="average" type-of-settlement="teepee">
       <skill id="model.unit.expertScout"/>
       <skill id="model.unit.expertFurTrapper"/>
     </indian-nation-type>
-    <indian-nation-type id="model.nation.tupi" color="045c04" number-of-settlements="low" aggression="high" type-of-settlement="teepee">
+    <indian-nation-type id="model.nationType.tupi" number-of-settlements="low" aggression="high" type-of-settlement="teepee">
       <skill id="model.unit.expertScout"/>
       <skill id="model.unit.expertFurTrapper"/>
     </indian-nation-type>
-    <indian-nation-type id="model.nation.arawak" color="6888c0" number-of-settlements="low" aggression="low" type-of-settlement="longhouse">
+    <indian-nation-type id="model.nationType.arawak" number-of-settlements="low" aggression="low" type-of-settlement="longhouse">
       <skill id="model.unit.masterSugarPlanter"/>
       <skill id="model.unit.masterCottonPlanter"/>
       <skill id="model.unit.masterTobaccoPlanter"/>
     </indian-nation-type>
-    <indian-nation-type id="model.nation.cherokee" color="6c3c18" number-of-settlements="average" aggression="average" type-of-settlement="longhouse">
+    <indian-nation-type id="model.nationType.cherokee" number-of-settlements="average" aggression="low" type-of-settlement="longhouse">
       <skill id="model.unit.masterSugarPlanter"/>
       <skill id="model.unit.masterCottonPlanter"/>
       <skill id="model.unit.masterTobaccoPlanter"/>
     </indian-nation-type>
-    <indian-nation-type id="model.nation.iroquois" color="74a44c" number-of-settlements="average" aggression="average" type-of-settlement="longhouse">
+    <indian-nation-type id="model.nationType.iroquois" number-of-settlements="average" aggression="average" type-of-settlement="longhouse">
       <skill id="model.unit.masterSugarPlanter"/>
       <skill id="model.unit.masterCottonPlanter"/>
       <skill id="model.unit.masterTobaccoPlanter"/>
     </indian-nation-type>
-    <indian-nation-type id="model.nation.inca" color="f4f0c4" number-of-settlements="low" aggression="low" type-of-settlement="city">
+    <indian-nation-type id="model.nationType.inca" number-of-settlements="low" aggression="low" type-of-settlement="city">
       <skill id="model.unit.expertFarmer"/>
       <skill id="model.unit.expertFisherman"/>
     </indian-nation-type>
-    <indian-nation-type id="model.nation.aztec" color="c4a020" number-of-settlements="low" aggression="high" type-of-settlement="city">
+    <indian-nation-type id="model.nationType.aztec" number-of-settlements="low" aggression="high" type-of-settlement="city">
       <skill id="model.unit.expertFarmer"/>
       <skill id="model.unit.expertFisherman"/>
     </indian-nation-type>
   </nation-types>
+
+  <nations>
+    <nation id="model.nation.dutch" color="ff9d3c" nation-type="model.nationType.dutch" selectable="yes" classic="yes"/>
+    <nation id="model.nation.french" color="0000ff" nation-type="model.nationType.french" selectable="yes" classic="yes"/>
+    <nation id="model.nation.english" color="ff0000" nation-type="model.nationType.english" selectable="yes" classic="yes"/>
+    <nation id="model.nation.spanish" color="ffff00" nation-type="model.nationType.spanish" selectable="yes" classic="yes"/>
+    <nation id="model.nation.inca" color="f4f0c4" nation-type="model.nationType.inca"/>
+    <nation id="model.nation.aztec" color="c4a020" nation-type="model.nationType.aztec"/>
+    <nation id="model.nation.arawak" color="6888c0" nation-type="model.nationType.arawak"/>
+    <nation id="model.nation.cherokee" color="6c3c18" nation-type="model.nationType.cherokee"/>
+    <nation id="model.nation.iroquois" color="74a44c" nation-type="model.nationType.iroquois"/>
+    <nation id="model.nation.sioux" color="c0ac84" nation-type="model.nationType.sioux"/>
+    <nation id="model.nation.apache" color="900000" nation-type="model.nationType.apache"/>
+    <nation id="model.nation.tupi" color="045c04" nation-type="model.nationType.tupi"/>
+    <nation id="model.nation.dutchREF" color="ff9d3c" nation-type="model.nationType.ref" ref-of="model.nation.dutch"/>
+    <nation id="model.nation.frenchREF" color="0000ff" nation-type="model.nationType.ref" ref-of="model.nation.french"/>
+    <nation id="model.nation.englishREF" color="ff0000" nation-type="model.nationType.ref" ref-of="model.nation.english"/>
+    <nation id="model.nation.spanishREF" color="ffff00" nation-type="model.nationType.ref" ref-of="model.nation.spanish"/>
+<!--
+    <nation id="model.nation.portuguese" color="00ffff" nation-type="model.nationType.spanish" selectable="yes"/>
+    <nation id="model.nation.swedish" color="00ffff" nation-type="model.nationType.spanish" selectable="yes"/>
+    <nation id="model.nation.italian" color="00ffff" nation-type="model.nationType.spanish" selectable="yes"/>
+    <nation id="model.nation.irish" color="00ffff" nation-type="model.nationType.spanish" selectable="yes"/>
+    <nation id="model.nation.portugueseREF" color="00ffff" nation-type="model.nationType.ref" ref-of="model.nation.portuguese"/>
+    <nation id="model.nation.swedishREF" color="00ffff" nation-type="model.nationType.ref" ref-of="model.nation.swedish"/>
+    <nation id="model.nation.italianREF" color="00ffff" nation-type="model.nationType.ref" ref-of="model.nation.italian"/>
+    <nation id="model.nation.irishREF" color="00ffff" nation-type="model.nationType.ref" ref-of="model.nation.irish"/>
+-->
+  </nations>
 
 </freecol-specification>

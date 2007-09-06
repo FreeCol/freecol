@@ -15,6 +15,7 @@ import net.sf.freecol.client.gui.InGameMenuBar;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.GameOptions;
 import net.sf.freecol.common.model.ModelMessage;
+import net.sf.freecol.common.model.Nation;
 import net.sf.freecol.common.model.NationType;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Tile;
@@ -95,7 +96,7 @@ public final class PreGameController {
     * Sets this client's player's nation.
     * @param nation Which nation this player wishes to set.
     */
-    public void setNation(NationType nation) {
+    public void setNation(Nation nation) {
         // Make the change:
         freeColClient.getMyPlayer().setNation(nation);
 

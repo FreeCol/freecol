@@ -14,6 +14,7 @@ import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.GameOptions;
 import net.sf.freecol.common.model.Market;
+import net.sf.freecol.common.model.Nation;
 import net.sf.freecol.common.model.NationType;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.networking.Connection;
@@ -257,7 +258,7 @@ public final class PreGameInputHandler extends InputHandler implements StreamedM
         Game game = getFreeColClient().getGame();
 
         Player player = (Player) game.getFreeColGameObject(element.getAttribute("player"));
-        NationType nation = FreeCol.getSpecification().getNationType(element.getAttribute("value"));
+        Nation nation = FreeCol.getSpecification().getNation(element.getAttribute("value"));
 
         player.setNation(nation);
         getFreeColClient().getCanvas().getStartGamePanel().refreshPlayersTable();

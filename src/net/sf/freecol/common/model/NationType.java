@@ -19,12 +19,6 @@ public abstract class NationType extends FreeColGameObjectType implements Abilit
     public static final String  REVISION = "$Revision$";
 
     /**
-     * The default color to use for this nation type. Can be
-     * overridden by the Player object.
-     */
-    private Color color;
-
-    /**
      * Stores the abilities of this Nation.
      */
     private HashMap<String, Boolean> abilities = new HashMap<String, Boolean>();
@@ -48,24 +42,6 @@ public abstract class NationType extends FreeColGameObjectType implements Abilit
      */
     public final String getRulerName() {
         return Messages.message(getID() + ".ruler");
-    }
-
-    /**
-     * Get the <code>Color</code> value.
-     *
-     * @return a <code>Color</code> value
-     */
-    public final Color getColor() {
-        return color;
-    }
-
-    /**
-     * Set the <code>Color</code> value.
-     *
-     * @param newColor The new Color value.
-     */
-    public final void setColor(final Color newColor) {
-        this.color = newColor;
     }
 
     /**

@@ -15,6 +15,7 @@ import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.GameOptions;
 import net.sf.freecol.common.model.Map;
+import net.sf.freecol.common.model.Nation;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.networking.Message;
 import net.sf.freecol.common.networking.NoRouteToServerException;
@@ -84,62 +85,15 @@ public final class PreGameController extends Controller {
         freeColServer.setAIMain(aiMain);
         game.setFreeColGameObjectListener(aiMain);        
 
-        // Add AI players:
-        for (int i = 0; i < Player.NUMBER_OF_PLAYERS; i++) {
-            if (game.getPlayer(i) != null) {
+        // Add AI players
+        // TODO: do not depend on nation types
+        int i = 0;
+        for (Nation nation : FreeCol.getSpecification().getNations()) {
+            if (game.getPlayer(nation) != null) {
                 continue;
             }
 
-            String name = null;
-            switch (i) {
-            case 0:
-                name = Messages.message("model.nation.Dutch.ruler");
-                break;
-            case 1:
-                name = Messages.message("model.nation.English.ruler");
-                break;
-            case 2:
-                name = Messages.message("model.nation.French.ruler");
-                break;
-            case 3:
-                name = Messages.message("model.nation.Spanish.ruler");
-                break;
-            case 4:
-                name = Messages.message("model.nation.Inca.ruler");
-                break;
-            case 5:
-                name = Messages.message("model.nation.Aztec.ruler");
-                break;
-            case 6:
-                name = Messages.message("model.nation.Arawak.ruler");
-                break;
-            case 7:
-                name = Messages.message("model.nation.Cherokee.ruler");
-                break;
-            case 8:
-                name = Messages.message("model.nation.Iroquois.ruler");
-                break;
-            case 9:
-                name = Messages.message("model.nation.Sioux.ruler");
-                break;
-            case 10:
-                name = Messages.message("model.nation.Apache.ruler");
-                break;
-            case 11:
-                name = Messages.message("model.nation.Tupi.ruler");
-                break;
-            case 12:
-                name = Messages.message("model.nation.refDutch.ruler");
-                break;
-            case 13:
-                name = Messages.message("model.nation.refEnglish.ruler");
-                break;
-            case 14:
-                name = Messages.message("model.nation.refFrench.ruler");
-                break;
-            case 15:
-                name = Messages.message("model.nation.refSpanish.ruler");
-            }
+            String name = nation.getType().getRulerName();
             DummyConnection theConnection = new DummyConnection(
                     "Server connection - " + name,
                     freeColServer.getInGameInputHandler());
@@ -149,7 +103,7 @@ public final class PreGameController extends Controller {
                                                     true,
                                                     null,
                                                     theConnection,
-                                                     FreeCol.getSpecification().getNationType(i));
+                                                     nation);
             DummyConnection aiConnection = new DummyConnection(
                     "AI connection - " + name,
                     new AIInGameInputHandler(freeColServer, aiPlayer, aiMain));
@@ -165,6 +119,7 @@ public final class PreGameController extends Controller {
             Element addNewPlayer = Message.createNewRootElement("addPlayer");
             addNewPlayer.appendChild(aiPlayer.toXMLElement(null, addNewPlayer.getOwnerDocument()));
             freeColServer.getServer().sendToAll(addNewPlayer, theConnection);
+            i++;
         }
         
         // Make the map:        

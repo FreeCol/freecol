@@ -35,7 +35,7 @@ public class Game extends FreeColGameObject {
 
     /** A virtual player to use with enemy privateers */
     // TODO: Using null here throws a warning. A Player should belong to a Game.
-    public static final Player unknownEnemy = new Player(null, "", false, null);
+    public static final Player unknownEnemy = new Player(null, "unknown enemy", false, null);
 
     /** Contains all the players in the game. */
     private List<Player> players = new ArrayList<Player>();
@@ -438,17 +438,19 @@ public class Game extends FreeColGameObject {
      * 
      * @return A vacant nation.
      */
-    public EuropeanNationType getVacantNation() {
-        for (EuropeanNationType nation : FreeCol.getSpecification().getEuropeanNationTypes()) {
-            boolean taken = false;
-            for (Player player : getPlayers()) {
-                if (player.getNation() == nation) {
-                    taken = true;
-                    break;
+    public Nation getVacantNation() {
+        for (Nation nation : FreeCol.getSpecification().getNations()) {
+            if (nation.isSelectable() && nation.isClassic()) {
+                boolean taken = false;
+                for (Player player : getPlayers()) {
+                    if (player.getNation() == nation) {
+                        taken = true;
+                        break;
+                    }
                 }
-            }
-            if (!taken) {
-                return nation;
+                if (!taken) {
+                    return nation;
+                }
             }
         }
         return null;
@@ -460,7 +462,7 @@ public class Game extends FreeColGameObject {
      * @param nation The nation.
      * @return The <code>Player</code> of the given nation.
      */
-    public Player getPlayer(NationType nation) {
+    public Player getPlayer(Nation nation) {
         Iterator<Player> playerIterator = getPlayerIterator();
         while (playerIterator.hasNext()) {
             Player player = playerIterator.next();

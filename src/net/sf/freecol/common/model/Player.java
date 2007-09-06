@@ -51,7 +51,9 @@ public class Player extends FreeColGameObject implements Abilities, Nameable, Mo
     /**
      * The index counter for this class.
      */
-    private static int lastIndex = 0;
+    // must be -1 because of "unknownEnemy"
+    // TODO: make this unnecessary
+    private static int lastIndex = -1;
 
     private int index;
 
@@ -98,7 +100,7 @@ public class Player extends FreeColGameObject implements Abilities, Nameable, Mo
 
     private String name;
 
-    private NationType nation;
+    private Nation nation;
 
     private String nationName;
 
@@ -223,7 +225,7 @@ public class Player extends FreeColGameObject implements Abilities, Nameable, Mo
      * @param nation The nation of the <code>Player</code>.
      * 
      */
-    public Player(Game game, String name, boolean admin, boolean ai, NationType nation) {
+    public Player(Game game, String name, boolean admin, boolean ai, Nation nation) {
         this(game, name, admin, nation);
         this.ai = ai;
     }
@@ -266,13 +268,13 @@ public class Player extends FreeColGameObject implements Abilities, Nameable, Mo
      * @param nation The nation of the <code>Player</code>.
      * 
      */
-    public Player(Game game, String name, boolean admin, NationType nation) {
+    public Player(Game game, String name, boolean admin, Nation newNation) {
         super(game);
         this.index = lastIndex++;
         this.name = name;
         this.admin = admin;
-        this.nation = nation;
-        color = (nation == null) ? noNationColor : nation.getColor();
+        this.nation = newNation;
+        color = (newNation == null) ? noNationColor : nation.getColor();
         for (int k = 0; k < tension.length; k++) {
             tension[k] = new Tension(0);
         }
@@ -623,7 +625,7 @@ public class Player extends FreeColGameObject implements Abilities, Nameable, Mo
      * 
      */
     public Player getREFPlayer() {
-        return getGame().getPlayer(FreeCol.getSpecification().getNationType(nation.getID() + "REF"));
+        return getGame().getPlayer(FreeCol.getSpecification().getNation(nation.getID() + "REF"));
     }
 
     /**
@@ -828,23 +830,6 @@ public class Player extends FreeColGameObject implements Abilities, Nameable, Mo
     }
 
     /**
-     * 
-     * Returns the default color for the given <code>nation</code>.
-     * 
-     * @param nation The nation of the <code>Player</code>.
-     * 
-     * @return The defult color for the given nation.
-     * 
-     */
-    public static Color getDefaultNationColor(NationType nation) {
-        if (nation == null) {
-            return noNationColor;
-        } else {
-            return nation.getColor();
-        }
-    }
-
-    /**
      * Returns whether this player has met with the <code>Player</code> if the
      * given <code>nation</code>.
      * 
@@ -920,9 +905,9 @@ public class Player extends FreeColGameObject implements Abilities, Nameable, Mo
                     addModelMessage(this, "EventPanel.MEETING_NATIVES", null, ModelMessage.FOREIGN_DIPLOMACY, player);
                 }
                 // special cases for Aztec/Inca
-                if (player.getNation() == FreeCol.getSpecification().getNationType("model.nation.aztec")) {
+                if (player.getNation().getType() == FreeCol.getSpecification().getNationType("model.nation.aztec")) {
                     addModelMessage(this, "EventPanel.MEETING_AZTEC", null, ModelMessage.FOREIGN_DIPLOMACY, player);
-                } else if (player.getNation() == FreeCol.getSpecification().getNationType("model.nation.inca")) {
+                } else if (player.getNation().getType() == FreeCol.getSpecification().getNationType("model.nation.inca")) {
                     addModelMessage(this, "EventPanel.MEETING_INCA", null, ModelMessage.FOREIGN_DIPLOMACY, player);
                 }
             }
@@ -1461,7 +1446,7 @@ public class Player extends FreeColGameObject implements Abilities, Nameable, Mo
      * 
      * @return The nation of this player.
      */
-    public NationType getNation() {
+    public Nation getNation() {
         return nation;
     }
 
@@ -1500,8 +1485,8 @@ public class Player extends FreeColGameObject implements Abilities, Nameable, Mo
      * 
      * @param n The new nation for this player.
      */
-    public void setNation(NationType nationType) {
-        nation = nationType;
+    public void setNation(Nation newNation) {
+        nation = newNation;
     }
 
     /**
@@ -1880,7 +1865,7 @@ public class Player extends FreeColGameObject implements Abilities, Nameable, Mo
         if (player == this || player.getNation() == null) {
             return;
         }
-        tension[player.getNation().getIndex()] = newTension;
+        tension[player.getIndex()] = newTension;
     }
 
     /**
@@ -1893,7 +1878,7 @@ public class Player extends FreeColGameObject implements Abilities, Nameable, Mo
         if (player.getNation() == null) {
             return new Tension();
         } else {
-            return tension[player.getNation().getIndex()];
+            return tension[player.getIndex()];
         }
     }
 
@@ -2033,7 +2018,7 @@ public class Player extends FreeColGameObject implements Abilities, Nameable, Mo
         if (player.getNation() == null) {
             return;
         }
-        int oldStance = stance[player.getNation().getIndex()];
+        int oldStance = stance[player.getIndex()];
         // Ignore requests to change the stance when indian players are
         // involved:
         /*
@@ -2050,7 +2035,7 @@ public class Player extends FreeColGameObject implements Abilities, Nameable, Mo
         if (newStance == CEASE_FIRE && oldStance != WAR) {
             throw new IllegalStateException("Cease fire can only be declared when at war.");
         }
-        stance[player.getNation().getIndex()] = newStance;
+        stance[player.getIndex()] = newStance;
         if (player.getStance(this) != newStance) {
             getGame().getModelController().setStance(this, player, newStance);
         }
@@ -2491,7 +2476,7 @@ public class Player extends FreeColGameObject implements Abilities, Nameable, Mo
         setID(in.getAttributeValue(null, "ID"));
         index = Integer.parseInt(in.getAttributeValue(null, "index"));
         name = in.getAttributeValue(null, "username");
-        nation = FreeCol.getSpecification().getNationType(in.getAttributeValue(null, "nation"));
+        nation = FreeCol.getSpecification().getNation(in.getAttributeValue(null, "nation"));
         color = new Color(Integer.parseInt(in.getAttributeValue(null, "color")));
         admin = (new Boolean(in.getAttributeValue(null, "admin"))).booleanValue();
         gold = Integer.parseInt(in.getAttributeValue(null, "gold"));

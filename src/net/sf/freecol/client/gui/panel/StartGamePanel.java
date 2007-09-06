@@ -489,8 +489,8 @@ class PlayersTableModel extends AbstractTableModel {
 
             if (column == 1) {
                 int nation = ((Integer) value).intValue();
-                preGameController.setNation(FreeCol.getSpecification().getNationType(nation));
-                preGameController.setColor(FreeCol.getSpecification().getNationType(nation).getColor());
+                preGameController.setNation(FreeCol.getSpecification().getNation(nation));
+                preGameController.setColor(FreeCol.getSpecification().getNation(nation).getColor());
                 fireTableCellUpdated(row, 2);
             } else if (column == 2) {
                 preGameController.setColor((Color) value);

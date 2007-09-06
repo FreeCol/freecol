@@ -38,14 +38,6 @@ public class EuropeanNationType extends NationType {
     }
 
     /**
-     * Constructor.
-     */
-    public EuropeanNationType(int index, String id) {
-        super(index);
-        setID(id);
-    }
-
-    /**
      * Returns the name of this Nation's Home Port.
      *
      * @return a <code>String</code> value
@@ -102,7 +94,6 @@ public class EuropeanNationType extends NationType {
     public void readFromXML(XMLStreamReader in, final Map<String, UnitType> unitTypeByRef)
             throws XMLStreamException {
         setID(in.getAttributeValue(null, "id"));
-        setColor(new Color(Integer.parseInt(in.getAttributeValue(null, "color"), 16)));
         ref = getAttribute(in, "ref", false);
 
         while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
