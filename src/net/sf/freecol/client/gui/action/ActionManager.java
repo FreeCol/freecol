@@ -52,6 +52,7 @@ public class ActionManager extends OptionGroup {
         add(new BuildColonyAction(freeColClient));
         // add(new BuildRoadAction(freeColClient));         // Depreciated
         add(new ChangeAction(freeColClient));
+        add(new ChangeWindowedModeAction(freeColClient));
         add(new ChatAction(freeColClient));
         add(new ClearOrdersAction(freeColClient));
         add(new ColopediaBuildingAction(freeColClient));

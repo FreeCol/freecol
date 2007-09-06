@@ -15,6 +15,7 @@ import net.sf.freecol.client.gui.action.AssignTradeRouteAction;
 import net.sf.freecol.client.gui.action.BuildColonyAction;
 //import net.sf.freecol.client.gui.action.BuildRoadAction;
 import net.sf.freecol.client.gui.action.ChangeAction;
+import net.sf.freecol.client.gui.action.ChangeWindowedModeAction;
 import net.sf.freecol.client.gui.action.ChatAction;
 import net.sf.freecol.client.gui.action.ClearOrdersAction;
 import net.sf.freecol.client.gui.action.ColopediaBuildingAction;
@@ -200,6 +201,7 @@ public class InGameMenuBar extends FreeColMenuBar {
         menu.add(getCheckBoxMenuItem(DisplayTileOwnersAction.ID));
         menu.add(getCheckBoxMenuItem(DisplayGridAction.ID));
         menu.add(getMenuItem(ToggleViewModeAction.ID));
+        menu.add(getCheckBoxMenuItem(ChangeWindowedModeAction.ID));
 
         menu.addSeparator();
 

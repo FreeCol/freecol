@@ -297,15 +297,9 @@ public final class Canvas extends JDesktopPane {
     }
 
     /**
-     * Paints this component. This method will use {@link GUI#display} to draw
-     * the map/background on this component.
-     * 
-     * @param g The Graphics context in which to draw this component.
-     * @see GUI#display
+     * Updates the sizes of the components on this Canvas.
      */
-    @Override
-    public void paintComponent(Graphics g) {
-        // Fixes resizing of frame:
+    public void updateSizes() {
         if (oldSize == null) {
             oldSize = getSize();
         }
@@ -327,8 +321,20 @@ public final class Canvas extends JDesktopPane {
                 }
             }
             gui.setSize(getSize());
+            oldSize = getSize();
         }
-
+    }
+    
+    /**
+     * Paints this component. This method will use {@link GUI#display} to draw
+     * the map/background on this component.
+     * 
+     * @param g The Graphics context in which to draw this component.
+     * @see GUI#display
+     */
+    @Override
+    public void paintComponent(Graphics g) {
+        updateSizes();
         Graphics2D g2d = (Graphics2D) g;
         gui.display(g2d);
     }

@@ -8,6 +8,7 @@ import javax.swing.JMenu;
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.action.AboutAction;
+import net.sf.freecol.client.gui.action.ChangeWindowedModeAction;
 import net.sf.freecol.client.gui.action.ColopediaBuildingAction;
 import net.sf.freecol.client.gui.action.ColopediaFatherAction;
 import net.sf.freecol.client.gui.action.ColopediaGoodsAction;
@@ -121,6 +122,7 @@ public class MapEditorMenuBar extends FreeColMenuBar {
         menu.add(getCheckBoxMenuItem(DisplayTileNamesAction.ID));
         menu.add(getCheckBoxMenuItem(DisplayTileOwnersAction.ID));
         menu.add(getCheckBoxMenuItem(DisplayGridAction.ID));
+        menu.add(getCheckBoxMenuItem(ChangeWindowedModeAction.ID));
 
         add(menu);
     }

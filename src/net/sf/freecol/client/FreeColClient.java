@@ -130,6 +130,8 @@ public final class FreeColClient {
      * it is an indication of an approved login to a server.
      */
     private boolean loggedIn = false;
+    
+    private Rectangle windowBounds;
 
 
     /**
@@ -207,13 +209,12 @@ public final class FreeColClient {
         } else {
             sfxPlayer = null;
         }
+        
         if (GraphicsEnvironment.isHeadless()) {
             logger.info("It seems that the GraphicsEnvironment is headless!");
         }
         gd = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice();
-        if (windowed) {
-            frame = new WindowedFrame();
-        } else {
+        if (!windowed) {
             if (!gd.isFullScreenSupported()) {
                 String fullscreenNotSupported = "\nIt seems that full screen mode is not fully supported for this\nGraphicsDevice. Please try the \"--windowed\" option if you\nexperience any graphical problems while running FreeCol.";
                 logger.info(fullscreenNotSupported);
@@ -226,22 +227,63 @@ public final class FreeColClient {
                  * WindowedFrame(windowSize);
                  */
             }
-            frame = new FullScreenFrame(gd);
-            innerWindowSize = frame.getSize();
+            Rectangle bounds = gd.getDefaultConfiguration().getBounds();
+            innerWindowSize = new Dimension(bounds.width - bounds.x, bounds.height - bounds.y);
         }
         gui = new GUI(this, innerWindowSize, imageLibrary);
         canvas = new Canvas(this, innerWindowSize, gui);
+        changeWindowedMode(windowed);
+        
+        canvas.showMainPanel();
+        gui.startCursorBlinking();
+    }
+    
+    /**
+     * Change the windowed mode.
+     * @param windowed Use <code>true</code> for windowed mode
+     *      and <code>false</code> for fullscreen mode.
+     */
+    public void changeWindowedMode(boolean windowed) {
+        if (frame != null) {
+            if (frame instanceof WindowedFrame) {
+                windowBounds = frame.getBounds();
+            }
+            frame.setVisible(false);
+            frame.dispose();
+        }
+        this.windowed = windowed;
+        if (windowed) {
+            frame = new WindowedFrame();
+        } else {
+            frame = new FullScreenFrame(gd);
+        }
         if (frame instanceof WindowedFrame) {
             ((WindowedFrame) frame).setCanvas(canvas);
             frame.getContentPane().add(canvas);
-            frame.pack();
+            if (windowBounds != null) {
+                frame.setBounds(windowBounds);
+            } else {
+                frame.pack();
+            }
         } else if (frame instanceof FullScreenFrame) {
             ((FullScreenFrame) frame).setCanvas(canvas);
             frame.getContentPane().add(canvas);
+            canvas.setSize(frame.getSize());
         }
+        gui.forceReposition();
+        canvas.updateSizes();
         frame.setVisible(true);
-        canvas.showMainPanel();
-        gui.startCursorBlinking();
+    }
+    
+    /**
+     * Checks if the application is displayed in a window.
+     * @return <code>true</code> if the application is currently
+     *      displayed in a frame, and <code>false</code> if
+     *      currently in fullscreen mode.
+     * @see #changeWindowedMode
+     */
+    public boolean isWindowed() {
+        return windowed;
     }
 
     /**
