@@ -1551,8 +1551,8 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener {
         }
 
         public void paintComponent(Graphics g) {
-            GUI gui = parent.getGUI();
-            ImageLibrary lib = parent.getGUI().getImageLibrary();
+            GUI colonyTileGUI = parent.getColonyTileGUI();
+            ImageLibrary lib = colonyTileGUI.getImageLibrary();
 
             g.setColor(Color.black);
             g.fillRect(0, 0, getWidth(), getHeight());
@@ -1561,7 +1561,7 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener {
                 for (int x = 0; x < 3; x++) {
                     for (int y = 0; y < 3; y++) {
                         TileType tileType = getColony().getTile().getType();
-                        gui.displayColonyTile((Graphics2D) g, game.getMap(), getColony().getTile(x, y), ((2 - x) + y)
+                        colonyTileGUI.displayColonyTile((Graphics2D) g, game.getMap(), getColony().getTile(x, y), ((2 - x) + y)
                                 * lib.getTerrainImageWidth(tileType) / 2, (x + y) * lib.getTerrainImageHeight(tileType) / 2,
                                 getColony());
 
@@ -1601,7 +1601,7 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener {
                     updateDescriptionLabel(unitLabel, true);
                 }
 
-                ImageLibrary lib = parent.getGUI().getImageLibrary();
+                ImageLibrary lib = parent.getColonyTileGUI().getImageLibrary();
 
                 if (colonyTile.isColonyCenterTile()) {
                     initializeAsCenterTile(lib);

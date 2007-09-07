@@ -28,6 +28,8 @@ import net.sf.freecol.client.gui.action.QuitAction;
 import net.sf.freecol.client.gui.action.SaveAction;
 import net.sf.freecol.client.gui.action.ScaleMapAction;
 import net.sf.freecol.client.gui.action.ShowMainAction;
+import net.sf.freecol.client.gui.action.ZoomInAction;
+import net.sf.freecol.client.gui.action.ZoomOutAction;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.client.gui.menu.DebugMenu;
 
@@ -123,6 +125,10 @@ public class MapEditorMenuBar extends FreeColMenuBar {
         menu.add(getCheckBoxMenuItem(DisplayTileOwnersAction.ID));
         menu.add(getCheckBoxMenuItem(DisplayGridAction.ID));
         menu.add(getCheckBoxMenuItem(ChangeWindowedModeAction.ID));
+        
+        menu.addSeparator();
+        menu.add(getMenuItem(ZoomInAction.ID));
+        menu.add(getMenuItem(ZoomOutAction.ID));
 
         add(menu);
     }

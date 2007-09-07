@@ -51,7 +51,6 @@ public final class MiniMap extends JPanel implements MouseInputListener {
     private boolean scaleMap = false;
 
     private FreeColClient freeColClient;
-    private final ImageProvider imageProvider;
     private final JButton          miniMapZoomOutButton;
     private final JButton          miniMapZoomInButton;
 
@@ -78,12 +77,9 @@ public final class MiniMap extends JPanel implements MouseInputListener {
      * The constructor that will initialize this component.
      * 
      * @param freeColClient The main controller object for the client
-     * @param imageProvider The ImageProvider that can provide us with images to display
-     *        and information about those images (such as the width of a tile image).
      */
-    public MiniMap(FreeColClient freeColClient, ImageProvider imageProvider) {
+    public MiniMap(FreeColClient freeColClient) {
         this.freeColClient = freeColClient;
-        this.imageProvider = imageProvider;
 
         tileSize = 4 * (freeColClient.getClientOptions().getInteger(ClientOptions.DEFAULT_MINIMAP_ZOOM) + 1);
 
@@ -258,8 +254,9 @@ public final class MiniMap extends JPanel implements MouseInputListener {
     * @param height The height of the map.
     */
     private void paintMap(Graphics graphics, int x, int y, int width, int height) {
-        Graphics2D g = (Graphics2D) graphics;
-        Map map = freeColClient.getGame().getMap();
+        final Graphics2D g = (Graphics2D) graphics;
+        final Map map = freeColClient.getGame().getMap();
+        final ImageProvider imageProvider = freeColClient.getGUI().getImageLibrary();
 
         /* Fill the rectangle with solid black */
         g.setColor(Color.BLACK);

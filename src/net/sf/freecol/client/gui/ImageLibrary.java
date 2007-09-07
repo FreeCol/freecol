@@ -191,11 +191,19 @@ public final class ImageLibrary extends ImageProvider {
 
     private Image[] alarmChips;
 
-    private Hashtable<Color, BufferedImage> colorChips;
+    private Hashtable<Color, Image> colorChips;
 
-    private Hashtable<Color, BufferedImage> missionChips;
+    private Hashtable<Color, Image> missionChips;
 
-    private Hashtable<Color, BufferedImage> expertMissionChips;
+    private Hashtable<Color, Image> expertMissionChips;
+
+    /**
+     * The scaling factor used when creating this
+     * <code>ImageLibrary</code>. The value
+     * <code>1</code> is used if this object is not
+     * a result of a scaling operation.
+     */
+    private final float scalingFactor;
 
 
     /**
@@ -218,6 +226,7 @@ public final class ImageLibrary extends ImageProvider {
      * @throws FreeColException If one of the data files could not be found.
      */
     public ImageLibrary(String freeColHome) throws FreeColException {
+        this.scalingFactor = 1;
         // TODO: normally this check shouldn't be here. init(false) is the way
         // to go.
         if (freeColHome.equals("")) {
@@ -227,8 +236,67 @@ public final class ImageLibrary extends ImageProvider {
             dataDirectory = freeColHome;
             init(false);
         }
-
     }
+
+    /**
+     * Private constructor used for cloning and getting a
+     * scaled version of this <code>ImageLibrary</code>.
+     * @param scalingFactor The scaling factor.
+     * @see #getScaledImageLibrary
+     */
+    private ImageLibrary(float scalingFactor,
+            Vector<ImageIcon> units,
+            Vector<ImageIcon> unitsGrayscale,
+            Vector<ImageIcon> rivers,
+            Vector<ImageIcon> misc,
+            Vector<ImageIcon> colonies,
+            Vector<ImageIcon> indians,
+            Hashtable<String, ImageIcon>  terrain1,
+            Hashtable<String, ImageIcon>  terrain2,
+            Hashtable<String, ImageIcon> overlay1,
+            Hashtable<String, ImageIcon> overlay2,
+            Hashtable<String, ImageIcon> forests,
+            Hashtable<String, ImageIcon> bonus,
+            Hashtable<String, ImageIcon> goods,
+            Hashtable<String, Vector<ImageIcon>> border1,
+            Hashtable<String, Vector<ImageIcon>> border2,
+            Hashtable<String, Vector<ImageIcon>> coast1,
+            Hashtable<String, Vector<ImageIcon>> coast2,
+            Vector<Vector<ImageIcon>> unitButtons,
+            Image[] alarmChips,
+            Hashtable<Color, Image> colorChips,
+            Hashtable<Color, Image> missionChips,
+            Hashtable<Color, Image> expertMissionChips) {
+        dataDirectory = "";
+
+        this.scalingFactor = scalingFactor;
+        this.units = units;
+        this.unitsGrayscale = unitsGrayscale;
+        this.rivers = rivers;
+        this.misc = misc;
+        this.colonies = colonies;
+        this.indians = indians;
+        this.terrain1 = terrain1;
+        this.terrain2 = terrain2;
+        this.overlay1 = overlay1;
+        this.overlay2 = overlay2;
+        this.forests = forests;
+        this.bonus = bonus;
+        this.goods = goods;
+        this.border1 = border1;
+        this.border2 = border2;
+        this.coast1 = coast1;
+        this.coast2 = coast2;
+
+        this.unitButtons = unitButtons;
+        this.alarmChips = alarmChips;
+        this.colorChips = colorChips;
+        this.missionChips = missionChips;
+        this.expertMissionChips = expertMissionChips;
+
+        scaleImages(scalingFactor);
+    }
+
 
     /**
      * Performs all necessary init operations such as loading of data files.
@@ -259,9 +327,149 @@ public final class ImageLibrary extends ImageProvider {
         loadMonarch(gc, resourceLocator, doLookup);
 
         alarmChips = new Image[Tension.NUMBER_OF_LEVELS];
-        colorChips = new Hashtable<Color, BufferedImage>();
-        missionChips = new Hashtable<Color, BufferedImage>();
-        expertMissionChips = new Hashtable<Color, BufferedImage>();
+        colorChips = new Hashtable<Color, Image>();
+        missionChips = new Hashtable<Color, Image>();
+        expertMissionChips = new Hashtable<Color, Image>();
+    }
+
+    /**
+     * Returns the scaling factor used when creating this ImageLibrary.
+     * @return 1 unless {@see #getScaledImageLibrary} was used to create
+     *      this object.
+     */
+    public float getScalingFactor() {
+        return scalingFactor;
+    }
+
+    /**
+     * Gets a scaled version of this <code>ImageLibrary</code>.
+     * @param scalingFactor The factor used when scaling. 2 is twice
+     *      the size of the original images and 0.5 is half.
+     * @return A new <code>ImageLibrary</code>.
+     */
+    public ImageLibrary getScaledImageLibrary(float scalingFactor) {
+        return new ImageLibrary(scalingFactor, units, unitsGrayscale, rivers,
+                misc, colonies, indians, terrain1, terrain2, overlay1, overlay2, forests, bonus, goods, border1, border2, coast1, coast2, unitButtons,
+                alarmChips, colorChips, missionChips, expertMissionChips);
+    }
+
+    /**
+     * Scales the images in this <code>ImageLibrary</code>
+     * using the given factor.
+     * @param scalingFactor The factor used when scaling. 2 is twice
+     *      the size of the original images and 0.5 is half.
+     */
+    private void scaleImages(float scalingFactor) {
+        units = scaleImages(units, scalingFactor);
+        unitsGrayscale = scaleImages(unitsGrayscale, scalingFactor);
+        rivers = scaleImages(rivers, scalingFactor);
+        misc = scaleImages(misc, scalingFactor);
+        colonies = scaleImages(colonies, scalingFactor);
+        indians = scaleImages(indians, scalingFactor);
+        //monarch = scaleImages(monarch);
+
+        terrain1 = scaleImages3(terrain1, scalingFactor, Image.SCALE_FAST);
+        terrain2 = scaleImages3(terrain2, scalingFactor, Image.SCALE_FAST);
+        overlay1 = scaleImages3(overlay1, scalingFactor);
+        overlay2 = scaleImages3(overlay2, scalingFactor);
+        forests = scaleImages3(forests, scalingFactor);
+        bonus = scaleImages3(bonus, scalingFactor);
+        goods = scaleImages3(goods, scalingFactor);
+        
+        border1 = scaleImages2(border1, scalingFactor);
+        border2 = scaleImages2(border2, scalingFactor);
+        coast1 = scaleImages2(coast1, scalingFactor);
+        coast2 = scaleImages2(coast2, scalingFactor);
+        //unitButtons = scaleImages2(unitButtons);
+        /*
+        alarmChips = scaleImages(alarmChips, scalingFactor);
+        colorChips = scaleImages(colorChips, scalingFactor);
+        missionChips = scaleImages(missionChips, scalingFactor);
+        expertMissionChips = scaleImages(expertMissionChips, scalingFactor);
+        */
+    }
+
+    private Image[] scaleImages(Image[] list, float f) {
+        Image[] output = new Image[list.length];
+        for (int i=0; i<list.length; i++) {
+            Image im = list[i];
+            if (im != null) {
+                output[i] = im.getScaledInstance(Math.round(im.getWidth(null) * f), Math.round(im.getHeight(null) * f), Image.SCALE_SMOOTH);
+            }
+        }
+
+        return output;
+    }
+
+    private Hashtable<Color, Image> scaleImages(Hashtable<Color, Image> hashtable, float f) {
+        Hashtable<Color, Image> output = new Hashtable<Color, Image>();
+        for (Color c : hashtable.keySet()) {
+            Image im = hashtable.get(c);
+            output.put(c, im.getScaledInstance(Math.round(im.getWidth(null) * f), Math.round(im.getHeight(null) * f), Image.SCALE_SMOOTH));
+        }
+        return output;
+    }
+    
+    private Hashtable<String, ImageIcon> scaleImages3(Hashtable<String, ImageIcon> hashtable, float f) {
+        return scaleImages3(hashtable, f, Image.SCALE_SMOOTH);
+    }
+    
+    private Hashtable<String, ImageIcon> scaleImages3(Hashtable<String, ImageIcon> hashtable, float f, int scalingMethod) {
+        Hashtable<String, ImageIcon> output = new Hashtable<String, ImageIcon>();
+        for (String key : hashtable.keySet()) {
+            Image im = hashtable.get(key).getImage();
+            output.put(key, new ImageIcon(im.getScaledInstance(Math.round(im.getWidth(null) * f), Math.round(im.getHeight(null) * f), scalingMethod)));
+        }
+        return output;
+    }
+    
+    private Hashtable<String, Vector<ImageIcon>> scaleImages2(Hashtable<String, Vector<ImageIcon>> hashtable, float f) {
+        Hashtable<String, Vector<ImageIcon>> output = new Hashtable<String, Vector<ImageIcon>>();
+        for (String key : hashtable.keySet()) {
+            if (hashtable.get(key) == null) {
+                output.put(key, null);
+            } else {
+                Vector<ImageIcon> outputV = new Vector<ImageIcon>();
+                for (ImageIcon icon : hashtable.get(key)) {
+                    if (icon == null) {
+                        outputV.add(null);
+                    } else {
+                        Image im = icon.getImage();
+                        outputV.add(new ImageIcon(im.getScaledInstance(Math.round(im.getWidth(null) * f), Math.round(im.getHeight(null) * f), Image.SCALE_SMOOTH)));
+                    }
+                }
+                output.put(key, outputV);
+            }
+        }
+        return output;
+    }
+
+    private Vector<ImageIcon> scaleImages(Vector<ImageIcon> list, float f) {
+        Vector<ImageIcon> output = new Vector<ImageIcon>();
+        for (ImageIcon im : list) {
+            if (im != null) {
+                output.add(new ImageIcon(im.getImage().getScaledInstance(Math.round(im.getIconWidth() * f), Math.round(im.getIconHeight() * f), Image.SCALE_SMOOTH)));
+            } else {
+                output.add(null);
+            }
+        }
+        return output;
+    }
+
+    private Vector<Vector<ImageIcon>> scaleImages2(Vector<Vector<ImageIcon>> list, float f) {
+        Vector<Vector<ImageIcon>> output = new Vector<Vector<ImageIcon>>();
+        for (Vector<ImageIcon> v : list) {
+            Vector<ImageIcon> outputV = new Vector<ImageIcon>();
+            output.add(outputV);
+            for (ImageIcon im : v) {
+                if (im != null) {
+                    outputV.add(new ImageIcon(im.getImage().getScaledInstance(Math.round(im.getIconWidth() * f), Math.round(im.getIconHeight() * f), Image.SCALE_SMOOTH)));
+                } else {
+                    outputV.add(null);
+                }
+            }
+        }
+        return output;
     }
 
     /**

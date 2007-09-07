@@ -68,7 +68,7 @@ public final class GUI {
 
     private final FreeColClient freeColClient;
     private Dimension size;
-    private final ImageLibrary lib;
+    private ImageLibrary lib;
     private TerrainCursor cursor;
     private ViewMode viewMode;
     
@@ -89,7 +89,7 @@ public final class GUI {
     private boolean dragStarted = false;
 
     // Helper variables for displaying the map.
-    private final int tileHeight,
+    private int tileHeight,
     tileWidth,
     topSpace,
     topRows,
@@ -154,7 +154,7 @@ public final class GUI {
     
     private volatile boolean blinkingMarqueeEnabled;
     
-    private final Image cursorImage;
+    private Image cursorImage;
 
     /**
     * The constructor to use.
@@ -166,39 +166,36 @@ public final class GUI {
     public GUI(FreeColClient freeColClient, Dimension size, ImageLibrary lib) {
         this.freeColClient = freeColClient;
         this.size = size;
-        this.lib = lib;
+
+        setImageLibrary(lib);
+
+        inGame = false;
+        logger.info("GUI created.");
+        messages = new Vector<GUIMessage>(MESSAGE_COUNT);
+        viewMode = new ViewMode(this);
+        logger.info("Starting in Move Units View Mode");
+        displayGrid = freeColClient.getClientOptions().getBoolean(ClientOptions.DISPLAY_GRID);
+        blinkingMarqueeEnabled = true;
 
         cursor = new net.sf.freecol.client.gui.TerrainCursor();
-
+    }
+    
+    public void setImageLibrary(ImageLibrary lib) {
+        this.lib = lib;
         TileType tileType = FreeCol.getSpecification().getTileType(0);
         tileHeight = lib.getTerrainImageHeight(tileType);
         tileWidth = lib.getTerrainImageWidth(tileType);
 
         // Calculate the amount of rows that will be drawn above the central Tile
         topSpace = ((int) size.height - tileHeight) / 2;
-        //bottomSpace = topSpace;
-
         if ((topSpace % (tileHeight / 2)) != 0) {
             topRows = topSpace / (tileHeight / 2) + 2;
         } else {
             topRows = topSpace / (tileHeight / 2) + 1;
         }
         bottomRows = topRows;
-
         leftSpace = ((int) size.width - tileWidth) / 2;
         rightSpace = leftSpace;
-        inGame = false;
-        logger.info("GUI created.");
-
-        messages = new Vector<GUIMessage>(MESSAGE_COUNT);
-        
-        viewMode = new ViewMode(this);
-        logger.warning("Starting in Move Units View Mode");
-
-        displayGrid = freeColClient.getClientOptions().getBoolean(ClientOptions.DISPLAY_GRID);
-        
-        blinkingMarqueeEnabled = true;
-        
         cursorImage = lib.getMiscImage(ImageLibrary.UNIT_SELECT);
     }
     
@@ -1455,7 +1452,7 @@ public final class GUI {
             g.drawImage(image.getImage(), (x + tileWidth / 4) - image.getIconWidth() / 2,
                     (y + tileHeight / 2) - image.getIconHeight() / 2, null);
             // Draw an occupation and nation indicator.
-            displayOccupationIndicator(g, occupyingUnit, x + STATE_OFFSET_X, y);
+            displayOccupationIndicator(g, occupyingUnit, x + (int) (STATE_OFFSET_X * lib.getScalingFactor()), y);
         }
     }
 
@@ -1634,7 +1631,7 @@ public final class GUI {
 
             // Tile Overlays first (eg. hills and mountains)
             if (tile.getType().getArtOverlay() != null) {
-                g.drawImage(lib.getOverlayImage(tile.getType(), tile.getX(), tile.getY()), x, y - 32, null);
+                g.drawImage(lib.getOverlayImage(tile.getType(), tile.getX(), tile.getY()), x, y - (int) (32 * lib.getScalingFactor()), null);
             }
             
             TileItemContainer tic = tile.getTileItemContainer();
@@ -1804,34 +1801,34 @@ public final class GUI {
                     g.drawImage(lib.getIndianSettlementImage(type), x + (lib.getTerrainImageWidth(tile.getType()) - lib.getIndianSettlementImageWidth(type)) / 2, y + (lib.getTerrainImageHeight(tile.getType()) - lib.getIndianSettlementImageHeight(type)) / 2, null);
 
                     // Draw the color chip for the settlement.
-                    g.drawImage(lib.getColorChip(((IndianSettlement)settlement).getOwner().getColor()), x + STATE_OFFSET_X, y + STATE_OFFSET_Y, null);
+                    g.drawImage(lib.getColorChip(((IndianSettlement)settlement).getOwner().getColor()), x + (int) (STATE_OFFSET_X  * lib.getScalingFactor()), y + (int) (STATE_OFFSET_Y * lib.getScalingFactor()), null);
 
                     // Draw the mission chip if needed.
                     Unit missionary = ((IndianSettlement)settlement).getMissionary();
                     if (missionary != null) {
                         boolean expert = missionary.hasAbility("model.ability.expertMissionary");
-                        g.drawImage(lib.getMissionChip(missionary.getOwner().getColor(), expert), x + MISSION_OFFSET_X, y + MISSION_OFFSET_Y, null);
+                        g.drawImage(lib.getMissionChip(missionary.getOwner().getColor(), expert), x + (int) (STATE_OFFSET_X * lib.getScalingFactor()) + (MISSION_OFFSET_X - STATE_OFFSET_X), y + (int) (MISSION_OFFSET_Y * lib.getScalingFactor()), null);
                     }
 
                     // Draw the alarm chip if needed.
                     if (freeColClient.getMyPlayer() != null
                             && freeColClient.getMyPlayer().hasContacted(((IndianSettlement)settlement).getOwner())) {
-                        g.drawImage(lib.getAlarmChip(((IndianSettlement)settlement).getAlarm(freeColClient.getMyPlayer()).getLevel()), x + ALARM_OFFSET_X, y + ALARM_OFFSET_Y, null);
+                        g.drawImage(lib.getAlarmChip(((IndianSettlement)settlement).getAlarm(freeColClient.getMyPlayer()).getLevel()), x + (int) (STATE_OFFSET_X * lib.getScalingFactor()) + (ALARM_OFFSET_X - STATE_OFFSET_X), y + (int) (ALARM_OFFSET_Y  * lib.getScalingFactor()), null);
                     }
 
                     g.setColor(Color.BLACK);
                     if (((IndianSettlement) settlement).isCapital()) {
                         // TODO: make this look nicer
-                        g.drawString("*", x + TEXT_OFFSET_X + STATE_OFFSET_X, y + STATE_OFFSET_Y + TEXT_OFFSET_Y);
+                        g.drawString("*", x + (STATE_OFFSET_X * lib.getScalingFactor()) + TEXT_OFFSET_X, y + (int) (STATE_OFFSET_Y * lib.getScalingFactor()) + TEXT_OFFSET_Y);
                     } else {
-                        g.drawString("-", x + TEXT_OFFSET_X + STATE_OFFSET_X, y + STATE_OFFSET_Y + TEXT_OFFSET_Y);
+                        g.drawString("-", x + (int) (STATE_OFFSET_X * lib.getScalingFactor()) + TEXT_OFFSET_X, y + (int) (STATE_OFFSET_Y * lib.getScalingFactor()) + TEXT_OFFSET_Y);
                     }
                 } else {
                     logger.warning("Requested to draw unknown settlement type.");
                 }
             } else if (tile.hasLostCityRumour()) {
                 g.drawImage(lib.getMiscImage(ImageLibrary.LOST_CITY_RUMOUR),
-                            x + RUMOUR_OFFSET_X, y + RUMOUR_OFFSET_Y, null);
+                            x + (int) (RUMOUR_OFFSET_X * lib.getScalingFactor()), y + (int) (RUMOUR_OFFSET_Y * lib.getScalingFactor()), null);
             }
         }
     }
@@ -2152,10 +2149,10 @@ public final class GUI {
             // If unit is sentry, draw in grayscale
             Image image = lib.getUnitImage(type, unit.getState() == Unit.SENTRY);
             
-            g.drawImage(image, (x + tileWidth / 2) - lib.getUnitImageWidth(type) / 2, (y + tileHeight / 2) - lib.getUnitImageHeight(type) / 2 - UNIT_OFFSET, null);
+            g.drawImage(image, (x + tileWidth / 2) - lib.getUnitImageWidth(type) / 2, (y + tileHeight / 2) - lib.getUnitImageHeight(type) / 2 - (int) (UNIT_OFFSET * lib.getScalingFactor()), null);
 
             // Draw an occupation and nation indicator.
-            displayOccupationIndicator(g, unit, x + STATE_OFFSET_X, y);
+            displayOccupationIndicator(g, unit, x + (int) (STATE_OFFSET_X * lib.getScalingFactor()), y);
 
             // Draw one small line for each additional unit (like in civ3).
             int unitsOnTile = unit.getTile().getTotalUnitCount();
@@ -2163,7 +2160,7 @@ public final class GUI {
                 g.setColor(Color.WHITE);
                 int unitLinesY = y + OTHER_UNITS_OFFSET_Y;
                 for (int i = 0; (i < unitsOnTile) && (i < MAX_OTHER_UNITS); i++) {
-                    g.drawLine(x + STATE_OFFSET_X + OTHER_UNITS_OFFSET_X, unitLinesY, x + STATE_OFFSET_X + OTHER_UNITS_OFFSET_X + OTHER_UNITS_WIDTH, unitLinesY);
+                    g.drawLine(x + (int) ((STATE_OFFSET_X + OTHER_UNITS_OFFSET_X) * lib.getScalingFactor()), unitLinesY, x + (int) ((STATE_OFFSET_X + OTHER_UNITS_OFFSET_X + OTHER_UNITS_WIDTH) * lib.getScalingFactor()), unitLinesY);
                     unitLinesY += 2;
                 }
             }

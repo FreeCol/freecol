@@ -74,8 +74,8 @@ public final class MapControls {
         // Create GUI Objects
         //
 
-        infoPanel = new InfoPanel(freeColClient, freeColClient.getGame(), freeColClient.getGUI().getImageLibrary());
-        miniMap = new MiniMap(freeColClient, freeColClient.getGUI().getImageLibrary());
+        infoPanel = new InfoPanel(freeColClient, freeColClient.getGame(), freeColClient.getImageLibrary());
+        miniMap = new MiniMap(freeColClient);
         compassRose = new JLabel(freeColClient.getGUI().getImageLibrary().getMiscImageIcon(9));
         
         final ActionManager am = freeColClient.getActionManager();

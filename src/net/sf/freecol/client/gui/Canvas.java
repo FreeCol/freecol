@@ -178,6 +178,8 @@ public final class Canvas extends JDesktopPane {
     private final ClientOptionsDialog clientOptionsDialog;
 
     private final LoadingSavegameDialog loadingSavegameDialog;
+    
+    private final GUI colonyTileGUI;
 
     private JMenuBar jMenuBar;
 
@@ -200,6 +202,8 @@ public final class Canvas extends JDesktopPane {
     public Canvas(FreeColClient client, Dimension size, GUI gui) {
         this.freeColClient = client;
         this.gui = gui;
+
+        colonyTileGUI = new GUI(client, size, freeColClient.getImageLibrary());
 
         initialSize = size;
 
@@ -248,6 +252,10 @@ public final class Canvas extends JDesktopPane {
     @Override
     public Dimension getPreferredSize() {
         return initialSize;
+    }
+    
+    public GUI getColonyTileGUI() {
+        return colonyTileGUI;
     }
 
     /**
@@ -2175,9 +2183,11 @@ public final class Canvas extends JDesktopPane {
      * Returns the image provider that is being used by this canvas.
      * 
      * @return The image provider that is being used by this canvas.
+     * @deprecated Use {@see FreeColClient#getImageLibrary} or
+     *      {@see GUI#getImageLibrary}.
      */
     public ImageProvider getImageProvider() {
-        return gui.getImageLibrary();
+        return freeColClient.getImageLibrary();
     }
 
     /**

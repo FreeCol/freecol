@@ -108,6 +108,8 @@ public class ActionManager extends OptionGroup {
         add(new UnloadAction(freeColClient));
         add(new WaitAction(freeColClient));
         add(new QuitAction(freeColClient));
+        add(new ZoomInAction(freeColClient));
+        add(new ZoomOutAction(freeColClient));
     }
 
     /**

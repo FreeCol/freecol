@@ -64,6 +64,8 @@ import net.sf.freecol.client.gui.action.ToggleViewModeAction;
 import net.sf.freecol.client.gui.action.TradeRouteAction;
 import net.sf.freecol.client.gui.action.UnloadAction;
 import net.sf.freecol.client.gui.action.WaitAction;
+import net.sf.freecol.client.gui.action.ZoomInAction;
+import net.sf.freecol.client.gui.action.ZoomOutAction;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.client.gui.menu.DebugMenu;
 
@@ -202,6 +204,10 @@ public class InGameMenuBar extends FreeColMenuBar {
         menu.add(getCheckBoxMenuItem(DisplayGridAction.ID));
         menu.add(getMenuItem(ToggleViewModeAction.ID));
         menu.add(getCheckBoxMenuItem(ChangeWindowedModeAction.ID));
+
+        menu.addSeparator();
+        menu.add(getMenuItem(ZoomInAction.ID));
+        menu.add(getMenuItem(ZoomOutAction.ID));
 
         menu.addSeparator();
 
