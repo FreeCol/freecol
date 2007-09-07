@@ -511,6 +511,12 @@ public final class InGameController implements NetworkConstants {
         if (unit != null) {
             clearGotoOrders(unit);
             move(unit, direction);
+
+            //centers unit if option "always center" is active
+            if(freeColClient.getClientOptions().getBoolean(ClientOptions.ALWAYS_CENTER)){
+            	Position unitPosition = unit.getTile().getPosition();
+            	freeColClient.getGUI().setFocus(unitPosition);
+            }
         } // else: nothing: There is no active unit that can be moved.
     }
 
