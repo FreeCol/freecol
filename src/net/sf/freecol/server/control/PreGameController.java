@@ -86,14 +86,13 @@ public final class PreGameController extends Controller {
         game.setFreeColGameObjectListener(aiMain);        
 
         // Add AI players
-        // TODO: do not depend on nation types
         int i = 0;
         for (Nation nation : FreeCol.getSpecification().getNations()) {
-            if (game.getPlayer(nation) != null) {
+            if (game.getPlayer(nation.getID()) != null) {
                 continue;
             }
 
-            String name = nation.getType().getRulerName();
+            String name = nation.getRulerName();
             DummyConnection theConnection = new DummyConnection(
                     "Server connection - " + name,
                     freeColServer.getInGameInputHandler());

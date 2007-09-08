@@ -9,6 +9,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.UIManager;
 
+import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.Player;
@@ -54,18 +55,19 @@ public final class ReportForeignAffairPanel extends ReportPanel implements Actio
         int percentColumn = 6;
         HIGConstraints higConst = new HIGConstraints();
 
-        Element report = getCanvas().getClient().getInGameController().getForeignAffairsReport();
+        FreeColClient client = getCanvas().getClient();
+        Element report = client.getInGameController().getForeignAffairsReport();
         int number = report.getChildNodes().getLength();
         for (int i = 0; i < number; i++) {
             Element enemyElement = (Element) report.getChildNodes().item(i);
             JPanel enemyPanel = new JPanel(new HIGLayout(widths, heights));
             enemyPanel.setOpaque(false);
             int row = 1;
-            Player enemy = (Player) getCanvas().getClient().getGame().getFreeColGameObject(enemyElement.getAttribute("nation"));
-            final Image coatOfArms = (Image) UIManager.get(enemy.getNation().getID() + ".coatOfArms.image");
+            Player enemy = (Player) client.getGame().getFreeColGameObject(enemyElement.getAttribute("player"));
+            final Image coatOfArms = (Image) UIManager.get(enemy.getNationID() + ".coatOfArms.image");
             enemyPanel.add(new JLabel(new ImageIcon(coatOfArms)),
                            higConst.rcwh(row, coatColumn, 1, heights.length, "t"));
-            enemyPanel.add(new JLabel(enemy.getNation().getName()), higConst.rc(row, labelColumn));
+            enemyPanel.add(new JLabel(enemy.getNationAsString()), higConst.rc(row, labelColumn));
             row += 2;
             enemyPanel.add(new JLabel(Messages.message("report.stance")), higConst.rc(row, labelColumn));
             int stance = Integer.parseInt(enemyElement.getAttribute("stance"));

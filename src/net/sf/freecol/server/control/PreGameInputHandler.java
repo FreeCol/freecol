@@ -60,6 +60,11 @@ public final class PreGameInputHandler extends InputHandler {
                 return nation(connection, element);
             }
         });
+        register("setNationType", new NetworkRequestHandler() {
+            public Element handle(Connection connection, Element element) {
+                return nationType(connection, element);
+            }
+        });
         register("setColor", new NetworkRequestHandler() {
             public Element handle(Connection connection, Element element) {
                 return color(connection, element);
@@ -156,6 +161,27 @@ public final class PreGameInputHandler extends InputHandler {
     }
 
     /**
+     * Handles a "nationType"-message from a client.
+     * 
+     * @param connection The connection the message came from.
+     * @param element The element containing the request.
+     */
+    private Element nationType(Connection connection, Element element) {
+        ServerPlayer player = getFreeColServer().getPlayer(connection);
+        if (player != null) {
+            NationType nationType = FreeCol.getSpecification().getNationType(element.getAttribute("value"));
+            player.setNationType(nationType);
+            Element updateNationType = Message.createNewRootElement("updateNationType");
+            updateNationType.setAttribute("nationType", player.getID());
+            updateNationType.setAttribute("value", nationType.getID());
+            getFreeColServer().getServer().sendToAll(updateNationType, player.getConnection());
+        } else {
+            logger.warning("NationType from unknown connection.");
+        }
+        return null;
+    }
+
+    /**
      * Handles a "color"-message from a client.
      * 
      * @param connection The connection the message came from.
@@ -198,7 +224,7 @@ public final class PreGameInputHandler extends InputHandler {
         LinkedList<Color> colors = new LinkedList<Color>();
         while (playerIterator.hasNext()) {
             ServerPlayer player = (ServerPlayer) playerIterator.next();
-            final Nation nation = player.getNation();
+            final Nation nation = FreeCol.getSpecification().getNation(player.getNationID());
             final Color color = player.getColor();
             // Check the nation.
             for (int i = 0; i < nations.size(); i++) {

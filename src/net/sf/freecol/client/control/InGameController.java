@@ -277,7 +277,7 @@ public final class InGameController implements NetworkConstants {
             }
 
             if (!freeColClient.isSingleplayer()) {
-                freeColClient.playSound(SfxLibrary.ANTHEM_BASE + currentPlayer.getNation().getIndex());
+                freeColClient.playSound(SfxLibrary.ANTHEM_BASE + currentPlayer.getNationType().getIndex());
             }
             
             checkTradeRoutesInEurope();
@@ -1465,7 +1465,7 @@ public final class InGameController implements NetworkConstants {
         }
 
         if (unit.getTile().isLand() && !unit.getOwner().isNewLandNamed()) {
-            String newLandName = canvas.showInputDialog("newLand.text", unit.getOwner().getDefaultNewLandName(),
+            String newLandName = canvas.showInputDialog("newLand.text", unit.getOwner().getNewLandName(),
                     "newLand.yes", null);
             unit.getOwner().setNewLandName(newLandName);
             Element setNewLandNameElement = Message.createNewRootElement("setNewLandName");
@@ -3208,12 +3208,6 @@ public final class InGameController implements NetworkConstants {
      * Gathers information about opponents.
      */
     public Element getForeignAffairsReport() {
-        /* can do at any time
-        if (freeColClient.getGame().getCurrentPlayer() != freeColClient.getMyPlayer()) {
-            freeColClient.getCanvas().showInformationMessage("notYourTurn");
-            return null;
-        }
-        */
         return freeColClient.getClient().ask(Message.createNewRootElement("foreignAffairs"));
     }
 

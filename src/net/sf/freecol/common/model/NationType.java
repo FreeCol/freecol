@@ -36,15 +36,6 @@ public abstract class NationType extends FreeColGameObjectType implements Abilit
     }
 
     /**
-     * Get the <code>RulerName</code> value.
-     *
-     * @return a <code>String</code> value
-     */
-    public final String getRulerName() {
-        return Messages.message(getID() + ".ruler");
-    }
-
-    /**
      * Whether this is a EuropeanNation.
      *
      */

@@ -443,7 +443,7 @@ public class Game extends FreeColGameObject {
             if (nation.isSelectable() && nation.isClassic()) {
                 boolean taken = false;
                 for (Player player : getPlayers()) {
-                    if (player.getNation() == nation) {
+                    if (player.getNationID().equals(nation.getID())) {
                         taken = true;
                         break;
                     }
@@ -462,11 +462,11 @@ public class Game extends FreeColGameObject {
      * @param nation The nation.
      * @return The <code>Player</code> of the given nation.
      */
-    public Player getPlayer(Nation nation) {
+    public Player getPlayer(String nationID) {
         Iterator<Player> playerIterator = getPlayerIterator();
         while (playerIterator.hasNext()) {
             Player player = playerIterator.next();
-            if (player.getNation() == nation) {
+            if (player.getNationID().equals(nationID)) {
                 return player;
             }
         }

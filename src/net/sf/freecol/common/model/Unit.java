@@ -1331,7 +1331,7 @@ public class Unit extends FreeColGameObject implements Abilities, Locatable, Loc
             }
         } else {
             // check for embarkation
-            if (target.getFirstUnit() == null || target.getFirstUnit().getNation() != getNation()) {
+            if (target.getFirstUnit() == null || target.getFirstUnit().getOwner() != getOwner()) {
                 logger.fine("Trying to embark on tile occupied by foreign units with " + getName());
                 return ILLEGAL_MOVE;
             } else {
@@ -2386,9 +2386,11 @@ public class Unit extends FreeColGameObject implements Abilities, Locatable, Loc
      * 
      * @return The nation the unit is serving.
      */
+    /*
     public Nation getNation() {
         return owner.getNation();
     }
+    */
 
     /**
      * Gets the type of the unit.
@@ -4133,7 +4135,7 @@ public class Unit extends FreeColGameObject implements Abilities, Locatable, Loc
                 randomTreasure = (int) modifier.applyTo(randomTreasure);
             }
 
-            if (((IndianNationType) enemy.getNation().getType()).getTypeOfSettlement() == IndianNationType.CITY) {
+            if (((IndianNationType) enemy.getNationType()).getTypeOfSettlement() == IndianNationType.CITY) {
                 tTrain.setTreasureAmount(randomTreasure * 500 + 10000);
             } else {
                 tTrain.setTreasureAmount(randomTreasure * 50  + 300);

@@ -1057,25 +1057,29 @@
     <european-nation-type id="model.nationType.ref" ref="yes">
       <modifier id="model.modifier.bombardBonus" type="percentage" value="50"/>
     </european-nation-type>
-    <european-nation-type id="model.nationType.dutch">
+    <!-- this was the Dutch player -->
+    <european-nation-type id="model.nationType.trade">
       <modifier id="model.modifier.tradeBonus" type="percentage" value="50"/>
       <unit id="model.unit.freeColonist" tools="100"/>
       <unit id="model.unit.freeColonist" armed="yes"/>
       <unit id="model.unit.merchantman"/>
     </european-nation-type>
-    <european-nation-type id="model.nationType.french">
+    <!-- this was the French player -->
+    <european-nation-type id="model.nationType.cooperation">
       <modifier id="model.modifier.nativeAlarmBonus" type="percentage" value="-50"/>
       <unit id="model.unit.hardyPioneer" tools="100"/>
       <unit id="model.unit.freeColonist" armed="yes"/>
       <unit id="model.unit.caravel"/>
     </european-nation-type>
-    <european-nation-type id="model.nationType.english">
+    <!-- this was the English player -->
+    <european-nation-type id="model.nationType.immigration">
       <modifier id="model.modifier.religiousUnrestBonus" type="percentage" value="-33"/>
       <unit id="model.unit.freeColonist" tools="100"/>
       <unit id="model.unit.freeColonist" armed="yes"/>
       <unit id="model.unit.caravel"/>
     </european-nation-type>
-    <european-nation-type id="model.nationType.spanish">
+    <!-- this was the Spanish player -->
+    <european-nation-type id="model.nationType.conquest">
       <modifier id="model.modifier.nativeConvertBonus" type="percentage" value="200"/>
       <modifier id="model.modifier.nativeTreasureBonus" type="percentage" value="200"/>
       <unit id="model.unit.freeColonist" tools="100"/>
@@ -1121,10 +1125,10 @@
   </nation-types>
 
   <nations>
-    <nation id="model.nation.dutch" color="ff9d3c" nation-type="model.nationType.dutch" selectable="yes" classic="yes"/>
-    <nation id="model.nation.french" color="0000ff" nation-type="model.nationType.french" selectable="yes" classic="yes"/>
-    <nation id="model.nation.english" color="ff0000" nation-type="model.nationType.english" selectable="yes" classic="yes"/>
-    <nation id="model.nation.spanish" color="ffff00" nation-type="model.nationType.spanish" selectable="yes" classic="yes"/>
+    <nation id="model.nation.dutch" color="ff9d3c" nation-type="model.nationType.trade" selectable="yes" classic="yes"/>
+    <nation id="model.nation.french" color="0000ff" nation-type="model.nationType.cooperation" selectable="yes" classic="yes"/>
+    <nation id="model.nation.english" color="ff0000" nation-type="model.nationType.immigration" selectable="yes" classic="yes"/>
+    <nation id="model.nation.spanish" color="ffff00" nation-type="model.nationType.conquest" selectable="yes" classic="yes"/>
     <nation id="model.nation.inca" color="f4f0c4" nation-type="model.nationType.inca"/>
     <nation id="model.nation.aztec" color="c4a020" nation-type="model.nationType.aztec"/>
     <nation id="model.nation.arawak" color="6888c0" nation-type="model.nationType.arawak"/>

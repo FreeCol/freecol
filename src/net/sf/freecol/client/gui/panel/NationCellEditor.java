@@ -23,7 +23,7 @@ public final class NationCellEditor extends DefaultCellEditor {
     * A standard constructor.
     */
     public NationCellEditor() {
-        super(new JComboBox(new Vector(FreeCol.getSpecification().getEuropeanNationTypes())));
+        super(new JComboBox(new Vector(FreeCol.getSpecification().getClassicNations())));
     }
     
     public Object getCellEditorValue() {

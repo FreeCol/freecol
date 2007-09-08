@@ -2442,7 +2442,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
                 continue;
             }
             Element enemyElement = reply.getOwnerDocument().createElement("opponent");
-            enemyElement.setAttribute("nation", String.valueOf(enemyPlayer.getNation()));
+            enemyElement.setAttribute("player", enemyPlayer.getID());
             int numberOfColonies = enemyPlayer.getSettlements().size();
             int numberOfUnits = 0;
             int militaryStrength = 0;

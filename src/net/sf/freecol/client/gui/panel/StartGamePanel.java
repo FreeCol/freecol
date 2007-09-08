@@ -25,6 +25,7 @@ import net.sf.freecol.client.control.PreGameController;
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.Game;
+import net.sf.freecol.common.model.NationType;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.server.generator.MapGeneratorOptions;
 import cz.autel.dmi.HIGLayout;
@@ -59,6 +60,8 @@ public final class StartGamePanel extends FreeColPanel implements ActionListener
     // Messages.message("white"),
     // Messages.message("yellow"),
     // };
+
+    public static final int NAME_COLUMN = 0, NATION_COLUMN = 1, ADVANTAGE_COLUMN = 2, COLOR_COLUMN = 3;
 
     private final Canvas parent;
 
@@ -115,8 +118,9 @@ public final class StartGamePanel extends FreeColPanel implements ActionListener
         tableModel = new PlayersTableModel(freeColClient, freeColClient.getPreGameController());
         table = new JTable(tableModel);
 
-        TableColumn nameColumn = table.getColumnModel().getColumn(0),
-                colorsColumn = table.getColumnModel().getColumn(2);
+        TableColumn nameColumn = table.getColumnModel().getColumn(NAME_COLUMN),
+            advantageColumn = table.getColumnModel().getColumn(ADVANTAGE_COLUMN),
+            colorsColumn = table.getColumnModel().getColumn(COLOR_COLUMN);
         DefaultTableCellRenderer dtcr = new DefaultTableCellRenderer();
 
         dtcr.setOpaque(false);
@@ -199,13 +203,19 @@ public final class StartGamePanel extends FreeColPanel implements ActionListener
 
         tableModel.setData(game.getPlayers(), thisPlayer);
 
-        TableColumn nationsColumn = table.getColumnModel().getColumn(1);
+        TableColumn nationsColumn = table.getColumnModel().getColumn(NATION_COLUMN);
         nationsColumn.setCellEditor(new NationCellEditor());
         nationsColumn.setCellRenderer(new NationCellRenderer());
-        ((NationCellRenderer) table.getColumnModel().getColumn(1).getCellRenderer()).setData(game.getPlayers(),
+        ((NationCellRenderer) table.getColumnModel().getColumn(NATION_COLUMN).getCellRenderer()).setData(game.getPlayers(),
+                thisPlayer);
+
+        TableColumn advantagesColumn = table.getColumnModel().getColumn(ADVANTAGE_COLUMN);
+        advantagesColumn.setCellEditor(new AdvantageCellEditor());
+        advantagesColumn.setCellRenderer(new AdvantageCellRenderer());
+        ((AdvantageCellRenderer) table.getColumnModel().getColumn(ADVANTAGE_COLUMN).getCellRenderer()).setData(game.getPlayers(),
                 thisPlayer);
         
-        ((ColorCellEditor) table.getColumnModel().getColumn(2).getCellEditor()).setData(game.getPlayers(), thisPlayer);
+        ((ColorCellEditor) table.getColumnModel().getColumn(COLOR_COLUMN).getCellEditor()).setData(game.getPlayers(), thisPlayer);
         
         if (singlePlayerGame) {
             // If we set the ready flag to false then the player will be able to
@@ -362,6 +372,7 @@ class PlayersTableModel extends AbstractTableModel {
     private static final String[] columnNames = {
         Messages.message("player"),
         Messages.message("nation"),
+        Messages.message("advantage"),
         Messages.message("color")
     };
 
@@ -452,12 +463,14 @@ class PlayersTableModel extends AbstractTableModel {
         if ((row < getRowCount()) && (column < getColumnCount()) && (row >= 0) && (column >= 0)) {
             Player player = getPlayer(row);
             switch (column) {
-            case 0:
+            case StartGamePanel.NAME_COLUMN:
                 return player.getName();
-            case 1:
+            case StartGamePanel.NATION_COLUMN:
                 return new Integer(player.getIndex());
-            default:
+            case StartGamePanel.COLOR_COLUMN:
                 return player.getColor();
+            case StartGamePanel.ADVANTAGE_COLUMN:
+                return player.getNationType();
             }
         }
         return null;
@@ -490,13 +503,15 @@ class PlayersTableModel extends AbstractTableModel {
         if ((row < getRowCount()) && (column < getColumnCount()) && (row >= 0) && (column >= 0)) {
             // Column 0 can't be updated.
 
-            if (column == 1) {
+            if (column == StartGamePanel.NATION_COLUMN) {
                 int nation = ((Integer) value).intValue();
                 preGameController.setNation(FreeCol.getSpecification().getNation(nation));
                 preGameController.setColor(FreeCol.getSpecification().getNation(nation).getColor());
-                fireTableCellUpdated(row, 2);
-            } else if (column == 2) {
+                fireTableCellUpdated(row, StartGamePanel.COLOR_COLUMN);
+            } else if (column == StartGamePanel.COLOR_COLUMN) {
                 preGameController.setColor((Color) value);
+            } else if (column == StartGamePanel.ADVANTAGE_COLUMN) {
+                preGameController.setNationType((NationType) value);
             }
 
             fireTableCellUpdated(row, column);

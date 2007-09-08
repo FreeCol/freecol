@@ -112,16 +112,15 @@ public final class NationCellRenderer implements TableCellRenderer {
         }
         component.setBackground(table.getBackground());
 
-        /*
         int index = player.getIndex();
-        if (player.isIndian() || player.isREF()) {
+        if (player.isIndian()) {
             index -= FreeCol.getSpecification().getEuropeanNationTypes().size();
-        }
-        if (player.isREF()) {
+        } else if (player.isREF()) {
+            index -= FreeCol.getSpecification().getEuropeanNationTypes().size();
             index -= FreeCol.getSpecification().getIndianNationTypes().size();
         }        
         component.setSelectedIndex(index);
-        */
+
         return component;
     }
 }

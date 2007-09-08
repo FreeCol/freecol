@@ -93,9 +93,9 @@ public final class PreGameController {
 
 
     /**
-    * Sets this client's player's nation.
-    * @param nation Which nation this player wishes to set.
-    */
+     * Sets this client's player's nation.
+     * @param nation Which nation this player wishes to set.
+     */
     public void setNation(Nation nation) {
         // Make the change:
         freeColClient.getMyPlayer().setNation(nation);
@@ -105,6 +105,22 @@ public final class PreGameController {
         nationElement.setAttribute("value", nation.getID());
 
         freeColClient.getClient().sendAndWait(nationElement);
+    }
+
+
+    /**
+     * Sets this client's player's nation type.
+     * @param nation Which nation this player wishes to set.
+     */
+    public void setNationType(NationType nationType) {
+        // Make the change:
+        freeColClient.getMyPlayer().setNationType(nationType);
+
+        // Inform the server:
+        Element nationTypeElement = Message.createNewRootElement("setNationType");
+        nationTypeElement.setAttribute("value", nationType.getID());
+
+        freeColClient.getClient().sendAndWait(nationTypeElement);
     }
 
 

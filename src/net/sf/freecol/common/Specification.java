@@ -599,6 +599,16 @@ public final class Specification {
         return result;
     }
 
+    public List<EuropeanNationType> getClassicNationTypes() {
+        ArrayList<EuropeanNationType> result = new ArrayList<EuropeanNationType>();
+        for (Nation nation : nations) {
+            if (nation.isClassic()) {
+                result.add((EuropeanNationType) nation.getType());
+            }
+        }
+        return result;
+    }
+
     public int numberOfNationTypes() {
         return nationTypes.size();
     }

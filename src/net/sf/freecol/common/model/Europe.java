@@ -481,14 +481,14 @@ public final class Europe extends FreeColGameObject implements Location,
      * @return The name of this location.
      */
     public String getName() {
-        return toString();
+        return getOwner().getEuropeName();
     }
 
     /**
      * Returns a suitable name.
      */
     public String toString() {
-        return ((EuropeanNationType) getOwner().getNation().getType()).getEuropeName();
+        return "Europe";
     }
 
     /**

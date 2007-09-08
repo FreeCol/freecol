@@ -1716,7 +1716,7 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener {
                                     new ChoiceItem(Messages.message("indianLand.take"), 2) };
                             ChoiceItem ci = (ChoiceItem) parent.
                                 showChoiceDialog(Messages.message("indianLand.text",
-                                                                  "%player%", player.getNation().getName()),
+                                                                  "%player%", player.getNationAsString()),
                                                  Messages.message("indianLand.cancel"), choices);
                             if (ci == null) {
                                 return null;

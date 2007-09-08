@@ -1136,7 +1136,7 @@ public final class GUI {
                     currentPlayerColor,
                     640,
                     18);
-            final String currentNationID = freeColClient.getGame().getCurrentPlayer().getNation().getID();
+            final String currentNationID = freeColClient.getGame().getCurrentPlayer().getNationID();
             final Image coatOfArms = (Image) UIManager.get(currentNationID + ".coatOfArms.image");
             final int cHeight = (coatOfArms != null) ? coatOfArms.getHeight(null) : 0;
             g.drawImage(im, (size.width - im.getWidth(null)) / 2, (size.height - im.getHeight(null) - cHeight) / 2, null);
@@ -1930,7 +1930,7 @@ public final class GUI {
         }
         
         if (displayTileOwners && tile.getOwner() != null) {
-            String tileOwner = tile.getOwner().getNation().getName();
+            String tileOwner = tile.getOwner().getNationAsString();
             g.setColor(Color.BLACK);
             int b = getBreakingPoint(tileOwner);
             if (b == -1) {

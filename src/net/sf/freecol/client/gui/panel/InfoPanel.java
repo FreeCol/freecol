@@ -379,7 +379,7 @@ public final class InfoPanel extends FreeColPanel {
                     }
                 }
                 if (tile.getOwner() != null) {
-                    text += tile.getOwner().getNation().getName();
+                    text += tile.getOwner().getNationAsString();
                 }
                 plowOwnerLabel.setText(text);
                 if (!text.equals("")) {

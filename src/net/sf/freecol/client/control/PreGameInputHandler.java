@@ -78,6 +78,8 @@ public final class PreGameInputHandler extends InputHandler implements StreamedM
                 reply = playerReady(element);
             } else if (type.equals("updateNation")) {
                 reply = updateNation(element);
+            } else if (type.equals("updateNationType")) {
+                reply = updateNationType(element);
             } else if (type.equals("updateColor")) {
                 reply = updateColor(element);
             } else if (type.equals("startGame")) {
@@ -261,6 +263,25 @@ public final class PreGameInputHandler extends InputHandler implements StreamedM
         Nation nation = FreeCol.getSpecification().getNation(element.getAttribute("value"));
 
         player.setNation(nation);
+        getFreeColClient().getCanvas().getStartGamePanel().refreshPlayersTable();
+
+        return null;
+    }
+
+
+    /**
+    * Handles an "updateNationType"-message.
+    *
+    * @param element The element (root element in a DOM-parsed XML tree) that
+    *                holds all the information.
+    */
+    private Element updateNationType(Element element) {
+        Game game = getFreeColClient().getGame();
+
+        Player player = (Player) game.getFreeColGameObject(element.getAttribute("player"));
+        NationType nationType = FreeCol.getSpecification().getNationType(element.getAttribute("value"));
+
+        player.setNationType(nationType);
         getFreeColClient().getCanvas().getStartGamePanel().refreshPlayersTable();
 
         return null;

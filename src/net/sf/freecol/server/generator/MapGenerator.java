@@ -492,7 +492,7 @@ public class MapGenerator {
 
             Unit carrier = null;
             List<Unit> units = new ArrayList<Unit>();
-            List<EuropeanNationType.StartingUnit> unitList = ((EuropeanNationType) player.getNation().getType()).getStartingUnits();
+            List<EuropeanNationType.StartingUnit> unitList = ((EuropeanNationType) player.getNationType()).getStartingUnits();
             for (EuropeanNationType.StartingUnit startingUnit : unitList) {
                 Unit newUnit = new Unit(map.getGame(), startTile, player, startingUnit.unitType,
                                         Unit.SENTRY, startingUnit.armed, startingUnit.mounted,

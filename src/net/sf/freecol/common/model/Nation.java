@@ -84,6 +84,15 @@ public class Nation extends FreeColGameObjectType {
     }
 
     /**
+     * Get the <code>RulerName</code> value.
+     *
+     * @return a <code>String</code> value
+     */
+    public final String getRulerName() {
+        return Messages.message(getID() + ".ruler");
+    }
+
+    /**
      * Get the <code>Selectable</code> value.
      *
      * @return a <code>boolean</code> value
@@ -117,70 +126,6 @@ public class Nation extends FreeColGameObjectType {
      */
     public final void setClassic(final boolean newClassic) {
         this.classic = newClassic;
-    }
-
-    /**
-     * Get the <code>RulerName</code> value.
-     *
-     * @return a <code>String</code> value
-     */
-    public final String getRulerName() {
-        return Messages.message(type.getID() + ".ruler");
-    }
-
-    /**
-     * Whether this is a EuropeanNation.
-     *
-     */
-    public boolean isEuropean() {
-        return type.isEuropean();
-    }
-
-    /**
-     * Whether this is a EuropeanREFNation.
-     *
-     */
-    public boolean isREF() {
-        return type.isREF();
-    }
-
-    /**
-     * Returns true if this Nation has the ability with the given ID.
-     *
-     * @param id a <code>String</code> value
-     * @return a <code>boolean</code> value
-     */
-    public boolean hasAbility(String id) {
-        return type.getAbilities().containsKey(id) && 
-            type.getAbilities().get(id);
-    }
-
-    /**
-     * Returns a copy of this Nation's abilities.
-     *
-     * @return a <code>Map</code> value
-     */
-    public Map<String, Boolean> getAbilities() {
-        return new HashMap<String, Boolean>(type.getAbilities());
-    }
-
-    /**
-     * Get the <code>Modifier</code> value.
-     *
-     * @param id a <code>String</code> value
-     * @return a <code>Modifier</code> value
-     */
-    public final Modifier getModifier(String id) {
-        return type.getModifiers().get(id);
-    }
-
-    /**
-     * Returns a copy of this Nation's modifiers.
-     *
-     * @return a <code>Map</code> value
-     */
-    public Map<String, Modifier> getModifiers() {
-        return new HashMap<String, Modifier>(type.getModifiers());
     }
 
     public String toString() {

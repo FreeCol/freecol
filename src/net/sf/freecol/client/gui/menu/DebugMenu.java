@@ -161,7 +161,7 @@ public class DebugMenu extends JMenu {
         while (it.hasNext()) {
             final Player p = it.next();
             if (p.isEuropean() && p.canBuildColonies()) {
-                JRadioButtonMenuItem cv2 = new JRadioButtonMenuItem(p.getNation().getName(),
+                JRadioButtonMenuItem cv2 = new JRadioButtonMenuItem(p.getNationAsString(),
                         gui.displayColonyValue && gui.displayColonyValuePlayer == p);
                 cv2.setOpaque(false);
                 cv2.setMnemonic(KeyEvent.VK_C);
