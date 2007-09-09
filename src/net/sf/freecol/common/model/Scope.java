@@ -46,6 +46,19 @@ public final class Scope extends FreeColObject implements Cloneable {
      */
     private String attributeValue;
 
+
+
+    /**
+     * Creates a new <code>Scope</code> instance.
+     *
+     * @param in a <code>XMLStreamReader</code> value
+     * @exception XMLStreamException if an error occurs
+     */
+    public Scope(XMLStreamReader in) throws XMLStreamException {
+        readFromXMLImpl(in);
+    }
+
+
     /**
      * Get the <code>Type</code> value.
      *
@@ -137,6 +150,12 @@ public final class Scope extends FreeColObject implements Cloneable {
     }
 
 
+    /**
+     * Describe <code>appliesTo</code> method here.
+     *
+     * @param object a <code>FreeColGameObjectType</code> value
+     * @return a <code>boolean</code> value
+     */
     public boolean appliesTo(FreeColGameObjectType object) {
         if (type != null && type != object.getID()) {
             return false;
@@ -167,7 +186,7 @@ public final class Scope extends FreeColObject implements Cloneable {
         type = in.getAttributeValue(null, "type");
         abilityID = in.getAttributeValue(null, "ability-id");
         abilityValue = getAttribute(in, "ability-value", true);
-        attributeName = in.getAttributeValue(null, "attribute-id");
+        attributeName = in.getAttributeValue(null, "attribute-name");
         attributeValue = in.getAttributeValue(null, "attribute-value");
         in.nextTag();
     }
@@ -187,7 +206,7 @@ public final class Scope extends FreeColObject implements Cloneable {
         out.writeAttribute("type", type);
         out.writeAttribute("ability-id", abilityID);
         out.writeAttribute("ability-value", String.valueOf(abilityValue));
-        out.writeAttribute("attribute-id", attributeName);
+        out.writeAttribute("attribute-name", attributeName);
         out.writeAttribute("attribute-value", attributeValue);
 
         out.writeEndElement();

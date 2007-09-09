@@ -37,6 +37,14 @@ public abstract class FreeColGameObjectType extends FreeColObject {
         return Messages.message(id + ".description");
     }
 
+    public boolean hasAbility(String id) {
+        return false;
+    }
+
+    public Modifier getModifier(String id) {
+        return null;
+    }
+
     protected void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
     }
 }

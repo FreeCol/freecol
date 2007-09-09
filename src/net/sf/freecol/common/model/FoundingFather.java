@@ -38,11 +38,6 @@ public class FoundingFather extends FreeColGameObjectType implements Abilities, 
                             TYPE_COUNT = 5;
 
     /**
-     * Stores the abilities of this Type.
-     */
-    private HashMap<String, Boolean> abilities = new HashMap<String, Boolean>();
-
-    /**
      * Stores the Modifiers of this Type.
      */
     private HashMap<String, Modifier> modifiers = new HashMap<String, Modifier>();
@@ -142,16 +137,7 @@ public class FoundingFather extends FreeColGameObjectType implements Abilities, 
      * @return a <code>boolean</code> value
      */
     public boolean hasAbility(String id) {
-        return abilities.containsKey(id) && abilities.get(id);
-    }
-
-    /**
-     * Returns a copy of this FoundingFather's abilities.
-     *
-     * @return a <code>Map</code> value
-     */
-    public Map<String, Boolean> getAbilities() {
-        return new HashMap<String, Boolean>(abilities);
+        return modifiers.containsKey(id) && modifiers.get(id).getBooleanValue();
     }
 
     /**
@@ -161,7 +147,11 @@ public class FoundingFather extends FreeColGameObjectType implements Abilities, 
      * @param newValue a <code>boolean</code> value
      */
     public void setAbility(String id, boolean newValue) {
-        abilities.put(id, newValue);
+        if (modifiers.containsKey(id)) {
+            modifiers.get(id).setBooleanValue(newValue);
+        } else {
+            modifiers.put(id, new Modifier(id, newValue, Modifier.BOOLEAN));
+        }
     }
 
     /**
@@ -185,21 +175,26 @@ public class FoundingFather extends FreeColGameObjectType implements Abilities, 
     }
 
     /**
-     * Returns all events.
-     *
-     * @return a <code>List</code> of Events.
-     */
-    public Map<String, String> getEvents() {
-        return events;
-    }
-
-    /**
      * Returns a copy of this FoundingFather's modifiers.
      *
      * @return a <code>Map</code> value
      */
     public Map<String, Modifier> getModifiers() {
         return new HashMap<String, Modifier>(modifiers);
+    }
+
+    // TODO: make this unnecessary
+    public Map<String, Boolean> getAbilities() {
+        return null;
+    }
+
+    /**
+     * Returns all events.
+     *
+     * @return a <code>List</code> of Events.
+     */
+    public Map<String, String> getEvents() {
+        return events;
     }
 
     protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
@@ -231,10 +226,9 @@ public class FoundingFather extends FreeColGameObjectType implements Abilities, 
         while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
             String childName = in.getLocalName();
             if ("ability".equals(childName)) {
-                String abilityId = in.getAttributeValue(null, "id");
-                boolean value = getAttribute(in, "value", true);
-                setAbility(abilityId, value);
-                in.nextTag(); // close this element
+                Modifier modifier = new Modifier(in);
+                setModifier(modifier.getId(), modifier);
+                // close this element
             } else if (Modifier.getXMLElementTagName().equals(childName)) {
                 Modifier modifier = new Modifier(in);
                 setModifier(modifier.getId(), modifier); // close this element
