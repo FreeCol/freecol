@@ -906,6 +906,9 @@
       <modifier id="model.ability.movementBonus" type="additive" value="1">
         <scope ability-id="model.ability.navalUnit" value="yes"/>
       </modifier>
+      <modifier id="model.modifier.sailToEuropeBonus" type="additive" value="1">
+        <scope ability-id="model.ability.navalUnit" value="yes"/>
+      </modifier>
     </founding-father>
     <founding-father id="model.foundingFather.fransiscoDeCoronado" type="exploration"
                      weight1="3" weight2="5" weight3="7">

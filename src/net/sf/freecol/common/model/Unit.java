@@ -2581,14 +2581,40 @@ public class Unit extends FreeColGameObject implements Abilities, Locatable, Loc
      * @return The amount of moves this unit has at the beginning of each turn.
      */
     public int getInitialMovesLeft() {
+        int movesLeft = unitType.getMovement();
+        // TODO: do this with roles
         if (isMounted()) {
-            return 12;
+            movesLeft = Math.min(12, movesLeft);
         } else if (isMissionary()) {
-            return 6;
-        } else if (isNaval() && owner.hasFather(FreeCol.getSpecification().getFoundingFather("model.foundingFather.ferdinandMagellan"))) {
-            return unitType.getMovement() + 3;
+            movesLeft = Math.min(6, movesLeft);
+        }
+        Modifier modifier = getModifier("model.modifier.movementBonus");
+        if (modifier != null) {
+            movesLeft = (int) modifier.applyTo(movesLeft);
+        }
+        return movesLeft;
+    }
+
+    /**
+     * Get a modifier that applies to this Unit.
+     *
+     * @param id a <code>String</code> value
+     * @return a <code>Modifier</code> value
+     */
+    public Modifier getModifier(String id) {
+        Modifier typeModifier = getUnitType().getModifier(id);
+        Modifier playerModifier = getOwner().getModifier(id);
+        if (playerModifier == null || !playerModifier.appliesTo(getUnitType())) {
+            if (typeModifier == null) {
+                return null;
+            } else {
+                return typeModifier;
+            }
+        } else if (typeModifier == null) {
+            return playerModifier;
         } else {
-            return unitType.getMovement();
+            typeModifier.combine(playerModifier);
+            return typeModifier;
         }
     }
     
@@ -2810,8 +2836,9 @@ public class Unit extends FreeColGameObject implements Abilities, Locatable, Loc
                 // I think '4' was also used in the original game.
                 workLeft = 4 - workLeft;
             }
-            if (getOwner().hasFather(FreeCol.getSpecification().getFoundingFather("model.foundingFather.ferdinandMagellan"))) {
-                workLeft--;
+            Modifier modifier = getOwner().getModifier("model.modifier.sailToEuropeBonus");
+            if (modifier != null) {
+                workLeft -= modifier.getValue();
             }
             movesLeft = 0;
             break;
@@ -2822,8 +2849,9 @@ public class Unit extends FreeColGameObject implements Abilities, Locatable, Loc
                 // I think '4' was also used in the original game.
                 workLeft = 4 - workLeft;
             }
-            if (getOwner().hasFather(FreeCol.getSpecification().getFoundingFather("model.foundingFather.ferdinandMagellan"))) {
-                workLeft--;
+            Modifier modifier1 = getOwner().getModifier("model.modifier.sailToEuropeBonus");
+            if (modifier1 != null) {
+                workLeft -= modifier1.getValue();
             }
             movesLeft = 0;
             break;
