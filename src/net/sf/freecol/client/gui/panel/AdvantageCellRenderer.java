@@ -34,8 +34,6 @@ public final class AdvantageCellRenderer implements TableCellRenderer {
     private List<Player> players;
     private Player thisPlayer;
 
-    private static final JComboBox comboBox = new JComboBox();
-
     /**
     * The default constructor.
     */
@@ -78,15 +76,16 @@ public final class AdvantageCellRenderer implements TableCellRenderer {
 
         Player player = getPlayer(row);
 
-        JComboBox component;
+        Component component;
         component = standardNationsComboBox;
-        /*
-        if (player.isEuropean()) {
-
+        if (player == thisPlayer) {
+            component = standardNationsComboBox;
+            ((JComboBox) component).setSelectedItem(player.getNationType());
+        } else if (player.isEuropean()) {
+            component = new JLabel(player.getNationType().getName());
         } else {
-            component = comboBox;
+            component = new JLabel();
         }
-        */
 
         if (player.isReady()) {
             component.setForeground(Color.GRAY);
@@ -94,15 +93,6 @@ public final class AdvantageCellRenderer implements TableCellRenderer {
             component.setForeground(table.getForeground());
         }
         component.setBackground(table.getBackground());
-
-        int index = player.getIndex();
-        if (player.isIndian()) {
-            index -= FreeCol.getSpecification().getEuropeanNationTypes().size();
-        } else if (player.isREF()) {
-            index -= FreeCol.getSpecification().getEuropeanNationTypes().size();
-            index -= FreeCol.getSpecification().getIndianNationTypes().size();
-        }        
-        component.setSelectedIndex(index);
 
         return component;
     }

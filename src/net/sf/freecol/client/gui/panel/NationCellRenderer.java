@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Vector;
 
 import javax.swing.JComboBox;
+import javax.swing.JLabel;
 import javax.swing.JTable;
 import javax.swing.table.TableCellRenderer;
 
@@ -26,15 +27,18 @@ public final class NationCellRenderer implements TableCellRenderer {
     public static final String  LICENSE = "http://www.gnu.org/licenses/gpl.html";
     public static final String  REVISION = "$Revision$";
 
-    private static Vector<Nation> europeans = 
-        new Vector<Nation>(FreeCol.getSpecification().getClassicNations());
-    private static Vector<IndianNationType> indians = 
-        new Vector<IndianNationType>(FreeCol.getSpecification().getIndianNationTypes());
-    private static Vector<EuropeanNationType> refs = 
-        new Vector<EuropeanNationType>(FreeCol.getSpecification().getREFNationTypes());
-    private static final JComboBox standardNationsComboBox = new JComboBox(europeans);
+    /*
+    private static Vector<Nation> indians = 
+        new Vector<Nation>(FreeCol.getSpecification().getIndianNations());
+    private static Vector<Nation> refs = 
+        new Vector<Nation>(FreeCol.getSpecification().getREFNations());
     private static final JComboBox indianTribesComboBox = new JComboBox(indians);
     private static final JComboBox refNationsComboBox = new JComboBox(refs);
+    */
+
+    private static Vector<Nation> europeans = 
+        new Vector<Nation>(FreeCol.getSpecification().getClassicNations());
+    private static final JComboBox standardNationsComboBox = new JComboBox(europeans);
 
     private List<Player> players;
     private Player thisPlayer;
@@ -81,28 +85,17 @@ public final class NationCellRenderer implements TableCellRenderer {
 
         Player player = getPlayer(row);
 
-        JComboBox component;
-        if (player.isREF()) {
-            component = refNationsComboBox;
-        } else if (player.isEuropean()) {
+        Component component;
+        if (player == thisPlayer) {
             component = standardNationsComboBox;
-        } else {
-            component = indianTribesComboBox;
-        }
-
-        if (player.isAI()) {
-        /*
-            int nation = player.getNation();
-            if ((nation != Player.DUTCH) && (nation != Player.ENGLISH)
-                    && (nation != Player.FRENCH) && (nation != Player.SPANISH)) {
-                // This is an indian AI player.
-
-                indianTribesComboBox.setForeground(Color.LIGHT_GRAY);
-                return indianTribesComboBox;
-            } else {
-                standardNationsComboBox.setForeground(Color.LIGHT_GRAY);
+            for (int index = 0; index < europeans.size(); index++) {
+                if (europeans.get(index).getID().equals(player.getNationID())) {
+                    ((JComboBox) component).setSelectedIndex(index);
+                    break;
+                }
             }
-            */
+        } else {
+            component = new JLabel(player.getNationAsString());
         }
 
         if (player.isReady()) {
@@ -111,15 +104,6 @@ public final class NationCellRenderer implements TableCellRenderer {
             component.setForeground(table.getForeground());
         }
         component.setBackground(table.getBackground());
-
-        int index = player.getIndex();
-        if (player.isIndian()) {
-            index -= FreeCol.getSpecification().getEuropeanNationTypes().size();
-        } else if (player.isREF()) {
-            index -= FreeCol.getSpecification().getEuropeanNationTypes().size();
-            index -= FreeCol.getSpecification().getIndianNationTypes().size();
-        }        
-        component.setSelectedIndex(index);
 
         return component;
     }

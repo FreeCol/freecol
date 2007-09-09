@@ -48,18 +48,6 @@ public final class StartGamePanel extends FreeColPanel implements ActionListener
     // MAPSIZE = 2,
             READY = 3, CHAT = 4, GAME_OPTIONS = 5, MAP_GENERATOR_OPTIONS = 6;
 
-    // private final String[] colors = { Messages.message("black"),
-    // Messages.message("blue"),
-    // Messages.message("cyan"),
-    // Messages.message("gray"),
-    // Messages.message("green"),
-    // Messages.message("magenta"),
-    // Messages.message("orange"),
-    // Messages.message("pink"),
-    // Messages.message("red"),
-    // Messages.message("white"),
-    // Messages.message("yellow"),
-    // };
 
     public static final int NAME_COLUMN = 0, NATION_COLUMN = 1, ADVANTAGE_COLUMN = 2, COLOR_COLUMN = 3;
 
@@ -136,7 +124,7 @@ public final class StartGamePanel extends FreeColPanel implements ActionListener
         tableScroll.getViewport().setOpaque(false);
         tableScroll.getColumnHeader().setOpaque(false);
 
-        int[] widths = { 300, margin, 300 };
+        int[] widths = { 400, margin, 300 };
         int[] heights = { 200, margin, 0, margin, 0, margin, 0, margin, 0 };
         setLayout(new HIGLayout(widths, heights));
 
