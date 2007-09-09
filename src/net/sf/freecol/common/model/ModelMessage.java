@@ -73,7 +73,8 @@ public class ModelMessage {
         if (messageID == null) {
             throw new IllegalArgumentException("The messageID cannot be null.");
         }
-        if (!(display instanceof FreeColGameObject ||
+        if (!(display == null ||
+              display instanceof FreeColGameObject ||
               display instanceof FreeColGameObjectType)) {
             throw new IllegalArgumentException("The display must be a FreeColGameObject or FreeColGameObjectType!");
         }

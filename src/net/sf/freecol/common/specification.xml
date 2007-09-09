@@ -878,6 +878,13 @@
     </building-type>
   </building-types>
 
+  <!-- By default, all founding fathers should be available to all
+       players. Founding fathers can be restricted to certain
+       nations by adding these nations explicitly, like this:
+       <nation id="model.nation.spanish"/> or
+       <nation-type id="model.nation.trade"/>
+       A founding fathers with these settings would only be available
+       to the Spanish nation and nations with the Trade advantage. -->
   <founding-fathers>
     <founding-father id="model.foundingFather.adamSmith" type="trade"
                      weight1="2" weight2="8" weight3="6">

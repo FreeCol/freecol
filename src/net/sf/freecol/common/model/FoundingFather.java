@@ -2,6 +2,7 @@
 package net.sf.freecol.common.model;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
@@ -46,6 +47,12 @@ public class FoundingFather extends FreeColGameObjectType implements Abilities, 
      * Stores the Events of this Type.
      */
     private HashMap<String, String> events = new HashMap<String, String>();
+
+    /**
+     * Stores the IDs of the Nations and NationTypes this
+     * FoundingFather is available to.
+     */
+    private HashSet<String> availableTo = new HashSet<String>();
 
     /**
      * Creates a new <code>FoundingFather</code> instance.
@@ -129,6 +136,20 @@ public class FoundingFather extends FreeColGameObjectType implements Abilities, 
         }
     }
     
+
+    /**
+     * Returns true if this <code>FoundingFather</code> is available
+     * to the Player given.
+     *
+     * @param player a <code>Player</code> value
+     * @return a <code>boolean</code> value
+     */
+    public boolean isAvailableTo(Player player) {
+        return (availableTo.isEmpty() || availableTo.contains(player.getNationID()) ||
+                availableTo.contains(player.getNationType().getID()));
+    }
+
+
 
     /**
      * Returns true if this FoundingFather has the ability with the given ID.
@@ -237,6 +258,10 @@ public class FoundingFather extends FreeColGameObjectType implements Abilities, 
                 String value = in.getAttributeValue(null, "value");
                 events.put(eventId, value);
                 in.nextTag(); // close this element
+            } else if ("nation".equals(childName) ||
+                       "nation-type".equals(childName)) {
+                availableTo.add(in.getAttributeValue(null, "id"));
+                in.nextTag();
             } else {
                 logger.finest("Parsing of " + childName + " is not implemented yet");
                 while (in.nextTag() != XMLStreamConstants.END_ELEMENT ||

@@ -233,7 +233,8 @@ public final class InGameController extends Controller {
         for (int type = 0; type < FoundingFather.TYPE_COUNT; type++) {
             int weightSum = 0;
             for (FoundingFather father : FreeCol.getSpecification().getFoundingFathers()) {
-                if (!player.hasFather(father) && father.getType() == type) {
+                if (!player.hasFather(father) && father.getType() == type &&
+                    father.isAvailableTo(player)) {
                     weightSum += father.getWeight(age);
                 }
             }
