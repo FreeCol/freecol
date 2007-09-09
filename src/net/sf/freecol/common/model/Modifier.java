@@ -66,14 +66,30 @@ public final class Modifier extends FreeColObject implements Cloneable {
         this.values[this.type] = value;
     }
     
+    /**
+     * Creates a new <code>Modifier</code> instance.
+     *
+     * @param element an <code>Element</code> value
+     */
     public Modifier(Element element) {
         readFromXMLElement(element);
     }
     
+    /**
+     * Creates a new <code>Modifier</code> instance.
+     *
+     * @param in a <code>XMLStreamReader</code> value
+     * @exception XMLStreamException if an error occurs
+     */
     public Modifier(XMLStreamReader in) throws XMLStreamException {
         readFromXML(in);
     }
     
+    /**
+     * Creates a new <code>Modifier</code> instance.
+     *
+     * @param modifier a <code>Modifier</code> value
+     */
     public Modifier(Modifier modifier) {
         id = modifier.id;
         type = modifier.type;
@@ -114,6 +130,7 @@ public final class Modifier extends FreeColObject implements Cloneable {
     
     /**
      * Initialize this object from an XML-representation of this object.
+     *
      * @param in The input stream with the XML.
      * @throws XMLStreamException if a problem was encountered
      *      during parsing.
@@ -133,17 +150,8 @@ public final class Modifier extends FreeColObject implements Cloneable {
     /**
      * This method writes an XML-representation of this object to
      * the given stream.
-     * 
-     * <br><br>
-     * 
-     * Only attributes visible to the given <code>Player</code> will 
-     * be added to that representation if <code>showAll</code> is
-     * set to <code>false</code>.
-     *  
+     *
      * @param out The target stream.
-     * @param player The <code>Player</code> this XML-representation 
-     *      should be made for, or <code>null</code> if
-     *      <code>showAll == true</code>.
      * @throws XMLStreamException if there are any problems writing
      *      to the stream.
      */
@@ -285,6 +293,8 @@ public final class Modifier extends FreeColObject implements Cloneable {
     /**
      * Applies this modifier to a number.
      *
+     * @param number a <code>float</code> value
+     * @return a <code>float</code> value
      */
     public float applyTo(float number) {
         if (type == COMBINED) {
