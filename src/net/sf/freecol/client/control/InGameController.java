@@ -401,7 +401,7 @@ public final class InGameController implements NetworkConstants {
                                 }
                             }
                         }
-                    } else if (tileOwner.isEuropean()) {
+                    } else if (tileOwner != null && tileOwner.isEuropean()) {
                         ownedByEuropeans = true;
                     } else if (tileOwner != null) {
                         ownedByIndians = true;
