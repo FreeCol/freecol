@@ -3422,12 +3422,13 @@ public class Unit extends FreeColGameObject implements Abilities, Locatable, Loc
                 result.add(new Modifier("modifiers.cargoPenalty", percentage, Modifier.PERCENTAGE));
                 totalPercentage += percentage;
             }
-            if (attacker.hasAbility("model.ability.piracy") && 
-                attacker.getOwner().hasFather(FreeCol.getSpecification().getFoundingFather("model.foundingFather.francisDrake"))) {
-                // Drake grants 50% attack bonus
-                percentage = 50;
-                result.add(new Modifier("modifiers.drake", percentage, Modifier.PERCENTAGE));
-                totalPercentage += percentage;
+            if (attacker.hasAbility("model.ability.piracy")) {
+                Modifier piracyBonus = attacker.getModifier("model.modifier.piracyBonus");
+                if (piracyBonus != null) {
+                    // Drake grants 50% power bonus (in colonization gives for attack and defense)
+                    result.add(piracyBonus);
+                    totalPercentage += piracyBonus.getValue();
+                }
             }
         } else {
 
@@ -3450,10 +3451,10 @@ public class Unit extends FreeColGameObject implements Abilities, Locatable, Loc
             }
 
             // 50% veteran bonus
-            if (attacker.hasAbility("model.ability.expertSoldier")) {
-                percentage = 50;
-                result.add(new Modifier("modifiers.veteranBonus", percentage, Modifier.PERCENTAGE));
-                totalPercentage += percentage;
+            Modifier veteranModifier = attacker.getModifier("model.modifier.veteranBonus");
+            if (veteranModifier != null) {
+                result.add(veteranModifier);
+                totalPercentage += veteranModifier.getValue();
             }
 
             // 50% attack bonus
@@ -3480,7 +3481,8 @@ public class Unit extends FreeColGameObject implements Abilities, Locatable, Loc
                  * Ambush bonus in the open = defender's defense bonus, if
                  * defender is REF, or attacker is indian.
                  */
-                if (attacker.getOwner().isIndian() || defender.getOwner().isREF()) {
+                if (attacker.hasAbility("model.ability.ambushBonus") ||
+                    defender.hasAbility("model.ability.ambushPenalty")) {
                     percentage = defender.getTile().defenseBonus();
                     result.add(new Modifier("modifiers.ambushBonus", percentage, Modifier.PERCENTAGE));
                     totalPercentage += percentage;
@@ -3498,10 +3500,10 @@ public class Unit extends FreeColGameObject implements Abilities, Locatable, Loc
             // Attacking a settlement
             if (defender != null && defender.getTile() != null && defender.getTile().getSettlement() != null) {
                 // REF bombardment bonus
-                if (attacker.getOwner().isREF()) {
-                    percentage = 50;
-                    result.add(new Modifier("modifiers.REFbonus", percentage, Modifier.PERCENTAGE));
-                    totalPercentage += percentage;
+                Modifier bombardModifier = attacker.getModifier("model.modifier.bombardBonus");
+                if (bombardModifier != null) {
+                    result.add(bombardModifier);
+                    totalPercentage += bombardModifier.getValue();
                 }
             }
         }
@@ -3553,12 +3555,13 @@ public class Unit extends FreeColGameObject implements Abilities, Locatable, Loc
                 result.add(new Modifier("modifiers.cargoPenalty", percentage, Modifier.PERCENTAGE));
                 totalPercentage += percentage;
             }
-            if (defender.hasAbility("model.ability.piracy") && 
-                defender.getOwner().hasFather(FreeCol.getSpecification().getFoundingFather("model.foundingFather.francisDrake"))) {
-                // Drake grants 50% power bonus (in colonization gives for attack and defense)
-                percentage = 50;
-                result.add(new Modifier("modifiers.drake", percentage, Modifier.PERCENTAGE));
-                totalPercentage += percentage;
+            if (defender.hasAbility("model.ability.piracy")) {
+                Modifier piracyBonus = defender.getModifier("model.modifier.piracyBonus");
+                if (piracyBonus != null) {
+                    // Drake grants 50% power bonus (in colonization gives for attack and defense)
+                    result.add(piracyBonus);
+                    totalPercentage += piracyBonus.getValue();
+                }
             }
         } else {
             // Paul Revere makes an unarmed colonist in a settlement pick up
@@ -3586,10 +3589,10 @@ public class Unit extends FreeColGameObject implements Abilities, Locatable, Loc
             }
 
             // 50% veteran bonus
-            if (defender.hasAbility("model.ability.expertSoldier")) {
-                percentage = 50;
-                result.add(new Modifier("modifiers.veteranBonus", percentage, Modifier.PERCENTAGE));
-                totalPercentage += percentage;
+            Modifier veteranModifier = defender.getModifier("model.modifier.veteranBonus");
+            if (veteranModifier != null) {
+                result.add(veteranModifier);
+                totalPercentage += veteranModifier.getValue();
             }
 
             // 50% fortify bonus
@@ -3612,7 +3615,8 @@ public class Unit extends FreeColGameObject implements Abilities, Locatable, Loc
                 }
             } else if (defender.getTile() != null) {
                 // In the open
-                if (!attacker.getOwner().isIndian() && !defender.getOwner().isREF()) {
+                if (!(attacker.hasAbility("model.ability.ambushBonus") ||
+                      defender.hasAbility("model.ability.ambushPenalty"))) {
                     // Terrain defensive bonus.
                     percentage = defender.getTile().defenseBonus();
                     result.add(new Modifier("modifiers.terrainBonus", percentage, Modifier.PERCENTAGE));
