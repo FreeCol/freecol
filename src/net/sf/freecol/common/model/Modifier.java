@@ -412,12 +412,12 @@ public final class Modifier extends FreeColObject implements Cloneable {
         switch(type) {
         case ADDITIVE:
         case PERCENTAGE:
-            return -values[getType()];
+            return -values[type];
         case MULTIPLICATIVE:
-            return 1 / values[getType()];
+            return 1 / values[type];
         default:
             // It can't happen
-            return values[getType()];
+            return values[type];
         }
     }
     
