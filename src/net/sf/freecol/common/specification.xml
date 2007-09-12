@@ -3,58 +3,58 @@
 <freecol-specification>
   <!-- types of goods.  an element must be defined before it is referenced -->
   <goods-types>
-    <goods-type id="model.goods.Food" art="goods/food.png" is-farmed="yes" ignore-limit="yes" is-food="yes">
+    <goods-type id="model.goods.Food" art="goods/food.png" is-farmed="true" ignore-limit="true" is-food="true">
       <market initial-amount="10000" initial-price="1"  price-difference="7"/>
     </goods-type>
-    <goods-type id="model.goods.Sugar" art="goods/sugar.png" is-farmed="yes">
+    <goods-type id="model.goods.Sugar" art="goods/sugar.png" is-farmed="true">
       <market initial-amount="1500"  initial-price="2"  price-difference="4"/>
     </goods-type>
-    <goods-type id="model.goods.Tobacco" art="goods/tobacco.png" is-farmed="yes">
+    <goods-type id="model.goods.Tobacco" art="goods/tobacco.png" is-farmed="true">
       <market initial-amount="1500"  initial-price="2"  price-difference="4"/>
     </goods-type>
-    <goods-type id="model.goods.Cotton" art="goods/cotton.png" is-farmed="yes">
+    <goods-type id="model.goods.Cotton" art="goods/cotton.png" is-farmed="true">
       <market initial-amount="1500"  initial-price="2"  price-difference="4"/>
     </goods-type>
-    <goods-type id="model.goods.Furs" art="goods/furs.png" is-farmed="yes">
+    <goods-type id="model.goods.Furs" art="goods/furs.png" is-farmed="true">
       <market initial-amount="1500"  initial-price="2"  price-difference="4"/>
     </goods-type>
-    <goods-type id="model.goods.Lumber" art="goods/lumber.png" is-farmed="yes">
+    <goods-type id="model.goods.Lumber" art="goods/lumber.png" is-farmed="true">
       <market initial-amount="3000"  initial-price="1"  price-difference="5"/>
     </goods-type>
-    <goods-type id="model.goods.Ore" art="goods/ore.png" is-farmed="yes">
+    <goods-type id="model.goods.Ore" art="goods/ore.png" is-farmed="true">
       <market initial-amount="2000"  initial-price="4"  price-difference="3"/>
     </goods-type>
-    <goods-type id="model.goods.Silver" art="goods/silver.png" is-farmed="yes">
+    <goods-type id="model.goods.Silver" art="goods/silver.png" is-farmed="true">
       <market initial-amount="500"   initial-price="16" price-difference="1"/>
     </goods-type>
-    <goods-type id="model.goods.Horses" art="goods/horses.png" is-farmed="no" made-from="food">
+    <goods-type id="model.goods.Horses" art="goods/horses.png" is-farmed="false" made-from="food">
       <market initial-amount="1000"  initial-price="1"  price-difference="1"/>
     </goods-type>
-    <goods-type id="model.goods.Rum" art="goods/rum.png" is-farmed="no" made-from="sugar">
+    <goods-type id="model.goods.Rum" art="goods/rum.png" is-farmed="false" made-from="sugar">
       <market initial-amount="1000"  initial-price="10" price-difference="1"/>
     </goods-type>
-    <goods-type id="model.goods.Cigars" art="goods/cigars.png" is-farmed="no" made-from="tobacco">
+    <goods-type id="model.goods.Cigars" art="goods/cigars.png" is-farmed="false" made-from="tobacco">
       <market initial-amount="1000"  initial-price="10" price-difference="1"/>
     </goods-type>
-    <goods-type id="model.goods.Cloth" art="goods/cloth.png" is-farmed="no" made-from="cotton">
+    <goods-type id="model.goods.Cloth" art="goods/cloth.png" is-farmed="false" made-from="cotton">
       <market initial-amount="1000"  initial-price="10" price-difference="1"/>
     </goods-type>
-    <goods-type id="model.goods.Coats" art="goods/coats.png" is-farmed="no" made-from="furs">
+    <goods-type id="model.goods.Coats" art="goods/coats.png" is-farmed="false" made-from="furs">
       <market initial-amount="1000"  initial-price="10" price-difference="1"/>
     </goods-type>
-    <goods-type id="model.goods.TradeGoods" art="goods/tradeGoods.png" is-farmed="no">
+    <goods-type id="model.goods.TradeGoods" art="goods/tradeGoods.png" is-farmed="false">
       <market initial-amount="1000"  initial-price="1"  price-difference="1"/>
     </goods-type>
-    <goods-type id="model.goods.Tools" art="goods/tools.png" is-farmed="no" made-from="ore">
+    <goods-type id="model.goods.Tools" art="goods/tools.png" is-farmed="false" made-from="ore">
       <market initial-amount="500"   initial-price="1"  price-difference="1"/>
     </goods-type>
-    <goods-type id="model.goods.Muskets" art="goods/muskets.png" is-farmed="no" made-from="tools">
+    <goods-type id="model.goods.Muskets" art="goods/muskets.png" is-farmed="false" made-from="tools">
       <market initial-amount="500"   initial-price="1"  price-difference="1"/>
     </goods-type>
-    <goods-type id="model.goods.Fish" art="goods/fish.png" is-farmed="yes" storable="no" stored-as="model.goods.food" is-food="yes" />
-    <goods-type id="model.goods.Bells" art="goods/bells.png" is-farmed="no" storable="no"/>
-    <goods-type id="model.goods.Crosses" art="goods/crosses.png" is-farmed="no" storable="no"/>
-    <goods-type id="model.goods.Hammers" art="goods/hammers.png" is-farmed="no" made-from="lumber" storable="no"/>
+    <goods-type id="model.goods.Fish" art="goods/fish.png" is-farmed="true" storable="false" stored-as="model.goods.food" is-food="true" />
+    <goods-type id="model.goods.Bells" art="goods/bells.png" is-farmed="false" storable="false"/>
+    <goods-type id="model.goods.Crosses" art="goods/crosses.png" is-farmed="false" storable="false"/>
+    <goods-type id="model.goods.Hammers" art="goods/hammers.png" is-farmed="false" made-from="lumber" storable="false"/>
   </goods-types>
 
   <resource-types>
@@ -200,7 +200,7 @@
       <production goods-type="model.goods.Ore"        value="2"/>
       <resource   type="model.resource.Minerals"         probability="100"/>
     </tile-type>
-    <tile-type    id="model.tile.mixedForest"       basic-move-cost="6" basic-work-turns="4" is-forest="yes">
+    <tile-type    id="model.tile.mixedForest"       basic-move-cost="6" basic-work-turns="4" is-forest="true">
       <art basic="terrain/plains/" forest="forest/mixed.png" minimap-color="24731f"/>
       <gen humidityMin="-2" humidityMax="2" temperatureMin="-2" temperatureMax="2" altitudeMin="1" altitudeMax="2" latitudeMin="0" latitudeMax="2"/>
       <skirmish defence-factor="50"/>
@@ -214,7 +214,7 @@
       <resource   type="model.resource.Game"          probability="34"/>
     -->
     </tile-type>
-    <tile-type    id="model.tile.coniferForest"     basic-move-cost="6" basic-work-turns="4" is-forest="yes">
+    <tile-type    id="model.tile.coniferForest"     basic-move-cost="6" basic-work-turns="4" is-forest="true">
       <art basic="terrain/grassland/" forest="forest/conifer.png" minimap-color="24731f"/>
       <gen humidityMin="-2" humidityMax="2" temperatureMin="-2" temperatureMax="2" altitudeMin="1" altitudeMax="1" latitudeMin="0" latitudeMax="2"/>
       <skirmish defence-factor="50"/>
@@ -224,7 +224,7 @@
       <production goods-type="model.goods.Lumber"     value="6"/>
       <resource   type="model.resource.Lumber"        probability="100"/>
     </tile-type>
-    <tile-type    id="model.tile.broadleafForest"   basic-move-cost="6" basic-work-turns="4" is-forest="yes">
+    <tile-type    id="model.tile.broadleafForest"   basic-move-cost="6" basic-work-turns="4" is-forest="true">
       <art basic="terrain/prairie/" forest="forest/broadleaf.png" minimap-color="24731f"/>
       <gen humidityMin="-2" humidityMax="2" temperatureMin="-2" temperatureMax="2" altitudeMin="1" altitudeMax="1" latitudeMin="0" latitudeMax="2"/>
       <skirmish defence-factor="50"/>
@@ -234,7 +234,7 @@
       <production goods-type="model.goods.Lumber"     value="4"/>
       <resource   type="model.resource.Game"          probability="100"/>
     </tile-type>
-    <tile-type    id="model.tile.tropicalForest"    basic-move-cost="6" basic-work-turns="6" is-forest="yes">
+    <tile-type    id="model.tile.tropicalForest"    basic-move-cost="6" basic-work-turns="6" is-forest="true">
       <art basic="terrain/savannah/" forest="forest/tropical.png" minimap-color="24731f"/>
       <skirmish defence-factor="50"/>
       <gen humidityMin="-2" humidityMax="2" temperatureMin="-2" temperatureMax="2" altitudeMin="1" altitudeMax="1" latitudeMin="0" latitudeMax="2"/>
@@ -244,7 +244,7 @@
       <production goods-type="model.goods.Lumber"     value="4"/>
       <resource   type="model.resource.Lumber"        probability="100"/>
     </tile-type>
-    <tile-type    id="model.tile.wetlandForest"     basic-move-cost="9" basic-work-turns="6" is-forest="yes">
+    <tile-type    id="model.tile.wetlandForest"     basic-move-cost="9" basic-work-turns="6" is-forest="true">
       <art basic="terrain/marsh/" forest="forest/wetland.png" minimap-color="24731f"/>
       <gen humidityMin="1" humidityMax="3" temperatureMin="-1" temperatureMax="3" altitudeMin="2" altitudeMax="2" latitudeMin="0" latitudeMax="2"/>
       <skirmish defence-factor="50"/>
@@ -255,7 +255,7 @@
       <production goods-type="model.goods.Ore"        value="1"/>
       <resource   type="model.resource.Minerals"      probability="100"/>
     </tile-type>
-    <tile-type    id="model.tile.rainForest"        basic-move-cost="9" basic-work-turns="7" is-forest="yes">
+    <tile-type    id="model.tile.rainForest"        basic-move-cost="9" basic-work-turns="7" is-forest="true">
       <art basic="terrain/swamp/" forest="forest/rain.png" minimap-color="24731f"/>
       <gen humidityMin="1" humidityMax="3" temperatureMin="-1" temperatureMax="3" altitudeMin="1" altitudeMax="1" latitudeMin="0" latitudeMax="2"/>
       <skirmish defence-factor="75"/>
@@ -266,7 +266,7 @@
       <production goods-type="model.goods.Ore"        value="1"/>
       <resource   type="model.resource.Minerals"      probability="100"/>
     </tile-type>
-    <tile-type    id="model.tile.scrubForest"       basic-move-cost="3" basic-work-turns="4" is-forest="yes">
+    <tile-type    id="model.tile.scrubForest"       basic-move-cost="3" basic-work-turns="4" is-forest="true">
       <art basic="terrain/desert/" forest="forest/scrub.png" minimap-color="24731f"/>
       <gen humidityMin="-3" humidityMax="-1" temperatureMin="-1" temperatureMax="3" altitudeMin="1" altitudeMax="2" latitudeMin="0" latitudeMax="2"/>
       <skirmish defence-factor="50"/>
@@ -277,7 +277,7 @@
       <production goods-type="model.goods.Ore"        value="1"/>
       <resource   type="model.resource.Oasis"         probability="100"/>
     </tile-type>
-    <tile-type    id="model.tile.borealForest"      basic-move-cost="6" basic-work-turns="4" is-forest="yes">
+    <tile-type    id="model.tile.borealForest"      basic-move-cost="6" basic-work-turns="4" is-forest="true">
       <art basic="terrain/tundra/" forest="forest/boreal.png" minimap-color="24731f"/>
       <gen humidityMin="-3" humidityMax="3" temperatureMin="-3" temperatureMax="1" altitudeMin="1" altitudeMax="3" latitudeMin="1" latitudeMax="3"/>
       <skirmish defence-factor="50"/>
@@ -287,7 +287,7 @@
       <production goods-type="model.goods.Ore"        value="1"/>
       <resource   type="model.resource.Game"          probability="100"/>
     </tile-type>
-    <tile-type    id="model.tile.hills"             basic-move-cost="6" basic-work-turns="4" no-river="yes">
+    <tile-type    id="model.tile.hills"             basic-move-cost="6" basic-work-turns="4" no-river="true">
       <art basic="terrain/plains/" overlay="terrain/hills/hills" minimap-color="708052"/>
       <gen humidityMin="-3" humidityMax="3" temperatureMin="-3" temperatureMax="3" altitudeMin="2" altitudeMax="3" latitudeMin="0" latitudeMax="3"/>
       <skirmish defence-factor="100"/>
@@ -295,7 +295,7 @@
       <production goods-type="model.goods.Ore"        value="4"/>
       <resource   type="model.resource.Ore"           probability="100"/>
     </tile-type>
-    <tile-type    id="model.tile.mountains"         basic-move-cost="9" basic-work-turns="7" can-settle="no" no-river="yes">
+    <tile-type    id="model.tile.mountains"         basic-move-cost="9" basic-work-turns="7" can-settle="false" no-river="true">
       <art basic="terrain/plains/" overlay="terrain/mountains/mountains" minimap-color="577352"/>
       <gen humidityMin="-3" humidityMax="3" temperatureMin="-3" temperatureMax="3" altitudeMin="3" altitudeMax="3" latitudeMin="0" latitudeMax="3"/>
       <skirmish defence-factor="150"/>
@@ -303,17 +303,17 @@
       <production goods-type="model.goods.Silver"     value="1"/>
       <resource   type="model.resource.Silver"        probability="100"/>
     </tile-type>
-    <tile-type    id="model.tile.arctic"            basic-move-cost="6" basic-work-turns="4" can-settle="no" no-river="yes">
+    <tile-type    id="model.tile.arctic"            basic-move-cost="6" basic-work-turns="4" can-settle="false" no-river="true">
       <art basic="terrain/arctic/" minimap-color="ffffff"/>
       <gen humidityMin="-3" humidityMax="3" temperatureMin="-3" temperatureMax="-1" altitudeMin="1" altitudeMax="3" latitudeMin="2" latitudeMax="3"/>
     </tile-type>
-    <tile-type    id="model.tile.ocean"             basic-move-cost="3" basic-work-turns="4" is-water="yes">
+    <tile-type    id="model.tile.ocean"             basic-move-cost="3" basic-work-turns="4" is-water="true">
       <art basic="terrain/ocean/" minimap-color="0000ff"/>
       <gen humidityMin="-3" humidityMax="3" temperatureMin="-3" temperatureMax="3" altitudeMin="-2" altitudeMax="-1" latitudeMin="0" latitudeMax="3"/>
       <production goods-type="model.goods.Fish"       value="2"/>
       <resource   type="model.resource.Fish"          probability="100"/>
     </tile-type>
-    <tile-type    id="model.tile.highSeas"          basic-move-cost="3" basic-work-turns="4" is-water="yes" sail-to-europe="yes">
+    <tile-type    id="model.tile.highSeas"          basic-move-cost="3" basic-work-turns="4" is-water="true" sail-to-europe="true">
       <art basic="terrain/highSeas/" minimap-color="0000cc"/>
       <gen humidityMin="-3" humidityMax="3" temperatureMin="-3" temperatureMax="3" altitudeMin="-3" altitudeMax="-2" latitudeMin="0" latitudeMax="3"/>
       <production goods-type="model.goods.Fish"       value="4"/>
@@ -335,7 +335,7 @@
   <!--
   Parent options: name, add-work-turns, overlay, natural, type, required-improvement,
                   expended-goods-type, expended-amount, deliver-goods-type, deliver-amount
-    - natural="yes" means that this improvement cannot be built, but may be present on its own
+    - natural="true" means that this improvement cannot be built, but may be present on its own
     - expended goods/amount are the 'cost' of building this improvement
     - deliver goods/amount are the instant reward that will be given to the nearby colony (eg. lumber from deforestation)
       - deliver-amount is a factor to multiply the base production of that tile to give.
@@ -347,8 +347,8 @@
     - magnitude is a number to decide overwriting,
       a similar id tileimprovement will be replaced with one with a higher magnitude
   tiles child options: all-land-tiles, all-forest-tiles, all-water-tiles
-    - putting all-water-tiles="no" is redundant, but serves as a reminder
-    - putting all-land-tiles="yes" all-forest-tiles="no" will result in all non-forested land tiles.
+    - putting all-water-tiles="false" is redundant, but serves as a reminder
+    - putting all-land-tiles="true" all-forest-tiles="false" will result in all non-forested land tiles.
   tile child options: id
   effect child options: goods-type and value, movement-cost, movement-cost-factor
     - use goods-type & value.
@@ -357,9 +357,9 @@
   change child options: from, to
   -->
   <tileimprovement-types>
-    <tileimprovement-type id="model.improvement.River" natural="yes" add-work-turns="0">
+    <tileimprovement-type id="model.improvement.River" natural="true" add-work-turns="0">
       <type id="river" magnitude="1"/>
-      <tiles all-land-tiles="yes"/>
+      <tiles all-land-tiles="true"/>
       <effect goods-type="model.goods.Food" value="1"/>
       <effect goods-type="model.goods.Sugar" value="1"/>
       <effect goods-type="model.goods.Tobacco" value="1"/>
@@ -370,10 +370,10 @@
       <effect goods-type="model.goods.Silver" value="1"/>
       <effect movement-cost="1"/>
     </tileimprovement-type>
-    <tileimprovement-type id="model.improvement.Road" occupation-string="R" add-work-turns="0" over-trees="yes"
+    <tileimprovement-type id="model.improvement.Road" occupation-string="R" add-work-turns="0" over-trees="true"
             expended-goods-type="model.goods.Tools" expended-amount="20">
       <type id="road" magnitude="1"/>
-      <tiles all-land-tiles="yes"/>
+      <tiles all-land-tiles="true"/>
       <effect goods-type="model.goods.Furs" value="1"/>
       <effect goods-type="model.goods.Lumber" value="1"/>
       <effect goods-type="model.goods.Ore" value="1"/>
@@ -382,7 +382,7 @@
     </tileimprovement-type>
     <tileimprovement-type id="model.improvement.Plow" occupation-string="P" add-work-turns="2" overlay="4"
             expended-goods-type="model.goods.Tools" expended-amount="20">
-      <tiles all-land-tiles="yes" all-forest-tiles="no"/>
+      <tiles all-land-tiles="true" all-forest-tiles="false"/>
       <effect goods-type="model.goods.Food" value="1"/>
       <effect goods-type="model.goods.Sugar" value="1"/>
       <effect goods-type="model.goods.Tobacco" value="1"/>
@@ -391,7 +391,7 @@
     <tileimprovement-type id="model.improvement.ClearForest" occupation-string="P" add-work-turns="2"
             expended-goods-type="model.goods.Tools" expended-amount="20"
             deliver-goods-type="model.goods.Lumber" deliver-amount="5">
-      <tiles all-forest-tiles="yes"/>
+      <tiles all-forest-tiles="true"/>
       <change from="model.tile.mixedForest"     to="model.tile.plains"/>
       <change from="model.tile.coniferForest"   to="model.tile.grassland"/>
       <change from="model.tile.broadleafForest" to="model.tile.prairie"/>
@@ -433,18 +433,18 @@
   <unit-types>
     <unit-type id="model.unit.freeColonist"         offence="0"  defence="1" movement="3" lineOfSight="1"
                skill="0" promotion="model.unit.veteranSoldier" recruitProbability="20" pathImage="foot">
-      <ability id="model.ability.foundColony" value="yes"/>
-      <ability id="model.ability.bornInColony" value="yes"/>
-      <ability id="model.ability.foundInLostCity" value="yes"/>
-      <upgrade unit="model.unit.expertFarmer" turnsToLearn="4" learnFromNatives="yes" learnFromExperience="yes"/>
-      <upgrade unit="model.unit.expertFisherman" turnsToLearn="4" learnFromNatives="yes" learnFromExperience="yes"/>
-      <upgrade unit="model.unit.expertFurTrapper" turnsToLearn="4" learnFromNatives="yes" learnFromExperience="yes"/>
-      <upgrade unit="model.unit.expertSilverMiner" turnsToLearn="4" learnFromNatives="yes" learnFromExperience="yes"/>
-      <upgrade unit="model.unit.expertLumberJack" turnsToLearn="4" learnFromNatives="yes" learnFromExperience="yes"/>
-      <upgrade unit="model.unit.expertOreMiner" turnsToLearn="4" learnFromNatives="yes" learnFromExperience="yes"/>
-      <upgrade unit="model.unit.masterSugarPlanter" turnsToLearn="6" learnFromNatives="yes" learnFromExperience="yes"/>
-      <upgrade unit="model.unit.masterCottonPlanter" turnsToLearn="6" learnFromNatives="yes" learnFromExperience="yes"/>
-      <upgrade unit="model.unit.masterTobaccoPlanter" turnsToLearn="6" learnFromNatives="yes" learnFromExperience="yes"/>
+      <ability id="model.ability.foundColony" value="true"/>
+      <ability id="model.ability.bornInColony" value="true"/>
+      <ability id="model.ability.foundInLostCity" value="true"/>
+      <upgrade unit="model.unit.expertFarmer" turnsToLearn="4" learnFromNatives="true" learnFromExperience="true"/>
+      <upgrade unit="model.unit.expertFisherman" turnsToLearn="4" learnFromNatives="true" learnFromExperience="true"/>
+      <upgrade unit="model.unit.expertFurTrapper" turnsToLearn="4" learnFromNatives="true" learnFromExperience="true"/>
+      <upgrade unit="model.unit.expertSilverMiner" turnsToLearn="4" learnFromNatives="true" learnFromExperience="true"/>
+      <upgrade unit="model.unit.expertLumberJack" turnsToLearn="4" learnFromNatives="true" learnFromExperience="true"/>
+      <upgrade unit="model.unit.expertOreMiner" turnsToLearn="4" learnFromNatives="true" learnFromExperience="true"/>
+      <upgrade unit="model.unit.masterSugarPlanter" turnsToLearn="6" learnFromNatives="true" learnFromExperience="true"/>
+      <upgrade unit="model.unit.masterCottonPlanter" turnsToLearn="6" learnFromNatives="true" learnFromExperience="true"/>
+      <upgrade unit="model.unit.masterTobaccoPlanter" turnsToLearn="6" learnFromNatives="true" learnFromExperience="true"/>
       <upgrade unit="model.unit.firebrandPreacher" turnsToLearn="8"/>
       <upgrade unit="model.unit.elderStatesman" turnsToLearn="8"/>
       <upgrade unit="model.unit.masterCarpenter" turnsToLearn="4"/>
@@ -454,135 +454,135 @@
       <upgrade unit="model.unit.masterFurTrader" turnsToLearn="6"/>
       <upgrade unit="model.unit.masterBlacksmith" turnsToLearn="6"/>
       <upgrade unit="model.unit.masterGunsmith" turnsToLearn="6"/>
-      <upgrade unit="model.unit.seasonedScout" turnsToLearn="4" learnFromNatives="yes" learnInLostCity="yes"/>
+      <upgrade unit="model.unit.seasonedScout" turnsToLearn="4" learnFromNatives="true" learnInLostCity="true"/>
       <upgrade unit="model.unit.hardyPioneer" turnsToLearn="4"/>
       <upgrade unit="model.unit.veteranSoldier" turnsToLearn="6"/>
       <upgrade unit="model.unit.jesuitMissionary" turnsToLearn="8"/>
     </unit-type>
     <unit-type id="model.unit.expertFarmer"         offence="0"  defence="1" movement="3" lineOfSight="1" price="1100" 
                skill="1" recruitProbability="1" expert-production="model.goods.Food" clearSpeciality="model.unit.freeColonist" pathImage="foot">
-      <ability id="model.ability.foundColony" value="yes"/>
+      <ability id="model.ability.foundColony" value="true"/>
       <modifier id="model.goods.Food" type="additive" value="2"/>
     </unit-type>
     <unit-type id="model.unit.expertFisherman"      offence="0"  defence="1" movement="3" lineOfSight="1" price="1000" 
                skill="1" recruitProbability="1" expert-production="model.goods.Fish" clearSpeciality="model.unit.freeColonist" pathImage="foot">
-      <ability id="model.ability.foundColony" value="yes"/>
+      <ability id="model.ability.foundColony" value="true"/>
       <modifier id="model.goods.Fish" type="additive" value="2"/>
     </unit-type>
     <unit-type id="model.unit.expertFurTrapper"     offence="0"  defence="1" movement="3" lineOfSight="1"               
                skill="1"  expert-production="model.goods.Furs" clearSpeciality="model.unit.freeColonist" pathImage="foot">
-      <ability id="model.ability.foundColony" value="yes"/>
+      <ability id="model.ability.foundColony" value="true"/>
       <modifier id="model.goods.Furs" type="multiplicative" value="2"/>
     </unit-type>
     <unit-type id="model.unit.expertSilverMiner"    offence="0"  defence="1" movement="3" lineOfSight="1" price="900"  
                skill="1" recruitProbability="1" expert-production="model.goods.Silver" clearSpeciality="model.unit.freeColonist" pathImage="foot">
-      <ability id="model.ability.foundColony" value="yes"/>
+      <ability id="model.ability.foundColony" value="true"/>
       <modifier id="model.goods.Silver" type="multiplicative" value="2"/>
     </unit-type>
     <unit-type id="model.unit.expertLumberJack"     offence="0"  defence="1" movement="3" lineOfSight="1" price="700"  
                skill="1" recruitProbability="1" expert-production="model.goods.Lumber" clearSpeciality="model.unit.freeColonist" pathImage="foot">
-      <ability id="model.ability.foundColony" value="yes"/>
+      <ability id="model.ability.foundColony" value="true"/>
       <modifier id="model.goods.Lumber" type="multiplicative" value="2"/>
     </unit-type>
     <unit-type id="model.unit.expertOreMiner"       offence="0"  defence="1" movement="3" lineOfSight="1" price="600"  
                skill="1" recruitProbability="1" expert-production="model.goods.Ore" clearSpeciality="model.unit.freeColonist" pathImage="foot">
-      <ability id="model.ability.foundColony" value="yes"/>
+      <ability id="model.ability.foundColony" value="true"/>
       <modifier id="model.goods.Ore" type="multiplicative" value="2"/>
     </unit-type>
     <unit-type id="model.unit.masterSugarPlanter"   offence="0"  defence="1" movement="3" lineOfSight="1"               
                skill="2"  expert-production="model.goods.Sugar" clearSpeciality="model.unit.freeColonist" pathImage="foot">
-      <ability id="model.ability.foundColony" value="yes"/>
+      <ability id="model.ability.foundColony" value="true"/>
       <modifier id="model.goods.Sugar" type="multiplicative" value="2"/>
     </unit-type>
     <unit-type id="model.unit.masterCottonPlanter"  offence="0"  defence="1" movement="3" lineOfSight="1"               
                skill="2"  expert-production="model.goods.Cotton" clearSpeciality="model.unit.freeColonist" pathImage="foot">
-      <ability id="model.ability.foundColony" value="yes"/>
+      <ability id="model.ability.foundColony" value="true"/>
       <modifier id="model.goods.Cotton" type="multiplicative" value="2"/>
     </unit-type>
     <unit-type id="model.unit.masterTobaccoPlanter" offence="0"  defence="1" movement="3" lineOfSight="1"               
                skill="2"  expert-production="model.goods.Tobacco" clearSpeciality="model.unit.freeColonist" pathImage="foot">
-      <ability id="model.ability.foundColony" value="yes"/>
+      <ability id="model.ability.foundColony" value="true"/>
       <modifier id="model.goods.Tobacco" type="multiplicative" value="2"/>
     </unit-type>
     <unit-type id="model.unit.firebrandPreacher"    offence="0"  defence="1" movement="3" lineOfSight="1" price="1500" 
                skill="3" recruitProbability="1" expert-production="model.goods.Crosses" clearSpeciality="model.unit.freeColonist" pathImage="foot">
-      <ability id="model.ability.foundColony" value="yes"/>
+      <ability id="model.ability.foundColony" value="true"/>
       <modifier id="model.goods.Crosses" type="multiplicative" value="2"/>
     </unit-type>
     <unit-type id="model.unit.elderStatesman"       offence="0"  defence="1" movement="3" lineOfSight="1" price="1900" 
                skill="3" recruitProbability="1" expert-production="model.goods.Bells" clearSpeciality="model.unit.freeColonist" pathImage="foot">
-      <ability id="model.ability.foundColony" value="yes"/>
+      <ability id="model.ability.foundColony" value="true"/>
       <modifier id="model.goods.Bells" type="multiplicative" value="2"/>
     </unit-type>
     <unit-type id="model.unit.masterCarpenter"      offence="0"  defence="1" movement="3" lineOfSight="1" price="1000" 
                skill="1" recruitProbability="1" expert-production="model.goods.Hammers" clearSpeciality="model.unit.freeColonist" pathImage="foot">
-      <ability id="model.ability.foundColony" value="yes"/>
+      <ability id="model.ability.foundColony" value="true"/>
       <modifier id="model.goods.Hammers" type="multiplicative" value="2"/>
     </unit-type>
     <unit-type id="model.unit.masterDistiller"      offence="0"  defence="1" movement="3" lineOfSight="1" price="1100" 
                skill="2" recruitProbability="1" expert-production="model.goods.Rum" clearSpeciality="model.unit.freeColonist" pathImage="foot">
-      <ability id="model.ability.foundColony" value="yes"/>
+      <ability id="model.ability.foundColony" value="true"/>
       <modifier id="model.goods.Rum" type="multiplicative" value="2"/>
     </unit-type>
     <unit-type id="model.unit.masterWeaver"         offence="0"  defence="1" movement="3" lineOfSight="1" price="1300" 
                skill="2" recruitProbability="1" expert-production="model.goods.Cloth" clearSpeciality="model.unit.freeColonist" pathImage="foot">
-      <ability id="model.ability.foundColony" value="yes"/>
+      <ability id="model.ability.foundColony" value="true"/>
       <modifier id="model.goods.Cloth" type="multiplicative" value="2"/>
     </unit-type>
     <unit-type id="model.unit.masterTobacconist"    offence="0"  defence="1" movement="3" lineOfSight="1" price="1200" 
                skill="2" recruitProbability="1" expert-production="model.goods.Cigars" clearSpeciality="model.unit.freeColonist" pathImage="foot">
-      <ability id="model.ability.foundColony" value="yes"/>
+      <ability id="model.ability.foundColony" value="true"/>
       <modifier id="model.goods.Cigars" type="multiplicative" value="2"/>
     </unit-type>
     <unit-type id="model.unit.masterFurTrader"      offence="0"  defence="1" movement="3" lineOfSight="1" price="950"  
                skill="2" recruitProbability="1" expert-production="model.goods.Coats" clearSpeciality="model.unit.freeColonist" pathImage="foot">
-      <ability id="model.ability.foundColony" value="yes"/>
+      <ability id="model.ability.foundColony" value="true"/>
       <modifier id="model.goods.Coats" type="multiplicative" value="2"/>
     </unit-type>
     <unit-type id="model.unit.masterBlacksmith"     offence="0"  defence="1" movement="3" lineOfSight="1" price="1050" 
                skill="2" recruitProbability="1" expert-production="model.goods.Tools" clearSpeciality="model.unit.freeColonist" pathImage="foot">
-      <ability id="model.ability.foundColony" value="yes"/>
+      <ability id="model.ability.foundColony" value="true"/>
       <modifier id="model.goods.Tools" type="multiplicative" value="2"/>
     </unit-type>
     <unit-type id="model.unit.masterGunsmith"       offence="0"  defence="1" movement="3" lineOfSight="1" price="850"  
                skill="2" recruitProbability="1" expert-production="model.goods.Muskets" clearSpeciality="model.unit.freeColonist" pathImage="foot">
-      <ability id="model.ability.foundColony" value="yes"/>
+      <ability id="model.ability.foundColony" value="true"/>
       <modifier id="model.goods.Muskets" type="multiplicative" value="2"/>
     </unit-type>
     <unit-type id="model.unit.seasonedScout"        offence="0"  defence="1" movement="3" lineOfSight="1"               
                skill="1" recruitProbability="1" clearSpeciality="model.unit.freeColonist" pathImage="foot">
-      <ability id="model.ability.foundColony" value="yes"/>
-      <ability id="model.ability.expertScout" value="yes"/>
+      <ability id="model.ability.foundColony" value="true"/>
+      <ability id="model.ability.expertScout" value="true"/>
     </unit-type>
     <unit-type id="model.unit.hardyPioneer"         offence="0"  defence="1" movement="3" lineOfSight="1" price="1100" 
                skill="1" recruitProbability="1" clearSpeciality="model.unit.freeColonist" pathImage="foot">
-      <ability id="model.ability.foundColony" value="yes"/>
-      <ability id="model.ability.expertPioneer" value="yes"/>
+      <ability id="model.ability.foundColony" value="true"/>
+      <ability id="model.ability.expertPioneer" value="true"/>
     </unit-type>
     <unit-type id="model.unit.veteranSoldier"       offence="0"  defence="1" movement="3" lineOfSight="1" price="2000" 
                skill="2" recruitProbability="1" promotion="model.unit.colonialRegular" clearSpeciality="model.unit.freeColonist" pathImage="foot">
-      <ability id="model.ability.foundColony" value="yes"/>
+      <ability id="model.ability.foundColony" value="true"/>
       <modifier id="model.modifier.veteranBonus" type="percentage" value="50"/>
     </unit-type>
     <unit-type id="model.unit.jesuitMissionary"     offence="0"  defence="1" movement="3" lineOfSight="1" price="1400" 
                skill="3" recruitProbability="1" clearSpeciality="model.unit.freeColonist" pathImage="foot">
-      <ability id="model.ability.foundColony" value="yes"/>
-      <ability id="model.ability.expertMissionary" value="yes"/>
+      <ability id="model.ability.foundColony" value="true"/>
+      <ability id="model.ability.expertMissionary" value="true"/>
     </unit-type>
     <unit-type id="model.unit.indenturedServant"    offence="0"  defence="1" movement="3" lineOfSight="1"              
                skill="-1" recruitProbability="20" promotion="model.unit.freeColonist" pathImage="foot">
-      <ability id="model.ability.foundColony" value="yes"/>
+      <ability id="model.ability.foundColony" value="true"/>
       <upgrade unit="model.unit.freeColonist" turnsToLearn="4"/>
-      <upgrade unit="model.unit.expertFarmer" learnFromNatives="yes"/>
-      <upgrade unit="model.unit.expertFisherman" learnFromNatives="yes"/>
-      <upgrade unit="model.unit.expertFurTrapper" learnFromNatives="yes"/>
-      <upgrade unit="model.unit.expertSilverMiner" learnFromNatives="yes"/>
-      <upgrade unit="model.unit.expertLumberJack" learnFromNatives="yes"/>
-      <upgrade unit="model.unit.expertOreMiner" learnFromNatives="yes"/>
-      <upgrade unit="model.unit.masterSugarPlanter" learnFromNatives="yes"/>
-      <upgrade unit="model.unit.masterCottonPlanter" learnFromNatives="yes"/>
-      <upgrade unit="model.unit.masterTobaccoPlanter" learnFromNatives="yes"/>
-      <upgrade unit="model.unit.seasonedScout" learnFromNatives="yes" learnInLostCity="yes"/>
+      <upgrade unit="model.unit.expertFarmer" learnFromNatives="true"/>
+      <upgrade unit="model.unit.expertFisherman" learnFromNatives="true"/>
+      <upgrade unit="model.unit.expertFurTrapper" learnFromNatives="true"/>
+      <upgrade unit="model.unit.expertSilverMiner" learnFromNatives="true"/>
+      <upgrade unit="model.unit.expertLumberJack" learnFromNatives="true"/>
+      <upgrade unit="model.unit.expertOreMiner" learnFromNatives="true"/>
+      <upgrade unit="model.unit.masterSugarPlanter" learnFromNatives="true"/>
+      <upgrade unit="model.unit.masterCottonPlanter" learnFromNatives="true"/>
+      <upgrade unit="model.unit.masterTobaccoPlanter" learnFromNatives="true"/>
+      <upgrade unit="model.unit.seasonedScout" learnFromNatives="true" learnInLostCity="true"/>
       <modifier id="model.goods.Rum" type="additive" value="-1" />
       <modifier id="model.goods.Cigars" type="additive" value="-1" />
       <modifier id="model.goods.Cloth" type="additive" value="-1" />
@@ -595,9 +595,9 @@
     </unit-type>
     <unit-type id="model.unit.pettyCriminal"        offence="0"  defence="1" movement="3" lineOfSight="1"               
                skill="-2" recruitProbability="20" promotion="model.unit.indenturedServant" pathImage="foot">
-      <ability id="model.ability.foundColony" value="yes"/>
+      <ability id="model.ability.foundColony" value="true"/>
       <upgrade unit="model.unit.indenturedServant" turnsToLearn="4"/>
-      <upgrade unit="model.unit.seasonedScout" learnInLostCity="yes"/>
+      <upgrade unit="model.unit.seasonedScout" learnInLostCity="true"/>
       <modifier id="model.goods.Rum" type="additive" value="-2" />
       <modifier id="model.goods.Cigars" type="additive" value="-2" />
       <modifier id="model.goods.Cloth" type="additive" value="-2" />
@@ -610,7 +610,7 @@
     </unit-type>
     <unit-type id="model.unit.indianConvert"        offence="0"  defence="1" movement="3" lineOfSight="1"               
                skill="0" pathImage="foot">
-      <ability id="model.ability.convert" value="yes"/>
+      <ability id="model.ability.convert" value="true"/>
       <modifier id="model.goods.Food" type="additive" value="1"/>
       <modifier id="model.goods.Sugar" type="additive" value="1"/>
       <modifier id="model.goods.Tobacco" type="additive" value="1"/>
@@ -628,98 +628,98 @@
       <modifier id="model.goods.Tools" type="additive" value="-2" />
     </unit-type>
     <unit-type id="model.unit.brave"                offence="1"  defence="1" movement="3" lineOfSight="1" space="1">
-      <ability id="model.ability.carryGoods" value="yes"/>
-      <ability id="model.ability.bornInIndianSettlement" value="yes"/>
-      <ability id="model.ability.pillageUnprotectedColony" value="yes"/>
+      <ability id="model.ability.carryGoods" value="true"/>
+      <ability id="model.ability.bornInIndianSettlement" value="true"/>
+      <ability id="model.ability.pillageUnprotectedColony" value="true"/>
     </unit-type>
     <unit-type id="model.unit.colonialRegular"      offence="3"  defence="3" movement="3" lineOfSight="1"
                clearSpeciality="model.unit.freeColonist" pathImage="foot">
-      <ability id="model.ability.foundColony" value="yes"/>
+      <ability id="model.ability.foundColony" value="true"/>
       <required-ability id="model.ability.independenceDeclared"/>
     </unit-type>
     <unit-type id="model.unit.kingsRegular"         offence="4"  defence="4" movement="3" lineOfSight="1"
                clearSpeciality="model.unit.freeColonist">
-      <ability id="model.ability.foundColony" value="yes"/>
+      <ability id="model.ability.foundColony" value="true"/>
     </unit-type>
     <unit-type id="model.unit.caravel"              offence="0"  defence="2"  movement="12" lineOfSight="1" space="2"
                hitPoints="6" price="1000" hammers="128" tools="40" pathImage="naval">
-      <ability id="model.ability.navalUnit" value="yes"/>
-      <ability id="model.ability.carryGoods" value="yes"/>
-      <ability id="model.ability.carryUnits" value="yes"/>
+      <ability id="model.ability.navalUnit" value="true"/>
+      <ability id="model.ability.carryGoods" value="true"/>
+      <ability id="model.ability.carryUnits" value="true"/>
       <required-ability id="model.ability.buildShips"/>
     </unit-type>
     <unit-type id="model.unit.frigate"              offence="16" defence="16" movement="18" lineOfSight="2" space="4"
                hitPoints="6" price="5000" hammers="512" tools="200" pathImage="naval">
-      <ability id="model.ability.navalUnit" value="yes"/>
-      <ability id="model.ability.carryGoods" value="yes"/>
-      <ability id="model.ability.carryUnits" value="yes"/>
-      <ability id="model.ability.captureGoods" value="yes"/>
+      <ability id="model.ability.navalUnit" value="true"/>
+      <ability id="model.ability.carryGoods" value="true"/>
+      <ability id="model.ability.carryUnits" value="true"/>
+      <ability id="model.ability.captureGoods" value="true"/>
       <required-ability id="model.ability.buildShips"/>
     </unit-type>
     <unit-type id="model.unit.galleon"              offence="0"  defence="10" movement="18" lineOfSight="2" space="6"
                hitPoints="6" price="3000" hammers="320" tools="100" pathImage="naval">
-      <ability id="model.ability.navalUnit" value="yes"/>
-      <ability id="model.ability.carryGoods" value="yes"/>
-      <ability id="model.ability.carryUnits" value="yes"/>
+      <ability id="model.ability.navalUnit" value="true"/>
+      <ability id="model.ability.carryGoods" value="true"/>
+      <ability id="model.ability.carryUnits" value="true"/>
       <required-ability id="model.ability.buildShips"/>
     </unit-type>
     <unit-type id="model.unit.manOWar"              offence="24" defence="24" movement="18" lineOfSight="2" space="6"
                hitPoints="6" hammers="1024" tools="300" pathImage="naval">
-      <ability id="model.ability.navalUnit" value="yes"/>
-      <ability id="model.ability.carryGoods" value="yes"/>
-      <ability id="model.ability.carryUnits" value="yes"/>
-      <ability id="model.ability.captureGoods" value="yes"/>
+      <ability id="model.ability.navalUnit" value="true"/>
+      <ability id="model.ability.carryGoods" value="true"/>
+      <ability id="model.ability.carryUnits" value="true"/>
+      <ability id="model.ability.captureGoods" value="true"/>
       <required-ability id="model.ability.buildShips"/>
       <required-ability id="model.ability.independence"/>
     </unit-type>
     <unit-type id="model.unit.merchantman"          offence="0"  defence="6" movement="15" lineOfSight="1" space="4"
                hitPoints="6" price="2000" hammers="192" tools="80" pathImage="naval">
-      <ability id="model.ability.navalUnit" value="yes"/>
-      <ability id="model.ability.carryGoods" value="yes"/>
-      <ability id="model.ability.carryUnits" value="yes"/>
+      <ability id="model.ability.navalUnit" value="true"/>
+      <ability id="model.ability.carryGoods" value="true"/>
+      <ability id="model.ability.carryUnits" value="true"/>
       <required-ability id="model.ability.buildShips"/>
     </unit-type>
     <unit-type id="model.unit.privateer"            offence="8"  defence="8" movement="24" lineOfSight="2" space="2"
                hitPoints="6" price="2000" hammers="256" tools="120" pathImage="naval">
-      <ability id="model.ability.navalUnit" value="yes"/>
-      <ability id="model.ability.carryGoods" value="yes"/>
-      <ability id="model.ability.carryUnits" value="yes"/>
-      <ability id="model.ability.captureGoods" value="yes"/>
-      <ability id="model.ability.piracy" value="yes"/>
+      <ability id="model.ability.navalUnit" value="true"/>
+      <ability id="model.ability.carryGoods" value="true"/>
+      <ability id="model.ability.carryUnits" value="true"/>
+      <ability id="model.ability.captureGoods" value="true"/>
+      <ability id="model.ability.piracy" value="true"/>
       <required-ability id="model.ability.buildShips"/>
     </unit-type>
     <unit-type id="model.unit.artillery"            offence="7"  defence="5" movement="3" lineOfSight="1"
                hammers="192" tools="40" price="500" increasingPrice="100" pathImage="wagon">
-      <ability id="model.ability.bombard" value="yes"/>
+      <ability id="model.ability.bombard" value="true"/>
       <required-ability id="model.ability.buildArtillery"/>
     </unit-type>
     <unit-type id="model.unit.damagedArtillery"     offence="5"  defence="3" movement="3" lineOfSight="1" pathImage="wagon">
-      <ability id="model.ability.bombard" value="yes"/>
+      <ability id="model.ability.bombard" value="true"/>
     </unit-type>
     <unit-type id="model.unit.treasureTrain"        offence="0"  defence="0" movement="3" lineOfSight="1" spaceTaken="6" pathImage="wagon">
-      <ability id="model.ability.carryTreasure" value="yes"/>
+      <ability id="model.ability.carryTreasure" value="true"/>
     </unit-type>
     <unit-type id="model.unit.wagonTrain"           offence="0"  defence="1" movement="6" lineOfSight="1" space="2"
                hammers="40" tools="0" pathImage="wagon">
-      <ability id="model.ability.carryGoods" value="yes"/>
+      <ability id="model.ability.carryGoods" value="true"/>
     </unit-type>
     <unit-type id="model.unit.milkmaid"             offence="0"  defence="1" movement="3"  lineOfSight="1" expert-production="food" pathImage="foot">
-      <ability id="model.ability.foundColony" value="yes"/>
+      <ability id="model.ability.foundColony" value="true"/>
     </unit-type>
     <unit-type id="model.unit.revenger"             offence="666"  defence="666" movement="18" lineOfSight="3" pathImage="foot">
-        <ability id="model.ability.undead" value="yes"/>
-        <ability id="model.ability.multipleAttacks" value="yes"/>
+        <ability id="model.ability.undead" value="true"/>
+        <ability id="model.ability.multipleAttacks" value="true"/>
     </unit-type>
     <unit-type id="model.unit.flyingDutchman"       offence="666"  defence="666" movement="36" lineOfSight="3" space="6" hitPoints="6" pathImage="naval">
-      <ability id="model.ability.navalUnit" value="yes"/>
-      <ability id="model.ability.carryGoods" value="yes"/>
-      <ability id="model.ability.carryUnits" value="yes"/>
-      <ability id="model.ability.captureGoods" value="yes"/>
-      <ability id="model.ability.undead" value="yes"/>
+      <ability id="model.ability.navalUnit" value="true"/>
+      <ability id="model.ability.carryGoods" value="true"/>
+      <ability id="model.ability.carryUnits" value="true"/>
+      <ability id="model.ability.captureGoods" value="true"/>
+      <ability id="model.ability.undead" value="true"/>
     </unit-type>    
     <unit-type id="model.unit.undead"               offence="18"  defence="4" movement="3" lineOfSight="1" pathImage="foot">
-      <ability id="model.ability.foundColony" value="yes"/>
-      <ability id="model.ability.undead" value="yes"/>
+      <ability id="model.ability.foundColony" value="true"/>
+      <ability id="model.ability.undead" value="true"/>
     </unit-type>
   </unit-types>
   
@@ -739,7 +739,7 @@
       <required-population value="8"/>
       <required-ability id="model.ability.buildFactory"/>
       <modifier id="model.goods.Tools" type="percentage" value="50"/>
-      <ability id="model.ability.expertsUseConnections" value="yes"/>
+      <ability id="model.ability.expertsUseConnections" value="true"/>
     </building-type>
     <building-type id="model.building.TobacconistHouse" basicProduction="3" workplaces="3" consumes="model.goods.Tobacco" produces="model.goods.Cigars">
     </building-type>
@@ -749,7 +749,7 @@
       <required-population value="8"/>
       <required-ability id="model.ability.buildFactory"/>
       <modifier id="model.goods.Cigars" type="percentage" value="50"/>
-      <ability id="model.ability.expertsUseConnections" value="yes"/>
+      <ability id="model.ability.expertsUseConnections" value="true"/>
     </building-type>
     <building-type id="model.building.WeaverHouse" basicProduction="3" workplaces="3" consumes="model.goods.Cotton" produces="model.goods.Cloth">
     </building-type>
@@ -759,7 +759,7 @@
       <required-population value="8"/>
       <required-ability id="model.ability.buildFactory"/>
       <modifier id="model.goods.Cloth" type="percentage" value="50"/>
-      <ability id="model.ability.expertsUseConnections" value="yes"/>
+      <ability id="model.ability.expertsUseConnections" value="true"/>
     </building-type>
     <building-type id="model.building.DistillerHouse" basicProduction="3" workplaces="3" consumes="model.goods.Sugar" produces="model.goods.Rum">
     </building-type>
@@ -769,7 +769,7 @@
       <required-population value="8"/>
       <required-ability id="model.ability.buildFactory"/>
       <modifier id="model.goods.Rum" type="percentage" value="50"/>
-      <ability id="model.ability.expertsUseConnections" value="yes"/>
+      <ability id="model.ability.expertsUseConnections" value="true"/>
     </building-type>
     <building-type id="model.building.FurTraderHouse" basicProduction="3" workplaces="3" consumes="model.goods.Furs" produces="model.goods.Coats">
     </building-type>
@@ -779,33 +779,33 @@
       <required-population value="6"/>
       <required-ability id="model.ability.buildFactory"/>
       <modifier id="model.goods.Coats" type="percentage" value="50"/>
-      <ability id="model.ability.expertsUseConnections" value="yes"/>
+      <ability id="model.ability.expertsUseConnections" value="true"/>
     </building-type>
     <building-type id="model.building.Schoolhouse" hammers-required="64"  tools-required="0"   workplaces="1" minSkill="1" maxSkill="1">
       <required-population value="4"/>
-      <ability id="model.ability.teach" value="yes"/>
+      <ability id="model.ability.teach" value="true"/>
     </building-type>
     <building-type id="model.building.College"     hammers-required="160" tools-required="50"  workplaces="2" minSkill="1" maxSkill="2" upgradesFrom="model.building.Schoolhouse">
       <required-population value="8"/>
-      <ability id="model.ability.teach" value="yes"/>
+      <ability id="model.ability.teach" value="true"/>
     </building-type>
     <building-type id="model.building.University"  hammers-required="200" tools-required="100" workplaces="3" minSkill="1" maxSkill="3" upgradesFrom="model.building.College">
       <required-population value="10"/>
-      <ability id="model.ability.teach" value="yes"/>
+      <ability id="model.ability.teach" value="true"/>
     </building-type>
     <building-type id="model.building.Armory"   hammers-required="52"  tools-required="0"   basicProduction="3" workplaces="3" consumes="model.goods.Tools" produces="model.goods.Muskets">
-      <ability id="model.ability.buildArtillery" value="yes"/>
+      <ability id="model.ability.buildArtillery" value="true"/>
     </building-type>
     <building-type id="model.building.Magazine" hammers-required="120" tools-required="50"  basicProduction="6" workplaces="3" consumes="model.goods.Tools" produces="model.goods.Muskets" upgradesFrom="model.building.Armory">
       <required-population value="8"/>
-      <ability id="model.ability.buildArtillery" value="yes"/>
+      <ability id="model.ability.buildArtillery" value="true"/>
     </building-type>
     <building-type id="model.building.Arsenal"  hammers-required="240" tools-required="100" basicProduction="6" workplaces="3" consumes="model.goods.Tools" produces="model.goods.Muskets" upgradesFrom="model.building.Magazine">
       <required-population value="8"/>
       <required-ability id="model.ability.buildFactory"/>
       <modifier id="model.goods.Muskets" type="percentage" value="50"/>
-      <ability id="model.ability.buildArtillery" value="yes"/>
-      <ability id="model.ability.expertsUseConnections" value="yes"/>
+      <ability id="model.ability.buildArtillery" value="true"/>
+      <ability id="model.ability.expertsUseConnections" value="true"/>
     </building-type>
     <building-type id="model.building.Chapel"    workplaces="0" produces="model.goods.Crosses">
       <modifier id="model.goods.Crosses" type="additive" value="1"/>
@@ -813,12 +813,12 @@
     <building-type id="model.building.Church"    hammers-required="64"  tools-required="0"   basicProduction="3" workplaces="3" produces="model.goods.Crosses" upgradesFrom="model.building.Chapel">
       <required-population value="3"/>
       <modifier id="model.goods.Crosses" type="additive" value="2"/>
-      <ability id="model.ability.dressMissionary" value="yes"/> <!-- maybe it will be changed with equipment implementation -->
+      <ability id="model.ability.dressMissionary" value="true"/> <!-- maybe it will be changed with equipment implementation -->
     </building-type>
     <building-type id="model.building.Cathedral" hammers-required="176" tools-required="100" basicProduction="6" workplaces="3" produces="model.goods.Crosses" upgradesFrom="model.building.Church">
       <required-population value="8"/>
       <modifier id="model.goods.Crosses" type="additive" value="3"/>
-      <ability id="model.ability.dressMissionary" value="yes"/> <!-- maybe it will be changed with equipment implementation -->
+      <ability id="model.ability.dressMissionary" value="true"/> <!-- maybe it will be changed with equipment implementation -->
     </building-type>
     <building-type id="model.building.Stockade" hammers-required="64"  tools-required="0"   workplaces="0">
       <required-population value="3"/>
@@ -827,12 +827,12 @@
     <building-type id="model.building.Fort"     hammers-required="120" tools-required="100" workplaces="0" upgradesFrom="model.building.Stockade">
       <required-population value="3"/>
       <skirmish defense-bonus="150"/>
-      <ability id="model.ability.bombardShips" value="yes"/>
+      <ability id="model.ability.bombardShips" value="true"/>
     </building-type>
     <building-type id="model.building.Fortress" hammers-required="320" tools-required="200" workplaces="0" upgradesFrom="model.building.Fort">
       <required-population value="8"/>
       <skirmish defense-bonus="200"/>
-      <ability id="model.ability.bombardShips" value="yes"/>
+      <ability id="model.ability.bombardShips" value="true"/>
     </building-type>
     <building-type id="model.building.Depot"              workplaces="0">
       <modifier id="model.modifier.warehouseStorage" type="additive" value="100"/>
@@ -845,25 +845,25 @@
     </building-type>
     <building-type id="model.building.Country" workplaces="0" consumes="model.goods.Food" produces="model.goods.Horses">
       <modifier id="model.goods.Horses" type="percentage" value="-50"/>
-      <ability id="model.ability.autoProduction" value="yes" />
+      <ability id="model.ability.autoProduction" value="true" />
     </building-type>
     <building-type id="model.building.Stables" hammers-required="64" tools-required="0" workplaces="0" consumes="model.goods.Food" produces="model.goods.Horses" upgradesFrom="model.building.Country">
-      <ability id="model.ability.autoProduction" value="yes" />
+      <ability id="model.ability.autoProduction" value="true" />
     </building-type>
     <building-type id="model.building.Docks"    hammers-required="52"  tools-required="0"   workplaces="0">
       <!-- TODO: add requirement for not land-locked colony -->
-      <ability id="model.ability.produceInWater" value="yes"/>
+      <ability id="model.ability.produceInWater" value="true"/>
     </building-type>
     <building-type id="model.building.Drydock"  hammers-required="80"  tools-required="50"  workplaces="0" upgradesFrom="model.building.Docks">
       <required-population value="4"/>
-      <ability id="model.ability.produceInWater" value="yes"/>
-      <ability id="model.ability.repairShips" value="yes"/>
+      <ability id="model.ability.produceInWater" value="true"/>
+      <ability id="model.ability.repairShips" value="true"/>
     </building-type>
     <building-type id="model.building.Shipyard" hammers-required="240" tools-required="100" workplaces="0" upgradesFrom="model.building.Drydock">
       <required-population value="8"/>
-      <ability id="model.ability.produceInWater" value="yes"/>
-      <ability id="model.ability.repairShips" value="yes"/>
-      <ability id="model.ability.buildShips" value="yes"/>
+      <ability id="model.ability.produceInWater" value="true"/>
+      <ability id="model.ability.repairShips" value="true"/>
+      <ability id="model.ability.buildShips" value="true"/>
     </building-type>
     <building-type id="model.building.PrintingPress" hammers-required="52"  tools-required="20"  workplaces="0">
       <modifier id="model.goods.Bells" type="percentage" value="50"/>
@@ -874,7 +874,7 @@
     </building-type>
     <building-type id="model.building.CustomHouse" hammers-required="160" tools-required="50" workplaces="0">
       <required-ability id="model.ability.buildCustomHouse"/>
-      <ability id="model.ability.export" value="yes"/>
+      <ability id="model.ability.export" value="true"/>
     </building-type>
   </building-types>
 
@@ -888,7 +888,7 @@
   <founding-fathers>
     <founding-father id="model.foundingFather.adamSmith" type="trade"
                      weight1="2" weight2="8" weight3="6">
-      <ability id="model.ability.buildFactory" value="yes"/>
+      <ability id="model.ability.buildFactory" value="true"/>
     </founding-father>
     <founding-father id="model.foundingFather.jacobFugger" type="trade"
                      weight1="0" weight2="5" weight3="8">
@@ -901,20 +901,20 @@
     </founding-father>
     <founding-father id="model.foundingFather.peterStuyvesant" type="trade"
                      weight1="2" weight2="4" weight3="8">
-      <ability id="model.ability.buildCustomHouse" value="yes"/>
+      <ability id="model.ability.buildCustomHouse" value="true"/>
     </founding-father>
     <founding-father id="model.foundingFather.janDeWitt" type="trade"
                      weight1="2" weight2="6" weight3="10">
-      <ability id="model.ability.tradeWithForeignColonies" value="yes"/>
-      <ability id="model.ability.betterForeignAffairsReport" value="yes"/>
+      <ability id="model.ability.tradeWithForeignColonies" value="true"/>
+      <ability id="model.ability.betterForeignAffairsReport" value="true"/>
     </founding-father>
     <founding-father id="model.foundingFather.ferdinandMagellan" type="exploration"
                      weight1="2" weight2="10" weight3="10">
       <modifier id="model.ability.movementBonus" type="additive" value="1">
-        <scope ability-id="model.ability.navalUnit" value="yes"/>
+        <scope ability-id="model.ability.navalUnit" value="true"/>
       </modifier>
       <modifier id="model.modifier.sailToEuropeBonus" type="additive" value="1">
-        <scope ability-id="model.ability.navalUnit" value="yes"/>
+        <scope ability-id="model.ability.navalUnit" value="true"/>
       </modifier>
     </founding-father>
     <founding-father id="model.foundingFather.fransiscoDeCoronado" type="exploration"
@@ -924,9 +924,9 @@
     <founding-father id="model.foundingFather.hernandoDeSoto" type="exploration"
                      weight1="5" weight2="10" weight3="5">
       <modifier id="model.modifier.lineOfSightBonus" type="additive" value="1">
-        <scope ability-id="model.ability.navalUnit" value="no"/>
+        <scope ability-id="model.ability.navalUnit" value="false"/>
       </modifier>
-      <ability id="model.ability.rumoursAlwaysPositive" value="yes"/>
+      <ability id="model.ability.rumoursAlwaysPositive" value="true"/>
     </founding-father>
     <founding-father id="model.foundingFather.henryHudson" type="exploration"
                      weight1="10" weight2="1" weight3="1">
@@ -946,11 +946,11 @@
     </founding-father>
     <founding-father id="model.foundingFather.georgeWashington" type="military"
                      weight1="0" weight2="4" weight3="10">
-      <ability id="model.ability.automaticPromotion" value="yes"/>
+      <ability id="model.ability.automaticPromotion" value="true"/>
     </founding-father>
     <founding-father id="model.foundingFather.paulRevere" type="military"
                      weight1="10" weight2="2" weight3="1">
-      <ability id="model.ability.automaticDefense" value="yes"/>
+      <ability id="model.ability.automaticDefense" value="true"/>
     </founding-father>
     <founding-father id="model.foundingFather.francisDrake" type="military"
                      weight1="4" weight2="8" weight3="6">
@@ -973,7 +973,7 @@
     </founding-father>
     <founding-father id="model.foundingFather.thomasPaine" type="political"
                      weight1="1" weight2="2" weight3="8">
-      <ability id="model.ability.addTaxToBells" value="yes"/>
+      <ability id="model.ability.addTaxToBells" value="true"/>
     </founding-father>
     <founding-father id="model.foundingFather.simonBolivar" type="political"
                      weight1="0" weight2="4" weight3="6">
@@ -981,12 +981,12 @@
     </founding-father>
     <founding-father id="model.foundingFather.benjaminFranklin" type="political"
                      weight1="5" weight2="5" weight3="5">
-      <ability id="model.ability.ignoreEuropeanWars" value="yes"/>
-      <ability id="model.ability.alwaysOfferedPeace" value="yes"/>
+      <ability id="model.ability.ignoreEuropeanWars" value="true"/>
+      <ability id="model.ability.alwaysOfferedPeace" value="true"/>
     </founding-father>
     <founding-father id="model.foundingFather.williamBrewster" type="religious"
                      weight1="7" weight2="4" weight3="1">
-      <ability id="model.ability.canRecruitUnit" value="no">
+      <ability id="model.ability.canRecruitUnit" value="false">
         <scope type="model.unit.indenturedServant"/>
         <scope type="model.unit.pettyCriminal"/>
         <scope type="model.unit.freeColonist"/>
@@ -998,7 +998,7 @@
     </founding-father>
     <founding-father id="model.foundingFather.fatherJeanDeBrebeuf" type="religious"
                      weight1="6" weight2="6" weight3="1">
-      <ability id="model.ability.expertMissionary" value="yes">
+      <ability id="model.ability.expertMissionary" value="true">
         <scope type="model.role.missionary"/>
       </ability>
     </founding-father>
@@ -1016,11 +1016,11 @@
     <!-- default nation for multi-player games -->
     <european-nation-type id="model.nationType.default">
       <unit id="model.unit.freeColonist" tools="100"/>
-      <unit id="model.unit.freeColonist" armed="yes"/>
+      <unit id="model.unit.freeColonist" armed="true"/>
       <unit id="model.unit.caravel"/>
     </european-nation-type>
     <!-- default REF nation -->
-    <european-nation-type id="model.nationType.ref" ref="yes">
+    <european-nation-type id="model.nationType.ref" ref="true">
       <modifier id="model.modifier.bombardBonus" type="percentage" value="50"/>
       <ability id="model.ability.ambushPenalty" value="true"/>
     </european-nation-type>
@@ -1028,21 +1028,21 @@
     <european-nation-type id="model.nationType.trade">
       <modifier id="model.modifier.tradeBonus" type="percentage" value="50"/>
       <unit id="model.unit.freeColonist" tools="100"/>
-      <unit id="model.unit.freeColonist" armed="yes"/>
+      <unit id="model.unit.freeColonist" armed="true"/>
       <unit id="model.unit.merchantman"/>
     </european-nation-type>
     <!-- this was the French player -->
     <european-nation-type id="model.nationType.cooperation">
       <modifier id="model.modifier.nativeAlarmBonus" type="percentage" value="-50"/>
       <unit id="model.unit.hardyPioneer" tools="100"/>
-      <unit id="model.unit.freeColonist" armed="yes"/>
+      <unit id="model.unit.freeColonist" armed="true"/>
       <unit id="model.unit.caravel"/>
     </european-nation-type>
     <!-- this was the English player -->
     <european-nation-type id="model.nationType.immigration">
       <modifier id="model.modifier.religiousUnrestBonus" type="percentage" value="-33"/>
       <unit id="model.unit.freeColonist" tools="100"/>
-      <unit id="model.unit.freeColonist" armed="yes"/>
+      <unit id="model.unit.freeColonist" armed="true"/>
       <unit id="model.unit.caravel"/>
     </european-nation-type>
     <!-- this was the Spanish player -->
@@ -1050,7 +1050,7 @@
       <modifier id="model.modifier.nativeConvertBonus" type="percentage" value="200"/>
       <modifier id="model.modifier.nativeTreasureBonus" type="percentage" value="200"/>
       <unit id="model.unit.freeColonist" tools="100"/>
-      <unit id="model.unit.veteranSoldier" armed="yes" mounted="yes"/>
+      <unit id="model.unit.veteranSoldier" armed="true" mounted="true"/>
       <unit id="model.unit.caravel"/>
     </european-nation-type>
 
@@ -1100,10 +1100,10 @@
   </nation-types>
 
   <nations>
-    <nation id="model.nation.dutch" color="ff9d3c" nation-type="model.nationType.trade" selectable="yes" classic="yes"/>
-    <nation id="model.nation.french" color="0000ff" nation-type="model.nationType.cooperation" selectable="yes" classic="yes"/>
-    <nation id="model.nation.english" color="ff0000" nation-type="model.nationType.immigration" selectable="yes" classic="yes"/>
-    <nation id="model.nation.spanish" color="ffff00" nation-type="model.nationType.conquest" selectable="yes" classic="yes"/>
+    <nation id="model.nation.dutch" color="ff9d3c" nation-type="model.nationType.trade" selectable="true" classic="true"/>
+    <nation id="model.nation.french" color="0000ff" nation-type="model.nationType.cooperation" selectable="true" classic="true"/>
+    <nation id="model.nation.english" color="ff0000" nation-type="model.nationType.immigration" selectable="true" classic="true"/>
+    <nation id="model.nation.spanish" color="ffff00" nation-type="model.nationType.conquest" selectable="true" classic="true"/>
     <nation id="model.nation.inca" color="f4f0c4" nation-type="model.nationType.inca"/>
     <nation id="model.nation.aztec" color="c4a020" nation-type="model.nationType.aztec"/>
     <nation id="model.nation.arawak" color="6888c0" nation-type="model.nationType.arawak"/>
@@ -1117,10 +1117,10 @@
     <nation id="model.nation.englishREF" color="ff0000" nation-type="model.nationType.ref" ref-of="model.nation.english"/>
     <nation id="model.nation.spanishREF" color="ffff00" nation-type="model.nationType.ref" ref-of="model.nation.spanish"/>
 <!--
-    <nation id="model.nation.portuguese" color="00ffff" nation-type="model.nationType.spanish" selectable="yes"/>
-    <nation id="model.nation.swedish" color="00ffff" nation-type="model.nationType.spanish" selectable="yes"/>
-    <nation id="model.nation.italian" color="00ffff" nation-type="model.nationType.spanish" selectable="yes"/>
-    <nation id="model.nation.irish" color="00ffff" nation-type="model.nationType.spanish" selectable="yes"/>
+    <nation id="model.nation.portuguese" color="00ffff" nation-type="model.nationType.spanish" selectable="true"/>
+    <nation id="model.nation.swedish" color="00ffff" nation-type="model.nationType.spanish" selectable="true"/>
+    <nation id="model.nation.italian" color="00ffff" nation-type="model.nationType.spanish" selectable="true"/>
+    <nation id="model.nation.irish" color="00ffff" nation-type="model.nationType.spanish" selectable="true"/>
     <nation id="model.nation.portugueseREF" color="00ffff" nation-type="model.nationType.ref" ref-of="model.nation.portuguese"/>
     <nation id="model.nation.swedishREF" color="00ffff" nation-type="model.nationType.ref" ref-of="model.nation.swedish"/>
     <nation id="model.nation.italianREF" color="00ffff" nation-type="model.nationType.ref" ref-of="model.nation.italian"/>
