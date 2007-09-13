@@ -556,7 +556,7 @@ public final class Modifier extends FreeColObject implements Cloneable {
         if (type == COMBINED) {
             values = readFromArrayElement("values", in, new float[0]);
         } else if (type == BOOLEAN) {
-            setBooleanValue(getAttribute(in, "booleanValue", false));
+            setBooleanValue(getAttribute(in, "value", false));
         } else {
             values[getType()] = Float.parseFloat(in.getAttributeValue(null, "value"));
         }
@@ -597,7 +597,7 @@ public final class Modifier extends FreeColObject implements Cloneable {
         if (type == COMBINED) {
             toArrayElement("values", values, out);
         } else if (type == BOOLEAN) {
-            out.writeAttribute("booleanValue", booleanValue ? "yes" : "no");
+            out.writeAttribute("value", booleanValue ? "true" : "false");
         } else {
             out.writeAttribute("value", Float.toString(values[getType()]));
         }
