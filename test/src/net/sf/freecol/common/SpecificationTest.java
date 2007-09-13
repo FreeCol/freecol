@@ -25,7 +25,7 @@ public final class SpecificationTest extends TestCase {
 
         UnitType colonist = spec.getUnitType(Unit.FREE_COLONIST);
         assertTrue(colonist.hasAbility("model.ability.foundColony"));
-        assertTrue(colonist.hasAbility("model.ability.recruitable"));
+        assertTrue(colonist.isRecruitable());
         assertFalse(colonist.hasAbility("model.ability.navalUnit"));
         assertFalse(colonist.hasAbility("model.ability.carryGoods"));
         assertFalse(colonist.hasAbility("model.ability.carryUnits"));
@@ -33,7 +33,7 @@ public final class SpecificationTest extends TestCase {
 
         UnitType wagon = spec.getUnitType(Unit.WAGON_TRAIN);
         assertFalse(wagon.hasAbility("model.ability.foundColony"));
-        assertFalse(wagon.hasAbility("model.ability.recruitable"));
+        assertFalse(wagon.isRecruitable());
         assertFalse(wagon.hasAbility("model.ability.navalUnit"));
         assertTrue(wagon.hasAbility("model.ability.carryGoods"));
         assertFalse(wagon.hasAbility("model.ability.carryUnits"));
@@ -41,7 +41,7 @@ public final class SpecificationTest extends TestCase {
 
         UnitType brave = spec.getUnitType(Unit.BRAVE);
         assertFalse(brave.hasAbility("model.ability.foundColony"));
-        assertFalse(brave.hasAbility("model.ability.recruitable"));
+        assertFalse(brave.isRecruitable());
         assertFalse(brave.hasAbility("model.ability.navalUnit"));
         assertTrue(brave.hasAbility("model.ability.carryGoods"));
         assertFalse(brave.hasAbility("model.ability.carryUnits"));
@@ -49,7 +49,7 @@ public final class SpecificationTest extends TestCase {
 
         UnitType caravel = spec.getUnitType(Unit.CARAVEL);
         assertFalse(caravel.hasAbility("model.ability.foundColony"));
-        assertFalse(caravel.hasAbility("model.ability.recruitable"));
+        assertFalse(caravel.isRecruitable());
         assertTrue(caravel.hasAbility("model.ability.navalUnit"));
         assertTrue(caravel.hasAbility("model.ability.carryGoods"));
         assertTrue(caravel.hasAbility("model.ability.carryUnits"));
@@ -57,7 +57,7 @@ public final class SpecificationTest extends TestCase {
                    
         UnitType privateer = spec.getUnitType(Unit.PRIVATEER);
         assertFalse(privateer.hasAbility("model.ability.foundColony"));
-        assertFalse(privateer.hasAbility("model.ability.recruitable"));
+        assertFalse(privateer.isRecruitable());
         assertTrue(privateer.hasAbility("model.ability.navalUnit"));
         assertTrue(privateer.hasAbility("model.ability.carryGoods"));
         assertTrue(privateer.hasAbility("model.ability.carryUnits"));
