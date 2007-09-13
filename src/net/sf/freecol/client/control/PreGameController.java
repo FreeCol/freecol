@@ -134,7 +134,7 @@ public final class PreGameController {
 
         // Inform the server:
         Element colorElement = Message.createNewRootElement("setColor");
-        colorElement.setAttribute("value", Player.convertColorToString(color));
+        colorElement.setAttribute("value", "#" + Integer.toHexString(color.getRGB()));
 
         freeColClient.getClient().sendAndWait(colorElement);
     }

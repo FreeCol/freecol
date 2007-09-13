@@ -139,7 +139,7 @@ public class Nation extends FreeColGameObjectType {
     public void readFromXML(XMLStreamReader in, final Map<String, NationType> nationTypeByRef)
         throws XMLStreamException {
         setID(in.getAttributeValue(null, "id"));
-        setColor(new Color(Integer.parseInt(in.getAttributeValue(null, "color"), 16)));
+        setColor(new Color(Integer.decode(in.getAttributeValue(null, "color"))));
         type = nationTypeByRef.get(in.getAttributeValue(null, "nation-type"));
         selectable = getAttribute(in, "selectable", false);
         classic = getAttribute(in, "classic", false);

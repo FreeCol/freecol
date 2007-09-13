@@ -200,7 +200,7 @@ public final class TileType extends FreeColGameObjectType
                 artForest = in.getAttributeValue(null, "forest");
                 artCoast = getAttribute(in, "coast", (water ? null : "terrain/beach/"));
                 float[] defaultArray = new float[] {0.0f, 0.0f, 0.0f};
-                minimapColor = new Color(Integer.parseInt(in.getAttributeValue(null, "minimap-color"), 16));
+                minimapColor = new Color(Integer.decode(in.getAttributeValue(null, "minimap-color")));
                 in.nextTag(); // close this element
             } else if ("gen".equals(childName)) {
                 humidity[0] = getAttribute(in, "humidityMin", -3);

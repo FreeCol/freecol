@@ -191,7 +191,7 @@ public final class PreGameInputHandler extends InputHandler {
         ServerPlayer player = getFreeColServer().getPlayer(connection);
         if (player != null) {
             String color = element.getAttribute("value");
-            player.setColor(color);
+            player.setColor(new Color(Integer.decode(color)));
             Element updateColor = Message.createNewRootElement("updateColor");
             updateColor.setAttribute("player", player.getID());
             updateColor.setAttribute("value", color);

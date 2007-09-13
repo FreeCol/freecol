@@ -1437,40 +1437,12 @@ public class Player extends FreeColGameObject implements Abilities, Nameable, Mo
     }
 
     /**
-     * Returns the String representation of the given Color. The result is
-     * something that looks like this example: "R:23;G:230;B:89".
-     * 
-     * @param c The <code>Color</code>.
-     * @return The String representation of the given Color.
-     */
-    public static String convertColorToString(Color c) {
-        return "R:" + c.getRed() + ";G:" + c.getGreen() + ";B:" + c.getBlue();
-    }
-
-    /**
      * Sets the color for this player.
      * 
      * @param c The new color for this player.
      */
     public void setColor(Color c) {
         color = c;
-    }
-
-    /**
-     * Sets the color for this player.
-     * 
-     * @param c The new color for this player.
-     */
-    public void setColor(String c) {
-        final String red, green, blue;
-        red = c.substring(c.indexOf(':') + 1, c.indexOf(';'));
-        c = c.substring(c.indexOf(';') + 1);
-        green = c.substring(c.indexOf(':') + 1, c.indexOf(';'));
-        c = c.substring(c.indexOf(';') + 1);
-        blue = c.substring(c.indexOf(':') + 1);
-        Color myColor = new Color(Integer.valueOf(red).intValue(), Integer.valueOf(green).intValue(), Integer.valueOf(
-                blue).intValue());
-        setColor(myColor);
     }
 
     /**

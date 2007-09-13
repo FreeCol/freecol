@@ -1,6 +1,7 @@
 
 package net.sf.freecol.client.control;
 
+import java.awt.Color;
 import java.util.logging.Logger;
 import javax.swing.SwingUtilities;
 
@@ -300,7 +301,7 @@ public final class PreGameInputHandler extends InputHandler implements StreamedM
         Player player = (Player) game.getFreeColGameObject(element.getAttribute("player"));
         String color = element.getAttribute("value");
 
-        player.setColor(color);
+        player.setColor(new Color(Integer.decode(color)));
 
         getFreeColClient().getCanvas().getStartGamePanel().refreshPlayersTable();
 
