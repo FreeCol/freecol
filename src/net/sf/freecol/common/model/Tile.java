@@ -37,7 +37,7 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
     // TODO: remove
     // An addition onto the tile can be one of the following:
     public static final int ADD_NONE = 0, ADD_RIVER_MINOR = 1, ADD_RIVER_MAJOR = 2,
-        ADD_HILLS = 3, ADD_MOUNTAINS = 4;    // Depreciated, but left for legacy
+        ADD_HILLS = 3, ADD_MOUNTAINS = 4;    // Deprecated, but left for legacy
     
     // Indians' claims on the tile may be one of the following:
     public static final int CLAIM_NONE = 0, CLAIM_VISITED = 1, CLAIM_CLAIMED = 2;
