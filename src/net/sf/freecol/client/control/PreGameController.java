@@ -134,7 +134,10 @@ public final class PreGameController {
 
         // Inform the server:
         Element colorElement = Message.createNewRootElement("setColor");
-        colorElement.setAttribute("value", "#" + Integer.toHexString(color.getRGB()));
+        // the substring hack is necessary to prevent an integer
+        // overflow, as the hex string will be unsigned, and
+        // Integer.decode() expects a signed int
+        colorElement.setAttribute("value", "#" + Integer.toHexString(color.getRGB()).substring(2));
 
         freeColClient.getClient().sendAndWait(colorElement);
     }
