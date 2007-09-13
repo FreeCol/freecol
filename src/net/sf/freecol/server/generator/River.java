@@ -6,7 +6,6 @@ import java.util.Iterator;
 import java.util.logging.Logger;
 
 import net.sf.freecol.FreeCol;
-import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.PseudoRandom;
 import net.sf.freecol.common.model.Map;
 import net.sf.freecol.common.model.Tile;
@@ -261,7 +260,7 @@ public class River {
                     int lastDir = newDirection(i, dir);
                     Map.Position px = Map.getAdjacent(newPosition, lastDir);
                     Tile tile = map.getTile(px);
-                    if (tile == null || !tile.isLand() || tile.hasRiver()) {
+                    if (tile != null && (!tile.isLand() || tile.hasRiver())) {
                         
                         sections.add(new Section(source, dir));
                         Section lastSection = new Section(newPosition, lastDir);
