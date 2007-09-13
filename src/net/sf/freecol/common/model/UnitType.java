@@ -587,6 +587,9 @@ public final class UnitType extends FreeColGameObjectType implements Abilities, 
                 in.nextTag(); // close this element
             } else if (Modifier.getXMLElementTagName().equals(nodeName)) {
                 Modifier modifier = new Modifier(in); // Modifier close the element
+                if (modifier.getCategory() == null) {
+                    modifier.setCategory(this.getID());
+                }
                 setModifier(modifier.getId(), modifier);
             } else {
                 logger.finest("Parsing of " + nodeName + " is not implemented yet");

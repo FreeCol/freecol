@@ -55,6 +55,16 @@ public final class Modifier extends FreeColObject implements Cloneable {
     private boolean booleanValue;
 
     /**
+     * The next Modifier in the list.
+     */
+    private Modifier next;
+
+    /**
+     * The last Modifier in the list.
+     */
+    private Modifier last;
+
+    /**
      * Describe scopes here.
      */
     private List<Scope> scopes = new ArrayList<Scope>();
@@ -431,6 +441,15 @@ public final class Modifier extends FreeColObject implements Cloneable {
         if (getType() != otherModifier.getType()) {
             setType(COMBINED);
         }
+
+        if (last == null) {
+            Modifier copy = new Modifier(this);
+            copy.setNext(otherModifier);
+            setNext(copy);
+        } else {
+            getLast().setNext(otherModifier);
+        }
+        setLast(otherModifier);
         
         if (otherModifier.getType() != COMBINED) {
             combine(otherModifier, otherModifier.getType());
@@ -483,6 +502,41 @@ public final class Modifier extends FreeColObject implements Cloneable {
         }
     }
 
+    /**
+     * Get the <code>Next</code> value.
+     *
+     * @return a <code>Modifier</code> value
+     */
+    public Modifier getNext() {
+        return next;
+    }
+
+    /**
+     * Set the <code>Next</code> value.
+     *
+     * @param newNext The new Next value.
+     */
+    public void setNext(final Modifier newNext) {
+        this.next = newNext;
+    }
+
+    /**
+     * Get the <code>Last</code> value.
+     *
+     * @return a <code>Modifier</code> value
+     */
+    public Modifier getLast() {
+        return last;
+    }
+
+    /**
+     * Set the <code>Last</code> value.
+     *
+     * @param newLast The new Last value.
+     */
+    public void setLast(final Modifier newLast) {
+        this.last = newLast;
+    }
 
     // -- Serialization --
 
