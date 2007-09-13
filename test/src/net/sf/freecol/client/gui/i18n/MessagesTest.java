@@ -20,6 +20,7 @@ public class MessagesTest extends FreeColTestCase {
 
     public void testMessageString() {
 
+    	assertEquals("Press enter in order to end the turn.", Messages.message("infoPanel.endTurnPanel.text"));	
         assertEquals("Trade Advisor", Messages.message("menuBar.report.trade"));
 
         // With parameters
