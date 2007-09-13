@@ -1,13 +1,11 @@
 
 package net.sf.freecol.common.model;
 
-import java.awt.Color;
 import java.util.HashMap;
 import java.util.Map;
+
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
-
-import net.sf.freecol.client.gui.i18n.Messages;
 
 /**
  * Represents one of the nations present in the game.
@@ -36,7 +34,7 @@ public abstract class NationType extends FreeColGameObjectType implements Abilit
     }
 
     /**
-     * Whether this is a EuropeanNation.
+     * Whether this is a EuropeanNation, i.e. a player or a REF.
      *
      */
     public abstract boolean isEuropean();

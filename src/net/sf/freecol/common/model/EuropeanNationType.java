@@ -1,10 +1,10 @@
 
 package net.sf.freecol.common.model;
 
-import java.awt.Color;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
@@ -12,7 +12,8 @@ import javax.xml.stream.XMLStreamReader;
 import net.sf.freecol.client.gui.i18n.Messages;
 
 /**
- * Represents one of the European nations present in the game.
+ * Represents one of the European nations present in the game, i.e. both REFs
+ * and possible human players.
  */
 public class EuropeanNationType extends NationType {
 

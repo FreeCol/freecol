@@ -2,7 +2,7 @@ package net.sf.freecol.common.model;
 
 import java.awt.Color;
 import java.util.Map;
-import java.util.HashMap;
+
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
