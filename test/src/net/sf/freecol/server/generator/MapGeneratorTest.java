@@ -3,9 +3,12 @@ package net.sf.freecol.server.generator;
 import java.util.Iterator;
 import java.util.Vector;
 
+import net.sf.freecol.FreeCol;
+import net.sf.freecol.common.Specification;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.IndianSettlement;
 import net.sf.freecol.common.model.Map;
+import net.sf.freecol.common.model.Nation;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.Tile;
@@ -17,22 +20,19 @@ import net.sf.freecol.util.test.MockModelController;
 public class MapGeneratorTest extends FreeColTestCase {
 
 	public void testWithNoIndians() {
-        
+
 		Game g = new Game(new MockModelController());
+		Specification s = FreeCol.getSpecification();
 
 		// A new game does not have a map yet
 		assertEquals(null, g.getMap());
 
 		MapGenerator gen = new MapGenerator();
 
-		Vector<Player> players = new Vector<Player>();
-		players.add(new Player(g, String.valueOf(Player.DUTCH), false, Player.DUTCH));
-		players.add(new Player(g, String.valueOf(Player.FRENCH), false, Player.FRENCH));
-		players.add(new Player(g, String.valueOf(Player.ENGLISH), false, Player.ENGLISH));
-		players.add(new Player(g, String.valueOf(Player.SPANISH), false, Player.SPANISH));
-
-		for (Player p : players) {
-			g.addPlayer(p);
+		for (Nation n : s.getNations()) {
+			if (n.getType().isEuropean() && !n.getType().isREF()) {
+				g.addPlayer(new Player(g, n.getType().getName(), false, n));
+			}
 		}
 
 		gen.createMap(g);
@@ -49,25 +49,27 @@ public class MapGeneratorTest extends FreeColTestCase {
 		assertEquals(null, g.getMap());
 
 		MapGenerator gen = new MapGenerator();
-		((SelectOption) gen.getMapGeneratorOptions().getObject(MapGeneratorOptions.MAP_SIZE))
+		((SelectOption) gen.getMapGeneratorOptions().getObject(
+			MapGeneratorOptions.MAP_SIZE))
 			.setValue(MapGeneratorOptions.MAP_SIZE_SMALL);
 
-		Vector<Player> players = new Vector<Player>();
-		players.add(new Player(g, String.valueOf(Player.DUTCH), false, Player.DUTCH));
+		Nation nation = FreeCol.getSpecification().getNation(
+			"model.nation.dutch");
 
-		for (Player p : players) {
-			g.addPlayer(p);
-		}
+		g.addPlayer(new Player(g, nation.getType().getName(), false, nation));
+
 		gen.createMap(g);
 
 		// Check that the map is created at all
 		assertNotNull(g.getMap());
 
-		assertEquals(gen.getMapGeneratorOptions().getWidth(), g.getMap().getWidth());
-		assertEquals(gen.getMapGeneratorOptions().getHeight(), g.getMap().getHeight());
+		assertEquals(gen.getMapGeneratorOptions().getWidth(), g.getMap()
+			.getWidth());
+		assertEquals(gen.getMapGeneratorOptions().getHeight(), g.getMap()
+			.getHeight());
 
 	}
-	
+
 	public void testMapGenerator() {
 
 		Game g = new Game(new MockModelController());
@@ -79,17 +81,19 @@ public class MapGeneratorTest extends FreeColTestCase {
 
 		Vector<Player> players = new Vector<Player>();
 
-		for (int i = 0; i < Player.NUMBER_OF_NATIONS; i++) {
-			if (g.getPlayer(i) != null) {
-				continue;
+		for (Nation n : FreeCol.getSpecification().getNations()) {
+			Player p;
+			if (n.getType().isEuropean() && !n.getType().isREF()){
+				p = new Player(g, n.getType().getName(), false, n);
+			} else {
+				p = new Player(g, n.getType().getName(), false, true, n);
 			}
-			Player p = new Player(g, String.valueOf(i), false, i);
 			g.addPlayer(p);
 			players.add(p);
 		}
 
 		gen.createMap(g);
-
+		
 		// Check that the map is created at all
 		assertNotNull(g.getMap());
 
@@ -110,7 +114,8 @@ public class MapGeneratorTest extends FreeColTestCase {
 			total++;
 		}
 		// Land Mass requirement fulfilled?
-		assertTrue(100 * land / total >= gen.getMapGeneratorOptions().getLandMass());
+		assertTrue(100 * land / total >= gen.getMapGeneratorOptions()
+			.getLandMass());
 
 		// Does the wholeMapIterator visit all fields?
 		assertEquals(gen.getMapGeneratorOptions().getWidth()
@@ -122,15 +127,20 @@ public class MapGeneratorTest extends FreeColTestCase {
 	 * 
 	 */
 	public void testIndianCapital() {
-        
+
 		Game g = new Game(new MockModelController());
 
 		MapGenerator gen = new MapGenerator();
 
 		Vector<Player> players = new Vector<Player>();
 
-		for (int i = 0; i < Player.NUMBER_OF_NATIONS; i++) {
-			Player p = new Player(g, String.valueOf(i), false, i);
+		for (Nation n : FreeCol.getSpecification().getNations()) {
+			Player p;
+			if (n.getType().isEuropean() && !n.getType().isREF()){
+				p = new Player(g, n.getType().getName(), false, n);
+			} else {
+				p = new Player(g, n.getType().getName(), false, true, n);
+			}
 			g.addPlayer(p);
 			players.add(p);
 		}

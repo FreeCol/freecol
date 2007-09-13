@@ -929,4 +929,12 @@ public class Game extends FreeColGameObject {
     public static String getXMLElementTagName() {
         return "game";
     }
+    
+    /**
+	 * Need to overwrite behavior of equals inherited from FreeColGameObject,
+	 * since two games are not the same if the have the same id.
+	 */
+	public boolean equals(Object o) {
+		return this == o;
+	}
 }

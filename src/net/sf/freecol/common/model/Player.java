@@ -13,7 +13,6 @@ import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
-import net.sf.freecol.FreeCol;
 
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.gui.i18n.Messages;
@@ -50,10 +49,10 @@ public class Player extends FreeColGameObject implements Abilities, Nameable, Mo
 
     /**
      * The index counter for this class.
+     * 
+     * TODO: make this unnecessary
      */
-    // must be -1 because of "unknownEnemy"
-    // TODO: make this unnecessary
-    private static int lastIndex = -1;
+    private static java.util.Map<Game, Integer> lastIndex = new HashMap<Game, Integer>();
 
     /**
      * The index of this player
@@ -267,8 +266,6 @@ public class Player extends FreeColGameObject implements Abilities, Nameable, Mo
      * 
      * Creates a new (human) <code>Player</code> with specified name.
      * 
-     * 
-     * 
      * @param game The <code>Game</code> this <code>Player</code> belongs
      *            to.
      * 
@@ -283,7 +280,18 @@ public class Player extends FreeColGameObject implements Abilities, Nameable, Mo
      */
     public Player(Game game, String name, boolean admin, Nation newNation) {
         super(game);
-        this.index = lastIndex++;
+        
+        if (game == null)
+        	this.index = -1;
+        else {
+        	// Index need to start at 0 for each game!
+        	Integer lastIndexValue = lastIndex.get(game);
+        	if (lastIndexValue == null){
+        		lastIndexValue = 0;
+        	}
+        	this.index = lastIndexValue++;
+        	lastIndex.put(game, lastIndexValue);
+        }
         this.name = name;
         this.admin = admin;
         if (newNation != null && newNation.getType() != null) {
