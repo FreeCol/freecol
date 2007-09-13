@@ -154,7 +154,7 @@ public class Messages {
                 message = message.replaceAll(data[i], data[i+1]);
             }
         }
-        return message;
+        return message.trim();
     }
 
     /**
