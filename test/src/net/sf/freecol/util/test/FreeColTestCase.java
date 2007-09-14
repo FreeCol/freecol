@@ -12,6 +12,7 @@ import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.Map;
+import net.sf.freecol.common.model.Nation;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.TileType;
@@ -71,13 +72,15 @@ public class FreeColTestCase extends TestCase {
     public static Game getStandardGame() {
         game = new Game(new MockModelController());
 
-        Vector<Player> players = new Vector<Player>();
-
-        for (int i = 0; i < Player.NUMBER_OF_NATIONS; i++) {
-            Player p = new Player(game, String.valueOf(i), false, !Player.isEuropeanNoREF(i), i);
-            game.addPlayer(p);
-            players.add(p);
-        }
+        for (Nation n : FreeCol.getSpecification().getNations()) {
+			Player p;
+			if (n.getType().isEuropean() && !n.getType().isREF()){
+				p = new Player(game, n.getType().getName(), false, n);
+			} else {
+				p = new Player(game, n.getType().getName(), false, true, n);
+			}
+			game.addPlayer(p);
+		}
         return game;
     }
 
@@ -204,7 +207,8 @@ public class FreeColTestCase extends TestCase {
             throw new IllegalArgumentException();
 
         Game game = getGame();
-        Player dutch = game.getPlayer(Player.DUTCH);
+        // TODO not sure if this is correct
+        Player dutch = game.getPlayer("model.nation.dutch");
 
         Map map = getTestMap(FreeCol.getSpecification().getTileType("model.tile.plains"), true);
         game.setMap(map);
