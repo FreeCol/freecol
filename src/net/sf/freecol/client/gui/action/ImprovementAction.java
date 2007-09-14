@@ -1,14 +1,12 @@
 package net.sf.freecol.client.gui.action;
 
 import java.awt.event.ActionEvent;
-import java.util.List;
 import java.util.logging.Logger;
 
 import javax.swing.KeyStroke;
 
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.GUI;
-import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.TileImprovementType;
@@ -79,13 +77,9 @@ public class ImprovementAction extends MapboardAction {
                 Tile tile = selectedOne.getTile();
                 int newActionID = 0;
                 for (TileImprovementType impType : iaType.getImpTypes()) {
-                    if (!impType.isTileTypeAllowed(tile.getType())) {
-                        continue;
-                    }
-                    if (!impType.isWorkerAllowed(selectedOne)) {
-                        continue;
-                    }
-                    if (tile.findTileImprovementType(impType) != null) {
+                	// Make sure that the tile accepts this improvement 
+                	// and that the worker can do the improvement
+                	if (!impType.isTileAllowed(tile) || !impType.isWorkerAllowed(selectedOne)) {
                         continue;
                     }
                     newActionID = iaType.getImpTypes().indexOf(impType);
@@ -123,14 +117,9 @@ public class ImprovementAction extends MapboardAction {
         
         // Check if there is an ImprovementType that can be performed by this unit on this tile
         for (TileImprovementType impType : iaType.getImpTypes()) {
-            if (!impType.isTileTypeAllowed(tile.getType())) {
-                continue;
-            }
-            if (!impType.isWorkerAllowed(selectedOne)) {
-                continue;
-            }
-            if (tile.findTileImprovementType(impType) != null) {
-                // Already has this improvement
+        	// Make sure that the tile accepts this improvement 
+        	// and that the worker can do the improvement
+            if (!impType.isTileAllowed(tile) || !impType.isWorkerAllowed(selectedOne)) {
                 continue;
             }
             return true;
