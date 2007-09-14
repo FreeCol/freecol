@@ -3,9 +3,13 @@ package net.sf.freecol.common.model;
 
 import java.lang.reflect.Method;
 import java.util.logging.Logger;
+
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
+
+import net.sf.freecol.common.util.Utils;
+
 import org.w3c.dom.Element;
 
 /**
@@ -428,7 +432,7 @@ abstract public class FreeColGameObject extends PersistentObject {
     */
     public boolean equals(FreeColGameObject o) {
         if (o != null) {
-            return getID().equals(o.getID());
+            return Utils.equals(this.getGame(), o.getGame()) && getID().equals(o.getID());
         } else {
             return false;
         }

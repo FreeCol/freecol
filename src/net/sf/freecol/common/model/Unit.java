@@ -2940,6 +2940,8 @@ public class Unit extends FreeColGameObject implements Abilities, Locatable, Loc
         if (!impType.isTileTypeAllowed(getTile().getType())) {
             return false;
         }
+        // TODO: This does not check if the tile (not TileType accepts the improvement)
+        
         // Check if there is an existing Improvement of this type
         TileImprovement improvement = getTile().findTileImprovementType(impType);
         if (improvement == null) {

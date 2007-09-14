@@ -1218,7 +1218,7 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
     }
 
     /**
-     * Gets an <code>Iterator</code> of every <code>TileImprovement</code>
+     * Gets an <code>Iterator</code> of every <code>TileItem</code>
      * located on this <code>Tile</code>.
      * 
      * @return The <code>Iterator</code>.
@@ -2078,9 +2078,6 @@ break;
 
         private boolean explored = false;
 
-        // Tile data:
-        private boolean plowed, forested, bonus;
-
         private Player owner;
 
         // All known TileItems
@@ -2449,7 +2446,7 @@ break;
         if (workType == null) {
             return -1;
         }
-        if (!workType.isTileTypeAllowed(getType())) {
+        if (!workType.isTileAllowed(this)) {
             return -1;
         }
         // Return the basic work turns + additional work turns

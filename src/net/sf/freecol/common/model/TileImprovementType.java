@@ -128,14 +128,26 @@ public final class TileImprovementType extends FreeColGameObjectType
         return true;
     }
 
-    public boolean isTileTypeAllowed(TileType tileType) {
-        return (allowedTileTypes.indexOf(tileType) >= 0);
-    }
+    /**
+	 * This will check if in principle this type of improvement can be used on
+	 * this kind of tile, disregarding the current state of an actual tile.
+	 * 
+	 * If you want to find out if an improvement is allowed for a tile, call
+	 * {@link #isTileAllowed(Tile)}.
+	 * 
+	 * @param tileType
+	 * @return
+	 */
+	public boolean isTileTypeAllowed(TileType tileType) {
+		return (allowedTileTypes.indexOf(tileType) >= 0);
+	}
 
     /**
-     * Check if a given <code>Tile</code> is valid for this TileImprovement.
-     * @return true if Tile TileType is valid and required Improvement (if any) is present.
-     */
+	 * Check if a given <code>Tile</code> is valid for this TileImprovement.
+	 * 
+	 * @return true if Tile TileType is valid and required Improvement (if any)
+	 *         is present.
+	 */
     public boolean isTileAllowed(Tile tile) {
         if (!isTileTypeAllowed(tile.getType())) {
             return false;
@@ -248,7 +260,7 @@ public final class TileImprovementType extends FreeColGameObjectType
         natural = getAttribute(in, "natural", false);
         String s = getAttribute(in, "occupation-string", "I");
         occupationString = s.substring(0, 1);
-        addWorkTurns = getAttribute(in, "add-works-turns", 0);
+        addWorkTurns = getAttribute(in, "add-work-turns", 0);
         movementCost = -1;
         movementCostFactor = -1;
         
@@ -280,15 +292,26 @@ public final class TileImprovementType extends FreeColGameObjectType
 
             } else if ("tiles".equals(childName)) {
                 boolean allLand = getAttribute(in, "all-land-tiles", false);
+                boolean allForestUndefined = in.getAttributeValue(null, "all-forest-tiles") == null;
                 boolean allForest = getAttribute(in, "all-forest-tiles", false);
                 boolean allWater = getAttribute(in, "all-water-tiles", false);
 
                 for (TileType t : tileTypeList) {
-                    if (!allLand && !t.isWater() || !allForest && t.isForested()
-                        || !allWater && t.isWater()) {
-                        continue;
-                    }
-                    allowedTileTypes.add(t);
+                	if (t.isWater()){
+                		if (allWater)
+                			allowedTileTypes.add(t);
+                	} else {
+                		if (t.isForested()){
+                			if ((allLand && allForestUndefined) || allForest){
+                				allowedTileTypes.add(t);
+                			}
+                		} else {
+                			if (allLand){
+                				allowedTileTypes.add(t);
+                			}
+                		}
+                		
+                	}
                 }
                 in.nextTag(); // close this element
                 
