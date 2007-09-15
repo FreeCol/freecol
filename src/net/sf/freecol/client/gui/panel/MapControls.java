@@ -30,7 +30,6 @@ import net.sf.freecol.client.gui.action.SkipUnitAction;
 import net.sf.freecol.client.gui.action.WaitAction;
 import net.sf.freecol.client.gui.panel.MapEditorTransformPanel.MapTransform;
 import net.sf.freecol.common.model.Tile;
-import net.sf.freecol.common.model.Unit;
 
 
 /**
@@ -119,7 +118,6 @@ public final class MapControls {
         compassRose.setSize(compassRose.getPreferredSize());
         compassRose.addMouseListener(new MouseAdapter() {
                 public void mouseClicked(MouseEvent e) {
-                    Unit activeUnit = gui.getActiveUnit();
                     int x = e.getX() - compassRose.getWidth()/2;
                     int y = e.getY() - compassRose.getHeight()/2;
                     double theta = Math.atan2(y, x) + Math.PI/2 + Math.PI/8;
