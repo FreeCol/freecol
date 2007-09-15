@@ -12,9 +12,10 @@ import javax.swing.ButtonGroup;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JLabel;
-import javax.swing.JPanel;
 import javax.swing.JRadioButton;
+import javax.swing.JSpinner;
 import javax.swing.JTextField;
+import javax.swing.SpinnerNumberModel;
 
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.control.ConnectController;
@@ -29,7 +30,7 @@ import cz.autel.dmi.HIGLayout;
 public final class NewPanel extends FreeColPanel implements ActionListener {
     private static final Logger logger = Logger.getLogger(NewPanel.class.getName());
 
-    public static final String  COPYRIGHT = "Copyright (C) 2003-2005 The FreeCol Team";
+    public static final String  COPYRIGHT = "Copyright (C) 2003-2007 The FreeCol Team";
     public static final String  LICENSE = "http://www.gnu.org/licenses/gpl.html";
     public static final String  REVISION = "$Revision$";
 
@@ -48,14 +49,17 @@ public final class NewPanel extends FreeColPanel implements ActionListener {
                                 join,
                                 start,
                                 meta;
-    private final JPanel        namePanel,
-                                joinServerPanel,
-                                startServerPanel,
-                                buttonPanel;
     private final JLabel        ipLabel,
-                                port1Label,
-                                port2Label;
-    private final JCheckBox     publicServer;
+        port1Label,
+        port2Label,
+        singlePlayerNoLabel,
+        multiPlayerNoLabel;
+    private final JCheckBox     publicServer,
+        additionalNations,
+        selectAdvantages,
+        useAdvantages;
+
+    private final JSpinner singlePlayerNo, multiPlayerNo;
 
     private final Canvas        parent;
 
@@ -83,9 +87,20 @@ public final class NewPanel extends FreeColPanel implements ActionListener {
         ipLabel = new JLabel( Messages.message("host") );
         port1Label = new JLabel( Messages.message("port") );
         port2Label = new JLabel( Messages.message("startServerOnPort") );
+        singlePlayerNoLabel = new JLabel(Messages.message("singlePlayerNo"));
+        multiPlayerNoLabel = new JLabel(Messages.message("multiPlayerNo"));
+
         publicServer = new JCheckBox( Messages.message("publicServer") );
+        additionalNations = new JCheckBox(Messages.message("additionalNations"));
+        selectAdvantages = new JCheckBox(Messages.message("selectAdvantages"));
+        useAdvantages = new JCheckBox(Messages.message("useAdvantages"));
+
+        singlePlayerNo = new JSpinner(new SpinnerNumberModel(4, 1, 8, 1));
+        multiPlayerNo = new JSpinner(new SpinnerNumberModel(4, 2, 8, 1));
+
         name = new JTextField( System.getProperty("user.name", Messages.message("defaultPlayerName")) );
-        name.setColumns(30);
+        name.setColumns(20);
+
         server = new JTextField("127.0.0.1");
         port1 = new JTextField("3541");
         port2 = new JTextField("3541");
@@ -94,62 +109,54 @@ public final class NewPanel extends FreeColPanel implements ActionListener {
         start = new JRadioButton(Messages.message("startMultiplayerGame"), false);
         meta = new JRadioButton( Messages.message("getServerList") + " (" + FreeCol.META_SERVER_ADDRESS + ")", false);
 
-        namePanel = new JPanel();
-        namePanel.setOpaque(false);
-        namePanel.add(nameLabel);
-        namePanel.add(name);
-
-        joinServerPanel = new JPanel();
-        joinServerPanel.setOpaque(false);
-        joinServerPanel.add(ipLabel);
-        joinServerPanel.add(server);
-        joinServerPanel.add(port1Label);
-        joinServerPanel.add(port1);
-
-        startServerPanel = new JPanel();
-        startServerPanel.setOpaque(false);
-        startServerPanel.add(port2Label);
-        startServerPanel.add(port2);
-
-        buttonPanel = new JPanel();
-        buttonPanel.setOpaque(false);
-        buttonPanel.add(ok);
-        buttonPanel.add(cancel);
-        enterPressesWhenFocused(ok);
-        enterPressesWhenFocused(cancel);
-
         group.add(single);
         group.add(join);
         group.add(start);
         group.add(meta);
 
-        int numberOfRows = 9;
-        int[] widths = {0};
+        int numberOfRows = 11;
+        int[] widths = {21, 0, margin, 0, margin, 0, margin, 0, 6*margin, 0};
         int[] heights = new int[2 * numberOfRows - 1];
         for (int index = 1; index < heights.length; index += 2) {
             heights[index] = margin;
         }
-        int column = 1;
+        heights[heights.length - 2] = 3 * margin;
+
         setLayout(new HIGLayout(widths, heights));
 
         int row = 1;
-        add(namePanel, higConst.rc(row, column));
+        add(nameLabel, higConst.rc(row, 8, "r"));
+        add(name, higConst.rc(row, 10));
         row += 2;
-        add(single, higConst.rc(row, column));
+        add(single, higConst.rcwh(row, 1, 8, 1, "l"));
         row += 2;
-        add(meta, higConst.rc(row, column));
+        add(additionalNations, higConst.rcwh(row, 2, 3, 1, "l"));
+        add(selectAdvantages, higConst.rc(row, 10, "l"));
         row += 2;
-        add(join, higConst.rc(row, column));
+        add(singlePlayerNoLabel, higConst.rcwh(row, 2, 3, 1, "l"));
+        add(singlePlayerNo, higConst.rc(row, 8));
         row += 2;
-        add(joinServerPanel, higConst.rc(row, column, "l"));
+        add(meta, higConst.rcwh(row, 1, 8, 1, "l"));
         row += 2;
-        add(start, higConst.rc(row, column));
+        add(join, higConst.rcwh(row, 1, 8, 1, "l"));
         row += 2;
-        add(startServerPanel, higConst.rc(row, column, "l"));
+        add(ipLabel, higConst.rc(row, 2));
+        add(server, higConst.rc(row, 4));
+        add(port1Label, higConst.rc(row, 6));
+        add(port1, higConst.rc(row, 8));
         row += 2;
-        add(publicServer, higConst.rc(row, column));
+        add(start, higConst.rcwh(row, 1, 8, 1, "l"));
         row += 2;
-        add(buttonPanel, higConst.rc(row, column));
+        add(port2Label, higConst.rcwh(row, 2, 3, 1, "l"));
+        add(port2, higConst.rc(row, 8));
+        add(publicServer, higConst.rc(row, 10, "l"));
+        row += 2;
+        add(multiPlayerNoLabel, higConst.rcwh(row, 2, 3, 1, "l"));
+        add(multiPlayerNo, higConst.rc(row, 8));
+        add(useAdvantages, higConst.rc(row, 10, "l"));
+        row += 2;
+        add(ok, higConst.rc(row, 8, "r"));
+        add(cancel, higConst.rc(row, 10, "l"));
 
 
         ok.setActionCommand(String.valueOf(OK));
@@ -166,13 +173,8 @@ public final class NewPanel extends FreeColPanel implements ActionListener {
         start.addActionListener(this);
         meta.addActionListener(this);
 
-        ipLabel.setEnabled(false);
-        server.setEnabled(false);
-        port1Label.setEnabled(false);
-        port1.setEnabled(false);
-        port2Label.setEnabled(false);
-        publicServer.setEnabled(false);
-        port2.setEnabled(false);
+        single.setSelected(true);
+        setEnabledComponents();
 
         setSize(getPreferredSize());
     }
@@ -195,33 +197,53 @@ public final class NewPanel extends FreeColPanel implements ActionListener {
         for (int i = 0; i < components.length; i++) {
             components[i].setEnabled(enabled);
         }
+        setEnabledComponents();
+    }
 
-        if (single.isSelected() || meta.isSelected()) {
-            ipLabel.setEnabled(false);
-            server.setEnabled(false);
-            port1Label.setEnabled(false);
-            port1.setEnabled(false);
-            port2Label.setEnabled(false);
-            port2.setEnabled(false);
-            publicServer.setEnabled(false);
+    private void setEnabledComponents() {
+        if (single.isSelected()) {
+            setSinglePlayerOptions(true);
+            setJoinGameOptions(false);
+            setServerOptions(false);
         } else if (join.isSelected()) {
-            ipLabel.setEnabled(true);
-            server.setEnabled(true);
-            port1Label.setEnabled(true);
-            port1.setEnabled(true);
-            port2Label.setEnabled(false);
-            port2.setEnabled(false);
-            publicServer.setEnabled(false);
+            setSinglePlayerOptions(false);
+            setJoinGameOptions(true);
+            setServerOptions(false);
         } else if (start.isSelected()) {
-            ipLabel.setEnabled(false);
-            server.setEnabled(false);
-            port1Label.setEnabled(false);
-            port1.setEnabled(false);
-            port2Label.setEnabled(true);
-            port2.setEnabled(true);
-            publicServer.setEnabled(true);
+            setSinglePlayerOptions(false);
+            setJoinGameOptions(false);
+            setServerOptions(true);
+        } else if (meta.isSelected()) {
+            setSinglePlayerOptions(false);
+            setJoinGameOptions(false);
+            setServerOptions(false);
         }
     }
+
+    private void setSinglePlayerOptions(boolean enabled) {
+        additionalNations.setEnabled(enabled);
+        selectAdvantages.setEnabled(enabled);
+        singlePlayerNoLabel.setEnabled(enabled);
+        singlePlayerNo.setEnabled(enabled);
+    }
+
+    private void setJoinGameOptions(boolean enabled) {
+        ipLabel.setEnabled(enabled);
+        server.setEnabled(enabled);
+        port1Label.setEnabled(enabled);
+        port1.setEnabled(enabled);
+    }
+
+    private void setServerOptions(boolean enabled) {
+        port2Label.setEnabled(enabled);
+        port2.setEnabled(enabled);
+        publicServer.setEnabled(enabled);
+        multiPlayerNoLabel.setEnabled(enabled);
+        multiPlayerNo.setEnabled(enabled);
+        useAdvantages.setEnabled(enabled);
+    }
+        
+
 
     /**
     * This function analyses an event and calls the right methods to take
@@ -270,40 +292,10 @@ public final class NewPanel extends FreeColPanel implements ActionListener {
                     parent.showMainPanel();
                     break;
                 case SINGLE:
-                    ipLabel.setEnabled(false);
-                    server.setEnabled(false);
-                    port1Label.setEnabled(false);
-                    port1.setEnabled(false);
-                    port2Label.setEnabled(false);
-                    port2.setEnabled(false);
-                    publicServer.setEnabled(false);
-                    break;
                 case JOIN:
-                    ipLabel.setEnabled(true);
-                    server.setEnabled(true);
-                    port1Label.setEnabled(true);
-                    port1.setEnabled(true);
-                    port2Label.setEnabled(false);
-                    port2.setEnabled(false);
-                    publicServer.setEnabled(false);
-                    break;
                 case START:
-                    ipLabel.setEnabled(false);
-                    server.setEnabled(false);
-                    port1Label.setEnabled(false);
-                    port1.setEnabled(false);
-                    port2Label.setEnabled(true);
-                    port2.setEnabled(true);
-                    publicServer.setEnabled(true);
-                    break;
                 case META_SERVER:
-                    ipLabel.setEnabled(false);
-                    server.setEnabled(false);
-                    port1Label.setEnabled(false);
-                    port1.setEnabled(false);
-                    port2Label.setEnabled(false);
-                    port2.setEnabled(false);
-                    publicServer.setEnabled(false);
+                    setEnabledComponents();
                     break;
                 default:
                     logger.warning("Invalid Actioncommand: invalid number.");
