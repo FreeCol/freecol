@@ -192,8 +192,8 @@ public final class UserConnectionHandler implements MessageHandler, StreamedMess
                 out.writeAttribute("singleplayer", Boolean.toString(freeColServer.isSingleplayer()));
                 out.writeAttribute("startGame", "true");
                 out.writeAttribute("isCurrentPlayer", Boolean.toString(isCurrentPlayer));
-                out.writeAttribute("useAdvantages", Boolean.toString(freeColServer.getUseAdvantages()));
-                out.writeAttribute("selectAdvantages", Boolean.toString(freeColServer.getSelectAdvantages()));
+                System.out.println("advantages: " + freeColServer.getAdvantages());
+                out.writeAttribute("advantages", Integer.toString(freeColServer.getAdvantages()));
                 out.writeAttribute("additionalNations", Boolean.toString(freeColServer.getAdditionalNations()));
                 freeColServer.getGame().toXML(out, player);
                 freeColServer.getMapGenerator().getMapGeneratorOptions().toXML(out);

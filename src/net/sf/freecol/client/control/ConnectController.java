@@ -53,8 +53,7 @@ public final class ConnectController {
     private final FreeColClient freeColClient;
 
     private int numberOfPlayers = 4;
-    private boolean selectAdvantages = true;
-    private boolean useAdvantages = true;
+    private int advantages;
     private boolean additionalNations = true;
 
     /**
@@ -75,8 +74,10 @@ public final class ConnectController {
      * @param players The number of selectable European players in this game.
      * @param useAdvantages Whether to use national advantages.
      */
-    public void startMultiplayerGame(boolean publicServer, String username, int port, int players, boolean useAdvantages) {
+    public void startMultiplayerGame(boolean publicServer, String username, int port, int players, int advantages) {
         freeColClient.setMapEditor(false);
+
+        this.advantages = advantages;
         
         if (freeColClient.isLoggedIn()) {
             logout(true);
@@ -91,7 +92,8 @@ public final class ConnectController {
         }
 
         try {
-            FreeColServer freeColServer = new FreeColServer(publicServer, false, port, null, players, useAdvantages, true);
+            FreeColServer freeColServer = new FreeColServer(publicServer, false, port, null, players,
+                                                            advantages, additionalNations);
             freeColClient.setFreeColServer(freeColServer);
         } catch (NoRouteToServerException e) {
             freeColClient.getCanvas().errorMessage("server.noRouteToServer");
@@ -114,11 +116,12 @@ public final class ConnectController {
      * @param selectAdvantages Whether national advantages can be selected.
      */
     public void startSingleplayerGame(String username, int players, boolean additionalNations,
-                                      boolean selectAdvantages) {
+                                      int advantages) {
 
         if (players > 4) {
             additionalNations = true;
         }
+        this.advantages = advantages;
 
         freeColClient.setMapEditor(false);
         
@@ -138,8 +141,8 @@ public final class ConnectController {
         }
 
         try {
-            FreeColServer freeColServer = new FreeColServer(false, true, port, null, players, selectAdvantages,
-                                                            additionalNations);
+            FreeColServer freeColServer = new FreeColServer(false, true, port, null, players,
+                                                            advantages, additionalNations);
             freeColClient.setFreeColServer(freeColServer);
         } catch (NoRouteToServerException e) {
             logger.warning("Illegal state: An exception occured that can only appear in public multiplayer games.");
@@ -155,7 +158,7 @@ public final class ConnectController {
         if (loggedIn) {
             freeColClient.getPreGameController().setReady(true);
             freeColClient.getCanvas().showStartGamePanel(freeColClient.getGame(), freeColClient.getMyPlayer(), true,
-                                                         players, selectAdvantages, additionalNations);
+                                                         players, advantages, additionalNations);
         }
     }
 
@@ -190,7 +193,7 @@ public final class ConnectController {
         freeColClient.setSingleplayer(false);
         if (login(username, host, port) && !freeColClient.getGUI().isInGame()) {
             canvas.showStartGamePanel(freeColClient.getGame(), freeColClient.getMyPlayer(), false,
-                                      numberOfPlayers, useAdvantages, additionalNations);
+                                      numberOfPlayers, advantages, additionalNations);
         }
     }
 
@@ -239,10 +242,13 @@ public final class ConnectController {
                 boolean startGame = (startGameStr != null) && Boolean.valueOf(startGameStr).booleanValue();
                 boolean singleplayer = Boolean.valueOf(in.getAttributeValue(null, "singleplayer")).booleanValue();
                 boolean isCurrentPlayer = Boolean.valueOf(in.getAttributeValue(null, "isCurrentPlayer")).booleanValue();
-                useAdvantages = Boolean.valueOf(in.getAttributeValue(null, "useAdvantages")).booleanValue();
-                selectAdvantages = Boolean.valueOf(in.getAttributeValue(null, "selectAdvantages")).booleanValue();
                 additionalNations = Boolean.valueOf(in.getAttributeValue(null, "additionalNations")).booleanValue();
-
+                String advantageString = in.getAttributeValue(null, "advantages");
+                if (advantageString == null) {
+                    advantages = 0;
+                } else {
+                    advantages = Integer.parseInt(advantageString);
+                }
                 in.nextTag();
                 Game game = new Game(freeColClient.getModelController(), in, username);
                 Player thisPlayer = game.getPlayerByName(username);

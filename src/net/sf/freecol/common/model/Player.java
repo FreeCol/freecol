@@ -45,7 +45,7 @@ public class Player extends FreeColGameObject implements Abilities, Nameable, Mo
      * Europeans + 4 REF + 8 native. In the future, we might wish to
      * extend that to 8 Europeans (mainly for multi-player games).
      */
-    public static final int NUMBER_OF_PLAYERS = 16;
+    public static final int NUMBER_OF_PLAYERS = 24;
 
     /**
      * The index counter for this class.

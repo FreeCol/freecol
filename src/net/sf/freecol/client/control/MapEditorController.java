@@ -68,7 +68,7 @@ public final class MapEditorController {
     public void startMapEditor() {
         try {
             freeColClient.setMapEditor(true);
-            final FreeColServer freeColServer = new FreeColServer(false, false, 0, null, 4, false, false);
+            final FreeColServer freeColServer = new FreeColServer(false, false, 0, null);
             freeColClient.setFreeColServer(freeColServer);            
             freeColClient.setGame(freeColServer.getGame());
             freeColClient.setMyPlayer(null);

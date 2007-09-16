@@ -22,6 +22,7 @@ import javax.swing.event.ChangeListener;
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.control.ConnectController;
 import net.sf.freecol.client.gui.Canvas;
+import net.sf.freecol.client.gui.panel.AdvantageCellRenderer;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.ServerInfo;
 import cz.autel.dmi.HIGLayout;
@@ -267,9 +268,13 @@ public final class NewPanel extends FreeColPanel implements ActionListener {
                 case OK:
                     if (single.isSelected()) {
                         int players = ((Integer) singlePlayerNo.getValue()).intValue();
+                        int advantages = AdvantageCellRenderer.FIXED;
+                        if (selectAdvantages.isSelected()) {
+                            advantages = AdvantageCellRenderer.SELECTABLE;
+                        }
                         connectController.startSingleplayerGame(name.getText(), players, 
                                                                 additionalNations.isSelected(),
-                                                                selectAdvantages.isSelected());
+                                                                advantages);
                     } else if (join.isSelected()) {
                         int port;
 
@@ -292,8 +297,12 @@ public final class NewPanel extends FreeColPanel implements ActionListener {
                             break;
                         }
                         int players = ((Integer) singlePlayerNo.getValue()).intValue();
+                        int advantages = AdvantageCellRenderer.NONE;
+                        if (useAdvantages.isSelected()) {
+                            advantages = AdvantageCellRenderer.SELECTABLE;
+                        }
                         connectController.startMultiplayerGame(publicServer.isSelected(), name.getText(), port,
-                                                               players, useAdvantages.isSelected());
+                                                               players, advantages);
                     } else if (meta.isSelected()) {
                         ArrayList<ServerInfo> serverList = connectController.getServerList();
                         if (serverList != null) {

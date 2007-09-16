@@ -28,13 +28,15 @@ public final class AdvantageCellRenderer implements TableCellRenderer {
     public static final String  LICENSE = "http://www.gnu.org/licenses/gpl.html";
     public static final String  REVISION = "$Revision$";
 
+    public static final int NONE = 0, FIXED = 1, SELECTABLE = 2;
+
     private static Vector<EuropeanNationType> europeans = 
         new Vector<EuropeanNationType>(FreeCol.getSpecification().getClassicNationTypes());
     private static final JComboBox standardNationsComboBox = new JComboBox(europeans);
 
     private List<Player> players;
     private Player thisPlayer;
-    private boolean useAdvantages, selectAdvantages;
+    private int advantages;
 
     /**
     * The default constructor.
@@ -49,11 +51,10 @@ public final class AdvantageCellRenderer implements TableCellRenderer {
     * @param players The players that should be rendered in the table.
     * @param owningPlayer The player running the client that is displaying the table.
     */
-    public void setData(List<Player> players, Player owningPlayer, boolean useAdvantages, boolean selectAdvantages) {
+    public void setData(List<Player> players, Player owningPlayer, int advantages) {
         this.players = players;
         thisPlayer = owningPlayer;
-        this.useAdvantages = useAdvantages;
-        this.selectAdvantages = selectAdvantages;
+        this.advantages = advantages;
     }
 
     private Player getPlayer(int i) {
@@ -83,13 +84,18 @@ public final class AdvantageCellRenderer implements TableCellRenderer {
         Component component;
         component = standardNationsComboBox;
         if (player == thisPlayer) {
-            if (!useAdvantages) {
-                component = new JLabel(Messages.message("model.nationType.none.name"));
-            } else if (selectAdvantages) {
+            switch(advantages) {
+            case FIXED:
+                component = new JLabel(player.getNationType().getName());
+                break;
+            case SELECTABLE:
                 component = standardNationsComboBox;
                 ((JComboBox) component).setSelectedItem(player.getNationType());
-            } else {
-                component = new JLabel(player.getNationType().getName());
+                break;
+            case NONE:
+            default:
+                component = new JLabel(Messages.message("model.nationType.none.name"));
+                break;
             }
         } else if (player.isEuropean()) {
             component = new JLabel(player.getNationType().getName());

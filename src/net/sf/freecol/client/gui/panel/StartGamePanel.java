@@ -78,7 +78,7 @@ public final class StartGamePanel extends FreeColPanel implements ActionListener
 
     private JButton mapGeneratorOptions;
 
-    private boolean useAdvantages, selectAdvantages;
+    private int advantages;
 
     /**
      * The constructor that will add the items to this panel.
@@ -186,20 +186,14 @@ public final class StartGamePanel extends FreeColPanel implements ActionListener
      * @param singlePlayerGame <code>true</code> if the user wants to start a
      *            single player game, <code>false</code> otherwise.
      */
-    public void initialize(boolean singlePlayerGame, boolean advantages, boolean additionalNations) {
+    public void initialize(boolean singlePlayerGame, boolean additionalNations, int advantages) {
         this.singlePlayerGame = singlePlayerGame;
         game = freeColClient.getGame();
         thisPlayer = freeColClient.getMyPlayer();
 
-        if (singlePlayerGame) {
-            selectAdvantages = advantages;
-            useAdvantages = true;
-        } else {
-            selectAdvantages = advantages;
-            useAdvantages = advantages;
-        }
+        this.advantages = advantages;
 
-        tableModel.setData(game.getPlayers(), thisPlayer, selectAdvantages);
+        tableModel.setData(game.getPlayers(), thisPlayer, advantages);
 
         TableColumn nationsColumn = table.getColumnModel().getColumn(NATION_COLUMN);
         nationsColumn.setCellEditor(new NationCellEditor());
@@ -208,12 +202,12 @@ public final class StartGamePanel extends FreeColPanel implements ActionListener
         .setData(game.getPlayers(), thisPlayer, additionalNations);
 
         TableColumn advantagesColumn = table.getColumnModel().getColumn(ADVANTAGE_COLUMN);
-        if (selectAdvantages) {
+        if (advantages == AdvantageCellRenderer.SELECTABLE) {
             advantagesColumn.setCellEditor(new AdvantageCellEditor());
         }
         advantagesColumn.setCellRenderer(new AdvantageCellRenderer());
         ((AdvantageCellRenderer) table.getColumnModel().getColumn(ADVANTAGE_COLUMN).getCellRenderer())
-        .setData(game.getPlayers(), thisPlayer, useAdvantages, selectAdvantages);
+        .setData(game.getPlayers(), thisPlayer, advantages);
         
         ((ColorCellEditor) table.getColumnModel().getColumn(COLOR_COLUMN).getCellEditor())
         .setData(game.getPlayers(), thisPlayer);
@@ -368,7 +362,7 @@ class PlayersTableModel extends AbstractTableModel {
 
     private final PreGameController preGameController;
 
-    private boolean selectAdvantages;
+    private int advantages;
 
     private static final String[] columnNames = {
         Messages.message("player"),
@@ -401,10 +395,10 @@ class PlayersTableModel extends AbstractTableModel {
      * @param owningPlayer The player running the client that is displaying the
      *            table.
      */
-    public void setData(List<Player> myPlayers, Player owningPlayer, boolean selectAdvantages) {
+    public void setData(List<Player> myPlayers, Player owningPlayer, int advantages) {
         players = myPlayers;
         thisPlayer = owningPlayer;
-        this.selectAdvantages = selectAdvantages;
+        this.advantages = advantages;
     }
 
     /**
@@ -510,7 +504,7 @@ class PlayersTableModel extends AbstractTableModel {
                 preGameController.setNation(nation);
                 preGameController.setColor(nation.getColor());
                 fireTableCellUpdated(row, StartGamePanel.COLOR_COLUMN);
-                if (!selectAdvantages) {
+                if (advantages == AdvantageCellRenderer.FIXED) {
                     preGameController.setNationType(nation.getType());
                     fireTableCellUpdated(row, StartGamePanel.ADVANTAGE_COLUMN);
                 }

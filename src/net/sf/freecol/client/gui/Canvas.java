@@ -371,12 +371,12 @@ public final class Canvas extends JDesktopPane {
      *            game, 'false' otherwise.
      * @see StartGamePanel
      */
-    public void showStartGamePanel(Game game, Player player, boolean singlePlayerMode,
-                                   int players, boolean advantages, boolean additionalNations) {
+    public void showStartGamePanel(Game game, Player player, boolean singlePlayerMode, int players,
+                                   int advantages, boolean additionalNations) {
         closeMenus();
 
         if (game != null && player != null) {
-            startGamePanel.initialize(singlePlayerMode, advantages, additionalNations);
+            startGamePanel.initialize(singlePlayerMode, additionalNations, advantages);
             addAsFrame(startGamePanel);
             startGamePanel.requestFocus();
         } else {
