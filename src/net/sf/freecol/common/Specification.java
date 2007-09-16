@@ -657,6 +657,16 @@ public final class Specification {
         return result;
     }
 
+    public List<Nation> getEuropeanNations() {
+        ArrayList<Nation> result = new ArrayList<Nation>();
+        for (Nation nation : nations) {
+            if (nation.isSelectable()) {
+                result.add(nation);
+            }
+        }
+        return result;
+    }
+
     /**
      * Takes an XML node with child nodes that represent objects of the type
      * <code>T</code> and returns a list of the deserialized objects of type

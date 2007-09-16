@@ -27,21 +27,17 @@ public final class NationCellRenderer implements TableCellRenderer {
     public static final String  LICENSE = "http://www.gnu.org/licenses/gpl.html";
     public static final String  REVISION = "$Revision$";
 
-    /*
-    private static Vector<Nation> indians = 
-        new Vector<Nation>(FreeCol.getSpecification().getIndianNations());
-    private static Vector<Nation> refs = 
-        new Vector<Nation>(FreeCol.getSpecification().getREFNations());
-    private static final JComboBox indianTribesComboBox = new JComboBox(indians);
-    private static final JComboBox refNationsComboBox = new JComboBox(refs);
-    */
-
-    private static Vector<Nation> europeans = 
+    private static Vector<Nation> classicNations = 
         new Vector<Nation>(FreeCol.getSpecification().getClassicNations());
-    private static final JComboBox standardNationsComboBox = new JComboBox(europeans);
+    private static final JComboBox classicNationsComboBox = new JComboBox(classicNations);
+
+    private static Vector<Nation> europeanNations = 
+        new Vector<Nation>(FreeCol.getSpecification().getEuropeanNations());
+    private static final JComboBox europeanNationsComboBox = new JComboBox(europeanNations);
 
     private List<Player> players;
     private Player thisPlayer;
+    private boolean additionalNations;
 
     /**
     * The default constructor.
@@ -56,9 +52,10 @@ public final class NationCellRenderer implements TableCellRenderer {
     * @param players The players that should be rendered in the table.
     * @param owningPlayer The player running the client that is displaying the table.
     */
-    public void setData(List<Player> players, Player owningPlayer) {
+    public void setData(List<Player> players, Player owningPlayer, boolean additionalNations) {
         this.players = players;
         thisPlayer = owningPlayer;
+        this.additionalNations = additionalNations;
     }
 
     private Player getPlayer(int i) {
@@ -87,9 +84,16 @@ public final class NationCellRenderer implements TableCellRenderer {
 
         Component component;
         if (player == thisPlayer) {
-            component = standardNationsComboBox;
-            for (int index = 0; index < europeans.size(); index++) {
-                if (europeans.get(index).getID().equals(player.getNationID())) {
+            Vector<Nation> nations;
+            if (additionalNations) {
+                nations = europeanNations;
+                component = europeanNationsComboBox;
+            } else {
+                nations = classicNations;
+                component = classicNationsComboBox;
+            }
+            for (int index = 0; index < nations.size(); index++) {
+                if (nations.get(index).getID().equals(player.getNationID())) {
                     ((JComboBox) component).setSelectedIndex(index);
                     break;
                 }

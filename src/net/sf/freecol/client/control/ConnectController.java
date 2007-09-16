@@ -52,7 +52,10 @@ public final class ConnectController {
 
     private final FreeColClient freeColClient;
 
-
+    private int numberOfPlayers = 4;
+    private boolean selectAdvantages = true;
+    private boolean useAdvantages = true;
+    private boolean additionalNations = true;
 
     /**
     * Creates a new <code>ConnectController</code>.
@@ -64,13 +67,15 @@ public final class ConnectController {
 
     
     /**
-    * Starts a multiplayer server and connects to it.
-    *
-    * @param publicServer Should this server be listed at the meta server.
-    * @param username The name to use when logging in.
-    * @param port The port in which the server should listen for new clients.
-    */
-    public void startMultiplayerGame(boolean publicServer, String username, int port) {
+     * Starts a multiplayer server and connects to it.
+     *
+     * @param publicServer Should this server be listed at the meta server.
+     * @param username The name to use when logging in.
+     * @param port The port in which the server should listen for new clients.
+     * @param players The number of selectable European players in this game.
+     * @param useAdvantages Whether to use national advantages.
+     */
+    public void startMultiplayerGame(boolean publicServer, String username, int port, int players, boolean useAdvantages) {
         freeColClient.setMapEditor(false);
         
         if (freeColClient.isLoggedIn()) {
@@ -86,7 +91,7 @@ public final class ConnectController {
         }
 
         try {
-            FreeColServer freeColServer = new FreeColServer(publicServer, false, port, null);
+            FreeColServer freeColServer = new FreeColServer(publicServer, false, port, null, players, useAdvantages, true);
             freeColClient.setFreeColServer(freeColServer);
         } catch (NoRouteToServerException e) {
             freeColClient.getCanvas().errorMessage("server.noRouteToServer");
@@ -101,11 +106,20 @@ public final class ConnectController {
 
 
     /**
-    * Starts a new singleplayer game by connecting to the server.
-    *
-    * @param username The name to use when logging in.
-    */
-    public void startSingleplayerGame(String username) {
+     * Starts a new singleplayer game by connecting to the server.
+     *
+     * @param username The name to use when logging in.
+     * @param players The number of selectable European players.
+     * @param additionalNations Whether to use additional nations not in the original game.
+     * @param selectAdvantages Whether national advantages can be selected.
+     */
+    public void startSingleplayerGame(String username, int players, boolean additionalNations,
+                                      boolean selectAdvantages) {
+
+        if (players > 4) {
+            additionalNations = true;
+        }
+
         freeColClient.setMapEditor(false);
         
         if (freeColClient.isLoggedIn()) {
@@ -124,7 +138,8 @@ public final class ConnectController {
         }
 
         try {
-            FreeColServer freeColServer = new FreeColServer(false, true, port, null);
+            FreeColServer freeColServer = new FreeColServer(false, true, port, null, players, selectAdvantages,
+                                                            additionalNations);
             freeColClient.setFreeColServer(freeColServer);
         } catch (NoRouteToServerException e) {
             logger.warning("Illegal state: An exception occured that can only appear in public multiplayer games.");
@@ -139,7 +154,8 @@ public final class ConnectController {
 
         if (loggedIn) {
             freeColClient.getPreGameController().setReady(true);
-            freeColClient.getCanvas().showStartGamePanel(freeColClient.getGame(), freeColClient.getMyPlayer(), true);
+            freeColClient.getCanvas().showStartGamePanel(freeColClient.getGame(), freeColClient.getMyPlayer(), true,
+                                                         players, selectAdvantages, additionalNations);
         }
     }
 
@@ -173,7 +189,8 @@ public final class ConnectController {
 
         freeColClient.setSingleplayer(false);
         if (login(username, host, port) && !freeColClient.getGUI().isInGame()) {
-            canvas.showStartGamePanel(freeColClient.getGame(), freeColClient.getMyPlayer(), false);
+            canvas.showStartGamePanel(freeColClient.getGame(), freeColClient.getMyPlayer(), false,
+                                      numberOfPlayers, useAdvantages, additionalNations);
         }
     }
 
@@ -221,8 +238,11 @@ public final class ConnectController {
                 final String startGameStr = in.getAttributeValue(null, "startGame");
                 boolean startGame = (startGameStr != null) && Boolean.valueOf(startGameStr).booleanValue();
                 boolean singleplayer = Boolean.valueOf(in.getAttributeValue(null, "singleplayer")).booleanValue();
-                boolean isCurrentPlayer = Boolean.valueOf(in.getAttributeValue(null, "isCurrentPlayer")).booleanValue();                
-                
+                boolean isCurrentPlayer = Boolean.valueOf(in.getAttributeValue(null, "isCurrentPlayer")).booleanValue();
+                useAdvantages = Boolean.valueOf(in.getAttributeValue(null, "useAdvantages")).booleanValue();
+                selectAdvantages = Boolean.valueOf(in.getAttributeValue(null, "selectAdvantages")).booleanValue();
+                additionalNations = Boolean.valueOf(in.getAttributeValue(null, "additionalNations")).booleanValue();
+
                 in.nextTag();
                 Game game = new Game(freeColClient.getModelController(), in, username);
                 Player thisPlayer = game.getPlayerByName(username);

@@ -168,7 +168,7 @@ public final class FreeCol {
                     }
                 } else {
                     try {
-                        freeColServer = new FreeColServer(true, false, serverPort, serverName);
+                        freeColServer = new FreeColServer(true, false, serverPort, serverName, 4, false, false);
                     } catch (NoRouteToServerException e) {
                         System.out.println(Messages.message("server.noRouteToServer"));
                         System.exit(1);

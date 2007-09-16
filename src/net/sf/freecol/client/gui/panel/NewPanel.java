@@ -16,6 +16,8 @@ import javax.swing.JRadioButton;
 import javax.swing.JSpinner;
 import javax.swing.JTextField;
 import javax.swing.SpinnerNumberModel;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.control.ConnectController;
@@ -96,6 +98,14 @@ public final class NewPanel extends FreeColPanel implements ActionListener {
         useAdvantages = new JCheckBox(Messages.message("useAdvantages"));
 
         singlePlayerNo = new JSpinner(new SpinnerNumberModel(4, 1, 8, 1));
+        singlePlayerNo.addChangeListener(new ChangeListener() {
+                public void stateChanged(ChangeEvent e) {
+                    int players = ((Integer) singlePlayerNo.getValue()).intValue();
+                    if (players > 4) {
+                        additionalNations.setSelected(true);
+                    }
+                }
+            });
         multiPlayerNo = new JSpinner(new SpinnerNumberModel(4, 2, 8, 1));
 
         name = new JTextField( System.getProperty("user.name", Messages.message("defaultPlayerName")) );
@@ -256,7 +266,10 @@ public final class NewPanel extends FreeColPanel implements ActionListener {
             switch (Integer.valueOf(command).intValue()) {
                 case OK:
                     if (single.isSelected()) {
-                        connectController.startSingleplayerGame(name.getText());
+                        int players = ((Integer) singlePlayerNo.getValue()).intValue();
+                        connectController.startSingleplayerGame(name.getText(), players, 
+                                                                additionalNations.isSelected(),
+                                                                selectAdvantages.isSelected());
                     } else if (join.isSelected()) {
                         int port;
 
@@ -278,8 +291,9 @@ public final class NewPanel extends FreeColPanel implements ActionListener {
                             port2Label.setForeground(Color.red);
                             break;
                         }
-
-                        connectController.startMultiplayerGame(publicServer.isSelected(), name.getText(), port);
+                        int players = ((Integer) singlePlayerNo.getValue()).intValue();
+                        connectController.startMultiplayerGame(publicServer.isSelected(), name.getText(), port,
+                                                               players, useAdvantages.isSelected());
                     } else if (meta.isSelected()) {
                         ArrayList<ServerInfo> serverList = connectController.getServerList();
                         if (serverList != null) {

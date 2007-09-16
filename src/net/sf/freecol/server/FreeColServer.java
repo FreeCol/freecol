@@ -121,6 +121,11 @@ public final class FreeColServer {
     /** The name of this server. */
     private String name;
 
+    private int numberOfPlayers;
+    private boolean selectAdvantages;
+    private boolean useAdvantages;
+    private boolean additionalNations;
+
     /** The provider for random numbers */
     private final ServerPseudoRandom _pseudoRandom = new ServerPseudoRandom();
 
@@ -144,11 +149,20 @@ public final class FreeColServer {
      *             will be logged by this class).
      * 
      */
-    public FreeColServer(boolean publicServer, boolean singleplayer, int port, String name) throws IOException, NoRouteToServerException {
+    public FreeColServer(boolean publicServer, boolean singleplayer, int port, String name,
+                         int players, boolean advantages, boolean additionalNations)
+        throws IOException, NoRouteToServerException {
         this.publicServer = publicServer;
         this.singleplayer = singleplayer;
         this.port = port;
         this.name = name;
+        this.numberOfPlayers = players;
+        this.additionalNations = additionalNations;
+        if (singleplayer) {
+            selectAdvantages = advantages;
+        } else {
+            useAdvantages = advantages;
+        }
         modelController = new ServerModelController(this);
         game = new Game(modelController);
         mapGenerator = new MapGenerator();
@@ -334,6 +348,34 @@ public final class FreeColServer {
     public void setName(String name) {
         this.name = name;
     }
+
+    /**
+     * Describe <code>getUseAdvantages</code> method here.
+     *
+     * @return a <code>boolean</code> value
+     */
+    public boolean getUseAdvantages() {
+        return useAdvantages;
+    }
+
+    /**
+     * Describe <code>getSelectAdvantages</code> method here.
+     *
+     * @return a <code>boolean</code> value
+     */
+    public boolean getSelectAdvantages() {
+        return selectAdvantages;
+    }
+    
+    /**
+     * Describe <code>getAdditionalNations</code> method here.
+     *
+     * @return a <code>boolean</code> value
+     */
+    public boolean getAdditionalNations() {
+        return additionalNations;
+    }
+
 
     /**
      * Sends information about this server to the meta-server. The information

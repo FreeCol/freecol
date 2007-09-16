@@ -12,6 +12,7 @@ import javax.swing.JTable;
 import javax.swing.table.TableCellRenderer;
 
 import net.sf.freecol.FreeCol;
+import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.EuropeanNationType;
 import net.sf.freecol.common.model.IndianNationType;
 import net.sf.freecol.common.model.Nation;
@@ -33,6 +34,7 @@ public final class AdvantageCellRenderer implements TableCellRenderer {
 
     private List<Player> players;
     private Player thisPlayer;
+    private boolean useAdvantages, selectAdvantages;
 
     /**
     * The default constructor.
@@ -47,9 +49,11 @@ public final class AdvantageCellRenderer implements TableCellRenderer {
     * @param players The players that should be rendered in the table.
     * @param owningPlayer The player running the client that is displaying the table.
     */
-    public void setData(List<Player> players, Player owningPlayer) {
+    public void setData(List<Player> players, Player owningPlayer, boolean useAdvantages, boolean selectAdvantages) {
         this.players = players;
         thisPlayer = owningPlayer;
+        this.useAdvantages = useAdvantages;
+        this.selectAdvantages = selectAdvantages;
     }
 
     private Player getPlayer(int i) {
@@ -79,8 +83,14 @@ public final class AdvantageCellRenderer implements TableCellRenderer {
         Component component;
         component = standardNationsComboBox;
         if (player == thisPlayer) {
-            component = standardNationsComboBox;
-            ((JComboBox) component).setSelectedItem(player.getNationType());
+            if (!useAdvantages) {
+                component = new JLabel(Messages.message("model.nationType.none.name"));
+            } else if (selectAdvantages) {
+                component = standardNationsComboBox;
+                ((JComboBox) component).setSelectedItem(player.getNationType());
+            } else {
+                component = new JLabel(player.getNationType().getName());
+            }
         } else if (player.isEuropean()) {
             component = new JLabel(player.getNationType().getName());
         } else {

@@ -1116,16 +1116,14 @@
     <nation id="model.nation.frenchREF" color="#0000ff" nation-type="model.nationType.ref" ref-of="model.nation.french"/>
     <nation id="model.nation.englishREF" color="#ff0000" nation-type="model.nationType.ref" ref-of="model.nation.english"/>
     <nation id="model.nation.spanishREF" color="#ffff00" nation-type="model.nationType.ref" ref-of="model.nation.spanish"/>
-<!--
     <nation id="model.nation.portuguese" color="#00ffff" nation-type="model.nationType.spanish" selectable="true"/>
     <nation id="model.nation.swedish" color="#00ffff" nation-type="model.nationType.spanish" selectable="true"/>
-    <nation id="model.nation.italian" color="#00ffff" nation-type="model.nationType.spanish" selectable="true"/>
-    <nation id="model.nation.irish" color="#00ffff" nation-type="model.nationType.spanish" selectable="true"/>
+    <nation id="model.nation.danish" color="#00ffff" nation-type="model.nationType.spanish" selectable="true"/>
+    <nation id="model.nation.russian" color="#00ffff" nation-type="model.nationType.spanish" selectable="true"/>
     <nation id="model.nation.portugueseREF" color="#00ffff" nation-type="model.nationType.ref" ref-of="model.nation.portuguese"/>
     <nation id="model.nation.swedishREF" color="#00ffff" nation-type="model.nationType.ref" ref-of="model.nation.swedish"/>
-    <nation id="model.nation.italianREF" color="#00ffff" nation-type="model.nationType.ref" ref-of="model.nation.italian"/>
-    <nation id="model.nation.irishREF" color="#00ffff" nation-type="model.nationType.ref" ref-of="model.nation.irish"/>
--->
+    <nation id="model.nation.danishREF" color="#00ffff" nation-type="model.nationType.ref" ref-of="model.nation.italian"/>
+    <nation id="model.nation.russianREF" color="#00ffff" nation-type="model.nationType.ref" ref-of="model.nation.irish"/>
   </nations>
 
 </freecol-specification>
