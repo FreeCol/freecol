@@ -25,7 +25,7 @@ public class GoodsTest extends FreeColTestCase {
 
         Map map = getTestMap(plainsType);
 
-        Unit wagon = new Unit(getGame(), map.getTile(9, 10), getGame().getPlayer(Player.DUTCH),
+        Unit wagon = new Unit(getGame(), map.getTile(9, 10), dutch(),
                               FreeCol.getSpecification().getUnitType("model.unit.wagonTrain"),
                               Unit.ACTIVE);
 
@@ -41,7 +41,7 @@ public class GoodsTest extends FreeColTestCase {
         try {
             Map map = getTestMap(plainsType);
 
-            Unit wagon = new Unit(getGame(), map.getTile(9, 10), getGame().getPlayer(Player.DUTCH), 
+            Unit wagon = new Unit(getGame(), map.getTile(9, 10), dutch(), 
                                   FreeCol.getSpecification().getUnitType("model.unit.wagonTrain"),
                                   Unit.ACTIVE);
 
@@ -61,7 +61,7 @@ public class GoodsTest extends FreeColTestCase {
 
         Map map = getTestMap(plainsType);
 
-        Unit wagon = new Unit(getGame(), map.getTile(9, 10), getGame().getPlayer(Player.DUTCH), wagonTrainType,
+        Unit wagon = new Unit(getGame(), map.getTile(9, 10), dutch(), wagonTrainType,
                 Unit.ACTIVE);
 
         Goods g = new Goods(getGame(), wagon, Goods.COTTON, 75);
@@ -92,7 +92,7 @@ public class GoodsTest extends FreeColTestCase {
 
     public void testGetTile() {
         Game game = getStandardGame();
-        Player dutch = getGame().getPlayer(Player.DUTCH);
+        Player dutch = dutch();
         Map map = getTestMap(plainsType);
         game.setMap(map);
 
@@ -126,24 +126,34 @@ public class GoodsTest extends FreeColTestCase {
     }
 
     public void testGetRawMaterial() {
-        assertEquals(-1, Goods.getRawMaterial(Goods.COTTON));
-        assertEquals(Goods.COTTON, Goods.getRawMaterial(Goods.CLOTH));
+    	GoodsType cotton = FreeCol.getSpecification().getGoodsType("model.goods.Cotton");
+    	GoodsType cloth = FreeCol.getSpecification().getGoodsType("model.goods.Cloth");
+    	
+        assertEquals(null, cotton.getRawMaterial());
+        assertEquals(cotton, cloth.getRawMaterial());
     }
 
     public void testGetManufactoredGoods() {
-        assertEquals(-1, Goods.getManufactoredGoods(Goods.CLOTH));
-        assertEquals(Goods.CLOTH, Goods.getManufactoredGoods(Goods.COTTON));
+    	GoodsType cotton = FreeCol.getSpecification().getGoodsType("model.goods.Cotton");
+    	GoodsType cloth = FreeCol.getSpecification().getGoodsType("model.goods.Cloth");
+    	
+        assertEquals(null, cloth.getProducedMaterial());
+        assertEquals(cloth, cotton.getProducedMaterial());
     }
 
     public void testIsFarmedGoods() {
-        assertEquals(false, Goods.isFarmedGoods(Goods.BELLS));
-        assertEquals(true, Goods.isFarmedGoods(Goods.COTTON));
-        assertEquals(false, Goods.isFarmedGoods(Goods.CLOTH));
+    	GoodsType bells = FreeCol.getSpecification().getGoodsType("model.goods.Bells");
+    	GoodsType cloth = FreeCol.getSpecification().getGoodsType("model.goods.Cloth");
+    	GoodsType cotton = FreeCol.getSpecification().getGoodsType("model.goods.Cotton");
+    	
+        assertFalse(bells.isFarmed());
+        assertTrue(cotton.isFarmed());
+        assertFalse(cloth.isFarmed());
     }
 
     public void testSetGetLocation() {
         Game game = getStandardGame();
-        Player dutch = getGame().getPlayer(Player.DUTCH);
+        Player dutch = dutch();
         Map map = getTestMap(plainsType, true);
         game.setMap(map);
         Colony colony = getStandardColony();
@@ -171,7 +181,7 @@ public class GoodsTest extends FreeColTestCase {
     public void testGetTakeSpace() {
         Map map = getTestMap(plainsType, true);
 
-        Unit wagon = new Unit(getGame(), map.getTile(9, 10), getGame().getPlayer(Player.DUTCH), wagonTrainType,
+        Unit wagon = new Unit(getGame(), map.getTile(9, 10), dutch(), wagonTrainType,
                 Unit.ACTIVE);
 
         Goods cotton = new Goods(getGame(), wagon, Goods.COTTON, 75);
@@ -182,7 +192,7 @@ public class GoodsTest extends FreeColTestCase {
     public void testSetGetAmount() {
         Map map = getTestMap(plainsType, true);
 
-        Unit wagon = new Unit(getGame(), map.getTile(9, 10), getGame().getPlayer(Player.DUTCH), wagonTrainType,
+        Unit wagon = new Unit(getGame(), map.getTile(9, 10), dutch(), wagonTrainType,
                 Unit.ACTIVE);
 
         Goods cotton = new Goods(getGame(), wagon, Goods.COTTON, 75);
@@ -198,12 +208,16 @@ public class GoodsTest extends FreeColTestCase {
         assertEquals(100000, cotton.getAmount());
 
     }
+    
+    public Player dutch(){
+    	return getGame().getPlayer("model.nation.dutch");    	
+    }
 
     public void testAdjustAmount() {
 
         Map map = getTestMap(plainsType, true);
 
-        Unit wagon = new Unit(getGame(), map.getTile(9, 10), getGame().getPlayer(Player.DUTCH), wagonTrainType,
+        Unit wagon = new Unit(getGame(), map.getTile(9, 10), dutch(), wagonTrainType,
                 Unit.ACTIVE);
 
         Goods cotton = new Goods(getGame(), wagon, Goods.COTTON, 75);
@@ -228,9 +242,9 @@ public class GoodsTest extends FreeColTestCase {
         game.setMap(map);
         Colony colony = getStandardColony();
 
-        Unit wagonInColony = new Unit(getGame(), colony.getTile(), getGame().getPlayer(Player.DUTCH), wagonTrainType,
+        Unit wagonInColony = new Unit(getGame(), colony.getTile(), getGame().getPlayer("model.nation.dutch"), wagonTrainType,
                 Unit.ACTIVE);
-        Unit wagonNotInColony = new Unit(getGame(), map.getTile(10, 10), getGame().getPlayer(Player.DUTCH),
+        Unit wagonNotInColony = new Unit(getGame(), map.getTile(10, 10), getGame().getPlayer("model.nation.dutch"),
                 wagonTrainType, Unit.ACTIVE);
 
         // Check that it does not work if current Location == null
@@ -263,10 +277,10 @@ public class GoodsTest extends FreeColTestCase {
         assertEquals(wagonNotInColony, cotton.getLocation());
 
         {// Check with Europe
-            Europe europe = getGame().getPlayer(Player.DUTCH).getEurope();
-            Unit privateer1 = new Unit(getGame(), europe, getGame().getPlayer(Player.DUTCH), privateerType,
+            Europe europe = getGame().getPlayer("model.nation.dutch").getEurope();
+            Unit privateer1 = new Unit(getGame(), europe, getGame().getPlayer("model.nation.dutch"), privateerType,
                     Unit.ACTIVE);
-            Unit privateer2 = new Unit(getGame(), europe, getGame().getPlayer(Player.DUTCH), privateerType,
+            Unit privateer2 = new Unit(getGame(), europe, getGame().getPlayer("model.nation.dutch"), privateerType,
                     Unit.ACTIVE);
 
             // While source in Europe, target in Europe
@@ -358,9 +372,9 @@ public class GoodsTest extends FreeColTestCase {
         game.setMap(map);
         Colony colony = getStandardColony();
 
-        Unit wagonInColony = new Unit(getGame(), colony.getTile(), getGame().getPlayer(Player.DUTCH), wagonTrainType,
+        Unit wagonInColony = new Unit(getGame(), colony.getTile(), getGame().getPlayer("model.nation.dutch"), wagonTrainType,
                 Unit.ACTIVE);
-        Unit wagonNotInColony = new Unit(getGame(), map.getTile(10, 10), getGame().getPlayer(Player.DUTCH),
+        Unit wagonNotInColony = new Unit(getGame(), map.getTile(10, 10), getGame().getPlayer("model.nation.dutch"),
                 wagonTrainType, Unit.ACTIVE);
 
         Goods cotton = new Goods(getGame(), null, Goods.COTTON, 75);
@@ -379,8 +393,8 @@ public class GoodsTest extends FreeColTestCase {
         }
 
         // Not allowed to unload in Europe
-        Unit privateer = new Unit(getGame(), getGame().getPlayer(Player.DUTCH).getEurope(), getGame().getPlayer(
-                Player.DUTCH), privateerType, Unit.ACTIVE);
+        Unit privateer = new Unit(getGame(), getGame().getPlayer("model.nation.dutch").getEurope(), getGame().getPlayer(
+                "model.nation.dutch"), privateerType, Unit.ACTIVE);
         cotton.setLocation(privateer);
         try {
             cotton.unload();

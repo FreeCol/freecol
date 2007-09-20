@@ -3,6 +3,7 @@ package net.sf.freecol.common.model;
 import java.util.Vector;
 
 import junit.framework.TestCase;
+import net.sf.freecol.FreeCol;
 import net.sf.freecol.common.FreeColException;
 import net.sf.freecol.util.test.MockModelController;
 
@@ -14,7 +15,7 @@ public class GameTest extends TestCase {
         
         game.setMap(new Map(game, Map.SMALL));
 
-		game.addPlayer(new Player(game, "TestPlayer", false, Player.DUTCH));
+		game.addPlayer(new Player(game, "TestPlayer", false, FreeCol.getSpecification().getNation("model.nation.dutch")));
 
 		game.newTurn();
 
@@ -25,13 +26,19 @@ public class GameTest extends TestCase {
 
 		Vector<Player> players = new Vector<Player>();
 
-		for (int i = Player.NUMBER_OF_NATIONS - 1; i >= 0; i--) {
-			Player p = new Player(game, String.valueOf(i), false, !Player.isEuropeanNoREF(i), i);
+		for (Nation n : FreeCol.getSpecification().getNations()) {
+			Player p;
+			if (n.getType().isEuropean() && !n.getType().isREF()) {
+				p = new Player(game, n.getType().getName(), false, n);
+			} else {
+				p = new Player(game, n.getType().getName(), false, true, n);
+			}
 			game.addPlayer(p);
 			players.add(p);
 		}
 
-        assertEquals(Player.NUMBER_OF_NATIONS, game.getPlayers().size());
+		assertEquals(FreeCol.getSpecification().getNations().size(), game
+			.getPlayers().size());
 		assertEquals(players, game.getPlayers());
 	}
 

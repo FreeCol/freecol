@@ -21,7 +21,7 @@ public class BuildingTest extends FreeColTestCase {
 
         // First check with a building that can be fully build with a normal
         // colony
-        BuildingType warehouseType = FreeCol.getSpecification().getBuildingType("model.building.warehouse");
+        BuildingType warehouseType = FreeCol.getSpecification().getBuildingType("model.building.Warehouse");
         Building warehouse = new Building(getGame(), colony, warehouseType, false);
         assertTrue(warehouse.canBuildNext());
         warehouse.upgrade();
@@ -31,7 +31,7 @@ public class BuildingTest extends FreeColTestCase {
         warehouse.upgrade();
         assertFalse(warehouse.canBuildNext());
 
-        // Check whether it is population restriction work
+        // Check whether population restrictions work
 
         // Colony smallColony = getStandardColony(1);
         // 
@@ -44,11 +44,17 @@ public class BuildingTest extends FreeColTestCase {
 
     public void testInitialColony() {
 
+    	// Need to call this to reset the standard colony.
+    	getStandardGame();
+    	
         Colony colony = getStandardColony();
 
-        BuildingType warehouseType = FreeCol.getSpecification().getBuildingType("model.building.warehouse");
+        BuildingType warehouseType = FreeCol.getSpecification().getBuildingType("model.building.Warehouse");
         Building warehouse = colony.getBuilding(warehouseType);
-        assertFalse(warehouse.isBuilt());
+
+        // Is build as depot...
+        assertTrue(warehouse.isBuilt());
+        
         assertTrue(warehouse.canBuildNext());
 
         // Check other building...
@@ -58,6 +64,9 @@ public class BuildingTest extends FreeColTestCase {
     }
 
     public void testCanAddToBuilding() {
+    	
+    	// Need to call this to reset the standard colony.
+    	getStandardGame();
         
         Colony colony = getStandardColony(6);
         List<Unit> units = colony.getUnitList();
@@ -65,12 +74,15 @@ public class BuildingTest extends FreeColTestCase {
         Iterator<Building> buildingIterator = colony.getBuildingIterator();
         while (buildingIterator.hasNext()) {
             Building building = buildingIterator.next();
+            
             // schoolhouse is special, see testCanAddToSchool
-            if (building.getType().hasAbility("model.ability.teach")) continue;
+            if (building.getType().hasAbility("model.ability.teach")) 
+            	continue;
+            
             int maxUnits = building.getMaxUnits();
             for (int index = 0; index < maxUnits; index++) {
                 assertTrue("unable to add unit " + index + " to building type " +
-                           building.getType(), building.canAdd(units.get(index)));
+                           building.getType().getName(), building.canAdd(units.get(index)));
                 building.add(units.get(index));
             }
             assertFalse("able to add unit " + maxUnits + " to building type " +
@@ -86,11 +98,13 @@ public class BuildingTest extends FreeColTestCase {
     /**
      * WARNING! This test makes implicit assumptions about the
      * schoolhouse that could be invalidated by the
-     * specification. TODO: make this more generic.
+     * specification. 
+     * 
+     * TODO: make this more generic.
      */
     public void testCanAddToSchool(){
         
-        Colony colony = getStandardColony(8);
+        Colony colony = getStandardColony(10);
         
         Iterator<Unit> units = colony.getUnitIterator();
         
@@ -119,7 +133,7 @@ public class BuildingTest extends FreeColTestCase {
         carpenter.setType(Unit.MASTER_CARPENTER);
         
         // Check school
-        BuildingType schoolType = FreeCol.getSpecification().getBuildingType("model.building.schoolhouse");
+        BuildingType schoolType = FreeCol.getSpecification().getBuildingType("model.building.Schoolhouse");
         Building school = colony.getBuilding(schoolType);
 
         // these can never teach
@@ -186,6 +200,9 @@ public class BuildingTest extends FreeColTestCase {
         school.remove(farmer);
 
         school.upgrade();
+        
+        assertEquals(school.getType().getName(), school.getType(), spec().getBuildingType("model.building.University"));
+        
         // these can never teach
         assertFalse("able to add free colonist to University",
                     school.canAdd(colonist));

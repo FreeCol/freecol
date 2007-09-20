@@ -34,7 +34,7 @@ public class MapTest extends FreeColTestCase {
 
 		for (int x = 0; x < 10; x++) {
 			for (int y = 0; y < 15; y++) {
-				tiles.get(x).add(new Tile(game, Tile.PLAINS, x, y));
+				tiles.get(x).add(new Tile(game, spec().getTileType("model.tile.plains"), x, y));
 			}
 		}
 
@@ -45,7 +45,7 @@ public class MapTest extends FreeColTestCase {
 
 		for (int x = 0; x < 10; x++) {
 			for (int y = 0; y < 15; y++) {
-				assertEquals(Tile.PLAINS, map.getTile(x, y).getType());
+				assertEquals(spec().getTileType("model.tile.plains"), map.getTile(x, y).getType());
 			}
 		}
 	}
@@ -61,7 +61,7 @@ public class MapTest extends FreeColTestCase {
 
 		for (int x = 0; x < 10; x++) {
 			for (int y = 0; y < 15; y++) {
-				tiles.get(x).add(new Tile(game, Tile.PLAINS, x, y));
+				tiles.get(x).add(new Tile(game, spec().getTileType("model.tile.plains"), x, y));
 			}
 		}
 
@@ -124,7 +124,7 @@ public class MapTest extends FreeColTestCase {
         
 		for (int x = 0; x < 5; x++) {
 			for (int y = 0; y < 6; y++) {
-                Tile tile = new Tile(game, Tile.PLAINS, x, y);
+                Tile tile = new Tile(game, spec().getTileType("model.tile.plains"), x, y);
 				tiles.get(x).add(tile);
                 allTiles.add(tile);
 				positions.add(new Position(x, y));
@@ -159,7 +159,7 @@ public class MapTest extends FreeColTestCase {
 
 		for (int x = 0; x < 10; x++) {
 			for (int y = 0; y < 15; y++) {
-				tiles.get(x).add(new Tile(game, Tile.PLAINS, x, y));
+				tiles.get(x).add(new Tile(game, spec().getTileType("model.tile.plains"), x, y));
 			}
 		}
 

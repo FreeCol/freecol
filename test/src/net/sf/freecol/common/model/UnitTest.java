@@ -18,13 +18,13 @@ public class UnitTest extends FreeColTestCase {
     public void testDoAssignedWorkHardyPioneerPlowPlain() {
 
         Game game = getStandardGame();
-        Player dutch = game.getPlayer(Player.DUTCH);
-        Map map = getTestMap(Tile.PLAINS);
+        Player dutch = game.getPlayer("model.nation.dutch");
+        Map map = getTestMap(spec().getTileType("model.tile.plains"));
         game.setMap(map);
         Tile plain = map.getTile(5, 8);
         map.getTile(5, 8).setExploredBy(dutch, true);
 
-        Unit hardyPioneer = new Unit(game, plain, dutch, Unit.HARDY_PIONEER, Unit.ACTIVE, false, false, 100, false);
+        Unit hardyPioneer = new Unit(game, plain, dutch, spec().getUnitType("model.unit.hardyPioneer"), Unit.ACTIVE, false, false, 100, false);
 
         // Before
         assertEquals(3, hardyPioneer.getMovesLeft());
@@ -32,8 +32,15 @@ public class UnitTest extends FreeColTestCase {
         assertEquals(-1, hardyPioneer.getWorkLeft());
         assertEquals(100, hardyPioneer.getNumberOfTools());
         assertEquals(false, plain.isPlowed());
-
-        hardyPioneer.setState(Unit.PLOW);
+        
+        TileImprovementType plow = spec().getTileImprovementType("model.improvement.Plow");
+        assertNotNull(plow);
+        
+        // How are improvements done?
+        TileImprovement plainPlow = plain.findTileImprovementType(plow);
+        assertNotNull(plainPlow);
+        
+        hardyPioneer.work(plainPlow);
 
         assertEquals(0, hardyPioneer.getMovesLeft());
         assertEquals(1, hardyPioneer.getWorkLeft());
@@ -63,15 +70,15 @@ public class UnitTest extends FreeColTestCase {
     public void testColonyProfitFromEnhancement() {
 
         Game game = getStandardGame();
-        Player dutch = game.getPlayer(Player.DUTCH);
-        Map map = getTestMap(Tile.PLAINS);
+        Player dutch = game.getPlayer("model.nation.dutch");
+        Map map = getTestMap(spec().getTileType("model.tile.plains"));
         game.setMap(map);
         map.getTile(5, 8).setExploredBy(dutch, true);
         map.getTile(6, 8).setExploredBy(dutch, true);
         Tile plain58 = map.getTile(5, 8);
 
         // Found colony on 6,8
-        Unit soldier = new Unit(game, map.getTile(6, 8), dutch, Unit.VETERAN_SOLDIER, Unit.ACTIVE, true, false, 0,
+        Unit soldier = new Unit(game, map.getTile(6, 8), dutch, spec().getUnitType("model.unit.veteranSoldier"), Unit.ACTIVE, true, false, 0,
                 false);
 
         Colony colony = new Colony(game, dutch, "New Amsterdam", soldier.getTile());
@@ -80,7 +87,7 @@ public class UnitTest extends FreeColTestCase {
 
         soldier.setLocation(colony.getColonyTile(plain58));
 
-        Unit hardyPioneer = new Unit(game, plain58, dutch, Unit.HARDY_PIONEER, Unit.ACTIVE, false, false, 100, false);
+        Unit hardyPioneer = new Unit(game, plain58, dutch, spec().getUnitType("model.unit.hardyPioneer"), Unit.ACTIVE, false, false, 100, false);
 
         // Before
         assertEquals(0, colony.getGoodsCount(Goods.FOOD));
@@ -128,13 +135,13 @@ public class UnitTest extends FreeColTestCase {
     public void testDoAssignedWorkHardyPioneerBuildRoad() {
 
         Game game = getStandardGame();
-        Player dutch = game.getPlayer(Player.DUTCH);
-        Map map = getTestMap(Tile.PLAINS);
+        Player dutch = game.getPlayer("model.nation.dutch");
+        Map map = getTestMap(spec().getTileType("model.tile.plains"));
         game.setMap(map);
         Tile plain = map.getTile(5, 8);
         map.getTile(5, 8).setExploredBy(dutch, true);
 
-        Unit hardyPioneer = new Unit(game, plain, dutch, Unit.HARDY_PIONEER, Unit.ACTIVE, false, false, 100, false);
+        Unit hardyPioneer = new Unit(game, plain, dutch, spec().getUnitType("model.unit.hardyPioneer"), Unit.ACTIVE, false, false, 100, false);
 
         // Before
         assertEquals(3, hardyPioneer.getMovesLeft());
@@ -162,11 +169,11 @@ public class UnitTest extends FreeColTestCase {
         assertEquals(80, hardyPioneer.getNumberOfTools());
     }
 
-    public static int getWorkLeftForPioneerWork(int unitType, int tileType, boolean forrest, int whichWork, int addition) {
+    public static int getWorkLeftForPioneerWork(UnitType unitType, TileType tileType, boolean forrest, int whichWork, int addition) {
 
         Game game = getStandardGame();
 
-        Player dutch = game.getPlayer(Player.DUTCH);
+        Player dutch = game.getPlayer("model.nation.dutch");
 
         Tile tile = new Tile(game, tileType, 0, 0);
         tile.setAddition(addition);
@@ -185,6 +192,25 @@ public class UnitTest extends FreeColTestCase {
      * 
      */
     public void testDoAssignedWorkAmateurAndHardyPioneer() {
+    	
+    	TileType plains = spec().getTileType("model.tile.plains");
+        TileType desert = spec().getTileType("model.tile.desert");
+        TileType grassland = spec().getTileType("model.tile.grassland");
+        TileType prairie = spec().getTileType("model.tile.prairie");
+        TileType tundra = spec().getTileType("model.tile.tundra");
+        TileType savannah = spec().getTileType("model.tile.savannah");
+        TileType marsh = spec().getTileType("model.tile.marsh");
+        TileType swamp = spec().getTileType("model.tile.swamp");
+        TileType arctic = spec().getTileType("model.tile.arctic");
+        
+        TileType plainsForest = spec().getTileType("model.tile.mixedForest");
+        TileType desertForest = spec().getTileType("model.tile.scrubForest");
+        TileType grasslandForest = spec().getTileType("model.tile.coniferForest");
+        TileType prairieForest = spec().getTileType("model.tile.broadleafForest");
+        TileType tundraForest = spec().getTileType("model.tile.borealForest");
+        TileType savannahForest = spec().getTileType("model.tile.tropicalForest");
+        TileType marshForest = spec().getTileType("model.tile.wetlandForest");
+        TileType swampForest = spec().getTileType("model.tile.rainForest");
         
         { // Savanna
             assertEquals(7,
@@ -223,18 +249,18 @@ public class UnitTest extends FreeColTestCase {
         }
 
         { // Plains
-            assertEquals(5, getWorkLeftForPioneerWork(Unit.FREE_COLONIST, Tile.PLAINS, true, Unit.PLOW, Tile.ADD_NONE));
-            assertEquals(3, getWorkLeftForPioneerWork(Unit.FREE_COLONIST, Tile.PLAINS, true, Unit.BUILD_ROAD,
+            assertEquals(5, getWorkLeftForPioneerWork(Unit.FREE_COLONIST, spec().getTileType("model.tile.plains"), true, Unit.PLOW, Tile.ADD_NONE));
+            assertEquals(3, getWorkLeftForPioneerWork(Unit.FREE_COLONIST, spec().getTileType("model.tile.plains"), true, Unit.BUILD_ROAD,
                     Tile.ADD_NONE));
-            assertEquals(4, getWorkLeftForPioneerWork(Unit.FREE_COLONIST, Tile.PLAINS, false, Unit.PLOW, Tile.ADD_NONE));
-            assertEquals(2, getWorkLeftForPioneerWork(Unit.FREE_COLONIST, Tile.PLAINS, false, Unit.BUILD_ROAD,
+            assertEquals(4, getWorkLeftForPioneerWork(Unit.FREE_COLONIST, spec().getTileType("model.tile.plains"), false, Unit.PLOW, Tile.ADD_NONE));
+            assertEquals(2, getWorkLeftForPioneerWork(Unit.FREE_COLONIST, spec().getTileType("model.tile.plains"), false, Unit.BUILD_ROAD,
                     Tile.ADD_NONE));
 
-            assertEquals(2, getWorkLeftForPioneerWork(Unit.HARDY_PIONEER, Tile.PLAINS, true, Unit.PLOW, Tile.ADD_NONE));
-            assertEquals(1, getWorkLeftForPioneerWork(Unit.HARDY_PIONEER, Tile.PLAINS, true, Unit.BUILD_ROAD,
+            assertEquals(2, getWorkLeftForPioneerWork(Unit.HARDY_PIONEER, spec().getTileType("model.tile.plains"), true, Unit.PLOW, Tile.ADD_NONE));
+            assertEquals(1, getWorkLeftForPioneerWork(Unit.HARDY_PIONEER, spec().getTileType("model.tile.plains"), true, Unit.BUILD_ROAD,
                     Tile.ADD_NONE));
-            assertEquals(1, getWorkLeftForPioneerWork(Unit.HARDY_PIONEER, Tile.PLAINS, false, Unit.PLOW, Tile.ADD_NONE));
-            assertEquals(-1, getWorkLeftForPioneerWork(Unit.HARDY_PIONEER, Tile.PLAINS, false, Unit.BUILD_ROAD,
+            assertEquals(1, getWorkLeftForPioneerWork(Unit.HARDY_PIONEER, spec().getTileType("model.tile.plains"), false, Unit.PLOW, Tile.ADD_NONE));
+            assertEquals(-1, getWorkLeftForPioneerWork(Unit.HARDY_PIONEER, spec().getTileType("model.tile.plains"), false, Unit.BUILD_ROAD,
                     Tile.ADD_NONE));
         }
 
@@ -308,8 +334,8 @@ public class UnitTest extends FreeColTestCase {
      */
     public void testBuildColonySameTile() {
         Game game = getStandardGame();
-        Player dutch = game.getPlayer(Player.DUTCH);
-        Map map = getTestMap(Tile.PLAINS, true);
+        Player dutch = game.getPlayer("model.nation.dutch");
+        Map map = getTestMap(spec().getTileType("model.tile.plains"), true);
         game.setMap(map);
 
         Unit soldier = new Unit(game, map.getTile(6, 8), dutch, Unit.VETERAN_SOLDIER, Unit.ACTIVE, true, false, 0,

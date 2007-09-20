@@ -11,6 +11,7 @@ import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.TradeRoute;
 import net.sf.freecol.common.model.Unit;
+import net.sf.freecol.common.model.UnitType;
 
 public class MockModelController implements ModelController {
 
@@ -61,6 +62,12 @@ public class MockModelController implements ModelController {
 	 */
 	public boolean shouldCallNewTurn(FreeColGameObject freeColGameObject) {
 		return true;
+	}
+
+	public Unit createUnit(String taskID, Location location, Player owner,
+		UnitType type) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }

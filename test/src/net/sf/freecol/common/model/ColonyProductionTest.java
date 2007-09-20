@@ -2,31 +2,16 @@ package net.sf.freecol.common.model;
 
 import java.util.Vector;
 
-import junit.framework.TestCase;
-
 import net.sf.freecol.FreeCol;
-import net.sf.freecol.util.test.MockModelController;
+import net.sf.freecol.util.test.FreeColTestCase;
 
-public class ColonyProductionTest extends TestCase {
-
-    public static Game getStandardGame() {
-        Game game = new Game(new MockModelController());
-        
-        Vector<Player> players = new Vector<Player>();
-        
-        for (int i = 0; i < Player.NUMBER_OF_NATIONS; i++) {
-            Player p = new Player(game, String.valueOf(i), false, i);
-            game.addPlayer(p);
-            players.add(p);
-        }
-        return game;
-    }
+public class ColonyProductionTest extends FreeColTestCase {
 
     public void testProductionOne() {
 
         Game game = getStandardGame();
 
-        Player dutch = game.getPlayer(Player.DUTCH);
+        Player dutch = game.getPlayer("model.nation.dutch");
 
         Vector<Vector<Tile>> tiles = new Vector<Vector<Tile>>(10);
 
@@ -63,15 +48,17 @@ public class ColonyProductionTest extends TestCase {
 
             assertEquals(colony, colony.getTile().getSettlement());
 
-            assertEquals(dutch.getNation(), colony.getTile().getNationOwner());
+            assertEquals(dutch, colony.getTile().getOwner());
 
             // Should have 50 Muskets and nothing else
-            GoodsType muskets = FreeCol.getSpecification().getGoodsType("model.goods.muskets");
-            for (int i = 0; i < Goods.NUMBER_OF_TYPES; i++) {
-                if (FreeCol.getSpecification().getGoodsType(i) == muskets)
-                    assertEquals(50, colony.getGoodsCount(i));
+            GoodsType muskets = FreeCol.getSpecification().getGoodsType("model.goods.Muskets");
+            assertNotNull(muskets);
+            
+            for (GoodsType type : FreeCol.getSpecification().getGoodsTypeList()){
+                if (type == muskets)
+                    assertEquals(50, colony.getGoodsCount(type));
                 else
-                    assertEquals(0, colony.getGoodsCount(i));
+                    assertEquals(type.getName(), 0, colony.getGoodsCount(type));
             }
         }
 
@@ -79,7 +66,7 @@ public class ColonyProductionTest extends TestCase {
             // Soldier should be working on the field with the bonus
             assertEquals(Goods.FOOD, soldier.getWorkType());
 
-            assertEquals(colony.getColonyTile(map.getTile(5,8)), soldier.getLocation());
+            assertEquals(colony.getColonyTile(map.getTile(5,8)).getTile(), soldier.getLocation().getTile());
 
             assertEquals(0, soldier.getMovesLeft());
 

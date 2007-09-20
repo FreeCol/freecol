@@ -19,9 +19,9 @@ public class SchoolTest extends FreeColTestCase {
 
     private void trainForTurns(Colony colony, int requiredTurns, int unitType) {
         for (int turn = 0; turn < requiredTurns; turn++) {
-            assertEquals("wrong number of units in turn " + turn + ": " + Unit.getName(unitType),
+            assertEquals("wrong number of units in turn " + turn + ": " + unitType,
                          1, colony.getUnitList(unitType).size());
-            colony.getBuilding(Building.SCHOOLHOUSE).newTurn();
+            colony.getBuilding(spec().getBuildingType("model.building.Schoolhouse")).newTurn();
         }
     }
 
@@ -47,8 +47,8 @@ public class SchoolTest extends FreeColTestCase {
         Unit ore = units.next();
         ore.setType(Unit.EXPERT_ORE_MINER);
 
-        Building school = colony.getBuilding(Building.SCHOOLHOUSE);
-        school.setLevel(Building.HOUSE);
+        Building school = colony.getBuilding(spec().getBuildingType("model.building.Schoolhouse"));
+        school.upgrade();
 
         ore.setLocation(school);
         trainForTurns(colony, ore.getNeededTurnsOfTraining());
@@ -67,8 +67,9 @@ public class SchoolTest extends FreeColTestCase {
         Unit blackSmith = units.next();
         blackSmith.setType(Unit.MASTER_BLACKSMITH);
 
-        Building school = colony.getBuilding(Building.SCHOOLHOUSE);
-        school.setLevel(Building.SHOP);
+        Building school = colony.getBuilding(spec().getBuildingType("model.building.Schoolhouse"));
+        school.upgrade();
+        school.upgrade();
 
         blackSmith.setLocation(school);
         trainForTurns(colony, blackSmith.getNeededTurnsOfTraining());
@@ -87,8 +88,10 @@ public class SchoolTest extends FreeColTestCase {
         Unit elder = units.next();
         elder.setType(Unit.ELDER_STATESMAN);
 
-        Building school = colony.getBuilding(Building.SCHOOLHOUSE);
-        school.setLevel(Building.FACTORY);
+        Building school = colony.getBuilding(spec().getBuildingType("model.building.Schoolhouse"));
+        school.upgrade();
+        school.upgrade();
+        school.upgrade();
 
         elder.setLocation(school);
         trainForTurns(colony, elder.getNeededTurnsOfTraining());
@@ -152,8 +155,9 @@ public class SchoolTest extends FreeColTestCase {
         ore.setType(Unit.EXPERT_ORE_MINER);
 
         // Build a college...
-        Building school = colony.getBuilding(Building.SCHOOLHOUSE);
-        school.setLevel(Building.SHOP);
+        Building school = colony.getBuilding(spec().getBuildingType("model.building.Schoolhouse"));
+        school.upgrade();
+        school.upgrade();
 
         blacksmith.setLocation(school);
         lumberjack.setLocation(school);
@@ -227,9 +231,9 @@ public class SchoolTest extends FreeColTestCase {
         Unit ore = units.next();
         ore.setType(Unit.EXPERT_ORE_MINER);
 
-        Building school = colony.getBuilding(Building.SCHOOLHOUSE);
+        Building school = colony.getBuilding(spec().getBuildingType("model.building.Schoolhouse"));
 
-        school.setLevel(Building.FACTORY);
+        school.upgrade();school.upgrade();school.upgrade();
 
         black.setLocation(school);
         ore.setLocation(school);
@@ -293,9 +297,9 @@ public class SchoolTest extends FreeColTestCase {
         Unit ore = units.next();
         ore.setType(Unit.EXPERT_ORE_MINER);
 
-        Building school = colony.getBuilding(Building.SCHOOLHOUSE);
+        Building school = colony.getBuilding(spec().getBuildingType("model.building.Schoolhouse"));
 
-        school.setLevel(Building.SHOP);
+        school.upgrade();school.upgrade();
 
         // It should take 4 turns to train an expert lumber jack and 6 to train
         // a blacksmith
@@ -329,9 +333,9 @@ public class SchoolTest extends FreeColTestCase {
         Unit lumberjack2 = units.next();
         lumberjack2.setType(Unit.EXPERT_LUMBER_JACK);
 
-        Building school = colony.getBuilding(Building.SCHOOLHOUSE);
+        Building school = colony.getBuilding(spec().getBuildingType("model.building.Schoolhouse"));
 
-        school.setLevel(Building.SHOP);
+        school.upgrade();school.upgrade();
 
         lumberjack1.setLocation(school);
         lumberjack2.setLocation(school);
@@ -366,9 +370,9 @@ public class SchoolTest extends FreeColTestCase {
         Unit ore = units.next();
         ore.setType(Unit.EXPERT_ORE_MINER);
 
-        Building school = colony.getBuilding(Building.SCHOOLHOUSE);
+        Building school = colony.getBuilding(spec().getBuildingType("model.building.Schoolhouse"));
 
-        school.setLevel(Building.SHOP);
+        school.upgrade();school.upgrade();
 
         // It should take 3 turns to train an expert lumber jack and also 3 to
         // train a ore miner
@@ -415,8 +419,8 @@ public class SchoolTest extends FreeColTestCase {
         Unit teacher = units.next();
         teacher.setType(Unit.EXPERT_ORE_MINER);
 
-        Building school = colony.getBuilding(Building.SCHOOLHOUSE);
-        school.setLevel(Building.SHOP);
+        Building school = colony.getBuilding(spec().getBuildingType("model.building.Schoolhouse"));
+        school.upgrade();school.upgrade();
 
         teacher.setLocation(school);
 
@@ -441,8 +445,8 @@ public class SchoolTest extends FreeColTestCase {
         Unit teacher = units.next();
         teacher.setType(Unit.MASTER_BLACKSMITH);
 
-        Building school = colony.getBuilding(Building.SCHOOLHOUSE);
-        school.setLevel(Building.SHOP);
+        Building school = colony.getBuilding(spec().getBuildingType("model.building.Schoolhouse"));
+        school.upgrade();school.upgrade();
 
         teacher.setLocation(school);
 
@@ -467,8 +471,8 @@ public class SchoolTest extends FreeColTestCase {
         //teacher.setType(Unit.EXPERT_ORE_MINER);
         teacher.setType(Unit.MASTER_BLACKSMITH);
 
-        Building school = colony.getBuilding(Building.SCHOOLHOUSE);
-        school.setLevel(Building.SHOP);
+        Building school = colony.getBuilding(spec().getBuildingType("model.building.Schoolhouse"));
+        school.upgrade();school.upgrade();
 
         teacher.setLocation(school);
         assertEquals(teacher.getNeededTurnsOfTraining(), 4);
@@ -496,8 +500,8 @@ public class SchoolTest extends FreeColTestCase {
         Unit teacher = units.next();
         teacher.setType(Unit.EXPERT_ORE_MINER);
 
-        Building school = colony.getBuilding(Building.SCHOOLHOUSE);
-        school.setLevel(Building.SHOP);
+        Building school = colony.getBuilding(spec().getBuildingType("model.building.Schoolhouse"));
+        school.upgrade();school.upgrade();
         teacher.setLocation(school);
 
         // Train to become free colonist
@@ -531,8 +535,8 @@ public class SchoolTest extends FreeColTestCase {
         Unit teacher2 = units.next();
         teacher2.setType(Unit.MASTER_CARPENTER);
 
-        Building school = colony.getBuilding(Building.SCHOOLHOUSE);
-        school.setLevel(Building.SHOP);
+        Building school = colony.getBuilding(spec().getBuildingType("model.building.Schoolhouse"));
+        school.upgrade();school.upgrade();
         
         // The ore miner is set in the school before the carpenter (note: the
         // carpenter is the only master of skill level 1).
@@ -625,8 +629,8 @@ public class SchoolTest extends FreeColTestCase {
         Unit teacher2 = units.next();
         teacher2.setType(Unit.MASTER_CARPENTER);
 
-        Building school = colony.getBuilding(Building.SCHOOLHOUSE);
-        school.setLevel(Building.SHOP);
+        Building school = colony.getBuilding(spec().getBuildingType("model.building.Schoolhouse"));
+        school.upgrade();school.upgrade();
 
         // First we let the teacher1 train for 3 turns
         teacher1.setLocation(school);
@@ -674,8 +678,8 @@ public class SchoolTest extends FreeColTestCase {
         Unit teacher2 = units.next();
         teacher2.setType(Unit.MASTER_CARPENTER);
 
-        Building school = colony.getBuilding(Building.SCHOOLHOUSE);
-        school.setLevel(Building.SHOP);
+        Building school = colony.getBuilding(spec().getBuildingType("model.building.Schoolhouse"));
+        school.upgrade();school.upgrade();
         
         // The ore miner is set in the school before the carpenter (note: the
         // carpenter is the only master of skill level 1).
@@ -753,8 +757,8 @@ public class SchoolTest extends FreeColTestCase {
         Unit lumberjack = units.next();
         lumberjack.setType(Unit.EXPERT_LUMBER_JACK);
 
-        Building school = colony.getBuilding(Building.SCHOOLHOUSE);
-        school.setLevel(Building.SHOP);
+        Building school = colony.getBuilding(spec().getBuildingType("model.building.Schoolhouse"));
+        school.upgrade();school.upgrade();
 
         lumberjack.setLocation(school);
         trainForTurns(colony, lumberjack.getNeededTurnsOfTraining());
@@ -783,8 +787,8 @@ public class SchoolTest extends FreeColTestCase {
         Unit miner = units.next();
         miner.setType(Unit.EXPERT_ORE_MINER);
 
-        Building school = colony.getBuilding(Building.SCHOOLHOUSE);
-        school.setLevel(Building.HOUSE);
+        Building school = colony.getBuilding(spec().getBuildingType("model.building.Schoolhouse"));
+        school.upgrade();school.upgrade();
 
         // Put LumberJack in School
         lumberjack.setLocation(school);
@@ -805,8 +809,8 @@ public class SchoolTest extends FreeColTestCase {
      */
     public void testTeachingOrder() {
         Colony colony = getStandardColony(4);
-        Building school = colony.getBuilding(Building.SCHOOLHOUSE);
-        school.setLevel(Building.SHOP);
+        Building school = colony.getBuilding(spec().getBuildingType("model.building.Schoolhouse"));
+        school.upgrade();school.upgrade();
 
         Iterator<Unit> units = colony.getUnitIterator();
 
@@ -858,8 +862,8 @@ public class SchoolTest extends FreeColTestCase {
      */
     public void testTeachingDoublePromotion() {
         Colony colony = getStandardColony(4);
-        Building school = colony.getBuilding(Building.SCHOOLHOUSE);
-        school.setLevel(Building.SHOP);
+        Building school = colony.getBuilding(spec().getBuildingType("model.building.Schoolhouse"));
+        school.upgrade();school.upgrade();
 
         Iterator<Unit> units = colony.getUnitIterator();
 
