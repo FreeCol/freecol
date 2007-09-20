@@ -21,7 +21,6 @@ public class AllTests {
 		suite.addTestSuite(MapTest.class);
 		suite.addTestSuite(TileTest.class);
 		suite.addTestSuite(ColonyProductionTest.class);
-		suite.addTest(AllTests.suite());
 		suite.addTestSuite(UnitTest.class);
 		suite.addTestSuite(ModelMessageTest.class);
 		suite.addTestSuite(PlayerTest.class);
