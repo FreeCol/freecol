@@ -415,8 +415,8 @@ public class ColonyTile extends FreeColGameObject implements WorkLocation, Ownab
             produceGoodsCenterTile();
         } else if (getUnit() != null && !isOccupied()) {
             produceGoods();
+            workTile.expendResource(getUnit().getWorkType(), colony);
         }
-        workTile.expendResource(getUnit().getWorkType(), colony);
     }
 
     private void produceGoods() {
@@ -484,7 +484,7 @@ public class ColonyTile extends FreeColGameObject implements WorkLocation, Ownab
                 return 0;
             }
 
-            production = getUnit().getProductionOf(goodsType, workTile.potential(goodsType));
+            production = unit.getProductionOf(goodsType, workTile.potential(goodsType));
         } else if (goodsType.isFoodType() || goodsType == workTile.secondaryGoods()) {
             production = workTile.potential(goodsType);
         }
