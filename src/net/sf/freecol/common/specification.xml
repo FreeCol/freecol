@@ -27,28 +27,28 @@
     <goods-type id="model.goods.Silver" art="goods/silver.png" is-farmed="true">
       <market initial-amount="500"   initial-price="16" price-difference="1"/>
     </goods-type>
-    <goods-type id="model.goods.Horses" art="goods/horses.png" is-farmed="false" made-from="food">
+    <goods-type id="model.goods.Horses" art="goods/horses.png" is-farmed="false" made-from="model.goods.Food">
       <market initial-amount="1000"  initial-price="1"  price-difference="1"/>
     </goods-type>
-    <goods-type id="model.goods.Rum" art="goods/rum.png" is-farmed="false" made-from="sugar">
+    <goods-type id="model.goods.Rum" art="goods/rum.png" is-farmed="false" made-from="model.goods.Sugar">
       <market initial-amount="1000"  initial-price="10" price-difference="1"/>
     </goods-type>
-    <goods-type id="model.goods.Cigars" art="goods/cigars.png" is-farmed="false" made-from="tobacco">
+    <goods-type id="model.goods.Cigars" art="goods/cigars.png" is-farmed="false" made-from="model.goods.Tobacco">
       <market initial-amount="1000"  initial-price="10" price-difference="1"/>
     </goods-type>
-    <goods-type id="model.goods.Cloth" art="goods/cloth.png" is-farmed="false" made-from="cotton">
+    <goods-type id="model.goods.Cloth" art="goods/cloth.png" is-farmed="false" made-from="model.goods.Cotton">
       <market initial-amount="1000"  initial-price="10" price-difference="1"/>
     </goods-type>
-    <goods-type id="model.goods.Coats" art="goods/coats.png" is-farmed="false" made-from="furs">
+    <goods-type id="model.goods.Coats" art="goods/coats.png" is-farmed="false" made-from="model.goods.Furs">
       <market initial-amount="1000"  initial-price="10" price-difference="1"/>
     </goods-type>
     <goods-type id="model.goods.TradeGoods" art="goods/tradeGoods.png" is-farmed="false">
       <market initial-amount="1000"  initial-price="1"  price-difference="1"/>
     </goods-type>
-    <goods-type id="model.goods.Tools" art="goods/tools.png" is-farmed="false" made-from="ore">
+    <goods-type id="model.goods.Tools" art="goods/tools.png" is-farmed="false" made-from="model.goods.Ore">
       <market initial-amount="500"   initial-price="1"  price-difference="1"/>
     </goods-type>
-    <goods-type id="model.goods.Muskets" art="goods/muskets.png" is-farmed="false" made-from="tools">
+    <goods-type id="model.goods.Muskets" art="goods/muskets.png" is-farmed="false" made-from="model.goods.Tools">
       <market initial-amount="500"   initial-price="1"  price-difference="1"/>
     </goods-type>
     <goods-type id="model.goods.Fish" art="goods/fish.png" is-farmed="true" storable="false" stored-as="model.goods.food" is-food="true" />
@@ -1116,6 +1116,7 @@
     <nation id="model.nation.frenchREF" color="#0000ff" nation-type="model.nationType.ref" ref-of="model.nation.french"/>
     <nation id="model.nation.englishREF" color="#ff0000" nation-type="model.nationType.ref" ref-of="model.nation.english"/>
     <nation id="model.nation.spanishREF" color="#ffff00" nation-type="model.nationType.ref" ref-of="model.nation.spanish"/>
+<!-- 
     <nation id="model.nation.portuguese" color="#00ffff" nation-type="model.nationType.conquest" selectable="true"/>
     <nation id="model.nation.swedish" color="#00ffff" nation-type="model.nationType.cooperation" selectable="true"/>
     <nation id="model.nation.danish" color="#00ffff" nation-type="model.nationType.trade" selectable="true"/>
@@ -1124,6 +1125,7 @@
     <nation id="model.nation.swedishREF" color="#00ffff" nation-type="model.nationType.ref" ref-of="model.nation.swedish"/>
     <nation id="model.nation.danishREF" color="#00ffff" nation-type="model.nationType.ref" ref-of="model.nation.italian"/>
     <nation id="model.nation.russianREF" color="#00ffff" nation-type="model.nationType.ref" ref-of="model.nation.irish"/>
+ -->
   </nations>
 
 </freecol-specification>
