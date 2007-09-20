@@ -272,7 +272,7 @@ public final class Building extends FreeColGameObject implements Abilities, Work
         }
          */
 
-        if (next.getPopulationRequired() > colony.getUnitCount()) {
+        if (colony.getUnitCount() < next.getPopulationRequired()) {
             return false;
         }
 
