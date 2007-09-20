@@ -1919,7 +1919,15 @@ break;
 
         if (getColony() != null) {
             playerExploredTiles[nation].setColonyUnitCount(getSettlement().getUnitCount());
-            playerExploredTiles[nation].setColonyStockadeLevel(getColony().getStockade().getType().getIndex());
+            
+            // TODO stockade may now be null, but is 0 the right way to set this?
+            // This might as well be a mistake in the spec.
+            Building stockade = getColony().getStockade();
+            if (stockade != null){
+            	playerExploredTiles[nation].setColonyStockadeLevel(stockade.getType().getIndex());
+            } else {
+            	playerExploredTiles[nation].setColonyStockadeLevel(0);
+            }
         } else if (getSettlement() != null) {
             playerExploredTiles[nation].setMissionary(((IndianSettlement) getSettlement()).getMissionary());
 
