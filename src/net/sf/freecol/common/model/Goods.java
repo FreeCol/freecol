@@ -68,7 +68,7 @@ public class Goods extends FreeColObject implements Locatable, Ownable, Named {
 
     /**
      * Creates a standard <code>Goods</code>-instance given the place where
-     * the goods .
+     * the goods is.
      * 
      * This constructor only asserts that the game and 
      * that the location (if given) can store goods. The goods will not
