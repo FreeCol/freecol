@@ -4,7 +4,7 @@ package net.sf.freecol.client.gui.panel;
 import java.awt.Color;
 import java.awt.Component;
 import java.util.List;
-import java.util.Vector;
+//import java.util.Vector;
 
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
@@ -27,6 +27,7 @@ public final class NationCellRenderer implements TableCellRenderer {
     public static final String  LICENSE = "http://www.gnu.org/licenses/gpl.html";
     public static final String  REVISION = "$Revision$";
 
+    /*
     private static Vector<Nation> classicNations = 
         new Vector<Nation>(FreeCol.getSpecification().getClassicNations());
     private static final JComboBox classicNationsComboBox = new JComboBox(classicNations);
@@ -34,15 +35,20 @@ public final class NationCellRenderer implements TableCellRenderer {
     private static Vector<Nation> europeanNations = 
         new Vector<Nation>(FreeCol.getSpecification().getEuropeanNations());
     private static final JComboBox europeanNationsComboBox = new JComboBox(europeanNations);
+    */
 
+    private final Nation[] nations;
+    private final JComboBox comboBox;
     private List<Player> players;
     private Player thisPlayer;
-    private boolean additionalNations;
+    //private boolean additionalNations;
 
     /**
     * The default constructor.
     */
-    public NationCellRenderer() {
+    public NationCellRenderer(Nation[] nations) {
+        this.nations = nations;
+        this.comboBox = new JComboBox(nations);
     }
 
 
@@ -52,10 +58,11 @@ public final class NationCellRenderer implements TableCellRenderer {
     * @param players The players that should be rendered in the table.
     * @param owningPlayer The player running the client that is displaying the table.
     */
-    public void setData(List<Player> players, Player owningPlayer, boolean additionalNations) {
+    public void setData(List<Player> players, Player owningPlayer) {
+        //, boolean additionalNations) {
         this.players = players;
         thisPlayer = owningPlayer;
-        this.additionalNations = additionalNations;
+        //this.additionalNations = additionalNations;
     }
 
     private Player getPlayer(int i) {
@@ -84,20 +91,28 @@ public final class NationCellRenderer implements TableCellRenderer {
 
         Component component;
         if (player == thisPlayer) {
+            /*
             Vector<Nation> nations;
+            JComboBox comboBox;
             if (additionalNations) {
                 nations = europeanNations;
-                component = europeanNationsComboBox;
+                comboBox = europeanNationsComboBox;
+                System.out.println("size is " + comboBox.getItemCount());
+                for (int index = 0; index < comboBox.getItemCount(); index++) {
+                    System.out.println(comboBox.getItemAt(index));
+                }
             } else {
                 nations = classicNations;
-                component = classicNationsComboBox;
+                comboBox = classicNationsComboBox;
             }
-            for (int index = 0; index < nations.size(); index++) {
-                if (nations.get(index).getID().equals(player.getNationID())) {
-                    ((JComboBox) component).setSelectedIndex(index);
+            */
+            for (int index = 0; index < nations.length; index++) {
+                if (nations[index].getID().equals(player.getNationID())) {
+                    comboBox.setSelectedIndex(index);
                     break;
                 }
             }
+            component = comboBox;
         } else {
             component = new JLabel(player.getNationAsString());
         }

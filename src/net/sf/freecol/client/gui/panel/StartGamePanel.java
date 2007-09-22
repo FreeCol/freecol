@@ -8,8 +8,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 
+import javax.swing.DefaultCellEditor;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
+import javax.swing.JComboBox;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextArea;
@@ -193,13 +195,20 @@ public final class StartGamePanel extends FreeColPanel implements ActionListener
 
         this.advantages = advantages;
 
+        Nation[] nations;
+        if (additionalNations) {
+            nations = FreeCol.getSpecification().getEuropeanNations().toArray(new Nation[] {});
+        } else {
+            nations = FreeCol.getSpecification().getClassicNations().toArray(new Nation[] {});
+        }
+
         tableModel.setData(game.getPlayers(), thisPlayer, advantages);
 
         TableColumn nationsColumn = table.getColumnModel().getColumn(NATION_COLUMN);
-        nationsColumn.setCellEditor(new NationCellEditor());
-        nationsColumn.setCellRenderer(new NationCellRenderer());
+        nationsColumn.setCellEditor(new DefaultCellEditor(new JComboBox(nations)));
+        nationsColumn.setCellRenderer(new NationCellRenderer(nations));
         ((NationCellRenderer) table.getColumnModel().getColumn(NATION_COLUMN).getCellRenderer())
-        .setData(game.getPlayers(), thisPlayer, additionalNations);
+        .setData(game.getPlayers(), thisPlayer);
 
         TableColumn advantagesColumn = table.getColumnModel().getColumn(ADVANTAGE_COLUMN);
         if (advantages == AdvantageCellRenderer.SELECTABLE) {
@@ -500,7 +509,8 @@ class PlayersTableModel extends AbstractTableModel {
             // Column 0 can't be updated.
 
             if (column == StartGamePanel.NATION_COLUMN) {
-                Nation nation = FreeCol.getSpecification().getNation(((Integer) value).intValue());
+                //Nation nation = FreeCol.getSpecification().getNation(((Integer) value).intValue());
+                Nation nation = (Nation) value;
                 preGameController.setNation(nation);
                 preGameController.setColor(nation.getColor());
                 fireTableCellUpdated(row, StartGamePanel.COLOR_COLUMN);

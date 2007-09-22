@@ -243,12 +243,7 @@ public final class ConnectController {
                 boolean singleplayer = Boolean.valueOf(in.getAttributeValue(null, "singleplayer")).booleanValue();
                 boolean isCurrentPlayer = Boolean.valueOf(in.getAttributeValue(null, "isCurrentPlayer")).booleanValue();
                 additionalNations = Boolean.valueOf(in.getAttributeValue(null, "additionalNations")).booleanValue();
-                String advantageString = in.getAttributeValue(null, "advantages");
-                if (advantageString == null) {
-                    advantages = 0;
-                } else {
-                    advantages = Integer.parseInt(advantageString);
-                }
+                advantages = Integer.parseInt(in.getAttributeValue(null, "advantages"));
                 in.nextTag();
                 Game game = new Game(freeColClient.getModelController(), in, username);
                 Player thisPlayer = game.getPlayerByName(username);

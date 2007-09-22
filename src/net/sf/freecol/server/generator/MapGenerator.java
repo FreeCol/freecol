@@ -470,7 +470,7 @@ public class MapGenerator {
                 europeanPlayers.add(player);
             }
         }
-
+        int startingPositions = europeanPlayers.size();
         List<Integer> shipYPositions = new ArrayList<Integer>();
 
         for (Player player : europeanPlayers) {
@@ -478,7 +478,7 @@ public class MapGenerator {
 
             int y = random.nextInt(height - 20) + 10;
             int x = width - 1;
-            while (isAShipTooClose(map, y, europeanPlayers.size(), shipYPositions)) {
+            while (isAShipTooClose(map, y, startingPositions, shipYPositions)) {
                 y = random.nextInt(height - 20) + 10;
             }
             shipYPositions.add(new Integer(y));

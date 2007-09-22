@@ -1908,6 +1908,7 @@ break;
         if (playerExploredTiles[nation] == null) {
             logger.warning("'playerExploredTiles' for " + player.getName() + " is 'null'.");
             throw new IllegalStateException("'playerExploredTiles' for " + player.getName()
+                                            + " (index " + player.getIndex() + ") " 
                                             + " is 'null'. " + player.canSee(this) + ", "
                                             + isExploredBy(player) + " ::: " + getPosition());
         }

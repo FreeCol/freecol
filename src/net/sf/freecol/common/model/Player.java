@@ -41,9 +41,8 @@ public class Player extends FreeColGameObject implements Abilities, Nameable, Mo
     public static final String REVISION = "$Revision$";
 
     /**
-     * The number of players. At the moment, we have 16 players: 4
-     * Europeans + 4 REF + 8 native. In the future, we might wish to
-     * extend that to 8 Europeans (mainly for multi-player games).
+     * The number of players. At the moment, we have 24 players: 8
+     * Europeans + 8 REF + 8 native.
      */
     public static final int NUMBER_OF_PLAYERS = 24;
 

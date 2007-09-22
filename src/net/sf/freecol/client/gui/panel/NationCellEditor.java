@@ -1,12 +1,13 @@
 
 package net.sf.freecol.client.gui.panel;
 
-import java.util.Vector;
+//import java.util.Vector;
 
 import javax.swing.DefaultCellEditor;
 import javax.swing.JComboBox;
 
 import net.sf.freecol.FreeCol;
+import net.sf.freecol.common.model.Nation;
 import net.sf.freecol.common.model.Player;
 
 /**
@@ -22,11 +23,12 @@ public final class NationCellEditor extends DefaultCellEditor {
     /**
     * A standard constructor.
     */
-    public NationCellEditor() {
-        super(new JComboBox(new Vector(FreeCol.getSpecification().getClassicNations())));
+    public NationCellEditor(Nation[] nations) {
+        super(new JComboBox(nations));
     }
     
     public Object getCellEditorValue() {
-        return new Integer(((JComboBox) getComponent()).getSelectedIndex());
+        //return new Integer(((JComboBox) getComponent()).getSelectedIndex());
+        return ((JComboBox) getComponent()).getSelectedItem();
     }
 }
