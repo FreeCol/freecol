@@ -1128,8 +1128,8 @@
     <nation id="model.nation.russian" color="#ffffff" nation-type="model.nationType.immigration" selectable="true"/>
     <nation id="model.nation.portugueseREF" color="#00ff00" nation-type="model.nationType.ref" ref-of="model.nation.portuguese"/>
     <nation id="model.nation.swedishREF" color="#ff00ff" nation-type="model.nationType.ref" ref-of="model.nation.swedish"/>
-    <nation id="model.nation.danishREF" color="#00ffff" nation-type="model.nationType.ref" ref-of="model.nation.italian"/>
-    <nation id="model.nation.russianREF" color="#ffffff" nation-type="model.nationType.ref" ref-of="model.nation.irish"/>
+    <nation id="model.nation.danishREF" color="#00ffff" nation-type="model.nationType.ref" ref-of="model.nation.danish"/>
+    <nation id="model.nation.russianREF" color="#ffffff" nation-type="model.nationType.ref" ref-of="model.nation.russian"/>
   </nations>
 
 </freecol-specification>
