@@ -556,11 +556,17 @@ public class Player extends FreeColGameObject implements Abilities, Nameable, Mo
         setStance(getREFPlayer(), WAR);
         setTax(0);
         // Dispose all units in Europe.
-        // TODO: Create a ModelMessage.
         Iterator<Unit> it = europe.getUnitIterator();
+        String unitNames = "";
         while (it.hasNext()) {
             Unit u = it.next();
+            unitNames += ", " + u.getName();
             u.dispose();
+        }
+        if (unitNames.length() > 0) {
+            addModelMessage(this, "model.player.independence.unitsSeized", 
+                            new String[][] {{"%units%", unitNames.substring(2)}},
+                            ModelMessage.UNIT_LOST);
         }
         europe.dispose();
         europe = null;
