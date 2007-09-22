@@ -50,8 +50,6 @@ public class MapGenerator {
     public static final String  LICENSE = "http://www.gnu.org/licenses/gpl.html";
     public static final String  REVISION = "$Revision$";
     
-    private final static int NUM_STARTING_LOCATIONS = 4;
-
     private final Random random;
     private final MapGeneratorOptions mapGeneratorOptions;
     
@@ -461,27 +459,29 @@ public class MapGenerator {
     protected void createEuropeanUnits(Map map, List<Player> players) {
         final int width = map.getWidth();
         final int height = map.getHeight();
-        int[] shipYPos = new int[NUM_STARTING_LOCATIONS];
-        for (int i = 0; i < NUM_STARTING_LOCATIONS; i++) {
-            shipYPos[i] = 0;
-        }
 
-        for (int i = 0; i < players.size(); i++) {
-            Player player = players.get(i);
+        List<Player> europeanPlayers = new ArrayList<Player>();
+        for (Player player : players) {
             if (player.isREF()) {
                 player.setEntryLocation(map.getTile(width - 2, random.nextInt(height - 20) + 10));
                 continue;
             }
-            if (!player.isEuropean()) {
-                continue;
+            if (player.isEuropean()) {
+                europeanPlayers.add(player);
             }
+        }
+
+        List<Integer> shipYPositions = new ArrayList<Integer>();
+
+        for (Player player : europeanPlayers) {
+            logger.fine("generating units for player " + player.getName());
 
             int y = random.nextInt(height - 20) + 10;
             int x = width - 1;
-            while (isAShipTooClose(map, y, shipYPos)) {
+            while (isAShipTooClose(map, y, europeanPlayers.size(), shipYPositions)) {
                 y = random.nextInt(height - 20) + 10;
             }
-            shipYPos[i] = y;
+            shipYPositions.add(new Integer(y));
             while (map.getTile(x - 1, y).getType().canSailToEurope()) {
                 x--;
             }
@@ -492,7 +492,8 @@ public class MapGenerator {
 
             Unit carrier = null;
             List<Unit> units = new ArrayList<Unit>();
-            List<EuropeanNationType.StartingUnit> unitList = ((EuropeanNationType) player.getNationType()).getStartingUnits();
+            List<EuropeanNationType.StartingUnit> unitList = ((EuropeanNationType) player.getNationType())
+                .getStartingUnits();
             for (EuropeanNationType.StartingUnit startingUnit : unitList) {
                 Unit newUnit = new Unit(map.getGame(), startTile, player, startingUnit.unitType,
                                         Unit.SENTRY, startingUnit.armed, startingUnit.mounted,
@@ -505,6 +506,8 @@ public class MapGenerator {
                 }
                 
             }
+            // TODO: don't assume a single carrier with sufficient
+            // space for all other units
             if (carrier != null) {
                 for (Unit unit : units) {
                     if (!unit.hasAbility("model.ability.carryUnits")) {
@@ -624,14 +627,16 @@ public class MapGenerator {
     /**
      * Determine whether a proposed ship starting Y position is "too close"
      * to those already used.
+     * @param map a <code>Map</code> value
      * @param proposedY Proposed ship starting Y position
-     * @param usedYPositions List of already assigned positions
+     * @param startingPositions The number of starting positions
      * @return True if the proposed position is too close
      */
-    protected boolean isAShipTooClose(Map map, int proposedY,
-                                        int[] usedYPositions) {
-        for (int i = 0; i < NUM_STARTING_LOCATIONS && usedYPositions[i] != 0; i++) {
-            if (Math.abs(usedYPositions[i] - proposedY) < (map.getHeight() / 2) / NUM_STARTING_LOCATIONS) {
+    protected boolean isAShipTooClose(Map map, int proposedY, int startingPositions,
+                                      List<Integer> usedYPositions) {
+        int distance = (map.getHeight() / 2) / startingPositions;
+        for (Integer yPosition : usedYPositions) {
+            if (Math.abs(yPosition.intValue() - proposedY) < distance) {
                 return true;
             }
         }
