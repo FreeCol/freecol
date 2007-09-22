@@ -140,7 +140,7 @@ public final class PreGameInputHandler extends InputHandler {
     }
 
     /**
-     * Handles a "nation"-message from a client.
+     * Handles a "setNation"-message from a client.
      * 
      * @param connection The connection the message came from.
      * @param element The element containing the request.
@@ -149,11 +149,15 @@ public final class PreGameInputHandler extends InputHandler {
         ServerPlayer player = getFreeColServer().getPlayer(connection);
         if (player != null) {
             Nation nation = FreeCol.getSpecification().getNation(element.getAttribute("value"));
-            player.setNation(nation);
-            Element updateNation = Message.createNewRootElement("updateNation");
-            updateNation.setAttribute("player", player.getID());
-            updateNation.setAttribute("value", nation.getID());
-            getFreeColServer().getServer().sendToAll(updateNation, player.getConnection());
+            if (nation.isClassic() || (nation.isSelectable() && getFreeColServer().getAdditionalNations())) {
+                player.setNation(nation);
+                Element updateNation = Message.createNewRootElement("updateNation");
+                updateNation.setAttribute("player", player.getID());
+                updateNation.setAttribute("value", nation.getID());
+                getFreeColServer().getServer().sendToAll(updateNation, player.getConnection());
+            } else {
+                logger.warning("Selected non-selectable nation.");
+            }
         } else {
             logger.warning("Nation from unknown connection.");
         }
@@ -161,7 +165,7 @@ public final class PreGameInputHandler extends InputHandler {
     }
 
     /**
-     * Handles a "nationType"-message from a client.
+     * Handles a "setNationType"-message from a client.
      * 
      * @param connection The connection the message came from.
      * @param element The element containing the request.
@@ -170,11 +174,16 @@ public final class PreGameInputHandler extends InputHandler {
         ServerPlayer player = getFreeColServer().getPlayer(connection);
         if (player != null) {
             NationType nationType = FreeCol.getSpecification().getNationType(element.getAttribute("value"));
-            player.setNationType(nationType);
-            Element updateNationType = Message.createNewRootElement("updateNationType");
-            updateNationType.setAttribute("nationType", player.getID());
-            updateNationType.setAttribute("value", nationType.getID());
-            getFreeColServer().getServer().sendToAll(updateNationType, player.getConnection());
+            if (getFreeColServer().getAdvantages() == 
+                net.sf.freecol.client.gui.panel.AdvantageCellRenderer.SELECTABLE) {
+                player.setNationType(nationType);
+                Element updateNationType = Message.createNewRootElement("updateNationType");
+                updateNationType.setAttribute("nationType", player.getID());
+                updateNationType.setAttribute("value", nationType.getID());
+                getFreeColServer().getServer().sendToAll(updateNationType, player.getConnection());
+            } else {
+                logger.warning("NationType is not selectable");
+            }
         } else {
             logger.warning("NationType from unknown connection.");
         }
@@ -182,7 +191,7 @@ public final class PreGameInputHandler extends InputHandler {
     }
 
     /**
-     * Handles a "color"-message from a client.
+     * Handles a "setColor"-message from a client.
      * 
      * @param connection The connection the message came from.
      * @param element The element containing the request.

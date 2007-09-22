@@ -27,21 +27,10 @@ public final class NationCellRenderer implements TableCellRenderer {
     public static final String  LICENSE = "http://www.gnu.org/licenses/gpl.html";
     public static final String  REVISION = "$Revision$";
 
-    /*
-    private static Vector<Nation> classicNations = 
-        new Vector<Nation>(FreeCol.getSpecification().getClassicNations());
-    private static final JComboBox classicNationsComboBox = new JComboBox(classicNations);
-
-    private static Vector<Nation> europeanNations = 
-        new Vector<Nation>(FreeCol.getSpecification().getEuropeanNations());
-    private static final JComboBox europeanNationsComboBox = new JComboBox(europeanNations);
-    */
-
     private final Nation[] nations;
     private final JComboBox comboBox;
     private List<Player> players;
     private Player thisPlayer;
-    //private boolean additionalNations;
 
     /**
     * The default constructor.
@@ -59,10 +48,8 @@ public final class NationCellRenderer implements TableCellRenderer {
     * @param owningPlayer The player running the client that is displaying the table.
     */
     public void setData(List<Player> players, Player owningPlayer) {
-        //, boolean additionalNations) {
         this.players = players;
         thisPlayer = owningPlayer;
-        //this.additionalNations = additionalNations;
     }
 
     private Player getPlayer(int i) {
@@ -91,21 +78,6 @@ public final class NationCellRenderer implements TableCellRenderer {
 
         Component component;
         if (player == thisPlayer) {
-            /*
-            Vector<Nation> nations;
-            JComboBox comboBox;
-            if (additionalNations) {
-                nations = europeanNations;
-                comboBox = europeanNationsComboBox;
-                System.out.println("size is " + comboBox.getItemCount());
-                for (int index = 0; index < comboBox.getItemCount(); index++) {
-                    System.out.println(comboBox.getItemAt(index));
-                }
-            } else {
-                nations = classicNations;
-                comboBox = classicNationsComboBox;
-            }
-            */
             for (int index = 0; index < nations.length; index++) {
                 if (nations[index].getID().equals(player.getNationID())) {
                     comboBox.setSelectedIndex(index);

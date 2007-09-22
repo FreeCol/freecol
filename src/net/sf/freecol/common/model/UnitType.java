@@ -116,6 +116,11 @@ public final class UnitType extends FreeColGameObjectType implements Abilities, 
     private HashMap<String, Boolean> abilities = new HashMap<String, Boolean>();
     
     /**
+     * Stores the abilities required by this Type.
+     */
+    private HashMap<String, Boolean> requiredAbilities = new HashMap<String, Boolean>();
+    
+    /**
      * Stores the production modifiers of this Type
      */
     private HashMap<String, Modifier> modifiers = new HashMap<String, Modifier>();
@@ -576,6 +581,11 @@ public final class UnitType extends FreeColGameObjectType implements Abilities, 
                 boolean value = getAttribute(in, "value", true);
                 setAbility(abilityId, value);
                 in.nextTag(); // close this element
+            } else if ("required-ability".equals(nodeName)) {
+                String abilityId = in.getAttributeValue(null, "id");
+                boolean value = getAttribute(in, "value", true);
+                requiredAbilities.put(abilityId, value);
+                in.nextTag(); // close this element
             } else if ("upgrade".equals(nodeName)) {
                 Upgrade upgrade = new Upgrade();
                 String educationUnit = in.getAttributeValue(null, "unit");
@@ -602,21 +612,46 @@ public final class UnitType extends FreeColGameObjectType implements Abilities, 
     }
 
 
+    /**
+     * Returns true if this UnitType has a skill.
+     *
+     * @return a <code>boolean</code> value
+     */
     public boolean hasSkill() {
 
         return skill != UNDEFINED;
     }
 
 
+    /**
+     * Returns true if this UnitType can be built.
+     *
+     * @return a <code>boolean</code> value
+     */
     public boolean canBeBuilt() {
 
         return hammersRequired != UNDEFINED;
     }
 
 
+    /**
+     * Returns true if this UnitType has a price.
+     *
+     * @return a <code>boolean</code> value
+     */
     public boolean hasPrice() {
 
         return price != UNDEFINED;
+    }
+
+
+    /**
+     * Returns the abilities required by this UnitType.
+     *
+     * @return the abilities required by this UnitType.
+     */
+    public Map<String, Boolean> getRequiredAbilities() {
+        return requiredAbilities;
     }
 
 

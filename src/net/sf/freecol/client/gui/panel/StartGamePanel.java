@@ -187,6 +187,8 @@ public final class StartGamePanel extends FreeColPanel implements ActionListener
      * 
      * @param singlePlayerGame <code>true</code> if the user wants to start a
      *            single player game, <code>false</code> otherwise.
+     * @param additionalNations whether to allow additional nations
+     * @param advantages the type of advantages used
      */
     public void initialize(boolean singlePlayerGame, boolean additionalNations, int advantages) {
         this.singlePlayerGame = singlePlayerGame;

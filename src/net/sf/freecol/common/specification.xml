@@ -896,7 +896,7 @@
     </founding-father>
     <founding-father id="model.foundingFather.peterMinuit" type="trade"
                      weight1="9" weight2="1" weight3="1">
-<!-- Player saves 100% percent, i.e. pays nothing. -->
+      <!-- Player saves 100% percent, i.e. pays nothing. -->
       <modifier id="model.modifier.landPaymentModifier" type="percentage" value="-100"/>
     </founding-father>
     <founding-father id="model.foundingFather.peterStuyvesant" type="trade"
@@ -1018,11 +1018,13 @@
       <unit id="model.unit.freeColonist" tools="100"/>
       <unit id="model.unit.freeColonist" armed="true"/>
       <unit id="model.unit.caravel"/>
+      <ability id="model.ability.electFoundingFather"/>
     </european-nation-type>
     <!-- default REF nation -->
     <european-nation-type id="model.nationType.ref" ref="true">
       <modifier id="model.modifier.bombardBonus" type="percentage" value="50"/>
       <ability id="model.ability.ambushPenalty" value="true"/>
+      <ability id="model.ability.electFoundingFather"/>
     </european-nation-type>
     <!-- this was the Dutch player -->
     <european-nation-type id="model.nationType.trade">
@@ -1030,6 +1032,7 @@
       <unit id="model.unit.freeColonist" tools="100"/>
       <unit id="model.unit.freeColonist" armed="true"/>
       <unit id="model.unit.merchantman"/>
+      <ability id="model.ability.electFoundingFather"/>
     </european-nation-type>
     <!-- this was the French player -->
     <european-nation-type id="model.nationType.cooperation">
@@ -1037,6 +1040,7 @@
       <unit id="model.unit.hardyPioneer" tools="100"/>
       <unit id="model.unit.freeColonist" armed="true"/>
       <unit id="model.unit.caravel"/>
+      <ability id="model.ability.electFoundingFather"/>
     </european-nation-type>
     <!-- this was the English player -->
     <european-nation-type id="model.nationType.immigration">
@@ -1044,6 +1048,7 @@
       <unit id="model.unit.freeColonist" tools="100"/>
       <unit id="model.unit.freeColonist" armed="true"/>
       <unit id="model.unit.caravel"/>
+      <ability id="model.ability.electFoundingFather"/>
     </european-nation-type>
     <!-- this was the Spanish player -->
     <european-nation-type id="model.nationType.conquest">
@@ -1052,6 +1057,7 @@
       <unit id="model.unit.freeColonist" tools="100"/>
       <unit id="model.unit.veteranSoldier" armed="true" mounted="true"/>
       <unit id="model.unit.caravel"/>
+      <ability id="model.ability.electFoundingFather"/>
     </european-nation-type>
 
     <indian-nation-type id="model.nationType.apache" number-of-settlements="average" aggression="high" type-of-settlement="teepee">
@@ -1116,14 +1122,14 @@
     <nation id="model.nation.frenchREF" color="#0000ff" nation-type="model.nationType.ref" ref-of="model.nation.french"/>
     <nation id="model.nation.englishREF" color="#ff0000" nation-type="model.nationType.ref" ref-of="model.nation.english"/>
     <nation id="model.nation.spanishREF" color="#ffff00" nation-type="model.nationType.ref" ref-of="model.nation.spanish"/>
-    <nation id="model.nation.portuguese" color="#00ffff" nation-type="model.nationType.conquest" selectable="true"/>
-    <nation id="model.nation.swedish" color="#00ffff" nation-type="model.nationType.cooperation" selectable="true"/>
+    <nation id="model.nation.portuguese" color="#00ff00" nation-type="model.nationType.conquest" selectable="true"/>
+    <nation id="model.nation.swedish" color="#ff00ff" nation-type="model.nationType.cooperation" selectable="true"/>
     <nation id="model.nation.danish" color="#00ffff" nation-type="model.nationType.trade" selectable="true"/>
-    <nation id="model.nation.russian" color="#00ffff" nation-type="model.nationType.immigration" selectable="true"/>
-    <nation id="model.nation.portugueseREF" color="#00ffff" nation-type="model.nationType.ref" ref-of="model.nation.portuguese"/>
-    <nation id="model.nation.swedishREF" color="#00ffff" nation-type="model.nationType.ref" ref-of="model.nation.swedish"/>
+    <nation id="model.nation.russian" color="#ffffff" nation-type="model.nationType.immigration" selectable="true"/>
+    <nation id="model.nation.portugueseREF" color="#00ff00" nation-type="model.nationType.ref" ref-of="model.nation.portuguese"/>
+    <nation id="model.nation.swedishREF" color="#ff00ff" nation-type="model.nationType.ref" ref-of="model.nation.swedish"/>
     <nation id="model.nation.danishREF" color="#00ffff" nation-type="model.nationType.ref" ref-of="model.nation.italian"/>
-    <nation id="model.nation.russianREF" color="#00ffff" nation-type="model.nationType.ref" ref-of="model.nation.irish"/>
+    <nation id="model.nation.russianREF" color="#ffffff" nation-type="model.nationType.ref" ref-of="model.nation.irish"/>
   </nations>
 
 </freecol-specification>

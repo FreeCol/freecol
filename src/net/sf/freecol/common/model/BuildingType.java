@@ -29,6 +29,11 @@ public final class BuildingType extends FreeColGameObjectType implements Abiliti
     
     private HashMap<String, Boolean> abilities = new HashMap<String, Boolean>();
     
+    /**
+     * Stores the abilities required by this Type.
+     */
+    private HashMap<String, Boolean> requiredAbilities = new HashMap<String, Boolean>();
+    
     private HashMap<String, Modifier> modifiers = new HashMap<String, Modifier>();
   
 
@@ -128,6 +133,11 @@ public final class BuildingType extends FreeColGameObjectType implements Abiliti
             } else if ("required-population".equals(childName)) {
                 populationRequired = getAttribute(in, "value", 1);
                 in.nextTag(); // close this element
+            } else if ("required-ability".equals(childName)) {
+                String abilityId = in.getAttributeValue(null, "id");
+                boolean value = getAttribute(in, "value", true);
+                requiredAbilities.put(abilityId, value);
+                in.nextTag(); // close this element
             } else if (Modifier.getXMLElementTagName().equals(childName)) {
                 Modifier modifier = new Modifier(in);
                 if (modifier.getCategory() == null) {
@@ -148,6 +158,16 @@ public final class BuildingType extends FreeColGameObjectType implements Abiliti
         return unitType.hasSkill() && unitType.getSkill() >= minSkill && unitType.getSkill() <= maxSkill;
     }
   
+    /**
+     * Returns the abilities required by this BuildingType.
+     *
+     * @return the abilities required by this UnitType.
+     */
+    public Map<String, Boolean> getRequiredAbilities() {
+        return requiredAbilities;
+    }
+
+
     /**
      * Returns true if this UnitType has the ability with the given ID.
      *

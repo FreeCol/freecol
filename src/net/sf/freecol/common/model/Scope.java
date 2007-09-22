@@ -1,7 +1,7 @@
 
 package net.sf.freecol.common.model;
 
-import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 
 import javax.xml.stream.XMLStreamException;
@@ -36,15 +36,15 @@ public final class Scope extends FreeColObject implements Cloneable {
     private boolean abilityValue;
 
     /**
-     * The name of an <code>Attribute</code>.
+     * The name of an <code>Method</code>.
      */
-    private String attributeName;
+    private String methodName;
 
     /**
      * The <code>String</code> representation of the value of an
-     * <code>Attribute</code>.
+     * <code>Method</code>.
      */
-    private String attributeValue;
+    private String methodValue;
 
 
 
@@ -114,39 +114,39 @@ public final class Scope extends FreeColObject implements Cloneable {
     }
 
     /**
-     * Get the <code>AttributeName</code> value.
+     * Get the <code>MethodName</code> value.
      *
      * @return a <code>String</code> value
      */
-    public String getAttributeName() {
-        return attributeName;
+    public String getMethodName() {
+        return methodName;
     }
 
     /**
-     * Set the <code>AttributeName</code> value.
+     * Set the <code>MethodName</code> value.
      *
-     * @param newAttributeName The new AttributeName value.
+     * @param newMethodName The new MethodName value.
      */
-    public void setAttributeName(final String newAttributeName) {
-        this.attributeName = newAttributeName;
+    public void setMethodName(final String newMethodName) {
+        this.methodName = newMethodName;
     }
 
     /**
-     * Get the <code>AttributeValue</code> value.
+     * Get the <code>MethodValue</code> value.
      *
      * @return an <code>String</code> value
      */
-    public String getAttributeValue() {
-        return attributeValue;
+    public String getMethodValue() {
+        return methodValue;
     }
 
     /**
-     * Set the <code>AttributeValue</code> value.
+     * Set the <code>MethodValue</code> value.
      *
-     * @param newAttributeValue The new AttributeValue value.
+     * @param newMethodValue The new MethodValue value.
      */
-    public void setAttributeValue(final String newAttributeValue) {
-        this.attributeValue = newAttributeValue;
+    public void setMethodValue(final String newMethodValue) {
+        this.methodValue = newMethodValue;
     }
 
 
@@ -163,10 +163,13 @@ public final class Scope extends FreeColObject implements Cloneable {
         if (abilityID != null && object.hasAbility(abilityID) != abilityValue) {
             return false;
         }
-        if (attributeName != null) {
+        if (methodName != null) {
             try {
-                Field attribute = object.getClass().getField(attributeName);
-                // TODO: somehow check this using reflection
+                Method method = object.getClass().getMethod(methodName);
+                Class returnType = method.getReturnType();
+                if (method.invoke(object).toString().equals(methodValue)) {
+                    return true;
+                }
             } catch(Exception e) {
                 return false;
             }
@@ -186,8 +189,8 @@ public final class Scope extends FreeColObject implements Cloneable {
         type = in.getAttributeValue(null, "type");
         abilityID = in.getAttributeValue(null, "ability-id");
         abilityValue = getAttribute(in, "ability-value", true);
-        attributeName = in.getAttributeValue(null, "attribute-name");
-        attributeValue = in.getAttributeValue(null, "attribute-value");
+        methodName = in.getAttributeValue(null, "method-name");
+        methodValue = in.getAttributeValue(null, "method-value");
         in.nextTag();
     }
     
@@ -206,8 +209,8 @@ public final class Scope extends FreeColObject implements Cloneable {
         out.writeAttribute("type", type);
         out.writeAttribute("ability-id", abilityID);
         out.writeAttribute("ability-value", String.valueOf(abilityValue));
-        out.writeAttribute("attribute-name", attributeName);
-        out.writeAttribute("attribute-value", attributeValue);
+        out.writeAttribute("method-name", methodName);
+        out.writeAttribute("method-value", methodValue);
 
         out.writeEndElement();
     }
