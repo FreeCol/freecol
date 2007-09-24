@@ -382,6 +382,7 @@
     </tileimprovement-type>
     <tileimprovement-type id="model.improvement.Plow" occupation-string="P" add-work-turns="2" overlay="4"
             expended-goods-type="model.goods.Tools" expended-amount="20">
+      <type id="plow" magnitude="1"/>
       <tiles all-land-tiles="true" all-forest-tiles="false"/>
       <effect goods-type="model.goods.Food" value="1"/>
       <effect goods-type="model.goods.Sugar" value="1"/>
@@ -392,6 +393,7 @@
             expended-goods-type="model.goods.Tools" expended-amount="20"
             deliver-goods-type="model.goods.Lumber" deliver-amount="5">
       <tiles all-forest-tiles="true"/>
+      <type id="clearForest" magnitude="1"/>
       <change from="model.tile.mixedForest"     to="model.tile.plains"/>
       <change from="model.tile.coniferForest"   to="model.tile.grassland"/>
       <change from="model.tile.broadleafForest" to="model.tile.prairie"/>
