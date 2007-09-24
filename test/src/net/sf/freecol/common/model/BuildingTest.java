@@ -16,8 +16,8 @@ public class BuildingTest extends FreeColTestCase {
 
 
     public void testCanBuildNext() {
-
-        Colony colony = getStandardColony();
+    	
+    	Colony colony = getStandardColony();
 
         // First check with a building that can be fully build with a normal
         // colony
@@ -28,7 +28,13 @@ public class BuildingTest extends FreeColTestCase {
         assertTrue(warehouse.canBuildNext());
         warehouse.upgrade();
         assertFalse(warehouse.canBuildNext());
-        warehouse.upgrade();
+        
+        try {
+        	warehouse.upgrade();
+        	fail();
+        } catch (IllegalStateException e){
+        	// Should throw exception
+        }
         assertFalse(warehouse.canBuildNext());
 
         // Check whether population restrictions work
@@ -44,9 +50,6 @@ public class BuildingTest extends FreeColTestCase {
 
     public void testInitialColony() {
 
-    	// Need to call this to reset the standard colony.
-    	getStandardGame();
-    	
         Colony colony = getStandardColony();
 
         BuildingType warehouseType = FreeCol.getSpecification().getBuildingType("model.building.Warehouse");
@@ -65,9 +68,6 @@ public class BuildingTest extends FreeColTestCase {
 
     public void testCanAddToBuilding() {
     	
-    	// Need to call this to reset the standard colony.
-    	getStandardGame();
-        
         Colony colony = getStandardColony(6);
         List<Unit> units = colony.getUnitList();
 
@@ -80,6 +80,9 @@ public class BuildingTest extends FreeColTestCase {
             	continue;
             
             int maxUnits = building.getMaxUnits();
+            
+            assertEquals(0, building.getUnitCount());
+            
             for (int index = 0; index < maxUnits; index++) {
                 assertTrue("unable to add unit " + index + " to building type " +
                            building.getType().getName(), building.canAdd(units.get(index)));

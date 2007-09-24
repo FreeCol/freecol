@@ -14,14 +14,19 @@ public final class SpecificationTest extends TestCase {
      * 
      */
     public void testLoad() {
-        new Specification();
+    	
+    	Specification spec = Specification.getSpecification();
+    	
+    	assertNotNull(spec);
+    	
+    	assertEquals(spec, Specification.getSpecification());
     }
 
     /**
      * Test for some typical abilities.
      */
     public void testUnitAbilities() {
-        Specification spec = new Specification();
+    	Specification spec = Specification.getSpecification();
 
         UnitType colonist = spec.getUnitType(Unit.FREE_COLONIST);
         assertTrue(colonist.hasAbility("model.ability.foundColony"));
@@ -67,7 +72,7 @@ public final class SpecificationTest extends TestCase {
 
     public void testFoundingFathers() {
 
-        Specification spec = new Specification();
+        Specification spec = Specification.getSpecification();
 
         FoundingFather smith = spec.getFoundingFather("model.foundingFather.adamSmith");
         assertFalse(smith == null);

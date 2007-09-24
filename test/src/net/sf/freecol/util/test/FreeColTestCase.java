@@ -10,7 +10,6 @@ import net.sf.freecol.common.FreeColException;
 import net.sf.freecol.common.Specification;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.Game;
-import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.Map;
 import net.sf.freecol.common.model.Nation;
 import net.sf.freecol.common.model.Player;
@@ -37,11 +36,18 @@ public class FreeColTestCase extends TestCase {
 
     static boolean updateLocale = true;
     
-    public void setUp() {
-        if (updateLocale) {
-            updateLocale = false;
-            Messages.setMessageBundle(Locale.US);
-        }
+    @Override
+	protected void setUp() throws Exception {
+		if (updateLocale) {
+			updateLocale = false;
+			Messages.setMessageBundle(Locale.US);
+		}
+	}
+
+    @Override
+    protected void tearDown() throws Exception {
+    	// If a game has been created destroy it.
+    	game = null;
     }
 
     /**
@@ -222,7 +228,6 @@ public class FreeColTestCase extends TestCase {
         UnitType unitType = FreeCol.getSpecification().getUnitType("model.unit.freeColonist");
         Unit soldier = new Unit(game, map.getTile(tileX, tileY), dutch, unitType, Unit.ACTIVE, true, false, 0, false);
 
-        soldier.setWorkType(Goods.FOOD);
         soldier.buildColony(colony);
 
         for (int i = 1; i < numberOfSettlers; i++) {
