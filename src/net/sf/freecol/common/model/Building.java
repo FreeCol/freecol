@@ -331,13 +331,16 @@ public final class Building extends FreeColGameObject implements Abilities, Work
      * attribute in BuildingType)
      */
     public void upgrade() {
-        if (canBuildNext()) {
-            if (isBuilt) {
-                setType(buildingType.getUpgradesTo());
-            } else {
-                setType(buildingType);
-            }
+    	
+    	if (!canBuildNext())
+    		throw new IllegalStateException("Cannot upgrade this building.");
+    	
+        if (isBuilt) {
+            setType(buildingType.getUpgradesTo());
+        } else {
+            setType(buildingType);
         }
+        
     }
     
     private void setType(BuildingType newBuildingType) {
