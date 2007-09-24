@@ -109,7 +109,7 @@
 
     <target name="build" depends="init,compile,reencode_messages" description="Compiles the source files.">
         <copy todir="${freecol.build.dir}">
-        <fileset dir="${freecol.src.dir}" includes="**/*.xml" />
+        <fileset dir="${freecol.src.dir}" includes="**/*.xml" /> 
         </copy>
     </target>
 
@@ -511,8 +511,12 @@
     </target>
 
     <target name="testall" depends="build-unit-tests" unless="skip.dist.test"
-            description="Runs all unit tests"
-    >
+            description="Runs all unit tests">
+    	
+    	<delete dir="${freecol.build.dir}/report" />
+    	<mkdir dir="${freecol.build.dir}/report"/>
+    	<mkdir dir="${freecol.build.dir}/report/xml"/>
+    	
         <echo message="if the next task fails then please read the build script" />
         <!-- if the next fails then here is the long answer:
             http://ant.apache.org/faq.html#delegating-classloader
@@ -537,23 +541,26 @@
                 <pathelement location="${basedir}/jars/wstx-lgpl-4.0pr1.jar"/>
             </classpath>
             <formatter type="xml" />
-            <batchtest fork="false" todir="${freecol.build.dir}">
+            
+           	<test todir="${freecol.build.dir}" name="net.sf.freecol.AllTests" />
+        	
+        	<!--
+        	<batchtest fork="false" todir="${freecol.build.dir}/report/xml">
                 <fileset dir="test/src" includes="**/*Test.java" />
             </batchtest>
+            -->
         </junit>
-        <delete dir="build/report" />
-        <mkdir dir="build/report"/>
-        <echo message="Basedir:${basedir}"/>
+        
         <junitreport>
-            <fileset dir="build">
+            <fileset dir="${freecol.build.dir}/report/xml">
                 <include name="TEST-*.xml"/>
             </fileset>
-            <report todir="build/report" />
+            <report todir="${freecol.build.dir}/report" />
         </junitreport>
 
-        <fail if="error.junit">
-            Automated Unit Tests failed.
-        </fail>
+    	<echo message="For detailed results of the test run see: ${freecol.build.dir}/report/index.html"/>
+        
+    	<fail if="error.junit" message="Automated Unit Tests failed."/>
     </target>
 
     <target name="build-unit-tests" depends="build">
