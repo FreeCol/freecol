@@ -714,7 +714,7 @@ public final class UnitType extends FreeColGameObjectType implements Abilities, 
             base = (int) modifier.applyTo(base);
         }
         
-        return Math.min(base, 1);
+        return Math.max(base, 1);
     }
     
     private class Upgrade {
