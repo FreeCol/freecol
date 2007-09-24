@@ -1,6 +1,9 @@
 
-Unit Testing Guide
-------------------
+!---------------------------------------------!
+! Unit Testing Guide                          !
+!                                             !
+!   to run the tests: 'ant testall'           !
+!---------------------------------------------!
 
 1. What is unit testing?
 
@@ -98,6 +101,12 @@ For instance if bin is your target directory and you want to run all tests
 java -cp bin;test/lib/junit.jar junit.swingui.TestRunner net.sf.freecol.AllTests
 
 c.) Using ant run:
+
+If you have ant 1.7 you can just
+
+ant testall
+
+Otherwise:
 
 ant -lib test/lib/junit.jar -Dtest=$qualified name of test class but ommitting net.sf.freecol$ test
 
