@@ -9,6 +9,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
+
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
@@ -61,7 +62,20 @@ public final class Specification {
     private final List<Nation> nations;
     private final List<NationType> nationTypes;
 
-    public Specification() {
+    /**
+	 * Creates a new Specification object by loading it from the
+	 * specification.xml.
+	 * 
+	 * This method is protected, since only one Specification object may exist.
+	 * This is due to static links from type {@link Goods} to the most important
+	 * GoodsTypes. If another specification object is created these links would
+	 * not work anymore for the previously created specification.
+	 * 
+	 * To get hold of an Specification object use the static method
+	 * {@link #getSpecification()} which returns a singleton instance of the
+	 * Specification class.
+	 */
+    protected Specification() {
         logger.info("Initializing Specification");
 
         buildingTypeList = new ArrayList<BuildingType>();
@@ -703,4 +717,16 @@ public final class Specification {
          */
         public T objectFrom(XMLStreamReader in) throws XMLStreamException;
     }
+
+    /**
+     * Singleton
+     */
+    protected static Specification specification;
+    
+	public static Specification getSpecification() {
+		if (specification == null){
+            specification = new Specification();
+        }
+        return specification;
+	}
 }

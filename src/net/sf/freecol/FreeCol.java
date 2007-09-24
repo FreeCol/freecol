@@ -358,10 +358,7 @@ public final class FreeCol {
      * @return the specification to be used by all other classes.
      */
     public static Specification getSpecification() {
-        if (specification == null){
-            specification = new Specification();
-        }
-        return specification;
+        return Specification.getSpecification();
     }
 
     /**
