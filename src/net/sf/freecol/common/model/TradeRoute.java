@@ -343,15 +343,19 @@ public class TradeRoute extends FreeColGameObject implements Cloneable, Ownable 
         setID(in.getAttributeValue(null, "ID"));
         setName(in.getAttributeValue(null, "name"));
         String ownerID = in.getAttributeValue(null, "owner");
-        if (ownerID.equals("unknown")) {
-            owner = Game.unknownEnemy;
-            // TODO: make this disappear
-        } else if (getGame() != null) {
-            owner = (Player) getGame().getFreeColGameObject(ownerID);
-            if (owner == null) {
-                owner = new Player(getGame(), in.getAttributeValue(null, "owner"));
-            }
+        
+        Game game = getGame();
+        if (game != null){
+        	if (ownerID.equals("unknown")) {
+        		owner = game.getUnknownEnemy(); 
+        	} else {
+	            owner = (Player) getGame().getFreeColGameObject(ownerID);
+	            if (owner == null) {
+	                owner = new Player(getGame(), in.getAttributeValue(null, "owner"));
+	            }
+	        }
         }
+        
         while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
             if (getStopXMLElementTagName().equals(in.getLocalName())) {
                 stops.add(new Stop(in));

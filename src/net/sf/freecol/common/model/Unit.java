@@ -1807,14 +1807,22 @@ public class Unit extends FreeColGameObject implements Abilities, Locatable, Loc
      *                another {@link Tile} than this <code>Unit</code> or is not
      *                a valid pioneer.
      */
-    public void work(TileImprovement improvement) {
-        if (improvement.getTile() != getTile()) {
-            throw new IllegalStateException("Can only set a 'Unit' to work at a 'TileImprovement' that is on the same 'Tile'.");
-        }
-        if (!isPioneer()) {
+    public void work(TileImprovementType improvementType) {
+    	
+    	if (!isPioneer()) {
             throw new IllegalStateException("Only 'Pioneers' can perform TileImprovement.");
         }
-
+    	
+    	if (!canPerformImprovement(improvementType)){
+    		throw new IllegalArgumentException("Cannot perform this improvement for this tile");
+    	}
+    	
+    	TileImprovement improvement = getTile().findTileImprovementType(improvementType);
+    	if (improvement == null){
+    		improvement = new TileImprovement(getGame(), getTile(), improvementType);
+    		getTile().add(improvement);
+    	}
+    	
         setWorkImprovement(improvement);
         setState(Unit.IMPROVING);
         // No need to set Location, stay at the tile it is on.
@@ -3130,9 +3138,16 @@ public class Unit extends FreeColGameObject implements Abilities, Locatable, Loc
     /**
      * Get the number of turns of work left.
      * 
-     * @return Work left
+     * Caution: This does not equal the internal amount of work left as expert bonuses 
+     * are included in the returned number. 
+     * 
+     * @return number of turns of work left.
      */
     public int getWorkLeft() {
+    	if (state == IMPROVING && getUnitType().hasAbility("model.ability.expertPioneer")){
+    		return workLeft / 2;
+    	}
+    	
         return workLeft;
     }
 
@@ -3149,9 +3164,17 @@ public class Unit extends FreeColGameObject implements Abilities, Locatable, Loc
                     setState(ACTIVE);
                     return;
                 }
+
                 // Otherwise do work
-                getWorkImprovement().doWork(getUnitType().hasAbility("model.ability.expertPioneer") ? 2 : 1);
-                workLeft = getWorkImprovement().getTurnsToComplete();
+                int amountOfWork = getUnitType().hasAbility("model.ability.expertPioneer") ? 2 : 1;
+                
+                workLeft = getWorkImprovement().doWork(amountOfWork);
+                
+                // Make sure that a hardy pioneer will finish if the workLeft is 
+                // less than he can do in a turn 
+                if (0 < workLeft && workLeft < amountOfWork){
+                	workLeft = getWorkImprovement().doWork(workLeft);
+                }
             } else {
                 workLeft--;
             }
@@ -4571,7 +4594,7 @@ public class Unit extends FreeColGameObject implements Abilities, Locatable, Loc
 
         String ownerID = in.getAttributeValue(null, "owner");
         if (ownerID.equals("unknown")) {
-            owner = Game.unknownEnemy;
+            owner = getGame().getUnknownEnemy();
         } else {
             owner = (Player) getGame().getFreeColGameObject(ownerID);
             if (owner == null) {

@@ -1,34 +1,17 @@
 package net.sf.freecol.common.model;
 
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.io.StringReader;
-import java.io.StringWriter;
 import java.util.Iterator;
 import java.util.List;
 import java.util.logging.Logger;
 
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.stream.XMLInputFactory;
-import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerException;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
 
 import net.sf.freecol.FreeCol;
-import net.sf.freecol.client.gui.i18n.Messages;
+import net.sf.freecol.server.generator.River;
 
-import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-import org.xml.sax.InputSource;
-import org.xml.sax.SAXException;
 
 
 /**
@@ -170,26 +153,28 @@ public class TileImprovement extends TileItem implements Locatable, Named {
     }
 
     public boolean isComplete() {
-        return (turnsToComplete == 0);
+        return turnsToComplete <= 0;
     }
 
     /**
-     * Performs work to complete this <code>TileImprovement</code>
-     * @turns This function allows for a unit to perform more than 1 'turn',
-     *        perhaps in the event a skilled unit is able to build improvements
-     *        with a bonus. The <code>doWork</code> function without any
-     *        input params assumes 1 turn of work done.
-     * @returns {@link isComplete boolean whether this Improvement has been completed}
-     */
-    public boolean doWork(int turns) {
+	 * Performs work towards completion of this <code>TileImprovement</code>
+	 * 
+	 * This function allows for a unit to perform more than 1 'turn', perhaps in
+	 * the event a skilled unit is able to build improvements with a bonus. The
+	 * <code>doWork</code> function without any input params assumes 1 turn of
+	 * work done.
+	 * 
+	 * @returns {@link remaining turns to completion}
+	 */
+	public int doWork(int turns) {
         turnsToComplete -= turns;
-        if (turnsToComplete < 0) {
+        if (turnsToComplete <= 0) {
             turnsToComplete = 0;
         }
-        return isComplete();
+        return turnsToComplete;
     }
 
-    public boolean doWork() {
+    public int doWork() {
         return doWork(1);
     }
 

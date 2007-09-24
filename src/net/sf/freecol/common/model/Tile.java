@@ -605,11 +605,15 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
      * Returns 'true' if this Tile has been plowed.
      * 
      * @return 'true' if this Tile has been plowed.
+     *
+     * TODO: remove as soon as alternative is clear
+     * 
+     * @deprecated Plowing is an specification dependent improvement type and should not be needed.
      */
-    // TODO: remove as soon as alternative is clear
     public boolean isPlowed() {
-        return false; //plowed;
+        return hasImprovement(FreeCol.getSpecification().getTileImprovementType("model.improvement.Plow"));
     }
+    
     /**
      * Returns 'true' if this Tile has a resource on it.
      * 
@@ -1335,16 +1339,37 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
     public TileImprovement findTileImprovementType(TileImprovementType type) {
         return tileItemContainer.findTileImprovementType(type);
     }
-
+    
     /**
-     * Calculates the potential of a certain <code>GoodsType</code>.
-     * 
-     * @param tileType The <code>TileType</code>.
-     * @param goodsType The <code>GoodsType</code> to check the potential for.
-     * @param tiContainer The <code>TileItemContainer</code> with any TileItems to give bonuses.
-     * @param fishbonus The Bonus Fish to be considered if valid
-     * @return The amount of goods.
-     */
+	 * Will check whether this tile has a completed improvement of the given
+	 * type.
+	 * 
+	 * Useful for checking whether the tile for instance has a road or is
+	 * plowed.
+	 * 
+	 * @param type
+	 *            The type to check for.
+	 * @return Whether the tile has the improvement and the improvement is
+	 *         completed.
+	 */
+	public boolean hasImprovement(TileImprovementType type) {
+		return tileItemContainer.hasImprovement(type);
+	}
+    
+    /**
+	 * Calculates the potential of a certain <code>GoodsType</code>.
+	 * 
+	 * @param tileType
+	 *            The <code>TileType</code>.
+	 * @param goodsType
+	 *            The <code>GoodsType</code> to check the potential for.
+	 * @param tiContainer
+	 *            The <code>TileItemContainer</code> with any TileItems to
+	 *            give bonuses.
+	 * @param fishbonus
+	 *            The Bonus Fish to be considered if valid
+	 * @return The amount of goods.
+	 */
     public static int getTileTypePotential(TileType tileType, GoodsType goodsType, TileItemContainer tiContainer, int fishBonus) {
         if (!goodsType.isFarmed()) {
             return 0;
@@ -1499,6 +1524,9 @@ break;
      * squares).
      * 
      * @return The type of primary good best produced by this tile.
+     * 
+     * @TODO: This might fail if the tile produces more other stuff than food.
+     * 
      */
     public GoodsType primaryGoods() {
         if (type == null) {
@@ -1507,7 +1535,7 @@ break;
         
         GoodsType[] top = getSortedGoodsTop(type, tileItemContainer, getFishBonus());
         for (GoodsType g : top) {
-            if (g != null || g.isFoodType()) {
+            if (g != null && g.isFoodType()) {
                 return g;
             }
         }
@@ -1518,7 +1546,7 @@ break;
      * The type of secondary good (non-food) this tile produces best (used for Town Commons
      * squares).
      * 
-     * @return The type of secondary good best produced by this tile.
+     * @return The type of secondary good best produced by this tile (or null if none found).
      */
     public GoodsType secondaryGoods() {
         if (type == null) {
@@ -1527,9 +1555,10 @@ break;
         
         GoodsType[] top = getSortedGoodsTop(type, tileItemContainer, getFishBonus());
         for (GoodsType g : top) {
-            if (g != null || !g.isFoodType()) {
-                return g;
+            if (g == null || g.isFoodType()) {
+            	continue;
             }
+            return g;
         }
         return null;
     }
@@ -2061,10 +2090,6 @@ break;
         playerExploredTile.setVisited();
     }
 
-
-    private final Tile theTile = this;
-
-
     /**
      * This class contains the data visible to a specific player.
      * 
@@ -2306,10 +2331,10 @@ break;
             if (!explored) {
                 out.writeAttribute("explored", Boolean.toString(explored));
             }
-            if (theTile.hasLostCityRumour()) {
+            if (Tile.this.hasLostCityRumour()) {
                 out.writeAttribute("lostCityRumour", Boolean.toString(lostCityRumour));
             }
-            if (theTile.getOwner() != owner) {
+            if (Tile.this.getOwner() != owner) {
                 out.writeAttribute("owner", owner.getID());
             }
             if (colonyUnitCount != 0) {
@@ -2360,14 +2385,14 @@ break;
             if (lostCityRumourStr != null) {
                 lostCityRumour = Boolean.valueOf(lostCityRumourStr).booleanValue();
             } else {
-                lostCityRumour = theTile.hasLostCityRumour();
+                lostCityRumour = Tile.this.hasLostCityRumour();
             }
 
             final String ownerStr = in.getAttributeValue(null, "owner");
             if (ownerStr != null) {
                 owner = (Player) getGame().getFreeColGameObject(ownerStr);
             } else {
-                owner = theTile.getOwner();
+                owner = Tile.this.getOwner();
             }
 
             final String colonyUnitCountStr = in.getAttributeValue(null, "colonyUnitCount");
@@ -2399,7 +2424,7 @@ break;
             }
 
             missionary = null;
-            TileItemContainer tileItemContainer = new TileItemContainer(getGame(), theTile);
+            TileItemContainer tileItemContainer = new TileItemContainer(getGame(), Tile.this);
             while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
                 if (in.getLocalName().equals("missionary")) {
                     in.nextTag();

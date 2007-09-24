@@ -380,6 +380,23 @@ public class TileItemContainer extends FreeColGameObject {
         }
         return null;
     }
+    
+    /**
+	 * Will check whether this tile has a completed improvement of the given
+	 * type.
+	 * 
+	 * Useful for checking whether the tile for instance has a road or is
+	 * plowed.
+	 * 
+	 * @param type
+	 *            The type to check for.
+	 * @return Whether the tile has the improvement and the improvement is
+	 *         completed.
+	 */
+	public boolean hasImprovement(TileImprovementType type) {
+		TileImprovement improvement = findTileImprovementType(type);
+		return improvement != null && improvement.isComplete();
+	}
 
     /**
      * Removes all references to this object.
