@@ -429,10 +429,13 @@ public class ColonyTile extends FreeColGameObject implements WorkLocation, Ownab
     }
 
     private void produceGoodsCenterTile() {
-        GoodsType goodsFood = workTile.primaryGoods();
+        
+    	GoodsType goodsFood = workTile.primaryGoods();
         colony.addGoods(goodsFood, getProductionOf(goodsFood));
+        
         GoodsType type2 = workTile.secondaryGoods();
-        colony.addGoods(type2, getProductionOf(type2));
+        if (type2 != null)
+        	colony.addGoods(type2, getProductionOf(type2));
 
         if (unit != null) {
             getWorkTile().setOwningSettlement(getColony());
@@ -589,7 +592,7 @@ public class ColonyTile extends FreeColGameObject implements WorkLocation, Ownab
      * @return A representation of a colony-tile that can be used for debugging.
      */
     public String toString() {
-        return getTile().getPosition().toString() + " in '" + getColony().getName() + "'" + super.toString();
+        return getWorkTile().getPosition().toString() + " in '" + getColony().getName() + "'" + super.toString();
     }
 
     /**
