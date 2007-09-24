@@ -542,7 +542,7 @@
             </classpath>
             <formatter type="xml" />
             
-           	<test todir="${freecol.build.dir}" name="net.sf.freecol.AllTests" />
+           	<test todir="${freecol.build.dir}/report/xml" name="net.sf.freecol.AllTests" />
         	
         	<!--
         	<batchtest fork="false" todir="${freecol.build.dir}/report/xml">
