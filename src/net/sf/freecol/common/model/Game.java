@@ -33,10 +33,16 @@ public class Game extends FreeColGameObject {
 
     private static final Logger logger = Logger.getLogger(Game.class.getName());
 
-    /** A virtual player to use with enemy privateers */
-    // TODO: Using null here throws a warning. A Player should belong to a Game.
-    public static final Player unknownEnemy = new Player(null, "unknown enemy", false, null);
+    /** 
+     * A virtual player to use with enemy privateers 
+     * TODO: player should have a game.
+     */
+    protected final Player unknownEnemy = new Player(null, "unknown enemy", false, null);
 
+    public Player getUnknownEnemy() {
+    	return unknownEnemy;
+	}
+    
     /** Contains all the players in the game. */
     private List<Player> players = new ArrayList<Player>();
 
@@ -54,7 +60,7 @@ public class Game extends FreeColGameObject {
     private Player viewOwner;
 
     /** The maximum number of (human) players allowed in this game. */
-    private int maxPlayers = 4;
+    private int maxPlayers = 8;
 
     /** Contains references to all objects created in this game. */
     private HashMap<String, FreeColGameObject> freeColGameObjects = new HashMap<String, FreeColGameObject>(10000);
