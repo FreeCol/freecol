@@ -1,8 +1,8 @@
 package net.sf.freecol.common.model;
 
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
+
 import net.sf.freecol.client.gui.i18n.Messages;
 
 public abstract class FreeColGameObjectType extends FreeColObject {
@@ -47,4 +47,12 @@ public abstract class FreeColGameObjectType extends FreeColObject {
 
     protected void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
     }
+    
+    /**
+	 * Use only for debugging purposes! A human-readable and localized name is
+	 * returned by getName().
+	 */
+	public String toString() {
+		return id;
+	}
 }
