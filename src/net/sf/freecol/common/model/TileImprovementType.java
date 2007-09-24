@@ -102,11 +102,7 @@ public final class TileImprovementType extends FreeColGameObjectType
     }
 
     public boolean isWorkerTypeAllowed(UnitType unitType) {
-    	return true;
-        
-    	// TODO: The specification does not set the worker attribute, yet. 
-    	// Thus this check always fails! 
-    	// return allowedWorkers.contains(unitType.getID());
+    	return allowedWorkers.isEmpty() || allowedWorkers.contains(unitType.getID());
     }
 
     /**
