@@ -54,6 +54,7 @@ public final class TileImprovementType extends FreeColGameObjectType
         return natural;
     }
 
+    // TODO: Why don't we use getID()?
     public String getTypeId() {
         return typeId;
     }
@@ -101,7 +102,11 @@ public final class TileImprovementType extends FreeColGameObjectType
     }
 
     public boolean isWorkerTypeAllowed(UnitType unitType) {
-        return allowedWorkers.contains(unitType.getID());
+    	return true;
+        
+    	// TODO: The specification does not set the worker attribute, yet. 
+    	// Thus this check always fails! 
+    	// return allowedWorkers.contains(unitType.getID());
     }
 
     /**
