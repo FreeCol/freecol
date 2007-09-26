@@ -532,7 +532,7 @@
             if you have a version of Ant prior to 1.6 on UNIX:
             export CLASSPATH=${CLASSPATH}:test/lib/junit.jar; ant testall
             -->
-        <junit printsummary="on" errorproperty="error.junit">
+        <junit printsummary="on" errorproperty="error.junit" fork="yes" maxmemory="512m">
             <classpath>
                 <pathelement location="${freecol.build.dir}" />
                 <pathelement location="test/lib/junit.jar" />
@@ -542,7 +542,7 @@
             </classpath>
             <formatter type="xml" />
             
-           	<test todir="${freecol.build.dir}/report/xml" name="net.sf.freecol.AllTests" />
+           	<test todir="${freecol.build.dir}/report/xml" name="net.sf.freecol.AllTests" fork="yes"/>
         	
         	<!--
         	<batchtest fork="false" todir="${freecol.build.dir}/report/xml">
