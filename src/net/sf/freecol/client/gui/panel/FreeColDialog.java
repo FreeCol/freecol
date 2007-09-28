@@ -625,11 +625,11 @@ public class FreeColDialog extends FreeColPanel {
         // decide on some mnemonics for the actions
         char  okButtonMnemonic = '\0';
         char  cancelButtonMnemonic = '\0';
-        String  okLower = okText.toLowerCase();
-        String  cancelLower = cancelText.toLowerCase();
-        String  menuMnemonics = "gvorc";
-        for ( int ci = 0, nc = okLower.length();  ci < nc;  ci ++ ) {
-            char  ch = Character.toLowerCase( okLower.charAt(ci) );
+        String  okUpper = okText.toUpperCase();
+        String  cancelUpper = cancelText.toUpperCase();
+        String  menuMnemonics = "GVORCD";
+        for ( int ci = 0, nc = okUpper.length();  ci < nc;  ci ++ ) {
+            char  ch = okUpper.charAt(ci);
 
             // if the character at "ci" in "okText" is not claimed by the menu..
             if ( -1 == menuMnemonics.indexOf(ch) ) {
@@ -638,12 +638,12 @@ public class FreeColDialog extends FreeColPanel {
                 break;
             }
         }
-        for ( int ci = 0, nc = cancelLower.length();  ci < nc;  ci ++ ) {
-            char  ch = Character.toLowerCase( cancelLower.charAt(ci) );
+        for ( int ci = 0, nc = cancelUpper.length();  ci < nc;  ci ++ ) {
+            char  ch = cancelUpper.charAt(ci);
 
             // if the character at "ci" in "cancelText" is not claimed by the
-            // menu nor by "okText"..
-            if ( -1 == menuMnemonics.indexOf(ch)  &&  -1 == okLower.indexOf(ch) ) {
+            // menu nor by okButton..
+            if ( -1 == menuMnemonics.indexOf(ch)  &&  ch != okButtonMnemonic ) {
 
                 cancelButtonMnemonic = ch;
                 break;

@@ -11,6 +11,7 @@ import java.util.logging.Logger;
 
 import javax.swing.AbstractButton;
 import javax.swing.border.Border;
+import javax.swing.Action;
 import javax.swing.BorderFactory;
 import javax.swing.ComponentInputMap;
 import javax.swing.InputMap;
@@ -191,15 +192,16 @@ public class FreeColPanel extends JPanel {
         return header;
     }
 
-    public void setCancelComponent(AbstractButton c) {
-        if (c == null) {
+    public void setCancelComponent(AbstractButton cancelButton) {
+        if (cancelButton == null) {
             throw new NullPointerException();
         }
-
-        InputMap inputMap = new ComponentInputMap(c);
-        inputMap.put(KeyStroke.getKeyStroke(cancelKeyCode, 0, false), "pressed");
-        inputMap.put(KeyStroke.getKeyStroke(cancelKeyCode, 0, true), "released");
-        SwingUtilities.replaceUIInputMap(c, JComponent.WHEN_IN_FOCUSED_WINDOW, inputMap);
+        
+        InputMap inputMap = getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
+        inputMap.put(KeyStroke.getKeyStroke(cancelKeyCode, 0, true), "release");
+                
+        Action cancelAction = cancelButton.getAction();
+        getActionMap().put("release", cancelAction);
     }
 
     /**
