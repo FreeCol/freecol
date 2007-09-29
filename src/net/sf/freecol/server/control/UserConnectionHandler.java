@@ -234,7 +234,9 @@ public final class UserConnectionHandler implements MessageHandler, StreamedMess
 
         // Create and add the new player:
         boolean admin = (freeColServer.getGame().getPlayers().size() == 0);
-        ServerPlayer newPlayer = new ServerPlayer(freeColServer.getGame(), username, admin, connection.getSocket(), connection);
+        ServerPlayer newPlayer = new ServerPlayer(freeColServer.getGame(), username, admin, 
+                                                  connection.getSocket(), connection);
+
         freeColServer.getGame().addPlayer(newPlayer);
 
         // Send message to all players except to the new player:

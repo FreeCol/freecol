@@ -67,7 +67,6 @@ public class ServerPlayer extends Player implements ServerModelObject {
         connected = (connection != null);
     }
 
-
     /**
     * Creates a new <code>ServerPlayer</code>.
     *

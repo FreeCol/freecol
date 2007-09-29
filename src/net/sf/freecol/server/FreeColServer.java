@@ -167,6 +167,12 @@ public final class FreeColServer {
 
         modelController = new ServerModelController(this);
         game = new Game(modelController);
+        if (additionalNations) {
+            game.setVacantNations(FreeCol.getSpecification().getEuropeanNations());
+        } else {
+            game.setVacantNations(FreeCol.getSpecification().getClassicNations());
+        }
+        game.setMaximumPlayers(players);
         mapGenerator = new MapGenerator();
         userConnectionHandler = new UserConnectionHandler(this);
         preGameController = new PreGameController(this);

@@ -62,7 +62,7 @@ public class Game extends FreeColGameObject {
     private Player viewOwner;
 
     /** The maximum number of (human) players allowed in this game. */
-    private int maxPlayers = 8;
+    private int maxPlayers = 4;
 
     /** Contains references to all objects created in this game. */
     private HashMap<String, FreeColGameObject> freeColGameObjects = new HashMap<String, FreeColGameObject>(10000);
@@ -84,6 +84,11 @@ public class Game extends FreeColGameObject {
 
     /** The lost city rumour class. */
     private final static LostCityRumour lostCityRumour = new LostCityRumour();
+
+    /**
+     * Describe vacantNations here.
+     */
+    private List<Nation> vacantNations = new ArrayList<Nation>();
 
 
     /**
@@ -223,6 +228,24 @@ public class Game extends FreeColGameObject {
     }
 
     /**
+     * Get the <code>AvailableNations</code> value.
+     *
+     * @return a <code>List<Nation></code> value
+     */
+    public final List<Nation> getVacantNations() {
+        return vacantNations;
+    }
+
+    /**
+     * Set the <code>AvailableNations</code> value.
+     *
+     * @param newAvailableNations The new AvailableNations value.
+     */
+    public final void setVacantNations(final List<Nation> newNations) {
+        this.vacantNations = newNations;
+    }
+
+    /**
      * Check if the clients are trusted or if the server should keep secrets in
      * order to prevent cheating.
      * 
@@ -311,6 +334,7 @@ public class Game extends FreeColGameObject {
     public void addPlayer(Player player) {
         if (player.isAI() || canAddNewPlayer()) {
             players.add(player);
+            vacantNations.remove(FreeCol.getSpecification().getNation(player.getNationID()));
 
             if (currentPlayer == null) {
                 currentPlayer = player;
@@ -330,6 +354,7 @@ public class Game extends FreeColGameObject {
         boolean updateCurrentPlayer = (currentPlayer == player);
 
         players.remove(players.indexOf(player));
+        vacantNations.add(FreeCol.getSpecification().getNation(player.getNationID()));
         player.dispose();
 
         if (updateCurrentPlayer) {
@@ -447,21 +472,11 @@ public class Game extends FreeColGameObject {
      * @return A vacant nation.
      */
     public Nation getVacantNation() {
-        for (Nation nation : FreeCol.getSpecification().getNations()) {
-            if (nation.isSelectable() && nation.isClassic()) {
-                boolean taken = false;
-                for (Player player : getPlayers()) {
-                    if (player.getNationID().equals(nation.getID())) {
-                        taken = true;
-                        break;
-                    }
-                }
-                if (!taken) {
-                    return nation;
-                }
-            }
+        if (vacantNations.isEmpty()) {
+            return null;
+        } else {
+            return vacantNations.get(0);
         }
-        return null;
     }
 
     /**
@@ -681,14 +696,24 @@ public class Game extends FreeColGameObject {
     }
 
     /**
-     * Gets the maximum number of (human) players that can be added to this
-     * game.
+     * Gets the maximum number of (human) players that can be added to
+     * this game.
      * 
      * @return the maximum number of (human) players that can be added to this
      *         game
      */
     public int getMaximumPlayers() {
         return maxPlayers;
+    }
+
+    /**
+     * Sets the maximum number of (human) players that can be added to
+     * this game.
+     *
+     * @param newMax an <code>int</code> value
+     */
+    public void setMaximumPlayers(int newMax) {
+        maxPlayers = newMax;
     }
 
     /**
