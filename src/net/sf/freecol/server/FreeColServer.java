@@ -375,6 +375,14 @@ public final class FreeColServer {
         return additionalNations;
     }
 
+    /**
+     * Returns the number of players.
+     *
+     * @return an <code>int</code> value
+     */
+    public int getNumberOfPlayers() {
+        return numberOfPlayers;
+    }
 
     /**
      * Sends information about this server to the meta-server. The information

@@ -274,9 +274,9 @@ public class Player extends FreeColGameObject implements Abilities, Nameable, Mo
         super(game);
         
         if (game == null)
-        	this.index = -1;
+            this.index = -1;
         else {
-        	this.index = game.getNextPlayerIndex();
+            this.index = game.getNextPlayerIndex();
         }
         this.name = name;
         this.admin = admin;
@@ -424,7 +424,7 @@ public class Player extends FreeColGameObject implements Abilities, Nameable, Mo
         if (settlements.contains(s)) {
             if (s.getOwner() == this) {
                 throw new IllegalStateException(
-                        "Cannot remove the ownership of the given settlement before it has been given to another player.");
+                                                "Cannot remove the ownership of the given settlement before it has been given to another player.");
             }
             settlements.remove(s);
         }
@@ -885,14 +885,14 @@ public class Player extends FreeColGameObject implements Abilities, Nameable, Mo
      */
     public void setExplored(Unit unit) {
         if (getGame() == null || getGame().getMap() == null || unit == null || unit.getLocation() == null
-                || unit.getTile() == null || isIndian()) {
+            || unit.getTile() == null || isIndian()) {
             return;
         }
         if (canSeeTiles == null) {
             resetCanSeeTiles();
         }
         Iterator<Position> positionIterator = getGame().getMap().getCircleIterator(unit.getTile().getPosition(), true,
-                unit.getLineOfSight());
+                                                                                   unit.getLineOfSight());
         while (positionIterator.hasNext()) {
             Map.Position p = positionIterator.next();
             canSeeTiles[p.getX()][p.getY()] = true;
@@ -985,7 +985,7 @@ public class Player extends FreeColGameObject implements Abilities, Nameable, Mo
                      * colony.getTile().getPosition() + "), Tile: " + position); }
                      */
                     Iterator<Position> positionIterator = map
-                            .getCircleIterator(position, true, colony.getLineOfSight());
+                        .getCircleIterator(position, true, colony.getLineOfSight());
                     while (positionIterator.hasNext()) {
                         Map.Position p = positionIterator.next();
                         canSeeTiles[p.getX()][p.getY()] = true;
@@ -1491,7 +1491,7 @@ public class Player extends FreeColGameObject implements Abilities, Nameable, Mo
                 }
             }
             if (t.getSettlement() != null && t.getSettlement().getOwner() != null
-                    && t.getSettlement().getOwner().equals(this)) {
+                && t.getSettlement().getOwner().equals(this)) {
                 Iterator<Unit> unitIterator = t.getSettlement().getUnitIterator();
                 while (unitIterator.hasNext()) {
                     Unit u = unitIterator.next();
@@ -1588,7 +1588,7 @@ public class Player extends FreeColGameObject implements Abilities, Nameable, Mo
             }
             int distance;
             if (colony.hasAbility("model.ability.repairShips")
-                    && (distance = unit.getTile().getDistanceTo(colony.getTile())) < shortestDistance) {
+                && (distance = unit.getTile().getDistanceTo(colony.getTile())) < shortestDistance) {
                 closestLocation = colony;
                 shortestDistance = distance;
             }
@@ -1785,7 +1785,7 @@ public class Player extends FreeColGameObject implements Abilities, Nameable, Mo
         }
     }
 
-        /**
+    /**
      * Sets the hostility against the given player.
      * 
      * @param player The <code>Player</code>.
@@ -1952,9 +1952,9 @@ public class Player extends FreeColGameObject implements Abilities, Nameable, Mo
         // Ignore requests to change the stance when indian players are
         // involved:
         /*
-        if (isIndian() || player.isIndian()) {
-            return;
-        }
+          if (isIndian() || player.isIndian()) {
+          return;
+          }
         */
         if (player == this) {
             throw new IllegalStateException("Cannot set the stance towards ourselves.");
@@ -2143,71 +2143,71 @@ public class Player extends FreeColGameObject implements Abilities, Nameable, Mo
                 }
 
                 /** TODO: restore effects of founding fathers as soon as possible
-                switch (currentFather) {
-                case FoundingFather.HERNANDO_DE_SOTO:
+                    switch (currentFather) {
+                    case FoundingFather.HERNANDO_DE_SOTO:
                     Iterator<Unit> ui = getUnitIterator();
                     while (ui.hasNext()) {
-                        setExplored(ui.next());
+                    setExplored(ui.next());
                     }
                     break;
 
-                case FoundingFather.JOHN_PAUL_JONES:
+                    case FoundingFather.JOHN_PAUL_JONES:
                     // get new frigate
                     getGame().getModelController().createUnit(getID() + "newTurnJohnPaulJones", getEurope(), this,
-                            Unit.FRIGATE);
+                    Unit.FRIGATE);
                     break;
 
-                case FoundingFather.BARTOLOME_DE_LAS_CASAS:
+                    case FoundingFather.BARTOLOME_DE_LAS_CASAS:
                     // make all converts free colonists
                     for (Iterator<Unit> iter = getUnitIterator(); iter.hasNext();) {
-                        Unit u = iter.next();
-                        if (u.hasAbility("model.unit.convert")) {
-                            u.setType(Unit.FREE_COLONIST);
-                            // reset experience, otherwise they will
-                            // immediately become experts
-                            u.modifyExperience(-u.getExperience());
-                        }
+                    Unit u = iter.next();
+                    if (u.hasAbility("model.unit.convert")) {
+                    u.setType(Unit.FREE_COLONIST);
+                    // reset experience, otherwise they will
+                    // immediately become experts
+                    u.modifyExperience(-u.getExperience());
+                    }
                     }
                     break;
 
-                case FoundingFather.FRANCISCO_DE_CORONADO:
+                    case FoundingFather.FRANCISCO_DE_CORONADO:
 
                     break;
 
-                case FoundingFather.SIMON_BOLIVAR:
+                    case FoundingFather.SIMON_BOLIVAR:
                     // SoL increase by 20 %
                     Iterator<Settlement> colonyIterator2 = getSettlementIterator();
                     while (colonyIterator2.hasNext()) {
-                        ((Colony) colonyIterator2.next()).addSoL(20);
+                    ((Colony) colonyIterator2.next()).addSoL(20);
                     }
                     break;
 
-                case FoundingFather.WILLIAM_BREWSTER:
+                    case FoundingFather.WILLIAM_BREWSTER:
                     // don't recruit any more criminals or servants
                     for (int i = 0; i < 3; i++) {
-                        UnitType recruitType = getEurope().getRecruitable(i);
-                        if (recruitType == Unit.PETTY_CRIMINAL || recruitType == Unit.INDENTURED_SERVANT) {
-                            getEurope().setRecruitable(i, Unit.FREE_COLONIST);
-                        }
+                    UnitType recruitType = getEurope().getRecruitable(i);
+                    if (recruitType == Unit.PETTY_CRIMINAL || recruitType == Unit.INDENTURED_SERVANT) {
+                    getEurope().setRecruitable(i, Unit.FREE_COLONIST);
+                    }
                     }
                     break;
 
-                case FoundingFather.THOMAS_JEFFERSON:
+                    case FoundingFather.THOMAS_JEFFERSON:
                     // increase bells production by 50 %
                     bellsBonus += 50;
                     break;
 
-                case FoundingFather.THOMAS_PAINE:
+                    case FoundingFather.THOMAS_PAINE:
                     // increase bell production by current tax rate
                     bellsBonus += tax;
                     break;
 
-                }
+                    }
                 */
                 addModelMessage(this, "model.player.foundingFatherJoinedCongress", new String[][] {
                         { "%foundingFather%", currentFather.getName() },
                         { "%description%", currentFather.getDescription() } },
-                        ModelMessage.DEFAULT);
+                    ModelMessage.DEFAULT);
                 currentFather = null;
                 bells = 0;
             }
@@ -2235,11 +2235,11 @@ public class Player extends FreeColGameObject implements Abilities, Nameable, Mo
                     if (newSoL > oldSoL) {
                         addModelMessage(this, "model.player.SoLIncrease", new String[][] {
                                 { "%oldSoL%", String.valueOf(oldSoL) }, { "%newSoL%", String.valueOf(newSoL) } },
-                                ModelMessage.SONS_OF_LIBERTY);
+                            ModelMessage.SONS_OF_LIBERTY);
                     } else {
                         addModelMessage(this, "model.player.SoLDecrease", new String[][] {
                                 { "%oldSoL%", String.valueOf(oldSoL) }, { "%newSoL%", String.valueOf(newSoL) } },
-                                ModelMessage.SONS_OF_LIBERTY);
+                            ModelMessage.SONS_OF_LIBERTY);
                     }
                 }
             }
@@ -2312,7 +2312,7 @@ public class Player extends FreeColGameObject implements Abilities, Nameable, Mo
      *             stream.
      */
     protected void toXMLImpl(XMLStreamWriter out, Player player, boolean showAll, boolean toSavedGame)
-            throws XMLStreamException {
+        throws XMLStreamException {
         // Start element:
         out.writeStartElement(getXMLElementTagName());
         out.writeAttribute("ID", getID());
@@ -2706,7 +2706,7 @@ public class Player extends FreeColGameObject implements Abilities, Nameable, Mo
      */
     public boolean canTrade(int goodsIndex, int marketAccess) {
         return (arrears[goodsIndex] == 0 || (marketAccess == Market.CUSTOM_HOUSE && getGameOptions().getBoolean(
-                GameOptions.CUSTOM_IGNORE_BOYCOTT)));
+                                                                                                                GameOptions.CUSTOM_IGNORE_BOYCOTT)));
     }
     public boolean canTrade(GoodsType type, int marketAccess) {
         return canTrade(type.getIndex(), marketAccess);

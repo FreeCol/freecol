@@ -38,6 +38,11 @@ public class Nation extends FreeColGameObjectType {
      */
     private boolean classic;
 
+    /**
+     * Describe refID here.
+     */
+    private String refID;
+
 
     /**
      * Sole constructor.
@@ -102,6 +107,24 @@ public class Nation extends FreeColGameObjectType {
     }
 
     /**
+     * Get the <code>RefID</code> value.
+     *
+     * @return a <code>String</code> value
+     */
+    public final String getRefID() {
+        return refID;
+    }
+
+    /**
+     * Set the <code>RefID</code> value.
+     *
+     * @param newRefID The new RefID value.
+     */
+    public final void setRefID(final String newRefID) {
+        this.refID = newRefID;
+    }
+
+    /**
      * Set the <code>Selectable</code> value.
      *
      * @param newSelectable The new Selectable value.
@@ -143,6 +166,7 @@ public class Nation extends FreeColGameObjectType {
         type = nationTypeByRef.get(in.getAttributeValue(null, "nation-type"));
         selectable = getAttribute(in, "selectable", false);
         classic = getAttribute(in, "classic", false);
+        refID = getAttribute(in, "ref-of", null);
         in.nextTag();
    }
 

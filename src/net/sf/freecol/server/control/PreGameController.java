@@ -4,7 +4,9 @@ package net.sf.freecol.server.control;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -81,14 +83,23 @@ public final class PreGameController extends Controller {
 
         Game game = freeColServer.getGame();
         MapGenerator mapGenerator = freeColServer.getMapGenerator();
-        AIMain aiMain = new AIMain(freeColServer);        
+        AIMain aiMain = new AIMain(freeColServer);
         freeColServer.setAIMain(aiMain);
-        game.setFreeColGameObjectListener(aiMain);        
+        game.setFreeColGameObjectListener(aiMain);
 
+        List<Nation> nations = new ArrayList<Nation>();
+        int numberOfPlayers = freeColServer.getNumberOfPlayers() - game.getPlayers().size();
+        if (numberOfPlayers > 0) {
+            nations.addAll(game.getVacantNations().subList(0, numberOfPlayers));
+        }
+        nations.addAll(FreeCol.getSpecification().getIndianNations());
+        nations.addAll(FreeCol.getSpecification().getREFNations());
+        
         // Add AI players
         int i = 0;
-        for (Nation nation : FreeCol.getSpecification().getNations()) {
-            if (game.getPlayer(nation.getID()) != null) {
+        for (Nation nation : nations) {
+            if (game.getPlayer(nation.getID()) != null ||
+                nation.getType().isREF() && game.getPlayer(nation.getRefID()) == null) {
                 continue;
             }
 
