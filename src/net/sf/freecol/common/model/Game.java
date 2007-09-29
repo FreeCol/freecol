@@ -33,6 +33,8 @@ public class Game extends FreeColGameObject {
 
     private static final Logger logger = Logger.getLogger(Game.class.getName());
 
+    protected int playerIndex;
+
     /** 
      * A virtual player to use with enemy privateers 
      * TODO: player should have a game.
@@ -41,7 +43,7 @@ public class Game extends FreeColGameObject {
 
     public Player getUnknownEnemy() {
     	return unknownEnemy;
-	}
+    }
     
     /** Contains all the players in the game. */
     private List<Player> players = new ArrayList<Player>();
@@ -121,7 +123,7 @@ public class Game extends FreeColGameObject {
      * @see net.sf.freecol.server.FreeColServer#loadGame(File)
      */
     public Game(FreeColGameObjectListener freeColGameObjectListener, ModelController modelController,
-            XMLStreamReader in, FreeColGameObject[] fcgos) throws XMLStreamException {
+                XMLStreamReader in, FreeColGameObject[] fcgos) throws XMLStreamException {
         super(null, in);
 
         setFreeColGameObjectListener(freeColGameObjectListener);
@@ -207,7 +209,7 @@ public class Game extends FreeColGameObject {
      *      String, int)
      */
     public Game(ModelController modelController, XMLStreamReader in, String viewOwnerUsername)
-            throws XMLStreamException {
+        throws XMLStreamException {
         super(null, in);
 
         this.modelController = modelController;
@@ -308,7 +310,7 @@ public class Game extends FreeColGameObject {
      */
     public void addPlayer(Player player) {
         if (player.isAI() || canAddNewPlayer()) {
-        	players.add(player);
+            players.add(player);
 
             if (currentPlayer == null) {
                 currentPlayer = player;
@@ -354,7 +356,7 @@ public class Game extends FreeColGameObject {
         if (old != null) {
             logger.warning("Replacing FreeColGameObject: " + old.getClass() + " with " + freeColGameObject.getClass());
             throw new IllegalArgumentException("Replacing FreeColGameObject: " + old.getClass() + " with "
-                    + freeColGameObject.getClass());
+                                               + freeColGameObject.getClass());
         }
 
         if (freeColGameObjectListener != null) {
@@ -741,7 +743,7 @@ public class Game extends FreeColGameObject {
     public boolean checkIntegrity() {
         boolean ok = true;
         Iterator<FreeColGameObject> iterator = ((HashMap<String, FreeColGameObject>) freeColGameObjects.clone())
-                .values().iterator();
+            .values().iterator();
         while (iterator.hasNext()) {
             FreeColGameObject fgo = iterator.next();
             if (fgo.isUninitialized()) {
@@ -808,7 +810,7 @@ public class Game extends FreeColGameObject {
             amount = 5000;
         }
         amount += 20 * (attackingPlayer.getTension(payingPlayer).getValue() - attackingPlayer.getTension(targetPlayer)
-                .getValue());
+                        .getValue());
 
         return Math.max(amount, 650);
     }
@@ -837,7 +839,7 @@ public class Game extends FreeColGameObject {
      *             stream.
      */
     protected void toXMLImpl(XMLStreamWriter out, Player player, boolean showAll, boolean toSavedGame)
-            throws XMLStreamException {
+        throws XMLStreamException {
         // Start element:
         out.writeStartElement(getXMLElementTagName());
 
@@ -937,20 +939,18 @@ public class Game extends FreeColGameObject {
     }
     
     /**
-	 * Need to overwrite behavior of equals inherited from FreeColGameObject,
-	 * since two games are not the same if the have the same id.
-	 */
-	public boolean equals(Object o) {
-		return this == o;
-	}
+     * Need to overwrite behavior of equals inherited from FreeColGameObject,
+     * since two games are not the same if the have the same id.
+     */
+    public boolean equals(Object o) {
+        return this == o;
+    }
 
-	protected int playerIndex;
-	
-	/**
-	 * Returns an increasing number that can be used when creating players.
-	 * @return
-	 */
-	public int getNextPlayerIndex() {
-		return playerIndex++;
-	}
+    /**
+     * Returns an increasing number that can be used when creating players.
+     * @return
+     */
+    public int getNextPlayerIndex() {
+        return playerIndex++;
+    }
 }
