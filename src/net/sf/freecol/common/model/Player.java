@@ -47,13 +47,6 @@ public class Player extends FreeColGameObject implements Abilities, Nameable, Mo
     public static final int NUMBER_OF_PLAYERS = 24;
 
     /**
-     * The index counter for this class.
-     * 
-     * TODO: make this unnecessary
-     */
-    private static java.util.Map<Game, Integer> lastIndex = new HashMap<Game, Integer>();
-
-    /**
      * The index of this player
      */
     private int index;
@@ -283,13 +276,7 @@ public class Player extends FreeColGameObject implements Abilities, Nameable, Mo
         if (game == null)
         	this.index = -1;
         else {
-        	// Index need to start at 0 for each game!
-        	Integer lastIndexValue = lastIndex.get(game);
-        	if (lastIndexValue == null){
-        		lastIndexValue = 0;
-        	}
-        	this.index = lastIndexValue++;
-        	lastIndex.put(game, lastIndexValue);
+        	this.index = game.getNextPlayerIndex();
         }
         this.name = name;
         this.admin = admin;

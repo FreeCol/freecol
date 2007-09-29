@@ -308,7 +308,7 @@ public class Game extends FreeColGameObject {
      */
     public void addPlayer(Player player) {
         if (player.isAI() || canAddNewPlayer()) {
-            players.add(player);
+        	players.add(player);
 
             if (currentPlayer == null) {
                 currentPlayer = player;
@@ -942,5 +942,15 @@ public class Game extends FreeColGameObject {
 	 */
 	public boolean equals(Object o) {
 		return this == o;
+	}
+
+	protected int playerIndex;
+	
+	/**
+	 * Returns an increasing number that can be used when creating players.
+	 * @return
+	 */
+	public int getNextPlayerIndex() {
+		return playerIndex++;
 	}
 }
