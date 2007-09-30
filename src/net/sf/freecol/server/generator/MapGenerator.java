@@ -270,8 +270,9 @@ public class MapGenerator {
         List<Player> indians = new ArrayList<Player>();
 
         for (Player player : players) {
-            if (player.isIndian())
+            if (player.isIndian()) {
                 indians.add(player);
+            }
         }
 
         if (indians.size() == 0)
@@ -309,7 +310,7 @@ public class MapGenerator {
                             bestTribe = t;
                         }
                     }
-                    IndianSettlement is = placeIndianSettlement(players.get(bestTribe + 4),
+                    IndianSettlement is = placeIndianSettlement(indians.get(bestTribe),
                         bestTribe, false, candidate.getPosition(), map, players);
 
                     // CO: Fix for missing capital
@@ -468,6 +469,7 @@ public class MapGenerator {
             }
             if (player.isEuropean()) {
                 europeanPlayers.add(player);
+                logger.finest("found European player " + player.getNationAsString());
             }
         }
         int startingPositions = europeanPlayers.size();

@@ -86,7 +86,7 @@ public class Game extends FreeColGameObject {
     private final static LostCityRumour lostCityRumour = new LostCityRumour();
 
     /**
-     * Describe vacantNations here.
+     * The nations that can still be selected in this Game.
      */
     private List<Nation> vacantNations = new ArrayList<Nation>();
 
@@ -228,7 +228,7 @@ public class Game extends FreeColGameObject {
     }
 
     /**
-     * Get the <code>AvailableNations</code> value.
+     * Get the <code>VacantNations</code> value.
      *
      * @return a <code>List<Nation></code> value
      */
@@ -237,9 +237,9 @@ public class Game extends FreeColGameObject {
     }
 
     /**
-     * Set the <code>AvailableNations</code> value.
+     * Set the <code>VacantNations</code> value.
      *
-     * @param newAvailableNations The new AvailableNations value.
+     * @param newNations the new list of vacant nations
      */
     public final void setVacantNations(final List<Nation> newNations) {
         this.vacantNations = newNations;
