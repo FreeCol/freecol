@@ -2112,6 +2112,18 @@ public class Player extends FreeColGameObject implements Abilities, Nameable, Mo
                     }
                 }
 
+                java.util.Map<String, String> upgrades = currentFather.getUpgrades();
+                if (upgrades != null) {
+                    Iterator<Unit> unitIterator = getUnitIterator();
+                    while (unitIterator.hasNext()) {
+                        Unit unit = unitIterator.next();
+                        String newTypeID = upgrades.get(unit.getID());
+                        if (newTypeID != null) {
+                            unit.setType(FreeCol.getSpecification().getUnitType(newTypeID));
+                        }
+                    }
+                }
+
                 for (String event : currentFather.getEvents().keySet()) {
                     if (event.equals("model.event.resetNativeAlarm")) {
                         // reduce indian tension and alarm

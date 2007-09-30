@@ -33,6 +33,11 @@ public class FoundingFather extends FreeColGameObjectType implements Abilities, 
      */
     private int type;
 
+    /**
+     * Describe upgrades here.
+     */
+    private Map<String, String> upgrades;
+
     public static final int TRADE = 0,
                             EXPLORATION = 1,
                             MILITARY = 2,
@@ -234,6 +239,24 @@ public class FoundingFather extends FreeColGameObjectType implements Abilities, 
     }
 
     /**
+     * Get the <code>Upgrades</code> value.
+     *
+     * @return a <code>Map<String, String></code> value
+     */
+    public final Map<String, String> getUpgrades() {
+        return upgrades;
+    }
+
+    /**
+     * Set the <code>Upgrades</code> value.
+     *
+     * @param newUpgrades The new Upgrades value.
+     */
+    public final void setUpgrades(final Map<String, String> newUpgrades) {
+        this.upgrades = newUpgrades;
+    }
+
+    /**
      * Returns all events.
      *
      * @return a <code>List</code> of Events.
@@ -295,6 +318,14 @@ public class FoundingFather extends FreeColGameObjectType implements Abilities, 
                     units = new ArrayList<AbstractUnit>();
                 }
                 units.add(unit);
+            } else if ("upgrade".equals(childName)) {
+                String fromID = in.getAttributeValue(null, "from-id");
+                String toID = in.getAttributeValue(null, "to-id");
+                if (upgrades == null) {
+                    upgrades = new HashMap<String, String>();
+                }
+                upgrades.put(fromID, toID);
+                in.nextTag();
             } else {
                 logger.finest("Parsing of " + childName + " is not implemented yet");
                 while (in.nextTag() != XMLStreamConstants.END_ELEMENT ||
