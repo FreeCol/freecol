@@ -29,7 +29,7 @@ public class EuropeanNationType extends NationType {
     /**
      * Stores the starting units of this Nation.
      */
-    private List<StartingUnit> startingUnits = new ArrayList<StartingUnit>();
+    private List<AbstractUnit> startingUnits = new ArrayList<AbstractUnit>();
 
     /**
      * Constructor.
@@ -88,7 +88,7 @@ public class EuropeanNationType extends NationType {
      *
      * @return a list of this Nation's starting units.
      */
-    public List<StartingUnit> getStartingUnits() {
+    public List<AbstractUnit> getStartingUnits() {
         return startingUnits;
     }
 
@@ -111,27 +111,10 @@ public class EuropeanNationType extends NationType {
                 }
                 setModifier(modifier.getId(), modifier);
             } else if ("unit".equals(childName)) {
-                StartingUnit unit = new StartingUnit();
-                unit.unitType = unitTypeByRef.get(in.getAttributeValue(null, "id"));
-                unit.armed = getAttribute(in, "armed", false);
-                unit.mounted = getAttribute(in, "mounted", false);
-                unit.missionary = getAttribute(in, "missionary", false);
-                unit.tools = getAttribute(in, "tools", 0);
+                AbstractUnit unit = new AbstractUnit(in); // AbstractUnit closes element
                 startingUnits.add(unit);
-                in.nextTag(); // close this element
             }
         }
-    }
-
-    /**
-     * This class records the data necessary to construct a starting unit.
-     */
-    public class StartingUnit {
-        public UnitType unitType;
-        public boolean armed = false;
-        public boolean mounted = false;
-        public boolean missionary = false;
-        public int tools = 0;
     }
 
 }

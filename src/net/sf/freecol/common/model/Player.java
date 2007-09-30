@@ -2102,6 +2102,16 @@ public class Player extends FreeColGameObject implements Abilities, Nameable, Mo
                     }
                 }
 
+                List<AbstractUnit> units = currentFather.getUnits();
+                if (units != null) {
+                    // TODO: make use of armed, mounted, etc.
+                    for (int index = 0; index < units.size(); index++) {
+                        AbstractUnit unit = units.get(index);
+                        String uniqueID = getID() + "newTurn" + currentFather.getID() + String.valueOf(index);
+                        getGame().getModelController().createUnit(uniqueID, getEurope(), this, unit.getUnitType());
+                    }
+                }
+
                 for (String event : currentFather.getEvents().keySet()) {
                     if (event.equals("model.event.resetNativeAlarm")) {
                         // reduce indian tension and alarm
@@ -2142,68 +2152,6 @@ public class Player extends FreeColGameObject implements Abilities, Nameable, Mo
 
                 }
 
-                /** TODO: restore effects of founding fathers as soon as possible
-                    switch (currentFather) {
-                    case FoundingFather.HERNANDO_DE_SOTO:
-                    Iterator<Unit> ui = getUnitIterator();
-                    while (ui.hasNext()) {
-                    setExplored(ui.next());
-                    }
-                    break;
-
-                    case FoundingFather.JOHN_PAUL_JONES:
-                    // get new frigate
-                    getGame().getModelController().createUnit(getID() + "newTurnJohnPaulJones", getEurope(), this,
-                    Unit.FRIGATE);
-                    break;
-
-                    case FoundingFather.BARTOLOME_DE_LAS_CASAS:
-                    // make all converts free colonists
-                    for (Iterator<Unit> iter = getUnitIterator(); iter.hasNext();) {
-                    Unit u = iter.next();
-                    if (u.hasAbility("model.unit.convert")) {
-                    u.setType(Unit.FREE_COLONIST);
-                    // reset experience, otherwise they will
-                    // immediately become experts
-                    u.modifyExperience(-u.getExperience());
-                    }
-                    }
-                    break;
-
-                    case FoundingFather.FRANCISCO_DE_CORONADO:
-
-                    break;
-
-                    case FoundingFather.SIMON_BOLIVAR:
-                    // SoL increase by 20 %
-                    Iterator<Settlement> colonyIterator2 = getSettlementIterator();
-                    while (colonyIterator2.hasNext()) {
-                    ((Colony) colonyIterator2.next()).addSoL(20);
-                    }
-                    break;
-
-                    case FoundingFather.WILLIAM_BREWSTER:
-                    // don't recruit any more criminals or servants
-                    for (int i = 0; i < 3; i++) {
-                    UnitType recruitType = getEurope().getRecruitable(i);
-                    if (recruitType == Unit.PETTY_CRIMINAL || recruitType == Unit.INDENTURED_SERVANT) {
-                    getEurope().setRecruitable(i, Unit.FREE_COLONIST);
-                    }
-                    }
-                    break;
-
-                    case FoundingFather.THOMAS_JEFFERSON:
-                    // increase bells production by 50 %
-                    bellsBonus += 50;
-                    break;
-
-                    case FoundingFather.THOMAS_PAINE:
-                    // increase bell production by current tax rate
-                    bellsBonus += tax;
-                    break;
-
-                    }
-                */
                 addModelMessage(this, "model.player.foundingFatherJoinedCongress", new String[][] {
                         { "%foundingFather%", currentFather.getName() },
                         { "%description%", currentFather.getDescription() } },

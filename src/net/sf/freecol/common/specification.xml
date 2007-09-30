@@ -1010,7 +1010,7 @@
     </founding-father>
     <founding-father id="model.foundingFather.bartolmeDeLasCasas" type="religious"
                      weight1="0" weight2="5" weight3="10">
-      <upgrade-units id="model.unit.indianConvert" newId="model.unit.freeColonist"/>
+      <upgrade from-id="model.unit.indianConvert" to-id="model.unit.freeColonist"/>
     </founding-father>
   </founding-fathers>
 

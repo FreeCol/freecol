@@ -18,6 +18,7 @@ import javax.xml.stream.XMLStreamReader;
 
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.common.FreeColException;
+import net.sf.freecol.common.model.AbstractUnit;
 import net.sf.freecol.common.model.Building;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.ColonyTile;
@@ -494,12 +495,12 @@ public class MapGenerator {
 
             Unit carrier = null;
             List<Unit> units = new ArrayList<Unit>();
-            List<EuropeanNationType.StartingUnit> unitList = ((EuropeanNationType) player.getNationType())
+            List<AbstractUnit> unitList = ((EuropeanNationType) player.getNationType())
                 .getStartingUnits();
-            for (EuropeanNationType.StartingUnit startingUnit : unitList) {
-                Unit newUnit = new Unit(map.getGame(), startTile, player, startingUnit.unitType,
-                                        Unit.SENTRY, startingUnit.armed, startingUnit.mounted,
-                                        startingUnit.tools, startingUnit.missionary);
+            for (AbstractUnit startingUnit : unitList) {
+                Unit newUnit = new Unit(map.getGame(), startTile, player, startingUnit.getUnitType(),
+                                        Unit.SENTRY, startingUnit.isArmed(), startingUnit.isMounted(),
+                                        startingUnit.getTools(), startingUnit.isMissionary());
                 if (newUnit.hasAbility("model.ability.carryUnits")) {
                     carrier = newUnit;
                     carrier.setState(Unit.ACTIVE);
