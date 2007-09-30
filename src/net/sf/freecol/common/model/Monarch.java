@@ -1,6 +1,7 @@
 
 package net.sf.freecol.common.model;
 
+import java.util.ArrayList;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
@@ -413,10 +414,9 @@ public final class Monarch extends FreeColGameObject {
      * @return The enemy nation.
      */
     public Player declareWar() {
-        int offset = getGame().getModelController().getPseudoRandom().nextInt(Player.NUMBER_OF_PLAYERS);
+        ArrayList<Player> europeanPlayers = new ArrayList<Player>();
         for (int i = 0; i < Player.NUMBER_OF_PLAYERS; i++) {
-            int nation = (i + offset) % Player.NUMBER_OF_PLAYERS;
-            Player enemy = getGame().getPlayer(nation);
+            Player enemy = getGame().getPlayer(i);
             if (enemy == player) {
                 continue;
             } else if (!player.hasContacted(enemy)) {
@@ -426,9 +426,14 @@ public final class Monarch extends FreeColGameObject {
             }
             int stance = player.getStance(enemy);
             if (stance == Player.PEACE || stance == Player.CEASE_FIRE) {
-                player.setStance(enemy, Player.WAR);
-                return enemy;
+                europeanPlayers.add(enemy);
             }
+        }
+        if (europeanPlayers.size() > 0) {
+            int random = getGame().getModelController().getPseudoRandom().nextInt(europeanPlayers.size());
+            Player enemy = europeanPlayers.get(random);
+            player.setStance(enemy, Player.WAR);
+            return enemy;
         }
         return null;
     }
