@@ -1015,7 +1015,7 @@ public class IndianSettlement extends Settlement {
 
         /* Increase alarm: */
         if (getUnitCount() > 0) {
-            int[] extraAlarm = new int[Player.NUMBER_OF_PLAYERS];
+            int[] extraAlarm = new int[getGame().getNumberOfPlayers()];
             
             int alarmRadius = getRadius() + 2; // the radius in which Europeans cause alarm
             Iterator<Position> ci = getGame().getMap().getCircleIterator(getTile().getPosition(), true, alarmRadius);

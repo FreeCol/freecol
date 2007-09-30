@@ -676,6 +676,10 @@ public class Game extends FreeColGameObject {
         return players;
     }
 
+    public int getNumberOfPlayers() {
+        return players.size();
+    }
+
     /**
      * Returns all the European players known by the player of this game.
      * 
