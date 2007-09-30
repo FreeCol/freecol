@@ -227,18 +227,6 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
     }
 
     /**
-     * Gets the name of a given type of tile, not checking for ability to see this tile.
-     *//*
-    public static String getName(TileType type) {
-        if (type == null) 
-            return null;
-        return Messages.message(type.getName());
-    }
-    public static String getName(int tileIndex) {
-        return getName(FreeCol.getSpecification().getTileType(tileIndex));
-    }
-*/
-    /**
      * Returns a description of the <code>Tile</code>, with the name of the tile
      * and any improvements on it (road/plow/etc) from <code>TileItemContainer</code>.
      * @return The description label for this tile
@@ -247,34 +235,6 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
         return getName() + tileItemContainer.getLabel();
     }
     
-    /**
-     * Gets the name of the given tile type. (Depreciated)
-     * 
-     * @return The name as a <code>String</code>.
-     *//*
-         public static String getName(int type, boolean forested, int addition) {
-         /*      Depreciated
-         if (addition == ADD_MOUNTAINS) {
-         return Messages.message("mountains");
-         } else if (addition == ADD_HILLS) {
-         return Messages.message("hills");
-         } else *//*
-                    if (0 < type && type < FreeCol.getSpecification().numberOfTileTypes()) {
-                    TileType tileType = FreeCol.getSpecification().tileType(type);
-                    return forested ? Messages.message(tileType.whenForested.name) : Messages.message(tileType.name);
-                    }
-                    return Messages.message("unexplored");
-                    }
-                  */
-    /**
-     * Set the <code>Name</code> value.
-     * 
-     * @param newName The new Name value.
-     *//*
-         public void setName(String newName) {
-         // this.name = newName;
-         }
-       */
     /**
      * Returns the name of this location.
      * 
@@ -695,33 +655,6 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
     }
 
     /**
-     * Sets the addition on this Tile.
-     * 
-     * @param addition The addition on this Tile.
-     *//*   Depreciated
-            public void setAddition(int addition) {
-            //  Depreciated, but left as legacy
-            if (addition == ADD_HILLS) {
-            setForested(false);
-            type = HILLS;
-            } else if (addition == ADD_MOUNTAINS) {
-            setForested(false);
-            type = MOUNTAINS;
-            }
-            if (addition != ADD_RIVER_MINOR && addition != ADD_RIVER_MAJOR) {
-            river = 0;
-            }
-        
-            if (!isLand() && addition > ADD_RIVER_MAJOR) {
-            logger.warning("Setting addition to Ocean.");
-            type = PLAINS;
-            }
-        
-            additionType = addition;
-            updatePlayerExploredTiles();
-            }
-       */
-    /**
      * Returns the river on this <code>Tile</code> if any
      * @return River <code>TileImprovement</code>
      */
@@ -888,70 +821,6 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
         return owningSettlement;
     }
 
-    /**
-     * Sets whether the tile is forested or not.
-     * 
-     * If a forest is set for the tile (isForested == true) 
-     * then mountains or hills will be removed. (depreciated)
-     *
-     * Forests are ignored/rejected if on Arctic, Hills or Mountains
-     * 
-     * If called on an ocean tile, the type of the tile is set to PLAINS.
-     * 
-     * @param isForested New value for forested.
-     *//*
-         public void setForested(boolean isForested) {
-         forested = isForested;
-         /*  Depreciated
-         if (forested && (additionType == ADD_HILLS
-         || additionType == ADD_MOUNTAINS)) {
-         additionType = ADD_NONE;
-         }
-        
-         if (!isLand() && forested) {
-         logger.warning("Setting forested to Ocean.");
-         type = PLAINS;
-         }
-        
-         if ((type == ARCTIC || type == HILLS || type == MOUNTAINS) && forested) {
-         logger.warning("Ignoring forest on ARCTIC, HILLS or MOUNTAINS.");
-         forested = false;
-         }
-        
-         updatePlayerExploredTiles();
-         }
-       */
-    /**
-     * Sets whether the tile is plowed or not.
-     * 
-     * @param value New value.
-     *//*
-         public void setPlowed(boolean value) {
-         plowed = value;
-         updatePlayerExploredTiles();
-         }
-       */
-    /**
-     * Sets whether the tile has a road or not.
-     * 
-     * @param value New value.
-     *//*
-         public void setRoad(boolean value) {
-         road = value;
-         updatePlayerExploredTiles();
-         }
-       */
-    /**
-     * Sets whether the tile has a bonus or not.
-     * 
-     * @param value New value for bonus
-     *//*
-         public void setBonus(boolean value) {
-         bonus = value;
-         updatePlayerExploredTiles();
-         }
-       */
-    
     /**
      * Sets the <code>Resource</code> for this <code>Tile</code>
      */
@@ -1181,10 +1050,6 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
      * @return The amount of units at this <code>Location</code>.
      */
     public int getUnitCount() {
-        /*
-         * if (settlement != null) { return settlement.getUnitCount() +
-         * unitContainer.getUnitCount(); }
-         */
         return unitContainer.getUnitCount();
     }
 
@@ -1264,12 +1129,6 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
         return potential(FreeCol.getSpecification().getGoodsType(goodsIndex));
     }
 
-    /*
-      return getTileTypePotential(getType(), goods, getAddition(), getFishBonus(), 
-      hasResource(), isForested(), isPlowed(), hasRoad());
-      }
-    */
-
     /**
      * Gets the maximum potential for producing the given type of goods. The
      * maximum potential is the potential of a tile after the tile has been
@@ -1279,11 +1138,14 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
      * @return The maximum potential.
      */
     public int getMaximumPotential(GoodsType goodsType) {
-        // If we consider maximum potential to the effect of having all possible improvements done,
-        // iterate through the improvements and get the bonuses of all related ones.
-        // If there are options to change tiletype using an improvement, consider that too.
+        // If we consider maximum potential to the effect of having
+        // all possible improvements done, iterate through the
+        // improvements and get the bonuses of all related ones.  If
+        // there are options to change tiletype using an improvement,
+        // consider that too.
 
-        // Assortment of valid TileTypes and their respective TileItemContainers, including this one
+        // Assortment of valid TileTypes and their respective
+        // TileItemContainers, including this one
         List<TileType> tileTypes = new ArrayList<TileType>();
         List<TileItemContainer> tiContainers = new ArrayList<TileItemContainer>();
         List<TileImprovementType> tiList = FreeCol.getSpecification().getTileImprovementTypeList();
@@ -1341,35 +1203,35 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
     }
     
     /**
-	 * Will check whether this tile has a completed improvement of the given
-	 * type.
-	 * 
-	 * Useful for checking whether the tile for instance has a road or is
-	 * plowed.
-	 * 
-	 * @param type
-	 *            The type to check for.
-	 * @return Whether the tile has the improvement and the improvement is
-	 *         completed.
-	 */
-	public boolean hasImprovement(TileImprovementType type) {
-		return tileItemContainer.hasImprovement(type);
-	}
+     * Will check whether this tile has a completed improvement of the given
+     * type.
+     * 
+     * Useful for checking whether the tile for instance has a road or is
+     * plowed.
+     * 
+     * @param type
+     *            The type to check for.
+     * @return Whether the tile has the improvement and the improvement is
+     *         completed.
+     */
+    public boolean hasImprovement(TileImprovementType type) {
+        return tileItemContainer.hasImprovement(type);
+    }
     
     /**
-	 * Calculates the potential of a certain <code>GoodsType</code>.
-	 * 
-	 * @param tileType
-	 *            The <code>TileType</code>.
-	 * @param goodsType
-	 *            The <code>GoodsType</code> to check the potential for.
-	 * @param tiContainer
-	 *            The <code>TileItemContainer</code> with any TileItems to
-	 *            give bonuses.
-	 * @param fishbonus
-	 *            The Bonus Fish to be considered if valid
-	 * @return The amount of goods.
-	 */
+     * Calculates the potential of a certain <code>GoodsType</code>.
+     * 
+     * @param tileType
+     *            The <code>TileType</code>.
+     * @param goodsType
+     *            The <code>GoodsType</code> to check the potential for.
+     * @param tiContainer
+     *            The <code>TileItemContainer</code> with any TileItems to
+     *            give bonuses.
+     * @param fishbonus
+     *            The Bonus Fish to be considered if valid
+     * @return The amount of goods.
+     */
     public static int getTileTypePotential(TileType tileType, GoodsType goodsType, TileItemContainer tiContainer, int fishBonus) {
         if (!goodsType.isFarmed()) {
             return 0;
@@ -1385,98 +1247,6 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
         return potential;
     }
 
-    /**
-     * The potential of a given type of tile to produce a certain type of goods.
-     * 
-     * @param type The type of tile
-     * @param goods The type of goods to check the potential for.
-     * @param additionType The type of addition (mountains, hills etc).
-     * @param bonus Should be <code>true</code> to indicate that a bonus is
-     *            present.
-     * @param forested <code>true</code> to indicate a forest.
-     * @param plowed <code>true</code> to indicate that it is plowed.
-     * @param road <code>true</code> to indicate a road
-     * @return The amount of goods.
-     *//*
-         public static int getTileTypePotential(int type, int goods, int additionType, int fishBonus, 
-         boolean bonus, boolean forested, boolean plowed, boolean road) {
-
-         GoodsType goodsType = FreeCol.getSpecification().goodsType(goods);
-
-         if (!goodsType.isFarmed()) {
-         return 0;
-         }
-
-         TileType tileType = FreeCol.getSpecification().tileType(type);
-         if (forested) {
-         tileType = tileType.whenForested;   // Get forested tiletype
-         }
-
-         // Get tile potential + bonus if any
-         int basepotential = tileType.getFullPotential(goods, bonus);
-         if (type == OCEAN && goods == Goods.FOOD) {
-         basepotential = basepotential + fishBonus;
-
-         /*  Depreciated
-         switch (additionType) {
-         case ADD_HILLS:
-         basepotential = potentialtable[12][goods][0];
-         break;
-         case ADD_MOUNTAINS:
-         basepotential = potentialtable[13][goods][0];
-         break;
-         default:
-         if (tileType == OCEAN && goods == Goods.FOOD) {
-         basepotential = potentialtable[tileType][goods][0] + fishBonus;
-         } else {
-         basepotential = potentialtable[tileType][goods][(forested ? 1 : 0)];
-         }
-         break;
-         }
-       *//*
-
-if (basepotential > 0) {
-if (goodsType.isImprovedByPlowing() && plowed) {
-basepotential++;
-} 
-if (goodsType.isImprovedByRoad() && road) {
-basepotential++;
-}
-if (goodsType.isImprovedByRiver()) {
-if (additionType == ADD_RIVER_MAJOR) {
-basepotential += 2;
-} else if (additionType == ADD_RIVER_MINOR) {
-basepotential += 1;
-}
-}
-}
-
-//        if (bonus && goods == getBonusType(tileType, additionType, forested)) {   // Depreciated
-/*  Depreciated
-switch (goods) {
-case Goods.LUMBER:
-case Goods.FURS:
-case Goods.TOBACCO:
-case Goods.COTTON:
-basepotential += 6;
-break;
-case Goods.FOOD:
-basepotential += 4;
-break;
-case Goods.SUGAR:
-basepotential += 7;
-break;
-case Goods.SILVER:
-case Goods.ORE:
-basepotential += 2;
-break;
-}
-         *//*
-             }
-
-             return basepotential;
-             }
-           */
     /**
      * Finds the top three outputs based on TileType, TileItemContainer and FishBonus if any
      * @param tileType The <code>TileType/code>
@@ -1611,7 +1381,7 @@ break;
             Resource resource = tileItemContainer.getResource();
             // Potential of this Tile and Improvements
             int potential = getTileTypePotential(getType(), goodsType, null, getFishBonus())
-                           + tileItemContainer.getImprovementBonusPotential(goodsType);
+                + tileItemContainer.getImprovementBonusPotential(goodsType);
             if (resource.useQuantity(goodsType, potential) == 0) {
                 addModelMessage(this, "model.tile.resourceExhausted", 
                                 new String[][] { 
@@ -2486,49 +2256,6 @@ break;
         // Return the basic work turns + additional work turns
         return (getType().getBasicWorkTurns() + workType.getAddWorkTurns());
     }
-
-    /*  Depreciated
-        if (getTile().getAddition() == Tile.ADD_HILLS) {
-        return 4;
-        }
-
-        if (getTile().getAddition() == Tile.ADD_MOUNTAINS) {
-        return 7;
-        }
-        int workAmount;
-        switch (getType()) {
-        case Tile.SAVANNAH:
-        workAmount = isForested() ? 8 : 5;
-        break;
-        case Tile.DESERT:
-        case Tile.PLAINS:
-        case Tile.PRAIRIE:
-        case Tile.GRASSLANDS:
-        workAmount = isForested() ? 6 : 5;
-        break;
-        case Tile.MARSH:
-        workAmount = isForested() ? 8 : 7;
-        break;
-        case Tile.SWAMP:
-        case Tile.MOUNTAINS:
-        workAmount = 9;
-        break;
-        case Tile.ARCTIC:
-        case Tile.TUNDRA:
-        case Tile.HILLS:
-        workAmount = 6;
-        break;
-        default:
-        throw new IllegalArgumentException("Unknown Tile Type: " + getType());
-        }
-
-        if (workType == Unit.BUILD_ROAD) {
-        return workAmount - 2;
-        } else {
-        return workAmount;
-        }
-        }
-    */
 
     /**
      * Returns the unit who is occupying the tile
