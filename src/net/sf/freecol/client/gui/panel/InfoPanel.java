@@ -31,6 +31,7 @@ import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Tile;
+import net.sf.freecol.common.model.TileImprovement;
 import net.sf.freecol.common.model.TileType;
 import net.sf.freecol.common.model.Unit;
 import cz.autel.dmi.HIGLayout;
@@ -354,10 +355,13 @@ public final class InfoPanel extends FreeColPanel {
                 int row = 2;
                 
                 text = "";
-                if (tile.getAddition() == Tile.ADD_RIVER_MINOR) {
-                    text = Messages.message("minorRiver");
-                } else if (tile.getAddition() == Tile.ADD_RIVER_MAJOR) {
-                    text = Messages.message("majorRiver");
+                TileImprovement river = tile.getRiver();
+                if (river != null) {
+                    if (river.getMagnitude() == 1) {
+                        text = Messages.message("minorRiver");
+                    } else if (river.getMagnitude() > 1) {
+                        text = Messages.message("majorRiver");
+                    }
                 }
                 if (tile.hasRoad()) {
                     if (!text.equals("")) {

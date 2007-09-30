@@ -34,11 +34,6 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
 
     public static final String REVISION = "$Revision$";
 
-    // TODO: remove
-    // An addition onto the tile can be one of the following:
-    public static final int ADD_NONE = 0, ADD_RIVER_MINOR = 1, ADD_RIVER_MAJOR = 2,
-        ADD_HILLS = 3, ADD_MOUNTAINS = 4;    // Deprecated, but left for legacy
-    
     // Indians' claims on the tile may be one of the following:
     public static final int CLAIM_NONE = 0, CLAIM_VISITED = 1, CLAIM_CLAIMED = 2;
 
@@ -641,17 +636,6 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
         }
         setOwner(player);
         updatePlayerExploredTiles();
-    }
-
-    /**
-     * Returns the addition on this Tile.
-     * 
-     * @return The addition on this Tile.
-     *//*   Depreciated
-            TODO: remove
-       */
-    public int getAddition() {
-        return 0;
     }
 
     /**
