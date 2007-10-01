@@ -3,6 +3,7 @@ package net.sf.freecol.common.model;
 import java.awt.Color;
 import java.util.ArrayList;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
@@ -10,7 +11,7 @@ import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
-public final class TileType extends FreeColGameObjectType
+public final class TileType extends FreeColGameObjectType implements Modifiers
 {
     public static final  String  COPYRIGHT = "Copyright (C) 2003-2006 The FreeCol Team";
     public static final  String  LICENSE = "http://www.gnu.org/licenses/gpl.html";
@@ -44,6 +45,11 @@ public final class TileType extends FreeColGameObjectType
     private List<Integer> producedAmount;
     private List<ResourceType> resourceType;
     private List<Integer> resourceProbability;
+
+    /**
+     * Stores the Modifiers of this Type.
+     */
+    private HashMap<String, Modifier> modifiers = new HashMap<String, Modifier>();
 
     // ------------------------------------------------------------ constructor
 
@@ -101,12 +107,13 @@ public final class TileType extends FreeColGameObjectType
         return basicWorkTurns;
     }
 
+    // this isn't actually used anywhere
     public int getAttackBonus() {
         return attackBonus;
     }
 
-    public int getDefenceBonus() {
-        return defenceBonus;
+    public Modifier getDefenceBonus() {
+        return getModifier("model.modifier.defence");
     }
 
     public int getPotential(GoodsType goodsType) {
@@ -167,6 +174,35 @@ public final class TileType extends FreeColGameObjectType
         }
     }
     
+    /**
+     * Get the <code>Modifier</code> value.
+     *
+     * @param id a <code>String</code> value
+     * @return a <code>Modifier</code> value
+     */
+    public final Modifier getModifier(String id) {
+        return modifiers.get(id);
+    }
+
+    /**
+     * Set the <code>Modifier</code> value.
+     *
+     * @param id a <code>String</code> value
+     * @param newModifier a <code>Modifier</code> value
+     */
+    public final void setModifier(String id, final Modifier newModifier) {
+        modifiers.put(id, newModifier);
+    }
+
+    /**
+     * Returns a copy of this FoundingFather's modifiers.
+     *
+     * @return a <code>Map</code> value
+     */
+    public Map<String, Modifier> getModifiers() {
+        return new HashMap<String, Modifier>(modifiers);
+    }
+
     // ------------------------------------------------------------ API methods
 
     protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
@@ -212,10 +248,9 @@ public final class TileType extends FreeColGameObjectType
                 latitude[0] = getAttribute(in, "latitudeMin", -1);
                 latitude[1] = getAttribute(in, "latitudeMax", -1);
                 in.nextTag(); // close this element
-            } else if ("skirmish".equals(childName)) {
-                attackBonus = getAttribute(in, "attack-factor", 0);
-                defenceBonus = getAttribute(in, "defence-factor", 0);
-                in.nextTag(); // close this element
+            } else if ("modifier".equals(childName)) {
+                Modifier modifier = new Modifier(in);
+                setModifier(modifier.getId(), modifier); // close this element
             } else if ("production".equals(childName)) {
                 String g = in.getAttributeValue(null, "goods-type");
                 GoodsType gt = goodsTypeByRef.get(g);

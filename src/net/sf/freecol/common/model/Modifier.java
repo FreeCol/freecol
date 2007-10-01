@@ -30,17 +30,17 @@ public final class Modifier extends FreeColObject implements Cloneable {
     public static final int BOOLEAN = 4;
     
     /**
-     * The ID of the abstractModifier, used to look up name, etc.
+     * The ID of the Modifier, used to look up name, etc.
      */
     private String id;
 
     /**
-     * The category of this AbstractModifier, e.g. "offenseModifier".
+     * The ID of the source of this Modifier, e.g. "model.foundingFather.thomasJefferson"
      */
-    private String category;
+    private String source;
 
     /**
-     * The type of this abstractModifier
+     * The type of this Modifier
      */
     private int type;
 
@@ -88,13 +88,13 @@ public final class Modifier extends FreeColObject implements Cloneable {
      * Creates a new <code>Modifier</code> instance.
      *
      * @param id a <code>String</code> value
-     * @param category a <code>String</code> value
+     * @param source a <code>String</code> value
      * @param value an <code>float</code> value
      * @param type the type of the modifier
      */
-    public Modifier(String id, String category, float value, int type) {
+    public Modifier(String id, String source, float value, int type) {
         setId(id);
-        setCategory(category);
+        setSource(source);
         setType(type);
         this.values[type] = value;
     }
@@ -115,13 +115,13 @@ public final class Modifier extends FreeColObject implements Cloneable {
      * Creates a new <code>Modifier</code> instance.
      *
      * @param id a <code>String</code> value
-     * @param category a <code>String</code> value
+     * @param source a <code>String</code> value
      * @param value an <code>float</code> value
      * @param type the type of the modifier
      */
-    public Modifier(String id, String category, float value, String type) {
+    public Modifier(String id, String source, float value, String type) {
         setId(id);
-        setCategory(category);
+        setSource(source);
         setType(getTypeFromString(type));
         this.values[getType()] = value;
     }
@@ -142,13 +142,13 @@ public final class Modifier extends FreeColObject implements Cloneable {
      * Creates a new <code>Modifier</code> instance.
      *
      * @param id a <code>String</code> value
-     * @param category a <code>String</code> value
+     * @param source a <code>String</code> value
      * @param value a <code>boolean</code> value
      * @param type an <code>int</code> value
      */
-    public Modifier(String id, String category, boolean value, int type) {
+    public Modifier(String id, String source, boolean value, int type) {
         this.id = id;
-        this.category = category;
+        this.source = source;
         this.booleanValue = value;
         this.type = type;
     }
@@ -169,13 +169,13 @@ public final class Modifier extends FreeColObject implements Cloneable {
      * Creates a new <code>Modifier</code> instance.
      *
      * @param id a <code>String</code> value
-     * @param category a <code>String</code> value
+     * @param source a <code>String</code> value
      * @param value a <code>boolean</code> value
      * @param type an <code>String</code> value
      */
-    public Modifier(String id, String category, boolean value, String type) {
+    public Modifier(String id, String source, boolean value, String type) {
         this.id = id;
-        this.category = category;
+        this.source = source;
         this.booleanValue = value;
         this.type = getTypeFromString(type);
     }
@@ -208,7 +208,7 @@ public final class Modifier extends FreeColObject implements Cloneable {
     public Modifier(Modifier modifier) {
         setId(modifier.getId());
         setType(modifier.getType());
-        setCategory(modifier.getCategory());
+        setSource(modifier.getSource());
         scopes = new ArrayList(modifier.getScopes());
         booleanValue = modifier.getBooleanValue();
         for (int i = 0; i < values.length; i++) {
@@ -255,21 +255,21 @@ public final class Modifier extends FreeColObject implements Cloneable {
     }
 
     /**
-     * Get the <code>Category</code> value.
+     * Get the <code>Source</code> value.
      *
      * @return a <code>String</code> value
      */
-    public final String getCategory() {
-        return category;
+    public final String getSource() {
+        return source;
     }
 
     /**
-     * Set the <code>Category</code> value.
+     * Set the <code>Source</code> value.
      *
-     * @param newCategory The new Category value.
+     * @param newSource The new Source value.
      */
-    public final void setCategory(final String newCategory) {
-        this.category = newCategory;
+    public final void setSource(final String newSource) {
+        this.source = newSource;
     }
 
 
@@ -550,7 +550,7 @@ public final class Modifier extends FreeColObject implements Cloneable {
      */
     public void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
         setId(in.getAttributeValue(null, "id"));
-        setCategory(in.getAttributeValue(null, "category"));
+        setSource(in.getAttributeValue(null, "source"));
         setType(getTypeFromString(in.getAttributeValue(null, "type")));
 
         if (type == COMBINED) {
@@ -590,8 +590,8 @@ public final class Modifier extends FreeColObject implements Cloneable {
         out.writeStartElement(getXMLElementTagName());
 
         out.writeAttribute("id", getId());
-        if (category != null) {
-            out.writeAttribute("category", category);
+        if (source != null) {
+            out.writeAttribute("source", source);
         }
         out.writeAttribute("type", getTypeAsString());
         if (type == COMBINED) {

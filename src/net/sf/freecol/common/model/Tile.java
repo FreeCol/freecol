@@ -1348,9 +1348,13 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
      * @return The defense modifier (in percent) of this tile.
      */
     public int defenseBonus() {
-        if (type == null) {
+        if (type == null || type.getDefenceBonus() == null) {
             return 0;
         }
+        return (int) type.getDefenceBonus().getValue();
+    }
+
+    public Modifier getDefenceBonus() {
         return type.getDefenceBonus();
     }
 

@@ -295,8 +295,8 @@ public class FoundingFather extends FreeColGameObjectType implements Abilities, 
             String childName = in.getLocalName();
             if ("ability".equals(childName)) {
                 Modifier modifier = new Modifier(in);
-                if (modifier.getCategory() == null) {
-                    modifier.setCategory(this.getID());
+                if (modifier.getSource() == null) {
+                    modifier.setSource(this.getID());
                 }
                 setModifier(modifier.getId(), modifier);
                 // close this element

@@ -178,8 +178,8 @@ public class IndianNationType extends NationType {
                 in.nextTag(); // close this element
             } else if (Modifier.getXMLElementTagName().equals(childName)) {
                 Modifier modifier = new Modifier(in); // Modifier close the element
-                if (modifier.getCategory() == null) {
-                    modifier.setCategory(this.getID());
+                if (modifier.getSource() == null) {
+                    modifier.setSource(this.getID());
                 }
                setModifier(modifier.getId(), modifier);
             } else if ("skill".equals(childName)) {

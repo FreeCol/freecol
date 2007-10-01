@@ -37,6 +37,7 @@ import net.sf.freecol.common.model.Europe;
 import net.sf.freecol.common.model.FoundingFather;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.GoodsType;
+import net.sf.freecol.common.model.Modifier;
 import net.sf.freecol.common.model.ResourceType;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.TileType;
@@ -434,7 +435,11 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
         detailPanel.setLayout(layout);
 
         String movementCost = String.valueOf(tileType.getBasicMoveCost() / 3);
-        String defenseBonus = String.valueOf(tileType.getDefenceBonus()) + "%";
+        String defenseBonus = "0%";
+        Modifier defence = tileType.getDefenceBonus();
+        if (defence != null) {
+            defenseBonus = String.valueOf(defence.getValue()) + "%";
+        }
 
         GoodsType secondaryGoodsType = Tile.secondaryGoods(tileType);
 
