@@ -25,6 +25,7 @@ public class AllTests {
 		suite.addTestSuite(ModelMessageTest.class);
 		suite.addTestSuite(PlayerTest.class);
 		suite.addTestSuite(NationTypeTest.class);
+                suite.addTestSuite(ScopeTest.class);
 		//$JUnit-END$
 		return suite;
 	}

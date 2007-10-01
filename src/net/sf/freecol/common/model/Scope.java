@@ -33,7 +33,7 @@ public final class Scope extends FreeColObject implements Cloneable {
     /**
      * The value of an <code>Ability</code>.
      */
-    private boolean abilityValue;
+    private boolean abilityValue = true;
 
     /**
      * The name of an <code>Method</code>.
@@ -47,6 +47,11 @@ public final class Scope extends FreeColObject implements Cloneable {
     private String methodValue;
 
 
+    /**
+     * Creates a new <code>Scope</code> instance.
+     *
+     */
+    public Scope() {}
 
     /**
      * Creates a new <code>Scope</code> instance.
@@ -157,7 +162,7 @@ public final class Scope extends FreeColObject implements Cloneable {
      * @return a <code>boolean</code> value
      */
     public boolean appliesTo(FreeColGameObjectType object) {
-        if (type != null && type != object.getID()) {
+        if (type != null && !type.equals(object.getID())) {
             return false;
         }
         if (abilityID != null && object.hasAbility(abilityID) != abilityValue) {
@@ -166,9 +171,8 @@ public final class Scope extends FreeColObject implements Cloneable {
         if (methodName != null) {
             try {
                 Method method = object.getClass().getMethod(methodName);
-                Class returnType = method.getReturnType();
-                if (method.invoke(object).toString().equals(methodValue)) {
-                    return true;
+                if (!method.invoke(object).toString().equals(methodValue)) {
+                    return false;
                 }
             } catch(Exception e) {
                 return false;
