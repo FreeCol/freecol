@@ -141,9 +141,6 @@ public final class GUI {
     private boolean displayGrid = false;
     private GeneralPath gridPath = null;
 
-    /** List of the enemy units which should temporarily be displayed at the top. */
-    private ArrayList<Unit> enemyUnitsOnTop = new ArrayList<Unit>();
-    
     // Debug variables:
     public boolean displayCoordinates = false;
     public boolean displayColonyValue = false;
@@ -390,15 +387,15 @@ public final class GUI {
         if (activeUnit != null && activeUnit.getTile() == unitTile) {
             return activeUnit;
         } else {
-            Iterator<Unit> it = enemyUnitsOnTop.iterator();
-            while (it.hasNext()) {
-                Unit eu = it.next();
-                if (eu.getTile() == unitTile) {
-                    return eu;
-                }
-            }
-            
             if (unitTile.getSettlement() == null) {
+                Unit bestDefendingUnit = null;
+                if (activeUnit != null) {
+                    bestDefendingUnit = unitTile.getDefendingUnit(activeUnit);
+                    if (bestDefendingUnit != null) {
+                        return bestDefendingUnit;
+                    }
+                }
+                
                 Unit movableUnit = unitTile.getMovableUnit();
                 if (movableUnit != null && movableUnit.getLocation() == movableUnit.getTile()) {
                     return movableUnit;
@@ -460,7 +457,6 @@ public final class GUI {
         }*/
         
         if (activeUnit != null && activeUnit.getOwner() != freeColClient.getMyPlayer()) {
-            enemyUnitsOnTop.add(0, activeUnit);
             freeColClient.getCanvas().repaint(0, 0, getWidth(), getHeight());
             return;
         }
@@ -522,8 +518,6 @@ public final class GUI {
     public void setFocus(Position focus) {
         this.focus = focus;
 
-        enemyUnitsOnTop.clear();
-        
         forceReposition();
         freeColClient.getCanvas().repaint(0, 0, getWidth(), getHeight());
     }
