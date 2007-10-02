@@ -547,6 +547,12 @@ public final class Modifier extends FreeColObject implements Cloneable {
             if ("scope".equals(childName)) {
                 Scope scope = new Scope(in);
                 getScopes().add(scope);
+            } else if ("modifier".equals(childName)) {
+                Modifier modifier = new Modifier(in);
+                if (modifiers == null) {
+                    modifiers = new ArrayList<Modifier>();
+                }
+                modifiers.add(modifier);
             } else {
                 logger.finest("Parsing of " + childName + " is not implemented yet");
                 while (in.nextTag() != XMLStreamConstants.END_ELEMENT ||
@@ -584,6 +590,11 @@ public final class Modifier extends FreeColObject implements Cloneable {
         }
         for (Scope scope : getScopes()) {
             scope.toXMLImpl(out);
+        }
+        if (modifiers != null) {
+            for (Modifier modifier : getModifiers()) {
+                modifier.toXMLImpl(out);
+            }
         }
 
         out.writeEndElement();
