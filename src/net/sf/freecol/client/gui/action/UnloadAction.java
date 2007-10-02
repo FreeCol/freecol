@@ -10,6 +10,7 @@ import javax.swing.KeyStroke;
 
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.GUI;
+import net.sf.freecol.client.gui.panel.MapControls;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.Unit;
 
@@ -54,7 +55,7 @@ public class UnloadAction extends MapboardAction {
         if (gui == null) return false;
     
         Unit unit = getFreeColClient().getGUI().getActiveUnit();
-        return (unit != null && unit.isCarrier() && unit.canUnload());
+        return (unit != null && unit.isCarrier() && unit.getGoodsCount() > 0);
     }    
     
     /**
@@ -64,16 +65,39 @@ public class UnloadAction extends MapboardAction {
     public void actionPerformed(ActionEvent e) {
         Unit unit = getFreeColClient().getGUI().getActiveUnit();
         if (unit != null) {
-            Iterator<Goods> goodsIterator = unit.getGoodsIterator();
-            while (goodsIterator.hasNext()) {
-                Goods goods = goodsIterator.next();
-                getFreeColClient().getInGameController().unloadCargo(goods);
-            }
-            Iterator<Unit> unitIterator = unit.getUnitIterator();
-            while (unitIterator.hasNext()) {
-                Unit newUnit = unitIterator.next();
-                getFreeColClient().getInGameController().leaveShip(newUnit);
+            if (!unit.isInEurope() && unit.getColony() == null) {
+                if (getFreeColClient().getCanvas().showConfirmDialog("dumpAllCargo", "yes", "no")) {
+                    unloadAllCargo(unit);
+                    MapControls controls = ((MapControlsAction) getFreeColClient().getActionManager().getFreeColAction(MapControlsAction.ID)).getMapControls();
+                    if (controls != null) {
+                        controls.update();
+                    }
+                }
+            } else {
+                unloadAllCargo(unit);
+                unloadAllUnits(unit);
+                MapControls controls = ((MapControlsAction) getFreeColClient().getActionManager().getFreeColAction(MapControlsAction.ID)).getMapControls();
+                if (controls != null) {
+                    controls.update();
+                }
             }
         }
     }
+
+    private void unloadAllUnits(Unit unit) {
+        Iterator<Unit> unitIterator = unit.getUnitIterator();
+        while (unitIterator.hasNext()) {
+            Unit newUnit = unitIterator.next();
+            getFreeColClient().getInGameController().leaveShip(newUnit);
+        }
+    }
+
+    private void unloadAllCargo(Unit unit) {
+        Iterator<Goods> goodsIterator = unit.getGoodsIterator();
+        while (goodsIterator.hasNext()) {
+            Goods goods = goodsIterator.next();
+            getFreeColClient().getInGameController().unloadCargo(goods);
+        }
+    }
+
 }

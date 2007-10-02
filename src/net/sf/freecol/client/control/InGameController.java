@@ -1995,7 +1995,11 @@ public final class InGameController implements NetworkConstants {
         unloadCargoElement.appendChild(goods.toXMLElement(freeColClient.getMyPlayer(), unloadCargoElement
                 .getOwnerDocument()));
 
-        goods.unload();
+        if (goods.getLocation() instanceof Unit && ((Unit) goods.getLocation()).getColony() != null) {
+            goods.unload();
+        } else {
+            goods.setLocation(null);
+        }
 
         client.sendAndWait(unloadCargoElement);
     }
