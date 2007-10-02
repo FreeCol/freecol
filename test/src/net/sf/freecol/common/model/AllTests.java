@@ -26,6 +26,7 @@ public class AllTests {
 		suite.addTestSuite(PlayerTest.class);
 		suite.addTestSuite(NationTypeTest.class);
                 suite.addTestSuite(ScopeTest.class);
+                suite.addTestSuite(ModifierTest.class);
 		//$JUnit-END$
 		return suite;
 	}

@@ -55,14 +55,9 @@ public final class Modifier extends FreeColObject implements Cloneable {
     private boolean booleanValue;
 
     /**
-     * The next Modifier in the list.
+     * A list of modifiers that contributed to this one.
      */
-    private Modifier next;
-
-    /**
-     * The last Modifier in the list.
-     */
-    private Modifier last;
+    private List<Modifier> modifiers;
 
     /**
      * Describe scopes here.
@@ -210,6 +205,9 @@ public final class Modifier extends FreeColObject implements Cloneable {
         setType(modifier.getType());
         setSource(modifier.getSource());
         scopes = new ArrayList(modifier.getScopes());
+        if (modifier.getModifiers() != null) {
+            modifiers = new ArrayList(modifier.getModifiers());
+        }
         booleanValue = modifier.getBooleanValue();
         for (int i = 0; i < values.length; i++) {
             values[i] = modifier.values[i];
@@ -217,6 +215,24 @@ public final class Modifier extends FreeColObject implements Cloneable {
     }
     
     // -- Methods --
+
+    /**
+     * Get the <code>Modifiers</code> value.
+     *
+     * @return a <code>List<Modifier></code> value
+     */
+    public List<Modifier> getModifiers() {
+        return modifiers;
+    }
+
+    /**
+     * Set the <code>Modifiers</code> value.
+     *
+     * @param newModifiers The new Modifiers value.
+     */
+    public void setModifiers(final List<Modifier> newModifiers) {
+        this.modifiers = newModifiers;
+    }
 
     /**
      * Get the <code>BooleanValue</code> value.
@@ -442,15 +458,16 @@ public final class Modifier extends FreeColObject implements Cloneable {
             setType(COMBINED);
         }
 
-        if (last == null) {
-            Modifier copy = new Modifier(this);
-            copy.setNext(otherModifier);
-            setNext(copy);
-        } else {
-            getLast().setNext(otherModifier);
+        if (modifiers == null) {
+            modifiers = new ArrayList<Modifier>();
+            modifiers.add(new Modifier(this));
         }
-        setLast(otherModifier);
-        
+        if (otherModifier.getModifiers() == null) {
+            modifiers.add(otherModifier);
+        } else {
+            modifiers.addAll(otherModifier.getModifiers());
+        }
+
         if (otherModifier.getType() != COMBINED) {
             combine(otherModifier, otherModifier.getType());
         } else {
@@ -492,50 +509,14 @@ public final class Modifier extends FreeColObject implements Cloneable {
     private float applyTo(float number, int type) {
         switch(type) {
         case ADDITIVE:
-            return number + values[getType()];
+            return number + values[type];
         case MULTIPLICATIVE:
-            return number * values[getType()];
+            return number * values[type];
         case PERCENTAGE:
-            return number + (number * values[getType()]) / 100;
+            return number + (number * values[type]) / 100;
         default:
             return number;
         }
-    }
-
-    /**
-     * Get the <code>Next</code> value.
-     *
-     * @return a <code>Modifier</code> value
-     */
-    public Modifier getNext() {
-        return next;
-    }
-
-    /**
-     * Set the <code>Next</code> value.
-     *
-     * @param newNext The new Next value.
-     */
-    public void setNext(final Modifier newNext) {
-        this.next = newNext;
-    }
-
-    /**
-     * Get the <code>Last</code> value.
-     *
-     * @return a <code>Modifier</code> value
-     */
-    public Modifier getLast() {
-        return last;
-    }
-
-    /**
-     * Set the <code>Last</code> value.
-     *
-     * @param newLast The new Last value.
-     */
-    public void setLast(final Modifier newLast) {
-        this.last = newLast;
     }
 
     // -- Serialization --
