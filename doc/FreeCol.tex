@@ -453,7 +453,7 @@ to the currently selected unit:
 \item build a colony
 \item plow the tile the unit is on (requires 20 tools)
 \item build a road on the tile the unit is on (requires 20 tools)
-\item unload all goods and units on board
+\item unload all goods and units on board if possible
 \item continue towards a selected destination
 \item skip this turn
 \item switch to a different unit on the same tile
@@ -462,10 +462,14 @@ to the currently selected unit:
 \item disband the unit
 \end{itemize}
 
-Note that not all orders are available at all times. The unload order
-is only available if the unit is a carrier and is in a colony, for
-example, and the build colony order is only available if the unit is
-able to build colonies and the tile it is on will support a colony.
+Note that not all orders are available at all times. The build colony
+order is only available if the unit is able to build colonies and the
+tile it is on will support a colony, for example. The unload order is
+only available if the unit is carrying units and is in a colony or in
+Europe, or if it is carrying goods. You can unload the goods anywhere,
+but if you are not in Europe or in a colony, the goods will be lost.
+You can use this feature to dump unwanted cargo\index{dump cargo} in
+order to avoid the \hyperlink{Cargo Penalty}{cargo penalty}.
 
 The \hypertarget{reports menu}{Reports Menu} provides access to
 various reports on the current state of your colonies. In these
@@ -1905,6 +1909,66 @@ Naval units can also attack colonies on coastal tiles, although their
 chance of success is not very high. And colonies with a
 \hyperlink{Fort}{Fort} or \hyperlink{Fortress}{Fortress} will
 automatically fire at enemy ships on adjacent ocean tiles.
+
+
+\hypertarget{combat bonuses}{\subsubsection{Combat Bonuses and Penalties}}
+
+Bonuses and penalties for naval units:
+
+\begin{itemize}
+\item \hypertarget{Cargo Penalty}{Cargo Penalty}: for each unit of
+  cargo, both the offensive and the defensive power of the unit are
+  reduced by 12.5\%.
+\item \hypertarget{Piracy Bonus}{Piracy Bonus}: after
+  \hyperlink{Francis Drake}{Francis Drake} has joined the Continental
+  Congress (see below), both the offensive and the defensive power of
+  all your \hyperlink{Privateer}{Privateers} is increased by 50\%.
+\end{itemize}
+
+Bonuses and penalties for land units:
+
+\begin{itemize}
+\item \hypertarget{Armed Bonus}{Armed Bonus}: the offensive and
+  defensive power of your units increases by two if they are
+  armed. Native units and the units of the \hyperlink{Royal
+    Expeditionary Force}{Royal Expeditionary Force} are only granted
+  half this bonus.
+\item \hypertarget{Mounted Bonus}{Mounted Bonus}: the offensive and
+  defensive power of your units increases by one if they are mounted.
+\item \hypertarget{Veteran Bonus}{Veteran Bonus}: the offensive and
+  defensive power of veteran units is increased by one.
+\item \hypertarget{Attack Bonus}{Attack Bonus}: the offensive power of
+  attacking units is increased by 50\%.
+\item \hypertarget{Movement Penalty}{Movement Penalty}: the offensive
+  power of units with only two movement points left is reduced by 33\%
+  and the offensive power of units with only one movement point left
+  is reduced by 66\%.
+\item \hypertarget{Ambush Bonus}{Ambush Bonus}: the offensive power of
+  native units is increased by the defence bonus of the defender's
+  tile. Your units are granted the same bonus when attacking units of
+  the Royal Expeditionary Force.
+\item \hypertarget{Artillery Penalty}{Artillery Penalty}: the
+  offensive power of artillery attacking units not in a colony is
+  reduced by 75\%. The defensive power of artillery not in a colony is
+  also reduced by 75\%.
+\item \hypertarget{Bombard Bonus}{Bombard Bonus}: the offensive power
+  of the units of the Royal Expeditionary Force is increased by 50\%
+  when attacking a colony.
+\item \hypertarget{Fortified Bonus}{Fortified Bonus}: the defensive
+  power of fortified units is increased by 50\%.
+\item \hypertarget{Stockade Bonus}{Stockade Bonus}: the defensive
+  power of units in a colony with a \hyperlink{Stockade}{Stockade},
+  Fort or Fortress is increased by 100\%, 150\% and 200\%,
+  respectively.
+\item \hypertarget{Artillery Bonus}{Artillery Bonus}: the defensive
+  power of artillery in a colony defending against an Indian raid is
+  increased by 50\%.
+\item \hypertarget{Ambush Penalty}{Ambush Penalty}: the defensive
+  power of your units when defending against Indians, and of the units
+  of the Royal Expeditionary Force when defending against your units
+  is reduced by the defence bonus of the defender's tile.
+\end{itemize}
+
 
 
 \hypertarget{Continental Congress}{\section{The Continental Congress}}
