@@ -1026,7 +1026,6 @@
     <european-nation-type id="model.nationType.ref" ref="true">
       <modifier id="model.modifier.bombardBonus" type="percentage" value="50"/>
       <ability id="model.ability.ambushPenalty" value="true"/>
-      <ability id="model.ability.electFoundingFather"/>
     </european-nation-type>
     <!-- this was the Dutch player -->
     <european-nation-type id="model.nationType.trade">
