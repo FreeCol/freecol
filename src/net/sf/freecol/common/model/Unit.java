@@ -1545,25 +1545,6 @@ public class Unit extends FreeColGameObject implements Abilities, Locatable, Loc
     }
 
     /**
-     * Checks wether or not the unit can unload the cargo
-     * 
-     * @return The result.
-     */
-    public boolean canUnload() {
-        Location l = getLocation();
-        if (isInEurope()) {
-            return true;
-        } else if (getTile() == null) {
-            // this should not happen, but it does
-            return false;
-        } else if (getColony() != null) {
-            return true;
-        } else {
-            return false;
-        }
-    }
-
-    /**
      * Sets the given state to all the units that si beeing carried.
      * 
      * @param state The state.

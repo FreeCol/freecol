@@ -55,7 +55,14 @@ public class UnloadAction extends MapboardAction {
         if (gui == null) return false;
     
         Unit unit = getFreeColClient().getGUI().getActiveUnit();
-        return (unit != null && unit.isCarrier() && unit.getGoodsCount() > 0);
+        if (unit != null && unit.isCarrier()) {
+            if (unit.getGoodsCount() > 0) {
+                return true;
+            } else if (unit.getUnitCount() > 0 && (unit.isInEurope() || unit.getColony() != null)) {
+                return true;
+            }
+        }
+        return false;
     }    
     
     /**
