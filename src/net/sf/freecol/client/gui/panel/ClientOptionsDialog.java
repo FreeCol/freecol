@@ -132,7 +132,7 @@ public final class ClientOptionsDialog extends FreeColDialog implements ActionLi
                     ui.updateOption();
                     parent.remove(this);
                     freeColClient.saveClientOptions();
-                    freeColClient.getActionManager().initializeActions();
+                    freeColClient.getActionManager().update();
                     if (freeColClient.getCanvas().getJMenuBar() != null) {
                         freeColClient.getCanvas().resetFreeColMenuBar();
                     }
