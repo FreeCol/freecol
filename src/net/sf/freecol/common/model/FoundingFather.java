@@ -200,7 +200,7 @@ public class FoundingFather extends FreeColGameObjectType implements Abilities, 
         if (modifiers.containsKey(id)) {
             modifiers.get(id).setBooleanValue(newValue);
         } else {
-            modifiers.put(id, new Modifier(id, newValue, Modifier.BOOLEAN));
+            modifiers.put(id, new Modifier(id, newValue));
         }
     }
 

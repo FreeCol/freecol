@@ -127,10 +127,9 @@ public final class Modifier extends FreeColObject implements Cloneable {
      *
      * @param id a <code>String</code> value
      * @param value a <code>boolean</code> value
-     * @param type an <code>int</code> value
      */
-    public Modifier(String id, boolean value, int type) {
-        this(id, null, value, type);
+    public Modifier(String id, boolean value) {
+        this(id, null, value);
     }
 
     /**
@@ -139,42 +138,13 @@ public final class Modifier extends FreeColObject implements Cloneable {
      * @param id a <code>String</code> value
      * @param source a <code>String</code> value
      * @param value a <code>boolean</code> value
-     * @param type an <code>int</code> value
      */
-    public Modifier(String id, String source, boolean value, int type) {
+    public Modifier(String id, String source, boolean value) {
         this.id = id;
         this.source = source;
         this.booleanValue = value;
-        this.type = type;
+        this.type = BOOLEAN;
     }
-
-    
-    /**
-     * Creates a new <code>Modifier</code> instance.
-     *
-     * @param id a <code>String</code> value
-     * @param value a <code>boolean</code> value
-     * @param type an <code>String</code> value
-     */
-    public Modifier(String id, boolean value, String type) {
-        this(id, null, value, type);
-    }
-
-    /**
-     * Creates a new <code>Modifier</code> instance.
-     *
-     * @param id a <code>String</code> value
-     * @param source a <code>String</code> value
-     * @param value a <code>boolean</code> value
-     * @param type an <code>String</code> value
-     */
-    public Modifier(String id, String source, boolean value, String type) {
-        this.id = id;
-        this.source = source;
-        this.booleanValue = value;
-        this.type = getTypeFromString(type);
-    }
-
     
     /**
      * Creates a new <code>Modifier</code> instance.

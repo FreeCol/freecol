@@ -203,6 +203,7 @@ public final class Colony extends Settlement implements Abilities, Location, Nam
             Building building = (Building) workLocation;
             BuildingType buildingType = building.getType().getFirstLevel();
             buildingMap.put(buildingType.getID(), building);
+            modifiers.putAll(buildingType.getModifiers());
         }
     }
 
@@ -786,6 +787,9 @@ public final class Colony extends Settlement implements Abilities, Location, Nam
      * @return <code>true</code> if this unit type could be added.
     */
     public boolean canTrain(Unit unit) {
+        if (!hasAbility("model.ability.teach")) {
+            return false;
+        }
         Iterator<Building> buildingIterator = getBuildingIterator();
         while (buildingIterator.hasNext()) {
             Building building = buildingIterator.next();
@@ -2098,7 +2102,7 @@ public final class Colony extends Settlement implements Abilities, Location, Nam
      */
     public boolean hasAbility(String id) {
         // TODO: search player abilities too
-        return abilities.containsKey(id) && abilities.get(id);
+        return modifiers.containsKey(id) && modifiers.get(id).getBooleanValue();
     }
 
     /**
@@ -2108,7 +2112,7 @@ public final class Colony extends Settlement implements Abilities, Location, Nam
      * @param newValue a <code>boolean</code> value
      */
     public void setAbility(String id, boolean newValue) {
-        abilities.put(id, newValue);
+        modifiers.put(id, new Modifier(id, newValue));
     }
 
     /**

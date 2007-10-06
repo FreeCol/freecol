@@ -27,8 +27,6 @@ public final class BuildingType extends FreeColGameObjectType implements Abiliti
     private BuildingType upgradesFrom;
     private BuildingType upgradesTo;
     
-    private HashMap<String, Boolean> abilities = new HashMap<String, Boolean>();
-    
     /**
      * Stores the abilities required by this Type.
      */
@@ -128,7 +126,7 @@ public final class BuildingType extends FreeColGameObjectType implements Abiliti
             if ("ability".equals(childName)) {
                 String abilityId = in.getAttributeValue(null, "id");
                 boolean value = getAttribute(in, "value", true);
-                setAbility(abilityId, value);
+                setModifier(abilityId, new Modifier(abilityId, getID(), value));
                 in.nextTag(); // close this element
             } else if ("required-population".equals(childName)) {
                 populationRequired = getAttribute(in, "value", 1);
@@ -175,7 +173,7 @@ public final class BuildingType extends FreeColGameObjectType implements Abiliti
      * @return a <code>boolean</code> value
        */
     public boolean hasAbility(String id) {
-        return abilities.containsKey(id) && abilities.get(id);
+        return modifiers.containsKey(id) && modifiers.get(id).getBooleanValue();
     }
 
     /**
@@ -185,7 +183,7 @@ public final class BuildingType extends FreeColGameObjectType implements Abiliti
      * @param newValue a <code>boolean</code> value
      */
     public void setAbility(String id, boolean newValue) {
-        abilities.put(id, newValue);
+        modifiers.put(id, new Modifier(id, newValue));
     }
 
     /**
@@ -194,7 +192,7 @@ public final class BuildingType extends FreeColGameObjectType implements Abiliti
      * @return a <code>Map</code> value
      */
     public Map<String, Boolean> getAbilities() {
-        return new HashMap<String, Boolean>(abilities);
+        return new HashMap<String, Boolean>();
     }
 
     /**

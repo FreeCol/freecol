@@ -56,6 +56,7 @@ public class SchoolTest extends FreeColTestCase {
         ore.setLocation(school);
         trainForTurns(colony, ore.getNeededTurnsOfTraining());
         assertEquals(Unit.EXPERT_ORE_MINER, colonist.getType());
+        colony.dispose();
     }
 
     public void testCollege() {
@@ -78,6 +79,7 @@ public class SchoolTest extends FreeColTestCase {
         blackSmith.setLocation(school);
         trainForTurns(colony, blackSmith.getNeededTurnsOfTraining());
         assertEquals(Unit.MASTER_BLACKSMITH, colonist.getType());
+        colony.dispose();
     }
 
     public void testUniversity() {
@@ -101,6 +103,7 @@ public class SchoolTest extends FreeColTestCase {
         elder.setLocation(school);
         trainForTurns(colony, elder.getNeededTurnsOfTraining());
         assertEquals(Unit.ELDER_STATESMAN, colonist.getType());
+        colony.dispose();
     }
 
     /**
@@ -204,6 +207,7 @@ public class SchoolTest extends FreeColTestCase {
         }
         assertEquals(0, colony.getUnitList(Unit.FREE_COLONIST).size());
         assertEquals(2, colony.getUnitList(Unit.VETERAN_SOLDIER).size());
+        colony.dispose();
 
     }
 
@@ -279,6 +283,7 @@ public class SchoolTest extends FreeColTestCase {
         assertEquals(4, colony.getUnitList(Unit.FREE_COLONIST).size());
         assertEquals(2, colony.getUnitList(Unit.MASTER_BLACKSMITH).size());
         assertEquals(2, colony.getUnitList(Unit.EXPERT_ORE_MINER).size());
+        colony.dispose();
     }
 
     /**
@@ -286,17 +291,14 @@ public class SchoolTest extends FreeColTestCase {
      * @return
      */
     public Colony getUniversityColony(){
-    	Colony colony = getStandardColony(10);
+        Colony colony = getStandardColony(10);
 
         for (Unit u : colony.getUnitList()){
-        	u.setType(Unit.ELDER_STATESMAN);
+            u.setType(Unit.ELDER_STATESMAN);
         }
 
-        BuildingType schoolType = spec().getBuildingType("model.building.Schoolhouse");
+        BuildingType schoolType = spec().getBuildingType("model.building.University");
         colony.addWorkLocation(new Building(getGame(), colony, schoolType));
-        Building school = colony.getBuilding(spec().getBuildingType("model.building.Schoolhouse"));
-        school.upgrade();
-        school.upgrade();
         return colony;
     }
     
@@ -318,8 +320,6 @@ public class SchoolTest extends FreeColTestCase {
         Unit black = units.next();
         black.setType(Unit.MASTER_BLACKSMITH);
 
-        BuildingType schoolType = spec().getBuildingType("model.building.Schoolhouse");
-        colony.addWorkLocation(new Building(getGame(), colony, schoolType));
         Building school = colony.getBuilding(spec().getBuildingType("model.building.Schoolhouse"));
 
         // It should take 4 turns to train an expert lumber jack and 6 to train
@@ -333,6 +333,7 @@ public class SchoolTest extends FreeColTestCase {
         assertEquals(0, colony.getUnitList(Unit.FREE_COLONIST).size());
         assertEquals(1, colony.getUnitList(Unit.EXPERT_LUMBER_JACK).size());
         assertEquals(2, colony.getUnitList(Unit.MASTER_BLACKSMITH).size());
+        colony.dispose();
     }
 
     /**
@@ -341,9 +342,9 @@ public class SchoolTest extends FreeColTestCase {
      */
     public void testTwoTeachersOfSameKind() {
         
-    	Colony colony = getUniversityColony();
+        Colony colony = getUniversityColony();
         Building school = colony.getBuilding(schoolType);
-    	
+        
         Iterator<Unit> units = colony.getUnitIterator();
 
         Unit colonist1 = units.next();
@@ -361,6 +362,7 @@ public class SchoolTest extends FreeColTestCase {
         trainForTurns(colony, lumberjack1.getNeededTurnsOfTraining());
         assertEquals(0, colony.getUnitList(Unit.FREE_COLONIST).size());
         assertEquals(3, colony.getUnitList(Unit.EXPERT_LUMBER_JACK).size());
+        colony.dispose();
     }
 
     /**
@@ -369,8 +371,8 @@ public class SchoolTest extends FreeColTestCase {
      * 
      */
     public void testSingleGuyTwoTeachers2() {
-    	
-    	Colony colony = getUniversityColony();
+        
+        Colony colony = getUniversityColony();
         Building school = colony.getBuilding(schoolType);
 
         Iterator<Unit> units = colony.getUnitIterator();
@@ -413,14 +415,15 @@ public class SchoolTest extends FreeColTestCase {
         assertEquals(0, colony.getUnitList(Unit.FREE_COLONIST).size());
         assertEquals(2, colony.getUnitList(Unit.EXPERT_LUMBER_JACK).size());
         assertEquals(1, colony.getUnitList(Unit.EXPERT_ORE_MINER).size());
+        colony.dispose();
     }
 
     /**
      * Test that an petty criminal becomes an indentured servant
      */
     public void testTeachPettyCriminals() {
-    	
-    	Colony colony = getUniversityColony();
+        
+        Colony colony = getUniversityColony();
         Building school = colony.getBuilding(schoolType);
 
         Iterator<Unit> units = colony.getUnitIterator();
@@ -437,6 +440,7 @@ public class SchoolTest extends FreeColTestCase {
         trainForTurns(colony, teacher.getNeededTurnsOfTraining(), Unit.PETTY_CRIMINAL);
         assertEquals(0, colony.getUnitList(Unit.PETTY_CRIMINAL).size());
         assertEquals(Unit.INDENTURED_SERVANT, criminal.getType());
+        colony.dispose();
     }
 
     /**
@@ -444,8 +448,8 @@ public class SchoolTest extends FreeColTestCase {
      * taught, but on the teacher.
      */
     public void testTeachPettyCriminalsByMaster() {
-    	
-    	Colony colony = getUniversityColony();
+        
+        Colony colony = getUniversityColony();
         Building school = colony.getBuilding(schoolType);
         
         Iterator<Unit> units = colony.getUnitIterator();
@@ -461,6 +465,7 @@ public class SchoolTest extends FreeColTestCase {
         assertEquals(teacher.getNeededTurnsOfTraining(), 4);
         trainForTurns(colony, teacher.getNeededTurnsOfTraining(), Unit.PETTY_CRIMINAL);
         assertEquals(Unit.INDENTURED_SERVANT, criminal.getType());
+        colony.dispose();
     }
 
     /**
@@ -468,8 +473,8 @@ public class SchoolTest extends FreeColTestCase {
      * 
      */
     public void testTeachIndenturedServants() {
-    	
-    	Colony colony = getUniversityColony();
+        
+        Colony colony = getUniversityColony();
         Building school = colony.getBuilding(schoolType);
         
         Iterator<Unit> units = colony.getUnitIterator();
@@ -529,8 +534,8 @@ public class SchoolTest extends FreeColTestCase {
      * Moving a teacher inside the colony should not reset its training.
      */
     public void testMoveTeacherInside() {
-    	
-    	Colony colony = getUniversityColony();
+        
+        Colony colony = getUniversityColony();
         Building school = colony.getBuilding(schoolType);
         
         Iterator<Unit> units = colony.getUnitIterator();
@@ -585,8 +590,6 @@ public class SchoolTest extends FreeColTestCase {
         
         // Move teacher1 back to school
         teacher1.setLocation(school);
-        System.out.println("teacher1's student is " + teacher1.getStudent());
-        System.out.println("teacher2's student is " + teacher2.getStudent());
 
         school.newTurn();
         assertEquals(3, teacher1.getTurnsOfTraining());
@@ -626,10 +629,10 @@ public class SchoolTest extends FreeColTestCase {
     }
     
     public void testCaseTwoTeachersWithDifferentExp(){
-    	
-    	Colony colony = getUniversityColony();
+        
+        Colony colony = getUniversityColony();
         Building school = colony.getBuilding(schoolType);
-    	Iterator<Unit> units = colony.getUnitIterator();
+        Iterator<Unit> units = colony.getUnitIterator();
         Unit colonist = units.next();
         colonist.setType(Unit.FREE_COLONIST);
         Unit teacher1 = units.next();
@@ -666,8 +669,8 @@ public class SchoolTest extends FreeColTestCase {
      * Moving a teacher outside the colony should reset its training.
      */
     public void testMoveTeacherOutside() {
-    	
-    	Colony outsideColony = getStandardColony(1, 10, 8);
+        
+        Colony outsideColony = getStandardColony(1, 10, 8);
         Iterator<Unit> outsideUnits = outsideColony.getUnitIterator();
         Unit outsider = outsideUnits.next();
         outsider.setType(Unit.FREE_COLONIST);
@@ -750,8 +753,8 @@ public class SchoolTest extends FreeColTestCase {
      * Sons of Liberty should not influence teaching.
      */
     public void testSonsOfLiberty() {
-    	
-    	Colony colony = getUniversityColony();
+        
+        Colony colony = getUniversityColony();
         Building school = colony.getBuilding(schoolType);
         
         colony.addSoL(100);
@@ -802,6 +805,7 @@ public class SchoolTest extends FreeColTestCase {
         trainForTurns(colony, miner.getNeededTurnsOfTraining());
         assertEquals(0, colony.getUnitList(Unit.FREE_COLONIST).size());
         assertEquals(2, colony.getUnitList(Unit.EXPERT_ORE_MINER).size());
+        colony.dispose();
     }
 
     /**
@@ -810,8 +814,8 @@ public class SchoolTest extends FreeColTestCase {
      * 
      */
     public void testTeachingOrder() {
-    	
-    	Colony colony = getUniversityColony();
+
+        Colony colony = getUniversityColony();
         Building school = colony.getBuilding(schoolType);
         
         Iterator<Unit> units = colony.getUnitIterator();
@@ -863,8 +867,8 @@ public class SchoolTest extends FreeColTestCase {
      * learn a skill at the same time.
      */
     public void testTeachingDoublePromotion() {
-    	
-    	Colony colony = getUniversityColony();
+        
+        Colony colony = getUniversityColony();
         Building school = colony.getBuilding(schoolType);
         
         Iterator<Unit> units = colony.getUnitIterator();
