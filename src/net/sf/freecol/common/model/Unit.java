@@ -2454,15 +2454,15 @@ public class Unit extends FreeColGameObject implements Abilities, Locatable, Loc
         } else if (isArmed() && isMounted()) {
             switch (getType()) {
             case KINGS_REGULAR:
-                return Messages.message("model.unit.kingsCavalry");
+                return Messages.message("model.unit.kingsCavalry.name");
             case COLONIAL_REGULAR:
-                return Messages.message("model.unit.colonialCavalry");
+                return Messages.message("model.unit.colonialCavalry.name");
             case VETERAN_SOLDIER:
-                return Messages.message("model.unit.veteranDragoon");
+                return Messages.message("model.unit.veteranDragoon.name");
             case BRAVE:
-                return Messages.message("model.unit.indianDragoon");
+                return Messages.message("model.unit.indianDragoon.name");
             default:
-                return (Messages.message("model.unit.dragoon") + " (" + getUnitType().getName() + ")");
+                return (Messages.message("model.unit.dragoon.name") + " (" + getUnitType().getName() + ")");
             }
         } else if (isArmed()) {
             switch (getType()) {
@@ -2471,23 +2471,23 @@ public class Unit extends FreeColGameObject implements Abilities, Locatable, Loc
             case VETERAN_SOLDIER:
                 return getUnitType().getName();
             case BRAVE:
-                return Messages.message("model.unit.armedBrave");
+                return Messages.message("model.unit.armedBrave.name");
             default:
-                return (Messages.message("model.unit.soldier") + " (" + getUnitType().getName() + ")");
+                return (Messages.message("model.unit.soldier.name") + " (" + getUnitType().getName() + ")");
             }
         } else if (isMounted()) {
             if (hasAbility("model.ability.expertScout")) {
                 return getUnitType().getName();
             } else if (getType() == BRAVE) {
-                return Messages.message("model.unit.mountedBrave");
+                return Messages.message("model.unit.mountedBrave.name");
             } else {
-                return (Messages.message("model.unit.scout") + " (" + getUnitType().getName() + ")");
+                return (Messages.message("model.unit.scout.name") + " (" + getUnitType().getName() + ")");
             }
         } else if (isMissionary()) {
             if (hasAbility("model.ability.expertMissionary")) {
                 return getUnitType().getName();
             } else {
-                return (Messages.message("model.unit.missionary") + " (" + getUnitType().getName() + ")");
+                return (Messages.message("model.unit.missionary.name") + " (" + getUnitType().getName() + ")");
             }
         } else if (canCarryTreasure()) {
             return getUnitType().getName() + " (" + getTreasureAmount() + " " + Messages.message("gold") + ")";
@@ -2495,7 +2495,7 @@ public class Unit extends FreeColGameObject implements Abilities, Locatable, Loc
             if (hasAbility("model.ability.expertPioneer")) {
                 return getUnitType().getName();
             } else {
-                return (Messages.message("model.unit.pioneer") + " (" + getUnitType().getName() + ")");
+                return (Messages.message("model.unit.pioneer.name") + " (" + getUnitType().getName() + ")");
             }
         } else {
             return getUnitType().getName();

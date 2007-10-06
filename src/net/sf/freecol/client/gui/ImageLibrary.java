@@ -1560,7 +1560,7 @@ public final class ImageLibrary extends ImageProvider {
             // TODO: Put it in specification
             if (colony.isUndead()) {
                 return COLONY_UNDEAD;
-            } else if (!stockade.isBuilt()) {
+            } else if (stockade == null) {
                 if (colony.getUnitCount() <= 3) {
                     return COLONY_SMALL;
                 } else if (colony.getUnitCount() <= 7) {
@@ -1576,7 +1576,8 @@ public final class ImageLibrary extends ImageProvider {
                 } else {
                     return COLONY_STOCKADE;
                 }
-            } else if (stockade.getType().getUpgradesTo() != null) {
+            } else if (stockade != null &&
+                       stockade.getType().getUpgradesTo() != null) {
                 if (colony.getUnitCount() > 7) {
                     return COLONY_LARGE_FORT;
                 } else {

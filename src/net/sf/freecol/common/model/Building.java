@@ -201,8 +201,11 @@ public final class Building extends FreeColGameObject implements Abilities, Work
         if (!canBuildNext()) {
             return -1;
         }
-
-        return buildingType.getUpgradesTo().getHammersRequired();
+        if (buildingType.getUpgradesTo() != null) {
+            return buildingType.getUpgradesTo().getHammersRequired();
+        } else {
+            return -1;
+        }
     }
 
     /**
@@ -217,7 +220,11 @@ public final class Building extends FreeColGameObject implements Abilities, Work
             return -1;
         }
 
-        return buildingType.getUpgradesTo().getToolsRequired();
+        if (buildingType.getUpgradesTo() != null) {
+            return buildingType.getUpgradesTo().getToolsRequired();
+        } else {
+            return -1;
+        }
     }
 
     /**
@@ -232,7 +239,11 @@ public final class Building extends FreeColGameObject implements Abilities, Work
             return -1;
         }
 
-        return buildingType.getUpgradesTo().getPopulationRequired();
+        if (buildingType.getUpgradesTo() != null) {
+            return buildingType.getUpgradesTo().getPopulationRequired();
+        } else {
+            return -1;
+        }
     }
 
     /**

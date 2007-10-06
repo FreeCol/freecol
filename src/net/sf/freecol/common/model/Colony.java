@@ -1870,7 +1870,9 @@ public final class Colony extends Settlement implements Abilities, Location, Nam
             }
         } else {
             out.writeAttribute("unitCount", Integer.toString(getUnitCount()));
-            getStockade().toXML(out, player, showAll, toSavedGame);
+            if (getStockade() != null) {
+                getStockade().toXML(out, player, showAll, toSavedGame);
+            }
         }
         goodsContainer.toXML(out, player, showAll, toSavedGame);
         // End element:
