@@ -13,7 +13,7 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import net.sf.freecol.FreeCol;
 
-public final class UnitType extends FreeColGameObjectType implements Abilities, Modifiers {
+public final class UnitType extends FreeColGameObjectType implements Abilities, Buildable, Modifiers {
     public static final  String  COPYRIGHT = "Copyright (C) 2003-2007 The FreeCol Team";
     public static final  String  LICENSE   = "http://www.gnu.org/licenses/gpl.html";
     public static final  String  REVISION  = "$Revision$";
@@ -104,6 +104,11 @@ public final class UnitType extends FreeColGameObjectType implements Abilities, 
      * Describe pathImage here.
      */
     private String pathImage;
+
+    /**
+     * Describe populationRequired here.
+     */
+    private int populationRequired;
 
     /**
      * Describe education here.
@@ -298,6 +303,24 @@ public final class UnitType extends FreeColGameObjectType implements Abilities, 
      */
     public void setToolsRequired(final int newToolsRequired) {
         this.toolsRequired = newToolsRequired;
+    }
+
+    /**
+     * Get the <code>PopulationRequired</code> value.
+     *
+     * @return an <code>int</code> value
+     */
+    public int getPopulationRequired() {
+        return populationRequired;
+    }
+
+    /**
+     * Set the <code>PopulationRequired</code> value.
+     *
+     * @param newPopulationRequired The new PopulationRequired value.
+     */
+    public void setPopulationRequired(final int newPopulationRequired) {
+        this.populationRequired = newPopulationRequired;
     }
 
     /**
@@ -567,6 +590,7 @@ public final class UnitType extends FreeColGameObjectType implements Abilities, 
 
         hammersRequired = getAttribute(in, "hammers", UNDEFINED);
         toolsRequired = getAttribute(in, "tools", UNDEFINED);
+        populationRequired = getAttribute(in, "population-required", 1);
 
         price = getAttribute(in, "price", UNDEFINED);
         increasingPrice = getAttribute(in, "increasingPrice", UNDEFINED);
@@ -650,7 +674,7 @@ public final class UnitType extends FreeColGameObjectType implements Abilities, 
      *
      * @return the abilities required by this UnitType.
      */
-    public Map<String, Boolean> getRequiredAbilities() {
+    public Map<String, Boolean> getAbilitiesRequired() {
         return requiredAbilities;
     }
 

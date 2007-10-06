@@ -159,9 +159,9 @@ public final class BuildingType extends FreeColGameObjectType implements Abiliti
     /**
      * Returns the abilities required by this BuildingType.
      *
-     * @return the abilities required by this UnitType.
+     * @return the abilities required by this BuildingType.
      */
-    public Map<String, Boolean> getRequiredAbilities() {
+    public Map<String, Boolean> getAbilitiesRequired() {
         return requiredAbilities;
     }
 
