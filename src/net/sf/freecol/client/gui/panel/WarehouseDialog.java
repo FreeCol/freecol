@@ -97,7 +97,9 @@ public final class WarehouseDialog extends FreeColDialog implements ActionListen
 
         warehouseDialog.removeAll();
         for (GoodsType goodsType : FreeCol.getSpecification().getGoodsTypeList()) {
-            warehouseDialog.add(new WarehouseGoodsPanel(colony, goodsType));
+            if (goodsType.isStorable()) {
+                warehouseDialog.add(new WarehouseGoodsPanel(colony, goodsType));
+            }
         }
         setSize(getPreferredSize());
 
