@@ -962,16 +962,13 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener {
             Iterator<Building> buildingIterator = getColony().getBuildingIterator();
             while (buildingIterator.hasNext()) {
                 Building building = buildingIterator.next();
-                // TODO: fix this
-                //if (building.isBuilt()) {
-                    aSingleBuildingPanel = new ASingleBuildingPanel(building);
-                    if (colonyPanel.isEditable()) {
-                        aSingleBuildingPanel.addMouseListener(releaseListener);
-                        aSingleBuildingPanel.setTransferHandler(defaultTransferHandler);
-                    }
-                    aSingleBuildingPanel.setOpaque(false);
-                    add(aSingleBuildingPanel);
-                    //}
+                aSingleBuildingPanel = new ASingleBuildingPanel(building);
+                if (colonyPanel.isEditable()) {
+                    aSingleBuildingPanel.addMouseListener(releaseListener);
+                    aSingleBuildingPanel.setTransferHandler(defaultTransferHandler);
+                }
+                aSingleBuildingPanel.setOpaque(false);
+                add(aSingleBuildingPanel);
             }
         }
 
@@ -1293,9 +1290,9 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener {
 
 
         /**
-         * Creates this CargoPanel.
+         * Creates this WarehousePanel.
          * 
-         * @param colonyPanel The panel that holds this CargoPanel.
+         * @param colonyPanel The panel that holds this WarehousePanel.
          */
         public WarehousePanel(ColonyPanel colonyPanel) {
             this.colonyPanel = colonyPanel;
@@ -1306,11 +1303,11 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener {
         }
 
         /**
-         * Adds a component to this CargoPanel and makes sure that the unit or
+         * Adds a component to this WarehousePanel and makes sure that the unit or
          * good that the component represents gets modified so that it is on
          * board the currently selected ship.
          * 
-         * @param comp The component to add to this CargoPanel.
+         * @param comp The component to add to this WarehousePanel.
          * @param editState Must be set to 'true' if the state of the component
          *            that is added (which should be a dropped component
          *            representing a Unit or good) should be changed so that the
@@ -1358,13 +1355,14 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener {
             warehousePanel.removeAll();
             List<Goods> allGoods = getColony().getGoodsContainer().getFullGoods();
             for (Goods goods : allGoods) {
-                GoodsLabel goodsLabel = new GoodsLabel(goods, parent);
-                if (colonyPanel.isEditable()) {
-                    goodsLabel.setTransferHandler(defaultTransferHandler);
-                    goodsLabel.addMouseListener(pressListener);
+                if (goods.getType().isStorable()) {
+                    GoodsLabel goodsLabel = new GoodsLabel(goods, parent);
+                    if (colonyPanel.isEditable()) {
+                        goodsLabel.setTransferHandler(defaultTransferHandler);
+                        goodsLabel.addMouseListener(pressListener);
+                    }
+                    warehousePanel.add(goodsLabel, false);
                 }
-
-                warehousePanel.add(goodsLabel, false);
             }
 
             warehousePanel.revalidate();
