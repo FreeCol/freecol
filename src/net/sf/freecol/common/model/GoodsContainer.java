@@ -125,6 +125,10 @@ public class GoodsContainer extends FreeColGameObject {
         return removeGoods(g.getType(), g.getAmount());
     }
 
+    public Goods removeGoods(GoodsType type) {
+        return removeGoods(type, Integer.MAX_VALUE);
+    }
+
     /**
      * Removes the given amount of the given type of goods.
      *
@@ -338,7 +342,9 @@ public class GoodsContainer extends FreeColGameObject {
     * Prepares this <code>GoodsContainer</code> for a new turn.
     */
     public void saveState() {
-
+        if (oldStoredGoods == null) {
+            oldStoredGoods = new int[storedGoods.length];
+        }
         for (int i = 0; i < storedGoods.length; i++) {
             oldStoredGoods[i] = storedGoods[i];
         }

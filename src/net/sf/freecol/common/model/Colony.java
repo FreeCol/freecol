@@ -47,10 +47,6 @@ public final class Colony extends Settlement implements Abilities, Location, Nam
     
     private List<Building> delayedProduction = new ArrayList<Building>();
 
-    private int hammers;
-
-    private int bells;
-
     /** The SoL membership this turn. */
     private int sonsOfLiberty;
 
@@ -123,8 +119,6 @@ public final class Colony extends Settlement implements Abilities, Location, Nam
         goodsContainer = new GoodsContainer(game, this);
         initializeGoodsTypeArrays();
         this.name = name;
-        hammers = 0;
-        bells = 0;
         sonsOfLiberty = 0;
         oldSonsOfLiberty = 0;
         Map map = game.getMap();
@@ -631,19 +625,10 @@ public final class Colony extends Settlement implements Abilities, Location, Nam
      * @return The amount of this type of Goods at this Location.
      */
     public int getGoodsCount(GoodsType type) {
-        if (type.isStorable()) {
-            return goodsContainer.getGoodsCount(type);
-        } else if (type.getStoredAs() != null) {
+        if (type.getStoredAs() != null) {
             return goodsContainer.getGoodsCount(type.getStoredAs());
         } else {
-            if (type == Goods.HAMMERS) {
-                return getHammers();
-            } else if (type == Goods.BELLS) {
-                return getBells();
-            } else {
-                logger.warning(type.getName() + " is not stored in this Colony!");
-                return 0;
-            }
+            return goodsContainer.getGoodsCount(type);
         }
     }
     
@@ -665,21 +650,15 @@ public final class Colony extends Settlement implements Abilities, Location, Nam
         goodsContainer.removeGoods(goods.getType(), goods.getAmount());
     }
 
+    public void removeGoods(GoodsType type) {
+        goodsContainer.removeGoods(type);
+    }
+
     public void addGoods(GoodsType type, int amount) {
-        if (type.isStorable()) {
-            goodsContainer.addGoods(type, amount);
-        } else if (type.getStoredAs() != null) {
+        if (type.getStoredAs() != null) {
             goodsContainer.addGoods(type.getStoredAs(), amount);
         } else {
-            if (type == Goods.HAMMERS) {
-                addHammers(amount);
-            } else if (type == Goods.BELLS) {
-                addBells(amount);
-            } else if (type == Goods.CROSSES) {
-                getOwner().incrementCrosses(amount);
-            } else {
-                logger.warning(type.getName() + " cannot be stored in this Colony!");
-            }
+            goodsContainer.addGoods(type, amount);
         }
     }
 
@@ -902,7 +881,7 @@ public final class Colony extends Settlement implements Abilities, Location, Nam
                         { "%building%", getBuilding(currentlyBuilding).getName() } }, ModelMessage.WARNING);
             }
         }
-        hammers += amount;
+        goodsContainer.addGoods(Goods.HAMMERS, amount);
     }
 
     /**
@@ -945,7 +924,7 @@ public final class Colony extends Settlement implements Abilities, Location, Nam
      * @return The current hammer count of the colony.
      */
     public int getHammers() {
-        return hammers;
+        return getGoodsCount(Goods.HAMMERS);
     }
 
     /**
@@ -980,11 +959,8 @@ public final class Colony extends Settlement implements Abilities, Location, Nam
      */
     public void addBells(int amount) {
         getOwner().incrementBells(amount);
-        if (getMembers() <= getUnitCount() + 1) {
-            bells += amount;
-        }
-        if (bells <= 0) {
-            bells = 0;
+        if (getMembers() <= getUnitCount() + 1 && amount > 0) {
+            addGoods(Goods.BELLS, amount);
         }
     }
 
@@ -999,7 +975,8 @@ public final class Colony extends Settlement implements Abilities, Location, Nam
          * SoL is determined by the formula: int membership = ... in
          * "updateSoL()":
          */
-        bells += (bells * amount) / 100;
+        int bells = getGoodsCount(Goods.BELLS);
+        addGoods(Goods.BELLS, (bells * amount) / 100);
     }
 
     /**
@@ -1008,7 +985,7 @@ public final class Colony extends Settlement implements Abilities, Location, Nam
      * @return The current bell count of the colony.
      */
     public int getBells() {
-        return bells;
+        return getGoodsCount(Goods.BELLS);
     }
 
     /**
@@ -1030,7 +1007,7 @@ public final class Colony extends Settlement implements Abilities, Location, Nam
             return;
         }
         // Update "addSol(int)" and "getMembers()" if this formula gets changed:
-        int membership = (bells * 100) / (BELLS_PER_REBEL * getUnitCount());
+        int membership = (getBells() * 100) / (BELLS_PER_REBEL * getUnitCount());
         if (membership < 0)
             membership = 0;
         if (membership > 100)
@@ -1043,7 +1020,7 @@ public final class Colony extends Settlement implements Abilities, Location, Nam
      * Return the number of sons of liberty
      */
     public int getMembers() {
-        return Math.min(bells / BELLS_PER_REBEL, getUnitCount());
+        return Math.min(getBells() / BELLS_PER_REBEL, getUnitCount());
     }
 
     /**
@@ -1293,7 +1270,7 @@ public final class Colony extends Settlement implements Abilities, Location, Nam
                 if (Unit.getNextTools(unitTypeIndex) <= getGoodsCount(Goods.TOOLS)) {
                     Unit unit = getGame().getModelController().createUnit(getID() + "buildUnit", getTile(), getOwner(),
                             unitType);
-                    hammers = 0;
+                    removeGoods(Goods.HAMMERS);
                     removeGoods(Goods.TOOLS, Unit.getNextTools(unit.getType()));
                     addModelMessage(this, "model.colony.unitReady", new String[][] { { "%colony%", getName() },
                             { "%unit%", unit.getName() } }, ModelMessage.UNIT_ADDED, unit);
@@ -1309,8 +1286,8 @@ public final class Colony extends Settlement implements Abilities, Location, Nam
         } else if (currentlyBuilding != -1) {
             int hammersRequired = getBuilding(currentlyBuilding).getNextHammers();
             int toolsRequired = getBuilding(currentlyBuilding).getNextTools();
-            if ((hammers >= hammersRequired) && (hammersRequired != -1)) {
-                hammers = hammersRequired;
+            if ((getHammers() >= hammersRequired) && (hammersRequired != -1)) {
+                removeGoods(Goods.HAMMERS, getHammers() - hammersRequired);
                 if (getGoodsCount(Goods.TOOLS) >= toolsRequired) {
                     if (!getBuilding(currentlyBuilding).canBuildNext()) {
                         throw new IllegalStateException("Cannot build the selected building.");
@@ -1318,7 +1295,7 @@ public final class Colony extends Settlement implements Abilities, Location, Nam
                     if (toolsRequired > 0) {
                         removeGoods(Goods.TOOLS, toolsRequired);
                     }
-                    hammers = 0;
+                    removeGoods(Goods.HAMMERS);
                     getBuilding(currentlyBuilding).upgrade();
                     addModelMessage(this, "model.colony.buildingReady", new String[][] { { "%colony%", getName() },
                             { "%building%", getBuilding(currentlyBuilding).getName() } },
@@ -1353,10 +1330,10 @@ public final class Colony extends Settlement implements Abilities, Location, Nam
         int toolsRemaining = 0;
         if (getCurrentlyBuilding() >= Colony.BUILDING_UNIT_ADDITION) {
             int unitType = getCurrentlyBuilding() - BUILDING_UNIT_ADDITION;
-            hammersRemaining = Math.max(Unit.getNextHammers(unitType) - hammers, 0);
+            hammersRemaining = Math.max(Unit.getNextHammers(unitType) - getHammers(), 0);
             toolsRemaining = Math.max(Unit.getNextTools(unitType) - getGoodsCount(Goods.TOOLS), 0);
         } else if (getCurrentlyBuilding() != -1) {
-            hammersRemaining = Math.max(getBuilding(currentlyBuilding).getNextHammers() - hammers, 0);
+            hammersRemaining = Math.max(getBuilding(currentlyBuilding).getNextHammers() - getHammers(), 0);
             toolsRemaining = Math.max(getBuilding(currentlyBuilding).getNextTools() - getGoodsCount(Goods.TOOLS), 0);
         }
         int price = hammersRemaining * getGameOptions().getInteger(GameOptions.HAMMER_PRICE)
@@ -1382,13 +1359,19 @@ public final class Colony extends Settlement implements Abilities, Location, Nam
         int toolsRemaining = 0;
         if (getCurrentlyBuilding() >= Colony.BUILDING_UNIT_ADDITION) {
             int unitIndex = getCurrentlyBuilding() - BUILDING_UNIT_ADDITION;
-            hammersRemaining = Math.max(Unit.getNextHammers(unitIndex) - hammers, 0);
+            int difference = Unit.getNextHammers(unitIndex) - getHammers();
+            hammersRemaining = Math.max(difference, 0);
             toolsRemaining = Math.max(Unit.getNextTools(unitIndex) - getGoodsCount(Goods.TOOLS), 0);
-            hammers = Math.max(Unit.getNextHammers(unitIndex), hammers);
+            if (difference > 0) {
+                addGoods(Goods.HAMMERS, difference);
+            }
         } else if (getCurrentlyBuilding() != -1) {
-            hammersRemaining = Math.max(getBuilding(currentlyBuilding).getNextHammers() - hammers, 0);
+            int difference = getBuilding(currentlyBuilding).getNextHammers() - getHammers();
+            hammersRemaining = Math.max(difference, 0);
             toolsRemaining = Math.max(getBuilding(currentlyBuilding).getNextTools() - getGoodsCount(Goods.TOOLS), 0);
-            hammers = Math.max(getBuilding(currentlyBuilding).getNextHammers(), hammers);
+            if (difference > 0) {
+                addGoods(Goods.HAMMERS, difference);
+            }
         }
         if (hammersRemaining > 0) {
             getOwner().modifyGold(-hammersRemaining * getGameOptions().getInteger(GameOptions.HAMMER_PRICE));
@@ -1761,10 +1744,7 @@ public final class Colony extends Settlement implements Abilities, Location, Nam
         createWarehouseCapacityWarning();
 
         // Remove bells:
-        bells -= Math.max(0, getUnitCount() - 2);
-        if (bells < 0) {
-            bells = 0;
-        }
+        removeGoods(Goods.BELLS, Math.max(0, getUnitCount() - 2));
 
         // Update SoL:
         updateSoL();
@@ -1849,8 +1829,6 @@ public final class Colony extends Settlement implements Abilities, Location, Nam
         out.writeAttribute("tile", tile.getID());
         out.writeAttribute("defenseBonus", Integer.toString(defenseBonus));
         if (getGame().isClientTrusted() || showAll || player == getOwner()) {
-            out.writeAttribute("hammers", Integer.toString(hammers));
-            out.writeAttribute("bells", Integer.toString(bells));
             out.writeAttribute("sonsOfLiberty", Integer.toString(sonsOfLiberty));
             out.writeAttribute("oldSonsOfLiberty", Integer.toString(oldSonsOfLiberty));
             out.writeAttribute("tories", Integer.toString(tories));
@@ -1903,8 +1881,6 @@ public final class Colony extends Settlement implements Abilities, Location, Nam
             tile = new Tile(getGame(), in.getAttributeValue(null, "owner"));
         }
         owner.addSettlement(this);
-        hammers = getAttribute(in, "hammers", 0);
-        bells = getAttribute(in, "bells", 0);
         sonsOfLiberty = getAttribute(in, "sonsOfLiberty", 0);
         oldSonsOfLiberty = getAttribute(in, "oldSonsOfLiberty", 0);
         tories = getAttribute(in, "tories", 0);

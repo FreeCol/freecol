@@ -2093,7 +2093,7 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
             if (Tile.this.hasLostCityRumour()) {
                 out.writeAttribute("lostCityRumour", Boolean.toString(lostCityRumour));
             }
-            if (Tile.this.getOwner() != owner) {
+            if (Tile.this.getOwner() != owner && owner != null) {
                 out.writeAttribute("owner", owner.getID());
             }
             if (colonyUnitCount != 0) {

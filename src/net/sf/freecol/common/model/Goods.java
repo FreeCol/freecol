@@ -31,33 +31,6 @@ public class Goods extends FreeColObject implements Locatable, Ownable, Named {
                                     RUM, CIGARS, CLOTH, COATS, TRADEGOODS, TOOLS, MUSKETS, 
                                     FISH, BELLS, CROSSES, HAMMERS;
     public static int NUMBER_OF_TYPES;
-/*
-    public static final int FOOD = 0,
-                            SUGAR = 1,
-                            TOBACCO = 2,
-                            COTTON = 3,
-                            FURS = 4,
-                            LUMBER = 5,
-                            ORE = 6,
-                            SILVER = 7,
-                            HORSES = 8,
-                            RUM = 9,
-                            CIGARS = 10,
-                            CLOTH = 11,
-                            COATS = 12,
-                            TRADE_GOODS = 13,
-                            TOOLS = 14,
-                            MUSKETS = 15;
-
-    public static final int NUMBER_OF_TYPES = 16;
-    // Unstorable goods:
-    public static final int FISH = 16, // Stored as food.
-                            BELLS = 17,
-                            CROSSES = 18,
-                            HAMMERS = 19;
-
-    public static final int NUMBER_OF_ALL_TYPES = 20;
-*/
 
     private Game game;
     private Location location;
@@ -218,48 +191,6 @@ public class Goods extends FreeColObject implements Locatable, Ownable, Named {
         return (location != null) ? location.getTile() : null;
     }
 
-
-    /**
-    * Gets the type of goods that is needed to produce the given type
-    * of goods.
-    *
-    * @param goodsType The type of manufactured goods.
-    * @return The type of raw material or <code>-1</code> if the given type
-    *         of goods does not have a raw material.
-    */
-    /* Depreciated
-    public static int getRawMaterial(int goodsType) {
-        GoodsType  good = FreeCol.getSpecification().goodsType( goodsType );
-        return good.isRefined() ? good.madeFrom.index : -1;        
-    }
-    */
-
-    /**
-    * Gets the type of goods which can be produced by the given
-    * raw material.
-    *
-    * @param rawMaterialGoodsType The type of raw material.
-    * @return The type of manufactured goods or <code>-1</code> if the given type
-    *         of goods does not have a manufactured goods.
-    */
-    /* Depreciated
-    public static int getManufactoredGoods(int rawMaterialGoodsType) {
-        GoodsType  good = FreeCol.getSpecification().goodsType( rawMaterialGoodsType );
-        return good.isRawMaterial() ? good.makes.index : -1;
-    }
-    */
-
-    /**
-    * Checks if the given type of goods can be produced on a {@link ColonyTile}.
-    * @param goodsType The type of goods to test.
-    * @return The result.
-    */
-    /*  Depreciated
-    public static boolean isFarmedGoods(int goodsType) {
-
-        return FreeCol.getSpecification().goodsType(goodsType).isFarmed;
-    }
-    */
 
     /**
     * Sets the location of the goods.
