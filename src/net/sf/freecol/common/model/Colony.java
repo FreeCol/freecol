@@ -143,7 +143,7 @@ public final class Colony extends Settlement implements Abilities, Location, Nam
         List<BuildingType> buildingTypes = FreeCol.getSpecification().getBuildingTypeList();
         for (BuildingType buildingType : buildingTypes) {
             if (buildingType.getUpgradesFrom() == null) {
-                boolean built = buildingType.getHammersRequired() == 0;
+                boolean built = (buildingType.getHammersRequired() == 0);
                 addWorkLocation(new Building(game, this, buildingType, built));
             }
         }

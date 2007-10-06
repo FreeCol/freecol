@@ -962,7 +962,8 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener {
             Iterator<Building> buildingIterator = getColony().getBuildingIterator();
             while (buildingIterator.hasNext()) {
                 Building building = buildingIterator.next();
-                if (building.isBuilt()) {
+                // TODO: fix this
+                //if (building.isBuilt()) {
                     aSingleBuildingPanel = new ASingleBuildingPanel(building);
                     if (colonyPanel.isEditable()) {
                         aSingleBuildingPanel.addMouseListener(releaseListener);
@@ -970,7 +971,7 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener {
                     }
                     aSingleBuildingPanel.setOpaque(false);
                     add(aSingleBuildingPanel);
-                }
+                    //}
             }
         }
 
@@ -1011,7 +1012,6 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener {
             public void initialize() {
 
                 removeAll();
-
                 if (building.getMaxUnits() == 0) {
                     add(new JLabel("(" + building.getName() + ")"), higConst.rc(1, 1));
                 } else {

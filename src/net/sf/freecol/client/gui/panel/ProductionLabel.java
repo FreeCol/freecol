@@ -131,8 +131,8 @@ public final class ProductionLabel extends JComponent {
         if (goodsType != null) {
             goodsIcon = parent.getImageProvider().getGoodsImageIcon(goodsType);
             compressedWidth = goodsIcon.getIconWidth()*2;
+            setToolTipText(String.valueOf(amount) + " " + goodsType.getName());
         }
-        setToolTipText(String.valueOf(amount) + " " + goodsType.getName());
     }
     
 

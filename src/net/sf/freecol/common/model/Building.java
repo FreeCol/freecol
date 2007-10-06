@@ -1169,6 +1169,9 @@ public final class Building extends FreeColGameObject implements Abilities, Work
      */
     public int getProductionFromProductivity(int productivity) {
         GoodsType goodsOutputType = getGoodsOutputType();
+        if (goodsOutputType == null) {
+            return 0;
+        }
         Player player = colony.getOwner();
 
         float goodsOutput = productivity;
