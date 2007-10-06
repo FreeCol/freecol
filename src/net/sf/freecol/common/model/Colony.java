@@ -142,9 +142,9 @@ public final class Colony extends Settlement implements Abilities, Location, Nam
         addWorkLocation(new ColonyTile(game, this, tile));
         List<BuildingType> buildingTypes = FreeCol.getSpecification().getBuildingTypeList();
         for (BuildingType buildingType : buildingTypes) {
-            if (buildingType.getUpgradesFrom() == null) {
-                boolean built = (buildingType.getHammersRequired() == 0);
-                addWorkLocation(new Building(game, this, buildingType, built));
+            if (buildingType.getUpgradesFrom() == null &&
+                buildingType.getHammersRequired() == 0) {
+                addWorkLocation(new Building(game, this, buildingType));
             }
         }
         currentlyBuilding = -1;
@@ -192,7 +192,12 @@ public final class Colony extends Settlement implements Abilities, Location, Nam
         super(game, id);
     }
 
-    private void addWorkLocation(WorkLocation workLocation) {
+    /**
+     * Add a WorkLocation to this Colony.
+     *
+     * @param workLocation a <code>WorkLocation</code> value
+     */
+    public void addWorkLocation(WorkLocation workLocation) {
         workLocations.add(workLocation);
         if (workLocation instanceof Building) {
             Building building = (Building) workLocation;
@@ -373,7 +378,7 @@ public final class Colony extends Settlement implements Abilities, Location, Nam
         Iterator<Building> buildingIterator = getBuildingIterator();
         while (buildingIterator.hasNext()) {
             Building building = buildingIterator.next();
-            if (building.isBuilt() && building.getGoodsOutputType() == goodsType) {
+            if (building != null && building.getGoodsOutputType() == goodsType) {
                 return building;
             }
         }
@@ -393,7 +398,7 @@ public final class Colony extends Settlement implements Abilities, Location, Nam
         Iterator<Building> buildingIterator = getBuildingIterator();
         while (buildingIterator.hasNext()) {
             Building building = buildingIterator.next();
-            if (building.isBuilt() && building.getGoodsInputType() == goodsType) {
+            if (building.getGoodsInputType() == goodsType) {
                 return building;
             }
         }
@@ -781,10 +786,6 @@ public final class Colony extends Settlement implements Abilities, Location, Nam
      * @return <code>true</code> if this unit type could be added.
     */
     public boolean canTrain(Unit unit) {
-        if (!hasAbility("model.ability.teach")) {
-            return false;
-        }
-        
         Iterator<Building> buildingIterator = getBuildingIterator();
         while (buildingIterator.hasNext()) {
             Building building = buildingIterator.next();
@@ -813,8 +814,8 @@ public final class Colony extends Settlement implements Abilities, Location, Nam
         Iterator<Building> buildingIterator = getBuildingIterator();
         while (buildingIterator.hasNext()) {
             Building building = buildingIterator.next();
-            if (building.isBuilt() && building.hasAbility("model.ability.teach") &&
-                    building.canAdd(unitType)) {
+            if (building.hasAbility("model.ability.teach") &&
+                building.canAdd(unitType)) {
                 return true;
             }
         }
@@ -826,7 +827,7 @@ public final class Colony extends Settlement implements Abilities, Location, Nam
         Iterator<Building> buildingIterator = getBuildingIterator();
         while (buildingIterator.hasNext()) {
             Building building = buildingIterator.next();
-            if (building.isBuilt() && building.hasAbility("model.ability.teach")) {
+            if (building.hasAbility("model.ability.teach")) {
                 teachers.addAll(building.getUnitList());
             }
         }
@@ -2020,8 +2021,7 @@ public final class Colony extends Settlement implements Abilities, Location, Nam
      * @return whether the colony has a stockade
      */
     public boolean hasStockade() {
-        Building stockade = getStockade();
-        return stockade != null && stockade.isBuilt();
+        return (getStockade() != null);
     }
     
     /**

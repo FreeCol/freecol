@@ -18,27 +18,10 @@ import org.w3c.dom.Element;
 
 /**
  * Represents a building in a colony.
- * 
- * <br>
- * <br>
- * 
- * Each <code>Building</code> has a type and a level. The levels are
- * {@link #NOT_BUILT}, {@link #HOUSE}, {@link #SHOP} and {@link #FACTORY}.
- * The {@link #getName name} of a <code>Building</code> depends on both the
- * type and the level:
- * 
- * <br>
- * <br>
- * Type {@link #STOCKADE} <br>
- * Level {@link #NOT_BUILT}: <i>null</i> <br>
- * Level {@link #HOUSE}: "Stockade" <br>
- * Level {@link #SHOP}: "Fort" <br>
- * Level {@link #FACTORY}: "Fortress"
- * 
  */
 public final class Building extends FreeColGameObject implements Abilities, WorkLocation, Ownable, Named {
     
-    public static final String COPYRIGHT = "Copyright (C) 2003-2006 The FreeCol Team";
+    public static final String COPYRIGHT = "Copyright (C) 2003-2007 The FreeCol Team";
 
     public static final String LICENSE = "http://www.gnu.org/licenses/gpl.html";
 
@@ -61,8 +44,6 @@ public final class Building extends FreeColGameObject implements Abilities, Work
 
     private BuildingType buildingType;
     
-    private boolean isBuilt = false;
-
 
     /**
      * Creates a new <code>Building</code>.
@@ -71,12 +52,11 @@ public final class Building extends FreeColGameObject implements Abilities, Work
      * @param colony The colony in which this building is located.
      * @param type The type of building.
      */
-    public Building(Game game, Colony colony, BuildingType type, boolean built) {
+    public Building(Game game, Colony colony, BuildingType type) {
         super(game);
 
         this.colony = colony;
-        setType(type);
-        this.isBuilt = built;
+        this.buildingType = type;
     }
 
     /**
@@ -150,23 +130,14 @@ public final class Building extends FreeColGameObject implements Abilities, Work
     /**
      * Gets the name of a building.
      * 
-     * @return The name of the <code>Building</code> or <i>null</i> if the
-     *         building has not been built.
+     * @return The name of the <code>Building</code>
      */
     public String getName() {
-        if (isBuilt) {
-            return null;
-        } else {
-            return buildingType.getName();
-        }
+        return buildingType.getName();
     }
 
     public int getLevel() {
-        if (isBuilt) {
-            return buildingType.getLevel();
-        } else {
-            return 0;
-        }
+        return buildingType.getLevel();
     }
 
     /**
@@ -256,11 +227,7 @@ public final class Building extends FreeColGameObject implements Abilities, Work
      *         population.
      */
     public boolean canBuildNext() {
-        if (isBuilt) {
-            return canBuild(buildingType.getUpgradesTo());
-        } else {
-            return canBuild(buildingType);
-        }
+        return canBuild(buildingType.getUpgradesTo());
     }
     
 
@@ -291,15 +258,6 @@ public final class Building extends FreeColGameObject implements Abilities, Work
     }
 
     /**
-     * Checks if the building has been built.
-     * 
-     * @return The result.
-     */
-    public boolean isBuilt() {
-        return isBuilt;
-    }
-
-    /**
      * Gets a pointer to the colony containing this building.
      * 
      * @return The <code>Colony</code>.
@@ -324,7 +282,7 @@ public final class Building extends FreeColGameObject implements Abilities, Work
      * @see #damage
      */
     public boolean canBeDamaged() {
-        return isBuilt() && buildingType.getHammersRequired() > 0;
+        return buildingType.getHammersRequired() > 0;
     }
     
     /**
@@ -346,23 +304,21 @@ public final class Building extends FreeColGameObject implements Abilities, Work
     	if (!canBuildNext())
     		throw new IllegalStateException("Cannot upgrade this building.");
     	
-        if (isBuilt) {
-            setType(buildingType.getUpgradesTo());
-        } else {
-            setType(buildingType);
-        }
+        setType(buildingType.getUpgradesTo());
         
     }
     
     private void setType(BuildingType newBuildingType) {
-        if (isBuilt) {
-            // remove modifiers and abilities from current type
+        // remove modifiers and abilities from current type
+        if (buildingType.getModifiers() != null) {
             Map<String, Modifier> oldModifiers = buildingType.getModifiers();
             for (Entry<String, Modifier> entry : oldModifiers.entrySet()) {
                 colony.removeModifier(entry.getKey(), entry.getValue());
             }
-            colony.setDefenseBonus(colony.getDefenseBonus() - buildingType.getDefenseBonus());
-            
+        }
+        colony.setDefenseBonus(colony.getDefenseBonus() - buildingType.getDefenseBonus());
+        
+        if (buildingType.getAbilities() != null) {
             Map<String, Boolean> abilities = buildingType.getAbilities();
             for(Entry<String, Boolean> ability : abilities.entrySet()) {
                 abilities.put(ability.getKey(), !ability.getValue());
@@ -371,7 +327,6 @@ public final class Building extends FreeColGameObject implements Abilities, Work
         }
         
         if (newBuildingType != null) {
-            isBuilt = true;
             buildingType = newBuildingType;
             
             // add new modifiers and abilities from new type
@@ -388,8 +343,6 @@ public final class Building extends FreeColGameObject implements Abilities, Work
                     unit.setLocation(getTile());
                 }
             }
-        } else {
-            isBuilt = false;
         }
         
         // Colonists exceding units limit must be put outside
@@ -404,11 +357,7 @@ public final class Building extends FreeColGameObject implements Abilities, Work
      * @return The number.
      */
     public int getMaxUnits() {
-        if (isBuilt) {
-            return buildingType.getWorkPlaces();
-        } else {
-            return 0;
-        }
+        return buildingType.getWorkPlaces();
     }
 
     /**
@@ -445,7 +394,7 @@ public final class Building extends FreeColGameObject implements Abilities, Work
 
     /**
      * Checks if the specified <code>UnitType</code> may be added to this
-     * <code>WorkLocation</code>. Whether is built is  not taken into account.
+     * <code>WorkLocation</code>.
      * 
      * @param unitType the <code>UnitTYpe</code>.
      * @return <i>true</i> if the <i>UnitType</i> may be added and <i>false</i>
@@ -631,10 +580,6 @@ public final class Building extends FreeColGameObject implements Abilities, Work
      * Prepares this <code>Building</code> for a new turn.
      */
     public void newTurn() {
-        if (!isBuilt()) {
-            // Don't do anything if the building does not exist.
-            return; 
-        }
         if (hasAbility("model.ability.teach")) {
             trainStudents();
         }

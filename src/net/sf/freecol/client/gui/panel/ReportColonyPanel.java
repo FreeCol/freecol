@@ -164,9 +164,7 @@ public final class ReportColonyPanel extends ReportPanel implements ActionListen
         Iterator<Building> buildingIterator = colony.getBuildingIterator();
         while (buildingIterator.hasNext()) {
             Building building = buildingIterator.next();
-            if (building.isBuilt()) {
-                buildingPanel.add(new JLabel(building.getName()));
-            }
+            buildingPanel.add(new JLabel(building.getName()));
         }
         
         int currentType = colony.getCurrentlyBuilding();

@@ -21,8 +21,8 @@ public class BuildingTest extends FreeColTestCase {
 
         // First check with a building that can be fully build with a normal
         // colony
-        BuildingType warehouseType = FreeCol.getSpecification().getBuildingType("model.building.Warehouse");
-        Building warehouse = new Building(getGame(), colony, warehouseType, false);
+        BuildingType warehouseType = FreeCol.getSpecification().getBuildingType("model.building.Depot");
+        Building warehouse = new Building(getGame(), colony, warehouseType);
         assertTrue(warehouse.canBuildNext());
         warehouse.upgrade();
         assertTrue(warehouse.canBuildNext());
@@ -56,7 +56,7 @@ public class BuildingTest extends FreeColTestCase {
         Building warehouse = colony.getBuilding(warehouseType);
 
         // Is build as depot...
-        assertTrue(warehouse.isBuilt());
+        assertTrue(warehouse != null);
         
         assertTrue(warehouse.canBuildNext());
 
@@ -138,25 +138,13 @@ public class BuildingTest extends FreeColTestCase {
         // Check school
         BuildingType schoolType = FreeCol.getSpecification().getBuildingType("model.building.Schoolhouse");
         Building school = colony.getBuilding(schoolType);
+        assertTrue(school == null);
 
-        // these can never teach
-        assertFalse("able to add free colonist to Schoolhouse (not built)",
-                    school.canAdd(colonist));
-        assertFalse("able to add petty criminal to Schoolhouse (not built)",
-                    school.canAdd(criminal));
-        assertFalse("able to add indentured servant to Schoolhouse (not built)",
-                    school.canAdd(servant));
-        assertFalse("able to add indian convert to Schoolhouse (not built)",
-                    school.canAdd(indian));
-        
-        assertFalse("able to add elder statesman to Schoolhouse (not built)",
-                    school.canAdd(elder));
-        assertFalse("able to add master distiller to Schoolhouse (not built)",
-                    school.canAdd(distiller));
-        assertFalse("able to add master farmer to Schoolhouse (not built)",
-                    school.canAdd(farmer));
+        // build school
+        colony.addWorkLocation(new Building(getGame(), colony, schoolType));
+        school = colony.getBuilding(schoolType);
+        assertTrue(school != null);
 
-        school.upgrade();
         // these can never teach
         assertFalse("able to add free colonist to Schoolhouse",
                     school.canAdd(colonist));

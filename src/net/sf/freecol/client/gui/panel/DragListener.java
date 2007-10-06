@@ -96,7 +96,7 @@ public final class DragListener extends MouseAdapter {
                     while (buildingIterator.hasNext()) {
                         Building building = buildingIterator.next();
                         if (tempUnit.getWorkLocation() != building) { // Skip if currently working at this location
-                            if (building.isBuilt() && building.canAdd(tempUnit)) {
+                            if (building.canAdd(tempUnit)) {
                                 GoodsType goodsType = building.getGoodsOutputType();
                                 String locName = building.getName();
                                 menuItem = new JMenuItem(locName);

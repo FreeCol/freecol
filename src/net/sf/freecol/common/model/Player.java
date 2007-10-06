@@ -2148,8 +2148,8 @@ public class Player extends FreeColGameObject implements Abilities, Nameable, Mo
                                                                                        .get(event));
                         for (Colony colony : getColonies()) {
                             Building building = colony.getBuilding(type);
-                            if (building != null && !building.isBuilt()) {
-                                building.upgrade();
+                            if (building == null) {
+                                colony.addWorkLocation(new Building(getGame(), colony, type));
                             }
                         }
                     } else if (event.equals("model.event.seeAllColonies")) {

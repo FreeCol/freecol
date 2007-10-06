@@ -3657,7 +3657,7 @@ public class Unit extends FreeColGameObject implements Abilities, Locatable, Loc
             // Colony defensive bonus.
             Colony colony = (Colony) settlement;
             Building stockade = colony.getStockade();
-            if (!stockade.isBuilt()) {
+            if (stockade == null) {
                 // 50% colony bonus
                 return new Modifier("modifiers.inColony", 50, Modifier.PERCENTAGE);
             } else {

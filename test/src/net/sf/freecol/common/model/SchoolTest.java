@@ -49,8 +49,9 @@ public class SchoolTest extends FreeColTestCase {
         Unit ore = units.next();
         ore.setType(Unit.EXPERT_ORE_MINER);
 
+        BuildingType schoolType = spec().getBuildingType("model.building.Schoolhouse");
+        colony.addWorkLocation(new Building(getGame(), colony, schoolType));
         Building school = colony.getBuilding(spec().getBuildingType("model.building.Schoolhouse"));
-        school.upgrade();
 
         ore.setLocation(school);
         trainForTurns(colony, ore.getNeededTurnsOfTraining());
@@ -69,8 +70,9 @@ public class SchoolTest extends FreeColTestCase {
         Unit blackSmith = units.next();
         blackSmith.setType(Unit.MASTER_BLACKSMITH);
 
+        BuildingType schoolType = spec().getBuildingType("model.building.Schoolhouse");
+        colony.addWorkLocation(new Building(getGame(), colony, schoolType));
         Building school = colony.getBuilding(spec().getBuildingType("model.building.Schoolhouse"));
-        school.upgrade();
         school.upgrade();
 
         blackSmith.setLocation(school);
@@ -90,8 +92,9 @@ public class SchoolTest extends FreeColTestCase {
         Unit elder = units.next();
         elder.setType(Unit.ELDER_STATESMAN);
 
+        BuildingType schoolType = spec().getBuildingType("model.building.Schoolhouse");
+        colony.addWorkLocation(new Building(getGame(), colony, schoolType));
         Building school = colony.getBuilding(spec().getBuildingType("model.building.Schoolhouse"));
-        school.upgrade();
         school.upgrade();
         school.upgrade();
 
@@ -157,8 +160,9 @@ public class SchoolTest extends FreeColTestCase {
         ore.setType(Unit.EXPERT_ORE_MINER);
 
         // Build a college...
+        BuildingType schoolType = spec().getBuildingType("model.building.Schoolhouse");
+        colony.addWorkLocation(new Building(getGame(), colony, schoolType));
         Building school = colony.getBuilding(spec().getBuildingType("model.building.Schoolhouse"));
-        school.upgrade();
         school.upgrade();
 
         blacksmith.setLocation(school);
@@ -233,9 +237,11 @@ public class SchoolTest extends FreeColTestCase {
         Unit ore = units.next();
         ore.setType(Unit.EXPERT_ORE_MINER);
 
+        BuildingType schoolType = spec().getBuildingType("model.building.Schoolhouse");
+        colony.addWorkLocation(new Building(getGame(), colony, schoolType));
         Building school = colony.getBuilding(spec().getBuildingType("model.building.Schoolhouse"));
-
-        school.upgrade();school.upgrade();school.upgrade();
+        school.upgrade();
+        school.upgrade();
 
         black.setLocation(school);
         ore.setLocation(school);
@@ -286,8 +292,9 @@ public class SchoolTest extends FreeColTestCase {
         	u.setType(Unit.ELDER_STATESMAN);
         }
 
+        BuildingType schoolType = spec().getBuildingType("model.building.Schoolhouse");
+        colony.addWorkLocation(new Building(getGame(), colony, schoolType));
         Building school = colony.getBuilding(spec().getBuildingType("model.building.Schoolhouse"));
-        school.upgrade();
         school.upgrade();
         school.upgrade();
         return colony;
@@ -311,6 +318,8 @@ public class SchoolTest extends FreeColTestCase {
         Unit black = units.next();
         black.setType(Unit.MASTER_BLACKSMITH);
 
+        BuildingType schoolType = spec().getBuildingType("model.building.Schoolhouse");
+        colony.addWorkLocation(new Building(getGame(), colony, schoolType));
         Building school = colony.getBuilding(spec().getBuildingType("model.building.Schoolhouse"));
 
         // It should take 4 turns to train an expert lumber jack and 6 to train

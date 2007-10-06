@@ -191,10 +191,12 @@ public class ColonyPlan {
             buildList.add(building);
         }
 
+        /** TODO: fix this
         building = colony.getBuildingForProducing(Goods.MUSKETS);
         if (building.canBuildNext() && !building.isBuilt()) {
             buildList.add(building);
         }
+        */
         
         // TODO: create a interface buildable and add artillery to buildList
         //buildList.add(new Integer(Colony.BUILDING_UNIT_ADDITION + Unit.ARTILLERY));
