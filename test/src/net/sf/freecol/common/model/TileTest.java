@@ -114,4 +114,20 @@ public class TileTest extends FreeColTestCase {
         }
         
     }
+    
+    public void testPrimarySecondaryGoods() {
+        
+        Game game = getStandardGame();
+        
+        Specification s = FreeCol.getSpecification();
+        
+        Tile tile = new Tile(game, s.getTileType("model.tile.prairie"), 0, 0);
+        assertEquals(s.getGoodsType("model.goods.Food"),tile.primaryGoods());
+        assertEquals(s.getGoodsType("model.goods.Cotton"),tile.secondaryGoods());
+        
+        Tile tile2 = new Tile(game, s.getTileType("model.tile.mixedForest"), 0, 0);
+        assertEquals(s.getGoodsType("model.goods.Food"),tile2.primaryGoods());
+        assertEquals(s.getGoodsType("model.goods.Lumber"),tile2.secondaryGoods());
+        
+    }
 }

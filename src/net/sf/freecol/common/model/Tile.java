@@ -1256,6 +1256,7 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
                         }
                         top[i] = g;
                         val[i] = potential;
+                        break;
                     }
                 }
             }
