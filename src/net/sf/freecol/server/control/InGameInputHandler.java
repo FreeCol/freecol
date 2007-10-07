@@ -11,6 +11,7 @@ import net.sf.freecol.FreeCol;
 import net.sf.freecol.common.Specification;
 import net.sf.freecol.common.model.Building;
 
+import net.sf.freecol.common.model.BuildableType;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.ColonyTile;
 import net.sf.freecol.common.model.DiplomaticTrade;
@@ -2170,7 +2171,13 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
     private Element setCurrentlyBuilding(Connection connection, Element setCurrentlyBuildingElement) {
         ServerPlayer player = getFreeColServer().getPlayer(connection);
         Colony colony = (Colony) getGame().getFreeColGameObject(setCurrentlyBuildingElement.getAttribute("colony"));
-        int type = Integer.parseInt(setCurrentlyBuildingElement.getAttribute("type"));
+        String typeString = setCurrentlyBuildingElement.getAttribute("type");
+        BuildableType type = BuildableType.NOTHING;
+        if (FreeCol.getSpecification().getBuildingType(typeString) != null) {
+            type = FreeCol.getSpecification().getBuildingType(typeString);
+        } else if (FreeCol.getSpecification().getUnitType(typeString) != null) {
+            type = FreeCol.getSpecification().getUnitType(typeString);
+        }
         if (colony.getOwner() != player) {
             throw new IllegalStateException("Not your colony!");
         }

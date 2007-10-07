@@ -48,7 +48,9 @@ import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.client.gui.i18n.Messages;
+import net.sf.freecol.common.model.BuildableType;
 import net.sf.freecol.common.model.Building;
+import net.sf.freecol.common.model.BuildingType;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.ColonyTile;
 import net.sf.freecol.common.model.FoundingFather;
@@ -60,8 +62,9 @@ import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.TileType;
 import net.sf.freecol.common.model.Unit;
-import cz.autel.dmi.HIGLayout;
 import net.sf.freecol.common.model.UnitType;
+
+import cz.autel.dmi.HIGLayout;
 
 /**
  * This is a panel for the Colony display. It shows the units that are working
@@ -587,7 +590,7 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener {
             // Apparently this can happen
             return;
         }
-        if (getColony().getCurrentlyBuilding() == Building.NONE) {
+        if (getColony().getCurrentlyBuilding() == BuildableType.NOTHING) {
             hammersLabel.update(0, 0, 0, 0);
             toolsLabel.update(0, 0, 0, 0);
             buyBuilding.setEnabled(false);
@@ -603,17 +606,8 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener {
                 nextTools -= getColony().getProductionNextTurn(produced);
             }
             
-            int hammersNeeded = 0;
-            int toolsNeeded = 0;
-            if (getColony().getCurrentlyBuilding() < Colony.BUILDING_UNIT_ADDITION) {
-                hammersNeeded = getColony().getBuilding(getColony().getCurrentlyBuilding()).getNextHammers();
-                toolsNeeded = getColony().getBuilding(getColony().getCurrentlyBuilding()).getNextTools();
-            } else {
-                hammersNeeded = Unit.getNextHammers(getColony().getCurrentlyBuilding() - Colony.BUILDING_UNIT_ADDITION);
-                toolsNeeded = Unit.getNextTools(getColony().getCurrentlyBuilding() - Colony.BUILDING_UNIT_ADDITION);
-            }
-            hammersNeeded = Math.max(hammersNeeded, 0);
-            toolsNeeded = Math.max(toolsNeeded, 0);
+            int hammersNeeded = Math.max(getColony().getCurrentlyBuilding().getHammersRequired(), 0);
+            int toolsNeeded = Math.max(getColony().getCurrentlyBuilding().getToolsRequired(), 0);
 
             hammersLabel.update(0, hammersNeeded, hammers, nextHammers);
             toolsLabel.update(0, toolsNeeded, tools, nextTools);
@@ -1882,36 +1876,22 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener {
         public void initialize() {
             super.removeActionListener(buildingBoxListener);
             removeAllItems();
-            BuildingBoxItem nothingItem = new BuildingBoxItem(Messages.message("nothing"), -1);
-            this.addItem(nothingItem);
-            BuildingBoxItem toSelect = nothingItem;
+            this.addItem(new BuildingBoxItem(BuildableType.NOTHING));
 
-            Iterator<Building> buildingIterator = colonyPanel.getColony().getBuildingIterator();
-            while (buildingIterator.hasNext()) {
-                Building building = buildingIterator.next();
-                if (building.canBuildNext()) {
-                    String theText = buildingText(building);
-                    int i = building.getType().getIndex();
-                    BuildingBoxItem nextItem = new BuildingBoxItem(theText, i);
-                    this.addItem(nextItem);
-                    if (i == colonyPanel.getColony().getCurrentlyBuilding()) {
-                        toSelect = nextItem;
-                    }
+            List<BuildingType> buildingTypes = FreeCol.getSpecification().getBuildingTypeList();
+            for (BuildingType buildingType : buildingTypes) {
+                if (colonyPanel.getColony().canBuild(buildingType)) {
+                    addItem(new BuildingBoxItem(buildingType));
                 }
             }
-
-            List<UnitType> buildableUnits = colonyPanel.getColony().getBuildableUnits();
-            for (UnitType buildable : buildableUnits) {
-                String theText = unitText(buildable);
-                int i = buildable.getIndex() + Colony.BUILDING_UNIT_ADDITION;
-                BuildingBoxItem uItem = new BuildingBoxItem(theText, i);
-                addItem(uItem);
-                if (i == colonyPanel.getColony().getCurrentlyBuilding()) {
-                    toSelect = uItem;
+            List<UnitType> unitTypes = FreeCol.getSpecification().getUnitTypeList();
+            for (UnitType unitType : unitTypes) {
+                if (colonyPanel.getColony().canBuild(unitType)) {
+                    addItem(new BuildingBoxItem(unitType));
                 }
             }
+            setSelectedItem(colonyPanel.getColony().getCurrentlyBuilding());
 
-            this.setSelectedItem(toSelect);
             super.addActionListener(buildingBoxListener);
             colonyPanel.updateProgressLabel();
         }
@@ -1922,43 +1902,28 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener {
          * that type.
          */
         public final class BuildingBoxItem {
-            private final String text;
 
-            private final int type;
+            private final BuildableType type;
 
-
-            /**
-             * Sets up the text and the type.
-             * 
-             * @param text The text presented to the user for identifying the
-             *            item.
-             * @param type An <code>int</code> for identifying the item.
-             */
-            public BuildingBoxItem(String text, int type) {
-                this.text = text;
+            public BuildingBoxItem(BuildableType type) {
                 this.type = type;
             }
 
-            /**
-             * Gets the text associated with this item.
-             * 
-             * @return The text associated with this item.
-             */
-            public String getText() {
-                return text;
-            }
-
-            /**
-             * Gets the building type associated with that item.
-             * 
-             * @return The building type associated with this item.
-             */
-            public int getType() {
+            public BuildableType getType() {
                 return type;
             }
 
             public String toString() {
-                return getText();
+                String theText = new String(type.getName() + " (" + 
+                                            type.getHammersRequired() + " " +
+                                            Messages.message("model.goods.Hammers.name").toLowerCase());
+                if (type.getToolsRequired() > 0) {
+                    theText += ", " + type.getToolsRequired() + " " +
+                        Messages.message("model.goods.Tools.name").toLowerCase();
+                }
+                
+                theText += ")";
+                return theText;
             }
         }
 

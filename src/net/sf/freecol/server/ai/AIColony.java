@@ -15,6 +15,7 @@ import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 import net.sf.freecol.FreeCol;
 
+import net.sf.freecol.common.model.BuildableType;
 import net.sf.freecol.common.model.Building;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.ColonyTile;
@@ -392,10 +393,8 @@ public class AIColony extends AIObject {
         final boolean needsPioneer = (TileImprovementPlans.size() > 0 || unequippedHardyPioneer != null
                 && PioneeringMission.isValid(unequippedHardyPioneer));
         int toolsRequiredForBuilding = 0;
-        if (colony.getCurrentlyBuilding() >= 0) {
-            toolsRequiredForBuilding = (colony.getCurrentlyBuilding() >= Colony.BUILDING_UNIT_ADDITION) ? Unit
-                    .getNextTools(colony.getCurrentlyBuilding() - Colony.BUILDING_UNIT_ADDITION) : colony.getBuilding(
-                    colony.getCurrentlyBuilding()).getNextTools();
+        if (colony.getCurrentlyBuilding() != BuildableType.NOTHING) {
+            toolsRequiredForBuilding = colony.getCurrentlyBuilding().getToolsRequired();
         }
         if (colony.getProductionNetOf(Goods.TOOLS) == 0 && (colony.getGoodsCount(Goods.TOOLS) < 20 && needsPioneer)
                 || toolsRequiredForBuilding > colony.getGoodsCount(Goods.TOOLS)) {
@@ -591,25 +590,11 @@ public class AIColony extends AIObject {
              */
             if (goodsType == Goods.TOOLS && colony.getGoodsCount(Goods.TOOLS) > 0) {
                 if (colony.getProductionNetOf(Goods.TOOLS) > 0) {
-                    int requiredTools = 0;
-                    int buildTurns = 0;
-                    final int currentlyBuilding = colony.getCurrentlyBuilding();
-                    if (currentlyBuilding >= 0) {
-                        if (colony.getCurrentlyBuilding() >= Colony.BUILDING_UNIT_ADDITION) {
-                            final int nextHammers = Unit.getNextHammers(colony.getCurrentlyBuilding()
-                                    - Colony.BUILDING_UNIT_ADDITION);
-                            requiredTools += Unit.getNextTools(colony.getCurrentlyBuilding()
-                                    - Colony.BUILDING_UNIT_ADDITION);
-                            buildTurns += (nextHammers - colony.getHammers())
-                                    / (colony.getProductionOf(Goods.HAMMERS) + 1);
-                        } else {
-                            Building b = colony.getBuilding(currentlyBuilding);
-                            requiredTools += b.getNextTools();
-                            buildTurns += (b.getNextHammers() - colony.getHammers())
-                                    / (colony.getProductionOf(Goods.HAMMERS) + 1);
-                        }
-                    }
-
+                    final BuildableType currentlyBuilding = colony.getCurrentlyBuilding();
+                    int requiredTools = currentlyBuilding.getToolsRequired();
+                    int requiredHammers = currentlyBuilding.getHammersRequired();
+                    int buildTurns = (requiredHammers - colony.getHammers()) /
+                        (colony.getProductionOf(Goods.HAMMERS) + 1);
                     if (requiredTools > 0) {
                         if (colony.getWarehouseCapacity() > 100) {
                             requiredTools += 100;
@@ -719,10 +704,8 @@ public class AIColony extends AIObject {
      */
     public int getAvailableTools() {
         int toolsRequiredForBuilding = 0;
-        if (colony.getCurrentlyBuilding() >= 0) {
-            toolsRequiredForBuilding = (colony.getCurrentlyBuilding() >= Colony.BUILDING_UNIT_ADDITION) ? Unit
-                    .getNextTools(colony.getCurrentlyBuilding() - Colony.BUILDING_UNIT_ADDITION) : colony.getBuilding(
-                    colony.getCurrentlyBuilding()).getNextTools();
+        if (colony.getCurrentlyBuilding() != BuildableType.NOTHING) {
+            toolsRequiredForBuilding = colony.getCurrentlyBuilding().getToolsRequired();
         }
 
         return Math.max(0, colony.getGoodsCount(Goods.TOOLS) - toolsRequiredForBuilding);
@@ -1088,9 +1071,10 @@ public class AIColony extends AIObject {
 
         // temporarily move units from carpenter to blacksmith if the current building needs no lumber but more tools
         // TODO: mine ore if needed
-        Building nowbuilding = colony.getBuilding(colony.getCurrentlyBuilding());
-        if ( nowbuilding != null && nowbuilding.getNextHammers() <= colony.getHammers() &&
-             nowbuilding.getNextTools() > colony.getGoodsCount(Goods.TOOLS)) {
+        BuildableType nowbuilding = colony.getCurrentlyBuilding();
+        if (nowbuilding != BuildableType.NOTHING &&
+            nowbuilding.getHammersRequired() <= colony.getHammers() &&
+            nowbuilding.getToolsRequired() > colony.getGoodsCount(Goods.TOOLS)) {
             Building carpenter = colony.getBuildingForProducing(Goods.HAMMERS);
             Building blacksmith = colony.getBuildingForProducing(Goods.TOOLS);
             for (Unit unit : carpenter.getUnitList()) {
@@ -1112,29 +1096,21 @@ public class AIColony extends AIObject {
      */
     private void decideBuildable(Connection connection) {
         // TODO: Request tools if needed.
-        int hammersOld = 0;
-        if (colony.getCurrentlyBuilding() >= Colony.BUILDING_UNIT_ADDITION) {
-            hammersOld = Unit.getNextHammers(colony.getCurrentlyBuilding() - Colony.BUILDING_UNIT_ADDITION);
-        } else if (colony.getCurrentlyBuilding() > -1) {
-            hammersOld = colony.getBuilding(colony.getCurrentlyBuilding()).getNextHammers();
-        }
+        int hammersOld = colony.getCurrentlyBuilding().getHammersRequired();
 
-        boolean isOldValid = true;
-        if (colony.getCurrentlyBuilding() < 0) {
-            isOldValid = false;
-        } else if (colony.getCurrentlyBuilding() < Colony.BUILDING_UNIT_ADDITION) {
-            isOldValid = colony.getBuilding(colony.getCurrentlyBuilding()).canBuildNext();
-        }
+        boolean isOldValid = colony.canBuild();
         
         Iterator<Building> bi = colonyPlan.getBuildable();
         while (bi.hasNext()) {
             Building buildable = bi.next();
             int index = buildable.getType().getIndex();
 
+            /* TODO: convert ColonyPlan to BuildQueue
             if (index == colony.getCurrentlyBuilding()) {
                 // We are building the right item already:
                 break;
             }
+            */
 
             int hammersNew = buildable.getNextHammers();
             if (hammersNew > colony.getHammers() || hammersNew > hammersOld || !isOldValid) {

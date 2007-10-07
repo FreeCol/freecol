@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map.Entry;
 import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamConstants;
@@ -62,15 +63,6 @@ public final class Colony extends Settlement implements Abilities, Location, Nam
     /** The current production bonus. */
     private int productionBonus;
 
-    /**
-     * Identifies what this colony is currently building. This is the type of
-     * the "Building" that is being built, or if
-     * <code>currentlyBuilding >= BUILDING_UNIT_ADDITION</code> the type of
-     * the <code>Unit</code> (+BUILDING_UNIT_ADDITION) that is currently
-     * beeing build
-     */
-    private int currentlyBuilding;
-
     // Whether this colony is landlocked
     private boolean landLocked = true;
 
@@ -89,6 +81,11 @@ public final class Colony extends Settlement implements Abilities, Location, Nam
     private HashMap<String, Modifier> modifiers = new HashMap<String, Modifier>();
 
     private int defenseBonus;
+
+    /**
+     * A list of Buildable items, which is NEVER empty.
+     */
+    private List<BuildableType> buildQueue = new ArrayList<BuildableType>();
     
     private HashMap<String, Boolean> abilities = new HashMap<String, Boolean>();
 
@@ -141,7 +138,7 @@ public final class Colony extends Settlement implements Abilities, Location, Nam
                 addWorkLocation(new Building(game, this, buildingType));
             }
         }
-        currentlyBuilding = -1;
+        setCurrentlyBuilding(BuildableType.NOTHING);
         /*
         if (landLocked)
             currentlyBuilding = Building.WAREHOUSE;
@@ -864,22 +861,27 @@ public final class Colony extends Settlement implements Abilities, Location, Nam
      * @param amount The number of hammers to add.
      */
     public void addHammers(int amount) {
-        if (currentlyBuilding == -1) {
+        if (getCurrentlyBuilding() == BuildableType.NOTHING) {
             addModelMessage(this, "model.colony.cannotBuild", new String[][] { { "%colony%", getName() } },
                     ModelMessage.WARNING, this);
             return;
         }
         // Building only:
-        if (currentlyBuilding < BUILDING_UNIT_ADDITION) {
-            if (getBuilding(currentlyBuilding).getNextPop() > getUnitCount()) {
-                addModelMessage(this, "model.colony.buildNeedPop", new String[][] { { "%colony%", getName() },
-                        { "%building%", getBuilding(currentlyBuilding).getNextName() } }, ModelMessage.WARNING);
-                return;
-            }
-            if (getBuilding(currentlyBuilding).getNextHammers() == -1) {
-                addModelMessage(this, "model.colony.alreadyBuilt", new String[][] { { "%colony%", getName() },
-                        { "%building%", getBuilding(currentlyBuilding).getName() } }, ModelMessage.WARNING);
-            }
+        if (getCurrentlyBuilding().getPopulationRequired() > getUnitCount()) {
+            addModelMessage(this, "model.colony.buildNeedPop",
+                            new String[][] { { "%colony%", getName() },
+                                             { "%building%", getCurrentlyBuilding().getName() } },
+                            ModelMessage.WARNING);
+            return;
+        }
+
+        if (getCurrentlyBuilding() instanceof BuildingType &&
+            getBuilding((BuildingType) getCurrentlyBuilding()) != null) {
+            addModelMessage(this, "model.colony.alreadyBuilt",
+                            new String[][] {
+                                { "%colony%", getName() },
+                                { "%building%", getCurrentlyBuilding().getName() } },
+                            ModelMessage.WARNING);
         }
         goodsContainer.addGoods(Goods.HAMMERS, amount);
     }
@@ -932,8 +934,8 @@ public final class Colony extends Settlement implements Abilities, Location, Nam
      * 
      * @return The type of building currently being built.
      */
-    public int getCurrentlyBuilding() {
-        return currentlyBuilding;
+    public BuildableType getCurrentlyBuilding() {
+        return buildQueue.get(0);
     }
 
     /**
@@ -941,15 +943,35 @@ public final class Colony extends Settlement implements Abilities, Location, Nam
      * 
      * @param type The type of building to be built.
      */
-    public void setCurrentlyBuilding(int type) {
-        currentlyBuilding = type;
+    public void setCurrentlyBuilding(BuildableType buildable) {
+        buildQueue.add(0, buildable);
     }
 
     /**
      * Sets the type of building to None, so no building is done.
      */
     public void stopBuilding() {
-        setCurrentlyBuilding(Building.NONE);
+        if (getCurrentlyBuilding() != BuildableType.NOTHING) {
+            setCurrentlyBuilding(BuildableType.NOTHING);
+        }
+    }
+
+    /**
+     * Get the <code>BuildQueue</code> value.
+     *
+     * @return a <code>List<Buildable></code> value
+     */
+    public List<BuildableType> getBuildQueue() {
+        return buildQueue;
+    }
+
+    /**
+     * Set the <code>BuildQueue</code> value.
+     *
+     * @param newBuildQueue The new BuildQueue value.
+     */
+    public void setBuildQueue(final List<BuildableType> newBuildQueue) {
+        this.buildQueue = newBuildQueue;
     }
 
     /**
@@ -1232,25 +1254,45 @@ public final class Colony extends Settlement implements Abilities, Location, Nam
         return count;
     }
 
+
+    /**
+     * Describe <code>canBuild</code> method here.
+     *
+     * @return a <code>boolean</code> value
+     */
+    public boolean canBuild() {
+        return canBuild(getCurrentlyBuilding());
+    }
+
+    public boolean canBuild(BuildableType buildableType) {
+        if (buildableType == BuildableType.NOTHING) {
+            return false;
+        } else if (buildableType.getHammersRequired() <= 0) {
+            return false;
+        } else if (buildableType.getPopulationRequired() > getUnitCount()) {
+            return false;
+        } else {
+            java.util.Map<String, Boolean> requiredAbilities = buildableType.getAbilitiesRequired();
+            for (Entry<String, Boolean> entry : requiredAbilities.entrySet()) {
+                if (hasAbility(entry.getKey()) != entry.getValue()) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
     private int getNextHammersForBuilding() {
-        if (getCurrentlyBuilding() >= Colony.BUILDING_UNIT_ADDITION) {
-            int unitTypeIndex = getCurrentlyBuilding() - BUILDING_UNIT_ADDITION;
-            UnitType unitType = FreeCol.getSpecification().getUnitType(unitTypeIndex);
-            return Unit.getNextHammers(unitType);
-        } else if (currentlyBuilding != -1) {
-            return getBuilding(currentlyBuilding).getNextHammers();
+        if (canBuild()) {
+            return getCurrentlyBuilding().getHammersRequired();
         } else {
             return -1;
         }
     }
 
     private int getNextToolsForBuilding() {
-        if (getCurrentlyBuilding() >= Colony.BUILDING_UNIT_ADDITION) {
-            int unitTypeIndex = getCurrentlyBuilding() - BUILDING_UNIT_ADDITION;
-            UnitType unitType = FreeCol.getSpecification().getUnitType(unitTypeIndex);
-            return Unit.getNextTools(unitType);
-        } else if (currentlyBuilding != -1) {
-            return getBuilding(currentlyBuilding).getNextTools();
+        if (canBuild()) {
+            return getCurrentlyBuilding().getToolsRequired();
         } else {
             return -1;
         }
@@ -1262,54 +1304,35 @@ public final class Colony extends Settlement implements Abilities, Location, Nam
             return;
         }
         lastVisited = getGame().getTurn().getNumber();
-        if (getCurrentlyBuilding() >= Colony.BUILDING_UNIT_ADDITION) {
-            int unitTypeIndex = getCurrentlyBuilding() - BUILDING_UNIT_ADDITION;
-            UnitType unitType = FreeCol.getSpecification().getUnitType(unitTypeIndex);
-            if (canBuildUnit(unitType) && Unit.getNextHammers(unitType) <= getHammers()
-                    && Unit.getNextHammers(unitType) != -1) {
-                if (Unit.getNextTools(unitTypeIndex) <= getGoodsCount(Goods.TOOLS)) {
-                    Unit unit = getGame().getModelController().createUnit(getID() + "buildUnit", getTile(), getOwner(),
-                            unitType);
+        if (canBuild()) {
+            BuildableType buildable = getCurrentlyBuilding();
+            if (buildable.getHammersRequired() != -1 &&
+                buildable.getHammersRequired() <= getHammers()) {
+                if (buildable.getToolsRequired() <= getGoodsCount(Goods.TOOLS)) {
+                    // waste excess hammers
                     removeGoods(Goods.HAMMERS);
-                    removeGoods(Goods.TOOLS, Unit.getNextTools(unit.getType()));
-                    addModelMessage(this, "model.colony.unitReady", new String[][] { { "%colony%", getName() },
-                            { "%unit%", unit.getName() } }, ModelMessage.UNIT_ADDED, unit);
+                    removeGoods(Goods.TOOLS, buildable.getToolsRequired());
+                    if (buildable instanceof UnitType) {
+                        Unit unit = getGame().getModelController().createUnit(getID() + "buildUnit", getTile(), getOwner(),
+                                                                              (UnitType) buildable);
+                        addModelMessage(this, "model.colony.unitReady",
+                                        new String[][] { { "%colony%", getName() },
+                                                         { "%unit%", unit.getName() } },
+                                        ModelMessage.UNIT_ADDED, unit);
+                    } else if (buildable instanceof BuildingType) {
+                        BuildingType upgradesFrom = ((BuildingType) buildable).getUpgradesFrom();
+                        if (upgradesFrom == null) {
+                            addWorkLocation(new Building(getGame(), this, (BuildingType) buildable));
+                        } else {
+                            getBuilding(upgradesFrom).upgrade();
+                        }
+                    }
                 } else {
                     addModelMessage(this, "model.colony.itemNeedTools",
                                     new String[][] {
                                         { "%colony%", getName() },
-                                        { "%item%", unitType.getName() } },
+                                        { "%item%", buildable.getName() } },
                                     ModelMessage.MISSING_GOODS, 
-                                    FreeCol.getSpecification().getGoodsType("model.goods.tools"));
-                }
-            }
-        } else if (currentlyBuilding != -1) {
-            int hammersRequired = getBuilding(currentlyBuilding).getNextHammers();
-            int toolsRequired = getBuilding(currentlyBuilding).getNextTools();
-            if ((getHammers() >= hammersRequired) && (hammersRequired != -1)) {
-                removeGoods(Goods.HAMMERS, getHammers() - hammersRequired);
-                if (getGoodsCount(Goods.TOOLS) >= toolsRequired) {
-                    if (!getBuilding(currentlyBuilding).canBuildNext()) {
-                        throw new IllegalStateException("Cannot build the selected building.");
-                    }
-                    if (toolsRequired > 0) {
-                        removeGoods(Goods.TOOLS, toolsRequired);
-                    }
-                    removeGoods(Goods.HAMMERS);
-                    getBuilding(currentlyBuilding).upgrade();
-                    addModelMessage(this, "model.colony.buildingReady", new String[][] { { "%colony%", getName() },
-                            { "%building%", getBuilding(currentlyBuilding).getName() } },
-                            ModelMessage.BUILDING_COMPLETED, this);
-                    if (!getBuilding(currentlyBuilding).canBuildNext()) {
-                        stopBuilding();
-                    }
-                    getTile().updatePlayerExploredTiles();
-                } else {
-                    addModelMessage(this, "model.colony.itemNeedTools", 
-                                    new String[][] {
-                                        { "%colony%", getName() },
-                                        { "%item%", getBuilding(currentlyBuilding).getNextName() }
-                                    }, ModelMessage.MISSING_GOODS,
                                     FreeCol.getSpecification().getGoodsType("model.goods.tools"));
                 }
             }
@@ -1326,16 +1349,8 @@ public final class Colony extends Settlement implements Abilities, Location, Nam
     public int getPriceForBuilding() {
         // Any changes in this method should also be reflected in
         // "payForBuilding()"
-        int hammersRemaining = 0;
-        int toolsRemaining = 0;
-        if (getCurrentlyBuilding() >= Colony.BUILDING_UNIT_ADDITION) {
-            int unitType = getCurrentlyBuilding() - BUILDING_UNIT_ADDITION;
-            hammersRemaining = Math.max(Unit.getNextHammers(unitType) - getHammers(), 0);
-            toolsRemaining = Math.max(Unit.getNextTools(unitType) - getGoodsCount(Goods.TOOLS), 0);
-        } else if (getCurrentlyBuilding() != -1) {
-            hammersRemaining = Math.max(getBuilding(currentlyBuilding).getNextHammers() - getHammers(), 0);
-            toolsRemaining = Math.max(getBuilding(currentlyBuilding).getNextTools() - getGoodsCount(Goods.TOOLS), 0);
-        }
+        int hammersRemaining = Math.max(getCurrentlyBuilding().getHammersRequired() - getHammers(), 0);
+        int toolsRemaining = Math.max(getCurrentlyBuilding().getToolsRequired() - getGoodsCount(Goods.TOOLS), 0);
         int price = hammersRemaining * getGameOptions().getInteger(GameOptions.HAMMER_PRICE)
                 + (getOwner().getMarket().getBidPrice(Goods.TOOLS, toolsRemaining) * 110) / 100;
         return price;
@@ -1355,30 +1370,16 @@ public final class Colony extends Settlement implements Abilities, Location, Nam
         if (getPriceForBuilding() > getOwner().getGold()) {
             throw new IllegalStateException("Not enough gold.");
         }
-        int hammersRemaining = 0;
-        int toolsRemaining = 0;
-        if (getCurrentlyBuilding() >= Colony.BUILDING_UNIT_ADDITION) {
-            int unitIndex = getCurrentlyBuilding() - BUILDING_UNIT_ADDITION;
-            int difference = Unit.getNextHammers(unitIndex) - getHammers();
-            hammersRemaining = Math.max(difference, 0);
-            toolsRemaining = Math.max(Unit.getNextTools(unitIndex) - getGoodsCount(Goods.TOOLS), 0);
-            if (difference > 0) {
-                addGoods(Goods.HAMMERS, difference);
-            }
-        } else if (getCurrentlyBuilding() != -1) {
-            int difference = getBuilding(currentlyBuilding).getNextHammers() - getHammers();
-            hammersRemaining = Math.max(difference, 0);
-            toolsRemaining = Math.max(getBuilding(currentlyBuilding).getNextTools() - getGoodsCount(Goods.TOOLS), 0);
-            if (difference > 0) {
-                addGoods(Goods.HAMMERS, difference);
-            }
-        }
+        int hammersRemaining = getCurrentlyBuilding().getHammersRequired() - getHammers();
+        int toolsRemaining = getCurrentlyBuilding().getToolsRequired() - getGoodsCount(Goods.TOOLS);
+
         if (hammersRemaining > 0) {
             getOwner().modifyGold(-hammersRemaining * getGameOptions().getInteger(GameOptions.HAMMER_PRICE));
+            addGoods(Goods.HAMMERS, hammersRemaining);
         }
         if (toolsRemaining > 0) {
             getOwner().getMarket().buy(Goods.TOOLS, toolsRemaining, getOwner());
-            getGoodsContainer().addGoods(Goods.TOOLS, toolsRemaining);
+            addGoods(Goods.TOOLS, toolsRemaining);
         }
     }
 
@@ -1834,7 +1835,7 @@ public final class Colony extends Settlement implements Abilities, Location, Nam
             out.writeAttribute("tories", Integer.toString(tories));
             out.writeAttribute("oldTories", Integer.toString(oldTories));
             out.writeAttribute("productionBonus", Integer.toString(productionBonus));
-            out.writeAttribute("currentlyBuilding", Integer.toString(currentlyBuilding));
+            out.writeAttribute("currentlyBuilding", getCurrentlyBuilding().getID());
             out.writeAttribute("landLocked", Boolean.toString(landLocked));
             char[] exportsCharArray = new char[exports.length];
             for (int i = 0; i < exports.length; i++) {
@@ -1887,7 +1888,8 @@ public final class Colony extends Settlement implements Abilities, Location, Nam
         oldTories = getAttribute(in, "oldTories", 0);
         productionBonus = getAttribute(in, "productionBonus", 0);
         defenseBonus = getAttribute(in, "productionBonus", 0);
-        currentlyBuilding = getAttribute(in, "currentlyBuilding", -1);
+        String currently = getAttribute(in, "currentlyBuilding", null);
+        setCurrentlyBuilding(BuildableType.NOTHING);
         landLocked = getAttribute(in, "landLocked", true);
         unitCount = getAttribute(in, "unitCount", -1);
         final String exportString = in.getAttributeValue(null, "exports");

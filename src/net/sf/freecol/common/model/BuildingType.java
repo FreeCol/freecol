@@ -11,15 +11,13 @@ import javax.xml.stream.XMLStreamReader;
  * given building type can have. The levels contain the information about the
  * name of the building in a given level and what is needed to build it.
  */
-public final class BuildingType extends FreeColGameObjectType implements Abilities, Modifiers {
+public final class BuildingType extends BuildableType implements Abilities, Modifiers {
+
     public static final String COPYRIGHT = "Copyright (C) 2003-2007 The FreeCol Team";
-
     public static final String LICENSE = "http://www.gnu.org/licenses/gpl.html";
-
     public static final String REVISION = "$Revision$";
     
     private int level, defenseBonus;
-    private int hammersRequired, toolsRequired, populationRequired;
   
     private int workPlaces, basicProduction, minSkill, maxSkill;
     private GoodsType consumes, produces;
@@ -27,16 +25,12 @@ public final class BuildingType extends FreeColGameObjectType implements Abiliti
     private BuildingType upgradesFrom;
     private BuildingType upgradesTo;
     
-    /**
-     * Stores the abilities required by this Type.
-     */
-    private HashMap<String, Boolean> requiredAbilities = new HashMap<String, Boolean>();
-    
     private HashMap<String, Modifier> modifiers = new HashMap<String, Modifier>();
   
 
     public BuildingType(int index) {
         setIndex(index);
+        setPopulationRequired(1);
     }
     
     public BuildingType getUpgradesFrom() {
@@ -71,24 +65,16 @@ public final class BuildingType extends FreeColGameObjectType implements Abiliti
         return produces;
     }
 
-    public int getHammersRequired() {
-        return hammersRequired;
-    }
-
-    public int getToolsRequired() {
-        return toolsRequired;
-    }
-    
-    public int getPopulationRequired() {
-        return populationRequired;
-    }
-    
     public int getLevel() {
         return level;
     }
     
     public int getDefenseBonus() {
         return defenseBonus;
+    }
+
+    public FreeColGameObjectType getType() {
+        return this;
     }
 
     protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
@@ -108,8 +94,8 @@ public final class BuildingType extends FreeColGameObjectType implements Abiliti
         }
         
         defenseBonus = getAttribute(in, "defense-bonus", 0);
-        hammersRequired = getAttribute(in, "hammers-required", 0);
-        toolsRequired = getAttribute(in, "tools-required", 0);
+        setHammersRequired(getAttribute(in, "hammers-required", 0));
+        setToolsRequired(getAttribute(in, "tools-required", 0));
         
         workPlaces = getAttribute(in, "workplaces", 0);
         basicProduction = getAttribute(in, "basicProduction", 0);
@@ -119,7 +105,6 @@ public final class BuildingType extends FreeColGameObjectType implements Abiliti
         
         minSkill = getAttribute(in, "minSkill", Integer.MIN_VALUE);
         maxSkill = getAttribute(in, "maxSkill", Integer.MAX_VALUE);
-        populationRequired = 1;
 
         while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
             String childName = in.getLocalName();
@@ -129,12 +114,12 @@ public final class BuildingType extends FreeColGameObjectType implements Abiliti
                 setModifier(abilityId, new Modifier(abilityId, getID(), value));
                 in.nextTag(); // close this element
             } else if ("required-population".equals(childName)) {
-                populationRequired = getAttribute(in, "value", 1);
+                setPopulationRequired(getAttribute(in, "value", 1));
                 in.nextTag(); // close this element
             } else if ("required-ability".equals(childName)) {
                 String abilityId = in.getAttributeValue(null, "id");
                 boolean value = getAttribute(in, "value", true);
-                requiredAbilities.put(abilityId, value);
+                getAbilitiesRequired().put(abilityId, value);
                 in.nextTag(); // close this element
             } else if (Modifier.getXMLElementTagName().equals(childName)) {
                 Modifier modifier = new Modifier(in);
@@ -156,16 +141,6 @@ public final class BuildingType extends FreeColGameObjectType implements Abiliti
         return unitType.hasSkill() && unitType.getSkill() >= minSkill && unitType.getSkill() <= maxSkill;
     }
   
-    /**
-     * Returns the abilities required by this BuildingType.
-     *
-     * @return the abilities required by this BuildingType.
-     */
-    public Map<String, Boolean> getAbilitiesRequired() {
-        return requiredAbilities;
-    }
-
-
     /**
      * Returns true if this UnitType has the ability with the given ID.
      *
@@ -216,7 +191,7 @@ public final class BuildingType extends FreeColGameObjectType implements Abiliti
     }
 
     /**
-     * Returns a copy of this FoundingFather's modifiers.
+     * Returns a copy of this BuildingType's modifiers.
      *
      * @return a <code>Map</code> value
      */

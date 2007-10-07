@@ -13,7 +13,7 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import net.sf.freecol.FreeCol;
 
-public final class UnitType extends FreeColGameObjectType implements Abilities, Buildable, Modifiers {
+public final class UnitType extends BuildableType implements Abilities, Modifiers {
     public static final  String  COPYRIGHT = "Copyright (C) 2003-2007 The FreeCol Team";
     public static final  String  LICENSE   = "http://www.gnu.org/licenses/gpl.html";
     public static final  String  REVISION  = "$Revision$";
@@ -44,16 +44,6 @@ public final class UnitType extends FreeColGameObjectType implements Abilities, 
      * Describe spaceTaken here.
      */
     private int spaceTaken;
-
-    /**
-     * Describe hammersRequired here.
-     */
-    private int hammersRequired;
-
-    /**
-     * Describe toolsRequired here.
-     */
-    private int toolsRequired;
 
     /**
      * Describe skill here.
@@ -106,11 +96,6 @@ public final class UnitType extends FreeColGameObjectType implements Abilities, 
     private String pathImage;
 
     /**
-     * Describe populationRequired here.
-     */
-    private int populationRequired;
-
-    /**
      * Describe education here.
      */
     private HashMap<String, Upgrade> upgrades = new HashMap<String, Upgrade>();
@@ -119,11 +104,6 @@ public final class UnitType extends FreeColGameObjectType implements Abilities, 
      * Stores the abilities of this Type.
      */
     private HashMap<String, Boolean> abilities = new HashMap<String, Boolean>();
-    
-    /**
-     * Stores the abilities required by this Type.
-     */
-    private HashMap<String, Boolean> requiredAbilities = new HashMap<String, Boolean>();
     
     /**
      * Stores the production modifiers of this Type
@@ -267,60 +247,6 @@ public final class UnitType extends FreeColGameObjectType implements Abilities, 
      */
     public void setRecruitProbability(final int newRecruitProbability) {
         this.recruitProbability = newRecruitProbability;
-    }
-
-    /**
-     * Get the <code>HammersRequired</code> value.
-     *
-     * @return an <code>int</code> value
-     */
-    public int getHammersRequired() {
-        return hammersRequired;
-    }
-
-    /**
-     * Set the <code>HammersRequired</code> value.
-     *
-     * @param newHammersRequired The new HammersRequired value.
-     */
-    public void setHammersRequired(final int newHammersRequired) {
-        this.hammersRequired = newHammersRequired;
-    }
-
-    /**
-     * Get the <code>ToolsRequired</code> value.
-     *
-     * @return an <code>int</code> value
-     */
-    public int getToolsRequired() {
-        return toolsRequired;
-    }
-
-    /**
-     * Set the <code>ToolsRequired</code> value.
-     *
-     * @param newToolsRequired The new ToolsRequired value.
-     */
-    public void setToolsRequired(final int newToolsRequired) {
-        this.toolsRequired = newToolsRequired;
-    }
-
-    /**
-     * Get the <code>PopulationRequired</code> value.
-     *
-     * @return an <code>int</code> value
-     */
-    public int getPopulationRequired() {
-        return populationRequired;
-    }
-
-    /**
-     * Set the <code>PopulationRequired</code> value.
-     *
-     * @param newPopulationRequired The new PopulationRequired value.
-     */
-    public void setPopulationRequired(final int newPopulationRequired) {
-        this.populationRequired = newPopulationRequired;
     }
 
     /**
@@ -565,6 +491,10 @@ public final class UnitType extends FreeColGameObjectType implements Abilities, 
         }
     }
 
+    public FreeColGameObjectType getType() {
+        return this;
+    }
+
     protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
         readFromXML(in, null);
     }
@@ -588,9 +518,9 @@ public final class UnitType extends FreeColGameObjectType implements Abilities, 
         recruitProbability = getAttribute(in, "recruitProbability", 0);
         skill = getAttribute(in, "skill", UNDEFINED);
 
-        hammersRequired = getAttribute(in, "hammers", UNDEFINED);
-        toolsRequired = getAttribute(in, "tools", UNDEFINED);
-        populationRequired = getAttribute(in, "population-required", 1);
+        setHammersRequired(getAttribute(in, "hammers", UNDEFINED));
+        setToolsRequired(getAttribute(in, "tools", UNDEFINED));
+        setPopulationRequired(getAttribute(in, "population-required", 1));
 
         price = getAttribute(in, "price", UNDEFINED);
         increasingPrice = getAttribute(in, "increasingPrice", UNDEFINED);
@@ -608,7 +538,7 @@ public final class UnitType extends FreeColGameObjectType implements Abilities, 
             } else if ("required-ability".equals(nodeName)) {
                 String abilityId = in.getAttributeValue(null, "id");
                 boolean value = getAttribute(in, "value", true);
-                requiredAbilities.put(abilityId, value);
+                getAbilitiesRequired().put(abilityId, value);
                 in.nextTag(); // close this element
             } else if ("upgrade".equals(nodeName)) {
                 Upgrade upgrade = new Upgrade();
@@ -654,7 +584,7 @@ public final class UnitType extends FreeColGameObjectType implements Abilities, 
      */
     public boolean canBeBuilt() {
 
-        return hammersRequired != UNDEFINED;
+        return getHammersRequired() != UNDEFINED;
     }
 
 
@@ -667,17 +597,6 @@ public final class UnitType extends FreeColGameObjectType implements Abilities, 
 
         return price != UNDEFINED;
     }
-
-
-    /**
-     * Returns the abilities required by this UnitType.
-     *
-     * @return the abilities required by this UnitType.
-     */
-    public Map<String, Boolean> getAbilitiesRequired() {
-        return requiredAbilities;
-    }
-
 
     /**
      * Returns true if this UnitType has the ability with the given ID.

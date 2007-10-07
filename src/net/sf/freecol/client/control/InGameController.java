@@ -27,6 +27,7 @@ import net.sf.freecol.client.gui.panel.FreeColDialog;
 import net.sf.freecol.client.gui.sound.SfxLibrary;
 import net.sf.freecol.client.networking.Client;
 import net.sf.freecol.common.Specification;
+import net.sf.freecol.common.model.BuildableType;
 import net.sf.freecol.common.model.Building;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.ColonyTile;
@@ -2311,7 +2312,7 @@ public final class InGameController implements NetworkConstants {
      * @param colony The <code>Colony</code>
      * @param type The new type of building to build.
      */
-    public void setCurrentlyBuilding(Colony colony, int type) {
+    public void setCurrentlyBuilding(Colony colony, BuildableType type) {
         if (freeColClient.getGame().getCurrentPlayer() != freeColClient.getMyPlayer()) {
             freeColClient.getCanvas().showInformationMessage("notYourTurn");
             return;
@@ -2323,7 +2324,7 @@ public final class InGameController implements NetworkConstants {
 
         Element setCurrentlyBuildingElement = Message.createNewRootElement("setCurrentlyBuilding");
         setCurrentlyBuildingElement.setAttribute("colony", colony.getID());
-        setCurrentlyBuildingElement.setAttribute("type", Integer.toString(type));
+        setCurrentlyBuildingElement.setAttribute("type", type.getID());
 
         client.sendAndWait(setCurrentlyBuildingElement);
     }

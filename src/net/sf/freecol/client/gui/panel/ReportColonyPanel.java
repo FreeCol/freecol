@@ -18,6 +18,7 @@ import javax.swing.border.Border;
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.i18n.Messages;
+import net.sf.freecol.common.model.BuildableType;
 import net.sf.freecol.common.model.Building;
 import net.sf.freecol.common.model.BuildingType;
 import net.sf.freecol.common.model.Colony;
@@ -167,22 +168,14 @@ public final class ReportColonyPanel extends ReportPanel implements ActionListen
             buildingPanel.add(new JLabel(building.getName()));
         }
         
-        int currentType = colony.getCurrentlyBuilding();
-        if (currentType >= Colony.BUILDING_UNIT_ADDITION) {
-            UnitType unitType = FreeCol.getSpecification().getUnitType(currentType - Colony.BUILDING_UNIT_ADDITION);
-            JLabel unitLabel = new JLabel(unitType.getName());
-            unitLabel.setForeground(Color.GRAY);
-            buildingPanel.add(unitLabel);
-        } else  if (currentType != -1) {
-            JLabel buildingLabel = new JLabel(FreeCol.getSpecification().getBuildingType(currentType).getName());
-            buildingLabel.setForeground(Color.GRAY);
-            buildingPanel.add(buildingLabel);
+        BuildableType currentType = colony.getCurrentlyBuilding();
+        JLabel buildableLabel = new JLabel(currentType.getName());
+        if (currentType == BuildableType.NOTHING) {
+            buildableLabel.setForeground(Color.RED);
         } else {
-            /* If nothing is build, show it red color */
-            JLabel nothingLabel = new JLabel(Messages.message("nothing"));
-            nothingLabel.setForeground(Color.RED);
-            buildingPanel.add(nothingLabel);
+            buildableLabel.setForeground(Color.GRAY);
         }
+        buildingPanel.add(buildableLabel);
         return buildingPanel;
     }
 
