@@ -392,7 +392,7 @@ abstract public class FreeColGameObject extends PersistentObject {
      * @see ModelMessage
      */
     protected void addModelMessage(FreeColGameObject source, String messageID, String[][] data,
-                                   int type, Object display) {
+                                   int type, PersistentObject display) {
         ModelMessage message = new ModelMessage(source, messageID, data, type, display);
         initializeModelMessage(message);
     }

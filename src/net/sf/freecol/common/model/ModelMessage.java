@@ -1,8 +1,11 @@
 
 package net.sf.freecol.common.model;
 
-
 import java.util.Arrays;
+import java.util.ArrayList;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamReader;
+import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.gui.i18n.Messages;
@@ -10,7 +13,7 @@ import net.sf.freecol.client.gui.i18n.Messages;
 /**
  * Contains a message about a change in the model.
  */
-public class ModelMessage {
+public class ModelMessage extends PersistentObject {
 
     public static final String  COPYRIGHT = "Copyright (C) 2003-2006 The FreeCol Team";
     public static final String  LICENSE = "http://www.gnu.org/licenses/gpl.html";
@@ -35,7 +38,7 @@ public class ModelMessage {
     public static final int TUTORIAL = 15;
 
     private final FreeColGameObject source;
-    private final Object display;
+    private final PersistentObject display;
     private final int type;
     private final String messageID;
     private final String[][] data;
@@ -54,7 +57,7 @@ public class ModelMessage {
     * @param display The Object to display.
     * @see FreeColGameObject#addModelMessage(FreeColGameObject, String, String[][], int)
     */
-    public ModelMessage(FreeColGameObject source, String messageID, String[][] data, int type, Object display) {
+    public ModelMessage(FreeColGameObject source, String messageID, String[][] data, int type, PersistentObject display) {
         this.source = source;
         this.messageID = messageID;
         this.data = data;
@@ -124,8 +127,8 @@ public class ModelMessage {
      * @param source the source object
      * @return an object to be displayed for the message. 
      */
-    static private Object getDefaultDisplay(int type, FreeColGameObject source) {
-        Object newDisplay = null;
+    static private PersistentObject getDefaultDisplay(int type, FreeColGameObject source) {
+        PersistentObject newDisplay = null;
         switch(type) {
         case SONS_OF_LIBERTY:
         case GOVERNMENT_EFFICIENCY:
@@ -262,7 +265,7 @@ public class ModelMessage {
      * Gets the Object to display.
      * @return The Object to display.
      */
-    public Object getDisplay() {
+    public PersistentObject getDisplay() {
         return display;
     }
 
@@ -347,4 +350,41 @@ public class ModelMessage {
     public static String getXMLElementTagName() {
         return "modelMessage";
     }
+
+    public void toXML(XMLStreamWriter out, Player player, boolean showAll, boolean toSavedGame)
+        throws XMLStreamException {
+        toXML(out);
+    }
+
+    public void toXML(XMLStreamWriter out) throws XMLStreamException {
+        out.writeStartElement(getXMLElementTagName());
+        out.writeAttribute("source", source.getID());
+        if (display instanceof FreeColGameObject) {
+            out.writeAttribute("display", ((FreeColGameObject) display).getID());
+        } else if (display instanceof FreeColGameObjectType) {
+            out.writeAttribute("display", ((FreeColGameObjectType) display).getID());
+        }
+        out.writeAttribute("type", String.valueOf(type));
+        out.writeAttribute("messageID", messageID);
+        out.writeAttribute("hasBeenDisplayed", String.valueOf(beenDisplayed));
+        ArrayList<String> flatData = new ArrayList<String>();
+        for (String[] element : data) {
+            flatData.add(element[0]);
+            flatData.add(element[1]);
+        }
+        toArrayElement("data", flatData.toArray(new String[] {}), out);
+        out.writeEndElement();
+    }
+
+    /**
+     * Initialize this object from an XML-representation of this object.
+     * @param in The input stream with the XML.
+     * @throws XMLStreamException if a problem was encountered
+     *      during parsing.
+     */
+    public void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
+
+
+    }
+
 }
