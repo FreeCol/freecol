@@ -2725,7 +2725,7 @@ public class Player extends FreeColGameObject implements Abilities, Nameable, Mo
                         FoundingFather father = FreeCol.getSpecification().getFoundingFather(modifier.getSource());
                         if (father != null && father.hasAbility("model.ability.addTaxToBells")) {
                             modifier.setValue(bellsBonus.getValue() + difference);
-                            return;
+                            break;
                         }
                     }
                 }
