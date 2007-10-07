@@ -1326,6 +1326,10 @@ public final class Colony extends Settlement implements Abilities, Location, Nam
                         } else {
                             getBuilding(upgradesFrom).upgrade();
                         }
+                        buildQueue.remove(0);
+                        if (buildQueue.size() == 0) {
+                            buildQueue.add(BuildableType.NOTHING);
+                        }
                     }
                 } else {
                     addModelMessage(this, "model.colony.itemNeedTools",

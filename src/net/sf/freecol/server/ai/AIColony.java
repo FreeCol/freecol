@@ -1103,20 +1103,17 @@ public class AIColony extends AIObject {
         Iterator<Building> bi = colonyPlan.getBuildable();
         while (bi.hasNext()) {
             Building buildable = bi.next();
-            int index = buildable.getType().getIndex();
 
-            /* TODO: convert ColonyPlan to BuildQueue
-            if (index == colony.getCurrentlyBuilding()) {
+            if (buildable.getType() == colony.getCurrentlyBuilding()) {
                 // We are building the right item already:
                 break;
             }
-            */
 
             int hammersNew = buildable.getNextHammers();
             if (hammersNew > colony.getHammers() || hammersNew > hammersOld || !isOldValid) {
                 Element setCurrentlyBuildingElement = Message.createNewRootElement("setCurrentlyBuilding");
                 setCurrentlyBuildingElement.setAttribute("colony", colony.getID());
-                setCurrentlyBuildingElement.setAttribute("type", Integer.toString(index));
+                setCurrentlyBuildingElement.setAttribute("type", buildable.getType().getID());
 
                 try {
                     connection.sendAndWait(setCurrentlyBuildingElement);
