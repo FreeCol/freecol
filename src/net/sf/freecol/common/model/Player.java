@@ -71,6 +71,7 @@ public class Player extends FreeColGameObject implements Abilities, Nameable, Mo
      * Only used by AI - stores the tension levels,
      * 0-1000 with 1000 maximum hostility.
      */
+    // TODO: move this to AIPlayer
     private Tension[] tension = new Tension[NUMBER_OF_PLAYERS];
 
     /**
@@ -98,7 +99,7 @@ public class Player extends FreeColGameObject implements Abilities, Nameable, Mo
     private NationType nationType;
 
     /**
-     * The nation name of this player, e.g. "model.nation.dutch.name".
+     * The nation ID of this player, e.g. "model.nation.dutch".
      */
     private String nationID;
 
@@ -139,9 +140,6 @@ public class Player extends FreeColGameObject implements Abilities, Nameable, Mo
     private int crosses;
 
     private int bells;
-
-    /** Bells bonus granted by Thomas Paine and Thomas Jefferson. */
-    private int bellsBonus = 0;
 
     private boolean dead = false;
 
@@ -1139,7 +1137,7 @@ public class Player extends FreeColGameObject implements Abilities, Nameable, Mo
      * @return The bell production bonus.
      */
     public int getBellsBonus() {
-        return bellsBonus;
+        return (int) getModifier("model.goods.Bells").getValue();
     }
 
     /**
@@ -2289,7 +2287,6 @@ public class Player extends FreeColGameObject implements Abilities, Nameable, Mo
         out.writeAttribute("rebellionState", Integer.toString(rebellionState));
         out.writeAttribute("ai", Boolean.toString(ai));
         out.writeAttribute("tax", Integer.toString(tax));
-        out.writeAttribute("bellsBonus", Integer.toString(bellsBonus));
         int[] tensionArray = new int[tension.length];
         for (int i = 0; i < tension.length; i++) {
             tensionArray[i] = tension[i].getValue();
@@ -2323,6 +2320,12 @@ public class Player extends FreeColGameObject implements Abilities, Nameable, Mo
                 }
             }
             out.writeAttribute("contacted", sb.toString());
+            if (europe != null) {
+                europe.toXML(out, player, showAll, toSavedGame);
+            }
+            if (monarch != null) {
+                monarch.toXML(out, player, showAll, toSavedGame);
+            }
         } else {
             out.writeAttribute("gold", Integer.toString(-1));
             out.writeAttribute("crosses", Integer.toString(-1));
@@ -2335,14 +2338,6 @@ public class Player extends FreeColGameObject implements Abilities, Nameable, Mo
         }
         if (entryLocation != null) {
             out.writeAttribute("entryLocation", entryLocation.getID());
-        }
-        if (getGame().isClientTrusted() || showAll || equals(player)) {
-            if (europe != null) {
-                europe.toXML(out, player, showAll, toSavedGame);
-            }
-            if (monarch != null) {
-                monarch.toXML(out, player, showAll, toSavedGame);
-            }
         }
         toArrayElement("tension", tensionArray, out);
         toArrayElement("stance", stance, out);
@@ -2358,6 +2353,12 @@ public class Player extends FreeColGameObject implements Abilities, Nameable, Mo
         if (market != null) {
             market.toXML(out, player, showAll, toSavedGame);
         }
+
+        /*
+        for (ModelMessage message : modelMessages) {
+            message.toXML(out);
+        }
+        */
 
         out.writeEndElement();
     }
@@ -2380,7 +2381,6 @@ public class Player extends FreeColGameObject implements Abilities, Nameable, Mo
         bells = Integer.parseInt(in.getAttributeValue(null, "bells"));
         oldSoL = getAttribute(in, "oldSoL", 0);
         score = getAttribute(in, "score", 0);
-        bellsBonus = getAttribute(in, "bellsBonus", 0);
         ready = (new Boolean(in.getAttributeValue(null, "ready"))).booleanValue();
         ai = (new Boolean(in.getAttributeValue(null, "ai"))).booleanValue();
         dead = (new Boolean(in.getAttributeValue(null, "dead"))).booleanValue();
@@ -2709,10 +2709,26 @@ public class Player extends FreeColGameObject implements Abilities, Nameable, Mo
      * @param amount The new tax.
      */
     public void setTax(int amount) {
-        if (amount > tax && hasAbility("model.ability.addTaxToBells")) {
-            bellsBonus += (amount - tax);
-        }
         tax = amount;
+        if (amount > tax && hasAbility("model.ability.addTaxToBells")) {
+            Modifier bellsBonus = getModifier("model.goods.Bells");
+            if (bellsBonus == null) {
+                setModifier("model.goods.Bells",
+                            new Modifier("model.goods.Bells", tax, Modifier.ADDITIVE));
+            } else {
+                int difference = (amount - tax);
+                bellsBonus.setValue(bellsBonus.getValue() + difference);
+                if (bellsBonus.getModifiers() != null) {
+                    for (Modifier modifier : bellsBonus.getModifiers()) {
+                        if (FreeCol.getSpecification().getFoundingFather(modifier.getSource())
+                            .hasAbility("model.ability.addTaxToBells")) {
+                            modifier.setValue(bellsBonus.getValue() + difference);
+                            return;
+                        }
+                    }
+                }
+            }
+        }
     }
 
     /**
