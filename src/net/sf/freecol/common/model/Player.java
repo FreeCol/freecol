@@ -2709,12 +2709,11 @@ public class Player extends FreeColGameObject implements Abilities, Nameable, Mo
      * @param amount The new tax.
      */
     public void setTax(int amount) {
-        tax = amount;
-        if (amount > tax && hasAbility("model.ability.addTaxToBells")) {
+        if (amount != tax && hasAbility("model.ability.addTaxToBells")) {
             Modifier bellsBonus = getModifier("model.goods.Bells");
             if (bellsBonus == null) {
                 setModifier("model.goods.Bells",
-                            new Modifier("model.goods.Bells", tax, Modifier.ADDITIVE));
+                            new Modifier("model.goods.Bells", amount, Modifier.ADDITIVE));
             } else {
                 int difference = (amount - tax);
                 bellsBonus.setValue(bellsBonus.getValue() + difference);
@@ -2732,6 +2731,7 @@ public class Player extends FreeColGameObject implements Abilities, Nameable, Mo
                 }
             }
         }
+        tax = amount;
     }
 
     /**
