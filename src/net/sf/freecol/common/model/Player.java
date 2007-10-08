@@ -2719,11 +2719,8 @@ public class Player extends FreeColGameObject implements Abilities, Nameable, Mo
                 bellsBonus.setValue(bellsBonus.getValue() + difference);
                 if (bellsBonus.getModifiers() != null) {
                     for (Modifier modifier : bellsBonus.getModifiers()) {
-                        // TODO: make this even more generic - the
-                        // ability might be granted by a building,
-                        // etc.
-                        FoundingFather father = FreeCol.getSpecification().getFoundingFather(modifier.getSource());
-                        if (father != null && father.hasAbility("model.ability.addTaxToBells")) {
+                        FreeColGameObjectType type = FreeCol.getSpecification().getType(modifier.getSource());
+                        if (type != null && type.hasAbility("model.ability.addTaxToBells")) {
                             modifier.setValue(bellsBonus.getValue() + difference);
                             break;
                         }
