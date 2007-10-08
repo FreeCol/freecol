@@ -399,13 +399,13 @@ abstract public class FreeColGameObject extends PersistentObject {
 
     private void initializeModelMessage(ModelMessage message) {
         if (message.getSource() == null) {
-            logger.warning("ModelMessage with ID " + message.getMessageID() + " has null message.getSource().");
+            logger.warning("ModelMessage with ID " + message.getID() + " has null message.getSource().");
         } else if (message.getSource() instanceof Player) {
             ((Player) message.getSource()).addModelMessage(message);
         } else if (message.getSource() instanceof Ownable) {
             ((Ownable) message.getSource()).getOwner().addModelMessage(message);
         } else {
-            logger.warning("ModelMessage with ID " + message.getMessageID() +
+            logger.warning("ModelMessage with ID " + message.getID() +
                            " and message.getSource() " +
                            message.getSource().toString() + " has unknown owner.");
         }

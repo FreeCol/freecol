@@ -196,21 +196,20 @@ public class ModelMessage extends PersistentObject {
     public FreeColGameObject getSource() {
         return source;
     }
-
+    
     /**
-    * Gets the ID of the message to display.   
-    * @return The ID. 
-    */
-    public String getMessageID() {
+     * Gets the ID of the message to display.   
+     * @return The ID. 
+     */
+    public String getID() {
         return messageID;
     }
     
-    
     /**
-    * Returns the data to be displayed in the message.
-    * @return The data as a <code>String[][]</code> or <i>null</i>
-    *         if no data applies.
-    */
+     * Returns the data to be displayed in the message.
+     * @return The data as a <code>String[][]</code> or <i>null</i>
+     *         if no data applies.
+     */
     public String[][] getData() {
         return data;
     }
@@ -346,7 +345,6 @@ public class ModelMessage extends PersistentObject {
         return sb.toString();
     }
 
-    // TODO: make this serializable; can we avoid passing Game in Constructor?
     
     public static String getXMLElementTagName() {
         return "modelMessage";
@@ -360,11 +358,7 @@ public class ModelMessage extends PersistentObject {
     public void toXML(XMLStreamWriter out) throws XMLStreamException {
         out.writeStartElement(getXMLElementTagName());
         out.writeAttribute("source", source.getID());
-        if (display instanceof FreeColGameObject) {
-            out.writeAttribute("display", ((FreeColGameObject) display).getID());
-        } else if (display instanceof FreeColGameObjectType) {
-            out.writeAttribute("display", ((FreeColGameObjectType) display).getID());
-        }
+        out.writeAttribute("display", display.getID());
         out.writeAttribute("type", String.valueOf(type));
         out.writeAttribute("messageID", messageID);
         out.writeAttribute("hasBeenDisplayed", String.valueOf(beenDisplayed));

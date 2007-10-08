@@ -261,7 +261,7 @@ public final class ReportTurnPanel extends ReportPanel implements ActionListener
 
         Player player = freeColClient.getMyPlayer();
         try {
-            String input = Messages.message(message.getMessageID());
+            String input = Messages.message(message.getID());
             int start = input.indexOf('%');
             if (start == -1) {
                 // no variables present

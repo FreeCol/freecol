@@ -598,9 +598,9 @@ public final class Canvas extends JDesktopPane {
         }
         for (int i = 0; i < modelMessages.length; i++) {
             try {
-                messageText[i] = Messages.message(modelMessages[i].getMessageID(), modelMessages[i].getData());
+                messageText[i] = Messages.message(modelMessages[i].getID(), modelMessages[i].getData());
             } catch (MissingResourceException e) {
-                logger.warning("could not find message with id: " + modelMessages[i].getMessageID() + ".");
+                logger.warning("could not find message with id: " + modelMessages[i].getID() + ".");
             }
 
             messageIcon[i] = getImageIcon(modelMessages[i].getDisplay(), false);
@@ -826,7 +826,7 @@ public final class Canvas extends JDesktopPane {
         String[] texts = new String[messages.length];
         ImageIcon[] images = new ImageIcon[messages.length];
         for (int i = 0; i < messages.length; i++) {
-            String ID = messages[i].getMessageID();
+            String ID = messages[i].getID();
             try {
                 texts[i] = Messages.message(ID);
             } catch (MissingResourceException e) {

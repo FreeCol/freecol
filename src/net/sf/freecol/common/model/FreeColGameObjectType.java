@@ -49,10 +49,10 @@ public abstract class FreeColGameObjectType extends FreeColObject {
     }
     
     /**
-	 * Use only for debugging purposes! A human-readable and localized name is
-	 * returned by getName().
-	 */
-	public String toString() {
-		return id;
-	}
+     * Use only for debugging purposes! A human-readable and localized name is
+     * returned by getName().
+     */
+    public String toString() {
+        return id;
+    }
 }

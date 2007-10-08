@@ -35,6 +35,9 @@ public abstract class PersistentObject {
 
     protected static Logger logger = Logger.getLogger(PersistentObject.class.getName());
 
+    public String getID() {
+        return null;
+    }
 
     /**
      * This method writes an XML-representation of this object to
