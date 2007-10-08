@@ -3,6 +3,7 @@ package net.sf.freecol.common.model;
 
 import java.util.Arrays;
 import java.util.ArrayList;
+import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
@@ -37,11 +38,11 @@ public class ModelMessage extends PersistentObject {
     public static final int MISSING_GOODS = 14;
     public static final int TUTORIAL = 15;
 
-    private final FreeColGameObject source;
-    private final PersistentObject display;
-    private final int type;
-    private final String messageID;
-    private final String[][] data;
+    private FreeColGameObject source;
+    private PersistentObject display;
+    private int type;
+    private String messageID;
+    private String[][] data;
     private boolean beenDisplayed = false;
 
 
@@ -367,12 +368,7 @@ public class ModelMessage extends PersistentObject {
         out.writeAttribute("type", String.valueOf(type));
         out.writeAttribute("messageID", messageID);
         out.writeAttribute("hasBeenDisplayed", String.valueOf(beenDisplayed));
-        ArrayList<String> flatData = new ArrayList<String>();
-        for (String[] element : data) {
-            flatData.add(element[0]);
-            flatData.add(element[1]);
-        }
-        toArrayElement("data", flatData.toArray(new String[] {}), out);
+        toArrayElement("data", new String[][] {}, out);
         out.writeEndElement();
     }
 
@@ -384,6 +380,37 @@ public class ModelMessage extends PersistentObject {
      */
     public void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
 
+
+    }
+
+    /**
+     * Initialize this object from an XML-representation of this object.
+     * @param in The input stream with the XML.
+     * @param game a <code>Game</code> value
+     * @exception XMLStreamException if a problem was encountered
+     *      during parsing.
+     */
+    public void readFromXMLImpl(XMLStreamReader in, Game game) throws XMLStreamException {
+        source = game.getFreeColGameObject(in.getAttributeValue(null, "type"));
+        String displayString = in.getAttributeValue(null, "source");
+        if (displayString != null) {
+            if (game.getFreeColGameObject(displayString) != null) {
+                display = game.getFreeColGameObject(displayString);
+            } else if (FreeCol.getSpecification().getType(displayString) != null) {
+                display = FreeCol.getSpecification().getType(displayString);
+            }
+        }
+        type = getAttribute(in, "type", DEFAULT);
+        messageID = in.getAttributeValue(null, "messageID");
+        beenDisplayed = Boolean.parseBoolean(in.getAttributeValue(null, "hasBeenDisplayed"));
+
+        while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
+            if (in.getLocalName().equals("data")) {
+                data =  readFromArrayElement("data", in, new String[0][0]);
+            }
+        }
+
+        in.nextTag();
 
     }
 

@@ -266,11 +266,6 @@ public class FoundingFather extends FreeColGameObjectType implements Abilities, 
     }
 
     protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
-        readFromXML(in, null);
-    }
-
-    public void readFromXML(XMLStreamReader in, final Map<String, GoodsType> goodsTypeByRef)
-            throws XMLStreamException {
         setID(in.getAttributeValue(null, "id"));
         String typeString = in.getAttributeValue(null, "type");
         if ("trade".equals(typeString)) {

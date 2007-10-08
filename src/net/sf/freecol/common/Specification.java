@@ -19,6 +19,7 @@ import net.sf.freecol.client.gui.action.ImprovementActionType;
 import net.sf.freecol.common.model.BuildingType;
 import net.sf.freecol.common.model.EuropeanNationType;
 import net.sf.freecol.common.model.FoundingFather;
+import net.sf.freecol.common.model.FreeColGameObjectType;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.IndianNationType;
@@ -43,6 +44,8 @@ public final class Specification {
     public static final String LICENSE = "http://www.gnu.org/licenses/gpl.html";
 
     public static final String REVISION = "$Revision$";
+
+    private final Map<String, FreeColGameObjectType> allTypes;
 
     private final List<BuildingType> buildingTypeList;
 
@@ -78,6 +81,7 @@ public final class Specification {
     protected Specification() {
         logger.info("Initializing Specification");
 
+        allTypes = new HashMap<String, FreeColGameObjectType>();
         buildingTypeList = new ArrayList<BuildingType>();
         goodsTypeList = new ArrayList<GoodsType>();
         resourceTypeList = new ArrayList<ResourceType>();
@@ -114,6 +118,7 @@ public final class Specification {
                         public GoodsType objectFrom(XMLStreamReader in) throws XMLStreamException {
                             GoodsType goodsType = new GoodsType(goodsIndex++);
                             goodsType.readFromXML(in, goodsTypeByRef);
+                            allTypes.put(goodsType.getID(), goodsType);
                             goodsTypeByRef.put(goodsType.getID(), goodsType);
                             if (goodsType.isFarmed()) {
                                 farmedGoodsTypeList.add(goodsType);
@@ -131,6 +136,7 @@ public final class Specification {
                         public BuildingType objectFrom(XMLStreamReader in) throws XMLStreamException {
                             BuildingType buildingType = new BuildingType(buildingIndex++);
                             buildingType.readFromXML(in, goodsTypeByRef, buildingTypeByRef);
+                            allTypes.put(buildingType.getID(), buildingType);
                             buildingTypeByRef.put(buildingType.getID(), buildingType);
                             return buildingType;
                         }
@@ -145,6 +151,7 @@ public final class Specification {
                         public ResourceType objectFrom(XMLStreamReader in) throws XMLStreamException {
                             ResourceType resourceType = new ResourceType(resIndex++);
                             resourceType.readFromXML(in, goodsTypeByRef);
+                            allTypes.put(resourceType.getID(), resourceType);
                             resourceTypeByRef.put(resourceType.getID(), resourceType);
                             return resourceType;
                         }
@@ -159,6 +166,7 @@ public final class Specification {
                         public TileType objectFrom(XMLStreamReader in) throws XMLStreamException {
                             TileType tileType = new TileType(tileIndex++);
                             tileType.readFromXML(in, goodsTypeByRef, resourceTypeByRef);
+                            allTypes.put(tileType.getID(), tileType);
                             tileTypeByRef.put(tileType.getID(), tileType);
                             return tileType;
                         }
@@ -174,6 +182,7 @@ public final class Specification {
                             TileImprovementType tileImprovementType = new TileImprovementType(impIndex++);
                             tileImprovementType.readFromXML(in, tileTypeList,
                                                     tileTypeByRef, goodsTypeByRef, tileImprovementTypeByRef);
+                            allTypes.put(tileImprovementType.getID(), tileImprovementType);
                             tileImprovementTypeByRef.put(tileImprovementType.getID(), tileImprovementType);
                             return tileImprovementType;
                         }
@@ -188,6 +197,7 @@ public final class Specification {
                         public ImprovementActionType objectFrom(XMLStreamReader in) throws XMLStreamException {
                             ImprovementActionType impActionType = new ImprovementActionType();
                             impActionType.readFromXML(in, tileImprovementTypeByRef);
+                            allTypes.put(impActionType.getID(), impActionType);
                             return impActionType;
                         }
                     };
@@ -201,6 +211,7 @@ public final class Specification {
                         public UnitType objectFrom(XMLStreamReader in) throws XMLStreamException {
                             UnitType unitType = new UnitType(unitIndex++);
                             unitType.readFromXML(in, goodsTypeByRef);
+                            allTypes.put(unitType.getID(), unitType);
                             unitTypeByRef.put(unitType.getID(), unitType);
                             return unitType;
                         }
@@ -214,7 +225,8 @@ public final class Specification {
                         int fatherIndex = 0;
                         public FoundingFather objectFrom(XMLStreamReader in) throws XMLStreamException {
                             FoundingFather foundingFather = new FoundingFather(fatherIndex++);
-                            foundingFather.readFromXML(in, goodsTypeByRef);
+                            foundingFather.readFromXML(in);
+                            allTypes.put(foundingFather.getID(), foundingFather);
                             return foundingFather;
                         }
                     };
@@ -233,6 +245,7 @@ public final class Specification {
                                 nationType = new IndianNationType(nationIndex++);
                             }                             
                             nationType.readFromXML(in, unitTypeByRef);
+                            allTypes.put(nationType.getID(), nationType);
                             nationTypeByRef.put(nationType.getID(), nationType);
                             return nationType;
                         }
@@ -247,6 +260,7 @@ public final class Specification {
                         public Nation objectFrom(XMLStreamReader in) throws XMLStreamException {
                             Nation nation = new Nation(nationIndex++);
                             nation.readFromXML(in, nationTypeByRef);
+                            allTypes.put(nation.getID(), nation);
                             return nation;
                         }
                     };
@@ -273,6 +287,10 @@ public final class Specification {
 
     // ---------------------------------------------------------- retrieval methods
     
+    public FreeColGameObjectType getType(String Id) {
+        return allTypes.get(Id);
+    }
+
     // -- Buildings --
     public List<BuildingType> getBuildingTypeList() {
         return buildingTypeList;
