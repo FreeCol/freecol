@@ -34,9 +34,9 @@ public class FoundingFather extends FreeColGameObjectType implements Abilities, 
     private int type;
 
     /**
-     * Describe upgrades here.
+     * Holds the upgrades of Units caused by this FoundingFather.
      */
-    private Map<String, String> upgrades;
+    private Map<UnitType, UnitType> upgrades;
 
     public static final int TRADE = 0,
                             EXPLORATION = 1,
@@ -241,9 +241,9 @@ public class FoundingFather extends FreeColGameObjectType implements Abilities, 
     /**
      * Get the <code>Upgrades</code> value.
      *
-     * @return a <code>Map<String, String></code> value
+     * @return a <code>Map<UnitType, UnitType></code> value
      */
-    public final Map<String, String> getUpgrades() {
+    public final Map<UnitType, UnitType> getUpgrades() {
         return upgrades;
     }
 
@@ -252,7 +252,7 @@ public class FoundingFather extends FreeColGameObjectType implements Abilities, 
      *
      * @param newUpgrades The new Upgrades value.
      */
-    public final void setUpgrades(final Map<String, String> newUpgrades) {
+    public final void setUpgrades(final Map<UnitType, UnitType> newUpgrades) {
         this.upgrades = newUpgrades;
     }
 
@@ -266,6 +266,11 @@ public class FoundingFather extends FreeColGameObjectType implements Abilities, 
     }
 
     protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
+        readFromXML(in, null);
+    }
+
+    public void readFromXML(XMLStreamReader in, Map<String, UnitType> unitTypeByRef)
+        throws XMLStreamException {
         setID(in.getAttributeValue(null, "id"));
         String typeString = in.getAttributeValue(null, "type");
         if ("trade".equals(typeString)) {
@@ -314,12 +319,14 @@ public class FoundingFather extends FreeColGameObjectType implements Abilities, 
                 }
                 units.add(unit);
             } else if ("upgrade".equals(childName)) {
-                String fromID = in.getAttributeValue(null, "from-id");
-                String toID = in.getAttributeValue(null, "to-id");
-                if (upgrades == null) {
-                    upgrades = new HashMap<String, String>();
+                UnitType fromType = unitTypeByRef.get(in.getAttributeValue(null, "from-id"));
+                UnitType toType = unitTypeByRef.get(in.getAttributeValue(null, "to-id"));
+                if (fromType != null && toType != null) {
+                    if (upgrades == null) {
+                        upgrades = new HashMap<UnitType, UnitType>();
+                    }
+                    upgrades.put(fromType, toType);
                 }
-                upgrades.put(fromID, toID);
                 in.nextTag();
             } else {
                 logger.finest("Parsing of " + childName + " is not implemented yet");

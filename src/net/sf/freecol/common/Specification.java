@@ -225,7 +225,7 @@ public final class Specification {
                         int fatherIndex = 0;
                         public FoundingFather objectFrom(XMLStreamReader in) throws XMLStreamException {
                             FoundingFather foundingFather = new FoundingFather(fatherIndex++);
-                            foundingFather.readFromXML(in);
+                            foundingFather.readFromXML(in, unitTypeByRef);
                             allTypes.put(foundingFather.getID(), foundingFather);
                             return foundingFather;
                         }
