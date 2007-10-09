@@ -2319,12 +2319,6 @@ public class Player extends FreeColGameObject implements Abilities, Nameable, Mo
                 }
             }
             out.writeAttribute("contacted", sb.toString());
-            if (europe != null) {
-                europe.toXML(out, player, showAll, toSavedGame);
-            }
-            if (monarch != null) {
-                monarch.toXML(out, player, showAll, toSavedGame);
-            }
         } else {
             out.writeAttribute("gold", Integer.toString(-1));
             out.writeAttribute("crosses", Integer.toString(-1));
@@ -2338,6 +2332,8 @@ public class Player extends FreeColGameObject implements Abilities, Nameable, Mo
         if (entryLocation != null) {
             out.writeAttribute("entryLocation", entryLocation.getID());
         }
+        // attributes end here
+
         toArrayElement("tension", tensionArray, out);
         toArrayElement("stance", stance, out);
         if (isEuropean()) {
@@ -2351,6 +2347,15 @@ public class Player extends FreeColGameObject implements Abilities, Nameable, Mo
         }
         if (market != null) {
             market.toXML(out, player, showAll, toSavedGame);
+        }
+
+        if (getGame().isClientTrusted() || showAll || equals(player)) {
+            if (europe != null) {
+                europe.toXML(out, player, showAll, toSavedGame);
+            }
+            if (monarch != null) {
+                monarch.toXML(out, player, showAll, toSavedGame);
+            }
         }
 
         /*
