@@ -181,6 +181,46 @@ public final class Scope extends FreeColObject implements Cloneable {
         return true;
     }
 
+    public boolean equals(Object o) {
+        if (o instanceof Scope) {
+            Scope otherScope = (Scope) o;
+            if (type == null) {
+                if (otherScope.getType() != type) {
+                    return false;
+                }
+            } else if (!type.equals(otherScope.getType())) {
+                return false;
+            }
+            if (abilityID == null) {
+                if (otherScope.getAbilityID() != abilityID) {
+                    return false;
+                }
+            } else if (!abilityID.equals(otherScope.getAbilityID())) {
+                return false;
+            }
+            if (abilityValue != otherScope.isAbilityValue()) {
+                return false;
+            }
+            if (methodName == null) {
+                if (otherScope.getMethodName() != methodName) {
+                    return false;
+                }
+            } else if (!methodName.equals(otherScope.getMethodName())) {
+                return false;
+            }
+            if (methodValue == null) {
+                if (otherScope.getMethodValue() != methodValue) {
+                    return false;
+                }
+            } else if (!methodValue.equals(otherScope.getMethodValue())) {
+                return false;
+            }
+            return true;
+        } else {
+            return false;
+        }
+    }
+
 
     /**
      * Initialize this object from an XML-representation of this object.

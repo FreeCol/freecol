@@ -77,4 +77,61 @@ public class ScopeTest extends FreeColTestCase {
         testScope.setAbilityID("model.ability.foundColony");
         assertFalse(testScope.appliesTo(frigate));
     }
+
+    public void testEquality() {
+
+        Scope testScope1 = new Scope();
+        testScope1.setType("model.unit.frigate");
+        testScope1.setAbilityID("model.ability.navalUnit");
+        testScope1.setMethodName("getLineOfSight");
+        testScope1.setMethodValue("2");
+        assertTrue(testScope1.equals(testScope1));
+
+        Scope testScope2 = new Scope();
+        testScope2.setType("model.unit.frigate");
+        testScope2.setAbilityID("model.ability.navalUnit");
+        testScope2.setMethodName("getLineOfSight");
+        testScope2.setMethodValue("2");
+        assertTrue(testScope2.equals(testScope2));
+
+        assertTrue(testScope1.equals(testScope2));
+        assertTrue(testScope2.equals(testScope1));
+
+        testScope1.setType("model.unit.carpenter");
+
+        assertFalse(testScope1.equals(testScope2));
+        assertFalse(testScope2.equals(testScope1));
+
+        testScope1.setType("model.unit.frigate");
+        testScope1.setAbilityID("model.ability.foundColony");
+
+        assertFalse(testScope1.equals(testScope2));
+        assertFalse(testScope2.equals(testScope1));
+
+        testScope1.setAbilityID("model.ability.navalUnit");
+        testScope1.setAbilityValue(false);
+
+        assertFalse(testScope1.equals(testScope2));
+        assertFalse(testScope2.equals(testScope1));
+
+        testScope1.setAbilityValue(true);
+        testScope1.setMethodName("getOffence");
+
+        assertFalse(testScope1.equals(testScope2));
+        assertFalse(testScope2.equals(testScope1));
+
+        testScope1.setMethodName("getLineOfSight");
+        testScope1.setMethodValue("9");
+
+        assertFalse(testScope1.equals(testScope2));
+        assertFalse(testScope2.equals(testScope1));
+
+        testScope1.setMethodValue("2");
+
+        assertTrue(testScope1.equals(testScope2));
+        assertTrue(testScope2.equals(testScope1));
+
+    }
+        
+
 }
