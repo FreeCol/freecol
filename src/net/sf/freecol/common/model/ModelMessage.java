@@ -14,7 +14,7 @@ import net.sf.freecol.client.gui.i18n.Messages;
 /**
  * Contains a message about a change in the model.
  */
-public class ModelMessage extends PersistentObject {
+public class ModelMessage extends FreeColObject {
 
     public static final String  COPYRIGHT = "Copyright (C) 2003-2006 The FreeCol Team";
     public static final String  LICENSE = "http://www.gnu.org/licenses/gpl.html";
@@ -45,6 +45,9 @@ public class ModelMessage extends PersistentObject {
     private String[][] data;
     private boolean beenDisplayed = false;
 
+
+    public ModelMessage() {
+    }
 
     /**
     * Creates a new <code>ModelMessage</code>.
@@ -350,12 +353,7 @@ public class ModelMessage extends PersistentObject {
         return "modelMessage";
     }
 
-    public void toXML(XMLStreamWriter out, Player player, boolean showAll, boolean toSavedGame)
-        throws XMLStreamException {
-        toXML(out);
-    }
-
-    public void toXML(XMLStreamWriter out) throws XMLStreamException {
+    public void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
         out.writeStartElement(getXMLElementTagName());
         out.writeAttribute("source", source.getID());
         out.writeAttribute("display", display.getID());
@@ -373,8 +371,17 @@ public class ModelMessage extends PersistentObject {
      *      during parsing.
      */
     public void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
+        messageID = in.getAttributeValue(null, "messageID");
+        type = getAttribute(in, "type", DEFAULT);
+        beenDisplayed = Boolean.parseBoolean(in.getAttributeValue(null, "hasBeenDisplayed"));
 
+        while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
+            if (in.getLocalName().equals("data")) {
+                data =  readFromArrayElement("data", in, new String[0][0]);
+            }
+        }
 
+        in.nextTag();
     }
 
     /**
@@ -384,7 +391,11 @@ public class ModelMessage extends PersistentObject {
      * @exception XMLStreamException if a problem was encountered
      *      during parsing.
      */
-    public void readFromXMLImpl(XMLStreamReader in, Game game) throws XMLStreamException {
+    public void readFromXML(XMLStreamReader in, Game game) throws XMLStreamException {
+        messageID = in.getAttributeValue(null, "messageID");
+        type = getAttribute(in, "type", DEFAULT);
+        beenDisplayed = Boolean.parseBoolean(in.getAttributeValue(null, "hasBeenDisplayed"));
+
         source = game.getFreeColGameObject(in.getAttributeValue(null, "type"));
         String displayString = in.getAttributeValue(null, "source");
         if (displayString != null) {
@@ -394,9 +405,6 @@ public class ModelMessage extends PersistentObject {
                 display = FreeCol.getSpecification().getType(displayString);
             }
         }
-        type = getAttribute(in, "type", DEFAULT);
-        messageID = in.getAttributeValue(null, "messageID");
-        beenDisplayed = Boolean.parseBoolean(in.getAttributeValue(null, "hasBeenDisplayed"));
 
         while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
             if (in.getLocalName().equals("data")) {

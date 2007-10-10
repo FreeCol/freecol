@@ -2356,13 +2356,10 @@ public class Player extends FreeColGameObject implements Abilities, Nameable, Mo
             if (monarch != null) {
                 monarch.toXML(out, player, showAll, toSavedGame);
             }
+            for (ModelMessage message : modelMessages) {
+                message.toXML(out);
+            }
         }
-
-        /*
-        for (ModelMessage message : modelMessages) {
-            message.toXML(out);
-        }
-        */
 
         out.writeEndElement();
     }
@@ -2471,7 +2468,11 @@ public class Player extends FreeColGameObject implements Abilities, Nameable, Mo
                 } else {
                     market = new Market(getGame(), in);
                 }
-            }
+            } else if (in.getLocalName().equals(ModelMessage.getXMLElementTagName())) {
+                ModelMessage message = new ModelMessage();
+                message.readFromXML(in, getGame());
+                addModelMessage(message);
+            }            
         }
         if (market == null) {
             market = new Market(getGame(), this);
