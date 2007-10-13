@@ -25,6 +25,7 @@ import net.sf.freecol.client.gui.panel.FreeColPanel;
 import net.sf.freecol.common.option.BooleanOption;
 import net.sf.freecol.common.option.FileOption;
 import net.sf.freecol.common.option.IntegerOption;
+import net.sf.freecol.common.option.LanguageOption;
 import net.sf.freecol.common.option.Option;
 import net.sf.freecol.common.option.OptionGroup;
 import net.sf.freecol.common.option.SelectOption;
@@ -119,6 +120,14 @@ public final class OptionGroupUI extends JPanel implements OptionUpdater {
                 }
             } else if (o instanceof SelectOption) {
                 final SelectOptionUI soi = new SelectOptionUI((SelectOption) o, editable);
+                add(soi);
+                ou.add(soi);
+                buttonAdded = false;
+                if (!o.getId().equals(Option.NO_ID)) {
+                    optionUIs.put(o.getId(), soi);
+                }
+            } else if (o instanceof LanguageOption) {
+                final LanguageOptionUI soi = new LanguageOptionUI((LanguageOption) o, editable);
                 add(soi);
                 ou.add(soi);
                 buttonAdded = false;

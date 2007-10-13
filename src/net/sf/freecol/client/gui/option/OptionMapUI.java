@@ -16,6 +16,7 @@ import javax.swing.JTabbedPane;
 import net.sf.freecol.common.option.BooleanOption;
 import net.sf.freecol.common.option.FileOption;
 import net.sf.freecol.common.option.IntegerOption;
+import net.sf.freecol.common.option.LanguageOption;
 import net.sf.freecol.common.option.Option;
 import net.sf.freecol.common.option.OptionGroup;
 import net.sf.freecol.common.option.OptionMap;
@@ -110,6 +111,14 @@ public final class OptionMapUI extends JPanel implements OptionUpdater {
                 }
             } else if (o instanceof SelectOption) {
                 JComponent c = new SelectOptionUI((SelectOption) o, editable);
+                northPanel.add(c);
+                ou.add(c);
+                if (!o.getId().equals(Option.NO_ID)) {
+                    optionUIs.put(o.getId(), c);
+                }
+            } else if (o instanceof LanguageOption) {
+                System.out.println("found languageOption");
+                JComponent c = new LanguageOptionUI((LanguageOption) o, editable);
                 northPanel.add(c);
                 ou.add(c);
                 if (!o.getId().equals(Option.NO_ID)) {

@@ -40,6 +40,7 @@ import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.networking.Message;
 import net.sf.freecol.common.option.LanguageOption;
+import net.sf.freecol.common.option.LanguageOption.Language;
 import net.sf.freecol.common.option.Option;
 import net.sf.freecol.server.FreeColServer;
 
@@ -182,12 +183,13 @@ public final class FreeColClient {
             Option o = clientOptions.getObject(ClientOptions.LANGUAGE);
             o.addPropertyChangeListener(new PropertyChangeListener() {
                 public void propertyChange(PropertyChangeEvent e) {
-                    if (((Integer) e.getNewValue()).intValue() == 0) {
+                    if (((Language) e.getNewValue()).getKey().equals(LanguageOption.AUTO)) {
                         canvas.showInformationMessage("autodetectLanguageSelected");
                     } else {
-                        Locale l = LanguageOption.getLocale(((Integer) e.getNewValue()).intValue());
+                        Locale l = ((Language) e.getNewValue()).getLocale();
                         Messages.setMessageBundle(l);
-                        canvas.showInformationMessage("newLanguageSelected", new String[][] {{"%language%", l.getDisplayName()}});
+                        canvas.showInformationMessage("newLanguageSelected",
+                                                      new String[][] {{"%language%", l.getDisplayName()}});
                     }
                 }
             });
