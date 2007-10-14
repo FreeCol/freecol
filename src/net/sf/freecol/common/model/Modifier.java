@@ -50,6 +50,17 @@ public final class Modifier extends Feature implements Cloneable {
      * Creates a new <code>Modifier</code> instance.
      *
      * @param id a <code>String</code> value
+     * @param type an <code>int</code> value
+     */
+    private Modifier(String id, int type) {
+        setId(id);
+        this.type = type;
+    }
+
+    /**
+     * Creates a new <code>Modifier</code> instance.
+     *
+     * @param id a <code>String</code> value
      * @param value an <code>float</code> value
      * @param type the type of the modifier
      */
@@ -131,7 +142,6 @@ public final class Modifier extends Feature implements Cloneable {
         if (modifier.getModifiers() != null) {
             modifiers = new ArrayList(modifier.getModifiers());
         }
-        //booleanValue = modifier.getBooleanValue();
         for (int i = 0; i < values.length; i++) {
             values[i] = modifier.values[i];
         }
@@ -246,121 +256,64 @@ public final class Modifier extends Feature implements Cloneable {
     }
 
     /**
-     * Returns the inverse modifier of this one
-     *
-     * @return a inverse <code>Modifier</code>
-     */
-    public Modifier getInverse() {
-        Modifier newModifier = new Modifier(this);
-
-        switch(type) {
-        case COMBINED:
-            for (int i = 0; i < values.length; i++) {
-                newModifier.values[i] = getInverse(i);
-            }
-            break;
-        default:
-            newModifier.values[getType()] = getInverse(getType());
-            break;
-        }
-        return newModifier;
-    }
-    
-    private float getInverse(int type) {
-        switch(type) {
-        case ADDITIVE:
-        case PERCENTAGE:
-            return -values[type];
-        case MULTIPLICATIVE:
-            return 1 / values[type];
-        default:
-            // It can't happen
-            return values[type];
-        }
-    }
-    
-
-    /**
      * Combines this modifier with another.
      *
      * @param otherModifier a <code>Modifier</code> value
      */
-    public void combine(Modifier otherModifier) {
-        if (getType() != otherModifier.getType()) {
-            setType(COMBINED);
-        }
+    public static Modifier combine(Modifier... modifiers) {
+        switch(modifiers.length) {
+        case 0:
+            return null;
+        case 1:
+            return modifiers[0];
+        default:
+            String id = modifiers[0].getId();
+            Modifier result = new Modifier(id, modifiers[0].type);
+            result.modifiers = new ArrayList<Modifier>();
 
-        if (modifiers == null) {
-            modifiers = new ArrayList<Modifier>();
-            modifiers.add(new Modifier(this));
-        }
-        if (otherModifier.getModifiers() == null) {
-            modifiers.add(otherModifier);
-        } else {
-            modifiers.addAll(otherModifier.getModifiers());
-        }
-
-        if (otherModifier.getType() != COMBINED) {
-            combine(otherModifier, otherModifier.getType());
-        } else {
-            for (int i = 0; i < values.length; i++) {
-                combine(otherModifier, i);
+            for (Modifier modifier : modifiers) {
+                if (!id.equals(modifier.getId())) {
+                    return null;
+                }
+                if (result.type != modifier.type) {
+                    result.setType(COMBINED);
+                }
+                if (modifier.modifiers == null) {
+                    result.modifiers.add(modifier);
+                } else {
+                    result.modifiers.addAll(modifier.modifiers);
+                }
+                result.values[ADDITIVE] += modifier.values[ADDITIVE];
+                result.values[PERCENTAGE] += modifier.values[PERCENTAGE];
+                result.values[MULTIPLICATIVE] *= modifier.values[MULTIPLICATIVE];
             }
-        }
-    }
-    
-    private void combine(Modifier otherModifier, int type) {
-        switch(type) {
-        case ADDITIVE:
-        case PERCENTAGE:
-            values[type] += otherModifier.values[type];
-            return;
-        case MULTIPLICATIVE:
-            values[type] *= otherModifier.values[type];
-            return;
+            return result;
         }
     }
 
-    public static Modifier combine(List<Feature> features) {
-        Modifier result = new Modifier("result", 0, ADDITIVE);
-        result.setModifiers(new ArrayList<Modifier>());
-        for (Feature feature : features) {
-            if (feature instanceof Modifier) {
-                result.combine((Modifier) feature);
-            }
-        }
-        return result;
-    }
-
- 
     /**
-     * Applies this modifier to a number.
+     * Remove values of other Modifier from this one.
+     *
+     * @param modifier a <code>Modifier</code> value
+     */
+    public void removeValues(Modifier modifier) {
+        values[ADDITIVE] -= modifier.values[ADDITIVE];
+        values[PERCENTAGE] -= modifier.values[PERCENTAGE];
+        values[MULTIPLICATIVE] /= modifier.values[MULTIPLICATIVE];
+    }
+
+
+    /**
+     * Applies this Modifier to a number.
      *
      * @param number a <code>float</code> value
      * @return a <code>float</code> value
      */
     public float applyTo(float number) {
-        if (getType() == COMBINED) {
-            for (int i = 0; i < values.length; i++) {
-                number = applyTo(number, i);
-            }
-            return number;
-        } else {
-            return applyTo(number, getType());
-        }
-    }
-    
-    private float applyTo(float number, int type) {
-        switch(type) {
-        case ADDITIVE:
-            return number + values[type];
-        case MULTIPLICATIVE:
-            return number * values[type];
-        case PERCENTAGE:
-            return number + (number * values[type]) / 100;
-        default:
-            return number;
-        }
+        float result = number + values[ADDITIVE];
+        result *= values[MULTIPLICATIVE];
+        result += (result * values[PERCENTAGE]) / 100;
+        return result;
     }
 
     // -- Serialization --

@@ -2602,8 +2602,7 @@ public class Unit extends FreeColGameObject implements Abilities, Locatable, Loc
         } else if (typeModifier == null) {
             return playerModifier;
         } else {
-            typeModifier.combine(playerModifier);
-            return typeModifier;
+            return Modifier.combine(typeModifier, playerModifier);
         }
     }
     

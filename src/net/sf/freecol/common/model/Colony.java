@@ -2043,8 +2043,7 @@ public final class Colony extends Settlement implements Abilities, Location, Nam
         Modifier playerModifier = owner.getModifier(id);
         if (modifier != null) {
             if (playerModifier != null) {
-                result = new Modifier(modifier);
-                result.combine(playerModifier);
+                result = Modifier.combine(modifier, playerModifier);
             } else {
                 result = modifier;
             }
@@ -2065,19 +2064,19 @@ public final class Colony extends Settlement implements Abilities, Location, Nam
         setFeature(newModifier);
     }
     
-    /*
-    public void addModifier(String id, final Modifier newModifier) {
-        if (features.get(id) == null) {
-            setModifier(id, newModifier);
-        } else {
-            features.get(id).combine(newModifier);
-        }
-    }
-    */
-    
-    public void removeModifier(String id, final Modifier newModifier) {
-        if (features.get(id) != null) {
-            //features.get(id).combine(newModifier.getInverse());
+    public void removeModifier(final Modifier newModifier) {
+        Modifier oldModifier = getModifier(newModifier.getId());
+        if (newModifier == null || oldModifier == null ||
+            oldModifier.getModifiers() == null ) {
+            return;
+        }        
+        boolean removed = oldModifier.getModifiers().remove(newModifier);
+        if (removed) {
+            if (oldModifier.getModifiers().size() == 1) {
+                setFeature(oldModifier.getModifiers().get(0));
+            } else {
+                oldModifier.removeValues(newModifier);
+            }
         }
     }
 
@@ -2085,17 +2084,17 @@ public final class Colony extends Settlement implements Abilities, Location, Nam
     }
 
     /**
-     * Returns true if the Building has the ability identified by
-     * <code>id</code.
+     * Returns true if the Colony, or its owner has the ability
+     * identified by <code>id</code.
      *
      * @param id a <code>String</code> value
      * @return a <code>boolean</code> value
      */
     public boolean hasAbility(String id) {
-        // TODO: search player abilities too
-        return features.containsKey(id) &&
+        return (features.containsKey(id) &&
             (features.get(id) instanceof Ability) &&
-            ((Ability) features.get(id)).getValue();
+            ((Ability) features.get(id)).getValue()) ||
+            owner.hasAbility(id);
     }
 
     /**
@@ -2117,9 +2116,8 @@ public final class Colony extends Settlement implements Abilities, Location, Nam
             return;
         }
         Feature oldValue = features.get(feature.getId());
-        if (oldValue instanceof Modifier &&
-            feature instanceof Modifier) {
-            ((Modifier) oldValue).combine((Modifier) feature);
+        if (oldValue instanceof Modifier && feature instanceof Modifier) {
+            features.put(feature.getId(), Modifier.combine((Modifier) oldValue, (Modifier) feature));
         } else {
             features.put(feature.getId(), feature);
         }

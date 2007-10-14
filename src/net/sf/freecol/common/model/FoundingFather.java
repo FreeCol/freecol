@@ -228,9 +228,8 @@ public class FoundingFather extends FreeColGameObjectType implements Abilities, 
             return;
         }
         Feature oldValue = features.get(feature.getId());
-        if (oldValue instanceof Modifier &&
-            feature instanceof Modifier) {
-            ((Modifier) oldValue).combine((Modifier) feature);
+        if (oldValue instanceof Modifier && feature instanceof Modifier) {
+            features.put(feature.getId(), Modifier.combine((Modifier) oldValue, (Modifier) feature));
         } else {
             features.put(feature.getId(), feature);
         }

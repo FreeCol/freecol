@@ -2040,9 +2040,8 @@ public class Player extends FreeColGameObject implements Abilities, Nameable, Mo
             return;
         }
         Feature oldValue = features.get(feature.getID());
-        if (oldValue instanceof Modifier &&
-            feature instanceof Modifier) {
-            ((Modifier) oldValue).combine((Modifier) feature);
+        if (oldValue instanceof Modifier && feature instanceof Modifier) {
+            features.put(feature.getId(), Modifier.combine((Modifier) oldValue, (Modifier) feature));
         } else {
             features.put(feature.getID(), feature);
         }
