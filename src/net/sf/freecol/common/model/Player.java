@@ -190,14 +190,9 @@ public class Player extends FreeColGameObject implements Abilities, Nameable, Mo
     protected boolean[][] canSeeTiles = null;
 
     /**
-     * Stores the abilities of this Player.
-     */
-    private HashMap<String, Boolean> abilities = new HashMap<String, Boolean>();    
-
-    /**
      * Stores the Modifiers of this Player.
      */
-    private HashMap<String, Modifier> modifiers = new HashMap<String, Modifier>();
+    private HashMap<String, Feature> features = new HashMap<String, Feature>();
 
 
     /**
@@ -2021,7 +2016,9 @@ public class Player extends FreeColGameObject implements Abilities, Nameable, Mo
      * @return a <code>boolean</code> value
      */
     public boolean hasAbility(String id) {
-        return abilities.containsKey(id) && abilities.get(id);
+        return features.containsKey(id) && 
+            ((Ability) features.get(id)) instanceof Ability &&
+            ((Ability) features.get(id)).getValue();
     }
 
     /**
@@ -2030,8 +2027,25 @@ public class Player extends FreeColGameObject implements Abilities, Nameable, Mo
      * @param id a <code>String</code> value
      * @param newValue a <code>boolean</code> value
      */
-    public void setAbility(String id, boolean newValue) {
-        abilities.put(id, newValue);
+    public void setAbility(Ability newAbility) {
+        features.put(newAbility.getID(), newAbility);
+    }
+
+    public void setAbility(String id, boolean value) {
+        setFeature(new Ability(id, value));
+    }
+
+    public void setFeature(Feature feature) {
+        if (feature == null) {
+            return;
+        }
+        Feature oldValue = features.get(feature.getID());
+        if (oldValue instanceof Modifier &&
+            feature instanceof Modifier) {
+            ((Modifier) oldValue).combine((Modifier) feature);
+        } else {
+            features.put(feature.getID(), feature);
+        }
     }
 
     /**
@@ -2041,7 +2055,7 @@ public class Player extends FreeColGameObject implements Abilities, Nameable, Mo
      * @return a <code>Modifier</code> value
      */
     public final Modifier getModifier(String id) {
-        return modifiers.get(id);
+        return (Modifier) features.get(id);
     }
 
     /**
@@ -2051,7 +2065,7 @@ public class Player extends FreeColGameObject implements Abilities, Nameable, Mo
      * @param newModifier a <code>Modifier</code> value
      */
     public final void setModifier(String id, final Modifier newModifier) {
-        modifiers.put(id, newModifier);
+        features.put(id, newModifier);
     }
 
 
@@ -2090,14 +2104,8 @@ public class Player extends FreeColGameObject implements Abilities, Nameable, Mo
         if (isEuropean()) {
             if (getBells() >= getTotalFoundingFatherCost() && currentFather != null) {
                 addFather(currentFather);
-                abilities.putAll(currentFather.getAbilities());
-                java.util.Map<String, Modifier> newModifiers = currentFather.getModifiers();
-                for (String key : newModifiers.keySet()) {
-                    if (getModifier(key) == null) {
-                        setModifier(key, newModifiers.get(key));
-                    } else {
-                        getModifier(key).combine(newModifiers.get(key));
-                    }
+                for (Feature feature : currentFather.getFeatures().values()) {
+                    setFeature(feature);
                 }
 
                 List<AbstractUnit> units = currentFather.getUnits();

@@ -309,11 +309,11 @@ public final class Building extends FreeColGameObject implements Abilities, Work
     }
     
     private void setType(BuildingType newBuildingType) {
-        // remove modifiers from current type
-        if (buildingType.getModifiers() != null) {
-            Map<String, Modifier> oldModifiers = buildingType.getModifiers();
-            for (Entry<String, Modifier> entry : oldModifiers.entrySet()) {
-                colony.removeModifier(entry.getKey(), entry.getValue());
+        // remove features from current type
+        if (buildingType.getFeatures() != null) {
+            Map<String, Feature> oldFeatures = buildingType.getFeatures();
+            for (Entry<String, Feature> entry : oldFeatures.entrySet()) {
+                colony.removeFeature(entry.getKey(), entry.getValue());
             }
         }
         colony.setDefenseBonus(colony.getDefenseBonus() - buildingType.getDefenseBonus());
@@ -321,10 +321,10 @@ public final class Building extends FreeColGameObject implements Abilities, Work
         if (newBuildingType != null) {
             buildingType = newBuildingType;
             
-            // add new modifiers and abilities from new type
-            Map<String, Modifier> newModifiers = buildingType.getModifiers();
-            for (Entry<String, Modifier> entry : newModifiers.entrySet()) {
-                colony.addModifier(entry.getKey(), entry.getValue());
+            // add new features and abilities from new type
+            Map<String, Feature> newFeatures = buildingType.getFeatures();
+            for (Feature feature : newFeatures.values()) {
+                colony.setFeature(feature);
             }
             colony.setDefenseBonus(colony.getDefenseBonus() + buildingType.getDefenseBonus());
             colony.putAbilities(buildingType.getAbilities());

@@ -76,9 +76,9 @@ public final class Colony extends Settlement implements Abilities, Location, Nam
     private boolean[] exports;
 
     /**
-     * Stores the Modifiers of this Player.
+     * Stores the Features of this Colony.
      */
-    private HashMap<String, Modifier> modifiers = new HashMap<String, Modifier>();
+    private HashMap<String, Feature> features = new HashMap<String, Feature>();
 
     private int defenseBonus;
 
@@ -87,8 +87,6 @@ public final class Colony extends Settlement implements Abilities, Location, Nam
      */
     private List<BuildableType> buildQueue = new ArrayList<BuildableType>();
     
-    private HashMap<String, Boolean> abilities = new HashMap<String, Boolean>();
-
     /** Cannot do it this way as NUMBER_OF_TYPES is not a constant
     private int[] highLevel = new int[Goods.NUMBER_OF_TYPES];
     private int[] lowLevel = new int[Goods.NUMBER_OF_TYPES];
@@ -194,7 +192,9 @@ public final class Colony extends Settlement implements Abilities, Location, Nam
             Building building = (Building) workLocation;
             BuildingType buildingType = building.getType().getFirstLevel();
             buildingMap.put(buildingType.getID(), building);
-            modifiers.putAll(buildingType.getModifiers());
+            for (Feature feature : building.getType().getFeatures().values()) {
+                setFeature(feature);
+            }
         }
     }
 
@@ -1849,8 +1849,12 @@ public final class Colony extends Settlement implements Abilities, Location, Nam
             toArrayElement("lowLevel", lowLevel, out);
             toArrayElement("highLevel", highLevel, out);
             toArrayElement("exportLevel", exportLevel, out);
-            for (Modifier modifier : modifiers.values()) {
-                modifier.toXML(out, player);
+            for (Feature feature : features.values()) {
+                if (feature instanceof Ability) {
+                    ((Ability) feature).toXML(out, player);
+                } else if (feature instanceof Modifier) {
+                    ((Modifier) feature).toXML(out, player);
+                }
             }
             Iterator<WorkLocation> workLocationIterator = workLocations.iterator();
             while (workLocationIterator.hasNext()) {
@@ -1933,7 +1937,7 @@ public final class Colony extends Settlement implements Abilities, Location, Nam
                 exportLevel = readFromArrayElement("exportLevel", in, new int[0]);
             } else if (in.getLocalName().equals(Modifier.getXMLElementTagName())) {
                 Modifier modifier = new Modifier(in);
-                modifiers.put(modifier.getId(), modifier);
+                setFeature(modifier);
             } else {
                 logger.warning("Unknown tag: " + in.getLocalName() + " loading colony " + name);
             }
@@ -2035,7 +2039,7 @@ public final class Colony extends Settlement implements Abilities, Location, Nam
      */
     public final Modifier getModifier(String id) {
         Modifier result;
-        Modifier modifier = modifiers.get(id);
+        Modifier modifier = (Modifier) features.get(id);
         Modifier playerModifier = owner.getModifier(id);
         if (modifier != null) {
             if (playerModifier != null) {
@@ -2058,21 +2062,26 @@ public final class Colony extends Settlement implements Abilities, Location, Nam
      * @param newModifier a <code>Modifier</code> value
      */
     public final void setModifier(String id, final Modifier newModifier) {
-        modifiers.put(id, newModifier);
+        setFeature(newModifier);
     }
     
+    /*
     public void addModifier(String id, final Modifier newModifier) {
-        if (modifiers.get(id) == null) {
+        if (features.get(id) == null) {
             setModifier(id, newModifier);
         } else {
-            modifiers.get(id).combine(newModifier);
+            features.get(id).combine(newModifier);
         }
     }
+    */
     
     public void removeModifier(String id, final Modifier newModifier) {
-        if (modifiers.get(id) != null) {
-            modifiers.get(id).combine(newModifier.getInverse());
+        if (features.get(id) != null) {
+            //features.get(id).combine(newModifier.getInverse());
         }
+    }
+
+    public void removeFeature(String id, Feature feature) {
     }
 
     /**
@@ -2084,7 +2093,9 @@ public final class Colony extends Settlement implements Abilities, Location, Nam
      */
     public boolean hasAbility(String id) {
         // TODO: search player abilities too
-        return modifiers.containsKey(id) && modifiers.get(id).getBooleanValue();
+        return features.containsKey(id) &&
+            (features.get(id) instanceof Ability) &&
+            ((Ability) features.get(id)).getValue();
     }
 
     /**
@@ -2094,7 +2105,24 @@ public final class Colony extends Settlement implements Abilities, Location, Nam
      * @param newValue a <code>boolean</code> value
      */
     public void setAbility(String id, boolean newValue) {
-        modifiers.put(id, new Modifier(id, newValue));
+        features.put(id, new Ability(id, newValue));
+    }
+
+    public Feature getFeature(String id) {
+        return features.get(id);
+    }
+
+    public void setFeature(Feature feature) {
+        if (feature == null) {
+            return;
+        }
+        Feature oldValue = features.get(feature.getId());
+        if (oldValue instanceof Modifier &&
+            feature instanceof Modifier) {
+            ((Modifier) oldValue).combine((Modifier) feature);
+        } else {
+            features.put(feature.getId(), feature);
+        }
     }
 
     /**
@@ -2103,7 +2131,9 @@ public final class Colony extends Settlement implements Abilities, Location, Nam
      * @param abilities the new abilities
      */
     public void putAbilities(java.util.Map<String, Boolean> abilities) {
-        this.abilities.putAll(abilities);
+        for (Entry<String, Boolean> entry : abilities.entrySet()) {
+            features.put(entry.getKey(), new Ability(entry.getKey(), entry.getValue()));
+        }
     }
     
     public int getDefenseBonus() {

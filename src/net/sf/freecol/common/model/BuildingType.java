@@ -25,8 +25,7 @@ public final class BuildingType extends BuildableType implements Abilities, Modi
     private BuildingType upgradesFrom;
     private BuildingType upgradesTo;
     
-    private HashMap<String, Modifier> modifiers = new HashMap<String, Modifier>();
-  
+    private HashMap<String, Feature> features = new HashMap<String, Feature>();
 
     public BuildingType(int index) {
         setIndex(index);
@@ -108,10 +107,10 @@ public final class BuildingType extends BuildableType implements Abilities, Modi
 
         while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
             String childName = in.getLocalName();
-            if ("ability".equals(childName)) {
+            if (Ability.getXMLElementTagName().equals(childName)) {
                 String abilityId = in.getAttributeValue(null, "id");
                 boolean value = getAttribute(in, "value", true);
-                setModifier(abilityId, new Modifier(abilityId, getID(), value));
+                features.put(abilityId, new Ability(abilityId, getID(), value));
                 in.nextTag(); // close this element
             } else if ("required-population".equals(childName)) {
                 setPopulationRequired(getAttribute(in, "value", 1));
@@ -148,7 +147,9 @@ public final class BuildingType extends BuildableType implements Abilities, Modi
      * @return a <code>boolean</code> value
        */
     public boolean hasAbility(String id) {
-        return modifiers.containsKey(id) && modifiers.get(id).getBooleanValue();
+        return features.containsKey(id) && 
+            (features.get(id) instanceof Ability) &&
+            ((Ability) features.get(id)).getValue();
     }
 
     /**
@@ -158,7 +159,7 @@ public final class BuildingType extends BuildableType implements Abilities, Modi
      * @param newValue a <code>boolean</code> value
      */
     public void setAbility(String id, boolean newValue) {
-        modifiers.put(id, new Modifier(id, newValue));
+        features.put(id, new Ability(id, newValue));
     }
 
     /**
@@ -177,7 +178,7 @@ public final class BuildingType extends BuildableType implements Abilities, Modi
      * @return a <code>Modifier</code> value
      */
     public final Modifier getModifier(String id) {
-        return modifiers.get(id);
+        return (Modifier) features.get(id);
     }
 
     /**
@@ -187,15 +188,15 @@ public final class BuildingType extends BuildableType implements Abilities, Modi
      * @param newModifier a <code>Modifier</code> value
      */
     public final void setModifier(String id, final Modifier newModifier) {
-        modifiers.put(id, newModifier);
+        features.put(id, newModifier);
     }
 
     /**
-     * Returns a copy of this BuildingType's modifiers.
+     * Returns a copy of this BuildingType's features.
      *
      * @return a <code>Map</code> value
      */
-    public Map<String, Modifier> getModifiers() {
-        return new HashMap<String, Modifier>(modifiers);
+    public Map<String, Feature> getFeatures() {
+        return new HashMap<String, Feature>(features);
     }
 }

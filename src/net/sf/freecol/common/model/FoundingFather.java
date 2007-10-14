@@ -46,9 +46,9 @@ public class FoundingFather extends FreeColGameObjectType implements Abilities, 
                             TYPE_COUNT = 5;
 
     /**
-     * Stores the Modifiers of this Type.
+     * Stores the Features of this Type.
      */
-    private HashMap<String, Modifier> modifiers = new HashMap<String, Modifier>();
+    private HashMap<String, Feature> features = new HashMap<String, Feature>();
 
     /**
      * Stores the Events of this Type.
@@ -187,7 +187,9 @@ public class FoundingFather extends FreeColGameObjectType implements Abilities, 
      * @return a <code>boolean</code> value
      */
     public boolean hasAbility(String id) {
-        return modifiers.containsKey(id) && modifiers.get(id).getBooleanValue();
+        return features.containsKey(id) && 
+            (features.get(id) instanceof Ability) &&
+            ((Ability) features.get(id)).getValue();
     }
 
     /**
@@ -197,11 +199,7 @@ public class FoundingFather extends FreeColGameObjectType implements Abilities, 
      * @param newValue a <code>boolean</code> value
      */
     public void setAbility(String id, boolean newValue) {
-        if (modifiers.containsKey(id)) {
-            modifiers.get(id).setBooleanValue(newValue);
-        } else {
-            modifiers.put(id, new Modifier(id, newValue));
-        }
+        features.put(id, new Ability(id, newValue));
     }
 
     /**
@@ -211,7 +209,7 @@ public class FoundingFather extends FreeColGameObjectType implements Abilities, 
      * @return a <code>Modifier</code> value
      */
     public final Modifier getModifier(String id) {
-        return modifiers.get(id);
+        return (Modifier) features.get(id);
     }
 
     /**
@@ -221,21 +219,30 @@ public class FoundingFather extends FreeColGameObjectType implements Abilities, 
      * @param newModifier a <code>Modifier</code> value
      */
     public final void setModifier(String id, final Modifier newModifier) {
-        modifiers.put(id, newModifier);
+        features.put(id, newModifier);
+    }
+
+
+    public void setFeature(Feature feature) {
+        if (feature == null) {
+            return;
+        }
+        Feature oldValue = features.get(feature.getId());
+        if (oldValue instanceof Modifier &&
+            feature instanceof Modifier) {
+            ((Modifier) oldValue).combine((Modifier) feature);
+        } else {
+            features.put(feature.getId(), feature);
+        }
     }
 
     /**
-     * Returns a copy of this FoundingFather's modifiers.
+     * Returns a copy of this FoundingFather's features.
      *
      * @return a <code>Map</code> value
      */
-    public Map<String, Modifier> getModifiers() {
-        return new HashMap<String, Modifier>(modifiers);
-    }
-
-    // TODO: make this unnecessary
-    public Map<String, Boolean> getAbilities() {
-        return null;
+    public Map<String, Feature> getFeatures() {
+        return new HashMap<String, Feature>(features);
     }
 
     /**
@@ -294,14 +301,16 @@ public class FoundingFather extends FreeColGameObjectType implements Abilities, 
         while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
             String childName = in.getLocalName();
             if ("ability".equals(childName)) {
+                Ability ability = new Ability(in);
+                if (ability.getSource() == null) {
+                    ability.setSource(this.getID());
+                }
+                setFeature(ability);
+            } else if (Modifier.getXMLElementTagName().equals(childName)) {
                 Modifier modifier = new Modifier(in);
                 if (modifier.getSource() == null) {
                     modifier.setSource(this.getID());
                 }
-                setModifier(modifier.getId(), modifier);
-                // close this element
-            } else if (Modifier.getXMLElementTagName().equals(childName)) {
-                Modifier modifier = new Modifier(in);
                 setModifier(modifier.getId(), modifier); // close this element
             } else if ("event".equals(childName)) {
                 String eventId = in.getAttributeValue(null, "id");

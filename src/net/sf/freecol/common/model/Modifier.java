@@ -16,7 +16,7 @@ import org.w3c.dom.Element;
  * that can be applied to any action within the game, most obviously
  * combat.
  */
-public final class Modifier extends FreeColObject implements Cloneable {
+public final class Modifier extends Feature implements Cloneable {
 
     public static final String  COPYRIGHT = "Copyright (C) 2003-2007 The FreeCol Team";
     public static final String  LICENSE   = "http://www.gnu.org/licenses/gpl.html";
@@ -27,18 +27,7 @@ public final class Modifier extends FreeColObject implements Cloneable {
     public static final int MULTIPLICATIVE = 1;
     public static final int PERCENTAGE = 2;
     public static final int COMBINED = 3;
-    public static final int BOOLEAN = 4;
     
-    /**
-     * The ID of the Modifier, used to look up name, etc.
-     */
-    private String id;
-
-    /**
-     * The ID of the source of this Modifier, e.g. "model.foundingFather.thomasJefferson"
-     */
-    private String source;
-
     /**
      * The type of this Modifier
      */
@@ -50,20 +39,9 @@ public final class Modifier extends FreeColObject implements Cloneable {
     private float values[] = {0, 1, 0};
 
     /**
-     * The boolean value of this modifier.
-     */
-    private boolean booleanValue;
-
-    /**
      * A list of modifiers that contributed to this one.
      */
     private List<Modifier> modifiers;
-
-    /**
-     * Describe scopes here.
-     */
-    private List<Scope> scopes = new ArrayList<Scope>();
-
 
     // -- Constructors --
 
@@ -121,31 +99,6 @@ public final class Modifier extends FreeColObject implements Cloneable {
         this.values[getType()] = value;
     }
 
-
-    /**
-     * Creates a new <code>Modifier</code> instance.
-     *
-     * @param id a <code>String</code> value
-     * @param value a <code>boolean</code> value
-     */
-    public Modifier(String id, boolean value) {
-        this(id, null, value);
-    }
-
-    /**
-     * Creates a new <code>Modifier</code> instance.
-     *
-     * @param id a <code>String</code> value
-     * @param source a <code>String</code> value
-     * @param value a <code>boolean</code> value
-     */
-    public Modifier(String id, String source, boolean value) {
-        this.id = id;
-        this.source = source;
-        this.booleanValue = value;
-        this.type = BOOLEAN;
-    }
-    
     /**
      * Creates a new <code>Modifier</code> instance.
      *
@@ -174,11 +127,11 @@ public final class Modifier extends FreeColObject implements Cloneable {
         setId(modifier.getId());
         setType(modifier.getType());
         setSource(modifier.getSource());
-        scopes = new ArrayList(modifier.getScopes());
+        setScopes(new ArrayList(modifier.getScopes()));
         if (modifier.getModifiers() != null) {
             modifiers = new ArrayList(modifier.getModifiers());
         }
-        booleanValue = modifier.getBooleanValue();
+        //booleanValue = modifier.getBooleanValue();
         for (int i = 0; i < values.length; i++) {
             values[i] = modifier.values[i];
         }
@@ -204,60 +157,6 @@ public final class Modifier extends FreeColObject implements Cloneable {
         this.modifiers = newModifiers;
     }
 
-    /**
-     * Get the <code>BooleanValue</code> value.
-     *
-     * @return a <code>boolean</code> value
-     */
-    public boolean getBooleanValue() {
-        return booleanValue;
-    }
-
-    /**
-     * Set the <code>BooleanValue</code> value.
-     *
-     * @param newBooleanValue The new BooleanValue value.
-     */
-    public void setBooleanValue(final boolean newBooleanValue) {
-        this.booleanValue = newBooleanValue;
-    }
-
-    /**
-     * Get the <code>Scopes</code> value.
-     *
-     * @return a <code>List<Scope></code> value
-     */
-    public final List<Scope> getScopes() {
-        return scopes;
-    }
-
-    /**
-     * Set the <code>Scopes</code> value.
-     *
-     * @param newScopes The new Scopes value.
-     */
-    public final void setScopes(final List<Scope> newScopes) {
-        this.scopes = newScopes;
-    }
-
-    /**
-     * Get the <code>Source</code> value.
-     *
-     * @return a <code>String</code> value
-     */
-    public final String getSource() {
-        return source;
-    }
-
-    /**
-     * Set the <code>Source</code> value.
-     *
-     * @param newSource The new Source value.
-     */
-    public final void setSource(final String newSource) {
-        this.source = newSource;
-    }
-
 
     /**
      * Describe <code>getTypeFromString</code> method here.
@@ -274,8 +173,6 @@ public final class Modifier extends FreeColObject implements Cloneable {
             return PERCENTAGE;
         } else if ("combined".equals(type)) {
             return COMBINED;
-        } else if ("boolean".equals(type) || type == null) {
-            return BOOLEAN;
         } else {
             throw new IllegalArgumentException("Unknown type");
         }
@@ -296,30 +193,10 @@ public final class Modifier extends FreeColObject implements Cloneable {
             return "percentage";
         case COMBINED:
             return "combined";
-        case BOOLEAN:
-            return "boolean";
         default:
             // It can't happen
             return null;
         }
-    }
-
-    /**
-     * Get the <code>Id</code> value.
-     *
-     * @return a <code>String</code> value
-     */
-    public String getId() {
-        return id;
-    }
-
-    /**
-     * Set the <code>Id</code> value.
-     *
-     * @param newId The new Id value.
-     */
-    public void setId(final String newId) {
-        this.id = newId;
     }
 
     /**
@@ -340,24 +217,12 @@ public final class Modifier extends FreeColObject implements Cloneable {
         this.type = newType;
     }
 
+
     /**
-     * Returns true if the <code>appliesTo</code> method of at least
-     * one <code>Scope</code> object returns true.
+     * Returns the XML tag name for this element.
      *
-     * @param objectType a <code>FreeColGameObjectType</code> value
-     * @return a <code>boolean</code> value
+     * @return a <code>String</code> value
      */
-    public boolean appliesTo(FreeColGameObjectType objectType) {
-        for (Scope scope : scopes) {
-            if (scope.appliesTo(objectType)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-
-
     public static String getXMLElementTagName() {
         return "modifier";
     }
@@ -393,9 +258,6 @@ public final class Modifier extends FreeColObject implements Cloneable {
             for (int i = 0; i < values.length; i++) {
                 newModifier.values[i] = getInverse(i);
             }
-            break;
-        case BOOLEAN:
-            newModifier.booleanValue = !booleanValue;
             break;
         default:
             newModifier.values[getType()] = getInverse(getType());
@@ -458,6 +320,18 @@ public final class Modifier extends FreeColObject implements Cloneable {
             return;
         }
     }
+
+    public static Modifier combine(List<Feature> features) {
+        Modifier result = new Modifier("result", 0, ADDITIVE);
+        result.setModifiers(new ArrayList<Modifier>());
+        for (Feature feature : features) {
+            if (feature instanceof Modifier) {
+                result.combine((Modifier) feature);
+            }
+        }
+        return result;
+    }
+
  
     /**
      * Applies this modifier to a number.
@@ -506,8 +380,6 @@ public final class Modifier extends FreeColObject implements Cloneable {
 
         if (type == COMBINED) {
             values = readFromArrayElement("values", in, new float[0]);
-        } else if (type == BOOLEAN) {
-            setBooleanValue(getAttribute(in, "value", false));
         } else {
             values[getType()] = Float.parseFloat(in.getAttributeValue(null, "value"));
         }
@@ -547,14 +419,12 @@ public final class Modifier extends FreeColObject implements Cloneable {
         out.writeStartElement(getXMLElementTagName());
 
         out.writeAttribute("id", getId());
-        if (source != null) {
-            out.writeAttribute("source", source);
+        if (getSource() != null) {
+            out.writeAttribute("source", getSource());
         }
         out.writeAttribute("type", getTypeAsString());
         if (type == COMBINED) {
             toArrayElement("values", values, out);
-        } else if (type == BOOLEAN) {
-            out.writeAttribute("value", booleanValue ? "true" : "false");
         } else {
             out.writeAttribute("value", Float.toString(values[getType()]));
         }
