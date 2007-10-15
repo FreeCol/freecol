@@ -151,17 +151,10 @@ public final class Ability extends Feature {
     public void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
         // Start element:
         out.writeStartElement(getXMLElementTagName());
-
-        out.writeAttribute("id", getId());
-        if (getSource() != null) {
-            out.writeAttribute("source", getSource());
-        }
         out.writeAttribute("value", String.valueOf(value));
 
-        for (Scope scope : getScopes()) {
-            scope.toXMLImpl(out);
-        }
-
+        super.toXMLImpl(out);
+        
         out.writeEndElement();
     }
 

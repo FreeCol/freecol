@@ -315,7 +315,7 @@ public class FoundingFather extends FreeColGameObjectType implements Abilities, 
 
         while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
             String childName = in.getLocalName();
-            if ("ability".equals(childName)) {
+            if (Ability.getXMLElementTagName().equals(childName)) {
                 Ability ability = new Ability(in);
                 if (ability.getSource() == null) {
                     ability.setSource(this.getID());

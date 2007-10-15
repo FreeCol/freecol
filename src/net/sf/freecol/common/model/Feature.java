@@ -22,13 +22,15 @@ package net.sf.freecol.common.model;
 
 import java.util.ArrayList;
 import java.util.List;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamWriter;
 
 /**
  * The <code>Feature</code> class encapsulates a bonus or penalty
  * that can be applied to any action within the game, most obviously
  * combat.
  */
-public abstract class Feature extends FreeColObject implements Cloneable {
+public abstract class Feature extends FreeColObject {
 
 
     /**
@@ -122,5 +124,25 @@ public abstract class Feature extends FreeColObject implements Cloneable {
         }
         return false;
     }
-
+    
+    /**
+     * This method writes an XML-representation of this object to
+     * the given stream.
+     *
+     * Classes extending this class must write attributes before this method
+     * is called, and must write children after this method is called.
+     *
+     * @param out The target stream.
+     * @throws XMLStreamException if there are any problems writing
+     *      to the stream.
+     */
+    public void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
+        out.writeAttribute("id", id);
+        if (getSource() != null) {
+            out.writeAttribute("source", source);
+        }
+        for (Scope scope : scopes) {
+            scope.toXMLImpl(out);
+        }
+    }
 }

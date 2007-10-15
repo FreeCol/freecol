@@ -1865,6 +1865,7 @@ public final class Colony extends Settlement implements Abilities, Location, Nam
             toArrayElement("lowLevel", lowLevel, out);
             toArrayElement("highLevel", highLevel, out);
             toArrayElement("exportLevel", exportLevel, out);
+            /* Don't write features, they will be added from buildings in readFromXMLImpl
             for (Feature feature : features.values()) {
                 if (feature instanceof Ability) {
                     ((Ability) feature).toXML(out, player);
@@ -1872,6 +1873,7 @@ public final class Colony extends Settlement implements Abilities, Location, Nam
                     ((Modifier) feature).toXML(out, player);
                 }
             }
+             */
             Iterator<WorkLocation> workLocationIterator = workLocations.iterator();
             while (workLocationIterator.hasNext()) {
                 ((FreeColGameObject) workLocationIterator.next()).toXML(out, player, showAll, toSavedGame);
@@ -1951,9 +1953,14 @@ public final class Colony extends Settlement implements Abilities, Location, Nam
                 highLevel = readFromArrayElement("highLevel", in, new int[0]);
             } else if (in.getLocalName().equals("exportLevel")) {
                 exportLevel = readFromArrayElement("exportLevel", in, new int[0]);
+            /* Features are not written, they will be added from buildings
+            } else if (in.getLocalName().equals(Ability.getXMLElementTagName())) {
+                Ability ability = new Ability(in);
+                setFeature(ability);
             } else if (in.getLocalName().equals(Modifier.getXMLElementTagName())) {
                 Modifier modifier = new Modifier(in);
                 setFeature(modifier);
+             */
             } else {
                 logger.warning("Unknown tag: " + in.getLocalName() + " loading colony " + name);
             }

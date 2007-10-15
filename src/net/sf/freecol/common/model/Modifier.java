@@ -36,7 +36,7 @@ import org.w3c.dom.Element;
  * combat. The Modifier may be applicable only to certain Objects
  * specified by means of <code>Scope</code> objects.
  */
-public final class Modifier extends Feature implements Cloneable {
+public final class Modifier extends Feature {
 
     public static final int ADDITIVE = 0;
     public static final int MULTIPLICATIVE = 1;
@@ -425,19 +425,15 @@ public final class Modifier extends Feature implements Cloneable {
     public void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
         // Start element:
         out.writeStartElement(getXMLElementTagName());
-
-        out.writeAttribute("id", getId());
-        if (getSource() != null) {
-            out.writeAttribute("source", getSource());
-        }
         out.writeAttribute("type", getTypeAsString());
-        if (type == COMBINED) {
-            toArrayElement("values", values, out);
-        } else {
+        if (type != COMBINED) {
             out.writeAttribute("value", Float.toString(values[getType()]));
         }
-        for (Scope scope : getScopes()) {
-            scope.toXMLImpl(out);
+
+        super.toXMLImpl(out);
+        
+        if (type == COMBINED) {
+            toArrayElement("values", values, out);
         }
         if (modifiers != null) {
             for (Modifier modifier : getModifiers()) {

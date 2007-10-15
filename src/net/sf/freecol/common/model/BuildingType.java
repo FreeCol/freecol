@@ -124,10 +124,11 @@ public final class BuildingType extends BuildableType implements Abilities, Modi
         while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
             String childName = in.getLocalName();
             if (Ability.getXMLElementTagName().equals(childName)) {
-                String abilityId = in.getAttributeValue(null, "id");
-                boolean value = getAttribute(in, "value", true);
-                features.put(abilityId, new Ability(abilityId, getID(), value));
-                in.nextTag(); // close this element
+                Ability ability = new Ability(in);
+                if (ability.getSource() == null) {
+                    ability.setSource(this.getID());
+                }
+                features.put(ability.getId(), ability); // Ability close the element
             } else if ("required-population".equals(childName)) {
                 setPopulationRequired(getAttribute(in, "value", 1));
                 in.nextTag(); // close this element
