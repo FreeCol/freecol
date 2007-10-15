@@ -1639,7 +1639,7 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener {
                 TileType tileType = colonyTile.getTile().getType();
                 // A colony always produces food.
                 GoodsType primaryGood = colonyTile.getTile().primaryGoods();
-                ImageIcon goodsIcon = parent.getImageProvider().getGoodsImageIcon(primaryGood);
+                ImageIcon goodsIcon = parent.getGUI().getImageLibrary().getGoodsImageIcon(primaryGood);
                 ProductionLabel pl = new ProductionLabel(primaryGood, colonyTile.getProductionOf(primaryGood), parent);
                 pl.setSize(lib.getTerrainImageWidth(tileType), goodsIcon.getIconHeight());
                 add(pl);
@@ -1647,7 +1647,7 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener {
                 // A colony may produce one additional good
                 GoodsType secondaryGood = colonyTile.getTile().secondaryGoods();
                 if (colonyTile.getProductionOf(secondaryGood) != 0) {
-                    goodsIcon = parent.getImageProvider().getGoodsImageIcon(secondaryGood);
+                    goodsIcon = parent.getGUI().getImageLibrary().getGoodsImageIcon(secondaryGood);
                     ProductionLabel sl = new ProductionLabel(secondaryGood, colonyTile.getProductionOf(secondaryGood), parent);
                     sl.setSize(lib.getTerrainImageWidth(tileType), goodsIcon.getIconHeight());
                     add(sl);
