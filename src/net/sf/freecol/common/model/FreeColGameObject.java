@@ -34,7 +34,7 @@ import org.w3c.dom.Element;
 /**
 * The superclass of all game objects in FreeCol.
 */
-abstract public class FreeColGameObject extends PersistentObject {
+abstract public class FreeColGameObject extends FreeColObject {
 
     private static final Logger logger = Logger.getLogger(FreeColGameObject.class.getName());
 
@@ -212,6 +212,17 @@ abstract public class FreeColGameObject extends PersistentObject {
      */
     public void toSavedXML(XMLStreamWriter out) throws XMLStreamException {
         toXML(out, null, true, true);
+    }
+
+    /**
+     * Makes an XML-representation of this object.
+     * 
+     * @param out The output stream.
+     * @throws XMLStreamException if there are any problems writing to the
+     *             stream.
+     */
+    protected void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
+        toXMLImpl(out, null, false, false);
     }
             
     /**
@@ -408,7 +419,7 @@ abstract public class FreeColGameObject extends PersistentObject {
      * @see ModelMessage
      */
     protected void addModelMessage(FreeColGameObject source, String messageID, String[][] data,
-                                   int type, PersistentObject display) {
+                                   int type, FreeColObject display) {
         ModelMessage message = new ModelMessage(source, messageID, data, type, display);
         initializeModelMessage(message);
     }
