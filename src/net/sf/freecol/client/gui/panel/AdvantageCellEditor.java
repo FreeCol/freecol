@@ -26,6 +26,7 @@ import javax.swing.DefaultCellEditor;
 import javax.swing.JComboBox;
 
 import net.sf.freecol.FreeCol;
+import net.sf.freecol.common.model.EuropeanNationType;
 import net.sf.freecol.common.model.NationType;
 import net.sf.freecol.common.model.Player;
 
@@ -40,7 +41,7 @@ public final class AdvantageCellEditor extends DefaultCellEditor {
     * A standard constructor.
     */
     public AdvantageCellEditor() {
-        super(new JComboBox(new Vector(FreeCol.getSpecification().getClassicNationTypes())));
+        super(new JComboBox(new Vector<EuropeanNationType>(FreeCol.getSpecification().getClassicNationTypes())));
     }
     
     public Object getCellEditorValue() {

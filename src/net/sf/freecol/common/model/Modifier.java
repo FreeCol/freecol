@@ -155,9 +155,9 @@ public final class Modifier extends Feature implements Cloneable {
         setId(modifier.getId());
         setType(modifier.getType());
         setSource(modifier.getSource());
-        setScopes(new ArrayList(modifier.getScopes()));
+        setScopes(new ArrayList<Scope>(modifier.getScopes()));
         if (modifier.getModifiers() != null) {
-            modifiers = new ArrayList(modifier.getModifiers());
+            modifiers = new ArrayList<Modifier>(modifier.getModifiers());
         }
         for (int i = 0; i < values.length; i++) {
             values[i] = modifier.values[i];
