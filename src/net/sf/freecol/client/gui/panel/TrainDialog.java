@@ -86,7 +86,7 @@ public final class TrainDialog extends FreeColDialog implements ActionListener {
         this.inGameController = freeColClient.getInGameController();
         setFocusCycleRoot(true);
 
-        ImageLibrary library = (ImageLibrary) parent.getImageProvider();
+        ImageLibrary library = parent.getGUI().getImageLibrary();
 
         List<UnitType> unitTypes = FreeCol.getSpecification().getUnitTypeList();
         for(UnitType unitType : unitTypes) {

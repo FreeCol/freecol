@@ -86,7 +86,7 @@ public final class MapEditorTransformPanel extends FreeColPanel {
         super(new BorderLayout());
         
         this.freeColClient = parent.getClient();
-        this.library = (ImageLibrary) parent.getImageProvider();
+        this.library = parent.getGUI().getImageLibrary();
 
         listPanel = new JPanel(new GridLayout(2, 0));
 

@@ -55,7 +55,7 @@ public class ModelMessage extends FreeColObject {
     public static final int TUTORIAL = 15;
 
     private FreeColGameObject source;
-    private PersistentObject display;
+    private FreeColObject display;
     private int type;
     private String messageID;
     private String[][] data;
@@ -77,7 +77,7 @@ public class ModelMessage extends FreeColObject {
     * @param display The Object to display.
     * @see FreeColGameObject#addModelMessage(FreeColGameObject, String, String[][], int)
     */
-    public ModelMessage(FreeColGameObject source, String messageID, String[][] data, int type, PersistentObject display) {
+    public ModelMessage(FreeColGameObject source, String messageID, String[][] data, int type, FreeColObject display) {
         this.source = source;
         this.messageID = messageID;
         this.data = data;
@@ -147,8 +147,8 @@ public class ModelMessage extends FreeColObject {
      * @param source the source object
      * @return an object to be displayed for the message. 
      */
-    static private PersistentObject getDefaultDisplay(int type, FreeColGameObject source) {
-        PersistentObject newDisplay = null;
+    static private FreeColObject getDefaultDisplay(int type, FreeColGameObject source) {
+        FreeColObject newDisplay = null;
         switch(type) {
         case SONS_OF_LIBERTY:
         case GOVERNMENT_EFFICIENCY:
@@ -284,7 +284,7 @@ public class ModelMessage extends FreeColObject {
      * Gets the Object to display.
      * @return The Object to display.
      */
-    public PersistentObject getDisplay() {
+    public FreeColObject getDisplay() {
         return display;
     }
 

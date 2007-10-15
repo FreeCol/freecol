@@ -112,7 +112,7 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
     public ColopediaPanel(Canvas parent) {
         super(new FlowLayout(FlowLayout.CENTER, 1000, 10));
         this.parent = parent;
-        this.library = (ImageLibrary) parent.getImageProvider();
+        this.library = parent.getGUI().getImageLibrary();
 
         setLayout(new BorderLayout());
 

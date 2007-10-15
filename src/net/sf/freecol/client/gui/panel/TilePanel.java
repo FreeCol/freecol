@@ -106,7 +106,7 @@ public final class TilePanel extends FreeColDialog implements ActionListener {
         JLabel[] labels = new JLabel[number];
         for (int k = 0; k < number; k++) {
             goodsTypes[k] = farmedGoods.get(k);
-            labels[k] = new JLabel(canvas.getImageProvider().getGoodsImageIcon(goodsTypes[k]));
+            labels[k] = new JLabel(canvas.getGUI().getImageLibrary().getGoodsImageIcon(goodsTypes[k]));
             //goodsPanel.add(labels[k]);
         }
 //        fishLabel = new JLabel(canvas.getImageProvider().getGoodsImageIcon((Goods.FISH).getIndex());
@@ -168,7 +168,7 @@ public final class TilePanel extends FreeColDialog implements ActionListener {
         goodsPanel.removeAll();
         List<GoodsType> production = tileType.getPotentialTypeList();
         for (GoodsType goodsType : production) {
-            JLabel label = new JLabel(canvas.getImageProvider().getGoodsImageIcon(goodsType));
+            JLabel label = new JLabel(canvas.getGUI().getImageLibrary().getGoodsImageIcon(goodsType));
             label.setText(String.valueOf(tile.potential(goodsType)));
             goodsPanel.add(label);
         }

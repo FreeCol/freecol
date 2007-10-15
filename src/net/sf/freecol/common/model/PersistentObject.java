@@ -132,6 +132,26 @@ public abstract class PersistentObject {
             throw new IllegalStateException("XMLStreamException");
         }
     }    
+    /**
+     * This method writes an XML-representation of this object to
+     * the given stream.
+     * 
+     * <br><br>
+     * 
+     * Only attributes visible to the given <code>Player</code> will 
+     * be added to that representation if <code>showAll</code> is
+     * set to <code>false</code>.
+     *  
+     * @param player The <code>Player</code> this XML-representation 
+     *      should be made for, or <code>null</code> if
+     *      <code>showAll == true</code>.
+     * @param document The <code>Document</code>.
+     * @return An XML-representation of this object.
+     */    
+    public Element toXMLElement(Document document) {
+        return toXMLElement(null, document, false, false);
+    }
+
 
     /**
      * This method writes an XML-representation of this object to
@@ -155,7 +175,18 @@ public abstract class PersistentObject {
      * @throws XMLStreamException if there are any problems writing
      *      to the stream.
      */    
-    public abstract void toXML(XMLStreamWriter out, Player player, boolean showAll, boolean toSavedGame) throws XMLStreamException;
+    public void toXML(XMLStreamWriter out, Player player, boolean showAll, boolean toSavedGame) throws XMLStreamException {
+        toXMLImpl(out);
+    }
+
+    /**
+     * Makes an XML-representation of this object.
+     * 
+     * @param out The output stream.
+     * @throws XMLStreamException if there are any problems writing to the
+     *             stream.
+     */
+    abstract protected void toXMLImpl(XMLStreamWriter out) throws XMLStreamException;
 
     
     /**

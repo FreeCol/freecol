@@ -77,7 +77,7 @@ public final class EmigrationPanel extends FreeColDialog implements ActionListen
      */
     public void initialize(Europe europe) {
 
-        ImageLibrary library = (ImageLibrary) getCanvas().getImageProvider();
+        ImageLibrary library = getCanvas().getGUI().getImageLibrary();
 
         int[] widths = { 0 };
         int[] heights = { 0, margin, 0, margin, 0, margin, 0 };

@@ -116,7 +116,7 @@ public final class RecruitDialog extends FreeColDialog implements ActionListener
         int recruitPrice = 0;
         Player player = freeColClient.getMyPlayer();
         if ((freeColClient.getGame() != null) && (player != null)) {
-            ImageLibrary library = (ImageLibrary) getCanvas().getImageProvider();
+            ImageLibrary library = getCanvas().getGUI().getImageLibrary();
             recruitPrice = player.getRecruitPrice();
 
             question.setText(Messages.message("recruitDialog.clickOn", "%money%", String.valueOf(recruitPrice)));

@@ -84,7 +84,7 @@ public final class UnitLabel extends JLabel implements ActionListener {
      * @param parent The parent that knows more than we do.
      */
     public UnitLabel(Unit unit, Canvas parent) {
-        ImageProvider lib = parent.getImageProvider();
+        ImageProvider lib = parent.getGUI().getImageLibrary();
         int type = lib.getUnitGraphicsType(unit);
         setIcon(lib.getUnitImageIcon(type));
         setDisabledIcon(lib.getUnitImageIcon(type, true));
@@ -171,33 +171,31 @@ public final class UnitLabel extends JLabel implements ActionListener {
      * @param isSmall The image will be smaller if set to <code>true</code>.
      */
     public void setSmall(boolean isSmall) {
+        int unitIndex = parent.getGUI().getImageLibrary().getUnitGraphicsType(unit);
         if (isSmall) {
             setPreferredSize(null);
-            ImageIcon imageIcon = (parent.getImageProvider().getUnitImageIcon(parent.getImageProvider()
-                    .getUnitGraphicsType(unit)));
+            ImageIcon imageIcon = parent.getGUI().getImageLibrary().getUnitImageIcon(unitIndex);
             // setIcon(new
             // ImageIcon(imageIcon.getImage().getScaledInstance(imageIcon.getIconWidth()
             // / 2, imageIcon.getIconHeight() / 2, Image.SCALE_DEFAULT)));
             setIcon(new ImageIcon(imageIcon.getImage().getScaledInstance((imageIcon.getIconWidth() / 3) * 2,
                     (imageIcon.getIconHeight() / 3) * 2, Image.SCALE_SMOOTH)));
 
-            ImageIcon disabledImageIcon = (parent.getImageProvider().getUnitImageIcon(parent.getImageProvider()
-                    .getUnitGraphicsType(unit), true));
+            ImageIcon disabledImageIcon = parent.getGUI().getImageLibrary().getUnitImageIcon(unitIndex, true);
             setDisabledIcon(new ImageIcon(disabledImageIcon.getImage().getScaledInstance(
                     (imageIcon.getIconWidth() / 3) * 2, (imageIcon.getIconHeight() / 3) * 2, Image.SCALE_SMOOTH)));
             setBorder(BorderFactory.createEmptyBorder(0, 2, 0, 0));
         } else {
             if (unit.getLocation() instanceof ColonyTile) {
                 TileType tileType = ((ColonyTile) unit.getLocation()).getTile().getType();
-                setSize(new Dimension(parent.getImageProvider().getTerrainImageWidth(tileType) / 2, parent
-                        .getImageProvider().getUnitImageHeight(parent.getImageProvider().getUnitGraphicsType(unit))));
+                setSize(new Dimension(parent.getGUI().getImageLibrary().getTerrainImageWidth(tileType) / 2,
+                        parent.getGUI().getImageLibrary().getUnitImageHeight(unitIndex)));
             } else {
                 setPreferredSize(null);
             }
 
-            setIcon(parent.getImageProvider().getUnitImageIcon(parent.getImageProvider().getUnitGraphicsType(unit)));
-            setDisabledIcon(parent.getImageProvider().getUnitImageIcon(
-                    parent.getImageProvider().getUnitGraphicsType(unit), true));
+            setIcon(parent.getGUI().getImageLibrary().getUnitImageIcon(unitIndex));
+            setDisabledIcon(parent.getGUI().getImageLibrary().getUnitImageIcon(unitIndex, true));
             if (unit.getLocation() instanceof ColonyTile) {
                 setBorder(BorderFactory.createEmptyBorder(0, 15, 0, 15));
             } else {
@@ -362,9 +360,9 @@ public final class UnitLabel extends JLabel implements ActionListener {
                         logger.warning("Invalid action");
                     }
                 }
-                setIcon(parent.getImageProvider().getUnitImageIcon(parent.getImageProvider().getUnitGraphicsType(unit)));
-                setDisabledIcon(parent.getImageProvider().getUnitImageIcon(
-                        parent.getImageProvider().getUnitGraphicsType(unit), true));
+                int unitIndex = parent.getGUI().getImageLibrary().getUnitGraphicsType(unit);
+                setIcon(parent.getGUI().getImageLibrary().getUnitImageIcon(unitIndex));
+                setDisabledIcon(parent.getGUI().getImageLibrary().getUnitImageIcon(unitIndex, true));
 
                 Component uc = getParent();
                 while (uc != null) {

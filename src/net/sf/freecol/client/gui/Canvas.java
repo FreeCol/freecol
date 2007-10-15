@@ -668,7 +668,7 @@ public final class Canvas extends JDesktopPane {
      * @return The appropriate ImageIcon.
      */
     public ImageIcon getImageIcon(Object display, boolean small) {
-        ImageLibrary imageLibrary = (ImageLibrary) getImageProvider();
+        ImageLibrary imageLibrary = getGUI().getImageLibrary();
         Image image = null;
         if (display == null) {
             return new ImageIcon();
@@ -2194,17 +2194,6 @@ public final class Canvas extends JDesktopPane {
      */
     public void refreshTile(Position p) {
         refreshTile(p.getX(), p.getY());
-    }
-
-    /**
-     * Returns the image provider that is being used by this canvas.
-     * 
-     * @return The image provider that is being used by this canvas.
-     * @deprecated Use {@see FreeColClient#getImageLibrary} or
-     *      {@see GUI#getImageLibrary}.
-     */
-    public ImageProvider getImageProvider() {
-        return freeColClient.getImageLibrary();
     }
 
     /**

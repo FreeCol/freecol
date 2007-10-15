@@ -77,7 +77,7 @@ public final class PurchaseDialog extends FreeColDialog implements ActionListene
         this.inGameController = freeColClient.getInGameController();
         setFocusCycleRoot(true);
 
-        ImageLibrary library = (ImageLibrary) parent.getImageProvider();
+        ImageLibrary library = parent.getGUI().getImageLibrary();
 
         setLayout(new HIGLayout(new int[] { 0 }, new int[] { 0, margin, 0, margin, 0 }));
 

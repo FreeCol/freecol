@@ -81,7 +81,7 @@ public final class DragListener extends MouseAdapter {
             
             if (comp instanceof UnitLabel) {
                 UnitLabel unitLabel = (UnitLabel) comp;
-                ImageLibrary imageLibrary = (ImageLibrary) unitLabel.getCanvas().getImageProvider();
+                ImageLibrary imageLibrary = unitLabel.getCanvas().getGUI().getImageLibrary();
                 Unit tempUnit = unitLabel.getUnit();
 
                 JPopupMenu menu = new JPopupMenu("Unit");
