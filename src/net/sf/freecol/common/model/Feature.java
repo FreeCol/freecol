@@ -112,6 +112,9 @@ public abstract class Feature extends FreeColObject implements Cloneable {
      * @return a <code>boolean</code> value
      */
     public boolean appliesTo(FreeColGameObjectType objectType) {
+        if (scopes.size() == 0) {
+            return true;
+        }
         for (Scope scope : scopes) {
             if (scope.appliesTo(objectType)) {
                 return true;

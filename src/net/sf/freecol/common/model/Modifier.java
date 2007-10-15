@@ -33,11 +33,10 @@ import org.w3c.dom.Element;
 /**
  * The <code>Modifier</code> class encapsulates a bonus or penalty
  * that can be applied to any action within the game, most obviously
- * combat.
+ * combat. The Modifier may be applicable only to certain Objects
+ * specified by means of <code>Scope</code> objects.
  */
 public final class Modifier extends Feature implements Cloneable {
-
-
 
     public static final int ADDITIVE = 0;
     public static final int MULTIPLICATIVE = 1;
@@ -66,10 +65,12 @@ public final class Modifier extends Feature implements Cloneable {
      * Creates a new <code>Modifier</code> instance.
      *
      * @param id a <code>String</code> value
+     * @param source a <code>String</code> value
      * @param type an <code>int</code> value
      */
-    private Modifier(String id, int type) {
+    private Modifier(String id, String source, int type) {
         setId(id);
+        setSource(source);
         this.type = type;
     }
 
@@ -185,7 +186,7 @@ public final class Modifier extends Feature implements Cloneable {
 
 
     /**
-     * Describe <code>getTypeFromString</code> method here.
+     * Returns the type of Modifier specified by the argument.
      *
      * @param type a <code>String</code> value
      * @return an <code>int</code> value
@@ -205,7 +206,7 @@ public final class Modifier extends Feature implements Cloneable {
     }
     
     /**
-     * Describe <code>getTypeAsString</code> method here.
+     * Returns the type of Modifier as a String.
      *
      * @return a <code>String</code> value
      */
@@ -272,9 +273,11 @@ public final class Modifier extends Feature implements Cloneable {
     }
 
     /**
-     * Combines this modifier with another.
+     * Combines several Modifiers. The resulting Modifier is always
+     * unscoped.
      *
-     * @param otherModifier a <code>Modifier</code> value
+     * @param modifiers some modifiers
+     * @return a <code>Modifier</code> value
      */
     public static Modifier combine(Modifier... modifiers) {
         switch(modifiers.length) {
@@ -284,7 +287,7 @@ public final class Modifier extends Feature implements Cloneable {
             return modifiers[0];
         default:
             String id = modifiers[0].getId();
-            Modifier result = new Modifier(id, modifiers[0].type);
+            Modifier result = new Modifier(id, "result", modifiers[0].type);
             result.modifiers = new ArrayList<Modifier>();
 
             for (Modifier modifier : modifiers) {
@@ -308,14 +311,50 @@ public final class Modifier extends Feature implements Cloneable {
     }
 
     /**
-     * Remove values of other Modifier from this one.
+     * Removes another Modifier from this one and returns the result.
+     * If this Modifier was the combination of two other Modifiers,
+     * then removing one of the original Modifiers will return the
+     * other original Modifier.
      *
-     * @param modifier a <code>Modifier</code> value
+     * @param newModifier a <code>Modifier</code> value
+     * @return a <code>Modifier</code> value
      */
-    public void removeValues(Modifier modifier) {
-        values[ADDITIVE] -= modifier.values[ADDITIVE];
-        values[PERCENTAGE] -= modifier.values[PERCENTAGE];
-        values[MULTIPLICATIVE] /= modifier.values[MULTIPLICATIVE];
+    public Modifier remove(Modifier newModifier) {
+        if (getModifiers() != null && getModifiers().remove(newModifier)) {
+            if (getModifiers().size() == 1) {
+                return getModifiers().get(0);
+            } else {
+                values[ADDITIVE] -= newModifier.values[ADDITIVE];
+                values[PERCENTAGE] -= newModifier.values[PERCENTAGE];
+                values[MULTIPLICATIVE] /= newModifier.values[MULTIPLICATIVE];
+            }
+        }
+        return this;
+    }
+
+    /**
+     * Returns a Modifier applicable to the argument, or null if there
+     * is no such Modifier.
+     *
+     * @param object a <code>FreeColGameObjectType</code> value
+     * @return a <code>Modifier</code> value
+     */
+    public Modifier getApplicableModifier(FreeColGameObjectType object) {
+        if (getModifiers() == null) {
+            if (appliesTo(object)) {
+                return this;
+            } else {
+                return null;
+            }
+        } else {
+            List<Modifier> result = new ArrayList<Modifier>();
+            for (Modifier modifier : getModifiers()) {
+                if (modifier.appliesTo(object)) {
+                    result.add(modifier);
+                }
+            }
+            return combine(result.toArray(new Modifier[0]));
+        }
     }
 
 

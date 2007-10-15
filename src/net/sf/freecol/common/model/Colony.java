@@ -2082,17 +2082,12 @@ public final class Colony extends Settlement implements Abilities, Location, Nam
     
     public void removeModifier(final Modifier newModifier) {
         Modifier oldModifier = getModifier(newModifier.getId());
-        if (newModifier == null || oldModifier == null ||
-            oldModifier.getModifiers() == null ) {
+        if (newModifier == null || oldModifier == null) {
             return;
-        }        
-        boolean removed = oldModifier.getModifiers().remove(newModifier);
-        if (removed) {
-            if (oldModifier.getModifiers().size() == 1) {
-                setFeature(oldModifier.getModifiers().get(0));
-            } else {
-                oldModifier.removeValues(newModifier);
-            }
+        } else if (newModifier == oldModifier) {
+            features.remove(newModifier);
+        } else {
+            setFeature(oldModifier.remove(newModifier));
         }
     }
 
