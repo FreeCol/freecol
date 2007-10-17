@@ -72,7 +72,6 @@ import net.sf.freecol.common.model.Building;
 import net.sf.freecol.common.model.BuildingType;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.ColonyTile;
-import net.sf.freecol.common.model.FoundingFather;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.GoodsType;
@@ -354,6 +353,7 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener {
         return this.parent;
     }
 
+    @Override
     public void requestFocus() {
         exitButton.requestFocus();
     }
@@ -956,6 +956,7 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener {
             this.colonyPanel = colonyPanel;
         }
 
+        @Override
         public String getUIClassID() {
             return "BuildingsPanelUI";
         }
@@ -1151,6 +1152,7 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener {
         }
 
         // TODO: make this an ordinary panel with ProductionLabels
+        @Override
         public void paintComponent(Graphics g) {
             Colony currentColony = getColony();
             if (currentColony == null) {
@@ -1217,6 +1219,7 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener {
             this.colonyPanel = colonyPanel;
         }
 
+        @Override
         public String getUIClassID() {
             return "OutsideColonyPanelUI";
         }
@@ -1283,10 +1286,12 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener {
          * @param comp The component to add to this InPortPanel.
          * @return The component argument.
          */
+        @Override
         public Component add(Component comp) {
             return super.add(comp);
         }
 
+        @Override
         public String getUIClassID() {
             return "InPortPanelUI";
         }
@@ -1308,6 +1313,7 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener {
             this.colonyPanel = colonyPanel;
         }
 
+        @Override
         public String getUIClassID() {
             return "WarehousePanelUI";
         }
@@ -1350,6 +1356,7 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener {
             return c;
         }
 
+        @Override
         public void remove(Component comp) {
             if (comp instanceof GoodsLabel) {
                 // Goods g = ((GoodsLabel)comp).getGoods();
@@ -1396,6 +1403,7 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener {
             this.colonyPanel = colonyPanel;
         }
 
+        @Override
         public String getUIClassID() {
             return "CargoPanelUI";
         }
@@ -1504,6 +1512,7 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener {
             return (getSelectedUnit() != null);
         }
 
+        @Override
         public void remove(Component comp) {
             if (comp instanceof UnitLabel) {
                 Unit unit = ((UnitLabel) comp).getUnit();
@@ -1558,6 +1567,7 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener {
             }
         }
 
+        @Override
         public void paintComponent(Graphics g) {
             GUI colonyTileGUI = parent.getColonyTileGUI();
             ImageLibrary lib = colonyTileGUI.getImageLibrary();
@@ -1776,6 +1786,7 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener {
                 return c;
             }
 
+            @Override
             public void remove(Component comp) {
                 if (comp instanceof UnitLabel) {
                     ((UnitLabel) comp).setSmall(false);
@@ -1788,6 +1799,7 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener {
              * Checks if this <code>JComponent</code> contains the given
              * coordinate.
              */
+            @Override
             public boolean contains(int px, int py) {
                 /**
                  * We are assuming the tile size is 128x64.
@@ -1929,6 +1941,7 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener {
                 return type;
             }
 
+            @Override
             public String toString() {
                 String theText = new String(type.getName() + " (" + 
                                             type.getHammersRequired() + " " +
