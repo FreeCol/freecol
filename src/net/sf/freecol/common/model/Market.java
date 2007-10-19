@@ -53,64 +53,7 @@ public final class Market extends FreeColGameObject implements Ownable {
     private static final int GOODS_STABILIZER = 750;
 
     private final Data[]  dataForGoodType;
-    /*  Depreciated - now in Specification
-        private static final int[] initialAmounts = {
-        10000, // FOOD
-        1500, // SUGAR
-        1500, // TOBACCO
-        1500, // COTTON
-        1500, // FURS
-        3000, // LUMBER
-        2000, // ORE
-        500, // SILVER
-        1000, // HORSES
-        1000, // RUM
-        1000, // CIGARS
-        1000, // CLOTH
-        1000, // COATS
-        1000, // TRADE_GOODS
-        500, // TOOLS
-        500  // MUSKETS
-        };
 
-        private static final int[] priceDifferences = {
-        7, // FOOD
-        2, // SUGAR
-        2, // TOBACCO
-        2, // COTTON
-        2, // FURS
-        5, // LUMBER
-        3, // ORE
-        1, // SILVER
-        1, // HORSES
-        1, // RUM
-        1, // CIGARS
-        1, // CLOTH
-        1, // COATS
-        1, // TRADE_GOODS
-        1, // TOOLS
-        1  // MUSKETS
-        };
-
-        private int[] initialPrices = {
-        1, // FOOD
-        4, // SUGAR
-        4, // TOBACCO
-        4, // COTTON
-        4, // FURS
-        1, // LUMBER
-        4, // ORE
-        16, // SILVER
-        1, // HORSES
-        10, // RUM
-        10, // CIGARS
-        10, // CLOTH
-        10, // COATS
-        1, // TRADE_GOODS
-        1, // TOOLS
-        1  // MUSKETS
-        };
-    */
     private ArrayList<TransactionListener> transactionListeners =
         new ArrayList<TransactionListener>();
     

@@ -33,9 +33,13 @@ import net.sf.freecol.FreeCol;
 import org.w3c.dom.Element;
 
 /**
-* Represents a locatable goods of a specified type and amount.
-*/
-public class Goods extends FreeColObject implements Locatable, Ownable, Named {
+ * Represents locatable goods of a specified type and amount. Use
+ * AbstractGoods to represent abstract or potential goods that need
+ * not be present in any particular location.
+ *
+ * @see AbstractGoods
+ */
+public class Goods extends AbstractGoods implements Locatable, Ownable, Named {
 
 
     private static Logger logger = Logger.getLogger(Goods.class.getName());
@@ -50,8 +54,6 @@ public class Goods extends FreeColObject implements Locatable, Ownable, Named {
 
     private Game game;
     private Location location;
-    private GoodsType type;
-    private int amount;
 
     // ------------------------------------------------------------ constructor
 
@@ -85,19 +87,41 @@ public class Goods extends FreeColObject implements Locatable, Ownable, Named {
 
         this.game = game;
         this.location = location;
-        this.type = type;
-        this.amount = amount;
+        setType(type);
+        setAmount(amount);
     }
 
+    /**
+     * Creates a new <code>Goods</code> instance.
+     *
+     * @param game a <code>Game</code> value
+     * @param location a <code>Location</code> value
+     * @param goodsIndex an <code>int</code> value
+     * @param amount an <code>int</code> value
+     */
     public Goods(Game game, Location location, int goodsIndex, int amount) {
         this(game, location, FreeCol.getSpecification().getGoodsType(goodsIndex), amount);
     }
 
+    /**
+     * Creates a new <code>Goods</code> instance.
+     *
+     * @param game a <code>Game</code> value
+     * @param in a <code>XMLStreamReader</code> value
+     * @exception XMLStreamException if an error occurs
+     */
     public Goods(Game game, XMLStreamReader in) throws XMLStreamException {
         this.game = game;
         readFromXML(in);
+
     }
     
+    /**
+     * Creates a new <code>Goods</code> instance.
+     *
+     * @param game a <code>Game</code> value
+     * @param e an <code>Element</code> value
+     */
     public Goods(Game game, Element e) {
         this.game = game;
         readFromXMLElement(e);
@@ -156,7 +180,7 @@ public class Goods extends FreeColObject implements Locatable, Ownable, Named {
     *         <br>15 Cotton
     */
     public String toString() {
-        return Integer.toString(amount) + " " + getName();
+        return Integer.toString(getAmount()) + " " + getName();
     }
 
     /**
@@ -230,7 +254,7 @@ public class Goods extends FreeColObject implements Locatable, Ownable, Named {
             this.location = location;
         } catch (IllegalStateException e) {
             throw new IllegalStateException("Could not move the goods of type: "
-                    + getType().getName() + " (" + type + ") with amount: " + getAmount() + " from "
+                    + getType().getName() + " with amount: " + getAmount() + " from "
                     + this.location + " to " + location, e);
         }
     }
@@ -252,34 +276,6 @@ public class Goods extends FreeColObject implements Locatable, Ownable, Named {
     public int getTakeSpace() {
         return 1;
     }
-
-    /**
-    * Gets the value <code>amount</code>.
-    * @return The current value of amount.
-    */
-    public int getAmount() {
-        return amount;
-    }
-
-    /**
-    * Sets the value <code>amount</code>.
-    * 
-    * This method does not check this new amount in any way (thus the amount might be negative)
-    * 
-    * @param newAmount The new value for amount.
-    */
-    public void setAmount(int newAmount) {
-        amount = newAmount;
-    }
-
-    /**
-    * Gets the value <code>type</code>. Note that type of goods should NEVER change.
-    * @return The current value of type.
-    */
-    public GoodsType getType() {
-        return type;
-    }
-
 
     /**
     * If the amount of goods is greater than the container can hold,
@@ -377,8 +373,8 @@ public class Goods extends FreeColObject implements Locatable, Ownable, Named {
         // Start element:
         out.writeStartElement(getXMLElementTagName());
 
-        out.writeAttribute("type", type.getName());
-        out.writeAttribute("amount", Integer.toString(amount));
+        out.writeAttribute("type", getID());
+        out.writeAttribute("amount", Integer.toString(getAmount()));
 
         if (location != null) {
             out.writeAttribute("location", location.getID());
@@ -396,8 +392,8 @@ public class Goods extends FreeColObject implements Locatable, Ownable, Named {
      *      during parsing.
      */
     protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {        
-        type = FreeCol.getSpecification().getGoodsType(in.getAttributeValue(null, "type"));
-        amount = Integer.parseInt(in.getAttributeValue(null, "amount"));
+        setType(FreeCol.getSpecification().getGoodsType(in.getAttributeValue(null, "type")));
+        setAmount(Integer.parseInt(in.getAttributeValue(null, "amount")));
 
         final String locationStr = in.getAttributeValue(null, "location");
         if (locationStr != null) {

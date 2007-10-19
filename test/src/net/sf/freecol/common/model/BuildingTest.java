@@ -19,8 +19,16 @@
 
 package net.sf.freecol.common.model;
 
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.StringReader;
+import java.io.StringWriter;
 import java.util.Iterator;
 import java.util.List;
+import javax.xml.stream.XMLOutputFactory;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamReader;
+import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.util.test.FreeColTestCase;
@@ -237,5 +245,27 @@ public class BuildingTest extends FreeColTestCase {
 
     }
 
+    public void testSerialize() {
+
+        Colony colony = getStandardColony(6);
+        List<Unit> units = colony.getUnitList();
+
+        Iterator<Building> buildingIterator = colony.getBuildingIterator();
+        while (buildingIterator.hasNext()) {
+            Building building = buildingIterator.next();
+
+            try {
+                StringWriter sw = new StringWriter();
+                XMLOutputFactory xif = XMLOutputFactory.newInstance();
+                XMLStreamWriter xsw = xif.createXMLStreamWriter(sw);
+                building.toXML(xsw, building.getColony().getOwner(), true, true);
+                xsw.close();
+            } catch (XMLStreamException e) {
+            }
+
+        }
+
+
+    }
 
 }

@@ -35,9 +35,6 @@ import org.w3c.dom.Element;
  */
 public class TradeRoute extends FreeColGameObject implements Cloneable, Ownable {
 
-
-
-
     public static final TradeRoute NO_TRADE_ROUTE = new TradeRoute();
 
     // private static final Logger logger =
@@ -66,19 +63,43 @@ public class TradeRoute extends FreeColGameObject implements Cloneable, Ownable 
      */
     private ArrayList<Stop> stops = new ArrayList<Stop>();
 
+    /**
+     * Creates a new <code>TradeRoute</code> instance.
+     *
+     */
     private TradeRoute() {};
 
+    /**
+     * Creates a new <code>TradeRoute</code> instance.
+     *
+     * @param game a <code>Game</code> value
+     * @param name a <code>String</code> value
+     * @param player a <code>Player</code> value
+     */
     public TradeRoute(Game game, String name, Player player) {
         super(game);
         this.name = name;
         this.owner = player;
     }
 
+    /**
+     * Creates a new <code>TradeRoute</code> instance.
+     *
+     * @param game a <code>Game</code> value
+     * @param in a <code>XMLStreamReader</code> value
+     * @exception XMLStreamException if an error occurs
+     */
     public TradeRoute(Game game, XMLStreamReader in) throws XMLStreamException {
         super(game, in);
         readFromXML(in);
     }
 
+    /**
+     * Creates a new <code>TradeRoute</code> instance.
+     *
+     * @param game a <code>Game</code> value
+     * @param e an <code>Element</code> value
+     */
     public TradeRoute(Game game, Element e) {
         super(game, e);
         readFromXMLElement(e);
