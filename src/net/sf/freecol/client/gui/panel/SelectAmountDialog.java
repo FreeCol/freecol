@@ -26,6 +26,7 @@ import java.util.Vector;
 
 import javax.swing.JButton;
 import javax.swing.JComboBox;
+import javax.swing.JPanel;
 import javax.swing.JTextArea;
 
 import net.sf.freecol.client.FreeColClient;
@@ -50,7 +51,9 @@ public final class SelectAmountDialog extends FreeColDialog implements ActionLis
 
     private static final int SELECT_CANCEL = -1;
 
-    private final JButton cancel;
+    private final JButton cancel, ok;
+
+    private final JPanel buttonPanel;
 
     private final JTextArea question;
 
@@ -94,6 +97,10 @@ public final class SelectAmountDialog extends FreeColDialog implements ActionLis
         comboBox.setEditable(true);
         comboBox.addActionListener(this);
 
+        ok = new JButton(Messages.message("ok"));
+        enterPressesWhenFocused(ok);
+        ok.addActionListener(this);
+
         cancel = new JButton(Messages.message("cancel"));
         enterPressesWhenFocused(cancel);
         cancel.addActionListener(new ActionListener() {
@@ -102,6 +109,10 @@ public final class SelectAmountDialog extends FreeColDialog implements ActionLis
                 }
             });
         setCancelComponent(cancel);
+
+        buttonPanel = new JPanel();
+        buttonPanel.add(ok);
+        buttonPanel.add(cancel);
 
         initialize();
 
@@ -131,7 +142,7 @@ public final class SelectAmountDialog extends FreeColDialog implements ActionLis
         row += 2;
         add(comboBox, higConst.rc(row, column));
         row += 2;
-        add(cancel, higConst.rc(row, column, ""));
+        add(buttonPanel, higConst.rc(row, column));
 
         setSize(getPreferredSize());
 
