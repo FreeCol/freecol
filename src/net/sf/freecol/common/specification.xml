@@ -660,14 +660,14 @@
       <ability id="model.ability.foundColony" value="true"/>
     </unit-type>
     <unit-type id="model.unit.caravel"              offence="0"  defence="2"  movement="12" lineOfSight="1" space="2"
-               hitPoints="6" price="1000" hammers="128" tools="40" pathImage="naval">
+               spaceTaken="24" hitPoints="6" price="1000" hammers="128" tools="40" pathImage="naval">
       <ability id="model.ability.navalUnit" value="true"/>
       <ability id="model.ability.carryGoods" value="true"/>
       <ability id="model.ability.carryUnits" value="true"/>
       <required-ability id="model.ability.buildShips"/>
     </unit-type>
     <unit-type id="model.unit.frigate"              offence="16" defence="16" movement="18" lineOfSight="2" space="4"
-               hitPoints="6" price="5000" hammers="512" tools="200" pathImage="naval">
+               spaceTaken="32" hitPoints="6" price="5000" hammers="512" tools="200" pathImage="naval">
       <ability id="model.ability.navalUnit" value="true"/>
       <ability id="model.ability.carryGoods" value="true"/>
       <ability id="model.ability.carryUnits" value="true"/>
@@ -675,14 +675,14 @@
       <required-ability id="model.ability.buildShips"/>
     </unit-type>
     <unit-type id="model.unit.galleon"              offence="0"  defence="10" movement="18" lineOfSight="2" space="6"
-               hitPoints="6" price="3000" hammers="320" tools="100" pathImage="naval">
+               spaceTaken="64" hitPoints="6" price="3000" hammers="320" tools="100" pathImage="naval">
       <ability id="model.ability.navalUnit" value="true"/>
       <ability id="model.ability.carryGoods" value="true"/>
       <ability id="model.ability.carryUnits" value="true"/>
       <required-ability id="model.ability.buildShips"/>
     </unit-type>
     <unit-type id="model.unit.manOWar"              offence="24" defence="24" movement="18" lineOfSight="2" space="6"
-               hitPoints="6" hammers="1024" tools="300" pathImage="naval">
+               spaceTaken="64" hitPoints="6" hammers="1024" tools="300" pathImage="naval">
       <ability id="model.ability.navalUnit" value="true"/>
       <ability id="model.ability.carryGoods" value="true"/>
       <ability id="model.ability.carryUnits" value="true"/>
@@ -691,14 +691,14 @@
       <required-ability id="model.ability.independence"/>
     </unit-type>
     <unit-type id="model.unit.merchantman"          offence="0"  defence="6" movement="15" lineOfSight="1" space="4"
-               hitPoints="6" price="2000" hammers="192" tools="80" pathImage="naval">
+               spaceTaken="32" hitPoints="6" price="2000" hammers="192" tools="80" pathImage="naval">
       <ability id="model.ability.navalUnit" value="true"/>
       <ability id="model.ability.carryGoods" value="true"/>
       <ability id="model.ability.carryUnits" value="true"/>
       <required-ability id="model.ability.buildShips"/>
     </unit-type>
     <unit-type id="model.unit.privateer"            offence="8"  defence="8" movement="24" lineOfSight="2" space="2"
-               hitPoints="6" price="2000" hammers="256" tools="120" pathImage="naval">
+               spaceTaken="24" hitPoints="6" price="2000" hammers="256" tools="120" pathImage="naval">
       <ability id="model.ability.navalUnit" value="true"/>
       <ability id="model.ability.carryGoods" value="true"/>
       <ability id="model.ability.carryUnits" value="true"/>
@@ -717,7 +717,7 @@
     <unit-type id="model.unit.treasureTrain"        offence="0"  defence="0" movement="3" lineOfSight="1" spaceTaken="6" pathImage="wagon">
       <ability id="model.ability.carryTreasure" value="true"/>
     </unit-type>
-    <unit-type id="model.unit.wagonTrain"           offence="0"  defence="1" movement="6" lineOfSight="1" space="2"
+    <unit-type id="model.unit.wagonTrain"           offence="0"  defence="1" movement="6" lineOfSight="1" spaceTaken="12" space="2"
                hammers="40" tools="0" pathImage="wagon">
       <ability id="model.ability.carryGoods" value="true"/>
     </unit-type>
