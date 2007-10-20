@@ -338,4 +338,47 @@ public class UnitTest extends FreeColTestCase {
 
         assertEquals(colony, map.getTile(6, 9).getSettlement());
     }
+
+    public void testCanAdd() {
+
+        Game game = getStandardGame();
+        Player dutch = game.getPlayer("model.nation.dutch");
+
+        Unit galleon = new Unit(game, null, dutch, spec().getUnitType("model.unit.galleon"),
+                                Unit.ACTIVE, false, false, 0, false);
+        Unit caravel = new Unit(game, null, dutch, spec().getUnitType("model.unit.caravel"),
+                                Unit.ACTIVE, false, false, 0, false);
+        Unit colonist = new Unit(game, null, dutch, spec().getUnitType("model.unit.freeColonist"),
+                                 Unit.ACTIVE, false, false, 0, false);
+        Unit wagonTrain = new Unit(game, null, dutch, spec().getUnitType("model.unit.wagonTrain"),
+                                   Unit.ACTIVE, false, false, 0, false);
+        Unit treasureTrain = new Unit(game, null, dutch, spec().getUnitType("model.unit.treasureTrain"),
+                                      Unit.ACTIVE, false, false, 0, false);
+
+        // tests according to standard rules
+        assertTrue(galleon.canAdd(colonist));
+        assertTrue(galleon.canAdd(treasureTrain));
+
+        assertFalse(galleon.canAdd(wagonTrain));
+        assertFalse(galleon.canAdd(caravel));
+        assertFalse(galleon.canAdd(galleon));
+
+        assertTrue(caravel.canAdd(colonist));
+
+        assertFalse(caravel.canAdd(wagonTrain));
+        assertFalse(caravel.canAdd(treasureTrain));
+        assertFalse(caravel.canAdd(caravel));
+        assertFalse(caravel.canAdd(galleon));
+
+        // tests according to other possible rules
+        wagonTrain.getUnitType().setSpaceTaken(2);
+        caravel.getUnitType().setSpaceTaken(1);
+
+        assertTrue(galleon.canAdd(wagonTrain));
+        assertTrue(caravel.canAdd(wagonTrain));
+        // this may seem strange, but ships do carry smaller boats
+        assertTrue(galleon.canAdd(caravel));
+        assertFalse(caravel.canAdd(caravel));
+
+    }
 }

@@ -1657,7 +1657,9 @@ public class Unit extends FreeColGameObject implements Abilities, Locatable, Loc
      * @return The result.
      */
     public boolean canAdd(Locatable locatable) {
-        if (locatable instanceof Unit && hasAbility("model.ability.carryUnits")) {
+        if (locatable == this) {
+            return false;
+        } else if (locatable instanceof Unit && hasAbility("model.ability.carryUnits")) {
             return getSpaceLeft() >= locatable.getTakeSpace();
         } else if (locatable instanceof Goods && hasAbility("model.ability.carryGoods")) {
             Goods g = (Goods) locatable;
