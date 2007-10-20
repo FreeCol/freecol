@@ -2409,8 +2409,8 @@ public final class InGameController implements NetworkConstants {
         changeStateElement.setAttribute("state", Integer.toString(state));
         client.sendAndWait(changeStateElement);
 
-        if (!freeColClient.getCanvas().isShowingSubPanel()
-                && (unit.getMovesLeft() == 0 || unit.getState() == Unit.SENTRY)) {
+        if (!freeColClient.getCanvas().isShowingSubPanel() &&
+            (unit.getMovesLeft() == 0 || unit.getState() == Unit.SENTRY || unit.getState() == Unit.SKIPPED)) {
             nextActiveUnit();
         } else {
             freeColClient.getCanvas().refresh();

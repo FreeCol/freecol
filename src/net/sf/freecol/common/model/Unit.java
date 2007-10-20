@@ -76,7 +76,7 @@ public class Unit extends FreeColGameObject implements Abilities, Locatable, Loc
     /** A state a Unit can have. */
     public static final int ACTIVE = 0, FORTIFIED = 1, SENTRY = 2, IN_COLONY = 3, /*PLOW = 4, BUILD_ROAD = 5,*/
             IMPROVING = 4,      // All TileImprovements use state of IMPROVING
-            TO_EUROPE = 6, IN_EUROPE = 7, TO_AMERICA = 8, FORTIFYING = 9, NUMBER_OF_STATES = 10;
+        TO_EUROPE = 6, IN_EUROPE = 7, TO_AMERICA = 8, FORTIFYING = 9, SKIPPED = 10, NUMBER_OF_STATES = 11;
 
     /**
      * A move type.
@@ -2775,6 +2775,9 @@ public class Unit extends FreeColGameObject implements Abilities, Locatable, Loc
         case Unit.TO_EUROPE:
             occupationString = "G";
             break;
+        case Unit.SKIPPED:
+            occupationString = "W";
+            break;
         default:
             occupationString = "?";
             logger.warning("Unit has an invalid occpuation: " + getState());
@@ -2859,6 +2862,9 @@ public class Unit extends FreeColGameObject implements Abilities, Locatable, Loc
                 workLeft -= modifier1.getValue();
             }
             movesLeft = 0;
+            break;
+        case SKIPPED:
+            // do nothing
             break;
         default:
             workLeft = -1;
@@ -3010,6 +3016,8 @@ public class Unit extends FreeColGameObject implements Abilities, Locatable, Loc
                     || (getEntryLocation() == getLocation());
         case TO_AMERICA:
             return (location instanceof Europe && isNaval());
+        case SKIPPED:
+            return (movesLeft > 0);
         default:
             logger.warning("Invalid unit state: " + s);
             return false;
