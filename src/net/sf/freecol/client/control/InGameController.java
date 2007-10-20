@@ -3201,31 +3201,6 @@ public final class InGameController implements NetworkConstants {
     }
 
     /**
-     * Skips the active unit by setting it's <code>movesLeft</code> to 0.
-     */
-    public void skipActiveUnit() {
-        if (freeColClient.getGame().getCurrentPlayer() != freeColClient.getMyPlayer()) {
-            freeColClient.getCanvas().showInformationMessage("notYourTurn");
-            return;
-        }
-
-        GUI gui = freeColClient.getGUI();
-
-        Unit unit = gui.getActiveUnit();
-
-        if (unit != null) {
-            Element skipUnit = Message.createNewRootElement("skipUnit");
-            skipUnit.setAttribute("unit", unit.getID());
-
-            unit.skip();
-
-            freeColClient.getClient().sendAndWait(skipUnit);
-        }
-
-        nextActiveUnit();
-    }
-
-    /**
      * Gathers information about opponents.
      */
     public Element getForeignAffairsReport() {

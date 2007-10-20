@@ -294,12 +294,6 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
                 return disbandUnit(connection, element);
             }
         });
-        register("skipUnit", new CurrentPlayerNetworkRequestHandler() {
-            @Override
-            public Element handle(Player player, Connection connection, Element element) {
-                return skipUnit(connection, element);
-            }
-        });
         register("cashInTreasureTrain", new CurrentPlayerNetworkRequestHandler() {
             @Override
             public Element handle(Player player, Connection connection, Element element) {
@@ -2349,27 +2343,6 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
     private Element endTurn(Connection connection, Element element) {
         ServerPlayer player = getFreeColServer().getPlayer(connection);
         getFreeColServer().getInGameController().endTurn(player);
-        return null;
-    }
-
-    /**
-     * Handles a "skipUnit"-message.
-     * 
-     * @param connection The <code>Connection</code> the message was received
-     *            on.
-     * @param element The element containing the request.
-     */
-    private Element skipUnit(Connection connection, Element element) {
-        ServerPlayer player = getFreeColServer().getPlayer(connection);
-        Unit unit = (Unit) getGame().getFreeColGameObject(element.getAttribute("unit"));
-        if (unit == null) {
-            throw new IllegalArgumentException("Could not find 'Unit' with specified ID: "
-                    + element.getAttribute("unit"));
-        }
-        if (unit.getOwner() != player) {
-            throw new IllegalStateException("Not your unit!");
-        }
-        unit.skip();
         return null;
     }
 
