@@ -495,8 +495,11 @@ public class MapGenerator {
         for (Player player : europeanPlayers) {
             logger.fine("generating units for player " + player.getName());
 
-            int y = random.nextInt(height - 20) + 10;
-            int x = width - 1;
+            int x, y;
+            do {
+                x = width - 1;
+                y = random.nextInt(height - 20) + 10;
+            } while (map.getTile(x, y).isLand());
             while (isAShipTooClose(map, y, startingPositions, shipYPositions)) {
                 y = random.nextInt(height - 20) + 10;
             }
