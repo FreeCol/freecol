@@ -138,7 +138,7 @@ public class ColonyTradeItem extends TradeItem {
     public void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
         out.writeStartElement(getXMLElementTagName());
         super.toXML(out);
-        out.writeAttribute("colony", this.colony.getID());
+        out.writeAttribute("colony", this.colony.getId());
         out.writeEndElement();
     }
     

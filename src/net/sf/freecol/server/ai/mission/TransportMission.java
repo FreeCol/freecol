@@ -359,7 +359,7 @@ public class TransportMission extends Mission {
                 // Move back to america:
                 if (carrier.getOwner().getGold() < MINIMUM_GOLD_TO_STAY_IN_EUROPE || transportList.size() > 0) {
                     Element moveToAmericaElement = Message.createNewRootElement("moveToAmerica");
-                    moveToAmericaElement.setAttribute("unit", carrier.getID());
+                    moveToAmericaElement.setAttribute("unit", carrier.getId());
                     try {
                         connection.sendAndWait(moveToAmericaElement);
                     } catch (IOException e) {
@@ -416,7 +416,7 @@ public class TransportMission extends Mission {
                     // carrier.getTile());
                     if (carrier.getMoveType(r) == Unit.MOVE_HIGH_SEAS && moveToEurope) {
                         Element moveToEuropeElement = Message.createNewRootElement("moveToEurope");
-                        moveToEuropeElement.setAttribute("unit", carrier.getID());
+                        moveToEuropeElement.setAttribute("unit", carrier.getId());
                         try {
                             connection.sendAndWait(moveToEuropeElement);
                         } catch (IOException e) {
@@ -434,7 +434,7 @@ public class TransportMission extends Mission {
                 transportListChanged = restockCargoAtDestination(connection);
             } else if (moveToEurope && carrier.canMoveToEurope()) {
                 Element moveToEuropeElement = Message.createNewRootElement("moveToEurope");
-                moveToEuropeElement.setAttribute("unit", carrier.getID());
+                moveToEuropeElement.setAttribute("unit", carrier.getId());
                 try {
                     connection.sendAndWait(moveToEuropeElement);
                 } catch (IOException e) {
@@ -456,7 +456,7 @@ public class TransportMission extends Mission {
      * @param connection The <code>Connection</code> to the server.
      */
     private void buyCargo(Connection connection) {
-        AIPlayer aiPlayer = (AIPlayer) getAIMain().getAIObject(getUnit().getOwner().getID());
+        AIPlayer aiPlayer = (AIPlayer) getAIMain().getAIObject(getUnit().getOwner().getId());
 
         if (!(getUnit().getLocation() instanceof Europe)) {
             throw new IllegalStateException("Carrier not in Europe");
@@ -494,7 +494,7 @@ public class TransportMission extends Mission {
                     && t.getTransportDestination().getTile().getColony() != null
                     && t.getTransportDestination().getTile().getColony().getOwner() == getUnit().getOwner()) {
                 AIColony ac = (AIColony) getAIMain().getAIObject(
-                        t.getTransportDestination().getTile().getColony().getID());
+                        t.getTransportDestination().getTile().getColony().getId());
                 aiColonies.add(ac);
             }
         }
@@ -503,7 +503,7 @@ public class TransportMission extends Mission {
          * Add the colony containing the wish with the highest value to the
          * "aiColonies"-list:
          */
-        Iterator<Wish> highValueWishIterator = ((AIPlayer) getAIMain().getAIObject(getUnit().getOwner().getID()))
+        Iterator<Wish> highValueWishIterator = ((AIPlayer) getAIMain().getAIObject(getUnit().getOwner().getId()))
                 .getWishIterator();
         while (highValueWishIterator.hasNext()) {
             Wish w = highValueWishIterator.next();
@@ -593,13 +593,13 @@ public class TransportMission extends Mission {
      * @return The goods.
      */
     public AIGoods buyGoodsInEurope(Connection connection, GoodsType type, int amount, Location destination) {
-        AIPlayer aiPlayer = (AIPlayer) getAIMain().getAIObject(getUnit().getOwner().getID());
+        AIPlayer aiPlayer = (AIPlayer) getAIMain().getAIObject(getUnit().getOwner().getId());
         Player player = aiPlayer.getPlayer();
         Market market = player.getMarket();
 
         if (player.getGold() >= market.getBidPrice(type, amount)) {
             Element buyGoodsElement = Message.createNewRootElement("buyGoods");
-            buyGoodsElement.setAttribute("carrier", getUnit().getID());
+            buyGoodsElement.setAttribute("carrier", getUnit().getId());
             buyGoodsElement.setAttribute("type", Integer.toString(type.getIndex()));
             buyGoodsElement.setAttribute("amount", Integer.toString(amount));
             try {
@@ -640,7 +640,7 @@ public class TransportMission extends Mission {
      * @return The <code>AIUnit</code>.
      */
     private AIUnit getUnitInEurope(Connection connection, UnitType unitType) {
-        AIPlayer aiPlayer = (AIPlayer) getAIMain().getAIObject(getUnit().getOwner().getID());
+        AIPlayer aiPlayer = (AIPlayer) getAIMain().getAIObject(getUnit().getOwner().getId());
         Player player = aiPlayer.getPlayer();
         Europe europe = player.getEurope();
 
@@ -653,7 +653,7 @@ public class TransportMission extends Mission {
         while (ui.hasNext()) {
             Unit u = ui.next();
             if (unitType == null || unitType == u.getUnitType()) {
-                return (AIUnit) getAIMain().getAIObject(u.getID());
+                return (AIUnit) getAIMain().getAIObject(u.getId());
             }
         }
 
@@ -710,7 +710,7 @@ public class TransportMission extends Mission {
      * @return The <code>AIUnit</code>.
      */
     private AIUnit getCheapestUnitInEurope(Connection connection) {
-        AIPlayer aiPlayer = (AIPlayer) getAIMain().getAIObject(getUnit().getOwner().getID());
+        AIPlayer aiPlayer = (AIPlayer) getAIMain().getAIObject(getUnit().getOwner().getId());
         Player player = aiPlayer.getPlayer();
         Europe europe = player.getEurope();
 
@@ -723,7 +723,7 @@ public class TransportMission extends Mission {
         while (ui.hasNext()) {
             Unit u = ui.next();
             if (!u.isCarrier() && ((AIUnit) getAIMain().getAIObject(u)).getTransport() == null) {
-                return (AIUnit) getAIMain().getAIObject(u.getID());
+                return (AIUnit) getAIMain().getAIObject(u.getId());
             }
         }
 
@@ -926,7 +926,7 @@ public class TransportMission extends Mission {
                             && carrier.getState() != Unit.TO_EUROPE && carrier.getState() != Unit.TO_AMERICA) {
                         if (u.getLocation() instanceof Europe || u.getColony() != null) {
                             Element leaveShipElement = Message.createNewRootElement("leaveShip");
-                            leaveShipElement.setAttribute("unit", u.getID());
+                            leaveShipElement.setAttribute("unit", u.getId());
                             try {
                                 connection.sendAndWait(leaveShipElement);
                             } catch (IOException e) {
@@ -1052,8 +1052,8 @@ public class TransportMission extends Mission {
                 if (u.getTile() == carrier.getTile() && carrier.getState() != Unit.TO_EUROPE
                         && carrier.getState() != Unit.TO_AMERICA) {
                     Element boardShipElement = Message.createNewRootElement("boardShip");
-                    boardShipElement.setAttribute("unit", u.getID());
-                    boardShipElement.setAttribute("carrier", carrier.getID());
+                    boardShipElement.setAttribute("unit", u.getId());
+                    boardShipElement.setAttribute("carrier", carrier.getId());
                     try {
                         connection.sendAndWait(boardShipElement);
                         tli.remove();
@@ -1068,7 +1068,7 @@ public class TransportMission extends Mission {
                         && carrier.getState() != Unit.TO_AMERICA) {
                     if (carrier.getLocation() instanceof Europe) {
                         Element buyGoodsElement = Message.createNewRootElement("buyGoods");
-                        buyGoodsElement.setAttribute("carrier", carrier.getID());
+                        buyGoodsElement.setAttribute("carrier", carrier.getId());
                         buyGoodsElement.setAttribute("type", Integer.toString(ag.getGoods().getType().getIndex()));
                         buyGoodsElement.setAttribute("amount", Integer.toString(ag.getGoods().getAmount()));
                         try {
@@ -1081,7 +1081,7 @@ public class TransportMission extends Mission {
                         ag.setGoods(new Goods(getGame(), carrier, ag.getGoods().getType(), ag.getGoods().getAmount()));
                     } else {
                         Element loadCargoElement = Message.createNewRootElement("loadCargo");
-                        loadCargoElement.setAttribute("carrier", carrier.getID());
+                        loadCargoElement.setAttribute("carrier", carrier.getId());
                         loadCargoElement.appendChild(ag.getGoods().toXMLElement(carrier.getOwner(),
                                 loadCargoElement.getOwnerDocument()));
 
@@ -1153,13 +1153,13 @@ public class TransportMission extends Mission {
     protected void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
         out.writeStartElement(getXMLElementTagName());
 
-        out.writeAttribute("unit", getUnit().getID());
+        out.writeAttribute("unit", getUnit().getId());
 
         Iterator<Transportable> tli = transportList.iterator();
         while (tli.hasNext()) {
             Transportable t = tli.next();
             out.writeStartElement(ELEMENT_TRANSPORTABLE);
-            out.writeAttribute("ID", ((AIObject) t).getID());
+            out.writeAttribute("ID", ((AIObject) t).getId());
             out.writeEndElement();
         }
         out.writeEndElement();

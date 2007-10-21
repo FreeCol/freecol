@@ -227,7 +227,7 @@ public final class TileType extends FreeColGameObjectType implements Modifiers
 
     public void readFromXML(XMLStreamReader in, final Map<String, GoodsType> goodsTypeByRef,
             final Map<String, ResourceType> resourceTypeByRef) throws XMLStreamException {
-        setID(in.getAttributeValue(null, "id"));
+        setId(in.getAttributeValue(null, "id"));
         basicMoveCost = Integer.parseInt(in.getAttributeValue(null, "basic-move-cost"));
         basicWorkTurns = Integer.parseInt(in.getAttributeValue(null, "basic-work-turns"));
         forest = getAttribute(in, "is-forest", false);
@@ -285,7 +285,7 @@ public final class TileType extends FreeColGameObjectType implements Modifiers
         }
         
         if (artBasic == null) {
-            throw new RuntimeException("TileType " + getID() + " has no art defined!");
+            throw new RuntimeException("TileType " + getId() + " has no art defined!");
         }
     }
 

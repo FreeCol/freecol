@@ -150,7 +150,7 @@ public class ImprovementAction extends MapboardAction {
      * @return "ImprovementAction"
      */
     public String getId() {
-        return iaType.getID();
+        return iaType.getId();
     }
 
     /**

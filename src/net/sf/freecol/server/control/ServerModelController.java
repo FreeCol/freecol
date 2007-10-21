@@ -74,7 +74,7 @@ public class ServerModelController implements ModelController {
      * @param taskID The <code>taskID</code> should be a unique identifier.
      *            One method to make a unique <code>taskID</code>: <br>
      *            <br>
-     *            getID() + "methodName:taskDescription" <br>
+     *            getId() + "methodName:taskDescription" <br>
      *            <br>
      *            As long as the "taskDescription" is unique within the method
      *            ("methodName"), you get a unique identifier.
@@ -137,7 +137,7 @@ public class ServerModelController implements ModelController {
      * @param taskID The <code>taskID</code> should be a unique identifier.
      *            One method to make a unique <code>taskID</code>: <br>
      *            <br>
-     *            getID() + "methodName:taskDescription" <br>
+     *            getId() + "methodName:taskDescription" <br>
      *            br> As long as the "taskDescription" is unique within the
      *            method ("methodName"), you get a unique identifier.
      * @param location The <code>Location</code> where the <code>Unit</code>
@@ -156,7 +156,7 @@ public class ServerModelController implements ModelController {
      * @param taskID The <code>taskID</code> should be a unique identifier.
      *            One method to make a unique <code>taskID</code>: <br>
      *            <br>
-     *            getID() + "methodName:taskDescription" <br>
+     *            getId() + "methodName:taskDescription" <br>
      *            br> As long as the "taskDescription" is unique within the
      *            method ("methodName"), you get a unique identifier.
      * @param location The <code>Location</code> where the <code>Unit</code>
@@ -173,7 +173,7 @@ public class ServerModelController implements ModelController {
      */
     public synchronized Unit createUnit(String taskID, Location location, Player owner, UnitType type, boolean secure,
             Connection connection) {
-        String extendedTaskID = taskID + owner.getID()
+        String extendedTaskID = taskID + owner.getId()
                 + Integer.toString(freeColServer.getGame().getTurn().getNumber());
         Unit unit;
         TaskEntry taskEntry;
@@ -226,7 +226,7 @@ public class ServerModelController implements ModelController {
         Game game = freeColServer.getGame();
         ServerPlayer player = (ServerPlayer) unit.getOwner();
         Location entryLocation;
-        String taskID = unit.getID() + Integer.toString(freeColServer.getGame().getTurn().getNumber());
+        String taskID = unit.getId() + Integer.toString(freeColServer.getGame().getTurn().getNumber());
 
         if (taskRegister.containsKey(taskID)) {
             entryLocation = (Location) taskRegister.get(taskID).entry;
@@ -304,8 +304,8 @@ public class ServerModelController implements ModelController {
     public void setStance(Player first, Player second, int stance) {
         Element element = Message.createNewRootElement("setStance");
         element.setAttribute("stance", Integer.toString(stance));
-        element.setAttribute("first", first.getID());
-        element.setAttribute("second", second.getID());
+        element.setAttribute("first", first.getId());
+        element.setAttribute("second", second.getId());
 
         Iterator<Player> enemyPlayerIterator = first.getGame().getPlayerIterator();
         while (enemyPlayerIterator.hasNext()) {

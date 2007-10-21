@@ -115,7 +115,7 @@ public interface Location {
      * @return The ID.
      * @see FreeColGameObject#getID
      */
-    public String getID();
+    public String getId();
 
     /**
      * Gets the <code>GoodsContainer</code> this <code>Location</code> use

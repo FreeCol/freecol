@@ -602,8 +602,8 @@ public class TileItemContainer extends FreeColGameObject {
         // Start element:
         out.writeStartElement(getXMLElementTagName());
 
-        out.writeAttribute("ID", getID());
-        out.writeAttribute("tile", tile.getID());
+        out.writeAttribute("ID", getId());
+        out.writeAttribute("tile", tile.getId());
 
         if (hasResource()) {
             resource.toXML(out, player, showAll, toSavedGame);
@@ -623,7 +623,7 @@ public class TileItemContainer extends FreeColGameObject {
      * @param in The input stream with the XML.
      */
     protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
-        setID(in.getAttributeValue(null, "ID"));
+        setId(in.getAttributeValue(null, "ID"));
 
         tile = (Tile) getGame().getFreeColGameObject(in.getAttributeValue(null, "tile"));
         if (tile == null) {

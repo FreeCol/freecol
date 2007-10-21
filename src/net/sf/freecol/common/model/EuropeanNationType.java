@@ -60,7 +60,7 @@ public class EuropeanNationType extends NationType {
      * @return a <code>String</code> value
      */
     public String getEuropeName() {
-        return Messages.message(getID() + ".europe");
+        return Messages.message(getId() + ".europe");
     }
 
     /**
@@ -69,7 +69,7 @@ public class EuropeanNationType extends NationType {
      * @return a <code>String</code> value
      */
     public String getREFName() {
-        return Messages.message(getID() + ".ref");
+        return Messages.message(getId() + ".ref");
     }
 
     /**
@@ -110,7 +110,7 @@ public class EuropeanNationType extends NationType {
 
     public void readFromXML(XMLStreamReader in, final Map<String, UnitType> unitTypeByRef)
             throws XMLStreamException {
-        setID(in.getAttributeValue(null, "id"));
+        setId(in.getAttributeValue(null, "id"));
         ref = getAttribute(in, "ref", false);
 
         while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
@@ -123,7 +123,7 @@ public class EuropeanNationType extends NationType {
             } else if (Modifier.getXMLElementTagName().equals(childName)) {
                 Modifier modifier = new Modifier(in); // Modifier close the element
                 if (modifier.getSource() == null) {
-                    modifier.setSource(this.getID());
+                    modifier.setSource(this.getId());
                 }
                 setModifier(modifier.getId(), modifier);
             } else if ("unit".equals(childName)) {

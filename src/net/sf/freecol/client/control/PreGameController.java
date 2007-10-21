@@ -118,7 +118,7 @@ public final class PreGameController {
 
         // Inform the server:
         Element nationElement = Message.createNewRootElement("setNation");
-        nationElement.setAttribute("value", nation.getID());
+        nationElement.setAttribute("value", nation.getId());
 
         freeColClient.getClient().sendAndWait(nationElement);
     }
@@ -134,7 +134,7 @@ public final class PreGameController {
 
         // Inform the server:
         Element nationTypeElement = Message.createNewRootElement("setNationType");
-        nationTypeElement.setAttribute("value", nationType.getID());
+        nationTypeElement.setAttribute("value", nationType.getId());
 
         freeColClient.getClient().sendAndWait(nationTypeElement);
     }

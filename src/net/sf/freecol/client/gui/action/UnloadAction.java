@@ -42,7 +42,7 @@ public class UnloadAction extends MapboardAction {
     private static final Logger logger = Logger.getLogger(UnloadAction.class.getName());
 
 
-    public static final String ID = "unloadAction";
+    public static final String id = "unloadAction";
 
     /**
      * Creates this action.
@@ -57,7 +57,7 @@ public class UnloadAction extends MapboardAction {
     * @return "unloadAction"
     */
     public String getId() {
-        return ID;
+        return id;
     }
 
     /**
@@ -91,7 +91,7 @@ public class UnloadAction extends MapboardAction {
             if (!unit.isInEurope() && unit.getColony() == null) {
                 if (getFreeColClient().getCanvas().showConfirmDialog("dumpAllCargo", "yes", "no")) {
                     unloadAllCargo(unit);
-                    MapControls controls = ((MapControlsAction) getFreeColClient().getActionManager().getFreeColAction(MapControlsAction.ID)).getMapControls();
+                    MapControls controls = ((MapControlsAction) getFreeColClient().getActionManager().getFreeColAction(MapControlsAction.id)).getMapControls();
                     if (controls != null) {
                         controls.update();
                     }
@@ -99,7 +99,7 @@ public class UnloadAction extends MapboardAction {
             } else {
                 unloadAllCargo(unit);
                 unloadAllUnits(unit);
-                MapControls controls = ((MapControlsAction) getFreeColClient().getActionManager().getFreeColAction(MapControlsAction.ID)).getMapControls();
+                MapControls controls = ((MapControlsAction) getFreeColClient().getActionManager().getFreeColAction(MapControlsAction.id)).getMapControls();
                 if (controls != null) {
                     controls.update();
                 }

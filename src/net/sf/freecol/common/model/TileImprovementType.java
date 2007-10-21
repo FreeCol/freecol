@@ -70,7 +70,7 @@ public final class TileImprovementType extends FreeColGameObjectType
         return natural;
     }
 
-    // TODO: Why don't we use getID()?
+    // TODO: Why don't we use getId()?
     public String getTypeId() {
         return typeId;
     }
@@ -118,7 +118,7 @@ public final class TileImprovementType extends FreeColGameObjectType
     }
 
     public boolean isWorkerTypeAllowed(UnitType unitType) {
-    	return allowedWorkers.isEmpty() || allowedWorkers.contains(unitType.getID());
+    	return allowedWorkers.isEmpty() || allowedWorkers.contains(unitType.getId());
     }
 
     /**
@@ -273,7 +273,7 @@ public final class TileImprovementType extends FreeColGameObjectType
     public void readFromXML(XMLStreamReader in, final List<TileType> tileTypeList,
            final Map<String, TileType> tileTypeByRef, final Map<String, GoodsType> goodsTypeByRef,
            final Map<String, TileImprovementType> tileImprovementTypeByRef) throws XMLStreamException {
-        setID(in.getAttributeValue(null, "id"));
+        setId(in.getAttributeValue(null, "id"));
         natural = getAttribute(in, "natural", false);
         String s = getAttribute(in, "occupation-string", "I");
         occupationString = s.substring(0, 1);

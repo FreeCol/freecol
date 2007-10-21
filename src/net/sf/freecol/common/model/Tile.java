@@ -1442,11 +1442,11 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
             }
         }
 
-        out.writeAttribute("ID", getID());
+        out.writeAttribute("ID", getId());
         out.writeAttribute("x", Integer.toString(x));
         out.writeAttribute("y", Integer.toString(y));
         if (type != null) {
-            out.writeAttribute("type", getType().getID());
+            out.writeAttribute("type", getType().getId());
         }
 
         boolean lostCity = (pet == null) ? lostCityRumour : pet.hasLostCityRumour();
@@ -1454,14 +1454,14 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
 
         if (owner != null) {
             if (getGame().isClientTrusted() || showAll || player.canSee(this)) {
-                out.writeAttribute("owner", owner.getID());
+                out.writeAttribute("owner", owner.getId());
             } else if (pet != null) {
-                out.writeAttribute("owner", pet.getOwner().getID());
+                out.writeAttribute("owner", pet.getOwner().getId());
             }
         }
 
         if ((getGame().isClientTrusted() || showAll || player.canSee(this)) && (owningSettlement != null)) {
-            out.writeAttribute("owningSettlement", owningSettlement.getID());
+            out.writeAttribute("owningSettlement", owningSettlement.getId());
         }
 
         if (settlement != null) {
@@ -1472,21 +1472,21 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
                     if (!player.canSee(getTile())) {
                         if (pet.getColonyUnitCount() != 0) {
                             out.writeStartElement(Colony.getXMLElementTagName());
-                            out.writeAttribute("ID", getColony().getID());
+                            out.writeAttribute("ID", getColony().getId());
                             out.writeAttribute("name", getColony().getName());
-                            out.writeAttribute("owner", getColony().getOwner().getID());
-                            out.writeAttribute("tile", getID());
+                            out.writeAttribute("owner", getColony().getOwner().getId());
+                            out.writeAttribute("tile", getId());
                             out.writeAttribute("unitCount", Integer.toString(pet.getColonyUnitCount()));
 
                             Building b = getColony().getStockade();
                             out.writeStartElement(Building.getXMLElementTagName());
-                            out.writeAttribute("ID", b.getID());
-                            out.writeAttribute("colony", getColony().getID());
+                            out.writeAttribute("ID", b.getId());
+                            out.writeAttribute("colony", getColony().getId());
                             out.writeAttribute("buildingType", Integer.toString(pet.getColonyStockadeLevel()));
                             out.writeEndElement();
 
                             GoodsContainer emptyGoodsContainer = new GoodsContainer(getGame(), getColony());
-                            emptyGoodsContainer.setFakeID(getColony().getGoodsContainer().getID());
+                            emptyGoodsContainer.setFakeID(getColony().getGoodsContainer().getId());
                             emptyGoodsContainer.toXML(out, player, showAll, toSavedGame);
 
                             out.writeEndElement();
@@ -1498,9 +1498,9 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
                     final IndianSettlement is = (IndianSettlement) getSettlement();
 
                     out.writeStartElement(IndianSettlement.getXMLElementTagName());
-                    out.writeAttribute("ID", getSettlement().getID());
-                    out.writeAttribute("tile", getID());
-                    out.writeAttribute("owner", getSettlement().getOwner().getID());
+                    out.writeAttribute("ID", getSettlement().getId());
+                    out.writeAttribute("tile", getId());
+                    out.writeAttribute("owner", getSettlement().getOwner().getId());
                     out.writeAttribute("tribe", Integer.toString(is.getTribe()));
                     out.writeAttribute("kind", Integer.toString(is.getKind()));
                     out.writeAttribute("isCapital", Boolean.toString(is.isCapital()));
@@ -1508,9 +1508,9 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
                         out.writeAttribute("learnableSkill", Integer.toString(pet.getSkill().getIndex()));
                     }
                     if (pet.getHighlyWantedGoods() != null) {
-                        out.writeAttribute("highlyWantedGoods", pet.getHighlyWantedGoods().getID());
-                        out.writeAttribute("wantedGoods1", pet.getWantedGoods1().getID());
-                        out.writeAttribute("wantedGoods2", pet.getWantedGoods2().getID());
+                        out.writeAttribute("highlyWantedGoods", pet.getHighlyWantedGoods().getId());
+                        out.writeAttribute("wantedGoods1", pet.getWantedGoods1().getId());
+                        out.writeAttribute("wantedGoods2", pet.getWantedGoods2().getId());
                     }
                     out.writeAttribute("hasBeenVisited", Boolean.toString(pet.hasBeenVisited()));
 
@@ -1527,11 +1527,11 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
                     }
 
                     UnitContainer emptyUnitContainer = new UnitContainer(getGame(), getSettlement());
-                    emptyUnitContainer.setFakeID(is.getUnitContainer().getID());
+                    emptyUnitContainer.setFakeID(is.getUnitContainer().getId());
                     emptyUnitContainer.toXML(out, player, showAll, toSavedGame);
 
                     GoodsContainer emptyGoodsContainer = new GoodsContainer(getGame(), is);
-                    emptyGoodsContainer.setFakeID(is.getGoodsContainer().getID());
+                    emptyGoodsContainer.setFakeID(is.getGoodsContainer().getId());
                     emptyGoodsContainer.toXML(out, player, showAll, toSavedGame);
 
                     out.writeEndElement();
@@ -1550,10 +1550,10 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
             tileItemContainer.toXML(out, player, showAll, toSavedGame);
         } else {
             UnitContainer emptyUnitContainer = new UnitContainer(getGame(), this);
-            emptyUnitContainer.setFakeID(unitContainer.getID());
+            emptyUnitContainer.setFakeID(unitContainer.getId());
             emptyUnitContainer.toXML(out, player, showAll, toSavedGame);
             TileItemContainer emptyTileItemContainer = new TileItemContainer(getGame(), this);
-            emptyTileItemContainer.setFakeID(tileItemContainer.getID());
+            emptyTileItemContainer.setFakeID(tileItemContainer.getId());
             emptyTileItemContainer.toXML(out, player, showAll, toSavedGame);
         }
 
@@ -1574,7 +1574,7 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
      * @param in The input stream with the XML.
      */
     protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
-        setID(in.getAttributeValue(null, "ID"));
+        setId(in.getAttributeValue(null, "ID"));
 
         x = Integer.parseInt(in.getAttributeValue(null, "x"));
         y = Integer.parseInt(in.getAttributeValue(null, "y"));
@@ -2110,7 +2110,7 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
                 out.writeAttribute("lostCityRumour", Boolean.toString(lostCityRumour));
             }
             if (Tile.this.getOwner() != owner && owner != null) {
-                out.writeAttribute("owner", owner.getID());
+                out.writeAttribute("owner", owner.getId());
             }
             if (colonyUnitCount != 0) {
                 out.writeAttribute("colonyUnitCount", Integer.toString(colonyUnitCount));

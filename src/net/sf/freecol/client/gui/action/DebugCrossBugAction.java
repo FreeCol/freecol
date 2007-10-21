@@ -37,7 +37,7 @@ public class DebugCrossBugAction extends MapboardAction {
 
 
 
-    public static final String ID = "debugCrossBugAction";
+    public static final String id = "debugCrossBugAction";
 
 
     /**
@@ -64,7 +64,7 @@ public class DebugCrossBugAction extends MapboardAction {
      * @return "debugCrossBugAction"
      */
     public String getId() {
-        return ID;
+        return id;
     }
 
     /**

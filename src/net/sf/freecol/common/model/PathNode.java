@@ -280,7 +280,7 @@ public class PathNode implements Comparable<PathNode> {
         if (!(o instanceof PathNode)) {
             return false;
         } else {
-            return tile.getID().equals(((PathNode) o).getTile().getID()); 
+            return tile.getId().equals(((PathNode) o).getTile().getId()); 
         }
     }
     

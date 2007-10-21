@@ -147,7 +147,7 @@ public class IndianNationType extends NationType {
 
     public void readFromXML(XMLStreamReader in, final Map<String, UnitType> unitTypeByRef)
             throws XMLStreamException {
-        setID(in.getAttributeValue(null, "id"));
+        setId(in.getAttributeValue(null, "id"));
 
         String valueString = in.getAttributeValue(null, "number-of-settlements");
         if ("low".equals(valueString)) {
@@ -195,7 +195,7 @@ public class IndianNationType extends NationType {
             } else if (Modifier.getXMLElementTagName().equals(childName)) {
                 Modifier modifier = new Modifier(in); // Modifier close the element
                 if (modifier.getSource() == null) {
-                    modifier.setSource(this.getID());
+                    modifier.setSource(this.getId());
                 }
                setModifier(modifier.getId(), modifier);
             } else if ("skill".equals(childName)) {

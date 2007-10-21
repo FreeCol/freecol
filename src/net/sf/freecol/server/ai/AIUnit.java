@@ -97,7 +97,7 @@ public class AIUnit extends AIObject implements Transportable {
      * @param unit The unit to make an {@link AIObject} for.
      */
     public AIUnit(AIMain aiMain, Unit unit) {
-        super(aiMain, unit.getID());
+        super(aiMain, unit.getId());
 
         this.unit = unit;
         if (unit == null) {
@@ -336,9 +336,9 @@ public class AIUnit extends AIObject implements Transportable {
      * @return The same ID as the <code>Unit</code> this <code>AIObject</code>
      *         controls.
      */
-    public String getID() {
+    public String getId() {
         if (unit != null) {
-            return unit.getID();
+            return unit.getId();
         } else {
             logger.warning("unit == null");
             return null;
@@ -355,17 +355,17 @@ public class AIUnit extends AIObject implements Transportable {
     protected void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
         out.writeStartElement(getXMLElementTagName());
 
-        out.writeAttribute("ID", getID());
+        out.writeAttribute("ID", getId());
         if (transport != null) {
             if (transport.getUnit() == null) {
                 logger.warning("transport.getUnit() == null");
-            } else if (getAIMain().getAIObject(transport.getID()) == null) {
+            } else if (getAIMain().getAIObject(transport.getId()) == null) {
                 logger.warning("broken reference to transport");
             } else if (transport.getMission() != null && transport.getMission() instanceof TransportMission
                     && !((TransportMission) transport.getMission()).isOnTransportList(this)) {
                 logger.warning("We should not be on the transport list.");
             } else {
-                out.writeAttribute("transport", transport.getUnit().getID());
+                out.writeAttribute("transport", transport.getUnit().getId());
             }
         }
         if (mission != null) {

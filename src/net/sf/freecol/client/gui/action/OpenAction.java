@@ -37,7 +37,7 @@ public class OpenAction extends MapboardAction {
 
 
 
-    public static final String ID = "openAction";
+    public static final String id = "openAction";
 
 
     /**
@@ -65,7 +65,7 @@ public class OpenAction extends MapboardAction {
      * @return "declareIndependenceAction"
      */
     public String getId() {
-        return ID;
+        return id;
     }
 
     /**

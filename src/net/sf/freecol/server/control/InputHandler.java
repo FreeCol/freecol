@@ -274,7 +274,7 @@ public abstract class InputHandler extends FreeColServerHolder implements Messag
         public Element handle(Connection connection, Element element) {
             ServerPlayer player = getFreeColServer().getPlayer(connection);
             if (player != null) {
-                element.setAttribute("sender", player.getID());
+                element.setAttribute("sender", player.getId());
             }
             Server server = getFreeColServer().getServer();
             if (server != null) {

@@ -38,7 +38,7 @@ public class ShowMainAction extends FreeColAction {
 
 
 
-    public static final String ID = "showMainAction";
+    public static final String id = "showMainAction";
 
 
     /**
@@ -63,7 +63,7 @@ public class ShowMainAction extends FreeColAction {
      * @return The <code>String</code>: "showMainAction"
      */
     public String getId() {
-        return ID;
+        return id;
     }
 
     /**

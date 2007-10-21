@@ -51,7 +51,7 @@ public abstract class FreeColObject {
     protected static Logger logger = Logger.getLogger(FreeColObject.class.getName());
 
 
-    public String getID() {
+    public String getId() {
         return null;
     }
 

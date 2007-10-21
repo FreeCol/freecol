@@ -220,7 +220,7 @@ public class ModelMessage extends FreeColObject {
      * Gets the ID of the message to display.   
      * @return The ID. 
      */
-    public String getID() {
+    public String getId() {
         return messageID;
     }
     
@@ -354,7 +354,7 @@ public class ModelMessage extends FreeColObject {
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder("ModelMessage<");
-        sb.append(hashCode() + ", " + source.getID() + ", " + messageID + ", ");
+        sb.append(hashCode() + ", " + source.getId() + ", " + messageID + ", ");
         if (data != null) {
             for (String[] s : data) {
                 sb.append(Arrays.toString(s) + "/");
@@ -371,8 +371,8 @@ public class ModelMessage extends FreeColObject {
 
     public void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
         out.writeStartElement(getXMLElementTagName());
-        out.writeAttribute("source", source.getID());
-        out.writeAttribute("display", display.getID());
+        out.writeAttribute("source", source.getId());
+        out.writeAttribute("display", display.getId());
         out.writeAttribute("type", String.valueOf(type));
         out.writeAttribute("messageID", messageID);
         out.writeAttribute("hasBeenDisplayed", String.valueOf(beenDisplayed));

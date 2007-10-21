@@ -96,26 +96,26 @@ public final class MapControls {
         final ActionManager am = freeColClient.getActionManager();
         
         List<UnitButton> ubList = new ArrayList<UnitButton>();
-        ubList.add(new UnitButton(am.getFreeColAction(WaitAction.ID)));
-        ubList.add(new UnitButton(am.getFreeColAction(SkipUnitAction.ID)));
-        ubList.add(new UnitButton(am.getFreeColAction(SentryAction.ID)));
-        ubList.add(new UnitButton(am.getFreeColAction(FortifyAction.ID)));
+        ubList.add(new UnitButton(am.getFreeColAction(WaitAction.id)));
+        ubList.add(new UnitButton(am.getFreeColAction(SkipUnitAction.id)));
+        ubList.add(new UnitButton(am.getFreeColAction(SentryAction.id)));
+        ubList.add(new UnitButton(am.getFreeColAction(FortifyAction.id)));
         for (ImprovementActionType iaType : FreeCol.getSpecification().getImprovementActionTypeList()) {
-            ubList.add(new UnitButton(am.getFreeColAction(iaType.getID())));
+            ubList.add(new UnitButton(am.getFreeColAction(iaType.getId())));
         }
-        ubList.add(new UnitButton(am.getFreeColAction(BuildColonyAction.ID)));
-        ubList.add(new UnitButton(am.getFreeColAction(DisbandUnitAction.ID)));
+        ubList.add(new UnitButton(am.getFreeColAction(BuildColonyAction.id)));
+        ubList.add(new UnitButton(am.getFreeColAction(DisbandUnitAction.id)));
         unitButton = (ubList.toArray(new UnitButton[0]));
         /*  Depreciated
         unitButton = new UnitButton[] {
-            new UnitButton(am.getFreeColAction(WaitAction.ID)),
-            new UnitButton(am.getFreeColAction(SkipUnitAction.ID)),
-            new UnitButton(am.getFreeColAction(SentryAction.ID)),
-            new UnitButton(am.getFreeColAction(FortifyAction.ID)),
-            new UnitButton(am.getFreeColAction(PlowAction.ID)),
-            new UnitButton(am.getFreeColAction(BuildRoadAction.ID)),
-            new UnitButton(am.getFreeColAction(BuildColonyAction.ID)),
-            new UnitButton(am.getFreeColAction(DisbandUnitAction.ID))
+            new UnitButton(am.getFreeColAction(WaitAction.id)),
+            new UnitButton(am.getFreeColAction(SkipUnitAction.id)),
+            new UnitButton(am.getFreeColAction(SentryAction.id)),
+            new UnitButton(am.getFreeColAction(FortifyAction.id)),
+            new UnitButton(am.getFreeColAction(PlowAction.id)),
+            new UnitButton(am.getFreeColAction(BuildRoadAction.id)),
+            new UnitButton(am.getFreeColAction(BuildColonyAction.id)),
+            new UnitButton(am.getFreeColAction(DisbandUnitAction.id))
         };
         */
         

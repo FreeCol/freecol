@@ -38,7 +38,7 @@ public class ReportTurnAction extends MapboardAction {
     private static final Logger logger = Logger.getLogger(ReportTurnAction.class.getName());
 
 
-    public static final String ID = "reportTurnAction";
+    public static final String id = "reportTurnAction";
     
     /**
      * Creates this action.
@@ -63,7 +63,7 @@ public class ReportTurnAction extends MapboardAction {
      * @return "reportTurnAction"
      */
     public String getId() {
-        return ID;
+        return id;
     }
 
     /**

@@ -44,8 +44,8 @@ public class BuildableType extends FreeColGameObjectType {
     
     public BuildableType() {}
 
-    private BuildableType(String ID) {
-        setID(ID);
+    private BuildableType(String id) {
+        setId(id);
     }
 
     /**

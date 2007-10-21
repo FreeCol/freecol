@@ -576,13 +576,13 @@ public final class ImageLibrary extends ImageProvider {
         
         for (TileType type : FreeCol.getSpecification().getTileTypeList()) {
             String filePath = dataDirectory + path + type.getArtBasic() + tileName;
-            terrain1.put(type.getID(), findImage(filePath + "0" + extension, resourceLocator, doLookup));
-            terrain2.put(type.getID(), findImage(filePath + "1" + extension, resourceLocator, doLookup));
+            terrain1.put(type.getId(), findImage(filePath + "0" + extension, resourceLocator, doLookup));
+            terrain2.put(type.getId(), findImage(filePath + "1" + extension, resourceLocator, doLookup));
 
             if (type.getArtOverlay() != null) {
                 filePath = dataDirectory + path + type.getArtOverlay();
-                overlay1.put(type.getID(), findImage(filePath + "0" + extension, resourceLocator, doLookup));
-                overlay2.put(type.getID(), findImage(filePath + "1" + extension, resourceLocator, doLookup));
+                overlay1.put(type.getId(), findImage(filePath + "0" + extension, resourceLocator, doLookup));
+                overlay2.put(type.getId(), findImage(filePath + "1" + extension, resourceLocator, doLookup));
             }
             
             Vector<ImageIcon> tempVector1 = new Vector<ImageIcon>();
@@ -593,8 +593,8 @@ public final class ImageLibrary extends ImageProvider {
                 tempVector2.add(findImage(filePath + "1" + extension, resourceLocator, doLookup));
             }
 
-            border1.put(type.getID(), tempVector1);
-            border2.put(type.getID(), tempVector2);
+            border1.put(type.getId(), tempVector1);
+            border2.put(type.getId(), tempVector2);
             
             if (type.getArtCoast() != null) {
                 tempVector1 = new Vector<ImageIcon>();
@@ -605,8 +605,8 @@ public final class ImageLibrary extends ImageProvider {
                     tempVector2.add(findImage(filePath + "1" + extension, resourceLocator, doLookup));
                 }
                 
-                coast1.put(type.getID(), tempVector1);
-                coast2.put(type.getID(), tempVector2);
+                coast1.put(type.getId(), tempVector1);
+                coast2.put(type.getId(), tempVector2);
             }
         }
         
@@ -669,7 +669,7 @@ public final class ImageLibrary extends ImageProvider {
         for (TileType type : FreeCol.getSpecification().getTileTypeList()) {
             if (type.getArtForest() != null) {
                 String filePath = dataDirectory + path + type.getArtForest();
-                forests.put(type.getID(), findImage(filePath, resourceLocator, doLookup));
+                forests.put(type.getId(), findImage(filePath, resourceLocator, doLookup));
             }
         }
         /*forests = new Vector<ImageIcon>(FOREST_COUNT);
@@ -815,7 +815,7 @@ public final class ImageLibrary extends ImageProvider {
         
         for (GoodsType type : FreeCol.getSpecification().getGoodsTypeList()) {
             String filePath = dataDirectory + path + type.getArt();
-            goods.put(type.getID(), findImage(filePath, resourceLocator, doLookup));
+            goods.put(type.getId(), findImage(filePath, resourceLocator, doLookup));
         }
         /*for (int i = 0; i < GOODS_COUNT; i++) {
             String filePath = dataDirectory + path + goodsDirectory + goodsName + i + extension;
@@ -853,7 +853,7 @@ public final class ImageLibrary extends ImageProvider {
         
         for (ResourceType type : FreeCol.getSpecification().getResourceTypeList()) {
             String filePath = dataDirectory + path + type.getArt();
-            bonus.put(type.getID(), findImage(filePath, resourceLocator, doLookup));
+            bonus.put(type.getId(), findImage(filePath, resourceLocator, doLookup));
         }
         /*for (int i = 0; i < BONUS_COUNT; i++) {
             String filePath = dataDirectory + path + bonusDirectory + bonusName + i + extension;
@@ -1039,7 +1039,7 @@ public final class ImageLibrary extends ImageProvider {
      * @return The bonus-ImageIcon at the given index.
      */
     public ImageIcon getBonusImageIcon(ResourceType type) {
-        return bonus.get(type.getID());
+        return bonus.get(type.getId());
     }
 
     /**
@@ -1205,9 +1205,9 @@ public final class ImageLibrary extends ImageProvider {
      */
     public Image getOverlayImage(TileType type, int x, int y) {
         if ((x + y) % 2 == 0) {
-            return overlay1.get(type.getID()).getImage();
+            return overlay1.get(type.getId()).getImage();
         } else {
-            return overlay2.get(type.getID()).getImage();
+            return overlay2.get(type.getId()).getImage();
         }
     }
 
@@ -1224,7 +1224,7 @@ public final class ImageLibrary extends ImageProvider {
     public Image getTerrainImage(TileType type, int x, int y) {
         String key;
         if (type != null) {
-            key = type.getID();
+            key = type.getId();
         } else {
             key = unexploredName;
         }
@@ -1256,7 +1256,7 @@ public final class ImageLibrary extends ImageProvider {
         
         String key;
         if (type != null) {
-            key = type.getID();
+            key = type.getId();
         } else {
             key = unexploredName;
         }
@@ -1289,7 +1289,7 @@ public final class ImageLibrary extends ImageProvider {
         
         String key;
         if (type != null) {
-            key = type.getID();
+            key = type.getId();
         } else {
             key = unexploredName;
         }
@@ -1318,7 +1318,7 @@ public final class ImageLibrary extends ImageProvider {
      * @return The image at the given index.
      */
     public Image getForestImage(TileType type) {
-        return forests.get(type.getID()).getImage();
+        return forests.get(type.getId()).getImage();
     }
 
     /**
@@ -1379,7 +1379,7 @@ public final class ImageLibrary extends ImageProvider {
      * @return The goods-image at the given index.
      */
     public ImageIcon getGoodsImageIcon(GoodsType g) {
-        return goods.get(g.getID());
+        return goods.get(g.getId());
     }
 
     /**
@@ -1487,7 +1487,7 @@ public final class ImageLibrary extends ImageProvider {
      * @return The width of the terrain-image at the given index.
      */
     public int getTerrainImageWidth(TileType type) {
-        return terrain1.get(type.getID()).getIconWidth();
+        return terrain1.get(type.getId()).getIconWidth();
     }
 
     /**
@@ -1497,7 +1497,7 @@ public final class ImageLibrary extends ImageProvider {
      * @return The height of the terrain-image at the given index.
      */
     public int getTerrainImageHeight(TileType type) {
-        return terrain1.get(type.getID()).getIconHeight();
+        return terrain1.get(type.getId()).getIconHeight();
     }
 
     /**

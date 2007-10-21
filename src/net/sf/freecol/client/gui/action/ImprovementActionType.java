@@ -77,7 +77,7 @@ public final class ImprovementActionType extends FreeColGameObjectType
 
     public void readFromXML(XMLStreamReader in, final Map<String, TileImprovementType> tileImprovementTypeByRef)
            throws XMLStreamException {
-        setID(in.getAttributeValue(null, "id"));
+        setId(in.getAttributeValue(null, "id"));
         accelerator = in.getAttributeValue(null, "accelerator").charAt(0);
 
         while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {

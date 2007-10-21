@@ -225,7 +225,7 @@ public class DebugMenu extends JMenu {
                         Colony c = ci.next();
                         c.addBells(100);
 
-                        Colony sc = (Colony) freeColClient.getFreeColServer().getGame().getFreeColGameObject(c.getID());
+                        Colony sc = (Colony) freeColClient.getFreeColServer().getGame().getFreeColGameObject(c.getId());
                         sc.addBells(100);
                     }
                 }
@@ -245,7 +245,7 @@ public class DebugMenu extends JMenu {
                 if (freeColClient.getFreeColServer() != null) {
                     net.sf.freecol.server.ai.AIMain aiMain = freeColClient.getFreeColServer().getAIMain();
                     net.sf.freecol.server.ai.AIPlayer ap = (net.sf.freecol.server.ai.AIPlayer) aiMain
-                            .getAIObject(freeColClient.getMyPlayer().getID());
+                            .getAIObject(freeColClient.getMyPlayer().getId());
                     ap.setDebuggingConnection(freeColClient.getClient().getConnection());
                     ap.startWorking();
                     freeColClient.getConnectController().reconnect();
@@ -266,7 +266,7 @@ public class DebugMenu extends JMenu {
                 boolean problemDetected = false;
                 Map serverMap = freeColClient.getFreeColServer().getGame().getMap();
                 Player myServerPlayer = (Player) freeColClient.getFreeColServer().getGame().getFreeColGameObject(
-                        freeColClient.getMyPlayer().getID());
+                        freeColClient.getMyPlayer().getId());
 
                 Iterator<Position> it = serverMap.getWholeMapIterator();
                 while (it.hasNext()) {
@@ -276,29 +276,29 @@ public class DebugMenu extends JMenu {
                         while (unitIterator.hasNext()) {
                             Unit u = unitIterator.next();
                             if (u.isVisibleTo(myServerPlayer)) {
-                                if (freeColClient.getGame().getFreeColGameObject(u.getID()) == null) {
+                                if (freeColClient.getGame().getFreeColGameObject(u.getId()) == null) {
                                     System.out.println("Unsynchronization detected: Unit missing on client-side");
-                                    System.out.println(u.getName() + "(" + u.getID() + "). Position: "
+                                    System.out.println(u.getName() + "(" + u.getId() + "). Position: "
                                             + u.getTile().getPosition());
                                     try {
                                         System.out.println("Possible unit on client-side: "
                                                 + freeColClient.getGame().getMap().getTile(u.getTile().getPosition())
-                                                        .getFirstUnit().getID());
+                                                        .getFirstUnit().getId());
                                     } catch (NullPointerException npe) {
                                     }
                                     System.out.println();
                                     problemDetected = true;
                                 } else {
                                     Unit clientSideUnit = (Unit) freeColClient.getGame()
-                                            .getFreeColGameObject(u.getID());
+                                            .getFreeColGameObject(u.getId());
                                     if (clientSideUnit.getTile() != null
-                                            && !clientSideUnit.getTile().getID().equals(u.getTile().getID())) {
+                                            && !clientSideUnit.getTile().getId().equals(u.getTile().getId())) {
                                         System.out
                                                 .println("Unsynchronization detected: Unit located on different tiles");
-                                        System.out.println("Server: " + u.getName() + "(" + u.getID() + "). Position: "
+                                        System.out.println("Server: " + u.getName() + "(" + u.getId() + "). Position: "
                                                 + u.getTile().getPosition());
                                         System.out.println("Client: " + clientSideUnit.getName() + "("
-                                                + clientSideUnit.getID() + "). Position: "
+                                                + clientSideUnit.getId() + "). Position: "
                                                 + clientSideUnit.getTile().getPosition());
                                         System.out.println();
                                         problemDetected = true;

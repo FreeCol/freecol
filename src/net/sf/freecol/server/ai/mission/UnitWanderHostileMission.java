@@ -114,7 +114,7 @@ public class UnitWanderHostileMission extends Mission {
             int direction = moveTowards(connection, pathToTarget);
             if (direction >= 0 && unit.getMoveType(direction) == Unit.ATTACK) {
                 Element element = Message.createNewRootElement("attack");
-                element.setAttribute("unit", unit.getID());
+                element.setAttribute("unit", unit.getId());
                 element.setAttribute("direction", Integer.toString(direction));
 
                 try {
@@ -142,7 +142,7 @@ public class UnitWanderHostileMission extends Mission {
             thisTile = map.getNeighbourOrNull(direction, thisTile);
 
             Element element = Message.createNewRootElement("move");
-            element.setAttribute("unit", unit.getID());
+            element.setAttribute("unit", unit.getId());
             element.setAttribute("direction", Integer.toString(direction));
 
             try {
@@ -164,7 +164,7 @@ public class UnitWanderHostileMission extends Mission {
     protected void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
         out.writeStartElement(getXMLElementTagName());
         
-        out.writeAttribute("unit", getUnit().getID());
+        out.writeAttribute("unit", getUnit().getId());
 
         out.writeEndElement();
     }

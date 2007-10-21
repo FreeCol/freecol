@@ -260,7 +260,7 @@ public class TradeRoute extends FreeColGameObject implements Cloneable, Ownable 
 
 
         public Stop(Location location) {
-            this.locationId = location.getID();
+            this.locationId = location.getId();
         }
 
         /**
@@ -361,9 +361,9 @@ public class TradeRoute extends FreeColGameObject implements Cloneable, Ownable 
         // Start element:
         out.writeStartElement(getXMLElementTagName());
 
-        out.writeAttribute("ID", getID());
+        out.writeAttribute("ID", getId());
         out.writeAttribute("name", getName());
-        out.writeAttribute("owner", getOwner().getID());
+        out.writeAttribute("owner", getOwner().getId());
         for (Stop stop : stops) {
             stop.toXMLImpl(out);
         }
@@ -377,7 +377,7 @@ public class TradeRoute extends FreeColGameObject implements Cloneable, Ownable 
      * @param in The input stream with the XML.
      */
     protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
-        setID(in.getAttributeValue(null, "ID"));
+        setId(in.getAttributeValue(null, "ID"));
         setName(in.getAttributeValue(null, "name"));
         String ownerID = in.getAttributeValue(null, "owner");
         

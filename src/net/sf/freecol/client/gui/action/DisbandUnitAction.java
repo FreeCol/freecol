@@ -37,7 +37,7 @@ public class DisbandUnitAction extends MapboardAction {
 
 
 
-    public static final String ID = "disbandUnitAction";
+    public static final String id = "disbandUnitAction";
 
 
     /**
@@ -72,7 +72,7 @@ public class DisbandUnitAction extends MapboardAction {
      * @return "disbandUnitAction"
      */
     public String getId() {
-        return ID;
+        return id;
     }
 
     /**

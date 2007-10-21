@@ -29,7 +29,7 @@ public abstract class FreeColGameObjectType extends FreeColObject {
     private String id;
     private int index;
 
-    protected final void setID(final String id) {
+    protected final void setId(final String id) {
         this.id = id;
     }
 
@@ -37,7 +37,7 @@ public abstract class FreeColGameObjectType extends FreeColObject {
         this.index = index;
     }
 
-    public final String getID() {
+    public final String getId() {
         return id;
     }
 

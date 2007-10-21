@@ -38,7 +38,7 @@ public class AssignTradeRouteAction extends MapboardAction {
 
 
 
-    public static final String ID = "assignTradeRouteAction";
+    public static final String id = "assignTradeRouteAction";
 
 
     /**
@@ -56,7 +56,7 @@ public class AssignTradeRouteAction extends MapboardAction {
      * @return "assignTradeRouteAction"
      */
     public String getId() {
-        return ID;
+        return id;
     }
 
     /**

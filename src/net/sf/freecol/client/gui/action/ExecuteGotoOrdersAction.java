@@ -36,7 +36,7 @@ public class ExecuteGotoOrdersAction extends MapboardAction {
 
 
 
-    public static final String ID = "executeGotoOrdersAction";
+    public static final String id = "executeGotoOrdersAction";
 
 
     /**
@@ -54,7 +54,7 @@ public class ExecuteGotoOrdersAction extends MapboardAction {
      * @return "waitAction"
      */
     public String getId() {
-        return ID;
+        return id;
     }
 
     /**

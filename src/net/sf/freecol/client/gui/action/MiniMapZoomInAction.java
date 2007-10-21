@@ -39,7 +39,7 @@ public class MiniMapZoomInAction extends MapboardAction {
     private static final Logger logger = Logger.getLogger(MiniMapZoomInAction.class.getName());
 
 
-    public static final String ID = "miniMapZoomInAction";
+    public static final String id = "miniMapZoomInAction";
 
 
     /**
@@ -60,7 +60,7 @@ public class MiniMapZoomInAction extends MapboardAction {
     * @return "miniMapZoomInAction"
     */
     public String getId() {
-        return ID;
+        return id;
     }
     
 
@@ -70,7 +70,7 @@ public class MiniMapZoomInAction extends MapboardAction {
      * @return <code>true</code> if the minimap can be zoomed in.
      */
     protected boolean shouldBeEnabled() {
-        MapControlsAction mca = (MapControlsAction) getFreeColClient().getActionManager().getFreeColAction(MapControlsAction.ID);
+        MapControlsAction mca = (MapControlsAction) getFreeColClient().getActionManager().getFreeColAction(MapControlsAction.id);
         return super.shouldBeEnabled()
                 && mca.getMapControls() != null
                 && mca.getMapControls().canZoomIn();
@@ -81,9 +81,9 @@ public class MiniMapZoomInAction extends MapboardAction {
      * @param e The <code>ActionEvent</code>.
      */    
     public void actionPerformed(ActionEvent e) {
-        MapControlsAction mca = (MapControlsAction) getFreeColClient().getActionManager().getFreeColAction(MapControlsAction.ID);
+        MapControlsAction mca = (MapControlsAction) getFreeColClient().getActionManager().getFreeColAction(MapControlsAction.id);
         mca.getMapControls().zoomIn();
         update();
-        getFreeColClient().getActionManager().getFreeColAction(MiniMapZoomOutAction.ID).update();
+        getFreeColClient().getActionManager().getFreeColAction(MiniMapZoomOutAction.id).update();
     }
 }

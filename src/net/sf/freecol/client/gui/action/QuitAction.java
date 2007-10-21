@@ -38,7 +38,7 @@ public class QuitAction extends MapboardAction {
 
 
 
-    public static final String ID = "quitAction";
+    public static final String id = "quitAction";
 
 
     /**
@@ -64,7 +64,7 @@ public class QuitAction extends MapboardAction {
      * @return "waitAction"
      */
     public String getId() {
-        return ID;
+        return id;
     }
 
     /**

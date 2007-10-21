@@ -1128,7 +1128,7 @@ public final class Building extends FreeColGameObject implements Abilities, Work
         Player player = colony.getOwner();
 
         float goodsOutput = productivity;
-        Modifier modifier = colony.getModifier(goodsOutputType.getID());
+        Modifier modifier = colony.getModifier(goodsOutputType.getId());
         if (modifier != null) {
             goodsOutput = modifier.applyTo(productivity);
         }
@@ -1185,8 +1185,8 @@ public final class Building extends FreeColGameObject implements Abilities, Work
         out.writeStartElement(getXMLElementTagName());
 
         // Add attributes:
-        out.writeAttribute("ID", getID());
-        out.writeAttribute("colony", colony.getID());
+        out.writeAttribute("ID", getId());
+        out.writeAttribute("colony", colony.getId());
         out.writeAttribute("buildingType", Integer.toString(buildingType.getIndex()));
 
         // Add child elements:
@@ -1207,7 +1207,7 @@ public final class Building extends FreeColGameObject implements Abilities, Work
      */
     @Override
     protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
-        setID(in.getAttributeValue(null, "ID"));
+        setId(in.getAttributeValue(null, "ID"));
 
         colony = (Colony) getGame().getFreeColGameObject(in.getAttributeValue(null, "colony"));
         if (colony == null) {

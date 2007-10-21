@@ -62,10 +62,10 @@ abstract public class FreeColGameObject extends FreeColObject {
             //game.setFreeColGameObject(id, this);            
             String nextID = getRealXMLElementTagName() + ":" + game.getNextID();
             if (nextID != null) {
-                setID(nextID);
+                setId(nextID);
             }
         } else if (this instanceof Game) {
-            setID("0");
+            setId("0");
         } else {
             logger.warning("Created 'FreeColGameObject' with 'game == null': " + this);
         }
@@ -126,7 +126,7 @@ abstract public class FreeColGameObject extends FreeColObject {
             logger.warning("Created 'FreeColGameObject' with 'game == null': " + this);
         }
 
-        setID(id);
+        setId(id);
         
         uninitialized = true;
     }
@@ -167,7 +167,7 @@ abstract public class FreeColGameObject extends FreeColObject {
     */
     public void dispose() {
         disposed = true;
-        getGame().removeFreeColGameObject(getID());
+        getGame().removeFreeColGameObject(getId());
     }
     
 
@@ -307,7 +307,7 @@ abstract public class FreeColGameObject extends FreeColObject {
     *
     * @return The unique ID of this object.
     */
-    public String getID() {
+    public String getId() {
         return id;
     }
 
@@ -338,11 +338,11 @@ abstract public class FreeColGameObject extends FreeColObject {
     *
     * @param newID the unique ID of this object,
     */
-    public void setID(String newID) {
+    public void setId(String newID) {
         if (game != null && !(this instanceof Game)) {
-            if (!newID.equals(getID())) {
-                if (getID() != null) {
-                    game.removeFreeColGameObject(getID());
+            if (!newID.equals(getId())) {
+                if (getId() != null) {
+                    game.removeFreeColGameObject(getId());
                 }
 
                 this.id = newID;
@@ -426,13 +426,13 @@ abstract public class FreeColGameObject extends FreeColObject {
 
     private void initializeModelMessage(ModelMessage message) {
         if (message.getSource() == null) {
-            logger.warning("ModelMessage with ID " + message.getID() + " has null message.getSource().");
+            logger.warning("ModelMessage with ID " + message.getId() + " has null message.getSource().");
         } else if (message.getSource() instanceof Player) {
             ((Player) message.getSource()).addModelMessage(message);
         } else if (message.getSource() instanceof Ownable) {
             ((Ownable) message.getSource()).getOwner().addModelMessage(message);
         } else {
-            logger.warning("ModelMessage with ID " + message.getID() +
+            logger.warning("ModelMessage with ID " + message.getId() +
                            " and message.getSource() " +
                            message.getSource().toString() + " has unknown owner.");
         }
@@ -447,7 +447,7 @@ abstract public class FreeColGameObject extends FreeColObject {
     *         <i>false</i> otherwise.
     */
     public boolean hasID(String id) {
-        return getID().equals(id);
+        return getId().equals(id);
     }
 
 
@@ -459,7 +459,7 @@ abstract public class FreeColGameObject extends FreeColObject {
     */
     public boolean equals(FreeColGameObject o) {
         if (o != null) {
-            return Utils.equals(this.getGame(), o.getGame()) && getID().equals(o.getID());
+            return Utils.equals(this.getGame(), o.getGame()) && getId().equals(o.getId());
         } else {
             return false;
         }
@@ -476,7 +476,7 @@ abstract public class FreeColGameObject extends FreeColObject {
     }
         
     public int hashCode() {
-        return getID().hashCode();
+        return getId().hashCode();
     }
 
     
@@ -485,6 +485,6 @@ abstract public class FreeColGameObject extends FreeColObject {
     * @return The <code>String</code>
     */
     public String toString() {
-        return getClass().getName() + ": " + getID() + " (super's hash code: " + Integer.toHexString(super.hashCode()) + ")";
+        return getClass().getName() + ": " + getId() + " (super's hash code: " + Integer.toHexString(super.hashCode()) + ")";
     }
 }

@@ -153,7 +153,7 @@ public class UnitSeekAndDestroyMission extends Mission {
                         && (unit.getOwner().getStance(newTile.getDefendingUnit(unit).getOwner()) == Player.WAR
                                 || ((Ownable) target).getOwner() == newTile.getDefendingUnit(unit).getOwner())) {
                     Element element = Message.createNewRootElement("attack");
-                    element.setAttribute("unit", unit.getID());
+                    element.setAttribute("unit", unit.getId());
                     element.setAttribute("direction", Integer.toString(direction));
 
                     try {
@@ -165,7 +165,7 @@ public class UnitSeekAndDestroyMission extends Mission {
                 } else if (unit.getMoveType(direction) != Unit.ATTACK                        
                         && unit.getMoveType(direction) != Unit.ILLEGAL_MOVE) {
                     Element element = Message.createNewRootElement("move");
-                    element.setAttribute("unit", unit.getID());
+                    element.setAttribute("unit", unit.getId());
                     element.setAttribute("direction", Integer.toString(direction));
 
                     try {
@@ -344,8 +344,8 @@ public class UnitSeekAndDestroyMission extends Mission {
     protected void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
         out.writeStartElement(getXMLElementTagName());
         
-        out.writeAttribute("unit", getUnit().getID());
-        out.writeAttribute("target", getTarget().getID());
+        out.writeAttribute("unit", getUnit().getId());
+        out.writeAttribute("target", getTarget().getId());
 
         out.writeEndElement();
     }

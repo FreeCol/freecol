@@ -147,10 +147,10 @@ public class WorkerWish extends Wish {
     protected void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
         out.writeStartElement(getXMLElementTagName());
 
-        out.writeAttribute("ID", getID());
-        out.writeAttribute("destination", destination.getID());
+        out.writeAttribute("ID", getId());
+        out.writeAttribute("destination", destination.getId());
         if (transportable != null) {
-            out.writeAttribute("transportable", transportable.getID());
+            out.writeAttribute("transportable", transportable.getId());
         }
         out.writeAttribute("value", Integer.toString(value));
 

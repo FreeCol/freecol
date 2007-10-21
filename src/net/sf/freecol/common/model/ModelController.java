@@ -47,7 +47,7 @@ public interface ModelController {
     * @param taskID The <code>taskID</code> should be a unique identifier.
     *               One method to make a unique <code>taskID</code>:
     *               <br><br>
-    *               getID() + "methodName:taskDescription"
+    *               getId() + "methodName:taskDescription"
     *               <br><br>
     *               As long as the "taskDescription" is unique
     *               within the method ("methodName"), you get a unique
@@ -98,7 +98,7 @@ public interface ModelController {
     * @param taskID The <code>taskID</code> should be a unique identifier.
     *               One method to make a unique <code>taskID</code>:
     *               <br><br>
-    *               getID() + "methodName:taskDescription"
+    *               getId() + "methodName:taskDescription"
     *               <br><br>
     *               As long as the "taskDescription" is unique
     *               within the method ("methodName"), you get a unique

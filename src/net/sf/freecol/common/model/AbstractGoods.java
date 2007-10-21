@@ -51,8 +51,8 @@ public class AbstractGoods extends FreeColObject {
      *
      * @return a <code>String</code> value
      */
-    public String getID() {
-        return type.getID();
+    public String getId() {
+        return type.getId();
     }
 
     /**
@@ -116,7 +116,7 @@ public class AbstractGoods extends FreeColObject {
     public void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
         out.writeStartElement(getXMLElementTagName());
 
-        out.writeAttribute("type", getID());
+        out.writeAttribute("type", getId());
         out.writeAttribute("amount", Integer.toString(amount));
         out.writeEndElement();
     }

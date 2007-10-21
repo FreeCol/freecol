@@ -792,7 +792,7 @@ public class Game extends FreeColGameObject {
         while (iterator.hasNext()) {
             FreeColGameObject fgo = iterator.next();
             if (fgo.isUninitialized()) {
-                logger.warning("Uinitialized object: " + fgo.getID() + " (" + fgo.getClass() + ")");
+                logger.warning("Uinitialized object: " + fgo.getId() + " (" + fgo.getClass() + ")");
                 ok = false;
             }
         }
@@ -892,10 +892,10 @@ public class Game extends FreeColGameObject {
             throw new IllegalArgumentException("showAll must be set to true when toSavedGame is true.");
         }
 
-        out.writeAttribute("ID", getID());
+        out.writeAttribute("ID", getId());
         out.writeAttribute("turn", Integer.toString(getTurn().getNumber()));
         if (currentPlayer != null) {
-            out.writeAttribute("currentPlayer", currentPlayer.getID());
+            out.writeAttribute("currentPlayer", currentPlayer.getId());
         }
 
         if (toSavedGame) {
@@ -923,7 +923,7 @@ public class Game extends FreeColGameObject {
      * @param in The input stream with the XML.
      */
     protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
-        setID(in.getAttributeValue(null, "ID"));
+        setId(in.getAttributeValue(null, "ID"));
 
         getTurn().setNumber(Integer.parseInt(in.getAttributeValue(null, "turn")));
 

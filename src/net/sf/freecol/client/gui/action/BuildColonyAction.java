@@ -38,7 +38,7 @@ public class BuildColonyAction extends MapboardAction {
 
 
 
-    public static final String ID = "buildColonyAction";
+    public static final String id = "buildColonyAction";
 
 
     /**
@@ -78,7 +78,7 @@ public class BuildColonyAction extends MapboardAction {
      * @return "buildColonyAction"
      */
     public String getId() {
-        return ID;
+        return id;
     }
 
     /**

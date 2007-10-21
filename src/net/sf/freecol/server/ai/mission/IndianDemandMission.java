@@ -153,8 +153,8 @@ public class IndianDemandMission extends Mission {
                     && unit.getMovesLeft() > 0) {
                 // We have arrived.
                 Element demandElement = Message.createNewRootElement("indianDemand");
-                demandElement.setAttribute("unit", unit.getID());
-                demandElement.setAttribute("colony", target.getID());
+                demandElement.setAttribute("unit", unit.getId());
+                demandElement.setAttribute("colony", target.getId());
 
                 Player enemy = target.getOwner();
                 Goods goods = selectGoods(target);
@@ -193,8 +193,8 @@ public class IndianDemandMission extends Mission {
                     unit.getOwner().modifyTension(enemy, tension);
                     if (unitTension <= Tension.TENSION_HAPPY && (goods == null || goods.getType() == Goods.FOOD)) {
                         Element deliverGiftElement = Message.createNewRootElement("deliverGift");
-                        deliverGiftElement.setAttribute("unit", getUnit().getID());
-                        deliverGiftElement.setAttribute("settlement", target.getID());
+                        deliverGiftElement.setAttribute("unit", getUnit().getId());
+                        deliverGiftElement.setAttribute("settlement", target.getId());
                         deliverGiftElement.appendChild(getUnit().getGoodsIterator().next().toXMLElement(null,
                                 deliverGiftElement.getOwnerDocument()));
 
@@ -210,7 +210,7 @@ public class IndianDemandMission extends Mission {
                     if (unitTension >= Tension.TENSION_CONTENT) {
                         // if we didn't get what we wanted, attack
                         Element element = Message.createNewRootElement("attack");
-                        element.setAttribute("unit", unit.getID());
+                        element.setAttribute("unit", unit.getId());
                         element.setAttribute("direction", Integer.toString(r));
 
                         try {
@@ -240,7 +240,7 @@ public class IndianDemandMission extends Mission {
             thisTile = unit.getGame().getMap().getNeighbourOrNull(direction, thisTile);
 
             Element moveElement = Message.createNewRootElement("move");
-            moveElement.setAttribute("unit", unit.getID());
+            moveElement.setAttribute("unit", unit.getId());
             moveElement.setAttribute("direction", Integer.toString(direction));
 
             try {
@@ -353,8 +353,8 @@ public class IndianDemandMission extends Mission {
     protected void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
         out.writeStartElement(getXMLElementTagName());
 
-        out.writeAttribute("unit", getUnit().getID());
-        out.writeAttribute("target", target.getID());
+        out.writeAttribute("unit", getUnit().getId());
+        out.writeAttribute("target", target.getId());
         out.writeAttribute("completed", Boolean.toString(completed));
 
         out.writeEndElement();

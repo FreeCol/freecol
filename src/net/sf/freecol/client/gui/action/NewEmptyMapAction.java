@@ -47,7 +47,7 @@ public class NewEmptyMapAction extends MapboardAction {
 
 
 
-    public static final String ID = "newEmptyMapAction";
+    public static final String id = "newEmptyMapAction";
 
 
     /**
@@ -76,7 +76,7 @@ public class NewEmptyMapAction extends MapboardAction {
      * @return The String: "newEmptyMapAction"
      */
     public String getId() {
-        return ID;
+        return id;
     }
 
     /**

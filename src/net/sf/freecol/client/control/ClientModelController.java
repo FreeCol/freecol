@@ -67,7 +67,7 @@ public class ClientModelController implements ModelController {
      * @param taskID The <code>taskID</code> should be a unique identifier.
      *            One method to make a unique <code>taskID</code>: <br>
      *            <br>
-     *            getID() + "methodName:taskDescription" <br>
+     *            getId() + "methodName:taskDescription" <br>
      *            <br>
      *            As long as the "taskDescription" is unique within the method
      *            ("methodName"), you get a unique identifier.
@@ -99,7 +99,7 @@ public class ClientModelController implements ModelController {
      * @param taskID The <code>taskID</code> should be a unique identifier.
      *            One method to make a unique <code>taskID</code>: <br>
      *            <br>
-     *            getID() + "methodName:taskDescription" <br>
+     *            getId() + "methodName:taskDescription" <br>
      *            <br>
      *            As long as the "taskDescription" is unique within the method
      *            ("methodName"), you get a unique identifier.
@@ -114,8 +114,8 @@ public class ClientModelController implements ModelController {
 
         Element createUnitElement = Message.createNewRootElement("createUnit");
         createUnitElement.setAttribute("taskID", taskID);
-        createUnitElement.setAttribute("location", location.getID());
-        createUnitElement.setAttribute("owner", owner.getID());
+        createUnitElement.setAttribute("location", location.getId());
+        createUnitElement.setAttribute("owner", owner.getId());
         createUnitElement.setAttribute("type", Integer.toString(type.getIndex()));
 
         logger.info("Waiting for the server to reply...");
@@ -143,7 +143,7 @@ public class ClientModelController implements ModelController {
      */
     public Location setToVacantEntryLocation(Unit unit) {
         Element createUnitElement = Message.createNewRootElement("getVacantEntryLocation");
-        createUnitElement.setAttribute("unit", unit.getID());
+        createUnitElement.setAttribute("unit", unit.getId());
 
         Element reply = freeColClient.getClient().ask(createUnitElement);
         if (reply == null) {

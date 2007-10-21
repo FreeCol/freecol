@@ -51,7 +51,7 @@ public abstract class TradeItem extends FreeColObject {
     /**
      * The ID, used to get a name, etc.
      */
-    private String ID;
+    private String id;
 
         
     /**
@@ -64,7 +64,7 @@ public abstract class TradeItem extends FreeColObject {
      */
     public TradeItem(Game game, String id, Player source, Player destination) {
         this.game = game;
-        this.ID = id;
+        this.id = id;
         this.source = source;
         this.destination = destination;
     }
@@ -84,8 +84,8 @@ public abstract class TradeItem extends FreeColObject {
      *
      * @return a <code>String</code> value
      */
-    public final String getID() {
-        return ID;
+    public final String getId() {
+        return id;
     }
 
     /**
@@ -93,8 +93,8 @@ public abstract class TradeItem extends FreeColObject {
      *
      * @param newID The new ID value.
      */
-    public final void setID(final String newID) {
-        this.ID = newID;
+    public final void setId(final String newID) {
+        this.id = newID;
     }
 
     /**
@@ -181,7 +181,7 @@ public abstract class TradeItem extends FreeColObject {
      *      during parsing.
      */
     protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
-        this.ID = in.getAttributeValue(null, "ID");
+        this.id = in.getAttributeValue(null, "ID");
         String sourceID = in.getAttributeValue(null, "source");
         this.source = (Player) game.getFreeColGameObject(sourceID);
         String destinationID = in.getAttributeValue(null, "destination");
@@ -206,9 +206,9 @@ public abstract class TradeItem extends FreeColObject {
      *      to the stream.
      */
     public void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
-        out.writeAttribute("ID", this.ID);
-        out.writeAttribute("source", this.source.getID());
-        out.writeAttribute("destination", this.destination.getID());
+        out.writeAttribute("ID", this.id);
+        out.writeAttribute("source", this.source.getId());
+        out.writeAttribute("destination", this.destination.getId());
     }
     
 

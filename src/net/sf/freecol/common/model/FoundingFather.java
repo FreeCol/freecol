@@ -97,7 +97,7 @@ public class FoundingFather extends FreeColGameObjectType implements Abilities, 
      * @return a <code>String</code> value
      */
     public String getText() {
-        return Messages.message(getID() + ".text");
+        return Messages.message(getId() + ".text");
     }
 
     /**
@@ -106,7 +106,7 @@ public class FoundingFather extends FreeColGameObjectType implements Abilities, 
      * @return a <code>String</code> value
      */
     public String getBirthAndDeath() {
-        return Messages.message(getID() + ".birthAndDeath");
+        return Messages.message(getId() + ".birthAndDeath");
     }
 
     /**
@@ -191,7 +191,7 @@ public class FoundingFather extends FreeColGameObjectType implements Abilities, 
      */
     public boolean isAvailableTo(Player player) {
         return (availableTo.isEmpty() || availableTo.contains(player.getNationID()) ||
-                availableTo.contains(player.getNationType().getID()));
+                availableTo.contains(player.getNationType().getId()));
     }
 
 
@@ -293,7 +293,7 @@ public class FoundingFather extends FreeColGameObjectType implements Abilities, 
 
     public void readFromXML(XMLStreamReader in, Map<String, UnitType> unitTypeByRef)
         throws XMLStreamException {
-        setID(in.getAttributeValue(null, "id"));
+        setId(in.getAttributeValue(null, "id"));
         String typeString = in.getAttributeValue(null, "type");
         if ("trade".equals(typeString)) {
             type = TRADE;
@@ -306,7 +306,7 @@ public class FoundingFather extends FreeColGameObjectType implements Abilities, 
         } else if ("religious".equals(typeString)) {
             type = RELIGIOUS;
         } else {
-            throw new IllegalArgumentException("FoundingFather " + getID() + " has unknown type " + typeString);
+            throw new IllegalArgumentException("FoundingFather " + getId() + " has unknown type " + typeString);
         }                           
 
         weight[1] = Integer.parseInt(in.getAttributeValue(null, "weight1"));
@@ -318,13 +318,13 @@ public class FoundingFather extends FreeColGameObjectType implements Abilities, 
             if (Ability.getXMLElementTagName().equals(childName)) {
                 Ability ability = new Ability(in);
                 if (ability.getSource() == null) {
-                    ability.setSource(this.getID());
+                    ability.setSource(this.getId());
                 }
                 setFeature(ability);
             } else if (Modifier.getXMLElementTagName().equals(childName)) {
                 Modifier modifier = new Modifier(in);
                 if (modifier.getSource() == null) {
-                    modifier.setSource(this.getID());
+                    modifier.setSource(this.getId());
                 }
                 setModifier(modifier.getId(), modifier); // close this element
             } else if ("event".equals(childName)) {

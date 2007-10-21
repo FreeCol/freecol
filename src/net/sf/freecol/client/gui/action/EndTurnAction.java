@@ -39,7 +39,7 @@ public class EndTurnAction extends MapboardAction {
 
 
 
-    public static final String ID = "endTurnAction";
+    public static final String id = "endTurnAction";
 
 
     /**
@@ -57,7 +57,7 @@ public class EndTurnAction extends MapboardAction {
      * @return "endTurnAction"
      */
     public String getId() {
-        return ID;
+        return id;
     }
 
     /**

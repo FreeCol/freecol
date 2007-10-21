@@ -98,7 +98,7 @@ public final class BuildingType extends BuildableType implements Abilities, Modi
 
     public void readFromXML(XMLStreamReader in, final Map<String, GoodsType> goodsTypeByRef,
            final Map<String, BuildingType> buildingTypeByRef) throws XMLStreamException {
-        setID(in.getAttributeValue(null, "id"));
+        setId(in.getAttributeValue(null, "id"));
         
         if (hasAttribute(in, "upgradesFrom")) {
             upgradesFrom = buildingTypeByRef.get(in.getAttributeValue(null, "upgradesFrom"));
@@ -126,7 +126,7 @@ public final class BuildingType extends BuildableType implements Abilities, Modi
             if (Ability.getXMLElementTagName().equals(childName)) {
                 Ability ability = new Ability(in);
                 if (ability.getSource() == null) {
-                    ability.setSource(this.getID());
+                    ability.setSource(this.getId());
                 }
                 features.put(ability.getId(), ability); // Ability close the element
             } else if ("required-population".equals(childName)) {
@@ -140,7 +140,7 @@ public final class BuildingType extends BuildableType implements Abilities, Modi
             } else if (Modifier.getXMLElementTagName().equals(childName)) {
                 Modifier modifier = new Modifier(in);
                 if (modifier.getSource() == null) {
-                    modifier.setSource(this.getID());
+                    modifier.setSource(this.getId());
                 }
                 setModifier(modifier.getId(), modifier); // Modifier close the element
             } else {

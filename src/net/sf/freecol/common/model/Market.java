@@ -491,8 +491,8 @@ public final class Market extends FreeColGameObject implements Ownable {
         // Start element:
         out.writeStartElement(getXMLElementTagName());
 
-        out.writeAttribute("ID", getID());
-        out.writeAttribute("owner", owner.getID());
+        out.writeAttribute("ID", getId());
+        out.writeAttribute("owner", owner.getId());
         
         for (int i=0; i<dataForGoodType.length;i++) {
             dataForGoodType[i].toXML(out, player, showAll, toSavedGame);
@@ -506,7 +506,7 @@ public final class Market extends FreeColGameObject implements Ownable {
      * @param in The input stream with the XML.
      */
     protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
-        setID(in.getAttributeValue(null, "ID"));
+        setId(in.getAttributeValue(null, "ID"));
         
         owner = (Player) getGame().getFreeColGameObject(in.getAttributeValue(null, "owner"));
         if (owner == null) {
@@ -623,7 +623,7 @@ public final class Market extends FreeColGameObject implements Ownable {
             // Start element:
             out.writeStartElement(getXMLElementTagName());
 
-            out.writeAttribute("ID", getID());
+            out.writeAttribute("ID", getId());
             out.writeAttribute("tradeable", Boolean.toString(isTradeable));
             out.writeAttribute("amount", Integer.toString(amountInMarket));
 
@@ -635,7 +635,7 @@ public final class Market extends FreeColGameObject implements Ownable {
          * @param in The input stream with the XML.
          */
         protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
-            setID(in.getAttributeValue(null, "ID"));
+            setId(in.getAttributeValue(null, "ID"));
             isTradeable = Boolean.valueOf(in.getAttributeValue(null, "tradeable")).booleanValue();
             amountInMarket = Integer.parseInt(in.getAttributeValue(null, "amount"));
             

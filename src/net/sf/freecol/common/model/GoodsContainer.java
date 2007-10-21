@@ -449,7 +449,7 @@ public class GoodsContainer extends FreeColGameObject {
         // Start element:
         out.writeStartElement(getXMLElementTagName());
 
-        out.writeAttribute("ID", getID());
+        out.writeAttribute("ID", getId());
 
         for (int i=0; i<storedGoods.length; i++) {
             out.writeAttribute("goods" + Integer.toString(i), Integer.toString(storedGoods[i]));
@@ -462,7 +462,7 @@ public class GoodsContainer extends FreeColGameObject {
      * @param in The input stream with the XML.
      */
     protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
-        setID(in.getAttributeValue(null, "ID"));
+        setId(in.getAttributeValue(null, "ID"));
         
         storedGoods = new int[FreeCol.getSpecification().numberOfGoodsTypes()];
 

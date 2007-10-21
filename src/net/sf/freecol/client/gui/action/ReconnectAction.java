@@ -39,7 +39,7 @@ public class ReconnectAction extends MapboardAction {
 
 
 
-    public static final String ID = "reconnectAction";
+    public static final String id = "reconnectAction";
 
 
     /**
@@ -67,7 +67,7 @@ public class ReconnectAction extends MapboardAction {
      * @return "declareIndependenceAction"
      */
     public String getId() {
-        return ID;
+        return id;
     }
 
     public String getMenuItemText() {

@@ -157,7 +157,7 @@ public class ColonyPlan {
                     Iterator<Building> iterator = colony.getBuildingIterator();
                     while (iterator.hasNext()) {
                         Building building = iterator.next();
-                        if (building.getType().getModifier(outputType.getID()) != null
+                        if (building.getType().getModifier(outputType.getId()) != null
                                 && building.canBuildNext()) {
                             buildList.add(building);
                         }
@@ -628,7 +628,7 @@ public class ColonyPlan {
     public Element toXMLElement(Document document) {
         Element element = document.createElement(getXMLElementTagName());
 
-        element.setAttribute("ID", colony.getID());
+        element.setAttribute("ID", colony.getId());
 
         return element;
     }

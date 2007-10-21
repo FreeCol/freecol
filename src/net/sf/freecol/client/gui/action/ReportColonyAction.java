@@ -39,7 +39,7 @@ public class ReportColonyAction extends MapboardAction {
     private static final Logger logger = Logger.getLogger(ReportColonyAction.class.getName());
 
 
-    public static final String ID = "reportColonyAction";
+    public static final String id = "reportColonyAction";
     
     /**
      * Creates this action.
@@ -64,7 +64,7 @@ public class ReportColonyAction extends MapboardAction {
      * @return "reportColonyAction"
      */
     public String getId() {
-        return ID;
+        return id;
     }
 
     /**

@@ -146,7 +146,7 @@ public final class PreGameInputHandler extends InputHandler {
             boolean ready = (new Boolean(element.getAttribute("value"))).booleanValue();
             player.setReady(ready);
             Element playerReady = Message.createNewRootElement("playerReady");
-            playerReady.setAttribute("player", player.getID());
+            playerReady.setAttribute("player", player.getId());
             playerReady.setAttribute("value", Boolean.toString(ready));
             getFreeColServer().getServer().sendToAll(playerReady, player.getConnection());
         } else {
@@ -168,8 +168,8 @@ public final class PreGameInputHandler extends InputHandler {
             if (nation.isClassic() || (nation.isSelectable() && getFreeColServer().getAdditionalNations())) {
                 player.setNation(nation);
                 Element updateNation = Message.createNewRootElement("updateNation");
-                updateNation.setAttribute("player", player.getID());
-                updateNation.setAttribute("value", nation.getID());
+                updateNation.setAttribute("player", player.getId());
+                updateNation.setAttribute("value", nation.getId());
                 getFreeColServer().getServer().sendToAll(updateNation, player.getConnection());
             } else {
                 logger.warning("Selected non-selectable nation.");
@@ -194,8 +194,8 @@ public final class PreGameInputHandler extends InputHandler {
                 net.sf.freecol.client.gui.panel.AdvantageCellRenderer.SELECTABLE) {
                 player.setNationType(nationType);
                 Element updateNationType = Message.createNewRootElement("updateNationType");
-                updateNationType.setAttribute("nationType", player.getID());
-                updateNationType.setAttribute("value", nationType.getID());
+                updateNationType.setAttribute("nationType", player.getId());
+                updateNationType.setAttribute("value", nationType.getId());
                 getFreeColServer().getServer().sendToAll(updateNationType, player.getConnection());
             } else {
                 logger.warning("NationType is not selectable");
@@ -218,7 +218,7 @@ public final class PreGameInputHandler extends InputHandler {
             String color = element.getAttribute("value");
             player.setColor(new Color(Integer.decode(color)));
             Element updateColor = Message.createNewRootElement("updateColor");
-            updateColor.setAttribute("player", player.getID());
+            updateColor.setAttribute("player", player.getId());
             updateColor.setAttribute("value", color);
             getFreeColServer().getServer().sendToAll(updateColor, player.getConnection());
         } else {
@@ -299,7 +299,7 @@ public final class PreGameInputHandler extends InputHandler {
         logger.info("Logout by: " + connection + ((player != null) ? " (" + player.getName() + ") " : ""));
         Element logoutMessage = Message.createNewRootElement("logout");
         logoutMessage.setAttribute("reason", "User has logged out.");
-        logoutMessage.setAttribute("player", player.getID());
+        logoutMessage.setAttribute("player", player.getId());
         player.setConnected(false);
         getFreeColServer().getGame().removePlayer(player);
         getFreeColServer().getServer().sendToAll(logoutMessage, connection);

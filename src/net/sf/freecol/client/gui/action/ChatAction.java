@@ -39,7 +39,7 @@ public class ChatAction extends FreeColAction {
 
 
 
-    public static final String ID = "chatAction";
+    public static final String id = "chatAction";
 
 
     /**
@@ -70,7 +70,7 @@ public class ChatAction extends FreeColAction {
      * @return "chatAction"
      */
     public String getId() {
-        return ID;
+        return id;
     }
 
     /**

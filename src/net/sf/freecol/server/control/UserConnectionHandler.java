@@ -184,7 +184,7 @@ public final class UserConnectionHandler implements MessageHandler, StreamedMess
             if (player.isAI()) {
                 player.setAI(false);
                 Element setAIElement = Message.createNewRootElement("setAI");
-                setAIElement.setAttribute("player", player.getID());
+                setAIElement.setAttribute("player", player.getId());
                 setAIElement.setAttribute("ai", Boolean.toString(false));
                 server.sendToAll(setAIElement);
             }
@@ -319,7 +319,7 @@ public final class UserConnectionHandler implements MessageHandler, StreamedMess
             if (player.isAI()) {
                 player.setAI(false);
                 Element setAIElement = Message.createNewRootElement("setAI");
-                setAIElement.setAttribute("player", player.getID());
+                setAIElement.setAttribute("player", player.getId());
                 setAIElement.setAttribute("ai", Boolean.toString(false));
                 server.sendToAll(setAIElement);
             }

@@ -38,7 +38,7 @@ public class ReportForeignAction extends MapboardAction {
 
 
 
-    public static final String ID = "reportForeignAction";
+    public static final String id = "reportForeignAction";
 
 
     /**
@@ -65,7 +65,7 @@ public class ReportForeignAction extends MapboardAction {
      * @return "reportForeignAction"
      */
     public String getId() {
-        return ID;
+        return id;
     }
 
     /**

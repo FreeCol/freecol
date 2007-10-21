@@ -88,7 +88,7 @@ public final class TilePopup extends JPopupMenu implements ActionListener {
             //final Image gotoImage = (Image) UIManager.get("cursor.go.image");
             //JMenuItem gotoMenuItem = new JMenuItem(Messages.message("gotoThisTile"), new ImageIcon(gotoImage));
             JMenuItem gotoMenuItem = new JMenuItem(Messages.message("gotoThisTile"));
-            gotoMenuItem.setActionCommand("GOTO" + tile.getID());
+            gotoMenuItem.setActionCommand("GOTO" + tile.getId());
             gotoMenuItem.addActionListener(this);
             add(gotoMenuItem);
             hasAnItem = true;
@@ -141,7 +141,7 @@ public final class TilePopup extends JPopupMenu implements ActionListener {
             while (it.hasNext()) {
                 Unit u = it.next();
                 JMenuItem toMenuItem = new JMenuItem(u.toString());
-                toMenuItem.setActionCommand("TO" + u.getID());
+                toMenuItem.setActionCommand("TO" + u.getId());
                 toMenuItem.addActionListener(this);
                 takeOwnership.add(toMenuItem);
                 notEmpty = true;
@@ -149,7 +149,7 @@ public final class TilePopup extends JPopupMenu implements ActionListener {
                     AIUnit au = (AIUnit) freeColClient.getFreeColServer().getAIMain().getAIObject(u);                
                     if (au.getMission() != null && au.getMission() instanceof TransportMission) {
                         JMenuItem menuItem = new JMenuItem("Transport list for: " + u.toString());
-                        menuItem.setActionCommand("TL" + Unit.getXMLElementTagName() + u.getID());
+                        menuItem.setActionCommand("TL" + Unit.getXMLElementTagName() + u.getId());
                         menuItem.addActionListener(this);
                         add(menuItem);
                     }
@@ -160,7 +160,7 @@ public final class TilePopup extends JPopupMenu implements ActionListener {
                     takeOwnership.addSeparator();
                 }
                 JMenuItem toMenuItem = new JMenuItem(tile.getSettlement().toString());
-                toMenuItem.setActionCommand("TO" + tile.getSettlement().getID());
+                toMenuItem.setActionCommand("TO" + tile.getSettlement().getId());
                 toMenuItem.addActionListener(this);
                 takeOwnership.add(toMenuItem);
                 notEmpty = true;
@@ -197,7 +197,7 @@ public final class TilePopup extends JPopupMenu implements ActionListener {
                             " ( " + unit.getOccupationIndicator() + " )");
         }
         JMenuItem menuItem = new JMenuItem(text);
-        menuItem.setActionCommand(Unit.getXMLElementTagName() + unit.getID());
+        menuItem.setActionCommand(Unit.getXMLElementTagName() + unit.getId());
         menuItem.addActionListener(this);
         if (indent) {
             menuItem.setFont(menuItem.getFont().deriveFont(Font.ITALIC));
@@ -313,7 +313,7 @@ public final class TilePopup extends JPopupMenu implements ActionListener {
         } else if (command.startsWith("TO")) {
             String id = command.substring(("TO").length());
             Ownable o = (Ownable) freeColClient.getFreeColServer().getGame().getFreeColGameObject(id);
-            Player mp = (Player) freeColClient.getFreeColServer().getGame().getFreeColGameObject(freeColClient.getMyPlayer().getID());
+            Player mp = (Player) freeColClient.getFreeColServer().getGame().getFreeColGameObject(freeColClient.getMyPlayer().getId());
             o.setOwner(mp);
             if (o instanceof Unit) {
                 Iterator<Unit> it = ((Unit) o).getUnitIterator();

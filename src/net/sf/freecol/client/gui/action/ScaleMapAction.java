@@ -50,7 +50,7 @@ public class ScaleMapAction extends FreeColAction {
 
 
 
-    public static final String ID = "scaleMapAction";
+    public static final String id = "scaleMapAction";
 
 
     /**
@@ -68,7 +68,7 @@ public class ScaleMapAction extends FreeColAction {
      * @return "scaleMapAction"
      */
     public String getId() {
-        return ID;
+        return id;
     }
     
     /**

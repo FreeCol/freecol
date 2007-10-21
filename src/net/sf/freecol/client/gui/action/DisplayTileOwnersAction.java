@@ -38,7 +38,7 @@ public class DisplayTileOwnersAction extends SelectableAction {
 
 
 
-    public static final String ID = "displayTileOwnersAction";
+    public static final String id = "displayTileOwnersAction";
 
 
     /**
@@ -66,7 +66,7 @@ public class DisplayTileOwnersAction extends SelectableAction {
      * @return "displayTileOwnersAction"
      */
     public String getId() {
-        return ID;
+        return id;
     }
 
     /**

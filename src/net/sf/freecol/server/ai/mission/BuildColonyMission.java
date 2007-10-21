@@ -200,7 +200,7 @@ public class BuildColonyMission extends Mission {
             if (getUnit().canBuildColony() && target == getUnit().getTile() && getUnit().getMovesLeft() > 0) {
                 Element buildColonyElement = Message.createNewRootElement("buildColony");
                 buildColonyElement.setAttribute("name", unit.getOwner().getDefaultColonyName());
-                buildColonyElement.setAttribute("unit", unit.getID());
+                buildColonyElement.setAttribute("unit", unit.getId());
 
                 try {
                     connection.ask(buildColonyElement);
@@ -349,9 +349,9 @@ public class BuildColonyMission extends Mission {
     protected void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
         out.writeStartElement(getXMLElementTagName());
 
-        out.writeAttribute("unit", getUnit().getID());
+        out.writeAttribute("unit", getUnit().getId());
         if (target != null) {
-            out.writeAttribute("target", target.getID());
+            out.writeAttribute("target", target.getId());
         }
         out.writeAttribute("doNotGiveUp", Boolean.toString(doNotGiveUp));
         out.writeAttribute("colonyBuilt", Boolean.toString(colonyBuilt));

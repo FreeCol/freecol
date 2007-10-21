@@ -386,7 +386,7 @@ public class Map extends FreeColGameObject {
                 });
         final HashMap<String, PathNode> closedList = new HashMap<String, PathNode>();
 
-        openList.put(firstNode.getTile().getID(), firstNode);
+        openList.put(firstNode.getTile().getId(), firstNode);
         openListQueue.offer(firstNode);
 
         while (openList.size() > 0) {
@@ -472,23 +472,23 @@ public class Map extends FreeColGameObject {
                         + getDistance(newTile.getPosition(), end.getPosition());
 
                 // Finding the node on the open list:
-                PathNode successor = openList.get(newTile.getID());
+                PathNode successor = openList.get(newTile.getId());
 
                 if (successor != null) {
                     if (successor.getF() <= f) {
                         continue;
                     } else {
-                        openList.remove(successor.getTile().getID());
+                        openList.remove(successor.getTile().getId());
                         openListQueue.remove(successor);
                     }
                 } else {
                     // Finding the node on the closed list.
-                    successor = closedList.get(newTile.getID());
+                    successor = closedList.get(newTile.getId());
                     if (successor != null) {
                         if (successor.getF() <= f) {
                             continue;
                         } else {
-                            closedList.remove(newTile.getID());
+                            closedList.remove(newTile.getId());
                         }
                     }
                 }
@@ -499,14 +499,14 @@ public class Map extends FreeColGameObject {
                 successor.setOnCarrier(onCarrier);
 
                 // Adding the new node to the open list:
-                openList.put(successor.getTile().getID(), successor);
+                openList.put(successor.getTile().getId(), successor);
                 openListQueue.offer(successor);
             }
 
-            closedList.put(currentNode.getTile().getID(), currentNode);
+            closedList.put(currentNode.getTile().getId(), currentNode);
 
             // Removing the current node from the open list:
-            openList.remove(currentNode.getTile().getID());
+            openList.remove(currentNode.getTile().getId());
             openListQueue.remove(currentNode);
         }
 
@@ -720,14 +720,14 @@ public class Map extends FreeColGameObject {
                 });
         final HashMap<String, PathNode> closedList = new HashMap<String, PathNode>();
 
-        openList.put(startTile.getID(), firstNode);
+        openList.put(startTile.getId(), firstNode);
         openListQueue.offer(firstNode);
 
         while (openList.size() > 0) {
             // Choosing the node with the lowest cost:
             PathNode currentNode = openListQueue.poll();
-            openList.remove(currentNode.getTile().getID());
-            closedList.put(currentNode.getTile().getID(), currentNode);
+            openList.remove(currentNode.getTile().getId());
+            closedList.put(currentNode.getTile().getId(), currentNode);
 
             // Reached the end
             if (currentNode.getTurns() > maxTurns) {
@@ -800,7 +800,7 @@ public class Map extends FreeColGameObject {
                 }
 
                 // Finding the node on the open list:
-                PathNode successor = closedList.get(newTile.getID());
+                PathNode successor = closedList.get(newTile.getId());
                 if (successor != null) {
                     if (successor.getCost() <= cost) {
                         continue;
@@ -808,12 +808,12 @@ public class Map extends FreeColGameObject {
                         logger.warning("This should not happen. :-(");
                     }
                 } else {
-                    successor = openList.get(newTile.getID());
+                    successor = openList.get(newTile.getId());
                     if (successor != null) {
                         if (successor.getCost() <= cost) {
                             continue;
                         } else {
-                            openList.remove(successor.getTile().getID());
+                            openList.remove(successor.getTile().getId());
                             openListQueue.remove(successor);
                         }
                     }
@@ -821,7 +821,7 @@ public class Map extends FreeColGameObject {
                             movesLeft, turns);
                     successor.previous = currentNode;
                     successor.setOnCarrier(onCarrier);
-                    openList.put(successor.getTile().getID(), successor);
+                    openList.put(successor.getTile().getId(), successor);
                     openListQueue.offer(successor);
                 }
             }
@@ -1829,7 +1829,7 @@ public class Map extends FreeColGameObject {
         // Start element:
         out.writeStartElement(getXMLElementTagName());
 
-        out.writeAttribute("ID", getID());
+        out.writeAttribute("ID", getId());
         out.writeAttribute("width", Integer.toString(getWidth()));
         out.writeAttribute("height", Integer.toString(getHeight()));
 
@@ -1841,7 +1841,7 @@ public class Map extends FreeColGameObject {
                 tile.toXML(out, player, showAll, toSavedGame);
             } else {
                 Tile hiddenTile = new Tile(getGame(), null, tile.getX(), tile.getY());
-                hiddenTile.setFakeID(tile.getID());
+                hiddenTile.setFakeID(tile.getId());
                 hiddenTile.toXML(out, player, showAll, toSavedGame);
             }
         }
@@ -1858,7 +1858,7 @@ public class Map extends FreeColGameObject {
     @Override
     protected void readFromXMLImpl(XMLStreamReader in)
             throws XMLStreamException {
-        setID(in.getAttributeValue(null, "ID"));
+        setId(in.getAttributeValue(null, "ID"));
 
         if (columns == null) {
             int width = Integer.parseInt(in.getAttributeValue(null, "width"));

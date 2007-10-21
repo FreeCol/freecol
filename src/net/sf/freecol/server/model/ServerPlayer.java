@@ -282,7 +282,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
     public void toServerAdditionElement(XMLStreamWriter out) throws XMLStreamException {
         out.writeStartElement(getServerAdditionXMLElementTagName());
 
-        out.writeAttribute("ID", getID());
+        out.writeAttribute("ID", getId());
         
         out.writeEndElement();
     }
@@ -292,7 +292,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
      * Sets the ID of the super class to be <code>serverID</code>.
      */
     public void updateID() {
-        setID(serverID);
+        setId(serverID);
     }
     
     

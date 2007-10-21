@@ -292,7 +292,7 @@ public class Player extends FreeColGameObject implements Abilities, Nameable, Mo
         if (newNation != null && newNation.getType() != null) {
             this.nationType = newNation.getType();
             this.color = newNation.getColor();
-            this.nationID = newNation.getID();
+            this.nationID = newNation.getId();
             if (nationType.isEuropean()) {
                 /*
                  * 
@@ -1405,7 +1405,7 @@ public class Player extends FreeColGameObject implements Abilities, Nameable, Mo
      * @param n The new nation for this player.
      */
     public void setNation(Nation newNation) {
-        nationID = newNation.getID();
+        nationID = newNation.getId();
         //color = newNation.getColor();
     }
 
@@ -2044,7 +2044,7 @@ public class Player extends FreeColGameObject implements Abilities, Nameable, Mo
      * @param newValue a <code>boolean</code> value
      */
     public void setAbility(Ability newAbility) {
-        features.put(newAbility.getID(), newAbility);
+        features.put(newAbility.getId(), newAbility);
     }
 
     public void setAbility(String id, boolean value) {
@@ -2055,11 +2055,11 @@ public class Player extends FreeColGameObject implements Abilities, Nameable, Mo
         if (feature == null) {
             return;
         }
-        Feature oldValue = features.get(feature.getID());
+        Feature oldValue = features.get(feature.getId());
         if (oldValue instanceof Modifier && feature instanceof Modifier) {
             features.put(feature.getId(), Modifier.combine((Modifier) oldValue, (Modifier) feature));
         } else {
-            features.put(feature.getID(), feature);
+            features.put(feature.getId(), feature);
         }
     }
 
@@ -2128,7 +2128,7 @@ public class Player extends FreeColGameObject implements Abilities, Nameable, Mo
                     // TODO: make use of armed, mounted, etc.
                     for (int index = 0; index < units.size(); index++) {
                         AbstractUnit unit = units.get(index);
-                        String uniqueID = getID() + "newTurn" + currentFather.getID() + String.valueOf(index);
+                        String uniqueID = getId() + "newTurn" + currentFather.getId() + String.valueOf(index);
                         getGame().getModelController().createUnit(uniqueID, getEurope(), this, unit.getUnitType());
                     }
                 }
@@ -2197,7 +2197,7 @@ public class Player extends FreeColGameObject implements Abilities, Nameable, Mo
             for (Iterator<Unit> unitIterator = getUnitIterator(); unitIterator.hasNext();) {
                 Unit unit = unitIterator.next();
                 if (logger.isLoggable(Level.FINEST)) {
-                    logger.finest("Calling newTurn for unit " + unit.getName() + " " + unit.getID());
+                    logger.finest("Calling newTurn for unit " + unit.getName() + " " + unit.getId());
                 }
                 unit.newTurn();
             }
@@ -2230,7 +2230,7 @@ public class Player extends FreeColGameObject implements Abilities, Nameable, Mo
             for (Iterator<Unit> unitIterator = getUnitIterator(); unitIterator.hasNext();) {
                 Unit unit = unitIterator.next();
                 if (logger.isLoggable(Level.FINEST)) {
-                    logger.finest("Calling newTurn for unit " + unit.getName() + " " + unit.getID());
+                    logger.finest("Calling newTurn for unit " + unit.getName() + " " + unit.getId());
                 }
                 unit.newTurn();
             }
@@ -2295,12 +2295,12 @@ public class Player extends FreeColGameObject implements Abilities, Nameable, Mo
         throws XMLStreamException {
         // Start element:
         out.writeStartElement(getXMLElementTagName());
-        out.writeAttribute("ID", getID());
+        out.writeAttribute("ID", getId());
         out.writeAttribute("index", String.valueOf(index));
         out.writeAttribute("username", name);
         out.writeAttribute("nationID", nationID);
         if (nationType != null) {
-            out.writeAttribute("nationType", nationType.getID());
+            out.writeAttribute("nationType", nationType.getId());
         }
         out.writeAttribute("color", Integer.toString(color.getRGB()));
         out.writeAttribute("admin", Boolean.toString(admin));
@@ -2318,7 +2318,7 @@ public class Player extends FreeColGameObject implements Abilities, Nameable, Mo
             out.writeAttribute("crosses", Integer.toString(crosses));
             out.writeAttribute("bells", Integer.toString(bells));
             if (currentFather != null) {
-                out.writeAttribute("currentFather", currentFather.getID());
+                out.writeAttribute("currentFather", currentFather.getId());
             }
             out.writeAttribute("crossesRequired", Integer.toString(crossesRequired));
             out.writeAttribute("attackedByPrivateers", Boolean.toString(attackedByPrivateers));
@@ -2353,7 +2353,7 @@ public class Player extends FreeColGameObject implements Abilities, Nameable, Mo
             out.writeAttribute("newLandName", newLandName);
         }
         if (entryLocation != null) {
-            out.writeAttribute("entryLocation", entryLocation.getID());
+            out.writeAttribute("entryLocation", entryLocation.getId());
         }
         // attributes end here
 
@@ -2393,7 +2393,7 @@ public class Player extends FreeColGameObject implements Abilities, Nameable, Mo
      * @param in The input stream with the XML.
      */
     protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
-        setID(in.getAttributeValue(null, "ID"));
+        setId(in.getAttributeValue(null, "ID"));
         index = Integer.parseInt(in.getAttributeValue(null, "index"));
         name = in.getAttributeValue(null, "username");
         nationID = in.getAttributeValue(null, "nationID");
@@ -2550,7 +2550,7 @@ public class Player extends FreeColGameObject implements Abilities, Nameable, Mo
             }
         }
         
-        int random = getGame().getModelController().getRandom(getID() + "newRecruitableUnit", total);
+        int random = getGame().getModelController().getRandom(getId() + "newRecruitableUnit", total);
         UnitType recruitable = null;
         total = 0;
         for (UnitType unitType : recruitableUnits) {
@@ -2872,7 +2872,7 @@ public class Player extends FreeColGameObject implements Abilities, Nameable, Mo
      */
     public boolean equals(Player o) {
         if (o != null) {
-            return getID().equals(o.getID());
+            return getId().equals(o.getId());
         } else {
             return false;
         }

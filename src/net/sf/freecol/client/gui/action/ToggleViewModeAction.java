@@ -42,7 +42,7 @@ public class ToggleViewModeAction extends MapboardAction {
 
 
 
-    public static final String ID = "toggleViewModeAction";
+    public static final String id = "toggleViewModeAction";
 
 
     /**
@@ -62,7 +62,7 @@ public class ToggleViewModeAction extends MapboardAction {
      * @return "toggleViewModeAction"
      */
     public String getId() {
-        return ID;
+        return id;
     }
 
     /**

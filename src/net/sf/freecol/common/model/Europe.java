@@ -383,7 +383,7 @@ public final class Europe extends FreeColGameObject implements Location,
      *         in case the unit cannot be bought.
      */
     public int getUnitPrice(UnitType unitType) {
-        Integer price = unitPrices.get(unitType.getID());
+        Integer price = unitPrices.get(unitType.getId());
         if (price != null) {
             return price.intValue();
         } else {
@@ -422,7 +422,7 @@ public final class Europe extends FreeColGameObject implements Location,
 
         int increasingPrice = unit.getUnitType().getIncreasingPrice();
         if (increasingPrice > 0) {
-            unitPrices.put(unit.getUnitType().getID(), new Integer(price + increasingPrice));
+            unitPrices.put(unit.getUnitType().getId(), new Integer(price + increasingPrice));
         }
     }
 
@@ -539,12 +539,12 @@ public final class Europe extends FreeColGameObject implements Location,
         // Start element:
         out.writeStartElement(getXMLElementTagName());
 
-        out.writeAttribute("ID", getID());
+        out.writeAttribute("ID", getId());
         out.writeAttribute("recruit0", Integer.toString(recruitables[0].getIndex()));
         out.writeAttribute("recruit1", Integer.toString(recruitables[1].getIndex()));
         out.writeAttribute("recruit2", Integer.toString(recruitables[2].getIndex()));
         out.writeAttribute("recruitPrice", Integer.toString(recruitPrice));
-        out.writeAttribute("owner", owner.getID());
+        out.writeAttribute("owner", owner.getId());
         Enumeration<String> keys = unitPrices.keys();
         while (keys.hasMoreElements()) {
             String unitType = keys.nextElement();
@@ -569,7 +569,7 @@ public final class Europe extends FreeColGameObject implements Location,
      */
     protected void readFromXMLImpl(XMLStreamReader in)
             throws XMLStreamException {
-        setID(in.getAttributeValue(null, "ID"));
+        setId(in.getAttributeValue(null, "ID"));
 
         Specification spec = FreeCol.getSpecification();
         recruitables[0] = spec.getUnitType(Integer.parseInt(in.getAttributeValue(null, "recruit0")));

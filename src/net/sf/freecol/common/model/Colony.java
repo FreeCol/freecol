@@ -207,7 +207,7 @@ public final class Colony extends Settlement implements Abilities, Location, Nam
         if (workLocation instanceof Building) {
             Building building = (Building) workLocation;
             BuildingType buildingType = building.getType().getFirstLevel();
-            buildingMap.put(buildingType.getID(), building);
+            buildingMap.put(buildingType.getId(), building);
             for (Feature feature : building.getType().getFeatures().values()) {
                 setFeature(feature);
             }
@@ -476,10 +476,10 @@ public final class Colony extends Settlement implements Abilities, Location, Nam
      * @return The <code>Building</code>.
      */
     public Building getBuilding(int typeIndex) {
-        return buildingMap.get(FreeCol.getSpecification().getBuildingType(typeIndex).getFirstLevel().getID());
+        return buildingMap.get(FreeCol.getSpecification().getBuildingType(typeIndex).getFirstLevel().getId());
     }
     public Building getBuilding(BuildingType type) {
-        return buildingMap.get(type.getFirstLevel().getID());
+        return buildingMap.get(type.getFirstLevel().getId());
     }
 
     /**
@@ -1329,7 +1329,7 @@ public final class Colony extends Settlement implements Abilities, Location, Nam
                     removeGoods(Goods.HAMMERS);
                     removeGoods(Goods.TOOLS, buildable.getToolsRequired());
                     if (buildable instanceof UnitType) {
-                        Unit unit = getGame().getModelController().createUnit(getID() + "buildUnit", getTile(), getOwner(),
+                        Unit unit = getGame().getModelController().createUnit(getId() + "buildUnit", getTile(), getOwner(),
                                                                               (UnitType) buildable);
                         addModelMessage(this, "model.colony.unitReady",
                                         new String[][] { { "%colony%", getName() },
@@ -1535,13 +1535,13 @@ public final class Colony extends Settlement implements Abilities, Location, Nam
         if (getGoodsCount(Goods.FOOD) >= 200) {
             List<UnitType> unitTypes = FreeCol.getSpecification().getUnitTypesWithAbility("model.ability.bornInColony");
             if (unitTypes.size() > 0) {
-                int random = getGame().getModelController().getRandom(getID() + "bornInColony", unitTypes.size());
-                Unit u = getGame().getModelController().createUnit(getID() + "newTurn200food",
+                int random = getGame().getModelController().getRandom(getId() + "bornInColony", unitTypes.size());
+                Unit u = getGame().getModelController().createUnit(getId() + "newTurn200food",
                                                 getTile(), getOwner(), unitTypes.get(random));
                 removeGoods(Goods.FOOD, 200);
                 addModelMessage(this, "model.colony.newColonist", new String[][] { { "%colony%", getName() } },
                                 ModelMessage.UNIT_ADDED, u);
-                logger.info("New colonist created in " + getName() + " with ID=" + u.getID());
+                logger.info("New colonist created in " + getName() + " with ID=" + u.getId());
             }
         }
     }
@@ -1844,10 +1844,10 @@ public final class Colony extends Settlement implements Abilities, Location, Nam
         // Start element:
         out.writeStartElement(getXMLElementTagName());
         // Add attributes:
-        out.writeAttribute("ID", getID());
+        out.writeAttribute("ID", getId());
         out.writeAttribute("name", name);
-        out.writeAttribute("owner", owner.getID());
-        out.writeAttribute("tile", tile.getID());
+        out.writeAttribute("owner", owner.getId());
+        out.writeAttribute("tile", tile.getId());
         out.writeAttribute("defenseBonus", Integer.toString(defenseBonus));
         if (getGame().isClientTrusted() || showAll || player == getOwner()) {
             out.writeAttribute("sonsOfLiberty", Integer.toString(sonsOfLiberty));
@@ -1855,7 +1855,7 @@ public final class Colony extends Settlement implements Abilities, Location, Nam
             out.writeAttribute("tories", Integer.toString(tories));
             out.writeAttribute("oldTories", Integer.toString(oldTories));
             out.writeAttribute("productionBonus", Integer.toString(productionBonus));
-            out.writeAttribute("currentlyBuilding", getCurrentlyBuilding().getID());
+            out.writeAttribute("currentlyBuilding", getCurrentlyBuilding().getId());
             out.writeAttribute("landLocked", Boolean.toString(landLocked));
             char[] exportsCharArray = new char[exports.length];
             for (int i = 0; i < exports.length; i++) {
@@ -1897,7 +1897,7 @@ public final class Colony extends Settlement implements Abilities, Location, Nam
     @Override
     protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
         initializeGoodsTypeArrays();
-        setID(in.getAttributeValue(null, "ID"));
+        setId(in.getAttributeValue(null, "ID"));
         name = in.getAttributeValue(null, "name");
         owner = (Player) getGame().getFreeColGameObject(in.getAttributeValue(null, "owner"));
         if (owner == null) {

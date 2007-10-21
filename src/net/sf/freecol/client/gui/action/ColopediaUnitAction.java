@@ -37,7 +37,7 @@ public class ColopediaUnitAction extends MapboardAction {
     private static final Logger logger = Logger.getLogger(ColopediaUnitAction.class.getName());
 
 
-    public static final String ID = "colopediaUnitAction";
+    public static final String id = "colopediaUnitAction";
     
     /**
      * Creates this action.
@@ -62,7 +62,7 @@ public class ColopediaUnitAction extends MapboardAction {
      * @return "colopediaUnitAction"
      */
     public String getId() {
-        return ID;
+        return id;
     }
 
     /**

@@ -38,7 +38,7 @@ public class ZoomInAction extends FreeColAction {
 
 
 
-    public static final String ID = "zoomInAction";
+    public static final String id = "zoomInAction";
 
 
     /**
@@ -71,7 +71,7 @@ public class ZoomInAction extends FreeColAction {
      * @return "zoomInAction"
      */
     public String getId() {
-        return ID;
+        return id;
     }
 
     /**
@@ -94,6 +94,6 @@ public class ZoomInAction extends FreeColAction {
         getFreeColClient().getCanvas().refresh();
 
         update();
-        freeColClient.getActionManager().getFreeColAction(ZoomOutAction.ID).update();
+        freeColClient.getActionManager().getFreeColAction(ZoomOutAction.id).update();
     }
 }

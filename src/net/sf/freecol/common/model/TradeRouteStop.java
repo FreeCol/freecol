@@ -143,7 +143,7 @@ public class TradeRouteStop {
 
     public void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
         out.writeStartElement(getXMLElementTagName());
-        out.writeAttribute("location", this.location.getID());
+        out.writeAttribute("location", this.location.getId());
         if (goodsToUnload != null) {
             out.writeStartElement("goodsToUnload");
             for (AbstractGoods goods : goodsToUnload) {

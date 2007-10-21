@@ -291,7 +291,7 @@ public class ColonyTile extends FreeColGameObject implements WorkLocation, Ownab
     */
     public void add(Locatable locatable) {
         if (isColonyCenterTile() || unit != null) {
-            throw new IllegalStateException("Other unit present while adding a unit to ColonyTile:" + getID());
+            throw new IllegalStateException("Other unit present while adding a unit to ColonyTile:" + getId());
         }
 
         if (!canAdd(locatable)) {
@@ -551,9 +551,9 @@ public class ColonyTile extends FreeColGameObject implements WorkLocation, Ownab
         out.writeStartElement(getXMLElementTagName());
         
         // Add attributes:       
-        out.writeAttribute("ID", getID());
-        out.writeAttribute("colony", colony.getID());
-        out.writeAttribute("workTile", workTile.getID());
+        out.writeAttribute("ID", getId());
+        out.writeAttribute("colony", colony.getId());
+        out.writeAttribute("workTile", workTile.getId());
 
         if (unit != null) {
             unit.toXML(out, player, showAll, toSavedGame);
@@ -570,7 +570,7 @@ public class ColonyTile extends FreeColGameObject implements WorkLocation, Ownab
      *      during parsing.
      */
     protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
-        setID(in.getAttributeValue(null, "ID"));
+        setId(in.getAttributeValue(null, "ID"));
 
         colony = (Colony) getGame().getFreeColGameObject(in.getAttributeValue(null, "colony"));
         if (colony == null) {

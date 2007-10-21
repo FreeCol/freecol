@@ -38,7 +38,7 @@ public class PreferencesAction extends MapboardAction {
 
 
 
-    public static final String ID = "preferencesAction";
+    public static final String id = "preferencesAction";
 
 
     /**
@@ -66,7 +66,7 @@ public class PreferencesAction extends MapboardAction {
      * @return "declareIndependenceAction"
      */
     public String getId() {
-        return ID;
+        return id;
     }
 
     public String getMenuItemText() {

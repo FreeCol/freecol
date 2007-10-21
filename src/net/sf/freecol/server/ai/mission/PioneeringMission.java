@@ -131,7 +131,7 @@ public class PioneeringMission extends Mission {
         if (tileImprovementPlan != null) {
             return;
         }
-        final AIPlayer aiPlayer = (AIPlayer) getAIMain().getAIObject(getUnit().getOwner().getID());
+        final AIPlayer aiPlayer = (AIPlayer) getAIMain().getAIObject(getUnit().getOwner().getId());
         final Unit carrier = (getUnit().getLocation() instanceof Unit) ? (Unit) getUnit().getLocation() : null;
         
         final Tile startTile;
@@ -253,7 +253,7 @@ public class PioneeringMission extends Mission {
                     final int tools = ac.getAvailableTools();
                     if (tools >= 20) {                    
                         Element equipUnitElement = Message.createNewRootElement("equipunit");
-                        equipUnitElement.setAttribute("unit", getUnit().getID());
+                        equipUnitElement.setAttribute("unit", getUnit().getId());
                         equipUnitElement.setAttribute("type", Integer.toString(Goods.TOOLS.getIndex()));
                         equipUnitElement.setAttribute("amount", Integer.toString(Math.min(tools - tools % 20, 100)));
                         try {
@@ -289,7 +289,7 @@ public class PioneeringMission extends Mission {
                         && getUnit().getState() != Unit.IMPROVING
                         && getUnit().checkSetState(Unit.IMPROVING)) {
                     Element changeStateElement = Message.createNewRootElement("changeState");
-                    changeStateElement.setAttribute("unit", getUnit().getID());
+                    changeStateElement.setAttribute("unit", getUnit().getId());
                     changeStateElement.setAttribute("state", Integer.toString(Unit.IMPROVING));
                     try {
                         connection.sendAndWait(changeStateElement);
@@ -361,7 +361,7 @@ public class PioneeringMission extends Mission {
      *         and <code>false</code> otherwise.
      */    
     public static boolean isValid(AIUnit aiUnit) {
-        AIPlayer aiPlayer = (AIPlayer) aiUnit.getAIMain().getAIObject(aiUnit.getUnit().getOwner().getID());
+        AIPlayer aiPlayer = (AIPlayer) aiUnit.getAIMain().getAIObject(aiUnit.getUnit().getOwner().getId());
         Iterator<TileImprovementPlan> tiIterator = aiPlayer.getTileImprovementPlanIterator();            
         while (tiIterator.hasNext()) {
             TileImprovementPlan ti = tiIterator.next();
@@ -383,9 +383,9 @@ public class PioneeringMission extends Mission {
     protected void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
         out.writeStartElement(getXMLElementTagName());
         
-        out.writeAttribute("unit", getUnit().getID());
+        out.writeAttribute("unit", getUnit().getId());
         if (tileImprovementPlan != null) {
-            out.writeAttribute("tileImprovementPlan", tileImprovementPlan.getID());
+            out.writeAttribute("tileImprovementPlan", tileImprovementPlan.getId());
         }
 
         out.writeEndElement();

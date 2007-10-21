@@ -326,7 +326,7 @@ public final class InGameController implements NetworkConstants {
         if (name != null) {
             object.setName(name);
             Element renameElement = Message.createNewRootElement("rename");
-            renameElement.setAttribute("nameable", ((FreeColGameObject) object).getID());
+            renameElement.setAttribute("nameable", ((FreeColGameObject) object).getId());
             renameElement.setAttribute("name", name);
             freeColClient.getClient().sendAndWait(renameElement);
         }
@@ -477,7 +477,7 @@ public final class InGameController implements NetworkConstants {
 
         Element buildColonyElement = Message.createNewRootElement("buildColony");
         buildColonyElement.setAttribute("name", name);
-        buildColonyElement.setAttribute("unit", unit.getID());
+        buildColonyElement.setAttribute("unit", unit.getId());
 
         Element reply = client.ask(buildColonyElement);
 
@@ -616,9 +616,9 @@ public final class InGameController implements NetworkConstants {
      */
     public void setDestination(Unit unit, Location destination) {
         Element setDestinationElement = Message.createNewRootElement("setDestination");
-        setDestinationElement.setAttribute("unit", unit.getID());
+        setDestinationElement.setAttribute("unit", unit.getId());
         if (destination != null) {
-            setDestinationElement.setAttribute("destination", destination.getID());
+            setDestinationElement.setAttribute("destination", destination.getId());
         }
 
         unit.setDestination(destination);
@@ -868,7 +868,7 @@ public final class InGameController implements NetworkConstants {
     private void updateCurrentStop(Unit unit) {
         // Set destination to next stop's location
         Element updateCurrentStopElement = Message.createNewRootElement("updateCurrentStop");
-        updateCurrentStopElement.setAttribute("unit", unit.getID());
+        updateCurrentStopElement.setAttribute("unit", unit.getId());
         freeColClient.getClient().sendAndWait(updateCurrentStopElement);
         
         Stop stop = unit.nextStop();
@@ -1035,7 +1035,7 @@ public final class InGameController implements NetworkConstants {
         Settlement settlement = map.getNeighbourOrNull(direction, unit.getTile()).getSettlement();
 
         Element spyElement = Message.createNewRootElement("spySettlement");
-        spyElement.setAttribute("unit", unit.getID());
+        spyElement.setAttribute("unit", unit.getId());
         spyElement.setAttribute("direction", String.valueOf(direction));
         Element reply = freeColClient.getClient().ask(spyElement);
         if (reply != null) {
@@ -1051,7 +1051,7 @@ public final class InGameController implements NetworkConstants {
             
             do {
                 Element diplomaticElement = Message.createNewRootElement("diplomaticTrade");
-                diplomaticElement.setAttribute("unit", unit.getID());
+                diplomaticElement.setAttribute("unit", unit.getId());
                 diplomaticElement.setAttribute("direction", String.valueOf(direction));
                 diplomaticElement.appendChild(agreement.toXMLElement(null, diplomaticElement.getOwnerDocument()));
                 reply = freeColClient.getClient().ask(diplomaticElement);
@@ -1091,7 +1091,7 @@ public final class InGameController implements NetworkConstants {
                 unit.getTile()).getColony();
 
         Element spyElement = Message.createNewRootElement("spySettlement");
-        spyElement.setAttribute("unit", unit.getID());
+        spyElement.setAttribute("unit", unit.getId());
         spyElement.setAttribute("direction", String.valueOf(direction));
         Element reply = freeColClient.getClient().ask(spyElement);
         if (reply != null) {
@@ -1138,7 +1138,7 @@ public final class InGameController implements NetworkConstants {
         }
 
         Element buyLandElement = Message.createNewRootElement("buyLand");
-        buyLandElement.setAttribute("tile", tile.getID());
+        buyLandElement.setAttribute("tile", tile.getId());
 
         freeColClient.getMyPlayer().buyLand(tile);
 
@@ -1190,8 +1190,8 @@ public final class InGameController implements NetworkConstants {
         }
 
         Element tradePropositionElement = Message.createNewRootElement("tradeProposition");
-        tradePropositionElement.setAttribute("unit", unit.getID());
-        tradePropositionElement.setAttribute("settlement", settlement.getID());
+        tradePropositionElement.setAttribute("unit", unit.getId());
+        tradePropositionElement.setAttribute("settlement", settlement.getId());
         tradePropositionElement.appendChild(goods.toXMLElement(null, tradePropositionElement.getOwnerDocument()));
 
         Element reply = client.ask(tradePropositionElement);
@@ -1232,8 +1232,8 @@ public final class InGameController implements NetworkConstants {
             } // Ask for more gold (ret == 2):
 
             tradePropositionElement = Message.createNewRootElement("tradeProposition");
-            tradePropositionElement.setAttribute("unit", unit.getID());
-            tradePropositionElement.setAttribute("settlement", settlement.getID());
+            tradePropositionElement.setAttribute("unit", unit.getId());
+            tradePropositionElement.setAttribute("settlement", settlement.getId());
             tradePropositionElement.appendChild(goods.toXMLElement(null, tradePropositionElement.getOwnerDocument()));
             tradePropositionElement.setAttribute("gold", Integer.toString((gold * 11) / 10));
 
@@ -1259,8 +1259,8 @@ public final class InGameController implements NetworkConstants {
         Client client = freeColClient.getClient();
 
         Element tradeElement = Message.createNewRootElement("trade");
-        tradeElement.setAttribute("unit", unit.getID());
-        tradeElement.setAttribute("settlement", settlement.getID());
+        tradeElement.setAttribute("unit", unit.getId());
+        tradeElement.setAttribute("settlement", settlement.getId());
         tradeElement.setAttribute("gold", Integer.toString(gold));
         tradeElement.appendChild(goods.toXMLElement(null, tradeElement.getOwnerDocument()));
 
@@ -1300,7 +1300,7 @@ public final class InGameController implements NetworkConstants {
         Client client = freeColClient.getClient();
         
         Element buyPropositionElement = Message.createNewRootElement("buyProposition");
-        buyPropositionElement.setAttribute("unit", unit.getID());
+        buyPropositionElement.setAttribute("unit", unit.getId());
         buyPropositionElement.appendChild(goods.toXMLElement(null, buyPropositionElement.getOwnerDocument()));
 
         Element reply = client.ask(buyPropositionElement);
@@ -1335,7 +1335,7 @@ public final class InGameController implements NetworkConstants {
             } // Ask for more gold (ret == 2):
 
             buyPropositionElement = Message.createNewRootElement("buyProposition");
-            buyPropositionElement.setAttribute("unit", unit.getID());
+            buyPropositionElement.setAttribute("unit", unit.getId());
             buyPropositionElement.appendChild(goods.toXMLElement(null, buyPropositionElement.getOwnerDocument()));
             buyPropositionElement.setAttribute("gold", Integer.toString((gold * 9) / 10));
 
@@ -1357,7 +1357,7 @@ public final class InGameController implements NetworkConstants {
         Client client = freeColClient.getClient();
 
         Element buyElement = Message.createNewRootElement("buy");
-        buyElement.setAttribute("unit", unit.getID());
+        buyElement.setAttribute("unit", unit.getId());
         buyElement.setAttribute("gold", Integer.toString(gold));
         buyElement.appendChild(goods.toXMLElement(null, buyElement.getOwnerDocument()));
 
@@ -1384,8 +1384,8 @@ public final class InGameController implements NetworkConstants {
         Client client = freeColClient.getClient();
 
         Element deliverGiftElement = Message.createNewRootElement("deliverGift");
-        deliverGiftElement.setAttribute("unit", unit.getID());
-        deliverGiftElement.setAttribute("settlement", settlement.getID());
+        deliverGiftElement.setAttribute("unit", unit.getId());
+        deliverGiftElement.setAttribute("settlement", settlement.getId());
         deliverGiftElement.appendChild(goods.toXMLElement(null, deliverGiftElement.getOwnerDocument()));
 
         client.sendAndWait(deliverGiftElement);
@@ -1425,7 +1425,7 @@ public final class InGameController implements NetworkConstants {
             if (cash) {
                 // Inform the server:
                 Element cashInTreasureTrainElement = Message.createNewRootElement("cashInTreasureTrain");
-                cashInTreasureTrainElement.setAttribute("unit", unit.getID());
+                cashInTreasureTrainElement.setAttribute("unit", unit.getId());
 
                 client.sendAndWait(cashInTreasureTrainElement);
 
@@ -1455,7 +1455,7 @@ public final class InGameController implements NetworkConstants {
 
         // Inform the server:
         Element moveElement = Message.createNewRootElement("move");
-        moveElement.setAttribute("unit", unit.getID());
+        moveElement.setAttribute("unit", unit.getId());
         moveElement.setAttribute("direction", Integer.toString(direction));
 
         // TODO: server can actually fail (illegal move)!
@@ -1528,7 +1528,7 @@ public final class InGameController implements NetworkConstants {
                 return;
             case FreeColDialog.SCOUT_INDIAN_SETTLEMENT_TRIBUTE:
                 Element demandMessage = Message.createNewRootElement("armedUnitDemandTribute");
-                demandMessage.setAttribute("unit", unit.getID());
+                demandMessage.setAttribute("unit", unit.getId());
                 demandMessage.setAttribute("direction", Integer.toString(direction));
                 Element reply = freeColClient.getClient().ask(demandMessage);
                 if (reply != null && reply.getTagName().equals("armedUnitDemandTributeResult")) {
@@ -1648,7 +1648,7 @@ public final class InGameController implements NetworkConstants {
         }
 
         Element attackElement = Message.createNewRootElement("attack");
-        attackElement.setAttribute("unit", unit.getID());
+        attackElement.setAttribute("unit", unit.getId());
         attackElement.setAttribute("direction", Integer.toString(direction));
 
         // Get the result of the attack from the server:
@@ -1864,9 +1864,9 @@ public final class InGameController implements NetworkConstants {
         }
 
         Element embarkElement = Message.createNewRootElement("embark");
-        embarkElement.setAttribute("unit", unit.getID());
+        embarkElement.setAttribute("unit", unit.getId());
         embarkElement.setAttribute("direction", Integer.toString(direction));
-        embarkElement.setAttribute("embarkOnto", destinationUnit.getID());
+        embarkElement.setAttribute("embarkOnto", destinationUnit.getId());
 
         client.sendAndWait(embarkElement);
     }
@@ -1906,8 +1906,8 @@ public final class InGameController implements NetworkConstants {
         freeColClient.playSound(SfxLibrary.LOAD_CARGO);
 
         Element boardShipElement = Message.createNewRootElement("boardShip");
-        boardShipElement.setAttribute("unit", unit.getID());
-        boardShipElement.setAttribute("carrier", carrier.getID());
+        boardShipElement.setAttribute("unit", unit.getId());
+        boardShipElement.setAttribute("carrier", carrier.getId());
 
         unit.boardShip(carrier);
 
@@ -1931,7 +1931,7 @@ public final class InGameController implements NetworkConstants {
         Client client = freeColClient.getClient();
 
         Element clearSpecialityElement = Message.createNewRootElement("clearSpeciality");
-        clearSpecialityElement.setAttribute("unit", unit.getID());
+        clearSpecialityElement.setAttribute("unit", unit.getId());
 
         unit.clearSpeciality();
 
@@ -1955,7 +1955,7 @@ public final class InGameController implements NetworkConstants {
         unit.leaveShip();
 
         Element leaveShipElement = Message.createNewRootElement("leaveShip");
-        leaveShipElement.setAttribute("unit", unit.getID());
+        leaveShipElement.setAttribute("unit", unit.getId());
 
         client.sendAndWait(leaveShipElement);
     }
@@ -1982,7 +1982,7 @@ public final class InGameController implements NetworkConstants {
         goods.adjustAmount();
 
         Element loadCargoElement = Message.createNewRootElement("loadCargo");
-        loadCargoElement.setAttribute("carrier", carrier.getID());
+        loadCargoElement.setAttribute("carrier", carrier.getId());
         loadCargoElement.appendChild(goods.toXMLElement(freeColClient.getMyPlayer(), loadCargoElement
                 .getOwnerDocument()));
 
@@ -2060,7 +2060,7 @@ public final class InGameController implements NetworkConstants {
         freeColClient.playSound(SfxLibrary.LOAD_CARGO);
 
         Element buyGoodsElement = Message.createNewRootElement("buyGoods");
-        buyGoodsElement.setAttribute("carrier", carrier.getID());
+        buyGoodsElement.setAttribute("carrier", carrier.getId());
         buyGoodsElement.setAttribute("type", Integer.toString(type.getIndex()));
         buyGoodsElement.setAttribute("amount", Integer.toString(amount));
 
@@ -2112,7 +2112,7 @@ public final class InGameController implements NetworkConstants {
         int lowLevel = colony.getLowLevel()[goodsType.getIndex()];
 
         Element setGoodsLevelsElement = Message.createNewRootElement("setGoodsLevels");
-        setGoodsLevelsElement.setAttribute("colony", colony.getID());
+        setGoodsLevelsElement.setAttribute("colony", colony.getId());
         setGoodsLevelsElement.setAttribute("goods", String.valueOf(goodsType.getIndex()));
         setGoodsLevelsElement.setAttribute("export", String.valueOf(export));
         setGoodsLevelsElement.setAttribute("exportLevel", String.valueOf(exportLevel));
@@ -2146,7 +2146,7 @@ public final class InGameController implements NetworkConstants {
         }
 
         Element equipUnitElement = Message.createNewRootElement("equipunit");
-        equipUnitElement.setAttribute("unit", unit.getID());
+        equipUnitElement.setAttribute("unit", unit.getId());
         equipUnitElement.setAttribute("type", Integer.toString(type.getIndex()));
         equipUnitElement.setAttribute("amount", Integer.toString(amount));
 
@@ -2221,8 +2221,8 @@ public final class InGameController implements NetworkConstants {
         Client client = freeColClient.getClient();
 
         Element workElement = Message.createNewRootElement("work");
-        workElement.setAttribute("unit", unit.getID());
-        workElement.setAttribute("workLocation", workLocation.getID());
+        workElement.setAttribute("unit", unit.getId());
+        workElement.setAttribute("workLocation", workLocation.getId());
 
         unit.work(workLocation);
 
@@ -2242,7 +2242,7 @@ public final class InGameController implements NetworkConstants {
         }
 
         Element putOutsideColonyElement = Message.createNewRootElement("putOutsideColony");
-        putOutsideColonyElement.setAttribute("unit", unit.getID());
+        putOutsideColonyElement.setAttribute("unit", unit.getId());
         unit.putOutsideColony();
 
         Client client = freeColClient.getClient();
@@ -2266,7 +2266,7 @@ public final class InGameController implements NetworkConstants {
         Client client = freeColClient.getClient();
 
         Element changeWorkTypeElement = Message.createNewRootElement("changeWorkType");
-        changeWorkTypeElement.setAttribute("unit", unit.getID());
+        changeWorkTypeElement.setAttribute("unit", unit.getId());
         changeWorkTypeElement.setAttribute("workType", Integer.toString(workType.getIndex()));
 
         unit.setWorkType(workType);
@@ -2307,8 +2307,8 @@ public final class InGameController implements NetworkConstants {
         }
 
         Element assignTeacherElement = Message.createNewRootElement("assignTeacher");
-        assignTeacherElement.setAttribute("student", student.getID());
-        assignTeacherElement.setAttribute("teacher", teacher.getID());
+        assignTeacherElement.setAttribute("student", student.getId());
+        assignTeacherElement.setAttribute("teacher", teacher.getId());
 
         if (student.getTeacher() != null) {
             student.getTeacher().setStudent(null);
@@ -2339,8 +2339,8 @@ public final class InGameController implements NetworkConstants {
         colony.setCurrentlyBuilding(type);
 
         Element setCurrentlyBuildingElement = Message.createNewRootElement("setCurrentlyBuilding");
-        setCurrentlyBuildingElement.setAttribute("colony", colony.getID());
-        setCurrentlyBuildingElement.setAttribute("type", type.getID());
+        setCurrentlyBuildingElement.setAttribute("colony", colony.getId());
+        setCurrentlyBuildingElement.setAttribute("type", type.getId());
 
         client.sendAndWait(setCurrentlyBuildingElement);
     }
@@ -2405,7 +2405,7 @@ public final class InGameController implements NetworkConstants {
         // NOTE! The call to nextActiveUnit below can lead to the dreaded
         // "not your turn" error, so let's finish networking first.
         Element changeStateElement = Message.createNewRootElement("changeState");
-        changeStateElement.setAttribute("unit", unit.getID());
+        changeStateElement.setAttribute("unit", unit.getId());
         changeStateElement.setAttribute("state", Integer.toString(state));
         client.sendAndWait(changeStateElement);
 
@@ -2513,7 +2513,7 @@ public final class InGameController implements NetworkConstants {
             String skillName;
 
             Element askSkill = Message.createNewRootElement("askSkill");
-            askSkill.setAttribute("unit", unit.getID());
+            askSkill.setAttribute("unit", unit.getId());
             askSkill.setAttribute("direction", Integer.toString(direction));
 
             Element reply = client.ask(askSkill);
@@ -2542,7 +2542,7 @@ public final class InGameController implements NetworkConstants {
                         new String[][] { {"%unit%", unit.getName()}, {"%skill%", skillName} });
             } else {
                 Element learnSkill = Message.createNewRootElement("learnSkillAtSettlement");
-                learnSkill.setAttribute("unit", unit.getID());
+                learnSkill.setAttribute("unit", unit.getId());
                 learnSkill.setAttribute("direction", Integer.toString(direction));
 
                 if (!canvas.showConfirmDialog("learnSkill.text", "learnSkill.yes", "learnSkill.no", new String[][] { {
@@ -2639,7 +2639,7 @@ public final class InGameController implements NetworkConstants {
         unit.setMovesLeft(0);
 
         Element scoutMessage = Message.createNewRootElement("scoutIndianSettlement");
-        scoutMessage.setAttribute("unit", unit.getID());
+        scoutMessage.setAttribute("unit", unit.getId());
         scoutMessage.setAttribute("direction", Integer.toString(direction));
         scoutMessage.setAttribute("action", "basic");
         Element reply = client.ask(scoutMessage);
@@ -2753,7 +2753,7 @@ public final class InGameController implements NetworkConstants {
         int action = ((Integer) response.get(0)).intValue();
 
         Element missionaryMessage = Message.createNewRootElement("missionaryAtSettlement");
-        missionaryMessage.setAttribute("unit", unit.getID());
+        missionaryMessage.setAttribute("unit", unit.getId());
         missionaryMessage.setAttribute("direction", Integer.toString(direction));
 
         Element reply = null;
@@ -2791,7 +2791,7 @@ public final class InGameController implements NetworkConstants {
             return;
         case FreeColDialog.MISSIONARY_INCITE_INDIANS:
             missionaryMessage.setAttribute("action", "incite");
-            missionaryMessage.setAttribute("incite", ((Player) response.get(1)).getID());
+            missionaryMessage.setAttribute("incite", ((Player) response.get(1)).getId());
 
             reply = client.ask(missionaryMessage);
 
@@ -2805,10 +2805,10 @@ public final class InGameController implements NetworkConstants {
                 }
                 
                 Element inciteMessage = Message.createNewRootElement("inciteAtSettlement");
-                inciteMessage.setAttribute("unit", unit.getID());
+                inciteMessage.setAttribute("unit", unit.getId());
                 inciteMessage.setAttribute("direction", Integer.toString(direction));
                 inciteMessage.setAttribute("confirmed", confirmed ? "true" : "false");
-                inciteMessage.setAttribute("enemy", ((Player) response.get(1)).getID());
+                inciteMessage.setAttribute("enemy", ((Player) response.get(1)).getId());
 
                 if (confirmed) {
                     unit.getOwner().modifyGold(-amount);
@@ -2848,7 +2848,7 @@ public final class InGameController implements NetworkConstants {
         unit.moveToEurope();
 
         Element moveToEuropeElement = Message.createNewRootElement("moveToEurope");
-        moveToEuropeElement.setAttribute("unit", unit.getID());
+        moveToEuropeElement.setAttribute("unit", unit.getId());
 
         client.sendAndWait(moveToEuropeElement);
     }
@@ -2891,7 +2891,7 @@ public final class InGameController implements NetworkConstants {
         unit.moveToAmerica();
 
         Element moveToAmericaElement = Message.createNewRootElement("moveToAmerica");
-        moveToAmericaElement.setAttribute("unit", unit.getID());
+        moveToAmericaElement.setAttribute("unit", unit.getId());
 
         client.sendAndWait(moveToAmericaElement);
     }
@@ -2965,7 +2965,7 @@ public final class InGameController implements NetworkConstants {
         }
 
         Element payForBuildingElement = Message.createNewRootElement("payForBuilding");
-        payForBuildingElement.setAttribute("colony", colony.getID());
+        payForBuildingElement.setAttribute("colony", colony.getId());
 
         colony.payForBuilding();
 
@@ -3104,7 +3104,7 @@ public final class InGameController implements NetworkConstants {
         Element tradeRoutesElement = Message.createNewRootElement("setTradeRoutes");
         for(TradeRoute route : routes) {
             Element routeElement = tradeRoutesElement.getOwnerDocument().createElement(TradeRoute.getXMLElementTagName());
-            routeElement.setAttribute("id", route.getID());
+            routeElement.setAttribute("id", route.getId());
             tradeRoutesElement.appendChild(routeElement);
         }
         freeColClient.getClient().sendAndWait(tradeRoutesElement);
@@ -3124,14 +3124,14 @@ public final class InGameController implements NetworkConstants {
     public void assignTradeRoute(Unit unit, TradeRoute tradeRoute) {
         if (tradeRoute != null) {
             Element assignTradeRouteElement = Message.createNewRootElement("assignTradeRoute");
-            assignTradeRouteElement.setAttribute("unit", unit.getID());
+            assignTradeRouteElement.setAttribute("unit", unit.getId());
             if (tradeRoute == TradeRoute.NO_TRADE_ROUTE) {
                 unit.setTradeRoute(null);
                 freeColClient.getClient().sendAndWait(assignTradeRouteElement);
                 setDestination(unit, null);
             } else {
                 unit.setTradeRoute(tradeRoute);
-                assignTradeRouteElement.setAttribute("tradeRoute", tradeRoute.getID());
+                assignTradeRouteElement.setAttribute("tradeRoute", tradeRoute.getId());
                 freeColClient.getClient().sendAndWait(assignTradeRouteElement);
                 Location location = unit.getLocation();
                 if (location instanceof Tile)
@@ -3242,7 +3242,7 @@ public final class InGameController implements NetworkConstants {
         }
 
         Element disbandUnit = Message.createNewRootElement("disbandUnit");
-        disbandUnit.setAttribute("unit", unit.getID());
+        disbandUnit.setAttribute("unit", unit.getId());
 
         unit.dispose();
 
@@ -3356,7 +3356,7 @@ public final class InGameController implements NetworkConstants {
      * @param flag whether to ignore the ModelMessage or not
      */
     public synchronized void ignoreMessage(ModelMessage message, boolean flag) {
-        String key = message.getSource().getID();
+        String key = message.getSource().getId();
         for (String[] replacement : message.getData()) {
             if (replacement[0].equals("%goods%")) {
                 key += replacement[1];
@@ -3394,7 +3394,7 @@ public final class InGameController implements NetworkConstants {
         for (ModelMessage message : inputList) {
             if (shouldAllowMessage(message)) {
                 if (message.getType() == ModelMessage.WAREHOUSE_CAPACITY) {
-                    String key = message.getSource().getID();
+                    String key = message.getSource().getId();
                     for (String[] replacement : message.getData()) {
                         if (replacement[0].equals("%goods%")) {
                             key += replacement[1];
@@ -3562,7 +3562,7 @@ public final class InGameController implements NetworkConstants {
         Client client = freeColClient.getClient();
 
         Element abandonColony = Message.createNewRootElement("abandonColony");
-        abandonColony.setAttribute("colony", colony.getID());
+        abandonColony.setAttribute("colony", colony.getId());
 
         colony.dispose();
         client.sendAndWait(abandonColony);

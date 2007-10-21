@@ -194,7 +194,7 @@ public final class AIInGameInputHandler implements MessageHandler, StreamedMessa
         final Game game = freeColServer.getGame();
         final Player currentPlayer = (Player) game.getFreeColGameObject(setCurrentPlayerElement.getAttribute("player"));
 
-        if (serverPlayer.getID() == currentPlayer.getID()) {
+        if (serverPlayer.getId() == currentPlayer.getId()) {
             logger.finest("Starting new Thread for " + serverPlayer.getName());
             Thread t = new Thread("AIPlayer (" + serverPlayer.getName() + ")") {
                 public void run() {
@@ -242,7 +242,7 @@ public final class AIInGameInputHandler implements MessageHandler, StreamedMessa
 
         FoundingFather foundingFather = getAIPlayer().selectFoundingFather(possibleFoundingFathers);
         Element reply = Message.createNewRootElement("chosenFoundingFather");
-        reply.setAttribute("foundingFather", foundingFather.getID());
+        reply.setAttribute("foundingFather", foundingFather.getId());
         serverPlayer.setCurrentFather(foundingFather);
 
         return reply;

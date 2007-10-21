@@ -155,7 +155,7 @@ public class DefendSettlementMission extends Mission {
             
             if (bestTarget != null) {
                 Element element = Message.createNewRootElement("attack");
-                element.setAttribute("unit", unit.getID());
+                element.setAttribute("unit", unit.getId());
                 element.setAttribute("direction", Integer.toString(bestDirection));
 
                 try {
@@ -181,7 +181,7 @@ public class DefendSettlementMission extends Mission {
                     && unit.getState() != Unit.FORTIFYING
                     && unit.checkSetState(Unit.FORTIFYING)) {
                 Element changeStateElement = Message.createNewRootElement("changeState");
-                changeStateElement.setAttribute("unit", unit.getID());
+                changeStateElement.setAttribute("unit", unit.getId());
                 changeStateElement.setAttribute("state", Integer.toString(Unit.FORTIFYING));
                 try {
                     logger.log(Level.FINEST, "Sending fortity request...");
@@ -261,8 +261,8 @@ public class DefendSettlementMission extends Mission {
     protected void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
         out.writeStartElement(getXMLElementTagName());
         
-        out.writeAttribute("unit", getUnit().getID());
-        out.writeAttribute("settlement", settlement.getID());
+        out.writeAttribute("unit", getUnit().getId());
+        out.writeAttribute("settlement", settlement.getId());
 
         out.writeEndElement();
     }

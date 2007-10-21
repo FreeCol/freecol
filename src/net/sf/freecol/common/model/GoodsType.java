@@ -137,7 +137,7 @@ public final class GoodsType extends FreeColGameObjectType
 
     public void readFromXML(XMLStreamReader in, final Map<String, GoodsType> goodsTypeByRef)
             throws XMLStreamException {
-        setID(in.getAttributeValue(null, "id"));
+        setId(in.getAttributeValue(null, "id"));
         isFarmed = getAttribute(in, "is-farmed", false);
         isFood = getAttribute(in, "is-food", false);
         ignoreLimit = getAttribute(in, "ignore-limit", false);

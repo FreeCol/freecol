@@ -38,7 +38,7 @@ public class FortifyAction extends MapboardAction {
 
 
 
-    public static final String ID = "fortifyAction";
+    public static final String id = "fortifyAction";
 
 
     /**
@@ -74,7 +74,7 @@ public class FortifyAction extends MapboardAction {
      * @return "fortifyAction"
      */
     public String getId() {
-        return ID;
+        return id;
     }
 
     /**

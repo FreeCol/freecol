@@ -2190,7 +2190,7 @@ public class Unit extends FreeColGameObject implements Abilities, Locatable, Loc
      *            otherwise.
      */
     public void setMissionary(boolean b) {
-        logger.finest(getID() + ": Entering method setMissionary with param " + b);
+        logger.finest(getId() + ": Entering method setMissionary with param " + b);
         setMovesLeft(0);
 
         if (b) {
@@ -3685,7 +3685,7 @@ public class Unit extends FreeColGameObject implements Abilities, Locatable, Loc
                 // 50% colony bonus
                 return new Modifier("modifiers.inColony", 50, Modifier.PERCENTAGE);
             } else {
-                String modifier = stockade.getType().getID();
+                String modifier = stockade.getType().getId();
                 modifier = "modifiers." + modifier.substring(modifier.lastIndexOf(".") + 1);
                 return new Modifier(modifier, colony.getDefenseBonus(), Modifier.PERCENTAGE);
             }
@@ -4186,9 +4186,9 @@ public class Unit extends FreeColGameObject implements Abilities, Locatable, Loc
 
         List<UnitType> treasureUnitTypes = FreeCol.getSpecification().getUnitTypesWithAbility("model.ability.carryTreasure");
         if (treasureUnitTypes.size() > 0) {
-            int randomTreasure = modelController.getRandom(getID() + "indianTreasureRandom" + getID(), 11);
-            int random = modelController.getRandom(getID() + "newUnitForTreasure" + getID(), treasureUnitTypes.size());
-            Unit tTrain = modelController.createUnit(getID() + "indianTreasure" + getID(), newTile, getOwner(),
+            int randomTreasure = modelController.getRandom(getId() + "indianTreasureRandom" + getId(), 11);
+            int random = modelController.getRandom(getId() + "newUnitForTreasure" + getId(), treasureUnitTypes.size());
+            Unit tTrain = modelController.createUnit(getId() + "indianTreasure" + getId(), newTile, getOwner(),
                     treasureUnitTypes.get(random));
 
             // Larger treasure if Hernan Cortes is present in the congress:
@@ -4436,7 +4436,7 @@ public class Unit extends FreeColGameObject implements Abilities, Locatable, Loc
         UnitType learnType = FreeCol.getSpecification().getExpertForProducing(goodsType);
         if (learnType != null && unitType.canLearnFromExperience(learnType)) {
             logger.finest("About to call getRandom for experience");
-            int random = getGame().getModelController().getRandom(getID() + "experience", 5000);
+            int random = getGame().getModelController().getRandom(getId() + "experience", 5000);
             if (random < Math.min(experience, 200)) {
                 logger.finest("About to change type of unit due to experience.");
                 String oldName = getName();
@@ -4456,7 +4456,7 @@ public class Unit extends FreeColGameObject implements Abilities, Locatable, Loc
      */
     public void newTurn() {
         if (isUninitialized()) {
-            logger.warning("Calling newTurn for an uninitialized object: " + getID());
+            logger.warning("Calling newTurn for an uninitialized object: " + getId());
         }
         checkExperiencePromotion();
         movesLeft = getInitialMovesLeft();
@@ -4491,7 +4491,7 @@ public class Unit extends FreeColGameObject implements Abilities, Locatable, Loc
         // Start element:
         out.writeStartElement(getXMLElementTagName());
 
-        out.writeAttribute("ID", getID());
+        out.writeAttribute("ID", getId());
         if (name != null) {
             out.writeAttribute("name", name);
         }
@@ -4505,7 +4505,7 @@ public class Unit extends FreeColGameObject implements Abilities, Locatable, Loc
         out.writeAttribute("numberOfTools", Integer.toString(numberOfTools));
         String ownerID = null;
         if (getOwner().equals(player) || !hasAbility("model.ability.piracy") || showAll) {
-            ownerID = owner.getID();
+            ownerID = owner.getId();
         } else {
             ownerID = "unknown";
         }
@@ -4517,37 +4517,37 @@ public class Unit extends FreeColGameObject implements Abilities, Locatable, Loc
         out.writeAttribute("hitpoints", Integer.toString(hitpoints));
 
         if (student != null) {
-            out.writeAttribute("student", student.getID());
+            out.writeAttribute("student", student.getId());
         }
 
         if (teacher != null) {
-            out.writeAttribute("teacher", teacher.getID());
+            out.writeAttribute("teacher", teacher.getId());
         }
 
         if (indianSettlement != null) {
             if (getGame().isClientTrusted() || showAll || player == getOwner()) {
-                out.writeAttribute("indianSettlement", indianSettlement.getID());
+                out.writeAttribute("indianSettlement", indianSettlement.getId());
             }
         }
 
         if (entryLocation != null) {
-            out.writeAttribute("entryLocation", entryLocation.getID());
+            out.writeAttribute("entryLocation", entryLocation.getId());
         }
 
         if (location != null) {
             if (getGame().isClientTrusted() || showAll || player == getOwner()
                     || !(location instanceof Building || location instanceof ColonyTile)) {
-                out.writeAttribute("location", location.getID());
+                out.writeAttribute("location", location.getId());
             } else {
-                out.writeAttribute("location", getColony().getID());
+                out.writeAttribute("location", getColony().getId());
             }
         }
 
         if (destination != null) {
-            out.writeAttribute("destination", destination.getID());
+            out.writeAttribute("destination", destination.getId());
         }
         if (tradeRoute != null) {
-            out.writeAttribute("tradeRoute", tradeRoute.getID());
+            out.writeAttribute("tradeRoute", tradeRoute.getId());
             out.writeAttribute("currentStop", String.valueOf(currentStop));
         }
 
@@ -4564,12 +4564,12 @@ public class Unit extends FreeColGameObject implements Abilities, Locatable, Loc
             if (hasAbility("model.ability.carryGoods")) {
                 out.writeAttribute("visibleGoodsCount", Integer.toString(getGoodsCount()));
                 GoodsContainer emptyGoodsContainer = new GoodsContainer(getGame(), this);
-                emptyGoodsContainer.setFakeID(goodsContainer.getID());
+                emptyGoodsContainer.setFakeID(goodsContainer.getId());
                 emptyGoodsContainer.toXML(out, player, showAll, toSavedGame);
             }
             if (hasAbility("model.ability.carryUnits")) {
                 UnitContainer emptyUnitContainer = new UnitContainer(getGame(), this);
-                emptyUnitContainer.setFakeID(unitContainer.getID());
+                emptyUnitContainer.setFakeID(unitContainer.getId());
                 emptyUnitContainer.toXML(out, player, showAll, toSavedGame);
             }
         }
@@ -4584,7 +4584,7 @@ public class Unit extends FreeColGameObject implements Abilities, Locatable, Loc
      * @throws javax.xml.stream.XMLStreamException is thrown if something goes wrong.
      */
     protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
-        setID(in.getAttributeValue(null, "ID"));
+        setId(in.getAttributeValue(null, "ID"));
         setName(in.getAttributeValue(null, "name"));
         type = Integer.parseInt(in.getAttributeValue(null, "type"));
         unitType = FreeCol.getSpecification().getUnitType(type);
@@ -4856,7 +4856,7 @@ public class Unit extends FreeColGameObject implements Abilities, Locatable, Loc
         String unitName = getName();
         String colonyName = colony.getName();
         
-        int random = getGame().getModelController().getRandom(getID() + "pillageColony",
+        int random = getGame().getModelController().getRandom(getId() + "pillageColony",
                 buildingList.size() + goodsList.size() + shipList.size() + 1);
         if (random < buildingList.size()) {
             Building building = buildingList.get(random);
@@ -4899,7 +4899,7 @@ public class Unit extends FreeColGameObject implements Abilities, Locatable, Loc
      */
     private void getConvert(IndianSettlement indianSettlement) {
         ModelController modelController = getGame().getModelController();
-        int random = modelController.getRandom(getID() + "getConvert", 100);
+        int random = modelController.getRandom(getId() + "getConvert", 100);
         int convertProbability = (5 - getOwner().getDifficulty()) * 10; // 50% - 10%
         Modifier modifier = getOwner().getModifier("model.ability.nativeConvertBonus");
         if (modifier != null) {
@@ -4915,8 +4915,8 @@ public class Unit extends FreeColGameObject implements Abilities, Locatable, Loc
                 List<UnitType> converts = FreeCol.getSpecification().getUnitTypesWithAbility("model.ability.convert");
                 if (converts.size() > 0) {
                     indianSettlement.getFirstUnit().dispose();
-                    random = modelController.getRandom(getID() + "getConvertType", converts.size());
-                    modelController.createUnit(getID() + "indianConvert", getLocation(),
+                    random = modelController.getRandom(getId() + "getConvertType", converts.size());
+                    modelController.createUnit(getId() + "indianConvert", getLocation(),
                             getOwner(), converts.get(random));
                 }
             }

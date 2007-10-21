@@ -129,7 +129,7 @@ public final class ResourceType extends FreeColGameObjectType
 
     public void readFromXML(XMLStreamReader in, final Map<String, GoodsType> goodsTypeByRef)
             throws XMLStreamException {
-        setID(in.getAttributeValue(null, "id"));
+        setId(in.getAttributeValue(null, "id"));
         art = in.getAttributeValue(null, "art");
         if (hasAttribute(in, "maximum-value")) {
             maxValue = Integer.parseInt(in.getAttributeValue(null, "maximum-value"));

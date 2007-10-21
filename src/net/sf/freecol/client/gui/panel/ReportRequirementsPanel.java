@@ -321,7 +321,7 @@ public final class ReportRequirementsPanel extends ReportPanel implements Action
         button.setForeground(LINK_COLOR);
         button.setAlignmentY(0.8f);
         button.setBorder(BorderFactory.createEmptyBorder());
-        button.setActionCommand(colony.getID());
+        button.setActionCommand(colony.getId());
         button.addActionListener(this);
         return button;
     }

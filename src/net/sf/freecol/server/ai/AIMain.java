@@ -138,7 +138,7 @@ public class AIMain extends FreeColObject implements FreeColGameObjectListener {
         boolean ok = true;
         for (AIObject ao : aiObjects.values()) {
             if (ao.isUninitialized()) {
-                logger.warning("Uninitialized object: " + ao.getID() + " (" + ao.getClass() + ")");
+                logger.warning("Uninitialized object: " + ao.getId() + " (" + ao.getClass() + ")");
                 ok = false;
             }
         }
@@ -146,8 +146,8 @@ public class AIMain extends FreeColObject implements FreeColGameObjectListener {
         while (fit.hasNext()) {
             FreeColGameObject f = fit.next();
             if ((f instanceof Unit || f instanceof Player || f instanceof Colony)
-                    && !aiObjects.containsKey(f.getID())) {
-                logger.warning("Missing AIObject for: " + f.getID());
+                    && !aiObjects.containsKey(f.getId())) {
+                logger.warning("Missing AIObject for: " + f.getId());
                 ok = false;
             }
         }
@@ -203,7 +203,7 @@ public class AIMain extends FreeColObject implements FreeColGameObjectListener {
         while (i.hasNext()) {
             FreeColGameObject fcgo = i.next();
             if (overwrite || getAIObject(fcgo) == null) {
-                setFreeColGameObject(fcgo.getID(), fcgo);
+                setFreeColGameObject(fcgo.getId(), fcgo);
             }
         }
     }
@@ -219,7 +219,7 @@ public class AIMain extends FreeColObject implements FreeColGameObjectListener {
     * @return The <code>AIObject</code>.
     */
     public AIObject getAIObject(FreeColGameObject fcgo) {
-        return getAIObject(fcgo.getID());
+        return getAIObject(fcgo.getId());
     }
 
 
@@ -281,7 +281,7 @@ public class AIMain extends FreeColObject implements FreeColGameObjectListener {
         AIObject ao = getAIObject(source);
         if (ao != null) {
             ao.dispose();
-            setFreeColGameObject(source.getID(), source);
+            setFreeColGameObject(source.getId(), source);
         }
     }
 
@@ -300,8 +300,8 @@ public class AIMain extends FreeColObject implements FreeColGameObjectListener {
         if (aiObjects.containsKey(id)) {
             return;
         }
-        if (!id.equals(freeColGameObject.getID())) {
-            throw new IllegalArgumentException("!id.equals(freeColGameObject.getID())");
+        if (!id.equals(freeColGameObject.getId())) {
+            throw new IllegalArgumentException("!id.equals(freeColGameObject.getId())");
         }
         if (freeColGameObject instanceof Unit) {
             new AIUnit(this, (Unit) freeColGameObject);
@@ -344,10 +344,10 @@ public class AIMain extends FreeColObject implements FreeColGameObjectListener {
 
             try {
                 if (!(aio instanceof Wish) || ((Wish) aio).shouldBeStored()) {
-                    if (aio.getID() != null) {
+                    if (aio.getId() != null) {
                         aio.toXML(out);
                     } else {
-                        logger.warning("aio.getID() == null, for: " + aio.getClass().getName());
+                        logger.warning("aio.getId() == null, for: " + aio.getClass().getName());
                     }
                 }
             } catch (Exception e) {

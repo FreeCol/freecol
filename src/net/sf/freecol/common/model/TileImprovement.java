@@ -403,9 +403,9 @@ public class TileImprovement extends TileItem implements Locatable, Named {
         out.writeStartElement(getXMLElementTagName());
 
         // Add attributes:
-        out.writeAttribute("ID", getID());
-        out.writeAttribute("tile", getTile().getID());
-        out.writeAttribute("type", getType().getID());
+        out.writeAttribute("ID", getId());
+        out.writeAttribute("tile", getTile().getId());
+        out.writeAttribute("type", getType().getId());
         out.writeAttribute("turns", Integer.toString(turnsToComplete));
         out.writeAttribute("magnitude", Integer.toString(magnitude));
         out.writeAttribute("style", Integer.toString(style));
@@ -422,7 +422,7 @@ public class TileImprovement extends TileItem implements Locatable, Named {
      */
     @Override
     protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
-        setID(in.getAttributeValue(null, "ID"));
+        setId(in.getAttributeValue(null, "ID"));
 
         tile = (Tile) getGame().getFreeColGameObject(in.getAttributeValue(null, "tile"));
         if (tile == null) {

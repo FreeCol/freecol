@@ -41,7 +41,7 @@ public class MapControlsAction extends SelectableAction {
 
 
 
-    public static final String ID = "mapControlsAction";
+    public static final String id = "mapControlsAction";
 
     private MapControls mapControls;
 
@@ -73,7 +73,7 @@ public class MapControlsAction extends SelectableAction {
      * @return "mapControlsAction"
      */
     public String getId() {
-        return ID;
+        return id;
     }
 
     /**

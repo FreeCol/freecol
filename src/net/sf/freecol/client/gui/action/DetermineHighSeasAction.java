@@ -51,7 +51,7 @@ public class DetermineHighSeasAction extends FreeColAction {
 
 
 
-    public static final String ID = "determineHighSeasAction";
+    public static final String id = "determineHighSeasAction";
 
 
     /**
@@ -69,7 +69,7 @@ public class DetermineHighSeasAction extends FreeColAction {
      * @return "determineHighSeasAction"
      */
     public String getId() {
-        return ID;
+        return id;
     }
     
     /**

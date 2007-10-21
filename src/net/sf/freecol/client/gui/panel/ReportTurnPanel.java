@@ -156,7 +156,7 @@ public final class ReportTurnPanel extends ReportPanel implements ActionListener
                 if (message.getDisplay() instanceof Colony) {
                     final JButton button = new JButton();
                     button.setIcon(icon);
-                    button.setActionCommand(((Colony) message.getDisplay()).getID());
+                    button.setActionCommand(((Colony) message.getDisplay()).getId());
                     button.addActionListener(this);
                     button.setBorder(BorderFactory.createEmptyBorder());
                 } else if (message.getDisplay() instanceof Unit) {
@@ -217,24 +217,24 @@ public final class ReportTurnPanel extends ReportPanel implements ActionListener
             Europe europe = (Europe) source;
             JButton button = new JButton(europe.getName());
             button.addActionListener(this);
-            button.setActionCommand(europe.getID());
+            button.setActionCommand(europe.getId());
             headline = button;
         } else if (source instanceof Market) {
             JButton button = new JButton(Messages.message("model.message.marketPrices"));
             button.addActionListener(this);
-            button.setActionCommand(freeColClient.getMyPlayer().getEurope().getID());
+            button.setActionCommand(freeColClient.getMyPlayer().getEurope().getId());
             headline = button;
         } else if (source instanceof Colony) {
             final Colony colony = (Colony) source;
             JButton button = new JButton(colony.getName());
             button.addActionListener(this);
-            button.setActionCommand(colony.getID());
+            button.setActionCommand(colony.getId());
             headline = button;
         } else if (source instanceof Unit) {
             final Unit unit = (Unit) source;
             JButton button = new JButton(unit.getName());
             button.addActionListener(this);
-            button.setActionCommand(unit.getTile().getID());
+            button.setActionCommand(unit.getTile().getId());
             headline = button;
         } else if (source instanceof Nameable) {
             headline = new JLabel(((Nameable) source).getName());
@@ -277,7 +277,7 @@ public final class ReportTurnPanel extends ReportPanel implements ActionListener
 
         Player player = freeColClient.getMyPlayer();
         try {
-            String input = Messages.message(message.getID());
+            String input = Messages.message(message.getId());
             int start = input.indexOf('%');
             if (start == -1) {
                 // no variables present
@@ -356,7 +356,7 @@ public final class ReportTurnPanel extends ReportPanel implements ActionListener
         button.setAlignmentY(0.8f);
         button.setBorder(BorderFactory.createEmptyBorder());
         button.addActionListener(this);
-        button.setActionCommand(object.getID());
+        button.setActionCommand(object.getId());
         StyleConstants.setComponent(document.getStyle("button"), button);
         document.insertString(document.getLength(), " ", document.getStyle("button"));
     }

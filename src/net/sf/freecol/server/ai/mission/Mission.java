@@ -82,7 +82,7 @@ public abstract class Mission extends AIObject {
      * Gets the ID of this mission.
      * @return The ID.
      */
-    public String getID() {
+    public String getId() {
         return null;
     }
     
@@ -157,7 +157,7 @@ public abstract class Mission extends AIObject {
     */
     protected void move(Connection connection, int direction) {
         Element moveElement = Message.createNewRootElement("move");
-        moveElement.setAttribute("unit", getUnit().getID());
+        moveElement.setAttribute("unit", getUnit().getId());
         moveElement.setAttribute("direction", Integer.toString(direction));
 
         try {
@@ -177,7 +177,7 @@ public abstract class Mission extends AIObject {
     protected void exploreLostCityRumour(Connection connection) {
         if (getUnit().getTile().hasLostCityRumour()) {           
             Element exploreElement = Message.createNewRootElement("explore");
-            exploreElement.setAttribute("unit", getUnit().getID());       
+            exploreElement.setAttribute("unit", getUnit().getId());       
             try {
                 connection.ask(exploreElement);
             } catch (IOException e) {

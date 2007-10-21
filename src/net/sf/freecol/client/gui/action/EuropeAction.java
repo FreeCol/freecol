@@ -37,7 +37,7 @@ public class EuropeAction extends MapboardAction {
 
 
 
-    public static final String ID = "europeAction";
+    public static final String id = "europeAction";
 
 
     /**
@@ -55,7 +55,7 @@ public class EuropeAction extends MapboardAction {
      * @return "europeAction"
      */
     public String getId() {
-        return ID;
+        return id;
     }
 
     /**

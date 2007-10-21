@@ -144,7 +144,7 @@ public class TileImprovementPlan extends AIObject {
      * Returns the ID for this <code>TileImprovementPlan</code>.
      * @return The ID of this <code>TileImprovementPlan</code>.
      */
-    public String getID() {
+    public String getId() {
         return id;
     }
 
@@ -232,13 +232,13 @@ public class TileImprovementPlan extends AIObject {
     protected void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
         out.writeStartElement(getXMLElementTagName());
 
-        out.writeAttribute("ID", getID());        
+        out.writeAttribute("ID", getId());        
         out.writeAttribute("type", Integer.toString(type.getIndex()));
         out.writeAttribute("value", Integer.toString(value));
         if (pioneer != null) {
-            out.writeAttribute("pioneer", pioneer.getID());
+            out.writeAttribute("pioneer", pioneer.getId());
         }
-        out.writeAttribute("target", target.getID());
+        out.writeAttribute("target", target.getId());
 
         out.writeEndElement();
     }

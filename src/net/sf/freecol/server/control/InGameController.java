@@ -102,7 +102,7 @@ public final class InGameController extends Controller {
         Player winner = checkForWinner();
         if (winner != null && (!freeColServer.isSingleplayer() || !winner.isAI())) {
             Element gameEndedElement = Message.createNewRootElement("gameEnded");
-            gameEndedElement.setAttribute("winner", winner.getID());
+            gameEndedElement.setAttribute("winner", winner.getId());
             freeColServer.getServer().sendToAll(gameEndedElement, null);
             return;
         }
@@ -149,7 +149,7 @@ public final class InGameController extends Controller {
             if (checkForDeath(newPlayer)) {
                 newPlayer.setDead(true);
                 Element setDeadElement = Message.createNewRootElement("setDead");
-                setDeadElement.setAttribute("player", newPlayer.getID());
+                setDeadElement.setAttribute("player", newPlayer.getId());
                 freeColServer.getServer().sendToAll(setDeadElement, null);
                 return nextPlayer();
             }
@@ -180,7 +180,7 @@ public final class InGameController extends Controller {
         }
         
         Element setCurrentPlayerElement = Message.createNewRootElement("setCurrentPlayer");
-        setCurrentPlayerElement.setAttribute("player", newPlayer.getID());
+        setCurrentPlayerElement.setAttribute("player", newPlayer.getId());
         freeColServer.getServer().sendToAll(setCurrentPlayerElement, null);
         
         return newPlayer;
@@ -207,7 +207,7 @@ public final class InGameController extends Controller {
                 for (int i = 0; i < randomFoundingFathers.size(); i++) {
                     if (randomFoundingFathers.get(i) != null) {
                         chooseFoundingFatherElement.setAttribute("foundingFather" + Integer.toString(i), 
-                                                                 randomFoundingFathers.get(i).getID());
+                                                                 randomFoundingFathers.get(i).getId());
                         atLeastOneChoice = true;
                     } else {
                         chooseFoundingFatherElement.setAttribute("foundingFather" + Integer.toString(i), "");
@@ -477,7 +477,7 @@ public final class InGameController extends Controller {
                             return;
                         }
                         nextPlayer.setStance(enemy, Player.WAR);
-                        monarchActionElement.setAttribute("enemy", enemy.getID());
+                        monarchActionElement.setAttribute("enemy", enemy.getId());
                         try {
                             nextPlayer.getConnection().send(monarchActionElement);
                         } catch (IOException e) {
@@ -623,9 +623,9 @@ public final class InGameController extends Controller {
                                         opponentAttackElement.setAttribute("result", Integer.toString(result));
                                         opponentAttackElement
                                                 .setAttribute("plunderGold", Integer.toString(plunderGold));
-                                        opponentAttackElement.setAttribute("colony", colony.getID());
-                                        opponentAttackElement.setAttribute("unit", attacker.getID());
-                                        opponentAttackElement.setAttribute("defender", unit.getID());
+                                        opponentAttackElement.setAttribute("colony", colony.getId());
+                                        opponentAttackElement.setAttribute("unit", attacker.getId());
+                                        opponentAttackElement.setAttribute("defender", unit.getId());
 
                                         if (!enemyPlayer.canSee(attacker.getTile())) {
                                             opponentAttackElement.setAttribute("update", "tile");
@@ -650,7 +650,7 @@ public final class InGameController extends Controller {
                                  * bombardElement.setAttribute("result",
                                  * Integer.toString(result));
                                  * bombardElement.setAttribute("colony",
-                                 * colony.getID());
+                                 * colony.getId());
                                  * 
                                  * if (!unit.isVisibleTo(player)) {
                                  * bombardElement.appendChild(unit.toXMLElement(player,

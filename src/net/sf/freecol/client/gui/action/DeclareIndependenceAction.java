@@ -35,7 +35,7 @@ public class DeclareIndependenceAction extends MapboardAction {
 
 
 
-    public static final String ID = "declareIndependenceAction";
+    public static final String id = "declareIndependenceAction";
 
 
     /**
@@ -63,7 +63,7 @@ public class DeclareIndependenceAction extends MapboardAction {
      * @return "declareIndependenceAction"
      */
     public String getId() {
-        return ID;
+        return id;
     }
 
     /**

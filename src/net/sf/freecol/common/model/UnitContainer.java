@@ -273,7 +273,7 @@ public class UnitContainer extends FreeColGameObject {
         // Start element:
         out.writeStartElement(getXMLElementTagName());
 
-        out.writeAttribute("ID", getID());
+        out.writeAttribute("ID", getId());
 
         Iterator<Unit> unitIterator = getUnitIterator();
         while (unitIterator.hasNext()) {
@@ -290,7 +290,7 @@ public class UnitContainer extends FreeColGameObject {
      * @param in The input stream with the XML.
      */
     protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
-        setID(in.getAttributeValue(null, "ID"));
+        setId(in.getAttributeValue(null, "ID"));
 
         units.clear();
 

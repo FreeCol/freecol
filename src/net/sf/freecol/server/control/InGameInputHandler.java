@@ -534,7 +534,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         }
         Location entryLocation = getFreeColServer().getModelController().setToVacantEntryLocation(unit);
         Element reply = Message.createNewRootElement("getVacantEntryLocationConfirmed");
-        reply.setAttribute("location", entryLocation.getID());
+        reply.setAttribute("location", entryLocation.getId());
         return reply;
     }
 
@@ -562,10 +562,10 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         ServerPlayer player = getFreeColServer().getPlayer(connection);
         Element childElement = (Element) element.getChildNodes().item(0);
         TradeRoute clientTradeRoute = new TradeRoute(null, childElement);
-        TradeRoute serverTradeRoute = (TradeRoute) getGame().getFreeColGameObject(clientTradeRoute.getID());
+        TradeRoute serverTradeRoute = (TradeRoute) getGame().getFreeColGameObject(clientTradeRoute.getId());
         if (serverTradeRoute == null) {
             throw new IllegalArgumentException("Could not find 'TradeRoute' with specified ID: "
-                    + clientTradeRoute.getID());
+                    + clientTradeRoute.getId());
         }
         if (serverTradeRoute.getOwner() != player) {
             throw new IllegalStateException("Not your trade route!");
@@ -682,7 +682,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         Settlement settlement = tile.getSettlement();
         if (settlement == null) {
             throw new IllegalArgumentException("No settlement on 'Tile' " +
-                                               tile.getID());
+                                               tile.getId());
         }
         unit.setMovesLeft(0);
         
@@ -830,19 +830,19 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
                 if (unit.isVisibleTo(enemyPlayer)) { // && !disembark
                     Element opponentMoveElement = Message.createNewRootElement("opponentMove");
                     opponentMoveElement.setAttribute("direction", Integer.toString(direction));
-                    opponentMoveElement.setAttribute("unit", unit.getID());
+                    opponentMoveElement.setAttribute("unit", unit.getId());
                     enemyPlayer.getConnection().send(opponentMoveElement);
                 } else if (enemyPlayer.canSee(newTile)
                         && (newTile.getSettlement() == null || !getGame().getGameOptions().getBoolean(
                                 GameOptions.UNIT_HIDING))) {
                     Element opponentMoveElement = Message.createNewRootElement("opponentMove");
                     opponentMoveElement.setAttribute("direction", Integer.toString(direction));
-                    opponentMoveElement.setAttribute("tile", newTile.getID());
+                    opponentMoveElement.setAttribute("tile", newTile.getId());
                     opponentMoveElement.appendChild(unit.toXMLElement(enemyPlayer, opponentMoveElement
                             .getOwnerDocument()));
                     if (unit.getLocation() instanceof Unit && !((Unit) unit.getLocation()).isVisibleTo(enemyPlayer)) {
                         Unit location = (Unit) unit.getLocation();
-                        opponentMoveElement.setAttribute("inUnit", location.getID());
+                        opponentMoveElement.setAttribute("inUnit", location.getId());
                         opponentMoveElement.appendChild(location.toXMLElement(enemyPlayer, opponentMoveElement
                                 .getOwnerDocument()));
                     }
@@ -909,7 +909,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
                     int moves = Math.min(9, 3 + diff / 3);
                     unit.setMovesLeft(unit.getMovesLeft() - moves);
                     reply.setAttribute("movesSlowed", Integer.toString(moves));
-                    reply.setAttribute("slowedBy", attacker.getID());
+                    reply.setAttribute("slowedBy", attacker.getId());
                 }
             }
         }
@@ -1010,7 +1010,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         }
         Element rumourElement = Message.createNewRootElement("lostCityRumour");
         rumourElement.setAttribute("type", Integer.toString(rumour));
-        rumourElement.setAttribute("unit", unit.getID());
+        rumourElement.setAttribute("unit", unit.getId());
         Unit newUnit;
         int random;
         dx = 10 - player.getDifficulty(); // 6-10
@@ -1027,7 +1027,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         case LostCityRumour.LEARN:
             random = getPseudoRandom().nextInt(learntUnitTypes.size());
             unit.setType(learntUnitTypes.get(random));
-            rumourElement.setAttribute("unitType", learntUnitTypes.get(random).getID());
+            rumourElement.setAttribute("unitType", learntUnitTypes.get(random).getId());
             break;
         case LostCityRumour.TRIBAL_CHIEF:
             int amount = getPseudoRandom().nextInt(dx * 10) + dx * 5;
@@ -1238,8 +1238,8 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
                 opponentAttackElement.setAttribute("direction", Integer.toString(direction));
                 opponentAttackElement.setAttribute("result", Integer.toString(result));
                 opponentAttackElement.setAttribute("plunderGold", Integer.toString(plunderGold));
-                opponentAttackElement.setAttribute("unit", unit.getID());
-                opponentAttackElement.setAttribute("defender", defender.getID());
+                opponentAttackElement.setAttribute("unit", unit.getId());
+                opponentAttackElement.setAttribute("defender", defender.getId());
                 if (!defender.isVisibleTo(enemyPlayer)) {
                     opponentAttackElement.setAttribute("update", "defender");
                     if (!enemyPlayer.canSee(defender.getTile())) {
@@ -1279,7 +1279,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         if (unit.canCaptureGoods() && getGame().getGameOptions().getBoolean(GameOptions.UNIT_HIDING)) {
             List<Goods> goodsInUnit = unit.getGoodsContainer().getFullGoods();
             for (Goods goods : goodsInUnit) {
-                oldGoodsCounts.put(goods.getType().getID(), goods.getAmount());
+                oldGoodsCounts.put(goods.getType().getId(), goods.getAmount());
             }
         }
         int oldUnits = unit.getTile().getUnitCount();
@@ -1299,7 +1299,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         if (unit.canCaptureGoods() && getGame().getGameOptions().getBoolean(GameOptions.UNIT_HIDING)) {
             List<Goods> goodsInUnit = unit.getGoodsContainer().getCompactGoods();
             for (Goods newGoods : goodsInUnit) {
-                int capturedGoods = newGoods.getAmount() - oldGoodsCounts.get(newGoods.getType().getID()).intValue();
+                int capturedGoods = newGoods.getAmount() - oldGoodsCounts.get(newGoods.getType().getId()).intValue();
                 if (capturedGoods > 0) {
                     Element captured = reply.getOwnerDocument().createElement("capturedGoods");
                     captured.setAttribute("type", Integer.toString(newGoods.getType().getIndex()));
@@ -1415,7 +1415,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
                 if (enemyPlayer.canSee(oldTile)) {
                     Element removeElement = Message.createNewRootElement("remove");
                     Element removeUnit = removeElement.getOwnerDocument().createElement("removeObject");
-                    removeUnit.setAttribute("ID", unit.getID());
+                    removeUnit.setAttribute("ID", unit.getId());
                     removeElement.appendChild(removeUnit);
                     enemyPlayer.getConnection().send(removeElement);
                 }
@@ -1462,7 +1462,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
                     if (enemyPlayer.canSee(oldTile)) {
                         Element removeElement = Message.createNewRootElement("remove");
                         Element removeUnit = removeElement.getOwnerDocument().createElement("removeObject");
-                        removeUnit.setAttribute("ID", unit.getID());
+                        removeUnit.setAttribute("ID", unit.getId());
                         removeElement.appendChild(removeUnit);
                         enemyPlayer.getConnection().send(removeElement);
                     }
@@ -1748,7 +1748,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
                 if (unit.isVisibleTo(enemyPlayer)) {
                     Element removeElement = Message.createNewRootElement("remove");
                     Element removeUnit = removeElement.getOwnerDocument().createElement("removeObject");
-                    removeUnit.setAttribute("ID", unit.getID());
+                    removeUnit.setAttribute("ID", unit.getId());
                     removeElement.appendChild(removeUnit);
                     enemyPlayer.getConnection().send(removeElement);
                 }
@@ -1909,7 +1909,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
                 if (enemyPlayer.canSee(oldTile)) {
                     Element removeElement = Message.createNewRootElement("remove");
                     Element removeUnit = removeElement.getOwnerDocument().createElement("removeObject");
-                    removeUnit.setAttribute("ID", unit.getID());
+                    removeUnit.setAttribute("ID", unit.getId());
                     removeElement.appendChild(removeUnit);
                     enemyPlayer.getConnection().send(removeElement);
                 }
@@ -2420,7 +2420,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         }
         independent.giveIndependence();
         Element giveIndependenceElement = Message.createNewRootElement("giveIndependence");
-        giveIndependenceElement.setAttribute("player", independent.getID());
+        giveIndependenceElement.setAttribute("player", independent.getId());
         getFreeColServer().getServer().sendToAll(giveIndependenceElement, connection);
         return null;
     }
@@ -2442,7 +2442,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
                 continue;
             }
             Element enemyElement = reply.getOwnerDocument().createElement("opponent");
-            enemyElement.setAttribute("player", enemyPlayer.getID());
+            enemyElement.setAttribute("player", enemyPlayer.getId());
             int numberOfColonies = enemyPlayer.getSettlements().size();
             int numberOfUnits = 0;
             int militaryStrength = 0;
@@ -2797,7 +2797,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
             unitElement.replaceChild(goodsContainerElement, unitElement.getElementsByTagName(
                     GoodsContainer.getXMLElementTagName()).item(0));
             deliverGiftElement.appendChild(unitElement);
-            deliverGiftElement.setAttribute("settlement", settlement.getID());
+            deliverGiftElement.setAttribute("settlement", settlement.getId());
             deliverGiftElement.appendChild(goods.toXMLElement(receiver, deliverGiftElement.getOwnerDocument()));
             try {
                 receiver.getConnection().send(deliverGiftElement);
@@ -2916,7 +2916,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         /*
          * player.setDead(true); Element setDeadElement =
          * Message.createNewRootElement("setDead");
-         * setDeadElement.setAttribute("player", player.getID());
+         * setDeadElement.setAttribute("player", player.getId());
          * freeColServer.getServer().sendToAll(setDeadElement, connection);
          */
         /*

@@ -512,8 +512,8 @@ public final class Monarch extends FreeColGameObject {
         // Start element:
         out.writeStartElement(getXMLElementTagName());
 
-        out.writeAttribute("ID", getID());
-        out.writeAttribute("player", this.player.getID());
+        out.writeAttribute("ID", getId());
+        out.writeAttribute("player", this.player.getId());
         out.writeAttribute("name", name);
         out.writeAttribute("supportSea", String.valueOf(supportSea));
         toArrayElement("ref", ref, out);
@@ -526,7 +526,7 @@ public final class Monarch extends FreeColGameObject {
      * @param in The input stream with the XML.
      */
     protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
-        setID(in.getAttributeValue(null, "ID"));
+        setId(in.getAttributeValue(null, "ID"));
         
         player = (Player) getGame().getFreeColGameObject(in.getAttributeValue(null, "player"));
         if (player == null) {

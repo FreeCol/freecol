@@ -138,7 +138,7 @@ public class UnitTradeItem extends TradeItem {
     public void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
         out.writeStartElement(getXMLElementTagName());
         super.toXML(out);
-        out.writeAttribute("unit", this.unit.getID());
+        out.writeAttribute("unit", this.unit.getId());
         out.writeEndElement();
     }
     

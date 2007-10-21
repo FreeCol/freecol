@@ -184,25 +184,25 @@ public class InGameMenuBar extends FreeColMenuBar {
         menu.setOpaque(false);
         menu.setMnemonic(KeyEvent.VK_G);
 
-        menu.add(getMenuItem(NewAction.ID));
-        menu.add(getMenuItem(OpenAction.ID));
-        menu.add(getMenuItem(SaveAction.ID));
+        menu.add(getMenuItem(NewAction.id));
+        menu.add(getMenuItem(OpenAction.id));
+        menu.add(getMenuItem(SaveAction.id));
 
         menu.addSeparator();
 
-        menu.add(getMenuItem(PreferencesAction.ID));
-        menu.add(getMenuItem(ReconnectAction.ID));
+        menu.add(getMenuItem(PreferencesAction.id));
+        menu.add(getMenuItem(ReconnectAction.id));
 
         menu.addSeparator();
 
-        menu.add(getMenuItem(ChatAction.ID));
-        menu.add(getMenuItem(DeclareIndependenceAction.ID));
-        menu.add(getMenuItem(EndTurnAction.ID));
+        menu.add(getMenuItem(ChatAction.id));
+        menu.add(getMenuItem(DeclareIndependenceAction.id));
+        menu.add(getMenuItem(EndTurnAction.id));
 
         menu.addSeparator();
 
-        menu.add(getMenuItem(ShowMainAction.ID));
-        menu.add(getMenuItem(QuitAction.ID));
+        menu.add(getMenuItem(ShowMainAction.id));
+        menu.add(getMenuItem(QuitAction.id));
 
         add(menu);
     }
@@ -214,21 +214,21 @@ public class InGameMenuBar extends FreeColMenuBar {
         menu.setOpaque(false);
         menu.setMnemonic(KeyEvent.VK_V);
 
-        menu.add(getCheckBoxMenuItem(MapControlsAction.ID));
-        menu.add(getCheckBoxMenuItem(DisplayTileNamesAction.ID));
-        menu.add(getCheckBoxMenuItem(DisplayTileOwnersAction.ID));
-        menu.add(getCheckBoxMenuItem(DisplayGridAction.ID));
-        menu.add(getMenuItem(ToggleViewModeAction.ID));
-        menu.add(getCheckBoxMenuItem(ChangeWindowedModeAction.ID));
+        menu.add(getCheckBoxMenuItem(MapControlsAction.id));
+        menu.add(getCheckBoxMenuItem(DisplayTileNamesAction.id));
+        menu.add(getCheckBoxMenuItem(DisplayTileOwnersAction.id));
+        menu.add(getCheckBoxMenuItem(DisplayGridAction.id));
+        menu.add(getMenuItem(ToggleViewModeAction.id));
+        menu.add(getCheckBoxMenuItem(ChangeWindowedModeAction.id));
 
         menu.addSeparator();
-        menu.add(getMenuItem(ZoomInAction.ID));
-        menu.add(getMenuItem(ZoomOutAction.ID));
+        menu.add(getMenuItem(ZoomInAction.id));
+        menu.add(getMenuItem(ZoomOutAction.id));
 
         menu.addSeparator();
 
-        menu.add(getMenuItem(EuropeAction.ID));
-        menu.add(getMenuItem(TradeRouteAction.ID));
+        menu.add(getMenuItem(EuropeAction.id));
+        menu.add(getMenuItem(TradeRouteAction.id));
 
         add(menu);
     }
@@ -239,36 +239,36 @@ public class InGameMenuBar extends FreeColMenuBar {
         menu.setOpaque(false);
         menu.setMnemonic(KeyEvent.VK_O);
 
-        menu.add(getMenuItem(WaitAction.ID));
-        menu.add(getMenuItem(SentryAction.ID));
-        menu.add(getMenuItem(FortifyAction.ID));
-        menu.add(getMenuItem(GotoAction.ID));
-        menu.add(getMenuItem(AssignTradeRouteAction.ID));
+        menu.add(getMenuItem(WaitAction.id));
+        menu.add(getMenuItem(SentryAction.id));
+        menu.add(getMenuItem(FortifyAction.id));
+        menu.add(getMenuItem(GotoAction.id));
+        menu.add(getMenuItem(AssignTradeRouteAction.id));
 
         menu.addSeparator();
 
-        menu.add(getMenuItem(BuildColonyAction.ID));
+        menu.add(getMenuItem(BuildColonyAction.id));
         // Insert all Improvements here:
         for (ImprovementActionType iaType : FreeCol.getSpecification().getImprovementActionTypeList()) {
-            menu.add(getMenuItem(iaType.getID()));
+            menu.add(getMenuItem(iaType.getId()));
         }
         /*  Depreciated
-        menu.add(getMenuItem(PlowAction.ID));
-        menu.add(getMenuItem(BuildRoadAction.ID));
+        menu.add(getMenuItem(PlowAction.id));
+        menu.add(getMenuItem(BuildRoadAction.id));
         */
-        menu.add(getMenuItem(UnloadAction.ID));
+        menu.add(getMenuItem(UnloadAction.id));
 
         menu.addSeparator();
 
-        menu.add(getMenuItem(ExecuteGotoOrdersAction.ID));
-        menu.add(getMenuItem(SkipUnitAction.ID));
-        menu.add(getMenuItem(ChangeAction.ID));
-        menu.add(getMenuItem(ClearOrdersAction.ID));
+        menu.add(getMenuItem(ExecuteGotoOrdersAction.id));
+        menu.add(getMenuItem(SkipUnitAction.id));
+        menu.add(getMenuItem(ChangeAction.id));
+        menu.add(getMenuItem(ClearOrdersAction.id));
 
         menu.addSeparator();
 
-        menu.add(getMenuItem(RenameAction.ID));
-        menu.add(getMenuItem(DisbandUnitAction.ID));
+        menu.add(getMenuItem(RenameAction.id));
+        menu.add(getMenuItem(DisbandUnitAction.id));
 
         add(menu);
     }
@@ -280,18 +280,18 @@ public class InGameMenuBar extends FreeColMenuBar {
         menu.setOpaque(false);
         menu.setMnemonic(KeyEvent.VK_R);
 
-        menu.add(getMenuItem(ReportReligionAction.ID));
-        menu.add(getMenuItem(ReportLabourAction.ID));
-        menu.add(getMenuItem(ReportColonyAction.ID));
-        menu.add(getMenuItem(ReportForeignAction.ID));
-        menu.add(getMenuItem(ReportIndianAction.ID));
-        menu.add(getMenuItem(ReportContinentalCongressAction.ID));
-        menu.add(getMenuItem(ReportMilitaryAction.ID));
-        menu.add(getMenuItem(ReportNavalAction.ID));
-        menu.add(getMenuItem(ReportCargoAction.ID));
-        menu.add(getMenuItem(ReportTradeAction.ID));
-        menu.add(getMenuItem(ReportTurnAction.ID));
-        menu.add(getMenuItem(ReportRequirementsAction.ID));
+        menu.add(getMenuItem(ReportReligionAction.id));
+        menu.add(getMenuItem(ReportLabourAction.id));
+        menu.add(getMenuItem(ReportColonyAction.id));
+        menu.add(getMenuItem(ReportForeignAction.id));
+        menu.add(getMenuItem(ReportIndianAction.id));
+        menu.add(getMenuItem(ReportContinentalCongressAction.id));
+        menu.add(getMenuItem(ReportMilitaryAction.id));
+        menu.add(getMenuItem(ReportNavalAction.id));
+        menu.add(getMenuItem(ReportCargoAction.id));
+        menu.add(getMenuItem(ReportTradeAction.id));
+        menu.add(getMenuItem(ReportTurnAction.id));
+        menu.add(getMenuItem(ReportRequirementsAction.id));
 
         add(menu);
 
@@ -308,14 +308,14 @@ public class InGameMenuBar extends FreeColMenuBar {
         menu.setOpaque(false);
         menu.setMnemonic(KeyEvent.VK_C);
 
-        menu.add(getMenuItem(ColopediaTerrainAction.ID));
-        menu.add(getMenuItem(ColopediaUnitAction.ID));
-        menu.add(getMenuItem(ColopediaGoodsAction.ID));
-        menu.add(getMenuItem(ColopediaSkillAction.ID));
-        menu.add(getMenuItem(ColopediaBuildingAction.ID));
-        menu.add(getMenuItem(ColopediaFatherAction.ID));        
+        menu.add(getMenuItem(ColopediaTerrainAction.id));
+        menu.add(getMenuItem(ColopediaUnitAction.id));
+        menu.add(getMenuItem(ColopediaGoodsAction.id));
+        menu.add(getMenuItem(ColopediaSkillAction.id));
+        menu.add(getMenuItem(ColopediaBuildingAction.id));
+        menu.add(getMenuItem(ColopediaFatherAction.id));        
         menu.addSeparator();        
-        menu.add(getMenuItem(AboutAction.ID));
+        menu.add(getMenuItem(AboutAction.id));
         
         add(menu);
     }

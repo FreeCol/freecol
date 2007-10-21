@@ -49,7 +49,7 @@ public class ChangeAction extends MapboardAction {
     private static final Logger logger = Logger.getLogger(ChangeAction.class.getName());
 
 
-    public static final String ID = "changeAction";
+    public static final String id = "changeAction";
 
 
     /**
@@ -111,7 +111,7 @@ public class ChangeAction extends MapboardAction {
     * @return "changeAction"
     */
     public String getId() {
-        return ID;
+        return id;
     }
 
     /**

@@ -178,7 +178,7 @@ public final class Scope extends FreeColObject implements Cloneable {
      * @return a <code>boolean</code> value
      */
     public boolean appliesTo(FreeColGameObjectType object) {
-        if (type != null && !type.equals(object.getID())) {
+        if (type != null && !type.equals(object.getId())) {
             return false;
         }
         if (abilityID != null && object.hasAbility(abilityID) != abilityValue) {

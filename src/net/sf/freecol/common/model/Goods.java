@@ -138,11 +138,11 @@ public class Goods extends AbstractGoods implements Locatable, Ownable, Named {
     public static void initialize(List<GoodsType> goodsList, int numberOfTypes) {
         for (GoodsType g : goodsList) {
             try {
-                String fieldName = g.getID().substring(g.getID().lastIndexOf('.') + 1).toUpperCase();
+                String fieldName = g.getId().substring(g.getId().lastIndexOf('.') + 1).toUpperCase();
                 Goods.class.getDeclaredField(fieldName).set(null, g);
             } catch (Exception e) {
                 logger.warning("Error assigning a GoodsType to Goods." +
-                        g.getID().toUpperCase() + "\n" + e.toString());
+                        g.getId().toUpperCase() + "\n" + e.toString());
             }
         }
         NUMBER_OF_TYPES = numberOfTypes;
@@ -373,11 +373,11 @@ public class Goods extends AbstractGoods implements Locatable, Ownable, Named {
         // Start element:
         out.writeStartElement(getXMLElementTagName());
 
-        out.writeAttribute("type", getID());
+        out.writeAttribute("type", getId());
         out.writeAttribute("amount", Integer.toString(getAmount()));
 
         if (location != null) {
-            out.writeAttribute("location", location.getID());
+            out.writeAttribute("location", location.getId());
         } else {
             logger.warning("Creating an XML-element for a 'Goods' without a 'Location'.");
         }

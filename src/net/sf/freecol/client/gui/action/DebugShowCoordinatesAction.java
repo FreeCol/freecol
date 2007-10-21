@@ -37,7 +37,7 @@ public class DebugShowCoordinatesAction extends MapboardAction {
 
 
 
-    public static final String ID = "debugShowCoordinatesAction";
+    public static final String id = "debugShowCoordinatesAction";
 
 
     /**
@@ -64,7 +64,7 @@ public class DebugShowCoordinatesAction extends MapboardAction {
      * @return "debugShowCoordinatesAction"
      */
     public String getId() {
-        return ID;
+        return id;
     }
 
     /**

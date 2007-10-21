@@ -36,7 +36,7 @@ public class RenameAction extends MapboardAction {
 
 
 
-    public static final String ID = "renameAction";
+    public static final String id = "renameAction";
 
 
     /**
@@ -63,7 +63,7 @@ public class RenameAction extends MapboardAction {
      * @return "renameAction"
      */
     public String getId() {
-        return ID;
+        return id;
     }
 
     /**

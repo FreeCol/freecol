@@ -38,7 +38,7 @@ public class SentryAction extends MapboardAction {
 
 
     
-    public static final String ID = "sentryAction";
+    public static final String id = "sentryAction";
     
     /**
      * Creates this action.
@@ -68,7 +68,7 @@ public class SentryAction extends MapboardAction {
     * @return "sentryAction"
     */
     public String getId() {
-        return ID;
+        return id;
     }
 
     /**

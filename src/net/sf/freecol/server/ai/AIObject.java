@@ -91,7 +91,7 @@ public abstract class AIObject extends FreeColObject {
     *         the ID of the {@link FreeColGameObject} this object
     *         represents.
     */
-    public abstract String getID();
+    public abstract String getId();
     
     /**
      * Initialize this object from an XML-representation of this object.
@@ -120,7 +120,7 @@ public abstract class AIObject extends FreeColObject {
      * any referances to this object.
      */
     public void dispose() {
-        getAIMain().removeAIObject(getID());
+        getAIMain().removeAIObject(getId());
     }
     
         

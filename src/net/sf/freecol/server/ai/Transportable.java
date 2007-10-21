@@ -122,5 +122,5 @@ public interface Transportable {
      *         the ID of the {@link FreeColGameObject} that object
      *         represents.
      */    
-    public String getID();
+    public String getId();
 }

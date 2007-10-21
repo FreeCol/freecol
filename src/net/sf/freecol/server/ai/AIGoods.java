@@ -304,7 +304,7 @@ public class AIGoods extends AIObject implements Transportable {
      * Returns the ID of this {@link AIObject}.
      * @return The ID.
      */
-    public String getID() {
+    public String getId() {
         return id;
     }
 
@@ -320,18 +320,18 @@ public class AIGoods extends AIObject implements Transportable {
 
         out.writeAttribute("ID", id);
         if (destination != null) {
-            out.writeAttribute("destination", destination.getID());
+            out.writeAttribute("destination", destination.getId());
         }
         out.writeAttribute("transportPriority", Integer.toString(transportPriority));
         if (transport != null) {
-            if (getAIMain().getAIObject(transport.getID()) == null) {
+            if (getAIMain().getAIObject(transport.getId()) == null) {
                 logger.warning("broken reference to transport");
             } else if (transport.getMission() != null
                     && transport.getMission() instanceof TransportMission
                     && !((TransportMission) transport.getMission()).isOnTransportList(this)) {
                 logger.warning("We should not be on the transport list.");
             } else {
-                out.writeAttribute("transport", transport.getID());
+                out.writeAttribute("transport", transport.getId());
             }
         }
         goods.toXML(out, null);

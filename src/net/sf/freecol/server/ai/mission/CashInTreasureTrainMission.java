@@ -144,7 +144,7 @@ public class CashInTreasureTrainMission extends Mission {
         
         if (getUnit().canCashInTreasureTrain()) {
             Element cashInTreasureTrainElement = Message.createNewRootElement("cashInTreasureTrain");
-            cashInTreasureTrainElement.setAttribute("unit", getUnit().getID());
+            cashInTreasureTrainElement.setAttribute("unit", getUnit().getId());
             try {
                 connection.sendAndWait(cashInTreasureTrainElement);
             } catch (IOException e) {
@@ -201,7 +201,7 @@ public class CashInTreasureTrainMission extends Mission {
     protected void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
         out.writeStartElement(getXMLElementTagName());
         
-        out.writeAttribute("unit", getUnit().getID());
+        out.writeAttribute("unit", getUnit().getId());
 
         out.writeEndElement();
     }

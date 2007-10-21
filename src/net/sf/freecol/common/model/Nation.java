@@ -110,7 +110,7 @@ public class Nation extends FreeColGameObjectType {
      * @return a <code>String</code> value
      */
     public final String getRulerName() {
-        return Messages.message(getID() + ".ruler");
+        return Messages.message(getId() + ".ruler");
     }
 
     /**
@@ -177,7 +177,7 @@ public class Nation extends FreeColGameObjectType {
 
     public void readFromXML(XMLStreamReader in, final Map<String, NationType> nationTypeByRef)
         throws XMLStreamException {
-        setID(in.getAttributeValue(null, "id"));
+        setId(in.getAttributeValue(null, "id"));
         setColor(new Color(Integer.decode(in.getAttributeValue(null, "color"))));
         type = nationTypeByRef.get(in.getAttributeValue(null, "nation-type"));
         selectable = getAttribute(in, "selectable", false);

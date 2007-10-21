@@ -109,22 +109,22 @@ public class MapEditorMenuBar extends FreeColMenuBar {
         menu.setOpaque(false);
         menu.setMnemonic(KeyEvent.VK_G);
 
-        menu.add(getMenuItem(NewAction.ID));
-        menu.add(getMenuItem(NewEmptyMapAction.ID));
+        menu.add(getMenuItem(NewAction.id));
+        menu.add(getMenuItem(NewEmptyMapAction.id));
         
         menu.addSeparator();
         
-        menu.add(getMenuItem(OpenAction.ID));
-        menu.add(getMenuItem(SaveAction.ID));
+        menu.add(getMenuItem(OpenAction.id));
+        menu.add(getMenuItem(SaveAction.id));
 
         menu.addSeparator();
 
-        menu.add(getMenuItem(PreferencesAction.ID));
+        menu.add(getMenuItem(PreferencesAction.id));
 
         menu.addSeparator();
 
-        menu.add(getMenuItem(ShowMainAction.ID));
-        menu.add(getMenuItem(QuitAction.ID));
+        menu.add(getMenuItem(ShowMainAction.id));
+        menu.add(getMenuItem(QuitAction.id));
 
         add(menu);
     }
@@ -136,15 +136,15 @@ public class MapEditorMenuBar extends FreeColMenuBar {
         menu.setOpaque(false);
         menu.setMnemonic(KeyEvent.VK_V);
 
-        menu.add(getCheckBoxMenuItem(MapControlsAction.ID));
-        menu.add(getCheckBoxMenuItem(DisplayTileNamesAction.ID));
-        menu.add(getCheckBoxMenuItem(DisplayTileOwnersAction.ID));
-        menu.add(getCheckBoxMenuItem(DisplayGridAction.ID));
-        menu.add(getCheckBoxMenuItem(ChangeWindowedModeAction.ID));
+        menu.add(getCheckBoxMenuItem(MapControlsAction.id));
+        menu.add(getCheckBoxMenuItem(DisplayTileNamesAction.id));
+        menu.add(getCheckBoxMenuItem(DisplayTileOwnersAction.id));
+        menu.add(getCheckBoxMenuItem(DisplayGridAction.id));
+        menu.add(getCheckBoxMenuItem(ChangeWindowedModeAction.id));
         
         menu.addSeparator();
-        menu.add(getMenuItem(ZoomInAction.ID));
-        menu.add(getMenuItem(ZoomOutAction.ID));
+        menu.add(getMenuItem(ZoomInAction.id));
+        menu.add(getMenuItem(ZoomOutAction.id));
 
         add(menu);
     }
@@ -156,8 +156,8 @@ public class MapEditorMenuBar extends FreeColMenuBar {
         menu.setOpaque(false);
         menu.setMnemonic(KeyEvent.VK_T);
         
-        menu.add(getMenuItem(ScaleMapAction.ID));
-        menu.add(getMenuItem(DetermineHighSeasAction.ID));
+        menu.add(getMenuItem(ScaleMapAction.id));
+        menu.add(getMenuItem(DetermineHighSeasAction.id));
         
         add(menu);
     }
@@ -169,14 +169,14 @@ public class MapEditorMenuBar extends FreeColMenuBar {
         menu.setOpaque(false);
         menu.setMnemonic(KeyEvent.VK_C);
 
-        menu.add(getMenuItem(ColopediaTerrainAction.ID));
-        menu.add(getMenuItem(ColopediaUnitAction.ID));
-        menu.add(getMenuItem(ColopediaGoodsAction.ID));
-        menu.add(getMenuItem(ColopediaSkillAction.ID));
-        menu.add(getMenuItem(ColopediaBuildingAction.ID));
-        menu.add(getMenuItem(ColopediaFatherAction.ID));
+        menu.add(getMenuItem(ColopediaTerrainAction.id));
+        menu.add(getMenuItem(ColopediaUnitAction.id));
+        menu.add(getMenuItem(ColopediaGoodsAction.id));
+        menu.add(getMenuItem(ColopediaSkillAction.id));
+        menu.add(getMenuItem(ColopediaBuildingAction.id));
+        menu.add(getMenuItem(ColopediaFatherAction.id));
         menu.addSeparator();        
-        menu.add(getMenuItem(AboutAction.ID));
+        menu.add(getMenuItem(AboutAction.id));
 
         add(menu);
     }

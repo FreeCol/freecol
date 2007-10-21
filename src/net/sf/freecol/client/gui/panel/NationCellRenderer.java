@@ -95,7 +95,7 @@ public final class NationCellRenderer implements TableCellRenderer {
         Component component;
         if (player == thisPlayer) {
             for (int index = 0; index < nations.length; index++) {
-                if (nations[index].getID().equals(player.getNationID())) {
+                if (nations[index].getId().equals(player.getNationID())) {
                     comboBox.setSelectedIndex(index);
                     break;
                 }

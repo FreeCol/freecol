@@ -107,7 +107,7 @@ public class UnitWanderMission extends Mission {
             thisTile = unit.getGame().getMap().getNeighbourOrNull(direction, thisTile);
 
             Element moveElement = Message.createNewRootElement("move");
-            moveElement.setAttribute("unit", unit.getID());
+            moveElement.setAttribute("unit", unit.getId());
             moveElement.setAttribute("direction", Integer.toString(direction));
             
             try {
@@ -129,7 +129,7 @@ public class UnitWanderMission extends Mission {
     protected void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
         out.writeStartElement(getXMLElementTagName());
         
-        out.writeAttribute("unit", getUnit().getID());
+        out.writeAttribute("unit", getUnit().getId());
 
         out.writeEndElement();
     }

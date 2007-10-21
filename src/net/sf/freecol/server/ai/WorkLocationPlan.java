@@ -284,7 +284,7 @@ public class WorkLocationPlan {
     public Element toXMLElement(Document document) {
         Element element = document.createElement(getXMLElementTagName());
 
-        element.setAttribute("ID", workLocation.getID());
+        element.setAttribute("ID", workLocation.getId());
         element.setAttribute("priority", Integer.toString(priority));
         element.setAttribute("goodsType", Integer.toString(goodsType.getIndex()));
 

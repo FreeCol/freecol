@@ -39,7 +39,7 @@ public class DisplayGridAction extends SelectableAction {
 
 
 
-    public static final String ID = "displayGridAction";
+    public static final String id = "displayGridAction";
 
 
     /**
@@ -68,7 +68,7 @@ public class DisplayGridAction extends SelectableAction {
      * @return "displayGridAction"
      */
     public String getId() {
-        return ID;
+        return id;
     }
 
     /**

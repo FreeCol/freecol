@@ -416,7 +416,7 @@ public final class UnitType extends BuildableType implements Abilities, Modifier
      * @return <code>true</code> if can learn the given UnitType
      */
     public boolean canBeTaught(UnitType unitType) {
-        Upgrade upgrade = upgrades.get(unitType.getID());
+        Upgrade upgrade = upgrades.get(unitType.getId());
         return upgrade != null && upgrade.canBeTaught();
     }
 
@@ -427,7 +427,7 @@ public final class UnitType extends BuildableType implements Abilities, Modifier
      * @return <code>true</code> if can learn the given UnitType
      */
     public boolean canLearnFromExperience(UnitType unitType) {
-        Upgrade upgrade = upgrades.get(unitType.getID());
+        Upgrade upgrade = upgrades.get(unitType.getId());
         return upgrade != null && upgrade.learnFromExperience;
     }
 
@@ -438,7 +438,7 @@ public final class UnitType extends BuildableType implements Abilities, Modifier
      * @return <code>true</code> if can learn the given UnitType
      */
     public boolean canLearnFromNatives(UnitType unitType) {
-        Upgrade upgrade = upgrades.get(unitType.getID());
+        Upgrade upgrade = upgrades.get(unitType.getId());
         return upgrade != null && upgrade.learnFromNatives;
     }
 
@@ -449,7 +449,7 @@ public final class UnitType extends BuildableType implements Abilities, Modifier
      * @return <code>true</code> if can learn the given UnitType
      */
     public boolean canLearnInLostCity(UnitType unitType) {
-        Upgrade upgrade = upgrades.get(unitType.getID());
+        Upgrade upgrade = upgrades.get(unitType.getId());
         return upgrade != null && upgrade.learnInLostCity;
     }
 
@@ -499,7 +499,7 @@ public final class UnitType extends BuildableType implements Abilities, Modifier
      * @return a <code>int</code> value
      */
     public int getEducationTurns(UnitType unitType) {
-        Upgrade upgrade = upgrades.get(unitType.getID());
+        Upgrade upgrade = upgrades.get(unitType.getId());
         if (upgrade != null) {
             return upgrade.turnsToLearn;
         } else {
@@ -517,7 +517,7 @@ public final class UnitType extends BuildableType implements Abilities, Modifier
 
     public void readFromXML(XMLStreamReader in, final Map<String, GoodsType> goodsTypeByRef)
             throws XMLStreamException {
-        setID(in.getAttributeValue(null, "id"));
+        setId(in.getAttributeValue(null, "id"));
         offence = getAttribute(in, "offence", 0);
         defence = getAttribute(in, "defence", 1);
         movement = Integer.parseInt(in.getAttributeValue(null, "movement"));
@@ -568,7 +568,7 @@ public final class UnitType extends BuildableType implements Abilities, Modifier
             } else if (Modifier.getXMLElementTagName().equals(nodeName)) {
                 Modifier modifier = new Modifier(in); // Modifier close the element
                 if (modifier.getSource() == null) {
-                    modifier.setSource(this.getID());
+                    modifier.setSource(this.getId());
                 }
                 setModifier(modifier.getId(), modifier);
             } else {
@@ -668,7 +668,7 @@ public final class UnitType extends BuildableType implements Abilities, Modifier
             return 0;
         }
         
-        Modifier modifier = getModifier(goodsType.getID());
+        Modifier modifier = getModifier(goodsType.getId());
         if (modifier != null) {
             base = (int) modifier.applyTo(base);
         }

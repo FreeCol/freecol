@@ -38,7 +38,7 @@ public class SkipUnitAction extends MapboardAction {
 
 
 
-    public static final String ID = "skipUnitAction";
+    public static final String id = "skipUnitAction";
 
 
     /**
@@ -72,7 +72,7 @@ public class SkipUnitAction extends MapboardAction {
      * @return "skipUnitAction"
      */
     public String getId() {
-        return ID;
+        return id;
     }
 
     /**

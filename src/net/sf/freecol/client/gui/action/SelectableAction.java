@@ -39,7 +39,7 @@ public abstract class SelectableAction extends MapboardAction {
     private static final Logger logger = Logger.getLogger(SelectableAction.class.getName());
 
 
-    public static final String ID = "selectableAction";
+    public static final String id = "selectableAction";
 
     protected boolean selected = false;
 
@@ -91,7 +91,7 @@ public abstract class SelectableAction extends MapboardAction {
     * @return "mapControlsAction"
     */
     public String getId() {
-        return ID;
+        return id;
     }
 
     /**

@@ -141,8 +141,8 @@ public class WishRealizationMission extends Mission {
                     Colony colony = (Colony) wish.getDestination();
 
                     Element workElement = Message.createNewRootElement("work");
-                    workElement.setAttribute("unit", unit.getID());
-                    workElement.setAttribute("workLocation", colony.getVacantWorkLocationFor(getUnit()).getID());
+                    workElement.setAttribute("unit", unit.getId());
+                    workElement.setAttribute("workLocation", colony.getVacantWorkLocationFor(getUnit()).getId());
                     try {
                         connection.sendAndWait(workElement);
                     } catch (IOException e) {
@@ -238,8 +238,8 @@ public class WishRealizationMission extends Mission {
         if (wish.shouldBeStored()) {
             out.writeStartElement(getXMLElementTagName());
 
-            out.writeAttribute("unit", getUnit().getID());
-            out.writeAttribute("wish", wish.getID());
+            out.writeAttribute("unit", getUnit().getId());
+            out.writeAttribute("wish", wish.getId());
 
             out.writeEndElement();
         }

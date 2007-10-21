@@ -36,7 +36,7 @@ public class ClearOrdersAction extends MapboardAction {
 
 
 
-    public static final String ID = "clearOrdersAction";
+    public static final String id = "clearOrdersAction";
 
 
     /**
@@ -63,7 +63,7 @@ public class ClearOrdersAction extends MapboardAction {
      * @return "clearOrdersAction"
      */
     public String getId() {
-        return ID;
+        return id;
     }
 
     /**

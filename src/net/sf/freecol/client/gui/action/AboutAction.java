@@ -35,7 +35,7 @@ public class AboutAction extends FreeColAction {
 
 
 
-    public static final String ID = "aboutAction";
+    public static final String id = "aboutAction";
 
 
     /**
@@ -53,7 +53,7 @@ public class AboutAction extends FreeColAction {
      * @return "waitAction"
      */
     public String getId() {
-        return ID;
+        return id;
     }
 
     /**

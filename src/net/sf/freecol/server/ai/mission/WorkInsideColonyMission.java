@@ -128,8 +128,8 @@ public class WorkInsideColonyMission extends Mission{
     protected void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
         out.writeStartElement(getXMLElementTagName());
         
-        out.writeAttribute("unit", getUnit().getID());
-        out.writeAttribute("colony", aiColony.getID());
+        out.writeAttribute("unit", getUnit().getId());
+        out.writeAttribute("colony", aiColony.getId());
 
         out.writeEndElement();
     }

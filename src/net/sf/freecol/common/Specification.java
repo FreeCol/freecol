@@ -134,8 +134,8 @@ public final class Specification {
                         public GoodsType objectFrom(XMLStreamReader in) throws XMLStreamException {
                             GoodsType goodsType = new GoodsType(goodsIndex++);
                             goodsType.readFromXML(in, goodsTypeByRef);
-                            allTypes.put(goodsType.getID(), goodsType);
-                            goodsTypeByRef.put(goodsType.getID(), goodsType);
+                            allTypes.put(goodsType.getId(), goodsType);
+                            goodsTypeByRef.put(goodsType.getId(), goodsType);
                             if (goodsType.isFarmed()) {
                                 farmedGoodsTypeList.add(goodsType);
                             }
@@ -152,8 +152,8 @@ public final class Specification {
                         public BuildingType objectFrom(XMLStreamReader in) throws XMLStreamException {
                             BuildingType buildingType = new BuildingType(buildingIndex++);
                             buildingType.readFromXML(in, goodsTypeByRef, buildingTypeByRef);
-                            allTypes.put(buildingType.getID(), buildingType);
-                            buildingTypeByRef.put(buildingType.getID(), buildingType);
+                            allTypes.put(buildingType.getId(), buildingType);
+                            buildingTypeByRef.put(buildingType.getId(), buildingType);
                             return buildingType;
                         }
                     };
@@ -167,8 +167,8 @@ public final class Specification {
                         public ResourceType objectFrom(XMLStreamReader in) throws XMLStreamException {
                             ResourceType resourceType = new ResourceType(resIndex++);
                             resourceType.readFromXML(in, goodsTypeByRef);
-                            allTypes.put(resourceType.getID(), resourceType);
-                            resourceTypeByRef.put(resourceType.getID(), resourceType);
+                            allTypes.put(resourceType.getId(), resourceType);
+                            resourceTypeByRef.put(resourceType.getId(), resourceType);
                             return resourceType;
                         }
                     };
@@ -182,8 +182,8 @@ public final class Specification {
                         public TileType objectFrom(XMLStreamReader in) throws XMLStreamException {
                             TileType tileType = new TileType(tileIndex++);
                             tileType.readFromXML(in, goodsTypeByRef, resourceTypeByRef);
-                            allTypes.put(tileType.getID(), tileType);
-                            tileTypeByRef.put(tileType.getID(), tileType);
+                            allTypes.put(tileType.getId(), tileType);
+                            tileTypeByRef.put(tileType.getId(), tileType);
                             return tileType;
                         }
                     };
@@ -198,8 +198,8 @@ public final class Specification {
                             TileImprovementType tileImprovementType = new TileImprovementType(impIndex++);
                             tileImprovementType.readFromXML(in, tileTypeList,
                                                     tileTypeByRef, goodsTypeByRef, tileImprovementTypeByRef);
-                            allTypes.put(tileImprovementType.getID(), tileImprovementType);
-                            tileImprovementTypeByRef.put(tileImprovementType.getID(), tileImprovementType);
+                            allTypes.put(tileImprovementType.getId(), tileImprovementType);
+                            tileImprovementTypeByRef.put(tileImprovementType.getId(), tileImprovementType);
                             return tileImprovementType;
                         }
                     };
@@ -213,7 +213,7 @@ public final class Specification {
                         public ImprovementActionType objectFrom(XMLStreamReader in) throws XMLStreamException {
                             ImprovementActionType impActionType = new ImprovementActionType();
                             impActionType.readFromXML(in, tileImprovementTypeByRef);
-                            allTypes.put(impActionType.getID(), impActionType);
+                            allTypes.put(impActionType.getId(), impActionType);
                             return impActionType;
                         }
                     };
@@ -227,8 +227,8 @@ public final class Specification {
                         public UnitType objectFrom(XMLStreamReader in) throws XMLStreamException {
                             UnitType unitType = new UnitType(unitIndex++);
                             unitType.readFromXML(in, goodsTypeByRef);
-                            allTypes.put(unitType.getID(), unitType);
-                            unitTypeByRef.put(unitType.getID(), unitType);
+                            allTypes.put(unitType.getId(), unitType);
+                            unitTypeByRef.put(unitType.getId(), unitType);
                             return unitType;
                         }
                     };
@@ -242,7 +242,7 @@ public final class Specification {
                         public FoundingFather objectFrom(XMLStreamReader in) throws XMLStreamException {
                             FoundingFather foundingFather = new FoundingFather(fatherIndex++);
                             foundingFather.readFromXML(in, unitTypeByRef);
-                            allTypes.put(foundingFather.getID(), foundingFather);
+                            allTypes.put(foundingFather.getId(), foundingFather);
                             return foundingFather;
                         }
                     };
@@ -261,8 +261,8 @@ public final class Specification {
                                 nationType = new IndianNationType(nationIndex++);
                             }                             
                             nationType.readFromXML(in, unitTypeByRef);
-                            allTypes.put(nationType.getID(), nationType);
-                            nationTypeByRef.put(nationType.getID(), nationType);
+                            allTypes.put(nationType.getId(), nationType);
+                            nationTypeByRef.put(nationType.getId(), nationType);
                             return nationType;
                         }
                     };
@@ -276,7 +276,7 @@ public final class Specification {
                         public Nation objectFrom(XMLStreamReader in) throws XMLStreamException {
                             Nation nation = new Nation(nationIndex++);
                             nation.readFromXML(in, nationTypeByRef);
-                            allTypes.put(nation.getID(), nation);
+                            allTypes.put(nation.getId(), nation);
                             return nation;
                         }
                     };
@@ -343,7 +343,7 @@ public final class Specification {
 
     public BuildingType getBuildingType(String id) {
         for (BuildingType b : buildingTypeList) {
-            if (b.getID().equals(id)) {
+            if (b.getId().equals(id)) {
                 return b;
             }
         }
@@ -405,7 +405,7 @@ public final class Specification {
      */
     public GoodsType getGoodsType(String id) {
         for (GoodsType g : goodsTypeList) {
-            if (g.getID().equals(id)) {
+            if (g.getId().equals(id)) {
                 return g;
             }
         }
@@ -461,7 +461,7 @@ public final class Specification {
 
     public ResourceType getResourceType(String id) {
         for (ResourceType r : resourceTypeList) {
-            if (r.getID().equals(id)) {
+            if (r.getId().equals(id)) {
                 return r;
             }
         }
@@ -483,7 +483,7 @@ public final class Specification {
 
     public TileType getTileType(String id) {
         for (TileType t : tileTypeList) {
-            if (t.getID().equals(id)) {
+            if (t.getId().equals(id)) {
                 return t;
             }
         }
@@ -501,7 +501,7 @@ public final class Specification {
 
     public TileImprovementType getTileImprovementType(String id) {
         for (TileImprovementType ti : tileImprovementTypeList) {
-            if (ti.getID().equals(id)) {
+            if (ti.getId().equals(id)) {
                 return ti;
             }
         }
@@ -519,7 +519,7 @@ public final class Specification {
 
     public ImprovementActionType getImprovementActionType(String id) {
         for (ImprovementActionType ia : improvementActionTypeList) {
-            if (ia.getID().equals(id)) {
+            if (ia.getId().equals(id)) {
                 return ia;
             }
         }
@@ -545,7 +545,7 @@ public final class Specification {
 
     public UnitType getUnitType(String id) {
         for (UnitType u : unitTypeList) {
-            if (u.getID().equals(id)) {
+            if (u.getId().equals(id)) {
                 return u;
             }
         }
@@ -604,7 +604,7 @@ public final class Specification {
 
     public FoundingFather getFoundingFather(String id) {
         for (FoundingFather father : foundingFathers) {
-            if (father.getID().equals(id)) {
+            if (father.getId().equals(id)) {
                 return father;
             }
         }
@@ -671,7 +671,7 @@ public final class Specification {
 
     public NationType getNationType(String id) {
         for (NationType nation : nationTypes) {
-            if (nation.getID().equals(id)) {
+            if (nation.getId().equals(id)) {
                 return nation;
             }
         }
@@ -688,7 +688,7 @@ public final class Specification {
 
     public Nation getNation(String id) {
         for (Nation nation : nations) {
-            if (nation.getID().equals(id)) {
+            if (nation.getId().equals(id)) {
                 return nation;
             }
         }

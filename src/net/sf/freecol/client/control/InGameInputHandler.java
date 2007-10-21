@@ -230,7 +230,7 @@ public final class InGameInputHandler extends InputHandler {
                 return null;
             }
             if (unit.getTile() == null) {
-                logger.warning("Ignoring opponentMove, unit " + unit.getID() + " has no tile!");
+                logger.warning("Ignoring opponentMove, unit " + unit.getId() + " has no tile!");
                 return null;
             }
 
@@ -564,7 +564,7 @@ public final class InGameInputHandler extends InputHandler {
         FoundingFather foundingFather = possibleFoundingFathers[selected];
 
         Element reply = Message.createNewRootElement("chosenFoundingFather");
-        reply.setAttribute("foundingFather", foundingFather.getID());
+        reply.setAttribute("foundingFather", foundingFather.getId());
         getFreeColClient().getMyPlayer().setCurrentFather(foundingFather);
         return reply;
     }
@@ -612,7 +612,7 @@ public final class InGameInputHandler extends InputHandler {
         Settlement settlement = tile.getSettlement();
         if (settlement == null) {
             throw new IllegalArgumentException("No settlement on 'Tile' " +
-                                               tile.getID());
+                                               tile.getId());
         }
         
         NodeList childElements = element.getChildNodes();
@@ -630,7 +630,7 @@ public final class InGameInputHandler extends InputHandler {
                 if (agreement.isAccept()) {
                     diplomaticElement.setAttribute("accept", "accept");
                 } else {
-                    diplomaticElement.setAttribute("unit", unit.getID());
+                    diplomaticElement.setAttribute("unit", unit.getId());
                     diplomaticElement.setAttribute("direction", String.valueOf(direction));
                     diplomaticElement.appendChild(agreement.toXMLElement(null, diplomaticElement.getOwnerDocument()));
                 }

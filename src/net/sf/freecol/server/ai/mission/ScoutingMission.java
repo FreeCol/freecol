@@ -127,7 +127,7 @@ public class ScoutingMission extends Mission {
                         - getUnit().getColony().getFoodConsumption() < 2
                         || getUnit().getColony().getGoodsContainer().getGoodsCount(Goods.HORSES) >= 52) {
                     Element equipUnitElement = Message.createNewRootElement("equipunit");
-                    equipUnitElement.setAttribute("unit", getUnit().getID());
+                    equipUnitElement.setAttribute("unit", getUnit().getId());
                     equipUnitElement.setAttribute("type", Integer.toString((Goods.HORSES).getIndex()));
                     equipUnitElement.setAttribute("amount", Integer.toString(50));
                     try {
@@ -178,7 +178,7 @@ public class ScoutingMission extends Mission {
                     final int mt = getUnit().getMoveType(direction);                                            
                     if (getUnit().getMoveType(direction) == Unit.ENTER_INDIAN_VILLAGE_WITH_SCOUT) {
                         Element scoutMessage = Message.createNewRootElement("scoutIndianSettlement");
-                        scoutMessage.setAttribute("unit", getUnit().getID());
+                        scoutMessage.setAttribute("unit", getUnit().getId());
                         scoutMessage.setAttribute("direction", Integer.toString(direction));
                         scoutMessage.setAttribute("action", "basic");
                         try {
@@ -218,7 +218,7 @@ public class ScoutingMission extends Mission {
 
         if (isTarget(getUnit().getTile(), getUnit()) && getUnit().getColony() != null) {
             Element equipUnitElement = Message.createNewRootElement("equipunit");
-            equipUnitElement.setAttribute("unit", getUnit().getID());
+            equipUnitElement.setAttribute("unit", getUnit().getId());
             equipUnitElement.setAttribute("type", Integer.toString((Goods.HORSES).getIndex()));
             equipUnitElement.setAttribute("amount", Integer.toString(0));
             try {
@@ -374,7 +374,7 @@ public class ScoutingMission extends Mission {
     protected void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
         out.writeStartElement(getXMLElementTagName());
 
-        out.writeAttribute("unit", getUnit().getID());
+        out.writeAttribute("unit", getUnit().getId());
 
         out.writeEndElement();
     }

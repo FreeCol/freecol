@@ -38,7 +38,7 @@ public class ChangeWindowedModeAction extends SelectableAction {
 
 
 
-    public static final String ID = "changeWindowedModeAction";
+    public static final String id = "changeWindowedModeAction";
 
 
     /**
@@ -64,7 +64,7 @@ public class ChangeWindowedModeAction extends SelectableAction {
      * @return "changeWindowedModeAction"
      */
     public String getId() {
-        return ID;
+        return id;
     }
 
     /**

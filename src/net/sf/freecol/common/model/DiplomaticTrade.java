@@ -323,8 +323,8 @@ public class DiplomaticTrade extends FreeColObject {
     public void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
         out.writeStartElement(getXMLElementTagName());
         out.writeAttribute("accept", accept ? "accept" : "");
-        out.writeAttribute("sender", sender.getID());
-        out.writeAttribute("recipient", recipient.getID());
+        out.writeAttribute("sender", sender.getId());
+        out.writeAttribute("recipient", recipient.getId());
         for (TradeItem item : items) {
             item.toXML(out);
         }

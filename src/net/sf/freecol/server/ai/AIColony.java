@@ -84,7 +84,7 @@ public class AIColony extends AIObject {
      * @param colony The colony to make an {@link AIObject} for.
      */
     public AIColony(AIMain aiMain, Colony colony) {
-        super(aiMain, colony.getID());
+        super(aiMain, colony.getId());
 
         this.colony = colony;
         colonyPlan = new ColonyPlan(aiMain, colony);
@@ -636,7 +636,7 @@ public class AIColony extends AIObject {
                     } else if (ag.getGoods() == null) {
                         logger.warning("aiGoods.getGoods() == null");
                         if (ag.isUninitialized()) {
-                            logger.warning("AIGoods uninitialized: " + ag.getID());
+                            logger.warning("AIGoods uninitialized: " + ag.getId());
                         }
                     }
                     if (ag != null && ag.getGoods() != null && ag.getGoods().getType() == goodsType
@@ -1128,8 +1128,8 @@ public class AIColony extends AIObject {
             int hammersNew = buildable.getNextHammers();
             if (hammersNew > colony.getHammers() || hammersNew > hammersOld || !isOldValid) {
                 Element setCurrentlyBuildingElement = Message.createNewRootElement("setCurrentlyBuilding");
-                setCurrentlyBuildingElement.setAttribute("colony", colony.getID());
-                setCurrentlyBuildingElement.setAttribute("type", buildable.getType().getID());
+                setCurrentlyBuildingElement.setAttribute("colony", colony.getId());
+                setCurrentlyBuildingElement.setAttribute("type", buildable.getType().getId());
 
                 try {
                     connection.sendAndWait(setCurrentlyBuildingElement);
@@ -1170,8 +1170,8 @@ public class AIColony extends AIObject {
      * @return The same ID as the <code>Colony</code> this
      *         <code>AIColony</code> stores AI-specific information for.
      */
-    public String getID() {
-        return colony.getID();
+    public String getId() {
+        return colony.getId();
     }
 
     /**
@@ -1184,7 +1184,7 @@ public class AIColony extends AIObject {
     protected void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
         out.writeStartElement(getXMLElementTagName());
 
-        out.writeAttribute("ID", getID());
+        out.writeAttribute("ID", getId());
 
         Iterator<AIGoods> aiGoodsIterator = aiGoods.iterator();
         while (aiGoodsIterator.hasNext()) {
@@ -1193,12 +1193,12 @@ public class AIColony extends AIObject {
                 logger.warning("ag == null");
                 continue;
             }
-            if (ag.getID() == null) {
-                logger.warning("ag.getID() == null");
+            if (ag.getId() == null) {
+                logger.warning("ag.getId() == null");
                 continue;
             }
             out.writeStartElement(AIGoods.getXMLElementTagName() + "ListElement");
-            out.writeAttribute("ID", ag.getID());
+            out.writeAttribute("ID", ag.getId());
             out.writeEndElement();
         }
 
@@ -1216,7 +1216,7 @@ public class AIColony extends AIObject {
                 logger.warning("Unknown type of wish.");
                 continue;
             }
-            out.writeAttribute("ID", w.getID());
+            out.writeAttribute("ID", w.getId());
             out.writeEndElement();
         }
 
@@ -1224,7 +1224,7 @@ public class AIColony extends AIObject {
         while (TileImprovementPlanIterator.hasNext()) {
             TileImprovementPlan ti = TileImprovementPlanIterator.next();
             out.writeStartElement(TileImprovementPlan.getXMLElementTagName() + "ListElement");
-            out.writeAttribute("ID", ti.getID());
+            out.writeAttribute("ID", ti.getId());
             out.writeEndElement();
         }
 

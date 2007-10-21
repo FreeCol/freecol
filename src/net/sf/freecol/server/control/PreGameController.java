@@ -114,7 +114,7 @@ public final class PreGameController extends Controller {
         // Add AI players
         int i = 0;
         for (Nation nation : nations) {
-            if (game.getPlayer(nation.getID()) != null ||
+            if (game.getPlayer(nation.getId()) != null ||
                 nation.getType().isREF() && game.getPlayer(nation.getRefID()) == null) {
                 continue;
             }

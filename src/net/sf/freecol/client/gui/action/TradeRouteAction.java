@@ -36,7 +36,7 @@ public class TradeRouteAction extends MapboardAction {
     private static final Logger logger = Logger.getLogger(TradeRouteAction.class.getName());
 
 
-    public static final String ID = "tradeRouteAction";
+    public static final String id = "tradeRouteAction";
 
     /**
      * Creates this action.
@@ -61,7 +61,7 @@ public class TradeRouteAction extends MapboardAction {
     * @return "tradeRouteAction"
     */
     public String getId() {
-        return ID;
+        return id;
     }
 
 

@@ -139,7 +139,7 @@ public class AIPlayer extends AIObject {
      *            <code>AIPlayer</code>.
      */
     public AIPlayer(AIMain aiMain, ServerPlayer player) {
-        super(aiMain, player.getID());
+        super(aiMain, player.getId());
         this.player = player;
     }
 
@@ -304,7 +304,7 @@ public class AIPlayer extends AIObject {
         
         for (Player p : dominions) {
             Element giveIndependenceElement = Message.createNewRootElement("giveIndependence");
-            giveIndependenceElement.setAttribute("player", p.getID());
+            giveIndependenceElement.setAttribute("player", p.getId());
             sendAndWaitSafely(giveIndependenceElement);
         }
     }
@@ -350,15 +350,15 @@ public class AIPlayer extends AIObject {
                     player.modifyGold(player.getMarket().getBidPrice(Goods.HORSES, 50));
                     
                     Element clearSpecialityElement = Message.createNewRootElement("clearSpeciality");
-                    clearSpecialityElement.setAttribute("unit", unit.getID());
+                    clearSpecialityElement.setAttribute("unit", unit.getId());
                     sendAndWaitSafely(clearSpecialityElement);
                     Element equipMusketsElement = Message.createNewRootElement("equipunit");
-                    equipMusketsElement.setAttribute("unit", unit.getID());
+                    equipMusketsElement.setAttribute("unit", unit.getId());
                     equipMusketsElement.setAttribute("type", Integer.toString((Goods.MUSKETS).getIndex()));
                     equipMusketsElement.setAttribute("amount", Integer.toString(50));
                     sendAndWaitSafely(equipMusketsElement);
                     Element equipHorsesElement = Message.createNewRootElement("equipunit");
-                    equipHorsesElement.setAttribute("unit", unit.getID());
+                    equipHorsesElement.setAttribute("unit", unit.getId());
                     equipHorsesElement.setAttribute("type", Integer.toString((Goods.HORSES).getIndex()));
                     equipHorsesElement.setAttribute("amount", Integer.toString(50));
                     sendAndWaitSafely(equipHorsesElement);
@@ -795,26 +795,26 @@ public class AIPlayer extends AIObject {
                     if (!u.isArmed() && u.canBeArmed()) {
                         recruitCount--;
                         Element equipUnitElement = Message.createNewRootElement("equipunit");
-                        equipUnitElement.setAttribute("unit", u.getID());
+                        equipUnitElement.setAttribute("unit", u.getId());
                         equipUnitElement.setAttribute("type", Integer.toString((Goods.MUSKETS).getIndex()));
                         equipUnitElement.setAttribute("amount", "50");
                         u.setArmed(true);
                         sendAndWaitSafely(equipUnitElement);
                         Element putOutsideColonyElement = Message.createNewRootElement("putOutsideColony");
-                        putOutsideColonyElement.setAttribute("unit", u.getID());
+                        putOutsideColonyElement.setAttribute("unit", u.getId());
                         u.putOutsideColony();
                         sendAndWaitSafely(putOutsideColonyElement);
                         // Check if the unit can fortify before sending the order
                         if (u.checkSetState(Unit.FORTIFYING)) {
                             Element changeStateElement = Message.createNewRootElement("changeState");
-                            changeStateElement.setAttribute("unit", u.getID());
+                            changeStateElement.setAttribute("unit", u.getId());
                             changeStateElement.setAttribute("state", Integer.toString(Unit.FORTIFYING));
                             sendAndWaitSafely(changeStateElement);
                         }
                         olddefenders++;
                         if (!u.isMounted() && u.canBeMounted()) {
                             equipUnitElement = Message.createNewRootElement("equipunit");
-                            equipUnitElement.setAttribute("unit", u.getID());
+                            equipUnitElement.setAttribute("unit", u.getId());
                             equipUnitElement.setAttribute("type", Integer.toString((Goods.HORSES).getIndex()));
                             equipUnitElement.setAttribute("amount", "50");
                             sendAndWaitSafely(equipUnitElement);
@@ -1630,7 +1630,7 @@ public class AIPlayer extends AIObject {
                 }
                 int result = o2.getTransportPriority() - o1.getTransportPriority();
                 if (result == 0) {
-                    result = o1.getID().compareTo(o2.getID());
+                    result = o1.getId().compareTo(o2.getId());
                 }
                 return result;
             }
@@ -1774,8 +1774,8 @@ public class AIPlayer extends AIObject {
     public int tradeProposition(Unit unit, Settlement settlement, Goods goods, int gold) {
         logger.finest("Entering method tradeProposition");
         if (settlement instanceof IndianSettlement) {
-            String goldKey = "tradeGold#" + goods.getType().getIndex() + "#" + goods.getAmount() + "#" + unit.getID();
-            String hagglingKey = "tradeHaggling#" + unit.getID();
+            String goldKey = "tradeGold#" + goods.getType().getIndex() + "#" + goods.getAmount() + "#" + unit.getId();
+            String hagglingKey = "tradeHaggling#" + unit.getId();
             int price;
             if (sessionRegister.containsKey(goldKey)) {
                 price = sessionRegister.get(goldKey).intValue();
@@ -1912,12 +1912,12 @@ public class AIPlayer extends AIObject {
             Iterator<Unit> unitsIterator = player.getUnitIterator();
             while (unitsIterator.hasNext()) {
                 Unit theUnit = unitsIterator.next();
-                AIUnit a = (AIUnit) getAIMain().getAIObject(theUnit.getID());
+                AIUnit a = (AIUnit) getAIMain().getAIObject(theUnit.getId());
                 if (a != null) {
                     au.add(a);
                 } else {
-                    logger.warning("Could not find the AIUnit for: " + theUnit + " (" + theUnit.getID() + ") - "
-                            + (getGame().getFreeColGameObject(theUnit.getID()) != null));
+                    logger.warning("Could not find the AIUnit for: " + theUnit + " (" + theUnit.getId() + ") - "
+                            + (getGame().getFreeColGameObject(theUnit.getId()) != null));
                 }
             }
             aiUnits = au;
@@ -1936,7 +1936,7 @@ public class AIPlayer extends AIObject {
         Iterator<Colony> colonyIterator = player.getColonyIterator();
         while (colonyIterator.hasNext()) {
             Colony colony = colonyIterator.next();
-            AIColony a = (AIColony) getAIMain().getAIObject(colony.getID());
+            AIColony a = (AIColony) getAIMain().getAIObject(colony.getId());
             if (a != null) {
                 ac.add(a);
             } else {
@@ -1999,8 +1999,8 @@ public class AIPlayer extends AIObject {
      * @return The ID.
      */
     @Override
-    public String getID() {
-        return player.getID();
+    public String getId() {
+        return player.getId();
     }
 
     /**
@@ -2013,7 +2013,7 @@ public class AIPlayer extends AIObject {
     @Override
     protected void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
         out.writeStartElement(getXMLElementTagName());
-        out.writeAttribute("ID", getID());
+        out.writeAttribute("ID", getId());
         out.writeEndElement();
     }
 
@@ -2048,7 +2048,7 @@ public class AIPlayer extends AIObject {
      */
     public void registerSellGoods(Goods goods) {
         String goldKey = "tradeGold#" + goods.getType().getIndex() + "#" + goods.getAmount()
-            + "#" + goods.getLocation().getID();
+            + "#" + goods.getLocation().getId();
         sessionRegister.put(goldKey, null);
     }
 
@@ -2066,8 +2066,8 @@ public class AIPlayer extends AIObject {
         logger.finest("Entering method tradeProposition");
         IndianSettlement settlement = (IndianSettlement) goods.getLocation();
         String goldKey = "tradeGold#" + goods.getType().getIndex() + "#" + goods.getAmount()
-            + "#" + settlement.getID();
-        String hagglingKey = "tradeHaggling#" + unit.getID();
+            + "#" + settlement.getId();
+        String hagglingKey = "tradeHaggling#" + unit.getId();
         
         Integer registered = sessionRegister.get(goldKey);
         if (registered == null) {

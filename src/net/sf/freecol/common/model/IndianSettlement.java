@@ -1130,13 +1130,13 @@ public class IndianSettlement extends Settlement {
                         getUnitIterator().next().dispose();
 
                         ModelController modelController = getGame().getModelController();
-                        int random = modelController.getRandom(getID() + "getNewConvertType", converts.size());
-                        Unit u = modelController.createUnit(getID() + "newTurn100missionary", targetTile,
+                        int random = modelController.getRandom(getId() + "getNewConvertType", converts.size());
+                        Unit u = modelController.createUnit(getId() + "newTurn100missionary", targetTile,
                                 missionary.getOwner(), converts.get(random));
                         addModelMessage(u, "model.colony.newConvert",
                                         new String[][] {{"%nation%", getOwner().getNationAsString()}},
                                         ModelMessage.UNIT_ADDED);
-                        logger.info("New convert created for " + missionary.getOwner().getName() + " with ID=" + u.getID());
+                        logger.info("New convert created for " + missionary.getOwner().getName() + " with ID=" + u.getId());
                     }
                 }
             }
@@ -1152,15 +1152,15 @@ public class IndianSettlement extends Settlement {
             if (ownedUnits.size() <= 6 + getKind()) { // up to a limit. Anyway cities produce more children than camps
                 List<UnitType> unitTypes = FreeCol.getSpecification().getUnitTypesWithAbility("model.ability.bornInIndianSettlement");
                 if (unitTypes.size() > 0) {
-                    int random = getGame().getModelController().getRandom(getID() + "bornInIndianSettlement", unitTypes.size());
-                    Unit u = getGame().getModelController().createUnit(getID() + "newTurn200food",
+                    int random = getGame().getModelController().getRandom(getId() + "bornInIndianSettlement", unitTypes.size());
+                    Unit u = getGame().getModelController().createUnit(getId() + "newTurn200food",
                                             getTile(), getOwner(), unitTypes.get(random));
                     consumeGoods(Goods.FOOD, 200);  // All food will be consumed, even if RUM helped
                     consumeGoods(Goods.RUM, 200/4);    // Also, some available RUM is consumed
                     // I know that consumeGoods will produce gold, which is explained because children are always a gift
 
                     addOwnedUnit(u);    // New indians quickly go out of their city and start annoying.
-                    logger.info("New indian native created in " + getTile() + " with ID=" + u.getID());
+                    logger.info("New indian native created in " + getTile() + " with ID=" + u.getId());
                 }
             }
         }
@@ -1247,9 +1247,9 @@ public class IndianSettlement extends Settlement {
             logger.warning("toSavedGame is true, but showAll is false");
         }
 
-        out.writeAttribute("ID", getID());
-        out.writeAttribute("tile", tile.getID());
-        out.writeAttribute("owner", owner.getID());
+        out.writeAttribute("ID", getId());
+        out.writeAttribute("tile", tile.getId());
+        out.writeAttribute("owner", owner.getId());
         out.writeAttribute("tribe", Integer.toString(tribe));
         out.writeAttribute("kind", Integer.toString(kind));
         out.writeAttribute("lastTribute", Integer.toString(lastTribute));
@@ -1258,7 +1258,7 @@ public class IndianSettlement extends Settlement {
         if (getGame().isClientTrusted() || showAll || player == getOwner()) {
             String ownedUnitsString = "";
             for (int i=0; i<ownedUnits.size(); i++) {
-                ownedUnitsString += ownedUnits.get(i).getID();
+                ownedUnitsString += ownedUnits.get(i).getId();
                 if (i != ownedUnits.size() - 1) {
                     ownedUnitsString += ", ";
                 }
@@ -1274,7 +1274,7 @@ public class IndianSettlement extends Settlement {
             }
             for (int i = 0; i < wantedGoods.length; i++) {
                 String tag = "wantedGoods" + Integer.toString(i);
-                out.writeAttribute(tag, wantedGoods[i].getID());
+                out.writeAttribute(tag, wantedGoods[i].getId());
             }
 
         }
@@ -1296,11 +1296,11 @@ public class IndianSettlement extends Settlement {
             goodsContainer.toXML(out, player, showAll, toSavedGame);
         } else {
             UnitContainer emptyUnitContainer = new UnitContainer(getGame(), this);
-            emptyUnitContainer.setFakeID(unitContainer.getID());
+            emptyUnitContainer.setFakeID(unitContainer.getId());
             emptyUnitContainer.toXML(out, player, showAll, toSavedGame);
 
             GoodsContainer emptyGoodsContainer = new GoodsContainer(getGame(), this);
-            emptyGoodsContainer.setFakeID(goodsContainer.getID());
+            emptyGoodsContainer.setFakeID(goodsContainer.getId());
             emptyGoodsContainer.toXML(out, player, showAll, toSavedGame);
         }
 
@@ -1315,7 +1315,7 @@ public class IndianSettlement extends Settlement {
      */
     @Override
     protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
-        setID(in.getAttributeValue(null, "ID"));
+        setId(in.getAttributeValue(null, "ID"));
 
         tile = (Tile) getGame().getFreeColGameObject(in.getAttributeValue(null, "tile"));
         if (tile == null) {

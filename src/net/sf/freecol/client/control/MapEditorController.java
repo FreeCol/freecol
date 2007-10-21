@@ -120,7 +120,7 @@ public final class MapEditorController {
      */
     public void setMapTransform(MapTransform mt) {
         currentMapTransform = mt;
-        MapControlsAction mca = (MapControlsAction) freeColClient.getActionManager().getFreeColAction(MapControlsAction.ID);
+        MapControlsAction mca = (MapControlsAction) freeColClient.getActionManager().getFreeColAction(MapControlsAction.id);
         if (mca.getMapControls() != null) {
             mca.getMapControls().update(mt);
         }

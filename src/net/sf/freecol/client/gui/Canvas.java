@@ -331,7 +331,7 @@ public final class Canvas extends JDesktopPane {
             if (jMenuBar != null) {
                 jMenuBar.setSize(getWidth(), (int) jMenuBar.getPreferredSize().getHeight());
             }
-            MapControlsAction mca = (MapControlsAction) freeColClient.getActionManager().getFreeColAction(MapControlsAction.ID);
+            MapControlsAction mca = (MapControlsAction) freeColClient.getActionManager().getFreeColAction(MapControlsAction.id);
             MapControls mc = mca.getMapControls();
             if (mc != null && mc.isShowing()) {
                 mc.removeFromComponent(this);
@@ -614,9 +614,9 @@ public final class Canvas extends JDesktopPane {
         }
         for (int i = 0; i < modelMessages.length; i++) {
             try {
-                messageText[i] = Messages.message(modelMessages[i].getID(), modelMessages[i].getData());
+                messageText[i] = Messages.message(modelMessages[i].getId(), modelMessages[i].getData());
             } catch (MissingResourceException e) {
-                logger.warning("could not find message with id: " + modelMessages[i].getID() + ".");
+                logger.warning("could not find message with id: " + modelMessages[i].getId() + ".");
             }
 
             messageIcon[i] = getImageIcon(modelMessages[i].getDisplay(), false);
@@ -842,11 +842,11 @@ public final class Canvas extends JDesktopPane {
         String[] texts = new String[messages.length];
         ImageIcon[] images = new ImageIcon[messages.length];
         for (int i = 0; i < messages.length; i++) {
-            String ID = messages[i].getID();
+            String id = messages[i].getId();
             try {
-                texts[i] = Messages.message(ID);
+                texts[i] = Messages.message(id);
             } catch (MissingResourceException e) {
-                logger.warning("could not find message with id: " + ID + ".");
+                logger.warning("could not find message with id: " + id + ".");
             }
             images[i] = getImageIcon(messages[i].getDisplay(), false);
         }
