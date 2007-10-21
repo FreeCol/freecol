@@ -26,8 +26,11 @@ import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
+import java.io.FileFilter;
+import java.io.IOException;
 import java.util.logging.Logger;
 
+import javax.imageio.ImageIO;
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -143,27 +146,46 @@ public final class MapGeneratorOptionsDialog extends FreeColDialog implements Ac
          */
         JPanel shortcutsPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
         shortcutsPanel.add(new JLabel(Messages.message("shortcuts")));
-        Image americasImage = (Image) UIManager.get("map.americas");
-        ImageIcon americasIcon = (americasImage != null) ? new ImageIcon(americasImage) : null;
-        final File americasMapFile = new File(FreeCol.getDataDirectory() + File.separator + "maps", "america-large.fsg");
-        if (americasIcon != null && americasMapFile.exists()) {
-            JButton americasButton = new JButton(Messages.message("map.americas"), americasIcon);
-            americasButton.setBorderPainted(false);
-            americasButton.setRolloverEnabled(true);
-            final OptionMapUI theUI = ui;
-            americasButton.addActionListener(new ActionListener() {
-                public void actionPerformed(ActionEvent e) {
-                    theUI.reset();
-                    FileOptionUI fou = (FileOptionUI) theUI.getOptionUI(MapGeneratorOptions.IMPORT_FILE);
-                    fou.setValue(americasMapFile);
-                    
-                    ((BooleanOptionUI) theUI.getOptionUI(MapGeneratorOptions.IMPORT_LAND_MAP)).setValue(true);
-                    ((BooleanOptionUI) theUI.getOptionUI(MapGeneratorOptions.IMPORT_RUMOURS)).setValue(false);
-                    ((BooleanOptionUI) theUI.getOptionUI(MapGeneratorOptions.IMPORT_TERRAIN)).setValue(true);
-                    ((BooleanOptionUI) theUI.getOptionUI(MapGeneratorOptions.IMPORT_BONUSES)).setValue(false);
+        File mapDirectory = new File(FreeCol.getDataDirectory(), "maps");
+        if (mapDirectory.isDirectory()) {
+            for (final File file : mapDirectory.listFiles(new FileFilter() {
+                    public boolean accept(File file) {
+                        return file.isFile() && file.getName().endsWith(".fsg");
+                    }
+                })) {
+                JButton mapButton = new JButton();
+                String mapName = file.getName().substring(0, file.getName().lastIndexOf('.'));
+                String imageName = mapName + ".png";
+                File imageFile = new File(mapDirectory, imageName);
+                if (imageFile.exists() && imageFile.isFile()) {
+                    try {
+                        Image mapImage = ImageIO.read(imageFile);
+                        ImageIcon mapIcon = new ImageIcon(mapImage);
+                        mapButton.setIcon(mapIcon);
+                        mapButton.setToolTipText(mapName);
+                    } catch(IOException e) {
+                        logger.warning("Unable to load map image " + imageName);
+                    }
+                } else {
+                    mapButton.setText(mapName);
                 }
-            });
-            shortcutsPanel.add(americasButton);
+                mapButton.setBorderPainted(false);
+                mapButton.setRolloverEnabled(true);
+                final OptionMapUI theUI = ui;
+                mapButton.addActionListener(new ActionListener() {
+                        public void actionPerformed(ActionEvent e) {
+                            theUI.reset();
+                            FileOptionUI fou = (FileOptionUI) theUI.getOptionUI(MapGeneratorOptions.IMPORT_FILE);
+                            fou.setValue(file);
+                    
+                            ((BooleanOptionUI) theUI.getOptionUI(MapGeneratorOptions.IMPORT_LAND_MAP)).setValue(true);
+                            ((BooleanOptionUI) theUI.getOptionUI(MapGeneratorOptions.IMPORT_RUMOURS)).setValue(false);
+                            ((BooleanOptionUI) theUI.getOptionUI(MapGeneratorOptions.IMPORT_TERRAIN)).setValue(true);
+                            ((BooleanOptionUI) theUI.getOptionUI(MapGeneratorOptions.IMPORT_BONUSES)).setValue(false);
+                        }
+                    });
+                shortcutsPanel.add(mapButton);
+            }
         }
         uiPanel.add(shortcutsPanel, BorderLayout.NORTH);
     }
