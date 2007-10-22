@@ -4461,6 +4461,10 @@ public class Unit extends FreeColGameObject implements Abilities, Locatable, Loc
         checkExperiencePromotion();
         movesLeft = getInitialMovesLeft();
         doAssignedWork();
+        if (getState() == SKIPPED) {
+            setState(ACTIVE);
+        }
+
     }
 
     /**
