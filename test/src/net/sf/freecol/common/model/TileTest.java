@@ -146,4 +146,16 @@ public class TileTest extends FreeColTestCase {
         assertEquals(s.getGoodsType("model.goods.Lumber"),tile2.secondaryGoods());
         
     }
+
+    public void testPotential() {
+        Game game = getStandardGame();
+        Specification s = FreeCol.getSpecification();
+        Tile tile = new Tile(game, s.getTileType("model.tile.mountains"), 0, 0);
+        assertEquals(0,tile.potential(s.getGoodsType("model.goods.Food")));
+        assertEquals(1,tile.potential(s.getGoodsType("model.goods.Silver")));
+        tile.setResource(s.getResourceType("model.resource.Silver"));
+        assertEquals(0,tile.potential(s.getGoodsType("model.goods.Food")));
+        assertEquals(3,tile.potential(s.getGoodsType("model.goods.Silver")));
+    }
+
 }

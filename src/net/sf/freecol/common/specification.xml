@@ -935,7 +935,7 @@
         <scope ability-id="model.ability.navalUnit" value="true"/>
       </modifier>
     </founding-father>
-    <founding-father id="model.foundingFather.fransiscoDeCoronado" type="exploration"
+    <founding-father id="model.foundingFather.franciscoDeCoronado" type="exploration"
                      weight1="3" weight2="5" weight3="7">
       <event id="model.event.seeAllColonies"/>
     </founding-father>

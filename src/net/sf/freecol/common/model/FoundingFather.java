@@ -135,11 +135,11 @@ public class FoundingFather extends FreeColGameObjectType implements Abilities, 
      */
     public static String getTypeAsString(int type) {
         switch (type) {
-            case TRADE: return Messages.message("foundingFather.trade");
-            case EXPLORATION: return Messages.message("foundingFather.exploration");
-            case MILITARY: return Messages.message("foundingFather.military");
-            case POLITICAL: return Messages.message("foundingFather.political");
-            case RELIGIOUS: return Messages.message("foundingFather.religious");
+            case TRADE: return Messages.message("model.foundingFather.trade");
+            case EXPLORATION: return Messages.message("model.foundingFather.exploration");
+            case MILITARY: return Messages.message("model.foundingFather.military");
+            case POLITICAL: return Messages.message("model.foundingFather.political");
+            case RELIGIOUS: return Messages.message("model.foundingFather.religious");
         }
         
         return "";

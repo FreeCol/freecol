@@ -498,8 +498,9 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
         for(GoodsType goodsType : productionTypes) {
             JLabel goodsLabel = new JLabel(library.getGoodsImageIcon(goodsType));
             goodsLabel.setText(String.valueOf(tileType.getPotential(goodsType)));
-            detailPanel.add(goodsLabel, higConst.rc(row, rightColumn));
+            goodsPanel.add(goodsLabel);
         }
+        detailPanel.add(goodsPanel, higConst.rc(row, rightColumn));
         row += 2;
 
         detailPanel.add(new JLabel(Messages.message("colopedia.terrain.description")), higConst.rc(row, leftColumn,

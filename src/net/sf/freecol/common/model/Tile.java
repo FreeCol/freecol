@@ -1382,7 +1382,7 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
      * @see ColonyTile#newTurn
      */
     public void expendResource(GoodsType goodsType, Settlement settlement) {
-        if (hasResource()) {
+        if (hasResource() && tileItemContainer.getResource().getQuantity() != -1) {
             Resource resource = tileItemContainer.getResource();
             // Potential of this Tile and Improvements
             int potential = getTileTypePotential(getType(), goodsType, null, getFishBonus())

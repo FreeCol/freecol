@@ -177,7 +177,7 @@ public class Resource extends TileItem {
      */
     public int getBonus(GoodsType goodsType, int potential) {
         int bonusAmount = (int) ((potential + type.getBonus(goodsType)) * type.getFactor(goodsType)) - potential;
-        if (bonusAmount < quantity) {
+        if (quantity > -1 && bonusAmount > quantity) {
             bonusAmount = quantity;
         }
         return potential + bonusAmount;
@@ -189,6 +189,7 @@ public class Resource extends TileItem {
      * @param potential Potential of Tile + Improvements
      */
     public int useQuantity(GoodsType goodsType, int potential) {
+        // Return -1 here if not limited resource?
         return useQuantity(getBonus(goodsType, potential) - potential);
     }    
 
@@ -200,8 +201,12 @@ public class Resource extends TileItem {
     public int useQuantity(int usedQuantity) {
         if (quantity >= usedQuantity) {
             quantity -= usedQuantity;
+        } else if (quantity == -1) {
+            logger.warning("useQuantity called for unlimited resource");
         } else {
-            logger.warning("Insufficient quantity in " + this);
+            // Shouldn't generally happen.  Do something more drastic here?
+            logger.severe("Insufficient quantity in " + this);
+            quantity = 0;
         }
         return quantity;
     }
