@@ -914,7 +914,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
             }
         }
         
-        Vector<Tile> surroundingTiles = getGame().getMap().getSurroundingTiles(unit.getTile(), unit.getLineOfSight());
+        List<Tile> surroundingTiles = getGame().getMap().getSurroundingTiles(unit.getTile(), unit.getLineOfSight());
         for (int i = 0; i < surroundingTiles.size(); i++) {
             Tile t = surroundingTiles.get(i);
             reply.appendChild(t.toXMLElement(player, reply.getOwnerDocument()));
@@ -1316,7 +1316,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
             if (result == Unit.ATTACK_DONE_SETTLEMENT && newTile.getSettlement() != null) {
                 lineOfSight = Math.max(lineOfSight, newTile.getSettlement().getLineOfSight());
             }
-            Vector<Tile> surroundingTiles = getGame().getMap().getSurroundingTiles(unit.getTile(), lineOfSight);
+            List<Tile> surroundingTiles = getGame().getMap().getSurroundingTiles(unit.getTile(), lineOfSight);
             for (int i = 0; i < surroundingTiles.size(); i++) {
                 Tile t = surroundingTiles.get(i);
                 update.appendChild(t.toXMLElement(player, update.getOwnerDocument()));
@@ -1956,7 +1956,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
             reply.appendChild(colony.toXMLElement(player, reply.getOwnerDocument()));
             if (colony.getLineOfSight() > unit.getLineOfSight()) {
                 Element updateElement = reply.getOwnerDocument().createElement("update");
-                Vector<Tile> surroundingTiles = getGame().getMap().getSurroundingTiles(unit.getTile(),
+                List<Tile> surroundingTiles = getGame().getMap().getSurroundingTiles(unit.getTile(),
                         colony.getLineOfSight());
                 for (int i = 0; i < surroundingTiles.size(); i++) {
                     Tile t = surroundingTiles.get(i);

@@ -243,7 +243,7 @@ public class ServerModelController implements ModelController {
 
         // Display the tiles surrounding the Unit:
         Element updateElement = Message.createNewRootElement("update");
-        Vector<Tile> surroundingTiles = game.getMap().getSurroundingTiles(unit.getTile(), unit.getLineOfSight());
+        List<Tile> surroundingTiles = game.getMap().getSurroundingTiles(unit.getTile(), unit.getLineOfSight());
 
         for (int i = 0; i < surroundingTiles.size(); i++) {
             Tile t = surroundingTiles.get(i);

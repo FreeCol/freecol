@@ -24,7 +24,6 @@ import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
-import java.util.Vector;
 import java.util.logging.Logger;
 
 import net.sf.freecol.FreeCol;
@@ -95,16 +94,15 @@ public class TerrainGenerator {
         final boolean importBonuses = (importGame != null) && getMapGeneratorOptions().getBoolean(MapGeneratorOptions.IMPORT_BONUSES);
         final boolean importLandMap = (importGame != null) && getMapGeneratorOptions().getBoolean(MapGeneratorOptions.IMPORT_LAND_MAP);
                 
-        Vector<Vector<Tile>> columns = new Vector<Vector<Tile>>(getMapGeneratorOptions().getWidth());
-        for (int i = 0; i < width; i++) {
-            Vector<Tile> v = new Vector<Tile>(height);
-            for (int j = 0; j < height; j++) {
+        Tile[][] tiles = new Tile[width][height];
+        for (int x = 0; x < width; x++) {
+            for (int y = 0; y < height; y++) {
                 Tile t;                
                 if (importTerrain
-                        && importGame.getMap().isValid(i, j)) {
-                    Tile importTile = importGame.getMap().getTile(i, j);
-                    if (importLandMap || importTile.isLand() == landMap[i][j]) {
-                        t = new Tile(game, importTile.getType(), i, j);
+                        && importGame.getMap().isValid(x, y)) {
+                    Tile importTile = importGame.getMap().getTile(x, y);
+                    if (importLandMap || importTile.isLand() == landMap[x][y]) {
+                        t = new Tile(game, importTile.getType(), x, y);
                         // TileItemContainer copies everything including Resource unless importBonuses == false
                         t.getTileItemContainer().copyFrom(importTile.getTileItemContainer(), importBonuses);
                         if (!importBonuses) {
@@ -112,17 +110,16 @@ public class TerrainGenerator {
                             perhapsAddBonus(t, landMap);
                         }
                     } else {
-                        t = createTile(game, landMap, i, j);    
+                        t = createTile(game, landMap, x, y);
                     }
                 } else {
-                    t = createTile(game, landMap, i, j);
+                    t = createTile(game, landMap, x, y);
                 }
-                v.add(t);
+                tiles[x][y] = t;
             }
-            columns.add(v);
         }
 
-        Map map = new Map(game, columns);
+        Map map = new Map(game, tiles);
         game.setMap(map);
 
         if (!importTerrain) {

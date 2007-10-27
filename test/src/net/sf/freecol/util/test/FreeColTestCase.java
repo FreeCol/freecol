@@ -130,16 +130,12 @@ public class FreeColTestCase extends TestCase {
         }
     }
 
-    public static Vector<Vector<Tile>> getTestTiles(Game game, int width, int height, TileType tileType) {
-        Vector<Vector<Tile>> tiles = new Vector<Vector<Tile>>(10);
-
-        for (int x = 0; x < width; x++) {
-            tiles.add(new Vector<Tile>(15));
-        }
+    public static Tile[][] getTestTiles(Game game, int width, int height, TileType tileType) {
+        Tile[][] tiles = new Tile[width][height];
 
         for (int x = 0; x < width; x++) {
             for (int y = 0; y < height; y++) {
-                tiles.get(x).add(new Tile(game, tileType, x, y));
+                tiles[x][y] = new Tile(game, tileType, x, y);
             }
         }
         return tiles;

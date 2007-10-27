@@ -226,27 +226,23 @@ public class ScaleMapAction extends FreeColAction {
         final int oldWidth = oldMap.getWidth();
         final int oldHeight = oldMap.getHeight();
         
-        Vector<Vector<Tile>> columns = new Vector<Vector<Tile>>(width);
-        for (int i = 0; i < width; i++) {
-            Vector<Tile> v = new Vector<Tile>(height);
-            for (int j = 0; j < height; j++) {
-                final int oldX = (i * oldWidth) / width;
-                final int oldY = (j * oldHeight) / height;
+        Tile[][] tiles = new Tile[width][height];
+        for (int x = 0; x < width; x++) {
+            for (int y = 0; y < height; y++) {
+                final int oldX = (x * oldWidth) / width;
+                final int oldY = (y * oldHeight) / height;
                 /*
                  * TODO: This tile should be based on the average as
                  *       mentioned at the top of this method.
                  */
-                Tile oldTile = oldMap.getTile(oldX, oldY);
-                
-                // Copy values to the new tile:
-                Tile t = new Tile(game, oldTile.getType(), i, j);
-                t.getTileItemContainer().copyFrom(oldTile.getTileItemContainer());
-                v.add(t);
+                Tile importTile = oldMap.getTile(oldX, oldY);
+                Tile t = new Tile(game, importTile.getType(), x, y);
+                t.getTileItemContainer().copyFrom(importTile.getTileItemContainer());
+                tiles[x][y] = t;
             }
-            columns.add(v);
         }
 
-        Map map = new Map(game, columns);
+        Map map = new Map(game, tiles);
         game.setMap(map);
         
         // Update river directions

@@ -19,13 +19,14 @@
 
 package net.sf.freecol.common.model;
 
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.PriorityQueue;
 import java.util.Random;
-import java.util.Vector;
 import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamConstants;
@@ -65,11 +66,7 @@ public class Map extends FreeColGameObject {
     private static final int[] EVEN_DX = { 0, 0, 1, 0, 0, -1, -1, -1 };
     private static final int[] EVEN_DY = { -2, -1, 0, 1, 2, 1, 0, -1 };
 
-    /**
-     * This Vector contains a set of other Vectors that can be considered
-     * columns. Those columns contain a set of Tiles.
-     */
-    private Vector<Vector<Tile>> columns = null;
+    private Tile[][] tiles = null;
 
     private final DefaultCostDecider defaultCostDecider = new DefaultCostDecider();
     private int width;
@@ -90,8 +87,7 @@ public class Map extends FreeColGameObject {
     public Map(Game game, int size) throws FreeColException {
         super(game);
 
-        createColumns(size);
-        initSize();
+        initialize(size);
     }
 
     /**
@@ -104,11 +100,12 @@ public class Map extends FreeColGameObject {
      *            the tiles.
      */
 
-    public Map(Game game, Vector<Vector<Tile>> columns) {
+    public Map(Game game, Tile[][] tiles) {
         super(game);
 
-        this.columns = columns;
-        initSize();
+        this.tiles = tiles;
+        width = tiles.length;
+        height = tiles[0].length;
     }
 
     /**
@@ -126,7 +123,6 @@ public class Map extends FreeColGameObject {
         super(game, in);
 
         readFromXML(in);
-        initSize();
     }
 
     /**
@@ -142,12 +138,6 @@ public class Map extends FreeColGameObject {
      */
     public Map(Game game, String id) {
         super(game, id);
-        initSize();        
-    }
-
-    private void initSize() {
-      width = columns.size();
-      height = columns.get(0).size();;
     }
 
     /**
@@ -938,7 +928,7 @@ public class Map extends FreeColGameObject {
      * @exception FreeColException
      *                If the given size is invalid.
      */
-    private void createColumns(int size) throws FreeColException {
+    private void initialize(int size) throws FreeColException {
         int width, height;
 
         switch (size) {
@@ -962,21 +952,20 @@ public class Map extends FreeColGameObject {
             throw new FreeColException("Invalid map-size: " + size + ".");
         }
 
-        createColumns(width, height);
+        initialize(width, height);
     }
 
     /**
      * Creates the columns contains the rows that contains the tiles.
      */
-    private void createColumns(int width, int height) {
-        columns = new Vector<Vector<Tile>>(width);
-        for (int i = 0; i < width; i++) {
-            Vector<Tile> v = new Vector<Tile>(height);
-            for (int j = 0; j < height; j++) {
-                Tile t = new Tile(getGame(), null, i, j);
-                v.add(t);
+    private void initialize(int width, int height) {
+        this.width = width;
+        this.height = height;
+        tiles = new Tile[width][height];
+        for (int x = 0; x < width; x++) {
+            for (int y = 0; y < height; y++) {
+                tiles[x][y] = new Tile(getGame(), null, x, y);
             }
-            columns.add(v);
         }
     }
 
@@ -1003,8 +992,8 @@ public class Map extends FreeColGameObject {
      *         position is invalid.
      */
     public Tile getTile(int x, int y) {
-        if ((x >= 0) && (x < width) && (y >= 0) && (y < height)) {
-            return columns.get(x).get(y);
+        if (isValid(x, y)) {
+            return tiles[x][y];
         } else {
             return null;
         }
@@ -1021,7 +1010,7 @@ public class Map extends FreeColGameObject {
      *            The <code>Tile</code>.
      */
     public void setTile(Tile tile, int x, int y) {
-        columns.get(x).set(y, tile);
+        tiles[x][y] = tile;
     }
 
     /**
@@ -1110,8 +1099,8 @@ public class Map extends FreeColGameObject {
      *            How far away do we need to go starting from the center tile.
      * @return The tiles surrounding the given tile.
      */
-    public Vector<Tile> getSurroundingTiles(Tile t, int range) {
-        Vector<Tile> result = new Vector<Tile>();
+    public List<Tile> getSurroundingTiles(Tile t, int range) {
+        List<Tile> result = new ArrayList<Tile>();
         Position tilePosition = new Position(t.getX(), t.getY());
         Iterator<Position> i = (range == 1) ? getAdjacentIterator(tilePosition)
                 : getCircleIterator(tilePosition, true, range);
@@ -1860,19 +1849,12 @@ public class Map extends FreeColGameObject {
             throws XMLStreamException {
         setId(in.getAttributeValue(null, "ID"));
 
-        if (columns == null) {
+        if (tiles == null) {
             int width = Integer.parseInt(in.getAttributeValue(null, "width"));
             int height = Integer.parseInt(in.getAttributeValue(null, "height"));
 
-            // createColumns(width, height);
-            columns = new Vector<Vector<Tile>>(width);
-            for (int i = 0; i < width; i++) {
-                Vector<Tile> v = new Vector<Tile>(height);
-                for (int j = 0; j < height; j++) {
-                    v.add(null);
-                }
-                columns.add(v);
-            }
+            // initialize(width, height);
+            tiles = new Tile[width][height];
         }
 
         while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {

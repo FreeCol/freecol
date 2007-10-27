@@ -32,15 +32,11 @@ public class ColonyProductionTest extends FreeColTestCase {
 
         Player dutch = game.getPlayer("model.nation.dutch");
 
-        Vector<Vector<Tile>> tiles = new Vector<Vector<Tile>>(10);
-
-        for (int x = 0; x < 10; x++) {
-            tiles.add(new Vector<Tile>(15));
-        }
+        Tile[][] tiles = new Tile[10][15];
 
         for (int x = 0; x < 10; x++) {
             for (int y = 0; y < 15; y++) {
-                tiles.get(x).add(new Tile(game, FreeCol.getSpecification().getTileType("model.tile.plains"), x, y));
+                tiles[x][y] = new Tile(game, FreeCol.getSpecification().getTileType("model.tile.plains"), x, y);
             }
         }
 

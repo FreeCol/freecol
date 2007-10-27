@@ -2886,7 +2886,7 @@ public class Unit extends FreeColGameObject implements Abilities, Locatable, Loc
             return false;
         }
 
-        Vector<Tile> surroundingTiles = getGame().getMap().getSurroundingTiles(getTile(), 1);
+        List<Tile> surroundingTiles = getGame().getMap().getSurroundingTiles(getTile(), 1);
         if (surroundingTiles.size() != 8) {
             return true;
         } else {
@@ -3232,7 +3232,7 @@ public class Unit extends FreeColGameObject implements Abilities, Locatable, Loc
                         if (getColony() != null && getColony().getOwner().equals(getOwner())) {
                             getColony().addGoods(deliverType, deliverAmount);
                         } else {
-                            Vector<Tile> surroundingTiles = getTile().getMap().getSurroundingTiles(getTile(), 1);
+                            List<Tile> surroundingTiles = getTile().getMap().getSurroundingTiles(getTile(), 1);
                             Vector<Settlement> adjacentColonies = new Vector<Settlement>();
                             for (int i = 0; i < surroundingTiles.size(); i++) {
                                 Tile t = surroundingTiles.get(i);
