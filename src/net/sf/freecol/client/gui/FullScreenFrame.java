@@ -29,7 +29,7 @@ import net.sf.freecol.FreeCol;
 
 /**
  * The fullscreen frame that contains everything. If full screen mode is not
- * supported (or choosen), then the {@link WindowedFrame} will be used instead.
+ * supported (or chosen), then the {@link WindowedFrame} will be used instead.
  */
 public final class FullScreenFrame extends JFrame {
 	private static final Logger logger = Logger.getLogger(FullScreenFrame.class
@@ -47,7 +47,6 @@ public final class FullScreenFrame extends JFrame {
 	public FullScreenFrame(GraphicsDevice gd) {
 		super("Freecol " + FreeCol.getVersion(), gd.getDefaultConfiguration());
 		
-		// TODO: Add an icon for the taskbar.
 		logger.info("FullScreenFrame's JFrame created.");
 
 		setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
@@ -106,3 +105,4 @@ public final class FullScreenFrame extends JFrame {
 		canvas.add(c);
 	}
 }
+

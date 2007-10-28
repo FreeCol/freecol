@@ -143,7 +143,7 @@ public final class FreeColClient {
 
     /**
      * Indicated whether or not there is an open connection to the server. This
-     * is not an indication of the existance of a Connection Object, but instead
+     * is not an indication of the existence of a Connection Object, but instead
      * it is an indication of an approved login to a server.
      */
     private boolean loggedIn = false;
@@ -251,6 +251,8 @@ public final class FreeColClient {
         gui = new GUI(this, innerWindowSize, imageLibrary);
         canvas = new Canvas(this, innerWindowSize, gui);
         changeWindowedMode(windowed);
+        
+        frame.setIconImage(imageLibrary.getUnitImage(ImageLibrary.GALLEON));
         
         canvas.showMainPanel();
         gui.startCursorBlinking();
@@ -737,3 +739,4 @@ public final class FreeColClient {
         private static final int VALUES_PER_CALL = 100;
     }
 }
+
