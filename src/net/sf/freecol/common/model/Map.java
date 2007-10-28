@@ -66,11 +66,9 @@ public class Map extends FreeColGameObject {
     private static final int[] EVEN_DX = { 0, 0, 1, 0, 0, -1, -1, -1 };
     private static final int[] EVEN_DY = { -2, -1, 0, 1, 2, 1, 0, -1 };
 
-    private Tile[][] tiles = null;
+    private Tile[][] tiles;
 
     private final DefaultCostDecider defaultCostDecider = new DefaultCostDecider();
-    private int width;
-    private int height;
     
 
     /**
@@ -87,7 +85,7 @@ public class Map extends FreeColGameObject {
     public Map(Game game, int size) throws FreeColException {
         super(game);
 
-        initialize(size);
+        tiles = getTiles(size);
     }
 
     /**
@@ -104,8 +102,6 @@ public class Map extends FreeColGameObject {
         super(game);
 
         this.tiles = tiles;
-        width = tiles.length;
-        height = tiles[0].length;
     }
 
     /**
@@ -928,7 +924,7 @@ public class Map extends FreeColGameObject {
      * @exception FreeColException
      *                If the given size is invalid.
      */
-    private void initialize(int size) throws FreeColException {
+    private Tile[][] getTiles(int size) throws FreeColException {
         int width, height;
 
         switch (size) {
@@ -952,22 +948,9 @@ public class Map extends FreeColGameObject {
             throw new FreeColException("Invalid map-size: " + size + ".");
         }
 
-        initialize(width, height);
+        return new Tile[width][height];
     }
 
-    /**
-     * Creates the columns contains the rows that contains the tiles.
-     */
-    private void initialize(int width, int height) {
-        this.width = width;
-        this.height = height;
-        tiles = new Tile[width][height];
-        for (int x = 0; x < width; x++) {
-            for (int y = 0; y < height; y++) {
-                tiles[x][y] = new Tile(getGame(), null, x, y);
-            }
-        }
-    }
 
     /**
      * Returns the Tile at a requested position.
@@ -1019,7 +1002,11 @@ public class Map extends FreeColGameObject {
      * @return The width of this Map.
      */
     public int getWidth() {
-        return width;
+        if (tiles == null) {
+            return 0;
+        } else {
+            return tiles.length;
+        }
     }
 
     /**
@@ -1028,7 +1015,11 @@ public class Map extends FreeColGameObject {
      * @return The height of this Map.
      */
     public int getHeight() {
-        return height;
+        if (tiles == null) {
+            return 0;
+        } else {
+            return tiles[0].length;
+        }
     }
 
     /**
@@ -1261,7 +1252,7 @@ public class Map extends FreeColGameObject {
      * @return True if it is valid
      */
     public boolean isValid(Position position) {
-        return isValid(position.x, position.y, width, height);
+        return isValid(position.x, position.y, getWidth(), getHeight());
     }
 
     /**
@@ -1853,7 +1844,6 @@ public class Map extends FreeColGameObject {
             int width = Integer.parseInt(in.getAttributeValue(null, "width"));
             int height = Integer.parseInt(in.getAttributeValue(null, "height"));
 
-            // initialize(width, height);
             tiles = new Tile[width][height];
         }
 

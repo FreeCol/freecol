@@ -98,8 +98,7 @@ public class TerrainGenerator {
         for (int x = 0; x < width; x++) {
             for (int y = 0; y < height; y++) {
                 Tile t;                
-                if (importTerrain
-                        && importGame.getMap().isValid(x, y)) {
+                if (importTerrain && importGame.getMap().isValid(x, y)) {
                     Tile importTile = importGame.getMap().getTile(x, y);
                     if (importLandMap || importTile.isLand() == landMap[x][y]) {
                         t = new Tile(game, importTile.getType(), x, y);
