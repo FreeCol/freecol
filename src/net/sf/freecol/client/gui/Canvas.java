@@ -56,6 +56,7 @@ import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.action.ActionManager;
 import net.sf.freecol.client.gui.action.MapControlsAction;
 import net.sf.freecol.client.gui.i18n.Messages;
+import net.sf.freecol.client.gui.panel.AboutPanel;
 import net.sf.freecol.client.gui.panel.ChatPanel;
 import net.sf.freecol.client.gui.panel.ChooseFoundingFatherDialog;
 import net.sf.freecol.client.gui.panel.ClientOptionsDialog;
@@ -151,7 +152,7 @@ import net.sf.freecol.server.generator.MapGeneratorOptions;
  * <br>
  * When displaying a dialog, using a <code>showXXXDialog</code>, the calling
  * thread will wait until that dialog is dismissed before returning. In
- * contrast, a <code>showXXXPanel</code>-method returns immediatly.
+ * contrast, a <code>showXXXPanel</code>-method returns immediately.
  */
 public final class Canvas extends JDesktopPane {
     private static final Logger logger = Logger.getLogger(Canvas.class.getName());
@@ -184,6 +185,8 @@ public final class Canvas extends JDesktopPane {
     private final StatusPanel statusPanel;
 
     private final ChatPanel chatPanel;
+    
+    private final AboutPanel aboutPanel;
 
     private final GUI gui;
 
@@ -240,6 +243,7 @@ public final class Canvas extends JDesktopPane {
         victoryPanel = new VictoryPanel(this, freeColClient);
         clientOptionsDialog = new ClientOptionsDialog(this, freeColClient);
         loadingSavegameDialog = new LoadingSavegameDialog(this, freeColClient);
+        aboutPanel = new AboutPanel(this, freeColClient);
 
         setFocusable(true);
         setFocusTraversalKeysEnabled(false);
@@ -464,6 +468,17 @@ public final class Canvas extends JDesktopPane {
         return offer;
     }
 
+    /**
+     * Displays the <code>AboutPanel</code>.
+     * 
+     * @see AboutPanel
+     */
+    public void showAboutPanel() {
+        closeMenus();
+        addAsFrame(aboutPanel);
+        aboutPanel.requestFocus();
+    }
+    
     /**
      * Displays the <code>ChatPanel</code>.
      * 

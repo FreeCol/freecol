@@ -62,7 +62,6 @@ public class AboutAction extends FreeColAction {
      * @param e The <code>ActionEvent</code>.
      */
     public void actionPerformed(ActionEvent e) {
-        // TODO: Create an About-panel:
-        freeColClient.getCanvas().errorMessage(null, "http://www.freecol.org");
+    	freeColClient.getCanvas().showAboutPanel();
     }
 }
