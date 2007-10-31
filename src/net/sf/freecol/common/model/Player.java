@@ -276,7 +276,7 @@ public class Player extends FreeColGameObject implements Abilities, Nameable, Mo
      * 
      * 'false' otherwise.
      * 
-     * @param nation The nation of the <code>Player</code>.
+     * @param newNation The nation of the <code>Player</code>.
      * 
      */
     public Player(Game game, String name, boolean admin, Nation newNation) {
@@ -1402,7 +1402,7 @@ public class Player extends FreeColGameObject implements Abilities, Nameable, Mo
     /**
      * Sets the nation for this player.
      * 
-     * @param n The new nation for this player.
+     * @param newNation The new nation for this player.
      */
     public void setNation(Nation newNation) {
         nationID = newNation.getId();
@@ -2040,8 +2040,7 @@ public class Player extends FreeColGameObject implements Abilities, Nameable, Mo
     /**
      * Sets the ability to newValue;
      *
-     * @param id a <code>String</code> value
-     * @param newValue a <code>boolean</code> value
+     * @param newAbility an <code>Ability</code> value
      */
     public void setAbility(Ability newAbility) {
         features.put(newAbility.getId(), newAbility);
@@ -2678,7 +2677,7 @@ public class Player extends FreeColGameObject implements Abilities, Nameable, Mo
     /**
      * Returns true if type of goods can be traded in Europe.
      * 
-     * @param goodsIndex The index of the goods.
+     * @param type The goods type.
      * @return True if there are no arrears due for this type of goods.
      */
     public boolean canTrade(GoodsType type) {

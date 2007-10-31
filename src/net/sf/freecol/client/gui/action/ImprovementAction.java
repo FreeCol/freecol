@@ -59,7 +59,7 @@ public class ImprovementAction extends MapboardAction {
     /**
      * Updates this action to one of the possible actions for this ImprovementAction.
      * 
-     * @param p <code>true</code> if this action should be "clear forest".
+     * @param newActionID The new action.
      */
     private void updateValues(int newActionID) {
         if (actionID == newActionID) {

@@ -1472,7 +1472,7 @@ public final class InGameInputHandler extends InputHandler {
          * 
          * @param unit The unit which init the negotiation.
          * @param settlement The settlement where the unit has made the proposal
-         * @param unit The proposal made by unit's owner.
+         * @param proposal The proposal made by unit's owner.
          */
         public ShowNegotiationDialogSwingTask(Unit unit, Settlement settlement, DiplomaticTrade proposal) {
             this.unit = unit;

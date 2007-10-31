@@ -136,15 +136,6 @@ public abstract class FreeColObject {
      * This method writes an XML-representation of this object to
      * the given stream.
      * 
-     * <br><br>
-     * 
-     * Only attributes visible to the given <code>Player</code> will 
-     * be added to that representation if <code>showAll</code> is
-     * set to <code>false</code>.
-     *  
-     * @param player The <code>Player</code> this XML-representation 
-     *      should be made for, or <code>null</code> if
-     *      <code>showAll == true</code>.
      * @param document The <code>Document</code>.
      * @return An XML-representation of this object.
      */    
@@ -592,7 +583,7 @@ public abstract class FreeColObject {
      * Return an attribute value or the default value.
      *
      * @param in a <code>XMLStreamReader</code> value
-     * @param defaultValue an <code>int</code> value
+     * @param attributeName An attribute name
      * @return an <code>int</code> value
      */
     public boolean hasAttribute(XMLStreamReader in, String attributeName) {
@@ -604,6 +595,7 @@ public abstract class FreeColObject {
      * Return an attribute value or the default value.
      *
      * @param in a <code>XMLStreamReader</code> value
+     * @param attributeName An attribute name
      * @param defaultValue an <code>int</code> value
      * @return an <code>int</code> value
      */
@@ -620,7 +612,8 @@ public abstract class FreeColObject {
      * Return an attribute value or the default value.
      *
      * @param in a <code>XMLStreamReader</code> value
-     * @param defaultValue an <code>int</code> value
+     * @param attributeName An attribute name
+     * @param defaultValue a <code>float</code> value
      * @return an <code>int</code> value
      */
     public float getAttribute(XMLStreamReader in, String attributeName, float defaultValue) {
@@ -636,7 +629,8 @@ public abstract class FreeColObject {
      * Return an attribute value or the default value.
      *
      * @param in a <code>XMLStreamReader</code> value
-     * @param defaultValue an <code>boolean</code> value
+     * @param attributeName An attribute name
+     * @param defaultValue a <code>boolean</code> value
      * @return an <code>boolean</code> value
      */
     public boolean getAttribute(XMLStreamReader in, String attributeName, boolean defaultValue) {
@@ -652,6 +646,7 @@ public abstract class FreeColObject {
      * Return an attribute value or the default value.
      *
      * @param in a <code>XMLStreamReader</code> value
+     * @param attributeName An attribute name
      * @param defaultValue an <code>String</code> value
      * @return an <code>String</code> value
      */

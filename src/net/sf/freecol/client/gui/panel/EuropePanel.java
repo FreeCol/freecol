@@ -420,10 +420,7 @@ public final class EuropePanel extends FreeColPanel implements ActionListener {
     /**
      * Refreshes the components on this panel that need to be refreshed after
      * the user has purchased a new unit.
-     * 
-     * @param type The type of unit that was just purchased. This is needed to
-     *            know which component needs to be refreshed.
-     */
+      */
     public void refreshInPort() {
         inPortPanel.removeAll();
 

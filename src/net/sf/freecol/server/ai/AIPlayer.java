@@ -1566,7 +1566,7 @@ public class AIPlayer extends AIObject {
     /**
      * This is a temporary method which are used for forcing the computer
      * players into building more colonies. The method will be removed after the
-     * proper code for deciding wether a colony should be built or not has been
+     * proper code for deciding whether a colony should be built or not has been
      * implemented.
      * 
      * @return <code>true</code> if the AI should build more colonies.

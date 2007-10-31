@@ -486,7 +486,6 @@ public final class Building extends FreeColGameObject implements Abilities, Work
      * 
      * @return The {@link Unit#getType unit type}.
      * @see Unit#getExpertWorkType
-     * @see ColonyTile#getExpertForProducing
      */
     public UnitType getExpertUnitType() {
         return FreeCol.getSpecification().getExpertForProducing(getGoodsOutputType());

@@ -693,7 +693,7 @@ public class Unit extends FreeColGameObject implements Abilities, Locatable, Loc
     /**
      * Gets the skill level of the given type of <code>Unit</code>.
      * 
-     * @param unitTypeIndex The type of <code>Unit</code>.
+     * @param unitType The type of <code>Unit</code>.
      * @return The level of skill for the given unit. A higher value signals a
      *         more advanced type of units.
      */
@@ -897,7 +897,7 @@ public class Unit extends FreeColGameObject implements Abilities, Locatable, Loc
 
     /**
      * Gets the TileImprovement that this pioneer is contributing to.
-     * @returns The <code>TileImprovement</code>
+     * @return The <code>TileImprovement</code>
      */
     public TileImprovement getWorkImprovement() {
         return workImprovement;
@@ -905,7 +905,7 @@ public class Unit extends FreeColGameObject implements Abilities, Locatable, Loc
 
     /**
      * Sets the TileImprovement that this pioneer is contributing to.
-     * @returns The <code>TileImprovement</code>
+     * @return The <code>TileImprovement</code>
      */
     public void setWorkImprovement(TileImprovement imp) {
         workImprovement = imp;
@@ -916,7 +916,7 @@ public class Unit extends FreeColGameObject implements Abilities, Locatable, Loc
      * 
      * @return The type of goods or <code>-1</code> if this unit is not an
      *         expert at producing any type of goods.
-     * @see ColonyTile#getExpertForProducing
+     * @see UnitType#getExpertProduction
      */
     public GoodsType getExpertWorkType() {
         return unitType.getExpertProduction();
@@ -1800,7 +1800,7 @@ public class Unit extends FreeColGameObject implements Abilities, Locatable, Loc
 
     /**
      * Sets this <code>Unit</code> to work at this <code>TileImprovement</code>
-     * @param impType The <code>TileImprovement</code> that this Unit will work at.
+     * @param improvementType The <code>TileImprovement</code> that this Unit will work at.
      * @exception IllegalStateException If the <code>TileImprovement</code> is on
      *                another {@link Tile} than this <code>Unit</code> or is not
      *                a valid pioneer.
@@ -2351,7 +2351,7 @@ public class Unit extends FreeColGameObject implements Abilities, Locatable, Loc
     /**
      * Checks if this <code>Unit</code> is able to carry {@link Locatable}s.
      * 
-     * @param type The type used when checking.
+     * @param unitType The type used when checking.
      * @return 'true' if the unit can carry other units, 'false' otherwise.
      */
     public static boolean isCarrier(UnitType unitType) {
@@ -2419,7 +2419,7 @@ public class Unit extends FreeColGameObject implements Abilities, Locatable, Loc
     /**
      * Sets the type of the unit.
      * 
-     * @param type The new type of the unit.
+     * @param unitType The new type of the unit.
      */
     public void setType(UnitType unitType) {
         // TODO: check for requirements (like for colonialRegular)
@@ -2875,8 +2875,7 @@ public class Unit extends FreeColGameObject implements Abilities, Locatable, Loc
     /**
      * Checks if this <code>Unit</code> can be moved to Europe.
      * 
-     * @return <code>true</code> if this unit is adjacent to a
-     *         <code>Tile</code> of type {@link Tile#HIGH_SEAS}.
+     * @return <code>true</code> if this unit can move to Europe.
      */
     public boolean canMoveToEurope() {
         if (getLocation() instanceof Europe) {
@@ -2901,7 +2900,7 @@ public class Unit extends FreeColGameObject implements Abilities, Locatable, Loc
     }
 
     /**
-     * Moves this unit to europe.
+     * Moves this unit to Europe.
      * 
      * @exception IllegalStateException If the move is illegal.
      */
@@ -4819,7 +4818,7 @@ public class Unit extends FreeColGameObject implements Abilities, Locatable, Loc
     /**
      * Return the type of the image which will be used to draw the path
      *
-     * @returns a <code>String</code> to form the resource key
+     * @return a <code>String</code> to form the resource key
      */
     public String getPathTypeImage() {
         if (isMounted()) {

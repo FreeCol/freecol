@@ -187,8 +187,8 @@ public class DiplomaticTrade extends FreeColObject {
     /**
      * Remove a TradeItem from the DiplomaticTrade.
      * 
-     * @param newItem
-     *            a <code>TradeItem</code> value
+     * @param index
+     *            the index of the <code>TradeItem</code> to remove
      */
     public void remove(int index) {
         items.remove(index);
@@ -304,20 +304,9 @@ public class DiplomaticTrade extends FreeColObject {
      * This method writes an XML-representation of this object to the given
      * stream.
      * 
-     * <br>
-     * <br>
-     * 
-     * Only attributes visible to the given <code>Player</code> will be added
-     * to that representation if <code>showAll</code> is set to
-     * <code>false</code>.
-     * 
-     * @param out
+      * @param out
      *            The target stream.
-     * @param player
-     *            The <code>Player</code> this XML-representation should be
-     *            made for, or <code>null</code> if
-     *            <code>showAll == true</code>.
-     * @throws XMLStreamException
+      * @throws XMLStreamException
      *             if there are any problems writing to the stream.
      */
     public void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {

@@ -93,9 +93,8 @@ public class Map extends FreeColGameObject {
      * 
      * @param game
      *            The <code>Game</code> this map belongs to.
-     * @param columns
-     *            This <code>Vector</code> contains the rows, that contains
-     *            the tiles.
+     * @param tiles
+     *            The 2D array of tiles.
      */
 
     public Map(Game game, Tile[][] tiles) {

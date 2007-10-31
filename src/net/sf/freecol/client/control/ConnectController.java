@@ -88,7 +88,7 @@ public final class ConnectController {
      * @param username The name to use when logging in.
      * @param port The port in which the server should listen for new clients.
      * @param players The number of selectable European players in this game.
-     * @param useAdvantages Whether to use national advantages.
+     * @param advantages Whether to use national advantages.
      */
     public void startMultiplayerGame(boolean publicServer, String username, int port, int players, int advantages) {
         freeColClient.setMapEditor(false);
@@ -129,7 +129,7 @@ public final class ConnectController {
      * @param username The name to use when logging in.
      * @param players The number of selectable European players.
      * @param additionalNations Whether to use additional nations not in the original game.
-     * @param selectAdvantages Whether national advantages can be selected.
+     * @param advantages Whether national advantages can be selected.
      */
     public void startSingleplayerGame(String username, int players, boolean additionalNations,
                                       int advantages) {

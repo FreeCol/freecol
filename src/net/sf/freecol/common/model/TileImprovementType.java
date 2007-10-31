@@ -152,8 +152,8 @@ public final class TileImprovementType extends FreeColGameObjectType
 	 * If you want to find out if an improvement is allowed for a tile, call
 	 * {@link #isTileAllowed(Tile)}.
 	 * 
-	 * @param tileType
-	 * @return
+	 * @param tileType The type of terrain
+	 * @return true if improvement is possible
 	 */
 	public boolean isTileTypeAllowed(TileType tileType) {
 		return (allowedTileTypes.indexOf(tileType) >= 0);

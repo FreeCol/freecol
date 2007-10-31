@@ -37,7 +37,6 @@ public abstract class TileItem extends FreeColGameObject implements Locatable, N
     * Creates a new <code>TileItem</code>.
     *
     * @param game The <code>Game</code> in which this object belong.
-    * @param owner The owner of this <code>Settlement</code>.
     * @param tile The location of the <code>Settlement</code>.    
     */
     public TileItem(Game game, Tile tile) {

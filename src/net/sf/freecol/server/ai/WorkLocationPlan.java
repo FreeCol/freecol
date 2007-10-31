@@ -123,7 +123,7 @@ public class WorkLocationPlan {
     /**
      * Updates the given <code>TileImprovementPlan</code>.
      * 
-     * @param ti The <code>TileImprovementPlan</code> to update.
+     * @param tip The <code>TileImprovementPlan</code> to update.
      * @return The same <code>TileImprovementPlan</code>-object
      *      as provided to the method or <code>null</code> if 
      *      there is no more need for the improvement. 

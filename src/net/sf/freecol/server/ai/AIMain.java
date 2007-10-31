@@ -294,7 +294,7 @@ public class AIMain extends FreeColObject implements FreeColGameObjectListener {
     * @param freeColGameObject The <code>FreeColGameObject</code> to add.
     * @see AIObject
     * @see FreeColGameObject
-    * @see FreeColGameObject#getID
+    * @see FreeColGameObject#getId
     */
     public void setFreeColGameObject(String id, FreeColGameObject freeColGameObject) {
         if (aiObjects.containsKey(id)) {

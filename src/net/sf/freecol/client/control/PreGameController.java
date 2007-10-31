@@ -126,7 +126,7 @@ public final class PreGameController {
 
     /**
      * Sets this client's player's nation type.
-     * @param nation Which nation this player wishes to set.
+     * @param nationType Which nation this player wishes to set.
      */
     public void setNationType(NationType nationType) {
         // Make the change:

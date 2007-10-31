@@ -121,17 +121,8 @@ public class ColonyTradeItem extends TradeItem {
     /**
      * This method writes an XML-representation of this object to
      * the given stream.
-     * 
-     * <br><br>
-     * 
-     * Only attributes visible to the given <code>Player</code> will 
-     * be added to that representation if <code>showAll</code> is
-     * set to <code>false</code>.
      *  
      * @param out The target stream.
-     * @param player The <code>Player</code> this XML-representation 
-     *      should be made for, or <code>null</code> if
-     *      <code>showAll == true</code>.
      * @throws XMLStreamException if there are any problems writing
      *      to the stream.
      */

@@ -400,7 +400,7 @@ public final class Specification {
     /**
      * Describe <code>getGoodsType</code> method here.
      *
-     * @param name a <code>String</code> value
+     * @param id a <code>String</code> value
      * @return a <code>GoodsType</code> value
      */
     public GoodsType getGoodsType(String id) {
@@ -741,7 +741,7 @@ public final class Specification {
      * <code>T</code>.
      * 
      * @param <T> the type of objects to deserialize
-     * @param xml the XML node to whose children to deserialize.
+     * @param in The XML stream reader used to deserialize objects.
      * @param factory the factory used to deserialize the object
      * @return a list containing all the child elements of the node deserialized
      */
@@ -766,7 +766,7 @@ public final class Specification {
         /**
          * Converts an XML node to an object of the generic type of the factory.
          * 
-         * @param xml an XML node to convert to an object
+         * @param in The XML stream reader used to deserialize objects.
          * @return the object
          */
         public T objectFrom(XMLStreamReader in) throws XMLStreamException;

@@ -1035,8 +1035,7 @@ public final class ImageLibrary extends ImageProvider {
     /**
      * Returns the bonus-ImageIcon at the given index.
      * 
-     * @param index The index of the bonus-ImageIcon to return.
-     * @return The bonus-ImageIcon at the given index.
+     * @param type The type of the bonus-ImageIcon to return.
      */
     public ImageIcon getBonusImageIcon(ResourceType type) {
         return bonus.get(type.getId());
@@ -1155,12 +1154,11 @@ public final class ImageLibrary extends ImageProvider {
     }
 
     /**
-     * Returns the scaled terrain-image at the given index (and position 0, 0).
+     * Returns the scaled terrain-image for a terrain type (and position 0, 0).
      * 
-     * @param index The index of the terrain-image to return.
-     * @param forested Whether the image should be forested.
+     * @param type The type of the terrain-image to return.
      * @param scale The scale of the terrain image to return.
-     * @return The terrain-image at the given index.
+     * @return The terrain-image
      */
     public Image getScaledTerrainImage(TileType type, float scale) {
         // Index used for drawing the base is the artBasic value
@@ -1312,9 +1310,9 @@ public final class ImageLibrary extends ImageProvider {
     }
 
     /**
-     * Returns the forest image at the given index.
+     * Returns the forest image for a terrain type.
      * 
-     * @param index The index of the image to return.
+     * @param type The type of the terrain-image to return.
      * @return The image at the given index.
      */
     public Image getForestImage(TileType type) {
@@ -1365,7 +1363,7 @@ public final class ImageLibrary extends ImageProvider {
     /**
      * Returns the goods-image at the given index.
      * 
-     * @param index The index of the goods-image to return.
+     * @param g The type of the goods-image to return.
      * @return The goods-image at the given index.
      */
     public Image getGoodsImage(GoodsType g) {
@@ -1373,9 +1371,9 @@ public final class ImageLibrary extends ImageProvider {
     }
 
     /**
-     * Returns the goods-image at the given index.
+     * Returns the goods-image for a goods type.
      * 
-     * @param index The index of the goods-image to return.
+     * @param g The type of the goods-image to return.
      * @return The goods-image at the given index.
      */
     public ImageIcon getGoodsImageIcon(GoodsType g) {
@@ -1383,9 +1381,9 @@ public final class ImageLibrary extends ImageProvider {
     }
 
     /**
-     * Returns the scaled goods-ImageIcon at the given index.
+     * Returns the scaled goods-ImageIcon for a goods type.
      * 
-     * @param index The index of the goods-ImageIcon to return.
+     * @param type The type of the goods-ImageIcon to return.
      * @param scale The scale of the goods-ImageIcon to return.
      * @return The goods-ImageIcon at the given index.
      */
@@ -1481,9 +1479,9 @@ public final class ImageLibrary extends ImageProvider {
     }
 
     /**
-     * Returns the width of the terrain-image at the given index.
+     * Returns the width of the terrain-image for a terrain type.
      * 
-     * @param index The index of the terrain-image.
+     * @param type The type of the terrain-image.
      * @return The width of the terrain-image at the given index.
      */
     public int getTerrainImageWidth(TileType type) {
@@ -1491,9 +1489,9 @@ public final class ImageLibrary extends ImageProvider {
     }
 
     /**
-     * Returns the height of the terrain-image at the given index.
+     * Returns the height of the terrain-image for a terrain type.
      * 
-     * @param index The index of the terrain-image.
+     * @param type The type of the terrain-image.
      * @return The height of the terrain-image at the given index.
      */
     public int getTerrainImageHeight(TileType type) {

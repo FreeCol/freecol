@@ -26,7 +26,7 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
 /**
- * Contains information on builable types.
+ * Contains information on buildable types.
  */
 public class BuildableType extends FreeColGameObjectType {
 

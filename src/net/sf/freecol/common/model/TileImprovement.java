@@ -158,7 +158,7 @@ public class TileImprovement extends TileItem implements Locatable, Named {
     }
 
     /**
-     * Returns the current turns to completion.
+     * @return the current turns to completion.
      */
     public int getTurnsToComplete() {
         return turnsToComplete;
@@ -180,7 +180,7 @@ public class TileImprovement extends TileItem implements Locatable, Named {
 	 * <code>doWork</code> function without any input params assumes 1 turn of
 	 * work done.
 	 * 
-	 * @returns {@link remaining turns to completion}
+	 * @return {@link remaining turns to completion}
 	 */
 	public int doWork(int turns) {
         turnsToComplete -= turns;
@@ -251,8 +251,7 @@ public class TileImprovement extends TileItem implements Locatable, Named {
 
     /**
      * Returns any change of TileType
-     * @param usedQuantity The quantity that was used up.
-     * @return The final value of quantity.
+     * @return The new TileType.
      */
     public TileType getChange(TileType tileType) {
         if (!isComplete()) {

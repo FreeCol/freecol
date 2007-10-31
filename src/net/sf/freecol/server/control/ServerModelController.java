@@ -131,7 +131,7 @@ public class ServerModelController implements ModelController {
 
     /**
      * Creates a new unit. This method is the same as running
-     * {@link #createUnit(String, Location, Player, int, boolean, Connection)}
+     * {@link #createUnit(String, Location, Player, UnitType, boolean, Connection)}
      * with <code>secure = true</code> and <code>connection = null</code>.
      * 
      * @param taskID The <code>taskID</code> should be a unique identifier.

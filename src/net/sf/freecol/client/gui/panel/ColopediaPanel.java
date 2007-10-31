@@ -362,7 +362,7 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
     /**
      * Builds the button for the given tile.
      * 
-     * @param tileType the TileType
+     * @param tileIndex the tile index
      * @param parent the parent node
      */
     private void buildTerrainItem(int tileIndex, DefaultMutableTreeNode parent) {
@@ -375,7 +375,7 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
     /**
      * Builds the button for the given resource.
      * 
-     * @param type the ResourceType
+     * @param resIndex the resource index
      * @param parent the parent node
      */
     private void buildResourceItem(int resIndex, DefaultMutableTreeNode parent) {
@@ -403,9 +403,8 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
     /**
      * Builds the button for the given goods.
      * 
-     * @param goods
-     * @param goodsIcon
-     * @param parent
+     * @param goodsIndex The goods index
+     * @param parent The parent tree node
      */
     private void buildGoodsItem(int goodsIndex, DefaultMutableTreeNode parent) {
         GoodsType goodsType = FreeCol.getSpecification().getGoodsType(goodsIndex);
@@ -430,7 +429,7 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
     /**
      * Builds the details panel for the given tile.
      * 
-     * @param tileType The TileType
+     * @param tileIndex The tile index
      */
     private void buildTerrainDetail(int tileIndex) {
         TileType tileType = FreeCol.getSpecification().getTileType(tileIndex);
@@ -514,7 +513,7 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
     /**
      * Builds the details panel for the given resource.
      * 
-     * @param type The ResourceType
+     * @param resIndex The resource index
      */
     private void buildResourceDetail(int resIndex) {
         ResourceType type = FreeCol.getSpecification().getResourceType(resIndex);
@@ -679,7 +678,7 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
     /**
      * Builds the details panel for the given goods.
      * 
-     * @param goods
+     * @param goodsIndex The goods index
      */
     private void buildGoodsDetail(int goodsIndex) {
         detailPanel.removeAll();
@@ -753,7 +752,7 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
     /**
      * Builds the details panel for the given building.
      * 
-     * @param action
+     * @param building The building index
      */
     private void buildBuildingDetail(int building) {
         detailPanel.removeAll();

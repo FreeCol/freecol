@@ -242,7 +242,7 @@ public final class ChooseFoundingFatherDialog extends FreeColDialog implements A
         /**
          * Prepares this panel to be displayed.
          * 
-         * @param foundingFather The founding father to be displayed or
+         * @param father The founding father to be displayed or
          *            <code>-1</code> if there is none.
          */
         public void initialize(FoundingFather father, int index) {

@@ -498,7 +498,7 @@ public class Game extends FreeColGameObject {
     /**
      * Return a <code>Player</code> identified by it's nation.
      * 
-     * @param nation The nation.
+     * @param nationID The nation.
      * @return The <code>Player</code> of the given nation.
      */
     public Player getPlayer(String nationID) {
@@ -993,7 +993,7 @@ public class Game extends FreeColGameObject {
 
     /**
      * Returns an increasing number that can be used when creating players.
-     * @return
+     * @return The next player index
      */
     public int getNextPlayerIndex() {
         return playerIndex++;

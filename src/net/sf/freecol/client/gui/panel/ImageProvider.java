@@ -126,7 +126,7 @@ public abstract class ImageProvider {
     /**
      * Should return the width of the terrain-image at the given index.
      * 
-     * @param index The index of the terrain-image.
+     * @param type The type of the terrain-image.
      * @return The width of the terrain-image at the given index.
      */
     public abstract int getTerrainImageWidth(TileType type);
@@ -134,7 +134,7 @@ public abstract class ImageProvider {
     /**
      * Should return the height of the terrain-image at the given index.
      * 
-     * @param index The index of the terrain-image.
+     * @param type The type of the terrain-image.
      * @return The height of the terrain-image at the given index.
      */
     public abstract int getTerrainImageHeight(TileType type);

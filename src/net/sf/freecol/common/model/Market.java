@@ -44,8 +44,8 @@ public final class Market extends FreeColGameObject implements Ownable {
 
     /**
      * Constant for specifying the access to this <code>Market</code>
-     * when {@link #buy(int, int, Player) buying} and
-     * {@link #sell(int, int, Player, int) selling} goods.
+     * when {@link #buy(GoodsType, int, Player) buying} and
+     * {@link #sell(GoodsType, int, Player, int) selling} goods.
      */
     public static final int EUROPE = 0,
         CUSTOM_HOUSE = 1;
@@ -316,7 +316,7 @@ public final class Market extends FreeColGameObject implements Ownable {
     /**
      * Add the given <code>Goods</code> to this <code>Market</code>.
      * 
-     * @param type The type of goods.
+     * @param goodsIndex The index of goods.
      * @param amount The amount of goods.
      */
     public void add(int goodsIndex, int amount) {
@@ -349,7 +349,7 @@ public final class Market extends FreeColGameObject implements Ownable {
 
     /**
      * Remove the given <code>Goods</code> from this <code>Market</code>.
-     * @param type The type of goods.
+     * @param goodsIndex The index of goods.
      * @param amount The amount of goods.
      */
     public void remove(int goodsIndex, int amount) {

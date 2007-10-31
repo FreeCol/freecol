@@ -264,7 +264,7 @@ public class TileItemContainer extends FreeColGameObject {
     /**
      * Adds a <code>TileItem</code> to this containter.
      * @param t The TileItem to add to this container.
-     @ @return The added TileItem or the existing TileItem or <code>null</code> on error
+     * @return The added TileItem or the existing TileItem or <code>null</code> on error
      */
     public TileItem addTileItem(TileItem t) {
         if (t == null) {
@@ -385,7 +385,7 @@ public class TileItemContainer extends FreeColGameObject {
     /**
     * Checks if a TileImprovement of this Type is already in this container.
     *
-    * @param t The <code>TileImprovementType</code> to test the presence of.
+    * @param type The <code>TileImprovementType</code> to test the presence of.
     * @return The result.
     */
     public TileImprovement findTileImprovementType(TileImprovementType type) {

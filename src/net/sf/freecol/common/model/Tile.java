@@ -614,8 +614,7 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
     /**
      * The nation that consider this tile to be their property.
      * 
-     * @return The nation or {@link Player#NO_NATION} is there is no nation
-     *         owning this tile.
+     * @return The player owning this tile.
      */
     public Player getOwner() {
         return owner;
@@ -624,8 +623,7 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
     /**
      * Sets the nation that should consider this tile to be their property.
      * 
-     * @param owner The nation or {@link Player#NO_NATION} is there is no
-     *            nation owning this tile.
+     * @param owner The player, new owner of this tile.
      * @see #getOwner
      */
     public void setOwner(Player owner) {
@@ -1228,7 +1226,7 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
      * @param tiContainer
      *            The <code>TileItemContainer</code> with any TileItems to
      *            give bonuses.
-     * @param fishbonus
+     * @param fishBonus
      *            The Bonus Fish to be considered if valid
      * @return The amount of goods.
      */
@@ -1251,7 +1249,7 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
      * Finds the top three outputs based on TileType, TileItemContainer and FishBonus if any
      * @param tileType The <code>TileType/code>
      * @param tiContainer The <code>TileItemContainer</code>
-     * @param fishbonus The Bonus Fish to be considered if valid
+     * @param fishBonus The Bonus Fish to be considered if valid
      * @return The sorted top three of the outputs.
      */
     public static GoodsType[] getSortedGoodsTop(TileType tileType, TileItemContainer tiContainer, int fishBonus) {

@@ -142,7 +142,7 @@ public class Messages {
      * string replacements.
      * 
      * @param messageId The key of the message to find
-     * @data data consists of pairs of strings, each time the first of the pair
+     * @param data consists of pairs of strings, each time the first of the pair
      *       is replaced by the second in the messages.
      */
     public static String message(String messageId, String... data) {

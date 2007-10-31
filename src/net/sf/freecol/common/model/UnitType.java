@@ -456,7 +456,6 @@ public final class UnitType extends BuildableType implements Abilities, Modifier
     /**
      * Get a list of UnitType which can learn in a lost city rumour
      *
-     * @param maximumSkill the maximum level skill which we are searching for
      * @return <code>UnitType</code> with a skill equal or less than given
      * maximum
      */

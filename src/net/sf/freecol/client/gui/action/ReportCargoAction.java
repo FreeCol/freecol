@@ -56,7 +56,7 @@ public class ReportCargoAction extends MapboardAction {
     /**
      * Returns the id of this <code>Option</code>.
      * 
-     * @return 
+     * @return "reportCargoAction"
      */
     public String getId() {
         return id;

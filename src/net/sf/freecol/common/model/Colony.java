@@ -472,7 +472,7 @@ public final class Colony extends Settlement implements Abilities, Location, Nam
     /**
      * Gets a <code>Building</code> of the specified type.
      * 
-     * @param type The type of building to get.
+     * @param typeIndex The index of the building type to get.
      * @return The <code>Building</code>.
      */
     public Building getBuilding(int typeIndex) {
@@ -775,7 +775,7 @@ public final class Colony extends Settlement implements Abilities, Location, Nam
      * skilled unit type with a skill level not exceeding the level of the
      * schoolhouse. @see Building#canAdd
      * 
-     * @param unitType The unit type to add as a teacher.
+     * @param unit The unit to add as a teacher.
      * @return <code>true</code> if this unit type could be added.
     */
     public boolean canTrain(Unit unit) {
@@ -957,7 +957,7 @@ public final class Colony extends Settlement implements Abilities, Location, Nam
     /**
      * Sets the type of building to be built.
      * 
-     * @param type The type of building to be built.
+     * @param buildable The type of building to be built.
      */
     public void setCurrentlyBuilding(BuildableType buildable) {
         buildQueue.add(0, buildable);
