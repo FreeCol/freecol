@@ -376,7 +376,9 @@ public class ModelMessage extends FreeColObject {
         out.writeAttribute("type", String.valueOf(type));
         out.writeAttribute("messageID", messageID);
         out.writeAttribute("hasBeenDisplayed", String.valueOf(beenDisplayed));
-        toArrayElement("data", new String[][] {}, out);
+        if (data != null) {
+            toArrayElement("data", data, out);
+        }
         out.writeEndElement();
     }
 
