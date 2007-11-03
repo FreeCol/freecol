@@ -1838,8 +1838,6 @@ public final class InGameController implements NetworkConstants {
             for (Unit nextUnit : destinationTile.getUnitList()) {
                 if (nextUnit.getSpaceLeft() >= unit.getTakeSpace()) {
                     choices.add(nextUnit);
-                } else {
-                    break;
                 }
             }
 
