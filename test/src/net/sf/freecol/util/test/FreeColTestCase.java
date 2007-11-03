@@ -56,12 +56,12 @@ public class FreeColTestCase extends TestCase {
     static boolean updateLocale = true;
     
     @Override
-	protected void setUp() throws Exception {
-		if (updateLocale) {
-			updateLocale = false;
-			Messages.setMessageBundle(Locale.US);
-		}
-	}
+    protected void setUp() throws Exception {
+        if (updateLocale) {
+            updateLocale = false;
+            Messages.setMessageBundle(Locale.US);
+        }
+    }
 
     @Override
     protected void tearDown() throws Exception {
@@ -102,14 +102,14 @@ public class FreeColTestCase extends TestCase {
         game = new Game(new MockModelController());
 
         for (Nation n : FreeCol.getSpecification().getNations()) {
-			Player p;
-			if (n.getType().isEuropean() && !n.getType().isREF()){
-				p = new Player(game, n.getType().getName(), false, n);
-			} else {
-				p = new Player(game, n.getType().getName(), false, true, n);
-			}
-			game.addPlayer(p);
-		}
+            Player p;
+            if (n.getType().isEuropean() && !n.getType().isREF()){
+                p = new Player(game, n.getType().getName(), false, n);
+            } else {
+                p = new Player(game, n.getType().getName(), false, true, n);
+            }
+            game.addPlayer(p);
+        }
         return game;
     }
 
@@ -247,7 +247,7 @@ public class FreeColTestCase extends TestCase {
 
         for (int i = 1; i < numberOfSettlers; i++) {
             Unit settler = new Unit(game, map.getTile(tileX, tileY), dutch, unitType, Unit.ACTIVE, true, false, 0,
-                    false);
+                                    false);
             settler.setLocation(colony);
         }
 

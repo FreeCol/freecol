@@ -189,6 +189,11 @@ public class Player extends FreeColGameObject implements Abilities, Nameable, Mo
 
     private Location entryLocation;
 
+    /**
+     * The Units this player owns.
+     */
+    private java.util.Map<String, Unit> units = new HashMap<String, Unit>();
+
     private Iterator<Unit> nextActiveUnitIterator = new UnitIterator(this, new ActivePredicate());
 
     private Iterator<Unit> nextGoingToUnitIterator = new UnitIterator(this, new GoingToPredicate());
@@ -515,6 +520,37 @@ public class Player extends FreeColGameObject implements Abilities, Nameable, Mo
      */
     public int getScore() {
         return score;
+    }
+
+    /**
+     * Get the <code>Unit</code> value.
+     *
+     * @return a <code>List<Unit></code> value
+     */
+    public final Unit getUnit(String id) {
+        return units.get(id);
+    }
+
+    /**
+     * Set the <code>Unit</code> value.
+     *
+     * @param newUnit The new Units value.
+     */
+    public final void setUnit(final Unit newUnit) {
+        if (newUnit != null) {
+            units.put(newUnit.getId(), newUnit);
+        }
+    }
+
+    /**
+     * Remove Unit.
+     *
+     * @param oldUnit an <code>Unit</code> value
+     */
+    public void removeUnit(final Unit oldUnit) {
+        if (oldUnit != null) {
+            units.remove(oldUnit.getId());
+        }
     }
 
     /**
@@ -1482,6 +1518,7 @@ public class Player extends FreeColGameObject implements Abilities, Nameable, Mo
      * @see Unit
      */
     public Iterator<Unit> getUnitIterator() {
+        /*
         ArrayList<Unit> units = new ArrayList<Unit>();
         Map map = getGame().getMap();
         Iterator<Position> tileIterator = map.getWholeMapIterator();
@@ -1520,7 +1557,8 @@ public class Player extends FreeColGameObject implements Abilities, Nameable, Mo
                 units.add(u);
             }
         }
-        return units.iterator();
+        */
+        return units.values().iterator();
     }
 
     /**
