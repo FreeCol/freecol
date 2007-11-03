@@ -52,6 +52,7 @@ import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.Tension;
 import net.sf.freecol.common.model.Tile;
+import net.sf.freecol.common.model.TileImprovementType;
 import net.sf.freecol.common.model.TradeRoute;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.UnitType;
@@ -2121,14 +2122,25 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
     private Element changeWorkType(Connection connection, Element workElement) {
         ServerPlayer player = getFreeColServer().getPlayer(connection);
         Unit unit = (Unit) getGame().getFreeColGameObject(workElement.getAttribute("unit"));
-        int workTypeIndex = Integer.parseInt(workElement.getAttribute("workType"));
-        GoodsType workType = FreeCol.getSpecification().getGoodsType(workTypeIndex);
         if (unit.getOwner() != player) {
             throw new IllegalStateException("Not your unit!");
         }
-        // No reason to send an update to other players: this is always hidden.
-        unit.setWorkType(workType);
+
+        String workTypeString = workElement.getAttribute("workType");
+        if (workTypeString != null) {
+            int workTypeIndex = Integer.parseInt(workTypeString);
+            GoodsType workType = FreeCol.getSpecification().getGoodsType(workTypeIndex);
+            // No reason to send an update to other players: this is always hidden.
+            unit.setWorkType(workType);
+            return null;
+        }
+        String improvementTypeString = workElement.getAttribute("improvementType");
+        if (improvementTypeString != null) {
+            TileImprovementType type = FreeCol.getSpecification().getTileImprovementType(improvementTypeString);
+            unit.work(type);
+        }
         return null;
+
     }
 
     /**

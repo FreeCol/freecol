@@ -69,6 +69,7 @@ import net.sf.freecol.common.model.PathNode;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.Tile;
+import net.sf.freecol.common.model.TileImprovementType;
 import net.sf.freecol.common.model.TradeRoute;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.UnitType;
@@ -2270,6 +2271,29 @@ public final class InGameController implements NetworkConstants {
         changeWorkTypeElement.setAttribute("workType", Integer.toString(workType.getIndex()));
 
         unit.setWorkType(workType);
+
+        client.sendAndWait(changeWorkTypeElement);
+    }
+
+    /**
+     * Changes the work type of this <code>Unit</code>.
+     * 
+     * @param unit The <code>Unit</code>
+     * @param workType The new <code>GoodsType</code> to produce.
+     */
+    public void changeWorkType(Unit unit, TileImprovementType improvementType) {
+        if (freeColClient.getGame().getCurrentPlayer() != freeColClient.getMyPlayer()) {
+            freeColClient.getCanvas().showInformationMessage("notYourTurn");
+            return;
+        }
+
+        Client client = freeColClient.getClient();
+
+        Element changeWorkTypeElement = Message.createNewRootElement("changeWorkType");
+        changeWorkTypeElement.setAttribute("unit", unit.getId());
+        changeWorkTypeElement.setAttribute("workType", improvementType.getId());
+
+        unit.work(improvementType);
 
         client.sendAndWait(changeWorkTypeElement);
     }
