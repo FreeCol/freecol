@@ -27,7 +27,9 @@ import java.util.List;
 import java.util.logging.Logger;
 import net.sf.freecol.FreeCol;
 
+import net.sf.freecol.common.model.BuildableType;
 import net.sf.freecol.common.model.Building;
+import net.sf.freecol.common.model.BuildingType;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.ColonyTile;
 import net.sf.freecol.common.model.Game;
@@ -129,17 +131,41 @@ public class ColonyPlan {
      * @return An iterator containing all the <code>Buildable</code> sorted by
      *         priority (highest priority first).
      */
-    public Iterator<Building> getBuildable() {
-        ArrayList<Building> buildList = new ArrayList<Building>();
+    public Iterator<BuildableType> getBuildable() {
+        List<BuildableType> buildList = new ArrayList<BuildableType>();
+
+        BuildingType docks = null;
+        BuildingType customHouse = null;
+        BuildingType carpenter = null;
+        BuildingType stables = null;
+        BuildingType stockade = null;
+        BuildingType armory = null;
+        BuildingType schoolhouse = null;
+        for (BuildingType type : FreeCol.getSpecification().getBuildingTypeList()) {
+            if (type.getUpgradesFrom() != null) {
+                continue;
+            }
+            if (type.hasAbility("model.ability.produceInWater")) {
+                docks = type;
+            } else if (type.hasAbility("model.ability.export")) {
+                customHouse = type;
+            } else if (type.hasAbility("model.ability.teach")) {
+                schoolhouse = type;
+            } else if (type.getProducedGoodsType() == Goods.HAMMERS) {
+                carpenter = type;
+            } else if (type.getProducedGoodsType() == Goods.HORSES) {
+                stables = type;
+            } else if (type.getProducedGoodsType() == Goods.MUSKETS) {
+                armory = type;
+            } else if (type.getDefenseBonus() > 0) {
+                stockade = type;
+            }
+        }
 
         String ability = "model.ability.produceInWater";
         if (!colony.hasAbility(ability)) {
-            Iterator<Building> iterator = colony.getBuildingIterator();
-            while (iterator.hasNext()) {
-                Building building = iterator.next();
-                if (building.hasAbility(ability) && building.canBuildNext()) {
-                    buildList.add(building);
-                }
+            if (colony.canBuild(docks)) {
+                buildList.add(docks);
             }
         }
 
@@ -149,7 +175,7 @@ public class ColonyPlan {
             if (wlp.getWorkLocation() instanceof Building) {
                 Building b = (Building) wlp.getWorkLocation();
                 if (b.canBuildNext()) {
-                    buildList.add(b);
+                    buildList.add(b.getType().getUpgradesTo());
                 }
 
                 GoodsType outputType = b.getGoodsOutputType();
@@ -159,7 +185,7 @@ public class ColonyPlan {
                         Building building = iterator.next();
                         if (building.getType().getModifier(outputType.getId()) != null
                                 && building.canBuildNext()) {
-                            buildList.add(building);
+                            buildList.add(building.getType().getUpgradesTo());
                         }
                     }
                 }
@@ -169,16 +195,9 @@ public class ColonyPlan {
         Building buildingForExport = null;
         ability = "model.ability.export";
         if (!colony.hasAbility(ability)) {
-            Iterator<Building> iterator = colony.getBuildingIterator();
-            while (iterator.hasNext()) {
-                Building building = iterator.next();
-                if (building.hasAbility(ability)) {
-                    buildingForExport = building;
-                    if (building.canBuildNext() &&
-                            colony.getGoodsContainer().hasReachedCapacity(colony.getWarehouseCapacity())) {
-                        buildList.add(building);
-                    }
-                }
+            if (colony.canBuild(customHouse) &&
+                colony.getGoodsContainer().hasReachedCapacity(colony.getWarehouseCapacity())) {
+                buildList.add(customHouse);
             }
         }
 
@@ -186,41 +205,59 @@ public class ColonyPlan {
         Building building = colony.getWarehouse();
         if (building.canBuildNext()) {
             if (colony.getGoodsContainer().hasReachedCapacity(colony.getWarehouseCapacity())) {
-                buildList.add(0, building);
+                buildList.add(0, building.getType().getUpgradesTo());
             } else {
-                buildList.add(building);
+                buildList.add(building.getType());
             }
         }
 
         building = colony.getBuildingForProducing(Goods.HAMMERS);
-        if (buildList.size() > 3 && building.canBuildNext()) {
-            buildList.add(0, building);
+        if (buildList.size() > 3) {
+            if (building == null) {
+                if (colony.canBuild(carpenter)) {
+                    buildList.add(0, carpenter);
+                }
+            } else if (building.canBuildNext()) {
+                buildList.add(0, building.getType().getUpgradesTo());
+            }
         }
 
         building = colony.getBuildingForProducing(Goods.HORSES);
-        if (colony.getProductionOf(Goods.HORSES) > 2 && building.canBuildNext()) {
-            buildList.add(building);
+        if (colony.getProductionOf(Goods.HORSES) > 2) {
+            if (building == null) {
+                if (colony.canBuild(stables)) {
+                    buildList.add(stables);
+                }
+            } else if (building.canBuildNext()) {
+                buildList.add(building.getType().getUpgradesTo());
+            }
         }
 
         building = colony.getStockade();
-        if (building.canBuildNext()) {
-            buildList.add(building);
+        if (building == null) {
+            if (colony.canBuild(stockade)) {
+                buildList.add(stockade);
+            }
+        } else if (building.canBuildNext()) {
+            buildList.add(building.getType().getUpgradesTo());
         }
 
-        /** TODO: fix this
         building = colony.getBuildingForProducing(Goods.MUSKETS);
-        if (building.canBuildNext() && !building.isBuilt()) {
-            buildList.add(building);
+        if (building == null) {
+            if (colony.canBuild(armory)) {
+                buildList.add(armory);
+            }
+        } else if (building.canBuildNext()) {
+            buildList.add(building.getType().getUpgradesTo());
         }
-        */
         
-        // TODO: create a interface buildable and add artillery to buildList
-        //buildList.add(new Integer(Colony.BUILDING_UNIT_ADDITION + Unit.ARTILLERY));
+        buildList.add(FreeCol.getSpecification().getUnitType("model.unit.artillery"));
 
-        // buildList.add(new Integer(Building.SCHOOLHOUSE));
-
-        if (buildingForExport.canBuildNext()) {
-            buildList.add(buildingForExport);
+        ability = "model.ability.teach";
+        if (!colony.hasAbility(ability)) {
+            if (colony.canBuild(schoolhouse)) {
+                buildList.add(schoolhouse);
+            }
         }
 
         buildList.add(null);

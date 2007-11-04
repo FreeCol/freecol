@@ -122,7 +122,7 @@ public class AbstractGoods extends FreeColObject {
 
     /**
     * Gets the tag name of the root element representing this object.
-    * @return "goods".
+    * @return "abstractGoods".
     */
     public static String getXMLElementTagName() {
         return "abstractGoods";

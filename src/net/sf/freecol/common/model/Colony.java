@@ -1280,8 +1280,14 @@ public final class Colony extends Settlement implements Abilities, Location, Nam
         return canBuild(getCurrentlyBuilding());
     }
 
+    /**
+     * Returns true if this Colony can build the given BuildableType.
+     *
+     * @param buildableType a <code>BuildableType</code> value
+     * @return a <code>boolean</code> value
+     */
     public boolean canBuild(BuildableType buildableType) {
-        if (buildableType == BuildableType.NOTHING) {
+        if (buildableType == null || buildableType == BuildableType.NOTHING) {
             return false;
         } else if (buildableType.getHammersRequired() <= 0) {
             return false;
@@ -1291,6 +1297,20 @@ public final class Colony extends Settlement implements Abilities, Location, Nam
             java.util.Map<String, Boolean> requiredAbilities = buildableType.getAbilitiesRequired();
             for (Entry<String, Boolean> entry : requiredAbilities.entrySet()) {
                 if (hasAbility(entry.getKey()) != entry.getValue()) {
+                    return false;
+                }
+            }
+        }
+        if (buildableType instanceof BuildingType) {
+            Building building = getBuilding((BuildingType) buildableType);
+            if (building != null && building.getType() == buildableType) {
+                return false;
+            }
+            BuildingType buildingType = (BuildingType) buildableType;
+            if (buildingType.getUpgradesFrom() != null) {
+                if (building == null) {
+                    return false;
+                } else if (building.getType() != buildingType.getUpgradesFrom()) {
                     return false;
                 }
             }

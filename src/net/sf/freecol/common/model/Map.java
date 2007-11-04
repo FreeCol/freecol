@@ -1291,7 +1291,7 @@ public class Map extends FreeColGameObject {
      *        within the bounds of the map and <code>false</code> otherwise
      */
     public static boolean isValid(int x, int y, int width, int height) {
-        return x>=0 && x < width && y >= 0 && y < height;
+        return x >= 0 && x < width && y >= 0 && y < height;
     }
 
     /**

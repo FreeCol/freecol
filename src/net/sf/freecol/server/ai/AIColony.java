@@ -1116,20 +1116,20 @@ public class AIColony extends AIObject {
 
         boolean isOldValid = colony.canBuild();
         
-        Iterator<Building> bi = colonyPlan.getBuildable();
+        Iterator<BuildableType> bi = colonyPlan.getBuildable();
         while (bi.hasNext()) {
-            Building buildable = bi.next();
+            BuildableType buildable = bi.next();
 
-            if (buildable.getType() == colony.getCurrentlyBuilding()) {
+            if (buildable == colony.getCurrentlyBuilding()) {
                 // We are building the right item already:
                 break;
             }
 
-            int hammersNew = buildable.getNextHammers();
+            int hammersNew = buildable.getHammersRequired();
             if (hammersNew > colony.getHammers() || hammersNew > hammersOld || !isOldValid) {
                 Element setCurrentlyBuildingElement = Message.createNewRootElement("setCurrentlyBuilding");
                 setCurrentlyBuildingElement.setAttribute("colony", colony.getId());
-                setCurrentlyBuildingElement.setAttribute("type", buildable.getType().getId());
+                setCurrentlyBuildingElement.setAttribute("type", buildable.getId());
 
                 try {
                     connection.sendAndWait(setCurrentlyBuildingElement);
