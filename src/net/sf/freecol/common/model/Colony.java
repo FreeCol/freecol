@@ -236,9 +236,15 @@ public final class Colony extends Settlement implements Abilities, Location, Nam
      * Updates SoL and builds stockade if possible.
      */
     public void updatePopulation() {
-        if (getUnitCount() >= 3 && getOwner().hasFather(FreeCol.getSpecification().getFoundingFather("model.foundingFather.laSalle"))) {
-            if (!hasStockade()) {
-                getStockade().upgrade();
+        Modifier priceBonus = getModifier("model.modifier.buildingPriceBonus");
+        if (priceBonus != null && priceBonus.applyTo(100) == 0) {
+            // this means we can get a building for free
+            for (BuildingType buildingType : FreeCol.getSpecification().getBuildingTypeList()) {
+                if (priceBonus.appliesTo(buildingType) &&
+                    getBuilding(buildingType) == null &&
+                    getUnitCount() >= buildingType.getPopulationRequired()) {
+                    addWorkLocation(new Building(getGame(), this, buildingType));
+                }
             }
         }
         getTile().updatePlayerExploredTiles();
