@@ -87,15 +87,7 @@ public final class TilePanel extends FreeColDialog implements ActionListener {
         ownerLabel = new JLabel("", JLabel.CENTER);
         ownerLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
         add(ownerLabel);        
-/*        
-        ArrayList<Integer> farmedGoods = new ArrayList<Integer>();
-        for (int i = 0; i < Goods.NUMBER_OF_TYPES; i++) {
-            if (Goods.isFarmedGoods(i)) {
-                farmedGoods.add(i);
-            }
 
-        }
-*/
         List<GoodsType> farmedGoods = FreeCol.getSpecification().getFarmedGoodsTypeList();
         number = farmedGoods.size();
 
@@ -107,9 +99,7 @@ public final class TilePanel extends FreeColDialog implements ActionListener {
         for (int k = 0; k < number; k++) {
             goodsTypes[k] = farmedGoods.get(k);
             labels[k] = new JLabel(canvas.getGUI().getImageLibrary().getGoodsImageIcon(goodsTypes[k]));
-            //goodsPanel.add(labels[k]);
         }
-//        fishLabel = new JLabel(canvas.getImageProvider().getGoodsImageIcon((Goods.FISH).getIndex());
         
         goodsPanel.setSize(goodsPanel.getPreferredSize());
         add(goodsPanel);
@@ -166,11 +156,15 @@ public final class TilePanel extends FreeColDialog implements ActionListener {
         }
         
         goodsPanel.removeAll();
-        List<GoodsType> production = tileType.getPotentialTypeList();
-        for (GoodsType goodsType : production) {
-            JLabel label = new JLabel(canvas.getGUI().getImageLibrary().getGoodsImageIcon(goodsType));
-            label.setText(String.valueOf(tile.potential(goodsType)));
-            goodsPanel.add(label);
+        if (tileType == null) {
+            colopediaButton.setEnabled(false);
+        } else {
+            List<GoodsType> production = tileType.getPotentialTypeList();
+            for (GoodsType goodsType : production) {
+                JLabel label = new JLabel(canvas.getGUI().getImageLibrary().getGoodsImageIcon(goodsType));
+                label.setText(String.valueOf(tile.potential(goodsType)));
+                goodsPanel.add(label);
+            }
         }
         setSize(getPreferredSize());
 
