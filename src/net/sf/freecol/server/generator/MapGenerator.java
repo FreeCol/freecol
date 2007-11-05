@@ -39,6 +39,7 @@ import net.sf.freecol.FreeCol;
 import net.sf.freecol.common.FreeColException;
 import net.sf.freecol.common.model.AbstractUnit;
 import net.sf.freecol.common.model.Building;
+import net.sf.freecol.common.model.BuildingType;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.ColonyTile;
 import net.sf.freecol.common.model.EuropeanNationType;
@@ -580,7 +581,9 @@ public class MapGenerator {
                             }
                         }
                     }
-                    Building schoolhouse = colony.getBuilding(FreeCol.getSpecification().getBuildingType("model.unit.Schoolhouse"));
+                    BuildingType schoolType = FreeCol.getSpecification().getBuildingType("model.building.Schoolhouse");
+                    Building schoolhouse = new Building(map.getGame(), colony, schoolType);
+                    colony.addWorkLocation(schoolhouse);
                     unitType = FreeCol.getSpecification().getUnitType("model.unit.masterCarpenter");
                     while (!schoolhouse.canAdd(unitType)) {
                         schoolhouse.upgrade();
