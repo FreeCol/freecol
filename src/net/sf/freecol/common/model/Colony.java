@@ -136,6 +136,8 @@ public final class Colony extends Settlement implements Abilities, Location, Nam
         tile.setOwner(owner);
         for (int direction = 0; direction < Map.NUMBER_OF_DIRECTIONS; direction++) {
             Tile t = map.getNeighbourOrNull(direction, tile);
+            if (t==null)
+                continue;
             if (t.getOwner() == null) {
                 t.setOwner(owner);
             }
