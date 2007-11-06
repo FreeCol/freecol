@@ -40,12 +40,6 @@ import org.w3c.dom.Element;
  */
 public final class Building extends FreeColGameObject implements Abilities, WorkLocation, Ownable, Named {
     
-
-
-    
-    // TODO: Remove when it isn't used in AI code
-    public static final int MAX_LEVEL = 3;
-
     /** The type of a building. */
     public static final int NONE = -1;
 
@@ -257,20 +251,7 @@ public final class Building extends FreeColGameObject implements Abilities, Work
      *         population.
      */
     public boolean canBuild(BuildingType next) {
-        if (next == null) {
-            return false;
-        }
-        /* TODO: check required abilities for next
-        if () {
-            return false;
-        }
-         */
-
-        if (colony.getUnitCount() < next.getPopulationRequired()) {
-            return false;
-        }
-
-        return true;
+        return getColony().canBuild(next);
     }
 
     /**

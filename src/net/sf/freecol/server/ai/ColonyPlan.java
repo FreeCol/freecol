@@ -53,6 +53,11 @@ import org.w3c.dom.Element;
  * @see Colony
  */
 public class ColonyPlan {
+
+    // What is this supposed to be? Is it the maximum number of units
+    // per building?
+    private static final int MAX_LEVEL = 3;
+
     @SuppressWarnings("unused")
     private static final Logger logger = Logger.getLogger(ColonyPlan.class.getName());
 
@@ -259,8 +264,6 @@ public class ColonyPlan {
                 buildList.add(schoolhouse);
             }
         }
-
-        buildList.add(null);
 
         return buildList.iterator();
     }
@@ -493,9 +496,10 @@ public class ColonyPlan {
             boolean blacksmithAdded = false;
 
             // Add a manufacturer for the secondary type of goods:
-            if (getProductionOf(Goods.FOOD) >= workLocationPlans.size() * 2 + 2 && secondaryRawMaterial != null
-                    && 12 * secondaryWorkers + 6 <= getProductionOf(secondaryRawMaterial)
-                    && secondaryWorkers <= Building.MAX_LEVEL) {
+            if (getProductionOf(Goods.FOOD) >= workLocationPlans.size() * 2 + 2 &&
+                secondaryRawMaterial != null &&
+                12 * secondaryWorkers + 6 <= getProductionOf(secondaryRawMaterial) &&
+                secondaryWorkers <= MAX_LEVEL) {
                 GoodsType producedGoods = secondaryRawMaterial.getProducedMaterial();
                 Building b = colony.getBuildingForProducing(producedGoods);
                 if (b != null) {
@@ -512,7 +516,7 @@ public class ColonyPlan {
             // Add a manufacturer for the primary type of goods:
             if (getProductionOf(Goods.FOOD) >= workLocationPlans.size() * 2 + 2 && primaryRawMaterial != null
                     && 12 * primaryWorkers + 6 <= getProductionOf(primaryRawMaterial)
-                    && primaryWorkers <= Building.MAX_LEVEL) {
+                    && primaryWorkers <= MAX_LEVEL) {
                 GoodsType producedGoods = primaryRawMaterial.getProducedMaterial();
                 Building b = colony.getBuildingForProducing(producedGoods);
                 if (b != null) {
@@ -528,7 +532,7 @@ public class ColonyPlan {
 
             // Add a gunsmith:
             if (blacksmithAdded && getProductionOf(Goods.FOOD) >= workLocationPlans.size() * 2 + 2
-                    && gunsmiths < Building.MAX_LEVEL) {
+                    && gunsmiths < MAX_LEVEL) {
                 Building b = colony.getBuildingForProducing(Goods.MUSKETS);
                 if (b != null) {
                     WorkLocationPlan wlp = new WorkLocationPlan(getAIMain(), b, Goods.MUSKETS);
@@ -540,7 +544,7 @@ public class ColonyPlan {
 
             // Add carpenters:
             if (getProductionOf(Goods.FOOD) >= workLocationPlans.size() * 2 + 2
-                    && 12 * carpenters + 6 <= getProductionOf(Goods.LUMBER) && carpenters <= Building.MAX_LEVEL) {
+                    && 12 * carpenters + 6 <= getProductionOf(Goods.LUMBER) && carpenters <= MAX_LEVEL) {
                 if (carpenter != null) {
                     WorkLocationPlan wlp = new WorkLocationPlan(getAIMain(), carpenter, Goods.HAMMERS);
                     workLocationPlans.add(wlp);

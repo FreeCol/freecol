@@ -1322,7 +1322,9 @@ public class AIPlayer extends AIObject {
                 return 0;
             }
         }
-        if (colony != null && numberOfDefendingUnits > colony.getStockade().getLevel() + 1) {
+        if (colony != null && 
+            colony.getStockade() != null &&
+            numberOfDefendingUnits > colony.getStockade().getLevel() + 1) {
             return Math.max(0, value - 9000);
         }
         return value;

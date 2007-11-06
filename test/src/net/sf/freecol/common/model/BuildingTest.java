@@ -35,18 +35,15 @@ import net.sf.freecol.util.test.FreeColTestCase;
 
 public class BuildingTest extends FreeColTestCase {
 
-
-
-
-
     public void testCanBuildNext() {
     	
     	Colony colony = getStandardColony();
 
-        // First check with a building that can be fully build with a normal
-        // colony
+        // First check with a building that can be fully built with a
+        // normal colony
         BuildingType warehouseType = FreeCol.getSpecification().getBuildingType("model.building.Depot");
         Building warehouse = new Building(getGame(), colony, warehouseType);
+        colony.addWorkLocation(warehouse);
         assertTrue(warehouse.canBuildNext());
         warehouse.upgrade();
         assertTrue(warehouse.canBuildNext());
