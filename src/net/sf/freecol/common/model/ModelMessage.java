@@ -372,7 +372,9 @@ public class ModelMessage extends FreeColObject {
     public void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
         out.writeStartElement(getXMLElementTagName());
         out.writeAttribute("source", source.getId());
-        out.writeAttribute("display", display.getId());
+        if (display != null) {
+            out.writeAttribute("display", display.getId());
+        }
         out.writeAttribute("type", String.valueOf(type));
         out.writeAttribute("messageID", messageID);
         out.writeAttribute("hasBeenDisplayed", String.valueOf(beenDisplayed));
