@@ -630,7 +630,7 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener {
 
             // The buy button should only be active if:
             //    - the panel is active,
-            //    - the building isnt finished,
+            //    - the building isn't finished,
             //    - the player has enough money
             buyBuilding.setEnabled(isEditable() &&
             		(hammers < hammersNeeded || tools < toolsNeeded)  &&
@@ -1560,9 +1560,9 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener {
 
             for (int x = 0; x < 3; x++) {
                 for (int y = 0; y < 3; y++) {
-                	ColonyTile tile = getColony().getColonyTile(x, y);
-                	if (tile==null)
-                		continue;
+                    ColonyTile tile = getColony().getColonyTile(x, y);
+                    if (tile==null)
+                        continue;
                     ASingleTilePanel p = new ASingleTilePanel(tile, x, y);
                     add(p, new Integer(layer));
                     layer++;
@@ -1584,7 +1584,7 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener {
                         TileType tileType = getColony().getTile().getType();
                         Tile tile = getColony().getTile(x, y);
                         if (tile==null)
-                        	continue;
+                            continue;
                         colonyTileGUI.displayColonyTile((Graphics2D) g, game.getMap(), tile, ((2 - x) + y)
                                 * lib.getTerrainImageWidth(tileType) / 2, (x + y) * lib.getTerrainImageHeight(tileType) / 2,
                                 getColony());
@@ -1726,7 +1726,7 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener {
                                 && colonyTile.getWorkTile().getOwningSettlement() != getColony()) {
                             if (colonyTile.getWorkTile().getOwningSettlement().getOwner().isEuropean()) {
                                 parent.errorMessage("tileTakenEuro");
-                            } else { // its an indian setttlement
+                            } else { // its an indian settlement
                                 parent.errorMessage("tileTakenInd");
                             }
                             return null;
@@ -1828,7 +1828,7 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener {
                  * 128pixels is 40 pixels, situated in the middle of 128. The
                  * middle 40 pixels of 128 is 63-20 and 63+20
                  * 
-                 * Tada. A way of detecting if the x,y is withing the diamond.
+                 * Tada. A way of detecting if the x,y is within the diamond.
                  * This algorithm should work no matter how tall or short the
                  * rectangle (and therefore the diamond within) is.
                  */
