@@ -1476,12 +1476,17 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
                             out.writeAttribute("tile", getId());
                             out.writeAttribute("unitCount", Integer.toString(pet.getColonyUnitCount()));
 
-                            Building b = getColony().getStockade();
-                            out.writeStartElement(Building.getXMLElementTagName());
-                            out.writeAttribute("ID", b.getId());
-                            out.writeAttribute("colony", getColony().getId());
-                            out.writeAttribute("buildingType", Integer.toString(pet.getColonyStockadeLevel()));
-                            out.writeEndElement();
+                            Building stockade = getColony().getStockade();
+                            if (stockade != null) {
+                                stockade.toXML(out);
+                                /*
+                                out.writeStartElement(Building.getXMLElementTagName());
+                                out.writeAttribute("ID", stockade.getId());
+                                out.writeAttribute("colony", getColony().getId());
+                                out.writeAttribute("buildingType", Integer.toString(pet.getColonyStockadeLevel()));
+                                out.writeEndElement();
+                                */
+                            }
 
                             GoodsContainer emptyGoodsContainer = new GoodsContainer(getGame(), getColony());
                             emptyGoodsContainer.setFakeID(getColony().getGoodsContainer().getId());
