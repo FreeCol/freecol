@@ -120,13 +120,6 @@ public final class Colony extends Settlement implements Abilities, Location, Nam
      */
     public Colony(Game game, Player owner, String name, Tile tile) {
         super(game, owner, tile);
-        Iterator<Position> exploreIt = getGame().getMap().getCircleIterator(getTile().getPosition(), true,
-                getLineOfSight());
-        while (exploreIt.hasNext()) {
-            Tile t = getGame().getMap().getTile(exploreIt.next());
-            t.setExploredBy(owner, true);
-        }
-        owner.invalidateCanSeeTiles();
         goodsContainer = new GoodsContainer(game, this);
         initializeGoodsTypeArrays();
         this.name = name;

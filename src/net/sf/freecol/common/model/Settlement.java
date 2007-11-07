@@ -61,6 +61,14 @@ abstract public class Settlement extends FreeColGameObject implements Location, 
         this.tile = tile;
         this.owner = owner;
         
+        Iterator<Position> exploreIt = game.getMap().getCircleIterator(tile.getPosition(), true,
+                                                                       getLineOfSight());
+        while (exploreIt.hasNext()) {
+            Tile t = game.getMap().getTile(exploreIt.next());
+            t.setExploredBy(owner, true);
+        }
+        owner.invalidateCanSeeTiles();
+
         // Relocate any worker already on the Tile (from another Settlement):
         if (tile.getOwningSettlement() != null) {
             if (tile.getOwningSettlement() instanceof Colony) {
