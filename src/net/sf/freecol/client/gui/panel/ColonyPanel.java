@@ -1560,7 +1560,10 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener {
 
             for (int x = 0; x < 3; x++) {
                 for (int y = 0; y < 3; y++) {
-                    ASingleTilePanel p = new ASingleTilePanel(getColony().getColonyTile(x, y), x, y);
+                	ColonyTile tile = getColony().getColonyTile(x, y);
+                	if (tile==null)
+                		continue;
+                    ASingleTilePanel p = new ASingleTilePanel(tile, x, y);
                     add(p, new Integer(layer));
                     layer++;
                 }
@@ -1579,7 +1582,10 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener {
                 for (int x = 0; x < 3; x++) {
                     for (int y = 0; y < 3; y++) {
                         TileType tileType = getColony().getTile().getType();
-                        colonyTileGUI.displayColonyTile((Graphics2D) g, game.getMap(), getColony().getTile(x, y), ((2 - x) + y)
+                        Tile tile = getColony().getTile(x, y);
+                        if (tile==null)
+                        	continue;
+                        colonyTileGUI.displayColonyTile((Graphics2D) g, game.getMap(), tile, ((2 - x) + y)
                                 * lib.getTerrainImageWidth(tileType) / 2, (x + y) * lib.getTerrainImageHeight(tileType) / 2,
                                 getColony());
 
