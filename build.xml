@@ -58,8 +58,10 @@
 
     <target name="init" unless="TSTAMP">
         <tstamp/>
-        <exec executable="svn" output="build/svn.properties">
-          <arg value="info" />
+        <exec executable="svn" output="${basedir}/build/svn.properties">
+          <arg value="info"/>
+          <arg value="-r"/>
+          <arg value="HEAD"/>
         </exec>
         <property prefix="svn" file="build/svn.properties"/>
         <manifest file="${basedir}/src/MANIFEST.MF">
