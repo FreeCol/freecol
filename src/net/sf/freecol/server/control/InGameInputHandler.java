@@ -52,6 +52,7 @@ import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.Tension;
 import net.sf.freecol.common.model.Tile;
+import net.sf.freecol.common.model.TileImprovement;
 import net.sf.freecol.common.model.TileImprovementType;
 import net.sf.freecol.common.model.TradeRoute;
 import net.sf.freecol.common.model.Unit;
@@ -251,6 +252,12 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
             @Override
             public Element handle(Player player, Connection connection, Element element) {
                 return changeWorkType(connection, element);
+            }
+        });
+        register("workImprovement", new CurrentPlayerNetworkRequestHandler() {
+            @Override
+            public Element handle(Player player, Connection connection, Element element) {
+                return workImprovement(connection, element);
             }
         });
         register("setCurrentlyBuilding", new CurrentPlayerNetworkRequestHandler() {
@@ -2132,14 +2139,41 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
             GoodsType workType = FreeCol.getSpecification().getGoodsType(workTypeIndex);
             // No reason to send an update to other players: this is always hidden.
             unit.setWorkType(workType);
-            return null;
+
         }
+        return null;
+
+    }
+
+    /**
+     * Handles a "changeWorkType"-request from a client.
+     * 
+     * @param connection The connection the message came from.
+     * @param workElement The element containing the request.
+     */
+    private Element workImprovement(Connection connection, Element workElement) {
+        ServerPlayer player = getFreeColServer().getPlayer(connection);
+        Unit unit = (Unit) getGame().getFreeColGameObject(workElement.getAttribute("unit"));
+        if (unit.getOwner() != player) {
+            throw new IllegalStateException("Not your unit!");
+        }
+
+        Element reply = null;
+
         String improvementTypeString = workElement.getAttribute("improvementType");
         if (improvementTypeString != null) {
             TileImprovementType type = FreeCol.getSpecification().getTileImprovementType(improvementTypeString);
-            unit.work(type);
+            TileImprovement improvement = unit.getTile().findTileImprovementType(type);
+            if (improvement == null) {
+                // create new improvement
+                improvement = new TileImprovement(getGame(), unit.getTile(), type);
+                unit.getTile().add(improvement);
+            }
+            reply = Message.createNewRootElement("workImprovementConfirmed");
+            reply.appendChild(improvement.toXMLElement(player, reply.getOwnerDocument()));
+            unit.work(improvement);
         }
-        return null;
+        return reply;
 
     }
 

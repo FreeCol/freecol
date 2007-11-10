@@ -69,6 +69,7 @@ import net.sf.freecol.common.model.PathNode;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.Tile;
+import net.sf.freecol.common.model.TileImprovement;
 import net.sf.freecol.common.model.TileImprovementType;
 import net.sf.freecol.common.model.TradeRoute;
 import net.sf.freecol.common.model.Unit;
@@ -2285,15 +2286,21 @@ public final class InGameController implements NetworkConstants {
             return;
         }
 
-        Client client = freeColClient.getClient();
-
-        Element changeWorkTypeElement = Message.createNewRootElement("changeWorkType");
+        Element changeWorkTypeElement = Message.createNewRootElement("workImprovement");
         changeWorkTypeElement.setAttribute("unit", unit.getId());
-        changeWorkTypeElement.setAttribute("workType", improvementType.getId());
+        changeWorkTypeElement.setAttribute("improvementType", improvementType.getId());
 
-        unit.work(improvementType);
-
-        client.sendAndWait(changeWorkTypeElement);
+        Element reply = freeColClient.getClient().ask(changeWorkTypeElement);
+        Element improvementElement = (Element) reply.getChildNodes().item(0);
+        TileImprovement improvement = (TileImprovement) freeColClient.getGame()
+            .getFreeColGameObject(improvementElement.getAttribute("ID"));
+        if (improvement == null) {
+            improvement = new TileImprovement(freeColClient.getGame(), improvementElement);
+            unit.getTile().add(improvement);
+        } else {
+            improvement.readFromXMLElement(improvementElement);
+        }
+        unit.work(improvement);
     }
 
     /**

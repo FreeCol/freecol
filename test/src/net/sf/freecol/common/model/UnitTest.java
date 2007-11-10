@@ -72,8 +72,10 @@ public class UnitTest extends FreeColTestCase {
         assertEquals(-1, hardyPioneer.getWorkLeft());
         assertEquals(100, hardyPioneer.getNumberOfTools());
         assertEquals(false, plain.hasImprovement(plow));
-        
-        hardyPioneer.work(plow);
+
+        TileImprovement plowImprovement = new TileImprovement(game, plain, plow);
+        plain.add(plowImprovement);
+        hardyPioneer.work(plowImprovement);
 
         assertEquals(0, hardyPioneer.getMovesLeft());
         assertEquals(1, hardyPioneer.getWorkLeft());
@@ -138,7 +140,9 @@ public class UnitTest extends FreeColTestCase {
         assertEquals(5 + 5, colony.getFoodProduction());
 
         // Start Plowing
-        hardyPioneer.work(plow);
+        TileImprovement plowImprovement = new TileImprovement(game, plain58, plow);
+        plain58.add(plowImprovement);
+        hardyPioneer.work(plowImprovement);
  
         game.newTurn();
 
@@ -185,7 +189,9 @@ public class UnitTest extends FreeColTestCase {
         assertEquals(Unit.ACTIVE, hardyPioneer.getState());
 
         // Now do it
-        hardyPioneer.work(road);
+        TileImprovement roadImprovement = new TileImprovement(game, plain, road);
+        plain.add(roadImprovement);
+        hardyPioneer.work(roadImprovement);
 
         // After
         assertEquals(0, hardyPioneer.getMovesLeft());
@@ -212,8 +218,13 @@ public class UnitTest extends FreeColTestCase {
         Tile tile = new Tile(game, tileType, 0, 0);
 
         Unit unit = new Unit(game, tile, dutch, unitType, Unit.ACTIVE, false, false, 100, false);
-        
-        unit.work(whichWork);
+
+        TileImprovement improvement = tile.findTileImprovementType(whichWork);
+        if (improvement == null) {
+            improvement = new TileImprovement(game, tile, whichWork);
+            tile.add(improvement);
+        }
+        unit.work(improvement);
 
         return unit.getWorkLeft();
     }

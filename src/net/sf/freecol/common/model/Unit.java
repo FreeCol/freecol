@@ -1791,25 +1791,23 @@ public class Unit extends FreeColGameObject implements Abilities, Locatable, Loc
 
     /**
      * Sets this <code>Unit</code> to work at this <code>TileImprovement</code>
-     * @param improvementType The <code>TileImprovement</code> that this Unit will work at.
+     * @param improvement a <code>TileImprovement</code> value
      * @exception IllegalStateException If the <code>TileImprovement</code> is on
      *                another {@link Tile} than this <code>Unit</code> or is not
      *                a valid pioneer.
      */
-    public void work(TileImprovementType improvementType) {
+    public void work(TileImprovement improvement) {
     	
     	if (!isPioneer()) {
             throw new IllegalStateException("Only 'Pioneers' can perform TileImprovement.");
         }
     	
-    	if (!canPerformImprovement(improvementType)){
+    	if (!canPerformImprovement(improvement.getType())){
             throw new IllegalArgumentException("Cannot perform this improvement for this tile");
     	}
     	
-    	TileImprovement improvement = getTile().findTileImprovementType(improvementType);
     	if (improvement == null){
-            improvement = new TileImprovement(getGame(), getTile(), improvementType);
-            getTile().add(improvement);
+            throw new IllegalArgumentException("Cannot perform this improvement for this tile");
     	}
     	
         setWorkImprovement(improvement);
