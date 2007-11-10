@@ -1287,18 +1287,6 @@ public class Unit extends FreeColGameObject implements Abilities, Locatable, Loc
                     return MOVE;
                 } else if (canTradeWith(settlement)) {
                     return ENTER_SETTLEMENT_WITH_CARRIER_AND_GOODS;
-                } else if (!from.isLand()) {
-                    /*
-                     * An enemy should be able to attack a colony on a 1x1
-                     * island. Therefor: All attacks on colonies from ships
-                     * are allowed. This behavior should be discussed on the
-                     * developer's mailing list before being changed.
-                     */
-                    if (isOffensiveUnit()) {
-                        return ATTACK;
-                    } else {
-                        return ILLEGAL_MOVE;
-                    }
                 } else if (settlement instanceof IndianSettlement) {
                     IndianSettlement indian = (IndianSettlement) settlement;
                     if (isScout()) {
