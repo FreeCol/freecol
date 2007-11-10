@@ -90,7 +90,7 @@ public final class AboutPanel extends FreeColPanel implements ActionListener {
         JPanel table = new JPanel(new GridLayout(3, 2));
         infoPanel.add(table);
         table.add(new JLabel(Messages.message("aboutPanel.version")));
-        table.add(new JLabel(FreeCol.getVersion()));
+        table.add(new JLabel(FreeCol.getRevision()));
         table.add(new JLabel(Messages.message("aboutPanel.officialSite")));
         String siteURL = "http://www.freecol.org";
         JLabel site = new JLabel("<html><font color='Blue'>"+siteURL+"</font></html>");

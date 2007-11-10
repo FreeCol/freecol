@@ -85,7 +85,7 @@ public final class DefaultHandler extends Handler {
         setFormatter(new TextFormatter());
 
         try {
-            String str = "FreeCol game version: " + FreeCol.getVersion() + "\n" + "FreeCol protocol version: "
+            String str = "FreeCol game version: " + FreeCol.getRevision() + "\n" + "FreeCol protocol version: "
                     + Message.getFreeColProtocolVersion() + "\n\n" + "Java vendor: "
                     + System.getProperty("java.vendor") + "\n" + "Java version: " + System.getProperty("java.version")
                     + "\n" + "Java WM name: " + System.getProperty("java.vm.name") + "\n" + "Java WM vendor: "

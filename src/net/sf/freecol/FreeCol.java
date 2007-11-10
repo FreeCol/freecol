@@ -31,6 +31,8 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.Locale;
+import java.util.jar.Attributes;
+import java.util.jar.Manifest;
 import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -85,6 +87,7 @@ public final class FreeCol {
     private static Specification specification;
 
     private static final String FREECOL_VERSION = "0.7.2";
+    private static String FREECOL_REVISION;
     
     private static final String MIN_JDK_VERSION = "1.5";
     private static final String FILE_SEP = System.getProperty("file.separator");
@@ -125,6 +128,17 @@ public final class FreeCol {
      * @param args The command-line arguments.
      */
     public static void main(String[] args) {
+
+        try {
+            Manifest manifest = new Manifest(FreeCol.class.getResourceAsStream("/META-INF/MANIFEST.MF"));
+            Attributes attribs = manifest.getMainAttributes();
+            String revision = attribs.getValue("Revision");
+            FREECOL_REVISION = FREECOL_VERSION + " (Revision: " + revision + ")";
+        } catch (Exception e) {
+            System.out.println("Unable to load Manifest.");
+            FREECOL_REVISION = FREECOL_VERSION;
+        }
+
         initLogging();
         
         // Display splash screen:
@@ -615,6 +629,14 @@ public final class FreeCol {
         return FREECOL_VERSION;
     }
 
+    /**
+     * Gets the current revision of game.
+     *
+     * @return The current version and SVN Revision of the game.
+     */
+    public static String getRevision() {
+        return FREECOL_REVISION;
+    }
 
     /**
     * Checks if the program is in "Debug mode".

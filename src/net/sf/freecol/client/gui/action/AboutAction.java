@@ -44,7 +44,7 @@ public class AboutAction extends FreeColAction {
      * @param freeColClient The main controller object for the client.
      */
     AboutAction(FreeColClient freeColClient) {
-        super(freeColClient, "FreeCol " + FreeCol.getVersion(), "FreeCol " + FreeCol.getVersion(), 0, null, false);
+        super(freeColClient, "FreeCol " + FreeCol.getRevision(), "FreeCol " + FreeCol.getRevision(), 0, null, false);
     }
 
     /**

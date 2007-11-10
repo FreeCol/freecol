@@ -58,6 +58,16 @@
 
     <target name="init" unless="TSTAMP">
         <tstamp/>
+        <exec executable="svn" output="build/svn.properties">
+          <arg value="info" />
+        </exec>
+        <property prefix="svn" file="build/svn.properties"/>
+        <manifest file="${basedir}/src/MANIFEST.MF">
+          <attribute name="Created-By" value="FreeCol Team"/>
+          <attribute name="Main-Class" value="net.sf.freecol.FreeCol"/>
+          <attribute name="Class-Path" value="jars/higlayout.jar jars/jsr173_1.0_api.jar jars/wstx-lgpl-4.0pr1.jar"/>
+          <attribute name="Revision" value="${svn.Revision}"/>
+        </manifest>
     </target>
 
     <!-- Compiles the java source files. -->

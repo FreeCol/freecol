@@ -1,4 +1,0 @@
-Manifest-Version: 1.0
-Created-By: FreeCol Team
-Main-Class: net.sf.freecol.FreeCol
-Class-Path: jars/higlayout.jar jars/jsr173_1.0_api.jar jars/wstx-lgpl-4.0pr1.jar
