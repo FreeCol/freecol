@@ -47,9 +47,6 @@ import org.w3c.dom.Element;
 public final class Tile extends FreeColGameObject implements Location, Named, Ownable {
     private static final Logger logger = Logger.getLogger(Tile.class.getName());
 
-
-
-
     // Indians' claims on the tile may be one of the following:
     public static final int CLAIM_NONE = 0, CLAIM_VISITED = 1, CLAIM_CLAIMED = 2;
 
@@ -278,17 +275,49 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
         return getGame().getMap().getDistance(getPosition(), tile.getPosition());
     }
 
+    /**
+     * Returns null.
+     *
+     * @return null
+     */
     public GoodsContainer getGoodsContainer() {
         return null;
     }
 
+    /**
+     * Returns the <code>TileItemContainer</code>.
+     *
+     * @return a <code>TileItemContainer</code> value
+     */
     public TileItemContainer getTileItemContainer() {
         return tileItemContainer;
     }
 
+    /**
+     * Returns a List of <code>TileImprovements</code>.
+     *
+     * @returns a List of <code>TileImprovements</code>
+     */
     public List<TileImprovement> getTileImprovements() {
         return tileItemContainer.getImprovements();
     }
+
+    /**
+     * Returns a List of completed <code>TileImprovements</code>.
+     *
+     * @returns a List of <code>TileImprovements</code>
+     */
+    public List<TileImprovement> getCompletedTileImprovements() {
+        List<TileImprovement> result = new ArrayList<TileImprovement>();
+        for (TileImprovement improvement : tileItemContainer.getImprovements()) {
+            if (improvement.getTurnsToComplete() == 0) {
+                result.add(improvement);
+            }
+        }
+        return result;
+    }
+
+
 
     /**
      * Gets the total value of all treasure trains on this <code>Tile</code>.
