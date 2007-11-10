@@ -59,8 +59,6 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
 
     private int x, y;
 
-    private Position position;
-
     private int indianClaim;
 
     /** The player that consider this tile to be their land. */
@@ -122,7 +120,6 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
 
         x = locX;
         y = locY;
-        position = new Position(x, y);
 
         owningSettlement = null;
         settlement = null;
@@ -872,7 +869,7 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
      * @return The <code>Position</code> of this <code>Tile</code>.
      */
     public Position getPosition() {
-        return position;
+        return new Position(x, y);
     }
 
     /**
@@ -1581,7 +1578,6 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
 
         x = Integer.parseInt(in.getAttributeValue(null, "x"));
         y = Integer.parseInt(in.getAttributeValue(null, "y"));
-        position = new Position(x, y);
         String typeStr = in.getAttributeValue(null, "type");
         if (typeStr != null) {
             type = FreeCol.getSpecification().getTileType(typeStr);
