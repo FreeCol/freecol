@@ -24,27 +24,25 @@ import junit.framework.TestSuite;
 
 public class AllTests {
 
-
-
-
-	public static Test suite() {
-		TestSuite suite = new TestSuite("Test for net.sf.freecol.common");
-		//$JUnit-BEGIN$
-		suite.addTestSuite(BuildingTest.class);
-		suite.addTestSuite(SchoolTest.class);
-		suite.addTestSuite(GoodsTest.class);
-		suite.addTestSuite(GameTest.class);
-		suite.addTestSuite(MapTest.class);
-		suite.addTestSuite(TileTest.class);
-		suite.addTestSuite(ColonyProductionTest.class);
-		suite.addTestSuite(UnitTest.class);
-		suite.addTestSuite(ModelMessageTest.class);
-		suite.addTestSuite(PlayerTest.class);
-		suite.addTestSuite(NationTypeTest.class);
-                suite.addTestSuite(ScopeTest.class);
-                suite.addTestSuite(ModifierTest.class);
-		//$JUnit-END$
-		return suite;
-	}
+    public static Test suite() {
+	TestSuite suite = new TestSuite("Test for net.sf.freecol.common");
+	//$JUnit-BEGIN$
+	suite.addTestSuite(BuildingTest.class);
+	suite.addTestSuite(SchoolTest.class);
+	suite.addTestSuite(GoodsTest.class);
+	suite.addTestSuite(GameTest.class);
+	suite.addTestSuite(MapTest.class);
+	suite.addTestSuite(TileTest.class);
+	suite.addTestSuite(SoLTest.class);
+	suite.addTestSuite(ColonyProductionTest.class);
+	suite.addTestSuite(UnitTest.class);
+	suite.addTestSuite(ModelMessageTest.class);
+	suite.addTestSuite(PlayerTest.class);
+	suite.addTestSuite(NationTypeTest.class);
+	suite.addTestSuite(ScopeTest.class);
+	suite.addTestSuite(ModifierTest.class);
+	//$JUnit-END$
+	return suite;
+    }
 
 }
