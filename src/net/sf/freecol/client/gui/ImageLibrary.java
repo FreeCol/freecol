@@ -1485,7 +1485,13 @@ public final class ImageLibrary extends ImageProvider {
      * @return The width of the terrain-image at the given index.
      */
     public int getTerrainImageWidth(TileType type) {
-        return terrain1.get(type.getId()).getIconWidth();
+        String key;
+        if (type != null) {
+            key = type.getId();
+        } else {
+            key = unexploredName;
+        }
+        return terrain1.get(key).getIconWidth();
     }
 
     /**
@@ -1495,7 +1501,13 @@ public final class ImageLibrary extends ImageProvider {
      * @return The height of the terrain-image at the given index.
      */
     public int getTerrainImageHeight(TileType type) {
-        return terrain1.get(type.getId()).getIconHeight();
+        String key;
+        if (type != null) {
+            key = type.getId();
+        } else {
+            key = unexploredName;
+        }
+        return terrain1.get(key).getIconHeight();
     }
 
     /**
