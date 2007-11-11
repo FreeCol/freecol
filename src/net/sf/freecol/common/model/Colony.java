@@ -44,11 +44,6 @@ import org.w3c.dom.Element;
 public final class Colony extends Settlement implements Abilities, Location, Nameable, Modifiers {
     private static final Logger logger = Logger.getLogger(Colony.class.getName());
 
-
-
-
-    public static final int BUILDING_UNIT_ADDITION = 1000;
-
     private static final int BELLS_PER_REBEL = 100;
 
     /** The name of the colony. */
@@ -1014,8 +1009,8 @@ public final class Colony extends Settlement implements Abilities, Location, Nam
          * SoL is determined by the formula: int membership = ... in
          * "updateSoL()":
          */
-        int bells = getGoodsCount(Goods.BELLS);
-        addGoods(Goods.BELLS, (bells * amount) / 100);
+	int requiredBells = ((sonsOfLiberty + amount) * BELLS_PER_REBEL * getUnitCount()) / 100;
+        addGoods(Goods.BELLS, requiredBells - getGoodsCount(Goods.BELLS));
     }
 
     /**
@@ -1046,7 +1041,7 @@ public final class Colony extends Settlement implements Abilities, Location, Nam
             return;
         }
         // Update "addSol(int)" and "getMembers()" if this formula gets changed:
-        int membership = (getBells() * 100) / (BELLS_PER_REBEL * getUnitCount());
+        int membership = (getBells() * 100) / (BELLS_PER_REBEL * units);
         if (membership < 0)
             membership = 0;
         if (membership > 100)
@@ -1059,7 +1054,8 @@ public final class Colony extends Settlement implements Abilities, Location, Nam
      * Return the number of sons of liberty
      */
     public int getMembers() {
-        return Math.min(getBells() / BELLS_PER_REBEL, getUnitCount());
+	float result = (sonsOfLiberty * getUnitCount()) / 100f;
+        return Math.round(result);
     }
 
     /**
