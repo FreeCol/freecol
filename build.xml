@@ -58,18 +58,6 @@
 
     <target name="init" unless="TSTAMP">
         <tstamp/>
-        <exec executable="svn" output="${basedir}/build/svn.properties">
-          <arg value="info"/>
-          <arg value="-r"/>
-          <arg value="HEAD"/>
-        </exec>
-        <property prefix="svn" file="build/svn.properties"/>
-        <manifest file="${basedir}/src/MANIFEST.MF">
-          <attribute name="Created-By" value="FreeCol Team"/>
-          <attribute name="Main-Class" value="net.sf.freecol.FreeCol"/>
-          <attribute name="Class-Path" value="jars/higlayout.jar jars/jsr173_1.0_api.jar jars/wstx-lgpl-4.0pr1.jar"/>
-          <attribute name="Revision" value="${svn.Revision}"/>
-        </manifest>
     </target>
 
     <!-- Compiles the java source files. -->
@@ -120,14 +108,28 @@
     </target>
 
     <target name="build" depends="init,compile,reencode_messages" description="Compiles the source files.">
-        <copy todir="${freecol.build.dir}">
+      <copy todir="${freecol.build.dir}">
         <fileset dir="${freecol.src.dir}" includes="**/*.xml" /> 
-        </copy>
+      </copy>
     </target>
 
+    <target name="manifest" description="Creates the Manifest file.">
+      <exec executable="svn" output="${basedir}/build/svn.properties">
+        <arg value="info"/>
+        <arg value="-r"/>
+        <arg value="HEAD"/>
+      </exec>
+      <property prefix="svn" file="build/svn.properties"/>
+      <manifest file="${basedir}/src/MANIFEST.MF">
+        <attribute name="Created-By" value="FreeCol Team"/>
+        <attribute name="Main-Class" value="net.sf.freecol.FreeCol"/>
+        <attribute name="Class-Path" value="jars/higlayout.jar jars/jsr173_1.0_api.jar jars/wstx-lgpl-4.0pr1.jar"/>
+        <attribute name="Revision" value="${svn.Revision}"/>
+      </manifest>
+    </target>
 
     <!-- Compiles the source files and creates a JAR-file. -->
-    <target name="package" depends="init,build" description="Compiles the source files and creates a JAR-file.">
+    <target name="package" depends="init,build,manifest" description="Compiles the source files and creates a JAR-file.">
         <jar jarfile="${freecol.jar.file}"
             basedir="${freecol.build.dir}"
             manifest="${basedir}/src/MANIFEST.MF"
@@ -138,7 +140,7 @@
 
 
     <!-- Compiles the metaserver and creates a JAR-file. -->
-    <target name="metaserver" depends="init,build" description="Compiles the metaserver and creates a JAR-file.">
+    <target name="metaserver" depends="init,build,manifest" description="Compiles the metaserver and creates a JAR-file.">
         <jar jarfile="${freecol.metaserver.jar.file}"
             basedir="${freecol.build.dir}"
             manifest="${basedir}/src/MANIFEST.MF"
