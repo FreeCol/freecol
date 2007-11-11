@@ -88,7 +88,7 @@ import cz.autel.dmi.HIGLayout;
  * This is a panel for the Colony display. It shows the units that are working
  * in the colony, the buildings and much more.
  */
-public final class ColonyPanel extends FreeColPanel implements ActionListener {
+public final class ColonyPanel extends FreeColPanel implements ActionListener, LoadingListener {
 
 
 
@@ -200,10 +200,11 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener {
         productionPanel = new ProductionPanel(this);
         outsideColonyPanel = new OutsideColonyPanel(this);
         inPortPanel = new InPortPanel();
-        cargoPanel = new CargoPanel(this);
         warehousePanel = new WarehousePanel(this);
         tilePanel = new TilePanel(this);
         buildingsPanel = new BuildingsPanel(this);
+        cargoPanel = new CargoPanel(parent, freeColClient);
+        cargoPanel.addLoadingListener(this);
 
         defaultTransferHandler = new DefaultTransferHandler(parent, this);
         pressListener = new DragListener(this);
@@ -466,6 +467,10 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener {
             }
         }
 
+        if (lastCarrier != null) {
+            cargoPanel.setCarrier(lastCarrier.getUnit());
+        }
+
         if (preSelectedUnitLabel == null) {
             setSelectedUnitLabel(lastCarrier);
         } else {
@@ -523,23 +528,6 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener {
                 unloadButton.setEnabled(true);
                 fillButton.setEnabled(true);
             }
-        }
-    }
-
-    /**
-     * Updates the label that is placed above the cargo panel. It shows the name
-     * of the unit whose cargo is displayed and the amount of space left on that
-     * unit.
-     */
-    private void updateCargoLabel() {
-        if (selectedUnit != null) {
-            cargoPanel.getParent().setEnabled(true);
-            cargoBorder.setTitle(Messages.message("cargoOnCarrierLong", 
-                    "%name%", selectedUnit.getUnit().getName(),
-                    "%space%", String.valueOf(selectedUnit.getUnit().getSpaceLeft())));
-        } else {
-            cargoPanel.getParent().setEnabled(false);
-            cargoBorder.setTitle(Messages.message("cargoOnCarrier"));
         }
     }
 
@@ -743,7 +731,6 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener {
             while (unitIterator.hasNext()) {
                 Unit newUnit = unitIterator.next();
                 inGameController.leaveShip(newUnit);
-                updateCargoLabel();
                 updateCargoPanel();
                 updateOutsideColonyPanel();
                 outsideColonyPanel.revalidate();
@@ -829,7 +816,6 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener {
             }
             selectedUnit = unitLabel;
             updateCargoPanel();
-            updateCargoLabel();
         }
         updateCarrierButtons();
         cargoPanel.revalidate();
@@ -837,39 +823,7 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener {
     }
 
     private void updateCargoPanel() {
-        cargoPanel.removeAll();
-
-        if (selectedUnit != null) {
-            selectedUnit.setSelected(true);
-            Unit selUnit = selectedUnit.getUnit();
-
-            Iterator<Unit> unitIterator = selUnit.getUnitIterator();
-            while (unitIterator.hasNext()) {
-                Unit unit = unitIterator.next();
-
-                UnitLabel label = new UnitLabel(unit, parent);
-                if (isEditable()) {
-                    label.setTransferHandler(defaultTransferHandler);
-                    label.addMouseListener(pressListener);
-                }
-
-                cargoPanel.add(label, false);
-            }
-
-            Iterator<Goods> goodsIterator = selUnit.getGoodsIterator();
-            while (goodsIterator.hasNext()) {
-                Goods g = goodsIterator.next();
-
-                GoodsLabel label = new GoodsLabel(g, parent);
-                if (isEditable()) {
-                    label.setTransferHandler(defaultTransferHandler);
-                    label.addMouseListener(pressListener);
-                }
-
-                cargoPanel.add(label, false);
-            }
-
-        }
+        cargoPanel.initialize();
     }
 
     /**
@@ -937,6 +891,20 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener {
         return game;
     }
 
+    public void loadedUnit(Unit unit) {
+        if (unit.getTile().getSettlement() == null) {
+            closeColonyPanel();
+        }
+        
+        updateBuildingBox();
+        updateSoLLabel();
+        updateOutsideColonyPanel();
+    }
+
+
+    public void loadedGoods(Goods goods) {
+        updateWarehouse();
+    }
 
     /**
      * This panel is a list of the colony's buildings.
@@ -1264,7 +1232,6 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener {
             }
 
             ((UnitLabel) comp).setSmall(false);
-            updateCargoLabel();
             Component c = add(comp);
             refresh();
             colonyPanel.updateSoLLabel();
@@ -1386,154 +1353,6 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener {
         }
     }
 
-    /**
-     * A panel that holds units and goods that represent Units and cargo that
-     * are on board the currently selected ship.
-     */
-    public final class CargoPanel extends JPanel {
-        private final ColonyPanel colonyPanel;
-
-
-        /**
-         * Creates this CargoPanel.
-         * 
-         * @param colonyPanel The panel that holds this CargoPanel.
-         */
-        public CargoPanel(ColonyPanel colonyPanel) {
-            this.colonyPanel = colonyPanel;
-        }
-
-        @Override
-        public String getUIClassID() {
-            return "CargoPanelUI";
-        }
-
-        /**
-         * Adds a component to this CargoPanel and makes sure that the unit or
-         * good that the component represents gets modified so that it is on
-         * board the currently selected ship.
-         * 
-         * @param comp The component to add to this CargoPanel.
-         * @param editState Must be set to 'true' if the state of the component
-         *            that is added (which should be a dropped component
-         *            representing a Unit or good) should be changed so that the
-         *            underlying unit or goods are on board the currently
-         *            selected ship.
-         * @return The component argument.
-         */
-        public Component add(Component comp, boolean editState) {
-            Container oldParent = comp.getParent();
-            if (selectedUnit == null) {
-                return null;
-            }
-
-            if (editState) {
-                if (comp instanceof UnitLabel) {
-                    if (oldParent != null) {
-                        oldParent.remove(comp);
-                    }
-                    Unit unit = ((UnitLabel) comp).getUnit();
-                    if (!unit.isCarrier()) {// No, you cannot load ships onto
-                        // other ships.
-                        if (!selectedUnit.getUnit().canAdd(unit)) {
-                            if (oldParent != null) {
-                                oldParent.add(comp);
-                            }
-                            return null;
-                        }
-
-                        ((UnitLabel) comp).setSmall(false);
-                        if (inGameController.boardShip(unit, selectedUnit.getUnit())) {
-                            if (unit.getTile().getSettlement() == null) {
-                                closeColonyPanel();
-                            }
-
-                            updateBuildingBox();
-                            colonyPanel.updateSoLLabel();
-                        } else {
-                            if (oldParent != null) {
-                                oldParent.add(comp);
-                            }
-                            return null;
-                        }
-                    } else {
-                        if (oldParent != null) {
-                            oldParent.add(comp);
-                        }
-
-                        return null;
-                    }
-                } else if (comp instanceof GoodsLabel) {
-                    Goods g = ((GoodsLabel) comp).getGoods();
-
-                    Unit carrier = getSelectedUnit();
-                    int newAmount = g.getAmount();
-                    if (carrier.getSpaceLeft() == 0
-                            && carrier.getGoodsContainer().getGoodsCount(g.getType()) % 100 + g.getAmount() > 100) {
-                        newAmount = 100 - carrier.getGoodsContainer().getGoodsCount(g.getType()) % 100;
-                    } else if (g.getAmount() > 100) {
-                        newAmount = 100;
-                    }
-
-                    if (newAmount == 0) {
-                        return null;
-                    }
-
-                    Goods goodsToAdd = new Goods(game, g.getLocation(), g.getType(), newAmount);
-                    if (!selectedUnit.getUnit().canAdd(goodsToAdd)) {
-                        return null;
-                    }
-                    g.setAmount(g.getAmount() - newAmount);
-
-                    ((GoodsLabel) comp).setSmall(false);
-                    inGameController.loadCargo(goodsToAdd, selectedUnit.getUnit());
-                    colonyPanel.getWarehousePanel().revalidate();
-
-                    reinitialize();
-
-                    return comp;
-                } else {
-                    logger.warning("An invalid component got dropped on this CargoPanel.");
-                    return null;
-                }
-            }
-
-            updateCargoLabel();
-            Component c = add(comp);
-
-            refresh();
-            if (oldParent != null && oldParent.getParent() instanceof BuildingsPanel.ASingleBuildingPanel) {
-                ((BuildingsPanel.ASingleBuildingPanel) oldParent.getParent()).updateProductionLabel();
-            }
-            return c;
-        }
-
-        public boolean isActive() {
-            return (getSelectedUnit() != null);
-        }
-
-        @Override
-        public void remove(Component comp) {
-            if (comp instanceof UnitLabel) {
-                Unit unit = ((UnitLabel) comp).getUnit();
-                inGameController.leaveShip(unit);
-
-                super.remove(comp);
-            } else if (comp instanceof GoodsLabel) {
-                Goods g = ((GoodsLabel) comp).getGoods();
-                inGameController.unloadCargo(g);
-                super.remove(comp);
-                colonyPanel.getWarehousePanel().revalidate();
-                colonyPanel.getCargoPanel().revalidate();
-
-                // TODO: Make this look prettier :-)
-                UnitLabel t = selectedUnit;
-                selectedUnit = null;
-                setSelectedUnitLabel(t);
-            }
-            updateCargoLabel();
-        }
-    }
 
     /**
      * A panel that displays the tiles in the immediate area around the colony.
@@ -1783,7 +1602,6 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener {
                     }
                 }
 
-                updateCargoLabel();
                 Component c = add(comp);
                 refresh();
                 if (oldParent != null && oldParent instanceof BuildingsPanel.ASingleBuildingPanel) {

@@ -168,7 +168,7 @@ public final class EuropePanel extends FreeColPanel implements ActionListener {
         toEuropePanel = new ToEuropePanel(this);
         inPortPanel = new InPortPanel();
         docksPanel = new DocksPanel(this);
-        cargoPanel = new CargoPanel(this);
+        cargoPanel = new CargoPanel(parent, freeColClient);
         marketPanel = new MarketPanel(this);
         
         log = new TransactionLog();
@@ -228,8 +228,6 @@ public final class EuropePanel extends FreeColPanel implements ActionListener {
                 .message("goingToAmerica")));
         toEuropePanel.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEmptyBorder(), Messages
                 .message("goingToEurope")));
-        cargoPanel.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEmptyBorder(), Messages
-                .message("cargo")));
         docksPanel.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEmptyBorder(), Messages
                 .message("docks")));
         inPortPanel.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEmptyBorder(), Messages
@@ -502,6 +500,10 @@ public final class EuropePanel extends FreeColPanel implements ActionListener {
         // We set the last carrier in the list active.
         setSelectedUnitLabel(lastCarrier);
 
+        if (lastCarrier != null) {
+            cargoPanel.setCarrier(lastCarrier.getUnit());
+        }
+
         Player player = freeColClient.getMyPlayer();
         List<GoodsType> goodsTypes = FreeCol.getSpecification().getGoodsTypeList();
         for (GoodsType goodsType : goodsTypes) {
@@ -548,57 +550,13 @@ public final class EuropePanel extends FreeColPanel implements ActionListener {
         }
         selectedUnit = unitLabel;
         updateCargoPanel();
-        updateCargoLabel();
 
         cargoPanel.revalidate();
         refresh();
     }
 
     private void updateCargoPanel() {
-        cargoPanel.removeAll();
-
-        if (selectedUnit != null) {
-            selectedUnit.setSelected(true);
-            Unit selUnit = selectedUnit.getUnit();
-
-            Iterator<Unit> unitIterator = selUnit.getUnitIterator();
-            while (unitIterator.hasNext()) {
-                Unit unit = unitIterator.next();
-
-                UnitLabel label = new UnitLabel(unit, parent);
-                label.setTransferHandler(defaultTransferHandler);
-                label.addMouseListener(pressListener);
-
-                cargoPanel.add(label, false);
-            }
-
-            Iterator<Goods> goodsIterator = selUnit.getGoodsIterator();
-            while (goodsIterator.hasNext()) {
-                Goods g = goodsIterator.next();
-
-                GoodsLabel label = new GoodsLabel(g, parent);
-                label.setTransferHandler(defaultTransferHandler);
-                label.addMouseListener(pressListener);
-
-                cargoPanel.add(label, false);
-            }
-        }
-
-    }
-
-    /**
-     * Updates the label that is placed above the cargo panel. It shows the name
-     * of the unit whose cargo is displayed and the amount of space left on that
-     * unit.
-     */
-    private void updateCargoLabel() {
-        if (selectedUnit != null) {
-            ((TitledBorder) cargoPanel.getBorder()).setTitle(Messages.message("cargo") + " ("
-                    + selectedUnit.getUnit().getName() + ") " + Messages.message("spaceLeft") + ": "
-                    + selectedUnit.getUnit().getSpaceLeft());
-        } else {
-            ((TitledBorder) cargoPanel.getBorder()).setTitle(Messages.message("cargo"));
-        }
+        cargoPanel.initialize();
     }
 
     /**
@@ -632,7 +590,6 @@ public final class EuropePanel extends FreeColPanel implements ActionListener {
                 Goods goods = goodsIterator.next();
                 if (player.canTrade(goods)) {
                     inGameController.sellGoods(goods);
-                    updateCargoLabel();
                     updateCargoPanel();
                 } else {
                     inGameController.payArrears(goods);
@@ -644,7 +601,6 @@ public final class EuropePanel extends FreeColPanel implements ActionListener {
             while (unitIterator.hasNext()) {
                 Unit newUnit = unitIterator.next();
                 inGameController.leaveShip(newUnit);
-                updateCargoLabel();
                 updateCargoPanel();
                 getCargoPanel().revalidate();
                 // update docks panel
@@ -708,6 +664,15 @@ public final class EuropePanel extends FreeColPanel implements ActionListener {
         }
     }
 
+    public void loadedGoods(Goods goods) {
+        marketPanel.revalidate();
+        revalidate();
+        refresh();
+    }
+
+    public void loadedUnit(Unit unit) {
+        refreshDocks();
+    }
 
     /**
      * A panel that holds UnitsLabels that represent Units that are going to
@@ -902,7 +867,6 @@ public final class EuropePanel extends FreeColPanel implements ActionListener {
                     return null;
                 }
             }
-            updateCargoLabel();
             Component c = add(comp);
             europePanel.refresh();
             return c;
@@ -923,134 +887,7 @@ public final class EuropePanel extends FreeColPanel implements ActionListener {
         }
     }
 
-    /**
-     * A panel that holds units and goods that represent Units and cargo that
-     * are on board the currently selected ship.
-     */
-    public final class CargoPanel extends JPanel {
-        private final EuropePanel europePanel;
 
-
-        /**
-         * Creates this CargoPanel.
-         * 
-         * @param europePanel The panel that holds this CargoPanel.
-         */
-        public CargoPanel(EuropePanel europePanel) {
-            this.europePanel = europePanel;
-        }
-
-        /**
-         * Adds a component to this CargoPanel and makes sure that the unit or
-         * good that the component represents gets modified so that it is on
-         * board the currently selected ship.
-         * 
-         * @param comp The component to add to this CargoPanel.
-         * @param editState Must be set to 'true' if the state of the component
-         *            that is added (which should be a dropped component
-         *            representing a Unit or good) should be changed so that the
-         *            underlying unit or goods are on board the currently
-         *            selected ship.
-         * @return The component argument.
-         */
-        public Component add(Component comp, boolean editState) {
-            if (selectedUnit == null) {
-                return null;
-            }
-
-            if (editState) {
-                Container oldParent = comp.getParent();
-
-                if (comp instanceof UnitLabel) {
-                    Unit unit = ((UnitLabel) comp).getUnit();
-                    if (selectedUnit.getUnit().getSpaceLeft() > 0) {
-                        inGameController.boardShip(unit, selectedUnit.getUnit());
-
-                        if (comp.getParent() != null) {
-                            comp.getParent().remove(comp);
-                        }
-                    } else {
-                        return null;
-                    }
-                } else if (comp instanceof GoodsLabel) {
-                    Goods g = ((GoodsLabel) comp).getGoods();
-
-                    Unit carrier = getSelectedUnit();
-                    int newAmount = g.getAmount();
-                    if (carrier.getSpaceLeft() == 0
-                            && carrier.getGoodsContainer().getGoodsCount(g.getType()) % 100 + g.getAmount() > 100) {
-                        newAmount = 100 - carrier.getGoodsContainer().getGoodsCount(g.getType()) % 100;
-                    } else if (g.getAmount() > 100) {
-                        newAmount = 100;
-                    }
-
-                    if (newAmount == 0) {
-                        return null;
-                    }
-
-                    if (g.getAmount() != newAmount) {
-                        g.setAmount(g.getAmount() - newAmount);
-                        g = new Goods(game, g.getLocation(), g.getType(), newAmount);
-                    } else {
-                        if (oldParent != null) {
-                            oldParent.remove(comp);
-                        }
-                    }
-
-                    if (!selectedUnit.getUnit().canAdd(g)) {
-                        return null;
-                    }
-
-                    inGameController.loadCargo(g, selectedUnit.getUnit());
-
-                    // TODO: Make this look prettier :-)
-                    UnitLabel t = selectedUnit;
-                    selectedUnit = null;
-                    setSelectedUnitLabel(t);
-                    // reinitialize();
-
-                    return comp;
-                } else if (comp instanceof MarketLabel) {
-                    MarketLabel label = (MarketLabel) comp;
-                    Player player = freeColClient.getMyPlayer();
-                    if (player.canTrade(label.getType())) {
-                        inGameController.buyGoods(label.getType(), label.getAmount(), selectedUnit.getUnit());
-                        inGameController.nextModelMessage();
-                        updateCargoLabel();
-
-                        // TODO: Make this look prettier :-)
-                        UnitLabel t = selectedUnit;
-                        selectedUnit = null;
-                        setSelectedUnitLabel(t);
-
-                        europePanel.getMarketPanel().revalidate();
-                        revalidate();
-                        europePanel.refresh();
-                        return comp;
-                    }
-
-                    inGameController.payArrears(label.getType());
-                    return null;
-                } else {
-                    logger.warning("An invalid component got dropped on this CargoPanel.");
-                    return null;
-                }
-            }
-
-            updateCargoLabel();
-            Component c = add(comp);
-            europePanel.refresh();
-            return c;
-        }
-
-        public boolean isActive() {
-            return (getSelectedUnit() != null);
-        }
-
-        public String getUIClassID() {
-            return "EuropeCargoPanelUI";
-        }
-    }
 
     /**
      * A panel that shows goods available for purchase in Europe.
@@ -1086,7 +923,6 @@ public final class EuropePanel extends FreeColPanel implements ActionListener {
                     Player player = freeColClient.getMyPlayer();
                     if (player.canTrade(goods)) {
                         inGameController.sellGoods(goods);
-                        updateCargoLabel();
                     } else {
                         inGameController.payArrears(goods);
                     }

@@ -1652,14 +1652,30 @@ public class Unit extends FreeColGameObject implements Abilities, Locatable, Loc
             return false;
         } else if (locatable instanceof Unit && hasAbility("model.ability.carryUnits")) {
             return getSpaceLeft() >= locatable.getTakeSpace();
-        } else if (locatable instanceof Goods && hasAbility("model.ability.carryGoods")) {
+        } else if (locatable instanceof Goods) {
             Goods g = (Goods) locatable;
-            return getSpaceLeft() > 0
-                || (getGoodsContainer().getGoodsCount(g.getType()) % 100 != 0 && getGoodsContainer()
-                    .getGoodsCount(g.getType())
-                    % 100 + g.getAmount() <= 100);
+            return (getLoadableAmount(g.getType()) >= g.getAmount());
         } else {
             return false;
+        }
+    }
+
+    /**
+     * Returns the amount of a GoodsType that could be loaded.
+     *
+     * @param type a <code>GoodsType</code> value
+     * @return an <code>int</code> value
+     */
+    public int getLoadableAmount(GoodsType type) {
+        if (hasAbility("model.ability.carryGoods")) {
+            int result = getSpaceLeft() * 100;
+            int count = getGoodsContainer().getGoodsCount(type) % 100;
+            if (count > 0 && count < 100) {
+                result += (100 - count);
+            }
+            return result;
+        } else {
+            return 0;
         }
     }
 

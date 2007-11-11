@@ -242,12 +242,11 @@ public final class DefaultTransferHandler extends TransferHandler {
                     return false;
                 }
 
-                if (unit.isNaval() && (comp instanceof EuropePanel.CargoPanel
-                        || comp instanceof EuropePanel.DocksPanel
+                if (unit.isNaval() && (comp instanceof EuropePanel.DocksPanel
                         || comp instanceof ColonyPanel.OutsideColonyPanel
                         || comp instanceof ColonyPanel.BuildingsPanel.ASingleBuildingPanel
                         || comp instanceof ColonyPanel.TilePanel.ASingleTilePanel
-                        || comp instanceof ColonyPanel.CargoPanel)) {
+                        || comp instanceof CargoPanel)) {
                     return false;
                 }
 
@@ -264,14 +263,12 @@ public final class DefaultTransferHandler extends TransferHandler {
                         ((EuropePanel.ToAmericaPanel)comp).add(data, true);
                     } else if (comp instanceof EuropePanel.DocksPanel) {
                         ((EuropePanel.DocksPanel)comp).add(data, true);
-                    } else if (comp instanceof EuropePanel.CargoPanel) {
-                        ((EuropePanel.CargoPanel)comp).add(data, true);
                     } else if (comp instanceof ColonyPanel.BuildingsPanel.ASingleBuildingPanel) {
                         ((ColonyPanel.BuildingsPanel.ASingleBuildingPanel) comp).add(data, true);
                     } else if (comp instanceof ColonyPanel.OutsideColonyPanel) {
                         ((ColonyPanel.OutsideColonyPanel) comp).add(data, true);
-                    } else if (comp instanceof ColonyPanel.CargoPanel) {
-                        ((ColonyPanel.CargoPanel)comp).add(data, true);
+                    } else if (comp instanceof CargoPanel) {
+                        ((CargoPanel)comp).add(data, true);
                     } else if (comp instanceof ColonyPanel.TilePanel.ASingleTilePanel) {
                         ((ColonyPanel.TilePanel.ASingleTilePanel)comp).add(data, true);
                     } else {
@@ -307,10 +304,10 @@ public final class DefaultTransferHandler extends TransferHandler {
                     label.getGoods().setAmount(amount);
                 }
 
-                if (!(comp instanceof ColonyPanel.WarehousePanel || comp instanceof ColonyPanel.CargoPanel
-                        || comp instanceof EuropePanel.MarketPanel || comp instanceof EuropePanel.CargoPanel)
-                    || (comp instanceof EuropePanel.CargoPanel && !((EuropePanel.CargoPanel) comp).isActive())
-                    || (comp instanceof ColonyPanel.CargoPanel && !((ColonyPanel.CargoPanel) comp).isActive())) {
+                if (!(comp instanceof ColonyPanel.WarehousePanel || 
+                      comp instanceof CargoPanel ||
+                      comp instanceof EuropePanel.MarketPanel) || 
+                    (comp instanceof CargoPanel && !((CargoPanel) comp).isActive())) {
 
                     return false;
                 }
@@ -324,12 +321,10 @@ public final class DefaultTransferHandler extends TransferHandler {
 
                     if (comp instanceof ColonyPanel.WarehousePanel) {
                         ((ColonyPanel.WarehousePanel)comp).add(data, true);
-                    } else if (comp instanceof ColonyPanel.CargoPanel) {
-                        ((ColonyPanel.CargoPanel)comp).add(data, true);
+                    } else if (comp instanceof CargoPanel) {
+                        ((CargoPanel)comp).add(data, true);
                     } else if (comp instanceof EuropePanel.MarketPanel) {
                         ((EuropePanel.MarketPanel)comp).add(data, true);
-                    } else if (comp instanceof EuropePanel.CargoPanel) {
-                        ((EuropePanel.CargoPanel)comp).add(data, true);
                     } else {
                         logger.warning("The receiving component is of an invalid type.");
                         return false;
@@ -371,8 +366,8 @@ public final class DefaultTransferHandler extends TransferHandler {
                     // Be not removing MarketLabels from their home. -sjm
                     //data.getParent().remove(data);
 
-                    if (comp instanceof EuropePanel.CargoPanel) {
-                        ((EuropePanel.CargoPanel)comp).add(data, true);
+                    if (comp instanceof CargoPanel) {
+                        ((CargoPanel)comp).add(data, true);
                     } else {
                         logger.warning("The receiving component is of an invalid type.");
                         return false;
