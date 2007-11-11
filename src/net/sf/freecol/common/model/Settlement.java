@@ -67,6 +67,7 @@ abstract public class Settlement extends FreeColGameObject implements Location, 
             Tile t = game.getMap().getTile(exploreIt.next());
             t.setExploredBy(owner, true);
         }
+        this.tile.setExploredBy(owner, true);
         owner.invalidateCanSeeTiles();
 
         // Relocate any worker already on the Tile (from another Settlement):
