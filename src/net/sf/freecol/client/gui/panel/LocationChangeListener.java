@@ -20,21 +20,15 @@
 
 package net.sf.freecol.client.gui.panel;
 
-import net.sf.freecol.common.model.Goods;
-import net.sf.freecol.common.model.Unit;
+import java.awt.Container;
+import javax.swing.JLabel;
+
 
 /**
-* Interface for classes that listen for loading actions
-*/
-public interface LoadingListener {
+ * Interface for classes that listen for the movement of JLabels.
+ */
+public interface LocationChangeListener {
 
-
-    public void loadedUnit(Unit unit);
-
-    //public void unloadedUnit(Unit unit);
-
-    public void loadedGoods(Goods goods);
-
-    //public void unloadedGoods(Goods goods);
+    public void locationChanged(JLabel label, Container oldParent, Container newParent);
 
 }

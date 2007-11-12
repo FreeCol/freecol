@@ -50,7 +50,7 @@ public final class CargoPanel extends FreeColPanel {
      */
     private Unit carrier;
 
-    private List<LoadingListener> loadingListeners = new ArrayList<LoadingListener>();
+    private List<LocationChangeListener> locationChangeListeners = new ArrayList<LocationChangeListener>();
 
     private final DefaultTransferHandler defaultTransferHandler;
 
@@ -146,7 +146,7 @@ public final class CargoPanel extends FreeColPanel {
                     label.addMouseListener(pressListener);
                 }
 
-                add(label, false);
+                add(label);
             }
 
             Iterator<Goods> goodsIterator = carrier.getGoodsIterator();
@@ -159,16 +159,21 @@ public final class CargoPanel extends FreeColPanel {
                     label.addMouseListener(pressListener);
                 }
 
-                add(label, false);
+                add(label);
             }
+        }
 
+        updateTitle();
+    }
+
+    private void updateTitle() {
+        if (carrier == null) {
+            border.setTitle(Messages.message("cargoOnCarrier"));
+        } else {
             border.setTitle(Messages.message("cargoOnCarrierLong", 
                                              "%name%", carrier.getName(),
                                              "%space%", String.valueOf(carrier.getSpaceLeft())));
-        } else {
-            border.setTitle(Messages.message("cargoOnCarrier"));
         }
-
     }
 
     public boolean isActive() {
@@ -189,26 +194,29 @@ public final class CargoPanel extends FreeColPanel {
      * @return The component argument.
      */
     public Component add(Component comp, boolean editState) {
-        Container oldParent = comp.getParent();
         if (carrier == null) {
             return null;
-        }
-
-        if (editState) {
+        } else if (editState) {
             if (comp instanceof UnitLabel) {
+                Container oldParent = comp.getParent();
                 Unit unit = ((UnitLabel) comp).getUnit();
                 if (carrier.canAdd(unit)) {
                     ((UnitLabel) comp).setSmall(false);
                     if (inGameController.boardShip(unit, carrier)) {
-                        for (LoadingListener listener : loadingListeners) {
-                            listener.loadedUnit(unit);
+                        for (LocationChangeListener listener : locationChangeListeners) {
+                            listener.locationChanged((UnitLabel) comp, oldParent, this);
                         }
-                        initialize();
-                        return null;
+                        if (oldParent != null) {
+                            oldParent.remove(comp);
+                            oldParent.repaint();
+                        }
+                        add(comp);
+                        updateTitle();
+                        return comp;
                     }
                 }
-                return comp;
             } else if (comp instanceof GoodsLabel) {
+                Container oldParent = comp.getParent();
                 Goods g = ((GoodsLabel) comp).getGoods();
                 
                 int newAmount = Math.min(g.getAmount(), carrier.getLoadableAmount(g.getType()));
@@ -222,12 +230,12 @@ public final class CargoPanel extends FreeColPanel {
                 ((GoodsLabel) comp).setSmall(false);
                 inGameController.loadCargo(goodsToAdd, carrier);
 
-                for (LoadingListener listener : loadingListeners) {
-                    listener.loadedGoods(g);
+                for (LocationChangeListener listener : locationChangeListeners) {
+                    listener.locationChanged((GoodsLabel) comp, oldParent, this);
                 }
 
-                initialize();
-
+                add(comp);
+                updateTitle();
                 return comp;
             } else if (comp instanceof MarketLabel) {
                 MarketLabel label = (MarketLabel) comp;
@@ -235,20 +243,20 @@ public final class CargoPanel extends FreeColPanel {
                 if (player.canTrade(label.getType())) {
                     inGameController.buyGoods(label.getType(), label.getAmount(), carrier);
                     inGameController.nextModelMessage();
-                    initialize();
+                    add(comp);
+                    updateTitle();
                     return comp;
+                } else {
+                    inGameController.payArrears(label.getType());
+                    return null;
                 }
-
-                inGameController.payArrears(label.getType());
-                return null;
             } else {
                 //logger.warning("An invalid component got dropped on this CargoPanel.");
                 return null;
             }
         }
 
-        Component c = add(comp);
-        return c;
+        return null;
     }
 
 
@@ -257,11 +265,12 @@ public final class CargoPanel extends FreeColPanel {
         if (comp instanceof UnitLabel) {
             Unit unit = ((UnitLabel) comp).getUnit();
             inGameController.leaveShip(unit);
-
+            updateTitle();
             super.remove(comp);
         } else if (comp instanceof GoodsLabel) {
             Goods g = ((GoodsLabel) comp).getGoods();
             inGameController.unloadCargo(g);
+            updateTitle();
             super.remove(comp);
         }
     }
@@ -271,8 +280,8 @@ public final class CargoPanel extends FreeColPanel {
      *
      * @param listener the listener
      */
-    public void addLoadingListener(LoadingListener listener) {
-        loadingListeners.add(listener);
+    public void addLocationChangeListener(LocationChangeListener listener) {
+        locationChangeListeners.add(listener);
     }
 
     /**
@@ -280,18 +289,18 @@ public final class CargoPanel extends FreeColPanel {
      *
      * @param listener the listener
      */
-    public void removeLoadingListener(LoadingListener listener) {
-        loadingListeners.remove(listener);
+    public void removeLocationChangeListener(LocationChangeListener listener) {
+        locationChangeListeners.remove(listener);
     }
 
     /**
-     * Returns an array of all the LoadingListener added to this Market.
+     * Returns an array of all the LocationChangeListener added to this Market.
      *
-     * @return all of the LoadingListener added or an empty array if no
+     * @return all of the LocationChangeListener added or an empty array if no
      * listeners have been added
      */
-    public LoadingListener[] getLoadingListener() {
-        return loadingListeners.toArray(new LoadingListener[0]);
+    public LocationChangeListener[] getLocationChangeListeners() {
+        return locationChangeListeners.toArray(new LocationChangeListener[0]);
     }
 }
 

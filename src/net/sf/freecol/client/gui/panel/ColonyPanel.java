@@ -88,8 +88,7 @@ import cz.autel.dmi.HIGLayout;
  * This is a panel for the Colony display. It shows the units that are working
  * in the colony, the buildings and much more.
  */
-public final class ColonyPanel extends FreeColPanel implements ActionListener, LoadingListener {
-
+public final class ColonyPanel extends FreeColPanel implements ActionListener, LocationChangeListener {
 
 
     private static Logger logger = Logger.getLogger(ColonyPanel.class.getName());
@@ -204,7 +203,7 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener, L
         tilePanel = new TilePanel(this);
         buildingsPanel = new BuildingsPanel(this);
         cargoPanel = new CargoPanel(parent, freeColClient);
-        cargoPanel.addLoadingListener(this);
+        cargoPanel.addLocationChangeListener(this);
 
         defaultTransferHandler = new DefaultTransferHandler(parent, this);
         pressListener = new DragListener(this);
@@ -891,19 +890,19 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener, L
         return game;
     }
 
-    public void loadedUnit(Unit unit) {
-        if (unit.getTile().getSettlement() == null) {
-            closeColonyPanel();
+    public void locationChanged(JLabel label, Container oldParent, Container newParent) {
+        if (label instanceof UnitLabel) {
+            if (((UnitLabel) label).getUnit().getTile().getSettlement() == null) {
+                closeColonyPanel();
+                return;
+            }
+
+            updateBuildingBox();
+            updateSoLLabel();
+            updateOutsideColonyPanel();
+        } else if (label instanceof GoodsLabel) {
+            updateWarehouse();
         }
-        
-        updateBuildingBox();
-        updateSoLLabel();
-        updateOutsideColonyPanel();
-    }
-
-
-    public void loadedGoods(Goods goods) {
-        updateWarehouse();
     }
 
     /**
@@ -1095,6 +1094,11 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener, L
                 }
 
                 return null;
+            }
+
+            public void remove(Component comp) {
+                super.remove(comp);
+                updateProductionLabel();
             }
         }
     }
