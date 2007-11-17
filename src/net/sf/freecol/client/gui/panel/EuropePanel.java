@@ -28,6 +28,8 @@ import java.awt.Image;
 import java.awt.MediaTracker;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ContainerEvent;
+import java.awt.event.ContainerListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseListener;
@@ -72,7 +74,7 @@ import cz.autel.dmi.HIGLayout;
  * This is a panel for the Europe display. It shows the ships in Europe and
  * allows the user to send them back.
  */
-public final class EuropePanel extends FreeColPanel implements ActionListener {
+public final class EuropePanel extends FreeColPanel implements ActionListener, ContainerListener {
 
 
 
@@ -96,7 +98,7 @@ public final class EuropePanel extends FreeColPanel implements ActionListener {
 
     private final DocksPanel docksPanel;
 
-    private final CargoPanel cargoPanel;
+    private final EuropeCargoPanel cargoPanel;
 
     private final MarketPanel marketPanel;
     
@@ -168,7 +170,7 @@ public final class EuropePanel extends FreeColPanel implements ActionListener {
         toEuropePanel = new ToEuropePanel(this);
         inPortPanel = new InPortPanel();
         docksPanel = new DocksPanel(this);
-        cargoPanel = new CargoPanel(parent, freeColClient);
+        cargoPanel = new EuropeCargoPanel(parent);
         marketPanel = new MarketPanel(this);
         
         log = new TransactionLog();
@@ -200,8 +202,9 @@ public final class EuropePanel extends FreeColPanel implements ActionListener {
         toEuropePanel.addMouseListener(releaseListener);
         inPortPanel.addMouseListener(releaseListener);
         docksPanel.addMouseListener(releaseListener);
-        cargoPanel.addMouseListener(releaseListener);
         marketPanel.addMouseListener(releaseListener);
+        cargoPanel.addMouseListener(releaseListener);
+        cargoPanel.addContainerListener(this);
 
         toAmericaPanel.setLayout(new GridLayout(0, 2));
         toEuropePanel.setLayout(new GridLayout(0, 2));
@@ -428,6 +431,7 @@ public final class EuropePanel extends FreeColPanel implements ActionListener {
                 UnitLabel unitLabel = new UnitLabel(unit, parent);
                 unitLabel.setTransferHandler(defaultTransferHandler);
                 unitLabel.addMouseListener(pressListener);
+                unitLabel.addContainerListener(this);
                 inPortPanel.add(unitLabel);
             }
         }
@@ -435,6 +439,16 @@ public final class EuropePanel extends FreeColPanel implements ActionListener {
         // Only one component will be repainted!
         inPortPanel.repaint(0, 0, inPortPanel.getWidth(), inPortPanel.getHeight());
         setSelectedUnit(unitIterator.get(unitIterator.size() - 1));
+    }
+
+    public void componentAdded(ContainerEvent event) {
+        refreshDocks();
+    }
+
+    public void componentRemoved(ContainerEvent event) {
+        if (event.getComponent() instanceof CargoPanel) {
+            refreshDocks();
+        }
     }
 
     /**
@@ -549,6 +563,13 @@ public final class EuropePanel extends FreeColPanel implements ActionListener {
             selectedUnit.setSelected(false);
         }
         selectedUnit = unitLabel;
+        if (unitLabel == null) {
+            cargoPanel.setCarrier(null);
+        } else {
+            cargoPanel.setCarrier(unitLabel.getUnit());
+            unitLabel.setSelected(true);
+        }
+
         updateCargoPanel();
 
         cargoPanel.revalidate();
@@ -672,6 +693,17 @@ public final class EuropePanel extends FreeColPanel implements ActionListener {
 
     public void loadedUnit(Unit unit) {
         refreshDocks();
+    }
+
+    public final class EuropeCargoPanel extends CargoPanel {
+        public EuropeCargoPanel(Canvas parent) {
+            super(parent, true);
+        }
+
+        @Override
+        public String getUIClassID() {
+            return "EuropeCargoPanelUI";
+        }
     }
 
     /**
@@ -868,6 +900,7 @@ public final class EuropePanel extends FreeColPanel implements ActionListener {
                 }
             }
             Component c = add(comp);
+            revalidate();
             europePanel.refresh();
             return c;
         }

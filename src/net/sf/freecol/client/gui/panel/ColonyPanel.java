@@ -32,6 +32,8 @@ import java.awt.Rectangle;
 import java.awt.dnd.Autoscroll;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ContainerEvent;
+import java.awt.event.ContainerListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseListener;
@@ -88,7 +90,7 @@ import cz.autel.dmi.HIGLayout;
  * This is a panel for the Colony display. It shows the units that are working
  * in the colony, the buildings and much more.
  */
-public final class ColonyPanel extends FreeColPanel implements ActionListener, LocationChangeListener {
+public final class ColonyPanel extends FreeColPanel implements ActionListener, ContainerListener {
 
 
     private static Logger logger = Logger.getLogger(ColonyPanel.class.getName());
@@ -132,7 +134,7 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener, L
 
     private final InPortPanel inPortPanel;
 
-    private final CargoPanel cargoPanel;
+    private final ColonyCargoPanel cargoPanel;
 
     private final TitledBorder cargoBorder;
 
@@ -202,8 +204,8 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener, L
         warehousePanel = new WarehousePanel(this);
         tilePanel = new TilePanel(this);
         buildingsPanel = new BuildingsPanel(this);
-        cargoPanel = new CargoPanel(parent, freeColClient);
-        cargoPanel.addLocationChangeListener(this);
+        cargoPanel = new ColonyCargoPanel(parent);
+        cargoPanel.addContainerListener(this);
 
         defaultTransferHandler = new DefaultTransferHandler(parent, this);
         pressListener = new DragListener(this);
@@ -466,10 +468,6 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener, L
             }
         }
 
-        if (lastCarrier != null) {
-            cargoPanel.setCarrier(lastCarrier.getUnit());
-        }
-
         if (preSelectedUnitLabel == null) {
             setSelectedUnitLabel(lastCarrier);
         } else {
@@ -527,6 +525,23 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener, L
                 unloadButton.setEnabled(true);
                 fillButton.setEnabled(true);
             }
+        }
+    }
+
+    /**
+     * Updates the label that is placed above the cargo panel. It shows the name
+     * of the unit whose cargo is displayed and the amount of space left on that
+     * unit.
+     */
+    private void updateCargoLabel() {
+        if (selectedUnit != null) {
+            cargoPanel.getParent().setEnabled(true);
+            cargoBorder.setTitle(Messages.message("cargoOnCarrierLong", 
+                    "%name%", selectedUnit.getUnit().getName(),
+                    "%space%", String.valueOf(selectedUnit.getUnit().getSpaceLeft())));
+        } else {
+            cargoPanel.getParent().setEnabled(false);
+            cargoBorder.setTitle(Messages.message("cargoOnCarrier"));
         }
     }
 
@@ -814,11 +829,17 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener, L
                 selectedUnit.setSelected(false);
             }
             selectedUnit = unitLabel;
-            updateCargoPanel();
+            if (unitLabel == null) {
+                cargoPanel.setCarrier(null);
+            } else {
+                cargoPanel.setCarrier(unitLabel.getUnit());
+                unitLabel.setSelected(true);
+            }
+            updateCargoLabel();
+            //updateCarrierButtons();
+            cargoPanel.revalidate();
+            refresh();
         }
-        updateCarrierButtons();
-        cargoPanel.revalidate();
-        refresh();
     }
 
     private void updateCargoPanel() {
@@ -890,9 +911,18 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener, L
         return game;
     }
 
-    public void locationChanged(JLabel label, Container oldParent, Container newParent) {
-        if (label instanceof UnitLabel) {
-            if (((UnitLabel) label).getUnit().getTile().getSettlement() == null) {
+    public void componentAdded(ContainerEvent event) {
+        if (event.getComponent() instanceof ColonyCargoPanel ||
+            event.getComponent() instanceof UnitLabel) {
+            updateCargoLabel();
+            updateCarrierButtons();
+            refresh();
+        }
+    }
+
+    public void componentRemoved(ContainerEvent event) {
+        if (event.getChild() instanceof UnitLabel) {
+            if (((UnitLabel) event.getChild()).getUnit().getTile().getSettlement() == null) {
                 closeColonyPanel();
                 return;
             }
@@ -900,8 +930,21 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener, L
             updateBuildingBox();
             updateSoLLabel();
             updateOutsideColonyPanel();
-        } else if (label instanceof GoodsLabel) {
+        } else if (event.getChild() instanceof GoodsLabel) {
             updateWarehouse();
+        }
+        updateCargoLabel();
+        updateCarrierButtons();
+    }
+
+    public final class ColonyCargoPanel extends CargoPanel {
+        public ColonyCargoPanel(Canvas parent) {
+            super(parent, false);
+        }
+
+        @Override
+        public String getUIClassID() {
+            return "CargoPanelUI";
         }
     }
 

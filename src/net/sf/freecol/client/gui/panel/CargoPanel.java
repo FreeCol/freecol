@@ -31,7 +31,6 @@ import javax.swing.border.TitledBorder;
 import javax.swing.BorderFactory;
 import javax.swing.JPanel;
 
-import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.control.InGameController;
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.i18n.Messages;
@@ -43,24 +42,18 @@ import net.sf.freecol.common.model.Unit;
  * A panel that holds units and goods that represent Units and cargo
  * that are on board the currently selected ship.
  */
-public final class CargoPanel extends FreeColPanel {
+public class CargoPanel extends FreeColPanel {
 
     /**
      * The carrier that contains cargo.
      */
     private Unit carrier;
 
-    private List<LocationChangeListener> locationChangeListeners = new ArrayList<LocationChangeListener>();
-
     private final DefaultTransferHandler defaultTransferHandler;
 
     private final MouseListener pressListener;
 
     private final Canvas parent;
-
-    private final FreeColClient freeColClient;
-
-    private InGameController inGameController;
 
     private final TitledBorder border;
 
@@ -74,16 +67,18 @@ public final class CargoPanel extends FreeColPanel {
      * 
      * @param colonyPanel The panel that holds this CargoPanel.
      */
-    public CargoPanel(Canvas parent, FreeColClient freeColClient) {
+    public CargoPanel(Canvas parent, boolean withTitle) {
         this.parent = parent;
-        this.freeColClient = freeColClient;
-        this.inGameController = freeColClient.getInGameController();
 
         defaultTransferHandler = new DefaultTransferHandler(parent, this);
         pressListener = new DragListener(this);
 
-        border = BorderFactory.createTitledBorder(BorderFactory.createEmptyBorder(),
-                                                  Messages.message("cargoOnCarrier"));
+        if (withTitle) {
+            border = BorderFactory.createTitledBorder(BorderFactory.createEmptyBorder(),
+                                                      Messages.message("cargoOnCarrier"));
+        } else {
+            border = null;
+        }
 
         setBorder(border);
         initialize();
@@ -167,12 +162,14 @@ public final class CargoPanel extends FreeColPanel {
     }
 
     private void updateTitle() {
-        if (carrier == null) {
-            border.setTitle(Messages.message("cargoOnCarrier"));
-        } else {
-            border.setTitle(Messages.message("cargoOnCarrierLong", 
-                                             "%name%", carrier.getName(),
-                                             "%space%", String.valueOf(carrier.getSpaceLeft())));
+        if (border != null) {
+            if (carrier == null) {
+                border.setTitle(Messages.message("cargoOnCarrier"));
+            } else {
+                border.setTitle(Messages.message("cargoOnCarrierLong", 
+                                                 "%name%", carrier.getName(),
+                                                 "%space%", String.valueOf(carrier.getSpaceLeft())));
+            }
         }
     }
 
@@ -197,15 +194,13 @@ public final class CargoPanel extends FreeColPanel {
         if (carrier == null) {
             return null;
         } else if (editState) {
+            InGameController inGameController = parent.getClient().getInGameController();
             if (comp instanceof UnitLabel) {
                 Container oldParent = comp.getParent();
                 Unit unit = ((UnitLabel) comp).getUnit();
                 if (carrier.canAdd(unit)) {
                     ((UnitLabel) comp).setSmall(false);
                     if (inGameController.boardShip(unit, carrier)) {
-                        for (LocationChangeListener listener : locationChangeListeners) {
-                            listener.locationChanged((UnitLabel) comp, oldParent, this);
-                        }
                         if (oldParent != null) {
                             oldParent.remove(comp);
                             oldParent.repaint();
@@ -224,22 +219,18 @@ public final class CargoPanel extends FreeColPanel {
                     return null;
                 }
 
-                Goods goodsToAdd = new Goods(freeColClient.getGame(), g.getLocation(), g.getType(), newAmount);
+                Goods goodsToAdd = new Goods(g.getGame(), g.getLocation(), g.getType(), newAmount);
                 g.setAmount(g.getAmount() - newAmount);
 
                 ((GoodsLabel) comp).setSmall(false);
                 inGameController.loadCargo(goodsToAdd, carrier);
-
-                for (LocationChangeListener listener : locationChangeListeners) {
-                    listener.locationChanged((GoodsLabel) comp, oldParent, this);
-                }
 
                 add(comp);
                 updateTitle();
                 return comp;
             } else if (comp instanceof MarketLabel) {
                 MarketLabel label = (MarketLabel) comp;
-                Player player = freeColClient.getMyPlayer();
+                Player player = carrier.getOwner();
                 if (player.canTrade(label.getType())) {
                     inGameController.buyGoods(label.getType(), label.getAmount(), carrier);
                     inGameController.nextModelMessage();
@@ -262,6 +253,7 @@ public final class CargoPanel extends FreeColPanel {
 
     @Override
     public void remove(Component comp) {
+        InGameController inGameController = parent.getClient().getInGameController();
         if (comp instanceof UnitLabel) {
             Unit unit = ((UnitLabel) comp).getUnit();
             inGameController.leaveShip(unit);
@@ -275,32 +267,5 @@ public final class CargoPanel extends FreeColPanel {
         }
     }
 
-    /**
-     * Adds a loading listener for notification of any loading
-     *
-     * @param listener the listener
-     */
-    public void addLocationChangeListener(LocationChangeListener listener) {
-        locationChangeListeners.add(listener);
-    }
-
-    /**
-     * Removes a loading listener
-     *
-     * @param listener the listener
-     */
-    public void removeLocationChangeListener(LocationChangeListener listener) {
-        locationChangeListeners.remove(listener);
-    }
-
-    /**
-     * Returns an array of all the LocationChangeListener added to this Market.
-     *
-     * @return all of the LocationChangeListener added or an empty array if no
-     * listeners have been added
-     */
-    public LocationChangeListener[] getLocationChangeListeners() {
-        return locationChangeListeners.toArray(new LocationChangeListener[0]);
-    }
 }
 
