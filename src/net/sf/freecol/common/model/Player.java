@@ -1518,47 +1518,11 @@ public class Player extends FreeColGameObject implements Abilities, Nameable, Mo
      * @see Unit
      */
     public Iterator<Unit> getUnitIterator() {
-        /*
-        ArrayList<Unit> units = new ArrayList<Unit>();
-        Map map = getGame().getMap();
-        Iterator<Position> tileIterator = map.getWholeMapIterator();
-        while (tileIterator.hasNext()) {
-            Tile t = map.getTile(tileIterator.next());
-            if (t != null && t.getFirstUnit() != null && t.getFirstUnit().getOwner().equals(this)) {
-                Iterator<Unit> unitIterator = t.getUnitIterator();
-                while (unitIterator.hasNext()) {
-                    Unit u = unitIterator.next();
-                    Iterator<Unit> childUnitIterator = u.getUnitIterator();
-                    while (childUnitIterator.hasNext()) {
-                        Unit childUnit = childUnitIterator.next();
-                        units.add(childUnit);
-                    }
-                    units.add(u);
-                }
-            }
-            if (t.getSettlement() != null && t.getSettlement().getOwner() != null
-                && t.getSettlement().getOwner().equals(this)) {
-                Iterator<Unit> unitIterator = t.getSettlement().getUnitIterator();
-                while (unitIterator.hasNext()) {
-                    Unit u = unitIterator.next();
-                    units.add(u);
-                }
-            }
-        }
-        if (getEurope() != null) {
-            Iterator<Unit> unitIterator = getEurope().getUnitIterator();
-            while (unitIterator.hasNext()) {
-                Unit u = unitIterator.next();
-                Iterator<Unit> childUnitIterator = u.getUnitIterator();
-                while (childUnitIterator.hasNext()) {
-                    Unit childUnit = childUnitIterator.next();
-                    units.add(childUnit);
-                }
-                units.add(u);
-            }
-        }
-        */
         return units.values().iterator();
+    }
+
+    public List<Unit> getUnits() {
+        return (List<Unit>) units.values();
     }
 
     /**

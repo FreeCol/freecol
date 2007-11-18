@@ -356,16 +356,8 @@ public final class InGameController extends Controller {
         // Quick check to avoid long processing time:
         if (!player.getSettlements().isEmpty()) {
             return false;
-        }
-
-        Iterator<Position> tileIterator = map.getWholeMapIterator();
-        while (tileIterator.hasNext()) {
-            Tile t = map.getTile(tileIterator.next());
-            if (t != null
-                    && ((t.getFirstUnit() != null && t.getFirstUnit().getOwner().equals(player)) || t.getSettlement() != null
-                            && t.getSettlement().getOwner().equals(player))) {
-                return false;
-            }
+        } else if (!player.getUnits().isEmpty()) {
+            return false;
         }
         
         /*
