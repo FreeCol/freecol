@@ -45,6 +45,8 @@ import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.client.gui.ViewMode;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.client.gui.panel.MapEditorTransformPanel.MapTransform;
+
+import net.sf.freecol.common.model.AbstractGoods;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.GoodsType;
@@ -337,11 +339,12 @@ public final class InfoPanel extends FreeColPanel {
             int counter = 1;
             int row = 1;
             goodsPanel.removeAll();
-            List<GoodsType> production = tile.getType().getPotentialTypeList();
-            for (GoodsType goodsType : production) {
-                JLabel goodsLabel = new JLabel(String.valueOf(tile.potential(goodsType)),
-                        library.getScaledGoodsImageIcon(goodsType, 0.50f), JLabel.RIGHT);
-                goodsLabel.setToolTipText(goodsType.getName());
+            List<AbstractGoods> production = tile.getType().getProduction();
+            for (AbstractGoods goods : production) {
+                JLabel goodsLabel = new JLabel(String.valueOf(tile.potential(goods.getType())),
+                                               library.getScaledGoodsImageIcon(goods.getType(), 0.50f),
+                                               JLabel.RIGHT);
+                goodsLabel.setToolTipText(goods.getType().getName());
                 goodsLabel.setFont(goodsLabel.getFont().deriveFont(9f));
                 goodsPanel.add(goodsLabel, higConst.rc(row, counter));
                 if (counter == 3) {

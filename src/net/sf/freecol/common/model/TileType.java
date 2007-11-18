@@ -57,12 +57,15 @@ public final class TileType extends FreeColGameObjectType implements Modifiers
     private int[] altitude = new int[2];
     private int[] latitude = new int[2];
 
-    private List<GoodsType> producedType;
-    private List<Integer> producedAmount;
     private List<ResourceType> resourceType;
     private List<Integer> resourceProbability;
 
     private GoodsType secondaryGoods = null;
+
+    /**
+     * Describe production here.
+     */
+    private List<AbstractGoods> production;
 
     /**
      * Stores the Modifiers of this Type.
@@ -135,24 +138,25 @@ public final class TileType extends FreeColGameObjectType implements Modifiers
     }
 
     public int getPotential(GoodsType goodsType) {
-        int index = producedType.indexOf(goodsType);
-        if (index >= 0) {
-            return producedAmount.get(index);
-        } else {
-            return 0;
+        for (AbstractGoods goods : production) {
+            if (goods.getType() == goodsType) {
+                return goods.getAmount();
+            }
         }
+        return 0;
     }
 
     public GoodsType getSecondaryGoods() {
         return secondaryGoods;
     }
 
-    public List<GoodsType> getPotentialTypeList() {
-        return producedType;
-    }
-    
-    public List<Integer> getPotentialAmountList() {
-        return producedAmount;
+    /**
+     * Get the <code>Production</code> value.
+     *
+     * @return a <code>List<AbstractGoods></code> value
+     */
+    public List<AbstractGoods> getProduction() {
+        return production;
     }
 
     public List<ResourceType> getResourceTypeList() {
@@ -249,8 +253,7 @@ public final class TileType extends FreeColGameObjectType implements Modifiers
         }
         
         artBasic = null;
-        producedType = new ArrayList<GoodsType>();
-        producedAmount = new ArrayList<Integer>();
+        production = new ArrayList<AbstractGoods>();
         resourceType = new ArrayList<ResourceType>();
         resourceProbability = new ArrayList<Integer>();
 
@@ -278,10 +281,9 @@ public final class TileType extends FreeColGameObjectType implements Modifiers
                 Modifier modifier = new Modifier(in);
                 setModifier(modifier.getId(), modifier); // close this element
             } else if ("production".equals(childName)) {
-                String g = in.getAttributeValue(null, "goods-type");
-                GoodsType gt = goodsTypeByRef.get(g);
-                producedType.add(gt);
-                producedAmount.add(Integer.parseInt(in.getAttributeValue(null, "value")));
+                GoodsType type = goodsTypeByRef.get(in.getAttributeValue(null, "goods-type"));
+                int amount = Integer.parseInt(in.getAttributeValue(null, "value"));
+                production.add(new AbstractGoods(type, amount));
                 in.nextTag(); // close this element
             } else if ("resource".equals(childName)) {
                 String r = in.getAttributeValue(null, "type");

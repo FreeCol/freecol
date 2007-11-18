@@ -47,6 +47,24 @@ public class AbstractGoods extends FreeColObject {
     private int amount;
 
     /**
+     * Creates a new <code>AbstractGoods</code> instance.
+     *
+     */
+    public AbstractGoods() {}
+
+    /**
+     * Creates a new <code>AbstractGoods</code> instance.
+     *
+     * @param type a <code>GoodsType</code> value
+     * @param amount an <code>int</code> value
+     */
+    public AbstractGoods(GoodsType type, int amount) {
+        this.type = type;
+        this.amount = amount;
+    }
+
+
+    /**
      * Describe <code>getID</code> method here.
      *
      * @return a <code>String</code> value

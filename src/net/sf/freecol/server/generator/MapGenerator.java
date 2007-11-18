@@ -37,6 +37,7 @@ import javax.xml.stream.XMLStreamReader;
 
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.common.FreeColException;
+import net.sf.freecol.common.model.AbstractGoods;
 import net.sf.freecol.common.model.AbstractUnit;
 import net.sf.freecol.common.model.Building;
 import net.sf.freecol.common.model.BuildingType;
@@ -433,8 +434,8 @@ public class MapGenerator {
                 }
             } else {
                 TileType tileType = t.getType();
-                for (GoodsType g : tileType.getPotentialTypeList()) {
-                    int index = farmedList.indexOf(g);
+                for (AbstractGoods goods : tileType.getProduction()) {
+                    int index = farmedList.indexOf(goods.getType());
                     if (index >= 0) {
                         potentials[index]++;
                     }

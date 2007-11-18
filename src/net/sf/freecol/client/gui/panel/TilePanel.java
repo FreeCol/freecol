@@ -43,6 +43,8 @@ import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.client.gui.i18n.Messages;
+
+import net.sf.freecol.common.model.AbstractGoods;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.Player;
@@ -159,10 +161,10 @@ public final class TilePanel extends FreeColDialog implements ActionListener {
         if (tileType == null) {
             colopediaButton.setEnabled(false);
         } else {
-            List<GoodsType> production = tileType.getPotentialTypeList();
-            for (GoodsType goodsType : production) {
-                JLabel label = new JLabel(canvas.getGUI().getImageLibrary().getGoodsImageIcon(goodsType));
-                label.setText(String.valueOf(tile.potential(goodsType)));
+            List<AbstractGoods> production = tileType.getProduction();
+            for (AbstractGoods goods : production) {
+                JLabel label = new JLabel(canvas.getGUI().getImageLibrary().getGoodsImageIcon(goods.getType()));
+                label.setText(String.valueOf(tile.potential(goods.getType())));
                 goodsPanel.add(label);
             }
         }

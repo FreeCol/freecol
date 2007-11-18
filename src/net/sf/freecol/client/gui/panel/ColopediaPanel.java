@@ -50,6 +50,8 @@ import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.client.gui.i18n.Messages;
+
+import net.sf.freecol.common.model.AbstractGoods;
 import net.sf.freecol.common.model.Building;
 import net.sf.freecol.common.model.BuildingType;
 import net.sf.freecol.common.model.Europe;
@@ -493,10 +495,10 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
         detailPanel.add(new JLabel(Messages.message("colopedia.terrain.production")), higConst.rc(row, leftColumn));
         JPanel goodsPanel = new JPanel(new GridLayout(0, 8, margin, 0));
         goodsPanel.setOpaque(false);
-        List<GoodsType> productionTypes = tileType.getPotentialTypeList();
-        for(GoodsType goodsType : productionTypes) {
-            JLabel goodsLabel = new JLabel(library.getGoodsImageIcon(goodsType));
-            goodsLabel.setText(String.valueOf(tileType.getPotential(goodsType)));
+        List<AbstractGoods> production = tileType.getProduction();
+        for(AbstractGoods goods : production) {
+            JLabel goodsLabel = new JLabel(library.getGoodsImageIcon(goods.getType()));
+            goodsLabel.setText(String.valueOf(tileType.getPotential(goods.getType())));
             goodsPanel.add(goodsLabel);
         }
         detailPanel.add(goodsPanel, higConst.rc(row, rightColumn));
