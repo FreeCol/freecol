@@ -1344,40 +1344,11 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
      * @return The type of secondary good best produced by this tile (or null if none found).
      */
     public GoodsType secondaryGoods() {
-        if (type == null) {
+        if (type != null) {
+            return type.getSecondaryGoods();
+        } else {
             return null;
         }
-        
-        GoodsType[] top = getSortedGoodsTop(type, tileItemContainer, getFishBonus());
-        for (GoodsType g : top) {
-            if (g == null || g.isFoodType()) {
-            	continue;
-            }
-            return g;
-        }
-        return null;
-    }
-
-    /**
-     * The type of secondary good (non-food) this <code>TileType</code> produces best.
-     * (used for Colopedia)
-     * 
-     * @return The type of secondary good best produced by this tile.
-     */
-    public static GoodsType secondaryGoods(TileType type) {
-        GoodsType top = null;
-        int val = 0;
-        List<GoodsType> goodsTypeList = FreeCol.getSpecification().getGoodsTypeList();
-        for (GoodsType g : goodsTypeList) {
-            if (!g.isFoodType()) {
-                int potential = type.getPotential(g);
-                if (potential > val) {
-                    val = potential;
-                    top = g;
-                }
-            }
-        }
-        return top;
     }
 
     /**

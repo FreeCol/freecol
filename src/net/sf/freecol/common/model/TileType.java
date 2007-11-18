@@ -62,6 +62,8 @@ public final class TileType extends FreeColGameObjectType implements Modifiers
     private List<ResourceType> resourceType;
     private List<Integer> resourceProbability;
 
+    private GoodsType secondaryGoods = null;
+
     /**
      * Stores the Modifiers of this Type.
      */
@@ -139,6 +141,10 @@ public final class TileType extends FreeColGameObjectType implements Modifiers
         } else {
             return 0;
         }
+    }
+
+    public GoodsType getSecondaryGoods() {
+        return secondaryGoods;
     }
 
     public List<GoodsType> getPotentialTypeList() {
@@ -237,6 +243,10 @@ public final class TileType extends FreeColGameObjectType implements Modifiers
         canHaveRiver = !(getAttribute(in, "no-river", water));
         attackBonus = 0;
         defenceBonus = 0;
+
+        if (!water && canSettle) {
+            secondaryGoods = goodsTypeByRef.get(in.getAttributeValue(null, "secondary-goods"));
+        }
         
         artBasic = null;
         producedType = new ArrayList<GoodsType>();

@@ -456,7 +456,7 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
             defenseBonus = String.valueOf(defence.getValue()) + "%";
         }
 
-        GoodsType secondaryGoodsType = Tile.secondaryGoods(tileType);
+        GoodsType secondaryGoodsType = tileType.getSecondaryGoods();
 
         JLabel nameLabel = new JLabel(tileType.getName(), SwingConstants.CENTER);
         nameLabel.setFont(smallHeaderFont);
