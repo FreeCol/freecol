@@ -102,7 +102,7 @@ public final class ReportRequirementsPanel extends ReportPanel implements Action
         //Create a text pane.
         JTextPane textPane = new JTextPane();
         textPane.setOpaque(false);
-	textPane.setEditable(false);
+        textPane.setEditable(false);
 
         StyledDocument doc = textPane.getStyledDocument();
         defineStyles(doc);
@@ -166,10 +166,9 @@ public final class ReportRequirementsPanel extends ReportPanel implements Action
                     GoodsType goodsType = building.getGoodsOutputType();
                     UnitType expert = building.getExpertUnitType();
                     
-                    int expertIndex = expert.getIndex();
-                    int goodsIndex = goodsType.getIndex();
-                    if (goodsType != null) {
-                        // no expert
+                    if (goodsType != null && expert!=null) {
+                        // check if this building has no expert producing goods
+                        int expertIndex = expert.getIndex();
                         if (building.getFirstUnit() != null &&
                             !expertWarning[expertIndex] &&
                             unitCount[index][expertIndex] == 0) {
@@ -177,7 +176,10 @@ public final class ReportRequirementsPanel extends ReportPanel implements Action
                             expertWarning[expertIndex] = true;
                             hasWarning = true;
                         }
+                    }
+                    if (goodsType != null) {
                         // not enough input
+                        int goodsIndex = goodsType.getIndex();
                         if (building.getProductionNextTurn() < building.getMaximumProduction() &&
                             !productionWarning[goodsIndex]) {
                             addProductionWarning(doc, index, goodsType, building.getGoodsInputType());
