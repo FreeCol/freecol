@@ -545,13 +545,19 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
 
         List<GoodsType> goodsList = type.getBonusTypeList();
         List<Integer> amountList = type.getBonusAmountList();
+        List<Float> factorList = type.getBonusFactorList();
 
         detailPanel.add(new JLabel(Messages.message("colopedia.resource.bonusProduction")), higConst.rc(row, leftColumn));
         JPanel goodsPanel = new JPanel(new GridLayout(0, goodsList.size(), margin, 0));
         goodsPanel.setOpaque(false);
         for (int i = 0; i < goodsList.size(); i++) {
             JLabel goodsLabel = new JLabel(library.getGoodsImageIcon(goodsList.get(i)));
-            goodsLabel.setText(String.valueOf(amountList.get(i)));
+            int amount = amountList.get(i);
+            if (amount > 0) {
+                goodsLabel.setText("+" + String.valueOf(amount));
+            } else {
+                goodsLabel.setText("x " + String.valueOf(factorList.get(i)));
+            }
             goodsPanel.add(goodsLabel);
         }
         detailPanel.add(goodsPanel, higConst.rc(row, rightColumn));
