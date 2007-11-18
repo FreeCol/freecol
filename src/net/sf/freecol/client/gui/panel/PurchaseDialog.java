@@ -59,9 +59,6 @@ public final class PurchaseDialog extends FreeColDialog implements ActionListene
 
     private final ArrayList<JLabel> prices;
 
-    @SuppressWarnings("unused")
-    private final Canvas parent;
-
     private final FreeColClient freeColClient;
 
     private final InGameController inGameController;
@@ -72,7 +69,6 @@ public final class PurchaseDialog extends FreeColDialog implements ActionListene
      */
     public PurchaseDialog(Canvas parent) {
         super();
-        this.parent = parent;
         this.freeColClient = parent.getClient();
         this.inGameController = freeColClient.getInGameController();
         setFocusCycleRoot(true);
@@ -93,9 +89,9 @@ public final class PurchaseDialog extends FreeColDialog implements ActionListene
 
         int numberUnits = unitTypesForPurchasing.size();
         int[] widths = new int[] { 0, margin, 0 };
-        int[] heights = new int[numberUnits];
-        for (int index = 0; index < numberUnits; index++) {
-            heights[2 * index + 1] = margin;
+        int[] heights = new int[2 * numberUnits - 1];
+        for (int index = 1; index < numberUnits; index += 2) {
+            heights[index] = margin;
         }
         int buttonColumn = 1;
         int labelColumn = 3;
@@ -111,7 +107,7 @@ public final class PurchaseDialog extends FreeColDialog implements ActionListene
             JButton button = new JButton(unitType.getName(), library.getScaledUnitImageIcon(graphicsType, 0.66f));
             button.setIconTextGap(margin);
             button.addActionListener(this);
-            button.setActionCommand(unitType.getName());
+            button.setActionCommand(unitType.getId());
             enterPressesWhenFocused(button);
             buttons.add(button);
             purchasePanel.add(button, higConst.rc(row, buttonColumn));
