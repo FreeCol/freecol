@@ -243,7 +243,10 @@ public final class ReportProductionPanel extends JPanel implements ActionListene
             
             column = buildingColumn;
             for (BuildingType buildingType : buildingTypes) {
-                int level = colony.getBuilding(buildingType).getLevel();
+                Building b = colony.getBuilding(buildingType);
+                int level = 0;
+                if (b!=null)
+                    level = b.getLevel();
                 newLabel = new JLabel();
                 newLabel.setBorder(FreeColPanel.CELLBORDER);
                 if (level == buildingType.getLevel()) {
