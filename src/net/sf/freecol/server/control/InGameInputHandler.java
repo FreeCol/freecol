@@ -2318,13 +2318,13 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
      */
     private Element payArrears(Connection connection, Element payArrearsElement) {
         ServerPlayer player = getFreeColServer().getPlayer(connection);
-        int goodsIndex = new Integer(payArrearsElement.getAttribute("goodsType")).intValue();
-        int arrears = player.getArrears(goodsIndex);
+        GoodsType goodsType = FreeCol.getSpecification().getGoodsType(payArrearsElement.getAttribute("goodsType"));
+        int arrears = player.getArrears(goodsType);
         if (player.getGold() < arrears) {
             throw new IllegalStateException("Not enough gold to pay tax arrears!");
         } else {
             player.modifyGold(-arrears);
-            player.resetArrears(goodsIndex);
+            player.resetArrears(goodsType);
         }
         return null;
     }

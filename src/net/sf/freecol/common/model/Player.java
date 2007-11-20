@@ -167,7 +167,7 @@ public class Player extends FreeColGameObject implements Abilities, Nameable, Mo
     /** The current tax rate for this player. */
     private int tax = 0;
 
-    private int[] arrears, sales, incomeBeforeTaxes, incomeAfterTaxes;
+    private java.util.Map<GoodsType, MarketData> marketData = new HashMap<GoodsType, MarketData>();
 
     // 0 = pre-rebels; 1 = in rebellion; 2 = independence granted
     private int rebellionState;
@@ -313,10 +313,6 @@ public class Player extends FreeColGameObject implements Abilities, Nameable, Mo
                 if (!nationType.isREF()) {
                     monarch = new Monarch(game, this, "");
                 }
-                arrears = new int[Goods.NUMBER_OF_TYPES];
-                sales = new int[Goods.NUMBER_OF_TYPES];
-                incomeBeforeTaxes = new int[Goods.NUMBER_OF_TYPES];
-                incomeAfterTaxes = new int[Goods.NUMBER_OF_TYPES];
             } else {
                 gold = 1500;
             }      
@@ -1522,7 +1518,7 @@ public class Player extends FreeColGameObject implements Abilities, Nameable, Mo
     }
 
     public List<Unit> getUnits() {
-        return (List<Unit>) units.values();
+        return new ArrayList<Unit>(units.values());
     }
 
     /**
@@ -2161,8 +2157,8 @@ public class Player extends FreeColGameObject implements Abilities, Nameable, Mo
                             }
                         }
                     } else if (event.equals("model.event.boycottsLifted")) {
-                        for (int index = 0; index < Goods.NUMBER_OF_TYPES; index++) {
-                            resetArrears(index);
+                        for (GoodsType goodsType : FreeCol.getSpecification().getGoodsTypeList()) {
+                            resetArrears(goodsType);
                         }
                     } else if (event.equals("model.event.freeBuilding")) {
                         BuildingType type = FreeCol.getSpecification().getBuildingType(currentFather.getEvents()
@@ -2208,6 +2204,10 @@ public class Player extends FreeColGameObject implements Abilities, Nameable, Mo
                 getEurope().newTurn();
             }
 
+            if (getMarket() != null) {
+                logger.finest("Calling newTurn for player " + getName() + "'s Market");
+                getMarket().newTurn();
+            }
 
             int numberOfColonies = settlements.size(); 
             if (numberOfColonies > 0) {
@@ -2360,11 +2360,8 @@ public class Player extends FreeColGameObject implements Abilities, Nameable, Mo
 
         toArrayElement("tension", tensionArray, out);
         toArrayElement("stance", stance, out);
-        if (isEuropean()) {
-            toArrayElement("arrears", arrears, out);
-            toArrayElement("sales", sales, out);
-            toArrayElement("incomeBeforeTaxes", incomeBeforeTaxes, out);
-            toArrayElement("incomeAfterTaxes", incomeAfterTaxes, out);
+        for (MarketData data : marketData.values()) {
+            data.toXMLImpl(out);
         }
         for (TradeRoute route : getTradeRoutes()) {
             route.toXML(out, this);
@@ -2446,10 +2443,6 @@ public class Player extends FreeColGameObject implements Abilities, Nameable, Mo
         }
         tension = null;
         stance = null;
-        arrears = null;
-        sales = null;
-        incomeBeforeTaxes = null;
-        incomeAfterTaxes = null;
         while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
             if (in.getLocalName().equals("tension")) {
                 tension = new Tension[NUMBER_OF_PLAYERS];
@@ -2459,14 +2452,10 @@ public class Player extends FreeColGameObject implements Abilities, Nameable, Mo
                 }
             } else if (in.getLocalName().equals("stance")) {
                 stance = readFromArrayElement("stance", in, new int[0]);
-            } else if (in.getLocalName().equals("arrears")) {
-                arrears = readFromArrayElement("arrears", in, new int[0]);
-            } else if (in.getLocalName().equals("sales")) {
-                sales = readFromArrayElement("sales", in, new int[0]);
-            } else if (in.getLocalName().equals("incomeBeforeTaxes")) {
-                incomeBeforeTaxes = readFromArrayElement("incomeBeforeTaxes", in, new int[0]);
-            } else if (in.getLocalName().equals("incomeAfterTaxes")) {
-                incomeAfterTaxes = readFromArrayElement("incomeAfterTaxes", in, new int[0]);
+            } else if (in.getLocalName().equals("marketData")) {
+                MarketData data = new MarketData();
+                data.readFromXMLImpl(in);
+                marketData.put(data.goodsType, data);
             } else if (in.getLocalName().equals(Europe.getXMLElementTagName())) {
                 europe = (Europe) getGame().getFreeColGameObject(in.getAttributeValue(null, "ID"));
                 if (europe != null) {
@@ -2506,21 +2495,6 @@ public class Player extends FreeColGameObject implements Abilities, Nameable, Mo
             for (int i = 0; i < tension.length; i++) {
                 tension[i] = new Tension(0);
             }
-        }
-        if (stance == null) {
-            stance = new int[NUMBER_OF_PLAYERS];
-        }
-        if (arrears == null) {
-            arrears = new int[Goods.NUMBER_OF_TYPES];
-        }
-        if (sales == null) {
-            sales = new int[Goods.NUMBER_OF_TYPES];
-        }
-        if (incomeBeforeTaxes == null) {
-            incomeBeforeTaxes = new int[Goods.NUMBER_OF_TYPES];
-        }
-        if (incomeAfterTaxes == null) {
-            incomeAfterTaxes = new int[Goods.NUMBER_OF_TYPES];
         }
         invalidateCanSeeTiles();
     }
@@ -2610,14 +2584,16 @@ public class Player extends FreeColGameObject implements Abilities, Nameable, Mo
     /**
      * Returns the arrears due for a type of goods.
      * 
-     * @param goodsIndex The index of the goods.
+     * @param type a <code>GoodsType</code> value
      * @return The arrears due for this type of goods.
      */
-    public int getArrears(int goodsIndex) {
-        return arrears[goodsIndex];
-    }
     public int getArrears(GoodsType type) {
-        return arrears[type.getIndex()];
+        MarketData data = marketData.get(type);
+        if (data == null) {
+            return Integer.MIN_VALUE;
+        } else {
+            return data.arrears;
+        }
     }
 
     /**
@@ -2627,19 +2603,21 @@ public class Player extends FreeColGameObject implements Abilities, Nameable, Mo
      * @return The arrears due for this type of goods.
      */
     public int getArrears(Goods goods) {
-        return arrears[goods.getType().getIndex()];
+        return getArrears(goods.getType());
     }
 
     /**
      * Sets the arrears for a type of goods.
      * 
-     * @param goodsIndex The index of the goods.
+     * @param goodsType a <code>GoodsType</code> value
      */
-    public void setArrears(int goodsIndex) {
-        arrears[goodsIndex] = (getDifficulty() + 3) * 100 * getMarket().paidForSale(goodsIndex);
-    }
-    public void setArrears(GoodsType type) {
-        setArrears(type.getIndex());
+    public void setArrears(GoodsType goodsType) {
+        MarketData data = marketData.get(goodsType);
+        if (data == null) {
+            data = new MarketData(goodsType);
+            marketData.put(goodsType, data);
+        }
+        data.arrears = (getDifficulty() + 3) * 100 * getMarket().paidForSale(goodsType);
     }
 
     /**
@@ -2648,19 +2626,21 @@ public class Player extends FreeColGameObject implements Abilities, Nameable, Mo
      * @param goods The goods.
      */
     public void setArrears(Goods goods) {
-        setArrears(goods.getType().getIndex());
+        setArrears(goods.getType());
     }
 
     /**
      * Resets the arrears for this type of goods to zero.
      * 
-     * @param goodsIndex The index of the goods to reset the arrears for.
+     * @param goodsType a <code>GoodsType</code> value
      */
-    public void resetArrears(int goodsIndex) {
-        arrears[goodsIndex] = 0;
-    }
-    public void resetArrears(GoodsType type) {
-        arrears[type.getIndex()] = 0;
+    public void resetArrears(GoodsType goodsType) {
+        MarketData data = marketData.get(goodsType);
+        if (data == null) {
+            data = new MarketData(goodsType);
+            marketData.put(goodsType, data);
+        }
+        data.arrears = 0;
     }
 
     /**
@@ -2673,7 +2653,7 @@ public class Player extends FreeColGameObject implements Abilities, Nameable, Mo
      * @see #resetArrears(int)
      */
     public void resetArrears(Goods goods) {
-        resetArrears(goods.getType().getIndex());
+        resetArrears(goods.getType());
     }
 
     /**
@@ -2683,7 +2663,7 @@ public class Player extends FreeColGameObject implements Abilities, Nameable, Mo
      * @return True if there are no arrears due for this type of goods.
      */
     public boolean canTrade(GoodsType type) {
-        return canTrade(type.getIndex(), Market.EUROPE);
+        return canTrade(type, Market.EUROPE);
     }
 
     /**
@@ -2693,12 +2673,15 @@ public class Player extends FreeColGameObject implements Abilities, Nameable, Mo
      * @param marketAccess Way the goods are traded (Europe OR Custom)
      * @return <code>true</code> if type of goods can be traded.
      */
-    public boolean canTrade(int goodsIndex, int marketAccess) {
-        return (arrears[goodsIndex] == 0 || (marketAccess == Market.CUSTOM_HOUSE && getGameOptions().getBoolean(
-                                                                                                                GameOptions.CUSTOM_IGNORE_BOYCOTT)));
-    }
     public boolean canTrade(GoodsType type, int marketAccess) {
-        return canTrade(type.getIndex(), marketAccess);
+        MarketData data = marketData.get(type);
+        if (data == null) {
+            return true;
+        } else {
+            return (data.arrears == 0 ||
+                    (marketAccess == Market.CUSTOM_HOUSE &&
+                     getGameOptions().getBoolean(GameOptions.CUSTOM_IGNORE_BOYCOTT)));
+        }
     }
 
     /**
@@ -2709,7 +2692,7 @@ public class Player extends FreeColGameObject implements Abilities, Nameable, Mo
      * @return True if type of goods can be traded.
      */
     public boolean canTrade(Goods goods, int marketAccess) {
-        return canTrade(goods.getType().getIndex(), marketAccess);
+        return canTrade(goods.getType(), marketAccess);
     }
 
     /**
@@ -2763,21 +2746,31 @@ public class Player extends FreeColGameObject implements Abilities, Nameable, Mo
     /**
      * Returns the current sales.
      * 
-     * @param goodsIndex The index of the goods.
+     * @param goodsType a <code>GoodsType</code> value
      * @return The current sales.
      */
-    public int getSales(int goodsIndex) {
-        return sales[goodsIndex];
+    public int getSales(GoodsType goodsType) {
+        MarketData data = marketData.get(goodsType);
+        if (data == null) {
+            return 0;
+        } else {
+            return data.sales;
+        }
     }
 
     /**
      * Modifies the current sales.
      * 
-     * @param goodsIndex The index of the goods.
+     * @param goodsType a <code>GoodsType</code> value
      * @param amount The new sales.
      */
-    public void modifySales(int goodsIndex, int amount) {
-        sales[goodsIndex] += amount;
+    public void modifySales(GoodsType goodsType, int amount) {
+        MarketData data = marketData.get(goodsType);
+        if (data == null) {
+            data = new MarketData(goodsType);
+            marketData.put(goodsType, data);
+        }
+        data.sales += amount;
     }
 
     /**
@@ -2786,8 +2779,13 @@ public class Player extends FreeColGameObject implements Abilities, Nameable, Mo
      * @param goodsIndex The index of the goods.
      * @return The current incomeBeforeTaxes.
      */
-    public int getIncomeBeforeTaxes(int goodsIndex) {
-        return incomeBeforeTaxes[goodsIndex];
+    public int getIncomeBeforeTaxes(GoodsType goodsType) {
+        MarketData data = marketData.get(goodsType);
+        if (data == null) {
+            return 0;
+        } else {
+            return data.incomeBeforeTaxes;
+        }
     }
 
     /**
@@ -2796,8 +2794,13 @@ public class Player extends FreeColGameObject implements Abilities, Nameable, Mo
      * @param goodsIndex The index of the goods.
      * @param amount The new incomeBeforeTaxes.
      */
-    public void modifyIncomeBeforeTaxes(int goodsIndex, int amount) {
-        incomeBeforeTaxes[goodsIndex] += amount;
+    public void modifyIncomeBeforeTaxes(GoodsType goodsType, int amount) {
+        MarketData data = marketData.get(goodsType);
+        if (data == null) {
+            data = new MarketData(goodsType);
+            marketData.put(goodsType, data);
+        }
+        data.incomeBeforeTaxes += amount;
     }
 
     /**
@@ -2806,8 +2809,13 @@ public class Player extends FreeColGameObject implements Abilities, Nameable, Mo
      * @param goodsIndex The index of the goods.
      * @return The current incomeAfterTaxes.
      */
-    public int getIncomeAfterTaxes(int goodsIndex) {
-        return incomeAfterTaxes[goodsIndex];
+    public int getIncomeAfterTaxes(GoodsType goodsType) {
+        MarketData data = marketData.get(goodsType);
+        if (data == null) {
+            return 0;
+        } else {
+            return data.incomeAfterTaxes;
+        }
     }
 
     /**
@@ -2816,9 +2824,15 @@ public class Player extends FreeColGameObject implements Abilities, Nameable, Mo
      * @param goodsIndex The index of the goods.
      * @param amount The new incomeAfterTaxes.
      */
-    public void modifyIncomeAfterTaxes(int goodsIndex, int amount) {
-        incomeAfterTaxes[goodsIndex] += amount;
+    public void modifyIncomeAfterTaxes(GoodsType goodsType, int amount) {
+        MarketData data = marketData.get(goodsType);
+        if (data == null) {
+            data = new MarketData(goodsType);
+            marketData.put(goodsType, data);
+        }
+        data.incomeAfterTaxes += amount;
     }
+
 
     /**
      * Returns the difficulty level.
@@ -3013,4 +3027,59 @@ public class Player extends FreeColGameObject implements Abilities, Nameable, Mo
             return units.iterator();
         }
     }
+
+    private static final class MarketData extends FreeColObject {
+        GoodsType goodsType;
+        int arrears;
+        int sales;
+        int incomeBeforeTaxes;
+        int incomeAfterTaxes;
+
+        public MarketData() {}
+
+        public MarketData(GoodsType goodsType) {
+            this.goodsType = goodsType;
+        }
+
+        protected void toXMLImpl(XMLStreamWriter out) 
+            throws XMLStreamException {
+            // Start element:
+            out.writeStartElement(getXMLElementTagName());
+
+            out.writeAttribute("ID", goodsType.getId());
+            out.writeAttribute("arrears", Integer.toString(arrears));
+            out.writeAttribute("sales", Integer.toString(sales));
+            out.writeAttribute("incomeBeforeTaxes", Integer.toString(incomeBeforeTaxes));
+            out.writeAttribute("incomeAfterTaxes", Integer.toString(incomeAfterTaxes));
+
+            out.writeEndElement();
+        }
+
+        /**
+         * Initialize this object from an XML-representation of this object.
+         * @param in The input stream with the XML.
+         */
+        protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
+            goodsType = FreeCol.getSpecification().getGoodsType(in.getAttributeValue(null, "ID"));
+            arrears = Integer.parseInt(in.getAttributeValue(null, "arrears"));
+            sales = Integer.parseInt(in.getAttributeValue(null, "sales"));
+            incomeBeforeTaxes = Integer.parseInt(in.getAttributeValue(null, "incomeBeforeTaxes"));
+            incomeAfterTaxes = Integer.parseInt(in.getAttributeValue(null, "incomeAfterTaxes"));
+            
+            in.nextTag();
+        }
+
+        /**
+         * Returns the tag name of the root element representing this object.
+         *
+         * @return the tag name.
+         */
+        public static String getXMLElementTagName() {
+            return "marketData";
+        }
+
+
+    }
+
+
 }

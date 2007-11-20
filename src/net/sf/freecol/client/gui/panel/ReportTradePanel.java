@@ -36,6 +36,7 @@ import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.Building;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.Goods;
+import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.Market;
 import net.sf.freecol.common.model.Player;
 import cz.autel.dmi.HIGLayout;
@@ -118,12 +119,16 @@ public final class ReportTradePanel extends ReportPanel implements ActionListene
         reportPanel.add(afterTaxesLabel, higConst.rc(4, labelColumn));
 
         JLabel currentLabel;
-        for (int goodsIndex = 0; goodsIndex < Goods.NUMBER_OF_TYPES; goodsIndex++) {
-            int column = goodsIndex + extraColumns + 1;
-            int sales = player.getSales(goodsIndex);
-            int beforeTaxes = player.getIncomeBeforeTaxes(goodsIndex);
-            int afterTaxes = player.getIncomeAfterTaxes(goodsIndex);
-            MarketLabel marketLabel = new MarketLabel(FreeCol.getSpecification().getGoodsType(goodsIndex), market, getCanvas());
+        int column = extraColumns + 1;
+        for (GoodsType goodsType : FreeCol.getSpecification().getGoodsTypeList()) {
+            if (!goodsType.isStorable()) {
+                return;
+            }
+            column++;
+            int sales = player.getSales(goodsType);
+            int beforeTaxes = player.getIncomeBeforeTaxes(goodsType);
+            int afterTaxes = player.getIncomeAfterTaxes(goodsType);
+            MarketLabel marketLabel = new MarketLabel(goodsType, market, getCanvas());
             marketLabel.setBorder(FreeColPanel.TOPCELLBORDER);
             marketLabel.setVerticalTextPosition(JLabel.BOTTOM);
             marketLabel.setHorizontalTextPosition(JLabel.CENTER);
@@ -158,7 +163,7 @@ public final class ReportTradePanel extends ReportPanel implements ActionListene
             JButton colonyButton = createColonyButton(colonyIndex);
             reportPanel.add(colonyButton, higConst.rc(row, labelColumn));
             for (int goodsIndex = 0; goodsIndex < Goods.NUMBER_OF_TYPES; goodsIndex++) {
-                int column = goodsIndex + 1 + extraColumns;
+                column = goodsIndex + 1 + extraColumns;
                 int amount = colony.getGoodsCount(goodsIndex);
                 JLabel goodsLabel = new JLabel(String.valueOf(amount), JLabel.TRAILING);
                 if (colonyIndex == 0) {

@@ -3197,27 +3197,22 @@ public final class InGameController implements NetworkConstants {
         Client client = freeColClient.getClient();
         Player player = freeColClient.getMyPlayer();
 
-        int arrears = player.getArrears(type.getIndex());
+        int arrears = player.getArrears(type);
         if (player.getGold() >= arrears) {
             if (freeColClient.getCanvas().showConfirmDialog("model.europe.payArrears", "ok", "cancel",
                     new String[][] { { "%replace%", String.valueOf(arrears) } })) {
                 player.modifyGold(-arrears);
                 freeColClient.getCanvas().updateGoldLabel();
-                player.resetArrears(type.getIndex());
+                player.resetArrears(type);
                 // send to server
                 Element payArrearsElement = Message.createNewRootElement("payArrears");
-                payArrearsElement.setAttribute("goodsType", String.valueOf(type.getIndex()));
+                payArrearsElement.setAttribute("goodsType", type.getId());
                 client.sendAndWait(payArrearsElement);
             }
         } else {
             freeColClient.getCanvas().showInformationMessage("model.europe.cantPayArrears",
                     new String[][] { { "%amount%", String.valueOf(arrears) } });
         }
-    }
-
-    // TODO: make this unnecessary
-    public void payArrears(int typeIndex) {
-        payArrears(FreeCol.getSpecification().getGoodsType(typeIndex));
     }
 
     /**

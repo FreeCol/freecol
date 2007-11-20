@@ -1869,12 +1869,12 @@ public class AIPlayer extends AIObject {
             List<GoodsType> goodsTypes = FreeCol.getSpecification().getGoodsTypeList();
             for (GoodsType type : goodsTypes) {
                 if (type.isStorable()) {
-                    averageIncome += player.getIncomeAfterTaxes(type.getIndex());
+                    averageIncome += player.getIncomeAfterTaxes(type);
                     numberOfGoods++;
                 }
             }
             averageIncome = averageIncome / numberOfGoods;
-            if (player.getIncomeAfterTaxes(toBeDestroyed.getType().getIndex()) > averageIncome) {
+            if (player.getIncomeAfterTaxes(toBeDestroyed.getType()) > averageIncome) {
                 // this is a more valuable type of goods
                 return false;
             } else {

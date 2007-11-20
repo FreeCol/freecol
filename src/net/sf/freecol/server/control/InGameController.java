@@ -157,6 +157,7 @@ public final class InGameController extends Controller {
         
         if (newPlayer.isEuropean()) {
 
+            /* don't make this random for the moment
             try {        
                 Market market = newPlayer.getMarket();
                 // make random change to the market
@@ -169,6 +170,7 @@ public final class InGameController extends Controller {
                 logger.warning("Could not send message to: " + newPlayer.getName() + " with connection "
                         + newPlayer.getConnection());
             }
+            */
 
             if (newPlayer.getCurrentFather() == null && newPlayer.getSettlements().size() > 0) {
                 chooseFoundingFather(newPlayer);

@@ -462,9 +462,9 @@ public class Unit extends FreeColGameObject implements Abilities, Locatable, Loc
 
         setMovesLeft(0);
         getOwner().modifyGold(gold);
-        getOwner().modifySales(goods.getType().getIndex(), goods.getAmount());
-        getOwner().modifyIncomeBeforeTaxes(goods.getType().getIndex(), gold);
-        getOwner().modifyIncomeAfterTaxes(goods.getType().getIndex(), gold);
+        getOwner().modifySales(goods.getType(), goods.getAmount());
+        getOwner().modifyIncomeBeforeTaxes(goods.getType(), gold);
+        getOwner().modifyIncomeAfterTaxes(goods.getType(), gold);
 
         if (settlement instanceof IndianSettlement) {
             IndianSettlement nativeSettlement = ((IndianSettlement) settlement);
