@@ -2083,6 +2083,8 @@ public class Player extends FreeColGameObject implements Abilities, Nameable, Mo
     public void newTurn() {
 
         int newSoL = 0;
+        int newBells = 0;
+        int newCrosses = 0;
 
         // reducing tension levels if nation is native
         if (isIndian()) {
@@ -2101,8 +2103,12 @@ public class Player extends FreeColGameObject implements Abilities, Nameable, Mo
             if (isEuropean()) {
                 Colony colony = (Colony) settlement;
                 newSoL += colony.getSoL();
+                newBells += colony.getGoodsCount(Goods.BELLS);
+                newCrosses += colony.getGoodsCount(Goods.CROSSES);
             }
         }
+        bells = newBells;
+        crosses = newCrosses;
 
         /*
          * Moved founding fathers infront of units so that naval units
