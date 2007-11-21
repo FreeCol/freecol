@@ -31,6 +31,7 @@ import java.util.logging.Level;
 import java.util.logging.LogRecord;
 import java.util.logging.Logger;
 
+import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 
 import net.sf.freecol.FreeCol;
@@ -39,7 +40,9 @@ import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.InGameMenuBar;
+import net.sf.freecol.client.gui.action.BuildColonyAction;
 import net.sf.freecol.client.gui.i18n.Messages;
+import net.sf.freecol.client.gui.option.FreeColActionUI;
 import net.sf.freecol.client.gui.panel.ChoiceItem;
 import net.sf.freecol.client.gui.panel.EventPanel;
 import net.sf.freecol.client.gui.panel.FreeColDialog;
@@ -1491,6 +1494,17 @@ public final class InGameController implements NetworkConstants {
             setNewLandNameElement.setAttribute("newLandName", newLandName);
             client.sendAndWait(setNewLandNameElement);
             canvas.showEventDialog(EventPanel.FIRST_LANDING);
+            
+            final Player player = freeColClient.getMyPlayer();
+            final BuildColonyAction bca = (BuildColonyAction) freeColClient.getActionManager().getFreeColAction(BuildColonyAction.id);
+            final KeyStroke keyStroke = bca.getAccelerator();
+            final String[][] data = new String[][] {
+                {"%build_colony_key%", FreeColActionUI.getHumanKeyStrokeText(keyStroke)},
+                {"%build_colony_menu_item%", Messages.message("unit.state.7")},
+                {"%orders_menu_item%", Messages.message("menuBar.orders")}
+            };
+            player.addModelMessage(new ModelMessage(player, "tutorial.buildColony", data, ModelMessage.TUTORIAL, player));
+            nextModelMessage();
         }
 
         if (unit.getTile().getSettlement() != null && unit.isCarrier() && unit.getTradeRoute() == null

@@ -147,7 +147,7 @@ public final class FreeColActionUI extends JPanel implements OptionUpdater, Acti
     /**
     * Gets a string to represent the given <code>KeyStroke</code> to the user.
     */
-    private static String getHumanKeyStrokeText(KeyStroke keyStroke) {
+    public static String getHumanKeyStrokeText(KeyStroke keyStroke) {
         if (keyStroke == null) {
             return " ";
         }
