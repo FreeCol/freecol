@@ -57,7 +57,6 @@ public class ModelMessage extends FreeColObject {
     private FreeColGameObject source;
     private FreeColObject display;
     private int type;
-    private String messageID;
     private String[][] data;
     private boolean beenDisplayed = false;
 
@@ -71,15 +70,15 @@ public class ModelMessage extends FreeColObject {
     * @param source The source of the message. This is what the message should be
     *               associated with. In addition, the owner of the source is the
     *               player getting the message.
-    * @param messageID The ID of the message to display.
+    * @param id The ID of the message to display.
     * @param data Contains data to be displayed in the message or <i>null</i>.
     * @param type The type of this model message.
     * @param display The Object to display.
     * @see FreeColGameObject#addModelMessage(FreeColGameObject, String, String[][], int)
     */
-    public ModelMessage(FreeColGameObject source, String messageID, String[][] data, int type, FreeColObject display) {
+    public ModelMessage(FreeColGameObject source, String id, String[][] data, int type, FreeColObject display) {
         this.source = source;
-        this.messageID = messageID;
+        setId(id);
         this.data = data;
         this.type = type;
         this.display = display;
@@ -93,8 +92,8 @@ public class ModelMessage extends FreeColObject {
         if (source == null) {
             throw new IllegalArgumentException("The source cannot be null.");
         }
-        if (messageID == null) {
-            throw new IllegalArgumentException("The messageID cannot be null.");
+        if (getId() == null) {
+            throw new IllegalArgumentException("The id cannot be null.");
         }
         if (!(display == null ||
               display instanceof FreeColGameObject ||
@@ -117,13 +116,13 @@ public class ModelMessage extends FreeColObject {
     * @param source The source of the message. This is what the message should be
     *               associated with. In addition, the owner of the source is the
     *               player getting the message.
-    * @param messageID The ID of the message to display.
+    * @param id The ID of the message to display.
     * @param data Contains data to be displayed in the message or <i>null</i>.
     * @param type The type of this model message.
     * @see FreeColGameObject#addModelMessage(FreeColGameObject, String, String[][], int)
     */
-    public ModelMessage(FreeColGameObject source, String messageID, String[][] data, int type) {
-        this(source, messageID, data, type, getDefaultDisplay(type, source));
+    public ModelMessage(FreeColGameObject source, String id, String[][] data, int type) {
+        this(source, id, data, type, getDefaultDisplay(type, source));
 
     }
 
@@ -133,12 +132,12 @@ public class ModelMessage extends FreeColObject {
     * @param source The source of the message. This is what the message should be
     *               associated with. In addition, the owner of the source is the
     *               player getting the message.
-    * @param messageID The ID of the message to display.
+    * @param id The ID of the message to display.
     * @param data Contains data to be displayed in the message or <i>null</i>.
     * @see FreeColGameObject#addModelMessage(FreeColGameObject, String, String[][], int)
     */
-    public ModelMessage(FreeColGameObject source, String messageID, String[][] data) {
-        this(source, messageID, data, DEFAULT);
+    public ModelMessage(FreeColGameObject source, String id, String[][] data) {
+        this(source, id, data, DEFAULT);
     }
     
     /**
@@ -214,14 +213,6 @@ public class ModelMessage extends FreeColObject {
     */
     public FreeColGameObject getSource() {
         return source;
-    }
-    
-    /**
-     * Gets the ID of the message to display.   
-     * @return The ID. 
-     */
-    public String getId() {
-        return messageID;
     }
     
     /**
@@ -332,7 +323,7 @@ public class ModelMessage extends FreeColObject {
             }
         }
         return ( source.equals(m.source)
-                && messageID.equals(m.messageID)
+                && getId().equals(m.getId())
                 && type == m.type );
     }
     
@@ -340,7 +331,7 @@ public class ModelMessage extends FreeColObject {
     public int hashCode() {
         int value = 1;
         value = 37 * value + source.hashCode();
-        value = 37 * value + messageID.hashCode();
+        value = 37 * value + getId().hashCode();
         if (data != null) {
             for (String[] s : data) {
                 value = 37 * value + s[0].hashCode();
@@ -354,7 +345,7 @@ public class ModelMessage extends FreeColObject {
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder("ModelMessage<");
-        sb.append(hashCode() + ", " + source.getId() + ", " + messageID + ", ");
+        sb.append(hashCode() + ", " + source.getId() + ", " + getId() + ", ");
         if (data != null) {
             for (String[] s : data) {
                 sb.append(Arrays.toString(s) + "/");
@@ -376,7 +367,7 @@ public class ModelMessage extends FreeColObject {
             out.writeAttribute("display", display.getId());
         }
         out.writeAttribute("type", String.valueOf(type));
-        out.writeAttribute("messageID", messageID);
+        out.writeAttribute("ID", getId());
         out.writeAttribute("hasBeenDisplayed", String.valueOf(beenDisplayed));
         if (data != null) {
             toArrayElement("data", data, out);
@@ -391,7 +382,7 @@ public class ModelMessage extends FreeColObject {
      *      during parsing.
      */
     public void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
-        messageID = in.getAttributeValue(null, "messageID");
+        setId(in.getAttributeValue(null, "ID"));
         type = getAttribute(in, "type", DEFAULT);
         beenDisplayed = Boolean.parseBoolean(in.getAttributeValue(null, "hasBeenDisplayed"));
 
@@ -412,7 +403,7 @@ public class ModelMessage extends FreeColObject {
      *      during parsing.
      */
     public void readFromXML(XMLStreamReader in, Game game) throws XMLStreamException {
-        messageID = in.getAttributeValue(null, "messageID");
+        setId(in.getAttributeValue(null, "ID"));
         type = getAttribute(in, "type", DEFAULT);
         beenDisplayed = Boolean.parseBoolean(in.getAttributeValue(null, "hasBeenDisplayed"));
 

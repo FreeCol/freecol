@@ -49,12 +49,6 @@ public abstract class TradeItem extends FreeColObject {
     private Player destination;
 
     /**
-     * The ID, used to get a name, etc.
-     */
-    private String id;
-
-        
-    /**
      * Creates a new <code>TradeItem</code> instance.
      *
      * @param game a <code>Game</code> value
@@ -64,7 +58,7 @@ public abstract class TradeItem extends FreeColObject {
      */
     public TradeItem(Game game, String id, Player source, Player destination) {
         this.game = game;
-        this.id = id;
+        setId(id);
         this.source = source;
         this.destination = destination;
     }
@@ -77,24 +71,6 @@ public abstract class TradeItem extends FreeColObject {
      */
     public TradeItem(Game game, XMLStreamReader in) throws XMLStreamException {
         this.game = game;
-    }
-
-    /**
-     * Get the <code>ID</code> value.
-     *
-     * @return a <code>String</code> value
-     */
-    public final String getId() {
-        return id;
-    }
-
-    /**
-     * Set the <code>ID</code> value.
-     *
-     * @param newID The new ID value.
-     */
-    public final void setId(final String newID) {
-        this.id = newID;
     }
 
     /**
@@ -181,7 +157,7 @@ public abstract class TradeItem extends FreeColObject {
      *      during parsing.
      */
     protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
-        this.id = in.getAttributeValue(null, "ID");
+        setId(in.getAttributeValue(null, "ID"));
         String sourceID = in.getAttributeValue(null, "source");
         this.source = (Player) game.getFreeColGameObject(sourceID);
         String destinationID = in.getAttributeValue(null, "destination");
@@ -197,7 +173,7 @@ public abstract class TradeItem extends FreeColObject {
      *      to the stream.
      */
     public void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
-        out.writeAttribute("ID", this.id);
+        out.writeAttribute("ID", getId());
         out.writeAttribute("source", this.source.getId());
         out.writeAttribute("destination", this.destination.getId());
     }

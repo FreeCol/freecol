@@ -144,7 +144,7 @@ public class GoodsWish extends Wish {
       *      from the stream.
       */
      protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {        
-         id = in.getAttributeValue(null, "ID");
+         setId(in.getAttributeValue(null, "ID"));
          destination = (Location) getAIMain().getFreeColGameObject(in.getAttributeValue(null, "destination"));
          
          final String transportableStr = in.getAttributeValue(null, "transportable");

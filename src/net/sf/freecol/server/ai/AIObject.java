@@ -39,7 +39,6 @@ public abstract class AIObject extends FreeColObject {
     
     private final AIMain aiMain;
     protected boolean uninitialized = false;
-    protected String id = null;
 
     
     /**
@@ -60,7 +59,7 @@ public abstract class AIObject extends FreeColObject {
      */
     public AIObject(AIMain aiMain, String id) {
         this.aiMain = aiMain;
-        this.id = id;
+        setId(id);
         aiMain.addAIObject(id, this);
     }
 
@@ -84,14 +83,6 @@ public abstract class AIObject extends FreeColObject {
     public boolean isUninitialized() {
         return uninitialized;
     }
-    
-    /**
-    * Returns the ID of this <code>AIObject</code>.
-    * @return The ID of this <code>AIObject</code>. This is normally
-    *         the ID of the {@link FreeColGameObject} this object
-    *         represents.
-    */
-    public abstract String getId();
     
     /**
      * Initialize this object from an XML-representation of this object.

@@ -69,6 +69,7 @@ public class AbstractGoods extends FreeColObject {
      *
      * @return a <code>String</code> value
      */
+    @Override
     public String getId() {
         return type.getId();
     }

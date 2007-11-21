@@ -141,14 +141,6 @@ public class TileImprovementPlan extends AIObject {
     }    
 
     /**
-     * Returns the ID for this <code>TileImprovementPlan</code>.
-     * @return The ID of this <code>TileImprovementPlan</code>.
-     */
-    public String getId() {
-        return id;
-    }
-
-    /**
     * Returns the value for this <code>TileImprovementPlan</code>.
     * @return The value identifying the importance of
     *         this <code>TileImprovementPlan</code> - a higher value 
@@ -250,7 +242,7 @@ public class TileImprovementPlan extends AIObject {
      *      from the stream.
      */
     protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
-        id = in.getAttributeValue(null, "ID");
+        setId(in.getAttributeValue(null, "ID"));
         type = FreeCol.getSpecification().getTileImprovementType(Integer.parseInt(in.getAttributeValue(null, "type")));
         value = Integer.parseInt(in.getAttributeValue(null, "value"));
         

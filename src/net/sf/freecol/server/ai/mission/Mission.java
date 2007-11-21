@@ -79,15 +79,6 @@ public abstract class Mission extends AIObject {
 
     
     /**
-     * Gets the ID of this mission.
-     * @return The ID.
-     */
-    public String getId() {
-        return null;
-    }
-    
-    
-    /**
     * Moves the unit owning this mission towards the given <code>Tile</code>.
     * This is done in a loop until the tile is reached, there are no moves left,
     * the path to the target cannot be found or that the next step is not a move.

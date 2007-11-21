@@ -32,12 +32,6 @@ import javax.xml.stream.XMLStreamWriter;
  */
 public abstract class Feature extends FreeColObject {
 
-
-    /**
-     * The ID of the abstractModifier, used to look up name, etc.
-     */
-    private String id;
-
     /**
      * The category of this Feature, e.g. "offenseModifier".
      */
@@ -89,24 +83,6 @@ public abstract class Feature extends FreeColObject {
     }
 
     /**
-     * Get the <code>Id</code> value.
-     *
-     * @return a <code>String</code> value
-     */
-    public String getId() {
-        return id;
-    }
-
-    /**
-     * Set the <code>Id</code> value.
-     *
-     * @param newId The new Id value.
-     */
-    public void setId(final String newId) {
-        this.id = newId;
-    }
-
-    /**
      * Returns true if the <code>appliesTo</code> method of at least
      * one <code>Scope</code> object returns true.
      *
@@ -137,7 +113,7 @@ public abstract class Feature extends FreeColObject {
      *      to the stream.
      */
     public void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
-        out.writeAttribute("id", id);
+        out.writeAttribute("id", getId());
         if (getSource() != null) {
             out.writeAttribute("source", source);
         }

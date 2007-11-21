@@ -301,14 +301,6 @@ public class AIGoods extends AIObject implements Transportable {
     
     
     /**
-     * Returns the ID of this {@link AIObject}.
-     * @return The ID.
-     */
-    public String getId() {
-        return id;
-    }
-
-    /**
      * Writes this object to an XML stream.
      *
      * @param out The target stream.
@@ -318,7 +310,7 @@ public class AIGoods extends AIObject implements Transportable {
     protected void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
         out.writeStartElement(getXMLElementTagName());
 
-        out.writeAttribute("ID", id);
+        out.writeAttribute("ID", getId());
         if (destination != null) {
             out.writeAttribute("destination", destination.getId());
         }
@@ -346,7 +338,7 @@ public class AIGoods extends AIObject implements Transportable {
      *      from the stream.
      */
     protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
-        id = in.getAttributeValue(null, "ID");
+        setId(in.getAttributeValue(null, "ID"));
         final String destinationStr = in.getAttributeValue(null, "destination");
         if (destinationStr != null) {
             destination = (Location) getAIMain().getFreeColGameObject(destinationStr);

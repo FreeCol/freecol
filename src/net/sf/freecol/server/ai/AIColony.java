@@ -1165,16 +1165,6 @@ public class AIColony extends AIObject {
      */
 
     /**
-     * Gets the ID of this object.
-     * 
-     * @return The same ID as the <code>Colony</code> this
-     *         <code>AIColony</code> stores AI-specific information for.
-     */
-    public String getId() {
-        return colony.getId();
-    }
-
-    /**
      * Writes this object to an XML stream.
      * 
      * @param out The target stream.

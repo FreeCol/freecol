@@ -51,10 +51,8 @@ import org.w3c.dom.Element;
  * {@link #getEntryLocation entry location}.
  */
 public class Player extends FreeColGameObject implements Abilities, Nameable, Modifiers {
+
     private static final Logger logger = Logger.getLogger(Player.class.getName());
-
-
-
 
     /**
      * The number of players. At the moment, we have 24 players: 8
@@ -166,8 +164,6 @@ public class Player extends FreeColGameObject implements Abilities, Nameable, Mo
 
     /** The current tax rate for this player. */
     private int tax = 0;
-
-    private java.util.Map<GoodsType, MarketData> marketData = new HashMap<GoodsType, MarketData>();
 
     // 0 = pre-rebels; 1 = in rebellion; 2 = independence granted
     private int rebellionState;
@@ -2360,9 +2356,7 @@ public class Player extends FreeColGameObject implements Abilities, Nameable, Mo
 
         toArrayElement("tension", tensionArray, out);
         toArrayElement("stance", stance, out);
-        for (MarketData data : marketData.values()) {
-            data.toXMLImpl(out);
-        }
+
         for (TradeRoute route : getTradeRoutes()) {
             route.toXML(out, this);
         }
@@ -2452,10 +2446,6 @@ public class Player extends FreeColGameObject implements Abilities, Nameable, Mo
                 }
             } else if (in.getLocalName().equals("stance")) {
                 stance = readFromArrayElement("stance", in, new int[0]);
-            } else if (in.getLocalName().equals("marketData")) {
-                MarketData data = new MarketData();
-                data.readFromXMLImpl(in);
-                marketData.put(data.goodsType, data);
             } else if (in.getLocalName().equals(Europe.getXMLElementTagName())) {
                 europe = (Europe) getGame().getFreeColGameObject(in.getAttributeValue(null, "ID"));
                 if (europe != null) {
@@ -2588,11 +2578,11 @@ public class Player extends FreeColGameObject implements Abilities, Nameable, Mo
      * @return The arrears due for this type of goods.
      */
     public int getArrears(GoodsType type) {
-        MarketData data = marketData.get(type);
+        MarketData data = getMarket().getMarketData(type);
         if (data == null) {
             return Integer.MIN_VALUE;
         } else {
-            return data.arrears;
+            return data.getArrears();
         }
     }
 
@@ -2612,12 +2602,12 @@ public class Player extends FreeColGameObject implements Abilities, Nameable, Mo
      * @param goodsType a <code>GoodsType</code> value
      */
     public void setArrears(GoodsType goodsType) {
-        MarketData data = marketData.get(goodsType);
+        MarketData data = getMarket().getMarketData(goodsType);
         if (data == null) {
             data = new MarketData(goodsType);
-            marketData.put(goodsType, data);
+            getMarket().putMarketData(goodsType, data);
         }
-        data.arrears = (getDifficulty() + 3) * 100 * getMarket().paidForSale(goodsType);
+        data.setArrears((getDifficulty() + 3) * 100 * data.getPaidForSale());
     }
 
     /**
@@ -2635,12 +2625,12 @@ public class Player extends FreeColGameObject implements Abilities, Nameable, Mo
      * @param goodsType a <code>GoodsType</code> value
      */
     public void resetArrears(GoodsType goodsType) {
-        MarketData data = marketData.get(goodsType);
+        MarketData data = getMarket().getMarketData(goodsType);
         if (data == null) {
             data = new MarketData(goodsType);
-            marketData.put(goodsType, data);
+            getMarket().putMarketData(goodsType, data);
         }
-        data.arrears = 0;
+        data.setArrears(0);
     }
 
     /**
@@ -2674,11 +2664,11 @@ public class Player extends FreeColGameObject implements Abilities, Nameable, Mo
      * @return <code>true</code> if type of goods can be traded.
      */
     public boolean canTrade(GoodsType type, int marketAccess) {
-        MarketData data = marketData.get(type);
+        MarketData data = getMarket().getMarketData(type);
         if (data == null) {
             return true;
         } else {
-            return (data.arrears == 0 ||
+            return (data.getArrears() == 0 ||
                     (marketAccess == Market.CUSTOM_HOUSE &&
                      getGameOptions().getBoolean(GameOptions.CUSTOM_IGNORE_BOYCOTT)));
         }
@@ -2750,11 +2740,11 @@ public class Player extends FreeColGameObject implements Abilities, Nameable, Mo
      * @return The current sales.
      */
     public int getSales(GoodsType goodsType) {
-        MarketData data = marketData.get(goodsType);
+        MarketData data = getMarket().getMarketData(goodsType);
         if (data == null) {
             return 0;
         } else {
-            return data.sales;
+            return data.getSales();
         }
     }
 
@@ -2765,12 +2755,13 @@ public class Player extends FreeColGameObject implements Abilities, Nameable, Mo
      * @param amount The new sales.
      */
     public void modifySales(GoodsType goodsType, int amount) {
-        MarketData data = marketData.get(goodsType);
+        MarketData data = getMarket().getMarketData(goodsType);
         if (data == null) {
             data = new MarketData(goodsType);
-            marketData.put(goodsType, data);
+            getMarket().putMarketData(goodsType, data);
         }
-        data.sales += amount;
+        int oldSales = data.getSales();
+        data.setSales(oldSales + amount);
     }
 
     /**
@@ -2780,11 +2771,11 @@ public class Player extends FreeColGameObject implements Abilities, Nameable, Mo
      * @return The current incomeBeforeTaxes.
      */
     public int getIncomeBeforeTaxes(GoodsType goodsType) {
-        MarketData data = marketData.get(goodsType);
+        MarketData data = getMarket().getMarketData(goodsType);
         if (data == null) {
             return 0;
         } else {
-            return data.incomeBeforeTaxes;
+            return data.getIncomeBeforeTaxes();
         }
     }
 
@@ -2795,12 +2786,13 @@ public class Player extends FreeColGameObject implements Abilities, Nameable, Mo
      * @param amount The new incomeBeforeTaxes.
      */
     public void modifyIncomeBeforeTaxes(GoodsType goodsType, int amount) {
-        MarketData data = marketData.get(goodsType);
+        MarketData data = getMarket().getMarketData(goodsType);
         if (data == null) {
             data = new MarketData(goodsType);
-            marketData.put(goodsType, data);
+            getMarket().putMarketData(goodsType, data);
         }
-        data.incomeBeforeTaxes += amount;
+        int oldAmount = data.getIncomeBeforeTaxes();
+        data.setIncomeBeforeTaxes(oldAmount += amount);
     }
 
     /**
@@ -2810,11 +2802,11 @@ public class Player extends FreeColGameObject implements Abilities, Nameable, Mo
      * @return The current incomeAfterTaxes.
      */
     public int getIncomeAfterTaxes(GoodsType goodsType) {
-        MarketData data = marketData.get(goodsType);
+        MarketData data = getMarket().getMarketData(goodsType);
         if (data == null) {
             return 0;
         } else {
-            return data.incomeAfterTaxes;
+            return data.getIncomeAfterTaxes();
         }
     }
 
@@ -2825,12 +2817,13 @@ public class Player extends FreeColGameObject implements Abilities, Nameable, Mo
      * @param amount The new incomeAfterTaxes.
      */
     public void modifyIncomeAfterTaxes(GoodsType goodsType, int amount) {
-        MarketData data = marketData.get(goodsType);
+        MarketData data = getMarket().getMarketData(goodsType);
         if (data == null) {
             data = new MarketData(goodsType);
-            marketData.put(goodsType, data);
+            getMarket().putMarketData(goodsType, data);
         }
-        data.incomeAfterTaxes += amount;
+        int oldAmount = data.getIncomeAfterTaxes();
+        data.setIncomeAfterTaxes(oldAmount + amount);
     }
 
 
@@ -3027,59 +3020,5 @@ public class Player extends FreeColGameObject implements Abilities, Nameable, Mo
             return units.iterator();
         }
     }
-
-    private static final class MarketData extends FreeColObject {
-        GoodsType goodsType;
-        int arrears;
-        int sales;
-        int incomeBeforeTaxes;
-        int incomeAfterTaxes;
-
-        public MarketData() {}
-
-        public MarketData(GoodsType goodsType) {
-            this.goodsType = goodsType;
-        }
-
-        protected void toXMLImpl(XMLStreamWriter out) 
-            throws XMLStreamException {
-            // Start element:
-            out.writeStartElement(getXMLElementTagName());
-
-            out.writeAttribute("ID", goodsType.getId());
-            out.writeAttribute("arrears", Integer.toString(arrears));
-            out.writeAttribute("sales", Integer.toString(sales));
-            out.writeAttribute("incomeBeforeTaxes", Integer.toString(incomeBeforeTaxes));
-            out.writeAttribute("incomeAfterTaxes", Integer.toString(incomeAfterTaxes));
-
-            out.writeEndElement();
-        }
-
-        /**
-         * Initialize this object from an XML-representation of this object.
-         * @param in The input stream with the XML.
-         */
-        protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
-            goodsType = FreeCol.getSpecification().getGoodsType(in.getAttributeValue(null, "ID"));
-            arrears = Integer.parseInt(in.getAttributeValue(null, "arrears"));
-            sales = Integer.parseInt(in.getAttributeValue(null, "sales"));
-            incomeBeforeTaxes = Integer.parseInt(in.getAttributeValue(null, "incomeBeforeTaxes"));
-            incomeAfterTaxes = Integer.parseInt(in.getAttributeValue(null, "incomeAfterTaxes"));
-            
-            in.nextTag();
-        }
-
-        /**
-         * Returns the tag name of the root element representing this object.
-         *
-         * @return the tag name.
-         */
-        public static String getXMLElementTagName() {
-            return "marketData";
-        }
-
-
-    }
-
 
 }

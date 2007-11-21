@@ -47,12 +47,29 @@ import org.xml.sax.SAXException;
 
 public abstract class FreeColObject {
 
-
     protected static Logger logger = Logger.getLogger(FreeColObject.class.getName());
 
+    /**
+     * Describe id here.
+     */
+    private String id;
 
+    /**
+     * Get the <code>Id</code> value.
+     *
+     * @return a <code>String</code> value
+     */
     public String getId() {
-        return null;
+        return id;
+    }
+
+    /**
+     * Set the <code>Id</code> value.
+     *
+     * @param newId The new Id value.
+     */
+    protected void setId(final String newId) {
+        this.id = newId;
     }
 
     /**
