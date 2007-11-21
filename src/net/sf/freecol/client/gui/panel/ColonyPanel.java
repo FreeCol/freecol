@@ -916,6 +916,7 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener, C
             event.getComponent() instanceof UnitLabel) {
             updateCargoLabel();
             updateCarrierButtons();
+            updateWarehouse();
             refresh();
         }
     }
