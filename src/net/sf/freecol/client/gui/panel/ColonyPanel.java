@@ -523,7 +523,12 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener, C
             Unit unit = selectedUnit.getUnit();
             if (unit != null && unit.isCarrier() && unit.getSpaceLeft() < unit.getInitialSpaceLeft()) {
                 unloadButton.setEnabled(true);
-                fillButton.setEnabled(true);
+                for (Goods goods : unit.getGoodsList()) {
+                    if (getColony().getGoodsCount(goods.getType()) > 0) {
+                        fillButton.setEnabled(true);
+                        return;
+                    }
+                }
             }
         }
     }
