@@ -3532,6 +3532,8 @@ public final class InGameController implements NetworkConstants {
             return freeColClient.getClientOptions().getBoolean(ClientOptions.SHOW_MARKET_PRICES);
         case ModelMessage.MISSING_GOODS:
             return freeColClient.getClientOptions().getBoolean(ClientOptions.SHOW_MISSING_GOODS);
+        case ModelMessage.TUTORIAL:
+            return freeColClient.getClientOptions().getBoolean(ClientOptions.SHOW_TUTORIAL);
         default:
             return true;
         }

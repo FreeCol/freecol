@@ -119,6 +119,7 @@ public class ClientOptions extends OptionMap {
     public static final String SHOW_MARKET_PRICES = "guiShowMarketPrices";
     public static final String SHOW_LOST_CITY_RUMOURS = "guiShowLostCityRumours";
     public static final String SHOW_MISSING_GOODS = "guiShowMissingGoods";
+    public static final String SHOW_TUTORIAL = "guiShowTutorial";
     public static final String SHOW_COLONY_WARNINGS = "guiShowColonyWarnings";
     public static final String SHOW_PRECOMBAT = "guiShowPreCombat";
     
@@ -396,6 +397,7 @@ public class ClientOptions extends OptionMap {
         new BooleanOption(SHOW_MISSING_GOODS, messagesGroup, true);
         new BooleanOption(SHOW_COLONY_WARNINGS, messagesGroup, true);
         new BooleanOption(SHOW_PRECOMBAT, messagesGroup, true);
+        new BooleanOption(SHOW_TUTORIAL, messagesGroup, true);
         add(messagesGroup);
         
         OptionGroup savegamesGroup = new OptionGroup("clientOptions.savegames");
