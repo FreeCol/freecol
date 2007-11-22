@@ -22,14 +22,10 @@ package net.sf.freecol.client.gui.panel;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.event.MouseListener;
-
-import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.List;
 
-import javax.swing.border.TitledBorder;
 import javax.swing.BorderFactory;
-import javax.swing.JPanel;
+import javax.swing.border.TitledBorder;
 
 import net.sf.freecol.client.control.InGameController;
 import net.sf.freecol.client.gui.Canvas;

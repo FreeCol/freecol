@@ -33,8 +33,8 @@ import javax.swing.JPanel;
 import javax.swing.UIManager;
 import javax.swing.border.BevelBorder;
 import javax.swing.event.MouseInputListener;
-import net.sf.freecol.FreeCol;
 
+import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.action.MiniMapZoomInAction;

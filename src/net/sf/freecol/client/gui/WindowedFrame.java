@@ -21,8 +21,6 @@
 
 package net.sf.freecol.client.gui;
 
-import java.awt.GraphicsEnvironment;
-import java.awt.Rectangle;
 import java.util.logging.Logger;
 
 import javax.swing.JComponent;

@@ -23,16 +23,12 @@ package net.sf.freecol.client.gui.panel;
 import java.awt.Color;
 import java.awt.Component;
 import java.util.List;
-//import java.util.Vector;
 
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JTable;
 import javax.swing.table.TableCellRenderer;
 
-import net.sf.freecol.FreeCol;
-import net.sf.freecol.common.model.EuropeanNationType;
-import net.sf.freecol.common.model.IndianNationType;
 import net.sf.freecol.common.model.Nation;
 import net.sf.freecol.common.model.Player;
 

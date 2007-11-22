@@ -22,9 +22,11 @@ package net.sf.freecol.client.gui.action;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
+
 import net.sf.freecol.common.model.FreeColGameObjectType;
 import net.sf.freecol.common.model.TileImprovementType;
 

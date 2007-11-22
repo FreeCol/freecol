@@ -23,9 +23,9 @@ import java.awt.Color;
 import java.awt.Image;
 
 import javax.swing.ImageIcon;
+
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.TileType;
-
 import net.sf.freecol.common.model.Unit;
 
 /**

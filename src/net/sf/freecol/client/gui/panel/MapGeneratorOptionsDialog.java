@@ -36,7 +36,6 @@ import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.UIManager;
 
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.FreeColClient;

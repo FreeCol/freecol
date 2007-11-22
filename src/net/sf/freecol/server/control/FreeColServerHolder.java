@@ -19,8 +19,8 @@
 
 package net.sf.freecol.server.control;
 
-import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.PseudoRandom;
+import net.sf.freecol.common.model.Game;
 import net.sf.freecol.server.FreeColServer;
 
 /**

@@ -27,11 +27,10 @@ import javax.swing.JButton;
 import javax.swing.JLabel;
 
 import net.sf.freecol.client.gui.i18n.Messages;
-import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.IndianSettlement;
-import cz.autel.dmi.HIGLayout;
 import net.sf.freecol.common.model.UnitType;
+import cz.autel.dmi.HIGLayout;
 
 /**
  * This panel is used to show information about an Indian settlement.

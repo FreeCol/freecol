@@ -29,10 +29,8 @@ import java.awt.event.MouseAdapter;
 import java.util.logging.Logger;
 
 import javax.swing.AbstractButton;
-import javax.swing.border.Border;
 import javax.swing.Action;
 import javax.swing.BorderFactory;
-import javax.swing.ComponentInputMap;
 import javax.swing.InputMap;
 import javax.swing.JButton;
 import javax.swing.JComponent;
@@ -40,8 +38,8 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextArea;
 import javax.swing.KeyStroke;
-import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
+import javax.swing.border.Border;
 
 import net.sf.freecol.client.gui.Canvas;
 import cz.autel.dmi.HIGConstraints;

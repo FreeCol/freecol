@@ -28,7 +28,6 @@ import java.awt.FontFormatException;
 import java.awt.Image;
 import java.awt.MediaTracker;
 import java.awt.Point;
-import java.awt.Rectangle;
 import java.awt.Toolkit;
 import java.io.File;
 import java.io.FileInputStream;

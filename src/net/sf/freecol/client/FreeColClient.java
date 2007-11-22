@@ -59,8 +59,8 @@ import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.networking.Message;
 import net.sf.freecol.common.option.LanguageOption;
-import net.sf.freecol.common.option.LanguageOption.Language;
 import net.sf.freecol.common.option.Option;
+import net.sf.freecol.common.option.LanguageOption.Language;
 import net.sf.freecol.server.FreeColServer;
 
 import org.w3c.dom.Element;

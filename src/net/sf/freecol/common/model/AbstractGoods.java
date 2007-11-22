@@ -25,8 +25,6 @@ import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.freecol.FreeCol;
 
-import org.w3c.dom.Element;
-
 /**
  * Represents a certain amount of a GoodsType. It does not correspond
  * to actual cargo present in a Location. It is intended to represent

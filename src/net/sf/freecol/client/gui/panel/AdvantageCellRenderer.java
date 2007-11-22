@@ -33,8 +33,6 @@ import javax.swing.table.TableCellRenderer;
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.EuropeanNationType;
-import net.sf.freecol.common.model.IndianNationType;
-import net.sf.freecol.common.model.Nation;
 import net.sf.freecol.common.model.Player;
 
 /**

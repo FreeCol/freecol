@@ -54,14 +54,13 @@ import javax.swing.filechooser.FileFilter;
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.Colony;
-import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.IndianSettlement;
 import net.sf.freecol.common.model.Modifier;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.Unit;
-import cz.autel.dmi.HIGLayout;
 import net.sf.freecol.common.model.UnitType;
+import cz.autel.dmi.HIGLayout;
 
 
 /**

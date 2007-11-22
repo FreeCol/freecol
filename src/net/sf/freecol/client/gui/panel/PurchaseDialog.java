@@ -29,17 +29,16 @@ import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextArea;
-import net.sf.freecol.FreeCol;
 
+import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.control.InGameController;
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.Player;
-import net.sf.freecol.common.model.Unit;
-import cz.autel.dmi.HIGLayout;
 import net.sf.freecol.common.model.UnitType;
+import cz.autel.dmi.HIGLayout;
 
 /**
  * The panel that allows a user to purchase ships and artillery in Europe.

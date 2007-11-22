@@ -28,7 +28,6 @@ import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
-import java.util.Vector;
 import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamConstants;

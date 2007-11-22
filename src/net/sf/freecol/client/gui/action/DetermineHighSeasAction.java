@@ -22,7 +22,6 @@ package net.sf.freecol.client.gui.action;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.Vector;
 import java.util.logging.Logger;
 
 import javax.swing.BoxLayout;
@@ -37,8 +36,6 @@ import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.client.gui.panel.FreeColDialog;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Map;
-import net.sf.freecol.common.model.Tile;
-import net.sf.freecol.common.model.Map.Position;
 import net.sf.freecol.server.generator.TerrainGenerator;
 
 /**

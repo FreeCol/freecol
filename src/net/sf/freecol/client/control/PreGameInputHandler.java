@@ -22,8 +22,8 @@ package net.sf.freecol.client.control;
 
 import java.awt.Color;
 import java.util.logging.Logger;
-import javax.swing.SwingUtilities;
 
+import javax.swing.SwingUtilities;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;

@@ -29,8 +29,8 @@ import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
-import net.sf.freecol.common.option.Option;
 import net.sf.freecol.common.option.LanguageOption;
+import net.sf.freecol.common.option.Option;
 import net.sf.freecol.common.option.LanguageOption.Language;
 
 
