@@ -217,6 +217,11 @@ public class ClientOptions extends OptionMap {
                             COLONY_COMPARATOR_SOL = 4;
 
     /**
+     * If enabled: Automatically ends the turn when no units can be made active.
+     */
+    public static final String AUTO_END_TURN = "autoEndTurn";
+    
+    /**
      * Comparators for sorting colonies.
      */
     private static Comparator<Colony> colonyAgeComparator = new Comparator<Colony>() {
@@ -418,6 +423,7 @@ public class ClientOptions extends OptionMap {
 
         OptionGroup otherGroup = new OptionGroup("clientOptions.other");
         new BooleanOption(AUTOLOAD_EMIGRANTS, otherGroup, false);
+        new BooleanOption(AUTO_END_TURN, otherGroup, true);
         add(otherGroup);
 
     }

@@ -55,7 +55,6 @@ import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.ColonyTile;
 import net.sf.freecol.common.model.DiplomaticTrade;
 import net.sf.freecol.common.model.Europe;
-import net.sf.freecol.common.model.FoundingFather;
 import net.sf.freecol.common.model.FreeColGameObject;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.GoalDecider;
@@ -102,6 +101,11 @@ public final class InGameController implements NetworkConstants {
      */
     private boolean endingTurn = false;
 
+    /**
+     * If true, then at least one unit has been active and the turn may automatically be ended.
+     */
+    private boolean canAutoEndTurn = false;
+    
     /**
      * Sets that all going-to orders should be executed.
      */
@@ -3368,6 +3372,7 @@ public final class InGameController implements NetworkConstants {
         Unit nextActiveUnit = myPlayer.getNextActiveUnit();
 
         if (nextActiveUnit != null) {
+            canAutoEndTurn = true;
             gui.setActiveUnit(nextActiveUnit);
         } else {
             // no more active units, so we can move the others
@@ -3383,6 +3388,11 @@ public final class InGameController implements NetworkConstants {
                 gui.setActiveUnit(null);
             } else {
                 gui.setActiveUnit(null);
+            }
+            
+            if (canAutoEndTurn && !endingTurn
+                    && freeColClient.getClientOptions().getBoolean(ClientOptions.AUTO_END_TURN)) {
+                endTurn();
             }
         }
     }
@@ -3563,6 +3573,7 @@ public final class InGameController implements NetworkConstants {
         }
 
         endingTurn = true;
+        canAutoEndTurn = false;
 
         nextActiveUnit(null);
     }
