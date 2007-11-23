@@ -30,6 +30,7 @@ import javax.xml.stream.XMLStreamWriter;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.PathNode;
+import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.Map.Position;
@@ -203,11 +204,16 @@ public class BuildColonyMission extends Mission {
                 buildColonyElement.setAttribute("unit", unit.getId());
 
                 try {
-                    connection.ask(buildColonyElement);
-                    colonyBuilt = true;
-                    getAIUnit().setMission(
-                            new WorkInsideColonyMission(getAIMain(), getAIUnit(), (AIColony) getAIMain().getAIObject(
-                                    unit.getTile().getSettlement())));
+                    Element reply = connection.ask(buildColonyElement);
+                    if (reply!=null && reply.getTagName().equals("buildColonyConfirmed")) {
+                        colonyBuilt = true;
+                        Settlement settlement = unit.getTile().getSettlement();
+                        AIColony aiColony = (AIColony) getAIMain().getAIObject(settlement);
+                        getAIUnit().setMission(new WorkInsideColonyMission(getAIMain(), getAIUnit(), aiColony));
+                    }
+                    else {
+                        logger.warning("Could not build an AI colony on tile "+getUnit().getTile().getPosition().toString());
+                    }
                 } catch (IOException e) {
                     logger.warning("Could not send \"buildColonyElement\"-message!");
                 }
