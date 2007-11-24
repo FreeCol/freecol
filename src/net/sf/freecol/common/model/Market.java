@@ -210,8 +210,8 @@ public final class Market extends FreeColGameObject implements Ownable {
      */
     public int costToBuy(GoodsType type) {
         MarketData data = marketData.get(type);
-        if (type == null) {
-            return Integer.MIN_VALUE;
+        if (data == null) {
+            return 0;
         } else {
             return data.getCostToBuy();
         }
@@ -228,8 +228,8 @@ public final class Market extends FreeColGameObject implements Ownable {
      */
     public int paidForSale(GoodsType type) {
         MarketData data = marketData.get(type);
-        if (type == null) {
-            return Integer.MIN_VALUE;
+        if (data == null) {
+            return 0;
         } else {
             return data.getPaidForSale();
         }
@@ -384,7 +384,7 @@ public final class Market extends FreeColGameObject implements Ownable {
     public int getBidPrice(GoodsType type, int amount) {
         MarketData data = marketData.get(type);
         if (data == null) {
-            return Integer.MIN_VALUE;
+            return 0;
         } else {
             return (amount * data.getCostToBuy());
         }
@@ -400,7 +400,7 @@ public final class Market extends FreeColGameObject implements Ownable {
     public int getSalePrice(GoodsType type, int amount) {
         MarketData data = marketData.get(type);
         if (data == null) {
-            return Integer.MIN_VALUE;
+            return 0;
         } else {
             return (amount * data.getPaidForSale());
         }
