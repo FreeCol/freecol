@@ -551,6 +551,19 @@ public final class FreeCol {
                 }
                 
                 windowed = true;
+            } else if (args[i].length() > 16 && args[i].substring(0, 16).equals("--default-locale")) {
+                if (args[i].charAt(16) == '=') {
+                    // slightly ugly: strip encoding from LC_MESSAGES
+                    String languageID = args[i].substring(17);
+                    int index = languageID.indexOf('.');
+                    if (index > 0) {
+                        languageID = languageID.substring(0, index);
+                    }
+                    Locale.setDefault(LanguageOption.getLocale(languageID));
+                } else {
+                    printUsage();
+                    System.exit(0);
+                }
             } else if (args[i].equals("--no-sound")) {
                 sound = false;
             } else if (args[i].equals("--no-memory-check")) {
@@ -693,6 +706,8 @@ public final class FreeCol {
         System.out.println("  runs FreeCol in windowed mode instead of full screen mode");
         System.out.println("--load-savegame SAVEGAME_FILE");
         System.out.println("  loads the given savegame.");
+        System.out.println("--default-locale=LANGUAGE[_COUNTRY[_VARIANT]]");
+        System.out.println("  sets the default locale.");
         System.out.println("--splash[=SPLASH_IMAGE_FILE]");
         System.out.println("  displays a splash screen while loading the game");
         System.out.println("--no-sound");
