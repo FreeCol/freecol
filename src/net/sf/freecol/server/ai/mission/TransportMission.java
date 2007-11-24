@@ -134,6 +134,21 @@ public class TransportMission extends Mission {
             AIUnit aiUnit = (AIUnit) getAIMain().getAIObject(u);
             addToTransportList(aiUnit);
         }
+        
+        // Remove items that are no longer on the transport list:
+        List<Transportable> ts = new LinkedList<Transportable>();
+        for (Transportable t : new LinkedList<Transportable>(transportList)) {
+            if (ts.contains(t) || isCarrying(t)) {
+                if (t.getTransportDestination() == null) {
+                    removeFromTransportList(t);
+                }
+            } else {
+                if (t.getTransportSource() == null) {
+                    removeFromTransportList(t);
+                }
+            }
+            ts.add(t);
+        }
     }
 
     /**

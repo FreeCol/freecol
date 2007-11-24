@@ -3021,7 +3021,7 @@ public class Unit extends FreeColGameObject implements Abilities, Locatable, Loc
             return ((location instanceof Europe) && (getState() == TO_AMERICA))
                 || (getEntryLocation() == getLocation());
         case TO_AMERICA:
-            return (location instanceof Europe && isNaval());
+            return (location instanceof Europe && isNaval() && !isUnderRepair());
         case SKIPPED:
             return (movesLeft > 0);
         default:

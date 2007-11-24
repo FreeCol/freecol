@@ -46,6 +46,7 @@ import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.Map.Position;
+import net.sf.freecol.server.ai.AIUnit;
 
 public class DebugMenu extends JMenu {
 
@@ -234,6 +235,36 @@ public class DebugMenu extends JMenu {
 
         this.addSeparator();
 
+        final JMenuItem europeStatus = new JMenuItem("Display Europe Status");
+        europeStatus.setOpaque(false);
+        europeStatus.setMnemonic(KeyEvent.VK_E);
+        this.add(europeStatus);
+        europeStatus.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                if (freeColClient.getFreeColServer() != null) {
+                    net.sf.freecol.server.ai.AIMain aiMain = freeColClient.getFreeColServer().getAIMain();
+                    StringBuilder sb = new StringBuilder();
+                    for (Player tp : freeColClient.getGame().getPlayers()) {
+                        final Player p = (Player) freeColClient.getFreeColServer().getGame().getFreeColGameObject(tp.getId());
+                        if (p.getEurope() != null) {
+                            sb.append("\n==");
+                            sb.append(p.getNationAsString());
+                            sb.append("==\n");
+                            Iterator<Unit> it = p.getEurope().getUnitIterator();
+                            while (it.hasNext()) {
+                                Unit u = it.next();
+                                sb.append('\n');
+                                sb.append(u.getName());
+                                sb.append('\n');
+                                sb.append("    " + ((AIUnit) aiMain.getAIObject(u)).getMission().toString().replaceAll("\n", "    \n"));
+                            }
+                        }
+                    }
+                    canvas.showInformationMessage(sb.toString());
+                }
+            }
+        });
+
         final JMenuItem useAI = new JMenuItem("Use AI");
         useAI.setOpaque(false);
         useAI.setMnemonic(KeyEvent.VK_A);
@@ -253,6 +284,7 @@ public class DebugMenu extends JMenu {
             }
         });
 
+        
         this.addSeparator();
 
         final JMenuItem compareMaps = new JMenuItem(Messages.message("menuBar.debug.compareMaps"));
