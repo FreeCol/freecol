@@ -584,6 +584,10 @@ public class AIColony extends AIObject {
             if (goodsType == Goods.FOOD || goodsType == Goods.LUMBER) {
                 continue;
             }
+            // Never export unstorable goods
+            if (!goodsType.isStorable()) {
+                continue;
+            }
             // Only export muskets if we do not have room for them:
             if (goodsType == Goods.MUSKETS
                     && (colony.getProductionOf(Goods.MUSKETS) == 0 || colony.getGoodsCount(Goods.MUSKETS) < colony
