@@ -338,9 +338,9 @@ public class AIColony extends AIObject {
                         wlpIterator.remove();
 
                         if (((ColonyTile) wlp.getWorkLocation()).getWorkTile().isLand()) {
-                            FreeCol.getSpecification().getExpertForProducing(Goods.FOOD);
+                            unitType = FreeCol.getSpecification().getExpertForProducing(Goods.FOOD);
                         } else {
-                            FreeCol.getSpecification().getExpertForProducing(Goods.FISH);
+                            unitType = FreeCol.getSpecification().getExpertForProducing(Goods.FISH);
                         }
                         break;
                     }
