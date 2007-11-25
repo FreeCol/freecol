@@ -1747,61 +1747,27 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener, C
             super.addActionListener(buildingBoxListener);
         }
 
-        public String buildingText(Building building) {
-            String theText = new String(building.getNextName() + " (" + Integer.toString(building.getNextHammers())
-                    + " " + Messages.message("model.goods.Hammers").toLowerCase());
-
-            if (building.getNextTools() > 0) {
-                theText += ", " + Integer.toString(building.getNextTools()) + " "
-                        + Messages.message("model.goods.Tools").toLowerCase();
-            }
-
-            theText += ")";
-            return theText;
-        }
-
-        public String unitText(UnitType type) {
-            String theText = new String(type.getName() + " (" + Unit.getNextHammers(type) + " "
-                    + Messages.message("model.goods.Hammers").toLowerCase());
-
-            if (Unit.getNextTools(type) > 0) {
-                theText += ", " + Integer.toString(Unit.getNextTools(type)) + " "
-                        + Messages.message("model.goods.Tools").toLowerCase();
-            }
-
-            theText += ")";
-            return theText;
-        }
-
         /**
          * Sets up the BuildingBox such that it contains the appropriate
          * buildings.
          */
         public void initialize() {
-            super.removeActionListener(buildingBoxListener);
+            removeActionListener(buildingBoxListener);
             removeAllItems();
-            this.addItem(new BuildingBoxItem(BuildableType.NOTHING));
+            addItem(new BuildingBoxItem(BuildableType.NOTHING));
 
-            List<BuildingType> buildingTypes = FreeCol.getSpecification().getBuildingTypeList();
-            for (BuildingType buildingType : buildingTypes) {
-                if (colonyPanel.getColony().canBuild(buildingType)) {
-                    addItem(new BuildingBoxItem(buildingType));
-                }
-            }
-            List<UnitType> unitTypes = FreeCol.getSpecification().getUnitTypeList();
-            for (UnitType unitType : unitTypes) {
-                if (colonyPanel.getColony().canBuild(unitType)) {
-                    addItem(new BuildingBoxItem(unitType));
-                }
-            }
             BuildableType currentlyBuilding = colonyPanel.getColony().getCurrentlyBuilding();
-            for (int index = 0; index < this.getItemCount(); index++) {
-                if (((BuildingBoxItem) this.getItemAt(index)).getType() == currentlyBuilding) {
-                    setSelectedIndex(index);
-                    break;
+            List<BuildableType> buildableTypes = new ArrayList<BuildableType>(FreeCol.getSpecification().getBuildingTypeList());
+            buildableTypes.addAll(FreeCol.getSpecification().getUnitTypeList());
+            for (BuildableType buildableType : buildableTypes) {
+                if (colonyPanel.getColony().canBuild(buildableType)) {
+                    addItem(new BuildingBoxItem(buildableType));
+                    if (buildableType == currentlyBuilding) {
+                        setSelectedIndex(getItemCount() - 1);
+                    }
                 }
-            }            
-            super.addActionListener(buildingBoxListener);
+            }
+            addActionListener(buildingBoxListener);
             colonyPanel.updateProgressLabel();
         }
 
