@@ -446,7 +446,7 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
                     public boolean check(Unit u, PathNode pathNode) {
                         Map map = getGame().getMap();
 
-                        if (pathNode.getTile().getType() == Tile.HIGH_SEAS) {
+                        if (pathNode.getTile().getType().canSailToEurope()) {
                             goal = pathNode;
                             return true;
                         }
