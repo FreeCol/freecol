@@ -370,7 +370,11 @@ public class ColonyPlan {
                 continue;
             }
             if (((ColonyTile) wlp.getWorkLocation()).getWorkTile().potential(Goods.FOOD) <= 2) {
-                if (wlp.getProductionOf(wlp.getGoodsType()) <= 2) {
+                if (wlp.getGoodsType() == null) {
+                    // on arctic tiles nothing can be produced
+                    wlpIterator.remove();
+                } else if (wlp.getProductionOf(wlp.getGoodsType()) <= 2) {
+                    // just a poor location
                     wlpIterator.remove();
                 }
                 continue;
