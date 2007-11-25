@@ -430,6 +430,53 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
                 // TODO: Uncomment when wagon train code has been written:
                 // value -= 20;
                 value = 0;
+            } else {
+                // TODO: Remove when wagon train code has been written. START
+                final GoalDecider gd = new GoalDecider() {
+                    private PathNode goal = null;
+
+                    public PathNode getGoal() {
+                        return goal;
+                    }
+
+                    public boolean hasSubGoals() {
+                        return false;
+                    }
+
+                    public boolean check(Unit u, PathNode pathNode) {
+                        Map map = getGame().getMap();
+
+                        if (pathNode.getTile().getType() == Tile.HIGH_SEAS) {
+                            goal = pathNode;
+                            return true;
+                        }
+                        if (map.isAdjacentToMapEdge(pathNode.getTile())) {
+                            goal = pathNode;
+                            return true;
+                        }
+                        return false;
+                    }
+                };
+                final CostDecider cd = new CostDecider() {
+                    public int getCost(Unit unit, Tile oldTile, Tile newTile, int movesLeft, int turns) {
+                        if (newTile.isLand()) {
+                            return ILLEGAL_MOVE;
+                        } else {
+                            return 1;
+                        }
+                    }
+                    public int getMovesLeft() {
+                        return 0;
+                    }
+                    public boolean isNewTurn() {
+                        return false;
+                    }
+                };
+                final PathNode n = getMap().search(this, gd, cd, Integer.MAX_VALUE);
+                if (n == null) {
+                    value = 0;
+                }
+                // END-TODO
             }
 
             return Math.max(0, value);

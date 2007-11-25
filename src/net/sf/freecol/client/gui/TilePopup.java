@@ -148,7 +148,7 @@ public final class TilePopup extends JPopupMenu implements ActionListener {
                 if (u.isCarrier()) {
                     AIUnit au = (AIUnit) freeColClient.getFreeColServer().getAIMain().getAIObject(u);                
                     if (au.getMission() != null && au.getMission() instanceof TransportMission) {
-                        JMenuItem menuItem = new JMenuItem("Transport list for: " + u.toString());
+                        JMenuItem menuItem = new JMenuItem("Transport list for: " + u.toString() + " (" + u.hashCode() + ")");
                         menuItem.setActionCommand("TL" + Unit.getXMLElementTagName() + u.getId());
                         menuItem.addActionListener(this);
                         add(menuItem);
