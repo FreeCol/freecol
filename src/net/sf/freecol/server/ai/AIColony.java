@@ -86,7 +86,7 @@ public class AIColony extends AIObject {
         super(aiMain, colony.getId());
 
         this.colony = colony;
-        colonyPlan = new ColonyPlan(aiMain, colony);
+        colonyPlan = new ColonyPlan(aiMain, colony);        
     }
 
     /**
@@ -152,6 +152,56 @@ public class AIColony extends AIObject {
             o.dispose();
         }
         super.dispose();
+    }
+    
+    /**
+     * Updates custom house export settings.
+     */
+    private void updateCustomHouse() {
+        /*
+         * TODO: This method should use the properties of the
+         *       goods to determine if it should be sold,
+         *       instead of explicitly handling each type.
+         */
+        final int CAPACITY = colony.getWarehouseCapacity();
+        int[] exportLevels = new int[] {
+                 CAPACITY, // FOOD
+                        0, // SUGAR
+                        0, // TOBACCO
+                        0, // COTTON
+                        0, // FURS
+                 CAPACITY, // LUMBER
+                        0, // ORE
+                        0, // SILVER
+            CAPACITY - 20, // HORSES
+                        0, // RUM
+                        0, // CIGARS
+                        0, // CLOTH
+                        0, // COATS
+                        0, // TRADE_GOODS
+            Math.min(CAPACITY, 250), // TOOLS
+            CAPACITY - 50, // MUSKETS
+        };
+        boolean[] exports = new boolean[] {
+            false, //FOOD
+             true, // SUGAR
+             true, // TOBACCO
+             true, // COTTON
+             true, // FURS
+            false, // LUMBER
+             true, // ORE
+             true, // SILVER
+             true, // HORSES
+             true, // RUM
+             true, // CIGARS
+             true, // CLOTH
+             true, // COATS
+             true, // TRADE_GOODS
+             true, // TOOLS
+             true, // MUSKETS    
+        };
+        colony.setExports(exports);
+        colony.setExportLevel(exportLevels);
     }
 
     /**
@@ -577,6 +627,13 @@ public class AIColony extends AIObject {
         ArrayList<AIGoods> newAIGoods = new ArrayList<AIGoods>();
 
         // TODO: Do not sell raw material we are lacking.
+        
+        updateCustomHouse();
+        if (colony.hasAbility("model.ability.export")) {
+            // No need to export.
+            aiGoods.clear();
+            return;
+        }
 
         List<GoodsType> goodsList = FreeCol.getSpecification().getGoodsTypeList();
         for (GoodsType goodsType : goodsList) {
@@ -1080,13 +1137,13 @@ public class AIColony extends AIObject {
         }
 
         // FIXME: should be executed just once, when the custom house is built
-        if (colony.hasAbility("model.ability.export")) {
+        /*if (colony.hasAbility("model.ability.export")) {
             colony.setExports(Goods.SILVER, true);
             colony.setExports(Goods.RUM, true);
             colony.setExports(Goods.CIGARS, true);
             colony.setExports(Goods.CLOTH, true);
             colony.setExports(Goods.COATS, true);
-        }
+        }*/
 
         // temporarily move units from carpenter to blacksmith if the current building needs no lumber but more tools
         // TODO: mine ore if needed

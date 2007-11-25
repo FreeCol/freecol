@@ -729,6 +729,15 @@ public final class Colony extends Settlement implements Abilities, Location, Nam
     /**
      * Sets whether the custom house should export these goods.
      * 
+     * @param newExports The new export values.
+     */
+    public void setExports(final boolean[] newExports) {
+        System.arraycopy(newExports, 0, exports, 0, newExports.length);
+    }
+    
+    /**
+     * Sets whether the custom house should export these goods.
+     * 
      * @param type the type of goods.
      * @param value a <code>boolean</code> value
      */

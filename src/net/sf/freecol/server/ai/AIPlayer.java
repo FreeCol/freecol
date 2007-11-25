@@ -316,6 +316,9 @@ public class AIPlayer extends AIObject {
     private void cheat() {
         logger.finest("Entering method cheat");
         // TODO-AI-CHEATING: REMOVE WHEN THE AI IS GOOD ENOUGH:
+        for (GoodsType goodsType : FreeCol.getSpecification().getGoodsTypeList()) {
+            player.resetArrears(goodsType);
+        }
         if (getAIMain().getFreeColServer().isSingleplayer() && player.isEuropean() && !player.isREF() && player.isAI()
                 && player.getRebellionState() == Player.REBELLION_PRE_WAR) {
             Europe europe = player.getEurope();
