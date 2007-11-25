@@ -1794,8 +1794,13 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener, C
                     addItem(new BuildingBoxItem(unitType));
                 }
             }
-            setSelectedItem(colonyPanel.getColony().getCurrentlyBuilding());
-
+            BuildableType currentlyBuilding = colonyPanel.getColony().getCurrentlyBuilding();
+            for (int index = 0; index < this.getItemCount(); index++) {
+                if (((BuildingBoxItem) this.getItemAt(index)).getType() == currentlyBuilding) {
+                    setSelectedIndex(index);
+                    break;
+                }
+            }            
             super.addActionListener(buildingBoxListener);
             colonyPanel.updateProgressLabel();
         }
