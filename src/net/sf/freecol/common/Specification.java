@@ -58,9 +58,6 @@ import net.sf.freecol.common.model.UnitType;
 public final class Specification {
     private static final Logger logger = Logger.getLogger(Specification.class.getName());
 
-
-
-
     private final Map<String, FreeColGameObjectType> allTypes;
 
     private final List<BuildingType> buildingTypeList;
@@ -342,12 +339,7 @@ public final class Specification {
     }
 
     public BuildingType getBuildingType(String id) {
-        for (BuildingType b : buildingTypeList) {
-            if (b.getId().equals(id)) {
-                return b;
-            }
-        }
-        return null;
+        return (BuildingType) allTypes.get(id);
     }
 
     // -- Goods --
@@ -404,12 +396,7 @@ public final class Specification {
      * @return a <code>GoodsType</code> value
      */
     public GoodsType getGoodsType(String id) {
-        for (GoodsType g : goodsTypeList) {
-            if (g.getId().equals(id)) {
-                return g;
-            }
-        }
-        return null;
+        return (GoodsType) allTypes.get(id);
     }
 
     public List<GoodsType> getGoodsFood() {
@@ -460,12 +447,7 @@ public final class Specification {
     }
 
     public ResourceType getResourceType(String id) {
-        for (ResourceType r : resourceTypeList) {
-            if (r.getId().equals(id)) {
-                return r;
-            }
-        }
-        return null;
+        return (ResourceType) allTypes.get(id);
     }
 
     // -- Tiles --
@@ -482,12 +464,7 @@ public final class Specification {
     }
 
     public TileType getTileType(String id) {
-        for (TileType t : tileTypeList) {
-            if (t.getId().equals(id)) {
-                return t;
-            }
-        }
-        return null;
+        return (TileType) allTypes.get(id);
     }
 
     // -- Improvements --
@@ -500,12 +477,7 @@ public final class Specification {
     }
 
     public TileImprovementType getTileImprovementType(String id) {
-        for (TileImprovementType ti : tileImprovementTypeList) {
-            if (ti.getId().equals(id)) {
-                return ti;
-            }
-        }
-        return null;
+        return (TileImprovementType) allTypes.get(id);
     }
 
     // -- Improvement Actions --
@@ -518,12 +490,7 @@ public final class Specification {
     }
 
     public ImprovementActionType getImprovementActionType(String id) {
-        for (ImprovementActionType ia : improvementActionTypeList) {
-            if (ia.getId().equals(id)) {
-                return ia;
-            }
-        }
-        return null;
+        return (ImprovementActionType) allTypes.get(id);
     }
 
     // -- Units --
@@ -544,12 +511,7 @@ public final class Specification {
     }
 
     public UnitType getUnitType(String id) {
-        for (UnitType u : unitTypeList) {
-            if (u.getId().equals(id)) {
-                return u;
-            }
-        }
-        return null;
+        return (UnitType) allTypes.get(id);
     }
     
     public UnitType getExpertForProducing(GoodsType goodsType) {
@@ -603,12 +565,7 @@ public final class Specification {
     }
 
     public FoundingFather getFoundingFather(String id) {
-        for (FoundingFather father : foundingFathers) {
-            if (father.getId().equals(id)) {
-                return father;
-            }
-        }
-        return null;
+        return (FoundingFather) allTypes.get(id);
     }
 
     // -- NationTypes --
@@ -670,12 +627,7 @@ public final class Specification {
     }
 
     public NationType getNationType(String id) {
-        for (NationType nation : nationTypes) {
-            if (nation.getId().equals(id)) {
-                return nation;
-            }
-        }
-        return null;
+        return (NationType) allTypes.get(id);
     }
 
     public List<Nation> getNations() {
@@ -687,12 +639,7 @@ public final class Specification {
     }
 
     public Nation getNation(String id) {
-        for (Nation nation : nations) {
-            if (nation.getId().equals(id)) {
-                return nation;
-            }
-        }
-        return null;
+        return (Nation) allTypes.get(id);
     }
 
     public List<Nation> getClassicNations() {

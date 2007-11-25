@@ -2224,16 +2224,11 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
     private Element setCurrentlyBuilding(Connection connection, Element setCurrentlyBuildingElement) {
         ServerPlayer player = getFreeColServer().getPlayer(connection);
         Colony colony = (Colony) getGame().getFreeColGameObject(setCurrentlyBuildingElement.getAttribute("colony"));
-        String typeString = setCurrentlyBuildingElement.getAttribute("type");
-        BuildableType type = BuildableType.NOTHING;
-        if (FreeCol.getSpecification().getBuildingType(typeString) != null) {
-            type = FreeCol.getSpecification().getBuildingType(typeString);
-        } else if (FreeCol.getSpecification().getUnitType(typeString) != null) {
-            type = FreeCol.getSpecification().getUnitType(typeString);
-        }
         if (colony.getOwner() != player) {
             throw new IllegalStateException("Not your colony!");
         }
+        String typeString = setCurrentlyBuildingElement.getAttribute("type");
+        BuildableType type = (BuildableType) FreeCol.getSpecification().getType(typeString);
         colony.setCurrentlyBuilding(type);
         sendUpdatedTileToAll(colony.getTile(), player);
         return null;
