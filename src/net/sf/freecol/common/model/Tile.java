@@ -1498,7 +1498,9 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
             if (getGame().isClientTrusted() || showAll || player.canSee(this)) {
                 out.writeAttribute("owner", owner.getId());
             } else if (pet != null) {
-                out.writeAttribute("owner", pet.getOwner().getId());
+                if (pet.getOwner() != null) {
+                    out.writeAttribute("owner", pet.getOwner().getId());
+                }
             }
         }
 
