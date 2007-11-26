@@ -1303,8 +1303,9 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
      *            The Bonus Fish to be considered if valid
      * @return The amount of goods.
      */
-    public static int getTileTypePotential(TileType tileType, GoodsType goodsType, TileItemContainer tiContainer, int fishBonus) {
-        if (!goodsType.isFarmed()) {
+    public static int getTileTypePotential(TileType tileType, GoodsType goodsType, 
+                                           TileItemContainer tiContainer, int fishBonus) {
+        if (tileType == null || goodsType == null || !goodsType.isFarmed()) {
             return 0;
         }
         // Get tile potential + bonus if any
