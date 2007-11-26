@@ -52,10 +52,12 @@ import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
+import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JViewport;
 import javax.swing.KeyStroke;
+import javax.swing.ListCellRenderer;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.border.BevelBorder;
@@ -125,7 +127,9 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener, C
 
     private final ProductionPanel productionPanel;
 
-    private final BuildingBox buildingBox;
+    private final JComboBox buildingBox;
+
+    private final ActionListener buildingBoxListener;
 
     private final JComboBox nameBox;
 
@@ -219,7 +223,31 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener, C
         hammersLabel = new FreeColProgressBar(parent, Goods.HAMMERS);
         toolsLabel = new FreeColProgressBar(parent, Goods.TOOLS);
 
-        buildingBox = new BuildingBox(this);
+        buildingBox = new JComboBox();
+
+        buildingBoxListener = new ActionListener() {
+                public void actionPerformed(ActionEvent e) {
+                    getClient().getInGameController()
+                        .setCurrentlyBuilding(getColony(), ((BuildableType) buildingBox.getSelectedItem()));
+                    updateProgressLabel();
+                }};
+
+        buildingBox.setRenderer(new ListCellRenderer() {
+                public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected,
+                                                              boolean cellHasFocus) {
+                    BuildableType type = (BuildableType) value;
+                    String theText = new String(type.getName() + " (" + 
+                                                type.getHammersRequired() + " " +
+                                                Messages.message("model.goods.Hammers.name").toLowerCase());
+                    if (type.getToolsRequired() > 0) {
+                        theText += ", " + type.getToolsRequired() + " " +
+                            Messages.message("model.goods.Tools.name").toLowerCase();
+                    }
+                
+                    theText += ")";
+                    return new JLabel(theText);
+                }
+            });
 
         JScrollPane outsideColonyScroll = new JScrollPane(outsideColonyPanel,
                 ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED, ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
@@ -493,7 +521,7 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener, C
 
         tilePanel.initialize();
 
-        buildingBox.initialize();
+        updateBuildingBox();
         updateNameBox();
 
         updateSoLLabel();
@@ -593,7 +621,23 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener, C
     }
 
     public void updateBuildingBox() {
-        buildingBox.initialize();
+        buildingBox.removeActionListener(buildingBoxListener);
+        buildingBox.removeAllItems();
+        buildingBox.addItem(BuildableType.NOTHING);
+
+        BuildableType currentlyBuilding = getColony().getCurrentlyBuilding();
+        List<BuildableType> buildableTypes = new ArrayList<BuildableType>(FreeCol.getSpecification().getBuildingTypeList());
+        buildableTypes.addAll(FreeCol.getSpecification().getUnitTypeList());
+        for (BuildableType buildableType : buildableTypes) {
+            if (getColony().canBuild(buildableType)) {
+                buildingBox.addItem(buildableType);
+                if (buildableType == currentlyBuilding) {
+                    buildingBox.setSelectedIndex(buildingBox.getItemCount() - 1);
+                }
+            }
+        }
+        buildingBox.addActionListener(buildingBoxListener);
+        updateProgressLabel();
     }
 
     public void updateWarehouse() {
@@ -1718,122 +1762,6 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener, C
                 activePixels = (py * 128) / 64; // 64 --> /32 /2
                 // Now determine if x is in the diamond.
                 return ((px >= 63 - activePixels) && (px <= 63 + activePixels));
-            }
-        }
-    }
-
-    /**
-     * A combo box that contains a list of all the buildings that can be built
-     * in this colony.
-     */
-    public final class BuildingBox extends JComboBox {
-
-        private final ColonyPanel colonyPanel;
-
-        private final BuildingBoxListener buildingBoxListener;
-
-
-        /**
-         * Creates a new BuildingBox for this Colony.
-         * 
-         * @param colonyPanel The <code>ColonyPanel</code> this object is
-         *            created for.
-         */
-        public BuildingBox(ColonyPanel colonyPanel) {
-            super();
-            this.colonyPanel = colonyPanel;
-
-            buildingBoxListener = new BuildingBoxListener(this, colonyPanel);
-            super.addActionListener(buildingBoxListener);
-        }
-
-        /**
-         * Sets up the BuildingBox such that it contains the appropriate
-         * buildings.
-         */
-        public void initialize() {
-            removeActionListener(buildingBoxListener);
-            removeAllItems();
-            addItem(new BuildingBoxItem(BuildableType.NOTHING));
-
-            BuildableType currentlyBuilding = colonyPanel.getColony().getCurrentlyBuilding();
-            List<BuildableType> buildableTypes = new ArrayList<BuildableType>(FreeCol.getSpecification().getBuildingTypeList());
-            buildableTypes.addAll(FreeCol.getSpecification().getUnitTypeList());
-            for (BuildableType buildableType : buildableTypes) {
-                if (colonyPanel.getColony().canBuild(buildableType)) {
-                    addItem(new BuildingBoxItem(buildableType));
-                    if (buildableType == currentlyBuilding) {
-                        setSelectedIndex(getItemCount() - 1);
-                    }
-                }
-            }
-            addActionListener(buildingBoxListener);
-            colonyPanel.updateProgressLabel();
-        }
-
-
-        /**
-         * Represents a type of building, and the text of the next building in
-         * that type.
-         */
-        public final class BuildingBoxItem {
-
-            private final BuildableType type;
-
-            public BuildingBoxItem(BuildableType type) {
-                this.type = type;
-            }
-
-            public BuildableType getType() {
-                return type;
-            }
-
-            @Override
-            public String toString() {
-                String theText = new String(type.getName() + " (" + 
-                                            type.getHammersRequired() + " " +
-                                            Messages.message("model.goods.Hammers.name").toLowerCase());
-                if (type.getToolsRequired() > 0) {
-                    theText += ", " + type.getToolsRequired() + " " +
-                        Messages.message("model.goods.Tools.name").toLowerCase();
-                }
-                
-                theText += ")";
-                return theText;
-            }
-        }
-
-        /**
-         * The ActionListener for the BuildingBox.
-         */
-        public final class BuildingBoxListener implements ActionListener {
-
-            private ColonyPanel colonyPanel;
-
-            private BuildingBox buildingBox;
-
-
-            /**
-             * Sets up this BuildingBoxListener's buildingBox and colonyPanel.
-             * 
-             * @param buildingBox The <code>BuildingBox</code> to be listening
-             *            on.
-             * @param colonyPanel The <code>ColonyPanel</code> this object is
-             *            created for.
-             */
-            public BuildingBoxListener(BuildingBox buildingBox, ColonyPanel colonyPanel) {
-                super();
-                this.buildingBox = buildingBox;
-                this.colonyPanel = colonyPanel;
-            }
-
-            /**
-             * Sets the ColonyPanel's Colony's type of building.
-             */
-            public void actionPerformed(ActionEvent e) {
-                colonyPanel.getClient().getInGameController().setCurrentlyBuilding(colonyPanel.getColony(),
-                        ((BuildingBoxItem) buildingBox.getSelectedItem()).getType());
-                colonyPanel.updateProgressLabel();
             }
         }
     }
