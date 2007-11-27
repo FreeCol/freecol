@@ -43,7 +43,7 @@ public class BuildingTest extends FreeColTestCase {
         // normal colony
         BuildingType warehouseType = FreeCol.getSpecification().getBuildingType("model.building.Depot");
         Building warehouse = new Building(getGame(), colony, warehouseType);
-        colony.addWorkLocation(warehouse);
+        colony.addBuilding(warehouse);
         assertTrue(warehouse.canBuildNext());
         warehouse.upgrade();
         assertTrue(warehouse.canBuildNext());
@@ -92,9 +92,7 @@ public class BuildingTest extends FreeColTestCase {
         Colony colony = getStandardColony(6);
         List<Unit> units = colony.getUnitList();
 
-        Iterator<Building> buildingIterator = colony.getBuildingIterator();
-        while (buildingIterator.hasNext()) {
-            Building building = buildingIterator.next();
+        for (Building building : colony.getBuildings()) {
             
             // schoolhouse is special, see testCanAddToSchool
             if (building.getType().hasAbility("model.ability.teach")) 
@@ -162,7 +160,7 @@ public class BuildingTest extends FreeColTestCase {
         assertTrue(school == null);
 
         // build school
-        colony.addWorkLocation(new Building(getGame(), colony, schoolType));
+        colony.addBuilding(new Building(getGame(), colony, schoolType));
         school = colony.getBuilding(schoolType);
         assertTrue(school != null);
 
@@ -247,9 +245,7 @@ public class BuildingTest extends FreeColTestCase {
         Colony colony = getStandardColony(6);
         List<Unit> units = colony.getUnitList();
 
-        Iterator<Building> buildingIterator = colony.getBuildingIterator();
-        while (buildingIterator.hasNext()) {
-            Building building = buildingIterator.next();
+        for (Building building : colony.getBuildings()) {
 
             try {
                 StringWriter sw = new StringWriter();

@@ -4848,9 +4848,7 @@ public class Unit extends FreeColGameObject implements Abilities, Locatable, Loc
         ArrayList<Unit> shipList = new ArrayList<Unit>();
         ArrayList<Goods> goodsList = colony.getGoodsContainer().getCompactGoods();
         
-        Iterator<Building> itB = colony.getBuildingIterator();
-        while (itB.hasNext()) {
-            Building building = itB.next();
+        for (Building building : colony.getBuildings()) {
             if (building.canBeDamaged()) {
                 buildingList.add(building);
             }

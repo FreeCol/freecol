@@ -184,9 +184,7 @@ public class ColonyPlan {
 
                 GoodsType outputType = b.getGoodsOutputType();
                 if (outputType != null) {
-                    Iterator<Building> iterator = colony.getBuildingIterator();
-                    while (iterator.hasNext()) {
-                        Building building = iterator.next();
+                    for (Building building : colony.getBuildings()) {
                         if (building.getType().getModifier(outputType.getId()) != null
                                 && building.canBuildNext()) {
                             buildList.add(building.getType().getUpgradesTo());

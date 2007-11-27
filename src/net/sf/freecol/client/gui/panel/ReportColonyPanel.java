@@ -176,9 +176,7 @@ public final class ReportColonyPanel extends ReportPanel implements ActionListen
         JPanel buildingPanel = new JPanel(new GridLayout(0, 5, 12, 0));
         buildingPanel.setOpaque(false);
 
-        Iterator<Building> buildingIterator = colony.getBuildingIterator();
-        while (buildingIterator.hasNext()) {
-            Building building = buildingIterator.next();
+        for (Building building : colony.getBuildings()) {
             buildingPanel.add(new JLabel(building.getName()));
         }
         

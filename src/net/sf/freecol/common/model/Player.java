@@ -2162,7 +2162,7 @@ public class Player extends FreeColGameObject implements Abilities, Nameable, Mo
                         for (Colony colony : getColonies()) {
                             Building building = colony.getBuilding(type);
                             if (building == null) {
-                                colony.addWorkLocation(new Building(getGame(), colony, type));
+                                colony.addBuilding(new Building(getGame(), colony, type));
                             }
                         }
                     } else if (event.equals("model.event.seeAllColonies")) {

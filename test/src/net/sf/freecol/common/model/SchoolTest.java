@@ -66,7 +66,7 @@ public class SchoolTest extends FreeColTestCase {
         ore.setType(Unit.EXPERT_ORE_MINER);
 
         BuildingType schoolType = spec().getBuildingType("model.building.Schoolhouse");
-        colony.addWorkLocation(new Building(getGame(), colony, schoolType));
+        colony.addBuilding(new Building(getGame(), colony, schoolType));
         Building school = colony.getBuilding(spec().getBuildingType("model.building.Schoolhouse"));
 
         ore.setLocation(school);
@@ -88,7 +88,7 @@ public class SchoolTest extends FreeColTestCase {
         blackSmith.setType(Unit.MASTER_BLACKSMITH);
 
         BuildingType schoolType = spec().getBuildingType("model.building.Schoolhouse");
-        colony.addWorkLocation(new Building(getGame(), colony, schoolType));
+        colony.addBuilding(new Building(getGame(), colony, schoolType));
         Building school = colony.getBuilding(spec().getBuildingType("model.building.Schoolhouse"));
         school.upgrade();
 
@@ -111,7 +111,7 @@ public class SchoolTest extends FreeColTestCase {
         elder.setType(Unit.ELDER_STATESMAN);
 
         BuildingType schoolType = spec().getBuildingType("model.building.Schoolhouse");
-        colony.addWorkLocation(new Building(getGame(), colony, schoolType));
+        colony.addBuilding(new Building(getGame(), colony, schoolType));
         Building school = colony.getBuilding(spec().getBuildingType("model.building.Schoolhouse"));
         school.upgrade();
         school.upgrade();
@@ -180,7 +180,7 @@ public class SchoolTest extends FreeColTestCase {
 
         // Build a college...
         BuildingType schoolType = spec().getBuildingType("model.building.Schoolhouse");
-        colony.addWorkLocation(new Building(getGame(), colony, schoolType));
+        colony.addBuilding(new Building(getGame(), colony, schoolType));
         Building school = colony.getBuilding(spec().getBuildingType("model.building.Schoolhouse"));
         school.upgrade();
 
@@ -258,7 +258,7 @@ public class SchoolTest extends FreeColTestCase {
         ore.setType(Unit.EXPERT_ORE_MINER);
 
         BuildingType schoolType = spec().getBuildingType("model.building.Schoolhouse");
-        colony.addWorkLocation(new Building(getGame(), colony, schoolType));
+        colony.addBuilding(new Building(getGame(), colony, schoolType));
         Building school = colony.getBuilding(spec().getBuildingType("model.building.Schoolhouse"));
         school.upgrade();
         school.upgrade();
@@ -314,7 +314,7 @@ public class SchoolTest extends FreeColTestCase {
         }
 
         BuildingType schoolType = spec().getBuildingType("model.building.University");
-        colony.addWorkLocation(new Building(getGame(), colony, schoolType));
+        colony.addBuilding(new Building(getGame(), colony, schoolType));
         return colony;
     }
     

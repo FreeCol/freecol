@@ -1029,9 +1029,7 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener, C
 
             ASingleBuildingPanel aSingleBuildingPanel;
 
-            Iterator<Building> buildingIterator = getColony().getBuildingIterator();
-            while (buildingIterator.hasNext()) {
-                Building building = buildingIterator.next();
+            for (Building building : getColony().getBuildings()) {
                 aSingleBuildingPanel = new ASingleBuildingPanel(building);
                 if (colonyPanel.isEditable()) {
                     aSingleBuildingPanel.addMouseListener(releaseListener);

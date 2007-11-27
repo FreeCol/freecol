@@ -583,7 +583,7 @@ public class MapGenerator {
                     }
                     BuildingType schoolType = FreeCol.getSpecification().getBuildingType("model.building.Schoolhouse");
                     Building schoolhouse = new Building(map.getGame(), colony, schoolType);
-                    colony.addWorkLocation(schoolhouse);
+                    colony.addBuilding(schoolhouse);
                     unitType = FreeCol.getSpecification().getUnitType("model.unit.masterCarpenter");
                     while (!schoolhouse.canAdd(unitType)) {
                         schoolhouse.upgrade();

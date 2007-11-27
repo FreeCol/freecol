@@ -107,9 +107,7 @@ public final class DragListener extends MouseAdapter {
                     }
                     
                     // Work at Building - show both max potential and realistic projection
-                    Iterator<Building> buildingIterator = colony.getBuildingIterator();
-                    while (buildingIterator.hasNext()) {
-                        Building building = buildingIterator.next();
+                    for (Building building : colony.getBuildings()) {
                         if (tempUnit.getWorkLocation() != building) { // Skip if currently working at this location
                             if (building.canAdd(tempUnit)) {
                                 GoodsType goodsType = building.getGoodsOutputType();

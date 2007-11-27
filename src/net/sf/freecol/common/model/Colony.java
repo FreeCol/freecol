@@ -41,6 +41,7 @@ import org.w3c.dom.Element;
  * <code>Colony</code> where working is possible.
  */
 public final class Colony extends Settlement implements Abilities, Location, Nameable, Modifiers {
+
     private static final Logger logger = Logger.getLogger(Colony.class.getName());
 
     private static final int BELLS_PER_REBEL = 100;
@@ -48,12 +49,10 @@ public final class Colony extends Settlement implements Abilities, Location, Nam
     /** The name of the colony. */
     private String name;
 
-    /**
-     * Places a unit may work. Either a <code>Building</code> or a
-     * <code>ColonyTile</code>.
-     */
-    private ArrayList<WorkLocation> workLocations = new ArrayList<WorkLocation>();
+    /** A list of ColonyTiles. */
+    private ArrayList<ColonyTile> colonyTiles = new ArrayList<ColonyTile>();
 
+    /** A map of Buildings, indexed by the ID of their basic type. */
     private HashMap<String, Building> buildingMap = new HashMap<String, Building>();
     
     private List<Building> delayedProduction = new ArrayList<Building>();
@@ -123,31 +122,25 @@ public final class Colony extends Settlement implements Abilities, Location, Nam
         tile.setOwner(owner);
         for (int direction = 0; direction < Map.NUMBER_OF_DIRECTIONS; direction++) {
             Tile t = map.getNeighbourOrNull(direction, tile);
-            if (t==null)
+            if (t == null)
                 continue;
             if (t.getOwner() == null) {
                 t.setOwner(owner);
             }
-            addWorkLocation(new ColonyTile(game, this, t));
+            colonyTiles.add(new ColonyTile(game, this, t));
             if (t.getType().isWater()) {
                 landLocked = false;
             }
         }
-        addWorkLocation(new ColonyTile(game, this, tile));
+        colonyTiles.add(new ColonyTile(game, this, tile));
         List<BuildingType> buildingTypes = FreeCol.getSpecification().getBuildingTypeList();
         for (BuildingType buildingType : buildingTypes) {
             if (buildingType.getUpgradesFrom() == null &&
                 buildingType.getHammersRequired() == 0) {
-                addWorkLocation(new Building(game, this, buildingType));
+                addBuilding(new Building(getGame(), this, buildingType));
             }
         }
         setCurrentlyBuilding(BuildableType.NOTHING);
-        /*
-        if (landLocked)
-            currentlyBuilding = Building.WAREHOUSE;
-        else
-            currentlyBuilding = Building.DOCK;
-         */
     }
 
     /**
@@ -187,19 +180,15 @@ public final class Colony extends Settlement implements Abilities, Location, Nam
     }
 
     /**
-     * Add a WorkLocation to this Colony.
+     * Add a Building to this Colony.
      *
-     * @param workLocation a <code>WorkLocation</code> value
+     * @param building a <code>Building</code> value
      */
-    public void addWorkLocation(WorkLocation workLocation) {
-        workLocations.add(workLocation);
-        if (workLocation instanceof Building) {
-            Building building = (Building) workLocation;
-            BuildingType buildingType = building.getType().getFirstLevel();
-            buildingMap.put(buildingType.getId(), building);
-            for (Feature feature : building.getType().getFeatures().values()) {
-                setFeature(feature);
-            }
+    public void addBuilding(Building building) {
+        BuildingType buildingType = building.getType().getFirstLevel();
+        buildingMap.put(buildingType.getId(), building);
+        for (Feature feature : building.getType().getFeatures().values()) {
+            setFeature(feature);
         }
     }
 
@@ -232,7 +221,7 @@ public final class Colony extends Settlement implements Abilities, Location, Nam
                 if (priceBonus.appliesTo(buildingType) &&
                     getBuilding(buildingType) == null &&
                     getUnitCount() >= buildingType.getPopulationRequired()) {
-                    addWorkLocation(new Building(getGame(), this, buildingType));
+                    addBuilding(new Building(getGame(), this, buildingType));
                 }
             }
         }
@@ -378,10 +367,8 @@ public final class Colony extends Settlement implements Abilities, Location, Nam
      */
     public Building getBuildingForProducing(GoodsType goodsType) {
         // TODO: it should search for more than one building?
-        Iterator<Building> buildingIterator = getBuildingIterator();
-        while (buildingIterator.hasNext()) {
-            Building building = buildingIterator.next();
-            if (building != null && building.getGoodsOutputType() == goodsType) {
+        for (Building building : buildingMap.values()) {
+            if (building.getGoodsOutputType() == goodsType) {
                 return building;
             }
         }
@@ -398,9 +385,7 @@ public final class Colony extends Settlement implements Abilities, Location, Nam
      */
     public Building getBuildingForConsuming(GoodsType goodsType) {
         // TODO: it should search for more than one building?
-        Iterator<Building> buildingIterator = getBuildingIterator();
-        while (buildingIterator.hasNext()) {
-            Building building = buildingIterator.next();
+        for (Building building : buildingMap.values()) {
             if (building.getGoodsInputType() == goodsType) {
                 return building;
             }
@@ -416,7 +401,13 @@ public final class Colony extends Settlement implements Abilities, Location, Nam
      * @see WorkLocation
      */
     public Iterator<WorkLocation> getWorkLocationIterator() {
-        return workLocations.iterator();
+        return getWorkLocations().iterator();
+    }
+
+    public List<WorkLocation> getWorkLocations() {
+        List<WorkLocation> result = new ArrayList<WorkLocation>(colonyTiles);
+        result.addAll(buildingMap.values());
+        return result;
     }
 
     /**
@@ -426,25 +417,8 @@ public final class Colony extends Settlement implements Abilities, Location, Nam
      * @return The <code>List</code>.
      * @see Building
      */
-    public List<Building> getBuildingList() {
-        ArrayList<Building> b = new ArrayList<Building>();
-        for (WorkLocation location : workLocations) {
-            if (location instanceof Building) {
-                b.add((Building) location);
-            }
-        }
-        return b;
-    }
-
-    /**
-     * Gets an <code>Iterator</code> of every {@link Building} in this
-     * <code>Colony</code>.
-     * 
-     * @return The <code>Iterator</code>.
-     * @see Building
-     */
-    public Iterator<Building> getBuildingIterator() {
-        return getBuildingList().iterator();
+    public List<Building> getBuildings() {
+        return new ArrayList<Building>(buildingMap.values());
     }
 
     /**
@@ -455,13 +429,7 @@ public final class Colony extends Settlement implements Abilities, Location, Nam
      * @see ColonyTile
      */
     public Iterator<ColonyTile> getColonyTileIterator() {
-        ArrayList<ColonyTile> b = new ArrayList<ColonyTile>();
-        for (WorkLocation location : workLocations) {
-            if (location instanceof ColonyTile) {
-                b.add((ColonyTile) location);
-            }
-        }
-        return b.iterator();
+        return colonyTiles.iterator();
     }
 
     /**
@@ -511,36 +479,6 @@ public final class Colony extends Settlement implements Abilities, Location, Nam
             ColonyTile c = i.next();
             if (c.getWorkTile() == t) {
                 return c;
-            }
-        }
-        return null;
-    }
-
-    /**
-     * Gets a vacant <code>WorkLocation</code> for the given <code>Unit</code>.
-     * 
-     * @param locatable The <code>Unit</code>
-     * @return A vacant <code>WorkLocation</code> for the given
-     *         <code>Unit</code> or <code>null</code> if there is no such
-     *         location.
-     */
-    public WorkLocation getVacantWorkLocationFor(Unit locatable) {
-        WorkLocation w = getVacantColonyTileFor(locatable, Goods.FOOD);
-        if (w != null && w.canAdd(locatable) && getVacantColonyTileProductionFor(locatable, Goods.FOOD) > 0) {
-            return w;
-        }
-        Iterator<Building> i = getBuildingIterator();
-        while (i.hasNext()) {
-            w = i.next();
-            if (w.canAdd(locatable)) {
-                return w;
-            }
-        }
-        Iterator<WorkLocation> it = getWorkLocationIterator();
-        while (it.hasNext()) {
-            w = it.next();
-            if (w.canAdd(locatable)) {
-                return w;
             }
         }
         return null;
@@ -672,7 +610,7 @@ public final class Colony extends Settlement implements Abilities, Location, Nam
 
     public List<Unit> getUnitList() {
         ArrayList<Unit> units = new ArrayList<Unit>();
-        for (WorkLocation wl : workLocations) {
+        for (WorkLocation wl : getWorkLocations()) {
             for (Unit unit : wl.getUnitList()) {
                 units.add(unit);
             }
@@ -689,7 +627,7 @@ public final class Colony extends Settlement implements Abilities, Location, Nam
      */
     public List<Unit> getUnitList(int type) {
         ArrayList<Unit> units = new ArrayList<Unit>();
-        for (WorkLocation wl : workLocations) {
+        for (WorkLocation wl : getWorkLocations()) {
             for (Unit unit : wl.getUnitList()) {
                 if (unit.getType() == type) {
                     units.add(unit);
@@ -783,17 +721,7 @@ public final class Colony extends Settlement implements Abilities, Location, Nam
      * @return <code>true</code> if this unit type could be added.
     */
     public boolean canTrain(Unit unit) {
-        if (!hasAbility("model.ability.teach")) {
-            return false;
-        }
-        Iterator<Building> buildingIterator = getBuildingIterator();
-        while (buildingIterator.hasNext()) {
-            Building building = buildingIterator.next();
-            if (building.hasAbility("model.ability.teach") && building.canAdd(unit)) {
-                return true;
-            }
-        }
-        return false;
+        return canTrain(unit.getUnitType());
     }
 
     /**
@@ -811,9 +739,7 @@ public final class Colony extends Settlement implements Abilities, Location, Nam
             return false;
         }
         
-        Iterator<Building> buildingIterator = getBuildingIterator();
-        while (buildingIterator.hasNext()) {
-            Building building = buildingIterator.next();
+        for (Building building : buildingMap.values()) {
             if (building.hasAbility("model.ability.teach") &&
                 building.canAdd(unitType)) {
                 return true;
@@ -824,9 +750,7 @@ public final class Colony extends Settlement implements Abilities, Location, Nam
     
     public List<Unit> getTeachers() {
         List<Unit> teachers = new ArrayList<Unit>();
-        Iterator<Building> buildingIterator = getBuildingIterator();
-        while (buildingIterator.hasNext()) {
-            Building building = buildingIterator.next();
+        for (Building building : buildingMap.values()) {
             if (building.hasAbility("model.ability.teach")) {
                 teachers.addAll(building.getUnitList());
             }
@@ -917,8 +841,9 @@ public final class Colony extends Settlement implements Abilities, Location, Nam
         List<UnitType> unitTypes = FreeCol.getSpecification().getUnitTypeList();
         for (UnitType unitType : unitTypes) {
             if (unitType.getHammersRequired() > 0) {
-                // TODO: check requirements
-                buildableUnits.add(unitType);
+                if (canBuild(unitType)) {
+                    buildableUnits.add(unitType);
+                }
             }
         }
         return buildableUnits;
@@ -930,14 +855,9 @@ public final class Colony extends Settlement implements Abilities, Location, Nam
      * @param unitType The unit type to test against.
      * @return The result.
      */
+    // TODO: remove
     public boolean canBuildUnit(UnitType unitType) {
-        List<UnitType> buildableUnits = getBuildableUnits();
-        for (UnitType buildable : buildableUnits) {
-            if (unitType == buildable) {
-                return true;
-            }
-        }
-        return false;
+        return canBuild(unitType);
     }
 
     /**
@@ -1151,6 +1071,28 @@ public final class Colony extends Settlement implements Abilities, Location, Nam
     }
 
     /**
+     * Gets a vacant <code>WorkLocation</code> for the given <code>Unit</code>.
+     * 
+     * @param unit The <code>Unit</code>
+     * @return A vacant <code>WorkLocation</code> for the given
+     *         <code>Unit</code> or <code>null</code> if there is no such
+     *         location.
+     */
+    public WorkLocation getVacantWorkLocationFor(Unit unit) {
+        WorkLocation result = getVacantColonyTileFor(unit, Goods.FOOD);
+        if (result != null) {
+            return result;
+        } else {
+            for (Building building : buildingMap.values()) {
+                if (building.canAdd(unit)) {
+                    return building;
+                }
+            }
+        }
+        return null;
+    }
+
+    /**
      * Returns a vacant <code>ColonyTile</code> where the given
      * <code>unit</code> produces the maximum output of the given
      * <code>goodsType</code>.
@@ -1165,7 +1107,7 @@ public final class Colony extends Settlement implements Abilities, Location, Nam
      */
     public ColonyTile getVacantColonyTileFor(Unit unit, GoodsType goodsType) {
         ColonyTile bestPick = null;
-        int highestProduction = -2;
+        int highestProduction = 0;
         Iterator<ColonyTile> colonyTileIterator = getColonyTileIterator();
         while (colonyTileIterator.hasNext()) {
             ColonyTile colonyTile = colonyTileIterator.next();
@@ -1177,11 +1119,12 @@ public final class Colony extends Settlement implements Abilities, Location, Nam
                  * unit's owner has the founding father Peter Minuit
                  */
 
-                boolean ourLand = (owner.getLandPrice(workTile) == 0);
-                int potential = colonyTile.getProductionOf(unit, goodsType);
-                if (ourLand && potential > highestProduction) {
-                    highestProduction = potential;
-                    bestPick = colonyTile;
+                if (owner.getLandPrice(workTile) == 0) {
+                    int potential = colonyTile.getProductionOf(unit, goodsType);
+                    if (potential > highestProduction) {
+                        highestProduction = potential;
+                        bestPick = colonyTile;
+                    }
                 }
             }
         }
@@ -1203,36 +1146,6 @@ public final class Colony extends Settlement implements Abilities, Location, Nam
         ColonyTile bestPick = getVacantColonyTileFor(unit, goodsType);
         return bestPick != null ? bestPick.getProductionOf(unit, goodsType) : 0;
     }
-
-    /**
-     * Returns the horse production (given that enough food is being produced
-     * and a sufficient storage capacity).
-     * 
-     * @return The number of producable horses.
-     *//* deprecated
-    public int getPotentialHorseProduction() {
-        if (getGoodsCount(Goods.HORSES) < 2) {
-            return 0;
-        }
-        int maxAmount = getGoodsCount(Goods.HORSES) / 10;
-        // TODO: put production bonus for horses in specification
-        if (!getStables().isBuilt()) {
-            maxAmount /= 2;
-        }
-        return Math.max(1, maxAmount);
-    }*/
-
-    /**
-     * Gets the production of horses in this <code>Colony</code>.
-     * 
-     * @return The total production of horses in this <code>Colony</code>.
-     *//* deprecated
-    public int getHorseProduction() {
-        int surplus = getFoodProduction() - getFoodConsumption();
-        int maxSpace = getWarehouseCapacity() - getGoodsCount(Goods.HORSES);
-        int potential = Math.min(getPotentialHorseProduction(), maxSpace);
-        return Math.max(Math.min(surplus / 2, potential), 0); // store the half of surplus
-    }*/
 
     /**
      * Returns how much of a Good will be produced by this colony this turn
@@ -1268,7 +1181,7 @@ public final class Colony extends Settlement implements Abilities, Location, Nam
         }
         // TODO FIXME This should also take into account tools needed for a
         // current building project
-        if (goodsType == Goods.FOOD ) {
+        if (goodsType == Goods.FOOD) {
             used += getFoodConsumption();
         }
         count -= used;
@@ -1323,22 +1236,6 @@ public final class Colony extends Settlement implements Abilities, Location, Nam
         return true;
     }
 
-    private int getNextHammersForBuilding() {
-        if (canBuild()) {
-            return getCurrentlyBuilding().getHammersRequired();
-        } else {
-            return -1;
-        }
-    }
-
-    private int getNextToolsForBuilding() {
-        if (canBuild()) {
-            return getCurrentlyBuilding().getToolsRequired();
-        } else {
-            return -1;
-        }
-    }
-    
     private void checkBuildingComplete() {
         // In order to avoid duplicate messages:
         if (lastVisited == getGame().getTurn().getNumber()) {
@@ -1363,7 +1260,7 @@ public final class Colony extends Settlement implements Abilities, Location, Nam
                     } else if (buildable instanceof BuildingType) {
                         BuildingType upgradesFrom = ((BuildingType) buildable).getUpgradesFrom();
                         if (upgradesFrom == null) {
-                            addWorkLocation(new Building(getGame(), this, (BuildingType) buildable));
+                            addBuilding(new Building(getGame(), this, (BuildingType) buildable));
                         } else {
                             getBuilding(upgradesFrom).upgrade();
                         }
@@ -1545,16 +1442,6 @@ public final class Colony extends Settlement implements Abilities, Location, Nam
         }
     }
 
-    /* deprecated
-    // Breed horses:
-    private void updateHorses() {
-        int horseProduction = getHorseProduction();
-        if (horseProduction != 0) {
-            removeGoods(Goods.FOOD, horseProduction);
-            addGoods(Goods.HORSES, horseProduction);
-        }
-    }*/
-
     // Create a new colonist if there is enough food:
     private void checkForNewColonist() {
         if (getGoodsCount(Goods.FOOD) >= 200) {
@@ -1574,9 +1461,7 @@ public final class Colony extends Settlement implements Abilities, Location, Nam
 
     // Update carpenter and blacksmith
     private void addHammersAndTools() {
-        Iterator<Building> buildingIterator = getBuildingIterator();
-        while (buildingIterator.hasNext()) {
-            Building building = buildingIterator.next();
+        for (Building building : buildingMap.values()) {
             GoodsType output = building.getGoodsOutputType();
             if (output == Goods.HAMMERS || output == Goods.TOOLS) {
                 logger.finest("Calling newTurn for building " + building.getName());
@@ -1766,15 +1651,17 @@ public final class Colony extends Settlement implements Abilities, Location, Nam
         // will require a Buildable interface, and suitable methods
         // for the *Type classes.
         List<GoodsType> goodsForBuilding = new ArrayList<GoodsType>();
-        if (getNextHammersForBuilding() > 0) {
-            goodsForBuilding.add(Goods.HAMMERS);
-        }
-        if (getNextToolsForBuilding() > 0) {
-            goodsForBuilding.add(Goods.TOOLS);
+        if (canBuild()) {
+            if (getCurrentlyBuilding().getHammersRequired() > 0) {
+                goodsForBuilding.add(Goods.HAMMERS);
+            }
+            if (getCurrentlyBuilding().getToolsRequired() > 0) {
+                goodsForBuilding.add(Goods.TOOLS);
+            }
         }
         
         delayedProduction.clear();
-        addBuildingProduction(getBuildingList(), goodsForBuilding);
+        addBuildingProduction(getBuildings(), goodsForBuilding);
 
         // The following tasks consume hammers/tools,
         // or may do so in the future
@@ -1820,9 +1707,7 @@ public final class Colony extends Settlement implements Abilities, Location, Nam
     
     public Building getWarehouse() {
         // TODO: it should search for more than one building?
-        Iterator<Building> buildingIterator = getBuildingIterator();
-        while (buildingIterator.hasNext()) {
-            Building building = buildingIterator.next();
+        for (Building building : buildingMap.values()) {
             if (building.getType().getModifier("model.modifier.warehouseStorage") != null) {
                 return building;
             }
@@ -1899,7 +1784,7 @@ public final class Colony extends Settlement implements Abilities, Location, Nam
                 }
             }
              */
-            Iterator<WorkLocation> workLocationIterator = workLocations.iterator();
+            Iterator<WorkLocation> workLocationIterator = getWorkLocationIterator();
             while (workLocationIterator.hasNext()) {
                 ((FreeColGameObject) workLocationIterator.next()).toXML(out, player, showAll, toSavedGame);
             }
@@ -1956,14 +1841,14 @@ public final class Colony extends Settlement implements Abilities, Location, Nam
                 if (ct != null) {
                     ct.readFromXML(in);
                 } else {
-                    addWorkLocation(new ColonyTile(getGame(), in));
+                    colonyTiles.add(new ColonyTile(getGame(), in));
                 }
             } else if (in.getLocalName().equals(Building.getXMLElementTagName())) {
                 Building b = (Building) getGame().getFreeColGameObject(in.getAttributeValue(null, "ID"));
                 if (b != null) {
                     b.readFromXML(in);
                 } else {
-                    addWorkLocation(new Building(getGame(), in));
+                    addBuilding(new Building(getGame(), in));
                 }
             } else if (in.getLocalName().equals(GoodsContainer.getXMLElementTagName())) {
                 GoodsContainer gc = (GoodsContainer) getGame().getFreeColGameObject(in.getAttributeValue(null, "ID"));
@@ -2069,9 +1954,7 @@ public final class Colony extends Settlement implements Abilities, Location, Nam
      */ 
     public Building getStockade() {
         // TODO: it should search for more than one building?
-        Iterator<Building> buildingIterator = getBuildingIterator();
-        while (buildingIterator.hasNext()) {
-            Building building = buildingIterator.next();
+        for (Building building : buildingMap.values()) {
             if (building.getType().getDefenseBonus() > 0) {
                 return building;
             }
