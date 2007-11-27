@@ -347,7 +347,7 @@ public final class ImageLibrary extends ImageProvider {
 
     /**
      * Returns the scaling factor used when creating this ImageLibrary.
-     * @return 1 unless {@see #getScaledImageLibrary} was used to create
+     * @return 1 unless {@link #getScaledImageLibrary} was used to create
      *      this object.
      */
     public float getScalingFactor() {

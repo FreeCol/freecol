@@ -2296,7 +2296,7 @@ public final class InGameController implements NetworkConstants {
      * Changes the work type of this <code>Unit</code>.
      * 
      * @param unit The <code>Unit</code>
-     * @param workType The new <code>GoodsType</code> to produce.
+     * @param improvementType a <code>TileImprovementType</code> value
      */
     public void changeWorkType(Unit unit, TileImprovementType improvementType) {
         if (freeColClient.getGame().getCurrentPlayer() != freeColClient.getMyPlayer()) {

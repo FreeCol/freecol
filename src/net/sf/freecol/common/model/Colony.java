@@ -418,16 +418,12 @@ public final class Colony extends Settlement implements Abilities, Location, Nam
     }
 
     /**
-     * Gets an <code>Iterator</code> of every {@link ColonyTile} in this
+     * Gets a <code>List</code> of every {@link ColonyTile} in this
      * <code>Colony</code>.
      * 
-     * @return The <code>Iterator</code>.
+     * @return The <code>List</code>.
      * @see ColonyTile
      */
-    public Iterator<ColonyTile> getColonyTileIterator() {
-        return colonyTiles.iterator();
-    }
-
     public List<ColonyTile> getColonyTiles() {
         return colonyTiles;
     }
@@ -455,9 +451,7 @@ public final class Colony extends Settlement implements Abilities, Location, Nam
      */
     public ColonyTile getColonyTile(int x, int y) {
         Tile t = getTile(x, y);
-        Iterator<ColonyTile> i = getColonyTileIterator();
-        while (i.hasNext()) {
-            ColonyTile c = i.next();
+        for (ColonyTile c : colonyTiles) {
             if (c.getWorkTile() == t) {
                 return c;
             }
@@ -474,9 +468,7 @@ public final class Colony extends Settlement implements Abilities, Location, Nam
      * @return The <code>ColonyTile</code>
      */
     public ColonyTile getColonyTile(Tile t) {
-        Iterator<ColonyTile> i = getColonyTileIterator();
-        while (i.hasNext()) {
-            ColonyTile c = i.next();
+        for (ColonyTile c : colonyTiles) {
             if (c.getWorkTile() == t) {
                 return c;
             }
@@ -1095,9 +1087,7 @@ public final class Colony extends Settlement implements Abilities, Location, Nam
     public ColonyTile getVacantColonyTileFor(Unit unit, GoodsType goodsType) {
         ColonyTile bestPick = null;
         int highestProduction = 0;
-        Iterator<ColonyTile> colonyTileIterator = getColonyTileIterator();
-        while (colonyTileIterator.hasNext()) {
-            ColonyTile colonyTile = colonyTileIterator.next();
+        for (ColonyTile colonyTile : colonyTiles) {
             if (colonyTile.canAdd(unit)) {
                 Tile workTile = colonyTile.getWorkTile();
                 /*
@@ -1396,11 +1386,9 @@ public final class Colony extends Settlement implements Abilities, Location, Nam
 
     // Update all colony tiles
     private void addColonyTileProduction() {
-        Iterator<ColonyTile> tileIterator = getColonyTileIterator();
-        while (tileIterator.hasNext()) {
-            ColonyTile tile = tileIterator.next();
-            logger.finest("Calling newTurn for colony tile " + tile.toString());
-            tile.newTurn();
+        for (ColonyTile colonyTile : colonyTiles) {
+            logger.finest("Calling newTurn for colony tile " + colonyTile.toString());
+            colonyTile.newTurn();
         }
     }
 

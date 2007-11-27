@@ -593,9 +593,7 @@ public class AIPlayer extends AIObject {
         while (ci.hasNext()) {
             AIColony c = ci.next();
             ArrayList<Tile> oldWorkTiles = new ArrayList<Tile>();
-            Iterator<ColonyTile> it = c.getColony().getColonyTileIterator();
-            while (it.hasNext()) {
-                ColonyTile colonyTile = it.next();
+            for (ColonyTile colonyTile : c.getColony().getColonyTiles()) {
                 if (colonyTile.getUnit() != null) {
                     oldWorkTiles.add(colonyTile.getWorkTile());
                 }
@@ -604,9 +602,7 @@ public class AIPlayer extends AIObject {
             c.rearrangeWorkers(getConnection());
             
             ArrayList<Tile> tilesToUpdate = new ArrayList<Tile>();
-            it = c.getColony().getColonyTileIterator();
-            while (it.hasNext()) {
-                ColonyTile colonyTile = it.next();
+            for (ColonyTile colonyTile : c.getColony().getColonyTiles()) {
                 boolean isOccupied = colonyTile.getUnit() != null;
                 boolean wasOccupied = oldWorkTiles.remove(colonyTile.getWorkTile());
                 if (isOccupied != wasOccupied) {

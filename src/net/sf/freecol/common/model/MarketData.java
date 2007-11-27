@@ -76,10 +76,14 @@ public class MarketData extends FreeColObject {
      * Package constructor: This class is only supposed to be constructed
      * by {@link Market}.
      * 
-     * @param game The game this object should be created within.
      */
     public MarketData() {}
     
+    /**
+     * Creates a new <code>MarketData</code> instance.
+     *
+     * @param goodsType a <code>GoodsType</code> value
+     */
     public MarketData(GoodsType goodsType) {
         setId(goodsType.getId());
     }
@@ -239,15 +243,7 @@ public class MarketData extends FreeColObject {
      * set to <code>false</code>.
      *  
      * @param out The target stream.
-     * @param player The <code>Player</code> this XML-representation 
-     *      should be made for, or <code>null</code> if
-     *      <code>showAll == true</code>.
-     * @param showAll Only attributes visible to <code>player</code> 
-     *      will be added to the representation if <code>showAll</code>
-     *      is set to <i>false</i>.
-     * @param toSavedGame If <code>true</code> then information that
-     *      is only needed when saving a game is added.
-     * @throws XMLStreamException if there are any problems writing
+     * @exception XMLStreamException if there are any problems writing
      *      to the stream.
      */
     protected void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {

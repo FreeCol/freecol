@@ -342,7 +342,7 @@ public final class Market extends FreeColGameObject implements Ownable {
     /**
      * Add the given <code>Goods</code> to this <code>Market</code>.
      * 
-     * @param type a <code>GoodsType</code> value
+     * @param goodsType a <code>GoodsType</code> value
      * @param amount The amount of goods.
      */
     public void add(GoodsType goodsType, int amount) {
@@ -358,7 +358,7 @@ public final class Market extends FreeColGameObject implements Ownable {
 
     /**
      * Remove the given <code>Goods</code> from this <code>Market</code>.
-     * @param type a <code>GoodsType</code> value
+     * @param goodsType a <code>GoodsType</code> value
      * @param amount The amount of goods.
      */
     public void remove(GoodsType goodsType, int amount) {
@@ -393,7 +393,7 @@ public final class Market extends FreeColGameObject implements Ownable {
     /**
      * Gets the price of a given goods when the <code>Player</code> sells.
      *
-     * @param goodsIndex The index of the goods.
+     * @param type a <code>GoodsType</code> value
      * @param amount The amount of goods.
      * @return The sale price of the given goods.
      */

@@ -299,9 +299,7 @@ public class ColonyPlan {
         Building townHall = colony.getBuildingForProducing(Goods.BELLS);
 
         // Choose the best production for each tile:
-        Iterator<ColonyTile> colonyTileIterator = getColony().getColonyTileIterator();
-        while (colonyTileIterator.hasNext()) {
-            ColonyTile ct = colonyTileIterator.next();
+        for (ColonyTile ct : colony.getColonyTiles()) {
 
             if (ct.getWorkTile().getOwningSettlement() != null &&
                 ct.getWorkTile().getOwningSettlement() != colony || ct.isColonyCenterTile()) {
