@@ -250,9 +250,7 @@ public class ColonyTile extends FreeColGameObject implements WorkLocation, Ownab
      */
     public void relocateWorkers() {
         if (getUnit() != null) {
-            Iterator<WorkLocation> wli = getColony().getWorkLocationIterator();
-            while (wli.hasNext()) {
-                WorkLocation wl = wli.next();
+            for (WorkLocation wl : getColony().getWorkLocations()) {
                 if (wl != this && wl.canAdd(getUnit())) {
                     getUnit().setLocation(wl);
                     break;

@@ -394,16 +394,12 @@ public final class Colony extends Settlement implements Abilities, Location, Nam
     }
 
     /**
-     * Gets an <code>Iterator</code> of every location in this
-     * <code>Colony</code> where a {@link Unit} can work.
+     * Gets a <code>List</code> of every {@link WorkLocation} in this
+     * <code>Colony</code>.
      * 
-     * @return The <code>Iterator</code>.
+     * @return The <code>List</code>.
      * @see WorkLocation
      */
-    public Iterator<WorkLocation> getWorkLocationIterator() {
-        return getWorkLocations().iterator();
-    }
-
     public List<WorkLocation> getWorkLocations() {
         List<WorkLocation> result = new ArrayList<WorkLocation>(colonyTiles);
         result.addAll(buildingMap.values());
@@ -430,6 +426,10 @@ public final class Colony extends Settlement implements Abilities, Location, Nam
      */
     public Iterator<ColonyTile> getColonyTileIterator() {
         return colonyTiles.iterator();
+    }
+
+    public List<ColonyTile> getColonyTiles() {
+        return colonyTiles;
     }
 
     /**
@@ -519,9 +519,7 @@ public final class Colony extends Settlement implements Abilities, Location, Nam
     @Override
     public void remove(Locatable locatable) {
         if (locatable instanceof Unit) {
-            Iterator<WorkLocation> i = getWorkLocationIterator();
-            while (i.hasNext()) {
-                WorkLocation w = i.next();
+            for (WorkLocation w : getWorkLocations()) {
                 if (w.contains(locatable)) {
                     w.remove(locatable);
                     updatePopulation();
@@ -547,9 +545,7 @@ public final class Colony extends Settlement implements Abilities, Location, Nam
         if (unitCount != -1) {
             return unitCount;
         }
-        Iterator<WorkLocation> i = getWorkLocationIterator();
-        while (i.hasNext()) {
-            WorkLocation w = i.next();
+        for (WorkLocation w : getWorkLocations()) {
             count += w.getUnitCount();
         }
         return count;
@@ -779,24 +775,27 @@ public final class Colony extends Settlement implements Abilities, Location, Nam
 
     /**
      * Gets the <code>Unit</code> that is currently defending this
-     * <code>Colony</code>. Note that the colony will normally be defended by
-     * units outside of the colony (@see Tile#getDefendingUnit).
-     * <p>
-     * Note! Several callers fail to handle null as a return value. Return an
-     * arbitrary unarmed land unit.
+     * <code>Colony</code>. Note that the colony will normally be
+     * defended by units outside of the colony as long as there are
+     * some (@see Tile#getDefendingUnit).
      * 
      * @return The <code>Unit</code> that has been choosen to defend this
      *         colony.
      */
     private Unit getDefendingUnit() {
-        // Sanity check - are there units available?
-        List<Unit> unitList = getUnitList();
-        if (unitList.isEmpty()) {
-            throw new IllegalStateException("Colony " + name + " contains no units!");
+        int defence = Integer.MIN_VALUE;
+        Unit defender = null;
+        for (Unit unit : getUnitList()) {
+            if (unit.getUnitType().getDefence() > defence) {
+                defence = unit.getUnitType().getDefence();
+                defender = unit;
+            }
         }
-        // Get the first unit
-        // TODO should return an experienced soldier rather if available.
-        return unitList.get(0);
+        if (defender == null) {
+            throw new IllegalStateException("Colony " + name + " contains no units!");
+        } else {
+            return defender;
+        }
     }
 
     /**
@@ -847,17 +846,6 @@ public final class Colony extends Settlement implements Abilities, Location, Nam
             }
         }
         return buildableUnits;
-    }
-
-    /**
-     * Checks if this colony may build the given unit type.
-     * 
-     * @param unitType The unit type to test against.
-     * @return The result.
-     */
-    // TODO: remove
-    public boolean canBuildUnit(UnitType unitType) {
-        return canBuild(unitType);
     }
 
     /**
@@ -1063,9 +1051,8 @@ public final class Colony extends Settlement implements Abilities, Location, Nam
      */
     public int getProductionOf(GoodsType goodsType) {
         int amount = 0;
-        Iterator<WorkLocation> workLocationIterator = getWorkLocationIterator();
-        while (workLocationIterator.hasNext()) {
-            amount += workLocationIterator.next().getProductionOf(goodsType);
+        for (WorkLocation workLocation : getWorkLocations()) {
+            amount += workLocation.getProductionOf(goodsType);
         }
         return amount;
     }
@@ -1388,9 +1375,7 @@ public final class Colony extends Settlement implements Abilities, Location, Nam
     }
 
     private Unit getFirstUnit() {
-        Iterator<WorkLocation> wli = getWorkLocationIterator();
-        while (wli.hasNext()) {
-            WorkLocation wl = wli.next();
+        for (WorkLocation wl : getWorkLocations()) {
             Iterator<Unit> unitIterator = wl.getUnitIterator();
             while (unitIterator.hasNext()) {
                 Unit o = unitIterator.next();
@@ -1721,9 +1706,8 @@ public final class Colony extends Settlement implements Abilities, Location, Nam
      */
     @Override
     public void dispose() {
-        Iterator<WorkLocation> i = getWorkLocationIterator();
-        while (i.hasNext()) {
-            ((FreeColGameObject) i.next()).dispose();
+        for (WorkLocation workLocation : getWorkLocations()) {
+            ((FreeColGameObject) workLocation).dispose();
         }
         super.dispose();
     }
@@ -1784,9 +1768,8 @@ public final class Colony extends Settlement implements Abilities, Location, Nam
                 }
             }
              */
-            Iterator<WorkLocation> workLocationIterator = getWorkLocationIterator();
-            while (workLocationIterator.hasNext()) {
-                ((FreeColGameObject) workLocationIterator.next()).toXML(out, player, showAll, toSavedGame);
+            for (WorkLocation workLocation : getWorkLocations()) {
+                ((FreeColGameObject) workLocation).toXML(out, player, showAll, toSavedGame);
             }
         } else {
             out.writeAttribute("unitCount", Integer.toString(getUnitCount()));
@@ -2060,10 +2043,20 @@ public final class Colony extends Settlement implements Abilities, Location, Nam
         }
     }
     
+    /**
+     * Describe <code>getDefenseBonus</code> method here.
+     *
+     * @return an <code>int</code> value
+     */
     public int getDefenseBonus() {
         return defenseBonus;
     }
 
+    /**
+     * Describe <code>setDefenseBonus</code> method here.
+     *
+     * @param newDefenseBonus an <code>int</code> value
+     */
     public void setDefenseBonus(int newDefenseBonus) {
         defenseBonus = newDefenseBonus;
     }

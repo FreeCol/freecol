@@ -143,48 +143,42 @@ public final class ReportRequirementsPanel extends ReportPanel implements Action
             boolean hasWarning = false;
 
             // check if all unit requirements are met
-            Iterator<WorkLocation> workLocationIterator = colony.getWorkLocationIterator();
-            while (workLocationIterator.hasNext()) {
-                // check colony tiles
-                WorkLocation workLocation = workLocationIterator.next();
-                if (workLocation instanceof ColonyTile) {
-                    Unit unit = ((ColonyTile) workLocation).getUnit();
-                    if (unit != null) {
-                        GoodsType workType = unit.getWorkType();
-                        UnitType expert = FreeCol.getSpecification().getExpertForProducing(workType);
-                        int expertIndex = expert.getIndex();
-                        if (unitCount[index][expertIndex] == 0 && !expertWarning[expertIndex]) {
-                            addExpertWarning(doc, index, workType.getName(), expert);
-                            expertWarning[expertIndex] = true;
-                            hasWarning = true;
-                        }
+            for (ColonyTile colonyTile : colony.getColonyTiles()) {
+                Unit unit = colonyTile.getUnit();
+                if (unit != null) {
+                    GoodsType workType = unit.getWorkType();
+                    UnitType expert = FreeCol.getSpecification().getExpertForProducing(workType);
+                    int expertIndex = expert.getIndex();
+                    if (unitCount[index][expertIndex] == 0 && !expertWarning[expertIndex]) {
+                        addExpertWarning(doc, index, workType.getName(), expert);
+                        expertWarning[expertIndex] = true;
+                        hasWarning = true;
                     }
-                } else {
-                    // check buildings
-                    Building building = (Building) workLocation;
-                    GoodsType goodsType = building.getGoodsOutputType();
-                    UnitType expert = building.getExpertUnitType();
+                }
+            } 
+            for (Building building : colony.getBuildings()) {
+                GoodsType goodsType = building.getGoodsOutputType();
+                UnitType expert = building.getExpertUnitType();
                     
-                    if (goodsType != null && expert!=null) {
-                        // check if this building has no expert producing goods
-                        int expertIndex = expert.getIndex();
-                        if (building.getFirstUnit() != null &&
-                            !expertWarning[expertIndex] &&
-                            unitCount[index][expertIndex] == 0) {
-                            addExpertWarning(doc, index, goodsType.getName(), expert);
-                            expertWarning[expertIndex] = true;
-                            hasWarning = true;
-                        }
+                if (goodsType != null && expert != null) {
+                    // check if this building has no expert producing goods
+                    int expertIndex = expert.getIndex();
+                    if (building.getFirstUnit() != null &&
+                        !expertWarning[expertIndex] &&
+                        unitCount[index][expertIndex] == 0) {
+                        addExpertWarning(doc, index, goodsType.getName(), expert);
+                        expertWarning[expertIndex] = true;
+                        hasWarning = true;
                     }
-                    if (goodsType != null) {
-                        // not enough input
-                        int goodsIndex = goodsType.getIndex();
-                        if (building.getProductionNextTurn() < building.getMaximumProduction() &&
-                            !productionWarning[goodsIndex]) {
-                            addProductionWarning(doc, index, goodsType, building.getGoodsInputType());
-                            productionWarning[goodsIndex] = true;
-                            hasWarning = true;
-                        }
+                }
+                if (goodsType != null) {
+                    // not enough input
+                    int goodsIndex = goodsType.getIndex();
+                    if (building.getProductionNextTurn() < building.getMaximumProduction() &&
+                        !productionWarning[goodsIndex]) {
+                        addProductionWarning(doc, index, goodsType, building.getGoodsInputType());
+                        productionWarning[goodsIndex] = true;
+                        hasWarning = true;
                     }
                 }
             }

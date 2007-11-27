@@ -932,10 +932,8 @@ public class AIColony extends AIObject {
         // Ensure that we have enough food:
         int food = colony.getFoodProduction() - colony.getFoodConsumption();
         while (food < 0 && colony.getGoodsCount(Goods.FOOD) + food * 3 < 0) {
-            Iterator<WorkLocation> wlIterator = colony.getWorkLocationIterator();
             WorkLocation bestPick = null;
-            while (wlIterator.hasNext()) {
-                WorkLocation wl = wlIterator.next();
+            for (WorkLocation wl : colony.getWorkLocations()) {
                 if (wl.getUnitCount() > 0) {
                     if (wl instanceof ColonyTile) {
                         ColonyTile ct = (ColonyTile) wl;
@@ -1007,9 +1005,7 @@ public class AIColony extends AIObject {
         }
 
         // Move any workers not producing anything to a temporary location.
-        Iterator<WorkLocation> wlIterator = colony.getWorkLocationIterator();
-        while (wlIterator.hasNext()) {
-            WorkLocation wl = wlIterator.next();
+        for (WorkLocation wl : colony.getWorkLocations()) {
             while (wl.getUnitCount() > 0 && wl instanceof Building && ((Building) wl).getProductionNextTurn() <= 0) {
                 Iterator<Unit> unitIterator = wl.getUnitIterator();
                 Unit bestPick = unitIterator.next();
