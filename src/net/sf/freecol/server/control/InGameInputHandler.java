@@ -33,6 +33,7 @@ import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.ColonyTile;
 import net.sf.freecol.common.model.DiplomaticTrade;
 import net.sf.freecol.common.model.Europe;
+import net.sf.freecol.common.model.ExportData;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.GameOptions;
 import net.sf.freecol.common.model.Goods;
@@ -2340,16 +2341,9 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
              * new IllegalStateException("Colony has no custom house!");
              */
         }
-        int goodsIndex = Integer.valueOf(setGoodsLevelsElement.getAttribute("goods")).intValue();
-        boolean export = Boolean.valueOf(setGoodsLevelsElement.getAttribute("export")).booleanValue();
-        int exportLevel = Integer.valueOf(setGoodsLevelsElement.getAttribute("exportLevel")).intValue();
-        int highLevel = Integer.valueOf(setGoodsLevelsElement.getAttribute("highLevel")).intValue();
-        int lowLevel = Integer.valueOf(setGoodsLevelsElement.getAttribute("lowLevel")).intValue();
-
-        colony.setExports(goodsIndex, export);
-        colony.getExportLevel()[goodsIndex] = exportLevel;
-        colony.getHighLevel()[goodsIndex] = highLevel;
-        colony.getLowLevel()[goodsIndex] = lowLevel;
+        ExportData exportData = new ExportData();
+        exportData.readFromXMLElement((Element) setGoodsLevelsElement.getChildNodes().item(0));
+        colony.setExportData(exportData);
         return null;
     }
 

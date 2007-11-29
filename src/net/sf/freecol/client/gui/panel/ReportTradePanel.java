@@ -120,7 +120,7 @@ public final class ReportTradePanel extends ReportPanel implements ActionListene
         int column = extraColumns + 1;
         for (GoodsType goodsType : FreeCol.getSpecification().getGoodsTypeList()) {
             if (!goodsType.isStorable()) {
-                return;
+                continue;
             }
             column++;
             int sales = player.getSales(goodsType);
@@ -160,16 +160,20 @@ public final class ReportTradePanel extends ReportPanel implements ActionListene
             Colony colony = colonies.get(colonyIndex);
             JButton colonyButton = createColonyButton(colonyIndex);
             reportPanel.add(colonyButton, higConst.rc(row, labelColumn));
-            for (int goodsIndex = 0; goodsIndex < Goods.NUMBER_OF_TYPES; goodsIndex++) {
-                column = goodsIndex + 1 + extraColumns;
-                int amount = colony.getGoodsCount(goodsIndex);
+            column = extraColumns + 1;
+            for (GoodsType goodsType : FreeCol.getSpecification().getGoodsTypeList()) {
+                if (!goodsType.isStorable()) {
+                    continue;
+                }
+                column++;
+                int amount = colony.getGoodsCount(goodsType);
                 JLabel goodsLabel = new JLabel(String.valueOf(amount), JLabel.TRAILING);
                 if (colonyIndex == 0) {
                     goodsLabel.setBorder(FreeColPanel.TOPCELLBORDER);
                 } else {
                     goodsLabel.setBorder(FreeColPanel.CELLBORDER);
                 }
-                if (colony.getExports(goodsIndex)) {
+                if (colony.getExportData(goodsType).isExported()) {
                     goodsLabel.setText("*" + String.valueOf(amount));
                 }
                 if (amount > 200) {

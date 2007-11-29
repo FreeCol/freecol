@@ -38,6 +38,7 @@ import net.sf.freecol.common.model.BuildableType;
 import net.sf.freecol.common.model.Building;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.ColonyTile;
+import net.sf.freecol.common.model.ExportData;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.Location;
@@ -163,45 +164,18 @@ public class AIColony extends AIObject {
          *       goods to determine if it should be sold,
          *       instead of explicitly handling each type.
          */
-        final int CAPACITY = colony.getWarehouseCapacity();
-        int[] exportLevels = new int[] {
-                 CAPACITY, // FOOD
-                        0, // SUGAR
-                        0, // TOBACCO
-                        0, // COTTON
-                        0, // FURS
-                 CAPACITY, // LUMBER
-                        0, // ORE
-                        0, // SILVER
-            CAPACITY - 20, // HORSES
-                        0, // RUM
-                        0, // CIGARS
-                        0, // CLOTH
-                        0, // COATS
-                        0, // TRADE_GOODS
-            Math.min(CAPACITY, 250), // TOOLS
-            CAPACITY - 50, // MUSKETS
-        };
-        boolean[] exports = new boolean[] {
-            false, //FOOD
-             true, // SUGAR
-             true, // TOBACCO
-             true, // COTTON
-             true, // FURS
-            false, // LUMBER
-             true, // ORE
-             true, // SILVER
-             true, // HORSES
-             true, // RUM
-             true, // CIGARS
-             true, // CLOTH
-             true, // COATS
-             true, // TRADE_GOODS
-             true, // TOOLS
-             true, // MUSKETS    
-        };
-        colony.setExports(exports);
-        colony.setExportLevel(exportLevels);
+        int capacity = colony.getWarehouseCapacity();
+        ExportData defaultExports = new ExportData(Goods.FOOD, true, 0, 100, 0);
+        for (GoodsType goodsType : FreeCol.getSpecification().getGoodsTypeList()) {
+            if (goodsType.isStorable()) {
+                colony.setExportData(new ExportData(goodsType, defaultExports));
+            }
+        }
+        colony.getExportData(Goods.HORSES).setExportLevel(capacity - 20);
+        colony.getExportData(Goods.TOOLS).setExportLevel(Math.min(capacity, 250));
+        colony.getExportData(Goods.MUSKETS).setExportLevel(capacity - 50);
+        colony.getExportData(Goods.FOOD).setExported(false);
+        colony.getExportData(Goods.LUMBER).setExported(false);
     }
 
     /**

@@ -55,6 +55,7 @@ import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.ColonyTile;
 import net.sf.freecol.common.model.DiplomaticTrade;
 import net.sf.freecol.common.model.Europe;
+import net.sf.freecol.common.model.ExportData;
 import net.sf.freecol.common.model.FreeColGameObject;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.GoalDecider;
@@ -804,10 +805,9 @@ public final class InGameController implements NetworkConstants {
     private void stopInColony(Unit unit) {
 
         Stop stop = unit.getCurrentStop();
-        Location location = unit.getColony();
-        int[] exportLevel = unit.getColony().getExportLevel();  // respect the lower limit for TradeRoute
+        Colony colony = unit.getColony();
 
-        GoodsContainer warehouse = location.getGoodsContainer();
+        GoodsContainer warehouse = colony.getGoodsContainer();
         if (warehouse == null) {
             throw new IllegalStateException("No warehouse in a stop's location");
         }
@@ -824,11 +824,12 @@ public final class InGameController implements NetworkConstants {
                     if (goods.getAmount() < 100) {
                         // comlete goods until 100 units
                         // respect the lower limit for TradeRoute
-                        int amountPresent = warehouse.getGoodsCount(goodsType) - exportLevel[goodsType.getIndex()];
+                        int amountPresent = warehouse.getGoodsCount(goodsType) - 
+                            colony.getExportData(goodsType).getExportLevel();
                         if (amountPresent > 0) {
                             logger.finest("Automatically loading goods " + goods.getName());
                             int amountToLoad = Math.min(100 - goods.getAmount(), amountPresent);
-                            loadCargo(new Goods(freeColClient.getGame(), location, goods.getType(), amountToLoad), unit);
+                            loadCargo(new Goods(freeColClient.getGame(), colony, goods.getType(), amountToLoad), unit);
                         }
                     }
                     // remove item: other items of the same type
@@ -839,11 +840,11 @@ public final class InGameController implements NetworkConstants {
             }
             // this type of goods was not in the cargo list: do not
             // unload more than the warehouse can store
-            int capacity = ((Colony) location).getWarehouseCapacity() - warehouse.getGoodsCount(goods.getType());
+            int capacity = colony.getWarehouseCapacity() - warehouse.getGoodsCount(goods.getType());
             if (capacity < goods.getAmount() &&
                 !freeColClient.getCanvas().showConfirmDialog(Messages.message("traderoute.warehouseCapacity",
                                                                               "%unit%", unit.getName(),
-                                                                              "%colony%", ((Colony) location).getName(),
+                                                                              "%colony%", colony.getName(),
                                                                               "%amount%", String.valueOf(goods.getAmount() - capacity),
                                                                               "%goods%", goods.getName()),
                                                              "yes", "no")) {
@@ -858,11 +859,12 @@ public final class InGameController implements NetworkConstants {
         // load cargo that should be on board
         for (GoodsType goodsType : goodsTypesToLoad) {
             // respect the lower limit for TradeRoute
-            int amountPresent = warehouse.getGoodsCount(goodsType) - exportLevel[goodsType.getIndex()];
+            int amountPresent = warehouse.getGoodsCount(goodsType) -
+                colony.getExportData(goodsType).getExportLevel();
             if (amountPresent > 0) {
                 if (unit.getSpaceLeft() > 0) {
                     logger.finest("Automatically loading goods " + goodsType.getName());
-                    loadCargo(new Goods(freeColClient.getGame(), location, goodsType,
+                    loadCargo(new Goods(freeColClient.getGame(), colony, goodsType,
                             Math.min(amountPresent, 100)), unit);
                 }
             }
@@ -2124,18 +2126,12 @@ public final class InGameController implements NetworkConstants {
      */
     public void setGoodsLevels(Colony colony, GoodsType goodsType) {
         Client client = freeColClient.getClient();
-        boolean export = colony.getExports(goodsType);
-        int exportLevel = colony.getExportLevel()[goodsType.getIndex()];
-        int highLevel = colony.getHighLevel()[goodsType.getIndex()];
-        int lowLevel = colony.getLowLevel()[goodsType.getIndex()];
+        ExportData data = colony.getExportData(goodsType);
 
         Element setGoodsLevelsElement = Message.createNewRootElement("setGoodsLevels");
         setGoodsLevelsElement.setAttribute("colony", colony.getId());
-        setGoodsLevelsElement.setAttribute("goods", String.valueOf(goodsType.getIndex()));
-        setGoodsLevelsElement.setAttribute("export", String.valueOf(export));
-        setGoodsLevelsElement.setAttribute("exportLevel", String.valueOf(exportLevel));
-        setGoodsLevelsElement.setAttribute("highLevel", String.valueOf(highLevel));
-        setGoodsLevelsElement.setAttribute("lowLevel", String.valueOf(lowLevel));
+        setGoodsLevelsElement.appendChild(data.toXMLElement(colony.getOwner(), setGoodsLevelsElement
+                                                            .getOwnerDocument()));
 
         client.sendAndWait(setGoodsLevelsElement);
     }

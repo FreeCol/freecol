@@ -211,7 +211,6 @@ public class Player extends FreeColGameObject implements Abilities, Nameable, Mo
      */
     private HashMap<String, Feature> features = new HashMap<String, Feature>();
 
-
     /**
      * 
      * This constructor should only be used by subclasses.

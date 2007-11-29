@@ -54,7 +54,10 @@ public final class Colony extends Settlement implements Abilities, Location, Nam
 
     /** A map of Buildings, indexed by the ID of their basic type. */
     private HashMap<String, Building> buildingMap = new HashMap<String, Building>();
-    
+
+    /** A map of ExportData, indexed by the IDs of GoodsTypes. */
+    private HashMap<String, ExportData> exportData = new HashMap<String, ExportData>();
+
     private List<Building> delayedProduction = new ArrayList<Building>();
 
     /** The SoL membership this turn. */
@@ -81,9 +84,6 @@ public final class Colony extends Settlement implements Abilities, Location, Nam
     // Temporary variable:
     private int lastVisited = -1;
 
-    private int[] highLevel, lowLevel, exportLevel;
-    private boolean[] exports;
-
     /**
      * Stores the Features of this Colony.
      */
@@ -96,12 +96,6 @@ public final class Colony extends Settlement implements Abilities, Location, Nam
      */
     private List<BuildableType> buildQueue = new ArrayList<BuildableType>();
     
-    /** Cannot do it this way as NUMBER_OF_TYPES is not a constant
-    private int[] highLevel = new int[Goods.NUMBER_OF_TYPES];
-    private int[] lowLevel = new int[Goods.NUMBER_OF_TYPES];
-    private int[] exportLevel = new int[Goods.NUMBER_OF_TYPES];
-    private boolean[] exports = new boolean[Goods.NUMBER_OF_TYPES];
-    */
 
     /**
      * Creates a new <code>Colony</code>.
@@ -114,7 +108,6 @@ public final class Colony extends Settlement implements Abilities, Location, Nam
     public Colony(Game game, Player owner, String name, Tile tile) {
         super(game, owner, tile);
         goodsContainer = new GoodsContainer(game, this);
-        initializeGoodsTypeArrays();
         this.name = name;
         sonsOfLiberty = 0;
         oldSonsOfLiberty = 0;
@@ -193,24 +186,6 @@ public final class Colony extends Settlement implements Abilities, Location, Nam
     }
 
     /**
-     * Initializes warehouse/export settings.
-     */
-    private void initializeGoodsTypeArrays() {
-        int numberOfGoods = FreeCol.getSpecification().numberOfGoodsTypes();
-        highLevel = new int[numberOfGoods];
-        lowLevel = new int[numberOfGoods];
-        exportLevel = new int[numberOfGoods];
-        exports = new boolean[numberOfGoods];
-        
-        for (int goodsIndex = 0; goodsIndex < numberOfGoods; goodsIndex++) {
-            exports[goodsIndex] = false;
-            lowLevel[goodsIndex] = 10;
-            highLevel[goodsIndex] = 90;
-            exportLevel[goodsIndex] = 50;
-        }
-    }
-
-    /**
      * Updates SoL and builds stockade if possible.
      */
     public void updatePopulation() {
@@ -232,57 +207,27 @@ public final class Colony extends Settlement implements Abilities, Location, Nam
     }
 
     /**
-     * Get the <code>HighLevel</code> value.
-     * 
-     * @return an <code>int[]</code> value
+     * Describe <code>getExportData</code> method here.
+     *
+     * @param goodsType a <code>GoodsType</code> value
+     * @return an <code>ExportData</code> value
      */
-    public int[] getHighLevel() {
-        return highLevel;
+    public final ExportData getExportData(GoodsType goodsType) {
+        ExportData result = exportData.get(goodsType.getId());
+        if (result == null) {
+            result = new ExportData(goodsType);
+            setExportData(result);
+        }
+        return result;
     }
 
     /**
-     * Set the <code>HighLevel</code> value.
-     * 
-     * @param newHighLevel The new HighLevel value.
+     * Describe <code>setExportData</code> method here.
+     *
+     * @param newExportData an <code>ExportData</code> value
      */
-    public void setHighLevel(final int[] newHighLevel) {
-        this.highLevel = newHighLevel;
-    }
-
-    /**
-     * Get the <code>LowLevel</code> value.
-     * 
-     * @return an <code>int[]</code> value
-     */
-    public int[] getLowLevel() {
-        return lowLevel;
-    }
-
-    /**
-     * Set the <code>LowLevel</code> value.
-     * 
-     * @param newLowLevel The new LowLevel value.
-     */
-    public void setLowLevel(final int[] newLowLevel) {
-        this.lowLevel = newLowLevel;
-    }
-
-    /**
-     * Get the <code>ExportLevel</code> value.
-     * 
-     * @return an <code>int[]</code> value
-     */
-    public int[] getExportLevel() {
-        return exportLevel;
-    }
-
-    /**
-     * Set the <code>ExportLevel</code> value.
-     * 
-     * @param newExportLevel The new ExportLevel value.
-     */
-    public void setExportLevel(final int[] newExportLevel) {
-        this.exportLevel = newExportLevel;
+    public final void setExportData(ExportData newExportData) {
+        exportData.put(newExportData.getId(), newExportData);
     }
 
     /**
@@ -627,61 +572,6 @@ public final class Colony extends Settlement implements Abilities, Location, Nam
 
     public Iterator<Unit> getUnitIterator() {
         return getUnitList().iterator();
-    }
-
-    /**
-     * Returns true if the custom house should export this type of goods.
-     * 
-     * @param type The type of goods.
-     * @return True if the custom house should export this type of goods.
-     */
-    public boolean getExports(GoodsType type) {
-        return exports[type.getIndex()];
-    }
-    public boolean getExports(int goodsIndex) {
-        return exports[goodsIndex];
-    }
-
-    /**
-     * Returns true if the custom house should export these goods.
-     * 
-     * @param goods The goods.
-     * @return True if the custom house should export these goods.
-     */
-    public boolean getExports(Goods goods) {
-        return exports[goods.getType().getIndex()];
-    }
-
-    /**
-     * Sets whether the custom house should export these goods.
-     * 
-     * @param newExports The new export values.
-     */
-    public void setExports(final boolean[] newExports) {
-        System.arraycopy(newExports, 0, exports, 0, newExports.length);
-    }
-    
-    /**
-     * Sets whether the custom house should export these goods.
-     * 
-     * @param type the type of goods.
-     * @param value a <code>boolean</code> value
-     */
-    public void setExports(GoodsType type, boolean value) {
-        exports[type.getIndex()] = value;
-    }
-    public void setExports(int goodsIndex, boolean value) {
-        exports[goodsIndex] = value;
-    }
-
-    /**
-     * Sets whether the custom house should export these goods.
-     * 
-     * @param goods the goods.
-     * @param value a <code>boolean</code> value
-     */
-    public void setExports(Goods goods, boolean value) {
-        setExports(goods.getType().getIndex(), value);
     }
 
     @Override
@@ -1479,9 +1369,10 @@ public final class Colony extends Settlement implements Abilities, Location, Nam
         if (hasAbility("model.ability.export")) {
             List<Goods> exportGoods = getCompactGoods();
             for (Goods goods : exportGoods) {
-                if (getExports(goods) && (owner.canTrade(goods, Market.CUSTOM_HOUSE))) {
-                    GoodsType type = goods.getType();
-                    int amount = goods.getAmount() - getExportLevel()[type.getIndex()];
+                GoodsType type = goods.getType();
+                ExportData data = getExportData(type);
+                if (data.isExported() && (owner.canTrade(goods, Market.CUSTOM_HOUSE))) {
+                    int amount = goods.getAmount() - data.getExportLevel();
                     if (amount > 0) {
                         removeGoods(type, amount);
                         getOwner().getMarket().sell(type, amount, owner, Market.CUSTOM_HOUSE);
@@ -1496,7 +1387,8 @@ public final class Colony extends Settlement implements Abilities, Location, Nam
     private void createWarehouseCapacityWarning() {
         List<Goods> storedGoods = getGoodsContainer().getFullGoods();
         for (Goods goods : storedGoods) {
-            if (getExports(goods)  && (owner.canTrade(goods, Market.CUSTOM_HOUSE))) {
+            if (getExportData(goods.getType()).isExported() &&
+                owner.canTrade(goods, Market.CUSTOM_HOUSE)) {
                 // capacity will never be exceeded
                 continue;
             } else if (goods.getAmount() < getWarehouseCapacity()) {
@@ -1645,7 +1537,7 @@ public final class Colony extends Settlement implements Abilities, Location, Nam
         checkForNewColonist(); // must be after building production because horse production consumes some food
         exportGoods();
         // Throw away goods there is no room for.
-        goodsContainer.cleanAndReport(getWarehouseCapacity(), getLowLevel(), getHighLevel());
+        goodsContainer.cleanAndReport();
         // TODO: make warehouse a building
         createWarehouseCapacityWarning();
 
@@ -1739,14 +1631,9 @@ public final class Colony extends Settlement implements Abilities, Location, Nam
             out.writeAttribute("productionBonus", Integer.toString(productionBonus));
             out.writeAttribute("currentlyBuilding", getCurrentlyBuilding().getId());
             out.writeAttribute("landLocked", Boolean.toString(landLocked));
-            char[] exportsCharArray = new char[exports.length];
-            for (int i = 0; i < exports.length; i++) {
-                exportsCharArray[i] = (exports[i] ? '1' : '0');
+            for (ExportData data : exportData.values()) {
+                data.toXML(out);
             }
-            out.writeAttribute("exports", new String(exportsCharArray));
-            toArrayElement("lowLevel", lowLevel, out);
-            toArrayElement("highLevel", highLevel, out);
-            toArrayElement("exportLevel", exportLevel, out);
             /* Don't write features, they will be added from buildings in readFromXMLImpl
             for (Feature feature : features.values()) {
                 if (feature instanceof Ability) {
@@ -1777,7 +1664,6 @@ public final class Colony extends Settlement implements Abilities, Location, Nam
      */
     @Override
     protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
-        initializeGoodsTypeArrays();
         setId(in.getAttributeValue(null, "ID"));
         name = in.getAttributeValue(null, "name");
         owner = (Player) getGame().getFreeColGameObject(in.getAttributeValue(null, "owner"));
@@ -1799,12 +1685,6 @@ public final class Colony extends Settlement implements Abilities, Location, Nam
         setCurrentlyBuilding(BuildableType.NOTHING);
         landLocked = getAttribute(in, "landLocked", true);
         unitCount = getAttribute(in, "unitCount", -1);
-        final String exportString = in.getAttributeValue(null, "exports");
-        if (exportString != null) {
-            for (int i = 0; i < exportString.length(); i++) {
-                exports[i] = ((exportString.charAt(i) == '1') ? true : false);
-            }
-        }
         // Read child elements:
         while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
             if (in.getLocalName().equals(ColonyTile.getXMLElementTagName())) {
@@ -1828,12 +1708,10 @@ public final class Colony extends Settlement implements Abilities, Location, Nam
                 } else {
                     goodsContainer = new GoodsContainer(getGame(), this, in);
                 }
-            } else if (in.getLocalName().equals("lowLevel")) {
-                lowLevel = readFromArrayElement("lowLevel", in, new int[0]);
-            } else if (in.getLocalName().equals("highLevel")) {
-                highLevel = readFromArrayElement("highLevel", in, new int[0]);
-            } else if (in.getLocalName().equals("exportLevel")) {
-                exportLevel = readFromArrayElement("exportLevel", in, new int[0]);
+            } else if (in.getLocalName().equals(ExportData.getXMLElementTagName())) {
+                ExportData data = new ExportData();
+                data.readFromXML(in);
+                exportData.put(data.getId(), data);
             /* Features are not written, they will be added from buildings
             } else if (in.getLocalName().equals(Ability.getXMLElementTagName())) {
                 Ability ability = new Ability(in);

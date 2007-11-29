@@ -371,54 +371,53 @@ public class GoodsContainer extends FreeColGameObject {
     /**
      * Removes goods exceeding limit and reports on goods exceeding levels.
      *
-     * Note: The levels should be in descending order.
-     *
-     * @param limit The capacity of this <code>GoodsContainer</code>.
-     * @param lowLevel The lowest levels not to warn about.
-     * @param highLevel The highest levels not to warn about.
      */
-    public void cleanAndReport(int limit, int[] lowLevel, int[] highLevel) {
-        FreeColGameObject source = (FreeColGameObject) parent;
+    public void cleanAndReport() {
+        if (!(parent instanceof Colony)) {
+            return;
+        }
+        Colony colony = (Colony) parent;
+        int limit = colony.getWarehouseCapacity();
         int adjustment = limit / 100;
 
-        List<GoodsType> goodsTypeList = FreeCol.getSpecification().getGoodsTypeList();
-        for (GoodsType g : goodsTypeList) {
-            if (g.limitIgnored() || !g.isStorable()) {
+        for (GoodsType goodsType : FreeCol.getSpecification().getGoodsTypeList()) {
+            if (goodsType.limitIgnored() || !goodsType.isStorable()) {
                 continue;
             }
-            int index = g.getIndex();
-            int low = lowLevel[index] * adjustment;
-            int high = highLevel[index] * adjustment;
+            ExportData exportData = colony.getExportData(goodsType);
+            int index = goodsType.getIndex();
+            int low = exportData.getLowLevel() * adjustment;
+            int high = exportData.getHighLevel() * adjustment;
             if (storedGoods[index] > limit) {
                 // limit has been exceeded
                 int waste = storedGoods[index] - limit;
                 storedGoods[index] = limit;
-                addModelMessage(source, "model.building.warehouseWaste",
-                                new String [][] {{"%goods%", g.getName()},
+                addModelMessage(colony, "model.building.warehouseWaste",
+                                new String [][] {{"%goods%", goodsType.getName()},
                                                  {"%waste%", String.valueOf(waste)},
-                                                 {"%colony%", ((Colony) parent).getName()}},
-                                ModelMessage.WAREHOUSE_CAPACITY, g);
+                                                 {"%colony%", colony.getName()}},
+                                ModelMessage.WAREHOUSE_CAPACITY, goodsType);
             } else if (storedGoods[index] == limit && 
                        oldStoredGoods[index] < limit) {
                 // limit has been reached during this turn
-                addModelMessage(source, "model.building.warehouseOverfull",
-                                new String [][] {{"%goods%", g.getName()},
-                                                 {"%colony%", ((Colony) parent).getName()}},
-                                ModelMessage.WAREHOUSE_CAPACITY, g);
+                addModelMessage(colony, "model.building.warehouseOverfull",
+                                new String [][] {{"%goods%", goodsType.getName()},
+                                                 {"%colony%", colony.getName()}},
+                                ModelMessage.WAREHOUSE_CAPACITY, goodsType);
             } else if (storedGoods[index] > high &&
                        oldStoredGoods[index] <= high) {
-                addModelMessage(source, "model.building.warehouseFull",
-                                new String [][] {{"%goods%", g.getName()},
+                addModelMessage(colony, "model.building.warehouseFull",
+                                new String [][] {{"%goods%", goodsType.getName()},
                                                  {"%level%", String.valueOf(high)},
-                                                 {"%colony%", ((Colony) parent).getName()}},
-                                ModelMessage.WAREHOUSE_CAPACITY, g);
+                                                 {"%colony%", colony.getName()}},
+                                ModelMessage.WAREHOUSE_CAPACITY, goodsType);
             } else if (storedGoods[index] < low &&
                        oldStoredGoods[index] >= low) {
-                addModelMessage(source, "model.building.warehouseEmpty",
-                                new String [][] {{"%goods%", g.getName()},
+                addModelMessage(colony, "model.building.warehouseEmpty",
+                                new String [][] {{"%goods%", goodsType.getName()},
                                                  {"%level%", String.valueOf(low)},
-                                                 {"%colony%", ((Colony) parent).getName()}},
-                                ModelMessage.WAREHOUSE_CAPACITY, g);
+                                                 {"%colony%", colony.getName()}},
+                                ModelMessage.WAREHOUSE_CAPACITY, goodsType);
             }
         }
 

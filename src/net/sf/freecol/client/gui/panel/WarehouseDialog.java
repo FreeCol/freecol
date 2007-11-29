@@ -37,6 +37,7 @@ import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.Colony;
+import net.sf.freecol.common.model.ExportData;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.GoodsType;
 import cz.autel.dmi.HIGLayout;
@@ -188,8 +189,9 @@ public final class WarehouseDialog extends FreeColDialog implements ActionListen
             goodsLabel.setHorizontalAlignment(JLabel.LEADING);
             add(goodsLabel, higConst.rcwh(1, labelColumn, 1, 3));
 
+            ExportData exportData = colony.getExportData(goodsType);
             // export checkbox
-            export = new JCheckBox(Messages.message("warehouseDialog.export"), colony.getExports(goodsType));
+            export = new JCheckBox(Messages.message("warehouseDialog.export"), exportData.isExported());
             export.setToolTipText(Messages.message("warehouseDialog.export.shortDescription"));
             if (!colony.hasAbility("model.ability.export")) {
                 export.setEnabled(false);
@@ -197,19 +199,19 @@ public final class WarehouseDialog extends FreeColDialog implements ActionListen
             add(export, higConst.rc(5, labelColumn));
 
             // low level settings
-            SpinnerNumberModel lowLevelModel = new SpinnerNumberModel(colony.getLowLevel()[goodsIndex], 0, 100, 1);
+            SpinnerNumberModel lowLevelModel = new SpinnerNumberModel(exportData.getLowLevel(), 0, 100, 1);
             lowLevel = new JSpinner(lowLevelModel);
             lowLevel.setToolTipText(Messages.message("warehouseDialog.lowLevel.shortDescription"));
             add(lowLevel, higConst.rc(1, spinnerColumn));
 
             // high level settings
-            SpinnerNumberModel highLevelModel = new SpinnerNumberModel(colony.getHighLevel()[goodsIndex], 0, 100, 1);
+            SpinnerNumberModel highLevelModel = new SpinnerNumberModel(exportData.getHighLevel(), 0, 100, 1);
             highLevel = new JSpinner(highLevelModel);
             highLevel.setToolTipText(Messages.message("warehouseDialog.highLevel.shortDescription"));
             add(highLevel, higConst.rc(3, spinnerColumn));
 
             // export level settings
-            SpinnerNumberModel exportLevelModel = new SpinnerNumberModel(colony.getExportLevel()[goodsIndex], 0, colony
+            SpinnerNumberModel exportLevelModel = new SpinnerNumberModel(exportData.getExportLevel(), 0, colony
                     .getWarehouseCapacity(), 1);
             exportLevel = new JSpinner(exportLevelModel);
             exportLevel.setToolTipText(Messages.message("warehouseDialog.exportLevel.shortDescription"));
@@ -219,19 +221,19 @@ public final class WarehouseDialog extends FreeColDialog implements ActionListen
         }
 
         public void saveSettings() {
-            int goodsIndex = goodsType.getIndex();
             int lowLevelValue = ((SpinnerNumberModel) lowLevel.getModel()).getNumber().intValue();
             int highLevelValue = ((SpinnerNumberModel) highLevel.getModel()).getNumber().intValue();
             int exportLevelValue = ((SpinnerNumberModel) exportLevel.getModel()).getNumber().intValue();
-            boolean changed = (export.isSelected() != colony.getExports(goodsType))
-                                || (lowLevelValue != colony.getLowLevel()[goodsIndex])
-                                || (highLevelValue != colony.getHighLevel()[goodsIndex])
-                                || (exportLevelValue != colony.getExportLevel()[goodsIndex]);
+            ExportData exportData = colony.getExportData(goodsType);
+            boolean changed = (export.isSelected() != exportData.isExported())
+                || (lowLevelValue != exportData.getLowLevel())
+                || (highLevelValue != exportData.getHighLevel())
+                || (exportLevelValue != exportData.getExportLevel());
             
-            colony.setExports(goodsType, export.isSelected());
-            colony.getLowLevel()[goodsIndex] = lowLevelValue;
-            colony.getHighLevel()[goodsIndex] = highLevelValue;
-            colony.getExportLevel()[goodsIndex] = exportLevelValue;
+            exportData.setExported(export.isSelected());
+            exportData.setLowLevel(lowLevelValue);
+            exportData.setHighLevel(highLevelValue);
+            exportData.setExportLevel(exportLevelValue);
             if (changed) {
                 parent.getClient().getInGameController().setGoodsLevels(colony, goodsType);
             }
