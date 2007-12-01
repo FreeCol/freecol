@@ -1024,6 +1024,7 @@
     </founding-father>
     <founding-father id="model.foundingFather.williamBrewster" type="religious"
                      weight1="7" weight2="4" weight3="1">
+      <ability id="model.ability.selectRecruit" value="true"/>
       <ability id="model.ability.canRecruitUnit" value="false">
         <scope type="model.unit.indenturedServant"/>
         <scope type="model.unit.pettyCriminal"/>
