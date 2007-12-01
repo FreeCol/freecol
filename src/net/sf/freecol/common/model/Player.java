@@ -812,7 +812,7 @@ public class Player extends FreeColGameObject implements Abilities, Nameable, Mo
      */
     public void setContacted(Player player, boolean b) {
 
-        if (player == null || player == this) {
+        if (player == null || player == this || player == getGame().getUnknownEnemy()) {
             return;
         }
 
@@ -839,9 +839,9 @@ public class Player extends FreeColGameObject implements Abilities, Nameable, Mo
                     addModelMessage(this, "EventPanel.MEETING_NATIVES", null, ModelMessage.FOREIGN_DIPLOMACY, player);
                 }
                 // special cases for Aztec/Inca
-                if (player.getNationType() == FreeCol.getSpecification().getNationType("model.nation.aztec")) {
+                if (player.getNationType() == FreeCol.getSpecification().getNationType("model.nationType.aztec")) {
                     addModelMessage(this, "EventPanel.MEETING_AZTEC", null, ModelMessage.FOREIGN_DIPLOMACY, player);
-                } else if (player.getNationType() == FreeCol.getSpecification().getNationType("model.nation.inca")) {
+                } else if (player.getNationType() == FreeCol.getSpecification().getNationType("model.nationType.inca")) {
                     addModelMessage(this, "EventPanel.MEETING_INCA", null, ModelMessage.FOREIGN_DIPLOMACY, player);
                 }
             }

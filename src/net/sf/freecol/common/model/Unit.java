@@ -2776,7 +2776,13 @@ public class Unit extends FreeColGameObject implements Abilities, Locatable, Loc
             occupationString = "B";
             break;
         case Unit.IMPROVING:
-            occupationString = workImprovement.getOccupationString();
+            if (workImprovement == null) {
+                // TODO: this should become unnecessary as soon as AI
+                // improvements work
+                occupationString = "#";
+            } else {
+                occupationString = workImprovement.getOccupationString();
+            }
             break;
         case Unit.TO_AMERICA:
         case Unit.TO_EUROPE:

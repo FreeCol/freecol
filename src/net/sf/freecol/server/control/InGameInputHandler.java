@@ -95,6 +95,11 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
                 return createUnit(connection, element);
             }
         });
+        register("createBuilding", new NetworkRequestHandler() {
+            public Element handle(Connection connection, Element element) {
+                return createBuilding(connection, element);
+            }
+        });
         register("getRandom", new NetworkRequestHandler() {
             public Element handle(Connection connection, Element element) {
                 return getRandom(connection, element);
