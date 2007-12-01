@@ -27,6 +27,9 @@ import java.util.List;
 import java.util.logging.Logger;
 
 import net.sf.freecol.common.PseudoRandom;
+import net.sf.freecol.common.model.Building;
+import net.sf.freecol.common.model.BuildingType;
+import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.FreeColGameObject;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Location;
@@ -47,10 +50,8 @@ import org.w3c.dom.Element;
  * A server-side implementation of the <code>ModelController</code> interface.
  */
 public class ServerModelController implements ModelController {
+
     private static final Logger logger = Logger.getLogger(ServerModelController.class.getName());
-
-
-
 
     private final FreeColServer freeColServer;
 
@@ -212,6 +213,93 @@ public class ServerModelController implements ModelController {
          */
 
         return unit;
+    }
+
+    /**
+     * Creates a new building. This method is the same as running
+     * {@link #createBuilding(String, Location, Player, BuildingType, boolean, Connection)}
+     * with <code>secure = true</code> and <code>connection = null</code>.
+     * 
+     * @param taskID The <code>taskID</code> should be a unique identifier.
+     *            One method to make a unique <code>taskID</code>: <br>
+     *            <br>
+     *            getId() + "methodName:taskDescription" <br>
+     *            br> As long as the "taskDescription" is unique within the
+     *            method ("methodName"), you get a unique identifier.
+     * @param location The <code>Location</code> where the <code>Building</code>
+     *            will be created.
+     * @param owner The <code>Player</code> owning the <code>Building</code>.
+     * @param type The type of building (Building.FREE_COLONIST...).
+     * @return A reference to the <code>Building</code> which has been created.
+     */
+    public synchronized Building createBuilding(String taskID, Colony colony, BuildingType type) {
+        return createBuilding(taskID, colony, type, true, null);
+    }
+
+    /**
+     * Creates a new building.
+     * 
+     * @param taskID The <code>taskID</code> should be a unique identifier.
+     *            One method to make a unique <code>taskID</code>: <br>
+     *            <br>
+     *            getId() + "methodName:taskDescription" <br>
+     *            br> As long as the "taskDescription" is unique within the
+     *            method ("methodName"), you get a unique identifier.
+     * @param location The <code>Location</code> where the <code>Building</code>
+     *            will be created.
+     * @param owner The <code>Player</code> owning the <code>Building</code>.
+     * @param type The type of building (Building.FREE_COLONIST...).
+     * @param secure This variable should be set to <code>false</code> in case
+     *            this method is called when serving a client. Setting this
+     *            variable to <code>false</code> signals that the request
+     *            might be illegal.
+     * @param connection The connection that has requested to create the building,
+     *            or null if this request is internal to the server.
+     * @return A reference to the <code>Building</code> which has been created.
+     */
+    public synchronized Building createBuilding(String taskID, Colony colony, BuildingType type, boolean secure,
+                                                Connection connection) {
+        String extendedTaskID = taskID + colony.getOwner().getId()
+                + Integer.toString(freeColServer.getGame().getTurn().getNumber());
+        Building building;
+        TaskEntry taskEntry;
+        Player owner = colony.getOwner();
+
+        logger.info("Entering createBuilding.");
+
+        if (taskRegister.containsKey(extendedTaskID)) {
+            taskEntry = taskRegister.get(extendedTaskID);
+            building = (Building) taskEntry.entry;
+
+            if (building.getColony().getTile() != colony.getTile() ||
+                building.getOwner() != colony.getOwner() ||
+                building.getType() != type) {
+                logger.warning("Unsynchronization between the client and the server. Maybe a cheating attempt! Differences: "
+                               + ((building.getColony().getTile() != colony.getTile()) ? "colony: "
+                                  + building.getColony().getTile() + "!=" + colony.getTile() : "")
+                               + ((building.getOwner() != owner) ? "owner: " + building.getOwner() + "!=" + owner : "")
+                               + ((building.getType() != type) ? "type: " + building.getType() + "!=" + type : ""));
+                
+                taskRegister.remove(extendedTaskID);
+                building.dispose();
+                return null;
+            }
+
+            if (secure) {
+                taskEntry.secure = true;
+            }
+        } else {
+            building = new Building(freeColServer.getGame(), colony,type);
+            taskEntry = new TaskEntry(extendedTaskID, freeColServer.getGame().getTurn().getNumber(), secure, building);
+            taskRegister.put(extendedTaskID, taskEntry);
+        }
+
+        /*
+         * if (connection != null) { update(building,
+         * freeColServer.getPlayer(connection)); }
+         */
+
+        return building;
     }
 
     /**

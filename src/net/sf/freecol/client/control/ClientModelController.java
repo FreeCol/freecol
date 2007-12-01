@@ -25,7 +25,10 @@ import java.util.logging.Logger;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.networking.Client;
 import net.sf.freecol.common.PseudoRandom;
+import net.sf.freecol.common.model.Building;
+import net.sf.freecol.common.model.BuildingType;
 import net.sf.freecol.common.model.FreeColGameObject;
+import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.ModelController;
@@ -110,16 +113,15 @@ public class ClientModelController implements ModelController {
      * @return The created <code>Unit</code>.
      */
     public Unit createUnit(String taskID, Location location, Player owner, UnitType type) {
-        Client client = freeColClient.getClient();
 
         Element createUnitElement = Message.createNewRootElement("createUnit");
         createUnitElement.setAttribute("taskID", taskID);
         createUnitElement.setAttribute("location", location.getId());
         createUnitElement.setAttribute("owner", owner.getId());
-        createUnitElement.setAttribute("type", Integer.toString(type.getIndex()));
+        createUnitElement.setAttribute("type", type.getId());
 
         logger.info("Waiting for the server to reply...");
-        Element reply = client.ask(createUnitElement);
+        Element reply = freeColClient.getClient().ask(createUnitElement);
         logger.info("Reply received from server.");
 
         if (!reply.getTagName().equals("createUnitConfirmed")) {
@@ -132,6 +134,44 @@ public class ClientModelController implements ModelController {
         unit.setLocation(unit.getLocation());
 
         return unit;
+    }
+
+    /**
+     * Creates a new building.
+     * 
+     * @param taskID The <code>taskID</code> should be a unique identifier.
+     *            One method to make a unique <code>taskID</code>: <br>
+     *            <br>
+     *            getId() + "methodName:taskDescription" <br>
+     *            <br>
+     *            As long as the "taskDescription" is unique within the method
+     *            ("methodName"), you get a unique identifier.
+     * @param location The <code>Location</code> where the <code>Building</code>
+     *            will be created.
+     * @param owner The <code>Player</code> owning the <code>Building</code>.
+     * @param type The type of building (Building.FREE_COLONIST...).
+     * @return The created <code>Building</code>.
+     */
+    public Building createBuilding(String taskID, Colony colony, BuildingType type) {
+
+        Element createBuildingElement = Message.createNewRootElement("createBuilding");
+        createBuildingElement.setAttribute("taskID", taskID);
+        createBuildingElement.setAttribute("colony", colony.getId());
+        createBuildingElement.setAttribute("type", type.getId());
+
+        logger.info("Waiting for the server to reply...");
+        Element reply = freeColClient.getClient().ask(createBuildingElement);
+        logger.info("Reply received from server.");
+
+        if (!reply.getTagName().equals("createBuildingConfirmed")) {
+            logger.warning("Wrong tag name.");
+            throw new IllegalStateException();
+        }
+
+        Building building = new Building(freeColClient.getGame(),
+                                         (Element) reply.getElementsByTagName(Building.getXMLElementTagName())
+                                         .item(0));
+        return building;
     }
 
     /**

@@ -29,6 +29,8 @@ import java.util.logging.Logger;
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.common.Specification;
 import net.sf.freecol.common.model.BuildableType;
+import net.sf.freecol.common.model.Building;
+import net.sf.freecol.common.model.BuildingType;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.ColonyTile;
 import net.sf.freecol.common.model.DiplomaticTrade;
@@ -492,8 +494,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         String taskID = element.getAttribute("taskID");
         Location location = (Location) getGame().getFreeColGameObject(element.getAttribute("location"));
         Player owner = (Player) getGame().getFreeColGameObject(element.getAttribute("owner"));
-        int unitIndex = Integer.parseInt(element.getAttribute("type"));
-        UnitType type = FreeCol.getSpecification().getUnitType(unitIndex);
+        UnitType type = FreeCol.getSpecification().getUnitType(element.getAttribute("type"));
         if (location == null) {
             throw new NullPointerException();
         }
@@ -504,6 +505,27 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
                 .createUnit(taskID, location, owner, type, false, connection);
         Element reply = Message.createNewRootElement("createUnitConfirmed");
         reply.appendChild(unit.toXMLElement(owner, reply.getOwnerDocument()));
+        return reply;
+    }
+
+    /**
+     * Handles a "createBuilding"-message from a client.
+     * 
+     * @param connection The connection the message came from.
+     * @param element The element containing the request.
+     */
+    private Element createBuilding(Connection connection, Element element) {
+        logger.info("Receiving \"createBuilding\"-request.");
+        String taskID = element.getAttribute("taskID");
+        Colony colony = (Colony) getGame().getFreeColGameObject(element.getAttribute("colony"));
+        BuildingType type = FreeCol.getSpecification().getBuildingType(element.getAttribute("type"));
+        if (colony == null) {
+            throw new NullPointerException();
+        }
+        Building building = getFreeColServer().getModelController()
+                .createBuilding(taskID, colony, type, false, connection);
+        Element reply = Message.createNewRootElement("createBuildingConfirmed");
+        reply.appendChild(building.toXMLElement(colony.getOwner(), reply.getOwnerDocument()));
         return reply;
     }
 

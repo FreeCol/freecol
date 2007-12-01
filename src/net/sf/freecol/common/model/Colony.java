@@ -196,7 +196,7 @@ public final class Colony extends Settlement implements Abilities, Location, Nam
                 if (priceBonus.appliesTo(buildingType) &&
                     getBuilding(buildingType) == null &&
                     getUnitCount() >= buildingType.getPopulationRequired()) {
-                    addBuilding(new Building(getGame(), this, buildingType));
+                    createBuilding(buildingType);
                 }
             }
         }
@@ -1103,6 +1103,10 @@ public final class Colony extends Settlement implements Abilities, Location, Nam
         return true;
     }
 
+    private Building createBuilding(BuildingType buildingType) {
+        return getGame().getModelController().createBuilding(getId() + "buildBuilding", this, buildingType);
+    }
+
     private void checkBuildingComplete() {
         // In order to avoid duplicate messages:
         if (lastVisited == getGame().getTurn().getNumber()) {
@@ -1127,7 +1131,7 @@ public final class Colony extends Settlement implements Abilities, Location, Nam
                     } else if (buildable instanceof BuildingType) {
                         BuildingType upgradesFrom = ((BuildingType) buildable).getUpgradesFrom();
                         if (upgradesFrom == null) {
-                            addBuilding(new Building(getGame(), this, (BuildingType) buildable));
+                            createBuilding((BuildingType) buildable);
                         } else {
                             getBuilding(upgradesFrom).upgrade();
                         }

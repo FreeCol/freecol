@@ -61,6 +61,25 @@ public interface ModelController {
     public Unit createUnit(String taskID, Location location, Player owner, UnitType type);
 
     /**
+    * Creates a new building.
+    *
+    * @param taskID The <code>taskID</code> should be a unique identifier.
+    *               One method to make a unique <code>taskID</code>:
+    *               <br><br>
+    *               getId() + "methodName:taskDescription"
+    *               <br><br>
+    *               As long as the "taskDescription" is unique
+    *               within the method ("methodName"), you get a unique
+    *               identifier.
+    * @param location The <code>Location</code> where the <code>Building</code>
+    *               will be created.
+    * @param owner  The <code>Player</code> owning the <code>Building</code>.
+    * @param type   The type of building (Building.FREE_COLONIST...).
+    * @return The created <code>Building</code>.
+    */
+    public Building createBuilding(String taskID, Colony colony, BuildingType type);
+
+    /**
     * Puts the specified <code>Unit</code> in America.
     * @param unit The <code>Unit</code>.
     * @return The <code>Location</code> where the <code>Unit</code> appears.
