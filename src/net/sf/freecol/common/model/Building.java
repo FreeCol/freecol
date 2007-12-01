@@ -40,9 +40,6 @@ import org.w3c.dom.Element;
  */
 public final class Building extends FreeColGameObject implements Abilities, WorkLocation, Ownable, Named {
     
-    /** The type of a building. */
-    public static final int NONE = -1;
-
     /** The colony containing this building. */
     private Colony colony;
 
@@ -146,6 +143,11 @@ public final class Building extends FreeColGameObject implements Abilities, Work
         return buildingType.getName();
     }
 
+    /**
+     * Returns the level of this building.
+     *
+     * @return an <code>int</code> value
+     */
     public int getLevel() {
         return buildingType.getLevel();
     }
@@ -172,62 +174,6 @@ public final class Building extends FreeColGameObject implements Abilities, Work
     }
 
     /**
-     * Gets the number of hammers required for the improved building of the same
-     * type.
-     * 
-     * @return The number of hammers required for the improved building of the
-     *         same type, or <code>-1</code> if the building does not exist.
-     */
-    public int getNextHammers() {
-        if (!canBuildNext()) {
-            return -1;
-        }
-        if (buildingType.getUpgradesTo() != null) {
-            return buildingType.getUpgradesTo().getHammersRequired();
-        } else {
-            return -1;
-        }
-    }
-
-    /**
-     * Gets the number of tools required for the improved building of the same
-     * type.
-     * 
-     * @return The number of tools required for the improved building of the
-     *         same type, or <code>-1</code> if the building does not exist.
-     */
-    public int getNextTools() {
-        if (!canBuildNext()) {
-            return -1;
-        }
-
-        if (buildingType.getUpgradesTo() != null) {
-            return buildingType.getUpgradesTo().getToolsRequired();
-        } else {
-            return -1;
-        }
-    }
-
-    /**
-     * Gets the colony population required for the improved building of the same
-     * type.
-     * 
-     * @return The colony population required for the improved building of the
-     *         same type, or <code>-1</code> if the building does not exist.
-     */
-    public int getNextPop() {
-        if (!canBuildNext()) {
-            return -1;
-        }
-
-        if (buildingType.getUpgradesTo() != null) {
-            return buildingType.getUpgradesTo().getPopulationRequired();
-        } else {
-            return -1;
-        }
-    }
-
-    /**
      * Checks if this building can have a higher level.
      * 
      * @return If this <code>Building</code> can have a higher level, that
@@ -237,21 +183,7 @@ public final class Building extends FreeColGameObject implements Abilities, Work
      *         population.
      */
     public boolean canBuildNext() {
-        return canBuild(buildingType.getUpgradesTo());
-    }
-    
-
-    /**
-     * Checks if the given building type can be built.
-     * 
-     * @return If this <code>Building</code> can have a higher level, that
-     *         {@link FoundingFather Adam Smith} is present for manufactoring
-     *         factory level buildings and that the <code>Colony</code>
-     *         containing this <code>Building</code> has a sufficiently high
-     *         population.
-     */
-    public boolean canBuild(BuildingType next) {
-        return getColony().canBuild(next);
+        return getColony().canBuild(buildingType.getUpgradesTo());
     }
 
     /**

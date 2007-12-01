@@ -4369,34 +4369,6 @@ public class Unit extends FreeColGameObject implements Abilities, Locatable, Loc
         return base;
     }
 
-    public static int getNextHammers(int index) {
-        return getNextHammers(FreeCol.getSpecification().getUnitType(index));
-    }
-
-    public static int getNextHammers(UnitType type) {
-
-        if (type.canBeBuilt()) {
-
-            return type.getHammersRequired();
-        }
-
-        return -1;
-    }
-
-    public static int getNextTools(int index) {
-        return getNextTools(FreeCol.getSpecification().getUnitType(index));
-    }
-
-    public static int getNextTools(UnitType type) {
-
-        if (type.canBeBuilt()) {
-
-            return type.getToolsRequired();
-        }
-
-        return -1;
-    }
-
     /**
      * Removes all references to this object.
      */
