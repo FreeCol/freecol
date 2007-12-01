@@ -196,7 +196,7 @@ public final class Colony extends Settlement implements Abilities, Location, Nam
                 if (priceBonus.appliesTo(buildingType) &&
                     getBuilding(buildingType) == null &&
                     getUnitCount() >= buildingType.getPopulationRequired()) {
-                    createBuilding(buildingType);
+                    addBuilding(createBuilding(buildingType));
                 }
             }
         }
@@ -1131,7 +1131,7 @@ public final class Colony extends Settlement implements Abilities, Location, Nam
                     } else if (buildable instanceof BuildingType) {
                         BuildingType upgradesFrom = ((BuildingType) buildable).getUpgradesFrom();
                         if (upgradesFrom == null) {
-                            createBuilding((BuildingType) buildable);
+                            addBuilding(createBuilding((BuildingType) buildable));
                         } else {
                             getBuilding(upgradesFrom).upgrade();
                         }
@@ -1403,7 +1403,7 @@ public final class Colony extends Settlement implements Abilities, Location, Nam
                                     new String [][] {{"%goods%", goods.getName()},
                                                      {"%colony%", getName()},
                                                      {"%amount%", String.valueOf(waste)}},
-                                    ModelMessage.WAREHOUSE_CAPACITY, goods);
+                                    ModelMessage.WAREHOUSE_CAPACITY, goods.getType());
                 }
             }
         }
