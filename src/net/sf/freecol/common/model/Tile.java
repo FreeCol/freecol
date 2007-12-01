@@ -36,6 +36,7 @@ import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.Specification;
 import net.sf.freecol.common.model.Map.CircleIterator;
 import net.sf.freecol.common.model.Map.Position;
+import net.sf.freecol.common.util.EmptyIterator;
 
 import org.w3c.dom.Element;
 
@@ -1164,7 +1165,11 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
      * @return The <code>Iterator</code>.
      */
     public Iterator<TileItem> getTileItemIterator() {
-        return getTileItemList().iterator();
+        if (tileItems == null) {
+            return EmptyIterator.getInstance();
+        } else {
+            return tileItems.iterator();
+        }
     }
 
     /**

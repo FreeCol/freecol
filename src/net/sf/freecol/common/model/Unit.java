@@ -2840,7 +2840,10 @@ public class Unit extends FreeColGameObject implements Abilities, Locatable, Loc
         case IMPROVING:
             movesLeft = 0;
             getTile().takeOwnership(getOwner());
-            workLeft = getWorkImprovement().getTurnsToComplete();
+            workLeft = -1;
+            if (workImprovement != null) {
+                workLeft = workImprovement.getTurnsToComplete();
+            }
             state = s;
             doAssignedWork();
             return;
