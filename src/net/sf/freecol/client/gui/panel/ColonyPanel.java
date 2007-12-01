@@ -104,7 +104,7 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener, C
     /**
      * The speed of the scrolling.
      */
-    public static final int SCROLL_SPEED = 10;
+    public static final int SCROLL_SPEED = 40;
 
     private static final int EXIT = 0, BUY_BUILDING = 1, UNLOAD = 2, RENAME = 3, WAREHOUSE = 4, FILL = 5;
 
@@ -125,7 +125,7 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener, C
 
     private final FreeColProgressBar toolsLabel;
 
-    private final ProductionPanel productionPanel;
+    private final JPanel productionPanel;
 
     private final JComboBox buildingBox;
 
@@ -201,7 +201,8 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener, C
         fillInputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_F, 0, true), "released");
         SwingUtilities.replaceUIInputMap(fillButton, JComponent.WHEN_IN_FOCUSED_WINDOW, fillInputMap);
 
-        productionPanel = new ProductionPanel(this);
+        productionPanel = new JPanel();
+        productionPanel.setOpaque(false);
         outsideColonyPanel = new OutsideColonyPanel(this);
         inPortPanel = new InPortPanel();
         warehousePanel = new WarehousePanel(this);
@@ -333,9 +334,8 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener, C
         int[] widths = { 125, 125, margin, 138, margin, 215, margin, 204 };
         int[] heights = { 0, // colony select box
                 margin, 225, // colony tiles and buildings
-                margin, 8, // extra space for production panel
-                -8, // hammers label, same size as tools label
-                margin, -6, // tools label, same size as hammers label
+                margin, 28, // hammers label, same size as tools label
+                margin, 28, // tools label, same size as hammers label
                 margin, 120, // port and cargo panels
                 margin, 140, // warehouse
                 margin, 0 // buttons
@@ -348,8 +348,7 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener, C
         add(tilesScroll, higConst.rcwh(row, 1, 4, 1));
         add(buildingsScroll, higConst.rcwh(row, 6, 3, 1));
         row += 2;
-        add(productionPanel, higConst.rcwh(row, 1, 4, 2));
-        row += 1;
+        add(productionPanel, higConst.rcwh(row, 1, 4, 1, "tl"));
         add(buildingBox, higConst.rc(row, 6));
         add(hammersLabel, higConst.rc(row, 8));
         row += 2;
@@ -523,7 +522,7 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener, C
 
         updateBuildingBox();
         updateNameBox();
-
+        updateProductionPanel();
         updateSoLLabel();
         updateProgressLabel();
 
@@ -711,6 +710,36 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener, C
         }
     }
 
+    public void updateProductionPanel() {
+        productionPanel.removeAll();
+
+        final int foodProduction = colony.getFoodProduction();
+        final int foodConsumption = colony.getFoodConsumption();
+        final int horses = colony.getProductionOf(Goods.HORSES);
+        final int bells = colony.getProductionOf(Goods.BELLS);
+        final int crosses = colony.getProductionOf(Goods.CROSSES);
+
+        // The food that is used. If not enough food is produced, the
+        // complete production.  Horses consume 1 food each, so they
+        // need to be added to the used food.
+            
+        int usedFood = (foodConsumption < foodProduction ? foodConsumption : foodProduction) + horses;
+        productionPanel.add(new ProductionLabel(Goods.FOOD, usedFood, parent));
+
+        int surplusFood = foodProduction - foodConsumption - horses;
+        ProductionLabel surplusLabel = new ProductionLabel(Goods.FOOD, surplusFood, parent);
+        surplusLabel.setDrawPlus(true);
+        productionPanel.add(surplusLabel);
+
+        ProductionLabel horseLabel = new ProductionLabel(Goods.HORSES, horses, parent);
+        horseLabel.setMaxGoodsIcons(1);
+        productionPanel.add(horseLabel);
+
+        productionPanel.add(new ProductionLabel(Goods.BELLS, bells, parent));
+        productionPanel.add(new ProductionLabel(Goods.CROSSES, crosses, parent));
+
+    }
+    
     /**
      * Returns the currently select unit.
      * 
@@ -965,6 +994,7 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener, C
             updateCargoLabel();
             updateCarrierButtons();
             updateWarehouse();
+            updateProductionPanel();
             refresh();
         }
     }
@@ -975,7 +1005,7 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener, C
                 closeColonyPanel();
                 return;
             }
-
+            updateProductionPanel();
             updateBuildingBox();
             updateSoLLabel();
             updateOutsideColonyPanel();
@@ -1176,6 +1206,7 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener, C
                 initialize();
                 colonyPanel.updateSoLLabel();
 
+                updateProductionPanel();
                 updateProductionLabel();
                 if (oldParent instanceof ASingleBuildingPanel) {
                     ((ASingleBuildingPanel) oldParent).updateProductionLabel();
@@ -1190,77 +1221,6 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener, C
                 super.remove(comp);
                 updateProductionLabel();
             }
-        }
-    }
-
-    /**
-     * This panel holds the information of the current food, liberty bell and
-     * cross production.
-     */
-    public static final class ProductionPanel extends JPanel {
-        private final ColonyPanel colonyPanel;
-
-
-        public ProductionPanel(ColonyPanel colonyPanel) {
-            this.colonyPanel = colonyPanel;
-        }
-
-        private Colony getColony() {
-            return colonyPanel.getColony();
-        }
-
-        private Canvas getCanvas() {
-            return colonyPanel.getParentCanvas();
-        }
-
-        // TODO: make this an ordinary panel with ProductionLabels
-        @Override
-        public void paintComponent(Graphics g) {
-            Colony currentColony = getColony();
-            if (currentColony == null) {
-                // Apparently this can happen
-                return;
-            }
-
-            final int foodProduction = currentColony.getFoodProduction();
-            final int foodConsumption = currentColony.getFoodConsumption();
-            final int horses = currentColony.getProductionOf(Goods.HORSES);
-            final int bells = currentColony.getProductionOf(Goods.BELLS);
-            final int crosses = currentColony.getProductionOf(Goods.CROSSES);
-
-            ArrayList<ProductionLabel> products = new ArrayList<ProductionLabel>();
-
-            // The food that is used. If not enough food is produced, the
-            // complete production.
-            // Horses consume 1 food each, so they need to be added to the used
-            // food.
-            
-            int usedFood = (foodConsumption < foodProduction ? foodConsumption : foodProduction) + horses;
-            products.add(new ProductionLabel(Goods.FOOD, usedFood, getCanvas()));
-
-            int surplusFood = foodProduction - foodConsumption - horses;
-            ProductionLabel surplusLabel = new ProductionLabel(Goods.FOOD, surplusFood, getCanvas());
-            surplusLabel.setDrawPlus(true);
-            products.add(surplusLabel);
-
-            ProductionLabel horseLabel = new ProductionLabel(Goods.HORSES, horses, getCanvas());
-            horseLabel.setMaxGoodsIcons(1);
-            products.add(horseLabel);
-
-            products.add(new ProductionLabel(Goods.BELLS, bells, getCanvas()));
-            products.add(new ProductionLabel(Goods.CROSSES, crosses, getCanvas()));
-
-            int margin = 6;
-            int offset = 0;
-
-            for (ProductionLabel pl : products) {
-                pl.paintComponent(g);
-                int width = pl.getWidth() + margin;
-                offset += width;
-                g.translate(width, 0);
-            } 
-            g.translate(-offset, 0);
-
         }
     }
 
@@ -1319,6 +1279,7 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener, C
                     oldParent.remove(comp);
                     updateBuildingsPanel();
                     updateBuildingBox();
+                    updateProductionPanel();
                 } else {
                     logger.warning("An invalid component got dropped on this ColonistsPanel.");
                     return null;
@@ -1683,6 +1644,7 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener, C
                             updateBuildingBox();
                             updateWarehouse();
                             updateBuildingsPanel();
+                            updateProductionPanel();
 
                             ((UnitLabel) comp).setSmall(false);
 
