@@ -2474,7 +2474,9 @@ public class Player extends FreeColGameObject implements Abilities, Nameable, Mo
                 ModelMessage message = new ModelMessage();
                 message.readFromXML(in, getGame());
                 addModelMessage(message);
-            }            
+            } else {
+                logger.warning("Unknown tag: " + in.getLocalName() + " loading player");
+            }
         }
         if (market == null) {
             market = new Market(getGame(), this);

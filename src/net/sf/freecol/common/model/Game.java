@@ -967,6 +967,8 @@ public class Game extends FreeColGameObject {
                 } else {
                     map = new Map(this, in);
                 }
+            } else {
+                logger.warning("Unknown tag: " + in.getLocalName() + " loading game");
             }
         }
         if (gameOptions == null) {

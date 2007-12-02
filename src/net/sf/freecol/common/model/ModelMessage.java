@@ -423,8 +423,6 @@ public class ModelMessage extends FreeColObject {
             }
         }
 
-        in.nextTag();
-
     }
 
 }
