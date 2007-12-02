@@ -559,7 +559,7 @@ public class IndianSettlement extends Settlement {
     }
 
     /**
-     * Gets the kind of <code>Settlment</code> being used
+     * Gets the kind of <code>Settlement</code> being used
      * by the given tribe.
      *
      * @param tribe The tribe.
@@ -694,7 +694,7 @@ public class IndianSettlement extends Settlement {
     /**
     * Gets the <code>Unit</code> that is currently defending this <code>IndianSettlement</code>.
     * @param attacker The target that would be attacking this <code>IndianSettlement</code>.
-    * @return The <code>Unit</code> that has been choosen to defend this <code>IndianSettlement</code>.
+    * @return The <code>Unit</code> that has been chosen to defend this <code>IndianSettlement</code>.
     */
     @Override
     public Unit getDefendingUnit(Unit attacker) {
@@ -883,13 +883,17 @@ public class IndianSettlement extends Settlement {
         Collections.sort(goodsTypes, wantedGoodsComparator);
         int wantedIndex = 0;
         for (GoodsType goodsType : goodsTypes) {
-            if (goodsType != Goods.HORSES && goodsType != Goods.MUSKETS) {
-                if (wantedIndex < wantedGoods.length) {
-                    wantedGoods[wantedIndex] = goodsType;
-                    wantedIndex++;
-                } else {
-                    break;
-                }
+            // Indians do not ask for horses or guns
+            if (goodsType == Goods.HORSES || goodsType == Goods.MUSKETS) 
+                continue;
+            // no sense asking for bells or crosses
+            if (goodsType.isStorable()==false)
+                continue;
+            if (wantedIndex < wantedGoods.length) {
+                wantedGoods[wantedIndex] = goodsType;
+                wantedIndex++;
+            } else {
+                break;
             }
         }
     }
