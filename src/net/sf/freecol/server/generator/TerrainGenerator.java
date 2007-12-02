@@ -37,12 +37,17 @@ import net.sf.freecol.common.model.Map.Position;
  * Class for making a <code>Map</code> based upon a land map.
  */
 public class TerrainGenerator {
+
     private static final Logger logger = Logger.getLogger(TerrainGenerator.class.getName());
     
     private final MapGeneratorOptions mapGeneratorOptions;
+
     private final Random random = new Random();
 
+    private TileType ocean = FreeCol.getSpecification().getTileType("model.tile.ocean");
+
     public ArrayList<ArrayList<TileType>> latTileTypes = new ArrayList<ArrayList<TileType>>();
+
     /**
      * Creates a new <code>TerrainGenerator</code>.
      * 
@@ -92,9 +97,11 @@ public class TerrainGenerator {
         final boolean importBonuses = (importGame != null) && getMapGeneratorOptions().getBoolean(MapGeneratorOptions.IMPORT_BONUSES);
         final boolean importLandMap = (importGame != null) && getMapGeneratorOptions().getBoolean(MapGeneratorOptions.IMPORT_LAND_MAP);
                 
+        int forestChance = getMapGeneratorOptions().getPercentageOfForests();
         Tile[][] tiles = new Tile[width][height];
-        for (int x = 0; x < width; x++) {
-            for (int y = 0; y < height; y++) {
+        for (int y = 0; y < height; y++) {
+            int latitude = (Math.min(y, height - y) * 200) / height;
+            for (int x = 0; x < width; x++) {
                 Tile t;                
                 if (importTerrain && importGame.getMap().isValid(x, y)) {
                     Tile importTile = importGame.getMap().getTile(x, y);
@@ -107,10 +114,10 @@ public class TerrainGenerator {
                             perhapsAddBonus(t, landMap);
                         }
                     } else {
-                        t = createTile(game, landMap, x, y);
+                        t = createTile(game, x, y, landMap, latitude, forestChance);
                     }
                 } else {
-                    t = createTile(game, landMap, x, y);
+                    t = createTile(game, x, y, landMap, latitude, forestChance);
                 }
                 tiles[x][y] = t;
             }
@@ -126,31 +133,13 @@ public class TerrainGenerator {
         }
     }
 
-    private Tile createTile(Game game, boolean[][] landMap, int i, int j) {
-        final int height = landMap[0].length;
+    private Tile createTile(Game game, int x, int y, boolean[][] landMap, int latitude, int forestChance) {
         
         Tile t;
-        if (landMap[i][j]) {
-            t = new Tile(game, 
-                          getRandomLandTileType( ((Math.min(j, height - j) * 200) / height),
-                                            getMapGeneratorOptions().getPercentageOfForests() ),
-                          i, j);
-/*
-            if ((t.getType() != Tile.ARCTIC) && 
-                (random.nextInt(100) < getMapGeneratorOptions().getPercentageOfForests())) {
-                t.setForested(true);
-            } else if (t.getType() != Tile.ARCTIC) {
-                int k = random.nextInt(16);
-                if (k < 1) {
-                    t.setAddition(Tile.ADD_MOUNTAINS);
-                } else if (k < 2) {
-                    t.setAddition(Tile.ADD_HILLS);
-                }
-            }
-*/
+        if (landMap[x][y]) {
+            t = new Tile(game, getRandomLandTileType(latitude, forestChance), x, y);
         } else {
-            TileType ocean = FreeCol.getSpecification().getTileType("model.tile.ocean");
-            t = new Tile(game, ocean, i, j);
+            t = new Tile(game, ocean, x, y);
         }
         perhapsAddBonus(t, landMap);
         
