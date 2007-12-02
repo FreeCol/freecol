@@ -481,6 +481,8 @@ public final class Market extends FreeColGameObject implements Ownable {
 
     public void newTurn() {
         for (GoodsType goodsType : FreeCol.getSpecification().getGoodsTypeList()) {
+            if (goodsType.isStorable()==false)
+                continue;
             MarketData data = marketData.get(goodsType);
             if (data != null) {
                 remove(goodsType, goodsType.getInitialAmount()/50);
