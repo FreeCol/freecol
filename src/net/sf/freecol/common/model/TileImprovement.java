@@ -74,7 +74,7 @@ public class TileImprovement extends TileItem implements Locatable, Named {
             throw new NullPointerException();
         }
         this.type = type;
-        this.turnsToComplete = tile.getBasicWorkTurns() + type.getAddWorkTurns();
+        this.turnsToComplete = tile.getType().getBasicWorkTurns() + type.getAddWorkTurns();
         this.magnitude = type.getMagnitude();
     }
 

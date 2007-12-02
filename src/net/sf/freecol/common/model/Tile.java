@@ -198,15 +198,6 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
         return (getGame().getViewOwner() != null);
     }
 
-
-    // TODO: what's this supposed to do?
-    public int getBasicWorkTurns() {
-        if (type == null) {
-            return 0;
-        }
-        return type.getBasicWorkTurns();
-    }
-
     /**
      * Get the <code>Region</code> value.
      *
@@ -1348,7 +1339,7 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
 
     /**
      * Finds the top three outputs based on TileType, TileItemContainer and FishBonus if any
-     * @param tileType The <code>TileType/code>
+     * @param tileType The <code>TileType</code>
      * @param tiContainer The <code>TileItemContainer</code>
      * @param fishBonus The Bonus Fish to be considered if valid
      * @return The sorted top three of the outputs.
@@ -1379,11 +1370,14 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
         return top;
     }
 
-    public List<GoodsType> getSortedGoodsList(final TileType tileType, final TileItemContainer tiContainer, final int fishBonus) {
+    public List<GoodsType> getSortedGoodsList(final TileType tileType,
+                                              final TileItemContainer tiContainer,
+                                              final int fishBonus) {
         List<GoodsType> goodsTypeList = FreeCol.getSpecification().getGoodsTypeList();
         Collections.sort(goodsTypeList, new Comparator<GoodsType>() {
                 public int compare(GoodsType o, GoodsType p) {
-                    return getTileTypePotential(tileType, p, tiContainer, fishBonus) - getTileTypePotential(tileType, o, tiContainer, fishBonus);
+                    return getTileTypePotential(tileType, p, tiContainer, fishBonus) - 
+                        getTileTypePotential(tileType, o, tiContainer, fishBonus);
                 }
             });
         return goodsTypeList;
@@ -1557,13 +1551,6 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
                             Building stockade = getColony().getStockade();
                             if (stockade != null) {
                                 stockade.toXML(out);
-                                /*
-                                out.writeStartElement(Building.getXMLElementTagName());
-                                out.writeAttribute("ID", stockade.getId());
-                                out.writeAttribute("colony", getColony().getId());
-                                out.writeAttribute("buildingType", Integer.toString(pet.getColonyStockadeLevel()));
-                                out.writeEndElement();
-                                */
                             }
 
                             GoodsContainer emptyGoodsContainer = new GoodsContainer(getGame(), getColony());
@@ -2041,11 +2028,7 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
         public int getColonyStockadeLevel() {
             return colonyStockadeLevel;
         }
-        /*
-          public void setRoad(boolean road) {
-          this.road = road;
-          }
-        */
+
         public boolean hasRoad() {
             return (road != null);
         }
@@ -2128,16 +2111,6 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
 
         private boolean hasBeenVisited() {
             return settlementVisited;
-        }
-
-        // TODO: find out what this is supposed to do
-        public int getBasicWorkTurns() {
-            return 0;
-        }
-
-        // TODO: find out what this is supposed to do
-        public int getAddWorkTurns() {
-            return 0;
         }
 
         /**
