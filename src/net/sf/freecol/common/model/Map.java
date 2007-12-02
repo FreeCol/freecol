@@ -146,7 +146,7 @@ public class Map extends FreeColGameObject {
     public Region getRegion(String id) {
         Region result = regions.get(id);
         if (result == null) {
-            result = new Region(id, "", null);
+            result = new Region(id, null, null);
             regions.put(id, result);
         }
         return result;

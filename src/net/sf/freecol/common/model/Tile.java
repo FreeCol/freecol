@@ -1793,6 +1793,7 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
 
         playerExploredTiles[nation].setLostCityRumour(lostCityRumour);
         playerExploredTiles[nation].setOwner(owner);
+        playerExploredTiles[nation].setRegion(region);
 
         if (getColony() != null) {
             playerExploredTiles[nation].setColonyUnitCount(getSettlement().getUnitCount());
@@ -1961,6 +1962,8 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
 
         private Player owner;
 
+        private Region region;
+
         // All known TileItems
         private Resource resource;
         private List<TileImprovement> improvements;
@@ -2113,6 +2116,14 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
             return settlementVisited;
         }
 
+        public Region getRegion() {
+            return region;
+        }
+
+        private void setRegion(Region region) {
+            this.region = region;
+        }
+
         /**
          * Checks if this <code>Tile</code> has been explored.
          * 
@@ -2190,6 +2201,9 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
             }
             if (hasResource()) {
                 resource.toXML(out, player, showAll, toSavedGame);
+            }
+            if (region != null) {
+                region.toXML(out);
             }
             for (TileImprovement t : improvements) { 
                 t.toXML(out, player, showAll, toSavedGame);
@@ -2275,6 +2289,9 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
                         resource = new Resource(getGame(), in);
                     }
                     tileItemContainer.addTileItem(resource);
+                } else if (in.getLocalName().equals(Region.getXMLElementTagName())) {
+                    Region region = getGame().getMap().getRegion(in.getAttributeValue(null, "ID"));
+                    region.readFromXMLImpl(in, getGame().getMap());
                 } else if (in.getLocalName().equals(TileImprovement.getXMLElementTagName())) {
                     TileImprovement ti = (TileImprovement) getGame().getFreeColGameObject(in.getAttributeValue(null, "ID"));
                     if (ti != null) {

@@ -29,6 +29,7 @@ import java.util.logging.Logger;
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Map;
+import net.sf.freecol.common.model.Region;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.TileType;
 import net.sf.freecol.common.model.Map.Position;
@@ -294,32 +295,6 @@ public class TerrainGenerator {
             chosen = acceptable.get(random.nextInt(acceptable.size()));
         }
         return chosen;
-/*
-        int thisValue = Math.max(((percent - random.nextInt(20) - 1)) / 10, 0);
-
-        int minWoD = 0;
-        int maxWoD = 99;
-        int dryOrWet = random.nextInt(maxWoD - minWoD) + minWoD;
-        dryOrWet /= 33;
-        switch(thisValue) {
-        case 0: return Tile.ARCTIC;
-        case 1: case 2: switch (dryOrWet) {
-            case 0: return Tile.TUNDRA;
-            case 1: default: return Tile.TUNDRA;
-            case 2: return Tile.MARSH;
-        }
-        case 3: case 4: case 5: default: switch (dryOrWet) {
-            case 0: return Tile.DESERT;
-            case 1: default: return Tile.PLAINS;
-            case 2: return Tile.PRAIRIE;
-        }
-        case 6: case 7: case 8: case 9: switch (dryOrWet) {
-            case 0: return Tile.GRASSLANDS;
-            case 1: default: return Tile.SAVANNAH;
-            case 2: return Tile.SWAMP;
-        }
-        }
-*/
     }
 
     /**
@@ -410,16 +385,37 @@ public class TerrainGenerator {
             throw new RuntimeException("HighSeas TileType is defined by the 'sail-to-europe' attribute");
         }
 
+        Region pacific = map.getRegion("model.region.pacific");
+        Region northPacific = map.getRegion("model.region.northPacific");
+        northPacific.setParent(pacific);
+        Region southPacific = map.getRegion("model.region.southPacific");
+        southPacific.setParent(pacific);
+        Region atlantic = map.getRegion("model.region.atlantic");
+        Region northAtlantic = map.getRegion("model.region.northAtlantic");
+        northAtlantic.setParent(atlantic);
+        Region southAtlantic = map.getRegion("model.region.southAtlantic");
+        southAtlantic.setParent(atlantic);
+
         for (int y = 0; y < map.getHeight(); y++) {
             for (int x=0; x<maxDistanceToEdge && !map.isLandWithinDistance(x, y, distToLandFromHighSeas); x++) {
                 if (map.isValid(x, y)) {
                     map.getTile(x, y).setType(highSeas);
+                    if (x < map.getHeight() / 2) {
+                        map.getTile(x, y).setRegion(northPacific);
+                    } else {
+                        map.getTile(x, y).setRegion(southPacific);
+                    }
                 }
             }
 
             for (int x=1; x<=maxDistanceToEdge && !map.isLandWithinDistance(map.getWidth()-x, y, distToLandFromHighSeas); x++) {
                 if (map.isValid(map.getWidth()-x, y)) {
                     map.getTile(map.getWidth()-x, y).setType(highSeas);
+                    if (x < map.getHeight() / 2) {
+                        map.getTile(x, y).setRegion(northAtlantic);
+                    } else {
+                        map.getTile(x, y).setRegion(southAtlantic);
+                    }
                 }
             }
         }

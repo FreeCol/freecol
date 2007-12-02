@@ -250,7 +250,9 @@ public class Region extends FreeColObject implements Nameable {
     public void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
         out.writeStartElement(getXMLElementTagName());
         out.writeAttribute("ID", getId());
-        out.writeAttribute("name", name);
+        if (name != null) {
+            out.writeAttribute("name", name);
+        }
         out.writeAttribute("size", Integer.toString(size));
         out.writeAttribute("claimable", Boolean.toString(claimable));
         out.writeAttribute("discoverable", Boolean.toString(discoverable));
@@ -294,7 +296,6 @@ public class Region extends FreeColObject implements Nameable {
         size = getAttribute(in, "size", 0);
         claimable = getAttribute(in, "claimable", false);
         discoverable = getAttribute(in, "discoverable", false);
-        in.nextTag();
         String parentString = in.getAttributeValue(null, "parent");
         if (parentString != null) {
             parent = map.getRegion(parentString);
