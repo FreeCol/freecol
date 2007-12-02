@@ -407,8 +407,10 @@ public class ModelMessage extends FreeColObject {
         type = getAttribute(in, "type", DEFAULT);
         beenDisplayed = Boolean.parseBoolean(in.getAttributeValue(null, "hasBeenDisplayed"));
 
-        source = game.getFreeColGameObject(in.getAttributeValue(null, "type"));
-        String displayString = in.getAttributeValue(null, "source");
+        String sourceString = in.getAttributeValue(null, "source");
+        source = game.getFreeColGameObject(sourceString);
+        
+        String displayString = in.getAttributeValue(null, "display");
         if (displayString != null) {
             if (game.getFreeColGameObject(displayString) != null) {
                 display = game.getFreeColGameObject(displayString);
