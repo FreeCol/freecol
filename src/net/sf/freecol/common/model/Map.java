@@ -70,6 +70,7 @@ public class Map extends FreeColGameObject {
 
     private final DefaultCostDecider defaultCostDecider = new DefaultCostDecider();
     
+    private HashMap<String, Region> regions = new HashMap<String, Region>();
 
     /**
      * Create a new <code>Map</code> of a specified size.
@@ -133,6 +134,22 @@ public class Map extends FreeColGameObject {
      */
     public Map(Game game, String id) {
         super(game, id);
+    }
+
+    /**
+     * Returns the <code>Region</code> with the given ID. Creates a
+     * new Region if necessary.
+     *
+     * @param id a <code>String</code> value
+     * @return a <code>Region</code> value
+     */
+    public Region getRegion(String id) {
+        Region result = regions.get(id);
+        if (result == null) {
+            result = new Region(id, "", null);
+            regions.put(id, result);
+        }
+        return result;
     }
 
     /**
@@ -1825,6 +1842,10 @@ public class Map extends FreeColGameObject {
             }
         }
 
+        for (Region region : regions.values()) {
+            region.toXML(out);
+        }
+
         out.writeEndElement();
     }
 
@@ -1859,6 +1880,9 @@ public class Map extends FreeColGameObject {
                     t = new Tile(getGame(), in);
                 }
                 setTile(t, x, y);
+            } else if (in.getLocalName().equals(Region.getXMLElementTagName())) {
+                Region region = getRegion(in.getAttributeValue(null, "ID"));
+                region.readFromXMLImpl(in, this);
             }
         }
     }

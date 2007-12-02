@@ -94,6 +94,11 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
      */
     private PlayerExploredTile[] playerExploredTiles = null;
 
+    /**
+     * Describe region here.
+     */
+    private Region region;
+
     public static int NUMBER_OF_TYPES;
 
     private List<TileItem> tileItems;
@@ -202,6 +207,23 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
         return type.getBasicWorkTurns();
     }
 
+    /**
+     * Get the <code>Region</code> value.
+     *
+     * @return a <code>Region</code> value
+     */
+    public Region getRegion() {
+        return region;
+    }
+
+    /**
+     * Set the <code>Region</code> value.
+     *
+     * @param newRegion The new Region value.
+     */
+    public void setRegion(final Region newRegion) {
+        this.region = newRegion;
+    }
 
     /**
      * Gets the name of this tile, or shows "unexplored" if not explored by player.
@@ -1497,6 +1519,10 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
             out.writeAttribute("type", getType().getId());
         }
 
+        if (region != null) {
+            out.writeAttribute("region", region.getId());
+        }
+
         boolean lostCity = (pet == null) ? lostCityRumour : pet.hasLostCityRumour();
         out.writeAttribute("lostCityRumour", Boolean.toString(lostCity));
 
@@ -1636,6 +1662,11 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
         String typeStr = in.getAttributeValue(null, "type");
         if (typeStr != null) {
             type = FreeCol.getSpecification().getTileType(typeStr);
+        }
+
+        String regionString = in.getAttributeValue(null, "region");
+        if (regionString != null) {
+            region = getGame().getMap().getRegion(regionString);
         }
 
         final String lostCityRumourStr = in.getAttributeValue(null, "lostCityRumour");
