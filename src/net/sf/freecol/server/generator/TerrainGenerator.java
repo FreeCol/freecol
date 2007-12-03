@@ -400,7 +400,7 @@ public class TerrainGenerator {
             for (int x=0; x<maxDistanceToEdge && !map.isLandWithinDistance(x, y, distToLandFromHighSeas); x++) {
                 if (map.isValid(x, y)) {
                     map.getTile(x, y).setType(highSeas);
-                    if (x < map.getHeight() / 2) {
+                    if (y < map.getHeight() / 2) {
                         map.getTile(x, y).setRegion(northPacific);
                     } else {
                         map.getTile(x, y).setRegion(southPacific);
@@ -411,7 +411,7 @@ public class TerrainGenerator {
             for (int x=1; x<=maxDistanceToEdge && !map.isLandWithinDistance(map.getWidth()-x, y, distToLandFromHighSeas); x++) {
                 if (map.isValid(map.getWidth()-x, y)) {
                     map.getTile(map.getWidth()-x, y).setType(highSeas);
-                    if (x < map.getHeight() / 2) {
+                    if (y < map.getHeight() / 2) {
                         map.getTile(x, y).setRegion(northAtlantic);
                     } else {
                         map.getTile(x, y).setRegion(southAtlantic);
@@ -435,8 +435,6 @@ public class TerrainGenerator {
                     ", number of mountain tiles is " + number);
         logger.fine("Maximum length of mountain ranges is " + maximumLength);
         TileType hills = null, mountains = null;
-        // TODO: Change it with a better way to identify hills and mountains look for their overlay imagetype (14 and 15 respectively)
-        // To identify hills and mountains look for their id
         for (TileType t : FreeCol.getSpecification().getTileTypeList()) {
             if (t.getId().equals("model.tile.hills") && hills == null) {
                 hills = t;

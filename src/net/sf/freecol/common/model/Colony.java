@@ -1685,8 +1685,12 @@ public final class Colony extends Settlement implements Abilities, Location, Nam
         oldTories = getAttribute(in, "oldTories", 0);
         productionBonus = getAttribute(in, "productionBonus", 0);
         defenseBonus = getAttribute(in, "productionBonus", 0);
-        String currently = getAttribute(in, "currentlyBuilding", null);
-        setCurrentlyBuilding(BuildableType.NOTHING);
+        String buildable = getAttribute(in, "currentlyBuilding", null);
+        BuildableType buildableType = (BuildableType) FreeCol.getSpecification().getType(buildable);
+        if (buildableType == null) {
+            buildableType = BuildableType.NOTHING;
+        }
+        setCurrentlyBuilding(buildableType);
         landLocked = getAttribute(in, "landLocked", true);
         unitCount = getAttribute(in, "unitCount", -1);
         // Read child elements:

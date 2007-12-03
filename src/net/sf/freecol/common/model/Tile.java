@@ -2203,7 +2203,7 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
                 resource.toXML(out, player, showAll, toSavedGame);
             }
             if (region != null) {
-                region.toXML(out);
+                out.writeAttribute("region", region.getId());
             }
             for (TileImprovement t : improvements) { 
                 t.toXML(out, player, showAll, toSavedGame);
@@ -2270,6 +2270,11 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
                 wantedGoods2 = null;
             }
 
+            String regionString = in.getAttributeValue(null, "region");
+            if (regionString != null) {
+                region = getGame().getMap().getRegion(regionString);
+            }
+
             missionary = null;
             TileItemContainer tileItemContainer = new TileItemContainer(getGame(), Tile.this);
             while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
@@ -2289,9 +2294,6 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
                         resource = new Resource(getGame(), in);
                     }
                     tileItemContainer.addTileItem(resource);
-                } else if (in.getLocalName().equals(Region.getXMLElementTagName())) {
-                    Region region = getGame().getMap().getRegion(in.getAttributeValue(null, "ID"));
-                    region.readFromXMLImpl(in, getGame().getMap());
                 } else if (in.getLocalName().equals(TileImprovement.getXMLElementTagName())) {
                     TileImprovement ti = (TileImprovement) getGame().getFreeColGameObject(in.getAttributeValue(null, "ID"));
                     if (ti != null) {
