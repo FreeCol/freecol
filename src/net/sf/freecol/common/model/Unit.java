@@ -53,9 +53,6 @@ import org.w3c.dom.Element;
  */
 public class Unit extends FreeColGameObject implements Abilities, Locatable, Location, Ownable, Nameable {
 
-
-
-
     private static final Logger logger = Logger.getLogger(Unit.class.getName());
 
     /**
@@ -93,7 +90,7 @@ public class Unit extends FreeColGameObject implements Abilities, Locatable, Loc
 
     public static final int MUSKETS_TO_ARM_INDIAN = 25, HORSES_TO_MOUNT_INDIAN = 25;
 
-    private int type;
+    //private int type;
 
     private UnitType unitType;
 
@@ -105,9 +102,12 @@ public class Unit extends FreeColGameObject implements Abilities, Locatable, Loc
 
     private int state;
 
-    private int workLeft; // expressed in number of turns, '-1' if a Unit can
+    /** 
+     * The number of turns until the work is finished, or '-1' if a
+     * Unit can stay in its state forever.
+     */
+    private int workLeft;
 
-    // stay in its state forever
     private int numberOfTools;
 
     private int hitpoints; // For now; only used by ships when repairing.
@@ -164,12 +164,12 @@ public class Unit extends FreeColGameObject implements Abilities, Locatable, Loc
     private boolean alreadyOnHighSea = false;
 
     /**
-     * Describe student here.
+     * The student of this Unit, if it has one.
      */
     private Unit student;
 
     /**
-     * Describe teacher here.
+     * The teacher of this Unit, if it has one.
      */
     private Unit teacher;
 
@@ -234,7 +234,6 @@ public class Unit extends FreeColGameObject implements Abilities, Locatable, Loc
         goodsContainer = new GoodsContainer(game, this);
 
         this.owner = owner;
-        this.type = type.getIndex();
         unitType = type;
         naval = unitType.hasAbility("model.ability.navalUnit");
         this.armed = armed;
@@ -407,6 +406,13 @@ public class Unit extends FreeColGameObject implements Abilities, Locatable, Loc
         return stop;
     }
     
+    /**
+     * Returns true if the Unit should proceed to the next stop of its
+     * TradeRoute.
+     *
+     * @param stop a <code>Stop</code> value
+     * @return a <code>boolean</code> value
+     */
     public boolean shouldGoToStop(Stop stop) {
         ArrayList<GoodsType> goodsTypes = stop.getCargo();
         for(Goods goods : getGoodsList()) {
@@ -2394,24 +2400,12 @@ public class Unit extends FreeColGameObject implements Abilities, Locatable, Loc
     }
 
     /**
-     * Gets the nation the unit is serving. One of {DUTCH , ENGLISH, FRENCH,
-     * SPANISH}.
-     * 
-     * @return The nation the unit is serving.
-     */
-    /*
-      public Nation getNation() {
-      return owner.getNation();
-      }
-    */
-
-    /**
      * Gets the type of the unit.
      * 
      * @return The type of the unit.
      */
     public int getType() {
-        return type;
+        return unitType.getIndex();
     }
 
     /**
@@ -2431,19 +2425,7 @@ public class Unit extends FreeColGameObject implements Abilities, Locatable, Loc
     public void setType(UnitType unitType) {
         // TODO: check for requirements (like for colonialRegular)
         this.unitType = unitType;
-        type = unitType.getIndex();
         naval = unitType.hasAbility("model.ability.naval");
-    }
-
-    /**
-     * Checks if this unit is of a given type.
-     * 
-     * @param t The type.
-     * @return <code>true</code> if the unit was of the given type and
-     *         <code>false</code> otherwise.
-     */
-    public boolean isType(int t) {
-        return type == t;
     }
 
     /**
@@ -2541,52 +2523,27 @@ public class Unit extends FreeColGameObject implements Abilities, Locatable, Loc
     }
 
     /**
-     * Returns the name of a unit type in a human readable format. The return
-     * value can be used when communicating with the user.
-     * 
-     * @param someType The type of <code>Unit</code>.
-     * @return The given unit type as a String
-     * @throws IllegalArgumentException
-     *//*
-         public static String getName(UnitType someType) {
-
-         return Messages.message(someType.getName());
-         }
-       */
+     * Returns the score value of this Unit, which depends on its type
+     * and current location.
+     *
+     * @return an <code>int</code> value
+     */
     public int getScoreValue() {
-        return getScoreValue(type, location);
-    }
-
-    public static int getScoreValue(int someType, Location someLocation) {
-        int value = 0;
-        switch(someType) {
-        case WAGON_TRAIN:
-        case DAMAGED_ARTILLERY:
-            return 1;
-        case ARTILLERY:
-            return 2;
-        case CARAVEL:
-            return 3;
-        case MERCHANTMAN:
-        case PRIVATEER:
-            return 4;
-        case GALLEON:
-            return 5;
-        case FRIGATE:
-            return 6;
-        case MAN_O_WAR:
-            return 8;
-        default:
-            // TODO: restore
-            //value = getSkillLevel(someType) + 3;
-            value = 3;
-            if (someLocation != null && someLocation instanceof WorkLocation) {
+        int value = unitType.getSkill();
+        if (value == UnitType.UNDEFINED) {
+            if (unitType.getHammersRequired() > 0) {
+                value = Math.round(unitType.getHammersRequired() / 100f);
+            } else {
+                value = 1;
+            }
+        } else {
+            value += 3;
+            if (getLocation() instanceof WorkLocation) {
                 value *= 2;
             }
         }
         return value;
     }
-
 
     /**
      * Gets the amount of moves this unit has at the beginning of each turn.
@@ -2692,26 +2649,6 @@ public class Unit extends FreeColGameObject implements Abilities, Locatable, Loc
         setLocation(l);
         setState(ACTIVE);
         setMovesLeft(0);
-    }
-
-    /**
-     * Gets the x-coordinate of this Unit (on the map).
-     * 
-     * @return The x-coordinate of this Unit (on the map).
-     */
-    public int getX() {
-
-        return (getTile() != null) ? getTile().getX() : -1;
-    }
-
-    /**
-     * Gets the y-coordinate of this Unit (on the map).
-     * 
-     * @return The y-coordinate of this Unit (on the map).
-     */
-    public int getY() {
-
-        return (getTile() != null) ? getTile().getY() : -1;
     }
 
     /**
@@ -2980,16 +2917,6 @@ public class Unit extends FreeColGameObject implements Abilities, Locatable, Loc
     }
 
     /**
-     * Checks wether this unit can plow the <code>Tile</code> it is currently
-     * located on or not.
-     * 
-     * @return The result.
-     *//*
-         public boolean canPlow() {
-         return getTile().canBePlowed() && getNumberOfTools() >= 20;
-         }
-       */
-    /**
      * Checks if a <code>Unit</code> can get the given state set.
      * 
      * @param s The new state for this Unit. Should be one of {ACTIVE,
@@ -2998,41 +2925,25 @@ public class Unit extends FreeColGameObject implements Abilities, Locatable, Loc
      *         'false' otherwise.
      */
     public boolean checkSetState(int s) {
-        if (movesLeft <= 0 && (/*s == PLOW || s == BUILD_ROAD || */s == IMPROVING || s == FORTIFYING)) {
-            return false;
-        }
         switch (s) {
         case ACTIVE:
             return true;
-        case IMPROVING:     // Check should be done before
-            return true;
-            /*
-              case PLOW:
-              return canPlow();
-              case BUILD_ROAD:
-              if (getTile().hasRoad()) {
-              return false;
-              }
-              return (getNumberOfTools() >= 20);
-            */
         case IN_COLONY:
             return !isNaval();
         case FORTIFIED:
             return getState() == FORTIFYING;
+        case IMPROVING:
         case FORTIFYING:
+        case SKIPPED:
             return (getMovesLeft() > 0);
         case SENTRY:
             return true;
         case TO_EUROPE:
-            if (!isNaval()) {
-                return false;
-            }
-            return ((location instanceof Europe) && (getState() == TO_AMERICA))
-                || (getEntryLocation() == getLocation());
+            return isNaval() &&
+                ((location instanceof Europe) && (getState() == TO_AMERICA)) ||
+                (getEntryLocation() == getLocation());
         case TO_AMERICA:
             return (location instanceof Europe && isNaval() && !isUnderRepair());
-        case SKIPPED:
-            return (movesLeft > 0);
         default:
             logger.warning("Invalid unit state: " + s);
             return false;
@@ -3884,10 +3795,6 @@ public class Unit extends FreeColGameObject implements Abilities, Locatable, Loc
             return;
         }
         String repairLocationName = repairLocation.getLocationName();
-        /*
-         * if (repairLocation instanceof Colony) { repairLocationName =
-         * ((Colony) repairLocation).getName(); }
-         */
         if (colony != null) {
             addModelMessage(this, "model.unit.shipDamagedByBombardment", 
                             new String[][] {
@@ -3929,8 +3836,9 @@ public class Unit extends FreeColGameObject implements Abilities, Locatable, Loc
                     { "%colony%", colony.getName() }, { "%unit%", getName() },
                     { "%nation%", nation } }, ModelMessage.UNIT_LOST);
         } else {
-            addModelMessage(this, "model.unit.shipSunk", new String[][] { { "%unit%", getName() },
-                                                                          { "%nation%", nation } }, ModelMessage.UNIT_LOST);
+            addModelMessage(this, "model.unit.shipSunk", new String[][] {
+                    { "%unit%", getName() },
+                    { "%nation%", nation } }, ModelMessage.UNIT_LOST);
         }
         dispose();
     }
@@ -3974,8 +3882,9 @@ public class Unit extends FreeColGameObject implements Abilities, Locatable, Loc
             dispose();
         } else if (isMounted()) {
             if (enemyUnit.getType() == BRAVE && !enemyUnit.isMounted() && canStole) {
-                addModelMessage(this, "model.unit.braveMounted", new String[][] { { "%nation%",
-                                                                                    enemyUnit.getOwner().getNationAsString() } }, ModelMessage.FOREIGN_DIPLOMACY);
+                addModelMessage(this, "model.unit.braveMounted", new String[][] {
+                        { "%nation%", enemyUnit.getOwner().getNationAsString() } },
+                    ModelMessage.FOREIGN_DIPLOMACY);
                 enemyUnit.setMounted(true, true);
             }
             if (isArmed()) { // dragoon
@@ -3989,8 +3898,9 @@ public class Unit extends FreeColGameObject implements Abilities, Locatable, Loc
             // soldier
             setArmed(false, true);
             if (enemyUnit.getType() == BRAVE && !enemyUnit.isArmed() && canStole) {
-                addModelMessage(this, "model.unit.braveArmed", new String[][] { { "%nation%",
-                                                                                  enemyUnit.getOwner().getNationAsString() } }, ModelMessage.FOREIGN_DIPLOMACY);
+                addModelMessage(this, "model.unit.braveArmed", new String[][] {
+                        { "%nation%", enemyUnit.getOwner().getNationAsString() } },
+                    ModelMessage.FOREIGN_DIPLOMACY);
                 enemyUnit.setArmed(true, true);
             }
         } else {
@@ -4487,7 +4397,7 @@ public class Unit extends FreeColGameObject implements Abilities, Locatable, Loc
         if (name != null) {
             out.writeAttribute("name", name);
         }
-        out.writeAttribute("type", Integer.toString(type));
+        out.writeAttribute("unitType", unitType.getId());
         out.writeAttribute("armed", Boolean.toString(armed));
         out.writeAttribute("mounted", Boolean.toString(mounted));
         out.writeAttribute("missionary", Boolean.toString(missionary));
@@ -4578,8 +4488,7 @@ public class Unit extends FreeColGameObject implements Abilities, Locatable, Loc
     protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
         setId(in.getAttributeValue(null, "ID"));
         setName(in.getAttributeValue(null, "name"));
-        type = Integer.parseInt(in.getAttributeValue(null, "type"));
-        unitType = FreeCol.getSpecification().getUnitType(type);
+        unitType = FreeCol.getSpecification().getUnitType(in.getAttributeValue(null, "unitType"));
         naval = unitType.hasAbility("model.ability.navalUnit");
         armed = Boolean.valueOf(in.getAttributeValue(null, "armed")).booleanValue();
         mounted = Boolean.valueOf(in.getAttributeValue(null, "mounted")).booleanValue();

@@ -36,8 +36,6 @@ import net.sf.freecol.FreeCol;
 
 public final class UnitType extends BuildableType implements Abilities, Modifiers {
 
-    public static final  int  UNDEFINED = Integer.MIN_VALUE;
-
     /**
      * Describe offence here.
      */

@@ -30,11 +30,12 @@ import javax.xml.stream.XMLStreamReader;
  */
 public class BuildableType extends FreeColGameObjectType {
 
+    public static final int UNDEFINED = Integer.MIN_VALUE;
 
     public static final BuildableType NOTHING = new BuildableType("model.buildableType.nothing");
     
-    private int hammersRequired = 0;
-    private int toolsRequired = 0;
+    private int hammersRequired = UNDEFINED;
+    private int toolsRequired = UNDEFINED;
     private int populationRequired = 1;
     
     /**
