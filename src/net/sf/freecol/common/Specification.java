@@ -19,6 +19,9 @@
 
 package net.sf.freecol.common;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -56,6 +59,14 @@ import net.sf.freecol.common.model.UnitType;
  * resource named "specification.xml" in the same package as this class.
  */
 public final class Specification {
+
+    /**
+     * Singleton
+     */
+    protected static Specification specification;
+
+    protected static File specFile = null;
+    
     private static final Logger logger = Logger.getLogger(Specification.class.getName());
 
     private final Map<String, FreeColGameObjectType> allTypes;
@@ -78,20 +89,43 @@ public final class Specification {
     private final List<Nation> nations;
     private final List<NationType> nationTypes;
 
+
     /**
-	 * Creates a new Specification object by loading it from the
-	 * specification.xml.
-	 * 
-	 * This method is protected, since only one Specification object may exist.
-	 * This is due to static links from type {@link Goods} to the most important
-	 * GoodsTypes. If another specification object is created these links would
-	 * not work anymore for the previously created specification.
-	 * 
-	 * To get hold of an Specification object use the static method
-	 * {@link #getSpecification()} which returns a singleton instance of the
-	 * Specification class.
-	 */
-    protected Specification() {
+     * Creates a new <code>Specification</code> instance.
+     *
+     */
+    public Specification() {
+        this(Specification.class.getResourceAsStream("specification.xml"));
+        logger.info("loaded default specification.");
+    }
+
+    /**
+     * Creates a new <code>Specification</code> instance.
+     *
+     * @param specFile a <code>File</code> value
+     * @exception FileNotFoundException if an error occurs
+     */
+    public Specification(File specFile) throws FileNotFoundException {
+        this(new FileInputStream(specFile));
+        this.specFile = specFile;
+        logger.info("loaded specification from file '" + specFile.getPath() + "'");
+    }
+
+
+    /**
+     * Creates a new Specification object by loading it from the
+     * specification.xml.
+     * 
+     * This method is protected, since only one Specification object may exist.
+     * This is due to static links from type {@link Goods} to the most important
+     * GoodsTypes. If another specification object is created these links would
+     * not work anymore for the previously created specification.
+     * 
+     * To get hold of an Specification object use the static method
+     * {@link #getSpecification()} which returns a singleton instance of the
+     * Specification class.
+     */
+    protected Specification(InputStream in) {
         logger.info("Initializing Specification");
 
         allTypes = new HashMap<String, FreeColGameObjectType>();
@@ -117,7 +151,6 @@ public final class Specification {
 
 
         try {
-            InputStream in = Specification.class.getResourceAsStream("specification.xml");
             XMLStreamReader xsr = XMLInputFactory.newInstance().createXMLStreamReader(in);
             xsr.nextTag();
             while (xsr.nextTag() != XMLStreamConstants.END_ELEMENT) {
@@ -194,7 +227,7 @@ public final class Specification {
                         public TileImprovementType objectFrom(XMLStreamReader in) throws XMLStreamException {
                             TileImprovementType tileImprovementType = new TileImprovementType(impIndex++);
                             tileImprovementType.readFromXML(in, tileTypeList,
-                                                    tileTypeByRef, goodsTypeByRef, tileImprovementTypeByRef);
+                                                            tileTypeByRef, goodsTypeByRef, tileImprovementTypeByRef);
                             allTypes.put(tileImprovementType.getId(), tileImprovementType);
                             tileImprovementTypeByRef.put(tileImprovementType.getId(), tileImprovementType);
                             return tileImprovementType;
@@ -419,7 +452,7 @@ public final class Specification {
      * @param methodName the name of the method to invoke on the GoodsType
      * @return a list of <code>GoodsType</code>s for which the given
      * predicate returns true
-    */
+     */
     public List<GoodsType> getMatchingGoodsTypes(String methodName) throws Exception {
         Method method = GoodsType.class.getDeclaredMethod(methodName);
         method.setAccessible(true);
@@ -720,14 +753,26 @@ public final class Specification {
     }
 
     /**
-     * Singleton
+     * Describe <code>setSpecificationFile</code> method here.
+     *
+     * @param file a <code>File</code> value
      */
-    protected static Specification specification;
-    
-	public static Specification getSpecification() {
-		if (specification == null){
-            specification = new Specification();
+    public static void setSpecificationFile(File file) {
+        specFile = file;
+    }
+
+    public static Specification getSpecification() {
+        if (specification == null){
+            if (specFile == null) {
+                specification = new Specification();
+            } else {
+                try {
+                    specification = new Specification(specFile);
+                } catch(FileNotFoundException e) {
+                    specification = new Specification();
+                }
+            }
         }
         return specification;
-	}
+    }
 }

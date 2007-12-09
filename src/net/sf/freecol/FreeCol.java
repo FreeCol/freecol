@@ -607,6 +607,22 @@ public final class FreeCol {
                     printUsage();
                     System.exit(0);
                 }
+            } else if (args[i].equals("--specification")) {
+                i++;
+                if (i < args.length) {
+                    File specFile = new File(args[i]);
+                    if (!specFile.exists() || !specFile.isFile()) {                        
+                        specFile = new File(getSaveDirectory(), args[i]);
+                        if (!specFile.exists() || !specFile.isFile()) {
+                            System.out.println("The given specification file could not be found: " + args[i]);
+                            System.exit(1);
+                        }
+                    }
+                    Specification.setSpecificationFile(specFile);
+                } else {
+                    printUsage();
+                    System.exit(0);
+                }
             } else if (args[i].equals("--server-help")) {
                 printServerUsage();
                 System.exit(0);
@@ -685,6 +701,8 @@ public final class FreeCol {
         System.out.println("  specifies a custom name for the server");
         System.out.println("--load-savegame SAVEGAME_FILE");
         System.out.println("  loads the given savegame.");      
+        System.out.println("--specification SPECIFICATION_FILE");
+        System.out.println("  loads the given specification file.");
         System.out.println("--no-java-check");
         System.out.println("  skips the java version check");        
         System.out.println();
@@ -706,6 +724,8 @@ public final class FreeCol {
         System.out.println("  runs FreeCol in windowed mode instead of full screen mode");
         System.out.println("--load-savegame SAVEGAME_FILE");
         System.out.println("  loads the given savegame.");
+        System.out.println("--specification SPECIFICATION_FILE");
+        System.out.println("  loads the given specification file.");
         System.out.println("--default-locale=LANGUAGE[_COUNTRY[_VARIANT]]");
         System.out.println("  sets the default locale.");
         System.out.println("--splash[=SPLASH_IMAGE_FILE]");
