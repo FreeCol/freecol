@@ -771,7 +771,7 @@ public class AIColony extends AIObject {
      */
     public void rearrangeWorkers(Connection connection) {
         colonyPlan.create();
-
+        
         // TODO: Detect a siege and move the workers temporarily around.
 
         // Move a pioneer outside the colony if we have a sufficient amount of
@@ -1132,6 +1132,11 @@ public class AIColony extends AIObject {
         decideBuildable(connection);
         createTileImprovementPlans();
         createWishes();
+        
+        if (this.colony.getUnitCount()<=0) {
+            // something bad happened, there is no remaining unit working in the colony
+            throw new IllegalStateException("Colony " + colony.getName() + " contains no units!");
+        }
     }
 
     /**

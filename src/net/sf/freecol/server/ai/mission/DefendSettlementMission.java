@@ -132,11 +132,12 @@ public class DefendSettlementMission extends Mission {
             for (int i=0; i<Map.NUMBER_OF_DIRECTIONS; i++) {
                 int direction = directions[i];
                 Tile t = map.getNeighbourOrNull(direction, unit.getTile());
-                if (t != null
-                        && t.getDefendingUnit(unit) != null
-                        && t.getDefendingUnit(unit).getOwner().getStance(unit.getOwner()) == Player.WAR
+                if (t==null)
+                    continue;
+                Unit defender = t.getDefendingUnit(unit);
+                if (defender != null && defender.getOwner().getStance(unit.getOwner()) == Player.WAR
                         && unit.getMoveType(direction) == Unit.ATTACK) {
-                    Unit enemyUnit = t.getDefendingUnit(unit);
+                    Unit enemyUnit = defender;
                     float enemyAttack = enemyUnit.getOffensePower(unit);
                     float weAttack = unit.getOffensePower(enemyUnit);
                     float enemyDefend = enemyUnit.getDefensePower(unit);

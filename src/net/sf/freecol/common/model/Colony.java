@@ -141,7 +141,7 @@ public final class Colony extends Settlement implements Abilities, Location, Nam
      * 
      * @param game The <code>Game</code> this object belongs to.
      * @param in The input stream containing the XML.
-     * @throws XMLStreamException if an error occured during parsing.
+     * @throws XMLStreamException if an error occurred during parsing.
      */
     public Colony(Game game, XMLStreamReader in) throws XMLStreamException {
         super(game, in);
@@ -516,7 +516,7 @@ public final class Colony extends Settlement implements Abilities, Location, Nam
     }
 
     /**
-     * Removes a specified amount of a type of Goods from this containter.
+     * Removes a specified amount of a type of Goods from this container.
      * 
      * @param type The type of Goods to remove from this container.
      * @param amount The amount of Goods to remove from this container.
@@ -640,37 +640,28 @@ public final class Colony extends Settlement implements Abilities, Location, Nam
      * Gets the <code>Unit</code> that is currently defending this
      * <code>Colony</code>.
      * <p>
-     * Note! Several callers fail to handle null as a return value. Return an
-     * arbitrary unarmed land unit unless Paul Revere is present as founding
-     * father, in which case the unit can be armed as well. Also note that the
-     * colony would typically be defended by a unit outside it.
+     * Note that this function will only return a unit working inside the colony.
+     * Typically, colonies are also defended by units outside the colony on the same tile.
+     * To consider units outside the colony as well, use (@see Tile#getDefendingUnit) instead.
+     * <p>
+     * Returns an arbitrary unarmed land unit unless Paul Revere is present 
+     * as founding father, in which case the unit can be armed as well. 
      * 
-     * @param attacker The target that would be attacking this colony.
-     * @return The <code>Unit</code> that has been choosen to defend this
+     * @param attacker The unit that would be attacking this colony.
+     * @return The <code>Unit</code> that has been chosen to defend this
      *         colony.
      * @see Tile#getDefendingUnit(Unit)
+     * @throws IllegalStateException if there are units in the colony
      */
     @Override
     public Unit getDefendingUnit(Unit attacker) {
-        return getDefendingUnit();
-    }
-
-    /**
-     * Gets the <code>Unit</code> that is currently defending this
-     * <code>Colony</code>. Note that the colony will normally be
-     * defended by units outside of the colony as long as there are
-     * some (@see Tile#getDefendingUnit).
-     * 
-     * @return The <code>Unit</code> that has been choosen to defend this
-     *         colony.
-     */
-    private Unit getDefendingUnit() {
-        int defence = Integer.MIN_VALUE;
         Unit defender = null;
-        for (Unit unit : getUnitList()) {
-            if (unit.getUnitType().getDefence() > defence) {
-                defence = unit.getUnitType().getDefence();
-                defender = unit;
+        float defensePower = -1.0f;
+        for (Unit nextUnit : getUnitList()) {
+            float tmpPower = nextUnit.getDefensePower(attacker);
+            if (tmpPower > defensePower) {
+                defender = nextUnit;
+                defensePower = tmpPower;
             }
         }
         if (defender == null) {

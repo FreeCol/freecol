@@ -693,28 +693,20 @@ public class IndianSettlement extends Settlement {
 
     /**
     * Gets the <code>Unit</code> that is currently defending this <code>IndianSettlement</code>.
-    * @param attacker The target that would be attacking this <code>IndianSettlement</code>.
+    * @param attacker The unit that would be attacking this <code>IndianSettlement</code>.
     * @return The <code>Unit</code> that has been chosen to defend this <code>IndianSettlement</code>.
     */
     @Override
     public Unit getDefendingUnit(Unit attacker) {
-        Iterator<Unit> unitIterator = getUnitIterator();
-
         Unit defender = null;
-        if (unitIterator.hasNext()) {
-            defender = unitIterator.next();
-        } else {
-            return null;
-        }
-
-        while (unitIterator.hasNext()) {
-            Unit nextUnit = unitIterator.next();
-
-            if (nextUnit.getDefensePower(attacker) > defender.getDefensePower(attacker)) {
+        float defensePower = -1.0f;
+        for(Unit nextUnit : unitContainer.getUnitsClone()) {
+            float tmpPower = nextUnit.getDefensePower(attacker);
+            if (tmpPower > defensePower) {
                 defender = nextUnit;
+                defensePower = tmpPower;
             }
         }
-
         return defender;
     }
 

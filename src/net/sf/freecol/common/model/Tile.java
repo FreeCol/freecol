@@ -459,8 +459,8 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
 
                     public boolean check(Unit u, PathNode pathNode) {
                         Map map = getGame().getMap();
-
-                        if (pathNode.getTile().getType().canSailToEurope()) {
+                        TileType tileType = pathNode.getTile().getType();
+                        if (tileType!=null && tileType.canSailToEurope()) {
                             goal = pathNode;
                             return true;
                         }
@@ -500,32 +500,40 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
     /**
      * Gets the <code>Unit</code> that is currently defending this
      * <code>Tile</code>.
+     * <p>If this tile has a settlement, the units inside the settlement 
+     * are also considered as potential defenders 
      * 
      * @param attacker The target that would be attacking this tile.
-     * @return The <code>Unit</code> that has been choosen to defend this
+     * @return The <code>Unit</code> that has been chosen to defend this
      *         tile.
      */
     public Unit getDefendingUnit(Unit attacker) {
-        Unit defender = null;
+        // First, find the strongest defender of this tile, if any
+        Unit tileDefender = null;
         float defensePower = -1.0f;
         for(Unit nextUnit : unitContainer.getUnitsClone()) {
+            if (this.isLand() == nextUnit.isNaval()) {
+                // on land tiles, ships are docked in port and cannot defend
+                // on ocean tiles, land units behave as ship cargo and cannot defend
+                continue;
+            }
             float tmpPower = nextUnit.getDefensePower(attacker);
-            if (this.isLand() != nextUnit.isNaval()
-                && (tmpPower > defensePower)) {
-                defender = nextUnit;
+            if (tmpPower > defensePower) {
+                tileDefender = nextUnit;
                 defensePower = tmpPower;
             }
         }
-
+        // Then, find the strongest defender working in a settlement, if any
+        Unit settlementDefender = null;
         if (getSettlement() != null) {
-            if (defender == null || defender.isColonist() && !defender.isArmed() && !defender.isMounted()) {
-                return settlement.getDefendingUnit(attacker);
-            }
-
-            return defender;
+            settlementDefender = settlement.getDefendingUnit(attacker);
         }
-
-        return defender;
+        // return the strongest of these two units
+        if (settlementDefender!=null && settlementDefender.getDefensePower(attacker)>defensePower) {
+            return settlementDefender;
+        } else {
+            return tileDefender;
+        }
     }
 
     /**
@@ -1036,7 +1044,7 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
 
     /**
      * Gets a <code>Unit</code> that can become active. This is preferably a
-     * <code>Unit</code> not currently preforming any work.
+     * <code>Unit</code> not currently performing any work.
      * 
      * @return A <code>Unit</code> with <code>movesLeft > 0</code> or
      *         <i>null</i> if no such <code>Unit</code> is located on this
@@ -1999,7 +2007,7 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
          * Initialize this object from an XML-representation of this object.
          * 
          * @param in The XML stream to read the data from.
-         * @throws XMLStreamException if an error occured during parsing.
+         * @throws XMLStreamException if an error occurred during parsing.
          */
         public PlayerExploredTile(XMLStreamReader in) throws XMLStreamException {
             readFromXML(in);
@@ -2216,7 +2224,7 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
          * Initialize this object from an XML-representation of this object.
          * 
          * @param in The input stream with the XML.
-         * @throws XMLStreamException if an error occured during parsing.
+         * @throws XMLStreamException if an error occurred during parsing.
          */
         public void readFromXML(XMLStreamReader in) throws XMLStreamException {
             nation = Integer.parseInt(in.getAttributeValue(null, "nation"));

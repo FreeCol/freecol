@@ -1503,9 +1503,10 @@ public class AIPlayer extends AIObject {
 
             public boolean check(Unit unit, PathNode pathNode) {
                 Tile newTile = pathNode.getTile();
-                if (newTile.isLand() && !unit.isNaval() && newTile.getDefendingUnit(unit) != null
-                        && newTile.getDefendingUnit(unit).getOwner() != unit.getOwner()
-                        && unit.getOwner().getStance(newTile.getDefendingUnit(unit).getOwner()) == Player.WAR) {
+                Unit defender = newTile.getDefendingUnit(unit);
+                if (newTile.isLand() && !unit.isNaval() && defender != null
+                        && defender.getOwner() != unit.getOwner()
+                        && unit.getOwner().getStance(defender.getOwner()) == Player.WAR) {
                     int value = getUnitSeekAndDestroyMissionValue(unit, pathNode.getTile(), pathNode.getTurns());
                     if (value > bestNewTargetValue) {
                         bestTarget = pathNode;
