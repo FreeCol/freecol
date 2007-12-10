@@ -961,11 +961,13 @@ public class Game extends FreeColGameObject {
                     players.add(player);
                 }
             } else if (in.getLocalName().equals(Map.getXMLElementTagName())) {
-                map = (Map) getFreeColGameObject(in.getAttributeValue(null, "ID"));
+                String mapId = in.getAttributeValue(null, "ID");
+                map = (Map) getFreeColGameObject(mapId);
                 if (map != null) {
                     map.readFromXML(in);
                 } else {
-                    map = new Map(this, in);
+                    map = new Map(this, mapId);
+                    map.readFromXML(in);
                 }
             } else {
                 logger.warning("Unknown tag: " + in.getLocalName() + " loading game");
