@@ -131,7 +131,7 @@ public final class UserConnectionHandler implements MessageHandler, StreamedMess
             if (!player.isDead() && player.isEuropean() && !player.isREF()
                     && (!player.isConnected() || player.isAI())) {
                 Element playerElement = reply.getOwnerDocument().createElement("player");
-                playerElement.setAttribute("username", player.getUsername());
+                playerElement.setAttribute("username", player.getName());
                 reply.appendChild(playerElement);
             }
         }

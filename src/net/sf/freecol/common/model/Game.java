@@ -664,7 +664,7 @@ public class Game extends FreeColGameObject {
         while (playerIterator.hasNext()) {
             Player player = playerIterator.next();
 
-            if (player.getUsername().equals(username)) {
+            if (player.getName().equals(username)) {
                 return true;
             }
         }

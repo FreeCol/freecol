@@ -318,7 +318,7 @@ public final class ConnectController {
     * Reconnects to the server.
     */
     public void reconnect() {
-        final String username = freeColClient.getMyPlayer().getUsername();
+        final String username = freeColClient.getMyPlayer().getName();
         final String host = freeColClient.getClient().getHost();
         final int port = freeColClient.getClient().getPort();
         
@@ -569,7 +569,7 @@ public final class ConnectController {
     *
     * @param host The name of the machine running the <code>FreeColServer</code>.
     * @param port The port to use when connecting to the host.
-    * @return A list of available {@link Player#getUsername() usernames}.
+    * @return A list of available {@link Player#getName() usernames}.
     */
     private List<String> getVacantPlayers(String host, int port) {
         Connection mc;

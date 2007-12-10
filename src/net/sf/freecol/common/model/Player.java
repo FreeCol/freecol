@@ -908,7 +908,6 @@ public class Player extends FreeColGameObject implements Abilities, Nameable, Mo
      */
     public void setExplored(Tile tile) {
         logger.warning("Implemented by ServerPlayer");
-        // Implemented by ServerPlayer.
     }
 
     /**
@@ -1386,6 +1385,11 @@ public class Player extends FreeColGameObject implements Abilities, Nameable, Mo
         return name;
     }
 
+    /**
+     * Returns the name of this player.
+     * 
+     * @return The name of this player.
+     */
     public String toString() {
         return getName();
     }
@@ -1397,15 +1401,6 @@ public class Player extends FreeColGameObject implements Abilities, Nameable, Mo
      */
     public void setName(String newName) {
         this.name = newName;
-    }
-
-    /**
-     * Returns the name of this player.
-     * 
-     * @return The name of this player.
-     */
-    public String getUsername() {
-        return name;
     }
 
     /**

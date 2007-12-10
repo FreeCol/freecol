@@ -470,7 +470,7 @@ public final class InGameInputHandler extends InputHandler {
                         "defeatedSingleplayer.no").confirm()) {
                     freeColClient.quit();
                 } else {
-                    freeColClient.getFreeColServer().enterRevengeMode(player.getUsername());
+                    freeColClient.getFreeColServer().enterRevengeMode(player.getName());
                 }
             } else {
                 if (!new ShowConfirmDialogSwingTask("defeated.text", "defeated.yes", "defeated.no").confirm()) {
