@@ -221,11 +221,8 @@ public class DebugMenu extends JMenu {
             this.add(giveBells);
             giveBells.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
-                    Iterator<Colony> ci = freeColClient.getMyPlayer().getColonyIterator();
-                    while (ci.hasNext()) {
-                        Colony c = ci.next();
+                    for (Colony c : freeColClient.getMyPlayer().getColonies()) {
                         c.addBells(100);
-
                         Colony sc = (Colony) freeColClient.getFreeColServer().getGame().getFreeColGameObject(c.getId());
                         sc.addBells(100);
                     }

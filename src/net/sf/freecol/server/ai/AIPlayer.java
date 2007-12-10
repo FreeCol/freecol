@@ -622,9 +622,7 @@ public class AIPlayer extends AIObject {
         Map map = player.getGame().getMap();
         if (!player.isEuropean()) {
             // Determines if we need to move a brave out of the settlement.
-            Iterator<Settlement> it = player.getIndianSettlementIterator();
-            while (it.hasNext()) {
-                IndianSettlement is = (IndianSettlement) it.next();
+            for (IndianSettlement is : player.getIndianSettlements()) {
                 if (is.getUnitCount() > 2) {
                     int defenders = is.getTile().getUnitCount();
                     int threat = 0;
@@ -682,9 +680,7 @@ public class AIPlayer extends AIObject {
         if (1 == 1)
             return;
         // Ok, we are a European player. Things are about to get fun.
-        Iterator<Settlement> it = player.getSettlementIterator();
-        while (it.hasNext()) {
-            Colony colony = (Colony) (it.next());
+        for (Colony colony : player.getColonies()) {
             int olddefenders = 0;
             int defenders = 0;
             int threat = 0;
@@ -1129,9 +1125,7 @@ public class AIPlayer extends AIObject {
         if (!player.isIndian()) {
             return;
         }
-        Iterator<Settlement> indianSettlementIterator = player.getIndianSettlementIterator();
-        while (indianSettlementIterator.hasNext()) {
-            IndianSettlement indianSettlement = (IndianSettlement) indianSettlementIterator.next();
+        for (IndianSettlement indianSettlement : player.getIndianSettlements()) {
             // Do not bring gifts all the time:
             if (getRandom().nextInt(10) != 1) {
                 continue;
@@ -1189,9 +1183,7 @@ public class AIPlayer extends AIObject {
         if (!player.isIndian()) {
             return;
         }
-        Iterator<Settlement> indianSettlementIterator = player.getIndianSettlementIterator();
-        while (indianSettlementIterator.hasNext()) {
-            IndianSettlement indianSettlement = (IndianSettlement) indianSettlementIterator.next();
+        for (IndianSettlement indianSettlement : player.getIndianSettlements()) {
             // Do not demand goods all the time:
             if (getRandom().nextInt(10) != 1) {
                 continue;
@@ -1579,13 +1571,11 @@ public class AIPlayer extends AIObject {
         if (!getPlayer().canBuildColonies()) {
             return false;
         }
-        Iterator<Settlement> it = getPlayer().getSettlementIterator();
         int numberOfColonies = 0;
         int numberOfWorkers = 0;
-        while (it.hasNext()) {
-            Colony c = (Colony) it.next();
+        for (Colony colony : player.getColonies()) {
             numberOfColonies++;
-            numberOfWorkers += c.getUnitCount();
+            numberOfWorkers += colony.getUnitCount();
         }
         
         logger.finest("Leaving method hasFewColonies");
@@ -1936,9 +1926,7 @@ public class AIPlayer extends AIObject {
      */
     public Iterator<AIColony> getAIColonyIterator() {
         ArrayList<AIColony> ac = new ArrayList<AIColony>();
-        Iterator<Colony> colonyIterator = player.getColonyIterator();
-        while (colonyIterator.hasNext()) {
-            Colony colony = colonyIterator.next();
+        for (Colony colony : player.getColonies()) {
             AIColony a = (AIColony) getAIMain().getAIObject(colony.getId());
             if (a != null) {
                 ac.add(a);

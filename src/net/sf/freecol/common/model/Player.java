@@ -552,9 +552,7 @@ public class Player extends FreeColGameObject implements Abilities, Nameable, Mo
     public int getSoL() {
         int sum = 0;
         int number = 0;
-        Iterator<Settlement> it = getSettlementIterator();
-        while (it.hasNext()) {
-            Colony c = (Colony) it.next();
+        for (Colony c : getColonies()) {
             sum += c.getSoL();
             number++;
         }
@@ -656,9 +654,7 @@ public class Player extends FreeColGameObject implements Abilities, Nameable, Mo
      * name.
      */
     public Colony getColony(String name) {
-        Iterator<Settlement> it = getSettlementIterator();
-        while (it.hasNext()) {
-            Colony colony = (Colony) it.next();
+        for (Colony colony : getColonies()) {
             if (colony.getName().equals(name)) {
                 return colony;
             }
@@ -1002,9 +998,7 @@ public class Player extends FreeColGameObject implements Abilities, Nameable, Mo
                          */
                     }
                 }
-                Iterator<Settlement> colonyIterator = getSettlementIterator();
-                while (colonyIterator.hasNext()) {
-                    Settlement colony = colonyIterator.next();
+                for (Colony colony : getColonies()) {
                     Map.Position position = colony.getTile().getPosition();
                     canSeeTiles[position.getX()][position.getY()] = true;
                     /*
@@ -1428,7 +1422,6 @@ public class Player extends FreeColGameObject implements Abilities, Nameable, Mo
      */
     public void setNation(Nation newNation) {
         nationID = newNation.getId();
-        //color = newNation.getColor();
     }
 
     /**
@@ -1512,33 +1505,7 @@ public class Player extends FreeColGameObject implements Abilities, Nameable, Mo
     }
 
     /**
-     * Gets an <code>Iterator</code> containing all the settlements this
-     * player owns.
-     * 
-     * @return The <code>Iterator</code>.
-     * @see Colony
-     */
-    public Iterator<Settlement> getSettlementIterator() {
-        if (isIndian()) {
-            return EmptyIterator.getInstance();
-        } else {
-            return settlements.iterator();
-        }
-    }
-
-    /**
-     * Gets an <code>Iterator</code> containing all the colonies this player
-     * owns.
-     * 
-     * @return The <code>Iterator</code>.
-     * @see Colony
-     */
-    public Iterator<Colony> getColonyIterator() {
-        return getColonies().iterator();
-    }
-
-    /**
-     * Returns the settlements this player owns.
+     * Returns a list of all Settlements this player owns.
      * 
      * @return The settlements this player owns.
      */
@@ -1546,6 +1513,11 @@ public class Player extends FreeColGameObject implements Abilities, Nameable, Mo
         return settlements;
     }
 
+    /**
+     * Returns a list of all Colonies this player owns.
+     * 
+     * @return The colonies this player owns.
+     */
     public List<Colony> getColonies() {
         ArrayList<Colony> colonies = new ArrayList<Colony>();
         for (Settlement s : settlements) {
@@ -1556,6 +1528,23 @@ public class Player extends FreeColGameObject implements Abilities, Nameable, Mo
             }
         }
         return colonies;
+    }
+
+    /**
+     * Returns a list of all IndianSettlements this player owns.
+     * 
+     * @return The indian settlements this player owns.
+     */
+    public List<IndianSettlement> getIndianSettlements() {
+        ArrayList<IndianSettlement> indianSettlements = new ArrayList<IndianSettlement>();
+        for (Settlement s : settlements) {
+            if (s instanceof IndianSettlement) {
+                indianSettlements.add((IndianSettlement) s);
+            } else {
+                throw new RuntimeException("getIndianSettlements can only be called for players whose settlements are IndianSettlements.");
+            }
+        }
+        return indianSettlements;
     }
 
     /**
@@ -1575,9 +1564,7 @@ public class Player extends FreeColGameObject implements Abilities, Nameable, Mo
         }
         Location closestLocation = null;
         int shortestDistance = Integer.MAX_VALUE;
-        Iterator<Settlement> colonyIterator = getSettlementIterator();
-        while (colonyIterator.hasNext()) {
-            Colony colony = (Colony) colonyIterator.next();
+        for (Colony colony : getColonies()) {
             if (colony == null || colony.getTile() == unit.getTile()) {
                 // This happens when is called from damageAllShips because
                 // the colony is being captured and can't be repaired in that colony
@@ -1594,17 +1581,6 @@ public class Player extends FreeColGameObject implements Abilities, Nameable, Mo
             return closestLocation;
         }
         return getEurope();
-    }
-
-    /**
-     * Gets an <code>Iterator</code> containing all the indian settlements
-     * this player owns.
-     * 
-     * @return The <code>Iterator</code>.
-     * @see IndianSettlement
-     */
-    public Iterator<Settlement> getIndianSettlementIterator() {
-        return settlements.iterator();
     }
 
     /**
@@ -2139,9 +2115,7 @@ public class Player extends FreeColGameObject implements Abilities, Nameable, Mo
                             Player p = pi.next();
                             if (!p.isEuropean()) {
                                 p.getTension(this).setValue(0);
-                                Iterator<Settlement> isi = p.getIndianSettlementIterator();
-                                while (isi.hasNext()) {
-                                    IndianSettlement is = (IndianSettlement) isi.next();
+                                for (IndianSettlement is : getIndianSettlements()) {
                                     is.getAlarm(this).setValue(0);
                                 }
                             }
@@ -2560,8 +2534,7 @@ public class Player extends FreeColGameObject implements Abilities, Nameable, Mo
      */
     public int getBellsProductionNextTurn() {
         int bellsNextTurn = 0;
-        for (Iterator<Settlement> colonies = this.getSettlementIterator(); colonies.hasNext();) {
-            Colony colony = (Colony) colonies.next();
+        for (Colony colony : getColonies()) {
             bellsNextTurn += colony.getProductionOf(Goods.BELLS);
         }
         return bellsNextTurn;
@@ -2845,9 +2818,7 @@ public class Player extends FreeColGameObject implements Abilities, Nameable, Mo
             return goods;
         }
         int value = 0;
-        Iterator<Settlement> colonyIterator = getSettlementIterator();
-        while (colonyIterator.hasNext()) {
-            Colony colony = (Colony) colonyIterator.next();
+        for (Colony colony : getColonies()) {
             List<Goods> colonyGoods = colony.getCompactGoods();
             for (Goods currentGoods : colonyGoods) {
                 if (getArrears(currentGoods) == 0) {
