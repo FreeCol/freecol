@@ -34,8 +34,8 @@ public class BuildableType extends FreeColGameObjectType {
 
     public static final BuildableType NOTHING = new BuildableType("model.buildableType.nothing");
     
-    private int hammersRequired = UNDEFINED;
-    private int toolsRequired = UNDEFINED;
+    private int hammersRequired = 0;
+    private int toolsRequired = 0;
     private int populationRequired = 1;
     
     /**

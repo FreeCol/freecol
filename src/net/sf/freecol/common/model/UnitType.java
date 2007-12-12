@@ -599,7 +599,7 @@ public final class UnitType extends BuildableType implements Abilities, Modifier
      */
     public boolean canBeBuilt() {
 
-        return getHammersRequired() != UNDEFINED;
+        return getHammersRequired() > 0;
     }
 
 
