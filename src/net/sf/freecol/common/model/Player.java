@@ -998,23 +998,23 @@ public class Player extends FreeColGameObject implements Abilities, Nameable, Mo
                          */
                     }
                 }
-                for (Colony colony : getColonies()) {
-                    Map.Position position = colony.getTile().getPosition();
+                for (Settlement settlement : getSettlements()) {
+                    Map.Position position = settlement.getTile().getPosition();
                     canSeeTiles[position.getX()][position.getY()] = true;
                     /*
                      * if (getGame().getViewOwner() == null &&
                      * !hasExplored(map.getTile(position))) {
                      * 
                      * logger.warning("Trying to set a non-explored Tile to be
-                     * visible (3). Colony: " + colony + "(" +
-                     * colony.getTile().getPosition() + "), Tile: " + position);
+                     * visible (3). Settlement: " + settlement + "(" +
+                     * settlement.getTile().getPosition() + "), Tile: " + position);
                      * 
                      * throw new IllegalStateException("Trying to set a
-                     * non-explored Tile to be visible. Colony: " + colony + "(" +
-                     * colony.getTile().getPosition() + "), Tile: " + position); }
+                     * non-explored Tile to be visible. Settlement: " + settlement + "(" +
+                     * settlement.getTile().getPosition() + "), Tile: " + position); }
                      */
                     Iterator<Position> positionIterator = map
-                        .getCircleIterator(position, true, colony.getLineOfSight());
+                        .getCircleIterator(position, true, settlement.getLineOfSight());
                     while (positionIterator.hasNext()) {
                         Map.Position p = positionIterator.next();
                         canSeeTiles[p.getX()][p.getY()] = true;
@@ -1023,12 +1023,12 @@ public class Player extends FreeColGameObject implements Abilities, Nameable, Mo
                          * !hasExplored(map.getTile(p))) {
                          * 
                          * logger.warning("Trying to set a non-explored Tile to
-                         * be visible (4). Colony: " + colony + "(" +
-                         * colony.getTile().getPosition() + "), Tile: " + p);
+                         * be visible (4). Settlement: " + settlement + "(" +
+                         * settlement.getTile().getPosition() + "), Tile: " + p);
                          * 
                          * throw new IllegalStateException("Trying to set a
-                         * non-explored Tile to be visible. Colony: " + colony +
-                         * "(" + colony.getTile().getPosition() + "), Tile: " +
+                         * non-explored Tile to be visible. Settlement: " + settlement +
+                         * "(" + settlement.getTile().getPosition() + "), Tile: " +
                          * p); }
                          */
                     }
