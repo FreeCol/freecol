@@ -2698,42 +2698,48 @@ public class Unit extends FreeColGameObject implements Abilities, Locatable, Loc
 
         switch (getState()) {
         case Unit.ACTIVE:
-            occupationString = getMovesLeft() > 0 ? "-" : "0";
+            if (getMovesLeft() > 0) {
+                occupationString = Messages.message("model.unit.occupation.active");
+            } else {
+                occupationString = Messages.message("model.unit.occupation.activeNoMovesLeft");
+            }
             break;
         case Unit.FORTIFIED:
-            occupationString = "F";
+            occupationString = Messages.message("model.unit.occupation.fortified");
             break;
         case Unit.FORTIFYING:
-            occupationString = "F";
+            occupationString = Messages.message("model.unit.occupation.fortifying");
             break;
         case Unit.SENTRY:
-            occupationString = "S";
+            occupationString = Messages.message("model.unit.occupation.sentry");
             break;
         case Unit.IN_COLONY:
-            occupationString = "B";
+            occupationString = Messages.message("model.unit.occupation.inColony");
             break;
         case Unit.IMPROVING:
             if (workImprovement == null) {
                 // TODO: this should become unnecessary as soon as AI
                 // improvements work
-                occupationString = "#";
+                occupationString = Messages.message("model.unit.occupation.improving");
             } else {
                 occupationString = workImprovement.getOccupationString();
             }
             break;
         case Unit.TO_AMERICA:
+            occupationString = Messages.message("model.unit.occupation.goingToAmerica");
+            break;
         case Unit.TO_EUROPE:
-            occupationString = "G";
+            occupationString = Messages.message("model.unit.occupation.goingToEurope");
             break;
         case Unit.SKIPPED:
-            occupationString = "W";
+            occupationString = Messages.message("model.unit.occupation.skipped");
             break;
         default:
-            occupationString = "?";
+            occupationString = Messages.message("model.unit.occupation.unknown");
             logger.warning("Unit has an invalid occpuation: " + getState());
         }
         if (getDestination() != null) {
-            occupationString = "G";
+            occupationString = Messages.message("model.unit.occupation.goingSomewhere");
         }
 
         return occupationString;

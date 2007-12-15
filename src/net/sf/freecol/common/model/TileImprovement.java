@@ -107,10 +107,6 @@ public class TileImprovement extends TileItem implements Locatable, Named {
         return type;
     }
 
-    public String getTypeId() {
-        return type.getTypeId();
-    }
-
     public int getMagnitude() {
         return magnitude;
     }
@@ -119,14 +115,20 @@ public class TileImprovement extends TileItem implements Locatable, Named {
         this.magnitude = magnitude;
     }
 
-    /** Is this <code>TileImprovement</code> a road? */
+    /**
+     * Is this <code>TileImprovement</code> a road?
+     * @return a <code>boolean</code> value
+     */
     public boolean isRoad() {
-        return getTypeId().equals("road");
+        return getType().getId().equals("model.improvement.Road");
     }
 
-    /** Is this <code>TileImprovement</code> a river? */
+    /**
+     * Is this <code>TileImprovement</code> a river?
+     * @return a <code>boolean</code> value
+     */
     public boolean isRiver() {
-        return getTypeId().equals("river");
+        return getType().getId().equals("model.improvement.River");
     }
 
     /**
@@ -229,7 +231,7 @@ public class TileImprovement extends TileItem implements Locatable, Named {
         if (!isComplete()) {
             return moveCost;
         }
-        String typeId = type.getTypeId();
+        String typeId = type.getId();
         if (typeId == null) {
             // No checking for matching type
             return type.getMovementCost(moveCost);
@@ -239,7 +241,7 @@ public class TileImprovement extends TileItem implements Locatable, Named {
         while (ti.hasNext()) {
             TileItem tileItem = ti.next();
             if (tileItem instanceof TileImprovement) {
-                if (((TileImprovement) tileItem).getTypeId().equals(typeId)) {
+                if (((TileImprovement) tileItem).getType().getId().equals(typeId)) {
                     // Matched
                     return type.getMovementCost(moveCost);
                 }

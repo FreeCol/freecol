@@ -29,6 +29,7 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
 import net.sf.freecol.FreeCol;
+import net.sf.freecol.client.gui.i18n.Messages;
 
 public final class TileImprovementType extends FreeColGameObjectType
 {
@@ -37,7 +38,6 @@ public final class TileImprovementType extends FreeColGameObjectType
     private String typeId;
     private int magnitude;
     private int addWorkTurns;
-    private String occupationString;
 
     private int artOverlay;
     private boolean artOverTrees;
@@ -71,11 +71,6 @@ public final class TileImprovementType extends FreeColGameObjectType
         return natural;
     }
 
-    // TODO: Why don't we use getId()?
-    public String getTypeId() {
-        return typeId;
-    }
-
     public int getMagnitude() {
         return magnitude;
     }
@@ -85,7 +80,7 @@ public final class TileImprovementType extends FreeColGameObjectType
     }
 
     public String getOccupationString() {
-        return occupationString;
+        return Messages.message(getId() + ".occupationString");
     }
 
     // TODO: Make this work like the other *types with images using Hashtable
@@ -276,11 +271,10 @@ public final class TileImprovementType extends FreeColGameObjectType
            final Map<String, TileImprovementType> tileImprovementTypeByRef) throws XMLStreamException {
         setId(in.getAttributeValue(null, "id"));
         natural = getAttribute(in, "natural", false);
-        String s = getAttribute(in, "occupation-string", "I");
-        occupationString = s.substring(0, 1);
         addWorkTurns = getAttribute(in, "add-work-turns", 0);
         movementCost = -1;
         movementCostFactor = -1;
+        magnitude = getAttribute(in, "magnitude", 1);
         
         String req = in.getAttributeValue(null, "required-improvement");
         requiredImprovementType = tileImprovementTypeByRef.get(req);
@@ -303,12 +297,7 @@ public final class TileImprovementType extends FreeColGameObjectType
 
         while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
             String childName = in.getLocalName();
-            if ("type".equals(childName)) {
-                typeId = in.getAttributeValue(null, "id");
-                magnitude = getAttribute(in, "magnitude", 1);
-                in.nextTag(); // close this element
-
-            } else if ("tiles".equals(childName)) {
+            if ("tiles".equals(childName)) {
                 boolean allLand = getAttribute(in, "all-land-tiles", false);
                 boolean allForestUndefined = in.getAttributeValue(null, "all-forest-tiles") == null;
                 boolean allForest = getAttribute(in, "all-forest-tiles", false);

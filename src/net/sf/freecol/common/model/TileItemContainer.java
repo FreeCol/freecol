@@ -280,12 +280,12 @@ public class TileItemContainer extends FreeColGameObject {
         } else if (t instanceof TileImprovement) {
             TileImprovement improvement = (TileImprovement) t;
             // Check all improvements to find any to replace
-            String typeId = improvement.getTypeId();
+            String typeId = improvement.getType().getId();
             if (typeId != null) {
                 Iterator<TileImprovement> ti = improvements.iterator();
                 while (ti.hasNext()) {
                     TileImprovement imp = ti.next();
-                    if (imp.getTypeId().equals(typeId)) {
+                    if (imp.getType().getId().equals(typeId)) {
                         if (imp.getMagnitude() < improvement.getMagnitude()) {
                             removeTileItem(imp);
                             break;
@@ -445,7 +445,8 @@ public class TileItemContainer extends FreeColGameObject {
         List<TileImprovementType> tiTypeList = FreeCol.getSpecification().getTileImprovementTypeList();
         // Get the first river that matches or is below
         for (TileImprovementType tiType : tiTypeList) {
-            if ("river".equals(tiType.getTypeId()) && tiType.getMagnitude() <= magnitude) {
+            if ("model.improvement.River".equals(tiType.getId()) &&
+                tiType.getMagnitude() <= magnitude) {
                 TileImprovement river = new TileImprovement(getGame(), tile, tiType);
                 this.river = river;
                 adjustNeighbourRiverStyle(0);
@@ -492,7 +493,8 @@ public class TileItemContainer extends FreeColGameObject {
         List<TileImprovementType> tiTypeList = FreeCol.getSpecification().getTileImprovementTypeList();
         // Check if there is another river type defined for this magnitude
         for (TileImprovementType tiType : tiTypeList) {
-            if ("river".equals(tiType.getTypeId()) && tiType.getMagnitude() <= magnitude) {
+            if ("model.improvement.River".equals(tiType.getId()) && 
+                tiType.getMagnitude() <= magnitude) {
                 if (tiType != river.getType()) {
                     // Has a different river type for this magnitude
                     TileImprovement r = new TileImprovement(getGame(), tile, tiType);

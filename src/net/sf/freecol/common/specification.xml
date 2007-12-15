@@ -390,8 +390,7 @@
   change child options: from, to
   -->
   <tileimprovement-types>
-    <tileimprovement-type id="model.improvement.River" natural="true" add-work-turns="0">
-      <type id="river" magnitude="1"/>
+    <tileimprovement-type id="model.improvement.River" natural="true" add-work-turns="0" magnitude="1">
       <tiles all-land-tiles="true"/>
       <effect goods-type="model.goods.Food" value="1"/>
       <effect goods-type="model.goods.Sugar" value="1"/>
@@ -403,9 +402,8 @@
       <effect goods-type="model.goods.Silver" value="1"/>
       <effect movement-cost="1"/>
     </tileimprovement-type>
-    <tileimprovement-type id="model.improvement.Road" occupation-string="R" add-work-turns="0" over-trees="true"
-            expended-goods-type="model.goods.Tools" expended-amount="20">
-      <type id="road" magnitude="1"/>
+    <tileimprovement-type id="model.improvement.Road" add-work-turns="0" over-trees="true"
+            expended-goods-type="model.goods.Tools" expended-amount="20" magnitude="1">
       <tiles all-land-tiles="true"/>
       <effect goods-type="model.goods.Furs" value="1"/>
       <effect goods-type="model.goods.Lumber" value="1"/>
@@ -413,20 +411,18 @@
       <effect goods-type="model.goods.Silver" value="1"/>
       <effect movement-cost="1"/>
     </tileimprovement-type>
-    <tileimprovement-type id="model.improvement.Plow" occupation-string="P" add-work-turns="2" overlay="4"
-            expended-goods-type="model.goods.Tools" expended-amount="20">
-      <type id="plow" magnitude="1"/>
+    <tileimprovement-type id="model.improvement.Plow" add-work-turns="2" overlay="4"
+            expended-goods-type="model.goods.Tools" expended-amount="20" magnitude="1">
       <tiles all-land-tiles="true" all-forest-tiles="false"/>
       <effect goods-type="model.goods.Food" value="1"/>
       <effect goods-type="model.goods.Sugar" value="1"/>
       <effect goods-type="model.goods.Tobacco" value="1"/>
       <effect goods-type="model.goods.Cotton" value="1"/>
     </tileimprovement-type>
-    <tileimprovement-type id="model.improvement.ClearForest" occupation-string="P" add-work-turns="2"
+    <tileimprovement-type id="model.improvement.ClearForest" add-work-turns="2"
             expended-goods-type="model.goods.Tools" expended-amount="20"
-            deliver-goods-type="model.goods.Lumber" deliver-amount="5">
+            deliver-goods-type="model.goods.Lumber" deliver-amount="5" magnitude="1">
       <tiles all-forest-tiles="true"/>
-      <type id="clearForest" magnitude="1"/>
       <change from="model.tile.mixedForest"     to="model.tile.plains"/>
       <change from="model.tile.coniferForest"   to="model.tile.grassland"/>
       <change from="model.tile.broadleafForest" to="model.tile.prairie"/>
