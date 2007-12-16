@@ -101,7 +101,7 @@ public final class Europe extends FreeColGameObject implements Location,
      * @param in
      *            The input stream containing the XML.
      * @throws XMLStreamException
-     *             if an error occured during parsing.
+     *             if an error occurred during parsing.
      */
     public Europe(Game game, XMLStreamReader in) throws XMLStreamException {
         super(game, in);
@@ -314,7 +314,7 @@ public final class Europe extends FreeColGameObject implements Location,
     }
 
     /**
-     * Checks wether or not the specified locatable may be added to this
+     * Checks whether or not the specified locatable may be added to this
      * <code>Location</code>.
      * 
      * @param locatable
@@ -599,6 +599,7 @@ public final class Europe extends FreeColGameObject implements Location,
                 String unitType = in.getAttributeValue(null, "unitType");
                 Integer price = new Integer(in.getAttributeValue(null, "price"));
                 unitPrices.put(unitType, price);
+                in.nextTag(); // close "unitPrice" tag
             }
         }
     }
