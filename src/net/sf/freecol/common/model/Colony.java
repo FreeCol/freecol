@@ -1078,15 +1078,19 @@ public final class Colony extends Settlement implements Abilities, Location, Nam
             }
         }
         if (buildableType instanceof BuildingType) {
-            Building building = getBuilding((BuildingType) buildableType);
-            if (building != null && building.getType() == buildableType) {
-                return false;
-            }
-            BuildingType buildingType = (BuildingType) buildableType;
-            if (buildingType.getUpgradesFrom() != null) {
-                if (building == null) {
+            BuildingType newBuildingType = (BuildingType) buildableType;
+            Building colonyBuilding = this.getBuilding(newBuildingType);
+            if (colonyBuilding != null) {
+                // a building of the same family already exists
+                if (colonyBuilding.getType().getUpgradesTo() == null ||
+                    colonyBuilding.getType().getUpgradesTo() != newBuildingType) {
+                    // the existing building's next upgrade is not the new one we want to build
                     return false;
-                } else if (building.getType() != buildingType.getUpgradesFrom()) {
+                }
+            } else if (colonyBuilding == null) {
+                // the colony has no similar building yet
+                if (newBuildingType.getUpgradesFrom() != null) {
+                    // we are trying to build an advanced factory, we should build lower level shop first
                     return false;
                 }
             }
