@@ -84,12 +84,12 @@ public class Game extends FreeColGameObject {
     private HashMap<String, FreeColGameObject> freeColGameObjects = new HashMap<String, FreeColGameObject>(10000);
 
     /**
-     * The next availeble ID, that can be given to a new
+     * The next available ID, that can be given to a new
      * <code>FreeColGameObject</code>.
      */
     private int nextId = 1;
 
-    /** Indicates wether or not this object may give IDs. */
+    /** Indicates whether or not this object may give IDs. */
     private boolean canGiveID;
 
     private Turn turn = new Turn(1);
@@ -140,7 +140,7 @@ public class Game extends FreeColGameObject {
      * @param in The input stream containing the XML.
      * @param fcgos A list of <code>FreeColGameObject</code>s to be added to
      *            this <code>Game</code>.
-     * @throws XMLStreamException if an error occured during parsing.
+     * @throws XMLStreamException if an error occurred during parsing.
      * @see net.sf.freecol.server.FreeColServer#loadGame(File)
      */
     public Game(FreeColGameObjectListener freeColGameObjectListener, ModelController modelController,
@@ -299,9 +299,11 @@ public class Game extends FreeColGameObject {
         Iterator<Player> pit = getPlayerIterator();
         while (pit.hasNext()) {
             Player p = pit.next();
-            Colony result = p.getColony(name);
-            if (result != null) {
-                return result;
+            if (p.isEuropean()) {
+                Colony result = p.getColony(name);
+                if (result != null) {
+                    return result;
+                }
             }
         }
         return null;
@@ -461,9 +463,9 @@ public class Game extends FreeColGameObject {
     }
 
     /**
-     * Gets the <code>Map</code> that is beeing used in this game.
+     * Gets the <code>Map</code> that is being used in this game.
      * 
-     * @return The <code>Map</code> that is beeing used in this game or
+     * @return The <code>Map</code> that is being used in this game or
      *         <i>null</i> if no <code>Map</code> has been created.
      */
     public Map getMap() {
@@ -632,7 +634,7 @@ public class Game extends FreeColGameObject {
     /**
      * Gets a <code>Player</code> specified by a name.
      * 
-     * @param name The name identifing the <code>Player</code>.
+     * @param name The name identifying the <code>Player</code>.
      * @return The <code>Player</code>.
      */
     public Player getPlayerByName(String name) {
@@ -649,7 +651,7 @@ public class Game extends FreeColGameObject {
     }
 
     /**
-     * Checks if the specfied name is in use.
+     * Checks if the specified name is in use.
      * 
      * @param username The name.
      * @return <i>true</i> if the name is already in use and <i>false</i>
