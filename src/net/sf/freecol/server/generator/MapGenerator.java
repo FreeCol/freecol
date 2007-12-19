@@ -272,7 +272,7 @@ public class MapGenerator {
      * Create the Indian settlements, at least a capital for every nation and
      * random numbers of other settlements.
      * 
-     * @param map The <code>Map</code> to place the indian settlments on.
+     * @param map The <code>Map</code> to place the indian settlements on.
      * @param players The players to create <code>Settlement</code>s
      *       and starting locations for. That is; both indian and 
      *       european players. If players does not contain any indian players, 
@@ -541,9 +541,13 @@ public class MapGenerator {
             
             // START DEBUG:
             if (FreeCol.isInDebugMode()) {
+                // in debug mode give each player a few more units and a colony
                 UnitType unitType = FreeCol.getSpecification().getUnitType("model.unit.galleon");
                 Unit unit4 = new Unit(map.getGame(), startTile, player, unitType, Unit.ACTIVE);
-
+                
+                unitType = FreeCol.getSpecification().getUnitType("model.unit.privateer");
+                @SuppressWarnings("unused") Unit privateer = new Unit(map.getGame(), startTile, player, unitType, Unit.ACTIVE);
+                
                 unitType = FreeCol.getSpecification().getUnitType("model.unit.freeColonist");
                 @SuppressWarnings("unused") Unit unit5 = new Unit(map.getGame(), unit4, player, unitType, Unit.SENTRY);
                 unitType = FreeCol.getSpecification().getUnitType("model.unit.veteranSoldier");
@@ -570,7 +574,8 @@ public class MapGenerator {
                     }
                     unitType = FreeCol.getSpecification().getUnitType("model.unit.expertFarmer");
                     Unit buildColonyUnit = new Unit(map.getGame(), colonyTile, player, unitType, Unit.ACTIVE);
-                    Colony colony = new Colony(map.getGame(), player, "Colony for Testing", colonyTile);
+                    String colonyName = player.getNationAsString()+" Colony";
+                    Colony colony = new Colony(map.getGame(), player, colonyName, colonyTile);
                     buildColonyUnit.buildColony(colony);
                     if (buildColonyUnit.getLocation() instanceof ColonyTile) {
                         Tile ct = ((ColonyTile) buildColonyUnit.getLocation()).getWorkTile();
