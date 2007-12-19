@@ -479,7 +479,7 @@ public class AIColony extends AIObject {
     private int getToolsRequired(BuildableType buildableType) {
         int toolsRequiredForBuilding = 0;
         if (buildableType.getGoodsRequired() != null) {
-            for (AbstractGoods goodsRequired : colony.getCurrentlyBuilding().getGoodsRequired()) {
+            for (AbstractGoods goodsRequired : buildableType.getGoodsRequired()) {
                 if (goodsRequired.getType() == Goods.TOOLS) {
                     toolsRequiredForBuilding = goodsRequired.getAmount();
                     break;
@@ -493,7 +493,7 @@ public class AIColony extends AIObject {
     private int getHammersRequired(BuildableType buildableType) {
         int hammersRequiredForBuilding = 0;
         if (buildableType.getGoodsRequired() != null) {
-            for (AbstractGoods goodsRequired : colony.getCurrentlyBuilding().getGoodsRequired()) {
+            for (AbstractGoods goodsRequired : buildableType.getGoodsRequired()) {
                 if (goodsRequired.getType() == Goods.HAMMERS) {
                     hammersRequiredForBuilding = goodsRequired.getAmount();
                     break;
