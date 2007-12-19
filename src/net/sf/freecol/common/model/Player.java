@@ -2208,10 +2208,12 @@ public class Player extends FreeColGameObject implements Abilities, Nameable, Mo
      */
     public void calculateScore() {
         score = 0;
-        Iterator<Unit> unitIterator = getUnitIterator();
-        while (unitIterator.hasNext()) {
-            Unit unit = unitIterator.next();
-            score += unit.getScoreValue();
+        for (Unit unit : getUnits()) {
+            score += unit.getUnitType().getScoreValue();
+            if (unit.getLocation() != null &&
+                unit.getLocation() instanceof WorkLocation) {
+                score += unit.getUnitType().getScoreValue();
+            }
         }
         score += (score * oldSoL) / 100;
         score += getGold() / 1000;

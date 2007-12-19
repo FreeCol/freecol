@@ -112,6 +112,11 @@ public final class UnitType extends BuildableType implements Abilities, Modifier
     private String pathImage;
 
     /**
+     * Describe scoreValue here.
+     */
+    private int scoreValue;
+
+    /**
      * Describe education here.
      */
     private HashMap<String, Upgrade> upgrades = new HashMap<String, Upgrade>();
@@ -128,6 +133,24 @@ public final class UnitType extends BuildableType implements Abilities, Modifier
     
     public UnitType(int index) {
         setIndex(index);
+    }
+
+    /**
+     * Get the <code>ScoreValue</code> value.
+     *
+     * @return an <code>int</code> value
+     */
+    public int getScoreValue() {
+        return scoreValue;
+    }
+
+    /**
+     * Set the <code>ScoreValue</code> value.
+     *
+     * @param newScoreValue The new ScoreValue value.
+     */
+    public void setScoreValue(final int newScoreValue) {
+        this.scoreValue = newScoreValue;
     }
 
     /**
@@ -521,7 +544,7 @@ public final class UnitType extends BuildableType implements Abilities, Modifier
         defence = getAttribute(in, "defence", 1);
         movement = Integer.parseInt(in.getAttributeValue(null, "movement"));
         lineOfSight = getAttribute(in, "lineOfSight", 1);
-        
+        scoreValue = getAttribute(in, "scoreValue", 0);
         space = getAttribute(in, "space", 0);
         hitPoints = getAttribute(in, "hitPoints", 0);
         spaceTaken = getAttribute(in, "spaceTaken", 1);
@@ -533,8 +556,6 @@ public final class UnitType extends BuildableType implements Abilities, Modifier
         recruitProbability = getAttribute(in, "recruitProbability", 0);
         skill = getAttribute(in, "skill", UNDEFINED);
 
-        setHammersRequired(getAttribute(in, "hammers", UNDEFINED));
-        setToolsRequired(getAttribute(in, "tools", UNDEFINED));
         setPopulationRequired(getAttribute(in, "population-required", 1));
 
         price = getAttribute(in, "price", UNDEFINED);
@@ -554,6 +575,15 @@ public final class UnitType extends BuildableType implements Abilities, Modifier
                 String abilityId = in.getAttributeValue(null, "id");
                 boolean value = getAttribute(in, "value", true);
                 getAbilitiesRequired().put(abilityId, value);
+                in.nextTag(); // close this element
+            } else if ("required-goods".equals(nodeName)) {
+                GoodsType type = goodsTypeByRef.get(in.getAttributeValue(null, "id"));
+                int amount = getAttribute(in, "value", 0);
+                AbstractGoods requiredGoods = new AbstractGoods(type, amount);
+                if (getGoodsRequired() == null) {
+                    setGoodsRequired(new ArrayList<AbstractGoods>());
+                }
+                getGoodsRequired().add(requiredGoods);
                 in.nextTag(); // close this element
             } else if ("upgrade".equals(nodeName)) {
                 Upgrade upgrade = new Upgrade();
@@ -598,8 +628,7 @@ public final class UnitType extends BuildableType implements Abilities, Modifier
      * @return a <code>boolean</code> value
      */
     public boolean canBeBuilt() {
-
-        return getHammersRequired() > 0;
+        return getGoodsRequired() != null;
     }
 
 
@@ -609,7 +638,6 @@ public final class UnitType extends BuildableType implements Abilities, Modifier
      * @return a <code>boolean</code> value
      */
     public boolean hasPrice() {
-
         return price != UNDEFINED;
     }
 

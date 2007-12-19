@@ -211,7 +211,7 @@ public final class Building extends FreeColGameObject implements Abilities, Work
      * @see #damage
      */
     public boolean canBeDamaged() {
-        return buildingType.getHammersRequired() > 0;
+        return buildingType.getGoodsRequired() != null;
     }
     
     /**

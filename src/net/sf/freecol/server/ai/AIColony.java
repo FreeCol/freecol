@@ -34,6 +34,7 @@ import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.freecol.FreeCol;
+import net.sf.freecol.common.model.AbstractGoods;
 import net.sf.freecol.common.model.BuildableType;
 import net.sf.freecol.common.model.Building;
 import net.sf.freecol.common.model.Colony;
@@ -433,7 +434,7 @@ public class AIColony extends AIObject {
                 && PioneeringMission.isValid(unequippedHardyPioneer));
         int toolsRequiredForBuilding = 0;
         if (colony.getCurrentlyBuilding() != BuildableType.NOTHING) {
-            toolsRequiredForBuilding = colony.getCurrentlyBuilding().getToolsRequired();
+            toolsRequiredForBuilding = getToolsRequired(colony.getCurrentlyBuilding());
         }
         if (colony.getProductionNetOf(Goods.TOOLS) == 0 && (colony.getGoodsCount(Goods.TOOLS) < 20 && needsPioneer)
                 || toolsRequiredForBuilding > colony.getGoodsCount(Goods.TOOLS)) {
@@ -473,6 +474,33 @@ public class AIColony extends AIObject {
             }
         });
 
+    }
+
+    private int getToolsRequired(BuildableType buildableType) {
+        int toolsRequiredForBuilding = 0;
+        if (buildableType.getGoodsRequired() != null) {
+            for (AbstractGoods goodsRequired : colony.getCurrentlyBuilding().getGoodsRequired()) {
+                if (goodsRequired.getType() == Goods.TOOLS) {
+                    toolsRequiredForBuilding = goodsRequired.getAmount();
+                    break;
+                }
+            }
+        }
+        return toolsRequiredForBuilding;
+    }
+
+
+    private int getHammersRequired(BuildableType buildableType) {
+        int hammersRequiredForBuilding = 0;
+        if (buildableType.getGoodsRequired() != null) {
+            for (AbstractGoods goodsRequired : colony.getCurrentlyBuilding().getGoodsRequired()) {
+                if (goodsRequired.getType() == Goods.HAMMERS) {
+                    hammersRequiredForBuilding = goodsRequired.getAmount();
+                    break;
+                }
+            }
+        }
+        return hammersRequiredForBuilding;
     }
 
     /**
@@ -641,8 +669,8 @@ public class AIColony extends AIObject {
             if (goodsType == Goods.TOOLS && colony.getGoodsCount(Goods.TOOLS) > 0) {
                 if (colony.getProductionNetOf(Goods.TOOLS) > 0) {
                     final BuildableType currentlyBuilding = colony.getCurrentlyBuilding();
-                    int requiredTools = currentlyBuilding.getToolsRequired();
-                    int requiredHammers = currentlyBuilding.getHammersRequired();
+                    int requiredTools = getToolsRequired(currentlyBuilding);
+                    int requiredHammers = getHammersRequired(currentlyBuilding);
                     int buildTurns = (requiredHammers - colony.getHammers()) /
                         (colony.getProductionOf(Goods.HAMMERS) + 1);
                     if (requiredTools > 0) {
@@ -755,7 +783,7 @@ public class AIColony extends AIObject {
     public int getAvailableTools() {
         int toolsRequiredForBuilding = 0;
         if (colony.getCurrentlyBuilding() != BuildableType.NOTHING) {
-            toolsRequiredForBuilding = colony.getCurrentlyBuilding().getToolsRequired();
+            toolsRequiredForBuilding = getToolsRequired(colony.getCurrentlyBuilding());
         }
 
         return Math.max(0, colony.getGoodsCount(Goods.TOOLS) - toolsRequiredForBuilding);
@@ -1119,8 +1147,8 @@ public class AIColony extends AIObject {
         // TODO: mine ore if needed
         BuildableType nowbuilding = colony.getCurrentlyBuilding();
         if (nowbuilding != BuildableType.NOTHING &&
-            nowbuilding.getHammersRequired() <= colony.getHammers() &&
-            nowbuilding.getToolsRequired() > colony.getGoodsCount(Goods.TOOLS)) {
+            getHammersRequired(nowbuilding) <= colony.getHammers() &&
+            getToolsRequired(nowbuilding) > colony.getGoodsCount(Goods.TOOLS)) {
             Building carpenter = colony.getBuildingForProducing(Goods.HAMMERS);
             Building blacksmith = colony.getBuildingForProducing(Goods.TOOLS);
             for (Unit unit : carpenter.getUnitList()) {
@@ -1147,7 +1175,7 @@ public class AIColony extends AIObject {
      */
     private void decideBuildable(Connection connection) {
         // TODO: Request tools if needed.
-        int hammersOld = colony.getCurrentlyBuilding().getHammersRequired();
+        int hammersOld = getHammersRequired(colony.getCurrentlyBuilding());
 
         boolean isOldValid = colony.canBuild();
         
@@ -1160,7 +1188,7 @@ public class AIColony extends AIObject {
                 break;
             }
 
-            int hammersNew = buildable.getHammersRequired();
+            int hammersNew = getHammersRequired(buildable);
             if (hammersNew > colony.getHammers() || hammersNew > hammersOld || !isOldValid) {
                 Element setCurrentlyBuildingElement = Message.createNewRootElement("setCurrentlyBuilding");
                 setCurrentlyBuildingElement.setAttribute("colony", colony.getId());

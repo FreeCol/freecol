@@ -463,6 +463,7 @@
 
   <unit-types>
     <unit-type id="model.unit.freeColonist"         offence="0"  defence="1" movement="3" lineOfSight="1"
+               scoreValue="3"
                skill="0" promotion="model.unit.veteranSoldier" recruitProbability="20" pathImage="foot">
       <ability id="model.ability.foundColony" value="true"/>
       <ability id="model.ability.bornInColony" value="true"/>
@@ -491,117 +492,140 @@
       <upgrade unit="model.unit.jesuitMissionary" turnsToLearn="8"/>
     </unit-type>
     <unit-type id="model.unit.expertFarmer"         offence="0"  defence="1" movement="3" lineOfSight="1" price="1100" 
-               skill="1" recruitProbability="1" expert-production="model.goods.Food" clearSpeciality="model.unit.freeColonist" pathImage="foot">
+               skill="1" recruitProbability="1" expert-production="model.goods.Food"
+               scoreValue="4" clearSpeciality="model.unit.freeColonist" pathImage="foot">
       <ability id="model.ability.foundColony" value="true"/>
       <modifier id="model.goods.Food" type="additive" value="2"/>
     </unit-type>
     <unit-type id="model.unit.expertFisherman"      offence="0"  defence="1" movement="3" lineOfSight="1" price="1000" 
-               skill="1" recruitProbability="1" expert-production="model.goods.Fish" clearSpeciality="model.unit.freeColonist" pathImage="foot">
+               skill="1" recruitProbability="1" expert-production="model.goods.Fish"
+               scoreValue="4" clearSpeciality="model.unit.freeColonist" pathImage="foot">
       <ability id="model.ability.foundColony" value="true"/>
       <modifier id="model.goods.Fish" type="additive" value="2"/>
     </unit-type>
     <unit-type id="model.unit.expertFurTrapper"     offence="0"  defence="1" movement="3" lineOfSight="1"               
-               skill="1"  expert-production="model.goods.Furs" clearSpeciality="model.unit.freeColonist" pathImage="foot">
+               skill="1"  expert-production="model.goods.Furs"
+               scoreValue="4" clearSpeciality="model.unit.freeColonist" pathImage="foot">
       <ability id="model.ability.foundColony" value="true"/>
       <modifier id="model.goods.Furs" type="multiplicative" value="2"/>
     </unit-type>
     <unit-type id="model.unit.expertSilverMiner"    offence="0"  defence="1" movement="3" lineOfSight="1" price="900"  
-               skill="1" recruitProbability="1" expert-production="model.goods.Silver" clearSpeciality="model.unit.freeColonist" pathImage="foot">
+               skill="1" recruitProbability="1" expert-production="model.goods.Silver"
+               scoreValue="4" clearSpeciality="model.unit.freeColonist" pathImage="foot">
       <ability id="model.ability.foundColony" value="true"/>
       <modifier id="model.goods.Silver" type="multiplicative" value="2"/>
     </unit-type>
     <unit-type id="model.unit.expertLumberJack"     offence="0"  defence="1" movement="3" lineOfSight="1" price="700"  
-               skill="1" recruitProbability="1" expert-production="model.goods.Lumber" clearSpeciality="model.unit.freeColonist" pathImage="foot">
+               skill="1" recruitProbability="1" expert-production="model.goods.Lumber"
+               scoreValue="4" clearSpeciality="model.unit.freeColonist" pathImage="foot">
       <ability id="model.ability.foundColony" value="true"/>
       <modifier id="model.goods.Lumber" type="multiplicative" value="2"/>
     </unit-type>
     <unit-type id="model.unit.expertOreMiner"       offence="0"  defence="1" movement="3" lineOfSight="1" price="600"  
-               skill="1" recruitProbability="1" expert-production="model.goods.Ore" clearSpeciality="model.unit.freeColonist" pathImage="foot">
+               skill="1" recruitProbability="1" expert-production="model.goods.Ore"
+               scoreValue="4" clearSpeciality="model.unit.freeColonist" pathImage="foot">
       <ability id="model.ability.foundColony" value="true"/>
       <modifier id="model.goods.Ore" type="multiplicative" value="2"/>
     </unit-type>
     <unit-type id="model.unit.masterSugarPlanter"   offence="0"  defence="1" movement="3" lineOfSight="1"               
-               skill="2"  expert-production="model.goods.Sugar" clearSpeciality="model.unit.freeColonist" pathImage="foot">
+               skill="2"  expert-production="model.goods.Sugar"
+               scoreValue="5" clearSpeciality="model.unit.freeColonist" pathImage="foot">
       <ability id="model.ability.foundColony" value="true"/>
       <modifier id="model.goods.Sugar" type="multiplicative" value="2"/>
     </unit-type>
     <unit-type id="model.unit.masterCottonPlanter"  offence="0"  defence="1" movement="3" lineOfSight="1"               
-               skill="2"  expert-production="model.goods.Cotton" clearSpeciality="model.unit.freeColonist" pathImage="foot">
+               skill="2"  expert-production="model.goods.Cotton"
+               scoreValue="5" clearSpeciality="model.unit.freeColonist" pathImage="foot">
       <ability id="model.ability.foundColony" value="true"/>
       <modifier id="model.goods.Cotton" type="multiplicative" value="2"/>
     </unit-type>
     <unit-type id="model.unit.masterTobaccoPlanter" offence="0"  defence="1" movement="3" lineOfSight="1"               
-               skill="2"  expert-production="model.goods.Tobacco" clearSpeciality="model.unit.freeColonist" pathImage="foot">
+               skill="2"  expert-production="model.goods.Tobacco"
+               scoreValue="5" clearSpeciality="model.unit.freeColonist" pathImage="foot">
       <ability id="model.ability.foundColony" value="true"/>
       <modifier id="model.goods.Tobacco" type="multiplicative" value="2"/>
     </unit-type>
     <unit-type id="model.unit.firebrandPreacher"    offence="0"  defence="1" movement="3" lineOfSight="1" price="1500" 
-               skill="3" recruitProbability="1" expert-production="model.goods.Crosses" clearSpeciality="model.unit.freeColonist" pathImage="foot">
+               skill="3" recruitProbability="1" expert-production="model.goods.Crosses"
+               scoreValue="6" clearSpeciality="model.unit.freeColonist" pathImage="foot">
       <ability id="model.ability.foundColony" value="true"/>
       <modifier id="model.goods.Crosses" type="multiplicative" value="2"/>
     </unit-type>
     <unit-type id="model.unit.elderStatesman"       offence="0"  defence="1" movement="3" lineOfSight="1" price="1900" 
-               skill="3" recruitProbability="1" expert-production="model.goods.Bells" clearSpeciality="model.unit.freeColonist" pathImage="foot">
+               skill="3" recruitProbability="1" expert-production="model.goods.Bells"
+               scoreValue="6" clearSpeciality="model.unit.freeColonist" pathImage="foot">
       <ability id="model.ability.foundColony" value="true"/>
       <modifier id="model.goods.Bells" type="multiplicative" value="2"/>
     </unit-type>
     <unit-type id="model.unit.masterCarpenter"      offence="0"  defence="1" movement="3" lineOfSight="1" price="1000" 
-               skill="1" recruitProbability="1" expert-production="model.goods.Hammers" clearSpeciality="model.unit.freeColonist" pathImage="foot">
+               skill="1" recruitProbability="1" expert-production="model.goods.Hammers"
+               scoreValue="4" clearSpeciality="model.unit.freeColonist" pathImage="foot">
       <ability id="model.ability.foundColony" value="true"/>
       <modifier id="model.goods.Hammers" type="multiplicative" value="2"/>
     </unit-type>
     <unit-type id="model.unit.masterDistiller"      offence="0"  defence="1" movement="3" lineOfSight="1" price="1100" 
-               skill="2" recruitProbability="1" expert-production="model.goods.Rum" clearSpeciality="model.unit.freeColonist" pathImage="foot">
+               skill="2" recruitProbability="1" expert-production="model.goods.Rum"
+               scoreValue="5" clearSpeciality="model.unit.freeColonist" pathImage="foot">
       <ability id="model.ability.foundColony" value="true"/>
       <modifier id="model.goods.Rum" type="multiplicative" value="2"/>
     </unit-type>
     <unit-type id="model.unit.masterWeaver"         offence="0"  defence="1" movement="3" lineOfSight="1" price="1300" 
-               skill="2" recruitProbability="1" expert-production="model.goods.Cloth" clearSpeciality="model.unit.freeColonist" pathImage="foot">
+               skill="2" recruitProbability="1" expert-production="model.goods.Cloth"
+               scoreValue="5" clearSpeciality="model.unit.freeColonist" pathImage="foot">
       <ability id="model.ability.foundColony" value="true"/>
       <modifier id="model.goods.Cloth" type="multiplicative" value="2"/>
     </unit-type>
     <unit-type id="model.unit.masterTobacconist"    offence="0"  defence="1" movement="3" lineOfSight="1" price="1200" 
-               skill="2" recruitProbability="1" expert-production="model.goods.Cigars" clearSpeciality="model.unit.freeColonist" pathImage="foot">
+               skill="2" recruitProbability="1" expert-production="model.goods.Cigars"
+               scoreValue="5" clearSpeciality="model.unit.freeColonist" pathImage="foot">
       <ability id="model.ability.foundColony" value="true"/>
       <modifier id="model.goods.Cigars" type="multiplicative" value="2"/>
     </unit-type>
     <unit-type id="model.unit.masterFurTrader"      offence="0"  defence="1" movement="3" lineOfSight="1" price="950"  
-               skill="2" recruitProbability="1" expert-production="model.goods.Coats" clearSpeciality="model.unit.freeColonist" pathImage="foot">
+               skill="2" recruitProbability="1" expert-production="model.goods.Coats"
+               scoreValue="5" clearSpeciality="model.unit.freeColonist" pathImage="foot">
       <ability id="model.ability.foundColony" value="true"/>
       <modifier id="model.goods.Coats" type="multiplicative" value="2"/>
     </unit-type>
     <unit-type id="model.unit.masterBlacksmith"     offence="0"  defence="1" movement="3" lineOfSight="1" price="1050" 
-               skill="2" recruitProbability="1" expert-production="model.goods.Tools" clearSpeciality="model.unit.freeColonist" pathImage="foot">
+               skill="2" recruitProbability="1" expert-production="model.goods.Tools"
+               scoreValue="5" clearSpeciality="model.unit.freeColonist" pathImage="foot">
       <ability id="model.ability.foundColony" value="true"/>
       <modifier id="model.goods.Tools" type="multiplicative" value="2"/>
     </unit-type>
     <unit-type id="model.unit.masterGunsmith"       offence="0"  defence="1" movement="3" lineOfSight="1" price="850"  
-               skill="2" recruitProbability="1" expert-production="model.goods.Muskets" clearSpeciality="model.unit.freeColonist" pathImage="foot">
+               skill="2" recruitProbability="1" expert-production="model.goods.Muskets"
+               scoreValue="5" clearSpeciality="model.unit.freeColonist" pathImage="foot">
       <ability id="model.ability.foundColony" value="true"/>
       <modifier id="model.goods.Muskets" type="multiplicative" value="2"/>
     </unit-type>
     <unit-type id="model.unit.seasonedScout"        offence="0"  defence="1" movement="3" lineOfSight="1"               
-               skill="1" recruitProbability="1" clearSpeciality="model.unit.freeColonist" pathImage="foot">
+               skill="1" recruitProbability="1" clearSpeciality="model.unit.freeColonist"
+               scoreValue="4" pathImage="foot">
       <ability id="model.ability.foundColony" value="true"/>
       <ability id="model.ability.expertScout" value="true"/>
     </unit-type>
     <unit-type id="model.unit.hardyPioneer"         offence="0"  defence="1" movement="3" lineOfSight="1" price="1100" 
-               skill="1" recruitProbability="1" clearSpeciality="model.unit.freeColonist" pathImage="foot">
+               skill="1" recruitProbability="1" clearSpeciality="model.unit.freeColonist"
+               scoreValue="4" pathImage="foot">
       <ability id="model.ability.foundColony" value="true"/>
       <ability id="model.ability.expertPioneer" value="true"/>
     </unit-type>
     <unit-type id="model.unit.veteranSoldier"       offence="0"  defence="1" movement="3" lineOfSight="1" price="2000" 
-               skill="2" recruitProbability="1" promotion="model.unit.colonialRegular" clearSpeciality="model.unit.freeColonist" pathImage="foot">
+               skill="2" recruitProbability="1" promotion="model.unit.colonialRegular"
+               scoreValue="5" clearSpeciality="model.unit.freeColonist" pathImage="foot">
       <ability id="model.ability.foundColony" value="true"/>
       <modifier id="model.modifier.offence" type="percentage" value="50"/>
     </unit-type>
     <unit-type id="model.unit.jesuitMissionary"     offence="0"  defence="1" movement="3" lineOfSight="1" price="1400" 
-               skill="3" recruitProbability="1" clearSpeciality="model.unit.freeColonist" pathImage="foot">
+               skill="3" recruitProbability="1" clearSpeciality="model.unit.freeColonist"
+               scoreValue="5" pathImage="foot">
       <ability id="model.ability.foundColony" value="true"/>
       <ability id="model.ability.expertMissionary" value="true"/>
     </unit-type>
     <unit-type id="model.unit.indenturedServant"    offence="0"  defence="1" movement="3" lineOfSight="1"              
-               skill="-1" recruitProbability="20" promotion="model.unit.freeColonist" pathImage="foot">
+               skill="-1" recruitProbability="20" promotion="model.unit.freeColonist"
+               scoreValue="2" pathImage="foot">
       <ability id="model.ability.foundColony" value="true"/>
       <upgrade unit="model.unit.freeColonist" turnsToLearn="4"/>
       <upgrade unit="model.unit.expertFarmer" learnFromNatives="true"/>
@@ -625,7 +649,8 @@
       <modifier id="model.goods.Tools" type="additive" value="-1" />
     </unit-type>
     <unit-type id="model.unit.pettyCriminal"        offence="0"  defence="1" movement="3" lineOfSight="1"               
-               skill="-2" recruitProbability="20" promotion="model.unit.indenturedServant" pathImage="foot">
+               skill="-2" recruitProbability="20" promotion="model.unit.indenturedServant"
+               scoreValue="1" pathImage="foot">
       <ability id="model.ability.foundColony" value="true"/>
       <upgrade unit="model.unit.indenturedServant" turnsToLearn="4"/>
       <upgrade unit="model.unit.seasonedScout" learnInLostCity="true"/>
@@ -640,7 +665,7 @@
       <modifier id="model.goods.Tools" type="additive" value="-2" />
     </unit-type>
     <unit-type id="model.unit.indianConvert"        offence="0"  defence="1" movement="3" lineOfSight="1"               
-               skill="0" pathImage="foot">
+               scoreValue="3" skill="0" pathImage="foot">
       <ability id="model.ability.convert" value="true"/>
       <modifier id="model.goods.Food" type="additive" value="1"/>
       <modifier id="model.goods.Sugar" type="additive" value="1"/>
@@ -673,65 +698,83 @@
       <ability id="model.ability.foundColony" value="true"/>
     </unit-type>
     <unit-type id="model.unit.caravel"              offence="0"  defence="2"  movement="12" lineOfSight="1" space="2"
-               spaceTaken="24" hitPoints="6" price="1000" hammers="128" tools="40" pathImage="naval">
+               spaceTaken="24" hitPoints="6" price="1000" pathImage="naval" scoreValue="3">
+      <required-goods id="model.goods.Hammers" value="128"/>
+      <required-goods id="model.goods.Tools" value="40"/>
+      <required-ability id="model.ability.buildShips"/>
       <ability id="model.ability.navalUnit" value="true"/>
       <ability id="model.ability.carryGoods" value="true"/>
       <ability id="model.ability.carryUnits" value="true"/>
-      <required-ability id="model.ability.buildShips"/>
     </unit-type>
     <unit-type id="model.unit.frigate"              offence="16" defence="16" movement="18" lineOfSight="2" space="4"
-               spaceTaken="32" hitPoints="6" price="5000" hammers="512" tools="200" pathImage="naval">
+               spaceTaken="32" hitPoints="6" price="5000" pathImage="naval" scoreValue="6">
+      <required-goods id="model.goods.Hammers" value="512"/>
+      <required-goods id="model.goods.Tools" value="200"/>
+      <required-ability id="model.ability.buildShips"/>
       <ability id="model.ability.navalUnit" value="true"/>
       <ability id="model.ability.carryGoods" value="true"/>
       <ability id="model.ability.carryUnits" value="true"/>
       <ability id="model.ability.captureGoods" value="true"/>
-      <required-ability id="model.ability.buildShips"/>
     </unit-type>
     <unit-type id="model.unit.galleon"              offence="0"  defence="10" movement="18" lineOfSight="2" space="6"
-               spaceTaken="64" hitPoints="6" price="3000" hammers="320" tools="100" pathImage="naval">
+               spaceTaken="64" hitPoints="6" price="3000" pathImage="naval" scoreValue="5">
+      <required-goods id="model.goods.Hammers" value="320"/>
+      <required-goods id="model.goods.Tools" value="100"/>
+      <required-ability id="model.ability.buildShips"/>
       <ability id="model.ability.navalUnit" value="true"/>
       <ability id="model.ability.carryGoods" value="true"/>
       <ability id="model.ability.carryUnits" value="true"/>
-      <required-ability id="model.ability.buildShips"/>
     </unit-type>
     <unit-type id="model.unit.manOWar"              offence="24" defence="24" movement="18" lineOfSight="2" space="6"
-               spaceTaken="64" hitPoints="6" hammers="1024" tools="300" pathImage="naval">
+               spaceTaken="64" hitPoints="6" pathImage="naval" scoreValue="8">
+      <required-goods id="model.goods.Hammers" value="1024"/>
+      <required-goods id="model.goods.Tools" value="300"/>
+      <required-ability id="model.ability.buildShips"/>
+      <required-ability id="model.ability.independence"/>
       <ability id="model.ability.navalUnit" value="true"/>
       <ability id="model.ability.carryGoods" value="true"/>
       <ability id="model.ability.carryUnits" value="true"/>
       <ability id="model.ability.captureGoods" value="true"/>
-      <required-ability id="model.ability.buildShips"/>
-      <required-ability id="model.ability.independence"/>
     </unit-type>
     <unit-type id="model.unit.merchantman"          offence="0"  defence="6" movement="15" lineOfSight="1" space="4"
-               spaceTaken="32" hitPoints="6" price="2000" hammers="192" tools="80" pathImage="naval">
+               spaceTaken="32" hitPoints="6" price="2000" pathImage="naval" scoreValue="4">
+      <required-goods id="model.goods.Hammers" value="192"/>
+      <required-goods id="model.goods.Tools" value="80"/>
+      <required-ability id="model.ability.buildShips"/>
       <ability id="model.ability.navalUnit" value="true"/>
       <ability id="model.ability.carryGoods" value="true"/>
       <ability id="model.ability.carryUnits" value="true"/>
-      <required-ability id="model.ability.buildShips"/>
     </unit-type>
     <unit-type id="model.unit.privateer"            offence="8"  defence="8" movement="24" lineOfSight="2" space="2"
-               spaceTaken="24" hitPoints="6" price="2000" hammers="256" tools="120" pathImage="naval">
+               spaceTaken="24" hitPoints="6" price="2000" pathImage="naval" scoreValue="4">
+      <required-goods id="model.goods.Hammers" value="256"/>
+      <required-goods id="model.goods.Tools" value="120"/>
+      <required-ability id="model.ability.buildShips"/>
       <ability id="model.ability.navalUnit" value="true"/>
       <ability id="model.ability.carryGoods" value="true"/>
       <ability id="model.ability.carryUnits" value="true"/>
       <ability id="model.ability.captureGoods" value="true"/>
       <ability id="model.ability.piracy" value="true"/>
-      <required-ability id="model.ability.buildShips"/>
     </unit-type>
     <unit-type id="model.unit.artillery"            offence="7"  defence="5" movement="3" lineOfSight="1"
-               hammers="192" tools="40" price="500" increasingPrice="100" pathImage="wagon">
-      <ability id="model.ability.bombard" value="true"/>
+               price="500" increasingPrice="100" pathImage="wagon" scoreValue="2">
+      <required-goods id="model.goods.Hammers" value="192"/>
+      <required-goods id="model.goods.Tools" value="40"/>
       <required-ability id="model.ability.buildArtillery"/>
-    </unit-type>
-    <unit-type id="model.unit.damagedArtillery"     offence="5"  defence="3" movement="3" lineOfSight="1" pathImage="wagon">
       <ability id="model.ability.bombard" value="true"/>
     </unit-type>
-    <unit-type id="model.unit.treasureTrain"        offence="0"  defence="0" movement="3" lineOfSight="1" spaceTaken="6" pathImage="wagon">
+    <unit-type id="model.unit.damagedArtillery"     offence="5"  defence="3" movement="3"
+               scoreValue="1" lineOfSight="1" pathImage="wagon">
+      <ability id="model.ability.bombard" value="true"/>
+    </unit-type>
+    <unit-type id="model.unit.treasureTrain"        offence="0"  defence="0" movement="3"
+               scoreValue="1" lineOfSight="1" spaceTaken="6" pathImage="wagon">
       <ability id="model.ability.carryTreasure" value="true"/>
     </unit-type>
-    <unit-type id="model.unit.wagonTrain"           offence="0"  defence="1" movement="6" lineOfSight="1" spaceTaken="12" space="2"
-               hammers="40" tools="0" pathImage="wagon">
+    <unit-type id="model.unit.wagonTrain"           offence="0"  defence="1" movement="6"
+               scoreValue="1" lineOfSight="1" spaceTaken="12" space="2"
+               pathImage="wagon">
+      <required-goods id="model.goods.Hammers" value="40"/>
       <ability id="model.ability.carryGoods" value="true"/>
     </unit-type>
     <unit-type id="model.unit.milkmaid"             offence="0"  defence="1" movement="3"  lineOfSight="1" expert-production="food" pathImage="foot">
@@ -759,14 +802,19 @@
     </building-type>
     <building-type id="model.building.CarpenterHouse" basicProduction="3" workplaces="3" consumes="model.goods.Lumber" produces="model.goods.Hammers">
     </building-type>
-    <building-type id="model.building.LumberMill"     hammers-required="52" tools-required="0" basicProduction="6" workplaces="3" consumes="model.goods.Lumber" produces="model.goods.Hammers" upgradesFrom="model.building.CarpenterHouse">
+    <building-type id="model.building.LumberMill"     basicProduction="6" workplaces="3" consumes="model.goods.Lumber" produces="model.goods.Hammers" upgradesFrom="model.building.CarpenterHouse">
       <required-population value="3"/>
+      <required-goods id="model.goods.Hammers" value="52"/>
     </building-type>
     <building-type id="model.building.BlacksmithHouse" basicProduction="3" workplaces="3" consumes="model.goods.Ore" produces="model.goods.Tools">
     </building-type>
-    <building-type id="model.building.BlacksmithShop"  hammers-required="64"  tools-required="20"  basicProduction="6" workplaces="3" consumes="model.goods.Ore" produces="model.goods.Tools" upgradesFrom="model.building.BlacksmithHouse">
+    <building-type id="model.building.BlacksmithShop"  basicProduction="6" workplaces="3" consumes="model.goods.Ore" produces="model.goods.Tools" upgradesFrom="model.building.BlacksmithHouse">
+      <required-goods id="model.goods.Hammers" value="64"/>
+      <required-goods id="model.goods.Tools" value="20"/>
     </building-type>
-    <building-type id="model.building.IronWorks"       hammers-required="240" tools-required="100" basicProduction="6" workplaces="3" consumes="model.goods.Ore" produces="model.goods.Tools" upgradesFrom="model.building.BlacksmithShop">
+    <building-type id="model.building.IronWorks"       basicProduction="6" workplaces="3" consumes="model.goods.Ore" produces="model.goods.Tools" upgradesFrom="model.building.BlacksmithShop">
+      <required-goods id="model.goods.Hammers" value="240"/>
+      <required-goods id="model.goods.Tools" value="100"/>
       <required-population value="8"/>
       <required-ability id="model.ability.buildFactory"/>
       <modifier id="model.goods.Tools" type="percentage" value="50"/>
@@ -774,9 +822,13 @@
     </building-type>
     <building-type id="model.building.TobacconistHouse" basicProduction="3" workplaces="3" consumes="model.goods.Tobacco" produces="model.goods.Cigars">
     </building-type>
-    <building-type id="model.building.TobacconistShop"  hammers-required="64"  tools-required="20"  basicProduction="6" workplaces="3" consumes="model.goods.Tobacco" produces="model.goods.Cigars" upgradesFrom="model.building.TobacconistHouse">
+    <building-type id="model.building.TobacconistShop"  basicProduction="6" workplaces="3" consumes="model.goods.Tobacco" produces="model.goods.Cigars" upgradesFrom="model.building.TobacconistHouse">
+      <required-goods id="model.goods.Hammers" value="64"/>
+      <required-goods id="model.goods.Tools" value="20"/>
     </building-type>
-    <building-type id="model.building.CigarFactory"     hammers-required="160" tools-required="100" basicProduction="6" workplaces="3" consumes="model.goods.Tobacco" produces="model.goods.Cigars" upgradesFrom="model.building.TobacconistShop">
+    <building-type id="model.building.CigarFactory"     basicProduction="6" workplaces="3" consumes="model.goods.Tobacco" produces="model.goods.Cigars" upgradesFrom="model.building.TobacconistShop">
+      <required-goods id="model.goods.Hammers" value="160"/>
+      <required-goods id="model.goods.Tools" value="100"/>
       <required-population value="8"/>
       <required-ability id="model.ability.buildFactory"/>
       <modifier id="model.goods.Cigars" type="percentage" value="50"/>
@@ -784,9 +836,13 @@
     </building-type>
     <building-type id="model.building.WeaverHouse" basicProduction="3" workplaces="3" consumes="model.goods.Cotton" produces="model.goods.Cloth">
     </building-type>
-    <building-type id="model.building.WeaverShop"  hammers-required="64"  tools-required="20"  basicProduction="6" workplaces="3" consumes="model.goods.Cotton" produces="model.goods.Cloth" upgradesFrom="model.building.WeaverHouse">
+    <building-type id="model.building.WeaverShop"  basicProduction="6" workplaces="3" consumes="model.goods.Cotton" produces="model.goods.Cloth" upgradesFrom="model.building.WeaverHouse">
+      <required-goods id="model.goods.Hammers" value="64"/>
+      <required-goods id="model.goods.Tools" value="20"/>
     </building-type>
-    <building-type id="model.building.TextileMill" hammers-required="160" tools-required="100" basicProduction="6" workplaces="3" consumes="model.goods.Cotton" produces="model.goods.Cloth" upgradesFrom="model.building.WeaverShop">
+    <building-type id="model.building.TextileMill" basicProduction="6" workplaces="3" consumes="model.goods.Cotton" produces="model.goods.Cloth" upgradesFrom="model.building.WeaverShop">
+      <required-goods id="model.goods.Hammers" value="160"/>
+      <required-goods id="model.goods.Tools" value="100"/>
       <required-population value="8"/>
       <required-ability id="model.ability.buildFactory"/>
       <modifier id="model.goods.Cloth" type="percentage" value="50"/>
@@ -794,9 +850,13 @@
     </building-type>
     <building-type id="model.building.DistillerHouse" basicProduction="3" workplaces="3" consumes="model.goods.Sugar" produces="model.goods.Rum">
     </building-type>
-    <building-type id="model.building.RumDistillery"  hammers-required="64"  tools-required="20"  basicProduction="6" workplaces="3" consumes="model.goods.Sugar" produces="model.goods.Rum" upgradesFrom="model.building.DistillerHouse">
+    <building-type id="model.building.RumDistillery"  basicProduction="6" workplaces="3" consumes="model.goods.Sugar" produces="model.goods.Rum" upgradesFrom="model.building.DistillerHouse">
+      <required-goods id="model.goods.Hammers" value="64"/>
+      <required-goods id="model.goods.Tools" value="20"/>
     </building-type>
-    <building-type id="model.building.RumFactory"     hammers-required="160" tools-required="100" basicProduction="6" workplaces="3" consumes="model.goods.Sugar" produces="model.goods.Rum" upgradesFrom="model.building.RumDistillery">
+    <building-type id="model.building.RumFactory"     basicProduction="6" workplaces="3" consumes="model.goods.Sugar" produces="model.goods.Rum" upgradesFrom="model.building.RumDistillery">
+      <required-goods id="model.goods.Hammers" value="160"/>
+      <required-goods id="model.goods.Tools" value="100"/>
       <required-population value="8"/>
       <required-ability id="model.ability.buildFactory"/>
       <modifier id="model.goods.Rum" type="percentage" value="50"/>
@@ -804,34 +864,48 @@
     </building-type>
     <building-type id="model.building.FurTraderHouse" basicProduction="3" workplaces="3" consumes="model.goods.Furs" produces="model.goods.Coats">
     </building-type>
-    <building-type id="model.building.FurTradingPost" hammers-required="56"  tools-required="20"  basicProduction="6" workplaces="3" consumes="model.goods.Furs" produces="model.goods.Coats" upgradesFrom="model.building.FurTraderHouse">
+    <building-type id="model.building.FurTradingPost" basicProduction="6" workplaces="3" consumes="model.goods.Furs" produces="model.goods.Coats" upgradesFrom="model.building.FurTraderHouse">
+      <required-goods id="model.goods.Hammers" value="56"/>
+      <required-goods id="model.goods.Tools" value="20"/>
     </building-type>
-    <building-type id="model.building.FurFactory"     hammers-required="160" tools-required="100" basicProduction="6" workplaces="3" consumes="model.goods.Furs" produces="model.goods.Coats" upgradesFrom="model.building.FurTradingPost">
+    <building-type id="model.building.FurFactory"     basicProduction="6" workplaces="3" consumes="model.goods.Furs" produces="model.goods.Coats" upgradesFrom="model.building.FurTradingPost">
+      <required-goods id="model.goods.Hammers" value="160"/>
+      <required-goods id="model.goods.Tools" value="100"/>
       <required-population value="6"/>
       <required-ability id="model.ability.buildFactory"/>
       <modifier id="model.goods.Coats" type="percentage" value="50"/>
       <ability id="model.ability.expertsUseConnections" value="true"/>
     </building-type>
-    <building-type id="model.building.Schoolhouse" hammers-required="64"  tools-required="0"   workplaces="1" minSkill="1" maxSkill="1">
+    <building-type id="model.building.Schoolhouse" workplaces="1" minSkill="1" maxSkill="1">
+      <required-goods id="model.goods.Hammers" value="64"/>
       <required-population value="4"/>
       <ability id="model.ability.teach" value="true"/>
     </building-type>
-    <building-type id="model.building.College"     hammers-required="160" tools-required="50"  workplaces="2" minSkill="1" maxSkill="2" upgradesFrom="model.building.Schoolhouse">
+    <building-type id="model.building.College"     workplaces="2" minSkill="1" maxSkill="2" upgradesFrom="model.building.Schoolhouse">
+      <required-goods id="model.goods.Hammers" value="160"/>
+      <required-goods id="model.goods.Tools" value="50"/>
       <required-population value="8"/>
       <ability id="model.ability.teach" value="true"/>
     </building-type>
-    <building-type id="model.building.University"  hammers-required="200" tools-required="100" workplaces="3" minSkill="1" maxSkill="3" upgradesFrom="model.building.College">
+    <building-type id="model.building.University"  workplaces="3" minSkill="1" maxSkill="3" upgradesFrom="model.building.College">
+      <required-goods id="model.goods.Hammers" value="200"/>
+      <required-goods id="model.goods.Tools" value="100"/>
       <required-population value="10"/>
       <ability id="model.ability.teach" value="true"/>
     </building-type>
-    <building-type id="model.building.Armory"   hammers-required="52"  tools-required="0"   basicProduction="3" workplaces="3" consumes="model.goods.Tools" produces="model.goods.Muskets">
+    <building-type id="model.building.Armory"   basicProduction="3" workplaces="3" consumes="model.goods.Tools" produces="model.goods.Muskets">
+      <required-goods id="model.goods.Hammers" value="52"/>
       <ability id="model.ability.buildArtillery" value="true"/>
     </building-type>
-    <building-type id="model.building.Magazine" hammers-required="120" tools-required="50"  basicProduction="6" workplaces="3" consumes="model.goods.Tools" produces="model.goods.Muskets" upgradesFrom="model.building.Armory">
+    <building-type id="model.building.Magazine" basicProduction="6" workplaces="3" consumes="model.goods.Tools" produces="model.goods.Muskets" upgradesFrom="model.building.Armory">
+      <required-goods id="model.goods.Hammers" value="120"/>
+      <required-goods id="model.goods.Tools" value="50"/>
       <required-population value="8"/>
       <ability id="model.ability.buildArtillery" value="true"/>
     </building-type>
-    <building-type id="model.building.Arsenal"  hammers-required="240" tools-required="100" basicProduction="6" workplaces="3" consumes="model.goods.Tools" produces="model.goods.Muskets" upgradesFrom="model.building.Magazine">
+    <building-type id="model.building.Arsenal"  basicProduction="6" workplaces="3" consumes="model.goods.Tools" produces="model.goods.Muskets" upgradesFrom="model.building.Magazine">
+      <required-goods id="model.goods.Hammers" value="240"/>
+      <required-goods id="model.goods.Tools" value="100"/>
       <required-population value="8"/>
       <required-ability id="model.ability.buildFactory"/>
       <modifier id="model.goods.Muskets" type="percentage" value="50"/>
@@ -841,26 +915,34 @@
     <building-type id="model.building.Chapel"    workplaces="0" produces="model.goods.Crosses">
       <modifier id="model.goods.Crosses" type="additive" value="1"/>
     </building-type>
-    <building-type id="model.building.Church"    hammers-required="64"  tools-required="0"   basicProduction="3" workplaces="3" produces="model.goods.Crosses" upgradesFrom="model.building.Chapel">
+    <building-type id="model.building.Church"    basicProduction="3" workplaces="3" produces="model.goods.Crosses" upgradesFrom="model.building.Chapel">
+      <required-goods id="model.goods.Hammers" value="64"/>
       <required-population value="3"/>
       <modifier id="model.goods.Crosses" type="additive" value="2"/>
       <ability id="model.ability.dressMissionary" value="true"/> <!-- maybe it will be changed with equipment implementation -->
     </building-type>
-    <building-type id="model.building.Cathedral" hammers-required="176" tools-required="100" basicProduction="6" workplaces="3" produces="model.goods.Crosses" upgradesFrom="model.building.Church">
+    <building-type id="model.building.Cathedral" basicProduction="6" workplaces="3" produces="model.goods.Crosses" upgradesFrom="model.building.Church">
+      <required-goods id="model.goods.Hammers" value="176"/>
+      <required-goods id="model.goods.Tools" value="100"/>
       <required-population value="8"/>
       <modifier id="model.goods.Crosses" type="additive" value="3"/>
       <ability id="model.ability.dressMissionary" value="true"/> <!-- maybe it will be changed with equipment implementation -->
     </building-type>
-    <building-type id="model.building.Stockade" hammers-required="64"  tools-required="0"   workplaces="0">
+    <building-type id="model.building.Stockade" workplaces="0">
+      <required-goods id="model.goods.Hammers" value="64"/>
       <required-population value="3"/>
       <modifier id="model.modifier.defence" type="percentage" value="100"/>
     </building-type>
-    <building-type id="model.building.Fort"     hammers-required="120" tools-required="100" workplaces="0" upgradesFrom="model.building.Stockade">
+    <building-type id="model.building.Fort"     workplaces="0" upgradesFrom="model.building.Stockade">
+      <required-goods id="model.goods.Hammers" value="120"/>
+      <required-goods id="model.goods.Tools" value="100"/>
       <required-population value="3"/>
       <modifier id="model.modifier.defence" type="percentage" value="150"/>
       <ability id="model.ability.bombardShips" value="true"/>
     </building-type>
-    <building-type id="model.building.Fortress" hammers-required="320" tools-required="200" workplaces="0" upgradesFrom="model.building.Fort">
+    <building-type id="model.building.Fortress" workplaces="0" upgradesFrom="model.building.Fort">
+      <required-goods id="model.goods.Hammers" value="320"/>
+      <required-goods id="model.goods.Tools" value="200"/>
       <required-population value="8"/>
       <modifier id="model.modifier.defence" type="percentage" value="200"/>
       <ability id="model.ability.bombardShips" value="true"/>
@@ -868,42 +950,57 @@
     <building-type id="model.building.Depot"              workplaces="0">
       <modifier id="model.modifier.warehouseStorage" type="additive" value="100"/>
     </building-type>
-    <building-type id="model.building.Warehouse"          hammers-required="80" tools-required="0"  workplaces="0" upgradesFrom="model.building.Depot">
+    <building-type id="model.building.Warehouse"          workplaces="0" upgradesFrom="model.building.Depot">
+      <required-goods id="model.goods.Hammers" value="80"/>
       <modifier id="model.modifier.warehouseStorage" type="additive" value="200"/>
     </building-type>
-    <building-type id="model.building.WarehouseExpansion" hammers-required="80" tools-required="20" workplaces="0" upgradesFrom="model.building.Warehouse">
+    <building-type id="model.building.WarehouseExpansion" workplaces="0" upgradesFrom="model.building.Warehouse">
+      <required-goods id="model.goods.Hammers" value="80"/>
+      <required-goods id="model.goods.Tools" value="20"/>
       <modifier id="model.modifier.warehouseStorage" type="additive" value="300"/>
     </building-type>
     <building-type id="model.building.Country" workplaces="0" consumes="model.goods.Food" produces="model.goods.Horses">
       <modifier id="model.goods.Horses" type="percentage" value="-50"/>
       <ability id="model.ability.autoProduction" value="true" />
     </building-type>
-    <building-type id="model.building.Stables" hammers-required="64" tools-required="0" workplaces="0" consumes="model.goods.Food" produces="model.goods.Horses" upgradesFrom="model.building.Country">
+    <building-type id="model.building.Stables" workplaces="0" consumes="model.goods.Food" produces="model.goods.Horses" upgradesFrom="model.building.Country">
+      <required-goods id="model.goods.Hammers" value="64"/>
       <ability id="model.ability.autoProduction" value="true" />
     </building-type>
-    <building-type id="model.building.Docks"    hammers-required="52"  tools-required="0"   workplaces="0">
+    <building-type id="model.building.Docks"   workplaces="0">
       <!-- TODO: add requirement for not land-locked colony -->
+      <required-goods id="model.goods.Hammers" value="52"/>
       <ability id="model.ability.produceInWater" value="true"/>
     </building-type>
-    <building-type id="model.building.Drydock"  hammers-required="80"  tools-required="50"  workplaces="0" upgradesFrom="model.building.Docks">
+    <building-type id="model.building.Drydock" workplaces="0" upgradesFrom="model.building.Docks">
+      <required-goods id="model.goods.Hammers" value="80"/>
+      <required-goods id="model.goods.Tools" value="50"/>
       <required-population value="4"/>
       <ability id="model.ability.produceInWater" value="true"/>
       <ability id="model.ability.repairShips" value="true"/>
     </building-type>
-    <building-type id="model.building.Shipyard" hammers-required="240" tools-required="100" workplaces="0" upgradesFrom="model.building.Drydock">
+    <building-type id="model.building.Shipyard" workplaces="0" upgradesFrom="model.building.Drydock">
+      <required-goods id="model.goods.Hammers" value="240"/>
+      <required-goods id="model.goods.Tools" value="100"/>
       <required-population value="8"/>
       <ability id="model.ability.produceInWater" value="true"/>
       <ability id="model.ability.repairShips" value="true"/>
       <ability id="model.ability.buildShips" value="true"/>
     </building-type>
-    <building-type id="model.building.PrintingPress" hammers-required="52"  tools-required="20"  workplaces="0">
+    <building-type id="model.building.PrintingPress" workplaces="0">
+      <required-goods id="model.goods.Hammers" value="52"/>
+      <required-goods id="model.goods.Tools" value="20"/>
       <modifier id="model.goods.Bells" type="percentage" value="50"/>
     </building-type>
-    <building-type id="model.building.Newspaper"     hammers-required="120" tools-required="50" workplaces="0" upgradesFrom="model.building.PrintingPress">
+    <building-type id="model.building.Newspaper" workplaces="0" upgradesFrom="model.building.PrintingPress">
+      <required-goods id="model.goods.Hammers" value="120"/>
+      <required-goods id="model.goods.Tools" value="50"/>
       <required-population value="4"/>
       <modifier id="model.goods.Bells" type="percentage" value="100"/>
     </building-type>
-    <building-type id="model.building.CustomHouse" hammers-required="160" tools-required="50" workplaces="0">
+    <building-type id="model.building.CustomHouse" workplaces="0">
+      <required-goods id="model.goods.Hammers" value="160"/>
+      <required-goods id="model.goods.Tools" value="50"/>
       <required-ability id="model.ability.buildCustomHouse"/>
       <ability id="model.ability.export" value="true"/>
     </building-type>

@@ -71,6 +71,7 @@ import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.client.gui.i18n.Messages;
+import net.sf.freecol.common.model.AbstractGoods;
 import net.sf.freecol.common.model.BuildableType;
 import net.sf.freecol.common.model.Building;
 import net.sf.freecol.common.model.BuildingType;
@@ -237,16 +238,12 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener, C
                 public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected,
                                                               boolean cellHasFocus) {
                     BuildableType type = (BuildableType) value;
-                    String theText = new String(type.getName() + " (" + 
-                                                type.getHammersRequired() + " " +
-                                                Messages.message("model.goods.Hammers.name").toLowerCase());
-                    if (type.getToolsRequired() > 0) {
-                        theText += ", " + type.getToolsRequired() + " " +
-                            Messages.message("model.goods.Tools.name").toLowerCase();
+                    String requirements = type.getGoodsRequiredAsString();
+                    if ("".equals(requirements)) {
+                        return new JLabel(type.getName());
+                    } else {
+                        return new JLabel(new String(type.getName() + " (" + requirements + ")"));
                     }
-                
-                    theText += ")";
-                    return new JLabel(theText);
                 }
             });
 
@@ -670,10 +667,15 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener, C
             if (produced != null) {
                 nextTools -= getColony().getProductionNextTurn(produced);
             }
-            
-            int hammersNeeded = Math.max(getColony().getCurrentlyBuilding().getHammersRequired(), 0);
-            int toolsNeeded = Math.max(getColony().getCurrentlyBuilding().getToolsRequired(), 0);
-
+            int hammersNeeded = 0, toolsNeeded = 0;
+            /** TODO: make this more generic */
+            for (AbstractGoods requiredGoods : getColony().getCurrentlyBuilding().getGoodsRequired()) {
+                if (requiredGoods.getType() == Goods.HAMMERS) {
+                    hammersNeeded = Math.max(requiredGoods.getAmount(), 0);
+                } else if (requiredGoods.getType() == Goods.TOOLS) {
+                    toolsNeeded = Math.max(requiredGoods.getAmount(), 0);
+                }
+            }
             hammersLabel.update(0, hammersNeeded, hammers, nextHammers);
             toolsLabel.update(0, toolsNeeded, tools, nextTools);
 
@@ -681,9 +683,9 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener, C
             //    - the panel is active,
             //    - the building isn't finished,
             //    - the player has enough money
-            buyBuilding.setEnabled(isEditable() &&
-            		(hammers < hammersNeeded || tools < toolsNeeded)  &&
-                    getColony().getPriceForBuilding() <= freeColClient.getMyPlayer().getGold());
+            int price = getColony().getPriceForBuilding();
+            buyBuilding.setEnabled(isEditable() && price > 0 &&
+                                   price <= freeColClient.getMyPlayer().getGold());
         }
     }
 

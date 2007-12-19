@@ -129,7 +129,7 @@ public final class Colony extends Settlement implements Abilities, Location, Nam
         List<BuildingType> buildingTypes = FreeCol.getSpecification().getBuildingTypeList();
         for (BuildingType buildingType : buildingTypes) {
             if (buildingType.getUpgradesFrom() == null &&
-                buildingType.getHammersRequired() == 0) {
+                buildingType.getGoodsRequired() == null) {
                 addBuilding(new Building(getGame(), this, buildingType));
             }
         }
@@ -712,7 +712,7 @@ public final class Colony extends Settlement implements Abilities, Location, Nam
         ArrayList<UnitType> buildableUnits = new ArrayList<UnitType>();
         List<UnitType> unitTypes = FreeCol.getSpecification().getUnitTypeList();
         for (UnitType unitType : unitTypes) {
-            if (unitType.getHammersRequired() > 0) {
+            if (unitType.getGoodsRequired() != null) {
                 if (canBuild(unitType)) {
                     buildableUnits.add(unitType);
                 }
@@ -1065,7 +1065,7 @@ public final class Colony extends Settlement implements Abilities, Location, Nam
     public boolean canBuild(BuildableType buildableType) {
         if (buildableType == null || buildableType == BuildableType.NOTHING) {
             return false;
-        } else if (buildableType.getHammersRequired() <= 0) {
+        } else if (buildableType.getGoodsRequired() == null) {
             return false;
         } else if (buildableType.getPopulationRequired() > getUnitCount()) {
             return false;
@@ -1102,7 +1102,7 @@ public final class Colony extends Settlement implements Abilities, Location, Nam
         return getGame().getModelController().createBuilding(getId() + "buildBuilding", this, buildingType);
     }
 
-    private void checkBuildingComplete() {
+    private void checkBuildableComplete() {
         // In order to avoid duplicate messages:
         if (lastVisited == getGame().getTurn().getNumber()) {
             return;
@@ -1110,38 +1110,54 @@ public final class Colony extends Settlement implements Abilities, Location, Nam
         lastVisited = getGame().getTurn().getNumber();
         if (canBuild()) {
             BuildableType buildable = getCurrentlyBuilding();
-            if (buildable.getHammersRequired() != -1 &&
-                buildable.getHammersRequired() <= getHammers()) {
-                if (buildable.getToolsRequired() <= getGoodsCount(Goods.TOOLS)) {
-                    // waste excess hammers
-                    removeGoods(Goods.HAMMERS);
-                    removeGoods(Goods.TOOLS, buildable.getToolsRequired());
-                    if (buildable instanceof UnitType) {
-                        Unit unit = getGame().getModelController().createUnit(getId() + "buildUnit", getTile(), getOwner(),
-                                                                              (UnitType) buildable);
-                        addModelMessage(this, "model.colony.unitReady",
-                                        new String[][] { { "%colony%", getName() },
-                                                         { "%unit%", unit.getName() } },
-                                        ModelMessage.UNIT_ADDED, unit);
-                    } else if (buildable instanceof BuildingType) {
-                        BuildingType upgradesFrom = ((BuildingType) buildable).getUpgradesFrom();
-                        if (upgradesFrom == null) {
-                            addBuilding(createBuilding((BuildingType) buildable));
-                        } else {
-                            getBuilding(upgradesFrom).upgrade();
-                        }
-                        buildQueue.remove(0);
-                        if (buildQueue.size() == 0) {
-                            buildQueue.add(BuildableType.NOTHING);
-                        }
+            ArrayList<ModelMessage> messages = new ArrayList<ModelMessage>();
+            for (AbstractGoods goodsRequired : buildable.getGoodsRequired()) {
+                GoodsType requiredGoodsType = goodsRequired.getType();
+                if (getGoodsCount(requiredGoodsType) < goodsRequired.getAmount()) {
+                    if (!requiredGoodsType.isStorable()) {
+                        // buildable is not complete and we don't care
+                        // about missing goods because unstorable
+                        // goods (e.g. hammers) are still missing
+                        return;
                     }
-                } else {
-                    addModelMessage(this, "model.colony.itemNeedTools",
-                                    new String[][] {
-                                        { "%colony%", getName() },
-                                        { "%item%", buildable.getName() } },
-                                    ModelMessage.MISSING_GOODS, 
-                                    FreeCol.getSpecification().getGoodsType("model.goods.tools"));
+                    messages.add(new ModelMessage(this, "model.colony.buildableNeedsGoods",
+                                                  new String[][] {
+                                                      { "%colony%", getName() },
+                                                      { "%buildable%", buildable.getName() },
+                                                      { "%goodsType%", requiredGoodsType.getName() } },
+                                                  ModelMessage.MISSING_GOODS, 
+                                                  requiredGoodsType));
+                }
+            }
+            if (messages.size() == 0) {
+                // no messages means all goods are present
+                for (AbstractGoods goodsRequired : buildable.getGoodsRequired()) {
+                    GoodsType requiredGoodsType = goodsRequired.getType();
+                    if (requiredGoodsType.isStorable()) {
+                        removeGoods(requiredGoodsType, goodsRequired.getAmount());
+                    } else {
+                        // waste excess unstorable goods
+                        removeGoods(requiredGoodsType);
+                    }
+                }
+                if (buildable instanceof UnitType) {
+                    Unit unit = getGame().getModelController().createUnit(getId() + "buildUnit", getTile(), getOwner(),
+                                                                          (UnitType) buildable);
+                    addModelMessage(this, "model.colony.unitReady",
+                                    new String[][] { { "%colony%", getName() },
+                                                     { "%unit%", unit.getName() } },
+                                    ModelMessage.UNIT_ADDED, unit);
+                } else if (buildable instanceof BuildingType) {
+                    BuildingType upgradesFrom = ((BuildingType) buildable).getUpgradesFrom();
+                    if (upgradesFrom == null) {
+                        addBuilding(createBuilding((BuildingType) buildable));
+                    } else {
+                        getBuilding(upgradesFrom).upgrade();
+                    }
+                    buildQueue.remove(0);
+                    if (buildQueue.size() == 0) {
+                        buildQueue.add(BuildableType.NOTHING);
+                    }
                 }
             }
         }
@@ -1157,10 +1173,18 @@ public final class Colony extends Settlement implements Abilities, Location, Nam
     public int getPriceForBuilding() {
         // Any changes in this method should also be reflected in
         // "payForBuilding()"
-        int hammersRemaining = Math.max(getCurrentlyBuilding().getHammersRequired() - getHammers(), 0);
-        int toolsRemaining = Math.max(getCurrentlyBuilding().getToolsRequired() - getGoodsCount(Goods.TOOLS), 0);
-        int price = hammersRemaining * getGameOptions().getInteger(GameOptions.HAMMER_PRICE)
-                + (getOwner().getMarket().getBidPrice(Goods.TOOLS, toolsRemaining) * 110) / 100;
+        int price = 0;
+        for (AbstractGoods goodsRequired : getCurrentlyBuilding().getGoodsRequired()) {
+            GoodsType requiredGoodsType = goodsRequired.getType();
+            int remaining = goodsRequired.getAmount() - getGoodsCount(requiredGoodsType);
+            if (remaining > 0) {
+                if (requiredGoodsType == Goods.HAMMERS) {
+                    price += remaining * getGameOptions().getInteger(GameOptions.HAMMER_PRICE);
+                } else {
+                    price += (getOwner().getMarket().getBidPrice(Goods.TOOLS, remaining) * 110) / 100;
+                }
+            }
+        }
         return price;
     }
 
@@ -1178,16 +1202,18 @@ public final class Colony extends Settlement implements Abilities, Location, Nam
         if (getPriceForBuilding() > getOwner().getGold()) {
             throw new IllegalStateException("Not enough gold.");
         }
-        int hammersRemaining = getCurrentlyBuilding().getHammersRequired() - getHammers();
-        int toolsRemaining = getCurrentlyBuilding().getToolsRequired() - getGoodsCount(Goods.TOOLS);
-
-        if (hammersRemaining > 0) {
-            getOwner().modifyGold(-hammersRemaining * getGameOptions().getInteger(GameOptions.HAMMER_PRICE));
-            addGoods(Goods.HAMMERS, hammersRemaining);
-        }
-        if (toolsRemaining > 0) {
-            getOwner().getMarket().buy(Goods.TOOLS, toolsRemaining, getOwner());
-            addGoods(Goods.TOOLS, toolsRemaining);
+        for (AbstractGoods goodsRequired : getCurrentlyBuilding().getGoodsRequired()) {
+            GoodsType requiredGoodsType = goodsRequired.getType();
+            int remaining = goodsRequired.getAmount() - getGoodsCount(requiredGoodsType);
+            if (remaining > 0) {
+                if (requiredGoodsType == Goods.HAMMERS) {
+                    getOwner().modifyGold(-remaining * getGameOptions().getInteger(GameOptions.HAMMER_PRICE));
+                    addGoods(Goods.HAMMERS, remaining);
+                } else {
+                    getOwner().getMarket().buy(requiredGoodsType, remaining, getOwner());
+                    addGoods(requiredGoodsType, remaining);
+                }
+            }
         }
     }
 
@@ -1510,17 +1536,10 @@ public final class Colony extends Settlement implements Abilities, Location, Nam
             return;
         }
 
-        // TODO: this needs to be made future-proof by considering all
-        // materials that might be used for construction work. This
-        // will require a Buildable interface, and suitable methods
-        // for the *Type classes.
         List<GoodsType> goodsForBuilding = new ArrayList<GoodsType>();
         if (canBuild()) {
-            if (getCurrentlyBuilding().getHammersRequired() > 0) {
-                goodsForBuilding.add(Goods.HAMMERS);
-            }
-            if (getCurrentlyBuilding().getToolsRequired() > 0) {
-                goodsForBuilding.add(Goods.TOOLS);
+            for (AbstractGoods goodsRequired : getCurrentlyBuilding().getGoodsRequired()) {
+                goodsForBuilding.add(goodsRequired.getType());
             }
         }
         
@@ -1529,7 +1548,7 @@ public final class Colony extends Settlement implements Abilities, Location, Nam
 
         // The following tasks consume hammers/tools,
         // or may do so in the future
-        checkBuildingComplete();
+        checkBuildableComplete();
 
         addBuildingProduction(delayedProduction, null);
 

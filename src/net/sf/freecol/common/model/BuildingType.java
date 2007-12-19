@@ -19,6 +19,7 @@
 
 package net.sf.freecol.common.model;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -110,9 +111,6 @@ public final class BuildingType extends BuildableType implements Abilities, Modi
         }
         
         defenseBonus = getAttribute(in, "defense-bonus", 0);
-        setHammersRequired(getAttribute(in, "hammers-required", 0));
-        setToolsRequired(getAttribute(in, "tools-required", 0));
-        
         workPlaces = getAttribute(in, "workplaces", 0);
         basicProduction = getAttribute(in, "basicProduction", 0);
         
@@ -137,6 +135,15 @@ public final class BuildingType extends BuildableType implements Abilities, Modi
                 String abilityId = in.getAttributeValue(null, "id");
                 boolean value = getAttribute(in, "value", true);
                 getAbilitiesRequired().put(abilityId, value);
+                in.nextTag(); // close this element
+            } else if ("required-goods".equals(childName)) {
+                GoodsType type = goodsTypeByRef.get(in.getAttributeValue(null, "id"));
+                int amount = getAttribute(in, "value", 0);
+                AbstractGoods requiredGoods = new AbstractGoods(type, amount);
+                if (getGoodsRequired() == null) {
+                    setGoodsRequired(new ArrayList<AbstractGoods>());
+                }
+                getGoodsRequired().add(requiredGoods);
                 in.nextTag(); // close this element
             } else if (Modifier.getXMLElementTagName().equals(childName)) {
                 Modifier modifier = new Modifier(in);

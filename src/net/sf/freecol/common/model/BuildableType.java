@@ -20,10 +20,13 @@
 package net.sf.freecol.common.model;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
+
+import net.sf.freecol.client.gui.i18n.Messages;
 
 /**
  * Contains information on buildable types.
@@ -34,9 +37,12 @@ public class BuildableType extends FreeColGameObjectType {
 
     public static final BuildableType NOTHING = new BuildableType("model.buildableType.nothing");
     
-    private int hammersRequired = 0;
-    private int toolsRequired = 0;
     private int populationRequired = 1;
+
+    /**
+     * Describe goodsRequired here.
+     */
+    private List<AbstractGoods> goodsRequired;
     
     /**
      * Stores the abilities required by this Type.
@@ -49,40 +55,39 @@ public class BuildableType extends FreeColGameObjectType {
         setId(id);
     }
 
-    /**
-     * Get the <code>HammersRequired</code> value.
-     *
-     * @return an <code>int</code> value
-     */
-    public int getHammersRequired() {
-        return hammersRequired;
+    public String getGoodsRequiredAsString() {
+        String result = "";
+        if (goodsRequired != null) {
+            for (AbstractGoods goods : goodsRequired) {
+                result += Messages.message("model.goods.goodsAmount",
+                                           new String[][] {
+                                               {"%amount%", String.valueOf(goods.getAmount())},
+                                               {"%goods%", goods.getType().getName()}}) +
+                    ", ";
+            }
+            if (result.length() > 1) {
+                result = result.substring(0, result.length() - 2);
+            }
+        }
+        return result;
     }
 
     /**
-     * Set the <code>HammersRequired</code> value.
+     * Get the <code>GoodsRequired</code> value.
      *
-     * @param newHammersRequired The new HammersRequired value.
+     * @return a <code>List<AbstractGoods></code> value
      */
-    public void setHammersRequired(final int newHammersRequired) {
-        this.hammersRequired = newHammersRequired;
+    public final List<AbstractGoods> getGoodsRequired() {
+        return goodsRequired;
     }
 
     /**
-     * Get the <code>ToolsRequired</code> value.
+     * Set the <code>GoodsRequired</code> value.
      *
-     * @return an <code>int</code> value
+     * @param newGoodsRequired The new GoodsRequired value.
      */
-    public int getToolsRequired() {
-        return toolsRequired;
-    }
-
-    /**
-     * Set the <code>ToolsRequired</code> value.
-     *
-     * @param newToolsRequired The new ToolsRequired value.
-     */
-    public void setToolsRequired(final int newToolsRequired) {
-        this.toolsRequired = newToolsRequired;
+    public final void setGoodsRequired(final List<AbstractGoods> newGoodsRequired) {
+        this.goodsRequired = newGoodsRequired;
     }
 
     /**

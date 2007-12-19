@@ -581,14 +581,7 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
         } else if (type.getPrice() > 0) {
             price = String.valueOf(type.getPrice());
         }
-        String hammersRequired = "";
-        if (type.getHammersRequired() > 0) {
-            hammersRequired = String.valueOf(type.getHammersRequired());
-        }
-        String toolsRequired = "";
-        if (type.getToolsRequired() > 0) {
-            toolsRequired = String.valueOf(type.getToolsRequired());
-        }
+        String goodsRequired = type.getGoodsRequiredAsString();
         String skill = "";
         String schoolType = null;
         if (type.hasSkill()) {
@@ -607,7 +600,7 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
             schoolType = "";
         }
         int[] widths = { 0, 3 * margin, 0 };
-        int[] heights = new int[21];
+        int[] heights = new int[19];
         for (int index = 1; index < heights.length; index += 2) {
             heights[index] = margin;
         }
@@ -659,14 +652,9 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
                         higConst.rc(row, labelColumn));
         detailPanel.add(new JLabel(price), higConst.rc(row, valueColumn, "r"));
         row += 2;
-        detailPanel.add(new JLabel(Messages.message("colopedia.unit.hammersRequired")),
+        detailPanel.add(new JLabel(Messages.message("colopedia.unit.goodsRequired")),
                         higConst.rc(row, labelColumn));
-        detailPanel.add(new JLabel(hammersRequired),
-                        higConst.rc(row, valueColumn, "r"));
-        row += 2;
-        detailPanel.add(new JLabel(Messages.message("colopedia.unit.toolsRequired")),
-                        higConst.rc(row, labelColumn));
-        detailPanel.add(new JLabel(toolsRequired),
+        detailPanel.add(new JLabel(goodsRequired),
                         higConst.rc(row, valueColumn, "r"));
         row += 2;
         detailPanel.add(new JLabel(Messages.message("colopedia.unit.description")),
@@ -819,10 +807,12 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
         JPanel costs = new JPanel();
         costs.setOpaque(false);
         costs.setLayout(new FlowLayout(FlowLayout.LEFT));
-        costs.add(new JLabel(Integer.toString(buildingType.getHammersRequired()),
-                library.getGoodsImageIcon(Goods.HAMMERS), SwingConstants.LEFT));
-        costs.add(new JLabel(Integer.toString(buildingType.getToolsRequired()),
-                library.getGoodsImageIcon(Goods.TOOLS), SwingConstants.LEFT));
+        if (buildingType.getGoodsRequired() != null) {
+            for (AbstractGoods goodsRequired : buildingType.getGoodsRequired()) {
+                costs.add(new JLabel(Integer.toString(goodsRequired.getAmount()),
+                                     library.getGoodsImageIcon(goodsRequired.getType()), SwingConstants.LEFT));
+            }
+        }
         detailPanel.add(new JLabel(Messages.message("colopedia.buildings.cost")), higConst.rc(row, leftColumn));
         detailPanel.add(costs, higConst.rc(row, rightColumn));
         row += 2;

@@ -2515,34 +2515,11 @@ public class Unit extends FreeColGameObject implements Abilities, Locatable, Loc
      * @param newName The new Name value.
      */
     public void setName(String newName) {
-        if (name != null && name.equals("")) {
+        if (name != null && newName.equals("")) {
             this.name = null;
         } else {
             this.name = newName;
         }
-    }
-
-    /**
-     * Returns the score value of this Unit, which depends on its type
-     * and current location.
-     *
-     * @return an <code>int</code> value
-     */
-    public int getScoreValue() {
-        int value = unitType.getSkill();
-        if (value == UnitType.UNDEFINED) {
-            if (unitType.getHammersRequired() > 0) {
-                value = Math.round(unitType.getHammersRequired() / 100f);
-            } else {
-                value = 1;
-            }
-        } else {
-            value += 3;
-            if (getLocation() instanceof WorkLocation) {
-                value *= 2;
-            }
-        }
-        return value;
     }
 
     /**
