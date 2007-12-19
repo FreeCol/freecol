@@ -207,22 +207,25 @@ public class CargoPanel extends FreeColPanel {
                     }
                 }
             } else if (comp instanceof GoodsLabel) {
-                Container oldParent = comp.getParent();
-                Goods g = ((GoodsLabel) comp).getGoods();
-                
-                int newAmount = Math.min(g.getAmount(), carrier.getLoadableAmount(g.getType()));
-                if (newAmount == 0) {
+                Goods goods = ((GoodsLabel) comp).getGoods();
+
+                int spaceLeft = carrier.getSpaceLeft();
+                int loadableAmount = carrier.getLoadableAmount(goods.getType());
+                if (loadableAmount == 0) {
                     return null;
+                } else if (loadableAmount > goods.getAmount()) {
+                    loadableAmount = goods.getAmount();
                 }
-
-                Goods goodsToAdd = new Goods(g.getGame(), g.getLocation(), g.getType(), newAmount);
-                g.setAmount(g.getAmount() - newAmount);
-
-                ((GoodsLabel) comp).setSmall(false);
+                Goods goodsToAdd = new Goods(goods.getGame(), goods.getLocation(), goods.getType(), loadableAmount);
+                goods.setAmount(goods.getAmount() - loadableAmount);
                 inGameController.loadCargo(goodsToAdd, carrier);
-
-                add(comp);
-                updateTitle();
+                initialize();
+                Container oldParent = comp.getParent();
+                if (oldParent instanceof ColonyPanel.WarehousePanel) {
+                    ((ColonyPanel.WarehousePanel) oldParent).initialize();
+                } else {
+                    oldParent.remove(comp);
+                }
                 return comp;
             } else if (comp instanceof MarketLabel) {
                 MarketLabel label = (MarketLabel) comp;
@@ -230,7 +233,7 @@ public class CargoPanel extends FreeColPanel {
                 if (player.canTrade(label.getType())) {
                     inGameController.buyGoods(label.getType(), label.getAmount(), carrier);
                     inGameController.nextModelMessage();
-                    add(comp);
+                    initialize();
                     updateTitle();
                     return comp;
                 } else {
@@ -238,9 +241,10 @@ public class CargoPanel extends FreeColPanel {
                     return null;
                 }
             } else {
-                //logger.warning("An invalid component got dropped on this CargoPanel.");
                 return null;
             }
+        } else {
+            super.add(comp);
         }
 
         return null;

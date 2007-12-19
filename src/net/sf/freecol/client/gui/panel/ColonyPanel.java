@@ -92,7 +92,7 @@ import cz.autel.dmi.HIGLayout;
  * This is a panel for the Colony display. It shows the units that are working
  * in the colony, the buildings and much more.
  */
-public final class ColonyPanel extends FreeColPanel implements ActionListener, ContainerListener {
+public final class ColonyPanel extends FreeColPanel implements ActionListener {
 
 
     private static Logger logger = Logger.getLogger(ColonyPanel.class.getName());
@@ -210,7 +210,7 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener, C
         tilePanel = new TilePanel(this);
         buildingsPanel = new BuildingsPanel(this);
         cargoPanel = new ColonyCargoPanel(parent);
-        cargoPanel.addContainerListener(this);
+        //cargoPanel.addContainerListener(this);
 
         defaultTransferHandler = new DefaultTransferHandler(parent, this);
         pressListener = new DragListener(this);
@@ -990,6 +990,7 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener, C
         return game;
     }
 
+    /*
     public void componentAdded(ContainerEvent event) {
         if (event.getComponent() instanceof ColonyCargoPanel ||
             event.getComponent() instanceof UnitLabel) {
@@ -997,7 +998,8 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener, C
             updateCarrierButtons();
             updateWarehouse();
             updateProductionPanel();
-            refresh();
+            System.out.println("added component:");
+            //refresh();
         }
     }
 
@@ -1017,6 +1019,7 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener, C
         updateCargoLabel();
         updateCarrierButtons();
     }
+    */
 
     public final class ColonyCargoPanel extends CargoPanel {
         public ColonyCargoPanel(Canvas parent) {
@@ -1042,7 +1045,6 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener, C
          * @param colonyPanel The panel that holds this BuildingsPanel.
          */
         public BuildingsPanel(ColonyPanel colonyPanel) {
-            //super(new HIGLayout(new int[] {0}, new int[] {0}));
             setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
             this.colonyPanel = colonyPanel;
         }
@@ -1342,6 +1344,7 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener, C
             return "WarehousePanelUI";
         }
 
+
         /**
          * Adds a component to this WarehousePanel and makes sure that the unit or
          * good that the component represents gets modified so that it is on
@@ -1359,14 +1362,7 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener, C
             if (editState) {
                 if (comp instanceof GoodsLabel) {
                     comp.getParent().remove(comp);
-                    // Goods g = ((GoodsLabel)comp).getGoods();
                     ((GoodsLabel) comp).setSmall(false);
-                    // inGameController.unloadCargo(g, selectedUnit.getUnit());
-                    // colonyPanel.getWarehousePanel().revalidate();
-                    // colonyPanel.getCargoPanel().revalidate();
-                    // updateCargoLabel();
-                    // buildingsPanel.initialize();
-                    // initialize();
                     reinitialize();
                     return comp;
                 }
@@ -1383,17 +1379,14 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener, C
         @Override
         public void remove(Component comp) {
             if (comp instanceof GoodsLabel) {
-                // Goods g = ((GoodsLabel)comp).getGoods();
-
                 super.remove(comp);
-
                 colonyPanel.getWarehousePanel().revalidate();
                 colonyPanel.getCargoPanel().revalidate();
             }
         }
 
         public void initialize() {
-            warehousePanel.removeAll();
+            removeAll();
             List<Goods> allGoods = getColony().getGoodsContainer().getFullGoods();
             for (Goods goods : allGoods) {
                 if (goods.getType().isStorable()) {
@@ -1402,11 +1395,11 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener, C
                         goodsLabel.setTransferHandler(defaultTransferHandler);
                         goodsLabel.addMouseListener(pressListener);
                     }
-                    warehousePanel.add(goodsLabel, false);
+                    add(goodsLabel, false);
                 }
             }
 
-            warehousePanel.revalidate();
+            revalidate();
         }
     }
 
