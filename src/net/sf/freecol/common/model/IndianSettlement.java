@@ -44,18 +44,8 @@ import org.w3c.dom.Element;
  * Represents an Indian settlement.
  */
 public class IndianSettlement extends Settlement {
+
     private static final Logger logger = Logger.getLogger(IndianSettlement.class.getName());
-
-
-    public static final int INCA = 0;
-    public static final int AZTEC = 1;
-    public static final int ARAWAK = 2;
-    public static final int CHEROKEE = 3;
-    public static final int IROQUOIS = 4;
-    public static final int SIOUX = 5;
-    public static final int APACHE = 6;
-    public static final int TUPI = 7;
-    public static final int LAST_TRIBE = 7;
 
     public static final int MISSIONARY_TENSION = -3;
     public static final int MAX_CONVERT_DISTANCE = 10;
@@ -73,34 +63,38 @@ public class IndianSettlement extends Settlement {
      * skill has already been taught to a European.  At the client
      * side the value null is also possible in case the player hasn't
      * checked out the settlement yet.
-    */
+     */
     private UnitType learnableSkill = null;
 
     private GoodsType[] wantedGoods = new GoodsType[] {null, null, null};
 
     /**
-    * At the client side isVisited is true in case the player has visited
-    * the settlement.
-    */
-    private boolean isCapital,
-                    isVisited; /* true if a European player has asked to speak with the chief. */
+     * At the client side isVisited is true in case the player has
+     * visited the settlement.
+     */
+    private boolean isVisited = false;
+
+    /**
+     * Whether this is the capital of the tribe.
+     */
+    private boolean isCapital = false;
 
     private UnitContainer unitContainer;
 
     private ArrayList<Unit> ownedUnits = new ArrayList<Unit>();
 
-    private Unit missionary;
+    private Unit missionary = null;
 
     /** Used for monitoring the progress towards creating a convert. */
-    private int  convertProgress;
+    private int convertProgress = 0;
 
     /** The number of the turn during which the last tribute was paid. */
     int lastTribute = 0;
 
     /**
-    * Stores the alarm levels. <b>Only used by AI.</b>
-    * 0-1000 with 1000 as the maximum alarm level.
-    */
+     * Stores the alarm levels. <b>Only used by AI.</b>
+     * 0-1000 with 1000 as the maximum alarm level.
+     */
     private Tension[] alarm = new Tension[Player.NUMBER_OF_PLAYERS];
 
     // sort goods types descending by price
@@ -172,16 +166,6 @@ public class IndianSettlement extends Settlement {
      */
     public IndianSettlement(Game game, XMLStreamReader in) throws XMLStreamException {
         super(game, in);
-
-        // The client doesn't know a lot at first.
-        this.learnableSkill = null;
-        this.wantedGoods[0] = null;
-        this.wantedGoods[1] = null;
-        this.wantedGoods[2] = null;
-        isVisited = false;
-        missionary = null;
-        convertProgress = 0;
-
         readFromXML(in);
     }
 
@@ -194,16 +178,6 @@ public class IndianSettlement extends Settlement {
      */
     public IndianSettlement(Game game, Element e) {
         super(game, e);
-
-        // The client doesn't know a lot at first.
-        this.learnableSkill = null;
-        this.wantedGoods[0] = null;
-        this.wantedGoods[1] = null;
-        this.wantedGoods[2] = null;
-        isVisited = false;
-        missionary = null;
-        convertProgress = 0;
-
         readFromXMLElement(e);
     }
 
@@ -219,15 +193,6 @@ public class IndianSettlement extends Settlement {
      */
     public IndianSettlement(Game game, String id) {
         super(game, id);
-        
-        // The client doesn't know a lot at first.
-        this.learnableSkill = null;
-        this.wantedGoods[0] = null;
-        this.wantedGoods[1] = null;
-        this.wantedGoods[2] = null;
-        isVisited = false;
-        missionary = null;
-        convertProgress = 0;
     }
 
     /**
@@ -277,11 +242,11 @@ public class IndianSettlement extends Settlement {
     }
 
     /**
-    * Modifies the alarm level towards the given player.
-    *
-    * @param player The <code>Player</code>.
-    * @param addToAlarm The amount to add to the current alarm level.
-    */
+     * Modifies the alarm level towards the given player.
+     *
+     * @param player The <code>Player</code>.
+     * @param addToAlarm The amount to add to the current alarm level.
+     */
     public void modifyAlarm(Player player, int addToAlarm) {
         int nation = player.getIndex();
         Tension tension = alarm[nation];
@@ -290,10 +255,10 @@ public class IndianSettlement extends Settlement {
         }
         // propagate alarm upwards
         if(owner != null) {
-                if (isCapital())
-                        // capital has a greater impact
-                    owner.modifyTension(player, addToAlarm, this); 
-                else
+            if (isCapital())
+                // capital has a greater impact
+                owner.modifyTension(player, addToAlarm, this); 
+            else
                 owner.modifyTension(player, addToAlarm/2, this);            
         }
     }
@@ -315,11 +280,11 @@ public class IndianSettlement extends Settlement {
 
 
     /**
-    * Sets alarm towards the given player.
-    *
-    * @param player The <code>Player</code>.
-    * @param newAlarm The new alarm value.
-    */
+     * Sets alarm towards the given player.
+     *
+     * @param player The <code>Player</code>.
+     * @param newAlarm The new alarm value.
+     */
     public void setAlarm(Player player, Tension newAlarm) {
         alarm[player.getIndex()] = newAlarm;
     }
@@ -327,10 +292,10 @@ public class IndianSettlement extends Settlement {
 
 
     /**
-    * Gets the alarm level towards the given player.
-    * @param nation The nation to get the alarm level for.
-    * @return An object representing the alarm level.
-    */
+     * Gets the alarm level towards the given player.
+     * @param nation The nation to get the alarm level for.
+     * @return An object representing the alarm level.
+     */
     public Tension getAlarm(int nation) {
         return alarm[nation];
     }
@@ -356,27 +321,27 @@ public class IndianSettlement extends Settlement {
     }
 
     /**
-    * Returns true if a European player has visited this settlement to speak with the chief.
-    * @return true if a European player has visited this settlement to speak with the chief.
-    */
+     * Returns true if a European player has visited this settlement to speak with the chief.
+     * @return true if a European player has visited this settlement to speak with the chief.
+     */
     public boolean hasBeenVisited() {
         return isVisited;
     }
 
     /**
-    * Sets the visited status of this settlement to true, indicating that a European has had
-    * a chat with the chief.
-    */
+     * Sets the visited status of this settlement to true, indicating that a European has had
+     * a chat with the chief.
+     */
     public void setVisited() {
         this.isVisited = true;
     }
 
     /**
-    * Adds the given <code>Unit</code> to the list of units that belongs to this
-    * <code>IndianSettlement</code>.
-    * 
-    * @param u The <code>Unit</code> to be added.
-    */
+     * Adds the given <code>Unit</code> to the list of units that belongs to this
+     * <code>IndianSettlement</code>.
+     * 
+     * @param u The <code>Unit</code> to be added.
+     */
     public void addOwnedUnit(Unit u) {
         if (u == null) {
             throw new NullPointerException();
@@ -389,24 +354,24 @@ public class IndianSettlement extends Settlement {
 
 
     /**
-    * Gets an iterator over all the units this 
-    * <code>IndianSettlement</code> is owning.
-    * 
-    * @return The <code>Iterator</code>.
-    */
+     * Gets an iterator over all the units this 
+     * <code>IndianSettlement</code> is owning.
+     * 
+     * @return The <code>Iterator</code>.
+     */
     public Iterator<Unit> getOwnedUnitsIterator() {
         return ownedUnits.iterator();
     }
 
 
     /**
-    * Removes the given <code>Unit</code> to the list of units 
-    * that belongs to this <code>IndianSettlement</code>.
-    * 
-    * @param u The <code>Unit</code> to be removed from the
-    *       list of the units this <code>IndianSettlement</code>
-    *       owns.
-    */
+     * Removes the given <code>Unit</code> to the list of units 
+     * that belongs to this <code>IndianSettlement</code>.
+     * 
+     * @param u The <code>Unit</code> to be removed from the
+     *       list of the units this <code>IndianSettlement</code>
+     *       owns.
+     */
     public void removeOwnedUnit(Unit u) {
         if (u == null) {
             throw new NullPointerException();
@@ -421,54 +386,54 @@ public class IndianSettlement extends Settlement {
 
 
     /**
-    * Returns the skill that can be learned at this settlement.
-    * @return The skill that can be learned at this settlement.
-    */
+     * Returns the skill that can be learned at this settlement.
+     * @return The skill that can be learned at this settlement.
+     */
     public UnitType getLearnableSkill() {
         return learnableSkill;
     }
 
 
     /**
-    * Returns this settlement's highly wanted goods.
-    * @return This settlement's highly wanted goods.
-    */
+     * Returns this settlement's highly wanted goods.
+     * @return This settlement's highly wanted goods.
+     */
     public GoodsType getHighlyWantedGoods() {
         return wantedGoods[0];
     }
 
 
     /**
-    * Returns this settlement's wanted goods 1.
-    * @return This settlement's wanted goods 1.
-    */
+     * Returns this settlement's wanted goods 1.
+     * @return This settlement's wanted goods 1.
+     */
     public GoodsType getWantedGoods1() {
         return wantedGoods[1];
     }
 
 
     /**
-    * Returns this settlement's wanted goods 2.
-    * @return This settlement's wanted goods 2.
-    */
+     * Returns this settlement's wanted goods 2.
+     * @return This settlement's wanted goods 2.
+     */
     public GoodsType getWantedGoods2() {
         return wantedGoods[2];
     }
 
 
     /**
-    * Returns the missionary from this settlement if there is one or null if there is none.
-    * @return The missionary from this settlement if there is one or null if there is none.
-    */
+     * Returns the missionary from this settlement if there is one or null if there is none.
+     * @return The missionary from this settlement if there is one or null if there is none.
+     */
     public Unit getMissionary() {
         return missionary;
     }
 
 
     /**
-    * Sets the missionary for this settlement.
-    * @param missionary The missionary for this settlement.
-    */
+     * Sets the missionary for this settlement.
+     * @param missionary The missionary for this settlement.
+     */
     public void setMissionary(Unit missionary) {
         if (missionary != null) {
             if (!missionary.isMissionary()) {
@@ -505,9 +470,9 @@ public class IndianSettlement extends Settlement {
     }
 
     /**
-    * Sets the learnable skill for this Indian settlement.
-    * @param skill The new learnable skill for this Indian settlement.
-    */
+     * Sets the learnable skill for this Indian settlement.
+     * @param skill The new learnable skill for this Indian settlement.
+     */
     public void setLearnableSkill(UnitType skill) {
         learnableSkill = skill;
     }
@@ -546,10 +511,10 @@ public class IndianSettlement extends Settlement {
 
 
     /**
-    * Adds a <code>Locatable</code> to this Location.
-    *
-    * @param locatable The <code>Locatable</code> to add to this Location.
-    */
+     * Adds a <code>Locatable</code> to this Location.
+     *
+     * @param locatable The <code>Locatable</code> to add to this Location.
+     */
     @Override
     public void add(Locatable locatable) {
         if (locatable instanceof Unit) {
@@ -563,10 +528,10 @@ public class IndianSettlement extends Settlement {
 
 
     /**
-    * Removes a <code>Locatable</code> from this Location.
-    *
-    * @param locatable The <code>Locatable</code> to remove from this Location.
-    */
+     * Removes a <code>Locatable</code> from this Location.
+     *
+     * @param locatable The <code>Locatable</code> to remove from this Location.
+     */
     @Override
     public void remove(Locatable locatable) {
         if (locatable instanceof Unit) {
@@ -580,10 +545,10 @@ public class IndianSettlement extends Settlement {
 
 
     /**
-    * Returns the amount of Units at this Location.
-    *
-    * @return The amount of Units at this Location.
-    */
+     * Returns the amount of Units at this Location.
+     *
+     * @return The amount of Units at this Location.
+     */
     @Override
     public int getUnitCount() {
         return unitContainer.getUnitCount();
@@ -608,10 +573,10 @@ public class IndianSettlement extends Settlement {
 
 
     /**
-    * Gets the <code>Unit</code> that is currently defending this <code>IndianSettlement</code>.
-    * @param attacker The unit that would be attacking this <code>IndianSettlement</code>.
-    * @return The <code>Unit</code> that has been chosen to defend this <code>IndianSettlement</code>.
-    */
+     * Gets the <code>Unit</code> that is currently defending this <code>IndianSettlement</code>.
+     * @param attacker The unit that would be attacking this <code>IndianSettlement</code>.
+     * @return The <code>Unit</code> that has been chosen to defend this <code>IndianSettlement</code>.
+     */
     @Override
     public Unit getDefendingUnit(Unit attacker) {
         Unit defender = null;
@@ -628,37 +593,37 @@ public class IndianSettlement extends Settlement {
 
 
     /**
-    * Gets the amount of gold this <code>IndianSettlment</code>
-    * is willing to pay for the given <code>Goods</code>.
-    *
-    * <br><br>
-    *
-    * It is only meaningful to call this method from the
-    * server, since the settlement's {@link GoodsContainer}
-    * is hidden from the clients.
-    *
-    * @param goods The <code>Goods</code> to price.
-    * @return The price.
-    */
+     * Gets the amount of gold this <code>IndianSettlment</code>
+     * is willing to pay for the given <code>Goods</code>.
+     *
+     * <br><br>
+     *
+     * It is only meaningful to call this method from the
+     * server, since the settlement's {@link GoodsContainer}
+     * is hidden from the clients.
+     *
+     * @param goods The <code>Goods</code> to price.
+     * @return The price.
+     */
     public int getPrice(Goods goods) {
         return getPrice(goods.getType(), goods.getAmount());
     }
 
 
     /**
-    * Gets the amount of gold this <code>IndianSettlment</code>
-    * is willing to pay for the given <code>Goods</code>.
-    *
-    * <br><br>
-    *
-    * It is only meaningful to call this method from the
-    * server, since the settlement's {@link GoodsContainer}
-    * is hidden from the clients.
-    *
-    * @param type The type of <code>Goods</code> to price.
-    * @param amount The amount of <code>Goods</code> to price.
-    * @return The price.
-    */
+     * Gets the amount of gold this <code>IndianSettlment</code>
+     * is willing to pay for the given <code>Goods</code>.
+     *
+     * <br><br>
+     *
+     * It is only meaningful to call this method from the
+     * server, since the settlement's {@link GoodsContainer}
+     * is hidden from the clients.
+     *
+     * @param type The type of <code>Goods</code> to price.
+     * @param amount The amount of <code>Goods</code> to price.
+     * @return The price.
+     */
     public int getPrice(GoodsType type, int amount) {
         int returnPrice = 0;
 
@@ -677,7 +642,7 @@ public class IndianSettlement extends Settlement {
             }
 
             int sets = ((goodsContainer.getGoodsCount(Goods.MUSKETS) + amount) / Unit.MUSKETS_TO_ARM_INDIAN)
-                        - (goodsContainer.getGoodsCount(Goods.MUSKETS) / Unit.MUSKETS_TO_ARM_INDIAN);
+                - (goodsContainer.getGoodsCount(Goods.MUSKETS) / Unit.MUSKETS_TO_ARM_INDIAN);
             int startPrice = (19+getPriceAddition()) - (supply / Unit.MUSKETS_TO_ARM_INDIAN);
             for (int i=0; i<sets; i++) {
                 if ((startPrice-i) < 8 && (need > supply || goodsContainer.getGoodsCount(Goods.MUSKETS) < Unit.MUSKETS_TO_ARM_INDIAN * 2)) {
@@ -696,7 +661,7 @@ public class IndianSettlement extends Settlement {
             }
 
             int sets = (goodsContainer.getGoodsCount(Goods.HORSES) + amount) / Unit.HORSES_TO_MOUNT_INDIAN
-                        - (goodsContainer.getGoodsCount(Goods.HORSES) / Unit.HORSES_TO_MOUNT_INDIAN);
+                - (goodsContainer.getGoodsCount(Goods.HORSES) / Unit.HORSES_TO_MOUNT_INDIAN);
             int startPrice = (24+getPriceAddition()) - (supply/Unit.HORSES_TO_MOUNT_INDIAN);
 
             for (int i=0; i<sets; i++) {
@@ -706,8 +671,8 @@ public class IndianSettlement extends Settlement {
                 returnPrice += Unit.HORSES_TO_MOUNT_INDIAN * (startPrice-(i*4));
             }
         } else if (type == Goods.FOOD || type == Goods.LUMBER || type == Goods.SUGAR ||
-                type == Goods.TOBACCO || type == Goods.COTTON || type == Goods.FURS ||
-                type == Goods.ORE || type == Goods.SILVER) {
+                   type == Goods.TOBACCO || type == Goods.COTTON || type == Goods.FURS ||
+                   type == Goods.ORE || type == Goods.SILVER) {
             returnPrice = 0;
         } else {
             int currentGoods = goodsContainer.getGoodsCount(type);
@@ -738,7 +703,7 @@ public class IndianSettlement extends Settlement {
             }
 
             returnPrice = (int) (((20.0+getPriceAddition())-(0.05*(currentGoods+valueGoods)))*(currentGoods+valueGoods)
-                        - ((20.0+getPriceAddition())-(0.05*(currentGoods)))*(currentGoods));
+                                 - ((20.0+getPriceAddition())-(0.05*(currentGoods)))*(currentGoods));
         }
 
         // Bonus for top 3 types of goods:
@@ -754,11 +719,11 @@ public class IndianSettlement extends Settlement {
     }
 
     /**
-    * Gets the maximum possible production of the given type of goods.
-    * @param goodsType The type of goods to check.
-    * @return The maximum amount, of the given type of goods, that can
-    *         be produced in one turn.
-    */
+     * Gets the maximum possible production of the given type of goods.
+     * @param goodsType The type of goods to check.
+     * @return The maximum amount, of the given type of goods, that can
+     *         be produced in one turn.
+     */
     public int getMaximumProduction(GoodsType goodsType) {
         int amount = 0;
         Iterator<Position> it = getGame().getMap().getCircleIterator(getTile().getPosition(), true, getRadius());
@@ -774,16 +739,16 @@ public class IndianSettlement extends Settlement {
 
 
     /**
-    * Updates the variables {@link #getHighlyWantedGoods wantedGoods[0]},
-    * {@link #getWantedGoods1 wantedGoods[1]} and
-    * {@link #getWantedGoods2 wantedGoods[2]}.
-    *
-    * <br><br>
-    *
-    * It is only meaningful to call this method from the
-    * server, since the settlement's {@link GoodsContainer}
-    * is hidden from the clients.
-    */
+     * Updates the variables {@link #getHighlyWantedGoods wantedGoods[0]},
+     * {@link #getWantedGoods1 wantedGoods[1]} and
+     * {@link #getWantedGoods2 wantedGoods[2]}.
+     *
+     * <br><br>
+     *
+     * It is only meaningful to call this method from the
+     * server, since the settlement's {@link GoodsContainer}
+     * is hidden from the clients.
+     */
     public void updateWantedGoods() {
         /* TODO: Try the different types goods in "random" order 
          * (based on the numbers of units on this tile etc): */
@@ -808,20 +773,20 @@ public class IndianSettlement extends Settlement {
 
 
     /**
-    * Get the extra bonus if this is a <code>VILLAGE</code>,
-    * <code>CITY</code> or a capital.
-    */
+     * Get the extra bonus if this is a <code>LONGHOUSE</code>,
+     * <code>CITY</code> or a capital.
+     */
     private int getPriceAddition() {
         return getBonusMultiplier() - 1;
     }
 
 
     /**
-    * Get general bonus multiplier. This is >1 if this is a <code>VILLAGE</code>,
-    * <code>CITY</code> or a capital.
-    * 
-    * @return The bonus multiplier.
-    */
+     * Get general bonus multiplier. This is >1 if this is a <code>LONGHOUSE</code>,
+     * <code>CITY</code> or a capital.
+     * 
+     * @return The bonus multiplier.
+     */
     public int getBonusMultiplier() {
         int addition = getTypeOfSettlement() + 1;
         if (isCapital()) {
@@ -899,23 +864,23 @@ public class IndianSettlement extends Settlement {
                     }
                 }
             }
-/*
-            if (potential[Goods.SUGAR]-KEEP_RAW_MATERIAL > 0) {
-                typeWithSmallestAmount = Goods.RUM;
-            }
-            if (potential[Goods.TOBACCO]-KEEP_RAW_MATERIAL > 0 && goodsContainer.getGoodsCount(Goods.CIGARS) < goodsContainer.getGoodsCount(typeWithSmallestAmount)) {
-                typeWithSmallestAmount = Goods.CIGARS;
-            }
-            if (potential[Goods.COTTON]-KEEP_RAW_MATERIAL > 0 && goodsContainer.getGoodsCount(Goods.CLOTH) < goodsContainer.getGoodsCount(typeWithSmallestAmount)) {
-                typeWithSmallestAmount = Goods.CLOTH;
-            }
-            if (potential[Goods.FURS]-KEEP_RAW_MATERIAL > 0 && goodsContainer.getGoodsCount(Goods.COATS) < goodsContainer.getGoodsCount(typeWithSmallestAmount)) {
-                typeWithSmallestAmount = Goods.COATS;
-            }
-*/
+            /*
+              if (potential[Goods.SUGAR]-KEEP_RAW_MATERIAL > 0) {
+              typeWithSmallestAmount = Goods.RUM;
+              }
+              if (potential[Goods.TOBACCO]-KEEP_RAW_MATERIAL > 0 && goodsContainer.getGoodsCount(Goods.CIGARS) < goodsContainer.getGoodsCount(typeWithSmallestAmount)) {
+              typeWithSmallestAmount = Goods.CIGARS;
+              }
+              if (potential[Goods.COTTON]-KEEP_RAW_MATERIAL > 0 && goodsContainer.getGoodsCount(Goods.CLOTH) < goodsContainer.getGoodsCount(typeWithSmallestAmount)) {
+              typeWithSmallestAmount = Goods.CLOTH;
+              }
+              if (potential[Goods.FURS]-KEEP_RAW_MATERIAL > 0 && goodsContainer.getGoodsCount(Goods.COATS) < goodsContainer.getGoodsCount(typeWithSmallestAmount)) {
+              typeWithSmallestAmount = Goods.COATS;
+              }
+            */
             if (typeWithSmallestAmount != null) {
                 int production = Math.min(goodsContainer.getGoodsCount(typeWithSmallestAmount.getRawMaterial()),
-                        Math.min(10, goodsContainer.getGoodsCount(Goods.TOOLS)));
+                                          Math.min(10, goodsContainer.getGoodsCount(Goods.TOOLS)));
                 goodsContainer.removeGoods(Goods.TOOLS, production);
                 goodsContainer.removeGoods(typeWithSmallestAmount.getRawMaterial(), production);
                 goodsContainer.addGoods(typeWithSmallestAmount, production * 5);
@@ -951,8 +916,8 @@ public class IndianSettlement extends Settlement {
                 
                 // Nearby military units:
                 if (t.getFirstUnit() != null 
-                        && t.getFirstUnit().getOwner().isEuropean()
-                        && t.getSettlement() == null) {                    
+                    && t.getFirstUnit().getOwner().isEuropean()
+                    && t.getSettlement() == null) {                    
                     Iterator<Unit> ui = t.getUnitIterator();
                     while (ui.hasNext()) {
                         Unit u = ui.next();
@@ -1043,7 +1008,7 @@ public class IndianSettlement extends Settlement {
                         ModelController modelController = getGame().getModelController();
                         int random = modelController.getRandom(getId() + "getNewConvertType", converts.size());
                         Unit u = modelController.createUnit(getId() + "newTurn100missionary", targetTile,
-                                missionary.getOwner(), converts.get(random));
+                                                            missionary.getOwner(), converts.get(random));
                         addModelMessage(u, "model.colony.newConvert",
                                         new String[][] {{"%nation%", getOwner().getNationAsString()}},
                                         ModelMessage.UNIT_ADDED);
@@ -1065,7 +1030,7 @@ public class IndianSettlement extends Settlement {
                 if (unitTypes.size() > 0) {
                     int random = getGame().getModelController().getRandom(getId() + "bornInIndianSettlement", unitTypes.size());
                     Unit u = getGame().getModelController().createUnit(getId() + "newTurn200food",
-                                            getTile(), getOwner(), unitTypes.get(random));
+                                                                       getTile(), getOwner(), unitTypes.get(random));
                     consumeGoods(Goods.FOOD, 200);  // All food will be consumed, even if RUM helped
                     consumeGoods(Goods.RUM, 200/4);    // Also, some available RUM is consumed
                     // I know that consumeGoods will produce gold, which is explained because children are always a gift
@@ -1118,11 +1083,11 @@ public class IndianSettlement extends Settlement {
     }
 
     /**
-    * Creates the {@link GoodsContainer}.
-    * <br><br>
-    * DO NOT USE OTHER THAN IN {@link net.sf.freecol.server.FreeColServer#loadGame}:
-    * Only for compatibility when loading savegames with pre-0.0.3 protocols.
-    */
+     * Creates the {@link GoodsContainer}.
+     * <br><br>
+     * DO NOT USE OTHER THAN IN {@link net.sf.freecol.server.FreeColServer#loadGame}:
+     * Only for compatibility when loading savegames with pre-0.0.3 protocols.
+     */
     public void createGoodsContainer() {
         goodsContainer = new GoodsContainer(getGame(), this);
     }
@@ -1309,9 +1274,9 @@ public class IndianSettlement extends Settlement {
 
 
     /**
-    * Returns the tag name of the root element representing this object.
-    * @return "indianSettlement".
-    */
+     * Returns the tag name of the root element representing this object.
+     * @return "indianSettlement".
+     */
     public static String getXMLElementTagName() {
         return "indianSettlement";
     }
@@ -1342,7 +1307,7 @@ public class IndianSettlement extends Settlement {
         for(Goods goods : settlementGoods) {
             // Only sell raw materials but never sell food and lumber
             if (goods.getType() != Goods.FOOD && goods.getType() != Goods.LUMBER &&
-                    goods.getType().isStorable()) {
+                goods.getType().isStorable()) {
                 sellGoods[i] = goods;
                 i++;
                 if (i == sellGoods.length) break;
@@ -1353,36 +1318,36 @@ public class IndianSettlement extends Settlement {
     }
 
     /**
-    * Gets the amount of gold this <code>IndianSettlment</code>
-    * is willing to pay for the given <code>Goods</code>.
-    *
-    * <br><br>
-    *
-    * It is only meaningful to call this method from the
-    * server, since the settlement's {@link GoodsContainer}
-    * is hidden from the clients.
-    *
-    * @param goods The <code>Goods</code> to price.
-    * @return The price.
-    */
+     * Gets the amount of gold this <code>IndianSettlment</code>
+     * is willing to pay for the given <code>Goods</code>.
+     *
+     * <br><br>
+     *
+     * It is only meaningful to call this method from the
+     * server, since the settlement's {@link GoodsContainer}
+     * is hidden from the clients.
+     *
+     * @param goods The <code>Goods</code> to price.
+     * @return The price.
+     */
     public int getPriceToSell(Goods goods) {
         return getPriceToSell(goods.getType(), goods.getAmount());
     }
 
     /**
-    * Gets the amount of gold this <code>IndianSettlment</code>
-    * is willing to pay for the given <code>Goods</code>.
-    *
-    * <br><br>
-    *
-    * It is only meaningful to call this method from the
-    * server, since the settlement's {@link GoodsContainer}
-    * is hidden from the clients.
-    *
-    * @param type The type of <code>Goods</code> to price.
-    * @param amount The amount of <code>Goods</code> to price.
-    * @return The price.
-    */
+     * Gets the amount of gold this <code>IndianSettlment</code>
+     * is willing to pay for the given <code>Goods</code>.
+     *
+     * <br><br>
+     *
+     * It is only meaningful to call this method from the
+     * server, since the settlement's {@link GoodsContainer}
+     * is hidden from the clients.
+     *
+     * @param type The type of <code>Goods</code> to price.
+     * @param amount The amount of <code>Goods</code> to price.
+     * @return The price.
+     */
     public int getPriceToSell(GoodsType type, int amount) {
         if (amount > 100) {
             throw new IllegalArgumentException();
