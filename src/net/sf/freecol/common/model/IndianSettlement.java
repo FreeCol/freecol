@@ -57,12 +57,6 @@ public class IndianSettlement extends Settlement {
     public static final int TUPI = 7;
     public static final int LAST_TRIBE = 7;
 
-
-    public static final int CAMP = 0;
-    public static final int VILLAGE = 1;
-    public static final int CITY = 2;
-    public static final int LAST_KIND = 2;
-
     public static final int MISSIONARY_TENSION = -3;
     public static final int MAX_CONVERT_DISTANCE = 10;
     public static final int TURNS_PER_TRIBUTE = 5;
@@ -73,20 +67,12 @@ public class IndianSettlement extends Settlement {
     /** The amount of raw material that should be available before producing manufactured goods. */
     public static final int KEEP_RAW_MATERIAL = 50;
 
-    /** The kind of settlement this is.
-        TODO: this information should be moved to the IndianPlayer class (that doesn't
-              exist yet). */
-    private int kind;
-
-    /** The tribe that owns this settlement. */
-    private int tribe;
-
     /**
-    * This is the skill that can be learned by Europeans at this settlement.
-    * At the server side its value will be null when the skill has already been 
-    * taught to a European.
-    * At the client side the value null is also possible in case the player hasn't
-    * checked out the settlement yet.
+     * This is the skill that can be learned by Europeans at this
+     * settlement.  At the server side its value will be null when the
+     * skill has already been taught to a European.  At the client
+     * side the value null is also possible in case the player hasn't
+     * checked out the settlement yet.
     */
     private UnitType learnableSkill = null;
 
@@ -141,16 +127,14 @@ public class IndianSettlement extends Settlement {
      * @param game The <code>Game</code> in which this object belong.
      * @param player The <code>Player</code> owning this settlement.
      * @param tile The location of the <code>IndianSettlement</code>.
-     * @param tribe Tribe of settlement
-     * @param kind Kind of settlement
      * @param isCapital True if settlement is tribe's capital
      * @param learnableSkill The skill that can be learned by Europeans at this settlement.
      * @param isVisited Indicates if any European scout has asked to speak with the chief.
      * @param missionary The missionary in this settlement (or null).
      * @exception IllegalArgumentException if an invalid tribe or kind is given
      */
-    public IndianSettlement(Game game, Player player, Tile tile, int tribe, int kind,
-            boolean isCapital, UnitType learnableSkill, boolean isVisited, Unit missionary) {
+    public IndianSettlement(Game game, Player player, Tile tile, boolean isCapital,
+                            UnitType learnableSkill, boolean isVisited, Unit missionary) {
         super(game, player, tile);
 
         if (tile == null) {
@@ -162,31 +146,10 @@ public class IndianSettlement extends Settlement {
         unitContainer = new UnitContainer(game, this);
         goodsContainer = new GoodsContainer(game, this);
 
-        if (tribe < 0 || tribe > LAST_TRIBE) {
-            throw new IllegalArgumentException("Invalid tribe provided");
-        }
-
-        this.tribe = tribe;
-
-        if (kind < 0 || kind > LAST_KIND) {
-            throw new IllegalArgumentException("Invalid settlement kind provided");
-        }
-
-        this.kind = kind;
         this.learnableSkill = learnableSkill;
         this.isCapital = isCapital;
         this.isVisited = isVisited;
         this.missionary = missionary;
-
-        /*
-        for (int goodsType=0; goodsType<Goods.NUMBER_OF_TYPES; goodsType++) {
-            if (goodsType == Goods.LUMBER || goodsType == Goods.HORSES || goodsType == Goods.MUSKETS
-                    || goodsType == Goods.TRADE_GOODS || goodsType == Goods.TOOLS) {
-                continue;
-            }
-            goodsContainer.addGoods(goodsType, (int) (Math.random() * 300));
-        }
-        */        
 
         goodsContainer.addGoods(Goods.LUMBER, 300);
         convertProgress = 0;
@@ -552,44 +515,9 @@ public class IndianSettlement extends Settlement {
 
     /**
      * Gets the kind of Indian settlement.
-     * @return {@link #CAMP}, {@link #VILLAGE} or {@link #CITY}.
      */
-    public int getKind() {
-        return kind;
-    }
-
-    /**
-     * Gets the kind of <code>Settlement</code> being used
-     * by the given tribe.
-     *
-     * @param tribe The tribe.
-     * @return {@link #CAMP}, {@link #VILLAGE} or {@link #CITY}.
-     */
-    public static int getKind(int tribe) {
-        switch (tribe) {
-        case INCA:
-        case AZTEC:
-            return CITY;
-        case CHEROKEE:
-        case ARAWAK:
-        case IROQUOIS:
-            return VILLAGE;
-        case SIOUX:
-        case APACHE:
-        case TUPI:
-            return CAMP;
-        default:
-            logger.warning("Unknown tribe: " + tribe);
-            return CAMP;
-        }
-    }
-
-    /**
-    * Gets the tribe of the Indian settlement.
-    * @return The tribe.
-    */
-    public int getTribe() {
-        return tribe;
+    public int getTypeOfSettlement() {
+        return ((IndianNationType) owner.getNationType()).getTypeOfSettlement();
     }
 
     /**
@@ -600,19 +528,7 @@ public class IndianSettlement extends Settlement {
      */
     @Override
     public int getRadius() {
-        return getRadius(kind);
-    }
-    
-    /**
-     * Gets the radius of what the <code>Settlement</code> considers
-     * as it's own land.  Cities dominate 2 tiles, other settlements 1 tile.
-     * 
-     * @param kind The kind of settlement. One of: {@link #CAMP},
-     *      {@link #VILLAGE} or {@link #CITY}.
-     * @return Settlement radius
-     */
-    public static int getRadius(int kind) {
-        if (kind == CITY) {
+        if (getTypeOfSettlement() == IndianNationType.CITY) {
             return 2;
         } else {
             return 1;
@@ -907,7 +823,7 @@ public class IndianSettlement extends Settlement {
     * @return The bonus multiplier.
     */
     public int getBonusMultiplier() {
-        int addition = getKind() + 1;
+        int addition = getTypeOfSettlement() + 1;
         if (isCapital()) {
             addition++;
         }
@@ -1144,7 +1060,7 @@ public class IndianSettlement extends Settlement {
     private void checkForNewIndian() {
         // Alcohol also contributes to create children. 
         if (goodsContainer.getGoodsCount(Goods.FOOD) + 4*goodsContainer.getGoodsCount(Goods.RUM) > 200+KEEP_RAW_MATERIAL ) {
-            if (ownedUnits.size() <= 6 + getKind()) { // up to a limit. Anyway cities produce more children than camps
+            if (ownedUnits.size() <= 6 + getTypeOfSettlement()) { // up to a limit. Anyway cities produce more children than camps
                 List<UnitType> unitTypes = FreeCol.getSpecification().getUnitTypesWithAbility("model.ability.bornInIndianSettlement");
                 if (unitTypes.size() > 0) {
                     int random = getGame().getModelController().getRandom(getId() + "bornInIndianSettlement", unitTypes.size());
@@ -1245,8 +1161,6 @@ public class IndianSettlement extends Settlement {
         out.writeAttribute("ID", getId());
         out.writeAttribute("tile", tile.getId());
         out.writeAttribute("owner", owner.getId());
-        out.writeAttribute("tribe", Integer.toString(tribe));
-        out.writeAttribute("kind", Integer.toString(kind));
         out.writeAttribute("lastTribute", Integer.toString(lastTribute));
         out.writeAttribute("isCapital", Boolean.toString(isCapital));
 
@@ -1320,8 +1234,6 @@ public class IndianSettlement extends Settlement {
         if (owner == null) {
             owner = new Player(getGame(), in.getAttributeValue(null, "owner"));
         }
-        tribe = Integer.parseInt(in.getAttributeValue(null, "tribe"));
-        kind = Integer.parseInt(in.getAttributeValue(null, "kind"));
         isCapital = (new Boolean(in.getAttributeValue(null, "isCapital"))).booleanValue();
 
         owner.addSettlement(this);

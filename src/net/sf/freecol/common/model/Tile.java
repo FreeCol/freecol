@@ -1577,8 +1577,6 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
                     out.writeAttribute("ID", getSettlement().getId());
                     out.writeAttribute("tile", getId());
                     out.writeAttribute("owner", getSettlement().getOwner().getId());
-                    out.writeAttribute("tribe", Integer.toString(is.getTribe()));
-                    out.writeAttribute("kind", Integer.toString(is.getKind()));
                     out.writeAttribute("isCapital", Boolean.toString(is.isCapital()));
                     if (pet.getSkill() != null) {
                         out.writeAttribute("learnableSkill", Integer.toString(pet.getSkill().getIndex()));

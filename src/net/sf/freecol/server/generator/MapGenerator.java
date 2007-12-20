@@ -366,12 +366,12 @@ public class MapGenerator {
      */
     private IndianSettlement placeIndianSettlement(Player player, int tribe, boolean capital,
                                        Position position, Map map, List<Player> players) {
-        final int kind = IndianSettlement.getKind(tribe);
         final Tile tile = map.getTile(position);
         IndianSettlement settlement = new IndianSettlement(map.getGame(), player,
-                    tile, tribe, kind, capital,
+                    tile, capital,
                     generateSkillForLocation(map, map.getTile(position)),
                     false, null);
+        int kind = settlement.getTypeOfSettlement();
         logger.fine("Generated skill: " + settlement.getLearnableSkill().getName());
 
         tile.setSettlement(settlement);
@@ -379,7 +379,7 @@ public class MapGenerator {
         tile.setClaim(Tile.CLAIM_CLAIMED);
         tile.setOwningSettlement(settlement);
         
-        Iterator<Position> circleIterator = map.getCircleIterator(position, true, IndianSettlement.getRadius(kind));
+        Iterator<Position> circleIterator = map.getCircleIterator(position, true, settlement.getRadius());
         while (circleIterator.hasNext()) {
             Position adjPos = circleIterator.next();
             map.getTile(adjPos).setClaim(Tile.CLAIM_CLAIMED);

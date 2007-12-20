@@ -34,8 +34,8 @@ import javax.xml.stream.XMLStreamReader;
 public class IndianNationType extends NationType {
 
 
-    public static final int TEEPEE = 1, LONGHOUSE = 2, CITY = 3;
-    public static final int LOW = 1, AVERAGE = 2, HIGH = 3;
+    public static final int TEEPEE = 0, LONGHOUSE = 1, CITY = 2;
+    public static final int LOW = 0, AVERAGE = 1, HIGH = 2;
 
     /**
      * The number of settlements this Nation has.

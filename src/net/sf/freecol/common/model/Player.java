@@ -462,8 +462,7 @@ public class Player extends FreeColGameObject implements Abilities, Nameable, Mo
 
         ArrayList<ModelMessage> out = new ArrayList<ModelMessage>();
 
-        for (int index = modelMessages.size() - 1; index >= 0; index--) {
-            ModelMessage message = modelMessages.get(index);
+        for (ModelMessage message : modelMessages) {
             if (message.hasBeenDisplayed()) {
                 break;
             } else {
