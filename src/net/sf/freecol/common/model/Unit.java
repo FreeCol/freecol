@@ -90,8 +90,6 @@ public class Unit extends FreeColGameObject implements Abilities, Locatable, Loc
 
     public static final int MUSKETS_TO_ARM_INDIAN = 25, HORSES_TO_MOUNT_INDIAN = 25;
 
-    //private int type;
-
     private UnitType unitType;
 
     private boolean naval;

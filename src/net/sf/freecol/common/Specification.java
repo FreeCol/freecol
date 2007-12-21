@@ -320,7 +320,6 @@ public final class Specification {
             // Post specification actions
             // Get Food, Bells, Crosses and Hammers
             Goods.initialize(getGoodsTypeList(), numberOfGoodsTypes());
-            Tile.initialize(numberOfTileTypes());
 
             logger.info("Specification initialization complete");
         } catch (XMLStreamException e) {

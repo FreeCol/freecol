@@ -99,8 +99,6 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
      */
     private Region region;
 
-    public static int NUMBER_OF_TYPES;
-
     private List<TileItem> tileItems;
 
     /**
@@ -185,14 +183,6 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
     }
 
     // ------------------------------------------------------------ static methods
-
-    /**
-     * Initializes the important Types for quick reference - performed by Specification.java
-     * @param numberOfTypes Initializer for NUMBER_OF_TYPES
-     */
-    public static void initialize(int numberOfTypes) {
-        NUMBER_OF_TYPES = numberOfTypes;
-    }
 
     public boolean isViewShared() {
         return (getGame().getViewOwner() != null);
