@@ -159,6 +159,7 @@ public final class FreeCol {
         handleArgs(args);
         
         if (javaCheck && !checkJavaVersion()) {
+            removeSplash(splash);
             System.err.println("Java version " + MIN_JDK_VERSION +
                             " or better is recommended in order to run FreeCol." +
                             " Use --no-java-check to skip this check.");
@@ -167,6 +168,7 @@ public final class FreeCol {
 
         int  minMemory = 128;  // million bytes
         if (memoryCheck && Runtime.getRuntime().maxMemory() < minMemory * 1000000) {
+            removeSplash(splash);
             System.out.println("You need to assign more memory to the JVM. Restart FreeCol with:");
             System.out.println("java -Xmx" + minMemory + "M -jar FreeCol.jar");
             return;
@@ -193,6 +195,7 @@ public final class FreeCol {
                         
                         freeColServer = new FreeColServer(savegameFile, defaultPublicServer, defaultSingleplayer, serverPort, serverName);
                     } catch (Exception e) {
+                        removeSplash(splash);
                         System.out.println("Could not load savegame.");
                         return;
                     }
@@ -200,6 +203,7 @@ public final class FreeCol {
                     try {
                         freeColServer = new FreeColServer(true, false, serverPort, serverName);
                     } catch (NoRouteToServerException e) {
+                        removeSplash(splash);
                         System.out.println(Messages.message("server.noRouteToServer"));
                         System.exit(1);
                         return;
@@ -213,6 +217,7 @@ public final class FreeCol {
                     }
                 });
             } catch (IOException e) {
+                removeSplash(splash);
                 System.err.println("Error while loading server: " + e);
                 System.exit(-1);
             }
@@ -235,6 +240,7 @@ public final class FreeCol {
             } catch (UnsupportedLookAndFeelException e) {
                 logger.warning("Could not load the \"FreeCol Look and Feel\"");
             } catch (FreeColException e) {
+                removeSplash(splash);
                 e.printStackTrace();
                 System.out.println("\nThe data files could not be found by FreeCol. Please make sure");
                 System.out.println("they are present. If FreeCol is looking in the wrong directory");
@@ -255,6 +261,7 @@ public final class FreeCol {
             try {
                 lib = new ImageLibrary(dataFolder);
             } catch (FreeColException e) {
+                removeSplash(splash);
                 e.printStackTrace();
                 System.out.println("\nThe data files could not be found by FreeCol. Please make sure");
                 System.out.println("they are present. If FreeCol is looking in the wrong directory");
@@ -293,16 +300,13 @@ public final class FreeCol {
             }
         }
         
-        if (splash != null) {
-            splash.setVisible(false);
-            splash.dispose();
-        }
+        removeSplash(splash);
     }
 
     /**
      * Displays a splash screen.
      * @return The splash screen. It should be removed by the caller
-     *      when no longer needed.
+     *      when no longer needed by a call to removeSplash().
      */
     private static JWindow displaySplash(String filename) {
         try {
@@ -317,6 +321,16 @@ public final class FreeCol {
         } catch (Exception e) {
             logger.log(Level.WARNING, "Exception while displaying splash screen", e);
             return null;
+        }
+    }
+
+    /**
+     * Removes splash screen.
+     */
+    private static void removeSplash(JWindow splash) {
+        if (splash != null) {
+            splash.setVisible(false);
+            splash.dispose();
         }
     }
     
