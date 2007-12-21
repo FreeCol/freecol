@@ -2439,13 +2439,6 @@ public class Unit extends FreeColGameObject implements Abilities, Locatable, Loc
     }
 
     /**
-     * Skips this unit by setting the moves left to 0.
-     */
-    public void skip() {
-        movesLeft = 0;
-    }
-
-    /**
      * Returns the name of a unit in a human readable format. The return value
      * can be used when communicating with the user.
      * 
