@@ -983,8 +983,7 @@ public final class Colony extends Settlement implements Abilities, Location, Nam
         if (bldg != null) {
             used = bldg.getGoodsInputNextTurn();
         }
-        // TODO FIXME This should also take into account tools needed for a
-        // current building project
+
         if (goodsType.isStorable()) {
             if (goodsType.isFoodType()) {
                 used += getFoodConsumption();
@@ -996,12 +995,13 @@ public final class Colony extends Settlement implements Abilities, Location, Nam
                 for (AbstractGoods goodsRequired : currentBuildable.getGoodsRequired()) {
                     GoodsType requiredType = goodsRequired.getType();
                     int requiredAmount = goodsRequired.getAmount();
+                    int presentAmount = getGoodsCount(requiredType);
                     if (requiredType == goodsType) {
-                        if (count - used < requiredAmount) {
+                        if (presentAmount + (count - used) < requiredAmount) {
                             willBeFinished = false;
                             break;
-                        } else {
-                            possiblyUsed = requiredAmount;
+                        } else if (presentAmount < requiredAmount) {
+                            possiblyUsed = requiredAmount - presentAmount;
                         }
                     } else if (getGoodsCount(requiredType) + getProductionNextTurn(requiredType) <
                                goodsRequired.getAmount()) {
@@ -1009,7 +1009,7 @@ public final class Colony extends Settlement implements Abilities, Location, Nam
                         break;
                     }
                 }
-                if (willBeFinished) {
+                if (willBeFinished && possiblyUsed > 0) {
                     used += possiblyUsed;
                 }
             }
