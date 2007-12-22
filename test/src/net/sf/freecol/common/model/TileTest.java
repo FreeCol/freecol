@@ -158,4 +158,12 @@ public class TileTest extends FreeColTestCase {
         assertEquals(3,tile.potential(s.getGoodsType("model.goods.Silver")));
     }
 
+    public void testMovement() {
+        Game game = getStandardGame();
+        Specification spec = FreeCol.getSpecification();
+        Tile tile1 = new Tile(game, spec.getTileType("model.tile.plains"), 0, 0);
+        Tile tile2 = new Tile(game, spec.getTileType("model.tile.plains"), 0, 1);
+        assertEquals(3, tile1.getMoveCost(tile2));
+    }
+
 }

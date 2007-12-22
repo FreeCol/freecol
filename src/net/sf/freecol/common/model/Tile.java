@@ -690,13 +690,6 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
     }
 
     /**
-     * Returns the TileType of this Tile.
-     *//*
-         public TileType getTileType() {
-         return FreeCol.getSpecification().tileType(type);
-         }
-       */
-    /**
      * The nation that consider this tile to be their property.
      * 
      * @return The player owning this tile.

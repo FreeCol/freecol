@@ -2522,9 +2522,9 @@ public class Unit extends FreeColGameObject implements Abilities, Locatable, Loc
         int movesLeft = unitType.getMovement();
         // TODO: do this with roles
         if (isMounted()) {
-            movesLeft = Math.min(12, movesLeft);
+            movesLeft = Math.max(12, movesLeft);
         } else if (isMissionary()) {
-            movesLeft = Math.min(6, movesLeft);
+            movesLeft = Math.max(6, movesLeft);
         }
         Modifier modifier = getModifier("model.modifier.movementBonus");
         if (modifier != null) {
