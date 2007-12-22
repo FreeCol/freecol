@@ -2434,8 +2434,7 @@ public class Unit extends FreeColGameObject implements Abilities, Locatable, Loc
      *         always returned.
      */
     public int getMovesLeft() {
-
-        return !isUnderRepair() ? movesLeft : 0;
+        return movesLeft;
     }
 
     /**
@@ -4331,7 +4330,11 @@ public class Unit extends FreeColGameObject implements Abilities, Locatable, Loc
             logger.warning("Calling newTurn for an uninitialized object: " + getId());
         }
         checkExperiencePromotion();
-        movesLeft = getInitialMovesLeft();
+        if (isUnderRepair()) {
+            movesLeft = 0;
+        } else {
+            movesLeft = getInitialMovesLeft();
+        }
         doAssignedWork();
         if (getState() == SKIPPED) {
             setState(ACTIVE);

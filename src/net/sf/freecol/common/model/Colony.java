@@ -525,14 +525,30 @@ public final class Colony extends Settlement implements Abilities, Location, Nam
         goodsContainer.removeGoods(type, amount);
     }
 
+    /**
+     * Removes the given Goods from the Colony.
+     *
+     * @param goods a <code>Goods</code> value
+     */
     public void removeGoods(Goods goods) {
         goodsContainer.removeGoods(goods.getType(), goods.getAmount());
     }
 
+    /**
+     * Removes all Goods of the given type from the Colony.
+     *
+     * @param type a <code>GoodsType</code> value
+     */
     public void removeGoods(GoodsType type) {
         goodsContainer.removeGoods(type);
     }
 
+    /**
+     * Describe <code>addGoods</code> method here.
+     *
+     * @param type a <code>GoodsType</code> value
+     * @param amount an <code>int</code> value
+     */
     public void addGoods(GoodsType type, int amount) {
         if (type.getStoredAs() != null) {
             goodsContainer.addGoods(type.getStoredAs(), amount);
@@ -551,25 +567,6 @@ public final class Colony extends Settlement implements Abilities, Location, Nam
         return units;
     }
     
-    /**
-     * Returns a list of all units in this colony of the given type.
-     * 
-     * @param type The type of the units to include in the list. For instance
-     *            Unit.EXPERT_FARMER.
-     * @return A list of all the units of the given type in this colony.
-     */
-    public List<Unit> getUnitList(int type) {
-        ArrayList<Unit> units = new ArrayList<Unit>();
-        for (WorkLocation wl : getWorkLocations()) {
-            for (Unit unit : wl.getUnitList()) {
-                if (unit.getType() == type) {
-                    units.add(unit);
-                }
-            }
-        }
-        return units;
-    }
-
     public Iterator<Unit> getUnitIterator() {
         return getUnitList().iterator();
     }
@@ -669,37 +666,6 @@ public final class Colony extends Settlement implements Abilities, Location, Nam
         } else {
             return defender;
         }
-    }
-
-    /**
-     * Adds to the hammer count of the colony.
-     * 
-     * @param amount The number of hammers to add.
-     */
-    public void addHammers(int amount) {
-        if (getCurrentlyBuilding() == BuildableType.NOTHING) {
-            addModelMessage(this, "model.colony.cannotBuild", new String[][] { { "%colony%", getName() } },
-                    ModelMessage.WARNING, this);
-            return;
-        }
-        // Building only:
-        if (getCurrentlyBuilding().getPopulationRequired() > getUnitCount()) {
-            addModelMessage(this, "model.colony.buildNeedPop",
-                            new String[][] { { "%colony%", getName() },
-                                             { "%building%", getCurrentlyBuilding().getName() } },
-                            ModelMessage.WARNING);
-            return;
-        }
-
-        if (getCurrentlyBuilding() instanceof BuildingType &&
-            getBuilding((BuildingType) getCurrentlyBuilding()) != null) {
-            addModelMessage(this, "model.colony.alreadyBuilt",
-                            new String[][] {
-                                { "%colony%", getName() },
-                                { "%building%", getCurrentlyBuilding().getName() } },
-                            ModelMessage.WARNING);
-        }
-        goodsContainer.addGoods(Goods.HAMMERS, amount);
     }
 
     /**
@@ -1345,20 +1311,6 @@ public final class Colony extends Settlement implements Abilities, Location, Nam
             }
         }
     }
-
-
-    // Update carpenter and blacksmith
-    private void addHammersAndTools() {
-        for (Building building : buildingMap.values()) {
-            GoodsType output = building.getGoodsOutputType();
-            if (output == Goods.HAMMERS || output == Goods.TOOLS) {
-                logger.finest("Calling newTurn for building " + building.getName());
-                building.newTurn();
-            }
-        }
-    }
-
-
 
     /**
      * Update all buildings in given list which produce goods in
