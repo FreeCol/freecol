@@ -145,6 +145,6 @@ public final class ReportIndianPanel extends ReportPanel implements ActionListen
                        higConst.rc(row, valueColumn));
             row += 2;
         }
-        add(result);
+        reportPanel.add(result);
     }
 }
