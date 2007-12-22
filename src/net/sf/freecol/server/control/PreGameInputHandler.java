@@ -190,8 +190,11 @@ public final class PreGameInputHandler extends InputHandler {
         ServerPlayer player = getFreeColServer().getPlayer(connection);
         if (player != null) {
             NationType nationType = FreeCol.getSpecification().getNationType(element.getAttribute("value"));
-            if (getFreeColServer().getAdvantages() == 
-                net.sf.freecol.client.gui.panel.AdvantageCellRenderer.SELECTABLE) {
+            NationType fixedNationType = FreeCol.getSpecification().getNation(player.getNationID()).getType();
+            int advantages = getFreeColServer().getAdvantages();
+            if (advantages == net.sf.freecol.client.gui.panel.AdvantageCellRenderer.SELECTABLE
+                || (advantages == net.sf.freecol.client.gui.panel.AdvantageCellRenderer.FIXED
+                    && nationType.equals(fixedNationType))) {
                 player.setNationType(nationType);
                 Element updateNationType = Message.createNewRootElement("updateNationType");
                 updateNationType.setAttribute("nationType", player.getId());
