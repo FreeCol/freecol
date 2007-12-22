@@ -58,8 +58,6 @@ public final class Colony extends Settlement implements Abilities, Location, Nam
     /** A map of ExportData, indexed by the IDs of GoodsTypes. */
     private HashMap<String, ExportData> exportData = new HashMap<String, ExportData>();
 
-    private List<Building> delayedProduction = new ArrayList<Building>();
-
     /** The SoL membership this turn. */
     private int sonsOfLiberty;
 
@@ -688,15 +686,6 @@ public final class Colony extends Settlement implements Abilities, Location, Nam
     }
 
     /**
-     * Returns the hammer count of the colony.
-     * 
-     * @return The current hammer count of the colony.
-     */
-    public int getHammers() {
-        return getGoodsCount(Goods.HAMMERS);
-    }
-
-    /**
      * Returns the type of building currently being built.
      * 
      * @return The type of building currently being built.
@@ -769,15 +758,6 @@ public final class Colony extends Settlement implements Abilities, Location, Nam
     }
 
     /**
-     * Returns the bell count of the colony.
-     * 
-     * @return The current bell count of the colony.
-     */
-    public int getBells() {
-        return getGoodsCount(Goods.BELLS);
-    }
-
-    /**
      * Returns the current SoL membership of the colony.
      * 
      * @return The current SoL membership of the colony.
@@ -796,7 +776,7 @@ public final class Colony extends Settlement implements Abilities, Location, Nam
             return;
         }
         // Update "addSol(int)" and "getMembers()" if this formula gets changed:
-        int membership = (getBells() * 100) / (BELLS_PER_REBEL * units);
+        int membership = (getGoodsCount(Goods.BELLS) * 100) / (BELLS_PER_REBEL * units);
         if (membership < 0)
             membership = 0;
         if (membership > 100)
@@ -1005,11 +985,36 @@ public final class Colony extends Settlement implements Abilities, Location, Nam
         }
         // TODO FIXME This should also take into account tools needed for a
         // current building project
-        if (goodsType == Goods.FOOD) {
-            used += getFoodConsumption();
+        if (goodsType.isStorable()) {
+            if (goodsType.isFoodType()) {
+                used += getFoodConsumption();
+            }
+            BuildableType currentBuildable = getCurrentlyBuilding();
+            if (currentBuildable != null && currentBuildable != BuildableType.NOTHING) {
+                boolean willBeFinished = true;
+                int possiblyUsed = 0;
+                for (AbstractGoods goodsRequired : currentBuildable.getGoodsRequired()) {
+                    GoodsType requiredType = goodsRequired.getType();
+                    int requiredAmount = goodsRequired.getAmount();
+                    if (requiredType == goodsType) {
+                        if (count - used < requiredAmount) {
+                            willBeFinished = false;
+                            break;
+                        } else {
+                            possiblyUsed = requiredAmount;
+                        }
+                    } else if (getGoodsCount(requiredType) + getProductionNextTurn(requiredType) <
+                               goodsRequired.getAmount()) {
+                        willBeFinished = false;
+                        break;
+                    }
+                }
+                if (willBeFinished) {
+                    used += possiblyUsed;
+                }
+            }
         }
-        count -= used;
-        return count;
+        return count - used;
     }
 
 
@@ -1048,12 +1053,11 @@ public final class Colony extends Settlement implements Abilities, Location, Nam
             Building colonyBuilding = this.getBuilding(newBuildingType);
             if (colonyBuilding != null) {
                 // a building of the same family already exists
-                if (colonyBuilding.getType().getUpgradesTo() == null ||
-                    colonyBuilding.getType().getUpgradesTo() != newBuildingType) {
+                if (colonyBuilding.getType().getUpgradesTo() != newBuildingType) {
                     // the existing building's next upgrade is not the new one we want to build
                     return false;
                 }
-            } else if (colonyBuilding == null) {
+            } else {
                 // the colony has no similar building yet
                 if (newBuildingType.getUpgradesFrom() != null) {
                     // we are trying to build an advanced factory, we should build lower level shop first
@@ -1312,35 +1316,6 @@ public final class Colony extends Settlement implements Abilities, Location, Nam
         }
     }
 
-    /**
-     * Update all buildings in given list which produce goods in
-     * producedGoods. Buildings which don't produce goods in producedGoods
-     * are added to delayedProduction.
-     *
-     * If producedGoods is null, update all buildings in given iterator
-     */
-    private void addBuildingProduction(List<Building> list, List<GoodsType> producedGoods) {
-        // First auto production buildings
-        addBuildingProduction(list, producedGoods, true);
-        addBuildingProduction(list, producedGoods, false);
-    }
-    
-    private void addBuildingProduction(List<Building> list,
-            List<GoodsType> producedGoods, boolean autoProduction) {
-        for (Building building : list) {
-            if (building.hasAbility("model.ability.autoProduction") == autoProduction) {
-                GoodsType output = building.getGoodsOutputType();
-                if (producedGoods == null || producedGoods.contains(output)) {
-                    logger.finest("Calling newTurn for building " + building.getName());
-                    building.newTurn();
-                } else {
-                    delayedProduction.add(building);
-                }
-            }
-        }
-    }
-
-
     // Export goods if custom house is built
     private void exportGoods() {
         if (hasAbility("model.ability.export")) {
@@ -1494,17 +1469,41 @@ public final class Colony extends Settlement implements Abilities, Location, Nam
                 goodsForBuilding.add(goodsRequired.getType());
             }
         }
-        
-        delayedProduction.clear();
-        addBuildingProduction(getBuildings(), goodsForBuilding);
 
-        // The following tasks consume hammers/tools,
-        // or may do so in the future
+        List<Building> buildings1 = new ArrayList<Building>();
+        List<Building> buildings2 = new ArrayList<Building>();
+        for (Building building : getBuildings()) {
+            if (building.hasAbility("model.ability.autoProduction")) {
+                // call auto-producing buildings immediately
+                logger.finest("Calling newTurn for building " + building.getName());
+                building.newTurn();
+            } else if (goodsForBuilding.contains(building.getGoodsOutputType())) {
+                buildings1.add(building);
+            } else {
+                buildings2.add(building);
+            }
+        }
+
+        // buildings that produce building materials
+        for (Building building : buildings1) {
+            logger.finest("Calling newTurn for building " + building.getName());
+            building.newTurn();
+        }
+
+        // The following tasks consume building materials or may do so
+        // in the future
         checkBuildableComplete();
 
-        addBuildingProduction(delayedProduction, null);
+        // buildings that do not produce building materials, but might
+        // consume them
+        for (Building building : buildings2) {
+            logger.finest("Calling newTurn for building " + building.getName());
+            building.newTurn();
+        }
 
-        checkForNewColonist(); // must be after building production because horse production consumes some food
+        // must be after building production because horse production
+        // consumes some food
+        checkForNewColonist();
         exportGoods();
         // Throw away goods there is no room for.
         goodsContainer.cleanAndReport();
@@ -1522,7 +1521,6 @@ public final class Colony extends Settlement implements Abilities, Location, Nam
         oldTories = tories;
 
     }
-
 
     /**
      * Returns the capacity of this colony's warehouse. All goods above this

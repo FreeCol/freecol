@@ -671,7 +671,7 @@ public class AIColony extends AIObject {
                     final BuildableType currentlyBuilding = colony.getCurrentlyBuilding();
                     int requiredTools = getToolsRequired(currentlyBuilding);
                     int requiredHammers = getHammersRequired(currentlyBuilding);
-                    int buildTurns = (requiredHammers - colony.getHammers()) /
+                    int buildTurns = (requiredHammers - colony.getGoodsCount(Goods.HAMMERS)) /
                         (colony.getProductionOf(Goods.HAMMERS) + 1);
                     if (requiredTools > 0) {
                         if (colony.getWarehouseCapacity() > 100) {
@@ -1147,7 +1147,7 @@ public class AIColony extends AIObject {
         // TODO: mine ore if needed
         BuildableType nowbuilding = colony.getCurrentlyBuilding();
         if (nowbuilding != BuildableType.NOTHING &&
-            getHammersRequired(nowbuilding) <= colony.getHammers() &&
+            getHammersRequired(nowbuilding) <= colony.getGoodsCount(Goods.HAMMERS) &&
             getToolsRequired(nowbuilding) > colony.getGoodsCount(Goods.TOOLS)) {
             Building carpenter = colony.getBuildingForProducing(Goods.HAMMERS);
             Building blacksmith = colony.getBuildingForProducing(Goods.TOOLS);
@@ -1189,7 +1189,7 @@ public class AIColony extends AIObject {
             }
 
             int hammersNew = getHammersRequired(buildable);
-            if (hammersNew > colony.getHammers() || hammersNew > hammersOld || !isOldValid) {
+            if (hammersNew > colony.getGoodsCount(Goods.HAMMERS) || hammersNew > hammersOld || !isOldValid) {
                 Element setCurrentlyBuildingElement = Message.createNewRootElement("setCurrentlyBuilding");
                 setCurrentlyBuildingElement.setAttribute("colony", colony.getId());
                 setCurrentlyBuildingElement.setAttribute("type", buildable.getId());

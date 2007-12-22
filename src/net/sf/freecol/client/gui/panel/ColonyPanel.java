@@ -657,7 +657,7 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener {
             toolsLabel.update(0, 0, 0, 0);
             buyBuilding.setEnabled(false);
         } else {
-            final int hammers = getColony().getHammers();
+            final int hammers = getColony().getGoodsCount(Goods.HAMMERS);
             final int tools = getColony().getGoodsCount(Goods.TOOLS);
             final int nextHammers = getColony().getBuildingForProducing(Goods.HAMMERS).getProductionNextTurn();
             int nextTools = getColony().getBuildingForProducing(Goods.TOOLS).getProductionNextTurn();
