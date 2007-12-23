@@ -57,7 +57,15 @@ public class ClientOptions extends OptionMap {
      * Option for setting the language.
      */
     public static final String LANGUAGE = "languageOption";
-    
+
+    /**
+     * If this option is enabled, the display will recenter in order
+     * to display the active unit if it is not {@link net.sf.freecol.client.gui.GUI#onScreen(Map.Position)}).
+     * 
+     * @see net.sf.freecol.client.gui.GUI
+     */
+    public static final String JUMP_TO_ACTIVE_UNIT = "jumpToActiveUnit";
+
     /**
      * Selected tiles always gets centered if this option is
      * enabled (even if the tile is {@link net.sf.freecol.client.gui.GUI#onScreen(Map.Position)}).
@@ -360,6 +368,7 @@ public class ClientOptions extends OptionMap {
         new IntegerOption(MIN_NUMBER_FOR_DISPLAYING_GOODS_COUNT, guiGroup, 0, 10, 7);
         new IntegerOption(MAX_NUMBER_OF_GOODS_IMAGES, guiGroup, 1, 10, 7);
         new BooleanOption(ALWAYS_CENTER, guiGroup, false);
+        new BooleanOption(JUMP_TO_ACTIVE_UNIT, guiGroup, true);
         new BooleanOption(DISPLAY_FOG_OF_WAR, guiGroup, false);
         new BooleanOption(MAP_SCROLL_ON_DRAG, guiGroup, true);
         new BooleanOption(DISPLAY_COMPASS_ROSE, guiGroup, false);
