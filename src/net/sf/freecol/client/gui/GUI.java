@@ -344,8 +344,9 @@ public final class GUI {
         freeColClient.getCanvas().repaint(0, 0, getWidth(), getHeight());
 
         // Check if the gui needs to reposition:
-        if (!onScreen(selectedTile)
-           || freeColClient.getClientOptions().getBoolean(ClientOptions.ALWAYS_CENTER)) {
+        if ((!onScreen(selectedTile) &&
+             freeColClient.getClientOptions().getBoolean(ClientOptions.JUMP_TO_ACTIVE_UNIT)) ||
+            freeColClient.getClientOptions().getBoolean(ClientOptions.ALWAYS_CENTER)) {
                 setFocus(selectedTile);
         } else {
             if (oldPosition != null) {
