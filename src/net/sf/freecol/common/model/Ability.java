@@ -20,6 +20,9 @@
 
 package net.sf.freecol.common.model;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
@@ -37,6 +40,11 @@ public final class Ability extends Feature {
 
 
     private boolean value = true;
+
+    /**
+     * A list of abilities that contributed to this one.
+     */
+    private List<Ability> abilities;
 
     /**
      * Creates a new <code>Ability</code> instance.
@@ -105,6 +113,109 @@ public final class Ability extends Feature {
      */
     public void setValue(final boolean newValue) {
         this.value = newValue;
+    }
+
+    /**
+     * Get the <code>Abilities</code> value.
+     *
+     * @return a <code>List<Ability></code> value
+     */
+    public List<Ability> getAbilities() {
+        return abilities;
+    }
+
+    /**
+     * Set the <code>Abilities</code> value.
+     *
+     * @param newAbilities The new Abilities value.
+     */
+    public void setAbilities(final List<Ability> newAbilities) {
+        this.abilities = newAbilities;
+    }
+
+    /**
+     * Combines several Abilities. The resulting Ability is always
+     * unscoped.
+     *
+     * @param abilities some abilities
+     * @return a <code>Ability</code> value
+     */
+    public static Ability combine(Ability... abilities) {
+        switch(abilities.length) {
+        case 0:
+            return null;
+        case 1:
+            return abilities[0];
+        default:
+            String id = abilities[0].getId();
+            Ability result = new Ability(id, "result", true);
+            result.abilities = new ArrayList<Ability>();
+
+            for (Ability ability : abilities) {
+                if (!id.equals(ability.getId())) {
+                    return null;
+                }
+                if (ability.abilities == null) {
+                    result.abilities.add(ability);
+                } else {
+                    result.abilities.addAll(ability.abilities);
+                }
+                result.value = result.value && ability.value;
+            }
+            return result;
+        }
+    }
+
+    /**
+     * Removes another Ability from this one and returns the result.
+     * If this Ability was the combination of two other Abilities,
+     * then removing one of the original Abilities will return the
+     * other original Ability.
+     *
+     * @param newAbility a <code>Ability</code> value
+     * @return a <code>Ability</code> value
+     */
+    public Ability remove(Ability newAbility) {
+        if (abilities != null && abilities.remove(newAbility)) {
+            if (abilities.size() == 1) {
+                return abilities.get(0);
+            } else if (!newAbility.value) {
+                // only removing a false value might change the result
+                // value
+                for (Ability ability : abilities) {
+                    if (!ability.value) {
+                        return this;
+                    }
+                }
+                value = true;
+            }
+        }
+        return this;
+    }
+
+    /**
+     * Returns a Ability applicable to the argument, or null if there
+     * is no such Ability.
+     *
+     * @param object a <code>FreeColGameObjectType</code> value
+     * @return a <code>Ability</code> value
+     */
+    public Ability getApplicableAbility(FreeColGameObjectType object) {
+        if (abilities == null) {
+            if (appliesTo(object)) {
+                return this;
+            } else {
+                return null;
+            }
+        } else {
+            List<Ability> result = new ArrayList<Ability>();
+            for (Ability ability : abilities) {
+                if (ability.appliesTo(object)) {
+                    result.add(ability);
+                }
+            }
+            return combine(result.toArray(new Ability[0]));
+        }
     }
 
     // -- Serialization --

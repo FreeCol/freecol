@@ -1996,7 +1996,7 @@ public class Player extends FreeColGameObject implements Abilities, Nameable, Mo
      */
     public boolean hasAbility(String id) {
         return features.containsKey(id) && 
-            ((Ability) features.get(id)) instanceof Ability &&
+            features.get(id) instanceof Ability &&
             ((Ability) features.get(id)).getValue();
     }
 

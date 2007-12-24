@@ -285,9 +285,6 @@ abstract public class Settlement extends FreeColGameObject implements Location, 
         
         Tile settlementTile = getTile();
         
-        Player temp = owner;
-        owner = null;
-        
         Map map = getGame().getMap();
         Position position = settlementTile.getPosition();
         Iterator<Position> circleIterator = map.getCircleIterator(position, true, getRadius());
@@ -295,15 +292,17 @@ abstract public class Settlement extends FreeColGameObject implements Location, 
         settlementTile.setOwner(null);
         while (circleIterator.hasNext()) {
             Tile tile = map.getTile(circleIterator.next());
-            if (tile.getOwner() == owner) {
+            if (tile.getOwningSettlement() == this) {
+                tile.setOwningSettlement(null);
                 tile.setOwner(null);
             }
         }
-        
+        Player oldOwner = owner;        
+        owner = null;
         
         settlementTile.setSettlement(null);
-        temp.removeSettlement(this);
-        temp.invalidateCanSeeTiles();
+        oldOwner.removeSettlement(this);
+        oldOwner.invalidateCanSeeTiles();
         
         goodsContainer.dispose();
         super.dispose();

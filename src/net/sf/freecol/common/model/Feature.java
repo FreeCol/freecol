@@ -101,7 +101,7 @@ public abstract class Feature extends FreeColObject {
         }
         return false;
     }
-    
+
     /**
      * This method writes an XML-representation of this object to
      * the given stream.

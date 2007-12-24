@@ -96,7 +96,7 @@ public class Unit extends FreeColGameObject implements Abilities, Locatable, Loc
 
     private boolean armed, mounted, missionary;
 
-    private int movesLeft; // Always use getMovesLeft()
+    private int movesLeft;
 
     private int state;
 
@@ -2755,7 +2755,7 @@ public class Unit extends FreeColGameObject implements Abilities, Locatable, Loc
             break;
         case IMPROVING:
             movesLeft = 0;
-            getTile().takeOwnership(getOwner());
+            getTile().takeOwnership(getOwner(), null);
             workLeft = -1;
             if (workImprovement != null) {
                 workLeft = workImprovement.getTurnsToComplete();

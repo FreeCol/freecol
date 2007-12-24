@@ -968,8 +968,6 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
      * @param player The <code>ServerPlayer</code> to send a message to.
      */
     private void exploreLostCityRumour(Tile tile, Unit unit, ServerPlayer player) {
-        // Player player = unit.getOwner();
-        int type = unit.getType();
         // difficulty is in range 0-4, dx in range 2-6
         int dx = player.getDifficulty() + 2;
         // seasoned scouts should be more successful
@@ -990,7 +988,15 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
          * The higher the difficulty, the more likely bad things are to happen.
          */
         int[] probability = new int[LostCityRumour.NUMBER_OF_RUMOURS];
-        probability[LostCityRumour.BURIAL_GROUND] = dx;
+        /*
+         * It should not be possible to find an indian burial ground outside
+         * indian territory:
+         */
+        if (tile.getOwner() == null || tile.getOwner().isEuropean()) {
+            probability[LostCityRumour.BURIAL_GROUND] = 0;
+        } else {
+            probability[LostCityRumour.BURIAL_GROUND] = dx;
+        }
         probability[LostCityRumour.EXPEDITION_VANISHES] = dx * 2;
         probability[LostCityRumour.NOTHING] = dx * 5;
         // only these units can be promoted
@@ -1020,13 +1026,6 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
             start = 3;
         } else {
             start = 0;
-        }
-        /*
-         * It should not be possible to find an indian burial ground outside
-         * indian territory:
-         */
-        if (tile.getOwner() == null || tile.getOwner().isEuropean()) {
-            probability[LostCityRumour.BURIAL_GROUND] = 0;
         }
         int accumulator = 0;
         for (int i = start; i < LostCityRumour.NUMBER_OF_RUMOURS; i++) {
@@ -1084,12 +1083,13 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
             break;
         case LostCityRumour.FOUNTAIN_OF_YOUTH:
             if (player.getEurope() != null) {
-                if (player.hasFather(FreeCol.getSpecification().getFoundingFather("model.foundingFather.williamBrewster"))) {
+                if (player.hasAbility("model.ability.selectRecruit")) {
                     player.setRemainingEmigrants(dx);
                     rumourElement.setAttribute("emigrants", Integer.toString(dx));
                 } else {
                     for (int k = 0; k < dx; k++) {
-                        newUnit = new Unit(getGame(), player.getEurope(), player, player.generateRecruitable(), Unit.ACTIVE);
+                        newUnit = new Unit(getGame(), player.getEurope(), player,
+                                           player.generateRecruitable(), Unit.ACTIVE);
                         rumourElement.appendChild(newUnit.toXMLElement(player, rumourElement.getOwnerDocument()));
                         player.getEurope().add(newUnit);
                     }

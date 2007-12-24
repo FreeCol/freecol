@@ -714,8 +714,9 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
      * The tension level is modified accordingly.
      * 
      * @param player The <code>Player</code>.
+     * @param settlement a <code>Settlement</code> value
      */
-    public void takeOwnership(Player player) {
+    public void takeOwnership(Player player, Settlement settlement) {
         if (player.getLandPrice(this) > 0) {
             Player otherPlayer = getOwner();
             if (otherPlayer != null) {
@@ -727,6 +728,9 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
             }
         }
         setOwner(player);
+        if (settlement != null) {
+            owningSettlement = settlement;
+        }
         updatePlayerExploredTiles();
     }
 

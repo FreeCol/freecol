@@ -369,7 +369,7 @@ public class MapGenerator {
         final Tile tile = map.getTile(position);
         IndianSettlement settlement = new IndianSettlement(map.getGame(), player,
                     tile, capital,
-                    generateSkillForLocation(map, map.getTile(position)),
+                    generateSkillForLocation(map, tile),
                     false, null);
         int kind = settlement.getTypeOfSettlement();
         logger.fine("Generated skill: " + settlement.getLearnableSkill().getName());
@@ -381,9 +381,10 @@ public class MapGenerator {
         
         Iterator<Position> circleIterator = map.getCircleIterator(position, true, settlement.getRadius());
         while (circleIterator.hasNext()) {
-            Position adjPos = circleIterator.next();
-            map.getTile(adjPos).setClaim(Tile.CLAIM_CLAIMED);
-            map.getTile(adjPos).setOwner(player);
+            Tile newTile = map.getTile(circleIterator.next());
+            newTile.setClaim(Tile.CLAIM_CLAIMED);
+            newTile.setOwningSettlement(settlement);
+            newTile.setOwner(player);
         }
 
         for (int i = 0; i < (kind * 2) + 4; i++) {
