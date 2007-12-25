@@ -50,12 +50,12 @@ import org.w3c.dom.Element;
  * various defaults for the player. One example of this is the
  * {@link #getEntryLocation entry location}.
  */
-public class Player extends FreeColGameObject implements Abilities, Nameable, Modifiers {
+public class Player extends FreeColGameObject implements Features, Nameable {
 
     private static final Logger logger = Logger.getLogger(Player.class.getName());
 
     /**
-     * The number of players. At the moment, we have 24 players: 8
+     * The number of players. At the moment, we have 25 players: 8
      * Europeans + 8 REF + 8 native + "unknown player".
      */
     public static final int NUMBER_OF_PLAYERS = 25;
@@ -207,9 +207,9 @@ public class Player extends FreeColGameObject implements Abilities, Nameable, Mo
     protected boolean[][] canSeeTiles = null;
 
     /**
-     * Stores the Modifiers of this Player.
+     * Contains the abilities and modifiers of this type.
      */
-    private HashMap<String, Feature> features = new HashMap<String, Feature>();
+    private FeatureContainer featureContainer = new FeatureContainer();
 
     /**
      * 
@@ -1988,63 +1988,58 @@ public class Player extends FreeColGameObject implements Abilities, Nameable, Mo
         return bells;
     }
 
+
     /**
-     * Returns true if this Player has the ability with the given ID.
+     * Returns the <code>Ability</code> identified by ID.
+     *
+     * @param id a <code>String</code> value
+     * @return an <code>Ability</code> value
+     */
+    public Ability getAbility(String id) {
+        return featureContainer.getAbility(id);
+    }
+
+    /**
+     * Returns true if the Object has the ability identified by
+     * <code>id</code>.
      *
      * @param id a <code>String</code> value
      * @return a <code>boolean</code> value
      */
     public boolean hasAbility(String id) {
-        return features.containsKey(id) && 
-            features.get(id) instanceof Ability &&
-            ((Ability) features.get(id)).getValue();
+        return featureContainer.hasAbility(id);
     }
 
     /**
-     * Sets the ability to newValue;
-     *
-     * @param newAbility an <code>Ability</code> value
-     */
-    public void setAbility(Ability newAbility) {
-        features.put(newAbility.getId(), newAbility);
-    }
-
-    public void setAbility(String id, boolean value) {
-        setFeature(new Ability(id, value));
-    }
-
-    public void setFeature(Feature feature) {
-        if (feature == null) {
-            return;
-        }
-        Feature oldValue = features.get(feature.getId());
-        if (oldValue instanceof Modifier && feature instanceof Modifier) {
-            features.put(feature.getId(), Modifier.combine((Modifier) oldValue, (Modifier) feature));
-        } else {
-            features.put(feature.getId(), feature);
-        }
-    }
-
-    /**
-     * Get the <code>Modifier</code> value.
+     * Returns the Modifier identified by <code>id</code>.
      *
      * @param id a <code>String</code> value
      * @return a <code>Modifier</code> value
      */
-    public final Modifier getModifier(String id) {
-        return (Modifier) features.get(id);
+    public Modifier getModifier(String id) {
+        return featureContainer.getModifier(id);
     }
 
     /**
-     * Set the <code>Modifier</code> value.
+     * Add the given Feature to the Features Map. If the Feature given
+     * can not be combined with a Feature with the same ID already
+     * present, the old Feature will be replaced.
      *
-     * @param id a <code>String</code> value
-     * @param newModifier a <code>Modifier</code> value
+     * @param feature a <code>Feature</code> value
      */
-    public final void setModifier(String id, final Modifier newModifier) {
-        features.put(id, newModifier);
+    public void addFeature(Feature feature) {
+        featureContainer.addFeature(feature);
     }
 
+    /**
+     * Removes and returns a Feature from this feature set.
+     *
+     * @param oldFeature a <code>Feature</code> value
+     * @return a <code>Feature</code> value
+     */
+    public Feature removeFeature(Feature oldFeature) {
+        return featureContainer.removeFeature(oldFeature);
+    }
 
     /**
      * Prepares this <code>Player</code> for a new turn.
@@ -2081,8 +2076,8 @@ public class Player extends FreeColGameObject implements Abilities, Nameable, Mo
         if (isEuropean()) {
             if (getBells() >= getTotalFoundingFatherCost() && currentFather != null) {
                 addFather(currentFather);
-                for (Feature feature : currentFather.getFeatures().values()) {
-                    setFeature(feature);
+                for (Feature feature : currentFather.getFeatures()) {
+                    addFeature(feature);
                 }
 
                 List<AbstractUnit> units = currentFather.getUnits();
@@ -2684,8 +2679,7 @@ public class Player extends FreeColGameObject implements Abilities, Nameable, Mo
         if (amount != tax && hasAbility("model.ability.addTaxToBells")) {
             Modifier bellsBonus = getModifier("model.goods.Bells");
             if (bellsBonus == null) {
-                setModifier("model.goods.Bells",
-                            new Modifier("model.goods.Bells", amount, Modifier.ADDITIVE));
+                addFeature(new Modifier("model.goods.Bells", amount, Modifier.ADDITIVE));
             } else {
                 int difference = (amount - tax);
                 bellsBonus.setValue(bellsBonus.getValue() + difference);

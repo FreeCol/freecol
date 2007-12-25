@@ -19,15 +19,13 @@
 
 package net.sf.freecol.common.model;
 
-public interface Abilities {
+import java.util.Map;
 
-
-
-
+public interface Features {
 
     /**
      * Returns true if the Object has the ability identified by
-     * <code>id</code.
+     * <code>id</code>.
      *
      * @param id a <code>String</code> value
      * @return a <code>boolean</code> value
@@ -35,11 +33,28 @@ public interface Abilities {
     public boolean hasAbility(String id);
 
     /**
-     * Sets the ability identified by <code>id</code.
+     * Returns the Modifier identified by <code>id</code>.
      *
      * @param id a <code>String</code> value
-     * @param newValue a <code>boolean</code> value
+     * @return a <code>Modifier</code> value
      */
-    public void setAbility(String id, boolean newValue);
+    public Modifier getModifier(String id);
+
+    /**
+     * Add the given Feature to the Features Map. If the Feature given
+     * can not be combined with a Feature with the same ID already
+     * present, the old Feature will be replaced.
+     *
+     * @param feature a <code>Feature</code> value
+     */
+    public void addFeature(Feature feature);
+
+    /**
+     * Removes and returns a Feature from this feature set.
+     *
+     * @param oldFeature a <code>Feature</code> value
+     * @return a <code>Feature</code> value
+     */
+    public Feature removeFeature(Feature oldFeature);
 
 }

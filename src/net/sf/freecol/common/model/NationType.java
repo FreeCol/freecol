@@ -29,18 +29,12 @@ import javax.xml.stream.XMLStreamReader;
 /**
  * Represents one of the nations present in the game.
  */
-public abstract class NationType extends FreeColGameObjectType implements Abilities, Modifiers {
-
-
-    /**
-     * Stores the abilities of this Nation.
-     */
-    private HashMap<String, Boolean> abilities = new HashMap<String, Boolean>();
+public abstract class NationType extends FreeColGameObjectType implements Features {
 
     /**
-     * Stores the Modifiers of this Nation.
+     * Contains the abilities and modifiers of this type.
      */
-    private HashMap<String, Modifier> modifiers = new HashMap<String, Modifier>();
+    private FeatureContainer featureContainer = new FeatureContainer();
 
     /**
      * Sole constructor.
@@ -62,63 +56,46 @@ public abstract class NationType extends FreeColGameObjectType implements Abilit
     public abstract boolean isREF();
 
     /**
-     * Returns true if this Nation has the ability with the given ID.
+     * Returns true if the Object has the ability identified by
+     * <code>id</code>.
      *
      * @param id a <code>String</code> value
      * @return a <code>boolean</code> value
      */
     public boolean hasAbility(String id) {
-        return abilities.containsKey(id) && abilities.get(id);
+        return featureContainer.hasAbility(id);
     }
 
     /**
-     * Returns a copy of this Nation's abilities.
-     *
-     * @return a <code>Map</code> value
-     */
-    public Map<String, Boolean> getAbilities() {
-        return new HashMap<String, Boolean>(abilities);
-    }
-
-    /**
-     * Sets the ability to newValue;
-     *
-     * @param id a <code>String</code> value
-     * @param newValue a <code>boolean</code> value
-     */
-    public void setAbility(String id, boolean newValue) {
-        abilities.put(id, newValue);
-    }
-
-    /**
-     * Get the <code>Modifier</code> value.
+     * Returns the Modifier identified by <code>id</code>.
      *
      * @param id a <code>String</code> value
      * @return a <code>Modifier</code> value
      */
-    public final Modifier getModifier(String id) {
-        return modifiers.get(id);
+    public Modifier getModifier(String id) {
+        return featureContainer.getModifier(id);
     }
 
     /**
-     * Set the <code>Modifier</code> value.
+     * Add the given Feature to the Features Map. If the Feature given
+     * can not be combined with a Feature with the same ID already
+     * present, the old Feature will be replaced.
      *
-     * @param id a <code>String</code> value
-     * @param newModifier a <code>Modifier</code> value
+     * @param feature a <code>Feature</code> value
      */
-    public final void setModifier(String id, final Modifier newModifier) {
-        modifiers.put(id, newModifier);
+    public void addFeature(Feature feature) {
+        featureContainer.addFeature(feature);
     }
 
     /**
-     * Returns a copy of this Nation's modifiers.
+     * Removes and returns a Feature from this feature set.
      *
-     * @return a <code>Map</code> value
+     * @param oldFeature a <code>Feature</code> value
+     * @return a <code>Feature</code> value
      */
-    public Map<String, Modifier> getModifiers() {
-        return new HashMap<String, Modifier>(modifiers);
+    public Feature removeFeature(Feature oldFeature) {
+        return featureContainer.removeFeature(oldFeature);
     }
-
 
     public String toString() {
         return getName();

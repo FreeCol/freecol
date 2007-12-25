@@ -32,8 +32,7 @@ import javax.xml.stream.XMLStreamReader;
  * given building type can have. The levels contain the information about the
  * name of the building in a given level and what is needed to build it.
  */
-public final class BuildingType extends BuildableType implements Abilities, Modifiers {
-
+public final class BuildingType extends BuildableType {
     
     private int level, defenseBonus;
   
@@ -43,8 +42,6 @@ public final class BuildingType extends BuildableType implements Abilities, Modi
     private BuildingType upgradesFrom;
     private BuildingType upgradesTo;
     
-    private HashMap<String, Feature> features = new HashMap<String, Feature>();
-
     public BuildingType(int index) {
         setIndex(index);
         setPopulationRequired(1);
@@ -127,7 +124,7 @@ public final class BuildingType extends BuildableType implements Abilities, Modi
                 if (ability.getSource() == null) {
                     ability.setSource(this.getId());
                 }
-                features.put(ability.getId(), ability); // Ability close the element
+                addFeature(ability); // Ability close the element
             } else if ("required-population".equals(childName)) {
                 setPopulationRequired(getAttribute(in, "value", 1));
                 in.nextTag(); // close this element
@@ -150,7 +147,7 @@ public final class BuildingType extends BuildableType implements Abilities, Modi
                 if (modifier.getSource() == null) {
                     modifier.setSource(this.getId());
                 }
-                setModifier(modifier.getId(), modifier); // Modifier close the element
+                addFeature(modifier); // Modifier close the element
             } else {
                 logger.finest("Parsing of " + childName + " is not implemented yet");
                 while (in.nextTag() != XMLStreamConstants.END_ELEMENT ||
@@ -165,63 +162,4 @@ public final class BuildingType extends BuildableType implements Abilities, Modi
         return unitType.hasSkill() && unitType.getSkill() >= minSkill && unitType.getSkill() <= maxSkill;
     }
   
-    /**
-     * Returns true if this UnitType has the ability with the given ID.
-     *
-     * @param id a <code>String</code> value
-     * @return a <code>boolean</code> value
-       */
-    public boolean hasAbility(String id) {
-        return features.containsKey(id) && 
-            (features.get(id) instanceof Ability) &&
-            ((Ability) features.get(id)).getValue();
-    }
-
-    /**
-     * Sets the ability to newValue;
-     *
-     * @param id a <code>String</code> value
-     * @param newValue a <code>boolean</code> value
-     */
-    public void setAbility(String id, boolean newValue) {
-        features.put(id, new Ability(id, newValue));
-    }
-
-    /**
-     * Returns a copy of this BuildingType's abilities.
-     *
-     * @return a <code>Map</code> value
-     */
-    public Map<String, Boolean> getAbilities() {
-        return new HashMap<String, Boolean>();
-    }
-
-    /**
-     * Get the <code>Modifier</code> value.
-     *
-     * @param id a <code>String</code> value
-     * @return a <code>Modifier</code> value
-     */
-    public final Modifier getModifier(String id) {
-        return (Modifier) features.get(id);
-    }
-
-    /**
-     * Set the <code>Modifier</code> value.
-     *
-     * @param id a <code>String</code> value
-     * @param newModifier a <code>Modifier</code> value
-     */
-    public final void setModifier(String id, final Modifier newModifier) {
-        features.put(id, newModifier);
-    }
-
-    /**
-     * Returns a copy of this BuildingType's features.
-     *
-     * @return a <code>Map</code> value
-     */
-    public Map<String, Feature> getFeatures() {
-        return new HashMap<String, Feature>(features);
-    }
 }

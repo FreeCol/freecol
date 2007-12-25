@@ -37,9 +37,13 @@ import net.sf.freecol.client.gui.i18n.Messages;
  * The FoundingFather is able to grant new abilities or bonuses to the
  * player, or to cause certain events.
  */
-public class FoundingFather extends FreeColGameObjectType implements Abilities, Modifiers {
-
+public class FoundingFather extends FreeColGameObjectType implements Features {
     
+    /**
+     * Contains the abilities and modifiers of this type.
+     */
+    private FeatureContainer featureContainer = new FeatureContainer();
+
     /**
      * The probability of this FoundingFather being offered for selection.
      */
@@ -61,11 +65,6 @@ public class FoundingFather extends FreeColGameObjectType implements Abilities, 
                             POLITICAL = 3,
                             RELIGIOUS = 4,
                             TYPE_COUNT = 5;
-
-    /**
-     * Stores the Features of this Type.
-     */
-    private HashMap<String, Feature> features = new HashMap<String, Feature>();
 
     /**
      * Stores the Events of this Type.
@@ -195,70 +194,55 @@ public class FoundingFather extends FreeColGameObjectType implements Abilities, 
                 availableTo.contains(player.getNationType().getId()));
     }
 
-
+    /**
+     * Returns a copy of the object's features.
+     *
+     * @return a <code>List</code> value
+     */
+    public List<Feature> getFeatures() {
+        return featureContainer.getFeatures();
+    }
 
     /**
-     * Returns true if this FoundingFather has the ability with the given ID.
+     * Returns true if the Object has the ability identified by
+     * <code>id</code>.
      *
      * @param id a <code>String</code> value
      * @return a <code>boolean</code> value
      */
     public boolean hasAbility(String id) {
-        return features.containsKey(id) && 
-            (features.get(id) instanceof Ability) &&
-            ((Ability) features.get(id)).getValue();
+        return featureContainer.hasAbility(id);
     }
 
     /**
-     * Sets the ability to newValue;
-     *
-     * @param id a <code>String</code> value
-     * @param newValue a <code>boolean</code> value
-     */
-    public void setAbility(String id, boolean newValue) {
-        features.put(id, new Ability(id, newValue));
-    }
-
-    /**
-     * Get the <code>Modifier</code> value.
+     * Returns the Modifier identified by <code>id</code>.
      *
      * @param id a <code>String</code> value
      * @return a <code>Modifier</code> value
      */
-    public final Modifier getModifier(String id) {
-        return (Modifier) features.get(id);
+    public Modifier getModifier(String id) {
+        return featureContainer.getModifier(id);
     }
 
     /**
-     * Set the <code>Modifier</code> value.
+     * Add the given Feature to the Features Map. If the Feature given
+     * can not be combined with a Feature with the same ID already
+     * present, the old Feature will be replaced.
      *
-     * @param id a <code>String</code> value
-     * @param newModifier a <code>Modifier</code> value
+     * @param feature a <code>Feature</code> value
      */
-    public final void setModifier(String id, final Modifier newModifier) {
-        features.put(id, newModifier);
-    }
-
-
-    public void setFeature(Feature feature) {
-        if (feature == null) {
-            return;
-        }
-        Feature oldValue = features.get(feature.getId());
-        if (oldValue instanceof Modifier && feature instanceof Modifier) {
-            features.put(feature.getId(), Modifier.combine((Modifier) oldValue, (Modifier) feature));
-        } else {
-            features.put(feature.getId(), feature);
-        }
+    public void addFeature(Feature feature) {
+        featureContainer.addFeature(feature);
     }
 
     /**
-     * Returns a copy of this FoundingFather's features.
+     * Removes and returns a Feature from this feature set.
      *
-     * @return a <code>Map</code> value
+     * @param oldFeature a <code>Feature</code> value
+     * @return a <code>Feature</code> value
      */
-    public Map<String, Feature> getFeatures() {
-        return new HashMap<String, Feature>(features);
+    public Feature removeFeature(Feature oldFeature) {
+        return featureContainer.removeFeature(oldFeature);
     }
 
     /**
@@ -321,13 +305,13 @@ public class FoundingFather extends FreeColGameObjectType implements Abilities, 
                 if (ability.getSource() == null) {
                     ability.setSource(this.getId());
                 }
-                setFeature(ability);
+                addFeature(ability);
             } else if (Modifier.getXMLElementTagName().equals(childName)) {
                 Modifier modifier = new Modifier(in);
                 if (modifier.getSource() == null) {
                     modifier.setSource(this.getId());
                 }
-                setModifier(modifier.getId(), modifier); // close this element
+                addFeature(modifier); // close this element
             } else if ("event".equals(childName)) {
                 String eventId = in.getAttributeValue(null, "id");
                 String value = in.getAttributeValue(null, "value");

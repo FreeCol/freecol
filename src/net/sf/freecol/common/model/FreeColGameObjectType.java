@@ -61,8 +61,7 @@ public abstract class FreeColGameObjectType extends FreeColObject {
         return null;
     }
 
-    protected void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
-    }
+    protected void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {};
     
     /**
      * Use only for debugging purposes! A human-readable and localized name is

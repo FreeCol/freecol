@@ -51,7 +51,7 @@ import org.w3c.dom.Element;
  * Every <code>Unit</code> is owned by a {@link Player} and has a
  * {@link Location}.
  */
-public class Unit extends FreeColGameObject implements Abilities, Locatable, Location, Ownable, Nameable {
+public class Unit extends FreeColGameObject implements Features, Locatable, Location, Ownable, Nameable {
 
     private static final Logger logger = Logger.getLogger(Unit.class.getName());
 
@@ -759,28 +759,75 @@ public class Unit extends FreeColGameObject implements Abilities, Locatable, Loc
     }
 
     /**
-     * Returns true if the Unit has the ability identified by
-     * <code>id</code.
+     * Returns true if the Unit, or its owner has the ability
+     * identified by <code>id</code>.
      *
      * @param id a <code>String</code> value
      * @return a <code>boolean</code> value
      */
     public boolean hasAbility(String id) {
-        // TODO: implement role and unit abilities
-        return unitType.hasAbility(id);
+        Ability typeAbility = getUnitType().getAbility(id);
+        Ability playerAbility = owner.getAbility(id);
+        if (typeAbility != null) {
+            if (playerAbility != null) {
+                return typeAbility.getValue() && playerAbility.getValue();
+            } else {
+                return typeAbility.getValue();
+            }
+        } else {
+            if (playerAbility != null) {
+                return playerAbility.getValue();
+            } else {
+                return false;
+            }
+        }
+    }
+
+
+    /**
+     * Get a modifier that applies to this Unit.
+     *
+     * @param id a <code>String</code> value
+     * @return a <code>Modifier</code> value
+     */
+    public Modifier getModifier(String id) {
+        Modifier typeModifier = getUnitType().getModifier(id);
+        Modifier playerModifier = getOwner().getModifier(id);
+        if (playerModifier == null || !playerModifier.appliesTo(getUnitType())) {
+            if (typeModifier == null) {
+                return null;
+            } else {
+                return typeModifier;
+            }
+        } else {
+            if (typeModifier == null) {
+                return playerModifier;
+            } else {
+                return Modifier.combine(typeModifier, playerModifier);
+            }
+        }
+    }
+    
+    /**
+     * Add the given Feature to the Features Map. If the Feature given
+     * can not be combined with a Feature with the same ID already
+     * present, the old Feature will be replaced.
+     *
+     * @param feature a <code>Feature</code> value
+     */
+    public void addFeature(Feature feature) {
+        throw new UnsupportedOperationException("Can not add Feature to Unit directly!");
     }
 
     /**
-     * Sets the ability identified by <code>id</code.
+     * Removes and returns a Feature from this feature set.
      *
-     * @param id a <code>String</code> value
-     * @param newValue a <code>boolean</code> value
+     * @param oldFeature a <code>Feature</code> value
+     * @return a <code>Feature</code> value
      */
-    public void setAbility(String id, boolean newValue) {
-        // TODO: implement unit abilities
+    public Feature removeFeature(Feature oldFeature) {
+        throw new UnsupportedOperationException("Can not remove Feature from Unit directly!");
     }
-
-
 
     /**
      * Returns true if this unit can be a student.
@@ -2531,29 +2578,6 @@ public class Unit extends FreeColGameObject implements Abilities, Locatable, Loc
         }
         return movesLeft;
     }
-
-    /**
-     * Get a modifier that applies to this Unit.
-     *
-     * @param id a <code>String</code> value
-     * @return a <code>Modifier</code> value
-     */
-    public Modifier getModifier(String id) {
-        Modifier typeModifier = getUnitType().getModifier(id);
-        Modifier playerModifier = getOwner().getModifier(id);
-        if (playerModifier == null || !playerModifier.appliesTo(getUnitType())) {
-            if (typeModifier == null) {
-                return null;
-            } else {
-                return typeModifier;
-            }
-        } else if (typeModifier == null) {
-            return playerModifier;
-        } else {
-            return Modifier.combine(typeModifier, playerModifier);
-        }
-    }
-    
 
     /**
      * Gets the initial hitpoints for a given type of <code>Unit</code>. For

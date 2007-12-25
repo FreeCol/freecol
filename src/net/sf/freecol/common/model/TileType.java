@@ -30,8 +30,7 @@ import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
-public final class TileType extends FreeColGameObjectType implements Modifiers
-{
+public final class TileType extends FreeColGameObjectType implements Features {
 
     private String artBasic;
     private String artOverlay;
@@ -68,9 +67,9 @@ public final class TileType extends FreeColGameObjectType implements Modifiers
     private List<AbstractGoods> production;
 
     /**
-     * Stores the Modifiers of this Type.
+     * Contains the abilities and modifiers of this type.
      */
-    private HashMap<String, Modifier> modifiers = new HashMap<String, Modifier>();
+    private FeatureContainer featureContainer = new FeatureContainer();
 
     // ------------------------------------------------------------ constructor
 
@@ -201,32 +200,45 @@ public final class TileType extends FreeColGameObjectType implements Modifiers
     }
     
     /**
-     * Get the <code>Modifier</code> value.
+     * Returns true if the Object has the ability identified by
+     * <code>id</code>.
+     *
+     * @param id a <code>String</code> value
+     * @return a <code>boolean</code> value
+     */
+    public boolean hasAbility(String id) {
+        return featureContainer.hasAbility(id);
+    }
+
+    /**
+     * Returns the Modifier identified by <code>id</code>.
      *
      * @param id a <code>String</code> value
      * @return a <code>Modifier</code> value
      */
-    public final Modifier getModifier(String id) {
-        return modifiers.get(id);
+    public Modifier getModifier(String id) {
+        return featureContainer.getModifier(id);
     }
 
     /**
-     * Set the <code>Modifier</code> value.
+     * Add the given Feature to the Features Map. If the Feature given
+     * can not be combined with a Feature with the same ID already
+     * present, the old Feature will be replaced.
      *
-     * @param id a <code>String</code> value
-     * @param newModifier a <code>Modifier</code> value
+     * @param feature a <code>Feature</code> value
      */
-    public final void setModifier(String id, final Modifier newModifier) {
-        modifiers.put(id, newModifier);
+    public void addFeature(Feature feature) {
+        featureContainer.addFeature(feature);
     }
 
     /**
-     * Returns a copy of this FoundingFather's modifiers.
+     * Removes and returns a Feature from this feature set.
      *
-     * @return a <code>Map</code> value
+     * @param oldFeature a <code>Feature</code> value
+     * @return a <code>Feature</code> value
      */
-    public Map<String, Modifier> getModifiers() {
-        return new HashMap<String, Modifier>(modifiers);
+    public Feature removeFeature(Feature oldFeature) {
+        return featureContainer.removeFeature(oldFeature);
     }
 
     // ------------------------------------------------------------ API methods
@@ -279,7 +291,7 @@ public final class TileType extends FreeColGameObjectType implements Modifiers
                 in.nextTag(); // close this element
             } else if ("modifier".equals(childName)) {
                 Modifier modifier = new Modifier(in);
-                setModifier(modifier.getId(), modifier); // close this element
+                addFeature(modifier); // close this element
             } else if ("production".equals(childName)) {
                 GoodsType type = goodsTypeByRef.get(in.getAttributeValue(null, "goods-type"));
                 int amount = Integer.parseInt(in.getAttributeValue(null, "value"));

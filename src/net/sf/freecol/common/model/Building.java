@@ -38,7 +38,7 @@ import org.w3c.dom.Element;
 /**
  * Represents a building in a colony.
  */
-public final class Building extends FreeColGameObject implements Abilities, WorkLocation, Ownable, Named {
+public final class Building extends FreeColGameObject implements Features, WorkLocation, Ownable, Named {
     
     /** The colony containing this building. */
     private Colony colony;
@@ -239,11 +239,8 @@ public final class Building extends FreeColGameObject implements Abilities, Work
     
     private void setType(BuildingType newBuildingType) {
         // remove features from current type
-        if (buildingType.getFeatures() != null) {
-            Map<String, Feature> oldFeatures = buildingType.getFeatures();
-            for (Entry<String, Feature> entry : oldFeatures.entrySet()) {
-                colony.removeFeature(entry.getKey(), entry.getValue());
-            }
+        for (Feature feature : buildingType.getFeatures()) {
+            colony.removeFeature(feature);
         }
         colony.setDefenseBonus(colony.getDefenseBonus() - buildingType.getDefenseBonus());
 
@@ -251,12 +248,10 @@ public final class Building extends FreeColGameObject implements Abilities, Work
             buildingType = newBuildingType;
             
             // add new features and abilities from new type
-            Map<String, Feature> newFeatures = buildingType.getFeatures();
-            for (Feature feature : newFeatures.values()) {
-                colony.setFeature(feature);
+            for (Feature feature : buildingType.getFeatures()) {
+                colony.addFeature(feature);
             }
             colony.setDefenseBonus(colony.getDefenseBonus() + buildingType.getDefenseBonus());
-            colony.putAbilities(buildingType.getAbilities());
             
             // Colonists which can't work here must be put outside
             for (Unit unit : units) {
@@ -375,23 +370,45 @@ public final class Building extends FreeColGameObject implements Abilities, Work
     }
 
     /**
-     * Returns true if the Building has the ability identified by
-     * <code>id</code.
+     * Returns true if the Object has the ability identified by
+     * <code>id</code>.
      *
      * @param id a <code>String</code> value
      * @return a <code>boolean</code> value
      */
     public boolean hasAbility(String id) {
-        return buildingType.hasAbility(id);
+        return getType().hasAbility(id);
     }
 
     /**
-     * Sets the ability identified by <code>id</code.
+     * Returns the Modifier identified by <code>id</code>.
      *
      * @param id a <code>String</code> value
-     * @param newValue a <code>boolean</code> value
+     * @return a <code>Modifier</code> value
      */
-    public void setAbility(String id, boolean newValue) {
+    public Modifier getModifier(String id) {
+        return getType().getModifier(id);
+    }
+
+    /**
+     * Add the given Feature to the Features Map. If the Feature given
+     * can not be combined with a Feature with the same ID already
+     * present, the old Feature will be replaced.
+     *
+     * @param feature a <code>Feature</code> value
+     */
+    public void addFeature(Feature feature) {
+        getType().addFeature(feature);
+    }
+
+    /**
+     * Removes and returns a Feature from this feature set.
+     *
+     * @param oldFeature a <code>Feature</code> value
+     * @return a <code>Feature</code> value
+     */
+    public Feature removeFeature(Feature oldFeature) {
+        return getType().removeFeature(oldFeature);
     }
 
     /**

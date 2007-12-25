@@ -34,7 +34,7 @@ import javax.xml.stream.XMLStreamReader;
 
 import net.sf.freecol.FreeCol;
 
-public final class UnitType extends BuildableType implements Abilities, Modifiers {
+public final class UnitType extends BuildableType {
 
     /**
      * Describe offence here.
@@ -120,16 +120,6 @@ public final class UnitType extends BuildableType implements Abilities, Modifier
      * Describe education here.
      */
     private HashMap<String, Upgrade> upgrades = new HashMap<String, Upgrade>();
-    
-    /**
-     * Stores the abilities of this Type.
-     */
-    private HashMap<String, Boolean> abilities = new HashMap<String, Boolean>();
-    
-    /**
-     * Stores the production modifiers of this Type
-     */
-    private HashMap<String, Modifier> modifiers = new HashMap<String, Modifier>();
     
     public UnitType(int index) {
         setIndex(index);
@@ -569,7 +559,7 @@ public final class UnitType extends BuildableType implements Abilities, Modifier
             if ("ability".equals(nodeName)) {
                 String abilityId = in.getAttributeValue(null, "id");
                 boolean value = getAttribute(in, "value", true);
-                setAbility(abilityId, value);
+                addFeature(new Ability(abilityId, value));
                 in.nextTag(); // close this element
             } else if ("required-ability".equals(nodeName)) {
                 String abilityId = in.getAttributeValue(null, "id");
@@ -599,7 +589,7 @@ public final class UnitType extends BuildableType implements Abilities, Modifier
                 if (modifier.getSource() == null) {
                     modifier.setSource(this.getId());
                 }
-                setModifier(modifier.getId(), modifier);
+                addFeature(modifier);
             } else {
                 logger.finest("Parsing of " + nodeName + " is not implemented yet");
                 while (in.nextTag() != XMLStreamConstants.END_ELEMENT ||
@@ -639,55 +629,6 @@ public final class UnitType extends BuildableType implements Abilities, Modifier
      */
     public boolean hasPrice() {
         return price != UNDEFINED;
-    }
-
-    /**
-     * Returns true if this UnitType has the ability with the given ID.
-     *
-     * @param id a <code>String</code> value
-     * @return a <code>boolean</code> value
-     */
-    public boolean hasAbility(String id) {
-        return abilities.containsKey(id) && abilities.get(id);
-    }
-
-    /**
-     * Sets the ability to newValue;
-     *
-     * @param id a <code>String</code> value
-     * @param newValue a <code>boolean</code> value
-     */
-    public void setAbility(String id, boolean newValue) {
-        abilities.put(id, newValue);
-    }
-
-    /**
-     * Get the <code>Modifier</code> value.
-     *
-     * @param id a <code>String</code> value
-     * @return a <code>Modifier</code> value
-     */
-    public final Modifier getModifier(String id) {
-        return modifiers.get(id);
-    }
-
-    /**
-     * Set the <code>Modifier</code> value.
-     *
-     * @param id a <code>String</code> value
-     * @param newModifier a <code>Modifier</code> value
-     */
-    public final void setModifier(String id, final Modifier newModifier) {
-        modifiers.put(id, newModifier);
-    }
-
-    /**
-     * Returns a copy of this FoundingFather's modifiers.
-     *
-     * @return a <code>Map</code> value
-     */
-    public Map<String, Modifier> getModifiers() {
-        return new HashMap<String, Modifier>(modifiers);
     }
 
     public int getProductionFor(GoodsType goodsType, int base) {

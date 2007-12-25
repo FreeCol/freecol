@@ -31,16 +31,25 @@ import net.sf.freecol.client.gui.i18n.Messages;
 /**
  * Contains information on buildable types.
  */
-public class BuildableType extends FreeColGameObjectType {
+public class BuildableType extends FreeColGameObjectType implements Features {
 
     public static final int UNDEFINED = Integer.MIN_VALUE;
 
     public static final BuildableType NOTHING = new BuildableType("model.buildableType.nothing");
     
+    /**
+     * The minimum population that a Colony needs in order to build
+     * this type.
+     */
     private int populationRequired = 1;
 
     /**
-     * Describe goodsRequired here.
+     * Contains the abilities and modifiers of this type.
+     */
+    private FeatureContainer featureContainer = new FeatureContainer();
+
+    /**
+     * A list of AbstractGoods required to build this type.
      */
     private List<AbstractGoods> goodsRequired;
     
@@ -60,9 +69,8 @@ public class BuildableType extends FreeColGameObjectType {
         if (goodsRequired != null) {
             for (AbstractGoods goods : goodsRequired) {
                 result += Messages.message("model.goods.goodsAmount",
-                                           new String[][] {
-                                               {"%amount%", String.valueOf(goods.getAmount())},
-                                               {"%goods%", goods.getType().getName()}}) +
+                                           "%amount%", String.valueOf(goods.getAmount()),
+                                           "%goods%", goods.getType().getName()) +
                     ", ";
             }
             if (result.length() > 1) {
@@ -119,4 +127,66 @@ public class BuildableType extends FreeColGameObjectType {
 
     protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
     }
+
+    /**
+     * Returns a copy of the object's features.
+     *
+     * @return a <code>List</code> value
+     */
+    public List<Feature> getFeatures() {
+        return featureContainer.getFeatures();
+    }
+
+    /**
+     * Get the <code>Ability</code> value.
+     *
+     * @param id a <code>String</code> value
+     * @return a <code>Ability</code> value
+     */
+    public final Ability getAbility(String id) {
+        return featureContainer.getAbility(id);
+    }
+
+    /**
+     * Returns true if the Object has the ability identified by
+     * <code>id</code>.
+     *
+     * @param id a <code>String</code> value
+     * @return a <code>boolean</code> value
+     */
+    public boolean hasAbility(String id) {
+        return featureContainer.hasAbility(id);
+    }
+
+    /**
+     * Returns the Modifier identified by <code>id</code>.
+     *
+     * @param id a <code>String</code> value
+     * @return a <code>Modifier</code> value
+     */
+    public Modifier getModifier(String id) {
+        return featureContainer.getModifier(id);
+    }
+
+    /**
+     * Add the given Feature to the Features Map. If the Feature given
+     * can not be combined with a Feature with the same ID already
+     * present, the old Feature will be replaced.
+     *
+     * @param feature a <code>Feature</code> value
+     */
+    public void addFeature(Feature feature) {
+        featureContainer.addFeature(feature);
+    }
+
+    /**
+     * Removes and returns a Feature from this feature set.
+     *
+     * @param oldFeature a <code>Feature</code> value
+     * @return a <code>Feature</code> value
+     */
+    public Feature removeFeature(Feature oldFeature) {
+        return featureContainer.removeFeature(oldFeature);
+    }
+
 }

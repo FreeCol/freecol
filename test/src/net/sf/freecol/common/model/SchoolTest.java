@@ -86,6 +86,8 @@ public class SchoolTest extends FreeColTestCase {
         BuildingType schoolType = spec().getBuildingType("model.building.Schoolhouse");
         colony.addBuilding(new Building(getGame(), colony, schoolType));
         Building school = colony.getBuilding(spec().getBuildingType("model.building.Schoolhouse"));
+        assertTrue(schoolType.hasAbility("model.ability.teach"));
+        assertTrue(colony.canTrain(ore));
 
         ore.setLocation(school);
         trainForTurns(colony, ore.getNeededTurnsOfTraining());

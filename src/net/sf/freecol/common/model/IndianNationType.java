@@ -190,14 +190,14 @@ public class IndianNationType extends NationType {
             if ("ability".equals(childName)) {
                 String abilityId = in.getAttributeValue(null, "id");
                 boolean value = getAttribute(in, "value", true);
-                setAbility(abilityId, value);
+                addFeature(new Ability(abilityId, value));
                 in.nextTag(); // close this element
             } else if (Modifier.getXMLElementTagName().equals(childName)) {
                 Modifier modifier = new Modifier(in); // Modifier close the element
                 if (modifier.getSource() == null) {
                     modifier.setSource(this.getId());
                 }
-               setModifier(modifier.getId(), modifier);
+               addFeature(modifier);
             } else if ("skill".equals(childName)) {
                 skills.add(in.getAttributeValue(null, "id"));
                 in.nextTag(); // close this element

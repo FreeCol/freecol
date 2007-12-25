@@ -40,7 +40,7 @@ import org.w3c.dom.Element;
  * {@link ColonyTile}s. The latter represents the tiles around the
  * <code>Colony</code> where working is possible.
  */
-public final class Colony extends Settlement implements Abilities, Location, Nameable, Modifiers {
+public final class Colony extends Settlement implements Features, Location, Nameable {
 
     private static final Logger logger = Logger.getLogger(Colony.class.getName());
 
@@ -82,14 +82,14 @@ public final class Colony extends Settlement implements Abilities, Location, Nam
     // Temporary variable:
     private int lastVisited = -1;
 
-    /**
-     * Stores the Features of this Colony.
-     */
-    private HashMap<String, Feature> features = new HashMap<String, Feature>();
-
     private int defenseBonus;
 
     /**
+     * Contains the abilities and modifiers of this Colony.
+     */
+    private FeatureContainer featureContainer = new FeatureContainer();
+
+   /**
      * A list of Buildable items, which is NEVER empty.
      */
     private List<BuildableType> buildQueue = new ArrayList<BuildableType>();
@@ -178,8 +178,8 @@ public final class Colony extends Settlement implements Abilities, Location, Nam
     public void addBuilding(Building building) {
         BuildingType buildingType = building.getType().getFirstLevel();
         buildingMap.put(buildingType.getId(), building);
-        for (Feature feature : building.getType().getFeatures().values()) {
-            setFeature(feature);
+        for (Feature feature : building.getType().getFeatures()) {
+            addFeature(feature);
         }
     }
 
@@ -1791,13 +1791,13 @@ public final class Colony extends Settlement implements Abilities, Location, Nam
      */
     public final Modifier getModifier(String id) {
         Modifier result;
-        Modifier modifier = (Modifier) features.get(id);
+        Modifier colonyModifier = featureContainer.getModifier(id);
         Modifier playerModifier = owner.getModifier(id);
-        if (modifier != null) {
+        if (colonyModifier != null) {
             if (playerModifier != null) {
-                result = Modifier.combine(modifier, playerModifier);
+                result = Modifier.combine(colonyModifier, playerModifier);
             } else {
-                result = modifier;
+                result = colonyModifier;
             }
         } else {
             result = playerModifier;
@@ -1807,80 +1807,51 @@ public final class Colony extends Settlement implements Abilities, Location, Nam
     }
 
     /**
-     * Set the <code>Modifier</code> value.
-     *
-     * @param id a <code>String</code> value
-     * @param newModifier a <code>Modifier</code> value
-     */
-    public final void setModifier(String id, final Modifier newModifier) {
-        setFeature(newModifier);
-    }
-    
-    public void removeModifier(final Modifier newModifier) {
-        Modifier oldModifier = getModifier(newModifier.getId());
-        if (newModifier == null || oldModifier == null) {
-            return;
-        } else if (newModifier == oldModifier) {
-            features.remove(newModifier);
-        } else {
-            setFeature(oldModifier.remove(newModifier));
-        }
-    }
-
-    public void removeFeature(String id, Feature feature) {
-    }
-
-    /**
      * Returns true if the Colony, or its owner has the ability
-     * identified by <code>id</code.
+     * identified by <code>id</code>.
      *
      * @param id a <code>String</code> value
      * @return a <code>boolean</code> value
      */
     public boolean hasAbility(String id) {
-        return (features.containsKey(id) &&
-            (features.get(id) instanceof Ability) &&
-            ((Ability) features.get(id)).getValue()) ||
-            owner.hasAbility(id);
-    }
-
-    /**
-     * Sets the ability identified by <code>id</code.
-     *
-     * @param id a <code>String</code> value
-     * @param newValue a <code>boolean</code> value
-     */
-    public void setAbility(String id, boolean newValue) {
-        features.put(id, new Ability(id, newValue));
-    }
-
-    public Feature getFeature(String id) {
-        return features.get(id);
-    }
-
-    public void setFeature(Feature feature) {
-        if (feature == null) {
-            return;
-        }
-        Feature oldValue = features.get(feature.getId());
-        if (oldValue instanceof Modifier && feature instanceof Modifier) {
-            features.put(feature.getId(), Modifier.combine((Modifier) oldValue, (Modifier) feature));
+        Ability colonyAbility = featureContainer.getAbility(id);
+        Ability playerAbility = owner.getAbility(id);
+        if (colonyAbility != null) {
+            if (playerAbility != null) {
+                return colonyAbility.getValue() && playerAbility.getValue();
+            } else {
+                return colonyAbility.getValue();
+            }
         } else {
-            features.put(feature.getId(), feature);
+            if (playerAbility != null) {
+                return playerAbility.getValue();
+            } else {
+                return false;
+            }
         }
     }
 
     /**
-     * Sets the abilities given
+     * Add the given Feature to the Features Map. If the Feature given
+     * can not be combined with a Feature with the same ID already
+     * present, the old Feature will be replaced.
      *
-     * @param abilities the new abilities
+     * @param feature a <code>Feature</code> value
      */
-    public void putAbilities(java.util.Map<String, Boolean> abilities) {
-        for (Entry<String, Boolean> entry : abilities.entrySet()) {
-            features.put(entry.getKey(), new Ability(entry.getKey(), entry.getValue()));
-        }
+    public void addFeature(Feature feature) {
+        featureContainer.addFeature(feature);
     }
-    
+
+    /**
+     * Removes and returns a Feature from this feature set.
+     *
+     * @param oldFeature a <code>Feature</code> value
+     * @return a <code>Feature</code> value
+     */
+    public Feature removeFeature(Feature oldFeature) {
+        return featureContainer.removeFeature(oldFeature);
+    }
+
     /**
      * Describe <code>getDefenseBonus</code> method here.
      *
