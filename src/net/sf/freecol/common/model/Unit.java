@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map.Entry;
 import java.util.Vector;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -170,6 +171,11 @@ public class Unit extends FreeColGameObject implements Features, Locatable, Loca
      * The teacher of this Unit, if it has one.
      */
     private Unit teacher;
+
+    /**
+     * The equipment this Unit carries.
+     */
+    private List<EquipmentType> equipment = new ArrayList<EquipmentType>();
 
 
     /**
@@ -335,6 +341,24 @@ public class Unit extends FreeColGameObject implements Features, Locatable, Loca
         } else {
             throw new IllegalStateException("Unit can't carry treasure");
         }
+    }
+
+    /**
+     * Get the <code>Equipment</code> value.
+     *
+     * @return a <code>List<EquipmentType></code> value
+     */
+    public final List<EquipmentType> getEquipment() {
+        return equipment;
+    }
+
+    /**
+     * Set the <code>Equipment</code> value.
+     *
+     * @param newEquipment The new Equipment value.
+     */
+    public final void setEquipment(final List<EquipmentType> newEquipment) {
+        this.equipment = newEquipment;
     }
 
     /**
@@ -2034,10 +2058,41 @@ public class Unit extends FreeColGameObject implements Features, Locatable, Loca
      *         location.
      */
     private boolean canBeEquipped(GoodsType equipType, int amount) {
-        return ((getGoodsDumpLocation() != null && getGoodsDumpLocation().getGoodsCount(equipType) >= amount) || ((location instanceof Europe || location instanceof Unit
-                                                                                                                   && ((Unit) location).getLocation() instanceof Europe)
-                                                                                                                  && getOwner().getGold() >= getOwner().getMarket().getBidPrice(equipType, amount) && getOwner()
-                                                                                                                  .canTrade(equipType)));
+        return ((getGoodsDumpLocation() != null && getGoodsDumpLocation().getGoodsCount(equipType) >= amount) ||
+                ((location instanceof Europe || location instanceof Unit
+                  && ((Unit) location).getLocation() instanceof Europe)
+                 && getOwner().getGold() >= getOwner().getMarket().getBidPrice(equipType, amount) && 
+                 getOwner().canTrade(equipType)));
+    }
+
+    public boolean canBeEquippedWith(EquipmentType equipmentType) {
+        for (Entry<String, Boolean> entry : equipmentType.getUnitAbilitiesRequired().entrySet()) {
+            if (hasAbility(entry.getKey()) != entry.getValue()) {
+                return false;
+            }
+        }
+        if (!equipmentType.getLocationAbilitiesRequired().isEmpty()) {
+            if (getLocation() instanceof Features) {
+                Features locationWithFeatures = (Features) getLocation();
+                for (Entry<String, Boolean> entry : equipmentType.getLocationAbilitiesRequired().entrySet()) {
+                    if (locationWithFeatures.hasAbility(entry.getKey()) != entry.getValue()) {
+                        return false;
+                    }
+                }
+            } else {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private boolean equipmentCanBeBuilt(EquipmentType equipmentType) {
+        for (AbstractGoods requiredGoods : equipmentType.getGoodsRequired()) {
+            if (!canBeEquipped(requiredGoods.getType(), requiredGoods.getAmount())) {
+                return false;
+            }
+        }
+        return true;
     }
 
     /**
@@ -2082,6 +2137,52 @@ public class Unit extends FreeColGameObject implements Features, Locatable, Loca
                  && ((Unit) location).getLocation() instanceof Europe) 
                 || (getColony() != null && getColony().hasAbility("model.ability.dressMissionary")));
     }
+
+
+    public void equipWith(EquipmentType equipmentType) {
+        equipWith(equipmentType, false);
+    }
+
+    public void equipWith(EquipmentType equipmentType, boolean asResultOfCombat) {
+        if (!canBeEquippedWith(equipmentType)) {
+            logger.fine("Unable to equip unit " + getId() + " with " + equipmentType.getName());
+            return;
+        }
+        if (!(asResultOfCombat  || equipmentCanBeBuilt(equipmentType))) {
+            logger.fine("Unable to build equipment " + equipmentType.getName());
+            return;
+        }
+        Iterator<EquipmentType> equipmentIterator = equipment.iterator();
+        while (equipmentIterator.hasNext()) {
+            EquipmentType oldEquipment = equipmentIterator.next();
+            if (!oldEquipment.isCompatibleWith(equipmentType)) {
+                if (getGoodsDumpLocation() != null) {
+                    for (AbstractGoods goods : oldEquipment.getGoodsRequired()) {
+                        getGoodsDumpLocation().addGoods(goods.getType(), goods.getAmount());
+                    }
+                } else if (isInEurope()) {
+                    for (AbstractGoods goods : oldEquipment.getGoodsRequired()) {
+                        getOwner().getMarket().sell(goods.getType(), goods.getAmount(), getOwner());
+                    }
+                } else if (!asResultOfCombat) {
+                    throw new IllegalStateException();
+                }
+                equipmentIterator.remove();
+            }
+        }
+        if (getGoodsDumpLocation() != null) {
+            for (AbstractGoods goods : equipmentType.getGoodsRequired()) {
+                getGoodsDumpLocation().removeGoods(goods.getType(), goods.getAmount());
+            }
+        } else if (isInEurope()) {
+            for (AbstractGoods goods : equipmentType.getGoodsRequired()) {
+                getOwner().getMarket().buy(goods.getType(), goods.getAmount(), getOwner());
+            }
+        }                
+        equipment.add(equipmentType);
+    }        
+
+    
 
     /**
      * Sets the armed attribute of this unit.

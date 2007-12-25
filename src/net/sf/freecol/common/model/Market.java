@@ -52,8 +52,6 @@ public final class Market extends FreeColGameObject implements Ownable {
      */
     public static final int EUROPE = 0, CUSTOM_HOUSE = 1;
     
-    //private static final int GOODS_STABILIZER = 750;
-
     private final Map<GoodsType, MarketData> marketData = new HashMap<GoodsType, MarketData>();
 
     private ArrayList<TransactionListener> transactionListeners =

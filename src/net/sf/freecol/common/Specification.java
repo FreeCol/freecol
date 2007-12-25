@@ -39,6 +39,7 @@ import javax.xml.stream.XMLStreamReader;
 
 import net.sf.freecol.client.gui.action.ImprovementActionType;
 import net.sf.freecol.common.model.BuildingType;
+import net.sf.freecol.common.model.EquipmentType;
 import net.sf.freecol.common.model.EuropeanNationType;
 import net.sf.freecol.common.model.FoundingFather;
 import net.sf.freecol.common.model.FreeColGameObjectType;
@@ -89,6 +90,7 @@ public final class Specification {
     private final List<Nation> nations;
     private final List<NationType> nationTypes;
 
+    private final List<EquipmentType> equipmentTypes;
 
     /**
      * Creates a new <code>Specification</code> instance.
@@ -139,6 +141,7 @@ public final class Specification {
         foundingFathers = new ArrayList<FoundingFather>();
         nations = new ArrayList<Nation>();
         nationTypes = new ArrayList<NationType>();
+        equipmentTypes = new ArrayList<EquipmentType>();
 
         final Map<String, GoodsType> goodsTypeByRef = new HashMap<String, GoodsType>();
         final Map<String, ResourceType> resourceTypeByRef = new HashMap<String, ResourceType>();
@@ -311,6 +314,21 @@ public final class Specification {
                         }
                     };
                     nations.addAll(makeListFromXml(xsr, factory));
+
+
+                } else if ("equipment-types".equals(childName)) {
+
+                    logger.finest("Found child named " + childName);
+                    ObjectFactory<EquipmentType> factory = new ObjectFactory<EquipmentType>() {
+                        int equipmentIndex = 0;
+                        public EquipmentType objectFrom(XMLStreamReader in) throws XMLStreamException {
+                            EquipmentType equipmentType = new EquipmentType(equipmentIndex++);
+                            equipmentType.readFromXML(in, goodsTypeByRef);
+                            allTypes.put(equipmentType.getId(), equipmentType);
+                            return equipmentType;
+                        }
+                    };
+                    equipmentTypes.addAll(makeListFromXml(xsr, factory));
 
                 } else {
                     throw new RuntimeException("unexpected: " + childName);
@@ -662,6 +680,8 @@ public final class Specification {
         return (NationType) allTypes.get(id);
     }
 
+    // -- Nations --
+
     public List<Nation> getNations() {
         return nations;
     }
@@ -713,6 +733,17 @@ public final class Specification {
         }
         return result;
     }
+
+    // -- EquipmentTypes --
+    public List<EquipmentType> getEquipmentTypeList() {
+        return equipmentTypes;
+    }
+
+    public EquipmentType getEquipmentType(String id) {
+        return (EquipmentType) allTypes.get(id);
+    }
+    
+
 
     /**
      * Takes an XML node with child nodes that represent objects of the type

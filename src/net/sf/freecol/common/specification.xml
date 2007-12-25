@@ -461,7 +461,6 @@
     </improvementaction-type>
   </improvementaction-types>
 
-<!--
   <equipment-types>
     <equipment-type id="model.equipment.horses">
       <modifier id="model.modifier.lineOfSightBonus" type="additive" value="1"/>
@@ -481,20 +480,19 @@
       <required-goods id="model.goods.Muskets" value="50"/>
       <compatible-equipment id="model.equipment.horses"/>
     </equipment-type>
-    <equipment-type id="model.equipment.tools">
+    <equipment-type id="model.equipment.tools" maximum-count="5">
       <ability id="model.ability.improveTerrain" value="true"/>
       <required-ability id="model.ability.canBeEquipped" value="true"/>
-      <required-goods id="model.goods.Tools" value="20" maximum="100"/>
+      <required-goods id="model.goods.Tools" value="20"/>
     </equipment-type>
     <equipment-type id="model.equipment.missionary">
       <modifier id="model.modifier.movement" type="additive" value="3"/>
       <ability id="model.ability.missionary" value="true"/>
       <required-ability id="model.ability.canBeEquipped" value="true"/>
-      <required-building id="model.building.church"/>
+      <required-location-ability id="model.ability.dressMissionary" value="true"/>
       <compatible-equipment id="model.equipment.horses"/>
     </equipment-type>
   </equipment-types>
--->
 
   <unit-types>
     <unit-type id="model.unit.freeColonist"         offence="0"  defence="1" movement="3" lineOfSight="1"

@@ -519,10 +519,6 @@ public final class UnitType extends BuildableType {
         }
     }
 
-    public FreeColGameObjectType getType() {
-        return this;
-    }
-
     protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
         readFromXML(in, null);
     }
