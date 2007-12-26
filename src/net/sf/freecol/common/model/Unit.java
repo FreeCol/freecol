@@ -790,20 +790,17 @@ public class Unit extends FreeColGameObject implements Features, Locatable, Loca
      * @return a <code>boolean</code> value
      */
     public boolean hasAbility(String id) {
-        Ability typeAbility = getUnitType().getAbility(id);
-        Ability playerAbility = owner.getAbility(id);
-        if (typeAbility != null) {
-            if (playerAbility != null) {
-                return typeAbility.getValue() && playerAbility.getValue();
-            } else {
-                return typeAbility.getValue();
-            }
+        ArrayList<Ability> result = new ArrayList<Ability>();
+        result.add(getUnitType().getAbility(id));
+        result.add(getOwner().getAbility(id));
+        for (EquipmentType equipmentType : equipment) {
+            result.add(equipmentType.getAbility(id));
+        }
+        Ability combinedResult = Ability.combine(result.toArray(new Ability[0]));
+        if (combinedResult == null) {
+            return false;
         } else {
-            if (playerAbility != null) {
-                return playerAbility.getValue();
-            } else {
-                return false;
-            }
+            return combinedResult.getValue();
         }
     }
 
@@ -815,21 +812,13 @@ public class Unit extends FreeColGameObject implements Features, Locatable, Loca
      * @return a <code>Modifier</code> value
      */
     public Modifier getModifier(String id) {
-        Modifier typeModifier = getUnitType().getModifier(id);
-        Modifier playerModifier = getOwner().getModifier(id);
-        if (playerModifier == null || !playerModifier.appliesTo(getUnitType())) {
-            if (typeModifier == null) {
-                return null;
-            } else {
-                return typeModifier;
-            }
-        } else {
-            if (typeModifier == null) {
-                return playerModifier;
-            } else {
-                return Modifier.combine(typeModifier, playerModifier);
-            }
+        ArrayList<Modifier> result = new ArrayList<Modifier>();
+        result.add(getUnitType().getModifier(id));
+        result.add(getOwner().getModifier(id));
+        for (EquipmentType equipmentType : equipment) {
+            result.add(equipmentType.getModifier(id));
         }
+        return Modifier.combine(result.toArray(new Modifier[0]));
     }
     
     /**
