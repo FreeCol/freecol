@@ -1883,6 +1883,8 @@ public class Map extends FreeColGameObject {
             } else if (in.getLocalName().equals(Region.getXMLElementTagName())) {
                 Region region = getRegion(in.getAttributeValue(null, "ID"));
                 region.readFromXMLImpl(in, this);
+            } else {
+                logger.warning("Unknown tag: " + in.getLocalName() + " loading map");
             }
         }
     }

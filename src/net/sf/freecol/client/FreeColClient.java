@@ -454,7 +454,7 @@ public final class FreeColClient {
     }
 
     /**
-     * Gets the <code>GUI</code> that is beeing used to draw the map on the
+     * Gets the <code>GUI</code> that is being used to draw the map on the
      * {@link Canvas}.
      * 
      * @return The <code>GUI</code>.
@@ -506,9 +506,9 @@ public final class FreeColClient {
     // this.windowed = windowed;
     // }
     /**
-     * Sets wether or not this game is a singleplayer game.
+     * Sets whether or not this game is a singleplayer game.
      * 
-     * @param singleplayer Indicates wether or not this game is a singleplayer
+     * @param singleplayer Indicates whether or not this game is a singleplayer
      *            game.
      * @see #isSingleplayer
      */

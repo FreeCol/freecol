@@ -74,7 +74,7 @@ public class FreeColTestCase extends TestCase {
      * until getStandardGame() is called, which resets the singleton to a new
      * value.
      * 
-     * Calling this method repetetively without calling getStandardGame() will
+     * Calling this method repetitively without calling getStandardGame() will
      * result in the same Game being returned.
      * 
      * @return The game singleton.
@@ -238,16 +238,16 @@ public class FreeColTestCase extends TestCase {
         Map map = getTestMap(FreeCol.getSpecification().getTileType("model.tile.plains"), true);
         game.setMap(map);
 
-        Colony colony = new Colony(game, dutch, "New Amsterdam", map.getTile(tileX, tileY));
+        Tile tile = map.getTile(tileX, tileY);
+        Colony colony = new Colony(game, dutch, "New Amsterdam", tile);
 
         UnitType unitType = FreeCol.getSpecification().getUnitType("model.unit.freeColonist");
-        Unit soldier = new Unit(game, map.getTile(tileX, tileY), dutch, unitType, Unit.ACTIVE, true, false, 0, false);
+        Unit soldier = new Unit(game, tile, dutch, unitType, Unit.ACTIVE, true, false, 0, false);
 
         soldier.buildColony(colony);
 
         for (int i = 1; i < numberOfSettlers; i++) {
-            Unit settler = new Unit(game, map.getTile(tileX, tileY), dutch, unitType, Unit.ACTIVE, true, false, 0,
-                                    false);
+            Unit settler = new Unit(game, tile, dutch, unitType, Unit.ACTIVE, true, false, 0, false);
             settler.setLocation(colony);
         }
 

@@ -616,7 +616,7 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
     /**
      * Check if the tile has been explored.
      * 
-     * @return true iff tile is known.
+     * @return true if tile is known.
      */
     public boolean isExplored() {
         return type != null;
@@ -1719,6 +1719,8 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
                 } else {
                     playerExploredTiles[Integer.parseInt(in.getAttributeValue(null, "nation"))].readFromXML(in);
                 }
+            } else {
+                logger.warning("Unknown tag: " + in.getLocalName() + " loading tile");
             }
         }
         if (!settlementSent && settlement != null) {
@@ -2272,13 +2274,14 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
             TileItemContainer tileItemContainer = new TileItemContainer(getGame(), Tile.this);
             while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
                 if (in.getLocalName().equals("missionary")) {
-                    in.nextTag();
+                    in.nextTag(); // advance to the Unit tag
                     missionary = (Unit) getGame().getFreeColGameObject(in.getAttributeValue(null, "ID"));
                     if (missionary == null) {
                         missionary = new Unit(getGame(), in);
                     } else {
                         missionary.readFromXML(in);
                     }
+                    in.nextTag(); // close <missionary> tag
                 } else if (in.getLocalName().equals(Resource.getXMLElementTagName())) {
                     Resource resource = (Resource) getGame().getFreeColGameObject(in.getAttributeValue(null, "ID"));
                     if (resource != null) {
@@ -2295,6 +2298,8 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
                         ti = new TileImprovement(getGame(), in);
                     }
                     tileItemContainer.addTileItem(ti);
+                } else {
+                    logger.warning("Unknown tag: " + in.getLocalName() + " loading PlayerExploredTile");
                 }
             }
             getTileItemInfo(tileItemContainer);
