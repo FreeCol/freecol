@@ -274,39 +274,47 @@ public final class Modifier extends Feature {
     }
 
     /**
-     * Combines several Modifiers. The resulting Modifier is always
-     * unscoped.
+     * Combines several Modifiers, which may be <code>null</code>. The
+     * scopes of the Modifiers are not combined, so that the resulting
+     * Modifier is always unscoped.
      *
      * @param modifiers some modifiers
-     * @return a <code>Modifier</code> value
+     * @return a <code>Modifier</code> value, or <code>null</code> if
+     * the arguments can not be combined
      */
     public static Modifier combine(Modifier... modifiers) {
-        switch(modifiers.length) {
+        String resultId = null;
+        Modifier result = new Modifier(resultId, "result", COMBINED);
+        result.modifiers = new ArrayList<Modifier>();
+
+        for (Modifier modifier : modifiers) {
+            if (modifier == null) {
+                continue;
+            } else if (resultId == null) {
+                // this is the first new modifier
+                resultId = modifier.getId();
+                result.setId(resultId);
+                result.type = modifier.type;
+            } else if (!resultId.equals(modifier.getId())) {
+                return null;
+            } else if (result.type != modifier.type) {
+                result.setType(COMBINED);
+            }
+            if (modifier.modifiers == null) {
+                result.modifiers.add(modifier);
+            } else {
+                result.modifiers.addAll(modifier.modifiers);
+            }
+            result.values[ADDITIVE] += modifier.values[ADDITIVE];
+            result.values[PERCENTAGE] += modifier.values[PERCENTAGE];
+            result.values[MULTIPLICATIVE] *= modifier.values[MULTIPLICATIVE];
+        }
+        switch(result.modifiers.size()) {
         case 0:
             return null;
         case 1:
-            return modifiers[0];
+            return result.modifiers.get(0);
         default:
-            String id = modifiers[0].getId();
-            Modifier result = new Modifier(id, "result", modifiers[0].type);
-            result.modifiers = new ArrayList<Modifier>();
-
-            for (Modifier modifier : modifiers) {
-                if (!id.equals(modifier.getId())) {
-                    return null;
-                }
-                if (result.type != modifier.type) {
-                    result.setType(COMBINED);
-                }
-                if (modifier.modifiers == null) {
-                    result.modifiers.add(modifier);
-                } else {
-                    result.modifiers.addAll(modifier.modifiers);
-                }
-                result.values[ADDITIVE] += modifier.values[ADDITIVE];
-                result.values[PERCENTAGE] += modifier.values[PERCENTAGE];
-                result.values[MULTIPLICATIVE] *= modifier.values[MULTIPLICATIVE];
-            }
             return result;
         }
     }

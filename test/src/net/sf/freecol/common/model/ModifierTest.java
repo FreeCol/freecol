@@ -53,7 +53,7 @@ public class ModifierTest extends FreeColTestCase {
 
         Modifier modifier1 = new Modifier("test", 3, Modifier.ADDITIVE);
         Modifier modifier2 = new Modifier("test", 4, Modifier.ADDITIVE);
-        Modifier modifier = Modifier.combine(modifier1, modifier2);
+        Modifier modifier = Modifier.combine(null, modifier1, modifier2);
         assertTrue(modifier.getType() == Modifier.ADDITIVE);
         assertTrue(modifier.applyTo(1) == 1 + 3 + 4);
         assertTrue(modifier.getModifiers().size() == 2);
@@ -66,7 +66,7 @@ public class ModifierTest extends FreeColTestCase {
 
         Modifier modifier1 = new Modifier("test", 3, Modifier.MULTIPLICATIVE);
         Modifier modifier2 = new Modifier("test", 4, Modifier.MULTIPLICATIVE);
-        Modifier modifier = Modifier.combine(modifier1, modifier2);
+        Modifier modifier = Modifier.combine(modifier1, null, modifier2);
         assertTrue(modifier.getType() == Modifier.MULTIPLICATIVE);
         assertTrue(modifier.applyTo(2) == 2 * 3 * 4);
         assertTrue(modifier.getModifiers().size() == 2);
@@ -78,7 +78,7 @@ public class ModifierTest extends FreeColTestCase {
 
         Modifier modifier1 = new Modifier("test", 3, Modifier.PERCENTAGE);
         Modifier modifier2 = new Modifier("test", 4, Modifier.PERCENTAGE);
-        Modifier modifier = Modifier.combine(modifier1, modifier2);
+        Modifier modifier = Modifier.combine(modifier1, modifier2, null);
         assertTrue(modifier.getType() == Modifier.PERCENTAGE);
         assertTrue(modifier.applyTo(100) == 107f);
         assertTrue(modifier.getModifiers().size() == 2);
@@ -93,7 +93,7 @@ public class ModifierTest extends FreeColTestCase {
         Modifier modifier2 = new Modifier("test", 1.5f, Modifier.MULTIPLICATIVE);
         Modifier modifier3 = new Modifier("test", 50, Modifier.PERCENTAGE);
 
-        Modifier modifier = Modifier.combine(modifier1, modifier2);
+        Modifier modifier = Modifier.combine(null, modifier1, null, modifier2, null);
         assertTrue(modifier.getType() == Modifier.COMBINED);
         assertTrue(modifier.applyTo(1) == (1 + 3) * 1.5f);
         assertTrue(modifier.getModifiers().size() == 2);

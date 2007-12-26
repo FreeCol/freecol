@@ -134,34 +134,42 @@ public final class Ability extends Feature {
     }
 
     /**
-     * Combines several Abilities. The resulting Ability is always
-     * unscoped.
+     * Combines several Abilities, which may be <code>null</code>. The
+     * scopes of the Abilities are not combined, so that the resulting
+     * Ability is always unscoped.
      *
      * @param abilities some abilities
-     * @return a <code>Ability</code> value
+     * @return an <code>Ability</code> value, or <code>null</code> if
+     * the arguments can not be combined
      */
     public static Ability combine(Ability... abilities) {
-        switch(abilities.length) {
+        String resultId = null;
+        Ability result = new Ability(resultId, "result", true);
+        result.abilities = new ArrayList<Ability>();
+
+        for (Ability ability : abilities) {
+            if (ability == null) {
+                continue;
+            } else if (resultId == null) {
+                // this is the first new ability
+                resultId = ability.getId();
+                result.setId(resultId);
+            } else if (!resultId.equals(ability.getId())) {
+                return null;
+            }
+            if (ability.abilities == null) {
+                result.abilities.add(ability);
+            } else {
+                result.abilities.addAll(ability.abilities);
+            }
+            result.value = result.value && ability.value;
+        }
+        switch(result.abilities.size()) {
         case 0:
             return null;
         case 1:
-            return abilities[0];
+            return result.abilities.get(0);
         default:
-            String id = abilities[0].getId();
-            Ability result = new Ability(id, "result", true);
-            result.abilities = new ArrayList<Ability>();
-
-            for (Ability ability : abilities) {
-                if (!id.equals(ability.getId())) {
-                    return null;
-                }
-                if (ability.abilities == null) {
-                    result.abilities.add(ability);
-                } else {
-                    result.abilities.addAll(ability.abilities);
-                }
-                result.value = result.value && ability.value;
-            }
             return result;
         }
     }
