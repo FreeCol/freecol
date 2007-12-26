@@ -402,16 +402,6 @@ public final class Building extends FreeColGameObject implements Features, WorkL
     }
 
     /**
-     * Removes and returns a Feature from this feature set.
-     *
-     * @param oldFeature a <code>Feature</code> value
-     * @return a <code>Feature</code> value
-     */
-    public Feature removeFeature(Feature oldFeature) {
-        return getType().removeFeature(oldFeature);
-    }
-
-    /**
      * Returns the unit type being an expert in this <code>Building</code>.
      * 
      * @return The {@link Unit#getType unit type}.

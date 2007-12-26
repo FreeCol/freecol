@@ -236,16 +236,6 @@ public class FoundingFather extends FreeColGameObjectType implements Features {
     }
 
     /**
-     * Removes and returns a Feature from this feature set.
-     *
-     * @param oldFeature a <code>Feature</code> value
-     * @return a <code>Feature</code> value
-     */
-    public Feature removeFeature(Feature oldFeature) {
-        return featureContainer.removeFeature(oldFeature);
-    }
-
-    /**
      * Get the <code>Upgrades</code> value.
      *
      * @return a <code>Map<UnitType, UnitType></code> value

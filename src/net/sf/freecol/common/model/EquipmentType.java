@@ -165,16 +165,6 @@ public class EquipmentType extends FreeColGameObjectType implements Features {
     }
 
     /**
-     * Removes and returns a Feature from this feature set.
-     *
-     * @param oldFeature a <code>Feature</code> value
-     * @return a <code>Feature</code> value
-     */
-    public Feature removeFeature(Feature oldFeature) {
-        return featureContainer.removeFeature(oldFeature);
-    }
-
-    /**
      * Returns true if this type of equipment is compatible with the
      * given type of equipment.
      *

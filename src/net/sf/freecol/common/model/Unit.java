@@ -844,16 +844,6 @@ public class Unit extends FreeColGameObject implements Features, Locatable, Loca
     }
 
     /**
-     * Removes and returns a Feature from this feature set.
-     *
-     * @param oldFeature a <code>Feature</code> value
-     * @return a <code>Feature</code> value
-     */
-    public Feature removeFeature(Feature oldFeature) {
-        throw new UnsupportedOperationException("Can not remove Feature from Unit directly!");
-    }
-
-    /**
      * Returns true if this unit can be a student.
      *
      * @param teacher the teacher which is trying to teach it

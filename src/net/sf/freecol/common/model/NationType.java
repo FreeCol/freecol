@@ -87,16 +87,6 @@ public abstract class NationType extends FreeColGameObjectType implements Featur
         featureContainer.addFeature(feature);
     }
 
-    /**
-     * Removes and returns a Feature from this feature set.
-     *
-     * @param oldFeature a <code>Feature</code> value
-     * @return a <code>Feature</code> value
-     */
-    public Feature removeFeature(Feature oldFeature) {
-        return featureContainer.removeFeature(oldFeature);
-    }
-
     public String toString() {
         return getName();
     }

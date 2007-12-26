@@ -2032,16 +2032,6 @@ public class Player extends FreeColGameObject implements Features, Nameable {
     }
 
     /**
-     * Removes and returns a Feature from this feature set.
-     *
-     * @param oldFeature a <code>Feature</code> value
-     * @return a <code>Feature</code> value
-     */
-    public Feature removeFeature(Feature oldFeature) {
-        return featureContainer.removeFeature(oldFeature);
-    }
-
-    /**
      * Prepares this <code>Player</code> for a new turn.
      */
     public void newTurn() {
