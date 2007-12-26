@@ -258,7 +258,7 @@ public final class DragListener extends MouseAdapter {
                         separatorNeeded = true;
                     }
 
-                    if (tempUnit.canBeDressedAsMissionary()) {
+                    if (tempUnit.canBeEquippedWith(FreeCol.getSpecification().getEquipmentType("model.equipment.missionary"))) {
 
                         if (tempUnit.isMissionary()) {
                             menuItem = new JMenuItem(Messages.message("cancelMissionaryStatus"));

@@ -31,7 +31,6 @@ import net.sf.freecol.FreeCol;
  */
 public class AbstractUnit extends FreeColObject {
 
-
     /**
      * Describe unitType here.
      */

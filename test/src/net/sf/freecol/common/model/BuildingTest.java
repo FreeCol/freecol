@@ -87,6 +87,21 @@ public class BuildingTest extends FreeColTestCase {
 
     }
 
+    public void testChurch() {
+        Colony colony = getStandardColony(6);
+        BuildingType churchType = FreeCol.getSpecification().getBuildingType("model.building.Chapel");
+        assertFalse(churchType.hasAbility("model.ability.dressMissionary"));
+
+        Building church = colony.getBuilding(churchType);
+        assertTrue(church != null);
+        assertFalse(colony.hasAbility("model.ability.dressMissionary"));
+
+        church.upgrade();
+        assertTrue(church.getType().hasAbility("model.ability.dressMissionary"));
+        assertTrue(colony.hasAbility("model.ability.dressMissionary"));
+        
+    }
+
     public void testCanAddToBuilding() {
     	
         Colony colony = getStandardColony(6);

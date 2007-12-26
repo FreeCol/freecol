@@ -43,7 +43,7 @@ public class EquipmentType extends FreeColGameObjectType implements Features {
     /**
      * A list of AbstractGoods required to build this Type.
      */
-    private List<AbstractGoods> goodsRequired;
+    private List<AbstractGoods> goodsRequired = new ArrayList<AbstractGoods>();
     
     /**
      * Stores the abilities required of a unit to be equipped.

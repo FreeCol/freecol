@@ -490,7 +490,6 @@
       <ability id="model.ability.missionary" value="true"/>
       <required-ability id="model.ability.canBeEquipped" value="true"/>
       <required-location-ability id="model.ability.dressMissionary" value="true"/>
-      <compatible-equipment id="model.equipment.horses"/>
     </equipment-type>
   </equipment-types>
 

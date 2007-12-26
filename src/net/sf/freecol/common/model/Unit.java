@@ -95,7 +95,7 @@ public class Unit extends FreeColGameObject implements Features, Locatable, Loca
 
     private boolean naval;
 
-    private boolean armed, mounted, missionary;
+    private boolean armed, mounted;
 
     private int movesLeft;
 
@@ -243,7 +243,9 @@ public class Unit extends FreeColGameObject implements Features, Locatable, Loca
         this.armed = armed;
         this.mounted = mounted;
         this.numberOfTools = numberOfTools;
-        this.missionary = missionary;
+        if (missionary) {
+            equipment.add(FreeCol.getSpecification().getEquipmentType("model.equipment.missionary"));
+        }
 
         setLocation(location);
 
@@ -2051,15 +2053,19 @@ public class Unit extends FreeColGameObject implements Features, Locatable, Loca
             }
         }
         if (!equipmentType.getLocationAbilitiesRequired().isEmpty()) {
-            if (getLocation() instanceof Features) {
-                Features locationWithFeatures = (Features) getLocation();
-                for (Entry<String, Boolean> entry : equipmentType.getLocationAbilitiesRequired().entrySet()) {
-                    if (locationWithFeatures.hasAbility(entry.getKey()) != entry.getValue()) {
-                        return false;
+            if (isInEurope()) {
+                return true;
+            } else {
+                Colony colony = getColony();
+                if (colony == null) {
+                    return false;
+                } else {
+                    for (Entry<String, Boolean> entry : equipmentType.getLocationAbilitiesRequired().entrySet()) {
+                        if (colony.hasAbility(entry.getKey()) != entry.getValue()) {
+                            return false;
+                        }
                     }
                 }
-            } else {
-                return false;
             }
         }
         return true;
@@ -2102,21 +2108,6 @@ public class Unit extends FreeColGameObject implements Features, Locatable, Loca
     public boolean canBeEquippedWithTools() {
         return isPioneer() || canBeEquipped(Goods.TOOLS, 20);
     }
-
-    /**
-     * Checks if this unit can be dressed as a missionary at the current
-     * location.
-     * 
-     * @return <code>true</code> if it can be dressed as a missionary at the
-     *         current location.
-     */
-    public boolean canBeDressedAsMissionary() {
-        return isMissionary()
-            || ((location instanceof Europe || location instanceof Unit
-                 && ((Unit) location).getLocation() instanceof Europe) 
-                || (getColony() != null && getColony().hasAbility("model.ability.dressMissionary")));
-    }
-
 
     public void equipWith(EquipmentType equipmentType) {
         equipWith(equipmentType, false);
@@ -2326,29 +2317,17 @@ public class Unit extends FreeColGameObject implements Features, Locatable, Loca
      *            otherwise.
      */
     public void setMissionary(boolean b) {
+        // TODO: remove
         logger.finest(getId() + ": Entering method setMissionary with param " + b);
         setMovesLeft(0);
-
+        EquipmentType missionary = FreeCol.getSpecification().getEquipmentType("model.equipment.missionary");
         if (b) {
-            if (!isInEurope() && !getColony().hasAbility("model.ability.dressMissionary")) {
-                throw new IllegalStateException(
-                                                "Can only dress as a missionary when the unit is located in Europe or a Colony with a church.");
-            } else {
-                if (isPioneer()) {
-                    setNumberOfTools(0);
-                }
-
-                if (isArmed()) {
-                    setArmed(false);
-                }
-
-                if (isMounted()) {
-                    setMounted(false);
-                }
+            if (canBeEquippedWith(missionary)) {
+                equipWith(missionary);
             }
+        } else {
+            equipment.remove(missionary);
         }
-
-        missionary = b;
     }
 
     /**
@@ -2358,7 +2337,19 @@ public class Unit extends FreeColGameObject implements Features, Locatable, Loca
      *         otherwise.
      */
     public boolean isMissionary() {
-        return missionary || (hasAbility("model.ability.expertMissionary") && !isArmed() && !isMounted() && !isPioneer());
+        EquipmentType missionary = FreeCol.getSpecification().getEquipmentType("model.equipment.missionary");
+        if (equipment.contains(missionary)) {
+            return true;
+        } else if (hasAbility("model.ability.expertMissionary")) {
+            for (EquipmentType equipmentType : equipment) {
+                if (!missionary.isCompatibleWith(equipmentType)) {
+                    return false;
+                }
+            }
+            return true;
+        } else {
+            return false;
+        }
     }
 
     /**
@@ -2650,7 +2641,7 @@ public class Unit extends FreeColGameObject implements Features, Locatable, Loca
         if (isMounted()) {
             movesLeft = Math.max(12, movesLeft);
         } else if (isMissionary()) {
-            movesLeft = Math.max(6, movesLeft);
+            //movesLeft = Math.max(6, movesLeft);
         }
         Modifier modifier = getModifier("model.modifier.movementBonus");
         if (modifier != null) {
@@ -4481,7 +4472,6 @@ public class Unit extends FreeColGameObject implements Features, Locatable, Loca
         out.writeAttribute("unitType", unitType.getId());
         out.writeAttribute("armed", Boolean.toString(armed));
         out.writeAttribute("mounted", Boolean.toString(mounted));
-        out.writeAttribute("missionary", Boolean.toString(missionary));
         out.writeAttribute("movesLeft", Integer.toString(movesLeft));
         out.writeAttribute("state", Integer.toString(state));
         out.writeAttribute("workLeft", Integer.toString(workLeft));
@@ -4557,6 +4547,14 @@ public class Unit extends FreeColGameObject implements Features, Locatable, Loca
             }
         }
 
+        if (equipment.size() > 0) {
+            String[] equipmentStrings = new String[equipment.size()];
+            for (int index = 0; index < equipment.size(); index++) {
+                equipmentStrings[index] = equipment.get(index).getId();
+            }
+            toArrayElement("equipment", equipmentStrings, out);
+        }
+
         out.writeEndElement();
     }
 
@@ -4573,7 +4571,6 @@ public class Unit extends FreeColGameObject implements Features, Locatable, Loca
         naval = unitType.hasAbility("model.ability.navalUnit");
         armed = Boolean.valueOf(in.getAttributeValue(null, "armed")).booleanValue();
         mounted = Boolean.valueOf(in.getAttributeValue(null, "mounted")).booleanValue();
-        missionary = Boolean.valueOf(in.getAttributeValue(null, "missionary")).booleanValue();
         movesLeft = Integer.parseInt(in.getAttributeValue(null, "movesLeft"));
         state = Integer.parseInt(in.getAttributeValue(null, "state"));
         workLeft = Integer.parseInt(in.getAttributeValue(null, "workLeft"));
@@ -4739,7 +4736,11 @@ public class Unit extends FreeColGameObject implements Features, Locatable, Loca
                 } else {
                     goodsContainer = new GoodsContainer(getGame(), this, in);
                 }
-
+            } else if (in.getLocalName().equals("equipment")) {
+                String[] equipmentStrings = readFromArrayElement("equipment", in, new String[0]);
+                for (String equipmentId : equipmentStrings) {
+                    equipment.add(FreeCol.getSpecification().getEquipmentType(equipmentId));
+                }
             }
         }
         
