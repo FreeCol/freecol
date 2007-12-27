@@ -68,7 +68,7 @@ public class IndianBringGiftMission extends Mission {
     /** The <code>Colony</code> receiving the gift. */
     private Colony target;
 
-    /** Desides wether this mission has been completed or not. */
+    /** Decides whether this mission has been completed or not. */
     private boolean giftDelivered;
 
 
@@ -83,6 +83,7 @@ public class IndianBringGiftMission extends Mission {
         super(aiMain, aiUnit);
 
         this.target = target;
+        this.giftDelivered = false;
 
         if (!getUnit().getOwner().isIndian() || !getUnit().hasAbility("model.ability.carryGoods")) {
             logger.warning("Only an indian which can carry goods can be given the mission: IndianBringGiftMission");
@@ -122,6 +123,12 @@ public class IndianBringGiftMission extends Mission {
      * @param connection The <code>Connection</code> to the server.
      */
     public void doMission(Connection connection) {
+        
+        if (!isValid()) {
+            // the destination colony may have been destroyed
+            return;
+        }
+        
         if (!hasGift()) {
             if (getUnit().getTile() != getUnit().getIndianSettlement().getTile()) {
                 // Move to the owning settlement:
@@ -256,7 +263,10 @@ public class IndianBringGiftMission extends Mission {
         out.writeStartElement(getXMLElementTagName());
 
         out.writeAttribute("unit", getUnit().getId());
-        out.writeAttribute("target", target.getId());
+        if (target!=null) {
+            // the destination colony is still alive
+            out.writeAttribute("target", target.getId());
+        }
         out.writeAttribute("giftDelivered", Boolean.toString(giftDelivered));
 
         out.writeEndElement();
