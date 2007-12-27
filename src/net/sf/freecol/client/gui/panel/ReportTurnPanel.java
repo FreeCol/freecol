@@ -284,62 +284,68 @@ public final class ReportTurnPanel extends ReportPanel implements ActionListener
                 insertText(input.substring(0));
                 return;
             } else if (start > 0) {
-                // output any string before the first occurence of '%'
+                // output any string before the first occurrence of '%'
                 insertText(input.substring(0, start));
             }
             int end;
 
-            loop: while ((end = input.indexOf('%', start + 1)) >= 0) {
+            while ((end = input.indexOf('%', start + 1)) >= 0) {
                 String var = input.substring(start, end + 1);
-                for (String[] item : message.getData()) {
-                    if (item == null || item.length != 2) {
-                        logger.warning("Data has a wrong format for message: " + message);
-                    } else if (item[0] == null || item[1] == null) {
-                        logger.warning("Data in model message is 'null': " + message + ", " +
-                                       item[0] + ", " + item[1]);
-                    } else if (var.equals(item[0])) {
-                        // found variable to replace
-                        if (var.equals("%colony%")) {
-                            Colony colony = player.getColony(item[1]);
-                            if (colony != null) {
-                                insertLinkButton(colony, colony.getName());
-                            } else {
-                                insertText(item[1]);
-                            }
-                        } else if (var.equals("%europe%")) {
-                            insertLinkButton(player.getEurope(), player.getEurope().getName());
-                        } else if ((var.equals("%unit%") ||
-                                    var.equals("%newName%")) &&
-                                   message.getSource() instanceof Unit) {
-                            Tile tile = ((Unit) message.getSource()).getTile();
-                            if (tile != null) {
-                                insertLinkButton(tile, item[1]);
-                            } else {
-                                insertText(item[1]);
-                            }
+                String[] item = findReplacementData(message, var);
+                if (item!=null && var.equals(item[0])) {
+                    // found variable to replace
+                    if (var.equals("%colony%")) {
+                        Colony colony = player.getColony(item[1]);
+                        if (colony != null) {
+                            insertLinkButton(colony, colony.getName());
                         } else {
                             insertText(item[1]);
                         }
-                        start = end + 1;
-                        continue loop;
+                    } else if (var.equals("%europe%")) {
+                        insertLinkButton(player.getEurope(), player.getEurope().getName());
+                    } else if ((var.equals("%unit%") ||
+                                var.equals("%newName%")) &&
+                               message.getSource() instanceof Unit) {
+                        Tile tile = ((Unit) message.getSource()).getTile();
+                        if (tile != null) {
+                            insertLinkButton(tile, item[1]);
+                        } else {
+                            insertText(item[1]);
+                        }
+                    } else {
+                        insertText(item[1]);
                     }
+                    start = end + 1;
+                } else {
+                    // found no variable to replace: either a single '%', or
+                    // some unnecessary variable
+                    insertText(input.substring(start, end));
+                    start = end;
                 }
-
-                // found no variable to replace: either a single '%', or
-                // some unnecessary variable
-                insertText(input.substring(start, end));
-                start = end;
             }
 
-            // output any string after the last occurence of '%'
+            // output any string after the last occurrence of '%'
             if (start < input.length()) {
                 insertText(input.substring(start));
             }
         } catch(Exception e) {
             logger.warning(e.toString());
         }
+    }
+    
+    private String[] findReplacementData(ModelMessage message, String variable) {
         
-
+        for (String[] item : message.getData()) {
+            if (item == null || item.length != 2) {
+                logger.warning("Data has a wrong format for message: " + message);
+            } else if (item[0] == null || item[1] == null) {
+                logger.warning("Data in model message is 'null': " + message + ", " +
+                               item[0] + ", " + item[1]);
+            } else if (variable.equals(item[0])) {
+                return item;
+            }
+        }
+        return null;
     }
 
     private void insertText(String text) throws Exception {
@@ -363,7 +369,7 @@ public final class ReportTurnPanel extends ReportPanel implements ActionListener
 
 
     /**
-     * This function analyses an event and calls the right methods to take care
+     * This function analyzes an event and calls the right methods to take care
      * of the user's requests.
      * 
      * @param event The incoming ActionEvent.
