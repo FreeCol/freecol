@@ -1213,6 +1213,7 @@ public class IndianSettlement extends Settlement {
                 Unit u = (Unit) getGame().getFreeColGameObject(token);
                 if (u == null) {
                     u = new Unit(getGame(), token);
+                    owner.setUnit(u);
                 }
                 ownedUnits.add(u);
             }
