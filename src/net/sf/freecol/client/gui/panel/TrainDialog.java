@@ -116,7 +116,7 @@ public final class TrainDialog extends FreeColDialog implements ActionListener {
         int row = 1;
         int counter = 0;
         for (UnitType unitType : trainableUnits) {
-            int graphicsType = ImageLibrary.getUnitGraphicsType(unitType.getIndex(), false, false, 0, false);
+            int graphicsType = ImageLibrary.getUnitGraphicsType(unitType.getIndex(), false, false, false, false);
             JButton newButton = new JButton(unitType.getName(), 
                                             library.getScaledUnitImageIcon(graphicsType, 0.66f));
             newButton.setActionCommand(unitType.getId());

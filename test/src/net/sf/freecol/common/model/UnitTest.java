@@ -64,7 +64,8 @@ public class UnitTest extends FreeColTestCase {
         Tile plain = map.getTile(5, 8);
         map.getTile(5, 8).setExploredBy(dutch, true);
 
-        Unit hardyPioneer = new Unit(game, plain, dutch, spec().getUnitType("model.unit.hardyPioneer"), Unit.ACTIVE, false, false, 100, false);
+        Unit hardyPioneer = new Unit(game, plain, dutch, spec().getUnitType("model.unit.hardyPioneer"), 
+                                     Unit.ACTIVE);
 
         // Before
         assertEquals(3, hardyPioneer.getMovesLeft());
@@ -113,8 +114,8 @@ public class UnitTest extends FreeColTestCase {
         Tile plain58 = map.getTile(5, 8);
 
         // Found colony on 6,8
-        Unit soldier = new Unit(game, map.getTile(6, 8), dutch, spec().getUnitType("model.unit.veteranSoldier"), Unit.ACTIVE, true, false, 0,
-                false);
+        Unit soldier = new Unit(game, map.getTile(6, 8), dutch, spec().getUnitType("model.unit.veteranSoldier"),
+                                Unit.ACTIVE);
 
         Colony colony = new Colony(game, dutch, "New Amsterdam", soldier.getTile());
         soldier.setWorkType(Goods.FOOD);
@@ -122,7 +123,8 @@ public class UnitTest extends FreeColTestCase {
 
         soldier.setLocation(colony.getColonyTile(plain58));
 
-        Unit hardyPioneer = new Unit(game, plain58, dutch, spec().getUnitType("model.unit.hardyPioneer"), Unit.ACTIVE, false, false, 100, false);
+        Unit hardyPioneer = new Unit(game, plain58, dutch, spec().getUnitType("model.unit.hardyPioneer"), 
+                                     Unit.ACTIVE);
 
         // Before
         assertEquals(0, colony.getGoodsCount(Goods.FOOD));
@@ -179,7 +181,7 @@ public class UnitTest extends FreeColTestCase {
         map.getTile(5, 8).setExploredBy(dutch, true);
 
         Unit hardyPioneer = new Unit(game, plain, dutch, spec().getUnitType("model.unit.hardyPioneer"),
-                                     Unit.ACTIVE, false, false, 100, false);
+                                     Unit.ACTIVE);
 
         // Before
         assertEquals(3, hardyPioneer.getMovesLeft());
@@ -217,7 +219,8 @@ public class UnitTest extends FreeColTestCase {
 
         Tile tile = new Tile(game, tileType, 0, 0);
 
-        Unit unit = new Unit(game, tile, dutch, unitType, Unit.ACTIVE, false, false, 100, false);
+        EquipmentType tools = spec().getEquipmentType("model.equipment.tools");
+        Unit unit = new Unit(game, tile, dutch, unitType, Unit.ACTIVE, tools, tools, tools, tools, tools);
 
         TileImprovement improvement = tile.findTileImprovementType(whichWork);
         if (improvement == null) {
@@ -322,8 +325,8 @@ public class UnitTest extends FreeColTestCase {
     }
 
     /**
-     * Make sure that a colony can only be build by a worker on the same tile as
-     * the colony to be build.
+     * Make sure that a colony can only be built by a worker on the
+     * same tile as the colony to be built.
      * 
      */
     public void testBuildColonySameTile() {
@@ -333,7 +336,7 @@ public class UnitTest extends FreeColTestCase {
         game.setMap(map);
 
         Unit soldier = new Unit(game, map.getTile(6, 8), dutch, spec().getUnitType("model.unit.veteranSoldier"),
-                                Unit.ACTIVE, true, false, 0, false);
+                                Unit.ACTIVE);
 
         Colony colony = new Colony(game, dutch, "New Amsterdam", map.getTile(6, 9));
         soldier.setWorkType(Goods.FOOD);
@@ -356,15 +359,15 @@ public class UnitTest extends FreeColTestCase {
         Player dutch = game.getPlayer("model.nation.dutch");
 
         Unit galleon = new Unit(game, null, dutch, spec().getUnitType("model.unit.galleon"),
-                                Unit.ACTIVE, false, false, 0, false);
+                                Unit.ACTIVE);
         Unit caravel = new Unit(game, null, dutch, spec().getUnitType("model.unit.caravel"),
-                                Unit.ACTIVE, false, false, 0, false);
+                                Unit.ACTIVE);
         Unit colonist = new Unit(game, null, dutch, spec().getUnitType("model.unit.freeColonist"),
-                                 Unit.ACTIVE, false, false, 0, false);
+                                 Unit.ACTIVE);
         Unit wagonTrain = new Unit(game, null, dutch, spec().getUnitType("model.unit.wagonTrain"),
-                                   Unit.ACTIVE, false, false, 0, false);
+                                   Unit.ACTIVE);
         Unit treasureTrain = new Unit(game, null, dutch, spec().getUnitType("model.unit.treasureTrain"),
-                                      Unit.ACTIVE, false, false, 0, false);
+                                      Unit.ACTIVE);
 
         // tests according to standard rules
         assertTrue(galleon.canAdd(colonist));

@@ -389,7 +389,7 @@ public class MapGenerator {
 
         for (int i = 0; i < (kind * 2) + 4; i++) {
             UnitType unitType = FreeCol.getSpecification().getUnitType("model.unit.brave");
-            Unit unit = new Unit(map.getGame(), player, unitType);
+            Unit unit = new Unit(map.getGame(), settlement, player, unitType, Unit.ACTIVE, unitType.getDefaultEquipment());
             unit.setIndianSettlement(settlement);
 
             if (i == 0) {
@@ -520,8 +520,7 @@ public class MapGenerator {
                 .getStartingUnits();
             for (AbstractUnit startingUnit : unitList) {
                 Unit newUnit = new Unit(map.getGame(), startTile, player, startingUnit.getUnitType(),
-                                        Unit.SENTRY, startingUnit.isArmed(), startingUnit.isMounted(),
-                                        startingUnit.getTools(), startingUnit.isMissionary());
+                                        Unit.SENTRY, startingUnit.getEquipment());
                 if (newUnit.hasAbility("model.ability.carryUnits")) {
                     carrier = newUnit;
                     carrier.setState(Unit.ACTIVE);

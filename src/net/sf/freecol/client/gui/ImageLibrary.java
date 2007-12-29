@@ -1633,7 +1633,7 @@ public final class ImageLibrary extends ImageProvider {
      * @return The graphics that will represent the given unit.
      */
     public int getUnitGraphicsType(Unit unit) {
-        return getUnitGraphicsType(unit.getType(), unit.isArmed(), unit.isMounted(), unit.getNumberOfTools(), unit
+        return getUnitGraphicsType(unit.getType(), unit.isArmed(), unit.isMounted(), unit.isPioneer(), unit
                 .isMissionary());
     }
 
@@ -1643,11 +1643,11 @@ public final class ImageLibrary extends ImageProvider {
      * @param type The type of unit whose graphics type is needed.
      * @param armed Whether the unit is armed.
      * @param mounted Whether the unit is mounted.
-     * @param numberOfTools The number of tools this unit has.
+     * @param pioneer Whether this unit has tools.
      * @param missionary Whether the unit is missionary.
      * @return The graphics that will represent the given unit.
      */
-    public static int getUnitGraphicsType(int type, boolean armed, boolean mounted, int numberOfTools,
+    public static int getUnitGraphicsType(int type, boolean armed, boolean mounted, boolean pioneer,
             boolean missionary) {
         switch (type) {
         case Unit.FREE_COLONIST:
@@ -1675,7 +1675,7 @@ public final class ImageLibrary extends ImageProvider {
                 return SOLDIER;
             } else if (mounted) {
                 return UNARMED_DRAGOON;
-            } else if (numberOfTools > 0) {
+            } else if (pioneer) {
                 return FREE_COLONIST_WITH_TOOLS;
             } else if (missionary) {
                 return MISSIONARY_FREE_COLONIST;
@@ -1692,7 +1692,7 @@ public final class ImageLibrary extends ImageProvider {
                 return SOLDIER;
             } else if (mounted) {
                 return SEASONED_SCOUT_MOUNTED;
-            } else if (numberOfTools > 0) {
+            } else if (pioneer) {
                 return FREE_COLONIST_WITH_TOOLS;
             } else if (missionary) {
                 return MISSIONARY_FREE_COLONIST;
@@ -1706,7 +1706,7 @@ public final class ImageLibrary extends ImageProvider {
                 return SOLDIER;
             } else if (mounted) {
                 return UNARMED_DRAGOON;
-            } else if (numberOfTools > 0) {
+            } else if (pioneer) {
                 return HARDY_PIONEER_WITH_TOOLS;
             } else if (missionary) {
                 return MISSIONARY_FREE_COLONIST;
@@ -1720,7 +1720,7 @@ public final class ImageLibrary extends ImageProvider {
                 return VETERAN_SOLDIER;
             } else if (mounted) {
                 return UNARMED_VETERAN_DRAGOON;
-            } else if (numberOfTools > 0) {
+            } else if (pioneer) {
                 return FREE_COLONIST_WITH_TOOLS;
             } else if (missionary) {
                 return MISSIONARY_FREE_COLONIST;
@@ -1734,7 +1734,7 @@ public final class ImageLibrary extends ImageProvider {
                 return SOLDIER;
             } else if (mounted) {
                 return UNARMED_DRAGOON;
-            } else if (numberOfTools > 0) {
+            } else if (pioneer) {
                 return FREE_COLONIST_WITH_TOOLS;
             } else if (missionary) {
                 return JESUIT_MISSIONARY;
@@ -1748,7 +1748,7 @@ public final class ImageLibrary extends ImageProvider {
                 return SOLDIER;
             } else if (mounted) {
                 return UNARMED_DRAGOON;
-            } else if (numberOfTools > 0) {
+            } else if (pioneer) {
                 return FREE_COLONIST_WITH_TOOLS;
             } else if (missionary) {
                 return MISSIONARY_FREE_COLONIST;
@@ -1762,7 +1762,7 @@ public final class ImageLibrary extends ImageProvider {
                 return SOLDIER;
             } else if (mounted) {
                 return UNARMED_DRAGOON;
-            } else if (numberOfTools > 0) {
+            } else if (pioneer) {
                 return FREE_COLONIST_WITH_TOOLS;
             } else if (missionary) {
                 return MISSIONARY_FREE_COLONIST;
@@ -1776,7 +1776,7 @@ public final class ImageLibrary extends ImageProvider {
                 return SOLDIER;
             } else if (mounted) {
                 return UNARMED_DRAGOON;
-            } else if (numberOfTools > 0) {
+            } else if (pioneer) {
                 return FREE_COLONIST_WITH_TOOLS;
             } else if (missionary) {
                 return MISSIONARY_FREE_COLONIST;
@@ -1800,7 +1800,7 @@ public final class ImageLibrary extends ImageProvider {
                 return COLONIAL_REGULAR;
             } else if (mounted) {
                 return UNARMED_COLONIAL_CAVALRY;
-            } else if (numberOfTools > 0) {
+            } else if (pioneer) {
                 return FREE_COLONIST_WITH_TOOLS;
             } else if (missionary) {
                 return MISSIONARY_FREE_COLONIST;

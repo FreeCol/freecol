@@ -95,8 +95,6 @@ public class Unit extends FreeColGameObject implements Features, Locatable, Loca
 
     private boolean naval;
 
-    private boolean armed, mounted;
-
     private int movesLeft;
 
     private int state;
@@ -201,15 +199,11 @@ public class Unit extends FreeColGameObject implements Features, Locatable, Loca
      *            <code>Unit</code> upon.
      * @param owner The <code>Player</code> owning this unit.
      * @param type The type of the unit.
-     * @param s The initial state for this Unit (one of {@link #ACTIVE},
+     * @param state The initial state for this Unit (one of {@link #ACTIVE},
      *            {@link #FORTIFIED}...).
      */
-    public Unit(Game game, Location location, Player owner, UnitType type, int s) {
-        this(game, location, owner, type, s,
-             type.hasAbility("model.ability.expertSoldier"),
-             type.hasAbility("model.ability.expertScout"),
-             type.hasAbility("model.ability.expertPioneer") ? 100 : 0,
-             type.hasAbility("model.ability.expertMissionary"));
+    public Unit(Game game, Location location, Player owner, UnitType type, int state) {
+        this(game, location, owner, type, state, type.getDefaultEquipment());
     }
 
     /**
@@ -221,7 +215,7 @@ public class Unit extends FreeColGameObject implements Features, Locatable, Loca
      *            <code>Unit</code> upon.
      * @param owner The <code>Player</code> owning this unit.
      * @param type The type of the unit.
-     * @param s The initial state for this Unit (one of {@link #ACTIVE},
+     * @param state The initial state for this Unit (one of {@link #ACTIVE},
      *            {@link #FORTIFIED}...).
      * @param armed Determines wether the unit should be armed or not.
      * @param mounted Determines wether the unit should be mounted or not.
@@ -229,8 +223,8 @@ public class Unit extends FreeColGameObject implements Features, Locatable, Loca
      * @param missionary Determines wether this unit should be dressed like a
      *            missionary or not.
      */
-    public Unit(Game game, Location location, Player owner, UnitType type, int s, boolean armed, boolean mounted,
-                int numberOfTools, boolean missionary) {
+    public Unit(Game game, Location location, Player owner, UnitType type, int state, 
+                EquipmentType... initialEquipment) {
         super(game);
 
         visibleGoodsCount = -1;
@@ -240,22 +234,18 @@ public class Unit extends FreeColGameObject implements Features, Locatable, Loca
         this.owner = owner;
         unitType = type;
         naval = unitType.hasAbility("model.ability.navalUnit");
-        this.armed = armed;
-        this.mounted = mounted;
-        this.numberOfTools = numberOfTools;
-        if (missionary) {
-            equipment.add(FreeCol.getSpecification().getEquipmentType("model.equipment.missionary"));
-        }
-
         setLocation(location);
 
-        state = s;
+        this.state = state;
         workLeft = -1;
         workType = Goods.FOOD;
 
         this.movesLeft = getInitialMovesLeft();
         hitpoints = getInitialHitpoints(getUnitType());
 
+        for (EquipmentType equipmentType : initialEquipment) {
+            equipment.add(equipmentType);
+        }
         getOwner().setUnit(this);
         getOwner().invalidateCanSeeTiles();
     }
@@ -1345,9 +1335,9 @@ public class Unit extends FreeColGameObject implements Features, Locatable, Loca
                     return ENTER_SETTLEMENT_WITH_CARRIER_AND_GOODS;
                 } else if (settlement instanceof IndianSettlement) {
                     IndianSettlement indian = (IndianSettlement) settlement;
-                    if (isScout()) {
+                    if (hasAbility("model.ability.scoutIndianSettlement")) {
                         return ENTER_INDIAN_VILLAGE_WITH_SCOUT;
-                    } else if (isMissionary()) {
+                    } else if (hasAbility("model.ability.missionary")) {
                         return ENTER_INDIAN_VILLAGE_WITH_MISSIONARY;
                     } else if (isOffensiveUnit()) {
                         return ATTACK;
@@ -1357,7 +1347,7 @@ public class Unit extends FreeColGameObject implements Features, Locatable, Loca
                         return ILLEGAL_MOVE;
                     }
                 } else if (settlement instanceof Colony) {
-                    if (isScout()) {
+                    if (hasAbility("model.ability.scoutForeignColony")) {
                         return ENTER_FOREIGN_COLONY_WITH_SCOUT;
                     } else if (isOffensiveUnit()) {
                         return ATTACK;
@@ -1445,24 +1435,11 @@ public class Unit extends FreeColGameObject implements Features, Locatable, Loca
      */
     public int getLineOfSight() {
         int line = unitType.getLineOfSight();
-        if (isScout()) {
-            line = 2;
-        }
-        if (!isNaval() && getOwner().hasFather(FreeCol.getSpecification().getFoundingFather("model.foundingFather.hernandoDeSoto"))) {
-            line++;
+        Modifier modifier = getModifier("model.modifier.lineOfSightBonus");
+        if (modifier != null) {
+            line = (int) modifier.applyTo(line);
         }
         return line;
-    }
-
-    /**
-     * Checks if this <code>Unit</code> is a scout.
-     * 
-     * @return <i>true</i> if this <code>Unit</code> is a scout and <i>false</i>
-     *         otherwise.
-     */
-    public boolean isScout() {
-
-        return isMounted() && !isArmed();
     }
 
     /**
@@ -1849,13 +1826,9 @@ public class Unit extends FreeColGameObject implements Features, Locatable, Loca
             throw new IllegalStateException("Can only set a 'Unit'  to a 'WorkLocation' that is on the same 'Tile'.");
         }
 
-        if (armed)
-            setArmed(false);
-        if (mounted)
-            setMounted(false);
-        if (isPioneer())
-            setNumberOfTools(0);
-
+        for (EquipmentType equipmentType : equipment) {
+            removeEquipment(equipmentType);
+        }
         setState(Unit.IN_COLONY);
 
         setLocation(workLocation);
@@ -1870,7 +1843,7 @@ public class Unit extends FreeColGameObject implements Features, Locatable, Loca
      */
     public void work(TileImprovement improvement) {
     	
-    	if (!isPioneer()) {
+    	if (!hasAbility("model.ability.improveTerrain")) {
             throw new IllegalStateException("Only 'Pioneers' can perform TileImprovement.");
         }
     	
@@ -1932,6 +1905,12 @@ public class Unit extends FreeColGameObject implements Features, Locatable, Loca
                     }
                 }
             }
+            if (!(newLocation instanceof Building &&
+                  ((Building) newLocation).hasAbility("model.ability.teach")) &&
+                student != null) {
+                student.setTeacher(null);
+                student = null;
+            }
         } else {
             if (teacher != null) {
                 teacher.setStudent(null);
@@ -1942,7 +1921,7 @@ public class Unit extends FreeColGameObject implements Features, Locatable, Loca
                 student = null;
             }
         }
-        
+
         // Check for adjacent units owned by a player that our owner has not met
         // before:
         if (getGame().getMap() != null && location != null && location instanceof Tile && !isNaval()) {
@@ -2039,7 +2018,7 @@ public class Unit extends FreeColGameObject implements Features, Locatable, Loca
      *         location.
      */
     private boolean canBeEquipped(GoodsType equipType, int amount) {
-        return ((getGoodsDumpLocation() != null && getGoodsDumpLocation().getGoodsCount(equipType) >= amount) ||
+        return ((getColony() != null && getColony().getGoodsCount(equipType) >= amount) ||
                 ((location instanceof Europe || location instanceof Unit
                   && ((Unit) location).getLocation() instanceof Europe)
                  && getOwner().getGold() >= getOwner().getMarket().getBidPrice(equipType, amount) && 
@@ -2068,45 +2047,25 @@ public class Unit extends FreeColGameObject implements Features, Locatable, Loca
                 }
             }
         }
+        int count = 1;
+        for (EquipmentType oldType : equipment) {
+            if (oldType == equipmentType) {
+                count++;
+            }
+        }
+        if (count > equipmentType.getMaximumCount()) {
+            return false;
+        }
         return true;
     }
 
-    private boolean equipmentCanBeBuilt(EquipmentType equipmentType) {
+    public boolean equipmentCanBeBuilt(EquipmentType equipmentType) {
         for (AbstractGoods requiredGoods : equipmentType.getGoodsRequired()) {
             if (!canBeEquipped(requiredGoods.getType(), requiredGoods.getAmount())) {
                 return false;
             }
         }
         return true;
-    }
-
-    /**
-     * Checks if this unit can be armed in the current location.
-     * 
-     * @return <code>true</code> if it can be armed at the current location.
-     */
-    public boolean canBeArmed() {
-        return isArmed() || canBeEquipped(Goods.MUSKETS, 50);
-    }
-
-    /**
-     * Checks if this unit can be mounted in the current location.
-     * 
-     * @return <code>true</code> if it can mount a horse at the current
-     *         location.
-     */
-    public boolean canBeMounted() {
-        return isMounted() || canBeEquipped(Goods.HORSES, 50);
-    }
-
-    /**
-     * Checks if this unit can be equiped with tools in the current location.
-     * 
-     * @return <code>true</code> if it can be equipped with tools at the
-     *         current location.
-     */
-    public boolean canBeEquippedWithTools() {
-        return isPioneer() || canBeEquipped(Goods.TOOLS, 20);
     }
 
     public void equipWith(EquipmentType equipmentType) {
@@ -2118,7 +2077,7 @@ public class Unit extends FreeColGameObject implements Features, Locatable, Loca
             logger.fine("Unable to equip unit " + getId() + " with " + equipmentType.getName());
             return;
         }
-        if (!(asResultOfCombat  || equipmentCanBeBuilt(equipmentType))) {
+        if (!(asResultOfCombat || equipmentCanBeBuilt(equipmentType))) {
             logger.fine("Unable to build equipment " + equipmentType.getName());
             return;
         }
@@ -2126,23 +2085,13 @@ public class Unit extends FreeColGameObject implements Features, Locatable, Loca
         while (equipmentIterator.hasNext()) {
             EquipmentType oldEquipment = equipmentIterator.next();
             if (!oldEquipment.isCompatibleWith(equipmentType)) {
-                if (getGoodsDumpLocation() != null) {
-                    for (AbstractGoods goods : oldEquipment.getGoodsRequired()) {
-                        getGoodsDumpLocation().addGoods(goods.getType(), goods.getAmount());
-                    }
-                } else if (isInEurope()) {
-                    for (AbstractGoods goods : oldEquipment.getGoodsRequired()) {
-                        getOwner().getMarket().sell(goods.getType(), goods.getAmount(), getOwner());
-                    }
-                } else if (!asResultOfCombat) {
-                    throw new IllegalStateException();
-                }
+                dumpEquipment(oldEquipment, asResultOfCombat);
                 equipmentIterator.remove();
             }
         }
-        if (getGoodsDumpLocation() != null) {
+        if (getColony() != null) {
             for (AbstractGoods goods : equipmentType.getGoodsRequired()) {
-                getGoodsDumpLocation().removeGoods(goods.getType(), goods.getAmount());
+                getColony().removeGoods(goods.getType(), goods.getAmount());
             }
         } else if (isInEurope()) {
             for (AbstractGoods goods : equipmentType.getGoodsRequired()) {
@@ -2152,148 +2101,34 @@ public class Unit extends FreeColGameObject implements Features, Locatable, Loca
         equipment.add(equipmentType);
     }        
 
-    
-
-    /**
-     * Sets the armed attribute of this unit.
-     * 
-     * @param b <i>true</i> if this unit should be armed and <i>false</i>
-     *            otherwise.
-     * @param isCombat Whether this is a result of combat. That is; do not pay
-     *            for the muskets.
-     * 
-     */
-    public void setArmed(boolean b, boolean isCombat) {
-        if (isCombat) {
-            armed = b; // No questions asked.
-            return;
-        }
-
-        setMovesLeft(0);
-
-        if (b) {
-            if (isPioneer()) {
-                setNumberOfTools(0);
-            }
-
-            if (isMissionary()) {
-                setMissionary(false);
-            }
-        }
-
-        if ((b) && (!armed)) {
-            if (getGoodsDumpLocation() != null) {
-                if (getGoodsDumpLocation().getGoodsCount(Goods.MUSKETS) < 50) {
-                    return;
-                }
-
-                getGoodsDumpLocation().removeGoods(Goods.MUSKETS, 50);
-                armed = true;
-            } else if (isInEurope()) {
-                getOwner().getMarket().buy(Goods.MUSKETS, 50, getOwner());
-                armed = true;
-            } else {
-                logger.warning("Attempting to arm a soldier outside of a colony or Europe!");
-            }
-        } else if ((!b) && (armed)) {
-            armed = false;
-
-            if (getGoodsDumpLocation() != null) {
-                getGoodsDumpLocation().addGoods(Goods.MUSKETS, 50);
-            } else if (isInEurope()) {
-                getOwner().getMarket().sell(Goods.MUSKETS, 50, getOwner());
-            } else {
-                throw new IllegalStateException();
-            }
-        }
+    public void removeEquipment(EquipmentType equipmentType) {
+        removeEquipment(equipmentType, false);
     }
 
-    /**
-     * Sets the armed attribute of this unit.
-     * 
-     * @param b <i>true</i> if this unit should be armed and <i>false</i>
-     *            otherwise.
-     */
-    public void setArmed(boolean b) {
-        setArmed(b, false);
+    public void removeEquipment(EquipmentType equipmentType, boolean asResultOfCombat) {
+        dumpEquipment(equipmentType, asResultOfCombat);
+        equipment.remove(equipmentType);
     }
 
-    /**
-     * Checks if this <code>Unit</code> is currently armed.
-     * 
-     * @return <i>true</i> if this unit is armed and <i>false</i> otherwise.
-     */
-    public boolean isArmed() {
-        return armed;
-    }
-
-    /**
-     * Sets the mounted attribute of this unit.
-     * 
-     * @param b <i>true</i> if this unit should be mounted and <i>false</i>
-     *            otherwise.
-     * @param isCombat Whether this is a result of combat.
-     */
-    public void setMounted(boolean b, boolean isCombat) {
-        if (isCombat) {
-            mounted = b; // No questions asked.
-            return;
+    public void removeAllEquipment(boolean asResultOfCombat) {
+        for (EquipmentType equipmentType : equipment) {
+            dumpEquipment(equipmentType, asResultOfCombat);
         }
-
-        setMovesLeft(0);
-
-        if (b) {
-            if (isPioneer()) {
-                setNumberOfTools(0);
-            }
-
-            if (isMissionary()) {
-                setMissionary(false);
-            }
-        }
-
-        if ((b) && (!mounted)) {
-            if (getGoodsDumpLocation() != null) {
-                if (getGoodsDumpLocation().getGoodsCount(Goods.HORSES) < 50) {
-                    throw new IllegalStateException();
-                }
-
-                getGoodsDumpLocation().removeGoods(Goods.HORSES, 50);
-                mounted = true;
-            } else if (isInEurope()) {
-                getOwner().getMarket().buy(Goods.HORSES, 50, getOwner());
-                mounted = true;
-            } else {
-                logger.warning("Attempting to mount a colonist outside of a colony or Europe!");
-            }
-        } else if ((!b) && (mounted)) {
-            mounted = false;
-
-            if (getGoodsDumpLocation() != null) {
-                getGoodsDumpLocation().addGoods(Goods.HORSES, 50);
-            } else if (isInEurope()) {
-                getOwner().getMarket().sell(Goods.HORSES, 50, getOwner());
-            }
-        }
+        equipment.clear();
     }
 
-    /**
-     * Sets the mounted attribute of this unit.
-     * 
-     * @param b <i>true</i> if this unit should be mounted and <i>false</i>
-     *            otherwise.
-     */
-    public void setMounted(boolean b) {
-        setMounted(b, false);
-    }
-
-    /**
-     * Checks if this <code>Unit</code> is currently mounted.
-     * 
-     * @return <i>true</i> if this unit is mounted and <i>false</i> otherwise.
-     */
-    public boolean isMounted() {
-        return mounted;
+    private void dumpEquipment(EquipmentType equipmentType, boolean asResultOfCombat) {
+        if (getColony() != null) {
+            for (AbstractGoods goods : equipmentType.getGoodsRequired()) {
+                getColony().addGoods(goods.getType(), goods.getAmount());
+            }
+        } else if (isInEurope()) {
+            for (AbstractGoods goods : equipmentType.getGoodsRequired()) {
+                getOwner().getMarket().sell(goods.getType(), goods.getAmount(), getOwner());
+            }
+        } else if (!asResultOfCombat) {
+            throw new IllegalStateException();
+        }
     }
 
     /**
@@ -2311,26 +2146,6 @@ public class Unit extends FreeColGameObject implements Features, Locatable, Loca
     }
 
     /**
-     * Sets the unit to be a missionary.
-     * 
-     * @param b <i>true</i> if the unit should be a missionary and <i>false</i>
-     *            otherwise.
-     */
-    public void setMissionary(boolean b) {
-        // TODO: remove
-        logger.finest(getId() + ": Entering method setMissionary with param " + b);
-        setMovesLeft(0);
-        EquipmentType missionary = FreeCol.getSpecification().getEquipmentType("model.equipment.missionary");
-        if (b) {
-            if (canBeEquippedWith(missionary)) {
-                equipWith(missionary);
-            }
-        } else {
-            equipment.remove(missionary);
-        }
-    }
-
-    /**
      * Checks if this <code>Unit</code> is a missionary.
      * 
      * @return 'true' if this colonist is dressed as a missionary, 'false'
@@ -2338,18 +2153,24 @@ public class Unit extends FreeColGameObject implements Features, Locatable, Loca
      */
     public boolean isMissionary() {
         EquipmentType missionary = FreeCol.getSpecification().getEquipmentType("model.equipment.missionary");
-        if (equipment.contains(missionary)) {
-            return true;
-        } else if (hasAbility("model.ability.expertMissionary")) {
-            for (EquipmentType equipmentType : equipment) {
-                if (!missionary.isCompatibleWith(equipmentType)) {
-                    return false;
-                }
+        return equipment.contains(missionary) || hasAbility("model.ability.expertMissionary");
+    }
+
+    public boolean isPioneer() {
+        //TODO: make this more generic
+        EquipmentType tools = FreeCol.getSpecification().getEquipmentType("model.equipment.tools");
+        return equipment.contains(tools) || hasAbility("model.ability.expertPioneer");
+    }
+        
+    public int getNumberOfTools() {
+        int count = 0;
+        EquipmentType tools = FreeCol.getSpecification().getEquipmentType("model.equipment.tools");
+        for (EquipmentType equipmentType : equipment) {
+            if (tools == equipmentType) {
+                count += 20;
             }
-            return true;
-        } else {
-            return false;
         }
+        return count;
     }
 
     /**
@@ -2371,99 +2192,6 @@ public class Unit extends FreeColGameObject implements Features, Locatable, Loca
         } catch (IllegalStateException ise) {
             this.addModelMessage(this, "notEnoughGold", null, ModelMessage.DEFAULT);
         }
-    }
-
-    /**
-     * Sets how many tools this unit is carrying.
-     * 
-     * @param numberOfTools The number to set it to.
-     */
-    public void setNumberOfTools(int numberOfTools) {
-        setMovesLeft(0);
-        setState(ACTIVE);
-
-        if (numberOfTools >= 20) {
-            if (isMounted()) {
-                setMounted(false);
-            }
-
-            if (isArmed()) {
-                setArmed(false);
-            }
-
-            if (isMissionary()) {
-                setMissionary(false);
-            }
-        }
-
-        int changeAmount = 0;
-        /*
-         * if (numberOfTools > 100) { logger.warning("Attempting to give a
-         * pioneer a number of greater than 100!"); }
-         */
-        if (numberOfTools > 100) {
-            numberOfTools = 100;
-        }
-
-        if ((numberOfTools % 20) != 0) {
-            // logger.warning("Attempting to give a pioneer a number of tools
-            // that is not a multiple of 20!");
-            numberOfTools -= (numberOfTools % 20);
-        }
-
-        changeAmount = numberOfTools - this.numberOfTools;
-        if (changeAmount > 0) {
-            if (getGoodsDumpLocation() != null) {
-                int actualAmount = getGoodsDumpLocation().getGoodsCount(Goods.TOOLS);
-                if (actualAmount < changeAmount)
-                    changeAmount = actualAmount;
-                if ((this.numberOfTools + changeAmount) % 20 > 0)
-                    changeAmount -= (this.numberOfTools + changeAmount) % 20;
-                if (changeAmount <= 0)
-                    return;
-                getGoodsDumpLocation().removeGoods(Goods.TOOLS, changeAmount);
-                this.numberOfTools = this.numberOfTools + changeAmount;
-            } else if (isInEurope()) {
-                int maximumAmount = ((getOwner().getGold()) / (getOwner().getMarket().costToBuy(Goods.TOOLS)));
-                if (maximumAmount < changeAmount)
-                    changeAmount = maximumAmount;
-                if ((this.numberOfTools + changeAmount) % 20 > 0)
-                    changeAmount -= (this.numberOfTools + changeAmount) % 20;
-                if (changeAmount <= 0)
-                    return;
-                getOwner().getMarket().buy(Goods.TOOLS, changeAmount, getOwner());
-                this.numberOfTools = this.numberOfTools + changeAmount;
-            } else {
-                logger.warning("Attempting to create a pioneer outside of a colony or Europe!");
-            }
-        } else if (changeAmount < 0) {
-            this.numberOfTools = this.numberOfTools + changeAmount;
-
-            if (getGoodsDumpLocation() != null) {
-                getGoodsDumpLocation().addGoods(Goods.TOOLS, -changeAmount);
-            } else if (isInEurope()) {
-                getOwner().getMarket().sell(Goods.TOOLS, -changeAmount, getOwner());
-            }
-        }
-    }
-
-    /**
-     * Gets the number of tools this unit is carrying.
-     * 
-     * @return The number of tools.
-     */
-    public int getNumberOfTools() {
-        return numberOfTools;
-    }
-
-    /**
-     * Checks if this <code>Unit</code> is a pioneer.
-     * 
-     * @return <i>true</i> if it is a pioneer and <i>false</i> otherwise.
-     */
-    public boolean isPioneer() {
-
-        return 0 < getNumberOfTools();
     }
 
     /**
@@ -2555,6 +2283,15 @@ public class Unit extends FreeColGameObject implements Features, Locatable, Loca
         return movesLeft;
     }
 
+    public boolean isArmed() {
+        return equipment.contains(FreeCol.getSpecification().getEquipmentType("model.equipment.muskets"));
+    }
+
+    public boolean isMounted() {
+        return equipment.contains(FreeCol.getSpecification().getEquipmentType("model.equipment.horses"));
+    }
+
+
     /**
      * Returns the name of a unit in a human readable format. The return value
      * can be used when communicating with the user.
@@ -2605,7 +2342,7 @@ public class Unit extends FreeColGameObject implements Features, Locatable, Loca
             }
         } else if (canCarryTreasure()) {
             return getUnitType().getName() + " (" + getTreasureAmount() + " " + Messages.message("gold") + ")";
-        } else if (isPioneer()) {
+        } else if (hasAbility("model.ability.improveTerrain")) {
             if (hasAbility("model.ability.expertPioneer")) {
                 return getUnitType().getName();
             } else {
@@ -2637,12 +2374,6 @@ public class Unit extends FreeColGameObject implements Features, Locatable, Loca
      */
     public int getInitialMovesLeft() {
         int movesLeft = unitType.getMovement();
-        // TODO: do this with roles
-        if (isMounted()) {
-            movesLeft = Math.max(12, movesLeft);
-        } else if (isMissionary()) {
-            //movesLeft = Math.max(6, movesLeft);
-        }
         Modifier modifier = getModifier("model.modifier.movementBonus");
         if (modifier != null) {
             movesLeft = (int) modifier.applyTo(movesLeft);
@@ -3045,13 +2776,9 @@ public class Unit extends FreeColGameObject implements Features, Locatable, Loca
         getTile().setOwner(owner);
         getTile().setSettlement(colony);
         setLocation(colony);
+        setMovesLeft(0);
 
-        if (isArmed())
-            setArmed(false);
-        if (isMounted())
-            setMounted(false);
-        if (isPioneer())
-            setNumberOfTools(0);
+        removeAllEquipment(false);
     }
 
     /**
@@ -3213,8 +2940,9 @@ public class Unit extends FreeColGameObject implements Features, Locatable, Loca
                     break;
                 case IMPROVING:
                     // Spend Goods - Quick fix, replace later
-                    if (getWorkImprovement().getExpendedGoodsType() == Goods.TOOLS) {
-                        expendTools(getWorkImprovement().getExpendedAmount());
+                    if (getWorkImprovement().getExpendedEquipmentType() == 
+                        FreeCol.getSpecification().getEquipmentType("model.equipment.tools")) {
+                        expendEquipment(getWorkImprovement().getExpendedAmount());
                     }
                     // Deliver Goods if any
                     GoodsType deliverType = getWorkImprovement().getDeliverGoodsType();
@@ -3273,9 +3001,11 @@ public class Unit extends FreeColGameObject implements Features, Locatable, Loca
      * 
      * @param amount The number of tools to remove.
      */
-    private void expendTools(int amount) {
-        numberOfTools -= amount;
-        if (numberOfTools == 0) {
+    private void expendEquipment(int amount) {
+        // TODO: make this more generic
+        EquipmentType tools = FreeCol.getSpecification().getEquipmentType("model.equipment.tools");
+        equipment.remove(tools);
+        if (!equipment.contains(tools)) {
             if (hasAbility("model.ability.expertPioneer")) {
                 addModelMessage(this, "model.unit.noMoreToolsPioneer",
                                 new String[][] {
@@ -3916,10 +3646,10 @@ public class Unit extends FreeColGameObject implements Features, Locatable, Loca
      * The enemy may plunder horses and muskets.
      * 
      * @param enemyUnit The unit we are fighting against.
-     * @param canStole <code>true</code> indicates that muskets/horses
+     * @param canSteal <code>true</code> indicates that muskets/horses
      *            should be taken by the <code>enemyUnit</code>.
      */
-    public void demote(Unit enemyUnit, boolean canStole) {
+    public void demote(Unit enemyUnit, boolean canSteal) {
         String oldName = getName();
         String messageID = "model.unit.unitDemoted";
         String nation = owner.getNationAsString();
@@ -3948,45 +3678,46 @@ public class Unit extends FreeColGameObject implements Features, Locatable, Loca
             messageID = "model.unit.unitSlaughtered";
             messageType = ModelMessage.UNIT_LOST;
             dispose();
-        } else if (isMounted()) {
-            if (enemyUnit.getType() == BRAVE && !enemyUnit.isMounted() && canStole) {
-                addModelMessage(this, "model.unit.braveMounted", new String[][] {
-                        { "%nation%", enemyUnit.getOwner().getNationAsString() } },
-                    ModelMessage.FOREIGN_DIPLOMACY);
-                enemyUnit.setMounted(true, true);
-            }
-            if (isArmed()) { // dragoon
-                setMounted(false, true);
-            } else { // scout
-                messageID = "model.unit.unitSlaughtered";
-                messageType = ModelMessage.UNIT_LOST;
-                dispose();
-            }
-        } else if (isArmed()) {
-            // soldier
-            setArmed(false, true);
-            if (enemyUnit.getType() == BRAVE && !enemyUnit.isArmed() && canStole) {
-                addModelMessage(this, "model.unit.braveArmed", new String[][] {
-                        { "%nation%", enemyUnit.getOwner().getNationAsString() } },
-                    ModelMessage.FOREIGN_DIPLOMACY);
-                enemyUnit.setArmed(true, true);
-            }
         } else {
-            // civilians, wagon trains and treasure trains
-            if (enemyUnit.getOwner().isEuropean()) {
-                // this unit is captured, don't show old owner's messages to new
-                // owner
-                for (ModelMessage message : getOwner().getModelMessages()) {
-                    message.setBeenDisplayed(true);
+            EquipmentType typeToLose = null;
+            int combatLossPriority = 0;
+            for (EquipmentType equipmentType : equipment) {
+                if (equipmentType.getCombatLossPriority() > combatLossPriority) {
+                    typeToLose = equipmentType;
+                    combatLossPriority = equipmentType.getCombatLossPriority();
                 }
-                if (getType() == VETERAN_SOLDIER) {
+            }
+            if (typeToLose != null) {
+                // lose equipment as a result of combat
+                removeEquipment(typeToLose, true);
+                if (typeToLose.hasAbility("model.ability.equipmentCanBeCaptured") &&
+                    enemyUnit.hasAbility("model.ability.captureEquipment") &&
+                    enemyUnit.canBeEquippedWith(typeToLose)) {
+                    enemyUnit.equipWith(typeToLose, true);
+                    addModelMessage(this, "model.unit.equipmentCaptured",
+                                    new String[][] {
+                                        {"%nation%", enemyUnit.getOwner().getNationAsString()},
+                                        {"%equipment%", typeToLose.getName()}},
+                                    ModelMessage.FOREIGN_DIPLOMACY);
+                }
+            } else if (hasAbility("model.ability.canBeCaptured") &&
+                       enemyUnit.hasAbility("model.ability.captureUnits")) {
+                // civilians, wagon trains and treasure trains
+                if (enemyUnit.getOwner().isEuropean()) {
+                    // this unit is captured, don't show old owner's
+                    // messages to new owner
+                    for (ModelMessage message : getOwner().getModelMessages()) {
+                        message.setBeenDisplayed(true);
+                    }
+                }
+                if (hasAbility("model.ability.expertSoldier")) {
                     clearSpeciality();
                     messageID = "model.unit.veteranUnitCaptured";
                 } else {
                     messageID = "model.unit.unitCaptured";
                 }
                 messageType = ModelMessage.UNIT_LOST;
-                setHitpoints(getInitialHitpoints(enemyUnit.getUnitType()));
+                //setHitpoints(getInitialHitpoints(enemyUnit.getUnitType()));
                 setLocation(enemyUnit.getTile());
                 setOwner(enemyUnit.getOwner());
             } else {
@@ -4305,35 +4036,6 @@ public class Unit extends FreeColGameObject implements Features, Locatable, Loca
     }
 
     /**
-     * Gets the Colony the goods of this unit would go to if it were to
-     * de-equip.
-     * 
-     * @return The Colony the goods would go to, or null if there is no
-     *         appropriate Colony
-     */
-    public Colony getGoodsDumpLocation() {
-        if ((location instanceof Colony)) {
-            return ((Colony) location);
-        } else if (location instanceof Building) {
-            return (((Building) location).getColony());
-        } else if (location instanceof ColonyTile) {
-            return (((ColonyTile) location).getColony());
-        } else if ((location instanceof Tile) && (((Tile) location).getSettlement() != null)
-                   && (((Tile) location).getSettlement() instanceof Colony)) {
-            return (((Colony) (((Tile) location).getSettlement())));
-        } else if (location instanceof Unit) {
-            if ((((Unit) location).getLocation()) instanceof Colony) {
-                return ((Colony) (((Unit) location).getLocation()));
-            } else if (((((Unit) location).getLocation()) instanceof Tile)
-                       && (((Tile) (((Unit) location).getLocation())).getSettlement() != null)
-                       && (((Tile) (((Unit) location).getLocation())).getSettlement() instanceof Colony)) {
-                return ((Colony) (((Tile) (((Unit) location).getLocation())).getSettlement()));
-            }
-        }
-        return null;
-    }
-
-    /**
      * Given a type of goods to produce in the field and a tile, returns the
      * unit's potential to produce goods.
      * 
@@ -4470,12 +4172,9 @@ public class Unit extends FreeColGameObject implements Features, Locatable, Loca
             out.writeAttribute("name", name);
         }
         out.writeAttribute("unitType", unitType.getId());
-        out.writeAttribute("armed", Boolean.toString(armed));
-        out.writeAttribute("mounted", Boolean.toString(mounted));
         out.writeAttribute("movesLeft", Integer.toString(movesLeft));
         out.writeAttribute("state", Integer.toString(state));
         out.writeAttribute("workLeft", Integer.toString(workLeft));
-        out.writeAttribute("numberOfTools", Integer.toString(numberOfTools));
         String ownerID = null;
         if (getOwner().equals(player) || !hasAbility("model.ability.piracy") || showAll) {
             ownerID = owner.getId();
@@ -4569,12 +4268,9 @@ public class Unit extends FreeColGameObject implements Features, Locatable, Loca
         setName(in.getAttributeValue(null, "name"));
         unitType = FreeCol.getSpecification().getUnitType(in.getAttributeValue(null, "unitType"));
         naval = unitType.hasAbility("model.ability.navalUnit");
-        armed = Boolean.valueOf(in.getAttributeValue(null, "armed")).booleanValue();
-        mounted = Boolean.valueOf(in.getAttributeValue(null, "mounted")).booleanValue();
         movesLeft = Integer.parseInt(in.getAttributeValue(null, "movesLeft"));
         state = Integer.parseInt(in.getAttributeValue(null, "state"));
         workLeft = Integer.parseInt(in.getAttributeValue(null, "workLeft"));
-        numberOfTools = Integer.parseInt(in.getAttributeValue(null, "numberOfTools"));
 
         String ownerID = in.getAttributeValue(null, "owner");
         if (ownerID.equals("unknown")) {

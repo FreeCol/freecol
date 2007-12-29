@@ -117,8 +117,7 @@ public class GoodsTest extends FreeColTestCase {
         map.getTile(5, 8).setExploredBy(dutch, true);
         map.getTile(6, 8).setExploredBy(dutch, true);
 
-        Unit soldier = new Unit(game, map.getTile(6, 8), dutch, veteranSoldierType, Unit.ACTIVE, true, false, 0,
-                false);
+        Unit soldier = new Unit(game, map.getTile(6, 8), dutch, veteranSoldierType, Unit.ACTIVE);
 
         Colony colony = new Colony(game, dutch, "New Amsterdam", soldier.getTile());
         soldier.setWorkType(Goods.FOOD);

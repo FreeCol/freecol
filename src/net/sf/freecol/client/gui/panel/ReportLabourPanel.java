@@ -199,7 +199,7 @@ public final class ReportLabourPanel extends ReportPanel implements ActionListen
     }
 
     private JLabel createUnitLabel(UnitType unitType, int tools) {
-        int imageType = ImageLibrary.getUnitGraphicsType(unitType.getIndex(), false, false, tools, false);
+        int imageType = ImageLibrary.getUnitGraphicsType(unitType.getIndex(), false, false, (tools > 0), false);
         JLabel unitLabel = new JLabel(getLibrary().getUnitImageIcon(imageType));
         return unitLabel;
     }

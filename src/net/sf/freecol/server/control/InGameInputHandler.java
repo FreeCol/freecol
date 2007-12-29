@@ -34,6 +34,7 @@ import net.sf.freecol.common.model.BuildingType;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.ColonyTile;
 import net.sf.freecol.common.model.DiplomaticTrade;
+import net.sf.freecol.common.model.EquipmentType;
 import net.sf.freecol.common.model.Europe;
 import net.sf.freecol.common.model.ExportData;
 import net.sf.freecol.common.model.Game;
@@ -241,7 +242,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
                 return trainUnitInEurope(connection, element);
             }
         });
-        register("equipunit", new CurrentPlayerNetworkRequestHandler() {
+        register("equipUnit", new CurrentPlayerNetworkRequestHandler() {
             @Override
             public Element handle(Player player, Connection connection, Element element) {
                 return equipUnit(connection, element);
@@ -972,7 +973,8 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         int dx = player.getDifficulty() + 2;
         // seasoned scouts should be more successful
         int bonus = 0;
-        if (unit.hasAbility("model.ability.expertScout") && unit.isScout()) {
+        if (unit.hasAbility("model.ability.expertScout") && 
+            unit.hasAbility("model.ability.scoutIndianSettlements")) {
             bonus += 3;
             dx--;
         }
@@ -2021,7 +2023,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         int slot = Integer.parseInt(recruitUnitInEuropeElement.getAttribute("slot"));
         UnitType recruitable = europe.getRecruitable(slot);
         UnitType newRecruitable = player.generateRecruitable();
-        Unit unit = new Unit(getGame(), player, recruitable);
+        Unit unit = new Unit(getGame(), europe, player, recruitable, Unit.ACTIVE, recruitable.getDefaultEquipment());
         Element reply = Message.createNewRootElement("recruitUnitInEuropeConfirmed");
         reply.setAttribute("newRecruitable", Integer.toString(newRecruitable.getIndex()));
         reply.appendChild(unit.toXMLElement(player, reply.getOwnerDocument()));
@@ -2046,7 +2048,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         }
         UnitType recruitable = europe.getRecruitable(slot);
         UnitType newRecruitable = player.generateRecruitable();
-        Unit unit = new Unit(getGame(), player, recruitable);
+        Unit unit = new Unit(getGame(), europe, player, recruitable, Unit.ACTIVE, recruitable.getDefaultEquipment());
         Element reply = Message.createNewRootElement("emigrateUnitInEuropeConfirmed");
         if (!player.hasFather(FreeCol.getSpecification().getFoundingFather("model.foundingFather.williamBrewster"))) {
             reply.setAttribute("slot", Integer.toString(slot));
@@ -2068,7 +2070,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         Europe europe = player.getEurope();
         int unitIndex = Integer.parseInt(trainUnitInEuropeElement.getAttribute("unitType"));
         UnitType unitType = FreeCol.getSpecification().getUnitType(unitIndex);
-        Unit unit = new Unit(getGame(), player, unitType);
+        Unit unit = new Unit(getGame(), europe, player, unitType, Unit.ACTIVE, unitType.getDefaultEquipment());
         Element reply = Message.createNewRootElement("trainUnitInEuropeConfirmed");
         reply.appendChild(unit.toXMLElement(player, reply.getOwnerDocument()));
         europe.train(unit);
@@ -2076,7 +2078,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
     }
 
     /**
-     * Handles a "equipunit"-request from a client.
+     * Handles a "equipUnit"-request from a client.
      * 
      * @param connection The connection the message came from.
      * @param workElement The element containing the request.
@@ -2084,30 +2086,16 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
     private Element equipUnit(Connection connection, Element workElement) {
         ServerPlayer player = getFreeColServer().getPlayer(connection);
         Unit unit = (Unit) getGame().getFreeColGameObject(workElement.getAttribute("unit"));
-        GoodsType type = FreeCol.getSpecification().getGoodsType(Integer.parseInt(workElement.getAttribute("type")));
+        EquipmentType type = FreeCol.getSpecification().getEquipmentType(workElement.getAttribute("type"));
         int amount = Integer.parseInt(workElement.getAttribute("amount"));
         if (unit.getOwner() != player) {
             throw new IllegalStateException("Not your unit!");
         }
-        if (type == Goods.CROSSES) {
-            unit.setMissionary((amount > 0));
-        } else if (type == Goods.MUSKETS) {
-            unit.setArmed((amount > 0)); // So give them muskets if the
-            // amount we want is greater than
-            // zero.
-        } else if (type == Goods.HORSES) {
-            unit.setMounted((amount > 0)); // As above.
-        } else if (type == Goods.TOOLS) {
-            int actualAmount = amount;
-            if ((actualAmount % 20) > 0) {
-                logger.warning("Trying to set a number of tools that is not a multiple of 20.");
-                actualAmount -= (actualAmount % 20);
-            }
-            unit.setNumberOfTools(actualAmount);
-        } else {
-            logger.warning("Invalid type of goods to equip.");
-            return null;
+
+        for (int count = 0; count < amount; count++) {
+            unit.getEquipment().add(type);
         }
+
         if (unit.getLocation() instanceof Tile) {
             sendUpdatedTileToAll(unit.getTile(), player);
         }

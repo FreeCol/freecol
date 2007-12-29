@@ -196,8 +196,8 @@ public class TileImprovement extends TileItem implements Locatable, Named {
         return doWork(1);
     }
 
-    public GoodsType getExpendedGoodsType() {
-        return type.getExpendedGoodsType();
+    public EquipmentType getExpendedEquipmentType() {
+        return type.getExpendedEquipmentType();
     }
 
     public int getExpendedAmount() {

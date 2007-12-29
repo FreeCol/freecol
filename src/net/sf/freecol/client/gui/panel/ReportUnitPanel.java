@@ -433,7 +433,7 @@ public final class ReportUnitPanel extends JPanel implements ActionListener {
     
     private JLabel createUnitTypeLabel(UnitType unitType, boolean mounted, int count) {
         int unitTypeIndex = unitType.getIndex();
-        int graphicsType = ImageLibrary.getUnitGraphicsType(unitTypeIndex, true, mounted, 0, false);
+        int graphicsType = ImageLibrary.getUnitGraphicsType(unitTypeIndex, true, mounted, false, false);
         JLabel unitLabel = reportPanel.buildUnitLabel(graphicsType, 0.66f);
         unitLabel.setText(String.valueOf(count));
         if (count == 0) {

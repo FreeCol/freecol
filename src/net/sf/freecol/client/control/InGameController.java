@@ -49,11 +49,13 @@ import net.sf.freecol.client.gui.panel.FreeColDialog;
 import net.sf.freecol.client.gui.sound.SfxLibrary;
 import net.sf.freecol.client.networking.Client;
 import net.sf.freecol.common.Specification;
+import net.sf.freecol.common.model.AbstractGoods;
 import net.sf.freecol.common.model.BuildableType;
 import net.sf.freecol.common.model.Building;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.ColonyTile;
 import net.sf.freecol.common.model.DiplomaticTrade;
+import net.sf.freecol.common.model.EquipmentType;
 import net.sf.freecol.common.model.Europe;
 import net.sf.freecol.common.model.ExportData;
 import net.sf.freecol.common.model.FreeColGameObject;
@@ -2141,12 +2143,16 @@ public final class InGameController implements NetworkConstants {
      * <code>Goods</code>.
      * 
      * @param unit The <code>Unit</code>.
-     * @param type The type of <code>Goods</code>.
+     * @param type an <code>EquipmentType</code> value
      * @param amount How many of these goods the unit should have.
      */
-    public void equipUnit(Unit unit, GoodsType type, int amount) {
+    public void equipUnit(Unit unit, EquipmentType type, int amount) {
         if (freeColClient.getGame().getCurrentPlayer() != freeColClient.getMyPlayer()) {
             freeColClient.getCanvas().showInformationMessage("notYourTurn");
+            return;
+        }
+        if (amount == 0) {
+            // no changes
             return;
         }
 
@@ -2159,53 +2165,30 @@ public final class InGameController implements NetworkConstants {
             leaveShip(unit);
         }
 
-        Element equipUnitElement = Message.createNewRootElement("equipunit");
+        Element equipUnitElement = Message.createNewRootElement("equipUnit");
         equipUnitElement.setAttribute("unit", unit.getId());
-        equipUnitElement.setAttribute("type", Integer.toString(type.getIndex()));
+        equipUnitElement.setAttribute("type", type.getId());
         equipUnitElement.setAttribute("amount", Integer.toString(amount));
 
-        if (type == Goods.CROSSES) {
-            unit.setMissionary((amount > 0));
-        } else if (type == Goods.MUSKETS) {
-            if (unit.isInEurope()) {
-                if (!myPlayer.canTrade(type)) {
-                    payArrears(type);
-                    if (!myPlayer.canTrade(type)) {
-                        return; // The user cancelled the action.
+        if (amount > 0) {
+            for (AbstractGoods requiredGoods : type.getGoodsRequired()) {
+                GoodsType goodsType = requiredGoods.getType();
+                if (unit.isInEurope()) {
+                    if (!myPlayer.canTrade(goodsType)) {
+                        payArrears(goodsType);
+                        if (!myPlayer.canTrade(goodsType)) {
+                            return; // The user cancelled the action.
+                        }
                     }
                 }
             }
-            unit.setArmed((amount > 0)); // So give them muskets if the
-            // amount we want is greater than
-            // zero.
-        } else if (type == Goods.HORSES) {
-            if (unit.isInEurope()) {
-                if (!myPlayer.canTrade(type)) {
-                    payArrears(type);
-                    if (!myPlayer.canTrade(type)) {
-                        return; // The user cancelled the action.
-                    }
-                }
+            for (int count = 0; count < amount; count++) {
+                unit.equipWith(type);
             }
-            unit.setMounted((amount > 0)); // As above.
-        } else if (type == Goods.TOOLS) {
-            if (unit.isInEurope()) {
-                if (!myPlayer.canTrade(type)) {
-                    payArrears(type);
-                    if (!myPlayer.canTrade(type)) {
-                        return; // The user cancelled the action.
-                    }
-                }
-            }
-            int actualAmount = amount;
-            if ((actualAmount % 20) > 0) {
-                logger.warning("Trying to set a number of tools that is not a multiple of 20.");
-                actualAmount -= (actualAmount % 20);
-            }
-            unit.setNumberOfTools(actualAmount);
         } else {
-            logger.warning("Invalid type of goods to equip.");
-            return;
+            for (int count = 0; count > amount; count--) {
+                unit.removeEquipment(type);
+            }
         }
 
         freeColClient.getCanvas().updateGoldLabel();

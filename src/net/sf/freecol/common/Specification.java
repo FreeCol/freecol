@@ -229,8 +229,7 @@ public final class Specification {
                         int impIndex = 0;
                         public TileImprovementType objectFrom(XMLStreamReader in) throws XMLStreamException {
                             TileImprovementType tileImprovementType = new TileImprovementType(impIndex++);
-                            tileImprovementType.readFromXML(in, tileTypeList,
-                                                            tileTypeByRef, goodsTypeByRef, tileImprovementTypeByRef);
+                            tileImprovementType.readFromXML(in, tileTypeList, allTypes);
                             allTypes.put(tileImprovementType.getId(), tileImprovementType);
                             tileImprovementTypeByRef.put(tileImprovementType.getId(), tileImprovementType);
                             return tileImprovementType;

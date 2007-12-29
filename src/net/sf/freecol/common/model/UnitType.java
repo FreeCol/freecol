@@ -36,6 +36,8 @@ import net.sf.freecol.FreeCol;
 
 public final class UnitType extends BuildableType {
 
+    public static final EquipmentType[] NO_EQUIPMENT = new EquipmentType[0];
+
     /**
      * Describe offence here.
      */
@@ -639,6 +641,31 @@ public final class UnitType extends BuildableType {
         
         return Math.max(base, 1);
     }
+
+    public EquipmentType[] getDefaultEquipment() {
+        if (hasAbility("model.ability.canBeEquipped")) {
+            List<EquipmentType> equipment = new ArrayList<EquipmentType>();
+            if (hasAbility("model.ability.expertSoldier")) {
+                equipment.add(FreeCol.getSpecification().getEquipmentType("model.equipment.muskets"));
+            }
+            if (hasAbility("model.ability.expertScout")) {
+                equipment.add(FreeCol.getSpecification().getEquipmentType("model.equipment.horses"));
+            }
+            if (hasAbility("model.ability.expertPioneer")) {
+                EquipmentType tools = FreeCol.getSpecification().getEquipmentType("model.equipment.tools");
+                for (int count = 0; count < tools.getMaximumCount(); count++) {
+                    equipment.add(tools);
+                }
+            }
+            if (hasAbility("model.ability.expertMissionary")) {
+                equipment.add(FreeCol.getSpecification().getEquipmentType("model.equipment.missionary"));
+            }
+            return equipment.toArray(NO_EQUIPMENT);
+        } else {
+            return NO_EQUIPMENT;
+        }
+    }
+
     
     private class Upgrade {
         protected int turnsToLearn;

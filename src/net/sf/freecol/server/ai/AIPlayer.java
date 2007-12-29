@@ -41,6 +41,7 @@ import net.sf.freecol.FreeCol;
 import net.sf.freecol.common.model.Building;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.ColonyTile;
+import net.sf.freecol.common.model.EquipmentType;
 import net.sf.freecol.common.model.Europe;
 import net.sf.freecol.common.model.FoundingFather;
 import net.sf.freecol.common.model.FreeColGameObject;
@@ -97,8 +98,8 @@ import org.w3c.dom.Element;
 public class AIPlayer extends AIObject {
     private static final Logger logger = Logger.getLogger(AIPlayer.class.getName());
 
-
-
+    protected static EquipmentType muskets = FreeCol.getSpecification().getEquipmentType("model.equipment.muskets");
+    protected static EquipmentType horses = FreeCol.getSpecification().getEquipmentType("model.equipment.horses");
 
     private static final int MAX_DISTANCE_TO_BRING_GIFT = 5;
 
@@ -497,15 +498,13 @@ public class AIPlayer extends AIObject {
                         continue;
                     }
                     int unitType;
-                    boolean armed = false;
-                    boolean mounted = false;
+                    EquipmentType[] equipment = new EquipmentType[0];
                     if (i == Monarch.INFANTRY) {
                         unitType = Unit.KINGS_REGULAR;
-                        armed = true;
+                        equipment = new EquipmentType[] { muskets };
                     } else if (i == Monarch.DRAGOON) {
                         unitType = Unit.KINGS_REGULAR;
-                        armed = true;
-                        mounted = true;
+                        equipment = new EquipmentType[] { horses, muskets };
                     } else if (i == Monarch.ARTILLERY) {
                         unitType = Unit.ARTILLERY;
                     } else if (i == Monarch.MAN_OF_WAR) {
@@ -516,7 +515,7 @@ public class AIPlayer extends AIObject {
                     }
                     UnitType type = FreeCol.getSpecification().getUnitType(unitType);
                     new Unit(getGame(), getPlayer().getEurope(), getPlayer(),
-                            type, Unit.ACTIVE, armed, mounted, 0, false);
+                            type, Unit.ACTIVE, equipment);
                     ref[i]--;
                     totalNumber--;
                 }
@@ -788,13 +787,13 @@ public class AIPlayer extends AIObject {
                 ui = recruits.iterator();
                 while (ui.hasNext() && recruitCount > 0) {
                     Unit u = (ui.next());
-                    if (!u.isArmed() && u.canBeArmed()) {
+                    if (!u.isArmed() && u.canBeEquippedWith(muskets)) {
                         recruitCount--;
-                        Element equipUnitElement = Message.createNewRootElement("equipunit");
+                        Element equipUnitElement = Message.createNewRootElement("equipUnit");
                         equipUnitElement.setAttribute("unit", u.getId());
-                        equipUnitElement.setAttribute("type", Integer.toString((Goods.MUSKETS).getIndex()));
-                        equipUnitElement.setAttribute("amount", "50");
-                        u.setArmed(true);
+                        equipUnitElement.setAttribute("type", muskets.getId());
+                        equipUnitElement.setAttribute("amount", "1");
+                        u.equipWith(muskets);
                         sendAndWaitSafely(equipUnitElement);
                         Element putOutsideColonyElement = Message.createNewRootElement("putOutsideColony");
                         putOutsideColonyElement.setAttribute("unit", u.getId());
@@ -808,11 +807,11 @@ public class AIPlayer extends AIObject {
                             sendAndWaitSafely(changeStateElement);
                         }
                         olddefenders++;
-                        if (!u.isMounted() && u.canBeMounted()) {
-                            equipUnitElement = Message.createNewRootElement("equipunit");
+                        if (!u.isMounted() && u.canBeEquippedWith(horses)) {
+                            equipUnitElement = Message.createNewRootElement("equipUnit");
                             equipUnitElement.setAttribute("unit", u.getId());
-                            equipUnitElement.setAttribute("type", Integer.toString((Goods.HORSES).getIndex()));
-                            equipUnitElement.setAttribute("amount", "50");
+                            equipUnitElement.setAttribute("type", horses.getId());
+                            equipUnitElement.setAttribute("amount", "1");
                             sendAndWaitSafely(equipUnitElement);
                         } else {
                             needHorses = true;
@@ -1000,10 +999,12 @@ public class AIPlayer extends AIObject {
             Unit unit = aiUnit.getUnit();
             if (unit.canCarryTreasure()) {
                 aiUnit.setMission(new CashInTreasureTrainMission(getAIMain(), aiUnit));
-            } else if (unit.isScout() && ScoutingMission.isValid(aiUnit)) {
+            } else if (unit.hasAbility("model.ability.scoutIndianSettlement") &&
+                       ScoutingMission.isValid(aiUnit)) {
                 aiUnit.setMission(new ScoutingMission(getAIMain(), aiUnit));
             } else if ((unit.isOffensiveUnit() || unit.isDefensiveUnit())
-                    && (!unit.isColonist() || unit.getType() == Unit.VETERAN_SOLDIER || getGame().getTurn().getNumber() > 5)) {
+                    && (!unit.isColonist() || unit.getType() == Unit.VETERAN_SOLDIER || 
+                        getGame().getTurn().getNumber() > 5)) {
                 giveMilitaryMission(aiUnit);
             } else if (unit.getNumberOfTools() > 0 && PioneeringMission.isValid(aiUnit)) {
                 aiUnit.setMission(new PioneeringMission(getAIMain(), aiUnit));

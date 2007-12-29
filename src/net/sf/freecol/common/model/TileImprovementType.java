@@ -29,6 +29,7 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
 import net.sf.freecol.FreeCol;
+//import net.sf.freecol.common.Specification;
 import net.sf.freecol.client.gui.i18n.Messages;
 
 public final class TileImprovementType extends FreeColGameObjectType
@@ -46,7 +47,7 @@ public final class TileImprovementType extends FreeColGameObjectType
     private TileImprovementType requiredImprovementType;
 
     private HashSet<String> allowedWorkers;
-    private GoodsType expendedGoodsType;
+    private EquipmentType expendedEquipmentType;
     private int expendedAmount;   
     private GoodsType deliverGoodsType;
     private int deliverAmount;
@@ -97,8 +98,8 @@ public final class TileImprovementType extends FreeColGameObjectType
         return requiredImprovementType;
     }
 
-    public GoodsType getExpendedGoodsType() {
-        return expendedGoodsType;
+    public EquipmentType getExpendedEquipmentType() {
+        return expendedEquipmentType;
     }
 
     public int getExpendedAmount() {
@@ -128,39 +129,38 @@ public final class TileImprovementType extends FreeColGameObjectType
         if (expendedAmount == 0) {
             return true;
         }
-        /** TODO: Wait for correct methods from Unit.java, for now return true
-            if (!unit.hasGoods(expendedGoodsType) || unit.goods(expendedGoodsType) < expendedAmount) {
-            return false;
+        int count = 0;
+        for (EquipmentType equipmentType : unit.getEquipment()) {
+            if (equipmentType == expendedEquipmentType) {
+                count++;
+                if (count >= expendedAmount) {
+                    return true;
+                }
             }
-        */
-        // Quick fix, replace later
-        if (expendedGoodsType == Goods.TOOLS) {
-            return (unit.getNumberOfTools() >= expendedAmount);
-        }
-            
-        return true;
+        }   
+        return false;
     }
 
     /**
-	 * This will check if in principle this type of improvement can be used on
-	 * this kind of tile, disregarding the current state of an actual tile.
-	 * 
-	 * If you want to find out if an improvement is allowed for a tile, call
-	 * {@link #isTileAllowed(Tile)}.
-	 * 
-	 * @param tileType The type of terrain
-	 * @return true if improvement is possible
-	 */
-	public boolean isTileTypeAllowed(TileType tileType) {
-		return (allowedTileTypes.indexOf(tileType) >= 0);
-	}
+     * This will check if in principle this type of improvement can be used on
+     * this kind of tile, disregarding the current state of an actual tile.
+     * 
+     * If you want to find out if an improvement is allowed for a tile, call
+     * {@link #isTileAllowed(Tile)}.
+     * 
+     * @param tileType The type of terrain
+     * @return true if improvement is possible
+     */
+    public boolean isTileTypeAllowed(TileType tileType) {
+        return (allowedTileTypes.indexOf(tileType) >= 0);
+    }
 
     /**
-	 * Check if a given <code>Tile</code> is valid for this TileImprovement.
-	 * 
-	 * @return true if Tile TileType is valid and required Improvement (if any)
-	 *         is present.
-	 */
+     * Check if a given <code>Tile</code> is valid for this TileImprovement.
+     * 
+     * @return true if Tile TileType is valid and required Improvement (if any)
+     *         is present.
+     */
     public boolean isTileAllowed(Tile tile) {
         if (!isTileTypeAllowed(tile.getType())) {
             return false;
@@ -263,12 +263,11 @@ public final class TileImprovementType extends FreeColGameObjectType
     // ------------------------------------------------------------ API methods
 
     protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
-        readFromXML(in, null, null, null, null);
+        throw new UnsupportedOperationException("Call 'readFromXML' instead.");
     }
 
-    public void readFromXML(XMLStreamReader in, final List<TileType> tileTypeList,
-           final Map<String, TileType> tileTypeByRef, final Map<String, GoodsType> goodsTypeByRef,
-           final Map<String, TileImprovementType> tileImprovementTypeByRef) throws XMLStreamException {
+    public void readFromXML(XMLStreamReader in, List<TileType> tileTypeList, 
+                            Map<String, FreeColGameObjectType> allTypes) throws XMLStreamException {
         setId(in.getAttributeValue(null, "id"));
         natural = getAttribute(in, "natural", false);
         addWorkTurns = getAttribute(in, "add-work-turns", 0);
@@ -277,15 +276,15 @@ public final class TileImprovementType extends FreeColGameObjectType
         magnitude = getAttribute(in, "magnitude", 1);
         
         String req = in.getAttributeValue(null, "required-improvement");
-        requiredImprovementType = tileImprovementTypeByRef.get(req);
+        requiredImprovementType = (TileImprovementType) allTypes.get(req);
         artOverlay = getAttribute(in, "overlay", -1);
         artOverTrees = getAttribute(in, "over-trees", false);
 
-        String g = in.getAttributeValue(null, "expended-goods-type");
-        expendedGoodsType = goodsTypeByRef.get(g);
+        String g = in.getAttributeValue(null, "expended-equipment-type");
+        expendedEquipmentType = (EquipmentType) allTypes.get(g);
         expendedAmount = getAttribute(in, "expended-amount", 0);
         g = in.getAttributeValue(null, "deliver-goods-type");
-        deliverGoodsType = goodsTypeByRef.get(g);
+        deliverGoodsType = (GoodsType) allTypes.get(g);
         deliverAmount = getAttribute(in, "deliver-amount", 0);
 
         allowedWorkers = new HashSet<String>();
@@ -304,27 +303,27 @@ public final class TileImprovementType extends FreeColGameObjectType
                 boolean allWater = getAttribute(in, "all-water-tiles", false);
 
                 for (TileType t : tileTypeList) {
-                	if (t.isWater()){
-                		if (allWater)
-                			allowedTileTypes.add(t);
-                	} else {
-                		if (t.isForested()){
-                			if ((allLand && allForestUndefined) || allForest){
-                				allowedTileTypes.add(t);
-                			}
-                		} else {
-                			if (allLand){
-                				allowedTileTypes.add(t);
-                			}
-                		}
+                    if (t.isWater()){
+                        if (allWater)
+                            allowedTileTypes.add(t);
+                    } else {
+                        if (t.isForested()){
+                            if ((allLand && allForestUndefined) || allForest){
+                                allowedTileTypes.add(t);
+                            }
+                        } else {
+                            if (allLand){
+                                allowedTileTypes.add(t);
+                            }
+                        }
                 		
-                	}
+                    }
                 }
                 in.nextTag(); // close this element
                 
             } else if ("tile".equals(childName)) {
                 String tileId = in.getAttributeValue(null, "id");
-                allowedTileTypes.add(tileTypeByRef.get(tileId));
+                allowedTileTypes.add((TileType) allTypes.get(tileId));
                 in.nextTag(); // close this element
 
             } else if ("worker".equals(childName)) {
@@ -334,7 +333,7 @@ public final class TileImprovementType extends FreeColGameObjectType
             } else if ("effect".equals(childName)) {
                 if (hasAttribute(in, "goods-type")) {
                     g = in.getAttributeValue(null, "goods-type");
-                    GoodsType gt = goodsTypeByRef.get(g);
+                    GoodsType gt = (GoodsType) allTypes.get(g);
                     if (gt != null) {
                         goodsEffect.add(gt);
                         goodsBonus.add(Integer.parseInt(in.getAttributeValue(null, "value")));
@@ -349,8 +348,8 @@ public final class TileImprovementType extends FreeColGameObjectType
                 in.nextTag(); // close this element
                 
             } else if ("change".equals(childName)) {
-                tileTypeChangeFrom.add(tileTypeByRef.get(in.getAttributeValue(null, "from")));
-                tileTypeChangeTo.add(tileTypeByRef.get(in.getAttributeValue(null, "to")));
+                tileTypeChangeFrom.add((TileType) allTypes.get(in.getAttributeValue(null, "from")));
+                tileTypeChangeTo.add((TileType) allTypes.get(in.getAttributeValue(null, "to")));
                 in.nextTag(); // close this element
 
             } else {

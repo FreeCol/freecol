@@ -28,6 +28,7 @@ import java.util.logging.Logger;
 
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.common.model.Colony;
+import net.sf.freecol.common.model.EquipmentType;
 import net.sf.freecol.common.model.FoundingFather;
 import net.sf.freecol.common.model.GameOptions;
 import net.sf.freecol.common.model.Goods;
@@ -49,13 +50,13 @@ import org.w3c.dom.Element;
  * TODO: write class comment.
  */
 public final class InGameController extends Controller {
+
     private static Logger logger = Logger.getLogger(InGameController.class.getName());
 
-
-
+    protected static EquipmentType muskets = FreeCol.getSpecification().getEquipmentType("model.equipment.muskets");
+    protected static EquipmentType horses = FreeCol.getSpecification().getEquipmentType("model.equipment.horses");
 
     public int debugOnlyAITurns = 0;
-
 
     /**
      * The constructor to use.
@@ -532,6 +533,8 @@ public final class InGameController extends Controller {
     }
 
     private void createUnits(int[] units, Element element, ServerPlayer nextPlayer) {
+        EquipmentType[] infantry = new EquipmentType[] { muskets };
+        EquipmentType[] dragoon = new EquipmentType[] { horses, muskets };
         Unit newUnit;
         for (int type = 0; type < units.length; type++) {
             for (int i = 0; i < units[type]; i++) {
@@ -539,13 +542,9 @@ public final class InGameController extends Controller {
                     UnitType unitType = FreeCol.getSpecification().getUnitType("model.unit.artillery");
                     newUnit = new Unit(getGame(), nextPlayer.getEurope(), nextPlayer, unitType, Unit.ACTIVE);
                 } else {
-                    boolean mounted = false;
-                    if (type == Monarch.DRAGOON) {
-                        mounted = true;
-                    }
                     UnitType unitType = FreeCol.getSpecification().getUnitType("model.unit.veteranSoldier");
                     newUnit = new Unit(getGame(), nextPlayer.getEurope(), nextPlayer, unitType, Unit.ACTIVE,
-                            true, mounted, 0, false);
+                                       (type == Monarch.DRAGOON ? dragoon : infantry));
                 }
                 nextPlayer.getEurope().add(newUnit);
                 if (element != null) {

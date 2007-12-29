@@ -335,22 +335,9 @@ public final class Building extends FreeColGameObject implements Features, WorkL
 
         Unit unit = (Unit) locatable;
 
-        if (unit.isArmed()) {
-            unit.setArmed(false);
+        for (EquipmentType equipmentType : unit.getEquipment()) {
+            unit.removeEquipment(equipmentType);
         }
-
-        if (unit.isMounted()) {
-            unit.setMounted(false);
-        }
-
-        if (unit.isMissionary()) {
-            unit.setMissionary(false);
-        }
-
-        if (unit.getNumberOfTools() > 0) {
-            unit.setNumberOfTools(0);
-        }
-
         Unit student = unit.getStudent();
         if (hasAbility("model.ability.teach")) {
             if (student == null) {

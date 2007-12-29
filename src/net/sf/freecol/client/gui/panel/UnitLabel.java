@@ -41,6 +41,7 @@ import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.Building;
 import net.sf.freecol.common.model.BuildingType;
 import net.sf.freecol.common.model.ColonyTile;
+import net.sf.freecol.common.model.EquipmentType;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.TileType;
@@ -307,34 +308,6 @@ public final class UnitLabel extends JLabel implements ActionListener {
                 inGameController.changeState(unit, Unit.SENTRY);
             } else if (!unit.isCarrier()) {
                 switch (intCommand) {
-                case ARM:
-                    inGameController.equipUnit(unit, Goods.MUSKETS, ((unit.isArmed()) ? 0 : 50));
-                    break;
-                case MOUNT:
-                    inGameController.equipUnit(unit, Goods.HORSES, ((unit.isMounted()) ? 0 : 50));
-                    break;
-                case TOOLS:
-                    int tools = 100;
-                    if (!unit.isPioneer() && (event.getModifiers() & ActionEvent.SHIFT_MASK) != 0) {
-                        String s = getCanvas().showInputDialog("toolsEquip.text", "100", "ok", "cancel");
-                        tools = -1;
-
-                        while (s != null && tools == -1) {
-                            try {
-                                tools = Integer.parseInt(s);
-                            } catch (NumberFormatException e) {
-                                getCanvas().errorMessage("notANumber");
-                                s = getCanvas().showInputDialog("goodsTransfer.text", "100", "ok", "cancel");
-                            }
-                        }
-                        if (s == null)
-                            break;
-                    }
-                    inGameController.equipUnit(unit, Goods.TOOLS, ((unit.isPioneer()) ? 0 : tools));
-                    break;
-                case DRESS:
-                    inGameController.equipUnit(unit, Goods.CROSSES, ((unit.isMissionary()) ? 0 : 1));
-                    break;
                 case LEAVE_TOWN:
                     inGameController.putOutsideColony(unit);
                     break;
@@ -360,33 +333,38 @@ public final class UnitLabel extends JLabel implements ActionListener {
                         logger.warning("Invalid action");
                     }
                 }
-                int unitIndex = parent.getGUI().getImageLibrary().getUnitGraphicsType(unit);
-                setIcon(parent.getGUI().getImageLibrary().getUnitImageIcon(unitIndex));
-                setDisabledIcon(parent.getGUI().getImageLibrary().getUnitImageIcon(unitIndex, true));
-
-                Component uc = getParent();
-                while (uc != null) {
-                    if (uc instanceof ColonyPanel) {
-                        if (unit.getColony() == null) {
-                            parent.remove(uc);
-                            parent.getClient().getActionManager().update();
-                        } else {
-                            ((ColonyPanel) uc).reinitialize();
-                        }
-
-                        break;
-                    } else if (uc instanceof EuropePanel) {
-                        break;
-                    }
-
-                    uc = uc.getParent();
-                }
-
-                // repaint(0, 0, getWidth(), getHeight());
-                // uc.refresh();
+                updateIcon();
             }
         } catch (NumberFormatException e) {
             logger.warning("Invalid action number");
         }
+    }
+
+
+    public void updateIcon() {
+        int unitIndex = parent.getGUI().getImageLibrary().getUnitGraphicsType(unit);
+        setIcon(parent.getGUI().getImageLibrary().getUnitImageIcon(unitIndex));
+        setDisabledIcon(parent.getGUI().getImageLibrary().getUnitImageIcon(unitIndex, true));
+
+        Component uc = getParent();
+        while (uc != null) {
+            if (uc instanceof ColonyPanel) {
+                if (unit.getColony() == null) {
+                    parent.remove(uc);
+                    parent.getClient().getActionManager().update();
+                } else {
+                    ((ColonyPanel) uc).reinitialize();
+                }
+
+                break;
+            } else if (uc instanceof EuropePanel) {
+                break;
+            }
+
+            uc = uc.getParent();
+        }
+
+        // repaint(0, 0, getWidth(), getHeight());
+        // uc.refresh();
     }
 }

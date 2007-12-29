@@ -47,46 +47,42 @@ public class ColonyProductionTest extends FreeColTestCase {
         map.getTile(6, 8).setExploredBy(dutch, true);
                 
         game.setMap(map);
-                
-        Unit soldier = new Unit(game, map.getTile(6, 8), dutch, 
-                                FreeCol.getSpecification().getUnitType("model.unit.veteranSoldier"), 
-                                Unit.ACTIVE, true, false, 0, false);
-                
+        UnitType veteran = FreeCol.getSpecification().getUnitType("model.unit.veteranSoldier");
+        Unit soldier = new Unit(game, map.getTile(6, 8), dutch, veteran, Unit.ACTIVE, veteran.getDefaultEquipment());
+
         Colony colony = new Colony(game, dutch, "New Amsterdam", soldier.getTile());
         soldier.setWorkType(Goods.FOOD);
         soldier.buildColony(colony);
 
-        { // Test the colony
-            assertEquals(map.getTile(6, 8), colony.getTile());
+        // Test the colony
+        assertEquals(map.getTile(6, 8), colony.getTile());
 
-            assertEquals("New Amsterdam", colony.getLocationName());
+        assertEquals("New Amsterdam", colony.getLocationName());
 
-            assertEquals(colony, colony.getTile().getSettlement());
+        assertEquals(colony, colony.getTile().getSettlement());
 
-            assertEquals(dutch, colony.getTile().getOwner());
+        assertEquals(dutch, colony.getTile().getOwner());
 
-            // Should have 50 Muskets and nothing else
-            GoodsType muskets = FreeCol.getSpecification().getGoodsType("model.goods.Muskets");
-            assertNotNull(muskets);
+        // Should have 50 Muskets and nothing else
+        GoodsType muskets = FreeCol.getSpecification().getGoodsType("model.goods.Muskets");
+        assertNotNull(muskets);
             
-            for (GoodsType type : FreeCol.getSpecification().getGoodsTypeList()){
-                if (type == muskets)
-                    assertEquals(50, colony.getGoodsCount(type));
-                else
-                    assertEquals(type.getName(), 0, colony.getGoodsCount(type));
-            }
+        for (GoodsType type : FreeCol.getSpecification().getGoodsTypeList()){
+            if (type == muskets)
+                assertEquals(50, colony.getGoodsCount(type));
+            else
+                assertEquals(type.getName(), 0, colony.getGoodsCount(type));
         }
 
-        { // Test the state of the soldier
-            // Soldier should be working on the field with the bonus
-            assertEquals(Goods.FOOD, soldier.getWorkType());
+        // Test the state of the soldier
+        // Soldier should be working on the field with the bonus
+        assertEquals(Goods.FOOD, soldier.getWorkType());
+        
+        assertEquals(colony.getColonyTile(map.getTile(5,8)).getTile(), soldier.getLocation().getTile());
+        
+        assertEquals(0, soldier.getMovesLeft());
 
-            assertEquals(colony.getColonyTile(map.getTile(5,8)).getTile(), soldier.getLocation().getTile());
-
-            assertEquals(0, soldier.getMovesLeft());
-
-            assertEquals(false, soldier.isArmed());
-        }
+        assertEquals(false, soldier.isArmed());
     }
 
 }

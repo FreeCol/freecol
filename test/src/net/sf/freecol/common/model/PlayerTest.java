@@ -51,10 +51,10 @@ public class PlayerTest extends FreeColTestCase {
 
         UnitType freeColonist = spec().getUnitType("model.unit.freeColonist");
 
-        Unit unit1 = new Unit(game, map.getTile(4, 7), dutch, freeColonist, Unit.ACTIVE, false, false, 0, false);
-        Unit unit2 = new Unit(game, map.getTile(4, 8), dutch, freeColonist, Unit.ACTIVE, false, false, 0, false);
-        Unit unit3 = new Unit(game, map.getTile(5, 7), dutch, freeColonist, Unit.ACTIVE, false, false, 0, false);
-        Unit unit4 = new Unit(game, map.getTile(5, 8), dutch, freeColonist, Unit.ACTIVE, false, false, 0, false);
+        Unit unit1 = new Unit(game, map.getTile(4, 7), dutch, freeColonist, Unit.ACTIVE);
+        Unit unit2 = new Unit(game, map.getTile(4, 8), dutch, freeColonist, Unit.ACTIVE);
+        Unit unit3 = new Unit(game, map.getTile(5, 7), dutch, freeColonist, Unit.ACTIVE);
+        Unit unit4 = new Unit(game, map.getTile(5, 8), dutch, freeColonist, Unit.ACTIVE);
 
         int count = 0;
         Iterator<Unit> unitIterator = dutch.getUnitIterator();

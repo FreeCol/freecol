@@ -41,6 +41,11 @@ public class EquipmentType extends FreeColGameObjectType implements Features {
     private int maximumCount = 1;
 
     /**
+     * Describe combatLossPriority here.
+     */
+    private int combatLossPriority;
+
+    /**
      * A list of AbstractGoods required to build this Type.
      */
     private List<AbstractGoods> goodsRequired = new ArrayList<AbstractGoods>();
@@ -84,6 +89,24 @@ public class EquipmentType extends FreeColGameObjectType implements Features {
      */
     public final void setMaximumCount(final int newMaximumCount) {
         this.maximumCount = newMaximumCount;
+    }
+
+    /**
+     * Get the <code>CombatLossPriority</code> value.
+     *
+     * @return an <code>int</code> value
+     */
+    public final int getCombatLossPriority() {
+        return combatLossPriority;
+    }
+
+    /**
+     * Set the <code>CombatLossPriority</code> value.
+     *
+     * @param newCombatLossPriority The new CombatLossPriority value.
+     */
+    public final void setCombatLossPriority(final int newCombatLossPriority) {
+        this.combatLossPriority = newCombatLossPriority;
     }
 
     /**
@@ -185,6 +208,7 @@ public class EquipmentType extends FreeColGameObjectType implements Features {
             throws XMLStreamException {
         setId(in.getAttributeValue(null, "id"));
         maximumCount = getAttribute(in, "maximum-count", 1);
+        combatLossPriority = getAttribute(in, "combat-loss-priority", 0);
 
         while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
             String nodeName = in.getLocalName();

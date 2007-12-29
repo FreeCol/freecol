@@ -61,11 +61,8 @@ public final class ReportLabourDetailPanel extends ReportPanel implements Action
     }
 
     private JLabel createUnitLabel(UnitType unitType) {
-        int tools = 0;
-        if (unitType.hasAbility("model.ability.expertPioneer")) {
-            tools = 20;
-        }
-        int imageType = ImageLibrary.getUnitGraphicsType(unitType.getIndex(), false, false, tools, false);
+        int imageType = ImageLibrary.getUnitGraphicsType(unitType.getIndex(), false, false, 
+                                                         unitType.hasAbility("model.ability.expertPioneer"), false);
         JLabel unitLabel = new JLabel(getLibrary().getUnitImageIcon(imageType));
         return unitLabel;
     }

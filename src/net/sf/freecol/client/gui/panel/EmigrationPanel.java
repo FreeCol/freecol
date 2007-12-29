@@ -90,7 +90,7 @@ public final class EmigrationPanel extends FreeColDialog implements ActionListen
 
         for (int index = 0; index < NUMBER_OF_PERSONS; index++) {
             UnitType unitType = europe.getRecruitable(index);
-            int graphicsType = ImageLibrary.getUnitGraphicsType(unitType.getIndex(), false, false, 0, false);
+            int graphicsType = ImageLibrary.getUnitGraphicsType(unitType.getIndex(), false, false, false, false);
             person[index].setText(unitType.getName());
             person[index].setIcon(library.getScaledUnitImageIcon(graphicsType, 0.66f));
 

@@ -291,27 +291,7 @@ public class ColonyTile extends FreeColGameObject implements WorkLocation, Ownab
         getWorkTile().takeOwnership(u.getOwner(), getColony());
 
         if (u != null) {
-            if (u.isArmed()) {
-                u.setArmed(false);
-            }
-
-            if (u.isMounted()) {
-                u.setMounted(false);
-            }
-
-            if (u.isMissionary()) {
-                u.setMissionary(false);
-            }
-
-            if (u.getNumberOfTools() > 0) {
-                u.setNumberOfTools(0);
-            }
-
-            Unit student = u.getStudent();
-            if (student != null) {
-                student.setTeacher(null);
-                u.setStudent(null);
-            }
+            u.removeAllEquipment(false);
         }
 
         setUnit(u);

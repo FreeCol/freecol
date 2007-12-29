@@ -365,6 +365,43 @@
 -->
   </tile-types>
 
+  <equipment-types>
+    <equipment-type id="model.equipment.horses" combat-loss-priority="20">
+      <modifier id="model.modifier.lineOfSightBonus" type="additive" value="1"/>
+      <modifier id="model.modifier.movementBonus" type="additive" value="9"/>
+      <ability id="model.ability.scoutIndianSettlement" value="true"/>
+      <ability id="model.ability.scoutForeignColony" value="true"/>
+      <ability id="model.ability.canBeCaptured" value="false"/>
+      <ability id="model.ability.equipmentCanBeCaptured" value="true"/>
+      <required-ability id="model.ability.canBeEquipped" value="true"/>
+      <required-goods id="model.goods.Horses" value="50"/>
+      <compatible-equipment id="model.equipment.muskets"/>
+    </equipment-type>
+    <equipment-type id="model.equipment.muskets" combat-loss-priority="10">
+      <modifier id="model.modifier.defence" type="additive" value="1"/>
+      <modifier id="model.modifier.offence" type="additive" value="1"/>
+      <ability id="model.ability.scoutIndianSettlement" value="false"/>
+      <ability id="model.ability.scoutForeignColony" value="false"/>
+      <ability id="model.ability.captureUnits" value="true"/>
+      <ability id="model.ability.canBeCaptured" value="false"/>
+      <ability id="model.ability.equipmentCanBeCaptured" value="true"/>
+      <required-ability id="model.ability.canBeEquipped" value="true"/>
+      <required-goods id="model.goods.Muskets" value="50"/>
+      <compatible-equipment id="model.equipment.horses"/>
+    </equipment-type>
+    <equipment-type id="model.equipment.tools" maximum-count="5">
+      <ability id="model.ability.improveTerrain" value="true"/>
+      <required-ability id="model.ability.canBeEquipped" value="true"/>
+      <required-goods id="model.goods.Tools" value="20"/>
+    </equipment-type>
+    <equipment-type id="model.equipment.missionary">
+      <modifier id="model.modifier.movementBonus" type="additive" value="3"/>
+      <ability id="model.ability.missionary" value="true"/>
+      <required-ability id="model.ability.canBeEquipped" value="true"/>
+      <required-location-ability id="model.ability.dressMissionary" value="true"/>
+    </equipment-type>
+  </equipment-types>
+
   <!--
   Parent options: name, add-work-turns, overlay, natural, type, required-improvement,
                   expended-goods-type, expended-amount, deliver-goods-type, deliver-amount
@@ -403,7 +440,7 @@
       <effect movement-cost="1"/>
     </tileimprovement-type>
     <tileimprovement-type id="model.improvement.Road" add-work-turns="0" over-trees="true"
-            expended-goods-type="model.goods.Tools" expended-amount="20" magnitude="1">
+            expended-equipment-type="model.equipment.tools" expended-amount="1" magnitude="1">
       <tiles all-land-tiles="true"/>
       <effect goods-type="model.goods.Furs" value="1"/>
       <effect goods-type="model.goods.Lumber" value="1"/>
@@ -412,7 +449,7 @@
       <effect movement-cost="1"/>
     </tileimprovement-type>
     <tileimprovement-type id="model.improvement.Plow" add-work-turns="2" overlay="4"
-            expended-goods-type="model.goods.Tools" expended-amount="20" magnitude="1">
+            expended-equipment-type="model.equipment.tools" expended-amount="1" magnitude="1">
       <tiles all-land-tiles="true" all-forest-tiles="false"/>
       <effect goods-type="model.goods.Food" value="1"/>
       <effect goods-type="model.goods.Sugar" value="1"/>
@@ -420,7 +457,7 @@
       <effect goods-type="model.goods.Cotton" value="1"/>
     </tileimprovement-type>
     <tileimprovement-type id="model.improvement.ClearForest" add-work-turns="2"
-            expended-goods-type="model.goods.Tools" expended-amount="20"
+            expended-equipment-type="model.equipment.tools" expended-amount="1"
             deliver-goods-type="model.goods.Lumber" deliver-amount="5" magnitude="1">
       <tiles all-forest-tiles="true"/>
       <change from="model.tile.mixedForest"     to="model.tile.plains"/>
@@ -461,44 +498,13 @@
     </improvementaction-type>
   </improvementaction-types>
 
-  <equipment-types>
-    <equipment-type id="model.equipment.horses">
-      <modifier id="model.modifier.lineOfSightBonus" type="additive" value="1"/>
-      <modifier id="model.modifier.movement" type="additive" value="9"/>
-      <ability id="model.ability.scoutIndianSettlement" value="true"/>
-      <ability id="model.ability.scoutForeignColony" value="true"/>
-      <required-ability id="model.ability.canBeEquipped" value="true"/>
-      <required-goods id="model.goods.Horses" value="50"/>
-      <compatible-equipment id="model.equipment.muskets"/>
-    </equipment-type>
-    <equipment-type id="model.equipment.muskets">
-      <modifier id="model.modifier.defence" type="additive" value="1"/>
-      <modifier id="model.modifier.offence" type="additive" value="1"/>
-      <ability id="model.ability.scoutIndianSettlement" value="false"/>
-      <ability id="model.ability.scoutForeignColony" value="false"/>
-      <required-ability id="model.ability.canBeEquipped" value="true"/>
-      <required-goods id="model.goods.Muskets" value="50"/>
-      <compatible-equipment id="model.equipment.horses"/>
-    </equipment-type>
-    <equipment-type id="model.equipment.tools" maximum-count="5">
-      <ability id="model.ability.improveTerrain" value="true"/>
-      <required-ability id="model.ability.canBeEquipped" value="true"/>
-      <required-goods id="model.goods.Tools" value="20"/>
-    </equipment-type>
-    <equipment-type id="model.equipment.missionary">
-      <modifier id="model.modifier.movement" type="additive" value="3"/>
-      <ability id="model.ability.missionary" value="true"/>
-      <required-ability id="model.ability.canBeEquipped" value="true"/>
-      <required-location-ability id="model.ability.dressMissionary" value="true"/>
-    </equipment-type>
-  </equipment-types>
-
   <unit-types>
     <unit-type id="model.unit.freeColonist"         offence="0"  defence="1" movement="3" lineOfSight="1"
                scoreValue="3"
                skill="0" promotion="model.unit.veteranSoldier" recruitProbability="20" pathImage="foot">
       <ability id="model.ability.foundColony" value="true"/>
       <ability id="model.ability.canBeEquipped" value="true"/>
+      <ability id="model.ability.canBeCaptured" value="true"/>
       <ability id="model.ability.bornInColony" value="true"/>
       <ability id="model.ability.foundInLostCity" value="true"/>
       <upgrade unit="model.unit.expertFarmer" turnsToLearn="4" learnFromNatives="true" learnFromExperience="true"/>
@@ -529,6 +535,7 @@
                scoreValue="4" clearSpeciality="model.unit.freeColonist" pathImage="foot">
       <ability id="model.ability.foundColony" value="true"/>
       <ability id="model.ability.canBeEquipped" value="true"/>
+      <ability id="model.ability.canBeCaptured" value="true"/>
       <modifier id="model.goods.Food" type="additive" value="2"/>
     </unit-type>
     <unit-type id="model.unit.expertFisherman"      offence="0"  defence="1" movement="3" lineOfSight="1" price="1000" 
@@ -536,6 +543,7 @@
                scoreValue="4" clearSpeciality="model.unit.freeColonist" pathImage="foot">
       <ability id="model.ability.foundColony" value="true"/>
       <ability id="model.ability.canBeEquipped" value="true"/>
+      <ability id="model.ability.canBeCaptured" value="true"/>
       <modifier id="model.goods.Fish" type="additive" value="2"/>
     </unit-type>
     <unit-type id="model.unit.expertFurTrapper"     offence="0"  defence="1" movement="3" lineOfSight="1"               
@@ -543,6 +551,7 @@
                scoreValue="4" clearSpeciality="model.unit.freeColonist" pathImage="foot">
       <ability id="model.ability.foundColony" value="true"/>
       <ability id="model.ability.canBeEquipped" value="true"/>
+      <ability id="model.ability.canBeCaptured" value="true"/>
       <modifier id="model.goods.Furs" type="multiplicative" value="2"/>
     </unit-type>
     <unit-type id="model.unit.expertSilverMiner"    offence="0"  defence="1" movement="3" lineOfSight="1" price="900"  
@@ -550,6 +559,7 @@
                scoreValue="4" clearSpeciality="model.unit.freeColonist" pathImage="foot">
       <ability id="model.ability.foundColony" value="true"/>
       <ability id="model.ability.canBeEquipped" value="true"/>
+      <ability id="model.ability.canBeCaptured" value="true"/>
       <modifier id="model.goods.Silver" type="multiplicative" value="2"/>
     </unit-type>
     <unit-type id="model.unit.expertLumberJack"     offence="0"  defence="1" movement="3" lineOfSight="1" price="700"  
@@ -557,6 +567,7 @@
                scoreValue="4" clearSpeciality="model.unit.freeColonist" pathImage="foot">
       <ability id="model.ability.foundColony" value="true"/>
       <ability id="model.ability.canBeEquipped" value="true"/>
+      <ability id="model.ability.canBeCaptured" value="true"/>
       <modifier id="model.goods.Lumber" type="multiplicative" value="2"/>
     </unit-type>
     <unit-type id="model.unit.expertOreMiner"       offence="0"  defence="1" movement="3" lineOfSight="1" price="600"  
@@ -564,6 +575,7 @@
                scoreValue="4" clearSpeciality="model.unit.freeColonist" pathImage="foot">
       <ability id="model.ability.foundColony" value="true"/>
       <ability id="model.ability.canBeEquipped" value="true"/>
+      <ability id="model.ability.canBeCaptured" value="true"/>
       <modifier id="model.goods.Ore" type="multiplicative" value="2"/>
     </unit-type>
     <unit-type id="model.unit.masterSugarPlanter"   offence="0"  defence="1" movement="3" lineOfSight="1"               
@@ -571,6 +583,7 @@
                scoreValue="5" clearSpeciality="model.unit.freeColonist" pathImage="foot">
       <ability id="model.ability.foundColony" value="true"/>
       <ability id="model.ability.canBeEquipped" value="true"/>
+      <ability id="model.ability.canBeCaptured" value="true"/>
       <modifier id="model.goods.Sugar" type="multiplicative" value="2"/>
     </unit-type>
     <unit-type id="model.unit.masterCottonPlanter"  offence="0"  defence="1" movement="3" lineOfSight="1"               
@@ -578,6 +591,7 @@
                scoreValue="5" clearSpeciality="model.unit.freeColonist" pathImage="foot">
       <ability id="model.ability.foundColony" value="true"/>
       <ability id="model.ability.canBeEquipped" value="true"/>
+      <ability id="model.ability.canBeCaptured" value="true"/>
       <modifier id="model.goods.Cotton" type="multiplicative" value="2"/>
     </unit-type>
     <unit-type id="model.unit.masterTobaccoPlanter" offence="0"  defence="1" movement="3" lineOfSight="1"               
@@ -585,6 +599,7 @@
                scoreValue="5" clearSpeciality="model.unit.freeColonist" pathImage="foot">
       <ability id="model.ability.foundColony" value="true"/>
       <ability id="model.ability.canBeEquipped" value="true"/>
+      <ability id="model.ability.canBeCaptured" value="true"/>
       <modifier id="model.goods.Tobacco" type="multiplicative" value="2"/>
     </unit-type>
     <unit-type id="model.unit.firebrandPreacher"    offence="0"  defence="1" movement="3" lineOfSight="1" price="1500" 
@@ -592,6 +607,7 @@
                scoreValue="6" clearSpeciality="model.unit.freeColonist" pathImage="foot">
       <ability id="model.ability.foundColony" value="true"/>
       <ability id="model.ability.canBeEquipped" value="true"/>
+      <ability id="model.ability.canBeCaptured" value="true"/>
       <modifier id="model.goods.Crosses" type="multiplicative" value="2"/>
     </unit-type>
     <unit-type id="model.unit.elderStatesman"       offence="0"  defence="1" movement="3" lineOfSight="1" price="1900" 
@@ -599,6 +615,7 @@
                scoreValue="6" clearSpeciality="model.unit.freeColonist" pathImage="foot">
       <ability id="model.ability.foundColony" value="true"/>
       <ability id="model.ability.canBeEquipped" value="true"/>
+      <ability id="model.ability.canBeCaptured" value="true"/>
       <modifier id="model.goods.Bells" type="multiplicative" value="2"/>
     </unit-type>
     <unit-type id="model.unit.masterCarpenter"      offence="0"  defence="1" movement="3" lineOfSight="1" price="1000" 
@@ -606,6 +623,7 @@
                scoreValue="4" clearSpeciality="model.unit.freeColonist" pathImage="foot">
       <ability id="model.ability.foundColony" value="true"/>
       <ability id="model.ability.canBeEquipped" value="true"/>
+      <ability id="model.ability.canBeCaptured" value="true"/>
       <modifier id="model.goods.Hammers" type="multiplicative" value="2"/>
     </unit-type>
     <unit-type id="model.unit.masterDistiller"      offence="0"  defence="1" movement="3" lineOfSight="1" price="1100" 
@@ -613,6 +631,7 @@
                scoreValue="5" clearSpeciality="model.unit.freeColonist" pathImage="foot">
       <ability id="model.ability.foundColony" value="true"/>
       <ability id="model.ability.canBeEquipped" value="true"/>
+      <ability id="model.ability.canBeCaptured" value="true"/>
       <modifier id="model.goods.Rum" type="multiplicative" value="2"/>
     </unit-type>
     <unit-type id="model.unit.masterWeaver"         offence="0"  defence="1" movement="3" lineOfSight="1" price="1300" 
@@ -620,6 +639,7 @@
                scoreValue="5" clearSpeciality="model.unit.freeColonist" pathImage="foot">
       <ability id="model.ability.foundColony" value="true"/>
       <ability id="model.ability.canBeEquipped" value="true"/>
+      <ability id="model.ability.canBeCaptured" value="true"/>
       <modifier id="model.goods.Cloth" type="multiplicative" value="2"/>
     </unit-type>
     <unit-type id="model.unit.masterTobacconist"    offence="0"  defence="1" movement="3" lineOfSight="1" price="1200" 
@@ -627,6 +647,7 @@
                scoreValue="5" clearSpeciality="model.unit.freeColonist" pathImage="foot">
       <ability id="model.ability.foundColony" value="true"/>
       <ability id="model.ability.canBeEquipped" value="true"/>
+      <ability id="model.ability.canBeCaptured" value="true"/>
       <modifier id="model.goods.Cigars" type="multiplicative" value="2"/>
     </unit-type>
     <unit-type id="model.unit.masterFurTrader"      offence="0"  defence="1" movement="3" lineOfSight="1" price="950"  
@@ -634,6 +655,7 @@
                scoreValue="5" clearSpeciality="model.unit.freeColonist" pathImage="foot">
       <ability id="model.ability.foundColony" value="true"/>
       <ability id="model.ability.canBeEquipped" value="true"/>
+      <ability id="model.ability.canBeCaptured" value="true"/>
       <modifier id="model.goods.Coats" type="multiplicative" value="2"/>
     </unit-type>
     <unit-type id="model.unit.masterBlacksmith"     offence="0"  defence="1" movement="3" lineOfSight="1" price="1050" 
@@ -641,6 +663,7 @@
                scoreValue="5" clearSpeciality="model.unit.freeColonist" pathImage="foot">
       <ability id="model.ability.foundColony" value="true"/>
       <ability id="model.ability.canBeEquipped" value="true"/>
+      <ability id="model.ability.canBeCaptured" value="true"/>
       <modifier id="model.goods.Tools" type="multiplicative" value="2"/>
     </unit-type>
     <unit-type id="model.unit.masterGunsmith"       offence="0"  defence="1" movement="3" lineOfSight="1" price="850"  
@@ -648,6 +671,7 @@
                scoreValue="5" clearSpeciality="model.unit.freeColonist" pathImage="foot">
       <ability id="model.ability.foundColony" value="true"/>
       <ability id="model.ability.canBeEquipped" value="true"/>
+      <ability id="model.ability.canBeCaptured" value="true"/>
       <modifier id="model.goods.Muskets" type="multiplicative" value="2"/>
     </unit-type>
     <unit-type id="model.unit.seasonedScout"        offence="0"  defence="1" movement="3" lineOfSight="1"               
@@ -655,6 +679,7 @@
                scoreValue="4" pathImage="foot">
       <ability id="model.ability.foundColony" value="true"/>
       <ability id="model.ability.canBeEquipped" value="true"/>
+      <ability id="model.ability.canBeCaptured" value="true"/>
       <ability id="model.ability.expertScout" value="true"/>
     </unit-type>
     <unit-type id="model.unit.hardyPioneer"         offence="0"  defence="1" movement="3" lineOfSight="1" price="1100" 
@@ -662,6 +687,7 @@
                scoreValue="4" pathImage="foot">
       <ability id="model.ability.foundColony" value="true"/>
       <ability id="model.ability.canBeEquipped" value="true"/>
+      <ability id="model.ability.canBeCaptured" value="true"/>
       <ability id="model.ability.expertPioneer" value="true"/>
     </unit-type>
     <unit-type id="model.unit.veteranSoldier"       offence="0"  defence="1" movement="3" lineOfSight="1" price="2000" 
@@ -669,6 +695,8 @@
                scoreValue="5" clearSpeciality="model.unit.freeColonist" pathImage="foot">
       <ability id="model.ability.foundColony" value="true"/>
       <ability id="model.ability.canBeEquipped" value="true"/>
+      <ability id="model.ability.canBeCaptured" value="true"/>
+      <ability id="model.ability.expertSoldier" value="true"/>
       <modifier id="model.modifier.offence" type="percentage" value="50"/>
     </unit-type>
     <unit-type id="model.unit.jesuitMissionary"     offence="0"  defence="1" movement="3" lineOfSight="1" price="1400" 
@@ -676,6 +704,7 @@
                scoreValue="5" pathImage="foot">
       <ability id="model.ability.foundColony" value="true"/>
       <ability id="model.ability.canBeEquipped" value="true"/>
+      <ability id="model.ability.canBeCaptured" value="true"/>
       <ability id="model.ability.expertMissionary" value="true"/>
     </unit-type>
     <unit-type id="model.unit.indenturedServant"    offence="0"  defence="1" movement="3" lineOfSight="1"              
@@ -683,6 +712,7 @@
                scoreValue="2" pathImage="foot">
       <ability id="model.ability.foundColony" value="true"/>
       <ability id="model.ability.canBeEquipped" value="true"/>
+      <ability id="model.ability.canBeCaptured" value="true"/>
       <upgrade unit="model.unit.freeColonist" turnsToLearn="4"/>
       <upgrade unit="model.unit.expertFarmer" learnFromNatives="true"/>
       <upgrade unit="model.unit.expertFisherman" learnFromNatives="true"/>
@@ -709,6 +739,7 @@
                scoreValue="1" pathImage="foot">
       <ability id="model.ability.foundColony" value="true"/>
       <ability id="model.ability.canBeEquipped" value="true"/>
+      <ability id="model.ability.canBeCaptured" value="true"/>
       <upgrade unit="model.unit.indenturedServant" turnsToLearn="4"/>
       <upgrade unit="model.unit.seasonedScout" learnInLostCity="true"/>
       <modifier id="model.goods.Rum" type="additive" value="-2" />
@@ -744,17 +775,21 @@
       <ability id="model.ability.carryGoods" value="true"/>
       <ability id="model.ability.bornInIndianSettlement" value="true"/>
       <ability id="model.ability.pillageUnprotectedColony" value="true"/>
+      <ability id="model.ability.captureUnits" value="false"/>
+      <ability id="model.ability.captureEquipment" value="true"/>
     </unit-type>
     <unit-type id="model.unit.colonialRegular"      offence="3"  defence="3" movement="3" lineOfSight="1"
                clearSpeciality="model.unit.freeColonist" pathImage="foot">
       <ability id="model.ability.foundColony" value="true"/>
       <ability id="model.ability.canBeEquipped" value="true"/>
+      <ability id="model.ability.canBeCaptured" value="true"/>
       <required-ability id="model.ability.independenceDeclared"/>
     </unit-type>
     <unit-type id="model.unit.kingsRegular"         offence="4"  defence="4" movement="3" lineOfSight="1"
                clearSpeciality="model.unit.freeColonist">
       <ability id="model.ability.foundColony" value="true"/>
       <ability id="model.ability.canBeEquipped" value="true"/>
+      <ability id="model.ability.canBeCaptured" value="true"/>
     </unit-type>
     <unit-type id="model.unit.caravel"              offence="0"  defence="2"  movement="12" lineOfSight="1" space="2"
                spaceTaken="24" hitPoints="6" price="1000" pathImage="naval" scoreValue="3">
@@ -829,16 +864,19 @@
     <unit-type id="model.unit.treasureTrain"        offence="0"  defence="0" movement="3"
                scoreValue="1" lineOfSight="1" spaceTaken="6" pathImage="wagon">
       <ability id="model.ability.carryTreasure" value="true"/>
+      <ability id="model.ability.canBeCaptured" value="true"/>
     </unit-type>
     <unit-type id="model.unit.wagonTrain"           offence="0"  defence="1" movement="6"
                scoreValue="1" lineOfSight="1" spaceTaken="12" space="2"
                pathImage="wagon">
       <required-goods id="model.goods.Hammers" value="40"/>
       <ability id="model.ability.carryGoods" value="true"/>
+      <ability id="model.ability.canBeCaptured" value="true"/>
     </unit-type>
     <unit-type id="model.unit.milkmaid"             offence="0"  defence="1" movement="3"  lineOfSight="1" expert-production="food" pathImage="foot">
       <ability id="model.ability.foundColony" value="true"/>
       <ability id="model.ability.canBeEquipped" value="true"/>
+      <ability id="model.ability.canBeCaptured" value="true"/>
     </unit-type>
     <unit-type id="model.unit.revenger"             offence="666"  defence="666" movement="18" lineOfSight="3" pathImage="foot">
         <ability id="model.ability.undead" value="true"/>
@@ -854,6 +892,7 @@
     <unit-type id="model.unit.undead"               offence="18"  defence="4" movement="3" lineOfSight="1" pathImage="foot">
       <ability id="model.ability.foundColony" value="true"/>
       <ability id="model.ability.canBeEquipped" value="true"/>
+      <ability id="model.ability.canBeCaptured" value="true"/>
       <ability id="model.ability.undead" value="true"/>
     </unit-type>
   </unit-types>
@@ -1208,7 +1247,7 @@
   <nation-types>
     <!-- default nation for multi-player games -->
     <european-nation-type id="model.nationType.default">
-      <unit id="model.unit.freeColonist" tools="100"/>
+      <unit id="model.unit.freeColonist" tools="5"/>
       <unit id="model.unit.freeColonist" armed="true"/>
       <unit id="model.unit.caravel"/>
       <ability id="model.ability.electFoundingFather"/>
@@ -1221,7 +1260,7 @@
     <!-- this was the Dutch player -->
     <european-nation-type id="model.nationType.trade">
       <modifier id="model.modifier.tradeBonus" type="percentage" value="50"/>
-      <unit id="model.unit.freeColonist" tools="100"/>
+      <unit id="model.unit.freeColonist" tools="5"/>
       <unit id="model.unit.freeColonist" armed="true"/>
       <unit id="model.unit.merchantman"/>
       <ability id="model.ability.electFoundingFather"/>
@@ -1229,7 +1268,7 @@
     <!-- this was the French player -->
     <european-nation-type id="model.nationType.cooperation">
       <modifier id="model.modifier.nativeAlarmBonus" type="percentage" value="-50"/>
-      <unit id="model.unit.hardyPioneer" tools="100"/>
+      <unit id="model.unit.hardyPioneer" tools="5"/>
       <unit id="model.unit.freeColonist" armed="true"/>
       <unit id="model.unit.caravel"/>
       <ability id="model.ability.electFoundingFather"/>
@@ -1237,7 +1276,7 @@
     <!-- this was the English player -->
     <european-nation-type id="model.nationType.immigration">
       <modifier id="model.modifier.religiousUnrestBonus" type="percentage" value="-33"/>
-      <unit id="model.unit.freeColonist" tools="100"/>
+      <unit id="model.unit.freeColonist" tools="5"/>
       <unit id="model.unit.freeColonist" armed="true"/>
       <unit id="model.unit.caravel"/>
       <ability id="model.ability.electFoundingFather"/>
@@ -1246,7 +1285,7 @@
     <european-nation-type id="model.nationType.conquest">
       <modifier id="model.modifier.nativeConvertBonus" type="percentage" value="200"/>
       <modifier id="model.modifier.nativeTreasureBonus" type="percentage" value="200"/>
-      <unit id="model.unit.freeColonist" tools="100"/>
+      <unit id="model.unit.freeColonist" tools="5"/>
       <unit id="model.unit.veteranSoldier" armed="true" mounted="true"/>
       <unit id="model.unit.caravel"/>
       <ability id="model.ability.electFoundingFather"/>
@@ -1255,7 +1294,7 @@
       <modifier id="model.modifier.movementBonus" type="additive" value="1">
         <scope ability="model.ability.navalUnit"/>
       </modifier>
-      <unit id="model.unit.freeColonist" tools="100"/>
+      <unit id="model.unit.freeColonist" tools="5"/>
       <unit id="model.unit.freeColonist" armed="true"/>
       <unit id="model.unit.merchantman"/>
       <ability id="model.ability.electFoundingFather"/>

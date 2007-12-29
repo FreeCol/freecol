@@ -20,6 +20,9 @@
 
 package net.sf.freecol.common.model;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
@@ -156,6 +159,25 @@ public class AbstractUnit extends FreeColObject {
     public final void setTools(final int newTools) {
         this.tools = newTools;
     }
+
+    public EquipmentType[] getEquipment() {
+        List<EquipmentType> equipment = new ArrayList<EquipmentType>();
+        if (armed) {
+            equipment.add(FreeCol.getSpecification().getEquipmentType("model.equipment.muskets"));
+        }
+        if (mounted) {
+            equipment.add(FreeCol.getSpecification().getEquipmentType("model.equipment.horses"));
+        }
+        if (missionary) {
+            equipment.add(FreeCol.getSpecification().getEquipmentType("model.equipment.missionary"));
+        }
+        EquipmentType toolsType = FreeCol.getSpecification().getEquipmentType("model.equipment.tools");
+        for (int count = 0; count < tools; count++) {
+            equipment.add(toolsType);
+        }
+        return equipment.toArray(new EquipmentType[0]);
+    }
+
 
     /**
      * Initialize this object from an XML-representation of this object.

@@ -242,12 +242,12 @@ public class FreeColTestCase extends TestCase {
         Colony colony = new Colony(game, dutch, "New Amsterdam", tile);
 
         UnitType unitType = FreeCol.getSpecification().getUnitType("model.unit.freeColonist");
-        Unit soldier = new Unit(game, tile, dutch, unitType, Unit.ACTIVE, true, false, 0, false);
+        Unit soldier = new Unit(game, tile, dutch, unitType, Unit.ACTIVE, unitType.getDefaultEquipment());
 
         soldier.buildColony(colony);
 
         for (int i = 1; i < numberOfSettlers; i++) {
-            Unit settler = new Unit(game, tile, dutch, unitType, Unit.ACTIVE, true, false, 0, false);
+            Unit settler = new Unit(game, tile, dutch, unitType, Unit.ACTIVE, unitType.getDefaultEquipment());
             settler.setLocation(colony);
         }
 

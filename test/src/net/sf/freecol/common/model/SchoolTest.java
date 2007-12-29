@@ -833,11 +833,18 @@ public class SchoolTest extends FreeColTestCase {
 
         // Put LumberJack in School
         lumberjack.setLocation(school);
+        assertTrue(lumberjack.getStudent() == colonist);
+        assertTrue(colonist.getTeacher() == lumberjack);
         trainForTurns(colony, 2);
 
         // After 2 turns replace by miner. Progress starts from scratch.
         lumberjack.setLocation(colony.getVacantColonyTileFor(lumberjack, Goods.FOOD));
+        assertTrue(lumberjack.getStudent() == null);
+        assertTrue(colonist.getTeacher() == null);
+
         miner.setLocation(school);
+        assertTrue(miner.getStudent() == colonist);
+        assertTrue(colonist.getTeacher() == miner);
         trainForTurns(colony, miner.getNeededTurnsOfTraining());
         assertEquals(0, getUnitList(colony, Unit.FREE_COLONIST).size());
         assertEquals(2, getUnitList(colony, Unit.EXPERT_ORE_MINER).size());
