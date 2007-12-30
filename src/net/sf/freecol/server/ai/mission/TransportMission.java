@@ -651,7 +651,7 @@ public class TransportMission extends Mission {
      * </ol>
      * 
      * @param connection The <code>Connection</code> to the server.
-     * @param unitType The type of {@link Unit} to be found/recuited/trained.
+     * @param unitType The type of {@link Unit} to be found/recruited/trained.
      * @return The <code>AIUnit</code>.
      */
     private AIUnit getUnitInEurope(Connection connection, UnitType unitType) {
@@ -1124,7 +1124,11 @@ public class TransportMission extends Mission {
      * @return <code>true</code>
      */
     public boolean isValid() {
-        return true;
+        Unit unit = this.getAIUnit().getUnit();
+        if (unit.isNaval() && unit.isUnderRepair())
+            return false;
+        else
+            return true;
     }
 
     /**
