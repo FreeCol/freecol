@@ -39,7 +39,7 @@ public class SchoolTest extends FreeColTestCase {
         ArrayList<Unit> units = new ArrayList<Unit>();
         for (WorkLocation wl : colony.getWorkLocations()) {
             for (Unit unit : wl.getUnitList()) {
-                if (unit.getType() == type) {
+                if (unit.getIndex() == type) {
                     units.add(unit);
                 }
             }
@@ -91,7 +91,7 @@ public class SchoolTest extends FreeColTestCase {
 
         ore.setLocation(school);
         trainForTurns(colony, ore.getNeededTurnsOfTraining());
-        assertEquals(Unit.EXPERT_ORE_MINER, colonist.getType());
+        assertEquals(Unit.EXPERT_ORE_MINER, colonist.getIndex());
         colony.dispose();
     }
 
@@ -114,7 +114,7 @@ public class SchoolTest extends FreeColTestCase {
 
         blackSmith.setLocation(school);
         trainForTurns(colony, blackSmith.getNeededTurnsOfTraining());
-        assertEquals(Unit.MASTER_BLACKSMITH, colonist.getType());
+        assertEquals(Unit.MASTER_BLACKSMITH, colonist.getIndex());
         colony.dispose();
     }
 
@@ -138,7 +138,7 @@ public class SchoolTest extends FreeColTestCase {
 
         elder.setLocation(school);
         trainForTurns(colony, elder.getNeededTurnsOfTraining());
-        assertEquals(Unit.ELDER_STATESMAN, colonist.getType());
+        assertEquals(Unit.ELDER_STATESMAN, colonist.getIndex());
         colony.dispose();
     }
 
@@ -475,7 +475,7 @@ public class SchoolTest extends FreeColTestCase {
         // PETTY_CRIMINALS become INDENTURED_SERVANTS
         trainForTurns(colony, teacher.getNeededTurnsOfTraining(), Unit.PETTY_CRIMINAL);
         assertEquals(0, getUnitList(colony, Unit.PETTY_CRIMINAL).size());
-        assertEquals(Unit.INDENTURED_SERVANT, criminal.getType());
+        assertEquals(Unit.INDENTURED_SERVANT, criminal.getIndex());
         colony.dispose();
     }
 
@@ -500,7 +500,7 @@ public class SchoolTest extends FreeColTestCase {
 
         assertEquals(teacher.getNeededTurnsOfTraining(), 4);
         trainForTurns(colony, teacher.getNeededTurnsOfTraining(), Unit.PETTY_CRIMINAL);
-        assertEquals(Unit.INDENTURED_SERVANT, criminal.getType());
+        assertEquals(Unit.INDENTURED_SERVANT, criminal.getIndex());
         colony.dispose();
     }
 
@@ -525,7 +525,7 @@ public class SchoolTest extends FreeColTestCase {
         assertEquals(teacher.getNeededTurnsOfTraining(), 4);
         trainForTurns(colony, teacher.getNeededTurnsOfTraining(), Unit.INDENTURED_SERVANT);
         // Train to become free colonist
-        assertEquals(Unit.FREE_COLONIST, indenturedServant.getType());
+        assertEquals(Unit.FREE_COLONIST, indenturedServant.getIndex());
     }
 
     /**
@@ -561,7 +561,7 @@ public class SchoolTest extends FreeColTestCase {
         assertEquals(1, getUnitList(colony, Unit.FREE_COLONIST).size());
         school.newTurn();
         assertEquals(0, getUnitList(colony, Unit.FREE_COLONIST).size());
-        assertEquals(Unit.EXPERT_ORE_MINER, outsider.getType());
+        assertEquals(Unit.EXPERT_ORE_MINER, outsider.getIndex());
     }
 
     /**
@@ -660,7 +660,7 @@ public class SchoolTest extends FreeColTestCase {
         school.newTurn();
         assertEquals(0, teacher1.getTurnsOfTraining());
         assertEquals(1, teacher2.getTurnsOfTraining());
-        assertEquals(Unit.INDENTURED_SERVANT, teacher2.getStudent().getType());
+        assertEquals(Unit.INDENTURED_SERVANT, teacher2.getStudent().getIndex());
 
     }
     
@@ -882,7 +882,7 @@ public class SchoolTest extends FreeColTestCase {
         school.newTurn();
         school.newTurn();
         assertEquals(0, getUnitList(colony, Unit.FREE_COLONIST).size());
-        assertEquals(Unit.EXPERT_ORE_MINER, colonist.getType());
+        assertEquals(Unit.EXPERT_ORE_MINER, colonist.getIndex());
 
         // Servant training
         assertEquals(0, getUnitList(colony, Unit.FREE_COLONIST).size());
@@ -891,7 +891,7 @@ public class SchoolTest extends FreeColTestCase {
         school.newTurn();
         school.newTurn();
         assertEquals(0, getUnitList(colony, Unit.INDENTURED_SERVANT).size());
-        assertEquals(Unit.FREE_COLONIST, indenturedServant.getType());
+        assertEquals(Unit.FREE_COLONIST, indenturedServant.getIndex());
         indenturedServant.setLocation(getGame().getMap().getTile(10,8));
 
         // Criminal training
@@ -902,7 +902,7 @@ public class SchoolTest extends FreeColTestCase {
         school.newTurn();
         school.newTurn();
         assertEquals(0, getUnitList(colony, Unit.PETTY_CRIMINAL).size());
-        assertEquals(Unit.INDENTURED_SERVANT, criminal.getType());
+        assertEquals(Unit.INDENTURED_SERVANT, criminal.getIndex());
     }
 
     /**
@@ -942,8 +942,8 @@ public class SchoolTest extends FreeColTestCase {
         assertEquals(1, getUnitList(colony, Unit.FREE_COLONIST).size());
         assertEquals(1, getUnitList(colony, Unit.INDENTURED_SERVANT).size());
         assertEquals(0, getUnitList(colony, Unit.PETTY_CRIMINAL).size());
-        assertEquals(Unit.FREE_COLONIST, indenturedServant.getType());
-        assertEquals(Unit.INDENTURED_SERVANT, criminal.getType());
+        assertEquals(Unit.FREE_COLONIST, indenturedServant.getIndex());
+        assertEquals(Unit.INDENTURED_SERVANT, criminal.getIndex());
         
         // Train again
         school.newTurn();
@@ -955,8 +955,8 @@ public class SchoolTest extends FreeColTestCase {
         assertEquals(1, getUnitList(colony, Unit.FREE_COLONIST).size());
         assertEquals(0, getUnitList(colony, Unit.INDENTURED_SERVANT).size());
         assertEquals(0, getUnitList(colony, Unit.PETTY_CRIMINAL).size());
-        assertEquals(Unit.EXPERT_ORE_MINER, indenturedServant.getType());
-        assertEquals(Unit.FREE_COLONIST, criminal.getType());
+        assertEquals(Unit.EXPERT_ORE_MINER, indenturedServant.getIndex());
+        assertEquals(Unit.FREE_COLONIST, criminal.getIndex());
     }
 
 }

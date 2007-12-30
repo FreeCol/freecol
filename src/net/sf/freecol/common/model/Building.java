@@ -255,7 +255,7 @@ public final class Building extends FreeColGameObject implements Features, WorkL
             
             // Colonists which can't work here must be put outside
             for (Unit unit : units) {
-                if (!canAdd(unit.getUnitType())) {
+                if (!canAdd(unit.getType())) {
                     unit.setLocation(getTile());
                 }
             }
@@ -305,7 +305,7 @@ public final class Building extends FreeColGameObject implements Features, WorkL
         if (!(locatable instanceof Unit)) {
             return false;
         }
-        return canAdd(((Unit) locatable).getUnitType());
+        return canAdd(((Unit) locatable).getType());
     }
 
     /**
@@ -743,11 +743,11 @@ public final class Building extends FreeColGameObject implements Features, WorkL
             Iterator<Unit> i = getUnitIterator();
             while (i.hasNext()) {
                 Unit unit = (Unit)i.next();
-                if (unit.getUnitType() == getExpertUnitType()) {
+                if (unit.getType() == getExpertUnitType()) {
                     minimumProduction += 4;
                 }
             }
-            if (new_unit != null && canAdd(new_unit) && new_unit.getUnitType() == getExpertUnitType()) {
+            if (new_unit != null && canAdd(new_unit) && new_unit.getType() == getExpertUnitType()) {
                 minimumProduction += 4;
             }
             if (goodsOutput < minimumProduction) {

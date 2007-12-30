@@ -982,7 +982,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         int max = 7; // maximum dx + 1
         
         Specification specification = FreeCol.getSpecification();
-        List<UnitType> learntUnitTypes = unit.getUnitType().getUnitTypesLearntInLostCity();
+        List<UnitType> learntUnitTypes = unit.getType().getUnitTypesLearntInLostCity();
         List<UnitType> newUnitTypes = specification.getUnitTypesWithAbility("model.ability.foundInLostCity");
         List<UnitType> treasureUnitTypes = specification.getUnitTypesWithAbility("model.ability.carryTreasure");
         
@@ -1196,7 +1196,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         Element reply = Message.createNewRootElement("provideSkill");
         if (settlement.getLearnableSkill() != null) {
             reply.setAttribute("skill", Integer.toString(settlement.getLearnableSkill().getIndex()));
-            if (unit.getUnitType().canLearnFromNatives(settlement.getLearnableSkill())) {
+            if (unit.getType().canLearnFromNatives(settlement.getLearnableSkill())) {
                 // We now put the unit on the indian settlement.
                 // Normally we shouldn't have to this, but the
                 // movesLeft are set to 0 for unit and if the player
@@ -1538,7 +1538,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         // The unit was relocated to the indian settlement. See askSkill for
         // more info.
         IndianSettlement settlement = (IndianSettlement) unit.getLocation();
-        if (!unit.getUnitType().canLearnFromNatives(settlement.getLearnableSkill())) {
+        if (!unit.getType().canLearnFromNatives(settlement.getLearnableSkill())) {
             throw new IllegalStateException("Unit can't learn that skill from settlement!");
         }
         
@@ -2548,7 +2548,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
             Iterator<Unit> unitIterator = enemyPlayer.getUnitIterator();
             while (unitIterator.hasNext()) {
                 Unit unit = unitIterator.next();
-                switch (unit.getType()) {
+                switch (unit.getIndex()) {
                 case Unit.ARTILLERY:
                     artillery++;
                     break;
@@ -2566,7 +2566,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
                     }
                     break;
                 default:
-                    logger.warning("Unknown type of REF unit " + unit.getType());
+                    logger.warning("Unknown type of REF unit " + unit.getIndex());
                 }
             }
         }

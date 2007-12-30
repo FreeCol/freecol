@@ -233,7 +233,7 @@ public final class ReportUnitPanel extends JPanel implements ActionListener {
         Iterator<Unit> units = player.getUnitIterator();
         while (units.hasNext()) {
             Unit unit = units.next();
-            int type = unit.getType();
+            int type = unit.getIndex();
             String locationName = null;
 
             if (reportType == CARGO && unit.isCarrier()) {

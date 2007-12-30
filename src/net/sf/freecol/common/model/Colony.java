@@ -594,7 +594,7 @@ public final class Colony extends Settlement implements Features, Location, Name
      * @return <code>true</code> if this unit type could be added.
     */
     public boolean canTrain(Unit unit) {
-        return canTrain(unit.getUnitType());
+        return canTrain(unit.getType());
     }
 
     /**
@@ -1727,7 +1727,7 @@ public final class Colony extends Settlement implements Features, Location, Name
         while (unitIterator.hasNext()) {
             Unit unit = unitIterator.next();
             if (unit.hasAbility("model.ability.bombard")) {
-                attackPower += unit.getUnitType().getOffence();
+                attackPower += unit.getType().getOffence();
             }
         }
         if (attackPower > 48) {
@@ -1749,7 +1749,7 @@ public final class Colony extends Settlement implements Features, Location, Name
             Unit unit = unitIterator.next();
             logger.finest("Unit is " + unit.getName());
             if (unit.hasAbility("model.ability.bombard")) {
-                int power = unit.getUnitType().getOffence();
+                int power = unit.getType().getOffence();
                 if (power > maxPower) {
                     power = maxPower;
                     attacker = unit;

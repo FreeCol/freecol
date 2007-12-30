@@ -385,8 +385,8 @@ public class UnitTest extends FreeColTestCase {
         assertFalse(caravel.canAdd(galleon));
 
         // tests according to other possible rules
-        wagonTrain.getUnitType().setSpaceTaken(2);
-        caravel.getUnitType().setSpaceTaken(1);
+        wagonTrain.getType().setSpaceTaken(2);
+        caravel.getType().setSpaceTaken(1);
 
         assertTrue(galleon.canAdd(wagonTrain));
         assertTrue(caravel.canAdd(wagonTrain));

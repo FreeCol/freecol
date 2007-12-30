@@ -407,21 +407,21 @@ public final class Europe extends FreeColGameObject implements Location,
             throw new NullPointerException();
         }
 
-        int price = getUnitPrice(unit.getUnitType());
+        int price = getUnitPrice(unit.getType());
         if (price <= 0) {
             throw new IllegalArgumentException();
         }
         
-        if (getUnitPrice(unit.getUnitType()) > unit.getOwner().getGold()) {
+        if (getUnitPrice(unit.getType()) > unit.getOwner().getGold()) {
             throw new IllegalStateException();
         }
 
         unit.getOwner().modifyGold(price);
         unit.setLocation(this);
 
-        int increasingPrice = unit.getUnitType().getIncreasingPrice();
+        int increasingPrice = unit.getType().getIncreasingPrice();
         if (increasingPrice > 0) {
-            unitPrices.put(unit.getUnitType().getId(), new Integer(price + increasingPrice));
+            unitPrices.put(unit.getType().getId(), new Integer(price + increasingPrice));
         }
     }
 

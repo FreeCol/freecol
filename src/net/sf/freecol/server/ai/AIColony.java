@@ -845,10 +845,10 @@ public class AIColony extends AIObject {
                     if (unit.getExpertWorkType() == wlp.getGoodsType()
                             && wlp.getWorkLocation().canAdd(unit)
                             && (wlp.getGoodsType() != Goods.FOOD || !((ColonyTile) wl).getWorkTile().isLand()
-                                    && unit.getType() == Unit.EXPERT_FISHERMAN
+                                    && unit.getIndex() == Unit.EXPERT_FISHERMAN
                                     && colony.hasAbility("model.ability.produceInWater")
                                     || ((ColonyTile) wl).getWorkTile().isLand()
-                                    && unit.getType() != Unit.EXPERT_FISHERMAN)) {
+                                    && unit.getIndex() != Unit.EXPERT_FISHERMAN)) {
                         unit.setLocation(wlp.getWorkLocation());
                         unit.setWorkType(wlp.getGoodsType());
                         wlpIterator.remove();

@@ -185,13 +185,13 @@ public class ServerModelController implements ModelController {
             unit = (Unit) taskEntry.entry;
 
             if (unit.getLocation().getTile() != location.getTile() || unit.getOwner() != owner
-                    || unit.getUnitType() != type) {
+                    || unit.getType() != type) {
                 logger
                         .warning("Unsynchronization between the client and the server. Maybe a cheating attempt! Differences: "
                                 + ((unit.getLocation().getTile() != location.getTile()) ? "location: "
                                         + unit.getLocation().getTile() + "!=" + location.getTile() : "")
                                 + ((unit.getOwner() != owner) ? "owner: " + unit.getOwner() + "!=" + owner : "")
-                                + ((unit.getUnitType() != type) ? "type: " + unit.getUnitType() + "!=" + type : ""));
+                                + ((unit.getType() != type) ? "type: " + unit.getType() + "!=" + type : ""));
 
                 taskRegister.remove(extendedTaskID);
                 unit.dispose();

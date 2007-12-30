@@ -1727,7 +1727,7 @@ public final class InGameController implements NetworkConstants {
                 }
                 if (winner.isArmed()) {
                     if (winner.isMounted()) {
-                        if (winner.getType() == Unit.BRAVE) {
+                        if (winner.getIndex() == Unit.BRAVE) {
                             freeColClient.playSound(SfxLibrary.MUSKETSHORSES);
                         } else {
                             freeColClient.playSound(SfxLibrary.DRAGOON);
@@ -2563,7 +2563,7 @@ public final class InGameController implements NetworkConstants {
 
             if (skillName == null) {
                 canvas.errorMessage("indianSettlement.noMoreSkill");
-            } else if (!unit.getUnitType().canLearnFromNatives(skill)) {
+            } else if (!unit.getType().canLearnFromNatives(skill)) {
                 canvas.showInformationMessage("indianSettlement.cantLearnSkill",
                         new String[][] { {"%unit%", unit.getName()}, {"%skill%", skillName} });
             } else {

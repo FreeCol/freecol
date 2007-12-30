@@ -2085,8 +2085,8 @@ public class Player extends FreeColGameObject implements Features, Nameable {
                     Iterator<Unit> unitIterator = getUnitIterator();
                     while (unitIterator.hasNext()) {
                         Unit unit = unitIterator.next();
-                        if (upgrades.get(unit.getType()) != null) {
-                            unit.setType(upgrades.get(unit.getType()));
+                        if (upgrades.get(unit.getIndex()) != null) {
+                            unit.setType(upgrades.get(unit.getIndex()));
                         }
                     }
                 }
@@ -2193,10 +2193,10 @@ public class Player extends FreeColGameObject implements Features, Nameable {
     public void calculateScore() {
         score = 0;
         for (Unit unit : getUnits()) {
-            score += unit.getUnitType().getScoreValue();
+            score += unit.getType().getScoreValue();
             if (unit.getLocation() != null &&
                 unit.getLocation() instanceof WorkLocation) {
-                score += unit.getUnitType().getScoreValue();
+                score += unit.getType().getScoreValue();
             }
         }
         score += (score * oldSoL) / 100;

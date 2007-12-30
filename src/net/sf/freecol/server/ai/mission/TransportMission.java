@@ -667,7 +667,7 @@ public class TransportMission extends Mission {
         Iterator<Unit> ui = europe.getUnitIterator();
         while (ui.hasNext()) {
             Unit u = ui.next();
-            if (unitType == null || unitType == u.getUnitType()) {
+            if (unitType == null || unitType == u.getType()) {
                 return (AIUnit) getAIMain().getAIObject(u.getId());
             }
         }
@@ -869,7 +869,7 @@ public class TransportMission extends Mission {
     public int getAvailableSpace(Transportable t) {
         if (t.getTransportLocatable() instanceof Unit) {
             Unit u = (Unit) t.getTransportLocatable();
-            return getAvailableSpace(u.getType(), t.getTransportSource(), t.getTransportDestination());
+            return getAvailableSpace(u.getIndex(), t.getTransportSource(), t.getTransportDestination());
         } else {
             return getAvailableSpace(-1, t.getTransportSource(), t.getTransportDestination());
         }

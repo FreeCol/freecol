@@ -255,7 +255,7 @@ public class AIPlayer extends AIObject {
         Iterator<Unit> it = player.getUnitIterator();
         while (it.hasNext()) {
             Unit u = it.next();
-            if (u.getType() == Unit.MAN_O_WAR) {
+            if (u.getIndex() == Unit.MAN_O_WAR) {
                 return true;
             }
         }
@@ -272,7 +272,7 @@ public class AIPlayer extends AIObject {
         Iterator<Unit> it = player.getUnitIterator();
         while (it.hasNext()) {
             Unit u = it.next();
-            if (u.getType() == Unit.KINGS_REGULAR) {
+            if (u.getIndex() == Unit.KINGS_REGULAR) {
                 n++;
             }
         }
@@ -757,13 +757,13 @@ public class AIPlayer extends AIObject {
                         // If we are not on the tile we are in the colony.
                         inColonyCount++;
                     }
-                    if (u.getType() == Unit.VETERAN_SOLDIER) {
+                    if (u.getIndex() == Unit.VETERAN_SOLDIER) {
                         vets.add(u);
-                    } else if (u.getType() == Unit.PETTY_CRIMINAL) {
+                    } else if (u.getIndex() == Unit.PETTY_CRIMINAL) {
                         criminals.add(u);
-                    } else if (u.getType() == Unit.INDENTURED_SERVANT) {
+                    } else if (u.getIndex() == Unit.INDENTURED_SERVANT) {
                         servants.add(u);
-                    } else if (u.getType() == Unit.FREE_COLONIST) {
+                    } else if (u.getIndex() == Unit.FREE_COLONIST) {
                         colonists.add(u);
                     } else if (u.isColonist()) {
                         experts.add(u);
@@ -1004,7 +1004,7 @@ public class AIPlayer extends AIObject {
                        ScoutingMission.isValid(aiUnit)) {
                 aiUnit.setMission(new ScoutingMission(getAIMain(), aiUnit));
             } else if ((unit.isOffensiveUnit() || unit.isDefensiveUnit())
-                    && (!unit.isColonist() || unit.getType() == Unit.VETERAN_SOLDIER || 
+                    && (!unit.isColonist() || unit.getIndex() == Unit.VETERAN_SOLDIER || 
                         getGame().getTurn().getNumber() > 5)) {
                 giveMilitaryMission(aiUnit);
             } else if (unit.getNumberOfTools() > 0 && PioneeringMission.isValid(aiUnit)) {
@@ -1025,7 +1025,7 @@ public class AIPlayer extends AIObject {
 
                 // Check if this unit is needed as an expert (using:
                 // "WorkerWish"):
-                ArrayList<Wish> wishList = workerWishes.get(unit.getUnitType().getIndex());
+                ArrayList<Wish> wishList = workerWishes.get(unit.getType().getIndex());
                 WorkerWish bestWish = null;
                 int bestTurns = Integer.MAX_VALUE;
                 for (int i = 0; i < wishList.size(); i++) {
@@ -1333,10 +1333,10 @@ public class AIPlayer extends AIObject {
             if (newTile.getBestTreasureTrain() != null) {
                 value += Math.min(newTile.getBestTreasureTrain().getTreasureAmount() / 10, 50);
             }
-            if (newTile.getDefendingUnit(unit).getType() == Unit.ARTILLERY && newTile.getSettlement() == null) {
+            if (newTile.getDefendingUnit(unit).getIndex() == Unit.ARTILLERY && newTile.getSettlement() == null) {
                 value += 200 - newTile.getDefendingUnit(unit).getDefensePower(unit) * 2 - turns * 50;
             }
-            if (newTile.getDefendingUnit(unit).getType() == Unit.VETERAN_SOLDIER
+            if (newTile.getDefendingUnit(unit).getIndex() == Unit.VETERAN_SOLDIER
                     && !newTile.getDefendingUnit(unit).isArmed()) {
                 value += 10 - newTile.getDefendingUnit(unit).getDefensePower(unit) * 2 - turns * 25;
             }

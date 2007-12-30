@@ -96,7 +96,7 @@ public final class ReportLabourPanel extends ReportPanel implements ActionListen
         Iterator<Unit> units = player.getUnitIterator();
         while (units.hasNext()) {
             Unit unit = units.next();
-            int type = unit.getUnitType().getIndex();
+            int type = unit.getIndex();
             Location location = unit.getLocation();
 
             unitCount[type]++;

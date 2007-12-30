@@ -123,7 +123,7 @@ public final class TileImprovementType extends FreeColGameObjectType
      * @return true if Worker UnitType is allowed and expended Goods are available
      */
     public boolean isWorkerAllowed(Unit unit) {
-        if (!isWorkerTypeAllowed(unit.getUnitType())) {
+        if (!isWorkerTypeAllowed(unit.getType())) {
             return false;
         }
         if (expendedAmount == 0) {

@@ -148,7 +148,7 @@ public final class DragListener extends MouseAdapter {
                                 tempUnit.getLocation() instanceof WorkLocation &&
                                 teacher.getStudent() != tempUnit) {
                             menuItem = new JMenuItem(Messages.message("assignToTeacher"),
-                                                     imageLibrary.getScaledUnitImageIcon(teacher.getType(), 0.5f));
+                                                     imageLibrary.getScaledUnitImageIcon(teacher.getIndex(), 0.5f));
                             menuItem.setActionCommand("assign" + teacher.getId());
                             menuItem.addActionListener(unitLabel);
                             menu.add(menuItem);
@@ -267,7 +267,7 @@ public final class DragListener extends MouseAdapter {
                         separatorNeeded = false;
                     }
 
-                    if (tempUnit.getUnitType().getClearSpeciality() != null) {
+                    if (tempUnit.getType().getClearSpeciality() != null) {
                         menuItem = new JMenuItem(Messages.message("clearSpeciality"));
                         menuItem.setActionCommand(String.valueOf(UnitLabel.CLEAR_SPECIALITY));
                         menuItem.addActionListener(unitLabel);

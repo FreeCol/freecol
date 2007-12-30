@@ -261,7 +261,7 @@ public class ColonyTile extends FreeColGameObject implements WorkLocation, Ownab
             return false;
         }
         
-        if (!((Unit) locatable).getUnitType().hasSkill()) {
+        if (!((Unit) locatable).getType().hasSkill()) {
             return false;
         }
 

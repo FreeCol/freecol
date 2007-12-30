@@ -1633,7 +1633,7 @@ public final class ImageLibrary extends ImageProvider {
      * @return The graphics that will represent the given unit.
      */
     public int getUnitGraphicsType(Unit unit) {
-        return getUnitGraphicsType(unit.getType(), unit.isArmed(), unit.isMounted(), unit.isPioneer(), unit
+        return getUnitGraphicsType(unit.getIndex(), unit.isArmed(), unit.isMounted(), unit.isPioneer(), unit
                 .isMissionary());
     }
 
