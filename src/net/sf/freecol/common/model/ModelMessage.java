@@ -280,30 +280,6 @@ public class ModelMessage extends FreeColObject {
     }
 
     /**
-    * Returns the owner of this message. The owner of this method
-    * is the owner of the {@link #getSource source}.
-    * 
-    * @return The owner of the message. This is the <code>Player</code>
-    *       who should receive the message.
-    */
-    public Player getOwner() {
-        if (source instanceof Unit) {
-            return ((Unit) source).getOwner();
-        } else if (source instanceof Settlement) {
-            return ((Settlement) source).getOwner();
-        } else if (source instanceof Europe) {
-            return ((Europe) source).getOwner();
-        } else if (source instanceof Player) {
-            return (Player) source;
-        } else if (source instanceof Ownable) {
-            return ((Ownable) source).getOwner();
-        }
-
-        return null;
-    }
-
-
-    /**
     * Checks if this <code>ModelMessage</code> is equal to another <code>ModelMessage</code>.
     * @return <i>true</i> if the sources, message IDs and data are equal.
     */
