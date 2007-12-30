@@ -478,7 +478,7 @@ public final class InGameController implements NetworkConstants {
         String name = freeColClient.getCanvas().showInputDialog("nameColony.text",
                 freeColClient.getMyPlayer().getDefaultColonyName(), "nameColony.yes", "nameColony.no");
 
-        if (name == null) { // The user cancelled the action.
+        if (name == null) { // The user canceled the action.
             return;
         } else if (freeColClient.getMyPlayer().getColony(name) != null) {
             // colony name must be unique (per Player)
@@ -519,7 +519,7 @@ public final class InGameController implements NetworkConstants {
             gui.setActiveUnit(null);
             gui.setSelectedTile(colony.getTile().getPosition());
         } else {
-            // Handle errormessage.
+            // Handle error message.
         }
     }
 
@@ -824,7 +824,7 @@ public final class InGameController implements NetworkConstants {
                 GoodsType goodsType = goodsTypesToLoad.get(index);
                 if (goods.getType() == goodsType) {
                     if (goods.getAmount() < 100) {
-                        // comlete goods until 100 units
+                        // complete goods until 100 units
                         // respect the lower limit for TradeRoute
                         int amountPresent = warehouse.getGoodsCount(goodsType) - 
                             colony.getExportData(goodsType).getExportLevel();
@@ -1771,6 +1771,8 @@ public final class InGameController implements NetworkConstants {
                                                 "model.unit.newConvertFromAttack",
                                                 new String[][] {{"%nation%", nation}},
                                                 ModelMessage.UNIT_ADDED);
+                freeColClient.getMyPlayer().addModelMessage(message);
+                nextModelMessage();
             }
             
             if (defender.canCarryTreasure() && result >= Unit.ATTACK_WIN) {
