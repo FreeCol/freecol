@@ -784,7 +784,8 @@ public class Unit extends FreeColGameObject implements Features, Locatable, Loca
     public boolean hasAbility(String id) {
         ArrayList<Ability> result = new ArrayList<Ability>();
         result.add(getUnitType().getAbility(id));
-        result.add(getOwner().getAbility(id));
+        // the player's ability may have scope
+        result.add(getOwner().getAbility(id).getApplicableAbility(getUnitType()));
         for (EquipmentType equipmentType : equipment) {
             result.add(equipmentType.getAbility(id));
         }
@@ -806,7 +807,8 @@ public class Unit extends FreeColGameObject implements Features, Locatable, Loca
     public Modifier getModifier(String id) {
         ArrayList<Modifier> result = new ArrayList<Modifier>();
         result.add(getUnitType().getModifier(id));
-        result.add(getOwner().getModifier(id));
+        // the player's modifier may have scope
+        result.add(getOwner().getModifier(id).getApplicableModifier(getUnitType()));
         for (EquipmentType equipmentType : equipment) {
             result.add(equipmentType.getModifier(id));
         }
