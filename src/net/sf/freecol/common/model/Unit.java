@@ -1781,7 +1781,7 @@ public class Unit extends FreeColGameObject implements Features, Locatable, Loca
         if (hasAbility("model.ability.carryUnits")) {
             return unitContainer.getUnitsClone();
         } else {
-            return new ArrayList<Unit>();
+            return Collections.emptyList();
         }
     }
 
@@ -2159,16 +2159,16 @@ public class Unit extends FreeColGameObject implements Features, Locatable, Loca
      *         otherwise.
      */
     public boolean isMissionary() {
-        EquipmentType missionary = FreeCol.getSpecification().getEquipmentType("model.equipment.missionary");
-        return equipment.contains(missionary) || hasAbility("model.ability.expertMissionary");
+        return (hasAbility("model.ability.missionary") ||
+                hasAbility("model.ability.expertMissionary"));
     }
 
     public boolean isPioneer() {
-        //TODO: make this more generic
-        EquipmentType tools = FreeCol.getSpecification().getEquipmentType("model.equipment.tools");
-        return equipment.contains(tools) || hasAbility("model.ability.expertPioneer");
+        return (hasAbility("model.ability.improveTerrain") ||
+                hasAbility("model.ability.expertPioneer"));
     }
         
+    // TODO: make this go away
     public int getNumberOfTools() {
         int count = 0;
         EquipmentType tools = FreeCol.getSpecification().getEquipmentType("model.equipment.tools");
@@ -2805,7 +2805,7 @@ public class Unit extends FreeColGameObject implements Features, Locatable, Loca
      * @return The amount of units/goods than can be moved onto this Unit.
      */
     public int getSpaceLeft() {
-        int space = getInitialSpaceLeft() - getGoodsCount();
+        int space = unitType.getSpace() - getGoodsCount();
 
         Iterator<Unit> unitIterator = getUnitIterator();
         while (unitIterator.hasNext()) {
@@ -2835,25 +2835,6 @@ public class Unit extends FreeColGameObject implements Features, Locatable, Loca
 
     public int getGoodsCount() {
         return goodsContainer.getGoodsCount();
-    }
-
-    /**
-     * Returns the amount of units/cargo that this unit can carry.
-     * 
-     * @return The amount of units/cargo that this unit can carry.
-     */
-    public int getInitialSpaceLeft() {
-        return getInitialSpaceLeft(unitType);
-    }
-
-    /**
-     * Returns the amount of units/cargo that this unit can carry.
-     * 
-     * @param type The type of unit.
-     * @return The amount of units/cargo that this unit can carry.
-     */
-    public static int getInitialSpaceLeft(UnitType type) {
-        return type.getSpace();
     }
 
     /**
@@ -4042,26 +4023,23 @@ public class Unit extends FreeColGameObject implements Features, Locatable, Loca
         }
     }
 
-    /**
-     * Given a type of goods to produce in the field and a tile, returns the
-     * unit's potential to produce goods.
+    /** 
+     * Given a type of goods to produce in the field and a tile,
+     * returns the unit's potential to produce goods.
      * 
      * @param goodsType The type of goods to be produced.
-     * @param tile The tile which is being worked.
+     * @param base an <code>int</code> value
      * @return The potential amount of goods to be farmed.
      */
+    // TODO: what exactly do we need this for?
     public int getProductionOf(GoodsType goodsType, int base) {
         if (base == 0) {
             return 0;
         }
-        
-        base = unitType.getProductionFor(goodsType, base);
-
-        if (goodsType == Goods.FURS && 
-            getOwner().hasFather(FreeCol.getSpecification().getFoundingFather("model.foundingFather.henryHudson"))) {
-            base *= 2;
+        Modifier modifier = getModifier(goodsType.getId());
+        if (modifier != null) {
+            base = (int) modifier.applyTo(base);
         }
-
         return base;
     }
 

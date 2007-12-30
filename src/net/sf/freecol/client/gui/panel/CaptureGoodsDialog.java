@@ -176,7 +176,7 @@ public final class CaptureGoodsDialog extends FreeColDialog implements ActionLis
      * @param capturingUnit
      */
     public void initialize(Unit capturedUnit, Unit capturingUnit) {
-        maxCargo = capturingUnit.getInitialSpaceLeft();
+        maxCargo = capturingUnit.getType().getSpace();
         GoodsItem[] goods = new GoodsItem[capturedUnit.getGoodsCount()];
         if (goods.length > 0) {
             Iterator<Goods> iter = capturedUnit.getGoodsIterator();

@@ -636,7 +636,7 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
         if (type.hasAbility("carry-goods") || type.hasAbility("naval")) {
             detailPanel.add(new JLabel(Messages.message("colopedia.unit.capacity")),
                             higConst.rc(row, labelColumn));
-            detailPanel.add(new JLabel(String.valueOf(Unit.getInitialSpaceLeft(type))),
+            detailPanel.add(new JLabel(String.valueOf(type.getSpace())),
                             higConst.rc(row, valueColumn, "r"));
         } else {
             detailPanel.add(new JLabel(Messages.message("colopedia.unit.skill")),

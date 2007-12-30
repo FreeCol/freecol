@@ -238,10 +238,10 @@ public final class ReportUnitPanel extends JPanel implements ActionListener {
 
             if (reportType == CARGO && unit.isCarrier()) {
                 unitCounts[type][0]++;
-                capacity += unit.getInitialSpaceLeft();
+                capacity += unit.getType().getSpace();
             } else if (reportType == NAVAL && unit.isNaval()) {
                 unitCounts[type][0]++;
-                capacity += unit.getInitialSpaceLeft();
+                capacity += unit.getType().getSpace();
             } else if (reportType == MILITARY) {
                 switch (type) {
                 case Unit.ARTILLERY:
