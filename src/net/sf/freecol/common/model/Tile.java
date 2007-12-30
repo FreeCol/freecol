@@ -2189,6 +2189,9 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
                 out.writeAttribute("wantedGoods1", Integer.toString(wantedGoods1.getIndex()));
                 out.writeAttribute("wantedGoods2", Integer.toString(wantedGoods2.getIndex()));
             }
+            if (region != null) {
+                out.writeAttribute("region", region.getId());
+            }
             if (missionary != null) {
                 out.writeStartElement("missionary");
                 missionary.toXML(out, player, showAll, toSavedGame);
@@ -2196,9 +2199,6 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
             }
             if (hasResource()) {
                 resource.toXML(out, player, showAll, toSavedGame);
-            }
-            if (region != null) {
-                out.writeAttribute("region", region.getId());
             }
             for (TileImprovement t : improvements) { 
                 t.toXML(out, player, showAll, toSavedGame);
