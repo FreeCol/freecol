@@ -684,19 +684,18 @@ public class Unit extends FreeColGameObject implements Features, Locatable, Loca
     }
 
     /**
-     * Gets the UnitType which is teaching a teacher to a student
-     * This value is only meaningful for teachers that can be put in a school.
+     * Gets the UnitType which a teacher is teaching to a student.
+     * This value is only meaningful for teachers that can be put in a
+     * school.
      * 
-     * @return The turns of training needed to teach its current type to a free
-     *         colonist or to promote an indentured servant or a petty criminal.
-     * @see #getTurnsOfTraining
-     *
      * @param typeTeacher the unit type of the teacher
      * @param typeStudent the unit type of the student
      * @return an <code>UnitType</code> value
+     * @see #getTurnsOfTraining
+     *
      */
     public static UnitType getUnitTypeTeaching(UnitType typeTeacher, UnitType typeStudent) {
-        if (typeStudent.canBeTaught(typeTeacher)) {
+        if (typeStudent.canBeUpgraded(typeTeacher, UnitType.EDUCATION)) {
             return typeTeacher;
         } else {
             return typeStudent.getEducationUnit(0);
@@ -4037,7 +4036,7 @@ public class Unit extends FreeColGameObject implements Features, Locatable, Loca
      * to the UnitType specified for clearing
      */
     public void clearSpeciality() {
-        UnitType newType = unitType.getClearSpeciality();
+        UnitType newType = unitType.getDowngrade(UnitType.CLEAR_SKILL);
         if (newType != null) {
             setType(newType);
         }
@@ -4110,7 +4109,7 @@ public class Unit extends FreeColGameObject implements Features, Locatable, Loca
         }
         
         UnitType learnType = FreeCol.getSpecification().getExpertForProducing(goodsType);
-        if (learnType != null && unitType.canLearnFromExperience(learnType)) {
+        if (learnType != null && unitType.canBeUpgraded(learnType, UnitType.EXPERIENCE)) {
             logger.finest("About to call getRandom for experience");
             int random = getGame().getModelController().getRandom(getId() + "experience", 5000);
             if (random < Math.min(experience, 200)) {

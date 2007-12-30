@@ -36,6 +36,11 @@ import net.sf.freecol.FreeCol;
 
 public final class UnitType extends BuildableType {
 
+    public static int EDUCATION = 0, NATIVES = 1, EXPERIENCE = 2,
+        LOST_CITY = 3, PROMOTION = 4, NUMBER_OF_UPGRADE_TYPES = 5;
+
+    public static int CLEAR_SKILL = 0, DEMOTION = 1, NUMBER_OF_DOWNGRADE_TYPES = 2;
+
     public static final EquipmentType[] NO_EQUIPMENT = new EquipmentType[0];
 
     /**
@@ -99,16 +104,6 @@ public final class UnitType extends BuildableType {
     private GoodsType expertProduction;
 
     /**
-     * Describe promotion here.
-     */
-    private String promotion;
-
-    /**
-     * Describe clearSpeciality here.
-     */
-    private String clearSpeciality;
-
-    /**
      * Describe pathImage here.
      */
     private String pathImage;
@@ -122,6 +117,11 @@ public final class UnitType extends BuildableType {
      * Describe education here.
      */
     private HashMap<String, Upgrade> upgrades = new HashMap<String, Upgrade>();
+    
+    /**
+     * Describe education here.
+     */
+    private HashMap<String, Downgrade> downgrades = new HashMap<String, Downgrade>();
     
     public UnitType(int index) {
         setIndex(index);
@@ -370,41 +370,6 @@ public final class UnitType extends BuildableType {
         this.expertProduction = newExpertProduction;
     }
 
-    /**
-     * Get the <code>Promotion</code> value.
-     *
-     * @return a <code>UnitType</code> value
-     */
-    public UnitType getPromotion() {
-        return FreeCol.getSpecification().getUnitType(promotion);
-    }
-
-    /**
-     * Set the <code>Promotion</code> value.
-     *
-     * @param newPromotion The new Promotion value.
-     */
-    public void setPromotion(final String newPromotion) {
-        this.promotion = newPromotion;
-    }
-
-    /**
-     * Get the <code>ClearSpeciality</code> value.
-     *
-     * @return a <code>UnitType</code> value
-     */
-    public UnitType getClearSpeciality() {
-        return FreeCol.getSpecification().getUnitType(clearSpeciality);
-    }
-
-    /**
-     * Set the <code>ClearSpeciality</code> value.
-     *
-     * @param newClearSpeciality The new ClearSpeciality value.
-     */
-    public void setClearSpeciality(final String newClearSpeciality) {
-        this.clearSpeciality = newClearSpeciality;
-    }
 
     /**
      * Get the <code>PathImage</code> value.
@@ -424,48 +389,41 @@ public final class UnitType extends BuildableType {
         this.pathImage = newPathImage;
     }
 
-    /**
-     * Whether the given UnitType can be teached
-     *
-     * @param unitType the UnitType to learn
-     * @return <code>true</code> if can learn the given UnitType
-     */
-    public boolean canBeTaught(UnitType unitType) {
-        Upgrade upgrade = upgrades.get(unitType.getId());
-        return upgrade != null && upgrade.canBeTaught();
+    public UnitType getPromotion() {
+        Iterator<Entry<String, Upgrade>> iterator = upgrades.entrySet().iterator();
+        while (iterator.hasNext()) {
+            Entry<String, Upgrade> pair = iterator.next();
+            if (pair.getValue().asResultOf[PROMOTION]) {
+                return FreeCol.getSpecification().getUnitType(pair.getKey());
+            }
+        }
+        return null;
     }
 
-    /**
-     * Whether can learn from experience the given UnitType
-     *
-     * @param unitType the UnitType to learn
-     * @return <code>true</code> if can learn the given UnitType
-     */
-    public boolean canLearnFromExperience(UnitType unitType) {
-        Upgrade upgrade = upgrades.get(unitType.getId());
-        return upgrade != null && upgrade.learnFromExperience;
+    public UnitType getDowngrade(int downgradeType) {
+        Iterator<Entry<String, Downgrade>> iterator = downgrades.entrySet().iterator();
+        while (iterator.hasNext()) {
+            Entry<String, Downgrade> pair = iterator.next();
+            if (pair.getValue().asResultOf[downgradeType]) {
+                return FreeCol.getSpecification().getUnitType(pair.getKey());
+            }
+        }
+        return null;
     }
 
-    /**
-     * Whether can learn from natives the given UnitType
-     *
-     * @param unitType the UnitType to learn
-     * @return <code>true</code> if can learn the given UnitType
-     */
-    public boolean canLearnFromNatives(UnitType unitType) {
-        Upgrade upgrade = upgrades.get(unitType.getId());
-        return upgrade != null && upgrade.learnFromNatives;
-    }
+    
 
     /**
-     * Whether can learn in lost city rumour the given UnitType
+     * Whether this UnitType can be upgraded to the given UnitType by
+     * the given means of education.
      *
      * @param unitType the UnitType to learn
+     * @param educationType an <code>int</code> value
      * @return <code>true</code> if can learn the given UnitType
      */
-    public boolean canLearnInLostCity(UnitType unitType) {
+    public boolean canBeUpgraded(UnitType unitType, int educationType) {
         Upgrade upgrade = upgrades.get(unitType.getId());
-        return upgrade != null && upgrade.learnInLostCity;
+        return upgrade != null && upgrade.asResultOf[educationType];
     }
 
     /**
@@ -479,7 +437,7 @@ public final class UnitType extends BuildableType {
         ArrayList<UnitType> unitTypes = new ArrayList<UnitType>();
         while (iterator.hasNext()) {
             Entry<String, Upgrade> pair = iterator.next();
-            if (pair.getValue().learnInLostCity) {
+            if (pair.getValue().asResultOf[LOST_CITY]) {
                 unitTypes.add(FreeCol.getSpecification().getUnitType(pair.getKey()));
             }
         }
@@ -538,8 +496,6 @@ public final class UnitType extends BuildableType {
         spaceTaken = getAttribute(in, "spaceTaken", 1);
         
         pathImage = in.getAttributeValue(null, "pathImage");
-        promotion = in.getAttributeValue(null, "promotion");
-        clearSpeciality = in.getAttributeValue(null, "clearSpeciality");
 
         recruitProbability = getAttribute(in, "recruitProbability", 0);
         skill = getAttribute(in, "skill", UNDEFINED);
@@ -577,10 +533,19 @@ public final class UnitType extends BuildableType {
                 Upgrade upgrade = new Upgrade();
                 String educationUnit = in.getAttributeValue(null, "unit");
                 upgrade.turnsToLearn = getAttribute(in, "turnsToLearn", UNDEFINED);
-                upgrade.learnFromNatives = getAttribute(in, "learnFromNatives", false);
-                upgrade.learnFromExperience = getAttribute(in, "learnFromExperience", false);
-                upgrade.learnInLostCity = getAttribute(in, "learnInLostCity", false);
+                upgrade.asResultOf[EDUCATION] = getAttribute(in, "learnInSchool", true);
+                upgrade.asResultOf[NATIVES] = getAttribute(in, "asResultOfNatives", false);
+                upgrade.asResultOf[EXPERIENCE] = getAttribute(in, "asResultOfExperience", false);
+                upgrade.asResultOf[LOST_CITY] = getAttribute(in, "learnInLostCity", false);
+                upgrade.asResultOf[PROMOTION] = getAttribute(in, "promotion", false);
                 upgrades.put(educationUnit, upgrade);
+                in.nextTag(); // close this element
+            } else if ("downgrade".equals(nodeName)) {
+                Downgrade downgrade = new Downgrade();
+                String educationUnit = in.getAttributeValue(null, "unit");
+                downgrade.asResultOf[CLEAR_SKILL] = getAttribute(in, "clearSkill", false);
+                downgrade.asResultOf[DEMOTION] = getAttribute(in, "promotion", false);
+                downgrades.put(educationUnit, downgrade);
                 in.nextTag(); // close this element
             } else if (Modifier.getXMLElementTagName().equals(nodeName)) {
                 Modifier modifier = new Modifier(in); // Modifier close the element
@@ -669,10 +634,14 @@ public final class UnitType extends BuildableType {
     
     private class Upgrade {
         protected int turnsToLearn;
-        protected boolean learnFromNatives, learnFromExperience, learnInLostCity;
+        protected boolean[] asResultOf = new boolean[NUMBER_OF_UPGRADE_TYPES];
         
         public boolean canBeTaught() {
-            return turnsToLearn > 0;
+            return asResultOf[EDUCATION] && turnsToLearn > 0;
         }
+    }
+
+    private class Downgrade {
+        protected boolean asResultOf[] = new boolean[NUMBER_OF_DOWNGRADE_TYPES];;
     }
 }

@@ -579,6 +579,7 @@ public final class Building extends FreeColGameObject implements Features, WorkL
             Unit teacher = teachers.next();
             if (teacher.getStudent() == null) {
                 Unit student = findStudent(teacher);
+                System.out.println("returned " + (student == null ? "null" : student.getName()));
                 if (student == null) {
                     addModelMessage(getColony(), "model.building.noStudent",
                                     new String[][] {

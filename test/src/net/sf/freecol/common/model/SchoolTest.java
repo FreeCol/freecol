@@ -61,6 +61,19 @@ public class SchoolTest extends FreeColTestCase {
 
     BuildingType schoolType = spec().getBuildingType("model.building.Schoolhouse");
     
+
+    public void testUpgrades() {
+
+        UnitType colonist = spec().getUnitType("model.unit.freeColonist");
+        UnitType servant = spec().getUnitType("model.unit.indenturedServant");
+        UnitType criminal = spec().getUnitType("model.unit.pettyCriminal");
+        UnitType carpenter = spec().getUnitType("model.unit.masterCarpenter");
+
+        assertEquals(Unit.getUnitTypeTeaching(carpenter, colonist), carpenter);
+        assertEquals(Unit.getUnitTypeTeaching(carpenter, servant), colonist);
+        assertEquals(Unit.getUnitTypeTeaching(carpenter, criminal), servant);
+    }
+
     /**
      * Check that a free colonist can be taught something.
      * 
@@ -471,6 +484,7 @@ public class SchoolTest extends FreeColTestCase {
         teacher.setType(Unit.EXPERT_ORE_MINER);
 
         teacher.setLocation(school);
+        assertTrue(criminal.canBeStudent(teacher));
 
         // PETTY_CRIMINALS become INDENTURED_SERVANTS
         trainForTurns(colony, teacher.getNeededTurnsOfTraining(), Unit.PETTY_CRIMINAL);
@@ -876,17 +890,27 @@ public class SchoolTest extends FreeColTestCase {
         teacher.setType(Unit.EXPERT_ORE_MINER);
         teacher.setLocation(school);
 
+        assertTrue(colonist.canBeStudent(teacher));
+        assertTrue(indenturedServant.canBeStudent(teacher));
+        assertTrue(criminal.canBeStudent(teacher));
+
         // Colonist training
+        assertEquals(teacher, colonist.getTeacher());
+        assertEquals(colonist, teacher.getStudent());
         school.newTurn();
         school.newTurn();
         school.newTurn();
         school.newTurn();
         assertEquals(0, getUnitList(colony, Unit.FREE_COLONIST).size());
         assertEquals(Unit.EXPERT_ORE_MINER, colonist.getIndex());
+        assertEquals(teacher.getStudent(), null);
+        assertEquals(colonist.getTeacher(), null);
+        assertEquals(indenturedServant.getTeacher(), null);
 
         // Servant training
-        assertEquals(0, getUnitList(colony, Unit.FREE_COLONIST).size());
         school.newTurn();
+        assertEquals(teacher, indenturedServant.getTeacher());
+        assertEquals(indenturedServant, teacher.getStudent());
         school.newTurn();
         school.newTurn();
         school.newTurn();
