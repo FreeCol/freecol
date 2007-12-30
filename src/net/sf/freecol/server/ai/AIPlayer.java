@@ -373,7 +373,7 @@ public class AIPlayer extends AIObject {
                 int total = 0;
                 ArrayList<UnitType> navalUnits = new ArrayList<UnitType>();
                 for (UnitType unitType : unitTypes) {
-                    if (unitType.hasAbility("model.unit.navalUnit") && unitType.hasPrice()) {
+                    if (unitType.hasAbility("model.ability.navalUnit") && unitType.hasPrice()) {
                         navalUnits.add(unitType);
                         total += europe.getUnitPrice(unitType);
                     }
@@ -574,6 +574,7 @@ public class AIPlayer extends AIObject {
         while (aiUnitsIterator.hasNext()) {
             AIUnit aiUnit = aiUnitsIterator.next();
             if (aiUnit.getUnit().isNaval() && !aiUnit.hasMission()) {
+                // TODO: privateers should have military naval mission?
                 aiUnit.setMission(new TransportMission(getAIMain(), aiUnit));
             }
         }
@@ -1238,7 +1239,7 @@ public class AIPlayer extends AIObject {
                     PathNode pn = chosenOne.getUnit().findPath(indianSettlement.getTile(), target.getTile());
                     if (pn != null && pn.getTotalTurns() <= MAX_DISTANCE_TO_MAKE_DEMANDS) {
                         // Make it less probable that nice players get targeted
-                        // for a demand misson:
+                        // for a demand mission:
                         Player tp = target.getOwner();
                         int tension = 1 + getPlayer().getTension(tp).getValue()
                                 + indianSettlement.getAlarm(tp).getValue();
