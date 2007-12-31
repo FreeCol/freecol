@@ -76,6 +76,8 @@ abstract public class Settlement extends FreeColGameObject implements Location, 
                 Colony oc = tile.getColony();
                 ColonyTile ct = oc.getColonyTile(tile);
                 ct.relocateWorkers();
+            } else if (tile.getOwningSettlement() instanceof IndianSettlement) {
+                logger.warning("An indian settlement is already owning the tile.");
             } else {
                 logger.warning("An unknown type of settlement is already owning the tile.");
             }
