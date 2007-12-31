@@ -192,10 +192,14 @@ public final class GUI {
     
     public void setImageLibrary(ImageLibrary lib) {
         this.lib = lib;
+        cursorImage = lib.getMiscImage(ImageLibrary.UNIT_SELECT);
         TileType tileType = FreeCol.getSpecification().getTileType(0);
         tileHeight = lib.getTerrainImageHeight(tileType);
         tileWidth = lib.getTerrainImageWidth(tileType);
+        updateMapDisplayVariables();
+    }
 
+    private void updateMapDisplayVariables() {
         // Calculate the amount of rows that will be drawn above the central Tile
         topSpace = ((int) size.height - tileHeight) / 2;
         if ((topSpace % (tileHeight / 2)) != 0) {
@@ -206,7 +210,6 @@ public final class GUI {
         bottomRows = topRows;
         leftSpace = ((int) size.width - tileWidth) / 2;
         rightSpace = leftSpace;
-        cursorImage = lib.getMiscImage(ImageLibrary.UNIT_SELECT);
     }
     
     /**
@@ -244,6 +247,7 @@ public final class GUI {
     
     public void setSize(Dimension size) {
         this.size = size;
+        updateMapDisplayVariables();
     }
     
     public void moveTileCursor(int direction){

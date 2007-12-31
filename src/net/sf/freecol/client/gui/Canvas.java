@@ -346,6 +346,7 @@ public final class Canvas extends JDesktopPane {
                 }
             }
             gui.setSize(getSize());
+            gui.forceReposition();
             oldSize = getSize();
         }
     }
