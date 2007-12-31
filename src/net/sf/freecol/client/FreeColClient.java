@@ -254,7 +254,11 @@ public final class FreeColClient {
         
         frame.setIconImage(imageLibrary.getUnitImage(ImageLibrary.GALLEON));
         
-        canvas.showMainPanel();
+        SwingUtilities.invokeLater(new Runnable() {
+        	public void run() {
+        		canvas.showMainPanel();
+        	}
+        });
         gui.startCursorBlinking();
     }
     
