@@ -839,14 +839,14 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
     private Element move(Connection connection, Element moveElement) {
         FreeColServer freeColServer = getFreeColServer();
         ServerPlayer player = freeColServer.getPlayer(connection);
-        Unit unit = (Unit) getGame().getFreeColGameObject(moveElement.getAttribute("unit"));
+        String unitID = moveElement.getAttribute("unit");
+        Unit unit = (Unit) getGame().getFreeColGameObject(unitID);
         int direction = Integer.parseInt(moveElement.getAttribute("direction"));
         if (unit == null) {
-            throw new IllegalArgumentException("Could not find 'Unit' with specified ID: "
-                    + moveElement.getAttribute("unit"));
+            throw new IllegalArgumentException("Could not find 'Unit' with specified ID: " + unitID);
         }
         if (unit.getTile() == null) {
-            throw new IllegalArgumentException("'Unit' not on map: ID: " + moveElement.getAttribute("unit") + " ("
+            throw new IllegalArgumentException("'Unit' not on map: ID: " + unitID + " ("
                     + unit.getName() + ")");
         }
         if (unit.getOwner() != player) {
@@ -1225,12 +1225,12 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         FreeColServer freeColServer = getFreeColServer();
         ServerPlayer player = freeColServer.getPlayer(connection);
         // Get parameters:
-        Unit unit = (Unit) getGame().getFreeColGameObject(attackElement.getAttribute("unit"));
+        String unitID = attackElement.getAttribute("unit");
+        Unit unit = (Unit) getGame().getFreeColGameObject(unitID);
         int direction = Integer.parseInt(attackElement.getAttribute("direction"));
         // Test the parameters:
         if (unit == null) {
-            throw new IllegalArgumentException("Could not find 'Unit' with specified ID: "
-                    + attackElement.getAttribute("unit"));
+            throw new IllegalArgumentException("Could not find 'Unit' with specified ID: " + unitID);
         }
         if (unit.getTile() == null) {
             throw new IllegalArgumentException("'Unit' is not on the map: " + unit.toString());
@@ -1241,7 +1241,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         Tile newTile = getGame().getMap().getNeighbourOrNull(direction, unit.getTile());
         if (newTile == null) {
             throw new IllegalArgumentException("Could not find tile in direction " + direction + " from unit with ID "
-                    + attackElement.getAttribute("unit"));
+                    + unitID);
         }
         int result;
         int plunderGold = -1;
@@ -1251,7 +1251,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
                 result = Unit.ATTACK_DONE_SETTLEMENT;
             } else {
                 throw new IllegalStateException("Nothing to attack in direction " + direction + " from unit with ID "
-                        + attackElement.getAttribute("unit"));
+                        + unitID);
             }
         } else {
             result = generateAttackResult(unit, defender); 
