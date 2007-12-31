@@ -357,12 +357,12 @@ public class AIPlayer extends AIObject {
                     Element clearSpecialityElement = Message.createNewRootElement("clearSpeciality");
                     clearSpecialityElement.setAttribute("unit", unit.getId());
                     sendAndWaitSafely(clearSpecialityElement);
-                    Element equipMusketsElement = Message.createNewRootElement("equipunit");
+                    Element equipMusketsElement = Message.createNewRootElement("equipUnit");
                     equipMusketsElement.setAttribute("unit", unit.getId());
                     equipMusketsElement.setAttribute("type", Integer.toString((Goods.MUSKETS).getIndex()));
                     equipMusketsElement.setAttribute("amount", Integer.toString(50));
                     sendAndWaitSafely(equipMusketsElement);
-                    Element equipHorsesElement = Message.createNewRootElement("equipunit");
+                    Element equipHorsesElement = Message.createNewRootElement("equipUnit");
                     equipHorsesElement.setAttribute("unit", unit.getId());
                     equipHorsesElement.setAttribute("type", Integer.toString((Goods.HORSES).getIndex()));
                     equipHorsesElement.setAttribute("amount", Integer.toString(50));

@@ -252,7 +252,7 @@ public class PioneeringMission extends Mission {
                     AIColony ac = (AIColony) getAIMain().getAIObject(getUnit().getColony());
                     final int tools = ac.getAvailableTools();
                     if (tools >= 20) {                    
-                        Element equipUnitElement = Message.createNewRootElement("equipunit");
+                        Element equipUnitElement = Message.createNewRootElement("equipUnit");
                         equipUnitElement.setAttribute("unit", getUnit().getId());
                         equipUnitElement.setAttribute("type", Integer.toString(Goods.TOOLS.getIndex()));
                         equipUnitElement.setAttribute("amount", Integer.toString(Math.min(tools - tools % 20, 100)));

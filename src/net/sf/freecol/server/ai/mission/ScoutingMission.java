@@ -126,7 +126,7 @@ public class ScoutingMission extends Mission {
                 if (getUnit().getColony().getFoodProduction()
                         - getUnit().getColony().getFoodConsumption() < 2
                         || getUnit().getColony().getGoodsContainer().getGoodsCount(Goods.HORSES) >= 52) {
-                    Element equipUnitElement = Message.createNewRootElement("equipunit");
+                    Element equipUnitElement = Message.createNewRootElement("equipUnit");
                     equipUnitElement.setAttribute("unit", getUnit().getId());
                     equipUnitElement.setAttribute("type", Integer.toString((Goods.HORSES).getIndex()));
                     equipUnitElement.setAttribute("amount", Integer.toString(50));
@@ -217,7 +217,7 @@ public class ScoutingMission extends Mission {
         }
 
         if (isTarget(getUnit().getTile(), getUnit()) && getUnit().getColony() != null) {
-            Element equipUnitElement = Message.createNewRootElement("equipunit");
+            Element equipUnitElement = Message.createNewRootElement("equipUnit");
             equipUnitElement.setAttribute("unit", getUnit().getId());
             equipUnitElement.setAttribute("type", Integer.toString((Goods.HORSES).getIndex()));
             equipUnitElement.setAttribute("amount", Integer.toString(0));
