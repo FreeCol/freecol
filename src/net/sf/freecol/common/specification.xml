@@ -372,7 +372,6 @@
       <ability id="model.ability.scoutIndianSettlement" value="true"/>
       <ability id="model.ability.scoutForeignColony" value="true"/>
       <ability id="model.ability.canBeCaptured" value="false"/>
-      <ability id="model.ability.equipmentCanBeCaptured" value="true"/>
       <required-ability id="model.ability.canBeEquipped" value="true"/>
       <required-goods id="model.goods.Horses" value="50"/>
       <compatible-equipment id="model.equipment.muskets"/>
@@ -384,7 +383,6 @@
       <ability id="model.ability.scoutForeignColony" value="false"/>
       <ability id="model.ability.captureUnits" value="true"/>
       <ability id="model.ability.canBeCaptured" value="false"/>
-      <ability id="model.ability.equipmentCanBeCaptured" value="true"/>
       <required-ability id="model.ability.canBeEquipped" value="true"/>
       <required-goods id="model.goods.Muskets" value="50"/>
       <compatible-equipment id="model.equipment.horses"/>
@@ -873,6 +871,7 @@
       <required-goods id="model.goods.Tools" value="40"/>
       <required-ability id="model.ability.buildArtillery"/>
       <ability id="model.ability.bombard" value="true"/>
+      <downgrade id="model.unit.damagedArtillery" demotion="true"/>
     </unit-type>
     <unit-type id="model.unit.damagedArtillery"     offence="5"  defence="3" movement="3"
                scoreValue="1" lineOfSight="1" pathImage="wagon">
@@ -890,7 +889,8 @@
       <ability id="model.ability.carryGoods" value="true"/>
       <ability id="model.ability.canBeCaptured" value="true"/>
     </unit-type>
-    <unit-type id="model.unit.milkmaid"             offence="0"  defence="1" movement="3"  lineOfSight="1" expert-production="food" pathImage="foot">
+    <unit-type id="model.unit.milkmaid" offence="0"  defence="1" movement="3"  lineOfSight="1"
+               expert-production="food" pathImage="foot">
       <ability id="model.ability.foundColony" value="true"/>
       <ability id="model.ability.canBeEquipped" value="true"/>
       <ability id="model.ability.canBeCaptured" value="true"/>

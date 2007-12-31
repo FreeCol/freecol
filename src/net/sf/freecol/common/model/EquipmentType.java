@@ -101,6 +101,15 @@ public class EquipmentType extends FreeColGameObjectType implements Features {
     }
 
     /**
+     * Returns true if this EquipmentType can be captured in combat.
+     *
+     * @return a <code>boolean</code> value
+     */
+    public boolean canBeCaptured() {
+        return (combatLossPriority > 0);
+    }
+
+    /**
      * Set the <code>CombatLossPriority</code> value.
      *
      * @param newCombatLossPriority The new CombatLossPriority value.
