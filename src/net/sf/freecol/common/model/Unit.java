@@ -3658,7 +3658,7 @@ public class Unit extends FreeColGameObject implements Features, Locatable, Loca
                 if (enemyUnit.isUndead()) {
                     setType(UNDEAD);
                 } else {
-                    UnitType downgrade = getType().getDowngrade(UnitType.DEMOTION);
+                    UnitType downgrade = getType().getDowngrade(UnitType.CAPTURE);
                     if (downgrade != null) {
                         setType(downgrade);
                     }
@@ -3671,7 +3671,8 @@ public class Unit extends FreeColGameObject implements Features, Locatable, Loca
                 dispose();
             }
         } else {
-            // unit has equipment that protects from capture
+            // unit has equipment that protects from capture, or will
+            // be downgraded
             EquipmentType typeToLose = null;
             int combatLossPriority = 0;
             for (EquipmentType equipmentType : equipment) {
@@ -3693,8 +3694,13 @@ public class Unit extends FreeColGameObject implements Features, Locatable, Loca
                                     ModelMessage.FOREIGN_DIPLOMACY);
                 }
             } else {
-                logger.fine("Unit with ID " + getId() + " can not be captured " +
-                            "but has no equipment. Is this a bug?");
+                UnitType downgrade = getType().getDowngrade(UnitType.DEMOTION);
+                if (downgrade != null) {
+                    setType(downgrade);
+                } else {                
+                    messageID = "model.unit.unitSlaughtered";
+                    dispose();
+                }
             }
         }
         if (!isDisposed() && getMovesLeft() > getInitialMovesLeft()) {

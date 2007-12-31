@@ -39,7 +39,7 @@ public final class UnitType extends BuildableType {
     public static int EDUCATION = 0, NATIVES = 1, EXPERIENCE = 2,
         LOST_CITY = 3, PROMOTION = 4, NUMBER_OF_UPGRADE_TYPES = 5;
 
-    public static int CLEAR_SKILL = 0, DEMOTION = 1, NUMBER_OF_DOWNGRADE_TYPES = 2;
+    public static int CLEAR_SKILL = 0, DEMOTION = 1, CAPTURE = 2, NUMBER_OF_DOWNGRADE_TYPES = 3;
 
     public static final EquipmentType[] NO_EQUIPMENT = new EquipmentType[0];
 
@@ -545,6 +545,7 @@ public final class UnitType extends BuildableType {
                 String educationUnit = in.getAttributeValue(null, "unit");
                 downgrade.asResultOf[CLEAR_SKILL] = getAttribute(in, "clearSkill", false);
                 downgrade.asResultOf[DEMOTION] = getAttribute(in, "demotion", false);
+                downgrade.asResultOf[CAPTURE] = getAttribute(in, "capture", false);
                 downgrades.put(educationUnit, downgrade);
                 in.nextTag(); // close this element
             } else if (Modifier.getXMLElementTagName().equals(nodeName)) {

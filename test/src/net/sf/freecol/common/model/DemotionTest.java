@@ -24,7 +24,9 @@ import net.sf.freecol.util.test.FreeColTestCase;
 public class DemotionTest extends FreeColTestCase {
 
     TileType plains = spec().getTileType("model.tile.plains");
+
     EquipmentType muskets = spec().getEquipmentType("model.equipment.muskets");
+    EquipmentType horses = spec().getEquipmentType("model.equipment.horses");
 
     public void testColonistDemotedBySoldier() {
 
@@ -87,12 +89,52 @@ public class DemotionTest extends FreeColTestCase {
         assertTrue(soldier1.getTile() == tile2);
     }
 
+    public void testDragoonDemotedBySoldier() {
+
+        Game game = getStandardGame();
+        UnitType colonistType = spec().getUnitType("model.unit.freeColonist");
+        Player dutch = game.getPlayer("model.nation.dutch");
+        Player french = game.getPlayer("model.nation.french");
+        Map map = getTestMap(plains);
+        game.setMap(map);
+        Tile tile1 = map.getTile(5, 8);
+        tile1.setExploredBy(dutch, true);
+        tile1.setExploredBy(french, true);
+        Tile tile2 = map.getTile(4, 8);
+        tile2.setExploredBy(dutch, true);
+        tile2.setExploredBy(french, true);
+
+        Unit dragoon = new Unit(game, tile1, dutch, colonistType, Unit.ACTIVE);
+        dragoon.equipWith(muskets, true);
+        dragoon.equipWith(horses, true);
+        Unit soldier = new Unit(game, tile2, french, colonistType, Unit.ACTIVE);
+        soldier.equipWith(muskets, true);
+
+        dragoon.demote(soldier);
+        assertTrue(dragoon.getType() == colonistType);
+        assertTrue(dragoon.getOwner() == dutch);
+        assertTrue(dragoon.getTile() == tile1);
+        assertTrue(dragoon.getEquipment().size() == 1);
+        assertTrue(dragoon.getEquipment().get(0) == muskets);
+
+        dragoon.demote(soldier);
+        assertTrue(dragoon.getType() == colonistType);
+        assertTrue(dragoon.getOwner() == dutch);
+        assertTrue(dragoon.getTile() == tile1);
+        assertTrue(dragoon.getEquipment().isEmpty());
+
+        dragoon.demote(soldier);
+        assertTrue(dragoon.getType() == colonistType);
+        assertTrue(dragoon.getOwner() == french);
+        assertTrue(dragoon.getTile() == tile2);
+    }
+
     public void testVeteranSoldierDemotedBySoldier() {
 
         Game game = getStandardGame();
         UnitType colonistType = spec().getUnitType("model.unit.freeColonist");
         UnitType veteranType = spec().getUnitType("model.unit.veteranSoldier");
-        assertTrue(veteranType.getDowngrade(UnitType.DEMOTION) == colonistType);
+        assertTrue(veteranType.getDowngrade(UnitType.CAPTURE) == colonistType);
         Player dutch = game.getPlayer("model.nation.dutch");
         Player french = game.getPlayer("model.nation.french");
         Map map = getTestMap(plains);
@@ -119,6 +161,37 @@ public class DemotionTest extends FreeColTestCase {
         assertTrue(soldier1.getType() == colonistType);
         assertTrue(soldier1.getOwner() == french);
         assertTrue(soldier1.getTile() == tile2);
+    }
+
+    public void testArtilleryDemotedBySoldier() {
+
+        Game game = getStandardGame();
+        UnitType colonistType = spec().getUnitType("model.unit.freeColonist");
+        UnitType artilleryType = spec().getUnitType("model.unit.artillery");
+        UnitType damagedArtilleryType = spec().getUnitType("model.unit.damagedArtillery");
+        assertTrue(artilleryType.getDowngrade(UnitType.DEMOTION) == damagedArtilleryType);
+        Player dutch = game.getPlayer("model.nation.dutch");
+        Player french = game.getPlayer("model.nation.french");
+        Map map = getTestMap(plains);
+        game.setMap(map);
+        Tile tile1 = map.getTile(5, 8);
+        tile1.setExploredBy(dutch, true);
+        tile1.setExploredBy(french, true);
+        Tile tile2 = map.getTile(4, 8);
+        tile2.setExploredBy(dutch, true);
+        tile2.setExploredBy(french, true);
+
+        Unit artillery = new Unit(game, tile1, dutch, artilleryType, Unit.ACTIVE);
+        Unit soldier = new Unit(game, tile2, french, colonistType, Unit.ACTIVE);
+        soldier.equipWith(muskets, true);
+
+        artillery.demote(soldier);
+        assertTrue(artillery.getType() == damagedArtilleryType);
+        assertTrue(artillery.getOwner() == dutch);
+        assertTrue(artillery.getTile() == tile1);
+
+        artillery.demote(soldier);
+        assertTrue(artillery.isDisposed());
     }
 
 }
