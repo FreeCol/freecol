@@ -594,11 +594,11 @@ public class MapGenerator {
                         schoolhouse.upgrade();
                     }
                     Unit carpenter = new Unit(map.getGame(), colonyTile, player, unitType, Unit.ACTIVE);
-                    carpenter.setLocation(colony.getBuildingForProducing(carpenter.getExpertWorkType()));
+                    carpenter.setLocation(colony.getBuildingForProducing(unitType.getExpertProduction()));
 
                     unitType = FreeCol.getSpecification().getUnitType("model.unit.elderStatesman");
                     Unit statesman = new Unit(map.getGame(), colonyTile, player, unitType, Unit.ACTIVE);
-                    statesman.setLocation(colony.getBuildingForProducing(statesman.getExpertWorkType()));
+                    statesman.setLocation(colony.getBuildingForProducing(unitType.getExpertProduction()));
 
                     unitType = FreeCol.getSpecification().getUnitType("model.unit.expertLumberJack");
                     Unit lumberjack = new Unit(map.getGame(), colony, player, unitType, Unit.ACTIVE);

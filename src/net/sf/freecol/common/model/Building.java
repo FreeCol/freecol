@@ -335,9 +335,8 @@ public final class Building extends FreeColGameObject implements Features, WorkL
 
         Unit unit = (Unit) locatable;
 
-        for (EquipmentType equipmentType : unit.getEquipment()) {
-            unit.removeEquipment(equipmentType);
-        }
+        unit.removeAllEquipment(false);
+
         Unit student = unit.getStudent();
         if (hasAbility("model.ability.teach")) {
             if (student == null) {

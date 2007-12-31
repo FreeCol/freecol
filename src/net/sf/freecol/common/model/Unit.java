@@ -105,8 +105,6 @@ public class Unit extends FreeColGameObject implements Features, Locatable, Loca
      */
     private int workLeft;
 
-    private int numberOfTools;
-
     private int hitpoints; // For now; only used by ships when repairing.
 
     private Player owner;
@@ -968,17 +966,6 @@ public class Unit extends FreeColGameObject implements Features, Locatable, Loca
     }
 
     /**
-     * Gets the type of goods this unit is an expert at producing.
-     * 
-     * @return The type of goods or <code>-1</code> if this unit is not an
-     *         expert at producing any type of goods.
-     * @see UnitType#getExpertProduction
-     */
-    public GoodsType getExpertWorkType() {
-        return unitType.getExpertProduction();
-    }
-
-    /**
      * Returns the destination of this unit.
      * 
      * @return The destination of this unit.
@@ -1832,10 +1819,7 @@ public class Unit extends FreeColGameObject implements Features, Locatable, Loca
         if (workLocation.getTile() != getTile()) {
             throw new IllegalStateException("Can only set a 'Unit'  to a 'WorkLocation' that is on the same 'Tile'.");
         }
-
-        for (EquipmentType equipmentType : equipment) {
-            removeEquipment(equipmentType);
-        }
+        removeAllEquipment(false);
         setState(Unit.IN_COLONY);
 
         setLocation(workLocation);
@@ -2014,24 +1998,15 @@ public class Unit extends FreeColGameObject implements Features, Locatable, Loca
     }
 
     /**
-     * Checks whether this unit can be equipped with goods at the current
-     * location. This is the case if the unit is in a colony in which the goods
-     * are present, or if it is in Europe and the player can trade the goods and
-     * has enough gold to pay for them.
+     * Checks whether this unit can be equipped with the given
+     * <code>EquipmentType</code> at the current
+     * <code>Location</code>. This is the case if all requirements of
+     * the EquipmentType are met.
      * 
-     * @param equipType The type of goods.
-     * @param amount The amount of goods.
-     * @return whether this unit can be equipped with goods at the current
-     *         location.
+     * @param equipmentType an <code>EquipmentType</code> value
+     * @return whether this unit can be equipped with the given
+     *         <code>EquipmentType</code> at the current location.
      */
-    private boolean canBeEquipped(GoodsType equipType, int amount) {
-        return ((getColony() != null && getColony().getGoodsCount(equipType) >= amount) ||
-                ((location instanceof Europe || location instanceof Unit
-                  && ((Unit) location).getLocation() instanceof Europe)
-                 && getOwner().getGold() >= getOwner().getMarket().getBidPrice(equipType, amount) && 
-                 getOwner().canTrade(equipType)));
-    }
-
     public boolean canBeEquippedWith(EquipmentType equipmentType) {
         for (Entry<String, Boolean> entry : equipmentType.getUnitAbilitiesRequired().entrySet()) {
             if (hasAbility(entry.getKey()) != entry.getValue()) {
@@ -2066,19 +2041,50 @@ public class Unit extends FreeColGameObject implements Features, Locatable, Loca
         return true;
     }
 
+    /**
+     * Checks whether the given <code>EquipmentType</code> can be
+     * built at the current <code>Location</code>. This is the case if
+     * the unit is in a colony in which the goods are present, or if
+     * it is in Europe and the player can trade the goods and has
+     * enough gold to pay for them.
+     * 
+     * @param equipmentType an <code>EquipmentType</code> value
+     * @return whether this unit can be equipped with the given
+     *         <code>EquipmentType</code> at the current location.
+     */
     public boolean equipmentCanBeBuilt(EquipmentType equipmentType) {
-        for (AbstractGoods requiredGoods : equipmentType.getGoodsRequired()) {
-            if (!canBeEquipped(requiredGoods.getType(), requiredGoods.getAmount())) {
-                return false;
+        if (getColony() != null) {
+            for (AbstractGoods requiredGoods : equipmentType.getGoodsRequired()) {
+                if (!(getColony().getGoodsCount(requiredGoods.getType()) >= requiredGoods.getAmount())) {
+                    return false;
+                }
+            }
+        } else if (isInEurope()) {
+            for (AbstractGoods requiredGoods : equipmentType.getGoodsRequired()) {
+                GoodsType goodsType = requiredGoods.getType();
+                if (!(getOwner().canTrade(goodsType) &&
+                      getOwner().getGold() >= getOwner().getMarket().getBidPrice(goodsType, requiredGoods.getAmount()))) {
+                    return false;
+                }
             }
         }
-        return true;
+        return false;
     }
 
     public void equipWith(EquipmentType equipmentType) {
         equipWith(equipmentType, false);
     }
 
+    /**
+     * Equip this unit with the given EquipmentType, provided that all
+     * requirements are met, and that the EquipmentType can be built
+     * at this location or is present as a result of combat.
+     *
+     * @param equipmentType an <code>EquipmentType</code> value
+     * @param asResultOfCombat a <code>boolean</code> value
+     * @see #canBeEquippedWith
+     * @see #equipmentCanBeBuilt
+     */
     public void equipWith(EquipmentType equipmentType, boolean asResultOfCombat) {
         if (!canBeEquippedWith(equipmentType)) {
             logger.fine("Unable to equip unit " + getId() + " with " + equipmentType.getName());
@@ -2096,15 +2102,17 @@ public class Unit extends FreeColGameObject implements Features, Locatable, Loca
                 equipmentIterator.remove();
             }
         }
-        if (getColony() != null) {
-            for (AbstractGoods goods : equipmentType.getGoodsRequired()) {
-                getColony().removeGoods(goods.getType(), goods.getAmount());
+        if (!asResultOfCombat) {
+            if (getColony() != null) {
+                for (AbstractGoods goods : equipmentType.getGoodsRequired()) {
+                    getColony().removeGoods(goods.getType(), goods.getAmount());
+                }
+            } else if (isInEurope()) {
+                for (AbstractGoods goods : equipmentType.getGoodsRequired()) {
+                    getOwner().getMarket().buy(goods.getType(), goods.getAmount(), getOwner());
+                }
             }
-        } else if (isInEurope()) {
-            for (AbstractGoods goods : equipmentType.getGoodsRequired()) {
-                getOwner().getMarket().buy(goods.getType(), goods.getAmount(), getOwner());
-            }
-        }                
+        }
         equipment.add(equipmentType);
     }        
 
@@ -2290,6 +2298,8 @@ public class Unit extends FreeColGameObject implements Features, Locatable, Loca
         return movesLeft;
     }
 
+    // TODO: make these go away, if possible, private if not
+
     public boolean isArmed() {
         return equipment.contains(FreeCol.getSpecification().getEquipmentType("model.equipment.muskets"));
     }
@@ -2363,7 +2373,7 @@ public class Unit extends FreeColGameObject implements Features, Locatable, Loca
 
     /**
      * Set the <code>Name</code> value.
-     * TODO: Should we still allow this?
+     *
      * @param newName The new Name value.
      */
     public void setName(String newName) {
@@ -2666,8 +2676,7 @@ public class Unit extends FreeColGameObject implements Features, Locatable, Loca
     public void moveToEurope() {
         // Check if this move is illegal or not:
         if (!canMoveToEurope()) {
-            throw new IllegalStateException(
-                                            "It is not allowed to move units to europe from the tile where this unit is located.");
+            throw new IllegalStateException("It is not allowed to move units to europe from the tile where this unit is located.");
         } else if (getLocation() instanceof Tile) {
             // Don't set entry location if location isn't Tile
             setEntryLocation(getLocation());
@@ -2763,7 +2772,8 @@ public class Unit extends FreeColGameObject implements Features, Locatable, Loca
      *         where it is located and <code>false</code> otherwise.
      */
     public boolean canBuildColony() {
-        return getOwner().canBuildColonies() && hasAbility("model.ability.foundColony")
+        return //getOwner().canBuildColonies() && // we are checking this implicitly
+            hasAbility("model.ability.foundColony")
             && getMovesLeft() > 0 && getTile() != null && getTile().isColonizeable();
     }
 

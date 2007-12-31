@@ -1267,6 +1267,7 @@
       <unit id="model.unit.freeColonist" tools="5"/>
       <unit id="model.unit.freeColonist" armed="true"/>
       <unit id="model.unit.caravel"/>
+      <ability id="model.ability.foundColony" value="true"/>
       <ability id="model.ability.electFoundingFather"/>
     </european-nation-type>
     <!-- default REF nation -->
@@ -1280,6 +1281,7 @@
       <unit id="model.unit.freeColonist" tools="5"/>
       <unit id="model.unit.freeColonist" armed="true"/>
       <unit id="model.unit.merchantman"/>
+      <ability id="model.ability.foundColony" value="true"/>
       <ability id="model.ability.electFoundingFather"/>
     </european-nation-type>
     <!-- this was the French player -->
@@ -1288,6 +1290,7 @@
       <unit id="model.unit.hardyPioneer" tools="5"/>
       <unit id="model.unit.freeColonist" armed="true"/>
       <unit id="model.unit.caravel"/>
+      <ability id="model.ability.foundColony" value="true"/>
       <ability id="model.ability.electFoundingFather"/>
     </european-nation-type>
     <!-- this was the English player -->
@@ -1296,6 +1299,7 @@
       <unit id="model.unit.freeColonist" tools="5"/>
       <unit id="model.unit.freeColonist" armed="true"/>
       <unit id="model.unit.caravel"/>
+      <ability id="model.ability.foundColony" value="true"/>
       <ability id="model.ability.electFoundingFather"/>
     </european-nation-type>
     <!-- this was the Spanish player -->
@@ -1305,6 +1309,7 @@
       <unit id="model.unit.freeColonist" tools="5"/>
       <unit id="model.unit.veteranSoldier" armed="true" mounted="true"/>
       <unit id="model.unit.caravel"/>
+      <ability id="model.ability.foundColony" value="true"/>
       <ability id="model.ability.electFoundingFather"/>
     </european-nation-type>
     <european-nation-type id="model.nationType.naval">
@@ -1314,6 +1319,7 @@
       <unit id="model.unit.freeColonist" tools="5"/>
       <unit id="model.unit.freeColonist" armed="true"/>
       <unit id="model.unit.merchantman"/>
+      <ability id="model.ability.foundColony" value="true"/>
       <ability id="model.ability.electFoundingFather"/>
     </european-nation-type>
 
@@ -1321,44 +1327,52 @@
       <skill id="model.unit.expertScout"/>
       <skill id="model.unit.expertFurTrapper"/>
       <ability id="model.ability.ambushBonus" value="true"/>
+      <ability id="model.ability.foundColony" value="false"/>
     </indian-nation-type>
     <indian-nation-type id="model.nationType.sioux" number-of-settlements="average" aggression="average" type-of-settlement="teepee">
       <skill id="model.unit.expertScout"/>
       <skill id="model.unit.expertFurTrapper"/>
       <ability id="model.ability.ambushBonus" value="true"/>
+      <ability id="model.ability.foundColony" value="false"/>
     </indian-nation-type>
     <indian-nation-type id="model.nationType.tupi" number-of-settlements="low" aggression="high" type-of-settlement="teepee">
       <skill id="model.unit.expertScout"/>
       <skill id="model.unit.expertFurTrapper"/>
       <ability id="model.ability.ambushBonus" value="true"/>
+      <ability id="model.ability.foundColony" value="false"/>
     </indian-nation-type>
     <indian-nation-type id="model.nationType.arawak" number-of-settlements="low" aggression="low" type-of-settlement="longhouse">
       <skill id="model.unit.masterSugarPlanter"/>
       <skill id="model.unit.masterCottonPlanter"/>
       <skill id="model.unit.masterTobaccoPlanter"/>
       <ability id="model.ability.ambushBonus" value="true"/>
+      <ability id="model.ability.foundColony" value="false"/>
     </indian-nation-type>
     <indian-nation-type id="model.nationType.cherokee" number-of-settlements="average" aggression="low" type-of-settlement="longhouse">
       <skill id="model.unit.masterSugarPlanter"/>
       <skill id="model.unit.masterCottonPlanter"/>
       <skill id="model.unit.masterTobaccoPlanter"/>
       <ability id="model.ability.ambushBonus" value="true"/>
+      <ability id="model.ability.foundColony" value="false"/>
     </indian-nation-type>
     <indian-nation-type id="model.nationType.iroquois" number-of-settlements="average" aggression="average" type-of-settlement="longhouse">
       <skill id="model.unit.masterSugarPlanter"/>
       <skill id="model.unit.masterCottonPlanter"/>
       <skill id="model.unit.masterTobaccoPlanter"/>
       <ability id="model.ability.ambushBonus" value="true"/>
+      <ability id="model.ability.foundColony" value="false"/>
     </indian-nation-type>
     <indian-nation-type id="model.nationType.inca" number-of-settlements="low" aggression="low" type-of-settlement="city">
       <skill id="model.unit.expertFarmer"/>
       <skill id="model.unit.expertFisherman"/>
       <ability id="model.ability.ambushBonus" value="true"/>
+      <ability id="model.ability.foundColony" value="false"/>
     </indian-nation-type>
     <indian-nation-type id="model.nationType.aztec" number-of-settlements="low" aggression="high" type-of-settlement="city">
       <skill id="model.unit.expertFarmer"/>
       <skill id="model.unit.expertFisherman"/>
       <ability id="model.ability.ambushBonus" value="true"/>
+      <ability id="model.ability.foundColony" value="false"/>
     </indian-nation-type>
   </nation-types>
 

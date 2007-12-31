@@ -327,7 +327,7 @@ public class AIColony extends AIObject {
         Iterator<Unit> unitIterator = colony.getUnitIterator();
         while (unitIterator.hasNext()) {
             Unit u = unitIterator.next();
-            GoodsType workType = u.getExpertWorkType();
+            GoodsType workType = u.getType().getExpertProduction();
             if (workType != null) {
                 Iterator<WorkLocationPlan> wlpIterator = workLocationPlans.iterator();
                 while (wlpIterator.hasNext()) {
@@ -837,12 +837,12 @@ public class AIColony extends AIObject {
         Iterator<Unit> uit = units.iterator();
         while (uit.hasNext()) {
             Unit unit = uit.next();
-            if (unit.getExpertWorkType() != null) {
+            if (unit.getType().getExpertProduction() != null) {
                 Iterator<WorkLocationPlan> wlpIterator = workLocationPlans.iterator();
                 while (wlpIterator.hasNext()) {
                     WorkLocationPlan wlp = wlpIterator.next();
                     WorkLocation wl = wlp.getWorkLocation();
-                    if (unit.getExpertWorkType() == wlp.getGoodsType()
+                    if (unit.getType().getExpertProduction() == wlp.getGoodsType()
                             && wlp.getWorkLocation().canAdd(unit)
                             && (wlp.getGoodsType() != Goods.FOOD || !((ColonyTile) wl).getWorkTile().isLand()
                                     && unit.getIndex() == Unit.EXPERT_FISHERMAN
@@ -991,7 +991,7 @@ public class AIColony extends AIObject {
                 Unit bestUnit = unitIterator.next();
                 while (unitIterator.hasNext()) {
                     Unit u = unitIterator.next();
-                    if (u.getExpertWorkType() != u.getWorkType()) {
+                    if (u.getType().getExpertProduction() != u.getWorkType()) {
                         bestUnit = u;
                         break;
                     }
@@ -1013,7 +1013,7 @@ public class AIColony extends AIObject {
                 Unit bestPick = unitIterator.next();
                 while (unitIterator.hasNext()) {
                     Unit u = unitIterator.next();
-                    if (u.getExpertWorkType() != u.getWorkType()) {
+                    if (u.getType().getExpertProduction() != u.getWorkType()) {
                         bestPick = u;
                         break;
                     }

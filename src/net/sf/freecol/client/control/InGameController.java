@@ -1861,7 +1861,7 @@ public final class InGameController implements NetworkConstants {
         } else {
             ArrayList<Unit> choices = new ArrayList<Unit>();
             for (Unit nextUnit : destinationTile.getUnitList()) {
-                if (nextUnit.getSpaceLeft() >= unit.getTakeSpace()) {
+                if (nextUnit.getSpaceLeft() >= unit.getType().getSpaceTaken()) {
                     choices.add(nextUnit);
                 }
             }
@@ -2907,9 +2907,9 @@ public final class InGameController implements NetworkConstants {
                     if (possiblePassenger.isNaval()) {
                         continue;
                     }
-                    if (possiblePassenger.getTakeSpace() <= spaceLeft) {
+                    if (possiblePassenger.getType().getSpaceTaken() <= spaceLeft) {
                         boardShip(possiblePassenger, unit);
-                        spaceLeft -= possiblePassenger.getTakeSpace();
+                        spaceLeft -= possiblePassenger.getType().getSpaceTaken();
                     } else {
                         break;
                     }
