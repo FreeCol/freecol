@@ -129,6 +129,30 @@ public class DemotionTest extends FreeColTestCase {
         assertTrue(dragoon.getTile() == tile2);
     }
 
+    public void testScoutDemotedBySoldier() {
+
+        Game game = getStandardGame();
+        UnitType colonistType = spec().getUnitType("model.unit.freeColonist");
+        Player dutch = game.getPlayer("model.nation.dutch");
+        Player french = game.getPlayer("model.nation.french");
+        Map map = getTestMap(plains);
+        game.setMap(map);
+        Tile tile1 = map.getTile(5, 8);
+        tile1.setExploredBy(dutch, true);
+        tile1.setExploredBy(french, true);
+        Tile tile2 = map.getTile(4, 8);
+        tile2.setExploredBy(dutch, true);
+        tile2.setExploredBy(french, true);
+
+        Unit scout = new Unit(game, tile1, dutch, colonistType, Unit.ACTIVE);
+        scout.equipWith(horses, true);
+        Unit soldier = new Unit(game, tile2, french, colonistType, Unit.ACTIVE);
+        soldier.equipWith(muskets, true);
+
+        scout.demote(soldier);
+        scout.isDisposed();
+    }
+
     public void testVeteranSoldierDemotedBySoldier() {
 
         Game game = getStandardGame();

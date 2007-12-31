@@ -38,9 +38,6 @@ import net.sf.freecol.FreeCol;
  */
 public class Messages {
 
-
-
-
     private static final Logger logger = Logger.getLogger(Messages.class.getName());
 
     public static final String STRINGS_DIRECTORY = "strings";
@@ -165,12 +162,19 @@ public class Messages {
         if (data.length > 0 && message != null) {
             for (int i = 0; i < data.length; i += 2) {
                 if (data[i] == null || data[i+1] == null) {
-                    throw new IllegalArgumentException("Programming error,no data should be <null>.");
+                    throw new IllegalArgumentException("Programming error, no data should be <null>.");
                 }
                 message = message.replaceAll(data[i], data[i+1]);
             }
         }
         return message.trim();
+    }
+
+    public static boolean containsKey(String key) {
+        if (messageBundle == null) {
+            setMessageBundle(Locale.getDefault());
+        }
+         return (messageBundle.getProperty(key) != null);
     }
 
     /**
