@@ -83,6 +83,7 @@ public class ActionManager extends OptionGroup {
         add(new DisplayGridAction(freeColClient));
         add(new DisplayTileNamesAction(freeColClient));
         add(new DisplayTileOwnersAction(freeColClient));
+        add(new DisplayRegionAction(freeColClient));
         add(new EndTurnAction(freeColClient));
         add(new EuropeAction(freeColClient));
         add(new ExecuteGotoOrdersAction(freeColClient));

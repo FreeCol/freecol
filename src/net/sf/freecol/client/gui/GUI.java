@@ -151,6 +151,7 @@ public final class GUI {
 
     private boolean displayTileNames = false;
     private boolean displayTileOwners = false;
+    private boolean displayRegion = false;
     private boolean displayGrid = false;
     private GeneralPath gridPath = null;
 
@@ -1918,7 +1919,7 @@ public final class GUI {
      * @param y The y-coordinate of the location where to draw the Tile
      * (in pixels).
      */
-    private void displayOptionalValues(Graphics2D g, Map map, Tile tile, int x, int y) {  
+    private void displayOptionalValues(Graphics2D g, Map map, Tile tile, int x, int y) {
         if (displayTileNames) {
             String tileName = tile.getName();
             g.setColor(Color.BLACK);
@@ -1962,6 +1963,30 @@ public final class GUI {
                 */
             }
         }
+        
+        if (displayRegion && tile.getRegion() != null) {
+            String regionString = tile.getRegion().getDisplayName();
+            g.setColor(Color.BLACK);
+            int b = getBreakingPoint(regionString);
+            if (b == -1) {
+                g.drawString(regionString, x + (lib.getTerrainImageWidth(tile.getType()) - g.getFontMetrics().stringWidth(regionString))/2, y + (lib.getTerrainImageHeight(tile.getType())/2));
+                /* Takes to much resources:
+                BufferedImage stringImage = createStringImage(g, tileOwner, Color.BLACK, lib.getTerrainImageWidth(tile.getType().getIndex()), 10);
+                g.drawImage(stringImage, x + (lib.getTerrainImageWidth(tile.getType().getIndex()) - stringImage.getWidth())/2 + 1, y + lib.getTerrainImageHeight(tile.getType().getIndex())/2 - stringImage.getHeight()/2, null);
+                */
+            } else {
+                g.drawString(regionString.substring(0, b), x + (lib.getTerrainImageWidth(tile.getType()) - g.getFontMetrics().stringWidth(regionString.substring(0, b)))/2, y + lib.getTerrainImageHeight(tile.getType())/2 - (g.getFontMetrics().getAscent()*2)/3);
+                g.drawString(regionString.substring(b+1), x + (lib.getTerrainImageWidth(tile.getType()) - g.getFontMetrics().stringWidth(regionString.substring(b+1)))/2, y + lib.getTerrainImageHeight(tile.getType())/2 + (g.getFontMetrics().getAscent()*2)/3);
+                /* Takes to much resources:
+                BufferedImage stringImage = createStringImage(g, tileOwner.substring(0, b), Color.BLACK, lib.getTerrainImageWidth(tile.getType().getIndex()), 10);
+                g.drawImage(stringImage, x + (lib.getTerrainImageWidth(tile.getType().getIndex()) - stringImage.getWidth())/2 + 1, y + lib.getTerrainImageHeight(tile.getType().getIndex())/2 - (stringImage.getHeight()) - 5, null);
+                stringImage = createStringImage(g, tileOwner.substring(b+1), Color.BLACK, lib.getTerrainImageWidth(tile.getType().getIndex()), 10);
+                g.drawImage(stringImage, x + (lib.getTerrainImageWidth(tile.getType().getIndex()) - stringImage.getWidth())/2 + 1, y + lib.getTerrainImageHeight(tile.getType().getIndex())/2 - 5, null);
+                */
+            }
+        }
+        
+        
 
         /*
         if (tile.getPosition().equals(selectedTile)) {
@@ -2076,6 +2101,15 @@ public final class GUI {
         this.displayTileOwners = displayTileOwners;
     }
 
+    
+    /**
+     * If set to <i>true</i> then regions are drawn on the map.
+     * @param displayRegion <code>true</code> if the region
+     *       should be displayed and <code>false</code> otherwise.
+     */
+     public void setDisplayRegion(boolean displayRegion) {
+         this.displayRegion = displayRegion;
+     }
 
     /**
     * If set to <i>true</i> then a grid is drawn on the map.
