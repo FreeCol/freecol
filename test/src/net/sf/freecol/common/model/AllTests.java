@@ -41,6 +41,7 @@ public class AllTests {
 	suite.addTestSuite(NationTypeTest.class);
 	suite.addTestSuite(ScopeTest.class);
 	suite.addTestSuite(ModifierTest.class);
+	suite.addTestSuite(DemotionTest.class);
 	//$JUnit-END$
 	return suite;
     }

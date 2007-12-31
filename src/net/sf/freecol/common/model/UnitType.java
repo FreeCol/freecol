@@ -544,7 +544,7 @@ public final class UnitType extends BuildableType {
                 Downgrade downgrade = new Downgrade();
                 String educationUnit = in.getAttributeValue(null, "unit");
                 downgrade.asResultOf[CLEAR_SKILL] = getAttribute(in, "clearSkill", false);
-                downgrade.asResultOf[DEMOTION] = getAttribute(in, "promotion", false);
+                downgrade.asResultOf[DEMOTION] = getAttribute(in, "demotion", false);
                 downgrades.put(educationUnit, downgrade);
                 in.nextTag(); // close this element
             } else if (Modifier.getXMLElementTagName().equals(nodeName)) {

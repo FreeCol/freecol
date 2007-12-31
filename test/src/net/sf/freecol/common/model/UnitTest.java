@@ -23,9 +23,6 @@ import net.sf.freecol.util.test.FreeColTestCase;
 
 public class UnitTest extends FreeColTestCase {
 
-
-
-
     TileType plains = spec().getTileType("model.tile.plains");
     TileType desert = spec().getTileType("model.tile.desert");
     TileType grassland = spec().getTileType("model.tile.grassland");
@@ -59,7 +56,7 @@ public class UnitTest extends FreeColTestCase {
 
         Game game = getStandardGame();
         Player dutch = game.getPlayer("model.nation.dutch");
-        Map map = getTestMap(spec().getTileType("model.tile.plains"));
+        Map map = getTestMap(plains);
         game.setMap(map);
         Tile plain = map.getTile(5, 8);
         map.getTile(5, 8).setExploredBy(dutch, true);
@@ -107,7 +104,7 @@ public class UnitTest extends FreeColTestCase {
 
         Game game = getStandardGame();
         Player dutch = game.getPlayer("model.nation.dutch");
-        Map map = getTestMap(spec().getTileType("model.tile.plains"));
+        Map map = getTestMap(plains);
         game.setMap(map);
         map.getTile(5, 8).setExploredBy(dutch, true);
         map.getTile(6, 8).setExploredBy(dutch, true);
@@ -175,7 +172,7 @@ public class UnitTest extends FreeColTestCase {
 
         Game game = getStandardGame();
         Player dutch = game.getPlayer("model.nation.dutch");
-        Map map = getTestMap(spec().getTileType("model.tile.plains"));
+        Map map = getTestMap(plains);
         game.setMap(map);
         Tile plain = map.getTile(5, 8);
         map.getTile(5, 8).setExploredBy(dutch, true);

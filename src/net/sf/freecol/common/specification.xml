@@ -530,7 +530,7 @@
     <unit-type id="model.unit.expertFarmer"         offence="0"  defence="1" movement="3" lineOfSight="1" price="1100" 
                skill="1" recruitProbability="1" expert-production="model.goods.Food"
                scoreValue="4" pathImage="foot">
-      <downgrade id="model.unit.freeColonist"/>
+      <downgrade unit="model.unit.freeColonist"/>
       <ability id="model.ability.foundColony" value="true"/>
       <ability id="model.ability.canBeEquipped" value="true"/>
       <ability id="model.ability.canBeCaptured" value="true"/>
@@ -539,7 +539,7 @@
     <unit-type id="model.unit.expertFisherman"      offence="0"  defence="1" movement="3" lineOfSight="1" price="1000" 
                skill="1" recruitProbability="1" expert-production="model.goods.Fish"
                scoreValue="4" pathImage="foot">
-      <downgrade id="model.unit.freeColonist"/>
+      <downgrade unit="model.unit.freeColonist"/>
       <ability id="model.ability.foundColony" value="true"/>
       <ability id="model.ability.canBeEquipped" value="true"/>
       <ability id="model.ability.canBeCaptured" value="true"/>
@@ -548,7 +548,7 @@
     <unit-type id="model.unit.expertFurTrapper"     offence="0"  defence="1" movement="3" lineOfSight="1"               
                skill="1"  expert-production="model.goods.Furs"
                scoreValue="4" pathImage="foot">
-      <downgrade id="model.unit.freeColonist"/>
+      <downgrade unit="model.unit.freeColonist"/>
       <ability id="model.ability.foundColony" value="true"/>
       <ability id="model.ability.canBeEquipped" value="true"/>
       <ability id="model.ability.canBeCaptured" value="true"/>
@@ -557,7 +557,7 @@
     <unit-type id="model.unit.expertSilverMiner"    offence="0"  defence="1" movement="3" lineOfSight="1" price="900"  
                skill="1" recruitProbability="1" expert-production="model.goods.Silver"
                scoreValue="4" pathImage="foot">
-      <downgrade id="model.unit.freeColonist"/>
+      <downgrade unit="model.unit.freeColonist"/>
       <ability id="model.ability.foundColony" value="true"/>
       <ability id="model.ability.canBeEquipped" value="true"/>
       <ability id="model.ability.canBeCaptured" value="true"/>
@@ -566,7 +566,7 @@
     <unit-type id="model.unit.expertLumberJack"     offence="0"  defence="1" movement="3" lineOfSight="1" price="700"  
                skill="1" recruitProbability="1" expert-production="model.goods.Lumber"
                scoreValue="4" pathImage="foot">
-      <downgrade id="model.unit.freeColonist"/>
+      <downgrade unit="model.unit.freeColonist"/>
       <ability id="model.ability.foundColony" value="true"/>
       <ability id="model.ability.canBeEquipped" value="true"/>
       <ability id="model.ability.canBeCaptured" value="true"/>
@@ -575,7 +575,7 @@
     <unit-type id="model.unit.expertOreMiner"       offence="0"  defence="1" movement="3" lineOfSight="1" price="600"  
                skill="1" recruitProbability="1" expert-production="model.goods.Ore"
                scoreValue="4" pathImage="foot">
-      <downgrade id="model.unit.freeColonist"/>
+      <downgrade unit="model.unit.freeColonist"/>
       <ability id="model.ability.foundColony" value="true"/>
       <ability id="model.ability.canBeEquipped" value="true"/>
       <ability id="model.ability.canBeCaptured" value="true"/>
@@ -584,7 +584,7 @@
     <unit-type id="model.unit.masterSugarPlanter"   offence="0"  defence="1" movement="3" lineOfSight="1"               
                skill="2"  expert-production="model.goods.Sugar"
                scoreValue="5" pathImage="foot">
-      <downgrade id="model.unit.freeColonist"/>
+      <downgrade unit="model.unit.freeColonist"/>
       <ability id="model.ability.foundColony" value="true"/>
       <ability id="model.ability.canBeEquipped" value="true"/>
       <ability id="model.ability.canBeCaptured" value="true"/>
@@ -593,7 +593,7 @@
     <unit-type id="model.unit.masterCottonPlanter"  offence="0"  defence="1" movement="3" lineOfSight="1"               
                skill="2"  expert-production="model.goods.Cotton"
                scoreValue="5" pathImage="foot">
-      <downgrade id="model.unit.freeColonist"/>
+      <downgrade unit="model.unit.freeColonist"/>
       <ability id="model.ability.foundColony" value="true"/>
       <ability id="model.ability.canBeEquipped" value="true"/>
       <ability id="model.ability.canBeCaptured" value="true"/>
@@ -602,7 +602,7 @@
     <unit-type id="model.unit.masterTobaccoPlanter" offence="0"  defence="1" movement="3" lineOfSight="1"               
                skill="2"  expert-production="model.goods.Tobacco"
                scoreValue="5" pathImage="foot">
-      <downgrade id="model.unit.freeColonist"/>
+      <downgrade unit="model.unit.freeColonist"/>
       <ability id="model.ability.foundColony" value="true"/>
       <ability id="model.ability.canBeEquipped" value="true"/>
       <ability id="model.ability.canBeCaptured" value="true"/>
@@ -611,7 +611,7 @@
     <unit-type id="model.unit.firebrandPreacher"    offence="0"  defence="1" movement="3" lineOfSight="1" price="1500" 
                skill="3" recruitProbability="1" expert-production="model.goods.Crosses"
                scoreValue="6" pathImage="foot">
-      <downgrade id="model.unit.freeColonist"/>
+      <downgrade unit="model.unit.freeColonist"/>
       <ability id="model.ability.foundColony" value="true"/>
       <ability id="model.ability.canBeEquipped" value="true"/>
       <ability id="model.ability.canBeCaptured" value="true"/>
@@ -620,7 +620,7 @@
     <unit-type id="model.unit.elderStatesman"       offence="0"  defence="1" movement="3" lineOfSight="1" price="1900" 
                skill="3" recruitProbability="1" expert-production="model.goods.Bells"
                scoreValue="6" pathImage="foot">
-      <downgrade id="model.unit.freeColonist"/>
+      <downgrade unit="model.unit.freeColonist"/>
       <ability id="model.ability.foundColony" value="true"/>
       <ability id="model.ability.canBeEquipped" value="true"/>
       <ability id="model.ability.canBeCaptured" value="true"/>
@@ -629,7 +629,7 @@
     <unit-type id="model.unit.masterCarpenter"      offence="0"  defence="1" movement="3" lineOfSight="1" price="1000" 
                skill="1" recruitProbability="1" expert-production="model.goods.Hammers"
                scoreValue="4" pathImage="foot">
-      <downgrade id="model.unit.freeColonist"/>
+      <downgrade unit="model.unit.freeColonist"/>
       <ability id="model.ability.foundColony" value="true"/>
       <ability id="model.ability.canBeEquipped" value="true"/>
       <ability id="model.ability.canBeCaptured" value="true"/>
@@ -638,7 +638,7 @@
     <unit-type id="model.unit.masterDistiller"      offence="0"  defence="1" movement="3" lineOfSight="1" price="1100" 
                skill="2" recruitProbability="1" expert-production="model.goods.Rum"
                scoreValue="5" pathImage="foot">
-      <downgrade id="model.unit.freeColonist"/>
+      <downgrade unit="model.unit.freeColonist"/>
       <ability id="model.ability.foundColony" value="true"/>
       <ability id="model.ability.canBeEquipped" value="true"/>
       <ability id="model.ability.canBeCaptured" value="true"/>
@@ -647,7 +647,7 @@
     <unit-type id="model.unit.masterWeaver"         offence="0"  defence="1" movement="3" lineOfSight="1" price="1300" 
                skill="2" recruitProbability="1" expert-production="model.goods.Cloth"
                scoreValue="5" pathImage="foot">
-      <downgrade id="model.unit.freeColonist"/>
+      <downgrade unit="model.unit.freeColonist"/>
       <ability id="model.ability.foundColony" value="true"/>
       <ability id="model.ability.canBeEquipped" value="true"/>
       <ability id="model.ability.canBeCaptured" value="true"/>
@@ -656,7 +656,7 @@
     <unit-type id="model.unit.masterTobacconist"    offence="0"  defence="1" movement="3" lineOfSight="1" price="1200" 
                skill="2" recruitProbability="1" expert-production="model.goods.Cigars"
                scoreValue="5" pathImage="foot">
-      <downgrade id="model.unit.freeColonist"/>
+      <downgrade unit="model.unit.freeColonist"/>
       <ability id="model.ability.foundColony" value="true"/>
       <ability id="model.ability.canBeEquipped" value="true"/>
       <ability id="model.ability.canBeCaptured" value="true"/>
@@ -665,7 +665,7 @@
     <unit-type id="model.unit.masterFurTrader"      offence="0"  defence="1" movement="3" lineOfSight="1" price="950"  
                skill="2" recruitProbability="1" expert-production="model.goods.Coats"
                scoreValue="5" pathImage="foot">
-      <downgrade id="model.unit.freeColonist"/>
+      <downgrade unit="model.unit.freeColonist"/>
       <ability id="model.ability.foundColony" value="true"/>
       <ability id="model.ability.canBeEquipped" value="true"/>
       <ability id="model.ability.canBeCaptured" value="true"/>
@@ -674,7 +674,7 @@
     <unit-type id="model.unit.masterBlacksmith"     offence="0"  defence="1" movement="3" lineOfSight="1" price="1050" 
                skill="2" recruitProbability="1" expert-production="model.goods.Tools"
                scoreValue="5" pathImage="foot">
-      <downgrade id="model.unit.freeColonist"/>
+      <downgrade unit="model.unit.freeColonist"/>
       <ability id="model.ability.foundColony" value="true"/>
       <ability id="model.ability.canBeEquipped" value="true"/>
       <ability id="model.ability.canBeCaptured" value="true"/>
@@ -683,7 +683,7 @@
     <unit-type id="model.unit.masterGunsmith"       offence="0"  defence="1" movement="3" lineOfSight="1" price="850"  
                skill="2" recruitProbability="1" expert-production="model.goods.Muskets"
                scoreValue="5" pathImage="foot">
-      <downgrade id="model.unit.freeColonist"/>
+      <downgrade unit="model.unit.freeColonist"/>
       <ability id="model.ability.foundColony" value="true"/>
       <ability id="model.ability.canBeEquipped" value="true"/>
       <ability id="model.ability.canBeCaptured" value="true"/>
@@ -707,7 +707,7 @@
     </unit-type>
     <unit-type id="model.unit.veteranSoldier"       offence="0"  defence="1" movement="3" lineOfSight="1" price="2000" 
                skill="2" recruitProbability="1" scoreValue="5" pathImage="foot">
-      <downgrade id="model.unit.freeColonist" demotion="true"/>
+      <downgrade unit="model.unit.freeColonist" demotion="true"/>
       <ability id="model.ability.foundColony" value="true"/>
       <ability id="model.ability.canBeEquipped" value="true"/>
       <ability id="model.ability.canBeCaptured" value="true"/>
@@ -794,14 +794,14 @@
     </unit-type>
     <unit-type id="model.unit.colonialRegular"      offence="3"  defence="3" movement="3" lineOfSight="1"
                pathImage="foot">
-      <downgrade id="model.unit.freeColonist" demotion="true"/>
+      <downgrade unit="model.unit.freeColonist" demotion="true"/>
       <ability id="model.ability.foundColony" value="true"/>
       <ability id="model.ability.canBeEquipped" value="true"/>
       <ability id="model.ability.canBeCaptured" value="true"/>
       <required-ability id="model.ability.independenceDeclared"/>
     </unit-type>
     <unit-type id="model.unit.kingsRegular"         offence="4"  defence="4" movement="3" lineOfSight="1">
-      <downgrade id="model.unit.freeColonist" demotion="true"/>
+      <downgrade unit="model.unit.freeColonist" demotion="true"/>
       <ability id="model.ability.foundColony" value="true"/>
       <ability id="model.ability.canBeEquipped" value="true"/>
       <ability id="model.ability.canBeCaptured" value="true"/>
@@ -871,7 +871,7 @@
       <required-goods id="model.goods.Tools" value="40"/>
       <required-ability id="model.ability.buildArtillery"/>
       <ability id="model.ability.bombard" value="true"/>
-      <downgrade id="model.unit.damagedArtillery" demotion="true"/>
+      <downgrade unit="model.unit.damagedArtillery" demotion="true"/>
     </unit-type>
     <unit-type id="model.unit.damagedArtillery"     offence="5"  defence="3" movement="3"
                scoreValue="1" lineOfSight="1" pathImage="wagon">

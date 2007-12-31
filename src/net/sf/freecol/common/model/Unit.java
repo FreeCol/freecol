@@ -3483,7 +3483,7 @@ public class Unit extends FreeColGameObject implements Features, Locatable, Loca
                                     { "%nation%", getOwner().getNationAsString() } }, 
                                 ModelMessage.UNIT_DEMOTED);
             } else {
-                demote(defender, false);
+                demote(defender);
                 if (enemy.hasAbility("model.ability.automaticPromotion")) {
                     defender.promote();
                 }
@@ -3498,7 +3498,7 @@ public class Unit extends FreeColGameObject implements Features, Locatable, Loca
                                     { "%nation%", getOwner().getNationAsString() } }, 
                                 ModelMessage.UNIT_DEMOTED);
             } else {
-                demote(defender, false);
+                demote(defender);
                 defender.promote();
             }
             break;
@@ -3529,7 +3529,7 @@ public class Unit extends FreeColGameObject implements Features, Locatable, Loca
                     promote();
                 }
                 if (!defender.isNaval()) {
-                    defender.demote(this, false);
+                    defender.demote(this);
                     if (settlement instanceof IndianSettlement) {
                         getConvert((IndianSettlement) settlement);
                     }
@@ -3548,7 +3548,7 @@ public class Unit extends FreeColGameObject implements Features, Locatable, Loca
             } else {
                 promote();
                 if (!defender.isNaval()) {
-                    defender.demote(this, true);
+                    defender.demote(this);
                     if (settlement instanceof IndianSettlement) {
                         getConvert((IndianSettlement) settlement);
                     }
@@ -3644,39 +3644,34 @@ public class Unit extends FreeColGameObject implements Features, Locatable, Loca
      * The enemy may plunder horses and muskets.
      * 
      * @param enemyUnit The unit we are fighting against.
-     * @param canSteal <code>true</code> indicates that muskets/horses
-     *            should be taken by the <code>enemyUnit</code>.
      */
-    public void demote(Unit enemyUnit, boolean canSteal) {
+    public void demote(Unit enemyUnit) {
         String oldName = getName();
         String messageID = "model.unit.unitDemoted";
         String nation = owner.getNationAsString();
         int messageType = ModelMessage.UNIT_DEMOTED;
 
-        if (enemyUnit.isUndead()) {
-            // this unit is captured, don't show old owner's messages to new
-            // owner
-            for (ModelMessage message : getOwner().getModelMessages()) {
-                message.setBeenDisplayed(true);
+        if (hasAbility("model.ability.canBeCaptured")) {
+            // unit will be captured or destroyed
+            messageType = ModelMessage.UNIT_LOST;
+            if (enemyUnit.hasAbility("model.ability.captureUnits")) {
+                if (enemyUnit.isUndead()) {
+                    setType(UNDEAD);
+                } else {
+                    UnitType downgrade = getType().getDowngrade(UnitType.DEMOTION);
+                    if (downgrade != null) {
+                        setType(downgrade);
+                    }
+                }
+                messageID = "model.unit.unitCaptured";
+                setLocation(enemyUnit.getTile());
+                setOwner(enemyUnit.getOwner());
+            } else {
+                messageID = "model.unit.unitSlaughtered";
+                dispose();
             }
-            messageID = "model.unit.unitCaptured";
-            messageType = ModelMessage.UNIT_LOST;
-            setHitpoints(getInitialHitpoints(enemyUnit.unitType));
-            setLocation(enemyUnit.getTile());
-            setOwner(enemyUnit.getOwner());
-            setType(UNDEAD);
-        } else if (getIndex() == ARTILLERY) {
-            messageID = "model.unit.artilleryDamaged";
-            setType(DAMAGED_ARTILLERY);
-        } else if (getIndex() == DAMAGED_ARTILLERY) {
-            messageID = "model.unit.unitDestroyed";
-            messageType = ModelMessage.UNIT_LOST;
-            dispose();
-        } else if (getIndex() == BRAVE || getIndex() == KINGS_REGULAR) {
-            messageID = "model.unit.unitSlaughtered";
-            messageType = ModelMessage.UNIT_LOST;
-            dispose();
         } else {
+            // unit has equipment that protects from capture
             EquipmentType typeToLose = null;
             int combatLossPriority = 0;
             for (EquipmentType equipmentType : equipment) {
@@ -3688,8 +3683,7 @@ public class Unit extends FreeColGameObject implements Features, Locatable, Loca
             if (typeToLose != null) {
                 // lose equipment as a result of combat
                 removeEquipment(typeToLose, true);
-                if (typeToLose.hasAbility("model.ability.equipmentCanBeCaptured") &&
-                    enemyUnit.hasAbility("model.ability.captureEquipment") &&
+                if (enemyUnit.hasAbility("model.ability.captureEquipment") &&
                     enemyUnit.canBeEquippedWith(typeToLose)) {
                     enemyUnit.equipWith(typeToLose, true);
                     addModelMessage(this, "model.unit.equipmentCaptured",
@@ -3698,30 +3692,9 @@ public class Unit extends FreeColGameObject implements Features, Locatable, Loca
                                         {"%equipment%", typeToLose.getName()}},
                                     ModelMessage.FOREIGN_DIPLOMACY);
                 }
-            } else if (hasAbility("model.ability.canBeCaptured") &&
-                       enemyUnit.hasAbility("model.ability.captureUnits")) {
-                // civilians, wagon trains and treasure trains
-                if (enemyUnit.getOwner().isEuropean()) {
-                    // this unit is captured, don't show old owner's
-                    // messages to new owner
-                    for (ModelMessage message : getOwner().getModelMessages()) {
-                        message.setBeenDisplayed(true);
-                    }
-                }
-                if (hasAbility("model.ability.expertSoldier")) {
-                    clearSpeciality();
-                    messageID = "model.unit.veteranUnitCaptured";
-                } else {
-                    messageID = "model.unit.unitCaptured";
-                }
-                messageType = ModelMessage.UNIT_LOST;
-                //setHitpoints(getInitialHitpoints(enemyUnit.unitType));
-                setLocation(enemyUnit.getTile());
-                setOwner(enemyUnit.getOwner());
             } else {
-                messageID = "model.unit.unitSlaughtered";
-                messageType = ModelMessage.UNIT_LOST;
-                dispose();
+                logger.fine("Unit with ID " + getId() + " can not be captured " +
+                            "but has no equipment. Is this a bug?");
             }
         }
         if (!isDisposed() && getMovesLeft() > getInitialMovesLeft()) {
