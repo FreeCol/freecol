@@ -54,7 +54,9 @@ public class ModelMessage extends FreeColObject {
     public static final int MISSING_GOODS = 14;
     public static final int TUTORIAL = 15;
 
+    private Player owner;
     private FreeColGameObject source;
+    private Tile sourceTile;
     private FreeColObject display;
     private int type;
     private String[][] data;
@@ -78,22 +80,55 @@ public class ModelMessage extends FreeColObject {
     */
     public ModelMessage(FreeColGameObject source, String id, String[][] data, int type, FreeColObject display) {
         this.source = source;
+        if (source instanceof Unit) {
+            this.owner = ((Unit) source).getOwner();
+        } else if (source instanceof Settlement) {
+            this.owner = ((Settlement) source).getOwner();
+        } else if (source instanceof Europe) {
+            this.owner = ((Europe) source).getOwner();
+        } else if (source instanceof Player) {
+            this.owner = (Player) source;
+        } else if (source instanceof Ownable) {
+            this.owner = ((Ownable) source).getOwner();
+        }
+        if (source instanceof Settlement) {
+            this.sourceTile = ((Settlement)source).getTile();
+        } else if (source instanceof Unit) {
+            Unit u = (Unit) source;
+            if (u.getTile()!=null)
+                this.sourceTile = u.getTile();
+            else if (u.getColony()!=null)
+                this.sourceTile = u.getColony().getTile();
+            else if (u.getIndianSettlement()!=null)
+                this.sourceTile = u.getIndianSettlement().getTile();
+            else
+                this.sourceTile = null;
+        } else {
+            this.sourceTile = null;
+        }
+        
         setId(id);
         this.data = data;
         this.type = type;
-        this.display = display;
+        if (display == null)
+            this.display = getDefaultDisplay(type, source);
+        else
+            this.display = display;
         verifyFields();
     }
-    
+
     /**
      * Checks that all the fields as they are set in the constructor are valid.
      */
     private void verifyFields() {
-        if (source == null) {
-            throw new IllegalArgumentException("The source cannot be null.");
-        }
         if (getId() == null) {
-            throw new IllegalArgumentException("The id cannot be null.");
+            throw new IllegalArgumentException("ModelMessage should not have a null id.");
+        }
+        if (source == null) {
+            throw new IllegalArgumentException("ModelMessage with ID " + this.getId() + " should not have a null source.");
+        }
+        if (owner == null) {
+            throw new IllegalArgumentException("ModelMessage with ID " + this.getId() + " should not have a null owner.");
         }
         if (!(display == null ||
               display instanceof FreeColGameObject ||
@@ -109,37 +144,37 @@ public class ModelMessage extends FreeColObject {
             }
         }
     }
-
-    /**
-    * Creates a new <code>ModelMessage</code>.
-    *
-    * @param source The source of the message. This is what the message should be
-    *               associated with. In addition, the owner of the source is the
-    *               player getting the message.
-    * @param id The ID of the message to display.
-    * @param data Contains data to be displayed in the message or <i>null</i>.
-    * @param type The type of this model message.
-    * @see FreeColGameObject#addModelMessage(FreeColGameObject, String, String[][], int)
-    */
-    public ModelMessage(FreeColGameObject source, String id, String[][] data, int type) {
-        this(source, id, data, type, getDefaultDisplay(type, source));
-
-    }
-
-    /**
-    * Creates a new <code>ModelMessage</code>.
-    *
-    * @param source The source of the message. This is what the message should be
-    *               associated with. In addition, the owner of the source is the
-    *               player getting the message.
-    * @param id The ID of the message to display.
-    * @param data Contains data to be displayed in the message or <i>null</i>.
-    * @see FreeColGameObject#addModelMessage(FreeColGameObject, String, String[][], int)
-    */
-    public ModelMessage(FreeColGameObject source, String id, String[][] data) {
-        this(source, id, data, DEFAULT);
-    }
     
+    /**
+     * Creates a new <code>ModelMessage</code>.
+     *
+     * @param source The source of the message. This is what the message should be
+     *               associated with. In addition, the owner of the source is the
+     *               player getting the message.
+     * @param id The ID of the message to display.
+     * @param data Contains data to be displayed in the message or <i>null</i>.
+     * @param type The type of this model message.
+     * @see FreeColGameObject#addModelMessage(FreeColGameObject, String, String[][], int)
+     */
+     public ModelMessage(FreeColGameObject source, String id, String[][] data, int type) {
+         this(source, id, data, type, getDefaultDisplay(type, source));
+
+     }
+
+     /**
+     * Creates a new <code>ModelMessage</code>.
+     *
+     * @param source The source of the message. This is what the message should be
+     *               associated with. In addition, the owner of the source is the
+     *               player getting the message.
+     * @param id The ID of the message to display.
+     * @param data Contains data to be displayed in the message or <i>null</i>.
+     * @see FreeColGameObject#addModelMessage(FreeColGameObject, String, String[][], int)
+     */
+     public ModelMessage(FreeColGameObject source, String id, String[][] data) {
+         this(source, id, data, DEFAULT);
+     }
+     
     /**
      * Returns the default display object for the given type.
      * @param type the type for which to find the default display object.
@@ -151,7 +186,7 @@ public class ModelMessage extends FreeColObject {
         switch(type) {
         case SONS_OF_LIBERTY:
         case GOVERNMENT_EFFICIENCY:
-            newDisplay = FreeCol.getSpecification().getGoodsType("model.goods.bells");
+            newDisplay = FreeCol.getSpecification().getGoodsType("model.goods.Bells");
             break;
         case LOST_CITY_RUMOUR:
             newDisplay = new LostCityRumour();
@@ -163,7 +198,7 @@ public class ModelMessage extends FreeColObject {
             newDisplay = source;
             break;
         case BUILDING_COMPLETED:
-            newDisplay = FreeCol.getSpecification().getGoodsType("model.goods.hammers");
+            newDisplay = FreeCol.getSpecification().getGoodsType("model.goods.Hammers");
             break;
         case DEFAULT:
         case WARNING:
@@ -280,6 +315,18 @@ public class ModelMessage extends FreeColObject {
     }
 
     /**
+    * Returns the owner of this message. The owner of this method
+    * is the owner of the {@link #getSource source}.
+    * 
+    * @return The owner of the message. This is the <code>Player</code>
+    *       who should receive the message.
+    */
+    public Player getOwner() {
+        return owner;
+    }
+
+
+    /**
     * Checks if this <code>ModelMessage</code> is equal to another <code>ModelMessage</code>.
     * @return <i>true</i> if the sources, message IDs and data are equal.
     */
@@ -338,7 +385,15 @@ public class ModelMessage extends FreeColObject {
 
     public void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
         out.writeStartElement(getXMLElementTagName());
-        out.writeAttribute("source", source.getId());
+        out.writeAttribute("owner", owner.getId());
+        if (source!=null) {
+            if (source instanceof Unit && ((Unit)source).isDisposed())
+                out.writeAttribute("source", sourceTile.getId());
+            else if (source instanceof Settlement && ((Settlement)source).isDisposed())
+                out.writeAttribute("source", sourceTile.getId());
+            else
+                out.writeAttribute("source", source.getId());
+        }
         if (display != null) {
             out.writeAttribute("display", display.getId());
         }
@@ -380,6 +435,10 @@ public class ModelMessage extends FreeColObject {
      */
     public void readFromXML(XMLStreamReader in, Game game) throws XMLStreamException {
         setId(in.getAttributeValue(null, "ID"));
+        
+        String ownerPlayer = in.getAttributeValue(null, "owner");
+        owner = (Player)game.getFreeColGameObject(ownerPlayer);
+         
         type = getAttribute(in, "type", DEFAULT);
         beenDisplayed = Boolean.parseBoolean(in.getAttributeValue(null, "hasBeenDisplayed"));
 
@@ -401,6 +460,8 @@ public class ModelMessage extends FreeColObject {
             }
         }
 
+        verifyFields();
+        owner.addModelMessage(this);
     }
 
 }

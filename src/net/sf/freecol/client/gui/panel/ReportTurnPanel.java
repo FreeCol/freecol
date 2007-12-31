@@ -297,16 +297,21 @@ public final class ReportTurnPanel extends ReportPanel implements ActionListener
                     if (var.equals("%colony%")) {
                         Colony colony = player.getColony(item[1]);
                         if (colony != null) {
-                            insertLinkButton(colony, colony.getName());
+                            insertLinkButton(colony, item[1]);
+                        } else if (message.getSource() instanceof Tile) {
+                            insertLinkButton(message.getSource(), item[1]);
                         } else {
                             insertText(item[1]);
                         }
                     } else if (var.equals("%europe%")) {
                         insertLinkButton(player.getEurope(), player.getEurope().getName());
-                    } else if ((var.equals("%unit%") ||
-                                var.equals("%newName%")) &&
-                               message.getSource() instanceof Unit) {
-                        Tile tile = ((Unit) message.getSource()).getTile();
+                    } else if (var.equals("%unit%") || var.equals("%newName%")) {
+                        Tile tile = null;
+                        if (message.getSource() instanceof Unit) {
+                            tile = ((Unit) message.getSource()).getTile();
+                        } else if (message.getSource() instanceof Tile) {
+                            tile = (Tile)message.getSource();
+                        }
                         if (tile != null) {
                             insertLinkButton(tile, item[1]);
                         } else {

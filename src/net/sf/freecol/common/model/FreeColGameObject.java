@@ -426,16 +426,11 @@ abstract public class FreeColGameObject extends FreeColObject {
 
     private void initializeModelMessage(ModelMessage message) {
         if (message.getSource() == null) {
-            logger.warning("ModelMessage with ID " + message.getId() + " has null message.getSource().");
-        } else if (message.getSource() instanceof Player) {
-            ((Player) message.getSource()).addModelMessage(message);
-        } else if (message.getSource() instanceof Ownable) {
-            ((Ownable) message.getSource()).getOwner().addModelMessage(message);
-        } else {
-            logger.warning("ModelMessage with ID " + message.getId() +
-                           " and message.getSource() " +
-                           message.getSource().toString() + " has unknown owner.");
+            logger.warning("ModelMessage with ID " + message.getId() + " has null source.");
+        } else if (message.getOwner() == null) {
+            logger.warning("ModelMessage with ID " + message.getId() + " has null owner.");
         }
+        message.getOwner().addModelMessage(message);
     }
 
 

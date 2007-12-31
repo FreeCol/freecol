@@ -563,7 +563,7 @@ public class Player extends FreeColGameObject implements Features, Nameable {
     }
 
     /**
-     * Declares independece.
+     * Declares independence.
      */
     public void declareIndependence() {
         if (getSoL() < 50) {
@@ -593,7 +593,7 @@ public class Player extends FreeColGameObject implements Features, Nameable {
     }
 
     /**
-     * Gives independece to this <code>Player</code>.
+     * Gives independence to this <code>Player</code>.
      */
     public void giveIndependence() {
         if (!isEuropean()) {
@@ -619,7 +619,7 @@ public class Player extends FreeColGameObject implements Features, Nameable {
     }
 
     /**
-     * Gets the name this player has choosen for the new land.
+     * Gets the name this player has chosen for the new land.
      * 
      * @return The name of the new world as chosen by the
      * <code>Player</code>.  If no land name was chosen, the default
@@ -2325,9 +2325,6 @@ public class Player extends FreeColGameObject implements Features, Nameable {
             if (monarch != null) {
                 monarch.toXML(out, player, showAll, toSavedGame);
             }
-            for (ModelMessage message : modelMessages) {
-                message.toXML(out);
-            }
         }
 
         out.writeEndElement();
@@ -2425,10 +2422,6 @@ public class Player extends FreeColGameObject implements Features, Nameable {
                 } else {
                     market = new Market(getGame(), in);
                 }
-            } else if (in.getLocalName().equals(ModelMessage.getXMLElementTagName())) {
-                ModelMessage message = new ModelMessage();
-                message.readFromXML(in, getGame());
-                addModelMessage(message);
             } else {
                 logger.warning("Unknown tag: " + in.getLocalName() + " loading player");
             }
@@ -2891,7 +2884,7 @@ public class Player extends FreeColGameObject implements Features, Nameable {
          * 
          * @param owner The <code>Player</code> that needs an iterator of it's
          *            units.
-         * @param predicate An object for deciding wether a <code>Unit</code>
+         * @param predicate An object for deciding whether a <code>Unit</code>
          *            should be included in the <code>Iterator</code> or not.
          */
         public UnitIterator(Player owner, UnitPredicate predicate) {

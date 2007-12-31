@@ -943,29 +943,29 @@ public final class InGameInputHandler extends InputHandler {
         case LostCityRumour.BURIAL_GROUND:
             Player indianPlayer = tile.getOwner();
             indianPlayer.modifyTension(player, Tension.TENSION_HATEFUL);
-            m = new ModelMessage(tile, "lostCityRumour.BurialGround", new String[][] { { "%nation%",
+            m = new ModelMessage(unit, "lostCityRumour.BurialGround", new String[][] { { "%nation%",
                     indianPlayer.getNationAsString() } }, ModelMessage.LOST_CITY_RUMOUR);
             break;
         case LostCityRumour.EXPEDITION_VANISHES:
-            m = new ModelMessage(tile, "lostCityRumour.ExpeditionVanishes", null, ModelMessage.LOST_CITY_RUMOUR);
+            m = new ModelMessage(unit, "lostCityRumour.ExpeditionVanishes", null, ModelMessage.LOST_CITY_RUMOUR);
             unit.dispose();
             break;
         case LostCityRumour.NOTHING:
-            m = new ModelMessage(tile, "lostCityRumour.Nothing", null, ModelMessage.LOST_CITY_RUMOUR);
+            m = new ModelMessage(unit, "lostCityRumour.Nothing", null, ModelMessage.LOST_CITY_RUMOUR);
             break;
         case LostCityRumour.LEARN:
-            m = new ModelMessage(tile, "lostCityRumour.SeasonedScout", new String[][] { { "%unit%", unit.getName() } },
+            m = new ModelMessage(unit, "lostCityRumour.SeasonedScout", new String[][] { { "%unit%", unit.getName() } },
                     ModelMessage.LOST_CITY_RUMOUR);
             unit.setType(FreeCol.getSpecification().getUnitType(element.getAttribute("unitType")));
             break;
         case LostCityRumour.TRIBAL_CHIEF:
             String amount = element.getAttribute("amount");
-            m = new ModelMessage(tile, "lostCityRumour.TribalChief", new String[][] { { "%money%", amount } },
+            m = new ModelMessage(unit, "lostCityRumour.TribalChief", new String[][] { { "%money%", amount } },
                     ModelMessage.LOST_CITY_RUMOUR);
             player.modifyGold(Integer.parseInt(amount));
             break;
         case LostCityRumour.COLONIST:
-            m = new ModelMessage(tile, "lostCityRumour.Colonist", null, ModelMessage.LOST_CITY_RUMOUR);
+            m = new ModelMessage(unit, "lostCityRumour.Colonist", null, ModelMessage.LOST_CITY_RUMOUR);
             unitList = element.getChildNodes();
             for (int i = 0; i < unitList.getLength(); i++) {
                 Element unitElement = (Element) unitList.item(i);
@@ -980,7 +980,7 @@ public final class InGameInputHandler extends InputHandler {
             break;
         case LostCityRumour.TREASURE:
             String treasure = element.getAttribute("amount");
-            m = new ModelMessage(tile, "lostCityRumour.TreasureTrain", new String[][] { { "%money%", treasure } },
+            m = new ModelMessage(unit, "lostCityRumour.TreasureTrain", new String[][] { { "%money%", treasure } },
                     ModelMessage.LOST_CITY_RUMOUR);
             unitList = element.getChildNodes();
             for (int i = 0; i < unitList.getLength(); i++) {

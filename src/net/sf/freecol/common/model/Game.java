@@ -903,14 +903,25 @@ public class Game extends FreeColGameObject {
 
         gameOptions.toXML(out);
 
+        // serialize players
         Iterator<Player> playerIterator = getPlayerIterator();
         while (playerIterator.hasNext()) {
             Player p = playerIterator.next();
             p.toXML(out, player, showAll, toSavedGame);
         }
-
+        // serialize map
         if (map != null) {
             map.toXML(out, player, showAll, toSavedGame);
+        }
+        // serialize messages
+        playerIterator = getPlayerIterator();
+        while (playerIterator.hasNext()) {
+            Player p = playerIterator.next();
+            if (this.isClientTrusted() || showAll || p.equals(player)) {
+                for (ModelMessage message : p.getModelMessages()) {
+                    message.toXML(out);
+                }
+            }
         }
 
         out.writeEndElement();
@@ -968,6 +979,9 @@ public class Game extends FreeColGameObject {
                     map = new Map(this, mapId);
                     map.readFromXML(in);
                 }
+            } else if (in.getLocalName().equals(ModelMessage.getXMLElementTagName())) {
+                ModelMessage message = new ModelMessage();
+                message.readFromXML(in, this);
             } else {
                 logger.warning("Unknown tag: " + in.getLocalName() + " loading game");
             }
