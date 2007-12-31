@@ -498,7 +498,7 @@ public class TileItemContainer extends FreeColGameObject {
                 if (tiType != river.getType()) {
                     // Has a different river type for this magnitude
                     TileImprovement r = new TileImprovement(getGame(), tile, tiType);
-                    this.river = river;
+                    this.river = r;
                 } else {
                     // Same river type, adjust magnitude
                     river.setMagnitude(magnitude);
