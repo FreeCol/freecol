@@ -24,6 +24,7 @@ import java.awt.event.MouseListener;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import net.sf.freecol.common.model.Map;
 import net.sf.freecol.common.model.PathNode;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
@@ -54,14 +55,29 @@ public final class CanvasMapEditorMouseListener implements MouseListener {
     }
 
     /**
+     * This method can be called to make sure the map is loaded
+     * There is no point executing mouse events if the map is not loaded
+     */
+    private Map getMap() {
+        Map map = null;
+        if (canvas.getClient().getGame() != null)
+            map = canvas.getClient().getGame().getMap();
+        return map;
+    }
+    
+    /**
      * Invoked when a mouse button was clicked.
      * 
      * @param e The MouseEvent that holds all the information.
      */
     public void mouseClicked(MouseEvent e) {
+        if (getMap() == null) {
+            return;
+        }
         try {
             if (e.getClickCount() > 1) {
-                gui.showColonyPanel(gui.convertToMapCoordinates(e.getX(), e.getY()));
+                Position p = gui.convertToMapCoordinates(e.getX(), e.getY());
+                gui.showColonyPanel(p);
             } else {
                 canvas.requestFocus();
             }
@@ -87,6 +103,7 @@ public final class CanvasMapEditorMouseListener implements MouseListener {
     public void mouseExited(MouseEvent e) {
         // Ignore for now.
     }
+    
 
     /**
      * Invoked when a mouse button was pressed.
@@ -97,17 +114,22 @@ public final class CanvasMapEditorMouseListener implements MouseListener {
         if (!e.getComponent().isEnabled()) {
             return;
         }
+        if (getMap() == null) {
+            return;
+        }
         try {
             if (e.getButton() == MouseEvent.BUTTON3 || e.isPopupTrigger()) {
                 //canvas.showTilePopup(gui.convertToMapCoordinates(e.getX(), e.getY()), e.getX(), e.getY());
                 Position p = gui.convertToMapCoordinates(e.getX(), e.getY());
                 gui.setSelectedTile(p, true);
             } else if (e.getButton() == MouseEvent.BUTTON1) {
-                if (canvas.getClient().getGame() != null
-                        && canvas.getClient().getGame().getMap() != null
-                        && gui.getFocus() != null) {
+                if (gui.getFocus() != null) {
                     Position p = gui.convertToMapCoordinates(e.getX(), e.getY());
-                    Tile t = canvas.getClient().getGame().getMap().getTile(p);
+                    Tile t = getMap().getTile(p);
+                    if (t == null) {
+                        // can happen on the edges of the map
+                        return;
+                    }
                     canvas.getClient().getMapEditorController().transform(t);
                     canvas.refresh();
                     canvas.requestFocus();
@@ -124,6 +146,9 @@ public final class CanvasMapEditorMouseListener implements MouseListener {
      * @param e The MouseEvent that holds all the information.
      */
     public void mouseReleased(MouseEvent e) {
+        if (getMap() == null) {
+            return;
+        }
         try {
             if (gui.getDragPath() != null) {
                 // A mouse drag has ended (see CanvasMouseMotionListener).
