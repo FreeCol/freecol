@@ -61,6 +61,18 @@ public final class CanvasMapEditorMouseMotionListener implements MouseMotionList
         gui = g;
         scrollThread = null;
     }
+    
+    
+    /**
+     * This method can be called to make sure the map is loaded
+     * There is no point executing mouse events if the map is not loaded
+     */
+    private Map getMap() {
+        Map map = null;
+        if (canvas.getClient().getGame() != null)
+            map = canvas.getClient().getGame().getMap();
+        return map;
+    }
 
     /**
      * Invoked when the mouse has been moved.
@@ -68,6 +80,9 @@ public final class CanvasMapEditorMouseMotionListener implements MouseMotionList
      * @param e The MouseEvent that holds all the information.
      */
     public void mouseMoved(MouseEvent e) {
+        if (getMap() == null) {
+            return;
+        }
         /*
          * if (e.getComponent().isEnabled()) { scroll(e.getX(), e.getY()); }
          * else if (scrollThread != null) { scrollThread.stopScrolling();
@@ -80,6 +95,9 @@ public final class CanvasMapEditorMouseMotionListener implements MouseMotionList
     }
 
     private void scroll(int x, int y) {
+        if (getMap() == null) {
+            return;
+        }
         if (!canvas.getClient().getClientOptions().getBoolean(ClientOptions.MAP_SCROLL_ON_DRAG)) {
             return;
         }
@@ -126,7 +144,7 @@ public final class CanvasMapEditorMouseMotionListener implements MouseMotionList
         if (scrollThread != null) {
             scrollThread.setDirection(direction);
         } else {
-            scrollThread = new ScrollThread(canvas.getClient().getGame().getMap(), gui);
+            scrollThread = new ScrollThread(getMap(), gui);
             scrollThread.start();
         }
     }
@@ -137,6 +155,9 @@ public final class CanvasMapEditorMouseMotionListener implements MouseMotionList
      * @param e The MouseEvent that holds all the information.
      */
     public void mouseDragged(MouseEvent e) {
+        if (getMap() == null) {
+            return;
+        }
         Map.Position p = gui.convertToMapCoordinates(e.getX(), e.getY());
 
         if (e.getComponent().isEnabled()) {
@@ -146,7 +167,7 @@ public final class CanvasMapEditorMouseMotionListener implements MouseMotionList
             scrollThread = null;
         }
 
-        if (p == null || !canvas.getClient().getGame().getMap().isValid(p)) {
+        if (p == null || !getMap().isValid(p)) {
             return;
         }
         
@@ -154,7 +175,7 @@ public final class CanvasMapEditorMouseMotionListener implements MouseMotionList
             return;
         }
 
-        Tile tile = canvas.getClient().getGame().getMap().getTile(p);
+        Tile tile = getMap().getTile(p);
         if (tile != null) {
             canvas.getClient().getMapEditorController().transform(tile);
             canvas.refresh();
