@@ -791,6 +791,7 @@
       <ability id="model.ability.pillageUnprotectedColony" value="true"/>
       <ability id="model.ability.captureUnits" value="false"/>
       <ability id="model.ability.captureEquipment" value="true"/>
+      <ability id="model.ability.canBeEquipped" value="true"/>
     </unit-type>
     <unit-type id="model.unit.colonialRegular"      offence="3"  defence="3" movement="3" lineOfSight="1"
                pathImage="foot">
@@ -798,6 +799,7 @@
       <ability id="model.ability.foundColony" value="true"/>
       <ability id="model.ability.canBeEquipped" value="true"/>
       <ability id="model.ability.canBeCaptured" value="true"/>
+      <ability id="model.ability.canBeEquipped" value="true"/>
       <required-ability id="model.ability.independenceDeclared"/>
     </unit-type>
     <unit-type id="model.unit.kingsRegular"         offence="4"  defence="4" movement="3" lineOfSight="1">
@@ -805,6 +807,7 @@
       <ability id="model.ability.foundColony" value="true"/>
       <ability id="model.ability.canBeEquipped" value="true"/>
       <ability id="model.ability.canBeCaptured" value="true"/>
+      <ability id="model.ability.canBeEquipped" value="true"/>
     </unit-type>
     <unit-type id="model.unit.caravel"              offence="0"  defence="2"  movement="12" lineOfSight="1" space="2"
                spaceTaken="24" hitPoints="6" price="1000" pathImage="naval" scoreValue="3">

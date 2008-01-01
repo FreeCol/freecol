@@ -2285,6 +2285,11 @@ public class Unit extends FreeColGameObject implements Features, Locatable, Loca
         // TODO: check for requirements (like for colonialRegular)
         this.unitType = unitType;
         naval = unitType.hasAbility("model.ability.naval");
+        if (getMovesLeft() > getInitialMovesLeft()) {
+            setMovesLeft(getInitialMovesLeft());
+        }
+        hitpoints = getInitialHitpoints(unitType);
+
     }
 
     /**
@@ -3646,15 +3651,16 @@ public class Unit extends FreeColGameObject implements Features, Locatable, Loca
      * @param enemyUnit The unit we are fighting against.
      */
     public void demote(Unit enemyUnit) {
-        String oldName = getName();
+        UnitType oldType = getType();
         String messageID = "model.unit.unitDemoted";
         String nation = owner.getNationAsString();
         int messageType = ModelMessage.UNIT_DEMOTED;
 
         if (hasAbility("model.ability.canBeCaptured")) {
-            // unit will be captured or destroyed
             messageType = ModelMessage.UNIT_LOST;
             if (enemyUnit.hasAbility("model.ability.captureUnits")) {
+                setLocation(enemyUnit.getTile());
+                setOwner(enemyUnit.getOwner());
                 if (enemyUnit.isUndead()) {
                     setType(UNDEAD);
                 } else {
@@ -3663,11 +3669,19 @@ public class Unit extends FreeColGameObject implements Features, Locatable, Loca
                         setType(downgrade);
                     }
                 }
-                messageID = "model.unit.unitCaptured";
-                setLocation(enemyUnit.getTile());
-                setOwner(enemyUnit.getOwner());
+                String tempID = oldType.getId() + ".captured";
+                if (Messages.containsKey(tempID)) {
+                    messageID = tempID;
+                } else {
+                    messageID = "model.unit.unitCaptured";
+                }
             } else {
-                messageID = "model.unit.unitSlaughtered";
+                String tempID = oldType.getId() + ".destroyed";
+                if (Messages.containsKey(tempID)) {
+                    messageID = tempID;
+                } else {
+                    messageID = "model.unit.unitSlaughtered";
+                }
                 dispose();
             }
         } else {
@@ -3694,25 +3708,30 @@ public class Unit extends FreeColGameObject implements Features, Locatable, Loca
                                     ModelMessage.FOREIGN_DIPLOMACY);
                 }
             } else {
+                // be downgraded as a result of combat
                 UnitType downgrade = getType().getDowngrade(UnitType.DEMOTION);
                 if (downgrade != null) {
                     setType(downgrade);
                 } else {                
-                    messageID = "model.unit.unitSlaughtered";
+                    String tempID = oldType.getId() + ".destroyed";
+                    if (Messages.containsKey(tempID)) {
+                        messageID = tempID;
+                    } else {
+                        messageID = "model.unit.unitSlaughtered";
+                    }
                     dispose();
                 }
             }
-        }
-        if (!isDisposed() && getMovesLeft() > getInitialMovesLeft()) {
-            setMovesLeft(getInitialMovesLeft());
         }
         String newName = getName();
         FreeColGameObject source = this;
         if (getColony() != null) {
             source = getColony();
         }
+
+        // TODO: this still doesn't work as intended
         addModelMessage(source, messageID, new String[][] {
-                { "%oldName%", oldName },
+                { "%oldName%", oldType.getName() },
                 { "%unit%", newName },
                 { "%nation%", nation },
                 { "%enemyUnit%", enemyUnit.getName() },
@@ -3727,7 +3746,7 @@ public class Unit extends FreeColGameObject implements Features, Locatable, Loca
                 source = enemyUnit.getColony();
             }
             addModelMessage(source, messageID, new String[][] {
-                    { "%oldName%", oldName },
+                    { "%oldName%", oldType.getName() },
                     { "%unit%", newName },
                     { "%enemyUnit%", enemyUnit.getName() },
                     { "%nation%", nation },
