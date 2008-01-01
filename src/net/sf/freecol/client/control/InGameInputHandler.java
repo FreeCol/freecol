@@ -28,6 +28,7 @@ import javax.swing.SwingUtilities;
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.Canvas;
+import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.DiplomaticTrade;
 import net.sf.freecol.common.model.FoundingFather;
@@ -900,15 +901,15 @@ public final class InGameInputHandler extends InputHandler {
             // JACOB_FUGGER does not protect against new boycotts
             freeColClient.getMyPlayer().setArrears(goods);
 
-            final String message;
-            if (goods.getType() == Goods.HORSES) {
-                message = "model.monarch.bostonTeaParty.horses";
-            } else if (colony.isLandLocked()) {
-                message = "model.monarch.bostonTeaParty.landLocked";
-            } else {
-                message = "model.monarch.bostonTeaParty.harbour";
+            String messageID = goods.getType().getId() + ".destroyed";
+            if (!Messages.containsKey(messageID)) {
+                if (colony.isLandLocked()) {
+                    messageID = "model.monarch.bostonTeaParty.landLocked";
+                } else {
+                    messageID = "model.monarch.bostonTeaParty.harbour";
+                }
             }
-            new ShowModelMessageSwingTask(new ModelMessage(colony, message,
+            new ShowModelMessageSwingTask(new ModelMessage(colony, messageID,
                                              new String[][] { { "%colony%", colony.getName() },
                                                  { "%amount%", String.valueOf(goods.getAmount()) },
                                                  { "%goods%", goods.getName() } },
