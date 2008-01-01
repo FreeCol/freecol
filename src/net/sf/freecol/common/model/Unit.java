@@ -2322,58 +2322,35 @@ public class Unit extends FreeColGameObject implements Features, Locatable, Loca
      * @throws IllegalArgumentException
      */
     public String getName() {
+        String key = null;
         if (name != null) {
             return name;
         } else if (isArmed() && isMounted()) {
-            switch (getIndex()) {
-            case KINGS_REGULAR:
-                return Messages.message("model.unit.kingsCavalry.name");
-            case COLONIAL_REGULAR:
-                return Messages.message("model.unit.colonialCavalry.name");
-            case VETERAN_SOLDIER:
-                return Messages.message("model.unit.veteranDragoon.name");
-            case BRAVE:
-                return Messages.message("model.unit.indianDragoon.name");
-            default:
-                return (Messages.message("model.unit.dragoon.name") + " (" + unitType.getName() + ")");
-            }
+            key = "dragoon";
         } else if (isArmed()) {
-            switch (getIndex()) {
-            case KINGS_REGULAR:
-            case COLONIAL_REGULAR:
-            case VETERAN_SOLDIER:
-                return unitType.getName();
-            case BRAVE:
-                return Messages.message("model.unit.armedBrave.name");
-            default:
-                return (Messages.message("model.unit.soldier.name") + " (" + unitType.getName() + ")");
-            }
+            key = "soldier";
         } else if (isMounted()) {
-            if (hasAbility("model.ability.expertScout")) {
-                return unitType.getName();
-            } else if (getIndex() == BRAVE) {
-                return Messages.message("model.unit.mountedBrave.name");
-            } else {
-                return (Messages.message("model.unit.scout.name") + " (" + unitType.getName() + ")");
-            }
+            key = "scout";
         } else if (isMissionary()) {
-            if (hasAbility("model.ability.expertMissionary")) {
-                return unitType.getName();
+            key = "missionary";
+        } else if (isPioneer()) {
+            key = "pioneer";
+        }
+        if (key != null) {
+            String messageID = getType().getId() +  "." + key;
+            if (Messages.containsKey(messageID)) {
+                return Messages.message(messageID);
             } else {
-                return (Messages.message("model.unit.missionary.name") + " (" + unitType.getName() + ")");
-            }
-        } else if (canCarryTreasure()) {
-            return unitType.getName() + " (" + getTreasureAmount() + " " + Messages.message("gold") + ")";
-        } else if (hasAbility("model.ability.improveTerrain")) {
-            if (hasAbility("model.ability.expertPioneer")) {
-                return unitType.getName();
-            } else {
-                return (Messages.message("model.unit.pioneer.name") + " (" + unitType.getName() + ")");
+                return Messages.message("model.unit." + key + ".name", "%unit%", getType().getName());
             }
         } else {
-            return unitType.getName();
+            if (canCarryTreasure()) {
+                return Messages.message(getType().getId() + ".gold", "%gold%",
+                                        String.valueOf(getTreasureAmount()));
+            } else {
+                return unitType.getName();
+            }
         }
-
     }
 
     /**
@@ -3654,15 +3631,14 @@ public class Unit extends FreeColGameObject implements Features, Locatable, Loca
         UnitType oldType = getType();
         String messageID = "model.unit.unitDemoted";
         String nation = owner.getNationAsString();
-        int messageType = ModelMessage.UNIT_DEMOTED;
+        int messageType = ModelMessage.UNIT_LOST;
 
         if (hasAbility("model.ability.canBeCaptured")) {
-            messageType = ModelMessage.UNIT_LOST;
             if (enemyUnit.hasAbility("model.ability.captureUnits")) {
                 setLocation(enemyUnit.getTile());
                 setOwner(enemyUnit.getOwner());
                 if (enemyUnit.isUndead()) {
-                    setType(UNDEAD);
+                    setType(enemyUnit.getType());
                 } else {
                     UnitType downgrade = getType().getDowngrade(UnitType.CAPTURE);
                     if (downgrade != null) {
@@ -3712,6 +3688,13 @@ public class Unit extends FreeColGameObject implements Features, Locatable, Loca
                 UnitType downgrade = getType().getDowngrade(UnitType.DEMOTION);
                 if (downgrade != null) {
                     setType(downgrade);
+                    messageType = ModelMessage.UNIT_DEMOTED;
+                    String tempID = oldType.getId() + ".demoted";
+                    if (Messages.containsKey(tempID)) {
+                        messageID = tempID;
+                    } else {
+                        messageID = "model.unit.unitDemoted";
+                    }
                 } else {                
                     String tempID = oldType.getId() + ".destroyed";
                     if (Messages.containsKey(tempID)) {
@@ -3946,8 +3929,9 @@ public class Unit extends FreeColGameObject implements Features, Locatable, Loca
         enemy.modifyTension(getOwner(), Tension.TENSION_ADD_MAJOR);
 
         if (myPlayer.isEuropean()) {
-            addModelMessage(enemy, "model.unit.colonyCapturedBy", new String[][] { { "%colony%", colony.getName() },
-                                                                                   { "%amount%", Integer.toString(plunderGold) }, { "%player%", myPlayer.getNationAsString() } },
+            addModelMessage(enemy, "model.unit.colonyCapturedBy", new String[][] {
+                    { "%colony%", colony.getName() },
+                    { "%amount%", Integer.toString(plunderGold) }, { "%player%", myPlayer.getNationAsString() } },
                 ModelMessage.DEFAULT);
             colony.damageAllShips();
 
@@ -3956,28 +3940,30 @@ public class Unit extends FreeColGameObject implements Features, Locatable, Loca
 
             colony.setOwner(myPlayer); // This also changes over all of the
             // units...
-            addModelMessage(colony, "model.unit.colonyCaptured", new String[][] { { "%colony%", colony.getName() },
-                                                                                  { "%amount%", Integer.toString(plunderGold) } }, ModelMessage.DEFAULT);
+            addModelMessage(colony, "model.unit.colonyCaptured", new String[][] {
+                    { "%colony%", colony.getName() },
+                    { "%amount%", Integer.toString(plunderGold) } }, ModelMessage.DEFAULT);
 
             // Demote all soldiers and clear all orders:
             Iterator<Unit> it = colony.getTile().getUnitIterator();
             while (it.hasNext()) {
                 Unit u = it.next();
-                if (u.getIndex() == Unit.VETERAN_SOLDIER || u.getIndex() == Unit.KINGS_REGULAR
-                    || u.getIndex() == Unit.COLONIAL_REGULAR) {
-                    u.clearSpeciality();
+                if (isUndead()) {
+                    u.setType(getType());
+                } else {
+                    UnitType downgrade = u.getType().getDowngrade(UnitType.CAPTURE);
+                    if (downgrade != null) {
+                        u.setType(downgrade);
+                    }
                 }
                 u.setState(Unit.ACTIVE);
-                if (isUndead()) {
-                    u.setType(UNDEAD);
-                }
             }
 
             if (isUndead()) {
                 Iterator<Unit> it2 = colony.getUnitIterator();
                 while (it2.hasNext()) {
                     Unit u = it2.next();
-                    u.setType(UNDEAD);
+                    u.setType(getType());
                 }
             }
 
