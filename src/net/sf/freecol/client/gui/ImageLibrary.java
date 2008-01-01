@@ -95,51 +95,8 @@ public final class ImageLibrary extends ImageProvider {
             LAND_NORTH_EAST = 7, // border tile, some 'land' can be found in
                                     // north-east of this tile
             LAND_CENTER = 8; // ordinary tile, filled entirely with 'land'
-/*
-    public static final int BONUS_NONE = -1, BONUS_SILVER = 0, BONUS_FOOD = 1, BONUS_TOBACCO = 2, BONUS_COTTON = 3,
-            BONUS_SUGAR = 4, BONUS_FISH = 5, BONUS_ORE = 6, BONUS_FURS = 7, BONUS_LUMBER = 8, BONUS_COUNT = 9;
-*/
+
     public static final int MONARCH_COUNT = 4;
-
-    /**
-     * These finals represent the unit graphics that are available. It's
-     * important to note the difference between these finals and the unit type
-     * finals. There are more unit graphics than unit types. Example: type:hardy
-     * pioneer, corresponding graphics: hardy pioneer with tools and hardy
-     * pioneer without tools.
-     */
-    public static final int FREE_COLONIST = 0, EXPERT_FARMER = 1, EXPERT_FISHERMAN = 2, EXPERT_FUR_TRAPPER = 3,
-            EXPERT_SILVER_MINER = 4, EXPERT_LUMBER_JACK = 5, EXPERT_ORE_MINER = 6, MASTER_SUGAR_PLANTER = 7,
-            MASTER_COTTON_PLANTER = 8, MASTER_TOBACCO_PLANTER = 9,
-
-            FIREBRAND_PREACHER = 10, ELDER_STATESMAN = 11,
-
-            MASTER_CARPENTER = 12, MASTER_DISTILLER = 13, MASTER_WEAVER = 14, MASTER_TOBACCONIST = 15,
-            MASTER_FUR_TRADER = 16, MASTER_BLACKSMITH = 17, MASTER_GUNSMITH = 18,
-
-            SEASONED_SCOUT_NOT_MOUNTED = 19, HARDY_PIONEER_NO_TOOLS = 20, UNARMED_VETERAN_SOLDIER = 21,
-            JESUIT_MISSIONARY = 22, MISSIONARY_FREE_COLONIST = 23,
-
-            SEASONED_SCOUT_MOUNTED = 24, HARDY_PIONEER_WITH_TOOLS = 25, FREE_COLONIST_WITH_TOOLS = 26,
-            INDENTURED_SERVANT = 27, PETTY_CRIMINAL = 28,
-
-            INDIAN_CONVERT = 29, BRAVE = 30,
-
-            UNARMED_COLONIAL_REGULAR = 31, UNARMED_KINGS_REGULAR = 32,
-
-            SOLDIER = 33, VETERAN_SOLDIER = 34, COLONIAL_REGULAR = 35, KINGS_REGULAR = 36, UNARMED_DRAGOON = 37,
-            UNARMED_VETERAN_DRAGOON = 38, UNARMED_COLONIAL_CAVALRY = 39, UNARMED_KINGS_CAVALRY = 40, DRAGOON = 41,
-            VETERAN_DRAGOON = 42, COLONIAL_CAVALRY = 43, KINGS_CAVALRY = 44,
-
-            ARMED_BRAVE = 45, MOUNTED_BRAVE = 46, INDIAN_DRAGOON = 47,
-
-            CARAVEL = 48, FRIGATE = 49, GALLEON = 50, MAN_O_WAR = 51, MERCHANTMAN = 52, PRIVATEER = 53,
-
-            ARTILLERY = 54, DAMAGED_ARTILLERY = 55, TREASURE_TRAIN = 56, WAGON_TRAIN = 57,
-
-            MILKMAID = 58, JESUIT_MISSIONARY_NO_CROSS = 59, REVENGER = 60, FLYING_DUTCHMAN = 61, UNDEAD = 62,
-
-            UNIT_GRAPHICS_COUNT = 63;
 
     public static final int UNIT_BUTTON_WAIT = 0, UNIT_BUTTON_DONE = 1, UNIT_BUTTON_FORTIFY = 2,
             UNIT_BUTTON_SENTRY = 3, UNIT_BUTTON_CLEAR = 4, UNIT_BUTTON_PLOW = 5, UNIT_BUTTON_ROAD = 6,
@@ -156,12 +113,7 @@ public final class ImageLibrary extends ImageProvider {
             // INDIAN_SETTLEMENT_INCA = 3,
 
             INDIAN_COUNT = 4;
-/*
-    public static final int GOODS_FOOD = 0, GOODS_SUGAR = 1, GOODS_TOBACCO = 2, GOODS_COTTON = 3, GOODS_FURS = 4,
-            GOODS_LUMBER = 5, GOODS_ORE = 6, GOODS_SILVER = 7, GOODS_HORSES = 8, GOODS_RUM = 9, GOODS_CIGARS = 10,
-            GOODS_CLOTH = 11, GOODS_COATS = 12, GOODS_TRADE_GOODS = 13, GOODS_TOOLS = 14, GOODS_MUSKETS = 15,
-            GOODS_FISH = 16, GOODS_BELLS = 17, GOODS_CROSSES = 18, GOODS_HAMMERS = 19, GOODS_COUNT = 20;
-*/
+
     /**
      * The filename of the graphical representation of a specific unit is the
      * following: homeDirectory + path + unitsDirectory + unitsName + UNITTYPE +
@@ -185,25 +137,22 @@ public final class ImageLibrary extends ImageProvider {
     /**
      * A Vector of Image objects.
      */
-    private Vector<ImageIcon> //units, // Holds ImageIcon objects
-    //unitsGrayscale, // Holds ImageIcon objects of units in grayscale
-            //forests, // Holds ImageIcon objects
-            rivers, // Holds ImageIcon objects
-            misc, // Holds ImageIcon objects
-            colonies, // Holds ImageIcon objects
-            indians, // Holds ImageIcon objects
-            //goods, // Holds ImageIcon objects
-            //bonus, // Holds ImageIcon objects
-            monarch; // Holds ImageIcon objects
-    private ImageIcon[] units, unitsGrayscale;
+    private Vector<ImageIcon> rivers, // Holds ImageIcon objects
+        misc, // Holds ImageIcon objects
+        colonies, // Holds ImageIcon objects
+        indians, // Holds ImageIcon objects
+        monarch; // Holds ImageIcon objects
+
+    private ImageIcon[] units, // Holds ImageIcon objects
+        unitsGrayscale; // Holds ImageIcon objects of units in grayscale
+
     private Hashtable<String, ImageIcon> terrain1, terrain2, overlay1, overlay2,
             forests, bonus, goods;
 
-    //private Vector<Vector<ImageIcon>> terrain1, terrain2;
     private Hashtable<String, Vector<ImageIcon>> border1, border2, coast1, coast2;
 
-    private Vector<Vector<ImageIcon>> unitButtons; // Holds the unit-order
-                                                    // buttons
+    // Holds the unit-order buttons
+    private Vector<Vector<ImageIcon>> unitButtons; 
 
     private Image[] alarmChips;
 
