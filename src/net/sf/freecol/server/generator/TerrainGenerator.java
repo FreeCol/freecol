@@ -66,7 +66,7 @@ public class TerrainGenerator {
      * it is created.
      * 
      * @param game The game. 
-     * @param landMap Determines wether there should be land
+     * @param landMap Determines whether there should be land
      *                or ocean on a given tile. This array also
      *                specifies the size of the map that is going
      *                to be created.
@@ -84,7 +84,7 @@ public class TerrainGenerator {
      * 
      * @param game The game. 
      * @param importGame The game to import information form.
-     * @param landMap Determines wether there should be land
+     * @param landMap Determines whether there should be land
      *                or ocean on a given tile. This array also
      *                specifies the size of the map that is going
      *                to be created.
@@ -148,7 +148,7 @@ public class TerrainGenerator {
     }
 
     /**
-     * Adds a terrain bonus with a probabilty determined by the
+     * Adds a terrain bonus with a probability determined by the
      * <code>MapGeneratorOptions</code>.
      * 
      * @param t The Tile.
@@ -397,7 +397,9 @@ public class TerrainGenerator {
         southAtlantic.setParent(atlantic);
 
         for (int y = 0; y < map.getHeight(); y++) {
-            for (int x=0; x<maxDistanceToEdge && !map.isLandWithinDistance(x, y, distToLandFromHighSeas); x++) {
+            for (int x=0; x<maxDistanceToEdge && 
+                          x<map.getWidth() && 
+                          !map.isLandWithinDistance(x, y, distToLandFromHighSeas); x++) {
                 if (map.isValid(x, y)) {
                     map.getTile(x, y).setType(highSeas);
                     if (y < map.getHeight() / 2) {
@@ -408,7 +410,9 @@ public class TerrainGenerator {
                 }
             }
 
-            for (int x=1; x<=maxDistanceToEdge && !map.isLandWithinDistance(map.getWidth()-x, y, distToLandFromHighSeas); x++) {
+            for (int x=1; x<=maxDistanceToEdge && 
+                          x<=map.getWidth()-1 &&
+                          !map.isLandWithinDistance(map.getWidth()-x, y, distToLandFromHighSeas); x++) {
                 if (map.isValid(map.getWidth()-x, y)) {
                     map.getTile(map.getWidth()-x, y).setType(highSeas);
                     if (y < map.getHeight() / 2) {
