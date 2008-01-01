@@ -28,6 +28,7 @@ import net.sf.freecol.FreeCol;
 import net.sf.freecol.common.PseudoRandom;
 import net.sf.freecol.common.model.Map;
 import net.sf.freecol.common.model.Tile;
+import net.sf.freecol.common.model.TileImprovement;
 import net.sf.freecol.common.model.TileType;
 import net.sf.freecol.common.model.Map.Position;
 
@@ -56,7 +57,7 @@ public class River {
      * Current direction the river is flowing in.
      */
     private int direction = 1;
-
+    
     /**
      * The map on which the river flows.
      */
@@ -296,7 +297,7 @@ public class River {
                                 sections.add(new Section(px, oppositeDirection(lastDir)));
                             } else {
                                 Section waterSection = someRiver.getLastSection();
-                                waterSection.addBranch(oppositeDirection(lastDir), 1);
+                                waterSection.addBranch(oppositeDirection(lastDir), TileImprovement.SMALL_RIVER);
                             }
                             drawToMap();
                         }
@@ -372,15 +373,14 @@ public class River {
             }
             Tile tile = map.getTile(section.position);
             
-            switch (section.size) {
-            case 1:
-            case 2:
+            if (section.size == TileImprovement.SMALL_RIVER || 
+                section.size == TileImprovement.LARGE_RIVER) {
                 // tile.addRiver(Tile.ADD_RIVER_MAJOR, section.getBranches()); // Depreciated
                 // tile.addRiver will process the neighbouring branches as well 
                 tile.addRiver(section.size);
                 logger.fine("Added river (magnitude: " + section.size + ") to tile at " + section.position);
-                break;
-            default:
+            }
+            else if (section.size >= TileImprovement.FJORD_RIVER) {
                 TileType ocean = FreeCol.getSpecification().getTileType("model.tile.ocean");
                 tile.setType(ocean);
                 logger.fine("Created fjord at " + section.position);
@@ -431,19 +431,22 @@ public class River {
         private int[] base = {1, 3, 9, 27};
 
         public Map.Position position;
-        public int size = 1;
+        public int size = TileImprovement.SMALL_RIVER;
         public int direction = -1;
-        public int branch[] = {0, 0, 0, 0};
+        public int branch[] = {TileImprovement.NO_RIVER, 
+                               TileImprovement.NO_RIVER, 
+                               TileImprovement.NO_RIVER, 
+                               TileImprovement.NO_RIVER};
 
         public Section(Map.Position position, int direction) {
             this.position = position;
             this.direction = direction;
-            this.branch[direction/2] = 1;
+            this.branch[direction/2] = TileImprovement.SMALL_RIVER;
         }
 
         public void addBranch(int direction, int size) {
-            if (size != 1) {
-                size = 2;
+            if (size != TileImprovement.SMALL_RIVER) {
+                size = TileImprovement.LARGE_RIVER;
             }
             this.branch[direction/2] = size;
         }
@@ -465,7 +468,7 @@ public class River {
          */
         public void grow() {
             this.size++;
-            this.branch[direction/2] = 2;
+            this.branch[direction/2] = TileImprovement.LARGE_RIVER;
         }
 
     }

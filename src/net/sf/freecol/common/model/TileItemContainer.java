@@ -310,7 +310,7 @@ public class TileItemContainer extends FreeColGameObject {
     }
 
     /**
-     * Removes TileItem from this containter.
+     * Removes TileItem from this container.
      *
      * @param t The TileItem to remove from this container.
      * @return The TileItem that has been removed from this container (if any).
@@ -431,7 +431,7 @@ public class TileItemContainer extends FreeColGameObject {
      * @return The new river added, or the existing river TileImprovement
      */
     public TileImprovement addRiver(int magnitude) {
-        if (magnitude == 0) {
+        if (magnitude == TileImprovement.NO_RIVER) {
             return null;
         }
         if (hasRiver()) {
@@ -475,7 +475,7 @@ public class TileItemContainer extends FreeColGameObject {
      * @param magnitude The 'size' of the river, 0=none, 1=minor, 2=major
      */
     public void setRiverMagnitude(int magnitude) {
-        if (!hasRiver() && magnitude > 0) {
+        if (!hasRiver() && magnitude > TileImprovement.NO_RIVER) {
             // No river at the moment, create a new one
             addRiver(magnitude);
             return;
@@ -483,7 +483,7 @@ public class TileItemContainer extends FreeColGameObject {
         if (river.getMagnitude() == magnitude) {
             return;
         }
-        if (magnitude == 0) {
+        if (magnitude == TileImprovement.NO_RIVER) {
             // Remove river
             removeRiver();
             return;

@@ -50,13 +50,22 @@ public class TileImprovement extends TileItem implements Locatable, Named {
     private int magnitude;
     
     /**
+     * River magnitudes
+     */
+    public static final int NO_RIVER = 0;
+    public static final int SMALL_RIVER = 1;
+    public static final int LARGE_RIVER = 2;
+    public static final int FJORD_RIVER = 3; 
+
+    
+    /**
      * To store the style of multi-image TileImprovements (eg. rivers)
-     * Rivers have 4 directions {NE=1, SE=3, SW=9, NW=27}, and 3 levels {0=no river, 1=minor river, 2=major river}
+     * Rivers have 4 directions {NE=1, SE=3, SW=9, NW=27}, and 3 levels (see above)
      * @see Map
      * @see River
      */
     private int style;
-
+    
     // ------------------------------------------------------------ constructor
 
     /**

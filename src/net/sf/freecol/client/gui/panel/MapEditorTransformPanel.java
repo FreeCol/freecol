@@ -42,6 +42,7 @@ import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.common.model.ResourceType;
 import net.sf.freecol.common.model.Tile;
+import net.sf.freecol.common.model.TileImprovement;
 import net.sf.freecol.common.model.TileType;
 
 /**
@@ -108,8 +109,8 @@ public final class MapEditorTransformPanel extends FreeColPanel {
         for (TileType type : tileList) {
             buildButton(type.getIndex(), type.getName(), new TileTypeTransform(type));
         }
-        buildButton(MINOR_RIVER, "Minor River", new RiverTransform(MINOR_RIVER));
-        buildButton(MAJOR_RIVER, "Major River", new RiverTransform(MAJOR_RIVER));
+        buildButton(MINOR_RIVER, "Minor River", new RiverTransform(TileImprovement.SMALL_RIVER));
+        buildButton(MAJOR_RIVER, "Major River", new RiverTransform(TileImprovement.LARGE_RIVER));
         buildButton(RESOURCE, "Change/Remove Resource", new ResourceTransform());
         buildButton(LOST_CITY_RUMOUR, "Lost City Rumour", new LostCityRumourTransform());
     }
