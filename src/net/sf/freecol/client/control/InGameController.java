@@ -1727,7 +1727,7 @@ public final class InGameController implements NetworkConstants {
                 }
                 if (winner.isArmed()) {
                     if (winner.isMounted()) {
-                        if (winner.getIndex() == Unit.BRAVE) {
+                        if (winner.getOwner().isIndian()) {
                             freeColClient.playSound(SfxLibrary.MUSKETSHORSES);
                         } else {
                             freeColClient.playSound(SfxLibrary.DRAGOON);

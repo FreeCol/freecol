@@ -50,19 +50,21 @@ import net.sf.freecol.common.model.Tension;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.TileType;
 import net.sf.freecol.common.model.Unit;
+import net.sf.freecol.common.model.UnitType;
 
 /**
  * Holds various images that can be called upon by others in order to display
  * certain things.
  */
 public final class ImageLibrary extends ImageProvider {
+
     private static final Logger logger = Logger.getLogger(ImageLibrary.class.getName());
-
-
-
 
     public static final int UNIT_SELECT = 0, PLOWED = 4, TILE_TAKEN = 5, TILE_OWNED_BY_INDIANS = 6,
             LOST_CITY_RUMOUR = 7, DARKNESS = 8, MISC_COUNT = 10;
+
+    private static final String[] iconTypes = new String[] {
+        null, "scout", "soldier", "dragoon", "pioneer", "missionary" };
 
     /**
      * These finals are for quick reference. These should be made softcoded when next possible.
@@ -183,8 +185,8 @@ public final class ImageLibrary extends ImageProvider {
     /**
      * A Vector of Image objects.
      */
-    private Vector<ImageIcon> units, // Holds ImageIcon objects
-            unitsGrayscale, // Holds ImageIcon objects of units in grayscale
+    private Vector<ImageIcon> //units, // Holds ImageIcon objects
+    //unitsGrayscale, // Holds ImageIcon objects of units in grayscale
             //forests, // Holds ImageIcon objects
             rivers, // Holds ImageIcon objects
             misc, // Holds ImageIcon objects
@@ -193,6 +195,7 @@ public final class ImageLibrary extends ImageProvider {
             //goods, // Holds ImageIcon objects
             //bonus, // Holds ImageIcon objects
             monarch; // Holds ImageIcon objects
+    private ImageIcon[] units, unitsGrayscale;
     private Hashtable<String, ImageIcon> terrain1, terrain2, overlay1, overlay2,
             forests, bonus, goods;
 
@@ -258,8 +261,8 @@ public final class ImageLibrary extends ImageProvider {
      * @see #getScaledImageLibrary
      */
     private ImageLibrary(float scalingFactor,
-            Vector<ImageIcon> units,
-            Vector<ImageIcon> unitsGrayscale,
+            ImageIcon[] units,
+            ImageIcon[] unitsGrayscale,
             Vector<ImageIcon> rivers,
             Vector<ImageIcon> misc,
             Vector<ImageIcon> colonies,
@@ -469,6 +472,17 @@ public final class ImageLibrary extends ImageProvider {
         return output;
     }
 
+    private ImageIcon[] scaleImages(ImageIcon[] input, float f) {
+        ImageIcon[] output = new ImageIcon[input.length];
+        for (int index = 0; index < input.length; index++) {
+            ImageIcon inputIcon = input[index];
+            if (inputIcon != null) {
+                output[index] = new ImageIcon(inputIcon.getImage().getScaledInstance(Math.round(inputIcon.getIconWidth() * f), Math.round(inputIcon.getIconHeight() * f), Image.SCALE_SMOOTH));
+            }
+        }
+        return output;
+    }
+
     private Vector<Vector<ImageIcon>> scaleImages2(Vector<Vector<ImageIcon>> list, float f) {
         Vector<Vector<ImageIcon>> output = new Vector<Vector<ImageIcon>>();
         for (Vector<ImageIcon> v : list) {
@@ -526,13 +540,47 @@ public final class ImageLibrary extends ImageProvider {
      */
     private void loadUnits(GraphicsConfiguration gc, Class<FreeCol> resourceLocator, boolean doLookup)
             throws FreeColException {
-        units = new Vector<ImageIcon>(UNIT_GRAPHICS_COUNT);
-        unitsGrayscale = new Vector<ImageIcon>(UNIT_GRAPHICS_COUNT);
 
-        for (int i = 0; i < UNIT_GRAPHICS_COUNT; i++) {
-            String filePath = dataDirectory + path + unitsDirectory + unitsName + i + extension;
-            units.add(findImage(filePath, resourceLocator, doLookup));
-            unitsGrayscale.add(convertToGrayscale(units.get(i).getImage()));
+        units = new ImageIcon[FreeCol.getSpecification().numberOfUnitTypes() * iconTypes.length];
+        unitsGrayscale = new ImageIcon[FreeCol.getSpecification().numberOfUnitTypes() * iconTypes.length];
+
+        String filePath;
+
+        ImageIcon[] defaultIcon = new ImageIcon[iconTypes.length];
+        ImageIcon[] defaultGrayscaleIcon = new ImageIcon[iconTypes.length];
+        for (int index = 0; index < iconTypes.length; index++) {
+            String iconType = iconTypes[index];
+            if (iconType == null) {
+                filePath = dataDirectory + path + unitsDirectory + "unit" + extension;
+            } else {
+                filePath = dataDirectory + path + unitsDirectory + iconType + "/" + iconType + extension;
+            }
+            ImageIcon newIcon = findImage(filePath, resourceLocator, doLookup);
+            defaultIcon[index] = newIcon;
+            defaultGrayscaleIcon[index] = convertToGrayscale(newIcon.getImage());
+        }
+
+        for (UnitType unitType : FreeCol.getSpecification().getUnitTypeList()) {
+            String shortName = unitType.getId();
+            shortName = shortName.substring(shortName.lastIndexOf('.') + 1);
+            for (int index = 0; index < iconTypes.length; index++) {
+                int iconIndex = unitType.getIndex() * iconTypes.length + index;
+                String iconType = iconTypes[index];
+                if (iconType == null) {
+                    filePath = dataDirectory + path + unitsDirectory + shortName + extension;
+                } else {
+                    filePath = dataDirectory + path + unitsDirectory + iconType + "/" + shortName + extension;
+                }
+                try {
+                    ImageIcon unitIcon = findImage(filePath, resourceLocator, doLookup);
+                    units[iconIndex] = unitIcon;
+                    unitsGrayscale[iconIndex] = convertToGrayscale(unitIcon.getImage());
+                } catch (FreeColException e) {
+                    logger.fine("Using default icon for UnitType " + unitType.getName());
+                    units[iconIndex] = defaultIcon[index];
+                    unitsGrayscale[iconIndex] = defaultGrayscaleIcon[index];
+                }
+            }
         }
 
         /*
@@ -1093,9 +1141,9 @@ public final class ImageLibrary extends ImageProvider {
      */
     public ImageIcon getUnitImageIcon(int index, boolean grayscale) {
         if (grayscale)
-            return unitsGrayscale.get(index);
+            return unitsGrayscale[index];
         else
-            return units.get(index);
+            return units[index];
     }
 
     /**
@@ -1554,7 +1602,7 @@ public final class ImageLibrary extends ImageProvider {
      * @return The width of the unit-image at the given index.
      */
     public int getUnitImageWidth(int index) {
-        return units.get(index).getIconWidth();
+        return units[index].getIconWidth();
     }
 
     /**
@@ -1564,7 +1612,7 @@ public final class ImageLibrary extends ImageProvider {
      * @return The height of the unit-image at the given index.
      */
     public int getUnitImageHeight(int index) {
-        return units.get(index).getIconHeight();
+        return units[index].getIconHeight();
     }
 
     /**
@@ -1649,205 +1697,18 @@ public final class ImageLibrary extends ImageProvider {
      */
     public static int getUnitGraphicsType(int type, boolean armed, boolean mounted, boolean pioneer,
             boolean missionary) {
-        switch (type) {
-        case Unit.FREE_COLONIST:
-        case Unit.EXPERT_FARMER:
-        case Unit.EXPERT_FISHERMAN:
-        case Unit.EXPERT_FUR_TRAPPER:
-        case Unit.EXPERT_SILVER_MINER:
-        case Unit.EXPERT_LUMBER_JACK:
-        case Unit.EXPERT_ORE_MINER:
-        case Unit.MASTER_SUGAR_PLANTER:
-        case Unit.MASTER_COTTON_PLANTER:
-        case Unit.MASTER_TOBACCO_PLANTER:
-        case Unit.FIREBRAND_PREACHER:
-        case Unit.ELDER_STATESMAN:
-        case Unit.MASTER_CARPENTER:
-        case Unit.MASTER_DISTILLER:
-        case Unit.MASTER_WEAVER:
-        case Unit.MASTER_TOBACCONIST:
-        case Unit.MASTER_FUR_TRADER:
-        case Unit.MASTER_BLACKSMITH:
-        case Unit.MASTER_GUNSMITH:
-            if (armed && mounted) {
-                return DRAGOON;
-            } else if (armed) {
-                return SOLDIER;
-            } else if (mounted) {
-                return UNARMED_DRAGOON;
-            } else if (pioneer) {
-                return FREE_COLONIST_WITH_TOOLS;
-            } else if (missionary) {
-                return MISSIONARY_FREE_COLONIST;
-            } else {
-                // The ints representing the types are exactly the same
-                // as the ints representing the graphics. This is only the
-                // case for these units and it may change at ANY time.
-                return type;
-            }
-        case Unit.SEASONED_SCOUT:
-            if (armed && mounted) {
-                return DRAGOON;
-            } else if (armed) {
-                return SOLDIER;
-            } else if (mounted) {
-                return SEASONED_SCOUT_MOUNTED;
-            } else if (pioneer) {
-                return FREE_COLONIST_WITH_TOOLS;
-            } else if (missionary) {
-                return MISSIONARY_FREE_COLONIST;
-            } else {
-                return SEASONED_SCOUT_NOT_MOUNTED;
-            }
-        case Unit.HARDY_PIONEER:
-            if (armed && mounted) {
-                return DRAGOON;
-            } else if (armed) {
-                return SOLDIER;
-            } else if (mounted) {
-                return UNARMED_DRAGOON;
-            } else if (pioneer) {
-                return HARDY_PIONEER_WITH_TOOLS;
-            } else if (missionary) {
-                return MISSIONARY_FREE_COLONIST;
-            } else {
-                return HARDY_PIONEER_NO_TOOLS;
-            }
-        case Unit.VETERAN_SOLDIER:
-            if (armed && mounted) {
-                return VETERAN_DRAGOON;
-            } else if (armed) {
-                return VETERAN_SOLDIER;
-            } else if (mounted) {
-                return UNARMED_VETERAN_DRAGOON;
-            } else if (pioneer) {
-                return FREE_COLONIST_WITH_TOOLS;
-            } else if (missionary) {
-                return MISSIONARY_FREE_COLONIST;
-            } else {
-                return UNARMED_VETERAN_SOLDIER;
-            }
-        case Unit.JESUIT_MISSIONARY:
-            if (armed && mounted) {
-                return DRAGOON;
-            } else if (armed) {
-                return SOLDIER;
-            } else if (mounted) {
-                return UNARMED_DRAGOON;
-            } else if (pioneer) {
-                return FREE_COLONIST_WITH_TOOLS;
-            } else if (missionary) {
-                return JESUIT_MISSIONARY;
-            } else {
-                return JESUIT_MISSIONARY_NO_CROSS;
-            }
-        case Unit.INDENTURED_SERVANT:
-            if (armed && mounted) {
-                return DRAGOON;
-            } else if (armed) {
-                return SOLDIER;
-            } else if (mounted) {
-                return UNARMED_DRAGOON;
-            } else if (pioneer) {
-                return FREE_COLONIST_WITH_TOOLS;
-            } else if (missionary) {
-                return MISSIONARY_FREE_COLONIST;
-            } else {
-                return INDENTURED_SERVANT;
-            }
-        case Unit.PETTY_CRIMINAL:
-            if (armed && mounted) {
-                return DRAGOON;
-            } else if (armed) {
-                return SOLDIER;
-            } else if (mounted) {
-                return UNARMED_DRAGOON;
-            } else if (pioneer) {
-                return FREE_COLONIST_WITH_TOOLS;
-            } else if (missionary) {
-                return MISSIONARY_FREE_COLONIST;
-            } else {
-                return PETTY_CRIMINAL;
-            }
-        case Unit.INDIAN_CONVERT:
-            if (armed && mounted) {
-                return DRAGOON;
-            } else if (armed) {
-                return SOLDIER;
-            } else if (mounted) {
-                return UNARMED_DRAGOON;
-            } else if (pioneer) {
-                return FREE_COLONIST_WITH_TOOLS;
-            } else if (missionary) {
-                return MISSIONARY_FREE_COLONIST;
-            } else {
-                return INDIAN_CONVERT;
-            }
-        case Unit.BRAVE:
-            if (armed && mounted) {
-                return INDIAN_DRAGOON;
-            } else if (armed) {
-                return ARMED_BRAVE;
-            } else if (mounted) {
-                return MOUNTED_BRAVE;
-            } else {
-                return BRAVE;
-            }
-        case Unit.COLONIAL_REGULAR:
-            if (armed && mounted) {
-                return COLONIAL_CAVALRY;
-            } else if (armed) {
-                return COLONIAL_REGULAR;
-            } else if (mounted) {
-                return UNARMED_COLONIAL_CAVALRY;
-            } else if (pioneer) {
-                return FREE_COLONIST_WITH_TOOLS;
-            } else if (missionary) {
-                return MISSIONARY_FREE_COLONIST;
-            } else {
-                return UNARMED_COLONIAL_REGULAR;
-            }
-        case Unit.KINGS_REGULAR:
-            if (armed && mounted) {
-                return KINGS_CAVALRY;
-            } else if (armed) {
-                return KINGS_REGULAR;
-            } else if (mounted) {
-                return UNARMED_KINGS_CAVALRY;
-            } else {
-                return UNARMED_KINGS_REGULAR;
-            }
-        case Unit.CARAVEL:
-            return CARAVEL;
-        case Unit.FRIGATE:
-            return FRIGATE;
-        case Unit.GALLEON:
-            return GALLEON;
-        case Unit.MAN_O_WAR:
-            return MAN_O_WAR;
-        case Unit.MERCHANTMAN:
-            return MERCHANTMAN;
-        case Unit.PRIVATEER:
-            return PRIVATEER;
-        case Unit.ARTILLERY:
-            return ARTILLERY;
-        case Unit.DAMAGED_ARTILLERY:
-            return DAMAGED_ARTILLERY;
-        case Unit.TREASURE_TRAIN:
-            return TREASURE_TRAIN;
-        case Unit.WAGON_TRAIN:
-            return WAGON_TRAIN;
-        case Unit.MILKMAID:
-            return MILKMAID;
-        case Unit.REVENGER:
-            return REVENGER;
-        case Unit.FLYING_DUTCHMAN:
-            return FLYING_DUTCHMAN;
-        case Unit.UNDEAD:
-            return UNDEAD;
-        default:
-            // This case can NOT occur.
-            return -1;
+        int iconIndex = 0;
+        if (missionary) {
+            iconIndex = 5;
+        } else if (pioneer) {
+            iconIndex = 4;
+        } else if (armed && mounted) {
+            iconIndex = 3;
+        } else if (armed) {
+            iconIndex = 2;
+        } else if (mounted) {
+            iconIndex = 1;
         }
+        return type * iconTypes.length + iconIndex;
     }
 }

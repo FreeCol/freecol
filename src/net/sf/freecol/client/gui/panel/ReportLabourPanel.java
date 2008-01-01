@@ -157,12 +157,15 @@ public final class ReportLabourPanel extends ReportPanel implements ActionListen
         
         int row = 0, column = 0;
         for (UnitType unitType : colonists) {
-            int tools = 0;
+            boolean tools = false;
+            boolean missionary = false;
             if (unitType.hasAbility("model.ability.expertPioneer")) {
-                tools = 20;
+                tools = true;
+            } else if (unitType.hasAbility("model.ability.expertMissionary")) {
+                missionary = true;
             }
             
-            reportPanel.add(createUnitLabel(unitType, tools),
+            reportPanel.add(createUnitLabel(unitType, tools, missionary),
                             higConst.rc(2 * row + 1, columnsPerUnit * column + buttonColumn, "t"));
             if (unitCount[unitType.getIndex()] > 0) {
                 reportPanel.add(createUnitNameButton(unitType),
@@ -198,8 +201,8 @@ public final class ReportLabourPanel extends ReportPanel implements ActionListen
 
     }
 
-    private JLabel createUnitLabel(UnitType unitType, int tools) {
-        int imageType = ImageLibrary.getUnitGraphicsType(unitType.getIndex(), false, false, (tools > 0), false);
+    private JLabel createUnitLabel(UnitType unitType, boolean tools, boolean missionary) {
+        int imageType = ImageLibrary.getUnitGraphicsType(unitType.getIndex(), false, false, tools, missionary);
         JLabel unitLabel = new JLabel(getLibrary().getUnitImageIcon(imageType));
         return unitLabel;
     }
