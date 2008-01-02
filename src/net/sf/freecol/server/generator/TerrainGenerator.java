@@ -416,9 +416,9 @@ public class TerrainGenerator {
                 if (map.isValid(map.getWidth()-x, y)) {
                     map.getTile(map.getWidth()-x, y).setType(highSeas);
                     if (y < map.getHeight() / 2) {
-                        map.getTile(x, y).setRegion(northAtlantic);
+                        map.getTile(map.getWidth()-x, y).setRegion(northAtlantic);
                     } else {
-                        map.getTile(x, y).setRegion(southAtlantic);
+                        map.getTile(map.getWidth()-x, y).setRegion(southAtlantic);
                     }
                 }
             }
