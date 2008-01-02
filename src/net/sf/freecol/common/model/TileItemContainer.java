@@ -449,7 +449,7 @@ public class TileItemContainer extends FreeColGameObject {
                 tiType.getMagnitude() <= magnitude) {
                 TileImprovement river = new TileImprovement(getGame(), tile, tiType);
                 this.river = river;
-                adjustNeighbourRiverStyle(0);
+                adjustNeighbourRiverStyle(TileImprovement.NO_RIVER);
                 return (TileImprovement) addTileItem(river);
             }
         }

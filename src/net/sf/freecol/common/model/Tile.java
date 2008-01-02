@@ -757,7 +757,10 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
      * @param magnitude The magnitude of the river at this point
      */
     public void addRiver(int magnitude) {
-        tileItemContainer.addRiver(magnitude);
+        if (this.type.canHaveRiver()) {
+            // no point adding a river in the ocean
+            tileItemContainer.addRiver(magnitude);
+        }
     }
 
     public void setRiverMagnitude(int magnitude) {
