@@ -65,6 +65,7 @@ import net.sf.freecol.common.model.TileImprovement;
 import net.sf.freecol.common.model.TileItemContainer;
 import net.sf.freecol.common.model.TileType;
 import net.sf.freecol.common.model.Unit;
+import net.sf.freecol.common.model.Unit.UnitState;
 import net.sf.freecol.common.model.Map.Position;
 
 
@@ -488,7 +489,7 @@ public final class GUI {
 
         if (activeUnit != null) {
             if (freeColClient.getGame().getCurrentPlayer() == freeColClient.getMyPlayer()) {
-                if (activeUnit.getState() != Unit.ACTIVE) {
+                if (activeUnit.getState() != UnitState.ACTIVE) {
                     freeColClient.getInGameController().clearOrders(activeUnit);
                 }
             } else {
@@ -2164,7 +2165,7 @@ public final class GUI {
             occupationString = Integer.toString(unit.getVisibleGoodsCount());
         } else {
             occupationString = unit.getOccupationIndicator();
-            if (unit.getState() == Unit.FORTIFIED)
+            if (unit.getState() == UnitState.FORTIFIED)
                 g.setColor(Color.GRAY);
         }
         g.drawString(occupationString, x + TEXT_OFFSET_X, y + TEXT_OFFSET_Y);
@@ -2193,7 +2194,7 @@ public final class GUI {
             // Draw the unit.
             int type = lib.getUnitGraphicsType(unit);
             // If unit is sentry, draw in grayscale
-            Image image = lib.getUnitImage(type, unit.getState() == Unit.SENTRY);
+            Image image = lib.getUnitImage(type, unit.getState() == UnitState.SENTRY);
             
             g.drawImage(image, (x + tileWidth / 2) - lib.getUnitImageWidth(type) / 2, (y + tileHeight / 2) - lib.getUnitImageHeight(type) / 2 - (int) (UNIT_OFFSET * lib.getScalingFactor()), null);
 

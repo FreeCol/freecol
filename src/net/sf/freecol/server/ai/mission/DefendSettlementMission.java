@@ -34,6 +34,7 @@ import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
+import net.sf.freecol.common.model.Unit.UnitState;
 import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.networking.Message;
 import net.sf.freecol.server.ai.AIMain;
@@ -178,12 +179,12 @@ public class DefendSettlementMission extends Mission {
                 }
             }
         } else {
-            if (unit.getState() != Unit.FORTIFIED
-                    && unit.getState() != Unit.FORTIFYING
-                    && unit.checkSetState(Unit.FORTIFYING)) {
+            if (unit.getState() != UnitState.FORTIFIED
+                    && unit.getState() != UnitState.FORTIFYING
+                    && unit.checkSetState(UnitState.FORTIFYING)) {
                 Element changeStateElement = Message.createNewRootElement("changeState");
                 changeStateElement.setAttribute("unit", unit.getId());
-                changeStateElement.setAttribute("state", Integer.toString(Unit.FORTIFYING));
+                changeStateElement.setAttribute("state", UnitState.FORTIFYING.toString());
                 try {
                     logger.log(Level.FINEST, "Sending fortity request...");
                     connection.sendAndWait(changeStateElement);

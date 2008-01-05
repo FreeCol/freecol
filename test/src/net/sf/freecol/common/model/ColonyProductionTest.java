@@ -22,6 +22,7 @@ package net.sf.freecol.common.model;
 import java.util.Vector;
 
 import net.sf.freecol.FreeCol;
+import net.sf.freecol.common.model.Unit.UnitState;
 import net.sf.freecol.util.test.FreeColTestCase;
 
 public class ColonyProductionTest extends FreeColTestCase {
@@ -48,7 +49,7 @@ public class ColonyProductionTest extends FreeColTestCase {
                 
         game.setMap(map);
         UnitType veteran = FreeCol.getSpecification().getUnitType("model.unit.veteranSoldier");
-        Unit soldier = new Unit(game, map.getTile(6, 8), dutch, veteran, Unit.ACTIVE, veteran.getDefaultEquipment());
+        Unit soldier = new Unit(game, map.getTile(6, 8), dutch, veteran, UnitState.ACTIVE, veteran.getDefaultEquipment());
 
         Colony colony = new Colony(game, dutch, "New Amsterdam", soldier.getTile());
         soldier.setWorkType(Goods.FOOD);

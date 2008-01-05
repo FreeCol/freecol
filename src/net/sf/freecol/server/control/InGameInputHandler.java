@@ -57,6 +57,7 @@ import net.sf.freecol.common.model.TileImprovement;
 import net.sf.freecol.common.model.TileImprovementType;
 import net.sf.freecol.common.model.TradeRoute;
 import net.sf.freecol.common.model.Unit;
+import net.sf.freecol.common.model.Unit.UnitState;
 import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.model.WorkLocation;
 import net.sf.freecol.common.model.Map.Position;
@@ -1070,14 +1071,14 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
             break;
         case LostCityRumour.COLONIST:
             random = getPseudoRandom().nextInt(newUnitTypes.size());
-            newUnit = new Unit(getGame(), tile, player, newUnitTypes.get(random), Unit.ACTIVE);
+            newUnit = new Unit(getGame(), tile, player, newUnitTypes.get(random), UnitState.ACTIVE);
             unit.getTile().add(newUnit);
             rumourElement.appendChild(newUnit.toXMLElement(player, rumourElement.getOwnerDocument()));
             break;
         case LostCityRumour.TREASURE:
             int treasure = getPseudoRandom().nextInt(dx * 600) + dx * 300;
             random = getPseudoRandom().nextInt(treasureUnitTypes.size());
-            newUnit = new Unit(getGame(), tile, player, treasureUnitTypes.get(random), Unit.ACTIVE);
+            newUnit = new Unit(getGame(), tile, player, treasureUnitTypes.get(random), UnitState.ACTIVE);
             newUnit.setTreasureAmount(treasure);
             unit.getTile().add(newUnit);
             rumourElement.setAttribute("amount", Integer.toString(treasure));
@@ -1091,7 +1092,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
                 } else {
                     for (int k = 0; k < dx; k++) {
                         newUnit = new Unit(getGame(), player.getEurope(), player,
-                                           player.generateRecruitable(), Unit.ACTIVE);
+                                           player.generateRecruitable(), UnitState.ACTIVE);
                         rumourElement.appendChild(newUnit.toXMLElement(player, rumourElement.getOwnerDocument()));
                         player.getEurope().add(newUnit);
                     }
@@ -1152,7 +1153,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         UnitType newRecruitable = player.generateRecruitable();
         europe.setRecruitable(slot, newRecruitable);
         
-        Unit unit = new Unit(getGame(), europe, player, recruitable, Unit.ACTIVE);
+        Unit unit = new Unit(getGame(), europe, player, recruitable, UnitState.ACTIVE);
         player.getEurope().add(unit);
         Element reply = Message.createNewRootElement("selectFromFountainYouthConfirmed");
         reply.setAttribute("newRecruitable", Integer.toString(newRecruitable.getIndex()));
@@ -2023,7 +2024,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         int slot = Integer.parseInt(recruitUnitInEuropeElement.getAttribute("slot"));
         UnitType recruitable = europe.getRecruitable(slot);
         UnitType newRecruitable = player.generateRecruitable();
-        Unit unit = new Unit(getGame(), europe, player, recruitable, Unit.ACTIVE, recruitable.getDefaultEquipment());
+        Unit unit = new Unit(getGame(), europe, player, recruitable, UnitState.ACTIVE, recruitable.getDefaultEquipment());
         Element reply = Message.createNewRootElement("recruitUnitInEuropeConfirmed");
         reply.setAttribute("newRecruitable", Integer.toString(newRecruitable.getIndex()));
         reply.appendChild(unit.toXMLElement(player, reply.getOwnerDocument()));
@@ -2048,7 +2049,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         }
         UnitType recruitable = europe.getRecruitable(slot);
         UnitType newRecruitable = player.generateRecruitable();
-        Unit unit = new Unit(getGame(), europe, player, recruitable, Unit.ACTIVE, recruitable.getDefaultEquipment());
+        Unit unit = new Unit(getGame(), europe, player, recruitable, UnitState.ACTIVE, recruitable.getDefaultEquipment());
         Element reply = Message.createNewRootElement("emigrateUnitInEuropeConfirmed");
         if (!player.hasFather(FreeCol.getSpecification().getFoundingFather("model.foundingFather.williamBrewster"))) {
             reply.setAttribute("slot", Integer.toString(slot));
@@ -2070,7 +2071,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         Europe europe = player.getEurope();
         int unitIndex = Integer.parseInt(trainUnitInEuropeElement.getAttribute("unitType"));
         UnitType unitType = FreeCol.getSpecification().getUnitType(unitIndex);
-        Unit unit = new Unit(getGame(), europe, player, unitType, Unit.ACTIVE, unitType.getDefaultEquipment());
+        Unit unit = new Unit(getGame(), europe, player, unitType, UnitState.ACTIVE, unitType.getDefaultEquipment());
         Element reply = Message.createNewRootElement("trainUnitInEuropeConfirmed");
         reply.appendChild(unit.toXMLElement(player, reply.getOwnerDocument()));
         europe.train(unit);
@@ -2271,7 +2272,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         if (unit.getOwner() != player) {
             throw new IllegalStateException("Not your unit!");
         }
-        int state = Integer.parseInt(changeStateElement.getAttribute("state"));
+        UnitState state = Enum.valueOf(UnitState.class, changeStateElement.getAttribute("state"));
         Tile oldTile = unit.getTile();
         if (unit.checkSetState(state)) {
             unit.setState(state);

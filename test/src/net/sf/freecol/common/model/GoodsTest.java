@@ -23,6 +23,7 @@ import java.util.Locale;
 
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.gui.i18n.Messages;
+import net.sf.freecol.common.model.Unit.UnitState;
 import net.sf.freecol.util.test.FreeColTestCase;
 
 public class GoodsTest extends FreeColTestCase {
@@ -43,7 +44,7 @@ public class GoodsTest extends FreeColTestCase {
 
         Unit wagon = new Unit(getGame(), map.getTile(9, 10), dutch(),
                               FreeCol.getSpecification().getUnitType("model.unit.wagonTrain"),
-                              Unit.ACTIVE);
+                              UnitState.ACTIVE);
 
         Goods g = new Goods(getGame(), wagon, Goods.COTTON, 75);
 
@@ -59,7 +60,7 @@ public class GoodsTest extends FreeColTestCase {
 
             Unit wagon = new Unit(getGame(), map.getTile(9, 10), dutch(), 
                                   FreeCol.getSpecification().getUnitType("model.unit.wagonTrain"),
-                                  Unit.ACTIVE);
+                                  UnitState.ACTIVE);
 
             Goods g = new Goods(getGame(), wagon, Goods.COTTON, 75);
 
@@ -78,7 +79,7 @@ public class GoodsTest extends FreeColTestCase {
         Map map = getTestMap(plainsType);
 
         Unit wagon = new Unit(getGame(), map.getTile(9, 10), dutch(), wagonTrainType,
-                Unit.ACTIVE);
+                UnitState.ACTIVE);
 
         Goods g = new Goods(getGame(), wagon, Goods.COTTON, 75);
 
@@ -117,7 +118,7 @@ public class GoodsTest extends FreeColTestCase {
         map.getTile(5, 8).setExploredBy(dutch, true);
         map.getTile(6, 8).setExploredBy(dutch, true);
 
-        Unit soldier = new Unit(game, map.getTile(6, 8), dutch, veteranSoldierType, Unit.ACTIVE);
+        Unit soldier = new Unit(game, map.getTile(6, 8), dutch, veteranSoldierType, UnitState.ACTIVE);
 
         Colony colony = new Colony(game, dutch, "New Amsterdam", soldier.getTile());
         soldier.setWorkType(Goods.FOOD);
@@ -135,7 +136,7 @@ public class GoodsTest extends FreeColTestCase {
         assertEquals(75, colony.getGoodsCount(Goods.COTTON));
 
         // Check in a wagon
-        Unit wagon = new Unit(getGame(), map.getTile(9, 10), dutch, wagonTrainType, Unit.ACTIVE);
+        Unit wagon = new Unit(getGame(), map.getTile(9, 10), dutch, wagonTrainType, UnitState.ACTIVE);
         cotton.setLocation(wagon);
         assertEquals(map.getTile(9, 10), cotton.getTile());
     }
@@ -180,7 +181,7 @@ public class GoodsTest extends FreeColTestCase {
         assertEquals(75, colony.getGoodsCount(Goods.COTTON));
 
         // Check in a wagon
-        Unit wagon = new Unit(getGame(), map.getTile(9, 10), dutch, wagonTrainType, Unit.ACTIVE);
+        Unit wagon = new Unit(getGame(), map.getTile(9, 10), dutch, wagonTrainType, UnitState.ACTIVE);
         cotton.setLocation(wagon);
         assertEquals(wagon, cotton.getLocation());
 
@@ -197,7 +198,7 @@ public class GoodsTest extends FreeColTestCase {
         Map map = getTestMap(plainsType, true);
 
         Unit wagon = new Unit(getGame(), map.getTile(9, 10), dutch(), wagonTrainType,
-                Unit.ACTIVE);
+                UnitState.ACTIVE);
 
         Goods cotton = new Goods(getGame(), wagon, Goods.COTTON, 75);
 
@@ -208,7 +209,7 @@ public class GoodsTest extends FreeColTestCase {
         Map map = getTestMap(plainsType, true);
 
         Unit wagon = new Unit(getGame(), map.getTile(9, 10), dutch(), wagonTrainType,
-                Unit.ACTIVE);
+                UnitState.ACTIVE);
 
         Goods cotton = new Goods(getGame(), wagon, Goods.COTTON, 75);
 
@@ -233,7 +234,7 @@ public class GoodsTest extends FreeColTestCase {
         Map map = getTestMap(plainsType, true);
 
         Unit wagon = new Unit(getGame(), map.getTile(9, 10), dutch(), wagonTrainType,
-                Unit.ACTIVE);
+                UnitState.ACTIVE);
 
         Goods cotton = new Goods(getGame(), wagon, Goods.COTTON, 75);
 
@@ -258,9 +259,9 @@ public class GoodsTest extends FreeColTestCase {
         Colony colony = getStandardColony();
 
         Unit wagonInColony = new Unit(getGame(), colony.getTile(), getGame().getPlayer("model.nation.dutch"), wagonTrainType,
-                Unit.ACTIVE);
+                UnitState.ACTIVE);
         Unit wagonNotInColony = new Unit(getGame(), map.getTile(10, 10), getGame().getPlayer("model.nation.dutch"),
-                wagonTrainType, Unit.ACTIVE);
+                wagonTrainType, UnitState.ACTIVE);
 
         // Check that it does not work if current Location == null
         Goods cotton = new Goods(getGame(), null, Goods.COTTON, 75);
@@ -294,9 +295,9 @@ public class GoodsTest extends FreeColTestCase {
         {// Check with Europe
             Europe europe = getGame().getPlayer("model.nation.dutch").getEurope();
             Unit privateer1 = new Unit(getGame(), europe, getGame().getPlayer("model.nation.dutch"), privateerType,
-                    Unit.ACTIVE);
+                    UnitState.ACTIVE);
             Unit privateer2 = new Unit(getGame(), europe, getGame().getPlayer("model.nation.dutch"), privateerType,
-                    Unit.ACTIVE);
+                    UnitState.ACTIVE);
 
             // While source in Europe, target in Europe
             cotton.setLocation(privateer1);
@@ -388,9 +389,9 @@ public class GoodsTest extends FreeColTestCase {
         Colony colony = getStandardColony();
 
         Unit wagonInColony = new Unit(getGame(), colony.getTile(), getGame().getPlayer("model.nation.dutch"), wagonTrainType,
-                Unit.ACTIVE);
+                UnitState.ACTIVE);
         Unit wagonNotInColony = new Unit(getGame(), map.getTile(10, 10), getGame().getPlayer("model.nation.dutch"),
-                wagonTrainType, Unit.ACTIVE);
+                wagonTrainType, UnitState.ACTIVE);
 
         Goods cotton = new Goods(getGame(), null, Goods.COTTON, 75);
 
@@ -409,7 +410,7 @@ public class GoodsTest extends FreeColTestCase {
 
         // Not allowed to unload in Europe
         Unit privateer = new Unit(getGame(), getGame().getPlayer("model.nation.dutch").getEurope(), getGame().getPlayer(
-                "model.nation.dutch"), privateerType, Unit.ACTIVE);
+                "model.nation.dutch"), privateerType, UnitState.ACTIVE);
         cotton.setLocation(privateer);
         try {
             cotton.unload();

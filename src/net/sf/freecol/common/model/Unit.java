@@ -72,9 +72,9 @@ public class Unit extends FreeColGameObject implements Features, Locatable, Loca
         FLYING_DUTCHMAN = 41, UNDEAD = 42, UNIT_COUNT = 43;
 
     /** A state a Unit can have. */
-    public static final int ACTIVE = 0, FORTIFIED = 1, SENTRY = 2, IN_COLONY = 3, /*PLOW = 4, BUILD_ROAD = 5,*/
-        IMPROVING = 4,      // All TileImprovements use state of IMPROVING
-        TO_EUROPE = 6, IN_EUROPE = 7, TO_AMERICA = 8, FORTIFYING = 9, SKIPPED = 10, NUMBER_OF_STATES = 11;
+    public static enum UnitState { ACTIVE, FORTIFIED, SENTRY, IN_COLONY,
+            IMPROVING,      // All TileImprovements use state of IMPROVING
+            TO_EUROPE, IN_EUROPE, TO_AMERICA, FORTIFYING, SKIPPED }
 
     /**
      * A move type.
@@ -97,7 +97,7 @@ public class Unit extends FreeColGameObject implements Features, Locatable, Loca
 
     private int movesLeft;
 
-    private int state;
+    private UnitState state;
 
     /** 
      * The number of turns until the work is finished, or '-1' if a
@@ -176,7 +176,7 @@ public class Unit extends FreeColGameObject implements Features, Locatable, Loca
 
     /**
      * Initiate a new <code>Unit</code> of a specified type with the state set
-     * to {@link #ACTIVE} if a carrier and {@link #SENTRY} otherwise. The
+     * to {@link #ACTIVE} if a carrier and {@link #UnitState.SENTRY} otherwise. The
      * {@link Location} is set to <i>null</i>.
      * 
      * @param game The <code>Game</code> in which this <code>Unit</code>
@@ -185,7 +185,7 @@ public class Unit extends FreeColGameObject implements Features, Locatable, Loca
      * @param type The type of the unit.
      */
     public Unit(Game game, Player owner, UnitType type) {
-        this(game, null, owner, type, ACTIVE);
+        this(game, null, owner, type, UnitState.ACTIVE);
     }
 
     /**
@@ -200,7 +200,7 @@ public class Unit extends FreeColGameObject implements Features, Locatable, Loca
      * @param state The initial state for this Unit (one of {@link #ACTIVE},
      *            {@link #FORTIFIED}...).
      */
-    public Unit(Game game, Location location, Player owner, UnitType type, int state) {
+    public Unit(Game game, Location location, Player owner, UnitType type, UnitState state) {
         this(game, location, owner, type, state, type.getDefaultEquipment());
     }
 
@@ -213,7 +213,7 @@ public class Unit extends FreeColGameObject implements Features, Locatable, Loca
      *            <code>Unit</code> upon.
      * @param owner The <code>Player</code> owning this unit.
      * @param type The type of the unit.
-     * @param state The initial state for this Unit (one of {@link #ACTIVE},
+     * @param state The initial state for this Unit (one of {@link #UnitState.ACTIVE},
      *            {@link #FORTIFIED}...).
      * @param armed Determines wether the unit should be armed or not.
      * @param mounted Determines wether the unit should be mounted or not.
@@ -221,7 +221,7 @@ public class Unit extends FreeColGameObject implements Features, Locatable, Loca
      * @param missionary Determines wether this unit should be dressed like a
      *            missionary or not.
      */
-    public Unit(Game game, Location location, Player owner, UnitType type, int state, 
+    public Unit(Game game, Location location, Player owner, UnitType type, UnitState state, 
                 EquipmentType... initialEquipment) {
         super(game);
 
@@ -1483,8 +1483,8 @@ public class Unit extends FreeColGameObject implements Features, Locatable, Loca
      */
     public void moveToTile(Tile newTile) {
         if (newTile != null) {
-            setState(ACTIVE);
-            setStateToAllChildren(SENTRY);
+            setState(UnitState.ACTIVE);
+            setStateToAllChildren(UnitState.SENTRY);
             int moveCost = getMoveCost(newTile);
             setLocation(newTile);
             activeAdjacentSentryUnits(newTile);
@@ -1515,8 +1515,8 @@ public class Unit extends FreeColGameObject implements Features, Locatable, Loca
             Iterator<Unit> unitIt = map.getTile(it.next()).getUnitIterator();
             while (unitIt.hasNext()) {
                 Unit unit = unitIt.next();
-                if (unit.getState() == Unit.SENTRY && unit.getOwner() != getOwner()) {
-                    unit.setState(Unit.ACTIVE);
+                if (unit.getState() == UnitState.SENTRY && unit.getOwner() != getOwner()) {
+                    unit.setState(UnitState.ACTIVE);
                 }
             }
         }
@@ -1556,7 +1556,7 @@ public class Unit extends FreeColGameObject implements Features, Locatable, Loca
 
         if (getTile() == carrier.getTile() && isInEurope() == carrier.isInEurope()) {
             setLocation(carrier);
-            setState(SENTRY);
+            setState(UnitState.SENTRY);
         } else {
             throw new IllegalStateException("It is not allowed to board a ship on another tile.");
         }
@@ -1581,7 +1581,7 @@ public class Unit extends FreeColGameObject implements Features, Locatable, Loca
             throw new IllegalStateException("A unit may only leave a ship while in a harbour.");
         }
 
-        setState(ACTIVE);
+        setState(UnitState.ACTIVE);
     }
 
     /**
@@ -1589,7 +1589,7 @@ public class Unit extends FreeColGameObject implements Features, Locatable, Loca
      * 
      * @param state The state.
      */
-    public void setStateToAllChildren(int state) {
+    public void setStateToAllChildren(UnitState state) {
         if (hasAbility("model.ability.carryUnits")) {
             for (Unit u : getUnitList())
                 u.setState(state);
@@ -1826,7 +1826,7 @@ public class Unit extends FreeColGameObject implements Features, Locatable, Loca
             throw new IllegalStateException("Can only set a 'Unit'  to a 'WorkLocation' that is on the same 'Tile'.");
         }
         removeAllEquipment(false);
-        setState(Unit.IN_COLONY);
+        setState(UnitState.IN_COLONY);
 
         setLocation(workLocation);
     }
@@ -1853,7 +1853,7 @@ public class Unit extends FreeColGameObject implements Features, Locatable, Loca
     	}
     	
         setWorkImprovement(improvement);
-        setState(Unit.IMPROVING);
+        setState(UnitState.IMPROVING);
         // No need to set Location, stay at the tile it is on.
     }
 
@@ -1996,8 +1996,8 @@ public class Unit extends FreeColGameObject implements Features, Locatable, Loca
             throw new IllegalStateException();
         }
 
-        if (getState() == Unit.IN_COLONY) {
-            setState(Unit.ACTIVE);
+        if (getState() == UnitState.IN_COLONY) {
+            setState(UnitState.ACTIVE);
         }
 
         setLocation(getTile());
@@ -2162,7 +2162,9 @@ public class Unit extends FreeColGameObject implements Features, Locatable, Loca
         if (location instanceof Unit) {
             return ((Unit) location).isInEurope();
         } else {
-            return getLocation() instanceof Europe && getState() != TO_EUROPE && getState() != TO_AMERICA;
+            return getLocation() instanceof Europe && 
+                getState() != UnitState.TO_EUROPE &&
+                getState() != UnitState.TO_AMERICA;
         }
     }
 
@@ -2414,7 +2416,7 @@ public class Unit extends FreeColGameObject implements Features, Locatable, Loca
     public void setHitpoints(int hitpoints) {
         this.hitpoints = hitpoints;
         if (hitpoints >= getInitialHitpoints(unitType)) {
-            setState(ACTIVE);
+            setState(UnitState.ACTIVE);
         }
     }
 
@@ -2445,7 +2447,7 @@ public class Unit extends FreeColGameObject implements Features, Locatable, Loca
     public void sendToRepairLocation() {
         Location l = getOwner().getRepairLocation(this);
         setLocation(l);
-        setState(ACTIVE);
+        setState(UnitState.ACTIVE);
         setMovesLeft(0);
     }
 
@@ -2495,26 +2497,26 @@ public class Unit extends FreeColGameObject implements Features, Locatable, Loca
         String occupationString;
 
         switch (getState()) {
-        case Unit.ACTIVE:
+        case ACTIVE:
             if (getMovesLeft() > 0) {
                 occupationString = Messages.message("model.unit.occupation.active");
             } else {
                 occupationString = Messages.message("model.unit.occupation.activeNoMovesLeft");
             }
             break;
-        case Unit.FORTIFIED:
+        case FORTIFIED:
             occupationString = Messages.message("model.unit.occupation.fortified");
             break;
-        case Unit.FORTIFYING:
+        case FORTIFYING:
             occupationString = Messages.message("model.unit.occupation.fortifying");
             break;
-        case Unit.SENTRY:
+        case SENTRY:
             occupationString = Messages.message("model.unit.occupation.sentry");
             break;
-        case Unit.IN_COLONY:
+        case IN_COLONY:
             occupationString = Messages.message("model.unit.occupation.inColony");
             break;
-        case Unit.IMPROVING:
+        case IMPROVING:
             if (workImprovement == null) {
                 // TODO: this should become unnecessary as soon as AI
                 // improvements work
@@ -2523,13 +2525,13 @@ public class Unit extends FreeColGameObject implements Features, Locatable, Loca
                 occupationString = workImprovement.getOccupationString();
             }
             break;
-        case Unit.TO_AMERICA:
+        case TO_AMERICA:
             occupationString = Messages.message("model.unit.occupation.goingToAmerica");
             break;
-        case Unit.TO_EUROPE:
+        case TO_EUROPE:
             occupationString = Messages.message("model.unit.occupation.goingToEurope");
             break;
-        case Unit.SKIPPED:
+        case SKIPPED:
             occupationString = Messages.message("model.unit.occupation.skipped");
             break;
         default:
@@ -2548,7 +2550,7 @@ public class Unit extends FreeColGameObject implements Features, Locatable, Loca
      * 
      * @return The state of this <code>Unit</code>.
      */
-    public int getState() {
+    public UnitState getState() {
         return state;
     }
 
@@ -2559,12 +2561,12 @@ public class Unit extends FreeColGameObject implements Features, Locatable, Loca
      * If the work needs turns to be completed (for instance when plowing), then
      * the moves the unit has still left will be used up. Some work (basically
      * building a road with a hardy pioneer) might actually be finished already
-     * in this method-call, in which case the state is set back to ACTIVE.
+     * in this method-call, in which case the state is set back to UnitState.ACTIVE.
      * 
-     * @param s The new state for this Unit. Should be one of {ACTIVE,
+     * @param s The new state for this Unit. Should be one of {UnitState.ACTIVE,
      *            FORTIFIED, ...}.
      */
-    public void setState(int s) {
+    public void setState(UnitState s) {
         if (!checkSetState(s)) {
             throw new IllegalStateException("Illegal state: " + s);
         }
@@ -2595,9 +2597,9 @@ public class Unit extends FreeColGameObject implements Features, Locatable, Loca
             doAssignedWork();
             return;
         case TO_EUROPE:
-            if (state == ACTIVE && !(location instanceof Europe)) {
+            if (state == UnitState.ACTIVE && !(location instanceof Europe)) {
                 workLeft = 3;
-            } else if ((state == TO_AMERICA) && (location instanceof Europe)) {
+            } else if ((state == UnitState.TO_AMERICA) && (location instanceof Europe)) {
                 // I think '4' was also used in the original game.
                 workLeft = 4 - workLeft;
             }
@@ -2608,9 +2610,9 @@ public class Unit extends FreeColGameObject implements Features, Locatable, Loca
             movesLeft = 0;
             break;
         case TO_AMERICA:
-            if ((state == ACTIVE) && (location instanceof Europe)) {
+            if ((state == UnitState.ACTIVE) && (location instanceof Europe)) {
                 workLeft = 3;
-            } else if ((state == TO_EUROPE) && (location instanceof Europe)) {
+            } else if ((state == UnitState.TO_EUROPE) && (location instanceof Europe)) {
                 // I think '4' was also used in the original game.
                 workLeft = 4 - workLeft;
             }
@@ -2670,7 +2672,7 @@ public class Unit extends FreeColGameObject implements Features, Locatable, Loca
             setEntryLocation(getLocation());
         }
 
-        setState(TO_EUROPE);
+        setState(UnitState.TO_EUROPE);
         setLocation(getOwner().getEurope());
 
         // Clear the alreadyOnHighSea flag:
@@ -2687,7 +2689,7 @@ public class Unit extends FreeColGameObject implements Features, Locatable, Loca
             throw new IllegalStateException("A unit can only be moved to america from europe.");
         }
 
-        setState(TO_AMERICA);
+        setState(UnitState.TO_AMERICA);
 
         // Clear the alreadyOnHighSea flag:
         alreadyOnHighSea = false;
@@ -2722,19 +2724,19 @@ public class Unit extends FreeColGameObject implements Features, Locatable, Loca
     /**
      * Checks if a <code>Unit</code> can get the given state set.
      * 
-     * @param s The new state for this Unit. Should be one of {ACTIVE,
+     * @param s The new state for this Unit. Should be one of {UnitState.ACTIVE,
      *            FORTIFIED, ...}.
      * @return 'true' if the Unit's state can be changed to the new value,
      *         'false' otherwise.
      */
-    public boolean checkSetState(int s) {
+    public boolean checkSetState(UnitState s) {
         switch (s) {
         case ACTIVE:
             return true;
         case IN_COLONY:
             return !isNaval();
         case FORTIFIED:
-            return getState() == FORTIFYING;
+            return getState() == UnitState.FORTIFYING;
         case IMPROVING:
         case FORTIFYING:
         case SKIPPED:
@@ -2743,7 +2745,7 @@ public class Unit extends FreeColGameObject implements Features, Locatable, Loca
             return true;
         case TO_EUROPE:
             return isNaval() &&
-                ((location instanceof Europe) && (getState() == TO_AMERICA)) ||
+                ((location instanceof Europe) && (getState() == UnitState.TO_AMERICA)) ||
                 (getEntryLocation() == getLocation());
         case TO_AMERICA:
             return (location instanceof Europe && isNaval() && !isUnderRepair());
@@ -2856,7 +2858,7 @@ public class Unit extends FreeColGameObject implements Features, Locatable, Loca
      * @return number of turns of work left.
      */
     public int getWorkLeft() {
-    	if (state == IMPROVING && unitType.hasAbility("model.ability.expertPioneer")){
+    	if (state == UnitState.IMPROVING && unitType.hasAbility("model.ability.expertPioneer")){
             return workLeft / 2;
     	}
     	
@@ -2870,10 +2872,10 @@ public class Unit extends FreeColGameObject implements Features, Locatable, Loca
     public void doAssignedWork() {
         logger.finest("Entering method doAssignedWork.");
         if (workLeft > 0) {
-            if (state == IMPROVING) {
+            if (state == UnitState.IMPROVING) {
                 // Has the improvement been completed already? Do nothing.
                 if (getWorkImprovement().isComplete()) {
-                    setState(ACTIVE);
+                    setState(UnitState.ACTIVE);
                     return;
                 }
 
@@ -2892,14 +2894,14 @@ public class Unit extends FreeColGameObject implements Features, Locatable, Loca
             }
 
             // Shorter travel time to America for the REF:
-            if (state == TO_AMERICA && getOwner().isREF()) {
+            if (state == UnitState.TO_AMERICA && getOwner().isREF()) {
                 workLeft = 0;
             }
 
             if (workLeft == 0) {
                 workLeft = -1;
 
-                int state = getState();
+                UnitState state = getState();
 
                 switch (state) {
                 case TO_EUROPE:
@@ -2915,14 +2917,14 @@ public class Unit extends FreeColGameObject implements Features, Locatable, Loca
                             u.cashInTreasureTrain();
                         }
                     }
-                    setState(ACTIVE);
+                    setState(UnitState.ACTIVE);
                     break;
                 case TO_AMERICA:
                     getGame().getModelController().setToVacantEntryLocation(this);
-                    setState(ACTIVE);
+                    setState(UnitState.ACTIVE);
                     break;
                 case FORTIFYING:
-                    setState(FORTIFIED);
+                    setState(UnitState.FORTIFIED);
                     break;
                 case IMPROVING:
                     // Spend Goods - Quick fix, replace later
@@ -2970,12 +2972,12 @@ public class Unit extends FreeColGameObject implements Features, Locatable, Loca
                         getTile().setType(changeType);
                     }
                     // Finish up
-                    setState(ACTIVE);
+                    setState(UnitState.ACTIVE);
                     setMovesLeft(0);
                     break;
                 default:
                     logger.warning("Unknown work completed. State: " + state);
-                    setState(ACTIVE);
+                    setState(UnitState.ACTIVE);
                 }
             }
         }
@@ -3336,7 +3338,7 @@ public class Unit extends FreeColGameObject implements Features, Locatable, Loca
             }
 
             // 50% fortify bonus
-            if (defender.getState() == Unit.FORTIFIED) {
+            if (defender.getState() == UnitState.FORTIFIED) {
                 percentage = 50;
                 result.add(new Modifier("modifiers.fortified", percentage, Modifier.PERCENTAGE));
                 totalPercentage += percentage;
@@ -3363,7 +3365,7 @@ public class Unit extends FreeColGameObject implements Features, Locatable, Loca
                     totalPercentage += percentage;
                 }
                 // TODO: is it right? or should it be another ability?
-                if (defender.hasAbility("model.ability.bombard") && defender.getState() != Unit.FORTIFIED) {
+                if (defender.hasAbility("model.ability.bombard") && defender.getState() != UnitState.FORTIFIED) {
                     // -75% Artillery in the Open penalty
                     percentage = -75;
                     result.add(new Modifier("modifiers.artilleryPenalty", percentage, Modifier.PERCENTAGE));
@@ -3435,7 +3437,7 @@ public class Unit extends FreeColGameObject implements Features, Locatable, Loca
         // Wake up if you're attacking something.
         // Before, a unit could stay fortified during execution of an
         // attack. - sjm
-        state = ACTIVE;
+        state = UnitState.ACTIVE;
         if (hasAbility("model.ability.multipleAttacks")) {
             movesLeft = 0;
         }
@@ -3962,7 +3964,7 @@ public class Unit extends FreeColGameObject implements Features, Locatable, Loca
                         u.setType(downgrade);
                     }
                 }
-                u.setState(Unit.ACTIVE);
+                u.setState(UnitState.ACTIVE);
             }
 
             if (isUndead()) {
@@ -4118,8 +4120,8 @@ public class Unit extends FreeColGameObject implements Features, Locatable, Loca
             movesLeft = getInitialMovesLeft();
         }
         doAssignedWork();
-        if (getState() == SKIPPED) {
-            setState(ACTIVE);
+        if (getState() == UnitState.SKIPPED) {
+            setState(UnitState.ACTIVE);
         }
 
     }
@@ -4158,7 +4160,7 @@ public class Unit extends FreeColGameObject implements Features, Locatable, Loca
         }
         out.writeAttribute("unitType", unitType.getId());
         out.writeAttribute("movesLeft", Integer.toString(movesLeft));
-        out.writeAttribute("state", Integer.toString(state));
+        out.writeAttribute("state", state.toString());
         out.writeAttribute("workLeft", Integer.toString(workLeft));
         String ownerID = null;
         if (getOwner().equals(player) || !hasAbility("model.ability.piracy") || showAll) {
@@ -4254,7 +4256,7 @@ public class Unit extends FreeColGameObject implements Features, Locatable, Loca
         unitType = FreeCol.getSpecification().getUnitType(in.getAttributeValue(null, "unitType"));
         naval = unitType.hasAbility("model.ability.navalUnit");
         movesLeft = Integer.parseInt(in.getAttributeValue(null, "movesLeft"));
-        state = Integer.parseInt(in.getAttributeValue(null, "state"));
+        state = Enum.valueOf(UnitState.class, in.getAttributeValue(null, "state"));
         workLeft = Integer.parseInt(in.getAttributeValue(null, "workLeft"));
 
         String ownerID = in.getAttributeValue(null, "owner");

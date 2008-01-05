@@ -27,6 +27,7 @@ import javax.swing.KeyStroke;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.common.model.Unit;
+import net.sf.freecol.common.model.Unit.UnitState;
 
 /**
  * An action for skipping the active unit.
@@ -82,6 +83,7 @@ public class SkipUnitAction extends MapboardAction {
      */
     public void actionPerformed(ActionEvent e) {
         //getFreeColClient().getInGameController().skipActiveUnit();
-        getFreeColClient().getInGameController().changeState(getFreeColClient().getGUI().getActiveUnit(), Unit.SKIPPED);
+        getFreeColClient().getInGameController().changeState(getFreeColClient().getGUI().getActiveUnit(), 
+                                                             UnitState.SKIPPED);
     }
 }

@@ -66,6 +66,7 @@ import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.TransactionListener;
 import net.sf.freecol.common.model.Unit;
+import net.sf.freecol.common.model.Unit.UnitState;
 import cz.autel.dmi.HIGLayout;
 
 /**
@@ -403,7 +404,8 @@ public final class EuropePanel extends FreeColPanel implements ActionListener, C
         while (unitIterator.hasNext()) {
             Unit unit = unitIterator.next();
 
-            if (((unit.getState() == Unit.ACTIVE) || (unit.getState() == Unit.SENTRY)) && (!unit.isNaval())) {
+            if (((unit.getState() == UnitState.ACTIVE) ||
+                 (unit.getState() == UnitState.SENTRY)) && (!unit.isNaval())) {
                 UnitLabel unitLabel = new UnitLabel(unit, parent);
                 unitLabel.setTransferHandler(defaultTransferHandler);
                 unitLabel.addMouseListener(pressListener);
@@ -425,7 +427,7 @@ public final class EuropePanel extends FreeColPanel implements ActionListener, C
 
         List<Unit> unitIterator = europe.getUnitList();
         for (Unit unit : unitIterator) {
-            if ((unit.getState() == Unit.ACTIVE) && (unit.isNaval())) {
+            if ((unit.getState() == UnitState.ACTIVE) && (unit.isNaval())) {
                 UnitLabel unitLabel = new UnitLabel(unit, parent);
                 unitLabel.setTransferHandler(defaultTransferHandler);
                 unitLabel.addMouseListener(pressListener);
@@ -492,14 +494,14 @@ public final class EuropePanel extends FreeColPanel implements ActionListener, C
                 // Naval units can either be in the port, going to europe or
                 // going to america.
                 switch (unit.getState()) {
-                case Unit.ACTIVE:
+                case ACTIVE:
                     lastCarrier = unitLabel;
                     inPortPanel.add(unitLabel);
                     break;
-                case Unit.TO_EUROPE:
+                case TO_EUROPE:
                     toEuropePanel.add(unitLabel, false);
                     break;
-                case Unit.TO_AMERICA:
+                case TO_AMERICA:
                     toAmericaPanel.add(unitLabel, false);
                     break;
                 default:

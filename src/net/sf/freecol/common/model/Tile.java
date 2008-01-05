@@ -34,6 +34,7 @@ import javax.xml.stream.XMLStreamWriter;
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.Specification;
+import net.sf.freecol.common.model.Unit.UnitState;
 import net.sf.freecol.common.model.Map.CircleIterator;
 import net.sf.freecol.common.model.Map.Position;
 import net.sf.freecol.common.util.EmptyIterator;
@@ -1050,12 +1051,12 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
                 while (childUnitIterator.hasNext()) {
                     Unit childUnit = childUnitIterator.next();
 
-                    if ((childUnit.getMovesLeft() > 0) && (childUnit.getState() == Unit.ACTIVE)) {
+                    if ((childUnit.getMovesLeft() > 0) && (childUnit.getState() == UnitState.ACTIVE)) {
                         return childUnit;
                     }
                 }
 
-                if ((u.getMovesLeft() > 0) && (u.getState() == Unit.ACTIVE)) {
+                if ((u.getMovesLeft() > 0) && (u.getState() == UnitState.ACTIVE)) {
                     return u;
                 }
             }
@@ -2354,7 +2355,7 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
         if (owner != null && unit != null && unit.getOwner() != owner
             && owner.getStance(unit.getOwner()) != Player.ALLIANCE) {
             for(Unit enemyUnit : getUnitList()) {
-                if (enemyUnit.isOffensiveUnit() && enemyUnit.getState() == Unit.FORTIFIED) {
+                if (enemyUnit.isOffensiveUnit() && enemyUnit.getState() == UnitState.FORTIFIED) {
                     return enemyUnit;
                 }
             }

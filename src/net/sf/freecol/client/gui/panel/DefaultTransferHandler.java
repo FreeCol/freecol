@@ -53,6 +53,7 @@ import javax.swing.TransferHandler;
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.Unit;
+import net.sf.freecol.common.model.Unit.UnitState;
 
 /**
 * The transferhandler that is capable of creating ImageSelection objects.
@@ -219,15 +220,15 @@ public final class DefaultTransferHandler extends TransferHandler {
                     return false;
                 }
                 
-                if ((unit.getState() == Unit.TO_AMERICA) && (!(comp instanceof EuropePanel.ToEuropePanel))) {
+                if ((unit.getState() == UnitState.TO_AMERICA) && (!(comp instanceof EuropePanel.ToEuropePanel))) {
                     return false;
                 }
 
-                if ((unit.getState() == Unit.TO_EUROPE) && (!(comp instanceof EuropePanel.ToAmericaPanel))) {
+                if ((unit.getState() == UnitState.TO_EUROPE) && (!(comp instanceof EuropePanel.ToAmericaPanel))) {
                     return false;
                 }
 
-                if ((unit.getState() != Unit.TO_AMERICA) && ((comp instanceof EuropePanel.ToEuropePanel))) {
+                if ((unit.getState() != UnitState.TO_AMERICA) && ((comp instanceof EuropePanel.ToEuropePanel))) {
                     return false;
                 }
 

@@ -43,6 +43,7 @@ import net.sf.freecol.common.model.EquipmentType;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.Unit;
+import net.sf.freecol.common.model.Unit.UnitState;
 import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.model.WorkLocation;
 
@@ -173,13 +174,13 @@ public final class DragListener extends MouseAdapter {
                     menuItem.setActionCommand(String.valueOf(UnitLabel.FORTIFY));
                     menuItem.addActionListener(unitLabel);
                     menuItem.setEnabled((tempUnit.getMovesLeft() > 0)
-                            && !(tempUnit.getState() == Unit.FORTIFIED || tempUnit.getState() == Unit.FORTIFYING));
+                            && !(tempUnit.getState() == UnitState.FORTIFIED || tempUnit.getState() == UnitState.FORTIFYING));
                     menu.add(menuItem);
 
                     menuItem = new JMenuItem(Messages.message("sentryUnit"));
                     menuItem.setActionCommand(String.valueOf(UnitLabel.SENTRY));
                     menuItem.addActionListener(unitLabel);
-                    menuItem.setEnabled(tempUnit.getState() != Unit.SENTRY);
+                    menuItem.setEnabled(tempUnit.getState() != UnitState.SENTRY);
                     menu.add(menuItem);
 
                     menu.addSeparator();
@@ -322,7 +323,7 @@ public final class DragListener extends MouseAdapter {
             if ((comp instanceof UnitLabel) && (((UnitLabel) comp).getUnit().isCarrier())) {
                 if (parentPanel instanceof EuropePanel) {
                     Unit u = ((UnitLabel) comp).getUnit();
-                    if (u.getState() != Unit.TO_AMERICA && u.getState() != Unit.TO_EUROPE) {
+                    if (u.getState() != UnitState.TO_AMERICA && u.getState() != UnitState.TO_EUROPE) {
                         ((EuropePanel) parentPanel).setSelectedUnitLabel((UnitLabel) comp);
                     }
                 } else if (parentPanel instanceof ColonyPanel) {

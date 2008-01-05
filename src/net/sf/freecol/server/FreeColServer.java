@@ -57,6 +57,7 @@ import net.sf.freecol.common.model.FreeColGameObject;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Unit;
+import net.sf.freecol.common.model.Unit.UnitState;
 import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.networking.Message;
@@ -306,10 +307,10 @@ public final class FreeColServer {
             }
             if (navalUnits.size() > 0) {
                 UnitType navalType = navalUnits.get(getPseudoRandom().nextInt(navalUnits.size()));
-                Unit theFlyingDutchman = new Unit(game, p.getEntryLocation(), p, navalType, Unit.ACTIVE);
+                Unit theFlyingDutchman = new Unit(game, p.getEntryLocation(), p, navalType, UnitState.ACTIVE);
                 if (landUnits.size() > 0) {
                     UnitType landType = landUnits.get(getPseudoRandom().nextInt(landUnits.size()));
-                    new Unit(game, theFlyingDutchman, p, landType, Unit.SENTRY);
+                    new Unit(game, theFlyingDutchman, p, landType, UnitState.SENTRY);
                 }
                 p.setDead(false);
                 p.setColor(Color.BLACK);

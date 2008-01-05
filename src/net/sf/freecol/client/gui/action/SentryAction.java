@@ -28,6 +28,7 @@ import javax.swing.KeyStroke;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.common.model.Unit;
+import net.sf.freecol.common.model.Unit.UnitState;
 
 /**
 * An action to set sentry state to the active unit.
@@ -76,7 +77,8 @@ public class SentryAction extends MapboardAction {
      * @param actionEvent The <code>ActionEvent</code>.
      */    
     public void actionPerformed(ActionEvent actionEvent) {
-        getFreeColClient().getInGameController().changeState(getFreeColClient().getGUI().getActiveUnit(), Unit.SENTRY);
+        getFreeColClient().getInGameController().changeState(getFreeColClient().getGUI().getActiveUnit(),
+                                                             UnitState.SENTRY);
     }
     
 }

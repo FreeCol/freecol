@@ -33,6 +33,7 @@ import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.PathNode;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
+import net.sf.freecol.common.model.Unit.UnitState;
 import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.networking.Message;
 import net.sf.freecol.server.ai.AIColony;
@@ -286,11 +287,11 @@ public class PioneeringMission extends Mission {
                     }
                 }
                 if (getUnit().getTile() == tileImprovementPlan.getTarget()
-                        && getUnit().getState() != Unit.IMPROVING
-                        && getUnit().checkSetState(Unit.IMPROVING)) {
+                        && getUnit().getState() != UnitState.IMPROVING
+                        && getUnit().checkSetState(UnitState.IMPROVING)) {
                     Element changeStateElement = Message.createNewRootElement("changeState");
                     changeStateElement.setAttribute("unit", getUnit().getId());
-                    changeStateElement.setAttribute("state", Integer.toString(Unit.IMPROVING));
+                    changeStateElement.setAttribute("state", UnitState.IMPROVING.toString());
                     try {
                         connection.sendAndWait(changeStateElement);
                     } catch (IOException e) {

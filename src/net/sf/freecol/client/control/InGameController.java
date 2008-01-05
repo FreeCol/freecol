@@ -78,6 +78,7 @@ import net.sf.freecol.common.model.TileImprovement;
 import net.sf.freecol.common.model.TileImprovementType;
 import net.sf.freecol.common.model.TradeRoute;
 import net.sf.freecol.common.model.Unit;
+import net.sf.freecol.common.model.Unit.UnitState;
 import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.model.WorkLocation;
 import net.sf.freecol.common.model.Map.Position;
@@ -1823,7 +1824,7 @@ public final class InGameController implements NetworkConstants {
         Game game = freeColClient.getGame();
         Tile destinationTile = game.getMap().getNeighbourOrNull(direction, unit.getTile());
 
-        unit.setStateToAllChildren(Unit.ACTIVE);
+        unit.setStateToAllChildren(UnitState.ACTIVE);
 
         // Disembark only the first unit.
         Unit toDisembark = unit.getFirstUnit();
@@ -2379,7 +2380,7 @@ public final class InGameController implements NetworkConstants {
      * @param unit The <code>Unit</code>
      * @param state The state of the unit.
      */
-    public void changeState(Unit unit, int state) {
+    public void changeState(Unit unit, UnitState state) {
         if (freeColClient.getGame().getCurrentPlayer() != freeColClient.getMyPlayer()) {
             freeColClient.getCanvas().showInformationMessage("notYourTurn");
             return;
@@ -2393,7 +2394,7 @@ public final class InGameController implements NetworkConstants {
             return; // Don't bother (and don't log, this is not exceptional)
         }
 
-        if (state == Unit.IMPROVING) {
+        if (state == UnitState.IMPROVING) {
             int price = unit.getOwner().getLandPrice(unit.getTile());
             if (price > 0) {
                 Player nation = unit.getTile().getOwner();
@@ -2415,7 +2416,7 @@ public final class InGameController implements NetworkConstants {
                     buyLand(unit.getTile());
                 }
             }
-        } else if (state == Unit.FORTIFYING && unit.isOffensiveUnit() &&
+        } else if (state == UnitState.FORTIFYING && unit.isOffensiveUnit() &&
                 !unit.hasAbility("model.ability.piracy")) { // check if it's going to occupy a work tile
             Tile tile = unit.getTile();
             if (tile != null && tile.getOwningSettlement() != null) { // check stance with settlement's owner
@@ -2434,11 +2435,12 @@ public final class InGameController implements NetworkConstants {
         // "not your turn" error, so let's finish networking first.
         Element changeStateElement = Message.createNewRootElement("changeState");
         changeStateElement.setAttribute("unit", unit.getId());
-        changeStateElement.setAttribute("state", Integer.toString(state));
+        changeStateElement.setAttribute("state", state.toString());
         client.sendAndWait(changeStateElement);
 
         if (!freeColClient.getCanvas().isShowingSubPanel() &&
-            (unit.getMovesLeft() == 0 || unit.getState() == Unit.SENTRY || unit.getState() == Unit.SKIPPED)) {
+            (unit.getMovesLeft() == 0 || unit.getState() == UnitState.SENTRY ||
+             unit.getState() == UnitState.SKIPPED)) {
             nextActiveUnit();
         } else {
             freeColClient.getCanvas().refresh();
@@ -2467,7 +2469,7 @@ public final class InGameController implements NetworkConstants {
          */
         clearGotoOrders(unit);
         assignTradeRoute(unit, TradeRoute.NO_TRADE_ROUTE);
-        changeState(unit, Unit.ACTIVE);
+        changeState(unit, UnitState.ACTIVE);
     }
 
     /**

@@ -30,6 +30,7 @@ import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.TileImprovementType;
 import net.sf.freecol.common.model.Unit;
+import net.sf.freecol.common.model.Unit.UnitState;
 
 /**
  * An action for using the active unit to plow/clear a forest.
@@ -124,7 +125,7 @@ public class ImprovementAction extends MapboardAction {
             return false;
 
         Unit selectedOne = getFreeColClient().getGUI().getActiveUnit();
-        if (selectedOne == null || !selectedOne.checkSetState(Unit.IMPROVING))
+        if (selectedOne == null || !selectedOne.checkSetState(UnitState.IMPROVING))
             return false;
 
         Tile tile = selectedOne.getTile();

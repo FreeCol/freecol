@@ -36,6 +36,7 @@ import javax.xml.stream.XMLStreamWriter;
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.Map.Position;
+import net.sf.freecol.common.model.Unit.UnitState;
 import net.sf.freecol.common.util.EmptyIterator;
 
 import org.w3c.dom.Element;
@@ -2847,7 +2848,7 @@ public class Player extends FreeColGameObject implements Features, Nameable {
          * Returns true if the unit is active (and going nowhere).
          */
         public boolean obtains(Unit unit) {
-            return (!unit.isDisposed() && (unit.getMovesLeft() > 0) && (unit.getState() == Unit.ACTIVE)
+            return (!unit.isDisposed() && (unit.getMovesLeft() > 0) && (unit.getState() == UnitState.ACTIVE)
                     && (unit.getDestination() == null) && !(unit.getLocation() instanceof WorkLocation) && unit
                     .getTile() != null);
         }

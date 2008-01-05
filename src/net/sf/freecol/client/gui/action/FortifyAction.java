@@ -27,6 +27,7 @@ import javax.swing.KeyStroke;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.common.model.Unit;
+import net.sf.freecol.common.model.Unit.UnitState;
 
 /**
  * An action for fortifying the active unit.
@@ -65,7 +66,7 @@ public class FortifyAction extends MapboardAction {
      */
     protected boolean shouldBeEnabled() {
         return super.shouldBeEnabled() && getFreeColClient().getGUI().getActiveUnit() != null
-                && getFreeColClient().getGUI().getActiveUnit().checkSetState(Unit.FORTIFYING);
+                && getFreeColClient().getGUI().getActiveUnit().checkSetState(UnitState.FORTIFYING);
     }
 
     /**
@@ -84,6 +85,6 @@ public class FortifyAction extends MapboardAction {
      */
     public void actionPerformed(ActionEvent e) {
         getFreeColClient().getInGameController().changeState(getFreeColClient().getGUI().getActiveUnit(),
-                Unit.FORTIFYING);
+                UnitState.FORTIFYING);
     }
 }

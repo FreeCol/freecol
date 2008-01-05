@@ -60,6 +60,7 @@ import net.sf.freecol.common.model.Tension;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.TileImprovement;
 import net.sf.freecol.common.model.Unit;
+import net.sf.freecol.common.model.Unit.UnitState;
 import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.model.Map.Position;
 import net.sf.freecol.common.networking.Connection;
@@ -515,7 +516,7 @@ public class AIPlayer extends AIObject {
                     }
                     UnitType type = FreeCol.getSpecification().getUnitType(unitType);
                     new Unit(getGame(), getPlayer().getEurope(), getPlayer(),
-                            type, Unit.ACTIVE, equipment);
+                            type, UnitState.ACTIVE, equipment);
                     ref[i]--;
                     totalNumber--;
                 }
@@ -661,7 +662,7 @@ public class AIPlayer extends AIObject {
                     }
                     if (threat > defenders) {
                         Unit newDefender = is.getFirstUnit();
-                        newDefender.setState(Unit.ACTIVE);
+                        newDefender.setState(UnitState.ACTIVE);
                         newDefender.setLocation(is.getTile());
                         AIUnit newDefenderAI = (AIUnit) getAIMain().getAIObject(newDefender);
                         if (bestTarget != null) {
@@ -801,10 +802,10 @@ public class AIPlayer extends AIObject {
                         u.putOutsideColony();
                         sendAndWaitSafely(putOutsideColonyElement);
                         // Check if the unit can fortify before sending the order
-                        if (u.checkSetState(Unit.FORTIFYING)) {
+                        if (u.checkSetState(UnitState.FORTIFYING)) {
                             Element changeStateElement = Message.createNewRootElement("changeState");
                             changeStateElement.setAttribute("unit", u.getId());
-                            changeStateElement.setAttribute("state", Integer.toString(Unit.FORTIFYING));
+                            changeStateElement.setAttribute("state", UnitState.FORTIFYING.toString());
                             sendAndWaitSafely(changeStateElement);
                         }
                         olddefenders++;
@@ -893,13 +894,13 @@ public class AIPlayer extends AIObject {
                 Iterator<Unit> uit = colony.getUnitIterator();
                 while (uit.hasNext()) {
                     Unit candidate = uit.next();
-                    if (candidate.isOffensiveUnit() && candidate.getState() == Unit.FORTIFIED) {
+                    if (candidate.isOffensiveUnit() && candidate.getState() == UnitState.FORTIFIED) {
                         u = candidate;
                         break;
                     }
                 }
                 if (u != null) {
-                    u.setState(Unit.ACTIVE);
+                    u.setState(UnitState.ACTIVE);
                     u.setLocation(colony.getTile());
                     AIUnit newDefenderAI = (AIUnit) getAIMain().getAIObject(u);
                     if (bestTarget != null) {

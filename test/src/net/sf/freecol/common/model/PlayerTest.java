@@ -20,6 +20,7 @@
 package net.sf.freecol.common.model;
 
 import java.util.Iterator;
+import net.sf.freecol.common.model.Unit.UnitState;
 import net.sf.freecol.util.test.FreeColTestCase;
 
 public class PlayerTest extends FreeColTestCase {
@@ -51,10 +52,10 @@ public class PlayerTest extends FreeColTestCase {
 
         UnitType freeColonist = spec().getUnitType("model.unit.freeColonist");
 
-        Unit unit1 = new Unit(game, map.getTile(4, 7), dutch, freeColonist, Unit.ACTIVE);
-        Unit unit2 = new Unit(game, map.getTile(4, 8), dutch, freeColonist, Unit.ACTIVE);
-        Unit unit3 = new Unit(game, map.getTile(5, 7), dutch, freeColonist, Unit.ACTIVE);
-        Unit unit4 = new Unit(game, map.getTile(5, 8), dutch, freeColonist, Unit.ACTIVE);
+        Unit unit1 = new Unit(game, map.getTile(4, 7), dutch, freeColonist, UnitState.ACTIVE);
+        Unit unit2 = new Unit(game, map.getTile(4, 8), dutch, freeColonist, UnitState.ACTIVE);
+        Unit unit3 = new Unit(game, map.getTile(5, 7), dutch, freeColonist, UnitState.ACTIVE);
+        Unit unit4 = new Unit(game, map.getTile(5, 8), dutch, freeColonist, UnitState.ACTIVE);
 
         int count = 0;
         Iterator<Unit> unitIterator = dutch.getUnitIterator();

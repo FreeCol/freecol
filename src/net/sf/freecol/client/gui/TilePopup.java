@@ -44,6 +44,7 @@ import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
+import net.sf.freecol.common.model.Unit.UnitState;
 import net.sf.freecol.server.ai.AIUnit;
 import net.sf.freecol.server.ai.mission.TransportMission;
 
@@ -182,7 +183,7 @@ public final class TilePopup extends JPopupMenu implements ActionListener {
      */
     private void addUnit(Unit unit, boolean enabled, boolean indent) {
         String text;
-        if(unit.getState() == Unit.IMPROVING) {
+        if(unit.getState() == UnitState.IMPROVING) {
             text = ((indent ? "    " : "") + 
                     Messages.message("model.unit.nationUnit", 
                             "%nation%", unit.getOwner().getNationAsString(),

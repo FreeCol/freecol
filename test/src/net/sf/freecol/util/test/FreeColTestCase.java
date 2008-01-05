@@ -35,6 +35,7 @@ import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.TileType;
 import net.sf.freecol.common.model.Unit;
+import net.sf.freecol.common.model.Unit.UnitState;
 import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.server.generator.MapGeneratorOptions;
 
@@ -242,12 +243,12 @@ public class FreeColTestCase extends TestCase {
         Colony colony = new Colony(game, dutch, "New Amsterdam", tile);
 
         UnitType unitType = FreeCol.getSpecification().getUnitType("model.unit.freeColonist");
-        Unit soldier = new Unit(game, tile, dutch, unitType, Unit.ACTIVE, unitType.getDefaultEquipment());
+        Unit soldier = new Unit(game, tile, dutch, unitType, UnitState.ACTIVE, unitType.getDefaultEquipment());
 
         soldier.buildColony(colony);
 
         for (int i = 1; i < numberOfSettlers; i++) {
-            Unit settler = new Unit(game, tile, dutch, unitType, Unit.ACTIVE, unitType.getDefaultEquipment());
+            Unit settler = new Unit(game, tile, dutch, unitType, UnitState.ACTIVE, unitType.getDefaultEquipment());
             settler.setLocation(colony);
         }
 

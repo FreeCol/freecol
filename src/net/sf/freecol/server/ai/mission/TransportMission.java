@@ -43,6 +43,7 @@ import net.sf.freecol.common.model.PathNode;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
+import net.sf.freecol.common.model.Unit.UnitState;
 import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.networking.Message;
@@ -364,7 +365,7 @@ public class TransportMission extends Mission {
         updateTransportList();
 
         if (carrier.getLocation() instanceof Europe) {
-            if (carrier.getState() == Unit.TO_EUROPE || carrier.getState() == Unit.TO_AMERICA) {
+            if (carrier.getState() == UnitState.TO_EUROPE || carrier.getState() == UnitState.TO_AMERICA) {
                 return;
             } else {
                 restockCargoAtDestination(connection);
@@ -938,7 +939,7 @@ public class TransportMission extends Mission {
                 if (mission != null && mission.isValid()) {
                     if (au.getTransportDestination() != null
                             && au.getTransportDestination().getTile() == carrier.getTile()
-                            && carrier.getState() != Unit.TO_EUROPE && carrier.getState() != Unit.TO_AMERICA) {
+                            && carrier.getState() != UnitState.TO_EUROPE && carrier.getState() != UnitState.TO_AMERICA) {
                         if (u.getLocation() instanceof Europe || u.getColony() != null) {
                             Element leaveShipElement = Message.createNewRootElement("leaveShip");
                             leaveShipElement.setAttribute("unit", u.getId());
@@ -999,7 +1000,7 @@ public class TransportMission extends Mission {
                 AIGoods ag = (AIGoods) t;
                 if (ag.getTransportDestination() != null
                         && ag.getTransportDestination().getTile() == carrier.getLocation().getTile()
-                        && carrier.getState() != Unit.TO_EUROPE && carrier.getState() != Unit.TO_AMERICA) {
+                        && carrier.getState() != UnitState.TO_EUROPE && carrier.getState() != UnitState.TO_AMERICA) {
                     if (carrier.getLocation() instanceof Europe) {
                         // TODO-AI-CHEATING: REMOVE WHEN THE AI IS GOOD ENOUGH:
                         Player p = carrier.getOwner();
@@ -1064,8 +1065,8 @@ public class TransportMission extends Mission {
             if (t instanceof AIUnit) {
                 AIUnit au = (AIUnit) t;
                 Unit u = au.getUnit();
-                if (u.getTile() == carrier.getTile() && carrier.getState() != Unit.TO_EUROPE
-                        && carrier.getState() != Unit.TO_AMERICA) {
+                if (u.getTile() == carrier.getTile() && carrier.getState() != UnitState.TO_EUROPE
+                        && carrier.getState() != UnitState.TO_AMERICA) {
                     Element boardShipElement = Message.createNewRootElement("boardShip");
                     boardShipElement.setAttribute("unit", u.getId());
                     boardShipElement.setAttribute("carrier", carrier.getId());
@@ -1079,8 +1080,8 @@ public class TransportMission extends Mission {
                 }
             } else if (t instanceof AIGoods) {
                 AIGoods ag = (AIGoods) t;
-                if (ag.getGoods().getTile() == carrier.getTile() && carrier.getState() != Unit.TO_EUROPE
-                        && carrier.getState() != Unit.TO_AMERICA) {
+                if (ag.getGoods().getTile() == carrier.getTile() && carrier.getState() != UnitState.TO_EUROPE
+                        && carrier.getState() != UnitState.TO_AMERICA) {
                     if (carrier.getLocation() instanceof Europe) {
                         Element buyGoodsElement = Message.createNewRootElement("buyGoods");
                         buyGoodsElement.setAttribute("carrier", carrier.getId());

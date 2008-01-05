@@ -40,6 +40,7 @@ import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
+import net.sf.freecol.common.model.Unit.UnitState;
 import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.model.Map.Position;
 import net.sf.freecol.common.networking.Message;
@@ -488,7 +489,7 @@ public final class InGameController extends Controller {
                     case Monarch.SUPPORT_SEA:
                         // TODO: make this generic
                         UnitType unitType = FreeCol.getSpecification().getUnitType("model.unit.frigate");
-                        newUnit = new Unit(getGame(), nextPlayer.getEurope(), nextPlayer, unitType, Unit.ACTIVE);
+                        newUnit = new Unit(getGame(), nextPlayer.getEurope(), nextPlayer, unitType, UnitState.ACTIVE);
                         nextPlayer.getEurope().add(newUnit);
                         monarchActionElement.appendChild(newUnit.toXMLElement(nextPlayer, monarchActionElement
                                 .getOwnerDocument()));
@@ -539,10 +540,10 @@ public final class InGameController extends Controller {
             for (int i = 0; i < units[type]; i++) {
                 if (type == Monarch.ARTILLERY) {
                     UnitType unitType = FreeCol.getSpecification().getUnitType("model.unit.artillery");
-                    newUnit = new Unit(getGame(), nextPlayer.getEurope(), nextPlayer, unitType, Unit.ACTIVE);
+                    newUnit = new Unit(getGame(), nextPlayer.getEurope(), nextPlayer, unitType, UnitState.ACTIVE);
                 } else {
                     UnitType unitType = FreeCol.getSpecification().getUnitType("model.unit.veteranSoldier");
-                    newUnit = new Unit(getGame(), nextPlayer.getEurope(), nextPlayer, unitType, Unit.ACTIVE,
+                    newUnit = new Unit(getGame(), nextPlayer.getEurope(), nextPlayer, unitType, UnitState.ACTIVE,
                                        (type == Monarch.DRAGOON ? dragoon : infantry));
                 }
                 nextPlayer.getEurope().add(newUnit);

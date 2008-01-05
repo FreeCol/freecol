@@ -19,6 +19,7 @@
 
 package net.sf.freecol.common.model;
 
+import net.sf.freecol.common.model.Unit.UnitState;
 import net.sf.freecol.util.test.FreeColTestCase;
 
 public class DemotionTest extends FreeColTestCase {
@@ -48,9 +49,9 @@ public class DemotionTest extends FreeColTestCase {
         tile2.setExploredBy(dutch, true);
         tile2.setExploredBy(french, true);
 
-        Unit colonist = new Unit(game, tile1, dutch, colonistType, Unit.ACTIVE);
+        Unit colonist = new Unit(game, tile1, dutch, colonistType, UnitState.ACTIVE);
         assertTrue(colonist.hasAbility("model.ability.canBeCaptured"));
-        Unit soldier = new Unit(game, tile2, french, colonistType, Unit.ACTIVE);
+        Unit soldier = new Unit(game, tile2, french, colonistType, UnitState.ACTIVE);
         assertTrue(soldier.hasAbility("model.ability.canBeCaptured"));
         soldier.equipWith(muskets, true);
         assertFalse(soldier.hasAbility("model.ability.canBeCaptured"));
@@ -76,9 +77,9 @@ public class DemotionTest extends FreeColTestCase {
         tile2.setExploredBy(dutch, true);
         tile2.setExploredBy(french, true);
 
-        Unit soldier1 = new Unit(game, tile1, dutch, colonistType, Unit.ACTIVE);
+        Unit soldier1 = new Unit(game, tile1, dutch, colonistType, UnitState.ACTIVE);
         soldier1.equipWith(muskets, true);
-        Unit soldier2 = new Unit(game, tile2, french, colonistType, Unit.ACTIVE);
+        Unit soldier2 = new Unit(game, tile2, french, colonistType, UnitState.ACTIVE);
         soldier2.equipWith(muskets, true);
 
         soldier1.demote(soldier2);
@@ -107,10 +108,10 @@ public class DemotionTest extends FreeColTestCase {
         tile2.setExploredBy(dutch, true);
         tile2.setExploredBy(french, true);
 
-        Unit dragoon = new Unit(game, tile1, dutch, colonistType, Unit.ACTIVE);
+        Unit dragoon = new Unit(game, tile1, dutch, colonistType, UnitState.ACTIVE);
         dragoon.equipWith(muskets, true);
         dragoon.equipWith(horses, true);
-        Unit soldier = new Unit(game, tile2, french, colonistType, Unit.ACTIVE);
+        Unit soldier = new Unit(game, tile2, french, colonistType, UnitState.ACTIVE);
         soldier.equipWith(muskets, true);
 
         dragoon.demote(soldier);
@@ -146,10 +147,10 @@ public class DemotionTest extends FreeColTestCase {
         tile2.setExploredBy(dutch, true);
         tile2.setExploredBy(inca, true);
 
-        Unit dragoon = new Unit(game, tile1, dutch, colonistType, Unit.ACTIVE);
+        Unit dragoon = new Unit(game, tile1, dutch, colonistType, UnitState.ACTIVE);
         dragoon.equipWith(muskets, true);
         dragoon.equipWith(horses, true);
-        Unit brave = new Unit(game, tile2, inca, braveType, Unit.ACTIVE);
+        Unit brave = new Unit(game, tile2, inca, braveType, UnitState.ACTIVE);
 
         dragoon.demote(brave);
         assertEquals(colonistType, dragoon.getType());
@@ -188,9 +189,9 @@ public class DemotionTest extends FreeColTestCase {
         tile2.setExploredBy(dutch, true);
         tile2.setExploredBy(french, true);
 
-        Unit scout = new Unit(game, tile1, dutch, colonistType, Unit.ACTIVE);
+        Unit scout = new Unit(game, tile1, dutch, colonistType, UnitState.ACTIVE);
         scout.equipWith(horses, true);
-        Unit soldier = new Unit(game, tile2, french, colonistType, Unit.ACTIVE);
+        Unit soldier = new Unit(game, tile2, french, colonistType, UnitState.ACTIVE);
         soldier.equipWith(muskets, true);
 
         scout.demote(soldier);
@@ -212,9 +213,9 @@ public class DemotionTest extends FreeColTestCase {
         tile2.setExploredBy(dutch, true);
         tile2.setExploredBy(french, true);
 
-        Unit soldier1 = new Unit(game, tile1, dutch, veteranType, Unit.ACTIVE);
+        Unit soldier1 = new Unit(game, tile1, dutch, veteranType, UnitState.ACTIVE);
         soldier1.equipWith(muskets, true);
-        Unit soldier2 = new Unit(game, tile2, french, colonistType, Unit.ACTIVE);
+        Unit soldier2 = new Unit(game, tile2, french, colonistType, UnitState.ACTIVE);
         soldier2.equipWith(muskets, true);
 
         soldier1.demote(soldier2);
@@ -244,8 +245,8 @@ public class DemotionTest extends FreeColTestCase {
         tile2.setExploredBy(dutch, true);
         tile2.setExploredBy(french, true);
 
-        Unit artillery = new Unit(game, tile1, dutch, artilleryType, Unit.ACTIVE);
-        Unit soldier = new Unit(game, tile2, french, colonistType, Unit.ACTIVE);
+        Unit artillery = new Unit(game, tile1, dutch, artilleryType, UnitState.ACTIVE);
+        Unit soldier = new Unit(game, tile2, french, colonistType, UnitState.ACTIVE);
         soldier.equipWith(muskets, true);
 
         artillery.demote(soldier);

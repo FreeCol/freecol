@@ -46,6 +46,7 @@ import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.TileType;
 import net.sf.freecol.common.model.Unit;
+import net.sf.freecol.common.model.Unit.UnitState;
 
 /**
  * This label holds Unit data in addition to the JLabel data, which makes it
@@ -242,7 +243,7 @@ public final class UnitLabel extends JLabel implements ActionListener {
             setToolTipText(unit.getName());
         }
 
-        if (ignoreLocation || selected || (!unit.isCarrier() && unit.getState() != Unit.SENTRY)) {
+        if (ignoreLocation || selected || (!unit.isCarrier() && unit.getState() != UnitState.SENTRY)) {
             setEnabled(true);
         } else if (unit.getOwner() != parent.getClient().getMyPlayer() && unit.getColony() == null) {
             setEnabled(true);
@@ -303,9 +304,9 @@ public final class UnitLabel extends JLabel implements ActionListener {
             if (intCommand == ACTIVATE_UNIT) {
                 parent.getGUI().setActiveUnit(unit);
             } else if (intCommand == FORTIFY) {
-                inGameController.changeState(unit, Unit.FORTIFYING);
+                inGameController.changeState(unit, UnitState.FORTIFYING);
             } else if (intCommand == SENTRY) {
-                inGameController.changeState(unit, Unit.SENTRY);
+                inGameController.changeState(unit, UnitState.SENTRY);
             } else if (!unit.isCarrier()) {
                 switch (intCommand) {
                 case LEAVE_TOWN:

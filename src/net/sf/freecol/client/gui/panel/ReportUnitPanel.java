@@ -43,6 +43,7 @@ import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Unit;
+import net.sf.freecol.common.model.Unit.UnitState;
 import net.sf.freecol.common.model.UnitType;
 
 import org.w3c.dom.Element;
@@ -276,9 +277,9 @@ public final class ReportUnitPanel extends JPanel implements ActionListener {
                 continue;
             }
 
-            if (unit.getState() == Unit.TO_AMERICA) {
+            if (unit.getState() == UnitState.TO_AMERICA) {
                 locationName = Messages.message("goingToAmerica");
-            } else if (unit.getState() == Unit.TO_EUROPE) {
+            } else if (unit.getState() == UnitState.TO_EUROPE) {
                 locationName = Messages.message("goingToEurope");
             } else {
                 locationName = unit.getLocation().getLocationName();

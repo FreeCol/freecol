@@ -54,6 +54,7 @@ import net.sf.freecol.common.model.ResourceType;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.TileType;
 import net.sf.freecol.common.model.Unit;
+import net.sf.freecol.common.model.Unit.UnitState;
 import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.model.Map.Position;
 import net.sf.freecol.common.networking.Message;
@@ -389,7 +390,8 @@ public class MapGenerator {
 
         for (int i = 0; i < (kind * 2) + 4; i++) {
             UnitType unitType = FreeCol.getSpecification().getUnitType("model.unit.brave");
-            Unit unit = new Unit(map.getGame(), settlement, player, unitType, Unit.ACTIVE, unitType.getDefaultEquipment());
+            Unit unit = new Unit(map.getGame(), settlement, player, unitType, UnitState.ACTIVE,
+                                 unitType.getDefaultEquipment());
             unit.setIndianSettlement(settlement);
 
             if (i == 0) {
@@ -520,10 +522,10 @@ public class MapGenerator {
                 .getStartingUnits();
             for (AbstractUnit startingUnit : unitList) {
                 Unit newUnit = new Unit(map.getGame(), startTile, player, startingUnit.getUnitType(),
-                                        Unit.SENTRY, startingUnit.getEquipment());
+                                        UnitState.SENTRY, startingUnit.getEquipment());
                 if (newUnit.hasAbility("model.ability.carryUnits")) {
                     carrier = newUnit;
-                    carrier.setState(Unit.ACTIVE);
+                    carrier.setState(UnitState.ACTIVE);
                 } else {
                     units.add(newUnit);
                 }
@@ -543,17 +545,17 @@ public class MapGenerator {
             if (FreeCol.isInDebugMode()) {
                 // in debug mode give each player a few more units and a colony
                 UnitType unitType = FreeCol.getSpecification().getUnitType("model.unit.galleon");
-                Unit unit4 = new Unit(map.getGame(), startTile, player, unitType, Unit.ACTIVE);
+                Unit unit4 = new Unit(map.getGame(), startTile, player, unitType, UnitState.ACTIVE);
                 
                 unitType = FreeCol.getSpecification().getUnitType("model.unit.privateer");
-                @SuppressWarnings("unused") Unit privateer = new Unit(map.getGame(), startTile, player, unitType, Unit.ACTIVE);
+                @SuppressWarnings("unused") Unit privateer = new Unit(map.getGame(), startTile, player, unitType, UnitState.ACTIVE);
                 
                 unitType = FreeCol.getSpecification().getUnitType("model.unit.freeColonist");
-                @SuppressWarnings("unused") Unit unit5 = new Unit(map.getGame(), unit4, player, unitType, Unit.SENTRY);
+                @SuppressWarnings("unused") Unit unit5 = new Unit(map.getGame(), unit4, player, unitType, UnitState.SENTRY);
                 unitType = FreeCol.getSpecification().getUnitType("model.unit.veteranSoldier");
-                @SuppressWarnings("unused") Unit unit6 = new Unit(map.getGame(), unit4, player, unitType, Unit.SENTRY);
+                @SuppressWarnings("unused") Unit unit6 = new Unit(map.getGame(), unit4, player, unitType, UnitState.SENTRY);
                 unitType = FreeCol.getSpecification().getUnitType("model.unit.jesuitMissionary");
-                @SuppressWarnings("unused") Unit unit7 = new Unit(map.getGame(), unit4, player, unitType, Unit.SENTRY);
+                @SuppressWarnings("unused") Unit unit7 = new Unit(map.getGame(), unit4, player, unitType, UnitState.SENTRY);
 
                 Tile colonyTile = null;
                 Iterator<Position> cti = map.getFloodFillIterator(new Position(x, y));
@@ -573,7 +575,7 @@ public class MapGenerator {
                         }
                     }
                     unitType = FreeCol.getSpecification().getUnitType("model.unit.expertFarmer");
-                    Unit buildColonyUnit = new Unit(map.getGame(), colonyTile, player, unitType, Unit.ACTIVE);
+                    Unit buildColonyUnit = new Unit(map.getGame(), colonyTile, player, unitType, UnitState.ACTIVE);
                     String colonyName = player.getNationAsString()+" Colony";
                     Colony colony = new Colony(map.getGame(), player, colonyName, colonyTile);
                     buildColonyUnit.buildColony(colony);
@@ -593,15 +595,15 @@ public class MapGenerator {
                     while (!schoolhouse.canAdd(unitType)) {
                         schoolhouse.upgrade();
                     }
-                    Unit carpenter = new Unit(map.getGame(), colonyTile, player, unitType, Unit.ACTIVE);
+                    Unit carpenter = new Unit(map.getGame(), colonyTile, player, unitType, UnitState.ACTIVE);
                     carpenter.setLocation(colony.getBuildingForProducing(unitType.getExpertProduction()));
 
                     unitType = FreeCol.getSpecification().getUnitType("model.unit.elderStatesman");
-                    Unit statesman = new Unit(map.getGame(), colonyTile, player, unitType, Unit.ACTIVE);
+                    Unit statesman = new Unit(map.getGame(), colonyTile, player, unitType, UnitState.ACTIVE);
                     statesman.setLocation(colony.getBuildingForProducing(unitType.getExpertProduction()));
 
                     unitType = FreeCol.getSpecification().getUnitType("model.unit.expertLumberJack");
-                    Unit lumberjack = new Unit(map.getGame(), colony, player, unitType, Unit.ACTIVE);
+                    Unit lumberjack = new Unit(map.getGame(), colony, player, unitType, UnitState.ACTIVE);
                     if (lumberjack.getLocation() instanceof ColonyTile) {
                         Tile lt = ((ColonyTile) lumberjack.getLocation()).getWorkTile();
                         for (TileType t : FreeCol.getSpecification().getTileTypeList()) {
@@ -615,27 +617,27 @@ public class MapGenerator {
 
                     unitType = FreeCol.getSpecification().getUnitType("model.unit.seasonedScout");
                     @SuppressWarnings("unused") Unit scout = new Unit(map.getGame(), colonyTile, player, 
-                                                                      unitType, Unit.ACTIVE);
+                                                                      unitType, UnitState.ACTIVE);
 
                     unitType = FreeCol.getSpecification().getUnitType("model.unit.veteranSoldier");
                     @SuppressWarnings("unused") Unit unit8 = new Unit(map.getGame(), colonyTile, player, 
-                                                                      unitType, Unit.ACTIVE);
+                                                                      unitType, UnitState.ACTIVE);
 
                     @SuppressWarnings("unused") Unit unit9 = new Unit(map.getGame(), colonyTile, player, 
-                                                                      unitType, Unit.ACTIVE);
+                                                                      unitType, UnitState.ACTIVE);
 
                     unitType = FreeCol.getSpecification().getUnitType("model.unit.artillery");
                     @SuppressWarnings("unused") Unit unit10 = new Unit(map.getGame(), colonyTile, player,
-                                                                       unitType, Unit.ACTIVE);
+                                                                       unitType, UnitState.ACTIVE);
 
                     @SuppressWarnings("unused") Unit unit11 = new Unit(map.getGame(), colonyTile, player,
-                                                                       unitType, Unit.ACTIVE);
+                                                                       unitType, UnitState.ACTIVE);
 
                     @SuppressWarnings("unused") Unit unit12 = new Unit(map.getGame(), colonyTile, player,
-                                                                       unitType, Unit.ACTIVE);
+                                                                       unitType, UnitState.ACTIVE);
 
                     unitType = FreeCol.getSpecification().getUnitType("model.unit.treasureTrain");
-                    Unit unit13 = new Unit(map.getGame(), colonyTile, player, unitType, Unit.ACTIVE);
+                    Unit unit13 = new Unit(map.getGame(), colonyTile, player, unitType, UnitState.ACTIVE);
                     unit13.setTreasureAmount(10000);
 
                     /* DEBUGGING LINES FOR AI (0.4.1):

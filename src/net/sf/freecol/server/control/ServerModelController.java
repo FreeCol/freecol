@@ -38,6 +38,7 @@ import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.TradeRoute;
 import net.sf.freecol.common.model.Unit;
+import net.sf.freecol.common.model.Unit.UnitState;
 import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.networking.Message;
@@ -202,7 +203,7 @@ public class ServerModelController implements ModelController {
                 taskEntry.secure = true;
             }
         } else {
-            unit = new Unit(freeColServer.getGame(), location, owner, type, Unit.ACTIVE);
+            unit = new Unit(freeColServer.getGame(), location, owner, type, UnitState.ACTIVE);
             taskEntry = new TaskEntry(extendedTaskID, freeColServer.getGame().getTurn().getNumber(), secure, unit);
             taskRegister.put(extendedTaskID, taskEntry);
         }
@@ -326,7 +327,7 @@ public class ServerModelController implements ModelController {
         }
 
         unit.setLocation(entryLocation);
-        unit.setState(Unit.ACTIVE);
+        unit.setState(UnitState.ACTIVE);
 
         // Display the tiles surrounding the Unit:
         Element updateElement = Message.createNewRootElement("update");
