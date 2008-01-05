@@ -52,6 +52,7 @@ import javax.swing.UIManager;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.plaf.basic.BasicInternalFrameUI;
 
+//import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.action.MapControlsAction;
 import net.sf.freecol.client.gui.i18n.Messages;
@@ -1480,7 +1481,7 @@ public final class Canvas extends JDesktopPane {
      * @return The founding father the player has chosen.
      * @see net.sf.freecol.common.model.FoundingFather
      */
-    public int showChooseFoundingFatherDialog(FoundingFather[] possibleFoundingFathers) {
+    public FoundingFather showChooseFoundingFatherDialog(List<FoundingFather> possibleFoundingFathers) {
         closeStatusPanel();
 
         ChooseFoundingFatherDialog chooseFoundingFatherDialog = new ChooseFoundingFatherDialog(this);
@@ -1494,7 +1495,7 @@ public final class Canvas extends JDesktopPane {
 
         remove(chooseFoundingFatherDialog);
 
-        return response;
+        return possibleFoundingFathers.get(response);
     }
 
     /**

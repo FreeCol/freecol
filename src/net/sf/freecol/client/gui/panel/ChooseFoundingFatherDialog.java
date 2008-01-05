@@ -24,6 +24,8 @@ import java.awt.Dimension;
 import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Logger;
 
 import javax.swing.ImageIcon;
@@ -38,6 +40,7 @@ import javax.swing.border.EmptyBorder;
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.FoundingFather;
+import net.sf.freecol.common.model.FoundingFather.FoundingFatherType;
 
 /**
  * This panel displays the different founding fathers the player can work
@@ -48,13 +51,10 @@ import net.sf.freecol.common.model.FoundingFather;
 public final class ChooseFoundingFatherDialog extends FreeColDialog implements ActionListener {
     private static final Logger logger = Logger.getLogger(ChooseFoundingFatherDialog.class.getName());
 
-
-
-
     @SuppressWarnings("unused")
     private final Canvas parent;
 
-    private FoundingFatherPanel[] foundingFatherPanels = new FoundingFatherPanel[FoundingFather.TYPE_COUNT];
+    //    private ArrayList<FoundingFatherPanel> foundingFatherPanels = new ArrayList<FoundingFatherPanel>();
 
     private final JTabbedPane tb;
 
@@ -75,13 +75,6 @@ public final class ChooseFoundingFatherDialog extends FreeColDialog implements A
         setOpaque(false);
 
         tb = new JTabbedPane(JTabbedPane.TOP);
-
-        for (int i = 0; i < foundingFatherPanels.length; i++) {
-            foundingFatherPanels[i] = new FoundingFatherPanel(i);
-            tb.addTab(FoundingFather.getTypeAsString(i), null, foundingFatherPanels[i], null);
-        }
-
-        add(tb);
     }
 
     /**
@@ -93,17 +86,19 @@ public final class ChooseFoundingFatherDialog extends FreeColDialog implements A
      *            identifies a <code>FoundingFather</code> to be picked in
      *            each of those categories.
      */
-    public void initialize(FoundingFather[] possibleFoundingFathers) {
+    public void initialize(List<FoundingFather> possibleFoundingFathers) {
         boolean hasSelectedTab = false;
-        for (int i = 0; i < possibleFoundingFathers.length; i++) {
-            foundingFatherPanels[i].initialize(possibleFoundingFathers[i], i);
-            tb.setEnabledAt(i, foundingFatherPanels[i].isEnabled());
-            if (!hasSelectedTab && foundingFatherPanels[i].isEnabled()) {
-                tb.setSelectedIndex(i);
+        for (int index = 0; index < possibleFoundingFathers.size(); index++) {
+            FoundingFather father = possibleFoundingFathers.get(index);
+            FoundingFatherPanel panel = new FoundingFatherPanel(father.getType());
+            panel.initialize(father, index);
+            tb.addTab(father.getTypeAsString(), null, panel, null);
+            if (!hasSelectedTab && panel.isEnabled()) {
+                tb.setSelectedIndex(index);
                 hasSelectedTab = true;
             }
         }
-
+        add(tb);
         setSize(tb.getPreferredSize());
     }
 
@@ -120,7 +115,7 @@ public final class ChooseFoundingFatherDialog extends FreeColDialog implements A
     public void actionPerformed(ActionEvent event) {
         String command = event.getActionCommand();
         try {
-            setResponse(Integer.valueOf(command));
+            setResponse(Integer.valueOf(command).intValue());
         } catch (NumberFormatException e) {
             logger.warning("Invalid Actioncommand: not a number.");
             setResponse(null);
@@ -153,8 +148,7 @@ public final class ChooseFoundingFatherDialog extends FreeColDialog implements A
          * @param type The type of founding fathers to be displayed in this
          *            <code>FoundingFatherPanel</code>.
          */
-        public FoundingFatherPanel(int type) {
-            // this.type = type;
+        public FoundingFatherPanel(FoundingFatherType type) {
 
             setLayout(new BorderLayout());
 
@@ -167,24 +161,7 @@ public final class ChooseFoundingFatherDialog extends FreeColDialog implements A
             p1.setOpaque(false);
             p1.setBorder(new EmptyBorder(20, 20, 20, 20));
 
-            Image image = null;
-            switch (type) {
-            case 0:
-                image = (Image) UIManager.get("FoundingFather.trade");
-                break;
-            case 1:
-                image = (Image) UIManager.get("FoundingFather.exploration");
-                break;
-            case 2:
-                image = (Image) UIManager.get("FoundingFather.military");
-                break;
-            case 3:
-                image = (Image) UIManager.get("FoundingFather.political");
-                break;
-            case 4:
-                image = (Image) UIManager.get("FoundingFather.religious");
-                break;
-            }
+            Image image = (Image) UIManager.get("FoundingFather." + type.toString().toLowerCase());
 
             JLabel imageLabel;
             if (image != null) {
@@ -252,7 +229,7 @@ public final class ChooseFoundingFatherDialog extends FreeColDialog implements A
                 description.setText(father.getDescription());
                 text.setText("\n" + "[" + father.getBirthAndDeath() + "] "
                         + father.getText());
-                ok.setActionCommand(Integer.toString(index));
+                ok.setActionCommand(String.valueOf(index));
             }
         }
 

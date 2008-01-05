@@ -884,24 +884,7 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
         name.setPreferredSize(new Dimension(400, 50));
         detailPanel.add(name);
 
-        Image image = null;
-        switch (father.getType()) {
-        case FoundingFather.TRADE:
-            image = (Image) UIManager.get("FoundingFather.trade");
-            break;
-        case FoundingFather.EXPLORATION:
-            image = (Image) UIManager.get("FoundingFather.exploration");
-            break;
-        case FoundingFather.MILITARY:
-            image = (Image) UIManager.get("FoundingFather.military");
-            break;
-        case FoundingFather.POLITICAL:
-            image = (Image) UIManager.get("FoundingFather.political");
-            break;
-        case FoundingFather.RELIGIOUS:
-            image = (Image) UIManager.get("FoundingFather.religious");
-            break;
-        }
+        Image image = (Image) UIManager.get("FoundingFather." + father.getType().toString().toLowerCase());
 
         JLabel imageLabel;
         if (image != null) {

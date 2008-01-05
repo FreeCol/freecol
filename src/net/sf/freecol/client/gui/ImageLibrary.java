@@ -666,12 +666,6 @@ public final class ImageLibrary extends ImageProvider {
                 forests.put(type.getId(), findImage(filePath, resourceLocator, doLookup));
             }
         }
-        /*forests = new Vector<ImageIcon>(FOREST_COUNT);
-        forests.add(null);
-        for (int i = 1; i < FOREST_COUNT; i++) {
-            String filePath = dataDirectory + path + forestDirectory + forestName + i + extension;
-            forests.add(findImage(filePath, resourceLocator, doLookup));
-        }*/
     }
 
     /**
@@ -811,10 +805,6 @@ public final class ImageLibrary extends ImageProvider {
             String filePath = dataDirectory + path + type.getArt();
             goods.put(type.getId(), findImage(filePath, resourceLocator, doLookup));
         }
-        /*for (int i = 0; i < GOODS_COUNT; i++) {
-            String filePath = dataDirectory + path + goodsDirectory + goodsName + i + extension;
-            goods.add(findImage(filePath, resourceLocator, doLookup));
-        }*/
 
         /*
          * If all units are patched together in one graphics file then this is
@@ -849,10 +839,6 @@ public final class ImageLibrary extends ImageProvider {
             String filePath = dataDirectory + path + type.getArt();
             bonus.put(type.getId(), findImage(filePath, resourceLocator, doLookup));
         }
-        /*for (int i = 0; i < BONUS_COUNT; i++) {
-            String filePath = dataDirectory + path + bonusDirectory + bonusName + i + extension;
-            bonus.add(findImage(filePath, resourceLocator, doLookup));
-        }*/
     }
 
     /**

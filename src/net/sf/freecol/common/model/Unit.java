@@ -787,7 +787,10 @@ public class Unit extends FreeColGameObject implements Features, Locatable, Loca
             result.add(playerAbility.getApplicableAbility(unitType));
         }
         for (EquipmentType equipmentType : equipment) {
-            result.add(equipmentType.getAbility(id));
+            // TODO: find out why this can happen
+            if (equipmentType != null) {
+                result.add(equipmentType.getAbility(id));
+            }
         }
         Ability combinedResult = Ability.combine(result.toArray(new Ability[0]));
         if (combinedResult == null) {
@@ -813,7 +816,10 @@ public class Unit extends FreeColGameObject implements Features, Locatable, Loca
             result.add(playerModifier.getApplicableModifier(unitType));
         }
         for (EquipmentType equipmentType : equipment) {
-            result.add(equipmentType.getModifier(id));
+            // TODO: find out why this can happen
+            if (equipmentType != null) {
+                result.add(equipmentType.getModifier(id));
+            }
         }
         return Modifier.combine(result.toArray(new Modifier[0]));
     }

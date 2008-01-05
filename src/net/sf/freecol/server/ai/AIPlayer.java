@@ -1738,7 +1738,7 @@ public class AIPlayer extends AIObject {
      * @param foundingFathers The founding fathers on offer.
      * @return The founding father selected.
      */
-    public FoundingFather selectFoundingFather(FoundingFather[] foundingFathers) {
+    public FoundingFather selectFoundingFather(List<FoundingFather> foundingFathers) {
         // TODO: improve choice
         int age = getGame().getTurn().getAge();
         FoundingFather bestFather = null;

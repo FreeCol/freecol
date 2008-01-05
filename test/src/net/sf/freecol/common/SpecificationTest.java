@@ -20,6 +20,7 @@
 package net.sf.freecol.common;
 
 import net.sf.freecol.common.model.FoundingFather;
+import net.sf.freecol.common.model.FoundingFather.FoundingFatherType;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.UnitType;
 
@@ -95,7 +96,7 @@ public final class SpecificationTest extends TestCase {
 
         FoundingFather smith = spec.getFoundingFather("model.foundingFather.adamSmith");
         assertFalse(smith == null);
-        assertTrue(smith.getType() == FoundingFather.TRADE);
+        assertTrue(smith.getType() == FoundingFatherType.TRADE);
         // weight is some value in [0, 10]
         assertTrue(smith.getWeight(1) >= 0);
         assertTrue(smith.getWeight(2) >= 0);

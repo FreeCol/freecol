@@ -21,6 +21,7 @@ package net.sf.freecol.server.control;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.EnumMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.logging.Level;
@@ -30,6 +31,7 @@ import net.sf.freecol.FreeCol;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.EquipmentType;
 import net.sf.freecol.common.model.FoundingFather;
+import net.sf.freecol.common.model.FoundingFather.FoundingFatherType;
 import net.sf.freecol.common.model.GameOptions;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.Map;
@@ -205,15 +207,10 @@ public final class InGameController extends Controller {
                 List<FoundingFather> randomFoundingFathers = getRandomFoundingFathers(nextPlayer);
                 boolean atLeastOneChoice = false;
                 Element chooseFoundingFatherElement = Message.createNewRootElement("chooseFoundingFather");
-                for (int i = 0; i < randomFoundingFathers.size(); i++) {
-                    if (randomFoundingFathers.get(i) != null) {
-                        chooseFoundingFatherElement.setAttribute("foundingFather" + Integer.toString(i), 
-                                                                 randomFoundingFathers.get(i).getId());
-                        atLeastOneChoice = true;
-                    } else {
-                        chooseFoundingFatherElement.setAttribute("foundingFather" + Integer.toString(i), "");
-                    }
-
+                for (FoundingFather father : randomFoundingFathers) {
+                    chooseFoundingFatherElement.setAttribute(father.getType().toString(),
+                                                             father.getId());
+                    atLeastOneChoice = true;
                 }
                 if (!atLeastOneChoice) {
                     nextPlayer.setCurrentFather(null);
@@ -247,21 +244,23 @@ public final class InGameController extends Controller {
     private List<FoundingFather> getRandomFoundingFathers(Player player) {
         int age = getGame().getTurn().getAge();
         List<FoundingFather> randomFoundingFathers = new ArrayList<FoundingFather>();
-        for (int type = 0; type < FoundingFather.TYPE_COUNT; type++) {
-            int weightSum = 0;
-            for (FoundingFather father : FreeCol.getSpecification().getFoundingFathers()) {
-                if (!player.hasFather(father) && father.getType() == type &&
-                    father.isAvailableTo(player)) {
-                    weightSum += father.getWeight(age);
+        EnumMap<FoundingFatherType, Integer> weightSums = new
+            EnumMap<FoundingFatherType, Integer>(FoundingFatherType.class);
+        for (FoundingFather father : FreeCol.getSpecification().getFoundingFathers()) {
+            if (!player.hasFather(father) && father.isAvailableTo(player)) {
+                Integer weightSum = weightSums.get(father.getType());
+                if (weightSum == null) {
+                    weightSum = new Integer(0);
                 }
+                weightSums.put(father.getType(), weightSum + father.getWeight(age));
             }
-            if (weightSum == 0) {
-                randomFoundingFathers.add(null);
-            } else {
-                int r = getPseudoRandom().nextInt(weightSum) + 1;
-                weightSum = 0;
+        }
+        for (java.util.Map.Entry<FoundingFatherType, Integer> entry : weightSums.entrySet()) {
+            if (entry.getValue() != 0) {
+                int r = getPseudoRandom().nextInt(entry.getValue()) + 1;
+                int weightSum = 0;
                 for (FoundingFather father : FreeCol.getSpecification().getFoundingFathers()) {
-                    if (!player.hasFather(father) && father.getType() == type) {
+                    if (!player.hasFather(father) && father.getType() == entry.getKey()) {
                         weightSum += father.getWeight(age);
                         if (weightSum >= r) {
                             randomFoundingFathers.add(father);

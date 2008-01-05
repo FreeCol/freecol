@@ -20,7 +20,9 @@
 package net.sf.freecol.server.ai;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -32,6 +34,7 @@ import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.ColonyTradeItem;
 import net.sf.freecol.common.model.DiplomaticTrade;
 import net.sf.freecol.common.model.FoundingFather;
+import net.sf.freecol.common.model.FoundingFather.FoundingFatherType;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.GoldTradeItem;
 import net.sf.freecol.common.model.Goods;
@@ -230,13 +233,11 @@ public final class AIInGameInputHandler implements MessageHandler, StreamedMessa
      * 
      */
     private Element chooseFoundingFather(DummyConnection connection, Element element) {
-        FoundingFather[] possibleFoundingFathers = new FoundingFather[FoundingFather.TYPE_COUNT];
-        for (int i = 0; i < FoundingFather.TYPE_COUNT; i++) {
-            String id = element.getAttribute("foundingFather" + Integer.toString(i));
-            if ("".equals(id)) {
-                possibleFoundingFathers[i] = null;
-            } else {
-                possibleFoundingFathers[i] = FreeCol.getSpecification().getFoundingFather(id);
+        final List<FoundingFather> possibleFoundingFathers = new ArrayList<FoundingFather>();
+        for (FoundingFatherType type : FoundingFatherType.values()) {
+            String id = element.getAttribute(type.toString());
+            if (id != null) {
+                possibleFoundingFathers.add(FreeCol.getSpecification().getFoundingFather(id));
             }
         }
 

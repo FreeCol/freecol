@@ -784,6 +784,7 @@
       <modifier id="model.goods.Crosses" type="additive" value="-2" />
       <modifier id="model.goods.Hammers" type="additive" value="-2" />
       <modifier id="model.goods.Tools" type="additive" value="-2" />
+      <upgrade unit="model.unit.freeColonist" learnInSchool="false"/>
     </unit-type>
     <unit-type id="model.unit.brave"                offence="1"  defence="1" movement="3" lineOfSight="1" space="1">
       <ability id="model.ability.carryGoods" value="true"/>
@@ -800,6 +801,7 @@
       <ability id="model.ability.canBeEquipped" value="true"/>
       <ability id="model.ability.canBeCaptured" value="true"/>
       <ability id="model.ability.canBeEquipped" value="true"/>
+      <ability id="model.ability.expertSoldier" value="true"/>
       <required-ability id="model.ability.independenceDeclared"/>
     </unit-type>
     <unit-type id="model.unit.kingsRegular"         offence="4"  defence="4" movement="3" lineOfSight="1">
@@ -808,6 +810,7 @@
       <ability id="model.ability.canBeEquipped" value="true"/>
       <ability id="model.ability.canBeCaptured" value="true"/>
       <ability id="model.ability.canBeEquipped" value="true"/>
+      <ability id="model.ability.expertSoldier" value="true"/>
     </unit-type>
     <unit-type id="model.unit.caravel"              offence="0"  defence="2"  movement="12" lineOfSight="1" space="2"
                spaceTaken="24" hitPoints="6" price="1000" pathImage="naval" scoreValue="3">
@@ -1258,7 +1261,7 @@
                      weight1="3" weight2="8" weight3="3">
       <modifier id="model.ability.nativeConvertBonus" type="percentage" value="20"/>
     </founding-father>
-    <founding-father id="model.foundingFather.bartolmeDeLasCasas" type="religious"
+    <founding-father id="model.foundingFather.bartolomeDeLasCasas" type="religious"
                      weight1="0" weight2="5" weight3="10">
       <upgrade from-id="model.unit.indianConvert" to-id="model.unit.freeColonist"/>
     </founding-father>

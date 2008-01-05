@@ -52,19 +52,15 @@ public class FoundingFather extends FreeColGameObjectType implements Features {
     /**
      * The type of this FoundingFather. One of the following constants.
      */
-    private int type;
+    private FoundingFatherType type;
 
     /**
      * Holds the upgrades of Units caused by this FoundingFather.
      */
     private Map<UnitType, UnitType> upgrades;
 
-    public static final int TRADE = 0,
-                            EXPLORATION = 1,
-                            MILITARY = 2,
-                            POLITICAL = 3,
-                            RELIGIOUS = 4,
-                            TYPE_COUNT = 5;
+    public static enum FoundingFatherType { TRADE, EXPLORATION, MILITARY,
+            POLITICAL, RELIGIOUS }
 
     /**
      * Stores the Events of this Type.
@@ -114,7 +110,7 @@ public class FoundingFather extends FreeColGameObjectType implements Features {
      *
      * @return an <code>int</code> value
      */
-    public int getType() {
+    public FoundingFatherType getType() {
         return type;
     }
     
@@ -133,16 +129,8 @@ public class FoundingFather extends FreeColGameObjectType implements Features {
      * @param type an <code>int</code> value
      * @return a <code>String</code> value
      */
-    public static String getTypeAsString(int type) {
-        switch (type) {
-            case TRADE: return Messages.message("model.foundingFather.trade");
-            case EXPLORATION: return Messages.message("model.foundingFather.exploration");
-            case MILITARY: return Messages.message("model.foundingFather.military");
-            case POLITICAL: return Messages.message("model.foundingFather.political");
-            case RELIGIOUS: return Messages.message("model.foundingFather.religious");
-        }
-        
-        return "";
+    public static String getTypeAsString(FoundingFatherType type) {
+        return Messages.message("model.foundingFather." + type.toString().toLowerCase());
     }
 
     /**
@@ -269,20 +257,8 @@ public class FoundingFather extends FreeColGameObjectType implements Features {
     public void readFromXML(XMLStreamReader in, Map<String, UnitType> unitTypeByRef)
         throws XMLStreamException {
         setId(in.getAttributeValue(null, "id"));
-        String typeString = in.getAttributeValue(null, "type");
-        if ("trade".equals(typeString)) {
-            type = TRADE;
-        } else if ("exploration".equals(typeString)) {
-            type = EXPLORATION;
-        } else if ("military".equals(typeString)) {
-            type = MILITARY;
-        } else if ("political".equals(typeString)) {
-            type = POLITICAL;
-        } else if ("religious".equals(typeString)) {
-            type = RELIGIOUS;
-        } else {
-            throw new IllegalArgumentException("FoundingFather " + getId() + " has unknown type " + typeString);
-        }                           
+        String typeString = in.getAttributeValue(null, "type").toUpperCase();
+        type = Enum.valueOf(FoundingFatherType.class, typeString);
 
         weight[1] = Integer.parseInt(in.getAttributeValue(null, "weight1"));
         weight[2] = Integer.parseInt(in.getAttributeValue(null, "weight2"));

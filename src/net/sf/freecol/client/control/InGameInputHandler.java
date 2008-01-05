@@ -20,6 +20,8 @@
 package net.sf.freecol.client.control;
 
 import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -32,6 +34,7 @@ import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.DiplomaticTrade;
 import net.sf.freecol.common.model.FoundingFather;
+import net.sf.freecol.common.model.FoundingFather.FoundingFatherType;
 import net.sf.freecol.common.model.FreeColGameObject;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.LostCityRumour;
@@ -551,18 +554,15 @@ public final class InGameInputHandler extends InputHandler {
      *            holds all the information.
      */
     private Element chooseFoundingFather(Element element) {
-        final FoundingFather[] possibleFoundingFathers = new FoundingFather[FoundingFather.TYPE_COUNT];
-        for (int i = 0; i < FoundingFather.TYPE_COUNT; i++) {
-            String id = element.getAttribute("foundingFather" + Integer.toString(i));
-            if ("".equals(id)) {
-                possibleFoundingFathers[i] = null;
-            } else {
-                possibleFoundingFathers[i] = FreeCol.getSpecification().getFoundingFather(id);
+        final List<FoundingFather> possibleFoundingFathers = new ArrayList<FoundingFather>();
+        for (FoundingFatherType type : FoundingFatherType.values()) {
+            String id = element.getAttribute(type.toString());
+            if (id != null) {
+                possibleFoundingFathers.add(FreeCol.getSpecification().getFoundingFather(id));
             }
         }
 
-        int selected = new ShowSelectFoundingFatherSwingTask(possibleFoundingFathers).select();
-        FoundingFather foundingFather = possibleFoundingFathers[selected];
+        FoundingFather foundingFather = new ShowSelectFoundingFatherSwingTask(possibleFoundingFathers).select();
 
         Element reply = Message.createNewRootElement("chosenFoundingFather");
         reply.setAttribute("foundingFather", foundingFather.getId());
@@ -1444,23 +1444,40 @@ public final class InGameInputHandler extends InputHandler {
     /**
      * This class displays a dialog that lets the player pick a Founding Father.
      */
-    class ShowSelectFoundingFatherSwingTask extends ShowSelectSwingTask {
+    class ShowSelectFoundingFatherSwingTask extends SwingTask {
+
+        private List<FoundingFather> choices;
 
         /**
          * Constructor.
          * 
          * @param choices The possible founding fathers.
          */
-        public ShowSelectFoundingFatherSwingTask(FoundingFather[] choices) {
+        public ShowSelectFoundingFatherSwingTask(List<FoundingFather> choices) {
             this.choices = choices;
         }
 
         protected Object doWork() {
-            return Integer.valueOf(getFreeColClient().getCanvas().showChooseFoundingFatherDialog(choices));
+            return getFreeColClient().getCanvas().showChooseFoundingFatherDialog(choices);
         }
 
-
-        private FoundingFather[] choices;
+        /**
+         * Show dialog and wait for selection.
+         * 
+         * @return selection.
+         */
+        public FoundingFather select() {
+            try {
+                Object result = invokeAndWait();
+                return (FoundingFather) result;
+            } catch (InvocationTargetException e) {
+                if (e.getCause() instanceof RuntimeException) {
+                    throw (RuntimeException) e.getCause();
+                } else {
+                    throw new RuntimeException(e.getCause());
+                }
+            }
+        }
     }
 
     /**
