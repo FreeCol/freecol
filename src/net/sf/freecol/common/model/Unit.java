@@ -35,6 +35,7 @@ import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.gui.i18n.Messages;
+import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.Map.Position;
 import net.sf.freecol.common.model.TradeRoute.Stop;
 import net.sf.freecol.common.util.EmptyIterator;
@@ -79,7 +80,7 @@ public class Unit extends FreeColGameObject implements Features, Locatable, Loca
     /**
      * A move type.
      * 
-     * @see #getMoveType(int direction)
+     * @see #getMoveType(Direction direction)
      */
     public static enum MoveType { MOVE, MOVE_HIGH_SEAS, ATTACK, EMBARK, DISEMBARK,
             ENTER_INDIAN_VILLAGE_WITH_FREE_COLONIST, ENTER_INDIAN_VILLAGE_WITH_SCOUT,
@@ -1197,7 +1198,7 @@ public class Unit extends FreeColGameObject implements Features, Locatable, Loca
      * @return The move type. Notice: <code>Unit.ILLEGAL_MOVE</code> when
      *         there are no moves left.
      */
-    public MoveType getMoveType(int direction) {
+    public MoveType getMoveType(Direction direction) {
         if (getTile() == null) {
             throw new IllegalStateException("getTile() == null");
         }
@@ -1449,7 +1450,7 @@ public class Unit extends FreeColGameObject implements Features, Locatable, Loca
      * @see #getMoveType(int)
      * @exception IllegalStateException If the move is illegal.
      */
-    public void move(int direction) {
+    public void move(Direction direction) {
         MoveType moveType = getMoveType(direction);
 
         // For debugging:

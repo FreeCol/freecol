@@ -30,6 +30,7 @@ import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.freecol.common.model.GoalDecider;
 import net.sf.freecol.common.model.Goods;
+import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.PathNode;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
@@ -239,7 +240,7 @@ public class PioneeringMission extends Mission {
                     PathNode bestPath = findColonyWithTools();        
 
                     if (bestPath != null) {
-                        int direction = moveTowards(connection, bestPath);
+                        Direction direction = moveTowards(connection, bestPath);
                         moveButDontAttack(connection, direction);
                     } else {
                         skipMission = true;
@@ -275,9 +276,10 @@ public class PioneeringMission extends Mission {
                 if (getUnit().getTile() != tileImprovementPlan.getTarget()) {
                     PathNode pathToTarget = getUnit().findPath(tileImprovementPlan.getTarget());
                     if (pathToTarget != null) {
-                        int direction = moveTowards(connection, pathToTarget);
-                        if (direction >= 0 && (getUnit().getMoveType(direction) == MoveType.MOVE
-                                || getUnit().getMoveType(direction) == MoveType.EXPLORE_LOST_CITY_RUMOUR)) {
+                        Direction direction = moveTowards(connection, pathToTarget);
+                        if (direction != null &&
+                            (getUnit().getMoveType(direction) == MoveType.MOVE
+                             || getUnit().getMoveType(direction) == MoveType.EXPLORE_LOST_CITY_RUMOUR)) {
                             move(connection, direction);
                         }
                     }

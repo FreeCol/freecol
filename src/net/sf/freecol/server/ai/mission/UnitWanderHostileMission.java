@@ -28,6 +28,7 @@ import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.freecol.common.model.Map;
+import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.PathNode;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
@@ -112,11 +113,12 @@ public class UnitWanderHostileMission extends Mission {
         }
         
         if (pathToTarget != null) {
-            int direction = moveTowards(connection, pathToTarget);
-            if (direction >= 0 && unit.getMoveType(direction) == MoveType.ATTACK) {
+            Direction direction = moveTowards(connection, pathToTarget);
+            if (direction != null &&
+                unit.getMoveType(direction) == MoveType.ATTACK) {
                 Element element = Message.createNewRootElement("attack");
                 element.setAttribute("unit", unit.getId());
-                element.setAttribute("direction", Integer.toString(direction));
+                element.setAttribute("direction", direction.toString());
 
                 try {
                     connection.ask(element);
@@ -127,30 +129,7 @@ public class UnitWanderHostileMission extends Mission {
             }
         } else {
             // Just make a random move if no target can be found.
-            int[] directions = map.getRandomDirectionArray();
-
-            int direction = directions[0];
-            int j;
-            for (j = 0; j < 8 && (map.getNeighbourOrNull(direction, thisTile) == null 
-                    || (unit.getMoveType(direction) != MoveType.MOVE
-                       && unit.getMoveType(direction) != MoveType.DISEMBARK));
-                    j++) {
-                direction = directions[j];
-            }
-            if (j == 8) {
-                return; // Not possible to move in any directions.
-            }
-            thisTile = map.getNeighbourOrNull(direction, thisTile);
-
-            Element element = Message.createNewRootElement("move");
-            element.setAttribute("unit", unit.getId());
-            element.setAttribute("direction", Integer.toString(direction));
-
-            try {
-                connection.ask(element);
-            } catch (IOException e) {
-                logger.warning("Could not send message!");
-            }
+            moveRandomly(connection);
         }
     }
 

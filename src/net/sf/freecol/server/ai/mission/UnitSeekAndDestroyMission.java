@@ -32,6 +32,7 @@ import net.sf.freecol.common.model.FreeColGameObject;
 import net.sf.freecol.common.model.GoalDecider;
 import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.Map;
+import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.Ownable;
 import net.sf.freecol.common.model.PathNode;
 import net.sf.freecol.common.model.Player;
@@ -147,15 +148,15 @@ public class UnitSeekAndDestroyMission extends Mission {
         }
         
         if (pathToTarget != null) {
-            int direction = moveTowards(connection, pathToTarget);
-            while (direction >= 0) {
+            Direction direction = moveTowards(connection, pathToTarget);
+            while (direction != null) {
                 Tile newTile = getGame().getMap().getNeighbourOrNull(direction, unit.getTile());
                 if (unit.getMoveType(direction) == MoveType.ATTACK
                         && (unit.getOwner().getStance(newTile.getDefendingUnit(unit).getOwner()) == Player.WAR
                                 || ((Ownable) target).getOwner() == newTile.getDefendingUnit(unit).getOwner())) {
                     Element element = Message.createNewRootElement("attack");
                     element.setAttribute("unit", unit.getId());
-                    element.setAttribute("direction", Integer.toString(direction));
+                    element.setAttribute("direction", direction.toString());
 
                     try {
                         connection.ask(element);
@@ -167,7 +168,7 @@ public class UnitSeekAndDestroyMission extends Mission {
                         && unit.getMoveType(direction) != MoveType.ILLEGAL_MOVE) {
                     Element element = Message.createNewRootElement("move");
                     element.setAttribute("unit", unit.getId());
-                    element.setAttribute("direction", Integer.toString(direction));
+                    element.setAttribute("direction", direction.toString());
 
                     try {
                         connection.sendAndWait(element);
@@ -207,7 +208,7 @@ public class UnitSeekAndDestroyMission extends Mission {
             public boolean check(Unit u, PathNode pathNode) {
                 goal = pathNode;
                 if (pathNode.getTile().getSettlement() == null) {
-                    for (int direction=0; direction < Map.NUMBER_OF_DIRECTIONS; direction++) {
+                    for (Direction direction : Direction.values()) {
                         Tile attackTile = u.getGame().getMap().getNeighbourOrNull(direction, pathNode.getTile());
                         if (end == attackTile 
                                 && attackTile.getSettlement() != null 

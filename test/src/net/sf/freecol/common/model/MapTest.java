@@ -26,6 +26,7 @@ import java.util.List;
 import java.util.Set;
 
 import net.sf.freecol.common.FreeColException;
+import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.Map.Position;
 import net.sf.freecol.server.generator.MapGeneratorOptions;
 import net.sf.freecol.util.test.FreeColTestCase;
@@ -87,14 +88,14 @@ public class MapTest extends FreeColTestCase {
     }
 
     public void testGetReverseDirection() {
-        assertEquals(Map.S, Map.getReverseDirection(Map.N));
-        assertEquals(Map.N, Map.getReverseDirection(Map.S));
-        assertEquals(Map.E, Map.getReverseDirection(Map.W));
-        assertEquals(Map.W, Map.getReverseDirection(Map.E));
-        assertEquals(Map.NE, Map.getReverseDirection(Map.SW));
-        assertEquals(Map.NW, Map.getReverseDirection(Map.SE));
-        assertEquals(Map.SW, Map.getReverseDirection(Map.NE));
-        assertEquals(Map.SE, Map.getReverseDirection(Map.NW));
+        assertEquals(Direction.S, Direction.N.getReverseDirection());
+        assertEquals(Direction.N, Direction.S.getReverseDirection());
+        assertEquals(Direction.E, Direction.W.getReverseDirection());
+        assertEquals(Direction.W, Direction.E.getReverseDirection());
+        assertEquals(Direction.NE, Direction.SW.getReverseDirection());
+        assertEquals(Direction.NW, Direction.SE.getReverseDirection());
+        assertEquals(Direction.SW, Direction.NE.getReverseDirection());
+        assertEquals(Direction.SE, Direction.NW.getReverseDirection());
     }
 
     public void testGetWholeMapIterator() {

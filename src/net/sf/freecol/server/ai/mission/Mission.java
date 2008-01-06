@@ -24,6 +24,7 @@ import java.io.IOException;
 import java.util.logging.Logger;
 
 import net.sf.freecol.common.model.GoalDecider;
+import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.PathNode;
 import net.sf.freecol.common.model.Tension;
 import net.sf.freecol.common.model.Tile;
@@ -95,13 +96,13 @@ public abstract class Mission extends AIObject {
     *         if the resulting move would be an {@link Unit#ATTACK} etc. A direction
     *         can also be returned during the path, if the path has been blocked.
     */
-    protected int moveTowards(Connection connection, Tile tile) {
+    protected Direction moveTowards(Connection connection, Tile tile) {
         PathNode pathNode = getUnit().findPath(tile);
         
         if (pathNode != null) {
             return moveTowards(connection, pathNode);
         } else {
-            return NO_PATH_TO_TARGET;
+            return null;
         }
     }
 
@@ -121,9 +122,9 @@ public abstract class Mission extends AIObject {
     *         moving in the given direction would not be a {@link Unit#MOVE} or
     *         {@link Unit#MOVE_HIGH_SEAS}.
     */
-    protected int moveTowards(Connection connection, PathNode pathNode) {
+    protected Direction moveTowards(Connection connection, PathNode pathNode) {
         if (getUnit().getMovesLeft() <= 0) {            
-            return NO_MORE_MOVES_LEFT;
+            return null;
         }
         
         while (pathNode.next != null && pathNode.getTurns() == 0
@@ -132,13 +133,42 @@ public abstract class Mission extends AIObject {
                 || getUnit().getMoveType(pathNode.getDirection()) == MoveType.EXPLORE_LOST_CITY_RUMOUR)) {
             move(connection, pathNode.getDirection());         
             pathNode = pathNode.next;
-        }        
+        }
         if (pathNode.getTurns() == 0 && getUnit().getMoveType(pathNode.getDirection()) != MoveType.ILLEGAL_MOVE) {
             return pathNode.getDirection();
-        }        
-        return NO_MORE_MOVES_LEFT;
+        }
+        return null;
     }
 
+    protected void moveRandomly(Connection connection) {
+        Tile thisTile = getUnit().getTile();
+        Unit unit = getUnit();
+        Direction[] randomDirections = unit.getGame().getMap().getRandomDirectionArray();
+        while (unit.getMovesLeft() > 0) {
+            Direction direction = Direction.N;
+            int j;
+            for (j = 0; j < randomDirections.length; j++) {
+                direction = randomDirections[j];
+                if (unit.getGame().getMap().getNeighbourOrNull(direction, thisTile) != null &&
+                    unit.getMoveType(direction) == MoveType.MOVE) {
+                    break;
+                }
+            }
+            if (j == randomDirections.length)
+                break;
+            thisTile = unit.getGame().getMap().getNeighbourOrNull(direction, thisTile);
+
+            Element moveElement = Message.createNewRootElement("move");
+            moveElement.setAttribute("unit", unit.getId());
+            moveElement.setAttribute("direction", direction.toString());
+
+            try {
+                connection.sendAndWait(moveElement);
+            } catch (IOException e) {
+                logger.warning("Could not send \"move\"-message!");
+            }
+        }
+    }
 
     /**
     * Moves the unit owning this mission in the given direction.
@@ -147,10 +177,10 @@ public abstract class Mission extends AIObject {
     *         when communicating with the server.    
     * @param direction The direction to move the unit.         
     */
-    protected void move(Connection connection, int direction) {
+    protected void move(Connection connection, Direction direction) {
         Element moveElement = Message.createNewRootElement("move");
         moveElement.setAttribute("unit", getUnit().getId());
-        moveElement.setAttribute("direction", Integer.toString(direction));
+        moveElement.setAttribute("direction", direction.toString());
 
         try {
             connection.sendAndWait(moveElement);
@@ -159,12 +189,12 @@ public abstract class Mission extends AIObject {
         }
     }
     
-    protected void moveButDontAttack(Connection connection, int direction) {
-        if (direction >= 0) {
-            final MoveType mt = getUnit().getMoveType(direction);
-            if (mt != MoveType.ILLEGAL_MOVE && mt != MoveType.ATTACK) {
-                move(connection, direction);                    
-            }
+    protected void moveButDontAttack(Connection connection, Direction direction) {
+        if (direction == null)
+            return;
+        final MoveType mt = getUnit().getMoveType(direction);
+        if (mt != MoveType.ILLEGAL_MOVE && mt != MoveType.ATTACK) {
+            move(connection, direction);                    
         }
     }
     

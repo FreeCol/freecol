@@ -49,22 +49,86 @@ public class Map extends FreeColGameObject {
     public static final int SMALL = 0, MEDIUM = 1, LARGE = 2, HUGE = 3,
             CUSTOM = 4;
 
+
+    // Deltas for moving to adjacent squares. Different due to the
+    // isometric map. Starting north and going clockwise.
+    /*
+    private static final int[] ODD_DX =  { 0, 1, 1,   1, 0, 0, -1, 0 };
+    private static final int[] ODD_DY =  { -2, -1, 0, 1, 2, 1, 0, -1 };
+    private static final int[] EVEN_DX = { 0, 0, 1,   0, 0, -1, -1, -1 };
+    private static final int[] EVEN_DY = { -2, -1, 0, 1, 2, 1, 0, -1 };
+    */
+
     /** The directions a Unit can move to. */
-    public static final int N = 0, NE = 1, E = 2, SE = 3, S = 4, SW = 5, W = 6,
-            NW = 7, NUMBER_OF_DIRECTIONS = 8;
+    public static enum Direction {
+        N  ( 0, -2,  0, -2), 
+        NE ( 1, -1,  0, -1), 
+        E  ( 1,  0,  1,  0),
+        SE ( 1,  1,  0,  1),
+        S  ( 0,  2,  0,  2),
+        SW ( 0,  1, -1,  1),
+        W  (-1,  0, -1,  0),
+        NW ( 0, -1, -1, -1);
+
+        private int oddDX, oddDY, evenDX, evenDY;
+
+        Direction(int oddDX, int oddDY, int evenDX, int evenDY) {
+            this.oddDX = oddDX;
+            this.oddDY = oddDY;
+            this.evenDX = evenDX;
+            this.evenDY = evenDY;
+        }
+
+        public int getOddDX() {
+            return oddDX;
+        }
+
+        public int getOddDY() {
+            return oddDY;
+        }
+
+        public int getEvenDX() {
+            return evenDX;
+        }
+
+        public int getEvenDY() {
+            return evenDY;
+        }
+
+        /**
+         * Returns the reverse direction of the given direction.
+         * 
+         * @return The reverse direction of the given direction.
+         */
+        public Direction getReverseDirection() {
+            switch (this) {
+            case N:
+                return S;
+            case NE:
+                return SW;
+            case E:
+                return W;
+            case SE:
+                return NW;
+            case S:
+                return N;
+            case SW:
+                return NE;
+            case W:
+                return E;
+            case NW:
+                return SE;
+            default:
+                return null;
+            }
+        }
+    }
 
     /** The infinity cost as used by {@link #findPath(Unit, Tile, Tile)}. */
     public static final int COST_INFINITY = Integer.MAX_VALUE - 100000000;
 
     /** Constant used for given options in {@link #findPath(Unit, Tile, Tile)}. */
     public static final int BOTH_LAND_AND_SEA = 0, ONLY_LAND = 1, ONLY_SEA = 2;
-
-    // Deltas for moving to adjacent squares. Different due to the
-    // isometric map. Starting north and going clockwise.
-    private static final int[] ODD_DX = { 0, 1, 1, 1, 0, 0, -1, 0 };
-    private static final int[] ODD_DY = { -2, -1, 0, 1, 2, 1, 0, -1 };
-    private static final int[] EVEN_DX = { 0, 0, 1, 0, 0, -1, -1, -1 };
-    private static final int[] EVEN_DY = { -2, -1, 0, 1, 2, 1, 0, -1 };
 
     private Tile[][] tiles;
 
@@ -362,11 +426,11 @@ public class Map extends FreeColGameObject {
         PathNode firstNode;
         if (unit != null) {
             firstNode = new PathNode(start, 0, getDistance(start.getPosition(),
-                    end.getPosition()), -1, unit.getMovesLeft(), 0);
+                    end.getPosition()), Direction.N, unit.getMovesLeft(), 0);
             firstNode.setOnCarrier(carrier != null);
         } else {
             firstNode = new PathNode(start, 0, getDistance(start.getPosition(),
-                    end.getPosition()), -1, -1, -1);
+                    end.getPosition()), Direction.N, -1, -1);
         }
 
         final HashMap<String, PathNode> openList = new HashMap<String, PathNode>();
@@ -405,9 +469,8 @@ public class Map extends FreeColGameObject {
             }
             
             // Try every direction:
-            for (int direction = 0; direction < 8; direction++) {
-                Tile newTile = getNeighbourOrNull(direction, currentNode
-                        .getTile());
+            for (Direction direction : Direction.values()) {
+                Tile newTile = getNeighbourOrNull(direction, currentNode.getTile());
 
                 if (newTile == null) {
                     continue;
@@ -700,7 +763,7 @@ public class Map extends FreeColGameObject {
             unit = carrier;
         }
         int ml = (unit != null) ? unit.getMovesLeft() : -1;
-        PathNode firstNode = new PathNode(startTile, 0, 0, -1, ml, 0);
+        PathNode firstNode = new PathNode(startTile, 0, 0, Direction.N, ml, 0);
         firstNode.setOnCarrier(carrier != null);
 
         final HashMap<String, PathNode> openList = new HashMap<String, PathNode>();
@@ -751,9 +814,7 @@ public class Map extends FreeColGameObject {
             }
 
             // Try every direction:
-            int[] directions = getDirectionArray();
-            for (int j = 0; j < directions.length; j++) {
-                int direction = directions[j];
+            for (Direction direction : Direction.values()) {
 
                 Tile newTile = getNeighbourOrNull(direction, currentNode
                         .getTile());
@@ -860,7 +921,7 @@ public class Map extends FreeColGameObject {
      * @return <code>true</code> if the given tile is at the edge of the map.
      */
     public boolean isAdjacentToMapEdge(Tile tile) {
-        for (int direction = 0; direction < Map.NUMBER_OF_DIRECTIONS; direction++) {
+        for (Direction direction : Direction.values()) {
             if (getNeighbourOrNull(direction, tile) == null) {
                 return true;
             }
@@ -1047,7 +1108,7 @@ public class Map extends FreeColGameObject {
      *            The Tile to get a neighbour of.
      * @return The neighbouring Tile of the given Tile in the given direction.
      */
-    public Tile getNeighbourOrNull(int direction, Tile t) {
+    public Tile getNeighbourOrNull(Direction direction, Tile t) {
         return getNeighbourOrNull(direction, t.getX(), t.getY());
     }
 
@@ -1064,7 +1125,7 @@ public class Map extends FreeColGameObject {
      * @return The neighbouring Tile of the given coordinate in the given
      *         direction or null if invalid.
      */
-    public Tile getNeighbourOrNull(int direction, int x, int y) {
+    public Tile getNeighbourOrNull(Direction direction, int x, int y) {
         if (isValid(x, y)) {
             Position pos = getAdjacent(new Position(x, y), direction);
             return getTileOrNull(pos.getX(), pos.getY());
@@ -1123,67 +1184,34 @@ public class Map extends FreeColGameObject {
     }
 
     /**
+     * Get an array of the eight directions in deterministic order.
+     * 
+     * @return array with directions.
+     */
+    public static Direction[] getDirectionArray() {
+        return new Direction[] { Direction.N, Direction.NE, Direction.E, Direction.SE,
+                                 Direction.S, Direction.SW, Direction.W, Direction.NW };
+    }
+
+    /**
      * Creates an array of the eight directions in a random order.
      * 
      * @return The array.
      */
-    public int[] getRandomDirectionArray() {
+    public Direction[] getRandomDirectionArray() {
         PseudoRandom random = getGame().getModelController().getPseudoRandom();
 
-        int[] directions = getDirectionArray();
+        Direction[] directions = getDirectionArray();
         for (int i = 0; i < directions.length; i++) {
             int i2 = random.nextInt(directions.length);
             if (i2 != i) {
-                int temp = directions[i2];
+                Direction temp = directions[i2];
                 directions[i2] = directions[i];
                 directions[i] = temp;
             }
         }
 
         return directions;
-    }
-
-    /**
-     * Get an array of the eight directions in deterministic order.
-     * 
-     * @return array with directions.
-     */
-    private int[] getDirectionArray() {
-        int[] directions = new int[8];
-        for (int i = 0; i < directions.length; i++) {
-            directions[i] = i;
-        }
-        return directions;
-    }
-
-    /**
-     * Returns the reverse direction of the given direction.
-     * 
-     * @param direction
-     *            The direction to get the reverse of.
-     * @return The reverse direction of the given direction.
-     */
-    public static int getReverseDirection(int direction) {
-        switch (direction) {
-        case N:
-            return S;
-        case NE:
-            return SW;
-        case E:
-            return W;
-        case SE:
-            return NW;
-        case S:
-            return N;
-        case SW:
-            return NE;
-        case W:
-            return E;
-        case NW:
-            return SE;
-        default:
-            throw new IllegalArgumentException("Invalid direction received.");
-        }
     }
 
     /**
@@ -1203,11 +1231,11 @@ public class Map extends FreeColGameObject {
      * @param direction The direction (N, NE, E, etc.)
      * @return Adjacent position
      */
-     public static Position getAdjacent(Position position, int direction) {
+     public static Position getAdjacent(Position position, Direction direction) {
          int x = position.x + ((position.y & 1) != 0 ?
-             ODD_DX[direction] : EVEN_DX[direction]);
+                               direction.getOddDX() : direction.getEvenDX());
          int y = position.y + ((position.y & 1) != 0 ?
-             ODD_DY[direction] : EVEN_DY[direction]);
+                               direction.getOddDY() : direction.getEvenDY());
          return new Position(x, y);
      }
 
@@ -1461,6 +1489,8 @@ public class Map extends FreeColGameObject {
      */
     private abstract class MapIterator implements Iterator<Position> {
 
+        protected Direction[] directions = getDirectionArray();
+
         /**
          * Get the next position as a position rather as an object.
          * 
@@ -1559,7 +1589,7 @@ public class Map extends FreeColGameObject {
          */
         public boolean hasNext() {
             for (int i = x; i < 8; i++) {
-                Position newPosition = getAdjacent(basePosition, i);
+                Position newPosition = getAdjacent(basePosition, directions[i]);
                 if (isValid(newPosition))
                     return true;
             }
@@ -1576,7 +1606,7 @@ public class Map extends FreeColGameObject {
         @Override
         public Position nextPosition() throws NoSuchElementException {
             for (int i = x; i < 8; i++) {
-                Position newPosition = getAdjacent(basePosition, i);
+                Position newPosition = getAdjacent(basePosition, directions[i]);
                 if (isValid(newPosition)) {
                     x = i + 1;
                     return newPosition;
@@ -1620,15 +1650,15 @@ public class Map extends FreeColGameObject {
             n = 0;
 
             if (isFilled || radius == 1) {
-                nextPosition = getAdjacent(center, NE);
+                nextPosition = getAdjacent(center, Direction.NE);
                 currentRadius = 1;
             } else {
                 currentRadius = radius;
                 nextPosition = center;
                 for (int i = 1; i < radius; i++) {
-                    nextPosition = getAdjacent(nextPosition, N);
+                    nextPosition = getAdjacent(nextPosition, Direction.N);
                 }
-                nextPosition = getAdjacent(nextPosition, NE);
+                nextPosition = getAdjacent(nextPosition, Direction.NE);
             }
             if (!isValid(nextPosition)) {
                 determineNextPosition();
@@ -1662,23 +1692,23 @@ public class Map extends FreeColGameObject {
                     } else {
                         n = 0;
                         positionReturned = false;
-                        nextPosition = getAdjacent(nextPosition, NE);
+                        nextPosition = getAdjacent(nextPosition, Direction.NE);
                     }
                 } else {
                     int i = n / width;
-                    int direction;
+                    Direction direction;
                     switch (i) {
                     case 0:
-                        direction = SE;
+                        direction = Direction.SE;
                         break;
                     case 1:
-                        direction = SW;
+                        direction = Direction.SW;
                         break;
                     case 2:
-                        direction = NW;
+                        direction = Direction.NW;
                         break;
                     case 3:
-                        direction = NE;
+                        direction = Direction.NE;
                         break;
                     default:
                         throw new IllegalStateException("i=" + i + ", n=" + n
@@ -1741,7 +1771,7 @@ public class Map extends FreeColGameObject {
          */
         public boolean hasNext() {
             for (int i = index; i < 8; i += 2) {
-                Position newPosition = getAdjacent(basePosition, i);
+                Position newPosition = getAdjacent(basePosition, directions[i]);
                 if (isValid(newPosition))
                     return true;
             }
@@ -1758,7 +1788,7 @@ public class Map extends FreeColGameObject {
         @Override
         public Position nextPosition() throws NoSuchElementException {
             for (int i = index; i < 8; i += 2) {
-                Position newPosition = getAdjacent(basePosition, i);
+                Position newPosition = getAdjacent(basePosition, directions[i]);
                 if (isValid(newPosition)) {
                     index = i + 2;
                     return newPosition;
@@ -1776,13 +1806,14 @@ public class Map extends FreeColGameObject {
      * @param baseNumber The base to be used to create the base array.
      * @return A base array that can create unique identifiers for any combination
      */
-    public static int[] getBase(int[] directions, int baseNumber) {
-        int[] base = new int[NUMBER_OF_DIRECTIONS];
+    public static int[] getBase(Direction[] directions, int baseNumber) {
+        Direction[] allDirections = getDirectionArray();
+        int[] base = new int[allDirections.length];
         int n = 1;
-        for (int i = 0; i < NUMBER_OF_DIRECTIONS; i++) {
+        for (int i = 0; i < allDirections.length; i++) {
             base[i] = 0;
-            for (int j : directions) {
-                if (j == i) {
+            for (Direction direction : directions) {
+                if (direction == allDirections[i]) {
                     base[i] = n;
                     n *= baseNumber;
                     break;

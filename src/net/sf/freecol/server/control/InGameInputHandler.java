@@ -46,6 +46,7 @@ import net.sf.freecol.common.model.IndianSettlement;
 import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.LostCityRumour;
 import net.sf.freecol.common.model.Map;
+import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.Monarch;
 import net.sf.freecol.common.model.Nameable;
 import net.sf.freecol.common.model.Ownable;
@@ -709,7 +710,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
             throw new IllegalArgumentException("Could not find 'Unit' with specified ID: "
                                                + element.getAttribute("unit"));
         }
-        int direction = Integer.parseInt(element.getAttribute("direction"));
+        Direction direction = Enum.valueOf(Direction.class, element.getAttribute("direction"));
         Tile tile = getGame().getMap().getNeighbourOrNull(direction, unit.getTile());
         if (tile == null) {
             throw new IllegalArgumentException("Could not find 'Tile' in direction " +
@@ -764,7 +765,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         ServerPlayer player = freeColServer.getPlayer(connection);
         // Get parameters:
         Unit unit = (Unit) getGame().getFreeColGameObject(spyElement.getAttribute("unit"));
-        int direction = Integer.parseInt(spyElement.getAttribute("direction"));
+        Direction direction = Enum.valueOf(Direction.class, spyElement.getAttribute("direction"));
         // Test the parameters:
         if (unit == null) {
             throw new IllegalArgumentException("Could not find 'Unit' with specified ID: "
@@ -843,7 +844,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         ServerPlayer player = freeColServer.getPlayer(connection);
         String unitID = moveElement.getAttribute("unit");
         Unit unit = (Unit) getGame().getFreeColGameObject(unitID);
-        int direction = Integer.parseInt(moveElement.getAttribute("direction"));
+        Direction direction = Enum.valueOf(Direction.class, moveElement.getAttribute("direction"));
         if (unit == null) {
             throw new IllegalArgumentException("Could not find 'Unit' with specified ID: " + unitID);
         }
@@ -865,14 +866,14 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
             try {
                 if (unit.isVisibleTo(enemyPlayer)) { // && !disembark
                     Element opponentMoveElement = Message.createNewRootElement("opponentMove");
-                    opponentMoveElement.setAttribute("direction", Integer.toString(direction));
+                    opponentMoveElement.setAttribute("direction", direction.toString());
                     opponentMoveElement.setAttribute("unit", unit.getId());
                     enemyPlayer.getConnection().send(opponentMoveElement);
                 } else if (enemyPlayer.canSee(newTile)
                         && (newTile.getSettlement() == null || !getGame().getGameOptions().getBoolean(
                                 GameOptions.UNIT_HIDING))) {
                     Element opponentMoveElement = Message.createNewRootElement("opponentMove");
-                    opponentMoveElement.setAttribute("direction", Integer.toString(direction));
+                    opponentMoveElement.setAttribute("direction", direction.toString());
                     opponentMoveElement.setAttribute("tile", newTile.getId());
                     opponentMoveElement.appendChild(unit.toXMLElement(enemyPlayer, opponentMoveElement
                             .getOwnerDocument()));
@@ -1177,7 +1178,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         Map map = getGame().getMap();
         ServerPlayer player = freeColServer.getPlayer(connection);
         Unit unit = (Unit) getGame().getFreeColGameObject(element.getAttribute("unit"));
-        int direction = Integer.parseInt(element.getAttribute("direction"));
+        Direction direction = Enum.valueOf(Direction.class, element.getAttribute("direction"));
         if (unit == null) {
             throw new IllegalArgumentException("Could not find 'Unit' with specified ID: "
                     + element.getAttribute("unit"));
@@ -1229,7 +1230,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         // Get parameters:
         String unitID = attackElement.getAttribute("unit");
         Unit unit = (Unit) getGame().getFreeColGameObject(unitID);
-        int direction = Integer.parseInt(attackElement.getAttribute("direction"));
+        Direction direction = Enum.valueOf(Direction.class, attackElement.getAttribute("direction"));
         // Test the parameters:
         if (unit == null) {
             throw new IllegalArgumentException("Could not find 'Unit' with specified ID: " + unitID);
@@ -1272,7 +1273,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
             }
             Element opponentAttackElement = Message.createNewRootElement("opponentAttack");
             if (unit.isVisibleTo(enemyPlayer) || defender.isVisibleTo(enemyPlayer)) {
-                opponentAttackElement.setAttribute("direction", Integer.toString(direction));
+                opponentAttackElement.setAttribute("direction", direction.toString());
                 opponentAttackElement.setAttribute("result", result.toString());
                 opponentAttackElement.setAttribute("plunderGold", Integer.toString(plunderGold));
                 opponentAttackElement.setAttribute("unit", unit.getId());
@@ -1431,7 +1432,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         FreeColServer freeColServer = getFreeColServer();
         ServerPlayer player = freeColServer.getPlayer(connection);
         Unit unit = (Unit) getGame().getFreeColGameObject(embarkElement.getAttribute("unit"));
-        int direction = Integer.parseInt(embarkElement.getAttribute("direction"));
+        Direction direction = Enum.valueOf(Direction.class, embarkElement.getAttribute("direction"));
         Unit destinationUnit = (Unit) getGame().getFreeColGameObject(embarkElement.getAttribute("embarkOnto"));
         if (unit == null || destinationUnit == null
                 || getGame().getMap().getNeighbourOrNull(direction, unit.getTile()) != destinationUnit.getTile()) {
@@ -1525,7 +1526,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         Map map = getGame().getMap();
         ServerPlayer player = freeColServer.getPlayer(connection);
         Unit unit = (Unit) getGame().getFreeColGameObject(element.getAttribute("unit"));
-        int direction = Integer.parseInt(element.getAttribute("direction"));
+        Direction direction = Enum.valueOf(Direction.class, element.getAttribute("direction"));
         boolean cancelAction = false;
         if (element.getAttribute("action").equals("cancel")) {
             cancelAction = true;
@@ -1544,7 +1545,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
             throw new IllegalStateException("Unit can't learn that skill from settlement!");
         }
         
-        Tile tile = map.getNeighbourOrNull(Map.getReverseDirection(direction), unit.getTile());
+        Tile tile = map.getNeighbourOrNull(direction.getReverseDirection(), unit.getTile());
         unit.setLocation(tile);
         if (!cancelAction) {
             switch (settlement.getAlarm(player).getLevel()) {
@@ -1583,7 +1584,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         if (unit.getOwner() != player) {
             throw new IllegalStateException("Not your unit!");
         }
-        int direction = Integer.parseInt(element.getAttribute("direction"));
+        Direction direction = Enum.valueOf(Direction.class, element.getAttribute("direction"));
         String action = element.getAttribute("action");
         IndianSettlement settlement;
         if (action.equals("basic")) {
@@ -1594,7 +1595,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         } else {
             settlement = (IndianSettlement) unit.getTile().getSettlement();
             // Move the unit back to its original Tile.
-            unit.setLocation(map.getNeighbourOrNull(Map.getReverseDirection(direction), unit.getTile()));
+            unit.setLocation(map.getNeighbourOrNull(direction.getReverseDirection(), unit.getTile()));
         }
         Element reply = Message.createNewRootElement("scoutIndianSettlementResult");
         if (action.equals("basic")) {
@@ -1672,7 +1673,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         ServerPlayer player = freeColServer.getPlayer(connection);
         // Get parameters:
         Unit unit = (Unit) getGame().getFreeColGameObject(element.getAttribute("unit"));
-        int direction = Integer.parseInt(element.getAttribute("direction"));
+        Direction direction = Enum.valueOf(Direction.class, element.getAttribute("direction"));
         // Test the parameters:
         if (unit == null) {
             throw new IllegalArgumentException("Could not find 'Unit' with specified ID: "
@@ -1728,7 +1729,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         Map map = getGame().getMap();
         ServerPlayer player = freeColServer.getPlayer(connection);
         Unit unit = (Unit) getGame().getFreeColGameObject(element.getAttribute("unit"));
-        int direction = Integer.parseInt(element.getAttribute("direction"));
+        Direction direction = Enum.valueOf(Direction.class, element.getAttribute("direction"));
         String action = element.getAttribute("action");
         IndianSettlement settlement = (IndianSettlement) map.getNeighbourOrNull(direction, unit.getTile())
                 .getSettlement();
@@ -1807,11 +1808,11 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         Map map = getGame().getMap();
         ServerPlayer player = freeColServer.getPlayer(connection);
         Unit unit = (Unit) getGame().getFreeColGameObject(element.getAttribute("unit"));
-        int direction = Integer.parseInt(element.getAttribute("direction"));
+        Direction direction = Enum.valueOf(Direction.class, element.getAttribute("direction"));
         String confirmed = element.getAttribute("confirmed");
         IndianSettlement settlement = (IndianSettlement) unit.getTile().getSettlement();
         // Move the unit back to its original Tile.
-        unit.setLocation(map.getNeighbourOrNull(Map.getReverseDirection(direction), unit.getTile()));
+        unit.setLocation(map.getNeighbourOrNull(direction.getReverseDirection(), unit.getTile()));
         if (confirmed.equals("true")) {
             Player enemy = (Player) getGame().getFreeColGameObject(element.getAttribute("enemy"));
             int amount = Game.getInciteAmount(player, enemy, settlement.getOwner());

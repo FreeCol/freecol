@@ -22,14 +22,18 @@ package net.sf.freecol.server.generator;
 //import java.util.logging.Logger;
 
 import net.sf.freecol.common.model.Map;
+import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.TileImprovement;
 
 
 /**
- * This class facilitates building, editing the TileImprovement style for rivers
- * Rivers on the Map are composed of many individual TileImprovements displayed on each Tile the river flows through
- * The river TileImprovement on a Tile has a style which represents the inputs/outputs of water to/from neighboring Tiles
- * This class allows manipulation of individual stream(s) to neighboring Tiles (there are many in case of confluence)
+ * This class facilitates building, editing the TileImprovement style
+ * for rivers Rivers on the Map are composed of many individual
+ * TileImprovements displayed on each Tile the river flows through The
+ * river TileImprovement on a Tile has a style which represents the
+ * inputs/outputs of water to/from neighboring Tiles This class allows
+ * manipulation of individual stream(s) to neighboring Tiles (there
+ * are many in case of confluence)
  */
 public class RiverSection {
 
@@ -38,7 +42,7 @@ public class RiverSection {
     /**
      * Directions a river is allowed to flow
      */
-    private static int[] directions = {Map.NE, Map.SE, Map.SW, Map.NW};
+    private static Direction[] directions = {Direction.NE, Direction.SE, Direction.SW, Direction.NW};
     
     /**
      * Base numbers used to encode/decode the river style
@@ -61,7 +65,7 @@ public class RiverSection {
     /**
      * Direction the river is flowing toward, at the current section
      */
-    public int direction = -1;
+    public Direction direction;
     
     /**
      * Position of the current river section
@@ -83,7 +87,7 @@ public class RiverSection {
      * @param position The map position
      * @param direction The direction the river is flowing toward
      */
-    public RiverSection(Map.Position position, int direction) {
+    public RiverSection(Map.Position position, Direction direction) {
         this.position = position;
         this.direction = direction;
         setBranch(direction, TileImprovement.SMALL_RIVER);
@@ -137,7 +141,7 @@ public class RiverSection {
     /**
      * Sets the size of a branch
      */
-    public void setBranch(int direction, int size) {
+    public void setBranch(Direction direction, int size) {
         if (size != TileImprovement.SMALL_RIVER) {
             size = TileImprovement.LARGE_RIVER;
         }
@@ -154,7 +158,7 @@ public class RiverSection {
     /**
      * Gets the size of a branch
      */
-    public int getBranch(int direction) {
+    public int getBranch(Direction direction) {
         for (int i=0; i<directions.length; i++) {
             if (base[i] == 0) {
                 continue;                       // Skip this direction
@@ -169,14 +173,14 @@ public class RiverSection {
     /**
      * Removes a branch
      */
-    public void removeBranch(int direction) {
+    public void removeBranch(Direction direction) {
         setBranch(direction, TileImprovement.NO_RIVER);
     }
     
     /**
      * Increases the size a branch
      */
-    public void growBranch(int direction, int increment) {
+    public void growBranch(Direction direction, int increment) {
         for (int i=0; i<directions.length; i++) {
             if (base[i] == 0) {
                 continue;                       // Skip this direction

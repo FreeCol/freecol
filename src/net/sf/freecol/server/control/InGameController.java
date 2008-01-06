@@ -35,6 +35,7 @@ import net.sf.freecol.common.model.FoundingFather.FoundingFatherType;
 import net.sf.freecol.common.model.GameOptions;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.Map;
+import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.Monarch;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Settlement;
@@ -570,7 +571,7 @@ public final class InGameController extends Controller {
                 Unit attacker = colony.getBombardingAttacker();
                 logger.finest("Colony has attack power " + attackPower);
                 Position colonyPosition = colony.getTile().getPosition();
-                for (int direction = 0; direction < Map.NUMBER_OF_DIRECTIONS; direction++) {
+                for (Direction direction : Direction.values()) {
                     Tile tile = map.getTile(Map.getAdjacent(colonyPosition, direction));
                     if (!tile.isLand()) {
                         Iterator<Unit> unitIterator = tile.getUnitIterator();
@@ -612,7 +613,7 @@ public final class InGameController extends Controller {
 
                                     Element opponentAttackElement = Message.createNewRootElement("opponentAttack");
                                     if (unit.isVisibleTo(enemyPlayer)) {
-                                        opponentAttackElement.setAttribute("direction", Integer.toString(direction));
+                                        opponentAttackElement.setAttribute("direction", direction.toString());
                                         opponentAttackElement.setAttribute("result", result.toString());
                                         opponentAttackElement .setAttribute("plunderGold",
                                                                             Integer.toString(plunderGold));

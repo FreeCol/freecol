@@ -29,16 +29,15 @@ import javax.swing.SwingUtilities;
 
 import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.common.model.Map;
+import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.Tile;
 
 /**
  * Listens to the mouse being moved at the level of the Canvas.
  */
 public final class CanvasMapEditorMouseMotionListener implements MouseMotionListener {
+
     private static final Logger logger = Logger.getLogger(CanvasMapEditorMouseMotionListener.class.getName());
-
-
-
 
     private final Canvas canvas;
 
@@ -46,7 +45,6 @@ public final class CanvasMapEditorMouseMotionListener implements MouseMotionList
 
     private ScrollThread scrollThread;
 
-    // private static final int SCROLLSPACE = 3;
     private static final int SCROLLSPACE = 100;
 
 
@@ -107,31 +105,31 @@ public final class CanvasMapEditorMouseMotionListener implements MouseMotionList
          * if (y < canvas.getMenuBarHeight() + SCROLLSPACE) { y -=
          * canvas.getMenuBarHeight(); }
          */
-        int direction;
+        Direction direction;
         if ((x < SCROLLSPACE) && (y < SCROLLSPACE)) {
             // Upper-Left
-            direction = Map.NW;
+            direction = Direction.NW;
         } else if ((x >= gui.getWidth() - SCROLLSPACE) && (y < SCROLLSPACE)) {
             // Upper-Right
-            direction = Map.NE;
+            direction = Direction.NE;
         } else if ((x >= gui.getWidth() - SCROLLSPACE) && (y >= gui.getHeight() - SCROLLSPACE)) {
             // Bottom-Right
-            direction = Map.SE;
+            direction = Direction.SE;
         } else if ((x < SCROLLSPACE) && (y >= gui.getHeight() - SCROLLSPACE)) {
             // Bottom-Left
-            direction = Map.SW;
+            direction = Direction.SW;
         } else if (y < SCROLLSPACE) {
             // Top
-            direction = Map.N;
+            direction = Direction.N;
         } else if (x >= gui.getWidth() - SCROLLSPACE) {
             // Right
-            direction = Map.E;
+            direction = Direction.E;
         } else if (y >= gui.getHeight() - SCROLLSPACE) {
             // Bottom
-            direction = Map.S;
+            direction = Direction.S;
         } else if (x < SCROLLSPACE) {
             // Left
-            direction = Map.W;
+            direction = Direction.W;
         } else {
             // Center
             if (scrollThread != null) {
@@ -187,11 +185,12 @@ public final class CanvasMapEditorMouseMotionListener implements MouseMotionList
      * Scrolls the view of the Map by moving its focus.
      */
     private class ScrollThread extends Thread {
+
         private final Map map;
 
         private final GUI gui;
 
-        private int direction;
+        private Direction direction;
 
         private boolean cont;
 
@@ -213,7 +212,7 @@ public final class CanvasMapEditorMouseMotionListener implements MouseMotionList
          * 
          * @param d The direction in which this ScrollThread will scroll.
          */
-        public void setDirection(int d) {
+        public void setDirection(Direction d) {
             direction = d;
         }
 

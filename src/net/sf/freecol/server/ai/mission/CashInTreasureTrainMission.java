@@ -29,6 +29,7 @@ import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.freecol.common.model.GoalDecider;
 import net.sf.freecol.common.model.Map;
+import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.PathNode;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
@@ -133,7 +134,7 @@ public class CashInTreasureTrainMission extends Mission {
             PathNode bestPath = map.search(getUnit(), destinationDecider, Integer.MAX_VALUE);        
             
             if (bestPath != null) {
-                int direction = moveTowards(connection, bestPath);
+                Direction direction = moveTowards(connection, bestPath);
                 moveButDontAttack(connection, direction);
             }
         }

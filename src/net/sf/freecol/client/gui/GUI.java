@@ -57,6 +57,7 @@ import net.sf.freecol.common.model.Europe;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.IndianSettlement;
 import net.sf.freecol.common.model.Map;
+import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.PathNode;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Settlement;
@@ -76,9 +77,11 @@ import net.sf.freecol.common.model.Map.Position;
 * of this class.
 */
 public final class GUI {
+
     private static final Logger logger = Logger.getLogger(GUI.class.getName());
 
-
+    private static final Direction[] southernDirections = new Direction[] {
+        Direction.SE, Direction.S, Direction.SW };
 
     private final FreeColClient freeColClient;
     private Dimension size;
@@ -252,10 +255,10 @@ public final class GUI {
         updateMapDisplayVariables();
     }
     
-    public void moveTileCursor(int direction){
+    public void moveTileCursor(Direction direction){
         Tile selectedTile = freeColClient.getGame().getMap().getTileOrNull(getSelectedTile());
         if(selectedTile != null){   
-            Tile newTile = freeColClient.getGame().getMap().getNeighbourOrNull(direction,selectedTile);
+            Tile newTile = freeColClient.getGame().getMap().getNeighbourOrNull(direction, selectedTile);
             if(newTile != null)
                 setSelectedTile(newTile.getPosition());
         }
@@ -1549,12 +1552,14 @@ public final class GUI {
 
         Map.Position pos = new Map.Position(tile.getX(), tile.getY());
 
-        for (int i = 0; i < 8; i++) {
-            Map.Position p = Map.getAdjacent(pos, i);
+        for (Direction direction : Direction.values()) {
+            Map.Position p = Map.getAdjacent(pos, direction);
             if (map.isValid(p)) {
                 Tile borderingTile = map.getTile(p.x, p.y);
 
-                if (!drawUnexploredBorders && !borderingTile.isExplored() && i >= 3 && i <= 5) {
+                if (!drawUnexploredBorders && !borderingTile.isExplored() &&
+                    (direction == Direction.SE || direction == Direction.S ||
+                     direction == Direction.SW)) {
                     continue;
                 }
 
@@ -1566,17 +1571,17 @@ public final class GUI {
                 if (!tile.isLand() && borderingTile.isLand() && borderingTile.isExplored()) {
                     // If there is a Coast image (eg. beach) defined, use it, otherwise skip
                     if (borderingTile.getType().getArtCoast() != null) {
-                        g.drawImage(lib.getCoastImage(borderingTile.getType(), i,
+                        g.drawImage(lib.getCoastImage(borderingTile.getType(), direction,
                                                         tile.getX(), tile.getY()),
                                                         x, y, null);
                     }
-                    g.drawImage(lib.getBorderImage(borderingTile.getType(), i,
+                    g.drawImage(lib.getBorderImage(borderingTile.getType(), direction,
                                                     tile.getX(), tile.getY()),
                                                     x, y, null);
                 } else if (tile.isExplored() && borderingTile.isExplored() &&
                         borderingTile.getType().getIndex() < tile.getType().getIndex()) {
                     // Draw land terrain with bordering land type
-                    g.drawImage(lib.getBorderImage(borderingTile.getType(), i,
+                    g.drawImage(lib.getBorderImage(borderingTile.getType(), direction,
                                                     tile.getX(), tile.getY()),
                                                     x, y, null);
                 }
@@ -1725,8 +1730,8 @@ public final class GUI {
             if (tile.hasRoad()) {
                 long seed = Long.parseLong(Integer.toString(tile.getX()) + Integer.toString(tile.getY()));
                 boolean connectedRoad = false;
-                for (int i = 0; i < 8; i++) {
-                    Map.Position p = Map.getAdjacent(pos, i);
+                for (Direction direction : Direction.values()) {
+                    Map.Position p = Map.getAdjacent(pos, direction);
                     if (map.isValid(p)) {
                         Tile borderingTile = map.getTile(p);
                         if (borderingTile.hasRoad()) {
@@ -1734,15 +1739,15 @@ public final class GUI {
                             int nx = x + tileWidth/2;
                             int ny = y + tileHeight/2;
 
-                            switch (i) {
-                                case 0: nx = x + tileWidth/2; ny = y; break;
-                                case 1: nx = x + (tileWidth*3)/4; ny = y + tileHeight/4; break;
-                                case 2: nx = x + tileWidth; ny = y + tileHeight/2; break;
-                                case 3: nx = x + (tileWidth*3)/4; ny = y + (tileHeight*3)/4; break;
-                                case 4: nx = x + tileWidth/2; ny = y + tileHeight; break;
-                                case 5: nx = x + tileWidth/4; ny = y + (tileHeight*3)/4; break;
-                                case 6: nx = x; ny = y + tileHeight/2; break;
-                                case 7: nx = x + tileWidth/4; ny = y + tileHeight/4; break;
+                            switch (direction) {
+                                case N : nx = x + tileWidth/2; ny = y; break;
+                                case NE: nx = x + (tileWidth*3)/4; ny = y + tileHeight/4; break;
+                                case E : nx = x + tileWidth; ny = y + tileHeight/2; break;
+                                case SE: nx = x + (tileWidth*3)/4; ny = y + (tileHeight*3)/4; break;
+                                case S : nx = x + tileWidth/2; ny = y + tileHeight; break;
+                                case SW: nx = x + tileWidth/4; ny = y + (tileHeight*3)/4; break;
+                                case W : nx = x; ny = y + tileHeight/2; break;
+                                case NW: nx = x + tileWidth/4; ny = y + tileHeight/4; break;
                             }
 
                             drawRoad(g, seed, x + tileWidth/2, y + tileHeight/2, nx, ny);
@@ -1892,8 +1897,8 @@ public final class GUI {
         if (tile.isExplored()) {
             Map.Position pos = new Map.Position(tile.getX(), tile.getY());
 
-            for (int i = 3; i < 6; i++) {
-                Map.Position p = Map.getAdjacent(pos, i);
+            for (Direction direction : southernDirections) {
+                Map.Position p = Map.getAdjacent(pos, direction);
                 if (map.isValid(p)) {
                     Tile borderingTile = map.getTile(p);
 
@@ -1901,7 +1906,7 @@ public final class GUI {
                         continue;
                     }
 
-                    g.drawImage(lib.getBorderImage(null, i, tile.getX(), tile.getY()), x, y, null);
+                    g.drawImage(lib.getBorderImage(null, direction, tile.getX(), tile.getY()), x, y, null);
                 }
             }
         }

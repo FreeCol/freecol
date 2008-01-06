@@ -26,6 +26,7 @@ import java.util.logging.Logger;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
+import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.Map.Position;
 
 import org.w3c.dom.Element;
@@ -163,23 +164,23 @@ abstract public class Settlement extends FreeColGameObject implements Location, 
     */
     public Tile getTile(int x, int y) {
         if (x==0 && y==0) {
-            return getGame().getMap().getNeighbourOrNull(Map.N, tile);
+            return getGame().getMap().getNeighbourOrNull(Direction.N, tile);
         } else if (x==0 && y== 1) {
-            return getGame().getMap().getNeighbourOrNull(Map.NE, tile);
+            return getGame().getMap().getNeighbourOrNull(Direction.NE, tile);
         } else if (x==0 && y== 2) {
-            return getGame().getMap().getNeighbourOrNull(Map.E, tile);
+            return getGame().getMap().getNeighbourOrNull(Direction.E, tile);
         } else if (x==1 && y== 0) {
-            return getGame().getMap().getNeighbourOrNull(Map.NW, tile);
+            return getGame().getMap().getNeighbourOrNull(Direction.NW, tile);
         } else if (x==1 && y== 1) {
             return tile;
         } else if (x==1 && y== 2) {
-            return getGame().getMap().getNeighbourOrNull(Map.SE, tile);
+            return getGame().getMap().getNeighbourOrNull(Direction.SE, tile);
         } else if (x==2 && y== 0) {
-            return getGame().getMap().getNeighbourOrNull(Map.W, tile);
+            return getGame().getMap().getNeighbourOrNull(Direction.W, tile);
         } else if (x==2 && y== 1) {
-            return getGame().getMap().getNeighbourOrNull(Map.SW, tile);
+            return getGame().getMap().getNeighbourOrNull(Direction.SW, tile);
         } else if (x==2 && y== 2) {
-            return getGame().getMap().getNeighbourOrNull(Map.S, tile);
+            return getGame().getMap().getNeighbourOrNull(Direction.S, tile);
         } else {
             return null;
         }

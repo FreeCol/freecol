@@ -44,6 +44,8 @@ import net.sf.freecol.client.gui.action.SentryAction;
 import net.sf.freecol.client.gui.action.SkipUnitAction;
 import net.sf.freecol.client.gui.action.WaitAction;
 import net.sf.freecol.client.gui.panel.MapEditorTransformPanel.MapTransform;
+import net.sf.freecol.common.model.Map;
+import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.Tile;
 
 
@@ -102,23 +104,10 @@ public final class MapControls {
         ubList.add(new UnitButton(am.getFreeColAction(BuildColonyAction.id)));
         ubList.add(new UnitButton(am.getFreeColAction(DisbandUnitAction.id)));
         unitButton = (ubList.toArray(new UnitButton[0]));
-        /*  Depreciated
-        unitButton = new UnitButton[] {
-            new UnitButton(am.getFreeColAction(WaitAction.id)),
-            new UnitButton(am.getFreeColAction(SkipUnitAction.id)),
-            new UnitButton(am.getFreeColAction(SentryAction.id)),
-            new UnitButton(am.getFreeColAction(FortifyAction.id)),
-            new UnitButton(am.getFreeColAction(PlowAction.id)),
-            new UnitButton(am.getFreeColAction(BuildRoadAction.id)),
-            new UnitButton(am.getFreeColAction(BuildColonyAction.id)),
-            new UnitButton(am.getFreeColAction(DisbandUnitAction.id))
-        };
-        */
-        
+
         //
         // Don't allow them to gain focus
         //
-
         infoPanel.setFocusable(false);
         miniMap.setFocusable(false);
         compassRose.setFocusable(false);
@@ -136,7 +125,7 @@ public final class MapControls {
                     if (theta < 0) {
                         theta += 2*Math.PI;
                     }
-                    int direction = (int) Math.floor(theta / (Math.PI/4));
+                    Direction direction = Map.getDirectionArray()[(int) Math.floor(theta / (Math.PI/4))];
                     freeColClient.getInGameController().moveActiveUnit(direction);
                 }
             });

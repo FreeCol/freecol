@@ -26,7 +26,7 @@ import java.util.logging.Logger;
 
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.control.InGameController;
-import net.sf.freecol.common.model.Map;
+import net.sf.freecol.common.model.Map.Direction;
 
 /**
  * Listens to keys being pressed at the level of the Canvas.
@@ -96,21 +96,21 @@ public final class CanvasKeyListener implements KeyListener {
             break;
         case KeyEvent.VK_NUMPAD1:
         case KeyEvent.VK_END:
-            parent.getGUI().moveTileCursor(Map.SW);
+            parent.getGUI().moveTileCursor(Direction.SW);
             break;
         case KeyEvent.VK_NUMPAD2:
         case KeyEvent.VK_KP_DOWN:
         case KeyEvent.VK_DOWN:
-            parent.getGUI().moveTileCursor(Map.S);
+            parent.getGUI().moveTileCursor(Direction.S);
             break;
         case KeyEvent.VK_NUMPAD3:
         case KeyEvent.VK_PAGE_DOWN:
-            parent.getGUI().moveTileCursor(Map.SE);
+            parent.getGUI().moveTileCursor(Direction.SE);
             break;
         case KeyEvent.VK_NUMPAD4:
         case KeyEvent.VK_KP_LEFT:
         case KeyEvent.VK_LEFT:
-            parent.getGUI().moveTileCursor(Map.W);
+            parent.getGUI().moveTileCursor(Direction.W);
             break;
         case KeyEvent.VK_NUMPAD5:
         case KeyEvent.VK_C:
@@ -119,20 +119,20 @@ public final class CanvasKeyListener implements KeyListener {
         case KeyEvent.VK_NUMPAD6:
         case KeyEvent.VK_KP_RIGHT:
         case KeyEvent.VK_RIGHT:
-            parent.getGUI().moveTileCursor(Map.E);
+            parent.getGUI().moveTileCursor(Direction.E);
             break;
         case KeyEvent.VK_NUMPAD7:
         case KeyEvent.VK_HOME:
-            parent.getGUI().moveTileCursor(Map.NW);
+            parent.getGUI().moveTileCursor(Direction.NW);
             break;
         case KeyEvent.VK_NUMPAD8:
         case KeyEvent.VK_KP_UP:
         case KeyEvent.VK_UP:
-            parent.getGUI().moveTileCursor(Map.N);
+            parent.getGUI().moveTileCursor(Direction.N);
             break;
         case KeyEvent.VK_NUMPAD9:
         case KeyEvent.VK_PAGE_UP:
-            parent.getGUI().moveTileCursor(Map.NE);
+            parent.getGUI().moveTileCursor(Direction.NE);
             break;
         case KeyEvent.VK_SPACE:
             TerrainCursor cursor = parent.getGUI().getCursor();
@@ -154,21 +154,21 @@ public final class CanvasKeyListener implements KeyListener {
             break;
         case KeyEvent.VK_NUMPAD1:
         case KeyEvent.VK_END:
-            inGameController.moveActiveUnit(Map.SW);
+            inGameController.moveActiveUnit(Direction.SW);
             break;
         case KeyEvent.VK_NUMPAD2:
         case KeyEvent.VK_KP_DOWN:
         case KeyEvent.VK_DOWN:
-            inGameController.moveActiveUnit(Map.S);
+            inGameController.moveActiveUnit(Direction.S);
             break;
         case KeyEvent.VK_NUMPAD3:
         case KeyEvent.VK_PAGE_DOWN:
-            inGameController.moveActiveUnit(Map.SE);
+            inGameController.moveActiveUnit(Direction.SE);
             break;
         case KeyEvent.VK_NUMPAD4:
         case KeyEvent.VK_KP_LEFT:
         case KeyEvent.VK_LEFT:
-            inGameController.moveActiveUnit(Map.W);
+            inGameController.moveActiveUnit(Direction.W);
             break;
         case KeyEvent.VK_NUMPAD5:
         case KeyEvent.VK_C:
@@ -177,20 +177,20 @@ public final class CanvasKeyListener implements KeyListener {
         case KeyEvent.VK_NUMPAD6:
         case KeyEvent.VK_KP_RIGHT:
         case KeyEvent.VK_RIGHT:
-            inGameController.moveActiveUnit(Map.E);
+            inGameController.moveActiveUnit(Direction.E);
             break;
         case KeyEvent.VK_NUMPAD7:
         case KeyEvent.VK_HOME:
-            inGameController.moveActiveUnit(Map.NW);
+            inGameController.moveActiveUnit(Direction.NW);
             break;
         case KeyEvent.VK_NUMPAD8:
         case KeyEvent.VK_KP_UP:
         case KeyEvent.VK_UP:
-            inGameController.moveActiveUnit(Map.N);
+            inGameController.moveActiveUnit(Direction.N);
             break;
         case KeyEvent.VK_NUMPAD9:
         case KeyEvent.VK_PAGE_UP:
-            inGameController.moveActiveUnit(Map.NE);
+            inGameController.moveActiveUnit(Direction.NE);
             break;
         default:
             logger.info("The typed key (" + e.getKeyCode() + ") doesn't have a function yet.");

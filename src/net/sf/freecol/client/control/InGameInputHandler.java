@@ -39,6 +39,7 @@ import net.sf.freecol.common.model.FreeColGameObject;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.LostCityRumour;
 import net.sf.freecol.common.model.Map;
+import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.ModelMessage;
 import net.sf.freecol.common.model.Monarch;
 import net.sf.freecol.common.model.Player;
@@ -224,7 +225,7 @@ public final class InGameInputHandler extends InputHandler {
     private Element opponentMove(Element opponentMoveElement) {
         Map map = getGame().getMap();
 
-        int direction = Integer.parseInt(opponentMoveElement.getAttribute("direction"));
+        Direction direction = Enum.valueOf(Direction.class, opponentMoveElement.getAttribute("direction"));
 
         if (!opponentMoveElement.hasAttribute("tile")) {
             final Unit unit = (Unit) getGame().getFreeColGameObjectSafely(opponentMoveElement.getAttribute("unit"));
@@ -605,7 +606,7 @@ public final class InGameInputHandler extends InputHandler {
             throw new IllegalArgumentException("Could not find 'Unit' with specified ID: "
                                                + element.getAttribute("unit"));
         }
-        int direction = Integer.parseInt(element.getAttribute("direction"));
+        Direction direction = Enum.valueOf(Direction.class, element.getAttribute("direction"));
         Tile tile = getGame().getMap().getNeighbourOrNull(direction, unit.getTile());
         if (tile == null) {
             throw new IllegalArgumentException("Could not find 'Tile' in direction " +

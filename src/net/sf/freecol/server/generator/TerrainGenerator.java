@@ -29,6 +29,7 @@ import java.util.logging.Logger;
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Map;
+import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.Region;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.TileType;
@@ -41,6 +42,8 @@ public class TerrainGenerator {
 
     private static final Logger logger = Logger.getLogger(TerrainGenerator.class.getName());
     
+    private static final Direction[] directions = Map.getDirectionArray();
+
     private final MapGeneratorOptions mapGeneratorOptions;
 
     private final Random random = new Random();
@@ -162,8 +165,8 @@ public class TerrainGenerator {
             }
         } else {
             int adjacentLand = 0;
-            for (int k=0; k<8; k++) {
-                Position mp = Map.getAdjacent(t.getPosition(), k);
+            for (Direction direction : Direction.values()) {
+                Position mp = Map.getAdjacent(t.getPosition(), direction);
                 final boolean valid = Map.isValid(mp, landMap.length, landMap[0].length);
                 if (valid && landMap[mp.getX()][mp.getY()]) {
                     adjacentLand++;
@@ -456,9 +459,8 @@ public class TerrainGenerator {
         for (int tries = 0; tries < 100; tries++) {
             if (counter < number) {
                 Position p = map.getRandomLandPosition();
-                if (p != null
-                        && map.getTile(p).isLand()) {
-                    int direction = random.nextInt(8);
+                if (p != null && map.getTile(p).isLand()) {
+                    Direction direction = directions[random.nextInt(8)];
                     int length = maximumLength - random.nextInt(maximumLength/2);
                     logger.info("Direction of mountain range is " + direction +
                             ", length of mountain range is " + length);

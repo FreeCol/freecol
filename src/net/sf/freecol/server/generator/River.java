@@ -27,6 +27,7 @@ import java.util.logging.Logger;
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.common.PseudoRandom;
 import net.sf.freecol.common.model.Map;
+import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.TileImprovement;
 import net.sf.freecol.common.model.TileType;
@@ -40,12 +41,14 @@ public class River {
 
     private static final Logger logger = Logger.getLogger(MapGenerator.class.getName());
 
+    private static final Direction[] allDirections = Map.getDirectionArray();
 
     /**
      * Directions a river may flow in.
      * @see net.sf.freecol.common.model.Map
      */
-    private static int[] directions = {Map.NE, Map.SE, Map.SW, Map.NW};
+    private static final Direction[] directions = {
+        Direction.NE, Direction.SE, Direction.SW, Direction.NW};
 
     /**
      * Possible direction changes for a river.
@@ -59,7 +62,7 @@ public class River {
     /**
      * Current direction the river is flowing in.
      */
-    private int direction = Map.NE;
+    private Direction direction = Direction.NE;
     
     /**
      * The map on which the river flows.
@@ -113,7 +116,7 @@ public class River {
      * @param position Where this section is located.
      * @param direction The direction the river is flowing in.
      */
-    public void add(Map.Position position, int direction) {
+    public void add(Map.Position position, Direction direction) {
         this.sections.add(new RiverSection(position, direction));
     }
 
@@ -134,7 +137,7 @@ public class River {
             if (found) {
                 section.grow();
             } else if (section.getPosition().equals(position)) {
-                section.setBranch(oppositeDirection(lastSection.direction),
+                section.setBranch(lastSection.direction.getReverseDirection(),
                         lastSection.getSize());
                 section.grow();
                 found = true;
@@ -238,7 +241,7 @@ public class River {
         }
         
         for (int i = 0; i < directionChanges.length; i++) {
-            int dir = newDirection(i);
+            Direction dir = newDirection(i);
             Map.Position newPosition = Map.getAdjacent(source, dir);
             Tile nextTile = map.getTile(newPosition);
             
@@ -260,7 +263,7 @@ public class River {
             } else {
                 // find out if an adjacent tile is next to water
                 for (i = 0; i < directionChanges.length; i++) {
-                    int lastDir = newDirection(i, dir);
+                    Direction lastDir = newDirection(i, dir);
                     Map.Position px = Map.getAdjacent(newPosition, lastDir);
                     Tile tile = map.getTile(px);
                     if (tile != null && (!tile.isLand() || tile.hasRiver())) {
@@ -280,10 +283,11 @@ public class River {
                             logger.fine("Point " + newPosition + " is next to water.");
                             River someRiver = riverMap.get(px);
                             if (someRiver == null) {
-                                sections.add(new RiverSection(px, oppositeDirection(lastDir)));
+                                sections.add(new RiverSection(px, lastDir.getReverseDirection()));
                             } else {
                                 RiverSection waterSection = someRiver.getLastSection();
-                                waterSection.setBranch(oppositeDirection(lastDir), TileImprovement.SMALL_RIVER);
+                                waterSection.setBranch(lastDir.getReverseDirection(),
+                                                       TileImprovement.SMALL_RIVER);
                             }
                             drawToMap();
                         }
@@ -307,7 +311,7 @@ public class River {
      * @param index The index of the direction change.
      * @return A new direction. @see net.sf.freecol.common.model.Map.
      */
-    private int newDirection(int index) {
+    private Direction newDirection(int index) {
         return newDirection(index, this.direction);
     }
 
@@ -319,7 +323,7 @@ public class River {
      * @param currentDirection The current direction.
      * @return A new direction. @see net.sf.freecol.common.model.Map.
      */
-    private int newDirection(int index, int currentDirection) {
+    private Direction newDirection(int index, Direction currentDirection) {
         int offset = 0;
         if (index < 0 || index >= directionChanges.length) {
             PseudoRandom random =
@@ -328,19 +332,9 @@ public class River {
         } else {
             offset = directionChanges[index];
         }
-        return (currentDirection + offset + Map.NUMBER_OF_DIRECTIONS) 
-                % Map.NUMBER_OF_DIRECTIONS;
-    }
-
-    /**
-     * Returns the opposite of the direction given.
-     * 
-     * @param direction The direction to reverse.
-     * @return The opposite of the direction given.
-     */
-    private int oppositeDirection(int direction) {
-        return (direction + Map.NUMBER_OF_DIRECTIONS/2)
-                % Map.NUMBER_OF_DIRECTIONS;
+        index = (currentDirection.ordinal() + offset + allDirections.length) 
+            % allDirections.length;
+        return allDirections[index];
     }
 
     /**
@@ -354,7 +348,7 @@ public class River {
             RiverSection section = sectionIterator.next();
             riverMap.put(section.getPosition(), this);
             if (oldSection != null) {
-                section.setBranch(oppositeDirection(oldSection.direction),
+                section.setBranch(oldSection.direction.getReverseDirection(),
                         oldSection.getSize());
             }
             Tile tile = map.getTile(section.getPosition());

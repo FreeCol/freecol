@@ -67,6 +67,7 @@ import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.IndianSettlement;
 import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.Map;
+import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.ModelMessage;
 import net.sf.freecol.common.model.Nameable;
 import net.sf.freecol.common.model.Ownable;
@@ -532,7 +533,7 @@ public final class InGameController implements NetworkConstants {
      * 
      * @param direction The direction in which to move the Unit.
      */
-    public void moveActiveUnit(int direction) {
+    public void moveActiveUnit(Direction direction) {
         Unit unit = freeColClient.getGUI().getActiveUnit();
 
         if (freeColClient.getGame().getCurrentPlayer() != freeColClient.getMyPlayer()) {
@@ -947,7 +948,7 @@ public final class InGameController implements NetworkConstants {
      * @param unit The unit to be moved.
      * @param direction The direction in which to move the Unit.
      */
-    public void move(Unit unit, int direction) {
+    public void move(Unit unit, Direction direction) {
 
         if (freeColClient.getGame().getCurrentPlayer() != freeColClient.getMyPlayer()) {
             freeColClient.getCanvas().showInformationMessage("notYourTurn");
@@ -1046,7 +1047,7 @@ public final class InGameController implements NetworkConstants {
      * @param unit an <code>Unit</code> value
      * @param direction an <code>int</code> value
      */
-    private void negotiate(Unit unit, int direction) {
+    private void negotiate(Unit unit, Direction direction) {
         Map map = freeColClient.getGame().getMap();
         Settlement settlement = map.getNeighbourOrNull(direction, unit.getTile()).getSettlement();
 
@@ -1101,7 +1102,7 @@ public final class InGameController implements NetworkConstants {
      * @param unit an <code>Unit</code> value
      * @param direction an <code>int</code> value
      */
-    private void spy(Unit unit, int direction) {
+    private void spy(Unit unit, Direction direction) {
         Game game = freeColClient.getGame();
         Colony colony = game.getMap().getNeighbourOrNull(direction,
                 unit.getTile()).getColony();
@@ -1135,7 +1136,7 @@ public final class InGameController implements NetworkConstants {
      * @param unit The unit to be moved.
      * @param direction The direction in which to move the Unit.
      */
-    private void exploreLostCityRumour(Unit unit, int direction) {
+    private void exploreLostCityRumour(Unit unit, Direction direction) {
         if (freeColClient.getCanvas().showConfirmDialog("exploreLostCityRumour.text", "exploreLostCityRumour.yes",
                 "exploreLostCityRumour.no")) {
             reallyMove(unit, direction);
@@ -1175,7 +1176,7 @@ public final class InGameController implements NetworkConstants {
      *                direction.
      * @see Settlement
      */
-    private void tradeWithSettlement(Unit unit, int direction) {
+    private void tradeWithSettlement(Unit unit, Direction direction) {
         if (freeColClient.getGame().getCurrentPlayer() != freeColClient.getMyPlayer()) {
             freeColClient.getCanvas().showInformationMessage("notYourTurn");
             return;
@@ -1460,7 +1461,7 @@ public final class InGameController implements NetworkConstants {
      * @param unit The unit to be moved.
      * @param direction The direction in which to move the Unit.
      */
-    private void reallyMove(Unit unit, int direction) {
+    private void reallyMove(Unit unit, Direction direction) {
         if (freeColClient.getGame().getCurrentPlayer() != freeColClient.getMyPlayer()) {
             freeColClient.getCanvas().showInformationMessage("notYourTurn");
             return;
@@ -1472,7 +1473,7 @@ public final class InGameController implements NetworkConstants {
         // Inform the server:
         Element moveElement = Message.createNewRootElement("move");
         moveElement.setAttribute("unit", unit.getId());
-        moveElement.setAttribute("direction", Integer.toString(direction));
+        moveElement.setAttribute("direction", direction.toString());
 
         // TODO: server can actually fail (illegal move)!
 
@@ -1535,7 +1536,7 @@ public final class InGameController implements NetworkConstants {
      * @param unit The unit to perform the attack.
      * @param direction The direction in which to attack.
      */
-    private void attack(Unit unit, int direction) {
+    private void attack(Unit unit, Direction direction) {
         if (freeColClient.getGame().getCurrentPlayer() != freeColClient.getMyPlayer()) {
             freeColClient.getCanvas().showInformationMessage("notYourTurn");
             return;
@@ -1556,7 +1557,7 @@ public final class InGameController implements NetworkConstants {
             case FreeColDialog.SCOUT_INDIAN_SETTLEMENT_TRIBUTE:
                 Element demandMessage = Message.createNewRootElement("armedUnitDemandTribute");
                 demandMessage.setAttribute("unit", unit.getId());
-                demandMessage.setAttribute("direction", Integer.toString(direction));
+                demandMessage.setAttribute("direction", direction.toString());
                 Element reply = freeColClient.getClient().ask(demandMessage);
                 if (reply != null && reply.getTagName().equals("armedUnitDemandTributeResult")) {
                     String result = reply.getAttribute("result");
@@ -1665,7 +1666,7 @@ public final class InGameController implements NetworkConstants {
      * @param unit The unit to perform the attack.
      * @param direction The direction in which to attack.
      */
-    private void reallyAttack(Unit unit, int direction) {
+    private void reallyAttack(Unit unit, Direction direction) {
         Client client = freeColClient.getClient();
         Game game = freeColClient.getGame();
         Tile target = game.getMap().getNeighbourOrNull(direction, unit.getTile());
@@ -1676,7 +1677,7 @@ public final class InGameController implements NetworkConstants {
 
         Element attackElement = Message.createNewRootElement("attack");
         attackElement.setAttribute("unit", unit.getId());
-        attackElement.setAttribute("direction", Integer.toString(direction));
+        attackElement.setAttribute("direction", direction.toString());
 
         // Get the result of the attack from the server:
         Element attackResultElement = client.ask(attackElement);
@@ -1810,7 +1811,7 @@ public final class InGameController implements NetworkConstants {
      * @param unit The unit to be disembarked.
      * @param direction The direction in which to disembark the Unit.
      */
-    private void disembark(Unit unit, int direction) {
+    private void disembark(Unit unit, Direction direction) {
         if (freeColClient.getGame().getCurrentPlayer() != freeColClient.getMyPlayer()) {
             freeColClient.getCanvas().showInformationMessage("notYourTurn");
             return;
@@ -1847,7 +1848,7 @@ public final class InGameController implements NetworkConstants {
      * @param unit The unit to be embarked.
      * @param direction The direction in which to embark the Unit.
      */
-    private void embark(Unit unit, int direction) {
+    private void embark(Unit unit, Direction direction) {
         if (freeColClient.getGame().getCurrentPlayer() != freeColClient.getMyPlayer()) {
             freeColClient.getCanvas().showInformationMessage("notYourTurn");
             return;
@@ -1894,7 +1895,7 @@ public final class InGameController implements NetworkConstants {
 
         Element embarkElement = Message.createNewRootElement("embark");
         embarkElement.setAttribute("unit", unit.getId());
-        embarkElement.setAttribute("direction", Integer.toString(direction));
+        embarkElement.setAttribute("direction", direction.toString());
         embarkElement.setAttribute("embarkOnto", destinationUnit.getId());
 
         client.sendAndWait(embarkElement);
@@ -2502,7 +2503,7 @@ public final class InGameController implements NetworkConstants {
      * @param unit The unit to be moved.
      * @param direction The direction in which to move the Unit.
      */
-    private void moveHighSeas(Unit unit, int direction) {
+    private void moveHighSeas(Unit unit, Direction direction) {
         if (freeColClient.getGame().getCurrentPlayer() != freeColClient.getMyPlayer()) {
             freeColClient.getCanvas().showInformationMessage("notYourTurn");
             return;
@@ -2530,7 +2531,7 @@ public final class InGameController implements NetworkConstants {
      * @param unit The unit to learn the skill.
      * @param direction The direction in which the Indian settlement lies.
      */
-    private void learnSkillAtIndianSettlement(Unit unit, int direction) {
+    private void learnSkillAtIndianSettlement(Unit unit, Direction direction) {
         if (freeColClient.getGame().getCurrentPlayer() != freeColClient.getMyPlayer()) {
             freeColClient.getCanvas().showInformationMessage("notYourTurn");
             return;
@@ -2548,7 +2549,7 @@ public final class InGameController implements NetworkConstants {
 
             Element askSkill = Message.createNewRootElement("askSkill");
             askSkill.setAttribute("unit", unit.getId());
-            askSkill.setAttribute("direction", Integer.toString(direction));
+            askSkill.setAttribute("direction", direction.toString());
 
             Element reply = client.ask(askSkill);
             UnitType skill = null;
@@ -2577,7 +2578,7 @@ public final class InGameController implements NetworkConstants {
             } else {
                 Element learnSkill = Message.createNewRootElement("learnSkillAtSettlement");
                 learnSkill.setAttribute("unit", unit.getId());
-                learnSkill.setAttribute("direction", Integer.toString(direction));
+                learnSkill.setAttribute("direction", direction.toString());
 
                 if (!canvas.showConfirmDialog("learnSkill.text", "learnSkill.yes", "learnSkill.no", new String[][] { {
                         "%replace%", skillName } })) {
@@ -2615,7 +2616,7 @@ public final class InGameController implements NetworkConstants {
      * @param unit The unit that will spy, negotiate or attack.
      * @param direction The direction in which the foreign colony lies.
      */
-    private void scoutForeignColony(Unit unit, int direction) {
+    private void scoutForeignColony(Unit unit, Direction direction) {
         if (freeColClient.getGame().getCurrentPlayer() != freeColClient.getMyPlayer()) {
             freeColClient.getCanvas().showInformationMessage("notYourTurn");
             return;
@@ -2654,7 +2655,7 @@ public final class InGameController implements NetworkConstants {
      * @param unit The unit that will speak, attack or ask tribute.
      * @param direction The direction in which the Indian settlement lies.
      */
-    private void scoutIndianSettlement(Unit unit, int direction) {
+    private void scoutIndianSettlement(Unit unit, Direction direction) {
         if (freeColClient.getGame().getCurrentPlayer() != freeColClient.getMyPlayer()) {
             freeColClient.getCanvas().showInformationMessage("notYourTurn");
             return;
@@ -2674,7 +2675,7 @@ public final class InGameController implements NetworkConstants {
 
         Element scoutMessage = Message.createNewRootElement("scoutIndianSettlement");
         scoutMessage.setAttribute("unit", unit.getId());
-        scoutMessage.setAttribute("direction", Integer.toString(direction));
+        scoutMessage.setAttribute("direction", direction.toString());
         scoutMessage.setAttribute("action", "basic");
         Element reply = client.ask(scoutMessage);
 
@@ -2771,7 +2772,7 @@ public final class InGameController implements NetworkConstants {
      * @param unit The unit that will enter the settlement.
      * @param direction The direction in which the Indian settlement lies.
      */
-    private void useMissionary(Unit unit, int direction) {
+    private void useMissionary(Unit unit, Direction direction) {
         if (freeColClient.getGame().getCurrentPlayer() != freeColClient.getMyPlayer()) {
             freeColClient.getCanvas().showInformationMessage("notYourTurn");
             return;
@@ -2788,7 +2789,7 @@ public final class InGameController implements NetworkConstants {
 
         Element missionaryMessage = Message.createNewRootElement("missionaryAtSettlement");
         missionaryMessage.setAttribute("unit", unit.getId());
-        missionaryMessage.setAttribute("direction", Integer.toString(direction));
+        missionaryMessage.setAttribute("direction", direction.toString());
 
         Element reply = null;
 
@@ -2840,7 +2841,7 @@ public final class InGameController implements NetworkConstants {
                 
                 Element inciteMessage = Message.createNewRootElement("inciteAtSettlement");
                 inciteMessage.setAttribute("unit", unit.getId());
-                inciteMessage.setAttribute("direction", Integer.toString(direction));
+                inciteMessage.setAttribute("direction", direction.toString());
                 inciteMessage.setAttribute("confirmed", confirmed ? "true" : "false");
                 inciteMessage.setAttribute("enemy", ((Player) response.get(1)).getId());
 

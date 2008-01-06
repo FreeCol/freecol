@@ -30,6 +30,7 @@ import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.Map;
+import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.Tile;
@@ -128,11 +129,10 @@ public class DefendSettlementMission extends Mission {
         if (unit.isOffensiveUnit()) {
             Unit bestTarget = null;
             float bestDifference = Float.MIN_VALUE;
-            int bestDirection = -1;
+            Direction bestDirection = null;
             
-            int[] directions = map.getRandomDirectionArray();
-            for (int i=0; i<Map.NUMBER_OF_DIRECTIONS; i++) {
-                int direction = directions[i];
+            Direction[] directions = map.getRandomDirectionArray();
+            for (Direction direction : directions) {
                 Tile t = map.getNeighbourOrNull(direction, unit.getTile());
                 if (t==null)
                     continue;
@@ -145,7 +145,7 @@ public class DefendSettlementMission extends Mission {
                     float enemyDefend = enemyUnit.getDefensePower(unit);
                     float weDefend = unit.getDefensePower(enemyUnit);
 
-                    float difference = weAttack / (weAttack + enemyDefend) - enemyAttack / (enemyAttack + weDefend);                  
+                    float difference = weAttack / (weAttack + enemyDefend) - enemyAttack / (enemyAttack + weDefend);
                     if (difference > bestDifference) {
                         if (difference > 0 || weAttack > enemyDefend) {
                             bestDifference = difference;
@@ -159,7 +159,7 @@ public class DefendSettlementMission extends Mission {
             if (bestTarget != null) {
                 Element element = Message.createNewRootElement("attack");
                 element.setAttribute("unit", unit.getId());
-                element.setAttribute("direction", Integer.toString(bestDirection));
+                element.setAttribute("direction", bestDirection.toString());
 
                 try {
                     connection.ask(element);
@@ -172,7 +172,7 @@ public class DefendSettlementMission extends Mission {
             
         if (unit.getTile() != settlement.getTile()) {
             // Move towards the target.
-            int r = moveTowards(connection, settlement.getTile());
+            Direction r = moveTowards(connection, settlement.getTile());
             moveButDontAttack(connection, r);
         } else {
             if (unit.getState() != UnitState.FORTIFIED

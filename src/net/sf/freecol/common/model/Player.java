@@ -35,6 +35,7 @@ import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.gui.i18n.Messages;
+import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.Map.Position;
 import net.sf.freecol.common.model.Unit.UnitState;
 import net.sf.freecol.common.util.EmptyIterator;
@@ -2212,8 +2213,8 @@ public class Player extends FreeColGameObject implements Features, Nameable {
             Tile tile = getGame().getMap().getTile((tileIterator.next()));
             if (tile.getColony() != null) {
                 tiles.add(tile);
-                for (int i = 0; i < 8; i++) {
-                    Tile addTile = getGame().getMap().getNeighbourOrNull(i, tile);
+                for (Direction direction : Direction.values()) {
+                    Tile addTile = getGame().getMap().getNeighbourOrNull(direction, tile);
                     if (addTile != null) {
                         tiles.add(addTile);
                     }

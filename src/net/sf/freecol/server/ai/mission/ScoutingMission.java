@@ -31,6 +31,7 @@ import net.sf.freecol.common.model.GoalDecider;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.IndianSettlement;
 import net.sf.freecol.common.model.Map;
+import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.PathNode;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
@@ -174,13 +175,13 @@ public class ScoutingMission extends Mission {
 
             if (bestPath != null) {
                 transportDestination = null;
-                int direction = moveTowards(connection, bestPath);
-                if (direction >= 0) {
+                Direction direction = moveTowards(connection, bestPath);
+                if (direction != null) {
                     final MoveType mt = getUnit().getMoveType(direction);             
                     if (getUnit().getMoveType(direction) == MoveType.ENTER_INDIAN_VILLAGE_WITH_SCOUT) {
                         Element scoutMessage = Message.createNewRootElement("scoutIndianSettlement");
                         scoutMessage.setAttribute("unit", getUnit().getId());
-                        scoutMessage.setAttribute("direction", Integer.toString(direction));
+                        scoutMessage.setAttribute("direction", direction.toString());
                         scoutMessage.setAttribute("action", "basic");
                         try {
                             connection.ask(scoutMessage);

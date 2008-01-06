@@ -32,6 +32,7 @@ import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.freecol.FreeCol;
+import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.Unit.CombatResult;
 
 import org.w3c.dom.Element;
@@ -112,7 +113,7 @@ public final class Colony extends Settlement implements Features, Location, Name
         oldSonsOfLiberty = 0;
         Map map = game.getMap();
         tile.setOwner(owner);
-        for (int direction = 0; direction < Map.NUMBER_OF_DIRECTIONS; direction++) {
+        for (Direction direction : Direction.values()) {
             Tile t = map.getNeighbourOrNull(direction, tile);
             if (t == null)
                 continue;

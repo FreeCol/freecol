@@ -30,6 +30,7 @@ import javax.xml.stream.XMLStreamWriter;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.FreeColGameObject;
 import net.sf.freecol.common.model.Location;
+import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.Ownable;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
@@ -128,7 +129,7 @@ public class WishRealizationMission extends Mission {
         // Move towards the target.
         if (getUnit().getTile() != null) {
             if (wish.getDestination().getTile() != getUnit().getTile()) {
-                int r = moveTowards(connection, wish.getDestination().getTile());
+                Direction r = moveTowards(connection, wish.getDestination().getTile());
                 moveButDontAttack(connection, r);
             }
             if (wish.getDestination().getTile() == getUnit().getTile()) {

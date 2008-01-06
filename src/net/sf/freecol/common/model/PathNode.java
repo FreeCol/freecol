@@ -20,6 +20,7 @@
 
 package net.sf.freecol.common.model;
 
+import  net.sf.freecol.common.model.Map.Direction;
 
 /**
 * Represents a single <code>Tile</code> in a path.
@@ -41,7 +42,7 @@ public class PathNode implements Comparable<PathNode> {
     */
     private int f;
 
-    private int direction;
+    private Direction direction;
     private int movesLeft;
     private int turns;
     private boolean onCarrier = false;
@@ -72,7 +73,7 @@ public class PathNode implements Comparable<PathNode> {
     * @param turns The number of turns it takes to reach this <code>PathNode</code>'s
     *             <code>Tile</code> from the start of the path.
     */
-    public PathNode(Tile tile, int cost, int f, int direction, int movesLeft, int turns) {
+    public PathNode(Tile tile, int cost, int f, Direction direction, int movesLeft, int turns) {
         this.tile = tile;
         this.cost = cost;
         this.f = f;
@@ -201,7 +202,7 @@ public class PathNode implements Comparable<PathNode> {
     *         <code>Tile</code> returned by this <code>PathNode</code>'s
     *         {@link #getTile} in the path.
     */
-    public int getDirection() {
+    public Direction getDirection() {
         return direction;
     }
 

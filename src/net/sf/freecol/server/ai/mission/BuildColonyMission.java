@@ -29,6 +29,7 @@ import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.Game;
+import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.PathNode;
 import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.Tile;
@@ -191,7 +192,7 @@ public class BuildColonyMission extends Mission {
         // Move towards the target.
         if (getUnit().getTile() != null) {
             if (target != getUnit().getTile()) {
-                int r = moveTowards(connection, target);
+                Direction r = moveTowards(connection, target);
                 moveButDontAttack(connection, r);
             }
             if (getUnit().canBuildColony() && target == getUnit().getTile() && getUnit().getMovesLeft() > 0) {

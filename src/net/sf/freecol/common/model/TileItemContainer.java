@@ -31,6 +31,7 @@ import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.gui.i18n.Messages;
+import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.server.generator.RiverSection;
 
 import org.w3c.dom.Element;
@@ -525,7 +526,7 @@ public class TileItemContainer extends FreeColGameObject {
             // nothing changed
             return;
         }
-        int[] directions = {Map.NE, Map.SE, Map.SW, Map.NW};
+        Direction[] directions = {Direction.NE, Direction.SE, Direction.SW, Direction.NW};
         RiverSection mysection = new RiverSection(river.getStyle());
         // for each neighboring tile
         for (int i = 0; i < directions.length; i++) {
@@ -542,7 +543,7 @@ public class TileItemContainer extends FreeColGameObject {
             }
             if (otherRiver != null) {
                 // update the other tile river branch
-                int otherDirection = Map.getReverseDirection(directions[i]);
+                Direction otherDirection = directions[i].getReverseDirection();
                 RiverSection oppositesection = new RiverSection(otherRiver.getStyle());
                 oppositesection.setBranch(otherDirection, river.getMagnitude());
                 otherRiver.setStyle(oppositesection.encodeStyle());

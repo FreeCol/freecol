@@ -44,6 +44,7 @@ import net.sf.freecol.common.FreeColException;
 import net.sf.freecol.common.model.Building;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.GoodsType;
+import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.ResourceType;
 import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.Tension;
@@ -1217,14 +1218,16 @@ public final class ImageLibrary extends ImageProvider {
      * Returns the border terrain-image for the given type.
      * 
      * @param type The type of the terrain-image to return.
-     * @param borderType The border type.
+     * @param direction a <code>Direction</code> value
      * @param x The x-coordinate of the location of the tile that is being
      *            drawn.
      * @param y The x-coordinate of the location of the tile that is being
      *            drawn.
      * @return The terrain-image at the given index.
      */
-    public Image getBorderImage(TileType type, int borderType, int x, int y) {
+    public Image getBorderImage(TileType type, Direction direction, int x, int y) {
+
+        int borderType = direction.ordinal();
 
         final int[] directionsAndImageLibOffsets = new int[] { ImageLibrary.LAND_NORTH, ImageLibrary.LAND_NORTH_EAST,
                 ImageLibrary.LAND_EAST, ImageLibrary.LAND_SOUTH_EAST, ImageLibrary.LAND_SOUTH,
@@ -1250,15 +1253,16 @@ public final class ImageLibrary extends ImageProvider {
      * Returns the coast terrain-image for the given type.
      * 
      * @param type The type of the terrain-image to return.
-     * @param borderType The border type.
+     * @param direction a <code>Direction</code> value
      * @param x The x-coordinate of the location of the tile that is being
      *            drawn.
      * @param y The x-coordinate of the location of the tile that is being
      *            drawn.
      * @return The terrain-image at the given index.
      */
-    public Image getCoastImage(TileType type, int borderType, int x, int y) {
+    public Image getCoastImage(TileType type, Direction direction, int x, int y) {
 
+        int borderType = direction.ordinal();
         final int[] directionsAndImageLibOffsets = new int[] { ImageLibrary.LAND_NORTH, ImageLibrary.LAND_NORTH_EAST,
                 ImageLibrary.LAND_EAST, ImageLibrary.LAND_SOUTH_EAST, ImageLibrary.LAND_SOUTH,
                 ImageLibrary.LAND_SOUTH_WEST, ImageLibrary.LAND_WEST, ImageLibrary.LAND_NORTH_WEST };

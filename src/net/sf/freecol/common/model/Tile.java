@@ -36,6 +36,7 @@ import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.Specification;
 import net.sf.freecol.common.model.Unit.UnitState;
 import net.sf.freecol.common.model.Map.CircleIterator;
+import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.Map.Position;
 import net.sf.freecol.common.util.EmptyIterator;
 
@@ -1017,7 +1018,7 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
             return false;
         }
 
-        for (int direction = Map.N; direction <= Map.NW; direction++) {
+        for (Direction direction : Direction.values()) {
             Tile otherTile = getMap().getNeighbourOrNull(direction, this);
             if (otherTile != null) {
                 Settlement set = otherTile.getSettlement();

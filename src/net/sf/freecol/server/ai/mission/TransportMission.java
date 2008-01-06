@@ -38,6 +38,7 @@ import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.Locatable;
 import net.sf.freecol.common.model.Location;
+import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.Market;
 import net.sf.freecol.common.model.PathNode;
 import net.sf.freecol.common.model.Player;
@@ -427,8 +428,9 @@ public class TransportMission extends Mission {
             if (path != null) {
                 // Tile oldTile = carrier.getTile();
 
-                int r = moveTowards(connection, path);
-                if (r >= 0 && (carrier.getMoveType(r) == MoveType.MOVE || carrier.getMoveType(r) == MoveType.MOVE_HIGH_SEAS)) {
+                Direction r = moveTowards(connection, path);
+                if (r != null &&
+                    (carrier.getMoveType(r) == MoveType.MOVE || carrier.getMoveType(r) == MoveType.MOVE_HIGH_SEAS)) {
                     // Tile target = getGame().getMap().getNeighbourOrNull(r,
                     // carrier.getTile());
                     if (carrier.getMoveType(r) == MoveType.MOVE_HIGH_SEAS && moveToEurope) {

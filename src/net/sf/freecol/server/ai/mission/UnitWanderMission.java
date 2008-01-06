@@ -96,26 +96,7 @@ public class UnitWanderMission extends Mission {
         Unit unit = getUnit();
         
         while(unit.getMovesLeft() > 0) {
-            int direction = (int) (Math.random() * 8);
-            int j;
-            for (j = 8; j > 0 && ((unit.getGame().getMap().getNeighbourOrNull(direction, thisTile) == null)
-                    || (unit.getMoveType(direction) != MoveType.MOVE)
-                        && (unit.getMoveType(direction) != MoveType.DISEMBARK));
-                    j--) {
-                direction = (int) (Math.random() * 8);
-            }
-            if (j == 0) break;
-            thisTile = unit.getGame().getMap().getNeighbourOrNull(direction, thisTile);
-
-            Element moveElement = Message.createNewRootElement("move");
-            moveElement.setAttribute("unit", unit.getId());
-            moveElement.setAttribute("direction", Integer.toString(direction));
-            
-            try {
-                connection.sendAndWait(moveElement);
-            } catch (IOException e) {
-                logger.warning("Could not send \"move\"-message!");
-            }
+            moveRandomly(connection);
         }
     }
     

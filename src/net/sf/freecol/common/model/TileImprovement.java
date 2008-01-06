@@ -28,6 +28,7 @@ import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.freecol.FreeCol;
+import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.server.generator.River;
 
 import org.w3c.dom.Element;
@@ -295,7 +296,7 @@ public class TileImprovement extends TileItem implements Locatable, Named {
      * @param baseNumber The base to be used to create the base array.
      * @return An int[] with the magnitude in each direction.
      */
-    public int[] getStyleBreakdown(int[] directions, int baseNumber) {
+    public int[] getStyleBreakdown(Direction[] directions, int baseNumber) {
         return getStyleBreakdown(Map.getBase(directions, baseNumber));
     }
 

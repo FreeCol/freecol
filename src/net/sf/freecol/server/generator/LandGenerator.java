@@ -21,6 +21,7 @@ package net.sf.freecol.server.generator;
 
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Map;
+import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.Map.Position;
 
 /**
@@ -37,182 +38,186 @@ import net.sf.freecol.common.model.Map.Position;
  * </ul>
  */
 public class LandGenerator {
-     private static final int C = 2;
 
-     private final MapGeneratorOptions mapGeneratorOptions;
+    private static final int C = 2;
+
+    private static final Direction[] adjacentDirections = new Direction[] {
+        Direction.NE, Direction.SE, Direction.SW, Direction.NW };
+
+    private final MapGeneratorOptions mapGeneratorOptions;
      
-     private boolean[][] map;
-     private boolean[][] visited;
+    private boolean[][] map;
+    private boolean[][] visited;
      
-     private int width;
-     private int height;
+    private int width;
+    private int height;
 
-     private int preferredDistanceToEdge;
-     private int numberOfLandTiles;
-
-
-     /**
-      * Creates a new <code>LandGenerator</code>.
-      * 
-      * @param mapGeneratorOptions The options to be
-      *         used when creating a land map.
-      * @see #createLandMap
-      */
-     public LandGenerator(MapGeneratorOptions mapGeneratorOptions) {
-         this.mapGeneratorOptions = mapGeneratorOptions;
-     }
+    private int preferredDistanceToEdge;
+    private int numberOfLandTiles;
 
 
-     /**
-      * Imports the land map from the given <code>Game</code>.
-      * 
-      * @param game The <code>Game</code> to get the land map from.
-      * @return An array where <i>true</i> means land 
-      * and <i>false</i> means ocean.
-      */
-     public boolean[][] importLandMap(Game game) {
-         boolean[][] map = new boolean[game.getMap().getWidth()][game.getMap().getHeight()];
-         for (int i=0; i<map.length; i++) {
-             for (int j=0; j<map[0].length; j++) {
-                 map[i][j] = game.getMap().getTile(i, j).isLand();
-             }
-         }
-         return map;
-     }
+    /**
+     * Creates a new <code>LandGenerator</code>.
+     * 
+     * @param mapGeneratorOptions The options to be
+     *         used when creating a land map.
+     * @see #createLandMap
+     */
+    public LandGenerator(MapGeneratorOptions mapGeneratorOptions) {
+        this.mapGeneratorOptions = mapGeneratorOptions;
+    }
 
-     /**
-      * Creates a new land map.
-      * 
-      * @return An array where <i>true</i> means land 
-      * and <i>false</i> means ocean.
-      */
-     public boolean[][] createLandMap() {
-         width = mapGeneratorOptions.getWidth();
-         height = mapGeneratorOptions.getHeight();         
-         preferredDistanceToEdge = mapGeneratorOptions.getPrefDistToEdge();
-         map = new boolean[width][height];
-         visited = new boolean[width][height];
-         numberOfLandTiles = 0;
+
+    /**
+     * Imports the land map from the given <code>Game</code>.
+     * 
+     * @param game The <code>Game</code> to get the land map from.
+     * @return An array where <i>true</i> means land 
+     * and <i>false</i> means ocean.
+     */
+    public boolean[][] importLandMap(Game game) {
+        boolean[][] map = new boolean[game.getMap().getWidth()][game.getMap().getHeight()];
+        for (int i=0; i<map.length; i++) {
+            for (int j=0; j<map[0].length; j++) {
+                map[i][j] = game.getMap().getTile(i, j).isLand();
+            }
+        }
+        return map;
+    }
+
+    /**
+     * Creates a new land map.
+     * 
+     * @return An array where <i>true</i> means land 
+     * and <i>false</i> means ocean.
+     */
+    public boolean[][] createLandMap() {
+        width = mapGeneratorOptions.getWidth();
+        height = mapGeneratorOptions.getHeight();         
+        preferredDistanceToEdge = mapGeneratorOptions.getPrefDistToEdge();
+        map = new boolean[width][height];
+        visited = new boolean[width][height];
+        numberOfLandTiles = 0;
          
-         int x;
-         int y;
+        int x;
+        int y;
 
-         int minLandMass = mapGeneratorOptions.getLandMass();
+        int minLandMass = mapGeneratorOptions.getLandMass();
 
-         int minimumNumberOfTiles = (map.length * map[0].length * minLandMass - 2 * preferredDistanceToEdge) / 100;
-         while (numberOfLandTiles < minimumNumberOfTiles) {
-             do {
-                 x=((int) (Math.random() * (map.length-preferredDistanceToEdge*2))) + preferredDistanceToEdge;
-                 y=((int) (Math.random() * (map[0].length-preferredDistanceToEdge*4))) + preferredDistanceToEdge * 2;
-             } while (map[x][y]);
+        int minimumNumberOfTiles = (map.length * map[0].length * minLandMass - 2 * preferredDistanceToEdge) / 100;
+        while (numberOfLandTiles < minimumNumberOfTiles) {
+            do {
+                x=((int) (Math.random() * (map.length-preferredDistanceToEdge*2))) + preferredDistanceToEdge;
+                y=((int) (Math.random() * (map[0].length-preferredDistanceToEdge*4))) + preferredDistanceToEdge * 2;
+            } while (map[x][y]);
 
-             map[x][y] = true;
-             setLand(x,y);
-         }
+            map[x][y] = true;
+            setLand(x,y);
+        }
 
-         cleanMap();
-         createPolarRegions();
+        cleanMap();
+        createPolarRegions();
 
-         return map;
-     }
-
-
-     /**
-      * Adds land to the first two and last two rows. 
-      */
-     private void createPolarRegions() {
-         for (int x=0; x<map.length; x++) {
-             map[x][0] = true;
-             map[x][1] = true;
-             map[x][map[0].length-1] = true;
-             map[x][map[0].length-2] = true;
-         }
-     }
+        return map;
+    }
 
 
-     /**
-      * Removes any 1x1 islands on the map.
-      */
-     private void cleanMap() {
-         for (int y=0; y<map[0].length; y++) {
-             for (int x=0; x<map.length; x++) {
-                 if (isSingleTile(x, y)) {
-                     map[x][y] = false;
-                 }
-             }
-         }
-     }
+    /**
+     * Adds land to the first two and last two rows. 
+     */
+    private void createPolarRegions() {
+        for (int x=0; x<map.length; x++) {
+            map[x][0] = true;
+            map[x][1] = true;
+            map[x][map[0].length-1] = true;
+            map[x][map[0].length-2] = true;
+        }
+    }
 
 
-     /**
-      * Returns <i>true</i> if there are no adjacent land
-      * to the given coordinates.
-      */
-     private boolean isSingleTile(int x, int y) {
-         Position p = new Position(x, y);
-
-         for (int i=1; i<8;i+=2) {
-             Position n = Map.getAdjacent(p, i);
-             if (Map.isValid(n, width, height) && map[n.getX()][n.getY()]) {
-                 return false;
-             }
-         }
-
-         return true;
-     }
+    /**
+     * Removes any 1x1 islands on the map.
+     */
+    private void cleanMap() {
+        for (int y=0; y<map[0].length; y++) {
+            for (int x=0; x<map.length; x++) {
+                if (isSingleTile(x, y)) {
+                    map[x][y] = false;
+                }
+            }
+        }
+    }
 
 
-     private int getEdge(int x, int y) {
-         int u = Math.max(preferredDistanceToEdge-Math.min(x, map.length-x),
-                          2*preferredDistanceToEdge-Math.min(y, map[0].length-y))
-                 + C;
+    /**
+     * Returns <i>true</i> if there are no adjacent land
+     * to the given coordinates.
+     */
+    private boolean isSingleTile(int x, int y) {
+        Position p = new Position(x, y);
 
-         return (u>0 ? u : 0);
-     }
+        for (Direction direction : adjacentDirections) {
+            Position n = Map.getAdjacent(p, direction);
+            if (Map.isValid(n, width, height) && map[n.getX()][n.getY()]) {
+                return false;
+            }
+        }
 
-
-     private void setLand(int x, int y) {
-         if (visited[x][y]) {
-             return;
-         }
-
-         visited[x][y] = true;
-         numberOfLandTiles++;
-
-         Position p = new Position(x, y);
-
-         for (int i=1; i<8;i+=2) {
-             Position n = Map.getAdjacent(p, i);
-             if (Map.isValid(n, width, height)) {
-                 gl(n.getX(), n.getY());
-             }
-         }
-     }
+        return true;
+    }
 
 
-     private void gl(int i, int j) {
-         if (visited[i][j]) {
-             return;
-         }
+    private int getEdge(int x, int y) {
+        int u = Math.max(preferredDistanceToEdge-Math.min(x, map.length-x),
+                         2*preferredDistanceToEdge-Math.min(y, map[0].length-y))
+            + C;
 
-         int r = ((int) (Math.random() * 8)) + 1 - C + getEdge(i,j);
+        return (u>0 ? u : 0);
+    }
 
-         int sum = -1;
 
-         Position p = new Position(i, j);
+    private void setLand(int x, int y) {
+        if (visited[x][y]) {
+            return;
+        }
 
-         for (int k=0; k<8;k++) {
-             Position n = Map.getAdjacent(p, k);
-             if (Map.isValid(n, width, height) && map[n.getX()][n.getY()]) {
-                 sum++;
-             }
-         }
+        visited[x][y] = true;
+        numberOfLandTiles++;
 
-         if (sum >= r) {
-             if (!map[i][j]) {
-                 map[i][j] = true;
-                 setLand(i,j);
-             }
-         }
-     }
- }
+        Position p = new Position(x, y);
+
+        for (Direction direction : adjacentDirections) {
+            Position n = Map.getAdjacent(p, direction);
+            if (Map.isValid(n, width, height)) {
+                gl(n.getX(), n.getY());
+            }
+        }
+    }
+
+
+    private void gl(int i, int j) {
+        if (visited[i][j]) {
+            return;
+        }
+
+        int r = ((int) (Math.random() * 8)) + 1 - C + getEdge(i,j);
+
+        int sum = -1;
+
+        Position p = new Position(i, j);
+
+        for (Direction direction : Direction.values()) {
+            Position n = Map.getAdjacent(p, direction);
+            if (Map.isValid(n, width, height) && map[n.getX()][n.getY()]) {
+                sum++;
+            }
+        }
+
+        if (sum >= r) {
+            if (!map[i][j]) {
+                map[i][j] = true;
+                setLand(i,j);
+            }
+        }
+    }
+}

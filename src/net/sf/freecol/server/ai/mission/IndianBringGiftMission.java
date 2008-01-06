@@ -33,6 +33,7 @@ import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.GoodsContainer;
 import net.sf.freecol.common.model.IndianSettlement;
+import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Tension;
 import net.sf.freecol.common.model.Tile;
@@ -133,7 +134,7 @@ public class IndianBringGiftMission extends Mission {
         if (!hasGift()) {
             if (getUnit().getTile() != getUnit().getIndianSettlement().getTile()) {
                 // Move to the owning settlement:
-                int r = moveTowards(connection, getUnit().getIndianSettlement().getTile());
+                Direction r = moveTowards(connection, getUnit().getIndianSettlement().getTile());
                 moveButDontAttack(connection, r);
             } else {
                 // Load the goods:
@@ -155,8 +156,9 @@ public class IndianBringGiftMission extends Mission {
             }
         } else {
             // Move to the target's colony and deliver
-            int r = moveTowards(connection, target.getTile());
-            if (r >= 0 && getGame().getMap().getNeighbourOrNull(r, getUnit().getTile()) == target.getTile()) {
+            Direction r = moveTowards(connection, target.getTile());
+            if (r != null && 
+                getGame().getMap().getNeighbourOrNull(r, getUnit().getTile()) == target.getTile()) {
                 // We have arrived.
                 Element deliverGiftElement = Message.createNewRootElement("deliverGift");
                 deliverGiftElement.setAttribute("unit", getUnit().getId());
@@ -176,32 +178,7 @@ public class IndianBringGiftMission extends Mission {
         }
 
         // Walk in a random direction if we have any moves left:
-        Tile thisTile = getUnit().getTile();
-        Unit unit = getUnit();
-        while (unit.getMovesLeft() > 0) {
-            int direction = (int) (Math.random() * 8);
-            int j;
-            for (j = 8; j > 0
-                    && ((unit.getGame().getMap().getNeighbourOrNull(direction, thisTile) == null)
-                    || (unit.getMoveType(direction) == MoveType.ILLEGAL_MOVE)
-                    || (unit.getMoveType(direction) == MoveType.ATTACK)
-                    ); j--) {
-                direction = (int) (Math.random() * 8);
-            }
-            if (j == 0)
-                break;
-            thisTile = unit.getGame().getMap().getNeighbourOrNull(direction, thisTile);
-
-            Element moveElement = Message.createNewRootElement("move");
-            moveElement.setAttribute("unit", unit.getId());
-            moveElement.setAttribute("direction", Integer.toString(direction));
-
-            try {
-                connection.sendAndWait(moveElement);
-            } catch (IOException e) {
-                logger.warning("Could not send \"move\"-message!");
-            }
-        }
+        moveRandomly(connection);
     }
 
     /**
