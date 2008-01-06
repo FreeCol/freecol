@@ -20,6 +20,7 @@
 
 package net.sf.freecol.common.model;
 
+import net.sf.freecol.common.model.Unit.MoveType;
 
 /**
  * Class for determining the cost of a single move.
@@ -63,25 +64,25 @@ public class DefaultCostDecider implements CostDecider {
             return ILLEGAL_MOVE;
         } else {
             int mc = unit.getMoveCost(oldTile, newTile, ml);
-            int moveType = unit.getMoveType(oldTile, newTile, ml);
+            MoveType moveType = unit.getMoveType(oldTile, newTile, ml);
             
             if (newTile.getSettlement() != null
                     && newTile.getSettlement().getOwner() != unit.getOwner()) {
                 // A settlement is blocking the path:   
                 switch (moveType) {
-                    case Unit.ENTER_SETTLEMENT_WITH_CARRIER_AND_GOODS:
-                    case Unit.ENTER_INDIAN_VILLAGE_WITH_FREE_COLONIST:
-                    case Unit.ENTER_INDIAN_VILLAGE_WITH_MISSIONARY:
-                    case Unit.ENTER_INDIAN_VILLAGE_WITH_SCOUT:
-                    case Unit.ENTER_FOREIGN_COLONY_WITH_SCOUT:
-                    case Unit.ATTACK:
+                    case ENTER_SETTLEMENT_WITH_CARRIER_AND_GOODS:
+                    case ENTER_INDIAN_VILLAGE_WITH_FREE_COLONIST:
+                    case ENTER_INDIAN_VILLAGE_WITH_MISSIONARY:
+                    case ENTER_INDIAN_VILLAGE_WITH_SCOUT:
+                    case ENTER_FOREIGN_COLONY_WITH_SCOUT:
+                    case ATTACK:
                         if (unit.getDestination() == null ||
                                 unit.getDestination().getTile() != newTile) {
                             movesLeft = 0;
                             return ml + unit.getInitialMovesLeft() * 5;
                         }
                         break;
-                    case Unit.ILLEGAL_MOVE:
+                    case ILLEGAL_MOVE:
                         if (ml > 0) {
                             movesLeft = 0;
                             return ml + unit.getInitialMovesLeft() * 5;
@@ -91,7 +92,7 @@ public class DefaultCostDecider implements CostDecider {
             } else if (newTile.getDefendingUnit(unit) != null
                     && newTile.getDefendingUnit(unit).getOwner() != unit.getOwner()) {
                 // A unit is blocking the path:                
-                if (moveType != Unit.ATTACK || unit.getDestination() == null ||
+                if (moveType != MoveType.ATTACK || unit.getDestination() == null ||
                         unit.getDestination().getTile() != newTile)
                     mc += Math.max(0, 20 - turns * 4);
             } else if (newTile.isLand() && newTile.getFirstUnit() != null &&

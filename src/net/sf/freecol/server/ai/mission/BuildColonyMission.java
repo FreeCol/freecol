@@ -33,6 +33,7 @@ import net.sf.freecol.common.model.PathNode;
 import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
+import net.sf.freecol.common.model.Unit.MoveType;
 import net.sf.freecol.common.model.Map.Position;
 import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.networking.Message;
@@ -191,12 +192,7 @@ public class BuildColonyMission extends Mission {
         if (getUnit().getTile() != null) {
             if (target != getUnit().getTile()) {
                 int r = moveTowards(connection, target);
-                if (r >= 0) {
-                    final int mt = getUnit().getMoveType(r);
-                    if (mt != Unit.ILLEGAL_MOVE && mt != Unit.ATTACK) {
-                        move(connection, r);
-                    }
-                }
+                moveButDontAttack(connection, r);
             }
             if (getUnit().canBuildColony() && target == getUnit().getTile() && getUnit().getMovesLeft() > 0) {
                 Element buildColonyElement = Message.createNewRootElement("buildColony");

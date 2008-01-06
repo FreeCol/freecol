@@ -39,6 +39,7 @@ import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.Tension;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
+import net.sf.freecol.common.model.Unit.MoveType;
 import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.networking.Message;
 import net.sf.freecol.server.ai.AIMain;
@@ -149,7 +150,7 @@ public class UnitSeekAndDestroyMission extends Mission {
             int direction = moveTowards(connection, pathToTarget);
             while (direction >= 0) {
                 Tile newTile = getGame().getMap().getNeighbourOrNull(direction, unit.getTile());
-                if (unit.getMoveType(direction) == Unit.ATTACK
+                if (unit.getMoveType(direction) == MoveType.ATTACK
                         && (unit.getOwner().getStance(newTile.getDefendingUnit(unit).getOwner()) == Player.WAR
                                 || ((Ownable) target).getOwner() == newTile.getDefendingUnit(unit).getOwner())) {
                     Element element = Message.createNewRootElement("attack");
@@ -162,8 +163,8 @@ public class UnitSeekAndDestroyMission extends Mission {
                         logger.warning("Could not send message!");
                     }
                     break;
-                } else if (unit.getMoveType(direction) != Unit.ATTACK                        
-                        && unit.getMoveType(direction) != Unit.ILLEGAL_MOVE) {
+                } else if (unit.getMoveType(direction) != MoveType.ATTACK                        
+                        && unit.getMoveType(direction) != MoveType.ILLEGAL_MOVE) {
                     Element element = Message.createNewRootElement("move");
                     element.setAttribute("unit", unit.getId());
                     element.setAttribute("direction", Integer.toString(direction));

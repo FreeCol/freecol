@@ -81,10 +81,10 @@ public class Unit extends FreeColGameObject implements Features, Locatable, Loca
      * 
      * @see #getMoveType(int direction)
      */
-    public static final int MOVE = 0, MOVE_HIGH_SEAS = 1, ATTACK = 2, EMBARK = 3, DISEMBARK = 4,
-        ENTER_INDIAN_VILLAGE_WITH_FREE_COLONIST = 5, ENTER_INDIAN_VILLAGE_WITH_SCOUT = 6,
-        ENTER_INDIAN_VILLAGE_WITH_MISSIONARY = 7, ENTER_FOREIGN_COLONY_WITH_SCOUT = 8,
-        ENTER_SETTLEMENT_WITH_CARRIER_AND_GOODS = 9, EXPLORE_LOST_CITY_RUMOUR = 10, ILLEGAL_MOVE = 11;
+    public static enum MoveType { MOVE, MOVE_HIGH_SEAS, ATTACK, EMBARK, DISEMBARK,
+            ENTER_INDIAN_VILLAGE_WITH_FREE_COLONIST, ENTER_INDIAN_VILLAGE_WITH_SCOUT,
+            ENTER_INDIAN_VILLAGE_WITH_MISSIONARY, ENTER_FOREIGN_COLONY_WITH_SCOUT,
+            ENTER_SETTLEMENT_WITH_CARRIER_AND_GOODS, EXPLORE_LOST_CITY_RUMOUR, ILLEGAL_MOVE }
 
     public static final int ATTACK_GREAT_LOSS = -2, ATTACK_LOSS = -1, ATTACK_EVADES = 0, ATTACK_WIN = 1,
         ATTACK_GREAT_WIN = 2, ATTACK_DONE_SETTLEMENT = 3; // The last defender of the settlement has died.
@@ -1197,7 +1197,7 @@ public class Unit extends FreeColGameObject implements Features, Locatable, Loca
      * @return The move type. Notice: <code>Unit.ILLEGAL_MOVE</code> when
      *         there are no moves left.
      */
-    public int getMoveType(int direction) {
+    public MoveType getMoveType(int direction) {
         if (getTile() == null) {
             throw new IllegalStateException("getTile() == null");
         }
@@ -1215,7 +1215,7 @@ public class Unit extends FreeColGameObject implements Features, Locatable, Loca
      * @return The move type. Notice: <code>Unit.ILLEGAL_MOVE</code> when
      *         there are no moves left.
      */
-    public int getMoveType(Tile target) {
+    public MoveType getMoveType(Tile target) {
         return getMoveType(getTile(), target, getMovesLeft());
     }
 
@@ -1229,13 +1229,13 @@ public class Unit extends FreeColGameObject implements Features, Locatable, Loca
      * @return The move type. Notice: <code>Unit.ILLEGAL_MOVE</code> when
      *         there are no moves left.
      */
-    public int getMoveType(Tile from, Tile target, int ml) {
+    public MoveType getMoveType(Tile from, Tile target, int ml) {
         if (from == null) {
             throw new IllegalStateException("from == null");
         } else if (isUnderRepair()) {
-            return ILLEGAL_MOVE;
+            return MoveType.ILLEGAL_MOVE;
         } else if (ml <= 0) {
-            return ILLEGAL_MOVE;
+            return MoveType.ILLEGAL_MOVE;
         } else {
             if (isNaval()) {
                 return getNavalMoveType(from, target, ml);
@@ -1251,31 +1251,31 @@ public class Unit extends FreeColGameObject implements Features, Locatable, Loca
      * @param from The origin tile of the move
      * @param target The target tile of the move
      * @param ml The amount of moves this Unit has left
-     * @return The move type. Notice: <code>Unit.ILLEGAL_MOVE</code> when
+     * @return The move type. Notice: <code>Unit.MoveType.ILLEGAL_MOVE</code> when
      *         there are no moves left.
      */
-    private int getNavalMoveType(Tile from, Tile target, int ml) {
+    private MoveType getNavalMoveType(Tile from, Tile target, int ml) {
         if (target == null) { // TODO: do not allow "MOVE_HIGH_SEAS" north and
             // south.
             if (getOwner().canMoveToEurope()) {
-                return MOVE_HIGH_SEAS;
+                return MoveType.MOVE_HIGH_SEAS;
             } else {
-                return ILLEGAL_MOVE;
+                return MoveType.ILLEGAL_MOVE;
             }
         } else if (target.isLand()) {
             Settlement settlement = target.getSettlement();
             if (settlement != null) {
                 if (settlement.getOwner() == getOwner()) {
-                    return MOVE;
+                    return MoveType.MOVE;
                 } else if (canTradeWith(settlement)) {
-                    return ENTER_SETTLEMENT_WITH_CARRIER_AND_GOODS;
+                    return MoveType.ENTER_SETTLEMENT_WITH_CARRIER_AND_GOODS;
                 } else {
                     logger.fine("Trying to enter another player's settlement with " + getName());
-                    return ILLEGAL_MOVE;
+                    return MoveType.ILLEGAL_MOVE;
                 }
             } else if (target.getDefendingUnit(this) != null && target.getDefendingUnit(this).getOwner() != getOwner()) {
                 logger.fine("Trying to sail into tile occupied by enemy units with " + getName());
-                return ILLEGAL_MOVE;
+                return MoveType.ILLEGAL_MOVE;
             } else {
                 // Check for disembark.
                 Iterator<Unit> unitIterator = getUnitIterator();
@@ -1283,28 +1283,28 @@ public class Unit extends FreeColGameObject implements Features, Locatable, Loca
                 while (unitIterator.hasNext()) {
                     Unit u = unitIterator.next();
                     if (u.getMovesLeft() > 0) {
-                        return DISEMBARK;
+                        return MoveType.DISEMBARK;
                     }
                 }
                 logger.fine("No units to disembark from " + getName());
-                return ILLEGAL_MOVE;
+                return MoveType.ILLEGAL_MOVE;
             }
         } else if (target.getDefendingUnit(this) != null && target.getDefendingUnit(this).getOwner() != getOwner()) {
             // enemy units at sea
             if (isOffensiveUnit()) {
-                return ATTACK;
+                return MoveType.ATTACK;
             } else {
-                return ILLEGAL_MOVE;
+                return MoveType.ILLEGAL_MOVE;
             }
         } else if (target.getType().canSailToEurope()) {
             if (getOwner().canMoveToEurope()) {
-                return MOVE_HIGH_SEAS;
+                return MoveType.MOVE_HIGH_SEAS;
             } else {
-                return MOVE;
+                return MoveType.MOVE;
             }
         } else {
             // this must be ocean
-            return MOVE;
+            return MoveType.MOVE;
         }
     }
 
@@ -1315,14 +1315,14 @@ public class Unit extends FreeColGameObject implements Features, Locatable, Loca
      * @param from The origin tile of the move
      * @param target The target tile of the move
      * @param ml The amount of moves this Unit has left
-     * @return The move type. Notice: <code>Unit.ILLEGAL_MOVE</code> when
+     * @return The move type. Notice: <code>Unit.MoveType.ILLEGAL_MOVE</code> when
      *         there are no moves left.
      */
-    private int getLandMoveType(Tile from, Tile target, int ml) {
+    private MoveType getLandMoveType(Tile from, Tile target, int ml) {
         if (target == null) {
             // only naval units are allowed to do this
             logger.fine("Trying to enter null tile with land unit " + getName());
-            return ILLEGAL_MOVE;
+            return MoveType.ILLEGAL_MOVE;
         }
 
         if (target.isLand()) {
@@ -1330,76 +1330,76 @@ public class Unit extends FreeColGameObject implements Features, Locatable, Loca
             if (settlement != null) {
                 if (settlement.getOwner() == getOwner()) {
                     // our colony
-                    return MOVE;
+                    return MoveType.MOVE;
                 } else if (canTradeWith(settlement)) {
-                    return ENTER_SETTLEMENT_WITH_CARRIER_AND_GOODS;
+                    return MoveType.ENTER_SETTLEMENT_WITH_CARRIER_AND_GOODS;
                 } else if (settlement instanceof IndianSettlement) {
                     IndianSettlement indian = (IndianSettlement) settlement;
                     if (hasAbility("model.ability.scoutIndianSettlement")) {
-                        return ENTER_INDIAN_VILLAGE_WITH_SCOUT;
+                        return MoveType.ENTER_INDIAN_VILLAGE_WITH_SCOUT;
                     } else if (hasAbility("model.ability.missionary")) {
-                        return ENTER_INDIAN_VILLAGE_WITH_MISSIONARY;
+                        return MoveType.ENTER_INDIAN_VILLAGE_WITH_MISSIONARY;
                     } else if (isOffensiveUnit()) {
-                        return ATTACK;
+                        return MoveType.ATTACK;
                     } else if (indian.getLearnableSkill() != null || !indian.hasBeenVisited()) {
-                        return ENTER_INDIAN_VILLAGE_WITH_FREE_COLONIST;
+                        return MoveType.ENTER_INDIAN_VILLAGE_WITH_FREE_COLONIST;
                     } else {
-                        return ILLEGAL_MOVE;
+                        return MoveType.ILLEGAL_MOVE;
                     }
                 } else if (settlement instanceof Colony) {
                     if (hasAbility("model.ability.scoutForeignColony")) {
-                        return ENTER_FOREIGN_COLONY_WITH_SCOUT;
+                        return MoveType.ENTER_FOREIGN_COLONY_WITH_SCOUT;
                     } else if (isOffensiveUnit()) {
-                        return ATTACK;
+                        return MoveType.ATTACK;
                     } else {
                         logger.fine("Trying to enter foreign colony with " + getName());
-                        return ILLEGAL_MOVE;
+                        return MoveType.ILLEGAL_MOVE;
                     }
                 }
             } else if (target.getDefendingUnit(this) != null && target.getDefendingUnit(this).getOwner() != getOwner()) {
                 if (from.isLand()) {
                     if (isOffensiveUnit()) {
-                        return ATTACK;
+                        return MoveType.ATTACK;
                     } else {
                         logger.fine("Trying to attack with civilian " + getName());
-                        return ILLEGAL_MOVE;
+                        return MoveType.ILLEGAL_MOVE;
                     }
                 } else {
                     /*
                      * Note that attacking a settlement from a ship is allowed.
                      */
                     logger.fine("Attempting marine assault with " + getName());
-                    return ILLEGAL_MOVE;
+                    return MoveType.ILLEGAL_MOVE;
                 }
             } else if (target.getFirstUnit() != null && target.getFirstUnit().isNaval()
                        && target.getFirstUnit().getOwner() != getOwner()) {
                 // An enemy ship in land tile without a settlement
-                return ILLEGAL_MOVE;
+                return MoveType.ILLEGAL_MOVE;
             } else if (getMoveCost(from, target, ml) > ml) {
-                return ILLEGAL_MOVE;
+                return MoveType.ILLEGAL_MOVE;
             } else if (target.hasLostCityRumour()) {
-                return EXPLORE_LOST_CITY_RUMOUR;
+                return MoveType.EXPLORE_LOST_CITY_RUMOUR;
             } else {
-                return MOVE;
+                return MoveType.MOVE;
             }
         } else {
             // check for embarkation
             if (target.getFirstUnit() == null || target.getFirstUnit().getOwner() != getOwner()) {
                 logger.fine("Trying to embark on tile occupied by foreign units with " + getName());
-                return ILLEGAL_MOVE;
+                return MoveType.ILLEGAL_MOVE;
             } else {
                 for (Unit u : target.getUnitList()) {
                     if (u.getSpaceLeft() >= getTakeSpace()) {
-                        return EMBARK;
+                        return MoveType.EMBARK;
                     }
                 }
                 logger.fine("Trying to board full vessel with " + getName());
-                return ILLEGAL_MOVE;
+                return MoveType.ILLEGAL_MOVE;
             }
         }
 
         logger.info("Default illegal move for " + getName());
-        return ILLEGAL_MOVE;
+        return MoveType.ILLEGAL_MOVE;
     }
 
     /**
@@ -1450,7 +1450,7 @@ public class Unit extends FreeColGameObject implements Features, Locatable, Loca
      * @exception IllegalStateException If the move is illegal.
      */
     public void move(int direction) {
-        int moveType = getMoveType(direction);
+        MoveType moveType = getMoveType(direction);
 
         // For debugging:
         switch (moveType) {
@@ -1534,7 +1534,7 @@ public class Unit extends FreeColGameObject implements Features, Locatable, Loca
             throw new NullPointerException();
         }
 
-        if (getMoveType(unit.getTile()) != EMBARK) {
+        if (getMoveType(unit.getTile()) != MoveType.EMBARK) {
             throw new IllegalStateException("Illegal disembark requested!");
         }
 
@@ -2497,11 +2497,7 @@ public class Unit extends FreeColGameObject implements Features, Locatable, Loca
 
         if (getDestination() != null) {
             return Messages.message("model.unit.occupation.goingSomewhere");
-        }
-
-        if (state == UnitState.IMPROVING && workImprovement != null) {
-            // TODO: this needs to be changed as soon as AI
-            // improvements work
+        } else if (state == UnitState.IMPROVING && workImprovement != null) {
             return workImprovement.getOccupationString();
         } else if (state == UnitState.ACTIVE && getMovesLeft() == 0) {
             return Messages.message("model.unit.occupation.activeNoMovesLeft");

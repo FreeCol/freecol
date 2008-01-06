@@ -78,6 +78,7 @@ import net.sf.freecol.common.model.TileImprovement;
 import net.sf.freecol.common.model.TileImprovementType;
 import net.sf.freecol.common.model.TradeRoute;
 import net.sf.freecol.common.model.Unit;
+import net.sf.freecol.common.model.Unit.MoveType;
 import net.sf.freecol.common.model.Unit.UnitState;
 import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.model.WorkLocation;
@@ -690,17 +691,17 @@ public final class InGameController implements NetworkConstants {
                         .getLastNode().getTile().getSettlement().getOwner() != freeColClient.getMyPlayer()));
 
         while (path != null) {
-            int mt = unit.getMoveType(path.getDirection());
+            MoveType mt = unit.getMoveType(path.getDirection());
             switch (mt) {
-            case Unit.MOVE:
+            case MOVE:
                 reallyMove(unit, path.getDirection());
                 break;
-            case Unit.EXPLORE_LOST_CITY_RUMOUR:
+            case EXPLORE_LOST_CITY_RUMOUR:
                 exploreLostCityRumour(unit, path.getDirection());
                 if (unit.isDisposed())
                     return;
                 break;
-            case Unit.MOVE_HIGH_SEAS:
+            case MOVE_HIGH_SEAS:
                 if (destination instanceof Europe) {
                     moveToEurope(unit);
                     path = null;
@@ -711,13 +712,13 @@ public final class InGameController implements NetworkConstants {
                     reallyMove(unit, path.getDirection());
                 }
                 break;
-            case Unit.DISEMBARK:
+            case DISEMBARK:
                 disembark(unit, path.getDirection());
                 path = null;
                 break;
             default:
-                if (path == path.getLastNode() && mt != Unit.ILLEGAL_MOVE
-                        && (mt != Unit.ATTACK || knownEnemyOnLastTile)) {
+                if (path == path.getLastNode() && mt != MoveType.ILLEGAL_MOVE
+                        && (mt != MoveType.ATTACK || knownEnemyOnLastTile)) {
                     move(unit, path.getDirection());
                 } else {
                     Tile target = map.getNeighbourOrNull(path.getDirection(), unit.getTile());
@@ -963,37 +964,37 @@ public final class InGameController implements NetworkConstants {
          * ie) {}
          */
 
-        int move = unit.getMoveType(direction);
+        MoveType move = unit.getMoveType(direction);
 
         switch (move) {
-        case Unit.MOVE:
+        case MOVE:
             reallyMove(unit, direction);
             break;
-        case Unit.ATTACK:
+        case ATTACK:
             attack(unit, direction);
             break;
-        case Unit.DISEMBARK:
+        case DISEMBARK:
             disembark(unit, direction);
             break;
-        case Unit.EMBARK:
+        case EMBARK:
             embark(unit, direction);
             break;
-        case Unit.MOVE_HIGH_SEAS:
+        case MOVE_HIGH_SEAS:
             moveHighSeas(unit, direction);
             break;
-        case Unit.ENTER_INDIAN_VILLAGE_WITH_SCOUT:
+        case ENTER_INDIAN_VILLAGE_WITH_SCOUT:
             scoutIndianSettlement(unit, direction);
             break;
-        case Unit.ENTER_INDIAN_VILLAGE_WITH_MISSIONARY:
+        case ENTER_INDIAN_VILLAGE_WITH_MISSIONARY:
             useMissionary(unit, direction);
             break;
-        case Unit.ENTER_INDIAN_VILLAGE_WITH_FREE_COLONIST:
+        case ENTER_INDIAN_VILLAGE_WITH_FREE_COLONIST:
             learnSkillAtIndianSettlement(unit, direction);
             break;
-        case Unit.ENTER_FOREIGN_COLONY_WITH_SCOUT:
+        case ENTER_FOREIGN_COLONY_WITH_SCOUT:
             scoutForeignColony(unit, direction);
             break;
-        case Unit.ENTER_SETTLEMENT_WITH_CARRIER_AND_GOODS:
+        case ENTER_SETTLEMENT_WITH_CARRIER_AND_GOODS:
             //TODO: unify trade and negotiations
             Map map = freeColClient.getGame().getMap();
             Settlement settlement = map.getNeighbourOrNull(direction, unit.getTile()).getSettlement();
@@ -1003,10 +1004,10 @@ public final class InGameController implements NetworkConstants {
                 tradeWithSettlement(unit, direction);
             }
             break;
-        case Unit.EXPLORE_LOST_CITY_RUMOUR:
+        case EXPLORE_LOST_CITY_RUMOUR:
             exploreLostCityRumour(unit, direction);
             break;
-        case Unit.ILLEGAL_MOVE:
+        case ILLEGAL_MOVE:
             freeColClient.playSound(SfxLibrary.ILLEGAL_MOVE);
             break;
         default:

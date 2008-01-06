@@ -39,6 +39,7 @@ import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Tension;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
+import net.sf.freecol.common.model.Unit.MoveType;
 import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.networking.Message;
 import net.sf.freecol.server.ai.AIMain;
@@ -121,12 +122,7 @@ public class IndianDemandMission extends Mission {
             if (getUnit().getTile() != getUnit().getIndianSettlement().getTile()) {
                 // Move to the owning settlement:
                 int r = moveTowards(connection, getUnit().getIndianSettlement().getTile());
-                if (r >= 0) {
-                    final int mt = getUnit().getMoveType(r);
-                    if (mt != Unit.ILLEGAL_MOVE && mt != Unit.ATTACK) {
-                        move(connection, r);
-                    }
-                }
+                moveButDontAttack(connection, r);
             } else {
                 // Load the goods:
                 ArrayList<Goods> goodsList = new ArrayList<Goods>();
@@ -232,7 +228,7 @@ public class IndianDemandMission extends Mission {
             int j;
             for (j = 8; j > 0
                     && ((unit.getGame().getMap().getNeighbourOrNull(direction, thisTile) == null) || (unit
-                            .getMoveType(direction) != Unit.MOVE)); j--) {
+                            .getMoveType(direction) != MoveType.MOVE)); j--) {
                 direction = (int) (Math.random() * 8);
             }
             if (j == 0)

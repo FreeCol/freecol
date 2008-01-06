@@ -31,6 +31,7 @@ import net.sf.freecol.common.model.Map;
 import net.sf.freecol.common.model.PathNode;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
+import net.sf.freecol.common.model.Unit.MoveType;
 import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.networking.Message;
 import net.sf.freecol.server.ai.AIMain;
@@ -112,7 +113,7 @@ public class UnitWanderHostileMission extends Mission {
         
         if (pathToTarget != null) {
             int direction = moveTowards(connection, pathToTarget);
-            if (direction >= 0 && unit.getMoveType(direction) == Unit.ATTACK) {
+            if (direction >= 0 && unit.getMoveType(direction) == MoveType.ATTACK) {
                 Element element = Message.createNewRootElement("attack");
                 element.setAttribute("unit", unit.getId());
                 element.setAttribute("direction", Integer.toString(direction));
@@ -131,8 +132,8 @@ public class UnitWanderHostileMission extends Mission {
             int direction = directions[0];
             int j;
             for (j = 0; j < 8 && (map.getNeighbourOrNull(direction, thisTile) == null 
-                    || (unit.getMoveType(direction) != Unit.MOVE
-                       && unit.getMoveType(direction) != Unit.DISEMBARK));
+                    || (unit.getMoveType(direction) != MoveType.MOVE
+                       && unit.getMoveType(direction) != MoveType.DISEMBARK));
                     j++) {
                 direction = directions[j];
             }

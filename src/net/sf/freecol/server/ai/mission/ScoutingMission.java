@@ -34,6 +34,7 @@ import net.sf.freecol.common.model.Map;
 import net.sf.freecol.common.model.PathNode;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
+import net.sf.freecol.common.model.Unit.MoveType;
 import net.sf.freecol.common.model.Map.Position;
 import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.networking.Message;
@@ -175,8 +176,8 @@ public class ScoutingMission extends Mission {
                 transportDestination = null;
                 int direction = moveTowards(connection, bestPath);
                 if (direction >= 0) {
-                    final int mt = getUnit().getMoveType(direction);                                            
-                    if (getUnit().getMoveType(direction) == Unit.ENTER_INDIAN_VILLAGE_WITH_SCOUT) {
+                    final MoveType mt = getUnit().getMoveType(direction);             
+                    if (getUnit().getMoveType(direction) == MoveType.ENTER_INDIAN_VILLAGE_WITH_SCOUT) {
                         Element scoutMessage = Message.createNewRootElement("scoutIndianSettlement");
                         scoutMessage.setAttribute("unit", getUnit().getId());
                         scoutMessage.setAttribute("direction", Integer.toString(direction));
@@ -197,7 +198,7 @@ public class ScoutingMission extends Mission {
                         if (getUnit().isDisposed()) {
                             return;
                         }
-                    } else if (mt != Unit.ILLEGAL_MOVE && mt != Unit.ATTACK) {
+                    } else if (mt != MoveType.ILLEGAL_MOVE && mt != MoveType.ATTACK) {
                         move(connection, direction);
                     }
                 }

@@ -33,6 +33,7 @@ import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.PathNode;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
+import net.sf.freecol.common.model.Unit.MoveType;
 import net.sf.freecol.common.model.Unit.UnitState;
 import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.networking.Message;
@@ -239,12 +240,7 @@ public class PioneeringMission extends Mission {
 
                     if (bestPath != null) {
                         int direction = moveTowards(connection, bestPath);
-                        if (direction >= 0) {
-                            final int mt = getUnit().getMoveType(direction);
-                            if (mt != Unit.ILLEGAL_MOVE && mt != Unit.ATTACK) {
-                                move(connection, direction);                    
-                            }
-                        }
+                        moveButDontAttack(connection, direction);
                     } else {
                         skipMission = true;
                     }
@@ -280,8 +276,8 @@ public class PioneeringMission extends Mission {
                     PathNode pathToTarget = getUnit().findPath(tileImprovementPlan.getTarget());
                     if (pathToTarget != null) {
                         int direction = moveTowards(connection, pathToTarget);
-                        if (direction >= 0 && (getUnit().getMoveType(direction) == Unit.MOVE
-                                || getUnit().getMoveType(direction) == Unit.EXPLORE_LOST_CITY_RUMOUR)) {
+                        if (direction >= 0 && (getUnit().getMoveType(direction) == MoveType.MOVE
+                                || getUnit().getMoveType(direction) == MoveType.EXPLORE_LOST_CITY_RUMOUR)) {
                             move(connection, direction);
                         }
                     }

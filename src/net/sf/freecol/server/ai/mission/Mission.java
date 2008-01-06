@@ -28,6 +28,7 @@ import net.sf.freecol.common.model.PathNode;
 import net.sf.freecol.common.model.Tension;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
+import net.sf.freecol.common.model.Unit.MoveType;
 import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.networking.Message;
 import net.sf.freecol.server.ai.AIMain;
@@ -126,13 +127,13 @@ public abstract class Mission extends AIObject {
         }
         
         while (pathNode.next != null && pathNode.getTurns() == 0
-                && (getUnit().getMoveType(pathNode.getDirection()) == Unit.MOVE
-                || getUnit().getMoveType(pathNode.getDirection()) == Unit.MOVE_HIGH_SEAS
-                || getUnit().getMoveType(pathNode.getDirection()) == Unit.EXPLORE_LOST_CITY_RUMOUR)) {
+                && (getUnit().getMoveType(pathNode.getDirection()) == MoveType.MOVE
+                || getUnit().getMoveType(pathNode.getDirection()) == MoveType.MOVE_HIGH_SEAS
+                || getUnit().getMoveType(pathNode.getDirection()) == MoveType.EXPLORE_LOST_CITY_RUMOUR)) {
             move(connection, pathNode.getDirection());         
             pathNode = pathNode.next;
         }        
-        if (pathNode.getTurns() == 0 && getUnit().getMoveType(pathNode.getDirection()) != Unit.ILLEGAL_MOVE) {            
+        if (pathNode.getTurns() == 0 && getUnit().getMoveType(pathNode.getDirection()) != MoveType.ILLEGAL_MOVE) {
             return pathNode.getDirection();
         }        
         return NO_MORE_MOVES_LEFT;
@@ -158,6 +159,14 @@ public abstract class Mission extends AIObject {
         }
     }
     
+    protected void moveButDontAttack(Connection connection, int direction) {
+        if (direction >= 0) {
+            final MoveType mt = getUnit().getMoveType(direction);
+            if (mt != MoveType.ILLEGAL_MOVE && mt != MoveType.ATTACK) {
+                move(connection, direction);                    
+            }
+        }
+    }
     
     /**
      * Makes the unit explore the lost city rumour located on it's current

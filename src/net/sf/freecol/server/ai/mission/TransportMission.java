@@ -43,6 +43,7 @@ import net.sf.freecol.common.model.PathNode;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
+import net.sf.freecol.common.model.Unit.MoveType;
 import net.sf.freecol.common.model.Unit.UnitState;
 import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.networking.Connection;
@@ -427,10 +428,10 @@ public class TransportMission extends Mission {
                 // Tile oldTile = carrier.getTile();
 
                 int r = moveTowards(connection, path);
-                if (r >= 0 && (carrier.getMoveType(r) == Unit.MOVE || carrier.getMoveType(r) == Unit.MOVE_HIGH_SEAS)) {
+                if (r >= 0 && (carrier.getMoveType(r) == MoveType.MOVE || carrier.getMoveType(r) == MoveType.MOVE_HIGH_SEAS)) {
                     // Tile target = getGame().getMap().getNeighbourOrNull(r,
                     // carrier.getTile());
-                    if (carrier.getMoveType(r) == Unit.MOVE_HIGH_SEAS && moveToEurope) {
+                    if (carrier.getMoveType(r) == MoveType.MOVE_HIGH_SEAS && moveToEurope) {
                         Element moveToEuropeElement = Message.createNewRootElement("moveToEurope");
                         moveToEuropeElement.setAttribute("unit", carrier.getId());
                         try {

@@ -29,6 +29,7 @@ import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
+import net.sf.freecol.common.model.Unit.MoveType;
 import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.networking.Message;
 import net.sf.freecol.server.ai.AIMain;
@@ -98,8 +99,8 @@ public class UnitWanderMission extends Mission {
             int direction = (int) (Math.random() * 8);
             int j;
             for (j = 8; j > 0 && ((unit.getGame().getMap().getNeighbourOrNull(direction, thisTile) == null)
-                    || (unit.getMoveType(direction) != Unit.MOVE)
-                        && (unit.getMoveType(direction) != Unit.DISEMBARK));
+                    || (unit.getMoveType(direction) != MoveType.MOVE)
+                        && (unit.getMoveType(direction) != MoveType.DISEMBARK));
                     j--) {
                 direction = (int) (Math.random() * 8);
             }

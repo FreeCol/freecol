@@ -34,6 +34,7 @@ import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
+import net.sf.freecol.common.model.Unit.MoveType;
 import net.sf.freecol.common.model.Unit.UnitState;
 import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.networking.Message;
@@ -137,7 +138,7 @@ public class DefendSettlementMission extends Mission {
                     continue;
                 Unit defender = t.getDefendingUnit(unit);
                 if (defender != null && defender.getOwner().getStance(unit.getOwner()) == Player.WAR
-                        && unit.getMoveType(direction) == Unit.ATTACK) {
+                        && unit.getMoveType(direction) == MoveType.ATTACK) {
                     Unit enemyUnit = defender;
                     float enemyAttack = enemyUnit.getOffensePower(unit);
                     float weAttack = unit.getOffensePower(enemyUnit);
@@ -172,12 +173,7 @@ public class DefendSettlementMission extends Mission {
         if (unit.getTile() != settlement.getTile()) {
             // Move towards the target.
             int r = moveTowards(connection, settlement.getTile());
-            if (r >= 0) {
-                final int mt = getUnit().getMoveType(r);
-                if (mt != Unit.ILLEGAL_MOVE && mt != Unit.ATTACK) {
-                    move(connection, r);
-                }
-            }
+            moveButDontAttack(connection, r);
         } else {
             if (unit.getState() != UnitState.FORTIFIED
                     && unit.getState() != UnitState.FORTIFYING

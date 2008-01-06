@@ -32,6 +32,7 @@ import net.sf.freecol.common.model.Map;
 import net.sf.freecol.common.model.PathNode;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
+import net.sf.freecol.common.model.Unit.MoveType;
 import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.networking.Message;
 import net.sf.freecol.server.ai.AIMain;
@@ -133,12 +134,7 @@ public class CashInTreasureTrainMission extends Mission {
             
             if (bestPath != null) {
                 int direction = moveTowards(connection, bestPath);
-                if (direction >= 0) {
-                    final int mt = getUnit().getMoveType(direction);
-                    if (mt != Unit.ILLEGAL_MOVE && mt != Unit.ATTACK) {
-                        move(connection, direction);                    
-                    } 
-                }
+                moveButDontAttack(connection, direction);
             }
         }
         
