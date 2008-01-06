@@ -248,7 +248,11 @@ public final class MapEditorTransformPanel extends FreeColPanel {
         }
         
         public void transform(Tile t) {
-            t.addRiver(magnitude);
+            if (t.getType().canHaveRiver()) {
+                // only add a river on terrain tiles
+                // river mouth on ocean/lake tiles are treated separately
+                t.addRiver(magnitude);
+            }
         }
     }
 

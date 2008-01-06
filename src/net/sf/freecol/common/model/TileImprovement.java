@@ -279,10 +279,10 @@ public class TileImprovement extends TileItem implements Locatable, Named {
         return style;
     }
 
-    public void addStyle(int addStyle) {
-        this.style += addStyle;
-    }
-
+    /**
+     * Sets the Style of this Improvement - used for Rivers
+     * @param style The style
+     */
     public void setStyle(int style) {
         this.style = style;
     }

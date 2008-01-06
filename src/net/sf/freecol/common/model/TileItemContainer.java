@@ -31,6 +31,7 @@ import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.gui.i18n.Messages;
+import net.sf.freecol.server.generator.RiverSection;
 
 import org.w3c.dom.Element;
 
@@ -244,7 +245,7 @@ public class TileItemContainer extends FreeColGameObject {
     /**
      * Returns a description of the tile, with the name of the tile
      * and any improvements made to it (road/plow)
-     * @param separator The separator to be used (eg. "/")
+     * @param separator The separator to be used (e.g. "/")
      * @return The description label for this tile
      */
     public String getLabel(String separator) {
@@ -262,7 +263,7 @@ public class TileItemContainer extends FreeColGameObject {
     // ------------------------------------------------------------ add/remove from container
 
     /**
-     * Adds a <code>TileItem</code> to this containter.
+     * Adds a <code>TileItem</code> to this container.
      * @param t The TileItem to add to this container.
      * @return The added TileItem or the existing TileItem or <code>null</code> on error
      */
@@ -449,7 +450,11 @@ public class TileItemContainer extends FreeColGameObject {
                 tiType.getMagnitude() <= magnitude) {
                 TileImprovement river = new TileImprovement(getGame(), tile, tiType);
                 this.river = river;
-                adjustNeighbourRiverStyle(TileImprovement.NO_RIVER);
+                if (this.tile.getType().canHaveRiver()) {
+                    // only update surrounding tiles for terrain tiles
+                    // river mouth on ocean/lake tiles are treated separately
+                    adjustNeighbourRiverStyle(TileImprovement.NO_RIVER);
+                }
                 return (TileImprovement) addTileItem(river);
             }
         }
@@ -517,23 +522,36 @@ public class TileItemContainer extends FreeColGameObject {
      */
     public void adjustNeighbourRiverStyle(int oldMagnitude) {
         if (river == null || river.getMagnitude() == oldMagnitude) {
+            // nothing changed
             return;
         }
-        int magChange = river.getMagnitude() - oldMagnitude;
         int[] directions = {Map.NE, Map.SE, Map.SW, Map.NW};
-        int[] base = Map.getBase(directions, 3);
+        RiverSection mysection = new RiverSection(river.getStyle());
+        // for each neighboring tile
         for (int i = 0; i < directions.length; i++) {
             Tile t = getTile().getMap().getNeighbourOrNull(directions[i], getTile());
             if (t == null) {
                 continue;
             }
             TileImprovement otherRiver = t.getRiver();
-            if (otherRiver == null) {   // This tile doesn't have a river   
-                continue;
+            if (!t.isLand() && otherRiver==null) {
+                // add a virtual river in the ocean/lake tile 
+                // just for the purpose of drawing the river mouth
+                t.addRiver(river.getMagnitude());
+                otherRiver = t.getRiver();
             }
-            int otherDirection = Map.getReverseDirection(directions[i]);
-            otherRiver.addStyle(base[otherDirection] * magChange);
+            if (otherRiver != null) {
+                // update the other tile river branch
+                int otherDirection = Map.getReverseDirection(directions[i]);
+                RiverSection oppositesection = new RiverSection(otherRiver.getStyle());
+                oppositesection.setBranch(otherDirection, river.getMagnitude());
+                otherRiver.setStyle(oppositesection.encodeStyle());
+                // update the current tile river branch
+                mysection.setBranch(directions[i], river.getMagnitude());
+            }
+            // else the neighbor tile doesn't have a river, nothing to do
         }
+        river.setStyle(mysection.encodeStyle());
     }
 
     public int getRiverStyle() {
@@ -542,7 +560,7 @@ public class TileItemContainer extends FreeColGameObject {
         }
         return river.getStyle();
     }
-
+/* Commented because it doesn't appear to do anything valuable
     public void updateRiver() {
         if (river == null) {
             return;
@@ -558,7 +576,7 @@ public class TileItemContainer extends FreeColGameObject {
             style += base[i] * t.getRiverStyle();
         }
     }
-
+*/
     /**
      * Removes all references to this object.
      */
