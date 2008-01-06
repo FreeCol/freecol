@@ -32,6 +32,7 @@ import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.freecol.FreeCol;
+import net.sf.freecol.common.model.Unit.CombatResult;
 
 import org.w3c.dom.Element;
 
@@ -1193,13 +1194,13 @@ public final class Colony extends Settlement implements Features, Location, Name
      * @param defender The <code>Unit</code> defending against bombardment.
      * @param result The result of the bombardment.
      */
-    public void bombard(Unit defender, int result) {
+    public void bombard(Unit defender, CombatResult result) {
         if (defender == null) {
             throw new NullPointerException();
         }
         
         switch (result) {
-        case Unit.ATTACK_EVADES:
+        case EVADES:
             // send message to both parties
             addModelMessage(this, "model.unit.shipEvadedBombardment",
                             new String[][] {
@@ -1213,7 +1214,7 @@ public final class Colony extends Settlement implements Features, Location, Name
                                              { "%nation%", defender.getOwner().getNationAsString() } }, 
                             ModelMessage.DEFAULT, this);
             break;
-        case Unit.ATTACK_WIN:
+        case WIN:
             defender.shipDamaged(this);
             addModelMessage(this, "model.unit.enemyShipDamagedByBombardment",
                             new String[][] {
@@ -1221,7 +1222,7 @@ public final class Colony extends Settlement implements Features, Location, Name
                                 { "%unit%", defender.getName() },
                                 { "%nation%", defender.getOwner().getNationAsString() } }, ModelMessage.UNIT_DEMOTED);
             break;
-        case Unit.ATTACK_GREAT_WIN:
+        case GREAT_WIN:
             defender.shipSunk(this);
             addModelMessage(this, "model.unit.shipSunkByBombardment",
                             new String[][] {

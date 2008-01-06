@@ -40,6 +40,7 @@ import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
+import net.sf.freecol.common.model.Unit.CombatResult;
 import net.sf.freecol.common.model.Unit.UnitState;
 import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.model.Map.Position;
@@ -577,23 +578,24 @@ public final class InGameController extends Controller {
                             Unit unit = unitIterator.next();
                             Player player = unit.getOwner();
                             if (player != currentPlayer
-                                    && (currentPlayer.getStance(player) == Player.WAR || unit.hasAbility("model.ability.piracy"))) {
+                                    && (currentPlayer.getStance(player) == Player.WAR ||
+                                        unit.hasAbility("model.ability.piracy"))) {
                                 logger.finest("Found enemy unit " + unit.getOwner().getNationAsString() + " "
                                         + unit.getName());
                                 // generate bombardment result
                                 float totalProbability = attackPower + unit.getDefensePower(attacker);
-                                int result;
+                                CombatResult result;
                                 int r = getPseudoRandom().nextInt(Math.round(totalProbability) + 1);
                                 if (r < attackPower) {
                                     int diff = Math.round(unit.getDefensePower(attacker) * 2 - attackPower);
                                     int r2 = getPseudoRandom().nextInt((diff < 3) ? 3 : diff);
                                     if (r2 == 0) {
-                                        result = Unit.ATTACK_GREAT_WIN;
+                                        result = CombatResult.GREAT_WIN;
                                     } else {
-                                        result = Unit.ATTACK_WIN;
+                                        result = CombatResult.WIN;
                                     }
                                 } else {
-                                    result = Unit.ATTACK_EVADES;
+                                    result = CombatResult.EVADES;
                                 }
 
                                 // Inform the players (other then the player
@@ -611,9 +613,9 @@ public final class InGameController extends Controller {
                                     Element opponentAttackElement = Message.createNewRootElement("opponentAttack");
                                     if (unit.isVisibleTo(enemyPlayer)) {
                                         opponentAttackElement.setAttribute("direction", Integer.toString(direction));
-                                        opponentAttackElement.setAttribute("result", Integer.toString(result));
-                                        opponentAttackElement
-                                                .setAttribute("plunderGold", Integer.toString(plunderGold));
+                                        opponentAttackElement.setAttribute("result", result.toString());
+                                        opponentAttackElement .setAttribute("plunderGold",
+                                                                            Integer.toString(plunderGold));
                                         opponentAttackElement.setAttribute("colony", colony.getId());
                                         opponentAttackElement.setAttribute("unit", attacker.getId());
                                         opponentAttackElement.setAttribute("defender", unit.getId());

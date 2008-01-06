@@ -78,6 +78,7 @@ import net.sf.freecol.common.model.TileImprovement;
 import net.sf.freecol.common.model.TileImprovementType;
 import net.sf.freecol.common.model.TradeRoute;
 import net.sf.freecol.common.model.Unit;
+import net.sf.freecol.common.model.Unit.CombatResult;
 import net.sf.freecol.common.model.Unit.MoveType;
 import net.sf.freecol.common.model.Unit.UnitState;
 import net.sf.freecol.common.model.UnitType;
@@ -1680,7 +1681,7 @@ public final class InGameController implements NetworkConstants {
         // Get the result of the attack from the server:
         Element attackResultElement = client.ask(attackElement);
         if (attackResultElement != null) {
-            int result = Integer.parseInt(attackResultElement.getAttribute("result"));
+            CombatResult result = Enum.valueOf(CombatResult.class, attackResultElement.getAttribute("result"));
             int plunderGold = Integer.parseInt(attackResultElement.getAttribute("plunderGold"));
 
             // If a successful attack against a colony, we need to update the
@@ -1722,7 +1723,7 @@ public final class InGameController implements NetworkConstants {
 
             if (!unit.isNaval()) {
                 Unit winner;
-                if (result >= Unit.ATTACK_EVADES) {
+                if (result == CombatResult.WIN || result == CombatResult.GREAT_WIN) {
                     winner = unit;
                 } else {
                     winner = defender;
@@ -1741,7 +1742,7 @@ public final class InGameController implements NetworkConstants {
                     freeColClient.playSound(SfxLibrary.DRAGOON);
                 }
             } else {
-                if (result >= Unit.ATTACK_GREAT_WIN || result <= Unit.ATTACK_GREAT_LOSS) {
+                if (result == CombatResult.GREAT_WIN || result == CombatResult.GREAT_LOSS) {
                     freeColClient.playSound(SfxLibrary.SUNK);
                 }
             }
@@ -1777,12 +1778,14 @@ public final class InGameController implements NetworkConstants {
                 nextModelMessage();
             }
             
-            if (defender.canCarryTreasure() && result >= Unit.ATTACK_WIN) {
+            if (defender.canCarryTreasure() &&
+                (result == CombatResult.WIN ||
+                 result == CombatResult.GREAT_WIN)) {
                 checkCashInTreasureTrain(defender);
             }
                 
             if (!defender.isDisposed()
-                    && ((result == Unit.ATTACK_DONE_SETTLEMENT && unitElement != null)
+                    && ((result == CombatResult.DONE_SETTLEMENT && unitElement != null)
                             || defender.getLocation() == null || !defender.isVisibleTo(freeColClient.getMyPlayer()))) {
                 defender.dispose();
             }

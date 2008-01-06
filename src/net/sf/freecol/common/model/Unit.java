@@ -86,8 +86,8 @@ public class Unit extends FreeColGameObject implements Features, Locatable, Loca
             ENTER_INDIAN_VILLAGE_WITH_MISSIONARY, ENTER_FOREIGN_COLONY_WITH_SCOUT,
             ENTER_SETTLEMENT_WITH_CARRIER_AND_GOODS, EXPLORE_LOST_CITY_RUMOUR, ILLEGAL_MOVE }
 
-    public static final int ATTACK_GREAT_LOSS = -2, ATTACK_LOSS = -1, ATTACK_EVADES = 0, ATTACK_WIN = 1,
-        ATTACK_GREAT_WIN = 2, ATTACK_DONE_SETTLEMENT = 3; // The last defender of the settlement has died.
+    public static enum CombatResult { GREAT_LOSS, LOSS, EVADES, WIN,
+            GREAT_WIN, DONE_SETTLEMENT }; // The last defender of the settlement has died.
 
     public static final int MUSKETS_TO_ARM_INDIAN = 25, HORSES_TO_MOUNT_INDIAN = 25;
 
@@ -3378,7 +3378,7 @@ public class Unit extends FreeColGameObject implements Features, Locatable, Loca
      * @param plunderGold The amount of gold to plunder in case of a successful
      *            attack on a <code>Settlement</code>.
      */
-    public void attack(Unit defender, int result, int plunderGold) {
+    public void attack(Unit defender, CombatResult result, int plunderGold) {
         if (defender == null) {
             throw new NullPointerException("No defender specified!");
         }
@@ -3408,7 +3408,7 @@ public class Unit extends FreeColGameObject implements Features, Locatable, Loca
         Settlement settlement = newTile.getSettlement();
 
         switch (result) {
-        case ATTACK_EVADES:
+        case EVADES:
             if (isNaval()) {
                 // send message to both parties
                 addModelMessage(this, "model.unit.shipEvaded",
@@ -3425,7 +3425,7 @@ public class Unit extends FreeColGameObject implements Features, Locatable, Loca
                 logger.warning("Non-naval unit evades!");
             }
             break;
-        case ATTACK_LOSS:
+        case LOSS:
             if (isNaval()) {
                 shipDamaged();
                 addModelMessage(defender, "model.unit.enemyShipDamaged",
@@ -3440,7 +3440,7 @@ public class Unit extends FreeColGameObject implements Features, Locatable, Loca
                 }
             }
             break;
-        case ATTACK_GREAT_LOSS:
+        case GREAT_LOSS:
             if (isNaval()) {
                 shipSunk();
                 addModelMessage(defender, "model.unit.shipSunk",
@@ -3453,7 +3453,7 @@ public class Unit extends FreeColGameObject implements Features, Locatable, Loca
                 defender.promote();
             }
             break;
-        case ATTACK_DONE_SETTLEMENT:
+        case DONE_SETTLEMENT:
             if (settlement instanceof IndianSettlement) {
                 defender.dispose();
                 destroySettlement((IndianSettlement) settlement);
@@ -3463,7 +3463,7 @@ public class Unit extends FreeColGameObject implements Features, Locatable, Loca
                 throw new IllegalStateException("Unknown type of settlement.");
             }
             break;
-        case ATTACK_WIN:
+        case WIN:
             if (isNaval()) {
                 captureGoods(defender);
                 defender.shipDamaged();
@@ -3487,7 +3487,7 @@ public class Unit extends FreeColGameObject implements Features, Locatable, Loca
                 }
             }
             break;
-        case ATTACK_GREAT_WIN:
+        case GREAT_WIN:
             if (isNaval()) {
                 captureGoods(defender);
                 defender.shipSunk();
@@ -4455,7 +4455,7 @@ public class Unit extends FreeColGameObject implements Features, Locatable, Loca
     /**
      * Damage a building or a ship or steal some goods or gold. It's called
      * from attack when an indian attacks a colony and lose the combat with
-     * ATTACK_LOSS as result
+     * LOSS as result
      *
      * @param colony The attacked colony
      */

@@ -57,6 +57,7 @@ import net.sf.freecol.common.model.TileImprovement;
 import net.sf.freecol.common.model.TileImprovementType;
 import net.sf.freecol.common.model.TradeRoute;
 import net.sf.freecol.common.model.Unit;
+import net.sf.freecol.common.model.Unit.CombatResult;
 import net.sf.freecol.common.model.Unit.UnitState;
 import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.model.WorkLocation;
@@ -1244,12 +1245,12 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
             throw new IllegalArgumentException("Could not find tile in direction " + direction + " from unit with ID "
                     + unitID);
         }
-        int result;
+        CombatResult result;
         int plunderGold = -1;
         Unit defender = newTile.getDefendingUnit(unit);
         if (defender == null) {
             if (newTile.getSettlement() != null) {
-                result = Unit.ATTACK_DONE_SETTLEMENT;
+                result = CombatResult.DONE_SETTLEMENT;
             } else {
                 throw new IllegalStateException("Nothing to attack in direction " + direction + " from unit with ID "
                         + unitID);
@@ -1257,7 +1258,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         } else {
             result = generateAttackResult(unit, defender); 
         }
-        if (result == Unit.ATTACK_DONE_SETTLEMENT) {
+        if (result == CombatResult.DONE_SETTLEMENT) {
             // 10% of their gold
             plunderGold = newTile.getSettlement().getOwner().getGold() / 10;
         }
@@ -1272,7 +1273,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
             Element opponentAttackElement = Message.createNewRootElement("opponentAttack");
             if (unit.isVisibleTo(enemyPlayer) || defender.isVisibleTo(enemyPlayer)) {
                 opponentAttackElement.setAttribute("direction", Integer.toString(direction));
-                opponentAttackElement.setAttribute("result", Integer.toString(result));
+                opponentAttackElement.setAttribute("result", result.toString());
                 opponentAttackElement.setAttribute("plunderGold", Integer.toString(plunderGold));
                 opponentAttackElement.setAttribute("unit", unit.getId());
                 opponentAttackElement.setAttribute("defender", defender.getId());
@@ -1300,10 +1301,10 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         }
         // Create the reply for the attacking player:
         Element reply = Message.createNewRootElement("attackResult");
-        reply.setAttribute("result", Integer.toString(result));
+        reply.setAttribute("result", result.toString());
         reply.setAttribute("plunderGold", Integer.toString(plunderGold));
         
-        if (result == Unit.ATTACK_DONE_SETTLEMENT && newTile.getColony() != null) {
+        if (result == CombatResult.DONE_SETTLEMENT && newTile.getColony() != null) {
             // If a colony will been won, send an updated tile:
             reply.appendChild(newTile.toXMLElement(newTile.getColony().getOwner(), reply.getOwnerDocument()));
             reply.appendChild(defender.toXMLElement(newTile.getColony().getOwner(), reply.getOwnerDocument()));
@@ -1321,7 +1322,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         int oldUnits = unit.getTile().getUnitCount();
         unit.attack(defender, result, plunderGold);
         
-        if (result >= Unit.ATTACK_WIN && unit.getTile() != newTile &&
+        if (result.compareTo(CombatResult.WIN) >= 0 && unit.getTile() != newTile &&
                 oldUnits < unit.getTile().getUnitCount()) {
             // Unit won and didn't move, there are more units and last is a convert, send last one
             Unit lastUnit = unit.getTile().getLastUnit();
@@ -1345,11 +1346,11 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
             }
         }
 
-        if (result >= Unit.ATTACK_EVADES && unit.getTile().equals(newTile)) {
+        if (result.compareTo(CombatResult.EVADES) >= 0 && unit.getTile().equals(newTile)) {
             // In other words, we moved...
             Element update = reply.getOwnerDocument().createElement("update");
             int lineOfSight = unit.getLineOfSight();
-            if (result == Unit.ATTACK_DONE_SETTLEMENT && newTile.getSettlement() != null) {
+            if (result == CombatResult.DONE_SETTLEMENT && newTile.getSettlement() != null) {
                 lineOfSight = Math.max(lineOfSight, newTile.getSettlement().getLineOfSight());
             }
             List<Tile> surroundingTiles = getGame().getMap().getSurroundingTiles(unit.getTile(), lineOfSight);
@@ -1373,7 +1374,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
      *         {@link Unit#ATTACK_WIN}, {@link Unit#ATTACK_GREAT_WIN} or
      *         {@link Unit#ATTACK_DONE_SETTLEMENT}.
      */
-    private int generateAttackResult(Unit unit, Unit defender) {
+    private CombatResult generateAttackResult(Unit unit, Unit defender) {
         double attackPower = unit.getOffensePower(defender);
         double defensePower = defender.getDefensePower(unit);
         double totalProbability = attackPower + defensePower;
@@ -1381,26 +1382,26 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         // TODO: Use the PseudoRandom class:
         double r = Math.random();
         
-        final int result;
+        final CombatResult result;
         if (r <= victory * 0.2) {
             // 10% of the times winning:
-            result = Unit.ATTACK_GREAT_WIN;
+            result = CombatResult.GREAT_WIN;
         } else if (r <= victory) {
             // 90% of the times winning:
-            result = Unit.ATTACK_WIN;
+            result = CombatResult.WIN;
         } else if (defender.isNaval()
                 && r <= (0.8 * victory) + 0.2) {
             // 20% of the times loosing:
-            result = Unit.ATTACK_EVADES;
+            result = CombatResult.EVADES;
         } else if (r <= (0.1 * victory) + 0.9) {
             // 70% of the times loosing:
-            result = Unit.ATTACK_LOSS;
+            result = CombatResult.LOSS;
         } else {
             // 10% of the times loosing:
-            result = Unit.ATTACK_GREAT_LOSS;
+            result = CombatResult.GREAT_LOSS;
         }
         
-        if (result >= Unit.ATTACK_WIN && defender.getTile().getSettlement() != null) {
+        if (result.compareTo(CombatResult.WIN) >= 0 && defender.getTile().getSettlement() != null) {
             final boolean lastDefender;
             if (defender.getTile().getSettlement() instanceof Colony) {
                 lastDefender = !defender.isDefensiveUnit();
@@ -1412,7 +1413,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
                 throw new IllegalStateException("Unknown Settlement.");
             }
             if (lastDefender) {
-                return Unit.ATTACK_DONE_SETTLEMENT;
+                return CombatResult.DONE_SETTLEMENT;
             }
         }
         return result;

@@ -46,6 +46,7 @@ import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.Tension;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
+import net.sf.freecol.common.model.Unit.CombatResult;
 import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.networking.Message;
@@ -321,7 +322,7 @@ public final class InGameInputHandler extends InputHandler {
         Colony colony = (Colony) getGame().getFreeColGameObjectSafely(opponentAttackElement.getAttribute("colony"));
         Unit defender = (Unit) getGame().getFreeColGameObjectSafely(opponentAttackElement.getAttribute("defender"));
 
-        int result = Integer.parseInt(opponentAttackElement.getAttribute("result"));
+        CombatResult result = Enum.valueOf(CombatResult.class, opponentAttackElement.getAttribute("result"));
         int plunderGold = Integer.parseInt(opponentAttackElement.getAttribute("plunderGold"));
 
         if (opponentAttackElement.hasAttribute("update")) {
@@ -405,7 +406,7 @@ public final class InGameInputHandler extends InputHandler {
 
         if (!defender.isDisposed()
                 && (defender.getLocation() == null || !defender.isVisibleTo(getFreeColClient().getMyPlayer()))) {
-            if (result == Unit.ATTACK_DONE_SETTLEMENT && defender.getColony() != null
+            if (result == CombatResult.DONE_SETTLEMENT && defender.getColony() != null
                     && !defender.getColony().isDisposed()) {
                 defender.getColony().setUnitCount(defender.getColony().getUnitCount());
             }
