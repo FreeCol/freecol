@@ -2494,55 +2494,20 @@ public class Unit extends FreeColGameObject implements Features, Locatable, Loca
      * @return The occupation indicator string
      */
     public String getOccupationIndicator() {
-        String occupationString;
 
-        switch (getState()) {
-        case ACTIVE:
-            if (getMovesLeft() > 0) {
-                occupationString = Messages.message("model.unit.occupation.active");
-            } else {
-                occupationString = Messages.message("model.unit.occupation.activeNoMovesLeft");
-            }
-            break;
-        case FORTIFIED:
-            occupationString = Messages.message("model.unit.occupation.fortified");
-            break;
-        case FORTIFYING:
-            occupationString = Messages.message("model.unit.occupation.fortifying");
-            break;
-        case SENTRY:
-            occupationString = Messages.message("model.unit.occupation.sentry");
-            break;
-        case IN_COLONY:
-            occupationString = Messages.message("model.unit.occupation.inColony");
-            break;
-        case IMPROVING:
-            if (workImprovement == null) {
-                // TODO: this should become unnecessary as soon as AI
-                // improvements work
-                occupationString = Messages.message("model.unit.occupation.improving");
-            } else {
-                occupationString = workImprovement.getOccupationString();
-            }
-            break;
-        case TO_AMERICA:
-            occupationString = Messages.message("model.unit.occupation.goingToAmerica");
-            break;
-        case TO_EUROPE:
-            occupationString = Messages.message("model.unit.occupation.goingToEurope");
-            break;
-        case SKIPPED:
-            occupationString = Messages.message("model.unit.occupation.skipped");
-            break;
-        default:
-            occupationString = Messages.message("model.unit.occupation.unknown");
-            logger.warning("Unit has an invalid occpuation: " + getState());
-        }
         if (getDestination() != null) {
-            occupationString = Messages.message("model.unit.occupation.goingSomewhere");
+            return Messages.message("model.unit.occupation.goingSomewhere");
         }
 
-        return occupationString;
+        if (state == UnitState.IMPROVING && workImprovement != null) {
+            // TODO: this needs to be changed as soon as AI
+            // improvements work
+            return workImprovement.getOccupationString();
+        } else if (state == UnitState.ACTIVE && getMovesLeft() == 0) {
+            return Messages.message("model.unit.occupation.activeNoMovesLeft");
+        } else {
+            return Messages.message("model.unit.occupation." + state.toString().toLowerCase());
+        }
     }
 
     /**
