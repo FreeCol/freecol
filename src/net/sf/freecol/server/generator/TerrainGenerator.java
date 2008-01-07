@@ -104,9 +104,9 @@ public class TerrainGenerator {
         int forestChance = getMapGeneratorOptions().getPercentageOfForests();
         Tile[][] tiles = new Tile[width][height];
         for (int y = 0; y < height; y++) {
-            int latitude = (Math.min(y, height - y) * 200) / height;
+            int latitude = (Math.min(y, (height-1) - y) * 200) / height; // lat=0 for poles; lat=100 for equator
             for (int x = 0; x < width; x++) {
-                Tile t;                
+                Tile t;
                 if (importTerrain && importGame.getMap().isValid(x, y)) {
                     Tile importTile = importGame.getMap().getTile(x, y);
                     if (importLandMap || importTile.isLand() == landMap[x][y]) {
@@ -191,11 +191,12 @@ public class TerrainGenerator {
     /**
      * Gets a random land tile type based on the given percentage.
      *
-     * @param percent The location of the tile, where 100% is the center on
-     *        the y-axis and 0% is on the top/bottom of the map.
+     * @param latitude The location of the tile relative to the north/south poles and equator, 
+     *        100% is the mid-section of the map (equator) 
+     *        0% is on the top/bottom of the map (poles).
      * @param forestChance The percentage chance of forests in this area
      */
-    private TileType getRandomLandTileType(int percent, int forestChance) {
+    private TileType getRandomLandTileType(int latitudePercent, int forestChance) {
         // latRanges correspond to 0,1,2,3 from TileType.latitude (100-0)
         int[] latRanges = { 75, 50, 25, 0 };
         // altRanges correspond to 1,2,3 from TileType.altitude (1-10)
@@ -204,31 +205,34 @@ public class TerrainGenerator {
         while (latTileTypes.size() < latRanges.length) {
             latTileTypes.add(new ArrayList<TileType>());
         }
-        int lat = latRanges.length - 1;
+        // convert the latitude percentage into a classification index
+        // latitudeIndex = 0 is for the equator
+        // latitudeIndex = 3 is for the poles
+        int latitudeIndex = latRanges.length - 1;
         for (int i = 0; i < latRanges.length; i++) {
-            if (latRanges[i] < percent) {
-                lat = i;
+            if (latRanges[i] < latitudePercent) {
+                latitudeIndex = i;
                 break;
             }
         }
         // Fill the list of latitude TileTypes the first time you use it
-        if (latTileTypes.get(lat).size() == 0) {
+        if (latTileTypes.get(latitudeIndex).size() == 0) {
             for (TileType tileType : FreeCol.getSpecification().getTileTypeList()) {
-                if (!tileType.isWater() && tileType.withinRange(TileType.LATITUDE, lat)) {
+                if (!tileType.isWater() && tileType.withinRange(TileType.LATITUDE, latitudeIndex)) {
                     // Within range, add it
-                    latTileTypes.get(lat).add(tileType);
+                    latTileTypes.get(latitudeIndex).add(tileType);
                 }
             }
-            if (latTileTypes.get(lat).size() == 0) {
+            if (latTileTypes.get(latitudeIndex).size() == 0) {
                 // If it is still 0 after adding all relevant types, throw error
-                throw new RuntimeException("No TileType within latitude == " + lat);
+                throw new RuntimeException("No TileType within latitude == " + latitudeIndex);
             }
         }
         // Scope the type of tiles to be used and choose one
         TileType chosen = null;
-        //List<TileType> acceptable = latTileTypes.get(lat).clone();
+        //List<TileType> acceptable = latTileTypes.get(latitudeIndex).clone();
         List<TileType> acceptable = new ArrayList<TileType>();
-        acceptable.addAll(latTileTypes.get(lat));
+        acceptable.addAll(latTileTypes.get(latitudeIndex));
         // Choose based on altitude
         int altitude = random.nextInt(10);
         for (int i = 0; i < 3; i++) {
