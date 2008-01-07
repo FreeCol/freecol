@@ -251,8 +251,10 @@ public final class FreeColClient {
         gui = new GUI(this, innerWindowSize, imageLibrary);
         canvas = new Canvas(this, innerWindowSize, gui);
         changeWindowedMode(windowed);
-        
-        frame.setIconImage(imageLibrary.getUnitImage(FreeCol.getSpecification().getUnitType("model.unit.galleon").getIndex()));
+
+        int galleonIndex = FreeCol.getSpecification().getUnitType("model.unit.galleon").getIndex();
+        frame.setIconImage(imageLibrary.getUnitImage(imageLibrary.getUnitGraphicsType(galleonIndex,
+                                                                                      false, false, false, false)));
         
         SwingUtilities.invokeLater(new Runnable() {
         	public void run() {
