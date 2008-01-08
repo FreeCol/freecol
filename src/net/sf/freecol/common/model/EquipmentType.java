@@ -28,6 +28,8 @@ import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
+import net.sf.freecol.common.model.Unit.Role;
+
 public class EquipmentType extends FreeColGameObjectType implements Features {
 
     /**
@@ -44,6 +46,11 @@ public class EquipmentType extends FreeColGameObjectType implements Features {
      * Describe combatLossPriority here.
      */
     private int combatLossPriority;
+
+    /**
+     * Describe role here.
+     */
+    private Role role;
 
     /**
      * A list of AbstractGoods required to build this Type.
@@ -89,6 +96,24 @@ public class EquipmentType extends FreeColGameObjectType implements Features {
      */
     public final void setMaximumCount(final int newMaximumCount) {
         this.maximumCount = newMaximumCount;
+    }
+
+    /**
+     * Get the <code>Role</code> value.
+     *
+     * @return a <code>Role</code> value
+     */
+    public final Role getRole() {
+        return role;
+    }
+
+    /**
+     * Set the <code>Role</code> value.
+     *
+     * @param newRole The new Role value.
+     */
+    public final void setRole(final Role newRole) {
+        this.role = newRole;
     }
 
     /**
@@ -218,6 +243,8 @@ public class EquipmentType extends FreeColGameObjectType implements Features {
         setId(in.getAttributeValue(null, "id"));
         maximumCount = getAttribute(in, "maximum-count", 1);
         combatLossPriority = getAttribute(in, "combat-loss-priority", 0);
+        String roleString = getAttribute(in, "role", "default");
+        role = Enum.valueOf(Role.class, roleString.toUpperCase());
 
         while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
             String nodeName = in.getLocalName();

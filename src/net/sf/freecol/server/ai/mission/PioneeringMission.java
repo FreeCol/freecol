@@ -35,6 +35,7 @@ import net.sf.freecol.common.model.PathNode;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.Unit.MoveType;
+import net.sf.freecol.common.model.Unit.Role;
 import net.sf.freecol.common.model.Unit.UnitState;
 import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.networking.Message;
@@ -349,7 +350,7 @@ public class PioneeringMission extends Mission {
     public boolean isValid() {  
         updateTileImprovementPlan();
         return !skipMission && tileImprovementPlan != null &&
-                (getUnit().isPioneer() || getUnit().hasAbility("model.ability.expertPioneer"));
+                (getUnit().getRole() == Role.PIONEER || getUnit().hasAbility("model.ability.expertPioneer"));
     }
 
     /**

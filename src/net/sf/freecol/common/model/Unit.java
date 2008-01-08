@@ -77,6 +77,9 @@ public class Unit extends FreeColGameObject implements Features, Locatable, Loca
             IMPROVING,      // All TileImprovements use state of IMPROVING
             TO_EUROPE, IN_EUROPE, TO_AMERICA, FORTIFYING, SKIPPED }
 
+    /** The roles a Unit can have. */
+    public static enum Role { DEFAULT, PIONEER, MISSIONARY, SOLDIER, SCOUT, DRAGOON }
+
     /**
      * A move type.
      * 
@@ -98,7 +101,9 @@ public class Unit extends FreeColGameObject implements Features, Locatable, Loca
 
     private int movesLeft;
 
-    private UnitState state;
+    private UnitState state = UnitState.ACTIVE;
+
+    private Role role = Role.DEFAULT;
 
     /** 
      * The number of turns until the work is finished, or '-1' if a
@@ -245,6 +250,8 @@ public class Unit extends FreeColGameObject implements Features, Locatable, Loca
         for (EquipmentType equipmentType : initialEquipment) {
             equipment.add(equipmentType);
         }
+        setRole();
+
         getOwner().setUnit(this);
         getOwner().invalidateCanSeeTiles();
     }
@@ -2121,7 +2128,8 @@ public class Unit extends FreeColGameObject implements Features, Locatable, Loca
             }
         }
         equipment.add(equipmentType);
-    }        
+        setRole();
+    }
 
     public void removeEquipment(EquipmentType equipmentType) {
         removeEquipment(equipmentType, false);
@@ -2130,6 +2138,7 @@ public class Unit extends FreeColGameObject implements Features, Locatable, Loca
     public void removeEquipment(EquipmentType equipmentType, boolean asResultOfCombat) {
         dumpEquipment(equipmentType, asResultOfCombat);
         equipment.remove(equipmentType);
+        setRole();
     }
 
     public void removeAllEquipment(boolean asResultOfCombat) {
@@ -2137,6 +2146,7 @@ public class Unit extends FreeColGameObject implements Features, Locatable, Loca
             dumpEquipment(equipmentType, asResultOfCombat);
         }
         equipment.clear();
+        role = Role.DEFAULT;
     }
 
     private void dumpEquipment(EquipmentType equipmentType, boolean asResultOfCombat) {
@@ -2175,6 +2185,7 @@ public class Unit extends FreeColGameObject implements Features, Locatable, Loca
      * @return 'true' if this colonist is dressed as a missionary, 'false'
      *         otherwise.
      */
+    /*
     public boolean isMissionary() {
         return (hasAbility("model.ability.missionary") ||
                 hasAbility("model.ability.expertMissionary"));
@@ -2184,7 +2195,7 @@ public class Unit extends FreeColGameObject implements Features, Locatable, Loca
         return (hasAbility("model.ability.improveTerrain") ||
                 hasAbility("model.ability.expertPioneer"));
     }
-        
+    */  
     // TODO: make this go away
     public int getNumberOfTools() {
         int count = 0;
@@ -2313,7 +2324,6 @@ public class Unit extends FreeColGameObject implements Features, Locatable, Loca
     }
 
     // TODO: make these go away, if possible, private if not
-
     public boolean isArmed() {
         return equipment.contains(FreeCol.getSpecification().getEquipmentType("model.equipment.muskets"));
     }
@@ -2321,7 +2331,6 @@ public class Unit extends FreeColGameObject implements Features, Locatable, Loca
     public boolean isMounted() {
         return equipment.contains(FreeCol.getSpecification().getEquipmentType("model.equipment.horses"));
     }
-
 
     /**
      * Returns the name of a unit in a human readable format. The return value
@@ -2331,33 +2340,21 @@ public class Unit extends FreeColGameObject implements Features, Locatable, Loca
      * @throws IllegalArgumentException
      */
     public String getName() {
-        String key = null;
         if (name != null) {
             return name;
-        } else if (isArmed() && isMounted()) {
-            key = "dragoon";
-        } else if (isArmed()) {
-            key = "soldier";
-        } else if (isMounted()) {
-            key = "scout";
-        } else if (isMissionary()) {
-            key = "missionary";
-        } else if (isPioneer()) {
-            key = "pioneer";
-        }
-        if (key != null) {
+        } else if (canCarryTreasure()) {
+            return Messages.message(getType().getId() + ".gold", "%gold%",
+                                    String.valueOf(getTreasureAmount()));
+        } else {
+            String key = role.toString().toLowerCase();
+            if (role == Role.DEFAULT) {
+                key = "name";
+            }
             String messageID = getType().getId() +  "." + key;
             if (Messages.containsKey(messageID)) {
                 return Messages.message(messageID);
             } else {
                 return Messages.message("model.unit." + key + ".name", "%unit%", getType().getName());
-            }
-        } else {
-            if (canCarryTreasure()) {
-                return Messages.message(getType().getId() + ".gold", "%gold%",
-                                        String.valueOf(getTreasureAmount()));
-            } else {
-                return unitType.getName();
             }
         }
     }
@@ -2514,6 +2511,42 @@ public class Unit extends FreeColGameObject implements Features, Locatable, Loca
      */
     public UnitState getState() {
         return state;
+    }
+
+    /**
+     * Gets the <code>Role</code> of this <code>Unit</code>.
+     * 
+     * @return The <code>role</code> of this <code>Unit</code>.
+     */
+    public Role getRole() {
+        return role;
+    }
+
+    /**
+     * Determine role based on equipment.
+     */
+    private void setRole() {
+        role = Role.DEFAULT;
+        for (EquipmentType type : equipment) {
+            switch (type.getRole()) {
+            case SOLDIER:
+                if (role == Role.SCOUT) {
+                    role = Role.DRAGOON;
+                } else {
+                    role = Role.SOLDIER;
+                }
+                break;
+            case SCOUT:
+                if (role == Role.SOLDIER) {
+                    role = Role.DRAGOON;
+                } else {
+                    role = Role.SCOUT;
+                }
+                break;
+            default:
+                role = type.getRole();
+            }
+        }
     }
 
     /**
@@ -4123,6 +4156,7 @@ public class Unit extends FreeColGameObject implements Features, Locatable, Loca
         out.writeAttribute("unitType", unitType.getId());
         out.writeAttribute("movesLeft", Integer.toString(movesLeft));
         out.writeAttribute("state", state.toString());
+        out.writeAttribute("role", role.toString());
         out.writeAttribute("workLeft", Integer.toString(workLeft));
         String ownerID = null;
         if (getOwner().equals(player) || !hasAbility("model.ability.piracy") || showAll) {
@@ -4219,6 +4253,7 @@ public class Unit extends FreeColGameObject implements Features, Locatable, Loca
         naval = unitType.hasAbility("model.ability.navalUnit");
         movesLeft = Integer.parseInt(in.getAttributeValue(null, "movesLeft"));
         state = Enum.valueOf(UnitState.class, in.getAttributeValue(null, "state"));
+        role = Enum.valueOf(Role.class, in.getAttributeValue(null, "role"));
         workLeft = Integer.parseInt(in.getAttributeValue(null, "workLeft"));
 
         String ownerID = in.getAttributeValue(null, "owner");

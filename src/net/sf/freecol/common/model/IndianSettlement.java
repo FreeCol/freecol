@@ -36,6 +36,7 @@ import javax.xml.stream.XMLStreamWriter;
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.Map.Position;
+import net.sf.freecol.common.model.Unit.Role;
 
 import org.w3c.dom.Element;
 
@@ -436,7 +437,7 @@ public class IndianSettlement extends Settlement {
      */
     public void setMissionary(Unit missionary) {
         if (missionary != null) {
-            if (!missionary.isMissionary()) {
+            if (missionary.getRole() != Role.MISSIONARY) {
                 throw new IllegalArgumentException("Specified unit is not a missionary.");
             }
             missionary.setLocation(null);

@@ -45,6 +45,7 @@ import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.Unit.MoveType;
+import net.sf.freecol.common.model.Unit.Role;
 import net.sf.freecol.common.model.Unit.UnitState;
 import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.networking.Connection;
@@ -491,7 +492,7 @@ public class TransportMission extends Mission {
                 AIUnit newUnit = getCheapestUnitInEurope(connection);
                 if (newUnit != null) {
                     if (newUnit.getUnit().isColonist() && !newUnit.getUnit().isArmed()
-                            && !newUnit.getUnit().isMounted() && !newUnit.getUnit().isPioneer()) {
+                        && !newUnit.getUnit().isMounted() && newUnit.getUnit().getRole() != Role.PIONEER) {
                         newUnit.setMission(new BuildColonyMission(getAIMain(), newUnit));
                     }
                     addToTransportList(newUnit);

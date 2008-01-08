@@ -51,6 +51,7 @@ import net.sf.freecol.common.model.Tension;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.TileType;
 import net.sf.freecol.common.model.Unit;
+import net.sf.freecol.common.model.Unit.Role;
 import net.sf.freecol.common.model.UnitType;
 
 /**
@@ -1620,8 +1621,9 @@ public final class ImageLibrary extends ImageProvider {
      * @return The graphics that will represent the given unit.
      */
     public int getUnitGraphicsType(Unit unit) {
-        return getUnitGraphicsType(unit.getIndex(), unit.isArmed(), unit.isMounted(), unit.isPioneer(), unit
-                .isMissionary());
+        return getUnitGraphicsType(unit.getIndex(), unit.isArmed(), unit.isMounted(), 
+                                   unit.getRole() == Role.PIONEER, 
+                                   unit.getRole() == Role.MISSIONARY);
     }
 
     /**

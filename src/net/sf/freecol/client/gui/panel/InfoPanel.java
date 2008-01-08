@@ -48,6 +48,7 @@ import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.TileImprovement;
 import net.sf.freecol.common.model.Unit;
+import net.sf.freecol.common.model.Unit.Role;
 import cz.autel.dmi.HIGLayout;
 
 /**
@@ -518,7 +519,7 @@ public final class InfoPanel extends FreeColPanel {
                 unitLabel.setIcon(library.getUnitImageIcon(library.getUnitGraphicsType(unit)));
                 
                 // Handle the special cases.
-                if (unit.isPioneer()) {
+                if (unit.getRole() == Role.PIONEER) {
                     unitToolsLabel.setText(String.valueOf(unit.getNumberOfTools()));
                     unitCargoPanel.add(unitToolsLabel, higConst.rc(1, 1));
                 } else if (unit.canCarryTreasure()) {

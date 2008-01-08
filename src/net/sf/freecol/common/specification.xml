@@ -366,7 +366,7 @@
   </tile-types>
 
   <equipment-types>
-    <equipment-type id="model.equipment.horses" combat-loss-priority="20">
+    <equipment-type id="model.equipment.horses" combat-loss-priority="20" role="scout">
       <modifier id="model.modifier.lineOfSightBonus" type="additive" value="1"/>
       <modifier id="model.modifier.movementBonus" type="additive" value="9"/>
       <ability id="model.ability.scoutIndianSettlement" value="true"/>
@@ -376,7 +376,7 @@
       <required-goods id="model.goods.Horses" value="50"/>
       <compatible-equipment id="model.equipment.muskets"/>
     </equipment-type>
-    <equipment-type id="model.equipment.muskets" combat-loss-priority="10">
+    <equipment-type id="model.equipment.muskets" combat-loss-priority="10" role="soldier">
       <modifier id="model.modifier.defence" type="additive" value="1"/>
       <modifier id="model.modifier.offence" type="additive" value="1"/>
       <ability id="model.ability.scoutIndianSettlement" value="false"/>
@@ -387,12 +387,12 @@
       <required-goods id="model.goods.Muskets" value="50"/>
       <compatible-equipment id="model.equipment.horses"/>
     </equipment-type>
-    <equipment-type id="model.equipment.tools" maximum-count="5">
+    <equipment-type id="model.equipment.tools" maximum-count="5" role="pioneer">
       <ability id="model.ability.improveTerrain" value="true"/>
       <required-ability id="model.ability.canBeEquipped" value="true"/>
       <required-goods id="model.goods.Tools" value="20"/>
     </equipment-type>
-    <equipment-type id="model.equipment.missionary">
+    <equipment-type id="model.equipment.missionary" role="missionary">
       <modifier id="model.modifier.movementBonus" type="additive" value="3"/>
       <ability id="model.ability.missionary" value="true"/>
       <required-ability id="model.ability.canBeEquipped" value="true"/>
