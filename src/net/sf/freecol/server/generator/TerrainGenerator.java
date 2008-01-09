@@ -513,8 +513,13 @@ public class TerrainGenerator {
             for (int tries = 0; tries < 100; tries++) {
                 Position position = new Position(random.nextInt(map.getWidth()),
                                                  random.nextInt(map.getHeight()));
-
+                if (position.getY()==0 || position.getY()==map.getHeight()-1 ||
+                    position.getY()==1 || position.getY()==map.getHeight()-2) {
+                    // please no rivers in polar regions
+                    continue;
+                }
                 if (riverMap.get(position) == null) {
+                    // no river here yet
                     if (river.flowFromSource(position)) {
                         logger.fine("Created new river with length " + river.getLength());
                         counter++;
