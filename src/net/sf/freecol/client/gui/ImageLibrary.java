@@ -73,31 +73,6 @@ public final class ImageLibrary extends ImageProvider {
      */
     public static final int TERRAIN_COUNT = 16, BONUS_COUNT = 9, GOODS_COUNT = 20, FOREST_COUNT = 9;
 
-    /**
-     * These finals represent the different parts of a tile and its
-     * surroundings. Each basic tile is accompanied by several 'border' tiles
-     * that are also of the same terrain type. They can be found in the same
-     * directory so they need to be distinguished by these finals.
-     */
-    private static final int LAND_EAST = 0, // corner tile, some 'land' can be
-                                            // found in the far east of this
-                                            // tile
-            LAND_SOUTH_EAST = 1, // border tile, some 'land' can be found in
-                                    // south-east of this tile
-            LAND_SOUTH = 2, // corner tile, some 'land' can be found in the far
-                            // south of this tile
-            LAND_SOUTH_WEST = 3, // border tile, some 'land' can be found in
-                                    // south-west of this tile
-            LAND_WEST = 4, // corner tile, some 'land' can be found in the far
-                            // west of this tile
-            LAND_NORTH_WEST = 5, // border tile, some 'land' can be found in
-                                    // north-west of this tile
-            LAND_NORTH = 6, // corner tile, some 'land' can be found in the far
-                            // north of this tile
-            LAND_NORTH_EAST = 7, // border tile, some 'land' can be found in
-                                    // north-east of this tile
-            LAND_CENTER = 8; // ordinary tile, filled entirely with 'land'
-
     public static final int MONARCH_COUNT = 4;
 
     public static final int UNIT_BUTTON_WAIT = 0, UNIT_BUTTON_DONE = 1, UNIT_BUTTON_FORTIFY = 2,
@@ -570,10 +545,11 @@ public final class ImageLibrary extends ImageProvider {
             
             Vector<ImageIcon> tempVector1 = new Vector<ImageIcon>();
             Vector<ImageIcon> tempVector2 = new Vector<ImageIcon>();
-            for (int c = 1; c <= 8; c++) {
-                filePath = dataDirectory + path + type.getArtBasic() + borderName + c;
-                tempVector1.add(findImage(filePath + "0" + extension, resourceLocator, doLookup));
-                tempVector2.add(findImage(filePath + "1" + extension, resourceLocator, doLookup));
+            for (Direction direction : Direction.values()) {
+                filePath = dataDirectory + path + type.getArtBasic() + borderName + "_" +
+                    direction.toString();
+                tempVector1.add(findImage(filePath + "_even" + extension, resourceLocator, doLookup));
+                tempVector2.add(findImage(filePath + "_odd" + extension, resourceLocator, doLookup));
             }
 
             border1.put(type.getId(), tempVector1);
@@ -582,10 +558,11 @@ public final class ImageLibrary extends ImageProvider {
             if (type.getArtCoast() != null) {
                 tempVector1 = new Vector<ImageIcon>();
                 tempVector2 = new Vector<ImageIcon>();
-                for (int c = 1; c <= 8; c++) {
-                    filePath = dataDirectory + path + type.getArtCoast() + borderName + c;
-                    tempVector1.add(findImage(filePath + "0" + extension, resourceLocator, doLookup));
-                    tempVector2.add(findImage(filePath + "1" + extension, resourceLocator, doLookup));
+                for (Direction direction : Direction.values()) {
+                    filePath = dataDirectory + path + type.getArtCoast() + borderName + "_" +
+                        direction.toString();
+                    tempVector1.add(findImage(filePath + "_even" + extension, resourceLocator, doLookup));
+                    tempVector2.add(findImage(filePath + "_odd" + extension, resourceLocator, doLookup));
                 }
                 
                 coast1.put(type.getId(), tempVector1);
@@ -599,10 +576,11 @@ public final class ImageLibrary extends ImageProvider {
         
         Vector<ImageIcon> unexploredVector1 = new Vector<ImageIcon>();
         Vector<ImageIcon> unexploredVector2 = new Vector<ImageIcon>();
-        for (int c = 1; c <= 8; c++) {
-            unexploredPath = dataDirectory + path + terrainDirectory + unexploredDirectory + borderName + c;
-            unexploredVector1.add(findImage(unexploredPath + "0" + extension, resourceLocator, doLookup));
-            unexploredVector2.add(findImage(unexploredPath + "1" + extension, resourceLocator, doLookup));
+        for (Direction direction : Direction.values()) {
+            unexploredPath = dataDirectory + path + terrainDirectory + unexploredDirectory + borderName + 
+                "_" + direction.toString();
+            unexploredVector1.add(findImage(unexploredPath + "_even" + extension, resourceLocator, doLookup));
+            unexploredVector2.add(findImage(unexploredPath + "_odd" + extension, resourceLocator, doLookup));
         }
 
         border1.put(unexploredName, unexploredVector1);
@@ -1121,12 +1099,6 @@ public final class ImageLibrary extends ImageProvider {
     public Image getBorderImage(TileType type, Direction direction, int x, int y) {
 
         int borderType = direction.ordinal();
-
-        final int[] directionsAndImageLibOffsets = new int[] { ImageLibrary.LAND_NORTH, ImageLibrary.LAND_NORTH_EAST,
-                ImageLibrary.LAND_EAST, ImageLibrary.LAND_SOUTH_EAST, ImageLibrary.LAND_SOUTH,
-                ImageLibrary.LAND_SOUTH_WEST, ImageLibrary.LAND_WEST, ImageLibrary.LAND_NORTH_WEST };
-
-        borderType = directionsAndImageLibOffsets[borderType];
         
         String key;
         if (type != null) {
@@ -1156,11 +1128,6 @@ public final class ImageLibrary extends ImageProvider {
     public Image getCoastImage(TileType type, Direction direction, int x, int y) {
 
         int borderType = direction.ordinal();
-        final int[] directionsAndImageLibOffsets = new int[] { ImageLibrary.LAND_NORTH, ImageLibrary.LAND_NORTH_EAST,
-                ImageLibrary.LAND_EAST, ImageLibrary.LAND_SOUTH_EAST, ImageLibrary.LAND_SOUTH,
-                ImageLibrary.LAND_SOUTH_WEST, ImageLibrary.LAND_WEST, ImageLibrary.LAND_NORTH_WEST };
-
-        borderType = directionsAndImageLibOffsets[borderType];
         
         String key;
         if (type != null) {
