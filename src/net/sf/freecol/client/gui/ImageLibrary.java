@@ -1265,19 +1265,7 @@ public final class ImageLibrary extends ImageProvider {
      * @return The goods-ImageIcon at the given index.
      */
     public ImageIcon getScaledGoodsImageIcon(GoodsType type, float scale) {
-        if (type != null) {
-            ImageIcon icon = getGoodsImageIcon(type);
-            if (scale != 1) {
-                Image image;
-                image = icon.getImage();
-                int width = (int) (scale * image.getWidth(null));
-                int height = (int) (scale * image.getHeight(null));
-                image = image.getScaledInstance(width, height, Image.SCALE_SMOOTH);
-                icon = new ImageIcon(image);
-            }
-            return icon;
-        }
-        return null;
+        return getScaledImageIcon(getGoodsImageIcon(type), scale);
     }
 
     /**
@@ -1487,27 +1475,56 @@ public final class ImageLibrary extends ImageProvider {
     }
 
     /**
-     * Returns the graphics that will represent the given unit.
+     * Returns the ImageIcon that will represent the given unit.
      * 
      * @param unit The unit whose graphics type is needed.
-     * @return The graphics that will represent the given unit.
+     * @return an <code>ImageIcon</code> value
      */
     public ImageIcon getUnitImageIcon(Unit unit) {
         return getUnitImageIcon(unit.getType(), unit.getRole());
     }
 
+    /**
+     * Returns the ImageIcon that will represent a unit of the given type.
+     *
+     * @param unitType an <code>UnitType</code> value
+     * @return an <code>ImageIcon</code> value
+     */
     public ImageIcon getUnitImageIcon(UnitType unitType) {
         // Role.DEFAULT.ordinal() == 0
         return units[unitType.getIndex()];
     }
+    
+    /**
+     * Returns the ImageIcon that will represent a unit of the given
+     * type and role.
+     *
+     * @param unitType an <code>UnitType</code> value
+     * @param role a <code>Role</code> value
+     * @return an <code>ImageIcon</code> value
+     */
     public ImageIcon getUnitImageIcon(UnitType unitType, Role role) {
         return units[role.ordinal() * numberOfUnitTypes + unitType.getIndex()];
     }
 
+    /**
+     * Returns the ImageIcon that will represent the given unit.
+     *
+     * @param unit an <code>Unit</code> value
+     * @param grayscale a <code>boolean</code> value
+     * @return an <code>ImageIcon</code> value
+     */
     public ImageIcon getUnitImageIcon(Unit unit, boolean grayscale) {
         return getUnitImageIcon(unit.getType(), unit.getRole(), grayscale);
     }
 
+    /**
+     * Returns the ImageIcon that will represent a unit of the given type.
+     *
+     * @param unitType an <code>UnitType</code> value
+     * @param grayscale a <code>boolean</code> value
+     * @return an <code>ImageIcon</code> value
+     */
     public ImageIcon getUnitImageIcon(UnitType unitType, boolean grayscale) {
         // Role.DEFAULT.ordinal() == 0
         if (grayscale) {
@@ -1516,6 +1533,16 @@ public final class ImageLibrary extends ImageProvider {
             return units[unitType.getIndex()];
         }
     }
+
+    /**
+     * Returns the ImageIcon that will represent a unit of the given
+     * type and role.
+     *
+     * @param unitType an <code>UnitType</code> value
+     * @param role a <code>Role</code> value
+     * @param grayscale a <code>boolean</code> value
+     * @return an <code>ImageIcon</code> value
+     */
     public ImageIcon getUnitImageIcon(UnitType unitType, Role role, boolean grayscale) {
         int index = role.ordinal() * numberOfUnitTypes + unitType.getIndex();
         if (grayscale) {
@@ -1526,11 +1553,11 @@ public final class ImageLibrary extends ImageProvider {
     }
 
     /**
-     * Returns the scaled unit-ImageIcon at the given index.
+     * Returns the scaled ImageIcon.
      * 
-     * @param index The index of the unit-ImageIcon to return.
-     * @param scale The scale of the unit-ImageIcon to return.
-     * @return The unit-ImageIcon at the given index.
+     * @param inputIcon an <code>ImageIcon</code> value
+     * @param scale The scale of the ImageIcon to return.
+     * @return The scaled ImageIcon.
      */
     public ImageIcon getScaledImageIcon(ImageIcon inputIcon, float scale) {
         Image image = inputIcon.getImage();
