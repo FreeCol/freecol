@@ -138,11 +138,14 @@ public final class CanvasMapEditorMouseMotionListener implements MouseMotionList
             }
             return;
         }
-
+        
         if (scrollThread != null) {
+            // continue scrolling in a (perhaps new) direction
             scrollThread.setDirection(direction);
         } else {
+            // start scrolling in a direction
             scrollThread = new ScrollThread(getMap(), gui);
+            scrollThread.setDirection(direction);
             scrollThread.start();
         }
     }
