@@ -516,7 +516,7 @@ public final class InfoPanel extends FreeColPanel {
             unitCargoPanel.removeAll();
             if (unit != null) {
                 setUnitNameType(unit);
-                unitLabel.setIcon(library.getUnitImageIcon(library.getUnitGraphicsType(unit)));
+                unitLabel.setIcon(library.getUnitImageIcon(unit));
                 
                 // Handle the special cases.
                 if (unit.getRole() == Role.PIONEER) {
@@ -579,8 +579,8 @@ public final class InfoPanel extends FreeColPanel {
                 }
             }
             for (Unit carriedUnit : unit.getUnitList()) {
-                int graphicsType = library.getUnitGraphicsType(carriedUnit);
-                JLabel unitLabel = new JLabel(library.getScaledUnitImageIcon(graphicsType, 0.5f));
+                ImageIcon unitIcon = library.getUnitImageIcon(carriedUnit);
+                JLabel unitLabel = new JLabel(library.getScaledImageIcon(unitIcon, 0.5f));
                 unitLabel.setToolTipText(carriedUnit.getName());
                 unitCargoPanel.add(unitLabel, higConst.rc(row, counter));
                 if (counter == 4) {

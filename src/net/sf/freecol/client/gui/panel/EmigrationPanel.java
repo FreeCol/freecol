@@ -23,6 +23,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.logging.Logger;
 
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 
@@ -90,9 +91,9 @@ public final class EmigrationPanel extends FreeColDialog implements ActionListen
 
         for (int index = 0; index < NUMBER_OF_PERSONS; index++) {
             UnitType unitType = europe.getRecruitable(index);
-            int graphicsType = ImageLibrary.getUnitGraphicsType(unitType.getIndex(), false, false, false, false);
+            ImageIcon unitIcon = library.getUnitImageIcon(unitType);
             person[index].setText(unitType.getName());
-            person[index].setIcon(library.getScaledUnitImageIcon(graphicsType, 0.66f));
+            person[index].setIcon(library.getScaledImageIcon(unitIcon, 0.66f));
 
             add(person[index], higConst.rc(row, column));
             row += 2;

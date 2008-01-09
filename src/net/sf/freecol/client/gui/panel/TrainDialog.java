@@ -27,6 +27,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.logging.Logger;
 
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -46,8 +47,6 @@ import cz.autel.dmi.HIGLayout;
  */
 
 public final class TrainDialog extends FreeColDialog implements ActionListener {
-
-
 
     private static Logger logger = Logger.getLogger(TrainDialog.class.getName());
 
@@ -116,9 +115,9 @@ public final class TrainDialog extends FreeColDialog implements ActionListener {
         int row = 1;
         int counter = 0;
         for (UnitType unitType : trainableUnits) {
-            int graphicsType = ImageLibrary.getUnitGraphicsType(unitType.getIndex(), false, false, false, false);
+            ImageIcon unitIcon = library.getUnitImageIcon(unitType);
             JButton newButton = new JButton(unitType.getName(), 
-                                            library.getScaledUnitImageIcon(graphicsType, 0.66f));
+                                            library.getScaledImageIcon(unitIcon, 0.66f));
             newButton.setActionCommand(unitType.getId());
             newButton.addActionListener(this);
             newButton.setIconTextGap(margin);

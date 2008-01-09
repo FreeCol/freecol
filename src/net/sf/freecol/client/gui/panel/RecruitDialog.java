@@ -23,6 +23,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.logging.Logger;
 
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JTextArea;
 
@@ -122,9 +123,9 @@ public final class RecruitDialog extends FreeColDialog implements ActionListener
 
             for (int index = 0; index < NUMBER_OF_PERSONS; index++) {
                 UnitType unitType = player.getEurope().getRecruitable(index);
-                int graphicsType = ImageLibrary.getUnitGraphicsType(unitType.getIndex(), false, false, false, false);
+                ImageIcon unitIcon = library.getUnitImageIcon(unitType);
                 person[index].setText(unitType.getName());
-                person[index].setIcon(library.getScaledUnitImageIcon(graphicsType, 0.66f));
+                person[index].setIcon(library.getScaledImageIcon(unitIcon, 0.66f));
 
                 if (recruitPrice > player.getGold()) {
                     person[index].setEnabled(false);

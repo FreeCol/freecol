@@ -86,8 +86,8 @@ public abstract class ImageProvider {
      * @param index The index of the unit-image to return.
      * @return The unit-image at the given index.
      */
-    public abstract Image getUnitImage(int index);
-
+    //public abstract Image getUnitImage(int index);
+    
     /**
      * Returns the unit-image at the given index.
      * 
@@ -95,7 +95,7 @@ public abstract class ImageProvider {
      * @param grayscale If <code>true</code> return the image in grayscale
      * @return The unit-image at the given index.
      */
-    public abstract Image getUnitImage(int index, boolean grayscale);
+    //public abstract Image getUnitImage(int index, boolean grayscale);
 
     /**
      * Returns the unit-ImageIcon at the given index.
@@ -103,7 +103,7 @@ public abstract class ImageProvider {
      * @param type The type of the Unit of which we need the ImageIcon.
      * @return The unit-ImageIcon of the Unit with the given type.
      */
-    public abstract ImageIcon getUnitImageIcon(int type);
+    //public abstract ImageIcon getUnitImageIcon(int type);
 
     /**
      * Should return the ImageIcon of the Unit with the given type.
@@ -112,7 +112,7 @@ public abstract class ImageProvider {
      * @param grayscale If <code>true</code> return the image in grayscale
      * @return The ImageIcon of the Unit with the given type.
      */
-    public abstract ImageIcon getUnitImageIcon(int type, boolean grayscale);
+    //public abstract ImageIcon getUnitImageIcon(int type, boolean grayscale);
 
     /**
      * Should return the ImageIcon of the Unit Button with the given index.
@@ -145,7 +145,7 @@ public abstract class ImageProvider {
      * @param index The index of the unit-image.
      * @return The width of the unit-image at the given index.
      */
-    public abstract int getUnitImageWidth(int index);
+    //public abstract int getUnitImageWidth(int index);
 
     /**
      * Should return the height of the unit-image at the given index.
@@ -153,7 +153,7 @@ public abstract class ImageProvider {
      * @param index The index of the unit-image.
      * @return The height of the unit-image at the given index.
      */
-    public abstract int getUnitImageHeight(int index);
+    //public abstract int getUnitImageHeight(int index);
 
     /**
      * Should return the graphic type that can be used to represent the given
@@ -163,5 +163,5 @@ public abstract class ImageProvider {
      * @return The graphic type that can be used to represent the given Unit
      *         visually.
      */
-    public abstract int getUnitGraphicsType(Unit unit);
+    //public abstract int getUnitGraphicsType(Unit unit);
 }

@@ -144,16 +144,6 @@ public class ReportPanel extends FreeColPanel implements ActionListener {
     }
 
     /**
-     * Builds the button for the given unit.
-     * 
-     * @param unitIcon
-     * @param scale
-     */
-    public JLabel buildUnitLabel(int unitIcon, float scale) {
-        return new JLabel(library.getScaledUnitImageIcon(unitIcon, scale));
-    }
-
-    /**
      * This function analyses an event and calls the right methods to take care
      * of the user's requests.
      * 

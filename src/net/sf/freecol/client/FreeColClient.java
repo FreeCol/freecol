@@ -57,6 +57,7 @@ import net.sf.freecol.client.networking.Client;
 import net.sf.freecol.common.PseudoRandom;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Player;
+import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.networking.Message;
 import net.sf.freecol.common.option.LanguageOption;
 import net.sf.freecol.common.option.Option;
@@ -252,9 +253,8 @@ public final class FreeColClient {
         canvas = new Canvas(this, innerWindowSize, gui);
         changeWindowedMode(windowed);
 
-        int galleonIndex = FreeCol.getSpecification().getUnitType("model.unit.galleon").getIndex();
-        frame.setIconImage(imageLibrary.getUnitImage(imageLibrary.getUnitGraphicsType(galleonIndex,
-                                                                                      false, false, false, false)));
+        UnitType galleonType = FreeCol.getSpecification().getUnitType("model.unit.galleon");
+        frame.setIconImage(imageLibrary.getUnitImageIcon(galleonType).getImage());
         
         SwingUtilities.invokeLater(new Runnable() {
         	public void run() {

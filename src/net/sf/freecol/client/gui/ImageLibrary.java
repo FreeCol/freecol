@@ -32,6 +32,7 @@ import java.awt.image.BufferedImage;
 import java.awt.image.ColorConvertOp;
 import java.io.File;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.Vector;
 import java.util.logging.Logger;
@@ -65,8 +66,7 @@ public final class ImageLibrary extends ImageProvider {
     public static final int UNIT_SELECT = 0, PLOWED = 4, TILE_TAKEN = 5, TILE_OWNED_BY_INDIANS = 6,
             LOST_CITY_RUMOUR = 7, DARKNESS = 8, MISC_COUNT = 10;
 
-    private static final String[] iconTypes = new String[] {
-        null, "scout", "soldier", "dragoon", "pioneer", "missionary" };
+    private static final int numberOfUnitTypes = FreeCol.getSpecification().numberOfUnitTypes();
 
     /**
      * These finals are for quick reference. These should be made softcoded when next possible.
@@ -116,14 +116,8 @@ public final class ImageLibrary extends ImageProvider {
 
             INDIAN_COUNT = 4;
 
-    /**
-     * The filename of the graphical representation of a specific unit is the
-     * following: homeDirectory + path + unitsDirectory + unitsName + UNITTYPE +
-     * extension where '+' is the concatenation of Strings. and UNITTYPE is the
-     * type of the unit (as in the Unit class).
-     */
     private static final String path = new String("images/"), extension = new String(".png"),
-            unitsDirectory = new String("units/"), unitsName = new String("Unit"),
+            unitsDirectory = new String("units/"),
             terrainDirectory = new String("terrain/"),
             tileName = new String("center"), borderName = new String("border"),
             unexploredDirectory = new String("unexplored/"), unexploredName = new String("unexplored"),
@@ -492,47 +486,40 @@ public final class ImageLibrary extends ImageProvider {
     private void loadUnits(GraphicsConfiguration gc, Class<FreeCol> resourceLocator, boolean doLookup)
             throws FreeColException {
 
-        units = new ImageIcon[FreeCol.getSpecification().numberOfUnitTypes() * iconTypes.length];
-        unitsGrayscale = new ImageIcon[FreeCol.getSpecification().numberOfUnitTypes() * iconTypes.length];
+        ArrayList<ImageIcon> unitIcons = new ArrayList<ImageIcon>();
+        ArrayList<ImageIcon> unitIconsGrayscale = new ArrayList<ImageIcon>();
 
-        String filePath;
+        for (Role role : Role.values()) {
+            String filePath = dataDirectory + path + unitsDirectory;
+            String fileName = null;
 
-        ImageIcon[] defaultIcon = new ImageIcon[iconTypes.length];
-        ImageIcon[] defaultGrayscaleIcon = new ImageIcon[iconTypes.length];
-        for (int index = 0; index < iconTypes.length; index++) {
-            String iconType = iconTypes[index];
-            if (iconType == null) {
-                filePath = dataDirectory + path + unitsDirectory + "unit" + extension;
+            if (role == Role.DEFAULT) {
+                fileName = "unit" + extension;
             } else {
-                filePath = dataDirectory + path + unitsDirectory + iconType + "/" + iconType + extension;
+                String roleName = role.toString().toLowerCase();
+                filePath += roleName + "/";
+                fileName = roleName + extension;
             }
-            ImageIcon newIcon = findImage(filePath, resourceLocator, doLookup);
-            defaultIcon[index] = newIcon;
-            defaultGrayscaleIcon[index] = convertToGrayscale(newIcon.getImage());
-        }
+            ImageIcon defaultIcon = findImage(filePath + fileName, resourceLocator, doLookup);
+            ImageIcon defaultIconGrayscale = convertToGrayscale(defaultIcon.getImage());
 
-        for (UnitType unitType : FreeCol.getSpecification().getUnitTypeList()) {
-            String shortName = unitType.getId();
-            shortName = shortName.substring(shortName.lastIndexOf('.') + 1);
-            for (int index = 0; index < iconTypes.length; index++) {
-                int iconIndex = unitType.getIndex() * iconTypes.length + index;
-                String iconType = iconTypes[index];
-                if (iconType == null) {
-                    filePath = dataDirectory + path + unitsDirectory + shortName + extension;
-                } else {
-                    filePath = dataDirectory + path + unitsDirectory + iconType + "/" + shortName + extension;
-                }
+            for (UnitType unitType : FreeCol.getSpecification().getUnitTypeList()) {
+                fileName = unitType.getId();
+                fileName = fileName.substring(fileName.lastIndexOf('.') + 1) + extension;
                 try {
-                    ImageIcon unitIcon = findImage(filePath, resourceLocator, doLookup);
-                    units[iconIndex] = unitIcon;
-                    unitsGrayscale[iconIndex] = convertToGrayscale(unitIcon.getImage());
+                    ImageIcon unitIcon = findImage(filePath + fileName, resourceLocator, doLookup);
+                    unitIcons.add(unitIcon);
+                    unitIconsGrayscale.add(convertToGrayscale(unitIcon.getImage()));
                 } catch (FreeColException e) {
                     logger.fine("Using default icon for UnitType " + unitType.getName());
-                    units[iconIndex] = defaultIcon[index];
-                    unitsGrayscale[iconIndex] = defaultGrayscaleIcon[index];
+                    unitIcons.add(defaultIcon);
+                    unitIconsGrayscale.add(defaultIconGrayscale);
                 }
             }
         }
+
+        units = unitIcons.toArray(new ImageIcon[0]);
+        unitsGrayscale = unitIconsGrayscale.toArray(new ImageIcon[0]);
 
         /*
          * If all units are patched together in one graphics file then this is
@@ -1039,101 +1026,6 @@ public final class ImageLibrary extends ImageProvider {
         return new ImageIcon(filter.filter(srcImage, null));
     }
 
-    /**
-     * Returns the unit-image at the given index.
-     * 
-     * @param index The index of the unit-image to return.
-     * @return The unit-image at the given index.
-     */
-    public Image getUnitImage(int index) {
-        return getUnitImage(index, false);
-    }
-
-    /**
-     * Returns the unit-image at the given index.
-     * 
-     * @param index The index of the unit-image to return.
-     * @param grayscale If <code>true</code> return the image in grayscale
-     * @return The unit-image at the given index.
-     */
-    public Image getUnitImage(int index, boolean grayscale) {
-        return getUnitImageIcon(index, grayscale).getImage();
-    }
-
-    /**
-     * Returns the unit-ImageIcon at the given index.
-     * 
-     * @param index The index of the unit-ImageIcon to return.
-     * @return The unit-ImageIcon at the given index.
-     */
-    public ImageIcon getUnitImageIcon(int index) {
-        return getUnitImageIcon(index, false);
-    }
-
-    /**
-     * Returns the unit-ImageIcon at the given index.
-     * 
-     * @param index The index of the unit-ImageIcon to return.
-     * @return The unit-ImageIcon at the given index.
-     */
-    public ImageIcon getUnitImageIcon(int index, boolean grayscale) {
-        if (grayscale)
-            return unitsGrayscale[index];
-        else
-            return units[index];
-    }
-
-    /**
-     * Returns the scaled unit-ImageIcon at the given index.
-     * 
-     * @param index The index of the unit-ImageIcon to return.
-     * @param scale The scale of the unit-ImageIcon to return.
-     * @return The unit-ImageIcon at the given index.
-     */
-    public ImageIcon getScaledUnitImageIcon(int index, float scale) {
-        if (index >= 0) {
-            ImageIcon icon = getUnitImageIcon(index);
-            if (scale != 1) {
-                Image image;
-                image = icon.getImage();
-                int width = (int) (scale * image.getWidth(null));
-                int height = (int) (scale * image.getHeight(null));
-                image = image.getScaledInstance(width, height, Image.SCALE_SMOOTH);
-                icon = new ImageIcon(image);
-            }
-            return icon;
-        }
-        return null;
-    }
-    
-    /**
-     * Returns the Colopedia-specific scaled unit-ImageIcon at the given index.
-     * 
-     * @param index The index of the unit-ImageIcon to return.
-     * @param scale The scale of the unit-ImageIcon to return.
-     * @return The unit-ImageIcon at the given index.
-     */
-    public ImageIcon getColopediaUnitImageIcon(int index, float scale) {
-        if (index >= 0) {
-            ImageIcon icon = getUnitImageIcon(index);
-            if (scale != 1) {
-                Image image;
-                image = icon.getImage();
-                int width = (int) (scale * image.getWidth(null));
-                if (width > 30) {
-                    width = 30;
-                }
-                int height = (int) (scale * image.getHeight(null));
-                if (height > 30) {
-                    height = 30;
-                }
-                image = image.getScaledInstance(width, height, Image.SCALE_SMOOTH);
-                icon = new ImageIcon(image);
-            }
-            return icon;
-        }
-        return null;
-    }
 
     /**
      * Returns the scaled terrain-image for a terrain type (and position 0, 0).
@@ -1536,26 +1428,6 @@ public final class ImageLibrary extends ImageProvider {
     }
 
     /**
-     * Returns the width of the unit-image at the given index.
-     * 
-     * @param index The index of the unit-image.
-     * @return The width of the unit-image at the given index.
-     */
-    public int getUnitImageWidth(int index) {
-        return units[index].getIconWidth();
-    }
-
-    /**
-     * Returns the height of the unit-image at the given index.
-     * 
-     * @param index The index of the unit-image.
-     * @return The height of the unit-image at the given index.
-     */
-    public int getUnitImageHeight(int index) {
-        return units[index].getIconHeight();
-    }
-
-    /**
      * Returns the graphics that will represent the given settlement.
      * 
      * @param settlement The settlement whose graphics type is needed.
@@ -1620,36 +1492,52 @@ public final class ImageLibrary extends ImageProvider {
      * @param unit The unit whose graphics type is needed.
      * @return The graphics that will represent the given unit.
      */
-    public int getUnitGraphicsType(Unit unit) {
-        return getUnitGraphicsType(unit.getIndex(), unit.isArmed(), unit.isMounted(), 
-                                   unit.getRole() == Role.PIONEER, 
-                                   unit.getRole() == Role.MISSIONARY);
+    public ImageIcon getUnitImageIcon(Unit unit) {
+        return getUnitImageIcon(unit.getType(), unit.getRole());
+    }
+
+    public ImageIcon getUnitImageIcon(UnitType unitType) {
+        // Role.DEFAULT.ordinal() == 0
+        return units[unitType.getIndex()];
+    }
+    public ImageIcon getUnitImageIcon(UnitType unitType, Role role) {
+        return units[role.ordinal() * numberOfUnitTypes + unitType.getIndex()];
+    }
+
+    public ImageIcon getUnitImageIcon(Unit unit, boolean grayscale) {
+        return getUnitImageIcon(unit.getType(), unit.getRole(), grayscale);
+    }
+
+    public ImageIcon getUnitImageIcon(UnitType unitType, boolean grayscale) {
+        // Role.DEFAULT.ordinal() == 0
+        if (grayscale) {
+            return unitsGrayscale[unitType.getIndex()];
+        } else {
+            return units[unitType.getIndex()];
+        }
+    }
+    public ImageIcon getUnitImageIcon(UnitType unitType, Role role, boolean grayscale) {
+        int index = role.ordinal() * numberOfUnitTypes + unitType.getIndex();
+        if (grayscale) {
+            return unitsGrayscale[index];
+        } else {
+            return units[index];
+        }
     }
 
     /**
-     * Returns the graphics that will represent the given unit.
+     * Returns the scaled unit-ImageIcon at the given index.
      * 
-     * @param type The type of unit whose graphics type is needed.
-     * @param armed Whether the unit is armed.
-     * @param mounted Whether the unit is mounted.
-     * @param pioneer Whether this unit has tools.
-     * @param missionary Whether the unit is missionary.
-     * @return The graphics that will represent the given unit.
+     * @param index The index of the unit-ImageIcon to return.
+     * @param scale The scale of the unit-ImageIcon to return.
+     * @return The unit-ImageIcon at the given index.
      */
-    public static int getUnitGraphicsType(int type, boolean armed, boolean mounted, boolean pioneer,
-            boolean missionary) {
-        int iconIndex = 0;
-        if (missionary) {
-            iconIndex = 5;
-        } else if (pioneer) {
-            iconIndex = 4;
-        } else if (armed && mounted) {
-            iconIndex = 3;
-        } else if (armed) {
-            iconIndex = 2;
-        } else if (mounted) {
-            iconIndex = 1;
-        }
-        return type * iconTypes.length + iconIndex;
+    public ImageIcon getScaledImageIcon(ImageIcon inputIcon, float scale) {
+        Image image = inputIcon.getImage();
+        return new ImageIcon(image.getScaledInstance(Math.round(image.getWidth(null) * scale),
+                                                     Math.round(image.getHeight(null) * scale),
+                                                     Image.SCALE_SMOOTH));
     }
+    
+
 }

@@ -45,6 +45,7 @@ import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
+import net.sf.freecol.common.model.Unit.Role;
 import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.model.WorkLocation;
 import cz.autel.dmi.HIGLayout;
@@ -157,15 +158,14 @@ public final class ReportLabourPanel extends ReportPanel implements ActionListen
         
         int row = 0, column = 0;
         for (UnitType unitType : colonists) {
-            boolean tools = false;
-            boolean missionary = false;
+            Role role = Role.DEFAULT;
             if (unitType.hasAbility("model.ability.expertPioneer")) {
-                tools = true;
+                role = Role.PIONEER;
             } else if (unitType.hasAbility("model.ability.expertMissionary")) {
-                missionary = true;
+                role = Role.MISSIONARY;
             }
             
-            reportPanel.add(createUnitLabel(unitType, tools, missionary),
+            reportPanel.add(createUnitLabel(unitType, role),
                             higConst.rc(2 * row + 1, columnsPerUnit * column + buttonColumn, "t"));
             if (unitCount[unitType.getIndex()] > 0) {
                 reportPanel.add(createUnitNameButton(unitType),
@@ -201,9 +201,8 @@ public final class ReportLabourPanel extends ReportPanel implements ActionListen
 
     }
 
-    private JLabel createUnitLabel(UnitType unitType, boolean tools, boolean missionary) {
-        int imageType = ImageLibrary.getUnitGraphicsType(unitType.getIndex(), false, false, tools, missionary);
-        JLabel unitLabel = new JLabel(getLibrary().getUnitImageIcon(imageType));
+    private JLabel createUnitLabel(UnitType unitType, Role role) {
+        JLabel unitLabel = new JLabel(getLibrary().getUnitImageIcon(unitType, role));
         return unitLabel;
     }
 

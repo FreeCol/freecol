@@ -390,8 +390,7 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
      */
     private void buildUnitItem(int unit, float scale, DefaultMutableTreeNode parent) {
         UnitType unitType = FreeCol.getSpecification().getUnitType(unit);
-        int unitIcon = ImageLibrary.getUnitGraphicsType(unit, false, false, false, false);
-        ImageIcon icon = library.getColopediaUnitImageIcon(unitIcon, 0.5f);
+        ImageIcon icon = library.getScaledImageIcon(library.getUnitImageIcon(unitType), 0.5f);
         DefaultMutableTreeNode item = new DefaultMutableTreeNode(new ColopediaTreeItem(unitType.getName(), icon));
         parent.add(item);
     }
@@ -821,8 +820,7 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
         JLabel specialist = new JLabel();
         UnitType unitType = FreeCol.getSpecification().getExpertForProducing(buildingType.getProducedGoodsType());
         if (unitType != null) {
-            int graphicsType = ImageLibrary.getUnitGraphicsType(unitType.getIndex(), false, false, false, false);
-            specialist.setIcon(library.getUnitImageIcon(graphicsType));
+            specialist.setIcon(library.getUnitImageIcon(unitType));
             specialist.setText(unitType.getName());
             specialist.setHorizontalAlignment(SwingConstants.LEFT);
         }

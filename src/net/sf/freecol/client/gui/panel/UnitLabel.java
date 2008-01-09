@@ -37,6 +37,7 @@ import javax.swing.JLabel;
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.control.InGameController;
 import net.sf.freecol.client.gui.Canvas;
+import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.Building;
 import net.sf.freecol.common.model.BuildingType;
@@ -86,10 +87,9 @@ public final class UnitLabel extends JLabel implements ActionListener {
      * @param parent The parent that knows more than we do.
      */
     public UnitLabel(Unit unit, Canvas parent) {
-        ImageProvider lib = parent.getGUI().getImageLibrary();
-        int type = lib.getUnitGraphicsType(unit);
-        setIcon(lib.getUnitImageIcon(type));
-        setDisabledIcon(lib.getUnitImageIcon(type, true));
+        ImageLibrary lib = parent.getGUI().getImageLibrary();
+        setIcon(lib.getUnitImageIcon(unit));
+        setDisabledIcon(lib.getUnitImageIcon(unit, true));
         this.unit = unit;
         setDescriptionLabel(unit.getName());
         this.parent = parent;
@@ -173,17 +173,16 @@ public final class UnitLabel extends JLabel implements ActionListener {
      * @param isSmall The image will be smaller if set to <code>true</code>.
      */
     public void setSmall(boolean isSmall) {
-        int unitIndex = parent.getGUI().getImageLibrary().getUnitGraphicsType(unit);
+        ImageIcon imageIcon = parent.getGUI().getImageLibrary().getUnitImageIcon(unit);
+        ImageIcon disabledImageIcon = parent.getGUI().getImageLibrary().getUnitImageIcon(unit, true);
         if (isSmall) {
             setPreferredSize(null);
-            ImageIcon imageIcon = parent.getGUI().getImageLibrary().getUnitImageIcon(unitIndex);
             // setIcon(new
             // ImageIcon(imageIcon.getImage().getScaledInstance(imageIcon.getIconWidth()
             // / 2, imageIcon.getIconHeight() / 2, Image.SCALE_DEFAULT)));
             setIcon(new ImageIcon(imageIcon.getImage().getScaledInstance((imageIcon.getIconWidth() / 3) * 2,
                     (imageIcon.getIconHeight() / 3) * 2, Image.SCALE_SMOOTH)));
 
-            ImageIcon disabledImageIcon = parent.getGUI().getImageLibrary().getUnitImageIcon(unitIndex, true);
             setDisabledIcon(new ImageIcon(disabledImageIcon.getImage().getScaledInstance(
                     (imageIcon.getIconWidth() / 3) * 2, (imageIcon.getIconHeight() / 3) * 2, Image.SCALE_SMOOTH)));
             setBorder(BorderFactory.createEmptyBorder(0, 2, 0, 0));
@@ -191,13 +190,13 @@ public final class UnitLabel extends JLabel implements ActionListener {
             if (unit.getLocation() instanceof ColonyTile) {
                 TileType tileType = ((ColonyTile) unit.getLocation()).getTile().getType();
                 setSize(new Dimension(parent.getGUI().getImageLibrary().getTerrainImageWidth(tileType) / 2,
-                        parent.getGUI().getImageLibrary().getUnitImageHeight(unitIndex)));
+                                      imageIcon.getIconHeight()));
             } else {
                 setPreferredSize(null);
             }
 
-            setIcon(parent.getGUI().getImageLibrary().getUnitImageIcon(unitIndex));
-            setDisabledIcon(parent.getGUI().getImageLibrary().getUnitImageIcon(unitIndex, true));
+            setIcon(imageIcon);
+            setDisabledIcon(disabledImageIcon);
             if (unit.getLocation() instanceof ColonyTile) {
                 setBorder(BorderFactory.createEmptyBorder(0, 15, 0, 15));
             } else {
@@ -343,9 +342,8 @@ public final class UnitLabel extends JLabel implements ActionListener {
 
 
     public void updateIcon() {
-        int unitIndex = parent.getGUI().getImageLibrary().getUnitGraphicsType(unit);
-        setIcon(parent.getGUI().getImageLibrary().getUnitImageIcon(unitIndex));
-        setDisabledIcon(parent.getGUI().getImageLibrary().getUnitImageIcon(unitIndex, true));
+        setIcon(parent.getGUI().getImageLibrary().getUnitImageIcon(unit));
+        setDisabledIcon(parent.getGUI().getImageLibrary().getUnitImageIcon(unit, true));
 
         Component uc = getParent();
         while (uc != null) {

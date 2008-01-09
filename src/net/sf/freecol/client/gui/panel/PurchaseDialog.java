@@ -25,6 +25,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -102,8 +103,8 @@ public final class PurchaseDialog extends FreeColDialog implements ActionListene
         buttons = new ArrayList<JButton>();
         int row = 1;
         for(UnitType unitType : unitTypesForPurchasing) {
-            int graphicsType = ImageLibrary.getUnitGraphicsType(unitType.getIndex(), false, false, false, false);
-            JButton button = new JButton(unitType.getName(), library.getScaledUnitImageIcon(graphicsType, 0.66f));
+            ImageIcon unitIcon = library.getUnitImageIcon(unitType);
+            JButton button = new JButton(unitType.getName(), library.getScaledImageIcon(unitIcon, 0.66f));
             button.setIconTextGap(margin);
             button.addActionListener(this);
             button.setActionCommand(unitType.getId());

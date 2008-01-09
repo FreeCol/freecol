@@ -2337,7 +2337,6 @@ public class Unit extends FreeColGameObject implements Features, Locatable, Loca
      * can be used when communicating with the user.
      * 
      * @return The given unit type as a String
-     * @throws IllegalArgumentException
      */
     public String getName() {
         if (name != null) {
@@ -2346,16 +2345,28 @@ public class Unit extends FreeColGameObject implements Features, Locatable, Loca
             return Messages.message(getType().getId() + ".gold", "%gold%",
                                     String.valueOf(getTreasureAmount()));
         } else {
-            String key = role.toString().toLowerCase();
-            if (role == Role.DEFAULT) {
-                key = "name";
-            }
-            String messageID = getType().getId() +  "." + key;
-            if (Messages.containsKey(messageID)) {
-                return Messages.message(messageID);
-            } else {
-                return Messages.message("model.unit." + key + ".name", "%unit%", getType().getName());
-            }
+            return getName(getType(), getRole());
+        }
+    }
+
+    /**
+     * Returns the name of a unit in a human readable format. The return value
+     * can be used when communicating with the user.
+     * 
+     * @param someType an <code>UnitType</code> value
+     * @param someRole a <code>Role</code> value
+     * @return The given unit type as a String
+     */
+    public static String getName(UnitType someType, Role someRole) {
+        String key = someRole.toString().toLowerCase();
+        if (someRole == Role.DEFAULT) {
+            key = "name";
+        }
+        String messageID = someType.getId() +  "." + key;
+        if (Messages.containsKey(messageID)) {
+            return Messages.message(messageID);
+        } else {
+            return Messages.message("model.unit." + key + ".name", "%unit%", someType.getName());
         }
     }
 

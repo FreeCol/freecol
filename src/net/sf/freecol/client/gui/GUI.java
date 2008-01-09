@@ -1464,8 +1464,7 @@ public final class GUI {
         }
         
         if (occupyingUnit != null) {
-            int type = lib.getUnitGraphicsType(occupyingUnit);
-            ImageIcon image = lib.getScaledUnitImageIcon(type, 0.5f);
+            ImageIcon image = lib.getScaledImageIcon(lib.getUnitImageIcon(occupyingUnit), 0.5f);
             g.drawImage(image.getImage(), (x + tileWidth / 4) - image.getIconWidth() / 2,
                     (y + tileHeight / 2) - image.getIconHeight() / 2, null);
             // Draw an occupation and nation indicator.
@@ -2197,11 +2196,12 @@ public final class GUI {
             }
 
             // Draw the unit.
-            int type = lib.getUnitGraphicsType(unit);
             // If unit is sentry, draw in grayscale
-            Image image = lib.getUnitImage(type, unit.getState() == UnitState.SENTRY);
+            Image image = lib.getUnitImageIcon(unit, unit.getState() == UnitState.SENTRY).getImage();
             
-            g.drawImage(image, (x + tileWidth / 2) - lib.getUnitImageWidth(type) / 2, (y + tileHeight / 2) - lib.getUnitImageHeight(type) / 2 - (int) (UNIT_OFFSET * lib.getScalingFactor()), null);
+            g.drawImage(image, (x + tileWidth / 2) - image.getWidth(null) / 2,
+                        (y + tileHeight / 2) - image.getHeight(null) / 2 -
+                        (int) (UNIT_OFFSET * lib.getScalingFactor()), null);
 
             // Draw an occupation and nation indicator.
             displayOccupationIndicator(g, unit, x + (int) (STATE_OFFSET_X * lib.getScalingFactor()), y);

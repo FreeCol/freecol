@@ -29,6 +29,7 @@ import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.Player;
+import net.sf.freecol.common.model.Unit.Role;
 import net.sf.freecol.common.model.UnitType;
 import cz.autel.dmi.HIGLayout;
 
@@ -61,9 +62,11 @@ public final class ReportLabourDetailPanel extends ReportPanel implements Action
     }
 
     private JLabel createUnitLabel(UnitType unitType) {
-        int imageType = ImageLibrary.getUnitGraphicsType(unitType.getIndex(), false, false, 
-                                                         unitType.hasAbility("model.ability.expertPioneer"), false);
-        JLabel unitLabel = new JLabel(getLibrary().getUnitImageIcon(imageType));
+        Role role = Role.DEFAULT;
+        if (unitType.hasAbility("model.ability.expertPioneer")) {
+            role = Role.PIONEER;
+        }
+        JLabel unitLabel = new JLabel(getLibrary().getUnitImageIcon(unitType, role));
         return unitLabel;
     }
 

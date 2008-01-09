@@ -149,7 +149,7 @@ public final class DragListener extends MouseAdapter {
                                 tempUnit.getLocation() instanceof WorkLocation &&
                                 teacher.getStudent() != tempUnit) {
                             menuItem = new JMenuItem(Messages.message("assignToTeacher"),
-                                                     imageLibrary.getScaledUnitImageIcon(teacher.getIndex(), 0.5f));
+                                                     imageLibrary.getScaledImageIcon(imageLibrary.getUnitImageIcon(teacher), 0.5f));
                             menuItem.setActionCommand("assign" + teacher.getId());
                             menuItem.addActionListener(unitLabel);
                             menu.add(menuItem);
