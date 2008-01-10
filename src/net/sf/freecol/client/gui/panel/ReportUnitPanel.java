@@ -71,12 +71,12 @@ public final class ReportUnitPanel extends JPanel implements ActionListener {
     private static final int separator = 12;
 
     /** The type of a unit report. */
-    public static final int MILITARY = 0, NAVAL = 1, CARGO = 2;
+    public static enum ReportType { MILITARY, NAVAL, CARGO }
     
     /**
      * Whether this is a naval, military or cargo unit report.
      */
-    private int reportType;
+    private ReportType reportType;
 
     /**
      * Whether to display empty locations.
@@ -110,7 +110,11 @@ public final class ReportUnitPanel extends JPanel implements ActionListener {
     /**
      * Records the number of units of each type.
      */
-    private int[][] unitCounts;
+    private HashMap<UnitType, Integer> soldiers = new HashMap<UnitType, Integer>();
+    private HashMap<UnitType, Integer> dragoons = new HashMap<UnitType, Integer>();
+    private HashMap<UnitType, Integer> others = new HashMap<UnitType, Integer>();
+
+    private static final UnitType defaultType = FreeCol.getSpecification().getUnitType("model.unit.freeColonist");
 
     /**
      * Records the total cargo capacity of the fleet (currently
@@ -123,7 +127,7 @@ public final class ReportUnitPanel extends JPanel implements ActionListener {
      * 
      * @param parent The parent of this panel.
      */
-    public ReportUnitPanel(int type, boolean ignoreEmptyLocations, Canvas parent, ReportPanel reportPanel) {
+    public ReportUnitPanel(ReportType type, boolean ignoreEmptyLocations, Canvas parent, ReportPanel reportPanel) {
         this.reportType = type;
         this.ignoreEmptyLocations = ignoreEmptyLocations;
         this.parent = parent;
@@ -136,10 +140,9 @@ public final class ReportUnitPanel extends JPanel implements ActionListener {
      * Prepares this panel to be displayed.
      */
     public void initialize() {
-        unitCounts = new int[FreeCol.getSpecification().numberOfUnitTypes()][2];
         gatherData();
 
-        int rowsREF = (reportType == CARGO ? 0 : 1);
+        int rowsREF = (reportType == ReportType.CARGO ? 0 : 1);
         int[] widths = new int[] {0};
         int[] heights = new int[3 + rowsREF];
         heights[1 + rowsREF] = separator;
@@ -147,7 +150,7 @@ public final class ReportUnitPanel extends JPanel implements ActionListener {
         setLayout(new HIGLayout(widths, heights));
 
         int row = 1;
-        if (reportType != CARGO) {
+        if (reportType != ReportType.CARGO) {
             add(createREFPanel(), higConst.rc(row, labelColumn));
             row++;
         }
@@ -177,7 +180,7 @@ public final class ReportUnitPanel extends JPanel implements ActionListener {
 
     private void showDetails() {
 
-        int rowsREF = (reportType == CARGO ? 0 : 1);
+        int rowsREF = (reportType == ReportType.CARGO ? 0 : 1);
         int[] widths = new int[] { 0, 12, 0 };
         int[] heights = new int[colonies.size() + otherNames.size() + extraRows + rowsREF];
         heights[1 + rowsREF] = separator;
@@ -189,7 +192,7 @@ public final class ReportUnitPanel extends JPanel implements ActionListener {
         setLayout(new HIGLayout(widths, heights));
 
         // REF
-        if (reportType != CARGO) {
+        if (reportType != ReportType.CARGO) {
             add(createREFPanel(), higConst.rcwh(row, labelColumn, widths.length, 1));
             row++;
         }
@@ -228,61 +231,71 @@ public final class ReportUnitPanel extends JPanel implements ActionListener {
         //repaint();
     }
 
+    private int getCount(HashMap<UnitType, Integer> hash, UnitType unitType) {
+        Integer count = hash.get(unitType);
+        if (count != null) {
+            return count.intValue();
+        } else { 
+            return 0;
+        }
+    }
+
+    private void incrementCount(HashMap<UnitType, Integer> hash, UnitType unitType) {
+        Integer count = hash.get(unitType);
+        if (count == null) {
+            hash.put(unitType, new Integer(1));
+        } else {
+            hash.put(unitType, new Integer(count.intValue() + 1));
+        }
+    }
+
     private void gatherData() {
         prepareData();
-
-        Iterator<Unit> units = player.getUnitIterator();
-        while (units.hasNext()) {
-            Unit unit = units.next();
-            int type = unit.getIndex();
-            String locationName = null;
-
-            if (reportType == CARGO && unit.isCarrier()) {
-                unitCounts[type][0]++;
-                capacity += unit.getType().getSpace();
-            } else if (reportType == NAVAL && unit.isNaval()) {
-                unitCounts[type][0]++;
-                capacity += unit.getType().getSpace();
-            } else if (reportType == MILITARY) {
-                switch (type) {
-                case Unit.ARTILLERY:
-                case Unit.DAMAGED_ARTILLERY:
-                    unitCounts[type][0]++;
-                    break;
-                case Unit.VETERAN_SOLDIER:
-                case Unit.COLONIAL_REGULAR:
-                    if (unit.isArmed()) {
-                        if (unit.isMounted()) {
-                            unitCounts[type][1]++;
-                        } else {
-                            unitCounts[type][0]++;
-                        }
-                    } else {
-                        continue;
+        for (Unit unit : player.getUnits()) {
+            switch(reportType) {
+            case CARGO:
+                if (unit.isCarrier()) {
+                    incrementCount(others, unit.getType());
+                    capacity += unit.getType().getSpace();
+                } else {
+                    continue;
+                }
+                break;
+            case NAVAL:
+                if (unit.isNaval()) {
+                    incrementCount(others, unit.getType());
+                } else {
+                    continue;
+                }
+                break;
+            case MILITARY:
+                if (unit.isOffensiveUnit() && !unit.isNaval()) {
+                    UnitType unitType = defaultType;
+                    if (unit.getType().getOffence() > 0 ||
+                        unit.hasAbility("model.ability.expertSoldier")) {
+                        unitType = unit.getType();
                     }
-                    break;
-                default:
-                    if (unit.isArmed()) {
-                        if (unit.isMounted()) {
-                            unitCounts[Unit.FREE_COLONIST][1]++;
-                        } else {
-                            unitCounts[Unit.FREE_COLONIST][0]++;
-                        }
-                    } else {
-                        continue;
+                    switch(unit.getRole()) {
+                    case DRAGOON:
+                        incrementCount(dragoons, unitType);
+                        break;
+                    case SOLDIER:
+                        incrementCount(soldiers, unitType);
+                        break;
+                    default:
+                        incrementCount(others, unitType);
                     }
-                    break;
-                }                    
-            } else {
-                continue;
+                } else {
+                    continue;
+                }
+                break;
             }
 
+            String locationName = unit.getLocation().getLocationName();
             if (unit.getState() == UnitState.TO_AMERICA) {
                 locationName = Messages.message("goingToAmerica");
             } else if (unit.getState() == UnitState.TO_EUROPE) {
                 locationName = Messages.message("goingToEurope");
-            } else {
-                locationName = unit.getLocation().getLocationName();
             }
             
             ArrayList<Unit> unitList = locations.get(locationName);
@@ -300,20 +313,25 @@ public final class ReportUnitPanel extends JPanel implements ActionListener {
     private JPanel createREFPanel() {
         Element refUnits = parent.getClient().getInGameController().getREFUnits();
         JPanel refPanel = null;
-        if (reportType == NAVAL) {
+        if (reportType == ReportType.NAVAL) {
             int menOfWar = Integer.parseInt(refUnits.getAttribute("menOfWar"));
             refPanel = new JPanel(new GridLayout(1, 6));
-            refPanel.add(createUnitTypeLabel(Unit.MAN_O_WAR, Role.DEFAULT, menOfWar));
-        } else if (reportType == MILITARY) {
+            refPanel.add(createUnitTypeLabel(FreeCol.getSpecification().getUnitType("model.unit.manOWar"),
+                                             Role.DEFAULT, menOfWar));
+        } else if (reportType == ReportType.MILITARY) {
             int artillery = Integer.parseInt(refUnits.getAttribute("artillery"));
             int damagedArtillery = Integer.parseInt(refUnits.getAttribute("damagedArtillery"));
             int dragoons = Integer.parseInt(refUnits.getAttribute("dragoons"));
             int infantry = Integer.parseInt(refUnits.getAttribute("infantry"));
             refPanel = new JPanel(new GridLayout(1, 8));
-            refPanel.add(createUnitTypeLabel(Unit.ARTILLERY, Role.DEFAULT, artillery));
-            refPanel.add(createUnitTypeLabel(Unit.DAMAGED_ARTILLERY, Role.DEFAULT, damagedArtillery));
-            refPanel.add(createUnitTypeLabel(Unit.KINGS_REGULAR, Role.DRAGOON, dragoons));
-            refPanel.add(createUnitTypeLabel(Unit.KINGS_REGULAR, Role.SOLDIER, infantry));
+            refPanel.add(createUnitTypeLabel(FreeCol.getSpecification().getUnitType("model.unit.artillery"),
+                                             Role.DEFAULT, artillery));
+            refPanel.add(createUnitTypeLabel(FreeCol.getSpecification().getUnitType("model.unit.damagedArtillery"),
+                                             Role.DEFAULT, damagedArtillery));
+            refPanel.add(createUnitTypeLabel(FreeCol.getSpecification().getUnitType("model.unit.kingsRegular"),
+                                             Role.DRAGOON, dragoons));
+            refPanel.add(createUnitTypeLabel(FreeCol.getSpecification().getUnitType("model.unit.kingsRegular"),
+                                             Role.SOLDIER, infantry));
         }
         if (refPanel != null) {
             refPanel.setOpaque(false);
@@ -323,46 +341,42 @@ public final class ReportUnitPanel extends JPanel implements ActionListener {
     }
 
     private JPanel createUnitPanel() {
-        JPanel unitPanel = null;
-        if (reportType == CARGO) {
+        JPanel unitPanel = new JPanel(new GridLayout(1, 0));
+        switch (reportType) {
+        case CARGO:
             String[] abilities = new String[] {"model.ability.carryUnits", "model.ability.carryGoods"};
-            List<UnitType> unitTypes = FreeCol.getSpecification().getUnitTypesWithAnyAbility(abilities);
-            unitPanel = new JPanel(new GridLayout(1, unitTypes.size()));
-            for (UnitType unitType : unitTypes) {
-                int count = unitCounts[unitType.getIndex()][0];
-                unitPanel.add(createUnitTypeLabel(unitType, Role.DEFAULT, count));
+            for (UnitType unitType : FreeCol.getSpecification().getUnitTypesWithAnyAbility(abilities)) {
+                unitPanel.add(createUnitTypeLabel(unitType, Role.DEFAULT, getCount(others, unitType)));
             }
-        } else if (reportType == NAVAL) {
-            List<UnitType> unitTypes = FreeCol.getSpecification().getUnitTypesWithAbility("model.ability.navalUnit");
-            unitPanel = new JPanel(new GridLayout(1, unitTypes.size()));
-            for (UnitType unitType : unitTypes) {
-                int count = unitCounts[unitType.getIndex()][0];
-                unitPanel.add(createUnitTypeLabel(unitType, Role.DEFAULT, count));
+            break;
+        case NAVAL:
+            for (UnitType unitType : FreeCol.getSpecification().getUnitTypesWithAbility("model.ability.navalUnit")) {
+                unitPanel.add(createUnitTypeLabel(unitType, Role.DEFAULT, getCount(others, unitType)));
             }
-        } else if (reportType == MILITARY) {
-            int[] unitTypes = new int[] {
-                Unit.ARTILLERY, Unit.DAMAGED_ARTILLERY,
-                Unit.COLONIAL_REGULAR, Unit.VETERAN_SOLDIER,
-                Unit.FREE_COLONIST
-            };
-            unitPanel = new JPanel(new GridLayout(1, unitTypes.length));
-            // artillery can not be mounted
-            for (int index = 0; index < 2; index++) {
-                UnitType unitType = FreeCol.getSpecification().getUnitType(unitTypes[index]);
-                int count = unitCounts[unitType.getIndex()][0];
-                unitPanel.add(createUnitTypeLabel(unitType, Role.DEFAULT, count));
+            break;
+        case MILITARY:
+            int otherCount = 0;
+            int dragoonCount = 0;
+            List<UnitType> unitTypes = new ArrayList<UnitType>();
+            for (UnitType unitType : FreeCol.getSpecification().getUnitTypeList()) {
+                if (!unitType.hasAbility("model.ability.navalUnit") && 
+                    (unitType.getOffence() > 0 ||
+                     unitType.hasAbility("model.ability.expertSoldier"))) {
+                    if (unitType.hasAbility("model.ability.canBeEquipped")) {
+                        unitPanel.add(createUnitTypeLabel(unitType, Role.DRAGOON, getCount(dragoons, unitType)),
+                                      otherCount + dragoonCount);
+                        dragoonCount++;
+                        unitPanel.add(createUnitTypeLabel(unitType, Role.SOLDIER, getCount(soldiers, unitType)), -1);
+                    } else {
+                        unitPanel.add(createUnitTypeLabel(unitType, Role.DEFAULT, getCount(others, unitType)),
+                                      otherCount);
+                        otherCount++;
+                    }
+                }
             }
-            // other units can be mounted
-            for (int index = 2; index < unitTypes.length; index++) {
-                    UnitType unitType = FreeCol.getSpecification().getUnitType(unitTypes[index]);
-                    int count = unitCounts[unitType.getIndex()][1];
-                    unitPanel.add(createUnitTypeLabel(unitType, Role.DRAGOON, count));
-            }
-            for (int index = 2; index < unitTypes.length; index++) {
-                    UnitType unitType = FreeCol.getSpecification().getUnitType(unitTypes[index]);
-                    int count = unitCounts[unitType.getIndex()][0];
-                    unitPanel.add(createUnitTypeLabel(unitType, Role.SOLDIER, count));
-            }
+            unitPanel.add(createUnitTypeLabel(defaultType, Role.DRAGOON, getCount(dragoons, defaultType)),
+                          otherCount + dragoonCount);
+            unitPanel.add(createUnitTypeLabel(defaultType, Role.SOLDIER, getCount(soldiers, defaultType)), -1);
         }
         if (unitPanel != null) {
             unitPanel.setOpaque(false);
@@ -391,7 +405,7 @@ public final class ReportUnitPanel extends JPanel implements ActionListener {
             }
             if (unitList != null) {
                 JPanel unitPanel = new JPanel();
-                if (reportType == MILITARY) {
+                if (reportType == ReportType.MILITARY) {
                     unitPanel.setLayout(new GridLayout(0, 9));
                 } else {
                     unitPanel.setLayout(new GridLayout(0, 7));
@@ -431,10 +445,6 @@ public final class ReportUnitPanel extends JPanel implements ActionListener {
         locationIndex++;
     }
 
-    private JLabel createUnitTypeLabel(int unitTypeIndex, Role role, int count) {
-        return createUnitTypeLabel(FreeCol.getSpecification().getUnitType(unitTypeIndex), role, count);
-    }
-    
     private JLabel createUnitTypeLabel(UnitType unitType, Role role, int count) {
         ImageIcon unitIcon = reportPanel.getLibrary().getUnitImageIcon(unitType, role, count == 0);
         JLabel unitLabel = new JLabel(reportPanel.getLibrary().getScaledImageIcon(unitIcon, 0.66f));

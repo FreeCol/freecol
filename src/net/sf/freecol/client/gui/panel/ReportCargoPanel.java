@@ -38,7 +38,7 @@ public final class ReportCargoPanel extends ReportPanel implements ActionListene
      */
     public ReportCargoPanel(Canvas parent) {
         super(parent, Messages.message("menuBar.report.cargo"));
-        reportUnitPanel = new ReportUnitPanel(ReportUnitPanel.CARGO, true, getCanvas(), this);
+        reportUnitPanel = new ReportUnitPanel(ReportUnitPanel.ReportType.CARGO, true, getCanvas(), this);
     }
 
     @Override
