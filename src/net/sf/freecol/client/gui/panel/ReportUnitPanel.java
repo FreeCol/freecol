@@ -341,17 +341,23 @@ public final class ReportUnitPanel extends JPanel implements ActionListener {
     }
 
     private JPanel createUnitPanel() {
-        JPanel unitPanel = new JPanel(new GridLayout(1, 0));
+        JPanel unitPanel = new JPanel(new GridLayout(0, 8));
         switch (reportType) {
         case CARGO:
-            String[] abilities = new String[] {"model.ability.carryUnits", "model.ability.carryGoods"};
-            for (UnitType unitType : FreeCol.getSpecification().getUnitTypesWithAnyAbility(abilities)) {
-                unitPanel.add(createUnitTypeLabel(unitType, Role.DEFAULT, getCount(others, unitType)));
+            for (UnitType unitType : FreeCol.getSpecification().getUnitTypeList()) {
+                if (!unitType.hasAbility("model.ability.undead") && 
+                    (unitType.hasAbility("model.ability.carryUnits") ||
+                     unitType.hasAbility("model.ability.carryGoods"))) {
+                    unitPanel.add(createUnitTypeLabel(unitType, Role.DEFAULT, getCount(others, unitType)));
+                }
             }
             break;
         case NAVAL:
-            for (UnitType unitType : FreeCol.getSpecification().getUnitTypesWithAbility("model.ability.navalUnit")) {
-                unitPanel.add(createUnitTypeLabel(unitType, Role.DEFAULT, getCount(others, unitType)));
+            for (UnitType unitType : FreeCol.getSpecification().getUnitTypeList()) {
+                if (!unitType.hasAbility("model.ability.undead") &&
+                    unitType.hasAbility("model.ability.navalUnit")) {
+                    unitPanel.add(createUnitTypeLabel(unitType, Role.DEFAULT, getCount(others, unitType)));
+                }
             }
             break;
         case MILITARY:
@@ -359,9 +365,10 @@ public final class ReportUnitPanel extends JPanel implements ActionListener {
             int dragoonCount = 0;
             List<UnitType> unitTypes = new ArrayList<UnitType>();
             for (UnitType unitType : FreeCol.getSpecification().getUnitTypeList()) {
-                if (!unitType.hasAbility("model.ability.navalUnit") && 
-                    (unitType.getOffence() > 0 ||
-                     unitType.hasAbility("model.ability.expertSoldier"))) {
+                if (!unitType.hasAbility("model.ability.undead") &&
+                    !unitType.hasAbility("model.ability.navalUnit") && 
+                    (unitType.hasAbility("model.ability.expertSoldier") ||
+                     unitType.getOffence() > 0)) {
                     if (unitType.hasAbility("model.ability.canBeEquipped")) {
                         unitPanel.add(createUnitTypeLabel(unitType, Role.DRAGOON, getCount(dragoons, unitType)),
                                       otherCount + dragoonCount);

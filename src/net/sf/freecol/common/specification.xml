@@ -1133,7 +1133,7 @@
        players. Founding fathers can be restricted to certain
        nations by adding these nations explicitly, like this:
        <nation id="model.nation.spanish"/> or
-       <nation-type id="model.nation.trade"/>
+       <nation-type id="model.nationType.trade"/>
        A founding fathers with these settings would only be available
        to the Spanish nation and nations with the Trade advantage. -->
   <founding-fathers>
