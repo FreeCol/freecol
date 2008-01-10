@@ -272,7 +272,7 @@ public class River {
                         RiverSection lastSection = new RiverSection(newPosition, lastDir);
                         sections.add(lastSection);
                         
-                        if (tile.hasRiver()) {
+                        if (tile.hasRiver() && tile.isLand()) {
                             logger.fine("Point " + newPosition + " is next to another river.");
                             drawToMap();
                             // increase the size of another river
