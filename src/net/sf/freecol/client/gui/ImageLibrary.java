@@ -33,6 +33,7 @@ import java.awt.image.ColorConvertOp;
 import java.io.File;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.EnumMap;
 import java.util.Hashtable;
 import java.util.Vector;
 import java.util.logging.Logger;
@@ -125,7 +126,7 @@ public final class ImageLibrary extends ImageProvider {
     // Holds the unit-order buttons
     private Vector<Vector<ImageIcon>> unitButtons; 
 
-    private Image[] alarmChips;
+    private EnumMap<Tension.Level, Image> alarmChips;
 
     private Hashtable<Color, Image> colorChips;
 
@@ -199,7 +200,7 @@ public final class ImageLibrary extends ImageProvider {
             Hashtable<String, Vector<ImageIcon>> coast1,
             Hashtable<String, Vector<ImageIcon>> coast2,
             Vector<Vector<ImageIcon>> unitButtons,
-            Image[] alarmChips,
+            EnumMap<Tension.Level, Image> alarmChips,
             Hashtable<Color, Image> colorChips,
             Hashtable<Color, Image> missionChips,
             Hashtable<Color, Image> expertMissionChips) {
@@ -262,7 +263,7 @@ public final class ImageLibrary extends ImageProvider {
         loadBonus(gc, resourceLocator, doLookup);
         loadMonarch(gc, resourceLocator, doLookup);
 
-        alarmChips = new Image[Tension.NUMBER_OF_LEVELS];
+        alarmChips = new EnumMap<Tension.Level, Image>(Tension.Level.class);
         colorChips = new Hashtable<Color, Image>();
         missionChips = new Hashtable<Color, Image>();
         expertMissionChips = new Hashtable<Color, Image>();
@@ -910,26 +911,29 @@ public final class ImageLibrary extends ImageProvider {
      *            compatible with the local environment.
      * @param alarm The alarm level.
      */
-    private void loadAlarmChip(GraphicsConfiguration gc, int alarm) {
+    private void loadAlarmChip(GraphicsConfiguration gc, Tension.Level alarm) {
         BufferedImage tempImage = gc.createCompatibleImage(10, 17);
         Graphics2D g = (Graphics2D) tempImage.getGraphics();
 
         g.setColor(Color.BLACK);
         g.drawRect(0, 0, 10, 16);
 
-        if (alarm == Tension.HAPPY) {
+        switch(alarm) {
+        case HAPPY:
             g.setColor(Color.GREEN);
-        } else if (alarm == Tension.CONTENT) {
+            break;
+        case CONTENT:
             g.setColor(Color.BLUE);
-        } else if (alarm == Tension.DISPLEASED) {
+            break;
+        case DISPLEASED:
             g.setColor(Color.YELLOW);
-        } else if (alarm == Tension.ANGRY) {
+            break;
+        case ANGRY:
             g.setColor(Color.ORANGE);
-        } else if (alarm == Tension.HATEFUL) {
+            break;
+        case HATEFUL:
             g.setColor(Color.RED);
-        } else {
-            logger.warning("Unknown alarm level: " + alarm);
-            return;
+            break;
         }
 
         g.fillRect(1, 1, 8, 15);
@@ -938,7 +942,7 @@ public final class ImageLibrary extends ImageProvider {
         g.fillRect(4, 3, 2, 7);
         g.fillRect(4, 12, 2, 2);
 
-        alarmChips[alarm] = tempImage;
+        alarmChips.put(alarm, tempImage);
     }
 
     /**
@@ -1298,14 +1302,14 @@ public final class ImageLibrary extends ImageProvider {
      * @param alarm The alarm level.
      * @return The alarm chip.
      */
-    public Image getAlarmChip(int alarm) {
-        Image alarmChip = alarmChips[alarm];
+    public Image getAlarmChip(Tension.Level alarm) {
+        Image alarmChip = alarmChips.get(alarm);
 
         if (alarmChip == null) {
             GraphicsConfiguration gc = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice()
                     .getDefaultConfiguration();
             loadAlarmChip(gc, alarm);
-            alarmChip = alarmChips[alarm];
+            alarmChip = alarmChips.get(alarm);
         }
         return alarmChip;
     }

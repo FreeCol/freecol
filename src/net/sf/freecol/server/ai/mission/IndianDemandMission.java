@@ -189,7 +189,8 @@ public class IndianDemandMission extends Mission {
                     // TODO: if very happy, the brave should convert
                     tension = -(5 - enemy.getDifficulty()) * 50;
                     unit.getOwner().modifyTension(enemy, tension);
-                    if (unitTension <= Tension.TENSION_HAPPY && (goods == null || goods.getType() == Goods.FOOD)) {
+                    if (unitTension <= Tension.Level.HAPPY.getLimit() &&
+                        (goods == null || goods.getType() == Goods.FOOD)) {
                         Element deliverGiftElement = Message.createNewRootElement("deliverGift");
                         deliverGiftElement.setAttribute("unit", getUnit().getId());
                         deliverGiftElement.setAttribute("settlement", target.getId());
@@ -205,7 +206,7 @@ public class IndianDemandMission extends Mission {
                 } else {
                     tension = (enemy.getDifficulty() + 1) * 50;
                     unit.getOwner().modifyTension(enemy, tension);
-                    if (unitTension >= Tension.TENSION_CONTENT) {
+                    if (unitTension >= Tension.Level.CONTENT.getLimit()) {
                         // if we didn't get what we wanted, attack
                         Element element = Message.createNewRootElement("attack");
                         element.setAttribute("unit", unit.getId());
@@ -233,16 +234,17 @@ public class IndianDemandMission extends Mission {
      * @return The goods to demand.
      */
     public Goods selectGoods(Colony target) {
-        int tension = getUnit().getOwner().getTension(target.getOwner()).getLevel();
+        Tension.Level tension = getUnit().getOwner().getTension(target.getOwner()).getLevel();
         int dx = target.getOwner().getDifficulty() + 1;
         Goods goods = null;
         GoodsContainer warehouse = target.getGoodsContainer();
-        if (tension <= Tension.CONTENT && warehouse.getGoodsCount(Goods.FOOD) >= 100) {
+        if (tension.compareTo(Tension.Level.CONTENT) <= 0 &&
+            warehouse.getGoodsCount(Goods.FOOD) >= 100) {
             int amount = (warehouse.getGoodsCount(Goods.FOOD) * dx) / 6;
             if (amount > 0) {
                 return new Goods(getGame(), target, Goods.FOOD, amount);
             }
-        } else if (tension <= Tension.DISPLEASED) {
+        } else if (tension.compareTo(Tension.Level.DISPLEASED) <= 0) {
             Market market = target.getOwner().getMarket();
             int value = 0;
             List<Goods> warehouseGoods = warehouse.getCompactGoods();

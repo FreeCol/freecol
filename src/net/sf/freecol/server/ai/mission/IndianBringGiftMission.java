@@ -221,7 +221,7 @@ public class IndianBringGiftMission extends Mission {
     public static boolean isValidMission(Player owner, Player targetPlayer) {
         int stance = owner.getStance(targetPlayer);
         return (stance != Player.WAR && stance != Player.CEASE_FIRE)
-                && owner.getTension(targetPlayer).getLevel() <= Tension.HAPPY;
+            && owner.getTension(targetPlayer).getLevel().compareTo(Tension.Level.HAPPY) <= 0;
     }
 
     /**

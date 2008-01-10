@@ -265,7 +265,7 @@ public abstract class Mission extends AIObject {
                         tension -= 200;
                     }
                     // END: TODO-AI-CHEATING
-                    if (tension > Tension.TENSION_CONTENT) {
+                    if (tension > Tension.Level.CONTENT.getLimit()) {
                         if (bestTarget == null) {
                             bestTarget = pathNode;                           
                         } else if (bestTarget.getTurns() == pathNode.getTurns()) {

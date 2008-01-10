@@ -462,13 +462,14 @@ public class AIPlayer extends AIObject {
             if (p.getREFPlayer() == getPlayer() && p.getRebellionState() == Player.REBELLION_IN_WAR) {
                 getPlayer().getTension(p).modify(1000);
             }
-            if (getPlayer().getStance(p) != Player.WAR && getPlayer().getTension(p).getLevel() >= Tension.HATEFUL) {
+            if (getPlayer().getStance(p) != Player.WAR && 
+                getPlayer().getTension(p).getLevel() == Tension.Level.HATEFUL) {
                 getPlayer().setStance(p, Player.WAR);
             } else if (getPlayer().getStance(p) == Player.WAR
-                    && getPlayer().getTension(p).getLevel() <= Tension.CONTENT) {
+                       && getPlayer().getTension(p).getLevel().compareTo(Tension.Level.CONTENT) <= 0) {
                 getPlayer().setStance(p, Player.CEASE_FIRE);
             } else if (getPlayer().getStance(p) == Player.CEASE_FIRE
-                    && getPlayer().getTension(p).getLevel() <= Tension.HAPPY) {
+                       && getPlayer().getTension(p).getLevel().compareTo(Tension.Level.HAPPY) <= 0) {
                 getPlayer().setStance(p, Player.PEACE);
             }
         }
@@ -1244,7 +1245,7 @@ public class AIPlayer extends AIObject {
                         Player tp = target.getOwner();
                         int tension = 1 + getPlayer().getTension(tp).getValue()
                                 + indianSettlement.getAlarm(tp).getValue();
-                        if (getRandom().nextInt(tension) > Tension.HAPPY) {
+                        if (getRandom().nextInt(tension) > Tension.Level.HAPPY.getLimit()) {
                             chosenOne.setMission(new IndianDemandMission(getAIMain(), chosenOne, target));
                         }
                     }
@@ -1820,8 +1821,8 @@ public class AIPlayer extends AIObject {
             int amount = colony.getWarehouseCapacity() - colony.getGoodsCount(goods.getType());
             amount = Math.min(amount, goods.getAmount());
             // get a good price
-            int tensionLevel = player.getTension(otherPlayer).getLevel();
-            int percentage = (9 - tensionLevel) * 10;
+            Tension.Level tensionLevel = player.getTension(otherPlayer).getLevel();
+            int percentage = (9 - tensionLevel.ordinal()) * 10;
             // what we could get for the goods in Europe (minus taxes)
             int netProfits = ((100 - player.getTax()) * player.getMarket().getSalePrice(goods.getType(), amount)) / 100;
             int price = (netProfits * percentage) / 100;

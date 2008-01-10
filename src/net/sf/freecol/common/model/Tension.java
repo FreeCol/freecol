@@ -20,29 +20,9 @@
 
 package net.sf.freecol.common.model;
 
-
 import net.sf.freecol.client.gui.i18n.Messages;
 
-
 public class Tension {
-
-    /** 
-     * Constants for describing alarm levels.
-     */
-    public static final int HAPPY = 0,
-        CONTENT = 1,
-        DISPLEASED = 2,
-        ANGRY = 3,
-        HATEFUL = 4,
-        NUMBER_OF_LEVELS = 5;
-
-    public static final String[] level = {
-        "happy",
-        "content",
-        "displeased",
-        "angry",
-        "hateful"
-    };
 
     /**
     * Constants for adding to the tension levels.
@@ -68,20 +48,26 @@ public class Tension {
     /** Tension modification to be used when war is declared from a cease fire. */
     public static final int TENSION_ADD_DECLARE_WAR_FROM_CEASE_FIRE = 750;
     
-    /** The AI player is happy if <code>tension <= TENSION_HAPPY</code>. */
-    public static final int TENSION_HAPPY = 100;
+    /** 
+     * Constants for describing alarm levels.
+     */
+    public static enum Level { 
+        HAPPY(100), 
+        CONTENT(600), 
+        DISPLEASED(700),
+        ANGRY(800), 
+        HATEFUL(1000);
 
-    /** The AI player is content if <code>tension <= TENSION_CONTENT && tension > TENSION_HAPPY</code>. */
-    public static final int TENSION_CONTENT = 600;
+        private int limit;
 
-    /** The AI player is displeased if <code>tension <= TENSION_DISPLEASED && tension > TENSION_CONTENT</code>. */
-    public static final int TENSION_DISPLEASED = 700;
+        Level(int limit) {
+            this.limit = limit;
+        }
 
-    /** The AI player is angry if <code>tension <= TENSION_ANGRY && tension > TENSION_DISPLEASED</code>. */
-    public static final int TENSION_ANGRY = 800;
-
-    /** The AI player is hateful if <code>tension > TENSION_ANGRY</code>. */
-    public static final int TENSION_HATEFUL = 1000;
+        public int getLimit() {
+            return limit;
+        }
+    }
 
     private int value;
 
@@ -89,7 +75,7 @@ public class Tension {
      * Constructor.
      */
     public Tension() {
-        setValue(TENSION_HAPPY);
+        setValue(Level.HAPPY.getLimit());
     }
 
     public Tension(int newTension) {
@@ -111,8 +97,8 @@ public class Tension {
     public void setValue(int newValue) {
         if (newValue < 0) {
             value = 0;
-        } else if (newValue > TENSION_HATEFUL) {
-            value = TENSION_HATEFUL;
+        } else if (newValue > Level.HATEFUL.getLimit()) {
+            value = Level.HATEFUL.getLimit();
         } else {
             value = newValue;
         }
@@ -122,39 +108,17 @@ public class Tension {
      * Returns the current tension level.
      * @return The current level.
      */
-    public int getLevel() {
-        if (value <= TENSION_HAPPY) {
-            return HAPPY;
-        } else if (value <= TENSION_CONTENT) {
-            return CONTENT;
-        } else if (value <= TENSION_DISPLEASED) {
-            return DISPLEASED;
-        } else if (value <= TENSION_ANGRY) {
-            return ANGRY;
-        } else {
-            return HATEFUL;
+    public Level getLevel() {
+        for (Level level : Level.values()) {
+            if (value <= level.getLimit())
+                return level;
         }
-    }
+        return Level.HATEFUL;
+   }
 
-    public void setLevel(int level) {
+    public void setLevel(Level level) {
         if (level != getLevel()) {
-            switch(level) {
-            case HAPPY:
-                setValue(TENSION_HAPPY);
-                break;
-            case CONTENT:
-                setValue(TENSION_CONTENT);
-                break;
-            case DISPLEASED:
-                setValue(TENSION_DISPLEASED);
-                break;
-            case ANGRY:
-                setValue(TENSION_ANGRY);
-                break;
-            case HATEFUL:
-                setValue(TENSION_HATEFUL);
-                break;
-            }
+            setValue(level.getLimit());
         }
     }
 
@@ -172,37 +136,18 @@ public class Tension {
      * @return A <code>String</code>-representation of the
      *      current tension level, used to translate it in properties files.
      */
+    /*
     public String getCodeString() {
-        if (value <= TENSION_HAPPY) {
-            return "Happy";
-        } else if (value <= TENSION_CONTENT) {
-            return "Content";
-        } else if (value <= TENSION_DISPLEASED) {
-            return "Displeased";
-        } else if (value <= TENSION_ANGRY) {
-            return "Angry";
-        } else {
-            return "Hateful";
-        }
+        return getLevel().toString();
     }    
-    
+    */ 
     /** 
      * Returns the current tension level as a string.
      * @return A <code>String</code>-representation of the
      *      current tension level.
      */
     public String toString() {
-        if (value <= TENSION_HAPPY) {
-            return Messages.message(level[HAPPY]);
-        } else if (value <= TENSION_CONTENT) {
-            return Messages.message(level[CONTENT]);
-        } else if (value <= TENSION_DISPLEASED) {
-            return Messages.message(level[DISPLEASED]);
-        } else if (value <= TENSION_ANGRY) {
-            return Messages.message(level[ANGRY]);
-        } else {
-            return Messages.message(level[HATEFUL]);
-        }
+        return Messages.message(getLevel().toString().toLowerCase());
     }    
 }
 

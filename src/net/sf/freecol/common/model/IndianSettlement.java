@@ -223,15 +223,15 @@ public class IndianSettlement extends Settlement {
         int gold = 0;
         if (getGame().getTurn().getNumber() > lastTribute + TURNS_PER_TRIBUTE) {
             switch(getOwner().getTension(player).getLevel()) {
-            case Tension.HAPPY:
-            case Tension.CONTENT:
+            case HAPPY:
+            case CONTENT:
                 gold = Math.min(getOwner().getGold() / 10, 100);
                 break;
-            case Tension.DISPLEASED:
+            case DISPLEASED:
                 gold = Math.min(getOwner().getGold() / 20, 100);
                 break;
-            case Tension.ANGRY:
-            case Tension.HATEFUL:
+            case ANGRY:
+            case HATEFUL:
             default:
                 // do nothing
             }
@@ -318,7 +318,7 @@ public class IndianSettlement extends Settlement {
      * @return The ID of an alarm level message.
      */
     public String getAlarmLevelMessage(Player player) {
-        return "indianSettlement.alarm." + alarm[player.getIndex()].getCodeString();
+        return "indianSettlement.alarm." + alarm[player.getIndex()].toString().toLowerCase();
     }
 
     /**

@@ -1054,7 +1054,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         switch (rumour) {
         case LostCityRumour.BURIAL_GROUND:
             Player indianPlayer = unit.getTile().getOwner();
-            indianPlayer.modifyTension(player, Tension.TENSION_HATEFUL);
+            indianPlayer.modifyTension(player, Tension.Level.HATEFUL.getLimit());
             break;
         case LostCityRumour.EXPEDITION_VANISHES:
             unit.dispose();
@@ -1549,11 +1549,11 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         unit.setLocation(tile);
         if (!cancelAction) {
             switch (settlement.getAlarm(player).getLevel()) {
-            case Tension.HATEFUL:
+            case HATEFUL:
                 reply.setAttribute("result", "die");
                 unit.dispose();
                 break;
-            case Tension.ANGRY:
+            case ANGRY:
                 reply.setAttribute("result", "leave");
                 break;
             default:
@@ -1620,7 +1620,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
             // do it.
             unit.setMovesLeft(1);
             return null;
-        } else if (settlement.getAlarm(player).getLevel() == Tension.HATEFUL) {
+        } else if (settlement.getAlarm(player).getLevel() == Tension.Level.HATEFUL) {
             reply.setAttribute("result", "die");
             unit.dispose();
         } else if (action.equals("speak")) {
