@@ -445,12 +445,16 @@ public class TerrainGenerator {
      * @param map The map to use.
      */
     private void createMountains(Map map) {
+        float randomHillsRatio = 0.5f;
+        // 50% of user settings will be allocated for random hills here and there
+        // the rest will be allocated for large mountain ranges
         int maximumLength = Math.max(getMapGeneratorOptions().getWidth(), getMapGeneratorOptions().getHeight()) / 10;
-        int number = getMapGeneratorOptions().getNumberOfMountainTiles();
-        int counter = 0;
+        int number = (int)(getMapGeneratorOptions().getNumberOfMountainTiles()*(1-randomHillsRatio));
         logger.info("Number of land tiles is " + getMapGeneratorOptions().getLand() +
                     ", number of mountain tiles is " + number);
         logger.fine("Maximum length of mountain ranges is " + maximumLength);
+        
+        // lookup the resources from specification
         TileType hills = null, mountains = null;
         for (TileType t : FreeCol.getSpecification().getTileTypeList()) {
             if (t.getId().equals("model.tile.hills") && hills == null) {
@@ -466,6 +470,9 @@ public class TerrainGenerator {
         if (hills == null || mountains == null) {
             throw new RuntimeException("Both Hills and Mountains TileTypes must be defined");
         }
+        
+        // generate the mountain ranges
+        int counter = 0;
         for (int tries = 0; tries < 100; tries++) {
             if (counter < number) {
                 Position p = map.getRandomLandPosition();
@@ -496,11 +503,59 @@ public class TerrainGenerator {
                             }
                         }
                     }
-                    // break;
                 }
             }
         }
-        logger.info("Added " + counter + " mountain tiles.");
+        logger.info("Added " + counter + " mountain range tiles.");
+        
+        // and sprinkle a few random hills here and there
+        number = (int)(getMapGeneratorOptions().getNumberOfMountainTiles()*randomHillsRatio);
+        counter = 0;
+        for (int tries = 0; tries < 1000; tries++) {
+            if (counter < number) {
+                Position p = map.getRandomLandPosition();
+                if (p == null)
+                    continue;
+                Tile t = map.getTile(p);
+                if (t==null || !t.isLand())
+                    continue;
+                if (t.getType() == hills || t.getType() == mountains) {
+                    // already a high ground
+                    continue;
+                }
+                boolean isMountainRangeCloseBy = false;
+                Iterator<Position> it = map.getCircleIterator(p, false, 3);
+                while (it.hasNext()) {
+                    Tile neighborTile = map.getTile(it.next());
+                    if (neighborTile.isLand() && neighborTile.getType() == mountains) {
+                        isMountainRangeCloseBy = true;
+                        break;
+                    }
+                }
+                if (isMountainRangeCloseBy) {
+                    // do not add hills too close to a mountain range
+                    // this would defeat the purpose of adding random hills
+                    continue;
+                }
+                boolean isWaterCloseBy = false;
+                it = map.getCircleIterator(p, false, 1);
+                while (it.hasNext()) {
+                    Tile neighborTile = map.getTile(it.next());
+                    if (!neighborTile.isLand()) {
+                        isWaterCloseBy = true;
+                        break;
+                    }
+                }
+                if (isWaterCloseBy) {
+                    // do not add hills too close to the ocean/lake
+                    // this helps with good locations for building colonies on shore
+                    continue;
+                }
+                t.setType(hills);
+                counter++;
+            }
+        }
+        logger.info("Added " + counter + " random hills tiles.");
     }
     
     /**
