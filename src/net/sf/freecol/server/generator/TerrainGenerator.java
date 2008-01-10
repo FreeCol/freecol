@@ -218,6 +218,12 @@ public class TerrainGenerator {
         // Fill the list of latitude TileTypes the first time you use it
         if (latTileTypes.get(latitudeIndex).size() == 0) {
             for (TileType tileType : FreeCol.getSpecification().getTileTypeList()) {
+                if (tileType.getId().equals("model.tile.hills") ||
+                    tileType.getId().equals("model.tile.mountains")) {
+                    // do not generate hills or mountains at this time
+                    // they will be created explicitly later
+                    continue;
+                }
                 if (!tileType.isWater() && tileType.withinRange(TileType.LATITUDE, latitudeIndex)) {
                     // Within range, add it
                     latTileTypes.get(latitudeIndex).add(tileType);
