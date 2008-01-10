@@ -1352,8 +1352,8 @@ public class Map extends FreeColGameObject {
     public Position getRandomLandPosition() {
         final Random random = new Random();
         
-        int x = (getWidth() > 20) ? random.nextInt(getWidth() - 20) + 10 : random.nextInt(getWidth());
-        int y = (getHeight() > 20) ? random.nextInt(getHeight() - 20) + 10 : random.nextInt(getHeight());
+        int x = (getWidth() > 10) ? random.nextInt(getWidth() - 10) + 5 : random.nextInt(getWidth());
+        int y = (getHeight() > 10) ? random.nextInt(getHeight() - 10) + 5 : random.nextInt(getHeight());
         Position centerPosition = new Position(x, y);
         Iterator<Position> it = getFloodFillIterator(centerPosition);
         while (it.hasNext()) {
