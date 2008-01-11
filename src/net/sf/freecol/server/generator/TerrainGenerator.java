@@ -476,31 +476,64 @@ public class TerrainGenerator {
         for (int tries = 0; tries < 100; tries++) {
             if (counter < number) {
                 Position p = map.getRandomLandPosition();
-                if (p != null && map.getTile(p).isLand()) {
-                    Direction direction = directions[random.nextInt(8)];
-                    int length = maximumLength - random.nextInt(maximumLength/2);
-                    logger.info("Direction of mountain range is " + direction +
-                            ", length of mountain range is " + length);
-                    for (int index = 0; index < length; index++) {
-                        p = Map.getAdjacent(p, direction);
-                        Tile t = map.getTile(p);
-                        if (t != null && t.isLand()) {
-                            t.setType(mountains);
+                if (p == null)
+                    continue;
+                Tile startTile = map.getTile(p);
+                if (startTile==null || !startTile.isLand())
+                    continue;
+                if (startTile.getType() == hills || startTile.getType() == mountains) {
+                    // already a high ground
+                    continue;
+                }
+                boolean isMountainRangeCloseBy = false;
+                Iterator<Position> it = map.getCircleIterator(p, false, 3);
+                while (it.hasNext()) {
+                    Tile neighborTile = map.getTile(it.next());
+                    if (neighborTile.isLand() && neighborTile.getType() == mountains) {
+                        isMountainRangeCloseBy = true;
+                        break;
+                    }
+                }
+                if (isMountainRangeCloseBy) {
+                    // do not add a mountain range too close to another
+                    continue;
+                }
+                boolean isWaterCloseBy = false;
+                it = map.getCircleIterator(p, false, 2);
+                while (it.hasNext()) {
+                    Tile neighborTile = map.getTile(it.next());
+                    if (!neighborTile.isLand()) {
+                        isWaterCloseBy = true;
+                        break;
+                    }
+                }
+                if (isWaterCloseBy) {
+                    // do not add a mountain range too close to the ocean/lake
+                    // this helps with good locations for building colonies on shore
+                    continue;
+                }
+                Direction direction = directions[random.nextInt(8)];
+                int length = maximumLength - random.nextInt(maximumLength/2);
+                logger.info("Direction of mountain range is " + direction +
+                        ", length of mountain range is " + length);
+                for (int index = 0; index < length; index++) {
+                    p = Map.getAdjacent(p, direction);
+                    Tile nextTile = map.getTile(p);
+                    if (nextTile == null || !nextTile.isLand()) 
+                        continue;
+                    nextTile.setType(mountains);
+                    counter++;
+                    it = map.getCircleIterator(p, false, 1);
+                    while (it.hasNext()) {
+                        Tile neighborTile = map.getTile(it.next());
+                        if (neighborTile==null || !neighborTile.isLand() || neighborTile.getType()==mountains)
+                            continue;
+                        int r = random.nextInt(8);
+                        if (r == 0) {
+                            neighborTile.setType(mountains);
                             counter++;
-                            Iterator<Position> it = map.getCircleIterator(p, false, 1);
-                            while (it.hasNext()) {
-                                t = map.getTile(it.next());
-                                if (t.isLand() &&
-                                        t.getType() != mountains) {
-                                    int r = random.nextInt(8);
-                                    if (r == 0) {
-                                        t.setType(mountains);
-                                        counter++;
-                                    } else if (r > 2) {
-                                        t.setType(hills);
-                                    }
-                                }
-                            }
+                        } else if (r > 2) {
+                            neighborTile.setType(hills);
                         }
                     }
                 }
