@@ -2573,7 +2573,7 @@ public final class InGameController implements NetworkConstants {
 
             if (skillName == null) {
                 canvas.errorMessage("indianSettlement.noMoreSkill");
-            } else if (!unit.getType().canBeUpgraded(skill, UnitType.NATIVES)) {
+            } else if (!unit.getType().canBeUpgraded(skill, UnitType.UpgradeType.NATIVES)) {
                 canvas.showInformationMessage("indianSettlement.cantLearnSkill",
                         new String[][] { {"%unit%", unit.getName()}, {"%skill%", skillName} });
             } else {

@@ -20,6 +20,7 @@
 package net.sf.freecol.common.model;
 
 import net.sf.freecol.common.model.Unit.UnitState;
+import net.sf.freecol.common.model.UnitType.DowngradeType;
 import net.sf.freecol.util.test.FreeColTestCase;
 
 public class DemotionTest extends FreeColTestCase {
@@ -201,7 +202,7 @@ public class DemotionTest extends FreeColTestCase {
     public void testVeteranSoldierDemotedBySoldier() {
 
         Game game = getStandardGame();
-        assertEquals(colonistType, veteranType.getDowngrade(UnitType.CAPTURE));
+        assertEquals(colonistType, veteranType.getDowngrade(DowngradeType.CAPTURE));
         Player dutch = game.getPlayer("model.nation.dutch");
         Player french = game.getPlayer("model.nation.french");
         Map map = getTestMap(plains);
@@ -233,7 +234,7 @@ public class DemotionTest extends FreeColTestCase {
     public void testArtilleryDemotedBySoldier() {
 
         Game game = getStandardGame();
-        assertEquals(damagedArtilleryType, artilleryType.getDowngrade(UnitType.DEMOTION));
+        assertEquals(damagedArtilleryType, artilleryType.getDowngrade(DowngradeType.DEMOTION));
         Player dutch = game.getPlayer("model.nation.dutch");
         Player french = game.getPlayer("model.nation.french");
         Map map = getTestMap(plains);

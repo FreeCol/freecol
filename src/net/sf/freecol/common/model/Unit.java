@@ -38,6 +38,8 @@ import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.Map.Position;
 import net.sf.freecol.common.model.Player.Stance;
+import net.sf.freecol.common.model.UnitType.DowngradeType;
+import net.sf.freecol.common.model.UnitType.UpgradeType;
 import net.sf.freecol.common.model.TradeRoute.Stop;
 import net.sf.freecol.common.util.EmptyIterator;
 import net.sf.freecol.common.util.Utils;
@@ -702,7 +704,7 @@ public class Unit extends FreeColGameObject implements Features, Locatable, Loca
      *
      */
     public static UnitType getUnitTypeTeaching(UnitType typeTeacher, UnitType typeStudent) {
-        if (typeStudent.canBeUpgraded(typeTeacher, UnitType.EDUCATION)) {
+        if (typeStudent.canBeUpgraded(typeTeacher, UpgradeType.EDUCATION)) {
             return typeTeacher;
         } else {
             return typeStudent.getEducationUnit(0);
@@ -3655,7 +3657,7 @@ public class Unit extends FreeColGameObject implements Features, Locatable, Loca
                 if (enemyUnit.isUndead()) {
                     setType(enemyUnit.getType());
                 } else {
-                    UnitType downgrade = getType().getDowngrade(UnitType.CAPTURE);
+                    UnitType downgrade = getType().getDowngrade(DowngradeType.CAPTURE);
                     if (downgrade != null) {
                         setType(downgrade);
                     }
@@ -3700,7 +3702,7 @@ public class Unit extends FreeColGameObject implements Features, Locatable, Loca
                 }
             } else {
                 // be downgraded as a result of combat
-                UnitType downgrade = getType().getDowngrade(UnitType.DEMOTION);
+                UnitType downgrade = getType().getDowngrade(DowngradeType.DEMOTION);
                 if (downgrade != null) {
                     setType(downgrade);
                     messageType = ModelMessage.UNIT_DEMOTED;
@@ -3966,7 +3968,7 @@ public class Unit extends FreeColGameObject implements Features, Locatable, Loca
                 if (isUndead()) {
                     u.setType(getType());
                 } else {
-                    UnitType downgrade = u.getType().getDowngrade(UnitType.CAPTURE);
+                    UnitType downgrade = u.getType().getDowngrade(DowngradeType.CAPTURE);
                     if (downgrade != null) {
                         u.setType(downgrade);
                     }
@@ -4026,7 +4028,7 @@ public class Unit extends FreeColGameObject implements Features, Locatable, Loca
      * to the UnitType specified for clearing
      */
     public void clearSpeciality() {
-        UnitType newType = unitType.getDowngrade(UnitType.CLEAR_SKILL);
+        UnitType newType = unitType.getDowngrade(DowngradeType.CLEAR_SKILL);
         if (newType != null) {
             setType(newType);
         }
@@ -4096,7 +4098,7 @@ public class Unit extends FreeColGameObject implements Features, Locatable, Loca
         }
         
         UnitType learnType = FreeCol.getSpecification().getExpertForProducing(goodsType);
-        if (learnType != null && unitType.canBeUpgraded(learnType, UnitType.EXPERIENCE)) {
+        if (learnType != null && unitType.canBeUpgraded(learnType, UpgradeType.EXPERIENCE)) {
             logger.finest("About to call getRandom for experience");
             int random = getGame().getModelController().getRandom(getId() + "experience", 5000);
             if (random < Math.min(experience, 200)) {

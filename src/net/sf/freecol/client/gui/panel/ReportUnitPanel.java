@@ -345,7 +345,7 @@ public final class ReportUnitPanel extends JPanel implements ActionListener {
         switch (reportType) {
         case CARGO:
             for (UnitType unitType : FreeCol.getSpecification().getUnitTypeList()) {
-                if (!unitType.hasAbility("model.ability.undead") && 
+                if (unitType.isAvailableTo(player.getPlayerType()) && 
                     (unitType.hasAbility("model.ability.carryUnits") ||
                      unitType.hasAbility("model.ability.carryGoods"))) {
                     unitPanel.add(createUnitTypeLabel(unitType, Role.DEFAULT, getCount(others, unitType)));
@@ -354,7 +354,7 @@ public final class ReportUnitPanel extends JPanel implements ActionListener {
             break;
         case NAVAL:
             for (UnitType unitType : FreeCol.getSpecification().getUnitTypeList()) {
-                if (!unitType.hasAbility("model.ability.undead") &&
+                if (unitType.isAvailableTo(player.getPlayerType()) &&
                     unitType.hasAbility("model.ability.navalUnit")) {
                     unitPanel.add(createUnitTypeLabel(unitType, Role.DEFAULT, getCount(others, unitType)));
                 }
@@ -365,7 +365,7 @@ public final class ReportUnitPanel extends JPanel implements ActionListener {
             int dragoonCount = 0;
             List<UnitType> unitTypes = new ArrayList<UnitType>();
             for (UnitType unitType : FreeCol.getSpecification().getUnitTypeList()) {
-                if (!unitType.hasAbility("model.ability.undead") &&
+                if (unitType.isAvailableTo(player.getPlayerType()) &&
                     !unitType.hasAbility("model.ability.navalUnit") && 
                     (unitType.hasAbility("model.ability.expertSoldier") ||
                      unitType.getOffence() > 0)) {

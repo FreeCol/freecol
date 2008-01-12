@@ -268,7 +268,7 @@ public final class DragListener extends MouseAdapter {
                         separatorNeeded = false;
                     }
 
-                    if (tempUnit.getType().getDowngrade(UnitType.CLEAR_SKILL) != null) {
+                    if (tempUnit.getType().getDowngrade(UnitType.DowngradeType.CLEAR_SKILL) != null) {
                         menuItem = new JMenuItem(Messages.message("clearSpeciality"));
                         menuItem.setActionCommand(String.valueOf(UnitLabel.CLEAR_SPECIALITY));
                         menuItem.addActionListener(unitLabel);

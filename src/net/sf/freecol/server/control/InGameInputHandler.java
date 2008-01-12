@@ -1200,7 +1200,8 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         Element reply = Message.createNewRootElement("provideSkill");
         if (settlement.getLearnableSkill() != null) {
             reply.setAttribute("skill", Integer.toString(settlement.getLearnableSkill().getIndex()));
-            if (unit.getType().canBeUpgraded(settlement.getLearnableSkill(), UnitType.NATIVES)) {
+            if (unit.getType().canBeUpgraded(settlement.getLearnableSkill(), 
+                                             UnitType.UpgradeType.NATIVES)) {
                 // We now put the unit on the indian settlement.
                 // Normally we shouldn't have to this, but the
                 // movesLeft are set to 0 for unit and if the player
@@ -1542,7 +1543,8 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         // The unit was relocated to the indian settlement. See askSkill for
         // more info.
         IndianSettlement settlement = (IndianSettlement) unit.getLocation();
-        if (!unit.getType().canBeUpgraded(settlement.getLearnableSkill(), UnitType.NATIVES)) {
+        if (!unit.getType().canBeUpgraded(settlement.getLearnableSkill(),
+                                          UnitType.UpgradeType.NATIVES)) {
             throw new IllegalStateException("Unit can't learn that skill from settlement!");
         }
         
