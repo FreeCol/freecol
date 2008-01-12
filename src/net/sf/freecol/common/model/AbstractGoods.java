@@ -33,7 +33,6 @@ import net.sf.freecol.FreeCol;
  */
 public class AbstractGoods extends FreeColObject {
 
-
     /**
      * Describe type here.
      */
@@ -48,7 +47,9 @@ public class AbstractGoods extends FreeColObject {
      * Creates a new <code>AbstractGoods</code> instance.
      *
      */
-    public AbstractGoods() {}
+    public AbstractGoods() {
+        // empty constructor
+    }
 
     /**
      * Creates a new <code>AbstractGoods</code> instance.
@@ -57,19 +58,9 @@ public class AbstractGoods extends FreeColObject {
      * @param amount an <code>int</code> value
      */
     public AbstractGoods(GoodsType type, int amount) {
+        setId(type.getId());
         this.type = type;
         this.amount = amount;
-    }
-
-
-    /**
-     * Describe <code>getID</code> method here.
-     *
-     * @return a <code>String</code> value
-     */
-    @Override
-    public String getId() {
-        return type.getId();
     }
 
     /**

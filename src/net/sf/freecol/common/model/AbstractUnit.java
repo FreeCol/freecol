@@ -175,7 +175,7 @@ public class AbstractUnit extends FreeColObject {
         for (int count = 0; count < tools; count++) {
             equipment.add(toolsType);
         }
-        return equipment.toArray(new EquipmentType[0]);
+        return equipment.toArray(new EquipmentType[equipment.size()]);
     }
 
 
@@ -186,7 +186,7 @@ public class AbstractUnit extends FreeColObject {
      * @throws XMLStreamException if a problem was encountered
      *      during parsing.
      */
-    public void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
+    public final void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
         unitTypeID = in.getAttributeValue(null, "id");
         armed = getAttribute(in, "armed", false);
         mounted = getAttribute(in, "mounted", false);

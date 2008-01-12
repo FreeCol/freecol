@@ -46,7 +46,7 @@ public class BuildableType extends FreeColGameObjectType implements Features {
     /**
      * Contains the abilities and modifiers of this type.
      */
-    private FeatureContainer featureContainer = new FeatureContainer();
+    private final FeatureContainer featureContainer = new FeatureContainer();
 
     /**
      * A list of AbstractGoods required to build this type.
@@ -56,9 +56,11 @@ public class BuildableType extends FreeColGameObjectType implements Features {
     /**
      * Stores the abilities required by this Type.
      */
-    private HashMap<String, Boolean> requiredAbilities = new HashMap<String, Boolean>();
+    private final HashMap<String, Boolean> requiredAbilities = new HashMap<String, Boolean>();
     
-    public BuildableType() {}
+    public BuildableType() {
+        // empty constructor, class is abstract except for BuildableType.NOTHING
+    }
 
     private BuildableType(String id) {
         setId(id);
@@ -126,6 +128,7 @@ public class BuildableType extends FreeColGameObjectType implements Features {
     }
 
     protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
+        // the class is basically abstract, except for BuildableType.NOTHING
     }
 
     /**

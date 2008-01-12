@@ -222,7 +222,7 @@ public final class Ability extends Feature {
                     result.add(ability);
                 }
             }
-            return combine(result.toArray(new Ability[0]));
+            return combine(result.toArray(new Ability[result.size()]));
         }
     }
 

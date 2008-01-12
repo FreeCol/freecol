@@ -22,8 +22,6 @@ package net.sf.freecol.common.model;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
 
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
@@ -47,7 +45,7 @@ public final class Building extends FreeColGameObject implements Features, WorkL
      * List of the units which have this <code>Building</code> as it's
      * {@link Unit#getLocation() location}.
      */
-    private ArrayList<Unit> units = new ArrayList<Unit>();
+    private final List<Unit> units = new ArrayList<Unit>();
 
     private BuildingType buildingType;
     
@@ -120,7 +118,7 @@ public final class Building extends FreeColGameObject implements Features, WorkL
      *            {@link Ownable}.
      * @exception UnsupportedOperationException is always thrown by this method.
      */
-    public void setOwner(Player p) {
+    public void setOwner(final Player p) {
         throw new UnsupportedOperationException();
     }
 
@@ -169,8 +167,8 @@ public final class Building extends FreeColGameObject implements Features, WorkL
      *         improvement does not exist.
      */
     public String getNextName() {
-        BuildingType next = buildingType.getUpgradesTo();
-        return next != null ? next.getName() : null;
+        final BuildingType next = buildingType.getUpgradesTo();
+        return next == null ? null : next.getName();
     }
 
     /**
@@ -229,15 +227,13 @@ public final class Building extends FreeColGameObject implements Features, WorkL
      * attribute in BuildingType)
      */
     public void upgrade() {
-    	
-    	if (!canBuildNext())
-    		throw new IllegalStateException("Cannot upgrade this building.");
-    	
+    	if (!canBuildNext()) {
+            throw new IllegalStateException("Cannot upgrade this building.");
+    	}
         setType(buildingType.getUpgradesTo());
-        
     }
     
-    private void setType(BuildingType newBuildingType) {
+    private void setType(final BuildingType newBuildingType) {
         // remove features from current type
         for (Feature feature : buildingType.getFeatures()) {
             colony.removeFeature(feature);
@@ -293,7 +289,7 @@ public final class Building extends FreeColGameObject implements Features, WorkL
      * @return <i>true</i> if the <i>Unit</i> may be added and <i>false</i>
      *         otherwise.
      */
-    public boolean canAdd(Locatable locatable) {
+    public boolean canAdd(final Locatable locatable) {
         if (locatable.getLocation() == this) {
             return true;
         }
@@ -316,7 +312,7 @@ public final class Building extends FreeColGameObject implements Features, WorkL
      * @return <i>true</i> if the <i>UnitType</i> may be added and <i>false</i>
      *         otherwise.
      */
-    public boolean canAdd(UnitType unitType) {
+    public boolean canAdd(final UnitType unitType) {
         return buildingType.canAdd(unitType);
     }
 
@@ -328,12 +324,12 @@ public final class Building extends FreeColGameObject implements Features, WorkL
      * @param locatable The <code>Locatable</code> that shall be added to this
      *            <code>WorkLocation</code>.
      */
-    public void add(Locatable locatable) {
+    public void add(final Locatable locatable) {
         if (!canAdd(locatable)) {
             throw new IllegalStateException();
         }
 
-        Unit unit = (Unit) locatable;
+        final Unit unit = (Unit) locatable;
 
         unit.removeAllEquipment(false);
 
@@ -362,7 +358,7 @@ public final class Building extends FreeColGameObject implements Features, WorkL
      * @param id a <code>String</code> value
      * @return a <code>boolean</code> value
      */
-    public boolean hasAbility(String id) {
+    public boolean hasAbility(final String id) {
         return getType().hasAbility(id);
     }
 
@@ -372,7 +368,7 @@ public final class Building extends FreeColGameObject implements Features, WorkL
      * @param id a <code>String</code> value
      * @return a <code>Modifier</code> value
      */
-    public Modifier getModifier(String id) {
+    public Modifier getModifier(final String id) {
         return getType().getModifier(id);
     }
 
@@ -383,7 +379,7 @@ public final class Building extends FreeColGameObject implements Features, WorkL
      *
      * @param feature a <code>Feature</code> value
      */
-    public void addFeature(Feature feature) {
+    public void addFeature(final Feature feature) {
         getType().addFeature(feature);
     }
 
@@ -404,12 +400,12 @@ public final class Building extends FreeColGameObject implements Features, WorkL
      * @param locatable The <code>Locatable</code> that shall be removed from
      *            this <code>WorkLocation</code>.
      */
-    public void remove(Locatable locatable) {
+    public void remove(final Locatable locatable) {
         if (!(locatable instanceof Unit)) {
             throw new IllegalStateException();
         }
 
-        int index = units.indexOf(locatable);
+        final int index = units.indexOf(locatable);
 
         if (index != -1) {
             ((Unit) locatable).setMovesLeft(0);
@@ -431,7 +427,7 @@ public final class Building extends FreeColGameObject implements Features, WorkL
      *            <li><code>false</code> otherwise.</li>
      *            </ul>
      */
-    public boolean contains(Locatable locatable) {
+    public boolean contains(final Locatable locatable) {
         if (locatable instanceof Unit) {
             return units.contains(locatable);
         }
@@ -445,7 +441,7 @@ public final class Building extends FreeColGameObject implements Features, WorkL
      * @return The <code>Unit</code>.
      */
     public Unit getFirstUnit() {
-        if (units.size() > 0) {
+        if (!units.isEmpty()) {
             return units.get(0);
         }
 
@@ -458,7 +454,7 @@ public final class Building extends FreeColGameObject implements Features, WorkL
      * @return The <code>Unit</code>.
      */
     public Unit getLastUnit() {
-        if (units.size() > 0) {
+        if (!units.isEmpty()) {
             return units.get(units.size() - 1);
         }
 
@@ -475,9 +471,8 @@ public final class Building extends FreeColGameObject implements Features, WorkL
         return units.iterator();
     }
 
-    @SuppressWarnings("unchecked")
     public List<Unit> getUnitList() {
-        return (List<Unit>) units.clone();
+        return new ArrayList<Unit>(units);
     }
 
     /**
@@ -521,10 +516,10 @@ public final class Building extends FreeColGameObject implements Features, WorkL
     }
 
     private void produceGoods() {
-        int goodsInput = getGoodsInput();
-        int goodsOutput = getProduction();
-        GoodsType goodsInputType = getGoodsInputType();
-        GoodsType goodsOutputType = getGoodsOutputType();
+        final int goodsInput = getGoodsInput();
+        final int goodsOutput = getProduction();
+        final GoodsType goodsInputType = getGoodsInputType();
+        final GoodsType goodsOutputType = getGoodsOutputType();
 
         if (goodsInput == 0 && getMaximumGoodsInput() > 0) {
             addModelMessage(getColony(), "model.building.notEnoughInput", new String[][] {
@@ -533,8 +528,9 @@ public final class Building extends FreeColGameObject implements Features, WorkL
                 goodsInputType);
         }
 
-        if (goodsOutput <= 0)
+        if (goodsOutput <= 0) {
             return;
+        }
 
         // Actually produce the goods:
         if (goodsInputType != null) {
@@ -548,24 +544,23 @@ public final class Building extends FreeColGameObject implements Features, WorkL
         }
 
         if (getUnitCount() > 0) {
-            int experience = goodsOutput / getUnitCount();
+            final int experience = goodsOutput / getUnitCount();
             for (Unit unit : getUnitList()) {
                 unit.modifyExperience(experience);
             }
         }
     }
 
-    private Unit findStudent(Unit teacher) {
+    private Unit findStudent(final Unit teacher) {
         Unit student = null;
         int skill = Integer.MIN_VALUE;
         for (Unit potentialStudent : getColony().getUnitList()) {
             if (potentialStudent.canBeStudent(teacher) &&
-                potentialStudent.getTeacher() == null) {
+                potentialStudent.getTeacher() == null &&
+                potentialStudent.getSkillLevel() > skill) {
                 // prefer students with higher skill levels
-                if (potentialStudent.getSkillLevel() > skill) {
-                    student = potentialStudent;
-                    skill = student.getSkillLevel();
-                }
+                student = potentialStudent;
+                skill = student.getSkillLevel();
             }
         }
         return student;
@@ -573,12 +568,11 @@ public final class Building extends FreeColGameObject implements Features, WorkL
 
 
     private void trainStudents() {
-        Iterator<Unit> teachers = getUnitIterator();
+        final Iterator<Unit> teachers = getUnitIterator();
         while (teachers.hasNext()) {
-            Unit teacher = teachers.next();
+            final Unit teacher = teachers.next();
             if (teacher.getStudent() == null) {
-                Unit student = findStudent(teacher);
-                System.out.println("returned " + (student == null ? "null" : student.getName()));
+                final Unit student = findStudent(teacher);
                 if (student == null) {
                     addModelMessage(getColony(), "model.building.noStudent",
                                     new String[][] {
@@ -591,7 +585,7 @@ public final class Building extends FreeColGameObject implements Features, WorkL
                     student.setTeacher(teacher);
                 }                
             }
-            int training = teacher.getTurnsOfTraining() + 1;
+            final int training = teacher.getTurnsOfTraining() + 1;
             if (training < teacher.getNeededTurnsOfTraining()) {
                 teacher.setTurnsOfTraining(training);
             } else {
@@ -629,7 +623,7 @@ public final class Building extends FreeColGameObject implements Features, WorkL
      * Returns the amount of goods needed to have a full production if
      * <code>Unit</code> was added.
      */
-    public int getMaximumGoodsInputAdding(Unit unit) {
+    public int getMaximumGoodsInputAdding(final Unit unit) {
         if (getGoodsInputType() == null) {
             return 0;
         }
@@ -649,7 +643,7 @@ public final class Building extends FreeColGameObject implements Features, WorkL
      * @see #getProduction
      */
     public int getMaximumGoodsInput() {
-        if (hasAbility("model.ability.autoProduction")) {
+        if (canAutoProduce()) {
             return getGoodsInputAuto();
         } else {
             return getMaximumGoodsInputAdding(null);
@@ -666,7 +660,7 @@ public final class Building extends FreeColGameObject implements Features, WorkL
      * @see #getProduction
      */
     public int getGoodsInput() {
-        if (hasAbility("model.ability.autoProduction")) {
+        if (canAutoProduce()) {
             return getGoodsInputAuto();
         } else {
             return calculateGoodsInput(getMaximumGoodsInput(), 0);
@@ -677,7 +671,7 @@ public final class Building extends FreeColGameObject implements Features, WorkL
         if (getGoodsInputType() == null) {
             return 0;
         }
-        GoodsType inputType = getGoodsInputType();
+        final GoodsType inputType = getGoodsInputType();
         int surplus = colony.getProductionOf(inputType);
         if (inputType.isFoodType()) {
             surplus -= colony.getFoodConsumption();
@@ -695,7 +689,7 @@ public final class Building extends FreeColGameObject implements Features, WorkL
      * @see #getProduction
      */
     public int getGoodsInputNextTurn() {
-        if (hasAbility("model.ability.autoProduction")) {
+        if (canAutoProduce()) {
             return getGoodsInputAutoNextTurn();
         } else {
             return calculateGoodsInput(getMaximumGoodsInput(),
@@ -703,9 +697,9 @@ public final class Building extends FreeColGameObject implements Features, WorkL
         }
     }
 
-    private int calculateGoodsInput(int goodsInput, int addToWarehouse) {
+    private int calculateGoodsInput(int goodsInput, final int addToWarehouse) {
         if (getGoodsInputType() != null) {
-            int available = colony.getGoodsCount(getGoodsInputType()) + addToWarehouse;
+            final int available = colony.getGoodsCount(getGoodsInputType()) + addToWarehouse;
             if (available < goodsInput) {
                 // Not enough goods to do this?
                 goodsInput = available;
@@ -718,7 +712,7 @@ public final class Building extends FreeColGameObject implements Features, WorkL
         if (getGoodsInputType() == null) {
             return 0;
         }
-        GoodsType inputType = getGoodsInputType();
+        final GoodsType inputType = getGoodsInputType();
         int surplus = colony.getProductionNextTurn(inputType);
         if (inputType.isFoodType()) {
             surplus -= colony.getFoodConsumption();
@@ -735,14 +729,14 @@ public final class Building extends FreeColGameObject implements Features, WorkL
      * @param goodsInput Number of input goods,
      *        including those contributed by the new_unit, if applicable.
      */
-    public int calculateOutputAdding(int goodsInput, Unit new_unit) {
+    public int calculateOutputAdding(final int goodsInput, final Unit new_unit) {
         int goodsOutput = getProductionFromProductivity(goodsInput);
         if (hasAbility("model.ability.expertsUseConnections") &&
                 getGameOptions().getBoolean(GameOptions.EXPERTS_HAVE_CONNECTIONS)) {
             int minimumProduction = 0;
             Iterator<Unit> i = getUnitIterator();
             while (i.hasNext()) {
-                Unit unit = (Unit)i.next();
+                final Unit unit = (Unit)i.next();
                 if (unit.getType() == getExpertUnitType()) {
                     minimumProduction += 4;
                 }
@@ -765,7 +759,7 @@ public final class Building extends FreeColGameObject implements Features, WorkL
      * @see #getProduction
      * @see #getProductionNextTurn
      */
-    public int calculateOutput(int goodsInput) {
+    public int calculateOutput(final int goodsInput) {
         return calculateOutputAdding(goodsInput, null);
     }
 
@@ -803,13 +797,17 @@ public final class Building extends FreeColGameObject implements Features, WorkL
      * @see #getMaximumProduction
      */
     public int getProduction() {
-        if (hasAbility("model.ability.autoProduction")) {
+        if (canAutoProduce()) {
             return getAutoProduction();
         } else {
             return getProductionAdding(null);
         }
     }
     
+    private boolean canAutoProduce() {
+        return hasAbility("model.ability.autoProduction");
+    }
+
     /**
      * Returns the actual production of a buliding with 0 workplaces
      */
@@ -837,7 +835,7 @@ public final class Building extends FreeColGameObject implements Features, WorkL
      * @see #getProduction
      */
     public int getProductionNextTurn() {
-        if (hasAbility("model.ability.autoProduction")) {
+        if (canAutoProduce()) {
             return getAutoProductionNextTurn();
         } else {
             return getProductionNextTurnAdding(null);
@@ -851,7 +849,7 @@ public final class Building extends FreeColGameObject implements Features, WorkL
      * @return The production of this building the next turn.
      * @see #getProduction
      */
-    public int getProductionNextTurnAdding(Unit unit) {
+    public int getProductionNextTurnAdding(final Unit unit) {
         if (getGoodsOutputType() == null) {
             return 0;
         }
@@ -985,7 +983,7 @@ public final class Building extends FreeColGameObject implements Features, WorkL
      *         workers, when there is enough "input goods".
      */
     public int getMaximumProduction() {
-        if (hasAbility("model.ability.autoProduction")) {
+        if (canAutoProduce()) {
             return getMaximumAutoProduction();
         } else {
             return getMaximumProductionAdding(null);
@@ -1131,14 +1129,14 @@ public final class Building extends FreeColGameObject implements Features, WorkL
 
         while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
             Unit unit = (Unit) getGame().getFreeColGameObject(in.getAttributeValue(null, "ID"));
-            if (unit != null) {
+            if (unit == null) {
+                unit = new Unit(getGame(), in);
+                units.add(unit);
+            } else {
                 unit.readFromXML(in);
                 if (!units.contains(unit)) {
                     units.add(unit);
                 }
-            } else {
-                unit = new Unit(getGame(), in);
-                units.add(unit);
             }
         }
     }

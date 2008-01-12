@@ -52,13 +52,13 @@ public final class Colony extends Settlement implements Features, Location, Name
     private String name;
 
     /** A list of ColonyTiles. */
-    private ArrayList<ColonyTile> colonyTiles = new ArrayList<ColonyTile>();
+    private final List<ColonyTile> colonyTiles = new ArrayList<ColonyTile>();
 
     /** A map of Buildings, indexed by the ID of their basic type. */
-    private HashMap<String, Building> buildingMap = new HashMap<String, Building>();
+    private final java.util.Map<String, Building> buildingMap = new HashMap<String, Building>();
 
     /** A map of ExportData, indexed by the IDs of GoodsTypes. */
-    private HashMap<String, ExportData> exportData = new HashMap<String, ExportData>();
+    private final java.util.Map<String, ExportData> exportData = new HashMap<String, ExportData>();
 
     /** The SoL membership this turn. */
     private int sonsOfLiberty;
@@ -89,7 +89,7 @@ public final class Colony extends Settlement implements Features, Location, Name
     /**
      * Contains the abilities and modifiers of this Colony.
      */
-    private FeatureContainer featureContainer = new FeatureContainer();
+    private final FeatureContainer featureContainer = new FeatureContainer();
 
    /**
      * A list of Buildable items, which is NEVER empty.
@@ -111,12 +111,13 @@ public final class Colony extends Settlement implements Features, Location, Name
         this.name = name;
         sonsOfLiberty = 0;
         oldSonsOfLiberty = 0;
-        Map map = game.getMap();
+        final Map map = game.getMap();
         tile.setOwner(owner);
         for (Direction direction : Direction.values()) {
             Tile t = map.getNeighbourOrNull(direction, tile);
-            if (t == null)
+            if (t == null) {
                 continue;
+            }
             if (t.getOwner() == null) {
                 t.setOwner(owner);
             }
@@ -177,7 +178,7 @@ public final class Colony extends Settlement implements Features, Location, Name
      *
      * @param building a <code>Building</code> value
      */
-    public void addBuilding(Building building) {
+    public void addBuilding(final Building building) {
         BuildingType buildingType = building.getType().getFirstLevel();
         buildingMap.put(buildingType.getId(), building);
         for (Feature feature : building.getType().getFeatures()) {
@@ -212,7 +213,7 @@ public final class Colony extends Settlement implements Features, Location, Name
      * @param goodsType a <code>GoodsType</code> value
      * @return an <code>ExportData</code> value
      */
-    public final ExportData getExportData(GoodsType goodsType) {
+    public ExportData getExportData(final GoodsType goodsType) {
         ExportData result = exportData.get(goodsType.getId());
         if (result == null) {
             result = new ExportData(goodsType);
@@ -226,7 +227,7 @@ public final class Colony extends Settlement implements Features, Location, Name
      *
      * @param newExportData an <code>ExportData</code> value
      */
-    public final void setExportData(ExportData newExportData) {
+    public final void setExportData(final ExportData newExportData) {
         exportData.put(newExportData.getId(), newExportData);
     }
 
@@ -431,10 +432,10 @@ public final class Colony extends Settlement implements Features, Location, Name
         if (locatable instanceof Unit) {
             if (((Unit) locatable).isColonist()) {
                 WorkLocation w = getVacantWorkLocationFor((Unit) locatable);
-                if (w != null) {
-                    locatable.setLocation(w);
-                } else {
+                if (w == null) {
                     logger.warning("Could not find a 'WorkLocation' for " + locatable + " in " + this);
+                } else {
+                    locatable.setLocation(w);
                 }
             } else {
                 locatable.setLocation(getTile());
@@ -504,10 +505,10 @@ public final class Colony extends Settlement implements Features, Location, Name
      * @return The amount of this type of Goods at this Location.
      */
     public int getGoodsCount(GoodsType type) {
-        if (type.getStoredAs() != null) {
-            return goodsContainer.getGoodsCount(type.getStoredAs());
-        } else {
+        if (type.getStoredAs() == null) {
             return goodsContainer.getGoodsCount(type);
+        } else {
+            return goodsContainer.getGoodsCount(type.getStoredAs());
         }
     }
     
@@ -678,10 +679,8 @@ public final class Colony extends Settlement implements Features, Location, Name
         ArrayList<UnitType> buildableUnits = new ArrayList<UnitType>();
         List<UnitType> unitTypes = FreeCol.getSpecification().getUnitTypeList();
         for (UnitType unitType : unitTypes) {
-            if (unitType.getGoodsRequired() != null) {
-                if (canBuild(unitType)) {
-                    buildableUnits.add(unitType);
-                }
+            if (unitType.getGoodsRequired() != null && canBuild(unitType)) {
+                buildableUnits.add(unitType);
             }
         }
         return buildableUnits;
@@ -779,10 +778,11 @@ public final class Colony extends Settlement implements Features, Location, Name
         }
         // Update "addSol(int)" and "getMembers()" if this formula gets changed:
         int membership = (getGoodsCount(Goods.BELLS) * 100) / (BELLS_PER_REBEL * units);
-        if (membership < 0)
+        if (membership < 0) {
             membership = 0;
-        if (membership > 100)
+        } else if (membership > 100) {
             membership = 100;
+        }
         sonsOfLiberty = membership;
         tories = (units - getMembers());
     }
@@ -888,16 +888,16 @@ public final class Colony extends Settlement implements Features, Location, Name
      */
     public WorkLocation getVacantWorkLocationFor(Unit unit) {
         WorkLocation result = getVacantColonyTileFor(unit, Goods.FOOD);
-        if (result != null) {
-            return result;
-        } else {
+        if (result == null) {
             for (Building building : buildingMap.values()) {
                 if (building.canAdd(unit)) {
                     return building;
                 }
             }
+            return null;
+        } else {
+            return result;
         }
-        return null;
     }
 
     /**
@@ -950,7 +950,7 @@ public final class Colony extends Settlement implements Features, Location, Name
      */
     public int getVacantColonyTileProductionFor(Unit unit, GoodsType goodsType) {
         ColonyTile bestPick = getVacantColonyTileFor(unit, goodsType);
-        return bestPick != null ? bestPick.getProductionOf(unit, goodsType) : 0;
+        return bestPick == null ? 0 : bestPick.getProductionOf(unit, goodsType);
     }
 
     /**
@@ -998,7 +998,7 @@ public final class Colony extends Settlement implements Features, Location, Name
                     GoodsType requiredType = goodsRequired.getType();
                     int requiredAmount = goodsRequired.getAmount();
                     int presentAmount = getGoodsCount(requiredType);
-                    if (requiredType == goodsType) {
+                    if (requiredType.equals(goodsType)) {
                         if (presentAmount + (count - used) < requiredAmount) {
                             willBeFinished = false;
                             break;
@@ -1053,16 +1053,16 @@ public final class Colony extends Settlement implements Features, Location, Name
         if (buildableType instanceof BuildingType) {
             BuildingType newBuildingType = (BuildingType) buildableType;
             Building colonyBuilding = this.getBuilding(newBuildingType);
-            if (colonyBuilding != null) {
-                // a building of the same family already exists
-                if (colonyBuilding.getType().getUpgradesTo() != newBuildingType) {
-                    // the existing building's next upgrade is not the new one we want to build
-                    return false;
-                }
-            } else {
+            if (colonyBuilding == null) {
                 // the colony has no similar building yet
                 if (newBuildingType.getUpgradesFrom() != null) {
                     // we are trying to build an advanced factory, we should build lower level shop first
+                    return false;
+                }
+            } else {
+                // a building of the same family already exists
+                if (colonyBuilding.getType().getUpgradesTo() != newBuildingType) {
+                    // the existing building's next upgrade is not the new one we want to build
                     return false;
                 }
             }
@@ -1101,7 +1101,7 @@ public final class Colony extends Settlement implements Features, Location, Name
                                                   requiredGoodsType));
                 }
             }
-            if (messages.size() == 0) {
+            if (messages.isEmpty()) {
                 // no messages means all goods are present
                 for (AbstractGoods goodsRequired : buildable.getGoodsRequired()) {
                     GoodsType requiredGoodsType = goodsRequired.getType();
@@ -1127,7 +1127,7 @@ public final class Colony extends Settlement implements Features, Location, Name
                         getBuilding(upgradesFrom).upgrade();
                     }
                     buildQueue.remove(0);
-                    if (buildQueue.size() == 0) {
+                    if (buildQueue.isEmpty()) {
                         buildQueue.add(BuildableType.NOTHING);
                     }
                 }
@@ -1306,7 +1306,7 @@ public final class Colony extends Settlement implements Features, Location, Name
     private void checkForNewColonist() {
         if (getGoodsCount(Goods.FOOD) >= 200) {
             List<UnitType> unitTypes = FreeCol.getSpecification().getUnitTypesWithAbility("model.ability.bornInColony");
-            if (unitTypes.size() > 0) {
+            if (!unitTypes.isEmpty()) {
                 int random = getGame().getModelController().getRandom(getId() + "bornInColony", unitTypes.size());
                 Unit u = getGame().getModelController().createUnit(getId() + "newTurn200food",
                                                 getTile(), getOwner(), unitTypes.get(random));
@@ -1663,24 +1663,24 @@ public final class Colony extends Settlement implements Features, Location, Name
         while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
             if (in.getLocalName().equals(ColonyTile.getXMLElementTagName())) {
                 ColonyTile ct = (ColonyTile) getGame().getFreeColGameObject(in.getAttributeValue(null, "ID"));
-                if (ct != null) {
-                    ct.readFromXML(in);
-                } else {
+                if (ct == null) {
                     colonyTiles.add(new ColonyTile(getGame(), in));
+                } else {
+                    ct.readFromXML(in);
                 }
             } else if (in.getLocalName().equals(Building.getXMLElementTagName())) {
                 Building b = (Building) getGame().getFreeColGameObject(in.getAttributeValue(null, "ID"));
-                if (b != null) {
-                    b.readFromXML(in);
-                } else {
+                if (b == null) {
                     addBuilding(new Building(getGame(), in));
+                } else {
+                    b.readFromXML(in);
                 }
             } else if (in.getLocalName().equals(GoodsContainer.getXMLElementTagName())) {
                 GoodsContainer gc = (GoodsContainer) getGame().getFreeColGameObject(in.getAttributeValue(null, "ID"));
-                if (gc != null) {
-                    goodsContainer.readFromXML(in);
-                } else {
+                if (gc == null) {
                     goodsContainer = new GoodsContainer(getGame(), this, in);
+                } else {
+                    goodsContainer.readFromXML(in);
                 }
             } else if (in.getLocalName().equals(ExportData.getXMLElementTagName())) {
                 ExportData data = new ExportData();
@@ -1795,14 +1795,12 @@ public final class Colony extends Settlement implements Features, Location, Name
         Modifier result;
         Modifier colonyModifier = featureContainer.getModifier(id);
         Modifier playerModifier = owner.getModifier(id);
-        if (colonyModifier != null) {
-            if (playerModifier != null) {
-                result = Modifier.combine(colonyModifier, playerModifier);
-            } else {
-                result = colonyModifier;
-            }
-        } else {
+        if (colonyModifier == null) {
             result = playerModifier;
+        } else if (playerModifier == null) {
+            result = colonyModifier;
+        } else {
+            result = Modifier.combine(colonyModifier, playerModifier);
         }
         
         return result;
@@ -1818,18 +1816,16 @@ public final class Colony extends Settlement implements Features, Location, Name
     public boolean hasAbility(String id) {
         Ability colonyAbility = featureContainer.getAbility(id);
         Ability playerAbility = owner.getAbility(id);
-        if (colonyAbility != null) {
-            if (playerAbility != null) {
-                return colonyAbility.getValue() && playerAbility.getValue();
-            } else {
-                return colonyAbility.getValue();
-            }
-        } else {
-            if (playerAbility != null) {
-                return playerAbility.getValue();
-            } else {
+        if (colonyAbility == null) {
+            if (playerAbility == null) {
                 return false;
+            } else {
+                return playerAbility.getValue();
             }
+        } else if (playerAbility == null) {
+            return colonyAbility.getValue();
+        } else {
+            return colonyAbility.getValue() && playerAbility.getValue();
         }
     }
 
