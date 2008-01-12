@@ -56,6 +56,7 @@ import net.sf.freecol.common.PseudoRandom;
 import net.sf.freecol.common.model.FreeColGameObject;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Player;
+import net.sf.freecol.common.model.Player.PlayerType;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.Unit.UnitState;
 import net.sf.freecol.common.model.UnitType;
@@ -88,8 +89,6 @@ import org.w3c.dom.Element;
  * class.
  */
 public final class FreeColServer {
-
-
 
     private static Logger logger = Logger.getLogger(FreeColServer.class.getName());
 
@@ -313,6 +312,7 @@ public final class FreeColServer {
                     new Unit(game, theFlyingDutchman, p, landType, UnitState.SENTRY);
                 }
                 p.setDead(false);
+                p.setPlayerType(PlayerType.UNDEAD);
                 p.setColor(Color.BLACK);
                 Element updateElement = Message.createNewRootElement("update");
                 updateElement.appendChild(((FreeColGameObject) p.getEntryLocation()).toXMLElement(p, updateElement

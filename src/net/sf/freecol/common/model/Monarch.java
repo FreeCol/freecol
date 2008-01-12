@@ -28,6 +28,8 @@ import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.PseudoRandom;
+import net.sf.freecol.common.model.Player.PlayerType;
+import net.sf.freecol.common.model.Player.Stance;
 
 import org.w3c.dom.Element;
 
@@ -169,7 +171,7 @@ public final class Monarch extends FreeColGameObject {
 
         // nothing happens during the first few turns, nor after the
         // revolution
-        if (turn < grace || player.getRebellionState() != Player.REBELLION_PRE_WAR) {
+        if (turn < grace || player.getPlayerType() != PlayerType.COLONIAL) {
             return NO_ACTION;
         }
 
@@ -183,11 +185,11 @@ public final class Monarch extends FreeColGameObject {
                 }
                 if (player.hasContacted(enemy)) {
                     switch (player.getStance(enemy)) {
-                    case Player.WAR:
+                    case WAR:
                         atWar = true;
                         break;
-                    case Player.PEACE:
-                    case Player.CEASE_FIRE:
+                    case PEACE:
+                    case CEASE_FIRE:
                         canDeclareWar = true;
                         break;
                     }
@@ -441,15 +443,15 @@ public final class Monarch extends FreeColGameObject {
             } else if (!enemy.isEuropean() || enemy.isREF()) {
                 continue;
             }
-            int stance = player.getStance(enemy);
-            if (stance == Player.PEACE || stance == Player.CEASE_FIRE) {
+            Stance stance = player.getStance(enemy);
+            if (stance == Stance.PEACE || stance == Stance.CEASE_FIRE) {
                 europeanPlayers.add(enemy);
             }
         }
         if (europeanPlayers.size() > 0) {
             int random = getGame().getModelController().getPseudoRandom().nextInt(europeanPlayers.size());
             Player enemy = europeanPlayers.get(random);
-            player.setStance(enemy, Player.WAR);
+            player.setStance(enemy, Stance.WAR);
             return enemy;
         }
         return null;

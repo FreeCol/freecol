@@ -35,6 +35,7 @@ import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.ModelController;
 import net.sf.freecol.common.model.Player;
+import net.sf.freecol.common.model.Player.Stance;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.TradeRoute;
 import net.sf.freecol.common.model.Unit;
@@ -389,9 +390,9 @@ public class ServerModelController implements ModelController {
      * @param second The second <code>Player</code>.
      * @param stance The new stance.
      */
-    public void setStance(Player first, Player second, int stance) {
+    public void setStance(Player first, Player second, Stance stance) {
         Element element = Message.createNewRootElement("setStance");
-        element.setAttribute("stance", Integer.toString(stance));
+        element.setAttribute("stance", stance.toString());
         element.setAttribute("first", first.getId());
         element.setAttribute("second", second.getId());
 

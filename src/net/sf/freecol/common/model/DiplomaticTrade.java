@@ -30,6 +30,8 @@ import javax.xml.stream.XMLStreamWriter;
 
 import org.w3c.dom.Element;
 
+import net.sf.freecol.common.model.Player.Stance;
+
 /**
  * The class <code>DiplomaticTrade</code> represents an offer one player can
  * make another.
@@ -212,12 +214,12 @@ public class DiplomaticTrade extends FreeColObject {
 
 
     /**
-     * Returns the stance being offered, or Integer.MIN_VALUE if none
+     * Returns the stance being offered, or null if none
      * is being offered.
      *
      * @return an <code>int</code> value
      */
-    public int getStance() {
+    public Stance getStance() {
         Iterator<TradeItem> itemIterator = items.iterator();
         while (itemIterator.hasNext()) {
             TradeItem item = itemIterator.next();
@@ -225,7 +227,7 @@ public class DiplomaticTrade extends FreeColObject {
                 return ((StanceTradeItem) item).getStance();
             }
         }
-        return Integer.MIN_VALUE;
+        return null;
     }
 
 

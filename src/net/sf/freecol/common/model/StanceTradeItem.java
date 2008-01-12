@@ -17,14 +17,13 @@
  *  along with FreeCol.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
 package net.sf.freecol.common.model;
-
-
 
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
+
+import net.sf.freecol.common.model.Player.Stance;
 
 
 public class StanceTradeItem extends TradeItem {
@@ -32,7 +31,7 @@ public class StanceTradeItem extends TradeItem {
     /**
      * The stance between source and destination.
      */
-    private int stance;
+    private Stance stance;
         
     /**
      * Creates a new <code>StanceTradeItem</code> instance.
@@ -40,9 +39,9 @@ public class StanceTradeItem extends TradeItem {
      * @param game a <code>Game</code> value
      * @param source a <code>Player</code> value
      * @param destination a <code>Player</code> value
-     * @param stance an <code>int</code> value
+     * @param stance an <code>Stance</code> value
      */
-    public StanceTradeItem(Game game, Player source, Player destination, int stance) {
+    public StanceTradeItem(Game game, Player source, Player destination, Stance stance) {
         super(game, "tradeItem.stance", source, destination);
         this.stance = stance;
     }
@@ -61,9 +60,9 @@ public class StanceTradeItem extends TradeItem {
     /**
      * Get the <code>Stance</code> value.
      *
-     * @return an <code>int</code> value
+     * @return an <code>Stance</code> value
      */
-    public final int getStance() {
+    public final Stance getStance() {
         return stance;
     }
 
@@ -72,7 +71,7 @@ public class StanceTradeItem extends TradeItem {
      *
      * @param newStance The new Stance value.
      */
-    public final void setStance(final int newStance) {
+    public final void setStance(final Stance newStance) {
         this.stance = newStance;
     }
 
@@ -82,10 +81,7 @@ public class StanceTradeItem extends TradeItem {
      * @return a <code>boolean</code> value
      */
     public boolean isValid() {
-        return (stance == Player.WAR ||
-                stance == Player.CEASE_FIRE ||
-                stance == Player.PEACE ||
-                stance == Player.ALLIANCE);
+        return stance != null;
     }
 
     /**
@@ -117,7 +113,7 @@ public class StanceTradeItem extends TradeItem {
      */
     protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
         super.readFromXMLImpl(in);
-        this.stance = Integer.parseInt(in.getAttributeValue(null, "stance"));
+        this.stance = Enum.valueOf(Stance.class, in.getAttributeValue(null, "stance"));
         in.nextTag();
     }
 
@@ -132,7 +128,7 @@ public class StanceTradeItem extends TradeItem {
     public void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
         out.writeStartElement(getXMLElementTagName());
         super.toXML(out);
-        out.writeAttribute("stance", Integer.toString(this.stance));
+        out.writeAttribute("stance", this.stance.toString());
         out.writeEndElement();
     }
     

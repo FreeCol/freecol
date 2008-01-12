@@ -55,6 +55,8 @@ import net.sf.freecol.common.model.Monarch;
 import net.sf.freecol.common.model.Ownable;
 import net.sf.freecol.common.model.PathNode;
 import net.sf.freecol.common.model.Player;
+import net.sf.freecol.common.model.Player.PlayerType;
+import net.sf.freecol.common.model.Player.Stance;
 import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.Tension;
 import net.sf.freecol.common.model.Tile;
@@ -239,7 +241,7 @@ public class AIPlayer extends AIObject {
         while (it.hasNext()) {
             Player p = it.next();
             if (p.getREFPlayer() == getPlayer()
-                    && p.getRebellionState() == Player.REBELLION_IN_WAR
+                    && p.getPlayerType() == PlayerType.REBEL
                     && p.getMonarch() == null) {
                 dominions.add(p);
             }
@@ -322,7 +324,7 @@ public class AIPlayer extends AIObject {
             player.resetArrears(goodsType);
         }
         if (getAIMain().getFreeColServer().isSingleplayer() && player.isEuropean() && !player.isREF() && player.isAI()
-                && player.getRebellionState() == Player.REBELLION_PRE_WAR) {
+                && player.getPlayerType() == PlayerType.COLONIAL) {
             Europe europe = player.getEurope();
             List<UnitType> unitTypes = FreeCol.getSpecification().getUnitTypeList();
             
@@ -439,7 +441,8 @@ public class AIPlayer extends AIObject {
         Iterator<Player> it2 = getGame().getPlayerIterator();
         while (it2.hasNext()) {
             Player p = it2.next();
-            if (p.getREFPlayer() == getPlayer() && p.getRebellionState() == Player.REBELLION_IN_WAR) {
+            if (p.getREFPlayer() == getPlayer() &&
+                p.getPlayerType() == PlayerType.REBEL) {
                 return true;
             }
         }
@@ -459,18 +462,18 @@ public class AIPlayer extends AIObject {
             if (p == player) {
                 continue;
             }
-            if (p.getREFPlayer() == getPlayer() && p.getRebellionState() == Player.REBELLION_IN_WAR) {
+            if (p.getREFPlayer() == getPlayer() && p.getPlayerType() == PlayerType.REBEL) {
                 getPlayer().getTension(p).modify(1000);
             }
-            if (getPlayer().getStance(p) != Player.WAR && 
+            if (getPlayer().getStance(p) != Stance.WAR && 
                 getPlayer().getTension(p).getLevel() == Tension.Level.HATEFUL) {
-                getPlayer().setStance(p, Player.WAR);
-            } else if (getPlayer().getStance(p) == Player.WAR
+                getPlayer().setStance(p, Stance.WAR);
+            } else if (getPlayer().getStance(p) == Stance.WAR
                        && getPlayer().getTension(p).getLevel().compareTo(Tension.Level.CONTENT) <= 0) {
-                getPlayer().setStance(p, Player.CEASE_FIRE);
-            } else if (getPlayer().getStance(p) == Player.CEASE_FIRE
+                getPlayer().setStance(p, Stance.CEASE_FIRE);
+            } else if (getPlayer().getStance(p) == Stance.CEASE_FIRE
                        && getPlayer().getTension(p).getLevel().compareTo(Tension.Level.HAPPY) <= 0) {
-                getPlayer().setStance(p, Player.PEACE);
+                getPlayer().setStance(p, Stance.PEACE);
             }
         }
     }
@@ -484,7 +487,7 @@ public class AIPlayer extends AIObject {
         Iterator<Player> it = getGame().getPlayerIterator();
         while (it.hasNext()) {
             Player p = it.next();
-            if (p.getREFPlayer() == getPlayer() && p.getRebellionState() == Player.REBELLION_IN_WAR) {
+            if (p.getREFPlayer() == getPlayer() && p.getPlayerType() == PlayerType.REBEL) {
                 Monarch m = p.getMonarch();
                 if (m == null) {
                     continue;
@@ -1330,7 +1333,7 @@ public class AIPlayer extends AIObject {
         logger.finest("Entering method getUnitSeekAndDestroyMissionValue");
         if (newTile.isLand() && !unit.isNaval() && newTile.getDefendingUnit(unit) != null
                 && newTile.getDefendingUnit(unit).getOwner() != unit.getOwner()
-                && unit.getOwner().getStance(newTile.getDefendingUnit(unit).getOwner()) == Player.WAR) {
+                && unit.getOwner().getStance(newTile.getDefendingUnit(unit).getOwner()) == Stance.WAR) {
             int value = 10020;
             if (newTile.getBestTreasureTrain() != null) {
                 value += Math.min(newTile.getBestTreasureTrain().getTreasureAmount() / 10, 50);
@@ -1502,7 +1505,7 @@ public class AIPlayer extends AIObject {
                 Unit defender = newTile.getDefendingUnit(unit);
                 if (newTile.isLand() && !unit.isNaval() && defender != null
                         && defender.getOwner() != unit.getOwner()
-                        && unit.getOwner().getStance(defender.getOwner()) == Player.WAR) {
+                        && unit.getOwner().getStance(defender.getOwner()) == Stance.WAR) {
                     int value = getUnitSeekAndDestroyMissionValue(unit, pathNode.getTile(), pathNode.getTurns());
                     if (value > bestNewTargetValue) {
                         bestTarget = pathNode;
@@ -1814,7 +1817,7 @@ public class AIPlayer extends AIObject {
             Colony colony = (Colony) settlement;
             Player otherPlayer = unit.getOwner();
             // the client should have prevented this
-            if (player.getStance(otherPlayer) == Player.WAR) {
+            if (player.getStance(otherPlayer) == Stance.WAR) {
                 return NetworkConstants.NO_TRADE;
             }
             // don't pay for more than fits in the warehouse

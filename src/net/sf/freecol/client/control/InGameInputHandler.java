@@ -43,6 +43,7 @@ import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.ModelMessage;
 import net.sf.freecol.common.model.Monarch;
 import net.sf.freecol.common.model.Player;
+import net.sf.freecol.common.model.Player.Stance;
 import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.Tension;
 import net.sf.freecol.common.model.Tile;
@@ -771,7 +772,7 @@ public final class InGameInputHandler extends InputHandler {
             break;
         case Monarch.DECLARE_WAR:
             Player enemy = (Player) getGame().getFreeColGameObject(element.getAttribute("nation"));
-            player.setStance(enemy, Player.WAR);
+            player.setStance(enemy, Stance.WAR);
             player.addModelMessage(new ModelMessage(player, "model.monarch.declareWar",
                                                     new String[][] {
                                                         {"%nation%", enemy.getName()}},
@@ -835,7 +836,7 @@ public final class InGameInputHandler extends InputHandler {
     private Element setStance(Element element) {
         final FreeColClient freeColClient = getFreeColClient();
         Player player = freeColClient.getMyPlayer();
-        int stance = Integer.parseInt(element.getAttribute("stance"));
+        Stance stance = Enum.valueOf(Stance.class, element.getAttribute("stance"));
         Player first = (Player) getGame().getFreeColGameObject(element.getAttribute("first"));
         Player second = (Player) getGame().getFreeColGameObject(element.getAttribute("second"));
 
@@ -850,7 +851,7 @@ public final class InGameInputHandler extends InputHandler {
 
         first.setStance(second, stance);
 
-        if (stance == Player.WAR) {
+        if (stance == Stance.WAR) {
             if (player.equals(second)) {
                 player.addModelMessage(new ModelMessage(first, "model.diplomacy.war.declared",
                                                         new String[][] {

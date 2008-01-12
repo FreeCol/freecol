@@ -24,6 +24,7 @@ import java.util.logging.Logger;
 
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.common.model.Player;
+import net.sf.freecol.common.model.Player.PlayerType;
 
 /**
  * An action for declaring independence.
@@ -54,7 +55,7 @@ public class DeclareIndependenceAction extends MapboardAction {
      */
     protected boolean shouldBeEnabled() {
         Player p = getFreeColClient().getMyPlayer();
-        return super.shouldBeEnabled() && p != null && p.getRebellionState() == Player.REBELLION_PRE_WAR;
+        return super.shouldBeEnabled() && p != null && p.getPlayerType() == PlayerType.COLONIAL;
     }
 
     /**

@@ -34,6 +34,7 @@ import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.ModelController;
 import net.sf.freecol.common.model.Ownable;
 import net.sf.freecol.common.model.Player;
+import net.sf.freecol.common.model.Player.Stance;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.TradeRoute;
 import net.sf.freecol.common.model.Unit;
@@ -46,9 +47,8 @@ import org.w3c.dom.Element;
  * A client-side implementation of the <code>ModelController</code> interface.
  */
 public class ClientModelController implements ModelController {
+
     private static final Logger logger = Logger.getLogger(ClientModelController.class.getName());
-
-
 
 
     private final FreeColClient freeColClient;
@@ -206,7 +206,7 @@ public class ClientModelController implements ModelController {
      * @param second The second <code>Player</code>.
      * @param stance The new stance.
      */
-    public void setStance(Player first, Player second, int stance) {
+    public void setStance(Player first, Player second, Stance stance) {
         // Nothing to do.
     }
 

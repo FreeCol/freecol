@@ -51,6 +51,7 @@ import net.sf.freecol.common.model.Monarch;
 import net.sf.freecol.common.model.Nameable;
 import net.sf.freecol.common.model.Ownable;
 import net.sf.freecol.common.model.Player;
+import net.sf.freecol.common.model.Player.Stance;
 import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.Tension;
 import net.sf.freecol.common.model.Tile;
@@ -907,7 +908,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
                 // ships in settlements don't slow enemy ships
                 if (colony != null) {
                     Player enemy = colony.getOwner();
-                    if (player != enemy && (player.getStance(enemy) == Player.WAR
+                    if (player != enemy && (player.getStance(enemy) == Stance.WAR
                             || unit.hasAbility("model.ability.piracy"))
                             && colony.hasAbility("model.ability.bombardShips")) {
                         float bombardingPower = colony.getBombardingPower();
@@ -925,7 +926,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
                     }
                     
                     for (Unit enemyUnit : tile.getUnitList()) {
-                        if (enemyUnit.isOffensiveUnit() && (player.getStance(enemy) == Player.WAR
+                        if (enemyUnit.isOffensiveUnit() && (player.getStance(enemy) == Stance.WAR
                                 || enemyUnit.hasAbility("model.ability.piracy")
                                 || unit.hasAbility("model.ability.piracy"))) {
                             attackPower += enemyUnit.getOffensePower(unit);
@@ -1823,7 +1824,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
             }
             // Set the indian player at war with the european player (and vice
             // versa).
-            settlement.getOwner().setStance(enemy, Player.WAR);
+            settlement.getOwner().setStance(enemy, Stance.WAR);
             // Increase tension levels:
             settlement.modifyAlarm(enemy, 1000); // let propagation works
             enemy.modifyTension(settlement.getOwner(), 500);

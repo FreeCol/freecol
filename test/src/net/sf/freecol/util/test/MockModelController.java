@@ -30,6 +30,7 @@ import net.sf.freecol.common.model.FreeColGameObject;
 import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.ModelController;
 import net.sf.freecol.common.model.Player;
+import net.sf.freecol.common.model.Player.Stance;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.TradeRoute;
 import net.sf.freecol.common.model.Unit;
@@ -69,7 +70,7 @@ public class MockModelController implements ModelController {
         return 0;
     }
 
-    public void setStance(Player first, Player second, int stance) {
+    public void setStance(Player first, Player second, Stance stance) {
         // TODO Auto-generated method stub
 		
     }

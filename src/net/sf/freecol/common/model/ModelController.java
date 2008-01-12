@@ -23,6 +23,7 @@ package net.sf.freecol.common.model;
 import java.util.ArrayList;
 
 import net.sf.freecol.common.PseudoRandom;
+import net.sf.freecol.common.model.Player.Stance;
 
 /**
 * The <code>ModelController</code> is used by the model to perform
@@ -107,7 +108,7 @@ public interface ModelController {
      * @param second The second <code>Player</code>.
      * @param stance The new stance.
      */
-    public void setStance(Player first, Player second, int stance);
+    public void setStance(Player first, Player second, Stance stance);
     
     
     /**

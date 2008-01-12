@@ -38,6 +38,7 @@ import net.sf.freecol.common.model.Unit.UnitState;
 import net.sf.freecol.common.model.Map.CircleIterator;
 import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.Map.Position;
+import net.sf.freecol.common.model.Player.Stance;
 import net.sf.freecol.common.util.EmptyIterator;
 
 import org.w3c.dom.Element;
@@ -2351,7 +2352,7 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
             owner = owningSettlement.getOwner();
         }
         if (owner != null && unit != null && unit.getOwner() != owner
-            && owner.getStance(unit.getOwner()) != Player.ALLIANCE) {
+            && owner.getStance(unit.getOwner()) != Stance.ALLIANCE) {
             for(Unit enemyUnit : getUnitList()) {
                 if (enemyUnit.isOffensiveUnit() && enemyUnit.getState() == UnitState.FORTIFIED) {
                     return enemyUnit;

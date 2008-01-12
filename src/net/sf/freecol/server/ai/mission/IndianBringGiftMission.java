@@ -35,6 +35,7 @@ import net.sf.freecol.common.model.GoodsContainer;
 import net.sf.freecol.common.model.IndianSettlement;
 import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.Player;
+import net.sf.freecol.common.model.Player.Stance;
 import net.sf.freecol.common.model.Tension;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
@@ -219,8 +220,8 @@ public class IndianBringGiftMission extends Mission {
      *         with regard to the tension towards the target player.
      */
     public static boolean isValidMission(Player owner, Player targetPlayer) {
-        int stance = owner.getStance(targetPlayer);
-        return (stance != Player.WAR && stance != Player.CEASE_FIRE)
+        Stance stance = owner.getStance(targetPlayer);
+        return (stance != Stance.WAR && stance != Stance.CEASE_FIRE)
             && owner.getTension(targetPlayer).getLevel().compareTo(Tension.Level.HAPPY) <= 0;
     }
 

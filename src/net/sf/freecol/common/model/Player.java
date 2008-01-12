@@ -70,7 +70,7 @@ public class Player extends FreeColGameObject implements Features, Nameable {
     /**
      * Constants for describing the stance towards a player.
      */
-    public static final int WAR = -2, CEASE_FIRE = -1, PEACE = 0, ALLIANCE = 1;
+    public static enum Stance { WAR, CEASE_FIRE, PEACE, ALLIANCE }
 
     /** The maximum line of sight a unit can have in the game. */
     public static final int MAX_LINE_OF_SIGHT = 2;
@@ -94,7 +94,7 @@ public class Player extends FreeColGameObject implements Features, Nameable {
      * Stores the stance towards the other players. One of:
      * WAR, CEASE_FIRE, PEACE and ALLIANCE.
      */
-    private int[] stance = new int[NUMBER_OF_PLAYERS];
+    private Stance[] stance = new Stance[NUMBER_OF_PLAYERS];
 
     private static final Color noNationColor = Color.BLACK;
 
@@ -167,14 +167,9 @@ public class Player extends FreeColGameObject implements Features, Nameable {
     /** The current tax rate for this player. */
     private int tax = 0;
 
-    // 0 = pre-rebels; 1 = in rebellion; 2 = independence granted
-    private int rebellionState;
+    private PlayerType playerType;
 
-    public static final int REBELLION_PRE_WAR = 0;
-
-    public static final int REBELLION_IN_WAR = 1;
-
-    public static final int REBELLION_POST_WAR = 2;
+    public static enum PlayerType { NATIVE, COLONIAL, REBEL, INDEPENDENT, ROYAL, UNDEAD }
 
     // new simple schema for crosses
     // TODO: make this depend on difficulty
@@ -320,11 +315,14 @@ public class Player extends FreeColGameObject implements Features, Nameable {
         for (int k = 0; k < tension.length; k++) {
             tension[k] = new Tension(0);
         }
+        for (int k = 0; k < stance.length; k++) {
+            stance[k] = Stance.PEACE;
+        }
         market = new Market(getGame(), this);
         crosses = 0;
         bells = 0;
         currentFather = null;
-        rebellionState = 0;
+        playerType = PlayerType.COLONIAL;
     }
 
     /**
@@ -571,11 +569,11 @@ public class Player extends FreeColGameObject implements Features, Nameable {
         if (getSoL() < 50) {
             throw new IllegalStateException("Cannot declare independence. SoL is only: " + getSoL());
         }
-        if (getRebellionState() != REBELLION_PRE_WAR) {
+        if (playerType != PlayerType.COLONIAL) {
             throw new IllegalStateException("Independence has already been declared.");
         }
-        setRebellionState(REBELLION_IN_WAR);
-        setStance(getREFPlayer(), WAR);
+        setPlayerType(PlayerType.REBEL);
+        setStance(getREFPlayer(), Stance.WAR);
         setTax(0);
         // Dispose all units in Europe.
         Iterator<Unit> it = europe.getUnitIterator();
@@ -601,11 +599,11 @@ public class Player extends FreeColGameObject implements Features, Nameable {
         if (!isEuropean()) {
             throw new IllegalStateException("The player \"" + getName() + "\" is not european");
         }
-        if (getRebellionState() == Player.REBELLION_POST_WAR) {
+        if (playerType != PlayerType.REBEL) {
             throw new IllegalStateException("The player \"" + getName() + "\" is already independent");
         }
-        setRebellionState(Player.REBELLION_POST_WAR);
-        setStance(getREFPlayer(), Player.PEACE);
+        setPlayerType(PlayerType.INDEPENDENT);
+        setStance(getREFPlayer(), Stance.PEACE);
         addModelMessage(this, "model.player.independence", null, ModelMessage.DEFAULT);
     }
 
@@ -718,7 +716,7 @@ public class Player extends FreeColGameObject implements Features, Nameable {
      * otherwise.
      */
     public boolean isIndian() {
-        return !(nationType == null || isEuropean());
+        return playerType == PlayerType.NATIVE;
     }
 
     /**
@@ -728,7 +726,7 @@ public class Player extends FreeColGameObject implements Features, Nameable {
      */
     public boolean isAtWar() {
         for (Player player : getGame().getPlayers()) {
-            if (getStance(player) == WAR) {
+            if (getStance(player) == Stance.WAR) {
                 return true;
             }
         }
@@ -1061,18 +1059,12 @@ public class Player extends FreeColGameObject implements Features, Nameable {
     }
 
     /**
-     * Returns the state of this players rebellion status.
+     * Returns the type of this player.
      * 
-     * <pre>
-     *   0 = Have not declared independence
-     *   1 = Declared independence, at war with king
-     *   2 = Independence granted
-     * </pre>
-     * 
-     * @return The rebellion state.
+     * @return The player type.
      */
-    public int getRebellionState() {
-        return rebellionState;
+    public PlayerType getPlayerType() {
+        return playerType;
     }
 
     /**
@@ -1083,8 +1075,7 @@ public class Player extends FreeColGameObject implements Features, Nameable {
      *         independence.
      */
     public boolean canBuildColonies() {
-        // TODO: hasAbility("model.ability.buildColony");
-        return isEuropean() && getRebellionState() != REBELLION_IN_WAR && !isREF();
+        return hasAbility("model.ability.foundColony");
     }
 
     /**
@@ -1095,18 +1086,17 @@ public class Player extends FreeColGameObject implements Features, Nameable {
      *         independence.
      */
     public boolean canHaveFoundingFathers() {
-        // TODO: hasAbility("model.ability.electFoundingFather");
-        return isEuropean() && getRebellionState() != REBELLION_IN_WAR && !isREF();
+        return hasAbility("model.ability.electFoundingFather");
     }
 
     /**
-     * Sets the rebellion status.
+     * Sets the player type.
      * 
-     * @param state The state of this player's rebellion
-     * @see #getRebellionState
+     * @param state The new player type.
+     * @see #getPlayerType
      */
-    public void setRebellionState(int state) {
-        rebellionState = state;
+    public void setPlayerType(PlayerType type) {
+        playerType = type;
     }
 
     /**
@@ -1692,7 +1682,7 @@ public class Player extends FreeColGameObject implements Features, Nameable {
      *         <code>Player</code>.
      */
     public boolean canRecruitUnits() {
-        return isEuropean() && getRebellionState() < REBELLION_IN_WAR;
+        return playerType == PlayerType.COLONIAL;
     }
 
     /**
@@ -1853,7 +1843,7 @@ public class Player extends FreeColGameObject implements Features, Nameable {
             while (it.hasNext()) {
                 Tile ct = getGame().getMap().getTile(it.next());
                 if (ct.getColony() != null && ct.getColony().getOwner() != this) {
-                    if (getStance(ct.getColony().getOwner()) == WAR) {
+                    if (getStance(ct.getColony().getOwner()) == Stance.WAR) {
                         value -= Math.max(0, 20 - tile.getDistanceTo(tile) * 4);
                     } else {
                         value -= Math.max(0, 8 - tile.getDistanceTo(tile) * 2);
@@ -1863,7 +1853,7 @@ public class Player extends FreeColGameObject implements Features, Nameable {
                 while (ui.hasNext()) {
                     Unit u = ui.next();
                     if (u.getOwner() != this && u.isOffensiveUnit() && u.getOwner().isEuropean()) {
-                        if (getStance(u.getOwner()) == WAR) {
+                        if (getStance(u.getOwner()) == Stance.WAR) {
                             value -= Math.max(0, 40 - tile.getDistanceTo(tile) * 9);
                         }
                     }
@@ -1881,9 +1871,9 @@ public class Player extends FreeColGameObject implements Features, Nameable {
      * @param player The <code>Player</code>.
      * @return The stance.
      */
-    public int getStance(Player player) {
+    public Stance getStance(Player player) {
         if (player == null) {
-            return 0;
+            return Stance.PEACE;
         } else {
             return stance[player.getIndex()];
         }
@@ -1895,19 +1885,8 @@ public class Player extends FreeColGameObject implements Features, Nameable {
      * @param stance The stance.
      * @return A matching string.
      */
-    public static String getStanceAsString(int stance) {
-        switch (stance) {
-        case WAR:
-            return Messages.message("model.player.war");
-        case CEASE_FIRE:
-            return Messages.message("model.player.ceaseFire");
-        case PEACE:
-            return Messages.message("model.player.peace");
-        case ALLIANCE:
-            return Messages.message("model.player.alliance");
-        default:
-            return "Unknown type of stance.";
-        }
+    public static String getStanceAsString(Stance stance) {
+        return Messages.message("model.stance." + stance.toString().toLowerCase());
     }
 
     /**
@@ -1918,11 +1897,11 @@ public class Player extends FreeColGameObject implements Features, Nameable {
      * @param player The <code>Player</code>.
      * @param newStance The stance.
      */
-    public void setStance(Player player, int newStance) {
+    public void setStance(Player player, Stance newStance) {
         if (player == null) {
             return;
         }
-        int oldStance = stance[player.getIndex()];
+        Stance oldStance = stance[player.getIndex()];
         // Ignore requests to change the stance when indian players are
         // involved:
         /*
@@ -1936,7 +1915,7 @@ public class Player extends FreeColGameObject implements Features, Nameable {
         if (newStance == oldStance) {
             return;
         }
-        if (newStance == CEASE_FIRE && oldStance != WAR) {
+        if (newStance == Stance.CEASE_FIRE && oldStance != Stance.WAR) {
             throw new IllegalStateException("Cease fire can only be declared when at war.");
         }
         stance[player.getIndex()] = newStance;
@@ -1946,9 +1925,9 @@ public class Player extends FreeColGameObject implements Features, Nameable {
         if (player.getStance(this) != newStance) {
             player.setStance(this, newStance);
         }
-        if (oldStance == PEACE && newStance == WAR) {
+        if (oldStance == Stance.PEACE && newStance == Stance.WAR) {
             modifyTension(player, Tension.TENSION_ADD_DECLARE_WAR_FROM_PEACE);
-        } else if (oldStance == CEASE_FIRE && newStance == WAR) {
+        } else if (oldStance == Stance.CEASE_FIRE && newStance == Stance.WAR) {
             modifyTension(player, Tension.TENSION_ADD_DECLARE_WAR_FROM_CEASE_FIRE);
         }
     }
@@ -2259,13 +2238,10 @@ public class Player extends FreeColGameObject implements Features, Nameable {
         out.writeAttribute("admin", Boolean.toString(admin));
         out.writeAttribute("ready", Boolean.toString(ready));
         out.writeAttribute("dead", Boolean.toString(dead));
-        out.writeAttribute("rebellionState", Integer.toString(rebellionState));
+        out.writeAttribute("playerType", playerType.toString());
         out.writeAttribute("ai", Boolean.toString(ai));
         out.writeAttribute("tax", Integer.toString(tax));
-        int[] tensionArray = new int[tension.length];
-        for (int i = 0; i < tension.length; i++) {
-            tensionArray[i] = tension[i].getValue();
-        }
+
         if (getGame().isClientTrusted() || showAll || equals(player)) {
             out.writeAttribute("gold", Integer.toString(gold));
             out.writeAttribute("crosses", Integer.toString(crosses));
@@ -2310,8 +2286,17 @@ public class Player extends FreeColGameObject implements Features, Nameable {
         }
         // attributes end here
 
+        int[] tensionArray = new int[tension.length];
+        for (int i = 0; i < tension.length; i++) {
+            tensionArray[i] = tension[i].getValue();
+        }
         toArrayElement("tension", tensionArray, out);
-        toArrayElement("stance", stance, out);
+
+        String[] stanceArray = new String[stance.length];
+        for (int i = 0; i < stance.length; i++) {
+            stanceArray[i] = stance[i].toString();
+        }
+        toArrayElement("stance", stanceArray, out);
 
         for (TradeRoute route : getTradeRoutes()) {
             route.toXML(out, this);
@@ -2354,7 +2339,7 @@ public class Player extends FreeColGameObject implements Features, Nameable {
         ai = (new Boolean(in.getAttributeValue(null, "ai"))).booleanValue();
         dead = (new Boolean(in.getAttributeValue(null, "dead"))).booleanValue();
         tax = Integer.parseInt(in.getAttributeValue(null, "tax"));
-        rebellionState = Integer.parseInt(in.getAttributeValue(null, "rebellionState"));
+        playerType = Enum.valueOf(PlayerType.class, in.getAttributeValue(null, "playerType"));
         currentFather = FreeCol.getSpecification().getFoundingFather(in.getAttributeValue(null, "currentFather"));
         crossesRequired = Integer.parseInt(in.getAttributeValue(null, "crossesRequired"));
         final String contactedStr = in.getAttributeValue(null, "contacted");
@@ -2398,7 +2383,11 @@ public class Player extends FreeColGameObject implements Features, Nameable {
                     tension[i] = new Tension(tensionArray[i]);
                 }
             } else if (in.getLocalName().equals("stance")) {
-                stance = readFromArrayElement("stance", in, new int[0]);
+                String[] stanceStrings = readFromArrayElement("stance", in, new String[0]);
+                stance = new Stance[stanceStrings.length];
+                for (int index = 0; index < stanceStrings.length; index++) {
+                    stance[index] = Enum.valueOf(Stance.class, stanceStrings[index]);
+                }
             } else if (in.getLocalName().equals(Europe.getXMLElementTagName())) {
                 europe = (Europe) getGame().getFreeColGameObject(in.getAttributeValue(null, "ID"));
                 if (europe != null) {

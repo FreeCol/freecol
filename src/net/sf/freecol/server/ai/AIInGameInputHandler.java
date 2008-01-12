@@ -41,6 +41,7 @@ import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.GoodsTradeItem;
 import net.sf.freecol.common.model.Monarch;
 import net.sf.freecol.common.model.Player;
+import net.sf.freecol.common.model.Player.Stance;
 import net.sf.freecol.common.model.StanceTradeItem;
 import net.sf.freecol.common.model.TradeItem;
 import net.sf.freecol.common.model.Unit;
@@ -320,7 +321,7 @@ public final class AIInGameInputHandler implements MessageHandler, StreamedMessa
         NodeList childElements = element.getChildNodes();
         Element childElement = (Element) childElements.item(0);
         DiplomaticTrade agreement = new DiplomaticTrade(freeColServer.getGame(), childElement);
-        int stance = Integer.MIN_VALUE;
+        Stance stance = null;
         int value = 0;
         Iterator<TradeItem> itemIterator = agreement.iterator();
         while (itemIterator.hasNext()) {
@@ -361,7 +362,7 @@ public final class AIInGameInputHandler implements MessageHandler, StreamedMessa
         }
 
         boolean accept = false;
-        if (stance == Player.PEACE) {
+        if (stance == Stance.PEACE) {
             if (agreement.getSender().hasAbility("model.ability.alwaysOfferedPeace") &&
                 value >= 0) {
                 // TODO: introduce some kind of counter in order to avoid
@@ -370,7 +371,7 @@ public final class AIInGameInputHandler implements MessageHandler, StreamedMessa
             } else if (value >= 1000) {
                 accept = true;
             }
-        } else if (serverPlayer.getStance(agreement.getSender()) >= Player.PEACE) {
+        } else if (serverPlayer.getStance(agreement.getSender()).compareTo(Stance.PEACE) >= 0) {
             if (value > 100) {
                 accept = true;
             }

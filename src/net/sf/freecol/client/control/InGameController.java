@@ -73,6 +73,7 @@ import net.sf.freecol.common.model.Nameable;
 import net.sf.freecol.common.model.Ownable;
 import net.sf.freecol.common.model.PathNode;
 import net.sf.freecol.common.model.Player;
+import net.sf.freecol.common.model.Player.Stance;
 import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.TileImprovement;
@@ -1615,20 +1616,20 @@ public final class InGameController implements NetworkConstants {
                 enemy = defender.getOwner();
             }
             switch (attacker.getOwner().getStance(enemy)) {
-            case Player.CEASE_FIRE:
+            case CEASE_FIRE:
                 return freeColClient.getCanvas().showConfirmDialog("model.diplomacy.attack.ceaseFire",
                         "model.diplomacy.attack.confirm", "cancel",
                         new String[][] { { "%replace%", enemy.getNationAsString() } });
-            case Player.PEACE:
+            case PEACE:
                 return freeColClient.getCanvas().showConfirmDialog("model.diplomacy.attack.peace",
                         "model.diplomacy.attack.confirm", "cancel",
                         new String[][] { { "%replace%", enemy.getNationAsString() } });
-            case Player.ALLIANCE:
+            case ALLIANCE:
                 freeColClient.playSound(SfxLibrary.ILLEGAL_MOVE);
                 freeColClient.getCanvas().showInformationMessage("model.diplomacy.attack.alliance",
                         new String[][] { { "%replace%", enemy.getNationAsString() } });
                 return false;
-            case Player.WAR:
+            case WAR:
                 logger.finest("Player at war, no confirmation needed");
                 return true;
             default:
@@ -2427,7 +2428,7 @@ public final class InGameController implements NetworkConstants {
             if (tile != null && tile.getOwningSettlement() != null) { // check stance with settlement's owner
                 Player myPlayer = unit.getOwner();
                 Player enemy = tile.getOwningSettlement().getOwner();
-                if (myPlayer != enemy && myPlayer.getStance(enemy) != Player.ALLIANCE
+                if (myPlayer != enemy && myPlayer.getStance(enemy) != Stance.ALLIANCE
                     && !confirmHostileAction(unit, tile.getOwningSettlement().getTile())) { // player has aborted
                     return;
                 }
@@ -2853,8 +2854,8 @@ public final class InGameController implements NetworkConstants {
                     // war with the chosen european player, but is this really
                     // necessary at the client
                     // side?
-                    settlement.getOwner().setStance((Player) response.get(1), Player.WAR);
-                    ((Player) response.get(1)).setStance(settlement.getOwner(), Player.WAR);
+                    settlement.getOwner().setStance((Player) response.get(1), Stance.WAR);
+                    ((Player) response.get(1)).setStance(settlement.getOwner(), Stance.WAR);
                 }
 
                 client.sendAndWait(inciteMessage);

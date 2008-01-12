@@ -37,6 +37,7 @@ import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.Map.Position;
+import net.sf.freecol.common.model.Player.Stance;
 import net.sf.freecol.common.model.TradeRoute.Stop;
 import net.sf.freecol.common.util.EmptyIterator;
 import net.sf.freecol.common.util.Utils;
@@ -1193,7 +1194,7 @@ public class Unit extends FreeColGameObject implements Features, Locatable, Loca
     public boolean canTradeWith(Settlement settlement) {
         return (hasAbility("model.ability.carryGoods") &&
                 goodsContainer.getGoodsCount() > 0 &&
-                getOwner().getStance(settlement.getOwner()) != Player.WAR &&
+                getOwner().getStance(settlement.getOwner()) != Stance.WAR &&
                 ((settlement instanceof IndianSettlement) ||
                  getOwner().hasAbility("model.ability.tradeWithForeignColonies")));
     }
@@ -3428,14 +3429,14 @@ public class Unit extends FreeColGameObject implements Features, Locatable, Loca
             throw new NullPointerException("No defender specified!");
         }
         Player enemy = defender.getOwner();
-        if (getOwner().getStance(enemy) == Player.ALLIANCE) {
+        if (getOwner().getStance(enemy) == Stance.ALLIANCE) {
             throw new IllegalStateException("Cannot attack allied players.");
         }
 
         // make sure we are at war, unless one of both units is a privateer
         //getOwner().isEuropean() && enemy.isEuropean() &&
         if (!hasAbility("model.ability.piracy") && !defender.hasAbility("model.ability.piracy")) {
-            getOwner().setStance(enemy, Player.WAR);
+            getOwner().setStance(enemy, Stance.WAR);
         } else if (hasAbility("model.ability.piracy")) {
             enemy.setAttackedByPrivateers();
         }

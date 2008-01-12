@@ -51,6 +51,7 @@ import net.sf.freecol.common.model.GoldTradeItem;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.GoodsTradeItem;
 import net.sf.freecol.common.model.Player;
+import net.sf.freecol.common.model.Player.Stance;
 import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.StanceTradeItem;
 import net.sf.freecol.common.model.TradeItem;
@@ -133,9 +134,9 @@ public final class NegotiationDialog extends FreeColDialog implements ActionList
             this.otherPlayer = sender;
         }
 
-        if (player.getStance(otherPlayer) == Player.WAR) {
+        if (player.getStance(otherPlayer) == Stance.WAR) {
             if (!hasPeaceOffer()) {
-                int stance = Player.PEACE;
+                Stance stance = Stance.PEACE;
                 this.agreement.add(new StanceTradeItem(freeColClient.getGame(), player, otherPlayer, stance));
             }
         }
@@ -372,7 +373,7 @@ public final class NegotiationDialog extends FreeColDialog implements ActionList
 
 
     private boolean hasPeaceOffer() {
-        return (getStance() > Integer.MIN_VALUE);
+        return (getStance() != null);
     }
 
 
@@ -429,9 +430,9 @@ public final class NegotiationDialog extends FreeColDialog implements ActionList
     /**
      * Sets the <code>stance</code> between the players.
      *
-     * @param stance an <code>int</code> value
+     * @param stance a <code>Stance</code> value
      */
-    public void setStance(int stance) {
+    public void setStance(Stance stance) {
         agreement.add(new StanceTradeItem(freeColClient.getGame(), otherPlayer, player, stance));
     }
 
@@ -440,9 +441,9 @@ public final class NegotiationDialog extends FreeColDialog implements ActionList
      * Returns the stance being offered, or Integer.MIN_VALUE if none
      * is being offered.
      *
-     * @return an <code>int</code> value
+     * @return a <code>Stance</code> value
      */
-    public int getStance() {
+    public Stance getStance() {
         return agreement.getStance();
     }
 
@@ -619,8 +620,8 @@ public final class NegotiationDialog extends FreeColDialog implements ActionList
     public class StanceTradeItemPanel extends JPanel implements ActionListener {
 
         class StanceItem {
-            private int value;
-            StanceItem(int value) {
+            private Stance value;
+            StanceItem(Stance value) {
                 this.value = value;
             }
             
@@ -628,7 +629,7 @@ public final class NegotiationDialog extends FreeColDialog implements ActionList
                 return Player.getStanceAsString(value);
             }
             
-            int getValue() {
+            Stance getValue() {
                 return value;
             }
             
@@ -636,7 +637,7 @@ public final class NegotiationDialog extends FreeColDialog implements ActionList
                 if (other == null || !(other instanceof StanceItem)) {
                     return false;
                 }
-                return value == ((StanceItem) other).value;
+                return value.equals(((StanceItem) other).value);
             }
         }
         
@@ -657,11 +658,11 @@ public final class NegotiationDialog extends FreeColDialog implements ActionList
             addButton.setActionCommand("add");
             stanceBox = new JComboBox();
             
-            int stance = source.getStance(target);
-            if (stance != Player.WAR) stanceBox.addItem(new StanceItem(Player.WAR));
-            if (stance == Player.WAR) stanceBox.addItem(new StanceItem(Player.CEASE_FIRE));
-            if (stance != Player.PEACE) stanceBox.addItem(new StanceItem(Player.PEACE));
-            if (stance != Player.ALLIANCE) stanceBox.addItem(new StanceItem(Player.ALLIANCE));
+            Stance stance = source.getStance(target);
+            if (stance != Stance.WAR) stanceBox.addItem(new StanceItem(Stance.WAR));
+            if (stance == Stance.WAR) stanceBox.addItem(new StanceItem(Stance.CEASE_FIRE));
+            if (stance != Stance.PEACE) stanceBox.addItem(new StanceItem(Stance.PEACE));
+            if (stance != Stance.ALLIANCE) stanceBox.addItem(new StanceItem(Stance.ALLIANCE));
             if (parent.hasPeaceOffer()) {
                 stanceBox.setSelectedItem(new StanceItem(parent.getStance()));
             }

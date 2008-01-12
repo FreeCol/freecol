@@ -32,6 +32,7 @@ import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.Player;
+import net.sf.freecol.common.model.Player.Stance;
 
 import org.w3c.dom.Element;
 
@@ -42,8 +43,6 @@ import cz.autel.dmi.HIGLayout;
  * This panel displays the Foreign Affairs Report.
  */
 public final class ReportForeignAffairPanel extends ReportPanel implements ActionListener {
-
-
 
 
     /**
@@ -88,7 +87,7 @@ public final class ReportForeignAffairPanel extends ReportPanel implements Actio
             enemyPanel.add(new JLabel(enemy.getNationAsString()), higConst.rc(row, labelColumn));
             row += 2;
             enemyPanel.add(new JLabel(Messages.message("report.stance")), higConst.rc(row, labelColumn));
-            int stance = Integer.parseInt(enemyElement.getAttribute("stance"));
+            Stance stance = Enum.valueOf(Stance.class, enemyElement.getAttribute("stance"));
             enemyPanel.add(new JLabel(Player.getStanceAsString(stance)),
                            higConst.rc(row, valueColumn, "r"));
             row++;

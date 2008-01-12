@@ -38,6 +38,8 @@ import net.sf.freecol.common.model.Map;
 import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.Monarch;
 import net.sf.freecol.common.model.Player;
+import net.sf.freecol.common.model.Player.PlayerType;
+import net.sf.freecol.common.model.Player.Stance;
 import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
@@ -288,7 +290,7 @@ public final class InGameController extends Controller {
             Iterator<Player> playerIterator = getGame().getPlayerIterator();
             while (playerIterator.hasNext()) {
                 Player p = playerIterator.next();
-                if (!p.isAI() && p.getRebellionState() == Player.REBELLION_POST_WAR) {
+                if (!p.isAI() && p.getPlayerType() == PlayerType.INDEPENDENT) {
                     return p;
                 }
             }
@@ -471,7 +473,7 @@ public final class InGameController extends Controller {
                             logger.warning("Declared war on nobody.");
                             return;
                         }
-                        nextPlayer.setStance(enemy, Player.WAR);
+                        nextPlayer.setStance(enemy, Stance.WAR);
                         monarchActionElement.setAttribute("enemy", enemy.getId());
                         try {
                             nextPlayer.getConnection().send(monarchActionElement);
@@ -579,7 +581,7 @@ public final class InGameController extends Controller {
                             Unit unit = unitIterator.next();
                             Player player = unit.getOwner();
                             if (player != currentPlayer
-                                    && (currentPlayer.getStance(player) == Player.WAR ||
+                                    && (currentPlayer.getStance(player) == Stance.WAR ||
                                         unit.hasAbility("model.ability.piracy"))) {
                                 logger.finest("Found enemy unit " + unit.getOwner().getNationAsString() + " "
                                         + unit.getName());
