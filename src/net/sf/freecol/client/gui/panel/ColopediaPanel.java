@@ -56,6 +56,7 @@ import net.sf.freecol.common.model.FoundingFather;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.Modifier;
+import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.ResourceType;
 import net.sf.freecol.common.model.TileType;
 import net.sf.freecol.common.model.Unit;
@@ -572,7 +573,9 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
         detailPanel.removeAll();
         detailPanel.repaint();
 
-        Europe europe = parent.getClient().getMyPlayer().getEurope();
+        Player player = parent.getClient().getMyPlayer();
+        // player can be null when using the map editor
+        Europe europe = (player==null) ? null : player.getEurope();
         UnitType type = FreeCol.getSpecification().getUnitType(unit);
         String price = "";
         if (europe != null && europe.getUnitPrice(type) > 0) {
