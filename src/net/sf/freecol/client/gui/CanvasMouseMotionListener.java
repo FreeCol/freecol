@@ -133,9 +133,12 @@ public final class CanvasMouseMotionListener implements MouseMotionListener {
         }
 
         if (scrollThread != null) {
+            // continue scrolling in a (perhaps new) direction
             scrollThread.setDirection(direction);
         } else {
+            // start scrolling in a direction
             scrollThread = new ScrollThread(map, gui);
+            scrollThread.setDirection(direction);
             scrollThread.start();
         }
     }
