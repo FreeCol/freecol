@@ -3447,7 +3447,10 @@ public class Unit extends FreeColGameObject implements Features, Locatable, Loca
         // Before, a unit could stay fortified during execution of an
         // attack. - sjm
         state = UnitState.ACTIVE;
-        if (hasAbility("model.ability.multipleAttacks")) {
+        
+        // The Revenger unit can attack multiple times
+        // Other units can only attack once
+        if (!hasAbility("model.ability.multipleAttacks")) {
             movesLeft = 0;
         }
 
