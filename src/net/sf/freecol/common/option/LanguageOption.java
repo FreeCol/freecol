@@ -177,7 +177,7 @@ public class LanguageOption extends AbstractOption {
      * @return The Locale.
      */
     public static Locale getLocale(String languageID) {
-        if (languageID.equals(AUTO)) {
+        if (languageID == null || AUTO.equals(languageID)) {
             return Locale.getDefault();
         }
          

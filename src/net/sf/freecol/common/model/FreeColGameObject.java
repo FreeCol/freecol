@@ -17,7 +17,6 @@
  *  along with FreeCol.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
 package net.sf.freecol.common.model;
 
 import java.lang.reflect.Method;
@@ -338,7 +337,7 @@ abstract public class FreeColGameObject extends FreeColObject {
     *
     * @param newID the unique ID of this object,
     */
-    public void setId(String newID) {
+    public final void setId(String newID) {
         if (game != null && !(this instanceof Game)) {
             if (!newID.equals(getId())) {
                 if (getId() != null) {

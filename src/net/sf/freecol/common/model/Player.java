@@ -38,7 +38,6 @@ import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.Map.Position;
 import net.sf.freecol.common.model.Unit.UnitState;
-import net.sf.freecol.common.util.EmptyIterator;
 
 import org.w3c.dom.Element;
 
@@ -160,7 +159,7 @@ public class Player extends FreeColGameObject implements Features, Nameable {
     private boolean dead = false;
 
     // any founding fathers in this Player's congress
-    private List<FoundingFather> allFathers = new ArrayList<FoundingFather>();
+    final private List<FoundingFather> allFathers = new ArrayList<FoundingFather>();
 
     private FoundingFather currentFather;
 
@@ -185,20 +184,20 @@ public class Player extends FreeColGameObject implements Features, Nameable {
     /**
      * The Units this player owns.
      */
-    private java.util.Map<String, Unit> units = new HashMap<String, Unit>();
+    private final java.util.Map<String, Unit> units = new HashMap<String, Unit>();
 
-    private Iterator<Unit> nextActiveUnitIterator = new UnitIterator(this, new ActivePredicate());
+    private final Iterator<Unit> nextActiveUnitIterator = new UnitIterator(this, new ActivePredicate());
 
-    private Iterator<Unit> nextGoingToUnitIterator = new UnitIterator(this, new GoingToPredicate());
+    private final Iterator<Unit> nextGoingToUnitIterator = new UnitIterator(this, new GoingToPredicate());
 
     // Settlements this player owns
-    private List<Settlement> settlements = new ArrayList<Settlement>();
+    final private List<Settlement> settlements = new ArrayList<Settlement>();
 
     // Trade routes of this player
     private List<TradeRoute> tradeRoutes = new ArrayList<TradeRoute>();
 
     // Model messages for this player
-    private List<ModelMessage> modelMessages = new ArrayList<ModelMessage>();
+    private final List<ModelMessage> modelMessages = new ArrayList<ModelMessage>();
 
     // Temporary variables:
     protected boolean[][] canSeeTiles = null;
@@ -206,7 +205,7 @@ public class Player extends FreeColGameObject implements Features, Nameable {
     /**
      * Contains the abilities and modifiers of this type.
      */
-    private FeatureContainer featureContainer = new FeatureContainer();
+    private final FeatureContainer featureContainer = new FeatureContainer();
 
     /**
      * 
@@ -214,6 +213,7 @@ public class Player extends FreeColGameObject implements Features, Nameable {
      * 
      */
     protected Player() {
+        // empty constructor
     }
 
     /**
@@ -959,7 +959,7 @@ public class Player extends FreeColGameObject implements Features, Nameable {
                 Iterator<Unit> unitIterator = getUnitIterator();
                 while (unitIterator.hasNext()) {
                     Unit unit = unitIterator.next();
-                    if (unit.getLocation() == null || !(unit.getLocation() instanceof Tile)) {
+                    if (!(unit.getLocation() instanceof Tile)) {
                         continue;
                     }
                     Map.Position position = unit.getTile().getPosition();
@@ -1694,10 +1694,10 @@ public class Player extends FreeColGameObject implements Features, Nameable {
             return;
         }
         Modifier modifier = nationType.getModifier("model.modifier.religiousUnrestBonus");
-        if (modifier != null) {
-            crossesRequired += modifier.applyTo(CROSSES_INCREMENT);
-        } else {
+        if (modifier == null) {
             crossesRequired += CROSSES_INCREMENT;
+        } else {
+            crossesRequired += modifier.applyTo(CROSSES_INCREMENT);
         }
 
         // The book I have tells me the crosses needed is:
@@ -1852,10 +1852,10 @@ public class Player extends FreeColGameObject implements Features, Nameable {
                 Iterator<Unit> ui = ct.getUnitIterator();
                 while (ui.hasNext()) {
                     Unit u = ui.next();
-                    if (u.getOwner() != this && u.isOffensiveUnit() && u.getOwner().isEuropean()) {
-                        if (getStance(u.getOwner()) == Stance.WAR) {
-                            value -= Math.max(0, 40 - tile.getDistanceTo(tile) * 9);
-                        }
+                    if (u.getOwner() != this && u.isOffensiveUnit() && 
+                        u.getOwner().isEuropean() &&
+                        getStance(u.getOwner()) == Stance.WAR) {
+                        value -= Math.max(0, 40 - tile.getDistanceTo(tile) * 9);
                     }
                 }
             }
@@ -2056,7 +2056,7 @@ public class Player extends FreeColGameObject implements Features, Nameable {
                     // TODO: make use of armed, mounted, etc.
                     for (int index = 0; index < units.size(); index++) {
                         AbstractUnit unit = units.get(index);
-                        String uniqueID = getId() + "newTurn" + currentFather.getId() + String.valueOf(index);
+                        String uniqueID = getId() + "newTurn" + currentFather.getId() + index;
                         getGame().getModelController().createUnit(uniqueID, getEurope(), this, unit.getUnitType());
                     }
                 }
@@ -2175,8 +2175,7 @@ public class Player extends FreeColGameObject implements Features, Nameable {
         score = 0;
         for (Unit unit : getUnits()) {
             score += unit.getType().getScoreValue();
-            if (unit.getLocation() != null &&
-                unit.getLocation() instanceof WorkLocation) {
+            if (unit.getLocation() instanceof WorkLocation) {
                 score += unit.getType().getScoreValue();
             }
         }
@@ -2329,15 +2328,15 @@ public class Player extends FreeColGameObject implements Features, Nameable {
         nationID = in.getAttributeValue(null, "nationID");
         nationType = FreeCol.getSpecification().getNationType(in.getAttributeValue(null, "nationType"));
         color = new Color(Integer.parseInt(in.getAttributeValue(null, "color")));
-        admin = (new Boolean(in.getAttributeValue(null, "admin"))).booleanValue();
+        admin = getAttribute(in, "admin", false);
         gold = Integer.parseInt(in.getAttributeValue(null, "gold"));
         crosses = Integer.parseInt(in.getAttributeValue(null, "crosses"));
         bells = Integer.parseInt(in.getAttributeValue(null, "bells"));
         oldSoL = getAttribute(in, "oldSoL", 0);
         score = getAttribute(in, "score", 0);
-        ready = (new Boolean(in.getAttributeValue(null, "ready"))).booleanValue();
-        ai = (new Boolean(in.getAttributeValue(null, "ai"))).booleanValue();
-        dead = (new Boolean(in.getAttributeValue(null, "dead"))).booleanValue();
+        ready = getAttribute(in, "ready", false);
+        ai = getAttribute(in, "ai", false);
+        dead = getAttribute(in, "dead", false);
         tax = Integer.parseInt(in.getAttributeValue(null, "tax"));
         playerType = Enum.valueOf(PlayerType.class, in.getAttributeValue(null, "playerType"));
         currentFather = FreeCol.getSpecification().getFoundingFather(in.getAttributeValue(null, "currentFather"));
@@ -2390,17 +2389,17 @@ public class Player extends FreeColGameObject implements Features, Nameable {
                 }
             } else if (in.getLocalName().equals(Europe.getXMLElementTagName())) {
                 europe = (Europe) getGame().getFreeColGameObject(in.getAttributeValue(null, "ID"));
-                if (europe != null) {
-                    europe.readFromXML(in);
-                } else {
+                if (europe == null) {
                     europe = new Europe(getGame(), in);
+                } else {
+                    europe.readFromXML(in);
                 }
             } else if (in.getLocalName().equals(Monarch.getXMLElementTagName())) {
                 monarch = (Monarch) getGame().getFreeColGameObject(in.getAttributeValue(null, "ID"));
-                if (monarch != null) {
-                    monarch.readFromXML(in);
-                } else {
+                if (monarch == null) {
                     monarch = new Monarch(getGame(), in);
+                } else {
+                    monarch.readFromXML(in);
                 }
             } else if (in.getLocalName().equals(TradeRoute.getXMLElementTagName())) {
                 TradeRoute route = new TradeRoute(getGame(), in);
@@ -2408,10 +2407,10 @@ public class Player extends FreeColGameObject implements Features, Nameable {
             } else if (in.getLocalName().equals(Market.getXMLElementTagName())) {
                 market = (Market) getGame().getFreeColGameObject(in.getAttributeValue(null, "ID"));
                 // Get the market
-                if (market != null) {
-                    market.readFromXML(in);
-                } else {
+                if (market == null) {
                     market = new Market(getGame(), in);
+                } else {
+                    market.readFromXML(in);
                 }
             } else {
                 logger.warning("Unknown tag: " + in.getLocalName() + " loading player");
@@ -2815,10 +2814,10 @@ public class Player extends FreeColGameObject implements Features, Nameable {
      *         otherwise.
      */
     public boolean equals(Player o) {
-        if (o != null) {
-            return getId().equals(o.getId());
-        } else {
+        if (o == null) {
             return false;
+        } else {
+            return getId().equals(o.getId());
         }
     }
 
@@ -2861,6 +2860,7 @@ public class Player extends FreeColGameObject implements Features, Nameable {
      * An <code>Iterator</code> of {@link Unit}s that can be made active.
      */
     public class UnitIterator implements Iterator<Unit> {
+
         private Iterator<Unit> unitIterator = null;
 
         private Player owner;

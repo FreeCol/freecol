@@ -45,6 +45,7 @@ public abstract class Feature extends FreeColObject {
 
 
     public Feature() {
+        // empty constructor
     }
 
     /**
@@ -90,8 +91,8 @@ public abstract class Feature extends FreeColObject {
      * @param objectType a <code>FreeColGameObjectType</code> value
      * @return a <code>boolean</code> value
      */
-    public boolean appliesTo(FreeColGameObjectType objectType) {
-        if (scopes.size() == 0) {
+    public boolean appliesTo(final FreeColGameObjectType objectType) {
+        if (scopes.isEmpty()) {
             return true;
         }
         for (Scope scope : scopes) {
@@ -113,7 +114,7 @@ public abstract class Feature extends FreeColObject {
      * @throws XMLStreamException if there are any problems writing
      *      to the stream.
      */
-    public void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
+    public void toXMLImpl(final XMLStreamWriter out) throws XMLStreamException {
         out.writeAttribute("id", getId());
         if (getSource() != null) {
             out.writeAttribute("source", source);

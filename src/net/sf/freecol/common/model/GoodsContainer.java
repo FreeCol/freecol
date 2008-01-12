@@ -37,9 +37,9 @@ import org.w3c.dom.Element;
 * tasks easier.
 */
 public class GoodsContainer extends FreeColGameObject {
-    @SuppressWarnings("unused")
-    private static Logger logger = Logger.getLogger(Location.class.getName());
 
+    @SuppressWarnings("unused")
+    private static final Logger logger = Logger.getLogger(Location.class.getName());
 
     /** The list of Goods stored in this <code>GoodsContainer</code>. */
     private int[] storedGoods;
@@ -48,7 +48,7 @@ public class GoodsContainer extends FreeColGameObject {
     private int[] oldStoredGoods;
 
     /** The owner of this <code>GoodsContainer</code>. */
-    private Location parent;
+    private final Location parent;
 
     /**
      * Creates an empty <code>GoodsContainer</code>.
@@ -60,7 +60,7 @@ public class GoodsContainer extends FreeColGameObject {
         super(game);
 
         if (parent == null) {
-            throw new NullPointerException();
+            throw new IllegalStateException("Location of GoodsContainer must not be null!");
         }
 
         this.parent = parent;
@@ -84,7 +84,7 @@ public class GoodsContainer extends FreeColGameObject {
         super(game, in);
 
         if (parent == null) {
-            throw new NullPointerException();
+            throw new IllegalStateException("Location of GoodsContainer must not be null!");
         }
 
         this.parent = parent;
@@ -105,7 +105,7 @@ public class GoodsContainer extends FreeColGameObject {
         super(game, e);
 
         if (parent == null) {
-            throw new NullPointerException();
+            throw new IllegalStateException("Location of GoodsContainer must not be null!");
         }
 
         this.parent = parent;
@@ -174,10 +174,9 @@ public class GoodsContainer extends FreeColGameObject {
     public void removeAbove(int amount) {
         List<GoodsType> goodsTypeList = FreeCol.getSpecification().getGoodsTypeList();
         for (GoodsType g : goodsTypeList) {
-            if (g.isStorable() && !g.limitIgnored()) {
-                if (storedGoods[g.getIndex()] > amount) {
-                    storedGoods[g.getIndex()] = amount;
-                }
+            if (g.isStorable() && !g.limitIgnored() && 
+                storedGoods[g.getIndex()] > amount) {
+                storedGoods[g.getIndex()] = amount;
             }
         }
     }
@@ -206,10 +205,9 @@ public class GoodsContainer extends FreeColGameObject {
     public boolean hasReachedCapacity(int amount) {
         List<GoodsType> goodsTypeList = FreeCol.getSpecification().getGoodsTypeList();
         for (GoodsType g : goodsTypeList) {
-            if (g.isStorable() && !g.limitIgnored()) {
-                if (storedGoods[g.getIndex()] >= amount) {
-                    return true;
-                }
+            if (g.isStorable() && !g.limitIgnored() &&
+                storedGoods[g.getIndex()] >= amount) {
+                return true;
             }
         }
         return false;
@@ -275,7 +273,7 @@ public class GoodsContainer extends FreeColGameObject {
     * @return The <code>ArrayList</code>.
     * @see #getGoodsIterator
     */
-    public ArrayList<Goods> getGoods() {
+    public List<Goods> getGoods() {
         ArrayList<Goods> totalGoods = new ArrayList<Goods>();
 
         for (int i=0; i<storedGoods.length; i++) {
@@ -299,7 +297,7 @@ public class GoodsContainer extends FreeColGameObject {
     * @return The <code>Iterator</code>.
     * @see #getGoodsIterator
     */
-    public ArrayList<Goods> getCompactGoods() {
+    public List<Goods> getCompactGoods() {
         ArrayList<Goods> totalGoods = new ArrayList<Goods>();
 
         for (int i=0; i<storedGoods.length; i++) {
@@ -348,24 +346,10 @@ public class GoodsContainer extends FreeColGameObject {
 
 
     /**
-    * Removes all references to this object.
-    */
-    public void dispose() {
-        super.dispose();
-    }
-
-
-    /**
-    * Prepares this <code>GoodsContainer</code> for a new turn.
-    */
+     * Prepares this <code>GoodsContainer</code> for a new turn.
+     */
     public void saveState() {
-        if (oldStoredGoods == null) {
-            oldStoredGoods = new int[storedGoods.length];
-        }
-        for (int i = 0; i < storedGoods.length; i++) {
-            oldStoredGoods[i] = storedGoods[i];
-        }
-
+        System.arraycopy(storedGoods, 0, oldStoredGoods, 0, storedGoods.length);
     }
 
     /**
@@ -445,15 +429,14 @@ public class GoodsContainer extends FreeColGameObject {
      * @throws XMLStreamException if there are any problems writing
      *      to the stream.
      */
-    protected void toXMLImpl(XMLStreamWriter out, Player player, boolean showAll, boolean toSavedGame) throws XMLStreamException {
+    protected void toXMLImpl(XMLStreamWriter out, Player player, boolean showAll, boolean toSavedGame)
+        throws XMLStreamException {
         // Start element:
         out.writeStartElement(getXMLElementTagName());
 
         out.writeAttribute("ID", getId());
-
-        for (int i=0; i<storedGoods.length; i++) {
-            out.writeAttribute("goods" + Integer.toString(i), Integer.toString(storedGoods[i]));
-        }
+        toArrayElement("storedGoods", storedGoods, out);
+        toArrayElement("oldStoredGoods", storedGoods, out);
         out.writeEndElement();
     }
 
@@ -464,15 +447,8 @@ public class GoodsContainer extends FreeColGameObject {
     protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
         setId(in.getAttributeValue(null, "ID"));
         
-        storedGoods = new int[FreeCol.getSpecification().numberOfGoodsTypes()];
-
-        for (int i=0; i<storedGoods.length; i++) {
-            String goodsString = in.getAttributeValue(null, "goods" + Integer.toString(i));
-            if (goodsString != null) {
-                storedGoods[i] = Integer.parseInt(goodsString);
-            }
-        }
-
+        storedGoods = readFromArrayElement("storedGoods", in, new int[0]);
+        oldStoredGoods = readFromArrayElement("oldStoredGoods", in, new int[0]);
         in.nextTag();
     }
 
@@ -491,7 +467,7 @@ public class GoodsContainer extends FreeColGameObject {
     * <code>GoodsContainer</code>.    
     */
     public String toString() {
-        StringBuffer sb = new StringBuffer();
+        StringBuffer sb = new StringBuffer(200);
         sb.append("GoodsContainer with: ");
         List<GoodsType> goodsTypeList = FreeCol.getSpecification().getGoodsTypeList();
         for (GoodsType g : goodsTypeList) {

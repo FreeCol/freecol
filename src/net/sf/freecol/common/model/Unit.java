@@ -4510,7 +4510,7 @@ public class Unit extends FreeColGameObject implements Features, Locatable, Loca
     private void pillageColony(Colony colony) {
         ArrayList<Building> buildingList = new ArrayList<Building>();
         ArrayList<Unit> shipList = new ArrayList<Unit>();
-        ArrayList<Goods> goodsList = colony.getGoodsContainer().getCompactGoods();
+        List<Goods> goodsList = colony.getGoodsContainer().getCompactGoods();
         
         for (Building building : colony.getBuildings()) {
             if (building.canBeDamaged()) {
