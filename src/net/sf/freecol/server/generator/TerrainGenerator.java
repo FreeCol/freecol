@@ -486,7 +486,7 @@ public class TerrainGenerator {
                     continue;
                 }
                 boolean isMountainRangeCloseBy = false;
-                Iterator<Position> it = map.getCircleIterator(p, false, 3);
+                Iterator<Position> it = map.getCircleIterator(p, true, 3);
                 while (it.hasNext()) {
                     Tile neighborTile = map.getTile(it.next());
                     if (neighborTile.isLand() && neighborTile.getType() == mountains) {
@@ -499,7 +499,7 @@ public class TerrainGenerator {
                     continue;
                 }
                 boolean isWaterCloseBy = false;
-                it = map.getCircleIterator(p, false, 2);
+                it = map.getCircleIterator(p, true, 2);
                 while (it.hasNext()) {
                     Tile neighborTile = map.getTile(it.next());
                     if (!neighborTile.isLand()) {
@@ -557,7 +557,7 @@ public class TerrainGenerator {
                     continue;
                 }
                 boolean isMountainRangeCloseBy = false;
-                Iterator<Position> it = map.getCircleIterator(p, false, 3);
+                Iterator<Position> it = map.getCircleIterator(p, true, 3);
                 while (it.hasNext()) {
                     Tile neighborTile = map.getTile(it.next());
                     if (neighborTile.isLand() && neighborTile.getType() == mountains) {
@@ -571,7 +571,7 @@ public class TerrainGenerator {
                     continue;
                 }
                 boolean isWaterCloseBy = false;
-                it = map.getCircleIterator(p, false, 1);
+                it = map.getCircleIterator(p, true, 1);
                 while (it.hasNext()) {
                     Tile neighborTile = map.getTile(it.next());
                     if (!neighborTile.isLand()) {
