@@ -541,7 +541,7 @@ public class TerrainGenerator {
         }
         logger.info("Added " + counter + " mountain range tiles.");
         
-        // and sprinkle a few random hills here and there
+        // and sprinkle a few random hills/mountains here and there
         number = (int)(getMapGeneratorOptions().getNumberOfMountainTiles()*randomHillsRatio);
         counter = 0;
         for (int tries = 0; tries < 1000; tries++) {
@@ -584,7 +584,14 @@ public class TerrainGenerator {
                     // this helps with good locations for building colonies on shore
                     continue;
                 }
-                t.setType(hills);
+                int k = random.nextInt(4);
+                if (k == 0) {
+                    // 25% chance of mountain
+                    t.setType(mountains);
+                } else {
+                    // 75% chance of hill
+                    t.setType(hills);
+                }
                 counter++;
             }
         }
