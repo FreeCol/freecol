@@ -364,7 +364,7 @@ public class Goods extends AbstractGoods implements Locatable, Ownable, Named {
         // Start element:
         out.writeStartElement(getXMLElementTagName());
 
-        out.writeAttribute("type", getId());
+        out.writeAttribute("type", getType().getId());
         out.writeAttribute("amount", Integer.toString(getAmount()));
 
         if (location != null) {
