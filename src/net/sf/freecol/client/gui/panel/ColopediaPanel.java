@@ -575,7 +575,7 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
         Europe europe = parent.getClient().getMyPlayer().getEurope();
         UnitType type = FreeCol.getSpecification().getUnitType(unit);
         String price = "";
-        if (europe != null) {
+        if (europe != null && europe.getUnitPrice(type) > 0) {
             price = String.valueOf(europe.getUnitPrice(type));
         } else if (type.getPrice() > 0) {
             price = String.valueOf(type.getPrice());
