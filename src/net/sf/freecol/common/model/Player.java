@@ -2816,6 +2816,11 @@ public class Player extends FreeColGameObject implements Features, Nameable {
     public boolean equals(Player o) {
         if (o == null) {
             return false;
+        } else if (getId()==null || o.getId()==null) {
+            // This only happens in the client code with the virtual "enemy privateer" player
+            // This special player is not properly associated to the Game and therefore has no ID
+            // TODO: remove this hack when the virtual "enemy privateer" player is better implemented
+            return false;
         } else {
             return getId().equals(o.getId());
         }
