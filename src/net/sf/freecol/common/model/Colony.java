@@ -1341,6 +1341,10 @@ public final class Colony extends Settlement implements Features, Location, Name
     private void createWarehouseCapacityWarning() {
         List<Goods> storedGoods = getGoodsContainer().getFullGoods();
         for (Goods goods : storedGoods) {
+            if (!goods.getType().isStorable()) {
+                // no need to do anything about bells or crosses
+                continue;
+            }
             if (getExportData(goods.getType()).isExported() &&
                 owner.canTrade(goods, Market.CUSTOM_HOUSE)) {
                 // capacity will never be exceeded
