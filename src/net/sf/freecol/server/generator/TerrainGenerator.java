@@ -619,6 +619,20 @@ public class TerrainGenerator {
                     // please no rivers in polar regions
                     continue;
                 }
+                // check the river source/spring is not too close to the ocean
+                boolean isWaterCloseBy = false;
+                Iterator<Position> it = map.getCircleIterator(position, true, 2);
+                while (it.hasNext()) {
+                    Tile neighborTile = map.getTile(it.next());
+                    if (!neighborTile.isLand()) {
+                        isWaterCloseBy = true;
+                        break;
+                    }
+                }
+                if (isWaterCloseBy) {
+                    // do not start a new river too close to the ocean
+                    continue;
+                }
                 if (riverMap.get(position) == null) {
                     // no river here yet
                     if (river.flowFromSource(position)) {
