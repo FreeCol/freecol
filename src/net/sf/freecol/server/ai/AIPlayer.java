@@ -353,7 +353,8 @@ public class AIPlayer extends AIObject {
                         logger.warning("Could not train expert miner in order to create dragoon!");
                     }
                 }
-                if (unit != null) {
+                if (unit != null && unit.isColonist()) {
+                    // no need to equip artillery units with muskets or horses
                     player.modifyGold(player.getMarket().getBidPrice(Goods.MUSKETS, 50));
                     player.modifyGold(player.getMarket().getBidPrice(Goods.HORSES, 50));
                     
@@ -362,12 +363,12 @@ public class AIPlayer extends AIObject {
                     sendAndWaitSafely(clearSpecialityElement);
                     Element equipMusketsElement = Message.createNewRootElement("equipUnit");
                     equipMusketsElement.setAttribute("unit", unit.getId());
-                    equipMusketsElement.setAttribute("type", Integer.toString((Goods.MUSKETS).getIndex()));
+                    equipMusketsElement.setAttribute("type", "model.equipment.muskets");
                     equipMusketsElement.setAttribute("amount", Integer.toString(50));
                     sendAndWaitSafely(equipMusketsElement);
                     Element equipHorsesElement = Message.createNewRootElement("equipUnit");
                     equipHorsesElement.setAttribute("unit", unit.getId());
-                    equipHorsesElement.setAttribute("type", Integer.toString((Goods.HORSES).getIndex()));
+                    equipHorsesElement.setAttribute("type", "model.equipment.horses");
                     equipHorsesElement.setAttribute("amount", Integer.toString(50));
                     sendAndWaitSafely(equipHorsesElement);
                 }

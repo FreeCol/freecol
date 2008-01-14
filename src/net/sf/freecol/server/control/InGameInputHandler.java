@@ -2092,7 +2092,8 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
     private Element equipUnit(Connection connection, Element workElement) {
         ServerPlayer player = getFreeColServer().getPlayer(connection);
         Unit unit = (Unit) getGame().getFreeColGameObject(workElement.getAttribute("unit"));
-        EquipmentType type = FreeCol.getSpecification().getEquipmentType(workElement.getAttribute("type"));
+        String typeString = workElement.getAttribute("type");
+        EquipmentType type = FreeCol.getSpecification().getEquipmentType(typeString);
         int amount = Integer.parseInt(workElement.getAttribute("amount"));
         if (unit.getOwner() != player) {
             throw new IllegalStateException("Not your unit!");
