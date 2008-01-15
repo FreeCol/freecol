@@ -292,25 +292,33 @@ public class Player extends FreeColGameObject implements Features, Nameable {
             this.nationID = newNation.getId();
             if (nationType.isEuropean()) {
                 /*
-                 * 
                  * Setting the amount of gold to
                  * "getGameOptions().getInteger(GameOptions.STARTING_MONEY)"
                  * 
                  * just before starting the game. See
                  * "net.sf.freecol.server.control.PreGameController".
-                 * 
                  */
                 gold = 0;
                 europe = new Europe(game, this);
                 if (!nationType.isREF()) {
+                    // colonial nation
                     monarch = new Monarch(game, this, "");
+                    playerType = PlayerType.COLONIAL;
+                } else {
+                    // Royal expeditionnary force
+                    playerType = PlayerType.ROYAL;
                 }
             } else {
+                // indians
                 gold = 1500;
+                playerType = PlayerType.NATIVE;
             }      
         } else {
+            // virtual "enemy privateer" player
+            // or undead ?
             this.nationID = "";
             this.color = noNationColor;
+            this.playerType = PlayerType.COLONIAL;
         }
         for (int k = 0; k < tension.length; k++) {
             tension[k] = new Tension(0);
@@ -322,7 +330,6 @@ public class Player extends FreeColGameObject implements Features, Nameable {
         crosses = 0;
         bells = 0;
         currentFather = null;
-        playerType = PlayerType.COLONIAL;
     }
 
     /**
