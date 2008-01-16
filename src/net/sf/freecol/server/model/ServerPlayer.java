@@ -312,6 +312,6 @@ public class ServerPlayer extends Player implements ServerModelObject {
     
     @Override
     public String toString() {
-        return "ServerPlayer[id=" + serverID + ",conn=" + connection + "]";
+        return "ServerPlayer[name="+getName()+",id=" + serverID + ",conn=" + connection + "]";
     }
 }
