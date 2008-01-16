@@ -38,6 +38,7 @@ import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.freecol.FreeCol;
+import net.sf.freecol.common.model.AbstractUnit;
 import net.sf.freecol.common.model.Building;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.ColonyTile;
@@ -257,8 +258,8 @@ public class AIPlayer extends AIObject {
     private boolean hasManOfWar() {
         Iterator<Unit> it = player.getUnitIterator();
         while (it.hasNext()) {
-            Unit u = it.next();
-            if (u.getIndex() == Unit.MAN_O_WAR) {
+            Unit unit = it.next();
+            if ("model.unit.manOWar".equals(unit.getType().getId())) {
                 return true;
             }
         }
@@ -272,10 +273,8 @@ public class AIPlayer extends AIObject {
      */
     private int getNumberOfKingUnits() {
         int n = 0;
-        Iterator<Unit> it = player.getUnitIterator();
-        while (it.hasNext()) {
-            Unit u = it.next();
-            if (u.getIndex() == Unit.KINGS_REGULAR) {
+        for (Unit unit : player.getUnits()) {
+            if (unit.hasAbility("model.ability.refUnit")) {
                 n++;
             }
         }
@@ -487,45 +486,27 @@ public class AIPlayer extends AIObject {
         logger.finest("Entering method moveREFToDocks");
         Iterator<Player> it = getGame().getPlayerIterator();
         while (it.hasNext()) {
-            Player p = it.next();
-            if (p.getREFPlayer() == getPlayer() && p.getPlayerType() == PlayerType.REBEL) {
-                Monarch m = p.getMonarch();
-                if (m == null) {
-                    continue;
-                }
-                int[] ref = m.getREF();
-                int totalNumber = 0;
-                for (int i = 0; i < ref.length; i++) {
-                    totalNumber += ref[i];
-                }
-                while (totalNumber > 0) {
-                    int i = getRandom().nextInt(ref.length);
-                    if (ref[i] <= 0) {
-                        continue;
-                    }
-                    int unitType;
-                    EquipmentType[] equipment = new EquipmentType[0];
-                    if (i == Monarch.INFANTRY) {
-                        unitType = Unit.KINGS_REGULAR;
+            Player player = it.next();
+            if (player.getREFPlayer() == getPlayer() && 
+                player.getPlayerType() == PlayerType.REBEL &&
+                player.getMonarch() != null) {
+                for (AbstractUnit unit : player.getMonarch().getREF()) {
+                    EquipmentType[] equipment = UnitType.NO_EQUIPMENT;
+                    switch(unit.getRole()) {
+                    case SOLDIER:
                         equipment = new EquipmentType[] { muskets };
-                    } else if (i == Monarch.DRAGOON) {
-                        unitType = Unit.KINGS_REGULAR;
+                        break;
+                    case DRAGOON:
                         equipment = new EquipmentType[] { horses, muskets };
-                    } else if (i == Monarch.ARTILLERY) {
-                        unitType = Unit.ARTILLERY;
-                    } else if (i == Monarch.MAN_OF_WAR) {
-                        unitType = Unit.MAN_O_WAR;
-                    } else {
-                        logger.warning("Unsupported REF-unit.");
-                        continue;
+                        break;
+                    default:
                     }
-                    UnitType type = FreeCol.getSpecification().getUnitType(unitType);
-                    new Unit(getGame(), getPlayer().getEurope(), getPlayer(),
-                            type, UnitState.ACTIVE, equipment);
-                    ref[i]--;
-                    totalNumber--;
+                    for (int index = 0; index < unit.getNumber(); index++) {
+                        new Unit(getGame(), getPlayer().getEurope(), getPlayer(),
+                                 unit.getUnitType(), UnitState.ACTIVE, equipment);
+                    }
                 }
-                p.setMonarch(null);
+                player.setMonarch(null);
             }
         }
     }
@@ -743,12 +724,9 @@ public class AIPlayer extends AIObject {
                 defenders += (defenders * (colony.getStockade().getLevel()) / 2);
             }
             if (threat > defenders) {
-                // We're under attaaaaaaaaack! Man the stockade!
-                ArrayList<Unit> vets = new ArrayList<Unit>();
-                ArrayList<Unit> criminals = new ArrayList<Unit>();
-                ArrayList<Unit> servants = new ArrayList<Unit>();
-                ArrayList<Unit> colonists = new ArrayList<Unit>();
-                ArrayList<Unit> experts = new ArrayList<Unit>();
+                // We're under attack! Man the stockade!
+                ArrayList<Unit> recruits = new ArrayList<Unit>();
+                ArrayList<Unit> others = new ArrayList<Unit>();
                 int inColonyCount = 0;
                 // Let's make some more soldiers, if we can.
                 // First, find some people we can recruit.
@@ -763,23 +741,24 @@ public class AIPlayer extends AIObject {
                         // If we are not on the tile we are in the colony.
                         inColonyCount++;
                     }
-                    if (u.getIndex() == Unit.VETERAN_SOLDIER) {
-                        vets.add(u);
-                    } else if (u.getIndex() == Unit.PETTY_CRIMINAL) {
-                        criminals.add(u);
-                    } else if (u.getIndex() == Unit.INDENTURED_SERVANT) {
-                        servants.add(u);
-                    } else if (u.getIndex() == Unit.FREE_COLONIST) {
-                        colonists.add(u);
-                    } else if (u.isColonist()) {
-                        experts.add(u);
+                    if (u.hasAbility("model.ability.expertSoldier")) {
+                        recruits.add(u);
+                    } else if (u.hasAbility("model.ability.canBeEquipped")) {
+                        others.add(u);
                     }
                 }
-                ArrayList<Unit> recruits = new ArrayList<Unit>(vets);
-                recruits.addAll(criminals);
-                recruits.addAll(servants);
-                recruits.addAll(colonists);
-                recruits.addAll(experts);
+                // ATTENTION: skill may be Integer.MIN_VALUE!
+                Collections.sort(others, new Comparator<Unit>() {
+                        public int compare(Unit unit1, Unit unit2) {
+                            if (unit1.getSkillLevel() < unit2.getSkillLevel()) {
+                                return -1;
+                            } else if (unit1.getSkillLevel() > unit2.getSkillLevel()) {
+                                return 1;
+                            } else {
+                                return 0;
+                            }
+                        }});
+                recruits.addAll(others);
                 // Don't overdo it - leave at least one person behind.
                 int recruitCount = threat - defenders;
                 if (recruitCount > recruits.size() - 1) {
@@ -1010,7 +989,7 @@ public class AIPlayer extends AIObject {
                        ScoutingMission.isValid(aiUnit)) {
                 aiUnit.setMission(new ScoutingMission(getAIMain(), aiUnit));
             } else if ((unit.isOffensiveUnit() || unit.isDefensiveUnit())
-                    && (!unit.isColonist() || unit.getIndex() == Unit.VETERAN_SOLDIER || 
+                       && (!unit.isColonist() || unit.hasAbility("model.ability.expertSoldier") || 
                         getGame().getTurn().getNumber() > 5)) {
                 giveMilitaryMission(aiUnit);
             } else if (unit.getNumberOfTools() > 0 && PioneeringMission.isValid(aiUnit)) {
@@ -1339,10 +1318,11 @@ public class AIPlayer extends AIObject {
             if (newTile.getBestTreasureTrain() != null) {
                 value += Math.min(newTile.getBestTreasureTrain().getTreasureAmount() / 10, 50);
             }
-            if (newTile.getDefendingUnit(unit).getIndex() == Unit.ARTILLERY && newTile.getSettlement() == null) {
+            if (newTile.getDefendingUnit(unit).getType().getOffence() > 0 &&
+                newTile.getSettlement() == null) {
                 value += 200 - newTile.getDefendingUnit(unit).getDefensePower(unit) * 2 - turns * 50;
             }
-            if (newTile.getDefendingUnit(unit).getIndex() == Unit.VETERAN_SOLDIER
+            if (newTile.getDefendingUnit(unit).hasAbility("model.ability.expertSoldier")
                     && !newTile.getDefendingUnit(unit).isArmed()) {
                 value += 10 - newTile.getDefendingUnit(unit).getDefensePower(unit) * 2 - turns * 25;
             }

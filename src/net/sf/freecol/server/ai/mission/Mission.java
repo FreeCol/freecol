@@ -252,10 +252,12 @@ public abstract class Mission extends AIObject {
                     if (newTile.getDefendingUnit(unit).canCarryTreasure()) {
                         tension += Math.min(newTile.getDefendingUnit(unit).getTreasureAmount() / 10, 600);
                     }
-                    if (newTile.getDefendingUnit(unit).getIndex() == Unit.ARTILLERY && newTile.getSettlement() == null) {
+                    if (newTile.getDefendingUnit(unit).getType().getDefence() > 0 &&
+                        newTile.getSettlement() == null) {
                         tension += 100 - newTile.getDefendingUnit(unit).getDefensePower(unit) * 2;
                     }
-                    if (newTile.getDefendingUnit(unit).getIndex() == Unit.VETERAN_SOLDIER && !newTile.getDefendingUnit(unit).isArmed()) {
+                    if (newTile.getDefendingUnit(unit).hasAbility("model.ability.expertSoldier") &&
+                        !newTile.getDefendingUnit(unit).isArmed()) {
                         tension += 50 - newTile.getDefendingUnit(unit).getDefensePower(unit) * 2;
                     }
                     // TODO-AI-CHEATING: REMOVE WHEN THE AI KNOWNS HOW TO HANDLE PEACE WITH THE INDIANS:

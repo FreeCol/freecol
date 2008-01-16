@@ -730,6 +730,7 @@
                skill="2" recruitProbability="1" scoreValue="5" pathImage="foot">
       <available-to native="false"/>
       <downgrade unit="model.unit.freeColonist" capture="true"/>
+      <ability id="model.ability.mercenaryUnit" value="true"/>
       <ability id="model.ability.foundColony" value="true"/>
       <ability id="model.ability.canBeEquipped" value="true"/>
       <ability id="model.ability.canBeCaptured" value="true"/>
@@ -835,6 +836,7 @@
     <unit-type id="model.unit.kingsRegular"         offence="4"  defence="4" movement="3" lineOfSight="1">
       <available-to colonial="false" rebel="false" independent="false" royal="true" undead="false" native="false"/>
       <downgrade unit="model.unit.freeColonist" capture="true"/>
+      <ability id="model.ability.refUnit" value="true"/>
       <ability id="model.ability.foundColony" value="true"/>
       <ability id="model.ability.canBeEquipped" value="true"/>
       <ability id="model.ability.canBeCaptured" value="true"/>
@@ -879,6 +881,7 @@
       <required-goods id="model.goods.Tools" value="300"/>
       <required-ability id="model.ability.buildShips"/>
       <required-ability id="model.ability.independence"/>
+      <ability id="model.ability.refUnit" value="true"/>
       <ability id="model.ability.navalUnit" value="true"/>
       <ability id="model.ability.carryGoods" value="true"/>
       <ability id="model.ability.carryUnits" value="true"/>
@@ -912,6 +915,8 @@
       <required-goods id="model.goods.Hammers" value="192"/>
       <required-goods id="model.goods.Tools" value="40"/>
       <required-ability id="model.ability.buildArtillery"/>
+      <ability id="model.ability.refUnit" value="true"/>
+      <ability id="model.ability.mercenaryUnit" value="true"/>
       <ability id="model.ability.bombard" value="true"/>
       <downgrade unit="model.unit.damagedArtillery" demotion="true"/>
     </unit-type>
@@ -1315,8 +1320,8 @@
   <nation-types>
     <!-- default nation for multi-player games -->
     <european-nation-type id="model.nationType.default">
-      <unit id="model.unit.freeColonist" tools="5"/>
-      <unit id="model.unit.freeColonist" armed="true"/>
+      <unit id="model.unit.freeColonist" role="pioneer"/>
+      <unit id="model.unit.freeColonist" role="soldier"/>
       <unit id="model.unit.caravel"/>
       <ability id="model.ability.foundColony" value="true"/>
       <ability id="model.ability.electFoundingFather"/>
@@ -1329,8 +1334,8 @@
     <!-- this was the Dutch player -->
     <european-nation-type id="model.nationType.trade">
       <modifier id="model.modifier.tradeBonus" type="percentage" value="50"/>
-      <unit id="model.unit.freeColonist" tools="5"/>
-      <unit id="model.unit.freeColonist" armed="true"/>
+      <unit id="model.unit.freeColonist" role="pioneer"/>
+      <unit id="model.unit.freeColonist" role="soldier"/>
       <unit id="model.unit.merchantman"/>
       <ability id="model.ability.foundColony" value="true"/>
       <ability id="model.ability.electFoundingFather"/>
@@ -1338,8 +1343,8 @@
     <!-- this was the French player -->
     <european-nation-type id="model.nationType.cooperation">
       <modifier id="model.modifier.nativeAlarmBonus" type="percentage" value="-50"/>
-      <unit id="model.unit.hardyPioneer" tools="5"/>
-      <unit id="model.unit.freeColonist" armed="true"/>
+      <unit id="model.unit.hardyPioneer" role="pioneer"/>
+      <unit id="model.unit.freeColonist" role="soldier"/>
       <unit id="model.unit.caravel"/>
       <ability id="model.ability.foundColony" value="true"/>
       <ability id="model.ability.electFoundingFather"/>
@@ -1347,8 +1352,8 @@
     <!-- this was the English player -->
     <european-nation-type id="model.nationType.immigration">
       <modifier id="model.modifier.religiousUnrestBonus" type="percentage" value="-33"/>
-      <unit id="model.unit.freeColonist" tools="5"/>
-      <unit id="model.unit.freeColonist" armed="true"/>
+      <unit id="model.unit.freeColonist" role="pioneer"/>
+      <unit id="model.unit.freeColonist" role="soldier"/>
       <unit id="model.unit.caravel"/>
       <ability id="model.ability.foundColony" value="true"/>
       <ability id="model.ability.electFoundingFather"/>
@@ -1357,8 +1362,8 @@
     <european-nation-type id="model.nationType.conquest">
       <modifier id="model.modifier.nativeConvertBonus" type="percentage" value="200"/>
       <modifier id="model.modifier.nativeTreasureBonus" type="percentage" value="200"/>
-      <unit id="model.unit.freeColonist" tools="5"/>
-      <unit id="model.unit.veteranSoldier" armed="true" mounted="true"/>
+      <unit id="model.unit.freeColonist" role="pioneer"/>
+      <unit id="model.unit.veteranSoldier" role="soldier" mounted="true"/>
       <unit id="model.unit.caravel"/>
       <ability id="model.ability.foundColony" value="true"/>
       <ability id="model.ability.electFoundingFather"/>
@@ -1367,8 +1372,8 @@
       <modifier id="model.modifier.movementBonus" type="additive" value="1">
         <scope ability="model.ability.navalUnit"/>
       </modifier>
-      <unit id="model.unit.freeColonist" tools="5"/>
-      <unit id="model.unit.freeColonist" armed="true"/>
+      <unit id="model.unit.freeColonist" role="pioneer"/>
+      <unit id="model.unit.freeColonist" role="soldier"/>
       <unit id="model.unit.merchantman"/>
       <ability id="model.ability.foundColony" value="true"/>
       <ability id="model.ability.electFoundingFather"/>

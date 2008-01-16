@@ -21,15 +21,21 @@
 package net.sf.freecol.common.model;
 
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
+import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
+import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.PseudoRandom;
 import net.sf.freecol.common.model.Player.PlayerType;
 import net.sf.freecol.common.model.Player.Stance;
+import net.sf.freecol.common.model.Unit.Role;
 
 import org.w3c.dom.Element;
 
@@ -40,12 +46,17 @@ import org.w3c.dom.Element;
  */
 public final class Monarch extends FreeColGameObject {
 
-
     /** The name of this monarch. */
     private String name;
 
     /** The player of this monarch. */
     private Player player;
+
+    /** Pseudo-random number generator. */
+    PseudoRandom random = getGame().getModelController().getPseudoRandom();
+
+    private static final EquipmentType muskets = FreeCol.getSpecification().getEquipmentType("model.equipment.muskets");
+    private static final EquipmentType horses = FreeCol.getSpecification().getEquipmentType("model.equipment.horses");
 
     /** Constants describing monarch actions. */
     public static final int NO_ACTION = 0,
@@ -59,30 +70,32 @@ public final class Monarch extends FreeColGameObject {
         WAIVE_TAX = 8,
         ADD_UNITS = 9;
 
-    /** Constants describing the REF. */
-    public static final int INFANTRY = 0,
-        DRAGOON = 1,
-        ARTILLERY = 2,
-        MAN_OF_WAR = 3,
-        NUMBER_OF_TYPES = 4;
+    /** The space required to transport all land units. */
+    int spaceRequired;
+
+    /** The current naval transport capacity. */
+    int capacity;
+
+    /** The number of land units in the REF. */
+    private List<AbstractUnit> landUnits = new ArrayList<AbstractUnit>();
+
+    /** The number of naval units in the REF. */
+    private List<AbstractUnit> navalUnits = new ArrayList<AbstractUnit>();
 
     /** The minimum price for mercenaries. */
     public static final int MINIMUM_PRICE = 100;
-    
+
     /**
      * The maximum possible tax rate (given in percentage).
      */
     private static final int MAXIMUM_TAX_RATE = 95;
 
-    /** The number of units in the REF. */
-    private int[] ref = new int[NUMBER_OF_TYPES];       
-
     /** Whether a frigate has been provided. */
     // Setting this to true here disables the action completely.
     private boolean supportSea = true;
 
-    /** 
-     * Constructor. 
+    /**
+     * Constructor.
      *
      * @param game The <code>Game</code> this <code>Monarch</code>
      *      should be created in.
@@ -92,19 +105,33 @@ public final class Monarch extends FreeColGameObject {
      */
     public Monarch(Game game, Player player, String name) {
         super(game);
-        
+
         if (player == null) {
-            throw new NullPointerException("player == null");
+            throw new IllegalStateException("player == null");
         }
-        
+
         this.player = player;
         this.name = name;
-        int dx = player.getDifficulty();
 
-        ref[INFANTRY] = dx * 3 + 5;
-        ref[DRAGOON] = dx * 2 + 3;
-        ref[ARTILLERY] = dx + 3;
-        ref[MAN_OF_WAR] = dx + 1;
+        int number = player.getDifficulty() * 2 + 3;
+
+        for (UnitType unitType : FreeCol.getSpecification().getUnitTypeList()) {
+            if (unitType.hasAbility("model.ability.refUnit")) {
+                if (unitType.hasAbility("model.ability.navalUnit")) {
+                    navalUnits.add(new AbstractUnit(unitType, Role.DEFAULT, number));
+                    if (unitType.hasAbility("model.ability.carryUnits")) {
+                        capacity += unitType.getSpace() * number;
+                    }
+                } else if (unitType.hasAbility("model.ability.canBeEquipped")) {
+                    landUnits.add(new AbstractUnit(unitType, Role.SOLDIER, number));
+                    landUnits.add(new AbstractUnit(unitType, Role.DRAGOON, number));
+                    spaceRequired += unitType.getSpaceTaken() * 2 * number;
+                } else {
+                    landUnits.add(new AbstractUnit(unitType, Role.DEFAULT, number));
+                    spaceRequired += unitType.getSpaceTaken() * number;
+                }
+            }
+        }
     }
 
 
@@ -122,7 +149,7 @@ public final class Monarch extends FreeColGameObject {
 
         readFromXML(in);
     }
-    
+
     /**
      * Initiates a new <code>Monarch</code> from an <code>Element</code>
      * and registers this <code>Monarch</code> at the specified game.
@@ -138,7 +165,7 @@ public final class Monarch extends FreeColGameObject {
     }
 
     /**
-     * Initiates a new <code>Monarch</code> 
+     * Initiates a new <code>Monarch</code>
      * with the given ID. The object should later be
      * initialized by calling either
      * {@link #readFromXML(XMLStreamReader)} or
@@ -150,7 +177,7 @@ public final class Monarch extends FreeColGameObject {
     public Monarch(Game game, String id) {
         super(game, id);
     }
-    
+
 
     /**
      * Returns a monarch action. Not all actions are always
@@ -199,7 +226,7 @@ public final class Monarch extends FreeColGameObject {
 
         /** The probabilities of these actions. */
         int[] probability = new int[NUMBER_OF_ACTIONS];
-    
+
 
         for (int j = 0; j < NUMBER_OF_ACTIONS; j++ ) {
             probability[j] = 0;
@@ -212,7 +239,7 @@ public final class Monarch extends FreeColGameObject {
         if (player.getTax() < MAXIMUM_TAX_RATE) {
             probability[RAISE_TAX] = 10 + dx;
         }
-        
+
         probability[ADD_TO_REF] = 10 + dx;
 
         if (canDeclareWar) {
@@ -223,7 +250,7 @@ public final class Monarch extends FreeColGameObject {
         if (player.hasBeenAttackedByPrivateers() && !supportSea) {
             probability[SUPPORT_SEA] = 6 - dx;
         }
-        
+
         if (atWar) {
             // disable for the moment
             //probability[SUPPORT_LAND] = 6 - dx;
@@ -231,15 +258,15 @@ public final class Monarch extends FreeColGameObject {
                 probability[OFFER_MERCENARIES] = 6 - dx;
             }
         }
-        
+
         int accumulator = 0;
         for (int k = 0; k < NUMBER_OF_ACTIONS; k++ ) {
             accumulator += probability[k];
             probability[k] = accumulator;
         }
-        
-        int randomInt = getGame().getModelController().getPseudoRandom().nextInt(accumulator);
-        
+
+        int randomInt = random.nextInt(accumulator);
+
         for (int action = 0; action < NUMBER_OF_ACTIONS; action++) {
             if (randomInt < probability[action]) {
                 return action;
@@ -249,16 +276,17 @@ public final class Monarch extends FreeColGameObject {
         return NO_ACTION;
     }
 
-    public int[] getREF() {
-        return ref;        
+    /**
+     * Returns a Set of all REF units.
+     *
+     * @return a Set of all REF units.
+     */
+    public List<AbstractUnit> getREF() {
+        List<AbstractUnit> result = new ArrayList<AbstractUnit>(landUnits);
+        result.addAll(navalUnits);
+        return result;
     }
-    
-    public void clearREF() {
-        for (int i=0; i<ref.length; i++) {
-            ref[i] = 0;
-        }
-    }
-    
+
     /**
      * Returns the new increased tax.
      *
@@ -268,62 +296,92 @@ public final class Monarch extends FreeColGameObject {
         int turn = getGame().getTurn().getNumber();
         int adjustment = (6 - player.getDifficulty()) * 10; // 20-60
         // later in the game, the taxes will increase by more
-        int increase = getGame().getModelController().getPseudoRandom().nextInt(5 + turn/adjustment) + 1;
+        int increase = random.nextInt(5 + turn/adjustment) + 1;
         int newTax = player.getTax() + increase;
-        return Math.min(newTax, MAXIMUM_TAX_RATE);            
+        return Math.min(newTax, MAXIMUM_TAX_RATE);
     }
 
 
     /**
      * Returns units available as mercenaries.
-     * 
-     * @return A troop of mercenaries.    
+     *
+     * @return A troop of mercenaries.
      */
-    public int[] getMercenaries() {
-        int[] units = new int[ARTILLERY + 1];
+    public List<AbstractUnit> getMercenaries() {
+        List<AbstractUnit> mercenaries = new ArrayList<AbstractUnit>();
+        List<UnitType> unitTypes = new ArrayList<UnitType>();
+
+        for (UnitType unitType : FreeCol.getSpecification().getUnitTypeList()) {
+            if (unitType.hasAbility("model.ability.mercenaryUnit")) {
+                unitTypes.add(unitType);
+            }
+        }
         int gold = player.getGold();
         int price = 0;
-        for (int i = 0; i < 6; i++) {
-            int type = getGame().getModelController().getPseudoRandom().nextInt(NUMBER_OF_TYPES);
-            if (type > ARTILLERY) {
-                break;
-            }
-            int newPrice = getPrice(type);
-            if (price + newPrice <= gold) {
-                units[type]++;
-                price += newPrice;
+        int limit = unitTypes.size();
+        UnitType unitType = null;
+        for (int count = 0; count < limit; count++) {
+            int index = random.nextInt(unitTypes.size());
+            unitType = unitTypes.get(index);
+            if (unitType.hasAbility("model.ability.canBeEquipped")) {
+                int newPrice = getPrice(unitType, Role.DRAGOON);
+                for (int number = 3; number > 0; number--) {
+                    if (price + newPrice * number <= gold) {
+                        mercenaries.add(new AbstractUnit(unitType, Role.DRAGOON, number));
+                        price += newPrice * number;
+                        break;
+                    }
+                }
+                newPrice = getPrice(unitType, Role.SOLDIER);
+                for (int number = 3; number > 0; number--) {
+                    if (price + newPrice * number <= gold) {
+                        mercenaries.add(new AbstractUnit(unitType, Role.SOLDIER, number));
+                        price += newPrice * number;
+                        break;
+                    }
+                }
             } else {
-                break;
+                int newPrice = getPrice(unitType, Role.DEFAULT);
+                for (int number = 3; number > 0; number--) {
+                    if (price + newPrice * number <= gold) {
+                        mercenaries.add(new AbstractUnit(unitType, Role.DEFAULT, number));
+                        price += newPrice * number;
+                        break;
+                    }
+                }
+            }
+            unitTypes.remove(index);
+        }
+
+        if (price == 0 && unitType != null) {
+            if (unitType.hasAbility("model.ability.canBeEquipped")) {
+                mercenaries.add(new AbstractUnit(unitType, Role.SOLDIER, 1));
+            } else {
+                mercenaries.add(new AbstractUnit(unitType, Role.DEFAULT, 1));
             }
         }
 
-        if (price == 0) {
-            units[INFANTRY] = 1;
-        }
+        return mercenaries;
+    }
 
-        return units;
-    }        
-    
+
 
     /**
      * Returns units to be added to the Royal Expeditionary Force.
      *
      * @return An addition to the Royal Expeditionary Force.
      */
-    public int[] addToREF() {
-        int[] units = new int[NUMBER_OF_TYPES];
-        if (ref[INFANTRY] + ref[DRAGOON] + ref[ARTILLERY] >
-            ref[MAN_OF_WAR] * 6) {
-            units[MAN_OF_WAR] = 1;
-            ref[MAN_OF_WAR]++;
-        } else {        
-            PseudoRandom random = getGame().getModelController().getPseudoRandom();
+    public List<AbstractUnit> addToREF() {
+        ArrayList<AbstractUnit> result = new ArrayList<AbstractUnit>();
+        if (capacity < spaceRequired) {
+            AbstractUnit unit = navalUnits.get(random.nextInt(navalUnits.size()));
+            result.add(new AbstractUnit(unit.getUnitType(), unit.getRole(), 1));
+        } else {
             int number = random.nextInt(3) + 1;
-            int type = random.nextInt(3);            
-            units[type] = number;
-            ref[type] += number;
+            AbstractUnit unit = landUnits.get(random.nextInt(landUnits.size()));
+            result.add(new AbstractUnit(unit.getUnitType(), unit.getRole(), number));
         }
-        return units;
+        return result;
     }
 
     /**
@@ -331,82 +389,44 @@ public final class Monarch extends FreeColGameObject {
      *
      * @param units The addition to the Royal Expeditionary Force.
      */
-     public void addToREF(int[] units) {
-         for (int type = 0; type < units.length; type++) {
-             ref[type] += units[type];
-         }
-     }
-
-    public static String getName(int type) {
-        return getName(type, 1);
-    }
-
-    public static String getName(int type, int number) {
-        String name = "INVALID";
-        switch (type) {
-        case INFANTRY:
-            if (number == 1) {
-                name = Messages.message("model.monarch.infantry");
+    public void addToREF(List<AbstractUnit> units) {
+        for (AbstractUnit unitToAdd : units) {
+            UnitType unitType = unitToAdd.getUnitType();
+            if (unitType.hasAbility("model.ability.navalUnit")) {
+                for (AbstractUnit refUnit : navalUnits) {
+                    if (refUnit.getUnitType().equals(unitType)) {
+                        refUnit.setNumber(refUnit.getNumber() + unitToAdd.getNumber());
+                        if (unitType.hasAbility("model.ability.carryUnits")) {
+                            capacity += unitType.getSpace() * unitToAdd.getNumber();
+                        }
+                    }
+                }
             } else {
-                name = Messages.message("model.monarch.infantries");
-            }
-            break;
-        case DRAGOON:
-            if (number == 1) {
-                name = Messages.message("model.monarch.dragoon");
-            } else {
-                name = Messages.message("model.monarch.dragoons");
-            }
-            break;
-        case ARTILLERY:
-            if (number == 1) {
-                name = Messages.message("model.monarch.artillery");
-            } else {
-                name = Messages.message("model.monarch.artilleries");
-            }
-            break;
-        case MAN_OF_WAR:
-            if (number == 1) {
-                name = Messages.message("model.monarch.manofwar");
-            } else {
-                name = Messages.message("model.monarch.menofwar");
-            }
-            break;
-        }
-        return String.valueOf(number) + " " + name;
-    }
-
-
-    public String getName(int[] units) {
-        String name = null;
-        for (int type = 0; type < units.length; type++) {
-            if (units[type] > 0) {
-                if (name == null) {
-                    name = getName(type, units[type]);
-                } else {
-                    name = name + " " + Messages.message("and") +
-                        " " + getName(type, units[type]);
+                for (AbstractUnit refUnit : landUnits) {
+                    if (refUnit.getUnitType().equals(unitType) &&
+                        refUnit.getRole().equals(unitToAdd.getRole())) {
+                        refUnit.setNumber(refUnit.getNumber() + unitToAdd.getNumber());
+                        spaceRequired += unitType.getSpaceTaken() * unitToAdd.getNumber();
+                    }
                 }
             }
         }
-        return name;
     }
-    
 
-    public int getPrice(int type) {
-        int dx = player.getDifficulty();
-        switch (type) {
-        case INFANTRY:
-            return 300 + dx * 25;
-        case DRAGOON:
-            return 450 + dx * 25;
-        case ARTILLERY:
-            return 600 + dx * 25;
-        case MAN_OF_WAR:
-        default:
-            return 1000000;
+    public String getName(List<AbstractUnit> units) {
+        StringBuilder name = new StringBuilder();
+        String and = " " + Messages.message("and") + " ";
+        for (AbstractUnit unit : units) {
+            if (name.length() > 0) {
+                name.append(and);
+            }
+            name.append(unit.getNumber());
+            name.append(" ");
+            name.append(Unit.getName(unit.getUnitType(), unit.getRole()));
         }
+        return name.toString();
     }
+
 
     /**
      * Returns the price for the given units.
@@ -415,10 +435,11 @@ public final class Monarch extends FreeColGameObject {
      * @param rebate Whether to grant a rebate.
      * @return The price fo the units.
      */
-    public int getPrice(int[] units, boolean rebate) {
+    public int getPrice(List<AbstractUnit> units, boolean rebate) {
         int price = 0;
-        for (int type = 0; type < units.length; type++) {
-            price += units[type] * getPrice(type);
+        for (AbstractUnit unit : units) {
+            int newPrice = getPrice(unit.getUnitType(), unit.getRole());
+            price += newPrice * unit.getNumber();
         }
         if (price > player.getGold() && rebate) {
             return player.getGold();
@@ -427,7 +448,31 @@ public final class Monarch extends FreeColGameObject {
         }
     }
 
-     /**
+    public int getPrice(UnitType unitType, Role role) {
+        if (unitType.hasPrice()) {
+            int price = player.getEurope().getUnitPrice(unitType);
+            if (Role.SOLDIER.equals(role)) {
+                price += getEquipmentPrice(muskets);
+            } else if (Role.DRAGOON.equals(role)) {
+                price += getEquipmentPrice(muskets);
+                price += getEquipmentPrice(horses);
+            }
+            return price / 10 + 25 * player.getDifficulty();
+        } else {
+            return 1000000;
+        }
+    }
+
+    private int getEquipmentPrice(EquipmentType equipment) {
+        int price = 0;
+        for (AbstractGoods goods : equipment.getGoodsRequired()) {
+            price += player.getMarket().getBidPrice(goods.getType(), goods.getAmount());
+        }
+        return price;
+    }
+
+
+    /**
      * Returns the nation of another player to declare war on.
      *
      * @return The enemy nation.
@@ -449,8 +494,8 @@ public final class Monarch extends FreeColGameObject {
             }
         }
         if (europeanPlayers.size() > 0) {
-            int random = getGame().getModelController().getPseudoRandom().nextInt(europeanPlayers.size());
-            Player enemy = europeanPlayers.get(random);
+            int randomInt = random.nextInt(europeanPlayers.size());
+            Player enemy = europeanPlayers.get(randomInt);
             player.setStance(enemy, Stance.WAR);
             return enemy;
         }
@@ -461,7 +506,8 @@ public final class Monarch extends FreeColGameObject {
      * Returns an addition to the colonial forces.
      *
      * @return An addition to the colonial forces.
-     */     
+     */
+    /*
     public int[] supportLand() {
         int[] units = new int[NUMBER_OF_TYPES];
         switch (player.getDifficulty()) {
@@ -486,24 +532,24 @@ public final class Monarch extends FreeColGameObject {
         }
         return units;
     }
-            
+    */
 
-    
+
     /**
      * This method writes an XML-representation of this object to
      * the given stream.
-     * 
+     *
      * <br><br>
-     * 
-     * Only attributes visible to the given <code>Player</code> will 
+     *
+     * Only attributes visible to the given <code>Player</code> will
      * be added to that representation if <code>showAll</code> is
      * set to <code>false</code>.
-     *  
+     *
      * @param out The target stream.
-     * @param player The <code>Player</code> this XML-representation 
+     * @param player The <code>Player</code> this XML-representation
      *      should be made for, or <code>null</code> if
      *      <code>showAll == true</code>.
-     * @param showAll Only attributes visible to <code>player</code> 
+     * @param showAll Only attributes visible to <code>player</code>
      *      will be added to the representation if <code>showAll</code>
      *      is set to <i>false</i>.
      * @param toSavedGame If <code>true</code> then information that
@@ -511,7 +557,8 @@ public final class Monarch extends FreeColGameObject {
      * @throws XMLStreamException if there are any problems writing
      *      to the stream.
      */
-    protected void toXMLImpl(XMLStreamWriter out, Player player, boolean showAll, boolean toSavedGame) throws XMLStreamException {
+    protected void toXMLImpl(XMLStreamWriter out, Player player, boolean showAll, boolean toSavedGame)
+        throws XMLStreamException {
         // Start element:
         out.writeStartElement(getXMLElementTagName());
 
@@ -519,8 +566,19 @@ public final class Monarch extends FreeColGameObject {
         out.writeAttribute("player", this.player.getId());
         out.writeAttribute("name", name);
         out.writeAttribute("supportSea", String.valueOf(supportSea));
-        toArrayElement("ref", ref, out);
-        
+
+        out.writeStartElement("navalUnits");
+        for (AbstractUnit unit : navalUnits) {
+            unit.toXMLImpl(out);
+        }
+        out.writeEndElement();
+
+        out.writeStartElement("landUnits");
+        for (AbstractUnit unit : landUnits) {
+            unit.toXMLImpl(out);
+        }
+        out.writeEndElement();
+
         out.writeEndElement();
     }
 
@@ -530,19 +588,27 @@ public final class Monarch extends FreeColGameObject {
      */
     protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
         setId(in.getAttributeValue(null, "ID"));
-        
+
         player = (Player) getGame().getFreeColGameObject(in.getAttributeValue(null, "player"));
         if (player == null) {
             player = new Player(getGame(), in.getAttributeValue(null, "player"));
         }
         name = in.getAttributeValue(null, "name");
         supportSea = Boolean.valueOf(in.getAttributeValue(null, "supportSea")).booleanValue();
-        
-        in.nextTag();
-        if (in.getLocalName().equals("ref")) {
-            ref = readFromArrayElement("ref", in, new int[0]);
-        } else {
-            ref = new int[NUMBER_OF_TYPES];
+
+        while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
+            String childName = in.getLocalName();
+            if ("navalUnits".equals(childName)) {
+                while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
+                    AbstractUnit newUnit = new AbstractUnit(in);
+                    navalUnits.add(newUnit);
+                }
+            } else if ("landUnits".equals(childName)) {
+                while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
+                    AbstractUnit newUnit = new AbstractUnit(in);
+                    landUnits.add(newUnit);
+                }
+            }
         }
 
         in.nextTag();

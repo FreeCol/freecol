@@ -28,6 +28,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import net.sf.freecol.FreeCol;
+import net.sf.freecol.common.model.AbstractUnit;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.EquipmentType;
 import net.sf.freecol.common.model.FoundingFather;
@@ -453,11 +454,9 @@ public final class InGameController extends Controller {
                         }
                         break;
                     case Monarch.ADD_TO_REF:
-                        int[] addition = monarch.addToREF();
                         Element additionElement = monarchActionElement.getOwnerDocument().createElement("addition");
-                        additionElement.setAttribute("xLength", Integer.toString(addition.length));
-                        for (int x = 0; x < addition.length; x++) {
-                            additionElement.setAttribute("x" + Integer.toString(x), Integer.toString(addition[x]));
+                        for (AbstractUnit unit : monarch.addToREF()) {
+                            additionElement.appendChild(unit.toXMLElement(additionElement.getOwnerDocument()));
                         }
                         monarchActionElement.appendChild(additionElement);
                         try {
@@ -481,6 +480,7 @@ public final class InGameController extends Controller {
                             logger.warning("Could not send message to: " + nextPlayer.getName());
                         }
                         break;
+                        /** TODO: restore
                     case Monarch.SUPPORT_LAND:
                         int[] additions = monarch.supportLand();
                         createUnits(additions, monarchActionElement, nextPlayer);
@@ -503,15 +503,14 @@ public final class InGameController extends Controller {
                             logger.warning("Could not send message to: " + nextPlayer.getName());
                         }
                         break;
+                        */
                     case Monarch.OFFER_MERCENARIES:
-                        int[] units = monarch.getMercenaries();
-                        int price = monarch.getPrice(units, true);
                         Element mercenaryElement = monarchActionElement.getOwnerDocument().createElement("mercenaries");
+                        List<AbstractUnit> units = monarch.getMercenaries();
+                        int price = monarch.getPrice(units, true);
                         monarchActionElement.setAttribute("price", String.valueOf(price));
-                        mercenaryElement.setAttribute("xLength", Integer.toString(units.length));
-                        monarchActionElement.appendChild(mercenaryElement);
-                        for (int x = 0; x < units.length; x++) {
-                            mercenaryElement.setAttribute("x" + Integer.toString(x), Integer.toString(units[x]));
+                        for (AbstractUnit unit : units) {
+                            mercenaryElement.appendChild(unit.toXMLElement(monarchActionElement.getOwnerDocument()));
                         }
                         try {
                             Element reply = nextPlayer.getConnection().ask(monarchActionElement);
@@ -536,24 +535,25 @@ public final class InGameController extends Controller {
         t.start();
     }
 
-    private void createUnits(int[] units, Element element, ServerPlayer nextPlayer) {
-        EquipmentType[] infantry = new EquipmentType[] { muskets };
+    private void createUnits(List<AbstractUnit> units, Element element, ServerPlayer nextPlayer) {
+        EquipmentType[] soldier = new EquipmentType[] { muskets };
         EquipmentType[] dragoon = new EquipmentType[] { horses, muskets };
-        Unit newUnit;
-        for (int type = 0; type < units.length; type++) {
-            for (int i = 0; i < units[type]; i++) {
-                if (type == Monarch.ARTILLERY) {
-                    UnitType unitType = FreeCol.getSpecification().getUnitType("model.unit.artillery");
-                    newUnit = new Unit(getGame(), nextPlayer.getEurope(), nextPlayer, unitType, UnitState.ACTIVE);
-                } else {
-                    UnitType unitType = FreeCol.getSpecification().getUnitType("model.unit.veteranSoldier");
-                    newUnit = new Unit(getGame(), nextPlayer.getEurope(), nextPlayer, unitType, UnitState.ACTIVE,
-                                       (type == Monarch.DRAGOON ? dragoon : infantry));
-                }
-                nextPlayer.getEurope().add(newUnit);
-                if (element != null) {
-                    element.appendChild(newUnit.toXMLElement(nextPlayer, element.getOwnerDocument()));
-                }
+        for (AbstractUnit unit : units) {
+            EquipmentType[] equipment = UnitType.NO_EQUIPMENT;
+            switch(unit.getRole()) {
+            case SOLDIER:
+                equipment = soldier;
+                break;
+            case DRAGOON:
+                equipment = dragoon;
+                break;
+            default:
+            }
+            Unit newUnit = new Unit(getGame(), nextPlayer.getEurope(), nextPlayer,
+                                    unit.getUnitType(), UnitState.ACTIVE, equipment);
+            nextPlayer.getEurope().add(newUnit);
+            if (element != null) {
+                element.appendChild(newUnit.toXMLElement(nextPlayer, element.getOwnerDocument()));
             }
         }
     }

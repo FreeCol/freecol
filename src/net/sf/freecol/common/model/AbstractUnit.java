@@ -28,6 +28,7 @@ import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.freecol.FreeCol;
+import net.sf.freecol.common.model.Unit.Role;
 
 /**
  * Contains the information necessary to create a new unit.
@@ -35,29 +36,28 @@ import net.sf.freecol.FreeCol;
 public class AbstractUnit extends FreeColObject {
 
     /**
-     * Describe unitType here.
+     * The role of this AbstractUnit.
      */
-    private String unitTypeID;
+    private Role role = Role.DEFAULT;
 
     /**
-     * Describe armed here.
+     * The number of units.
      */
-    private boolean armed;
+    private int number = 1;
 
-    /**
-     * Describe mounted here.
-     */
-    private boolean mounted;
+    public AbstractUnit() {
+        // empty constructor
+    }
 
-    /**
-     * Describe missionary here.
-     */
-    private boolean missionary;
+    public AbstractUnit(String id, Role someRole, int someNumber) {
+        setId(id);
+        this.role = someRole;
+        this.number = someNumber;
+    }
 
-    /**
-     * Describe tools here.
-     */
-    private int tools;
+    public AbstractUnit(UnitType unitType, Role someRole, int someNumber) {
+        this(unitType.getId(), someRole, someNumber);
+    }
 
     /**
      * Creates a new <code>AbstractUnit</code> instance.
@@ -76,104 +76,75 @@ public class AbstractUnit extends FreeColObject {
      * @return an <code>UnitType</code> value
      */
     public final UnitType getUnitType() {
-        return FreeCol.getSpecification().getUnitType(unitTypeID);
+        return FreeCol.getSpecification().getUnitType(getId());
     }
 
     /**
-     * Set the <code>UnitType</code> value.
+     * Get the <code>Role</code> value.
      *
-     * @param newUnitType The new UnitType value.
+     * @return a <code>Role</code> value
      */
-    public final void setUnitTypeID(final String newUnitType) {
-        this.unitTypeID = newUnitType;
+    public final Role getRole() {
+        return role;
     }
 
     /**
-     * Get the <code>Armed</code> value.
+     * Set the <code>Role</code> value.
      *
-     * @return a <code>boolean</code> value
+     * @param newRole The new Role value.
      */
-    public final boolean isArmed() {
-        return armed;
+    public final void setRole(final Role newRole) {
+        this.role = newRole;
     }
 
     /**
-     * Set the <code>Armed</code> value.
-     *
-     * @param newArmed The new Armed value.
-     */
-    public final void setArmed(final boolean newArmed) {
-        this.armed = newArmed;
-    }
-
-    /**
-     * Get the <code>Mounted</code> value.
-     *
-     * @return a <code>boolean</code> value
-     */
-    public final boolean isMounted() {
-        return mounted;
-    }
-
-    /**
-     * Set the <code>Mounted</code> value.
-     *
-     * @param newMounted The new Mounted value.
-     */
-    public final void setMounted(final boolean newMounted) {
-        this.mounted = newMounted;
-    }
-
-    /**
-     * Get the <code>Missionary</code> value.
-     *
-     * @return a <code>boolean</code> value
-     */
-    public final boolean isMissionary() {
-        return missionary;
-    }
-
-    /**
-     * Set the <code>Missionary</code> value.
-     *
-     * @param newMissionary The new Missionary value.
-     */
-    public final void setMissionary(final boolean newMissionary) {
-        this.missionary = newMissionary;
-    }
-
-    /**
-     * Get the <code>Tools</code> value.
+     * Get the <code>Number</code> value.
      *
      * @return an <code>int</code> value
      */
-    public final int getTools() {
-        return tools;
+    public final int getNumber() {
+        return number;
     }
 
     /**
-     * Set the <code>Tools</code> value.
+     * Set the <code>Number</code> value.
      *
-     * @param newTools The new Tools value.
+     * @param newNumber The new Number value.
      */
-    public final void setTools(final int newTools) {
-        this.tools = newTools;
+    public final void setNumber(final int newNumber) {
+        this.number = newNumber;
     }
 
+    /**
+     * Returns the Equipment necessary to create a Unit with the same
+     * type and role as this AbstractUnit.
+     *
+     * @return an <code>EquipmentType[]</code> value
+     */
     public EquipmentType[] getEquipment() {
         List<EquipmentType> equipment = new ArrayList<EquipmentType>();
-        if (armed) {
-            equipment.add(FreeCol.getSpecification().getEquipmentType("model.equipment.muskets"));
-        }
-        if (mounted) {
-            equipment.add(FreeCol.getSpecification().getEquipmentType("model.equipment.horses"));
-        }
-        if (missionary) {
+        switch(role) {
+        case PIONEER:
+            EquipmentType tools = FreeCol.getSpecification().getEquipmentType("model.equipment.tools");
+            for (int count = 0; count < tools.getMaximumCount(); count++) {
+                equipment.add(tools);
+            }
+            break;
+        case MISSIONARY:
             equipment.add(FreeCol.getSpecification().getEquipmentType("model.equipment.missionary"));
-        }
-        EquipmentType toolsType = FreeCol.getSpecification().getEquipmentType("model.equipment.tools");
-        for (int count = 0; count < tools; count++) {
-            equipment.add(toolsType);
+            break;
+        case SOLDIER:
+            equipment.add(FreeCol.getSpecification().getEquipmentType("model.equipment.muskets"));
+            break;
+        case SCOUT:
+            equipment.add(FreeCol.getSpecification().getEquipmentType("model.equipment.horses"));
+            break;
+        case DRAGOON:
+            equipment.add(FreeCol.getSpecification().getEquipmentType("model.equipment.muskets"));
+            equipment.add(FreeCol.getSpecification().getEquipmentType("model.equipment.horses"));
+            break;
+        case DEFAULT:
+        default:
         }
         return equipment.toArray(new EquipmentType[equipment.size()]);
     }
@@ -187,11 +158,9 @@ public class AbstractUnit extends FreeColObject {
      *      during parsing.
      */
     public final void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
-        unitTypeID = in.getAttributeValue(null, "id");
-        armed = getAttribute(in, "armed", false);
-        mounted = getAttribute(in, "mounted", false);
-        missionary = getAttribute(in, "missionary", false);
-        tools = getAttribute(in, "tools", 0);
+        setId(in.getAttributeValue(null, "id"));
+        role = Enum.valueOf(Role.class, getAttribute(in, "role", "default").toUpperCase());
+        number = getAttribute(in, "number", 1);
         in.nextTag(); // close this element
     }
     
@@ -206,13 +175,9 @@ public class AbstractUnit extends FreeColObject {
     public void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
         // Start element:
         out.writeStartElement(getXMLElementTagName());
-
-        out.writeAttribute("id", unitTypeID);
-        out.writeAttribute("armed", String.valueOf(armed));
-        out.writeAttribute("mounted", String.valueOf(mounted));
-        out.writeAttribute("missionary", String.valueOf(missionary));
-        out.writeAttribute("tools", String.valueOf(tools));
-
+        out.writeAttribute("id", getId());
+        out.writeAttribute("role", role.toString().toLowerCase());
+        out.writeAttribute("number", String.valueOf(number));
         out.writeEndElement();
     }
     

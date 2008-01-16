@@ -31,6 +31,7 @@ import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.i18n.Messages;
+import net.sf.freecol.common.model.AbstractUnit;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.DiplomaticTrade;
 import net.sf.freecol.common.model.FoundingFather;
@@ -759,10 +760,13 @@ public final class InGameInputHandler extends InputHandler {
             }
             return reply;
         case Monarch.ADD_TO_REF:
-            Element arrayElement = Message.getChildElement(element, "addition");
-            int[] units = new int[Integer.parseInt(arrayElement.getAttribute("xLength"))];
-            for (int x = 0; x < units.length; x++) {
-                units[x] = Integer.parseInt(arrayElement.getAttribute("x" + Integer.toString(x)));
+            Element additionElement = Message.getChildElement(element, "addition");
+            NodeList childElements = additionElement.getChildNodes();
+            ArrayList<AbstractUnit> units = new ArrayList<AbstractUnit>();
+            for (int index = 0; index < childElements.getLength(); index++) {
+                AbstractUnit unit = new AbstractUnit();
+                unit.readFromXMLElement((Element) childElements.item(index));
+                units.add(unit);
             }
             monarch.addToREF(units);
             player.addModelMessage(new ModelMessage(player, "model.monarch.addToREF",
@@ -805,12 +809,16 @@ public final class InGameInputHandler extends InputHandler {
         case Monarch.OFFER_MERCENARIES:
             reply = Message.createNewRootElement("hireMercenaries");
             Element mercenaryElement = Message.getChildElement(element, "mercenaries");
-            int[] mercenaries = new int[Integer.parseInt(mercenaryElement.getAttribute("xLength"))];
-            for (int x = 0; x < mercenaries.length; x++) {
-                mercenaries[x] = Integer.parseInt(mercenaryElement.getAttribute("x" + Integer.toString(x)));
+            childElements = mercenaryElement.getChildNodes();
+            ArrayList<AbstractUnit> mercenaries = new ArrayList<AbstractUnit>();
+            for (int index = 0; index < childElements.getLength(); index++) {
+                AbstractUnit unit = new AbstractUnit();
+                unit.readFromXMLElement((Element) childElements.item(index));
+                mercenaries.add(unit);
             }
-            if (new ShowMonarchPanelSwingTask(action, new String[][] { { "%gold%", element.getAttribute("price") },
-                    { "%mercenaries%", monarch.getName(mercenaries) } }).confirm()) {
+            if (new ShowMonarchPanelSwingTask(action, new String[][] {
+                        { "%gold%", element.getAttribute("price") },
+                        { "%mercenaries%", monarch.getName(mercenaries) } }).confirm()) {
                 int price = new Integer(element.getAttribute("price")).intValue();
                 freeColClient.getMyPlayer().modifyGold(-price);
                 SwingUtilities.invokeLater(new Runnable() {

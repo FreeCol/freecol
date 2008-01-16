@@ -40,6 +40,7 @@ import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.client.gui.i18n.Messages;
+import net.sf.freecol.common.model.AbstractUnit;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.Player;
@@ -49,6 +50,7 @@ import net.sf.freecol.common.model.Unit.UnitState;
 import net.sf.freecol.common.model.UnitType;
 
 import org.w3c.dom.Element;
+import org.w3c.dom.NodeList;
 
 import cz.autel.dmi.HIGConstraints;
 import cz.autel.dmi.HIGLayout;
@@ -312,26 +314,30 @@ public final class ReportUnitPanel extends JPanel implements ActionListener {
 
     private JPanel createREFPanel() {
         Element refUnits = parent.getClient().getInGameController().getREFUnits();
+        NodeList childElements = refUnits.getChildNodes();
+        List<AbstractUnit> navalUnits = new ArrayList<AbstractUnit>();
+        List<AbstractUnit> landUnits = new ArrayList<AbstractUnit>();
+        for (int index = 0; index < childElements.getLength(); index++) {
+            AbstractUnit unit = new AbstractUnit();
+            unit.readFromXMLElement((Element) childElements.item(index));
+            if (unit.getUnitType().hasAbility("model.ability.navalUnit")) {
+                navalUnits.add(unit);
+            } else {
+                landUnits.add(unit);
+            }
+        }
+
         JPanel refPanel = null;
         if (reportType == ReportType.NAVAL) {
-            int menOfWar = Integer.parseInt(refUnits.getAttribute("menOfWar"));
             refPanel = new JPanel(new GridLayout(1, 6));
-            refPanel.add(createUnitTypeLabel(FreeCol.getSpecification().getUnitType("model.unit.manOWar"),
-                                             Role.DEFAULT, menOfWar));
+            for (AbstractUnit unit : navalUnits) {
+                refPanel.add(createUnitTypeLabel(unit.getUnitType(), Role.DEFAULT, unit.getNumber()));
+            }
         } else if (reportType == ReportType.MILITARY) {
-            int artillery = Integer.parseInt(refUnits.getAttribute("artillery"));
-            int damagedArtillery = Integer.parseInt(refUnits.getAttribute("damagedArtillery"));
-            int dragoons = Integer.parseInt(refUnits.getAttribute("dragoons"));
-            int infantry = Integer.parseInt(refUnits.getAttribute("infantry"));
             refPanel = new JPanel(new GridLayout(1, 8));
-            refPanel.add(createUnitTypeLabel(FreeCol.getSpecification().getUnitType("model.unit.artillery"),
-                                             Role.DEFAULT, artillery));
-            refPanel.add(createUnitTypeLabel(FreeCol.getSpecification().getUnitType("model.unit.damagedArtillery"),
-                                             Role.DEFAULT, damagedArtillery));
-            refPanel.add(createUnitTypeLabel(FreeCol.getSpecification().getUnitType("model.unit.kingsRegular"),
-                                             Role.DRAGOON, dragoons));
-            refPanel.add(createUnitTypeLabel(FreeCol.getSpecification().getUnitType("model.unit.kingsRegular"),
-                                             Role.SOLDIER, infantry));
+            for (AbstractUnit unit : landUnits) {
+                refPanel.add(createUnitTypeLabel(unit.getUnitType(), unit.getRole(), unit.getNumber()));
+            }
         }
         if (refPanel != null) {
             refPanel.setOpaque(false);

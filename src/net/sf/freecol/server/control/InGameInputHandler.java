@@ -21,6 +21,8 @@ package net.sf.freecol.server.control;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.EnumMap;
+import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
@@ -28,6 +30,7 @@ import java.util.logging.Logger;
 
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.common.Specification;
+import net.sf.freecol.common.model.AbstractUnit;
 import net.sf.freecol.common.model.BuildableType;
 import net.sf.freecol.common.model.Building;
 import net.sf.freecol.common.model.BuildingType;
@@ -60,6 +63,7 @@ import net.sf.freecol.common.model.TileImprovementType;
 import net.sf.freecol.common.model.TradeRoute;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.Unit.CombatResult;
+import net.sf.freecol.common.model.Unit.Role;
 import net.sf.freecol.common.model.Unit.UnitState;
 import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.model.WorkLocation;
@@ -2528,6 +2532,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         return reply;
     }
 
+
     /**
      * Handles a "getREFUnits"-message.
      * 
@@ -2537,51 +2542,46 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
      */
     private Element getREFUnits(Connection connection, Element element) {
         ServerPlayer player = getFreeColServer().getPlayer(connection);
-        Element reply = Message.createNewRootElement("REFUnits");
-        int artillery = 0;
-        int damagedArtillery = 0;
-        int menOfWar = 0;
-        int dragoons = 0;
-        int infantry = 0;
-        // TODO: make this disappear
-        if (player.getMonarch() != null) {
-            int ref[] = player.getMonarch().getREF();
-            artillery = ref[Monarch.ARTILLERY];
-            menOfWar = ref[Monarch.MAN_OF_WAR];
-            dragoons = ref[Monarch.DRAGOON];
-            infantry = ref[Monarch.INFANTRY];
-        } else {
+        List<AbstractUnit> units = new ArrayList<AbstractUnit>();
+        UnitType defaultType = FreeCol.getSpecification().getUnitType("model.unit.freeColonist");
+        if (player.getMonarch() == null) {
             ServerPlayer enemyPlayer = (ServerPlayer) player.getREFPlayer();
-            Iterator<Unit> unitIterator = enemyPlayer.getUnitIterator();
-            while (unitIterator.hasNext()) {
-                Unit unit = unitIterator.next();
-                switch (unit.getIndex()) {
-                case Unit.ARTILLERY:
-                    artillery++;
-                    break;
-                case Unit.DAMAGED_ARTILLERY:
-                    damagedArtillery++;
-                    break;
-                case Unit.MAN_O_WAR:
-                    menOfWar++;
-                    break;
-                case Unit.KINGS_REGULAR:
-                    if (unit.isMounted()) {
-                        dragoons++;
-                    } else {
-                        infantry++;
+            java.util.Map<UnitType, EnumMap<Role, Integer>> unitHash =
+                new HashMap<UnitType, EnumMap<Role, Integer>>();
+            for (Unit unit : enemyPlayer.getUnits()) {
+                if (unit.isOffensiveUnit()) {
+                    UnitType unitType = defaultType;
+                    if (unit.getType().getOffence() > 0 ||
+                        unit.hasAbility("model.ability.expertSoldier")) {
+                        unitType = unit.getType();
                     }
-                    break;
-                default:
-                    logger.warning("Unknown type of REF unit " + unit.getIndex());
+                    EnumMap<Role, Integer> roleMap = unitHash.get(unitType);
+                    if (roleMap == null) {
+                        roleMap = new EnumMap<Role, Integer>(Role.class);
+                    }
+                    Role role = unit.getRole();
+                    Integer count = roleMap.get(role);
+                    if (count == null) {
+                        roleMap.put(role, new Integer(1));
+                    } else {
+                        roleMap.put(role, new Integer(count.intValue() + 1));
+                    }
+                    unitHash.put(unitType, roleMap);
                 }
             }
+            for (java.util.Map.Entry<UnitType, EnumMap<Role, Integer>> typeEntry : unitHash.entrySet()) {
+                for (java.util.Map.Entry<Role, Integer> roleEntry : typeEntry.getValue().entrySet()) {
+                    units.add(new AbstractUnit(typeEntry.getKey(), roleEntry.getKey(), roleEntry.getValue()));
+                }
+            }
+        } else {
+            units = player.getMonarch().getREF();
         }
-        reply.setAttribute("artillery", String.valueOf(artillery));
-        reply.setAttribute("damagedArtillery", String.valueOf(damagedArtillery));
-        reply.setAttribute("menOfWar", String.valueOf(menOfWar));
-        reply.setAttribute("dragoons", String.valueOf(dragoons));
-        reply.setAttribute("infantry", String.valueOf(infantry));
+
+        Element reply = Message.createNewRootElement("REFUnits");
+        for (AbstractUnit unit : units) {
+            reply.appendChild(unit.toXMLElement(reply.getOwnerDocument()));
+        }
         return reply;
     }
 

@@ -551,8 +551,8 @@ public class TransportMission extends Mission {
         for (int i = 0; i < aiColonies.size(); i++) {
             AIColony ac = aiColonies.get(i);
             // Assuming that all colonists which can be bought in Europe take
-            // the same space:
-            int space = getAvailableSpace(Unit.FREE_COLONIST, getUnit().getOwner().getEurope(), ac.getColony());
+            // the same space: TODO: fix this
+            int space = getAvailableSpace(1, getUnit().getOwner().getEurope(), ac.getColony());
             Iterator<Wish> wishIterator = ac.getWishIterator();
             while (space > 0 && wishIterator.hasNext()) {
                 Wish w = wishIterator.next();

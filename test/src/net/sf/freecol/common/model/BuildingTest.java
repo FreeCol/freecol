@@ -140,34 +140,43 @@ public class BuildingTest extends FreeColTestCase {
      * TODO: make this more generic.
      */
     public void testCanAddToSchool(){
-        
+
+        UnitType freeColonistType = spec().getUnitType("model.unit.freeColonist");
+        UnitType indenturedServantType = spec().getUnitType("model.unit.indenturedServant");
+        UnitType pettyCriminalType = spec().getUnitType("model.unit.pettyCriminal");
+        UnitType expertFarmerType = spec().getUnitType("model.unit.expertFarmer");
+        UnitType masterCarpenterType = spec().getUnitType("model.unit.masterCarpenter");
+        UnitType masterDistillerType = spec().getUnitType("model.unit.masterDistiller");
+        UnitType elderStatesmanType = spec().getUnitType("model.unit.elderStatesman");
+        UnitType indianConvertType = spec().getUnitType("model.unit.indianConvert");
+
         Colony colony = getStandardColony(10);
         
         Iterator<Unit> units = colony.getUnitIterator();
         
         Unit farmer = units.next();
-        farmer.setType(Unit.EXPERT_FARMER);
+        farmer.setType(expertFarmerType);
         
         Unit colonist = units.next();
-        colonist.setType(Unit.FREE_COLONIST);
+        colonist.setType(freeColonistType);
         
         Unit criminal = units.next();
-        criminal.setType(Unit.PETTY_CRIMINAL);
+        criminal.setType(pettyCriminalType);
         
         Unit servant = units.next();
-        servant.setType(Unit.INDENTURED_SERVANT);
+        servant.setType(indenturedServantType);
         
         Unit indian = units.next();
-        indian.setType(Unit.INDIAN_CONVERT);
+        indian.setType(indianConvertType);
         
         Unit distiller = units.next();
-        distiller.setType(Unit.MASTER_DISTILLER);
+        distiller.setType(masterDistillerType);
         
         Unit elder = units.next();
-        elder.setType(Unit.ELDER_STATESMAN);
+        elder.setType(elderStatesmanType);
 
         Unit carpenter = units.next();
-        carpenter.setType(Unit.MASTER_CARPENTER);
+        carpenter.setType(masterCarpenterType);
         
         // Check school
         BuildingType schoolType = FreeCol.getSpecification().getBuildingType("model.building.Schoolhouse");
