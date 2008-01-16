@@ -336,6 +336,8 @@ public class TerrainGenerator {
     public static void determineHighSeas(Map map,
             int distToLandFromHighSeas,
             int maxDistanceToEdge) {
+        
+        // lookup ocean TileTypes from xml specification
         TileType ocean = null, highSeas = null;
         for (TileType t : FreeCol.getSpecification().getTileTypeList()) {
             if (t.isWater()) {
@@ -359,11 +361,16 @@ public class TerrainGenerator {
         if (highSeas == null || ocean == null) {
             throw new RuntimeException("Both Ocean and HighSeas TileTypes must be defined");
         }
+        
+        // reset all water tiles to default ocean type, and remove regions
         for (Tile t : map.getAllTiles()) {
+            t.setRegion(null);
             if (t.getType() == highSeas) {
                 t.setType(ocean);
             }
         }
+        
+        // recompute the new high seas layout
         createHighSeas(map, distToLandFromHighSeas, maxDistanceToEdge);
     }
     
