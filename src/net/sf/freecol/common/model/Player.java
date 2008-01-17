@@ -2281,7 +2281,6 @@ public class Player extends FreeColGameObject implements Features, Nameable {
             out.writeAttribute("gold", Integer.toString(-1));
             out.writeAttribute("crosses", Integer.toString(-1));
             out.writeAttribute("bells", Integer.toString(-1));
-            out.writeAttribute("currentFather", Integer.toString(-1));
             out.writeAttribute("crossesRequired", Integer.toString(-1));
         }
         if (newLandName != null) {
@@ -2346,7 +2345,10 @@ public class Player extends FreeColGameObject implements Features, Nameable {
         dead = getAttribute(in, "dead", false);
         tax = Integer.parseInt(in.getAttributeValue(null, "tax"));
         playerType = Enum.valueOf(PlayerType.class, in.getAttributeValue(null, "playerType"));
-        currentFather = FreeCol.getSpecification().getFoundingFather(in.getAttributeValue(null, "currentFather"));
+        String fatherId = in.getAttributeValue(null, "currentFather");
+        if (fatherId != null) {
+            currentFather = FreeCol.getSpecification().getFoundingFather(fatherId);
+        }
         crossesRequired = Integer.parseInt(in.getAttributeValue(null, "crossesRequired"));
         final String contactedStr = in.getAttributeValue(null, "contacted");
         if (contactedStr != null) {

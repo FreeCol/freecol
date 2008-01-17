@@ -2093,6 +2093,9 @@ public class Unit extends FreeColGameObject implements Features, Locatable, Loca
      * @see #equipmentCanBeBuilt
      */
     public void equipWith(EquipmentType equipmentType, boolean asResultOfCombat) {
+        if (equipmentType == null) {
+            throw new IllegalArgumentException("EquipmentType is 'null'.");
+        }
         if (!canBeEquippedWith(equipmentType)) {
             logger.fine("Unable to equip unit " + getId() + " with " + equipmentType.getName());
             return;

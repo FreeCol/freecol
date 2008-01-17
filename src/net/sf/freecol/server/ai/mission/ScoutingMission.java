@@ -27,6 +27,8 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
+import net.sf.freecol.FreeCol;
+import net.sf.freecol.common.model.EquipmentType;
 import net.sf.freecol.common.model.GoalDecider;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.IndianSettlement;
@@ -51,10 +53,10 @@ import org.w3c.dom.Element;
  * @see Unit#isScout
  */
 public class ScoutingMission extends Mission {
+
     private static final Logger logger = Logger.getLogger(ScoutingMission.class.getName());
 
-
-
+    private static final EquipmentType horsesType = FreeCol.getSpecification().getEquipmentType("model.equipment.horses");
 
     private boolean valid = true;
 
@@ -130,8 +132,8 @@ public class ScoutingMission extends Mission {
                         || getUnit().getColony().getGoodsContainer().getGoodsCount(Goods.HORSES) >= 52) {
                     Element equipUnitElement = Message.createNewRootElement("equipUnit");
                     equipUnitElement.setAttribute("unit", getUnit().getId());
-                    equipUnitElement.setAttribute("type", Integer.toString((Goods.HORSES).getIndex()));
-                    equipUnitElement.setAttribute("amount", Integer.toString(50));
+                    equipUnitElement.setAttribute("type", horsesType.getId());
+                    equipUnitElement.setAttribute("amount", "1");
                     try {
                         connection.ask(equipUnitElement);
                     } catch (IOException e) {
@@ -221,7 +223,8 @@ public class ScoutingMission extends Mission {
         if (isTarget(getUnit().getTile(), getUnit()) && getUnit().getColony() != null) {
             Element equipUnitElement = Message.createNewRootElement("equipUnit");
             equipUnitElement.setAttribute("unit", getUnit().getId());
-            equipUnitElement.setAttribute("type", Integer.toString((Goods.HORSES).getIndex()));
+            EquipmentType equipment = FreeCol.getSpecification().getEquipmentType("model.equipment.horses");
+            equipUnitElement.setAttribute("type", equipment.getId());
             equipUnitElement.setAttribute("amount", Integer.toString(0));
             try {
                 connection.ask(equipUnitElement);

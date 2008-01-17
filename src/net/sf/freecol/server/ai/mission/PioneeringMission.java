@@ -28,6 +28,8 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
+import net.sf.freecol.FreeCol;
+import net.sf.freecol.common.model.EquipmentType;
 import net.sf.freecol.common.model.GoalDecider;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.Map.Direction;
@@ -62,6 +64,7 @@ public class PioneeringMission extends Mission {
     
     private static final Logger logger = Logger.getLogger(PioneeringMission.class.getName());
 
+    private static final EquipmentType toolsType = FreeCol.getSpecification().getEquipmentType("model.equipment.tools");
 
     private TileImprovementPlan tileImprovementPlan = null;
     
@@ -253,8 +256,9 @@ public class PioneeringMission extends Mission {
                     if (tools >= 20) {                    
                         Element equipUnitElement = Message.createNewRootElement("equipUnit");
                         equipUnitElement.setAttribute("unit", getUnit().getId());
-                        equipUnitElement.setAttribute("type", Integer.toString(Goods.TOOLS.getIndex()));
-                        equipUnitElement.setAttribute("amount", Integer.toString(Math.min(tools - tools % 20, 100)));
+                        equipUnitElement.setAttribute("type", toolsType.getId());
+                        equipUnitElement.setAttribute("amount", Integer.toString(Math.min(tools / 20, 
+                                                                                          toolsType.getMaximumCount())));
                         try {
                             connection.sendAndWait(equipUnitElement);
                         } catch (Exception e) {

@@ -350,7 +350,15 @@ public final class Specification {
     // ---------------------------------------------------------- retrieval methods
     
     public FreeColGameObjectType getType(String Id) {
-        return allTypes.get(Id);
+        if (Id == null) {
+            throw new IllegalArgumentException("Trying to retrieve FreeColGameObjectType" +
+                                               " with ID 'null'.");
+        } else if (!allTypes.containsKey(Id)) {
+            throw new IllegalArgumentException("Trying to retrieve FreeColGameObjectType" +
+                                               " with ID " + Id + " returned 'null'.");
+        } else {
+            return allTypes.get(Id);
+        }
     }
 
     // -- Buildings --
@@ -388,7 +396,7 @@ public final class Specification {
     }
 
     public BuildingType getBuildingType(String id) {
-        return (BuildingType) allTypes.get(id);
+        return (BuildingType) getType(id);
     }
 
     // -- Goods --
@@ -445,7 +453,7 @@ public final class Specification {
      * @return a <code>GoodsType</code> value
      */
     public GoodsType getGoodsType(String id) {
-        return (GoodsType) allTypes.get(id);
+        return (GoodsType) getType(id);
     }
 
     public List<GoodsType> getGoodsFood() {
@@ -496,7 +504,7 @@ public final class Specification {
     }
 
     public ResourceType getResourceType(String id) {
-        return (ResourceType) allTypes.get(id);
+        return (ResourceType) getType(id);
     }
 
     // -- Tiles --
@@ -513,7 +521,7 @@ public final class Specification {
     }
 
     public TileType getTileType(String id) {
-        return (TileType) allTypes.get(id);
+        return (TileType) getType(id);
     }
 
     // -- Improvements --
@@ -526,7 +534,7 @@ public final class Specification {
     }
 
     public TileImprovementType getTileImprovementType(String id) {
-        return (TileImprovementType) allTypes.get(id);
+        return (TileImprovementType) getType(id);
     }
 
     // -- Improvement Actions --
@@ -539,7 +547,7 @@ public final class Specification {
     }
 
     public ImprovementActionType getImprovementActionType(String id) {
-        return (ImprovementActionType) allTypes.get(id);
+        return (ImprovementActionType) getType(id);
     }
 
     // -- Units --
@@ -560,7 +568,7 @@ public final class Specification {
     }
 
     public UnitType getUnitType(String id) {
-        return (UnitType) allTypes.get(id);
+        return (UnitType) getType(id);
     }
     
     public UnitType getExpertForProducing(GoodsType goodsType) {
@@ -614,7 +622,7 @@ public final class Specification {
     }
 
     public FoundingFather getFoundingFather(String id) {
-        return (FoundingFather) allTypes.get(id);
+        return (FoundingFather) getType(id);
     }
 
     // -- NationTypes --
@@ -676,7 +684,7 @@ public final class Specification {
     }
 
     public NationType getNationType(String id) {
-        return (NationType) allTypes.get(id);
+        return (NationType) getType(id);
     }
 
     // -- Nations --
@@ -690,7 +698,7 @@ public final class Specification {
     }
 
     public Nation getNation(String id) {
-        return (Nation) allTypes.get(id);
+        return (Nation) getType(id);
     }
 
     public List<Nation> getClassicNations() {
@@ -739,7 +747,7 @@ public final class Specification {
     }
 
     public EquipmentType getEquipmentType(String id) {
-        return (EquipmentType) allTypes.get(id);
+        return (EquipmentType) getType(id);
     }
     
 

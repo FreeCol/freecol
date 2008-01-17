@@ -1603,7 +1603,9 @@ public final class Colony extends Settlement implements Features, Location, Name
             out.writeAttribute("tories", Integer.toString(tories));
             out.writeAttribute("oldTories", Integer.toString(oldTories));
             out.writeAttribute("productionBonus", Integer.toString(productionBonus));
-            out.writeAttribute("currentlyBuilding", getCurrentlyBuilding().getId());
+            if (!BuildableType.NOTHING.equals(getCurrentlyBuilding())) {
+                out.writeAttribute("currentlyBuilding", getCurrentlyBuilding().getId());
+            }
             out.writeAttribute("landLocked", Boolean.toString(landLocked));
             for (ExportData data : exportData.values()) {
                 data.toXML(out);
@@ -1655,10 +1657,10 @@ public final class Colony extends Settlement implements Features, Location, Name
         oldTories = getAttribute(in, "oldTories", 0);
         productionBonus = getAttribute(in, "productionBonus", 0);
         defenseBonus = getAttribute(in, "productionBonus", 0);
+        BuildableType buildableType = BuildableType.NOTHING;
         String buildable = getAttribute(in, "currentlyBuilding", null);
-        BuildableType buildableType = (BuildableType) FreeCol.getSpecification().getType(buildable);
-        if (buildableType == null) {
-            buildableType = BuildableType.NOTHING;
+        if (buildable != null) {
+            buildableType = (BuildableType) FreeCol.getSpecification().getType(buildable);
         }
         setCurrentlyBuilding(buildableType);
         landLocked = getAttribute(in, "landLocked", true);
