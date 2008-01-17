@@ -43,6 +43,8 @@ public class River {
 
     private static final Direction[] allDirections = Map.getDirectionArray();
 
+    private static final TileType river = FreeCol.getSpecification().getTileType("model.tile.greatRiver");
+
     /**
      * Directions a river may flow in.
      * @see net.sf.freecol.common.model.Map
@@ -361,8 +363,7 @@ public class River {
                 logger.fine("Added river (magnitude: " + section.getSize() + ") to tile at " + section.getPosition());
             }
             else if (section.getSize() >= TileImprovement.FJORD_RIVER) {
-                TileType ocean = FreeCol.getSpecification().getTileType("model.tile.ocean");
-                tile.setType(ocean);
+                tile.setType(river);
                 logger.fine("Created fjord at " + section.getPosition());
             }
             oldSection = section;
