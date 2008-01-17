@@ -1222,7 +1222,10 @@ public class IndianSettlement extends Settlement {
 
         for (int i = 0; i < wantedGoods.length; i++) {
             String tag = "wantedGoods" + Integer.toString(i);
-            wantedGoods[i] = FreeCol.getSpecification().getGoodsType(getAttribute(in, tag, null));
+            String wantedGoodsId = getAttribute(in, tag, null);
+            if (wantedGoodsId != null) {
+                wantedGoods[i] = FreeCol.getSpecification().getGoodsType(wantedGoodsId);
+            }
         }
 
         isVisited = getAttribute(in, "hasBeenVisisted", false);
