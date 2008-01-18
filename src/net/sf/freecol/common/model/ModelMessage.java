@@ -37,6 +37,7 @@ public class ModelMessage extends FreeColObject {
 
 
     /** Constants describing the type of message. */
+    // TODO: use enum
     public static final int DEFAULT = 0;
     public static final int WARNING = 1;
     public static final int SONS_OF_LIBERTY = 2;
@@ -53,6 +54,7 @@ public class ModelMessage extends FreeColObject {
     public static final int GIFT_GOODS = 13;
     public static final int MISSING_GOODS = 14;
     public static final int TUTORIAL = 15;
+    public static final int COMBAT_RESULT = 16;
 
     private Player owner;
     private FreeColGameObject source;
