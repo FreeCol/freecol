@@ -26,6 +26,7 @@ import java.util.logging.Logger;
 import javax.swing.KeyStroke;
 
 import net.sf.freecol.client.FreeColClient;
+import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.ImageLibrary;
 
 /**
@@ -59,10 +60,16 @@ public class ZoomInAction extends FreeColAction {
     protected boolean shouldBeEnabled() {
         if (!super.shouldBeEnabled()) {
             return false;
-        } else {
-            float oldScaling = getFreeColClient().getGUI().getImageLibrary().getScalingFactor();
-            return oldScaling < 1.0;
-        }
+        } 
+        
+        Canvas canvas = getFreeColClient().getCanvas();
+        
+        if (canvas == null || !canvas.isMapboardActionsEnabled())
+        	return false;
+        
+        float oldScaling = getFreeColClient().getGUI().getImageLibrary().getScalingFactor();
+
+        return oldScaling < 1.0;
     }
 
     /**
