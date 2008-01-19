@@ -161,7 +161,7 @@ public class ColonyPlan {
                 stables = type;
             } else if (type.getProducedGoodsType() == Goods.MUSKETS) {
                 armory = type;
-            } else if (type.getDefenseBonus() > 0) {
+            } else if (type.getDefenceBonus() > 0) {
                 stockade = type;
             }
         }

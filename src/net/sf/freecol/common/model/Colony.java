@@ -33,7 +33,6 @@ import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.common.model.Map.Direction;
-import net.sf.freecol.common.model.Unit.CombatResult;
 
 import org.w3c.dom.Element;
 
@@ -84,7 +83,7 @@ public final class Colony extends Settlement implements Features, Location, Name
     // Temporary variable:
     private int lastVisited = -1;
 
-    private int defenseBonus;
+    private int defenceBonus;
 
     /**
      * Contains the abilities and modifiers of this Colony.
@@ -285,23 +284,6 @@ public final class Colony extends Settlement implements Features, Location, Name
      */
     public void setUnitCount(int unitCount) {
         this.unitCount = unitCount;
-    }
-
-    /**
-     * Damages all ship located on this <code>Colony</code>'s
-     * <code>Tile</code>. That is: they are sent to the closest location for
-     * repair.
-     * 
-     * @see Unit#shipDamaged
-     */
-    public void damageAllShips() {
-        Iterator<Unit> iter = getTile().getUnitIterator();
-        while (iter.hasNext()) {
-            Unit u = iter.next();
-            if (u.isNaval()) {
-                u.shipDamaged();
-            }
-        }
     }
 
     /**
@@ -654,12 +636,12 @@ public final class Colony extends Settlement implements Features, Location, Name
     @Override
     public Unit getDefendingUnit(Unit attacker) {
         Unit defender = null;
-        float defensePower = -1.0f;
+        float defencePower = -1.0f;
         for (Unit nextUnit : getUnitList()) {
-            float tmpPower = nextUnit.getDefensePower(attacker);
-            if (tmpPower > defensePower) {
+            float tmpPower = getGame().getCombatModel().getDefencePower(nextUnit, attacker);
+            if (tmpPower > defencePower) {
                 defender = nextUnit;
-                defensePower = tmpPower;
+                defencePower = tmpPower;
             }
         }
         if (defender == null) {
@@ -1190,55 +1172,6 @@ public final class Colony extends Settlement implements Features, Location, Name
     }
 
     /**
-     * Bombard a unit with the given outcome.
-     * 
-     * @param defender The <code>Unit</code> defending against bombardment.
-     * @param result The result of the bombardment.
-     */
-    public void bombard(Unit defender, CombatResult result) {
-        if (defender == null) {
-            throw new NullPointerException();
-        }
-        
-        switch (result) {
-        case EVADES:
-            // send message to both parties
-            addModelMessage(this, "model.unit.shipEvadedBombardment",
-                            new String[][] {
-                                { "%colony%", getName() },
-                                { "%unit%", defender.getName() },
-                                { "%nation%", defender.getOwner().getNationAsString() } }, 
-                            ModelMessage.DEFAULT, this);
-            addModelMessage(defender, "model.unit.shipEvadedBombardment",
-                            new String[][] { { "%colony%", getName() },
-                                             { "%unit%", defender.getName() },
-                                             { "%nation%", defender.getOwner().getNationAsString() } }, 
-                            ModelMessage.DEFAULT, this);
-            break;
-        case WIN:
-            defender.shipDamaged(this);
-            addModelMessage(this, "model.unit.enemyShipDamagedByBombardment",
-                            new String[][] {
-                                { "%colony%", getName() },
-                                { "%unit%", defender.getName() },
-                                { "%nation%", defender.getOwner().getNationAsString() } }, ModelMessage.UNIT_DEMOTED);
-            break;
-        case GREAT_WIN:
-            defender.shipSunk(this);
-            addModelMessage(this, "model.unit.shipSunkByBombardment",
-                            new String[][] {
-                                { "%colony%", getName() },
-                                { "%unit%", defender.getName() },
-                                { "%nation%", defender.getOwner().getNationAsString() } },
-                            ModelMessage.UNIT_DEMOTED);
-            break;
-        default:
-            logger.warning("Illegal result of bombardment!");
-            throw new IllegalArgumentException("Illegal result of bombardment!");
-        }
-    }
-
-    /**
      * Returns a random unit from this colony. At this moment, this method
      * always returns the first unit in the colony.
      * 
@@ -1596,7 +1529,7 @@ public final class Colony extends Settlement implements Features, Location, Name
         out.writeAttribute("name", name);
         out.writeAttribute("owner", owner.getId());
         out.writeAttribute("tile", tile.getId());
-        out.writeAttribute("defenseBonus", Integer.toString(defenseBonus));
+        out.writeAttribute("defenceBonus", Integer.toString(defenceBonus));
         if (getGame().isClientTrusted() || showAll || player == getOwner()) {
             out.writeAttribute("sonsOfLiberty", Integer.toString(sonsOfLiberty));
             out.writeAttribute("oldSonsOfLiberty", Integer.toString(oldSonsOfLiberty));
@@ -1656,7 +1589,7 @@ public final class Colony extends Settlement implements Features, Location, Name
         tories = getAttribute(in, "tories", 0);
         oldTories = getAttribute(in, "oldTories", 0);
         productionBonus = getAttribute(in, "productionBonus", 0);
-        defenseBonus = getAttribute(in, "productionBonus", 0);
+        defenceBonus = getAttribute(in, "productionBonus", 0);
         BuildableType buildableType = BuildableType.NOTHING;
         String buildable = getAttribute(in, "currentlyBuilding", null);
         if (buildable != null) {
@@ -1725,49 +1658,6 @@ public final class Colony extends Settlement implements Features, Location, Name
     }
     
     /**
-     * Returns the power for bombarding
-     * 
-     * @return the power for bombarding
-     */
-    public float getBombardingPower() {
-        float attackPower = 0;
-        Iterator<Unit> unitIterator = getTile().getUnitIterator();
-        while (unitIterator.hasNext()) {
-            Unit unit = unitIterator.next();
-            if (unit.hasAbility("model.ability.bombard")) {
-                attackPower += unit.getType().getOffence();
-            }
-        }
-        if (attackPower > 48) {
-            attackPower = 48;
-        }
-        return attackPower;
-    }
-    
-    /**
-     * Returns a unit to bombard
-     *
-     * @return a unit to bombard
-     */
-    public Unit getBombardingAttacker() {
-        Unit attacker = null;
-        Iterator<Unit> unitIterator = getTile().getUnitIterator();
-        int maxPower = -1;
-        while (unitIterator.hasNext()) {
-            Unit unit = unitIterator.next();
-            logger.finest("Unit is " + unit.getName());
-            if (unit.hasAbility("model.ability.bombard")) {
-                int power = unit.getType().getOffence();
-                if (power > maxPower) {
-                    power = maxPower;
-                    attacker = unit;
-                }
-            }
-        }
-        return attacker;
-    }
-    
-    /**
      * Returns true when colony has a stockade
      *
      * @return whether the colony has a stockade
@@ -1784,7 +1674,7 @@ public final class Colony extends Settlement implements Features, Location, Name
     public Building getStockade() {
         // TODO: it should search for more than one building?
         for (Building building : buildingMap.values()) {
-            if (building.getType().getDefenseBonus() > 0) {
+            if (building.getType().getDefenceBonus() > 0) {
                 return building;
             }
         }
@@ -1857,20 +1747,20 @@ public final class Colony extends Settlement implements Features, Location, Name
     }
 
     /**
-     * Describe <code>getDefenseBonus</code> method here.
+     * Describe <code>getDefenceBonus</code> method here.
      *
      * @return an <code>int</code> value
      */
-    public int getDefenseBonus() {
-        return defenseBonus;
+    public int getDefenceBonus() {
+        return defenceBonus;
     }
 
     /**
-     * Describe <code>setDefenseBonus</code> method here.
+     * Describe <code>setDefenceBonus</code> method here.
      *
-     * @param newDefenseBonus an <code>int</code> value
+     * @param newDefenceBonus an <code>int</code> value
      */
-    public void setDefenseBonus(int newDefenseBonus) {
-        defenseBonus = newDefenseBonus;
+    public void setDefenceBonus(int newDefenceBonus) {
+        defenceBonus = newDefenceBonus;
     }
 }

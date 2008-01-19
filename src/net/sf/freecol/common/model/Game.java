@@ -45,8 +45,6 @@ import net.sf.freecol.FreeCol;
  */
 public class Game extends FreeColGameObject {
 
-
-
     private static final Logger logger = Logger.getLogger(Game.class.getName());
 
     protected int playerIndex;
@@ -102,6 +100,11 @@ public class Game extends FreeColGameObject {
     private final static LostCityRumour lostCityRumour = new LostCityRumour();
 
     /**
+     * Describe combatModel here.
+     */
+    private CombatModel combatModel;
+
+    /**
      * The nations that can still be selected in this Game.
      */
     private List<Nation> vacantNations = new ArrayList<Nation>();
@@ -120,6 +123,7 @@ public class Game extends FreeColGameObject {
         super(null);
 
         this.modelController = modelController;
+        this.combatModel = new SimpleCombatModel(modelController.getPseudoRandom());
         this.viewOwner = null;
 
         gameOptions = new GameOptions();
@@ -149,6 +153,7 @@ public class Game extends FreeColGameObject {
 
         setFreeColGameObjectListener(freeColGameObjectListener);
         this.modelController = modelController;
+        this.combatModel = new SimpleCombatModel(modelController.getPseudoRandom());
         this.viewOwner = null;
 
         canGiveID = true;
@@ -234,6 +239,7 @@ public class Game extends FreeColGameObject {
         super(null, in);
 
         this.modelController = modelController;
+        this.combatModel = new SimpleCombatModel(modelController.getPseudoRandom());
         canGiveID = false;
         readFromXML(in);
         this.viewOwner = getPlayerByName(viewOwnerUsername);
@@ -311,6 +317,24 @@ public class Game extends FreeColGameObject {
 
     public Turn getTurn() {
         return turn;
+    }
+
+    /**
+     * Get the <code>CombatModel</code> value.
+     *
+     * @return a <code>CombatModel</code> value
+     */
+    public final CombatModel getCombatModel() {
+        return combatModel;
+    }
+
+    /**
+     * Set the <code>CombatModel</code> value.
+     *
+     * @param newCombatModel The new CombatModel value.
+     */
+    public final void setCombatModel(final CombatModel newCombatModel) {
+        this.combatModel = newCombatModel;
     }
 
     /**

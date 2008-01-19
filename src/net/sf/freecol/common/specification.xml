@@ -1258,7 +1258,7 @@
     </founding-father>
     <founding-father id="model.foundingFather.paulRevere" type="military"
                      weight1="10" weight2="2" weight3="1">
-      <ability id="model.ability.automaticDefense" value="true"/>
+      <ability id="model.ability.automaticDefence" value="true"/>
     </founding-father>
     <founding-father id="model.foundingFather.francisDrake" type="military"
                      weight1="4" weight2="8" weight3="6">

@@ -19,6 +19,8 @@
 
 package net.sf.freecol.common.model;
 
+import java.lang.reflect.Method;
+
 import net.sf.freecol.common.model.Unit.UnitState;
 import net.sf.freecol.common.model.UnitType.DowngradeType;
 import net.sf.freecol.util.test.FreeColTestCase;
@@ -36,9 +38,12 @@ public class DemotionTest extends FreeColTestCase {
     EquipmentType muskets = spec().getEquipmentType("model.equipment.muskets");
     EquipmentType horses = spec().getEquipmentType("model.equipment.horses");
 
-    public void testColonistDemotedBySoldier() {
+    public void testColonistDemotedBySoldier() throws Exception {
 
         Game game = getStandardGame();
+        CombatModel combatModel = game.getCombatModel();
+        Method method = SimpleCombatModel.class.getDeclaredMethod("demote", Unit.class, Unit.class);
+        method.setAccessible(true);
         Player dutch = game.getPlayer("model.nation.dutch");
         Player french = game.getPlayer("model.nation.french");
         Map map = getTestMap(plains);
@@ -57,16 +62,19 @@ public class DemotionTest extends FreeColTestCase {
         soldier.equipWith(muskets, true);
         assertFalse(soldier.hasAbility("model.ability.canBeCaptured"));
 
-        colonist.demote(soldier);
+        method.invoke(combatModel, colonist, soldier);
         assertEquals(colonistType, colonist.getType());
         assertEquals(french, colonist.getOwner());
         assertEquals(tile2, colonist.getTile());
 
     }
 
-    public void testSoldierDemotedBySoldier() {
+    public void testSoldierDemotedBySoldier() throws Exception {
 
         Game game = getStandardGame();
+        CombatModel combatModel = game.getCombatModel();
+        Method method = SimpleCombatModel.class.getDeclaredMethod("demote", Unit.class, Unit.class);
+        method.setAccessible(true);
         Player dutch = game.getPlayer("model.nation.dutch");
         Player french = game.getPlayer("model.nation.french");
         Map map = getTestMap(plains);
@@ -83,21 +91,24 @@ public class DemotionTest extends FreeColTestCase {
         Unit soldier2 = new Unit(game, tile2, french, colonistType, UnitState.ACTIVE);
         soldier2.equipWith(muskets, true);
 
-        soldier1.demote(soldier2);
+        method.invoke(combatModel, soldier1, soldier2);
         assertEquals(colonistType, soldier1.getType());
         assertEquals(dutch, soldier1.getOwner());
         assertEquals(tile1, soldier1.getTile());
         assertTrue(soldier1.getEquipment().isEmpty());
 
-        soldier1.demote(soldier2);
+        method.invoke(combatModel, soldier1, soldier2);
         assertEquals(colonistType, soldier1.getType());
         assertEquals(french, soldier1.getOwner());
         assertEquals(tile2, soldier1.getTile());
     }
 
-    public void testDragoonDemotedBySoldier() {
+    public void testDragoonDemotedBySoldier() throws Exception {
 
         Game game = getStandardGame();
+        CombatModel combatModel = game.getCombatModel();
+        Method method = SimpleCombatModel.class.getDeclaredMethod("demote", Unit.class, Unit.class);
+        method.setAccessible(true);
         Player dutch = game.getPlayer("model.nation.dutch");
         Player french = game.getPlayer("model.nation.french");
         Map map = getTestMap(plains);
@@ -115,28 +126,31 @@ public class DemotionTest extends FreeColTestCase {
         Unit soldier = new Unit(game, tile2, french, colonistType, UnitState.ACTIVE);
         soldier.equipWith(muskets, true);
 
-        dragoon.demote(soldier);
+        method.invoke(combatModel, dragoon, soldier);
         assertEquals(colonistType, dragoon.getType());
         assertEquals(dutch, dragoon.getOwner());
         assertEquals(tile1, dragoon.getTile());
         assertEquals(1, dragoon.getEquipment().size());
         assertEquals(muskets, dragoon.getEquipment().get(0));
 
-        dragoon.demote(soldier);
+        method.invoke(combatModel, dragoon, soldier);
         assertEquals(colonistType, dragoon.getType());
         assertEquals(dutch, dragoon.getOwner());
         assertEquals(tile1, dragoon.getTile());
         assertTrue(dragoon.getEquipment().isEmpty());
 
-        dragoon.demote(soldier);
+        method.invoke(combatModel, dragoon, soldier);
         assertEquals(colonistType, dragoon.getType());
         assertEquals(french, dragoon.getOwner());
         assertEquals(tile2, dragoon.getTile());
     }
 
-    public void testDragoonDemotedByBrave() {
+    public void testDragoonDemotedByBrave() throws Exception {
 
         Game game = getStandardGame();
+        CombatModel combatModel = game.getCombatModel();
+        Method method = SimpleCombatModel.class.getDeclaredMethod("demote", Unit.class, Unit.class);
+        method.setAccessible(true);
         Player dutch = game.getPlayer("model.nation.dutch");
         Player inca = game.getPlayer("model.nation.inca");
         Map map = getTestMap(plains);
@@ -153,7 +167,7 @@ public class DemotionTest extends FreeColTestCase {
         dragoon.equipWith(horses, true);
         Unit brave = new Unit(game, tile2, inca, braveType, UnitState.ACTIVE);
 
-        dragoon.demote(brave);
+        method.invoke(combatModel, dragoon, brave);
         assertEquals(colonistType, dragoon.getType());
         assertEquals(dutch, dragoon.getOwner());
         assertEquals(tile1, dragoon.getTile());
@@ -162,7 +176,7 @@ public class DemotionTest extends FreeColTestCase {
         assertEquals(1, brave.getEquipment().size());
         assertEquals(horses, brave.getEquipment().get(0));
 
-        dragoon.demote(brave);
+        method.invoke(combatModel, dragoon, brave);
         assertEquals(colonistType, dragoon.getType());
         assertEquals(dutch, dragoon.getOwner());
         assertEquals(tile1, dragoon.getTile());
@@ -171,14 +185,17 @@ public class DemotionTest extends FreeColTestCase {
         assertEquals(horses, brave.getEquipment().get(0));
         assertEquals(muskets, brave.getEquipment().get(1));
 
-        dragoon.demote(brave);
+        method.invoke(combatModel, dragoon, brave);
         assertTrue(dragoon.isDisposed());
 
     }
 
-    public void testScoutDemotedBySoldier() {
+    public void testScoutDemotedBySoldier() throws Exception {
 
         Game game = getStandardGame();
+        CombatModel combatModel = game.getCombatModel();
+        Method method = SimpleCombatModel.class.getDeclaredMethod("demote", Unit.class, Unit.class);
+        method.setAccessible(true);
         Player dutch = game.getPlayer("model.nation.dutch");
         Player french = game.getPlayer("model.nation.french");
         Map map = getTestMap(plains);
@@ -195,13 +212,16 @@ public class DemotionTest extends FreeColTestCase {
         Unit soldier = new Unit(game, tile2, french, colonistType, UnitState.ACTIVE);
         soldier.equipWith(muskets, true);
 
-        scout.demote(soldier);
+        method.invoke(combatModel, scout, soldier);
         scout.isDisposed();
     }
 
-    public void testVeteranSoldierDemotedBySoldier() {
+    public void testVeteranSoldierDemotedBySoldier() throws Exception {
 
         Game game = getStandardGame();
+        CombatModel combatModel = game.getCombatModel();
+        Method method = SimpleCombatModel.class.getDeclaredMethod("demote", Unit.class, Unit.class);
+        method.setAccessible(true);
         assertEquals(colonistType, veteranType.getDowngrade(DowngradeType.CAPTURE));
         Player dutch = game.getPlayer("model.nation.dutch");
         Player french = game.getPlayer("model.nation.french");
@@ -219,21 +239,24 @@ public class DemotionTest extends FreeColTestCase {
         Unit soldier2 = new Unit(game, tile2, french, colonistType, UnitState.ACTIVE);
         soldier2.equipWith(muskets, true);
 
-        soldier1.demote(soldier2);
+        method.invoke(combatModel, soldier1, soldier2);
         assertEquals(veteranType, soldier1.getType());
         assertEquals(dutch, soldier1.getOwner());
         assertEquals(tile1, soldier1.getTile());
         assertTrue(soldier1.getEquipment().isEmpty());
 
-        soldier1.demote(soldier2);
+        method.invoke(combatModel, soldier1, soldier2);
         assertEquals(colonistType, soldier1.getType());
         assertEquals(french, soldier1.getOwner());
         assertEquals(tile2, soldier1.getTile());
     }
 
-    public void testArtilleryDemotedBySoldier() {
+    public void testArtilleryDemotedBySoldier() throws Exception {
 
         Game game = getStandardGame();
+        CombatModel combatModel = game.getCombatModel();
+        Method method = SimpleCombatModel.class.getDeclaredMethod("demote", Unit.class, Unit.class);
+        method.setAccessible(true);
         assertEquals(damagedArtilleryType, artilleryType.getDowngrade(DowngradeType.DEMOTION));
         Player dutch = game.getPlayer("model.nation.dutch");
         Player french = game.getPlayer("model.nation.french");
@@ -250,12 +273,12 @@ public class DemotionTest extends FreeColTestCase {
         Unit soldier = new Unit(game, tile2, french, colonistType, UnitState.ACTIVE);
         soldier.equipWith(muskets, true);
 
-        artillery.demote(soldier);
+        method.invoke(combatModel, artillery, soldier);
         assertEquals(damagedArtilleryType, artillery.getType());
         assertEquals(dutch, artillery.getOwner());
         assertEquals(tile1, artillery.getTile());
 
-        artillery.demote(soldier);
+        method.invoke(combatModel, artillery, soldier);
         assertTrue(artillery.isDisposed());
     }
 

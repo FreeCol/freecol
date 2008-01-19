@@ -33,7 +33,7 @@ import javax.xml.stream.XMLStreamReader;
  */
 public final class BuildingType extends BuildableType {
     
-    private int level, defenseBonus;
+    private int level, defenceBonus;
   
     private int workPlaces, basicProduction, minSkill, maxSkill;
     private GoodsType consumes, produces;
@@ -82,8 +82,8 @@ public final class BuildingType extends BuildableType {
         return level;
     }
     
-    public int getDefenseBonus() {
-        return defenseBonus;
+    public int getDefenceBonus() {
+        return defenceBonus;
     }
 
     public FreeColGameObjectType getType() {
@@ -106,7 +106,7 @@ public final class BuildingType extends BuildableType {
             level = 1;
         }
         
-        defenseBonus = getAttribute(in, "defense-bonus", 0);
+        defenceBonus = getAttribute(in, "defence-bonus", 0);
         workPlaces = getAttribute(in, "workplaces", 0);
         basicProduction = getAttribute(in, "basicProduction", 0);
         

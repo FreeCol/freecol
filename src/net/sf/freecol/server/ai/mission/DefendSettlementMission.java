@@ -29,6 +29,7 @@ import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.freecol.common.model.Colony;
+import net.sf.freecol.common.model.CombatModel;
 import net.sf.freecol.common.model.Map;
 import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.Player;
@@ -128,6 +129,7 @@ public class DefendSettlementMission extends Mission {
         }
         
         if (unit.isOffensiveUnit()) {
+            CombatModel combatModel = unit.getGame().getCombatModel();
             Unit bestTarget = null;
             float bestDifference = Float.MIN_VALUE;
             Direction bestDirection = null;
@@ -141,10 +143,10 @@ public class DefendSettlementMission extends Mission {
                 if (defender != null && defender.getOwner().getStance(unit.getOwner()) == Stance.WAR
                         && unit.getMoveType(direction) == MoveType.ATTACK) {
                     Unit enemyUnit = defender;
-                    float enemyAttack = enemyUnit.getOffensePower(unit);
-                    float weAttack = unit.getOffensePower(enemyUnit);
-                    float enemyDefend = enemyUnit.getDefensePower(unit);
-                    float weDefend = unit.getDefensePower(enemyUnit);
+                    float enemyAttack = combatModel.getOffencePower(enemyUnit, unit);
+                    float weAttack = combatModel.getOffencePower(unit, enemyUnit);
+                    float enemyDefend = combatModel.getDefencePower(unit, enemyUnit);
+                    float weDefend = combatModel.getDefencePower(enemyUnit, unit);
 
                     float difference = weAttack / (weAttack + enemyDefend) - enemyAttack / (enemyAttack + weDefend);
                     if (difference > bestDifference) {

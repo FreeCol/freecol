@@ -30,6 +30,7 @@ import java.util.logging.Logger;
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.common.model.AbstractUnit;
 import net.sf.freecol.common.model.Colony;
+import net.sf.freecol.common.model.CombatModel;
 import net.sf.freecol.common.model.EquipmentType;
 import net.sf.freecol.common.model.FoundingFather;
 import net.sf.freecol.common.model.FoundingFather.FoundingFatherType;
@@ -44,7 +45,6 @@ import net.sf.freecol.common.model.Player.Stance;
 import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
-import net.sf.freecol.common.model.Unit.CombatResult;
 import net.sf.freecol.common.model.Unit.UnitState;
 import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.model.Map.Position;
@@ -561,17 +561,12 @@ public final class InGameController extends Controller {
     private void bombardEnemyShips(ServerPlayer currentPlayer) {
         logger.finest("Entering method bombardEnemyShips.");
         Map map = getFreeColServer().getGame().getMap();
+        CombatModel combatModel = getFreeColServer().getGame().getCombatModel();
         for (Settlement settlement : currentPlayer.getSettlements()) {
             Colony colony = (Colony) settlement;
             logger.finest("Colony is " + colony.getName());
             if (colony.hasAbility("model.ability.bombardShips") && !colony.isLandLocked()) {
                 logger.finest("Colony has harbour and fort.");
-                float attackPower = colony.getBombardingPower();
-                if (attackPower <= 0) {
-                    continue;
-                }
-                Unit attacker = colony.getBombardingAttacker();
-                logger.finest("Colony has attack power " + attackPower);
                 Position colonyPosition = colony.getTile().getPosition();
                 for (Direction direction : Direction.values()) {
                     Tile tile = map.getTile(Map.getAdjacent(colonyPosition, direction));
@@ -579,6 +574,7 @@ public final class InGameController extends Controller {
                         Iterator<Unit> unitIterator = tile.getUnitIterator();
                         while (unitIterator.hasNext()) {
                             Unit unit = unitIterator.next();
+                            float attackPower = combatModel.getOffencePower(colony, unit);
                             Player player = unit.getOwner();
                             if (player != currentPlayer
                                     && (currentPlayer.getStance(player) == Stance.WAR ||
@@ -586,20 +582,7 @@ public final class InGameController extends Controller {
                                 logger.finest("Found enemy unit " + unit.getOwner().getNationAsString() + " "
                                         + unit.getName());
                                 // generate bombardment result
-                                float totalProbability = attackPower + unit.getDefensePower(attacker);
-                                CombatResult result;
-                                int r = getPseudoRandom().nextInt(Math.round(totalProbability) + 1);
-                                if (r < attackPower) {
-                                    int diff = Math.round(unit.getDefensePower(attacker) * 2 - attackPower);
-                                    int r2 = getPseudoRandom().nextInt((diff < 3) ? 3 : diff);
-                                    if (r2 == 0) {
-                                        result = CombatResult.GREAT_WIN;
-                                    } else {
-                                        result = CombatResult.WIN;
-                                    }
-                                } else {
-                                    result = CombatResult.EVADES;
-                                }
+                                CombatModel.CombatResult result = combatModel.generateAttackResult(colony, unit);
 
                                 // Inform the players (other then the player
                                 // attacking) about the attack:
@@ -620,13 +603,12 @@ public final class InGameController extends Controller {
                                         opponentAttackElement .setAttribute("plunderGold",
                                                                             Integer.toString(plunderGold));
                                         opponentAttackElement.setAttribute("colony", colony.getId());
-                                        opponentAttackElement.setAttribute("unit", attacker.getId());
                                         opponentAttackElement.setAttribute("defender", unit.getId());
 
-                                        if (!enemyPlayer.canSee(attacker.getTile())) {
+                                        if (!enemyPlayer.canSee(colony.getTile())) {
                                             opponentAttackElement.setAttribute("update", "tile");
-                                            enemyPlayer.setExplored(attacker.getTile());
-                                            opponentAttackElement.appendChild(attacker.getTile().toXMLElement(
+                                            enemyPlayer.setExplored(colony.getTile());
+                                            opponentAttackElement.appendChild(colony.getTile().toXMLElement(
                                                         enemyPlayer, opponentAttackElement.getOwnerDocument()));
                                         }
 

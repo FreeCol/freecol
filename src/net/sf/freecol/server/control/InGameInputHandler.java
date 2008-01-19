@@ -36,6 +36,8 @@ import net.sf.freecol.common.model.Building;
 import net.sf.freecol.common.model.BuildingType;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.ColonyTile;
+import net.sf.freecol.common.model.CombatModel;
+import net.sf.freecol.common.model.CombatModel.CombatResult;
 import net.sf.freecol.common.model.DiplomaticTrade;
 import net.sf.freecol.common.model.EquipmentType;
 import net.sf.freecol.common.model.Europe;
@@ -62,7 +64,6 @@ import net.sf.freecol.common.model.TileImprovement;
 import net.sf.freecol.common.model.TileImprovementType;
 import net.sf.freecol.common.model.TradeRoute;
 import net.sf.freecol.common.model.Unit;
-import net.sf.freecol.common.model.Unit.CombatResult;
 import net.sf.freecol.common.model.Unit.Role;
 import net.sf.freecol.common.model.Unit.UnitState;
 import net.sf.freecol.common.model.UnitType;
@@ -899,7 +900,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         unit.move(direction);
         
         Element reply = Message.createNewRootElement("update");
-        
+        CombatModel combatModel = unit.getGame().getCombatModel();        
         // Check if ship is slowed
         if (unit.isNaval() && unit.getMovesLeft() > 0) {
             Iterator<Position> tileIterator = getGame().getMap().getAdjacentIterator(unit.getTile().getPosition());
@@ -915,13 +916,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
                     if (player != enemy && (player.getStance(enemy) == Stance.WAR
                             || unit.hasAbility("model.ability.piracy"))
                             && colony.hasAbility("model.ability.bombardShips")) {
-                        float bombardingPower = colony.getBombardingPower();
-                        if (bombardingPower > 0) {
-                            attackPower += bombardingPower;
-                            if (attacker == null) {
-                                attacker = colony.getBombardingAttacker();
-                            }
-                        }
+                        float bombardingPower = combatModel.getOffencePower(colony, unit);
                     }
                 } else if (!tile.isLand() && tile.getFirstUnit() != null) {
                     Player enemy = tile.getFirstUnit().getOwner();
@@ -933,7 +928,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
                         if (enemyUnit.isOffensiveUnit() && (player.getStance(enemy) == Stance.WAR
                                 || enemyUnit.hasAbility("model.ability.piracy")
                                 || unit.hasAbility("model.ability.piracy"))) {
-                            attackPower += enemyUnit.getOffensePower(unit);
+                            attackPower += combatModel.getOffencePower(enemyUnit, unit);
                             if (attacker == null) {
                                 attacker = enemyUnit;
                             }
@@ -943,11 +938,11 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
             }
             
             if (attackPower > 0) {
-                float defensePower = unit.getDefensePower(attacker);
-                float totalProbability = attackPower + defensePower;
+                float defencePower = combatModel.getDefencePower(unit, attacker);
+                float totalProbability = attackPower + defencePower;
                 int r = getPseudoRandom().nextInt(Math.round(totalProbability) + 1);
                 if (r < attackPower) {
-                    int diff = Math.max(0, Math.round(attackPower - defensePower));
+                    int diff = Math.max(0, Math.round(attackPower - defencePower));
                     int moves = Math.min(9, 3 + diff / 3);
                     unit.setMovesLeft(unit.getMovesLeft() - moves);
                     reply.setAttribute("movesSlowed", Integer.toString(moves));
@@ -1263,7 +1258,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
                         + unitID);
             }
         } else {
-            result = generateAttackResult(unit, defender); 
+            result = unit.getGame().getCombatModel().generateAttackResult(unit, defender); 
         }
         if (result == CombatResult.DONE_SETTLEMENT) {
             // 10% of their gold
@@ -1327,7 +1322,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
             }
         }
         int oldUnits = unit.getTile().getUnitCount();
-        unit.attack(defender, result, plunderGold);
+        unit.getGame().getCombatModel().attack(unit, defender, result, plunderGold, 0);
         
         if (result.compareTo(CombatResult.WIN) >= 0 && unit.getTile() != newTile &&
                 oldUnits < unit.getTile().getUnitCount()) {
@@ -1369,61 +1364,6 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
             reply.appendChild(update);
         }
         return reply;
-    }
-
-    /**
-     * Generates a result of an attack.
-     * 
-     * @param unit The <code>Unit</code> attacking.
-     * @param defender The defending unit.
-     * @return The result: {@link Unit#ATTACK_GREAT_LOSS},
-     *         {@link Unit#ATTACK_LOSS}, {@link Unit#ATTACK_EVADES},
-     *         {@link Unit#ATTACK_WIN}, {@link Unit#ATTACK_GREAT_WIN} or
-     *         {@link Unit#ATTACK_DONE_SETTLEMENT}.
-     */
-    private CombatResult generateAttackResult(Unit unit, Unit defender) {
-        double attackPower = unit.getOffensePower(defender);
-        double defensePower = defender.getDefensePower(unit);
-        double totalProbability = attackPower + defensePower;
-        double victory = attackPower / totalProbability;
-        // TODO: Use the PseudoRandom class:
-        double r = Math.random();
-        
-        final CombatResult result;
-        if (r <= victory * 0.2) {
-            // 10% of the times winning:
-            result = CombatResult.GREAT_WIN;
-        } else if (r <= victory) {
-            // 90% of the times winning:
-            result = CombatResult.WIN;
-        } else if (defender.isNaval()
-                && r <= (0.8 * victory) + 0.2) {
-            // 20% of the times loosing:
-            result = CombatResult.EVADES;
-        } else if (r <= (0.1 * victory) + 0.9) {
-            // 70% of the times loosing:
-            result = CombatResult.LOSS;
-        } else {
-            // 10% of the times loosing:
-            result = CombatResult.GREAT_LOSS;
-        }
-        
-        if (result.compareTo(CombatResult.WIN) >= 0 && defender.getTile().getSettlement() != null) {
-            final boolean lastDefender;
-            if (defender.getTile().getSettlement() instanceof Colony) {
-                lastDefender = !defender.isDefensiveUnit();
-            } else if (defender.getTile().getSettlement() instanceof IndianSettlement) {
-                final int defenders = defender.getTile().getUnitCount()
-                        + defender.getTile().getSettlement().getUnitCount();
-                lastDefender = (defenders <= 1);
-            } else {
-                throw new IllegalStateException("Unknown Settlement.");
-            }
-            if (lastDefender) {
-                return CombatResult.DONE_SETTLEMENT;
-            }
-        }
-        return result;
     }
 
     /**
@@ -2510,9 +2450,9 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
                 Unit unit = unitIterator.next();
                 numberOfUnits++;
                 if (unit.isNaval()) {
-                    navalStrength += unit.getOffensePower(unit);
+                    navalStrength += unit.getGame().getCombatModel().getOffencePower(unit, unit);
                 } else {
-                    militaryStrength += unit.getOffensePower(unit);
+                    militaryStrength += unit.getGame().getCombatModel().getOffencePower(unit, unit);
                 }
             }
             enemyElement.setAttribute("numberOfColonies", String.valueOf(numberOfColonies));

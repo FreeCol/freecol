@@ -27,13 +27,50 @@ public interface CombatModel {
             GREAT_WIN, DONE_SETTLEMENT }; // The last defender of the settlement has died.
 
     /**
+     * Generates a result of an attack.
+     * 
+     * @param unit The <code>Unit</code> attacking.
+     * @param defender The defending unit.
+     * @return a <code>CombatResult</code> value
+     */
+    public CombatResult generateAttackResult(Unit attacker, Unit defender);
+
+    /**
+     * Generates the result of a colony bombarding a Unit.
+     *
+     * @param colony the bombarding <code>Colony</code>
+     * @param defender the defending <code>Unit</code>
+     * @return a <code>CombatResult</code> value
+     */
+    public CombatResult generateAttackResult(Colony colony, Unit defender);
+
+    /**
+     * Returns the power for bombarding
+     * 
+     * @param colony a <code>Colony</code> value
+     * @param defender an <code>Unit</code> value
+     * @return the power for bombarding
+     */
+    public float getOffencePower(Colony colony, Unit defender);
+
+    /**
      * Return the offensive power of the attacker versus the defender.
      * 
      * @param attacker an <code>Unit</code> value
      * @param defender an <code>Unit</code> value
      * @return a <code>float</code> value
      */
-    public float getOffensePower(Unit attacker, Unit defender);
+    public float getOffencePower(Unit attacker, Unit defender);
+
+    /**
+     * Return the defensive power of the defender versus the
+     * bombarding colony.
+     * 
+     * @param colony a <code>Colony</code> value
+     * @param defender a <code>Unit</code> value
+     * @return an <code>float</code> value
+     */
+    public float getDefencePower(Colony colony, Unit defender);
 
     /**
      * Return the defensive power of the defender versus the attacker.
@@ -42,7 +79,17 @@ public interface CombatModel {
      * @param defender an <code>Unit</code> value
      * @return an <code>float</code> value
      */
-    public float getDefensePower(Unit attacker, Unit defender);
+    public float getDefencePower(Unit attacker, Unit defender);
+
+    /**
+     * Return a list of all offensive modifiers that apply to the attacker
+     * versus the defender.
+     * 
+     * @param colony an <code>Colony</code> value
+     * @param defender an <code>Unit</code> value
+     * @return a <code>List</code> of Modifiers
+     */
+    public List<Modifier> getOffensiveModifiers(Colony colony, Unit defender);
 
     /**
      * Return a list of all offensive modifiers that apply to the attacker
@@ -65,6 +112,16 @@ public interface CombatModel {
     public List<Modifier> getDefensiveModifiers(Unit attacker, Unit defender);
 
     /**
+     * Return a list of all defensive modifiers that apply to the defender
+     * versus the bombarding colony.
+     * 
+     * @param colony a <code>Colony</code> value
+     * @param defender an <code>Unit</code> value
+     * @return a <code>List</code> of Modifiers
+     */
+    public List<Modifier> getDefensiveModifiers(Colony colony, Unit defender);
+
+    /**
      * Return the defensive modifier that applies to defenders in the given
      * settlement versus the attacker.
      * 
@@ -84,6 +141,16 @@ public interface CombatModel {
      * @param plunderGold an <code>int</code> value
      */
     public void attack(Unit attacker, Unit defender, CombatResult result, int damage, int plunderGold);
+
+    /**
+     * Bombard a unit with the given outcome.
+     * 
+     * @param colony a <code>Colony</code> value
+     * @param defender The <code>Unit</code> defending against bombardment.
+     * @param result The result of the bombardment.
+     * @param damage an <code>int</code> value
+     */
+    public void bombard(Colony colony, Unit defender, CombatResult result, int damage);
 
 }
 

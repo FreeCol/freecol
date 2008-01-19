@@ -24,14 +24,126 @@ import java.util.List;
 import java.util.logging.Logger;
 
 import net.sf.freecol.FreeCol;
+import net.sf.freecol.client.gui.i18n.Messages;
+import net.sf.freecol.common.PseudoRandom;
 import net.sf.freecol.common.model.CombatModel.CombatResult;
 import net.sf.freecol.common.model.Player.Stance;
 import net.sf.freecol.common.model.Unit.UnitState;
+import net.sf.freecol.common.model.UnitType.DowngradeType;
 
 public class SimpleCombatModel implements CombatModel {
 
     private static final Logger logger = Logger.getLogger(SimpleCombatModel.class.getName());
 
+    private static PseudoRandom random;
+
+
+    public SimpleCombatModel(PseudoRandom pseudoRandom) {
+        this.random = pseudoRandom;
+    }
+
+    /**
+     * Generates a result of an attack.
+     * 
+     * @param attacker The <code>Unit</code> attacking.
+     * @param defender The defending unit.
+     * @return a <code>CombatResult</code> value
+     */
+    public CombatResult generateAttackResult(Unit attacker, Unit defender) {
+
+        float attackPower = getOffencePower(attacker, defender);
+        float defencePower = getDefencePower(attacker, defender);
+        float victory = attackPower / (attackPower + defencePower);
+
+        int r = random.nextInt(100);
+        
+        CombatResult result = CombatResult.EVADES;
+        if (r <= victory * 20) {
+            // 10% of the times winning:
+            result = CombatResult.GREAT_WIN;
+        } else if (r <= 100 * victory) {
+            // 90% of the times winning:
+            result = CombatResult.WIN;
+        } else if (defender.isNaval()
+                && r <= (80 * victory) + 20) {
+            // 20% of the times loosing:
+            result = CombatResult.EVADES;
+        } else if (r <= (10 * victory) + 90) {
+            // 70% of the times loosing:
+            result = CombatResult.LOSS;
+        } else {
+            // 10% of the times loosing:
+            result = CombatResult.GREAT_LOSS;
+        }
+        
+        if (result.compareTo(CombatResult.WIN) >= 0 &&
+            defender.getTile().getSettlement() != null) {
+            final boolean lastDefender;
+            if (defender.getTile().getSettlement() instanceof Colony) {
+                lastDefender = !defender.isDefensiveUnit();
+            } else if (defender.getTile().getSettlement() instanceof IndianSettlement) {
+                final int defenders = defender.getTile().getUnitCount()
+                        + defender.getTile().getSettlement().getUnitCount();
+                lastDefender = (defenders <= 1);
+            } else {
+                throw new IllegalStateException("Unknown Settlement.");
+            }
+            if (lastDefender) {
+                return CombatResult.DONE_SETTLEMENT;
+            }
+        }
+        return result;
+    }
+
+    /**
+     * Generates the result of a colony bombarding a Unit.
+     *
+     * @param colony the bombarding <code>Colony</code>
+     * @param defender the defending <code>Unit</code>
+     * @return a <code>CombatResult</code> value
+     */
+    public CombatResult generateAttackResult(Colony colony, Unit defender) {
+
+        float attackPower = getOffencePower(colony, defender);
+        float defencePower = getDefencePower(colony, defender);
+        float totalProbability = attackPower + defencePower;
+        CombatResult result = CombatResult.EVADES;
+        int r = random.nextInt(Math.round(totalProbability) + 1);
+        if (r < attackPower) {
+            int diff = Math.round(defencePower * 2 - attackPower);
+            int r2 = random.nextInt((diff < 3) ? 3 : diff);
+            if (r2 == 0) {
+                result = CombatResult.GREAT_WIN;
+            } else {
+                result = CombatResult.WIN;
+            }
+        }
+        return result;
+    }
+
+    /**
+     * Returns the power for bombarding
+     * 
+     * @param colony a <code>Colony</code> value
+     * @param defender an <code>Unit</code> value
+     * @return the power for bombarding
+     */
+    public float getOffencePower(Colony colony, Unit defender) {
+        float attackPower = 0;
+        if (defender.isNaval() &&
+            colony.hasAbility("model.ability.bombardShips")) {
+            for (Unit unit : colony.getTile().getUnitList()) {
+                if (unit.hasAbility("model.ability.bombard")) {
+                    attackPower += unit.getType().getOffence();
+                }
+            }
+            if (attackPower > 48) {
+                attackPower = 48;
+            }
+        }
+        return attackPower;
+    }
+    
     /**
      * Return the offensive power of the attacker versus the defender.
      * 
@@ -39,9 +151,25 @@ public class SimpleCombatModel implements CombatModel {
      * @param defender an <code>Unit</code> value
      * @return a <code>float</code> value
      */
-    public float getOffensePower(Unit attacker, Unit defender) {
+    public float getOffencePower(Unit attacker, Unit defender) {
         List<Modifier> modifiers = getOffensiveModifiers(attacker, defender);
         return modifiers.get(modifiers.size() - 1).getValue();
+    }
+
+    /**
+     * Return a list of all offensive modifiers that apply to the attacker
+     * versus the defender.
+     * 
+     * @param colony an <code>Colony</code> value
+     * @param defender an <code>Unit</code> value
+     * @return a <code>List</code> of Modifiers
+     */
+    public List<Modifier> getOffensiveModifiers(Colony colony, Unit defender) {
+        ArrayList<Modifier> result = new ArrayList<Modifier>();
+        result.add(new Modifier("model.modifier.bombardModifier", 
+                                getOffencePower(colony, defender),
+                                Modifier.ADDITIVE));
+        return result;
     }
 
     /**
@@ -73,7 +201,7 @@ public class SimpleCombatModel implements CombatModel {
             if (attacker.hasAbility("model.ability.piracy")) {
                 Modifier piracyBonus = attacker.getModifier("model.modifier.piracyBonus");
                 if (piracyBonus != null) {
-                    // Drake grants 50% power bonus (in colonization gives for attack and defense)
+                    // Drake grants 50% power bonus (in colonization gives for attack and defence)
                     result.add(piracyBonus);
                     totalPercentage += piracyBonus.getValue();
                 }
@@ -126,12 +254,12 @@ public class SimpleCombatModel implements CombatModel {
             if (defender != null && defender.getTile() != null && defender.getTile().getSettlement() == null) {
 
                 /**
-                 * Ambush bonus in the open = defender's defense bonus, if
+                 * Ambush bonus in the open = defender's defence bonus, if
                  * defender is REF, or attacker is indian.
                  */
                 if (attacker.hasAbility("model.ability.ambushBonus") ||
                     defender.hasAbility("model.ability.ambushPenalty")) {
-                    percentage = defender.getTile().defenseBonus();
+                    percentage = defender.getTile().defenceBonus();
                     result.add(new Modifier("modifiers.ambushBonus", percentage, Modifier.PERCENTAGE));
                     totalPercentage += percentage;
                 }
@@ -162,15 +290,43 @@ public class SimpleCombatModel implements CombatModel {
     }
 
     /**
+     * Return the defensive power of the defender versus the
+     * bombarding colony.
+     * 
+     * @param colony a <code>Colony</code> value
+     * @param defender a <code>Unit</code> value
+     * @return an <code>float</code> value
+     */
+    public float getDefencePower(Colony colony, Unit defender) {
+        return defender.getType().getDefence();
+    }
+
+    /**
      * Return the defensive power of the defender versus the attacker.
      * 
      * @param attacker an <code>Unit</code> value
      * @param defender an <code>Unit</code> value
      * @return an <code>float</code> value
      */
-    public float getDefensePower(Unit attacker, Unit defender) {
+    public float getDefencePower(Unit attacker, Unit defender) {
         List<Modifier> modifiers = getDefensiveModifiers(attacker, defender);
         return modifiers.get(modifiers.size() - 1).getValue();
+    }
+
+    /**
+     * Return a list of all defensive modifiers that apply to the defender
+     * versus the bombarding colony.
+     * 
+     * @param colony a <code>Colony</code> value
+     * @param defender an <code>Unit</code> value
+     * @return a <code>List</code> of Modifiers
+     */
+    public List<Modifier> getDefensiveModifiers(Colony colony, Unit defender) {
+        ArrayList<Modifier> result = new ArrayList<Modifier>();
+        result.add(new Modifier("model.modifier.defenceBonus",
+                                defender.getType().getDefence(),
+                                Modifier.ADDITIVE));
+        return result;
     }
 
     /**
@@ -192,7 +348,7 @@ public class SimpleCombatModel implements CombatModel {
         float totalAddend = defender.getType().getDefence();
         float totalPercentage = 100;
 
-        result.add(new Modifier("modifiers.baseDefense", totalAddend, Modifier.ADDITIVE));
+        result.add(new Modifier("modifiers.baseDefence", totalAddend, Modifier.ADDITIVE));
 
         if (defender.isNaval()) {
             int goodsCount = defender.getVisibleGoodsCount();
@@ -206,7 +362,7 @@ public class SimpleCombatModel implements CombatModel {
             if (defender.hasAbility("model.ability.piracy")) {
                 Modifier piracyBonus = defender.getModifier("model.modifier.piracyBonus");
                 if (piracyBonus != null) {
-                    // Drake grants 50% power bonus (in colonization gives for attack and defense)
+                    // Drake grants 50% power bonus (in colonization gives for attack and defence)
                     result.add(piracyBonus);
                     totalPercentage += piracyBonus.getValue();
                 }
@@ -220,7 +376,7 @@ public class SimpleCombatModel implements CombatModel {
                 addend = 1;
                 result.add(new Modifier("modifiers.armed", addend, Modifier.ADDITIVE));
                 totalAddend += addend;
-            } else if (defender.getOwner().hasAbility("model.ability.automaticDefense") && defender.isColonist()
+            } else if (defender.getOwner().hasAbility("model.ability.automaticDefence") && defender.isColonist()
                        && defender.getLocation() instanceof WorkLocation) {
                 Colony colony = ((WorkLocation) defender.getLocation()).getColony();
                 if (colony.getGoodsCount(Goods.MUSKETS) >= 50) {
@@ -256,7 +412,7 @@ public class SimpleCombatModel implements CombatModel {
                 totalPercentage += settlementModifier.getValue();
                 // TODO: is it right? or should it be another ability?
                 if (defender.hasAbility("model.ability.bombard") && attacker.getOwner().isIndian()) {
-                    // 100% defense bonus against an Indian raid
+                    // 100% defence bonus against an Indian raid
                     percentage = 100;
                     result.add(new Modifier("modifiers.artilleryAgainstRaid", percentage, Modifier.PERCENTAGE));
                     totalPercentage += percentage;
@@ -266,7 +422,7 @@ public class SimpleCombatModel implements CombatModel {
                 if (!(attacker.hasAbility("model.ability.ambushBonus") ||
                       defender.hasAbility("model.ability.ambushPenalty"))) {
                     // Terrain defensive bonus.
-                    percentage = defender.getTile().defenseBonus();
+                    percentage = defender.getTile().defenceBonus();
                     result.add(new Modifier("modifiers.terrainBonus", percentage, Modifier.PERCENTAGE));
                     totalPercentage += percentage;
                 }
@@ -305,7 +461,7 @@ public class SimpleCombatModel implements CombatModel {
             } else {
                 String modifier = stockade.getType().getId();
                 modifier = "modifiers." + modifier.substring(modifier.lastIndexOf(".") + 1);
-                return new Modifier(modifier, colony.getDefenseBonus(), Modifier.PERCENTAGE);
+                return new Modifier(modifier, colony.getDefenceBonus(), Modifier.PERCENTAGE);
             }
         } else if (settlement instanceof IndianSettlement) {
             // Indian settlement defensive bonus.
@@ -379,8 +535,8 @@ public class SimpleCombatModel implements CombatModel {
         case LOSS:
             if (attacker.isNaval()) {
                 Location repairLocation = attackingPlayer.getRepairLocation(attacker);
-                attacker.shipDamaged();
-                attacker.addModelMessage(attacker, "model.unit.shipDamaged",
+                damageShip(attacker, null);
+                attacker.addModelMessage(attacker, "model.unit.damageShip",
                                          new String[][] {
                                              { "%unit%", attacker.getName() },
                                              { "%repairLocation%", repairLocation.getLocationName() },
@@ -394,16 +550,16 @@ public class SimpleCombatModel implements CombatModel {
                                              { "%enemyNation%", attackingPlayer.getNationAsString() },
                                          }, ModelMessage.COMBAT_RESULT);
             } else {
-                attacker.demote(defender);
+                demote(attacker, defender);
                 if (defendingPlayer.hasAbility("model.ability.automaticPromotion")) {
-                    defender.promote();
+                    promote(defender);
                 }
             }
             break;
         case GREAT_LOSS:
             if (attacker.isNaval()) {
-                attacker.shipSunk();
-                attacker.addModelMessage(attacker, "model.unit.shipSunk",
+                sinkShip(attacker, null);
+                attacker.addModelMessage(attacker, "model.unit.sinkShip",
                                          new String[][] {
                                              { "%unit%", attacker.getName() },
                                              { "%enemyUnit%", defender.getName() },
@@ -416,8 +572,8 @@ public class SimpleCombatModel implements CombatModel {
                                              { "%enemyNation%", attackingPlayer.getNationAsString() }
                                          }, ModelMessage.COMBAT_RESULT);
             } else {
-                attacker.demote(defender);
-                defender.promote();
+                demote(attacker, defender);
+                promote(defender);
             }
             break;
         case DONE_SETTLEMENT:
@@ -425,7 +581,7 @@ public class SimpleCombatModel implements CombatModel {
                 defender.dispose();
                 attacker.destroySettlement((IndianSettlement) settlement);
             } else if (settlement instanceof Colony) {
-                attacker.captureColony((Colony) settlement, plunderGold);
+                captureColony(attacker, (Colony) settlement, plunderGold);
             } else {
                 throw new IllegalStateException("Unknown type of settlement.");
             }
@@ -434,14 +590,14 @@ public class SimpleCombatModel implements CombatModel {
             if (attacker.isNaval()) {
                 Location repairLocation = defendingPlayer.getRepairLocation(defender);
                 attacker.captureGoods(defender);
-                defender.shipDamaged();
+                damageShip(defender, null);
                 attacker.addModelMessage(attacker, "model.unit.enemyShipDamaged",
                                          new String[][] {
                                              { "%unit%", attacker.getName() },
                                              { "%enemyUnit%", defender.getName() },
                                              { "%enemyNation%", defendingPlayer.getNationAsString() }
                                          }, ModelMessage.COMBAT_RESULT);
-                defender.addModelMessage(defender, "model.unit.shipDamaged",
+                defender.addModelMessage(defender, "model.unit.damageShip",
                                          new String[][] {
                                              { "%unit%", defender.getName() },
                                              { "%repairLocation%", repairLocation.getLocationName() },
@@ -455,10 +611,10 @@ public class SimpleCombatModel implements CombatModel {
                 pillageColony(attacker, defender.getColony());
             } else {
                 if (attacker.hasAbility("model.ability.automaticPromotion")) {
-                    attacker.promote();
+                    promote(attacker);
                 }
                 if (!defender.isNaval()) {
-                    defender.demote(attacker);
+                    demote(defender, attacker);
                     if (settlement instanceof IndianSettlement) {
                         getConvert(attacker, (IndianSettlement) settlement);
                     }
@@ -468,23 +624,23 @@ public class SimpleCombatModel implements CombatModel {
         case GREAT_WIN:
             if (attacker.isNaval()) {
                 attacker.captureGoods(defender);
-                defender.shipSunk();
+                sinkShip(defender, null);
                 attacker.addModelMessage(attacker, "model.unit.enemyShipSunk",
                                          new String[][] {
                                              { "%unit%", attacker.getName() },
                                              { "%enemyUnit%", defender.getName() },
                                              { "%enemyNation%", defendingPlayer.getNationAsString() }
                                          }, ModelMessage.COMBAT_RESULT);
-                defender.addModelMessage(defender, "model.unit.shipSunk",
+                defender.addModelMessage(defender, "model.unit.sinkShip",
                                          new String[][] {
                                              { "%unit%", defender.getName() },
                                              { "%enemyUnit%", attacker.getName() },
                                              { "%enemyNation%", attackingPlayer.getNationAsString() }
                                          }, ModelMessage.UNIT_LOST);
             } else {
-                attacker.promote();
+                promote(attacker);
                 if (!defender.isNaval()) {
-                    defender.demote(attacker);
+                    demote(defender, attacker);
                     if (settlement instanceof IndianSettlement) {
                         getConvert(attacker, (IndianSettlement) settlement);
                     }
@@ -494,6 +650,152 @@ public class SimpleCombatModel implements CombatModel {
         default:
             logger.warning("Illegal result of attack!");
             throw new IllegalArgumentException("Illegal result of attack!");
+        }
+    }
+
+    /**
+     * Bombard a unit with the given outcome.
+     * 
+     * @param colony a <code>Colony</code> value
+     * @param defender The <code>Unit</code> defending against bombardment.
+     * @param result The result of the bombardment.
+     * @param damage an <code>int</code> value
+     */
+    public void bombard(Colony colony, Unit defender, CombatResult result, int damage) {
+
+        Player attackingPlayer = colony.getOwner();
+        Player defendingPlayer = defender.getOwner();
+        
+        switch (result) {
+        case EVADES:
+            // send message to both parties
+            attackingPlayer.addModelMessage(colony, "model.unit.shipEvadedBombardment",
+                                            new String[][] {
+                                                { "%colony%", colony.getName() },
+                                                { "%unit%", defender.getName() },
+                                                { "%nation%", defender.getOwner().getNationAsString() } }, 
+                                            ModelMessage.DEFAULT, colony);
+            defendingPlayer.addModelMessage(defender, "model.unit.shipEvadedBombardment",
+                                            new String[][] { { "%colony%", colony.getName() },
+                                                             { "%unit%", defender.getName() },
+                                                             { "%nation%", defender.getOwner().getNationAsString() } }, 
+                                            ModelMessage.DEFAULT, colony);
+            break;
+        case WIN:
+            damageShip(defender, colony);
+            attackingPlayer.addModelMessage(colony, "model.unit.enemyShipDamagedByBombardment",
+                                            new String[][] {
+                                                { "%colony%", colony.getName() },
+                                                { "%unit%", defender.getName() },
+                                                { "%nation%", defender.getOwner().getNationAsString() }
+                                            }, ModelMessage.UNIT_DEMOTED);
+            break;
+        case GREAT_WIN:
+            sinkShip(defender, colony);
+            defendingPlayer.addModelMessage(colony, "model.unit.shipSunkByBombardment",
+                                            new String[][] {
+                                                { "%colony%", colony.getName() },
+                                                { "%unit%", defender.getName() },
+                                                { "%nation%", defender.getOwner().getNationAsString() } },
+                                            ModelMessage.UNIT_DEMOTED);
+            break;
+        }
+    }
+
+    /**
+     * Captures an enemy colony and plunders gold.
+     * 
+     * @param unit an <code>Unit</code> value
+     * @param colony a <code>Colony</code> value
+     * @param plunderGold The amount of gold to plunder.
+     */
+    public void captureColony(Unit unit, Colony colony, int plunderGold) {
+        Player enemy = colony.getOwner();
+        Player myPlayer = unit.getOwner();
+        enemy.modifyTension(unit.getOwner(), Tension.TENSION_ADD_MAJOR);
+
+        if (myPlayer.isEuropean()) {
+            enemy.addModelMessage(enemy, "model.unit.colonyCapturedBy",
+                                  new String[][] {
+                                      { "%colony%", colony.getName() },
+                                      { "%amount%", Integer.toString(plunderGold) },
+                                      { "%player%", myPlayer.getNationAsString() }
+                                  }, ModelMessage.DEFAULT);
+            damageAllShips(colony);
+
+            myPlayer.modifyGold(plunderGold);
+            enemy.modifyGold(-plunderGold);
+
+            colony.setOwner(myPlayer); // This also changes over all of the
+            // units...
+            myPlayer.addModelMessage(colony, "model.unit.colonyCaptured", 
+                                     new String[][] {
+                                         { "%colony%", colony.getName() },
+                                         { "%amount%", Integer.toString(plunderGold) }
+                                     }, ModelMessage.DEFAULT);
+
+            // Demote all soldiers and clear all orders:
+            for (Unit capturedUnit : colony.getTile().getUnitList()) {
+                if (unit.isUndead()) {
+                    capturedUnit.setType(unit.getType());
+                } else {
+                    UnitType downgrade = capturedUnit.getType().getDowngrade(DowngradeType.CAPTURE);
+                    if (downgrade != null) {
+                        capturedUnit.setType(downgrade);
+                    }
+                }
+                capturedUnit.setState(UnitState.ACTIVE);
+            }
+
+            if (unit.isUndead()) {
+                for (Unit capturedUnit : colony.getUnitList()) {
+                    capturedUnit.setType(unit.getType());
+                }
+
+                unit.setLocation(colony.getTile());
+            } else { // Indian:
+                if (colony.getUnitCount() <= 1) {
+                    myPlayer.modifyGold(plunderGold);
+                    enemy.modifyGold(-plunderGold);
+                    myPlayer.addModelMessage(enemy, "model.unit.colonyBurning",
+                                             new String[][] { { "%colony%", colony.getName() },
+                                                              { "%amount%", Integer.toString(plunderGold) },
+                                                              { "%nation%", myPlayer.getNationAsString() },
+                                                              { "%unit%", unit.getName() }
+                                             }, ModelMessage.DEFAULT);
+                    damageAllShips(colony);
+                    colony.dispose();
+                } else {
+                    Unit victim = colony.getRandomUnit();
+                    if (victim == null) {
+                        return;
+                    }
+                    myPlayer.addModelMessage(colony, "model.unit.colonistSlaughtered",
+                                             new String[][] {
+                                                 { "%colony%", colony.getName() },
+                                                 { "%unit%", victim.getName() },
+                                                 { "%nation%", myPlayer.getNationAsString() },
+                                                 { "%enemyUnit%", unit.getName() }
+                                             }, ModelMessage.UNIT_LOST);
+                    victim.dispose();
+                }
+            }
+
+        }
+    }
+
+    /**
+     * Damages all ship located on this <code>Colony</code>'s
+     * <code>Tile</code>. That is: they are sent to the closest location for
+     * repair.
+     * 
+     * @see Unit#damageShip
+     */
+    private void damageAllShips(Colony colony) {
+        for (Unit unit : colony.getTile().getUnitList()) {
+            if (unit.isNaval()) {
+                damageShip(unit, null);
+            }
         }
     }
 
@@ -552,7 +854,7 @@ public class SimpleCombatModel implements CombatModel {
                                    ModelMessage.DEFAULT, goods);
         } else if (random < buildingList.size() + goodsList.size() + shipList.size()) {
             Unit ship = shipList.get(random - buildingList.size() - goodsList.size());
-            ship.shipDamaged();
+            damageShip(ship, null);
         } else { // steal gold
             int gold = colony.getOwner().getGold() / 10;
             colony.getOwner().modifyGold(-gold);
@@ -614,13 +916,218 @@ public class SimpleCombatModel implements CombatModel {
     }
 
     /**
+     * Sets the damage to this ship and sends it to its repair location.
+     * 
+     * @param colony The colony that opened fire on this unit.
+     */
+    private void damageShip(Unit damagedUnit, Colony colony) {
+        String nation = damagedUnit.getOwner().getNationAsString();
+        Location repairLocation = damagedUnit.getOwner().getRepairLocation(damagedUnit);
+        if (repairLocation == null) {
+            // This fixes a problem with enemy ships without a known repair
+            // location.
+            damagedUnit.dispose();
+            return;
+        }
+        String repairLocationName = repairLocation.getLocationName();
+        if (colony != null) {
+            damagedUnit.addModelMessage(damagedUnit, "model.unit.damageShipByBombardment", 
+                                        new String[][] {
+                                            { "%colony%", colony.getName() },
+                                            { "%unit%", damagedUnit.getName() },
+                                            { "%repairLocation%", repairLocationName },
+                                            { "%nation%", nation } },
+                                        ModelMessage.UNIT_DEMOTED);
+        } else {
+            damagedUnit.addModelMessage(damagedUnit, "model.unit.damageShip",
+                                        new String[][] {
+                                            { "%unit%", damagedUnit.getName() },
+                                            { "%repairLocation%", repairLocationName },
+                                            { "%nation%", nation } },
+                                        ModelMessage.UNIT_DEMOTED);
+        }
+        damagedUnit.setHitpoints(1);
+        damagedUnit.getUnitContainer().disposeAllUnits();
+        damagedUnit.getGoodsContainer().removeAll();
+        damagedUnit.sendToRepairLocation();
+    }
+
+    /**
+     * Sinks this ship.
+     * 
+     * @param colony The colony that opened fire on this unit.
+     */
+    private void sinkShip(Unit damagedUnit, Colony colony) {
+        String nation = damagedUnit.getOwner().getNationAsString();
+        if (colony != null) {
+            damagedUnit.addModelMessage(damagedUnit, "model.unit.sinkShipByBombardment",
+                                        new String[][] {
+                                            { "%colony%", colony.getName() },
+                                            { "%unit%", damagedUnit.getName() },
+                                            { "%nation%", nation }
+                                        }, ModelMessage.UNIT_LOST);
+        } else {
+            damagedUnit.addModelMessage(damagedUnit, "model.unit.sinkShip",
+                                        new String[][] {
+                                            { "%unit%", damagedUnit.getName() },
+                                            { "%nation%", nation }
+                                        }, ModelMessage.UNIT_LOST);
+        }
+        damagedUnit.dispose();
+    }
+
+    /**
+     * Demotes a unit. A unit that can not be further demoted is
+     * captured or destroyed. The enemy may plunder equipment.
+     *
+     * @param unit a <code>Unit</code> value
+     * @param enemyUnit a <code>Unit</code> value
+     */
+    private void demote(Unit unit, Unit enemyUnit) {
+        UnitType oldType = unit.getType();
+        String messageID = "model.unit.unitDemoted";
+        String nation = unit.getOwner().getNationAsString();
+        int messageType = ModelMessage.UNIT_LOST;
+
+        if (unit.hasAbility("model.ability.canBeCaptured")) {
+            if (enemyUnit.hasAbility("model.ability.captureUnits")) {
+                unit.setLocation(enemyUnit.getTile());
+                unit.setOwner(enemyUnit.getOwner());
+                if (enemyUnit.isUndead()) {
+                    unit.setType(enemyUnit.getType());
+                } else {
+                    UnitType downgrade = unit.getType().getDowngrade(DowngradeType.CAPTURE);
+                    if (downgrade != null) {
+                        unit.setType(downgrade);
+                    }
+                }
+                String tempID = oldType.getId() + ".captured";
+                if (Messages.containsKey(tempID)) {
+                    messageID = tempID;
+                } else {
+                    messageID = "model.unit.unitCaptured";
+                }
+            } else {
+                String tempID = oldType.getId() + ".destroyed";
+                if (Messages.containsKey(tempID)) {
+                    messageID = tempID;
+                } else {
+                    messageID = "model.unit.unitSlaughtered";
+                }
+                unit.dispose();
+            }
+        } else {
+            // unit has equipment that protects from capture, or will
+            // be downgraded
+            EquipmentType typeToLose = null;
+            int combatLossPriority = 0;
+            for (EquipmentType equipmentType : unit.getEquipment()) {
+                if (equipmentType.getCombatLossPriority() > combatLossPriority) {
+                    typeToLose = equipmentType;
+                    combatLossPriority = equipmentType.getCombatLossPriority();
+                }
+            }
+            if (typeToLose != null) {
+                // lose equipment as a result of combat
+                unit.removeEquipment(typeToLose, true);
+                if (enemyUnit.hasAbility("model.ability.captureEquipment") &&
+                    enemyUnit.canBeEquippedWith(typeToLose)) {
+                    enemyUnit.equipWith(typeToLose, true);
+                    unit.addModelMessage(unit, "model.unit.equipmentCaptured",
+                                         new String[][] {
+                                             {"%nation%", enemyUnit.getOwner().getNationAsString()},
+                                             {"%equipment%", typeToLose.getName()}},
+                                         ModelMessage.FOREIGN_DIPLOMACY);
+                }
+            } else {
+                // be downgraded as a result of combat
+                UnitType downgrade = unit.getType().getDowngrade(DowngradeType.DEMOTION);
+                if (downgrade != null) {
+                    unit.setType(downgrade);
+                    messageType = ModelMessage.UNIT_DEMOTED;
+                    String tempID = oldType.getId() + ".demoted";
+                    if (Messages.containsKey(tempID)) {
+                        messageID = tempID;
+                    } else {
+                        messageID = "model.unit.unitDemoted";
+                    }
+                } else {                
+                    String tempID = oldType.getId() + ".destroyed";
+                    if (Messages.containsKey(tempID)) {
+                        messageID = tempID;
+                    } else {
+                        messageID = "model.unit.unitSlaughtered";
+                    }
+                    unit.dispose();
+                }
+            }
+        }
+        String newName = unit.getName();
+        FreeColGameObject source = unit;
+        if (unit.getColony() != null) {
+            source = unit.getColony();
+        }
+
+        // TODO: this still doesn't work as intended
+        unit.addModelMessage(source, messageID, new String[][] {
+                { "%oldName%", oldType.getName() },
+                { "%unit%", newName },
+                { "%nation%", nation },
+                { "%enemyUnit%", enemyUnit.getName() },
+                { "%enemyNation%", enemyUnit.getOwner().getNationAsString() }
+            }, messageType, unit);
+
+        if (unit.getOwner() != enemyUnit.getOwner()) {
+            // unit unit hasn't been captured by enemyUnit, show message to
+            // enemyUnit's owner
+            source = enemyUnit;
+            if (enemyUnit.getColony() != null) {
+                source = enemyUnit.getColony();
+            }
+            unit.addModelMessage(source, messageID, new String[][] {
+                    { "%oldName%", oldType.getName() },
+                    { "%unit%", newName },
+                    { "%enemyUnit%", enemyUnit.getName() },
+                    { "%nation%", nation },
+                    { "%enemyNation%", enemyUnit.getOwner().getNationAsString() }
+                }, messageType, unit);
+        }
+    }
+
+    /**
+     * Promotes this unit.
+     *
+     * @param unit an <code>Unit</code> value
+     */
+    private void promote(Unit unit) {
+        String oldName = unit.getName();
+        String nation = unit.getOwner().getNationAsString();
+        UnitType newType = unit.getType().getPromotion();
+        
+        if (newType != null) {
+            unit.setType(newType);
+        }
+
+        String newName = unit.getName();
+        if (!newName.equals(oldName)) {
+            unit.addModelMessage(unit, "model.unit.unitPromoted",
+                                 new String[][] {
+                                     { "%oldName%", oldName },
+                                     { "%unit%", unit.getName() },
+                                     { "%nation%", nation }
+                                 }, ModelMessage.UNIT_IMPROVED);
+        }
+    }
+
+
+    /**
        model.unit.shipEvaded=%unit% has evaded an attack by %enemyNation% %enemyUnit%.
        model.unit.enemyShipEvaded=%enemyNation% %enemyUnit% has evaded an attack by %unit%.
 
-       model.unit.shipDamaged=%unit% has been damaged by %enemyNation% %enemyUnit% and must return to %repairLocation% for repairs. All goods and units on board have been lost! 
+       model.unit.damageShip=%unit% has been damaged by %enemyNation% %enemyUnit% and must return to %repairLocation% for repairs. All goods and units on board have been lost! 
        model.unit.enemyShipDamaged=%unit% has damaged %enemyNation% %enemyUnit%. %enemyNation% %enemyUnit% must return for repairs.
 
-       model.unit.shipSunk=%unit% has been sunk by %enemyNation% %enemyUnit%!
+       model.unit.sinkShip=%unit% has been sunk by %enemyNation% %enemyUnit%!
        model.unit.enemyShipSunk=%unit% has sunk %enemyNation% %enemyUnit%!
-  */
+    */
 }

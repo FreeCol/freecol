@@ -33,6 +33,7 @@ import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.AbstractUnit;
 import net.sf.freecol.common.model.Colony;
+import net.sf.freecol.common.model.CombatModel.CombatResult;
 import net.sf.freecol.common.model.DiplomaticTrade;
 import net.sf.freecol.common.model.FoundingFather;
 import net.sf.freecol.common.model.FoundingFather.FoundingFatherType;
@@ -49,7 +50,6 @@ import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.Tension;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
-import net.sf.freecol.common.model.Unit.CombatResult;
 import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.networking.Message;
@@ -399,9 +399,9 @@ public final class InGameInputHandler extends InputHandler {
         }
 
         if (colony != null) {
-            colony.bombard(defender, result);
+            unit.getGame().getCombatModel().bombard(colony, defender, result, 0);
         } else {
-            unit.attack(defender, result, plunderGold);
+            unit.getGame().getCombatModel().attack(unit, defender, result, plunderGold, 0);
             if (!unit.isDisposed() && (unit.getLocation() == null || !unit.isVisibleTo(getFreeColClient().getMyPlayer()))) {
                 unit.dispose();
             }

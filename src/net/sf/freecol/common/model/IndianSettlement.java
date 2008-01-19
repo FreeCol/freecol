@@ -581,12 +581,12 @@ public class IndianSettlement extends Settlement {
     @Override
     public Unit getDefendingUnit(Unit attacker) {
         Unit defender = null;
-        float defensePower = -1.0f;
+        float defencePower = -1.0f;
         for(Unit nextUnit : unitContainer.getUnitsClone()) {
-            float tmpPower = nextUnit.getDefensePower(attacker);
-            if (tmpPower > defensePower) {
+            float tmpPower = attacker.getGame().getCombatModel().getDefencePower(nextUnit, attacker);
+            if (tmpPower > defencePower) {
                 defender = nextUnit;
-                defensePower = tmpPower;
+                defencePower = tmpPower;
             }
         }
         return defender;
@@ -923,7 +923,8 @@ public class IndianSettlement extends Settlement {
                     while (ui.hasNext()) {
                         Unit u = ui.next();
                         if (u.isOffensiveUnit() && !u.isNaval()) {                          
-                            extraAlarm[u.getOwner().getIndex()] += u.getOffensePower(getTile().getDefendingUnit(u));
+                            extraAlarm[u.getOwner().getIndex()] +=
+                                u.getGame().getCombatModel().getOffencePower(u, getTile().getDefendingUnit(u));
                         }
                     }
                 }

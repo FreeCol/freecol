@@ -42,6 +42,7 @@ import net.sf.freecol.common.model.AbstractUnit;
 import net.sf.freecol.common.model.Building;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.ColonyTile;
+import net.sf.freecol.common.model.CombatModel;
 import net.sf.freecol.common.model.EquipmentType;
 import net.sf.freecol.common.model.Europe;
 import net.sf.freecol.common.model.FoundingFather;
@@ -1311,20 +1312,22 @@ public class AIPlayer extends AIObject {
 
     private int getUnitSeekAndDestroyMissionValue(Unit unit, Tile newTile, int turns) {
         logger.finest("Entering method getUnitSeekAndDestroyMissionValue");
+        Unit defender = newTile.getDefendingUnit(unit);
+        CombatModel combatModel = unit.getGame().getCombatModel();
         if (newTile.isLand() && !unit.isNaval() && newTile.getDefendingUnit(unit) != null
-                && newTile.getDefendingUnit(unit).getOwner() != unit.getOwner()
-                && unit.getOwner().getStance(newTile.getDefendingUnit(unit).getOwner()) == Stance.WAR) {
+                && defender.getOwner() != unit.getOwner()
+                && unit.getOwner().getStance(defender.getOwner()) == Stance.WAR) {
             int value = 10020;
             if (newTile.getBestTreasureTrain() != null) {
                 value += Math.min(newTile.getBestTreasureTrain().getTreasureAmount() / 10, 50);
             }
-            if (newTile.getDefendingUnit(unit).getType().getOffence() > 0 &&
+            if (defender.getType().getOffence() > 0 &&
                 newTile.getSettlement() == null) {
-                value += 200 - newTile.getDefendingUnit(unit).getDefensePower(unit) * 2 - turns * 50;
+                value += 200 - combatModel.getDefencePower(unit, defender) * 2 - turns * 50;
             }
-            if (newTile.getDefendingUnit(unit).hasAbility("model.ability.expertSoldier")
-                    && !newTile.getDefendingUnit(unit).isArmed()) {
-                value += 10 - newTile.getDefendingUnit(unit).getDefensePower(unit) * 2 - turns * 25;
+            if (defender.hasAbility("model.ability.expertSoldier")
+                    && !defender.isArmed()) {
+                value += 10 - combatModel.getDefencePower(unit, defender) * 2 - turns * 25;
             }
             if (newTile.getSettlement() != null) {
                 value += 300;
@@ -1332,16 +1335,16 @@ public class AIPlayer extends AIObject {
                 while (dp.hasNext()) {
                     Unit u = dp.next();
                     if (u.isDefensiveUnit()) {
-                        if (u.getDefensePower(unit) > unit.getOffensePower(u)) {
-                            value -= 100 * (u.getDefensePower(unit) - unit.getOffensePower(u));
+                        if (combatModel.getDefencePower(unit, u) > combatModel.getOffencePower(unit, u)) {
+                            value -= 100 * (combatModel.getDefencePower(unit, u) - combatModel.getOffencePower(unit, u));
                         } else {
-                            value -= u.getDefensePower(unit);
+                            value -= combatModel.getDefencePower(unit, u);
                         }
                     }
                 }
             }
-            value += newTile.getDefendingUnit(unit).getOffensePower(unit)
-                    - newTile.getDefendingUnit(unit).getDefensePower(unit);
+            value += combatModel.getOffencePower(defender, unit) -
+                combatModel.getDefencePower(defender, unit);
             value -= turns * 10;
             return Math.max(0, value);
         } else {

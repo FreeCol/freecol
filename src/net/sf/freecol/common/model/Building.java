@@ -238,7 +238,7 @@ public final class Building extends FreeColGameObject implements Features, WorkL
         for (Feature feature : buildingType.getFeatures()) {
             colony.removeFeature(feature);
         }
-        colony.setDefenseBonus(colony.getDefenseBonus() - buildingType.getDefenseBonus());
+        colony.setDefenceBonus(colony.getDefenceBonus() - buildingType.getDefenceBonus());
 
         if (newBuildingType != null) {
             buildingType = newBuildingType;
@@ -247,7 +247,7 @@ public final class Building extends FreeColGameObject implements Features, WorkL
             for (Feature feature : buildingType.getFeatures()) {
                 colony.addFeature(feature);
             }
-            colony.setDefenseBonus(colony.getDefenseBonus() + buildingType.getDefenseBonus());
+            colony.setDefenceBonus(colony.getDefenceBonus() + buildingType.getDefenceBonus());
             
             // Colonists which can't work here must be put outside
             for (Unit unit : units) {

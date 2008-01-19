@@ -54,6 +54,7 @@ import javax.swing.filechooser.FileFilter;
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.Colony;
+import net.sf.freecol.common.model.CombatModel;
 import net.sf.freecol.common.model.IndianSettlement;
 import net.sf.freecol.common.model.Modifier;
 import net.sf.freecol.common.model.Player;
@@ -324,15 +325,16 @@ public class FreeColDialog extends FreeColPanel {
     public static FreeColDialog createPreCombatDialog(Unit attacker, Unit defender,
                                                       Settlement settlement, Canvas parent) {
 
-        ArrayList<Modifier> offense = Unit.getOffensiveModifiers(attacker, defender);
-        ArrayList<Modifier> defense = new ArrayList<Modifier>();
+        CombatModel combatModel = attacker.getGame().getCombatModel();
+        List<Modifier> offense = combatModel.getOffensiveModifiers(attacker, defender);
+        List<Modifier> defense = new ArrayList<Modifier>();
         if (defender == null && settlement != null) {
-            Modifier settlementModifier = Unit.getSettlementModifier(attacker, settlement);
+            Modifier settlementModifier = combatModel.getSettlementModifier(attacker, settlement);
             defense.add(new Modifier("modifiers.baseDefense", Float.MIN_VALUE, Modifier.ADDITIVE));
             defense.add(settlementModifier);
             defense.add(new Modifier("modifiers.finalResult", Float.MIN_VALUE, Modifier.ADDITIVE));
         } else {
-            defense = Unit.getDefensiveModifiers(attacker, defender);
+            defense = combatModel.getDefensiveModifiers(attacker, defender);
         }
 
         int numberOfModifiers = Math.max(offense.size(), defense.size());

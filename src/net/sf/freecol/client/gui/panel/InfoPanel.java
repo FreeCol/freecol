@@ -405,7 +405,7 @@ public final class InfoPanel extends FreeColPanel {
                 }
 
                 bonusLabel.setText(Messages.message("colopedia.terrain.defenseBonus") +
-                        " " + tile.defenseBonus() + "%");
+                        " " + tile.defenceBonus() + "%");
                 labelPanel.add(bonusLabel, higConst.rc(row, 1));
                 row++;
 

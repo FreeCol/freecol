@@ -503,17 +503,17 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
     public Unit getDefendingUnit(Unit attacker) {
         // First, find the strongest defender of this tile, if any
         Unit tileDefender = null;
-        float defensePower = -1.0f;
+        float defencePower = -1.0f;
         for(Unit nextUnit : unitContainer.getUnitsClone()) {
             if (this.isLand() == nextUnit.isNaval()) {
                 // on land tiles, ships are docked in port and cannot defend
                 // on ocean tiles, land units behave as ship cargo and cannot defend
                 continue;
             }
-            float tmpPower = nextUnit.getDefensePower(attacker);
-            if (tmpPower > defensePower) {
+            float tmpPower = getGame().getCombatModel().getDefencePower(nextUnit, attacker);
+            if (tmpPower > defencePower) {
                 tileDefender = nextUnit;
-                defensePower = tmpPower;
+                defencePower = tmpPower;
             }
         }
         // Then, find the strongest defender working in a settlement, if any
@@ -522,7 +522,8 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
             settlementDefender = settlement.getDefendingUnit(attacker);
         }
         // return the strongest of these two units
-        if (settlementDefender!=null && settlementDefender.getDefensePower(attacker)>defensePower) {
+        if (settlementDefender != null && 
+            getGame().getCombatModel().getDefencePower(settlementDefender, attacker) > defencePower) {
             return settlementDefender;
         } else {
             return tileDefender;
@@ -1419,14 +1420,14 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
     }
 
     /**
-     * The defense/ambush bonus of this tile.
+     * The defence/ambush bonus of this tile.
      * <p>
-     * Note that the defense bonus is relative to the unit base strength,
+     * Note that the defence bonus is relative to the unit base strength,
      * not to the cumulative strength.
      * 
-     * @return The defense modifier (in percent) of this tile.
+     * @return The defence modifier (in percent) of this tile.
      */
-    public int defenseBonus() {
+    public int defenceBonus() {
         if (type == null || type.getDefenceBonus() == null) {
             return 0;
         }

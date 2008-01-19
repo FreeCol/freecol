@@ -54,6 +54,7 @@ import net.sf.freecol.common.model.BuildableType;
 import net.sf.freecol.common.model.Building;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.ColonyTile;
+import net.sf.freecol.common.model.CombatModel.CombatResult;
 import net.sf.freecol.common.model.DiplomaticTrade;
 import net.sf.freecol.common.model.EquipmentType;
 import net.sf.freecol.common.model.Europe;
@@ -80,7 +81,6 @@ import net.sf.freecol.common.model.TileImprovement;
 import net.sf.freecol.common.model.TileImprovementType;
 import net.sf.freecol.common.model.TradeRoute;
 import net.sf.freecol.common.model.Unit;
-import net.sf.freecol.common.model.Unit.CombatResult;
 import net.sf.freecol.common.model.Unit.MoveType;
 import net.sf.freecol.common.model.Unit.UnitState;
 import net.sf.freecol.common.model.UnitType;
@@ -1749,7 +1749,7 @@ public final class InGameController implements NetworkConstants {
                 }
             }
             try {
-                unit.attack(defender, result, plunderGold);
+                game.getCombatModel().attack(unit, defender, result, plunderGold, 0);
             } catch (Exception e) {
                 // Ignore the exception (the update further down will fix any
                 // problems).

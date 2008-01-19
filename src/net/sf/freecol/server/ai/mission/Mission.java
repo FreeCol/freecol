@@ -23,6 +23,7 @@ package net.sf.freecol.server.ai.mission;
 import java.io.IOException;
 import java.util.logging.Logger;
 
+import net.sf.freecol.common.model.CombatModel;
 import net.sf.freecol.common.model.GoalDecider;
 import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.PathNode;
@@ -241,29 +242,32 @@ public abstract class Mission extends AIObject {
             }
             
             public boolean check(Unit unit, PathNode pathNode) {
+                CombatModel combatModel = getGame().getCombatModel();
                 Tile newTile = pathNode.getTile();
+                Unit defender = newTile.getDefendingUnit(unit);
                 if ((newTile.isLand() && !unit.isNaval() || !newTile.isLand() && unit.isNaval()) &&
-                        newTile.getDefendingUnit(unit) != null && newTile.getDefendingUnit(unit).getOwner() != unit.getOwner()) {
+                        defender != null && 
+                    defender.getOwner() != unit.getOwner()) {
                     
-                    int tension = unit.getOwner().getTension(newTile.getDefendingUnit(unit).getOwner()).getValue();
+                    int tension = unit.getOwner().getTension(defender.getOwner()).getValue();
                     if (unit.getIndianSettlement() != null) {
-                        tension += unit.getIndianSettlement().getAlarm(newTile.getDefendingUnit(unit).getOwner()).getValue();
+                        tension += unit.getIndianSettlement().getAlarm(defender.getOwner()).getValue();
                     }
-                    if (newTile.getDefendingUnit(unit).canCarryTreasure()) {
-                        tension += Math.min(newTile.getDefendingUnit(unit).getTreasureAmount() / 10, 600);
+                    if (defender.canCarryTreasure()) {
+                        tension += Math.min(defender.getTreasureAmount() / 10, 600);
                     }
-                    if (newTile.getDefendingUnit(unit).getType().getDefence() > 0 &&
+                    if (defender.getType().getDefence() > 0 &&
                         newTile.getSettlement() == null) {
-                        tension += 100 - newTile.getDefendingUnit(unit).getDefensePower(unit) * 2;
+                        tension += 100 - combatModel.getDefencePower(unit, defender) * 2;
                     }
-                    if (newTile.getDefendingUnit(unit).hasAbility("model.ability.expertSoldier") &&
-                        !newTile.getDefendingUnit(unit).isArmed()) {
-                        tension += 50 - newTile.getDefendingUnit(unit).getDefensePower(unit) * 2;
+                    if (defender.hasAbility("model.ability.expertSoldier") &&
+                        !defender.isArmed()) {
+                        tension += 50 - combatModel.getDefencePower(unit, defender) * 2;
                     }
                     // TODO-AI-CHEATING: REMOVE WHEN THE AI KNOWNS HOW TO HANDLE PEACE WITH THE INDIANS:
                     if (unit.getOwner().isIndian() 
-                            && newTile.getDefendingUnit(unit) != null
-                            && newTile.getDefendingUnit(unit).getOwner().isAI()) {
+                            && defender != null
+                            && defender.getOwner().isAI()) {
                         tension -= 200;
                     }
                     // END: TODO-AI-CHEATING
