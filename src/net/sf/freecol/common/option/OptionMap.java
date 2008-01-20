@@ -139,6 +139,8 @@ public abstract class OptionMap extends OptionGroup {
             return ((IntegerOption) o).getValue();
         } else if (o instanceof SelectOption) {
             return ((SelectOption) o).getValue();
+        } else if (o instanceof RangeOption) {
+            return ((RangeOption) o).getValue();
         } else {
             throw new IllegalArgumentException("No integer value associated with the specified option.");
         }

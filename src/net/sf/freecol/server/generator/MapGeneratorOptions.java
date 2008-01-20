@@ -27,7 +27,7 @@ import net.sf.freecol.common.option.BooleanOption;
 import net.sf.freecol.common.option.FileOption;
 import net.sf.freecol.common.option.OptionGroup;
 import net.sf.freecol.common.option.OptionMap;
-import net.sf.freecol.common.option.SelectOption;
+import net.sf.freecol.common.option.RangeOption;
 
 import org.w3c.dom.Element;
 
@@ -281,21 +281,21 @@ public class MapGeneratorOptions extends OptionMap {
             mapSizes[index] = sizes[index] + " (" + getWidth(index) + "x" +
                 getHeight(index) + ")";
         }
-        new SelectOption(MAP_SIZE, landGeneratorGroup, mapSizes, 0, true);
+        new RangeOption(MAP_SIZE, landGeneratorGroup, mapSizes, 0, true);
 
         String[] landMasses = new String[sizes.length];
         for (int index = 0; index < sizes.length; index++) {
             landMasses[index] = sizes[index] + " (" + getLandMass(index) + "%)";
         }
-        new SelectOption(LAND_MASS, landGeneratorGroup, landMasses, 1, true);
+        new RangeOption(LAND_MASS, landGeneratorGroup, landMasses, 1, true);
         add(landGeneratorGroup);
         
         final OptionGroup terrainGeneratorGroup = new OptionGroup("mapGeneratorOptions.terrainGenerator");
-        new SelectOption(RIVER_NUMBER, terrainGeneratorGroup, sizes, 1, true);
-        new SelectOption(MOUNTAIN_NUMBER, terrainGeneratorGroup, sizes, 1, true);
-        new SelectOption(RUMOUR_NUMBER, terrainGeneratorGroup, sizes, 1, true);
-        new SelectOption(FOREST_NUMBER, terrainGeneratorGroup, sizes, 2, true);
-        new SelectOption(BONUS_NUMBER, terrainGeneratorGroup, sizes, 1, true);
+        new RangeOption(RIVER_NUMBER, terrainGeneratorGroup, sizes, 1, true);
+        new RangeOption(MOUNTAIN_NUMBER, terrainGeneratorGroup, sizes, 1, true);
+        new RangeOption(RUMOUR_NUMBER, terrainGeneratorGroup, sizes, 1, true);
+        new RangeOption(FOREST_NUMBER, terrainGeneratorGroup, sizes, 2, true);
+        new RangeOption(BONUS_NUMBER, terrainGeneratorGroup, sizes, 1, true);
         add(terrainGeneratorGroup);
     }
 

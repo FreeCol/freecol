@@ -29,7 +29,7 @@ import net.sf.freecol.common.option.BooleanOption;
 import net.sf.freecol.common.option.IntegerOption;
 import net.sf.freecol.common.option.OptionGroup;
 import net.sf.freecol.common.option.OptionMap;
-import net.sf.freecol.common.option.SelectOption;
+import net.sf.freecol.common.option.RangeOption;
 
 import org.w3c.dom.Element;
 
@@ -158,7 +158,7 @@ public class GameOptions extends OptionMap {
 
         /* Difficulty settings */
         OptionGroup difficultySettings = new OptionGroup("gameOptions.difficultySettings");
-        new SelectOption(DIFFICULTY, difficultySettings,
+        new RangeOption(DIFFICULTY, difficultySettings,
                          new String[] {"veryEasy", 
                                        "easy", 
                                        "normal", 

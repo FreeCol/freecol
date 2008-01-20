@@ -34,6 +34,7 @@ import net.sf.freecol.common.option.IntegerOption;
 import net.sf.freecol.common.option.LanguageOption;
 import net.sf.freecol.common.option.OptionGroup;
 import net.sf.freecol.common.option.OptionMap;
+import net.sf.freecol.common.option.RangeOption;
 import net.sf.freecol.common.option.SelectOption;
 
 import org.w3c.dom.Element;
@@ -390,7 +391,7 @@ public class ClientOptions extends OptionMap {
         
         OptionGroup minimapGroup = new OptionGroup("clientOptions.minimap");
         new BooleanOption(SMOOTH_MINIMAP_RENDERING, minimapGroup, false);
-        new SelectOption(DEFAULT_MINIMAP_ZOOM, minimapGroup,
+        new RangeOption(DEFAULT_MINIMAP_ZOOM, minimapGroup,
                          new String[] {"1", "2", "3", "4", "5"}, 2, true);
 
         guiGroup.add(minimapGroup);
