@@ -112,7 +112,8 @@ public class TerrainGenerator {
                     if (importLandMap || importTile.isLand() == landMap[x][y]) {
                         t = new Tile(game, importTile.getType(), x, y);
                         // TileItemContainer copies everything including Resource unless importBonuses == false
-                        t.getTileItemContainer().copyFrom(importTile.getTileItemContainer(), importBonuses);
+                        if (importTile.getTileItemContainer()!=null)
+                            t.getTileItemContainer().copyFrom(importTile.getTileItemContainer(), importBonuses);
                         if (!importBonuses) {
                             // In which case, we may add a Bonus Resource
                             perhapsAddBonus(t, landMap);
