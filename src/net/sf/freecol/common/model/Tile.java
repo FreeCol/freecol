@@ -1645,6 +1645,25 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
         y = Integer.parseInt(in.getAttributeValue(null, "y"));
         String typeStr = in.getAttributeValue(null, "type");
         if (typeStr != null) {
+            if (!typeStr.startsWith("model.tile")) {
+                // upgrade of legacy 0.7 maps (America, Africa, Australia) which use older xml format
+                final String additionStr = in.getAttributeValue(null, "addition");
+                final String forestedStr = in.getAttributeValue(null, "forested");
+                boolean forested = (forestedStr!=null)?Boolean.valueOf(forestedStr).booleanValue():false;
+                if (additionStr!=null && additionStr.equals("4")) typeStr = "model.tile.mountains";
+                else if (additionStr!=null && additionStr.equals("3")) typeStr = "model.tile.hills";
+                else if (typeStr.equals("1")) typeStr = forested?"model.tile.mixedForest":"model.tile.plains";
+                else if (typeStr.equals("2")) typeStr = forested?"model.tile.coniferForest":"model.tile.grassland";
+                else if (typeStr.equals("3")) typeStr = forested?"model.tile.broadleafForest":"model.tile.prairie";
+                else if (typeStr.equals("4")) typeStr = forested?"model.tile.tropicalForest":"model.tile.savannah";
+                else if (typeStr.equals("5")) typeStr = forested?"model.tile.wetlandForest":"model.tile.marsh";
+                else if (typeStr.equals("6")) typeStr = forested?"model.tile.rainForest":"model.tile.swamp";
+                else if (typeStr.equals("7")) typeStr = forested?"model.tile.scrubForest":"model.tile.desert";
+                else if (typeStr.equals("8")) typeStr = forested?"model.tile.borealForest":"model.tile.tundra";
+                else if (typeStr.equals("9")) typeStr = "model.tile.arctic";
+                else if (typeStr.equals("10")) typeStr = "model.tile.ocean";
+                else if (typeStr.equals("11")) typeStr = "model.tile.highSeas";
+            }
             type = FreeCol.getSpecification().getTileType(typeStr);
         }
 
