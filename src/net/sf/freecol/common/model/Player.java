@@ -595,6 +595,31 @@ public class Player extends FreeColGameObject implements Features, Nameable {
                             new String[][] {{"%units%", unitNames.substring(2)}},
                             ModelMessage.UNIT_LOST);
         }
+        List<Unit> veterans = new ArrayList<Unit>();
+        for (Colony colony : getColonies()) {
+            int sol = colony.getSoL();
+            if (sol > 50) {
+                for (Unit unit : colony.getTile().getUnitList()) {
+                    if (unit.hasAbility("model.ability.expertSoldier")) {
+                        veterans.add(unit);
+                    }
+                }
+                int limit = veterans.size() * (sol - 50) / 100;
+                if (limit > 0) {
+                    for (int index = 0; index < limit; index++) {
+                        Unit unit = veterans.get(index);
+                        // TODO: use a new upgrade type?
+                        unit.setType(unit.getType().getPromotion());
+                    }
+                    addModelMessage(colony, "model.player.continentalArmyMuster", 
+                                    new String[][] {
+                                        { "%colony%", colony.getName() },
+                                        { "%number%", String.valueOf(limit) }
+                                    }, ModelMessage.DEFAULT);
+                }
+                veterans.clear();
+            }
+        }
         europe.dispose();
         europe = null;
     }
