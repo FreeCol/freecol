@@ -29,10 +29,9 @@ import net.sf.freecol.common.model.IndianSettlement;
 import net.sf.freecol.common.model.Map;
 import net.sf.freecol.common.model.Nation;
 import net.sf.freecol.common.model.Player;
-import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Map.Position;
-import net.sf.freecol.common.option.SelectOption;
+import net.sf.freecol.common.option.RangeOption;
 import net.sf.freecol.util.test.FreeColTestCase;
 import net.sf.freecol.util.test.MockModelController;
 
@@ -68,9 +67,8 @@ public class MapGeneratorTest extends FreeColTestCase {
         assertEquals(null, g.getMap());
 
         MapGenerator gen = new MapGenerator();
-        ((SelectOption) gen.getMapGeneratorOptions().getObject(
-            MapGeneratorOptions.MAP_SIZE))
-        .setValue(MapGeneratorOptions.MAP_SIZE_SMALL);
+        RangeOption mapSize = (RangeOption) gen.getMapGeneratorOptions().getObject(MapGeneratorOptions.MAP_SIZE);
+        mapSize.setValue(MapGeneratorOptions.MAP_SIZE_SMALL);
 
         Nation nation = FreeCol.getSpecification().getNation(
                                                              "model.nation.dutch");
