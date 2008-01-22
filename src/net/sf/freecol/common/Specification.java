@@ -39,6 +39,7 @@ import javax.xml.stream.XMLStreamReader;
 
 import net.sf.freecol.client.gui.action.ImprovementActionType;
 import net.sf.freecol.common.model.BuildingType;
+import net.sf.freecol.common.model.DifficultyLevel;
 import net.sf.freecol.common.model.EquipmentType;
 import net.sf.freecol.common.model.EuropeanNationType;
 import net.sf.freecol.common.model.FoundingFather;
@@ -92,6 +93,8 @@ public final class Specification {
 
     private final List<EquipmentType> equipmentTypes;
 
+    private final List<DifficultyLevel> difficultyLevels;
+
     /**
      * Creates a new <code>Specification</code> instance.
      *
@@ -142,6 +145,7 @@ public final class Specification {
         nations = new ArrayList<Nation>();
         nationTypes = new ArrayList<NationType>();
         equipmentTypes = new ArrayList<EquipmentType>();
+        difficultyLevels = new ArrayList<DifficultyLevel>();
 
         final Map<String, GoodsType> goodsTypeByRef = new HashMap<String, GoodsType>();
         final Map<String, ResourceType> resourceTypeByRef = new HashMap<String, ResourceType>();
@@ -328,6 +332,19 @@ public final class Specification {
                         }
                     };
                     equipmentTypes.addAll(makeListFromXml(xsr, factory));
+
+                } else if ("difficulty-levels".equals(childName)) {
+
+                    logger.finest("Found child named " + childName);
+                    ObjectFactory<DifficultyLevel> factory = new ObjectFactory<DifficultyLevel>() {
+                        int levelIndex = 0;
+                        public DifficultyLevel objectFrom(XMLStreamReader in) throws XMLStreamException {
+                            DifficultyLevel level = new DifficultyLevel(levelIndex++);
+                            allTypes.put(level.getId(), level);
+                            return level;
+                        }
+                    };
+                    difficultyLevels.addAll(makeListFromXml(xsr, factory));
 
                 } else {
                     throw new RuntimeException("unexpected: " + childName);
@@ -750,6 +767,14 @@ public final class Specification {
         return (EquipmentType) getType(id);
     }
     
+    // -- DifficultyLevels --
+    public List<DifficultyLevel> getDifficultyLevels() {
+        return difficultyLevels;
+    }
+
+    public DifficultyLevel getDifficultyLevel(String id) {
+        return (DifficultyLevel) getType(id);
+    }
 
 
     /**

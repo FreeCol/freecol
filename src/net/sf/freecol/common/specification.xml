@@ -1466,4 +1466,103 @@
     <nation id="model.nation.russianREF" color="#ffffff" nation-type="model.nationType.ref" ref-of="model.nation.russian"/>
   </nations>
 
+  <!-- crosses-increment: additional crosses required for each new immigrant
+       land-price-factor: determines the price of land bought from the natives
+       founing-father-factor: determines how many bells are required for founding fathers
+       arrears-factor: determines how much money is required to lift a boycott
+       native-convert-probability: determines the probability of getting native converts
+       burn-probability: determines the probability of missions getting burned
+       recruit-price-increase: determines how fast the price for recruiting colonists increases
+       lower-cap-increase: determines how fast the minimum price for recruiting colonists increases
+    -->
+  <difficulty-levels>
+    <difficulty-level
+       id="model.difficulty.veryEasy"
+       crosses-increment="6"
+       land-price-factor="40"
+       founding-father-factor="5"
+       arrears-factor="300"
+       native-convert-probability="50"
+       burn-probability="2"
+       recruit-price-increase="20"
+       lower-cap-increase="0">
+      <!-- determines how fast the price for purchasing units increases -->
+      <purchase-prices price-increase="0" per-unit-type="true">
+        <!-- only artillery becomes more expensive -->
+        <purchase-price unit-type="model.unit.artillery" price-increase="100"/>
+      </purchase-prices>
+      <!-- determines how fast the price for training colonists increases -->
+      <training-prices price-increase="0" per-unit-type="true">
+        <!-- In the original game, this price does not increase at all. Example increase:
+             <training-price unit-type="model.unit.elderStatesman" price-increase="100"/>
+             -->
+      </training-prices>
+    </difficulty-level>
+
+    <difficulty-level
+       id="model.difficulty.easy"
+       crosses-increment="8"
+       land-price-factor="50"
+       founding-father-factor="6"
+       arrears-factor="400"
+       native-convert-probability="40"
+       burn-probability="4"
+       recruit-price-increase="30"
+       lower-cap-increase="0">
+      <purchase-prices price-increase="0" per-unit-type="true">
+        <purchase-price unit-type="model.unit.artillery" price-increase="100"/>
+      </purchase-prices>
+      <training-prices price-increase="0" per-unit-type="true"/>
+    </difficulty-level>
+
+    <difficulty-level
+       id="model.difficulty.medium"
+       crosses-increment="10"
+       land-price-factor="60"
+       founding-father-factor="7"
+       arrears-factor="500"
+       native-convert-probability="30"
+       burn-probability="6"
+       recruit-price-increase="40"
+       lower-cap-increase="0">
+      <purchase-prices price-increase="0" per-unit-type="true">
+        <purchase-price unit-type="model.unit.artillery" price-increase="100"/>
+      </purchase-prices>
+      <training-prices price-increase="0" per-unit-type="true"/>
+    </difficulty-level>
+
+    <difficulty-level
+       id="model.difficulty.hard"
+       crosses-increment="12"
+       land-price-factor="70"
+       founding-father-factor="8"
+       arrears-factor="600"
+       native-convert-probability="20"
+       burn-probability="8"
+       recruit-price-increase="30"
+       lower-cap-increase="0">
+      <purchase-prices price-increase="0" per-unit-type="true">
+        <purchase-price unit-type="model.unit.artillery" price-increase="100"/>
+      </purchase-prices>
+      <training-prices price-increase="0" per-unit-type="true"/>
+    </difficulty-level>
+
+    <difficulty-level
+       id="model.difficulty.veryHard"
+       crosses-increment="14"
+       land-price-factor="80"
+       founding-father-factor="9"
+       arrears-factor="700"
+       native-convert-probability="40"
+       burn-probability="10"
+       recruit-price-increase="30"
+       lower-cap-increase="0">
+      <purchase-prices price-increase="0" per-unit-type="true">
+        <purchase-price unit-type="model.unit.artillery" price-increase="100"/>
+      </purchase-prices>
+      <training-prices price-increase="0" per-unit-type="true"/>
+    </difficulty-level>
+
+  </difficulty-levels>
+
 </freecol-specification>
