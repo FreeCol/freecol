@@ -24,10 +24,30 @@
     <property name="freecol.overview.file" value="${freecol.src.dir}/overview.html"/>
 	<property name="test" value="AllTests"/>
 
-    <path id="test.class.path">
-        <fileset dir="test/lib" includes="*.jar" />
-        <fileset dir="${basedir}/jars/" includes="*.jar" />
+    <path id="libraries.classpath">
+        <!-- HIG Layout manager -->
+        <pathelement location="${basedir}/jars/higlayout.jar" />
+        <!-- StAX xml parser -->
+        <pathelement location="${basedir}/jars/jsr173_1.0_api.jar" />
+        <!-- Woodstox XML processor -->
+        <pathelement location="${basedir}/jars/wstx-lgpl-4.0pr1.jar"/>
     </path>
+    <path id="junit.classpath">
+        <pathelement location="${basedir}/test/lib/junit.jar" />
+    </path>
+    <path id="freecol.build.classpath">
+        <path refid="libraries.classpath" />
+    </path>
+    <path id="test.build.classpath">
+        <path refid="junit.classpath"/>
+        <path refid="libraries.classpath" />
+     </path>
+    <path id="test.run.classpath">
+        <pathelement location="${freecol.build.dir}" />
+        <path refid="junit.classpath"/>
+        <path refid="libraries.classpath" />
+    </path>
+
     <condition property="isOsUnixLike">
         <os family="unix" />
     </condition>
@@ -65,18 +85,19 @@
         <mkdir dir="${freecol.build.dir}"/>
         <javac srcdir="${freecol.src.dir}"
             destdir="${freecol.build.dir}"
-            classpath="${basedir}/jars/higlayout.jar:${basedir}/jars/jsr173_1.0_api.jar:${basedir}/jars/wstx-lgpl-4.0pr1.jar"
+            classpathref="freecol.build.classpath"
             debug="on"
             optimize="on"
             deprecation="off"
             source="1.5"/>
     </target>
 
+    <!-- Compile the JUnit tests -->
     <target name="compile-test" depends="init">
         <mkdir dir="${freecol.build.dir}"/>
         <javac srcdir="test/src"
             destdir="${freecol.build.dir}"
-            classpath="test/lib/junit.jar:${basedir}/jars/higlayout.jar:${basedir}/jars/jsr173_1.0_api.jar:${basedir}/jars/wstx-lgpl-4.0pr1.jar"
+            classpathref="test.build.classpath"
             debug="on"
             optimize="on"
             deprecation="off"
@@ -477,7 +498,7 @@
                 destdir="${freecol.javadoc.dir}"
                 packagenames="net.sf.freecol.*"
                 private="true"
-                classpath="${basedir}/jars/higlayout.jar:${basedir}/jars/jsr173_1.0_api.jar:${basedir}/jars/wstx-lgpl-4.0pr1.jar"
+                classpathref="freecol.build.classpath"
                 Author="true"
                 Windowtitle="FreeCol Code Documentation"
         />
@@ -511,13 +532,7 @@
             export CLASSPATH=${CLASSPATH}:test/lib/junit.jar; ant testall
             -->
         <junit printsummary="yes">
-	        <classpath>
-	            <pathelement location="${freecol.build.dir}" />
-	            <pathelement location="test/lib/junit.jar" />
-	            <pathelement location="${basedir}/jars/higlayout.jar" />
-	            <pathelement location="${basedir}/jars/jsr173_1.0_api.jar" />
-	            <pathelement location="${basedir}/jars/wstx-lgpl-4.0pr1.jar"/>
-	        </classpath>
+	        <classpath refid="test.run.classpath"/>
 	       	<formatter type="brief" usefile="false" />
         	<formatter type="plain" /> 
         	<test todir="${freecol.build.dir}" name="net.sf.freecol.${test}" />
@@ -549,13 +564,7 @@
             export CLASSPATH=${CLASSPATH}:test/lib/junit.jar; ant testall
             -->
         <junit printsummary="on" errorproperty="error.junit" fork="yes" maxmemory="16m">
-            <classpath>
-                <pathelement location="${freecol.build.dir}" />
-                <pathelement location="test/lib/junit.jar" />
-                <pathelement location="${basedir}/jars/higlayout.jar" />
-                <pathelement location="${basedir}/jars/jsr173_1.0_api.jar" />
-                <pathelement location="${basedir}/jars/wstx-lgpl-4.0pr1.jar"/>
-            </classpath>
+            <classpath refid="test.run.classpath"/>
             <formatter type="xml" />
             
            	<test todir="${freecol.build.dir}/report/xml" name="net.sf.freecol.AllTests" fork="yes"/>
@@ -583,7 +592,7 @@
         <depend srcDir="test/src" destDir="${freecol.build.dir}"
                 cache="${freecol.build.dir}" />
         <javac srcdir="test/src" destdir="${freecol.build.dir}"
-            classpathref="test.class.path" debug="on" deprecation="off"
+            classpathref="test.build.classpath" debug="on" deprecation="off"
             source="1.5" />
     </target>
 
