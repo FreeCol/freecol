@@ -22,9 +22,11 @@ package net.sf.freecol.common.model;
 import java.awt.Color;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.MissingResourceException;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -159,7 +161,7 @@ public class Player extends FreeColGameObject implements Features, Nameable {
     private boolean dead = false;
 
     // any founding fathers in this Player's congress
-    final private List<FoundingFather> allFathers = new ArrayList<FoundingFather>();
+    final private Set<FoundingFather> allFathers = new HashSet<FoundingFather>();
 
     private FoundingFather currentFather;
 
@@ -279,9 +281,9 @@ public class Player extends FreeColGameObject implements Features, Nameable {
     public Player(Game game, String name, boolean admin, Nation newNation) {
         super(game);
         
-        if (game == null)
+        if (game == null) {
             this.index = -1;
-        else {
+        } else {
             this.index = game.getNextPlayerIndex();
         }
         this.name = name;
@@ -435,8 +437,7 @@ public class Player extends FreeColGameObject implements Features, Nameable {
     public void removeSettlement(Settlement s) {
         if (settlements.contains(s)) {
             if (s.getOwner() == this) {
-                throw new IllegalStateException(
-                                                "Cannot remove the ownership of the given settlement before it has been given to another player.");
+                throw new IllegalStateException("Cannot remove the ownership of the given settlement before it has been given to another player.");
             }
             settlements.remove(s);
         }
@@ -1129,16 +1130,6 @@ public class Player extends FreeColGameObject implements Features, Nameable {
      */
     public void setPlayerType(PlayerType type) {
         playerType = type;
-    }
-
-    /**
-     * Adds a founding father to this players continental congress.
-     * 
-     * @param newFather a <code>FoundingFather</code> value
-     * @see FoundingFather
-     */
-    public void addFather(FoundingFather newFather) {
-        allFathers.add(newFather);
     }
 
     /**
@@ -2045,6 +2036,86 @@ public class Player extends FreeColGameObject implements Features, Nameable {
     }
 
     /**
+     * Adds a founding father to this players continental congress.
+     * 
+     * @param newFather a <code>FoundingFather</code> value
+     * @see FoundingFather
+     */
+    public void addFather(FoundingFather father) {
+
+        allFathers.add(father);
+
+        addModelMessage(this, "model.player.foundingFatherJoinedCongress", 
+                        new String[][] {
+                            { "%foundingFather%", currentFather.getName() },
+                            { "%description%", currentFather.getDescription() }
+                        }, ModelMessage.DEFAULT);
+
+        for (Feature feature : father.getFeatures()) {
+            addFeature(feature);
+        }
+
+        List<AbstractUnit> units = father.getUnits();
+        if (units != null) {
+            // TODO: make use of armed, mounted, etc.
+            for (int index = 0; index < units.size(); index++) {
+                AbstractUnit unit = units.get(index);
+                String uniqueID = getId() + "newTurn" + father.getId() + index;
+                getGame().getModelController().createUnit(uniqueID, getEurope(), this, unit.getUnitType());
+            }
+        }
+
+        java.util.Map<UnitType, UnitType> upgrades = father.getUpgrades();
+        if (upgrades != null) {
+            Iterator<Unit> unitIterator = getUnitIterator();
+            while (unitIterator.hasNext()) {
+                Unit unit = unitIterator.next();
+                if (upgrades.get(unit.getIndex()) != null) {
+                    unit.setType(upgrades.get(unit.getIndex()));
+                }
+            }
+        }
+
+        for (String event : father.getEvents().keySet()) {
+            if (event.equals("model.event.resetNativeAlarm")) {
+                // reduce indian tension and alarm
+                Iterator<Player> pi = getGame().getPlayerIterator();
+                while (pi.hasNext()) {
+                    Player p = pi.next();
+                    if (!p.isEuropean()) {
+                        p.getTension(this).setValue(0);
+                        for (IndianSettlement is : getIndianSettlements()) {
+                            is.getAlarm(this).setValue(0);
+                        }
+                    }
+                }
+            } else if (event.equals("model.event.boycottsLifted")) {
+                for (GoodsType goodsType : FreeCol.getSpecification().getGoodsTypeList()) {
+                    resetArrears(goodsType);
+                }
+            } else if (event.equals("model.event.freeBuilding")) {
+                BuildingType type = FreeCol.getSpecification().getBuildingType(father.getEvents()
+                                                                               .get(event));
+                for (Colony colony : getColonies()) {
+                    Building building = colony.getBuilding(type);
+                    if (building == null) {
+                        colony.addBuilding(new Building(getGame(), colony, type));
+                    }
+                }
+            } else if (event.equals("model.event.seeAllColonies")) {
+                exploreAllColonies();
+            } else if (event.equals("model.event.increaseSonsOfLiberty")) {
+                int value = Integer.parseInt(father.getEvents().get(event));
+                for (Colony colony : getColonies()) {
+                    colony.addSoL(value);
+                }
+            }
+
+
+        }
+    }
+
+    /**
      * Prepares this <code>Player</code> for a new turn.
      */
     public void newTurn() {
@@ -2079,73 +2150,6 @@ public class Player extends FreeColGameObject implements Features, Nameable {
         if (isEuropean()) {
             if (getBells() >= getTotalFoundingFatherCost() && currentFather != null) {
                 addFather(currentFather);
-                for (Feature feature : currentFather.getFeatures()) {
-                    addFeature(feature);
-                }
-
-                List<AbstractUnit> units = currentFather.getUnits();
-                if (units != null) {
-                    // TODO: make use of armed, mounted, etc.
-                    for (int index = 0; index < units.size(); index++) {
-                        AbstractUnit unit = units.get(index);
-                        String uniqueID = getId() + "newTurn" + currentFather.getId() + index;
-                        getGame().getModelController().createUnit(uniqueID, getEurope(), this, unit.getUnitType());
-                    }
-                }
-
-                java.util.Map<UnitType, UnitType> upgrades = currentFather.getUpgrades();
-                if (upgrades != null) {
-                    Iterator<Unit> unitIterator = getUnitIterator();
-                    while (unitIterator.hasNext()) {
-                        Unit unit = unitIterator.next();
-                        if (upgrades.get(unit.getIndex()) != null) {
-                            unit.setType(upgrades.get(unit.getIndex()));
-                        }
-                    }
-                }
-
-                for (String event : currentFather.getEvents().keySet()) {
-                    if (event.equals("model.event.resetNativeAlarm")) {
-                        // reduce indian tension and alarm
-                        Iterator<Player> pi = getGame().getPlayerIterator();
-                        while (pi.hasNext()) {
-                            Player p = pi.next();
-                            if (!p.isEuropean()) {
-                                p.getTension(this).setValue(0);
-                                for (IndianSettlement is : getIndianSettlements()) {
-                                    is.getAlarm(this).setValue(0);
-                                }
-                            }
-                        }
-                    } else if (event.equals("model.event.boycottsLifted")) {
-                        for (GoodsType goodsType : FreeCol.getSpecification().getGoodsTypeList()) {
-                            resetArrears(goodsType);
-                        }
-                    } else if (event.equals("model.event.freeBuilding")) {
-                        BuildingType type = FreeCol.getSpecification().getBuildingType(currentFather.getEvents()
-                                                                                       .get(event));
-                        for (Colony colony : getColonies()) {
-                            Building building = colony.getBuilding(type);
-                            if (building == null) {
-                                colony.addBuilding(new Building(getGame(), colony, type));
-                            }
-                        }
-                    } else if (event.equals("model.event.seeAllColonies")) {
-                        exploreAllColonies();
-                    } else if (event.equals("model.event.increaseSonsOfLiberty")) {
-                        int value = Integer.parseInt(currentFather.getEvents().get(event));
-                        for (Colony colony : getColonies()) {
-                            colony.addSoL(value);
-                        }
-                    }
-
-
-                }
-
-                addModelMessage(this, "model.player.foundingFatherJoinedCongress", new String[][] {
-                        { "%foundingFather%", currentFather.getName() },
-                        { "%description%", currentFather.getDescription() } },
-                    ModelMessage.DEFAULT);
                 currentFather = null;
                 bells = 0;
             }
@@ -2284,15 +2288,6 @@ public class Player extends FreeColGameObject implements Features, Nameable {
             out.writeAttribute("attackedByPrivateers", Boolean.toString(attackedByPrivateers));
             out.writeAttribute("oldSoL", Integer.toString(oldSoL));
             out.writeAttribute("score", Integer.toString(score));
-            // TODO: review this data structure
-            char[] fatherCharArray = new char[FreeCol.getSpecification().numberOfFoundingFathers()];
-            for (int i = 0; i < fatherCharArray.length; i++) {
-                fatherCharArray[i] = '0';
-            }
-            for (FoundingFather father : allFathers) {
-                fatherCharArray[father.getIndex()] = '1';
-            }
-            out.writeAttribute("foundingFathers", new String(fatherCharArray));
             StringBuffer sb = new StringBuffer(contacted.length);
             for (int i = 0; i < contacted.length; i++) {
                 if (contacted[i]) {
@@ -2336,6 +2331,12 @@ public class Player extends FreeColGameObject implements Features, Nameable {
         }
 
         if (getGame().isClientTrusted() || showAll || equals(player)) {
+            List<String> fatherIds = new ArrayList<String>();
+            for (FoundingFather father : allFathers) {
+                fatherIds.add(father.getId());
+            }
+            toArrayElement("foundingFathers", fatherIds.toArray(new String[fatherIds.size()]), out);
+
             if (europe != null) {
                 europe.toXML(out, player, showAll, toSavedGame);
             }
@@ -2370,9 +2371,9 @@ public class Player extends FreeColGameObject implements Features, Nameable {
         dead = getAttribute(in, "dead", false);
         tax = Integer.parseInt(in.getAttributeValue(null, "tax"));
         playerType = Enum.valueOf(PlayerType.class, in.getAttributeValue(null, "playerType"));
-        String fatherId = in.getAttributeValue(null, "currentFather");
-        if (fatherId != null) {
-            currentFather = FreeCol.getSpecification().getFoundingFather(fatherId);
+        String currentFatherId = in.getAttributeValue(null, "currentFather");
+        if (currentFatherId != null) {
+            currentFather = FreeCol.getSpecification().getFoundingFather(currentFatherId);
         }
         crossesRequired = Integer.parseInt(in.getAttributeValue(null, "crossesRequired"));
         final String contactedStr = in.getAttributeValue(null, "contacted");
@@ -2389,15 +2390,7 @@ public class Player extends FreeColGameObject implements Features, Nameable {
         if (newLandNameStr != null) {
             newLandName = newLandNameStr;
         }
-        // TODO: review this data structure
-        final String foundingFathersStr = in.getAttributeValue(null, "foundingFathers");
-        if (foundingFathersStr != null) {
-            for (int i = 0; i < foundingFathersStr.length(); i++) {
-                if (foundingFathersStr.charAt(i) == '1') {
-                    addFather(FreeCol.getSpecification().getFoundingFather(i));
-                }
-            }
-        }
+
         attackedByPrivateers = getAttribute(in, "attackedByPrivateers", false);
         final String entryLocationStr = in.getAttributeValue(null, "entryLocation");
         if (entryLocationStr != null) {
@@ -2414,6 +2407,16 @@ public class Player extends FreeColGameObject implements Features, Nameable {
                 int[] tensionArray = readFromArrayElement("tension", in, new int[0]);
                 for (int i = 0; i < tensionArray.length; i++) {
                     tension[i] = new Tension(tensionArray[i]);
+                }
+            } else if (in.getLocalName().equals("foundingFathers")) {
+                String[] fatherIds = readFromArrayElement("foundingFathers", in, new String[0]);
+                for (String fatherId : fatherIds) {
+                    FoundingFather father = FreeCol.getSpecification().getFoundingFather(fatherId);
+                    allFathers.add(father);
+                    // add only features, no other effects
+                    for (Feature feature : father.getFeatures()) {
+                        addFeature(feature);
+                    }
                 }
             } else if (in.getLocalName().equals("stance")) {
                 String[] stanceStrings = readFromArrayElement("stance", in, new String[0]);
