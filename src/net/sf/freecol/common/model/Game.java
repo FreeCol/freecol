@@ -153,7 +153,10 @@ public class Game extends FreeColGameObject {
 
         setFreeColGameObjectListener(freeColGameObjectListener);
         this.modelController = modelController;
-        this.combatModel = new SimpleCombatModel(modelController.getPseudoRandom());
+        if (modelController != null) {
+            // no model controller when using the map editor
+            this.combatModel = new SimpleCombatModel(modelController.getPseudoRandom());
+        }
         this.viewOwner = null;
 
         canGiveID = true;
