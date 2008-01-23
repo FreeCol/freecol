@@ -620,6 +620,21 @@ public final class Specification {
         return getUnitTypesWithAnyAbility(new String[] { ability });
     }
 
+    /*
+     * Returns the unit types that can be trained in Europe
+     */
+    public List<UnitType> getUnitTypesTrainedInEurope(){
+    	List<UnitType> unitTypesForTraining = new ArrayList<UnitType>();
+    	
+    	List<UnitType> unitTypes = getUnitTypeList();
+    	for(UnitType unitType : unitTypes) {
+    		if (!unitType.hasSkill() && unitType.hasPrice()) {
+    			unitTypesForTraining.add(unitType);
+    		}
+    	}
+    	return unitTypesForTraining;
+    }
+    
     // -- Founding Fathers --
 
     public List<FoundingFather> getFoundingFathers() {

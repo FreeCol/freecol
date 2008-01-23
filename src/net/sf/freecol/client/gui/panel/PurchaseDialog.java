@@ -79,15 +79,10 @@ public final class PurchaseDialog extends FreeColDialog implements ActionListene
 
         JTextArea question = getDefaultTextArea(Messages.message("purchaseDialog.clickOn"));
 
-        ArrayList<UnitType> unitTypesForPurchasing = new ArrayList<UnitType>();
-        List<UnitType> unitTypes = FreeCol.getSpecification().getUnitTypeList();
-        for(UnitType unitType : unitTypes) {
-            if (!unitType.hasSkill() && unitType.hasPrice()) {
-                unitTypesForPurchasing.add(unitType);
-            }
-        }
-
-        int numberUnits = unitTypesForPurchasing.size();
+        List<UnitType> unitTypesForTraining = FreeCol.getSpecification().getUnitTypesTrainedInEurope();
+        
+        int numberUnits = unitTypesForTraining.size();
+        
         int[] widths = new int[] { 0, margin, 0 };
         int[] heights = new int[2 * numberUnits - 1];
         for (int index = 1; index < numberUnits; index += 2) {
@@ -102,7 +97,7 @@ public final class PurchaseDialog extends FreeColDialog implements ActionListene
         prices = new ArrayList<JLabel>();
         buttons = new ArrayList<JButton>();
         int row = 1;
-        for(UnitType unitType : unitTypesForPurchasing) {
+        for(UnitType unitType : unitTypesForTraining) {
             ImageIcon unitIcon = library.getUnitImageIcon(unitType);
             JButton button = new JButton(unitType.getName(), library.getScaledImageIcon(unitIcon, 0.66f));
             button.setIconTextGap(margin);
