@@ -67,7 +67,7 @@ public final class TrainDialog extends FreeColDialog implements ActionListener {
     
     private final JButton cancel = new JButton(Messages.message("trainDialog.cancel"));
 
-    private final ArrayList<UnitType> trainableUnits = new ArrayList<UnitType>();
+    private final List<UnitType> trainableUnits = new ArrayList<UnitType>();
 
     private final ArrayList<JLabel> prices = new ArrayList<JLabel>();
 
@@ -86,12 +86,8 @@ public final class TrainDialog extends FreeColDialog implements ActionListener {
 
         ImageLibrary library = parent.getGUI().getImageLibrary();
 
-        List<UnitType> unitTypes = FreeCol.getSpecification().getUnitTypeList();
-        for(UnitType unitType : unitTypes) {
-            if (unitType.getSkill() > 0 && unitType.hasPrice()) {
-                trainableUnits.add(unitType);
-            }
-        }
+        trainableUnits.addAll(FreeCol.getSpecification().getUnitTypesTrainedInEurope());
+
         Collections.sort(trainableUnits, priceComparator);
 
         setLayout(new HIGLayout(new int[] { 0 }, new int[] { 0, margin, 0, margin, 0 }));
