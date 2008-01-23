@@ -749,14 +749,12 @@ public class TransportMission extends Mission {
 
         int priceTrained = 0;
         UnitType cheapestTrained = null;
-        List<UnitType> unitTypes = FreeCol.getSpecification().getUnitTypeList();
+        List<UnitType> unitTypes = FreeCol.getSpecification().getUnitTypesTrainedInEurope();
         for (UnitType unitType : unitTypes) {
-            if (unitType.hasPrice() && unitType.hasSkill()) {
-                int price = europe.getUnitPrice(unitType);
-                if (cheapestTrained == null || price < priceTrained) {
-                    cheapestTrained = unitType;
-                    priceTrained = price;
-                }
+            int price = europe.getUnitPrice(unitType);
+            if (cheapestTrained == null || price < priceTrained) {
+            	cheapestTrained = unitType;
+            	priceTrained = price;
             }
         }
         // Try recruiting the unit:
