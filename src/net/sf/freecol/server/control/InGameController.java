@@ -356,8 +356,6 @@ public final class InGameController extends Controller {
              */
             return false;
         }
-        
-        Map map = getGame().getMap();
 
         // Quick check to avoid long processing time:
         if (!player.getSettlements().isEmpty()) {
@@ -371,31 +369,113 @@ public final class InGameController extends Controller {
          * settlements on the map.
          */
         
-        if (player.isEuropean()) {
-            /*
-             * if (getGame().getTurn().getNumber() > 20 ||
-             * player.getEurope().getFirstUnit() == null && player.getGold() <
-             * 600 && player.getGold() < player.getRecruitPrice()) {
-             * 
-             */
-            if (getGame().getTurn().getNumber() > 20) {
-                return true;
-            } else if (player.getEurope() == null) {
-                return true;
-            } else if (player.getGold() < 1000) {
-                Iterator<Unit> unitIterator = player.getEurope().getUnitIterator();
-                while (unitIterator.hasNext()) {
-                    if (unitIterator.next().isCarrier()) {
-                        return false;
-                    }
-                }
-                return true;
-            } else {
-                return false;
-            }
-        } else {
-            return true;
+        /*
+         *  No Europe, no reenforcements
+         */
+        if (!player.isEuropean() || player.getEurope() == null) {
+        	return true;
         }
+        
+        // After 20 turns, no presence in New World means endgame
+        if (getGame().getTurn().getNumber() > 20) {
+        	return true;
+        }
+        
+        /*
+         * Check if player has colonists and carrier to transport them to New World
+         */
+        boolean hasCarrier = false;
+        boolean hasColonistsWaiting = false;
+        
+        Iterator<Unit> unitIterator = player.getEurope().getUnitIterator();
+    	while (unitIterator.hasNext()) {
+    		Unit unit = unitIterator.next();
+    		if (unit.isCarrier()) {
+    			/*
+    			 * The carrier has units 
+    			 *or goods that can be sold
+    			 */
+    			if(unit.getGoodsCount() > 0){
+    				return false;
+    			}
+    			
+    			hasCarrier = true;
+    			continue;
+    		}
+    		if (unit.isColonist()){
+    			hasColonistsWaiting = true;
+    			continue;
+    		}
+    	}
+        
+        int goldNeeded = 0;
+        
+        /*
+    	 * No carrier, check if has gold to buy one
+    	 */
+    	if(!hasCarrier){
+    		/*
+    		 * Find the cheapest naval unit
+    		 */
+    		
+    		Iterator<UnitType> navalUnits = FreeCol.getSpecification().getUnitTypesWithAbility("model.ability.navalUnit").iterator();
+    		
+    		int lowerPrice = navalUnits.next().getPrice();
+    		
+    		while(navalUnits.hasNext()){
+    			UnitType unit = navalUnits.next();
+    			if(unit.getPrice() < lowerPrice){
+    				lowerPrice = unit.getPrice();
+    			}
+    		}
+    		
+    		goldNeeded += lowerPrice;
+    		
+    		if(goldNeeded > player.getGold()){
+    			return true;
+    		}
+    	}
+    	
+    	/*
+    	 * No colonists, check if has gold to train 
+    	 *or recruit one
+    	 */
+    	
+    	if(!hasColonistsWaiting){
+    		int goldToRecruit =  player.getEurope().getRecruitPrice();
+    		
+    		/*
+    		 * Find the cheapest naval unit
+    		 */
+    		
+    		Iterator<UnitType> trainedUnits = FreeCol.getSpecification().getUnitTypesTrainedInEurope().iterator();
+    		
+    		int goldToTrain = Integer.MAX_VALUE;
+    		
+    		while(trainedUnits.hasNext()){
+    			UnitType unit = trainedUnits.next();
+    			
+    			if(!unit.hasAbility("model.ability.foundColony")){
+    				continue;
+    			}
+    			
+    			if(unit.getPrice() < goldToTrain){
+    				goldToTrain = unit.getPrice();
+    			}
+    		}
+    		    		
+    		goldNeeded += Math.min(goldToTrain, goldToRecruit);
+    		
+    		if(goldNeeded > player.getGold()){
+    			return true;
+    		}
+    	}
+    	
+    	/*
+    	 * Has carrier and colonists waiting, or
+    	 *enough gold to buy them
+    	 */
+    	return false;
     }
 
     /**
