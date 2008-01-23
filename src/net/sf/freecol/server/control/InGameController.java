@@ -420,12 +420,12 @@ public final class InGameController extends Controller {
     		
     		Iterator<UnitType> navalUnits = FreeCol.getSpecification().getUnitTypesWithAbility("model.ability.navalUnit").iterator();
     		
-    		int lowerPrice = navalUnits.next().getPrice();
+    		int lowerPrice = player.getEurope().getUnitPrice(navalUnits.next());
     		
     		while(navalUnits.hasNext()){
     			UnitType unit = navalUnits.next();
-    			if(unit.getPrice() < lowerPrice){
-    				lowerPrice = unit.getPrice();
+    			if(player.getEurope().getUnitPrice(unit) < lowerPrice){
+    				lowerPrice = player.getEurope().getUnitPrice(unit);
     			}
     		}
     		
@@ -445,7 +445,7 @@ public final class InGameController extends Controller {
     		int goldToRecruit =  player.getEurope().getRecruitPrice();
     		
     		/*
-    		 * Find the cheapest naval unit
+    		 * Find the cheapest colonist, either by recruiting or training
     		 */
     		
     		Iterator<UnitType> trainedUnits = FreeCol.getSpecification().getUnitTypesTrainedInEurope().iterator();
@@ -459,8 +459,8 @@ public final class InGameController extends Controller {
     				continue;
     			}
     			
-    			if(unit.getPrice() < goldToTrain){
-    				goldToTrain = unit.getPrice();
+    			if(player.getEurope().getUnitPrice(unit) < goldToTrain){
+    				goldToTrain = player.getEurope().getUnitPrice(unit);
     			}
     		}
     		    		

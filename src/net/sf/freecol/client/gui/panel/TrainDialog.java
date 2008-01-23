@@ -164,7 +164,7 @@ public final class TrainDialog extends FreeColDialog implements ActionListener {
             
             int price = player.getEurope().getUnitPrice(unitType);
             prices.get(index).setText(String.valueOf(price));
-            if (trainableUnits.get(index).getPrice() > player.getGold()) {
+            if (price > player.getGold()) {
                 button.setEnabled(false);
             } else {
                 button.setEnabled(true);

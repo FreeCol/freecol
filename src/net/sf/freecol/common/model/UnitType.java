@@ -310,6 +310,10 @@ public final class UnitType extends BuildableType {
      * Get the <code>Price</code> value.
      *
      * @return an <code>int</code> value
+     * 
+     * This returns the base price of the <code>UnitType</code>
+     * 
+     * For the actual price of the unit, use {@link Europe#getUnitPrice(UnitType)} 
      */
     public int getPrice() {
         return price;
