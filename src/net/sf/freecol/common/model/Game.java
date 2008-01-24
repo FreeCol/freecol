@@ -1013,6 +1013,12 @@ public class Game extends FreeColGameObject {
                 logger.warning("Unknown tag: " + in.getLocalName() + " loading game");
             }
         }
+        // sanity check: we should be on the closing tag
+        if (!in.getLocalName().equals(Game.getXMLElementTagName())) {
+            logger.warning("Error parsing xml: expecting closing tag </" + Game.getXMLElementTagName() + "> "+
+                           "found instead: " +in.getLocalName());
+        }
+        
         if (gameOptions == null) {
             gameOptions = new GameOptions();
         }

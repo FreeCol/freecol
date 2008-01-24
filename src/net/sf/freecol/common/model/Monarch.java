@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
@@ -54,6 +55,8 @@ public final class Monarch extends FreeColGameObject {
 
     /** Pseudo-random number generator. */
     PseudoRandom random = getGame().getModelController().getPseudoRandom();
+    
+    private static final Logger logger = Logger.getLogger(Monarch.class.getName());
 
     private static final EquipmentType muskets = FreeCol.getSpecification().getEquipmentType("model.equipment.muskets");
     private static final EquipmentType horses = FreeCol.getSpecification().getEquipmentType("model.equipment.horses");
@@ -610,8 +613,12 @@ public final class Monarch extends FreeColGameObject {
                 }
             }
         }
-
-        in.nextTag();
+        
+        // sanity check: we should be on the closing tag
+        if (!in.getLocalName().equals(Monarch.getXMLElementTagName())) {
+            logger.warning("Error parsing xml: expecting closing tag </" + Monarch.getXMLElementTagName() + "> "+
+                           "found instead: " +in.getLocalName());
+        }
     }
 
 

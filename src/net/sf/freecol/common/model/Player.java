@@ -2453,6 +2453,13 @@ public class Player extends FreeColGameObject implements Features, Nameable {
                 logger.warning("Unknown tag: " + in.getLocalName() + " loading player");
             }
         }
+        
+        // sanity check: we should be on the closing tag
+        if (!in.getLocalName().equals(Player.getXMLElementTagName())) {
+            logger.warning("Error parsing xml: expecting closing tag </" + Player.getXMLElementTagName() + "> "+
+                           "found instead: " +in.getLocalName());
+        }
+        
         if (market == null) {
             market = new Market(getGame(), this);
         }
