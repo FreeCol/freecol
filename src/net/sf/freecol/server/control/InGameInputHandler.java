@@ -38,6 +38,7 @@ import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.ColonyTile;
 import net.sf.freecol.common.model.CombatModel;
 import net.sf.freecol.common.model.CombatModel.CombatResult;
+import net.sf.freecol.common.model.CombatModel.CombatResultType;
 import net.sf.freecol.common.model.DiplomaticTrade;
 import net.sf.freecol.common.model.EquipmentType;
 import net.sf.freecol.common.model.Europe;
@@ -1252,7 +1253,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         Unit defender = newTile.getDefendingUnit(unit);
         if (defender == null) {
             if (newTile.getSettlement() != null) {
-                result = CombatResult.DONE_SETTLEMENT;
+                result = new CombatResult(CombatResultType.DONE_SETTLEMENT, 0);
             } else {
                 throw new IllegalStateException("Nothing to attack in direction " + direction + " from unit with ID "
                         + unitID);
@@ -1260,7 +1261,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         } else {
             result = unit.getGame().getCombatModel().generateAttackResult(unit, defender); 
         }
-        if (result == CombatResult.DONE_SETTLEMENT) {
+        if (result.type == CombatResultType.DONE_SETTLEMENT) {
             // 10% of their gold
             plunderGold = newTile.getSettlement().getOwner().getGold() / 10;
         }
@@ -1275,7 +1276,8 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
             Element opponentAttackElement = Message.createNewRootElement("opponentAttack");
             if (unit.isVisibleTo(enemyPlayer) || defender.isVisibleTo(enemyPlayer)) {
                 opponentAttackElement.setAttribute("direction", direction.toString());
-                opponentAttackElement.setAttribute("result", result.toString());
+                opponentAttackElement.setAttribute("result", result.type.toString());
+                opponentAttackElement.setAttribute("damage", String.valueOf(result.damage));
                 opponentAttackElement.setAttribute("plunderGold", Integer.toString(plunderGold));
                 opponentAttackElement.setAttribute("unit", unit.getId());
                 opponentAttackElement.setAttribute("defender", defender.getId());
@@ -1306,7 +1308,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         reply.setAttribute("result", result.toString());
         reply.setAttribute("plunderGold", Integer.toString(plunderGold));
         
-        if (result == CombatResult.DONE_SETTLEMENT && newTile.getColony() != null) {
+        if (result.type == CombatResultType.DONE_SETTLEMENT && newTile.getColony() != null) {
             // If a colony will been won, send an updated tile:
             reply.appendChild(newTile.toXMLElement(newTile.getColony().getOwner(), reply.getOwnerDocument()));
             reply.appendChild(defender.toXMLElement(newTile.getColony().getOwner(), reply.getOwnerDocument()));
@@ -1322,9 +1324,9 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
             }
         }
         int oldUnits = unit.getTile().getUnitCount();
-        unit.getGame().getCombatModel().attack(unit, defender, result, plunderGold, 0);
+        unit.getGame().getCombatModel().attack(unit, defender, result, plunderGold);
         
-        if (result.compareTo(CombatResult.WIN) >= 0 && unit.getTile() != newTile &&
+        if (result.type.compareTo(CombatResultType.WIN) >= 0 && unit.getTile() != newTile &&
                 oldUnits < unit.getTile().getUnitCount()) {
             // Unit won and didn't move, there are more units and last is a convert, send last one
             Unit lastUnit = unit.getTile().getLastUnit();
@@ -1348,11 +1350,11 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
             }
         }
 
-        if (result.compareTo(CombatResult.EVADES) >= 0 && unit.getTile().equals(newTile)) {
+        if (result.type.compareTo(CombatResultType.EVADES) >= 0 && unit.getTile().equals(newTile)) {
             // In other words, we moved...
             Element update = reply.getOwnerDocument().createElement("update");
             int lineOfSight = unit.getLineOfSight();
-            if (result == CombatResult.DONE_SETTLEMENT && newTile.getSettlement() != null) {
+            if (result.type == CombatResultType.DONE_SETTLEMENT && newTile.getSettlement() != null) {
                 lineOfSight = Math.max(lineOfSight, newTile.getSettlement().getLineOfSight());
             }
             List<Tile> surroundingTiles = getGame().getMap().getSurroundingTiles(unit.getTile(), lineOfSight);

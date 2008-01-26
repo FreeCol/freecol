@@ -55,6 +55,7 @@ import net.sf.freecol.common.model.Building;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.ColonyTile;
 import net.sf.freecol.common.model.CombatModel.CombatResult;
+import net.sf.freecol.common.model.CombatModel.CombatResultType;
 import net.sf.freecol.common.model.DiplomaticTrade;
 import net.sf.freecol.common.model.EquipmentType;
 import net.sf.freecol.common.model.Europe;
@@ -1683,7 +1684,8 @@ public final class InGameController implements NetworkConstants {
         // Get the result of the attack from the server:
         Element attackResultElement = client.ask(attackElement);
         if (attackResultElement != null) {
-            CombatResult result = Enum.valueOf(CombatResult.class, attackResultElement.getAttribute("result"));
+            CombatResultType result = Enum.valueOf(CombatResultType.class, attackResultElement.getAttribute("result"));
+            int damage = Integer.parseInt(attackElement.getAttribute("damage"));
             int plunderGold = Integer.parseInt(attackResultElement.getAttribute("plunderGold"));
 
             // If a successful attack against a colony, we need to update the
@@ -1725,7 +1727,7 @@ public final class InGameController implements NetworkConstants {
 
             if (!unit.isNaval()) {
                 Unit winner;
-                if (result == CombatResult.WIN || result == CombatResult.GREAT_WIN) {
+                if (result == CombatResultType.WIN || result == CombatResultType.GREAT_WIN) {
                     winner = unit;
                 } else {
                     winner = defender;
@@ -1744,12 +1746,12 @@ public final class InGameController implements NetworkConstants {
                     freeColClient.playSound(SfxLibrary.DRAGOON);
                 }
             } else {
-                if (result == CombatResult.GREAT_WIN || result == CombatResult.GREAT_LOSS) {
+                if (result == CombatResultType.GREAT_WIN || result == CombatResultType.GREAT_LOSS) {
                     freeColClient.playSound(SfxLibrary.SUNK);
                 }
             }
             try {
-                game.getCombatModel().attack(unit, defender, result, plunderGold, 0);
+                game.getCombatModel().attack(unit, defender, new CombatResult(result, damage), plunderGold);
             } catch (Exception e) {
                 // Ignore the exception (the update further down will fix any
                 // problems).
@@ -1781,13 +1783,13 @@ public final class InGameController implements NetworkConstants {
             }
             
             if (defender.canCarryTreasure() &&
-                (result == CombatResult.WIN ||
-                 result == CombatResult.GREAT_WIN)) {
+                (result == CombatResultType.WIN ||
+                 result == CombatResultType.GREAT_WIN)) {
                 checkCashInTreasureTrain(defender);
             }
                 
             if (!defender.isDisposed()
-                    && ((result == CombatResult.DONE_SETTLEMENT && unitElement != null)
+                    && ((result == CombatResultType.DONE_SETTLEMENT && unitElement != null)
                             || defender.getLocation() == null || !defender.isVisibleTo(freeColClient.getMyPlayer()))) {
                 defender.dispose();
             }

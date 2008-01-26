@@ -31,6 +31,9 @@ import net.sf.freecol.common.model.Player.Stance;
 import net.sf.freecol.common.model.Unit.UnitState;
 import net.sf.freecol.common.model.UnitType.DowngradeType;
 
+/**
+ * This class implements the original Colonization combat model.
+ */
 public class SimpleCombatModel implements CombatModel {
 
     private static final Logger logger = Logger.getLogger(SimpleCombatModel.class.getName());
@@ -57,26 +60,26 @@ public class SimpleCombatModel implements CombatModel {
 
         int r = random.nextInt(100);
         
-        CombatResult result = CombatResult.EVADES;
+        CombatResultType result = CombatResultType.EVADES;
         if (r <= victory * 20) {
             // 10% of the times winning:
-            result = CombatResult.GREAT_WIN;
+            result = CombatResultType.GREAT_WIN;
         } else if (r <= 100 * victory) {
             // 90% of the times winning:
-            result = CombatResult.WIN;
+            result = CombatResultType.WIN;
         } else if (defender.isNaval()
                 && r <= (80 * victory) + 20) {
             // 20% of the times loosing:
-            result = CombatResult.EVADES;
+            result = CombatResultType.EVADES;
         } else if (r <= (10 * victory) + 90) {
             // 70% of the times loosing:
-            result = CombatResult.LOSS;
+            result = CombatResultType.LOSS;
         } else {
             // 10% of the times loosing:
-            result = CombatResult.GREAT_LOSS;
+            result = CombatResultType.GREAT_LOSS;
         }
         
-        if (result.compareTo(CombatResult.WIN) >= 0 &&
+        if (result.compareTo(CombatResultType.WIN) >= 0 &&
             defender.getTile().getSettlement() != null) {
             final boolean lastDefender;
             if (defender.getTile().getSettlement() instanceof Colony) {
@@ -89,10 +92,10 @@ public class SimpleCombatModel implements CombatModel {
                 throw new IllegalStateException("Unknown Settlement.");
             }
             if (lastDefender) {
-                return CombatResult.DONE_SETTLEMENT;
+                result = CombatResultType.DONE_SETTLEMENT;
             }
         }
-        return result;
+        return new CombatResult(result, 0);
     }
 
     /**
@@ -107,18 +110,18 @@ public class SimpleCombatModel implements CombatModel {
         float attackPower = getOffencePower(colony, defender);
         float defencePower = getDefencePower(colony, defender);
         float totalProbability = attackPower + defencePower;
-        CombatResult result = CombatResult.EVADES;
+        CombatResultType result = CombatResultType.EVADES;
         int r = random.nextInt(Math.round(totalProbability) + 1);
         if (r < attackPower) {
             int diff = Math.round(defencePower * 2 - attackPower);
             int r2 = random.nextInt((diff < 3) ? 3 : diff);
             if (r2 == 0) {
-                result = CombatResult.GREAT_WIN;
+                result = CombatResultType.GREAT_WIN;
             } else {
-                result = CombatResult.WIN;
+                result = CombatResultType.WIN;
             }
         }
-        return result;
+        return new CombatResult(result, 0);
     }
 
     /**
@@ -477,10 +480,9 @@ public class SimpleCombatModel implements CombatModel {
      * @param attacker an <code>Unit</code> value
      * @param defender The <code>Unit</code> defending against attack.
      * @param result The result of the attack.
-     * @param damage an <code>int</code> value
      * @param plunderGold an <code>int</code> value
      */
-    public void attack(Unit attacker, Unit defender, CombatResult result, int damage, int plunderGold) {
+    public void attack(Unit attacker, Unit defender, CombatResult result, int plunderGold) {
         Player attackingPlayer = attacker.getOwner();
         Player defendingPlayer = defender.getOwner();
 
@@ -512,7 +514,7 @@ public class SimpleCombatModel implements CombatModel {
         //attacker.adjustTension(defender);
         Settlement settlement = newTile.getSettlement();
 
-        switch (result) {
+        switch (result.type) {
         case EVADES:
             if (attacker.isNaval()) {
                 // send message to both parties
@@ -659,14 +661,13 @@ public class SimpleCombatModel implements CombatModel {
      * @param colony a <code>Colony</code> value
      * @param defender The <code>Unit</code> defending against bombardment.
      * @param result The result of the bombardment.
-     * @param damage an <code>int</code> value
      */
-    public void bombard(Colony colony, Unit defender, CombatResult result, int damage) {
+    public void bombard(Colony colony, Unit defender, CombatResult result) {
 
         Player attackingPlayer = colony.getOwner();
         Player defendingPlayer = defender.getOwner();
         
-        switch (result) {
+        switch (result.type) {
         case EVADES:
             // send message to both parties
             attackingPlayer.addModelMessage(colony, "model.unit.shipEvadedBombardment",
@@ -1118,16 +1119,4 @@ public class SimpleCombatModel implements CombatModel {
                                  }, ModelMessage.UNIT_IMPROVED);
         }
     }
-
-
-    /**
-       model.unit.shipEvaded=%unit% has evaded an attack by %enemyNation% %enemyUnit%.
-       model.unit.enemyShipEvaded=%enemyNation% %enemyUnit% has evaded an attack by %unit%.
-
-       model.unit.damageShip=%unit% has been damaged by %enemyNation% %enemyUnit% and must return to %repairLocation% for repairs. All goods and units on board have been lost! 
-       model.unit.enemyShipDamaged=%unit% has damaged %enemyNation% %enemyUnit%. %enemyNation% %enemyUnit% must return for repairs.
-
-       model.unit.sinkShip=%unit% has been sunk by %enemyNation% %enemyUnit%!
-       model.unit.enemyShipSunk=%unit% has sunk %enemyNation% %enemyUnit%!
-    */
 }

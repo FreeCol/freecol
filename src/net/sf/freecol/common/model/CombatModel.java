@@ -23,8 +23,18 @@ import java.util.List;
 
 public interface CombatModel {
 
-    public static enum CombatResult { GREAT_LOSS, LOSS, EVADES, WIN,
-            GREAT_WIN, DONE_SETTLEMENT }; // The last defender of the settlement has died.
+    public static enum CombatResultType {
+        GREAT_LOSS, LOSS, EVADES, WIN,
+            GREAT_WIN, DONE_SETTLEMENT };
+
+    public class CombatResult {
+        public CombatResultType type;
+        public int damage;
+        public CombatResult(CombatResultType type, int damage) {
+            this.type = type;
+            this.damage = damage;
+        }
+    }
 
     /**
      * Generates a result of an attack.
@@ -137,10 +147,9 @@ public interface CombatModel {
      * @param attacker an <code>Unit</code> value
      * @param defender The <code>Unit</code> defending against attack.
      * @param result The result of the attack.
-     * @param damage an <code>int</code> value
      * @param plunderGold an <code>int</code> value
      */
-    public void attack(Unit attacker, Unit defender, CombatResult result, int damage, int plunderGold);
+    public void attack(Unit attacker, Unit defender, CombatResult result, int plunderGold);
 
     /**
      * Bombard a unit with the given outcome.
@@ -148,9 +157,8 @@ public interface CombatModel {
      * @param colony a <code>Colony</code> value
      * @param defender The <code>Unit</code> defending against bombardment.
      * @param result The result of the bombardment.
-     * @param damage an <code>int</code> value
      */
-    public void bombard(Colony colony, Unit defender, CombatResult result, int damage);
+    public void bombard(Colony colony, Unit defender, CombatResult result);
 
 }
 

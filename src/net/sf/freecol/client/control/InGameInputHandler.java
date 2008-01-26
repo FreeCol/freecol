@@ -34,6 +34,7 @@ import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.AbstractUnit;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.CombatModel.CombatResult;
+import net.sf.freecol.common.model.CombatModel.CombatResultType;
 import net.sf.freecol.common.model.DiplomaticTrade;
 import net.sf.freecol.common.model.FoundingFather;
 import net.sf.freecol.common.model.FoundingFather.FoundingFatherType;
@@ -325,7 +326,8 @@ public final class InGameInputHandler extends InputHandler {
         Colony colony = (Colony) getGame().getFreeColGameObjectSafely(opponentAttackElement.getAttribute("colony"));
         Unit defender = (Unit) getGame().getFreeColGameObjectSafely(opponentAttackElement.getAttribute("defender"));
 
-        CombatResult result = Enum.valueOf(CombatResult.class, opponentAttackElement.getAttribute("result"));
+        CombatResultType result = Enum.valueOf(CombatResultType.class, opponentAttackElement.getAttribute("result"));
+        int damage = Integer.parseInt(opponentAttackElement.getAttribute("damage"));
         int plunderGold = Integer.parseInt(opponentAttackElement.getAttribute("plunderGold"));
 
         if (opponentAttackElement.hasAttribute("update")) {
@@ -399,9 +401,9 @@ public final class InGameInputHandler extends InputHandler {
         }
 
         if (colony != null) {
-            unit.getGame().getCombatModel().bombard(colony, defender, result, 0);
+            unit.getGame().getCombatModel().bombard(colony, defender, new CombatResult(result, damage));
         } else {
-            unit.getGame().getCombatModel().attack(unit, defender, result, plunderGold, 0);
+            unit.getGame().getCombatModel().attack(unit, defender, new CombatResult(result, damage), plunderGold);
             if (!unit.isDisposed() && (unit.getLocation() == null || !unit.isVisibleTo(getFreeColClient().getMyPlayer()))) {
                 unit.dispose();
             }
@@ -409,7 +411,7 @@ public final class InGameInputHandler extends InputHandler {
 
         if (!defender.isDisposed()
                 && (defender.getLocation() == null || !defender.isVisibleTo(getFreeColClient().getMyPlayer()))) {
-            if (result == CombatResult.DONE_SETTLEMENT && defender.getColony() != null
+            if (result == CombatResultType.DONE_SETTLEMENT && defender.getColony() != null
                     && !defender.getColony().isDisposed()) {
                 defender.getColony().setUnitCount(defender.getColony().getUnitCount());
             }
