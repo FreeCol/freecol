@@ -93,6 +93,16 @@ public class DifficultyLevel extends FreeColGameObjectType {
      */
     private boolean trainingPricePerUnitType;
 
+    /**
+     * Describe badGovernmentLimit here.
+     */
+    private int badGovernmentLimit;
+
+    /**
+     * Describe veryBadGovernmentLimit here.
+     */
+    private int veryBadGovernmentLimit;
+
     private Map<UnitType, Integer> purchasePrices;
 
     private Map<UnitType, Integer> trainingPrices;
@@ -119,6 +129,42 @@ public class DifficultyLevel extends FreeColGameObjectType {
      */
     public final void setCrossesIncrement(final int newCrossesIncrement) {
         this.crossesIncrement = newCrossesIncrement;
+    }
+
+    /**
+     * Get the <code>BadGovernmentLimit</code> value.
+     *
+     * @return an <code>int</code> value
+     */
+    public final int getBadGovernmentLimit() {
+        return badGovernmentLimit;
+    }
+
+    /**
+     * Set the <code>BadGovernmentLimit</code> value.
+     *
+     * @param newBadGovernmentLimit The new BadGovernmentLimit value.
+     */
+    public final void setBadGovernmentLimit(final int newBadGovernmentLimit) {
+        this.badGovernmentLimit = newBadGovernmentLimit;
+    }
+
+    /**
+     * Get the <code>VeryBadGovernmentLimit</code> value.
+     *
+     * @return an <code>int</code> value
+     */
+    public final int getVeryBadGovernmentLimit() {
+        return veryBadGovernmentLimit;
+    }
+
+    /**
+     * Set the <code>VeryBadGovernmentLimit</code> value.
+     *
+     * @param newVeryBadGovernmentLimit The new VeryBadGovernmentLimit value.
+     */
+    public final void setVeryBadGovernmentLimit(final int newVeryBadGovernmentLimit) {
+        this.veryBadGovernmentLimit = newVeryBadGovernmentLimit;
     }
 
     /**
@@ -353,6 +399,8 @@ public class DifficultyLevel extends FreeColGameObjectType {
     protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
         setId(in.getAttributeValue(null, "id"));
         crossesIncrement = getAttribute(in, "crosses-increment", 10);
+        badGovernmentLimit = getAttribute(in, "bad-government-limit", 8);
+        veryBadGovernmentLimit = getAttribute(in, "very-bad-government-limit", 12);
         landPriceFactor = getAttribute(in, "land-price-factor", 60);
         foundingFatherFactor = getAttribute(in, "founding-father-factor", 7);
         arrearsFactor = getAttribute(in, "arrears-factor", 500);
