@@ -197,6 +197,51 @@ public class MapGeneratorOptions extends OptionMap {
                             BONUS_NUMBER_LARGE = 2,
                             BONUS_NUMBER_VERY_LARGE = 3,
                             BONUS_NUMBER_HUGE = 4;
+    
+    /**
+     * Option for setting the humidity of the map.
+     * Possible values are:
+     *   <ul>
+     *     <li>{@link #HUMIDITY_VERY_DRY}</li>
+     *     <li>{@link #HUMIDITY_DRY}</li>
+     *     <li>{@link #HUMIDITY_NORMAL}</li>
+     *     <li>{@link #HUMIDITY_WET}</li>
+     *     <li>{@link #HUMIDITY_VERY_WET}</li>
+     *     
+     */
+    public static final String HUMIDITY = "humidity";
+    
+    /**
+     * One of the settings used by {@link #HUMIDITY}.
+     */
+    public static final int HUMIDITY_VERY_DRY = 0,
+                            HUMIDITY_DRY = 1,
+                            HUMIDITY_NORMAL = 2,
+                            HUMIDITY_WET = 3,
+                            HUMIDITY_VERY_WET = 4;
+    
+    /**
+     * Option for setting the temperature of the map.
+     * Possible values are:
+     *   <ul>
+     *     <li>{@link #TEMPERATURE_COLD}</li>
+     *     <li>{@link #TEMPERATURE_CHILLY}</li>
+     *     <li>{@link #TEMPERATURE_TEMPERATE}</li>
+     *     <li>{@link #TEMPERATURE_WARM}</li>
+     *     <li>{@link #TEMPERATURE_HOT}</li>
+     *     
+     */
+    public static final String TEMPERATURE = "temperature";
+    
+    /**
+     * One of the settings used by {@link #TEMPERATURE}.
+     */
+    public static final int TEMPERATURE_COLD = 0,
+                            TEMPERATURE_CHILLY = 1,
+                            TEMPERATURE_TEMPERATE = 2,
+                            TEMPERATURE_WARM = 3,
+                            TEMPERATURE_HOT = 4;
+    
              
     /**
      * Option for setting a file to be imported (map etc).
@@ -249,7 +294,7 @@ public class MapGeneratorOptions extends OptionMap {
      * <br><br>
      *
      * @param in The XML stream to read the data from.
-     * @throws XMLStreamException if an error occured during parsing.          
+     * @throws XMLStreamException if an error occurred during parsing.          
      */
     public MapGeneratorOptions(XMLStreamReader in) throws XMLStreamException {
         super(in, getXMLElementTagName());
@@ -291,11 +336,24 @@ public class MapGeneratorOptions extends OptionMap {
         add(landGeneratorGroup);
         
         final OptionGroup terrainGeneratorGroup = new OptionGroup("mapGeneratorOptions.terrainGenerator");
-        new RangeOption(RIVER_NUMBER, terrainGeneratorGroup, sizes, 1, true);
-        new RangeOption(MOUNTAIN_NUMBER, terrainGeneratorGroup, sizes, 1, true);
-        new RangeOption(RUMOUR_NUMBER, terrainGeneratorGroup, sizes, 1, true);
-        new RangeOption(FOREST_NUMBER, terrainGeneratorGroup, sizes, 2, true);
-        new RangeOption(BONUS_NUMBER, terrainGeneratorGroup, sizes, 1, true);
+        new RangeOption(RIVER_NUMBER, terrainGeneratorGroup, sizes, RIVER_NUMBER_MEDIUM, true);
+        new RangeOption(MOUNTAIN_NUMBER, terrainGeneratorGroup, sizes, MOUNTAIN_NUMBER_MEDIUM, true);
+        new RangeOption(RUMOUR_NUMBER, terrainGeneratorGroup, sizes, RUMOUR_NUMBER_MEDIUM, true);
+        new RangeOption(FOREST_NUMBER, terrainGeneratorGroup, sizes, FOREST_NUMBER_LARGE, true);
+        new RangeOption(BONUS_NUMBER, terrainGeneratorGroup, sizes, BONUS_NUMBER_MEDIUM, true);
+        
+        String[] humidities = new String[] {"veryDry", "dry", "normal", "wet", "veryWet"};
+        for (int index = 0; index < sizes.length; index++) {
+            humidities[index] = Messages.message(humidities[index]);
+        }
+        new RangeOption(HUMIDITY, terrainGeneratorGroup, humidities, HUMIDITY_NORMAL, true);
+        
+        String[] temperatures = new String[] {"cold", "chilly", "temperate", "warm", "hot"};
+        for (int index = 0; index < sizes.length; index++) {
+            temperatures[index] = Messages.message(temperatures[index]);
+        }
+        new RangeOption(TEMPERATURE, terrainGeneratorGroup, temperatures, TEMPERATURE_TEMPERATE, true);
+        
         add(terrainGeneratorGroup);
     }
 
@@ -434,7 +492,7 @@ public class MapGeneratorOptions extends OptionMap {
 
     /**
      * Gets the number of rumours on the map to be created.
-     * @return The number of rumours..
+     * @return The number of rumours.
      */
     public int getNumberOfRumours() {
         return getNumberOfRumours(getInteger(RUMOUR_NUMBER));
@@ -552,8 +610,8 @@ public class MapGeneratorOptions extends OptionMap {
     }
 
     /**
-     * Gets the prefered distance to edge of the map to be created.
-     * @return The prefered distance to edge.
+     * Gets the preferred distance to edge of the map to be created.
+     * @return The preferred distance to edge.
      */
     public int getPrefDistToEdge() {
         final int size = getInteger(MAP_SIZE);
@@ -571,6 +629,22 @@ public class MapGeneratorOptions extends OptionMap {
         default:
             throw new IllegalStateException("Invalid map-size: " + size + ".");
         }
+    }
+    
+    /**
+     * Gets the average humidity of the map.
+     * @return The humidity.
+     */
+    public int getHumidity() {
+        return getInteger(HUMIDITY);
+    }
+    
+    /**
+     * Gets the average temperature of the map.
+     * @return The temperature.
+     */
+    public int getTemperature() {
+        return getInteger(TEMPERATURE);
     }
 
     protected boolean isCorrectTagName(String tagName) {

@@ -198,6 +198,10 @@ public class TerrainGenerator {
      * @param forestChance The percentage chance of forests in this area
      */
     private TileType getRandomLandTileType(int latitudePercent, int forestChance) {
+        // decode options
+        final int humidityPreference = getMapGeneratorOptions().getHumidity();
+        final int temperaturePreference = getMapGeneratorOptions().getTemperature();
+
         // latRanges correspond to 0,1,2,3 from TileType.latitude (100-0)
         int[] latRanges = { 75, 50, 25, 0 };
         // altRanges correspond to 1,2,3 from TileType.altitude (1-10)
@@ -235,6 +239,7 @@ public class TerrainGenerator {
                 throw new RuntimeException("No TileType within latitude == " + latitudeIndex);
             }
         }
+        
         // Scope the type of tiles to be used and choose one
         TileType chosen = null;
         //List<TileType> acceptable = latTileTypes.get(latitudeIndex).clone();
