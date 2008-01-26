@@ -49,7 +49,7 @@ public abstract class FreeColObject {
     protected static Logger logger = Logger.getLogger(FreeColObject.class.getName());
 
     /**
-     * Describe id here.
+     * Unique identifier of an object
      */
     private String id;
 
@@ -216,7 +216,7 @@ public abstract class FreeColObject {
      * This method writes an XML-representation of this object to
      * the given stream.
      * 
-     * All attributes will be made visable.
+     * All attributes will be made visible.
      *
      * @param out The target stream.
      * @throws XMLStreamException if there are any problems writing

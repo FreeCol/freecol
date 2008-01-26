@@ -37,7 +37,6 @@ abstract public class FreeColGameObject extends FreeColObject {
 
     private static final Logger logger = Logger.getLogger(FreeColGameObject.class.getName());
 
-    private String id;
     private Game game;
     private boolean disposed = false;
     private boolean uninitialized;
@@ -302,23 +301,13 @@ abstract public class FreeColGameObject extends FreeColObject {
 
 
     /**
-    * Gets the unique ID of this object.
-    *
-    * @return The unique ID of this object.
-    */
-    public String getId() {
-        return id;
-    }
-
-
-    /**
     * Gets the ID's integer part of this object.
     *
     * @return The unique ID of this object.
     */
     public Integer getIntegerID() {
         String stringPart = getRealXMLElementTagName() + ":";
-        return new Integer(id.substring(stringPart.length()));
+        return new Integer(getId().substring(stringPart.length()));
     }
 
     private String getRealXMLElementTagName() {
@@ -344,11 +333,11 @@ abstract public class FreeColGameObject extends FreeColObject {
                     game.removeFreeColGameObject(getId());
                 }
 
-                this.id = newID;
+                super.setId(newID);
                 game.setFreeColGameObject(newID, this);
             }
         } else {
-            this.id = newID;
+            super.setId(newID);
         }
     }
 
@@ -361,7 +350,7 @@ abstract public class FreeColGameObject extends FreeColObject {
     * @param newID the unique ID of this object,
     */
     public void setFakeID(String newID) {
-        this.id = newID;
+        super.setId(newID);
     }
 
     
