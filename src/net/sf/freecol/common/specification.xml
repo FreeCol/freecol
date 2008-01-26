@@ -1230,7 +1230,7 @@
       <event id="model.event.seeAllColonies"/>
     </founding-father>
     <founding-father id="model.foundingFather.hernandoDeSoto" type="exploration"
-                     weight1="5" weight2="10" weight3="5">
+                     weight1="10" weight2="2" weight3="2">
       <modifier id="model.modifier.lineOfSightBonus" type="additive" value="1">
         <scope ability-id="model.ability.navalUnit" value="false"/>
       </modifier>
@@ -1479,6 +1479,8 @@
     <difficulty-level
        id="model.difficulty.veryEasy"
        crosses-increment="6"
+       bad-government-limit="8"
+       very-bad-government-limit="12"
        land-price-factor="40"
        founding-father-factor="5"
        arrears-factor="300"
@@ -1502,6 +1504,8 @@
     <difficulty-level
        id="model.difficulty.easy"
        crosses-increment="8"
+       bad-government-limit="7"
+       very-bad-government-limit="11"
        land-price-factor="50"
        founding-father-factor="6"
        arrears-factor="400"
@@ -1518,6 +1522,8 @@
     <difficulty-level
        id="model.difficulty.medium"
        crosses-increment="10"
+       bad-government-limit="6"
+       very-bad-government-limit="10"
        land-price-factor="60"
        founding-father-factor="7"
        arrears-factor="500"
@@ -1534,6 +1540,8 @@
     <difficulty-level
        id="model.difficulty.hard"
        crosses-increment="12"
+       bad-government-limit="5"
+       very-bad-government-limit="9"
        land-price-factor="70"
        founding-father-factor="8"
        arrears-factor="600"
@@ -1550,6 +1558,8 @@
     <difficulty-level
        id="model.difficulty.veryHard"
        crosses-increment="14"
+       bad-government-limit="4"
+       very-bad-government-limit="8"
        land-price-factor="80"
        founding-father-factor="9"
        arrears-factor="700"
