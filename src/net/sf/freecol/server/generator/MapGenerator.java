@@ -253,6 +253,11 @@ public class MapGenerator {
                 for (int tries=0; tries<100; tries++) {
                     Position p = new Position(random.nextInt(map.getWidth()), 
                             random.nextInt(map.getHeight()));
+                    if (p.y<=2 || p.y>=map.getHeight()-3) {
+                        // please no lost city on the poles, 
+                        // as they are too difficult to go visit, and not realistic
+                        continue;
+                    }
                     Tile t = map.getTile(p);
                     if (map.getTile(p).isLand()
                             && !t.hasLostCityRumour()
