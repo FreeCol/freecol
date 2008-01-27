@@ -35,24 +35,24 @@ import net.sf.freecol.common.Specification;
  */
 public class IndianNationType extends NationType {
 
-
-    public static final int TEEPEE = 0, LONGHOUSE = 1, CITY = 2;
-    public static final int LOW = 0, AVERAGE = 1, HIGH = 2;
+    public static enum SettlementType { TEEPEE, LONGHOUSE, CITY };
+    public static enum SettlementNumber { LOW, AVERAGE, HIGH };
+    public static enum AggressionLevel { LOW, AVERAGE, HIGH };
 
     /**
      * The number of settlements this Nation has.
      */
-    private int numberOfSettlements;
+    private SettlementNumber numberOfSettlements;
 
     /**
      * The aggression of this Nation.
      */
-    private int aggression;
+    private AggressionLevel aggression;
 
     /**
      * The type of settlement this Nation has.
      */
-    private int typeOfSettlement;
+    private SettlementType typeOfSettlement;
 
     /**
      * Stores the ids of the skills taught by this Nation.
@@ -87,9 +87,9 @@ public class IndianNationType extends NationType {
     /**
      * Get the <code>NumberOfSettlements</code> value.
      *
-     * @return an <code>int</code> value
+     * @return a <code>SettlementNumber</code> value
      */
-    public final int getNumberOfSettlements() {
+    public final SettlementNumber getNumberOfSettlements() {
         return numberOfSettlements;
     }
 
@@ -98,16 +98,16 @@ public class IndianNationType extends NationType {
      *
      * @param newNumberOfSettlements The new NumberOfSettlements value.
      */
-    public final void setNumberOfSettlements(final int newNumberOfSettlements) {
+    public final void setNumberOfSettlements(final SettlementNumber newNumberOfSettlements) {
         this.numberOfSettlements = newNumberOfSettlements;
     }
 
     /**
      * Get the <code>Aggression</code> value.
      *
-     * @return an <code>int</code> value
+     * @return an <code>AggressionLevel</code> value
      */
-    public final int getAggression() {
+    public final AggressionLevel getAggression() {
         return aggression;
     }
 
@@ -116,16 +116,16 @@ public class IndianNationType extends NationType {
      *
      * @param newAggression The new Aggression value.
      */
-    public final void setAggression(final int newAggression) {
+    public final void setAggression(final AggressionLevel newAggression) {
         this.aggression = newAggression;
     }
 
     /**
      * Get the <code>TypeOfSettlement</code> value.
      *
-     * @return an <code>int</code> value
+     * @return an <code>SettlementType</code> value
      */
-    public final int getTypeOfSettlement() {
+    public final SettlementType getTypeOfSettlement() {
         return typeOfSettlement;
     }
 
@@ -134,7 +134,7 @@ public class IndianNationType extends NationType {
      *
      * @param newTypeOfSettlement The new TypeOfSettlement value.
      */
-    public final void setTypeOfSettlement(final int newTypeOfSettlement) {
+    public final void setTypeOfSettlement(final SettlementType newTypeOfSettlement) {
         this.typeOfSettlement = newTypeOfSettlement;
     }
 
@@ -151,41 +151,14 @@ public class IndianNationType extends NationType {
             throws XMLStreamException {
         setId(in.getAttributeValue(null, "id"));
 
-        String valueString = in.getAttributeValue(null, "number-of-settlements");
-        if ("low".equals(valueString)) {
-            numberOfSettlements = LOW;
-        } else if ("average".equals(valueString)) {
-            numberOfSettlements = AVERAGE;
-        } else if ("high".equals(valueString)) {
-            numberOfSettlements = HIGH;
-        } else {
-            throw new IllegalArgumentException("Unknown value for attribute number-of-settlements: " +
-                                               valueString);
-        }
+        String valueString = in.getAttributeValue(null, "number-of-settlements").toUpperCase();
+        numberOfSettlements = Enum.valueOf(SettlementNumber.class, valueString);
 
-        valueString = in.getAttributeValue(null, "aggression");
-        if ("low".equals(valueString)) {
-            aggression = LOW;
-        } else if ("average".equals(valueString)) {
-            aggression = AVERAGE;
-        } else if ("high".equals(valueString)) {
-            aggression = HIGH;
-        } else {
-            throw new IllegalArgumentException("Unknown value for attribute aggression: " +
-                                               valueString);
-        }
+        valueString = in.getAttributeValue(null, "aggression").toUpperCase();
+        aggression = Enum.valueOf(AggressionLevel.class, valueString);
 
-        valueString = in.getAttributeValue(null, "type-of-settlement");
-        if ("teepee".equals(valueString)) {
-            typeOfSettlement = TEEPEE;
-        } else if ("longhouse".equals(valueString)) {
-            typeOfSettlement = LONGHOUSE;
-        } else if ("city".equals(valueString)) {
-            typeOfSettlement = CITY;
-        } else {
-            throw new IllegalArgumentException("Unknown value for attribute type-of-settlement: " +
-                                               valueString);
-        }
+        valueString = in.getAttributeValue(null, "type-of-settlement").toUpperCase();
+        typeOfSettlement = Enum.valueOf(SettlementType.class, valueString);
 
         while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
             String childName = in.getLocalName();

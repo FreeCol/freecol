@@ -3251,7 +3251,8 @@ public class Unit extends FreeColGameObject implements Features, Locatable, Loca
                 randomTreasure = (int) modifier.applyTo(randomTreasure);
             }
 
-            if (((IndianNationType) enemy.getNationType()).getTypeOfSettlement() == IndianNationType.CITY) {
+            if (((IndianNationType) enemy.getNationType()).getTypeOfSettlement() == 
+                IndianNationType.SettlementType.CITY) {
                 tTrain.setTreasureAmount(randomTreasure * 500 + 10000);
             } else {
                 tTrain.setTreasureAmount(randomTreasure * 50  + 300);

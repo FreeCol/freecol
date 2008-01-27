@@ -482,7 +482,7 @@ public class IndianSettlement extends Settlement {
     /**
      * Gets the kind of Indian settlement.
      */
-    public int getTypeOfSettlement() {
+    public IndianNationType.SettlementType getTypeOfSettlement() {
         return ((IndianNationType) owner.getNationType()).getTypeOfSettlement();
     }
 
@@ -494,7 +494,7 @@ public class IndianSettlement extends Settlement {
      */
     @Override
     public int getRadius() {
-        if (getTypeOfSettlement() == IndianNationType.CITY) {
+        if (getTypeOfSettlement() == IndianNationType.SettlementType.CITY) {
             return 2;
         } else {
             return 1;
@@ -789,7 +789,7 @@ public class IndianSettlement extends Settlement {
      * @return The bonus multiplier.
      */
     public int getBonusMultiplier() {
-        int addition = getTypeOfSettlement() + 1;
+        int addition = getTypeOfSettlement().ordinal() + 1;
         if (isCapital()) {
             addition++;
         }
@@ -1027,7 +1027,8 @@ public class IndianSettlement extends Settlement {
     private void checkForNewIndian() {
         // Alcohol also contributes to create children. 
         if (goodsContainer.getGoodsCount(Goods.FOOD) + 4*goodsContainer.getGoodsCount(Goods.RUM) > 200+KEEP_RAW_MATERIAL ) {
-            if (ownedUnits.size() <= 6 + getTypeOfSettlement()) { // up to a limit. Anyway cities produce more children than camps
+            if (ownedUnits.size() <= 6 + getTypeOfSettlement().ordinal()) {
+                // up to a limit. Anyway cities produce more children than camps
                 List<UnitType> unitTypes = FreeCol.getSpecification().getUnitTypesWithAbility("model.ability.bornInIndianSettlement");
                 if (unitTypes.size() > 0) {
                     int random = getGame().getModelController().getRandom(getId() + "bornInIndianSettlement", unitTypes.size());

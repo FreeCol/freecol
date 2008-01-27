@@ -47,6 +47,7 @@ import net.sf.freecol.common.model.FreeColGameObject;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.GoodsType;
+import net.sf.freecol.common.model.IndianNationType.SettlementType;
 import net.sf.freecol.common.model.IndianSettlement;
 import net.sf.freecol.common.model.Map;
 import net.sf.freecol.common.model.Player;
@@ -377,7 +378,7 @@ public class MapGenerator {
                     tile, capital,
                     generateSkillForLocation(map, tile),
                     false, null);
-        int kind = settlement.getTypeOfSettlement();
+        SettlementType kind = settlement.getTypeOfSettlement();
         logger.fine("Generated skill: " + settlement.getLearnableSkill().getName());
 
         tile.setSettlement(settlement);
@@ -393,7 +394,7 @@ public class MapGenerator {
             newTile.setOwner(player);
         }
 
-        for (int i = 0; i < (kind * 2) + 4; i++) {
+        for (int i = 0; i < (kind.ordinal() * 2) + 4; i++) {
             UnitType unitType = FreeCol.getSpecification().getUnitType("model.unit.brave");
             Unit unit = new Unit(map.getGame(), settlement, player, unitType, UnitState.ACTIVE,
                                  unitType.getDefaultEquipment());
