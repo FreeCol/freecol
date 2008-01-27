@@ -20,8 +20,10 @@
 package net.sf.freecol.common.model;
 
 import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
+import net.sf.freecol.common.Specification;
 import net.sf.freecol.client.gui.i18n.Messages;
 
 public abstract class FreeColGameObjectType extends FreeColObject {
@@ -61,7 +63,11 @@ public abstract class FreeColGameObjectType extends FreeColObject {
         return null;
     }
 
-    protected void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {};
+    protected void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
+        // currently, FreeColGameObjectTypes are not serialized
+    };
+
+    protected abstract void readFromXML(XMLStreamReader in, Specification specification) throws XMLStreamException;
     
     /**
      * Use only for debugging purposes! A human-readable and localized name is

@@ -173,7 +173,7 @@ public class Nation extends FreeColGameObjectType {
     }
 
     protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
-        readFromXML(in, null);
+        throw new UnsupportedOperationException("Call 'readFromXML' instead.");
     }
 
     public void readFromXML(XMLStreamReader in, Specification specification)

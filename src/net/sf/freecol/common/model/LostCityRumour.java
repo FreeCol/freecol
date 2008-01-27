@@ -23,6 +23,7 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
+import net.sf.freecol.common.Specification;
 
 /**
  * Represents a lost city rumour.
@@ -42,7 +43,14 @@ public class LostCityRumour extends FreeColGameObjectType {
 
     public static final int NUMBER_OF_RUMOURS = 8;
 
-    protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {}
+    protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
+        // this class is really just an enum, but needs to inherit from FreeColGameObjectType
+    }
+
+    protected void readFromXML(XMLStreamReader in, Specification specification)
+        throws XMLStreamException {
+        // this class is really just an enum, but needs to inherit from FreeColGameObjectType
+    }
 
 }
 

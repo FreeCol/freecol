@@ -236,7 +236,7 @@ public final class TileType extends FreeColGameObjectType implements Features {
     // ------------------------------------------------------------ API methods
 
     protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
-        readFromXML(in, null);
+        throw new UnsupportedOperationException("Call 'readFromXML' instead.");
     }
 
     public void readFromXML(XMLStreamReader in, Specification specification)

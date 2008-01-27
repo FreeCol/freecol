@@ -27,6 +27,7 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
 import net.sf.freecol.FreeCol;
+import net.sf.freecol.common.Specification;
 
 /**
  * Represents a difficulty level.
@@ -397,6 +398,11 @@ public class DifficultyLevel extends FreeColGameObjectType {
 
 
     protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
+        throw new UnsupportedOperationException("Call 'readFromXML' instead.");
+    }
+
+    protected void readFromXML(XMLStreamReader in, Specification specification)
+        throws XMLStreamException {
         setId(in.getAttributeValue(null, "id"));
         crossesIncrement = getAttribute(in, "crosses-increment", 10);
         badGovernmentLimit = getAttribute(in, "bad-government-limit", 8);

@@ -75,7 +75,7 @@ public final class ImprovementActionType extends FreeColGameObjectType
     // ------------------------------------------------------------ API methods
 
     protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
-        readFromXML(in, null);
+        throw new UnsupportedOperationException("Call 'readFromXML' instead.");
     }
 
     public void readFromXML(XMLStreamReader in, Specification specification)

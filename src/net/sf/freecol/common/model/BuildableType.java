@@ -27,6 +27,7 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
 import net.sf.freecol.client.gui.i18n.Messages;
+import net.sf.freecol.common.Specification;
 
 /**
  * Contains information on buildable types.
@@ -128,6 +129,10 @@ public class BuildableType extends FreeColGameObjectType implements Features {
     }
 
     protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
+        // the class is basically abstract, except for BuildableType.NOTHING
+    }
+
+    protected void readFromXML(XMLStreamReader in, Specification specification) throws XMLStreamException {
         // the class is basically abstract, except for BuildableType.NOTHING
     }
 

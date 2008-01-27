@@ -741,43 +741,6 @@ public final class Specification {
 
 
     /**
-     * Takes an XML node with child nodes that represent objects of the type
-     * <code>T</code> and returns a list of the deserialized objects of type
-     * <code>T</code>.
-     * 
-     * @param <T> the type of objects to deserialize
-     * @param in The XML stream reader used to deserialize objects.
-     * @param factory the factory used to deserialize the object
-     * @return a list containing all the child elements of the node deserialized
-     */
-    private <T> List<T> makeListFromXml(XMLStreamReader in, final ObjectFactory<T> factory) throws XMLStreamException {
-        final ArrayList<T> list = new ArrayList<T>();
-        while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
-            list.add(factory.objectFrom(in));
-        }
-        return list;
-    }
-
-
-    /**
-     * The interface that needs to be implemented and passed to
-     * <code>makeListFromXml</code> to deserialize the objects from the XML
-     * file.
-     * 
-     * @param <T> the type object that will be deserialized.
-     */
-    static interface ObjectFactory<T> {
-
-        /**
-         * Converts an XML node to an object of the generic type of the factory.
-         * 
-         * @param in The XML stream reader used to deserialize objects.
-         * @return the object
-         */
-        public T objectFrom(XMLStreamReader in) throws XMLStreamException;
-    }
-
-    /**
      * Describe <code>setSpecificationFile</code> method here.
      *
      * @param file a <code>File</code> value
