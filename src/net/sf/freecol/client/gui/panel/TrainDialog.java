@@ -85,8 +85,13 @@ public final class TrainDialog extends FreeColDialog implements ActionListener {
         setFocusCycleRoot(true);
 
         ImageLibrary library = parent.getGUI().getImageLibrary();
-
-        trainableUnits.addAll(FreeCol.getSpecification().getUnitTypesTrainedInEurope());
+        
+        List<UnitType> unitTypes = FreeCol.getSpecification().getUnitTypeList();
+        for (UnitType unitType : unitTypes) { 	 
+            if (unitType.getSkill() > 0 && unitType.hasPrice()) { 	 
+                trainableUnits.add(unitType); 	 
+            } 	 
+        }
 
         Collections.sort(trainableUnits, priceComparator);
 
@@ -180,12 +185,12 @@ public final class TrainDialog extends FreeColDialog implements ActionListener {
      */
     public void actionPerformed(ActionEvent event) {
         String command = event.getActionCommand();
-        UnitType unitType = FreeCol.getSpecification().getUnitType(command);
-        if (unitType != null) {
+        if (String.valueOf(TRAIN_CANCEL).equals(command)) {
+            setResponse(new Integer(-1));
+        } else {
+            UnitType unitType = FreeCol.getSpecification().getUnitType(command);
             inGameController.trainUnitInEurope(unitType);
             setResponse(new Integer(0));
-        } else {
-            setResponse(new Integer(-1));
         }
     }
 }
