@@ -84,6 +84,7 @@ public final class RangeOptionUI extends JPanel implements OptionUpdater, Proper
         add(slider);
         
         slider.setEnabled(editable);
+        slider.setOpaque(false);
 
         option.addPropertyChangeListener(this);
         setOpaque(false);
@@ -94,7 +95,7 @@ public final class RangeOptionUI extends JPanel implements OptionUpdater, Proper
      * Unregister <code>PropertyChangeListener</code>s.
      */
     public void unregister() {
-        option.removePropertyChangeListener(this);    
+        option.removePropertyChangeListener(this);
     }
     
     /**
