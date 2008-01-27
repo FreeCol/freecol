@@ -166,10 +166,22 @@ public final class Specification {
                 if ("goods-types".equals(childName)) {
 
                     logger.finest("Found child named " + childName);
+                    int goodsIndex = 0;
+                    while (xsr.nextTag() != XMLStreamConstants.END_ELEMENT) {
+                        GoodsType goodsType = new GoodsType(goodsIndex++);
+                        goodsType.readFromXML(xsr, this);
+                        goodsTypeList.add(goodsType);
+                        allTypes.put(goodsType.getId(), goodsType);
+                        goodsTypeByRef.put(goodsType.getId(), goodsType);
+                        if (goodsType.isFarmed()) {
+                            farmedGoodsTypeList.add(goodsType);
+                        }
+                    }
+                    /*
                     ObjectFactory<GoodsType> factory = new ObjectFactory<GoodsType>() {
                         int goodsIndex = 0;
                         public GoodsType objectFrom(XMLStreamReader in) throws XMLStreamException {
-                            GoodsType goodsType = new GoodsType(goodsIndex++);
+                        GoodsType goodsType = new GoodsType(goodsIndex++);
                             goodsType.readFromXML(in, goodsTypeByRef);
                             allTypes.put(goodsType.getId(), goodsType);
                             goodsTypeByRef.put(goodsType.getId(), goodsType);
@@ -180,6 +192,7 @@ public final class Specification {
                         }
                     };
                     goodsTypeList.addAll(makeListFromXml(xsr, factory));
+                    */
 
                 } else if ("building-types".equals(childName)) {
 

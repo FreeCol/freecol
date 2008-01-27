@@ -15,7 +15,7 @@ public class MarketTest extends FreeColTestCase {
 	 */
 	public void testSellingInLargeAndInLittle() {
 
-		GoodsType silver = spec().getGoodsType("model.goods.Silver");
+		GoodsType silver = spec().getGoodsType("model.goods.silver");
 
 		int goldEarned;
 		{
@@ -54,7 +54,7 @@ public class MarketTest extends FreeColTestCase {
 
 		Specification s = spec();
 
-		GoodsType silver = s.getGoodsType("model.goods.Silver");
+		GoodsType silver = s.getGoodsType("model.goods.silver");
 
 		int previousGold = p.getGold();
 
@@ -76,7 +76,7 @@ public class MarketTest extends FreeColTestCase {
 
 		Specification s = spec();
 
-		GoodsType food = s.getGoodsType("model.goods.Food");
+		GoodsType food = s.getGoodsType("model.goods.food");
 
 		p.setGold(1000000);
 
@@ -104,7 +104,7 @@ public class MarketTest extends FreeColTestCase {
 
 		Specification s = spec();
 
-		GoodsType silver = s.getGoodsType("model.goods.Silver");
+		GoodsType silver = s.getGoodsType("model.goods.silver");
 
 		int previousGold = p.getGold();
 
@@ -176,7 +176,7 @@ public class MarketTest extends FreeColTestCase {
 	public void testDutchMarket() {
 
 		{// Test that the dutch can sell more goods until the price drops
-			GoodsType silver = spec().getGoodsType("model.goods.Silver");
+			GoodsType silver = spec().getGoodsType("model.goods.silver");
 			Game g = getStandardGame();
 			int dutchSellAmount = sellUntilPriceDrop(g, g
 				.getPlayer("model.nation.dutch"), silver);
@@ -188,7 +188,7 @@ public class MarketTest extends FreeColTestCase {
 			assertTrue(dutchSellAmount > frenchSellAmount);
 		}
 		{// Test that the dutch can buy more goods until the price rises
-			GoodsType muskets = spec().getGoodsType("model.goods.Muskets");
+			GoodsType muskets = spec().getGoodsType("model.goods.muskets");
 			int dutchSellAmount = buyUntilPriceRise(getStandardGame(),
 				"model.nation.dutch", muskets);
 
@@ -235,7 +235,7 @@ public class MarketTest extends FreeColTestCase {
 
 		Specification s = spec();
 
-		GoodsType silver = s.getGoodsType("model.goods.Silver");
+		GoodsType silver = s.getGoodsType("model.goods.silver");
 
 		int previousGold = english.getGold();
 

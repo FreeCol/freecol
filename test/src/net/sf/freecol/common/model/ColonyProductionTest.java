@@ -65,7 +65,7 @@ public class ColonyProductionTest extends FreeColTestCase {
         assertEquals(dutch, colony.getTile().getOwner());
 
         // Should have 50 Muskets and nothing else
-        GoodsType muskets = FreeCol.getSpecification().getGoodsType("model.goods.Muskets");
+        GoodsType muskets = FreeCol.getSpecification().getGoodsType("model.goods.muskets");
         assertNotNull(muskets);
             
         for (GoodsType type : FreeCol.getSpecification().getGoodsTypeList()){

@@ -142,25 +142,25 @@ public class GoodsTest extends FreeColTestCase {
     }
 
     public void testGetRawMaterial() {
-    	GoodsType cotton = FreeCol.getSpecification().getGoodsType("model.goods.Cotton");
-    	GoodsType cloth = FreeCol.getSpecification().getGoodsType("model.goods.Cloth");
+    	GoodsType cotton = FreeCol.getSpecification().getGoodsType("model.goods.cotton");
+    	GoodsType cloth = FreeCol.getSpecification().getGoodsType("model.goods.cloth");
     	
         assertEquals(null, cotton.getRawMaterial());
         assertEquals(cotton, cloth.getRawMaterial());
     }
 
     public void testGetManufactoredGoods() {
-    	GoodsType cotton = FreeCol.getSpecification().getGoodsType("model.goods.Cotton");
-    	GoodsType cloth = FreeCol.getSpecification().getGoodsType("model.goods.Cloth");
+    	GoodsType cotton = FreeCol.getSpecification().getGoodsType("model.goods.cotton");
+    	GoodsType cloth = FreeCol.getSpecification().getGoodsType("model.goods.cloth");
     	
         assertEquals(null, cloth.getProducedMaterial());
         assertEquals(cloth, cotton.getProducedMaterial());
     }
 
     public void testIsFarmedGoods() {
-    	GoodsType bells = FreeCol.getSpecification().getGoodsType("model.goods.Bells");
-    	GoodsType cloth = FreeCol.getSpecification().getGoodsType("model.goods.Cloth");
-    	GoodsType cotton = FreeCol.getSpecification().getGoodsType("model.goods.Cotton");
+    	GoodsType bells = FreeCol.getSpecification().getGoodsType("model.goods.bells");
+    	GoodsType cloth = FreeCol.getSpecification().getGoodsType("model.goods.cloth");
+    	GoodsType cotton = FreeCol.getSpecification().getGoodsType("model.goods.cotton");
     	
         assertFalse(bells.isFarmed());
         assertTrue(cotton.isFarmed());

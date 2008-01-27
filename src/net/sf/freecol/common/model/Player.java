@@ -1182,7 +1182,7 @@ public class Player extends FreeColGameObject implements Features, Nameable {
      * @return The bell production bonus.
      */
     public int getBellsBonus() {
-        return (int) getModifier("model.goods.Bells").getValue();
+        return (int) getModifier("model.goods.bells").getValue();
     }
 
     /**
@@ -2694,9 +2694,9 @@ public class Player extends FreeColGameObject implements Features, Nameable {
      */
     public void setTax(int amount) {
         if (amount != tax && hasAbility("model.ability.addTaxToBells")) {
-            Modifier bellsBonus = getModifier("model.goods.Bells");
+            Modifier bellsBonus = getModifier("model.goods.bells");
             if (bellsBonus == null) {
-                addFeature(new Modifier("model.goods.Bells", amount, Modifier.ADDITIVE));
+                addFeature(new Modifier("model.goods.bells", amount, Modifier.ADDITIVE));
             } else {
                 int difference = (amount - tax);
                 bellsBonus.setValue(bellsBonus.getValue() + difference);

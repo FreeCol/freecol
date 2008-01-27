@@ -46,7 +46,7 @@ public class MessagesTest extends FreeColTestCase {
         // Long String
         assertEquals("Food is necessary to feed your colonists and to breed horses. "
                 + "A new colonist is born whenever a colony has 200 units of food or more.",
-                     Messages.message("model.goods.Food.description"));
+                     Messages.message("model.goods.food.description"));
 
         // Message not found
         assertEquals(noSuchKey, Messages.message(noSuchKey));
@@ -68,7 +68,7 @@ public class MessagesTest extends FreeColTestCase {
         // Long String
         assertEquals("Food is necessary to feed your colonists and to breed horses. "
                 + "A new colonist is born whenever a colony has 200 units of food or more.", 
-                     Messages.message("model.goods.Food.description", new String[][] {}));
+                     Messages.message("model.goods.food.description", new String[][] {}));
 
         // Invalid Inputs
         assertEquals("Trade Advisor", Messages.message("menuBar.report.trade", new String[][] {}));
@@ -102,7 +102,7 @@ public class MessagesTest extends FreeColTestCase {
         // Long String
         assertEquals("Food is necessary to feed your colonists and to breed horses. "
                 + "A new colonist is born whenever a colony has 200 units of food or more.", Messages.message(
-                "model.goods.Food.description"));
+                "model.goods.food.description"));
 
         try {
             Messages.message("menuBar.statusLine", "%tax%");

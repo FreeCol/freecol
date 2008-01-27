@@ -28,6 +28,7 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
 import net.sf.freecol.client.gui.i18n.Messages;
+import net.sf.freecol.common.Specification;
 
 public final class GoodsType extends FreeColGameObjectType
 {
@@ -60,7 +61,7 @@ public final class GoodsType extends FreeColGameObjectType
         if (sellable) {
             return getName();
         } else {
-            return getName() + " (" + Messages.message("model.goods.Boycotted") + ")";
+            return getName() + " (" + Messages.message("model.goods.boycotted") + ")";
         }
     }
 
@@ -133,7 +134,7 @@ public final class GoodsType extends FreeColGameObjectType
     // ------------------------------------------------------------ API methods
 
     protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
-        readFromXML(in, null);
+        //readFromXML(in, null);
     }
 
     public void readFromXML(XMLStreamReader in, final Map<String, GoodsType> goodsTypeByRef)
@@ -156,6 +157,37 @@ public final class GoodsType extends FreeColGameObjectType
         storable = getAttribute(in, "storable", true);
         if (hasAttribute(in, "stored-as")) {
             storedAs = goodsTypeByRef.get(in.getAttributeValue(null, "stored-as"));
+        }
+
+        // Only expected child is 'market'
+        while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
+            initialAmount = Integer.parseInt(in.getAttributeValue(null, "initial-amount"));
+            initialPrice = getAttribute(in, "initial-price", 1);
+            priceDiff = getAttribute(in, "price-difference", 1);
+            in.nextTag(); // close this element
+        }
+    }
+
+    public void readFromXML(XMLStreamReader in, Specification specification) 
+        throws XMLStreamException {
+        setId(in.getAttributeValue(null, "id"));
+        isFarmed = getAttribute(in, "is-farmed", false);
+        isFood = getAttribute(in, "is-food", false);
+        ignoreLimit = getAttribute(in, "ignore-limit", false);
+        art = in.getAttributeValue(null, "art");
+
+        if (hasAttribute(in, "made-from")) {
+            String  madeFromRef = in.getAttributeValue(null, "made-from");
+            GoodsType rawMaterial = specification.getGoodsType(madeFromRef);
+            madeFrom = rawMaterial;
+            if (rawMaterial != null) {
+                rawMaterial.makes = this;
+            }
+        }
+
+        storable = getAttribute(in, "storable", true);
+        if (hasAttribute(in, "stored-as")) {
+            storedAs = specification.getGoodsType(in.getAttributeValue(null, "stored-as"));
         }
 
         // Only expected child is 'market'

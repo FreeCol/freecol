@@ -216,7 +216,7 @@ public class Goods extends AbstractGoods implements Locatable, Ownable, Named {
         if (sellable) {
             return type.getName();
         } else {
-            return type.getName() + " (" + Messages.message("model.goods.Boycotted") + ")";
+            return type.getName() + " (" + Messages.message("model.goods.boycotted") + ")";
         }
     }
 */

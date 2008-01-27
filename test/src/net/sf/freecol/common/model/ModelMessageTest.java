@@ -30,7 +30,7 @@ public class ModelMessageTest extends FreeColTestCase {
     
         Game game = getGame();
         Colony colony = getStandardColony(1);
-        GoodsType cotton = FreeCol.getSpecification().getGoodsType("model.goods.Cotton");
+        GoodsType cotton = FreeCol.getSpecification().getGoodsType("model.goods.cotton");
         
         ModelMessage mm1 = new ModelMessage(colony, "buildColony.landLocked", null, ModelMessage.MISSING_GOODS,
                 cotton);
@@ -52,7 +52,7 @@ public class ModelMessageTest extends FreeColTestCase {
         Game game = getGame();
         Player player = game.getPlayer("model.nation.dutch");
         Colony colony = getStandardColony(1);
-        GoodsType cotton = FreeCol.getSpecification().getGoodsType("model.goods.Cotton");
+        GoodsType cotton = FreeCol.getSpecification().getGoodsType("model.goods.cotton");
         
         ModelMessage mm1 = new ModelMessage(colony, "model.building.warehouseSoonFull",
                                     new String [][] {{"%goods%", cotton.getName()},

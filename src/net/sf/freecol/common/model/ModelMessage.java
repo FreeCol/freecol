@@ -188,7 +188,7 @@ public class ModelMessage extends FreeColObject {
         switch(type) {
         case SONS_OF_LIBERTY:
         case GOVERNMENT_EFFICIENCY:
-            newDisplay = FreeCol.getSpecification().getGoodsType("model.goods.Bells");
+            newDisplay = FreeCol.getSpecification().getGoodsType("model.goods.bells");
             break;
         case LOST_CITY_RUMOUR:
             newDisplay = new LostCityRumour();
@@ -200,7 +200,7 @@ public class ModelMessage extends FreeColObject {
             newDisplay = source;
             break;
         case BUILDING_COMPLETED:
-            newDisplay = FreeCol.getSpecification().getGoodsType("model.goods.Hammers");
+            newDisplay = FreeCol.getSpecification().getGoodsType("model.goods.hammers");
             break;
         case DEFAULT:
         case WARNING:

@@ -138,12 +138,12 @@ public class TileTest extends FreeColTestCase {
         Specification s = FreeCol.getSpecification();
         
         Tile tile = new Tile(game, s.getTileType("model.tile.prairie"), 0, 0);
-        assertEquals(s.getGoodsType("model.goods.Food"),tile.primaryGoods());
-        assertEquals(s.getGoodsType("model.goods.Cotton"),tile.secondaryGoods());
+        assertEquals(s.getGoodsType("model.goods.food"),tile.primaryGoods());
+        assertEquals(s.getGoodsType("model.goods.cotton"),tile.secondaryGoods());
         
         Tile tile2 = new Tile(game, s.getTileType("model.tile.mixedForest"), 0, 0);
-        assertEquals(s.getGoodsType("model.goods.Food"),tile2.primaryGoods());
-        assertEquals(s.getGoodsType("model.goods.Furs"),tile2.secondaryGoods());
+        assertEquals(s.getGoodsType("model.goods.food"),tile2.primaryGoods());
+        assertEquals(s.getGoodsType("model.goods.furs"),tile2.secondaryGoods());
         
     }
 
@@ -151,11 +151,11 @@ public class TileTest extends FreeColTestCase {
         Game game = getStandardGame();
         Specification s = FreeCol.getSpecification();
         Tile tile = new Tile(game, s.getTileType("model.tile.mountains"), 0, 0);
-        assertEquals(0,tile.potential(s.getGoodsType("model.goods.Food")));
-        assertEquals(1,tile.potential(s.getGoodsType("model.goods.Silver")));
+        assertEquals(0,tile.potential(s.getGoodsType("model.goods.food")));
+        assertEquals(1,tile.potential(s.getGoodsType("model.goods.silver")));
         tile.setResource(s.getResourceType("model.resource.Silver"));
-        assertEquals(0,tile.potential(s.getGoodsType("model.goods.Food")));
-        assertEquals(3,tile.potential(s.getGoodsType("model.goods.Silver")));
+        assertEquals(0,tile.potential(s.getGoodsType("model.goods.food")));
+        assertEquals(3,tile.potential(s.getGoodsType("model.goods.silver")));
     }
 
     public void testMovement() {
