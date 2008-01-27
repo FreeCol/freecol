@@ -146,14 +146,6 @@ public final class Specification {
         nationTypes = new ArrayList<NationType>();
         equipmentTypes = new ArrayList<EquipmentType>();
         difficultyLevels = new ArrayList<DifficultyLevel>();
-
-        final Map<String, GoodsType> goodsTypeByRef = new HashMap<String, GoodsType>();
-        final Map<String, ResourceType> resourceTypeByRef = new HashMap<String, ResourceType>();
-        final Map<String, TileType> tileTypeByRef = new HashMap<String, TileType>();
-        final Map<String, TileImprovementType> tileImprovementTypeByRef = new HashMap<String, TileImprovementType>();
-        final Map<String, BuildingType> buildingTypeByRef = new HashMap<String, BuildingType>();
-        final Map<String, UnitType> unitTypeByRef = new HashMap<String, UnitType>();
-        final Map<String, NationType> nationTypeByRef = new HashMap<String, NationType>();
         farmedGoodsTypeList = new ArrayList<GoodsType>();
 
 
@@ -172,192 +164,135 @@ public final class Specification {
                         goodsType.readFromXML(xsr, this);
                         goodsTypeList.add(goodsType);
                         allTypes.put(goodsType.getId(), goodsType);
-                        goodsTypeByRef.put(goodsType.getId(), goodsType);
                         if (goodsType.isFarmed()) {
                             farmedGoodsTypeList.add(goodsType);
                         }
                     }
-                    /*
-                    ObjectFactory<GoodsType> factory = new ObjectFactory<GoodsType>() {
-                        int goodsIndex = 0;
-                        public GoodsType objectFrom(XMLStreamReader in) throws XMLStreamException {
-                        GoodsType goodsType = new GoodsType(goodsIndex++);
-                            goodsType.readFromXML(in, goodsTypeByRef);
-                            allTypes.put(goodsType.getId(), goodsType);
-                            goodsTypeByRef.put(goodsType.getId(), goodsType);
-                            if (goodsType.isFarmed()) {
-                                farmedGoodsTypeList.add(goodsType);
-                            }
-                            return goodsType;
-                        }
-                    };
-                    goodsTypeList.addAll(makeListFromXml(xsr, factory));
-                    */
 
                 } else if ("building-types".equals(childName)) {
 
                     logger.finest("Found child named " + childName);
-                    ObjectFactory<BuildingType> factory = new ObjectFactory<BuildingType>() {
-                        int buildingIndex = 0;
-                        public BuildingType objectFrom(XMLStreamReader in) throws XMLStreamException {
-                            BuildingType buildingType = new BuildingType(buildingIndex++);
-                            buildingType.readFromXML(in, goodsTypeByRef, buildingTypeByRef);
-                            allTypes.put(buildingType.getId(), buildingType);
-                            buildingTypeByRef.put(buildingType.getId(), buildingType);
-                            return buildingType;
-                        }
-                    };
-                    buildingTypeList.addAll(makeListFromXml(xsr, factory));
+                    int buildingIndex = 0;
+                    while (xsr.nextTag() != XMLStreamConstants.END_ELEMENT) {
+                        BuildingType buildingType = new BuildingType(buildingIndex++);
+                        buildingType.readFromXML(xsr, this);
+                        allTypes.put(buildingType.getId(), buildingType);
+                        buildingTypeList.add(buildingType);
+                    }
 
                 } else if ("resource-types".equals(childName)) {
 
                     logger.finest("Found child named " + childName);
-                    ObjectFactory<ResourceType> factory = new ObjectFactory<ResourceType>() {
-                        int resIndex = 0;
-                        public ResourceType objectFrom(XMLStreamReader in) throws XMLStreamException {
-                            ResourceType resourceType = new ResourceType(resIndex++);
-                            resourceType.readFromXML(in, goodsTypeByRef);
-                            allTypes.put(resourceType.getId(), resourceType);
-                            resourceTypeByRef.put(resourceType.getId(), resourceType);
-                            return resourceType;
-                        }
-                    };
-                    resourceTypeList.addAll(makeListFromXml(xsr, factory));
+                    int resIndex = 0;
+                    while (xsr.nextTag() != XMLStreamConstants.END_ELEMENT) {
+                        ResourceType resourceType = new ResourceType(resIndex++);
+                        resourceType.readFromXML(xsr, this);
+                        allTypes.put(resourceType.getId(), resourceType);
+                        resourceTypeList.add(resourceType);
+                    }
 
                 } else if ("tile-types".equals(childName)) {
 
                     logger.finest("Found child named " + childName);
-                    ObjectFactory<TileType> factory = new ObjectFactory<TileType>() {
-                        int tileIndex = 0;
-                        public TileType objectFrom(XMLStreamReader in) throws XMLStreamException {
-                            TileType tileType = new TileType(tileIndex++);
-                            tileType.readFromXML(in, goodsTypeByRef, resourceTypeByRef);
-                            allTypes.put(tileType.getId(), tileType);
-                            tileTypeByRef.put(tileType.getId(), tileType);
-                            return tileType;
-                        }
-                    };
-                    tileTypeList.addAll(makeListFromXml(xsr, factory));
+                    int tileIndex = 0;
+                    while (xsr.nextTag() != XMLStreamConstants.END_ELEMENT) {
+                        TileType tileType = new TileType(tileIndex++);
+                        tileType.readFromXML(xsr, this);
+                        allTypes.put(tileType.getId(), tileType);
+                        tileTypeList.add(tileType);
+                    }
 
                 } else if ("tileimprovement-types".equals(childName)) {
 
                     logger.finest("Found child named " + childName);
-                    ObjectFactory<TileImprovementType> factory = new ObjectFactory<TileImprovementType>() {
-                        int impIndex = 0;
-                        public TileImprovementType objectFrom(XMLStreamReader in) throws XMLStreamException {
-                            TileImprovementType tileImprovementType = new TileImprovementType(impIndex++);
-                            tileImprovementType.readFromXML(in, tileTypeList, allTypes);
-                            allTypes.put(tileImprovementType.getId(), tileImprovementType);
-                            tileImprovementTypeByRef.put(tileImprovementType.getId(), tileImprovementType);
-                            return tileImprovementType;
-                        }
-                    };
-                    tileImprovementTypeList.addAll(makeListFromXml(xsr, factory));
+                    int impIndex = 0;
+                    while (xsr.nextTag() != XMLStreamConstants.END_ELEMENT) {
+                        TileImprovementType tileImprovementType = new TileImprovementType(impIndex++);
+                        tileImprovementType.readFromXML(xsr, this);
+                        allTypes.put(tileImprovementType.getId(), tileImprovementType);
+                        tileImprovementTypeList.add(tileImprovementType);
+                    }
 
                 } else if ("improvementaction-types".equals(childName)) {
 
                     logger.finest("Found child named " + childName);
-                    ObjectFactory<ImprovementActionType> factory = new ObjectFactory<ImprovementActionType>() {
-
-                        public ImprovementActionType objectFrom(XMLStreamReader in) throws XMLStreamException {
-                            ImprovementActionType impActionType = new ImprovementActionType();
-                            impActionType.readFromXML(in, tileImprovementTypeByRef);
-                            allTypes.put(impActionType.getId(), impActionType);
-                            return impActionType;
-                        }
-                    };
-                    improvementActionTypeList.addAll(makeListFromXml(xsr, factory));
+                    while (xsr.nextTag() != XMLStreamConstants.END_ELEMENT) {
+                        ImprovementActionType impActionType = new ImprovementActionType();
+                        impActionType.readFromXML(xsr, this);
+                        allTypes.put(impActionType.getId(), impActionType);
+                        improvementActionTypeList.add(impActionType);
+                    }
 
                 } else if ("unit-types".equals(childName)) {
 
                     logger.finest("Found child named " + childName);
-                    ObjectFactory<UnitType> factory = new ObjectFactory<UnitType>() {
-                        int unitIndex = 0;
-                        public UnitType objectFrom(XMLStreamReader in) throws XMLStreamException {
-                            UnitType unitType = new UnitType(unitIndex++);
-                            unitType.readFromXML(in, goodsTypeByRef);
-                            allTypes.put(unitType.getId(), unitType);
-                            unitTypeByRef.put(unitType.getId(), unitType);
-                            return unitType;
-                        }
-                    };
-                    unitTypeList.addAll(makeListFromXml(xsr, factory));
+                    int unitIndex = 0;
+                    while (xsr.nextTag() != XMLStreamConstants.END_ELEMENT) {
+                        UnitType unitType = new UnitType(unitIndex++);
+                        unitType.readFromXML(xsr, this);
+                        allTypes.put(unitType.getId(), unitType);
+                        unitTypeList.add(unitType);
+                    }
 
                 } else if ("founding-fathers".equals(childName)) {
 
                     logger.finest("Found child named " + childName);
-                    ObjectFactory<FoundingFather> factory = new ObjectFactory<FoundingFather>() {
-                        int fatherIndex = 0;
-                        public FoundingFather objectFrom(XMLStreamReader in) throws XMLStreamException {
-                            FoundingFather foundingFather = new FoundingFather(fatherIndex++);
-                            foundingFather.readFromXML(in, unitTypeByRef);
-                            allTypes.put(foundingFather.getId(), foundingFather);
-                            return foundingFather;
-                        }
-                    };
-                    foundingFathers.addAll(makeListFromXml(xsr, factory));
+                    int fatherIndex = 0;
+                    while (xsr.nextTag() != XMLStreamConstants.END_ELEMENT) {
+                        FoundingFather foundingFather = new FoundingFather(fatherIndex++);
+                        foundingFather.readFromXML(xsr, this);
+                        allTypes.put(foundingFather.getId(), foundingFather);
+                        foundingFathers.add(foundingFather);
+                    }
 
                 } else if ("nation-types".equals(childName)) {
 
                     logger.finest("Found child named " + childName);
-                    ObjectFactory<NationType> factory = new ObjectFactory<NationType>() {
-                        int nationIndex = 0;
-                        public NationType objectFrom(XMLStreamReader in) throws XMLStreamException {
-                            NationType nationType;
-                            if ("european-nation-type".equals(in.getLocalName())) {
-                                nationType = new EuropeanNationType(nationIndex++);
-                            } else {
-                                nationType = new IndianNationType(nationIndex++);
-                            }                             
-                            nationType.readFromXML(in, unitTypeByRef);
-                            allTypes.put(nationType.getId(), nationType);
-                            nationTypeByRef.put(nationType.getId(), nationType);
-                            return nationType;
-                        }
-                    };
-                    nationTypes.addAll(makeListFromXml(xsr, factory));
+                    int nationIndex = 0;
+                    while (xsr.nextTag() != XMLStreamConstants.END_ELEMENT) {
+                        NationType nationType;
+                        if ("european-nation-type".equals(xsr.getLocalName())) {
+                            nationType = new EuropeanNationType(nationIndex++);
+                        } else {
+                            nationType = new IndianNationType(nationIndex++);
+                        }                             
+                        nationType.readFromXML(xsr, this);
+                        allTypes.put(nationType.getId(), nationType);
+                        nationTypes.add(nationType);
+                    }
 
                 } else if ("nations".equals(childName)) {
 
                     logger.finest("Found child named " + childName);
-                    ObjectFactory<Nation> factory = new ObjectFactory<Nation>() {
-                        int nationIndex = 0;
-                        public Nation objectFrom(XMLStreamReader in) throws XMLStreamException {
-                            Nation nation = new Nation(nationIndex++);
-                            nation.readFromXML(in, nationTypeByRef);
-                            allTypes.put(nation.getId(), nation);
-                            return nation;
-                        }
-                    };
-                    nations.addAll(makeListFromXml(xsr, factory));
+                    int nationIndex = 0;
+                    while (xsr.nextTag() != XMLStreamConstants.END_ELEMENT) {
+                        Nation nation = new Nation(nationIndex++);
+                        nation.readFromXML(xsr, this);
+                        allTypes.put(nation.getId(), nation);
+                        nations.add(nation);
+                    }
 
 
                 } else if ("equipment-types".equals(childName)) {
 
                     logger.finest("Found child named " + childName);
-                    ObjectFactory<EquipmentType> factory = new ObjectFactory<EquipmentType>() {
-                        int equipmentIndex = 0;
-                        public EquipmentType objectFrom(XMLStreamReader in) throws XMLStreamException {
-                            EquipmentType equipmentType = new EquipmentType(equipmentIndex++);
-                            equipmentType.readFromXML(in, goodsTypeByRef);
-                            allTypes.put(equipmentType.getId(), equipmentType);
-                            return equipmentType;
-                        }
-                    };
-                    equipmentTypes.addAll(makeListFromXml(xsr, factory));
+                    int equipmentIndex = 0;
+                    while (xsr.nextTag() != XMLStreamConstants.END_ELEMENT) {
+                        EquipmentType equipmentType = new EquipmentType(equipmentIndex++);
+                        equipmentType.readFromXML(xsr, this);
+                        allTypes.put(equipmentType.getId(), equipmentType);
+                        equipmentTypes.add(equipmentType);
+                    }
 
                 } else if ("difficulty-levels".equals(childName)) {
 
                     logger.finest("Found child named " + childName);
-                    ObjectFactory<DifficultyLevel> factory = new ObjectFactory<DifficultyLevel>() {
-                        int levelIndex = 0;
-                        public DifficultyLevel objectFrom(XMLStreamReader in) throws XMLStreamException {
-                            DifficultyLevel level = new DifficultyLevel(levelIndex++);
-                            allTypes.put(level.getId(), level);
-                            return level;
-                        }
-                    };
-                    difficultyLevels.addAll(makeListFromXml(xsr, factory));
+                    int levelIndex = 0;
+                    while (xsr.nextTag() != XMLStreamConstants.END_ELEMENT) {
+                        DifficultyLevel level = new DifficultyLevel(levelIndex++);
+                        allTypes.put(level.getId(), level);
+                        difficultyLevels.add(level);
+                    }
 
                 } else {
                     throw new RuntimeException("unexpected: " + childName);
@@ -385,7 +320,7 @@ public final class Specification {
                                                " with ID 'null'.");
         } else if (!allTypes.containsKey(Id)) {
             throw new IllegalArgumentException("Trying to retrieve FreeColGameObjectType" +
-                                               " with ID " + Id + " returned 'null'.");
+                                               " with ID '" + Id + "' returned 'null'.");
         } else {
             return allTypes.get(Id);
         }

@@ -26,6 +26,8 @@ import java.util.Map;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
+import net.sf.freecol.common.Specification;
+
 /**
  * Represents one of the nations present in the game.
  */
@@ -95,7 +97,7 @@ public abstract class NationType extends FreeColGameObjectType implements Featur
         readFromXML(in, null);
     }
 
-    public abstract void readFromXML(XMLStreamReader in, final Map<String, UnitType> unitTypeByRef)
+    public abstract void readFromXML(XMLStreamReader in, Specification specification)
         throws XMLStreamException;
 
 }

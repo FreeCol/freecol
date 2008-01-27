@@ -28,6 +28,7 @@ import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
+import net.sf.freecol.common.Specification;
 import net.sf.freecol.common.model.Unit.Role;
 
 public class EquipmentType extends FreeColGameObjectType implements Features {
@@ -238,7 +239,7 @@ public class EquipmentType extends FreeColGameObjectType implements Features {
         readFromXML(in, null);
     }
 
-    public void readFromXML(XMLStreamReader in, final Map<String, GoodsType> goodsTypeByRef)
+    public void readFromXML(XMLStreamReader in, Specification specification)
             throws XMLStreamException {
         setId(in.getAttributeValue(null, "id"));
         maximumCount = getAttribute(in, "maximum-count", 1);
@@ -264,7 +265,7 @@ public class EquipmentType extends FreeColGameObjectType implements Features {
                 getLocationAbilitiesRequired().put(abilityId, value);
                 in.nextTag(); // close this element
             } else if ("required-goods".equals(nodeName)) {
-                GoodsType type = goodsTypeByRef.get(in.getAttributeValue(null, "id"));
+                GoodsType type = specification.getGoodsType(in.getAttributeValue(null, "id"));
                 int amount = getAttribute(in, "value", 0);
                 AbstractGoods requiredGoods = new AbstractGoods(type, amount);
                 if (getGoodsRequired() == null) {

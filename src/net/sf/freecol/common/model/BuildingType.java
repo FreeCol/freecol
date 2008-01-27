@@ -26,6 +26,8 @@ import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
+import net.sf.freecol.common.Specification;
+
 /**
  * Contains information on building types, like the number of upgrade levels a
  * given building type can have. The levels contain the information about the
@@ -91,15 +93,14 @@ public final class BuildingType extends BuildableType {
     }
 
     protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
-        readFromXML(in, null, null);
+        readFromXML(in, null);
     }
 
-    public void readFromXML(XMLStreamReader in, final Map<String, GoodsType> goodsTypeByRef,
-           final Map<String, BuildingType> buildingTypeByRef) throws XMLStreamException {
+    public void readFromXML(XMLStreamReader in, Specification specification) throws XMLStreamException {
         setId(in.getAttributeValue(null, "id"));
         
         if (hasAttribute(in, "upgradesFrom")) {
-            upgradesFrom = buildingTypeByRef.get(in.getAttributeValue(null, "upgradesFrom"));
+            upgradesFrom = specification.getBuildingType(in.getAttributeValue(null, "upgradesFrom"));
             upgradesFrom.upgradesTo = this;
             level = upgradesFrom.level + 1;
         } else {
@@ -109,10 +110,17 @@ public final class BuildingType extends BuildableType {
         defenceBonus = getAttribute(in, "defence-bonus", 0);
         workPlaces = getAttribute(in, "workplaces", 0);
         basicProduction = getAttribute(in, "basicProduction", 0);
-        
-        consumes = goodsTypeByRef.get(in.getAttributeValue(null, "consumes"));
-        produces = goodsTypeByRef.get(in.getAttributeValue(null, "produces"));
-        
+
+        String consumeStr = in.getAttributeValue(null, "consumes");
+        if (consumeStr != null) {
+            consumes = specification.getGoodsType(consumeStr);
+        }
+
+        String produceStr = in.getAttributeValue(null, "produces");
+        if (produceStr != null) {
+            produces = specification.getGoodsType(produceStr);
+        }
+
         minSkill = getAttribute(in, "minSkill", Integer.MIN_VALUE);
         maxSkill = getAttribute(in, "maxSkill", Integer.MAX_VALUE);
 
@@ -133,7 +141,7 @@ public final class BuildingType extends BuildableType {
                 getAbilitiesRequired().put(abilityId, value);
                 in.nextTag(); // close this element
             } else if ("required-goods".equals(childName)) {
-                GoodsType type = goodsTypeByRef.get(in.getAttributeValue(null, "id"));
+                GoodsType type = specification.getGoodsType(in.getAttributeValue(null, "id"));
                 int amount = getAttribute(in, "value", 0);
                 AbstractGoods requiredGoods = new AbstractGoods(type, amount);
                 if (getGoodsRequired() == null) {

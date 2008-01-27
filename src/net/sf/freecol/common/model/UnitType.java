@@ -34,6 +34,7 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
 import net.sf.freecol.FreeCol;
+import net.sf.freecol.common.Specification;
 import net.sf.freecol.common.model.Player.PlayerType;
 
 public final class UnitType extends BuildableType {
@@ -511,7 +512,7 @@ public final class UnitType extends BuildableType {
         readFromXML(in, null);
     }
 
-    public void readFromXML(XMLStreamReader in, final Map<String, GoodsType> goodsTypeByRef)
+    public void readFromXML(XMLStreamReader in, Specification specification)
             throws XMLStreamException {
         setId(in.getAttributeValue(null, "id"));
         offence = getAttribute(in, "offence", 0);
@@ -534,7 +535,9 @@ public final class UnitType extends BuildableType {
         increasingPrice = getAttribute(in, "increasingPrice", UNDEFINED);
 
         String goodsTypeRef = in.getAttributeValue(null, "expert-production");
-        expertProduction = goodsTypeByRef.get(goodsTypeRef);
+        if (goodsTypeRef != null) {
+            expertProduction = specification.getGoodsType(goodsTypeRef);
+        }
 
         while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
             String nodeName = in.getLocalName();
@@ -549,7 +552,7 @@ public final class UnitType extends BuildableType {
                 getAbilitiesRequired().put(abilityId, value);
                 in.nextTag(); // close this element
             } else if ("required-goods".equals(nodeName)) {
-                GoodsType type = goodsTypeByRef.get(in.getAttributeValue(null, "id"));
+                GoodsType type = specification.getGoodsType(in.getAttributeValue(null, "id"));
                 int amount = getAttribute(in, "value", 0);
                 AbstractGoods requiredGoods = new AbstractGoods(type, amount);
                 if (getGoodsRequired() == null) {

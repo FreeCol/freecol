@@ -25,6 +25,7 @@ import java.util.Map;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
+import net.sf.freecol.common.Specification;
 import net.sf.freecol.client.gui.i18n.Messages;
 
 /**
@@ -175,11 +176,11 @@ public class Nation extends FreeColGameObjectType {
         readFromXML(in, null);
     }
 
-    public void readFromXML(XMLStreamReader in, final Map<String, NationType> nationTypeByRef)
+    public void readFromXML(XMLStreamReader in, Specification specification)
         throws XMLStreamException {
         setId(in.getAttributeValue(null, "id"));
         setColor(new Color(Integer.decode(in.getAttributeValue(null, "color"))));
-        type = nationTypeByRef.get(in.getAttributeValue(null, "nation-type"));
+        type = specification.getNationType(in.getAttributeValue(null, "nation-type"));
         selectable = getAttribute(in, "selectable", false);
         classic = getAttribute(in, "classic", false);
         refID = getAttribute(in, "ref-of", null);

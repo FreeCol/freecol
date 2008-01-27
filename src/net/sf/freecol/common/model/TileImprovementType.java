@@ -29,7 +29,7 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
 import net.sf.freecol.FreeCol;
-//import net.sf.freecol.common.Specification;
+import net.sf.freecol.common.Specification;
 import net.sf.freecol.client.gui.i18n.Messages;
 
 public final class TileImprovementType extends FreeColGameObjectType
@@ -266,8 +266,8 @@ public final class TileImprovementType extends FreeColGameObjectType
         throw new UnsupportedOperationException("Call 'readFromXML' instead.");
     }
 
-    public void readFromXML(XMLStreamReader in, List<TileType> tileTypeList, 
-                            Map<String, FreeColGameObjectType> allTypes) throws XMLStreamException {
+    public void readFromXML(XMLStreamReader in, Specification specification)
+        throws XMLStreamException {
         setId(in.getAttributeValue(null, "id"));
         natural = getAttribute(in, "natural", false);
         addWorkTurns = getAttribute(in, "add-work-turns", 0);
@@ -276,15 +276,21 @@ public final class TileImprovementType extends FreeColGameObjectType
         magnitude = getAttribute(in, "magnitude", 1);
         
         String req = in.getAttributeValue(null, "required-improvement");
-        requiredImprovementType = (TileImprovementType) allTypes.get(req);
+        if (req != null) {
+            requiredImprovementType = specification.getTileImprovementType(req);
+        }
         artOverlay = getAttribute(in, "overlay", -1);
         artOverTrees = getAttribute(in, "over-trees", false);
 
         String g = in.getAttributeValue(null, "expended-equipment-type");
-        expendedEquipmentType = (EquipmentType) allTypes.get(g);
+        if (g != null) {
+            expendedEquipmentType = specification.getEquipmentType(g);
+        }
         expendedAmount = getAttribute(in, "expended-amount", 0);
         g = in.getAttributeValue(null, "deliver-goods-type");
-        deliverGoodsType = (GoodsType) allTypes.get(g);
+        if (g != null) {
+            deliverGoodsType = specification.getGoodsType(g);
+        }
         deliverAmount = getAttribute(in, "deliver-amount", 0);
 
         allowedWorkers = new HashSet<String>();
@@ -302,7 +308,7 @@ public final class TileImprovementType extends FreeColGameObjectType
                 boolean allForest = getAttribute(in, "all-forest-tiles", false);
                 boolean allWater = getAttribute(in, "all-water-tiles", false);
 
-                for (TileType t : tileTypeList) {
+                for (TileType t : specification.getTileTypeList()) {
                     if (t.isWater()){
                         if (allWater)
                             allowedTileTypes.add(t);
@@ -323,7 +329,7 @@ public final class TileImprovementType extends FreeColGameObjectType
                 
             } else if ("tile".equals(childName)) {
                 String tileId = in.getAttributeValue(null, "id");
-                allowedTileTypes.add((TileType) allTypes.get(tileId));
+                allowedTileTypes.add(specification.getTileType(tileId));
                 in.nextTag(); // close this element
 
             } else if ("worker".equals(childName)) {
@@ -333,7 +339,7 @@ public final class TileImprovementType extends FreeColGameObjectType
             } else if ("effect".equals(childName)) {
                 if (hasAttribute(in, "goods-type")) {
                     g = in.getAttributeValue(null, "goods-type");
-                    GoodsType gt = (GoodsType) allTypes.get(g);
+                    GoodsType gt = specification.getGoodsType(g);
                     if (gt != null) {
                         goodsEffect.add(gt);
                         goodsBonus.add(Integer.parseInt(in.getAttributeValue(null, "value")));
@@ -348,8 +354,8 @@ public final class TileImprovementType extends FreeColGameObjectType
                 in.nextTag(); // close this element
                 
             } else if ("change".equals(childName)) {
-                tileTypeChangeFrom.add((TileType) allTypes.get(in.getAttributeValue(null, "from")));
-                tileTypeChangeTo.add((TileType) allTypes.get(in.getAttributeValue(null, "to")));
+                tileTypeChangeFrom.add(specification.getTileType(in.getAttributeValue(null, "from")));
+                tileTypeChangeTo.add(specification.getTileType(in.getAttributeValue(null, "to")));
                 in.nextTag(); // close this element
 
             } else {

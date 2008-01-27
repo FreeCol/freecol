@@ -31,6 +31,7 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
 import net.sf.freecol.client.gui.i18n.Messages;
+import net.sf.freecol.common.Specification;
 
 /**
  * Represents one FoundingFather to be contained in a Player object.
@@ -254,7 +255,7 @@ public class FoundingFather extends FreeColGameObjectType implements Features {
         readFromXML(in, null);
     }
 
-    public void readFromXML(XMLStreamReader in, Map<String, UnitType> unitTypeByRef)
+    public void readFromXML(XMLStreamReader in, Specification specification)
         throws XMLStreamException {
         setId(in.getAttributeValue(null, "id"));
         String typeString = in.getAttributeValue(null, "type").toUpperCase();
@@ -294,8 +295,8 @@ public class FoundingFather extends FreeColGameObjectType implements Features {
                 }
                 units.add(unit);
             } else if ("upgrade".equals(childName)) {
-                UnitType fromType = unitTypeByRef.get(in.getAttributeValue(null, "from-id"));
-                UnitType toType = unitTypeByRef.get(in.getAttributeValue(null, "to-id"));
+                UnitType fromType = specification.getUnitType(in.getAttributeValue(null, "from-id"));
+                UnitType toType = specification.getUnitType(in.getAttributeValue(null, "to-id"));
                 if (fromType != null && toType != null) {
                     if (upgrades == null) {
                         upgrades = new HashMap<UnitType, UnitType>();

@@ -30,6 +30,8 @@ import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
+import net.sf.freecol.common.Specification;
+
 public final class TileType extends FreeColGameObjectType implements Features {
 
     private String artBasic;
@@ -234,11 +236,11 @@ public final class TileType extends FreeColGameObjectType implements Features {
     // ------------------------------------------------------------ API methods
 
     protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
-        readFromXML(in, null, null);
+        readFromXML(in, null);
     }
 
-    public void readFromXML(XMLStreamReader in, final Map<String, GoodsType> goodsTypeByRef,
-            final Map<String, ResourceType> resourceTypeByRef) throws XMLStreamException {
+    public void readFromXML(XMLStreamReader in, Specification specification)
+        throws XMLStreamException {
         setId(in.getAttributeValue(null, "id"));
         basicMoveCost = Integer.parseInt(in.getAttributeValue(null, "basic-move-cost"));
         basicWorkTurns = Integer.parseInt(in.getAttributeValue(null, "basic-work-turns"));
@@ -251,7 +253,7 @@ public final class TileType extends FreeColGameObjectType implements Features {
         defenceBonus = 0;
 
         if (!water && canSettle) {
-            secondaryGoods = goodsTypeByRef.get(in.getAttributeValue(null, "secondary-goods"));
+            secondaryGoods = specification.getGoodsType(in.getAttributeValue(null, "secondary-goods"));
         }
         
         artBasic = null;
@@ -283,13 +285,13 @@ public final class TileType extends FreeColGameObjectType implements Features {
                 Modifier modifier = new Modifier(in);
                 addFeature(modifier); // close this element
             } else if ("production".equals(childName)) {
-                GoodsType type = goodsTypeByRef.get(in.getAttributeValue(null, "goods-type"));
+                GoodsType type = specification.getGoodsType(in.getAttributeValue(null, "goods-type"));
                 int amount = Integer.parseInt(in.getAttributeValue(null, "value"));
                 production.add(new AbstractGoods(type, amount));
                 in.nextTag(); // close this element
             } else if ("resource".equals(childName)) {
                 String r = in.getAttributeValue(null, "type");
-                ResourceType rt = resourceTypeByRef.get(r);
+                ResourceType rt = specification.getResourceType(r);
                 resourceType.add(rt);
                 resourceProbability.add(getAttribute(in, "probability", 100));
                 in.nextTag(); // close this element

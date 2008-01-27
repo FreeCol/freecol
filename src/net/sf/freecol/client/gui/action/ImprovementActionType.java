@@ -27,6 +27,7 @@ import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
+import net.sf.freecol.common.Specification;
 import net.sf.freecol.common.model.FreeColGameObjectType;
 import net.sf.freecol.common.model.TileImprovementType;
 
@@ -77,7 +78,7 @@ public final class ImprovementActionType extends FreeColGameObjectType
         readFromXML(in, null);
     }
 
-    public void readFromXML(XMLStreamReader in, final Map<String, TileImprovementType> tileImprovementTypeByRef)
+    public void readFromXML(XMLStreamReader in, Specification specification)
            throws XMLStreamException {
         setId(in.getAttributeValue(null, "id"));
         accelerator = in.getAttributeValue(null, "accelerator").charAt(0);
@@ -85,7 +86,7 @@ public final class ImprovementActionType extends FreeColGameObjectType
         while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
             names.add(in.getAttributeValue(null, "name"));
             String t = in.getAttributeValue(null, "tileimprovement-type");
-            impTypes.add(tileImprovementTypeByRef.get(t));
+            impTypes.add(specification.getTileImprovementType(t));
             imageIDs.add(Integer.parseInt(in.getAttributeValue(null, "image-id")));
             in.nextTag(); // close this element
         }

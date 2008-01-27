@@ -28,6 +28,8 @@ import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
+import net.sf.freecol.common.Specification;
+
 public final class ResourceType extends FreeColGameObjectType
 {
 
@@ -128,7 +130,7 @@ public final class ResourceType extends FreeColGameObjectType
         readFromXML(in, null);
     }
 
-    public void readFromXML(XMLStreamReader in, final Map<String, GoodsType> goodsTypeByRef)
+    public void readFromXML(XMLStreamReader in, Specification specification)
             throws XMLStreamException {
         setId(in.getAttributeValue(null, "id"));
         art = in.getAttributeValue(null, "art");
@@ -146,7 +148,7 @@ public final class ResourceType extends FreeColGameObjectType
         // Only expected child is 'production-bonus'
         while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
             String goods = in.getAttributeValue(null, "goods-type");
-            GoodsType g = goodsTypeByRef.get(goods);
+            GoodsType g = specification.getGoodsType(goods);
             bonusGoods.add(g);
             bonusAmount.add(getAttribute(in, "bonus", 0));
             bonusFactor.add(getAttribute(in, "factor", 1f));

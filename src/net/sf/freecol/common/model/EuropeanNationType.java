@@ -29,6 +29,7 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
 import net.sf.freecol.client.gui.i18n.Messages;
+import net.sf.freecol.common.Specification;
 
 /**
  * Represents one of the European nations present in the game, i.e. both REFs
@@ -108,7 +109,7 @@ public class EuropeanNationType extends NationType {
         return startingUnits;
     }
 
-    public void readFromXML(XMLStreamReader in, final Map<String, UnitType> unitTypeByRef)
+    public void readFromXML(XMLStreamReader in, Specification specification)
             throws XMLStreamException {
         setId(in.getAttributeValue(null, "id"));
         ref = getAttribute(in, "ref", false);

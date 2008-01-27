@@ -28,6 +28,8 @@ import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
+import net.sf.freecol.common.Specification;
+
 /**
  * Represents one of the Indian nations present in the game.
  */
@@ -145,7 +147,7 @@ public class IndianNationType extends NationType {
         return skills;
     }
 
-    public void readFromXML(XMLStreamReader in, final Map<String, UnitType> unitTypeByRef)
+    public void readFromXML(XMLStreamReader in, Specification specification)
             throws XMLStreamException {
         setId(in.getAttributeValue(null, "id"));
 
