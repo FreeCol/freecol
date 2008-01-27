@@ -876,13 +876,13 @@ public class SimpleCombatModel implements CombatModel {
     private void getConvert(Unit attacker, IndianSettlement indianSettlement) {
         ModelController modelController = attacker.getGame().getModelController();
         int random = modelController.getRandom(attacker.getId() + "getConvert", 100);
-        int convertProbability = (5 - attacker.getOwner().getDifficulty()) * 10; // 50% - 10%
+        int convertProbability = attacker.getOwner().getDifficulty().getNativeConvertProbability();
         Modifier modifier = attacker.getModifier("model.ability.nativeConvertBonus");
         if (modifier != null) {
             convertProbability += modifier.getValue();
         }
         // TODO: it should be bigger when tension is high
-        int burnProbability = (1 + attacker.getOwner().getDifficulty()) * 2; // 2% - 10%
+        int burnProbability = attacker.getOwner().getDifficulty().getBurnProbability();
         
         if (random < convertProbability) {
             Unit missionary = indianSettlement.getMissionary();

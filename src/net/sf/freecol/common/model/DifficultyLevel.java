@@ -401,7 +401,7 @@ public class DifficultyLevel extends FreeColGameObjectType {
         throw new UnsupportedOperationException("Call 'readFromXML' instead.");
     }
 
-    protected void readFromXML(XMLStreamReader in, Specification specification)
+    public void readFromXML(XMLStreamReader in, Specification specification)
         throws XMLStreamException {
         setId(in.getAttributeValue(null, "id"));
         crossesIncrement = getAttribute(in, "crosses-increment", 10);
@@ -415,6 +415,9 @@ public class DifficultyLevel extends FreeColGameObjectType {
         recruitPriceIncrease = getAttribute(in, "recruit-price-increase", 40);
         lowerCapIncrease = getAttribute(in, "lower-cap-increase", 0);
 
+        purchasePrices = new HashMap<UnitType, Integer>();
+        trainingPrices = new HashMap<UnitType, Integer>();
+
         while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
             String childName = in.getLocalName();
             if ("purchase-prices".equals(childName)) {
@@ -425,14 +428,13 @@ public class DifficultyLevel extends FreeColGameObjectType {
                     if ("purchase-price".equals(childName)) {
                         String unitTypeId = getAttribute(in, "unit-type", null);
                         int priceIncrease = getAttribute(in, "price-increase", 0);
-                        purchasePrices.put(FreeCol.getSpecification().getUnitType(unitTypeId),
+                        purchasePrices.put(specification.getUnitType(unitTypeId),
                                            new Integer(priceIncrease));
-                        in.nextTag();
                     } else {
                         logger.finest("Parsing of " + childName + " is not implemented yet");
-                        in.nextTag();
                     }
                 }
+                in.nextTag();
             } else if ("training-prices".equals(childName)) {
                 trainingPriceIncrease = getAttribute(in, "price-increase", 0);
                 trainingPricePerUnitType = getAttribute(in, "per-unit-type", false);
@@ -441,19 +443,19 @@ public class DifficultyLevel extends FreeColGameObjectType {
                     if ("training-price".equals(childName)) {
                         String unitTypeId = getAttribute(in, "unit-type", null);
                         int priceIncrease = getAttribute(in, "price-increase", 0);
-                        trainingPrices.put(FreeCol.getSpecification().getUnitType(unitTypeId),
+                        trainingPrices.put(specification.getUnitType(unitTypeId),
                                            new Integer(priceIncrease));
-                        in.nextTag();
                     } else {
                         logger.finest("Parsing of " + childName + " is not implemented yet");
-                        in.nextTag();
                     }
+                    in.nextTag();
                 }
             } else {
                 logger.finest("Parsing of " + childName + " is not implemented yet");
                 in.nextTag();
             }
         }
+
     }
 
 }

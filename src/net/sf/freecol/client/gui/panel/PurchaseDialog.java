@@ -160,12 +160,12 @@ public final class PurchaseDialog extends FreeColDialog implements ActionListene
      */
     public void actionPerformed(ActionEvent event) {
         String command = event.getActionCommand();
-        UnitType unitType = FreeCol.getSpecification().getUnitType(command);
-        if (unitType != null) {
+        if (String.valueOf(PURCHASE_CANCEL).equals(command)) {
+            setResponse(new Integer(-1));
+        } else {
+            UnitType unitType = FreeCol.getSpecification().getUnitType(command);
             inGameController.purchaseUnitFromEurope(unitType);
             setResponse(new Integer(0));
-        } else {
-            setResponse(new Integer(-1));
         }
     }
 }

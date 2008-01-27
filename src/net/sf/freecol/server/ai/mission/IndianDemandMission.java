@@ -185,9 +185,11 @@ public class IndianDemandMission extends Mission {
                 if (unit.getIndianSettlement() != null) {
                     unitTension += unit.getIndianSettlement().getOwner().getTension(enemy).getValue();
                 }
+                // TODO: make this work with DifficultyLevel
+                int difficulty = enemy.getDifficulty().getIndex();
                 if (accepted) {
                     // TODO: if very happy, the brave should convert
-                    tension = -(5 - enemy.getDifficulty()) * 50;
+                    tension = -(5 - difficulty) * 50;
                     unit.getOwner().modifyTension(enemy, tension);
                     if (unitTension <= Tension.Level.HAPPY.getLimit() &&
                         (goods == null || goods.getType() == Goods.FOOD)) {
@@ -204,7 +206,7 @@ public class IndianDemandMission extends Mission {
                         }
                     }
                 } else {
-                    tension = (enemy.getDifficulty() + 1) * 50;
+                    tension = (difficulty + 1) * 50;
                     unit.getOwner().modifyTension(enemy, tension);
                     if (unitTension >= Tension.Level.CONTENT.getLimit()) {
                         // if we didn't get what we wanted, attack
@@ -235,7 +237,7 @@ public class IndianDemandMission extends Mission {
      */
     public Goods selectGoods(Colony target) {
         Tension.Level tension = getUnit().getOwner().getTension(target.getOwner()).getLevel();
-        int dx = target.getOwner().getDifficulty() + 1;
+        int dx = target.getOwner().getDifficulty().getIndex() + 1;
         Goods goods = null;
         GoodsContainer warehouse = target.getGoodsContainer();
         if (tension.compareTo(Tension.Level.CONTENT) <= 0 &&

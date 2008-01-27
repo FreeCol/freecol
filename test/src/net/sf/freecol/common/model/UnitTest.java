@@ -111,6 +111,11 @@ public class UnitTest extends FreeColTestCase {
         map.getTile(6, 8).setExploredBy(dutch, true);
         Tile plain58 = map.getTile(5, 8);
 
+        assertEquals(2, dutch.getDifficulty().getIndex());
+        assertEquals("model.difficulty.medium", dutch.getDifficulty().getId());
+        assertEquals(6, dutch.getDifficulty().getBadGovernmentLimit());
+        assertEquals(10, dutch.getDifficulty().getVeryBadGovernmentLimit());
+
         // Found colony on 6,8
         Unit soldier = new Unit(game, map.getTile(6, 8), dutch, spec().getUnitType("model.unit.veteranSoldier"),
                                 UnitState.ACTIVE);
@@ -129,6 +134,7 @@ public class UnitTest extends FreeColTestCase {
         assertEquals(2, colony.getFoodConsumption());
         assertEquals(5 + 5, colony.getFoodProduction());
         assertEquals(false, plain58.hasImprovement(plow));
+        assertEquals(0, colony.getProductionBonus());
         assertEquals("" + soldier.getLocation(), colony.getColonyTile(map.getTile(5, 8)), soldier.getLocation());
 
         // One turn to check production
@@ -137,6 +143,7 @@ public class UnitTest extends FreeColTestCase {
         assertEquals(false, plain58.hasImprovement(plow));
         assertEquals(8, colony.getGoodsCount(Goods.FOOD));
         assertEquals(2, colony.getFoodConsumption());
+        assertEquals(0, colony.getProductionBonus());
         assertEquals(5 + 5, colony.getFoodProduction());
 
         // Start Plowing

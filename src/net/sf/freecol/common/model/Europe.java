@@ -45,12 +45,11 @@ import org.w3c.dom.Element;
  * Europe is the place where you can {@link #recruit} and {@link #train} new
  * units. You may also sell/buy goods.
  */
-public final class Europe extends FreeColGameObject implements Location,
-        Ownable {
+public final class Europe extends FreeColGameObject implements Location, Ownable {
 
+    private static final Logger logger = Logger.getLogger(Europe.class.getName());
 
-    private static final Logger logger = Logger.getLogger(Europe.class
-            .getName());
+    private static final int RECRUIT_PRICE_INITIAL = 200;
 
     /**
      * This array represents the types of the units that can be recruited in
@@ -61,8 +60,9 @@ public final class Europe extends FreeColGameObject implements Location,
     private UnitType[] recruitables = { null, null, null };
 
     private Hashtable<String, Integer> unitPrices = new Hashtable<String, Integer>();
+
     private int recruitPrice;
-    private static final int RECRUIT_PRICE_INITIAL = 200;
+    private int recruitLowerCap;
 
     /**
      * Contains the units on this location.
@@ -434,11 +434,12 @@ public final class Europe extends FreeColGameObject implements Location,
         int required = owner.getCrossesRequired();
         int crosses = owner.getCrosses();
         int difference = Math.max(required - crosses, 0);
-        return Math.max((recruitPrice * difference) / required, 80);
+        return Math.max((recruitPrice * difference) / required, recruitLowerCap);
     }
 
     private void incrementRecruitPrice() {
-        recruitPrice += 20 + getOwner().getDifficulty() * 10;
+        recruitPrice += getOwner().getDifficulty().getRecruitPriceIncrease();
+        recruitLowerCap += getOwner().getDifficulty().getLowerCapIncrease();
     }
 
     /**

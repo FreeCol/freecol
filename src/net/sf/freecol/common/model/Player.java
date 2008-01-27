@@ -76,9 +76,6 @@ public class Player extends FreeColGameObject implements Features, Nameable {
     /** The maximum line of sight a unit can have in the game. */
     public static final int MAX_LINE_OF_SIGHT = 2;
 
-    /** Constants for describing difficulty level. */
-    public static final int VERY_EASY = 0, EASY = 1, MEDIUM = 2, HARD = 3, VERY_HARD = 4;
-
     /**
      * Contains booleans to see which tribes this player has met.
      */
@@ -171,10 +168,6 @@ public class Player extends FreeColGameObject implements Features, Nameable {
     private PlayerType playerType;
 
     public static enum PlayerType { NATIVE, COLONIAL, REBEL, INDEPENDENT, ROYAL, UNDEAD }
-
-    // new simple schema for crosses
-    // TODO: make this depend on difficulty
-    public static final int CROSSES_INCREMENT = 6;
 
     private int crossesRequired = 12;
 
@@ -783,8 +776,7 @@ public class Player extends FreeColGameObject implements Features, Nameable {
         for (int i = 0; i < Goods.NUMBER_OF_TYPES; i++) {
             price += tile.potential(i);
         }
-        // TODO: make this depend on difficulty
-        price = price * 40 + 100;
+        price = price * getDifficulty().getLandPriceFactor() + 100;
         Modifier modifier = getModifier("model.modifier.landPaymentModifier");
         if (modifier == null) {
             return price;
@@ -1718,9 +1710,9 @@ public class Player extends FreeColGameObject implements Features, Nameable {
         }
         Modifier modifier = nationType.getModifier("model.modifier.religiousUnrestBonus");
         if (modifier == null) {
-            crossesRequired += CROSSES_INCREMENT;
+            crossesRequired += getDifficulty().getCrossesIncrement();
         } else {
-            crossesRequired += modifier.applyTo(CROSSES_INCREMENT);
+            crossesRequired += modifier.applyTo(getDifficulty().getCrossesIncrement());
         }
 
         // The book I have tells me the crosses needed is:
@@ -2533,7 +2525,8 @@ public class Player extends FreeColGameObject implements Features, Nameable {
      * @see #incrementBells
      */
     public int getTotalFoundingFatherCost() {
-        return (getFatherCount() * getFatherCount() * (5 + getDifficulty()) + 50);
+        return (getFatherCount() * getFatherCount() *
+                getDifficulty().getFoundingFatherFactor() + 50);
     }
 
     /**
@@ -2589,7 +2582,7 @@ public class Player extends FreeColGameObject implements Features, Nameable {
             data = new MarketData(goodsType);
             getMarket().putMarketData(goodsType, data);
         }
-        data.setArrears((getDifficulty() + 3) * 100 * data.getPaidForSale());
+        data.setArrears(getDifficulty().getArrearsFactor() * 100 * data.getPaidForSale());
     }
 
     /**
@@ -2813,8 +2806,9 @@ public class Player extends FreeColGameObject implements Features, Nameable {
      * 
      * @return The difficulty level.
      */
-    public int getDifficulty() {
-        return getGame().getGameOptions().getInteger(GameOptions.DIFFICULTY);
+    public DifficultyLevel getDifficulty() {
+        int level = getGame().getGameOptions().getInteger(GameOptions.DIFFICULTY);
+        return FreeCol.getSpecification().getDifficultyLevel(level);
     }
 
     /**

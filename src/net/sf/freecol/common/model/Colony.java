@@ -1298,9 +1298,8 @@ public final class Colony extends Settlement implements Features, Location, Name
 
 
     private void createSoLMessages() {
-        final int difficulty = getOwner().getDifficulty();
-        final int veryBadGovernment = 10 - difficulty;
-        final int badGovernment = 6 - difficulty;
+        final int veryBadGovernment = getOwner().getDifficulty().getVeryBadGovernmentLimit();
+        final int badGovernment = getOwner().getDifficulty().getBadGovernmentLimit();
         if (sonsOfLiberty / 10 != oldSonsOfLiberty / 10) {
             if (sonsOfLiberty > oldSonsOfLiberty) {
                 addModelMessage(this, "model.colony.SoLIncrease", new String[][] {

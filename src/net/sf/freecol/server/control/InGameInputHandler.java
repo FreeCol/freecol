@@ -974,7 +974,8 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
      */
     private void exploreLostCityRumour(Tile tile, Unit unit, ServerPlayer player) {
         // difficulty is in range 0-4, dx in range 2-6
-        int dx = player.getDifficulty() + 2;
+        // TODO: make this work with DifficultyLevel
+        int dx = player.getGame().getGameOptions().getInteger(GameOptions.DIFFICULTY) + 2;
         // seasoned scouts should be more successful
         int bonus = 0;
         if (unit.hasAbility("model.ability.expertScout") && 
@@ -1051,7 +1052,8 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         rumourElement.setAttribute("unit", unit.getId());
         Unit newUnit;
         int random;
-        dx = 10 - player.getDifficulty(); // 6-10
+        // TODO: make this work with DifficultyLevel
+        dx = 10 - getGame().getGameOptions().getInteger(GameOptions.DIFFICULTY);
         switch (rumour) {
         case LostCityRumour.BURIAL_GROUND:
             Player indianPlayer = unit.getTile().getOwner();

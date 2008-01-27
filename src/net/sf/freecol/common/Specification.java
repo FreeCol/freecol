@@ -290,6 +290,7 @@ public final class Specification {
                     int levelIndex = 0;
                     while (xsr.nextTag() != XMLStreamConstants.END_ELEMENT) {
                         DifficultyLevel level = new DifficultyLevel(levelIndex++);
+                        level.readFromXML(xsr, this);
                         allTypes.put(level.getId(), level);
                         difficultyLevels.add(level);
                     }
@@ -737,6 +738,10 @@ public final class Specification {
 
     public DifficultyLevel getDifficultyLevel(String id) {
         return (DifficultyLevel) getType(id);
+    }
+
+    public DifficultyLevel getDifficultyLevel(int level) {
+        return difficultyLevels.get(level);
     }
 
 
