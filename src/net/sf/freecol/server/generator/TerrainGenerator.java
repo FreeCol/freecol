@@ -208,7 +208,34 @@ public class TerrainGenerator {
         final int temperaturePreference = getMapGeneratorOptions().getTemperature();
 
         // latRanges correspond to 0,1,2,3 from TileType.latitude (100-0)
-        int[] latRanges = { 75, 50, 25, 0 };
+        int equatorialZoneLimit=0, tropicalZoneLimit=0, temperateZoneLimit=0, borealZoneLimit=0;
+        if (temperaturePreference==MapGeneratorOptions.TEMPERATURE_COLD) {
+            equatorialZoneLimit = 90;
+            tropicalZoneLimit = 75;
+            temperateZoneLimit = 50;
+            borealZoneLimit = 0;
+        } else if (temperaturePreference==MapGeneratorOptions.TEMPERATURE_CHILLY) {
+            equatorialZoneLimit = 85;
+            tropicalZoneLimit = 70;
+            temperateZoneLimit = 35;
+            borealZoneLimit = 0;
+        } else if (temperaturePreference==MapGeneratorOptions.TEMPERATURE_TEMPERATE) {
+            equatorialZoneLimit = 75;
+            tropicalZoneLimit = 50;
+            temperateZoneLimit = 25;
+            borealZoneLimit = 0;
+        } else if (temperaturePreference==MapGeneratorOptions.TEMPERATURE_WARM) {
+            equatorialZoneLimit = 70;
+            tropicalZoneLimit = 45;
+            temperateZoneLimit = 15;
+            borealZoneLimit = 0;
+        } else if (temperaturePreference==MapGeneratorOptions.TEMPERATURE_HOT) {
+            equatorialZoneLimit = 65;
+            tropicalZoneLimit = 35;
+            temperateZoneLimit = 10;
+            borealZoneLimit = 0;
+        }
+        int[] latRanges = { equatorialZoneLimit, tropicalZoneLimit, temperateZoneLimit, borealZoneLimit };
         // altRanges correspond to 1,2,3 from TileType.altitude (1-10)
         int[] altRanges = { 6, 8, 10};
         // Create the lists of TileType the first time you use it
