@@ -315,7 +315,15 @@ public final class Specification {
 
     // ---------------------------------------------------------- retrieval methods
     
-    public FreeColGameObjectType getType(String Id) {
+    /**
+     * Returns the <code>FreeColGameObjectType</code> with the given
+     * ID. Throws an IllegalArgumentException if the ID is null, or if
+     * no such Type can be retrieved.
+     *
+     * @param Id a <code>String</code> value
+     * @return a <code>FreeColGameObjectType</code> value
+     */
+    public FreeColGameObjectType getType(String Id) throws IllegalArgumentException {
         if (Id == null) {
             throw new IllegalArgumentException("Trying to retrieve FreeColGameObjectType" +
                                                " with ID 'null'.");
@@ -552,7 +560,7 @@ public final class Specification {
      * @param abilities The abilities for the search
      * @return a <code>List</code> of <code>UnitType</code>
      */
-    public List<UnitType> getUnitTypesWithAnyAbility(String[] abilities) {
+    public List<UnitType> getUnitTypesWithAbility(String... abilities) {
         ArrayList<UnitType> unitTypes = new ArrayList<UnitType>();
         for (UnitType unitType : getUnitTypeList()) {
             for (int i = 0; i < abilities.length; i++) {
@@ -563,10 +571,6 @@ public final class Specification {
             }
         }
         return unitTypes;
-    }
-
-    public List<UnitType> getUnitTypesWithAbility(String ability) {
-        return getUnitTypesWithAnyAbility(new String[] { ability });
     }
 
     /**
@@ -779,4 +783,5 @@ public final class Specification {
         }
         return specification;
     }
+
 }

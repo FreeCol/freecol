@@ -1041,13 +1041,6 @@ public final class Building extends FreeColGameObject implements Features, WorkL
         if (modifier != null) {
             goodsOutput = modifier.applyTo(productivity);
         }
-
-        // TODO: Be sure this bonus is returned with colony.getModifier and remove
-        if (goodsOutputType == Goods.CROSSES &&
-            player.hasFather(FreeCol.getSpecification().getFoundingFather("model.foundingFather.williamPenn"))) {
-            goodsOutput += goodsOutput / 2;
-        }
-
         return (int) goodsOutput;
     }
 
