@@ -52,12 +52,6 @@ public final class TrainDialog extends FreeColDialog implements ActionListener {
 
     private static final int TRAIN_CANCEL = -1;
 
-    private final Comparator<UnitType> priceComparator = new Comparator<UnitType>() {
-        public int compare(UnitType type1, UnitType type2) {
-            return type1.getPrice() - type2.getPrice();
-        }
-    };
-    
     @SuppressWarnings("unused")
     private final Canvas parent;
 
@@ -85,15 +79,15 @@ public final class TrainDialog extends FreeColDialog implements ActionListener {
         setFocusCycleRoot(true);
 
         ImageLibrary library = parent.getGUI().getImageLibrary();
-        
-        List<UnitType> unitTypes = FreeCol.getSpecification().getUnitTypeList();
-        for (UnitType unitType : unitTypes) { 	 
-            if (unitType.getSkill() > 0 && unitType.hasPrice()) { 	 
-                trainableUnits.add(unitType); 	 
-            } 	 
-        }
+        final Player player = freeColClient.getMyPlayer();
 
-        Collections.sort(trainableUnits, priceComparator);
+        trainableUnits.addAll(FreeCol.getSpecification().getUnitTypesTrainedInEurope());
+        Collections.sort(trainableUnits, new Comparator<UnitType>() {
+                public int compare(UnitType type1, UnitType type2) {
+                    return player.getEurope().getUnitPrice(type1) - 
+                        player.getEurope().getUnitPrice(type2);
+                }
+            });
 
         setLayout(new HIGLayout(new int[] { 0 }, new int[] { 0, margin, 0, margin, 0 }));
 

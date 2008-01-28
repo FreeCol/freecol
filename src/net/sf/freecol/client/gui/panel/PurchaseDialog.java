@@ -22,6 +22,8 @@ package net.sf.freecol.client.gui.panel;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -46,12 +48,9 @@ import cz.autel.dmi.HIGLayout;
  */
 public final class PurchaseDialog extends FreeColDialog implements ActionListener {
 
-
-
     private static Logger logger = Logger.getLogger(PurchaseDialog.class.getName());
 
-    private static final int PURCHASE_CANCEL = 0, PURCHASE_ARTILLERY = 1, PURCHASE_CARAVEL = 2,
-            PURCHASE_MERCHANTMAN = 3, PURCHASE_GALLEON = 4, PURCHASE_PRIVATEER = 5, PURCHASE_FRIGATE = 6;
+    private static final int PURCHASE_CANCEL = 0;
 
     private final ArrayList<JButton> buttons;
 
@@ -78,10 +77,17 @@ public final class PurchaseDialog extends FreeColDialog implements ActionListene
         setLayout(new HIGLayout(new int[] { 0 }, new int[] { 0, margin, 0, margin, 0 }));
 
         JTextArea question = getDefaultTextArea(Messages.message("purchaseDialog.clickOn"));
+        final Player player = freeColClient.getMyPlayer();
 
-        List<UnitType> unitTypesForTraining = FreeCol.getSpecification().getUnitTypesTrainedInEurope();
+        List<UnitType> unitTypesForPurchase = FreeCol.getSpecification().getUnitTypesPurchasedInEurope();
+        Collections.sort(unitTypesForPurchase, new Comparator<UnitType>() {
+                public int compare(UnitType type1, UnitType type2) {
+                    return player.getEurope().getUnitPrice(type1) - 
+                        player.getEurope().getUnitPrice(type2);
+                }
+            });
         
-        int numberUnits = unitTypesForTraining.size();
+        int numberUnits = unitTypesForPurchase.size();
         
         int[] widths = new int[] { 0, margin, 0 };
         int[] heights = new int[2 * numberUnits - 1];
@@ -97,7 +103,7 @@ public final class PurchaseDialog extends FreeColDialog implements ActionListene
         prices = new ArrayList<JLabel>();
         buttons = new ArrayList<JButton>();
         int row = 1;
-        for(UnitType unitType : unitTypesForTraining) {
+        for(UnitType unitType : unitTypesForPurchase) {
             ImageIcon unitIcon = library.getUnitImageIcon(unitType);
             JButton button = new JButton(unitType.getName(), library.getScaledImageIcon(unitIcon, 0.66f));
             button.setIconTextGap(margin);

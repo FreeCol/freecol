@@ -569,19 +569,30 @@ public final class Specification {
         return getUnitTypesWithAnyAbility(new String[] { ability });
     }
 
-    /*
-     * Returns the unit types that can be trained in Europe
+    /**
+     * Returns the unit types that can be trained in Europe.
      */
     public List<UnitType> getUnitTypesTrainedInEurope(){
-    	List<UnitType> unitTypesForTraining = new ArrayList<UnitType>();
-    	
-    	List<UnitType> unitTypes = getUnitTypeList();
-    	for(UnitType unitType : unitTypes) {
-    		if (!unitType.hasSkill() && unitType.hasPrice()) {
-    			unitTypesForTraining.add(unitType);
-    		}
+    	List<UnitType> result = new ArrayList<UnitType>();
+    	for (UnitType unitType : getUnitTypeList()) {
+            if (unitType.getSkill() > 0 && unitType.hasPrice()) {
+                result.add(unitType);
+            }
     	}
-    	return unitTypesForTraining;
+    	return result;
+    }
+    
+    /**
+     * Returns the unit types that can be purchased in Europe.
+     */
+    public List<UnitType> getUnitTypesPurchasedInEurope(){
+    	List<UnitType> result = new ArrayList<UnitType>();
+    	for (UnitType unitType : getUnitTypeList()) {
+            if (!unitType.hasSkill() && unitType.hasPrice()) {
+                result.add(unitType);
+            }
+    	}
+    	return result;
     }
     
     // -- Founding Fathers --
