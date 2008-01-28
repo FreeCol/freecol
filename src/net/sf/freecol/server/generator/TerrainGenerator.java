@@ -101,7 +101,6 @@ public class TerrainGenerator {
         final boolean importBonuses = (importGame != null) && getMapGeneratorOptions().getBoolean(MapGeneratorOptions.IMPORT_BONUSES);
         final boolean importLandMap = (importGame != null) && getMapGeneratorOptions().getBoolean(MapGeneratorOptions.IMPORT_LAND_MAP);
                 
-        int forestChance = getMapGeneratorOptions().getPercentageOfForests();
         Tile[][] tiles = new Tile[width][height];
         for (int y = 0; y < height; y++) {
             int latitude = (Math.min(y, (height-1) - y) * 200) / height; // lat=0 for poles; lat=100 for equator
@@ -119,10 +118,10 @@ public class TerrainGenerator {
                             perhapsAddBonus(t, landMap);
                         }
                     } else {
-                        t = createTile(game, x, y, landMap, latitude, forestChance);
+                        t = createTile(game, x, y, landMap, latitude);
                     }
                 } else {
-                    t = createTile(game, x, y, landMap, latitude, forestChance);
+                    t = createTile(game, x, y, landMap, latitude);
                 }
                 tiles[x][y] = t;
             }
@@ -138,8 +137,14 @@ public class TerrainGenerator {
         }
     }
 
-    private Tile createTile(Game game, int x, int y, boolean[][] landMap, int latitude, int forestChance) {
+    private Tile createTile(Game game, int x, int y, boolean[][] landMap, int latitude) {
         
+        final int height = landMap[0].length;
+        int forestChance = getMapGeneratorOptions().getPercentageOfForests();
+        if (y==0 || y==height-1 || y==1 || y==height-2) {
+            // please no forests at the pole
+            forestChance = 0;
+        }
         Tile t;
         if (landMap[x][y]) {
             t = new Tile(game, getRandomLandTileType(latitude, forestChance), x, y);
