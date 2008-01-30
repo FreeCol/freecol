@@ -1230,7 +1230,7 @@ public class IndianSettlement extends Settlement {
             }
         }
 
-        isVisited = getAttribute(in, "hasBeenVisisted", false);
+        isVisited = getAttribute(in, "hasBeenVisited", false);
         convertProgress = getAttribute(in, "convertProgress", 0);
         lastTribute = getAttribute(in, "lastTribute", 0);
         String learnableSkillStr = getAttribute(in, "learnableSkill", null);
