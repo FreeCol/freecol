@@ -27,7 +27,7 @@ import net.sf.freecol.util.test.FreeColTestCase;
 
 public class ColonyProductionTest extends FreeColTestCase {
 
-    public void testProductionOne() {
+    public void testProductionSoldier() {
 
         Game game = getStandardGame();
 
@@ -84,6 +84,66 @@ public class ColonyProductionTest extends FreeColTestCase {
         assertEquals(0, soldier.getMovesLeft());
 
         assertEquals(false, soldier.isArmed());
+    }
+
+    public void testProductionPioneer() {
+
+        Game game = getStandardGame();
+
+        Player dutch = game.getPlayer("model.nation.dutch");
+
+        Tile[][] tiles = new Tile[10][15];
+
+        for (int x = 0; x < 10; x++) {
+            for (int y = 0; y < 15; y++) {
+                tiles[x][y] = new Tile(game, FreeCol.getSpecification().getTileType("model.tile.plains"), x, y);
+            }
+        }
+
+        Map map = new Map(game, tiles);
+
+        map.getTile(5, 8).setResource(FreeCol.getSpecification().getResourceType("model.resource.Grain"));
+        map.getTile(5, 8).setExploredBy(dutch, true);
+        map.getTile(6, 8).setExploredBy(dutch, true);
+                
+        game.setMap(map);
+        UnitType pioneerType = FreeCol.getSpecification().getUnitType("model.unit.hardyPioneer");
+        Unit pioneer = new Unit(game, map.getTile(6, 8), dutch, pioneerType, UnitState.ACTIVE,
+                                pioneerType.getDefaultEquipment());
+
+        Colony colony = new Colony(game, dutch, "New Amsterdam", pioneer.getTile());
+        pioneer.setWorkType(Goods.FOOD);
+        pioneer.buildColony(colony);
+
+        // Test the colony
+        assertEquals(map.getTile(6, 8), colony.getTile());
+
+        assertEquals("New Amsterdam", colony.getLocationName());
+
+        assertEquals(colony, colony.getTile().getSettlement());
+
+        assertEquals(dutch, colony.getTile().getOwner());
+
+        // Should have 100 tools and nothing else
+        GoodsType tools = FreeCol.getSpecification().getGoodsType("model.goods.tools");
+        assertNotNull(tools);
+            
+        for (GoodsType type : FreeCol.getSpecification().getGoodsTypeList()){
+            if (type == tools)
+                assertEquals(100, colony.getGoodsCount(type));
+            else
+                assertEquals(type.getName(), 0, colony.getGoodsCount(type));
+        }
+
+        // Test the state of the pioneer
+        // Pioneer should be working on the field with the bonus
+        assertEquals(Goods.FOOD, pioneer.getWorkType());
+        
+        assertEquals(colony.getColonyTile(map.getTile(5,8)).getTile(), pioneer.getLocation().getTile());
+        
+        assertEquals(0, pioneer.getMovesLeft());
+
+        assertEquals(false, pioneer.isArmed());
     }
 
 }

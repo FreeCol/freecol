@@ -43,6 +43,7 @@ public class AllTests {
 	suite.addTestSuite(ModifierTest.class);
 	suite.addTestSuite(DemotionTest.class);
 	suite.addTestSuite(MonarchTest.class);
+	suite.addTestSuite(AbstractUnitTest.class);
 	//$JUnit-END$
 	return suite;
     }

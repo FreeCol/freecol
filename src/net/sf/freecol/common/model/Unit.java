@@ -2152,7 +2152,7 @@ public class Unit extends FreeColGameObject implements Features, Locatable, Loca
                 getOwner().getMarket().sell(goods.getType(), goods.getAmount(), getOwner());
             }
         } else if (!asResultOfCombat) {
-            throw new IllegalStateException();
+            throw new IllegalStateException("Equipment can only be dumped in this location as a result of combat.");
         }
     }
 

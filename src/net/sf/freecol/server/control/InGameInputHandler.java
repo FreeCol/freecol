@@ -1960,8 +1960,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
             sendUpdatedTileToAll(unit.getTile(), player);
             return reply;
         } else {
-            logger
-                    .warning("A client is requesting to build a colony, but the operation is not permitted! (unsynchronized?)");
+            logger.warning("A client is requesting to build a colony, but the operation is not permitted! (unsynchronized?)");
             return null;
         }
     }
