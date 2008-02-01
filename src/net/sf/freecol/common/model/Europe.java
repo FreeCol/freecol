@@ -416,7 +416,7 @@ public final class Europe extends FreeColGameObject implements Location, Ownable
             throw new IllegalStateException();
         }
 
-        unit.getOwner().modifyGold(price);
+        unit.getOwner().modifyGold(-price);
         unit.setLocation(this);
 
         int increasingPrice = unit.getType().getIncreasingPrice();
