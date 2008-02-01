@@ -2072,7 +2072,7 @@ public class Unit extends FreeColGameObject implements Features, Locatable, Loca
                 }
             }
         }
-        return false;
+        return true;
     }
 
     public void equipWith(EquipmentType equipmentType) {
