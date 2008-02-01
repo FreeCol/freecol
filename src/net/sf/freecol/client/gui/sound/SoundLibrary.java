@@ -53,6 +53,8 @@ public class SoundLibrary {
 
         for (int i = 0; i < files.length; i++) {
             File leafFile = new File(file.getAbsolutePath(), files[i]);
+            if (leafFile.getAbsolutePath().endsWith(".svn"))
+                continue;
             int fileNumber = getNumber(leafFile.getName());
 
             if (fileNumber == -1)
