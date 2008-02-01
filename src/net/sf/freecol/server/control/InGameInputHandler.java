@@ -1307,7 +1307,8 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         }
         // Create the reply for the attacking player:
         Element reply = Message.createNewRootElement("attackResult");
-        reply.setAttribute("result", result.toString());
+        reply.setAttribute("result", result.type.toString());
+        reply.setAttribute("damage", String.valueOf(result.damage));
         reply.setAttribute("plunderGold", Integer.toString(plunderGold));
         
         if (result.type == CombatResultType.DONE_SETTLEMENT && newTile.getColony() != null) {

@@ -1683,9 +1683,11 @@ public final class InGameController implements NetworkConstants {
 
         // Get the result of the attack from the server:
         Element attackResultElement = client.ask(attackElement);
-        if (attackResultElement != null) {
+        if (attackResultElement != null && 
+            attackResultElement.getTagName().equals("attackResult")) {
+            // process the combat result
             CombatResultType result = Enum.valueOf(CombatResultType.class, attackResultElement.getAttribute("result"));
-            int damage = Integer.parseInt(attackElement.getAttribute("damage"));
+            int damage = Integer.parseInt(attackResultElement.getAttribute("damage"));
             int plunderGold = Integer.parseInt(attackResultElement.getAttribute("plunderGold"));
 
             // If a successful attack against a colony, we need to update the
