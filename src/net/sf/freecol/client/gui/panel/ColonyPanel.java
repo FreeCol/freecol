@@ -612,6 +612,11 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener {
     }
 
     @SuppressWarnings("unchecked")
+    private void sortBuildings(List buildings) {
+        Collections.sort(buildings, Building.getBuildingComparator());
+    }
+    
+    @SuppressWarnings("unchecked")
     private void sortColonies(List colonies) {
         Collections.sort(colonies, freeColClient.getClientOptions().getColonyComparator());
     }
@@ -1063,7 +1068,9 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener {
 
             ASingleBuildingPanel aSingleBuildingPanel;
 
-            for (Building building : getColony().getBuildings()) {
+            List<Building> buildings = getColony().getBuildings();
+            sortBuildings(buildings);
+            for (Building building : buildings) {
                 aSingleBuildingPanel = new ASingleBuildingPanel(building);
                 if (colonyPanel.isEditable()) {
                     aSingleBuildingPanel.addMouseListener(releaseListener);

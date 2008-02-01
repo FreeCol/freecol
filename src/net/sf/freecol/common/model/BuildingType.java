@@ -42,6 +42,7 @@ public final class BuildingType extends BuildableType {
     
     private BuildingType upgradesFrom;
     private BuildingType upgradesTo;
+    private int sequence;
     
     public BuildingType(int index) {
         setIndex(index);
@@ -87,6 +88,10 @@ public final class BuildingType extends BuildableType {
     public int getDefenceBonus() {
         return defenceBonus;
     }
+    
+    public int getSequence() {
+        return sequence;
+    }
 
     public FreeColGameObjectType getType() {
         return this;
@@ -123,6 +128,8 @@ public final class BuildingType extends BuildableType {
 
         minSkill = getAttribute(in, "minSkill", Integer.MIN_VALUE);
         maxSkill = getAttribute(in, "maxSkill", Integer.MAX_VALUE);
+        
+        sequence = getAttribute(in, "sequence", 0);
 
         while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
             String childName = in.getLocalName();

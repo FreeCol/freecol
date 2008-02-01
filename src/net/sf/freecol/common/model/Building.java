@@ -20,6 +20,7 @@
 package net.sf.freecol.common.model;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 
@@ -1043,6 +1044,16 @@ public final class Building extends FreeColGameObject implements Features, WorkL
         }
         return (int) goodsOutput;
     }
+    
+    private static Comparator<Building> buildingComparator = new Comparator<Building>() {
+        public int compare(Building b1, Building b2) {
+            return b1.getType().getSequence() - b2.getType().getSequence();
+        }
+    };
+    
+    public static Comparator<Building> getBuildingComparator() {
+        return buildingComparator;
+    }
 
     /**
      * Disposes this building. All units that currently has this
@@ -1141,5 +1152,9 @@ public final class Building extends FreeColGameObject implements Features, WorkL
      */
     public static String getXMLElementTagName() {
         return "building";
+    }
+    
+    public String toString() {
+        return getType().getId();
     }
 }
