@@ -565,8 +565,8 @@ public final class UnitType extends BuildableType {
                 String educationUnit = in.getAttributeValue(null, "unit");
                 upgrade.turnsToLearn = getAttribute(in, "turnsToLearn", UNDEFINED);
                 upgrade.asResultOf.put(UpgradeType.EDUCATION, getAttribute(in, "learnInSchool", true));
-                upgrade.asResultOf.put(UpgradeType.NATIVES, getAttribute(in, "asResultOfNatives", false));
-                upgrade.asResultOf.put(UpgradeType.EXPERIENCE, getAttribute(in, "asResultOfExperience", false));
+                upgrade.asResultOf.put(UpgradeType.NATIVES, getAttribute(in, "learnFromNatives", false));
+                upgrade.asResultOf.put(UpgradeType.EXPERIENCE, getAttribute(in, "learnFromExperience", false));
                 upgrade.asResultOf.put(UpgradeType.LOST_CITY, getAttribute(in, "learnInLostCity", false));
                 upgrade.asResultOf.put(UpgradeType.PROMOTION, getAttribute(in, "promotion", false));
                 upgrades.put(educationUnit, upgrade);
