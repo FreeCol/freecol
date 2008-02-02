@@ -126,11 +126,18 @@ public final class Colony extends Settlement implements Features, Location, Name
             }
         }
         colonyTiles.add(new ColonyTile(game, this, tile));
+        Modifier modifier = owner.getModifier("model.modifier.buildingPriceBonus");
         List<BuildingType> buildingTypes = FreeCol.getSpecification().getBuildingTypeList();
         for (BuildingType buildingType : buildingTypes) {
             if (buildingType.getUpgradesFrom() == null &&
                 buildingType.getGoodsRequired() == null) {
                 addBuilding(new Building(getGame(), this, buildingType));
+            } else if (modifier != null) {
+                Modifier applicableModifier = modifier.getApplicableModifier(buildingType);
+                if (applicableModifier != null &&
+                    applicableModifier.applyTo(100) == 0f) {
+                    addBuilding(new Building(getGame(), this, buildingType));
+                }
             }
         }
         setCurrentlyBuilding(BuildableType.NOTHING);

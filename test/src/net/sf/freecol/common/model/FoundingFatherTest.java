@@ -111,7 +111,7 @@ public class FoundingFatherTest extends FreeColTestCase {
 
     }
 
-    public void testBuildings() {
+    public void testBuildingEvent() {
 
         BuildingType press = spec().getBuildingType("model.building.PrintingPress");
 
@@ -123,6 +123,29 @@ public class FoundingFatherTest extends FreeColTestCase {
         events.put("model.event.freeBuilding", "model.building.PrintingPress");
         father.setEvents(events);
         colony.getOwner().addFather(father);
+
+        assertTrue(colony.getBuilding(press) != null);
+
+    }
+
+    public void testBuildingBonus() {
+
+        BuildingType press = spec().getBuildingType("model.building.PrintingPress");
+
+        Game game = getStandardGame();
+        Player dutch = game.getPlayer("model.nation.dutch");
+
+        FoundingFather father = new FoundingFather(111);
+        Modifier priceBonus = new Modifier("model.modifier.buildingPriceBonus", -100f, Modifier.PERCENTAGE);
+        Scope pressScope = new Scope();
+        pressScope.setType("model.building.PrintingPress");
+        List<Scope> scopeList = new ArrayList<Scope>();
+        scopeList.add(pressScope);
+        priceBonus.setScopes(scopeList);
+        father.addFeature(priceBonus);
+        dutch.addFather(father);
+
+        Colony colony = getStandardColony(4);
 
         assertTrue(colony.getBuilding(press) != null);
 
