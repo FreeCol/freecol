@@ -50,6 +50,7 @@ public final class Europe extends FreeColGameObject implements Location, Ownable
     private static final Logger logger = Logger.getLogger(Europe.class.getName());
 
     private static final int RECRUIT_PRICE_INITIAL = 200;
+    private static final int LOWER_CAP_INITIAL = 80;
 
     /**
      * This array represents the types of the units that can be recruited in
@@ -91,6 +92,7 @@ public final class Europe extends FreeColGameObject implements Location, Ownable
         setRecruitable(2, owner.generateRecruitable());
 
         recruitPrice = RECRUIT_PRICE_INITIAL;
+        recruitLowerCap = LOWER_CAP_INITIAL;
     }
 
     /**
