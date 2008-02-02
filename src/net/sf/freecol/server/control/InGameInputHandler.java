@@ -2047,8 +2047,14 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
             throw new IllegalStateException("Not your unit!");
         }
 
-        for (int count = 0; count < amount; count++) {
-            unit.getEquipment().add(type);
+        if (amount > 0) {
+            for (int count = 0; count < amount; count++) {
+                unit.getEquipment().add(type);
+            }
+        } else {
+            for (int count = 0; count > amount; count--) {
+                unit.removeEquipment(type);
+            }
         }
 
         if (unit.getLocation() instanceof Tile) {
