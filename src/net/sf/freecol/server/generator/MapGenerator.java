@@ -522,28 +522,34 @@ public class MapGenerator {
             startTile.setExploredBy(player, true);
             player.setEntryLocation(startTile);
 
-            Unit carrier = null;
-            List<Unit> units = new ArrayList<Unit>();
+            List<Unit> carriers = new ArrayList<Unit>();
+            List<Unit> passengers = new ArrayList<Unit>();
             List<AbstractUnit> unitList = ((EuropeanNationType) player.getNationType())
                 .getStartingUnits();
             for (AbstractUnit startingUnit : unitList) {
                 Unit newUnit = new Unit(map.getGame(), startTile, player, startingUnit.getUnitType(),
                                         UnitState.SENTRY, startingUnit.getEquipment());
                 if (newUnit.hasAbility("model.ability.carryUnits")) {
-                    carrier = newUnit;
-                    carrier.setState(UnitState.ACTIVE);
+                    newUnit.setState(UnitState.ACTIVE);
+                    carriers.add(newUnit);
                 } else {
-                    units.add(newUnit);
+                    passengers.add(newUnit);
                 }
                 
             }
-            // TODO: don't assume a single carrier with sufficient
-            // space for all other units
-            if (carrier != null) {
-                for (Unit unit : units) {
-                    if (!unit.hasAbility("model.ability.carryUnits")) {
-                        unit.setLocation(carrier);
+
+            if (carriers.isEmpty()) {
+                // TODO: entry location must be land
+            } else {
+                passengers: for (Unit unit : passengers) {
+                    for (Unit carrier : carriers) {
+                        if (carrier.getSpaceLeft() >= unit.getSpaceTaken()) {
+                            unit.setLocation(carrier);
+                            continue passengers;
+                        }
                     }
+                    // no space left on carriers
+                    unit.setLocation(player.getEurope());
                 }
             }
             

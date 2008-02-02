@@ -118,7 +118,7 @@ public abstract class TileItem extends FreeColGameObject implements Locatable, N
      * <code>TileItem</code>s do not take any space, and cannot be taken carried.
      * @return Always 0.
      */
-    public int getTakeSpace() {
+    public int getSpaceTaken() {
         return 0;
     }
 

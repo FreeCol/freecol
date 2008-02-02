@@ -273,7 +273,7 @@ public class Goods extends AbstractGoods implements Locatable, Ownable, Named {
     * Gets the amount of space this <code>Goods</code> take.
     * @return The amount.
     */
-    public int getTakeSpace() {
+    public int getSpaceTaken() {
         return 1;
     }
 

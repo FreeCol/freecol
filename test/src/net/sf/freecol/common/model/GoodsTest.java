@@ -202,7 +202,7 @@ public class GoodsTest extends FreeColTestCase {
 
         Goods cotton = new Goods(getGame(), wagon, Goods.COTTON, 75);
 
-        assertEquals(1, cotton.getTakeSpace());
+        assertEquals(1, cotton.getSpaceTaken());
     }
 
     public void testSetGetAmount() {

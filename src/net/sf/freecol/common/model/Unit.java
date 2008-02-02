@@ -1387,7 +1387,7 @@ public class Unit extends FreeColGameObject implements Features, Locatable, Loca
                 return MoveType.ILLEGAL_MOVE;
             } else {
                 for (Unit u : target.getUnitList()) {
-                    if (u.getSpaceLeft() >= getTakeSpace()) {
+                    if (u.getSpaceLeft() >= getSpaceTaken()) {
                         return MoveType.EMBARK;
                     }
                 }
@@ -1421,7 +1421,7 @@ public class Unit extends FreeColGameObject implements Features, Locatable, Loca
      * 
      * @return The space this <code>Unit</code> takes.
      */
-    public int getTakeSpace() {
+    public int getSpaceTaken() {
         return unitType.getSpaceTaken();
     }
 
@@ -1682,7 +1682,7 @@ public class Unit extends FreeColGameObject implements Features, Locatable, Loca
         if (locatable == this) {
             return false;
         } else if (locatable instanceof Unit && hasAbility("model.ability.carryUnits")) {
-            return getSpaceLeft() >= locatable.getTakeSpace();
+            return getSpaceLeft() >= locatable.getSpaceTaken();
         } else if (locatable instanceof Goods) {
             Goods g = (Goods) locatable;
             return (getLoadableAmount(g.getType()) >= g.getAmount());
@@ -2809,7 +2809,7 @@ public class Unit extends FreeColGameObject implements Features, Locatable, Loca
         Iterator<Unit> unitIterator = getUnitIterator();
         while (unitIterator.hasNext()) {
             Unit u = unitIterator.next();
-            space -= u.getTakeSpace();
+            space -= u.getSpaceTaken();
         }
 
         return space;
