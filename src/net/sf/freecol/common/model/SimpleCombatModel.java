@@ -1031,6 +1031,9 @@ public class SimpleCombatModel implements CombatModel {
             if (typeToLose != null) {
                 // lose equipment as a result of combat
                 unit.removeEquipment(typeToLose, true);
+                if (unit.getEquipment().isEmpty()) {
+                    messageID = "model.unit.unitDemotedToUnarmed";
+                }
                 if (enemyUnit.hasAbility("model.ability.captureEquipment") &&
                     enemyUnit.canBeEquippedWith(typeToLose)) {
                     enemyUnit.equipWith(typeToLose, true);
