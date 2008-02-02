@@ -261,7 +261,7 @@ public class TerrainGenerator {
                     // they will be created explicitly later
                     continue;
                 }
-                if (!tileType.isWater() && tileType.withinRange(TileType.LATITUDE, latitudeIndex)) {
+                if (!tileType.isWater() && tileType.withinRange(TileType.RangeType.LATITUDE, latitudeIndex)) {
                     // Within range, add it
                     latTileTypes.get(latitudeIndex).add(tileType);
                 }
@@ -288,7 +288,7 @@ public class TerrainGenerator {
         Iterator<TileType> it = acceptable.iterator();
         while (it.hasNext()) {
             TileType t = it.next();
-            if (t.withinRange(TileType.ALTITUDE, altitude)) {
+            if (t.withinRange(TileType.RangeType.ALTITUDE, altitude)) {
                 if (acceptable.size() == 1) {
                     chosen = t;
                     break;
@@ -317,7 +317,7 @@ public class TerrainGenerator {
             it = acceptable.iterator();
             while (it.hasNext()) {
                 TileType t = it.next();
-                if (!t.withinRange(TileType.HUMIDITY, humidity)) {
+                if (!t.withinRange(TileType.RangeType.HUMIDITY, humidity)) {
                     if (acceptable.size() == 1) {
                         chosen = t;
                         break;
@@ -332,7 +332,7 @@ public class TerrainGenerator {
             it = acceptable.iterator();
             while (it.hasNext()) {
                 TileType t = it.next();
-                if (!t.withinRange(TileType.TEMPERATURE, temperature)) {
+                if (!t.withinRange(TileType.RangeType.TEMPERATURE, temperature)) {
                     if (acceptable.size() == 1) {
                         chosen = t;
                         break;

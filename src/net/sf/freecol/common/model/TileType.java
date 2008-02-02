@@ -51,7 +51,7 @@ public final class TileType extends FreeColGameObjectType implements Features {
     private int attackBonus;
     private int defenceBonus;
     
-    public static final int HUMIDITY = 0, TEMPERATURE = 1, ALTITUDE = 2, LATITUDE = 3;
+    public static enum RangeType { HUMIDITY, TEMPERATURE, ALTITUDE, LATITUDE }
     
     private int[] humidity = new int[2];
     private int[] temperature = new int[2];
@@ -186,7 +186,7 @@ public final class TileType extends FreeColGameObjectType implements Features {
         return null;
     }
 
-    public boolean withinRange(int rangeType, int value) {
+    public boolean withinRange(RangeType rangeType, int value) {
         switch (rangeType) {
         case HUMIDITY:
             return (humidity[0] <= value && value <= humidity[1]);
