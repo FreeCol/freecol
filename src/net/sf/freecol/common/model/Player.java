@@ -2039,8 +2039,8 @@ public class Player extends FreeColGameObject implements Features, Nameable {
 
         addModelMessage(this, "model.player.foundingFatherJoinedCongress", 
                         new String[][] {
-                            { "%foundingFather%", currentFather.getName() },
-                            { "%description%", currentFather.getDescription() }
+                            { "%foundingFather%", father.getName() },
+                            { "%description%", father.getDescription() }
                         }, ModelMessage.DEFAULT);
 
         for (Feature feature : father.getFeatures()) {
@@ -2062,8 +2062,9 @@ public class Player extends FreeColGameObject implements Features, Nameable {
             Iterator<Unit> unitIterator = getUnitIterator();
             while (unitIterator.hasNext()) {
                 Unit unit = unitIterator.next();
-                if (upgrades.get(unit.getIndex()) != null) {
-                    unit.setType(upgrades.get(unit.getIndex()));
+                UnitType newType = upgrades.get(unit.getType());
+                if (newType != null) {
+                    unit.setType(newType);
                 }
             }
         }
