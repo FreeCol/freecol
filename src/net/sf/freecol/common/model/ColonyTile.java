@@ -448,16 +448,20 @@ public class ColonyTile extends FreeColGameObject implements WorkLocation, Ownab
     }
     
     /**
-    * Returns the production of the given type of goods.
-    */
+     * Returns the production of the given type of goods.
+     *
+     * @param goodsType a <code>GoodsType</code> value
+     * @return an <code>int</code> value
+     */
     public int getProductionOf(GoodsType goodsType) {
         if (goodsType == null) {
             throw new IllegalArgumentException("GoodsType must not be 'null'.");
         } else if (getUnit() == null) {
-            if (isColonyCenterTile()) {
-                return getProductionOf(null, goodsType);
+            if (isColonyCenterTile() &&
+                (goodsType.isFoodType() || 
+                 goodsType.equals(workTile.secondaryGoods()))) {
+                return workTile.potential(goodsType);
             } else {
-                // Produce nothing if there's nobody to work the terrain.
                 return 0;
             }
         } else if (goodsType.equals(getUnit().getWorkType())) {
@@ -468,25 +472,25 @@ public class ColonyTile extends FreeColGameObject implements WorkLocation, Ownab
     }
 
     /**
-    * Returns the production of the given type of goods which would be
-    * produced by the given unit
-    */
+     * Returns the production of the given type of goods which would
+     * be produced by the given unit
+     *
+     * @param unit an <code>Unit</code> value
+     * @param goodsType a <code>GoodsType</code> value
+     * @return an <code>int</code> value
+     */
     public int getProductionOf(Unit unit, GoodsType goodsType) {
-        int production = 0;
-        if (!(isColonyCenterTile())) {
-            if (!workTile.isLand() && !colony.hasAbility("model.ability.produceInWater")) {
-                return 0;
+        if (unit == null) {
+            throw new IllegalArgumentException("Unit must not be 'null'.");
+        } else if (workTile.isLand() || colony.hasAbility("model.ability.produceInWater")) {
+            int production = unit.getProductionOf(goodsType, workTile.potential(goodsType));
+            if (production > 0) {
+                production = Math.max(1, production + colony.getProductionBonus());
             }
-
-            production = unit.getProductionOf(goodsType, workTile.potential(goodsType));
-        } else if (goodsType.isFoodType() || goodsType == workTile.secondaryGoods()) {
-            production = workTile.potential(goodsType);
+            return production;
+        } else {
+            return 0;
         }
-        
-        if (production > 0) {
-            production = Math.max(1, production + colony.getProductionBonus());
-        }
-        return production;
     }
 
 
