@@ -449,10 +449,16 @@ public class ModelMessage extends FreeColObject {
         
         String displayString = in.getAttributeValue(null, "display");
         if (displayString != null) {
-            if (game.getFreeColGameObject(displayString) != null) {
-                display = game.getFreeColGameObject(displayString);
-            } else if (FreeCol.getSpecification().getType(displayString) != null) {
-                display = FreeCol.getSpecification().getType(displayString);
+            // usually referring to a unit, colony or player
+            display = game.getFreeColGameObject(displayString);
+            if (display==null) {
+                // either the unit, colony has been killed/destroyed
+                // or the message refers to goods or building type
+                try {
+                    display = FreeCol.getSpecification().getType(displayString);
+                } catch (IllegalArgumentException e) {
+                    // do nothing
+                }
             }
         }
 
