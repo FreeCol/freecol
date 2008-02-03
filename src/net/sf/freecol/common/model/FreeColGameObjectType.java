@@ -28,19 +28,10 @@ import net.sf.freecol.client.gui.i18n.Messages;
 
 public abstract class FreeColGameObjectType extends FreeColObject {
 
-    private String id;
     private int index;
-
-    protected final void setId(final String id) {
-        this.id = id;
-    }
 
     protected final void setIndex(final int index) {
         this.index = index;
-    }
-
-    public final String getId() {
-        return id;
     }
 
     public final int getIndex() {
@@ -48,11 +39,11 @@ public abstract class FreeColGameObjectType extends FreeColObject {
     }
 
     public final String getName() {
-        return Messages.message(id + ".name");
+        return Messages.message(getId() + ".name");
     }
 
     public final String getDescription() {
-        return Messages.message(id + ".description");
+        return Messages.message(getId() + ".description");
     }
 
     public boolean hasAbility(String id) {
@@ -74,6 +65,6 @@ public abstract class FreeColGameObjectType extends FreeColObject {
      * returned by getName().
      */
     public String toString() {
-        return id;
+        return getId();
     }
 }
