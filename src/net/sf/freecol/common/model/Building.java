@@ -1100,7 +1100,7 @@ public final class Building extends FreeColGameObject implements Features, WorkL
         // Add attributes:
         out.writeAttribute("ID", getId());
         out.writeAttribute("colony", colony.getId());
-        out.writeAttribute("buildingType", Integer.toString(buildingType.getIndex()));
+        out.writeAttribute("buildingType", buildingType.getId());
 
         // Add child elements:
         Iterator<Unit> unitIterator = getUnitIterator();
@@ -1126,8 +1126,8 @@ public final class Building extends FreeColGameObject implements Features, WorkL
         if (colony == null) {
             colony = new Colony(getGame(), in.getAttributeValue(null, "colony"));
         }
-        int buildingTypeIndex = Integer.parseInt(in.getAttributeValue(null, "buildingType"));
-        buildingType = FreeCol.getSpecification().getBuildingType(buildingTypeIndex);
+        String buildingTypeString = in.getAttributeValue(null, "buildingType");
+        buildingType = FreeCol.getSpecification().getBuildingType(buildingTypeString);
 
         units.clear();
 
