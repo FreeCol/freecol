@@ -3298,7 +3298,6 @@ public class Unit extends FreeColGameObject implements Features, Locatable, Loca
      * @param base an <code>int</code> value
      * @return The potential amount of goods to be farmed.
      */
-    // TODO: what exactly do we need this for?
     public int getProductionOf(GoodsType goodsType, int base) {
         if (base == 0) {
             return 0;

@@ -451,10 +451,20 @@ public class ColonyTile extends FreeColGameObject implements WorkLocation, Ownab
     * Returns the production of the given type of goods.
     */
     public int getProductionOf(GoodsType goodsType) {
-        if ((getUnit() == null) && !(isColonyCenterTile())) {
-            return 0; // Produce nothing if there's nobody to work the terrain.
+        if (goodsType == null) {
+            throw new IllegalArgumentException("GoodsType must not be 'null'.");
+        } else if (getUnit() == null) {
+            if (isColonyCenterTile()) {
+                return getProductionOf(null, goodsType);
+            } else {
+                // Produce nothing if there's nobody to work the terrain.
+                return 0;
+            }
+        } else if (goodsType.equals(getUnit().getWorkType())) {
+            return getProductionOf(getUnit(), goodsType);
+        } else {
+            return 0;
         }
-        return getProductionOf(getUnit(), goodsType);
     }
 
     /**
