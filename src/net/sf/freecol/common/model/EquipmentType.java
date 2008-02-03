@@ -230,6 +230,10 @@ public class EquipmentType extends FreeColGameObjectType implements Features {
      * @return a <code>boolean</code> value
      */
     public boolean isCompatibleWith(EquipmentType otherType) {
+        if (this.getId().equals(otherType.getId())) {
+            // model.equipment.tools for example
+            return true;
+        }
         return compatibleEquipment.contains(otherType.getId()) &&
             otherType.compatibleEquipment.contains(getId());
     }
