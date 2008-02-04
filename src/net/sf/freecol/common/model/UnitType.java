@@ -413,6 +413,27 @@ public final class UnitType extends BuildableType {
         return availableTo.get(playerType);
     }
 
+    /**
+     * Returns true if the UnitType is available to the given
+     * PlayerType.
+     *
+     * @param playerType a <code>PlayerType</code> value
+     * @return a <code>boolean</code> value
+     */
+    public boolean isAvailableTo(Player player) {
+        if (availableTo.get(player.getPlayerType())) {
+            java.util.Map<String, Boolean> requiredAbilities = getAbilitiesRequired();
+            for (Entry<String, Boolean> entry : requiredAbilities.entrySet()) {
+                if (player.hasAbility(entry.getKey()) != entry.getValue()) {
+                    return false;
+                }
+            }
+            return true;
+        } else {
+            return false;
+        }
+    }
+
     public UnitType getPromotion() {
         Iterator<Entry<String, Upgrade>> iterator = upgrades.entrySet().iterator();
         while (iterator.hasNext()) {

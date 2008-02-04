@@ -60,11 +60,6 @@ public class Unit extends FreeColGameObject implements Features, Locatable, Loca
 
     private static final Logger logger = Logger.getLogger(Unit.class.getName());
 
-    /**
-     * The type of a unit; used only for gameplaying purposes NOT painting
-     * purposes.
-     */
-
     /** A state a Unit can have. */
     public static enum UnitState { ACTIVE, FORTIFIED, SENTRY, IN_COLONY,
             IMPROVING,      // All TileImprovements use state of IMPROVING
@@ -235,7 +230,7 @@ public class Unit extends FreeColGameObject implements Features, Locatable, Loca
         workType = Goods.FOOD;
 
         this.movesLeft = getInitialMovesLeft();
-        hitpoints = getInitialHitpoints(unitType);
+        hitpoints = unitType.getHitPoints();
 
         for (EquipmentType equipmentType : initialEquipment) {
             equipment.add(equipmentType);
@@ -452,6 +447,7 @@ public class Unit extends FreeColGameObject implements Features, Locatable, Loca
      * @param goods The <code>Goods</code> to be traded.
      * @param gold The money to be given for the goods.
      */
+    // TODO: shouldn't this be somewhere else?
     public void trade(Settlement settlement, Goods goods, int gold) {
         if (getTile().getDistanceTo(settlement.getTile()) > 1) {
             logger.warning("Unit not adjacent to settlement!");
@@ -785,10 +781,7 @@ public class Unit extends FreeColGameObject implements Features, Locatable, Loca
             result.add(playerAbility.getApplicableAbility(unitType));
         }
         for (EquipmentType equipmentType : equipment) {
-            // TODO: find out why this can happen
-            if (equipmentType != null) {
-                result.add(equipmentType.getAbility(id));
-            }
+            result.add(equipmentType.getAbility(id));
         }
         Ability combinedResult = Ability.combine(result.toArray(new Ability[0]));
         if (combinedResult == null) {
@@ -814,10 +807,7 @@ public class Unit extends FreeColGameObject implements Features, Locatable, Loca
             result.add(playerModifier.getApplicableModifier(unitType));
         }
         for (EquipmentType equipmentType : equipment) {
-            // TODO: find out why this can happen
-            if (equipmentType != null) {
-                result.add(equipmentType.getModifier(id));
-            }
+            result.add(equipmentType.getModifier(id));
         }
         return Modifier.combine(result.toArray(new Modifier[0]));
     }
@@ -1529,15 +1519,13 @@ public class Unit extends FreeColGameObject implements Features, Locatable, Loca
      */
     public void embark(Unit unit) {
         if (unit == null) {
-            throw new NullPointerException();
-        }
-
-        if (getMoveType(unit.getTile()) != MoveType.EMBARK) {
+            throw new IllegalArgumentException("Target of embarkation must not be 'null'.");
+        } else if (getMoveType(unit.getTile()) != MoveType.EMBARK) {
             throw new IllegalStateException("Illegal disembark requested!");
+        } else {
+            setLocation(unit);
+            setMovesLeft(getMovesLeft() - 3);
         }
-
-        setLocation(unit);
-        setMovesLeft(getMovesLeft() - 3);
     }
 
     /**
@@ -1637,7 +1625,9 @@ public class Unit extends FreeColGameObject implements Features, Locatable, Loca
      *            <code>Unit</code>.
      */
     public void remove(Locatable locatable) {
-        if (locatable instanceof Unit && hasAbility("model.ability.carryUnits")) {
+        if (locatable == null) {
+            throw new IllegalArgumentException("Locatable must not be 'null'.");
+        } else if (locatable instanceof Unit && hasAbility("model.ability.carryUnits")) {
             unitContainer.removeUnit((Unit) locatable);
             spendAllMoves();
         } else if (locatable instanceof Goods && hasAbility("model.ability.carryGoods")) {
@@ -1823,9 +1813,7 @@ public class Unit extends FreeColGameObject implements Features, Locatable, Loca
         if (workLocation.getTile() != getTile()) {
             throw new IllegalStateException("Can only set a 'Unit'  to a 'WorkLocation' that is on the same 'Tile'.");
         }
-        removeAllEquipment(false);
         setState(UnitState.IN_COLONY);
-
         setLocation(workLocation);
     }
 
@@ -1861,17 +1849,17 @@ public class Unit extends FreeColGameObject implements Features, Locatable, Loca
      * @param newLocation The new Location of the Unit.
      */
     public void setLocation(Location newLocation) {
-        if (location != newLocation) {
-            experience = 0;
+
+        if (location == newLocation) {
+            return;
         }
         
         Colony oldColony = this.getColony();
         
         if (location != null) {
-            // the unit is leaving a colony tile
-            // reset the ownership of the tile, so that
-            //others may claim it
             if (location instanceof ColonyTile){
+                // the unit is leaving a colony tile reset the
+                // ownership of the tile, so that others may claim it
                 ((ColonyTile)location).getWorkTile().setOwner(null);
             }
             location.remove(this);
@@ -1879,42 +1867,28 @@ public class Unit extends FreeColGameObject implements Features, Locatable, Loca
 
         location = newLocation;
 
-        if (location != null) {
-            location.add(this);
+        if (newLocation != null) {
+            newLocation.add(this);
         }
 
-        Colony newColony = this.getColony();
-        
         // Reset training when changing/leaving colony
-        if (!Utils.equals(oldColony, newColony)){
+        if (!Utils.equals(oldColony, getColony())){
             setTurnsOfTraining(0);
         }
 
+        if (student != null &&
+            !(newLocation instanceof Building &&
+              ((Building) newLocation).hasAbility("model.ability.teach"))) {
+            // teacher has left school
+            student.setTeacher(null);
+            student = null;
+        }
+
         if (newLocation instanceof WorkLocation) {
-            if (teacher == null) {
-                for (Unit teacher : getColony().getTeachers()) {
-                    if (teacher.getStudent() == null && canBeStudent(teacher)) {
-                        teacher.setStudent(this);
-                        this.setTeacher(teacher);
-                        break;
-                    }
-                }
-            }
-            if (!(newLocation instanceof Building &&
-                  ((Building) newLocation).hasAbility("model.ability.teach")) &&
-                student != null) {
-                student.setTeacher(null);
-                student = null;
-            }
-        } else {
-            if (teacher != null) {
-                teacher.setStudent(null);
-                teacher = null;
-            }
-            if (student != null) {
-                student.setTeacher(null);
-                student = null;
-            }
+            removeAllEquipment(false);
+        } else if (teacher != null) {
+            teacher.setStudent(null);
+            teacher = null;
         }
 
         // Check for adjacent units owned by a player that our owner has not met
@@ -2172,23 +2146,6 @@ public class Unit extends FreeColGameObject implements Features, Locatable, Loca
         }
     }
 
-    /**
-     * Checks if this <code>Unit</code> is a missionary.
-     * 
-     * @return 'true' if this colonist is dressed as a missionary, 'false'
-     *         otherwise.
-     */
-    /*
-    public boolean isMissionary() {
-        return (hasAbility("model.ability.missionary") ||
-                hasAbility("model.ability.expertMissionary"));
-    }
-
-    public boolean isPioneer() {
-        return (hasAbility("model.ability.improveTerrain") ||
-                hasAbility("model.ability.expertPioneer"));
-    }
-    */  
     // TODO: make this go away
     public int getNumberOfTools() {
         int count = 0;
@@ -2295,13 +2252,17 @@ public class Unit extends FreeColGameObject implements Features, Locatable, Loca
      * @param unitType The new type of the unit.
      */
     public void setType(UnitType unitType) {
-        // TODO: check for requirements (like for colonialRegular)
-        this.unitType = unitType;
-        naval = unitType.hasAbility("model.ability.naval");
-        if (getMovesLeft() > getInitialMovesLeft()) {
-            setMovesLeft(getInitialMovesLeft());
+        if (unitType.isAvailableTo(owner)) {
+            this.unitType = unitType;
+            naval = unitType.hasAbility("model.ability.naval");
+            if (getMovesLeft() > getInitialMovesLeft()) {
+                setMovesLeft(getInitialMovesLeft());
+            }
+            hitpoints = unitType.getHitPoints();
+        } else {
+            throw new IllegalArgumentException(unitType.getName() + " is not available to player " +
+                                               owner.getName());
         }
-        hitpoints = getInitialHitpoints(unitType);
 
     }
 
@@ -2391,24 +2352,6 @@ public class Unit extends FreeColGameObject implements Features, Locatable, Loca
     }
 
     /**
-     * Gets the initial hitpoints for a given type of <code>Unit</code>. For
-     * now this method only returns <code>6</code> that is used to determine
-     * the number of rounds needed to repair a unit, but later it can be used
-     * for indicating the health of a unit as well.
-     * 
-     * <br>
-     * <br>
-     * 
-     * Larger values would indicate a longer repair-time.
-     * 
-     * @param type The type of a <code>Unit</code>.
-     * @return The initial hitpoints
-     */
-    public static int getInitialHitpoints(UnitType type) {
-        return type.getHitPoints();
-    }
-
-    /**
      * Sets the hitpoints for this unit.
      * 
      * @param hitpoints The hitpoints this unit has. This is currently only used
@@ -2417,7 +2360,7 @@ public class Unit extends FreeColGameObject implements Features, Locatable, Loca
      */
     public void setHitpoints(int hitpoints) {
         this.hitpoints = hitpoints;
-        if (hitpoints >= getInitialHitpoints(unitType)) {
+        if (hitpoints >= unitType.getHitPoints()) {
             setState(UnitState.ACTIVE);
         }
     }
@@ -2439,7 +2382,7 @@ public class Unit extends FreeColGameObject implements Features, Locatable, Loca
      * @return <i>true</i> if under repair and <i>false</i> otherwise.
      */
     public boolean isUnderRepair() {
-        return (hitpoints < getInitialHitpoints(unitType));
+        return (hitpoints < unitType.getHitPoints());
     }
 
     /**
@@ -2761,9 +2704,10 @@ public class Unit extends FreeColGameObject implements Features, Locatable, Loca
      *         where it is located and <code>false</code> otherwise.
      */
     public boolean canBuildColony() {
-        return //getOwner().canBuildColonies() && // we are checking this implicitly
-            hasAbility("model.ability.foundColony")
-            && getMovesLeft() > 0 && getTile() != null && getTile().isColonizeable();
+        return (hasAbility("model.ability.foundColony") &&
+                getMovesLeft() > 0 && 
+                getTile() != null && 
+                getTile().isColonizeable());
     }
 
     /**
@@ -2773,7 +2717,7 @@ public class Unit extends FreeColGameObject implements Features, Locatable, Loca
      */
     public void buildColony(Colony colony) {
         if (!canBuildColony()) {
-            throw new IllegalStateException();
+            throw new IllegalStateException("Unit " + getName() + " can not build colony on " + getTile().getName() + "!");
         }
         if (!getTile().getPosition().equals(colony.getTile().getPosition())) {
             throw new IllegalStateException("A Unit can only build a colony if on the same tile as the colony");
@@ -2783,8 +2727,7 @@ public class Unit extends FreeColGameObject implements Features, Locatable, Loca
         getTile().setSettlement(colony);
         setLocation(colony);
         setMovesLeft(0);
-
-        removeAllEquipment(false);
+        //removeAllEquipment(false);
     }
 
     /**
@@ -2926,11 +2869,8 @@ public class Unit extends FreeColGameObject implements Features, Locatable, Loca
                     setState(UnitState.FORTIFIED);
                     break;
                 case IMPROVING:
-                    // Spend Goods - Quick fix, replace later
-                    if (getWorkImprovement().getExpendedEquipmentType() == 
-                        FreeCol.getSpecification().getEquipmentType("model.equipment.tools")) {
-                        expendEquipment(getWorkImprovement().getExpendedAmount());
-                    }
+                    expendEquipment(getWorkImprovement().getExpendedEquipmentType(), 
+                                    getWorkImprovement().getExpendedAmount());
                     // Deliver Goods if any
                     GoodsType deliverType = getWorkImprovement().getDeliverGoodsType();
                     if (deliverType != null) {
@@ -2988,10 +2928,13 @@ public class Unit extends FreeColGameObject implements Features, Locatable, Loca
      * 
      * @param amount The number of tools to remove.
      */
-    private void expendEquipment(int amount) {
+    private void expendEquipment(EquipmentType type, int amount) {
+        for (int count = 0; count < amount; count++) {
+            equipment.remove(type);
+        }
+        setRole();
         // TODO: make this more generic
         EquipmentType tools = FreeCol.getSpecification().getEquipmentType("model.equipment.tools");
-        equipment.remove(tools);
         if (!equipment.contains(tools)) {
             if (hasAbility("model.ability.expertPioneer")) {
                 addModelMessage(this, "model.unit.noMoreToolsPioneer",
@@ -3029,7 +2972,6 @@ public class Unit extends FreeColGameObject implements Features, Locatable, Loca
      * @see #getVacantEntryLocation
      */
     public Location getEntryLocation() {
-
         return (entryLocation != null) ? entryLocation : getOwner().getEntryLocation();
     }
 
@@ -3049,6 +2991,7 @@ public class Unit extends FreeColGameObject implements Features, Locatable, Loca
      * @return The <code>Location</code>.
      * @see #getEntryLocation
      */
+    // TODO: shouldn't this be somewhere else?
     public Location getVacantEntryLocation() {
         Tile l = (Tile) getEntryLocation();
 
@@ -3142,6 +3085,7 @@ public class Unit extends FreeColGameObject implements Features, Locatable, Loca
      * 
      * @param enemyUnit The unit we are attacking.
      */
+    // TODO: move to AI code
     public void adjustTension(Unit enemyUnit) {
         Player myPlayer = getOwner();
         Player enemy = enemyUnit.getOwner();
@@ -3185,19 +3129,16 @@ public class Unit extends FreeColGameObject implements Features, Locatable, Loca
      *         carrying treasure.
      */
     public boolean canCarryTreasure() {
-
         return unitType.hasAbility("model.ability.carryTreasure");
     }
 
     /**
-     * Returns true if this unit is a ship that can capture enemy goods. That
-     * is, a privateer, frigate or man-o-war.
+     * Returns true if this unit is a ship that can capture enemy goods.
      * 
      * @return <code>true</code> if this <code>Unit</code> is capable of
      *         capturing goods.
      */
     public boolean canCaptureGoods() {
-
         return unitType.hasAbility("model.ability.captureGoods");
     }
 
@@ -3229,6 +3170,7 @@ public class Unit extends FreeColGameObject implements Features, Locatable, Loca
      * 
      * @param settlement The Indian settlement to destroy.
      */
+    // TODO: shouldn't this be somewhere else?
     public void destroySettlement(IndianSettlement settlement) {
         Player enemy = settlement.getOwner();
         boolean wasCapital = settlement.isCapital();
@@ -3263,8 +3205,10 @@ public class Unit extends FreeColGameObject implements Features, Locatable, Loca
                 tTrain.setTreasureAmount((tTrain.getTreasureAmount() * 3) / 2);
             }
 
-            addModelMessage(this, "model.unit.indianTreasure", new String[][] { { "%indian%", enemy.getNationAsString() },
-                                                                                { "%amount%", Integer.toString(tTrain.getTreasureAmount()) } }, ModelMessage.DEFAULT);
+            addModelMessage(this, "model.unit.indianTreasure", new String[][] {
+                    { "%indian%", enemy.getNationAsString() },
+                    { "%amount%", Integer.toString(tTrain.getTreasureAmount()) }
+                }, ModelMessage.DEFAULT);
         }
         setLocation(newTile);
     }
@@ -3280,8 +3224,8 @@ public class Unit extends FreeColGameObject implements Features, Locatable, Loca
     }
 
     /**
-     * Clear the speciality of a <code>Unit</code> changing the UnitType
-     * to the UnitType specified for clearing
+     * Clear the speciality of a <code>Unit</code> changing the
+     * UnitType to the UnitType specified for clearing.
      */
     public void clearSpeciality() {
         UnitType newType = unitType.getDowngrade(DowngradeType.CLEAR_SKILL);
@@ -3570,24 +3514,7 @@ public class Unit extends FreeColGameObject implements Features, Locatable, Loca
         if (destinationStr != null) {
             destination = (Location) getGame().getFreeColGameObject(destinationStr);
             if (destination == null) {
-                if (destinationStr.startsWith(Tile.getXMLElementTagName())) {
-                    destination = new Tile(getGame(), destinationStr);
-                } else if (destinationStr.startsWith(Colony.getXMLElementTagName())) {
-                    destination = new Colony(getGame(), destinationStr);
-                } else if (destinationStr.startsWith(IndianSettlement.getXMLElementTagName())) {
-                    destination = new IndianSettlement(getGame(), destinationStr);
-                } else if (destinationStr.startsWith(Europe.getXMLElementTagName())) {
-                    destination = new Europe(getGame(), destinationStr);
-                } else if (destinationStr.startsWith(ColonyTile.getXMLElementTagName())) {
-                    destination = new ColonyTile(getGame(), destinationStr);
-                } else if (destinationStr.startsWith(Building.getXMLElementTagName())) {
-                    destination = new Building(getGame(), destinationStr);
-                } else if (destinationStr.startsWith(Unit.getXMLElementTagName())) {
-                    destination = new Unit(getGame(), destinationStr);
-                } else {
-                    logger.warning("Unknown type of Location.");
-                    destination = new Tile(getGame(), destinationStr);
-                }
+                destination = newLocation(getGame(), destinationStr);
             }
         } else {
             destination = null;
@@ -3620,24 +3547,7 @@ public class Unit extends FreeColGameObject implements Features, Locatable, Loca
         if (entryLocationStr != null) {
             entryLocation = (Location) getGame().getFreeColGameObject(entryLocationStr);
             if (entryLocation == null) {
-                if (entryLocationStr.startsWith(Tile.getXMLElementTagName())) {
-                    entryLocation = new Tile(getGame(), entryLocationStr);
-                } else if (entryLocationStr.startsWith(Colony.getXMLElementTagName())) {
-                    entryLocation = new Colony(getGame(), entryLocationStr);
-                } else if (entryLocationStr.startsWith(IndianSettlement.getXMLElementTagName())) {
-                    entryLocation = new IndianSettlement(getGame(), entryLocationStr);
-                } else if (entryLocationStr.startsWith(Europe.getXMLElementTagName())) {
-                    entryLocation = new Europe(getGame(), entryLocationStr);
-                } else if (entryLocationStr.startsWith(ColonyTile.getXMLElementTagName())) {
-                    entryLocation = new ColonyTile(getGame(), entryLocationStr);
-                } else if (entryLocationStr.startsWith(Building.getXMLElementTagName())) {
-                    entryLocation = new Building(getGame(), entryLocationStr);
-                } else if (entryLocationStr.startsWith(Unit.getXMLElementTagName())) {
-                    entryLocation = new Unit(getGame(), entryLocationStr);
-                } else {
-                    logger.warning("Unknown type of Location (2).");
-                    entryLocation = new Tile(getGame(), entryLocationStr);
-                }
+                entryLocation = newLocation(getGame(), entryLocationStr);
             }
         }
 
@@ -3649,24 +3559,7 @@ public class Unit extends FreeColGameObject implements Features, Locatable, Loca
             }
             location = (Location) getGame().getFreeColGameObject(locationStr);
             if (location == null) {
-                if (locationStr.startsWith(Tile.getXMLElementTagName())) {
-                    location = new Tile(getGame(), locationStr);
-                } else if (locationStr.startsWith(Colony.getXMLElementTagName())) {
-                    location = new Colony(getGame(), locationStr);
-                } else if (locationStr.startsWith(IndianSettlement.getXMLElementTagName())) {
-                    location = new IndianSettlement(getGame(), locationStr);
-                } else if (locationStr.startsWith(Europe.getXMLElementTagName())) {
-                    location = new Europe(getGame(), locationStr);
-                } else if (locationStr.startsWith(ColonyTile.getXMLElementTagName())) {
-                    location = new ColonyTile(getGame(), locationStr);
-                } else if (locationStr.startsWith(Building.getXMLElementTagName())) {
-                    location = new Building(getGame(), locationStr);
-                } else if (locationStr.startsWith(Unit.getXMLElementTagName())) {
-                    location = new Unit(getGame(), locationStr);
-                } else {
-                    logger.warning("Unknown type of Location (3): " + locationStr);
-                    location = new Tile(getGame(), locationStr);
-                }
+                location = newLocation(getGame(), locationStr);
             }
         }
 
@@ -3715,6 +3608,28 @@ public class Unit extends FreeColGameObject implements Features, Locatable, Loca
         return "unit";
     }
 
+    private Location newLocation(Game game, String locationString) {
+        if (locationString.startsWith(Tile.getXMLElementTagName())) {
+            location = new Tile(game, locationString);
+        } else if (locationString.startsWith(Colony.getXMLElementTagName())) {
+            location = new Colony(game, locationString);
+        } else if (locationString.startsWith(IndianSettlement.getXMLElementTagName())) {
+            location = new IndianSettlement(game, locationString);
+        } else if (locationString.startsWith(Europe.getXMLElementTagName())) {
+            location = new Europe(game, locationString);
+        } else if (locationString.startsWith(ColonyTile.getXMLElementTagName())) {
+            location = new ColonyTile(game, locationString);
+        } else if (locationString.startsWith(Building.getXMLElementTagName())) {
+            location = new Building(game, locationString);
+        } else if (locationString.startsWith(Unit.getXMLElementTagName())) {
+            location = new Unit(game, locationString);
+        } else {
+            logger.warning("Unknown type of Location: " + locationString);
+            location = new Tile(game, locationString);
+        }
+        return location;
+    }
+
     /**
      * Returns true if this unit has already been moved onto high seas but not
      * to europe.
@@ -3741,7 +3656,7 @@ public class Unit extends FreeColGameObject implements Features, Locatable, Loca
      * @return turns to be repaired
      */
     public int getTurnsForRepair() {
-        return getInitialHitpoints(unitType) - getHitpoints();
+        return unitType.getHitPoints() - getHitpoints();
     }
     
     /**
