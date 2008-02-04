@@ -3563,6 +3563,8 @@ public class Unit extends FreeColGameObject implements Features, Locatable, Loca
             }
         }
 
+        equipment.clear();
+
         while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
             if (in.getLocalName().equals(UnitContainer.getXMLElementTagName())) {
                 unitContainer = (UnitContainer) getGame().getFreeColGameObject(in.getAttributeValue(null, "ID"));

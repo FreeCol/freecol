@@ -174,7 +174,8 @@ public final class DragListener extends MouseAdapter {
                     menuItem.setActionCommand(String.valueOf(UnitLabel.FORTIFY));
                     menuItem.addActionListener(unitLabel);
                     menuItem.setEnabled((tempUnit.getMovesLeft() > 0)
-                            && !(tempUnit.getState() == UnitState.FORTIFIED || tempUnit.getState() == UnitState.FORTIFYING));
+                            && !(tempUnit.getState() == UnitState.FORTIFIED ||
+                                 tempUnit.getState() == UnitState.FORTIFYING));
                     menu.add(menuItem);
 
                     menuItem = new JMenuItem(Messages.message("sentryUnit"));
