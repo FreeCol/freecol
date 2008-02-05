@@ -46,6 +46,8 @@ public final class Colony extends Settlement implements Features, Location, Name
     private static final Logger logger = Logger.getLogger(Colony.class.getName());
 
     private static final int BELLS_PER_REBEL = 100;
+    private static final int FOOD_PER_COLONIST = 200;
+    private static final int FOOD_CONSUMPTION = 2;
 
     /** The name of the colony. */
     private String name;
@@ -197,12 +199,13 @@ public final class Colony extends Settlement implements Features, Location, Name
      */
     public void updatePopulation() {
         Modifier priceBonus = getModifier("model.modifier.buildingPriceBonus");
-        if (priceBonus != null && priceBonus.applyTo(100) == 0) {
-            // this means we can get a building for free
+        if (priceBonus != null) {
+            // this means we might get a building for free
             for (BuildingType buildingType : FreeCol.getSpecification().getBuildingTypeList()) {
-                if (priceBonus.appliesTo(buildingType) &&
-                    getBuilding(buildingType) == null &&
-                    getUnitCount() >= buildingType.getPopulationRequired()) {
+                Modifier applicableBonus = priceBonus.getApplicableModifier(buildingType);
+                if (applicableBonus != null &&
+                    applicableBonus.applyTo(100) == 0f &&
+                    canBuild(buildingType)) {
                     addBuilding(createBuilding(buildingType));
                 }
             }
@@ -484,7 +487,7 @@ public final class Colony extends Settlement implements Features, Location, Name
      * @return The amount of food eaten in this colony each this turn.
      */
     public int getFoodConsumption() {
-        return 2 * getUnitCount();
+        return FOOD_CONSUMPTION * getUnitCount();
     }
 
     /**
@@ -568,13 +571,13 @@ public final class Colony extends Settlement implements Features, Location, Name
 
     @Override
     public boolean canAdd(Locatable locatable) {
-        // throw new UnsupportedOperationException();
         if (locatable instanceof Unit && ((Unit) locatable).getOwner() == getOwner()) {
             return true;
         } else if (locatable instanceof Goods) {
             return true;
+        } else {
+            return false;
         }
-        return false;
     }
 
     /**
@@ -1120,6 +1123,10 @@ public final class Colony extends Settlement implements Features, Location, Name
                         buildQueue.add(BuildableType.NOTHING);
                     }
                 }
+            } else {
+                for (ModelMessage message : messages) {
+                    owner.addModelMessage(message);
+                }
             }
         }
     }
@@ -1244,13 +1251,13 @@ public final class Colony extends Settlement implements Features, Location, Name
 
     // Create a new colonist if there is enough food:
     private void checkForNewColonist() {
-        if (getGoodsCount(Goods.FOOD) >= 200) {
+        if (getGoodsCount(Goods.FOOD) >= FOOD_PER_COLONIST) {
             List<UnitType> unitTypes = FreeCol.getSpecification().getUnitTypesWithAbility("model.ability.bornInColony");
             if (!unitTypes.isEmpty()) {
                 int random = getGame().getModelController().getRandom(getId() + "bornInColony", unitTypes.size());
                 Unit u = getGame().getModelController().createUnit(getId() + "newTurn200food",
                                                 getTile(), getOwner(), unitTypes.get(random));
-                removeGoods(Goods.FOOD, 200);
+                removeGoods(Goods.FOOD, FOOD_PER_COLONIST);
                 addModelMessage(this, "model.colony.newColonist", new String[][] { { "%colony%", getName() } },
                                 ModelMessage.UNIT_ADDED, u);
                 logger.info("New colonist created in " + getName() + " with ID=" + u.getId());
@@ -1550,13 +1557,6 @@ public final class Colony extends Settlement implements Features, Location, Name
                 data.toXML(out);
             }
             /* Don't write features, they will be added from buildings in readFromXMLImpl
-            for (Feature feature : features.values()) {
-                if (feature instanceof Ability) {
-                    ((Ability) feature).toXML(out, player);
-                } else if (feature instanceof Modifier) {
-                    ((Modifier) feature).toXML(out, player);
-                }
-            }
              */
             for (WorkLocation workLocation : getWorkLocations()) {
                 ((FreeColGameObject) workLocation).toXML(out, player, showAll, toSavedGame);
@@ -1631,14 +1631,6 @@ public final class Colony extends Settlement implements Features, Location, Name
                 ExportData data = new ExportData();
                 data.readFromXML(in);
                 exportData.put(data.getId(), data);
-            /* Features are not written, they will be added from buildings
-            } else if (in.getLocalName().equals(Ability.getXMLElementTagName())) {
-                Ability ability = new Ability(in);
-                setFeature(ability);
-            } else if (in.getLocalName().equals(Modifier.getXMLElementTagName())) {
-                Modifier modifier = new Modifier(in);
-                setFeature(modifier);
-             */
             } else {
                 logger.warning("Unknown tag: " + in.getLocalName() + " loading colony " + name);
             }
