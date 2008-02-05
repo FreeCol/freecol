@@ -425,8 +425,8 @@ public final class EuropePanel extends FreeColPanel implements ActionListener, C
     public void refreshInPort() {
         inPortPanel.removeAll();
 
-        List<Unit> unitIterator = europe.getUnitList();
-        for (Unit unit : unitIterator) {
+        List<Unit> units = europe.getUnitList();
+        for (Unit unit : units) {
             if ((unit.getState() == UnitState.ACTIVE) && (unit.isNaval())) {
                 UnitLabel unitLabel = new UnitLabel(unit, parent);
                 unitLabel.setTransferHandler(defaultTransferHandler);
@@ -438,7 +438,7 @@ public final class EuropePanel extends FreeColPanel implements ActionListener, C
 
         // Only one component will be repainted!
         inPortPanel.repaint(0, 0, inPortPanel.getWidth(), inPortPanel.getHeight());
-        setSelectedUnit(unitIterator.get(unitIterator.size() - 1));
+        setSelectedUnit(units.get(units.size() - 1));
     }
 
     public void componentAdded(ContainerEvent event) {

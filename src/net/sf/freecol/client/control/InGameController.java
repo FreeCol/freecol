@@ -2955,14 +2955,12 @@ public final class InGameController implements NetworkConstants {
         Europe europe = myPlayer.getEurope();
 
         if (myPlayer.getGold() < europe.getUnitPrice(unitType)) {
-            // System.out.println("Price: " + Unit.getPrice(unitType) + ", Gold:
-            // " + myPlayer.getGold());
             canvas.errorMessage("notEnoughGold");
             return;
         }
 
         Element trainUnitInEuropeElement = Message.createNewRootElement("trainUnitInEurope");
-        trainUnitInEuropeElement.setAttribute("unitType", Integer.toString(unitType.getIndex()));
+        trainUnitInEuropeElement.setAttribute("unitType", unitType.getId());
 
         Element reply = client.ask(trainUnitInEuropeElement);
         if (reply.getTagName().equals("trainUnitInEuropeConfirmed")) {

@@ -2022,8 +2022,8 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
     private Element trainUnitInEurope(Connection connection, Element trainUnitInEuropeElement) {
         Player player = getFreeColServer().getPlayer(connection);
         Europe europe = player.getEurope();
-        int unitIndex = Integer.parseInt(trainUnitInEuropeElement.getAttribute("unitType"));
-        UnitType unitType = FreeCol.getSpecification().getUnitType(unitIndex);
+        String unitId = trainUnitInEuropeElement.getAttribute("unitType");
+        UnitType unitType = FreeCol.getSpecification().getUnitType(unitId);
         Unit unit = new Unit(getGame(), europe, player, unitType, UnitState.ACTIVE, unitType.getDefaultEquipment());
         Element reply = Message.createNewRootElement("trainUnitInEuropeConfirmed");
         reply.appendChild(unit.toXMLElement(player, reply.getOwnerDocument()));
