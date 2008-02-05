@@ -1850,10 +1850,6 @@ public class Unit extends FreeColGameObject implements Features, Locatable, Loca
      */
     public void setLocation(Location newLocation) {
 
-        if (location == newLocation) {
-            return;
-        }
-        
         Colony oldColony = this.getColony();
         
         if (location != null) {
