@@ -610,6 +610,7 @@ public final class FreeCol {
                 i++;
                 if (i < args.length) {
                     savegameFile = new File(args[i]);
+                    setSaveDirectory(savegameFile.getParentFile());
                     if (!savegameFile.exists() || !savegameFile.isFile()) {                        
                         savegameFile = new File(getSaveDirectory(), args[i]);
                         if (!savegameFile.exists() || !savegameFile.isFile()) {
@@ -760,4 +761,8 @@ public final class FreeCol {
         System.out.println("  displays a help screen for the more advanced server options");
         System.out.println();
     }
+
+	public static void setSaveDirectory(File saveDirectory) {
+		FreeCol.saveDirectory = saveDirectory;
+	}
 }

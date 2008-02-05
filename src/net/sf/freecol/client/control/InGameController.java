@@ -151,6 +151,7 @@ public final class InGameController implements NetworkConstants {
         if (freeColClient.getMyPlayer().isAdmin() && freeColClient.getFreeColServer() != null) {
             final File file = canvas.showSaveDialog(FreeCol.getSaveDirectory(), fileName);
             if (file != null) {
+            	FreeCol.setSaveDirectory(file.getParentFile());
                 saveGame(file);
             }
         }
