@@ -37,6 +37,7 @@ import javax.swing.border.EmptyBorder;
 
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.Canvas;
+import net.sf.freecol.client.gui.action.MapControlsAction;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.client.gui.option.OptionMapUI;
 
@@ -153,6 +154,10 @@ public final class ClientOptionsDialog extends FreeColDialog implements ActionLi
                         freeColClient.getCanvas().resetFreeColMenuBar();
                     }
                     setResponse(new Boolean(true));
+                    
+                    // Immediately redraw the minimap if that was updated.
+                    MapControlsAction mca = (MapControlsAction) freeColClient.getActionManager().getFreeColAction(MapControlsAction.id);
+                    mca.getMapControls().update();
                     break;
                 case CANCEL:
                     ui.unregister();

@@ -20,6 +20,7 @@
 
 package net.sf.freecol.client.gui.panel;
 
+import java.awt.Color;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
@@ -45,8 +46,8 @@ import net.sf.freecol.client.gui.action.SkipUnitAction;
 import net.sf.freecol.client.gui.action.WaitAction;
 import net.sf.freecol.client.gui.panel.MapEditorTransformPanel.MapTransform;
 import net.sf.freecol.common.model.Map;
-import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.Tile;
+import net.sf.freecol.common.model.Map.Direction;
 
 
 /**
@@ -231,6 +232,16 @@ public final class MapControls {
 
     public boolean canZoomOut() {
         return miniMap.canZoomOut();
+    }
+
+    /**
+     * 
+     * @param newColor
+     * 
+     * @date 20080204 20:41 CD
+     */
+    public void changeBackgroundColor(Color newColor) {
+    	miniMap.setBackgroundColor(newColor);
     }
 
     /**

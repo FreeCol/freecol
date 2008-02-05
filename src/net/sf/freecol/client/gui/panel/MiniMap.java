@@ -37,6 +37,7 @@ import javax.swing.event.MouseInputListener;
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.client.FreeColClient;
+import net.sf.freecol.client.gui.action.MiniMapChangeBackgroundAction;
 import net.sf.freecol.client.gui.action.MiniMapZoomInAction;
 import net.sf.freecol.client.gui.action.MiniMapZoomOutAction;
 import net.sf.freecol.common.model.Map;
@@ -69,6 +70,7 @@ public final class MiniMap extends JPanel implements MouseInputListener {
     private FreeColClient freeColClient;
     private final JButton          miniMapZoomOutButton;
     private final JButton          miniMapZoomInButton;
+    private Color backgroundColor;
 
     private int tileSize; //tileSize is the size (in pixels) that each tile will take up on the mini map
 
@@ -96,6 +98,7 @@ public final class MiniMap extends JPanel implements MouseInputListener {
      */
     public MiniMap(FreeColClient freeColClient) {
         this.freeColClient = freeColClient;
+        backgroundColor = Color.BLACK;
 
         tileSize = 4 * (freeColClient.getClientOptions().getInteger(ClientOptions.DEFAULT_MINIMAP_ZOOM) + 1);
 
@@ -208,6 +211,10 @@ public final class MiniMap extends JPanel implements MouseInputListener {
         }        
         Image skin = (Image) UIManager.get("MiniMap.skin");
         
+    	int colorIndex = freeColClient.getClientOptions().getInteger(ClientOptions.MINIMAP_BACKGROUND_COLOR);
+    	Color newBackground = MiniMapChangeBackgroundAction.interpretIndex(colorIndex);
+    	this.setBackgroundColor(newBackground);
+        
         scaledFactorX = 1;
         scaledFactorY = 1;
         scaledOffsetX = 0;
@@ -219,7 +226,7 @@ public final class MiniMap extends JPanel implements MouseInputListener {
             if (!scaleMap) {
                 paintMap(graphics, mapX, mapY, MAP_WIDTH, MAP_HEIGHT);
             } else {
-                graphics.setColor(Color.BLACK);
+                graphics.setColor(backgroundColor);
                 graphics.fillRect(mapX, mapY, MAP_WIDTH, MAP_HEIGHT);
                 
                 final int realMapWidth = freeColClient.getGame().getMap().getWidth();
@@ -563,4 +570,12 @@ public final class MiniMap extends JPanel implements MouseInputListener {
     public void mouseMoved(MouseEvent e) {
 
     }
+
+	public Color getBackgroundColor() {
+		return backgroundColor;
+	}
+
+	public void setBackgroundColor(Color backgroundColor) {
+		this.backgroundColor = backgroundColor;
+	}
 }

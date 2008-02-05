@@ -41,13 +41,18 @@ import org.w3c.dom.Element;
 
 
 /**
-* Keeps track of the available client options.
+* Defines how available client options are displayed on the Setting dialog from File>Preferences
+* Also contains several Comparators used for display purposes.
 *
 * <br><br>
 *
 * New options should be added to
 * {@link #addDefaultOptions()} and each option should be given an unique
-* identifier (defined as a constant in this class).
+* identifier (defined as a constant in this class, then as fully-qualified strings in FreeColMessages.properties).
+* Identifiers like "guiShowSonsOfLiberty" actually REQUIRE string keys of:
+* 	clientOptions.messages.guiShowSonsOfLiberty.name
+* 	clientOptions.messages.guiShowSonsOfLiberty.shortDescription
+* So be sure to include both.
 */
 public class ClientOptions extends OptionMap {
     @SuppressWarnings("unused")
@@ -200,6 +205,20 @@ public class ClientOptions extends OptionMap {
      */
     public static final String DEFAULT_MINIMAP_ZOOM = "defaultZoomLevel";
 
+    /**
+     * The color to fill in around the actual map on the minimap.
+     * Typically only visible when the minimap is at full zoom-out,
+     * but at the default 'black' you can't differentiate between the background and the (unexplored) map.
+     * Actually: clientOptions.minimap.color.background
+     */
+    public static final String MINIMAP_BACKGROUND_COLOR = "color.background";
+    public static final String COLOR_BLACK 			= "black";
+    public static final String COLOR_VERY_DARK_GRAY	= "gray.dark.very";
+    public static final String COLOR_DARK_GRAY 		= "gray.dark";
+    public static final String COLOR_GRAY 			= "gray";
+    public static final String COLOR_LIGHT_GRAY 	= "gray.light";
+    public static final String COLOR_VERY_LIGHT_GRAY= "gray.light.very";
+    public static final String COLOR_LIGHT_BLUE 	= "blue.light";
     /** 
      * The Stock the custom house should keep when selling goods.
      */
@@ -391,6 +410,15 @@ public class ClientOptions extends OptionMap {
         
         OptionGroup minimapGroup = new OptionGroup("clientOptions.minimap");
         new BooleanOption(SMOOTH_MINIMAP_RENDERING, minimapGroup, false);
+        new SelectOption(MINIMAP_BACKGROUND_COLOR, minimapGroup,
+                new String[] {	COLOR_BLACK,
+        						COLOR_VERY_DARK_GRAY,
+        						COLOR_DARK_GRAY,
+        						COLOR_GRAY,
+        						COLOR_LIGHT_GRAY,
+        						COLOR_VERY_LIGHT_GRAY,
+        						COLOR_LIGHT_BLUE},
+                0);
         new RangeOption(DEFAULT_MINIMAP_ZOOM, minimapGroup,
                          new String[] {"1", "2", "3", "4", "5"}, 2, true);
 
