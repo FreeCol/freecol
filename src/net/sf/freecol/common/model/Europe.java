@@ -89,9 +89,9 @@ public final class Europe extends FreeColGameObject implements Location, Ownable
 
         unitContainer = new UnitContainer(game, this);
 
-        setRecruitable(0, owner.generateRecruitable());
-        setRecruitable(1, owner.generateRecruitable());
-        setRecruitable(2, owner.generateRecruitable());
+        setRecruitable(0, owner.generateRecruitable("r1"));
+        setRecruitable(1, owner.generateRecruitable("r2"));
+        setRecruitable(2, owner.generateRecruitable("r3"));
 
         recruitPrice = RECRUIT_PRICE_INITIAL;
         recruitLowerCap = LOWER_CAP_INITIAL;

@@ -2478,9 +2478,10 @@ public class Player extends FreeColGameObject implements Features, Nameable {
      * Generates a random unit type. The unit type that is returned represents
      * the type of a unit that is recruitable in Europe.
      * 
+     * @param unique a <code>String</code> value
      * @return A random unit type of a unit that is recruitable in Europe.
      */
-    public UnitType generateRecruitable() {
+    public UnitType generateRecruitable(String unique) {
         ArrayList<UnitType> recruitableUnits = new ArrayList<UnitType>();
         List<UnitType> unitTypes = FreeCol.getSpecification().getUnitTypeList();
         int total = 0;
@@ -2491,7 +2492,7 @@ public class Player extends FreeColGameObject implements Features, Nameable {
             }
         }
         
-        int random = getGame().getModelController().getRandom(getId() + "newRecruitableUnit", total);
+        int random = getGame().getModelController().getRandom(getId() + "newRecruitableUnit" + unique, total);
         UnitType recruitable = null;
         total = 0;
         for (UnitType unitType : recruitableUnits) {

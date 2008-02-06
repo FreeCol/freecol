@@ -1097,7 +1097,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
                 } else {
                     for (int k = 0; k < dx; k++) {
                         newUnit = new Unit(getGame(), player.getEurope(), player,
-                                           player.generateRecruitable(), UnitState.ACTIVE);
+                                           player.generateRecruitable(String.valueOf(k)), UnitState.ACTIVE);
                         rumourElement.appendChild(newUnit.toXMLElement(player, rumourElement.getOwnerDocument()));
                         player.getEurope().add(newUnit);
                     }
@@ -1155,7 +1155,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         Europe europe = player.getEurope();
         int slot = Integer.parseInt(element.getAttribute("slot"));
         UnitType recruitable = europe.getRecruitable(slot);
-        UnitType newRecruitable = player.generateRecruitable();
+        UnitType newRecruitable = player.generateRecruitable(String.valueOf(remaining));
         europe.setRecruitable(slot, newRecruitable);
         
         Unit unit = new Unit(getGame(), europe, player, recruitable, UnitState.ACTIVE);
@@ -1976,7 +1976,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         Europe europe = player.getEurope();
         int slot = Integer.parseInt(recruitUnitInEuropeElement.getAttribute("slot"));
         UnitType recruitable = europe.getRecruitable(slot);
-        UnitType newRecruitable = player.generateRecruitable();
+        UnitType newRecruitable = player.generateRecruitable("abc");
         Unit unit = new Unit(getGame(), europe, player, recruitable, UnitState.ACTIVE, recruitable.getDefaultEquipment());
         Element reply = Message.createNewRootElement("recruitUnitInEuropeConfirmed");
         reply.setAttribute("newRecruitable", Integer.toString(newRecruitable.getIndex()));
@@ -2001,7 +2001,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
             slot = (int) (Math.random() * 3);
         }
         UnitType recruitable = europe.getRecruitable(slot);
-        UnitType newRecruitable = player.generateRecruitable();
+        UnitType newRecruitable = player.generateRecruitable("xyzzy");
         Unit unit = new Unit(getGame(), europe, player, recruitable, UnitState.ACTIVE, recruitable.getDefaultEquipment());
         Element reply = Message.createNewRootElement("emigrateUnitInEuropeConfirmed");
         if (!player.hasFather(FreeCol.getSpecification().getFoundingFather("model.foundingFather.williamBrewster"))) {
