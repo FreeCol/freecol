@@ -625,7 +625,7 @@ public class TransportMission extends Mission {
             try {
                 connection.sendAndWait(buyGoodsElement);
             } catch (IOException e) {
-                logger.warning("Could not send \"trainUnitInEurope\"-message to the server.");
+                logger.warning("Could not send \"buyGoods\"-message to the server.");
                 return null;
             }
             AIGoods ag = new AIGoods(getAIMain(), getUnit(), type, amount, destination);
@@ -683,20 +683,7 @@ public class TransportMission extends Mission {
             for (int i = 0; i < 3; i++) {
                 // Note, used to be 1-3 but the method expects 0-2
                 if (europe.getRecruitable(i) == unitType) {
-                    Element recruitUnitInEuropeElement = Message.createNewRootElement("recruitUnitInEurope");
-                    recruitUnitInEuropeElement.setAttribute("slot", Integer.toString(i));
-                    try {
-                        Element reply = connection.ask(recruitUnitInEuropeElement);
-                        if (reply.getTagName().equals("recruitUnitInEuropeConfirmed")) {
-                            return (AIUnit) getAIMain().getAIObject(
-                                    ((Element) reply.getChildNodes().item(0)).getAttribute("ID"));
-                        } else {
-                            logger.warning("Could not recruit the specified unit in europe.");
-                            continue;
-                        }
-                    } catch (IOException e) {
-                        logger.warning("Could not send \"recruitUnitInEurope\"-message to the server.");
-                    }
+                    return aiPlayer.recruitAIUnitInEurope(i);
                 }
             }
         }
@@ -704,19 +691,7 @@ public class TransportMission extends Mission {
         // Try training the unit:
         if (unitType.hasPrice() && europe.getUnitPrice(unitType) >= 0 &&
                 player.getGold() >= europe.getUnitPrice(unitType)) {
-            Element trainUnitInEuropeElement = Message.createNewRootElement("trainUnitInEurope");
-            trainUnitInEuropeElement.setAttribute("unitType", Integer.toString(unitType.getIndex()));
-            try {
-                Element reply = connection.ask(trainUnitInEuropeElement);
-                if (reply.getTagName().equals("trainUnitInEuropeConfirmed")) {
-                    return (AIUnit) getAIMain().getAIObject(
-                            ((Element) reply.getChildNodes().item(0)).getAttribute("ID"));
-                } else {
-                    logger.warning("Could not train the specified unit in europe.");
-                }
-            } catch (IOException e) {
-                logger.warning("Could not send \"trainUnitInEurope\"-message to the server.");
-            }
+            return aiPlayer.trainAIUnitInEurope(unitType);
         }
 
         return null;
@@ -760,37 +735,13 @@ public class TransportMission extends Mission {
         // Try recruiting the unit:
         if (player.getGold() >= player.getRecruitPrice() && cheapestTrained != null
                 && player.getRecruitPrice() < priceTrained) {
-            Element recruitUnitInEuropeElement = Message.createNewRootElement("recruitUnitInEurope");
-            // TODO: Take the best unit (Seasoned scout, pioneer, soldier etc):
-            recruitUnitInEuropeElement.setAttribute("slot", Integer.toString(1));
-            try {
-                Element reply = connection.ask(recruitUnitInEuropeElement);
-                if (reply.getTagName().equals("recruitUnitInEuropeConfirmed")) {
-                    return (AIUnit) getAIMain().getAIObject(
-                            ((Element) reply.getChildNodes().item(0)).getAttribute("ID"));
-                } else {
-                    logger.warning("Could not recruit the specified unit in europe.");
-                }
-            } catch (IOException e) {
-                logger.warning("Could not send \"recruitUnitInEurope\"-message to the server.");
-            }
+            // TODO: Take the best unit (Seasoned scout, pioneer, soldier etc)
+            return aiPlayer.recruitAIUnitInEurope(1);
         }
 
         // Try training the unit:
         if (cheapestTrained != null && player.getGold() >= priceTrained) {
-            Element trainUnitInEuropeElement = Message.createNewRootElement("trainUnitInEurope");
-            trainUnitInEuropeElement.setAttribute("unitType", Integer.toString(cheapestTrained.getIndex()));
-            try {
-                Element reply = connection.ask(trainUnitInEuropeElement);
-                if (reply.getTagName().equals("trainUnitInEuropeConfirmed")) {
-                    return (AIUnit) getAIMain().getAIObject(
-                            ((Element) reply.getChildNodes().item(0)).getAttribute("ID"));
-                } else {
-                    logger.warning("Could not train the specified unit in europe.");
-                }
-            } catch (IOException e) {
-                logger.warning("Could not send \"trainUnitInEurope\"-message to the server.");
-            }
+            return aiPlayer.trainAIUnitInEurope(cheapestTrained);
         }
 
         return null;

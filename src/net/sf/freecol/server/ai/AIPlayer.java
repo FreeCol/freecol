@@ -315,6 +315,63 @@ public class AIPlayer extends AIObject {
     }
 
     /**
+     * Ask the server to train a unit in Europe on behalf of the AIPlayer
+     */
+    public AIUnit trainAIUnitInEurope(UnitType unitType) {
+        
+        if (unitType==null) {
+            throw new IllegalArgumentException("Invalid UnitType.");
+        }
+        
+        AIUnit unit = null;
+        try {
+            Element trainUnitInEuropeElement = Message.createNewRootElement("trainUnitInEurope");
+            trainUnitInEuropeElement.setAttribute("unitType", unitType.getId());
+            Element reply = this.getConnection().ask(trainUnitInEuropeElement);
+            if (reply!=null && reply.getTagName().equals("trainUnitInEuropeConfirmed")) {
+                Element unitElement = (Element) reply.getChildNodes().item(0);
+                String unitID = unitElement.getAttribute("ID");
+                unit = (AIUnit) getAIMain().getAIObject(unitID);
+                if (unit==null) {
+                    logger.warning("Could not train the specified AI unit "+unitType.getId()+" in europe.");
+                }
+            } else {
+                logger.warning("Could not train the specified AI unit "+unitType.getId()+" in europe.");
+            }
+        } catch (IOException e) {
+            logger.warning("Could not send \"trainUnitInEurope\"-message to the server.");
+        }
+        return unit;
+    }
+    
+    
+    /**
+     * Ask the server to recruit a unit in Europe on behalf of the AIPlayer
+     */
+    public AIUnit recruitAIUnitInEurope(int slot) {
+        
+        AIUnit unit = null;
+        Element recruitUnitInEuropeElement = Message.createNewRootElement("recruitUnitInEurope");
+        recruitUnitInEuropeElement.setAttribute("slot", Integer.toString(slot));
+        try {
+            Element reply = this.getConnection().ask(recruitUnitInEuropeElement);
+            if (reply!=null && reply.getTagName().equals("recruitUnitInEuropeConfirmed")) {
+                Element unitElement = (Element) reply.getChildNodes().item(0);
+                String unitID = unitElement.getAttribute("ID");
+                unit = (AIUnit) getAIMain().getAIObject(unitID);
+                if (unit==null) {
+                    logger.warning("Could not recruit the specified AI unit in europe");
+                }
+                return unit;
+            } else {
+                logger.warning("Could not recruit the specified AI unit in europe.");
+            }
+        } catch (IOException e) {
+            logger.warning("Could not send \"recruitUnitInEurope\"-message to the server.");
+        }
+        return unit;
+    }
+    /**
      * Cheats for the AI :-)
      */
     private void cheat() {
@@ -343,15 +400,7 @@ public class AIPlayer extends AIObject {
                 Unit unit = null;
                 if (unitToTrain != null) {
                     player.modifyGold(price);
-                    try {
-                        Element trainUnitInEuropeElement = Message.createNewRootElement("trainUnitInEurope");
-                        trainUnitInEuropeElement.setAttribute("unitType", Integer.toString(unitToTrain.getIndex()));
-                        Element reply = getConnection().ask(trainUnitInEuropeElement);
-                        unit = (Unit) getGame().getFreeColGameObject(
-                                ((Element) reply.getChildNodes().item(0)).getAttribute("ID"));
-                    } catch (IOException e) {
-                        logger.warning("Could not train expert miner in order to create dragoon!");
-                    }
+                    unit = this.trainAIUnitInEurope(unitToTrain).getUnit();
                 }
                 if (unit != null && unit.isColonist()) {
                     // no need to equip artillery units with muskets or horses
@@ -394,13 +443,7 @@ public class AIPlayer extends AIObject {
                     }
                 }
                 player.modifyGold(europe.getUnitPrice(unitToPurchase));
-                Element trainUnitInEuropeElement = Message.createNewRootElement("trainUnitInEurope");
-                trainUnitInEuropeElement.setAttribute("unitType", Integer.toString(unitToPurchase.getIndex()));
-                try {
-                    getConnection().ask(trainUnitInEuropeElement);
-                } catch (IOException e) {
-                    logger.warning("Could not buy the ship.");
-                }
+                this.trainAIUnitInEurope(unitToPurchase);
             }
         }
     }
