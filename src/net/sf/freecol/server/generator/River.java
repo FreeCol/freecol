@@ -41,8 +41,6 @@ public class River {
 
     private static final Logger logger = Logger.getLogger(MapGenerator.class.getName());
 
-    private static final Direction[] allDirections = Map.getDirectionArray();
-
     private static final TileType river = FreeCol.getSpecification().getTileType("model.tile.greatRiver");
 
     /**
@@ -56,15 +54,50 @@ public class River {
      * Possible direction changes for a river.
      * @see net.sf.freecol.common.model.Map
      */
-    private static final int STRAIGHT_AHEAD = 0;
-    private static final int RIGHT_TURN = 2; // right angle turn (90 degrees) clockwise
-    private static final int LEFT_TURN = -2; // right angle turn (90 degrees) counter clockwise
-    private static int[] directionChanges = { STRAIGHT_AHEAD, RIGHT_TURN, LEFT_TURN };  
+    private static enum DirectionChange {
+        STRAIGHT_AHEAD,
+        RIGHT_TURN,
+        LEFT_TURN;
+
+        public Direction getNewDirection(Direction oldDirection) {
+            switch(this) {
+            case STRAIGHT_AHEAD:
+                return oldDirection;
+            case RIGHT_TURN:
+                switch(oldDirection) {
+                case NE:
+                    return Direction.SE;
+                case SE:
+                    return Direction.SW;
+                case SW:
+                    return Direction.NW;
+                case NW:
+                    return Direction.NE;
+                default:
+                    return oldDirection;
+                }
+            case LEFT_TURN:
+                switch(oldDirection) {
+                case NE:
+                    return Direction.NW;
+                case SE:
+                    return Direction.NE;
+                case SW:
+                    return Direction.SE;
+                case NW:
+                    return Direction.SW;
+                default:
+                    return oldDirection;
+                }
+            }
+            return oldDirection;
+        }
+    }
 
     /**
      * Current direction the river is flowing in.
      */
-    private Direction direction = Direction.NE;
+    private Direction direction;
     
     /**
      * The map on which the river flows.
@@ -96,7 +129,10 @@ public class River {
     public River(Map map, Hashtable<Position, River> riverMap) {
         this.map = map;
         this.riverMap = riverMap;
-        logger.fine("Starting new river");
+        int length = directions.length;
+        int index = map.getGame().getModelController().getPseudoRandom().nextInt(length);
+        direction = directions[index];
+        logger.fine("Starting new river flowing " + direction.toString());
     }
 
     /**
@@ -238,12 +274,15 @@ public class River {
         
         if (sections.size() % 2 == 0) {
             // get random new direction
-            this.direction = newDirection(-1);
+            int length = DirectionChange.values().length;
+            int index = map.getGame().getModelController().getPseudoRandom().nextInt(length);
+            DirectionChange change = DirectionChange.values()[index];
+            this.direction = change.getNewDirection(this.direction);
             logger.fine("Direction is now " + direction);
         }
         
-        for (int i = 0; i < directionChanges.length; i++) {
-            Direction dir = newDirection(i);
+        for (DirectionChange change : DirectionChange.values()) {
+            Direction dir = change.getNewDirection(direction);
             Map.Position newPosition = Map.getAdjacent(source, dir);
             Tile nextTile = map.getTile(newPosition);
             
@@ -264,8 +303,8 @@ public class River {
                 continue;
             } else {
                 // find out if an adjacent tile is next to water
-                for (i = 0; i < directionChanges.length; i++) {
-                    Direction lastDir = newDirection(i, dir);
+                for (DirectionChange change2 : DirectionChange.values()) {
+                    Direction lastDir = change2.getNewDirection(dir);
                     Map.Position px = Map.getAdjacent(newPosition, lastDir);
                     Tile tile = map.getTile(px);
                     if (tile != null && (!tile.isLand() || tile.hasRiver())) {
@@ -306,39 +345,6 @@ public class River {
         return false;
     }
     
-    /**
-     * Returns a new direction, but never the opposite of the current
-     * direction.
-     *
-     * @param index The index of the direction change.
-     * @return A new direction. @see net.sf.freecol.common.model.Map.
-     */
-    private Direction newDirection(int index) {
-        return newDirection(index, this.direction);
-    }
-
-    /**
-     * Returns a new direction, but never the opposite of the given
-     * direction.
-     *
-     * @param index The index of the direction change.
-     * @param currentDirection The current direction.
-     * @return A new direction. @see net.sf.freecol.common.model.Map.
-     */
-    private Direction newDirection(int index, Direction currentDirection) {
-        int offset = 0;
-        if (index < 0 || index >= directionChanges.length) {
-            PseudoRandom random =
-                map.getGame().getModelController().getPseudoRandom();
-            offset = directionChanges[random.nextInt(directionChanges.length)];
-        } else {
-            offset = directionChanges[index];
-        }
-        index = (currentDirection.ordinal() + offset + allDirections.length) 
-            % allDirections.length;
-        return allDirections[index];
-    }
-
     /**
      * Draws the completed river to the map.
      */
