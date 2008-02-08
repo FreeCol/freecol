@@ -46,20 +46,13 @@ public class Map extends FreeColGameObject {
     private static final Logger logger = Logger.getLogger(Map.class.getName());
 
     /** The possible sizes for a Map. */
-    public static final int SMALL = 0, MEDIUM = 1, LARGE = 2, HUGE = 3,
-            CUSTOM = 4;
+    // public static enum Size { SMALL, MEDIUM, LARGE, HUGE, CUSTOM }
 
-
-    // Deltas for moving to adjacent squares. Different due to the
-    // isometric map. Starting north and going clockwise.
-    /*
-    private static final int[] ODD_DX =  { 0, 1, 1,   1, 0, 0, -1, 0 };
-    private static final int[] ODD_DY =  { -2, -1, 0, 1, 2, 1, 0, -1 };
-    private static final int[] EVEN_DX = { 0, 0, 1,   0, 0, -1, -1, -1 };
-    private static final int[] EVEN_DY = { -2, -1, 0, 1, 2, 1, 0, -1 };
+    /**
+     * The directions a Unit can move to. Includes deltas for moving
+     * to adjacent squares, which are required due to the isometric
+     * map. Starting north and going clockwise.
     */
-
-    /** The directions a Unit can move to. */
     public static enum Direction {
         N  ( 0, -2,  0, -2), 
         NE ( 1, -1,  0, -1), 
@@ -147,11 +140,13 @@ public class Map extends FreeColGameObject {
      * @exception FreeColException
      *                If thrown during the creation of the map.
      */
-    public Map(Game game, int size) throws FreeColException {
+    /*
+    public Map(Game game, Size size) throws FreeColException {
         super(game);
 
         tiles = getTiles(size);
     }
+    */
 
     /**
      * Create a new <code>Map</code> from a collection of tiles.
@@ -1001,7 +996,8 @@ public class Map extends FreeColGameObject {
      * @exception FreeColException
      *                If the given size is invalid.
      */
-    private Tile[][] getTiles(int size) throws FreeColException {
+    /*
+    private Tile[][] getTiles(Size size) throws FreeColException {
         int width, height;
 
         switch (size) {
@@ -1027,6 +1023,7 @@ public class Map extends FreeColGameObject {
 
         return new Tile[width][height];
     }
+    */
 
 
     /**
