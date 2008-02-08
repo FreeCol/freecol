@@ -121,7 +121,7 @@ public class Map extends FreeColGameObject {
     public static final int COST_INFINITY = Integer.MAX_VALUE - 100000000;
 
     /** Constant used for given options in {@link #findPath(Unit, Tile, Tile)}. */
-    public static final int BOTH_LAND_AND_SEA = 0, ONLY_LAND = 1, ONLY_SEA = 2;
+    public static enum PathType { BOTH_LAND_AND_SEA, ONLY_LAND, ONLY_SEA }
 
     private Tile[][] tiles;
 
@@ -249,7 +249,7 @@ public class Map extends FreeColGameObject {
      *                if either <code>start</code> or <code>end</code> are
      *                <code>null</code>.
      */
-    public PathNode findPath(Tile start, Tile end, int type) {
+    public PathNode findPath(Tile start, Tile end, PathType type) {
         return findPath(null, start, end, type);
     }
 
@@ -281,7 +281,7 @@ public class Map extends FreeColGameObject {
         if (unit == null) {
             throw new NullPointerException();
         }
-        return findPath(unit, start, end, -1, null);
+        return findPath(unit, start, end, null, null);
     }
 
     /**
@@ -316,7 +316,7 @@ public class Map extends FreeColGameObject {
         if (unit == null) {
             throw new NullPointerException();
         }
-        return findPath(unit, start, end, -1, carrier);
+        return findPath(unit, start, end, null, carrier);
     }
 
     /**
@@ -349,7 +349,7 @@ public class Map extends FreeColGameObject {
      * @exception IllegalArgumentException
      *                if <code>start == end</code>.
      */
-    private PathNode findPath(Unit unit, Tile start, Tile end, int type) {
+    private PathNode findPath(Unit unit, Tile start, Tile end, PathType type) {
         return findPath(unit, start, end, type, null);
     }
 
@@ -387,7 +387,7 @@ public class Map extends FreeColGameObject {
      * @exception IllegalArgumentException
      *                if <code>start == end</code>.
      */
-    private PathNode findPath(Unit unit, Tile start, final Tile end, int type,
+    private PathNode findPath(Unit unit, Tile start, final Tile end, PathType type,
             Unit carrier) {
         /*
          * Using A* with the Manhatten distace as the heuristics.
@@ -519,9 +519,9 @@ public class Map extends FreeColGameObject {
                         }
                     }
                 } else {
-                    if ((type == ONLY_SEA && newTile.isLand() || type == ONLY_LAND
-                            && !newTile.isLand())
-                            && newTile != end) {
+                    if ((type == PathType.ONLY_SEA && newTile.isLand() || 
+                         type == PathType.ONLY_LAND && !newTile.isLand()) &&
+                        newTile != end) {
                         continue;
                     } else {
                         cost += newTile.getMoveCost(currentNode.getTile());

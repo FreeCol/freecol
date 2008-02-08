@@ -1093,7 +1093,8 @@ public class Unit extends FreeColGameObject implements Features, Locatable, Loca
                 p = getGame().getMap().findPath(this, (Tile) carrier.getEntryLocation(), destination.getTile(), carrier);
             } else {
                 // TODO: Use a standard carrier with four move points as a the unit's carrier:
-                p = getGame().getMap().findPath((Tile) getOwner().getEntryLocation(), destination.getTile(), Map.BOTH_LAND_AND_SEA);
+                p = getGame().getMap().findPath((Tile) getOwner().getEntryLocation(), destination.getTile(), 
+                                                Map.PathType.BOTH_LAND_AND_SEA);
             }
             if (p != null) {
                 return p.getTotalTurns();
