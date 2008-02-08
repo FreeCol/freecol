@@ -34,7 +34,6 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
-import net.sf.freecol.common.FreeColException;
 import net.sf.freecol.common.PseudoRandom;
 
 /**
@@ -124,7 +123,7 @@ public class Map extends FreeColGameObject {
 
     private final DefaultCostDecider defaultCostDecider = new DefaultCostDecider();
     
-    private HashMap<String, Region> regions = new HashMap<String, Region>();
+    private final java.util.Map<String, Region> regions = new HashMap<String, Region>();
 
     /**
      * Create a new <code>Map</code> from a collection of tiles.
@@ -180,7 +179,7 @@ public class Map extends FreeColGameObject {
      * @param id a <code>String</code> value
      * @return a <code>Region</code> value
      */
-    public Region getRegion(String id) {
+    public Region getRegion(final String id) {
         Region result = regions.get(id);
         if (result == null) {
             result = new Region(id, null, null);
@@ -251,13 +250,13 @@ public class Map extends FreeColGameObject {
      *         <code>null</code> if no path is found.
      * @see #findPath(Tile, Tile, int)
      * @see Unit#findPath(Tile)
-     * @exception NullPointerException
+     * @exception IllegalArgumentException
      *                if either <code>unit</code>, <code>start</code> or
      *                <code>end</code> are <code>null</code>.
      */
     public PathNode findPath(Unit unit, Tile start, Tile end) {
         if (unit == null) {
-            throw new NullPointerException();
+            throw new IllegalArgumentException("Unit must not be 'null'.");
         }
         return findPath(unit, start, end, null, null);
     }
@@ -286,13 +285,13 @@ public class Map extends FreeColGameObject {
      *         <code>null</code> if no path is found.
      * @see #findPath(Tile, Tile, int)
      * @see Unit#findPath(Tile)
-     * @exception NullPointerException
+     * @exception IllegalArgumentException
      *                if either <code>unit</code>, <code>start</code> or
      *                <code>end</code> are <code>null</code>.
      */
     public PathNode findPath(Unit unit, Tile start, Tile end, Unit carrier) {
         if (unit == null) {
-            throw new NullPointerException();
+            throw new IllegalArgumentException("Unit must not be 'null'.");
         }
         return findPath(unit, start, end, null, carrier);
     }
@@ -378,17 +377,17 @@ public class Map extends FreeColGameObject {
          * The datastructure for the closed list is simply a HashMap.
          */
 
-        if (start == end) {
-            throw new IllegalArgumentException("start == end");
-        }
         if (start == null) {
-            throw new NullPointerException("start == null");
+            throw new IllegalArgumentException("Argument 'start' must not be 'null'.");
         }
         if (end == null) {
-            throw new NullPointerException("end == null");
+            throw new IllegalArgumentException("Argument 'end' must not be 'null'.");
+        }
+        if (start.equals(end)) {
+            throw new IllegalArgumentException("start == end");
         }
         if (carrier != null && unit == null) {
-            throw new NullPointerException("unit == null");
+            throw new IllegalArgumentException("Argument 'unit' must not be 'null'.");
         }
 
         final Unit theUnit = unit;
@@ -428,7 +427,7 @@ public class Map extends FreeColGameObject {
         openList.put(firstNode.getTile().getId(), firstNode);
         openListQueue.offer(firstNode);
 
-        while (openList.size() > 0) {
+        while (openList.isEmpty()) {
             // Choosing the node with the lowest f:
             PathNode currentNode = openListQueue.peek();
 
@@ -474,17 +473,17 @@ public class Map extends FreeColGameObject {
                 if (unit != null) {
                     int extraCost = defaultCostDecider.getCost(unit,
                             currentNode.getTile(), newTile, movesLeft, turns);
-                    if (extraCost == CostDecider.ILLEGAL_MOVE && newTile != end) {
+                    if (extraCost == CostDecider.ILLEGAL_MOVE && !newTile.equals(end)) {
                         continue;
                     }
                     if (extraCost == CostDecider.ILLEGAL_MOVE) {
-                        if (newTile == end) {
+                        if (newTile.equals(end)) {
                             cost += unit.getInitialMovesLeft();
                             movesLeft = 0;
                         }
                     } else {
                         if (carrier != null) {
-                            if (unit == carrier) {
+                            if (unit.equals(carrier)) {
                                 extraCost *= theUnit.getInitialMovesLeft();    
                             } else {
                                 extraCost *= carrier.getInitialMovesLeft();
@@ -499,7 +498,7 @@ public class Map extends FreeColGameObject {
                 } else {
                     if ((type == PathType.ONLY_SEA && newTile.isLand() || 
                          type == PathType.ONLY_LAND && !newTile.isLand()) &&
-                        newTile != end) {
+                        !newTile.equals(end)) {
                         continue;
                     } else {
                         cost += newTile.getMoveCost(currentNode.getTile());
@@ -728,7 +727,7 @@ public class Map extends FreeColGameObject {
          */
 
         if (startTile == null) {
-            throw new NullPointerException("startTile == null");
+            throw new IllegalArgumentException("startTile must not be 'null'.");
         }
 
         Unit theUnit = unit;
@@ -761,7 +760,7 @@ public class Map extends FreeColGameObject {
         openList.put(startTile.getId(), firstNode);
         openListQueue.offer(firstNode);
 
-        while (openList.size() > 0) {
+        while (openList.isEmpty()) {
             // Choosing the node with the lowest cost:
             PathNode currentNode = openListQueue.poll();
             openList.remove(currentNode.getTile().getId());
@@ -823,7 +822,7 @@ public class Map extends FreeColGameObject {
                 if (extraCost == CostDecider.ILLEGAL_MOVE) {
                     continue;
                 }
-                if (carrier != null && unit == theUnit) {
+                if (carrier != null && unit.equals(theUnit)) {
                     cost += extraCost
                             * (1 + (carrier.getInitialMovesLeft() / ((double) theUnit
                                     .getInitialMovesLeft())));
@@ -1383,13 +1382,15 @@ public class Map extends FreeColGameObject {
          */
         @Override
         public boolean equals(Object other) {
-            if (this == other)
+            if (this == other) {
                 return true;
-            if (other == null)
+            } else if (other == null) {
                 return false;
-            if (!(other instanceof Position))
+            } else if (!(other instanceof Position)) {
                 return false;
-            return x == ((Position) other).x && y == ((Position) other).y;
+            } else {
+                return x == ((Position) other).x && y == ((Position) other).y;
+            }
         }
 
         /**
@@ -1575,7 +1576,7 @@ public class Map extends FreeColGameObject {
             this.radius = radius;
 
             if (center == null) {
-                throw new NullPointerException("center == null");
+                throw new IllegalArgumentException("center must not be 'null'.");
             }
 
             n = 0;
