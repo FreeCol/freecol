@@ -49,6 +49,8 @@ import net.sf.freecol.server.generator.MapGeneratorOptions;
  */
 public class FreeColTestCase extends TestCase {
 
+    public static final TileType plainsType = FreeCol.getSpecification().getTileType("model.tile.plains");
+
     /**
      * use getGame to access this.
      */
@@ -121,14 +123,7 @@ public class FreeColTestCase extends TestCase {
      * @return a <code>Map</code> value
      */
     public static Map getEmptyMap() {
-        Game game = getGame();
-
-        try {
-            return new Map(game, MapGeneratorOptions.MAP_SIZE_SMALL);
-        } catch (FreeColException e) {
-            fail();
-            return null;
-        }
+        return new Map(getGame(), getTestTiles(game, 30, 64, plainsType));
     }
 
     public static Tile[][] getTestTiles(Game game, int width, int height, TileType tileType) {
@@ -153,7 +148,7 @@ public class FreeColTestCase extends TestCase {
      * @return The map created as described above.
      */
     public static Map getTestMap() {
-        return getTestMap(FreeCol.getSpecification().getTileType("model.tile.plains"), false);
+        return getTestMap(plainsType, false);
     }
 
     /**

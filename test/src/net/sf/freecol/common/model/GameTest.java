@@ -24,15 +24,16 @@ import java.util.Vector;
 import junit.framework.TestCase;
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.common.FreeColException;
+import net.sf.freecol.util.test.FreeColTestCase;
 import net.sf.freecol.util.test.MockModelController;
 
-public class GameTest extends TestCase {
+public class GameTest extends FreeColTestCase {
 
     public void testGame() throws FreeColException {
 
         Game game = new Game(new MockModelController());
         
-        game.setMap(new Map(game, Map.SMALL));
+        game.setMap(getEmptyMap());
 
         game.addPlayer(new Player(game, "TestPlayer", false, FreeCol.getSpecification().getNation("model.nation.dutch")));
 
