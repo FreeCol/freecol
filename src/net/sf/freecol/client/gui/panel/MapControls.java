@@ -126,7 +126,7 @@ public final class MapControls {
                     if (theta < 0) {
                         theta += 2*Math.PI;
                     }
-                    Direction direction = Map.getDirectionArray()[(int) Math.floor(theta / (Math.PI/4))];
+                    Direction direction = Direction.values()[(int) Math.floor(theta / (Math.PI/4))];
                     freeColClient.getInGameController().moveActiveUnit(direction);
                 }
             });

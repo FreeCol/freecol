@@ -45,9 +45,6 @@ public class Map extends FreeColGameObject {
 
     private static final Logger logger = Logger.getLogger(Map.class.getName());
 
-    /** The possible sizes for a Map. */
-    // public static enum Size { SMALL, MEDIUM, LARGE, HUGE, CUSTOM }
-
     /**
      * The directions a Unit can move to. Includes deltas for moving
      * to adjacent squares, which are required due to the isometric
@@ -128,25 +125,6 @@ public class Map extends FreeColGameObject {
     private final DefaultCostDecider defaultCostDecider = new DefaultCostDecider();
     
     private HashMap<String, Region> regions = new HashMap<String, Region>();
-
-    /**
-     * Create a new <code>Map</code> of a specified size.
-     * 
-     * @param game
-     *            The <code>Game</code> this map belongs to.
-     * @param size
-     *            The size of the map to construct, should be one of {SMALL,
-     *            MEDIUM, LARGE, HUGE}.
-     * @exception FreeColException
-     *                If thrown during the creation of the map.
-     */
-    /*
-    public Map(Game game, Size size) throws FreeColException {
-        super(game);
-
-        tiles = getTiles(size);
-    }
-    */
 
     /**
      * Create a new <code>Map</code> from a collection of tiles.
@@ -991,42 +969,6 @@ public class Map extends FreeColGameObject {
     }
 
     /**
-     * Creates the columns contains the rows that contains the tiles.
-     * 
-     * @exception FreeColException
-     *                If the given size is invalid.
-     */
-    /*
-    private Tile[][] getTiles(Size size) throws FreeColException {
-        int width, height;
-
-        switch (size) {
-        case SMALL:
-            width = 30;
-            height = 64;
-            break;
-        case MEDIUM:
-            width = 60;
-            height = 128;
-            break;
-        case LARGE:
-            width = 120;
-            height = 256;
-            break;
-        case HUGE:
-            width = 240;
-            height = 512;
-            break;
-        default:
-            throw new FreeColException("Invalid map-size: " + size + ".");
-        }
-
-        return new Tile[width][height];
-    }
-    */
-
-
-    /**
      * Returns the Tile at a requested position.
      * 
      * @param p
@@ -1181,16 +1123,6 @@ public class Map extends FreeColGameObject {
     }
 
     /**
-     * Get an array of the eight directions in deterministic order.
-     * 
-     * @return array with directions.
-     */
-    public static Direction[] getDirectionArray() {
-        return new Direction[] { Direction.N, Direction.NE, Direction.E, Direction.SE,
-                                 Direction.S, Direction.SW, Direction.W, Direction.NW };
-    }
-
-    /**
      * Creates an array of the eight directions in a random order.
      * 
      * @return The array.
@@ -1198,7 +1130,9 @@ public class Map extends FreeColGameObject {
     public Direction[] getRandomDirectionArray() {
         PseudoRandom random = getGame().getModelController().getPseudoRandom();
 
-        Direction[] directions = getDirectionArray();
+        int length = Direction.values().length;
+        Direction[] directions = new Direction[length];
+        System.arraycopy(Direction.values(), 0, directions, 0, length);
         for (int i = 0; i < directions.length; i++) {
             int i2 = random.nextInt(directions.length);
             if (i2 != i) {
@@ -1486,7 +1420,7 @@ public class Map extends FreeColGameObject {
      */
     private abstract class MapIterator implements Iterator<Position> {
 
-        protected Direction[] directions = getDirectionArray();
+        protected Direction[] directions = Direction.values();
 
         /**
          * Get the next position as a position rather as an object.
@@ -1804,7 +1738,7 @@ public class Map extends FreeColGameObject {
      * @return A base array that can create unique identifiers for any combination
      */
     public static int[] getBase(Direction[] directions, int baseNumber) {
-        Direction[] allDirections = getDirectionArray();
+        Direction[] allDirections = Direction.values();
         int[] base = new int[allDirections.length];
         int n = 1;
         for (int i = 0; i < allDirections.length; i++) {

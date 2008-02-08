@@ -42,8 +42,6 @@ public class TerrainGenerator {
 
     private static final Logger logger = Logger.getLogger(TerrainGenerator.class.getName());
     
-    private static final Direction[] directions = Map.getDirectionArray();
-
     private final MapGeneratorOptions mapGeneratorOptions;
 
     private final Random random = new Random();
@@ -557,7 +555,7 @@ public class TerrainGenerator {
                     // this helps with good locations for building colonies on shore
                     continue;
                 }
-                Direction direction = directions[random.nextInt(8)];
+                Direction direction = Direction.values()[random.nextInt(8)];
                 int length = maximumLength - random.nextInt(maximumLength/2);
                 logger.info("Direction of mountain range is " + direction +
                         ", length of mountain range is " + length);
