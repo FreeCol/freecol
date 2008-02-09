@@ -1409,7 +1409,7 @@ public final class Canvas extends JDesktopPane {
      * 
      * @param type The type of colopedia panel to display.
      */
-    public void showColopediaPanel(int type) {
+    public void showColopediaPanel(ColopediaPanel.Type type) {
         ColopediaPanel colopediaPanel = new ColopediaPanel(this);
         colopediaPanel.initialize(type);
         addAsFrame(colopediaPanel);
@@ -1422,7 +1422,7 @@ public final class Canvas extends JDesktopPane {
      * @param type The type of colopedia panel to display.
      * @param action The details to display.
      */
-    public void showColopediaPanel(int type, int action) {
+    public void showColopediaPanel(ColopediaPanel.Type type, int action) {
         ColopediaPanel colopediaPanel = new ColopediaPanel(this);
         colopediaPanel.initialize(type, action);
         addAsFrame(colopediaPanel);

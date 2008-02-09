@@ -315,7 +315,7 @@ public final class UnitLabel extends JLabel implements ActionListener {
                     inGameController.clearSpeciality(unit);
                     break;
                 case COLOPEDIA:
-                    getCanvas().showColopediaPanel(ColopediaPanel.COLOPEDIA_UNIT, unit.getIndex());
+                    getCanvas().showColopediaPanel(ColopediaPanel.Type.UNITS, unit.getIndex());
                     break;
                 default:
                     if (intCommand >= WORK_FARMING && intCommand <= WORK_LASTFARMING) {

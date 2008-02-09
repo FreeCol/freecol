@@ -70,6 +70,6 @@ public class ColopediaUnitAction extends MapboardAction {
      * @param e The <code>ActionEvent</code>.
      */
     public void actionPerformed(ActionEvent e) {
-        freeColClient.getCanvas().showColopediaPanel(ColopediaPanel.COLOPEDIA_UNIT);
+        freeColClient.getCanvas().showColopediaPanel(ColopediaPanel.Type.UNITS);
     }
 }

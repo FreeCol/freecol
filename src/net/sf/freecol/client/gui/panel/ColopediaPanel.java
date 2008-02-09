@@ -69,15 +69,12 @@ import cz.autel.dmi.HIGLayout;
  */
 public final class ColopediaPanel extends FreeColPanel implements ActionListener, TreeSelectionListener {
 
+    @SuppressWarnings("unused")
+    private static final Logger logger = Logger.getLogger(ColopediaPanel.class.getName());
+
     public static final int NO_DETAILS = 0;
 
-    public static final int COLOPEDIA_TERRAIN = 0;
-    public static final int COLOPEDIA_RESOURCE = 1;
-    public static final int COLOPEDIA_UNIT = 2;
-    public static final int COLOPEDIA_GOODS = 3;
-    public static final int COLOPEDIA_SKILLS = 4;
-    public static final int COLOPEDIA_BUILDING = 5;
-    public static final int COLOPEDIA_FATHER = 6;
+    public static enum Type { TERRAIN, RESOURCES, UNITS, GOODS, SKILLS, BUILDINGS, FATHERS }
 
     private static final TileImprovementType road = FreeCol.getSpecification()
         .getTileImprovementType("model.improvement.Road");
@@ -86,11 +83,7 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
     private static final TileImprovementType plowing = FreeCol.getSpecification()
         .getTileImprovementType("model.improvement.Plow");
 
-
-    @SuppressWarnings("unused")
-    private static final Logger logger = Logger.getLogger(ColopediaPanel.class.getName());
-
-    private static final int OK = -1;
+    private static final String OK = "OK";
 
     private final Canvas parent;
 
@@ -161,7 +154,7 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
      * 
      * @param type - the panel type
      */
-    public void initialize(int type) {
+    public void initialize(Type type) {
         initialize(type, NO_DETAILS);
     }
 
@@ -171,40 +164,37 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
      * @param type - the panel type
      * @param action - the details
      */
-    public void initialize(int type, int action) {
+    public void initialize(Type type, int action) {
         listPanel.removeAll();
         detailPanel.removeAll();
         tree = buildTree();
         switch (type) {
-        case COLOPEDIA_TERRAIN:
-            tree.expandRow(type);
+        case TERRAIN:
+            tree.expandRow(type.ordinal());
             buildTerrainDetail(action);
             break;
-        case COLOPEDIA_RESOURCE:
-            if (action == NO_DETAILS) {
-                action = 0;
-            }
-            tree.expandRow(type);
+        case RESOURCES:
+            tree.expandRow(type.ordinal());
             buildResourceDetail(action);
             break;
-        case COLOPEDIA_UNIT:
-            tree.expandRow(type);
+        case UNITS:
+            tree.expandRow(type.ordinal());
             buildUnitDetail(action);
             break;
-        case COLOPEDIA_GOODS:
-            tree.expandRow(type);
+        case GOODS:
+            tree.expandRow(type.ordinal());
             buildGoodsDetail(action);
             break;
-        case COLOPEDIA_SKILLS:
-            tree.expandRow(type);
+        case SKILLS:
+            tree.expandRow(type.ordinal());
             buildUnitDetail(action);
             break;
-        case COLOPEDIA_BUILDING:
-            tree.expandRow(type);
+        case BUILDINGS:
+            tree.expandRow(type.ordinal());
             buildBuildingDetail(action);
             break;
-        case COLOPEDIA_FATHER:
-            tree.expandRow(type);
+        case FATHERS:
+            tree.expandRow(type.ordinal());
             buildFatherDetail(action);
             break;
         default:
@@ -919,8 +909,7 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
      */
     public void actionPerformed(ActionEvent event) {
         String command = event.getActionCommand();
-        int action = Integer.valueOf(command).intValue();
-        if (action == OK) {
+        if (OK.equals(command)) {
             parent.remove(this);
         }
     }

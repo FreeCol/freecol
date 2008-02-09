@@ -70,6 +70,6 @@ public class ColopediaTerrainAction extends MapboardAction {
      * @param e The <code>ActionEvent</code>.
      */
     public void actionPerformed(ActionEvent e) {
-        freeColClient.getCanvas().showColopediaPanel(ColopediaPanel.COLOPEDIA_TERRAIN);
+        freeColClient.getCanvas().showColopediaPanel(ColopediaPanel.Type.TERRAIN);
     }
 }
