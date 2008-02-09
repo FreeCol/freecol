@@ -430,6 +430,57 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
         parent.add(item);
     }
 
+    private JButton getGoodsButton(final GoodsType goodsType, int amount) {
+        JButton goodsButton = new JButton(library.getGoodsImageIcon(goodsType));
+        if (amount > 0) {
+            goodsButton.setText(String.valueOf(amount));
+        }
+        goodsButton.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent event) {
+                    initialize(PanelType.GOODS, goodsType);
+                }
+            });
+        return goodsButton;
+    }
+
+    private JButton getResourceButton(final ResourceType resourceType) {
+        JButton resourceButton = new JButton(resourceType.getName(), 
+                                             library.getBonusImageIcon(resourceType));
+        resourceButton.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent event) {
+                    initialize(PanelType.RESOURCES, resourceType);
+                }
+            });
+        return resourceButton;
+    }
+
+    private JButton getBuildingButton(final BuildingType buildingType) {
+        JButton buildingButton = new JButton(buildingType.getName());
+        buildingButton.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent event) {
+                    initialize(PanelType.BUILDINGS, buildingType);
+                }
+            });
+        return buildingButton;
+    }
+
+
+    private JButton getUnitButton(final UnitType unitType) {
+        JButton unitButton = new JButton(unitType.getName(), library.getUnitImageIcon(unitType));
+        unitButton.setHorizontalAlignment(SwingConstants.LEFT);
+        unitButton.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent event) {
+                    if (unitType.hasSkill()) {
+                        initialize(PanelType.SKILLS, unitType);
+                    } else {
+                        initialize(PanelType.UNITS, unitType);
+                    }
+                }
+            });
+        return unitButton;
+    }
+
+
     /**
      * Builds the details panel for the given tile.
      * 
@@ -469,16 +520,19 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
         detailPanel.add(nameLabel, higConst.rcwh(row, leftColumn, widths.length, 1));
         row += 2;
 
-        detailPanel.add(new JLabel(Messages.message("colopedia.terrain.terrainImage")), higConst.rc(row, leftColumn));
+        detailPanel.add(new JLabel(Messages.message("colopedia.terrain.terrainImage")),
+                        higConst.rc(row, leftColumn));
         Image terrainImage = library.getScaledTerrainImage(tileType, 1f);
-        detailPanel.add(new JLabel(new ImageIcon(terrainImage)), higConst.rc(row, rightColumn));
+        detailPanel.add(new JLabel(new ImageIcon(terrainImage)), higConst.rc(row, rightColumn, "l"));
         row += 2;
 
-        detailPanel.add(new JLabel(Messages.message("colopedia.terrain.movementCost")), higConst.rc(row, leftColumn));
+        detailPanel.add(new JLabel(Messages.message("colopedia.terrain.movementCost")),
+                        higConst.rc(row, leftColumn));
         detailPanel.add(new JLabel(movementCost), higConst.rc(row, rightColumn));
         row += 2;
 
-        detailPanel.add(new JLabel(Messages.message("colopedia.terrain.defenseBonus")), higConst.rc(row, leftColumn));
+        detailPanel.add(new JLabel(Messages.message("colopedia.terrain.defenseBonus")), 
+                        higConst.rc(row, leftColumn));
         detailPanel.add(new JLabel(defenseBonus), higConst.rc(row, rightColumn));
         row += 2;
 
@@ -487,12 +541,10 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
             detailPanel.add(new JLabel(Messages.message("colopedia.terrain.resource")), higConst.rc(row, leftColumn));
             JPanel resourcePanel = new JPanel(new GridLayout(0, resourceList.size(), margin, 0));
             resourcePanel.setOpaque(false);
-            for (ResourceType r : resourceList) {
-                JLabel resourceLabel = new JLabel(library.getBonusImageIcon(r));
-                resourceLabel.setText(r.getName());
-                resourcePanel.add(resourceLabel);
+            for (final ResourceType resourceType : resourceList) {
+                resourcePanel.add(getResourceButton(resourceType));
             }
-            detailPanel.add(resourcePanel, higConst.rc(row, rightColumn));
+            detailPanel.add(resourcePanel, higConst.rc(row, rightColumn, "l"));
             row += 2;
         }
 
@@ -500,17 +552,14 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
         JPanel goodsPanel = new JPanel(new GridLayout(0, 8, margin, 0));
         goodsPanel.setOpaque(false);
         List<AbstractGoods> production = tileType.getProduction();
-        for(AbstractGoods goods : production) {
-            JLabel goodsLabel = new JLabel(library.getGoodsImageIcon(goods.getType()));
-            goodsLabel.setText(String.valueOf(tileType.getPotential(goods.getType())));
-            goodsPanel.add(goodsLabel);
+        for (final AbstractGoods goods : production) {
+            goodsPanel.add(getGoodsButton(goods.getType(), goods.getAmount()));
         }
-        detailPanel.add(goodsPanel, higConst.rc(row, rightColumn));
+        detailPanel.add(goodsPanel, higConst.rc(row, rightColumn, "l"));
         row += 2;
 
-        detailPanel.add(new JLabel(Messages.message("colopedia.terrain.description")), higConst.rc(row, leftColumn,
-                "tl"));
-//        String key = "colopedia.terrain." + id + ".description";
+        detailPanel.add(new JLabel(Messages.message("colopedia.terrain.description")), 
+                        higConst.rc(row, leftColumn, "tl"));
         detailPanel.add(getDefaultTextArea(tileType.getDescription()), higConst.rc(row, rightColumn));
 
         detailPanel.validate();
@@ -553,25 +602,33 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
         List<Integer> amountList = type.getBonusAmountList();
         List<Float> factorList = type.getBonusFactorList();
 
-        detailPanel.add(new JLabel(Messages.message("colopedia.resource.bonusProduction")), higConst.rc(row, leftColumn));
-        JPanel goodsPanel = new JPanel(new GridLayout(0, goodsList.size(), margin, 0));
+        detailPanel.add(new JLabel(Messages.message("colopedia.resource.bonusProduction")),
+                        higConst.rc(row, leftColumn));
+        JPanel goodsPanel = new JPanel();
         goodsPanel.setOpaque(false);
         for (int i = 0; i < goodsList.size(); i++) {
-            JLabel goodsLabel = new JLabel(library.getGoodsImageIcon(goodsList.get(i)));
+            final GoodsType goodsType = goodsList.get(i);
+            JButton goodsButton = new JButton(library.getGoodsImageIcon(goodsType));
             int amount = amountList.get(i);
             if (amount > 0) {
-                goodsLabel.setText("+" + String.valueOf(amount));
+                goodsButton.setText("+" + String.valueOf(amount));
             } else {
-                goodsLabel.setText("x " + String.valueOf(factorList.get(i)));
+                goodsButton.setText("x " + String.valueOf(factorList.get(i)));
             }
-            goodsPanel.add(goodsLabel);
+            goodsButton.addActionListener(new ActionListener() {
+                    public void actionPerformed(ActionEvent event) {
+                        initialize(PanelType.GOODS, goodsType);
+                    }
+                });
+            goodsPanel.add(goodsButton);
         }
-        detailPanel.add(goodsPanel, higConst.rc(row, rightColumn));
+        detailPanel.add(goodsPanel, higConst.rc(row, rightColumn, "l"));
         row += 2;
 
-        detailPanel.add(new JLabel(Messages.message("colopedia.resource.description")), higConst.rc(row, leftColumn,
-                "tl"));
-        detailPanel.add(getDefaultTextArea(type.getDescription()), higConst.rc(row, rightColumn));
+        detailPanel.add(new JLabel(Messages.message("colopedia.resource.description")),
+                        higConst.rc(row, leftColumn, "tl"));
+        detailPanel.add(getDefaultTextArea(type.getDescription()),
+                        higConst.rc(row, rightColumn));
 
         detailPanel.validate();
     }
@@ -598,23 +655,27 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
         } else if (type.getPrice() > 0) {
             price = String.valueOf(type.getPrice());
         }
-        String goodsRequired = type.getGoodsRequiredAsString();
+
+        JPanel goodsRequired = new JPanel();
+        goodsRequired.setOpaque(false);
+        if (type.getGoodsRequired() != null) {
+            for (final AbstractGoods goods : type.getGoodsRequired()) {
+                goodsRequired.add(getGoodsButton(goods.getType(), goods.getAmount()));
+            }
+        }
+
         String skill = "";
-        String schoolType = null;
+        JPanel schoolPanel = new JPanel();
+        schoolPanel.setOpaque(false);
         if (type.hasSkill()) {
             skill = String.valueOf(type.getSkill());
-            
-            for (BuildingType buildingType : FreeCol.getSpecification().getBuildingTypeList()) {
-                if (buildingType.hasAbility("model.ability.teach") && buildingType.canAdd(type)) {
-                    if (schoolType == null) {
-                        schoolType = buildingType.getName();
-                    } else {
-                        schoolType += ", " + buildingType.getName();
-                    }
+
+            for (final BuildingType buildingType : FreeCol.getSpecification().getBuildingTypeList()) {
+                if (buildingType.hasAbility("model.ability.teach") && 
+                    buildingType.canAdd(type)) {
+                    schoolPanel.add(getBuildingButton(buildingType));
                 }
             }
-        } else {
-            schoolType = "";
         }
         int[] widths = { 0, 3 * margin, 0 };
         int[] heights = new int[19];
@@ -662,7 +723,7 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
             row += 2;
             detailPanel.add(new JLabel(Messages.message("colopedia.unit.school")),
                             higConst.rc(row, labelColumn));
-            detailPanel.add(new JLabel(schoolType), higConst.rc(row, valueColumn, "r"));
+            detailPanel.add(schoolPanel, higConst.rc(row, valueColumn, "l"));
         }
         row += 2;
         detailPanel.add(new JLabel(Messages.message("colopedia.unit.price")),
@@ -671,8 +732,7 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
         row += 2;
         detailPanel.add(new JLabel(Messages.message("colopedia.unit.goodsRequired")),
                         higConst.rc(row, labelColumn));
-        detailPanel.add(new JLabel(goodsRequired),
-                        higConst.rc(row, valueColumn, "r"));
+        detailPanel.add(goodsRequired, higConst.rc(row, valueColumn, "l"));
         row += 2;
         detailPanel.add(new JLabel(Messages.message("colopedia.unit.description")),
                         higConst.rc(row, labelColumn, "tl"));
@@ -709,9 +769,6 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
         layout.setColumnWeight(valueColumn, 1);
         detailPanel.setLayout(layout);
 
-        String madeFrom = (type.isRefined()) ? type.getRawMaterial().getName() : "";
-        String makes = (type.isRawMaterial()) ? type.getProducedMaterial().getName() : "";
-
         int row = 1;
         JLabel name = new JLabel(type.getName(), SwingConstants.CENTER);
         name.setFont(smallHeaderFont);
@@ -739,15 +796,21 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
             detailPanel.add(new JLabel(Messages.message("colopedia.goods.improvedByRoad")), higConst.rc(row,
                     labelColumn));
             detailPanel.add(new JLabel(improvedByRoad), higConst.rc(row, valueColumn, "r"));
-            row += 2;
         } else {
-            detailPanel.add(new JLabel(Messages.message("colopedia.goods.madeFrom")), higConst.rc(row, labelColumn));
-            detailPanel.add(new JLabel(madeFrom), higConst.rc(row, valueColumn, "r"));
-            row += 2;
+            detailPanel.add(new JLabel(Messages.message("colopedia.goods.madeFrom")),
+                            higConst.rc(row, labelColumn));
+            if (type.isRefined()) {
+                detailPanel.add(getGoodsButton(type.getRawMaterial(), 0),
+                                higConst.rc(row, valueColumn, "l"));
+            }
         }
+        row += 2;
 
         detailPanel.add(new JLabel(Messages.message("colopedia.goods.makes")), higConst.rc(row, labelColumn));
-        detailPanel.add(new JLabel(makes), higConst.rc(row, valueColumn, "r"));
+        if (type.isRawMaterial()) {
+            detailPanel.add(getGoodsButton(type.getProducedMaterial(), 0), 
+                            higConst.rc(row, valueColumn, "l"));
+        }
         row += 2;
         detailPanel.add(new JLabel(Messages.message("colopedia.goods.description")), higConst
                 .rc(row, labelColumn, "tl"));
@@ -837,29 +900,24 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
         row += 2;
 
         // Costs to build - Hammers & Tools
-        JPanel costs = new JPanel();
-        costs.setOpaque(false);
-        costs.setLayout(new FlowLayout(FlowLayout.LEFT));
-        if (buildingType.getGoodsRequired() != null) {
-            for (AbstractGoods goodsRequired : buildingType.getGoodsRequired()) {
-                costs.add(new JLabel(Integer.toString(goodsRequired.getAmount()),
-                                     library.getGoodsImageIcon(goodsRequired.getType()), SwingConstants.LEFT));
-            }
-        }
         detailPanel.add(new JLabel(Messages.message("colopedia.buildings.cost")), higConst.rc(row, leftColumn));
-        detailPanel.add(costs, higConst.rc(row, rightColumn));
+        if (buildingType.getGoodsRequired() != null) {
+            JPanel costs = new JPanel();
+            costs.setOpaque(false);
+            costs.setLayout(new FlowLayout(FlowLayout.LEFT));
+            for (AbstractGoods goodsRequired : buildingType.getGoodsRequired()) {
+                costs.add(getGoodsButton(goodsRequired.getType(), goodsRequired.getAmount()));
+            }
+            detailPanel.add(costs, higConst.rc(row, rightColumn));
+        }
         row += 2;
 
         // Specialist
-        JLabel specialist = new JLabel();
-        UnitType unitType = FreeCol.getSpecification().getExpertForProducing(buildingType.getProducedGoodsType());
-        if (unitType != null) {
-            specialist.setIcon(library.getUnitImageIcon(unitType));
-            specialist.setText(unitType.getName());
-            specialist.setHorizontalAlignment(SwingConstants.LEFT);
-        }
         detailPanel.add(new JLabel(Messages.message("colopedia.buildings.specialist")), higConst.rc(row, leftColumn));
-        detailPanel.add(specialist, higConst.rc(row, rightColumn));
+        final UnitType unitType = FreeCol.getSpecification().getExpertForProducing(buildingType.getProducedGoodsType());
+        if (unitType != null) {
+            detailPanel.add(getUnitButton(unitType), higConst.rc(row, rightColumn, "l"));
+        }
         row += 2;
 
         // Production - Needs & Produces
@@ -868,17 +926,17 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
         production.setLayout(new FlowLayout(FlowLayout.LEFT));
         GoodsType inputType = buildingType.getConsumedGoodsType();
         if (inputType != null) {
-            JLabel label = new JLabel(Messages.message("colopedia.buildings.needs"), library
-                    .getGoodsImageIcon(inputType), SwingConstants.LEADING);
+            JLabel label = new JLabel(Messages.message("colopedia.buildings.needs"));
             label.setHorizontalTextPosition(SwingConstants.LEADING);
             production.add(label);
+            production.add(getGoodsButton(inputType, 0));
         }
         GoodsType outputType = buildingType.getProducedGoodsType();
         if (outputType != null) {
-            JLabel label = new JLabel(Messages.message("colopedia.buildings.produces"), library
-                    .getGoodsImageIcon(outputType), SwingConstants.LEADING);
+            JLabel label = new JLabel(Messages.message("colopedia.buildings.produces"));
             label.setHorizontalTextPosition(SwingConstants.LEADING);
             production.add(label);
+            production.add(getGoodsButton(outputType, 0));
         }
         detailPanel.add(new JLabel(Messages.message("colopedia.buildings.production")), higConst.rc(row, leftColumn));
         detailPanel.add(production, higConst.rc(row, rightColumn));
