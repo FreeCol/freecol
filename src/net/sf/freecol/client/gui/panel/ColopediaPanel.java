@@ -27,6 +27,7 @@ import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.List;
+import java.util.Map.Entry;
 import java.util.logging.Logger;
 
 import javax.swing.ImageIcon;
@@ -52,6 +53,7 @@ import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.AbstractGoods;
 import net.sf.freecol.common.model.BuildingType;
 import net.sf.freecol.common.model.Europe;
+import net.sf.freecol.common.model.Feature;
 import net.sf.freecol.common.model.FoundingFather;
 import net.sf.freecol.common.model.FreeColGameObjectType;
 import net.sf.freecol.common.model.Goods;
@@ -801,20 +803,34 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
         row += 2;
 
         // Requires - prerequisites to build
-        String requiresText = "";
-        if (buildingType.getPopulationRequired() > 0) {
-            requiresText += String.valueOf(buildingType.getPopulationRequired()) + " " + Messages.message("colonists");
-        }
+        StringBuilder requiresText = new StringBuilder();
         if (buildingType.getUpgradesFrom() != null) {
-            requiresText += "\n" + buildingType.getUpgradesFrom().getName();
+            requiresText.append(buildingType.getUpgradesFrom().getName() + "\n");
         }
-        /* TODO: add other requirements
-        if () {
-            requiresText += "\n" + ;
+        if (buildingType.getPopulationRequired() > 0) {
+            requiresText.append(String.valueOf(buildingType.getPopulationRequired()) + " " + 
+                                Messages.message("colonists") + "\n");
         }
-         */
+        for (Entry<String, Boolean> entry : buildingType.getAbilitiesRequired().entrySet()) {
+            if (entry.getValue()) {
+                requiresText.append(Messages.message(entry.getKey() + ".name"));
+                father: for (FoundingFather father : FreeCol.getSpecification().getFoundingFathers()) {
+                    for (Feature feature : father.getFeatures()) {
+                        // this assumes that a particular ability is
+                        // granted by only one FoundingFather
+                        if (entry.getKey().equals(feature.getId())) {
+                            requiresText.append(" ");
+                            requiresText.append(Messages.message("colopedia.abilityGrantedBy", "%father%", 
+                                                                 father.getName()));
+                            break father;
+                        }
+                    }
+                }
+                requiresText.append("\n");
+            }
+        }
 
-        JTextArea requires = getDefaultTextArea(requiresText);
+        JTextArea requires = getDefaultTextArea(requiresText.toString());
         detailPanel.add(new JLabel(Messages.message("colopedia.buildings.requires")), higConst
                 .rc(row, leftColumn, "tl"));
         detailPanel.add(requires, higConst.rc(row, rightColumn));

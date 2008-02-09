@@ -26,6 +26,8 @@ import java.util.List;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 
+import net.sf.freecol.client.gui.i18n.Messages;
+
 /**
  * The <code>Feature</code> class encapsulates a bonus or penalty
  * that can be applied to any action within the game, most obviously
@@ -46,6 +48,15 @@ public abstract class Feature extends FreeColObject {
 
     public Feature() {
         // empty constructor
+    }
+
+    /**
+     * Describe <code>getName</code> method here.
+     *
+     * @return a <code>String</code> value
+     */
+    public String getName() {
+        return Messages.message(getId() + ".name");
     }
 
     /**
