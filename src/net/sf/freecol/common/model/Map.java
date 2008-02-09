@@ -1066,34 +1066,10 @@ public class Map extends FreeColGameObject {
     public Tile getNeighbourOrNull(Direction direction, int x, int y) {
         if (isValid(x, y)) {
             Position pos = getAdjacent(new Position(x, y), direction);
-            return getTileOrNull(pos.getX(), pos.getY());
+            return getTile(pos.getX(), pos.getY());
         } else {
             return null;
         }
-    }
-
-    /**
-     * Get a tile or null if it does not exist.
-     * 
-     * @param x
-     *            The x position.
-     * @param y
-     *            The y position.
-     * @return tile if position is valid, null otherwise.
-     */
-    public Tile getTileOrNull(int x, int y) {
-        return isValid(x, y) ? getTile(x, y) : null;
-    }
-
-    /**
-     * Get a tile or null if it does not exist.
-     * 
-     * @param position
-     *            The position of the tile.
-     * @return tile if position is valid, null otherwise.
-     */
-    public Tile getTileOrNull(Position position) {
-        return isValid(position) ? getTile(position) : null;
     }
 
     /**

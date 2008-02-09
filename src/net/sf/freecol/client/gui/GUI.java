@@ -256,7 +256,7 @@ public final class GUI {
     }
     
     public void moveTileCursor(Direction direction){
-        Tile selectedTile = freeColClient.getGame().getMap().getTileOrNull(getSelectedTile());
+        Tile selectedTile = freeColClient.getGame().getMap().getTile(getSelectedTile());
         if(selectedTile != null){   
             Tile newTile = freeColClient.getGame().getMap().getNeighbourOrNull(direction, selectedTile);
             if(newTile != null)

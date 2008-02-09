@@ -2085,7 +2085,7 @@ public final class Canvas extends JDesktopPane {
      */
     public void showTilePopup(Map.Position pos, int x, int y) {
         if (pos != null) {
-            Tile t = freeColClient.getGame().getMap().getTileOrNull(pos.getX(), pos.getY());
+            Tile t = freeColClient.getGame().getMap().getTile(pos.getX(), pos.getY());
 
             if (t != null) {
                 TilePopup tp = new TilePopup(t, freeColClient, this, getGUI());

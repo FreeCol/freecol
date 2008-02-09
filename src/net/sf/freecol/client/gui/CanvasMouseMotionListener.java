@@ -246,7 +246,7 @@ public final class CanvasMouseMotionListener implements MouseMotionListener {
                         public void run() {
                             try {
                                 int x, y;
-                                Tile t = map.getTileOrNull(gui.getFocus().getX(), gui.getFocus().getY());
+                                Tile t = map.getTile(gui.getFocus().getX(), gui.getFocus().getY());
                                 if (t == null) {
                                     return;
                                 }

@@ -342,7 +342,7 @@ public final class MiniMap extends JPanel implements MouseInputListener {
             int yPixels = 0;
             for (int tileY = 0; yPixels <= height + tileSize; tileY++, yPixels += tileSize/4) {
                 /* Check the terrain to find out which color to use */
-                Tile tile = map.getTileOrNull(tileX + xOffset, tileY + yOffset);
+                Tile tile = map.getTile(tileX + xOffset, tileY + yOffset);
                 if (tile == null) {
                     continue;
                 }
@@ -352,58 +352,6 @@ public final class MiniMap extends JPanel implements MouseInputListener {
                 if (tile != null && tile.isExplored()) {
                     g.setColor(tile.getType().getMinimapColor());
                 }
-                /*  Depreciated
-                if (tile == null) {
-                    g.setColor(Color.BLACK);
-                } else if (tile.getAddition() == Tile.ADD_HILLS) {
-                    g.setColor(new Color(0.44f, 0.50f, 0.32f)); // Grayish orange
-                } else if (tile.getAddition() == Tile.ADD_MOUNTAINS) {
-                    g.setColor(new Color(0.34f, 0.45f, 0.32f)); // Gray
-                } else if (!tile.isForested()) {
-                    int type = tile.getType();
-                    switch (type) {
-                        case Tile.PLAINS:
-                        case Tile.GRASSLANDS:
-                        case Tile.PRAIRIE:
-                        case Tile.SAVANNAH:
-                            g.setColor(new Color(0.14f, 0.50f, 0.12f)); // Green
-                            break;
-
-                        case Tile.MARSH:
-                        case Tile.SWAMP:
-                            g.setColor(new Color(0.14f, 0.50f, 0.24f)); // Bluish green
-                            break;
-
-                        case Tile.DESERT:
-                            g.setColor(new Color(0.39f, 0.45f, 0.17f)); // Orangish
-                            break;
-
-                        case Tile.TUNDRA:
-                            g.setColor(new Color(0.39f, 0.62f, 0.37f)); // Light blue
-                            break;
-
-                        case Tile.ARCTIC:
-                            g.setColor(Color.WHITE);
-                            break;
-
-                        case Tile.OCEAN: //Blue ocean
-                            g.setColor(Color.BLUE);
-                            break;
-
-                        case Tile.HIGH_SEAS: //Darker blue high seas
-                            g.setColor(new Color(0.0f, 0.0f, 0.8f));
-                            break;
-
-                        case Tile.UNEXPLORED:
-                        default:
-                            g.setColor(Color.BLACK);
-                            break;
-                    }
-                } else {
-                  // Tile is forested, so display color of the forest
-                  g.setColor(new Color(0.14f, 0.45f, 0.12f)); // Darker green
-                }
-                */
                 if (tileSize == 4) {
                     int extra = (((tileY + yOffset) % 2) == 0) ? 0 : 2;
                     g.drawLine(x+extra+ 4*tileX, y+tileY, x+2+extra+4*tileX, y+tileY);
