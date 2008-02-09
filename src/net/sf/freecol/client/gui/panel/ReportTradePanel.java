@@ -57,7 +57,8 @@ public final class ReportTradePanel extends ReportPanel implements ActionListene
     private static final int extraColumns = 1; // labels
 
     /** How many columns are defined all together. */
-    private static final int columns = columnsPerLabel * Goods.NUMBER_OF_TYPES + extraColumns;
+    private static final int columns = columnsPerLabel * FreeCol.getSpecification().numberOfGoodsTypes() +
+        extraColumns;
 
     /** How wide the margins should be. */
     private static final int marginWidth = 12;

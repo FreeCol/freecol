@@ -671,9 +671,7 @@ public class IndianSettlement extends Settlement {
                 }
                 returnPrice += Unit.HORSES_TO_MOUNT_INDIAN * (startPrice-(i*4));
             }
-        } else if (type == Goods.FOOD || type == Goods.LUMBER || type == Goods.SUGAR ||
-                   type == Goods.TOBACCO || type == Goods.COTTON || type == Goods.FURS ||
-                   type == Goods.ORE || type == Goods.SILVER) {
+        } else if (type.isFarmed()) {
             returnPrice = 0;
         } else {
             int currentGoods = goodsContainer.getGoodsCount(type);
@@ -842,14 +840,10 @@ public class IndianSettlement extends Settlement {
         }
 
         List<GoodsType> goodsList = FreeCol.getSpecification().getGoodsTypeList();
-        int[] potential = new int[Goods.NUMBER_OF_TYPES];
         int workers = ownedUnits.size();
         for (GoodsType g : goodsList) {
-            int index = g.getIndex();
             /* Determine the maximum possible production for each type of goods: */
-            potential[index] = getProductionOf(g);
-            /* Produce the goods: */
-            goodsContainer.addGoods(g, potential[index]);
+            goodsContainer.addGoods(g, getProductionOf(g));
         }
 
         /* Use tools (if available) to produce manufactured goods: */

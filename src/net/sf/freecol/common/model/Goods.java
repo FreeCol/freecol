@@ -17,9 +17,7 @@
  *  along with FreeCol.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
 package net.sf.freecol.common.model;
-
 
 import java.util.List;
 import java.util.logging.Logger;
@@ -41,16 +39,17 @@ import org.w3c.dom.Element;
  */
 public class Goods extends AbstractGoods implements Locatable, Ownable, Named {
 
-
     private static Logger logger = Logger.getLogger(Goods.class.getName());
 
-//    public static final GoodsType FOOD, BELLS, CROSSES, HAMMERS, HORSES, TOOLS, MUSKETS, TRADE_GOODS, FURS, FISH;
-    // Need to change Units to the new specification to remove reliance on these static quick links.
-    // Only the essential should have a quick link.
-    public static GoodsType FOOD, SUGAR, TOBACCO, COTTON, FURS, LUMBER, ORE, SILVER, HORSES, 
-                                    RUM, CIGARS, CLOTH, COATS, TRADEGOODS, TOOLS, MUSKETS, 
-                                    FISH, BELLS, CROSSES, HAMMERS;
-    public static int NUMBER_OF_TYPES;
+    /**
+     * Need to change various classes to use the specification in
+     * order to remove reliance on these static quick links.  Only the
+     * essential should have a quick link.
+     */
+    public static GoodsType FOOD, SUGAR, TOBACCO, COTTON, FURS, LUMBER, ORE, SILVER,
+        HORSES, 
+        RUM, CIGARS, CLOTH, COATS, TRADEGOODS, TOOLS, MUSKETS, 
+        FISH, BELLS, CROSSES, HAMMERS;
 
     private Game game;
     private Location location;
@@ -145,7 +144,7 @@ public class Goods extends AbstractGoods implements Locatable, Ownable, Named {
                         g.getId().toUpperCase() + "\n" + e.toString());
             }
         }
-        NUMBER_OF_TYPES = numberOfTypes;
+        //NUMBER_OF_TYPES = numberOfTypes;
     }
 
     // ------------------------------------------------------------ retrieval methods

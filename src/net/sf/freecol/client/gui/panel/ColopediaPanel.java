@@ -58,6 +58,7 @@ import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.Modifier;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.ResourceType;
+import net.sf.freecol.common.model.TileImprovementType;
 import net.sf.freecol.common.model.TileType;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.UnitType;
@@ -68,9 +69,6 @@ import cz.autel.dmi.HIGLayout;
  */
 public final class ColopediaPanel extends FreeColPanel implements ActionListener, TreeSelectionListener {
 
-
-
-
     public static final int NO_DETAILS = 0;
 
     public static final int COLOPEDIA_TERRAIN = 0;
@@ -80,6 +78,14 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
     public static final int COLOPEDIA_SKILLS = 4;
     public static final int COLOPEDIA_BUILDING = 5;
     public static final int COLOPEDIA_FATHER = 6;
+
+    private static final TileImprovementType road = FreeCol.getSpecification()
+        .getTileImprovementType("model.improvement.Road");
+    private static final TileImprovementType river = FreeCol.getSpecification()
+        .getTileImprovementType("model.improvement.River");
+    private static final TileImprovementType plowing = FreeCol.getSpecification()
+        .getTileImprovementType("model.improvement.Plow");
+
 
     @SuppressWarnings("unused")
     private static final Logger logger = Logger.getLogger(ColopediaPanel.class.getName());
@@ -708,10 +714,9 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
 
         if (type.isFarmed()) {
             // Hardcoded for now - Come back and change later
-            String improvedByPlowing = Messages.message(type.getIndex()<=(Goods.COTTON).getIndex() ? "yes" : "no");
-            String improvedByRiver = Messages.message(type.getIndex()<=(Goods.FURS).getIndex() ? "yes" : "no");
-            String improvedByRoad = Messages.message((Goods.FURS).getIndex()<=type.getIndex()
-                                                    && type.getIndex()<=(Goods.SILVER).getIndex() ? "yes" : "no");
+            String improvedByPlowing = Messages.message(plowing.getBonus(type) > 0 ? "yes" : "no");
+            String improvedByRiver = Messages.message(river.getBonus(type) > 0 ? "yes" : "no");
+            String improvedByRoad = Messages.message(road.getBonus(type) > 0 ? "yes" : "no");
 
             detailPanel.add(new JLabel(Messages.message("colopedia.goods.improvedByPlowing")), higConst.rc(row,
                     labelColumn));

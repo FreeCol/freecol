@@ -396,8 +396,8 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
                     value -= 10;
                 } else {
                     if (tile.isLand()) {
-                        for (int i = 0; i < Goods.NUMBER_OF_TYPES; i++) {
-                            value += tile.potential(i);
+                        for (GoodsType type : FreeCol.getSpecification().getGoodsTypeList()) {
+                            value += tile.potential(type);
                         }
                         if (tile.isForested()) {
                             nearbyTileHasForest = true;

@@ -322,7 +322,7 @@ public class AIColony extends AIObject {
             }
         }
 
-        int[] production = new int[Goods.NUMBER_OF_TYPES];
+        int[] production = new int[FreeCol.getSpecification().numberOfGoodsTypes()];
         ArrayList<Unit> nonExpertUnits = new ArrayList<Unit>();
         Iterator<Unit> unitIterator = colony.getUnitIterator();
         while (unitIterator.hasNext()) {

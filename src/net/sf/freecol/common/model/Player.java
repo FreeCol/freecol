@@ -773,8 +773,8 @@ public class Player extends FreeColGameObject implements Features, Nameable {
             return 0;
         }
         int price = 0;
-        for (int i = 0; i < Goods.NUMBER_OF_TYPES; i++) {
-            price += tile.potential(i);
+        for (GoodsType type : FreeCol.getSpecification().getGoodsTypeList()) {
+            price += tile.potential(type);
         }
         price = price * getDifficulty().getLandPriceFactor() + 100;
         Modifier modifier = getModifier("model.modifier.landPaymentModifier");
