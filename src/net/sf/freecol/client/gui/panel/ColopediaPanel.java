@@ -72,7 +72,7 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
     @SuppressWarnings("unused")
     private static final Logger logger = Logger.getLogger(ColopediaPanel.class.getName());
 
-    public static final int NO_DETAILS = 0;
+    public static final int NO_DETAILS = Integer.MIN_VALUE;
 
     public static enum Type { TERRAIN, RESOURCES, UNITS, GOODS, SKILLS, BUILDINGS, FATHERS }
 
@@ -168,33 +168,27 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
         listPanel.removeAll();
         detailPanel.removeAll();
         tree = buildTree();
+        tree.expandRow(type.ordinal());
         switch (type) {
         case TERRAIN:
-            tree.expandRow(type.ordinal());
             buildTerrainDetail(action);
             break;
         case RESOURCES:
-            tree.expandRow(type.ordinal());
             buildResourceDetail(action);
             break;
         case UNITS:
-            tree.expandRow(type.ordinal());
             buildUnitDetail(action);
             break;
         case GOODS:
-            tree.expandRow(type.ordinal());
             buildGoodsDetail(action);
             break;
         case SKILLS:
-            tree.expandRow(type.ordinal());
             buildUnitDetail(action);
             break;
         case BUILDINGS:
-            tree.expandRow(type.ordinal());
             buildBuildingDetail(action);
             break;
         case FATHERS:
-            tree.expandRow(type.ordinal());
             buildFatherDetail(action);
             break;
         default:
@@ -337,7 +331,9 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
 
         List<BuildingType> buildingTypes = FreeCol.getSpecification().getBuildingTypeList();
         for (BuildingType buildingType : buildingTypes) {
-            DefaultMutableTreeNode item = new DefaultMutableTreeNode(new ColopediaTreeItem(buildingType.getName(), buildingIcon));
+            DefaultMutableTreeNode item = new DefaultMutableTreeNode(new ColopediaTreeItem(buildingType.getId(), 
+                                                                                           buildingType.getName(),
+                                                                                           buildingIcon));
             parent.add(item);
         }
     }
@@ -361,7 +357,8 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
     private void buildTerrainItem(int tileIndex, DefaultMutableTreeNode parent) {
         TileType tileType = FreeCol.getSpecification().getTileType(tileIndex);
         ImageIcon icon = new ImageIcon(library.getScaledTerrainImage(tileType, 0.25f));
-        DefaultMutableTreeNode item = new DefaultMutableTreeNode(new ColopediaTreeItem(tileType.getName(), icon));
+        DefaultMutableTreeNode item = new DefaultMutableTreeNode(new ColopediaTreeItem(tileType.getId(), 
+                                                                                       tileType.getName(), icon));
         parent.add(item);
     }
     
@@ -374,7 +371,9 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
     private void buildResourceItem(int resIndex, DefaultMutableTreeNode parent) {
         ResourceType resType = FreeCol.getSpecification().getResourceType(resIndex);
         ImageIcon icon = library.getBonusImageIcon(resType);
-        DefaultMutableTreeNode item = new DefaultMutableTreeNode(new ColopediaTreeItem(resType.getName(), icon));
+        DefaultMutableTreeNode item = new DefaultMutableTreeNode(new ColopediaTreeItem(resType.getId(), 
+                                                                                       resType.getName(),
+                                                                                       icon));
         parent.add(item);
     }
     
@@ -388,7 +387,8 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
     private void buildUnitItem(int unit, float scale, DefaultMutableTreeNode parent) {
         UnitType unitType = FreeCol.getSpecification().getUnitType(unit);
         ImageIcon icon = library.getScaledImageIcon(library.getUnitImageIcon(unitType), 0.5f);
-        DefaultMutableTreeNode item = new DefaultMutableTreeNode(new ColopediaTreeItem(unitType.getName(), icon));
+        DefaultMutableTreeNode item = new DefaultMutableTreeNode(new ColopediaTreeItem(unitType.getId(),
+                                                                                       unitType.getName(), icon));
         parent.add(item);
     }
     
@@ -401,7 +401,8 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
     private void buildGoodsItem(int goodsIndex, DefaultMutableTreeNode parent) {
         GoodsType goodsType = FreeCol.getSpecification().getGoodsType(goodsIndex);
         ImageIcon icon = library.getScaledGoodsImageIcon(goodsType, 0.75f);
-        DefaultMutableTreeNode item = new DefaultMutableTreeNode(new ColopediaTreeItem(goodsType.getName(), icon));
+        DefaultMutableTreeNode item = new DefaultMutableTreeNode(new ColopediaTreeItem(goodsType.getId(),
+                                                                                       goodsType.getName(), icon));
         parent.add(item);
     }
     
@@ -414,7 +415,8 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
     private void buildFatherItem(FoundingFather foundingFather, DefaultMutableTreeNode parent) {
         String name = foundingFather.getName();
         ImageIcon icon = library.getScaledGoodsImageIcon(Goods.BELLS, 0.75f);
-        DefaultMutableTreeNode item = new DefaultMutableTreeNode(new ColopediaTreeItem(name, icon));
+        DefaultMutableTreeNode item = new DefaultMutableTreeNode(new ColopediaTreeItem(foundingFather.getId(),
+                                                                                       name, icon));
         parent.add(item);
     }
 
@@ -424,9 +426,13 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
      * @param tileIndex The tile index
      */
     private void buildTerrainDetail(int tileIndex) {
-        TileType tileType = FreeCol.getSpecification().getTileType(tileIndex);
         detailPanel.removeAll();
         repaint();
+        if (tileIndex == NO_DETAILS) {
+            return;
+        }
+
+        TileType tileType = FreeCol.getSpecification().getTileType(tileIndex);
 
         int[] widths = { 0, 3 * margin, 0 };
         int[] heights = new int[13];
@@ -508,9 +514,13 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
      * @param resIndex The resource index
      */
     private void buildResourceDetail(int resIndex) {
-        ResourceType type = FreeCol.getSpecification().getResourceType(resIndex);
         detailPanel.removeAll();
         detailPanel.repaint();
+        if (resIndex == NO_DETAILS) {
+            return;
+        }
+
+        ResourceType type = FreeCol.getSpecification().getResourceType(resIndex);
 
         int[] widths = { 0, 3 * margin, 0 };
         int[] heights = new int[7];
@@ -568,6 +578,9 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
     private void buildUnitDetail(int unit) {
         detailPanel.removeAll();
         detailPanel.repaint();
+        if (unit == NO_DETAILS) {
+            return;
+        }
 
         Player player = parent.getClient().getMyPlayer();
         // player can be null when using the map editor
@@ -671,7 +684,9 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
     private void buildGoodsDetail(int goodsIndex) {
         detailPanel.removeAll();
         detailPanel.repaint();
-
+        if (goodsIndex == NO_DETAILS) {
+            return;
+        }
         GoodsType type = FreeCol.getSpecification().getGoodsType(goodsIndex);
 
         String isFarmed = Messages.message(type.isFarmed() ? "yes" : "no");
@@ -744,7 +759,9 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
     private void buildBuildingDetail(int building) {
         detailPanel.removeAll();
         detailPanel.repaint();
-
+        if (building == NO_DETAILS) {
+            return;
+        }
         BuildingType buildingType = FreeCol.getSpecification().getBuildingType(building);
         int[] widths = { 0, 3 * margin, 0 };
         int[] heights = new int[15];
@@ -871,6 +888,10 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
     private void buildFatherDetail(int foundingFather) {
         detailPanel.removeAll();
         detailPanel.repaint();
+        if (foundingFather == NO_DETAILS) {
+            return;
+        }
+
         detailPanel.setLayout(new FlowLayout());
 
         FoundingFather father = FreeCol.getSpecification().getFoundingFather(foundingFather);
