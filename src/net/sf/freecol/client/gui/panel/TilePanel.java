@@ -186,7 +186,7 @@ public final class TilePanel extends FreeColDialog implements ActionListener {
                 break;
             case COLOPEDIA:
                 setResponse(new Boolean(true));
-                canvas.showColopediaPanel(ColopediaPanel.Type.TERRAIN, tileType.getIndex());
+                canvas.showColopediaPanel(ColopediaPanel.PanelType.TERRAIN, tileType);
                 break;
             default:
                 logger.warning("Invalid Actioncommand: invalid number.");

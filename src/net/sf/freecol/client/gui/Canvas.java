@@ -110,6 +110,7 @@ import net.sf.freecol.common.model.DiplomaticTrade;
 import net.sf.freecol.common.model.Europe;
 import net.sf.freecol.common.model.FoundingFather;
 import net.sf.freecol.common.model.FreeColGameObject;
+import net.sf.freecol.common.model.FreeColGameObjectType;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.IndianSettlement;
@@ -1409,7 +1410,7 @@ public final class Canvas extends JDesktopPane {
      * 
      * @param type The type of colopedia panel to display.
      */
-    public void showColopediaPanel(ColopediaPanel.Type type) {
+    public void showColopediaPanel(ColopediaPanel.PanelType type) {
         ColopediaPanel colopediaPanel = new ColopediaPanel(this);
         colopediaPanel.initialize(type);
         addAsFrame(colopediaPanel);
@@ -1422,9 +1423,10 @@ public final class Canvas extends JDesktopPane {
      * @param type The type of colopedia panel to display.
      * @param action The details to display.
      */
-    public void showColopediaPanel(ColopediaPanel.Type type, int action) {
+    public void showColopediaPanel(ColopediaPanel.PanelType panelType,
+                                   FreeColGameObjectType objectType) {
         ColopediaPanel colopediaPanel = new ColopediaPanel(this);
-        colopediaPanel.initialize(type, action);
+        colopediaPanel.initialize(panelType, objectType);
         addAsFrame(colopediaPanel);
         colopediaPanel.requestFocus();
     }

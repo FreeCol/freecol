@@ -290,8 +290,8 @@ public final class DragListener extends MouseAdapter {
 
             } else if (comp instanceof GoodsLabel) {
                 GoodsLabel goodsLabel = (GoodsLabel) comp;
-                goodsLabel.getCanvas().showColopediaPanel(ColopediaPanel.Type.GOODS,
-                        goodsLabel.getGoods().getType().getIndex());
+                goodsLabel.getCanvas().showColopediaPanel(ColopediaPanel.PanelType.GOODS,
+                                                          goodsLabel.getGoods().getType());
                 /*
                  * if (parentPanel instanceof ColonyPanel) { Colony colony =
                  * ((ColonyPanel) parentPanel).getColony(); ((GoodsLabel)
