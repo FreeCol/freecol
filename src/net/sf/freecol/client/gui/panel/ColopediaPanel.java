@@ -83,6 +83,7 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
         .getTileImprovementType("model.improvement.Plow");
 
     private static final String OK = "OK";
+    private static final String ROOT = "ROOT";
 
     private final Canvas parent;
 
@@ -209,7 +210,7 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
      */
     private JTree buildTree() {
         DefaultMutableTreeNode root;
-        root = new DefaultMutableTreeNode(new ColopediaTreeItem("ROOT", Messages.message("menuBar.colopedia"), null));
+        root = new DefaultMutableTreeNode(new ColopediaTreeItem(ROOT, Messages.message("menuBar.colopedia"), null));
         
         DefaultMutableTreeNode terrain;
         terrain = new DefaultMutableTreeNode(new ColopediaTreeItem(PanelType.TERRAIN.toString(),
@@ -953,34 +954,33 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
             ColopediaTreeItem parentItem = (ColopediaTreeItem)parent.getUserObject();
             ColopediaTreeItem nodeItem = (ColopediaTreeItem)node.getUserObject();
 
-            try {
-                PanelType panelType = Enum.valueOf(PanelType.class, parentItem.getId());
-                String nodeId = nodeItem.getId();
+            if (ROOT.equals(parentItem.getId())) {
+                return;
+            }
 
-                switch(panelType) {
-                case TERRAIN:
-                    buildTerrainDetail(FreeCol.getSpecification().getTileType(nodeId));
-                    break;
-                case RESOURCES:
-                    buildResourceDetail(FreeCol.getSpecification().getResourceType(nodeId));
-                    break;
-                case UNITS:
-                case SKILLS:
-                    buildUnitDetail(FreeCol.getSpecification().getUnitType(nodeId));
-                    break;
-                case GOODS:
-                    buildGoodsDetail(FreeCol.getSpecification().getGoodsType(nodeId));
-                    break;
-                case BUILDINGS:
-                    buildBuildingDetail(FreeCol.getSpecification().getBuildingType(nodeId));
-                    break;
-                case FATHERS:
-                    buildFatherDetail(FreeCol.getSpecification().getFoundingFather(nodeId));
-                    break;
-                }
-            } catch(Exception e) {
-                logger.warning("Was ROOT selected?");
-                logger.warning(e.toString());
+            PanelType panelType = Enum.valueOf(PanelType.class, parentItem.getId());
+            String nodeId = nodeItem.getId();
+
+            switch(panelType) {
+            case TERRAIN:
+                buildTerrainDetail(FreeCol.getSpecification().getTileType(nodeId));
+                break;
+            case RESOURCES:
+                buildResourceDetail(FreeCol.getSpecification().getResourceType(nodeId));
+                break;
+            case UNITS:
+            case SKILLS:
+                buildUnitDetail(FreeCol.getSpecification().getUnitType(nodeId));
+                break;
+            case GOODS:
+                buildGoodsDetail(FreeCol.getSpecification().getGoodsType(nodeId));
+                break;
+            case BUILDINGS:
+                buildBuildingDetail(FreeCol.getSpecification().getBuildingType(nodeId));
+                break;
+            case FATHERS:
+                buildFatherDetail(FreeCol.getSpecification().getFoundingFather(nodeId));
+                break;
             }
         }
     }
