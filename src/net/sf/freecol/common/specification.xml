@@ -77,13 +77,14 @@
   </goods-types>
 
   <resource-types>
-    <resource-type id="model.resource.Game" art="bonus/furs.png">
+    <resource-type id="model.resource.Game" art="bonus/game.png">
       <production-bonus goods-type="model.goods.food" bonus="2"/>
       <!-- in colonization game gives 2 food (4 for expert farmer) -->
       <production-bonus goods-type="model.goods.furs" bonus="2"/>
     </resource-type>
-    <resource-type id="model.resource.Minerals" art="bonus/ore.png" minimum-value="40" maximum-value="400">
+    <resource-type id="model.resource.Minerals" art="bonus/minerals.png" minimum-value="40" maximum-value="400">
       <production-bonus goods-type="model.goods.ore" bonus="3"/>
+      <production-bonus goods-type="model.goods.silver" bonus="1"/>
     </resource-type>
     <resource-type id="model.resource.Ore" art="bonus/ore.png" minimum-value="40" maximum-value="4000">
       <production-bonus goods-type="model.goods.ore" bonus="2"/>

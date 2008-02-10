@@ -992,6 +992,11 @@ public final class ImageLibrary extends ImageProvider {
         return bonus.get(type.getId());
     }
 
+    public ImageIcon getScaledBonusImageIcon(ResourceType type, float scale) {
+        return getScaledImageIcon(getBonusImageIcon(type), scale);
+    }
+
+
     /**
      * Converts an image to grayscale
      * 

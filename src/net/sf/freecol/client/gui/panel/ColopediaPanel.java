@@ -375,7 +375,7 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
      * @param parent the parent node
      */
     private void buildResourceItem(ResourceType resType, DefaultMutableTreeNode parent) {
-        ImageIcon icon = library.getBonusImageIcon(resType);
+        ImageIcon icon = library.getScaledBonusImageIcon(resType, 0.75f);
         DefaultMutableTreeNode item = new DefaultMutableTreeNode(new ColopediaTreeItem(resType,
                                                                                        resType.getName(),
                                                                                        icon));
@@ -481,14 +481,14 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
      */
     private void buildTerrainDetail(TileType tileType) {
         detailPanel.removeAll();
-        repaint();
+        detailPanel.repaint();
         if (tileType == null) {
             return;
         }
 
         int[] widths = { 0, 3 * margin, 0 };
         int[] heights = new int[13];
-        for (int index = 1; index < 12; index += 2) {
+        for (int index = 1; index < heights.length; index += 2) {
             heights[index] = margin;
         }
         int row = 1;
@@ -532,7 +532,7 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
         List<ResourceType> resourceList = tileType.getResourceTypeList();
         if (resourceList.size() > 0) {
             detailPanel.add(new JLabel(Messages.message("colopedia.terrain.resource")), higConst.rc(row, leftColumn));
-            JPanel resourcePanel = new JPanel(new GridLayout(0, resourceList.size(), margin, 0));
+            JPanel resourcePanel = new JPanel();
             resourcePanel.setOpaque(false);
             for (final ResourceType resourceType : resourceList) {
                 resourcePanel.add(getResourceButton(resourceType));
@@ -542,7 +542,7 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
         }
 
         detailPanel.add(new JLabel(Messages.message("colopedia.terrain.production")), higConst.rc(row, leftColumn));
-        JPanel goodsPanel = new JPanel(new GridLayout(0, 8, margin, 0));
+        JPanel goodsPanel = new JPanel();
         goodsPanel.setOpaque(false);
         List<AbstractGoods> production = tileType.getProduction();
         for (final AbstractGoods goods : production) {
@@ -576,19 +576,17 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
             heights[index] = margin;
         }
 
-        int labelColumn = 1;
-        int valueColumn = 3;
-        HIGLayout layout = new HIGLayout(widths, heights);
-        layout.setColumnWeight(valueColumn, 1);
-        detailPanel.setLayout(layout);
-
         int row = 1;
         int leftColumn = 1;
         int rightColumn = 3;
 
+        HIGLayout layout = new HIGLayout(widths, heights);
+        layout.setColumnWeight(rightColumn, 1);
+        detailPanel.setLayout(layout);
+
         JLabel name = new JLabel(type.getName(), SwingConstants.CENTER);
         name.setFont(smallHeaderFont);
-        detailPanel.add(name, higConst.rcwh(row, labelColumn, widths.length, 1));
+        detailPanel.add(name, higConst.rcwh(row, leftColumn, widths.length, 1));
         row += 2;
 
         List<GoodsType> goodsList = type.getBonusTypeList();
