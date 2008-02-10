@@ -24,12 +24,14 @@ import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.GridLayout;
 import java.awt.Image;
+import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.logging.Logger;
 
+import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JLabel;
@@ -423,11 +425,24 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
         parent.add(item);
     }
 
+    private JButton getButton(String text, ImageIcon icon) {
+        JButton button = new JButton(text, icon);
+        button.setOpaque(false);
+        button.setForeground(LINK_COLOR);
+        button.setBorder(BorderFactory.createEmptyBorder());
+        return button;
+    }
+
     private JButton getGoodsButton(final GoodsType goodsType, int amount) {
-        JButton goodsButton = new JButton(library.getGoodsImageIcon(goodsType));
         if (amount > 0) {
-            goodsButton.setText(String.valueOf(amount));
+            return getGoodsButton(goodsType, String.valueOf(amount));
+        } else {
+            return getGoodsButton(goodsType, null);
         }
+    }
+
+    private JButton getGoodsButton(final GoodsType goodsType, String text) {
+        JButton goodsButton = getButton(text, library.getGoodsImageIcon(goodsType));
         goodsButton.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent event) {
                     initialize(PanelType.GOODS, goodsType);
@@ -437,8 +452,8 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
     }
 
     private JButton getResourceButton(final ResourceType resourceType) {
-        JButton resourceButton = new JButton(resourceType.getName(), 
-                                             library.getBonusImageIcon(resourceType));
+        JButton resourceButton = getButton(resourceType.getName(), 
+                                           library.getBonusImageIcon(resourceType));
         resourceButton.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent event) {
                     initialize(PanelType.RESOURCES, resourceType);
@@ -448,7 +463,7 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
     }
 
     private JButton getBuildingButton(final BuildingType buildingType) {
-        JButton buildingButton = new JButton(buildingType.getName());
+        JButton buildingButton = getButton(buildingType.getName(), null);
         buildingButton.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent event) {
                     initialize(PanelType.BUILDINGS, buildingType);
@@ -459,7 +474,7 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
 
 
     private JButton getUnitButton(final UnitType unitType) {
-        JButton unitButton = new JButton(unitType.getName(), library.getUnitImageIcon(unitType));
+        JButton unitButton = getButton(unitType.getName(), library.getUnitImageIcon(unitType));
         unitButton.setHorizontalAlignment(SwingConstants.LEFT);
         unitButton.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent event) {
@@ -598,19 +613,14 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
         JPanel goodsPanel = new JPanel();
         goodsPanel.setOpaque(false);
         for (int i = 0; i < goodsList.size(); i++) {
-            final GoodsType goodsType = goodsList.get(i);
-            JButton goodsButton = new JButton(library.getGoodsImageIcon(goodsType));
             int amount = amountList.get(i);
+            String text;
             if (amount > 0) {
-                goodsButton.setText("+" + String.valueOf(amount));
+                text = "+" + String.valueOf(amount);
             } else {
-                goodsButton.setText("x " + String.valueOf(factorList.get(i)));
+                text = "x " + String.valueOf(factorList.get(i));
             }
-            goodsButton.addActionListener(new ActionListener() {
-                    public void actionPerformed(ActionEvent event) {
-                        initialize(PanelType.GOODS, goodsType);
-                    }
-                });
+            JButton goodsButton = getGoodsButton(goodsList.get(i), text);
             goodsPanel.add(goodsButton);
         }
         detailPanel.add(goodsPanel, higConst.rc(row, rightColumn, "l"));
