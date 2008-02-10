@@ -21,35 +21,60 @@ package net.sf.freecol.client.gui.panel;
 
 import javax.swing.ImageIcon;
 
+import net.sf.freecol.client.gui.panel.ColopediaPanel.PanelType;
+import net.sf.freecol.common.model.FreeColGameObjectType;
+
 /**
- * TreeCellItems are used to represent the name and icon of a node in the Colopedia's tree.
+ * TreeCellItems are used to represent the name and icon of a node in
+ * the Colopedia's tree.
  */
 class ColopediaTreeItem {
 
-    private String id;
+    private PanelType panelType;
+    private FreeColGameObjectType objectType;
     private String text;
     private ImageIcon icon;
 
     /**
      * The constructor that will add the items to this panel.
      * 
-     * @param id The ID of the type represented by this item.
+     * @param panelType The panel type.
+     * @param text The name of the item.
+     */
+    ColopediaTreeItem(PanelType panelType, String text) {
+        this.panelType = panelType;
+        this.text = text;
+    }
+
+    /**
+     * The constructor that will add the items to this panel.
+     * 
+     * @param objectType The type represented by this item.
      * @param text The name of the item.
      * @param icon The icon of the item.
      */
-    ColopediaTreeItem(String id, String text, ImageIcon icon) {
-        this.id = id;
+    ColopediaTreeItem(FreeColGameObjectType objectType, String text, ImageIcon icon) {
+        this.objectType = objectType;
         this.text = text;
         this.icon = icon;
     }
 
     /**
-     * Returns the ID of the type this item represents.
+     * Returns the type this item represents.
      *
-     * @return the ID of the type this item represents.
+     * @return the type this item represents.
      */
-    public String getId() {
-        return id;
+    public FreeColGameObjectType getFreeColGameObjectType() {
+        return objectType;
+    }
+
+    /**
+     * Returns the panel type this item belongs to.
+     *
+     * @return the panel type this item belongs to.
+     */
+    public PanelType getPanelType() {
+        return panelType;
     }
 
     /**

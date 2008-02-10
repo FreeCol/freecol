@@ -101,7 +101,6 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
     
     private JTree tree;
 
-
     /**
      * The constructor that will add the items to this panel.
      * 
@@ -171,6 +170,7 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
         detailPanel.removeAll();
         tree = buildTree();
         tree.expandRow(panelType.ordinal());
+
         switch (panelType) {
         case TERRAIN:
             buildTerrainDetail((TileType) type);
@@ -212,54 +212,47 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
      */
     private JTree buildTree() {
         DefaultMutableTreeNode root;
-        root = new DefaultMutableTreeNode(new ColopediaTreeItem(ROOT, Messages.message("menuBar.colopedia"), null));
+        root = new DefaultMutableTreeNode(new ColopediaTreeItem(null, Messages.message("menuBar.colopedia")));
         
         DefaultMutableTreeNode terrain;
-        terrain = new DefaultMutableTreeNode(new ColopediaTreeItem(PanelType.TERRAIN.toString(),
-                                                                   Messages.message("menuBar.colopedia.terrain"),
-                                                                   null));
+        terrain = new DefaultMutableTreeNode(new ColopediaTreeItem(PanelType.TERRAIN,
+                                                                   Messages.message("menuBar.colopedia.terrain")));
         buildTerrainSubtree(terrain);
         root.add(terrain);
         
         DefaultMutableTreeNode resource;
-        resource = new DefaultMutableTreeNode(new ColopediaTreeItem(PanelType.RESOURCES.toString(), 
-                                                                    Messages.message("menuBar.colopedia.resource"),
-                                                                    null));
+        resource = new DefaultMutableTreeNode(new ColopediaTreeItem(PanelType.RESOURCES, 
+                                                                    Messages.message("menuBar.colopedia.resource")));
         buildResourceSubtree(resource);
         root.add(resource);
         
         DefaultMutableTreeNode units;
-        units = new DefaultMutableTreeNode(new ColopediaTreeItem(PanelType.UNITS.toString(),
-                                                                 Messages.message("menuBar.colopedia.unit"),
-                                                                 null));
+        units = new DefaultMutableTreeNode(new ColopediaTreeItem(PanelType.UNITS,
+                                                                 Messages.message("menuBar.colopedia.unit")));
         buildUnitSubtree(units);
         root.add(units);
         
         DefaultMutableTreeNode goods;
-        goods = new DefaultMutableTreeNode(new ColopediaTreeItem(PanelType.GOODS.toString(),
-                                                                 Messages.message("menuBar.colopedia.goods"),
-                                                                 null));
+        goods = new DefaultMutableTreeNode(new ColopediaTreeItem(PanelType.GOODS,
+                                                                 Messages.message("menuBar.colopedia.goods")));
         buildGoodsSubtree(goods);
         root.add(goods);
         
         DefaultMutableTreeNode skills;
-        skills = new DefaultMutableTreeNode(new ColopediaTreeItem(PanelType.SKILLS.toString(),
-                                                                  Messages.message("menuBar.colopedia.skill"),
-                                                                  null));
+        skills = new DefaultMutableTreeNode(new ColopediaTreeItem(PanelType.SKILLS,
+                                                                  Messages.message("menuBar.colopedia.skill")));
         buildSkillsSubtree(skills);
         root.add(skills);
         
         DefaultMutableTreeNode buildings;
-        buildings = new DefaultMutableTreeNode(new ColopediaTreeItem(PanelType.BUILDINGS.toString(),
-                                                                     Messages.message("menuBar.colopedia.building"),
-                                                                     null));
+        buildings = new DefaultMutableTreeNode(new ColopediaTreeItem(PanelType.BUILDINGS,
+                                                                     Messages.message("menuBar.colopedia.building")));
         buildBuildingSubtree(buildings);
         root.add(buildings);
         
         DefaultMutableTreeNode fathers;
-        fathers = new DefaultMutableTreeNode(new ColopediaTreeItem(PanelType.FATHERS.toString(),
-                                                                   Messages.message("menuBar.colopedia.father"),
-                                                                   null));
+        fathers = new DefaultMutableTreeNode(new ColopediaTreeItem(PanelType.FATHERS,
+                                                                   Messages.message("menuBar.colopedia.father")));
         buildFathersSubtree(fathers);
         root.add(fathers);
         
@@ -345,7 +338,7 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
 
         List<BuildingType> buildingTypes = FreeCol.getSpecification().getBuildingTypeList();
         for (BuildingType buildingType : buildingTypes) {
-            DefaultMutableTreeNode item = new DefaultMutableTreeNode(new ColopediaTreeItem(buildingType.getId(), 
+            DefaultMutableTreeNode item = new DefaultMutableTreeNode(new ColopediaTreeItem(buildingType, 
                                                                                            buildingType.getName(),
                                                                                            buildingIcon));
             parent.add(item);
@@ -370,7 +363,7 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
      */
     private void buildTerrainItem(TileType tileType, DefaultMutableTreeNode parent) {
         ImageIcon icon = new ImageIcon(library.getScaledTerrainImage(tileType, 0.25f));
-        DefaultMutableTreeNode item = new DefaultMutableTreeNode(new ColopediaTreeItem(tileType.getId(), 
+        DefaultMutableTreeNode item = new DefaultMutableTreeNode(new ColopediaTreeItem(tileType, 
                                                                                        tileType.getName(), icon));
         parent.add(item);
     }
@@ -383,7 +376,7 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
      */
     private void buildResourceItem(ResourceType resType, DefaultMutableTreeNode parent) {
         ImageIcon icon = library.getBonusImageIcon(resType);
-        DefaultMutableTreeNode item = new DefaultMutableTreeNode(new ColopediaTreeItem(resType.getId(), 
+        DefaultMutableTreeNode item = new DefaultMutableTreeNode(new ColopediaTreeItem(resType,
                                                                                        resType.getName(),
                                                                                        icon));
         parent.add(item);
@@ -398,7 +391,7 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
      */
     private void buildUnitItem(UnitType unitType, float scale, DefaultMutableTreeNode parent) {
         ImageIcon icon = library.getScaledImageIcon(library.getUnitImageIcon(unitType), 0.5f);
-        DefaultMutableTreeNode item = new DefaultMutableTreeNode(new ColopediaTreeItem(unitType.getId(),
+        DefaultMutableTreeNode item = new DefaultMutableTreeNode(new ColopediaTreeItem(unitType,
                                                                                        unitType.getName(), icon));
         parent.add(item);
     }
@@ -411,7 +404,7 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
      */
     private void buildGoodsItem(GoodsType goodsType, DefaultMutableTreeNode parent) {
         ImageIcon icon = library.getScaledGoodsImageIcon(goodsType, 0.75f);
-        DefaultMutableTreeNode item = new DefaultMutableTreeNode(new ColopediaTreeItem(goodsType.getId(),
+        DefaultMutableTreeNode item = new DefaultMutableTreeNode(new ColopediaTreeItem(goodsType,
                                                                                        goodsType.getName(), icon));
         parent.add(item);
     }
@@ -425,7 +418,7 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
     private void buildFatherItem(FoundingFather foundingFather, DefaultMutableTreeNode parent) {
         String name = foundingFather.getName();
         ImageIcon icon = library.getScaledGoodsImageIcon(Goods.BELLS, 0.75f);
-        DefaultMutableTreeNode item = new DefaultMutableTreeNode(new ColopediaTreeItem(foundingFather.getId(),
+        DefaultMutableTreeNode item = new DefaultMutableTreeNode(new ColopediaTreeItem(foundingFather,
                                                                                        name, icon));
         parent.add(item);
     }
@@ -1017,7 +1010,7 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
      * @param event The incoming TreeSelectionEvent.
      */
     public void valueChanged(TreeSelectionEvent event) {
-        if(event.getSource() == tree) {
+        if (event.getSource() == tree) {
             TreePath path = tree.getSelectionPath();
             if (path == null) {
                 return;
@@ -1028,33 +1021,28 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
             ColopediaTreeItem parentItem = (ColopediaTreeItem)parent.getUserObject();
             ColopediaTreeItem nodeItem = (ColopediaTreeItem)node.getUserObject();
 
-            if (ROOT.equals(parentItem.getId())) {
-                return;
-            }
-
-            PanelType panelType = Enum.valueOf(PanelType.class, parentItem.getId());
-            String nodeId = nodeItem.getId();
-
-            switch(panelType) {
-            case TERRAIN:
-                buildTerrainDetail(FreeCol.getSpecification().getTileType(nodeId));
-                break;
-            case RESOURCES:
-                buildResourceDetail(FreeCol.getSpecification().getResourceType(nodeId));
-                break;
-            case UNITS:
-            case SKILLS:
-                buildUnitDetail(FreeCol.getSpecification().getUnitType(nodeId));
-                break;
-            case GOODS:
-                buildGoodsDetail(FreeCol.getSpecification().getGoodsType(nodeId));
-                break;
-            case BUILDINGS:
-                buildBuildingDetail(FreeCol.getSpecification().getBuildingType(nodeId));
-                break;
-            case FATHERS:
-                buildFatherDetail(FreeCol.getSpecification().getFoundingFather(nodeId));
-                break;
+            if (parentItem.getPanelType() != null) {
+                switch(parentItem.getPanelType()) {
+                case TERRAIN:
+                    buildTerrainDetail((TileType) nodeItem.getFreeColGameObjectType());
+                    break;
+                case RESOURCES:
+                    buildResourceDetail((ResourceType) nodeItem.getFreeColGameObjectType());
+                    break;
+                case UNITS:
+                case SKILLS:
+                    buildUnitDetail((UnitType) nodeItem.getFreeColGameObjectType());
+                    break;
+                case GOODS:
+                    buildGoodsDetail((GoodsType) nodeItem.getFreeColGameObjectType());
+                    break;
+                case BUILDINGS:
+                    buildBuildingDetail((BuildingType) nodeItem.getFreeColGameObjectType());
+                    break;
+                case FATHERS:
+                    buildFatherDetail((FoundingFather) nodeItem.getFreeColGameObjectType());
+                    break;
+                }
             }
         }
     }
