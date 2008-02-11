@@ -34,7 +34,7 @@ import java.io.File;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.EnumMap;
-import java.util.Hashtable;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.logging.Logger;
@@ -108,21 +108,21 @@ public final class ImageLibrary extends ImageProvider {
     private ImageIcon[] units, // Holds ImageIcon objects
         unitsGrayscale; // Holds ImageIcon objects of units in grayscale
 
-    private Hashtable<String, ImageIcon> terrain1, terrain2, overlay1, overlay2,
+    private Map<String, ImageIcon> terrain1, terrain2, overlay1, overlay2,
             forests, bonus, goods;
 
-    private Hashtable<String, ArrayList<ImageIcon>> border1, border2, coast1, coast2;
+    private Map<String, ArrayList<ImageIcon>> border1, border2, coast1, coast2;
 
     // Holds the unit-order buttons
     private ArrayList<ArrayList<ImageIcon>> unitButtons; 
 
     private EnumMap<Tension.Level, Image> alarmChips;
 
-    private Hashtable<Color, Image> colorChips;
+    private Map<Color, Image> colorChips;
 
-    private Hashtable<Color, Image> missionChips;
+    private Map<Color, Image> missionChips;
 
-    private Hashtable<Color, Image> expertMissionChips;
+    private Map<Color, Image> expertMissionChips;
 
     /**
      * The scaling factor used when creating this
@@ -177,22 +177,22 @@ public final class ImageLibrary extends ImageProvider {
             ArrayList<ImageIcon> rivers,
             ArrayList<ImageIcon> misc,
             EnumMap<SettlementType, Image> settlements,
-            Hashtable<String, ImageIcon>  terrain1,
-            Hashtable<String, ImageIcon>  terrain2,
-            Hashtable<String, ImageIcon> overlay1,
-            Hashtable<String, ImageIcon> overlay2,
-            Hashtable<String, ImageIcon> forests,
-            Hashtable<String, ImageIcon> bonus,
-            Hashtable<String, ImageIcon> goods,
-            Hashtable<String, ArrayList<ImageIcon>> border1,
-            Hashtable<String, ArrayList<ImageIcon>> border2,
-            Hashtable<String, ArrayList<ImageIcon>> coast1,
-            Hashtable<String, ArrayList<ImageIcon>> coast2,
+            Map<String, ImageIcon>  terrain1,
+            Map<String, ImageIcon>  terrain2,
+            Map<String, ImageIcon> overlay1,
+            Map<String, ImageIcon> overlay2,
+            Map<String, ImageIcon> forests,
+            Map<String, ImageIcon> bonus,
+            Map<String, ImageIcon> goods,
+            Map<String, ArrayList<ImageIcon>> border1,
+            Map<String, ArrayList<ImageIcon>> border2,
+            Map<String, ArrayList<ImageIcon>> coast1,
+            Map<String, ArrayList<ImageIcon>> coast2,
             ArrayList<ArrayList<ImageIcon>> unitButtons,
             EnumMap<Tension.Level, Image> alarmChips,
-            Hashtable<Color, Image> colorChips,
-            Hashtable<Color, Image> missionChips,
-            Hashtable<Color, Image> expertMissionChips) {
+            Map<Color, Image> colorChips,
+            Map<Color, Image> missionChips,
+            Map<Color, Image> expertMissionChips) {
         dataDirectory = "";
 
         this.scalingFactor = scalingFactor;
@@ -251,9 +251,9 @@ public final class ImageLibrary extends ImageProvider {
         loadMonarch(gc, resourceLocator, doLookup);
 
         alarmChips = new EnumMap<Tension.Level, Image>(Tension.Level.class);
-        colorChips = new Hashtable<Color, Image>();
-        missionChips = new Hashtable<Color, Image>();
-        expertMissionChips = new Hashtable<Color, Image>();
+        colorChips = new HashMap<Color, Image>();
+        missionChips = new HashMap<Color, Image>();
+        expertMissionChips = new HashMap<Color, Image>();
     }
 
     /**
@@ -336,8 +336,8 @@ public final class ImageLibrary extends ImageProvider {
         return output;
     }
 
-    private Hashtable<Color, Image> scaleImages(Hashtable<Color, Image> hashtable, float f) {
-        Hashtable<Color, Image> output = new Hashtable<Color, Image>();
+    private Map<Color, Image> scaleImages(Map<Color, Image> hashtable, float f) {
+        HashMap<Color, Image> output = new HashMap<Color, Image>();
         for (Color c : hashtable.keySet()) {
             Image im = hashtable.get(c);
             output.put(c, im.getScaledInstance(Math.round(im.getWidth(null) * f), Math.round(im.getHeight(null) * f), Image.SCALE_SMOOTH));
@@ -345,12 +345,12 @@ public final class ImageLibrary extends ImageProvider {
         return output;
     }
     
-    private Hashtable<String, ImageIcon> scaleImages3(Hashtable<String, ImageIcon> hashtable, float f) {
+    private Map<String, ImageIcon> scaleImages3(Map<String, ImageIcon> hashtable, float f) {
         return scaleImages3(hashtable, f, Image.SCALE_SMOOTH);
     }
     
-    private Hashtable<String, ImageIcon> scaleImages3(Hashtable<String, ImageIcon> hashtable, float f, int scalingMethod) {
-        Hashtable<String, ImageIcon> output = new Hashtable<String, ImageIcon>();
+    private Map<String, ImageIcon> scaleImages3(Map<String, ImageIcon> hashtable, float f, int scalingMethod) {
+        HashMap<String, ImageIcon> output = new HashMap<String, ImageIcon>();
         for (String key : hashtable.keySet()) {
             Image im = hashtable.get(key).getImage();
             output.put(key, new ImageIcon(im.getScaledInstance(Math.round(im.getWidth(null) * f), Math.round(im.getHeight(null) * f), scalingMethod)));
@@ -358,8 +358,8 @@ public final class ImageLibrary extends ImageProvider {
         return output;
     }
     
-    private Hashtable<String, ArrayList<ImageIcon>> scaleImages2(Hashtable<String, ArrayList<ImageIcon>> hashtable, float f) {
-        Hashtable<String, ArrayList<ImageIcon>> output = new Hashtable<String, ArrayList<ImageIcon>>();
+    private Map<String, ArrayList<ImageIcon>> scaleImages2(Map<String, ArrayList<ImageIcon>> hashtable, float f) {
+        HashMap<String, ArrayList<ImageIcon>> output = new HashMap<String, ArrayList<ImageIcon>>();
         for (String key : hashtable.keySet()) {
             if (hashtable.get(key) == null) {
                 output.put(key, null);
@@ -521,14 +521,14 @@ public final class ImageLibrary extends ImageProvider {
      */
     private void loadTerrain(GraphicsConfiguration gc, Class<FreeCol> resourceLocator, boolean doLookup)
             throws FreeColException {
-        terrain1 = new Hashtable<String, ImageIcon>();
-        terrain2 = new Hashtable<String, ImageIcon>();
-        overlay1 = new Hashtable<String, ImageIcon>();
-        overlay2 = new Hashtable<String, ImageIcon>();
-        border1 = new Hashtable<String, ArrayList<ImageIcon>>();
-        border2 = new Hashtable<String, ArrayList<ImageIcon>>();
-        coast1 = new Hashtable<String, ArrayList<ImageIcon>>();
-        coast2 = new Hashtable<String, ArrayList<ImageIcon>>();
+        terrain1 = new HashMap<String, ImageIcon>();
+        terrain2 = new HashMap<String, ImageIcon>();
+        overlay1 = new HashMap<String, ImageIcon>();
+        overlay2 = new HashMap<String, ImageIcon>();
+        border1 = new HashMap<String, ArrayList<ImageIcon>>();
+        border2 = new HashMap<String, ArrayList<ImageIcon>>();
+        coast1 = new HashMap<String, ArrayList<ImageIcon>>();
+        coast2 = new HashMap<String, ArrayList<ImageIcon>>();
         
         for (TileType type : FreeCol.getSpecification().getTileTypeList()) {
             String filePath = dataDirectory + path + type.getArtBasic() + tileName;
@@ -623,7 +623,7 @@ public final class ImageLibrary extends ImageProvider {
      */
     private void loadForests(GraphicsConfiguration gc, Class<FreeCol> resourceLocator, boolean doLookup)
             throws FreeColException {
-        forests = new Hashtable<String, ImageIcon>();
+        forests = new HashMap<String, ImageIcon>();
         
         for (TileType type : FreeCol.getSpecification().getTileTypeList()) {
             if (type.getArtForest() != null) {
@@ -767,7 +767,7 @@ public final class ImageLibrary extends ImageProvider {
      */
     private void loadGoods(GraphicsConfiguration gc, Class<FreeCol> resourceLocator, boolean doLookup)
             throws FreeColException {
-        goods = new Hashtable<String, ImageIcon>();
+        goods = new HashMap<String, ImageIcon>();
         
         for (GoodsType type : FreeCol.getSpecification().getGoodsTypeList()) {
             String filePath = dataDirectory + path + type.getArt();
@@ -801,7 +801,7 @@ public final class ImageLibrary extends ImageProvider {
      */
     private void loadBonus(GraphicsConfiguration gc, Class<FreeCol> resourceLocator, boolean doLookup)
             throws FreeColException {
-        bonus = new Hashtable<String, ImageIcon>();
+        bonus = new HashMap<String, ImageIcon>();
         
         for (ResourceType type : FreeCol.getSpecification().getResourceTypeList()) {
             String filePath = dataDirectory + path + type.getArt();
