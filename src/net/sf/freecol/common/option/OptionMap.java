@@ -381,4 +381,24 @@ public abstract class OptionMap extends OptionGroup {
         throw new UnsupportedOperationException();
     }
 
+    /**
+     * Allow a File to be set in other ways, as from the user using the Client.
+     * 
+     * @param id
+     * @param newFileValue
+     */
+    public void setFile(String id, File newFileValue) {
+    	if( id == null || id.trim().length() == 0 )
+    		throw new IllegalArgumentException("Requires an ID");
+    	if( newFileValue == null )
+    		throw new IllegalArgumentException("Requires a File parameter");
+    	if( values.get(id) == null )
+    		throw new IllegalArgumentException("No option with ID=["+ id +"]");
+    	
+        try {
+            ((FileOption) values.get(id)).setValue(newFileValue);
+        } catch (ClassCastException e) {
+            throw new IllegalArgumentException("No File associated with option ["+ id +"].");
+        }
+    }
 }
