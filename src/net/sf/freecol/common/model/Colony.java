@@ -1097,10 +1097,11 @@ public final class Colony extends Settlement implements Features, Location, Name
                 // no messages means all goods are present
                 for (AbstractGoods goodsRequired : buildable.getGoodsRequired()) {
                     GoodsType requiredGoodsType = goodsRequired.getType();
-                    if (requiredGoodsType.isStorable()) {
+                    if (requiredGoodsType.isStorable() ||
+                        getGameOptions().getBoolean(GameOptions.SAVE_PRODUCTION_OVERFLOW)) {
                         removeGoods(requiredGoodsType, goodsRequired.getAmount());
                     } else {
-                        // waste excess unstorable goods
+                        // waste excess goods
                         removeGoods(requiredGoodsType);
                     }
                 }

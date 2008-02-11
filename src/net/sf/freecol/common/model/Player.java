@@ -1593,7 +1593,7 @@ public class Player extends FreeColGameObject implements Features, Nameable {
      * Increments the player's cross count, with benefits thereof.
      * 
      * @param num The number of crosses to add.
-     * @see #setCrosses
+     * @see #reduceCrosses
      */
     public void incrementCrosses(int num) {
         if (!canRecruitUnits()) {
@@ -1608,18 +1608,22 @@ public class Player extends FreeColGameObject implements Features, Nameable {
      * @param crosses The number.
      * @see #incrementCrosses
      */
-    public void setCrosses(int crosses) {
+    public void reduceCrosses() {
         if (!canRecruitUnits()) {
             return;
         }
-        this.crosses = crosses;
+
+        int cost = getGameOptions().getBoolean(GameOptions.SAVE_PRODUCTION_OVERFLOW) ?
+                crossesRequired : crosses;
+
+        this.crosses -= cost;
     }
 
     /**
      * Gets the number of crosses this player possess.
      * 
      * @return The number.
-     * @see #setCrosses
+     * @see #reduceCrosses
      */
     public int getCrosses() {
         if (!canRecruitUnits()) {
@@ -2144,7 +2148,8 @@ public class Player extends FreeColGameObject implements Features, Nameable {
             if (getBells() >= getTotalFoundingFatherCost() && currentFather != null) {
                 addFather(currentFather);
                 currentFather = null;
-                bells = 0;
+                bells -= getGameOptions().getBoolean(GameOptions.SAVE_PRODUCTION_OVERFLOW) ? 
+                    getTotalFoundingFatherCost() : bells;
             }
             
             // CO: since the pioneer already finishes faster, changing

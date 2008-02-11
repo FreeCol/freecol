@@ -55,6 +55,8 @@ public class GameOptions extends OptionMap {
     /** Whether experts have connections, producing without raw materials in factories */
     public static final String EXPERTS_HAVE_CONNECTIONS = "expertsHaveConnections";
 
+    public static final String SAVE_PRODUCTION_OVERFLOW = "saveProductionOverflow";
+
     /** Enables/disables fog of war. */
     public static final String FOG_OF_WAR = "fogOfWar";
 
@@ -146,6 +148,7 @@ public class GameOptions extends OptionMap {
         new IntegerOption(HAMMER_PRICE, colony, 0, 50, 20);
         new BooleanOption(CUSTOM_IGNORE_BOYCOTT, colony, false);
         new BooleanOption(EXPERTS_HAVE_CONNECTIONS, colony, false);
+        new BooleanOption(SAVE_PRODUCTION_OVERFLOW, colony, false);
 
         add(colony);
 

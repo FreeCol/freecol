@@ -40,10 +40,10 @@ import org.w3c.dom.Element;
 /**
  * Represents Europe in the game. Each <code>Player</code> has it's own
  * <code>Europe</code>.
- * 
+ * <p/>
  * <br>
  * <br>
- * 
+ * <p/>
  * Europe is the place where you can {@link #recruit} and {@link #train} new
  * units. You may also sell/buy goods.
  */
@@ -76,12 +76,10 @@ public final class Europe extends FreeColGameObject implements Location, Ownable
 
     /**
      * Creates a new <code>Europe</code>.
-     * 
-     * @param game
-     *            The <code>Game</code> in which this object belong.
-     * @param owner
-     *            The <code>Player</code> that will be using this object of
-     *            <code>Europe</code>.
+     *
+     * @param game  The <code>Game</code> in which this object belong.
+     * @param owner The <code>Player</code> that will be using this object of
+     *              <code>Europe</code>.
      */
     public Europe(Game game, Player owner) {
         super(game);
@@ -208,7 +206,7 @@ public final class Europe extends FreeColGameObject implements Location, Ownable
         incrementRecruitPrice();
         unit.setLocation(this);
         unit.getOwner().updateCrossesRequired();
-        unit.getOwner().setCrosses(0);
+        unit.getOwner().reduceCrosses();
 
         setRecruitable(slot, newRecruitable);
     }
@@ -240,11 +238,8 @@ public final class Europe extends FreeColGameObject implements Location, Ownable
         }
 
         unit.setLocation(this);
-        // TODO: shouldn't we subtract a certain amount of crosses instead of
-        // just removing all
-        // crosses? I'm not sure how this was done in the original.
         unit.getOwner().updateCrossesRequired();
-        unit.getOwner().setCrosses(0);
+        unit.getOwner().reduceCrosses();
 
         if (!unit.getOwner().hasAbility("model.ability.selectRecruit")) {
             addModelMessage(this, "model.europe.emigrate", new String[][] { {
