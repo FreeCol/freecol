@@ -39,4 +39,12 @@ public class Utils {
         return one == null ? two == null : one.equals(two);
     }
 
+    /**
+     * Generalize this method instead of calling it directly elsewhere.
+     * 
+     * @return			String
+     */
+    public static String getUserDirectory() {
+    	return System.getProperty("user.home");
+    }
 }
