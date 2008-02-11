@@ -116,7 +116,7 @@ public class GoodsContainer extends FreeColGameObject {
      * Adds a <code>Goods</code> to this containter.
      * @param g The Goods to add to this container.
      */
-    public void addGoods(Goods g) {
+    public void addGoods(AbstractGoods g) {
         addGoods(g.getType(), g.getAmount());
     }
 
@@ -138,7 +138,7 @@ public class GoodsContainer extends FreeColGameObject {
      * Removes Goods from this containter.
      * @param g The Goods to remove from this container.
      */
-    public Goods removeGoods(Goods g) {
+    public Goods removeGoods(AbstractGoods g) {
         return removeGoods(g.getType(), g.getAmount());
     }
 

@@ -523,8 +523,8 @@ public final class Colony extends Settlement implements Features, Location, Name
      *
      * @param goods a <code>Goods</code> value
      */
-    public void removeGoods(Goods goods) {
-        goodsContainer.removeGoods(goods.getType(), goods.getAmount());
+    public void removeGoods(AbstractGoods goods) {
+        goodsContainer.removeGoods(goods);
     }
 
     /**
@@ -548,6 +548,10 @@ public final class Colony extends Settlement implements Features, Location, Name
         } else {
             goodsContainer.addGoods(type, amount);
         }
+    }
+
+    public void addGoods(AbstractGoods goods) {
+        addGoods(goods.getType(), goods.getAmount());
     }
 
     public List<Unit> getUnitList() {
@@ -1096,13 +1100,12 @@ public final class Colony extends Settlement implements Features, Location, Name
             if (messages.isEmpty()) {
                 // no messages means all goods are present
                 for (AbstractGoods goodsRequired : buildable.getGoodsRequired()) {
-                    GoodsType requiredGoodsType = goodsRequired.getType();
-                    if (requiredGoodsType.isStorable() ||
-                        getGameOptions().getBoolean(GameOptions.SAVE_PRODUCTION_OVERFLOW)) {
-                        removeGoods(requiredGoodsType, goodsRequired.getAmount());
+                    if (getGameOptions().getBoolean(GameOptions.SAVE_PRODUCTION_OVERFLOW) ||
+                        goodsRequired.getType().isStorable()) {
+                        removeGoods(goodsRequired);
                     } else {
                         // waste excess goods
-                        removeGoods(requiredGoodsType);
+                        removeGoods(goodsRequired.getType());
                     }
                 }
                 if (buildable instanceof UnitType) {

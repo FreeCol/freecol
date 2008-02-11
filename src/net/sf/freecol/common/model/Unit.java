@@ -2083,7 +2083,7 @@ public class Unit extends FreeColGameObject implements Features, Locatable, Loca
         if (!asResultOfCombat) {
             if (getColony() != null) {
                 for (AbstractGoods goods : equipmentType.getGoodsRequired()) {
-                    getColony().removeGoods(goods.getType(), goods.getAmount());
+                    getColony().removeGoods(goods);
                 }
             } else if (isInEurope()) {
                 for (AbstractGoods goods : equipmentType.getGoodsRequired()) {
@@ -2116,7 +2116,7 @@ public class Unit extends FreeColGameObject implements Features, Locatable, Loca
     private void dumpEquipment(EquipmentType equipmentType, boolean asResultOfCombat) {
         if (getColony() != null) {
             for (AbstractGoods goods : equipmentType.getGoodsRequired()) {
-                getColony().addGoods(goods.getType(), goods.getAmount());
+                getColony().addGoods(goods);
             }
         } else if (isInEurope()) {
             for (AbstractGoods goods : equipmentType.getGoodsRequired()) {
