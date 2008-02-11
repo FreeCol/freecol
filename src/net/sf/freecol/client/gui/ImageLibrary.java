@@ -35,7 +35,6 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.Hashtable;
-import java.util.Vector;
 import java.util.logging.Logger;
 
 import javax.swing.ImageIcon;
@@ -107,9 +106,9 @@ public final class ImageLibrary extends ImageProvider {
     private final String dataDirectory;
 
     /**
-     * A Vector of Image objects.
+     * A ArrayList of Image objects.
      */
-    private Vector<ImageIcon> rivers, // Holds ImageIcon objects
+    private ArrayList<ImageIcon> rivers, // Holds ImageIcon objects
         misc, // Holds ImageIcon objects
         colonies, // Holds ImageIcon objects
         indians, // Holds ImageIcon objects
@@ -121,10 +120,10 @@ public final class ImageLibrary extends ImageProvider {
     private Hashtable<String, ImageIcon> terrain1, terrain2, overlay1, overlay2,
             forests, bonus, goods;
 
-    private Hashtable<String, Vector<ImageIcon>> border1, border2, coast1, coast2;
+    private Hashtable<String, ArrayList<ImageIcon>> border1, border2, coast1, coast2;
 
     // Holds the unit-order buttons
-    private Vector<Vector<ImageIcon>> unitButtons; 
+    private ArrayList<ArrayList<ImageIcon>> unitButtons; 
 
     private EnumMap<Tension.Level, Image> alarmChips;
 
@@ -184,10 +183,10 @@ public final class ImageLibrary extends ImageProvider {
     private ImageLibrary(float scalingFactor,
             ImageIcon[] units,
             ImageIcon[] unitsGrayscale,
-            Vector<ImageIcon> rivers,
-            Vector<ImageIcon> misc,
-            Vector<ImageIcon> colonies,
-            Vector<ImageIcon> indians,
+            ArrayList<ImageIcon> rivers,
+            ArrayList<ImageIcon> misc,
+            ArrayList<ImageIcon> colonies,
+            ArrayList<ImageIcon> indians,
             Hashtable<String, ImageIcon>  terrain1,
             Hashtable<String, ImageIcon>  terrain2,
             Hashtable<String, ImageIcon> overlay1,
@@ -195,11 +194,11 @@ public final class ImageLibrary extends ImageProvider {
             Hashtable<String, ImageIcon> forests,
             Hashtable<String, ImageIcon> bonus,
             Hashtable<String, ImageIcon> goods,
-            Hashtable<String, Vector<ImageIcon>> border1,
-            Hashtable<String, Vector<ImageIcon>> border2,
-            Hashtable<String, Vector<ImageIcon>> coast1,
-            Hashtable<String, Vector<ImageIcon>> coast2,
-            Vector<Vector<ImageIcon>> unitButtons,
+            Hashtable<String, ArrayList<ImageIcon>> border1,
+            Hashtable<String, ArrayList<ImageIcon>> border2,
+            Hashtable<String, ArrayList<ImageIcon>> coast1,
+            Hashtable<String, ArrayList<ImageIcon>> coast2,
+            ArrayList<ArrayList<ImageIcon>> unitButtons,
             EnumMap<Tension.Level, Image> alarmChips,
             Hashtable<Color, Image> colorChips,
             Hashtable<Color, Image> missionChips,
@@ -360,13 +359,13 @@ public final class ImageLibrary extends ImageProvider {
         return output;
     }
     
-    private Hashtable<String, Vector<ImageIcon>> scaleImages2(Hashtable<String, Vector<ImageIcon>> hashtable, float f) {
-        Hashtable<String, Vector<ImageIcon>> output = new Hashtable<String, Vector<ImageIcon>>();
+    private Hashtable<String, ArrayList<ImageIcon>> scaleImages2(Hashtable<String, ArrayList<ImageIcon>> hashtable, float f) {
+        Hashtable<String, ArrayList<ImageIcon>> output = new Hashtable<String, ArrayList<ImageIcon>>();
         for (String key : hashtable.keySet()) {
             if (hashtable.get(key) == null) {
                 output.put(key, null);
             } else {
-                Vector<ImageIcon> outputV = new Vector<ImageIcon>();
+                ArrayList<ImageIcon> outputV = new ArrayList<ImageIcon>();
                 for (ImageIcon icon : hashtable.get(key)) {
                     if (icon == null) {
                         outputV.add(null);
@@ -381,8 +380,8 @@ public final class ImageLibrary extends ImageProvider {
         return output;
     }
 
-    private Vector<ImageIcon> scaleImages(Vector<ImageIcon> list, float f) {
-        Vector<ImageIcon> output = new Vector<ImageIcon>();
+    private ArrayList<ImageIcon> scaleImages(ArrayList<ImageIcon> list, float f) {
+        ArrayList<ImageIcon> output = new ArrayList<ImageIcon>();
         for (ImageIcon im : list) {
             if (im != null) {
                 output.add(new ImageIcon(im.getImage().getScaledInstance(Math.round(im.getIconWidth() * f), Math.round(im.getIconHeight() * f), Image.SCALE_SMOOTH)));
@@ -404,10 +403,10 @@ public final class ImageLibrary extends ImageProvider {
         return output;
     }
 
-    private Vector<Vector<ImageIcon>> scaleImages2(Vector<Vector<ImageIcon>> list, float f) {
-        Vector<Vector<ImageIcon>> output = new Vector<Vector<ImageIcon>>();
-        for (Vector<ImageIcon> v : list) {
-            Vector<ImageIcon> outputV = new Vector<ImageIcon>();
+    private ArrayList<ArrayList<ImageIcon>> scaleImages2(ArrayList<ArrayList<ImageIcon>> list, float f) {
+        ArrayList<ArrayList<ImageIcon>> output = new ArrayList<ArrayList<ImageIcon>>();
+        for (ArrayList<ImageIcon> v : list) {
+            ArrayList<ImageIcon> outputV = new ArrayList<ImageIcon>();
             output.add(outputV);
             for (ImageIcon im : v) {
                 if (im != null) {
@@ -527,10 +526,10 @@ public final class ImageLibrary extends ImageProvider {
         terrain2 = new Hashtable<String, ImageIcon>();
         overlay1 = new Hashtable<String, ImageIcon>();
         overlay2 = new Hashtable<String, ImageIcon>();
-        border1 = new Hashtable<String, Vector<ImageIcon>>();
-        border2 = new Hashtable<String, Vector<ImageIcon>>();
-        coast1 = new Hashtable<String, Vector<ImageIcon>>();
-        coast2 = new Hashtable<String, Vector<ImageIcon>>();
+        border1 = new Hashtable<String, ArrayList<ImageIcon>>();
+        border2 = new Hashtable<String, ArrayList<ImageIcon>>();
+        coast1 = new Hashtable<String, ArrayList<ImageIcon>>();
+        coast2 = new Hashtable<String, ArrayList<ImageIcon>>();
         
         for (TileType type : FreeCol.getSpecification().getTileTypeList()) {
             String filePath = dataDirectory + path + type.getArtBasic() + tileName;
@@ -543,30 +542,30 @@ public final class ImageLibrary extends ImageProvider {
                 overlay2.put(type.getId(), findImage(filePath + "1" + extension, resourceLocator, doLookup));
             }
             
-            Vector<ImageIcon> tempVector1 = new Vector<ImageIcon>();
-            Vector<ImageIcon> tempVector2 = new Vector<ImageIcon>();
+            ArrayList<ImageIcon> tempArrayList1 = new ArrayList<ImageIcon>();
+            ArrayList<ImageIcon> tempArrayList2 = new ArrayList<ImageIcon>();
             for (Direction direction : Direction.values()) {
                 filePath = dataDirectory + path + type.getArtBasic() + borderName + "_" +
                     direction.toString();
-                tempVector1.add(findImage(filePath + "_even" + extension, resourceLocator, doLookup));
-                tempVector2.add(findImage(filePath + "_odd" + extension, resourceLocator, doLookup));
+                tempArrayList1.add(findImage(filePath + "_even" + extension, resourceLocator, doLookup));
+                tempArrayList2.add(findImage(filePath + "_odd" + extension, resourceLocator, doLookup));
             }
 
-            border1.put(type.getId(), tempVector1);
-            border2.put(type.getId(), tempVector2);
+            border1.put(type.getId(), tempArrayList1);
+            border2.put(type.getId(), tempArrayList2);
             
             if (type.getArtCoast() != null) {
-                tempVector1 = new Vector<ImageIcon>();
-                tempVector2 = new Vector<ImageIcon>();
+                tempArrayList1 = new ArrayList<ImageIcon>();
+                tempArrayList2 = new ArrayList<ImageIcon>();
                 for (Direction direction : Direction.values()) {
                     filePath = dataDirectory + path + type.getArtCoast() + borderName + "_" +
                         direction.toString();
-                    tempVector1.add(findImage(filePath + "_even" + extension, resourceLocator, doLookup));
-                    tempVector2.add(findImage(filePath + "_odd" + extension, resourceLocator, doLookup));
+                    tempArrayList1.add(findImage(filePath + "_even" + extension, resourceLocator, doLookup));
+                    tempArrayList2.add(findImage(filePath + "_odd" + extension, resourceLocator, doLookup));
                 }
                 
-                coast1.put(type.getId(), tempVector1);
-                coast2.put(type.getId(), tempVector2);
+                coast1.put(type.getId(), tempArrayList1);
+                coast2.put(type.getId(), tempArrayList2);
             }
         }
         
@@ -574,17 +573,17 @@ public final class ImageLibrary extends ImageProvider {
         terrain1.put(unexploredName, findImage(unexploredPath + "0" + extension, resourceLocator, doLookup));
         terrain2.put(unexploredName, findImage(unexploredPath + "1" + extension, resourceLocator, doLookup));
         
-        Vector<ImageIcon> unexploredVector1 = new Vector<ImageIcon>();
-        Vector<ImageIcon> unexploredVector2 = new Vector<ImageIcon>();
+        ArrayList<ImageIcon> unexploredArrayList1 = new ArrayList<ImageIcon>();
+        ArrayList<ImageIcon> unexploredArrayList2 = new ArrayList<ImageIcon>();
         for (Direction direction : Direction.values()) {
             unexploredPath = dataDirectory + path + terrainDirectory + unexploredDirectory + borderName + 
                 "_" + direction.toString();
-            unexploredVector1.add(findImage(unexploredPath + "_even" + extension, resourceLocator, doLookup));
-            unexploredVector2.add(findImage(unexploredPath + "_odd" + extension, resourceLocator, doLookup));
+            unexploredArrayList1.add(findImage(unexploredPath + "_even" + extension, resourceLocator, doLookup));
+            unexploredArrayList2.add(findImage(unexploredPath + "_odd" + extension, resourceLocator, doLookup));
         }
 
-        border1.put(unexploredName, unexploredVector1);
-        border2.put(unexploredName, unexploredVector2);
+        border1.put(unexploredName, unexploredArrayList1);
+        border2.put(unexploredName, unexploredArrayList2);
     }
 
     /**
@@ -603,7 +602,7 @@ public final class ImageLibrary extends ImageProvider {
     private void loadRivers(GraphicsConfiguration gc, Class<FreeCol> resourceLocator, boolean doLookup)
             throws FreeColException {
         int combinations = 81;
-        rivers = new Vector<ImageIcon>(combinations);
+        rivers = new ArrayList<ImageIcon>(combinations);
         for (int i = 0; i < combinations; i++) {
             String filePath = dataDirectory + path + riverDirectory + riverName + i + extension;
             rivers.add(findImage(filePath, resourceLocator, doLookup));
@@ -650,7 +649,7 @@ public final class ImageLibrary extends ImageProvider {
      */
     private void loadMisc(GraphicsConfiguration gc, Class<FreeCol> resourceLocator, boolean doLookup)
             throws FreeColException {
-        misc = new Vector<ImageIcon>(MISC_COUNT);
+        misc = new ArrayList<ImageIcon>(MISC_COUNT);
 
         for (int i = 0; i < MISC_COUNT; i++) {
             String filePath = dataDirectory + path + miscDirectory + miscName + i + extension;
@@ -673,9 +672,9 @@ public final class ImageLibrary extends ImageProvider {
      */
     private void loadUnitButtons(GraphicsConfiguration gc, Class<FreeCol> resourceLocator, boolean doLookup)
             throws FreeColException {
-        unitButtons = new Vector<Vector<ImageIcon>>(4);
+        unitButtons = new ArrayList<ArrayList<ImageIcon>>(4);
         for (int i = 0; i < 4; i++) {
-            unitButtons.add(new Vector<ImageIcon>(UNIT_BUTTON_COUNT));
+            unitButtons.add(new ArrayList<ImageIcon>(UNIT_BUTTON_COUNT));
         }
 
         for (int i = 0; i < 4; i++) {
@@ -720,7 +719,7 @@ public final class ImageLibrary extends ImageProvider {
      */
     private void loadColonies(GraphicsConfiguration gc, Class<FreeCol> resourceLocator, boolean doLookup)
             throws FreeColException {
-        colonies = new Vector<ImageIcon>(COLONY_COUNT);
+        colonies = new ArrayList<ImageIcon>(COLONY_COUNT);
 
         for (int i = 0; i < COLONY_COUNT; i++) {
             String filePath = dataDirectory + path + colonyDirectory + colonyName + i + extension;
@@ -743,7 +742,7 @@ public final class ImageLibrary extends ImageProvider {
      */
     private void loadIndians(GraphicsConfiguration gc, Class<FreeCol> resourceLocator, boolean doLookup)
             throws FreeColException {
-        indians = new Vector<ImageIcon>(INDIAN_COUNT);
+        indians = new ArrayList<ImageIcon>(INDIAN_COUNT);
 
         for (int i = 0; i < INDIAN_COUNT; i++) {
             String filePath = dataDirectory + path + indianDirectory + indianName + i + extension;
@@ -823,7 +822,7 @@ public final class ImageLibrary extends ImageProvider {
      */
     private void loadMonarch(GraphicsConfiguration gc, Class<FreeCol> resourceLocator, boolean doLookup)
             throws FreeColException {
-        monarch = new Vector<ImageIcon>(MONARCH_COUNT);
+        monarch = new ArrayList<ImageIcon>(MONARCH_COUNT);
 
         for (int i = 0; i < MONARCH_COUNT; i++) {
             String filePath = dataDirectory + path + monarchDirectory + monarchName + i + extension;
