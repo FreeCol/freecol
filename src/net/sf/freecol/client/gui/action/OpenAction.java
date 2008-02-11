@@ -41,7 +41,7 @@ public class OpenAction extends MapboardAction {
 
 
     /**
-     * Creates a new <code>DeclareIndependenceAction</code>.
+     * Creates a new <code>OpenAction</code>.
      * 
      * @param freeColClient The main controller object for the client.
      */
@@ -62,7 +62,7 @@ public class OpenAction extends MapboardAction {
     /**
      * Returns the id of this <code>Option</code>.
      * 
-     * @return "declareIndependenceAction"
+     * @return "openAction"
      */
     public String getId() {
         return id;
