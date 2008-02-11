@@ -480,8 +480,7 @@ public final class ImageLibrary extends ImageProvider {
             ImageIcon defaultIconGrayscale = convertToGrayscale(defaultIcon.getImage());
 
             for (UnitType unitType : FreeCol.getSpecification().getUnitTypeList()) {
-                fileName = unitType.getId();
-                fileName = fileName.substring(fileName.lastIndexOf('.') + 1) + extension;
+                fileName = unitType.getArt() + extension;
                 try {
                     ImageIcon unitIcon = findImage(filePath + fileName, resourceLocator, doLookup);
                     unitIcons.add(unitIcon);

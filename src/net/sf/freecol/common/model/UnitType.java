@@ -107,14 +107,19 @@ public final class UnitType extends BuildableType {
     private GoodsType expertProduction;
 
     /**
+     * How much a Unit of this type contributes to the Player's score.
+     */
+    private int scoreValue;
+
+    /**
+     * Describe art here.
+     */
+    private String art;
+
+    /**
      * Describe pathImage here.
      */
     private String pathImage;
-
-    /**
-     * Describe scoreValue here.
-     */
-    private int scoreValue;
 
     /**
      * Describe availableTo here.
@@ -131,9 +136,34 @@ public final class UnitType extends BuildableType {
      * Describe education here.
      */
     private HashMap<String, Downgrade> downgrades = new HashMap<String, Downgrade>();
+
+
     
+    /**
+     * Creates a new <code>UnitType</code> instance.
+     *
+     * @param index an <code>int</code> value
+     */
     public UnitType(int index) {
         setIndex(index);
+    }
+
+    /**
+     * Get the <code>Art</code> value.
+     *
+     * @return a <code>String</code> value
+     */
+    public String getArt() {
+        return art;
+    }
+
+    /**
+     * Set the <code>Art</code> value.
+     *
+     * @param newArt The new Art value.
+     */
+    public void setArt(final String newArt) {
+        this.art = newArt;
     }
 
     /**
@@ -545,6 +575,7 @@ public final class UnitType extends BuildableType {
         hitPoints = getAttribute(in, "hitPoints", 0);
         spaceTaken = getAttribute(in, "spaceTaken", 1);
         
+        art = in.getAttributeValue(null, "art");
         pathImage = in.getAttributeValue(null, "pathImage");
 
         recruitProbability = getAttribute(in, "recruitProbability", 0);
