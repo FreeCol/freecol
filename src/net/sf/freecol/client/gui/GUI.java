@@ -1115,7 +1115,10 @@ public final class GUI {
                     if (tile.getSettlement() instanceof Colony) {
                         Colony colony = (Colony) map.getTile(tileX, tileY).getSettlement();
                         BufferedImage stringImage = createStringImage(g, colony.getName(), colony.getOwner().getColor(), lib.getTerrainImageWidth(tile.getType()) * 4/3, 16);
-                        g.drawImage(stringImage, xx + (lib.getTerrainImageWidth(tile.getType()) - stringImage.getWidth())/2 + 1, yy + (lib.getColonyImageHeight(lib.getSettlementGraphicsType(colony))) + 1, null);
+                        g.drawImage(stringImage, 
+                                    xx + (lib.getTerrainImageWidth(tile.getType()) - 
+                                          stringImage.getWidth())/2 + 1,
+                                    yy + (lib.getSettlementImage(colony).getHeight(null) + 1), null);
                     }
                 }
                 xx += tileWidth;
@@ -1780,10 +1783,13 @@ public final class GUI {
 
             if (settlement != null) {
                 if (settlement instanceof Colony) {
-                    int type = lib.getSettlementGraphicsType(settlement);
-
+                    Image colonyImage = lib.getSettlementImage(settlement);
                     // Draw image of colony in center of the tile.
-                    g.drawImage(lib.getColonyImage(type), x + (lib.getTerrainImageWidth(tile.getType()) - lib.getColonyImageWidth(type)) / 2, y + (lib.getTerrainImageHeight(tile.getType()) - lib.getColonyImageHeight(type)) / 2, null);
+                    g.drawImage(colonyImage,
+                                x + (lib.getTerrainImageWidth(tile.getType()) -
+                                     colonyImage.getWidth(null)) / 2,
+                                y + (lib.getTerrainImageHeight(tile.getType()) -
+                                     colonyImage.getHeight(null)) / 2, null);
 
                     if (withNumber) {
                         String populationString = Integer.toString(((Colony)settlement).getUnitCount());
@@ -1813,10 +1819,14 @@ public final class GUI {
                     }
                     g.setColor(Color.BLACK);
                 } else if (settlement instanceof IndianSettlement) {
-                    int type = lib.getSettlementGraphicsType(settlement);
+                    Image settlementImage = lib.getSettlementImage(settlement);
 
                     // Draw image of indian settlement in center of the tile.
-                    g.drawImage(lib.getIndianSettlementImage(type), x + (lib.getTerrainImageWidth(tile.getType()) - lib.getIndianSettlementImageWidth(type)) / 2, y + (lib.getTerrainImageHeight(tile.getType()) - lib.getIndianSettlementImageHeight(type)) / 2, null);
+                    g.drawImage(settlementImage,
+                                x + (lib.getTerrainImageWidth(tile.getType()) -
+                                     settlementImage.getWidth(null)) / 2,
+                                y + (lib.getTerrainImageHeight(tile.getType()) - 
+                                     settlementImage.getHeight(null)) / 2, null);
 
                     // Draw the color chip for the settlement.
                     g.drawImage(lib.getColorChip(((IndianSettlement)settlement).getOwner().getColor()), x + (int) (STATE_OFFSET_X  * lib.getScalingFactor()), y + (int) (STATE_OFFSET_Y * lib.getScalingFactor()), null);

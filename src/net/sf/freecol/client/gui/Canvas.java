@@ -704,12 +704,7 @@ public final class Canvas extends JDesktopPane {
         } else if (display instanceof Settlement) {
             Settlement settlement = (Settlement) display;
             try {
-                int settlementType = imageLibrary.getSettlementGraphicsType(settlement);
-                if (display instanceof Colony) {
-                    image = imageLibrary.getColonyImage(settlementType);
-                } else {
-                    image = imageLibrary.getIndianSettlementImage(settlementType);
-                }
+                image = imageLibrary.getSettlementImage(settlement);
             } catch (Exception e) {
                 logger.warning("could not find image for settlement " + settlement);
             }

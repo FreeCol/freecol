@@ -35,6 +35,8 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.Hashtable;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.logging.Logger;
 
 import javax.swing.ImageIcon;
@@ -68,11 +70,6 @@ public final class ImageLibrary extends ImageProvider {
 
     private static final int numberOfUnitTypes = FreeCol.getSpecification().numberOfUnitTypes();
 
-    /**
-     * These finals are for quick reference. These should be made softcoded when next possible.
-     */
-    public static final int TERRAIN_COUNT = 16, BONUS_COUNT = 9, GOODS_COUNT = 20, FOREST_COUNT = 9;
-
     public static final int MONARCH_COUNT = 4;
 
     public static final int UNIT_BUTTON_WAIT = 0, UNIT_BUTTON_DONE = 1, UNIT_BUTTON_FORTIFY = 2,
@@ -80,16 +77,10 @@ public final class ImageLibrary extends ImageProvider {
             UNIT_BUTTON_BUILD = 7, UNIT_BUTTON_DISBAND = 8, UNIT_BUTTON_ZOOM_IN = 9, UNIT_BUTTON_ZOOM_OUT = 10,
             UNIT_BUTTON_COUNT = 11;
 
-    private static final int COLONY_SMALL = 0, COLONY_MEDIUM = 1, COLONY_LARGE = 2, COLONY_STOCKADE = 3,
-            COLONY_FORT = 4, COLONY_FORTRESS = 5, COLONY_MEDIUM_STOCKADE = 6, COLONY_LARGE_STOCKADE = 7,
-            COLONY_LARGE_FORT = 8, COLONY_UNDEAD = 9, COLONY_COUNT = 10,
-
-            INDIAN_SETTLEMENT_CAMP = 0,
-            // INDIAN_SETTLEMENT_VILLAGE = 1,
-            // INDIAN_SETTLEMENT_AZTEC = 2,
-            // INDIAN_SETTLEMENT_INCA = 3,
-
-            INDIAN_COUNT = 4;
+    private static enum SettlementType { SMALL, MEDIUM, LARGE, STOCKADE,
+            FORT, FORTRESS, MEDIUM_STOCKADE, LARGE_STOCKADE,
+            LARGE_FORT, UNDEAD, INDIAN_CAMP, //INDIAN_VILLAGE, AZTEC_CITY, INCA_CITY
+            }
 
     private static final String path = new String("images/"), extension = new String(".png"),
             unitsDirectory = new String("units/"),
@@ -100,7 +91,7 @@ public final class ImageLibrary extends ImageProvider {
             miscDirectory = new String("misc/"), miscName = new String("Misc"),
             unitButtonDirectory = new String("order-buttons/"), unitButtonName = new String("button"),
             colonyDirectory = new String("colonies/"), colonyName = new String("Colony"),
-            indianDirectory = new String("indians/"), indianName = new String("Indians"),
+    //indianDirectory = new String("indians/"), indianName = new String("Indians"),
             monarchDirectory = new String("monarch/"), monarchName = new String("Monarch");
 
     private final String dataDirectory;
@@ -110,9 +101,9 @@ public final class ImageLibrary extends ImageProvider {
      */
     private ArrayList<ImageIcon> rivers, // Holds ImageIcon objects
         misc, // Holds ImageIcon objects
-        colonies, // Holds ImageIcon objects
-        indians, // Holds ImageIcon objects
         monarch; // Holds ImageIcon objects
+
+    private EnumMap<SettlementType, Image> settlements;
 
     private ImageIcon[] units, // Holds ImageIcon objects
         unitsGrayscale; // Holds ImageIcon objects of units in grayscale
@@ -185,8 +176,7 @@ public final class ImageLibrary extends ImageProvider {
             ImageIcon[] unitsGrayscale,
             ArrayList<ImageIcon> rivers,
             ArrayList<ImageIcon> misc,
-            ArrayList<ImageIcon> colonies,
-            ArrayList<ImageIcon> indians,
+            EnumMap<SettlementType, Image> settlements,
             Hashtable<String, ImageIcon>  terrain1,
             Hashtable<String, ImageIcon>  terrain2,
             Hashtable<String, ImageIcon> overlay1,
@@ -210,8 +200,7 @@ public final class ImageLibrary extends ImageProvider {
         this.unitsGrayscale = unitsGrayscale;
         this.rivers = rivers;
         this.misc = misc;
-        this.colonies = colonies;
-        this.indians = indians;
+        this.settlements = settlements;
         this.terrain1 = terrain1;
         this.terrain2 = terrain2;
         this.overlay1 = overlay1;
@@ -256,8 +245,7 @@ public final class ImageLibrary extends ImageProvider {
         loadRivers(gc, resourceLocator, doLookup);
         loadMisc(gc, resourceLocator, doLookup);
         loadUnitButtons(gc, resourceLocator, doLookup);
-        loadColonies(gc, resourceLocator, doLookup);
-        loadIndians(gc, resourceLocator, doLookup);
+        loadSettlements(gc, resourceLocator, doLookup);
         loadGoods(gc, resourceLocator, doLookup);
         loadBonus(gc, resourceLocator, doLookup);
         loadMonarch(gc, resourceLocator, doLookup);
@@ -285,8 +273,9 @@ public final class ImageLibrary extends ImageProvider {
      */
     public ImageLibrary getScaledImageLibrary(float scalingFactor) {
         return new ImageLibrary(scalingFactor, units, unitsGrayscale, rivers,
-                misc, colonies, indians, terrain1, terrain2, overlay1, overlay2, forests, bonus, goods, border1, border2, coast1, coast2, unitButtons,
-                alarmChips, colorChips, missionChips, expertMissionChips);
+                                misc, settlements, terrain1, terrain2, overlay1, overlay2,
+                                forests, bonus, goods, border1, border2, coast1, coast2, unitButtons,
+                                alarmChips, colorChips, missionChips, expertMissionChips);
     }
 
     /**
@@ -300,8 +289,7 @@ public final class ImageLibrary extends ImageProvider {
         unitsGrayscale = scaleImages(unitsGrayscale, scalingFactor);
         rivers = scaleImages(rivers, scalingFactor);
         misc = scaleImages(misc, scalingFactor);
-        colonies = scaleImages(colonies, scalingFactor);
-        indians = scaleImages(indians, scalingFactor);
+        settlements = scaleImages(settlements, scalingFactor);
         //monarch = scaleImages(monarch);
 
         terrain1 = scaleImages3(terrain1, scalingFactor, Image.SCALE_FAST);
@@ -323,6 +311,17 @@ public final class ImageLibrary extends ImageProvider {
         missionChips = scaleImages(missionChips, scalingFactor);
         expertMissionChips = scaleImages(expertMissionChips, scalingFactor);
         */
+    }
+
+    private EnumMap<SettlementType, Image> scaleImages(EnumMap<SettlementType, Image> input, float scale) {
+        EnumMap<SettlementType, Image> result = new EnumMap<SettlementType, Image>(SettlementType.class);
+        for (Entry<SettlementType, Image> entry : input.entrySet()) {
+            Image image = entry.getValue();
+            result.put(entry.getKey(), image.getScaledInstance(Math.round(image.getWidth(null) * scale),
+                                                               Math.round(image.getHeight(null) * scale),
+                                                               Image.SCALE_SMOOTH));
+        }
+        return result;
     }
 
     private Image[] scaleImages(Image[] list, float f) {
@@ -717,13 +716,14 @@ public final class ImageLibrary extends ImageProvider {
      *            net.sf.freecol/images.
      * @throws FreeColException If one of the data files could not be found.
      */
-    private void loadColonies(GraphicsConfiguration gc, Class<FreeCol> resourceLocator, boolean doLookup)
+    private void loadSettlements(GraphicsConfiguration gc, Class<FreeCol> resourceLocator, boolean doLookup)
             throws FreeColException {
-        colonies = new ArrayList<ImageIcon>(COLONY_COUNT);
+        settlements = new EnumMap<SettlementType, Image>(SettlementType.class);
 
-        for (int i = 0; i < COLONY_COUNT; i++) {
-            String filePath = dataDirectory + path + colonyDirectory + colonyName + i + extension;
-            colonies.add(findImage(filePath, resourceLocator, doLookup));
+        for (SettlementType settlementType : SettlementType.values()) {
+            String filePath = dataDirectory + path + colonyDirectory + 
+                settlementType.toString().toLowerCase() + extension;
+            settlements.put(settlementType, findImage(filePath, resourceLocator, doLookup).getImage());
         }
     }
 
@@ -740,6 +740,7 @@ public final class ImageLibrary extends ImageProvider {
      *            net.sf.freecol/images.
      * @throws FreeColException If one of the data files could not be found.
      */
+    /*
     private void loadIndians(GraphicsConfiguration gc, Class<FreeCol> resourceLocator, boolean doLookup)
             throws FreeColException {
         indians = new ArrayList<ImageIcon>(INDIAN_COUNT);
@@ -749,6 +750,7 @@ public final class ImageLibrary extends ImageProvider {
             indians.add(findImage(filePath, resourceLocator, doLookup));
         }
     }
+    */
 
     /**
      * Loads the goods-images from file into memory.
@@ -1202,16 +1204,6 @@ public final class ImageLibrary extends ImageProvider {
     }
 
     /**
-     * Returns the indian settlement image at the given index.
-     * 
-     * @param index The index of the image to return.
-     * @return The image pointer
-     */
-    public Image getIndianSettlementImage(int index) {
-        return indians.get(index).getImage();
-    }
-
-    /**
      * Returns the goods-image at the given index.
      * 
      * @param g The type of the goods-image to return.
@@ -1240,16 +1232,6 @@ public final class ImageLibrary extends ImageProvider {
      */
     public ImageIcon getScaledGoodsImageIcon(GoodsType type, float scale) {
         return getScaledImageIcon(getGoodsImageIcon(type), scale);
-    }
-
-    /**
-     * Returns the colony image at the given index.
-     * 
-     * @param index The index of the image to return.
-     * @return The image pointer
-     */
-    public Image getColonyImage(int index) {
-        return colonies.get(index).getImage();
     }
 
     /**
@@ -1350,52 +1332,12 @@ public final class ImageLibrary extends ImageProvider {
     }
 
     /**
-     * Returns the width of the Colony-image at the given index.
-     * 
-     * @param index The index of the Colony-image.
-     * @return The width of the Colony-image at the given index.
-     */
-    public int getColonyImageWidth(int index) {
-        return colonies.get(index).getIconWidth();
-    }
-
-    /**
-     * Returns the height of the Colony-image at the given index.
-     * 
-     * @param index The index of the Colony-image.
-     * @return The height of the Colony-image at the given index.
-     */
-    public int getColonyImageHeight(int index) {
-        return colonies.get(index).getIconHeight();
-    }
-
-    /**
-     * Returns the width of the IndianSettlement-image at the given index.
-     * 
-     * @param index The index of the IndianSettlement-image.
-     * @return The width of the IndianSettlement-image at the given index.
-     */
-    public int getIndianSettlementImageWidth(int index) {
-        return indians.get(index).getIconWidth();
-    }
-
-    /**
-     * Returns the height of the IndianSettlement-image at the given index.
-     * 
-     * @param index The index of the IndianSettlement-image.
-     * @return The height of the IndianSettlement-image at the given index.
-     */
-    public int getIndianSettlementImageHeight(int index) {
-        return indians.get(index).getIconHeight();
-    }
-
-    /**
      * Returns the graphics that will represent the given settlement.
      * 
      * @param settlement The settlement whose graphics type is needed.
      * @return The graphics that will represent the given settlement.
      */
-    public int getSettlementGraphicsType(Settlement settlement) {
+    public Image getSettlementImage(Settlement settlement) {
 
         if (settlement instanceof Colony) {
             Colony colony = (Colony) settlement;
@@ -1404,36 +1346,36 @@ public final class ImageLibrary extends ImageProvider {
 
             // TODO: Put it in specification
             if (colony.isUndead()) {
-                return COLONY_UNDEAD;
+                return settlements.get(SettlementType.UNDEAD);
             } else if (stockade == null) {
                 if (colony.getUnitCount() <= 3) {
-                    return COLONY_SMALL;
+                    return settlements.get(SettlementType.SMALL);
                 } else if (colony.getUnitCount() <= 7) {
-                    return COLONY_MEDIUM;
+                    return settlements.get(SettlementType.MEDIUM);
                 } else {
-                    return COLONY_LARGE;
+                    return settlements.get(SettlementType.LARGE);
                 }
             } else if (!colony.hasAbility("model.ability.bombardShips")) {
                 if (colony.getUnitCount() > 7) {
-                    return COLONY_LARGE_STOCKADE;
+                    return settlements.get(SettlementType.LARGE_STOCKADE);
                 } else if (colony.getUnitCount() > 3) {
-                    return COLONY_MEDIUM_STOCKADE;
+                    return settlements.get(SettlementType.MEDIUM_STOCKADE);
                 } else {
-                    return COLONY_STOCKADE;
+                    return settlements.get(SettlementType.STOCKADE);
                 }
             } else if (stockade != null &&
                        stockade.getType().getUpgradesTo() != null) {
                 if (colony.getUnitCount() > 7) {
-                    return COLONY_LARGE_FORT;
+                    return settlements.get(SettlementType.LARGE_FORT);
                 } else {
-                    return COLONY_FORT;
+                    return settlements.get(SettlementType.FORT);
                 }
             } else {
-                return COLONY_FORTRESS;
+                return settlements.get(SettlementType.FORTRESS);
             }
 
         } else { // IndianSettlement
-            return INDIAN_SETTLEMENT_CAMP;
+            return settlements.get(SettlementType.INDIAN_CAMP);
 
             /*
              * TODO: Use when we have graphics: IndianSettlement
