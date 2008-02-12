@@ -47,4 +47,26 @@ public class Utils {
     public static String getUserDirectory() {
     	return System.getProperty("user.home");
     }
+
+    /**
+     * Return the minimum of 2 values
+     * 
+     * @param value1
+     * @param value2
+     * @return
+     */
+    public static int min( int value1, int value2 ) {
+    	return value1 < value2 ? value1 : value2;
+    }
+    
+    /**
+     * Return the maximum of 2 values
+     * 
+     * @param value1
+     * @param value2
+     * @return
+     */
+    public static int max( int value1, int value2 ) {
+    	return value1 > value2 ? value1 : value2;
+    }
 }
