@@ -48,7 +48,7 @@ public class TerrainGenerator {
 
     private TileType ocean = FreeCol.getSpecification().getTileType("model.tile.ocean");
 
-    public ArrayList<ArrayList<TileType>> latTileTypes = new ArrayList<ArrayList<TileType>>();
+    private ArrayList<TileType> terrainTileTypes = null;
 
     /**
      * Creates a new <code>TerrainGenerator</code>.
@@ -137,15 +137,9 @@ public class TerrainGenerator {
 
     private Tile createTile(Game game, int x, int y, boolean[][] landMap, int latitude) {
         
-        final int height = landMap[0].length;
-        int forestChance = getMapGeneratorOptions().getPercentageOfForests();
-        if (y==0 || y==height-1 || y==1 || y==height-2) {
-            // please no forests at the pole
-            forestChance = 0;
-        }
         Tile t;
         if (landMap[x][y]) {
-            t = new Tile(game, getRandomLandTileType(latitude, forestChance), x, y);
+            t = new Tile(game, getRandomLandTileType(latitude), x, y);
         } else {
             t = new Tile(game, ocean, x, y);
         }
@@ -200,148 +194,129 @@ public class TerrainGenerator {
      *        0% is on the top/bottom of the map (poles).
      * @param forestChance The percentage chance of forests in this area
      */
-    private TileType getRandomLandTileType(int latitudePercent, int forestChance) {
+    private TileType getRandomLandTileType(int latitudePercent) {
         // decode options
+        final int forestChance = getMapGeneratorOptions().getPercentageOfForests();
         final int humidityPreference = getMapGeneratorOptions().getHumidity();
         final int temperaturePreference = getMapGeneratorOptions().getTemperature();
-
-        // latRanges correspond to 0,1,2,3 from TileType.latitude (100-0)
-        int equatorialZoneLimit=0, tropicalZoneLimit=0, temperateZoneLimit=0, borealZoneLimit=0;
-        if (temperaturePreference==MapGeneratorOptions.TEMPERATURE_COLD) {
-            equatorialZoneLimit = 90;
-            tropicalZoneLimit = 75;
-            temperateZoneLimit = 50;
-            borealZoneLimit = 0;
-        } else if (temperaturePreference==MapGeneratorOptions.TEMPERATURE_CHILLY) {
-            equatorialZoneLimit = 85;
-            tropicalZoneLimit = 70;
-            temperateZoneLimit = 35;
-            borealZoneLimit = 0;
-        } else if (temperaturePreference==MapGeneratorOptions.TEMPERATURE_TEMPERATE) {
-            equatorialZoneLimit = 75;
-            tropicalZoneLimit = 50;
-            temperateZoneLimit = 25;
-            borealZoneLimit = 0;
-        } else if (temperaturePreference==MapGeneratorOptions.TEMPERATURE_WARM) {
-            equatorialZoneLimit = 70;
-            tropicalZoneLimit = 45;
-            temperateZoneLimit = 15;
-            borealZoneLimit = 0;
-        } else if (temperaturePreference==MapGeneratorOptions.TEMPERATURE_HOT) {
-            equatorialZoneLimit = 65;
-            tropicalZoneLimit = 35;
-            temperateZoneLimit = 10;
-            borealZoneLimit = 0;
-        }
-        int[] latRanges = { equatorialZoneLimit, tropicalZoneLimit, temperateZoneLimit, borealZoneLimit };
-        // altRanges correspond to 1,2,3 from TileType.altitude (1-10)
-        int[] altRanges = { 6, 8, 10};
-        // Create the lists of TileType the first time you use it
-        while (latTileTypes.size() < latRanges.length) {
-            latTileTypes.add(new ArrayList<TileType>());
-        }
-        // convert the latitude percentage into a classification index
-        // latitudeIndex = 0 is for the equator
-        // latitudeIndex = 3 is for the poles
-        int latitudeIndex = latRanges.length - 1;
-        for (int i = 0; i < latRanges.length; i++) {
-            if (latRanges[i] < latitudePercent) {
-                latitudeIndex = i;
-                break;
-            }
-        }
-        // Fill the list of latitude TileTypes the first time you use it
-        if (latTileTypes.get(latitudeIndex).size() == 0) {
+        
+        // create the main list of TileTypes the first time, and reuse it afterwards
+        if (terrainTileTypes==null) {
+            terrainTileTypes = new ArrayList<TileType>();
             for (TileType tileType : FreeCol.getSpecification().getTileTypeList()) {
                 if (tileType.getId().equals("model.tile.hills") ||
-                    tileType.getId().equals("model.tile.mountains")) {
+                    tileType.getId().equals("model.tile.mountains") ||
+                    tileType.isWater()) {
                     // do not generate hills or mountains at this time
-                    // they will be created explicitly later
+                    // they are created separately
                     continue;
                 }
-                if (!tileType.isWater() && tileType.withinRange(TileType.RangeType.LATITUDE, latitudeIndex)) {
-                    // Within range, add it
-                    latTileTypes.get(latitudeIndex).add(tileType);
-                }
-            }
-            if (latTileTypes.get(latitudeIndex).size() == 0) {
-                // If it is still 0 after adding all relevant types, throw error
-                throw new RuntimeException("No TileType within latitude == " + latitudeIndex);
+                terrainTileTypes.add(tileType);
             }
         }
+
+        // temperature calculation
+        int poleTemperature = -20;
+        int equatorTemperature= 40;
+        if (temperaturePreference==MapGeneratorOptions.TEMPERATURE_COLD) {
+            poleTemperature = -20;
+            equatorTemperature = 25;
+        } else if (temperaturePreference==MapGeneratorOptions.TEMPERATURE_CHILLY) {
+            poleTemperature = -20;
+            equatorTemperature = 30;
+        } else if (temperaturePreference==MapGeneratorOptions.TEMPERATURE_TEMPERATE) {
+            poleTemperature = -10;
+            equatorTemperature = 35;
+        } else if (temperaturePreference==MapGeneratorOptions.TEMPERATURE_WARM) {
+            poleTemperature = -5;
+            equatorTemperature = 40;
+        } else if (temperaturePreference==MapGeneratorOptions.TEMPERATURE_HOT) {
+            poleTemperature = 0;
+            equatorTemperature = 40;
+        }
+        int temperatureRange = equatorTemperature-poleTemperature;
+        int localeTemperature = poleTemperature + latitudePercent*temperatureRange/100;
+        int temperatureDeviation = 7; // +/- 7 degrees randomization
+        localeTemperature += random.nextInt(temperatureDeviation*2)-temperatureDeviation;
+        if (localeTemperature>40)
+            localeTemperature = 40;
+        if (localeTemperature<-20)
+            localeTemperature = -20;
         
-        // Scope the type of tiles to be used and choose one
-        TileType chosen = null;
-        //List<TileType> acceptable = latTileTypes.get(latitudeIndex).clone();
-        List<TileType> acceptable = new ArrayList<TileType>();
-        acceptable.addAll(latTileTypes.get(latitudeIndex));
-        // Choose based on altitude
-        int altitude = random.nextInt(10);
-        for (int i = 0; i < 3; i++) {
-            if (altRanges[i] > altitude) {
-                altitude = i;
-                break;
-            }
+        // humidity calculation
+        int averageHumidity = 50;
+        if (humidityPreference==MapGeneratorOptions.HUMIDITY_VERY_DRY) {
+            averageHumidity = 25;
+        } else if (humidityPreference==MapGeneratorOptions.HUMIDITY_DRY) {
+            averageHumidity = 35;
+        } else if (humidityPreference==MapGeneratorOptions.HUMIDITY_NORMAL) {
+            averageHumidity = 40;
+        } else if (humidityPreference==MapGeneratorOptions.HUMIDITY_WET) {
+            averageHumidity = 55;
+        } else if (humidityPreference==MapGeneratorOptions.HUMIDITY_VERY_WET) {
+            averageHumidity = 60;
         }
-        Iterator<TileType> it = acceptable.iterator();
+        int localeHumidity = averageHumidity;
+        int humidityDeviation = 20; // +/- 20% randomization
+        localeHumidity += random.nextInt(humidityDeviation*2) - humidityDeviation;
+        if (localeHumidity<0) 
+            localeHumidity = 0;
+        if (localeHumidity>100)
+            localeHumidity = 100;
+        
+        // initialize list of candidates with all terrain TileTypes
+        ArrayList<TileType> candidateTileTypes = new ArrayList<TileType>();
+        candidateTileTypes.addAll(terrainTileTypes);
+        
+        // remove those that do not match the current temperature
+        Iterator<TileType> it = candidateTileTypes.iterator();
         while (it.hasNext()) {
             TileType t = it.next();
-            if (t.withinRange(TileType.RangeType.ALTITUDE, altitude)) {
-                if (acceptable.size() == 1) {
-                    chosen = t;
-                    break;
-                }
+            if (!t.withinRange(TileType.RangeType.TEMPERATURE, localeTemperature)) {
                 it.remove();
             }
         }
+        if (candidateTileTypes.size() == 1) {
+            return candidateTileTypes.get(0);
+        } else if (candidateTileTypes.size()==0) {
+            throw new RuntimeException("No TileType for temperature==" + localeTemperature );
+        }
+        
+        // remove those that do not match the current humidity
+        it = candidateTileTypes.iterator();
+        while (it.hasNext()) {
+            TileType t = it.next();
+            if (!t.withinRange(TileType.RangeType.HUMIDITY, localeHumidity)) {
+                it.remove();
+            }
+        }
+        if (candidateTileTypes.size() == 1) {
+            return candidateTileTypes.get(0);
+        } else if (candidateTileTypes.size()==0) {
+            throw new RuntimeException("No TileType for temperature==" + localeTemperature 
+                    +" and humidity==" + localeHumidity);
+        }
+ 
         // Choose based on forested/unforested
-        if (chosen == null) {
-            boolean forested = random.nextInt(100) < forestChance;
-            it = acceptable.iterator();
-            while (it.hasNext()) {
-                TileType t = it.next();
-                if (t.isForested() != forested) {
-                    if (acceptable.size() == 1) {
-                        chosen = t;
-                        break;
-                    }
-                    it.remove();
-                }
+        boolean forested = random.nextInt(100) < forestChance;
+        it = candidateTileTypes.iterator();
+        while (it.hasNext()) {
+            TileType t = it.next();
+            if (t.isForested() != forested) {
+                it.remove();
             }
         }
-        // Choose based on humidity - later use MapGeneratorOptions to help define these
-        if (chosen == null) {
-            int humidity = random.nextInt(7) - 3;   // To get -3 to 3, 0 inclusive
-            it = acceptable.iterator();
-            while (it.hasNext()) {
-                TileType t = it.next();
-                if (!t.withinRange(TileType.RangeType.HUMIDITY, humidity)) {
-                    if (acceptable.size() == 1) {
-                        chosen = t;
-                        break;
-                    }
-                    it.remove();
-                }
-            }
+        if (candidateTileTypes.size() == 1) {
+            return candidateTileTypes.get(0);
+        } else if (candidateTileTypes.size()==0) {
+            throw new RuntimeException("No TileType for temperature==" + localeTemperature 
+                    +" and humidity==" + localeHumidity + " and forested=="+forested);
         }
-        // Choose based on temperature - later use MapGeneratorOptions to help define these
-        if (chosen == null) {
-            int temperature = random.nextInt(7) - 3;   // To get -3 to 3, 0 inclusive
-            it = acceptable.iterator();
-            while (it.hasNext()) {
-                TileType t = it.next();
-                if (!t.withinRange(TileType.RangeType.TEMPERATURE, temperature)) {
-                    if (acceptable.size() == 1) {
-                        chosen = t;
-                        break;
-                    }
-                    it.remove();
-                }
-            }
-        }
+        
         // All scoped, if none have been selected by elimination, randomly choose one
+        TileType chosen = null;
         if (chosen == null) {
-            chosen = acceptable.get(random.nextInt(acceptable.size()));
+            chosen = candidateTileTypes.get(random.nextInt(candidateTileTypes.size()));
         }
         return chosen;
     }

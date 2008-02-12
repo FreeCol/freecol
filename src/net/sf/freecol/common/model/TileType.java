@@ -51,12 +51,11 @@ public final class TileType extends FreeColGameObjectType implements Features {
     private int attackBonus;
     private int defenceBonus;
     
-    public static enum RangeType { HUMIDITY, TEMPERATURE, ALTITUDE, LATITUDE }
+    public static enum RangeType { HUMIDITY, TEMPERATURE, ALTITUDE }
     
     private int[] humidity = new int[2];
     private int[] temperature = new int[2];
     private int[] altitude = new int[2];
-    private int[] latitude = new int[2];
 
     private List<ResourceType> resourceType;
     private List<Integer> resourceProbability;
@@ -194,8 +193,6 @@ public final class TileType extends FreeColGameObjectType implements Features {
             return (temperature[0] <= value && value <= temperature[1]);
         case ALTITUDE:
             return (altitude[0] <= value && value <= altitude[1]);
-        case LATITUDE:
-            return (latitude[0] <= value && (latitude[1] == -1 || value <= latitude[1]));
         default:
             return false;
         }
@@ -272,14 +269,12 @@ public final class TileType extends FreeColGameObjectType implements Features {
                 minimapColor = new Color(Integer.decode(in.getAttributeValue(null, "minimap-color")));
                 in.nextTag(); // close this element
             } else if ("gen".equals(childName)) {
-                humidity[0] = getAttribute(in, "humidityMin", -3);
-                humidity[1] = getAttribute(in, "humidityMax", 3);
-                temperature[0] = getAttribute(in, "temperatureMin", -3);
-                temperature[1] = getAttribute(in, "temperatureMax", 3);
+                humidity[0] = getAttribute(in, "humidityMin", 0);
+                humidity[1] = getAttribute(in, "humidityMax", 100);
+                temperature[0] = getAttribute(in, "temperatureMin", -20);
+                temperature[1] = getAttribute(in, "temperatureMax", 40);
                 altitude[0] = getAttribute(in, "altitudeMin", 0);
                 altitude[1] = getAttribute(in, "altitudeMax", 0);
-                latitude[0] = getAttribute(in, "latitudeMin", -1);
-                latitude[1] = getAttribute(in, "latitudeMax", -1);
                 in.nextTag(); // close this element
             } else if ("modifier".equals(childName)) {
                 Modifier modifier = new Modifier(in);
