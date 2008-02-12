@@ -35,6 +35,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.logging.Logger;
@@ -68,8 +69,6 @@ public final class ImageLibrary extends ImageProvider {
     public static final int UNIT_SELECT = 0, PLOWED = 4, TILE_TAKEN = 5, TILE_OWNED_BY_INDIANS = 6,
             LOST_CITY_RUMOUR = 7, DARKNESS = 8, MISC_COUNT = 10;
 
-    private static final int numberOfUnitTypes = FreeCol.getSpecification().numberOfUnitTypes();
-
     public static final int MONARCH_COUNT = 4;
 
     public static final int UNIT_BUTTON_WAIT = 0, UNIT_BUTTON_DONE = 1, UNIT_BUTTON_FORTIFY = 2,
@@ -98,7 +97,7 @@ public final class ImageLibrary extends ImageProvider {
     /**
      * A ArrayList of Image objects.
      */
-    private ArrayList<ImageIcon> rivers, misc, monarch;
+    private List<ImageIcon> rivers, misc, monarch;
 
     private EnumMap<SettlementType, Image> settlements;
 
@@ -110,7 +109,7 @@ public final class ImageLibrary extends ImageProvider {
     private Map<String, ArrayList<ImageIcon>> border1, border2, coast1, coast2;
 
     // Holds the unit-order buttons
-    private ArrayList<ArrayList<ImageIcon>> unitButtons; 
+    private List<ArrayList<ImageIcon>> unitButtons; 
 
     private EnumMap<Tension.Level, Image> alarmChips;
 
@@ -152,7 +151,7 @@ public final class ImageLibrary extends ImageProvider {
         this.scalingFactor = 1;
         // TODO: normally this check shouldn't be here. init(false) is the way
         // to go.
-        if (freeColHome.equals("")) {
+        if ("".equals(freeColHome)) {
             dataDirectory = "data/";
             init(true);
         } else {
@@ -170,8 +169,8 @@ public final class ImageLibrary extends ImageProvider {
     private ImageLibrary(float scalingFactor,
             EnumMap<Role, Map<UnitType, ImageIcon>> units,
             EnumMap<Role, Map<UnitType, ImageIcon>> unitsGrayscale,
-            ArrayList<ImageIcon> rivers,
-            ArrayList<ImageIcon> misc,
+            List<ImageIcon> rivers,
+            List<ImageIcon> misc,
             EnumMap<SettlementType, Image> settlements,
             Map<String, ImageIcon>  terrain1,
             Map<String, ImageIcon>  terrain2,
@@ -184,7 +183,7 @@ public final class ImageLibrary extends ImageProvider {
             Map<String, ArrayList<ImageIcon>> border2,
             Map<String, ArrayList<ImageIcon>> coast1,
             Map<String, ArrayList<ImageIcon>> coast2,
-            ArrayList<ArrayList<ImageIcon>> unitButtons,
+            List<ArrayList<ImageIcon>> unitButtons,
             EnumMap<Tension.Level, Image> alarmChips,
             Map<Color, Image> colorChips,
             Map<Color, Image> missionChips,
@@ -343,7 +342,7 @@ public final class ImageLibrary extends ImageProvider {
         return output;
     }
 
-    private ArrayList<ImageIcon> scaleImages(ArrayList<ImageIcon> input, float scale) {
+    private ArrayList<ImageIcon> scaleImages(List<ImageIcon> input, float scale) {
         ArrayList<ImageIcon> output = new ArrayList<ImageIcon>();
         for (ImageIcon icon : input) {
             if (icon == null) {
