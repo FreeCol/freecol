@@ -54,7 +54,7 @@ import org.w3c.dom.Element;
 /**
  * Mission for controlling a pioneer.
  * 
- * @see Unit#isPioneer
+ * @see Unit#Role#PIONNER
  */
 public class PioneeringMission extends Mission {
     /* 

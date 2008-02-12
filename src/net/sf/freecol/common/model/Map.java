@@ -211,9 +211,9 @@ public class Map extends FreeColGameObject {
      * @param end
      *            The end of the path.
      * @param type
-     *            One of: {@link #BOTH_LAND_AND_SEA},
-     *            {@link #BOTH_LAND_AND_SEA}, {@link #ONLY_LAND} and
-     *            {@link #ONLY_SEA}.
+     *            One of: {@link PathType#BOTH_LAND_AND_SEA},
+     *            {@link PathType#BOTH_LAND_AND_SEA}, {@link PathType#ONLY_LAND} and
+     *            {@link PathType#ONLY_SEA}.
      * @return A <code>PathNode</code> for the first tile in the path. Calling
      *         {@link PathNode#getTile} on this object, will return the
      *         <code>Tile</code> right after the specified starting tile, and
@@ -237,7 +237,7 @@ public class Map extends FreeColGameObject {
      * 
      * @param unit
      *            The <code>Unit</code> that should be used to determine
-     *            wether or not a path is legal.
+     *            whether or not a path is legal.
      * @param start
      *            The <code>Tile</code> in which the path starts from.
      * @param end
@@ -248,7 +248,7 @@ public class Map extends FreeColGameObject {
      *         {@link PathNode#getDirection} will return the direction you need
      *         to take in order to reach that tile. This method returns
      *         <code>null</code> if no path is found.
-     * @see #findPath(Tile, Tile, int)
+     * @see #findPath(Tile, Tile, PathType)
      * @see Unit#findPath(Tile)
      * @exception IllegalArgumentException
      *                if either <code>unit</code>, <code>start</code> or
@@ -268,7 +268,7 @@ public class Map extends FreeColGameObject {
      * 
      * @param unit
      *            The <code>Unit</code> that should be used to determine
-     *            wether or not a path is legal.
+     *            whether or not a path is legal.
      * @param start
      *            The <code>Tile</code> in which the path starts from.
      * @param end
@@ -283,7 +283,7 @@ public class Map extends FreeColGameObject {
      *         {@link PathNode#getDirection} will return the direction you need
      *         to take in order to reach that tile. This method returns
      *         <code>null</code> if no path is found.
-     * @see #findPath(Tile, Tile, int)
+     * @see #findPath(Tile, Tile, PathType)
      * @see Unit#findPath(Tile)
      * @exception IllegalArgumentException
      *                if either <code>unit</code>, <code>start</code> or
@@ -303,7 +303,7 @@ public class Map extends FreeColGameObject {
      * 
      * @param unit
      *            The <code>Unit</code> that should be used to determine
-     *            wether or not a path is legal. The <code>options</code> are
+     *            whether or not a path is legal. The <code>options</code> are
      *            used instead if <code>unit == null</code>.
      * @param start
      *            The <code>Tile</code> in which the path starts from.
@@ -337,16 +337,16 @@ public class Map extends FreeColGameObject {
      * 
      * @param unit
      *            The <code>Unit</code> that should be used to determine
-     *            wether or not a path is legal. The <code>options</code> are
+     *            whether or not a path is legal. The <code>options</code> are
      *            used instead if <code>unit == null</code>.
      * @param start
      *            The <code>Tile</code> in which the path starts from.
      * @param end
      *            The end of the path.
      * @param type
-     *            One of: {@link #BOTH_LAND_AND_SEA},
-     *            {@link #BOTH_LAND_AND_SEA}, {@link #ONLY_LAND} and
-     *            {@link #ONLY_SEA}. This argument if ignored if
+     *            One of: {@link PathType#BOTH_LAND_AND_SEA},
+     *            {@link PathType#BOTH_LAND_AND_SEA}, {@link PathType#ONLY_LAND} and
+     *            {@link PathType#ONLY_SEA}. This argument if ignored if
      *            <code>unit != null</code>.
      * @param carrier
      *            A carrier that currently holds the <code>unit</code>, or
@@ -367,14 +367,14 @@ public class Map extends FreeColGameObject {
     private PathNode findPath(Unit unit, Tile start, final Tile end, PathType type,
             Unit carrier) {
         /*
-         * Using A* with the Manhatten distace as the heuristics.
+         * Using A* with the Manhatten distance as the heuristics.
          * 
-         * The datastructure for the open list is a combined structure: using a
+         * The data structure for the open list is a combined structure: using a
          * HashMap for membership tests and a PriorityQueue for getting the node
          * with the minimal f (cost+heuristics). This gives O(1) on membership
          * test and O(log N) for remove-best and insertions.
          * 
-         * The datastructure for the closed list is simply a HashMap.
+         * The data structure for the closed list is simply a HashMap.
          */
 
         if (start == null) {

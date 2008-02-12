@@ -92,7 +92,7 @@ public abstract class Mission extends AIObject {
     * @return The direction to take the final move (greater than or equal to zero),
     *         or {@link #NO_MORE_MOVES_LEFT} if there are no more moves left and
     *         {@link #NO_PATH_TO_TARGET} if there is no path to follow.
-    *         If a direction is returned, it is guarantied that moving in that direction
+    *         If a direction is returned, it is guaranteed that moving in that direction
     *         is not an {@link Unit#ILLEGAL_MOVE}, but a direction also gets returned
     *         if the resulting move would be an {@link Unit#ATTACK} etc. A direction
     *         can also be returned during the path, if the path has been blocked.
@@ -118,7 +118,7 @@ public abstract class Mission extends AIObject {
     * @param pathNode The first node of the path.
     * @return The direction to continue moving the path (greater than or equal to zero),
     *         or {@link #NO_MORE_MOVES_LEFT} if there are no more moves left.
-    *         If a direction is returned, it is guarantied that moving in that direction
+    *         If a direction is returned, it is guaranteed that moving in that direction
     *         is not an {@link Unit#ILLEGAL_MOVE}. A directions gets returned when
     *         moving in the given direction would not be a {@link Unit#MOVE} or
     *         {@link Unit#MOVE_HIGH_SEAS}.

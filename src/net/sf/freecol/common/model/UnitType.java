@@ -445,9 +445,9 @@ public final class UnitType extends BuildableType {
 
     /**
      * Returns true if the UnitType is available to the given
-     * PlayerType.
+     * Player.
      *
-     * @param playerType a <code>PlayerType</code> value
+     * @param player a <code>Player</code> value
      * @return a <code>boolean</code> value
      */
     public boolean isAvailableTo(Player player) {

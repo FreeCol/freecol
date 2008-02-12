@@ -50,7 +50,7 @@ import org.w3c.dom.Element;
 /**
  * Mission for controlling a scout.
  * 
- * @see Unit#isScout
+ * @see Unit#Role#SCOUT
  */
 public class ScoutingMission extends Mission {
 

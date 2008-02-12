@@ -39,7 +39,7 @@ public interface CombatModel {
     /**
      * Generates a result of an attack.
      * 
-     * @param unit The <code>Unit</code> attacking.
+     * @param attacker The <code>Unit</code> attacking.
      * @param defender The defending unit.
      * @return a <code>CombatResult</code> value
      */

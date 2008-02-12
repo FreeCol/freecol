@@ -146,9 +146,8 @@ public class ClientModelController implements ModelController {
      *            <br>
      *            As long as the "taskDescription" is unique within the method
      *            ("methodName"), you get a unique identifier.
-     * @param location The <code>Location</code> where the <code>Building</code>
+     * @param colony The <code>Colony</code> where the <code>Building</code>
      *            will be created.
-     * @param owner The <code>Player</code> owning the <code>Building</code>.
      * @param type The type of building (Building.FREE_COLONIST...).
      * @return The created <code>Building</code>.
      */

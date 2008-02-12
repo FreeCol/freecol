@@ -71,7 +71,7 @@ public class Unit extends FreeColGameObject implements Features, Locatable, Loca
     /**
      * A move type.
      * 
-     * @see #getMoveType(Direction direction)
+     * @see Unit#getMoveType(Map#Direction)
      */
     public static enum MoveType { MOVE, MOVE_HIGH_SEAS, ATTACK, EMBARK, DISEMBARK,
             ENTER_INDIAN_VILLAGE_WITH_FREE_COLONIST, ENTER_INDIAN_VILLAGE_WITH_SCOUT,
@@ -167,7 +167,7 @@ public class Unit extends FreeColGameObject implements Features, Locatable, Loca
 
     /**
      * Initiate a new <code>Unit</code> of a specified type with the state set
-     * to {@link #ACTIVE} if a carrier and {@link #UnitState.SENTRY} otherwise. The
+     * to {@link #UnitState#ACTIVE} if a carrier and {@link #UnitState#SENTRY} otherwise. The
      * {@link Location} is set to <i>null</i>.
      * 
      * @param game The <code>Game</code> in which this <code>Unit</code>
@@ -188,8 +188,8 @@ public class Unit extends FreeColGameObject implements Features, Locatable, Loca
      *            <code>Unit</code> upon.
      * @param owner The <code>Player</code> owning this unit.
      * @param type The type of the unit.
-     * @param state The initial state for this Unit (one of {@link #ACTIVE},
-     *            {@link #FORTIFIED}...).
+     * @param state The initial state for this Unit (one of {@link UnitState#ACTIVE},
+     *            {@link UnitState#FORTIFIED}...).
      */
     public Unit(Game game, Location location, Player owner, UnitType type, UnitState state) {
         this(game, location, owner, type, state, type.getDefaultEquipment());
@@ -206,11 +206,7 @@ public class Unit extends FreeColGameObject implements Features, Locatable, Loca
      * @param type The type of the unit.
      * @param state The initial state for this Unit (one of {@link #UnitState.ACTIVE},
      *            {@link #FORTIFIED}...).
-     * @param armed Determines wether the unit should be armed or not.
-     * @param mounted Determines wether the unit should be mounted or not.
-     * @param numberOfTools The number of tools the unit will be carrying.
-     * @param missionary Determines wether this unit should be dressed like a
-     *            missionary or not.
+     * @param initialEquipment The list of initial EquimentTypes
      */
     public Unit(Game game, Location location, Player owner, UnitType type, UnitState state, 
                 EquipmentType... initialEquipment) {
@@ -953,7 +949,6 @@ public class Unit extends FreeColGameObject implements Features, Locatable, Loca
 
     /**
      * Sets the TileImprovement that this pioneer is contributing to.
-     * @return The <code>TileImprovement</code>
      */
     public void setWorkImprovement(TileImprovement imp) {
         workImprovement = imp;
@@ -995,7 +990,7 @@ public class Unit extends FreeColGameObject implements Features, Locatable, Loca
      *         {@link PathNode#getDirection} will return the direction you need
      *         to take in order to reach that tile. This method returns
      *         <code>null</code> if no path is found.
-     * @see Map#findPath(Tile, Tile, int)
+     * @see Map#findPath(Tile, Tile, PathType)
      * @see Map#findPath(Unit, Tile , Tile)
      * @exception NullPointerException if <code>end == null</code>
      */
@@ -1435,7 +1430,7 @@ public class Unit extends FreeColGameObject implements Features, Locatable, Loca
      * Moves this unit in the specified direction.
      * 
      * @param direction The direction
-     * @see #getMoveType(int)
+     * @see #getMoveType(Direction)
      * @exception IllegalStateException If the move is illegal.
      */
     public void move(Direction direction) {
@@ -1465,7 +1460,7 @@ public class Unit extends FreeColGameObject implements Features, Locatable, Loca
     }
 
     /**
-     * Move to a given tile. Unlike {@link #move(int)} no validation is done, so
+     * Move to a given tile. Unlike {@link #move(Direction)} no validation is done, so
      * this method may be called from the opponentMove-handler.
      * 
      * @param newTile The new tile.
@@ -2353,7 +2348,7 @@ public class Unit extends FreeColGameObject implements Features, Locatable, Loca
      * 
      * @param hitpoints The hitpoints this unit has. This is currently only used
      *            for damaged ships, but might get an extended use later.
-     * @see #getInitialHitpoints
+     * @see UnitType#getHitPoints
      */
     public void setHitpoints(int hitpoints) {
         this.hitpoints = hitpoints;
@@ -2367,7 +2362,7 @@ public class Unit extends FreeColGameObject implements Features, Locatable, Loca
      * 
      * @return The hitpoints this unit has. This is currently only used for
      *         damaged ships, but might get an extended use later.
-     * @see #getInitialHitpoints
+     * @see UnitType#getHitPoints
      */
     public int getHitpoints() {
         return hitpoints;

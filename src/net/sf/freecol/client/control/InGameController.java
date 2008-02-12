@@ -2461,7 +2461,7 @@ public final class InGameController implements NetworkConstants {
 
     /**
      * Clears the orders of the given <code>Unit</code> The orders are cleared
-     * by making the unit {@link Unit#ACTIVE} and setting a null destination
+     * by making the unit {@link Unit#UnitState#ACTIVE} and setting a null destination
      * 
      * @param unit The <code>Unit</code>.
      */
@@ -2485,7 +2485,7 @@ public final class InGameController implements NetworkConstants {
 
     /**
      * Clears the orders of the given <code>Unit</code>. The orders are
-     * cleared by making the unit {@link Unit#ACTIVE}.
+     * cleared by making the unit {@link Unit#UnitState#ACTIVE}.
      * 
      * @param unit The <code>Unit</code>.
      */

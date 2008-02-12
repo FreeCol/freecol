@@ -189,10 +189,9 @@ public class TerrainGenerator {
     /**
      * Gets a random land tile type based on the given percentage.
      *
-     * @param latitude The location of the tile relative to the north/south poles and equator, 
+     * @param latitudePercent The location of the tile relative to the north/south poles and equator, 
      *        100% is the mid-section of the map (equator) 
      *        0% is on the top/bottom of the map (poles).
-     * @param forestChance The percentage chance of forests in this area
      */
     private TileType getRandomLandTileType(int latitudePercent) {
         // decode options

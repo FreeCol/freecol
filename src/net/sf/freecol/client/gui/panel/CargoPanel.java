@@ -61,7 +61,7 @@ public class CargoPanel extends FreeColPanel {
     /**
      * Creates this CargoPanel.
      * 
-     * @param colonyPanel The panel that holds this CargoPanel.
+     * @param parent The parent Canvas that holds this CargoPanel.
      */
     public CargoPanel(Canvas parent, boolean withTitle) {
         this.parent = parent;

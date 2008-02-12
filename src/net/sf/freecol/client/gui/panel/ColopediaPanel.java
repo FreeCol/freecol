@@ -165,7 +165,7 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
      * Prepares this panel to be displayed.
      * 
      * @param panelType - the panel type
-     * @param id the id of the item to be displayed
+     * @param type - the FreeColGameObjectType of the item to be displayed
      */
     public void initialize(PanelType panelType, FreeColGameObjectType type) {
         listPanel.removeAll();
@@ -360,8 +360,8 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
     /**
      * Builds the button for the given tile.
      * 
-     * @param tileIndex the tile index
-     * @param parent the parent node
+     * @param tileType - the TileType
+     * @param parent - the parent node
      */
     private void buildTerrainItem(TileType tileType, DefaultMutableTreeNode parent) {
         ImageIcon icon = new ImageIcon(library.getScaledTerrainImage(tileType, 0.25f));
@@ -373,8 +373,8 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
     /**
      * Builds the button for the given resource.
      * 
-     * @param resIndex the resource index
-     * @param parent the parent node
+     * @param resType - the ResourceType
+     * @param parent - the parent node
      */
     private void buildResourceItem(ResourceType resType, DefaultMutableTreeNode parent) {
         ImageIcon icon = library.getScaledBonusImageIcon(resType, 0.75f);
@@ -387,7 +387,7 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
     /**
      * Builds the button for the given unit.
      * 
-     * @param unit
+     * @param unitType
      * @param scale
      * @param parent
      */
@@ -401,7 +401,7 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
     /**
      * Builds the button for the given goods.
      * 
-     * @param goodsIndex The goods index
+     * @param goodsType The GoodsType
      * @param parent The parent tree node
      */
     private void buildGoodsItem(GoodsType goodsType, DefaultMutableTreeNode parent) {
@@ -492,7 +492,7 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
     /**
      * Builds the details panel for the given tile.
      * 
-     * @param tileIndex The tile index
+     * @param tileType The TileType
      */
     private void buildTerrainDetail(TileType tileType) {
         detailPanel.removeAll();
@@ -576,7 +576,7 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
     /**
      * Builds the details panel for the given resource.
      * 
-     * @param resIndex The resource index
+     * @param type The ResourceType
      */
     private void buildResourceDetail(ResourceType type) {
         detailPanel.removeAll();
@@ -637,7 +637,7 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
     /**
      * Builds the details panel for the given unit.
      * 
-     * @param unit
+     * @param type - the UnitType
      */
     private void buildUnitDetail(UnitType type) {
         detailPanel.removeAll();
@@ -746,7 +746,7 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
     /**
      * Builds the details panel for the given goods.
      * 
-     * @param goodsIndex The goods index
+     * @param type The GoodsType
      */
     private void buildGoodsDetail(GoodsType type) {
         detailPanel.removeAll();
@@ -823,7 +823,7 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
     /**
      * Builds the details panel for the given building.
      * 
-     * @param building The building index
+     * @param buildingType The BuildingType
      */
     private void buildBuildingDetail(BuildingType buildingType) {
         detailPanel.removeAll();
@@ -961,7 +961,7 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
     /**
      * Builds the details panel for the given founding father.
      * 
-     * @param foundingFather
+     * @param father - the FoundingFather
      */
     private void buildFatherDetail(FoundingFather father) {
         detailPanel.removeAll();

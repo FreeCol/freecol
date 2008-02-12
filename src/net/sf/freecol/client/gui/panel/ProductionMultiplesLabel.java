@@ -143,8 +143,6 @@ public final class ProductionMultiplesLabel extends JComponent {
      * @param amount
      * @param maximumProduction
      * @param parent
-     * 
-     * @date 20080211 17:32
      */
     public ProductionMultiplesLabel(GoodsType[] goodsType, int[] amount, int maximumProduction, Canvas parent) {
         super();
@@ -407,7 +405,7 @@ public final class ProductionMultiplesLabel extends JComponent {
     
     /**
      * Need to determine what the phatest icon is
-     * @return
+     * @return the width
      */
     public int getMaximumIconWidth() {
     	int width = 0;
@@ -422,7 +420,7 @@ public final class ProductionMultiplesLabel extends JComponent {
     /**
      * Need to determine the tallest icon
      * TODO: Why does this use the image instead of the Icon like width??
-     * @return
+     * @return the height
      */
     public int getMaximumIconHeight() {
     	int height = 0;

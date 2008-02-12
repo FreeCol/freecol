@@ -192,7 +192,7 @@ public class TileImprovement extends TileItem implements Locatable, Named {
 	 * <code>doWork</code> function without any input params assumes 1 turn of
 	 * work done.
 	 * 
-	 * @return {@link remaining turns to completion}
+	 * @return remaining turns to completion
 	 */
 	public int doWork(int turns) {
         turnsToComplete -= turns;

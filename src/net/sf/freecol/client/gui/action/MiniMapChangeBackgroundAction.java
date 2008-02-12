@@ -82,7 +82,7 @@ public class MiniMapChangeBackgroundAction extends MapboardAction {
     
     /**
      * Applies this action.
-     * @param e The <code>ActionEvent</code>.
+     * @param ae The <code>ActionEvent</code>.
      */    
     public void actionPerformed(ActionEvent ae) {
         MapControlsAction mca = (MapControlsAction) getFreeColClient().getActionManager().getFreeColAction(MapControlsAction.id);
@@ -107,7 +107,7 @@ public class MiniMapChangeBackgroundAction extends MapboardAction {
     /**
      * Ouch, bad news if in here we have to interpret a select boxes' indexes...
      * @param index
-     * @return
+     * @return the color
      */
     public static Color interpretIndex(int index) {
         Color toColor = Color.BLACK;

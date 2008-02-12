@@ -57,7 +57,7 @@ import net.sf.freecol.common.model.Map.Direction;
 * can't use the keyboard.
 *
 * The MapControls are useless by themselves, this object needs to
-* be placed on a JComponent in order to be useable.
+* be placed on a JComponent in order to be usable.
 */
 public final class MapControls {
     public static final int EUROPE = 2;
@@ -237,8 +237,6 @@ public final class MapControls {
     /**
      * 
      * @param newColor
-     * 
-     * @date 20080204 20:41 CD
      */
     public void changeBackgroundColor(Color newColor) {
     	miniMap.setBackgroundColor(newColor);

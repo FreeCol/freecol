@@ -219,19 +219,18 @@ public class ServerModelController implements ModelController {
 
     /**
      * Creates a new building. This method is the same as running
-     * {@link #createBuilding(String, Location, Player, BuildingType, boolean, Connection)}
+     * {@link #createBuilding(String, Colony, BuildingType, boolean, Connection)}
      * with <code>secure = true</code> and <code>connection = null</code>.
      * 
      * @param taskID The <code>taskID</code> should be a unique identifier.
      *            One method to make a unique <code>taskID</code>: <br>
      *            <br>
      *            getId() + "methodName:taskDescription" <br>
-     *            br> As long as the "taskDescription" is unique within the
+     *            <br> As long as the "taskDescription" is unique within the
      *            method ("methodName"), you get a unique identifier.
-     * @param location The <code>Location</code> where the <code>Building</code>
+     * @param colony The <code>Colony</code> where the <code>Building</code>
      *            will be created.
-     * @param owner The <code>Player</code> owning the <code>Building</code>.
-     * @param type The type of building (Building.FREE_COLONIST...).
+     * @param type The type of building.
      * @return A reference to the <code>Building</code> which has been created.
      */
     public synchronized Building createBuilding(String taskID, Colony colony, BuildingType type) {
@@ -245,12 +244,11 @@ public class ServerModelController implements ModelController {
      *            One method to make a unique <code>taskID</code>: <br>
      *            <br>
      *            getId() + "methodName:taskDescription" <br>
-     *            br> As long as the "taskDescription" is unique within the
+     *            <br> As long as the "taskDescription" is unique within the
      *            method ("methodName"), you get a unique identifier.
-     * @param location The <code>Location</code> where the <code>Building</code>
+     * @param colony The <code>Colony</code> where the <code>Building</code>
      *            will be created.
-     * @param owner The <code>Player</code> owning the <code>Building</code>.
-     * @param type The type of building (Building.FREE_COLONIST...).
+     * @param type The type of building.
      * @param secure This variable should be set to <code>false</code> in case
      *            this method is called when serving a client. Setting this
      *            variable to <code>false</code> signals that the request

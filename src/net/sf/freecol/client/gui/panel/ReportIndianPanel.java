@@ -71,7 +71,6 @@ public final class ReportIndianPanel extends ReportPanel implements ActionListen
      *
      * @param player a <code>Player</code> value
      * @param opponent a <code>Player</code> value
-     * @return a <code>JPanel</code> value
      */
     private void buildIndianAdvisorPanel(Player player, Player opponent) {
         if (opponent.isEuropean() || opponent.isREF()) {

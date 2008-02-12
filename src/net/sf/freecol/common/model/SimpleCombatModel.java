@@ -790,7 +790,7 @@ public class SimpleCombatModel implements CombatModel {
      * <code>Tile</code>. That is: they are sent to the closest location for
      * repair.
      * 
-     * @see Unit#damageShip
+     * @see #damageShip
      */
     private void damageAllShips(Colony colony) {
         for (Unit unit : colony.getTile().getUnitList()) {

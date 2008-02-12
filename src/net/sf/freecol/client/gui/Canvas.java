@@ -1415,8 +1415,8 @@ public final class Canvas extends JDesktopPane {
     /**
      * Shows a panel displaying Colopedia Information.
      * 
-     * @param type The type of colopedia panel to display.
-     * @param action The details to display.
+     * @param panelType The type of colopedia panel to display.
+     * @param objectType The details to display.
      */
     public void showColopediaPanel(ColopediaPanel.PanelType panelType,
                                    FreeColGameObjectType objectType) {

@@ -1117,7 +1117,7 @@ public class Player extends FreeColGameObject implements Features, Nameable {
     /**
      * Sets the player type.
      * 
-     * @param state The new player type.
+     * @param type The new player type.
      * @see #getPlayerType
      */
     public void setPlayerType(PlayerType type) {
@@ -1605,8 +1605,7 @@ public class Player extends FreeColGameObject implements Features, Nameable {
     /**
      * Sets the number of crosses this player possess.
      * 
-     * @param crosses The number.
-     * @see #incrementCrosses
+     * @see #incrementCrosses(int)
      */
     public void reduceCrosses() {
         if (!canRecruitUnits()) {
@@ -2032,9 +2031,9 @@ public class Player extends FreeColGameObject implements Features, Nameable {
     }
 
     /**
-     * Adds a founding father to this players continental congress.
+     * Adds a founding father to this player's continental congress.
      * 
-     * @param newFather a <code>FoundingFather</code> value
+     * @param father a <code>FoundingFather</code> value
      * @see FoundingFather
      */
     public void addFather(FoundingFather father) {
@@ -2622,7 +2621,7 @@ public class Player extends FreeColGameObject implements Features, Nameable {
      * <code>resetArrears(goods.getType());</code>
      * 
      * @param goods The goods to reset the arrears for.
-     * @see #resetArrears(int)
+     * @see #resetArrears(GoodsType)
      */
     public void resetArrears(Goods goods) {
         resetArrears(goods.getType());
@@ -2641,7 +2640,7 @@ public class Player extends FreeColGameObject implements Features, Nameable {
     /**
      * Returns true if type of goods can be traded at specified place.
      * 
-     * @param goodsIndex The index of the goods.
+     * @param type The GoodsType.
      * @param marketAccess Way the goods are traded (Europe OR Custom)
      * @return <code>true</code> if type of goods can be traded.
      */
@@ -2748,7 +2747,7 @@ public class Player extends FreeColGameObject implements Features, Nameable {
     /**
      * Returns the current incomeBeforeTaxes.
      * 
-     * @param goodsIndex The index of the goods.
+     * @param goodsType The GoodsType.
      * @return The current incomeBeforeTaxes.
      */
     public int getIncomeBeforeTaxes(GoodsType goodsType) {
@@ -2763,7 +2762,7 @@ public class Player extends FreeColGameObject implements Features, Nameable {
     /**
      * Modifies the current incomeBeforeTaxes.
      * 
-     * @param goodsIndex The index of the goods.
+     * @param goodsType The GoodsType.
      * @param amount The new incomeBeforeTaxes.
      */
     public void modifyIncomeBeforeTaxes(GoodsType goodsType, int amount) {
@@ -2779,7 +2778,7 @@ public class Player extends FreeColGameObject implements Features, Nameable {
     /**
      * Returns the current incomeAfterTaxes.
      * 
-     * @param goodsIndex The index of the goods.
+     * @param goodsType The GoodsType.
      * @return The current incomeAfterTaxes.
      */
     public int getIncomeAfterTaxes(GoodsType goodsType) {
@@ -2794,7 +2793,7 @@ public class Player extends FreeColGameObject implements Features, Nameable {
     /**
      * Modifies the current incomeAfterTaxes.
      * 
-     * @param goodsIndex The index of the goods.
+     * @param goodsType The GoodsType.
      * @param amount The new incomeAfterTaxes.
      */
     public void modifyIncomeAfterTaxes(GoodsType goodsType, int amount) {

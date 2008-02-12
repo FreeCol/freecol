@@ -387,8 +387,7 @@ public final class Building extends FreeColGameObject implements Features, WorkL
     /**
      * Returns the unit type being an expert in this <code>Building</code>.
      * 
-     * @return The {@link Unit#getType unit type}.
-     * @see Unit#getExpertWorkType
+     * @return The UnitType.
      */
     public UnitType getExpertUnitType() {
         return FreeCol.getSpecification().getExpertForProducing(getGoodsOutputType());

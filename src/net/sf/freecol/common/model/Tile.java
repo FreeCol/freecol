@@ -303,7 +303,7 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
     /**
      * Returns a List of <code>TileImprovements</code>.
      *
-     * @returns a List of <code>TileImprovements</code>
+     * @return a List of <code>TileImprovements</code>
      */
     public List<TileImprovement> getTileImprovements() {
         return tileItemContainer.getImprovements();
@@ -312,7 +312,7 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
     /**
      * Returns a List of completed <code>TileImprovements</code>.
      *
-     * @returns a List of <code>TileImprovements</code>
+     * @return a List of <code>TileImprovements</code>
      */
     public List<TileImprovement> getCompletedTileImprovements() {
         List<TileImprovement> result = new ArrayList<TileImprovement>();
@@ -1388,7 +1388,7 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
      * 
      * @return The type of primary good best produced by this tile.
      * 
-     * @TODO: This might fail if the tile produces more other stuff than food.
+     * TODO: This might fail if the tile produces more other stuff than food.
      * 
      */
     public GoodsType primaryGoods() {
@@ -1861,7 +1861,7 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
      * Updates the information about this <code>Tile</code> for the given
      * <code>Player</code>.
      * 
-     * @param nation The {@link Player#getNation nation} identifying the
+     * @param nation The {@link Player#getNationID nation} identifying the
      *            <code>Player</code>.
      */
     public void updatePlayerExploredTile(int nation) {
