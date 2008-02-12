@@ -86,6 +86,7 @@ import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.TileType;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.UnitType;
+import net.sf.freecol.common.util.Utils;
 import cz.autel.dmi.HIGLayout;
 
 /**
@@ -720,27 +721,34 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener {
     public void updateProductionPanel() {
         productionPanel.removeAll();
 
-        final int foodProduction = colony.getFoodProduction();
-        final int foodConsumption = colony.getFoodConsumption();
-        final int horses = colony.getProductionOf(Goods.HORSES);
+        final int foodFarmsProduction = colony.getFoodProduction();
+        final int foodFishProduction = colony.getProductionOf(Goods.FISH);
+        final int humanFoodConsumption = colony.getFoodConsumption();
+        int horsesFoodConsumption = colony.getProductionOf(Goods.HORSES);
+        final int horseStock = colony.getGoodsCount(Goods.HORSES);
         final int bells = colony.getProductionOf(Goods.BELLS);
         final int crosses = colony.getProductionOf(Goods.CROSSES);
-
+        
+        int totalFoodProduction = foodFarmsProduction + foodFishProduction;
+        horsesFoodConsumption = (horseStock <= 0)? 0 : horsesFoodConsumption;
+        
         // The food that is used. If not enough food is produced, the
         // complete production.  Horses consume 1 food each, so they
         // need to be added to the used food.
             
-        int usedFood = (foodConsumption < foodProduction ? foodConsumption : foodProduction) + horses;
+        final int usedFood = Utils.min(humanFoodConsumption, totalFoodProduction) + horsesFoodConsumption;
         productionPanel.add(new ProductionLabel(Goods.FOOD, usedFood, parent));
-
-        int surplusFood = foodProduction - foodConsumption - horses;
+        
+        int surplusFood = totalFoodProduction - humanFoodConsumption - horsesFoodConsumption;
         ProductionLabel surplusLabel = new ProductionLabel(Goods.FOOD, surplusFood, parent);
         surplusLabel.setDrawPlus(true);
         productionPanel.add(surplusLabel);
 
-        ProductionLabel horseLabel = new ProductionLabel(Goods.HORSES, horses, parent);
-        horseLabel.setMaxGoodsIcons(1);
-        productionPanel.add(horseLabel);
+        if( horsesFoodConsumption != 0 ) {			// Skip the horses label if there is no stock
+            ProductionLabel horseLabel = new ProductionLabel(Goods.HORSES, horsesFoodConsumption, parent);
+            horseLabel.setMaxGoodsIcons(1);
+            productionPanel.add(horseLabel);
+        }
 
         productionPanel.add(new ProductionLabel(Goods.BELLS, bells, parent));
         productionPanel.add(new ProductionLabel(Goods.CROSSES, crosses, parent));
