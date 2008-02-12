@@ -90,8 +90,7 @@ public final class ImageLibrary extends ImageProvider {
             riverDirectory = new String("river/"), riverName = new String("river"),
             miscDirectory = new String("misc/"), miscName = new String("Misc"),
             unitButtonDirectory = new String("order-buttons/"), unitButtonName = new String("button"),
-            colonyDirectory = new String("colonies/"), colonyName = new String("Colony"),
-    //indianDirectory = new String("indians/"), indianName = new String("Indians"),
+            settlementDirectory = new String("settlements/"),
             monarchDirectory = new String("monarch/"), monarchName = new String("Monarch");
 
     private final String dataDirectory;
@@ -99,14 +98,11 @@ public final class ImageLibrary extends ImageProvider {
     /**
      * A ArrayList of Image objects.
      */
-    private ArrayList<ImageIcon> rivers, // Holds ImageIcon objects
-        misc, // Holds ImageIcon objects
-        monarch; // Holds ImageIcon objects
+    private ArrayList<ImageIcon> rivers, misc, monarch;
 
     private EnumMap<SettlementType, Image> settlements;
 
-    private ImageIcon[] units, // Holds ImageIcon objects
-        unitsGrayscale; // Holds ImageIcon objects of units in grayscale
+    private ImageIcon[] units, unitsGrayscale;
 
     private Map<String, ImageIcon> terrain1, terrain2, overlay1, overlay2,
             forests, bonus, goods;
@@ -721,7 +717,7 @@ public final class ImageLibrary extends ImageProvider {
         settlements = new EnumMap<SettlementType, Image>(SettlementType.class);
 
         for (SettlementType settlementType : SettlementType.values()) {
-            String filePath = dataDirectory + path + colonyDirectory + 
+            String filePath = dataDirectory + path + settlementDirectory + 
                 settlementType.toString().toLowerCase() + extension;
             settlements.put(settlementType, findImage(filePath, resourceLocator, doLookup).getImage());
         }
