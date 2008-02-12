@@ -102,7 +102,7 @@ public final class ImageLibrary extends ImageProvider {
 
     private EnumMap<SettlementType, Image> settlements;
 
-    private ImageIcon[] units, unitsGrayscale;
+    private EnumMap<Role, Map<UnitType, ImageIcon>> units, unitsGrayscale;
 
     private Map<String, ImageIcon> terrain1, terrain2, overlay1, overlay2,
             forests, bonus, goods;
@@ -168,8 +168,8 @@ public final class ImageLibrary extends ImageProvider {
      * @see #getScaledImageLibrary
      */
     private ImageLibrary(float scalingFactor,
-            ImageIcon[] units,
-            ImageIcon[] unitsGrayscale,
+            EnumMap<Role, Map<UnitType, ImageIcon>> units,
+            EnumMap<Role, Map<UnitType, ImageIcon>> unitsGrayscale,
             ArrayList<ImageIcon> rivers,
             ArrayList<ImageIcon> misc,
             EnumMap<SettlementType, Image> settlements,
@@ -281,20 +281,20 @@ public final class ImageLibrary extends ImageProvider {
      *      the size of the original images and 0.5 is half.
      */
     private void scaleImages(float scalingFactor) {
-        units = scaleImages(units, scalingFactor);
-        unitsGrayscale = scaleImages(unitsGrayscale, scalingFactor);
+        units = scaleUnitImages(units, scalingFactor);
+        unitsGrayscale = scaleUnitImages(unitsGrayscale, scalingFactor);
         rivers = scaleImages(rivers, scalingFactor);
         misc = scaleImages(misc, scalingFactor);
         settlements = scaleImages(settlements, scalingFactor);
         //monarch = scaleImages(monarch);
 
-        terrain1 = scaleImages3(terrain1, scalingFactor, Image.SCALE_FAST);
-        terrain2 = scaleImages3(terrain2, scalingFactor, Image.SCALE_FAST);
-        overlay1 = scaleImages3(overlay1, scalingFactor);
-        overlay2 = scaleImages3(overlay2, scalingFactor);
-        forests = scaleImages3(forests, scalingFactor);
-        bonus = scaleImages3(bonus, scalingFactor);
-        goods = scaleImages3(goods, scalingFactor);
+        terrain1 = scaleImages(terrain1, scalingFactor);
+        terrain2 = scaleImages(terrain2, scalingFactor);
+        overlay1 = scaleImages(overlay1, scalingFactor);
+        overlay2 = scaleImages(overlay2, scalingFactor);
+        forests = scaleImages(forests, scalingFactor);
+        bonus = scaleImages(bonus, scalingFactor);
+        goods = scaleImages(goods, scalingFactor);
         
         border1 = scaleImages2(border1, scalingFactor);
         border2 = scaleImages2(border2, scalingFactor);
@@ -302,116 +302,102 @@ public final class ImageLibrary extends ImageProvider {
         coast2 = scaleImages2(coast2, scalingFactor);
         //unitButtons = scaleImages2(unitButtons);
         /*
-        alarmChips = scaleImages(alarmChips, scalingFactor);
-        colorChips = scaleImages(colorChips, scalingFactor);
-        missionChips = scaleImages(missionChips, scalingFactor);
-        expertMissionChips = scaleImages(expertMissionChips, scalingFactor);
+        alarmChips = scaleChips(alarmChips, scalingFactor);
+        colorChips = scaleChips(colorChips, scalingFactor);
+        missionChips = scaleChips(missionChips, scalingFactor);
+        expertMissionChips = scaleChips(expertMissionChips, scalingFactor);
         */
+    }
+
+    private Image scaleImage(Image image, float scale) {
+        return image.getScaledInstance(Math.round(image.getWidth(null) * scale),
+                                       Math.round(image.getHeight(null) * scale),
+                                       Image.SCALE_SMOOTH);
+    }
+
+    private ImageIcon scaleIcon(ImageIcon icon, float scale) {
+        return new ImageIcon(scaleImage(icon.getImage(), scale));
     }
 
     private EnumMap<SettlementType, Image> scaleImages(EnumMap<SettlementType, Image> input, float scale) {
         EnumMap<SettlementType, Image> result = new EnumMap<SettlementType, Image>(SettlementType.class);
         for (Entry<SettlementType, Image> entry : input.entrySet()) {
-            Image image = entry.getValue();
-            result.put(entry.getKey(), image.getScaledInstance(Math.round(image.getWidth(null) * scale),
-                                                               Math.round(image.getHeight(null) * scale),
-                                                               Image.SCALE_SMOOTH));
+            result.put(entry.getKey(), scaleImage(entry.getValue(), scale));
         }
         return result;
     }
 
-    private Image[] scaleImages(Image[] list, float f) {
-        Image[] output = new Image[list.length];
-        for (int i=0; i<list.length; i++) {
-            Image im = list[i];
-            if (im != null) {
-                output[i] = im.getScaledInstance(Math.round(im.getWidth(null) * f), Math.round(im.getHeight(null) * f), Image.SCALE_SMOOTH);
-            }
-        }
-
-        return output;
-    }
-
-    private Map<Color, Image> scaleImages(Map<Color, Image> hashtable, float f) {
+    private Map<Color, Image> scaleChips(Map<Color, Image> input, float scale) {
         HashMap<Color, Image> output = new HashMap<Color, Image>();
-        for (Color c : hashtable.keySet()) {
-            Image im = hashtable.get(c);
-            output.put(c, im.getScaledInstance(Math.round(im.getWidth(null) * f), Math.round(im.getHeight(null) * f), Image.SCALE_SMOOTH));
+        for (Entry<Color, Image> entry : input.entrySet()) {
+            output.put(entry.getKey(), scaleImage(entry.getValue(), scale));
         }
         return output;
     }
-    
-    private Map<String, ImageIcon> scaleImages3(Map<String, ImageIcon> hashtable, float f) {
-        return scaleImages3(hashtable, f, Image.SCALE_SMOOTH);
-    }
-    
-    private Map<String, ImageIcon> scaleImages3(Map<String, ImageIcon> hashtable, float f, int scalingMethod) {
+
+    private Map<String, ImageIcon> scaleImages(Map<String, ImageIcon> input, float scale) {
         HashMap<String, ImageIcon> output = new HashMap<String, ImageIcon>();
-        for (String key : hashtable.keySet()) {
-            Image im = hashtable.get(key).getImage();
-            output.put(key, new ImageIcon(im.getScaledInstance(Math.round(im.getWidth(null) * f), Math.round(im.getHeight(null) * f), scalingMethod)));
-        }
-        return output;
-    }
-    
-    private Map<String, ArrayList<ImageIcon>> scaleImages2(Map<String, ArrayList<ImageIcon>> hashtable, float f) {
-        HashMap<String, ArrayList<ImageIcon>> output = new HashMap<String, ArrayList<ImageIcon>>();
-        for (String key : hashtable.keySet()) {
-            if (hashtable.get(key) == null) {
-                output.put(key, null);
-            } else {
-                ArrayList<ImageIcon> outputV = new ArrayList<ImageIcon>();
-                for (ImageIcon icon : hashtable.get(key)) {
-                    if (icon == null) {
-                        outputV.add(null);
-                    } else {
-                        Image im = icon.getImage();
-                        outputV.add(new ImageIcon(im.getScaledInstance(Math.round(im.getWidth(null) * f), Math.round(im.getHeight(null) * f), Image.SCALE_SMOOTH)));
-                    }
-                }
-                output.put(key, outputV);
-            }
+        for (Entry<String, ImageIcon> entry : input.entrySet()) {
+            output.put(entry.getKey(), scaleIcon(entry.getValue(), scale));
         }
         return output;
     }
 
-    private ArrayList<ImageIcon> scaleImages(ArrayList<ImageIcon> list, float f) {
+    private ArrayList<ImageIcon> scaleImages(ArrayList<ImageIcon> input, float scale) {
         ArrayList<ImageIcon> output = new ArrayList<ImageIcon>();
-        for (ImageIcon im : list) {
-            if (im != null) {
-                output.add(new ImageIcon(im.getImage().getScaledInstance(Math.round(im.getIconWidth() * f), Math.round(im.getIconHeight() * f), Image.SCALE_SMOOTH)));
-            } else {
+        for (ImageIcon icon : input) {
+            if (icon == null) {
                 output.add(null);
+            } else {
+                output.add(scaleIcon(icon, scale));
             }
         }
         return output;
     }
 
-    private ImageIcon[] scaleImages(ImageIcon[] input, float f) {
-        ImageIcon[] output = new ImageIcon[input.length];
-        for (int index = 0; index < input.length; index++) {
-            ImageIcon inputIcon = input[index];
-            if (inputIcon != null) {
-                output[index] = new ImageIcon(inputIcon.getImage().getScaledInstance(Math.round(inputIcon.getIconWidth() * f), Math.round(inputIcon.getIconHeight() * f), Image.SCALE_SMOOTH));
+    private Map<String, ArrayList<ImageIcon>> scaleImages2(Map<String, ArrayList<ImageIcon>> input, float scale) {
+        HashMap<String, ArrayList<ImageIcon>> output = new HashMap<String, ArrayList<ImageIcon>>();
+        for (Entry<String, ArrayList<ImageIcon>> entry : input.entrySet()) {
+            if (entry.getValue() == null) {
+                output.put(entry.getKey(), null);
+            } else {
+                output.put(entry.getKey(), scaleImages(entry.getValue(), scale));
             }
         }
         return output;
     }
 
-    private ArrayList<ArrayList<ImageIcon>> scaleImages2(ArrayList<ArrayList<ImageIcon>> list, float f) {
+
+    private ArrayList<ArrayList<ImageIcon>> scaleImages2(ArrayList<ArrayList<ImageIcon>> input, float scale) {
         ArrayList<ArrayList<ImageIcon>> output = new ArrayList<ArrayList<ImageIcon>>();
-        for (ArrayList<ImageIcon> v : list) {
-            ArrayList<ImageIcon> outputV = new ArrayList<ImageIcon>();
-            output.add(outputV);
-            for (ImageIcon im : v) {
-                if (im != null) {
-                    outputV.add(new ImageIcon(im.getImage().getScaledInstance(Math.round(im.getIconWidth() * f), Math.round(im.getIconHeight() * f), Image.SCALE_SMOOTH)));
-                } else {
-                    outputV.add(null);
-                }
+        for (ArrayList<ImageIcon> list : input) {
+            if (list == null) {
+                output.add(null);
+            } else {
+                output.add(scaleImages(list, scale));
             }
         }
         return output;
+    }
+
+
+    private EnumMap<Role, Map<UnitType, ImageIcon>> scaleUnitImages(EnumMap<Role, Map<UnitType, ImageIcon>> input,
+                                                                    float f) {
+        EnumMap<Role, Map<UnitType, ImageIcon>> result = new EnumMap<Role, Map<UnitType, ImageIcon>>(Role.class);
+        for (Role role : Role.values()) {
+            Map<UnitType, ImageIcon> oldMap = input.get(role);
+            Map<UnitType, ImageIcon> newMap = new HashMap<UnitType, ImageIcon>();
+            for (Entry<UnitType, ImageIcon> entry : oldMap.entrySet()) {
+                ImageIcon oldIcon = entry.getValue();
+                ImageIcon newIcon = new ImageIcon(oldIcon.getImage()
+                                                  .getScaledInstance(Math.round(oldIcon.getIconWidth() * f),
+                                                                     Math.round(oldIcon.getIconHeight() * f),
+                                                                     Image.SCALE_SMOOTH));
+                newMap.put(entry.getKey(), newIcon);
+            }
+            result.put(role, newMap);
+        }
+        return result;
     }
 
     /**
@@ -456,10 +442,12 @@ public final class ImageLibrary extends ImageProvider {
     private void loadUnits(GraphicsConfiguration gc, Class<FreeCol> resourceLocator, boolean doLookup)
             throws FreeColException {
 
-        ArrayList<ImageIcon> unitIcons = new ArrayList<ImageIcon>();
-        ArrayList<ImageIcon> unitIconsGrayscale = new ArrayList<ImageIcon>();
+        units = new EnumMap<Role, Map<UnitType, ImageIcon>>(Role.class);
+        unitsGrayscale = new EnumMap<Role, Map<UnitType, ImageIcon>>(Role.class);
 
         for (Role role : Role.values()) {
+            Map<UnitType, ImageIcon> unitMap = new HashMap<UnitType, ImageIcon>();
+            Map<UnitType, ImageIcon> grayMap = new HashMap<UnitType, ImageIcon>();
             String filePath = dataDirectory + path + unitsDirectory;
             String fileName = null;
 
@@ -477,18 +465,17 @@ public final class ImageLibrary extends ImageProvider {
                 fileName = unitType.getArt() + extension;
                 try {
                     ImageIcon unitIcon = findImage(filePath + fileName, resourceLocator, doLookup);
-                    unitIcons.add(unitIcon);
-                    unitIconsGrayscale.add(convertToGrayscale(unitIcon.getImage()));
+                    unitMap.put(unitType, unitIcon);
+                    grayMap.put(unitType, convertToGrayscale(unitIcon.getImage()));
                 } catch (FreeColException e) {
                     logger.fine("Using default icon for UnitType " + unitType.getName());
-                    unitIcons.add(defaultIcon);
-                    unitIconsGrayscale.add(defaultIconGrayscale);
+                    unitMap.put(unitType, defaultIcon);
+                    grayMap.put(unitType, defaultIconGrayscale);
                 }
             }
+            units.put(role, unitMap);
+            unitsGrayscale.put(role, grayMap);
         }
-
-        units = unitIcons.toArray(new ImageIcon[0]);
-        unitsGrayscale = unitIconsGrayscale.toArray(new ImageIcon[0]);
 
         /*
          * If all units are patched together in one graphics file then this is
@@ -722,31 +709,6 @@ public final class ImageLibrary extends ImageProvider {
             settlements.put(settlementType, findImage(filePath, resourceLocator, doLookup).getImage());
         }
     }
-
-    /**
-     * Loads the indian settlement pictures from files into memory.
-     * 
-     * @param gc The GraphicsConfiguration is needed to create images that are
-     *            compatible with the local environment.
-     * @param resourceLocator The class that is used to locate data files.
-     * @param doLookup Must be set to 'false' if the path to the image files has
-     *            been manually provided by the user. If set to 'true' then a
-     *            lookup will be done to search for image files from
-     *            net.sf.freecol, in this case the images need to be placed in
-     *            net.sf.freecol/images.
-     * @throws FreeColException If one of the data files could not be found.
-     */
-    /*
-    private void loadIndians(GraphicsConfiguration gc, Class<FreeCol> resourceLocator, boolean doLookup)
-            throws FreeColException {
-        indians = new ArrayList<ImageIcon>(INDIAN_COUNT);
-
-        for (int i = 0; i < INDIAN_COUNT; i++) {
-            String filePath = dataDirectory + path + indianDirectory + indianName + i + extension;
-            indians.add(findImage(filePath, resourceLocator, doLookup));
-        }
-    }
-    */
 
     /**
      * Loads the goods-images from file into memory.
@@ -1403,8 +1365,7 @@ public final class ImageLibrary extends ImageProvider {
      * @return an <code>ImageIcon</code> value
      */
     public ImageIcon getUnitImageIcon(UnitType unitType) {
-        // Role.DEFAULT.ordinal() == 0
-        return units[unitType.getIndex()];
+        return units.get(Role.DEFAULT).get(unitType);
     }
     
     /**
@@ -1416,7 +1377,7 @@ public final class ImageLibrary extends ImageProvider {
      * @return an <code>ImageIcon</code> value
      */
     public ImageIcon getUnitImageIcon(UnitType unitType, Role role) {
-        return units[role.ordinal() * numberOfUnitTypes + unitType.getIndex()];
+        return units.get(role).get(unitType);
     }
 
     /**
@@ -1438,12 +1399,7 @@ public final class ImageLibrary extends ImageProvider {
      * @return an <code>ImageIcon</code> value
      */
     public ImageIcon getUnitImageIcon(UnitType unitType, boolean grayscale) {
-        // Role.DEFAULT.ordinal() == 0
-        if (grayscale) {
-            return unitsGrayscale[unitType.getIndex()];
-        } else {
-            return units[unitType.getIndex()];
-        }
+        return getUnitImageIcon(unitType, Role.DEFAULT, grayscale);
     }
 
     /**
@@ -1456,11 +1412,10 @@ public final class ImageLibrary extends ImageProvider {
      * @return an <code>ImageIcon</code> value
      */
     public ImageIcon getUnitImageIcon(UnitType unitType, Role role, boolean grayscale) {
-        int index = role.ordinal() * numberOfUnitTypes + unitType.getIndex();
         if (grayscale) {
-            return unitsGrayscale[index];
+            return unitsGrayscale.get(role).get(unitType);
         } else {
-            return units[index];
+            return units.get(role).get(unitType);
         }
     }
 
