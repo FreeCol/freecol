@@ -724,28 +724,38 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener {
         final int foodFarmsProduction = colony.getFoodProduction();
         final int foodFishProduction = colony.getProductionOf(Goods.FISH);
         final int humanFoodConsumption = colony.getFoodConsumption();
-        int horsesFoodConsumption = colony.getProductionOf(Goods.HORSES);
+        int horsesProduced = colony.getProductionOf(Goods.HORSES);
         final int horseStock = colony.getGoodsCount(Goods.HORSES);
         final int bells = colony.getProductionOf(Goods.BELLS);
         final int crosses = colony.getProductionOf(Goods.CROSSES);
         
-        int totalFoodProduction = foodFarmsProduction + foodFishProduction;
-        horsesFoodConsumption = (horseStock <= 0)? 0 : horsesFoodConsumption;
+        int foodProduction = foodFarmsProduction + foodFishProduction;
+        horsesProduced = (horseStock <= 0)? 0 : horsesProduced;
         
         // The food that is used. If not enough food is produced, the
         // complete production.  Horses consume 1 food each, so they
         // need to be added to the used food.
             
-        final int usedFood = Utils.min(humanFoodConsumption, totalFoodProduction) + horsesFoodConsumption;
-        productionPanel.add(new ProductionLabel(Goods.FOOD, usedFood, parent));
+        final int usedFood = Utils.min(humanFoodConsumption, foodProduction) + horsesProduced;
+        final int usedCorn = Utils.min(usedFood, foodFarmsProduction);
+        final int usedFish = Utils.max(usedFood - usedCorn, 0);
+        if( usedFish == 0 ) {
+            productionPanel.add(new ProductionLabel(Goods.FOOD, usedFood, parent));
+        } else {
+            productionPanel.add(new ProductionMultiplesLabel(Goods.FOOD, usedCorn, Goods.FISH, usedFish, parent));
+        }
         
-        int surplusFood = totalFoodProduction - humanFoodConsumption - horsesFoodConsumption;
-        ProductionLabel surplusLabel = new ProductionLabel(Goods.FOOD, surplusFood, parent);
+        int remainingCorn = foodFarmsProduction - usedCorn;
+        final int remainingFish = foodFishProduction  - usedFish;
+
+        int surplusFood = foodProduction - humanFoodConsumption - horsesProduced;
+        remainingCorn = Utils.min(surplusFood, remainingCorn);		//(surplusFood < 0) ? surplusFood : remainingCorn;
+        ProductionMultiplesLabel surplusLabel = new ProductionMultiplesLabel(Goods.FOOD, remainingCorn, Goods.FISH, remainingFish, parent);
         surplusLabel.setDrawPlus(true);
         productionPanel.add(surplusLabel);
 
-        if( horsesFoodConsumption != 0 ) {			// Skip the horses label if there is no stock
-            ProductionLabel horseLabel = new ProductionLabel(Goods.HORSES, horsesFoodConsumption, parent);
+        if( horsesProduced != 0 ) {			// Skip the horses label if there is no stock
+            ProductionLabel horseLabel = new ProductionLabel(Goods.HORSES, horsesProduced, parent);
             horseLabel.setMaxGoodsIcons(1);
             productionPanel.add(horseLabel);
         }
