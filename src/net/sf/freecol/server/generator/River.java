@@ -41,7 +41,7 @@ public class River {
 
     private static final Logger logger = Logger.getLogger(MapGenerator.class.getName());
 
-    private static final TileType river = FreeCol.getSpecification().getTileType("model.tile.greatRiver");
+    private static final TileType greatRiver = FreeCol.getSpecification().getTileType("model.tile.greatRiver");
 
     /**
      * Directions a river may flow in.
@@ -369,7 +369,11 @@ public class River {
                 logger.fine("Added river (magnitude: " + section.getSize() + ") to tile at " + section.getPosition());
             }
             else if (section.getSize() >= TileImprovement.FJORD_RIVER) {
-                tile.setType(river);
+                TileImprovement oldRiver = tile.getRiver(); // save the previous river
+                tile.setType(greatRiver);   // changing the type resets the improvements
+                tile.addRiver(section.getSize());
+                TileImprovement newRiver = tile.getRiver();
+                newRiver.setStyle(oldRiver.getStyle());
                 logger.fine("Created fjord at " + section.getPosition());
             }
             oldSection = section;
