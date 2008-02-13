@@ -41,14 +41,19 @@ public abstract class Feature extends FreeColObject {
     private String source;
 
     /**
+     * Describe start here.
+     */
+    private Turn start;
+
+    /**
+     * Describe end here.
+     */
+    private Turn end;
+
+    /**
      * Describe scopes here.
      */
     private List<Scope> scopes = new ArrayList<Scope>();
-
-
-    public Feature() {
-        // empty constructor
-    }
 
     /**
      * Describe <code>getName</code> method here.
@@ -66,6 +71,42 @@ public abstract class Feature extends FreeColObject {
      */
     public final List<Scope> getScopes() {
         return scopes;
+    }
+
+    /**
+     * Get the <code>Start</code> value.
+     *
+     * @return a <code>Turn</code> value
+     */
+    public final Turn getStart() {
+        return start;
+    }
+
+    /**
+     * Set the <code>Start</code> value.
+     *
+     * @param newStart The new Start value.
+     */
+    public final void setStart(final Turn newStart) {
+        this.start = newStart;
+    }
+
+    /**
+     * Get the <code>End</code> value.
+     *
+     * @return a <code>Turn</code> value
+     */
+    public final Turn getEnd() {
+        return end;
+    }
+
+    /**
+     * Set the <code>End</code> value.
+     *
+     * @param newEnd The new End value.
+     */
+    public final void setEnd(final Turn newEnd) {
+        this.end = newEnd;
     }
 
     /**

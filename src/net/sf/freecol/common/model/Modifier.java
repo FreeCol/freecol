@@ -21,7 +21,9 @@
 package net.sf.freecol.common.model;
 
 import java.util.ArrayList;
+import java.util.EnumMap;
 import java.util.List;
+import java.util.Map.Entry;
 
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
@@ -39,20 +41,24 @@ import org.w3c.dom.Element;
  */
 public final class Modifier extends Feature {
 
-    public static final int ADDITIVE = 0;
-    public static final int MULTIPLICATIVE = 1;
-    public static final int PERCENTAGE = 2;
-    public static final int COMBINED = 3;
+    public static enum Type { ADDITIVE, MULTIPLICATIVE, PERCENTAGE, COMBINED }
     
     /**
      * The type of this Modifier
      */
-    private int type;
+    private Type type;
 
     /**
      * The float values of this modifier
      */
-    private float values[] = {0, 1, 0};
+    private EnumMap<Type, Float> values = new EnumMap<Type, Float>(Type.class);
+
+
+    /**
+     * The value increments per turn (usually 'null'). This can be
+     * used to create bonuses that increase or decrease over time.
+     */
+    private EnumMap<Type, Float> increments;
 
     /**
      * A list of modifiers that contributed to this one.
@@ -67,12 +73,15 @@ public final class Modifier extends Feature {
      *
      * @param id a <code>String</code> value
      * @param source a <code>String</code> value
-     * @param type an <code>int</code> value
+     * @param type a <code>Type</code> value
      */
-    private Modifier(String id, String source, int type) {
+    private Modifier(String id, String source, Type type) {
         setId(id);
         setSource(source);
         this.type = type;
+        values.put(Type.ADDITIVE, 0f);
+        values.put(Type.PERCENTAGE, 0f);
+        values.put(Type.MULTIPLICATIVE, 1f);
     }
 
     /**
@@ -80,9 +89,9 @@ public final class Modifier extends Feature {
      *
      * @param id a <code>String</code> value
      * @param value an <code>float</code> value
-     * @param type the type of the modifier
+     * @param type the Type of the modifier
      */
-    public Modifier(String id, float value, int type) {
+    public Modifier(String id, float value, Type type) {
         this(id, null, value, type);
     }
 
@@ -92,13 +101,16 @@ public final class Modifier extends Feature {
      * @param id a <code>String</code> value
      * @param source a <code>String</code> value
      * @param value an <code>float</code> value
-     * @param type the type of the modifier
+     * @param type the Type of the modifier
      */
-    public Modifier(String id, String source, float value, int type) {
+    public Modifier(String id, String source, float value, Type type) {
         setId(id);
         setSource(source);
         setType(type);
-        this.values[type] = value;
+        values.put(Type.ADDITIVE, 0f);
+        values.put(Type.PERCENTAGE, 0f);
+        values.put(Type.MULTIPLICATIVE, 1f);
+        values.put(type, value);
     }
 
     /**
@@ -108,10 +120,11 @@ public final class Modifier extends Feature {
      * @param value an <code>float</code> value
      * @param type the type of the modifier
      */
+    /*
     public Modifier(String id, float value, String type) {
         this(id, null, value, type);
     }
-
+    */
 
     /**
      * Creates a new <code>Modifier</code> instance.
@@ -121,12 +134,15 @@ public final class Modifier extends Feature {
      * @param value an <code>float</code> value
      * @param type the type of the modifier
      */
+    /*
     public Modifier(String id, String source, float value, String type) {
         setId(id);
         setSource(source);
-        setType(getTypeFromString(type));
-        this.values[getType()] = value;
+        Type newType = Enum.valueOf(Type.class, type);
+        setType(newType);
+        values.put(newType, value);
     }
+    */
 
     /**
      * Creates a new <code>Modifier</code> instance.
@@ -160,8 +176,9 @@ public final class Modifier extends Feature {
         if (modifier.getModifiers() != null) {
             modifiers = new ArrayList<Modifier>(modifier.getModifiers());
         }
-        for (int i = 0; i < values.length; i++) {
-            values[i] = modifier.values[i];
+        values = new EnumMap<Type, Float>(Type.class);
+        for (Entry<Type, Float> entry : values.entrySet()) {
+            values.put(entry.getKey(), new Float(entry.getValue()));
         }
     }
     
@@ -187,52 +204,11 @@ public final class Modifier extends Feature {
 
 
     /**
-     * Returns the type of Modifier specified by the argument.
-     *
-     * @param type a <code>String</code> value
-     * @return an <code>int</code> value
-     */
-    protected int getTypeFromString(String type) {
-        if ("additive".equals(type)) {
-            return ADDITIVE;
-        } else if ("multiplicative".equals(type)) {
-            return MULTIPLICATIVE;
-        } else if ("percentage".equals(type)) {
-            return PERCENTAGE;
-        } else if ("combined".equals(type)) {
-            return COMBINED;
-        } else {
-            throw new IllegalArgumentException("Unknown type");
-        }
-    }
-    
-    /**
-     * Returns the type of Modifier as a String.
-     *
-     * @return a <code>String</code> value
-     */
-    protected String getTypeAsString() {
-        switch(getType()) {
-        case ADDITIVE:
-            return "additive";
-        case MULTIPLICATIVE:
-            return "multiplicative";
-        case PERCENTAGE:
-            return "percentage";
-        case COMBINED:
-            return "combined";
-        default:
-            // It can't happen
-            return null;
-        }
-    }
-
-    /**
      * Get the <code>Type</code> value.
      *
-     * @return an <code>int</code> value
+     * @return an <code>Type</code> value
      */
-    public int getType() {
+    public Type getType() {
         return type;
     }
 
@@ -241,19 +217,10 @@ public final class Modifier extends Feature {
      *
      * @param newType The new Type value.
      */
-    public void setType(final int newType) {
+    public void setType(final Type newType) {
         this.type = newType;
     }
 
-
-    /**
-     * Returns the XML tag name for this element.
-     *
-     * @return a <code>String</code> value
-     */
-    public static String getXMLElementTagName() {
-        return "modifier";
-    }
 
     /**
      * Get the <code>Value</code> value.
@@ -261,7 +228,7 @@ public final class Modifier extends Feature {
      * @return a <code>float</code> value
      */
     public float getValue() {
-        return values[getType()];
+        return values.get(type);
     }
 
     /**
@@ -270,7 +237,34 @@ public final class Modifier extends Feature {
      * @param newValue The new Value value.
      */
     public void setValue(final float newValue) {
-        this.values[getType()] = newValue;
+        values.put(type, newValue);
+    }
+
+    /**
+     * Returns true if this Modifier has value increments.
+     *
+     * @return a <code>boolean</code> value
+     */
+    public boolean hasIncrements() {
+        return (increments != null);
+    }
+
+    /**
+     * Get the <code>Increment</code> increment.
+     *
+     * @return a <code>float</code> increment
+     */
+    public float getIncrement() {
+        return increments.get(type);
+    }
+
+    /**
+     * Set the <code>Increment</code> increment.
+     *
+     * @param newIncrement The new Increment increment.
+     */
+    public void setIncrement(final float newIncrement) {
+        increments.put(type, newIncrement);
     }
 
     /**
@@ -284,9 +278,8 @@ public final class Modifier extends Feature {
      */
     public static Modifier combine(Modifier... modifiers) {
         String resultId = null;
-        Modifier result = new Modifier(resultId, "result", COMBINED);
+        Modifier result = new Modifier(resultId, "result", Type.COMBINED);
         result.modifiers = new ArrayList<Modifier>();
-
         for (Modifier modifier : modifiers) {
             if (modifier == null) {
                 continue;
@@ -298,16 +291,22 @@ public final class Modifier extends Feature {
             } else if (!resultId.equals(modifier.getId())) {
                 return null;
             } else if (result.type != modifier.type) {
-                result.setType(COMBINED);
+                result.setType(Type.COMBINED);
             }
             if (modifier.modifiers == null) {
                 result.modifiers.add(modifier);
             } else {
                 result.modifiers.addAll(modifier.modifiers);
             }
-            result.values[ADDITIVE] += modifier.values[ADDITIVE];
-            result.values[PERCENTAGE] += modifier.values[PERCENTAGE];
-            result.values[MULTIPLICATIVE] *= modifier.values[MULTIPLICATIVE];
+            result.values.put(Type.ADDITIVE, 
+                              result.values.get(Type.ADDITIVE) +
+                              modifier.values.get(Type.ADDITIVE));
+            result.values.put(Type.PERCENTAGE, 
+                              result.values.get(Type.PERCENTAGE) +
+                              modifier.values.get(Type.PERCENTAGE));
+            result.values.put(Type.MULTIPLICATIVE, 
+                              result.values.get(Type.MULTIPLICATIVE) *
+                              modifier.values.get(Type.MULTIPLICATIVE));
         }
         switch(result.modifiers.size()) {
         case 0:
@@ -333,9 +332,15 @@ public final class Modifier extends Feature {
             if (getModifiers().size() == 1) {
                 return getModifiers().get(0);
             } else {
-                values[ADDITIVE] -= newModifier.values[ADDITIVE];
-                values[PERCENTAGE] -= newModifier.values[PERCENTAGE];
-                values[MULTIPLICATIVE] /= newModifier.values[MULTIPLICATIVE];
+                values.put(Type.ADDITIVE, 
+                           values.get(Type.ADDITIVE) -
+                           newModifier.values.get(Type.ADDITIVE));
+                values.put(Type.PERCENTAGE, 
+                           values.get(Type.PERCENTAGE) -
+                           newModifier.values.get(Type.PERCENTAGE));
+                values.put(Type.MULTIPLICATIVE, 
+                           values.get(Type.MULTIPLICATIVE) /
+                           newModifier.values.get(Type.MULTIPLICATIVE));
             }
         }
         return this;
@@ -374,14 +379,30 @@ public final class Modifier extends Feature {
      * @return a <code>float</code> value
      */
     public float applyTo(float number) {
-        float result = number + values[ADDITIVE];
-        result *= values[MULTIPLICATIVE];
-        result += (result * values[PERCENTAGE]) / 100;
+        float result = number;
+        if (values.get(Type.ADDITIVE) != null) {
+            result += values.get(Type.ADDITIVE);
+        }
+        if (values.get(Type.MULTIPLICATIVE) != null) {
+            result *= values.get(Type.MULTIPLICATIVE);
+        }
+        if (values.get(Type.PERCENTAGE) != null) {
+            result += (result * values.get(Type.PERCENTAGE)) / 100;
+        }
         return result;
     }
 
     // -- Serialization --
 
+
+    /**
+     * Returns the XML tag name for this element.
+     *
+     * @return a <code>String</code> value
+     */
+    public static String getXMLElementTagName() {
+        return "modifier";
+    }
 
     /**
      * Initialize this object from an XML-representation of this object.
@@ -393,14 +414,16 @@ public final class Modifier extends Feature {
     public void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
         setId(in.getAttributeValue(null, "id"));
         setSource(in.getAttributeValue(null, "source"));
-        setType(getTypeFromString(in.getAttributeValue(null, "type")));
-
-        if (type == COMBINED) {
-            values = readFromArrayElement("values", in, new float[0]);
-        } else {
-            values[getType()] = Float.parseFloat(in.getAttributeValue(null, "value"));
+        setType(Enum.valueOf(Type.class, in.getAttributeValue(null, "type").toUpperCase()));
+        values.put(Type.ADDITIVE, 0f);
+        values.put(Type.PERCENTAGE, 0f);
+        values.put(Type.MULTIPLICATIVE, 1f);
+        for (Type type : Type.values()) {
+            String value = in.getAttributeValue(null, type.toString());
+            if (value != null) {
+                values.put(type, Float.parseFloat(value));
+            }
         }
-
         while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
             String childName = in.getLocalName();
             if ("scope".equals(childName)) {
@@ -434,16 +457,11 @@ public final class Modifier extends Feature {
     public void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
         // Start element:
         out.writeStartElement(getXMLElementTagName());
-        out.writeAttribute("type", getTypeAsString());
-        if (type != COMBINED) {
-            out.writeAttribute("value", Float.toString(values[getType()]));
+        out.writeAttribute("type", type.toString());
+        for (Entry<Type, Float> entry : values.entrySet()) {
+            out.writeAttribute(entry.getKey().toString(), entry.getValue().toString());
         }
-
         super.toXMLImpl(out);
-        
-        if (type == COMBINED) {
-            toArrayElement("values", values, out);
-        }
         if (modifiers != null) {
             for (Modifier modifier : getModifiers()) {
                 modifier.toXMLImpl(out);

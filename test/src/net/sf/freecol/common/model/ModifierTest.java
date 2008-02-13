@@ -27,14 +27,14 @@ public class ModifierTest extends FreeColTestCase {
 
     public void testAdditiveModifier() {
 
-        Modifier modifier = new Modifier("test", 3, Modifier.ADDITIVE);
+        Modifier modifier = new Modifier("test", 3, Modifier.Type.ADDITIVE);
 
         assertTrue(modifier.applyTo(1) == 3 + 1);
     }
 
     public void testMultiplicativeModifier() {
 
-        Modifier modifier = new Modifier("test", 1.5f, Modifier.MULTIPLICATIVE);
+        Modifier modifier = new Modifier("test", 1.5f, Modifier.Type.MULTIPLICATIVE);
 
         assertTrue(modifier.applyTo(1) == 1 * 1.5);
         assertTrue(modifier.applyTo(3) == 3 * 1.5);
@@ -42,7 +42,7 @@ public class ModifierTest extends FreeColTestCase {
 
     public void testPercentageModifier() {
 
-        Modifier modifier = new Modifier("test", 50, Modifier.PERCENTAGE);
+        Modifier modifier = new Modifier("test", 50, Modifier.Type.PERCENTAGE);
 
         assertTrue(modifier.applyTo(100) == 150f);
         assertTrue(modifier.applyTo(3) == 4.5f);
@@ -51,10 +51,10 @@ public class ModifierTest extends FreeColTestCase {
 
     public void testCombineAdditiveModifiers() {
 
-        Modifier modifier1 = new Modifier("test", 3, Modifier.ADDITIVE);
-        Modifier modifier2 = new Modifier("test", 4, Modifier.ADDITIVE);
+        Modifier modifier1 = new Modifier("test", 3, Modifier.Type.ADDITIVE);
+        Modifier modifier2 = new Modifier("test", 4, Modifier.Type.ADDITIVE);
         Modifier modifier = Modifier.combine(null, modifier1, modifier2);
-        assertTrue(modifier.getType() == Modifier.ADDITIVE);
+        assertTrue(modifier.getType() == Modifier.Type.ADDITIVE);
         assertTrue(modifier.applyTo(1) == 1 + 3 + 4);
         assertTrue(modifier.getModifiers().size() == 2);
         assertTrue(modifier.getModifiers().get(0) == modifier1);
@@ -64,10 +64,10 @@ public class ModifierTest extends FreeColTestCase {
 
     public void testCombineMultiplicativeModifiers() {
 
-        Modifier modifier1 = new Modifier("test", 3, Modifier.MULTIPLICATIVE);
-        Modifier modifier2 = new Modifier("test", 4, Modifier.MULTIPLICATIVE);
+        Modifier modifier1 = new Modifier("test", 3, Modifier.Type.MULTIPLICATIVE);
+        Modifier modifier2 = new Modifier("test", 4, Modifier.Type.MULTIPLICATIVE);
         Modifier modifier = Modifier.combine(modifier1, null, modifier2);
-        assertTrue(modifier.getType() == Modifier.MULTIPLICATIVE);
+        assertTrue(modifier.getType() == Modifier.Type.MULTIPLICATIVE);
         assertTrue(modifier.applyTo(2) == 2 * 3 * 4);
         assertTrue(modifier.getModifiers().size() == 2);
         assertTrue(modifier.getModifiers().get(1) == modifier2);
@@ -76,10 +76,10 @@ public class ModifierTest extends FreeColTestCase {
 
     public void testCombinePercentageModifiers() {
 
-        Modifier modifier1 = new Modifier("test", 3, Modifier.PERCENTAGE);
-        Modifier modifier2 = new Modifier("test", 4, Modifier.PERCENTAGE);
+        Modifier modifier1 = new Modifier("test", 3, Modifier.Type.PERCENTAGE);
+        Modifier modifier2 = new Modifier("test", 4, Modifier.Type.PERCENTAGE);
         Modifier modifier = Modifier.combine(modifier1, modifier2, null);
-        assertTrue(modifier.getType() == Modifier.PERCENTAGE);
+        assertTrue(modifier.getType() == Modifier.Type.PERCENTAGE);
         assertTrue(modifier.applyTo(100) == 107f);
         assertTrue(modifier.getModifiers().size() == 2);
         assertTrue(modifier.getModifiers().get(0) == modifier1);
@@ -89,19 +89,19 @@ public class ModifierTest extends FreeColTestCase {
 
     public void testCombinedModifier() {
         
-        Modifier modifier1 = new Modifier("test", 3, Modifier.ADDITIVE);
-        Modifier modifier2 = new Modifier("test", 1.5f, Modifier.MULTIPLICATIVE);
-        Modifier modifier3 = new Modifier("test", 50, Modifier.PERCENTAGE);
+        Modifier modifier1 = new Modifier("test", 3, Modifier.Type.ADDITIVE);
+        Modifier modifier2 = new Modifier("test", 1.5f, Modifier.Type.MULTIPLICATIVE);
+        Modifier modifier3 = new Modifier("test", 50, Modifier.Type.PERCENTAGE);
 
         Modifier modifier = Modifier.combine(null, modifier1, null, modifier2, null);
-        assertTrue(modifier.getType() == Modifier.COMBINED);
+        assertTrue(modifier.getType() == Modifier.Type.COMBINED);
         assertTrue(modifier.applyTo(1) == (1 + 3) * 1.5f);
         assertTrue(modifier.getModifiers().size() == 2);
         assertTrue(modifier.getModifiers().get(0) == modifier1);
         assertTrue(modifier.getModifiers().get(1) == modifier2);
 
         modifier = Modifier.combine(modifier, modifier3);
-        assertTrue(modifier.getType() == Modifier.COMBINED);
+        assertTrue(modifier.getType() == Modifier.Type.COMBINED);
         assertTrue(modifier.applyTo(1) == ((1 + 3) * 1.5f) * 1.5f);
         assertTrue(modifier.getModifiers().size() == 3);
         assertTrue(modifier.getModifiers().get(0) == modifier1);
@@ -109,7 +109,7 @@ public class ModifierTest extends FreeColTestCase {
         assertTrue(modifier.getModifiers().get(2) == modifier3);
 
         modifier = Modifier.combine(modifier2, modifier3);
-        assertTrue(modifier.getType() == Modifier.COMBINED);
+        assertTrue(modifier.getType() == Modifier.Type.COMBINED);
         assertTrue(modifier.applyTo(10) == 10 * 1.5f * 1.5f);
         assertTrue(modifier.getModifiers().size() == 2);
         assertTrue(modifier.getModifiers().get(0) == modifier2);
@@ -119,8 +119,8 @@ public class ModifierTest extends FreeColTestCase {
 
     public void testCombineFails() {
 
-        Modifier modifier1 = new Modifier("test1", 3, Modifier.ADDITIVE);
-        Modifier modifier2 = new Modifier("test2", 1.5f, Modifier.MULTIPLICATIVE);
+        Modifier modifier1 = new Modifier("test1", 3, Modifier.Type.ADDITIVE);
+        Modifier modifier2 = new Modifier("test2", 1.5f, Modifier.Type.MULTIPLICATIVE);
 
         Modifier modifier = Modifier.combine(modifier1, modifier2);
         // returns null because ids differ
@@ -129,12 +129,12 @@ public class ModifierTest extends FreeColTestCase {
 
     public void testRemove() {
 
-        Modifier modifier1 = new Modifier("test", 3, Modifier.ADDITIVE);
-        Modifier modifier2 = new Modifier("test", 1.5f, Modifier.MULTIPLICATIVE);
-        Modifier modifier3 = new Modifier("test", 50, Modifier.PERCENTAGE);
+        Modifier modifier1 = new Modifier("test", 3, Modifier.Type.ADDITIVE);
+        Modifier modifier2 = new Modifier("test", 1.5f, Modifier.Type.MULTIPLICATIVE);
+        Modifier modifier3 = new Modifier("test", 50, Modifier.Type.PERCENTAGE);
 
         Modifier modifier = Modifier.combine(modifier1, modifier2, modifier3);
-        assertTrue(modifier.getType() == Modifier.COMBINED);
+        assertTrue(modifier.getType() == Modifier.Type.COMBINED);
         assertTrue(modifier.applyTo(1) == ((1 + 3) * 1.5f) * 1.5f);
         assertTrue(modifier.getModifiers().size() == 3);
         assertTrue(modifier.getModifiers().get(0) == modifier1);
@@ -158,9 +158,9 @@ public class ModifierTest extends FreeColTestCase {
         UnitType carpenter = FreeCol.getSpecification().getUnitType("model.unit.masterCarpenter");
         UnitType frigate = FreeCol.getSpecification().getUnitType("model.unit.frigate");
 
-        Modifier modifier1 = new Modifier("test", 3, Modifier.ADDITIVE);
-        Modifier modifier2 = new Modifier("test", 1.5f, Modifier.MULTIPLICATIVE);
-        Modifier modifier3 = new Modifier("test", 30, Modifier.PERCENTAGE);
+        Modifier modifier1 = new Modifier("test", 3, Modifier.Type.ADDITIVE);
+        Modifier modifier2 = new Modifier("test", 1.5f, Modifier.Type.MULTIPLICATIVE);
+        Modifier modifier3 = new Modifier("test", 30, Modifier.Type.PERCENTAGE);
         Modifier modifier = Modifier.combine(modifier1, modifier2, modifier3);
 
         // applies to frigate

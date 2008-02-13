@@ -171,7 +171,7 @@ public class SimpleCombatModel implements CombatModel {
         ArrayList<Modifier> result = new ArrayList<Modifier>();
         result.add(new Modifier("model.modifier.bombardModifier", 
                                 getOffencePower(colony, defender),
-                                Modifier.ADDITIVE));
+                                Modifier.Type.ADDITIVE));
         return result;
     }
 
@@ -190,7 +190,7 @@ public class SimpleCombatModel implements CombatModel {
         float totalAddend = attacker.getType().getOffence();
         float totalPercentage = 100;
 
-        result.add(new Modifier("modifiers.baseOffense", totalAddend, Modifier.ADDITIVE));
+        result.add(new Modifier("modifiers.baseOffense", totalAddend, Modifier.Type.ADDITIVE));
 
         if (attacker.isNaval()) {
             int goodsCount = attacker.getGoodsCount();
@@ -198,7 +198,7 @@ public class SimpleCombatModel implements CombatModel {
                 // -12.5% penalty for every unit of cargo.
                 // TODO: shouldn't this be -cargo/capacity?
                 percentage = -12.5f * goodsCount;
-                result.add(new Modifier("modifiers.cargoPenalty", percentage, Modifier.PERCENTAGE));
+                result.add(new Modifier("modifiers.cargoPenalty", percentage, Modifier.Type.PERCENTAGE));
                 totalPercentage += percentage;
             }
             if (attacker.hasAbility("model.ability.piracy")) {
@@ -219,13 +219,13 @@ public class SimpleCombatModel implements CombatModel {
                     // brave or REF
                     addend = 1;
                 }
-                result.add(new Modifier("modifiers.armed", addend, Modifier.ADDITIVE));
+                result.add(new Modifier("modifiers.armed", addend, Modifier.Type.ADDITIVE));
                 totalAddend += addend;
             }
 
             if (attacker.isMounted()) {
                 addend = 1;
-                result.add(new Modifier("modifiers.mounted", addend, Modifier.ADDITIVE));
+                result.add(new Modifier("modifiers.mounted", addend, Modifier.Type.ADDITIVE));
                 totalAddend += addend;
             }
 
@@ -238,18 +238,18 @@ public class SimpleCombatModel implements CombatModel {
 
             // 50% attack bonus
             percentage = 50;
-            result.add(new Modifier("modifiers.attackBonus", percentage, Modifier.PERCENTAGE));
+            result.add(new Modifier("modifiers.attackBonus", percentage, Modifier.Type.PERCENTAGE));
             totalPercentage += percentage;
 
             // movement penalty
             int movesLeft = attacker.getMovesLeft();
             if (movesLeft == 1) {
                 percentage = -66;
-                result.add(new Modifier("modifiers.movementPenalty", percentage, Modifier.PERCENTAGE));
+                result.add(new Modifier("modifiers.movementPenalty", percentage, Modifier.Type.PERCENTAGE));
                 totalPercentage += percentage;
             } else if (movesLeft == 2) {
                 percentage = -33;
-                result.add(new Modifier("modifiers.movementPenalty", percentage, Modifier.PERCENTAGE));
+                result.add(new Modifier("modifiers.movementPenalty", percentage, Modifier.Type.PERCENTAGE));
                 totalPercentage += percentage;
             }
 
@@ -263,7 +263,7 @@ public class SimpleCombatModel implements CombatModel {
                 if (attacker.hasAbility("model.ability.ambushBonus") ||
                     defender.hasAbility("model.ability.ambushPenalty")) {
                     percentage = defender.getTile().defenceBonus();
-                    result.add(new Modifier("modifiers.ambushBonus", percentage, Modifier.PERCENTAGE));
+                    result.add(new Modifier("modifiers.ambushBonus", percentage, Modifier.Type.PERCENTAGE));
                     totalPercentage += percentage;
                 }
 
@@ -271,7 +271,7 @@ public class SimpleCombatModel implements CombatModel {
                 // TODO: is it right? or should it be another ability?
                 if (attacker.hasAbility("model.ability.bombard")) {
                     percentage = -75;
-                    result.add(new Modifier("modifiers.artilleryPenalty", percentage, Modifier.PERCENTAGE));
+                    result.add(new Modifier("modifiers.artilleryPenalty", percentage, Modifier.Type.PERCENTAGE));
                     totalPercentage += percentage;
                 }
             }
@@ -288,7 +288,7 @@ public class SimpleCombatModel implements CombatModel {
         }
 
         float offensivePower = (totalAddend * totalPercentage) / 100;
-        result.add(new Modifier("modifiers.finalResult", offensivePower, Modifier.ADDITIVE));
+        result.add(new Modifier("modifiers.finalResult", offensivePower, Modifier.Type.ADDITIVE));
         return result;
     }
 
@@ -328,7 +328,7 @@ public class SimpleCombatModel implements CombatModel {
         ArrayList<Modifier> result = new ArrayList<Modifier>();
         result.add(new Modifier("model.modifier.defenceBonus",
                                 defender.getType().getDefence(),
-                                Modifier.ADDITIVE));
+                                Modifier.Type.ADDITIVE));
         return result;
     }
 
@@ -351,7 +351,7 @@ public class SimpleCombatModel implements CombatModel {
         float totalAddend = defender.getType().getDefence();
         float totalPercentage = 100;
 
-        result.add(new Modifier("modifiers.baseDefence", totalAddend, Modifier.ADDITIVE));
+        result.add(new Modifier("modifiers.baseDefence", totalAddend, Modifier.Type.ADDITIVE));
 
         if (defender.isNaval()) {
             int goodsCount = defender.getVisibleGoodsCount();
@@ -359,7 +359,7 @@ public class SimpleCombatModel implements CombatModel {
                 // -12.5% penalty for every unit of cargo.
                 // TODO: shouldn't this be -cargo/capacity?
                 percentage =  -12.5f * goodsCount;
-                result.add(new Modifier("modifiers.cargoPenalty", percentage, Modifier.PERCENTAGE));
+                result.add(new Modifier("modifiers.cargoPenalty", percentage, Modifier.Type.PERCENTAGE));
                 totalPercentage += percentage;
             }
             if (defender.hasAbility("model.ability.piracy")) {
@@ -377,21 +377,21 @@ public class SimpleCombatModel implements CombatModel {
             // available.
             if (defender.isArmed()) {
                 addend = 1;
-                result.add(new Modifier("modifiers.armed", addend, Modifier.ADDITIVE));
+                result.add(new Modifier("modifiers.armed", addend, Modifier.Type.ADDITIVE));
                 totalAddend += addend;
             } else if (defender.getOwner().hasAbility("model.ability.automaticDefence") && defender.isColonist()
                        && defender.getLocation() instanceof WorkLocation) {
                 Colony colony = ((WorkLocation) defender.getLocation()).getColony();
                 if (colony.getGoodsCount(Goods.MUSKETS) >= 50) {
                     addend = 1;
-                    result.add(new Modifier("modifiers.paulRevere", addend, Modifier.ADDITIVE));
+                    result.add(new Modifier("modifiers.paulRevere", addend, Modifier.Type.ADDITIVE));
                     totalAddend += addend;
                 }
             }
 
             if (defender.isMounted()) {
                 addend = 1;
-                result.add(new Modifier("modifiers.mounted", addend, Modifier.ADDITIVE));
+                result.add(new Modifier("modifiers.mounted", addend, Modifier.Type.ADDITIVE));
                 totalAddend += addend;
             }
 
@@ -405,7 +405,7 @@ public class SimpleCombatModel implements CombatModel {
             // 50% fortify bonus
             if (defender.getState() == UnitState.FORTIFIED) {
                 percentage = 50;
-                result.add(new Modifier("modifiers.fortified", percentage, Modifier.PERCENTAGE));
+                result.add(new Modifier("modifiers.fortified", percentage, Modifier.Type.PERCENTAGE));
                 totalPercentage += percentage;
             }
 
@@ -417,7 +417,7 @@ public class SimpleCombatModel implements CombatModel {
                 if (defender.hasAbility("model.ability.bombard") && attacker.getOwner().isIndian()) {
                     // 100% defence bonus against an Indian raid
                     percentage = 100;
-                    result.add(new Modifier("modifiers.artilleryAgainstRaid", percentage, Modifier.PERCENTAGE));
+                    result.add(new Modifier("modifiers.artilleryAgainstRaid", percentage, Modifier.Type.PERCENTAGE));
                     totalPercentage += percentage;
                 }
             } else if (defender.getTile() != null) {
@@ -426,21 +426,21 @@ public class SimpleCombatModel implements CombatModel {
                       defender.hasAbility("model.ability.ambushPenalty"))) {
                     // Terrain defensive bonus.
                     percentage = defender.getTile().defenceBonus();
-                    result.add(new Modifier("modifiers.terrainBonus", percentage, Modifier.PERCENTAGE));
+                    result.add(new Modifier("modifiers.terrainBonus", percentage, Modifier.Type.PERCENTAGE));
                     totalPercentage += percentage;
                 }
                 // TODO: is it right? or should it be another ability?
                 if (defender.hasAbility("model.ability.bombard") && defender.getState() != UnitState.FORTIFIED) {
                     // -75% Artillery in the Open penalty
                     percentage = -75;
-                    result.add(new Modifier("modifiers.artilleryPenalty", percentage, Modifier.PERCENTAGE));
+                    result.add(new Modifier("modifiers.artilleryPenalty", percentage, Modifier.Type.PERCENTAGE));
                     totalPercentage += percentage;
                 }
             }
 
         }
         float defensivePower = (totalAddend * totalPercentage) / 100;
-        result.add(new Modifier("modifiers.finalResult", defensivePower, Modifier.ADDITIVE));
+        result.add(new Modifier("modifiers.finalResult", defensivePower, Modifier.Type.ADDITIVE));
         return result;
     }
 
@@ -460,17 +460,17 @@ public class SimpleCombatModel implements CombatModel {
             Building stockade = colony.getStockade();
             if (stockade == null) {
                 // 50% colony bonus
-                return new Modifier("modifiers.inColony", 50, Modifier.PERCENTAGE);
+                return new Modifier("modifiers.inColony", 50, Modifier.Type.PERCENTAGE);
             } else {
                 String modifier = stockade.getType().getId();
                 modifier = "modifiers." + modifier.substring(modifier.lastIndexOf(".") + 1);
-                return new Modifier(modifier, colony.getDefenceBonus(), Modifier.PERCENTAGE);
+                return new Modifier(modifier, colony.getDefenceBonus(), Modifier.Type.PERCENTAGE);
             }
         } else if (settlement instanceof IndianSettlement) {
             // Indian settlement defensive bonus.
-            return new Modifier("modifiers.inSettlement", 50, Modifier.PERCENTAGE);
+            return new Modifier("modifiers.inSettlement", 50, Modifier.Type.PERCENTAGE);
         } else {
-            return new Modifier(null, 0, Modifier.PERCENTAGE);
+            return new Modifier(null, 0, Modifier.Type.PERCENTAGE);
         }
     }
 

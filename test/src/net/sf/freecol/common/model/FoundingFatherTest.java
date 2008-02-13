@@ -47,14 +47,14 @@ public class FoundingFatherTest extends FreeColTestCase {
         assertTrue(dutch.hasAbility("some.new.ability"));
 
         FoundingFather father2 = new FoundingFather(112);
-        father2.addFeature(new Modifier("some.new.modifier", 2f, Modifier.ADDITIVE));
+        father2.addFeature(new Modifier("some.new.modifier", 2f, Modifier.Type.ADDITIVE));
         dutch.addFather(father2);
 
         assertTrue(dutch.getModifier("some.new.modifier") != null);
         assertEquals(4f, dutch.getModifier("some.new.modifier").applyTo(2));
 
         FoundingFather father3 = new FoundingFather(113);
-        father3.addFeature(new Modifier("some.new.modifier", 2f, Modifier.ADDITIVE));
+        father3.addFeature(new Modifier("some.new.modifier", 2f, Modifier.Type.ADDITIVE));
         dutch.addFather(father3);
 
         assertTrue(dutch.getModifier("some.new.modifier") != null);
@@ -136,7 +136,7 @@ public class FoundingFatherTest extends FreeColTestCase {
         Player dutch = game.getPlayer("model.nation.dutch");
 
         FoundingFather father = new FoundingFather(111);
-        Modifier priceBonus = new Modifier("model.modifier.buildingPriceBonus", -100f, Modifier.PERCENTAGE);
+        Modifier priceBonus = new Modifier("model.modifier.buildingPriceBonus", -100f, Modifier.Type.PERCENTAGE);
         Scope pressScope = new Scope();
         pressScope.setType("model.building.PrintingPress");
         List<Scope> scopeList = new ArrayList<Scope>();

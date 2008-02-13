@@ -330,9 +330,9 @@ public class FreeColDialog extends FreeColPanel {
         List<Modifier> defense = new ArrayList<Modifier>();
         if (defender == null && settlement != null) {
             Modifier settlementModifier = combatModel.getSettlementModifier(attacker, settlement);
-            defense.add(new Modifier("modifiers.baseDefense", Float.MIN_VALUE, Modifier.ADDITIVE));
+            defense.add(new Modifier("modifiers.baseDefense", Float.MIN_VALUE, Modifier.Type.ADDITIVE));
             defense.add(settlementModifier);
-            defense.add(new Modifier("modifiers.finalResult", Float.MIN_VALUE, Modifier.ADDITIVE));
+            defense.add(new Modifier("modifiers.finalResult", Float.MIN_VALUE, Modifier.Type.ADDITIVE));
         } else {
             defense = combatModel.getDefensiveModifiers(attacker, defender);
         }
@@ -405,7 +405,7 @@ public class FreeColDialog extends FreeColPanel {
             preCombatDialog.add(new JLabel(Messages.message(modifier.getId())), 
                                 higConst.rc(row, offenseLabelColumn));
             String value = String.valueOf(modifier.getValue());
-            if (modifier.getType() == Modifier.PERCENTAGE) {
+            if (modifier.getType() == Modifier.Type.PERCENTAGE) {
                 if (modifier.getValue() > 0) {
                     value = "+" + value;
                 }
@@ -451,7 +451,7 @@ public class FreeColDialog extends FreeColPanel {
             String value = String.valueOf(modifier.getValue());
             if (modifier.getValue() == Float.MIN_VALUE) {
                 value = "?";
-            } else if (modifier.getType() == Modifier.PERCENTAGE) {
+            } else if (modifier.getType() == Modifier.Type.PERCENTAGE) {
                 if (modifier.getValue() > 0) {
                     value = "+" + value;
                 }

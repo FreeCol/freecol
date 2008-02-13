@@ -2695,7 +2695,7 @@ public class Player extends FreeColGameObject implements Features, Nameable {
         if (amount != tax && hasAbility("model.ability.addTaxToBells")) {
             Modifier bellsBonus = getModifier("model.goods.bells");
             if (bellsBonus == null) {
-                addFeature(new Modifier("model.goods.bells", amount, Modifier.ADDITIVE));
+                addFeature(new Modifier("model.goods.bells", amount, Modifier.Type.ADDITIVE));
             } else {
                 int difference = (amount - tax);
                 bellsBonus.setValue(bellsBonus.getValue() + difference);
