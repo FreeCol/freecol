@@ -48,6 +48,7 @@ import net.sf.freecol.common.FreeColException;
 import net.sf.freecol.common.model.Building;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.GoodsType;
+import net.sf.freecol.common.model.IndianSettlement;
 import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.ResourceType;
 import net.sf.freecol.common.model.Settlement;
@@ -78,7 +79,7 @@ public final class ImageLibrary extends ImageProvider {
 
     private static enum SettlementType { SMALL, MEDIUM, LARGE, STOCKADE,
             FORT, FORTRESS, MEDIUM_STOCKADE, LARGE_STOCKADE,
-            LARGE_FORT, UNDEAD, INDIAN_CAMP, //INDIAN_VILLAGE, AZTEC_CITY, INCA_CITY
+            LARGE_FORT, UNDEAD, INDIAN_CAMP, INDIAN_VILLAGE, AZTEC_CITY, INCA_CITY
             }
 
     private static final String path = new String("images/"), extension = new String(".png"),
@@ -1332,18 +1333,20 @@ public final class ImageLibrary extends ImageProvider {
             }
 
         } else { // IndianSettlement
-            return settlements.get(SettlementType.INDIAN_CAMP);
-
-            /*
-             * TODO: Use when we have graphics: IndianSettlement
-             * indianSettlement = (IndianSettlement) settlement; if
-             * (indianSettlement.getKind() == IndianSettlement.CAMP) { return
-             * INDIAN_SETTLEMENT_CAMP; } else if (indianSettlement.getKind() ==
-             * IndianSettlement.VILLAGE) { return INDIAN_SETTLEMENT_VILLAGE; }
-             * else { //CITY if (indianSettlement.getTribe() ==
-             * IndianSettlement.AZTEC) return INDIAN_SETTLEMENT_AZTEC; else //
-             * INCA return INDIAN_SETTLEMENT_INCA; }
-             */
+            // TODO: put this in specification?
+            switch(((IndianSettlement) settlement).getTypeOfSettlement()) {
+            case TEEPEE:
+                return settlements.get(SettlementType.INDIAN_CAMP);
+            case LONGHOUSE:
+                return settlements.get(SettlementType.INDIAN_VILLAGE);
+            case CITY:
+            default:
+                if ("model.nationType.inca".equals(settlement.getOwner().getNationType().getId())) {
+                    return settlements.get(SettlementType.INCA_CITY);
+                } else {
+                    return settlements.get(SettlementType.AZTEC_CITY);
+                }
+            }
         }
     }
 
