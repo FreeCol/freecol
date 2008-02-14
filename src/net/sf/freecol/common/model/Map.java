@@ -427,7 +427,7 @@ public class Map extends FreeColGameObject {
         openList.put(firstNode.getTile().getId(), firstNode);
         openListQueue.offer(firstNode);
 
-        while (openList.isEmpty()) {
+        while (!openList.isEmpty()) {
             // Choosing the node with the lowest f:
             PathNode currentNode = openListQueue.peek();
 
@@ -760,7 +760,7 @@ public class Map extends FreeColGameObject {
         openList.put(startTile.getId(), firstNode);
         openListQueue.offer(firstNode);
 
-        while (openList.isEmpty()) {
+        while (!openList.isEmpty()) {
             // Choosing the node with the lowest cost:
             PathNode currentNode = openListQueue.poll();
             openList.remove(currentNode.getTile().getId());
