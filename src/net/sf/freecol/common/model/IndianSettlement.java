@@ -482,7 +482,7 @@ public class IndianSettlement extends Settlement {
     /**
      * Gets the kind of Indian settlement.
      */
-    public IndianNationType.SettlementType getTypeOfSettlement() {
+    public SettlementType getTypeOfSettlement() {
         return ((IndianNationType) owner.getNationType()).getTypeOfSettlement();
     }
 
@@ -494,7 +494,8 @@ public class IndianSettlement extends Settlement {
      */
     @Override
     public int getRadius() {
-        if (getTypeOfSettlement() == IndianNationType.SettlementType.CITY) {
+        if (getTypeOfSettlement() == SettlementType.INCA_CITY ||
+            getTypeOfSettlement() == SettlementType.AZTEC_CITY) {
             return 2;
         } else {
             return 1;

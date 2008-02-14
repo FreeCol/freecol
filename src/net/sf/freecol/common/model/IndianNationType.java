@@ -29,13 +29,14 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
 import net.sf.freecol.common.Specification;
+import net.sf.freecol.common.model.Settlement.SettlementType;
+
 
 /**
  * Represents one of the Indian nations present in the game.
  */
 public class IndianNationType extends NationType {
 
-    public static enum SettlementType { TEEPEE, LONGHOUSE, CITY };
     public static enum SettlementNumber { LOW, AVERAGE, HIGH };
     public static enum AggressionLevel { LOW, AVERAGE, HIGH };
 

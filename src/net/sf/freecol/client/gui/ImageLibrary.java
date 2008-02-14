@@ -52,6 +52,7 @@ import net.sf.freecol.common.model.IndianSettlement;
 import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.ResourceType;
 import net.sf.freecol.common.model.Settlement;
+import net.sf.freecol.common.model.Settlement.SettlementType;
 import net.sf.freecol.common.model.Tension;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.TileType;
@@ -76,11 +77,6 @@ public final class ImageLibrary extends ImageProvider {
             UNIT_BUTTON_SENTRY = 3, UNIT_BUTTON_CLEAR = 4, UNIT_BUTTON_PLOW = 5, UNIT_BUTTON_ROAD = 6,
             UNIT_BUTTON_BUILD = 7, UNIT_BUTTON_DISBAND = 8, UNIT_BUTTON_ZOOM_IN = 9, UNIT_BUTTON_ZOOM_OUT = 10,
             UNIT_BUTTON_COUNT = 11;
-
-    private static enum SettlementType { SMALL, MEDIUM, LARGE, STOCKADE,
-            FORT, FORTRESS, MEDIUM_STOCKADE, LARGE_STOCKADE,
-            LARGE_FORT, UNDEAD, INDIAN_CAMP, INDIAN_VILLAGE, AZTEC_CITY, INCA_CITY
-            }
 
     private static final String path = new String("images/"), extension = new String(".png"),
             unitsDirectory = new String("units/"),
@@ -1300,53 +1296,46 @@ public final class ImageLibrary extends ImageProvider {
         if (settlement instanceof Colony) {
             Colony colony = (Colony) settlement;
 
-            Building stockade = colony.getStockade();
-
             // TODO: Put it in specification
             if (colony.isUndead()) {
                 return settlements.get(SettlementType.UNDEAD);
-            } else if (stockade == null) {
-                if (colony.getUnitCount() <= 3) {
-                    return settlements.get(SettlementType.SMALL);
-                } else if (colony.getUnitCount() <= 7) {
-                    return settlements.get(SettlementType.MEDIUM);
-                } else {
-                    return settlements.get(SettlementType.LARGE);
-                }
-            } else if (!colony.hasAbility("model.ability.bombardShips")) {
-                if (colony.getUnitCount() > 7) {
-                    return settlements.get(SettlementType.LARGE_STOCKADE);
-                } else if (colony.getUnitCount() > 3) {
-                    return settlements.get(SettlementType.MEDIUM_STOCKADE);
-                } else {
-                    return settlements.get(SettlementType.STOCKADE);
-                }
-            } else if (stockade != null &&
-                       stockade.getType().getUpgradesTo() != null) {
-                if (colony.getUnitCount() > 7) {
-                    return settlements.get(SettlementType.LARGE_FORT);
-                } else {
-                    return settlements.get(SettlementType.FORT);
-                }
             } else {
-                return settlements.get(SettlementType.FORTRESS);
+                int stockadeLevel = 0;
+                if (colony.getStockade() != null) {
+                    stockadeLevel = colony.getStockade().getLevel();
+                }
+                switch(stockadeLevel) {
+                case 0:
+                    if (colony.getUnitCount() <= 3) {
+                        return settlements.get(SettlementType.SMALL);
+                    } else if (colony.getUnitCount() <= 7) {
+                        return settlements.get(SettlementType.MEDIUM);
+                    } else {
+                        return settlements.get(SettlementType.LARGE);
+                    }
+                case 1:
+                    if (colony.getUnitCount() > 7) {
+                        return settlements.get(SettlementType.LARGE_STOCKADE);
+                    } else if (colony.getUnitCount() > 3) {
+                        return settlements.get(SettlementType.MEDIUM_STOCKADE);
+                    } else {
+                        return settlements.get(SettlementType.SMALL_STOCKADE);
+                    }
+                case 2:
+                    if (colony.getUnitCount() > 7) {
+                        return settlements.get(SettlementType.LARGE_FORT);
+                    } else {
+                        return settlements.get(SettlementType.MEDIUM_FORT);
+                    }
+                case 3:
+                    return settlements.get(SettlementType.LARGE_FORTRESS);
+                default:
+                    return settlements.get(SettlementType.SMALL);
+                }
             }
 
         } else { // IndianSettlement
-            // TODO: put this in specification?
-            switch(((IndianSettlement) settlement).getTypeOfSettlement()) {
-            case TEEPEE:
-                return settlements.get(SettlementType.INDIAN_CAMP);
-            case LONGHOUSE:
-                return settlements.get(SettlementType.INDIAN_VILLAGE);
-            case CITY:
-            default:
-                if ("model.nationType.inca".equals(settlement.getOwner().getNationType().getId())) {
-                    return settlements.get(SettlementType.INCA_CITY);
-                } else {
-                    return settlements.get(SettlementType.AZTEC_CITY);
-                }
-            }
+            return settlements.get(((IndianSettlement) settlement).getTypeOfSettlement());
         }
     }
 

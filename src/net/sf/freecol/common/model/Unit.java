@@ -38,6 +38,7 @@ import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.Map.Position;
 import net.sf.freecol.common.model.Player.Stance;
+import net.sf.freecol.common.model.Settlement.SettlementType;
 import net.sf.freecol.common.model.UnitType.DowngradeType;
 import net.sf.freecol.common.model.UnitType.UpgradeType;
 import net.sf.freecol.common.model.TradeRoute.Stop;
@@ -3185,8 +3186,9 @@ public class Unit extends FreeColGameObject implements Features, Locatable, Loca
                 randomTreasure = (int) modifier.applyTo(randomTreasure);
             }
 
-            if (((IndianNationType) enemy.getNationType()).getTypeOfSettlement() == 
-                IndianNationType.SettlementType.CITY) {
+            SettlementType settlementType = ((IndianNationType) enemy.getNationType()).getTypeOfSettlement();
+            if (settlementType == SettlementType.INCA_CITY ||
+                settlementType == SettlementType.AZTEC_CITY) {
                 tTrain.setTreasureAmount(randomTreasure * 500 + 10000);
             } else {
                 tTrain.setTreasureAmount(randomTreasure * 50  + 300);
