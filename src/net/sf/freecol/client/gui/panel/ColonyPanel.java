@@ -736,9 +736,9 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener {
         // complete production.  Horses consume 1 food each, so they
         // need to be added to the used food.
             
-        final int usedFood = Utils.min(humanFoodConsumption, foodProduction) + horsesProduced;
-        final int usedCorn = Utils.min(usedFood, foodFarmsProduction);
-        final int usedFish = Utils.max(usedFood - usedCorn, 0);
+        final int usedFood = Math.min(humanFoodConsumption, foodProduction) + horsesProduced;
+        final int usedCorn = Math.min(usedFood, foodFarmsProduction);
+        final int usedFish = Math.max(usedFood - usedCorn, 0);
         if( usedFish == 0 ) {
             productionPanel.add(new ProductionLabel(Goods.FOOD, usedFood, parent));
         } else {
@@ -749,7 +749,7 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener {
         final int remainingFish = foodFishProduction  - usedFish;
 
         int surplusFood = foodProduction - humanFoodConsumption - horsesProduced;
-        remainingCorn = Utils.min(surplusFood, remainingCorn);		//(surplusFood < 0) ? surplusFood : remainingCorn;
+        remainingCorn = Math.min(surplusFood, remainingCorn);		//(surplusFood < 0) ? surplusFood : remainingCorn;
         ProductionMultiplesLabel surplusLabel = new ProductionMultiplesLabel(Goods.FOOD, remainingCorn, Goods.FISH, remainingFish, parent);
         surplusLabel.setDrawPlus(true);
         productionPanel.add(surplusLabel);
