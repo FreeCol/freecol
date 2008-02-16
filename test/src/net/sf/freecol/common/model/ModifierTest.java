@@ -176,7 +176,6 @@ public class ModifierTest extends FreeColTestCase {
         scope3.setMethodValue("2");
 
         modifier1.getScopes().add(scope1);
-        modifier1.setScope(true);
         assertTrue(modifier1.appliesTo(frigate));
         assertFalse(modifier1.appliesTo(carpenter));
 

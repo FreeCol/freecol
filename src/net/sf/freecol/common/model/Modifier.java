@@ -325,6 +325,12 @@ public final class Modifier extends Feature {
                                   result.values.get(Type.MULTIPLICATIVE) *
                                   modifier.values.get(Type.MULTIPLICATIVE));
             }
+            if (modifier.hasScope()) {
+                result.setScope(true);
+            }
+            if (modifier.hasTimeLimit()) {
+                result.setTimeLimit(true);
+            }
         }
         switch(result.modifiers.size()) {
         case 0:
