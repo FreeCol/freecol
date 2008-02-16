@@ -41,19 +41,65 @@ public abstract class Feature extends FreeColObject {
     private String source;
 
     /**
-     * Describe start here.
+     * The first Turn in which this Feature applies.
      */
-    private Turn start;
+    private Turn firstTurn;
 
     /**
-     * Describe end here.
+     * The last Turn in which this Feature applies.
      */
-    private Turn end;
+    private Turn lastTurn;
 
     /**
-     * Describe scopes here.
+     * Whether this feature has Scopes;
+     */
+    private boolean scope;
+
+    /**
+     * Describe timeLimit here.
+     */
+    private boolean timeLimit;
+
+    /**
+     * A list of Scopes limiting the applicability of this Feature.
      */
     private List<Scope> scopes = new ArrayList<Scope>();
+
+    /**
+     * Get the <code>TimeLimit</code> value.
+     *
+     * @return a <code>boolean</code> value
+     */
+    public final boolean hasTimeLimit() {
+        return timeLimit;
+    }
+
+    /**
+     * Set the <code>TimeLimit</code> value.
+     *
+     * @param newTimeLimit The new TimeLimit value.
+     */
+    public final void setTimeLimit(final boolean newTimeLimit) {
+        this.timeLimit = newTimeLimit;
+    }
+
+    /**
+     * Get the <code>Scope</code> value.
+     *
+     * @return a <code>boolean</code> value
+     */
+    public final boolean hasScope() {
+        return scope;
+    }
+
+    /**
+     * Set the <code>Scope</code> value.
+     *
+     * @param newScope The new Scope value.
+     */
+    public final void setScope(final boolean newScope) {
+        this.scope = newScope;
+    }
 
     /**
      * Describe <code>getName</code> method here.
@@ -74,39 +120,45 @@ public abstract class Feature extends FreeColObject {
     }
 
     /**
-     * Get the <code>Start</code> value.
+     * Get the <code>firstTurn</code> value.
      *
      * @return a <code>Turn</code> value
      */
-    public final Turn getStart() {
-        return start;
+    public final Turn getFirstTurn() {
+        return firstTurn;
     }
 
     /**
-     * Set the <code>Start</code> value.
+     * Set the <code>firstTurn</code> value.
      *
-     * @param newStart The new Start value.
+     * @param newFirstTurn The new FirstTurn value.
      */
-    public final void setStart(final Turn newStart) {
-        this.start = newStart;
+    public final void setFirstTurn(final Turn newFirstTurn) {
+        this.firstTurn = newFirstTurn;
+        if (newFirstTurn != null) {
+            timeLimit = true;
+        }
     }
 
     /**
-     * Get the <code>End</code> value.
+     * Get the <code>LastTurn</code> value.
      *
      * @return a <code>Turn</code> value
      */
-    public final Turn getEnd() {
-        return end;
+    public final Turn getLastTurn() {
+        return lastTurn;
     }
 
     /**
-     * Set the <code>End</code> value.
+     * Set the <code>LastTurn</code> value.
      *
-     * @param newEnd The new End value.
+     * @param newEnd The new LastTurn value.
      */
-    public final void setEnd(final Turn newEnd) {
-        this.end = newEnd;
+    public final void setLastTurn(final Turn newLastTurn) {
+        this.lastTurn = newLastTurn;
+        if (newLastTurn != null) {
+            timeLimit = true;
+        }
     }
 
     /**
@@ -116,6 +168,11 @@ public abstract class Feature extends FreeColObject {
      */
     public final void setScopes(final List<Scope> newScopes) {
         this.scopes = newScopes;
+        if (newScopes == null || newScopes.isEmpty()) {
+            scope = false;
+        } else {
+            scope = true;
+        }
     }
 
     /**
@@ -156,6 +213,37 @@ public abstract class Feature extends FreeColObject {
     }
 
     /**
+     * Returns true if the <code>appliesTo</code> method of at least
+     * one <code>Scope</code> object returns true.
+     *
+     * @param objectType a <code>FreeColGameObjectType</code> value
+     * @param turn a <code>Turn</code> value
+     * @return a <code>boolean</code> value
+     */
+    public boolean appliesTo(final FreeColGameObjectType objectType, Turn turn) {
+        if (turn != null &&
+            (firstTurn != null && turn.getNumber() < firstTurn.getNumber() ||
+             lastTurn != null && turn.getNumber() > lastTurn.getNumber())) {
+            return false;
+        } else {
+            return appliesTo(objectType);
+        }
+    }
+
+    /**
+     * Returns true if the Feature has an lastTurn turn smaller than the
+     * turn given.
+     *
+     * @param turn a <code>Turn</code> value
+     * @return a <code>boolean</code> value
+     */
+    public boolean isOutOfDate(Turn turn) {
+        return (turn != null &&
+                (lastTurn != null && turn.getNumber() > lastTurn.getNumber()));
+    }
+        
+
+    /**
      * This method writes an XML-representation of this object to
      * the given stream.
      *
@@ -171,6 +259,17 @@ public abstract class Feature extends FreeColObject {
         if (getSource() != null) {
             out.writeAttribute("source", source);
         }
+        out.writeAttribute("scope", String.valueOf(scope));
+        out.writeAttribute("timeLimit", String.valueOf(timeLimit));
+
+        /*
+        if (firstTurn != null) {
+            firstTurn.toXML();
+        }
+        if (lastTurn != null) {
+            lastTurn.toXML();
+        }
+        */
         for (Scope scope : scopes) {
             scope.toXMLImpl(out);
         }

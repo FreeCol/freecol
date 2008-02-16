@@ -17,7 +17,6 @@
  *  along with FreeCol.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
 package net.sf.freecol.common.model;
 
 import java.util.ArrayList;
@@ -32,7 +31,6 @@ import javax.xml.stream.XMLStreamWriter;
 
 import org.w3c.dom.Element;
 
-
 /**
  * The <code>Modifier</code> class encapsulates a bonus or penalty
  * that can be applied to any action within the game, most obviously
@@ -41,7 +39,24 @@ import org.w3c.dom.Element;
  */
 public final class Modifier extends Feature {
 
-    public static enum Type { ADDITIVE, MULTIPLICATIVE, PERCENTAGE, COMBINED }
+    private static enum Change { NONE, UPDATE, REMOVE }
+
+    public static enum Type { 
+        ADDITIVE(0),
+        MULTIPLICATIVE(1),
+        PERCENTAGE(0),
+        COMBINED(0);
+
+        private float defaultValue;
+
+        Type(float defaultValue) {
+            this.defaultValue = defaultValue;
+        }
+
+        public float getDefaultValue() {
+            return defaultValue;
+        }
+    }
     
     /**
      * The type of this Modifier
@@ -52,7 +67,6 @@ public final class Modifier extends Feature {
      * The float values of this modifier
      */
     private EnumMap<Type, Float> values = new EnumMap<Type, Float>(Type.class);
-
 
     /**
      * The value increments per turn (usually 'null'). This can be
@@ -67,6 +81,10 @@ public final class Modifier extends Feature {
 
     // -- Constructors --
 
+    private Modifier() {
+        // empty constructor
+    };
+
 
     /**
      * Creates a new <code>Modifier</code> instance.
@@ -76,12 +94,7 @@ public final class Modifier extends Feature {
      * @param type a <code>Type</code> value
      */
     private Modifier(String id, String source, Type type) {
-        setId(id);
-        setSource(source);
-        this.type = type;
-        values.put(Type.ADDITIVE, 0f);
-        values.put(Type.PERCENTAGE, 0f);
-        values.put(Type.MULTIPLICATIVE, 1f);
+        this(id, source, type.getDefaultValue(), type);
     }
 
     /**
@@ -107,42 +120,14 @@ public final class Modifier extends Feature {
         setId(id);
         setSource(source);
         setType(type);
-        values.put(Type.ADDITIVE, 0f);
-        values.put(Type.PERCENTAGE, 0f);
-        values.put(Type.MULTIPLICATIVE, 1f);
-        values.put(type, value);
+        if (type == Type.COMBINED) {
+            values.put(Type.ADDITIVE, Type.ADDITIVE.getDefaultValue());
+            values.put(Type.PERCENTAGE, Type.PERCENTAGE.getDefaultValue());
+            values.put(Type.MULTIPLICATIVE, Type.MULTIPLICATIVE.getDefaultValue());
+        } else {
+            values.put(type, value);
+        }
     }
-
-    /**
-     * Creates a new <code>Modifier</code> instance.
-     *
-     * @param id a <code>String</code> value
-     * @param value an <code>float</code> value
-     * @param type the type of the modifier
-     */
-    /*
-    public Modifier(String id, float value, String type) {
-        this(id, null, value, type);
-    }
-    */
-
-    /**
-     * Creates a new <code>Modifier</code> instance.
-     *
-     * @param id a <code>String</code> value
-     * @param source a <code>String</code> value
-     * @param value an <code>float</code> value
-     * @param type the type of the modifier
-     */
-    /*
-    public Modifier(String id, String source, float value, String type) {
-        setId(id);
-        setSource(source);
-        Type newType = Enum.valueOf(Type.class, type);
-        setType(newType);
-        values.put(newType, value);
-    }
-    */
 
     /**
      * Creates a new <code>Modifier</code> instance.
@@ -169,20 +154,34 @@ public final class Modifier extends Feature {
      * @param modifier a <code>Modifier</code> value
      */
     public Modifier(Modifier modifier) {
+        copyValues(modifier);
+    }
+    
+    // -- Methods --
+
+    private void copyValues(Modifier modifier) {
         setId(modifier.getId());
         setType(modifier.getType());
         setSource(modifier.getSource());
+        setFirstTurn(modifier.getFirstTurn());
+        setLastTurn(modifier.getLastTurn());
         setScopes(new ArrayList<Scope>(modifier.getScopes()));
         if (modifier.getModifiers() != null) {
             modifiers = new ArrayList<Modifier>(modifier.getModifiers());
         }
         values = new EnumMap<Type, Float>(Type.class);
-        for (Entry<Type, Float> entry : values.entrySet()) {
+        for (Entry<Type, Float> entry : modifier.values.entrySet()) {
             values.put(entry.getKey(), new Float(entry.getValue()));
+        }
+        if (modifier.increments != null) {
+            increments = new EnumMap<Type, Float>(Type.class);
+            for (Entry<Type, Float> entry : modifier.increments.entrySet()) {
+                increments.put(entry.getKey(), new Float(entry.getValue()));
+            }
         }
     }
     
-    // -- Methods --
+
 
     /**
      * Get the <code>Modifiers</code> value.
@@ -200,6 +199,16 @@ public final class Modifier extends Feature {
      */
     public void setModifiers(final List<Modifier> newModifiers) {
         this.modifiers = newModifiers;
+        if (newModifiers == null || newModifiers.isEmpty()) {
+            return;
+        } else if (newModifiers.size() == 1) {
+            copyValues(newModifiers.get(0));
+        } else {
+            copyValues(newModifiers.get(0));
+            for (Modifier modifier : newModifiers.subList(1, newModifiers.size())) {
+                add(modifier);
+            }
+        }
     }
 
 
@@ -245,7 +254,7 @@ public final class Modifier extends Feature {
      *
      * @return a <code>boolean</code> value
      */
-    public boolean hasIncrements() {
+    public boolean hasIncrement() {
         return (increments != null);
     }
 
@@ -264,6 +273,9 @@ public final class Modifier extends Feature {
      * @param newIncrement The new Increment increment.
      */
     public void setIncrement(final float newIncrement) {
+        if (increments == null) {
+            increments = new EnumMap<Type, Float>(Type.class);
+        }
         increments.put(type, newIncrement);
     }
 
@@ -298,15 +310,21 @@ public final class Modifier extends Feature {
             } else {
                 result.modifiers.addAll(modifier.modifiers);
             }
-            result.values.put(Type.ADDITIVE, 
-                              result.values.get(Type.ADDITIVE) +
-                              modifier.values.get(Type.ADDITIVE));
-            result.values.put(Type.PERCENTAGE, 
-                              result.values.get(Type.PERCENTAGE) +
-                              modifier.values.get(Type.PERCENTAGE));
-            result.values.put(Type.MULTIPLICATIVE, 
-                              result.values.get(Type.MULTIPLICATIVE) *
-                              modifier.values.get(Type.MULTIPLICATIVE));
+            if (modifier.values.get(Type.ADDITIVE) != null) {
+                result.values.put(Type.ADDITIVE, 
+                                  result.values.get(Type.ADDITIVE) +
+                                  modifier.values.get(Type.ADDITIVE));
+            }
+            if (modifier.values.get(Type.PERCENTAGE) != null) {
+                result.values.put(Type.PERCENTAGE, 
+                                  result.values.get(Type.PERCENTAGE) +
+                                  modifier.values.get(Type.PERCENTAGE));
+            }
+            if (modifier.values.get(Type.MULTIPLICATIVE) != null) {
+                result.values.put(Type.MULTIPLICATIVE, 
+                                  result.values.get(Type.MULTIPLICATIVE) *
+                                  modifier.values.get(Type.MULTIPLICATIVE));
+            }
         }
         switch(result.modifiers.size()) {
         case 0:
@@ -315,6 +333,48 @@ public final class Modifier extends Feature {
             return result.modifiers.get(0);
         default:
             return result;
+        }
+    }
+
+    public void add(Modifier modifier) {
+        if (modifier == null) {
+            return;
+        } else if (!getId().equals(modifier.getId())){
+            throw new IllegalArgumentException("Can not combine Modifiers with different IDs.");
+        } else if (modifiers == null) {
+            modifiers = new ArrayList<Modifier>();
+            Modifier copy = new Modifier();
+            copy.copyValues(this);
+            modifiers.add(copy);
+        }
+        if (modifier.modifiers == null) {
+            modifiers.add(modifier);
+        } else {
+            modifiers.addAll(modifier.modifiers);
+        }
+        if (type != modifier.type) {
+            setType(Type.COMBINED);
+        }
+        if (modifier.values.get(Type.ADDITIVE) != null) {
+            values.put(Type.ADDITIVE, 
+                       values.get(Type.ADDITIVE) +
+                       modifier.values.get(Type.ADDITIVE));
+        }
+        if (modifier.values.get(Type.PERCENTAGE) != null) {
+            values.put(Type.PERCENTAGE, 
+                       values.get(Type.PERCENTAGE) +
+                       modifier.values.get(Type.PERCENTAGE));
+        }
+        if (modifier.values.get(Type.MULTIPLICATIVE) != null) {
+            values.put(Type.MULTIPLICATIVE, 
+                       values.get(Type.MULTIPLICATIVE) *
+                       modifier.values.get(Type.MULTIPLICATIVE));
+        }
+        if (modifier.hasScope()) {
+            setScope(true);
+        }
+        if (modifier.hasTimeLimit()) {
+            setTimeLimit(true);
         }
     }
 
@@ -332,15 +392,21 @@ public final class Modifier extends Feature {
             if (getModifiers().size() == 1) {
                 return getModifiers().get(0);
             } else {
-                values.put(Type.ADDITIVE, 
-                           values.get(Type.ADDITIVE) -
-                           newModifier.values.get(Type.ADDITIVE));
-                values.put(Type.PERCENTAGE, 
-                           values.get(Type.PERCENTAGE) -
-                           newModifier.values.get(Type.PERCENTAGE));
-                values.put(Type.MULTIPLICATIVE, 
-                           values.get(Type.MULTIPLICATIVE) /
-                           newModifier.values.get(Type.MULTIPLICATIVE));
+                if (newModifier.values.get(Type.ADDITIVE) != null) {
+                    values.put(Type.ADDITIVE, 
+                               values.get(Type.ADDITIVE) -
+                               newModifier.values.get(Type.ADDITIVE));
+                }
+                if (newModifier.values.get(Type.PERCENTAGE) != null) {
+                    values.put(Type.PERCENTAGE, 
+                               values.get(Type.PERCENTAGE) -
+                               newModifier.values.get(Type.PERCENTAGE));
+                }
+                if (newModifier.values.get(Type.MULTIPLICATIVE) != null) {
+                    values.put(Type.MULTIPLICATIVE, 
+                               values.get(Type.MULTIPLICATIVE) /
+                               newModifier.values.get(Type.MULTIPLICATIVE));
+                }
             }
         }
         return this;
@@ -354,20 +420,34 @@ public final class Modifier extends Feature {
      * @return a <code>Modifier</code> value
      */
     public Modifier getApplicableModifier(FreeColGameObjectType object) {
+        return getApplicableModifier(object, null);
+    }
+
+    /**
+     * Returns a Modifier applicable to the argument, or null if there
+     * is no such Modifier.
+     *
+     * @param object a <code>FreeColGameObjectType</code> value
+     * @param turn a <code>Turn</code> value
+     * @return a <code>Modifier</code> value
+     */
+    public Modifier getApplicableModifier(FreeColGameObjectType object, Turn turn) {
         if (getModifiers() == null) {
-            if (appliesTo(object)) {
+            if (appliesTo(object, turn)) {
                 return this;
             } else {
                 return null;
             }
-        } else {
+        } else if (hasScope() || hasTimeLimit()) {
             List<Modifier> result = new ArrayList<Modifier>();
             for (Modifier modifier : getModifiers()) {
-                if (modifier.appliesTo(object)) {
+                if (modifier.appliesTo(object, turn)) {
                     result.add(modifier);
                 }
             }
-            return combine(result.toArray(new Modifier[0]));
+            return combine(result.toArray(new Modifier[result.size()]));
+        } else {
+            return this;
         }
     }
 
@@ -390,6 +470,60 @@ public final class Modifier extends Feature {
             result += (result * values.get(Type.PERCENTAGE)) / 100;
         }
         return result;
+    }
+
+    public Change newTurn(Turn turn) {
+        if (getModifiers() == null) {
+            if (isOutOfDate(turn)) {
+                return Change.REMOVE;
+            } else if (hasIncrement()) {
+                float newValue = 0;
+                switch(type) {
+                case ADDITIVE:
+                case PERCENTAGE:
+                    newValue = getValue() + increments.get(type);
+                    break;
+                case MULTIPLICATIVE:
+                    newValue = getValue() * increments.get(type);
+                    break;
+                case COMBINED:
+                    throw new UnsupportedOperationException("Error calling newTurn on COMBINED Modifier.");
+                }
+                if (type.getDefaultValue() == newValue) {
+                    return Change.REMOVE;
+                } else {
+                    setValue(newValue);
+                    return Change.UPDATE;
+                }
+            } else {
+                return Change.NONE;
+            }
+        } else if (hasTimeLimit() || hasIncrement()) {
+            boolean recombine = false;
+            List<Modifier> newModifiers = new ArrayList<Modifier>();
+            for (Modifier modifier : getModifiers()) {
+                switch(modifier.newTurn(turn)) {
+                case NONE:
+                    newModifiers.add(modifier);
+                    break;
+                case UPDATE:
+                    newModifiers.add(modifier);
+                    recombine = true;
+                    break;
+                case REMOVE:
+                    recombine = true;
+                    break;
+                }
+            }
+            if (recombine) {
+                setModifiers(newModifiers);
+                return Change.UPDATE;
+            } else {
+                return Change.NONE;
+            }
+        } else {
+            return Change.NONE;
+        }
     }
 
     // -- Serialization --
@@ -419,7 +553,7 @@ public final class Modifier extends Feature {
         values.put(Type.PERCENTAGE, 0f);
         values.put(Type.MULTIPLICATIVE, 1f);
         for (Type type : Type.values()) {
-            String value = in.getAttributeValue(null, type.toString());
+            String value = in.getAttributeValue(null, "value");
             if (value != null) {
                 values.put(type, Float.parseFloat(value));
             }

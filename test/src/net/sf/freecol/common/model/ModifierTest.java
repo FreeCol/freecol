@@ -176,6 +176,7 @@ public class ModifierTest extends FreeColTestCase {
         scope3.setMethodValue("2");
 
         modifier1.getScopes().add(scope1);
+        modifier1.setScope(true);
         assertTrue(modifier1.appliesTo(frigate));
         assertFalse(modifier1.appliesTo(carpenter));
 
@@ -186,8 +187,9 @@ public class ModifierTest extends FreeColTestCase {
         assertTrue(result.getModifiers().get(2) == modifier3);
         assertTrue(result.applyTo(1) == ((1 + 3) * 1.5f) + ((1 + 3) * 1.5f) * 30 / 100);
 
+        modifier.setScope(true);
         result = modifier.getApplicableModifier(carpenter);
-        assertTrue(result.getModifiers().size() == 2);
+        assertEquals(2, result.getModifiers().size());
         assertTrue(result.getModifiers().get(0) == modifier2);
         assertTrue(result.getModifiers().get(1) == modifier3);
         assertTrue(result.applyTo(1) == 1.5f + (1.5f * 30) / 100);
