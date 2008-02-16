@@ -27,6 +27,7 @@ import java.awt.Image;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.logging.Logger;
@@ -88,6 +89,9 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
 
     private static final String OK = "OK";
     private static final String ROOT = "ROOT";
+
+    // layout of production modifier panel
+    private static final int MODIFIERS_PER_ROW = 5;
 
     private final Canvas parent;
 
@@ -650,27 +654,44 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
         // player can be null when using the map editor
         Europe europe = (player==null) ? null : player.getEurope();
 
-        String price = "";
+        // the number of rows required for layout
+        int rowsRequired = 5;
+
+        String price = null;
         if (europe != null && europe.getUnitPrice(type) > 0) {
             price = String.valueOf(europe.getUnitPrice(type));
         } else if (type.getPrice() > 0) {
             price = String.valueOf(type.getPrice());
         }
 
-        JPanel goodsRequired = new JPanel();
-        goodsRequired.setOpaque(false);
+        if (price != null) {
+            rowsRequired++;
+        }
+
+        String capacity = null;
+        if (type.hasAbility("model.unit.carryGoods") || 
+            type.hasAbility("model.unit.carryUnits")) {
+            capacity = String.valueOf(type.getSpace());
+            rowsRequired++;
+        }
+
+        JPanel goodsRequired = null;
         if (type.getGoodsRequired() != null) {
+            rowsRequired++;
+            goodsRequired = new JPanel();
+            goodsRequired.setOpaque(false);
             for (final AbstractGoods goods : type.getGoodsRequired()) {
                 goodsRequired.add(getGoodsButton(goods.getType(), goods.getAmount()));
             }
         }
 
-        String skill = "";
-        JPanel schoolPanel = new JPanel();
-        schoolPanel.setOpaque(false);
+        String skill = null;
+        JPanel schoolPanel = null;
         if (type.hasSkill()) {
+            rowsRequired += 2;
             skill = String.valueOf(type.getSkill());
-
+            schoolPanel = new JPanel();
+            schoolPanel.setOpaque(false);
             for (final BuildingType buildingType : FreeCol.getSpecification().getBuildingTypeList()) {
                 if (buildingType.hasAbility("model.ability.teach") && 
                     buildingType.canAdd(type)) {
@@ -678,8 +699,67 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
                 }
             }
         }
+
+        JPanel productionPanel = null;
+        List<Modifier> bonusList = new ArrayList<Modifier>();
+        for (GoodsType goodsType : FreeCol.getSpecification().getGoodsTypeList()) {
+            Modifier productionBonus = type.getModifier(goodsType.getId());
+            if (productionBonus != null) {
+                bonusList.add(productionBonus);
+            }
+        }
+        int bonusNumber = bonusList.size();
+        if (bonusNumber > 0) {
+            int rows = bonusNumber / MODIFIERS_PER_ROW;
+            if (bonusNumber % MODIFIERS_PER_ROW != 0) {
+                rows++;
+            }
+            int widths[] = new int[2 * MODIFIERS_PER_ROW - 1];
+            for (int index = 1; index < widths.length; index += 2) {
+                widths[index] = 3 * margin;
+            }
+            int heights[] = new int[2 * rows - 1];
+            for (int index = 1; index < heights.length; index += 2) {
+                heights[index] = margin;
+            }
+            productionPanel = new JPanel(new HIGLayout(widths, heights));
+            productionPanel.setOpaque(false);
+            rowsRequired++;
+
+            int row = 1;
+            int column = 1;
+            for (Modifier productionBonus : bonusList) {
+                GoodsType goodsType = FreeCol.getSpecification().getGoodsType(productionBonus.getId());
+                String bonus = String.valueOf(productionBonus.getValue());
+                switch(productionBonus.getType()) {
+                case ADDITIVE:
+                    if (productionBonus.getValue() > 0) {
+                        bonus = "+" + bonus;
+                    }
+                    break;
+                case PERCENTAGE:
+                    if (productionBonus.getValue() > 0) {
+                        bonus = "+" + bonus;
+                    }
+                    bonus = bonus + "%";
+                    break;
+                case MULTIPLICATIVE:
+                    bonus = "x" + bonus;
+                    break;
+                default:
+                }
+                productionPanel.add(getGoodsButton(goodsType, bonus),
+                                    higConst.rc(row, column));
+                column += 2;
+                if (column == 11) {
+                    column = 1;
+                    row += 2;
+                }
+            }
+        }
+
         int[] widths = { 0, 3 * margin, 0 };
-        int[] heights = new int[19];
+        int[] heights = new int[2 * rowsRequired - 1];
         for (int index = 1; index < heights.length; index += 2) {
             heights[index] = margin;
         }
@@ -712,12 +792,14 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
         detailPanel.add(new JLabel(String.valueOf(type.getMovement()/3)),
                         higConst.rc(row, valueColumn, "r"));
         row += 2;
-        if (type.hasAbility("carry-goods") || type.hasAbility("naval")) {
+        if (capacity != null) {
             detailPanel.add(new JLabel(Messages.message("colopedia.unit.capacity")),
                             higConst.rc(row, labelColumn));
-            detailPanel.add(new JLabel(String.valueOf(type.getSpace())),
+            detailPanel.add(new JLabel(capacity),
                             higConst.rc(row, valueColumn, "r"));
-        } else {
+            row += 2;
+        } 
+        if (skill != null) {
             detailPanel.add(new JLabel(Messages.message("colopedia.unit.skill")),
                             higConst.rc(row, labelColumn));
             detailPanel.add(new JLabel(skill), higConst.rc(row, valueColumn, "r"));
@@ -725,16 +807,26 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
             detailPanel.add(new JLabel(Messages.message("colopedia.unit.school")),
                             higConst.rc(row, labelColumn));
             detailPanel.add(schoolPanel, higConst.rc(row, valueColumn, "l"));
+            row += 2;
         }
-        row += 2;
-        detailPanel.add(new JLabel(Messages.message("colopedia.unit.price")),
-                        higConst.rc(row, labelColumn));
-        detailPanel.add(new JLabel(price), higConst.rc(row, valueColumn, "r"));
-        row += 2;
-        detailPanel.add(new JLabel(Messages.message("colopedia.unit.goodsRequired")),
-                        higConst.rc(row, labelColumn));
-        detailPanel.add(goodsRequired, higConst.rc(row, valueColumn, "l"));
-        row += 2;
+        if (productionPanel != null) {
+            detailPanel.add(new JLabel(Messages.message("colopedia.unit.productionBonus")),
+                            higConst.rc(row, labelColumn, "tl"));
+            detailPanel.add(productionPanel, higConst.rc(row, valueColumn, "l"));
+            row += 2;
+        }
+        if (price != null) {
+            detailPanel.add(new JLabel(Messages.message("colopedia.unit.price")),
+                            higConst.rc(row, labelColumn));
+            detailPanel.add(new JLabel(price), higConst.rc(row, valueColumn, "r"));
+            row += 2;
+        }
+        if (goodsRequired != null) {
+            detailPanel.add(new JLabel(Messages.message("colopedia.unit.goodsRequired")),
+                            higConst.rc(row, labelColumn));
+            detailPanel.add(goodsRequired, higConst.rc(row, valueColumn, "l"));
+            row += 2;
+        }
         detailPanel.add(new JLabel(Messages.message("colopedia.unit.description")),
                         higConst.rc(row, labelColumn, "tl"));
         detailPanel.add(getDefaultTextArea(type.getDescription()),
