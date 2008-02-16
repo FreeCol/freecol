@@ -240,6 +240,8 @@ public final class Ability extends Feature {
         setId(in.getAttributeValue(null, "id"));
         setSource(in.getAttributeValue(null, "source"));
         value = getAttribute(in, "value", true);
+        setScope(Boolean.parseBoolean(in.getAttributeValue(null, "scope")));
+        setTimeLimit(Boolean.parseBoolean(in.getAttributeValue(null, "timeLimit")));
 
         while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
             String childName = in.getLocalName();
@@ -268,10 +270,26 @@ public final class Ability extends Feature {
     public void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
         // Start element:
         out.writeStartElement(getXMLElementTagName());
+        out.writeAttribute("id", getId());
         out.writeAttribute("value", String.valueOf(value));
+        if (getSource() != null) {
+            out.writeAttribute("source", getSource());
+        }
+        out.writeAttribute("scope", String.valueOf(hasScope()));
+        out.writeAttribute("timeLimit", String.valueOf(hasTimeLimit()));
 
-        super.toXMLImpl(out);
-        
+        /*
+        if (firstTurn != null) {
+            firstTurn.toXML();
+        }
+        if (lastTurn != null) {
+            lastTurn.toXML();
+        }
+        */
+        for (Scope scope : getScopes()) {
+            scope.toXMLImpl(out);
+        }
+
         out.writeEndElement();
     }
 

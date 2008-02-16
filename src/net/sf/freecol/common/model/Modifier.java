@@ -549,6 +549,9 @@ public final class Modifier extends Feature {
         setId(in.getAttributeValue(null, "id"));
         setSource(in.getAttributeValue(null, "source"));
         setType(Enum.valueOf(Type.class, in.getAttributeValue(null, "type").toUpperCase()));
+        setScope(Boolean.parseBoolean(in.getAttributeValue(null, "scope")));
+        setTimeLimit(Boolean.parseBoolean(in.getAttributeValue(null, "timeLimit")));
+
         if (getType() == Type.COMBINED) {
             for (Type newType : Type.values()) {
                 String value = in.getAttributeValue(null, type.toString());
@@ -567,6 +570,7 @@ public final class Modifier extends Feature {
             if ("scope".equals(childName)) {
                 Scope scope = new Scope(in);
                 getScopes().add(scope);
+                setScope(true);
             } else if ("modifier".equals(childName)) {
                 Modifier modifier = new Modifier(in);
                 if (modifiers == null) {
@@ -595,6 +599,24 @@ public final class Modifier extends Feature {
     public void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
         // Start element:
         out.writeStartElement(getXMLElementTagName());
+        out.writeAttribute("id", getId());
+        if (getSource() != null) {
+            out.writeAttribute("source", getSource());
+        }
+        out.writeAttribute("scope", String.valueOf(hasScope()));
+        out.writeAttribute("timeLimit", String.valueOf(hasTimeLimit()));
+
+        /*
+        if (firstTurn != null) {
+            firstTurn.toXML();
+        }
+        if (lastTurn != null) {
+            lastTurn.toXML();
+        }
+        */
+        for (Scope scope : getScopes()) {
+            scope.toXMLImpl(out);
+        }
         out.writeAttribute("type", type.toString());
         if (type == Type.COMBINED) {
             for (Entry<Type, Float> entry : values.entrySet()) {
@@ -603,7 +625,6 @@ public final class Modifier extends Feature {
         } else {
             out.writeAttribute("value", values.get(type).toString());
         }
-        super.toXMLImpl(out);
         if (modifiers != null) {
             for (Modifier modifier : getModifiers()) {
                 modifier.toXMLImpl(out);

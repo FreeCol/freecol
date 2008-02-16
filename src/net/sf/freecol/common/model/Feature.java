@@ -120,6 +120,20 @@ public abstract class Feature extends FreeColObject {
     }
 
     /**
+     * Set the <code>Scopes</code> value.
+     *
+     * @param newScopes The new Scopes value.
+     */
+    public final void setScopes(final List<Scope> newScopes) {
+        this.scopes = newScopes;
+        if (newScopes == null || newScopes.isEmpty()) {
+            scope = false;
+        } else {
+            scope = true;
+        }
+    }
+
+    /**
      * Get the <code>firstTurn</code> value.
      *
      * @return a <code>Turn</code> value
@@ -158,20 +172,6 @@ public abstract class Feature extends FreeColObject {
         this.lastTurn = newLastTurn;
         if (newLastTurn != null) {
             timeLimit = true;
-        }
-    }
-
-    /**
-     * Set the <code>Scopes</code> value.
-     *
-     * @param newScopes The new Scopes value.
-     */
-    public final void setScopes(final List<Scope> newScopes) {
-        this.scopes = newScopes;
-        if (newScopes == null || newScopes.isEmpty()) {
-            scope = false;
-        } else {
-            scope = true;
         }
     }
 
@@ -242,36 +242,4 @@ public abstract class Feature extends FreeColObject {
                 (lastTurn != null && turn.getNumber() > lastTurn.getNumber()));
     }
         
-
-    /**
-     * This method writes an XML-representation of this object to
-     * the given stream.
-     *
-     * Classes extending this class must write attributes before this method
-     * is called, and must write children after this method is called.
-     *
-     * @param out The target stream.
-     * @throws XMLStreamException if there are any problems writing
-     *      to the stream.
-     */
-    public void toXMLImpl(final XMLStreamWriter out) throws XMLStreamException {
-        out.writeAttribute("id", getId());
-        if (getSource() != null) {
-            out.writeAttribute("source", source);
-        }
-        out.writeAttribute("scope", String.valueOf(scope));
-        out.writeAttribute("timeLimit", String.valueOf(timeLimit));
-
-        /*
-        if (firstTurn != null) {
-            firstTurn.toXML();
-        }
-        if (lastTurn != null) {
-            lastTurn.toXML();
-        }
-        */
-        for (Scope scope : scopes) {
-            scope.toXMLImpl(out);
-        }
-    }
 }
