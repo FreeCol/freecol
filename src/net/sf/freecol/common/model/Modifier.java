@@ -549,10 +549,14 @@ public final class Modifier extends Feature {
         setId(in.getAttributeValue(null, "id"));
         setSource(in.getAttributeValue(null, "source"));
         setType(Enum.valueOf(Type.class, in.getAttributeValue(null, "type").toUpperCase()));
-        values.put(Type.ADDITIVE, 0f);
-        values.put(Type.PERCENTAGE, 0f);
-        values.put(Type.MULTIPLICATIVE, 1f);
-        for (Type type : Type.values()) {
+        if (getType() == Type.COMBINED) {
+            for (Type newType : Type.values()) {
+                String value = in.getAttributeValue(null, type.toString());
+                if (value != null) {
+                    values.put(newType, Float.parseFloat(value));
+                }
+            }
+        } else {
             String value = in.getAttributeValue(null, "value");
             if (value != null) {
                 values.put(type, Float.parseFloat(value));
@@ -592,8 +596,12 @@ public final class Modifier extends Feature {
         // Start element:
         out.writeStartElement(getXMLElementTagName());
         out.writeAttribute("type", type.toString());
-        for (Entry<Type, Float> entry : values.entrySet()) {
-            out.writeAttribute(entry.getKey().toString(), entry.getValue().toString());
+        if (type == Type.COMBINED) {
+            for (Entry<Type, Float> entry : values.entrySet()) {
+                out.writeAttribute(entry.getKey().toString(), entry.getValue().toString());
+            }
+        } else {
+            out.writeAttribute("value", values.get(type).toString());
         }
         super.toXMLImpl(out);
         if (modifiers != null) {
