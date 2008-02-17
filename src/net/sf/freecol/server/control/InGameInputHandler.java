@@ -2049,7 +2049,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
 
         if (amount > 0) {
             for (int count = 0; count < amount; count++) {
-                unit.getEquipment().add(type);
+                unit.equipWith(type);
             }
         } else {
             for (int count = 0; count > amount; count--) {

@@ -2110,17 +2110,19 @@ public class Unit extends FreeColGameObject implements Features, Locatable, Loca
     }
 
     private void dumpEquipment(EquipmentType equipmentType, boolean asResultOfCombat) {
-        if (getColony() != null) {
-            for (AbstractGoods goods : equipmentType.getGoodsRequired()) {
-                getColony().addGoods(goods);
+        if (!asResultOfCombat) {
+            // the equipment is returned to storage in the form of goods
+            if (getColony() != null) {
+                for (AbstractGoods goods : equipmentType.getGoodsRequired()) {
+                    getColony().addGoods(goods);
+                }
+            } else if (isInEurope()) {
+                for (AbstractGoods goods : equipmentType.getGoodsRequired()) {
+                    getOwner().getMarket().sell(goods.getType(), goods.getAmount(), getOwner());
+                }
             }
-        } else if (isInEurope()) {
-            for (AbstractGoods goods : equipmentType.getGoodsRequired()) {
-                getOwner().getMarket().sell(goods.getType(), goods.getAmount(), getOwner());
-            }
-        } else if (!asResultOfCombat) {
-            throw new IllegalStateException("Equipment can only be dumped in this location as a result of combat.");
         }
+        // else in case of a lost battle, the equipment is just destroyed
     }
 
     /**
@@ -3547,10 +3549,6 @@ public class Unit extends FreeColGameObject implements Features, Locatable, Loca
 
         final String locationStr = in.getAttributeValue(null, "location");
         if (locationStr != null) {
-            // TODO: Fix properly bug #1755566 and remove this
-            if (location != null) {
-                location.remove(this);
-            }
             location = (Location) getGame().getFreeColGameObject(locationStr);
             if (location == null) {
                 location = newLocation(getGame(), locationStr);
@@ -3605,25 +3603,26 @@ public class Unit extends FreeColGameObject implements Features, Locatable, Loca
     }
 
     private Location newLocation(Game game, String locationString) {
+        Location loc = null;
         if (locationString.startsWith(Tile.getXMLElementTagName())) {
-            location = new Tile(game, locationString);
+            loc = new Tile(game, locationString);
         } else if (locationString.startsWith(Colony.getXMLElementTagName())) {
-            location = new Colony(game, locationString);
+            loc = new Colony(game, locationString);
         } else if (locationString.startsWith(IndianSettlement.getXMLElementTagName())) {
-            location = new IndianSettlement(game, locationString);
+            loc = new IndianSettlement(game, locationString);
         } else if (locationString.startsWith(Europe.getXMLElementTagName())) {
-            location = new Europe(game, locationString);
+            loc = new Europe(game, locationString);
         } else if (locationString.startsWith(ColonyTile.getXMLElementTagName())) {
-            location = new ColonyTile(game, locationString);
+            loc = new ColonyTile(game, locationString);
         } else if (locationString.startsWith(Building.getXMLElementTagName())) {
-            location = new Building(game, locationString);
+            loc = new Building(game, locationString);
         } else if (locationString.startsWith(Unit.getXMLElementTagName())) {
-            location = new Unit(game, locationString);
+            loc = new Unit(game, locationString);
         } else {
             logger.warning("Unknown type of Location: " + locationString);
-            location = new Tile(game, locationString);
+            loc = new Tile(game, locationString);
         }
-        return location;
+        return loc;
     }
 
     /**
