@@ -129,11 +129,11 @@ public class IndianDemandMission extends Mission {
                 ArrayList<Goods> goodsList = new ArrayList<Goods>();
                 GoodsContainer gc = getUnit().getIndianSettlement().getGoodsContainer();
                 // Come back to clean up - takes SUGAR, TOBACCO, COTTON, FURS
-                for (int i = 1; i <= 4; i++) {
-                    if (gc.getGoodsCount(i) >= IndianSettlement.KEEP_RAW_MATERIAL + 25) {
-                        goodsList.add(new Goods(getGame(), getUnit().getIndianSettlement(), 
-                                FreeCol.getSpecification().getGoodsType(i),
-                                getRandom().nextInt(15) + 10));
+                for (GoodsType goodsType : new GoodsType[] {Goods.SUGAR, Goods.TOBACCO, Goods.COTTON, Goods.FURS}) {
+                    if (gc.getGoodsCount(goodsType) >= IndianSettlement.KEEP_RAW_MATERIAL + 25) {
+                        goodsList.add(new Goods(getGame(), getUnit().getIndianSettlement(),
+                                                goodsType,
+                                                getRandom().nextInt(15) + 10));
                     }
                 }
 
