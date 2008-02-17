@@ -34,6 +34,11 @@ public class DemotionTest extends FreeColTestCase {
     UnitType veteranType = spec().getUnitType("model.unit.veteranSoldier");
     UnitType artilleryType = spec().getUnitType("model.unit.artillery");
     UnitType damagedArtilleryType = spec().getUnitType("model.unit.damagedArtillery");
+    UnitType colonialRegularType = spec().getUnitType("model.unit.colonialRegular");
+    UnitType kingsRegularType = spec().getUnitType("model.unit.kingsRegular");
+    UnitType indianConvertType = spec().getUnitType("model.unit.indianConvert");
+    UnitType pettyCriminalType = spec().getUnitType("model.unit.pettyCriminal");
+    UnitType indenturedServantType = spec().getUnitType("model.unit.indenturedServant");
 
     EquipmentType muskets = spec().getEquipmentType("model.equipment.muskets");
     EquipmentType horses = spec().getEquipmentType("model.equipment.horses");
@@ -282,4 +287,15 @@ public class DemotionTest extends FreeColTestCase {
         assertTrue(artillery.isDisposed());
     }
 
+    public void testPromotion() throws Exception {
+        
+        assertEquals(veteranType, colonistType.getPromotion());
+        assertEquals(colonialRegularType, veteranType.getPromotion());
+        assertEquals(colonialRegularType, colonialRegularType.getPromotion());
+        assertEquals(artilleryType, artilleryType.getPromotion());
+        assertEquals(kingsRegularType, kingsRegularType.getPromotion());
+        assertEquals(indianConvertType, indianConvertType.getPromotion());
+        assertEquals(indenturedServantType, pettyCriminalType.getPromotion());
+        assertEquals(colonistType, indenturedServantType.getPromotion());
+    }
 }
