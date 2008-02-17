@@ -120,13 +120,7 @@ public final class Modifier extends Feature {
         setId(id);
         setSource(source);
         setType(type);
-        if (type == Type.COMBINED) {
-            values.put(Type.ADDITIVE, Type.ADDITIVE.getDefaultValue());
-            values.put(Type.PERCENTAGE, Type.PERCENTAGE.getDefaultValue());
-            values.put(Type.MULTIPLICATIVE, Type.MULTIPLICATIVE.getDefaultValue());
-        } else {
-            values.put(type, value);
-        }
+        values.put(type, value);
     }
 
     /**
@@ -228,6 +222,17 @@ public final class Modifier extends Feature {
      */
     public void setType(final Type newType) {
         this.type = newType;
+        if (type == Type.COMBINED) {
+            if (values.get(Type.ADDITIVE) == null) {
+                values.put(Type.ADDITIVE, Type.ADDITIVE.getDefaultValue());
+            }
+            if (values.get(Type.PERCENTAGE) == null) {
+                values.put(Type.PERCENTAGE, Type.PERCENTAGE.getDefaultValue());
+            }
+            if (values.get(Type.MULTIPLICATIVE) == null) {
+                values.put(Type.MULTIPLICATIVE, Type.MULTIPLICATIVE.getDefaultValue());
+            }
+        }
     }
 
 
@@ -279,6 +284,21 @@ public final class Modifier extends Feature {
         increments.put(type, newIncrement);
     }
 
+    public boolean isDefaultValue() {
+        if (type == Type.COMBINED) {
+            return (values.get(Type.ADDITIVE).floatValue() ==
+                    Type.ADDITIVE.getDefaultValue() &&
+                    values.get(Type.PERCENTAGE).floatValue() ==
+                    Type.PERCENTAGE.getDefaultValue() &&
+                    values.get(Type.MULTIPLICATIVE).floatValue() ==
+                    Type.MULTIPLICATIVE.getDefaultValue());
+        } else {
+            return (values.get(type).floatValue() == 
+                    type.getDefaultValue());
+        }
+    }
+                    
+
     /**
      * Combines several Modifiers, which may be <code>null</code>. The
      * scopes of the Modifiers are not combined, so that the resulting
@@ -289,56 +309,34 @@ public final class Modifier extends Feature {
      * the arguments can not be combined
      */
     public static Modifier combine(Modifier... modifiers) {
-        String resultId = null;
-        Modifier result = new Modifier(resultId, "result", Type.COMBINED);
-        result.modifiers = new ArrayList<Modifier>();
+        Modifier result = null;
         for (Modifier modifier : modifiers) {
             if (modifier == null) {
                 continue;
-            } else if (resultId == null) {
-                // this is the first new modifier
-                resultId = modifier.getId();
-                result.setId(resultId);
-                result.type = modifier.type;
-            } else if (!resultId.equals(modifier.getId())) {
-                return null;
-            } else if (result.type != modifier.type) {
-                result.setType(Type.COMBINED);
-            }
-            if (modifier.modifiers == null) {
-                result.modifiers.add(modifier);
+            } else if (result == null) {
+                result = new Modifier();
+                result.copyValues(modifier);
+                if (modifier.modifiers == null) {
+                    result.modifiers = new ArrayList<Modifier>();
+                    result.modifiers.add(modifier);
+                } else {
+                    // copyValues has already copied the modifiers
+                }
             } else {
-                result.modifiers.addAll(modifier.modifiers);
-            }
-            if (modifier.values.get(Type.ADDITIVE) != null) {
-                result.values.put(Type.ADDITIVE, 
-                                  result.values.get(Type.ADDITIVE) +
-                                  modifier.values.get(Type.ADDITIVE));
-            }
-            if (modifier.values.get(Type.PERCENTAGE) != null) {
-                result.values.put(Type.PERCENTAGE, 
-                                  result.values.get(Type.PERCENTAGE) +
-                                  modifier.values.get(Type.PERCENTAGE));
-            }
-            if (modifier.values.get(Type.MULTIPLICATIVE) != null) {
-                result.values.put(Type.MULTIPLICATIVE, 
-                                  result.values.get(Type.MULTIPLICATIVE) *
-                                  modifier.values.get(Type.MULTIPLICATIVE));
-            }
-            if (modifier.hasScope()) {
-                result.setScope(true);
-            }
-            if (modifier.hasTimeLimit()) {
-                result.setTimeLimit(true);
+                result.add(modifier);
             }
         }
-        switch(result.modifiers.size()) {
-        case 0:
+        if (result == null) {
             return null;
-        case 1:
-            return result.modifiers.get(0);
-        default:
-            return result;
+        } else {
+            switch(result.modifiers.size()) {
+            case 0:
+                return null;
+            case 1:
+                return result.modifiers.get(0);
+            default:
+                return result;
+            }
         }
     }
 

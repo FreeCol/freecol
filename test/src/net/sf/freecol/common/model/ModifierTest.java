@@ -95,15 +95,15 @@ public class ModifierTest extends FreeColTestCase {
 
         Modifier modifier = Modifier.combine(null, modifier1, null, modifier2, null);
         assertTrue(modifier.getType() == Modifier.Type.COMBINED);
-        assertTrue(modifier.applyTo(1) == (1 + 3) * 1.5f);
-        assertTrue(modifier.getModifiers().size() == 2);
-        assertTrue(modifier.getModifiers().get(0) == modifier1);
-        assertTrue(modifier.getModifiers().get(1) == modifier2);
+        assertEquals((1 + 3) * 1.5f, modifier.applyTo(1));
+        assertEquals(2, modifier.getModifiers().size());
+        assertEquals(modifier.getModifiers().get(0), modifier1);
+        assertEquals(modifier.getModifiers().get(1), modifier2);
 
         modifier = Modifier.combine(modifier, modifier3);
-        assertTrue(modifier.getType() == Modifier.Type.COMBINED);
-        assertTrue(modifier.applyTo(1) == ((1 + 3) * 1.5f) * 1.5f);
-        assertTrue(modifier.getModifiers().size() == 3);
+        assertEquals(Modifier.Type.COMBINED, modifier.getType());
+        assertEquals(((1 + 3) * 1.5f) * 1.5f, modifier.applyTo(1));
+        assertEquals(3, modifier.getModifiers().size());
         assertTrue(modifier.getModifiers().get(0) == modifier1);
         assertTrue(modifier.getModifiers().get(1) == modifier2);
         assertTrue(modifier.getModifiers().get(2) == modifier3);
@@ -122,9 +122,13 @@ public class ModifierTest extends FreeColTestCase {
         Modifier modifier1 = new Modifier("test1", 3, Modifier.Type.ADDITIVE);
         Modifier modifier2 = new Modifier("test2", 1.5f, Modifier.Type.MULTIPLICATIVE);
 
-        Modifier modifier = Modifier.combine(modifier1, modifier2);
-        // returns null because ids differ
-        assertTrue(modifier == null);
+        try {
+            Modifier modifier = Modifier.combine(modifier1, modifier2);
+            fail("Should not be able to combine Modifiers with different IDs.");
+        } catch(Exception e) {
+            // this is expected
+        }
+
     }
 
     public void testRemove() {
