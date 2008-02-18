@@ -241,7 +241,16 @@ public final class Ability extends Feature {
         setSource(in.getAttributeValue(null, "source"));
         value = getAttribute(in, "value", true);
         setScope(Boolean.parseBoolean(in.getAttributeValue(null, "scope")));
-        setTimeLimit(Boolean.parseBoolean(in.getAttributeValue(null, "timeLimit")));
+
+        String firstTurn = in.getAttributeValue(null, "firstTurn");
+        if (firstTurn != null) {
+            setFirstTurn(new Turn(Integer.parseInt(firstTurn)));
+        }
+
+        String lastTurn = in.getAttributeValue(null, "lastTurn");
+        if (lastTurn != null) {
+            setLastTurn(new Turn(Integer.parseInt(lastTurn)));
+        }
 
         while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
             String childName = in.getLocalName();
@@ -278,14 +287,13 @@ public final class Ability extends Feature {
         out.writeAttribute("scope", String.valueOf(hasScope()));
         out.writeAttribute("timeLimit", String.valueOf(hasTimeLimit()));
 
-        /*
-        if (firstTurn != null) {
-            firstTurn.toXML();
+        if (getFirstTurn() != null) {
+            out.writeAttribute("firstTurn", String.valueOf(getFirstTurn().getNumber()));
         }
-        if (lastTurn != null) {
-            lastTurn.toXML();
+        if (getLastTurn() != null) {
+            out.writeAttribute("lastTurn", String.valueOf(getLastTurn().getNumber()));
         }
-        */
+
         for (Scope scope : getScopes()) {
             scope.toXMLImpl(out);
         }

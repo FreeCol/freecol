@@ -20,9 +20,8 @@
 package net.sf.freecol.common.model;
 
 import java.util.ArrayList;
-import java.util.EnumMap;
+import java.util.Arrays;
 import java.util.List;
-import java.util.Map.Entry;
 
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
@@ -39,24 +38,17 @@ import org.w3c.dom.Element;
  */
 public final class Modifier extends Feature {
 
-    private static enum Change { NONE, UPDATE, REMOVE }
+    public static enum Type { ADDITIVE, MULTIPLICATIVE, PERCENTAGE, COMBINED }
 
-    public static enum Type { 
-        ADDITIVE(0),
-        MULTIPLICATIVE(1),
-        PERCENTAGE(0),
-        COMBINED(0);
+    public static final float[] defaultValues = new float[] { 0f, 1f, 0f };
 
-        private float defaultValue;
+    private float[] values = new float[] { 0f, 1f, 0f };
 
-        Type(float defaultValue) {
-            this.defaultValue = defaultValue;
-        }
-
-        public float getDefaultValue() {
-            return defaultValue;
-        }
-    }
+    /**
+     * The value increments per turn. This can be used to create
+     * Modifiers whose values increase or decrease over time.
+     */
+    private float[] increments = new float[] { 0f, 1f, 0f };
     
     /**
      * The type of this Modifier
@@ -64,18 +56,9 @@ public final class Modifier extends Feature {
     private Type type;
 
     /**
-     * The float values of this modifier
-     */
-    private EnumMap<Type, Float> values = new EnumMap<Type, Float>(Type.class);
-
-    /**
-     * The value increments per turn (usually 'null'). This can be
-     * used to create bonuses that increase or decrease over time.
-     */
-    private EnumMap<Type, Float> increments;
-
-    /**
-     * A list of modifiers that contributed to this one.
+     * A list of modifiers that contributed to this one, if it is a
+     * COMBINED Modifier. The elements of this list must not be
+     * COMBINED Modifiers.
      */
     private List<Modifier> modifiers;
 
@@ -94,7 +77,9 @@ public final class Modifier extends Feature {
      * @param type a <code>Type</code> value
      */
     private Modifier(String id, String source, Type type) {
-        this(id, source, type.getDefaultValue(), type);
+        setId(id);
+        setSource(source);
+        setType(type);
     }
 
     /**
@@ -105,7 +90,9 @@ public final class Modifier extends Feature {
      * @param type the Type of the modifier
      */
     public Modifier(String id, float value, Type type) {
-        this(id, null, value, type);
+        setId(id);
+        setType(type);
+        setValue(value);
     }
 
     /**
@@ -120,7 +107,7 @@ public final class Modifier extends Feature {
         setId(id);
         setSource(source);
         setType(type);
-        values.put(type, value);
+        setValue(value);
     }
 
     /**
@@ -163,15 +150,9 @@ public final class Modifier extends Feature {
         if (modifier.getModifiers() != null) {
             modifiers = new ArrayList<Modifier>(modifier.getModifiers());
         }
-        values = new EnumMap<Type, Float>(Type.class);
-        for (Entry<Type, Float> entry : modifier.values.entrySet()) {
-            values.put(entry.getKey(), new Float(entry.getValue()));
-        }
+        System.arraycopy(modifier.values, 0, values, 0, 3);
         if (modifier.increments != null) {
-            increments = new EnumMap<Type, Float>(Type.class);
-            for (Entry<Type, Float> entry : modifier.increments.entrySet()) {
-                increments.put(entry.getKey(), new Float(entry.getValue()));
-            }
+            System.arraycopy(modifier.increments, 0, increments, 0, 3);
         }
     }
     
@@ -192,12 +173,14 @@ public final class Modifier extends Feature {
      * @param newModifiers The new Modifiers value.
      */
     public void setModifiers(final List<Modifier> newModifiers) {
-        this.modifiers = newModifiers;
+        modifiers = null;
         if (newModifiers == null || newModifiers.isEmpty()) {
             return;
         } else if (newModifiers.size() == 1) {
             copyValues(newModifiers.get(0));
         } else {
+            modifiers = new ArrayList<Modifier>();
+            modifiers.add(newModifiers.get(0));
             copyValues(newModifiers.get(0));
             for (Modifier modifier : newModifiers.subList(1, newModifiers.size())) {
                 add(modifier);
@@ -222,19 +205,20 @@ public final class Modifier extends Feature {
      */
     public void setType(final Type newType) {
         this.type = newType;
-        if (type == Type.COMBINED) {
-            if (values.get(Type.ADDITIVE) == null) {
-                values.put(Type.ADDITIVE, Type.ADDITIVE.getDefaultValue());
-            }
-            if (values.get(Type.PERCENTAGE) == null) {
-                values.put(Type.PERCENTAGE, Type.PERCENTAGE.getDefaultValue());
-            }
-            if (values.get(Type.MULTIPLICATIVE) == null) {
-                values.put(Type.MULTIPLICATIVE, Type.MULTIPLICATIVE.getDefaultValue());
-            }
-        }
     }
 
+    /**
+     * Get the <code>defaultValue</code> value.
+     *
+     * @return a <code>float</code> value
+     */
+    public float getDefaultValue() {
+        if (type == Type.COMBINED) {
+            throw new IllegalArgumentException("Can not get the default value of a COMBINED Modifier.");
+        } else {
+            return defaultValues[type.ordinal()];
+        }
+    }
 
     /**
      * Get the <code>Value</code> value.
@@ -242,7 +226,11 @@ public final class Modifier extends Feature {
      * @return a <code>float</code> value
      */
     public float getValue() {
-        return values.get(type);
+        if (type == Type.COMBINED) {
+            throw new IllegalArgumentException("Can not get the value of a COMBINED Modifier.");
+        } else {
+            return values[type.ordinal()];
+        }
     }
 
     /**
@@ -251,16 +239,11 @@ public final class Modifier extends Feature {
      * @param newValue The new Value value.
      */
     public void setValue(final float newValue) {
-        values.put(type, newValue);
-    }
-
-    /**
-     * Returns true if this Modifier has value increments.
-     *
-     * @return a <code>boolean</code> value
-     */
-    public boolean hasIncrement() {
-        return (increments != null);
+        if (type == Type.COMBINED) {
+            throw new IllegalArgumentException("Can not set the value of a COMBINED Modifier.");
+        } else {
+            values[type.ordinal()] = newValue;
+        }
     }
 
     /**
@@ -269,7 +252,11 @@ public final class Modifier extends Feature {
      * @return a <code>float</code> increment
      */
     public float getIncrement() {
-        return increments.get(type);
+        if (type == Type.COMBINED) {
+            throw new IllegalArgumentException("Can not get the increment of a COMBINED Modifier.");
+        } else {
+            return increments[type.ordinal()];
+        }
     }
 
     /**
@@ -277,27 +264,19 @@ public final class Modifier extends Feature {
      *
      * @param newIncrement The new Increment increment.
      */
-    public void setIncrement(final float newIncrement) {
-        if (increments == null) {
-            increments = new EnumMap<Type, Float>(Type.class);
-        }
-        increments.put(type, newIncrement);
-    }
-
-    public boolean isDefaultValue() {
-        if (type == Type.COMBINED) {
-            return (values.get(Type.ADDITIVE).floatValue() ==
-                    Type.ADDITIVE.getDefaultValue() &&
-                    values.get(Type.PERCENTAGE).floatValue() ==
-                    Type.PERCENTAGE.getDefaultValue() &&
-                    values.get(Type.MULTIPLICATIVE).floatValue() ==
-                    Type.MULTIPLICATIVE.getDefaultValue());
+    public void setIncrement(final float newIncrement, Type type, Turn firstTurn, Turn lastTurn) {
+        if (this.type == Type.COMBINED) {
+            throw new IllegalArgumentException("Can not set the increment of a COMBINED Modifier.");
+        } else if (type == Type.COMBINED) {
+            throw new IllegalArgumentException("Can not set COMBINED increment.");
+        } else if (firstTurn == null) {
+            throw new IllegalArgumentException("Parameter firstTurn must not be 'null'.");
         } else {
-            return (values.get(type).floatValue() == 
-                    type.getDefaultValue());
+            increments[type.ordinal()] = newIncrement;
+            setFirstTurn(firstTurn);
+            setLastTurn(lastTurn);
         }
     }
-                    
 
     /**
      * Combines several Modifiers, which may be <code>null</code>. The
@@ -309,34 +288,22 @@ public final class Modifier extends Feature {
      * the arguments can not be combined
      */
     public static Modifier combine(Modifier... modifiers) {
-        Modifier result = null;
+        ArrayList<Modifier> newModifiers = new ArrayList<Modifier>();
         for (Modifier modifier : modifiers) {
-            if (modifier == null) {
+            if (modifier == null || modifier.isDefaultModifier()) {
                 continue;
-            } else if (result == null) {
-                result = new Modifier();
-                result.copyValues(modifier);
-                if (modifier.modifiers == null) {
-                    result.modifiers = new ArrayList<Modifier>();
-                    result.modifiers.add(modifier);
-                } else {
-                    // copyValues has already copied the modifiers
-                }
             } else {
-                result.add(modifier);
+                newModifiers.add(modifier);
             }
         }
-        if (result == null) {
+        if (newModifiers.isEmpty()) {
             return null;
+        } else if (newModifiers.size() == 1) {
+            return newModifiers.get(0);
         } else {
-            switch(result.modifiers.size()) {
-            case 0:
-                return null;
-            case 1:
-                return result.modifiers.get(0);
-            default:
-                return result;
-            }
+            Modifier result = new Modifier();
+            result.setModifiers(newModifiers);
+            return result;
         }
     }
 
@@ -359,36 +326,22 @@ public final class Modifier extends Feature {
         if (type != modifier.type) {
             setType(Type.COMBINED);
         }
-        if (modifier.values.get(Type.ADDITIVE) != null) {
-            values.put(Type.ADDITIVE, 
-                       values.get(Type.ADDITIVE) +
-                       modifier.values.get(Type.ADDITIVE));
-        }
-        if (modifier.values.get(Type.PERCENTAGE) != null) {
-            values.put(Type.PERCENTAGE, 
-                       values.get(Type.PERCENTAGE) +
-                       modifier.values.get(Type.PERCENTAGE));
-        }
-        if (modifier.values.get(Type.MULTIPLICATIVE) != null) {
-            values.put(Type.MULTIPLICATIVE, 
-                       values.get(Type.MULTIPLICATIVE) *
-                       modifier.values.get(Type.MULTIPLICATIVE));
-        }
+        values[Type.ADDITIVE.ordinal()] += modifier.values[Type.ADDITIVE.ordinal()];
+        values[Type.PERCENTAGE.ordinal()] += modifier.values[Type.PERCENTAGE.ordinal()];
+        values[Type.MULTIPLICATIVE.ordinal()] *= modifier.values[Type.MULTIPLICATIVE.ordinal()];
+
         if (modifier.hasScope()) {
             setScope(true);
         }
-        if (modifier.hasTimeLimit()) {
-            setTimeLimit(true);
-            if (modifier.getFirstTurn() != null &&
-                (getFirstTurn() == null || 
-                 modifier.getFirstTurn().getNumber() < getFirstTurn().getNumber())) {
-                setFirstTurn(modifier.getFirstTurn());
-            } 
-            if (modifier.getLastTurn() != null &&
-                (getLastTurn() == null || 
-                 modifier.getLastTurn().getNumber() > getLastTurn().getNumber())) {
-                setLastTurn(modifier.getLastTurn());
-            } 
+        if (modifier.getFirstTurn() != null &&
+            (getFirstTurn() == null || 
+             modifier.getFirstTurn().getNumber() < getFirstTurn().getNumber())) {
+            setFirstTurn(modifier.getFirstTurn());
+        } 
+        if (modifier.getLastTurn() != null &&
+            (getLastTurn() == null || 
+             modifier.getLastTurn().getNumber() > getLastTurn().getNumber())) {
+            setLastTurn(modifier.getLastTurn());
         }
     }
 
@@ -406,21 +359,7 @@ public final class Modifier extends Feature {
             if (getModifiers().size() == 1) {
                 return getModifiers().get(0);
             } else {
-                if (newModifier.values.get(Type.ADDITIVE) != null) {
-                    values.put(Type.ADDITIVE, 
-                               values.get(Type.ADDITIVE) -
-                               newModifier.values.get(Type.ADDITIVE));
-                }
-                if (newModifier.values.get(Type.PERCENTAGE) != null) {
-                    values.put(Type.PERCENTAGE, 
-                               values.get(Type.PERCENTAGE) -
-                               newModifier.values.get(Type.PERCENTAGE));
-                }
-                if (newModifier.values.get(Type.MULTIPLICATIVE) != null) {
-                    values.put(Type.MULTIPLICATIVE, 
-                               values.get(Type.MULTIPLICATIVE) /
-                               newModifier.values.get(Type.MULTIPLICATIVE));
-                }
+                setModifiers(getModifiers());
             }
         }
         return this;
@@ -439,11 +378,14 @@ public final class Modifier extends Feature {
 
     /**
      * Returns a Modifier applicable to the argument, or null if there
-     * is no such Modifier.
+     * is no such Modifier. This method assumes that it is safe to
+     * remove Modifiers that are out of date, because the Turn
+     * increases monotonically.
      *
      * @param object a <code>FreeColGameObjectType</code> value
      * @param turn a <code>Turn</code> value
      * @return a <code>Modifier</code> value
+     * @see Feature#isOutOfDate(Turn)
      */
     public Modifier getApplicableModifier(FreeColGameObjectType object, Turn turn) {
         if (getModifiers() == null) {
@@ -454,17 +396,43 @@ public final class Modifier extends Feature {
             }
         } else if (hasScope() || hasTimeLimit()) {
             List<Modifier> result = new ArrayList<Modifier>();
+            List<Modifier> toRemove = new ArrayList<Modifier>();
             for (Modifier modifier : getModifiers()) {
-                if (modifier.appliesTo(object, turn)) {
-                    result.add(modifier);
+                if (modifier.isOutOfDate(turn)) {
+                    toRemove.add(modifier);
+                } else if (modifier.appliesTo(object, turn)) {
+                    if (modifier.hasIncrement()) {
+                        if (turn != null && getFirstTurn() != null) {
+                            int diff = turn.getNumber() - getFirstTurn().getNumber();
+                            if (diff > 0) {
+                                float newValue = modifier.getValue();
+                                newValue += increments[Type.ADDITIVE.ordinal()] * diff;
+                                newValue *= increments[Type.MULTIPLICATIVE.ordinal()] * diff;
+                                newValue += (newValue * increments[Type.PERCENTAGE.ordinal()] * diff) / 100;
+                                Modifier newModifier = new Modifier(modifier);
+                                newModifier.setValue(newValue);
+                                result.add(newModifier);
+                            }
+                        }
+                    } else {
+                        result.add(modifier);
+                    }
                 }
             }
+            modifiers.removeAll(toRemove);
             return combine(result.toArray(new Modifier[result.size()]));
         } else {
             return this;
         }
     }
 
+    public boolean hasIncrement() {
+        return !Arrays.equals(increments, defaultValues);
+    }
+
+    public boolean isDefaultModifier() {
+        return Arrays.equals(values, defaultValues);
+    }
 
     /**
      * Applies this Modifier to a number.
@@ -474,71 +442,12 @@ public final class Modifier extends Feature {
      */
     public float applyTo(float number) {
         float result = number;
-        if (values.get(Type.ADDITIVE) != null) {
-            result += values.get(Type.ADDITIVE);
-        }
-        if (values.get(Type.MULTIPLICATIVE) != null) {
-            result *= values.get(Type.MULTIPLICATIVE);
-        }
-        if (values.get(Type.PERCENTAGE) != null) {
-            result += (result * values.get(Type.PERCENTAGE)) / 100;
-        }
+        result += values[Type.ADDITIVE.ordinal()];
+        result *= values[Type.MULTIPLICATIVE.ordinal()];
+        result += (result * values[Type.PERCENTAGE.ordinal()]) / 100;
         return result;
     }
 
-    public Change newTurn(Turn turn) {
-        if (getModifiers() == null) {
-            if (isOutOfDate(turn)) {
-                return Change.REMOVE;
-            } else if (hasIncrement()) {
-                float newValue = 0;
-                switch(type) {
-                case ADDITIVE:
-                case PERCENTAGE:
-                    newValue = getValue() + increments.get(type);
-                    break;
-                case MULTIPLICATIVE:
-                    newValue = getValue() * increments.get(type);
-                    break;
-                case COMBINED:
-                    throw new UnsupportedOperationException("Error calling newTurn on COMBINED Modifier.");
-                }
-                if (type.getDefaultValue() == newValue) {
-                    return Change.REMOVE;
-                } else {
-                    setValue(newValue);
-                    return Change.UPDATE;
-                }
-            } else {
-                return Change.NONE;
-            }
-        } else if (hasTimeLimit() || hasIncrement()) {
-            boolean recombine = false;
-            List<Modifier> newModifiers = new ArrayList<Modifier>();
-            for (Modifier modifier : getModifiers()) {
-                switch(modifier.newTurn(turn)) {
-                case NONE:
-                    newModifiers.add(modifier);
-                    break;
-                case UPDATE:
-                    newModifiers.add(modifier);
-                    recombine = true;
-                    break;
-                case REMOVE:
-                    recombine = true;
-                    break;
-                }
-            }
-            if (recombine) {
-                setModifiers(newModifiers);
-                return Change.UPDATE;
-            } else {
-                return Change.NONE;
-            }
-        } else {
-            return Change.NONE;
-        }
-    }
 
     // -- Serialization --
 
@@ -564,21 +473,22 @@ public final class Modifier extends Feature {
         setSource(in.getAttributeValue(null, "source"));
         setType(Enum.valueOf(Type.class, in.getAttributeValue(null, "type").toUpperCase()));
         setScope(Boolean.parseBoolean(in.getAttributeValue(null, "scope")));
-        setTimeLimit(Boolean.parseBoolean(in.getAttributeValue(null, "timeLimit")));
 
-        if (getType() == Type.COMBINED) {
-            for (Type newType : Type.values()) {
-                String value = in.getAttributeValue(null, type.toString());
-                if (value != null) {
-                    values.put(newType, Float.parseFloat(value));
-                }
-            }
-        } else {
-            String value = in.getAttributeValue(null, "value");
-            if (value != null) {
-                values.put(type, Float.parseFloat(value));
-            }
+        String firstTurn = in.getAttributeValue(null, "firstTurn");
+        if (firstTurn != null) {
+            setFirstTurn(new Turn(Integer.parseInt(firstTurn)));
         }
+
+        String lastTurn = in.getAttributeValue(null, "lastTurn");
+        if (lastTurn != null) {
+            setLastTurn(new Turn(Integer.parseInt(lastTurn)));
+        }
+        if (type == Type.COMBINED) {
+            values = readFromArrayElement("values", in, new float[0]);
+        } else {
+            values[type.ordinal()] = Float.parseFloat(in.getAttributeValue(null, "value"));
+        }
+
         while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
             String childName = in.getLocalName();
             if ("scope".equals(childName)) {
@@ -591,6 +501,8 @@ public final class Modifier extends Feature {
                     modifiers = new ArrayList<Modifier>();
                 }
                 modifiers.add(modifier);
+            } else if ("increments".equals(childName)) {
+                increments = readFromArrayElement("increments", in, new float[0]);
             } else {
                 logger.finest("Parsing of " + childName + " is not implemented yet");
                 while (in.nextTag() != XMLStreamConstants.END_ELEMENT ||
@@ -618,27 +530,28 @@ public final class Modifier extends Feature {
             out.writeAttribute("source", getSource());
         }
         out.writeAttribute("scope", String.valueOf(hasScope()));
-        out.writeAttribute("timeLimit", String.valueOf(hasTimeLimit()));
 
-        /*
-        if (firstTurn != null) {
-            firstTurn.toXML();
+        if (getFirstTurn() != null) {
+            out.writeAttribute("firstTurn", String.valueOf(getFirstTurn().getNumber()));
         }
-        if (lastTurn != null) {
-            lastTurn.toXML();
+        if (getLastTurn() != null) {
+            out.writeAttribute("lastTurn", String.valueOf(getLastTurn().getNumber()));
         }
-        */
+
+        if (type != Type.COMBINED) {
+            out.writeAttribute("value", Float.toString(values[type.ordinal()]));
+        } else {
+            toArrayElement("values", values, out);
+        }
+
+        if (hasIncrement()) {
+            toArrayElement("increments", values, out);
+        }
+
         for (Scope scope : getScopes()) {
             scope.toXMLImpl(out);
         }
-        out.writeAttribute("type", type.toString());
-        if (type == Type.COMBINED) {
-            for (Entry<Type, Float> entry : values.entrySet()) {
-                out.writeAttribute(entry.getKey().toString(), entry.getValue().toString());
-            }
-        } else {
-            out.writeAttribute("value", values.get(type).toString());
-        }
+
         if (modifiers != null) {
             for (Modifier modifier : getModifiers()) {
                 modifier.toXMLImpl(out);

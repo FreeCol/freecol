@@ -56,11 +56,6 @@ public abstract class Feature extends FreeColObject {
     private boolean scope;
 
     /**
-     * Describe timeLimit here.
-     */
-    private boolean timeLimit;
-
-    /**
      * A list of Scopes limiting the applicability of this Feature.
      */
     private List<Scope> scopes = new ArrayList<Scope>();
@@ -71,16 +66,7 @@ public abstract class Feature extends FreeColObject {
      * @return a <code>boolean</code> value
      */
     public final boolean hasTimeLimit() {
-        return timeLimit;
-    }
-
-    /**
-     * Set the <code>TimeLimit</code> value.
-     *
-     * @param newTimeLimit The new TimeLimit value.
-     */
-    public final void setTimeLimit(final boolean newTimeLimit) {
-        this.timeLimit = newTimeLimit;
+        return (firstTurn != null || lastTurn != null);
     }
 
     /**
@@ -149,9 +135,6 @@ public abstract class Feature extends FreeColObject {
      */
     public final void setFirstTurn(final Turn newFirstTurn) {
         this.firstTurn = newFirstTurn;
-        if (newFirstTurn != null) {
-            timeLimit = true;
-        }
     }
 
     /**
@@ -170,9 +153,6 @@ public abstract class Feature extends FreeColObject {
      */
     public final void setLastTurn(final Turn newLastTurn) {
         this.lastTurn = newLastTurn;
-        if (newLastTurn != null) {
-            timeLimit = true;
-        }
     }
 
     /**

@@ -233,12 +233,14 @@ public class ModifierTest extends FreeColTestCase {
         assertTrue(modifier2.hasTimeLimit());
 
         assertFalse(modifier1.appliesTo(frigate, new Turn(5)));
-        assertTrue(modifier1.appliesTo(frigate, new Turn(15)));
         assertFalse(modifier1.appliesTo(frigate, new Turn(35)));
+        assertFalse(modifier1.isOutOfDate(new Turn(25)));
+        assertTrue(modifier1.appliesTo(frigate, new Turn(25)));
 
         assertFalse(modifier2.appliesTo(frigate, new Turn(5)));
-        assertTrue(modifier2.appliesTo(frigate, new Turn(25)));
         assertFalse(modifier2.appliesTo(frigate, new Turn(5)));
+        assertFalse(modifier2.isOutOfDate(new Turn(25)));
+        assertTrue(modifier2.appliesTo(frigate, new Turn(25)));
 
         Modifier modifier = Modifier.combine(modifier1, modifier2);
 
@@ -246,11 +248,22 @@ public class ModifierTest extends FreeColTestCase {
 
         assertFalse(modifier.appliesTo(frigate, new Turn(5)));
         assertFalse(modifier.appliesTo(frigate, new Turn(45)));
-        assertTrue(modifier.appliesTo(frigate, new Turn(15)));
+        assertTrue(modifier.appliesTo(frigate, new Turn(25)));
         assertTrue(modifier.appliesTo(frigate, new Turn(35)));
 
         assertEquals(modifier1, modifier.getApplicableModifier(frigate, new Turn(15)));
         assertEquals(modifier2, modifier.getApplicableModifier(frigate, new Turn(35)));
+        // modifier1 has been removed as out of date
+        assertEquals(1, modifier.getModifiers().size());
+        assertEquals(modifier2, modifier.getModifiers().get(0));
+
+        modifier = Modifier.combine(modifier1, modifier2);
+        Modifier applicableModifier = modifier.getApplicableModifier(frigate, new Turn(25));
+        assertEquals(2, applicableModifier.getModifiers().size());
+        assertEquals(modifier1, applicableModifier.getModifiers().get(0));
+        assertEquals(modifier2, applicableModifier.getModifiers().get(1));
+
+        assertEquals(1 + 1 + 2f, modifier.getApplicableModifier(frigate, new Turn(25)).applyTo(1));
 
     }
 
