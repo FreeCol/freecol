@@ -740,7 +740,7 @@
       <ability id="model.ability.canBeCaptured" value="true"/>
       <ability id="model.ability.expertSoldier" value="true"/>
       <modifier id="model.modifier.offence" type="percentage" value="50"/>
-      <upgrade id="model.unit.colonialRegular" promotion="true"/>
+      <upgrade unit="model.unit.colonialRegular" promotion="true"/>
     </unit-type>
     <unit-type id="model.unit.jesuitMissionary" art="jesuitMissionary" offence="0"  defence="1" movement="3" lineOfSight="1" price="1400" 
                skill="3" recruitProbability="1" scoreValue="5" pathImage="foot">

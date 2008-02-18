@@ -465,11 +465,9 @@ public final class UnitType extends BuildableType {
     }
 
     public UnitType getPromotion() {
-        Iterator<Entry<String, Upgrade>> iterator = upgrades.entrySet().iterator();
-        while (iterator.hasNext()) {
-            Entry<String, Upgrade> pair = iterator.next();
-            if (pair.getValue().asResultOf.get(UpgradeType.PROMOTION)) {
-                return FreeCol.getSpecification().getUnitType(pair.getKey());
+        for (Entry<String, Upgrade> entry : upgrades.entrySet()) {
+            if (entry.getValue().asResultOf.get(UpgradeType.PROMOTION)) {
+                return FreeCol.getSpecification().getUnitType(entry.getKey());
             }
         }
         return null;

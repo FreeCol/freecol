@@ -289,13 +289,13 @@ public class DemotionTest extends FreeColTestCase {
 
     public void testPromotion() throws Exception {
         
-        assertEquals(veteranType, colonistType.getPromotion());
-        assertEquals(colonialRegularType, veteranType.getPromotion());
-        assertEquals(colonialRegularType, colonialRegularType.getPromotion());
-        assertEquals(artilleryType, artilleryType.getPromotion());
-        assertEquals(kingsRegularType, kingsRegularType.getPromotion());
-        assertEquals(indianConvertType, indianConvertType.getPromotion());
         assertEquals(indenturedServantType, pettyCriminalType.getPromotion());
         assertEquals(colonistType, indenturedServantType.getPromotion());
+        assertEquals(veteranType, colonistType.getPromotion());
+        assertEquals(colonialRegularType, veteranType.getPromotion());
+        assertEquals(null, colonialRegularType.getPromotion());
+        assertEquals(null, artilleryType.getPromotion());
+        assertEquals(null, kingsRegularType.getPromotion());
+        assertEquals(null, indianConvertType.getPromotion());
     }
 }
