@@ -379,6 +379,16 @@ public final class Modifier extends Feature {
         }
         if (modifier.hasTimeLimit()) {
             setTimeLimit(true);
+            if (modifier.getFirstTurn() != null &&
+                (getFirstTurn() == null || 
+                 modifier.getFirstTurn().getNumber() < getFirstTurn().getNumber())) {
+                setFirstTurn(modifier.getFirstTurn());
+            } 
+            if (modifier.getLastTurn() != null &&
+                (getLastTurn() == null || 
+                 modifier.getLastTurn().getNumber() > getLastTurn().getNumber())) {
+                setLastTurn(modifier.getLastTurn());
+            } 
         }
     }
 

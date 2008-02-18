@@ -29,23 +29,23 @@ public class ModifierTest extends FreeColTestCase {
 
         Modifier modifier = new Modifier("test", 3, Modifier.Type.ADDITIVE);
 
-        assertTrue(modifier.applyTo(1) == 3 + 1);
+        assertEquals(4f, modifier.applyTo(1));
     }
 
     public void testMultiplicativeModifier() {
 
         Modifier modifier = new Modifier("test", 1.5f, Modifier.Type.MULTIPLICATIVE);
 
-        assertTrue(modifier.applyTo(1) == 1 * 1.5);
-        assertTrue(modifier.applyTo(3) == 3 * 1.5);
+        assertEquals(1 * 1.5f, modifier.applyTo(1));
+        assertEquals(3 * 1.5f, modifier.applyTo(3));
     }
 
     public void testPercentageModifier() {
 
         Modifier modifier = new Modifier("test", 50, Modifier.Type.PERCENTAGE);
 
-        assertTrue(modifier.applyTo(100) == 150f);
-        assertTrue(modifier.applyTo(3) == 4.5f);
+        assertEquals(150f, modifier.applyTo(100));
+        assertEquals(4.5f, modifier.applyTo(3));
 
     }
 
@@ -54,11 +54,11 @@ public class ModifierTest extends FreeColTestCase {
         Modifier modifier1 = new Modifier("test", 3, Modifier.Type.ADDITIVE);
         Modifier modifier2 = new Modifier("test", 4, Modifier.Type.ADDITIVE);
         Modifier modifier = Modifier.combine(null, modifier1, modifier2);
-        assertTrue(modifier.getType() == Modifier.Type.ADDITIVE);
-        assertTrue(modifier.applyTo(1) == 1 + 3 + 4);
-        assertTrue(modifier.getModifiers().size() == 2);
-        assertTrue(modifier.getModifiers().get(0) == modifier1);
-        assertTrue(modifier.getModifiers().get(1) == modifier2);
+        assertEquals(Modifier.Type.ADDITIVE, modifier.getType());
+        assertEquals(1 + 3 + 4f, modifier.applyTo(1));
+        assertEquals(2, modifier.getModifiers().size());
+        assertEquals(modifier1, modifier.getModifiers().get(0));
+        assertEquals(modifier2, modifier.getModifiers().get(1));
 
     }
 
@@ -67,10 +67,10 @@ public class ModifierTest extends FreeColTestCase {
         Modifier modifier1 = new Modifier("test", 3, Modifier.Type.MULTIPLICATIVE);
         Modifier modifier2 = new Modifier("test", 4, Modifier.Type.MULTIPLICATIVE);
         Modifier modifier = Modifier.combine(modifier1, null, modifier2);
-        assertTrue(modifier.getType() == Modifier.Type.MULTIPLICATIVE);
-        assertTrue(modifier.applyTo(2) == 2 * 3 * 4);
-        assertTrue(modifier.getModifiers().size() == 2);
-        assertTrue(modifier.getModifiers().get(1) == modifier2);
+        assertEquals(Modifier.Type.MULTIPLICATIVE, modifier.getType());
+        assertEquals(2 * 3 * 4f, modifier.applyTo(2));
+        assertEquals(2, modifier.getModifiers().size());
+        assertEquals(modifier2, modifier.getModifiers().get(1));
 
     }
 
@@ -79,11 +79,11 @@ public class ModifierTest extends FreeColTestCase {
         Modifier modifier1 = new Modifier("test", 3, Modifier.Type.PERCENTAGE);
         Modifier modifier2 = new Modifier("test", 4, Modifier.Type.PERCENTAGE);
         Modifier modifier = Modifier.combine(modifier1, modifier2, null);
-        assertTrue(modifier.getType() == Modifier.Type.PERCENTAGE);
-        assertTrue(modifier.applyTo(100) == 107f);
-        assertTrue(modifier.getModifiers().size() == 2);
-        assertTrue(modifier.getModifiers().get(0) == modifier1);
-        assertTrue(modifier.getModifiers().get(1) == modifier2);
+        assertEquals(Modifier.Type.PERCENTAGE, modifier.getType());
+        assertEquals(107f, modifier.applyTo(100));
+        assertEquals(2, modifier.getModifiers().size());
+        assertEquals(modifier1, modifier.getModifiers().get(0));
+        assertEquals(modifier2, modifier.getModifiers().get(1));
 
     }
 
@@ -94,7 +94,7 @@ public class ModifierTest extends FreeColTestCase {
         Modifier modifier3 = new Modifier("test", 50, Modifier.Type.PERCENTAGE);
 
         Modifier modifier = Modifier.combine(null, modifier1, null, modifier2, null);
-        assertTrue(modifier.getType() == Modifier.Type.COMBINED);
+        assertEquals(Modifier.Type.COMBINED, modifier.getType());
         assertEquals((1 + 3) * 1.5f, modifier.applyTo(1));
         assertEquals(2, modifier.getModifiers().size());
         assertEquals(modifier.getModifiers().get(0), modifier1);
@@ -104,16 +104,16 @@ public class ModifierTest extends FreeColTestCase {
         assertEquals(Modifier.Type.COMBINED, modifier.getType());
         assertEquals(((1 + 3) * 1.5f) * 1.5f, modifier.applyTo(1));
         assertEquals(3, modifier.getModifiers().size());
-        assertTrue(modifier.getModifiers().get(0) == modifier1);
-        assertTrue(modifier.getModifiers().get(1) == modifier2);
-        assertTrue(modifier.getModifiers().get(2) == modifier3);
+        assertEquals(modifier1, modifier.getModifiers().get(0));
+        assertEquals(modifier2, modifier.getModifiers().get(1));
+        assertEquals(modifier3, modifier.getModifiers().get(2));
 
         modifier = Modifier.combine(modifier2, modifier3);
-        assertTrue(modifier.getType() == Modifier.Type.COMBINED);
-        assertTrue(modifier.applyTo(10) == 10 * 1.5f * 1.5f);
-        assertTrue(modifier.getModifiers().size() == 2);
-        assertTrue(modifier.getModifiers().get(0) == modifier2);
-        assertTrue(modifier.getModifiers().get(1) == modifier3);
+        assertEquals(Modifier.Type.COMBINED, modifier.getType());
+        assertEquals(10 * 1.5f * 1.5f, modifier.applyTo(10));
+        assertEquals(2, modifier.getModifiers().size());
+        assertEquals(modifier2, modifier.getModifiers().get(0));
+        assertEquals(modifier3, modifier.getModifiers().get(1));
 
     }
 
@@ -138,22 +138,22 @@ public class ModifierTest extends FreeColTestCase {
         Modifier modifier3 = new Modifier("test", 50, Modifier.Type.PERCENTAGE);
 
         Modifier modifier = Modifier.combine(modifier1, modifier2, modifier3);
-        assertTrue(modifier.getType() == Modifier.Type.COMBINED);
-        assertTrue(modifier.applyTo(1) == ((1 + 3) * 1.5f) * 1.5f);
-        assertTrue(modifier.getModifiers().size() == 3);
-        assertTrue(modifier.getModifiers().get(0) == modifier1);
-        assertTrue(modifier.getModifiers().get(1) == modifier2);
-        assertTrue(modifier.getModifiers().get(2) == modifier3);
+        assertEquals(Modifier.Type.COMBINED, modifier.getType());
+        assertEquals(((1 + 3) * 1.5f) * 1.5f, modifier.applyTo(1));
+        assertEquals(3, modifier.getModifiers().size());
+        assertEquals(modifier1, modifier.getModifiers().get(0));
+        assertEquals(modifier2, modifier.getModifiers().get(1));
+        assertEquals(modifier3, modifier.getModifiers().get(2));
 
         Modifier modifier4 = modifier.remove(modifier2);
-        assertTrue(modifier4 == modifier);
-        assertTrue(modifier.getModifiers().size() == 2);
-        assertTrue(modifier.getModifiers().get(0) == modifier1);
-        assertTrue(modifier.getModifiers().get(1) == modifier3);
-        assertTrue(modifier.applyTo(1) == ((1 + 3) * 1.5f));
+        assertEquals(modifier, modifier4);
+        assertEquals(2, modifier.getModifiers().size());
+        assertEquals(modifier1, modifier.getModifiers().get(0));
+        assertEquals(modifier3, modifier.getModifiers().get(1));
+        assertEquals(((1 + 3) * 1.5f), modifier.applyTo(1));
 
         Modifier modifier5 = modifier4.remove(modifier3);
-        assertTrue(modifier5 == modifier1);
+        assertEquals(modifier1, modifier5);
 
     }
 
@@ -184,18 +184,18 @@ public class ModifierTest extends FreeColTestCase {
         assertFalse(modifier1.appliesTo(carpenter));
 
         Modifier result = modifier.getApplicableModifier(frigate);
-        assertTrue(result.getModifiers().size() == 3);
-        assertTrue(result.getModifiers().get(0) == modifier1);
-        assertTrue(result.getModifiers().get(1) == modifier2);
-        assertTrue(result.getModifiers().get(2) == modifier3);
-        assertTrue(result.applyTo(1) == ((1 + 3) * 1.5f) + ((1 + 3) * 1.5f) * 30 / 100);
+        assertEquals(3, result.getModifiers().size());
+        assertEquals(modifier1, result.getModifiers().get(0));
+        assertEquals(modifier2, result.getModifiers().get(1));
+        assertEquals(modifier3, result.getModifiers().get(2));
+        assertEquals(((1 + 3) * 1.5f) + ((1 + 3) * 1.5f) * 30 / 100, result.applyTo(1));
 
         modifier.setScope(true);
         result = modifier.getApplicableModifier(carpenter);
         assertEquals(2, result.getModifiers().size());
-        assertTrue(result.getModifiers().get(0) == modifier2);
-        assertTrue(result.getModifiers().get(1) == modifier3);
-        assertTrue(result.applyTo(1) == 1.5f + (1.5f * 30) / 100);
+        assertEquals(modifier2, result.getModifiers().get(0));
+        assertEquals(modifier3, result.getModifiers().get(1));
+        assertEquals(1.5f + (1.5f * 30) / 100, result.applyTo(1));
 
         modifier2.getScopes().add(scope2);
         modifier2.getScopes().add(scope3);
@@ -203,17 +203,54 @@ public class ModifierTest extends FreeColTestCase {
         assertTrue(modifier2.appliesTo(carpenter));
 
         result = modifier.getApplicableModifier(frigate);
-        assertTrue(result.getModifiers().size() == 3);
-        assertTrue(result.getModifiers().get(0) == modifier1);
-        assertTrue(result.getModifiers().get(1) == modifier2);
-        assertTrue(result.getModifiers().get(2) == modifier3);
-        assertTrue(result.applyTo(1) == ((1 + 3) * 1.5f) + ((1 + 3) * 1.5f) * 30 / 100);
+        assertEquals(3, result.getModifiers().size());
+        assertEquals(modifier1, result.getModifiers().get(0));
+        assertEquals(modifier2, result.getModifiers().get(1));
+        assertEquals(modifier3, result.getModifiers().get(2));
+        assertEquals(((1 + 3) * 1.5f) + ((1 + 3) * 1.5f) * 30 / 100, result.applyTo(1));
 
         result = modifier.getApplicableModifier(carpenter);
-        assertTrue(result.getModifiers().size() == 2);
-        assertTrue(result.getModifiers().get(0) == modifier2);
-        assertTrue(result.getModifiers().get(1) == modifier3);
-        assertTrue(result.applyTo(1) == 1.5f + (1.5f * 30) / 100);
+        assertEquals(2, result.getModifiers().size());
+        assertEquals(modifier2, result.getModifiers().get(0));
+        assertEquals(modifier3, result.getModifiers().get(1));
+        assertEquals(1.5f + (1.5f * 30) / 100, result.applyTo(1));
+
+    }
+
+    public void testTimeLimits() {
+
+        UnitType frigate = FreeCol.getSpecification().getUnitType("model.unit.frigate");
+
+        Modifier modifier1 = new Modifier("test", 1, Modifier.Type.ADDITIVE);
+        Modifier modifier2 = new Modifier("test", 2, Modifier.Type.ADDITIVE);
+
+        modifier1.setFirstTurn(new Turn(10));
+        modifier1.setLastTurn(new Turn(30));
+        modifier2.setFirstTurn(new Turn(20));
+        modifier2.setLastTurn(new Turn(40));
+
+        assertTrue(modifier1.hasTimeLimit());
+        assertTrue(modifier2.hasTimeLimit());
+
+        assertFalse(modifier1.appliesTo(frigate, new Turn(5)));
+        assertTrue(modifier1.appliesTo(frigate, new Turn(15)));
+        assertFalse(modifier1.appliesTo(frigate, new Turn(35)));
+
+        assertFalse(modifier2.appliesTo(frigate, new Turn(5)));
+        assertTrue(modifier2.appliesTo(frigate, new Turn(25)));
+        assertFalse(modifier2.appliesTo(frigate, new Turn(5)));
+
+        Modifier modifier = Modifier.combine(modifier1, modifier2);
+
+        assertTrue(modifier.hasTimeLimit());
+
+        assertFalse(modifier.appliesTo(frigate, new Turn(5)));
+        assertFalse(modifier.appliesTo(frigate, new Turn(45)));
+        assertTrue(modifier.appliesTo(frigate, new Turn(15)));
+        assertTrue(modifier.appliesTo(frigate, new Turn(35)));
+
+        assertEquals(modifier1, modifier.getApplicableModifier(frigate, new Turn(15)));
+        assertEquals(modifier2, modifier.getApplicableModifier(frigate, new Turn(35)));
 
     }
 
