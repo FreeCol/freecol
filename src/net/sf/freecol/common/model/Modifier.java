@@ -63,7 +63,7 @@ public final class Modifier extends Feature {
 
     /**
      * A list of modifiers that contributed to this one, if it is a
-     * COMBINED Modifier. The elements of this list must not be
+     * composite Modifier. The elements of this list must not be
      * COMBINED Modifiers.
      */
     private List<Modifier> modifiers;
@@ -73,20 +73,6 @@ public final class Modifier extends Feature {
     private Modifier() {
         // empty constructor
     };
-
-
-    /**
-     * Creates a new <code>Modifier</code> instance.
-     *
-     * @param id a <code>String</code> value
-     * @param source a <code>String</code> value
-     * @param type a <code>Type</code> value
-     */
-    private Modifier(String id, String source, Type type) {
-        setId(id);
-        setSource(source);
-        setType(type);
-    }
 
     /**
      * Creates a new <code>Modifier</code> instance.
@@ -146,6 +132,11 @@ public final class Modifier extends Feature {
     
     // -- Methods --
 
+    /**
+     * Copies the fields of the given Modifier into this one.
+     *
+     * @param modifier a <code>Modifier</code> value
+     */
     private void copyValues(Modifier modifier) {
         setId(modifier.getId());
         setType(modifier.getType());
@@ -178,8 +169,8 @@ public final class Modifier extends Feature {
      * @param newModifiers The new Modifiers value.
      */
     public void setModifiers(final List<Modifier> newModifiers) {
-        modifiers = null;
         if (newModifiers == null || newModifiers.isEmpty()) {
+            modifiers = null;
             return;
         } else if (newModifiers.size() == 1) {
             copyValues(newModifiers.get(0));
@@ -291,7 +282,7 @@ public final class Modifier extends Feature {
         if (this.type == Type.COMBINED) {
             throw new IllegalArgumentException("Can not set the increment of a COMBINED Modifier.");
         } else if (type == Type.COMBINED) {
-            throw new IllegalArgumentException("Can not set COMBINED increment.");
+            throw new IllegalArgumentException("Can not assign a COMBINED increment.");
         } else if (firstTurn == null) {
             throw new IllegalArgumentException("Parameter firstTurn must not be 'null'.");
         } else {
