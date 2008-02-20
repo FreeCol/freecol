@@ -20,7 +20,6 @@
 package net.sf.freecol.common.model;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
@@ -152,7 +151,15 @@ public final class Modifier extends Feature {
         incrementType = modifier.incrementType;
     }
     
-
+    /**
+     * Returns <code>true</code> if this Modifier is composed of other
+     * Modifiers.
+     *
+     * @return a <code>boolean</code> value
+     */
+    public boolean isComposite() {
+        return !(getModifiers() == null || getModifiers().isEmpty());
+    }
 
     /**
      * Get the <code>Modifiers</code> value.
@@ -305,7 +312,7 @@ public final class Modifier extends Feature {
     public static Modifier combine(Modifier... modifiers) {
         ArrayList<Modifier> newModifiers = new ArrayList<Modifier>();
         for (Modifier modifier : modifiers) {
-            if (modifier == null || modifier.isDefaultModifier()) {
+            if (modifier == null) {
                 continue;
             } else {
                 newModifiers.add(modifier);
@@ -322,6 +329,12 @@ public final class Modifier extends Feature {
         }
     }
 
+    /**
+     * Adds a Modifier to this one. The result is generally a
+     * composite Modifier.
+     *
+     * @param modifier a <code>Modifier</code> value
+     */
     public void add(Modifier modifier) {
         if (modifier == null) {
             return;
@@ -446,12 +459,13 @@ public final class Modifier extends Feature {
     }
 
 
+    /**
+     * Returns <code>true</code> if this Modifier has an increment.
+     *
+     * @return a <code>boolean</code> value
+     */
     public boolean hasIncrement() {
         return incrementType != null;
-    }
-
-    public boolean isDefaultModifier() {
-        return Arrays.equals(values, defaultValues);
     }
 
     /**
