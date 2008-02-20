@@ -23,6 +23,8 @@ import net.sf.freecol.common.model.FoundingFather;
 import net.sf.freecol.common.model.FoundingFather.FoundingFatherType;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.UnitType;
+import net.sf.freecol.common.model.BuildingType;
+import net.sf.freecol.common.model.Modifier;
 
 import junit.framework.TestCase;
 
@@ -111,5 +113,27 @@ public final class SpecificationTest extends TestCase {
         assertTrue(smith.hasAbility("model.ability.buildFactory"));
     }
 
+    public void testModifiers() {
+
+    	Specification spec = Specification.getSpecification();
+    	
+    	// Percentage Modifier
+    	BuildingType ironWorks = spec.getBuildingType("model.building.IronWorks");
+    	Modifier modifier = ironWorks.getModifier("model.goods.tools");
+    	assertTrue(modifier.getType() == Modifier.Type.PERCENTAGE);
+    	assertTrue(modifier.getValue() == 50);
+
+    	// Additive Modifier
+    	BuildingType depot = spec.getBuildingType("model.building.Depot");
+    	modifier = depot.getModifier("model.modifier.warehouseStorage");
+    	assertTrue(modifier.getType() == Modifier.Type.ADDITIVE);
+    	assertTrue(modifier.getValue() == 100);
+    	
+    	// Multiplicative Modifier
+    	UnitType blackSmith = spec.getUnitType("model.unit.masterBlacksmith");
+    	modifier = blackSmith.getModifier("model.goods.tools");
+    	assertTrue(modifier.getType() == Modifier.Type.MULTIPLICATIVE);
+    	assertTrue(modifier.getValue() == 2);
+    }
 
 }
