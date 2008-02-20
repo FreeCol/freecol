@@ -60,6 +60,8 @@ public class Player extends FreeColGameObject implements Features, Nameable {
     /**
      * The number of players. At the moment, we have 25 players: 8
      * Europeans + 8 REF + 8 native + "unknown player".
+     * 
+     * TODO: This needs to disappear to allow for flexible specifications.
      */
     public static final int NUMBER_OF_PLAYERS = 25;
 
