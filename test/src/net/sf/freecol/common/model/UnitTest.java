@@ -77,6 +77,7 @@ public class UnitTest extends FreeColTestCase {
         hardyPioneer.work(plowImprovement);
 
         assertEquals(0, hardyPioneer.getMovesLeft());
+        assertEquals(Unit.UnitState.IMPROVING, hardyPioneer.getState());
         assertEquals(1, hardyPioneer.getWorkLeft());
         assertEquals(100, hardyPioneer.getNumberOfTools());
         assertEquals(false, plain.hasImprovement(plow));
