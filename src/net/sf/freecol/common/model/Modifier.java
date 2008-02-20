@@ -21,6 +21,7 @@ package net.sf.freecol.common.model;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Iterator;
 import java.util.List;
 
 import javax.xml.stream.XMLStreamConstants;
@@ -48,12 +49,17 @@ public final class Modifier extends Feature {
      * The value increments per turn. This can be used to create
      * Modifiers whose values increase or decrease over time.
      */
-    private float[] increments = new float[] { 0f, 1f, 0f };
+    private float increment;
     
     /**
      * The type of this Modifier
      */
     private Type type;
+
+    /**
+     * Describe incrementType here.
+     */
+    private Type incrementType;
 
     /**
      * A list of modifiers that contributed to this one, if it is a
@@ -151,9 +157,8 @@ public final class Modifier extends Feature {
             modifiers = new ArrayList<Modifier>(modifier.getModifiers());
         }
         System.arraycopy(modifier.values, 0, values, 0, 3);
-        if (modifier.increments != null) {
-            System.arraycopy(modifier.increments, 0, increments, 0, 3);
-        }
+        increment = modifier.increment;
+        incrementType = modifier.incrementType;
     }
     
 
@@ -208,6 +213,24 @@ public final class Modifier extends Feature {
     }
 
     /**
+     * Get the <code>IncrementType</code> value.
+     *
+     * @return a <code>Type</code> value
+     */
+    public Type getIncrementType() {
+        return incrementType;
+    }
+
+    /**
+     * Set the <code>IncrementType</code> value.
+     *
+     * @param newIncrementType The new IncrementType value.
+     */
+    public void setIncrementType(final Type newIncrementType) {
+        this.incrementType = newIncrementType;
+    }
+
+    /**
      * Get the <code>defaultValue</code> value.
      *
      * @return a <code>float</code> value
@@ -255,7 +278,7 @@ public final class Modifier extends Feature {
         if (type == Type.COMBINED) {
             throw new IllegalArgumentException("Can not get the increment of a COMBINED Modifier.");
         } else {
-            return increments[type.ordinal()];
+            return increment;
         }
     }
 
@@ -272,7 +295,8 @@ public final class Modifier extends Feature {
         } else if (firstTurn == null) {
             throw new IllegalArgumentException("Parameter firstTurn must not be 'null'.");
         } else {
-            increments[type.ordinal()] = newIncrement;
+            increment = newIncrement;
+            incrementType = type;
             setFirstTurn(firstTurn);
             setLastTurn(lastTurn);
         }
@@ -390,44 +414,49 @@ public final class Modifier extends Feature {
     public Modifier getApplicableModifier(FreeColGameObjectType object, Turn turn) {
         if (getModifiers() == null) {
             if (appliesTo(object, turn)) {
-                return this;
+                if (hasIncrement() && turn != null) {
+                    int diff = turn.getNumber() - getFirstTurn().getNumber();
+                    float newValue = getValue();
+                    switch(incrementType) {
+                    case ADDITIVE:
+                        newValue += increment * diff;
+                        break;
+                    case MULTIPLICATIVE:
+                        newValue *= increment * diff;
+                        break;
+                    case PERCENTAGE:
+                        newValue += (newValue * increment * diff) / 100;
+                        break;
+                    }
+                    Modifier newModifier = new Modifier(this);
+                    newModifier.setValue(newValue);
+                    return newModifier;
+                } else {
+                    return this;
+                }
             } else {
                 return null;
             }
         } else if (hasScope() || hasTimeLimit()) {
             List<Modifier> result = new ArrayList<Modifier>();
-            List<Modifier> toRemove = new ArrayList<Modifier>();
-            for (Modifier modifier : getModifiers()) {
-                if (modifier.isOutOfDate(turn)) {
-                    toRemove.add(modifier);
-                } else if (modifier.appliesTo(object, turn)) {
-                    if (modifier.hasIncrement()) {
-                        if (turn != null && getFirstTurn() != null) {
-                            int diff = turn.getNumber() - getFirstTurn().getNumber();
-                            if (diff > 0) {
-                                float newValue = modifier.getValue();
-                                newValue += increments[Type.ADDITIVE.ordinal()] * diff;
-                                newValue *= increments[Type.MULTIPLICATIVE.ordinal()] * diff;
-                                newValue += (newValue * increments[Type.PERCENTAGE.ordinal()] * diff) / 100;
-                                Modifier newModifier = new Modifier(modifier);
-                                newModifier.setValue(newValue);
-                                result.add(newModifier);
-                            }
-                        }
-                    } else {
-                        result.add(modifier);
-                    }
+            Iterator<Modifier> iterator = getModifiers().iterator();
+            while (iterator.hasNext()) {
+                Modifier nextModifier = iterator.next();
+                if (nextModifier.isOutOfDate(turn)) {
+                    iterator.remove();
+                } else {
+                    result.add(nextModifier.getApplicableModifier(object, turn));
                 }
             }
-            modifiers.removeAll(toRemove);
             return combine(result.toArray(new Modifier[result.size()]));
         } else {
             return this;
         }
     }
 
+
     public boolean hasIncrement() {
-        return !Arrays.equals(increments, defaultValues);
+        return incrementType != null;
     }
 
     public boolean isDefaultModifier() {
@@ -472,6 +501,11 @@ public final class Modifier extends Feature {
         setId(in.getAttributeValue(null, "id"));
         setSource(in.getAttributeValue(null, "source"));
         setType(Enum.valueOf(Type.class, in.getAttributeValue(null, "type").toUpperCase()));
+        String incrementString = in.getAttributeValue(null, "incrementType");
+        if (incrementString != null) {
+            setType(Enum.valueOf(Type.class, incrementString.toUpperCase()));
+            increment = Float.parseFloat(in.getAttributeValue(null, "increment"));
+        }
         setScope(Boolean.parseBoolean(in.getAttributeValue(null, "scope")));
 
         String firstTurn = in.getAttributeValue(null, "firstTurn");
@@ -501,8 +535,6 @@ public final class Modifier extends Feature {
                     modifiers = new ArrayList<Modifier>();
                 }
                 modifiers.add(modifier);
-            } else if ("increments".equals(childName)) {
-                increments = readFromArrayElement("increments", in, new float[0]);
             } else {
                 logger.finest("Parsing of " + childName + " is not implemented yet");
                 while (in.nextTag() != XMLStreamConstants.END_ELEMENT ||
@@ -529,6 +561,12 @@ public final class Modifier extends Feature {
         if (getSource() != null) {
             out.writeAttribute("source", getSource());
         }
+        out.writeAttribute("type", type.toString());
+        if (incrementType != null) {
+            out.writeAttribute("incrementType", incrementType.toString());
+            out.writeAttribute("increment", String.valueOf(increment));
+        }
+
         out.writeAttribute("scope", String.valueOf(hasScope()));
 
         if (getFirstTurn() != null) {
@@ -542,10 +580,6 @@ public final class Modifier extends Feature {
             out.writeAttribute("value", Float.toString(values[type.ordinal()]));
         } else {
             toArrayElement("values", values, out);
-        }
-
-        if (hasIncrement()) {
-            toArrayElement("increments", values, out);
         }
 
         for (Scope scope : getScopes()) {

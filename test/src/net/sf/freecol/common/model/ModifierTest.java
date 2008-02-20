@@ -267,4 +267,24 @@ public class ModifierTest extends FreeColTestCase {
 
     }
 
+    public void testIncrements() {
+
+        UnitType frigate = FreeCol.getSpecification().getUnitType("model.unit.frigate");
+
+        Modifier modifier1 = new Modifier("test", 1, Modifier.Type.ADDITIVE);
+        Modifier modifier2 = new Modifier("test", 2, Modifier.Type.ADDITIVE);
+
+        modifier1.setIncrement(1, Modifier.Type.ADDITIVE, new Turn(10), new Turn(15));
+        assertTrue(modifier1.hasIncrement());
+
+        assertFalse(modifier1.appliesTo(frigate, new Turn(9)));
+        assertEquals(null, modifier1.getApplicableModifier(frigate, new Turn(9)));
+        assertTrue(modifier1.appliesTo(frigate, new Turn(10)));
+        assertEquals(2f, modifier1.getApplicableModifier(frigate, new Turn(10)).applyTo(1));
+        assertEquals(3f, modifier1.getApplicableModifier(frigate, new Turn(11)).applyTo(1));
+        assertEquals(7f, modifier1.getApplicableModifier(frigate, new Turn(15)).applyTo(1));
+        assertEquals(null, modifier1.getApplicableModifier(frigate, new Turn(16)));
+
+    }
+
 }
