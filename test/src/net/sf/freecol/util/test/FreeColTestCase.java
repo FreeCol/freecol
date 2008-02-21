@@ -107,9 +107,9 @@ public class FreeColTestCase extends TestCase {
         for (Nation n : FreeCol.getSpecification().getNations()) {
             Player p;
             if (n.getType().isEuropean() && !n.getType().isREF()){
-                p = new Player(game, n.getType().getName(), false, n);
+                p = new Player(game, n.getRulerName(), false, n);
             } else {
-                p = new Player(game, n.getType().getName(), false, true, n);
+                p = new Player(game, n.getRulerName(), false, true, n);
             }
             game.addPlayer(p);
         }

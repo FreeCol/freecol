@@ -21,6 +21,7 @@ package net.sf.freecol.common.model;
 
 import java.lang.reflect.Method;
 
+import net.sf.freecol.common.model.Player.PlayerType;
 import net.sf.freecol.common.model.Unit.UnitState;
 import net.sf.freecol.common.model.UnitType.DowngradeType;
 import net.sf.freecol.util.test.FreeColTestCase;
@@ -289,6 +290,7 @@ public class DemotionTest extends FreeColTestCase {
 
     public void testPromotion() throws Exception {
         
+        // UnitType promotion
         assertEquals(indenturedServantType, pettyCriminalType.getPromotion());
         assertEquals(colonistType, indenturedServantType.getPromotion());
         assertEquals(veteranType, colonistType.getPromotion());
@@ -297,5 +299,31 @@ public class DemotionTest extends FreeColTestCase {
         assertEquals(null, artilleryType.getPromotion());
         assertEquals(null, kingsRegularType.getPromotion());
         assertEquals(null, indianConvertType.getPromotion());
+        
+        // Unit promotion
+        Game game = getStandardGame();
+        CombatModel combatModel = game.getCombatModel();
+        Method promoteMethod = SimpleCombatModel.class.getDeclaredMethod("promote", Unit.class);
+        promoteMethod.setAccessible(true);
+        Player player = game.getPlayer("model.nation.dutch");
+        Map map = getTestMap(plains);
+        game.setMap(map);
+        Tile tile1 = map.getTile(5, 8);
+        tile1.setExploredBy(player, true);
+        Unit unit = new Unit(game, tile1, player, pettyCriminalType, UnitState.ACTIVE);
+        promoteMethod.invoke(combatModel, unit);
+        assertEquals(unit.getType(), indenturedServantType);
+        promoteMethod.invoke(combatModel, unit);
+        assertEquals(unit.getType(), colonistType);
+        promoteMethod.invoke(combatModel, unit);
+        assertEquals(unit.getType(), veteranType);
+        
+        // further upgrading a VeteranSoldier to ColonialRegular should only work once independence is declared
+        promoteMethod.invoke(combatModel, unit);
+        assertEquals(unit.getType(), veteranType);
+        player.setPlayerType(PlayerType.REBEL);
+        // what about "model.ability.independenceDeclared" player ability??
+        promoteMethod.invoke(combatModel, unit);
+        assertEquals(unit.getType(), colonialRegularType);
     }
 }
