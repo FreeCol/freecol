@@ -29,6 +29,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
 import java.util.logging.Logger;
 
@@ -608,23 +609,15 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
         detailPanel.add(name, higConst.rcwh(row, leftColumn, widths.length, 1));
         row += 2;
 
-        List<GoodsType> goodsList = type.getBonusTypeList();
-        List<Integer> amountList = type.getBonusAmountList();
-        List<Float> factorList = type.getBonusFactorList();
+        Map<GoodsType, Modifier> modifiers = type.getModifiers();
 
         detailPanel.add(new JLabel(Messages.message("colopedia.resource.bonusProduction")),
                         higConst.rc(row, leftColumn));
         JPanel goodsPanel = new JPanel();
         goodsPanel.setOpaque(false);
-        for (int i = 0; i < goodsList.size(); i++) {
-            int amount = amountList.get(i);
-            String text;
-            if (amount > 0) {
-                text = "+" + String.valueOf(amount);
-            } else {
-                text = "x " + String.valueOf(factorList.get(i));
-            }
-            JButton goodsButton = getGoodsButton(goodsList.get(i), text);
+        for (Entry<GoodsType, Modifier> entry : modifiers.entrySet()) {
+            String text = getModifierAsString(entry.getValue());
+            JButton goodsButton = getGoodsButton(entry.getKey(), text);
             goodsPanel.add(goodsButton);
         }
         detailPanel.add(goodsPanel, higConst.rc(row, rightColumn, "l"));
@@ -730,24 +723,7 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
             int column = 1;
             for (Modifier productionBonus : bonusList) {
                 GoodsType goodsType = FreeCol.getSpecification().getGoodsType(productionBonus.getId());
-                String bonus = String.valueOf(productionBonus.getValue());
-                switch(productionBonus.getType()) {
-                case ADDITIVE:
-                    if (productionBonus.getValue() > 0) {
-                        bonus = "+" + bonus;
-                    }
-                    break;
-                case PERCENTAGE:
-                    if (productionBonus.getValue() > 0) {
-                        bonus = "+" + bonus;
-                    }
-                    bonus = bonus + "%";
-                    break;
-                case MULTIPLICATIVE:
-                    bonus = "x" + bonus;
-                    break;
-                default:
-                }
+                String bonus = getModifierAsString(productionBonus);
                 productionPanel.add(getGoodsButton(goodsType, bonus),
                                     higConst.rc(row, column));
                 column += 2;
@@ -1163,6 +1139,28 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
         textArea.setFocusable(false);
         textArea.setFont(defaultFont);
         return textArea;
+    }
+
+    public String getModifierAsString(Modifier modifier) {
+        String bonus = String.valueOf(modifier.getValue());
+        switch(modifier.getType()) {
+        case ADDITIVE:
+            if (modifier.getValue() > 0) {
+                bonus = "+" + bonus;
+            }
+            break;
+        case PERCENTAGE:
+            if (modifier.getValue() > 0) {
+                bonus = "+" + bonus;
+            }
+            bonus = bonus + "%";
+            break;
+        case MULTIPLICATIVE:
+            bonus = "x" + bonus;
+            break;
+        default:
+        }
+        return bonus;
     }
 
 }

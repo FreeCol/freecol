@@ -29,12 +29,10 @@ import net.sf.freecol.FreeCol;
 
 import org.w3c.dom.Element;
 
-
 /**
-* Represents a locatable goods of a specified type and quantity.
-*/
+ * Represents a locatable goods of a specified type and quantity.
+ */
 public class Resource extends TileItem {
-
 
     private static Logger logger = Logger.getLogger(Resource.class.getName());
 
@@ -43,9 +41,9 @@ public class Resource extends TileItem {
 
     /**
      * Creates a standard <code>Resource</code>-instance.
-     * 
+     *
      * This constructor asserts that the game, tile and type are valid.
-     * 
+     *
      * @param game The <code>Game</code> in which this object belongs.
      * @param tile The <code>Tile</code> on which this object sits.
      * @param type The <code>ResourceType</code> of this Resource.
@@ -70,28 +68,13 @@ public class Resource extends TileItem {
     }
 
     /**
-     * Initiates a new <code>TileImprovement</code> with the given ID. The object
-     * should later be initialized by calling either
-     * {@link #readFromXML(XMLStreamReader)} or
-     * {@link #readFromXMLElement(Element)}.
-     * 
-     * @param game The <code>Game</code> in which this object belong.
-     * @param id The unique identifier for this object.
+     * Returns a textual representation of this object.
+     * @return A <code>String</code> of either:
+     * <ol>
+     * <li>QUANTITY RESOURCETYPE (eg. 250 Minerals) if there is a limited quantity
+     * <li>RESOURCETYPE (eg. Game) if it is an unlimited resource
+     * </ol>
      */
-    /*
-    public TileImprovement(Game game, String id) {
-        super(game, id);
-    }
-    */
-
-    /**
-    * Returns a textual representation of this object.
-    * @return A <code>String</code> of either:
-    * <ol>
-    * <li>QUANTITY RESOURCETYPE (eg. 250 Minerals) if there is a limited quantity
-    * <li>RESOURCETYPE (eg. Game) if it is an unlimited resource
-    * </ol>
-    */
     public String toString() {
         if (quantity > -1) {
             return Integer.toString(quantity) + " " + getName();
@@ -108,14 +91,6 @@ public class Resource extends TileItem {
         return getType().getName();
     }
 
-    /**
-     * Returns the name of a given <code>ResourceType</code>.
-     * @return The name of this ResourceType.
-     *//*
-    public static String getName(ResourceType resType) {
-        return Messages.message(resType.getName());
-    }
-*/
     /**
      * Returns the <code>ResourceType</code> of this Resource.
      */
@@ -157,11 +132,17 @@ public class Resource extends TileItem {
      * @param potential Potential of Tile + Improvements
      */
     public int getBonus(GoodsType goodsType, int potential) {
-        int bonusAmount = (int) ((potential + type.getBonus(goodsType)) * type.getFactor(goodsType)) - potential;
-        if (quantity > -1 && bonusAmount > quantity) {
-            bonusAmount = quantity;
+        Modifier productionBonus = type.getProductionBonus(goodsType);
+        if (productionBonus == null) {
+            return potential;
+        } else {
+            int bonusAmount = (int) productionBonus.applyTo(potential) - potential;
+            if (quantity > -1 && bonusAmount > quantity) {
+                return potential + quantity;
+            } else {
+                return potential + bonusAmount;
+            }
         }
-        return potential + bonusAmount;
     }
 
     /**
@@ -172,13 +153,13 @@ public class Resource extends TileItem {
     public int useQuantity(GoodsType goodsType, int potential) {
         // Return -1 here if not limited resource?
         return useQuantity(getBonus(goodsType, potential) - potential);
-    }    
+    }
 
     /**
-    * Reduces the value <code>quantity</code>.
-    * @param usedQuantity The quantity that was used up.
-    * @return The final value of quantity.
-    */
+     * Reduces the value <code>quantity</code>.
+     * @param usedQuantity The quantity that was used up.
+     * @return The final value of quantity.
+     */
     public int useQuantity(int usedQuantity) {
         if (quantity >= usedQuantity) {
             quantity -= usedQuantity;
@@ -196,7 +177,7 @@ public class Resource extends TileItem {
      * Disposes this resource.
      */
     @Override
-    public void dispose() {
+        public void dispose() {
         super.dispose();
     }
 
@@ -205,14 +186,14 @@ public class Resource extends TileItem {
     /**
      * This method writes an XML-representation of this object to the given
      * stream.
-     * 
+     *
      * <br>
      * <br>
-     * 
+     *
      * Only attributes visible to the given <code>Player</code> will be added
      * to that representation if <code>showAll</code> is set to
      * <code>false</code>.
-     * 
+     *
      * @param out The target stream.
      * @param player The <code>Player</code> this XML-representation should be
      *            made for, or <code>null</code> if
@@ -226,8 +207,8 @@ public class Resource extends TileItem {
      *             stream.
      */
     @Override
-    protected void toXMLImpl(XMLStreamWriter out, Player player, boolean showAll, boolean toSavedGame)
-            throws XMLStreamException {
+        protected void toXMLImpl(XMLStreamWriter out, Player player, boolean showAll, boolean toSavedGame)
+        throws XMLStreamException {
         // Start element:
         out.writeStartElement(getXMLElementTagName());
 
@@ -243,12 +224,12 @@ public class Resource extends TileItem {
 
     /**
      * Initialize this object from an XML-representation of this object.
-     * 
+     *
      * @param in The input stream with the XML.
      * @throws XMLStreamException if a problem was encountered during parsing.
      */
     @Override
-    protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
+        protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
         setId(in.getAttributeValue(null, "ID"));
 
         tile = (Tile) getGame().getFreeColGameObject(in.getAttributeValue(null, "tile"));
@@ -257,14 +238,14 @@ public class Resource extends TileItem {
         }
         type = FreeCol.getSpecification().getResourceType(in.getAttributeValue(null, "type"));
         quantity = Integer.parseInt(in.getAttributeValue(null, "quantity"));
-        
+
         in.nextTag();
     }
 
     /**
-    * Gets the tag name of the root element representing this object.
-    * @return "resource".
-    */
+     * Gets the tag name of the root element representing this object.
+     * @return "resource".
+     */
     public static String getXMLElementTagName() {
         return "resource";
     }

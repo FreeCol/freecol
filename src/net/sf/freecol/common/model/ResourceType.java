@@ -20,6 +20,7 @@
 package net.sf.freecol.common.model;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
@@ -38,9 +39,7 @@ public final class ResourceType extends FreeColGameObjectType
     private int minValue;
     private int maxValue;
 
-    private List<GoodsType> bonusGoods;
-    private List<Integer> bonusAmount;
-    private List<Float> bonusFactor;
+    private Map<GoodsType, Modifier> modifiers = new HashMap<GoodsType, Modifier>();
 
     // ------------------------------------------------------------ constructors
 
@@ -54,6 +53,11 @@ public final class ResourceType extends FreeColGameObjectType
         return art;
     }
 
+    public Map<GoodsType, Modifier> getModifiers() {
+        return modifiers;
+    }
+
+    // TODO: remove this
     public int getRandomValue() {
         if (minValue == maxValue)
             return maxValue;
@@ -61,47 +65,19 @@ public final class ResourceType extends FreeColGameObjectType
         Random rand = new Random();
         return (minValue + rand.nextInt(maxValue-minValue+1));
     }
-    
-    public int getBonus(GoodsType g) {
-        int bonusIndex = bonusGoods.indexOf(g);
-        if (bonusIndex >= 0) {
-            return bonusAmount.get(bonusIndex);
-        }
-        return 0;
-    }
-    
-    public float getFactor(GoodsType g) {
-        int bonusIndex = bonusGoods.indexOf(g);
-        if (bonusIndex >= 0) {
-            return bonusFactor.get(bonusIndex);
-        }
-        return 1;
-    }
 
-    public List<GoodsType> getBonusTypeList() {
-        return bonusGoods;
-    }
-
-    public List<Integer> getBonusAmountList() {
-        return bonusAmount;
-    }
-
-    public List<Float> getBonusFactorList() {
-        return bonusFactor;
+    public Modifier getProductionBonus(GoodsType goodsType) {
+        return modifiers.get(goodsType);
     }
 
     public GoodsType getBestGoodsType() {
-        if (bonusGoods.size() == 1) {
-            return bonusGoods.get(0);
-        }
         GoodsType bestType = null;
-        int bestValue = 0;
-        for (int i = 0; i < bonusGoods.size(); i++) {
-            GoodsType g = bonusGoods.get(i);
-            // TODO: Use bonusFactor too
-            if (bestType == null || g.getInitialSellPrice() * bonusAmount.get(i) > bestValue) {
-                bestType = g;
-                bestValue = g.getInitialSellPrice() * bonusAmount.get(i);
+        float bestValue = 0f;
+        for (Map.Entry<GoodsType, Modifier> entry : modifiers.entrySet()) {
+            float value = entry.getKey().getInitialSellPrice() * entry.getValue().applyTo(100);
+            if (bestType == null || value > bestValue) {
+                bestType = entry.getKey();
+                bestValue = value;
             }
         }
         return bestType;
@@ -111,6 +87,7 @@ public final class ResourceType extends FreeColGameObjectType
      * Returns a <code>String</code> with the output/s of this ResourceType.
      */
     public String getOutputString() {
+        /** TODO: make something more useful
         if (bonusGoods.size() == 0) {
             return (new String("No Bonus"));
         }
@@ -122,6 +99,8 @@ public final class ResourceType extends FreeColGameObjectType
             s += bonusAmount.get(i).toString() + " " + bonusGoods.get(i);
         }
         return s;
+        */
+        return "";
     }
 
     // ------------------------------------------------------------ API methods
@@ -142,18 +121,23 @@ public final class ResourceType extends FreeColGameObjectType
             minValue = -1;
         }
 
-        bonusGoods = new ArrayList<GoodsType>();
-        bonusAmount = new ArrayList<Integer>();
-        bonusFactor = new ArrayList<Float>();
         // Only expected child is 'production-bonus'
         while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
-            String goods = in.getAttributeValue(null, "goods-type");
-            GoodsType g = specification.getGoodsType(goods);
-            bonusGoods.add(g);
-            bonusAmount.add(getAttribute(in, "bonus", 0));
-            bonusFactor.add(getAttribute(in, "factor", 1f));
-            in.nextTag(); // close this element
-        }
+            String childName = in.getLocalName();
+            if (Modifier.getXMLElementTagName().equals(childName)) {
+                Modifier modifier = new Modifier(in);
+                if (modifier.getSource() == null) {
+                    modifier.setSource(this.getId());
+                }
+                modifiers.put(specification.getGoodsType(modifier.getId()), modifier);
+            } else {
+                logger.finest("Parsing of " + childName + " is not implemented yet");
+                while (in.nextTag() != XMLStreamConstants.END_ELEMENT ||
+                       !in.getLocalName().equals(childName)) {
+                    in.nextTag();
+                }
+            }
+        }        
     }
     
 }

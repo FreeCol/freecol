@@ -78,45 +78,45 @@
 
   <resource-types>
     <resource-type id="model.resource.Game" art="bonus/game.png">
-      <production-bonus goods-type="model.goods.food" bonus="2"/>
+      <modifier id="model.goods.food" type="additive" value="2"/>
       <!-- in colonization game gives 2 food (4 for expert farmer) -->
-      <production-bonus goods-type="model.goods.furs" bonus="2"/>
+      <modifier id="model.goods.furs" type="additive" value="2"/>
     </resource-type>
     <resource-type id="model.resource.Minerals" art="bonus/minerals.png" minimum-value="40" maximum-value="400">
-      <production-bonus goods-type="model.goods.ore" bonus="3"/>
-      <production-bonus goods-type="model.goods.silver" bonus="1"/>
+      <modifier id="model.goods.ore" type="additive" value="3"/>
+      <modifier id="model.goods.silver" type="additive" value="1"/>
     </resource-type>
     <resource-type id="model.resource.Ore" art="bonus/ore.png" minimum-value="40" maximum-value="4000">
-      <production-bonus goods-type="model.goods.ore" bonus="2"/>
+      <modifier id="model.goods.ore" type="additive" value="2"/>
     </resource-type>
     <resource-type id="model.resource.Silver" art="bonus/silver.png" minimum-value="40" maximum-value="800">
-      <production-bonus goods-type="model.goods.silver" bonus="2"/>
+      <modifier id="model.goods.silver" type="additive" value="2"/>
     </resource-type>
     <resource-type id="model.resource.Lumber" art="bonus/lumber.png">
-      <production-bonus goods-type="model.goods.lumber" bonus="4"/>
+      <modifier id="model.goods.lumber" type="additive" value="4"/>
     </resource-type>
     <resource-type id="model.resource.Furs" art="bonus/furs.png">
-      <production-bonus goods-type="model.goods.furs" bonus="3"/>
+      <modifier id="model.goods.furs" type="additive" value="3"/>
     </resource-type>
     <resource-type id="model.resource.Tobacco" art="bonus/tobacco.png">
-      <production-bonus goods-type="model.goods.tobacco" factor="2"/>
+      <modifier id="model.goods.tobacco" type="multiplicative" value="2"/>
     </resource-type>
     <resource-type id="model.resource.Sugar" art="bonus/sugar.png">
-      <production-bonus goods-type="model.goods.sugar" factor="2"/>
+      <modifier id="model.goods.sugar" type="multiplicative" value="2"/>
     </resource-type>
     <resource-type id="model.resource.Cotton" art="bonus/cotton.png">
-      <production-bonus goods-type="model.goods.cotton" factor="2"/>
+      <modifier id="model.goods.cotton" type="multiplicative" value="2"/>
     </resource-type>
     <resource-type id="model.resource.Oasis" art="bonus/grain.png">
-      <production-bonus goods-type="model.goods.food" bonus="2"/>
+      <modifier id="model.goods.food" type="additive" value="2"/>
       <!-- in colonization game gives 2 food (4 for expert farmer) -->
     </resource-type>
     <resource-type id="model.resource.Grain" art="bonus/grain.png">
-      <production-bonus goods-type="model.goods.food" bonus="2"/>
+      <modifier id="model.goods.food" type="additive" value="2"/>
       <!-- in colonization game gives 2 food (4 for expert farmer) -->
     </resource-type>
     <resource-type id="model.resource.Fish" art="bonus/fish.png">
-      <production-bonus goods-type="model.goods.fish" bonus="3"/>
+      <modifier id="model.goods.fish" type="additive" value="3"/>
       <!-- in colonization game gives 3 food (6 for expert fisherman) -->
     </resource-type>
   </resource-types>
@@ -422,41 +422,37 @@
     - putting all-water-tiles="false" is redundant, but serves as a reminder
     - putting all-land-tiles="true" all-forest-tiles="false" will result in all non-forested land tiles.
   tile child options: id
-  effect child options: goods-type and value, movement-cost, movement-cost-factor
-    - use goods-type & value.
-    - movement-cost will set the movement cost to that amount in thirds.
-    - movement-cost-factor multiplies movement cost by a percentage factor (ie a value of 75 will result in a (100-75) = 25% reduction)
   change child options: from, to
   -->
   <tileimprovement-types>
     <tileimprovement-type id="model.improvement.River" natural="true" add-work-turns="0" magnitude="1">
       <tiles all-land-tiles="true"/>
-      <effect goods-type="model.goods.food" value="1"/>
-      <effect goods-type="model.goods.sugar" value="1"/>
-      <effect goods-type="model.goods.tobacco" value="1"/>
-      <effect goods-type="model.goods.cotton" value="1"/>
-      <effect goods-type="model.goods.furs" value="1"/>
-      <effect goods-type="model.goods.lumber" value="1"/>
-      <effect goods-type="model.goods.ore" value="1"/>
-      <effect goods-type="model.goods.silver" value="1"/>
-      <effect movement-cost="1"/>
+      <modifier id="model.goods.food" type="additive" value="1"/>
+      <modifier id="model.goods.sugar" type="additive" value="1"/>
+      <modifier id="model.goods.tobacco" type="additive" value="1"/>
+      <modifier id="model.goods.cotton" type="additive" value="1"/>
+      <modifier id="model.goods.furs" type="additive" value="1"/>
+      <modifier id="model.goods.lumber" type="additive" value="1"/>
+      <modifier id="model.goods.ore" type="additive" value="1"/>
+      <modifier id="model.goods.silver" type="additive" value="1"/>
+      <modifier id="model.modifier.movementBonus" type="additive" value="1"/>
     </tileimprovement-type>
     <tileimprovement-type id="model.improvement.Road" add-work-turns="0" over-trees="true"
             expended-equipment-type="model.equipment.tools" expended-amount="1" magnitude="1">
       <tiles all-land-tiles="true"/>
-      <effect goods-type="model.goods.furs" value="1"/>
-      <effect goods-type="model.goods.lumber" value="1"/>
-      <effect goods-type="model.goods.ore" value="1"/>
-      <effect goods-type="model.goods.silver" value="1"/>
-      <effect movement-cost="1"/>
+      <modifier id="model.goods.furs" type="additive" value="1"/>
+      <modifier id="model.goods.lumber" type="additive" value="1"/>
+      <modifier id="model.goods.ore" type="additive" value="1"/>
+      <modifier id="model.goods.silver" type="additive" value="1"/>
+      <modifier id="model.modifier.movementBonus" type="additive" value="1"/>
     </tileimprovement-type>
     <tileimprovement-type id="model.improvement.Plow" add-work-turns="2" overlay="4"
             expended-equipment-type="model.equipment.tools" expended-amount="1" magnitude="1">
       <tiles all-land-tiles="true" all-forest-tiles="false"/>
-      <effect goods-type="model.goods.food" value="1"/>
-      <effect goods-type="model.goods.sugar" value="1"/>
-      <effect goods-type="model.goods.tobacco" value="1"/>
-      <effect goods-type="model.goods.cotton" value="1"/>
+      <modifier id="model.goods.food" type="additive" value="1"/>
+      <modifier id="model.goods.sugar" type="additive" value="1"/>
+      <modifier id="model.goods.tobacco" type="additive" value="1"/>
+      <modifier id="model.goods.cotton" type="additive" value="1"/>
     </tileimprovement-type>
     <tileimprovement-type id="model.improvement.ClearForest" add-work-turns="2"
             expended-equipment-type="model.equipment.tools" expended-amount="1"
@@ -1215,7 +1211,7 @@
     </founding-father>
     <founding-father id="model.foundingFather.ferdinandMagellan" type="exploration"
                      weight1="2" weight2="10" weight3="10">
-      <modifier id="model.ability.movementBonus" type="additive" value="1">
+      <modifier id="model.modifier.movementBonus" type="additive" value="1">
         <scope ability-id="model.ability.navalUnit" value="true"/>
       </modifier>
       <modifier id="model.modifier.sailToEuropeBonus" type="additive" value="1">

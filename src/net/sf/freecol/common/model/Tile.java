@@ -102,8 +102,6 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
      */
     private Region region;
 
-    private List<TileItem> tileItems;
-
     /**
      * A constructor to use.
      * 
@@ -375,9 +373,7 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
      *         used by the AI when deciding where to build a new colony.
      */
     public int getColonyValue() {
-        if (!isLand()) {
-            return 0;
-        } else if (potential(Goods.FOOD) < 2) {
+        if (!getType().canSettle()) {
             return 0;
         } else if (getSettlement() != null) {
             return 0;
@@ -1159,29 +1155,6 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
      */
     public Iterator<Unit> getUnitIterator() {
         return getUnitList().iterator();
-    }
-
-    /**
-     * Gets a <code>List/code> of every <code>TileItem</code> located on this <code>Tile</code>.
-     *
-     * @return The <code>List</code>.
-     */
-    public List<TileItem> getTileItemList() {
-        return tileItems;
-    }
-
-    /**
-     * Gets an <code>Iterator</code> of every <code>TileItem</code>
-     * located on this <code>Tile</code>.
-     * 
-     * @return The <code>Iterator</code>.
-     */
-    public Iterator<TileItem> getTileItemIterator() {
-        if (tileItems == null) {
-            return EmptyIterator.getInstance();
-        } else {
-            return tileItems.iterator();
-        }
     }
 
     /**

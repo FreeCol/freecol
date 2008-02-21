@@ -20,9 +20,11 @@
 package net.sf.freecol.common.model;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
@@ -42,24 +44,22 @@ public final class TileImprovementType extends FreeColGameObjectType
 
     private int artOverlay;
     private boolean artOverTrees;
-    
+
     private List<TileType> allowedTileTypes;
     private TileImprovementType requiredImprovementType;
 
-    private HashSet<String> allowedWorkers;
+    private Set<String> allowedWorkers;
     private EquipmentType expendedEquipmentType;
-    private int expendedAmount;   
+    private int expendedAmount;
     private GoodsType deliverGoodsType;
     private int deliverAmount;
 
-    private List<GoodsType> goodsEffect;
-    private List<Integer> goodsBonus;
-    private List<TileType> tileTypeChangeFrom;
-    private List<TileType> tileTypeChangeTo;
+    private Map<String, Modifier> modifiers = new HashMap<String, Modifier>();
+    private Map<TileType, TileType> tileTypeChange = new HashMap<TileType, TileType>();
 
     private int movementCost;
     private float movementCostFactor;
-    
+
     // ------------------------------------------------------------ constructors
 
     public TileImprovementType(int index) {
@@ -137,17 +137,17 @@ public final class TileImprovementType extends FreeColGameObjectType
                     return true;
                 }
             }
-        }   
+        }
         return false;
     }
 
     /**
      * This will check if in principle this type of improvement can be used on
      * this kind of tile, disregarding the current state of an actual tile.
-     * 
+     *
      * If you want to find out if an improvement is allowed for a tile, call
      * {@link #isTileAllowed(Tile)}.
-     * 
+     *
      * @param tileType The type of terrain
      * @return true if improvement is possible
      */
@@ -157,7 +157,7 @@ public final class TileImprovementType extends FreeColGameObjectType
 
     /**
      * Check if a given <code>Tile</code> is valid for this TileImprovement.
-     * 
+     *
      * @return true if Tile TileType is valid and required Improvement (if any)
      *         is present.
      */
@@ -175,21 +175,20 @@ public final class TileImprovementType extends FreeColGameObjectType
     }
 
     public int getBonus(GoodsType goodsType) {
-        int index = goodsEffect.indexOf(goodsType);
-        if (index < 0) {
+        Modifier result = modifiers.get(goodsType.getId());
+        if (result == null) {
             return 0;
         } else {
-            return goodsBonus.get(index);
+            return (int) result.getValue();
         }
     }
-    
+
+    public Modifier getProductionBonus(GoodsType goodsType) {
+        return modifiers.get(goodsType.getId());
+    }
+
     public TileType getChange(TileType tileType) {
-        int index = tileTypeChangeFrom.indexOf(tileType);
-        if (index < 0) {
-            return null;
-        } else {
-            return tileTypeChangeTo.get(index);
-        }
+        return tileTypeChange.get(tileType);
     }
 
     /**
@@ -221,11 +220,12 @@ public final class TileImprovementType extends FreeColGameObjectType
             }
         } else {
             // Calculate bonuses from TileImprovementType
-            for (int i = 0; i < goodsEffect.size(); i++) {
-                int change = goodsBonus.get(i);
-                if (goodsType == goodsEffect.get(i)) {
-                    if (change < 0) {
-                        return 0;   // Reject if there is a drop in preferred GoodsType
+            for (Modifier modifier : modifiers.values()) {
+                float change = modifier.applyTo(1);
+                if (modifier.getId().equals(goodsType.getId())) {
+                    if (change < 1) {
+                        // Reject if there is a drop in preferred GoodsType
+                        return 0;
                     } else {
                         change *= 3;
                     }
@@ -274,7 +274,7 @@ public final class TileImprovementType extends FreeColGameObjectType
         movementCost = -1;
         movementCostFactor = -1;
         magnitude = getAttribute(in, "magnitude", 1);
-        
+
         String req = in.getAttributeValue(null, "required-improvement");
         if (req != null) {
             requiredImprovementType = specification.getTileImprovementType(req);
@@ -295,10 +295,8 @@ public final class TileImprovementType extends FreeColGameObjectType
 
         allowedWorkers = new HashSet<String>();
         allowedTileTypes = new ArrayList<TileType>();
-        goodsEffect = new ArrayList<GoodsType>();
-        goodsBonus = new ArrayList<Integer>();
-        tileTypeChangeFrom = new ArrayList<TileType>();
-        tileTypeChangeTo = new ArrayList<TileType>();
+        modifiers = new HashMap<String, Modifier>();
+        tileTypeChange = new HashMap<TileType, TileType>();
 
         while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
             String childName = in.getLocalName();
@@ -326,7 +324,7 @@ public final class TileImprovementType extends FreeColGameObjectType
                     }
                 }
                 in.nextTag(); // close this element
-                
+
             } else if ("tile".equals(childName)) {
                 String tileId = in.getAttributeValue(null, "id");
                 allowedTileTypes.add(specification.getTileType(tileId));
@@ -336,31 +334,20 @@ public final class TileImprovementType extends FreeColGameObjectType
                 allowedWorkers.add(in.getAttributeValue(null, "id"));
                 in.nextTag(); // close this element
 
-            } else if ("effect".equals(childName)) {
-                if (hasAttribute(in, "goods-type")) {
-                    g = in.getAttributeValue(null, "goods-type");
-                    GoodsType gt = specification.getGoodsType(g);
-                    if (gt != null) {
-                        goodsEffect.add(gt);
-                        goodsBonus.add(Integer.parseInt(in.getAttributeValue(null, "value")));
-                    }
+            } else if (Modifier.getXMLElementTagName().equals(childName)) {
+                Modifier modifier = new Modifier(in);
+                if (modifier.getSource() == null) {
+                    modifier.setSource(this.getId());
                 }
-                if (hasAttribute(in, "movement-cost")) {
-                    movementCost = getAttribute(in, "movement-cost", -1);
-                }
-                if (hasAttribute(in, "movement-cost-factor")) {
-                    movementCostFactor = getAttribute(in, "movement-cost-factor", -1);
-                }
-                in.nextTag(); // close this element
-                
+                modifiers.put(modifier.getId(), modifier);
             } else if ("change".equals(childName)) {
-                tileTypeChangeFrom.add(specification.getTileType(in.getAttributeValue(null, "from")));
-                tileTypeChangeTo.add(specification.getTileType(in.getAttributeValue(null, "to")));
+                tileTypeChange.put(specification.getTileType(in.getAttributeValue(null, "from")),
+                                   specification.getTileType(in.getAttributeValue(null, "to")));
                 in.nextTag(); // close this element
 
             } else {
                 throw new RuntimeException("unexpected: " + childName);
             }
         }
-    }   
+    }
 }

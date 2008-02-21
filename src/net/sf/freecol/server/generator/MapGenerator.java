@@ -433,7 +433,7 @@ public class MapGenerator {
             // If it has a resource, take the resource, and ignore the other things produced there
             if (t.hasResource()) {
                 ResourceType r = t.getTileItemContainer().getResource().getType();
-                for (GoodsType g : r.getBonusTypeList()) {
+                for (GoodsType g : r.getModifiers().keySet()) {
                     int index = farmedList.indexOf(g);
                     if (index >= 0) {
                         potentials[index]++;

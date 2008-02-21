@@ -146,6 +146,17 @@ public final class TileType extends FreeColGameObjectType implements Features {
         return 0;
     }
 
+    public Modifier getProductionBonus(GoodsType goodsType) {
+        Modifier result = new Modifier(goodsType.getId(), getId(), 0f, Modifier.Type.ADDITIVE);
+        for (AbstractGoods goods : production) {
+            if (goods.getType() == goodsType) {
+                result.setValue(goods.getAmount());
+                break;
+            }
+        }
+        return result;
+    }
+
     public GoodsType getSecondaryGoods() {
         return secondaryGoods;
     }

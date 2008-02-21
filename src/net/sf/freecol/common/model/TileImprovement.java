@@ -247,14 +247,10 @@ public class TileImprovement extends TileItem implements Locatable, Named {
             return type.getMovementCost(moveCost);
         }
         // Find matching type
-        Iterator<TileItem> ti = fromTile.getTileItemIterator();
-        while (ti.hasNext()) {
-            TileItem tileItem = ti.next();
-            if (tileItem instanceof TileImprovement) {
-                if (((TileImprovement) tileItem).getType().getId().equals(typeId)) {
-                    // Matched
-                    return type.getMovementCost(moveCost);
-                }
+        for (TileImprovement improvement : fromTile.getTileImprovements()) {
+            if (improvement.getType().getId().equals(typeId)) {
+                // Matched
+                return type.getMovementCost(moveCost);
             }
         }       
         // No match
