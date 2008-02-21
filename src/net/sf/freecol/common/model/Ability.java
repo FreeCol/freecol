@@ -98,6 +98,16 @@ public final class Ability extends Feature {
     }
     
     /**
+     * Returns <code>true</code> if this Ability is composed of other
+     * Abilities.
+     *
+     * @return a <code>boolean</code> value
+     */
+    public boolean isComposite() {
+        return !(getAbilities() == null || getAbilities().isEmpty());
+    }
+
+    /**
      * Get the <code>Value</code> value.
      *
      * @return a <code>boolean</code> value
@@ -122,6 +132,15 @@ public final class Ability extends Feature {
      */
     public List<Ability> getAbilities() {
         return abilities;
+    }
+
+    /**
+     * Get the <code>Abilities</code> value.
+     *
+     * @return a <code>List<Ability></code> value
+     */
+    public List<Feature> getFeatures() {
+        return new ArrayList<Feature>(abilities);
     }
 
     /**

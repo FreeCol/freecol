@@ -171,6 +171,15 @@ public final class Modifier extends Feature {
     }
 
     /**
+     * Get the <code>Modifiers</code> value.
+     *
+     * @return a <code>List<Modifier></code> value
+     */
+    public List<Feature> getFeatures() {
+        return new ArrayList<Feature>(modifiers);
+    }
+
+    /**
      * Set the <code>Modifiers</code> value.
      *
      * @param newModifiers The new Modifiers value.
@@ -481,7 +490,6 @@ public final class Modifier extends Feature {
         result += (result * values[Type.PERCENTAGE.ordinal()]) / 100;
         return result;
     }
-
 
     // -- Serialization --
 
