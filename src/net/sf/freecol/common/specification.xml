@@ -880,7 +880,7 @@
       <required-goods id="model.goods.hammers" value="1024"/>
       <required-goods id="model.goods.tools" value="300"/>
       <required-ability id="model.ability.buildShips"/>
-      <required-ability id="model.ability.independence"/>
+      <required-ability id="model.ability.independenceDeclared"/>
       <ability id="model.ability.refUnit" value="true"/>
       <ability id="model.ability.navalUnit" value="true"/>
       <ability id="model.ability.carryGoods" value="true"/>

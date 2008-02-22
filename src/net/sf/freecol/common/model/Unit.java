@@ -2256,7 +2256,8 @@ public class Unit extends FreeColGameObject implements Features, Locatable, Loca
             hitpoints = unitType.getHitPoints();
         } else {
             // ColonialRegulars only available after independence is declared
-            logger.warning(unitType.getName()+" is not available to "+owner.getPlayerType()+" player "+owner.getName());
+            logger.warning(unitType.getName() + " is not available to " + owner.getPlayerType() +
+                           " player " + owner.getName());
         }
 
     }

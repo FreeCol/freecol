@@ -576,6 +576,7 @@ public class Player extends FreeColGameObject implements Features, Nameable {
             throw new IllegalStateException("Independence has already been declared.");
         }
         setPlayerType(PlayerType.REBEL);
+        addFeature(new Ability("model.ability.independenceDeclared"));
         setStance(getREFPlayer(), Stance.WAR);
         setTax(0);
         // Dispose all units in Europe.

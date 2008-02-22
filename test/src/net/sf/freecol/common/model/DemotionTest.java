@@ -317,12 +317,20 @@ public class DemotionTest extends FreeColTestCase {
         assertEquals(unit.getType(), colonistType);
         promoteMethod.invoke(combatModel, unit);
         assertEquals(unit.getType(), veteranType);
+
+        assertTrue(veteranType.isAvailableTo(PlayerType.COLONIAL));
+        assertFalse(colonialRegularType.isAvailableTo(PlayerType.COLONIAL));
+        assertTrue(colonialRegularType.isAvailableTo(PlayerType.REBEL));
         
-        // further upgrading a VeteranSoldier to ColonialRegular should only work once independence is declared
+        // further upgrading a VeteranSoldier to ColonialRegular
+        // should only work once independence is declared
+        assertFalse(colonialRegularType.isAvailableTo(player));
         promoteMethod.invoke(combatModel, unit);
         assertEquals(unit.getType(), veteranType);
+
         player.setPlayerType(PlayerType.REBEL);
-        // what about "model.ability.independenceDeclared" player ability??
+        player.addFeature(new Ability("model.ability.independenceDeclared"));
+        assertTrue(colonialRegularType.isAvailableTo(player));
         promoteMethod.invoke(combatModel, unit);
         assertEquals(unit.getType(), colonialRegularType);
     }
