@@ -230,6 +230,27 @@ public class TileItemContainer extends FreeColGameObject {
     }
 
     /**
+     * Describe <code>getProductionBonus</code> method here.
+     *
+     * @param goodsType a <code>GoodsType</code> value
+     * @return a <code>Modifier</code> value
+     */
+    public Modifier getProductionBonus(GoodsType goodsType) {
+        List<Modifier> result = new ArrayList<Modifier>();
+        for (TileImprovement improvement : improvements) {
+            result.add(improvement.getProductionBonus(goodsType));
+        }
+        switch(result.size()) {
+        case 0:
+            return null;
+        case 1:
+            return result.get(0);
+        default:
+            return Modifier.combine(result);
+        }
+    }
+
+    /**
      * Determine the movement cost to this <code>Tile</code> from another <code>Tile</code>.
      * Does not consider special unit abilities.
      * @return The movement cost

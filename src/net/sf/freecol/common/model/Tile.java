@@ -1247,6 +1247,26 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
     }
 
     /**
+     * Describe <code>getProductionBonus</code> method here.
+     *
+     * @param goodsType a <code>GoodsType</code> value
+     * @return a <code>Modifier</code> value
+     */
+    public Modifier getProductionBonus(GoodsType goodsType) {
+        List<Modifier> result = new ArrayList<Modifier>();
+        result.add(type.getProductionBonus(goodsType));
+        result.add(tileItemContainer.getProductionBonus(goodsType));
+        switch(result.size()) {
+        case 0:
+            return null;
+        case 1:
+            return result.get(0);
+        default:
+            return Modifier.combine(result);
+        }
+    }
+
+    /**
      * Checks whether this <code>Tile</code> can have a road or not. This
      * method will return <code>false</code> if a road has already been built.
      * 

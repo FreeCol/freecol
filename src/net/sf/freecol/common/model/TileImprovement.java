@@ -35,8 +35,8 @@ import org.w3c.dom.Element;
 
 
 /**
-* Represents a locatable goods of a specified type and quantity.
-*/
+ * Represents a locatable goods of a specified type and quantity.
+ */
 public class TileImprovement extends TileItem implements Locatable, Named {
 
 
@@ -142,13 +142,13 @@ public class TileImprovement extends TileItem implements Locatable, Named {
     }
 
     /**
-    * Returns a textual representation of this object.
-    * @return A <code>String</code> of either:
-    * <ol>
-    * <li>NAME (#TURNS turns left) (eg. Road (2 turns left) ) if it is under construction
-    * <li>NAME (eg. Road) if it is complete
-    * </ol>
-    */
+     * Returns a textual representation of this object.
+     * @return A <code>String</code> of either:
+     * <ol>
+     * <li>NAME (#TURNS turns left) (eg. Road (2 turns left) ) if it is under construction
+     * <li>NAME (eg. Road) if it is complete
+     * </ol>
+     */
     public String toString() {
         if (turnsToComplete > 0) {
             return getName() + " (" + Integer.toString(turnsToComplete) + " turns left)";
@@ -185,16 +185,16 @@ public class TileImprovement extends TileItem implements Locatable, Named {
     }
 
     /**
-	 * Performs work towards completion of this <code>TileImprovement</code>
-	 * 
-	 * This function allows for a unit to perform more than 1 'turn', perhaps in
-	 * the event a skilled unit is able to build improvements with a bonus. The
-	 * <code>doWork</code> function without any input params assumes 1 turn of
-	 * work done.
-	 * 
-	 * @return remaining turns to completion
-	 */
-	public int doWork(int turns) {
+     * Performs work towards completion of this <code>TileImprovement</code>
+     * 
+     * This function allows for a unit to perform more than 1 'turn', perhaps in
+     * the event a skilled unit is able to build improvements with a bonus. The
+     * <code>doWork</code> function without any input params assumes 1 turn of
+     * work done.
+     * 
+     * @return remaining turns to completion
+     */
+    public int doWork(int turns) {
         turnsToComplete -= turns;
         if (turnsToComplete <= 0) {
             turnsToComplete = 0;
@@ -224,12 +224,26 @@ public class TileImprovement extends TileItem implements Locatable, Named {
 
     /**
      * Returns the bonus (if any).
+     * @param goodsType a <code>GoodsType</code> value
+     * @return an <code>int</code> value
      */
     public int getBonus(GoodsType goodsType) {
         if (!isComplete()) {
             return 0;
         }
         return type.getBonus(goodsType);
+    }
+
+    /**
+     * Returns the bonus Modifier (if any).
+     * @param goodsType a <code>GoodsType</code> value
+     * @return a <code>Modifier</code> value
+     */
+    public Modifier getProductionBonus(GoodsType goodsType) {
+        if (!isComplete()) {
+            return null;
+        }
+        return type.getProductionBonus(goodsType);
     }
 
     /**
@@ -287,8 +301,8 @@ public class TileImprovement extends TileItem implements Locatable, Named {
     /**
      * Returns an int[NUMBER_OF_DIRECTIONS] array based on the baseNumber and the 'active' directions given.
      * @param directions An int[] that gives the active directions
-              eg {Map.N, Map.NE, Map.E, Map.SE, Map.S, Map.SW, Map.W, Map.NW},
-              or {Map.E, Map.SW};
+     eg {Map.N, Map.NE, Map.E, Map.SE, Map.S, Map.SW, Map.W, Map.NW},
+     or {Map.E, Map.SW};
      * @param baseNumber The base to be used to create the base array.
      * @return A base array that can create unique identifiers for any combination
      */
@@ -312,8 +326,8 @@ public class TileImprovement extends TileItem implements Locatable, Named {
     /**
      * Breaks the Style of this Improvement into 8 directions - used for Rivers (at the moment)
      * @param directions An int[] that gives the active directions
-              eg {Map.N, Map.NE, Map.E, Map.SE, Map.S, Map.SW, Map.W, Map.NW},
-              or {Map.E, Map.SW};
+     eg {Map.N, Map.NE, Map.E, Map.SE, Map.S, Map.SW, Map.W, Map.NW},
+     or {Map.E, Map.SW};
      * @param baseNumber The base to be used to create the base array.
      * @return An int[] with the magnitude in each direction.
      */
@@ -430,7 +444,7 @@ public class TileImprovement extends TileItem implements Locatable, Named {
      */
     @Override
     protected void toXMLImpl(XMLStreamWriter out, Player player, boolean showAll, boolean toSavedGame)
-            throws XMLStreamException {
+        throws XMLStreamException {
         // Start element:
         out.writeStartElement(getXMLElementTagName());
 
@@ -469,9 +483,9 @@ public class TileImprovement extends TileItem implements Locatable, Named {
     }
 
     /**
-    * Gets the tag name of the root element representing this object.
-    * @return "tileImprovement".
-    */
+     * Gets the tag name of the root element representing this object.
+     * @return "tileImprovement".
+     */
     public static String getXMLElementTagName() {
         return "tileimprovement";
     }

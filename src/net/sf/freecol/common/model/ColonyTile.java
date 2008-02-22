@@ -472,6 +472,44 @@ public class ColonyTile extends FreeColGameObject implements WorkLocation, Ownab
     }
 
     /**
+     * Returns the production of the given type of goods.
+     *
+     * @param goodsType a <code>GoodsType</code> value
+     * @return an <code>int</code> value
+     */
+    public Modifier getProductionBonus(GoodsType goodsType) {
+        if (goodsType == null) {
+            throw new IllegalArgumentException("GoodsType must not be 'null'.");
+        } else if (getUnit() == null) {
+            if (isColonyCenterTile() &&
+                (goodsType.isFoodType() || 
+                 goodsType.equals(workTile.secondaryGoods()))) {
+                return workTile.getProductionBonus(goodsType);
+            } else {
+                return null;
+            }
+        } else if (goodsType.equals(getUnit().getWorkType())) {
+            // TODO: currently, the player's modifier may be present
+            // twice, once in the unit's modifiers, and once in the
+            // colony's -- need some kind of Set implementation
+            List<Modifier> result = new ArrayList<Modifier>();
+            result.add(workTile.getProductionBonus(goodsType));
+            result.add(getUnit().getModifier(goodsType.getId()));
+            result.add(getColony().getModifier(goodsType.getId()));
+            switch(result.size()) {
+            case 0:
+                return null;
+            case 1:
+                return result.get(0);
+            default:
+                return Modifier.combine(result);
+            }
+        } else {
+            return null;
+        }
+    }
+
+    /**
      * Returns the production of the given type of goods which would
      * be produced by the given unit
      *
