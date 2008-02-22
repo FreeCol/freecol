@@ -520,10 +520,10 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
         detailPanel.setLayout(layout);
 
         String movementCost = String.valueOf(tileType.getBasicMoveCost() / 3);
-        String defenseBonus = "0%";
+        String defenseBonus = "";
         Modifier defence = tileType.getDefenceBonus();
         if (defence != null) {
-            defenseBonus = String.valueOf(defence.getValue()) + "%";
+            defenseBonus = getModifierAsString(defence);
         }
 
         GoodsType secondaryGoodsType = tileType.getSecondaryGoods();
@@ -1156,7 +1156,7 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
             bonus = bonus + "%";
             break;
         case MULTIPLICATIVE:
-            bonus = "x" + bonus;
+            bonus = "\u00D7" + bonus;
             break;
         default:
         }

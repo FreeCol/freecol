@@ -59,10 +59,8 @@ import org.w3c.dom.Element;
  * Objects of this class contains AI-information for a single {@link Colony}.
  */
 public class AIColony extends AIObject {
+
     private static final Logger logger = Logger.getLogger(AIColony.class.getName());
-
-
-
 
     /**
      * The FreeColGameObject this AIObject contains AI-information for.
@@ -1205,27 +1203,6 @@ public class AIColony extends AIObject {
             }
         }
     }
-
-    /**
-     * Determines the best goods to produce on a given <code>Tile</code>
-     * within this colony.
-     * 
-     * @param t The <code>Tile</code>.
-     * @return The type of goods.
-     * 
-     * private int getBestGoodsToProduce(Tile t) { if (t.isForested()) { if
-     * (t.getType() == Tile.GRASSLANDS || t.getType() == Tile.SAVANNAH) { return
-     * Goods.LUMBER; } else { return Goods.FURS; } } if (t.getAddition() ==
-     * Tile.ADD_HILLS) { return Goods.ORE; } if (t.getAddition() ==
-     * Tile.ADD_MOUNTAINS) { if (t.hasBonus()) { return Goods.SILVER; } else {
-     * return Goods.ORE; } } if (!t.isLand()) { return Goods.FOOD; } if
-     * (t.getType() == Tile.DESERT) { if (t.hasBonus()) { return Goods.FOOD; }
-     * else { return Goods.ORE; } } switch(t.getType()) { case Tile.SWAMP: case
-     * Tile.PLAINS: return Goods.FOOD; case Tile.PRAIRIE: return Goods.COTTON;
-     * case Tile.GRASSLANDS: return Goods.TOBACCO; case Tile.SAVANNAH: return
-     * Goods.SUGAR; case Tile.MARSH: case Tile.TUNDRA: case Tile.ARCTIC:
-     * default: return Goods.ORE; } }
-     */
 
     /**
      * Writes this object to an XML stream.

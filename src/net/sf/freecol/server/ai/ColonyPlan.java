@@ -53,15 +53,12 @@ import org.w3c.dom.Element;
  */
 public class ColonyPlan {
 
-    // What is this supposed to be? Is it the maximum number of units
-    // per building?
-    private static final int MAX_LEVEL = 3;
-
     @SuppressWarnings("unused")
     private static final Logger logger = Logger.getLogger(ColonyPlan.class.getName());
 
-
-
+    // What is this supposed to be? Is it the maximum number of units
+    // per building?
+    private static final int MAX_LEVEL = 3;
 
     /**
      * The FreeColGameObject this AIObject contains AI-information for.
@@ -80,12 +77,11 @@ public class ColonyPlan {
      * @param colony The colony to make a <code>ColonyPlan</code> for.
      */
     public ColonyPlan(AIMain aiMain, Colony colony) {
+        if (colony == null) {
+            throw new IllegalArgumentException("Parameter 'colony' must not be 'null'.");
+        }
         this.aiMain = aiMain;
         this.colony = colony;
-
-        if (colony == null) {
-            throw new NullPointerException("colony == null");
-        }
     }
 
     /**
@@ -106,9 +102,8 @@ public class ColonyPlan {
      * 
      * @return The list of <code>WorkLocationPlan</code>s .
      */
-    @SuppressWarnings("unchecked")
     public List<WorkLocationPlan> getWorkLocationPlans() {
-        return (List<WorkLocationPlan>) workLocationPlans.clone();
+        return new ArrayList<WorkLocationPlan>(workLocationPlans);
     }
 
     /**
@@ -602,52 +597,6 @@ public class ColonyPlan {
         GoodsType[] top = Tile.getSortedGoodsTop(t.getType(), t.getTileItemContainer(), t.getFishBonus());
         return top[0];
     }
-/*
-        if (t.isForested() && t.hasBonus()) {
-            if (t.getType() == Tile.GRASSLANDS || t.getType() == Tile.SAVANNAH) {
-                return Goods.LUMBER;
-            } else {
-                return Goods.FURS;
-            }
-        }
-        if (t.getAddition() == Tile.ADD_HILLS) {
-            return Goods.ORE;
-        }
-        if (t.getAddition() == Tile.ADD_MOUNTAINS) {
-            if (t.hasBonus()) {
-                return Goods.SILVER;
-            } else {
-                return Goods.ORE;
-            }
-        }
-        if (!t.isLand()) {
-            return Goods.FOOD;
-        }
-        if (t.getType() == Tile.DESERT) {
-            if (t.hasBonus()) {
-                return Goods.FOOD;
-            } else {
-                return Goods.ORE;
-            }
-        }
-        switch (t.getType()) {
-        case Tile.SWAMP:
-        case Tile.PLAINS:
-        case Tile.TUNDRA:
-        case Tile.MARSH:
-            return Goods.FOOD;
-        case Tile.PRAIRIE:
-            return Goods.COTTON;
-        case Tile.GRASSLANDS:
-            return Goods.TOBACCO;
-        case Tile.SAVANNAH:
-            return Goods.SUGAR;
-        case Tile.ARCTIC:
-        default:
-            return Goods.ORE;
-        }
-    }
-*/
 
     /**
      * Gets the <code>Colony</code> this <code>ColonyPlan</code> controls.
