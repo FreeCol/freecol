@@ -486,7 +486,7 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
         final GoodsType goodsInputType = getGoodsInputType();
         final GoodsType goodsOutputType = getGoodsOutputType();
 
-        if (goodsInput == 0 && getMaximumGoodsInput() > 0) {
+        if (goodsInput == 0 && !canAutoProduce() && getMaximumGoodsInput() > 0) {
             addModelMessage(getColony(), "model.building.notEnoughInput", new String[][] {
                     { "%inputGoods%", goodsInputType.getName() }, { "%building%", getName() },
                     { "%colony%", colony.getName() } }, ModelMessage.MISSING_GOODS,
@@ -609,7 +609,7 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
      */
     public int getMaximumGoodsInput() {
         if (canAutoProduce()) {
-            return getGoodsInputAuto();
+            return getMaximumGoodsInputAuto();
         } else {
             return getMaximumGoodsInputAdding(null);
         }
@@ -642,6 +642,10 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
             surplus -= colony.getFoodConsumption();
         }
         return surplus / 2; // store the half of surplus
+    }
+
+    private int getMaximumGoodsInputAuto() {
+        return 2 * getMaximumAutoProduction();
     }
 
     /**
@@ -701,7 +705,7 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
             int minimumProduction = 0;
             Iterator<Unit> i = getUnitIterator();
             while (i.hasNext()) {
-                final Unit unit = (Unit)i.next();
+                final Unit unit = i.next();
                 if (unit.getType() == getExpertUnitType()) {
                     minimumProduction += 4;
                 }
@@ -999,8 +1003,6 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
         if (goodsOutputType == null) {
             return 0;
         }
-        Player player = colony.getOwner();
-
         return (int) colony.getFeatureContainer().applyModifier(productivity,
                                                                 goodsOutputType.getId(),
                                                                 buildingType, getGame().getTurn());
@@ -1022,8 +1024,8 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
      */
     @Override
     public void dispose() {
-        for (int i = 0; i < units.size(); i++) {
-            units.get(i).dispose();
+        for (Unit unit : units) {
+            unit.dispose();
         }
 
         super.dispose();
@@ -1066,7 +1068,7 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
         // Add child elements:
         Iterator<Unit> unitIterator = getUnitIterator();
         while (unitIterator.hasNext()) {
-            ((FreeColGameObject) unitIterator.next()).toXML(out, player, showAll, toSavedGame);
+            unitIterator.next().toXML(out, player, showAll, toSavedGame);
         }
 
         // End element:
