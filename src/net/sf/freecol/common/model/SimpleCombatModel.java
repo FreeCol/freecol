@@ -1110,12 +1110,15 @@ public class SimpleCombatModel implements CombatModel {
         
         if (newType != null) {
             unit.setType(newType);
-            unit.addModelMessage(unit, "model.unit.unitPromoted",
+            if (unit.getType().equals(newType)) {
+                // the new unit type was successfully applied
+                unit.addModelMessage(unit, "model.unit.unitPromoted",
                                  new String[][] {
                                      { "%oldName%", oldName },
                                      { "%unit%", unit.getName() },
                                      { "%nation%", nation }
                                  }, ModelMessage.UNIT_IMPROVED);
+            }
         }
     }
 }
