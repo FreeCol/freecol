@@ -25,6 +25,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.Collection;
+import java.util.LinkedList;
 import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamConstants;
@@ -33,6 +35,7 @@ import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.freecol.FreeCol;
+import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.Map.Direction;
 
 import org.w3c.dom.Element;
@@ -1192,6 +1195,92 @@ public final class Colony extends Settlement implements Location, Nameable {
     }
 
     /**
+     * determine if there is a problem with the production of the specified good
+     *
+     * @param goodsType  for this good
+     * @param amount     warehouse amount
+     * @param production production per turn
+     * @return all warnings
+     */
+    public Collection<String> getWarnings(GoodsType goodsType, int amount, int production) {
+        List<String> result = new LinkedList<String>();
+
+        if (goodsType == Goods.FOOD) {
+            if (amount + production < 0) {
+                result.add(Messages.message("model.colony.famineFeared",
+                        "%colony%", getName(),
+                        "%number%", "0"));
+            }
+        } else {
+            //food is never wasted -> new settler is produced
+            int waste = (amount + production - getWarehouseCapacity());
+            if (waste > 0 && !getExportData(goodsType).isExported()) {
+                result.add(Messages.message("model.building.warehouseSoonFull",
+                        "%goods%", goodsType.getName(),
+                        "%colony%", getName(),
+                        "%amount%", String.valueOf(waste)));
+
+            }
+        }
+
+        if (goodsType == Goods.TOOLS) {
+            BuildableType currentlyBuilding = getCurrentlyBuilding();
+            if (currentlyBuilding != BuildingType.NOTHING) {
+                for (AbstractGoods goods : currentlyBuilding.getGoodsRequired()) {
+                    if (goods.getType() == Goods.TOOLS && amount < goods.getAmount()) {
+                        result.add(Messages.message("model.colony.buildableNeedsGoods",
+                                "%colony%", getName(),
+                                "%buildable%", currentlyBuilding.getName(),
+                                "%goodsType%", goodsType.getName()));
+                    }
+                }
+            }
+        }
+
+        addInsufficientProductionMessage(result, getBuildingForProducing(goodsType));
+        addInsufficientProductionMessage(result, getBuildingForConsuming(goodsType));
+
+        return result;
+    }
+
+    /**
+     * adds a message about insufficient production for a building
+     *
+     * @param warnings where to add the warnings
+     * @param building for this building
+     */
+    private void addInsufficientProductionMessage(List<String> warnings, Building building) {
+        if (building != null) {
+            int delta = building.getMaximumProduction() - building.getProductionNextTurn();
+            if (delta > 0) {
+                warnings.add(createInsufficientProductionMessage(
+                        building.getGoodsOutputType(),
+                        delta,
+                        building.getGoodsInputType(),
+                        building.getMaximumGoodsInput() - building.getGoodsInputNextTurn()));
+            }
+        }
+    }
+
+    /**
+     * create a message about insufficient production
+     *
+     * @param outputType    output type
+     * @param missingOutput missing output
+     * @param inputType     input type
+     * @param missingInput  missing input
+     * @return message
+     */
+    private String createInsufficientProductionMessage(GoodsType outputType, int missingOutput, GoodsType inputType, int missingInput) {
+        return Messages.message("model.colony.insufficientProduction",
+                "%outputAmount%", String.valueOf(missingOutput),
+                "%outputType%", outputType.getName(),
+                "%colony%", getName(),
+                "%inputAmount%", String.valueOf(missingInput),
+                "%inputType%", inputType.getName());
+    }
+
+    /**
      * Returns a random unit from this colony. At this moment, this method
      * always returns the first unit in the colony.
      * 
@@ -1685,7 +1774,6 @@ public final class Colony extends Settlement implements Location, Nameable {
      * Get the <code>Modifier</code> value.
      *
      * @param id a <code>String</code> value
-     * @param turn a <code>Turn</code> value
      * @return a <code>Modifier</code> value
      */
     public final Set<Modifier> getModifierSet(String id) {
@@ -1699,7 +1787,6 @@ public final class Colony extends Settlement implements Location, Nameable {
      * identified by <code>id</code>.
      *
      * @param id a <code>String</code> value
-     * @param turn a <code>Turn</code> value
      * @return a <code>boolean</code> value
      */
     public boolean hasAbility(String id) {

@@ -19,25 +19,29 @@
 
 package net.sf.freecol.client.gui.panel;
 
-import java.awt.Color;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.util.Collections;
-import java.util.List;
-
-import javax.swing.JButton;
-import javax.swing.JLabel;
-import javax.swing.SwingConstants;
-
+import cz.autel.dmi.HIGLayout;
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.Colony;
-import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.Market;
 import net.sf.freecol.common.model.Player;
-import cz.autel.dmi.HIGLayout;
+import net.sf.freecol.common.model.Unit;
+
+import javax.swing.JButton;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.SwingConstants;
+import javax.swing.border.Border;
+import javax.swing.border.EmptyBorder;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.List;
 
 /**
  * This panel displays the Trade Report.
@@ -45,22 +49,30 @@ import cz.autel.dmi.HIGLayout;
 public final class ReportTradePanel extends ReportPanel implements ActionListener {
 
 
+    /**
+     * How many colums are defined per label.
+     */
+    private static final int columnsPerLabel = 1;
 
-    /** How many colums are defined per label. */
-    private static final int columnsPerLabel = 2;
-
-    /** How many additional rows are defined. */
-    private static final int extraRows = 5; // labels and separators
+    /**
+     * How many additional rows are defined.
+     */
+    private static final int extraRows = 7; // labels and separators
     private static final int extraBottomRows = 2;
 
-    /** How many additional columns are defined. */
+    /**
+     * How many additional columns are defined.
+     */
     private static final int extraColumns = 1; // labels
 
-    /** How many columns are defined all together. */
-    private static final int columns = columnsPerLabel * FreeCol.getSpecification().numberOfGoodsTypes() +
-        extraColumns;
+    /**
+     * How many columns are defined all together.
+     */
+    private static final int columns = columnsPerLabel * FreeCol.getSpecification().numberOfGoodsTypes() + extraColumns;
 
-    /** How wide the margins should be. */
+    /**
+     * How wide the margins should be.
+     */
     private static final int marginWidth = 12;
 
     private final JLabel salesLabel;
@@ -71,14 +83,16 @@ public final class ReportTradePanel extends ReportPanel implements ActionListene
 
     private List<Colony> colonies;
 
+    private final JPanel goodsHeader = new JPanel();
 
     /**
      * The constructor that will add the items to this panel.
-     * 
+     *
      * @param parent The parent of this panel.
      */
     public ReportTradePanel(Canvas parent) {
         super(parent, Messages.message("menuBar.report.trade"));
+        setSize(getMinimumSize());
 
         salesLabel = new JLabel(Messages.message("report.trade.unitsSold"), JLabel.TRAILING);
         salesLabel.setBorder(FreeColPanel.LEFTCELLBORDER);
@@ -86,6 +100,19 @@ public final class ReportTradePanel extends ReportPanel implements ActionListene
         beforeTaxesLabel.setBorder(FreeColPanel.LEFTCELLBORDER);
         afterTaxesLabel = new JLabel(Messages.message("report.trade.afterTaxes"), JLabel.TRAILING);
         afterTaxesLabel.setBorder(FreeColPanel.LEFTCELLBORDER);
+
+        goodsHeader.setBorder(new EmptyBorder(20, 20, 0, 20));
+        scrollPane.setColumnHeaderView(goodsHeader);
+    }
+
+    @Override
+    public Dimension getMinimumSize() {
+        return new Dimension(900, 750);
+    }
+
+    @Override
+    protected Border createBorder() {
+        return new EmptyBorder(0, 20, 20, 20);
     }
 
     /**
@@ -97,12 +124,20 @@ public final class ReportTradePanel extends ReportPanel implements ActionListene
 
         // Display Panel
         reportPanel.removeAll();
+        goodsHeader.removeAll();
 
         colonies = player.getColonies();
         Collections.sort(colonies, getCanvas().getClient().getClientOptions().getColonyComparator());
 
         int[] widths = new int[columns];
-        int[] heights = new int[colonies.size() + extraRows + extraBottomRows];
+
+        //align the labels with the goodsHeader
+        widths[0] = 170;
+        for (int i = 1; i < columns; i++) {
+            widths[i] = 40;
+        }
+
+        int[] heights = new int[colonies.size() * 2 + extraRows + extraBottomRows];
 
         int labelColumn = 1;
 
@@ -110,15 +145,29 @@ public final class ReportTradePanel extends ReportPanel implements ActionListene
         heights[heights.length - 2] = marginWidth;
 
         reportPanel.setLayout(new HIGLayout(widths, heights));
+        goodsHeader.setLayout(new HIGLayout(widths, new int[1]));
+
         JLabel emptyLabel = new JLabel();
         emptyLabel.setBorder(FreeColPanel.TOPLEFTCELLBORDER);
-        reportPanel.add(emptyLabel, higConst.rc(1, labelColumn));
-        reportPanel.add(salesLabel, higConst.rc(2, labelColumn));
-        reportPanel.add(beforeTaxesLabel, higConst.rc(3, labelColumn));
-        reportPanel.add(afterTaxesLabel, higConst.rc(4, labelColumn));
+        goodsHeader.add(emptyLabel, higConst.rc(1, labelColumn));
+
+        reportPanel.add(salesLabel, higConst.rc(1, labelColumn));
+        reportPanel.add(beforeTaxesLabel, higConst.rc(2, labelColumn));
+        reportPanel.add(afterTaxesLabel, higConst.rc(3, labelColumn));
+
+        JLabel cargoUnitsLabel = new JLabel(Messages.message("report.trade.cargoUnits"), JLabel.TRAILING);
+        cargoUnitsLabel.setBorder(FreeColPanel.LEFTCELLBORDER);
+        JLabel totalUnitsLabel = new JLabel(Messages.message("report.trade.totalUnits"), JLabel.TRAILING);
+        totalUnitsLabel.setBorder(FreeColPanel.LEFTCELLBORDER);
+        JLabel totalDeltaLabel = new JLabel(Messages.message("report.trade.totalDelta"), JLabel.TRAILING);
+        totalDeltaLabel.setBorder(FreeColPanel.LEFTCELLBORDER);
+
+        reportPanel.add(cargoUnitsLabel, higConst.rc(4, labelColumn));
+        reportPanel.add(totalUnitsLabel, higConst.rc(5, labelColumn));
+        reportPanel.add(totalDeltaLabel, higConst.rc(6, labelColumn));
 
         JLabel currentLabel;
-        int column = extraColumns + 1;
+        int column = extraColumns;
         for (GoodsType goodsType : FreeCol.getSpecification().getGoodsTypeList()) {
             if (!goodsType.isStorable()) {
                 continue;
@@ -131,28 +180,61 @@ public final class ReportTradePanel extends ReportPanel implements ActionListene
             marketLabel.setBorder(FreeColPanel.TOPCELLBORDER);
             marketLabel.setVerticalTextPosition(JLabel.BOTTOM);
             marketLabel.setHorizontalTextPosition(JLabel.CENTER);
-            reportPanel.add(marketLabel, higConst.rc(1, column));
+
+            goodsHeader.add(marketLabel, higConst.rc(1, column));
 
             currentLabel = new JLabel(String.valueOf(sales), JLabel.TRAILING);
             currentLabel.setBorder(FreeColPanel.CELLBORDER);
             if (sales < 0) {
                 currentLabel.setForeground(Color.RED);
             }
-            reportPanel.add(currentLabel, higConst.rc(2, column));
+            reportPanel.add(currentLabel, higConst.rc(1, column));
 
             currentLabel = new JLabel(String.valueOf(beforeTaxes), JLabel.TRAILING);
             currentLabel.setBorder(FreeColPanel.CELLBORDER);
             if (beforeTaxes < 0) {
                 currentLabel.setForeground(Color.RED);
             }
-            reportPanel.add(currentLabel, higConst.rc(3, column));
+            reportPanel.add(currentLabel, higConst.rc(2, column));
 
             currentLabel = new JLabel(String.valueOf(afterTaxes), JLabel.TRAILING);
             currentLabel.setBorder(FreeColPanel.CELLBORDER);
             if (afterTaxes < 0) {
                 currentLabel.setForeground(Color.RED);
             }
-            reportPanel.add(currentLabel, higConst.rc(4, column));
+            reportPanel.add(currentLabel, higConst.rc(3, column));
+
+            int cargoUnits = 0;
+            for (Iterator<Unit> iterator = player.getUnitIterator(); iterator.hasNext();) {
+                Unit unit = iterator.next();
+                if (unit.isCarrier()) {
+                    cargoUnits += unit.getGoodsContainer().getGoodsCount(goodsType);
+                }
+            }
+
+            int totalUnits = cargoUnits;
+            int deltaUnits = 0;
+            for (Colony colony : colonies) {
+                deltaUnits += colony.getProductionNetOf(goodsType);
+                totalUnits += colony.getGoodsCount(goodsType);
+            }
+
+            JLabel cargoUnitsAmount = new JLabel(String.valueOf(cargoUnits), JLabel.TRAILING);
+            cargoUnitsAmount.setBorder(FreeColPanel.CELLBORDER);
+            reportPanel.add(cargoUnitsAmount, higConst.rc(4, column));
+
+            JLabel totalUnitsAmount = new JLabel(String.valueOf(totalUnits), JLabel.TRAILING);
+            totalUnitsAmount.setBorder(FreeColPanel.CELLBORDER);
+            reportPanel.add(totalUnitsAmount, higConst.rc(5, column));
+
+            JLabel deltaUnitsAmount = new JLabel(String.valueOf(deltaUnits), JLabel.TRAILING);
+            if (deltaUnits < 0) {
+                deltaUnitsAmount.setForeground(Color.RED);
+            } else if (deltaUnits > 0) {
+                deltaUnitsAmount.setText("+" + deltaUnits);
+            }
+            deltaUnitsAmount.setBorder(FreeColPanel.CELLBORDER);
+            reportPanel.add(deltaUnitsAmount, higConst.rc(6, column));
         }
 
         int row = extraRows + 1;
@@ -160,8 +242,8 @@ public final class ReportTradePanel extends ReportPanel implements ActionListene
         for (int colonyIndex = 0; colonyIndex < colonies.size(); colonyIndex++) {
             Colony colony = colonies.get(colonyIndex);
             JButton colonyButton = createColonyButton(colonyIndex);
-            reportPanel.add(colonyButton, higConst.rc(row, labelColumn));
-            column = extraColumns + 1;
+            reportPanel.add(colonyButton, higConst.rcwh(row, labelColumn, 1, 2));
+            column = extraColumns;
             for (GoodsType goodsType : FreeCol.getSpecification().getGoodsTypeList()) {
                 if (!goodsType.isStorable()) {
                     continue;
@@ -177,19 +259,36 @@ public final class ReportTradePanel extends ReportPanel implements ActionListene
                 if (colony.getExportData(goodsType).isExported()) {
                     goodsLabel.setText("*" + String.valueOf(amount));
                 }
-                if (amount > 200) {
-                    goodsLabel.setForeground(Color.BLUE);
-                } else if (amount > 100) {
-                    goodsLabel.setForeground(Color.GREEN);
-                }
                 reportPanel.add(goodsLabel, higConst.rc(row, column));
+
+                int production = colony.getProductionNetOf(goodsType);
+
+                JLabel productionLabel = new JLabel(String.valueOf(production), JLabel.TRAILING);
+                if (production < 0) {
+                    productionLabel.setForeground(Color.RED);
+                } else if (production > 0) {
+                    productionLabel.setText("+" + production);
+                }
+
+                StringBuffer toolTip = new StringBuffer();
+                for (String warning : colony.getWarnings(goodsType, amount, production)) {
+                    if (toolTip.length() > 0) {
+                        toolTip.append(" - ");
+                    }
+                    toolTip.append(warning);
+                    productionLabel.setForeground(Color.MAGENTA);
+                    productionLabel.setToolTipText(toolTip.toString());
+                }
+
+                productionLabel.setBorder(FreeColPanel.CELLBORDER);
+                reportPanel.add(productionLabel, higConst.rc(row + 1, column));
             }
-            row++;
+            row += 2;
         }
 
         row++;
         reportPanel.add(new JLabel(Messages.message("report.trade.hasCustomHouse")),
-                        higConst.rcwh(row, 1, widths.length, 1));
+                higConst.rcwh(row, 1, widths.length, 1));
     }
 
     private JButton createColonyButton(int index) {
@@ -218,7 +317,7 @@ public final class ReportTradePanel extends ReportPanel implements ActionListene
     /**
      * This function analyses an event and calls the right methods to take care
      * of the user's requests.
-     * 
+     *
      * @param event The incoming ActionEvent.
      */
     public void actionPerformed(ActionEvent event) {

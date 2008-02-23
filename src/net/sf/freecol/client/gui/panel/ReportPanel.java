@@ -32,6 +32,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.border.EmptyBorder;
+import javax.swing.border.Border;
 
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.ImageLibrary;
@@ -55,7 +56,7 @@ public class ReportPanel extends FreeColPanel implements ActionListener {
 
     private JButton ok;
 
-    private JScrollPane scrollPane;
+    protected JScrollPane scrollPane;
 
     private static ImageLibrary library;
 
@@ -84,7 +85,7 @@ public class ReportPanel extends FreeColPanel implements ActionListener {
 
         reportPanel = new JPanel();
         reportPanel.setOpaque(true);
-        reportPanel.setBorder(new EmptyBorder(20, 20, 20, 20));
+        reportPanel.setBorder(createBorder());
 
         scrollPane = new JScrollPane(reportPanel, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
                                      JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
@@ -100,6 +101,10 @@ public class ReportPanel extends FreeColPanel implements ActionListener {
         setSize(850, 600);
     }
     
+    protected Border createBorder() {
+        return new EmptyBorder(20, 20, 20, 20);
+    }
+
     @Override
     public Dimension getMinimumSize() {
         return new Dimension(850, 600);

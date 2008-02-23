@@ -1111,7 +1111,7 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener {
 
             public final int[] widths = { 162, 46, 46, 46, 90 };
 
-            public final int[] heights = { 60, 0 };
+            public final int[] heights = { 60, 0, 0 };
 
             public static final int labelColumn = 1;
             public static final int unitColumn = 2;
@@ -1152,10 +1152,12 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener {
                     }
                     add(unitLabel, higConst.rc(1, unitColumn + index));
                     if (building.getType().hasAbility("model.ability.teach")) {
+                        JLabel progress = new JLabel(unit.getTurnsOfTraining() + "/" + unit.getNeededTurnsOfTraining());
+                        add(progress, higConst.rc(2, unitColumn + index));
                         if (unit.getStudent() != null) {
                             UnitLabel studentLabel = new UnitLabel(unit.getStudent(), parent, true);
                             studentLabel.setIgnoreLocation(true);
-                            add(studentLabel, higConst.rc(2, unitColumn + index));
+                            add(studentLabel, higConst.rc(3, unitColumn + index));
                         }
                     }
                 }

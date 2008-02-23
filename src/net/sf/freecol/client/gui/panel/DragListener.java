@@ -87,6 +87,10 @@ public final class DragListener extends MouseAdapter {
                 final Unit tempUnit = unitLabel.getUnit();
                 final InGameController inGameController = unitLabel.getCanvas().getClient().getInGameController();
                 JPopupMenu menu = new JPopupMenu("Unit");
+                JMenuItem name = new JMenuItem(tempUnit.getName());
+                name.setEnabled(false);
+                menu.add(name);
+
                 JMenuItem menuItem;
                 boolean separatorNeeded = false;
 
@@ -283,6 +287,21 @@ public final class DragListener extends MouseAdapter {
                 menuItem.setActionCommand(String.valueOf(UnitLabel.COLOPEDIA));
                 menuItem.addActionListener(unitLabel);
                 menu.add(menuItem);
+
+                int exprience = Math.min(tempUnit.getExperience(), 200);
+                if (tempUnit.getTurnsOfTraining() > 0 || exprience > 0) {
+                    menu.addSeparator();
+                }
+                if (tempUnit.getTurnsOfTraining() > 0) {
+                    JMenuItem teaching = new JMenuItem(Messages.message("menuBar.teacher") + ": " + tempUnit.getTurnsOfTraining() + "/" + tempUnit.getNeededTurnsOfTraining());
+                    teaching.setEnabled(false);
+                    menu.add(teaching);
+                }
+                if (exprience > 0) {
+                    JMenuItem experience = new JMenuItem(Messages.message("menuBar.experience") + ": " + exprience + "/200 (max. 4%");
+                    experience.setEnabled(false);
+                    menu.add(experience);
+                }
 
                 if (menu.getSubElements().length > 0) {
                     menu.show(comp, e.getX(), e.getY());
