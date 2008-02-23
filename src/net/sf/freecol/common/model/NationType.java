@@ -31,12 +31,7 @@ import net.sf.freecol.common.Specification;
 /**
  * Represents one of the nations present in the game.
  */
-public abstract class NationType extends FreeColGameObjectType implements Features {
-
-    /**
-     * Contains the abilities and modifiers of this type.
-     */
-    private FeatureContainer featureContainer = new FeatureContainer();
+public abstract class NationType extends FreeColGameObjectType {
 
     /**
      * Sole constructor.
@@ -56,38 +51,6 @@ public abstract class NationType extends FreeColGameObjectType implements Featur
      *
      */
     public abstract boolean isREF();
-
-    /**
-     * Returns true if the Object has the ability identified by
-     * <code>id</code>.
-     *
-     * @param id a <code>String</code> value
-     * @return a <code>boolean</code> value
-     */
-    public boolean hasAbility(String id) {
-        return featureContainer.hasAbility(id);
-    }
-
-    /**
-     * Returns the Modifier identified by <code>id</code>.
-     *
-     * @param id a <code>String</code> value
-     * @return a <code>Modifier</code> value
-     */
-    public Modifier getModifier(String id) {
-        return featureContainer.getModifier(id);
-    }
-
-    /**
-     * Add the given Feature to the Features Map. If the Feature given
-     * can not be combined with a Feature with the same ID already
-     * present, the old Feature will be replaced.
-     *
-     * @param feature a <code>Feature</code> value
-     */
-    public void addFeature(Feature feature) {
-        featureContainer.addFeature(feature);
-    }
 
     public String toString() {
         return getName();

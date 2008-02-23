@@ -22,8 +22,10 @@ package net.sf.freecol.common.model;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamConstants;
@@ -1252,18 +1254,11 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
      * @param goodsType a <code>GoodsType</code> value
      * @return a <code>Modifier</code> value
      */
-    public Modifier getProductionBonus(GoodsType goodsType) {
-        List<Modifier> result = new ArrayList<Modifier>();
+    public Set<Modifier> getProductionBonus(GoodsType goodsType) {
+        Set<Modifier> result = new HashSet<Modifier>();
         result.add(type.getProductionBonus(goodsType));
-        result.add(tileItemContainer.getProductionBonus(goodsType));
-        switch(result.size()) {
-        case 0:
-            return null;
-        case 1:
-            return result.get(0);
-        default:
-            return Modifier.combine(result);
-        }
+        result.addAll(tileItemContainer.getProductionBonus(goodsType));
+        return result;
     }
 
     /**
@@ -1421,14 +1416,10 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
      * @return The defence modifier (in percent) of this tile.
      */
     public int defenceBonus() {
-        if (type == null || type.getDefenceBonus() == null) {
+        if (type == null) {
             return 0;
         }
-        return (int) type.getDefenceBonus().getValue();
-    }
-
-    public Modifier getDefenceBonus() {
-        return type.getDefenceBonus();
+        return (int) type.getFeatureContainer().applyModifier(0, "model.modifier.defence");
     }
 
     /**

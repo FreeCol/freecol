@@ -39,13 +39,8 @@ import net.sf.freecol.common.Specification;
  * The FoundingFather is able to grant new abilities or bonuses to the
  * player, or to cause certain events.
  */
-public class FoundingFather extends FreeColGameObjectType implements Features {
+public class FoundingFather extends FreeColGameObjectType {
     
-    /**
-     * Contains the abilities and modifiers of this type.
-     */
-    private FeatureContainer featureContainer = new FeatureContainer();
-
     /**
      * The probability of this FoundingFather being offered for selection.
      */
@@ -185,47 +180,6 @@ public class FoundingFather extends FreeColGameObjectType implements Features {
     }
 
     /**
-     * Returns a copy of the object's features.
-     *
-     * @return a <code>List</code> value
-     */
-    public List<Feature> getFeatures() {
-        return featureContainer.getFeatures();
-    }
-
-    /**
-     * Returns true if the Object has the ability identified by
-     * <code>id</code>.
-     *
-     * @param id a <code>String</code> value
-     * @return a <code>boolean</code> value
-     */
-    public boolean hasAbility(String id) {
-        return featureContainer.hasAbility(id);
-    }
-
-    /**
-     * Returns the Modifier identified by <code>id</code>.
-     *
-     * @param id a <code>String</code> value
-     * @return a <code>Modifier</code> value
-     */
-    public Modifier getModifier(String id) {
-        return featureContainer.getModifier(id);
-    }
-
-    /**
-     * Add the given Feature to the Features Map. If the Feature given
-     * can not be combined with a Feature with the same ID already
-     * present, the old Feature will be replaced.
-     *
-     * @param feature a <code>Feature</code> value
-     */
-    public void addFeature(Feature feature) {
-        featureContainer.addFeature(feature);
-    }
-
-    /**
      * Get the <code>Upgrades</code> value.
      *
      * @return a <code>Map<UnitType, UnitType></code> value
@@ -281,13 +235,13 @@ public class FoundingFather extends FreeColGameObjectType implements Features {
                 if (ability.getSource() == null) {
                     ability.setSource(this.getId());
                 }
-                addFeature(ability);
+                addAbility(ability);
             } else if (Modifier.getXMLElementTagName().equals(childName)) {
                 Modifier modifier = new Modifier(in);
                 if (modifier.getSource() == null) {
                     modifier.setSource(this.getId());
                 }
-                addFeature(modifier); // close this element
+                addModifier(modifier); // close this element
             } else if ("event".equals(childName)) {
                 String eventId = in.getAttributeValue(null, "id");
                 String value = in.getAttributeValue(null, "value");

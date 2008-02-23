@@ -19,6 +19,8 @@
 
 package net.sf.freecol.common.model;
 
+import java.util.Set;
+
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
@@ -29,6 +31,29 @@ import net.sf.freecol.client.gui.i18n.Messages;
 public abstract class FreeColGameObjectType extends FreeColObject {
 
     private int index;
+
+    /**
+     * Describe featureContainer here.
+     */
+    protected FeatureContainer featureContainer = new FeatureContainer();
+
+    /**
+     * Get the <code>FeatureContainer</code> value.
+     *
+     * @return a <code>FeatureContainer</code> value
+     */
+    public final FeatureContainer getFeatureContainer() {
+        return featureContainer;
+    }
+
+    /**
+     * Set the <code>FeatureContainer</code> value.
+     *
+     * @param newFeatureContainer The new FeatureContainer value.
+     */
+    public final void setFeatureContainer(final FeatureContainer newFeatureContainer) {
+        this.featureContainer = newFeatureContainer;
+    }
 
     protected final void setIndex(final int index) {
         this.index = index;
@@ -47,11 +72,19 @@ public abstract class FreeColGameObjectType extends FreeColObject {
     }
 
     public boolean hasAbility(String id) {
-        return false;
+        return featureContainer.hasAbility(id);
     }
 
-    public Modifier getModifier(String id) {
-        return null;
+    public void addAbility(Ability ability) {
+        featureContainer.addAbility(ability);
+    }
+
+    public void addModifier(Modifier modifier) {
+        featureContainer.addModifier(modifier);
+    }
+
+    public Set<Modifier> getModifierSet(String id) {
+        return featureContainer.getModifierSet(id);
     }
 
     protected void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {

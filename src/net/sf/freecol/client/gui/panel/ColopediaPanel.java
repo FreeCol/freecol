@@ -521,7 +521,7 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
 
         String movementCost = String.valueOf(tileType.getBasicMoveCost() / 3);
         String defenseBonus = "";
-        Modifier defence = tileType.getDefenceBonus();
+        Modifier defence = tileType.getDefenceBonus().iterator().next();
         if (defence != null) {
             defenseBonus = getModifierAsString(defence);
         }
@@ -696,10 +696,7 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
         JPanel productionPanel = null;
         List<Modifier> bonusList = new ArrayList<Modifier>();
         for (GoodsType goodsType : FreeCol.getSpecification().getGoodsTypeList()) {
-            Modifier productionBonus = type.getModifier(goodsType.getId());
-            if (productionBonus != null) {
-                bonusList.add(productionBonus);
-            }
+            bonusList.addAll(type.getModifierSet(goodsType.getId()));
         }
         int bonusNumber = bonusList.size();
         if (bonusNumber > 0) {
@@ -946,16 +943,13 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
         for (Entry<String, Boolean> entry : buildingType.getAbilitiesRequired().entrySet()) {
             if (entry.getValue()) {
                 requiresText.append(Messages.message(entry.getKey() + ".name"));
-                father: for (FoundingFather father : FreeCol.getSpecification().getFoundingFathers()) {
-                    for (Feature feature : father.getFeatures()) {
-                        // this assumes that a particular ability is
-                        // granted by only one FoundingFather
-                        if (entry.getKey().equals(feature.getId())) {
-                            requiresText.append(" ");
-                            requiresText.append(Messages.message("colopedia.abilityGrantedBy", "%father%", 
-                                                                 father.getName()));
-                            break father;
-                        }
+                for (FoundingFather father : FreeCol.getSpecification().getFoundingFathers()) {
+                    if (father.hasAbility(entry.getKey())) {
+                        // TODO: this assumes that a particular
+                        // ability is granted only by a FoundingFather
+                        requiresText.append(" ");
+                        requiresText.append(Messages.message("colopedia.abilityGrantedBy", "%father%", 
+                                                             father.getName()));
                     }
                 }
                 requiresText.append("\n");

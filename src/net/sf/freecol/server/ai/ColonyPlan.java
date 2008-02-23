@@ -180,7 +180,7 @@ public class ColonyPlan {
                 GoodsType outputType = b.getGoodsOutputType();
                 if (outputType != null) {
                     for (Building building : colony.getBuildings()) {
-                        if (building.getType().getModifier(outputType.getId()) != null
+                        if (!building.getType().getModifierSet(outputType.getId()).isEmpty()
                                 && building.canBuildNext()) {
                             buildList.add(building.getType().getUpgradesTo());
                         }

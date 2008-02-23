@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.common.model.Unit.UnitState;
@@ -41,30 +42,32 @@ public class FoundingFatherTest extends FreeColTestCase {
         Player dutch = game.getPlayer("model.nation.dutch");
 
         FoundingFather father1 = new FoundingFather(111);
-        father1.addFeature(new Ability("some.new.ability"));
+        father1.addAbility(new Ability("some.new.ability"));
         dutch.addFather(father1);
 
         assertTrue(dutch.hasAbility("some.new.ability"));
 
         FoundingFather father2 = new FoundingFather(112);
-        father2.addFeature(new Modifier("some.new.modifier", 2f, Modifier.Type.ADDITIVE));
+        father2.addModifier(new Modifier("some.new.modifier", 2f, Modifier.Type.ADDITIVE));
         dutch.addFather(father2);
 
-        assertTrue(dutch.getModifier("some.new.modifier") != null);
-        assertEquals(4f, dutch.getModifier("some.new.modifier").applyTo(2));
+        Set<Modifier> modifierSet = dutch.getFeatureContainer().getModifierSet("some.new.modifier");
+        assertEquals(1, modifierSet.size());
+        assertEquals(2f, modifierSet.iterator().next().getValue());
+        assertEquals(4f, FeatureContainer.applyModifierSet(2, null, modifierSet));
 
         FoundingFather father3 = new FoundingFather(113);
-        father3.addFeature(new Modifier("some.new.modifier", 2f, Modifier.Type.ADDITIVE));
+        father3.addModifier(new Modifier("some.new.modifier", 2f, Modifier.Type.ADDITIVE));
         dutch.addFather(father3);
 
-        assertTrue(dutch.getModifier("some.new.modifier") != null);
-        assertEquals(6f, dutch.getModifier("some.new.modifier").applyTo(2));
+        assertFalse(dutch.getFeatureContainer().getModifierSet("some.new.modifier").isEmpty());
+        assertEquals(6f, dutch.getFeatureContainer().applyModifier(2, "some.new.modifier"));
 
         FoundingFather father4 = new FoundingFather(114);
-        father4.addFeature(new Ability("some.new.ability", false));
+        father4.addAbility(new Ability("some.new.ability", false));
         dutch.addFather(father4);
 
-        assertFalse(dutch.hasAbility("some.new.ability"));
+        assertFalse(dutch.getFeatureContainer().hasAbility("some.new.ability"));
 
     }
 
@@ -142,7 +145,7 @@ public class FoundingFatherTest extends FreeColTestCase {
         List<Scope> scopeList = new ArrayList<Scope>();
         scopeList.add(pressScope);
         priceBonus.setScopes(scopeList);
-        father.addFeature(priceBonus);
+        father.addModifier(priceBonus);
         dutch.addFather(father);
 
         Colony colony = getStandardColony(4);

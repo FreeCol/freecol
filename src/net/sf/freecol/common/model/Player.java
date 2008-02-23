@@ -53,7 +53,7 @@ import org.w3c.dom.Element;
  * various defaults for the player. One example of this is the
  * {@link #getEntryLocation entry location}.
  */
-public class Player extends FreeColGameObject implements Features, Nameable {
+public class Player extends FreeColGameObject implements Nameable {
 
     private static final Logger logger = Logger.getLogger(Player.class.getName());
 
@@ -202,7 +202,7 @@ public class Player extends FreeColGameObject implements Features, Nameable {
     /**
      * Contains the abilities and modifiers of this type.
      */
-    private final FeatureContainer featureContainer = new FeatureContainer();
+    private FeatureContainer featureContainer = new FeatureContainer();
 
     /**
      * 
@@ -380,6 +380,27 @@ public class Player extends FreeColGameObject implements Features, Nameable {
         return index;
     }
 
+    /**
+     * Get the <code>FeatureContainer</code> value.
+     *
+     * @return a <code>FeatureContainer</code> value
+     */
+    public final FeatureContainer getFeatureContainer() {
+        return featureContainer;
+    }
+
+    /**
+     * Set the <code>FeatureContainer</code> value.
+     *
+     * @param newFeatureContainer The new FeatureContainer value.
+     */
+    public final void setFeatureContainer(final FeatureContainer newFeatureContainer) {
+        this.featureContainer = newFeatureContainer;
+    }
+
+    public boolean hasAbility(String id) {
+        return featureContainer.hasAbility(id);
+    }
 
     /**
      * Returns this Player's Market.
@@ -576,7 +597,7 @@ public class Player extends FreeColGameObject implements Features, Nameable {
             throw new IllegalStateException("Independence has already been declared.");
         }
         setPlayerType(PlayerType.REBEL);
-        addFeature(new Ability("model.ability.independenceDeclared"));
+        featureContainer.addAbility(new Ability("model.ability.independenceDeclared"));
         setStance(getREFPlayer(), Stance.WAR);
         setTax(0);
         // Dispose all units in Europe.
@@ -780,12 +801,8 @@ public class Player extends FreeColGameObject implements Features, Nameable {
             price += tile.potential(type);
         }
         price = price * getDifficulty().getLandPriceFactor() + 100;
-        Modifier modifier = getModifier("model.modifier.landPaymentModifier");
-        if (modifier == null) {
-            return price;
-        } else {
-            return (int) modifier.applyTo(price);
-        }
+        return (int) featureContainer.applyModifier(price, "model.modifier.landPaymentModifier",
+                                                    null, getGame().getTurn());
     }
 
     /**
@@ -1103,7 +1120,7 @@ public class Player extends FreeColGameObject implements Features, Nameable {
      *         independence.
      */
     public boolean canBuildColonies() {
-        return hasAbility("model.ability.foundColony");
+        return featureContainer.hasAbility("model.ability.foundColony");
     }
 
     /**
@@ -1114,7 +1131,7 @@ public class Player extends FreeColGameObject implements Features, Nameable {
      *         independence.
      */
     public boolean canHaveFoundingFathers() {
-        return hasAbility("model.ability.electFoundingFather");
+        return featureContainer.hasAbility("model.ability.electFoundingFather");
     }
 
     /**
@@ -1177,7 +1194,7 @@ public class Player extends FreeColGameObject implements Features, Nameable {
      * @return The bell production bonus.
      */
     public int getBellsBonus() {
-        return (int) getModifier("model.goods.bells").getValue();
+        return (int) featureContainer.applyModifier(1, "model.goods.bells", null, getGame().getTurn());
     }
 
     /**
@@ -1714,13 +1731,8 @@ public class Player extends FreeColGameObject implements Features, Nameable {
         if (!canRecruitUnits()) {
             return;
         }
-        Modifier modifier = nationType.getModifier("model.modifier.religiousUnrestBonus");
-        if (modifier == null) {
-            crossesRequired += getDifficulty().getCrossesIncrement();
-        } else {
-            crossesRequired += modifier.applyTo(getDifficulty().getCrossesIncrement());
-        }
-
+        crossesRequired += (int) featureContainer.applyModifier(getDifficulty().getCrossesIncrement(),
+                                                                "model.modifier.religiousUnrestBonus");
         // The book I have tells me the crosses needed is:
         // [(colonist count in colonies + total colonist count) * 2] + 8.
         // So every unit counts as 2 unless they're in a colony,
@@ -1990,49 +2002,6 @@ public class Player extends FreeColGameObject implements Features, Nameable {
         return bells;
     }
 
-
-    /**
-     * Returns the <code>Ability</code> identified by ID.
-     *
-     * @param id a <code>String</code> value
-     * @return an <code>Ability</code> value
-     */
-    public Ability getAbility(String id) {
-        return featureContainer.getAbility(id);
-    }
-
-    /**
-     * Returns true if the Object has the ability identified by
-     * <code>id</code>.
-     *
-     * @param id a <code>String</code> value
-     * @return a <code>boolean</code> value
-     */
-    public boolean hasAbility(String id) {
-        return featureContainer.hasAbility(id);
-    }
-
-    /**
-     * Returns the Modifier identified by <code>id</code>.
-     *
-     * @param id a <code>String</code> value
-     * @return a <code>Modifier</code> value
-     */
-    public Modifier getModifier(String id) {
-        return featureContainer.getModifier(id);
-    }
-
-    /**
-     * Add the given Feature to the Features Map. If the Feature given
-     * can not be combined with a Feature with the same ID already
-     * present, the old Feature will be replaced.
-     *
-     * @param feature a <code>Feature</code> value
-     */
-    public void addFeature(Feature feature) {
-        featureContainer.addFeature(feature);
-    }
-
     /**
      * Adds a founding father to this player's continental congress.
      * 
@@ -2048,10 +2017,7 @@ public class Player extends FreeColGameObject implements Features, Nameable {
                             { "%foundingFather%", father.getName() },
                             { "%description%", father.getDescription() }
                         }, ModelMessage.DEFAULT);
-
-        for (Feature feature : father.getFeatures()) {
-            addFeature(feature);
-        }
+        featureContainer.add(father.getFeatureContainer());
 
         List<AbstractUnit> units = father.getUnits();
         if (units != null) {
@@ -2414,9 +2380,7 @@ public class Player extends FreeColGameObject implements Features, Nameable {
                     FoundingFather father = FreeCol.getSpecification().getFoundingFather(fatherId);
                     allFathers.add(father);
                     // add only features, no other effects
-                    for (Feature feature : father.getFeatures()) {
-                        addFeature(feature);
-                    }
+                    featureContainer.add(father.getFeatureContainer());
                 }
             } else if (in.getLocalName().equals("stance")) {
                 String[] stanceStrings = readFromArrayElement("stance", in, new String[0]);
@@ -2695,25 +2659,25 @@ public class Player extends FreeColGameObject implements Features, Nameable {
      * @param amount The new tax.
      */
     public void setTax(int amount) {
-        if (amount != tax && hasAbility("model.ability.addTaxToBells")) {
-            Modifier bellsBonus = getModifier("model.goods.bells");
-            if (bellsBonus == null) {
-                addFeature(new Modifier("model.goods.bells", amount, Modifier.Type.ADDITIVE));
-            } else {
-                int difference = (amount - tax);
-                bellsBonus.setValue(bellsBonus.getValue() + difference);
-                if (bellsBonus.getModifiers() != null) {
-                    for (Modifier modifier : bellsBonus.getModifiers()) {
-                        FreeColGameObjectType type = FreeCol.getSpecification().getType(modifier.getSource());
-                        if (type != null && type.hasAbility("model.ability.addTaxToBells")) {
-                            modifier.setValue(bellsBonus.getValue() + difference);
-                            break;
-                        }
+        tax = amount;
+        if (amount != tax && featureContainer.hasAbility("model.ability.addTaxToBells")) {
+            Set<Modifier> bellsBonus = featureContainer.getModifierSet("model.goods.bells");
+            for (Modifier modifier : bellsBonus) {
+                if ("model.ability.addTaxToBells".equals(modifier.getSource())) {
+                    modifier.setValue(amount);
+                    return;
+                } else {
+                    FreeColGameObjectType type = FreeCol.getSpecification().getType(modifier.getSource());
+                    if (type != null && type.hasAbility("model.ability.addTaxToBells")) {
+                        modifier.setValue(amount);
+                        return;
                     }
                 }
             }
+            // found no matching modifier
+            featureContainer.addModifier(new Modifier("model.goods.bells", "model.ability.addTaxToBells",
+                                                      amount, Modifier.Type.ADDITIVE));
         }
-        tax = amount;
     }
 
     /**

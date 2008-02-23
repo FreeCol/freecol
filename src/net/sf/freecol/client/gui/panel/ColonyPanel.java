@@ -1151,7 +1151,7 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener {
                         unitLabel.addMouseListener(pressListener);
                     }
                     add(unitLabel, higConst.rc(1, unitColumn + index));
-                    if (building.hasAbility("model.ability.teach")) {
+                    if (building.getType().hasAbility("model.ability.teach")) {
                         if (unit.getStudent() != null) {
                             UnitLabel studentLabel = new UnitLabel(unit.getStudent(), parent, true);
                             studentLabel.setIgnoreLocation(true);
@@ -1188,7 +1188,7 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener {
             public void updateProductionLabel() {
                 productionLabel.setProduction(building.getProductionNextTurn());
                 productionLabel.setMaximumProduction(building.getMaximumProduction());
-                if (building.hasAbility("model.ability.teach")) {
+                if (building.getType().hasAbility("model.ability.teach")) {
                     initialize();
                 }
             }

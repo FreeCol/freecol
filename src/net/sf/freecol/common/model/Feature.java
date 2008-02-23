@@ -51,22 +51,9 @@ public abstract class Feature extends FreeColObject {
     private Turn lastTurn;
 
     /**
-     * Whether this feature has Scopes;
-     */
-    private boolean scope;
-
-    /**
      * A list of Scopes limiting the applicability of this Feature.
      */
-    private List<Scope> scopes = new ArrayList<Scope>();
-
-    /**
-     * Returns <code>true</code> if this Feature is composed of other
-     * Feature.
-     *
-     * @return a <code>boolean</code> value
-     */
-    public abstract boolean isComposite();
+    private List<Scope> scopes;
 
     /**
      * Get the <code>TimeLimit</code> value.
@@ -83,16 +70,7 @@ public abstract class Feature extends FreeColObject {
      * @return a <code>boolean</code> value
      */
     public final boolean hasScope() {
-        return scope;
-    }
-
-    /**
-     * Set the <code>Scope</code> value.
-     *
-     * @param newScope The new Scope value.
-     */
-    public final void setScope(final boolean newScope) {
-        this.scope = newScope;
+        return !(scopes == null || scopes.isEmpty());
     }
 
     /**
@@ -120,20 +98,7 @@ public abstract class Feature extends FreeColObject {
      */
     public final void setScopes(final List<Scope> newScopes) {
         this.scopes = newScopes;
-        if (newScopes == null || newScopes.isEmpty()) {
-            scope = false;
-        } else {
-            scope = true;
-        }
     }
-
-    /**
-     * Get the <code>Features</code> that contributed to this Feature,
-     * if it is a composite Feature.
-     *
-     * @return a <code>List<Feature></code> value
-     */
-    protected abstract List<Feature> getFeatures();
 
     /**
      * Get the <code>firstTurn</code> value.
@@ -197,14 +162,7 @@ public abstract class Feature extends FreeColObject {
      * @return a <code>boolean</code> value
      */
     public boolean appliesTo(final FreeColGameObjectType objectType) {
-        if (isComposite()) {
-            for (Feature feature : getFeatures()) {
-                if (feature.appliesTo(objectType)) {
-                    return true;
-                }
-            }
-            return false;
-        } else if (scopes == null || scopes.isEmpty()) {
+        if (!hasScope()) {
             return true;
         } else {
             for (Scope scope : scopes) {
@@ -225,21 +183,12 @@ public abstract class Feature extends FreeColObject {
      * @return a <code>boolean</code> value
      */
     public boolean appliesTo(final FreeColGameObjectType objectType, Turn turn) {
-        if (isComposite()) {
-            for (Feature feature : getFeatures()) {
-                if (feature.appliesTo(objectType, turn)) {
-                    return true;
-                }
-            }
+        if (turn != null &&
+            (firstTurn != null && turn.getNumber() < firstTurn.getNumber() ||
+             lastTurn != null && turn.getNumber() > lastTurn.getNumber())) {
             return false;
         } else {
-            if (turn != null &&
-                (firstTurn != null && turn.getNumber() < firstTurn.getNumber() ||
-                 lastTurn != null && turn.getNumber() > lastTurn.getNumber())) {
-                return false;
-            } else {
-                return appliesTo(objectType);
-            }
+            return appliesTo(objectType);
         }
     }
 
@@ -251,16 +200,7 @@ public abstract class Feature extends FreeColObject {
      * @return a <code>boolean</code> value
      */
     public boolean isOutOfDate(Turn turn) {
-        if (isComposite()) {
-            for (Feature feature : getFeatures()) {
-                if (!feature.isOutOfDate(turn)) {
-                    return false;
-                }
-            }
-            return true;
-        } else {
-            return (turn != null &&
-                    (lastTurn != null && turn.getNumber() > lastTurn.getNumber()));
-        }
+        return (turn != null &&
+                (lastTurn != null && turn.getNumber() > lastTurn.getNumber()));
     }
 }

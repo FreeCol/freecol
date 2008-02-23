@@ -21,6 +21,7 @@ package net.sf.freecol.common.model;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.logging.Logger;
 
 import net.sf.freecol.FreeCol;
@@ -186,71 +187,48 @@ public class SimpleCombatModel implements CombatModel {
     public List<Modifier> getOffensiveModifiers(Unit attacker, Unit defender) {
         ArrayList<Modifier> result = new ArrayList<Modifier>();
 
-        float addend, percentage;
-        float totalAddend = attacker.getType().getOffence();
-        float totalPercentage = 100;
-
-        result.add(new Modifier("modifiers.baseOffense", totalAddend, Modifier.Type.ADDITIVE));
+        result.add(new Modifier("model.modifier.offence",
+                                "modifiers.baseOffense",
+                                attacker.getType().getOffence(),
+                                Modifier.Type.ADDITIVE));
 
         if (attacker.isNaval()) {
             int goodsCount = attacker.getGoodsCount();
             if (goodsCount > 0) {
                 // -12.5% penalty for every unit of cargo.
                 // TODO: shouldn't this be -cargo/capacity?
-                percentage = -12.5f * goodsCount;
-                result.add(new Modifier("modifiers.cargoPenalty", percentage, Modifier.Type.PERCENTAGE));
-                totalPercentage += percentage;
+                result.add(new Modifier("model.modifier.offence",
+                                        "modifiers.cargoPenalty",
+                                        -12.5f * goodsCount,
+                                        Modifier.Type.PERCENTAGE));
             }
             if (attacker.hasAbility("model.ability.piracy")) {
-                Modifier piracyBonus = attacker.getModifier("model.modifier.piracyBonus");
+                Set<Modifier> piracyBonus = attacker.getModifierSet("model.modifier.piracyBonus");
                 if (piracyBonus != null) {
                     // Drake grants 50% power bonus (in colonization gives for attack and defence)
-                    result.add(piracyBonus);
-                    totalPercentage += piracyBonus.getValue();
+                    result.addAll(piracyBonus);
                 }
             }
         } else {
-
-            if (attacker.isArmed()) {
-                if (totalAddend == 0) {
-                    // civilian
-                    addend = 2;
-                } else {
-                    // brave or REF
-                    addend = 1;
-                }
-                result.add(new Modifier("modifiers.armed", addend, Modifier.Type.ADDITIVE));
-                totalAddend += addend;
+            for (EquipmentType equipment : attacker.getEquipment()) {
+                result.addAll(equipment.getFeatureContainer().getModifierSet("model.modifier.offence"));
             }
-
-            if (attacker.isMounted()) {
-                addend = 1;
-                result.add(new Modifier("modifiers.mounted", addend, Modifier.Type.ADDITIVE));
-                totalAddend += addend;
-            }
-
-            // 50% veteran bonus
-            Modifier veteranModifier = attacker.getModifier("model.modifier.veteranBonus");
-            if (veteranModifier != null) {
-                result.add(veteranModifier);
-                totalPercentage += veteranModifier.getValue();
-            }
+            result.addAll(attacker.getType().getFeatureContainer()
+                          .getModifierSet("model.modifier.offence"));
 
             // 50% attack bonus
-            percentage = 50;
-            result.add(new Modifier("modifiers.attackBonus", percentage, Modifier.Type.PERCENTAGE));
-            totalPercentage += percentage;
+            result.add(new Modifier("model.modifier.offence",
+                                    "modifiers.attackBonus",
+                                    50, Modifier.Type.PERCENTAGE));
 
             // movement penalty
             int movesLeft = attacker.getMovesLeft();
             if (movesLeft == 1) {
-                percentage = -66;
-                result.add(new Modifier("modifiers.movementPenalty", percentage, Modifier.Type.PERCENTAGE));
-                totalPercentage += percentage;
+                result.add(new Modifier("model.modifier.offence",
+                                        "modifiers.movementPenalty", -66, Modifier.Type.PERCENTAGE));
             } else if (movesLeft == 2) {
-                percentage = -33;
-                result.add(new Modifier("modifiers.movementPenalty", percentage, Modifier.Type.PERCENTAGE));
-                totalPercentage += percentage;
+                result.add(new Modifier("model.modifier.offence",
+                                        "modifiers.movementPenalty", -33, Modifier.Type.PERCENTAGE));
             }
 
             // In the open
@@ -262,33 +240,28 @@ public class SimpleCombatModel implements CombatModel {
                  */
                 if (attacker.hasAbility("model.ability.ambushBonus") ||
                     defender.hasAbility("model.ability.ambushPenalty")) {
-                    percentage = defender.getTile().defenceBonus();
-                    result.add(new Modifier("modifiers.ambushBonus", percentage, Modifier.Type.PERCENTAGE));
-                    totalPercentage += percentage;
+                    result.add(new Modifier("model.modifier.offence",
+                                            "modifiers.ambushBonus", 
+                                            defender.getTile().defenceBonus(),
+                                            Modifier.Type.PERCENTAGE));
                 }
 
                 // 75% Artillery in the open penalty
                 // TODO: is it right? or should it be another ability?
                 if (attacker.hasAbility("model.ability.bombard")) {
-                    percentage = -75;
-                    result.add(new Modifier("modifiers.artilleryPenalty", percentage, Modifier.Type.PERCENTAGE));
-                    totalPercentage += percentage;
+                    result.add(new Modifier("model.modifier.offence",
+                                            "modifiers.artilleryPenalty",
+                                            -75, Modifier.Type.PERCENTAGE));
                 }
             }
 
             // Attacking a settlement
             if (defender != null && defender.getTile() != null && defender.getTile().getSettlement() != null) {
                 // REF bombardment bonus
-                Modifier bombardModifier = attacker.getModifier("model.modifier.bombardBonus");
-                if (bombardModifier != null) {
-                    result.add(bombardModifier);
-                    totalPercentage += bombardModifier.getValue();
-                }
+                result.addAll(attacker.getModifierSet("model.modifier.bombardBonus"));
             }
         }
 
-        float offensivePower = (totalAddend * totalPercentage) / 100;
-        result.add(new Modifier("modifiers.finalResult", offensivePower, Modifier.Type.ADDITIVE));
         return result;
     }
 
@@ -347,100 +320,85 @@ public class SimpleCombatModel implements CombatModel {
             return result;
         }
 
-        float addend, percentage;
-        float totalAddend = defender.getType().getDefence();
-        float totalPercentage = 100;
-
-        result.add(new Modifier("modifiers.baseDefence", totalAddend, Modifier.Type.ADDITIVE));
+        result.add(new Modifier("model.modifier.defence",
+                                "modifiers.baseDefence",
+                                defender.getType().getDefence(),
+                                Modifier.Type.ADDITIVE));
 
         if (defender.isNaval()) {
             int goodsCount = defender.getVisibleGoodsCount();
             if (goodsCount > 0) {
                 // -12.5% penalty for every unit of cargo.
                 // TODO: shouldn't this be -cargo/capacity?
-                percentage =  -12.5f * goodsCount;
-                result.add(new Modifier("modifiers.cargoPenalty", percentage, Modifier.Type.PERCENTAGE));
-                totalPercentage += percentage;
+                result.add(new Modifier("model.modifier.defence", 
+                                        "modifiers.cargoPenalty",
+                                        -12.5f * goodsCount,
+                                        Modifier.Type.PERCENTAGE));
             }
             if (defender.hasAbility("model.ability.piracy")) {
-                Modifier piracyBonus = defender.getModifier("model.modifier.piracyBonus");
-                if (piracyBonus != null) {
-                    // Drake grants 50% power bonus (in colonization gives for attack and defence)
-                    result.add(piracyBonus);
-                    totalPercentage += piracyBonus.getValue();
-                }
+                result.addAll(defender.getModifierSet("model.modifier.piracyBonus"));
             }
         } else {
             // Paul Revere makes an unarmed colonist in a settlement pick up
             // a stock-piled musket if attacked, so the bonus should be applied
             // for unarmed colonists inside colonies where there are muskets
             // available.
-            if (defender.isArmed()) {
-                addend = 1;
-                result.add(new Modifier("modifiers.armed", addend, Modifier.Type.ADDITIVE));
-                totalAddend += addend;
-            } else if (defender.getOwner().hasAbility("model.ability.automaticDefence") && defender.isColonist()
-                       && defender.getLocation() instanceof WorkLocation) {
+            if (!defender.isArmed() &&
+                defender.getOwner().hasAbility("model.ability.automaticDefence") &&
+                defender.isColonist() &&
+                defender.getLocation() instanceof WorkLocation) {
                 Colony colony = ((WorkLocation) defender.getLocation()).getColony();
                 if (colony.getGoodsCount(Goods.MUSKETS) >= 50) {
-                    addend = 1;
-                    result.add(new Modifier("modifiers.paulRevere", addend, Modifier.Type.ADDITIVE));
-                    totalAddend += addend;
+                    result.add(new Modifier("model.modifier.defence", "modifiers.paulRevere",
+                                            1, Modifier.Type.ADDITIVE));
                 }
             }
 
-            if (defender.isMounted()) {
-                addend = 1;
-                result.add(new Modifier("modifiers.mounted", addend, Modifier.Type.ADDITIVE));
-                totalAddend += addend;
+            for (EquipmentType equipment : attacker.getEquipment()) {
+                result.addAll(equipment.getFeatureContainer().getModifierSet("model.modifier.defence"));
             }
-
             // 50% veteran bonus
-            Modifier veteranModifier = defender.getModifier("model.modifier.veteranBonus");
-            if (veteranModifier != null) {
-                result.add(veteranModifier);
-                totalPercentage += veteranModifier.getValue();
-            }
+            result.addAll(attacker.getType().getFeatureContainer()
+                          .getModifierSet("model.modifier.defence"));
 
             // 50% fortify bonus
             if (defender.getState() == UnitState.FORTIFIED) {
-                percentage = 50;
-                result.add(new Modifier("modifiers.fortified", percentage, Modifier.Type.PERCENTAGE));
-                totalPercentage += percentage;
+                result.add(new Modifier("model.modifier.defence", 
+                                        "modifiers.fortified",
+                                        50, Modifier.Type.PERCENTAGE));
             }
 
             if (defender.getTile() != null && defender.getTile().getSettlement() != null) {
-                Modifier settlementModifier = getSettlementModifier(attacker, defender.getTile().getSettlement());
-                result.add(settlementModifier);
-                totalPercentage += settlementModifier.getValue();
+                result.add(getSettlementModifier(attacker, defender.getTile().getSettlement()));
                 // TODO: is it right? or should it be another ability?
-                if (defender.hasAbility("model.ability.bombard") && attacker.getOwner().isIndian()) {
+                if (defender.hasAbility("model.ability.bombard") &&
+                    attacker.getOwner().isIndian()) {
                     // 100% defence bonus against an Indian raid
-                    percentage = 100;
-                    result.add(new Modifier("modifiers.artilleryAgainstRaid", percentage, Modifier.Type.PERCENTAGE));
-                    totalPercentage += percentage;
+                    result.add(new Modifier("model.modifier.defence", 
+                                            "modifiers.artilleryAgainstRaid",
+                                            100, Modifier.Type.PERCENTAGE));
                 }
             } else if (defender.getTile() != null) {
                 // In the open
                 if (!(attacker.hasAbility("model.ability.ambushBonus") ||
                       defender.hasAbility("model.ability.ambushPenalty"))) {
                     // Terrain defensive bonus.
-                    percentage = defender.getTile().defenceBonus();
-                    result.add(new Modifier("modifiers.terrainBonus", percentage, Modifier.Type.PERCENTAGE));
-                    totalPercentage += percentage;
+                    result.add(new Modifier("model.modifier.defence", 
+                                            "modifiers.terrainBonus",
+                                            defender.getTile().defenceBonus(),
+                                            Modifier.Type.PERCENTAGE));
                 }
                 // TODO: is it right? or should it be another ability?
-                if (defender.hasAbility("model.ability.bombard") && defender.getState() != UnitState.FORTIFIED) {
+                if (defender.hasAbility("model.ability.bombard") &&
+                    defender.getState() != UnitState.FORTIFIED) {
                     // -75% Artillery in the Open penalty
-                    percentage = -75;
-                    result.add(new Modifier("modifiers.artilleryPenalty", percentage, Modifier.Type.PERCENTAGE));
-                    totalPercentage += percentage;
+                    result.add(new Modifier("model.modifier.defence", 
+                                            "modifiers.artilleryPenalty",
+                                            -75, Modifier.Type.PERCENTAGE));
                 }
             }
 
         }
-        float defensivePower = (totalAddend * totalPercentage) / 100;
-        result.add(new Modifier("modifiers.finalResult", defensivePower, Modifier.Type.ADDITIVE));
         return result;
     }
 
@@ -876,11 +834,10 @@ public class SimpleCombatModel implements CombatModel {
     private void getConvert(Unit attacker, IndianSettlement indianSettlement) {
         ModelController modelController = attacker.getGame().getModelController();
         int random = modelController.getRandom(attacker.getId() + "getConvert", 100);
-        int convertProbability = attacker.getOwner().getDifficulty().getNativeConvertProbability();
-        Modifier modifier = attacker.getModifier("model.ability.nativeConvertBonus");
-        if (modifier != null) {
-            convertProbability += modifier.getValue();
-        }
+        int convertProbability = (int) FeatureContainer
+            .applyModifierSet(attacker.getOwner().getDifficulty().getNativeConvertProbability(),
+                              attacker.getGame().getTurn(),
+                              attacker.getModifierSet("model.ability.nativeConvertBonus"));
         // TODO: it should be bigger when tension is high
         int burnProbability = attacker.getOwner().getDifficulty().getBurnProbability();
         

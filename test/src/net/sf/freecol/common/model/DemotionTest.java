@@ -329,7 +329,7 @@ public class DemotionTest extends FreeColTestCase {
         assertEquals(unit.getType(), veteranType);
 
         player.setPlayerType(PlayerType.REBEL);
-        player.addFeature(new Ability("model.ability.independenceDeclared"));
+        player.getFeatureContainer().addAbility(new Ability("model.ability.independenceDeclared"));
         assertTrue(colonialRegularType.isAvailableTo(player));
         promoteMethod.invoke(combatModel, unit);
         assertEquals(unit.getType(), colonialRegularType);

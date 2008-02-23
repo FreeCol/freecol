@@ -138,7 +138,7 @@ public final class BuildingType extends BuildableType {
                 if (ability.getSource() == null) {
                     ability.setSource(this.getId());
                 }
-                addFeature(ability); // Ability close the element
+                addAbility(ability); // Ability close the element
             } else if ("required-population".equals(childName)) {
                 setPopulationRequired(getAttribute(in, "value", 1));
                 in.nextTag(); // close this element
@@ -161,7 +161,7 @@ public final class BuildingType extends BuildableType {
                 if (modifier.getSource() == null) {
                     modifier.setSource(this.getId());
                 }
-                addFeature(modifier); // Modifier close the element
+                addModifier(modifier); // Modifier close the element
             } else {
                 logger.finest("Parsing of " + childName + " is not implemented yet");
                 while (in.nextTag() != XMLStreamConstants.END_ELEMENT ||
@@ -170,8 +170,26 @@ public final class BuildingType extends BuildableType {
                 }
             }
         }
+
+        // sanity check: we should be on the closing tag
+        if (!in.getLocalName().equals(BuildingType.getXMLElementTagName())) {
+            logger.warning("Error parsing xml: expecting closing tag </" + BuildingType.getXMLElementTagName() + "> "+
+                           "found instead: " +in.getLocalName());
+        }
+
     }
     
+    /**
+     * Gets the tag name of the root element representing this object.
+     * This method should be overwritten by any sub-class, preferably
+     * with the name of the class with the first letter in lower case.
+     *
+     * @return "building-type".
+     */
+    public static String getXMLElementTagName() {
+        return "building-type";
+    }
+
     public boolean canAdd(UnitType unitType) {
         return unitType.hasSkill() && unitType.getSkill() >= minSkill && unitType.getSkill() <= maxSkill;
     }

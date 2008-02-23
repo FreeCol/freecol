@@ -23,8 +23,10 @@ package net.sf.freecol.common.model;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamConstants;
@@ -477,7 +479,7 @@ public class ColonyTile extends FreeColGameObject implements WorkLocation, Ownab
      * @param goodsType a <code>GoodsType</code> value
      * @return an <code>int</code> value
      */
-    public Modifier getProductionBonus(GoodsType goodsType) {
+    public Set<Modifier> getProductionBonus(GoodsType goodsType) {
         if (goodsType == null) {
             throw new IllegalArgumentException("GoodsType must not be 'null'.");
         } else if (getUnit() == null) {
@@ -489,23 +491,13 @@ public class ColonyTile extends FreeColGameObject implements WorkLocation, Ownab
                 return null;
             }
         } else if (goodsType.equals(getUnit().getWorkType())) {
-            // TODO: currently, the player's modifier may be present
-            // twice, once in the unit's modifiers, and once in the
-            // colony's -- need some kind of Set implementation
-            List<Modifier> result = new ArrayList<Modifier>();
-            result.add(workTile.getProductionBonus(goodsType));
-            result.add(getUnit().getModifier(goodsType.getId()));
-            result.add(getColony().getModifier(goodsType.getId()));
-            switch(result.size()) {
-            case 0:
-                return null;
-            case 1:
-                return result.get(0);
-            default:
-                return Modifier.combine(result);
-            }
+            Set<Modifier> result = new HashSet<Modifier>();
+            result.addAll(workTile.getProductionBonus(goodsType));
+            result.addAll(getUnit().getModifierSet(goodsType.getId()));
+            result.addAll(getColony().getModifierSet(goodsType.getId()));
+            return result;
         } else {
-            return null;
+            return Collections.emptySet();
         }
     }
 

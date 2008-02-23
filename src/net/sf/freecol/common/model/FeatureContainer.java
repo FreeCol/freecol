@@ -20,23 +20,65 @@
 package net.sf.freecol.common.model;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
 
 import net.sf.freecol.client.gui.i18n.Messages;
 
-public class FeatureContainer implements Features {
+public class FeatureContainer {
 
-    private Map<String, Feature> features = new HashMap<String, Feature>();
+    private Map<String, Set<Ability>> abilities = new HashMap<String, Set<Ability>>();
+    private Map<String, Set<Modifier>> modifiers = new HashMap<String, Set<Modifier>>();
 
     /**
-     * Returns a copy of this Type's features.
+     * Returns a Set of Abilities with the given ID.
      *
-     * @return a <code>List</code> value
+     * @param id a <code>String</code> value
+     * @return a <code>Set<Feature></code> value
      */
-    public List<Feature> getFeatures() {
-        return new ArrayList<Feature>(features.values());
+    public Set<Ability> getAbilitySet(String id) {
+        return getAbilitySet(id, null, null);
+    }
+
+    /**
+     * Returns a Set of Abilities with the given ID which apply to the
+     * given FreeColGameObjectType.
+     *
+     * @param id a <code>String</code> value
+     * @param objectType a <code>FreeColGameObjectType</code> value
+     * @return a <code>Set<Feature></code> value
+     */
+    public Set<Ability> getAbilitySet(String id, FreeColGameObjectType objectType) {
+        return getAbilitySet(id, objectType, null);
+    }
+
+    /**
+     * Returns a Set of Abilities with the given ID which apply to the
+     * given FreeColGameObjectType and Turn.
+     *
+     * @param id a <code>String</code> value
+     * @param objectType a <code>FreeColGameObjectType</code> value
+     * @param turn a <code>Turn</code> value
+     * @return a <code>Set<Feature></code> value
+     */
+    public Set<Ability> getAbilitySet(String id, FreeColGameObjectType objectType, Turn turn) {
+        Set<Ability> abilitySet = abilities.get(id);
+        if (abilitySet == null) {
+            return Collections.emptySet();
+        } else {
+            Set<Ability> result = new HashSet<Ability>();
+            for (Ability ability : abilitySet) {
+                if (ability.appliesTo(objectType, turn)) {
+                    result.add(ability);
+                }
+            }
+            return result;
+        }
     }
 
     /**
@@ -46,69 +88,318 @@ public class FeatureContainer implements Features {
      * @return a <code>boolean</code> value
      */
     public boolean hasAbility(String id) {
-        return features.containsKey(id) && 
-            features.get(id) instanceof Ability &&
-            ((Ability) features.get(id)).getValue();
+        return hasAbility(id, null, null);
     }
 
     /**
-     * Get the <code>Ability</code> value.
+     * Returns true if this Player has the ability with the given ID.
      *
      * @param id a <code>String</code> value
+     * @param objectType a <code>FreeColGameObjectType</code> value
+     * @return a <code>boolean</code> value
+     */
+    public boolean hasAbility(String id, FreeColGameObjectType objectType) {
+        return hasAbility(id, objectType, null);
+    }
+
+    /**
+     * Returns true if this Player has the ability with the given ID.
+     *
+     * @param id a <code>String</code> value
+     * @param objectType a <code>FreeColGameObjectType</code> value
+     * @param turn a <code>Turn</code> value
+     * @return a <code>boolean</code> value
+     */
+    public boolean hasAbility(String id, FreeColGameObjectType objectType, Turn turn) {
+        Set<Ability> abilitieset = abilities.get(id);
+        if (abilitieset == null) {
+            return false;
+        } else {
+            boolean foundApplicableAbility = false;
+            for (Ability ability : abilitieset) {
+                if (ability.appliesTo(objectType, turn)) {
+                    if (ability.getValue()) {
+                        foundApplicableAbility = true;
+                    } else {
+                        return false;
+                    }
+                }
+            }
+            return foundApplicableAbility;
+        }
+    }
+
+    /**
+     * Returns true if the given Set of Abilities is not empty and
+     * does not contain any Abilities with the value false.
+     *
+     * @return a <code>boolean</code> value
+     */
+    public static boolean hasAbility(Set<Ability> abilitieset) {
+        if (abilitieset.isEmpty()) {
+            return false;
+        } else {
+            for (Ability ability : abilitieset) {
+                if (!ability.getValue()) {
+                    return false;
+                }
+            }
+            return true;
+        }
+    }
+
+    /**
+     * Returns a Set of Abilities with the given ID.
+     *
+     * @param id a <code>String</code> value
+     * @return a <code>Set<Feature></code> value
+     */
+    public Set<Modifier> getModifierSet(String id) {
+        return getModifierSet(id, null, null);
+    }
+
+    /**
+     * Returns a Set of Abilities with the given ID which apply to the
+     * given FreeColGameObjectType.
+     *
+     * @param id a <code>String</code> value
+     * @param objectType a <code>FreeColGameObjectType</code> value
+     * @return a <code>Set<Feature></code> value
+     */
+    public Set<Modifier> getModifierSet(String id, FreeColGameObjectType objectType) {
+        return getModifierSet(id, objectType, null);
+    }
+
+    /**
+     * Returns a Set of Abilities with the given ID which apply to the
+     * given FreeColGameObjectType and Turn.
+     *
+     * @param id a <code>String</code> value
+     * @param objectType a <code>FreeColGameObjectType</code> value
+     * @param turn a <code>Turn</code> value
+     * @return a <code>Set<Feature></code> value
+     */
+    public Set<Modifier> getModifierSet(String id, FreeColGameObjectType objectType, Turn turn) {
+        Set<Modifier> modifierSet = modifiers.get(id);
+        if (modifierSet == null) {
+            return Collections.emptySet();
+        } else {
+            Set<Modifier> result = new HashSet<Modifier>();
+            for (Modifier modifier : modifierSet) {
+                if (modifier.appliesTo(objectType, turn)) {
+                    result.add(modifier);
+                }
+            }
+            return result;
+        }
+    }
+
+    /**
+     * Applies a Set of Modifiers with the given ID to the given float
+     * value.
+     *
+     * @param number a <code>float</code> value
+     * @param id a <code>String</code> value
+     * @param a <code>float</code> value
+     */
+    public float applyModifier(float number, String id) {
+        return applyModifier(number, id, null, null);
+    }
+
+    /**
+     * Applies a Set of Modifiers with the given ID which match the
+     * given FreeColGameObjectType to the given float value.
+     *
+     * @param number a <code>float</code> value
+     * @param id a <code>String</code> value
+     * @param objectType a <code>FreeColGameObjectType</code> value
+     * @param a <code>float</code> value
+     */
+    public float applyModifier(float number, String id, FreeColGameObjectType objectType) {
+        return applyModifier(number, id, objectType, null);
+    }
+
+    /**
+     * Applies a Set of Modifiers with the given ID which match the
+     * given FreeColGameObjectType and Turn to the given float value.
+     *
+     * @param number a <code>float</code> value
+     * @param id a <code>String</code> value
+     * @param objectType a <code>FreeColGameObjectType</code> value
+     * @param turn a <code>Turn</code> value
+     * @param a <code>float</code> value
+     */
+    public float applyModifier(float number, String id, FreeColGameObjectType objectType, Turn turn) {
+        return applyModifierSet(number, turn, getModifierSet(id, objectType, turn));
+    }
+
+    /**
+     * Applies a given Set of Modifiers to the given float value.
+     *
+     * @param number a <code>float</code> value
+     * @param turn a <code>Turn</code> value
+     * @return a <code>float</code> value
+     */
+    public static float applyModifierSet(float number, Turn turn, Set<Modifier> modifierSet) {
+        if (modifierSet == null) {
+            return number;
+        }
+        for (Modifier modifier : modifierSet) {
+            float value = modifier.getValue();
+            if (modifier.hasIncrement() && turn != null) {
+                int diff = turn.getNumber() - modifier.getFirstTurn().getNumber();
+                switch(modifier.getIncrementType()) {
+                case ADDITIVE:
+                    value += modifier.getIncrement() * diff;
+                    break;
+                case MULTIPLICATIVE:
+                    value *= modifier.getIncrement() * diff;
+                    break;
+                case PERCENTAGE:
+                    value += (value * modifier.getIncrement() * diff) / 100;
+                    break;
+                }
+            }
+            switch(modifier.getType()) {
+            case ADDITIVE:
+                number += value;
+                break;
+            case MULTIPLICATIVE:
+                number *= value;
+                break;
+            case PERCENTAGE:
+                number += (number * value) / 100;
+                break;
+            }
+        }
+        return number;
+    }
+
+
+    /**
+     * Add the given Ability to the set of Abilities present. If the
+     * Ability given can not be combined with a Ability with the same
+     * ID already present, the old Ability will be replaced.
+     *
+     * @param ability a <code>Ability</code> value
+     * @param return true if the Ability was added
+     */
+    public boolean addAbility(Ability ability) {
+        if (ability == null) {
+            return false;
+        }
+        Set<Ability> abilitieset = abilities.get(ability.getId());
+        if (abilitieset == null) {
+            abilitieset = new HashSet<Ability>();
+            abilities.put(ability.getId(), abilitieset);
+        }
+        return abilitieset.add(ability);
+    }
+
+    /**
+     * Add the given Modifier to the set of Modifiers present. If the
+     * Modifier given can not be combined with a Modifier with the same
+     * ID already present, the old Modifier will be replaced.
+     *
+     * @param modifier a <code>Modifier</code> value
+     * @param return true if the Modifier was added
+     */
+    public boolean addModifier(Modifier modifier) {
+        if (modifier == null) {
+            return false;
+        }
+        Set<Modifier> modifierSet = modifiers.get(modifier.getId());
+        if (modifierSet == null) {
+            modifierSet = new HashSet<Modifier>();
+            modifiers.put(modifier.getId(), modifierSet);
+        }
+        return modifierSet.add(modifier);
+    }
+
+    /**
+     * Removes and returns a Ability from this ability set.
+     *
+     * @param oldAbility a <code>Ability</code> value
      * @return a <code>Ability</code> value
      */
-    public final Ability getAbility(String id) {
-        return (Ability) features.get(id);
+    public Ability removeAbility(Ability oldAbility) {
+        if (oldAbility == null) {
+            return null;
+        } else {
+            Set<Ability> abilitySet = abilities.get(oldAbility.getId());
+            if (abilitySet == null) {
+                return null;
+            } else if (abilitySet.remove(oldAbility)) {
+                return oldAbility;
+            } else {
+                return null;
+            }
+        }
     }
 
     /**
-     * Get the <code>Modifier</code> value.
+     * Removes and returns a Modifier from this modifier set.
      *
-     * @param id a <code>String</code> value
+     * @param oldModifier a <code>Modifier</code> value
      * @return a <code>Modifier</code> value
      */
-    public final Modifier getModifier(String id) {
-        return (Modifier) features.get(id);
-    }
-
-    /**
-     * Add the given Feature to the set of Features present. If the
-     * Feature given can not be combined with a Feature with the same
-     * ID already present, the old Feature will be replaced.
-     *
-     * @param feature a <code>Feature</code> value
-     */
-    public void addFeature(Feature feature) {
-        if (feature == null) {
-            return;
-        }
-        Feature oldValue = features.get(feature.getId());
-        if (oldValue instanceof Modifier && feature instanceof Modifier) {
-            features.put(feature.getId(), Modifier.combine((Modifier) oldValue, (Modifier) feature));
-        } else if (oldValue instanceof Ability && feature instanceof Ability) {
-            features.put(feature.getId(), Ability.combine((Ability) oldValue, (Ability) feature));
-        } else {
-            features.put(feature.getId(), feature);
-        }
-    }
-
-    /**
-     * Removes and returns a Feature from this feature set.
-     *
-     * @param oldFeature a <code>Feature</code> value
-     * @return a <code>Feature</code> value
-     */
-    public Feature removeFeature(Feature oldFeature) {
-        Feature feature = features.get(oldFeature.getId());
-        if (feature == null) {
+    public Modifier removeModifier(Modifier oldModifier) {
+        if (oldModifier == null) {
             return null;
-        } else if (feature == oldFeature) {
-            features.remove(feature.getId());
-        } else if (feature instanceof Modifier && oldFeature instanceof Modifier) {
-            ((Modifier) feature).remove((Modifier) oldFeature);
-        } else if (feature instanceof Ability && oldFeature instanceof Ability) {
-            ((Ability) feature).remove((Ability) oldFeature);
+        } else {
+            Set<Modifier> modifierSet = modifiers.get(oldModifier.getId());
+            if (modifierSet == null) {
+                return null;
+            } else if (modifierSet.remove(oldModifier)) {
+                return oldModifier;
+            } else {
+                return null;
+            }
         }
-        return null;
     }
+
+    /**
+     * Describe <code>add</code> method here.
+     *
+     * @param featureContainer a <code>FeatureContainer</code> value
+     */
+    public void add(FeatureContainer featureContainer) {
+        for (Entry<String, Set<Ability>> entry : featureContainer.abilities.entrySet()) {
+            Set<Ability> abilitySet = abilities.get(entry.getKey());
+            if (abilitySet == null) {
+                abilities.put(entry.getKey(), new HashSet<Ability>(entry.getValue()));
+            } else {
+                abilitySet.addAll(entry.getValue());
+            }
+        }
+        for (Entry<String, Set<Modifier>> entry : featureContainer.modifiers.entrySet()) {
+            Set<Modifier> modifierSet = modifiers.get(entry.getKey());
+            if (modifierSet == null) {
+                modifiers.put(entry.getKey(), new HashSet<Modifier>(entry.getValue()));
+            } else {
+                modifierSet.addAll(entry.getValue());
+            }
+        }
+    }
+
+    /**
+     * Describe <code>remove</code> method here.
+     *
+     * @param featureContainer a <code>FeatureContainer</code> value
+     */
+    public void remove(FeatureContainer featureContainer) {
+        for (Entry<String, Set<Ability>> entry : featureContainer.abilities.entrySet()) {
+            Set<Ability> abilitySet = abilities.get(entry.getKey());
+            if (abilitySet != null) {
+                abilitySet.removeAll(entry.getValue());
+            }
+        }
+        for (Entry<String, Set<Modifier>> entry : featureContainer.modifiers.entrySet()) {
+            Set<Modifier> modifierSet = modifiers.get(entry.getKey());
+            if (modifierSet != null) {
+                modifierSet.removeAll(entry.getValue());
+            }
+        }
+    }
+
 }

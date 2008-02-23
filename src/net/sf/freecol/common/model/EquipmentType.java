@@ -31,12 +31,7 @@ import javax.xml.stream.XMLStreamReader;
 import net.sf.freecol.common.Specification;
 import net.sf.freecol.common.model.Unit.Role;
 
-public class EquipmentType extends FreeColGameObjectType implements Features {
-
-    /**
-     * Contains the abilities and modifiers of this type.
-     */
-    private FeatureContainer featureContainer = new FeatureContainer();
+public class EquipmentType extends FreeColGameObjectType {
 
     /**
      * The maximum number of equipment items that can be combined.
@@ -145,48 +140,6 @@ public class EquipmentType extends FreeColGameObjectType implements Features {
     }
 
     /**
-     * Get the <code>Ability</code> value.
-     *
-     * @param id a <code>String</code> value
-     * @return a <code>Ability</code> value
-     */
-    public final Ability getAbility(String id) {
-        return featureContainer.getAbility(id);
-    }
-
-    /**
-     * Returns true if the Object has the ability identified by
-     * <code>id</code>.
-     *
-     * @param id a <code>String</code> value
-     * @return a <code>boolean</code> value
-     */
-    public boolean hasAbility(String id) {
-        return featureContainer.hasAbility(id);
-    }
-
-    /**
-     * Returns the Modifier identified by <code>id</code>.
-     *
-     * @param id a <code>String</code> value
-     * @return a <code>Modifier</code> value
-     */
-    public Modifier getModifier(String id) {
-        return featureContainer.getModifier(id);
-    }
-
-    /**
-     * Add the given Feature to the Features Map. If the Feature given
-     * can not be combined with a Feature with the same ID already
-     * present, the old Feature will be replaced.
-     *
-     * @param feature a <code>Feature</code> value
-     */
-    public void addFeature(Feature feature) {
-        featureContainer.addFeature(feature);
-    }
-
-    /**
      * Get the <code>GoodsRequired</code> value.
      *
      * @return a <code>List<AbstractGoods></code> value
@@ -256,7 +209,7 @@ public class EquipmentType extends FreeColGameObjectType implements Features {
             if (Ability.getXMLElementTagName().equals(nodeName)) {
                 String abilityId = in.getAttributeValue(null, "id");
                 boolean value = getAttribute(in, "value", true);
-                addFeature(new Ability(abilityId, value));
+                addAbility(new Ability(abilityId, value));
                 in.nextTag(); // close this element
             } else if ("required-ability".equals(nodeName)) {
                 String abilityId = in.getAttributeValue(null, "id");
@@ -286,7 +239,7 @@ public class EquipmentType extends FreeColGameObjectType implements Features {
                 if (modifier.getSource() == null) {
                     modifier.setSource(this.getId());
                 }
-                addFeature(modifier);
+                addModifier(modifier);
             } else {
                 logger.finest("Parsing of " + nodeName + " is not implemented yet");
                 while (in.nextTag() != XMLStreamConstants.END_ELEMENT ||

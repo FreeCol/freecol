@@ -37,7 +37,7 @@ import org.w3c.dom.Element;
 /**
  * Represents a building in a colony.
  */
-public final class Building extends FreeColGameObject implements Features, WorkLocation, Ownable, Named {
+public final class Building extends FreeColGameObject implements WorkLocation, Ownable, Named {
     
     /** The colony containing this building. */
     private Colony colony;
@@ -236,18 +236,14 @@ public final class Building extends FreeColGameObject implements Features, WorkL
     
     private void setType(final BuildingType newBuildingType) {
         // remove features from current type
-        for (Feature feature : buildingType.getFeatures()) {
-            colony.removeFeature(feature);
-        }
+        colony.getFeatureContainer().remove(buildingType.getFeatureContainer());
         colony.setDefenceBonus(colony.getDefenceBonus() - buildingType.getDefenceBonus());
 
         if (newBuildingType != null) {
             buildingType = newBuildingType;
             
             // add new features and abilities from new type
-            for (Feature feature : buildingType.getFeatures()) {
-                colony.addFeature(feature);
-            }
+            colony.getFeatureContainer().add(buildingType.getFeatureContainer());
             colony.setDefenceBonus(colony.getDefenceBonus() + buildingType.getDefenceBonus());
             
             // Colonists which can't work here must be put outside
@@ -335,7 +331,7 @@ public final class Building extends FreeColGameObject implements Features, WorkL
         unit.removeAllEquipment(false);
 
         Unit student = unit.getStudent();
-        if (hasAbility("model.ability.teach")) {
+        if (buildingType.hasAbility("model.ability.teach")) {
             if (student == null) {
                 student = findStudent(unit);
                 if (student != null) {
@@ -352,37 +348,6 @@ public final class Building extends FreeColGameObject implements Features, WorkL
         getColony().updatePopulation();
     }
 
-    /**
-     * Returns true if the Object has the ability identified by
-     * <code>id</code>.
-     *
-     * @param id a <code>String</code> value
-     * @return a <code>boolean</code> value
-     */
-    public boolean hasAbility(final String id) {
-        return getType().hasAbility(id);
-    }
-
-    /**
-     * Returns the Modifier identified by <code>id</code>.
-     *
-     * @param id a <code>String</code> value
-     * @return a <code>Modifier</code> value
-     */
-    public Modifier getModifier(final String id) {
-        return getType().getModifier(id);
-    }
-
-    /**
-     * Add the given Feature to the Features Map. If the Feature given
-     * can not be combined with a Feature with the same ID already
-     * present, the old Feature will be replaced.
-     *
-     * @param feature a <code>Feature</code> value
-     */
-    public void addFeature(final Feature feature) {
-        getType().addFeature(feature);
-    }
 
     /**
      * Returns the unit type being an expert in this <code>Building</code>.
@@ -488,10 +453,10 @@ public final class Building extends FreeColGameObject implements Features, WorkL
      * Prepares this <code>Building</code> for a new turn.
      */
     public void newTurn() {
-        if (hasAbility("model.ability.teach")) {
+        if (buildingType.hasAbility("model.ability.teach")) {
             trainStudents();
         }
-        if (hasAbility("model.ability.repairShips")) {
+        if (buildingType.hasAbility("model.ability.repairShips")) {
             repairShips();
         }
         if (getGoodsOutputType() != null) {
@@ -731,7 +696,7 @@ public final class Building extends FreeColGameObject implements Features, WorkL
      */
     public int calculateOutputAdding(final int goodsInput, final Unit new_unit) {
         int goodsOutput = getProductionFromProductivity(goodsInput);
-        if (hasAbility("model.ability.expertsUseConnections") &&
+        if (buildingType.hasAbility("model.ability.expertsUseConnections") &&
                 getGameOptions().getBoolean(GameOptions.EXPERTS_HAVE_CONNECTIONS)) {
             int minimumProduction = 0;
             Iterator<Unit> i = getUnitIterator();
@@ -805,7 +770,7 @@ public final class Building extends FreeColGameObject implements Features, WorkL
     }
     
     private boolean canAutoProduce() {
-        return hasAbility("model.ability.autoProduction");
+        return buildingType.hasAbility("model.ability.autoProduction");
     }
 
     /**
@@ -1036,12 +1001,9 @@ public final class Building extends FreeColGameObject implements Features, WorkL
         }
         Player player = colony.getOwner();
 
-        float goodsOutput = productivity;
-        Modifier modifier = colony.getModifier(goodsOutputType.getId());
-        if (modifier != null) {
-            goodsOutput = modifier.applyTo(productivity);
-        }
-        return (int) goodsOutput;
+        return (int) colony.getFeatureContainer().applyModifier(productivity,
+                                                                goodsOutputType.getId(),
+                                                                buildingType, getGame().getTurn());
     }
     
     private static Comparator<Building> buildingComparator = new Comparator<Building>() {

@@ -21,10 +21,11 @@ package net.sf.freecol.common.model;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map.Entry;
-import java.util.Vector;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -57,7 +58,7 @@ import org.w3c.dom.Element;
  * Every <code>Unit</code> is owned by a {@link Player} and has a
  * {@link Location}.
  */
-public class Unit extends FreeColGameObject implements Features, Locatable, Location, Ownable, Nameable {
+public class Unit extends FreeColGameObject implements Locatable, Location, Ownable, Nameable {
 
     private static final Logger logger = Logger.getLogger(Unit.class.getName());
 
@@ -585,11 +586,11 @@ public class Unit extends FreeColGameObject implements Features, Locatable, Loca
     public int getTransportFee() {
         if (canCashInTreasureTrain()) {
             if (!isInEurope() && getOwner().getEurope() != null) {
-                int transportFee = getTreasureAmount() / 2;
-                Modifier modifier = getOwner().getModifier("model.modifier.treasureTransportFee");
-                if (modifier != null) {
-                    return (int) modifier.applyTo(transportFee);
-                }
+                float transportFee = getTreasureAmount() / 2;
+                return (int) getOwner().getFeatureContainer()
+                    .applyModifier(getTreasureAmount() / 2f,
+                                   "model.modifier.treasureTransportFee",
+                                   unitType, getGame().getTurn());
             }
         }
         return 0;
@@ -770,22 +771,17 @@ public class Unit extends FreeColGameObject implements Features, Locatable, Loca
      * @return a <code>boolean</code> value
      */
     public boolean hasAbility(String id) {
-        ArrayList<Ability> result = new ArrayList<Ability>();
-        result.add(unitType.getAbility(id));
-        // the player's ability may have scope
-        Ability playerAbility = getOwner().getAbility(id);
-        if (playerAbility != null) {
-            result.add(playerAbility.getApplicableAbility(unitType));
-        }
+        Set<Ability> result = new HashSet<Ability>();
+        // UnitType abilities always apply
+        result.addAll(unitType.getFeatureContainer().getAbilitySet(id));
+        // the player's abilities may not apply
+        result.addAll(getOwner().getFeatureContainer()
+                      .getAbilitySet(id, unitType, getGame().getTurn()));
+        // EquipmentType abilities always apply
         for (EquipmentType equipmentType : equipment) {
-            result.add(equipmentType.getAbility(id));
+            result.addAll(equipmentType.getFeatureContainer().getAbilitySet(id));
         }
-        Ability combinedResult = Ability.combine(result.toArray(new Ability[0]));
-        if (combinedResult == null) {
-            return false;
-        } else {
-            return combinedResult.getValue();
-        }
+        return FeatureContainer.hasAbility(result);
     }
 
 
@@ -795,18 +791,18 @@ public class Unit extends FreeColGameObject implements Features, Locatable, Loca
      * @param id a <code>String</code> value
      * @return a <code>Modifier</code> value
      */
-    public Modifier getModifier(String id) {
-        ArrayList<Modifier> result = new ArrayList<Modifier>();
-        result.add(unitType.getModifier(id));
-        // the player's modifier may have scope
-        Modifier playerModifier = getOwner().getModifier(id);
-        if (playerModifier != null) {
-            result.add(playerModifier.getApplicableModifier(unitType));
-        }
+    public Set<Modifier> getModifierSet(String id) {
+        Set<Modifier> result = new HashSet<Modifier>();
+        // UnitType modifiers always apply
+        result.addAll(unitType.getFeatureContainer().getModifierSet(id));
+        // the player's modifiers may not apply
+        result.addAll(getOwner().getFeatureContainer()
+                      .getModifierSet(id, unitType, getGame().getTurn()));
+        // EquipmentType modifiers always apply
         for (EquipmentType equipmentType : equipment) {
-            result.add(equipmentType.getModifier(id));
+            result.addAll(equipmentType.getFeatureContainer().getModifierSet(id));
         }
-        return Modifier.combine(result.toArray(new Modifier[0]));
+        return result;
     }
     
     /**
@@ -1172,7 +1168,7 @@ public class Unit extends FreeColGameObject implements Features, Locatable, Loca
                 goodsContainer.getGoodsCount() > 0 &&
                 getOwner().getStance(settlement.getOwner()) != Stance.WAR &&
                 ((settlement instanceof IndianSettlement) ||
-                 getOwner().hasAbility("model.ability.tradeWithForeignColonies")));
+                 hasAbility("model.ability.tradeWithForeignColonies")));
     }
 
     /**
@@ -1419,12 +1415,14 @@ public class Unit extends FreeColGameObject implements Features, Locatable, Loca
      * @return The line of sight of this <code>Unit</code>.
      */
     public int getLineOfSight() {
-        int line = unitType.getLineOfSight();
-        Modifier modifier = getModifier("model.modifier.lineOfSightBonus");
-        if (modifier != null) {
-            line = (int) modifier.applyTo(line);
+        float line = unitType.getLineOfSight();
+        Set<Modifier> modifierSet = getModifierSet("model.modifier.lineOfSightBonus");
+        if (getTile() != null) {
+            modifierSet.addAll(getTile().getType().getFeatureContainer()
+                               .getModifierSet("model.modifier.lineOfSightBonus",
+                                               unitType, getGame().getTurn()));
         }
-        return line;
+        return (int) FeatureContainer.applyModifierSet(line, getGame().getTurn(), modifierSet);
     }
 
     /**
@@ -1871,7 +1869,7 @@ public class Unit extends FreeColGameObject implements Features, Locatable, Loca
 
         if (student != null &&
             !(newLocation instanceof Building &&
-              ((Building) newLocation).hasAbility("model.ability.teach"))) {
+              ((Building) newLocation).getType().hasAbility("model.ability.teach"))) {
             // teacher has left school
             student.setTeacher(null);
             student = null;
@@ -1993,7 +1991,7 @@ public class Unit extends FreeColGameObject implements Features, Locatable, Loca
                     return false;
                 } else {
                     for (Entry<String, Boolean> entry : equipmentType.getLocationAbilitiesRequired().entrySet()) {
-                        if (colony.hasAbility(entry.getKey()) != entry.getValue()) {
+                        if (colony.getFeatureContainer().hasAbility(entry.getKey()) != entry.getValue()) {
                             return false;
                         }
                     }
@@ -2339,12 +2337,8 @@ public class Unit extends FreeColGameObject implements Features, Locatable, Loca
      * @return The amount of moves this unit has at the beginning of each turn.
      */
     public int getInitialMovesLeft() {
-        int movesLeft = unitType.getMovement();
-        Modifier modifier = getModifier("model.modifier.movementBonus");
-        if (modifier != null) {
-            movesLeft = (int) modifier.applyTo(movesLeft);
-        }
-        return movesLeft;
+        return (int) FeatureContainer.applyModifierSet(unitType.getMovement(), getGame().getTurn(),
+                                                       getModifierSet("model.modifier.movementBonus"));
     }
 
     /**
@@ -2541,10 +2535,8 @@ public class Unit extends FreeColGameObject implements Features, Locatable, Loca
                 // I think '4' was also used in the original game.
                 workLeft = 4 - workLeft;
             }
-            Modifier modifier = getOwner().getModifier("model.modifier.sailToEuropeBonus");
-            if (modifier != null) {
-                workLeft -= modifier.getValue();
-            }
+            workLeft = (int) getOwner().getFeatureContainer()
+                .applyModifier(workLeft,"model.modifier.sailHighSeas", unitType, getGame().getTurn());
             movesLeft = 0;
             break;
         case TO_AMERICA:
@@ -2554,10 +2546,8 @@ public class Unit extends FreeColGameObject implements Features, Locatable, Loca
                 // I think '4' was also used in the original game.
                 workLeft = 4 - workLeft;
             }
-            Modifier modifier1 = getOwner().getModifier("model.modifier.sailToEuropeBonus");
-            if (modifier1 != null) {
-                workLeft -= modifier1.getValue();
-            }
+            workLeft = (int) getOwner().getFeatureContainer()
+                .applyModifier(workLeft,"model.modifier.sailHighSeas", unitType, getGame().getTurn());
             movesLeft = 0;
             break;
         case SKIPPED:
@@ -2878,7 +2868,7 @@ public class Unit extends FreeColGameObject implements Features, Locatable, Loca
                             getColony().addGoods(deliverType, deliverAmount);
                         } else {
                             List<Tile> surroundingTiles = getTile().getMap().getSurroundingTiles(getTile(), 1);
-                            Vector<Settlement> adjacentColonies = new Vector<Settlement>();
+                            List<Settlement> adjacentColonies = new ArrayList<Settlement>();
                             for (int i = 0; i < surroundingTiles.size(); i++) {
                                 Tile t = surroundingTiles.get(i);
                                 if (t.getColony() != null && t.getColony().getOwner().equals(getOwner())) {
@@ -3184,11 +3174,9 @@ public class Unit extends FreeColGameObject implements Features, Locatable, Loca
                                                      treasureUnitTypes.get(random));
 
             // Larger treasure if Hernan Cortes is present in the congress:
-            Modifier modifier = getOwner().getModifier("model.modifier.nativeTreasureModifier");
-            if (modifier != null) {
-                randomTreasure = (int) modifier.applyTo(randomTreasure);
-            }
-
+            Set<Modifier> modifierSet = getModifierSet("model.modifier.nativeTreasureModifier");
+            randomTreasure = (int) FeatureContainer.applyModifierSet(randomTreasure, getGame().getTurn(),
+                                                                     modifierSet);
             SettlementType settlementType = ((IndianNationType) enemy.getNationType()).getTypeOfSettlement();
             if (settlementType == SettlementType.INCA_CITY ||
                 settlementType == SettlementType.AZTEC_CITY) {
@@ -3243,11 +3231,8 @@ public class Unit extends FreeColGameObject implements Features, Locatable, Loca
         if (base == 0) {
             return 0;
         }
-        Modifier modifier = getModifier(goodsType.getId());
-        if (modifier != null) {
-            base = (int) modifier.applyTo(base);
-        }
-        return base;
+        return (int) FeatureContainer.applyModifierSet(base, getGame().getTurn(),
+                                                       getModifierSet(goodsType.getId()));
     }
 
     /**

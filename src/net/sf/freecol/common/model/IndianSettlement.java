@@ -945,10 +945,9 @@ public class IndianSettlement extends Settlement {
                 Player p = getGame().getPlayer(i);
                 if (p.isEuropean() && extraAlarm[i] != 0) {
                     if (extraAlarm[i] > 0) {
-                        Modifier modifier = p.getModifier("model.modifier.nativeAlarmModifier");
-                        if (modifier != null) {
-                            extraAlarm[i] = (int) modifier.applyTo(extraAlarm[i]);
-                        }
+                        extraAlarm[i] = (int) p.getFeatureContainer()
+                            .applyModifier(extraAlarm[i], "model.modifier.nativeAlarmModifier",
+                                           null, getGame().getTurn());
                     }
                     modifyAlarm(p, extraAlarm[i]);
                 }

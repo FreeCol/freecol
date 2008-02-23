@@ -95,7 +95,7 @@ public class MockModelController implements ModelController {
 
     public Building createBuilding(String taskID, Colony colony, BuildingType type) {
         // TODO Auto-generated method stub
-        return null;
+        return new Building(colony.getGame(), colony, type);
     }
 
 }

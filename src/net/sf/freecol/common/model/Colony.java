@@ -24,6 +24,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map.Entry;
+import java.util.Set;
 import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamConstants;
@@ -41,7 +42,7 @@ import org.w3c.dom.Element;
  * {@link ColonyTile}s. The latter represents the tiles around the
  * <code>Colony</code> where working is possible.
  */
-public final class Colony extends Settlement implements Features, Location, Nameable {
+public final class Colony extends Settlement implements Location, Nameable {
 
     private static final Logger logger = Logger.getLogger(Colony.class.getName());
 
@@ -128,22 +129,31 @@ public final class Colony extends Settlement implements Features, Location, Name
             }
         }
         colonyTiles.add(new ColonyTile(game, this, tile));
-        Modifier modifier = owner.getModifier("model.modifier.buildingPriceBonus");
         List<BuildingType> buildingTypes = FreeCol.getSpecification().getBuildingTypeList();
         for (BuildingType buildingType : buildingTypes) {
             if (buildingType.getUpgradesFrom() == null &&
                 buildingType.getGoodsRequired() == null) {
                 addBuilding(new Building(getGame(), this, buildingType));
-            } else if (modifier != null) {
-                Modifier applicableModifier = modifier.getApplicableModifier(buildingType);
-                if (applicableModifier != null &&
-                    applicableModifier.applyTo(100) == 0f) {
-                    addBuilding(new Building(getGame(), this, buildingType));
-                }
+            } else if (isFree(buildingType)) {
+                addBuilding(new Building(getGame(), this, buildingType));
             }
         }
         setCurrentlyBuilding(BuildableType.NOTHING);
     }
+
+    /**
+     * Returns <code>true</code> if a building of the given type can
+     * be built for free.
+     *
+     * @param buildingType a <code>BuildingType</code> value
+     * @return a <code>boolean</code> value
+     */
+    private boolean isFree(BuildingType buildingType) {
+        return (owner.getFeatureContainer()
+                .applyModifier(100f, "model.modifier.buildingPriceBonus",
+                               buildingType, getGame().getTurn()) == 0f);
+    }
+
 
     /**
      * Initiates a new <code>Colony</code> from an XML representation.
@@ -189,25 +199,17 @@ public final class Colony extends Settlement implements Features, Location, Name
     public void addBuilding(final Building building) {
         BuildingType buildingType = building.getType().getFirstLevel();
         buildingMap.put(buildingType.getId(), building);
-        for (Feature feature : building.getType().getFeatures()) {
-            addFeature(feature);
-        }
+        featureContainer.add(building.getType().getFeatureContainer());
     }
 
     /**
      * Updates SoL and builds stockade if possible.
      */
     public void updatePopulation() {
-        Modifier priceBonus = getModifier("model.modifier.buildingPriceBonus");
-        if (priceBonus != null) {
-            // this means we might get a building for free
-            for (BuildingType buildingType : FreeCol.getSpecification().getBuildingTypeList()) {
-                Modifier applicableBonus = priceBonus.getApplicableModifier(buildingType);
-                if (applicableBonus != null &&
-                    applicableBonus.applyTo(100) == 0f &&
-                    canBuild(buildingType)) {
-                    addBuilding(createBuilding(buildingType));
-                }
+        // this means we might get a building for free
+        for (BuildingType buildingType : FreeCol.getSpecification().getBuildingTypeList()) {
+            if (isFree(buildingType)) {
+                addBuilding(createBuilding(buildingType));
             }
         }
         getTile().updatePlayerExploredTiles();
@@ -612,7 +614,7 @@ public final class Colony extends Settlement implements Features, Location, Name
         }
         
         for (Building building : buildingMap.values()) {
-            if (building.hasAbility("model.ability.teach") &&
+            if (building.getType().hasAbility("model.ability.teach") &&
                 building.canAdd(unitType)) {
                 return true;
             }
@@ -623,7 +625,7 @@ public final class Colony extends Settlement implements Features, Location, Name
     public List<Unit> getTeachers() {
         List<Unit> teachers = new ArrayList<Unit>();
         for (Building building : buildingMap.values()) {
-            if (building.hasAbility("model.ability.teach")) {
+            if (building.getType().hasAbility("model.ability.teach")) {
                 teachers.addAll(building.getUnitList());
             }
         }
@@ -1429,7 +1431,7 @@ public final class Colony extends Settlement implements Features, Location, Name
         List<Building> buildings1 = new ArrayList<Building>();
         List<Building> buildings2 = new ArrayList<Building>();
         for (Building building : getBuildings()) {
-            if (building.hasAbility("model.ability.autoProduction")) {
+            if (building.getType().hasAbility("model.ability.autoProduction")) {
                 // call auto-producing buildings immediately
                 logger.finest("Calling newTurn for building " + building.getName());
                 building.newTurn();
@@ -1486,18 +1488,14 @@ public final class Colony extends Settlement implements Features, Location, Name
      * @return The capacity of this <code>Colony</code>'s warehouse.
      */
     public int getWarehouseCapacity() {
-        int basicStorage = 0;
-        Modifier storage = getModifier("model.modifier.warehouseStorage");
-        if (storage != null) {
-            basicStorage = (int) storage.applyTo(basicStorage);
-        }
-        return basicStorage;
+        return (int) featureContainer.applyModifier(0, "model.modifier.warehouseStorage",
+                                                    null, getGame().getTurn());
     }
     
     public Building getWarehouse() {
         // TODO: it should search for more than one building?
         for (Building building : buildingMap.values()) {
-            if (building.getType().getModifier("model.modifier.warehouseStorage") != null) {
+            if (!building.getType().getModifierSet("model.modifier.warehouseStorage").isEmpty()) {
                 return building;
             }
         }
@@ -1687,20 +1685,12 @@ public final class Colony extends Settlement implements Features, Location, Name
      * Get the <code>Modifier</code> value.
      *
      * @param id a <code>String</code> value
+     * @param turn a <code>Turn</code> value
      * @return a <code>Modifier</code> value
      */
-    public final Modifier getModifier(String id) {
-        Modifier result;
-        Modifier colonyModifier = featureContainer.getModifier(id);
-        Modifier playerModifier = owner.getModifier(id);
-        if (colonyModifier == null) {
-            result = playerModifier;
-        } else if (playerModifier == null) {
-            result = colonyModifier;
-        } else {
-            result = Modifier.combine(colonyModifier, playerModifier);
-        }
-        
+    public final Set<Modifier> getModifierSet(String id) {
+        Set<Modifier> result = featureContainer.getModifierSet(id, null, getGame().getTurn());
+        result.addAll(owner.getFeatureContainer().getModifierSet(id, null, getGame().getTurn()));
         return result;
     }
 
@@ -1709,43 +1699,17 @@ public final class Colony extends Settlement implements Features, Location, Name
      * identified by <code>id</code>.
      *
      * @param id a <code>String</code> value
+     * @param turn a <code>Turn</code> value
      * @return a <code>boolean</code> value
      */
     public boolean hasAbility(String id) {
-        Ability colonyAbility = featureContainer.getAbility(id);
-        Ability playerAbility = owner.getAbility(id);
-        if (colonyAbility == null) {
-            if (playerAbility == null) {
-                return false;
-            } else {
-                return playerAbility.getValue();
-            }
-        } else if (playerAbility == null) {
-            return colonyAbility.getValue();
-        } else {
-            return colonyAbility.getValue() && playerAbility.getValue();
-        }
+        Set<Ability> result = featureContainer.getAbilitySet(id, null, getGame().getTurn());
+        result.addAll(owner.getFeatureContainer().getAbilitySet(id, null, getGame().getTurn()));
+        return FeatureContainer.hasAbility(result);
     }
 
-    /**
-     * Add the given Feature to the Features Map. If the Feature given
-     * can not be combined with a Feature with the same ID already
-     * present, the old Feature will be replaced.
-     *
-     * @param feature a <code>Feature</code> value
-     */
-    public void addFeature(Feature feature) {
-        featureContainer.addFeature(feature);
-    }
-
-    /**
-     * Removes and returns a Feature from this feature set.
-     *
-     * @param oldFeature a <code>Feature</code> value
-     * @return a <code>Feature</code> value
-     */
-    public Feature removeFeature(Feature oldFeature) {
-        return featureContainer.removeFeature(oldFeature);
+    public FeatureContainer getFeatureContainer() {
+        return featureContainer;
     }
 
     /**

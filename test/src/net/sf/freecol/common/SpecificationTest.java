@@ -119,21 +119,21 @@ public final class SpecificationTest extends TestCase {
     	
     	// Percentage Modifier
     	BuildingType ironWorks = spec.getBuildingType("model.building.IronWorks");
-    	Modifier modifier = ironWorks.getModifier("model.goods.tools");
-    	assertTrue(modifier.getType() == Modifier.Type.PERCENTAGE);
-    	assertTrue(modifier.getValue() == 50);
+    	Modifier modifier = ironWorks.getModifierSet("model.goods.tools").iterator().next();
+    	assertEquals(Modifier.Type.PERCENTAGE, modifier.getType());
+    	assertEquals(50f, modifier.getValue());
 
     	// Additive Modifier
     	BuildingType depot = spec.getBuildingType("model.building.Depot");
-    	modifier = depot.getModifier("model.modifier.warehouseStorage");
-    	assertTrue(modifier.getType() == Modifier.Type.ADDITIVE);
-    	assertTrue(modifier.getValue() == 100);
+    	modifier = depot.getModifierSet("model.modifier.warehouseStorage").iterator().next();
+    	assertEquals(Modifier.Type.ADDITIVE, modifier.getType());
+    	assertEquals(100f, modifier.getValue());
     	
     	// Multiplicative Modifier
     	UnitType blackSmith = spec.getUnitType("model.unit.masterBlacksmith");
-    	modifier = blackSmith.getModifier("model.goods.tools");
-    	assertTrue(modifier.getType() == Modifier.Type.MULTIPLICATIVE);
-    	assertTrue(modifier.getValue() == 2);
+    	modifier = blackSmith.getModifierSet("model.goods.tools").iterator().next();
+    	assertEquals(Modifier.Type.MULTIPLICATIVE, modifier.getType());
+    	assertEquals(2f, modifier.getValue());
     }
 
 }

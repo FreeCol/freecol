@@ -25,6 +25,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+import java.util.Set;
 
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
@@ -32,7 +33,7 @@ import javax.xml.stream.XMLStreamReader;
 
 import net.sf.freecol.common.Specification;
 
-public final class TileType extends FreeColGameObjectType implements Features {
+public final class TileType extends FreeColGameObjectType {
 
     private String artBasic;
     private String artOverlay;
@@ -133,8 +134,8 @@ public final class TileType extends FreeColGameObjectType implements Features {
         return attackBonus;
     }
 
-    public Modifier getDefenceBonus() {
-        return getModifier("model.modifier.defence");
+    public Set<Modifier> getDefenceBonus() {
+        return featureContainer.getModifierSet("model.modifier.defence");
     }
 
     public int getPotential(GoodsType goodsType) {
@@ -208,38 +209,6 @@ public final class TileType extends FreeColGameObjectType implements Features {
             return false;
         }
     }
-    
-    /**
-     * Returns true if the Object has the ability identified by
-     * <code>id</code>.
-     *
-     * @param id a <code>String</code> value
-     * @return a <code>boolean</code> value
-     */
-    public boolean hasAbility(String id) {
-        return featureContainer.hasAbility(id);
-    }
-
-    /**
-     * Returns the Modifier identified by <code>id</code>.
-     *
-     * @param id a <code>String</code> value
-     * @return a <code>Modifier</code> value
-     */
-    public Modifier getModifier(String id) {
-        return featureContainer.getModifier(id);
-    }
-
-    /**
-     * Add the given Feature to the Features Map. If the Feature given
-     * can not be combined with a Feature with the same ID already
-     * present, the old Feature will be replaced.
-     *
-     * @param feature a <code>Feature</code> value
-     */
-    public void addFeature(Feature feature) {
-        featureContainer.addFeature(feature);
-    }
 
     // ------------------------------------------------------------ API methods
 
@@ -289,7 +258,7 @@ public final class TileType extends FreeColGameObjectType implements Features {
                 in.nextTag(); // close this element
             } else if ("modifier".equals(childName)) {
                 Modifier modifier = new Modifier(in);
-                addFeature(modifier); // close this element
+                addModifier(modifier); // close this element
             } else if ("production".equals(childName)) {
                 GoodsType type = specification.getGoodsType(in.getAttributeValue(null, "goods-type"));
                 int amount = Integer.parseInt(in.getAttributeValue(null, "value"));

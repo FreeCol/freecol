@@ -21,7 +21,9 @@ package net.sf.freecol.common.model;
 
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamConstants;
@@ -235,19 +237,12 @@ public class TileItemContainer extends FreeColGameObject {
      * @param goodsType a <code>GoodsType</code> value
      * @return a <code>Modifier</code> value
      */
-    public Modifier getProductionBonus(GoodsType goodsType) {
-        List<Modifier> result = new ArrayList<Modifier>();
+    public Set<Modifier> getProductionBonus(GoodsType goodsType) {
+        Set<Modifier> result = new HashSet<Modifier>();
         for (TileImprovement improvement : improvements) {
             result.add(improvement.getProductionBonus(goodsType));
         }
-        switch(result.size()) {
-        case 0:
-            return null;
-        case 1:
-            return result.get(0);
-        default:
-            return Modifier.combine(result);
-        }
+        return result;
     }
 
     /**

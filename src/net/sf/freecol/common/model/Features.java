@@ -46,7 +46,8 @@ public interface Features {
      * present, the old Feature will be replaced.
      *
      * @param feature a <code>Feature</code> value
+     * @return a <code>boolean</code> value
      */
-    public void addFeature(Feature feature);
+    public boolean addFeature(Feature feature);
 
 }

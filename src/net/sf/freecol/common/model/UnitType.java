@@ -594,7 +594,7 @@ public final class UnitType extends BuildableType {
             if ("ability".equals(nodeName)) {
                 String abilityId = in.getAttributeValue(null, "id");
                 boolean value = getAttribute(in, "value", true);
-                addFeature(new Ability(abilityId, value));
+                addAbility(new Ability(abilityId, value));
                 in.nextTag(); // close this element
             } else if ("required-ability".equals(nodeName)) {
                 String abilityId = in.getAttributeValue(null, "id");
@@ -640,7 +640,7 @@ public final class UnitType extends BuildableType {
                 if (modifier.getSource() == null) {
                     modifier.setSource(this.getId());
                 }
-                addFeature(modifier);
+                addModifier(modifier);
             } else {
                 logger.finest("Parsing of " + nodeName + " is not implemented yet");
                 while (in.nextTag() != XMLStreamConstants.END_ELEMENT ||
@@ -687,11 +687,7 @@ public final class UnitType extends BuildableType {
             return 0;
         }
         
-        Modifier modifier = getModifier(goodsType.getId());
-        if (modifier != null) {
-            base = (int) modifier.applyTo(base);
-        }
-        
+        base = (int) featureContainer.applyModifier(base, goodsType.getId());
         return Math.max(base, 1);
     }
 

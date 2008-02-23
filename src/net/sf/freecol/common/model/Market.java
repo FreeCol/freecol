@@ -267,12 +267,10 @@ public final class Market extends FreeColGameObject implements Ownable {
             player.modifySales(type, amount);
             player.modifyIncomeBeforeTaxes(type, incomeBeforeTaxes);
             player.modifyIncomeAfterTaxes(type, incomeAfterTaxes);
-            Modifier modifier = player.getModifier("model.modifier.tradeBonus");
-            if (modifier == null) {
-                add(type, amount);
-            } else {
-                add(type, (int) modifier.applyTo(amount));
-            }
+            amount = (int) player.getFeatureContainer()
+                .applyModifier(amount, "model.modifier.tradeBonus",
+                               type, getGame().getTurn());
+            add(type, amount);
 
             for(TransactionListener listener : transactionListeners) {
                 listener.logSale(type, amount, unitPrice, tax);
@@ -324,12 +322,10 @@ public final class Market extends FreeColGameObject implements Ownable {
         player.modifySales(goodsType, -amount);
         player.modifyIncomeBeforeTaxes(goodsType, -price);
         player.modifyIncomeAfterTaxes(goodsType, -price);
-        Modifier modifier = player.getModifier("model.modifier.tradeBonus");
-        if (modifier == null) {
-            remove(goodsType, amount);
-        } else {
-            remove(goodsType, (int) modifier.applyTo(amount));
-        }
+        amount = (int) player.getFeatureContainer()
+            .applyModifier(amount, "model.modifier.tradeBonus",
+                           goodsType, getGame().getTurn());
+        remove(goodsType, amount);
         
         for(TransactionListener listener : transactionListeners) {
             listener.logPurchase(goodsType, amount, unitPrice);

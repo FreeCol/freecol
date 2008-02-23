@@ -17,7 +17,6 @@
  *  along with FreeCol.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
 package net.sf.freecol.common.model;
 
 import java.util.ArrayList;
@@ -38,13 +37,7 @@ import org.w3c.dom.Element;
  */
 public final class Ability extends Feature {
 
-
     private boolean value = true;
-
-    /**
-     * A list of abilities that contributed to this one.
-     */
-    private List<Ability> abilities;
 
     /**
      * Creates a new <code>Ability</code> instance.
@@ -98,16 +91,6 @@ public final class Ability extends Feature {
     }
     
     /**
-     * Returns <code>true</code> if this Ability is composed of other
-     * Abilities.
-     *
-     * @return a <code>boolean</code> value
-     */
-    public boolean isComposite() {
-        return !(getAbilities() == null || getAbilities().isEmpty());
-    }
-
-    /**
      * Get the <code>Value</code> value.
      *
      * @return a <code>boolean</code> value
@@ -125,126 +108,6 @@ public final class Ability extends Feature {
         this.value = newValue;
     }
 
-    /**
-     * Get the <code>Abilities</code> value.
-     *
-     * @return a <code>List<Ability></code> value
-     */
-    public List<Ability> getAbilities() {
-        return abilities;
-    }
-
-    /**
-     * Get the <code>Abilities</code> value.
-     *
-     * @return a <code>List<Ability></code> value
-     */
-    public List<Feature> getFeatures() {
-        return new ArrayList<Feature>(abilities);
-    }
-
-    /**
-     * Set the <code>Abilities</code> value.
-     *
-     * @param newAbilities The new Abilities value.
-     */
-    public void setAbilities(final List<Ability> newAbilities) {
-        this.abilities = newAbilities;
-    }
-
-    /**
-     * Combines several Abilities, which may be <code>null</code>. The
-     * scopes of the Abilities are not combined, so that the resulting
-     * Ability is always unscoped.
-     *
-     * @param abilities some abilities
-     * @return an <code>Ability</code> value, or <code>null</code> if
-     * the arguments can not be combined
-     */
-    public static Ability combine(Ability... abilities) {
-        String resultId = null;
-        Ability result = new Ability(resultId, "result", true);
-        result.abilities = new ArrayList<Ability>();
-
-        for (Ability ability : abilities) {
-            if (ability == null) {
-                continue;
-            } else if (resultId == null) {
-                // this is the first new ability
-                resultId = ability.getId();
-                result.setId(resultId);
-            } else if (!resultId.equals(ability.getId())) {
-                return null;
-            }
-            if (ability.abilities == null) {
-                result.abilities.add(ability);
-            } else {
-                result.abilities.addAll(ability.abilities);
-            }
-            result.value = result.value && ability.value;
-        }
-        switch(result.abilities.size()) {
-        case 0:
-            return null;
-        case 1:
-            return result.abilities.get(0);
-        default:
-            return result;
-        }
-    }
-
-    /**
-     * Removes another Ability from this one and returns the result.
-     * If this Ability was the combination of two other Abilities,
-     * then removing one of the original Abilities will return the
-     * other original Ability.
-     *
-     * @param newAbility a <code>Ability</code> value
-     * @return a <code>Ability</code> value
-     */
-    public Ability remove(Ability newAbility) {
-        if (abilities != null && abilities.remove(newAbility)) {
-            if (abilities.size() == 1) {
-                return abilities.get(0);
-            } else if (!newAbility.value) {
-                // only removing a false value might change the result
-                // value
-                for (Ability ability : abilities) {
-                    if (!ability.value) {
-                        return this;
-                    }
-                }
-                value = true;
-            }
-        }
-        return this;
-    }
-
-    /**
-     * Returns a Ability applicable to the argument, or null if there
-     * is no such Ability.
-     *
-     * @param object a <code>FreeColGameObjectType</code> value
-     * @return a <code>Ability</code> value
-     */
-    public Ability getApplicableAbility(FreeColGameObjectType object) {
-        if (abilities == null) {
-            if (appliesTo(object)) {
-                return this;
-            } else {
-                return null;
-            }
-        } else {
-            List<Ability> result = new ArrayList<Ability>();
-            for (Ability ability : abilities) {
-                if (ability.appliesTo(object)) {
-                    result.add(ability);
-                }
-            }
-            return combine(result.toArray(new Ability[result.size()]));
-        }
-    }
-
     // -- Serialization --
 
 
@@ -259,7 +122,6 @@ public final class Ability extends Feature {
         setId(in.getAttributeValue(null, "id"));
         setSource(in.getAttributeValue(null, "source"));
         value = getAttribute(in, "value", true);
-        setScope(Boolean.parseBoolean(in.getAttributeValue(null, "scope")));
 
         String firstTurn = in.getAttributeValue(null, "firstTurn");
         if (firstTurn != null) {
@@ -275,6 +137,9 @@ public final class Ability extends Feature {
             String childName = in.getLocalName();
             if ("scope".equals(childName)) {
                 Scope scope = new Scope(in);
+                if (getScopes() == null) {
+                    setScopes(new ArrayList<Scope>());
+                }
                 getScopes().add(scope);
             } else {
                 logger.finest("Parsing of " + childName + " is not implemented yet");
@@ -303,8 +168,6 @@ public final class Ability extends Feature {
         if (getSource() != null) {
             out.writeAttribute("source", getSource());
         }
-        out.writeAttribute("scope", String.valueOf(hasScope()));
-        out.writeAttribute("timeLimit", String.valueOf(hasTimeLimit()));
 
         if (getFirstTurn() != null) {
             out.writeAttribute("firstTurn", String.valueOf(getFirstTurn().getNumber()));
