@@ -79,6 +79,108 @@ public class PlayerTest extends FreeColTestCase {
         assertTrue(french.getUnit(unit2.getId()) == unit2);
 
     }
+    
+    public void testEuropeanPlayer(Player player) {
+        assertTrue(player.canBuildColonies());
+        assertTrue(player.canHaveFoundingFathers());
+        assertTrue(player.canMoveToEurope());
+        assertTrue(player.canRecruitUnits());
+        assertEquals(player.getPlayerType(), Player.PlayerType.COLONIAL);
+        assertFalse(player.isDead());
+        assertTrue(player.isEuropean());
+        assertFalse(player.isIndian());
+        assertFalse(player.isREF());
+    }
+    
+    public void testIndianPlayer(Player player) {
+        assertFalse(player.canBuildColonies());
+        assertFalse(player.canHaveFoundingFathers());
+        assertFalse(player.canMoveToEurope());
+        assertFalse(player.canRecruitUnits());
+        assertEquals(player.getPlayerType(), Player.PlayerType.NATIVE);
+        assertFalse(player.isDead());
+        assertFalse(player.isEuropean());
+        assertTrue(player.isIndian());
+        assertFalse(player.isREF());
+    }
+    
+    public void testRoyalPlayer(Player player) {
+        assertFalse(player.canBuildColonies());
+        assertFalse(player.canHaveFoundingFathers());
+        assertTrue(player.canMoveToEurope());
+        assertFalse(player.canRecruitUnits());
+        assertEquals(player.getPlayerType(), Player.PlayerType.ROYAL);
+        assertFalse(player.isDead());
+        assertTrue(player.isEuropean());
+        assertFalse(player.isIndian());
+        assertTrue(player.isREF());
+    }
+    
+    public void testPlayers() {
+        Game game = getStandardGame();
+        
+        // europeans
+        Player dutch = game.getPlayer("model.nation.dutch");
+        Player french = game.getPlayer("model.nation.french");
+        Player english = game.getPlayer("model.nation.english");
+        Player spanish = game.getPlayer("model.nation.spanish");
+        Player portuguese = game.getPlayer("model.nation.portuguese");
+        Player swedish = game.getPlayer("model.nation.swedish");
+        Player danish = game.getPlayer("model.nation.danish");
+        Player russian = game.getPlayer("model.nation.russian");
+        testEuropeanPlayer(dutch);
+        testEuropeanPlayer(french);
+        testEuropeanPlayer(english);
+        testEuropeanPlayer(spanish);
+        testEuropeanPlayer(portuguese);
+        testEuropeanPlayer(swedish);
+        testEuropeanPlayer(danish);
+        testEuropeanPlayer(russian);
+        
+        // indians
+        Player inca = game.getPlayer("model.nation.inca");
+        Player aztec = game.getPlayer("model.nation.aztec");
+        Player arawak = game.getPlayer("model.nation.arawak");
+        Player cherokee = game.getPlayer("model.nation.cherokee");
+        Player iroquois = game.getPlayer("model.nation.iroquois");
+        Player sioux = game.getPlayer("model.nation.sioux");
+        Player apache = game.getPlayer("model.nation.apache");
+        Player tupi = game.getPlayer("model.nation.tupi");
+        testIndianPlayer(inca);
+        testIndianPlayer(aztec);
+        testIndianPlayer(arawak);
+        testIndianPlayer(cherokee);
+        testIndianPlayer(iroquois);
+        testIndianPlayer(sioux);
+        testIndianPlayer(apache);
+        testIndianPlayer(tupi);
+        
+        // royal
+        Player dutchREF = game.getPlayer("model.nation.dutchREF");
+        Player frenchREF = game.getPlayer("model.nation.frenchREF");
+        Player englishREF = game.getPlayer("model.nation.englishREF");
+        Player spanishREF = game.getPlayer("model.nation.spanishREF");
+        Player portugueseREF = game.getPlayer("model.nation.portugueseREF");
+        Player swedishREF = game.getPlayer("model.nation.swedishREF");
+        Player danishREF = game.getPlayer("model.nation.danishREF");
+        Player russianREF = game.getPlayer("model.nation.russianREF");
+        testRoyalPlayer(dutchREF);
+        testRoyalPlayer(frenchREF);
+        testRoyalPlayer(englishREF);
+        testRoyalPlayer(spanishREF);
+        testRoyalPlayer(portugueseREF);
+        testRoyalPlayer(swedishREF);
+        testRoyalPlayer(danishREF);
+        testRoyalPlayer(russianREF);
+        assertEquals(dutchREF, dutch.getREFPlayer());
+        assertEquals(frenchREF, french.getREFPlayer());
+        assertEquals(englishREF, english.getREFPlayer());
+        assertEquals(spanishREF, spanish.getREFPlayer());
+        assertEquals(portugueseREF, portuguese.getREFPlayer());
+        assertEquals(swedishREF, swedish.getREFPlayer());
+        assertEquals(danishREF, danish.getREFPlayer());
+        assertEquals(russianREF, russian.getREFPlayer());
+    }
 
     
 }

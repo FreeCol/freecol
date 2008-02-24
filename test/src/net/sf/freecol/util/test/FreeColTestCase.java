@@ -103,6 +103,7 @@ public class FreeColTestCase extends TestCase {
      */
     public static Game getStandardGame() {
         game = new Game(new MockModelController());
+        game.setMaximumPlayers(8);
 
         for (Nation n : FreeCol.getSpecification().getNations()) {
             Player p;
