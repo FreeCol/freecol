@@ -1199,6 +1199,7 @@ public class IndianSettlement extends Settlement {
         isCapital = (new Boolean(in.getAttributeValue(null, "isCapital"))).booleanValue();
 
         owner.addSettlement(this);
+        featureContainer.addModifier(Settlement.DEFENCE_MODIFIER);
         
         ownedUnits.clear();
         

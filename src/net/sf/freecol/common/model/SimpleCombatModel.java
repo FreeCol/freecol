@@ -43,6 +43,15 @@ public class SimpleCombatModel implements CombatModel {
 
     private static PseudoRandom random;
 
+    private static final Modifier smallMovementPenalty =
+        new Modifier("model.modifier.offence", "modifiers.movementPenalty",
+                     -33, Modifier.Type.PERCENTAGE);
+    private static final Modifier bigMovementPenalty =
+        new Modifier("model.modifier.offence", "modifiers.movementPenalty",
+                     -66, Modifier.Type.PERCENTAGE);
+    private static final Modifier artilleryPenalty =
+        new Modifier("model.modifier.offence", "modifiers.artilleryPenalty",
+                     -75, Modifier.Type.PERCENTAGE);
 
     public SimpleCombatModel(PseudoRandom pseudoRandom) {
         this.random = pseudoRandom;
@@ -226,11 +235,9 @@ public class SimpleCombatModel implements CombatModel {
             // movement penalty
             int movesLeft = attacker.getMovesLeft();
             if (movesLeft == 1) {
-                result.add(new Modifier("model.modifier.offence",
-                                        "modifiers.movementPenalty", -66, Modifier.Type.PERCENTAGE));
+                result.add(bigMovementPenalty);
             } else if (movesLeft == 2) {
-                result.add(new Modifier("model.modifier.offence",
-                                        "modifiers.movementPenalty", -33, Modifier.Type.PERCENTAGE));
+                result.add(smallMovementPenalty);
             }
 
             // In the open
@@ -251,9 +258,7 @@ public class SimpleCombatModel implements CombatModel {
                 // 75% Artillery in the open penalty
                 // TODO: is it right? or should it be another ability?
                 if (attacker.hasAbility("model.ability.bombard")) {
-                    result.add(new Modifier("model.modifier.offence",
-                                            "modifiers.artilleryPenalty",
-                                            -75, Modifier.Type.PERCENTAGE));
+                    result.add(artilleryPenalty);
                 }
             }
 
@@ -371,7 +376,8 @@ public class SimpleCombatModel implements CombatModel {
             }
 
             if (defender.getTile() != null && defender.getTile().getSettlement() != null) {
-                result.add(getSettlementModifier(attacker, defender.getTile().getSettlement()));
+                result.addAll(defender.getTile().getSettlement().getFeatureContainer()
+                              .getModifierSet("model.modifier.defence"));
                 // TODO: is it right? or should it be another ability?
                 if (defender.hasAbility("model.ability.bombard") &&
                     attacker.getOwner().isIndian()) {
@@ -394,9 +400,7 @@ public class SimpleCombatModel implements CombatModel {
                 if (defender.hasAbility("model.ability.bombard") &&
                     defender.getState() != UnitState.FORTIFIED) {
                     // -75% Artillery in the Open penalty
-                    result.add(new Modifier("model.modifier.defence", 
-                                            "modifiers.artilleryPenalty",
-                                            -75, Modifier.Type.PERCENTAGE));
+                    result.add(artilleryPenalty);
                 }
             }
 

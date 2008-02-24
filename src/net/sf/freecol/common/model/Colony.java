@@ -91,11 +91,6 @@ public final class Colony extends Settlement implements Location, Nameable {
 
     private int defenceBonus;
 
-    /**
-     * Contains the abilities and modifiers of this Colony.
-     */
-    private final FeatureContainer featureContainer = new FeatureContainer();
-
    /**
      * A list of Buildable items, which is NEVER empty.
      */
@@ -145,20 +140,6 @@ public final class Colony extends Settlement implements Location, Nameable {
     }
 
     /**
-     * Returns <code>true</code> if a building of the given type can
-     * be built for free.
-     *
-     * @param buildingType a <code>BuildingType</code> value
-     * @return a <code>boolean</code> value
-     */
-    private boolean isFree(BuildingType buildingType) {
-        return (owner.getFeatureContainer()
-                .applyModifier(100f, "model.modifier.buildingPriceBonus",
-                               buildingType, getGame().getTurn()) == 0f);
-    }
-
-
-    /**
      * Initiates a new <code>Colony</code> from an XML representation.
      * 
      * @param game The <code>Game</code> this object belongs to.
@@ -192,6 +173,19 @@ public final class Colony extends Settlement implements Location, Nameable {
      */
     public Colony(Game game, String id) {
         super(game, id);
+    }
+
+    /**
+     * Returns <code>true</code> if a building of the given type can
+     * be built for free.
+     *
+     * @param buildingType a <code>BuildingType</code> value
+     * @return a <code>boolean</code> value
+     */
+    private boolean isFree(BuildingType buildingType) {
+        return (owner.getFeatureContainer()
+                .applyModifier(100f, "model.modifier.buildingPriceBonus",
+                               buildingType, getGame().getTurn()) == 0f);
     }
 
     /**
@@ -1693,6 +1687,7 @@ public final class Colony extends Settlement implements Location, Nameable {
         setCurrentlyBuilding(buildableType);
         landLocked = getAttribute(in, "landLocked", true);
         unitCount = getAttribute(in, "unitCount", -1);
+        featureContainer.addModifier(Settlement.DEFENCE_MODIFIER);
         // Read child elements:
         while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
             if (in.getLocalName().equals(ColonyTile.getXMLElementTagName())) {
