@@ -1223,16 +1223,14 @@ public final class Colony extends Settlement implements Location, Nameable {
             }
         }
 
-        if (goodsType == Goods.TOOLS) {
-            BuildableType currentlyBuilding = getCurrentlyBuilding();
-            if (currentlyBuilding != BuildingType.NOTHING) {
-                for (AbstractGoods goods : currentlyBuilding.getGoodsRequired()) {
-                    if (goods.getType() == Goods.TOOLS && amount < goods.getAmount()) {
-                        result.add(Messages.message("model.colony.buildableNeedsGoods",
-                                "%colony%", getName(),
-                                "%buildable%", currentlyBuilding.getName(),
-                                "%goodsType%", goodsType.getName()));
-                    }
+        BuildableType currentlyBuilding = getCurrentlyBuilding();
+        if (currentlyBuilding != BuildingType.NOTHING) {
+            for (AbstractGoods goods : currentlyBuilding.getGoodsRequired()) {
+                if (goods.getType().equals(goodsType) && amount < goods.getAmount()) {
+                    result.add(Messages.message("model.colony.buildableNeedsGoods",
+                                                "%colony%", getName(),
+                                                "%buildable%", currentlyBuilding.getName(),
+                                                "%goodsType%", goodsType.getName()));
                 }
             }
         }
