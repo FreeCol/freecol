@@ -591,11 +591,12 @@ public final class UnitType extends BuildableType {
 
         while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
             String nodeName = in.getLocalName();
-            if ("ability".equals(nodeName)) {
-                String abilityId = in.getAttributeValue(null, "id");
-                boolean value = getAttribute(in, "value", true);
-                addAbility(new Ability(abilityId, value));
-                in.nextTag(); // close this element
+            if (Ability.getXMLElementTagName().equals(nodeName)) {
+                Ability ability = new Ability(in);
+                if (ability.getSource() == null) {
+                    ability.setSource(getNameKey());
+                }
+                addAbility(ability); // Ability close the element
             } else if ("required-ability".equals(nodeName)) {
                 String abilityId = in.getAttributeValue(null, "id");
                 boolean value = getAttribute(in, "value", true);
@@ -638,7 +639,7 @@ public final class UnitType extends BuildableType {
             } else if (Modifier.getXMLElementTagName().equals(nodeName)) {
                 Modifier modifier = new Modifier(in); // Modifier close the element
                 if (modifier.getSource() == null) {
-                    modifier.setSource(this.getId());
+                    modifier.setSource(getNameKey());
                 }
                 addModifier(modifier);
             } else {

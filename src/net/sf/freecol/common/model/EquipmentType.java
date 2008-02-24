@@ -207,10 +207,11 @@ public class EquipmentType extends FreeColGameObjectType {
         while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
             String nodeName = in.getLocalName();
             if (Ability.getXMLElementTagName().equals(nodeName)) {
-                String abilityId = in.getAttributeValue(null, "id");
-                boolean value = getAttribute(in, "value", true);
-                addAbility(new Ability(abilityId, value));
-                in.nextTag(); // close this element
+                Ability ability = new Ability(in);
+                if (ability.getSource() == null) {
+                    ability.setSource(getNameKey());
+                }
+                addAbility(ability);
             } else if ("required-ability".equals(nodeName)) {
                 String abilityId = in.getAttributeValue(null, "id");
                 boolean value = getAttribute(in, "value", true);
@@ -237,7 +238,7 @@ public class EquipmentType extends FreeColGameObjectType {
             } else if (Modifier.getXMLElementTagName().equals(nodeName)) {
                 Modifier modifier = new Modifier(in); // Modifier close the element
                 if (modifier.getSource() == null) {
-                    modifier.setSource(this.getId());
+                    modifier.setSource(getNameKey());
                 }
                 addModifier(modifier);
             } else {

@@ -63,8 +63,12 @@ public abstract class FreeColGameObjectType extends FreeColObject {
         return index;
     }
 
+    public final String getNameKey() {
+        return getId() + ".name";
+    }
+
     public final String getName() {
-        return Messages.message(getId() + ".name");
+        return Messages.message(getNameKey());
     }
 
     public final String getDescription() {

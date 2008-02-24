@@ -337,7 +337,7 @@ public final class TileImprovementType extends FreeColGameObjectType
             } else if (Modifier.getXMLElementTagName().equals(childName)) {
                 Modifier modifier = new Modifier(in);
                 if (modifier.getSource() == null) {
-                    modifier.setSource(this.getId());
+                    modifier.setSource(getNameKey());
                 }
                 modifiers.put(modifier.getId(), modifier);
             } else if ("change".equals(childName)) {

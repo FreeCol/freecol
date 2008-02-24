@@ -233,13 +233,13 @@ public class FoundingFather extends FreeColGameObjectType {
             if (Ability.getXMLElementTagName().equals(childName)) {
                 Ability ability = new Ability(in);
                 if (ability.getSource() == null) {
-                    ability.setSource(this.getId());
+                    ability.setSource(getNameKey());
                 }
                 addAbility(ability);
             } else if (Modifier.getXMLElementTagName().equals(childName)) {
                 Modifier modifier = new Modifier(in);
                 if (modifier.getSource() == null) {
-                    modifier.setSource(this.getId());
+                    modifier.setSource(getNameKey());
                 }
                 addModifier(modifier); // close this element
             } else if ("event".equals(childName)) {

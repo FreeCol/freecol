@@ -256,9 +256,12 @@ public final class TileType extends FreeColGameObjectType {
                 altitude[0] = getAttribute(in, "altitudeMin", 0);
                 altitude[1] = getAttribute(in, "altitudeMax", 0);
                 in.nextTag(); // close this element
-            } else if ("modifier".equals(childName)) {
+            } else if (Modifier.getXMLElementTagName().equals(childName)) {
                 Modifier modifier = new Modifier(in);
-                addModifier(modifier); // close this element
+                if (modifier.getSource() == null) {
+                    modifier.setSource(getNameKey());
+                }
+                addModifier(modifier); // Modifier close the element
             } else if ("production".equals(childName)) {
                 GoodsType type = specification.getGoodsType(in.getAttributeValue(null, "goods-type"));
                 int amount = Integer.parseInt(in.getAttributeValue(null, "value"));

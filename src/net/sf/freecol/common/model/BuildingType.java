@@ -136,7 +136,7 @@ public final class BuildingType extends BuildableType {
             if (Ability.getXMLElementTagName().equals(childName)) {
                 Ability ability = new Ability(in);
                 if (ability.getSource() == null) {
-                    ability.setSource(this.getId());
+                    ability.setSource(getNameKey());
                 }
                 addAbility(ability); // Ability close the element
             } else if ("required-population".equals(childName)) {
@@ -159,7 +159,7 @@ public final class BuildingType extends BuildableType {
             } else if (Modifier.getXMLElementTagName().equals(childName)) {
                 Modifier modifier = new Modifier(in);
                 if (modifier.getSource() == null) {
-                    modifier.setSource(this.getId());
+                    modifier.setSource(getNameKey());
                 }
                 addModifier(modifier); // Modifier close the element
             } else {
