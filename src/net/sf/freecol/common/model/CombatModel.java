@@ -19,7 +19,7 @@
 
 package net.sf.freecol.common.model;
 
-import java.util.List;
+import java.util.Set;
 
 public interface CombatModel {
 
@@ -99,7 +99,7 @@ public interface CombatModel {
      * @param defender an <code>Unit</code> value
      * @return a <code>List</code> of Modifiers
      */
-    public List<Modifier> getOffensiveModifiers(Colony colony, Unit defender);
+    public Set<Modifier> getOffensiveModifiers(Colony colony, Unit defender);
 
     /**
      * Return a list of all offensive modifiers that apply to the attacker
@@ -109,7 +109,7 @@ public interface CombatModel {
      * @param defender an <code>Unit</code> value
      * @return a <code>List</code> of Modifiers
      */
-    public List<Modifier> getOffensiveModifiers(Unit attacker, Unit defender);
+    public Set<Modifier> getOffensiveModifiers(Unit attacker, Unit defender);
 
     /**
      * Return a list of all defensive modifiers that apply to the defender
@@ -119,7 +119,7 @@ public interface CombatModel {
      * @param defender an <code>Unit</code> value
      * @return a <code>List</code> of Modifiers
      */
-    public List<Modifier> getDefensiveModifiers(Unit attacker, Unit defender);
+    public Set<Modifier> getDefensiveModifiers(Unit attacker, Unit defender);
 
     /**
      * Return a list of all defensive modifiers that apply to the defender
@@ -129,7 +129,7 @@ public interface CombatModel {
      * @param defender an <code>Unit</code> value
      * @return a <code>List</code> of Modifiers
      */
-    public List<Modifier> getDefensiveModifiers(Colony colony, Unit defender);
+    public Set<Modifier> getDefensiveModifiers(Colony colony, Unit defender);
 
     /**
      * Return the defensive modifier that applies to defenders in the given

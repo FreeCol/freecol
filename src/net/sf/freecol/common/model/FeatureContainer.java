@@ -244,8 +244,13 @@ public class FeatureContainer {
         if (modifierSet == null) {
             return number;
         }
+        float additive = 0, percentage = 0, multiplicative = 1;
         for (Modifier modifier : modifierSet) {
             float value = modifier.getValue();
+            if (value == Float.MIN_VALUE) {
+                // special case: unknown value
+                return Float.MIN_VALUE;
+            }
             if (modifier.hasIncrement() && turn != null) {
                 int diff = turn.getNumber() - modifier.getFirstTurn().getNumber();
                 switch(modifier.getIncrementType()) {
@@ -262,17 +267,21 @@ public class FeatureContainer {
             }
             switch(modifier.getType()) {
             case ADDITIVE:
-                number += value;
+                additive += value;
                 break;
             case MULTIPLICATIVE:
-                number *= value;
+                multiplicative *= value;
                 break;
             case PERCENTAGE:
-                number += (number * value) / 100;
+                percentage += value;
                 break;
             }
         }
-        return number;
+        float result = number;
+        result += additive;
+        result *= multiplicative;
+        result += (result * percentage) / 100;
+        return result;
     }
 
 

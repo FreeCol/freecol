@@ -33,7 +33,9 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.io.File;
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.logging.Logger;
 
 import javax.swing.AbstractAction;
@@ -55,6 +57,7 @@ import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.CombatModel;
+import net.sf.freecol.common.model.FeatureContainer;
 import net.sf.freecol.common.model.IndianSettlement;
 import net.sf.freecol.common.model.Modifier;
 import net.sf.freecol.common.model.Player;
@@ -326,13 +329,13 @@ public class FreeColDialog extends FreeColPanel {
                                                       Settlement settlement, Canvas parent) {
 
         CombatModel combatModel = attacker.getGame().getCombatModel();
-        List<Modifier> offense = combatModel.getOffensiveModifiers(attacker, defender);
-        List<Modifier> defense = new ArrayList<Modifier>();
+        Set<Modifier> offense = combatModel.getOffensiveModifiers(attacker, defender);
+        Set<Modifier> defense;
         if (defender == null && settlement != null) {
+            defense = new LinkedHashSet<Modifier>();
             Modifier settlementModifier = combatModel.getSettlementModifier(attacker, settlement);
             defense.add(new Modifier("modifiers.baseDefense", Float.MIN_VALUE, Modifier.Type.ADDITIVE));
             defense.add(settlementModifier);
-            defense.add(new Modifier("modifiers.finalResult", Float.MIN_VALUE, Modifier.Type.ADDITIVE));
         } else {
             defense = combatModel.getDefensiveModifiers(attacker, defender);
         }
@@ -387,7 +390,7 @@ public class FreeColDialog extends FreeColPanel {
             }
         });
 
-        Modifier modifier;
+        //Modifier modifier;
         int row = 1;
 
         // left hand side: attacker
@@ -400,18 +403,28 @@ public class FreeColDialog extends FreeColPanel {
         preCombatDialog.add(new UnitLabel(attacker, parent, false, true),
                             higConst.rcwh(row, offenseLabelColumn, 3, 1));
         row += 2;
-        for (int index = 0; index < offense.size() - 1; index++) {
-            modifier = offense.get(index);
+        for (Modifier modifier : offense) {
             preCombatDialog.add(new JLabel(Messages.message(modifier.getId())), 
                                 higConst.rc(row, offenseLabelColumn));
-            String value = String.valueOf(modifier.getValue());
-            if (modifier.getType() == Modifier.Type.PERCENTAGE) {
+            String bonus = String.valueOf(modifier.getValue());
+            switch(modifier.getType()) {
+            case ADDITIVE:
                 if (modifier.getValue() > 0) {
-                    value = "+" + value;
+                    bonus = "+" + bonus;
+                }
+                break;
+            case PERCENTAGE:
+                if (modifier.getValue() > 0) {
+                    bonus = "+" + bonus;
                 }
                 preCombatDialog.add(new JLabel("%"), higConst.rc(row, offensePercentageColumn));
+                break;
+            case MULTIPLICATIVE:
+                bonus = "\u00D7" + bonus;
+                break;
+            default:
             }                
-            preCombatDialog.add(new JLabel(value), higConst.rc(row, offenseValueColumn, "r"));
+            preCombatDialog.add(new JLabel(bonus), higConst.rc(row, offenseValueColumn, "r"));
             row += 2;
         }
         int finalResultRow = row;
@@ -444,20 +457,31 @@ public class FreeColDialog extends FreeColPanel {
             row += 2;
         }
 
-        for (int index = 0; index < defense.size() - 1; index++) {
-            modifier = defense.get(index);
+        for (Modifier modifier : defense) {
             preCombatDialog.add(new JLabel(Messages.message(modifier.getId())), 
                                 higConst.rc(row, defenseLabelColumn));
-            String value = String.valueOf(modifier.getValue());
+            String bonus = String.valueOf(modifier.getValue());
             if (modifier.getValue() == Float.MIN_VALUE) {
-                value = "?";
-            } else if (modifier.getType() == Modifier.Type.PERCENTAGE) {
+                bonus = "???";
+            }
+            switch(modifier.getType()) {
+            case ADDITIVE:
                 if (modifier.getValue() > 0) {
-                    value = "+" + value;
+                    bonus = "+" + bonus;
                 }
-                preCombatDialog.add(new JLabel("%"), higConst.rc(row, defensePercentageColumn));
+                break;
+            case PERCENTAGE:
+                if (modifier.getValue() > 0) {
+                    bonus = "+" + bonus;
+                }
+                preCombatDialog.add(new JLabel("%"), higConst.rc(row, offensePercentageColumn));
+                break;
+            case MULTIPLICATIVE:
+                bonus = "\u00D7" + bonus;
+                break;
+            default:
             }                
-            preCombatDialog.add(new JLabel(value), higConst.rc(row, defenseValueColumn, "r"));
+            preCombatDialog.add(new JLabel(bonus), higConst.rc(row, defenseValueColumn, "r"));
             row += 2;
         }
         if (row < finalResultRow) {
@@ -465,24 +489,25 @@ public class FreeColDialog extends FreeColPanel {
         }
 
         Font bigFont = preCombatDialog.getFont().deriveFont(Font.BOLD, 20f);
-        modifier = offense.get(offense.size() - 1);
-        JLabel finalOffenseLabel = new JLabel(Messages.message(modifier.getId()));
+
+        float offenseResult = FeatureContainer.applyModifierSet(0, attacker.getGame().getTurn(), offense);
+        JLabel finalOffenseLabel = new JLabel(Messages.message("modifiers.finalResult"));
         finalOffenseLabel.setFont(bigFont);
         preCombatDialog.add(finalOffenseLabel,
                             higConst.rc(row, offenseLabelColumn));
-        JLabel finalOffenseResult = new JLabel(String.valueOf(modifier.getValue()));
+        JLabel finalOffenseResult = new JLabel(String.valueOf(offenseResult));
         finalOffenseResult.setFont(bigFont);
         preCombatDialog.add(finalOffenseResult,
                             higConst.rc(row, offenseValueColumn, "r"));
 
-        modifier = defense.get(defense.size() - 1);
-        JLabel finalDefenseLabel = new JLabel(Messages.message(modifier.getId()));
+        float defenseResult = FeatureContainer.applyModifierSet(0, attacker.getGame().getTurn(), defense);
+        JLabel finalDefenseLabel = new JLabel(Messages.message("modifiers.finalResult"));
         finalDefenseLabel.setFont(bigFont);
         preCombatDialog.add(finalDefenseLabel,
                             higConst.rc(row, defenseLabelColumn));
-        JLabel finalDefenseResult = new JLabel(String.valueOf(modifier.getValue()));
-        if (modifier.getValue() == Float.MIN_VALUE) {
-            finalDefenseResult.setText("?");
+        JLabel finalDefenseResult = new JLabel(String.valueOf(defenseResult));
+        if (defenseResult == Float.MIN_VALUE) {
+            finalDefenseResult.setText("???");
         }
         finalDefenseResult.setFont(bigFont);
         preCombatDialog.add(finalDefenseResult,

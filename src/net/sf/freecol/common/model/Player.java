@@ -1120,7 +1120,7 @@ public class Player extends FreeColGameObject implements Nameable {
      *         independence.
      */
     public boolean canBuildColonies() {
-        return featureContainer.hasAbility("model.ability.foundColony");
+        return nationType.hasAbility("model.ability.foundColony");
     }
 
     /**
@@ -1131,7 +1131,7 @@ public class Player extends FreeColGameObject implements Nameable {
      *         independence.
      */
     public boolean canHaveFoundingFathers() {
-        return featureContainer.hasAbility("model.ability.electFoundingFather");
+        return nationType.hasAbility("model.ability.electFoundingFather");
     }
 
     /**

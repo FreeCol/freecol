@@ -20,6 +20,8 @@
 package net.sf.freecol.common.model;
 
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.logging.Logger;
@@ -156,8 +158,8 @@ public class SimpleCombatModel implements CombatModel {
      * @return a <code>float</code> value
      */
     public float getOffencePower(Unit attacker, Unit defender) {
-        List<Modifier> modifiers = getOffensiveModifiers(attacker, defender);
-        return modifiers.get(modifiers.size() - 1).getValue();
+        return FeatureContainer.applyModifierSet(0, attacker.getGame().getTurn(),
+                                                 getOffensiveModifiers(attacker, defender));
     }
 
     /**
@@ -168,8 +170,8 @@ public class SimpleCombatModel implements CombatModel {
      * @param defender an <code>Unit</code> value
      * @return a <code>List</code> of Modifiers
      */
-    public List<Modifier> getOffensiveModifiers(Colony colony, Unit defender) {
-        ArrayList<Modifier> result = new ArrayList<Modifier>();
+    public Set<Modifier> getOffensiveModifiers(Colony colony, Unit defender) {
+        Set<Modifier> result = new HashSet<Modifier>();
         result.add(new Modifier("model.modifier.bombardModifier", 
                                 getOffencePower(colony, defender),
                                 Modifier.Type.ADDITIVE));
@@ -184,8 +186,8 @@ public class SimpleCombatModel implements CombatModel {
      * @param defender an <code>Unit</code> value
      * @return a <code>List</code> of Modifiers
      */
-    public List<Modifier> getOffensiveModifiers(Unit attacker, Unit defender) {
-        ArrayList<Modifier> result = new ArrayList<Modifier>();
+    public Set<Modifier> getOffensiveModifiers(Unit attacker, Unit defender) {
+        Set<Modifier> result = new LinkedHashSet<Modifier>();
 
         result.add(new Modifier("model.modifier.offence",
                                 "modifiers.baseOffense",
@@ -285,8 +287,8 @@ public class SimpleCombatModel implements CombatModel {
      * @return an <code>float</code> value
      */
     public float getDefencePower(Unit attacker, Unit defender) {
-        List<Modifier> modifiers = getDefensiveModifiers(attacker, defender);
-        return modifiers.get(modifiers.size() - 1).getValue();
+        return FeatureContainer.applyModifierSet(0, attacker.getGame().getTurn(),
+                                                 getDefensiveModifiers(attacker, defender));
     }
 
     /**
@@ -297,8 +299,8 @@ public class SimpleCombatModel implements CombatModel {
      * @param defender an <code>Unit</code> value
      * @return a <code>List</code> of Modifiers
      */
-    public List<Modifier> getDefensiveModifiers(Colony colony, Unit defender) {
-        ArrayList<Modifier> result = new ArrayList<Modifier>();
+    public Set<Modifier> getDefensiveModifiers(Colony colony, Unit defender) {
+        Set<Modifier> result = new LinkedHashSet<Modifier>();
         result.add(new Modifier("model.modifier.defenceBonus",
                                 defender.getType().getDefence(),
                                 Modifier.Type.ADDITIVE));
@@ -313,9 +315,9 @@ public class SimpleCombatModel implements CombatModel {
      * @param defender an <code>Unit</code> value
      * @return a <code>List</code> of Modifiers
      */
-    public List<Modifier> getDefensiveModifiers(Unit attacker, Unit defender) {
+    public Set<Modifier> getDefensiveModifiers(Unit attacker, Unit defender) {
 
-        ArrayList<Modifier> result = new ArrayList<Modifier>();
+        Set<Modifier> result = new LinkedHashSet<Modifier>();
         if (defender == null) {
             return result;
         }

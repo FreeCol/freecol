@@ -3239,11 +3239,11 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
      * Removes all references to this object.
      */
     public void dispose() {
-        if (hasAbility("model.ability.carryUnits")) {
+        if (unitType.hasAbility("model.ability.carryUnits")) {
             unitContainer.dispose();
         }
 
-        if (hasAbility("model.ability.carryGoods")) {
+        if (unitType.hasAbility("model.ability.carryGoods")) {
             goodsContainer.dispose();
         }
 
