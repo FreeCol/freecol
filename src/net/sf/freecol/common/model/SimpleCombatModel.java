@@ -52,6 +52,15 @@ public class SimpleCombatModel implements CombatModel {
     private static final Modifier artilleryPenalty =
         new Modifier("model.modifier.offence", "modifiers.artilleryPenalty",
                      -75, Modifier.Type.PERCENTAGE);
+    private static final Modifier attackBonus =
+        new Modifier("model.modifier.offence", "modifiers.attackBonus",
+                     50, Modifier.Type.PERCENTAGE);
+    private static final Modifier fortificationBonus =
+        new Modifier("model.modifier.defence", "modifiers.fortified",
+                     50, Modifier.Type.PERCENTAGE);
+    private static final Modifier indianRaidBonus =
+        new Modifier("model.modifier.defence", "modifiers.artilleryAgainstRaid",
+                     100, Modifier.Type.PERCENTAGE);
 
     public SimpleCombatModel(PseudoRandom pseudoRandom) {
         this.random = pseudoRandom;
@@ -214,11 +223,7 @@ public class SimpleCombatModel implements CombatModel {
                                         Modifier.Type.PERCENTAGE));
             }
             if (attacker.hasAbility("model.ability.piracy")) {
-                Set<Modifier> piracyBonus = attacker.getModifierSet("model.modifier.piracyBonus");
-                if (piracyBonus != null) {
-                    // Drake grants 50% power bonus (in colonization gives for attack and defence)
-                    result.addAll(piracyBonus);
-                }
+                result.addAll(attacker.getModifierSet("model.modifier.piracyBonus"));
             }
         } else {
             for (EquipmentType equipment : attacker.getEquipment()) {
@@ -228,10 +233,7 @@ public class SimpleCombatModel implements CombatModel {
                           .getModifierSet("model.modifier.offence"));
 
             // 50% attack bonus
-            result.add(new Modifier("model.modifier.offence",
-                                    "modifiers.attackBonus",
-                                    50, Modifier.Type.PERCENTAGE));
-
+            result.add(attackBonus);
             // movement penalty
             int movesLeft = attacker.getMovesLeft();
             if (movesLeft == 1) {
@@ -351,14 +353,15 @@ public class SimpleCombatModel implements CombatModel {
             // for unarmed colonists inside colonies where there are muskets
             // available.
             if (!defender.isArmed() &&
-                defender.getOwner().hasAbility("model.ability.automaticDefence") &&
                 defender.isColonist() &&
-                defender.getLocation() instanceof WorkLocation) {
-                Colony colony = ((WorkLocation) defender.getLocation()).getColony();
-                if (colony.getGoodsCount(Goods.MUSKETS) >= 50) {
-                    result.add(new Modifier("model.modifier.defence", "modifiers.paulRevere",
-                                            1, Modifier.Type.ADDITIVE));
-                }
+                defender.getLocation() instanceof WorkLocation &&
+                defender.getOwner().hasAbility("model.ability.automaticDefence") &&
+                defender.getColony().getGoodsCount(Goods.MUSKETS) >= 50) {
+                Set<Ability> autoDefence = defender.getOwner().getFeatureContainer()
+                    .getAbilitySet("model.ability.automaticDefence");
+                result.add(new Modifier("model.modifier.defence", 
+                                        autoDefence.iterator().next().getSource(),
+                                        1, Modifier.Type.ADDITIVE));
             }
 
             for (EquipmentType equipment : attacker.getEquipment()) {
@@ -370,9 +373,7 @@ public class SimpleCombatModel implements CombatModel {
 
             // 50% fortify bonus
             if (defender.getState() == UnitState.FORTIFIED) {
-                result.add(new Modifier("model.modifier.defence", 
-                                        "modifiers.fortified",
-                                        50, Modifier.Type.PERCENTAGE));
+                result.add(fortificationBonus);
             }
 
             if (defender.getTile() != null && defender.getTile().getSettlement() != null) {
@@ -382,9 +383,7 @@ public class SimpleCombatModel implements CombatModel {
                 if (defender.hasAbility("model.ability.bombard") &&
                     attacker.getOwner().isIndian()) {
                     // 100% defence bonus against an Indian raid
-                    result.add(new Modifier("model.modifier.defence", 
-                                            "modifiers.artilleryAgainstRaid",
-                                            100, Modifier.Type.PERCENTAGE));
+                    result.add(indianRaidBonus);
                 }
             } else if (defender.getTile() != null) {
                 // In the open
@@ -406,36 +405,6 @@ public class SimpleCombatModel implements CombatModel {
 
         }
         return result;
-    }
-
-    /**
-     * Return the defensive modifier that applies to defenders in the given
-     * settlement versus the attacker.
-     * 
-     * @param attacker an <code>Unit</code> value
-     * @param settlement a <code>Settlement</code> value
-     * @return a <code>Modifier</code>
-     */
-    public Modifier getSettlementModifier(Unit attacker, Settlement settlement) {
-
-        if (settlement instanceof Colony) {
-            // Colony defensive bonus.
-            Colony colony = (Colony) settlement;
-            Building stockade = colony.getStockade();
-            if (stockade == null) {
-                // 50% colony bonus
-                return new Modifier("modifiers.inColony", 50, Modifier.Type.PERCENTAGE);
-            } else {
-                String modifier = stockade.getType().getId();
-                modifier = "modifiers." + modifier.substring(modifier.lastIndexOf(".") + 1);
-                return new Modifier(modifier, colony.getDefenceBonus(), Modifier.Type.PERCENTAGE);
-            }
-        } else if (settlement instanceof IndianSettlement) {
-            // Indian settlement defensive bonus.
-            return new Modifier("modifiers.inSettlement", 50, Modifier.Type.PERCENTAGE);
-        } else {
-            return new Modifier(null, 0, Modifier.Type.PERCENTAGE);
-        }
     }
 
     /**
@@ -502,7 +471,7 @@ public class SimpleCombatModel implements CombatModel {
             if (attacker.isNaval()) {
                 Location repairLocation = attackingPlayer.getRepairLocation(attacker);
                 damageShip(attacker, null);
-                attacker.addModelMessage(attacker, "model.unit.damageShip",
+                attacker.addModelMessage(attacker, "model.unit.shipDamaged",
                                          new String[][] {
                                              { "%unit%", attacker.getName() },
                                              { "%repairLocation%", repairLocation.getLocationName() },
@@ -597,7 +566,7 @@ public class SimpleCombatModel implements CombatModel {
                                              { "%enemyUnit%", defender.getName() },
                                              { "%enemyNation%", defendingPlayer.getNationAsString() }
                                          }, ModelMessage.COMBAT_RESULT);
-                defender.addModelMessage(defender, "model.unit.sinkShip",
+                defender.addModelMessage(defender, "model.unit.shipSunk",
                                          new String[][] {
                                              { "%unit%", defender.getName() },
                                              { "%enemyUnit%", attacker.getName() },

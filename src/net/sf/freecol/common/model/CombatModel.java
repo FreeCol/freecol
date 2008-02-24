@@ -132,16 +132,6 @@ public interface CombatModel {
     public Set<Modifier> getDefensiveModifiers(Colony colony, Unit defender);
 
     /**
-     * Return the defensive modifier that applies to defenders in the given
-     * settlement versus the attacker.
-     * 
-     * @param attacker an <code>Unit</code> value
-     * @param settlement a <code>Settlement</code> value
-     * @return a <code>Modifier</code>
-     */
-    public Modifier getSettlementModifier(Unit attacker, Settlement settlement);
-
-    /**
      * Attack a unit with the given outcome.
      * 
      * @param attacker an <code>Unit</code> value
