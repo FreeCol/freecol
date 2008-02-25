@@ -36,7 +36,7 @@ public class AllTests {
 	suite.addTestSuite(GoodsTest.class);
 	suite.addTestSuite(MapTest.class);
 	suite.addTestSuite(ModelMessageTest.class);
-	//suite.addTestSuite(ModifierTest.class);
+	suite.addTestSuite(ModifierTest.class);
 	suite.addTestSuite(MonarchTest.class);
 	suite.addTestSuite(NationTypeTest.class);
 	suite.addTestSuite(PlayerTest.class);
