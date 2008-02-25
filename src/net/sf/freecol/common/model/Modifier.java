@@ -113,34 +113,6 @@ public final class Modifier extends Feature {
     }
     
     /**
-     * Creates a new <code>Modifier</code> instance.
-     *
-     * @param modifier a <code>Modifier</code> value
-     */
-    public Modifier(Modifier modifier) {
-        copyValues(modifier);
-    }
-    
-    // -- Methods --
-
-    /**
-     * Copies the fields of the given Modifier into this one.
-     *
-     * @param modifier a <code>Modifier</code> value
-     */
-    private void copyValues(Modifier modifier) {
-        setId(modifier.getId());
-        setType(modifier.getType());
-        setSource(modifier.getSource());
-        setFirstTurn(modifier.getFirstTurn());
-        setLastTurn(modifier.getLastTurn());
-        setScopes(new ArrayList<Scope>(modifier.getScopes()));
-        value = modifier.value;
-        increment = modifier.increment;
-        incrementType = modifier.incrementType;
-    }
-    
-    /**
      * Get the <code>Type</code> value.
      *
      * @return an <code>Type</code> value
@@ -229,7 +201,8 @@ public final class Modifier extends Feature {
     }
 
     /**
-     * Applies this Modifier to a number.
+     * Applies this Modifier to a number. This method does not take
+     * scopes, increments or time limits into account.
      *
      * @param number a <code>float</code> value
      * @return a <code>float</code> value
@@ -245,18 +218,6 @@ public final class Modifier extends Feature {
         default:
             return number;
         }
-    }
-
-    public static float applyTo(float number, Modifier... modifiers) {
-        float result = number;
-        for (Modifier modifier : modifiers) {
-            number = modifier.applyTo(number);
-        }
-        return result;
-    }
-
-    public static float applyTo(float number, Set<Modifier> modifiers) {
-        return applyTo(number, modifiers.toArray(new Modifier[modifiers.size()]));
     }
 
     // -- Serialization --

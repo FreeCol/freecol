@@ -333,9 +333,9 @@ public class FreeColDialog extends FreeColPanel {
         Set<Modifier> defense;
         if (defender == null && settlement != null) {
             defense = new LinkedHashSet<Modifier>();
-            Modifier settlementModifier = combatModel.getSettlementModifier(attacker, settlement);
             defense.add(new Modifier("modifiers.baseDefense", Float.MIN_VALUE, Modifier.Type.ADDITIVE));
-            defense.add(settlementModifier);
+            defense.addAll(settlement.getFeatureContainer()
+                           .getModifierSet("model.modifier.defence", attacker.getType()));
         } else {
             defense = combatModel.getDefensiveModifiers(attacker, defender);
         }
