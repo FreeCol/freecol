@@ -208,7 +208,7 @@ public class SimpleCombatModel implements CombatModel {
         Set<Modifier> result = new LinkedHashSet<Modifier>();
 
         result.add(new Modifier("model.modifier.offence",
-                                "modifiers.baseOffense",
+                                "modifiers.baseOffence",
                                 attacker.getType().getOffence(),
                                 Modifier.Type.ADDITIVE));
 

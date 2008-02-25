@@ -341,7 +341,7 @@ public class FreeColDialog extends FreeColPanel {
         }
 
         int numberOfModifiers = Math.max(offense.size(), defense.size());
-        int extraRows = 3; // title, icon, buttons
+        int extraRows = 4; // title, icon, result, buttons
         int numberOfRows = 2 * (numberOfModifiers + extraRows) - 1;
 
         int[] widths = {-6, 20, -8, 0, 40, -1, 20, -3, 0};
@@ -404,7 +404,13 @@ public class FreeColDialog extends FreeColPanel {
                             higConst.rcwh(row, offenseLabelColumn, 3, 1));
         row += 2;
         for (Modifier modifier : offense) {
-            preCombatDialog.add(new JLabel(Messages.message(modifier.getId())), 
+            String source = modifier.getSource();
+            if (source == null) {
+                source = "???";
+            } else {
+                source = Messages.message(source);
+            }
+            preCombatDialog.add(new JLabel(source),
                                 higConst.rc(row, offenseLabelColumn));
             String bonus = String.valueOf(modifier.getValue());
             switch(modifier.getType()) {
@@ -458,7 +464,13 @@ public class FreeColDialog extends FreeColPanel {
         }
 
         for (Modifier modifier : defense) {
-            preCombatDialog.add(new JLabel(Messages.message(modifier.getId())), 
+            String source = modifier.getSource();
+            if (source == null) {
+                source = "???";
+            } else {
+                source = Messages.message(source);
+            }
+            preCombatDialog.add(new JLabel(source),
                                 higConst.rc(row, defenseLabelColumn));
             String bonus = String.valueOf(modifier.getValue());
             if (modifier.getValue() == Float.MIN_VALUE) {
