@@ -44,22 +44,22 @@ public class SimpleCombatModel implements CombatModel {
 
     private static PseudoRandom random;
 
-    private static final Modifier smallMovementPenalty =
+    public static final Modifier SMALL_MOVEMENT_PENALTY =
         new Modifier("model.modifier.offence", "modifiers.movementPenalty",
                      -33, Modifier.Type.PERCENTAGE);
-    private static final Modifier bigMovementPenalty =
+    public static final Modifier BIG_MOVEMENT_PENALTY =
         new Modifier("model.modifier.offence", "modifiers.movementPenalty",
                      -66, Modifier.Type.PERCENTAGE);
-    private static final Modifier artilleryPenalty =
-        new Modifier("model.modifier.offence", "modifiers.artilleryPenalty",
+    public static final Modifier ARTILLERY_PENALTY =
+        new Modifier("model.modifier.offence", "modifiers.ARTILLERY_PENALTY",
                      -75, Modifier.Type.PERCENTAGE);
-    private static final Modifier attackBonus =
-        new Modifier("model.modifier.offence", "modifiers.attackBonus",
+    public static final Modifier ATTACK_BONUS =
+        new Modifier("model.modifier.offence", "modifiers.ATTACK_BONUS",
                      50, Modifier.Type.PERCENTAGE);
-    private static final Modifier fortificationBonus =
+    public static final Modifier FORTIFICATION_BONUS =
         new Modifier("model.modifier.defence", "modifiers.fortified",
                      50, Modifier.Type.PERCENTAGE);
-    private static final Modifier indianRaidBonus =
+    public static final Modifier INDIAN_RAID_BONUS =
         new Modifier("model.modifier.defence", "modifiers.artilleryAgainstRaid",
                      100, Modifier.Type.PERCENTAGE);
 
@@ -237,13 +237,13 @@ public class SimpleCombatModel implements CombatModel {
                           .getModifierSet("model.modifier.offence"));
 
             // 50% attack bonus
-            result.add(attackBonus);
+            result.add(ATTACK_BONUS);
             // movement penalty
             int movesLeft = attacker.getMovesLeft();
             if (movesLeft == 1) {
-                result.add(bigMovementPenalty);
+                result.add(BIG_MOVEMENT_PENALTY);
             } else if (movesLeft == 2) {
-                result.add(smallMovementPenalty);
+                result.add(SMALL_MOVEMENT_PENALTY);
             }
 
             // In the open
@@ -264,7 +264,7 @@ public class SimpleCombatModel implements CombatModel {
                 // 75% Artillery in the open penalty
                 // TODO: is it right? or should it be another ability?
                 if (attacker.hasAbility("model.ability.bombard")) {
-                    result.add(artilleryPenalty);
+                    result.add(ARTILLERY_PENALTY);
                 }
             }
 
@@ -380,7 +380,7 @@ public class SimpleCombatModel implements CombatModel {
 
             // 50% fortify bonus
             if (defender.getState() == UnitState.FORTIFIED) {
-                result.add(fortificationBonus);
+                result.add(FORTIFICATION_BONUS);
             }
 
             if (defender.getTile() != null && defender.getTile().getSettlement() != null) {
@@ -390,7 +390,7 @@ public class SimpleCombatModel implements CombatModel {
                 if (defender.hasAbility("model.ability.bombard") &&
                     attacker.getOwner().isIndian()) {
                     // 100% defence bonus against an Indian raid
-                    result.add(indianRaidBonus);
+                    result.add(INDIAN_RAID_BONUS);
                 }
             } else if (defender.getTile() != null) {
                 // In the open
@@ -406,7 +406,7 @@ public class SimpleCombatModel implements CombatModel {
                 if (defender.hasAbility("model.ability.bombard") &&
                     defender.getState() != UnitState.FORTIFIED) {
                     // -75% Artillery in the Open penalty
-                    result.add(artilleryPenalty);
+                    result.add(ARTILLERY_PENALTY);
                 }
             }
 

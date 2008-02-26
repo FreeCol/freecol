@@ -30,6 +30,7 @@ public class AllTests {
 	suite.addTestSuite(AbstractUnitTest.class);
 	suite.addTestSuite(BuildingTest.class);
 	suite.addTestSuite(ColonyProductionTest.class);
+	suite.addTestSuite(CombatTest.class);
 	suite.addTestSuite(DemotionTest.class);
 	suite.addTestSuite(FoundingFatherTest.class);
 	suite.addTestSuite(GameTest.class);
