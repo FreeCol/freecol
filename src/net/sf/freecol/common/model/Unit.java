@@ -3152,53 +3152,6 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
     }
 
     /**
-     * Destroys an Indian settlement.
-     * 
-     * @param settlement The Indian settlement to destroy.
-     */
-    // TODO: shouldn't this be somewhere else?
-    public void destroySettlement(IndianSettlement settlement) {
-        Player enemy = settlement.getOwner();
-        boolean wasCapital = settlement.isCapital();
-        Tile newTile = settlement.getTile();
-        ModelController modelController = getGame().getModelController();
-        settlement.dispose();
-
-        enemy.modifyTension(getOwner(), Tension.TENSION_ADD_MAJOR);
-
-        List<UnitType> treasureUnitTypes = FreeCol.getSpecification().getUnitTypesWithAbility("model.ability.carryTreasure");
-        if (treasureUnitTypes.size() > 0) {
-            int randomTreasure = modelController.getRandom(getId() + "indianTreasureRandom" + getId(), 11);
-            int random = modelController.getRandom(getId() + "newUnitForTreasure" + getId(), treasureUnitTypes.size());
-            Unit tTrain = modelController.createUnit(getId() + "indianTreasure" + getId(), newTile, getOwner(),
-                                                     treasureUnitTypes.get(random));
-
-            // Larger treasure if Hernan Cortes is present in the congress:
-            Set<Modifier> modifierSet = getModifierSet("model.modifier.nativeTreasureModifier");
-            randomTreasure = (int) FeatureContainer.applyModifierSet(randomTreasure, getGame().getTurn(),
-                                                                     modifierSet);
-            SettlementType settlementType = ((IndianNationType) enemy.getNationType()).getTypeOfSettlement();
-            if (settlementType == SettlementType.INCA_CITY ||
-                settlementType == SettlementType.AZTEC_CITY) {
-                tTrain.setTreasureAmount(randomTreasure * 500 + 10000);
-            } else {
-                tTrain.setTreasureAmount(randomTreasure * 50  + 300);
-            }
-
-            // capitals give more gold
-            if (wasCapital) {
-                tTrain.setTreasureAmount((tTrain.getTreasureAmount() * 3) / 2);
-            }
-
-            addModelMessage(this, "model.unit.indianTreasure", new String[][] {
-                    { "%indian%", enemy.getNationAsString() },
-                    { "%amount%", Integer.toString(tTrain.getTreasureAmount()) }
-                }, ModelMessage.DEFAULT);
-        }
-        setLocation(newTile);
-    }
-
-    /**
      * Gets the Colony this unit is in.
      * 
      * @return The Colony it's in, or null if it is not in a Colony

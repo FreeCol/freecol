@@ -31,6 +31,7 @@ import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.PseudoRandom;
 import net.sf.freecol.common.model.CombatModel.CombatResult;
 import net.sf.freecol.common.model.Player.Stance;
+import net.sf.freecol.common.model.Settlement.SettlementType;
 import net.sf.freecol.common.model.Unit.UnitState;
 import net.sf.freecol.common.model.UnitType.DowngradeType;
 
@@ -222,9 +223,12 @@ public class SimpleCombatModel implements CombatModel {
                                         -12.5f * goodsCount,
                                         Modifier.Type.PERCENTAGE));
             }
+            /* this should no longer be necessary, as Drake adds an
+             * offence bonus directly
             if (attacker.hasAbility("model.ability.piracy")) {
                 result.addAll(attacker.getModifierSet("model.modifier.piracyBonus"));
             }
+            */
         } else {
             for (EquipmentType equipment : attacker.getEquipment()) {
                 result.addAll(equipment.getFeatureContainer().getModifierSet("model.modifier.offence"));
@@ -344,9 +348,12 @@ public class SimpleCombatModel implements CombatModel {
                                         -12.5f * goodsCount,
                                         Modifier.Type.PERCENTAGE));
             }
+            /* this should no longer be necessary, as Drake adds an
+             * defence bonus directly
             if (defender.hasAbility("model.ability.piracy")) {
                 result.addAll(defender.getModifierSet("model.modifier.piracyBonus"));
             }
+            */
         } else {
             // Paul Revere makes an unarmed colonist in a settlement pick up
             // a stock-piled musket if attacked, so the bonus should be applied
@@ -514,7 +521,7 @@ public class SimpleCombatModel implements CombatModel {
         case DONE_SETTLEMENT:
             if (settlement instanceof IndianSettlement) {
                 defender.dispose();
-                attacker.destroySettlement((IndianSettlement) settlement);
+                destroySettlement(attacker, (IndianSettlement) settlement);
             } else if (settlement instanceof Colony) {
                 captureColony(attacker, (Colony) settlement, plunderGold);
             } else {
@@ -799,6 +806,57 @@ public class SimpleCombatModel implements CombatModel {
                                        {"%enemyNation%", nation}, {"%enemyUnit%", unitName}},
                                    ModelMessage.DEFAULT, colony);
         }
+    }
+
+    /**
+     * Destroys an Indian settlement.
+     * 
+     * @param attacker an <code>Unit</code> value
+     * @param settlement an <code>IndianSettlement</code> value
+     */
+    private void destroySettlement(Unit attacker, IndianSettlement settlement) {
+        Player enemy = settlement.getOwner();
+        boolean wasCapital = settlement.isCapital();
+        Tile newTile = settlement.getTile();
+        ModelController modelController = attacker.getGame().getModelController();
+        settlement.dispose();
+
+        enemy.modifyTension(attacker.getOwner(), Tension.TENSION_ADD_MAJOR);
+
+        List<UnitType> treasureUnitTypes = FreeCol.getSpecification()
+            .getUnitTypesWithAbility("model.ability.carryTreasure");
+        if (treasureUnitTypes.size() > 0) {
+            int randomTreasure = modelController.getRandom(attacker.getId() + "indianTreasureRandom" + 
+                                                           attacker.getId(), 11);
+            int random = modelController.getRandom(attacker.getId() + "newUnitForTreasure" +
+                                                   attacker.getId(), treasureUnitTypes.size());
+            Unit tTrain = modelController.createUnit(attacker.getId() + "indianTreasure" +
+                                                     attacker.getId(), newTile, attacker.getOwner(),
+                                                     treasureUnitTypes.get(random));
+
+            // Larger treasure if Hernan Cortes is present in the congress:
+            Set<Modifier> modifierSet = attacker.getModifierSet("model.modifier.nativeTreasureModifier");
+            randomTreasure = (int) FeatureContainer.applyModifierSet(randomTreasure, attacker.getGame().getTurn(),
+                                                                     modifierSet);
+            SettlementType settlementType = ((IndianNationType) enemy.getNationType()).getTypeOfSettlement();
+            if (settlementType == SettlementType.INCA_CITY ||
+                settlementType == SettlementType.AZTEC_CITY) {
+                tTrain.setTreasureAmount(randomTreasure * 500 + 10000);
+            } else {
+                tTrain.setTreasureAmount(randomTreasure * 50  + 300);
+            }
+
+            // capitals give more gold
+            if (wasCapital) {
+                tTrain.setTreasureAmount((tTrain.getTreasureAmount() * 3) / 2);
+            }
+
+            attacker.addModelMessage(attacker, "model.unit.indianTreasure", new String[][] {
+                    { "%indian%", enemy.getNationAsString() },
+                    { "%amount%", Integer.toString(tTrain.getTreasureAmount()) }
+                }, ModelMessage.DEFAULT);
+        }
+        attacker.setLocation(newTile);
     }
 
     /**
