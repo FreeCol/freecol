@@ -51,10 +51,10 @@ public class SimpleCombatModel implements CombatModel {
         new Modifier("model.modifier.offence", "modifiers.movementPenalty",
                      -66, Modifier.Type.PERCENTAGE);
     public static final Modifier ARTILLERY_PENALTY =
-        new Modifier("model.modifier.offence", "modifiers.ARTILLERY_PENALTY",
+        new Modifier("model.modifier.offence", "modifiers.artilleryPenalty",
                      -75, Modifier.Type.PERCENTAGE);
     public static final Modifier ATTACK_BONUS =
-        new Modifier("model.modifier.offence", "modifiers.ATTACK_BONUS",
+        new Modifier("model.modifier.offence", "modifiers.attackBonus",
                      50, Modifier.Type.PERCENTAGE);
     public static final Modifier FORTIFICATION_BONUS =
         new Modifier("model.modifier.defence", "modifiers.fortified",
