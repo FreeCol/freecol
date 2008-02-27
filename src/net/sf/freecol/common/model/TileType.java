@@ -135,7 +135,7 @@ public final class TileType extends FreeColGameObjectType {
     }
 
     public Set<Modifier> getDefenceBonus() {
-        return featureContainer.getModifierSet("model.modifier.defence");
+        return getModifierSet("model.modifier.defence");
     }
 
     public int getPotential(GoodsType goodsType) {

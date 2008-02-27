@@ -28,6 +28,7 @@ public class CombatTest extends FreeColTestCase {
 
 
     TileType plains = spec().getTileType("model.tile.plains");
+    TileType hills = spec().getTileType("model.tile.hills");
 
     UnitType braveType = spec().getUnitType("model.unit.brave");
     UnitType colonistType = spec().getUnitType("model.unit.freeColonist");
@@ -52,13 +53,15 @@ public class CombatTest extends FreeColTestCase {
         Map map = getTestMap(plains);
         game.setMap(map);
         Tile tile1 = map.getTile(5, 8);
+        tile1.setType(hills);
+        assertEquals(hills, tile1.getType());
         tile1.setExploredBy(dutch, true);
         tile1.setExploredBy(french, true);
         Tile tile2 = map.getTile(4, 8);
         tile2.setExploredBy(dutch, true);
         tile2.setExploredBy(french, true);
 
-        Unit colonist = new Unit(game, tile1, dutch, colonistType, UnitState.ACTIVE);
+        Unit colonist = new Unit(game, tile1, dutch, colonistType, UnitState.FORTIFIED);
         Unit soldier = new Unit(game, tile2, french, veteranType, UnitState.ACTIVE);
 
         soldier.equipWith(muskets, true);
@@ -72,15 +75,37 @@ public class CombatTest extends FreeColTestCase {
         assertEquals(1, musketModifierSet.size());
         Modifier musketModifier = musketModifierSet.iterator().next();
 
+        Set<Modifier> horsesModifierSet = horses.getModifierSet("model.modifier.offence");
+        assertEquals(1, horsesModifierSet.size());
+        Modifier horsesModifier = horsesModifierSet.iterator().next();
+
         Set<Modifier> offenceModifiers = combatModel.getOffensiveModifiers(soldier, colonist);
-        assertEquals(4, offenceModifiers.size());
+        assertEquals(5, offenceModifiers.size());
         assertTrue(offenceModifiers.contains(veteranModifier));
         offenceModifiers.remove(veteranModifier);
         assertTrue(offenceModifiers.contains(musketModifier));
         offenceModifiers.remove(musketModifier);
+        assertTrue(offenceModifiers.contains(horsesModifier));
+        offenceModifiers.remove(horsesModifier);
         assertTrue(offenceModifiers.contains(SimpleCombatModel.ATTACK_BONUS));
         offenceModifiers.remove(SimpleCombatModel.ATTACK_BONUS);
+        // this was also added by the combat model
         assertEquals("modifiers.baseOffence", offenceModifiers.iterator().next().getSource());
+
+        Set<Modifier> hillsModifierSet = hills.getDefenceBonus();
+        assertFalse(soldier.hasAbility("model.ability.ambushBonus"));
+        assertFalse(colonist.hasAbility("model.ability.ambushPenalty"));                     
+        assertEquals(1, hillsModifierSet.size());
+        Modifier hillsModifier = hillsModifierSet.iterator().next();
+
+        Set<Modifier> defenceModifiers = combatModel.getDefensiveModifiers(soldier, colonist);
+        assertEquals(3, defenceModifiers.size());
+        assertTrue(defenceModifiers.contains(hillsModifier));
+        defenceModifiers.remove(hillsModifier);
+        assertTrue(defenceModifiers.contains(SimpleCombatModel.FORTIFICATION_BONUS));
+        defenceModifiers.remove(SimpleCombatModel.FORTIFICATION_BONUS);
+        // this was also added by the combat model
+        assertEquals("modifiers.baseDefence", defenceModifiers.iterator().next().getSource());
 
     }
 

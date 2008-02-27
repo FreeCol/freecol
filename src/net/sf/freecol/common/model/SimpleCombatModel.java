@@ -371,7 +371,7 @@ public class SimpleCombatModel implements CombatModel {
                                         1, Modifier.Type.ADDITIVE));
             }
 
-            for (EquipmentType equipment : attacker.getEquipment()) {
+            for (EquipmentType equipment : defender.getEquipment()) {
                 result.addAll(equipment.getFeatureContainer().getModifierSet("model.modifier.defence"));
             }
             // 50% veteran bonus
@@ -383,30 +383,30 @@ public class SimpleCombatModel implements CombatModel {
                 result.add(FORTIFICATION_BONUS);
             }
 
-            if (defender.getTile() != null && defender.getTile().getSettlement() != null) {
-                result.addAll(defender.getTile().getSettlement().getFeatureContainer()
-                              .getModifierSet("model.modifier.defence"));
-                // TODO: is it right? or should it be another ability?
-                if (defender.hasAbility("model.ability.bombard") &&
-                    attacker.getOwner().isIndian()) {
-                    // 100% defence bonus against an Indian raid
-                    result.add(INDIAN_RAID_BONUS);
-                }
-            } else if (defender.getTile() != null) {
-                // In the open
-                if (!(attacker.hasAbility("model.ability.ambushBonus") ||
-                      defender.hasAbility("model.ability.ambushPenalty"))) {
-                    // Terrain defensive bonus.
-                    result.add(new Modifier("model.modifier.defence", 
-                                            "modifiers.terrainBonus",
-                                            defender.getTile().defenceBonus(),
-                                            Modifier.Type.PERCENTAGE));
-                }
-                // TODO: is it right? or should it be another ability?
-                if (defender.hasAbility("model.ability.bombard") &&
-                    defender.getState() != UnitState.FORTIFIED) {
-                    // -75% Artillery in the Open penalty
-                    result.add(ARTILLERY_PENALTY);
+            if (defender.getTile() != null) {
+                Tile tile = defender.getTile();
+                if (tile.getSettlement() != null) {
+                    result.addAll(tile.getSettlement().getFeatureContainer()
+                                  .getModifierSet("model.modifier.defence"));
+                    // TODO: is it right? or should it be another ability?
+                    if (defender.hasAbility("model.ability.bombard") &&
+                        attacker.getOwner().isIndian()) {
+                        // 100% defence bonus against an Indian raid
+                        result.add(INDIAN_RAID_BONUS);
+                    }
+                } else {
+                    // In the open
+                    if (!(attacker.hasAbility("model.ability.ambushBonus") ||
+                          defender.hasAbility("model.ability.ambushPenalty"))) {
+                        // Terrain defensive bonus.
+                        result.addAll(tile.getType().getDefenceBonus());
+                    }
+                    // TODO: is it right? or should it be another ability?
+                    if (defender.hasAbility("model.ability.bombard") &&
+                        defender.getState() != UnitState.FORTIFIED) {
+                        // -75% Artillery in the Open penalty
+                        result.add(ARTILLERY_PENALTY);
+                    }
                 }
             }
 
