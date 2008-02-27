@@ -371,6 +371,8 @@
 
   <equipment-types>
     <equipment-type id="model.equipment.horses" combat-loss-priority="20" role="scout">
+      <modifier id="model.modifier.defence" type="additive" value="1"/>
+      <modifier id="model.modifier.offence" type="additive" value="1"/>
       <modifier id="model.modifier.lineOfSightBonus" type="additive" value="1"/>
       <modifier id="model.modifier.movementBonus" type="additive" value="9"/>
       <ability id="model.ability.scoutIndianSettlement" value="true"/>
