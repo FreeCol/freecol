@@ -501,7 +501,7 @@ public class SimpleCombatModel implements CombatModel {
         case GREAT_LOSS:
             if (attacker.isNaval()) {
                 sinkShip(attacker, null);
-                attacker.addModelMessage(attacker, "model.unit.sinkShip",
+                attacker.addModelMessage(attacker, "model.unit.shipSunk",
                                          new String[][] {
                                              { "%unit%", attacker.getName() },
                                              { "%enemyUnit%", defender.getName() },
@@ -539,7 +539,7 @@ public class SimpleCombatModel implements CombatModel {
                                              { "%enemyUnit%", defender.getName() },
                                              { "%enemyNation%", defendingPlayer.getNationAsString() }
                                          }, ModelMessage.COMBAT_RESULT);
-                defender.addModelMessage(defender, "model.unit.damageShip",
+                defender.addModelMessage(defender, "model.unit.shipDamaged",
                                          new String[][] {
                                              { "%unit%", defender.getName() },
                                              { "%repairLocation%", repairLocation.getLocationName() },
@@ -930,7 +930,7 @@ public class SimpleCombatModel implements CombatModel {
                                             { "%nation%", nation } },
                                         ModelMessage.UNIT_DEMOTED);
         } else {
-            damagedUnit.addModelMessage(damagedUnit, "model.unit.damageShip",
+            damagedUnit.addModelMessage(damagedUnit, "model.unit.shipDamaged",
                                         new String[][] {
                                             { "%unit%", damagedUnit.getName() },
                                             { "%repairLocation%", repairLocationName },
@@ -958,7 +958,7 @@ public class SimpleCombatModel implements CombatModel {
                                             { "%nation%", nation }
                                         }, ModelMessage.UNIT_LOST);
         } else {
-            damagedUnit.addModelMessage(damagedUnit, "model.unit.sinkShip",
+            damagedUnit.addModelMessage(damagedUnit, "model.unit.shipSunk",
                                         new String[][] {
                                             { "%unit%", damagedUnit.getName() },
                                             { "%nation%", nation }
