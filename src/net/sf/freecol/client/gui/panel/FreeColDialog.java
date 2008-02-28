@@ -486,7 +486,7 @@ public class FreeColDialog extends FreeColPanel {
                 if (modifier.getValue() > 0) {
                     bonus = "+" + bonus;
                 }
-                preCombatDialog.add(new JLabel("%"), higConst.rc(row, offensePercentageColumn));
+                preCombatDialog.add(new JLabel("%"), higConst.rc(row, defensePercentageColumn));
                 break;
             case MULTIPLICATIVE:
                 bonus = "\u00D7" + bonus;
