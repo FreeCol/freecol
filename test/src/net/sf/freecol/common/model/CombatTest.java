@@ -19,6 +19,7 @@
 
 package net.sf.freecol.common.model;
 
+import java.util.Iterator;
 import java.util.Set;
 
 import net.sf.freecol.common.model.Unit.UnitState;
@@ -29,7 +30,10 @@ public class CombatTest extends FreeColTestCase {
 
     TileType plains = spec().getTileType("model.tile.plains");
     TileType hills = spec().getTileType("model.tile.hills");
+    TileType ocean = spec().getTileType("model.tile.ocean");
 
+    UnitType galleonType = spec().getUnitType("model.unit.galleon");
+    UnitType privateerType = spec().getUnitType("model.unit.privateer");
     UnitType braveType = spec().getUnitType("model.unit.brave");
     UnitType colonistType = spec().getUnitType("model.unit.freeColonist");
     UnitType veteranType = spec().getUnitType("model.unit.veteranSoldier");
@@ -66,6 +70,7 @@ public class CombatTest extends FreeColTestCase {
 
         soldier.equipWith(muskets, true);
         soldier.equipWith(horses, true);
+        soldier.setMovesLeft(1);
 
         Set<Modifier> veteranModifierSet = veteranType.getModifierSet("model.modifier.offence");
         assertEquals(1, veteranModifierSet.size());
@@ -80,7 +85,9 @@ public class CombatTest extends FreeColTestCase {
         Modifier horsesModifier = horsesModifierSet.iterator().next();
 
         Set<Modifier> offenceModifiers = combatModel.getOffensiveModifiers(soldier, colonist);
-        assertEquals(5, offenceModifiers.size());
+        assertEquals(6, offenceModifiers.size());
+        assertTrue(offenceModifiers.contains(SimpleCombatModel.BIG_MOVEMENT_PENALTY));
+        offenceModifiers.remove(SimpleCombatModel.BIG_MOVEMENT_PENALTY);
         assertTrue(offenceModifiers.contains(veteranModifier));
         offenceModifiers.remove(veteranModifier);
         assertTrue(offenceModifiers.contains(musketModifier));
@@ -109,5 +116,92 @@ public class CombatTest extends FreeColTestCase {
 
     }
 
+    public void testGalleonAttackedByPrivateer() throws Exception {
 
+        Game game = getStandardGame();
+        CombatModel combatModel = game.getCombatModel();
+        Player dutch = game.getPlayer("model.nation.dutch");
+        Player french = game.getPlayer("model.nation.french");
+        Map map = getTestMap(ocean);
+        game.setMap(map);
+        Tile tile1 = map.getTile(5, 8);
+        tile1.setExploredBy(dutch, true);
+        tile1.setExploredBy(french, true);
+        Tile tile2 = map.getTile(4, 8);
+        tile2.setExploredBy(dutch, true);
+        tile2.setExploredBy(french, true);
+
+        Unit galleon = new Unit(game, tile1, dutch, galleonType, UnitState.ACTIVE);
+        Unit privateer = new Unit(game, tile2, french, privateerType, UnitState.ACTIVE);
+
+        /**
+         * Only base modifiers should apply.
+         */
+        Set<Modifier> offenceModifiers = combatModel.getOffensiveModifiers(privateer, galleon);
+        assertEquals(1, offenceModifiers.size());
+        assertEquals("modifiers.baseOffence", offenceModifiers.iterator().next().getSource());
+
+        Set<Modifier> defenceModifiers = combatModel.getDefensiveModifiers(privateer, galleon);
+        assertEquals(1, defenceModifiers.size());
+        assertEquals("modifiers.baseDefence", defenceModifiers.iterator().next().getSource());
+
+        /**
+         * Fortification should have no effect.
+         */
+        galleon.setState(UnitState.FORTIFYING);
+        galleon.setState(UnitState.FORTIFIED);
+        defenceModifiers = combatModel.getDefensiveModifiers(privateer, galleon);
+        assertEquals(1, defenceModifiers.size());
+        assertEquals("modifiers.baseDefence", defenceModifiers.iterator().next().getSource());
+
+        /**
+         * Penalties due to cargo.
+         */
+        Goods goods1 = new Goods(game, null, Goods.LUMBER, 50);
+        privateer.add(goods1);
+        offenceModifiers = combatModel.getOffensiveModifiers(privateer, galleon);
+        Iterator<Modifier> privIt = offenceModifiers.iterator();
+        assertEquals(2, offenceModifiers.size());
+        assertEquals("modifiers.baseOffence", privIt.next().getSource());
+        Modifier goodsPenalty1 = privIt.next();
+        assertEquals("modifiers.cargoPenalty", goodsPenalty1.getSource());
+        assertEquals(-12.5f, goodsPenalty1.getValue());
+
+        Goods goods2 = new Goods(game, null, Goods.LUMBER, 150);
+        galleon.add(goods2);
+        assertEquals(2, galleon.getVisibleGoodsCount());
+        defenceModifiers = combatModel.getDefensiveModifiers(privateer, galleon);
+        Iterator<Modifier> gallIt = defenceModifiers.iterator();
+        assertEquals(2, defenceModifiers.size());
+        assertEquals("modifiers.baseDefence", gallIt.next().getSource());
+        Modifier goodsPenalty2 = gallIt.next();
+        assertEquals("modifiers.cargoPenalty", goodsPenalty2.getSource());
+        assertEquals(-25f, goodsPenalty2.getValue());
+
+        /**
+         * Francis Drake
+         */
+        FoundingFather drake = spec().getFoundingFather("model.foundingFather.francisDrake");
+        Set<Modifier> drakeModifiers = drake.getFeatureContainer()
+            .getModifierSet("model.modifier.offence", privateerType);
+        assertEquals(1, drakeModifiers.size());
+        Modifier drakeModifier = drakeModifiers.iterator().next();
+
+        french.addFather(drake);
+        drakeModifiers = french.getFeatureContainer().getModifierSet("model.modifier.offence",
+                                                                     privateerType);
+        assertEquals(1, drakeModifiers.size());
+        assertEquals(drakeModifier, drakeModifiers.iterator().next());
+
+        offenceModifiers = combatModel.getOffensiveModifiers(privateer, galleon);
+        privIt = offenceModifiers.iterator();
+        assertEquals(3, offenceModifiers.size());
+        assertEquals("modifiers.baseOffence", privIt.next().getSource());
+        Modifier newDrakeModifier = privIt.next();
+        assertEquals(drakeModifier, newDrakeModifier);
+        goodsPenalty1 = privIt.next();
+        assertEquals("modifiers.cargoPenalty", goodsPenalty1.getSource());
+        assertEquals(-12.5f, goodsPenalty1.getValue());
+
+    }
 }

@@ -213,6 +213,12 @@ public class SimpleCombatModel implements CombatModel {
                                 attacker.getType().getOffence(),
                                 Modifier.Type.ADDITIVE));
 
+        result.addAll(attacker.getType().getFeatureContainer()
+                      .getModifierSet("model.modifier.offence"));
+
+        result.addAll(attacker.getOwner().getFeatureContainer()
+                      .getModifierSet("model.modifier.offence", attacker.getType()));
+
         if (attacker.isNaval()) {
             int goodsCount = attacker.getGoodsCount();
             if (goodsCount > 0) {
@@ -233,9 +239,6 @@ public class SimpleCombatModel implements CombatModel {
             for (EquipmentType equipment : attacker.getEquipment()) {
                 result.addAll(equipment.getFeatureContainer().getModifierSet("model.modifier.offence"));
             }
-            result.addAll(attacker.getType().getFeatureContainer()
-                          .getModifierSet("model.modifier.offence"));
-
             // 50% attack bonus
             result.add(ATTACK_BONUS);
             // movement penalty
@@ -337,6 +340,9 @@ public class SimpleCombatModel implements CombatModel {
                                 "modifiers.baseDefence",
                                 defender.getType().getDefence(),
                                 Modifier.Type.ADDITIVE));
+        result.addAll(defender.getType().getFeatureContainer()
+                      .getModifierSet("model.modifier.defence"));
+
 
         if (defender.isNaval()) {
             int goodsCount = defender.getVisibleGoodsCount();
@@ -374,10 +380,6 @@ public class SimpleCombatModel implements CombatModel {
             for (EquipmentType equipment : defender.getEquipment()) {
                 result.addAll(equipment.getFeatureContainer().getModifierSet("model.modifier.defence"));
             }
-            // 50% veteran bonus
-            result.addAll(attacker.getType().getFeatureContainer()
-                          .getModifierSet("model.modifier.defence"));
-
             // 50% fortify bonus
             if (defender.getState() == UnitState.FORTIFIED) {
                 result.add(FORTIFICATION_BONUS);
