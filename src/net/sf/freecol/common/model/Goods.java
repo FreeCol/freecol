@@ -27,6 +27,7 @@ import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.freecol.FreeCol;
+import net.sf.freecol.client.gui.i18n.Messages;
 
 import org.w3c.dom.Element;
 
@@ -179,7 +180,9 @@ public class Goods extends AbstractGoods implements Locatable, Ownable, Named {
     *         <br>15 Cotton
     */
     public String toString() {
-        return Integer.toString(getAmount()) + " " + getName();
+        return Messages.message("model.goods.goodsAmount",
+                                "%goods%", getName(),
+                                "%amount%", String.valueOf(getAmount()));
     }
 
     /**

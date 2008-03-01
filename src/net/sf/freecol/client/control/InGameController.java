@@ -2028,8 +2028,8 @@ public final class InGameController implements NetworkConstants {
     }
 
     /**
-     * Unload cargo. This method should only be invoked if the unit carrying the
-     * cargo is in a harbour.
+     * Unload cargo. If the unit carrying the cargo is not in a
+     * harbour, the goods will be dumped.
      * 
      * @param goods The goods which are going to leave the ship where it is
      *            located.

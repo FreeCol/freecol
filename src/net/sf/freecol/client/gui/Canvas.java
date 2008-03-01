@@ -63,6 +63,7 @@ import net.sf.freecol.client.gui.panel.ClientOptionsDialog;
 import net.sf.freecol.client.gui.panel.ColonyPanel;
 import net.sf.freecol.client.gui.panel.ColopediaPanel;
 import net.sf.freecol.client.gui.panel.DeclarationDialog;
+import net.sf.freecol.client.gui.panel.DumpCargoDialog;
 import net.sf.freecol.client.gui.panel.EmigrationPanel;
 import net.sf.freecol.client.gui.panel.ErrorPanel;
 import net.sf.freecol.client.gui.panel.EuropePanel;
@@ -1672,6 +1673,23 @@ public final class Canvas extends JDesktopPane {
         tilePanel.requestFocus();
         tilePanel.getResponseBoolean();
         remove(tilePanel);
+
+    }
+
+    /**
+     * Displays the <code>DumpCargoDialog</code>.
+     * 
+     * @param tile The tile whose panel needs to be displayed.
+     * @see Tile
+     */
+    public void showDumpCargoDialog(Unit unit) {
+        DumpCargoDialog dumpCargoDialog = new DumpCargoDialog(this);
+        dumpCargoDialog.initialize(unit);
+
+        addAsFrame(dumpCargoDialog);
+        dumpCargoDialog.requestFocus();
+        dumpCargoDialog.getResponseBoolean();
+        remove(dumpCargoDialog);
 
     }
 
