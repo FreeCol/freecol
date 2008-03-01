@@ -1024,9 +1024,7 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
      */
     @Override
     public void dispose() {
-        List<Unit> unitList = units;
-        units.clear();
-        for (Unit unit : unitList) {
+        for (Unit unit : new ArrayList<Unit>(units)) {
             unit.dispose();
         }
         super.dispose();
