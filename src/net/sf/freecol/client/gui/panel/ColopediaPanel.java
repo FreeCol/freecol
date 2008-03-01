@@ -31,6 +31,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 import java.util.logging.Logger;
 
 import javax.swing.BorderFactory;
@@ -521,9 +522,9 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
 
         String movementCost = String.valueOf(tileType.getBasicMoveCost() / 3);
         String defenseBonus = "";
-        Modifier defence = tileType.getDefenceBonus().iterator().next();
-        if (defence != null) {
-            defenseBonus = getModifierAsString(defence);
+        Set<Modifier> defenceModifiers = tileType.getDefenceBonus();
+        if (!defenceModifiers.isEmpty()) {
+            defenseBonus = getModifierAsString(defenceModifiers.iterator().next());
         }
 
         GoodsType secondaryGoodsType = tileType.getSecondaryGoods();
