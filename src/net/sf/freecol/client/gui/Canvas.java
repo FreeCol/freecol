@@ -113,6 +113,7 @@ import net.sf.freecol.common.model.FoundingFather;
 import net.sf.freecol.common.model.FreeColGameObject;
 import net.sf.freecol.common.model.FreeColGameObjectType;
 import net.sf.freecol.common.model.Game;
+import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.IndianSettlement;
 import net.sf.freecol.common.model.LostCityRumour;
@@ -1109,6 +1110,22 @@ public final class Canvas extends JDesktopPane {
 
         remove(saveDialog);
 
+        return response;
+    }
+
+    /**
+     * Displays a dialog that asks the user whether to pay arrears for
+     * boycotted goods or to dump them instead.
+     *
+     * @param goods a <code>Goods</code> value
+     * @param europe an <code>Europe</code> value
+     * @return a <code>boolean</code> value
+     */
+    public boolean showBoycottedGoodsDialog(Goods goods, Europe europe) {
+        FreeColDialog boycottedGoodsDialog = FreeColDialog.createBoycottedGoodsDialog(goods, europe);
+        addAsFrame(boycottedGoodsDialog);
+        boolean response = boycottedGoodsDialog.getResponseBoolean();
+        remove(boycottedGoodsDialog);
         return response;
     }
 
