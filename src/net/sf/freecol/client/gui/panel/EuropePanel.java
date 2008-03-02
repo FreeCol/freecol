@@ -655,10 +655,8 @@ public final class EuropePanel extends FreeColPanel implements ActionListener, C
             case RECRUIT:
             case PURCHASE:
             case TRAIN:
-                if (response > -1) {
-                    refreshDocks();
-                    refreshInPort();
-                }
+                refreshDocks();
+                refreshInPort();
                 revalidate();
                 break;
             case UNLOAD:

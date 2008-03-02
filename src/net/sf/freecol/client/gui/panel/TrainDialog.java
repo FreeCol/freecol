@@ -21,6 +21,7 @@ package net.sf.freecol.client.gui.panel;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.GridLayout;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -38,8 +39,11 @@ import net.sf.freecol.client.control.InGameController;
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.client.gui.i18n.Messages;
+
+import net.sf.freecol.common.model.Europe;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.UnitType;
+
 import cz.autel.dmi.HIGLayout;
 
 /**
@@ -48,25 +52,31 @@ import cz.autel.dmi.HIGLayout;
 
 public final class TrainDialog extends FreeColDialog implements ActionListener {
 
-    private static Logger logger = Logger.getLogger(TrainDialog.class.getName());
-
-    private static final int TRAIN_CANCEL = -1;
-
     @SuppressWarnings("unused")
+    private static final Logger logger = Logger.getLogger(TrainDialog.class.getName());
+
+    private static final int NUMBER_OF_COLUMNS = 3;
+
+    private static final String TRAIN_DONE = "DONE";
+
     private final Canvas parent;
 
     private final FreeColClient freeColClient;
 
     private final InGameController inGameController;
     
-    private final JButton cancel = new JButton(Messages.message("trainDialog.cancel"));
+    private final JButton done = new JButton(Messages.message("trainDialog.done"));
+
+    private final JPanel trainPanel = new JPanel(new GridLayout(0, NUMBER_OF_COLUMNS));
 
     private final List<UnitType> trainableUnits = new ArrayList<UnitType>();
 
-    private final ArrayList<JLabel> prices = new ArrayList<JLabel>();
+    private final Comparator<UnitType> unitPriceComparator;
 
-    private final ArrayList<JButton> buttons = new ArrayList<JButton>();
-    
+    private static final int[] buttonWidths = new int[] { 0, 6, 0 };
+    private static final int[] buttonHeights = new int[] { 24, 24 };
+    private static final HIGLayout buttonLayout = new HIGLayout(buttonWidths, buttonHeights);
+
 
     /**
      * The constructor to use.
@@ -78,76 +88,32 @@ public final class TrainDialog extends FreeColDialog implements ActionListener {
         this.inGameController = freeColClient.getInGameController();
         setFocusCycleRoot(true);
 
-        ImageLibrary library = parent.getGUI().getImageLibrary();
-        final Player player = freeColClient.getMyPlayer();
+        final Europe europe = freeColClient.getMyPlayer().getEurope();
+        unitPriceComparator = new Comparator<UnitType>() {
+            public int compare(final UnitType type1, final UnitType type2) {
+                return (europe.getUnitPrice(type1) - 
+                        europe.getUnitPrice(type2));
+            }
+        };
 
         trainableUnits.addAll(FreeCol.getSpecification().getUnitTypesTrainedInEurope());
-        Collections.sort(trainableUnits, new Comparator<UnitType>() {
-                public int compare(UnitType type1, UnitType type2) {
-                    return player.getEurope().getUnitPrice(type1) - 
-                        player.getEurope().getUnitPrice(type2);
-                }
-            });
 
-        setLayout(new HIGLayout(new int[] { 0 }, new int[] { 0, margin, 0, margin, 0 }));
+        setLayout(new HIGLayout(new int[] { 0 }, new int[] { 0, 3 * margin, 0, 3 * margin, 0 }));
 
-        int rows = trainableUnits.size();
-        if (rows % 2 == 0) {
-            rows--;
-        }
+        final JLabel question = new JLabel(Messages.message("trainDialog.clickOn"));
 
-        int[] widths = new int[] { 0, margin, 0, margin, 0, margin, 0 };
-        int[] heights = new int[rows];
-
-        for (int index = 0; index < rows / 2; index++) {
-            heights[2 * index + 1] = margin;
-        }
-
-        int[] labelColumn = { 1, 5 };
-        int[] buttonColumn = { 3, 7 };
-        JPanel trainPanel = new JPanel(new HIGLayout(widths, heights));
-
-        int row = 1;
-        int counter = 0;
-        for (UnitType unitType : trainableUnits) {
-            ImageIcon unitIcon = library.getUnitImageIcon(unitType);
-            JButton newButton = new JButton(unitType.getName(), 
-                                            library.getScaledImageIcon(unitIcon, 0.66f));
-            newButton.setActionCommand(unitType.getId());
-            newButton.addActionListener(this);
-            newButton.setIconTextGap(margin);
-            enterPressesWhenFocused(newButton);
-            buttons.add(newButton);
-            
-            JLabel newLabel = new JLabel();
-            prices.add(newLabel);
-            trainPanel.add(newLabel, higConst.rc(row, labelColumn[counter]));
-            trainPanel.add(newButton, higConst.rc(row, buttonColumn[counter]));
-            if (counter == 1) {
-                counter = 0;
-                row += 2;
-            } else {
-                counter = 1;
-            }
-        }
-        trainPanel.setSize(trainPanel.getPreferredSize());
-
-        JLabel question = new JLabel(Messages.message("trainDialog.clickOn"));
-
-        cancel.setActionCommand(String.valueOf(TRAIN_CANCEL));
-        cancel.addActionListener(this);
-        enterPressesWhenFocused(cancel);
+        done.setActionCommand(String.valueOf(TRAIN_DONE));
+        done.addActionListener(this);
+        enterPressesWhenFocused(done);
 
         add(question, higConst.rc(1, 1, ""));
         add(trainPanel, higConst.rc(3, 1));
-        add(cancel, higConst.rc(5, 1, ""));
-
-        setSize(getPreferredSize());
+        add(done, higConst.rc(5, 1, ""));
 
     }
 
     public void requestFocus() {
-        cancel.requestFocus();
+        done.requestFocus();
     }
 
     /**
@@ -155,20 +121,42 @@ public final class TrainDialog extends FreeColDialog implements ActionListener {
      * date.
      */
     public void initialize() {
-        Player player = freeColClient.getMyPlayer();
-        int numberOfTypes = trainableUnits.size();
-        for (int index = 0; index < numberOfTypes; index++) {
-            JButton button = buttons.get(index);
-            UnitType unitType = FreeCol.getSpecification().getUnitType(button.getActionCommand());
-            
-            int price = player.getEurope().getUnitPrice(unitType);
-            prices.get(index).setText(String.valueOf(price));
+
+        trainPanel.removeAll();
+
+        final Player player = freeColClient.getMyPlayer();
+        final Europe europe = player.getEurope();
+
+        final ImageLibrary library = parent.getGUI().getImageLibrary();
+
+        // price may have changed
+        Collections.sort(trainableUnits, unitPriceComparator);
+
+        for (UnitType unitType : trainableUnits) {
+            int price = europe.getUnitPrice(unitType);
+            JButton newButton = new JButton();
+            newButton.setLayout(buttonLayout);
+            ImageIcon unitIcon = library.getUnitImageIcon(unitType, (price > player.getGold()));
+            JLabel unitName = new JLabel(unitType.getName());
+            JLabel unitPrice = new JLabel(Messages.message("goldAmount", "%amount%", 
+                                                           String.valueOf(price)));
             if (price > player.getGold()) {
-                button.setEnabled(false);
-            } else {
-                button.setEnabled(true);
+                unitName.setEnabled(false);
+                unitPrice.setEnabled(false);
+                newButton.setEnabled(false);
             }
+            newButton.add(new JLabel(library.getScaledImageIcon(unitIcon, 0.66f)),
+                          higConst.rcwh(1, 1, 1, 2));
+            newButton.add(unitName, higConst.rc(1, 3));
+            newButton.add(unitPrice, higConst.rc(2, 3));
+            newButton.setActionCommand(unitType.getId());
+            newButton.addActionListener(this);
+            enterPressesWhenFocused(newButton);
+            trainPanel.add(newButton);
         }
+        trainPanel.setSize(trainPanel.getPreferredSize());
+        setSize(getPreferredSize());
+        revalidate();
     }
 
     /**
@@ -179,12 +167,12 @@ public final class TrainDialog extends FreeColDialog implements ActionListener {
      */
     public void actionPerformed(ActionEvent event) {
         String command = event.getActionCommand();
-        if (String.valueOf(TRAIN_CANCEL).equals(command)) {
+        if (TRAIN_DONE.equals(command)) {
             setResponse(new Integer(-1));
         } else {
             UnitType unitType = FreeCol.getSpecification().getUnitType(command);
             inGameController.trainUnitInEurope(unitType);
-            setResponse(new Integer(0));
+            initialize();
         }
     }
 }
