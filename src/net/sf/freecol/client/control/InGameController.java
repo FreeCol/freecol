@@ -342,7 +342,15 @@ public final class InGameController implements NetworkConstants {
             name = freeColClient.getCanvas().showInputDialog("renameUnit.text", object.getName(), "renameUnit.yes",
                     "renameUnit.no");
         }
-        if (name != null) {
+		
+        if (name == null) {
+            return;
+        } else if (object instanceof Colony && (freeColClient.getMyPlayer().getColony(name) != null)) {
+            // colony name must be unique (per Player)
+            freeColClient.getCanvas().showInformationMessage("nameColony.notUnique",
+                new String[][] { { "%name%", name } });
+            return;
+        } else {
             object.setName(name);
             Element renameElement = Message.createNewRootElement("rename");
             renameElement.setAttribute("nameable", ((FreeColGameObject) object).getId());
