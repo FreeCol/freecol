@@ -79,7 +79,6 @@ import net.sf.freecol.client.gui.panel.MapGeneratorOptionsDialog;
 import net.sf.freecol.client.gui.panel.MonarchPanel;
 import net.sf.freecol.client.gui.panel.NegotiationDialog;
 import net.sf.freecol.client.gui.panel.NewPanel;
-import net.sf.freecol.client.gui.panel.PurchaseDialog;
 import net.sf.freecol.client.gui.panel.QuitDialog;
 import net.sf.freecol.client.gui.panel.RecruitDialog;
 import net.sf.freecol.client.gui.panel.ReportCargoPanel;
@@ -1558,7 +1557,7 @@ public final class Canvas extends JDesktopPane {
      * @param intCommand One of {ExIT, RECRUIT, PURCHASE, TRAIN, UNLOAD}
      * @return <code>FreeColDialog.getResponseInt</code>.
      */
-    public int showEuropeDialog(int intCommand) {
+    public int showEuropeDialog(EuropePanel.EuropeAction europeAction) {
         // Close any open Europe Dialog (Recruit, Purchase, Train)       
         try {
             if (europeOpenDialog != null) {
@@ -1571,7 +1570,7 @@ public final class Canvas extends JDesktopPane {
         FreeColDialog localDialog = null;
 
         // Open new Dialog
-        switch (intCommand) {
+        switch (europeAction) {
             case EXIT:
             case UNLOAD:
                 return -1;
@@ -1579,14 +1578,9 @@ public final class Canvas extends JDesktopPane {
                 localDialog = new RecruitDialog(this);
                 break;
             case PURCHASE:
-                localDialog = new PurchaseDialog(this);
-                break;
             case TRAIN:
-                localDialog = new TrainDialog(this);
+                localDialog = new TrainDialog(this, europeAction);
                 break;
-            default:
-                logger.warning("Canvas.showEuropeDialog: Invalid intCommand");
-                return -1;
         }
         localDialog.initialize();
         europeOpenDialog = localDialog; // Set the open dialog to the class variable

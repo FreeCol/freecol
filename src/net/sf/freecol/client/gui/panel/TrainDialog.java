@@ -55,7 +55,7 @@ public final class TrainDialog extends FreeColDialog implements ActionListener {
     @SuppressWarnings("unused")
     private static final Logger logger = Logger.getLogger(TrainDialog.class.getName());
 
-    private static final int NUMBER_OF_COLUMNS = 3;
+    private static final int NUMBER_OF_COLUMNS = 2;
 
     private static final String TRAIN_DONE = "DONE";
 
@@ -73,15 +73,15 @@ public final class TrainDialog extends FreeColDialog implements ActionListener {
 
     private final Comparator<UnitType> unitPriceComparator;
 
-    private static final int[] buttonWidths = new int[] { 0, 6, 0 };
-    private static final int[] buttonHeights = new int[] { 24, 24 };
-    private static final HIGLayout buttonLayout = new HIGLayout(buttonWidths, buttonHeights);
+    private final int[] buttonWidths = new int[] { 0, 6, 0 };
+    private final int[] buttonHeights;
+    private final HIGLayout buttonLayout;
 
 
     /**
      * The constructor to use.
      */
-    public TrainDialog(Canvas parent) {
+    public TrainDialog(Canvas parent, EuropePanel.EuropeAction europeAction) {
         super();
         this.parent = parent;
         this.freeColClient = parent.getClient();
@@ -96,11 +96,22 @@ public final class TrainDialog extends FreeColDialog implements ActionListener {
             }
         };
 
-        trainableUnits.addAll(FreeCol.getSpecification().getUnitTypesTrainedInEurope());
+        JLabel question;
+        switch(europeAction) {
+        case TRAIN:
+            trainableUnits.addAll(FreeCol.getSpecification().getUnitTypesTrainedInEurope());
+            buttonHeights = new int[] { 22, 22 };
+            question = new JLabel(Messages.message("trainDialog.clickOn"));
+            break;
+        case PURCHASE:
+        default:
+            trainableUnits.addAll(FreeCol.getSpecification().getUnitTypesPurchasedInEurope());
+            buttonHeights = new int[] { 30, 30 };
+            question  = new JLabel(Messages.message("purchaseDialog.clickOn"));
+        }
 
+        buttonLayout = new HIGLayout(buttonWidths, buttonHeights);
         setLayout(new HIGLayout(new int[] { 0 }, new int[] { 0, 3 * margin, 0, 3 * margin, 0 }));
-
-        final JLabel question = new JLabel(Messages.message("trainDialog.clickOn"));
 
         done.setActionCommand(String.valueOf(TRAIN_DONE));
         done.addActionListener(this);
@@ -146,7 +157,7 @@ public final class TrainDialog extends FreeColDialog implements ActionListener {
                 newButton.setEnabled(false);
             }
             newButton.add(new JLabel(library.getScaledImageIcon(unitIcon, 0.66f)),
-                          higConst.rcwh(1, 1, 1, 2));
+                          higConst.rcwh(1, 1, 1, 2, ""));
             newButton.add(unitName, higConst.rc(1, 3));
             newButton.add(unitPrice, higConst.rc(2, 3));
             newButton.setActionCommand(unitType.getId());
@@ -172,6 +183,10 @@ public final class TrainDialog extends FreeColDialog implements ActionListener {
         } else {
             UnitType unitType = FreeCol.getSpecification().getUnitType(command);
             inGameController.trainUnitInEurope(unitType);
+            parent.getEuropePanel().refreshDocks();
+            parent.getEuropePanel().refreshInPort();
+            parent.getEuropePanel().revalidate();
+
             initialize();
         }
     }

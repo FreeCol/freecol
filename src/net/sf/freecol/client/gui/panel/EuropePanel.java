@@ -75,13 +75,9 @@ import cz.autel.dmi.HIGLayout;
  */
 public final class EuropePanel extends FreeColPanel implements ActionListener, ContainerListener {
 
-
-
     private static Logger logger = Logger.getLogger(EuropePanel.class.getName());
 
-    private static final int EXIT = 0, RECRUIT = 1, PURCHASE = 2, TRAIN = 3, UNLOAD = 4;
-
-    // private static final int TITLE_FONT_SIZE = 12;
+    public static enum EuropeAction { EXIT, RECRUIT, PURCHASE, TRAIN, UNLOAD }
 
     private final Canvas parent;
 
@@ -299,11 +295,11 @@ public final class EuropePanel extends FreeColPanel implements ActionListener, C
         row += 1;
         add(exitButton, higConst.rc(row, 8));
 
-        exitButton.setActionCommand(String.valueOf(EXIT));
-        recruitButton.setActionCommand(String.valueOf(RECRUIT));
-        purchaseButton.setActionCommand(String.valueOf(PURCHASE));
-        trainButton.setActionCommand(String.valueOf(TRAIN));
-        unloadButton.setActionCommand(String.valueOf(UNLOAD));
+        exitButton.setActionCommand(EuropeAction.EXIT.toString());
+        recruitButton.setActionCommand(EuropeAction.RECRUIT.toString());
+        purchaseButton.setActionCommand(EuropeAction.PURCHASE.toString());
+        trainButton.setActionCommand(EuropeAction.TRAIN.toString());
+        unloadButton.setActionCommand(EuropeAction.UNLOAD.toString());
         
         enterPressesWhenFocused(exitButton);
         enterPressesWhenFocused(recruitButton);
@@ -438,7 +434,9 @@ public final class EuropePanel extends FreeColPanel implements ActionListener, C
 
         // Only one component will be repainted!
         inPortPanel.repaint(0, 0, inPortPanel.getWidth(), inPortPanel.getHeight());
-        setSelectedUnit(units.get(units.size() - 1));
+        if (!units.isEmpty()) {
+            setSelectedUnit(units.get(units.size() - 1));
+        }
     }
 
     public void componentAdded(ContainerEvent event) {
@@ -642,11 +640,12 @@ public final class EuropePanel extends FreeColPanel implements ActionListener, C
         String command = event.getActionCommand();
         try {
             // Get Command
-            int intCommand = Integer.valueOf(command).intValue();
+            EuropeAction europeAction = Enum.valueOf(EuropeAction.class, command);
             // Close any open Europe Dialog, and show new one if required
-            int response = parent.showEuropeDialog(intCommand);
+            //int response = 
+            parent.showEuropeDialog(europeAction);
             // Process Command
-            switch (intCommand) {
+            switch (europeAction) {
             case EXIT:
                 freeColClient.getMyPlayer().getMarket().removeTransactionListener(log);
                 parent.remove(this);
