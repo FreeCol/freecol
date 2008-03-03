@@ -986,7 +986,9 @@ public final class Colony extends Settlement implements Location, Nameable {
                 used += getFoodConsumption();
             }
             BuildableType currentBuildable = getCurrentlyBuilding();
-            if (currentBuildable != null && currentBuildable != BuildableType.NOTHING) {
+            if (currentBuildable != null &&
+                currentBuildable != BuildableType.NOTHING &&
+                currentBuildable.getGoodsRequired() != null) {
                 boolean willBeFinished = true;
                 int possiblyUsed = 0;
                 for (AbstractGoods goodsRequired : currentBuildable.getGoodsRequired()) {
