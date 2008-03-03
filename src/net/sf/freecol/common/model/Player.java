@@ -277,7 +277,8 @@ public class Player extends FreeColGameObject implements Nameable {
         super(game);
         
         if (game == null) {
-            this.index = -1;
+            // The virtual enemy player for privateers
+            this.index = NUMBER_OF_PLAYERS-1;
         } else {
             this.index = game.getNextPlayerIndex();
         }
