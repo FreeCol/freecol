@@ -2205,7 +2205,11 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
             throw new IllegalStateException("Not your colony!");
         }
         String typeString = setCurrentlyBuildingElement.getAttribute("type");
-        BuildableType type = (BuildableType) FreeCol.getSpecification().getType(typeString);
+        BuildableType type = null;
+        if (typeString.equals("model.buildableType.nothing"))
+            type = BuildableType.NOTHING;
+        else
+            type = (BuildableType) FreeCol.getSpecification().getType(typeString);
         colony.setCurrentlyBuilding(type);
         sendUpdatedTileToAll(colony.getTile(), player);
         return null;
