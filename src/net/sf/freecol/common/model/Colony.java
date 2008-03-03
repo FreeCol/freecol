@@ -1783,9 +1783,10 @@ public final class Colony extends Settlement implements Location, Nameable {
      * @return a <code>boolean</code> value
      */
     public boolean hasAbility(String id) {
-        Set<Ability> result = featureContainer.getAbilitySet(id, null, getGame().getTurn());
-        result.addAll(owner.getFeatureContainer().getAbilitySet(id, null, getGame().getTurn()));
-        return FeatureContainer.hasAbility(result);
+        Set<Ability> colonyAbilities = featureContainer.getAbilitySet(id, null, getGame().getTurn());
+        Set<Ability> playerAbilities = owner.getFeatureContainer().getAbilitySet(id, null, getGame().getTurn());
+        colonyAbilities.addAll(playerAbilities);
+        return FeatureContainer.hasAbility(colonyAbilities);
     }
 
     public FeatureContainer getFeatureContainer() {

@@ -153,5 +153,20 @@ public class FoundingFatherTest extends FreeColTestCase {
         assertTrue(colony.getBuilding(press) != null);
 
     }
+    
+    public void testPeterStuyvesant() {
+        
+        Colony colony = getStandardColony(4);
+        Player player = colony.getOwner();
+        
+        // The custom house is not buildable initially
+        BuildableType customHouse = spec().getBuildingType("model.building.CustomHouse");
+        assertFalse(colony.canBuild(customHouse));
+        
+        // But it should become available after Peter Stuyvesant has joined continental congress
+        FoundingFather father = spec().getFoundingFather("model.foundingFather.peterStuyvesant");
+        player.addFather(father);
+        assertTrue(colony.canBuild(customHouse));
+    }
 
 }
