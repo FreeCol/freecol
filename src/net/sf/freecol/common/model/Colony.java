@@ -21,6 +21,7 @@ package net.sf.freecol.common.model;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map.Entry;
@@ -1785,7 +1786,7 @@ public final class Colony extends Settlement implements Location, Nameable {
      * @return a <code>boolean</code> value
      */
     public boolean hasAbility(String id) {
-        Set<Ability> colonyAbilities = featureContainer.getAbilitySet(id, null, getGame().getTurn());
+        HashSet<Ability> colonyAbilities = new HashSet(featureContainer.getAbilitySet(id, null, getGame().getTurn()));
         Set<Ability> playerAbilities = owner.getFeatureContainer().getAbilitySet(id, null, getGame().getTurn());
         colonyAbilities.addAll(playerAbilities);
         return FeatureContainer.hasAbility(colonyAbilities);

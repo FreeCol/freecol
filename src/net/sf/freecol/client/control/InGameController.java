@@ -2043,6 +2043,19 @@ public final class InGameController implements NetworkConstants {
      *            located.
      */
     public void unloadCargo(Goods goods) {
+        unloadCargo(goods, false);
+    }
+
+    /**
+     * Unload cargo. If the unit carrying the cargo is not in a
+     * harbour, or if the given boolean is true, the goods will be
+     * dumped.
+     * 
+     * @param goods The goods which are going to leave the ship where it is
+     *            located.
+     * @param dump a <code>boolean</code> value
+     */
+    public void unloadCargo(Goods goods, boolean dump) {
         if (freeColClient.getGame().getCurrentPlayer() != freeColClient.getMyPlayer()) {
             freeColClient.getCanvas().showInformationMessage("notYourTurn");
             return;
@@ -2056,7 +2069,8 @@ public final class InGameController implements NetworkConstants {
         unloadCargoElement.appendChild(goods.toXMLElement(freeColClient.getMyPlayer(), unloadCargoElement
                 .getOwnerDocument()));
 
-        if (goods.getLocation() instanceof Unit && ((Unit) goods.getLocation()).getColony() != null) {
+        if (!dump && goods.getLocation() instanceof Unit &&
+            ((Unit) goods.getLocation()).getColony() != null) {
             goods.unload();
         } else {
             goods.setLocation(null);

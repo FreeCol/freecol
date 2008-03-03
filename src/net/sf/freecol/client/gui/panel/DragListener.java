@@ -308,15 +308,52 @@ public final class DragListener extends MouseAdapter {
                 }
 
             } else if (comp instanceof GoodsLabel) {
-                GoodsLabel goodsLabel = (GoodsLabel) comp;
-                goodsLabel.getCanvas().showColopediaPanel(ColopediaPanel.PanelType.GOODS,
-                                                          goodsLabel.getGoods().getType());
+                final GoodsLabel goodsLabel = (GoodsLabel) comp;
+                final InGameController inGameController = goodsLabel.getCanvas().getClient().getInGameController();
+                JPopupMenu menu = new JPopupMenu("Cargo");
+                JMenuItem name = new JMenuItem(goodsLabel.getGoods().getName());
+                name.setEnabled(false);
+                menu.add(name);
+                JMenuItem unload = new JMenuItem(Messages.message("unload"));
+                unload.addActionListener(new ActionListener() {
+                        public void actionPerformed(ActionEvent e) {
+                            inGameController.unloadCargo(goodsLabel.getGoods());
+                            if (parentPanel instanceof CargoPanel) {
+                                ((CargoPanel) parentPanel).initialize();
+                            }
+                            parentPanel.revalidate();
+                        }
+                    });
+                menu.add(unload);
+                JMenuItem dump = new JMenuItem(Messages.message("dumpCargo"));
+                dump.addActionListener(new ActionListener() {
+                        public void actionPerformed(ActionEvent e) {
+                            inGameController.unloadCargo(goodsLabel.getGoods(), true);
+                            if (parentPanel instanceof CargoPanel) {
+                                ((CargoPanel) parentPanel).initialize();
+                            }
+                            parentPanel.revalidate();
+                        }
+                    });
+                menu.add(dump);
+                JMenuItem colopedia = new JMenuItem(Messages.message("menuBar.colopedia"));
+                colopedia.addActionListener(new ActionListener() {
+                        public void actionPerformed(ActionEvent e) {
+                            goodsLabel.getCanvas().showColopediaPanel(ColopediaPanel.PanelType.GOODS,
+                                                                      goodsLabel.getGoods().getType());
+                        }
+                    });
+                menu.add(colopedia);
                 /*
                  * if (parentPanel instanceof ColonyPanel) { Colony colony =
                  * ((ColonyPanel) parentPanel).getColony(); ((GoodsLabel)
                  * comp).getCanvas().showWarehouseDialog(colony);
                  * comp.repaint(); }
                  */
+                if (menu.getSubElements().length > 0) {
+                    menu.show(comp, e.getX(), e.getY());
+                }
+
             } else if (comp instanceof MarketLabel) {
                 if (parentPanel instanceof EuropePanel) {
                     ((EuropePanel) parentPanel).payArrears(((MarketLabel) comp).getType());
