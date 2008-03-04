@@ -48,7 +48,7 @@ public class UnloadAction extends MapboardAction {
      * Creates this action.
      * @param freeColClient The main controller object for the client.
      */
-    UnloadAction(FreeColClient freeColClient) {
+    public UnloadAction(FreeColClient freeColClient) {
         super(freeColClient, "menuBar.orders.unload", null, KeyStroke.getKeyStroke('U', 0));
     }
 

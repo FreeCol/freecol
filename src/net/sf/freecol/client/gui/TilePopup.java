@@ -30,6 +30,7 @@ import javax.swing.JPopupMenu;
 
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.FreeColClient;
+import net.sf.freecol.client.gui.action.UnloadAction;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.Goods;
@@ -112,11 +113,14 @@ public final class TilePopup extends JPopupMenu {
 
             if (hasGoods) {
                 JMenuItem dumpItem = new JMenuItem(Messages.message("dumpCargo"));
+                dumpItem.setAction(new UnloadAction(freeColClient));
+                /*
                 dumpItem.addActionListener(new ActionListener() {
                         public void actionPerformed(ActionEvent event) {
                             canvas.showDumpCargoDialog(currentUnit);
                         }
                     });
+                */
                 add(dumpItem);
             }
         }
