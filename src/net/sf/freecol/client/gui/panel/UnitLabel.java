@@ -254,13 +254,7 @@ public final class UnitLabel extends JLabel implements ActionListener {
         if (ignoreLocation)
             return;
 
-        if (getParent() instanceof ColonyPanel.OutsideColonyPanel || 
-            getParent() instanceof ColonyPanel.InPortPanel || 
-            getParent().getParent() instanceof ReportUnitPanel) {
-            int x = (getWidth() - getIcon().getIconWidth()) / 2;
-            int y = (getHeight() - getIcon().getIconHeight()) / 2;
-            parent.getGUI().displayOccupationIndicator(g, unit, x, y);
-        } else if (unit.getLocation() instanceof ColonyTile) {
+        if (unit.getLocation() instanceof ColonyTile) {
             GoodsType workType = unit.getWorkType();
             int production = ((ColonyTile) unit.getLocation()).getProductionOf(workType);
 
@@ -268,12 +262,23 @@ public final class UnitLabel extends JLabel implements ActionListener {
             g.translate(0, 10);
             pl.paintComponent(g);
             g.translate(0, -10);
-        } else if (unit.isUnderRepair()) {
-            BufferedImage repairImage = parent.getGUI().createStringImage((Graphics2D) g,
-                    Messages.message("underRepair", "%turns%", Integer.toString(unit.getTurnsForRepair())),
-                    Color.RED, getWidth(), 12);
-            g.drawImage(repairImage, (getWidth() - repairImage.getWidth()) / 2,
-                    (getHeight() - repairImage.getHeight()) / 2, null);
+        } else if (getParent() instanceof ColonyPanel.OutsideColonyPanel || 
+            getParent() instanceof ColonyPanel.InPortPanel || 
+            getParent() instanceof EuropePanel.InPortPanel || 
+            getParent().getParent() instanceof ReportUnitPanel) {
+            int x = (getWidth() - getIcon().getIconWidth()) / 2;
+            int y = (getHeight() - getIcon().getIconHeight()) / 2;
+            parent.getGUI().displayOccupationIndicator(g, unit, x, y);
+
+            if (unit.isUnderRepair()) {
+                BufferedImage repairImage = parent.getGUI()
+                    .createStringImage((Graphics2D) g,
+                                       Messages.message("underRepair", "%turns%",
+                                                        Integer.toString(unit.getTurnsForRepair())),
+                                       Color.RED, getWidth(), 12);
+                g.drawImage(repairImage, (getWidth() - repairImage.getWidth()) / 2,
+                            (getHeight() - repairImage.getHeight()) / 2, null);
+            }
         }
     }
 
