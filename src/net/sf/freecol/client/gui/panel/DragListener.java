@@ -288,19 +288,22 @@ public final class DragListener extends MouseAdapter {
                 menuItem.addActionListener(unitLabel);
                 menu.add(menuItem);
 
-                int exprience = Math.min(tempUnit.getExperience(), 200);
-                if (tempUnit.getTurnsOfTraining() > 0 || exprience > 0) {
+                int experience = Math.min(tempUnit.getExperience(), 200);
+                if (tempUnit.getTurnsOfTraining() > 0 || experience > 0) {
                     menu.addSeparator();
                 }
                 if (tempUnit.getTurnsOfTraining() > 0) {
-                    JMenuItem teaching = new JMenuItem(Messages.message("menuBar.teacher") + ": " + tempUnit.getTurnsOfTraining() + "/" + tempUnit.getNeededTurnsOfTraining());
+                    JMenuItem teaching = new JMenuItem(Messages.message("menuBar.teacher") +
+                                                       ": " + tempUnit.getTurnsOfTraining() +
+                                                       "/" + tempUnit.getNeededTurnsOfTraining());
                     teaching.setEnabled(false);
                     menu.add(teaching);
                 }
-                if (exprience > 0) {
-                    JMenuItem experience = new JMenuItem(Messages.message("menuBar.experience") + ": " + exprience + "/200 (max. 4%");
-                    experience.setEnabled(false);
-                    menu.add(experience);
+                if (experience > 0) {
+                    JMenuItem experienceItem = new JMenuItem(Messages.message("menuBar.experience") +
+                                                             ": " + experience + "/200 (max. 4%");
+                    experienceItem.setEnabled(false);
+                    menu.add(experienceItem);
                 }
 
                 if (menu.getSubElements().length > 0) {

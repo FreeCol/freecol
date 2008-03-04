@@ -114,13 +114,6 @@ public final class TilePopup extends JPopupMenu {
             if (hasGoods) {
                 JMenuItem dumpItem = new JMenuItem(Messages.message("dumpCargo"));
                 dumpItem.setAction(new UnloadAction(freeColClient));
-                /*
-                dumpItem.addActionListener(new ActionListener() {
-                        public void actionPerformed(ActionEvent event) {
-                            canvas.showDumpCargoDialog(currentUnit);
-                        }
-                    });
-                */
                 add(dumpItem);
             }
         }
