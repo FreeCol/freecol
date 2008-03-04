@@ -305,7 +305,8 @@ public final class InGameController implements NetworkConstants {
 
             removeUnitsOutsideLOS();
             if (currentPlayer.checkEmigrate()) {
-                if (currentPlayer.hasFather(FreeCol.getSpecification().getFoundingFather("model.foundingFather.williamBrewster"))) {
+                if (currentPlayer.hasAbility("model.ability.selectRecruit") &&
+                    currentPlayer.getEurope().recruitablesDiffer()) {
                     emigrateUnitInEurope(freeColClient.getCanvas().showEmigrationPanel());
                 } else {
                     emigrateUnitInEurope(0);
@@ -3098,7 +3099,7 @@ public final class InGameController implements NetworkConstants {
         Europe europe = myPlayer.getEurope();
 
         Element emigrateUnitInEuropeElement = Message.createNewRootElement("emigrateUnitInEurope");
-        if (myPlayer.hasFather(FreeCol.getSpecification().getFoundingFather("model.foundingFather.williamBrewster"))) {
+        if (myPlayer.hasAbility("model.ability.selectRecruit")) {
             emigrateUnitInEuropeElement.setAttribute("slot", Integer.toString(slot));
         }
 
@@ -3109,10 +3110,8 @@ public final class InGameController implements NetworkConstants {
             throw new IllegalStateException();
         }
 
-        // System.out.println("Sent slot " + slot);
-        if (!myPlayer.hasFather(FreeCol.getSpecification().getFoundingFather("model.foundingFather.williamBrewster"))) {
+        if (!myPlayer.hasAbility("model.ability.selectRecruit")) {
             slot = Integer.parseInt(reply.getAttribute("slot"));
-            // System.out.println("Received slot " + slot);
         }
 
         Element unitElement = (Element) reply.getChildNodes().item(0);

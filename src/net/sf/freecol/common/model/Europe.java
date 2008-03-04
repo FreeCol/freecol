@@ -140,6 +140,17 @@ public final class Europe extends FreeColGameObject implements Location, Ownable
         super(game, id);
     }
 
+
+    /**
+     * Returns true if not all recruitables are of the same type.
+     *
+     * @return a <code>boolean</code> value
+     */
+    public boolean recruitablesDiffer() {
+        return !(recruitables[0].equals(recruitables[1]) &&
+                 recruitables[0].equals(recruitables[2]));
+    }
+
     /**
      * Gets the type of the recruitable in Europe at the given slot.
      * 
