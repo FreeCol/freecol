@@ -48,11 +48,9 @@ import cz.autel.dmi.HIGConstraints;
  * Superclass for all panels in FreeCol.
  */
 public class FreeColPanel extends JPanel {
+
     @SuppressWarnings("unused")
     private static final Logger logger = Logger.getLogger(FreeColPanel.class.getName());
-
-
-
 
     protected static final HIGConstraints higConst = new HIGConstraints();
 

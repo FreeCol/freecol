@@ -319,7 +319,11 @@ public final class DragListener extends MouseAdapter {
                         public void actionPerformed(ActionEvent e) {
                             inGameController.unloadCargo(goodsLabel.getGoods());
                             if (parentPanel instanceof CargoPanel) {
-                                ((CargoPanel) parentPanel).initialize();
+                                CargoPanel cargoPanel = (CargoPanel) parentPanel;
+                                cargoPanel.initialize();
+                                if (cargoPanel.getParentPanel() instanceof ColonyPanel) {
+                                    ((ColonyPanel) cargoPanel.getParentPanel()).updateWarehouse();
+                                }
                             }
                             parentPanel.revalidate();
                         }

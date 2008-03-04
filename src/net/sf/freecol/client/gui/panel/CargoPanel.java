@@ -26,6 +26,7 @@ import java.util.Iterator;
 
 import javax.swing.BorderFactory;
 import javax.swing.border.TitledBorder;
+import javax.swing.JPanel;
 
 import net.sf.freecol.client.control.InGameController;
 import net.sf.freecol.client.gui.Canvas;
@@ -49,8 +50,6 @@ public class CargoPanel extends FreeColPanel {
 
     private final MouseListener pressListener;
 
-    private final Canvas parent;
-
     private final TitledBorder border;
 
     /**
@@ -59,12 +58,17 @@ public class CargoPanel extends FreeColPanel {
     private boolean editable = true;
 
     /**
+     * Describe parentPanel here.
+     */
+    private JPanel parentPanel;
+
+    /**
      * Creates this CargoPanel.
      * 
      * @param parent The parent Canvas that holds this CargoPanel.
      */
     public CargoPanel(Canvas parent, boolean withTitle) {
-        this.parent = parent;
+        super(parent);
 
         defaultTransferHandler = new DefaultTransferHandler(parent, this);
         pressListener = new DragListener(this);
@@ -83,6 +87,24 @@ public class CargoPanel extends FreeColPanel {
     @Override
     public String getUIClassID() {
         return "CargoPanelUI";
+    }
+
+    /**
+     * Get the <code>ParentPanel</code> value.
+     *
+     * @return a <code>JPanel</code> value
+     */
+    public final JPanel getParentPanel() {
+        return parentPanel;
+    }
+
+    /**
+     * Set the <code>ParentPanel</code> value.
+     *
+     * @param newParentPanel The new ParentPanel value.
+     */
+    public final void setParentPanel(final JPanel newParentPanel) {
+        this.parentPanel = newParentPanel;
     }
 
     /**
@@ -131,7 +153,7 @@ public class CargoPanel extends FreeColPanel {
             while (unitIterator.hasNext()) {
                 Unit unit = unitIterator.next();
 
-                UnitLabel label = new UnitLabel(unit, parent);
+                UnitLabel label = new UnitLabel(unit, getCanvas());
                 if (isEditable()) {
                     label.setTransferHandler(defaultTransferHandler);
                     label.addMouseListener(pressListener);
@@ -144,7 +166,7 @@ public class CargoPanel extends FreeColPanel {
             while (goodsIterator.hasNext()) {
                 Goods g = goodsIterator.next();
 
-                GoodsLabel label = new GoodsLabel(g, parent);
+                GoodsLabel label = new GoodsLabel(g, getCanvas());
                 if (isEditable()) {
                     label.setTransferHandler(defaultTransferHandler);
                     label.addMouseListener(pressListener);
@@ -190,7 +212,7 @@ public class CargoPanel extends FreeColPanel {
         if (carrier == null) {
             return null;
         } else if (editState) {
-            InGameController inGameController = parent.getClient().getInGameController();
+            InGameController inGameController = getCanvas().getClient().getInGameController();
             if (comp instanceof UnitLabel) {
                 Container oldParent = comp.getParent();
                 Unit unit = ((UnitLabel) comp).getUnit();
@@ -253,7 +275,7 @@ public class CargoPanel extends FreeColPanel {
 
     @Override
     public void remove(Component comp) {
-        InGameController inGameController = parent.getClient().getInGameController();
+        InGameController inGameController = getCanvas().getClient().getInGameController();
         if (comp instanceof UnitLabel) {
             Unit unit = ((UnitLabel) comp).getUnit();
             inGameController.leaveShip(unit);

@@ -211,7 +211,7 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener {
         tilePanel = new TilePanel(this);
         buildingsPanel = new BuildingsPanel(this);
         cargoPanel = new ColonyCargoPanel(parent);
-        //cargoPanel.addContainerListener(this);
+        cargoPanel.setParentPanel(this);
 
         defaultTransferHandler = new DefaultTransferHandler(parent, this);
         pressListener = new DragListener(this);

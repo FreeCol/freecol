@@ -166,6 +166,7 @@ public final class EuropePanel extends FreeColPanel implements ActionListener, C
         inPortPanel = new InPortPanel();
         docksPanel = new DocksPanel(this);
         cargoPanel = new EuropeCargoPanel(parent);
+        cargoPanel.setParentPanel(this);
         marketPanel = new MarketPanel(this);
         
         log = new TransactionLog();
