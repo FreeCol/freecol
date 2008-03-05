@@ -122,12 +122,14 @@ public class EuropeanNationType extends NationType {
                     ability.setSource(getNameKey());
                 }
                 addAbility(ability);
+                specification.getAbilityKeys().add(ability.getId());
             } else if (Modifier.getXMLElementTagName().equals(childName)) {
                 Modifier modifier = new Modifier(in); // Modifier close the element
                 if (modifier.getSource() == null) {
                     modifier.setSource(this.getId());
                 }
                 addModifier(modifier);
+                specification.getModifierKeys().add(modifier.getId());
             } else if ("unit".equals(childName)) {
                 AbstractUnit unit = new AbstractUnit(in); // AbstractUnit closes element
                 startingUnits.add(unit);

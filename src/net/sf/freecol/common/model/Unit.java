@@ -2247,7 +2247,7 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
     public void setType(UnitType unitType) {
         if (unitType.isAvailableTo(owner)) {
             this.unitType = unitType;
-            naval = unitType.hasAbility("model.ability.naval");
+            naval = unitType.hasAbility("model.ability.navalUnit");
             if (getMovesLeft() > getInitialMovesLeft()) {
                 setMovesLeft(getInitialMovesLeft());
             }

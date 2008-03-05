@@ -340,6 +340,7 @@ public final class TileImprovementType extends FreeColGameObjectType
                     modifier.setSource(getNameKey());
                 }
                 modifiers.put(modifier.getId(), modifier);
+                specification.getModifierKeys().add(modifier.getId());
             } else if ("change".equals(childName)) {
                 tileTypeChange.put(specification.getTileType(in.getAttributeValue(null, "from")),
                                    specification.getTileType(in.getAttributeValue(null, "to")));

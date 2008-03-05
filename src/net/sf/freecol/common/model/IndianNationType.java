@@ -169,12 +169,14 @@ public class IndianNationType extends NationType {
                     ability.setSource(getNameKey());
                 }
                 addAbility(ability); // Ability close the element
+                specification.getAbilityKeys().add(ability.getId());
             } else if (Modifier.getXMLElementTagName().equals(childName)) {
                 Modifier modifier = new Modifier(in); // Modifier close the element
                 if (modifier.getSource() == null) {
                     modifier.setSource(getNameKey());
                 }
                addModifier(modifier);
+                specification.getModifierKeys().add(modifier.getId());
             } else if ("skill".equals(childName)) {
                 skills.add(in.getAttributeValue(null, "id"));
                 in.nextTag(); // close this element

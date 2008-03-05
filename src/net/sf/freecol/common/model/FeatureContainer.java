@@ -29,6 +29,7 @@ import java.util.Map.Entry;
 import java.util.Set;
 
 import net.sf.freecol.client.gui.i18n.Messages;
+import net.sf.freecol.common.Specification;
 
 public class FeatureContainer {
 
@@ -67,6 +68,9 @@ public class FeatureContainer {
      * @return a <code>Set<Feature></code> value
      */
     public Set<Ability> getAbilitySet(String id, FreeColGameObjectType objectType, Turn turn) {
+        if (!Specification.getSpecification().getAbilityKeys().contains(id)) {
+            throw new IllegalArgumentException("Unknown ability key: " + id);
+        }
         Set<Ability> abilitySet = abilities.get(id);
         if (abilitySet == null) {
             return Collections.emptySet();
@@ -111,12 +115,15 @@ public class FeatureContainer {
      * @return a <code>boolean</code> value
      */
     public boolean hasAbility(String id, FreeColGameObjectType objectType, Turn turn) {
-        Set<Ability> abilitieset = abilities.get(id);
-        if (abilitieset == null) {
+        if (!Specification.getSpecification().getAbilityKeys().contains(id)) {
+            throw new IllegalArgumentException("Unknown ability key: " + id);
+        }
+        Set<Ability> abilitySet = abilities.get(id);
+        if (abilitySet == null) {
             return false;
         } else {
             boolean foundApplicableAbility = false;
-            for (Ability ability : abilitieset) {
+            for (Ability ability : abilitySet) {
                 if (ability.appliesTo(objectType, turn)) {
                     if (ability.getValue()) {
                         foundApplicableAbility = true;
@@ -135,11 +142,11 @@ public class FeatureContainer {
      *
      * @return a <code>boolean</code> value
      */
-    public static boolean hasAbility(Set<Ability> abilitieset) {
-        if (abilitieset.isEmpty()) {
+    public static boolean hasAbility(Set<Ability> abilitySet) {
+        if (abilitySet.isEmpty()) {
             return false;
         } else {
-            for (Ability ability : abilitieset) {
+            for (Ability ability : abilitySet) {
                 if (!ability.getValue()) {
                     return false;
                 }
@@ -180,6 +187,10 @@ public class FeatureContainer {
      * @return a <code>Set<Feature></code> value
      */
     public Set<Modifier> getModifierSet(String id, FreeColGameObjectType objectType, Turn turn) {
+        if (!Specification.getSpecification().getModifierKeys().contains(id) &&
+            Specification.getSpecification().getType(id) == null) {
+            throw new IllegalArgumentException("Unknown modifier key: " + id);
+        }
         Set<Modifier> modifierSet = modifiers.get(id);
         if (modifierSet == null) {
             return Collections.emptySet();
@@ -297,12 +308,12 @@ public class FeatureContainer {
         if (ability == null) {
             return false;
         }
-        Set<Ability> abilitieset = abilities.get(ability.getId());
-        if (abilitieset == null) {
-            abilitieset = new HashSet<Ability>();
-            abilities.put(ability.getId(), abilitieset);
+        Set<Ability> abilitySet = abilities.get(ability.getId());
+        if (abilitySet == null) {
+            abilitySet = new HashSet<Ability>();
+            abilities.put(ability.getId(), abilitySet);
         }
-        return abilitieset.add(ability);
+        return abilitySet.add(ability);
     }
 
     /**

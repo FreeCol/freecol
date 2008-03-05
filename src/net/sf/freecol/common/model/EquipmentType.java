@@ -212,16 +212,19 @@ public class EquipmentType extends FreeColGameObjectType {
                     ability.setSource(getNameKey());
                 }
                 addAbility(ability);
+                specification.getAbilityKeys().add(ability.getId());
             } else if ("required-ability".equals(nodeName)) {
                 String abilityId = in.getAttributeValue(null, "id");
                 boolean value = getAttribute(in, "value", true);
                 getUnitAbilitiesRequired().put(abilityId, value);
                 in.nextTag(); // close this element
+                specification.getAbilityKeys().add(abilityId);
             } else if ("required-location-ability".equals(nodeName)) {
                 String abilityId = in.getAttributeValue(null, "id");
                 boolean value = getAttribute(in, "value", true);
                 getLocationAbilitiesRequired().put(abilityId, value);
                 in.nextTag(); // close this element
+                specification.getAbilityKeys().add(abilityId);
             } else if ("required-goods".equals(nodeName)) {
                 GoodsType type = specification.getGoodsType(in.getAttributeValue(null, "id"));
                 int amount = getAttribute(in, "value", 0);
@@ -241,6 +244,7 @@ public class EquipmentType extends FreeColGameObjectType {
                     modifier.setSource(getNameKey());
                 }
                 addModifier(modifier);
+                specification.getModifierKeys().add(modifier.getId());
             } else {
                 logger.finest("Parsing of " + nodeName + " is not implemented yet");
                 while (in.nextTag() != XMLStreamConstants.END_ELEMENT ||

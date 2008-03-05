@@ -130,6 +130,7 @@ public final class ResourceType extends FreeColGameObjectType
                     modifier.setSource(getNameKey());
                 }
                 modifiers.put(specification.getGoodsType(modifier.getId()), modifier);
+                specification.getModifierKeys().add(modifier.getId());
             } else {
                 logger.finest("Parsing of " + childName + " is not implemented yet");
                 while (in.nextTag() != XMLStreamConstants.END_ELEMENT ||

@@ -28,8 +28,10 @@ import java.io.StringWriter;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.logging.Logger;
 
 import javax.xml.stream.XMLInputFactory;
@@ -72,6 +74,9 @@ public final class Specification {
     private static final Logger logger = Logger.getLogger(Specification.class.getName());
 
     private final Map<String, FreeColGameObjectType> allTypes;
+
+    private final Set<String> abilityKeys;
+    private final Set<String> modifierKeys;
 
     private final List<BuildingType> buildingTypeList;
 
@@ -134,6 +139,8 @@ public final class Specification {
         logger.info("Initializing Specification");
 
         allTypes = new HashMap<String, FreeColGameObjectType>();
+        abilityKeys = new HashSet<String>();
+        modifierKeys = new HashSet<String>();
         buildingTypeList = new ArrayList<BuildingType>();
         goodsTypeList = new ArrayList<GoodsType>();
         resourceTypeList = new ArrayList<ResourceType>();
@@ -315,6 +322,16 @@ public final class Specification {
 
     // ---------------------------------------------------------- retrieval methods
     
+
+    public Set<String> getAbilityKeys() {
+        return abilityKeys;
+    }
+
+    public Set<String> getModifierKeys() {
+        return modifierKeys;
+    }
+
+
     /**
      * Returns the <code>FreeColGameObjectType</code> with the given
      * ID. Throws an IllegalArgumentException if the ID is null, or if

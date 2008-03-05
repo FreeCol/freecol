@@ -236,12 +236,14 @@ public class FoundingFather extends FreeColGameObjectType {
                     ability.setSource(getNameKey());
                 }
                 addAbility(ability);
+                specification.getAbilityKeys().add(ability.getId());
             } else if (Modifier.getXMLElementTagName().equals(childName)) {
                 Modifier modifier = new Modifier(in);
                 if (modifier.getSource() == null) {
                     modifier.setSource(getNameKey());
                 }
                 addModifier(modifier); // close this element
+                specification.getModifierKeys().add(modifier.getId());
             } else if ("event".equals(childName)) {
                 String eventId = in.getAttributeValue(null, "id");
                 String value = in.getAttributeValue(null, "value");

@@ -597,11 +597,13 @@ public final class UnitType extends BuildableType {
                     ability.setSource(getNameKey());
                 }
                 addAbility(ability); // Ability close the element
+                specification.getAbilityKeys().add(ability.getId());
             } else if ("required-ability".equals(nodeName)) {
                 String abilityId = in.getAttributeValue(null, "id");
                 boolean value = getAttribute(in, "value", true);
                 getAbilitiesRequired().put(abilityId, value);
                 in.nextTag(); // close this element
+                specification.getAbilityKeys().add(abilityId);
             } else if ("required-goods".equals(nodeName)) {
                 GoodsType type = specification.getGoodsType(in.getAttributeValue(null, "id"));
                 int amount = getAttribute(in, "value", 0);
@@ -642,6 +644,7 @@ public final class UnitType extends BuildableType {
                     modifier.setSource(getNameKey());
                 }
                 addModifier(modifier);
+                specification.getModifierKeys().add(modifier.getId());
             } else {
                 logger.finest("Parsing of " + nodeName + " is not implemented yet");
                 while (in.nextTag() != XMLStreamConstants.END_ELEMENT ||
