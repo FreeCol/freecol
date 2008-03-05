@@ -541,13 +541,15 @@ public class SimpleCombatModel implements CombatModel {
                                              { "%enemyUnit%", defender.getName() },
                                              { "%enemyNation%", defendingPlayer.getNationAsString() }
                                          }, ModelMessage.COMBAT_RESULT);
-                defender.addModelMessage(defender, "model.unit.shipDamaged",
+                if (repairLocation != null ) {
+                    defender.addModelMessage(defender, "model.unit.shipDamaged",
                                          new String[][] {
                                              { "%unit%", defender.getName() },
                                              { "%repairLocation%", repairLocation.getLocationName() },
                                              { "%enemyUnit%", attacker.getName() },
                                              { "%enemyNation%", attackingPlayer.getNationAsString() },
                                          }, ModelMessage.UNIT_DEMOTED);
+                }
             } else if (attacker.hasAbility("model.ability.pillageUnprotectedColony") && 
                        !defender.isDefensiveUnit() &&
                        defender.getColony() != null &&
