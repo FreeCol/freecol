@@ -1015,7 +1015,7 @@ public final class InGameInputHandler extends InputHandler {
             } else {
                 m = new ModelMessage(player.getEurope(), "lostCityRumour.FountainOfYouth", null,
                                      ModelMessage.LOST_CITY_RUMOUR);
-                if (player.hasFather(FreeCol.getSpecification().getFoundingFather("model.foundingFather.williamBrewster"))) {
+                if (player.hasAbility("model.ability.selectRecruit")) {
                     final int emigrants = Integer.parseInt(element.getAttribute("emigrants"));
                     SwingUtilities.invokeLater(new Runnable() {
                         public void run() {

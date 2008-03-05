@@ -1028,8 +1028,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         }
         probability[LostCityRumour.FOUNTAIN_OF_YOUTH] = (max - dx) + bonus / 2;
         int start;
-        if (player.hasFather(FreeCol.getSpecification().getFoundingFather("model.foundingFather.hernandoDeSoto"))) {
-            // rumours are always positive
+        if (player.hasAbility("model.ability.rumoursAlwaysPositive")) {
             start = 3;
         } else {
             start = 0;
@@ -1698,12 +1697,10 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
             // TODO: chance needs to depend on amount of crosses that the
             // players who are involved have.
             double random = Math.random();
-            if (settlement.getMissionary().hasAbility("model.ability.expertMissionary")
-                || settlement.getMissionary().getOwner().hasFather(FreeCol.getSpecification().getFoundingFather("model.foundingFather.fatherJeanDeBrebeuf"))) {
+            if (settlement.getMissionary().hasAbility("model.ability.expertMissionary")) {
                 random += 0.2;
             }
-            if (unit.hasAbility("model.ability.expertMissionary")
-                || unit.getOwner().hasFather(FreeCol.getSpecification().getFoundingFather("model.foundingFather.fatherJeanDeBrebeuf"))) {
+            if (unit.hasAbility("model.ability.expertMissionary")) {
                 random -= 0.2;
             }
             if (random < 0.5) {
@@ -1995,7 +1992,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         Player player = getFreeColServer().getPlayer(connection);
         Europe europe = player.getEurope();
         int slot;
-        if (player.hasFather(FreeCol.getSpecification().getFoundingFather("model.foundingFather.williamBrewster"))) {
+        if (player.hasAbility("model.ability.selectRecruit")) {
             slot = Integer.parseInt(emigrateUnitInEuropeElement.getAttribute("slot"));
         } else {
             slot = (int) (Math.random() * 3);
@@ -2004,7 +2001,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         UnitType newRecruitable = player.generateRecruitable("xyzzy");
         Unit unit = new Unit(getGame(), europe, player, recruitable, UnitState.ACTIVE, recruitable.getDefaultEquipment());
         Element reply = Message.createNewRootElement("emigrateUnitInEuropeConfirmed");
-        if (!player.hasFather(FreeCol.getSpecification().getFoundingFather("model.foundingFather.williamBrewster"))) {
+        if (!player.hasAbility("model.ability.selectRecruit")) {
             reply.setAttribute("slot", Integer.toString(slot));
         }
         reply.setAttribute("newRecruitable", Integer.toString(newRecruitable.getIndex()));
