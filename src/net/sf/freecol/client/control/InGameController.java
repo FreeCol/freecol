@@ -2709,18 +2709,28 @@ public final class InGameController implements NetworkConstants {
         Element reply = client.ask(scoutMessage);
 
         if (reply.getTagName().equals("scoutIndianSettlementResult")) {
-            Specification spec = FreeCol.getSpecification();
-
             UnitType skill = null;
             String skillStr = reply.getAttribute("skill");
             if (skillStr != null) {
-                skill = spec.getUnitType(Integer.parseInt(skillStr));
+                skill = FreeCol.getSpecification().getUnitType(skillStr);
             }
             settlement.setLearnableSkill(skill);
-            settlement.setWantedGoods(0, Integer.parseInt(reply.getAttribute("highlyWantedGoods")));
-            settlement.setWantedGoods(1, Integer.parseInt(reply.getAttribute("wantedGoods1")));
-            settlement.setWantedGoods(2, Integer.parseInt(reply.getAttribute("wantedGoods2")));
+            settlement.setWantedGoods(0, FreeCol.getSpecification().getGoodsType(reply.getAttribute("highlyWantedGoods")));
+            settlement.setWantedGoods(1, FreeCol.getSpecification().getGoodsType(reply.getAttribute("wantedGoods1")));
+            settlement.setWantedGoods(2, FreeCol.getSpecification().getGoodsType(reply.getAttribute("wantedGoods2")));
             settlement.setVisited();
+
+            NodeList nodeList = reply.getChildNodes();
+            for (int i = 0; i < nodeList.getLength(); i++) {
+                Element element = (Element) nodeList.item(i);
+                FreeColGameObject fcgo = unit.getGame().getFreeColGameObjectSafely(element.getAttribute("ID"));
+                if (fcgo != null) {
+                    fcgo.readFromXMLElement(element);
+                } else {
+                    logger.warning("Could not find 'FreeColGameObject' with ID: " + element.getAttribute("ID"));
+                }
+            }
+            //new RefreshCanvasSwingTask().invokeLater();
         } else {
             logger.warning("Server gave an invalid reply to an askSkill message");
             return;

@@ -1885,32 +1885,40 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
         // Check for adjacent units owned by a player that our owner has not met
         // before:
         if (getGame().getMap() != null && location != null && location instanceof Tile && !isNaval()) {
-            Iterator<Position> tileIterator = getGame().getMap().getAdjacentIterator(getTile().getPosition());
-            while (tileIterator.hasNext()) {
-                Tile t = getGame().getMap().getTile(tileIterator.next());
-
-                if (t == null) {
-                    continue;
-                }
-
-                if (getOwner() == null) {
-                    logger.warning("owner == null");
-                    throw new NullPointerException();
-                }
-
-                if (t.getSettlement() != null && !t.getSettlement().getOwner().hasContacted(getOwner())) {
-                    t.getSettlement().getOwner().setContacted(getOwner(), true);
-                    getOwner().setContacted(t.getSettlement().getOwner(), true);
-                } else if (t.isLand() && t.getFirstUnit() != null
-                           && !t.getFirstUnit().getOwner().hasContacted(getOwner())) {
-                    t.getFirstUnit().getOwner().setContacted(getOwner(), true);
-                    getOwner().setContacted(t.getFirstUnit().getOwner(), true);
-                }
-            }
+            contactAdjacent(getTile());
         }
-
         if (!getOwner().isIndian()) {
             getOwner().setExplored(this);
+        }
+    }
+
+    /**
+     * Contact Players with Units or Settlements on surrounding Tiles.
+     *
+     * @param tile a <code>Tile</code> value
+     */
+    public void contactAdjacent(Tile tile) {
+        Iterator<Position> tileIterator = getGame().getMap().getAdjacentIterator(tile.getPosition());
+        while (tileIterator.hasNext()) {
+            Tile t = getGame().getMap().getTile(tileIterator.next());
+
+            if (t == null) {
+                continue;
+            }
+
+            if (getOwner() == null) {
+                logger.warning("owner == null");
+                throw new NullPointerException();
+            }
+
+            if (t.getSettlement() != null && !t.getSettlement().getOwner().hasContacted(getOwner())) {
+                t.getSettlement().getOwner().setContacted(getOwner(), true);
+                getOwner().setContacted(t.getSettlement().getOwner(), true);
+            } else if (t.isLand() && t.getFirstUnit() != null
+                       && !t.getFirstUnit().getOwner().hasContacted(getOwner())) {
+                t.getFirstUnit().getOwner().setContacted(getOwner(), true);
+                getOwner().setContacted(t.getFirstUnit().getOwner(), true);
+            }
         }
     }
 

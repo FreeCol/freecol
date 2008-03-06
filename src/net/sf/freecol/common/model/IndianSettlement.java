@@ -458,12 +458,6 @@ public class IndianSettlement extends Settlement {
         return wantedGoods;
     }
 
-    public void setWantedGoods(int index, int goodsIndex) {
-        if (0 <= index && index <= 2) {
-            wantedGoods[index] = FreeCol.getSpecification().getGoodsType(goodsIndex);
-        }
-    }
-
     public void setWantedGoods(int index, GoodsType type) {
         if (0 <= index && index <= 2) {
             wantedGoods[index] = type;

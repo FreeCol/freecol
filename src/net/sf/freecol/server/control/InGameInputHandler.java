@@ -1537,29 +1537,24 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         }
         Direction direction = Enum.valueOf(Direction.class, element.getAttribute("direction"));
         String action = element.getAttribute("action");
-        IndianSettlement settlement;
-        if (action.equals("basic")) {
-            settlement = (IndianSettlement) map.getNeighbourOrNull(direction, unit.getTile()).getSettlement();
-            // Move the unit onto the settlement's Tile.
-            unit.setLocation(settlement.getTile());
-            unit.setMovesLeft(0);
-        } else {
-            settlement = (IndianSettlement) unit.getTile().getSettlement();
-            // Move the unit back to its original Tile.
-            unit.setLocation(map.getNeighbourOrNull(direction.getReverseDirection(), unit.getTile()));
-        }
+        IndianSettlement settlement = (IndianSettlement) map.getNeighbourOrNull(direction, unit.getTile()).getSettlement();
         Element reply = Message.createNewRootElement("scoutIndianSettlementResult");
         if (action.equals("basic")) {
+            unit.contactAdjacent(settlement.getTile());
+            unit.setMovesLeft(0);
             // Just return the skill and wanted goods.
             UnitType skill = settlement.getLearnableSkill();
             if (skill != null) {
-                reply.setAttribute("skill", Integer.toString(skill.getIndex()));
+                reply.setAttribute("skill", skill.getId());
             }
             settlement.updateWantedGoods();
             GoodsType[] wantedGoods = settlement.getWantedGoods();
-            reply.setAttribute("highlyWantedGoods", Integer.toString(wantedGoods[0].getIndex()));
-            reply.setAttribute("wantedGoods1", Integer.toString(wantedGoods[1].getIndex()));
-            reply.setAttribute("wantedGoods2", Integer.toString(wantedGoods[2].getIndex()));
+            reply.setAttribute("highlyWantedGoods", wantedGoods[0].getId());
+            reply.setAttribute("wantedGoods1", wantedGoods[1].getId());
+            reply.setAttribute("wantedGoods2", wantedGoods[2].getId());
+            for (Tile tile : getGame().getMap().getSurroundingTiles(unit.getTile(), unit.getLineOfSight())) {
+                reply.appendChild(tile.toXMLElement(player, reply.getOwnerDocument()));
+            }
             // Set the Tile.PlayerExploredTile attribute.
             settlement.getTile().updateIndianSettlementInformation(player);
         } else if (action.equals("cancel")) {
