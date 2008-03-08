@@ -59,7 +59,7 @@ public final class ReportIndianPanel extends ReportPanel implements ActionListen
         Player player = getCanvas().getClient().getMyPlayer();
         // Display Panel
         reportPanel.removeAll();
-        reportPanel.setLayout(new GridLayout(8, 1));
+        reportPanel.setLayout(new GridLayout(0, 1));
         for (Player opponent : getCanvas().getClient().getGame().getPlayers()) {
             buildIndianAdvisorPanel(player, opponent);
         }
@@ -110,13 +110,14 @@ public final class ReportIndianPanel extends ReportPanel implements ActionListen
         row += 2;
         result.add(new JLabel(Messages.message("report.indian.typeOfSettlements")),
                    higConst.rc(row, labelColumn));
-        result.add(new JLabel(String.valueOf(((IndianNationType) opponent.getNationType()).getTypeOfSettlement())),
-                   higConst.rc(row, valueColumn, "r"));
+        result.add(new JLabel(String.valueOf(((IndianNationType) opponent.getNationType())
+                                             .getSettlementTypeAsString())),
+                   higConst.rc(row, valueColumn));
         row += 2;
         result.add(new JLabel(Messages.message("report.indian.numberOfSettlements")),
                    higConst.rc(row, labelColumn));
         result.add(new JLabel(String.valueOf(numberOfSettlements)),
-                   higConst.rc(row, valueColumn, "r"));
+                   higConst.rc(row, valueColumn));
         row += 2;
         result.add(new JLabel(Messages.message("report.indian.tension")),
                    higConst.rc(row, labelColumn));

@@ -47,7 +47,7 @@ abstract public class Settlement extends FreeColGameObject implements Location, 
             UNDEAD, 
             INDIAN_CAMP, INDIAN_VILLAGE, AZTEC_CITY, INCA_CITY }
     
-    public static final int RADIUS =1;
+    public static final int RADIUS = 1;
 
     public static final Modifier DEFENCE_MODIFIER =
         new Modifier("model.modifier.defence", "modifiers.inSettlement", 
