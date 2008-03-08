@@ -885,31 +885,28 @@ public class FreeColDialog extends FreeColPanel {
     * @return The FreeColDialog that asks the question to the user.
     */
     public static FreeColDialog createScoutIndianSettlementDialog(IndianSettlement settlement, Player player) {
-        String introText = Messages.message(settlement.getAlarmLevelMessage(player),
-                "%nation%", settlement.getOwner().getNationAsString());
-        UnitType skillType = settlement.getLearnableSkill();
-        String messageID;
-        String skillName = "";
-        if (skillType != null) {
-            messageID = "scoutSettlement.question1";
-            skillName = skillType.getName().toLowerCase();
-        } else {
-            messageID = "scoutSettlement.question2";
+        final JTextArea text = getDefaultTextArea(Messages.message(settlement.getAlarmLevelMessage(player),
+                                                                   "%nation%", settlement.getOwner().getNationAsString()));
+        text.append("\n\n");
+        text.append(Messages.message("scoutSettlement.greetings",
+                                     "%nation%", settlement.getOwner().getNationAsString(),
+                                     "%number%", String.valueOf(settlement.getOwner().getNumberOfSettlements())));
+        text.append(" ");
+        if (settlement.getLearnableSkill() != null) {
+            text.append(Messages.message("scoutSettlement.skill", "%skill%",
+                                         settlement.getLearnableSkill().getName().toLowerCase()));
+            text.append(" ");
         }
-        String[] data = new String [] {
-            "%replace_skill%", skillName,
-            "%replace_good1%", settlement.getHighlyWantedGoods().getName(),
-            "%replace_good2%", settlement.getWantedGoods1().getName(),
-            "%replace_good3%", settlement.getWantedGoods2().getName()};
+        text.append(Messages.message("scoutSettlement.trade",
+                                     "%goods1%", settlement.getHighlyWantedGoods().getName(),
+                                     "%goods2%", settlement.getWantedGoods1().getName(),
+                                     "%goods3%", settlement.getWantedGoods2().getName()));
+        text.append("\n\n");
     
-        String mainText = Messages.message(messageID, data);
-
-        final JTextArea intro = getDefaultTextArea(introText);
-        final JTextArea question = getDefaultTextArea(mainText);
         final JButton speak = new JButton(Messages.message("scoutSettlement.speak")),
-                demand = new JButton(Messages.message("scoutSettlement.tribute")),
-                attack = new JButton(Messages.message("scoutSettlement.attack")),
-                cancel = new JButton(Messages.message("scoutSettlement.cancel"));
+            demand = new JButton(Messages.message("scoutSettlement.tribute")),
+            attack = new JButton(Messages.message("scoutSettlement.attack")),
+            cancel = new JButton(Messages.message("scoutSettlement.cancel"));
 
         final FreeColDialog scoutDialog = new FreeColDialog() {
             public void requestFocus() {
@@ -918,9 +915,9 @@ public class FreeColDialog extends FreeColPanel {
         };
 
         int[] widths = {0};
-        int[] heights = new int[11];
-        for (int index = 0; index < 5; index++) {
-            heights[2 * index + 1] = margin;
+        int[] heights = new int[9];
+        for (int index = 1; index < heights.length; index += 2) {
+            heights[index] = margin;
         }
         int textColumn = 1;
 
@@ -948,9 +945,7 @@ public class FreeColDialog extends FreeColPanel {
         });
 
         int row = 1;
-        scoutDialog.add(intro, higConst.rc(row, textColumn));
-        row += 2;
-        scoutDialog.add(question, higConst.rc(row, textColumn));
+        scoutDialog.add(text, higConst.rc(row, textColumn));
         row += 2;
         scoutDialog.add(speak, higConst.rc(row, textColumn));
         row += 2;

@@ -136,6 +136,9 @@ public class Player extends FreeColGameObject implements Nameable {
 
     private int gold;
 
+    // only used to store the number of native settlements
+    private int numberOfSettlements;
+
     /** The market for Europe. */
     private Market market;
 
@@ -458,6 +461,14 @@ public class Player extends FreeColGameObject implements Nameable {
             }
             settlements.remove(s);
         }
+    }
+
+    public int getNumberOfSettlements() {
+        return numberOfSettlements;
+    }
+
+    public void setNumberOfSettlements(int number) {
+        numberOfSettlements = number;
     }
 
     /**
@@ -2243,6 +2254,7 @@ public class Player extends FreeColGameObject implements Nameable {
         out.writeAttribute("playerType", playerType.toString());
         out.writeAttribute("ai", Boolean.toString(ai));
         out.writeAttribute("tax", Integer.toString(tax));
+        out.writeAttribute("numberOfSettlements", Integer.toString(numberOfSettlements));
 
         if (getGame().isClientTrusted() || showAll || equals(player)) {
             out.writeAttribute("gold", Integer.toString(gold));
@@ -2337,6 +2349,7 @@ public class Player extends FreeColGameObject implements Nameable {
         ai = getAttribute(in, "ai", false);
         dead = getAttribute(in, "dead", false);
         tax = Integer.parseInt(in.getAttributeValue(null, "tax"));
+        numberOfSettlements = getAttribute(in, "numberOfSettlements", 0);
         playerType = Enum.valueOf(PlayerType.class, in.getAttributeValue(null, "playerType"));
         String currentFatherId = in.getAttributeValue(null, "currentFather");
         if (currentFatherId != null) {

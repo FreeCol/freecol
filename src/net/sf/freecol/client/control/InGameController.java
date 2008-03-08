@@ -2720,6 +2720,7 @@ public final class InGameController implements NetworkConstants {
             settlement.setWantedGoods(1, FreeCol.getSpecification().getGoodsType(reply.getAttribute("wantedGoods1")));
             settlement.setWantedGoods(2, FreeCol.getSpecification().getGoodsType(reply.getAttribute("wantedGoods2")));
             settlement.setVisited();
+            settlement.getOwner().setNumberOfSettlements(Integer.parseInt(reply.getAttribute("numberOfCamps")));
             freeColClient.getInGameInputHandler().update(reply);
         } else {
             logger.warning("Server gave an invalid reply to an askSkill message");
