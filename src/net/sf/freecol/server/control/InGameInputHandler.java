@@ -1552,7 +1552,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
             reply.setAttribute("highlyWantedGoods", wantedGoods[0].getId());
             reply.setAttribute("wantedGoods1", wantedGoods[1].getId());
             reply.setAttribute("wantedGoods2", wantedGoods[2].getId());
-            for (Tile tile : getGame().getMap().getSurroundingTiles(unit.getTile(), unit.getLineOfSight())) {
+            for (Tile tile : getGame().getMap().getSurroundingTiles(settlement.getTile(), unit.getLineOfSight())) {
                 reply.appendChild(tile.toXMLElement(player, reply.getOwnerDocument()));
             }
             // Set the Tile.PlayerExploredTile attribute.

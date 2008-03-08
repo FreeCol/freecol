@@ -2719,18 +2719,7 @@ public final class InGameController implements NetworkConstants {
             settlement.setWantedGoods(1, FreeCol.getSpecification().getGoodsType(reply.getAttribute("wantedGoods1")));
             settlement.setWantedGoods(2, FreeCol.getSpecification().getGoodsType(reply.getAttribute("wantedGoods2")));
             settlement.setVisited();
-
-            NodeList nodeList = reply.getChildNodes();
-            for (int i = 0; i < nodeList.getLength(); i++) {
-                Element element = (Element) nodeList.item(i);
-                FreeColGameObject fcgo = unit.getGame().getFreeColGameObjectSafely(element.getAttribute("ID"));
-                if (fcgo != null) {
-                    fcgo.readFromXMLElement(element);
-                } else {
-                    logger.warning("Could not find 'FreeColGameObject' with ID: " + element.getAttribute("ID"));
-                }
-            }
-            //new RefreshCanvasSwingTask().invokeLater();
+            freeColClient.getInGameInputHandler().update(reply);
         } else {
             logger.warning("Server gave an invalid reply to an askSkill message");
             return;
