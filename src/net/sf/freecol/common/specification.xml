@@ -1144,7 +1144,7 @@
       <ability id="model.ability.autoProduction" value="true" />
     </building-type>
     <building-type id="model.building.Docks"   workplaces="0" sequence="15">
-      <!-- TODO: add requirement for not land-locked colony -->
+      <required-ability id="model.ability.hasPort" value="true" />
       <required-goods id="model.goods.hammers" value="52"/>
       <ability id="model.ability.produceInWater" value="true"/>
     </building-type>

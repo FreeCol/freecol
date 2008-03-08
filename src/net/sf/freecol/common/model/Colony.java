@@ -54,6 +54,8 @@ public final class Colony extends Settlement implements Location, Nameable {
     private static final int FOOD_PER_COLONIST = 200;
     private static final int FOOD_CONSUMPTION = 2;
 
+    public static final Ability HAS_PORT = new Ability("model.ability.hasPort");
+
     /** The name of the colony. */
     private String name;
 
@@ -126,6 +128,9 @@ public final class Colony extends Settlement implements Location, Nameable {
             if (t.getType().isWater()) {
                 landLocked = false;
             }
+        }
+        if (!landLocked) {
+            featureContainer.addAbility(HAS_PORT);
         }
         colonyTiles.add(new ColonyTile(game, this, tile));
         List<BuildingType> buildingTypes = FreeCol.getSpecification().getBuildingTypeList();
@@ -1689,6 +1694,9 @@ public final class Colony extends Settlement implements Location, Nameable {
         }
         setCurrentlyBuilding(buildableType);
         landLocked = getAttribute(in, "landLocked", true);
+        if (!landLocked) {
+            featureContainer.addAbility(HAS_PORT);
+        }
         unitCount = getAttribute(in, "unitCount", -1);
         featureContainer.addModifier(Settlement.DEFENCE_MODIFIER);
         // Read child elements:
@@ -1786,7 +1794,8 @@ public final class Colony extends Settlement implements Location, Nameable {
      * @return a <code>boolean</code> value
      */
     public boolean hasAbility(String id) {
-        HashSet<Ability> colonyAbilities = new HashSet(featureContainer.getAbilitySet(id, null, getGame().getTurn()));
+        HashSet<Ability> colonyAbilities = 
+            new HashSet<Ability>(featureContainer.getAbilitySet(id, null, getGame().getTurn()));
         Set<Ability> playerAbilities = owner.getFeatureContainer().getAbilitySet(id, null, getGame().getTurn());
         colonyAbilities.addAll(playerAbilities);
         return FeatureContainer.hasAbility(colonyAbilities);
