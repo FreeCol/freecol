@@ -1144,8 +1144,32 @@ public final class Canvas extends JDesktopPane {
      *         he wants to attack the settlement.
      */
     public ScoutAction showScoutIndianSettlementDialog(IndianSettlement settlement) {
-        FreeColDialog scoutDialog = FreeColDialog.createScoutIndianSettlementDialog(settlement,
-                freeColClient.getMyPlayer());
+        StringBuilder text = new StringBuilder(400);
+        text.append(Messages.message(settlement.getAlarmLevelMessage(freeColClient.getMyPlayer()),
+                                     "%nation%", settlement.getOwner().getNationAsString()));
+        text.append("\n\n");
+        text.append(Messages.message("scoutSettlement.greetings",
+                                     "%nation%", settlement.getOwner().getNationAsString(),
+                                     "%number%", String.valueOf(settlement.getOwner().getNumberOfSettlements())));
+        text.append(" ");
+        if (settlement.getLearnableSkill() != null) {
+            text.append(Messages.message("scoutSettlement.skill", "%skill%",
+                                         settlement.getLearnableSkill().getName().toLowerCase()));
+            text.append(" ");
+        }
+        text.append(Messages.message("scoutSettlement.trade",
+                                     "%goods1%", settlement.getHighlyWantedGoods().getName(),
+                                     "%goods2%", settlement.getWantedGoods1().getName(),
+                                     "%goods3%", settlement.getWantedGoods2().getName()));
+        text.append("\n\n");
+    
+        FreeColDialog scoutDialog = FreeColDialog
+            .createChoiceDialog(text.toString(), null,
+                                ScoutAction.INDIAN_SETTLEMENT_SPEAK,
+                                ScoutAction.INDIAN_SETTLEMENT_TRIBUTE,
+                                ScoutAction.INDIAN_SETTLEMENT_ATTACK,
+                                ScoutAction.CANCEL);
+
         addAsFrame(scoutDialog);
         scoutDialog.requestFocus();
 

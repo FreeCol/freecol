@@ -77,13 +77,24 @@ public class FreeColDialog extends FreeColPanel {
     private static final Logger logger = Logger.getLogger(FreeColDialog.class.getName());
 
 
-    public static enum ScoutAction { CANCEL,
-            INDIAN_SETTLEMENT_SPEAK,
-            INDIAN_SETTLEMENT_TRIBUTE,
-            INDIAN_SETTLEMENT_ATTACK,
-            FOREIGN_COLONY_NEGOTIATE,
-            FOREIGN_COLONY_SPY,
-            FOREIGN_COLONY_ATTACK }
+    public static enum ScoutAction {
+        CANCEL ("cancel"),
+            INDIAN_SETTLEMENT_SPEAK ("scoutSettlement.speak"),
+            INDIAN_SETTLEMENT_TRIBUTE ("scoutSettlement.tribute"),
+            INDIAN_SETTLEMENT_ATTACK ("scoutSettlement.attack"),
+            FOREIGN_COLONY_NEGOTIATE ("scoutColony.negotiate"),
+            FOREIGN_COLONY_SPY ("scoutColony.spy"),
+            FOREIGN_COLONY_ATTACK ("scoutColony.attack");
+
+        private String key;
+        ScoutAction(String key) {
+            this.key = key;
+        }
+
+        public String toString() {
+            return Messages.message(key);
+        }
+    }
 
     public static enum MissionaryAction { CANCEL,
             ESTABLISH_MISSION,
@@ -548,15 +559,21 @@ public class FreeColDialog extends FreeColPanel {
     * @return The <code>FreeColDialog</code>.
     * @see ChoiceItem
     */
-    public static FreeColDialog createChoiceDialog(String text, String cancelText, Object[] objects) {
-        final JButton cancelButton = new JButton(cancelText);
+    public static FreeColDialog createChoiceDialog(String text, String cancelText, Object... objects) {
+
+        if (objects.length == 0) {
+            throw new IllegalArgumentException("Can not create choice dialog with 0 choices!");
+        }
+
+        final JButton cancelButton = new JButton();
+        if (cancelText != null) {
+            cancelButton.setText(cancelText);
+            enterPressesWhenFocused(cancelButton);
+        }
 
         final JButton firstButton;
-        if (objects.length > 0) {
-            firstButton = new JButton(objects[0].toString());
-        } else {
-            firstButton = cancelButton;
-        }
+        firstButton = new JButton(objects[0].toString());
+
         final FreeColDialog choiceDialog = new FreeColDialog() {
             public void requestFocus() {
                 firstButton.requestFocus();
@@ -570,29 +587,28 @@ public class FreeColDialog extends FreeColPanel {
         });
         
         enterPressesWhenFocused(firstButton);
-        enterPressesWhenFocused(cancelButton);
 
         choiceDialog.setLayout(new BorderLayout());
-        JLabel l = new JLabel(text, JLabel.CENTER);
+        JTextArea textArea = getDefaultTextArea(text);
 
-        int height = l.getMinimumSize().height + cancelButton.getMinimumSize().height + 40;
+        int height = textArea.getMinimumSize().height + cancelButton.getMinimumSize().height + 40;
 
-        choiceDialog.add(l, BorderLayout.NORTH);
+        choiceDialog.add(textArea, BorderLayout.NORTH);
 
-        JPanel objectsPanel = new JPanel(new GridLayout(objects.length+1, 1, 10,10));
-        objectsPanel.setBorder(new CompoundBorder(objectsPanel.getBorder(), new EmptyBorder(10,20,10,20)));
+        JPanel objectsPanel = new JPanel(new GridLayout(objects.length + 1, 1, 10, 10));
+        objectsPanel.setBorder(new CompoundBorder(objectsPanel.getBorder(), 
+                                                  new EmptyBorder(10, 20, 10, 20)));
 
-        if (objects.length > 0) {
-            final Object firstObject = objects[0];
-            firstButton.addActionListener(new ActionListener() {
+        final Object firstObject = objects[0];
+        firstButton.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent event) {
                     choiceDialog.setResponse(firstObject);
                 }
             });
-            objectsPanel.add(firstButton);
-            height += firstButton.getMinimumSize().height;
-        }
-        for (int i=1; i<objects.length; i++) {
+        objectsPanel.add(firstButton);
+        height += firstButton.getMinimumSize().height;
+
+        for (int i = 1; i < objects.length; i++) {
             final Object object = objects[i];
             final JButton objectButton = new JButton(object.toString());
             objectButton.addActionListener(new ActionListener() {
@@ -604,7 +620,9 @@ public class FreeColDialog extends FreeColPanel {
             objectsPanel.add(objectButton);
             height += objectButton.getMinimumSize().height;
         }
-        objectsPanel.add(cancelButton);
+        if (cancelText != null) {
+            objectsPanel.add(cancelButton);
+        }
         JScrollPane scrollPane = new JScrollPane(objectsPanel,
                                                  JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
                                                  JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
@@ -875,91 +893,6 @@ public class FreeColDialog extends FreeColPanel {
         return boycottedGoodsDialog;
     }
 
-    /**
-    * Creates a dialog that asks the user what he wants to do with his scout in the indian
-    * settlement. Options are: speak with chief, demand tribute, attack or cancel.
-    * The possible responses are integers that are defined in this class as finals.
-    *
-    * @param settlement The indian settlement that is being scouted.
-    * @param player The player to create the dialog for.
-    * @return The FreeColDialog that asks the question to the user.
-    */
-    public static FreeColDialog createScoutIndianSettlementDialog(IndianSettlement settlement, Player player) {
-        final JTextArea text = getDefaultTextArea(Messages.message(settlement.getAlarmLevelMessage(player),
-                                                                   "%nation%", settlement.getOwner().getNationAsString()));
-        text.append("\n\n");
-        text.append(Messages.message("scoutSettlement.greetings",
-                                     "%nation%", settlement.getOwner().getNationAsString(),
-                                     "%number%", String.valueOf(settlement.getOwner().getNumberOfSettlements())));
-        text.append(" ");
-        if (settlement.getLearnableSkill() != null) {
-            text.append(Messages.message("scoutSettlement.skill", "%skill%",
-                                         settlement.getLearnableSkill().getName().toLowerCase()));
-            text.append(" ");
-        }
-        text.append(Messages.message("scoutSettlement.trade",
-                                     "%goods1%", settlement.getHighlyWantedGoods().getName(),
-                                     "%goods2%", settlement.getWantedGoods1().getName(),
-                                     "%goods3%", settlement.getWantedGoods2().getName()));
-        text.append("\n\n");
-    
-        final JButton speak = new JButton(Messages.message("scoutSettlement.speak")),
-            demand = new JButton(Messages.message("scoutSettlement.tribute")),
-            attack = new JButton(Messages.message("scoutSettlement.attack")),
-            cancel = new JButton(Messages.message("scoutSettlement.cancel"));
-
-        final FreeColDialog scoutDialog = new FreeColDialog() {
-            public void requestFocus() {
-                speak.requestFocus();
-            }
-        };
-
-        int[] widths = {0};
-        int[] heights = new int[9];
-        for (int index = 1; index < heights.length; index += 2) {
-            heights[index] = margin;
-        }
-        int textColumn = 1;
-
-        scoutDialog.setLayout(new HIGLayout(widths, heights));
-
-        speak.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent event) {
-                scoutDialog.setResponse(ScoutAction.INDIAN_SETTLEMENT_SPEAK);
-            }
-        });
-        demand.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent event) {
-                scoutDialog.setResponse(ScoutAction.INDIAN_SETTLEMENT_TRIBUTE);
-            }
-        });
-        attack.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent event) {
-                scoutDialog.setResponse(ScoutAction.INDIAN_SETTLEMENT_ATTACK);
-            }
-        });
-        cancel.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent event) {
-                scoutDialog.setResponse(ScoutAction.CANCEL);
-            }
-        });
-
-        int row = 1;
-        scoutDialog.add(text, higConst.rc(row, textColumn));
-        row += 2;
-        scoutDialog.add(speak, higConst.rc(row, textColumn));
-        row += 2;
-        scoutDialog.add(demand, higConst.rc(row, textColumn));
-        row += 2;
-        scoutDialog.add(attack, higConst.rc(row, textColumn));
-        row += 2;
-        scoutDialog.add(cancel, higConst.rc(row, textColumn));
-
-        scoutDialog.setSize(scoutDialog.getPreferredSize());
-        scoutDialog.setCancelComponent(cancel);
-
-        return scoutDialog;
-    }
 
     /**
     * Creates a dialog that asks the user what he wants to do with his scout in the indian
