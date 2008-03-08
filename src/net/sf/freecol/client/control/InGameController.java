@@ -45,7 +45,8 @@ import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.client.gui.option.FreeColActionUI;
 import net.sf.freecol.client.gui.panel.ChoiceItem;
 import net.sf.freecol.client.gui.panel.EventPanel;
-import net.sf.freecol.client.gui.panel.FreeColDialog;
+import net.sf.freecol.client.gui.panel.FreeColDialog.MissionaryAction;
+import net.sf.freecol.client.gui.panel.FreeColDialog.ScoutAction;
 import net.sf.freecol.client.gui.sound.SfxLibrary;
 import net.sf.freecol.client.networking.Client;
 import net.sf.freecol.common.Specification;
@@ -1559,14 +1560,14 @@ public final class InGameController implements NetworkConstants {
         if (target.getSettlement() != null && target.getSettlement() instanceof IndianSettlement && unit.isArmed()) {
             IndianSettlement settlement = (IndianSettlement) target.getSettlement();
             switch (freeColClient.getCanvas().showArmedUnitIndianSettlementDialog(settlement)) {
-            case FreeColDialog.SCOUT_INDIAN_SETTLEMENT_ATTACK:
+            case INDIAN_SETTLEMENT_ATTACK:
                 if (confirmHostileAction(unit, target) && confirmPreCombat(unit, target)) {
                     reallyAttack(unit, direction);
                 }
                 return;
-            case FreeColDialog.SCOUT_INDIAN_SETTLEMENT_CANCEL:
+            case CANCEL:
                 return;
-            case FreeColDialog.SCOUT_INDIAN_SETTLEMENT_TRIBUTE:
+            case INDIAN_SETTLEMENT_TRIBUTE:
                 Element demandMessage = Message.createNewRootElement("armedUnitDemandTribute");
                 demandMessage.setAttribute("unit", unit.getId());
                 demandMessage.setAttribute("direction", direction.toString());
@@ -2656,18 +2657,18 @@ public final class InGameController implements NetworkConstants {
         Tile tile = map.getNeighbourOrNull(direction, unit.getTile());
         Colony colony = tile.getColony();
 
-        int userAction = canvas.showScoutForeignColonyDialog(colony, unit);
+        ScoutAction userAction = canvas.showScoutForeignColonyDialog(colony, unit);
 
         switch (userAction) {
-        case FreeColDialog.SCOUT_FOREIGN_COLONY_CANCEL:
+        case CANCEL:
             break;
-        case FreeColDialog.SCOUT_FOREIGN_COLONY_ATTACK:
+        case FOREIGN_COLONY_ATTACK:
             attack(unit, direction);
             break;
-        case FreeColDialog.SCOUT_FOREIGN_COLONY_NEGOTIATE:
+        case FOREIGN_COLONY_NEGOTIATE:
              negotiate(unit, direction);
             break;
-        case FreeColDialog.SCOUT_FOREIGN_COLONY_SPY:
+        case FOREIGN_COLONY_SPY:
             spy(unit, direction);
             break;
         default:
@@ -2725,10 +2726,10 @@ public final class InGameController implements NetworkConstants {
             return;
         }
 
-        int userAction = canvas.showScoutIndianSettlementDialog(settlement);
+        ScoutAction userAction = canvas.showScoutIndianSettlementDialog(settlement);
 
         switch (userAction) {
-        case FreeColDialog.SCOUT_INDIAN_SETTLEMENT_ATTACK:
+        case INDIAN_SETTLEMENT_ATTACK:
             scoutMessage.setAttribute("action", "attack");
             // The movesLeft has been set to 0 when the scout initiated its
             // action.If it wants to attack then it can and it will need some
@@ -2740,15 +2741,15 @@ public final class InGameController implements NetworkConstants {
                 reallyAttack(unit, direction);
             }
             return;
-        case FreeColDialog.SCOUT_INDIAN_SETTLEMENT_CANCEL:
+        case CANCEL:
             scoutMessage.setAttribute("action", "cancel");
             client.sendAndWait(scoutMessage);
             return;
-        case FreeColDialog.SCOUT_INDIAN_SETTLEMENT_SPEAK:
+        case INDIAN_SETTLEMENT_SPEAK:
             scoutMessage.setAttribute("action", "speak");
             reply = client.ask(scoutMessage);
             break;
-        case FreeColDialog.SCOUT_INDIAN_SETTLEMENT_TRIBUTE:
+        case INDIAN_SETTLEMENT_TRIBUTE:
             scoutMessage.setAttribute("action", "tribute");
             reply = client.ask(scoutMessage);
             break;
@@ -2813,7 +2814,7 @@ public final class InGameController implements NetworkConstants {
                 .getSettlement();
 
         List<Object> response = canvas.showUseMissionaryDialog(settlement);
-        int action = ((Integer) response.get(0)).intValue();
+        MissionaryAction action = (MissionaryAction) response.get(0);
 
         Element missionaryMessage = Message.createNewRootElement("missionaryAtSettlement");
         missionaryMessage.setAttribute("unit", unit.getId());
@@ -2824,17 +2825,17 @@ public final class InGameController implements NetworkConstants {
         unit.setMovesLeft(0);
 
         switch (action) {
-        case FreeColDialog.MISSIONARY_CANCEL:
+        case CANCEL:
             missionaryMessage.setAttribute("action", "cancel");
             client.sendAndWait(missionaryMessage);
             break;
-        case FreeColDialog.MISSIONARY_ESTABLISH:
+        case ESTABLISH_MISSION:
             missionaryMessage.setAttribute("action", "establish");
             settlement.setMissionary(unit);
             client.sendAndWait(missionaryMessage);
             nextActiveUnit(); // At this point: unit.getTile() == null
             return;
-        case FreeColDialog.MISSIONARY_DENOUNCE_AS_HERESY:
+        case DENOUNCE_HERESY:
             missionaryMessage.setAttribute("action", "heresy");
             reply = client.ask(missionaryMessage);
 
@@ -2852,7 +2853,7 @@ public final class InGameController implements NetworkConstants {
                 nextActiveUnit(); // At this point: unit == null
             }
             return;
-        case FreeColDialog.MISSIONARY_INCITE_INDIANS:
+        case INCITE_INDIANS:
             missionaryMessage.setAttribute("action", "incite");
             missionaryMessage.setAttribute("incite", ((Player) response.get(1)).getId());
 

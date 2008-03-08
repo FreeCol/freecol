@@ -77,20 +77,18 @@ public class FreeColDialog extends FreeColPanel {
     private static final Logger logger = Logger.getLogger(FreeColDialog.class.getName());
 
 
-    public static final int SCOUT_INDIAN_SETTLEMENT_CANCEL = 0,
-                            SCOUT_INDIAN_SETTLEMENT_SPEAK = 1,
-                            SCOUT_INDIAN_SETTLEMENT_TRIBUTE = 2,
-                            SCOUT_INDIAN_SETTLEMENT_ATTACK = 3;
+    public static enum ScoutAction { CANCEL,
+            INDIAN_SETTLEMENT_SPEAK,
+            INDIAN_SETTLEMENT_TRIBUTE,
+            INDIAN_SETTLEMENT_ATTACK,
+            FOREIGN_COLONY_NEGOTIATE,
+            FOREIGN_COLONY_SPY,
+            FOREIGN_COLONY_ATTACK }
 
-    public static final int SCOUT_FOREIGN_COLONY_CANCEL = 0,
-                            SCOUT_FOREIGN_COLONY_NEGOTIATE = 1,
-                            SCOUT_FOREIGN_COLONY_SPY = 2,
-                            SCOUT_FOREIGN_COLONY_ATTACK = 3;
-
-    public static final int MISSIONARY_CANCEL = 0,
-                            MISSIONARY_ESTABLISH = 1,
-                            MISSIONARY_DENOUNCE_AS_HERESY = 2,
-                            MISSIONARY_INCITE_INDIANS = 3;
+    public static enum MissionaryAction { CANCEL,
+            ESTABLISH_MISSION,
+            DENOUNCE_HERESY,
+            INCITE_INDIANS }
 
     // Stores the response from the user:
     private Object response = null;
@@ -785,22 +783,22 @@ public class FreeColDialog extends FreeColPanel {
 
         negotiate.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent event) {
-                scoutDialog.setResponse(new Integer(SCOUT_FOREIGN_COLONY_NEGOTIATE));
+                scoutDialog.setResponse(ScoutAction.FOREIGN_COLONY_NEGOTIATE);
             }
         });
         spy.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent event) {
-                scoutDialog.setResponse(new Integer(SCOUT_FOREIGN_COLONY_SPY));
+                scoutDialog.setResponse(ScoutAction.FOREIGN_COLONY_SPY);
             }
         });
         attack.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent event) {
-                scoutDialog.setResponse(new Integer(SCOUT_FOREIGN_COLONY_ATTACK));
+                scoutDialog.setResponse(ScoutAction.FOREIGN_COLONY_ATTACK);
             }
         });
         cancel.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent event) {
-                scoutDialog.setResponse(new Integer(SCOUT_FOREIGN_COLONY_CANCEL));
+                scoutDialog.setResponse(ScoutAction.CANCEL);
             }
         });
 
@@ -930,22 +928,22 @@ public class FreeColDialog extends FreeColPanel {
 
         speak.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent event) {
-                scoutDialog.setResponse(new Integer(SCOUT_INDIAN_SETTLEMENT_SPEAK));
+                scoutDialog.setResponse(ScoutAction.INDIAN_SETTLEMENT_SPEAK);
             }
         });
         demand.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent event) {
-                scoutDialog.setResponse(new Integer(SCOUT_INDIAN_SETTLEMENT_TRIBUTE));
+                scoutDialog.setResponse(ScoutAction.INDIAN_SETTLEMENT_TRIBUTE);
             }
         });
         attack.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent event) {
-                scoutDialog.setResponse(new Integer(SCOUT_INDIAN_SETTLEMENT_ATTACK));
+                scoutDialog.setResponse(ScoutAction.INDIAN_SETTLEMENT_ATTACK);
             }
         });
         cancel.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent event) {
-                scoutDialog.setResponse(new Integer(SCOUT_INDIAN_SETTLEMENT_CANCEL));
+                scoutDialog.setResponse(ScoutAction.CANCEL);
             }
         });
 
@@ -1002,17 +1000,17 @@ public class FreeColDialog extends FreeColPanel {
 
         demand.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent event) {
-                armedUnitDialog.setResponse(new Integer(SCOUT_INDIAN_SETTLEMENT_TRIBUTE));
+                armedUnitDialog.setResponse(ScoutAction.INDIAN_SETTLEMENT_TRIBUTE);
             }
         });
         attack.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent event) {
-                armedUnitDialog.setResponse(new Integer(SCOUT_INDIAN_SETTLEMENT_ATTACK));
+                armedUnitDialog.setResponse(ScoutAction.INDIAN_SETTLEMENT_ATTACK);
             }
         });
         cancel.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent event) {
-                armedUnitDialog.setResponse(new Integer(SCOUT_INDIAN_SETTLEMENT_CANCEL));
+                armedUnitDialog.setResponse(ScoutAction.CANCEL);
             }
         });
 
@@ -1080,26 +1078,26 @@ public class FreeColDialog extends FreeColPanel {
         if (settlement.getMissionary() == null) {
             establishOrHeresy.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent event) {
-                    missionaryDialog.setResponse(new Integer(MISSIONARY_ESTABLISH));
+                    missionaryDialog.setResponse(MissionaryAction.ESTABLISH_MISSION);
                 }
             });
         }
         else {
             establishOrHeresy.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent event) {
-                    missionaryDialog.setResponse(new Integer(MISSIONARY_DENOUNCE_AS_HERESY));
+                    missionaryDialog.setResponse(MissionaryAction.DENOUNCE_HERESY);
                 }
             });
         }
 
         incite.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent event) {
-                missionaryDialog.setResponse(new Integer(MISSIONARY_INCITE_INDIANS));
+                missionaryDialog.setResponse(MissionaryAction.INCITE_INDIANS);
             }
         });
         cancel.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent event) {
-                missionaryDialog.setResponse(new Integer(MISSIONARY_CANCEL));
+                missionaryDialog.setResponse(MissionaryAction.CANCEL);
             }
         });
 

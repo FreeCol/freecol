@@ -69,6 +69,8 @@ import net.sf.freecol.client.gui.panel.ErrorPanel;
 import net.sf.freecol.client.gui.panel.EuropePanel;
 import net.sf.freecol.client.gui.panel.EventPanel;
 import net.sf.freecol.client.gui.panel.FreeColDialog;
+import net.sf.freecol.client.gui.panel.FreeColDialog.MissionaryAction;
+import net.sf.freecol.client.gui.panel.FreeColDialog.ScoutAction;
 import net.sf.freecol.client.gui.panel.FreeColImageBorder;
 import net.sf.freecol.client.gui.panel.GameOptionsDialog;
 import net.sf.freecol.client.gui.panel.IndianSettlementPanel;
@@ -1141,13 +1143,13 @@ public final class Canvas extends JDesktopPane {
      *         demand tribute, FreeColDialog.SCOUT_INDIAN_SETTLEMENT_ATTACK if
      *         he wants to attack the settlement.
      */
-    public int showScoutIndianSettlementDialog(IndianSettlement settlement) {
+    public ScoutAction showScoutIndianSettlementDialog(IndianSettlement settlement) {
         FreeColDialog scoutDialog = FreeColDialog.createScoutIndianSettlementDialog(settlement,
                 freeColClient.getMyPlayer());
         addAsFrame(scoutDialog);
         scoutDialog.requestFocus();
 
-        int response = scoutDialog.getResponseInt();
+        ScoutAction response = (ScoutAction) scoutDialog.getResponse();
 
         remove(scoutDialog);
 
@@ -1167,13 +1169,13 @@ public final class Canvas extends JDesktopPane {
      *         spy the colony, FreeColDialog.SCOUT_FOREIGN_COLONY_ATTACK if
      *         he wants to attack the colony.
      */
-    public int showScoutForeignColonyDialog(Colony colony, Unit unit) {
+    public ScoutAction showScoutForeignColonyDialog(Colony colony, Unit unit) {
         FreeColDialog scoutDialog = FreeColDialog.createScoutForeignColonyDialog(colony,
                 unit);
         addAsFrame(scoutDialog);
         scoutDialog.requestFocus();
 
-        int response = scoutDialog.getResponseInt();
+        ScoutAction response = (ScoutAction) scoutDialog.getResponse();
 
         remove(scoutDialog);
 
@@ -1193,13 +1195,13 @@ public final class Canvas extends JDesktopPane {
      *         FreeColDialog.SCOUT_INDIAN_SETTLEMENT_ATTACK if he wants to
      *         attack the settlement.
      */
-    public int showArmedUnitIndianSettlementDialog(IndianSettlement settlement) {
+    public ScoutAction showArmedUnitIndianSettlementDialog(IndianSettlement settlement) {
         FreeColDialog armedUnitDialog = FreeColDialog.createArmedUnitIndianSettlementDialog(settlement, freeColClient
                 .getMyPlayer());
         addAsFrame(armedUnitDialog);
         armedUnitDialog.requestFocus();
 
-        int response = armedUnitDialog.getResponseInt();
+        ScoutAction response = (ScoutAction) armedUnitDialog.getResponse();
 
         remove(armedUnitDialog);
 
@@ -1228,14 +1230,14 @@ public final class Canvas extends JDesktopPane {
         addAsFrame(missionaryDialog);
         missionaryDialog.requestFocus();
 
-        Integer response = (Integer) missionaryDialog.getResponse();
+        MissionaryAction response = (MissionaryAction) missionaryDialog.getResponse();
         ArrayList<Object> returnValue = new ArrayList<Object>();
         // TODO: Find a solution so that we can use a more specialized list.
         returnValue.add(response);
 
         remove(missionaryDialog);
 
-        if (response.intValue() == FreeColDialog.MISSIONARY_INCITE_INDIANS) {
+        if (MissionaryAction.INCITE_INDIANS.equals(response)) {
             FreeColDialog inciteDialog = FreeColDialog.createInciteDialog(freeColClient.getGame().getEuropeanPlayers(),
                     freeColClient.getMyPlayer());
             addAsFrame(inciteDialog);
@@ -1246,7 +1248,7 @@ public final class Canvas extends JDesktopPane {
                 returnValue.add(response2);
             } else {
                 returnValue.clear();
-                returnValue.add(new Integer(FreeColDialog.MISSIONARY_CANCEL));
+                returnValue.add(MissionaryAction.CANCEL);
             }
 
             remove(inciteDialog);
