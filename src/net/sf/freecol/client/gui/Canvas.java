@@ -69,8 +69,6 @@ import net.sf.freecol.client.gui.panel.ErrorPanel;
 import net.sf.freecol.client.gui.panel.EuropePanel;
 import net.sf.freecol.client.gui.panel.EventPanel;
 import net.sf.freecol.client.gui.panel.FreeColDialog;
-import net.sf.freecol.client.gui.panel.FreeColDialog.MissionaryAction;
-import net.sf.freecol.client.gui.panel.FreeColDialog.ScoutAction;
 import net.sf.freecol.client.gui.panel.FreeColImageBorder;
 import net.sf.freecol.client.gui.panel.GameOptionsDialog;
 import net.sf.freecol.client.gui.panel.IndianSettlementPanel;
@@ -157,10 +155,43 @@ import net.sf.freecol.server.generator.MapGeneratorOptions;
  * contrast, a <code>showXXXPanel</code>-method returns immediately.
  */
 public final class Canvas extends JDesktopPane {
+
     private static final Logger logger = Logger.getLogger(Canvas.class.getName());
 
+    public static enum ScoutAction {
+        CANCEL ("scoutSettlement.cancel"),
+        INDIAN_SETTLEMENT_SPEAK ("scoutSettlement.speak"),
+        INDIAN_SETTLEMENT_TRIBUTE ("scoutSettlement.tribute"),
+        INDIAN_SETTLEMENT_ATTACK ("scoutSettlement.attack"),
+        FOREIGN_COLONY_NEGOTIATE ("scoutColony.negotiate"),
+        FOREIGN_COLONY_SPY ("scoutColony.spy"),
+        FOREIGN_COLONY_ATTACK ("scoutColony.attack");
 
+        private String key;
+        ScoutAction(String key) {
+            this.key = key;
+        }
 
+        public String toString() {
+            return Messages.message(key);
+        }
+    }
+
+    public static enum MissionaryAction {
+        CANCEL ("missionarySettlement.cancel"),
+        ESTABLISH_MISSION ("missionarySettlement.establish"),
+        DENOUNCE_HERESY ("missionarySettlement.cancel"),
+        INCITE_INDIANS ("missionarySettlement.incite");
+
+        private String key;
+        MissionaryAction(String key) {
+            this.key = key;
+        }
+
+        public String toString() {
+            return Messages.message(key);
+        }
+    }
 
     private static final Integer MAIN_LAYER = JLayeredPane.DEFAULT_LAYER;
 
@@ -1136,11 +1167,11 @@ public final class Canvas extends JDesktopPane {
      * 
      * @param settlement The indian settlement that is being scouted.
      * 
-     * @return FreeColDialog.SCOUT_INDIAN_SETTLEMENT_CANCEL if the action was
-     *         cancelled, FreeColDialog.SCOUT_INDIAN_SETTLEMENT_SPEAK if he
-     *         wants to speak with the chief,
-     *         FreeColDialog.SCOUT_INDIAN_SETTLEMENT_TRIBUTE if he wants to
-     *         demand tribute, FreeColDialog.SCOUT_INDIAN_SETTLEMENT_ATTACK if
+     * @return ScoutAction.CANCEL if the action was cancelled,
+     *         ScoutAction.INDIAN_SETTLEMENT_SPEAK if he wants to
+     *         speak with the chief,
+     *         ScoutAction.INDIAN_SETTLEMENT_TRIBUTE if he wants to
+     *         demand tribute, ScoutAction.INDIAN_SETTLEMENT_ATTACK if
      *         he wants to attack the settlement.
      */
     public ScoutAction showScoutIndianSettlementDialog(IndianSettlement settlement) {
@@ -1186,16 +1217,24 @@ public final class Canvas extends JDesktopPane {
      * 
      * @param colony The foreign colony that is being scouted.
      * 
-     * @return FreeColDialog.SCOUT_FOREIGN_COLONY_CANCEL if the action was
-     *         cancelled, FreeColDialog.SCOUT_FOREIGN_COLONY_NEGOTIATE if he
-     *         wants to negotaite with the foreign power,
-     *         FreeColDialog.SCOUT_FOREIGN_COLONY_SPY if he wants to
-     *         spy the colony, FreeColDialog.SCOUT_FOREIGN_COLONY_ATTACK if
-     *         he wants to attack the colony.
+     * @return ScoutAction.CANCEL if the action was cancelled,
+     *         ScoutAction.FOREIGN_COLONY_NEGOTIATE if he wants to
+     *         negotaite with the foreign power,
+     *         ScoutAction.FOREIGN_COLONY_SPY if he wants to spy the
+     *         colony, ScoutAction.FOREIGN_COLONY_ATTACK if he wants
+     *         to attack the colony.
      */
     public ScoutAction showScoutForeignColonyDialog(Colony colony, Unit unit) {
-        FreeColDialog scoutDialog = FreeColDialog.createScoutForeignColonyDialog(colony,
-                unit);
+        String mainText = Messages.message("scoutColony.text", 
+                                           "%unit%", unit.getName(), 
+                                           "%colony%", colony.getName());
+
+        FreeColDialog scoutDialog = FreeColDialog
+            .createChoiceDialog(mainText, null,
+                                ScoutAction.FOREIGN_COLONY_NEGOTIATE,
+                                ScoutAction.FOREIGN_COLONY_SPY,
+                                ScoutAction.FOREIGN_COLONY_ATTACK,
+                                ScoutAction.CANCEL);
         addAsFrame(scoutDialog);
         scoutDialog.requestFocus();
 
@@ -1213,15 +1252,21 @@ public final class Canvas extends JDesktopPane {
      * @param settlement The indian settlement that is going to be attacked or
      *            demanded.
      * 
-     * @return FreeColDialog.SCOUT_INDIAN_SETTLEMENT_CANCEL if the action was
-     *         cancelled, FreeColDialog.SCOUT_INDIAN_SETTLEMENT_TRIBUTE if he
+     * @return ScoutAction.CANCEL if the action was
+     *         cancelled, ScoutAction.INDIAN_SETTLEMENT_TRIBUTE if he
      *         wants to demand tribute,
-     *         FreeColDialog.SCOUT_INDIAN_SETTLEMENT_ATTACK if he wants to
+     *         ScoutAction.INDIAN_SETTLEMENT_ATTACK if he wants to
      *         attack the settlement.
      */
     public ScoutAction showArmedUnitIndianSettlementDialog(IndianSettlement settlement) {
-        FreeColDialog armedUnitDialog = FreeColDialog.createArmedUnitIndianSettlementDialog(settlement, freeColClient
-                .getMyPlayer());
+        String introText = Messages.message(settlement.getAlarmLevelMessage(freeColClient.getMyPlayer()),
+                "%nation%", settlement.getOwner().getNationAsString());
+
+        FreeColDialog armedUnitDialog = FreeColDialog
+            .createChoiceDialog(introText, null,
+                                ScoutAction.INDIAN_SETTLEMENT_TRIBUTE,
+                                ScoutAction.INDIAN_SETTLEMENT_ATTACK,
+                                ScoutAction.CANCEL);
         addAsFrame(armedUnitDialog);
         armedUnitDialog.requestFocus();
 
@@ -1249,8 +1294,20 @@ public final class Canvas extends JDesktopPane {
      *         cancelled.
      */
     public List<Object> showUseMissionaryDialog(IndianSettlement settlement) {
-        FreeColDialog missionaryDialog = FreeColDialog.createUseMissionaryDialog(settlement, freeColClient
-                .getMyPlayer());
+        StringBuilder introText = new StringBuilder(Messages
+                                                    .message(settlement.getAlarmLevelMessage(freeColClient.getMyPlayer()),
+                     "%nation%", settlement.getOwner().getNationAsString()));
+        introText.append("\n\n");
+        introText.append(Messages.message("missionarySettlement.question"));
+
+
+        FreeColDialog missionaryDialog = FreeColDialog
+            .createChoiceDialog(introText.toString(), null,
+                                MissionaryAction.ESTABLISH_MISSION,
+                                MissionaryAction.DENOUNCE_HERESY,
+                                MissionaryAction.INCITE_INDIANS,
+                                MissionaryAction.CANCEL);
+
         addAsFrame(missionaryDialog);
         missionaryDialog.requestFocus();
 
