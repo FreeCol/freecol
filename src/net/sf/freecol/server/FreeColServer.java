@@ -427,7 +427,7 @@ public final class FreeColServer {
             } else {
                 element = Message.createNewRootElement("update");
             }
-            // TODO: Add possibillity of choosing a name:
+            // TODO: Add possibility of choosing a name:
             if (name != null) {
                 element.setAttribute("name", name);
             } else {
@@ -556,7 +556,7 @@ public final class FreeColServer {
             GZIPOutputStream gzip;
             if (DISABLE_SAVEGAME_COMPRESSION) {
                 // No compression
-                xsw = xof.createXMLStreamWriter(new FileOutputStream(file));
+                xsw = xof.createXMLStreamWriter(new FileOutputStream(file), "UTF-8");
             } else {
                 // Compression
                 gzip = new GZIPOutputStream(new FileOutputStream(file));
@@ -870,10 +870,10 @@ public final class FreeColServer {
     }
 
     /**
-     * Gets the <code>Game</code> that is beeing played.
+     * Gets the <code>Game</code> that is being played.
      * 
      * @return The <code>Game</code> which is the main class of the game-model
-     *         beeing used in this game.
+     *         being used in this game.
      */
     public Game getGame() {
         return game;
