@@ -60,6 +60,16 @@ public class Nation extends FreeColGameObjectType {
      */
     private String refID;
 
+    /**
+     * Describe shieldArt here.
+     */
+    private String shieldArt;
+
+    /**
+     * Describe monarch-art here.
+     */
+    private String monarchArt;
+
 
     /**
      * Sole constructor.
@@ -85,6 +95,42 @@ public class Nation extends FreeColGameObjectType {
      */
     public final void setColor(final Color newColor) {
         this.color = newColor;
+    }
+
+    /**
+     * Get the <code>ShieldArt</code> value.
+     *
+     * @return a <code>String</code> value
+     */
+    public final String getShieldArt() {
+        return shieldArt;
+    }
+
+    /**
+     * Set the <code>ShieldArt</code> value.
+     *
+     * @param newShieldArt The new ShieldArt value.
+     */
+    public final void setShieldArt(final String newShieldArt) {
+        this.shieldArt = newShieldArt;
+    }
+
+    /**
+     * Get the <code>Monarch-Art</code> value.
+     *
+     * @return a <code>String</code> value
+     */
+    public final String getMonarchArt() {
+        return monarchArt;
+    }
+
+    /**
+     * Set the <code>MonarchArt</code> value.
+     *
+     * @param newMonarch-Art The new Monarch-Art value.
+     */
+    public final void setMonarchArt(final String newMonarchArt) {
+        this.monarchArt = newMonarchArt;
     }
 
     /**
@@ -184,6 +230,8 @@ public class Nation extends FreeColGameObjectType {
         selectable = getAttribute(in, "selectable", false);
         classic = getAttribute(in, "classic", false);
         refID = getAttribute(in, "ref-of", null);
+        shieldArt = getAttribute(in, "shield-art", "native.png");
+        monarchArt = getAttribute(in, "monarch-art", "louis.png");
         in.nextTag();
    }
 

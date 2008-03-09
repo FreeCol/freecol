@@ -50,6 +50,7 @@ import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.IndianSettlement;
 import net.sf.freecol.common.model.Map.Direction;
+import net.sf.freecol.common.model.Nation;
 import net.sf.freecol.common.model.ResourceType;
 import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.Settlement.SettlementType;
@@ -71,8 +72,6 @@ public final class ImageLibrary extends ImageProvider {
     public static final int UNIT_SELECT = 0, PLOWED = 4, TILE_TAKEN = 5, TILE_OWNED_BY_INDIANS = 6,
             LOST_CITY_RUMOUR = 7, DARKNESS = 8, MISC_COUNT = 10;
 
-    public static final int MONARCH_COUNT = 4;
-
     public static final int UNIT_BUTTON_WAIT = 0, UNIT_BUTTON_DONE = 1, UNIT_BUTTON_FORTIFY = 2,
             UNIT_BUTTON_SENTRY = 3, UNIT_BUTTON_CLEAR = 4, UNIT_BUTTON_PLOW = 5, UNIT_BUTTON_ROAD = 6,
             UNIT_BUTTON_BUILD = 7, UNIT_BUTTON_DISBAND = 8, UNIT_BUTTON_ZOOM_IN = 9, UNIT_BUTTON_ZOOM_OUT = 10,
@@ -87,14 +86,16 @@ public final class ImageLibrary extends ImageProvider {
             miscDirectory = new String("misc/"), miscName = new String("Misc"),
             unitButtonDirectory = new String("order-buttons/"), unitButtonName = new String("button"),
             settlementDirectory = new String("settlements/"),
-            monarchDirectory = new String("monarch/"), monarchName = new String("Monarch");
+        monarchDirectory = new String("monarch/");
 
     private final String dataDirectory;
 
     /**
      * A ArrayList of Image objects.
      */
-    private List<ImageIcon> rivers, misc, monarch;
+    private List<ImageIcon> rivers, misc;
+
+    private Map<Nation, ImageIcon> monarch;
 
     private EnumMap<SettlementType, Image> settlements;
 
@@ -778,11 +779,12 @@ public final class ImageLibrary extends ImageProvider {
      */
     private void loadMonarch(GraphicsConfiguration gc, Class<FreeCol> resourceLocator, boolean doLookup)
             throws FreeColException {
-        monarch = new ArrayList<ImageIcon>(MONARCH_COUNT);
+        monarch = new HashMap<Nation, ImageIcon>();
 
-        for (int i = 0; i < MONARCH_COUNT; i++) {
-            String filePath = dataDirectory + path + monarchDirectory + monarchName + i + extension;
-            monarch.add(findImage(filePath, resourceLocator, doLookup));
+        for (Nation nation : FreeCol.getSpecification().getNations()) {
+            String monarchName = nation.getMonarchArt();
+            String filePath = dataDirectory + path + monarchDirectory + monarchName;
+            monarch.put(nation, findImage(filePath, resourceLocator, doLookup));
         }
     }
 
@@ -905,7 +907,7 @@ public final class ImageLibrary extends ImageProvider {
      * @param nation The nation this monarch rules.
      * @return the monarch-image for the given nation.
      */
-    public Image getMonarchImage(int nation) {
+    public Image getMonarchImage(Nation nation) {
         return monarch.get(nation).getImage();
     }
 
@@ -915,7 +917,7 @@ public final class ImageLibrary extends ImageProvider {
      * @param nation The nation this monarch rules.
      * @return the monarch-image for the given nation.
      */
-    public ImageIcon getMonarchImageIcon(int nation) {
+    public ImageIcon getMonarchImageIcon(Nation nation) {
         return monarch.get(nation);
     }
 

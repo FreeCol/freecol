@@ -1445,6 +1445,15 @@ public class Player extends FreeColGameObject implements Nameable {
     }
 
     /**
+     * Return this Player's nation.
+     *
+     * @return a <code>String</code> value
+     */
+    public Nation getNation() {
+        return FreeCol.getSpecification().getNation(nationID);
+    }
+
+    /**
      * Sets the nation for this player.
      * 
      * @param newNation The new nation for this player.

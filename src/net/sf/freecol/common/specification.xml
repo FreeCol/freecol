@@ -1382,52 +1382,60 @@
       <ability id="model.ability.electFoundingFather"/>
     </european-nation-type>
 
-    <indian-nation-type id="model.nationType.apache" number-of-settlements="average" aggression="high" type-of-settlement="indian_camp">
+    <indian-nation-type id="model.nationType.apache" number-of-settlements="average"
+                        aggression="high" type-of-settlement="indian_camp">
       <skill id="model.unit.expertScout"/>
       <skill id="model.unit.expertFurTrapper"/>
       <ability id="model.ability.ambushBonus" value="true"/>
       <ability id="model.ability.foundColony" value="false"/>
     </indian-nation-type>
-    <indian-nation-type id="model.nationType.sioux" number-of-settlements="average" aggression="average" type-of-settlement="indian_camp">
+    <indian-nation-type id="model.nationType.sioux" number-of-settlements="average"
+                        aggression="average" type-of-settlement="indian_camp">
       <skill id="model.unit.expertScout"/>
       <skill id="model.unit.expertFurTrapper"/>
       <ability id="model.ability.ambushBonus" value="true"/>
       <ability id="model.ability.foundColony" value="false"/>
     </indian-nation-type>
-    <indian-nation-type id="model.nationType.tupi" number-of-settlements="low" aggression="high" type-of-settlement="indian_camp">
+    <indian-nation-type id="model.nationType.tupi" number-of-settlements="low"
+                        aggression="high" type-of-settlement="indian_camp">
       <skill id="model.unit.expertScout"/>
       <skill id="model.unit.expertFurTrapper"/>
       <ability id="model.ability.ambushBonus" value="true"/>
       <ability id="model.ability.foundColony" value="false"/>
     </indian-nation-type>
-    <indian-nation-type id="model.nationType.arawak" number-of-settlements="low" aggression="low" type-of-settlement="indian_village">
+    <indian-nation-type id="model.nationType.arawak" number-of-settlements="low"
+                        aggression="low" type-of-settlement="indian_village">
       <skill id="model.unit.masterSugarPlanter"/>
       <skill id="model.unit.masterCottonPlanter"/>
       <skill id="model.unit.masterTobaccoPlanter"/>
       <ability id="model.ability.ambushBonus" value="true"/>
       <ability id="model.ability.foundColony" value="false"/>
     </indian-nation-type>
-    <indian-nation-type id="model.nationType.cherokee" number-of-settlements="average" aggression="low" type-of-settlement="indian_village">
+    <indian-nation-type id="model.nationType.cherokee" number-of-settlements="average"
+                        aggression="low" type-of-settlement="indian_village">
       <skill id="model.unit.masterSugarPlanter"/>
       <skill id="model.unit.masterCottonPlanter"/>
       <skill id="model.unit.masterTobaccoPlanter"/>
       <ability id="model.ability.ambushBonus" value="true"/>
       <ability id="model.ability.foundColony" value="false"/>
     </indian-nation-type>
-    <indian-nation-type id="model.nationType.iroquois" number-of-settlements="average" aggression="average" type-of-settlement="indian_village">
+    <indian-nation-type id="model.nationType.iroquois" number-of-settlements="average"
+                        aggression="average" type-of-settlement="indian_village">
       <skill id="model.unit.masterSugarPlanter"/>
       <skill id="model.unit.masterCottonPlanter"/>
       <skill id="model.unit.masterTobaccoPlanter"/>
       <ability id="model.ability.ambushBonus" value="true"/>
       <ability id="model.ability.foundColony" value="false"/>
     </indian-nation-type>
-    <indian-nation-type id="model.nationType.inca" number-of-settlements="low" aggression="low" type-of-settlement="inca_city">
+    <indian-nation-type id="model.nationType.inca" number-of-settlements="low"
+                        aggression="low" type-of-settlement="inca_city">
       <skill id="model.unit.expertFarmer"/>
       <skill id="model.unit.expertFisherman"/>
       <ability id="model.ability.ambushBonus" value="true"/>
       <ability id="model.ability.foundColony" value="false"/>
     </indian-nation-type>
-    <indian-nation-type id="model.nationType.aztec" number-of-settlements="low" aggression="high" type-of-settlement="aztec_city">
+    <indian-nation-type id="model.nationType.aztec" number-of-settlements="low"
+                        aggression="high" type-of-settlement="aztec_city">
       <skill id="model.unit.expertFarmer"/>
       <skill id="model.unit.expertFisherman"/>
       <ability id="model.ability.ambushBonus" value="true"/>
@@ -1436,30 +1444,78 @@
   </nation-types>
 
   <nations>
-    <nation id="model.nation.dutch" color="#ff9d3c" nation-type="model.nationType.trade" selectable="true" classic="true"/>
-    <nation id="model.nation.french" color="#0000ff" nation-type="model.nationType.cooperation" selectable="true" classic="true"/>
-    <nation id="model.nation.english" color="#ff0000" nation-type="model.nationType.immigration" selectable="true" classic="true"/>
-    <nation id="model.nation.spanish" color="#ffff00" nation-type="model.nationType.conquest" selectable="true" classic="true"/>
-    <nation id="model.nation.inca" color="#f4f0c4" nation-type="model.nationType.inca"/>
-    <nation id="model.nation.aztec" color="#c4a020" nation-type="model.nationType.aztec"/>
-    <nation id="model.nation.arawak" color="#6888c0" nation-type="model.nationType.arawak"/>
-    <nation id="model.nation.cherokee" color="#6c3c18" nation-type="model.nationType.cherokee"/>
-    <nation id="model.nation.iroquois" color="#74a44c" nation-type="model.nationType.iroquois"/>
-    <nation id="model.nation.sioux" color="#c0ac84" nation-type="model.nationType.sioux"/>
-    <nation id="model.nation.apache" color="#900000" nation-type="model.nationType.apache"/>
-    <nation id="model.nation.tupi" color="#045c04" nation-type="model.nationType.tupi"/>
-    <nation id="model.nation.dutchREF" color="#ff9d3c" nation-type="model.nationType.ref" ref-of="model.nation.dutch"/>
-    <nation id="model.nation.frenchREF" color="#0000ff" nation-type="model.nationType.ref" ref-of="model.nation.french"/>
-    <nation id="model.nation.englishREF" color="#ff0000" nation-type="model.nationType.ref" ref-of="model.nation.english"/>
-    <nation id="model.nation.spanishREF" color="#ffff00" nation-type="model.nationType.ref" ref-of="model.nation.spanish"/>
-    <nation id="model.nation.portuguese" color="#00ff00" nation-type="model.nationType.naval" selectable="true"/>
-    <nation id="model.nation.swedish" color="#ff00ff" nation-type="model.nationType.cooperation" selectable="true"/>
-    <nation id="model.nation.danish" color="#00ffff" nation-type="model.nationType.trade" selectable="true"/>
-    <nation id="model.nation.russian" color="#ffffff" nation-type="model.nationType.immigration" selectable="true"/>
-    <nation id="model.nation.portugueseREF" color="#00ff00" nation-type="model.nationType.ref" ref-of="model.nation.portuguese"/>
-    <nation id="model.nation.swedishREF" color="#ff00ff" nation-type="model.nationType.ref" ref-of="model.nation.swedish"/>
-    <nation id="model.nation.danishREF" color="#00ffff" nation-type="model.nationType.ref" ref-of="model.nation.danish"/>
-    <nation id="model.nation.russianREF" color="#ffffff" nation-type="model.nationType.ref" ref-of="model.nation.russian"/>
+    <nation id="model.nation.dutch" color="#ff9d3c" 
+            nation-type="model.nationType.trade" selectable="true" classic="true"
+            monarch-art="william.png" shield-art="dutch.png"/>
+    <nation id="model.nation.french" color="#0000ff"
+            nation-type="model.nationType.cooperation" selectable="true" classic="true"
+            monarch-art="louis.png" shield-art="french.png"/>
+    <nation id="model.nation.english" color="#ff0000"
+            nation-type="model.nationType.immigration" selectable="true" classic="true"
+            monarch-art="elizabeth.png" shield-art="english.png"/>
+    <nation id="model.nation.spanish" color="#ffff00"
+            nation-type="model.nationType.conquest" selectable="true" classic="true"
+            monarch-art="philip.png" shield-art="spanish.png"/>
+    <nation id="model.nation.portuguese" color="#00ff00"
+            nation-type="model.nationType.naval" selectable="true"
+            monarch-art="william.png" shield-art="dutch.png"/>
+    <nation id="model.nation.swedish" color="#ff00ff"
+            nation-type="model.nationType.cooperation" selectable="true"
+            monarch-art="louis.png" shield-art="french.png"/>
+    <nation id="model.nation.danish" color="#00ffff"
+            nation-type="model.nationType.trade" selectable="true"
+            monarch-art="elizabeth.png" shield-art="english.png"/>
+    <nation id="model.nation.russian" color="#ffffff"
+            nation-type="model.nationType.immigration" selectable="true"
+            monarch-art="philip.png" shield-art="spanish.png"/>
+    <nation id="model.nation.inca" color="#f4f0c4"
+            nation-type="model.nationType.inca"
+            shield-art="native.png"/>
+    <nation id="model.nation.aztec" color="#c4a020"
+            nation-type="model.nationType.aztec"
+            shield-art="native.png"/>
+    <nation id="model.nation.arawak" color="#6888c0"
+            nation-type="model.nationType.arawak"
+            shield-art="native.png"/>
+    <nation id="model.nation.cherokee" color="#6c3c18"
+            nation-type="model.nationType.cherokee"
+            shield-art="native.png"/>
+    <nation id="model.nation.iroquois" color="#74a44c"
+            nation-type="model.nationType.iroquois"
+            shield-art="native.png"/>
+    <nation id="model.nation.sioux" color="#c0ac84"
+            nation-type="model.nationType.sioux"
+            shield-art="native.png"/>
+    <nation id="model.nation.apache" color="#900000"
+            nation-type="model.nationType.apache"
+            shield-art="native.png"/>
+    <nation id="model.nation.tupi" color="#045c04"
+            nation-type="model.nationType.tupi"
+            shield-art="native.png"/>
+    <nation id="model.nation.dutchREF" color="#ff9d3c"
+            nation-type="model.nationType.ref" ref-of="model.nation.dutch"
+            shield-art="dutch-ref.png"/>
+    <nation id="model.nation.frenchREF" color="#0000ff"
+            nation-type="model.nationType.ref" ref-of="model.nation.french"
+            shield-art="french-ref.png"/>
+    <nation id="model.nation.englishREF" color="#ff0000"
+            nation-type="model.nationType.ref" ref-of="model.nation.english"
+            shield-art="english-ref.png"/>
+    <nation id="model.nation.spanishREF" color="#ffff00"
+            nation-type="model.nationType.ref" ref-of="model.nation.spanish"
+            shield-art="spanish-ref.png"/>
+    <nation id="model.nation.portugueseREF" color="#00ff00"
+            nation-type="model.nationType.ref" ref-of="model.nation.portuguese"
+            shield-art="dutch-ref.png"/>
+    <nation id="model.nation.swedishREF" color="#ff00ff"
+            nation-type="model.nationType.ref" ref-of="model.nation.swedish"
+            shield-art="french-ref.png"/>
+    <nation id="model.nation.danishREF" color="#00ffff"
+            nation-type="model.nationType.ref" ref-of="model.nation.danish"
+            shield-art="english-ref.png"/>
+    <nation id="model.nation.russianREF" color="#ffffff"
+            nation-type="model.nationType.ref" ref-of="model.nation.russian"
+            shield-art="spanish-ref.png"/>
   </nations>
 
   <!-- crosses-increment: additional crosses required for each new immigrant

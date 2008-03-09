@@ -1787,7 +1787,6 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
             if (player.isEuropean()) {
                 logger.warning("'playerExploredTiles' for " + player.getName() + " is 'null'.");
                 throw new IllegalStateException("'playerExploredTiles' for " + player.getName()
-                                                + " (index " + player.getIndex() + ") " 
                                                 + " is 'null'. " + player.canSee(this) + ", "
                                                 + isExploredBy(player) + " ::: " + getPosition());
             } else {

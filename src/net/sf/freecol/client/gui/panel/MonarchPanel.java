@@ -32,6 +32,7 @@ import javax.swing.SwingConstants;
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.Monarch;
+import net.sf.freecol.common.model.Nation;
 import cz.autel.dmi.HIGLayout;
 
 /**
@@ -102,8 +103,7 @@ public final class MonarchPanel extends FreeColDialog implements ActionListener 
     public void initialize(int action, String[][] replace) {
         removeAll();
 
-        // TODO: Index does not equals nation
-        int nation = parent.getClient().getMyPlayer().getIndex();
+        Nation nation = parent.getClient().getMyPlayer().getNation();
         imageLabel.setIcon(parent.getGUI().getImageLibrary().getMonarchImageIcon(nation));
 
         int[] widths = { -3, 3 * margin, -1 };
