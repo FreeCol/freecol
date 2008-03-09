@@ -146,7 +146,7 @@ public final class ConnectController {
         }
 
         // TODO-MUCH-LATER: connect client/server directly (not using network-classes)
-        int port = 3541;
+        int port = FreeCol.getDefaultPort();
 
         if (freeColClient.getFreeColServer() != null && freeColClient.getFreeColServer().getServer().getPort() == port) {
             if (freeColClient.getCanvas().showConfirmDialog("stopServer.text", "stopServer.yes", "stopServer.no")) {
@@ -169,7 +169,7 @@ public final class ConnectController {
         }
 
         freeColClient.setSingleplayer(true);
-        boolean loggedIn = login(username, "127.0.0.1", 3541);
+        boolean loggedIn = login(username, "127.0.0.1", port);
 
         if (loggedIn) {
             freeColClient.getPreGameController().setReady(true);
@@ -396,7 +396,7 @@ public final class ConnectController {
                 publicServer = defaultPublicServer;
                 singleplayer = defaultSingleplayer;
                 name = null;
-                port = 3541;
+                port = FreeCol.getDefaultPort();
             }
         } catch (FileNotFoundException e) {
             SwingUtilities.invokeLater( new ErrorJob("fileNotFound") );
@@ -432,7 +432,7 @@ public final class ConnectController {
                     freeColClient.setSingleplayer(singleplayer);
                     SwingUtilities.invokeLater( new Runnable() {
                         public void run() {
-                            login(username, "127.0.0.1", 3541);               
+                            login(username, "127.0.0.1", FreeCol.getDefaultPort());
                             canvas.closeStatusPanel();
                         }
                     } );                    

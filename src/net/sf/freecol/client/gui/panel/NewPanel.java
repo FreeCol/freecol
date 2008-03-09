@@ -128,8 +128,8 @@ public final class NewPanel extends FreeColPanel implements ActionListener {
         name.setColumns(20);
 
         server = new JTextField("127.0.0.1");
-        port1 = new JTextField("3541");
-        port2 = new JTextField("3541");
+        port1 = new JTextField(new Integer(FreeCol.getDefaultPort()).toString());
+        port2 = new JTextField(new Integer(FreeCol.getDefaultPort()).toString());
         single = new JRadioButton(Messages.message("singlePlayerGame"), true);
         join = new JRadioButton(Messages.message("joinMultiPlayerGame"), false);
         start = new JRadioButton(Messages.message("startMultiplayerGame"), false);

@@ -37,6 +37,7 @@ import javax.swing.JTextField;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.border.EmptyBorder;
 
+import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.i18n.Messages;
@@ -121,7 +122,7 @@ public final class LoadingSavegameDialog extends FreeColDialog implements Action
         JPanel p2 = new JPanel(new FlowLayout(FlowLayout.LEFT));
         p2.add(new JLabel(Messages.message("LoadingSavegame.port"), JLabel.LEFT));
         panel.add(p2);
-        portField = new JSpinner(new SpinnerNumberModel(3541, 1, 65536, 1));
+        portField = new JSpinner(new SpinnerNumberModel(FreeCol.getDefaultPort(), 1, 65536, 1));
         panel.add(portField);
 
         ButtonGroup bg = new ButtonGroup();

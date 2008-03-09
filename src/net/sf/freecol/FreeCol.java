@@ -109,7 +109,8 @@ public final class FreeCol {
 
     private static int serverPort;
     private static String serverName = null;
-    
+    private static final int DEFAULT_PORT = 3541;
+
     private static File saveDirectory;
     
     private static File savegameFile = null;
@@ -388,6 +389,14 @@ public final class FreeCol {
         }
     }
 
+    /**
+     * Returns the default server network port.
+     * @return The port number.
+     */
+    public static int getDefaultPort() {
+        return DEFAULT_PORT;
+    }
+    
     /**
      * Returns the file containing the client options.
      * @return The file.
