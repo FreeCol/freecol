@@ -484,8 +484,7 @@ public final class Monarch extends FreeColGameObject {
      */
     public Player declareWar() {
         ArrayList<Player> europeanPlayers = new ArrayList<Player>();
-        for (int i = 0; i < Player.NUMBER_OF_PLAYERS; i++) {
-            Player enemy = getGame().getPlayer(i);
+        for (Player enemy : getGame().getPlayers()) {
             if (enemy == player) {
                 continue;
             } else if (!player.hasContacted(enemy)) {

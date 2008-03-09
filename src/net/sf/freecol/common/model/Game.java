@@ -47,7 +47,9 @@ public class Game extends FreeColGameObject {
 
     private static final Logger logger = Logger.getLogger(Game.class.getName());
 
-    protected int playerIndex;
+    public static final int UNKNOWN_PLAYER_INDEX = 0;
+
+    protected int playerIndex = 1;
 
     /** 
      * A virtual player to use with enemy privateers 

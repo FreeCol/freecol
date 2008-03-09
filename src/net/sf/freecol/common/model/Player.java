@@ -25,6 +25,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map.Entry;
 import java.util.MissingResourceException;
 import java.util.Set;
 import java.util.logging.Level;
@@ -58,14 +59,6 @@ public class Player extends FreeColGameObject implements Nameable {
     private static final Logger logger = Logger.getLogger(Player.class.getName());
 
     /**
-     * The number of players. At the moment, we have 25 players: 8
-     * Europeans + 8 REF + 8 native + "unknown player".
-     * 
-     * TODO: This needs to disappear to allow for flexible specifications.
-     */
-    public static final int NUMBER_OF_PLAYERS = 25;
-
-    /**
      * The index of this player
      */
     private int index;
@@ -79,22 +72,17 @@ public class Player extends FreeColGameObject implements Nameable {
     public static final int MAX_LINE_OF_SIGHT = 2;
 
     /**
-     * Contains booleans to see which tribes this player has met.
-     */
-    private boolean[] contacted = new boolean[NUMBER_OF_PLAYERS];
-
-    /**
      * Only used by AI - stores the tension levels,
      * 0-1000 with 1000 maximum hostility.
      */
     // TODO: move this to AIPlayer
-    private Tension[] tension = new Tension[NUMBER_OF_PLAYERS];
+    private java.util.Map<Player, Tension> tension = new HashMap<Player, Tension>();
 
     /**
      * Stores the stance towards the other players. One of:
      * WAR, CEASE_FIRE, PEACE and ALLIANCE.
      */
-    private Stance[] stance = new Stance[NUMBER_OF_PLAYERS];
+    private java.util.Map<Player, Stance> stance = new HashMap<Player, Stance>();
 
     private static final Color noNationColor = Color.BLACK;
 
@@ -281,7 +269,7 @@ public class Player extends FreeColGameObject implements Nameable {
         
         if (game == null) {
             // The virtual enemy player for privateers
-            this.index = NUMBER_OF_PLAYERS-1;
+            this.index = Game.UNKNOWN_PLAYER_INDEX;
         } else {
             this.index = game.getNextPlayerIndex();
         }
@@ -320,12 +308,6 @@ public class Player extends FreeColGameObject implements Nameable {
             this.nationID = "";
             this.color = noNationColor;
             this.playerType = PlayerType.COLONIAL;
-        }
-        for (int k = 0; k < tension.length; k++) {
-            tension[k] = new Tension(0);
-        }
-        for (int k = 0; k < stance.length; k++) {
-            stance[k] = Stance.PEACE;
         }
         market = new Market(getGame(), this);
         crosses = 0;
@@ -851,7 +833,7 @@ public class Player extends FreeColGameObject implements Nameable {
         if (player == null) {
             return true;
         } else {
-            return contacted[player.getIndex()];
+            return stance.containsKey(player);
         }
     }
 
@@ -862,22 +844,29 @@ public class Player extends FreeColGameObject implements Nameable {
      * @param b <code>true</code> if this <code>Player</code> has
      * contacted the given <code>Player</code>.
      */
-    public void setContacted(Player player, boolean b) {
+    public void setContacted(Player player, boolean contacted) {
 
         if (player == null || player == this || player == getGame().getUnknownEnemy()) {
             return;
-        }
+        }            
 
-        if (b == true && b != contacted[player.getIndex()]) {
+        if (contacted && !hasContacted(player)) {
+            stance.put(player, Stance.PEACE);
             boolean contactedIndians = false;
             boolean contactedEuro = false;
 
-            for (int i = 0; i < getGame().getPlayers().size(); i++) {
-                if (contacted[i]) {
-                    if (getGame().getPlayer(i).isEuropean()) {
+            for (Player player1 : getGame().getPlayers()) {
+                if (hasContacted(player1)) {
+                    if (player1.isEuropean()) {
                         contactedEuro = true;
+                        if (contactedIndians) {
+                            break;
+                        }
                     } else {
                         contactedIndians = true;
+                        if (contactedEuro) {
+                            break;
+                        }
                     }
                 }
             }
@@ -899,7 +888,9 @@ public class Player extends FreeColGameObject implements Nameable {
             }
         }
 
-        contacted[player.getIndex()] = b;
+        if (!contacted) {
+            stance.remove(player);
+        }
     }
 
     /**
@@ -1783,12 +1774,16 @@ public class Player extends FreeColGameObject implements Nameable {
         if (player == this || player == null) {
             return;
         }
-        tension[player.getIndex()].modify(addToTension);
+        if (tension.get(player) == null) {
+            tension.put(player, new Tension(addToTension));
+        } else {
+            tension.get(player).modify(addToTension);
+        }
         
         if (origin != null && isIndian() && origin.getOwner() == player) {
             for (Settlement settlement: settlements) {
                 if (settlement instanceof IndianSettlement && !origin.equals(settlement)) {
-                    ((IndianSettlement) settlement).propagatedAlarm(player.getIndex(), addToTension);
+                    ((IndianSettlement) settlement).propagatedAlarm(player, addToTension);
                 }
             }
         }
@@ -1804,7 +1799,7 @@ public class Player extends FreeColGameObject implements Nameable {
         if (player == this || player == null) {
             return;
         }
-        tension[player.getIndex()] = newTension;
+        tension.put(player, newTension);
     }
 
     /**
@@ -1817,7 +1812,7 @@ public class Player extends FreeColGameObject implements Nameable {
         if (player == null) {
             return new Tension();
         } else {
-            return tension[player.getIndex()];
+            return tension.get(player);
         }
     }
 
@@ -1920,7 +1915,7 @@ public class Player extends FreeColGameObject implements Nameable {
         if (player == null) {
             return Stance.PEACE;
         } else {
-            return stance[player.getIndex()];
+            return stance.get(player);
         }
     }
 
@@ -1944,30 +1939,21 @@ public class Player extends FreeColGameObject implements Nameable {
      */
     public void setStance(Player player, Stance newStance) {
         if (player == null) {
-            return;
+            throw new IllegalArgumentException("Player must not be 'null'.");
         }
-        Stance oldStance = stance[player.getIndex()];
-        // Ignore requests to change the stance when indian players are
-        // involved:
-        /*
-          if (isIndian() || player.isIndian()) {
-          return;
-          }
-        */
         if (player == this) {
-            throw new IllegalStateException("Cannot set the stance towards ourselves.");
+            throw new IllegalArgumentException("Cannot set the stance towards ourselves.");
         }
+        Stance oldStance = stance.get(player);
         if (newStance == oldStance) {
             return;
         }
         if (newStance == Stance.CEASE_FIRE && oldStance != Stance.WAR) {
             throw new IllegalStateException("Cease fire can only be declared when at war.");
         }
-        stance[player.getIndex()] = newStance;
+        stance.put(player, newStance);
         if (player.getStance(this) != newStance) {
             getGame().getModelController().setStance(this, player, newStance);
-        }
-        if (player.getStance(this) != newStance) {
             player.setStance(this, newStance);
         }
         if (oldStance == Stance.PEACE && newStance == Stance.WAR) {
@@ -2101,9 +2087,9 @@ public class Player extends FreeColGameObject implements Nameable {
 
         // reducing tension levels if nation is native
         if (isIndian()) {
-            for (int i = 0; i < tension.length; i++) {
-                if (tension[i] != null && tension[i].getValue() > 0) {
-                    tension[i].modify( -(4 + tension[i].getValue()/100));
+            for (Tension tension1 : tension.values()) {
+                if (tension1.getValue() > 0) {
+                    tension1.modify( -(4 + tension1.getValue()/100));
                 }
             }
         }
@@ -2267,15 +2253,6 @@ public class Player extends FreeColGameObject implements Nameable {
             out.writeAttribute("attackedByPrivateers", Boolean.toString(attackedByPrivateers));
             out.writeAttribute("oldSoL", Integer.toString(oldSoL));
             out.writeAttribute("score", Integer.toString(score));
-            StringBuffer sb = new StringBuffer(contacted.length);
-            for (int i = 0; i < contacted.length; i++) {
-                if (contacted[i]) {
-                    sb.append('1');
-                } else {
-                    sb.append('0');
-                }
-            }
-            out.writeAttribute("contacted", sb.toString());
         } else {
             out.writeAttribute("gold", Integer.toString(-1));
             out.writeAttribute("crosses", Integer.toString(-1));
@@ -2290,17 +2267,19 @@ public class Player extends FreeColGameObject implements Nameable {
         }
         // attributes end here
 
-        int[] tensionArray = new int[tension.length];
-        for (int i = 0; i < tension.length; i++) {
-            tensionArray[i] = tension[i].getValue();
+        for (Entry<Player, Tension> entry : tension.entrySet()) {
+            out.writeStartElement("tension");
+            out.writeAttribute("player", entry.getKey().getId());
+            out.writeAttribute("value", String.valueOf(entry.getValue().getValue()));
+            out.writeEndElement();
         }
-        toArrayElement("tension", tensionArray, out);
 
-        String[] stanceArray = new String[stance.length];
-        for (int i = 0; i < stance.length; i++) {
-            stanceArray[i] = stance[i].toString();
+        for (Entry<Player, Stance> entry : stance.entrySet()) {
+            out.writeStartElement("stance");
+            out.writeAttribute("player", entry.getKey().getId());
+            out.writeAttribute("value", entry.getValue().toString());
+            out.writeEndElement();
         }
-        toArrayElement("stance", stanceArray, out);
 
         for (TradeRoute route : getTradeRoutes()) {
             route.toXML(out, this);
@@ -2356,16 +2335,6 @@ public class Player extends FreeColGameObject implements Nameable {
             currentFather = FreeCol.getSpecification().getFoundingFather(currentFatherId);
         }
         crossesRequired = Integer.parseInt(in.getAttributeValue(null, "crossesRequired"));
-        final String contactedStr = in.getAttributeValue(null, "contacted");
-        if (contactedStr != null) {
-            for (int i = 0; i < contactedStr.length(); i++) {
-                if (contactedStr.charAt(i) == '1') {
-                    contacted[i] = true;
-                } else {
-                    contacted[i] = false;
-                }
-            }
-        }
         final String newLandNameStr = in.getAttributeValue(null, "newLandName");
         if (newLandNameStr != null) {
             newLandName = newLandNameStr;
@@ -2379,15 +2348,13 @@ public class Player extends FreeColGameObject implements Nameable {
                 entryLocation = new Tile(getGame(), entryLocationStr);
             }
         }
-        tension = null;
-        stance = null;
+        tension = new HashMap<Player, Tension>();
+        stance = new HashMap<Player, Stance>();
         while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
             if (in.getLocalName().equals("tension")) {
-                tension = new Tension[NUMBER_OF_PLAYERS];
-                int[] tensionArray = readFromArrayElement("tension", in, new int[0]);
-                for (int i = 0; i < tensionArray.length; i++) {
-                    tension[i] = new Tension(tensionArray[i]);
-                }
+                Player player = (Player) getGame().getFreeColGameObject(in.getAttributeValue(null, "player"));
+                tension.put(player, new Tension(getAttribute(in, "value", 0)));
+                in.nextTag(); // close element
             } else if (in.getLocalName().equals("foundingFathers")) {
                 String[] fatherIds = readFromArrayElement("foundingFathers", in, new String[0]);
                 for (String fatherId : fatherIds) {
@@ -2397,11 +2364,9 @@ public class Player extends FreeColGameObject implements Nameable {
                     featureContainer.add(father.getFeatureContainer());
                 }
             } else if (in.getLocalName().equals("stance")) {
-                String[] stanceStrings = readFromArrayElement("stance", in, new String[0]);
-                stance = new Stance[stanceStrings.length];
-                for (int index = 0; index < stanceStrings.length; index++) {
-                    stance[index] = Enum.valueOf(Stance.class, stanceStrings[index]);
-                }
+                Player player = (Player) getGame().getFreeColGameObject(in.getAttributeValue(null, "player"));
+                stance.put(player, Enum.valueOf(Stance.class, in.getAttributeValue(null, "value")));
+                in.nextTag(); // close element
             } else if (in.getLocalName().equals(Europe.getXMLElementTagName())) {
                 europe = (Europe) getGame().getFreeColGameObject(in.getAttributeValue(null, "ID"));
                 if (europe == null) {
@@ -2440,12 +2405,6 @@ public class Player extends FreeColGameObject implements Nameable {
         
         if (market == null) {
             market = new Market(getGame(), this);
-        }
-        if (tension == null) {
-            tension = new Tension[NUMBER_OF_PLAYERS];
-            for (int i = 0; i < tension.length; i++) {
-                tension[i] = new Tension(0);
-            }
         }
         invalidateCanSeeTiles();
     }

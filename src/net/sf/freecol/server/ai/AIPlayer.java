@@ -500,24 +500,24 @@ public class AIPlayer extends AIObject {
      */
     private void determineStances() {
         logger.finest("Entering method determineStances");
-        Iterator<Player> playerIterator = getGame().getPlayerIterator();
-        while (playerIterator.hasNext()) {
-            Player p = playerIterator.next();
-            if (p == player) {
-                continue;
-            }
-            if (p.getREFPlayer() == getPlayer() && p.getPlayerType() == PlayerType.REBEL) {
-                getPlayer().getTension(p).modify(1000);
-            }
-            if (getPlayer().getStance(p) != Stance.WAR && 
-                getPlayer().getTension(p).getLevel() == Tension.Level.HATEFUL) {
-                getPlayer().setStance(p, Stance.WAR);
-            } else if (getPlayer().getStance(p) == Stance.WAR
-                       && getPlayer().getTension(p).getLevel().compareTo(Tension.Level.CONTENT) <= 0) {
-                getPlayer().setStance(p, Stance.CEASE_FIRE);
-            } else if (getPlayer().getStance(p) == Stance.CEASE_FIRE
-                       && getPlayer().getTension(p).getLevel().compareTo(Tension.Level.HAPPY) <= 0) {
-                getPlayer().setStance(p, Stance.PEACE);
+        for (Player p : getGame().getPlayers()) {
+            if (p != player) {
+                Stance stance = getPlayer().getStance(p);
+                if (stance != null) {
+                    if (p.getREFPlayer() == getPlayer() && p.getPlayerType() == PlayerType.REBEL) {
+                        getPlayer().getTension(p).modify(1000);
+                    }
+                    if (stance != Stance.WAR && 
+                        getPlayer().getTension(p).getLevel() == Tension.Level.HATEFUL) {
+                        getPlayer().setStance(p, Stance.WAR);
+                    } else if (stance == Stance.WAR
+                               && getPlayer().getTension(p).getLevel().compareTo(Tension.Level.CONTENT) <= 0) {
+                        getPlayer().setStance(p, Stance.CEASE_FIRE);
+                    } else if (stance == Stance.CEASE_FIRE
+                               && getPlayer().getTension(p).getLevel().compareTo(Tension.Level.HAPPY) <= 0) {
+                        getPlayer().setStance(p, Stance.PEACE);
+                    }
+                }
             }
         }
     }

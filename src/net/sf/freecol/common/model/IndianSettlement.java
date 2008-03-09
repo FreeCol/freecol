@@ -24,7 +24,9 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Iterator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map.Entry;
 import java.util.StringTokenizer;
 import java.util.logging.Logger;
 
@@ -96,7 +98,7 @@ public class IndianSettlement extends Settlement {
      * Stores the alarm levels. <b>Only used by AI.</b>
      * 0-1000 with 1000 as the maximum alarm level.
      */
-    private Tension[] alarm = new Tension[Player.NUMBER_OF_PLAYERS];
+    private java.util.Map<Player, Tension> alarm = new HashMap<Player, Tension>();
 
     // sort goods types descending by price
     private final Comparator<GoodsType> wantedGoodsComparator = new Comparator<GoodsType>() {
@@ -149,10 +151,6 @@ public class IndianSettlement extends Settlement {
         goodsContainer.addGoods(Goods.LUMBER, 300);
         convertProgress = 0;
         
-        for (int k = 0; k < alarm.length; k++) {
-            alarm[k] = new Tension(0);
-        }
-
         updateWantedGoods();
     }
 
@@ -208,6 +206,14 @@ public class IndianSettlement extends Settlement {
         }
     }
 
+    /**
+     * Returns the alarm Map.
+     *
+     * @return the alarm Map.
+     */
+    public java.util.Map<Player, Tension> getAlarm() {
+        return alarm;
+    }
 
     /**
      * Returns the amount of gold this settlement pays as a tribute.
@@ -249,18 +255,18 @@ public class IndianSettlement extends Settlement {
      * @param addToAlarm The amount to add to the current alarm level.
      */
     public void modifyAlarm(Player player, int addToAlarm) {
-        int nation = player.getIndex();
-        Tension tension = alarm[nation];
+        Tension tension = alarm.get(player);
         if(tension != null) {
             tension.modify(addToAlarm);            
         }
         // propagate alarm upwards
-        if(owner != null) {
-            if (isCapital())
+        if (owner != null) {
+            if (isCapital()) {
                 // capital has a greater impact
-                owner.modifyTension(player, addToAlarm, this); 
-            else
-                owner.modifyTension(player, addToAlarm/2, this);            
+                owner.modifyTension(player, addToAlarm, this);
+            } else {
+                owner.modifyTension(player, addToAlarm/2, this);
+            }
         }
     }
 
@@ -268,17 +274,16 @@ public class IndianSettlement extends Settlement {
      * Propagates the tension felt towards a given nation 
      * from the tribe down to each settlement that has already met that nation.
      * 
-     * @param nation The nation towards whom the alarm is felt.
+     * @param player The Player towards whom the alarm is felt.
      * @param addToAlarm The amount to add to the current alarm level.
      */
-    public void propagatedAlarm(int nation, int addToAlarm) {
-        Tension tension = alarm[nation];
+    public void propagatedAlarm(Player player, int addToAlarm) {
+        Tension tension = alarm.get(player);
         // only applies tension if settlement has met europeans
-        if(tension != null && isVisited) {
+        if (tension != null && isVisited) {
             tension.modify(addToAlarm);            
         }
     }
-
 
     /**
      * Sets alarm towards the given player.
@@ -287,18 +292,7 @@ public class IndianSettlement extends Settlement {
      * @param newAlarm The new alarm value.
      */
     public void setAlarm(Player player, Tension newAlarm) {
-        alarm[player.getIndex()] = newAlarm;
-    }
-
-
-
-    /**
-     * Gets the alarm level towards the given player.
-     * @param nation The nation to get the alarm level for.
-     * @return An object representing the alarm level.
-     */
-    public Tension getAlarm(int nation) {
-        return alarm[nation];
+        alarm.put(player, newAlarm);
     }
 
     /**
@@ -307,7 +301,7 @@ public class IndianSettlement extends Settlement {
      * @return An object representing the alarm level.
      */    
     public Tension getAlarm(Player player) {
-        return getAlarm(player.getIndex());
+        return alarm.get(player);
     }
 
     /**
@@ -318,7 +312,10 @@ public class IndianSettlement extends Settlement {
      * @return The ID of an alarm level message.
      */
     public String getAlarmLevelMessage(Player player) {
-        return "indianSettlement.alarm." + alarm[player.getIndex()].toString().toLowerCase();
+        if (alarm.get(player) == null) {
+            alarm.put(player, new Tension(0));
+        }
+        return "indianSettlement.alarm." + alarm.get(player).toString().toLowerCase();
     }
 
     /**
@@ -449,6 +446,9 @@ public class IndianSettlement extends Settlement {
             this.missionary.dispose();
         }
         this.missionary = missionary;
+        if (alarm.get(missionary.getOwner()) == null) {
+            alarm.put(missionary.getOwner(), new Tension(0));
+        }
         getTile().updatePlayerExploredTiles();
     }
 
@@ -948,10 +948,10 @@ public class IndianSettlement extends Settlement {
             }
 
             /* Decrease alarm slightly - independent from nation level */
-            for (int i=0; i<alarm.length; i++) {
-                if (alarm[i] != null && alarm[i].getValue() > 0) {
-                    int newAlarm = 4 + alarm[i].getValue()/100;
-                    alarm[i].modify(-newAlarm);
+            for (Tension tension : alarm.values()) {
+                if (tension.getValue() > 0) {
+                    int newAlarm = 4 + tension.getValue()/100;
+                    tension.modify(-newAlarm);
                 }
             }
         }
@@ -966,7 +966,7 @@ public class IndianSettlement extends Settlement {
             }
 
             // Increase increment if alarm level is high.
-            increment += 2 * alarm[missionary.getOwner().getIndex()].getValue() / 100;
+            increment += 2 * alarm.get(missionary.getOwner()).getValue() / 100;
             convertProgress += increment;
 
             int extra = Math.max(0, 8-getUnitCount()*getUnitCount());
@@ -1105,7 +1105,8 @@ public class IndianSettlement extends Settlement {
      *      to the stream.
      */
     @Override
-    protected void toXMLImpl(XMLStreamWriter out, Player player, boolean showAll, boolean toSavedGame) throws XMLStreamException {
+    protected void toXMLImpl(XMLStreamWriter out, Player player, boolean showAll, boolean toSavedGame)
+        throws XMLStreamException {
         // Start element:
         out.writeStartElement(getXMLElementTagName());
 
@@ -1143,11 +1144,12 @@ public class IndianSettlement extends Settlement {
 
         }
         
-        int[] tensionArray = new int[alarm.length];
-        for (int i = 0; i < alarm.length; i++) {
-            tensionArray[i] = alarm[i].getValue();
+        for (Entry<Player, Tension> entry : alarm.entrySet()) {
+            out.writeStartElement("alarm");
+            out.writeAttribute("player", entry.getKey().getId());
+            out.writeAttribute("value", String.valueOf(entry.getValue().getValue()));
+            out.writeEndElement();
         }
-        toArrayElement("alarm", tensionArray, out);
 
         if (missionary != null) {
             out.writeStartElement("missionary");
@@ -1226,13 +1228,12 @@ public class IndianSettlement extends Settlement {
             learnableSkill = FreeCol.getSpecification().getUnitType(Integer.parseInt(learnableSkillStr));
         }
 
-        alarm = new Tension[Player.NUMBER_OF_PLAYERS];
+        alarm = new HashMap<Player, Tension>();
         while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
             if (in.getLocalName().equals("alarm")) {
-                int[] tensionArray = readFromArrayElement("alarm", in, new int[0]);
-                for (int i = 0; i < tensionArray.length; i++) {
-                    alarm[i] = new Tension(tensionArray[i]);
-                }
+                Player player = (Player) getGame().getFreeColGameObject(in.getAttributeValue(null, "player"));
+                alarm.put(player, new Tension(getAttribute(in, "value", 0)));
+                in.nextTag(); // close element
             } else if (in.getLocalName().equals("wantedGoods")) {
                 String[] wantedGoodsID = readFromArrayElement("wantedGoods", in, new String[0]);
                 for (int i = 0; i < wantedGoodsID.length; i++) {

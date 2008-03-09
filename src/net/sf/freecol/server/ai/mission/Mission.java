@@ -248,8 +248,12 @@ public abstract class Mission extends AIObject {
                 if ((newTile.isLand() && !unit.isNaval() || !newTile.isLand() && unit.isNaval()) &&
                         defender != null && 
                     defender.getOwner() != unit.getOwner()) {
-                    
-                    int tension = unit.getOwner().getTension(defender.getOwner()).getValue();
+
+                    int tension = 0;
+                    Tension alarm = unit.getOwner().getTension(defender.getOwner());
+                    if (alarm != null) {
+                        tension = alarm.getValue();
+                    }
                     if (unit.getIndianSettlement() != null) {
                         tension += unit.getIndianSettlement().getAlarm(defender.getOwner()).getValue();
                     }

@@ -1499,7 +1499,11 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         Tile tile = map.getNeighbourOrNull(direction.getReverseDirection(), unit.getTile());
         unit.setLocation(tile);
         if (!cancelAction) {
-            switch (settlement.getAlarm(player).getLevel()) {
+            Tension tension = settlement.getAlarm(player);
+            if (tension == null) {
+                tension = new Tension(0);
+            }
+            switch (tension.getLevel()) {
             case HATEFUL:
                 reply.setAttribute("result", "die");
                 unit.dispose();

@@ -132,16 +132,6 @@ public class Tension {
     }
 
     /** 
-     * Returns the current tension level as the string used to translate it.
-     * @return A <code>String</code>-representation of the
-     *      current tension level, used to translate it in properties files.
-     */
-    /*
-    public String getCodeString() {
-        return getLevel().toString();
-    }    
-    */ 
-    /** 
      * Returns the current tension level as a string.
      * @return A <code>String</code>-representation of the
      *      current tension level.
@@ -149,6 +139,7 @@ public class Tension {
     public String toString() {
         return Messages.message(getLevel().toString().toLowerCase());
     }    
+
 }
 
 

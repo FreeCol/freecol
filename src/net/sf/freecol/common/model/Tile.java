@@ -22,9 +22,11 @@ package net.sf.freecol.common.model;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.logging.Logger;
 
@@ -51,6 +53,7 @@ import org.w3c.dom.Element;
  * @see Map
  */
 public final class Tile extends FreeColGameObject implements Location, Named, Ownable {
+
     private static final Logger logger = Logger.getLogger(Tile.class.getName());
 
     // Indians' claims on the tile may be one of the following:
@@ -97,7 +100,7 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
     /**
      * Stores each player's image of this tile. Only initialized when needed.
      */
-    private PlayerExploredTile[] playerExploredTiles = null;
+    private java.util.Map<Player, PlayerExploredTile> playerExploredTiles;
 
     /**
      * Describe region here.
@@ -129,7 +132,7 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
         settlement = null;
 
         if (!isViewShared()) {
-            playerExploredTiles = new PlayerExploredTile[Player.NUMBER_OF_PLAYERS];
+            playerExploredTiles = new HashMap<Player, PlayerExploredTile>();
         }
     }
 
@@ -145,7 +148,7 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
         super(game, in);
 
         if (!isViewShared()) {
-            playerExploredTiles = new PlayerExploredTile[Player.NUMBER_OF_PLAYERS];
+            playerExploredTiles = new HashMap<Player, PlayerExploredTile>();
         }
 
         readFromXML(in);
@@ -162,7 +165,7 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
         super(game, e);
 
         if (!isViewShared()) {
-            playerExploredTiles = new PlayerExploredTile[Player.NUMBER_OF_PLAYERS];
+            playerExploredTiles = new HashMap<Player, PlayerExploredTile>();
         }
 
         readFromXMLElement(e);
@@ -181,7 +184,7 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
         super(game, id);
 
         if (!isViewShared()) {
-            playerExploredTiles = new PlayerExploredTile[Player.NUMBER_OF_PLAYERS];
+            playerExploredTiles = new HashMap<Player, PlayerExploredTile>();
         }
     }
 
@@ -224,11 +227,9 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
         } else {
             Player player = getGame().getCurrentPlayer();
             if (player != null) {
-                if (playerExploredTiles[player.getIndex()] != null) {
-                    PlayerExploredTile pet = playerExploredTiles[player.getIndex()];
-                    if (pet.explored) {
-                        return getType().getName();
-                    }
+                PlayerExploredTile pet = playerExploredTiles.get(player);
+                if (pet != null && pet.explored) {
+                    return getType().getName();
                 }
                 return Messages.message("unexplored");
             } else {
@@ -1481,9 +1482,7 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
             // We're sending the Tile from the server to the client and showAll
             // is false.
             if (player != null) {
-                if (playerExploredTiles[player.getIndex()] != null) {
-                    pet = playerExploredTiles[player.getIndex()];
-                }
+                pet = playerExploredTiles.get(player);
             } else {
                 logger.warning("player == null");
             }
@@ -1563,11 +1562,12 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
                     }
                     out.writeAttribute("hasBeenVisited", Boolean.toString(pet.hasBeenVisited()));
 
-                    int[] tensionArray = new int[Player.NUMBER_OF_PLAYERS];
-                    for (int i = 0; i < tensionArray.length; i++) {
-                        tensionArray[i] = is.getAlarm(i).getValue();
+                    for (Entry<Player, Tension> entry : is.getAlarm().entrySet()) {
+                        out.writeStartElement("alarm");
+                        out.writeAttribute("player", entry.getKey().getId());
+                        out.writeAttribute("value", String.valueOf(entry.getValue()));
+                        out.writeEndElement();
                     }
-                    toArrayElement("alarm", tensionArray, out);
 
                     if (pet.getMissionary() != null) {
                         out.writeStartElement("missionary");
@@ -1607,9 +1607,9 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
         }
 
         if (toSavedGame) {
-            for (int i = 0; i < playerExploredTiles.length; i++) {
-                if (playerExploredTiles[i] != null && playerExploredTiles[i].isExplored()) {
-                    playerExploredTiles[i].toXML(out, player, showAll, toSavedGame);
+            for (PlayerExploredTile peTile : playerExploredTiles.values()) {
+                if (peTile.isExplored()) {
+                    peTile.toXML(out, player, showAll, toSavedGame);
                 }
             }
         }
@@ -1720,11 +1720,12 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
                 }
             } else if (in.getLocalName().equals("playerExploredTile")) {
                 // Only from a savegame:
-                if (playerExploredTiles[Integer.parseInt(in.getAttributeValue(null, "nation"))] == null) {
+                Player player = (Player) getGame().getFreeColGameObject(in.getAttributeValue(null, "player"));
+                if (playerExploredTiles.get(player) == null) {
                     PlayerExploredTile pet = new PlayerExploredTile(in);
-                    playerExploredTiles[pet.getNation()] = pet;
+                    playerExploredTiles.put(player, pet);
                 } else {
-                    playerExploredTiles[Integer.parseInt(in.getAttributeValue(null, "nation"))].readFromXML(in);
+                    playerExploredTiles.get(player).readFromXML(in);
                 }
             } else {
                 logger.warning("Unknown tag: " + in.getLocalName() + " loading tile");
@@ -1755,7 +1756,7 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
         if (playerExploredTiles == null) {
             return null;
         }
-        return playerExploredTiles[player.getIndex()];
+        return playerExploredTiles.get(player);
     }
 
     /**
@@ -1766,7 +1767,7 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
      * @see PlayerExploredTile
      */
     private void createPlayerExploredTile(Player player) {
-        playerExploredTiles[player.getIndex()] = new PlayerExploredTile(player.getIndex(), getTileItemContainer());
+        playerExploredTiles.put(player, new PlayerExploredTile(player, getTileItemContainer()));
     }
 
     /**
@@ -1776,47 +1777,50 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
      * @param player The <code>Player</code>.
      */
     public void updatePlayerExploredTile(Player player) {
-        int nation = player.getIndex();
+
         if (playerExploredTiles == null || getGame().getViewOwner() != null) {
             return;
         }
-        if (playerExploredTiles[nation] == null && !player.isEuropean()) {
-            return;
-        }
-        if (playerExploredTiles[nation] == null) {
-            logger.warning("'playerExploredTiles' for " + player.getName() + " is 'null'.");
-            throw new IllegalStateException("'playerExploredTiles' for " + player.getName()
-                                            + " (index " + player.getIndex() + ") " 
-                                            + " is 'null'. " + player.canSee(this) + ", "
-                                            + isExploredBy(player) + " ::: " + getPosition());
+        PlayerExploredTile pet = playerExploredTiles.get(player);
+        if (pet == null) {
+
+            if (player.isEuropean()) {
+                logger.warning("'playerExploredTiles' for " + player.getName() + " is 'null'.");
+                throw new IllegalStateException("'playerExploredTiles' for " + player.getName()
+                                                + " (index " + player.getIndex() + ") " 
+                                                + " is 'null'. " + player.canSee(this) + ", "
+                                                + isExploredBy(player) + " ::: " + getPosition());
+            } else {
+                return;
+            }
         }
 
-        playerExploredTiles[nation].getTileItemInfo(tileItemContainer);
+        pet.getTileItemInfo(tileItemContainer);
 
-        playerExploredTiles[nation].setLostCityRumour(lostCityRumour);
-        playerExploredTiles[nation].setOwner(owner);
-        playerExploredTiles[nation].setRegion(region);
+        pet.setLostCityRumour(lostCityRumour);
+        pet.setOwner(owner);
+        pet.setRegion(region);
 
         if (getColony() != null) {
-            playerExploredTiles[nation].setColonyUnitCount(getSettlement().getUnitCount());
+            pet.setColonyUnitCount(getSettlement().getUnitCount());
             
             // TODO stockade may now be null, but is 0 the right way to set this?
             // This might as well be a mistake in the spec.
             Building stockade = getColony().getStockade();
             if (stockade != null){
-            	playerExploredTiles[nation].setColonyStockadeLevel(stockade.getType().getIndex());
+            	pet.setColonyStockadeLevel(stockade.getType().getIndex());
             } else {
-            	playerExploredTiles[nation].setColonyStockadeLevel(0);
+            	pet.setColonyStockadeLevel(0);
             }
         } else if (getSettlement() != null) {
-            playerExploredTiles[nation].setMissionary(((IndianSettlement) getSettlement()).getMissionary());
+            pet.setMissionary(((IndianSettlement) getSettlement()).getMissionary());
 
             /*
              * These attributes should not be updated by this method: skill,
              * highlyWantedGoods, wantedGoods1 and wantedGoods2
              */
         } else {
-            playerExploredTiles[nation].setColonyUnitCount(0);
+            pet.setColonyUnitCount(0);
         }
     }
 
@@ -1829,14 +1833,10 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
         if (playerExploredTiles == null || getGame().getViewOwner() != null) {
             return;
         }
-        Iterator<Player> it = getGame().getPlayerIterator();
-        while (it.hasNext()) {
-            Player p = it.next();
-            if (playerExploredTiles[p.getIndex()] == null && !p.isEuropean()) {
-                continue;
-            }
-            if (p.canSee(this)) {
-                updatePlayerExploredTile(p);
+        for (Player player : getGame().getPlayers()) {
+            if (playerExploredTiles.get(player) != null ||
+                (player.isEuropean() && player.canSee(this))) {
+                updatePlayerExploredTile(player);
             }
         }
     }
@@ -1848,9 +1848,11 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
      * @param nation The {@link Player#getNationID nation} identifying the
      *            <code>Player</code>.
      */
+    /*
     public void updatePlayerExploredTile(int nation) {
         updatePlayerExploredTile(getGame().getPlayer(nation));
     }
+    */
 
     /**
      * Checks if this <code>Tile</code> has been explored by the given
@@ -1865,7 +1867,7 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
         if (player.isIndian()) {
             return true;
         }
-        if (playerExploredTiles[player.getIndex()] == null || !isExplored()) {
+        if (playerExploredTiles.get(player) == null || !isExplored()) {
             return false;
         }
 
@@ -1885,7 +1887,7 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
         if (player.isIndian()) {
             return;
         }
-        if (playerExploredTiles[player.getIndex()] == null) {
+        if (playerExploredTiles.get(player) == null) {
             createPlayerExploredTile(player);
         }
         getPlayerExploredTile(player).setExplored(explored);
@@ -1958,7 +1960,7 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
      */
     public class PlayerExploredTile {
 
-        private int nation;
+        private Player player;
 
         private boolean explored = false;
 
@@ -1992,8 +1994,8 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
          * 
          * @param nation The nation.
          */
-        public PlayerExploredTile(int nation, TileItemContainer tic) {
-            this.nation = nation;
+        public PlayerExploredTile(Player player, TileItemContainer tic) {
+            this.player = player;
             getTileItemInfo(tic);
         }
 
@@ -2136,12 +2138,12 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
         }
 
         /**
-         * Gets the nation owning this object.
+         * Gets the Player owning this object (not the Tile).
          * 
-         * @return The nation of this <code>PlayerExploredTile</code>.
+         * @return The Player of this <code>PlayerExploredTile</code>.
          */
-        public int getNation() {
-            return nation;
+        public Player getPlayer() {
+            return player;
         }
 
         /**
@@ -2172,7 +2174,7 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
             // Start element:
             out.writeStartElement("playerExploredTile");
 
-            out.writeAttribute("nation", Integer.toString(nation));
+            out.writeAttribute("player", player.getId());
 
             if (!explored) {
                 out.writeAttribute("explored", Boolean.toString(explored));
@@ -2221,7 +2223,7 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
          * @throws XMLStreamException if an error occurred during parsing.
          */
         public void readFromXML(XMLStreamReader in) throws XMLStreamException {
-            nation = Integer.parseInt(in.getAttributeValue(null, "nation"));
+            player = (Player) getGame().getFreeColGameObject(in.getAttributeValue(null, "player"));
 
             final String exploredStr = in.getAttributeValue(null, "explored");
             if (exploredStr != null) {

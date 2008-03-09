@@ -61,6 +61,7 @@ import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.PathNode;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Settlement;
+import net.sf.freecol.common.model.Tension;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.TileImprovement;
 import net.sf.freecol.common.model.TileItemContainer;
@@ -1819,6 +1820,7 @@ public final class GUI {
                     }
                     g.setColor(Color.BLACK);
                 } else if (settlement instanceof IndianSettlement) {
+                    IndianSettlement indianSettlement = (IndianSettlement) settlement;
                     Image settlementImage = lib.getSettlementImage(settlement);
 
                     // Draw image of indian settlement in center of the tile.
@@ -1829,34 +1831,49 @@ public final class GUI {
                                      settlementImage.getHeight(null)) / 2, null);
 
                     // Draw the color chip for the settlement.
-                    g.drawImage(lib.getColorChip(((IndianSettlement)settlement).getOwner().getColor()), x + (int) (STATE_OFFSET_X  * lib.getScalingFactor()), y + (int) (STATE_OFFSET_Y * lib.getScalingFactor()), null);
+                    g.drawImage(lib.getColorChip(indianSettlement.getOwner().getColor()),
+                                x + (int) (STATE_OFFSET_X * lib.getScalingFactor()),
+                                y + (int) (STATE_OFFSET_Y * lib.getScalingFactor()), null);
 
                     // Draw the mission chip if needed.
-                    Unit missionary = ((IndianSettlement)settlement).getMissionary();
+                    Unit missionary = indianSettlement.getMissionary();
                     if (missionary != null) {
                         boolean expert = missionary.hasAbility("model.ability.expertMissionary");
-                        g.drawImage(lib.getMissionChip(missionary.getOwner().getColor(), expert), x + (int) (STATE_OFFSET_X * lib.getScalingFactor()) + (MISSION_OFFSET_X - STATE_OFFSET_X), y + (int) (MISSION_OFFSET_Y * lib.getScalingFactor()), null);
+                        g.drawImage(lib.getMissionChip(missionary.getOwner().getColor(), expert),
+                                    x + (int) (STATE_OFFSET_X * lib.getScalingFactor()) +
+                                    (MISSION_OFFSET_X - STATE_OFFSET_X),
+                                    y + (int) (MISSION_OFFSET_Y * lib.getScalingFactor()), null);
                     }
 
                     // Draw the alarm chip if needed.
-                    if (freeColClient.getMyPlayer() != null
-                            && freeColClient.getMyPlayer().hasContacted(((IndianSettlement)settlement).getOwner())) {
-                        g.drawImage(lib.getAlarmChip(((IndianSettlement)settlement).getAlarm(freeColClient.getMyPlayer()).getLevel()), x + (int) (STATE_OFFSET_X * lib.getScalingFactor()) + (ALARM_OFFSET_X - STATE_OFFSET_X), y + (int) (ALARM_OFFSET_Y  * lib.getScalingFactor()), null);
+                    if (freeColClient.getMyPlayer() != null) {
+                        Tension alarm = indianSettlement.getAlarm(freeColClient.getMyPlayer());
+                        if (alarm != null) {
+                            g.drawImage(lib.getAlarmChip(alarm.getLevel()),
+                                        x + (int) (STATE_OFFSET_X * lib.getScalingFactor()) +
+                                        (ALARM_OFFSET_X - STATE_OFFSET_X),
+                                        y + (int) (ALARM_OFFSET_Y  * lib.getScalingFactor()), null);
+                        }
                     }
 
                     g.setColor(Color.BLACK);
-                    if (((IndianSettlement) settlement).isCapital()) {
+                    if (indianSettlement.isCapital()) {
                         // TODO: make this look nicer
-                        g.drawString("*", x + (STATE_OFFSET_X * lib.getScalingFactor()) + TEXT_OFFSET_X, y + (int) (STATE_OFFSET_Y * lib.getScalingFactor()) + TEXT_OFFSET_Y);
+                        g.drawString("*",
+                                     x + (STATE_OFFSET_X * lib.getScalingFactor()) + TEXT_OFFSET_X,
+                                     y + (int) (STATE_OFFSET_Y * lib.getScalingFactor()) + TEXT_OFFSET_Y);
                     } else {
-                        g.drawString("-", x + (int) (STATE_OFFSET_X * lib.getScalingFactor()) + TEXT_OFFSET_X, y + (int) (STATE_OFFSET_Y * lib.getScalingFactor()) + TEXT_OFFSET_Y);
+                        g.drawString("-", 
+                                     x + (int) (STATE_OFFSET_X * lib.getScalingFactor()) + TEXT_OFFSET_X,
+                                     y + (int) (STATE_OFFSET_Y * lib.getScalingFactor()) + TEXT_OFFSET_Y);
                     }
                 } else {
                     logger.warning("Requested to draw unknown settlement type.");
                 }
             } else if (tile.hasLostCityRumour()) {
                 g.drawImage(lib.getMiscImage(ImageLibrary.LOST_CITY_RUMOUR),
-                            x + (int) (RUMOUR_OFFSET_X * lib.getScalingFactor()), y + (int) (RUMOUR_OFFSET_Y * lib.getScalingFactor()), null);
+                            x + (int) (RUMOUR_OFFSET_X * lib.getScalingFactor()),
+                            y + (int) (RUMOUR_OFFSET_Y * lib.getScalingFactor()), null);
             }
         }
     }
