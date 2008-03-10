@@ -1603,7 +1603,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
                     reply.setAttribute("amount", Integer.toString(beadsGold));
                     player.modifyGold(beadsGold);
                 }
-                settlement.setVisited();
+                settlement.setVisited(player);
             } else {
                 reply.setAttribute("result", "nothing");
             }

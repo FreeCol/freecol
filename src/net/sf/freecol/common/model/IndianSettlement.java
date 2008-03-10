@@ -327,11 +327,16 @@ public class IndianSettlement extends Settlement {
     }
 
     /**
-     * Sets the visited status of this settlement to true, indicating that a European has had
-     * a chat with the chief.
+     * Sets the visited status of this settlement to true, indicating
+     * that a European has had a chat with the chief.
+     *    
+     * @param player a <code>Player</code> value
      */
-    public void setVisited() {
+    public void setVisited(Player player) {
         this.isVisited = true;
+        if (alarm.get(player) == null) {
+            alarm.put(player, new Tension(0));
+        }
     }
 
     /**

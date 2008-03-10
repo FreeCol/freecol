@@ -2598,7 +2598,7 @@ public final class InGameController implements NetworkConstants {
             }
 
             settlement.setLearnableSkill(skill);
-            settlement.setVisited();
+            settlement.setVisited(unit.getOwner());
 
             if (skillName == null) {
                 canvas.errorMessage("indianSettlement.noMoreSkill");
@@ -2719,7 +2719,7 @@ public final class InGameController implements NetworkConstants {
             settlement.setWantedGoods(0, FreeCol.getSpecification().getGoodsType(reply.getAttribute("highlyWantedGoods")));
             settlement.setWantedGoods(1, FreeCol.getSpecification().getGoodsType(reply.getAttribute("wantedGoods1")));
             settlement.setWantedGoods(2, FreeCol.getSpecification().getGoodsType(reply.getAttribute("wantedGoods2")));
-            settlement.setVisited();
+            settlement.setVisited(unit.getOwner());
             settlement.getOwner().setNumberOfSettlements(Integer.parseInt(reply.getAttribute("numberOfCamps")));
             freeColClient.getInGameInputHandler().update(reply);
         } else {
