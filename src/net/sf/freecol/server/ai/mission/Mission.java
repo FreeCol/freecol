@@ -254,7 +254,8 @@ public abstract class Mission extends AIObject {
                     if (alarm != null) {
                         tension = alarm.getValue();
                     }
-                    if (unit.getIndianSettlement() != null) {
+                    if (unit.getIndianSettlement() != null &&
+                        unit.getIndianSettlement().getAlarm(defender.getOwner()) != null) {
                         tension += unit.getIndianSettlement().getAlarm(defender.getOwner()).getValue();
                     }
                     if (defender.canCarryTreasure()) {

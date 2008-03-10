@@ -503,18 +503,19 @@ public class AIPlayer extends AIObject {
         for (Player p : getGame().getPlayers()) {
             if (p != player) {
                 Stance stance = getPlayer().getStance(p);
-                if (stance != null) {
+                Tension tension = getPlayer().getTension(p);
+                if (stance != null && tension != null) {
                     if (p.getREFPlayer() == getPlayer() && p.getPlayerType() == PlayerType.REBEL) {
-                        getPlayer().getTension(p).modify(1000);
+                        tension.modify(1000);
                     }
-                    if (stance != Stance.WAR && 
-                        getPlayer().getTension(p).getLevel() == Tension.Level.HATEFUL) {
+                    if (stance != Stance.WAR &&
+                        tension.getLevel() == Tension.Level.HATEFUL) {
                         getPlayer().setStance(p, Stance.WAR);
                     } else if (stance == Stance.WAR
-                               && getPlayer().getTension(p).getLevel().compareTo(Tension.Level.CONTENT) <= 0) {
+                               && tension.getLevel().compareTo(Tension.Level.CONTENT) <= 0) {
                         getPlayer().setStance(p, Stance.CEASE_FIRE);
                     } else if (stance == Stance.CEASE_FIRE
-                               && getPlayer().getTension(p).getLevel().compareTo(Tension.Level.HAPPY) <= 0) {
+                               && tension.getLevel().compareTo(Tension.Level.HAPPY) <= 0) {
                         getPlayer().setStance(p, Stance.PEACE);
                     }
                 }
@@ -663,28 +664,33 @@ public class AIPlayer extends AIObject {
                     while (positionIterator.hasNext()) {
                         Tile t = map.getTile(positionIterator.next());
                         if (t.getFirstUnit() != null) {
-                            if (t.getFirstUnit().getOwner() == player) {
+                            Player enemy = t.getFirstUnit().getOwner();
+                            if (enemy == player) {
                                 defenders++;
                             } else {
-                                if (player.getTension(t.getFirstUnit().getOwner()).getValue() >= Tension.TENSION_ADD_MAJOR) {
-                                    threat += 2;
-                                    if (t.getUnitCount() * 2 > worstThreat) {
-                                        if (t.getSettlement() != null) {
-                                            bestTarget = t.getSettlement();
-                                        } else {
-                                            bestTarget = t.getFirstUnit();
+                                Tension tension = player.getTension(enemy);
+                                if (tension != null) {
+                                    int value = tension.getValue();
+                                    if (value >= Tension.TENSION_ADD_MAJOR) {
+                                        threat += 2;
+                                        if (t.getUnitCount() * 2 > worstThreat) {
+                                            if (t.getSettlement() != null) {
+                                                bestTarget = t.getSettlement();
+                                            } else {
+                                                bestTarget = t.getFirstUnit();
+                                            }
+                                            worstThreat = t.getUnitCount() * 2;
                                         }
-                                        worstThreat = t.getUnitCount() * 2;
-                                    }
-                                } else if (player.getTension(t.getFirstUnit().getOwner()).getValue() >= Tension.TENSION_ADD_MINOR) {
-                                    threat += 1;
-                                    if (t.getUnitCount() > worstThreat) {
-                                        if (t.getSettlement() != null) {
-                                            bestTarget = t.getSettlement();
-                                        } else {
-                                            bestTarget = t.getFirstUnit();
+                                    } else if (value >= Tension.TENSION_ADD_MINOR) {
+                                        threat += 1;
+                                        if (t.getUnitCount() > worstThreat) {
+                                            if (t.getSettlement() != null) {
+                                                bestTarget = t.getSettlement();
+                                            } else {
+                                                bestTarget = t.getFirstUnit();
+                                            }
+                                            worstThreat = t.getUnitCount();
                                         }
-                                        worstThreat = t.getUnitCount();
                                     }
                                 }
                             }
