@@ -1088,7 +1088,9 @@ public final class Colony extends Settlement implements Location, Nameable {
             ArrayList<ModelMessage> messages = new ArrayList<ModelMessage>();
             for (AbstractGoods goodsRequired : buildable.getGoodsRequired()) {
                 GoodsType requiredGoodsType = goodsRequired.getType();
-                if (getGoodsCount(requiredGoodsType) < goodsRequired.getAmount()) {
+                int available = getGoodsCount(requiredGoodsType);
+                int required = goodsRequired.getAmount();
+                if (available < required) {
                     if (!requiredGoodsType.isStorable()) {
                         // buildable is not complete and we don't care
                         // about missing goods because unstorable
@@ -1096,11 +1098,12 @@ public final class Colony extends Settlement implements Location, Nameable {
                         return;
                     }
                     messages.add(new ModelMessage(this, "model.colony.buildableNeedsGoods",
-                                                  new String[][] {
-                                                      { "%colony%", getName() },
-                                                      { "%buildable%", buildable.getName() },
-                                                      { "%goodsType%", requiredGoodsType.getName() } },
-                                                  ModelMessage.MISSING_GOODS, 
+                                                  new String[][]{
+                                                      {"%colony%", getName()},
+                                                      {"%buildable%", buildable.getName()},
+                                                      {"%amount%", String.valueOf(required - available)},
+                                                      {"%goodsType%", requiredGoodsType.getName()}},
+                                                  ModelMessage.MISSING_GOODS,
                                                   requiredGoodsType));
                 }
             }
@@ -1232,13 +1235,19 @@ public final class Colony extends Settlement implements Location, Nameable {
                     result.add(Messages.message("model.colony.buildableNeedsGoods",
                                                 "%colony%", getName(),
                                                 "%buildable%", currentlyBuilding.getName(),
+                                                "%amount%", String.valueOf(goods.getAmount() - amount),
                                                 "%goodsType%", goodsType.getName()));
                 }
             }
         }
 
         addInsufficientProductionMessage(result, getBuildingForProducing(goodsType));
-        addInsufficientProductionMessage(result, getBuildingForConsuming(goodsType));
+
+        Building buildingForConsuming = getBuildingForConsuming(goodsType);
+        if (buildingForConsuming != null && !buildingForConsuming.getGoodsOutputType().isStorable()) {
+            //the warnings are for a non-storable good, which is not displayed in the trade report
+            addInsufficientProductionMessage(result, buildingForConsuming);
+        }
 
         return result;
     }
