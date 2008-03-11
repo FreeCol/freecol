@@ -2173,7 +2173,7 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
             // Start element:
             out.writeStartElement("playerExploredTile");
 
-            out.writeAttribute("player", player.getId());
+            out.writeAttribute("player", this.player.getId());
 
             if (!explored) {
                 out.writeAttribute("explored", Boolean.toString(explored));
