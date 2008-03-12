@@ -52,7 +52,7 @@ public class ReportPanel extends FreeColPanel implements ActionListener {
 
     protected JPanel reportPanel;
 
-    private JLabel header;
+    protected JLabel header;
 
     private JButton ok;
 

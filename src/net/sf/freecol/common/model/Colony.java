@@ -383,6 +383,14 @@ public final class Colony extends Settlement implements Location, Nameable {
     public Building getBuilding(BuildingType type) {
         return buildingMap.get(type.getFirstLevel().getId());
     }
+    public Building getBuilding(String ability) {
+        for (Building building : buildingMap.values()) {
+            if (building.getType().hasAbility(ability)) {
+                return building;
+            }
+        }
+        return null;
+    }
 
     /**
      * Gets the specified <code>ColonyTile</code>.
