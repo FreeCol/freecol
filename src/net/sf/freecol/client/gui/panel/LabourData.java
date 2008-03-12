@@ -499,7 +499,6 @@ public class LabourData {
                 break;
             default:
                 getter.getLocationData(unitData).notWorking++;
-                unitData.total.notWorking++;
                 break;
         }
     }
