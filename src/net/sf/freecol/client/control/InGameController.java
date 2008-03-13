@@ -340,25 +340,25 @@ public final class InGameController implements NetworkConstants {
         if (object instanceof Colony) {
             name = freeColClient.getCanvas().showInputDialog("renameColony.text", object.getName(), "renameColony.yes",
                     "renameColony.no");
+            if (freeColClient.getMyPlayer().getColony(name) != null) {
+                // colony name must be unique (per Player)
+                freeColClient.getCanvas().showInformationMessage("nameColony.notUnique",
+                                                                 new String[][] { { "%name%", name } });
+                return;
+            }
         } else if (object instanceof Unit) {
             name = freeColClient.getCanvas().showInputDialog("renameUnit.text", object.getName(), "renameUnit.yes",
                     "renameUnit.no");
-        }
-		
-        if (name == null) {
-            return;
-        } else if (object instanceof Colony && (freeColClient.getMyPlayer().getColony(name) != null)) {
-            // colony name must be unique (per Player)
-            freeColClient.getCanvas().showInformationMessage("nameColony.notUnique",
-                new String[][] { { "%name%", name } });
-            return;
         } else {
-            object.setName(name);
-            Element renameElement = Message.createNewRootElement("rename");
-            renameElement.setAttribute("nameable", ((FreeColGameObject) object).getId());
-            renameElement.setAttribute("name", name);
-            freeColClient.getClient().sendAndWait(renameElement);
+            return;
         }
+
+        object.setName(name);
+        Element renameElement = Message.createNewRootElement("rename");
+        renameElement.setAttribute("nameable", ((FreeColGameObject) object).getId());
+        renameElement.setAttribute("name", name);
+        freeColClient.getClient().sendAndWait(renameElement);
+
     }
 
     /**
@@ -1627,26 +1627,37 @@ public final class InGameController implements NetworkConstants {
                 }
                 enemy = defender.getOwner();
             }
-            switch (attacker.getOwner().getStance(enemy)) {
-            case CEASE_FIRE:
-                return freeColClient.getCanvas().showConfirmDialog("model.diplomacy.attack.ceaseFire",
-                        "model.diplomacy.attack.confirm", "cancel",
-                        new String[][] { { "%replace%", enemy.getNationAsString() } });
-            case PEACE:
-                return freeColClient.getCanvas().showConfirmDialog("model.diplomacy.attack.peace",
-                        "model.diplomacy.attack.confirm", "cancel",
-                        new String[][] { { "%replace%", enemy.getNationAsString() } });
-            case ALLIANCE:
-                freeColClient.playSound(SfxLibrary.ILLEGAL_MOVE);
-                freeColClient.getCanvas().showInformationMessage("model.diplomacy.attack.alliance",
-                        new String[][] { { "%replace%", enemy.getNationAsString() } });
-                return false;
-            case WAR:
-                logger.finest("Player at war, no confirmation needed");
+            // TODO: this really should not be necessary
+            if (attacker.getOwner().getStance(enemy) == null) {
                 return true;
-            default:
-                logger.warning("Unknown stance " + attacker.getOwner().getStance(enemy));
-                return true;
+            } else {
+                switch (attacker.getOwner().getStance(enemy)) {
+                case CEASE_FIRE:
+                    return freeColClient.getCanvas().showConfirmDialog("model.diplomacy.attack.ceaseFire",
+                                                                       "model.diplomacy.attack.confirm", "cancel",
+                                                                       new String[][] {
+                                                                           { "%replace%", enemy.getNationAsString() }
+                                                                       });
+                case PEACE:
+                    return freeColClient.getCanvas().showConfirmDialog("model.diplomacy.attack.peace",
+                                                                       "model.diplomacy.attack.confirm", "cancel",
+                                                                       new String[][] {
+                                                                           { "%replace%", enemy.getNationAsString() }
+                                                                       });
+                case ALLIANCE:
+                    freeColClient.playSound(SfxLibrary.ILLEGAL_MOVE);
+                    freeColClient.getCanvas().showInformationMessage("model.diplomacy.attack.alliance",
+                                                                     new String[][] {
+                                                                         { "%replace%", enemy.getNationAsString() }
+                                                                     });
+                    return false;
+                case WAR:
+                    logger.finest("Player at war, no confirmation needed");
+                    return true;
+                default:
+                    logger.warning("Unknown stance " + attacker.getOwner().getStance(enemy));
+                    return true;
+                }
             }
         } else {
             // Privateers can attack and remain at peace

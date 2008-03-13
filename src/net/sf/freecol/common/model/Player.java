@@ -852,42 +852,49 @@ public class Player extends FreeColGameObject implements Nameable {
 
         if (contacted && !hasContacted(player)) {
             stance.put(player, Stance.PEACE);
+            player.stance.put(this, Stance.PEACE);
             boolean contactedIndians = false;
             boolean contactedEuro = false;
 
-            for (Player player1 : getGame().getPlayers()) {
-                if (hasContacted(player1)) {
-                    if (player1.isEuropean()) {
-                        contactedEuro = true;
-                        if (contactedIndians) {
-                            break;
-                        }
-                    } else {
-                        contactedIndians = true;
-                        if (contactedEuro) {
-                            break;
+            if (isEuropean()) {
+                for (Player player1 : getGame().getPlayers()) {
+                    if (hasContacted(player1)) {
+                        if (player1.isEuropean()) {
+                            contactedEuro = true;
+                            if (contactedIndians) {
+                                break;
+                            }
+                        } else {
+                            contactedIndians = true;
+                            if (contactedEuro) {
+                                break;
+                            }
                         }
                     }
                 }
-            }
-            // these dialogs should only appear on the first event
-            if (player.isEuropean()) {
-                if (!contactedEuro) {
-                    addModelMessage(this, "EventPanel.MEETING_EUROPEANS", null, ModelMessage.FOREIGN_DIPLOMACY, player);
+                // these dialogs should only appear on the first event
+                if (player.isEuropean()) {
+                    if (!contactedEuro) {
+                        addModelMessage(this, "EventPanel.MEETING_EUROPEANS", null, ModelMessage.FOREIGN_DIPLOMACY, player);
+                    }
+                } else {
+                    player.tension.put(this, new Tension(0));
+                    if (!contactedIndians) {
+                        addModelMessage(this, "EventPanel.MEETING_NATIVES", null, ModelMessage.FOREIGN_DIPLOMACY, player);
+                    }
+                    // special cases for Aztec/Inca
+                    if (player.getNationType() == FreeCol.getSpecification().getNationType("model.nationType.aztec")) {
+                        addModelMessage(this, "EventPanel.MEETING_AZTEC", null, ModelMessage.FOREIGN_DIPLOMACY, player);
+                    } else if (player.getNationType() == 
+                               FreeCol.getSpecification().getNationType("model.nationType.inca")) {
+                        addModelMessage(this, "EventPanel.MEETING_INCA", null, ModelMessage.FOREIGN_DIPLOMACY, player);
+                    }
                 }
             } else {
-                if (!contactedIndians) {
-                    addModelMessage(this, "EventPanel.MEETING_NATIVES", null, ModelMessage.FOREIGN_DIPLOMACY, player);
-                }
-                // special cases for Aztec/Inca
-                if (player.getNationType() == FreeCol.getSpecification().getNationType("model.nationType.aztec")) {
-                    addModelMessage(this, "EventPanel.MEETING_AZTEC", null, ModelMessage.FOREIGN_DIPLOMACY, player);
-                } else if (player.getNationType() == FreeCol.getSpecification().getNationType("model.nationType.inca")) {
-                    addModelMessage(this, "EventPanel.MEETING_INCA", null, ModelMessage.FOREIGN_DIPLOMACY, player);
-                }
+                tension.put(player, new Tension(0));
             }
-        }
 
+        }
         if (!contacted) {
             stance.remove(player);
         }

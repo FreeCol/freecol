@@ -1571,7 +1571,8 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
             // do it.
             unit.setMovesLeft(1);
             return null;
-        } else if (settlement.getAlarm(player).getLevel() == Tension.Level.HATEFUL) {
+        } else if (settlement.getAlarm(player) != null &&
+                   settlement.getAlarm(player).getLevel() == Tension.Level.HATEFUL) {
             reply.setAttribute("result", "die");
             unit.dispose();
         } else if (action.equals("speak")) {

@@ -1565,7 +1565,7 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
                     for (Entry<Player, Tension> entry : is.getAlarm().entrySet()) {
                         out.writeStartElement("alarm");
                         out.writeAttribute("player", entry.getKey().getId());
-                        out.writeAttribute("value", String.valueOf(entry.getValue()));
+                        out.writeAttribute("value", String.valueOf(entry.getValue().getValue()));
                         out.writeEndElement();
                     }
 
