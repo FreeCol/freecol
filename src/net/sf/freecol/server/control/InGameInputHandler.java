@@ -979,7 +979,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         // seasoned scouts should be more successful
         int bonus = 0;
         if (unit.hasAbility("model.ability.expertScout") && 
-            unit.hasAbility("model.ability.scoutIndianSettlements")) {
+            unit.hasAbility("model.ability.scoutIndianSettlement")) {
             bonus += 3;
             dx--;
         }
