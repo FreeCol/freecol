@@ -853,10 +853,10 @@ public class Player extends FreeColGameObject implements Nameable {
         if (contacted && !hasContacted(player)) {
             stance.put(player, Stance.PEACE);
             player.stance.put(this, Stance.PEACE);
-            boolean contactedIndians = false;
-            boolean contactedEuro = false;
 
             if (isEuropean()) {
+                boolean contactedIndians = false;
+                boolean contactedEuro = false;
                 for (Player player1 : getGame().getPlayers()) {
                     if (hasContacted(player1)) {
                         if (player1.isEuropean()) {

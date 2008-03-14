@@ -1913,12 +1913,12 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
 
             Settlement settlement = t.getSettlement();
             if (settlement != null) {
-                if (settlement instanceof IndianSettlement) {
-                    ((IndianSettlement) settlement).getAlarm().put(getOwner(), new Tension(0));
-                }
                 if (!settlement.getOwner().hasContacted(getOwner())) {
                     settlement.getOwner().setContacted(getOwner(), true);
                     getOwner().setContacted(settlement.getOwner(), true);
+                }
+                if (settlement instanceof IndianSettlement) {
+                    ((IndianSettlement) settlement).getAlarm().put(getOwner(), new Tension(0));
                 }
             } else if (t.isLand() && t.getFirstUnit() != null
                        && !t.getFirstUnit().getOwner().hasContacted(getOwner())) {
