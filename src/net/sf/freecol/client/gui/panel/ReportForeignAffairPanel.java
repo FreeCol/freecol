@@ -30,6 +30,7 @@ import javax.swing.UIManager;
 
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.Canvas;
+import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Player.Stance;
@@ -71,6 +72,7 @@ public final class ReportForeignAffairPanel extends ReportPanel implements Actio
         HIGConstraints higConst = new HIGConstraints();
 
         FreeColClient client = getCanvas().getClient();
+        ImageLibrary imageLibrary = getCanvas().getGUI().getImageLibrary();
         Element report = client.getInGameController().getForeignAffairsReport();
         int number = report.getChildNodes().getLength();
         for (int i = 0; i < number; i++) {
@@ -79,9 +81,9 @@ public final class ReportForeignAffairPanel extends ReportPanel implements Actio
             enemyPanel.setOpaque(false);
             int row = 1;
             Player enemy = (Player) client.getGame().getFreeColGameObject(enemyElement.getAttribute("player"));
-            final Image coatOfArms = (Image) UIManager.get(enemy.getNationID() + ".coatOfArms.image");
+            final ImageIcon coatOfArms = imageLibrary.getCoatOfArmsImageIcon(enemy.getNation());
             if (coatOfArms != null) {
-                enemyPanel.add(new JLabel(new ImageIcon(coatOfArms)),
+                enemyPanel.add(new JLabel(coatOfArms),
                                higConst.rcwh(row, coatColumn, 1, heights.length, "t"));
             }
             enemyPanel.add(new JLabel(enemy.getNationAsString()), higConst.rc(row, labelColumn));

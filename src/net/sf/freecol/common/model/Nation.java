@@ -61,9 +61,9 @@ public class Nation extends FreeColGameObjectType {
     private String refID;
 
     /**
-     * Describe shieldArt here.
+     * Describe coatOfArms here.
      */
-    private String shieldArt;
+    private String coatOfArms;
 
     /**
      * Describe monarch-art here.
@@ -98,21 +98,21 @@ public class Nation extends FreeColGameObjectType {
     }
 
     /**
-     * Get the <code>ShieldArt</code> value.
+     * Get the <code>CoatOfArms</code> value.
      *
      * @return a <code>String</code> value
      */
-    public final String getShieldArt() {
-        return shieldArt;
+    public final String getCoatOfArms() {
+        return coatOfArms;
     }
 
     /**
-     * Set the <code>ShieldArt</code> value.
+     * Set the <code>CoatOfArms</code> value.
      *
-     * @param newShieldArt The new ShieldArt value.
+     * @param newCoatOfArms The new CoatOfArms value.
      */
-    public final void setShieldArt(final String newShieldArt) {
-        this.shieldArt = newShieldArt;
+    public final void setCoatOfArms(final String newCoatOfArms) {
+        this.coatOfArms = newCoatOfArms;
     }
 
     /**
@@ -230,7 +230,7 @@ public class Nation extends FreeColGameObjectType {
         selectable = getAttribute(in, "selectable", false);
         classic = getAttribute(in, "classic", false);
         refID = getAttribute(in, "ref-of", null);
-        shieldArt = getAttribute(in, "shield-art", "native.png");
+        coatOfArms = getAttribute(in, "coat-of-arms", "native.png");
         monarchArt = getAttribute(in, "monarch-art", "louis.png");
         in.nextTag();
    }

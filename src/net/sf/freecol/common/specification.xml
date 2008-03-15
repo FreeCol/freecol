@@ -1446,76 +1446,76 @@
   <nations>
     <nation id="model.nation.dutch" color="#ff9d3c" 
             nation-type="model.nationType.trade" selectable="true" classic="true"
-            monarch-art="william.png" shield-art="dutch.png"/>
+            monarch-art="william.png" coat-of-arms="dutch.png"/>
     <nation id="model.nation.french" color="#0000ff"
             nation-type="model.nationType.cooperation" selectable="true" classic="true"
-            monarch-art="louis.png" shield-art="french.png"/>
+            monarch-art="louis.png" coat-of-arms="french.png"/>
     <nation id="model.nation.english" color="#ff0000"
             nation-type="model.nationType.immigration" selectable="true" classic="true"
-            monarch-art="elizabeth.png" shield-art="english.png"/>
+            monarch-art="elizabeth.png" coat-of-arms="english.png"/>
     <nation id="model.nation.spanish" color="#ffff00"
             nation-type="model.nationType.conquest" selectable="true" classic="true"
-            monarch-art="philip.png" shield-art="spanish.png"/>
+            monarch-art="philip.png" coat-of-arms="spanish.png"/>
     <nation id="model.nation.portuguese" color="#00ff00"
             nation-type="model.nationType.naval" selectable="true"
-            monarch-art="william.png" shield-art="dutch.png"/>
+            monarch-art="william.png" coat-of-arms="dutch.png"/>
     <nation id="model.nation.swedish" color="#ff00ff"
             nation-type="model.nationType.cooperation" selectable="true"
-            monarch-art="louis.png" shield-art="french.png"/>
+            monarch-art="louis.png" coat-of-arms="french.png"/>
     <nation id="model.nation.danish" color="#00ffff"
             nation-type="model.nationType.trade" selectable="true"
-            monarch-art="elizabeth.png" shield-art="english.png"/>
+            monarch-art="elizabeth.png" coat-of-arms="english.png"/>
     <nation id="model.nation.russian" color="#ffffff"
             nation-type="model.nationType.immigration" selectable="true"
-            monarch-art="philip.png" shield-art="spanish.png"/>
+            monarch-art="philip.png" coat-of-arms="spanish.png"/>
     <nation id="model.nation.inca" color="#f4f0c4"
             nation-type="model.nationType.inca"
-            shield-art="native.png"/>
+            coat-of-arms="native.png"/>
     <nation id="model.nation.aztec" color="#c4a020"
             nation-type="model.nationType.aztec"
-            shield-art="native.png"/>
+            coat-of-arms="native.png"/>
     <nation id="model.nation.arawak" color="#6888c0"
             nation-type="model.nationType.arawak"
-            shield-art="native.png"/>
+            coat-of-arms="native.png"/>
     <nation id="model.nation.cherokee" color="#6c3c18"
             nation-type="model.nationType.cherokee"
-            shield-art="native.png"/>
+            coat-of-arms="native.png"/>
     <nation id="model.nation.iroquois" color="#74a44c"
             nation-type="model.nationType.iroquois"
-            shield-art="native.png"/>
+            coat-of-arms="native.png"/>
     <nation id="model.nation.sioux" color="#c0ac84"
             nation-type="model.nationType.sioux"
-            shield-art="native.png"/>
+            coat-of-arms="native.png"/>
     <nation id="model.nation.apache" color="#900000"
             nation-type="model.nationType.apache"
-            shield-art="native.png"/>
+            coat-of-arms="native.png"/>
     <nation id="model.nation.tupi" color="#045c04"
             nation-type="model.nationType.tupi"
-            shield-art="native.png"/>
+            coat-of-arms="native.png"/>
     <nation id="model.nation.dutchREF" color="#ff9d3c"
             nation-type="model.nationType.ref" ref-of="model.nation.dutch"
-            shield-art="dutch-ref.png"/>
+            coat-of-arms="dutch-ref.png"/>
     <nation id="model.nation.frenchREF" color="#0000ff"
             nation-type="model.nationType.ref" ref-of="model.nation.french"
-            shield-art="french-ref.png"/>
+            coat-of-arms="french-ref.png"/>
     <nation id="model.nation.englishREF" color="#ff0000"
             nation-type="model.nationType.ref" ref-of="model.nation.english"
-            shield-art="english-ref.png"/>
+            coat-of-arms="english-ref.png"/>
     <nation id="model.nation.spanishREF" color="#ffff00"
             nation-type="model.nationType.ref" ref-of="model.nation.spanish"
-            shield-art="spanish-ref.png"/>
+            coat-of-arms="spanish-ref.png"/>
     <nation id="model.nation.portugueseREF" color="#00ff00"
             nation-type="model.nationType.ref" ref-of="model.nation.portuguese"
-            shield-art="dutch-ref.png"/>
+            coat-of-arms="dutch-ref.png"/>
     <nation id="model.nation.swedishREF" color="#ff00ff"
             nation-type="model.nationType.ref" ref-of="model.nation.swedish"
-            shield-art="french-ref.png"/>
+            coat-of-arms="french-ref.png"/>
     <nation id="model.nation.danishREF" color="#00ffff"
             nation-type="model.nationType.ref" ref-of="model.nation.danish"
-            shield-art="english-ref.png"/>
+            coat-of-arms="english-ref.png"/>
     <nation id="model.nation.russianREF" color="#ffffff"
             nation-type="model.nationType.ref" ref-of="model.nation.russian"
-            shield-art="spanish-ref.png"/>
+            coat-of-arms="spanish-ref.png"/>
   </nations>
 
   <!-- crosses-increment: additional crosses required for each new immigrant

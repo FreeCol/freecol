@@ -2467,11 +2467,15 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
                     militaryStrength += unit.getGame().getCombatModel().getOffencePower(unit, unit);
                 }
             }
+            Stance stance = enemyPlayer.getStance(player);
+            if (stance == null) {
+                stance = Stance.PEACE;
+            }
             enemyElement.setAttribute("numberOfColonies", String.valueOf(numberOfColonies));
             enemyElement.setAttribute("numberOfUnits", String.valueOf(numberOfUnits));
             enemyElement.setAttribute("militaryStrength", String.valueOf(militaryStrength));
             enemyElement.setAttribute("navalStrength", String.valueOf(navalStrength));
-            enemyElement.setAttribute("stance", String.valueOf(enemyPlayer.getStance(player)));
+            enemyElement.setAttribute("stance", String.valueOf(stance));
             enemyElement.setAttribute("gold", String.valueOf(enemyPlayer.getGold()));
             if (player.equals(enemyPlayer) ||
                 player.hasAbility("model.ability.betterForeignAffairsReport")) {

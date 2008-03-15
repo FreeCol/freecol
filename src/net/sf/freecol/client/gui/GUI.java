@@ -1157,8 +1157,7 @@ public final class GUI {
                     currentPlayerColor,
                     640,
                     18);
-            final String currentNationID = freeColClient.getGame().getCurrentPlayer().getNationID();
-            final Image coatOfArms = (Image) UIManager.get(currentNationID + ".coatOfArms.image");
+            final Image coatOfArms = lib.getCoatOfArmsImage(freeColClient.getGame().getCurrentPlayer().getNation());
             final int cHeight = (coatOfArms != null) ? coatOfArms.getHeight(null) : 0;
             g.drawImage(im, (size.width - im.getWidth(null)) / 2, (size.height - im.getHeight(null) - cHeight) / 2, null);
             if (coatOfArms != null) {

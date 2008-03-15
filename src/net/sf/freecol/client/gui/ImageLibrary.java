@@ -86,7 +86,8 @@ public final class ImageLibrary extends ImageProvider {
             miscDirectory = new String("misc/"), miscName = new String("Misc"),
             unitButtonDirectory = new String("order-buttons/"), unitButtonName = new String("button"),
             settlementDirectory = new String("settlements/"),
-        monarchDirectory = new String("monarch/");
+            monarchDirectory = new String("monarch/"),
+            coatOfArmsDirectory = new String("coat-of-arms/");
 
     private final String dataDirectory;
 
@@ -96,6 +97,8 @@ public final class ImageLibrary extends ImageProvider {
     private List<ImageIcon> rivers, misc;
 
     private Map<Nation, ImageIcon> monarch;
+
+    private Map<Nation, ImageIcon> coatOfArms;
 
     private EnumMap<SettlementType, Image> settlements;
 
@@ -242,6 +245,7 @@ public final class ImageLibrary extends ImageProvider {
         loadGoods(gc, resourceLocator, doLookup);
         loadBonus(gc, resourceLocator, doLookup);
         loadMonarch(gc, resourceLocator, doLookup);
+        loadCoatOfArms(gc, resourceLocator, doLookup);
 
         alarmChips = new EnumMap<Tension.Level, Image>(Tension.Level.class);
         colorChips = new HashMap<Color, Image>();
@@ -789,6 +793,30 @@ public final class ImageLibrary extends ImageProvider {
     }
 
     /**
+     * Loads the coat-of-arms images from file into memory.
+     * 
+     * @param gc The GraphicsConfiguration is needed to create images that are
+     *            compatible with the local environment.
+     * @param resourceLocator The class that is used to locate data files.
+     * @param doLookup Must be set to 'false' if the path to the image files has
+     *            been manually provided by the user. If set to 'true' then a
+     *            lookup will be done to search for image files from
+     *            net.sf.freecol, in this case the images need to be placed in
+     *            net/sf/freecol/images.
+     * @throws FreeColException If one of the data files could not be found.
+     */
+    private void loadCoatOfArms(GraphicsConfiguration gc, Class<FreeCol> resourceLocator, boolean doLookup)
+        throws FreeColException {
+        coatOfArms = new HashMap<Nation, ImageIcon>();
+
+        for (Nation nation : FreeCol.getSpecification().getNations()) {
+            String coatOfArmsName = nation.getCoatOfArms();
+            String filePath = dataDirectory + path + coatOfArmsDirectory + coatOfArmsName;
+            coatOfArms.put(nation, findImage(filePath, resourceLocator, doLookup));
+        }
+    }
+
+    /**
      * Generates a color chip image and stores it in memory.
      * 
      * @param gc The GraphicsConfiguration is needed to create images that are
@@ -912,13 +940,33 @@ public final class ImageLibrary extends ImageProvider {
     }
 
     /**
-     * Returns the monarch-image icon for the given tile.
+     * Returns the monarch-image icon for the given Nation.
      * 
      * @param nation The nation this monarch rules.
      * @return the monarch-image for the given nation.
      */
     public ImageIcon getMonarchImageIcon(Nation nation) {
         return monarch.get(nation);
+    }
+
+    /**
+     * Returns the coat-of-arms image for the given Nation.
+     * 
+     * @param nation The nation.
+     * @return the coat-of-arms of this nation
+     */
+    public ImageIcon getCoatOfArmsImageIcon(Nation nation) {
+        return coatOfArms.get(nation);
+    }
+
+    /**
+     * Returns the coat-of-arms image for the given Nation.
+     * 
+     * @param nation The nation.
+     * @return the coat-of-arms of this nation
+     */
+    public Image getCoatOfArmsImage(Nation nation) {
+        return coatOfArms.get(nation).getImage();
     }
 
     /**
