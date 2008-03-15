@@ -145,6 +145,7 @@ public class ContactTest extends FreeColTestCase {
         assertEquals(Stance.PEACE, dutch.getStance(iroquois));
 
         assertNotNull(iroquois.getTension(dutch));
+        assertNotNull(settlement.getAlarm(dutch));
 
     }
 
@@ -261,6 +262,7 @@ public class ContactTest extends FreeColTestCase {
 
         // TODO: do we need this?
         // assertNotNull(iroquois.getTension(apache));
+        // assertNotNull(settlement.getAlarm(iroquois));
 
     }
 
