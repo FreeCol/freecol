@@ -852,9 +852,8 @@ public class Player extends FreeColGameObject implements Nameable {
 
         if (contacted && !hasContacted(player)) {
             stance.put(player, Stance.PEACE);
-            player.stance.put(this, Stance.PEACE);
 
-            if (isEuropean()) {
+            if (isEuropean() && !isAI()) {
                 boolean contactedIndians = false;
                 boolean contactedEuro = false;
                 for (Player player1 : getGame().getPlayers()) {
@@ -878,7 +877,6 @@ public class Player extends FreeColGameObject implements Nameable {
                         addModelMessage(this, "EventPanel.MEETING_EUROPEANS", null, ModelMessage.FOREIGN_DIPLOMACY, player);
                     }
                 } else {
-                    player.tension.put(this, new Tension(0));
                     if (!contactedIndians) {
                         addModelMessage(this, "EventPanel.MEETING_NATIVES", null, ModelMessage.FOREIGN_DIPLOMACY, player);
                     }
@@ -890,7 +888,7 @@ public class Player extends FreeColGameObject implements Nameable {
                         addModelMessage(this, "EventPanel.MEETING_INCA", null, ModelMessage.FOREIGN_DIPLOMACY, player);
                     }
                 }
-            } else {
+            } else if (!isEuropean()) {
                 tension.put(player, new Tension(0));
             }
 

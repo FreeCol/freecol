@@ -1905,12 +1905,6 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
             if (t == null) {
                 continue;
             }
-
-            if (getOwner() == null) {
-                logger.warning("owner == null");
-                throw new NullPointerException();
-            }
-
             Settlement settlement = t.getSettlement();
             if (settlement != null) {
                 if (!settlement.getOwner().hasContacted(getOwner())) {
@@ -2727,7 +2721,6 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
         getTile().setSettlement(colony);
         setLocation(colony);
         setMovesLeft(0);
-        //removeAllEquipment(false);
     }
 
     /**
