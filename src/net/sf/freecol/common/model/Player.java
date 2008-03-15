@@ -588,6 +588,11 @@ public class Player extends FreeColGameObject implements Nameable {
         featureContainer.addAbility(new Ability("model.ability.independenceDeclared"));
         setStance(getREFPlayer(), Stance.WAR);
         setTax(0);
+        // Reset all arrears
+        for (GoodsType goodsType : FreeCol.getSpecification().getGoodsTypeList()) {
+            resetArrears(goodsType);
+        }
+
         // Dispose all units in Europe.
         Iterator<Unit> it = europe.getUnitIterator();
         String unitNames = "";
