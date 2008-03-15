@@ -109,6 +109,7 @@ public final class PreGameController extends Controller {
         nations.addAll(FreeCol.getSpecification().getREFNations());
         
         // Add AI players
+        game.setUnknownEnemy(new Player(game, "unknown enemy", false, null));
         int i = 0;
         for (Nation nation : nations) {
             if (game.getPlayer(nation.getId()) != null ||
@@ -136,7 +137,7 @@ public final class PreGameController extends Controller {
 
             freeColServer.getServer().addConnection(theConnection, 3 - i);
 
-            freeColServer.getGame().addPlayer(aiPlayer);
+            game.addPlayer(aiPlayer);
 
             // Send message to all players except to the new player:
             Element addNewPlayer = Message.createNewRootElement("addPlayer");

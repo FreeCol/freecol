@@ -1251,6 +1251,10 @@ public class AIPlayer extends AIObject {
                 for (int i = 0; i < nearbyColonies.size(); i++) {
                     Colony t = nearbyColonies.get(i);
                     Player to = t.getOwner();
+                    if (getPlayer().getTension(to) == null ||
+                        indianSettlement.getAlarm(to) == null) {
+                        continue;
+                    }
                     int tension = 1 + getPlayer().getTension(to).getValue() + indianSettlement.getAlarm(to).getValue();
                     tension = getRandom().nextInt(tension);
                     if (tension > targetTension) {
@@ -1269,7 +1273,7 @@ public class AIPlayer extends AIObject {
                         break;
                     }
                 }
-                if (chosenOne != null) {
+                if (chosenOne != null && target != null) {
                     // Check that the colony can be reached:
                     PathNode pn = chosenOne.getUnit().findPath(indianSettlement.getTile(), target.getTile());
                     if (pn != null && pn.getTotalTurns() <= MAX_DISTANCE_TO_MAKE_DEMANDS) {

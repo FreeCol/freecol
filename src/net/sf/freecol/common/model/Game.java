@@ -47,20 +47,13 @@ public class Game extends FreeColGameObject {
 
     private static final Logger logger = Logger.getLogger(Game.class.getName());
 
-    public static final int UNKNOWN_PLAYER_INDEX = 0;
-
-    protected int playerIndex = 1;
+    protected int playerIndex = 0;
 
     /** 
      * A virtual player to use with enemy privateers 
-     * TODO: player should have a game.
      */
-    protected final Player unknownEnemy = new Player(null, "unknown enemy", false, null);
+    private Player unknownEnemy;
 
-    public Player getUnknownEnemy() {
-    	return unknownEnemy;
-    }
-    
     /** Contains all the players in the game. */
     private List<Player> players = new ArrayList<Player>();
 
@@ -254,6 +247,14 @@ public class Game extends FreeColGameObject {
         return modelController;
     }
 
+    public Player getUnknownEnemy() {
+    	return unknownEnemy;
+    }
+
+    public void setUnknownEnemy(Player player) {
+        this.unknownEnemy = player;
+    }
+    
     /**
      * Get the <code>VacantNations</code> value.
      *
@@ -877,13 +878,15 @@ public class Game extends FreeColGameObject {
      */
     public static int getInciteAmount(Player payingPlayer, Player targetPlayer, Player attackingPlayer) {
         int amount = 0;
-        if (attackingPlayer.getTension(payingPlayer).getValue() > attackingPlayer.getTension(targetPlayer).getValue()) {
+        Tension payingTension = attackingPlayer.getTension(payingPlayer);
+        Tension targetTension = attackingPlayer.getTension(targetPlayer);
+        if (targetTension != null && 
+            payingTension.getValue() > targetTension.getValue()) {
             amount = 10000;
         } else {
             amount = 5000;
         }
-        amount += 20 * (attackingPlayer.getTension(payingPlayer).getValue() - attackingPlayer.getTension(targetPlayer)
-                        .getValue());
+        amount += 20 * (payingTension.getValue() - targetTension.getValue());
 
         return Math.max(amount, 650);
     }

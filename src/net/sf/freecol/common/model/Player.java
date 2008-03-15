@@ -267,12 +267,6 @@ public class Player extends FreeColGameObject implements Nameable {
     public Player(Game game, String name, boolean admin, Nation newNation) {
         super(game);
         
-        if (game == null) {
-            // The virtual enemy player for privateers
-            this.index = Game.UNKNOWN_PLAYER_INDEX;
-        } else {
-            this.index = game.getNextPlayerIndex();
-        }
         this.name = name;
         this.admin = admin;
         if (newNation != null && newNation.getType() != null) {
