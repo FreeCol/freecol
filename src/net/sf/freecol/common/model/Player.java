@@ -68,9 +68,6 @@ public class Player extends FreeColGameObject implements Nameable {
      */
     public static enum Stance { WAR, CEASE_FIRE, PEACE, ALLIANCE }
 
-    /** The maximum line of sight a unit can have in the game. */
-    public static final int MAX_LINE_OF_SIGHT = 2;
-
     /**
      * Only used by AI - stores the tension levels,
      * 0-1000 with 1000 maximum hostility.
