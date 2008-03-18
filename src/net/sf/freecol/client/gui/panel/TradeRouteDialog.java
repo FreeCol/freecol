@@ -43,10 +43,10 @@ import cz.autel.dmi.HIGLayout;
  * Allows the user to edit trade routes.
  */
 public final class TradeRouteDialog extends FreeColDialog implements ActionListener {
-    private static final Logger logger = Logger.getLogger(TradeRouteDialog.class.getName());
 
+    private static final Logger logger = Logger.getLogger(TradeRouteDialog.class.getName());
     
-    private static final int OK = 0, CANCEL = 1, DEASSIGN = 2;
+    private static enum Action { OK, CANCEL, DEASSIGN };
 
     private final JButton ok = new JButton(Messages.message("ok"));
     private final JButton cancel = new JButton(Messages.message("cancel"));
@@ -72,9 +72,9 @@ public final class TradeRouteDialog extends FreeColDialog implements ActionListe
 
         tradeRoutePanel.setOpaque(false);
 
-        ok.setActionCommand(String.valueOf(OK));
-        cancel.setActionCommand(String.valueOf(CANCEL));
-        deassignRouteButton.setActionCommand(String.valueOf(DEASSIGN));
+        ok.setActionCommand(Action.OK.toString());
+        cancel.setActionCommand(Action.CANCEL.toString());
+        deassignRouteButton.setActionCommand(Action.DEASSIGN.toString());
         
         ok.addActionListener(this);
         cancel.addActionListener(this);
@@ -202,12 +202,11 @@ public final class TradeRouteDialog extends FreeColDialog implements ActionListe
     * @param event The incoming ActionEvent.
     */
     public void actionPerformed(ActionEvent event) {
-        String command = event.getActionCommand();
+        Action action = Enum.valueOf(Action.class, event.getActionCommand());
         try {
-            switch (Integer.valueOf(command).intValue()) {
+            switch (action) {
             case OK:
                 getCanvas().remove(this);
-                //setResponse(new Boolean(true));
                 ArrayList<TradeRoute> routes = new ArrayList<TradeRoute>();
                 for (int index = 0; index < listModel.getSize(); index++) {
                     routes.add((TradeRoute) listModel.getElementAt(index));
