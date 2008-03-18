@@ -270,6 +270,11 @@ public class Player extends FreeColGameObject implements Nameable {
             this.nationType = newNation.getType();
             this.color = newNation.getColor();
             this.nationID = newNation.getId();
+            try {
+                featureContainer.add(nationType.getFeatureContainer());
+            } catch (Throwable error) {
+                error.printStackTrace();
+            }
             if (nationType.isEuropean()) {
                 /*
                  * Setting the amount of gold to
@@ -285,7 +290,7 @@ public class Player extends FreeColGameObject implements Nameable {
                     monarch = new Monarch(game, this, "");
                     playerType = PlayerType.COLONIAL;
                 } else {
-                    // Royal expeditionnary force
+                    // Royal expeditionary force
                     playerType = PlayerType.ROYAL;
                 }
             } else {
@@ -1442,7 +1447,11 @@ public class Player extends FreeColGameObject implements Nameable {
      * @param newNationType a <code>NationType</code> value
      */
     public void setNationType(NationType newNationType) {
+        if (nationType != null) {
+            featureContainer.remove(nationType.getFeatureContainer());
+        }
         nationType = newNationType;
+        featureContainer.add(newNationType.getFeatureContainer());
     }
 
     /**
@@ -2358,6 +2367,10 @@ public class Player extends FreeColGameObject implements Nameable {
                 entryLocation = new Tile(getGame(), entryLocationStr);
             }
         }
+
+        featureContainer = new FeatureContainer();
+        featureContainer.add(nationType.getFeatureContainer());
+
         tension = new HashMap<Player, Tension>();
         stance = new HashMap<Player, Stance>();
         while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {

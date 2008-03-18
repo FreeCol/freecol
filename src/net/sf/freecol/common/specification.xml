@@ -1336,7 +1336,7 @@
     </european-nation-type>
     <!-- this was the Dutch player -->
     <european-nation-type id="model.nationType.trade">
-      <modifier id="model.modifier.tradeBonus" type="percentage" value="50"/>
+      <modifier id="model.modifier.tradeBonus" type="percentage" value="-50"/>
       <unit id="model.unit.freeColonist" role="pioneer"/>
       <unit id="model.unit.freeColonist" role="soldier"/>
       <unit id="model.unit.merchantman"/>
