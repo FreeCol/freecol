@@ -37,6 +37,7 @@ public class AllTests {
 	suite.addTestSuite(GameTest.class);
 	suite.addTestSuite(GoodsTest.class);
 	suite.addTestSuite(MapTest.class);
+	suite.addTestSuite(MarketTest.class);
 	suite.addTestSuite(ModelMessageTest.class);
 	suite.addTestSuite(ModifierTest.class);
 	suite.addTestSuite(MonarchTest.class);
