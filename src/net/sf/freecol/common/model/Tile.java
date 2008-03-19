@@ -1556,7 +1556,7 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
                         out.writeAttribute("learnableSkill", Integer.toString(pet.getSkill().getIndex()));
                     }
                     if (pet.getHighlyWantedGoods() != null) {
-                        out.writeAttribute("highlyWantedGoods", pet.getHighlyWantedGoods().getId());
+                        out.writeAttribute("wantedGoods0", pet.getHighlyWantedGoods().getId());
                         out.writeAttribute("wantedGoods1", pet.getWantedGoods1().getId());
                         out.writeAttribute("wantedGoods2", pet.getWantedGoods2().getId());
                     }
@@ -2193,9 +2193,9 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
             }
             out.writeAttribute("settlementVisited", Boolean.toString(settlementVisited));
             if (highlyWantedGoods != null) {
-                out.writeAttribute("highlyWantedGoods", Integer.toString(highlyWantedGoods.getIndex()));
-                out.writeAttribute("wantedGoods1", Integer.toString(wantedGoods1.getIndex()));
-                out.writeAttribute("wantedGoods2", Integer.toString(wantedGoods2.getIndex()));
+                out.writeAttribute("wantedGoods0", highlyWantedGoods.getId());
+                out.writeAttribute("wantedGoods1", wantedGoods1.getId());
+                out.writeAttribute("wantedGoods2", wantedGoods2.getId());
             }
             if (region != null) {
                 out.writeAttribute("region", region.getId());
@@ -2262,11 +2262,11 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
             }
             settlementVisited = Boolean.valueOf(in.getAttributeValue(null, "settlementVisited")).booleanValue();
 
-            final String highlyWantedGoodsStr = in.getAttributeValue(null, "highlyWantedGoods");
+            final String highlyWantedGoodsStr = in.getAttributeValue(null, "wantedGoods0");
             if (highlyWantedGoodsStr != null) {
-                highlyWantedGoods = spec.getGoodsType(Integer.parseInt(highlyWantedGoodsStr));
-                wantedGoods1 = spec.getGoodsType(Integer.parseInt(in.getAttributeValue(null, "wantedGoods1")));
-                wantedGoods2 = spec.getGoodsType(Integer.parseInt(in.getAttributeValue(null, "wantedGoods2")));
+                highlyWantedGoods = spec.getGoodsType(highlyWantedGoodsStr);
+                wantedGoods1 = spec.getGoodsType(in.getAttributeValue(null, "wantedGoods1"));
+                wantedGoods2 = spec.getGoodsType(in.getAttributeValue(null, "wantedGoods2"));
             } else {
                 highlyWantedGoods = null;
                 wantedGoods1 = null;
