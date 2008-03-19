@@ -2372,7 +2372,8 @@ public class Player extends FreeColGameObject implements Nameable {
         }
 
         featureContainer = new FeatureContainer();
-        featureContainer.add(nationType.getFeatureContainer());
+        if (nationType!=null)
+            featureContainer.add(nationType.getFeatureContainer());
 
         tension = new HashMap<Player, Tension>();
         stance = new HashMap<Player, Stance>();
