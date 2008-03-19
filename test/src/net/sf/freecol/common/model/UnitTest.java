@@ -401,4 +401,23 @@ public class UnitTest extends FreeColTestCase {
         assertFalse(caravel.canAdd(caravel));
 
     }
+    
+    public void testMissionnary() {
+
+        Game game = getStandardGame();
+        Map map = getTestMap(plains, true);
+        game.setMap(map);
+        Player sioux = game.getPlayer("model.nation.sioux");
+        Player dutch = game.getPlayer("model.nation.dutch");
+        Tile tile = map.getTile(6, 9);
+        UnitType missionaryType = spec().getUnitType("model.unit.jesuitMissionary");
+        UnitType farmerSkill = spec().getUnitType("model.unit.expertFarmer");
+        Unit missionary = new Unit(game, tile, dutch, missionaryType, UnitState.ACTIVE);
+        IndianSettlement s = new IndianSettlement(game, sioux, tile, true, farmerSkill, true, null);
+        // add the missionary
+        s.setMissionary(missionary);
+        // remove the missionary (SimpleCombatModel.getConvert(...)
+        s.setMissionary(null);
+
+    }
 }
