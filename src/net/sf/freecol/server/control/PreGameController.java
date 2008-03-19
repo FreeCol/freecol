@@ -109,7 +109,7 @@ public final class PreGameController extends Controller {
         nations.addAll(FreeCol.getSpecification().getREFNations());
         
         // Add AI players
-        game.setUnknownEnemy(new Player(game, "unknown enemy", false, null));
+        game.setUnknownEnemy(new Player(game, Player.UNKNOWN_ENEMY, false, null));
         int i = 0;
         for (Nation nation : nations) {
             if (game.getPlayer(nation.getId()) != null ||

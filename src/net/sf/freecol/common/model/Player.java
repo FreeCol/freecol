@@ -93,6 +93,8 @@ public class Player extends FreeColGameObject implements Nameable {
      * of an AI player.
      */
     private String name;
+    
+    public static final String UNKNOWN_ENEMY = "unknown enemy";
 
     /**
      * The NationType of this player.
@@ -2335,7 +2337,8 @@ public class Player extends FreeColGameObject implements Nameable {
         index = Integer.parseInt(in.getAttributeValue(null, "index"));
         name = in.getAttributeValue(null, "username");
         nationID = in.getAttributeValue(null, "nationID");
-        nationType = FreeCol.getSpecification().getNationType(in.getAttributeValue(null, "nationType"));
+        if (!name.equals(UNKNOWN_ENEMY))
+            nationType = FreeCol.getSpecification().getNationType(in.getAttributeValue(null, "nationType"));
         color = new Color(Integer.parseInt(in.getAttributeValue(null, "color")));
         admin = getAttribute(in, "admin", false);
         gold = Integer.parseInt(in.getAttributeValue(null, "gold"));

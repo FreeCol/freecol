@@ -28,6 +28,7 @@ import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.freecol.FreeCol;
+import net.sf.freecol.common.model.Player;
 
 import org.w3c.dom.Element;
 
@@ -384,7 +385,7 @@ public class TradeRoute extends FreeColGameObject implements Cloneable, Ownable 
         
         Game game = getGame();
         if (game != null){
-        	if (ownerID.equals("unknown")) {
+        	if (ownerID.equals(Player.UNKNOWN_ENEMY)) {
         		owner = game.getUnknownEnemy(); 
         	} else {
 	            owner = (Player) getGame().getFreeColGameObject(ownerID);

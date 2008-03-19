@@ -3317,7 +3317,7 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
         if (getOwner().equals(player) || !hasAbility("model.ability.piracy") || showAll) {
             ownerID = owner.getId();
         } else {
-            ownerID = "unknown";
+            ownerID = Player.UNKNOWN_ENEMY;
         }
         out.writeAttribute("owner", ownerID);
         out.writeAttribute("turnsOfTraining", Integer.toString(turnsOfTraining));
@@ -3412,7 +3412,7 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
         workLeft = Integer.parseInt(in.getAttributeValue(null, "workLeft"));
 
         String ownerID = in.getAttributeValue(null, "owner");
-        if (ownerID.equals("unknown")) {
+        if (ownerID.equals(Player.UNKNOWN_ENEMY)) {
             owner = getGame().getUnknownEnemy();
         } else {
             owner = (Player) getGame().getFreeColGameObject(ownerID);

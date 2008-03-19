@@ -941,6 +941,9 @@ public class Game extends FreeColGameObject {
             Player p = playerIterator.next();
             p.toXML(out, player, showAll, toSavedGame);
         }
+        if (getUnknownEnemy()!=null) {
+            getUnknownEnemy().toXML(out, player, showAll, toSavedGame);
+        }
         // serialize map
         if (map != null) {
             map.toXML(out, player, showAll, toSavedGame);
