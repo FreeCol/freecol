@@ -443,6 +443,9 @@ public class IndianSettlement extends Settlement {
                 throw new IllegalArgumentException("Specified unit is not a missionary.");
             }
             missionary.setLocation(null);
+            if (alarm.get(missionary.getOwner()) == null) {
+                alarm.put(missionary.getOwner(), new Tension(0));
+            }
         }
         if (missionary != this.missionary) {
             convertProgress = 0;
@@ -451,9 +454,6 @@ public class IndianSettlement extends Settlement {
             this.missionary.dispose();
         }
         this.missionary = missionary;
-        if (alarm.get(missionary.getOwner()) == null) {
-            alarm.put(missionary.getOwner(), new Tension(0));
-        }
         getTile().updatePlayerExploredTiles();
     }
 
@@ -815,7 +815,8 @@ public class IndianSettlement extends Settlement {
         Iterator<Position> it = getGame().getMap().getCircleIterator(getTile().getPosition(), true, getRadius());
         while (it.hasNext()) {
             Tile workTile = getGame().getMap().getTile(it.next());
-            if ((workTile.getOwningSettlement() == null || workTile.getOwningSettlement() == this) && !workTile.isOccupied()) {
+            if ((workTile.getOwningSettlement() == null ||
+                 workTile.getOwningSettlement() == this) && !workTile.isOccupied()) {
                 potential += workTile.potential(type);
             }
         }
