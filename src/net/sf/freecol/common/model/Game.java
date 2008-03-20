@@ -1003,7 +1003,11 @@ public class Game extends FreeColGameObject {
                     player.readFromXML(in);
                 } else {
                     player = new Player(this, in);
-                    players.add(player);
+                    if (player.getName().equals(Player.UNKNOWN_ENEMY)) {
+                        setUnknownEnemy(player);
+                    } else {
+                        players.add(player);
+                    }
                 }
             } else if (in.getLocalName().equals(Map.getXMLElementTagName())) {
                 String mapId = in.getAttributeValue(null, "ID");
