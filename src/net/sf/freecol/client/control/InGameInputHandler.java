@@ -40,6 +40,7 @@ import net.sf.freecol.common.model.FoundingFather;
 import net.sf.freecol.common.model.FoundingFather.FoundingFatherType;
 import net.sf.freecol.common.model.FreeColGameObject;
 import net.sf.freecol.common.model.Goods;
+import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.LostCityRumour;
 import net.sf.freecol.common.model.Map;
 import net.sf.freecol.common.model.Map.Direction;
@@ -140,6 +141,8 @@ public final class InGameInputHandler extends InputHandler {
                 reply = newConvert(element);
             } else if (type.equals("diplomaticTrade")) {
                 reply = diplomaticTrade(element);
+            } else if (type.equals("marketElement")) {
+                reply = marketElement(element);
             } else {
                 logger.warning("Message is of unsupported type \"" + type + "\".");
             }
@@ -890,6 +893,26 @@ public final class InGameInputHandler extends InputHandler {
         player.giveIndependence();
         return null;
     }
+
+
+    /**
+     * Handles a "marketElement"-request.
+     * 
+     * @param element The element (root element in a DOM-parsed XML tree) that
+     *        holds all the information.
+     */
+    private Element marketElement(Element element) {
+        final Player player = getFreeColClient().getMyPlayer();
+        GoodsType type = FreeCol.getSpecification().getGoodsType(element.getAttribute("type"));
+        int amount = Integer.parseInt(element.getAttribute("amount"));
+        if (amount > 0) {
+            player.getMarket().add(type, amount);
+        } else {
+            player.getMarket().remove(type, -amount);
+        }
+        return null;
+    }
+
 
     /**
      * Handles a "removeGoods"-request.

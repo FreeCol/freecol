@@ -30,6 +30,7 @@ import java.util.logging.Logger;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 
+import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.Market;
@@ -60,8 +61,13 @@ public final class MarketLabel extends JLabel implements ActionListener {
         super(parent.getGUI().getImageLibrary().getGoodsImageIcon(type));
         
         this.type = type;
-        setToolTipText(type.getName());
-
+        /*
+        if (FreeCol.isInDebugMode()) {
+            setToolTipText(type.getName() + " " + market.getMarketData(type).getAmountInMarket());
+        } else {
+            setToolTipText(type.getName());
+        }
+        */
         if (market == null) {
             throw new NullPointerException();
         }
@@ -151,13 +157,17 @@ public final class MarketLabel extends JLabel implements ActionListener {
     public void paintComponent(Graphics g) {
 
         Player player = market.getGame().getViewOwner();
+        String toolTipText = type.getName();
         if (player == null || player.canTrade(type)) {
-            setToolTipText(type.getName());
             setEnabled(true);
         } else {
-            setToolTipText(type.getName(false));
+            toolTipText = type.getName(false);
             setEnabled(false);
         }
+        if (FreeCol.isInDebugMode()) {
+            toolTipText += " " + market.getMarketData(type).getAmountInMarket();
+        }
+        setToolTipText(toolTipText);
 
         super.setText(Integer.toString(market.paidForSale(type)) + "/" + Integer.toString(market.costToBuy(type)));
         super.paintComponent(g);

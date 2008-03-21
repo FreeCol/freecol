@@ -1810,14 +1810,19 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
             throw new IllegalStateException();
         }
         carrier.buyGoods(type, amount);
-        /*
+       
         Element marketElement = Message.createNewRootElement("marketElement");
         marketElement.setAttribute("type", buyGoodsElement.getAttribute("type"));
         marketElement.setAttribute("amount", String.valueOf(-amount/4));
         for (ServerPlayer enemyPlayer : getOtherPlayers(player)) {
-            enemyPlayer.getConnection().send(marketElement);
+            try {
+                enemyPlayer.getConnection().send(marketElement);
+            } catch (IOException e) {
+                logger.warning("Could not send message to: " + enemyPlayer.getName() +
+                               " with connection " + enemyPlayer.getConnection());
+            }
         }
-        */
+   
         return null;
     }
 
@@ -1834,6 +1839,19 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
             throw new IllegalStateException("Not your unit!");
         }
         player.getMarket().sell(goods, player);
+
+        Element marketElement = Message.createNewRootElement("marketElement");
+        marketElement.setAttribute("type", sellGoodsElement.getAttribute("type"));
+        marketElement.setAttribute("amount", String.valueOf(goods.getAmount()/4));
+        for (ServerPlayer enemyPlayer : getOtherPlayers(player)) {
+            try {
+                enemyPlayer.getConnection().send(marketElement);
+            } catch (IOException e) {
+                logger.warning("Could not send message to: " + enemyPlayer.getName() +
+                               " with connection " + enemyPlayer.getConnection());
+            }
+        }
+   
         return null;
     }
 
