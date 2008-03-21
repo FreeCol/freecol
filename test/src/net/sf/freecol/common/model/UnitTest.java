@@ -403,7 +403,6 @@ public class UnitTest extends FreeColTestCase {
     }
     
     public void testMissionnary() {
-
         Game game = getStandardGame();
         Map map = getTestMap(plains, true);
         game.setMap(map);
@@ -418,6 +417,36 @@ public class UnitTest extends FreeColTestCase {
         s.setMissionary(missionary);
         // remove the missionary (SimpleCombatModel.getConvert(...)
         s.setMissionary(null);
-
+    }
+    
+    public void testLineOfSight() {
+        Game game = getStandardGame();
+        Map map = getTestMap(plains, true);
+        game.setMap(map);
+        Player player = game.getPlayer("model.nation.dutch");
+        Tile tile = map.getTile(6, 9);
+        
+        UnitType frigateType = spec().getUnitType("model.unit.frigate");
+        Unit frigate = new Unit(game, tile, player, frigateType, UnitState.ACTIVE);
+        assertEquals(2, frigate.getLineOfSight());
+        
+        UnitType revengerType = spec().getUnitType("model.unit.revenger");
+        Unit revenger = new Unit(game, tile, player, revengerType, UnitState.ACTIVE);
+        assertEquals(3, revenger.getLineOfSight());
+        
+        UnitType colonistType = spec().getUnitType("model.unit.freeColonist");
+        Unit colonist = new Unit(game, tile, player, colonistType, UnitState.ACTIVE);
+        assertEquals(1, colonist.getLineOfSight());
+        
+        EquipmentType horses = spec().getEquipmentType("model.equipment.horses");
+        colonist.equipWith(horses);
+        assertEquals(2, colonist.getLineOfSight());
+        
+        // with Hernando De Soto, land units should see further 
+        FoundingFather father = spec().getFoundingFather("model.foundingFather.hernandoDeSoto");
+        player.addFather(father);
+        assertEquals(2, frigate.getLineOfSight());  // should not increase
+        assertEquals(4, revenger.getLineOfSight()); // should get +1 bonus
+        assertEquals(3, colonist.getLineOfSight()); // should get +1 bonus
     }
 }
