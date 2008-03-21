@@ -194,6 +194,8 @@ public class FeatureContainer {
         Set<Modifier> modifierSet = modifiers.get(id);
         if (modifierSet == null) {
             return Collections.emptySet();
+        } else if (objectType == null) {
+            return modifierSet;
         } else {
             Set<Modifier> result = new HashSet<Modifier>();
             for (Modifier modifier : modifierSet) {

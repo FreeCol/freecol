@@ -429,6 +429,7 @@ public class UnitTest extends FreeColTestCase {
         UnitType frigateType = spec().getUnitType("model.unit.frigate");
         Unit frigate = new Unit(game, tile, player, frigateType, UnitState.ACTIVE);
         assertEquals(2, frigate.getLineOfSight());
+        assertTrue(frigate.hasAbility("model.ability.navalUnit"));
         
         UnitType revengerType = spec().getUnitType("model.unit.revenger");
         Unit revenger = new Unit(game, tile, player, revengerType, UnitState.ACTIVE);
@@ -445,6 +446,7 @@ public class UnitTest extends FreeColTestCase {
         // with Hernando De Soto, land units should see further 
         FoundingFather father = spec().getFoundingFather("model.foundingFather.hernandoDeSoto");
         player.addFather(father);
+
         assertEquals(2, frigate.getLineOfSight());  // should not increase
         assertEquals(4, revenger.getLineOfSight()); // should get +1 bonus
         assertEquals(3, colonist.getLineOfSight()); // should get +1 bonus
