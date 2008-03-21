@@ -1390,20 +1390,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         }
         Tile oldTile = unit.getTile();
         unit.embark(destinationUnit);
-        for (ServerPlayer enemyPlayer : getOtherPlayers(player)) {
-            try {
-                if (enemyPlayer.canSee(oldTile)) {
-                    Element removeElement = Message.createNewRootElement("remove");
-                    Element removeUnit = removeElement.getOwnerDocument().createElement("removeObject");
-                    removeUnit.setAttribute("ID", unit.getId());
-                    removeElement.appendChild(removeUnit);
-                    enemyPlayer.getConnection().send(removeElement);
-                }
-            } catch (IOException e) {
-                logger.warning("Could not send message to: " + enemyPlayer.getName() + " with connection "
-                        + enemyPlayer.getConnection());
-            }
-        }
+        sendRemoveUnitToAll(unit, player);
         return null;
     }
 
@@ -1432,21 +1419,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         }
         unit.boardShip(carrier);
         if (tellEnemyPlayers) {
-            for (ServerPlayer enemyPlayer : getOtherPlayers(player)) {
-                try {
-                    if (enemyPlayer.canSee(oldTile)) {
-                        // TODO: can't we move this out of the loop?
-                        Element removeElement = Message.createNewRootElement("remove");
-                        Element removeUnit = removeElement.getOwnerDocument().createElement("removeObject");
-                        removeUnit.setAttribute("ID", unit.getId());
-                        removeElement.appendChild(removeUnit);
-                        enemyPlayer.getConnection().send(removeElement);
-                    }
-                } catch (IOException e) {
-                    logger.warning("Could not send message to: " + enemyPlayer.getName() + " with connection "
-                            + enemyPlayer.getConnection());
-                }
-            }
+            sendRemoveUnitToAll(unit, player);
         }
         // For updating the number of colonist:
         sendUpdatedTileToAll(unit.getTile(), player);
@@ -1714,14 +1687,13 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
     }
 
     private void sendRemoveUnitToAll(Unit unit, Player player) {
+        Element removeElement = Message.createNewRootElement("remove");
+        Element removeUnit = removeElement.getOwnerDocument().createElement("removeObject");
+        removeUnit.setAttribute("ID", unit.getId());
+        removeElement.appendChild(removeUnit);
         for (ServerPlayer enemyPlayer : getOtherPlayers(player)) {
             try {
                 if (unit.isVisibleTo(enemyPlayer)) {
-                    // TODO: can't we move this out of the loop?
-                    Element removeElement = Message.createNewRootElement("remove");
-                    Element removeUnit = removeElement.getOwnerDocument().createElement("removeObject");
-                    removeUnit.setAttribute("ID", unit.getId());
-                    removeElement.appendChild(removeUnit);
                     enemyPlayer.getConnection().send(removeElement);
                 }
             } catch (IOException e) {
@@ -1879,20 +1851,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         }
         Tile oldTile = unit.getTile();
         unit.moveToEurope();
-        for (ServerPlayer enemyPlayer : getOtherPlayers(player)) {
-            try {
-                if (enemyPlayer.canSee(oldTile)) {
-                    Element removeElement = Message.createNewRootElement("remove");
-                    Element removeUnit = removeElement.getOwnerDocument().createElement("removeObject");
-                    removeUnit.setAttribute("ID", unit.getId());
-                    removeElement.appendChild(removeUnit);
-                    enemyPlayer.getConnection().send(removeElement);
-                }
-            } catch (IOException e) {
-                logger.warning("Could not send message to: " + enemyPlayer.getName() + " with connection "
-                        + enemyPlayer.getConnection());
-            }
-        }
+        sendRemoveUnitToAll(unit, player);
         return null;
     }
 
