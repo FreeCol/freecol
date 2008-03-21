@@ -470,6 +470,19 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         });
     }
 
+    private List<ServerPlayer> getOtherPlayers(Player player) {
+        List<ServerPlayer> result = new ArrayList<ServerPlayer>();
+        for (Player otherPlayer : getGame().getPlayers()) {
+            ServerPlayer enemyPlayer = (ServerPlayer) otherPlayer;
+            if (player.equals(enemyPlayer) || enemyPlayer.getConnection() == null) {
+                continue;
+            }
+            result.add(enemyPlayer);
+        }
+        return result;
+    }
+
+
     /**
      * Handles a "buyLand"-message from a client.
      * 
@@ -863,13 +876,8 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
             throw new IllegalStateException("Not your unit!");
         }
         Tile newTile = getGame().getMap().getNeighbourOrNull(direction, unit.getTile());
-        
-        Iterator<Player> enemyPlayerIterator = getGame().getPlayerIterator();
-        while (enemyPlayerIterator.hasNext()) {
-            ServerPlayer enemyPlayer = (ServerPlayer) enemyPlayerIterator.next();
-            if (player.equals(enemyPlayer) || enemyPlayer.getConnection() == null) {
-                continue;
-            }
+
+        for (ServerPlayer enemyPlayer : getOtherPlayers(player)) {
             try {
                 if (unit.isVisibleTo(enemyPlayer)) { // && !disembark
                     Element opponentMoveElement = Message.createNewRootElement("opponentMove");
@@ -1114,20 +1122,14 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
                     + player.getConnection());
         }
         // tell everyone the rumour has been explored
-        Iterator<Player> updateIterator = getGame().getPlayerIterator();
-        while (updateIterator.hasNext()) {
-            ServerPlayer updatePlayer = (ServerPlayer) updateIterator.next();
-            if (player.equals(updatePlayer) || updatePlayer.getConnection() == null) {
-                continue;
-            } else if (updatePlayer.canSee(tile)) {
-                try {
-                    Element rumourUpdate = Message.createNewRootElement("update");
-                    rumourUpdate.appendChild(tile.toXMLElement(updatePlayer, rumourUpdate.getOwnerDocument()));
-                    updatePlayer.getConnection().send(rumourUpdate);
-                } catch (IOException e) {
-                    logger.warning("Could not send update message to: " + updatePlayer.getName() + " with connection "
-                            + updatePlayer.getConnection());
-                }
+        for (ServerPlayer updatePlayer : getOtherPlayers(player)) {
+            try {
+                Element rumourUpdate = Message.createNewRootElement("update");
+                rumourUpdate.appendChild(tile.toXMLElement(updatePlayer, rumourUpdate.getOwnerDocument()));
+                updatePlayer.getConnection().send(rumourUpdate);
+            } catch (IOException e) {
+                logger.warning("Could not send update message to: " + updatePlayer.getName() + " with connection "
+                               + updatePlayer.getConnection());
             }
         }
     }
@@ -1268,12 +1270,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         }
         // Inform the players (other then the player attacking) about
         // the attack:
-        Iterator<Player> enemyPlayerIterator = getGame().getPlayerIterator();
-        while (enemyPlayerIterator.hasNext()) {
-            ServerPlayer enemyPlayer = (ServerPlayer) enemyPlayerIterator.next();
-            if (player.equals(enemyPlayer) || enemyPlayer.getConnection() == null) {
-                continue;
-            }
+        for (ServerPlayer enemyPlayer : getOtherPlayers(player)) {
             Element opponentAttackElement = Message.createNewRootElement("opponentAttack");
             if (unit.isVisibleTo(enemyPlayer) || defender.isVisibleTo(enemyPlayer)) {
                 opponentAttackElement.setAttribute("direction", direction.toString());
@@ -1393,12 +1390,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         }
         Tile oldTile = unit.getTile();
         unit.embark(destinationUnit);
-        Iterator<Player> enemyPlayerIterator = getGame().getPlayerIterator();
-        while (enemyPlayerIterator.hasNext()) {
-            ServerPlayer enemyPlayer = (ServerPlayer) enemyPlayerIterator.next();
-            if (player.equals(enemyPlayer) || enemyPlayer.getConnection() == null) {
-                continue;
-            }
+        for (ServerPlayer enemyPlayer : getOtherPlayers(player)) {
             try {
                 if (enemyPlayer.canSee(oldTile)) {
                     Element removeElement = Message.createNewRootElement("remove");
@@ -1440,14 +1432,10 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         }
         unit.boardShip(carrier);
         if (tellEnemyPlayers) {
-            Iterator<Player> enemyPlayerIterator = getGame().getPlayerIterator();
-            while (enemyPlayerIterator.hasNext()) {
-                ServerPlayer enemyPlayer = (ServerPlayer) enemyPlayerIterator.next();
-                if (player.equals(enemyPlayer) || enemyPlayer.getConnection() == null) {
-                    continue;
-                }
+            for (ServerPlayer enemyPlayer : getOtherPlayers(player)) {
                 try {
                     if (enemyPlayer.canSee(oldTile)) {
+                        // TODO: can't we move this out of the loop?
                         Element removeElement = Message.createNewRootElement("remove");
                         Element removeUnit = removeElement.getOwnerDocument().createElement("removeObject");
                         removeUnit.setAttribute("ID", unit.getId());
@@ -1726,14 +1714,10 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
     }
 
     private void sendRemoveUnitToAll(Unit unit, Player player) {
-        Iterator<Player> enemyPlayerIterator = getGame().getPlayerIterator();
-        while (enemyPlayerIterator.hasNext()) {
-            ServerPlayer enemyPlayer = (ServerPlayer) enemyPlayerIterator.next();
-            if (player.equals(enemyPlayer) || enemyPlayer.getConnection() == null) {
-                continue;
-            }
+        for (ServerPlayer enemyPlayer : getOtherPlayers(player)) {
             try {
                 if (unit.isVisibleTo(enemyPlayer)) {
+                    // TODO: can't we move this out of the loop?
                     Element removeElement = Message.createNewRootElement("remove");
                     Element removeUnit = removeElement.getOwnerDocument().createElement("removeObject");
                     removeUnit.setAttribute("ID", unit.getId());
@@ -1854,6 +1838,14 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
             throw new IllegalStateException();
         }
         carrier.buyGoods(type, amount);
+        /*
+        Element marketElement = Message.createNewRootElement("marketElement");
+        marketElement.setAttribute("type", buyGoodsElement.getAttribute("type"));
+        marketElement.setAttribute("amount", String.valueOf(-amount/4));
+        for (ServerPlayer enemyPlayer : getOtherPlayers(player)) {
+            enemyPlayer.getConnection().send(marketElement);
+        }
+        */
         return null;
     }
 
@@ -1887,12 +1879,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         }
         Tile oldTile = unit.getTile();
         unit.moveToEurope();
-        Iterator<Player> enemyPlayerIterator = getGame().getPlayerIterator();
-        while (enemyPlayerIterator.hasNext()) {
-            ServerPlayer enemyPlayer = (ServerPlayer) enemyPlayerIterator.next();
-            if (player.equals(enemyPlayer) || enemyPlayer.getConnection() == null) {
-                continue;
-            }
+        for (ServerPlayer enemyPlayer : getOtherPlayers(player)) {
             try {
                 if (enemyPlayer.canSee(oldTile)) {
                     Element removeElement = Message.createNewRootElement("remove");
@@ -2946,6 +2933,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
     }
 
     private void sendUpdatedTileToAll(Tile newTile, Player player) {
+        // TODO: can Player be null?
         Iterator<Player> enemyPlayerIterator = getGame().getPlayerIterator();
         while (enemyPlayerIterator.hasNext()) {
             ServerPlayer enemyPlayer = (ServerPlayer) enemyPlayerIterator.next();
