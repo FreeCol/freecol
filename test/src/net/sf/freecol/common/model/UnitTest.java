@@ -402,7 +402,7 @@ public class UnitTest extends FreeColTestCase {
 
     }
     
-    public void testMissionnary() {
+    public void testMissionary() {
         Game game = getStandardGame();
         Map map = getTestMap(plains, true);
         game.setMap(map);
