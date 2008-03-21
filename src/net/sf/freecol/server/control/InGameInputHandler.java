@@ -483,6 +483,23 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
     }
 
 
+    private void sendRemoveUnitToAll(Unit unit, Player player) {
+        Element removeElement = Message.createNewRootElement("remove");
+        Element removeUnit = removeElement.getOwnerDocument().createElement("removeObject");
+        removeUnit.setAttribute("ID", unit.getId());
+        removeElement.appendChild(removeUnit);
+        for (ServerPlayer enemyPlayer : getOtherPlayers(player)) {
+            if (unit.isVisibleTo(enemyPlayer)) {
+                try {
+                    enemyPlayer.getConnection().send(removeElement);
+                } catch (IOException e) {
+                    logger.warning("Could not send message to: " + enemyPlayer.getName() + " with connection "
+                                   + enemyPlayer.getConnection());
+                }
+            }
+        }
+    }
+
     /**
      * Handles a "buyLand"-message from a client.
      * 
@@ -1683,23 +1700,6 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
             return reply;
         } else {
             return null;
-        }
-    }
-
-    private void sendRemoveUnitToAll(Unit unit, Player player) {
-        Element removeElement = Message.createNewRootElement("remove");
-        Element removeUnit = removeElement.getOwnerDocument().createElement("removeObject");
-        removeUnit.setAttribute("ID", unit.getId());
-        removeElement.appendChild(removeUnit);
-        for (ServerPlayer enemyPlayer : getOtherPlayers(player)) {
-            try {
-                if (unit.isVisibleTo(enemyPlayer)) {
-                    enemyPlayer.getConnection().send(removeElement);
-                }
-            } catch (IOException e) {
-                logger.warning("Could not send message to: " + enemyPlayer.getName() + " with connection "
-                        + enemyPlayer.getConnection());
-            }
         }
     }
 

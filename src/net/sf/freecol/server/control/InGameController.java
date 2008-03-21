@@ -36,8 +36,10 @@ import net.sf.freecol.common.model.FoundingFather;
 import net.sf.freecol.common.model.FoundingFather.FoundingFatherType;
 import net.sf.freecol.common.model.GameOptions;
 import net.sf.freecol.common.model.Goods;
+import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.Map;
 import net.sf.freecol.common.model.Map.Direction;
+import net.sf.freecol.common.model.Market;
 import net.sf.freecol.common.model.Monarch;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Player.PlayerType;
@@ -164,20 +166,19 @@ public final class InGameController extends Controller {
         
         if (newPlayer.isEuropean()) {
 
-            /* don't make this random for the moment
-               try {        
-               Market market = newPlayer.getMarket();
-               // make random change to the market
-               market.remove(getPseudoRandom().nextInt(Goods.NUMBER_OF_TYPES),
-               (getPseudoRandom().nextInt(21)));
-               Element updateElement = Message.createNewRootElement("update");
-               updateElement.appendChild(newPlayer.getMarket().toXMLElement(newPlayer, updateElement.getOwnerDocument()));
-               newPlayer.getConnection().send(updateElement);
-               } catch (IOException e) {
-               logger.warning("Could not send message to: " + newPlayer.getName() + " with connection "
-               + newPlayer.getConnection());
-               }
-            */
+            try {        
+                Market market = newPlayer.getMarket();
+                // make random change to the market
+                List<GoodsType> goodsTypes = FreeCol.getSpecification().getGoodsTypeList();
+                market.remove(goodsTypes.get(getPseudoRandom().nextInt(goodsTypes.size())),
+                              (getPseudoRandom().nextInt(21)));
+                Element updateElement = Message.createNewRootElement("update");
+                updateElement.appendChild(newPlayer.getMarket().toXMLElement(newPlayer, updateElement.getOwnerDocument()));
+                newPlayer.getConnection().send(updateElement);
+            } catch (IOException e) {
+                logger.warning("Could not send message to: " + newPlayer.getName() +
+                               " with connection " + newPlayer.getConnection());
+            }
 
             if (newPlayer.getCurrentFather() == null && newPlayer.getSettlements().size() > 0) {
                 chooseFoundingFather(newPlayer);
