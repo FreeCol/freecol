@@ -1801,7 +1801,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
     private Element buyGoods(Connection connection, Element buyGoodsElement) {
         ServerPlayer player = getFreeColServer().getPlayer(connection);
         Unit carrier = (Unit) getGame().getFreeColGameObject(buyGoodsElement.getAttribute("carrier"));
-        GoodsType type = FreeCol.getSpecification().getGoodsType(Integer.parseInt(buyGoodsElement.getAttribute("type")));
+        GoodsType type = FreeCol.getSpecification().getGoodsType(buyGoodsElement.getAttribute("type"));
         int amount = Integer.parseInt(buyGoodsElement.getAttribute("amount"));
         if (carrier.getOwner() != player) {
             throw new IllegalStateException("Not your unit!");
@@ -1812,7 +1812,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         carrier.buyGoods(type, amount);
        
         Element marketElement = Message.createNewRootElement("marketElement");
-        marketElement.setAttribute("type", buyGoodsElement.getAttribute("type"));
+        marketElement.setAttribute("type", type.getId());
         marketElement.setAttribute("amount", String.valueOf(-amount/4));
         for (ServerPlayer enemyPlayer : getOtherPlayers(player)) {
             try {
@@ -1841,7 +1841,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         player.getMarket().sell(goods, player);
 
         Element marketElement = Message.createNewRootElement("marketElement");
-        marketElement.setAttribute("type", sellGoodsElement.getAttribute("type"));
+        marketElement.setAttribute("type", goods.getType().getId());
         marketElement.setAttribute("amount", String.valueOf(goods.getAmount()/4));
         for (ServerPlayer enemyPlayer : getOtherPlayers(player)) {
             try {

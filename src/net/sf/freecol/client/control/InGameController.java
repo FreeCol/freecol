@@ -2132,7 +2132,7 @@ public final class InGameController implements NetworkConstants {
 
         Element buyGoodsElement = Message.createNewRootElement("buyGoods");
         buyGoodsElement.setAttribute("carrier", carrier.getId());
-        buyGoodsElement.setAttribute("type", Integer.toString(type.getIndex()));
+        buyGoodsElement.setAttribute("type", type.getId());
         buyGoodsElement.setAttribute("amount", Integer.toString(amount));
 
         carrier.buyGoods(type, amount);

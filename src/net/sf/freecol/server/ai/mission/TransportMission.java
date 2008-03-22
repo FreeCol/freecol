@@ -620,7 +620,7 @@ public class TransportMission extends Mission {
         if (player.getGold() >= market.getBidPrice(type, amount)) {
             Element buyGoodsElement = Message.createNewRootElement("buyGoods");
             buyGoodsElement.setAttribute("carrier", getUnit().getId());
-            buyGoodsElement.setAttribute("type", Integer.toString(type.getIndex()));
+            buyGoodsElement.setAttribute("type", type.getId());
             buyGoodsElement.setAttribute("amount", Integer.toString(amount));
             try {
                 connection.sendAndWait(buyGoodsElement);
