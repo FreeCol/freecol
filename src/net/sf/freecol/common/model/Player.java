@@ -2091,7 +2091,14 @@ public class Player extends FreeColGameObject implements Nameable {
             } else if (event.equals("model.event.increaseSonsOfLiberty")) {
                 int value = Integer.parseInt(father.getEvents().get(event));
                 for (Colony colony : getColonies()) {
-                    colony.addSoL(value);
+                    /*
+                     * The number of bells to be generated in order to
+                     * get the appropriate SoL is determined by the
+                     * formula: int membership = ... in "colony.updateSoL()":
+                     */
+                    int requiredBells = ((colony.getSoL() + value) * Colony.BELLS_PER_REBEL *
+                                         colony.getUnitCount()) / 100;
+                    colony.addGoods(Goods.BELLS, requiredBells - colony.getGoodsCount(Goods.BELLS));
                 }
             }
 

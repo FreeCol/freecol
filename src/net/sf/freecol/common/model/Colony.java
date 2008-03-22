@@ -50,7 +50,7 @@ public final class Colony extends Settlement implements Location, Nameable {
 
     private static final Logger logger = Logger.getLogger(Colony.class.getName());
 
-    private static final int BELLS_PER_REBEL = 200;
+    public static final int BELLS_PER_REBEL = 200;
     private static final int FOOD_PER_COLONIST = 200;
     private static final int FOOD_CONSUMPTION = 2;
 
@@ -206,7 +206,7 @@ public final class Colony extends Settlement implements Location, Nameable {
     }
 
     /**
-     * Updates SoL and builds stockade if possible.
+     * Updates SoL and builds Buildings that are free if possible.
      */
     public void updatePopulation() {
         // this means we might get a building for free
@@ -374,16 +374,22 @@ public final class Colony extends Settlement implements Location, Nameable {
     /**
      * Gets a <code>Building</code> of the specified type.
      * 
-     * @param typeIndex The index of the building type to get.
+     * @param type The type of the building to get.
      * @return The <code>Building</code>.
      */
-    public Building getBuilding(int typeIndex) {
-        return buildingMap.get(FreeCol.getSpecification().getBuildingType(typeIndex).getFirstLevel().getId());
-    }
     public Building getBuilding(BuildingType type) {
         return buildingMap.get(type.getFirstLevel().getId());
     }
-    public Building getBuilding(String ability) {
+
+
+    /**
+     * Returns a <code>Building</code> with the given
+     * <code>Ability</code>, or null, if none exists.
+     *
+     * @param ability a <code>String</code> value
+     * @return a <code>Building</code> value
+     */
+    public Building getBuildingWithAbility(String ability) {
         for (Building building : buildingMap.values()) {
             if (building.getType().hasAbility(ability)) {
                 return building;
@@ -515,10 +521,6 @@ public final class Colony extends Settlement implements Location, Nameable {
         } else {
             return goodsContainer.getGoodsCount(type.getStoredAs());
         }
-    }
-    
-    public int getGoodsCount(int goodsIndex) {
-        return getGoodsCount(FreeCol.getSpecification().getGoodsType(goodsIndex));
     }
 
     /**
@@ -741,7 +743,7 @@ public final class Colony extends Settlement implements Location, Nameable {
     }
 
     /**
-     * Adds to the bell count of the colony.
+     * Adds to the bell count of the colony. Used only by DebugMenu.
      * 
      * @param amount The number of bells to add.
      */
@@ -750,21 +752,6 @@ public final class Colony extends Settlement implements Location, Nameable {
         if (getMembers() <= getUnitCount() + 1 && amount > 0) {
             addGoods(Goods.BELLS, amount);
         }
-    }
-
-    /**
-     * Adds to the bell count of the colony.
-     * 
-     * @param amount The percentage of SoL to add.
-     */
-    public void addSoL(int amount) {
-        /*
-         * The number of bells to be generated in order to get the appropriate
-         * SoL is determined by the formula: int membership = ... in
-         * "updateSoL()":
-         */
-	int requiredBells = ((sonsOfLiberty + amount) * BELLS_PER_REBEL * getUnitCount()) / 100;
-        addGoods(Goods.BELLS, requiredBells - getGoodsCount(Goods.BELLS));
     }
 
     /**
@@ -1288,7 +1275,8 @@ public final class Colony extends Settlement implements Location, Nameable {
      * @param missingInput  missing input
      * @return message
      */
-    private String createInsufficientProductionMessage(GoodsType outputType, int missingOutput, GoodsType inputType, int missingInput) {
+    private String createInsufficientProductionMessage(GoodsType outputType, int missingOutput,
+                                                       GoodsType inputType, int missingInput) {
         return Messages.message("model.colony.insufficientProduction",
                 "%outputAmount%", String.valueOf(missingOutput),
                 "%outputType%", outputType.getName(),

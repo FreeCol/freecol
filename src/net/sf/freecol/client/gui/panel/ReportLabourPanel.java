@@ -463,10 +463,12 @@ public final class ReportLabourPanel extends ReportPanel implements ActionListen
             row++;
         }
 
-        Building schoolhouse = colony != null && data.isTraining() ? colony.getBuilding("model.ability.teach") : null;
+        Building schoolhouse = colony != null && data.isTraining() ?
+            colony.getBuildingWithAbility("model.ability.teach") : null;
 
         if (showBuildings && schoolhouse != null && row > buildingStartRow) {
-            reportPanel.add(createEmptyLabel(), higConst.rcwh(buildingStartRow, BUILDING_COLUMN, 1, row - buildingStartRow));
+            reportPanel.add(createEmptyLabel(),
+                            higConst.rcwh(buildingStartRow, BUILDING_COLUMN, 1, row - buildingStartRow));
             buildingStartRow = row;
         }
 
