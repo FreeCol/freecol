@@ -817,7 +817,7 @@ public class SchoolTest extends FreeColTestCase {
         Colony colony = getUniversityColony();
         Building school = colony.getBuilding(schoolType);
         
-        colony.addSoL(100);
+        colony.addGoods(Goods.BELLS, 10000);
         colony.newTurn();
 
         Iterator<Unit> units = colony.getUnitIterator();

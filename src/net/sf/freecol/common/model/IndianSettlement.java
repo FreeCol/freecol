@@ -1006,7 +1006,7 @@ public class IndianSettlement extends Settlement {
                                                             missionary.getOwner(), converts.get(random));
                         addModelMessage(u, "model.colony.newConvert",
                                         new String[][] {{"%nation%", getOwner().getNationAsString()}},
-                                        ModelMessage.UNIT_ADDED);
+                                        ModelMessage.MessageType.UNIT_ADDED);
                         logger.info("New convert created for " + missionary.getOwner().getName() + " with ID=" + u.getId());
                     }
                 }

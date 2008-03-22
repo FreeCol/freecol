@@ -542,7 +542,7 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
             addModelMessage(settlement, "model.unit.gift", new String[][] {
                     { "%player%", getOwner().getNationAsString() }, { "%type%", goods.getName() },
                     { "%amount%", Integer.toString(amount) }, { "%colony%", ((Colony) settlement).getName() } },
-                ModelMessage.GIFT_GOODS, goods.getType());
+                ModelMessage.MessageType.GIFT_GOODS, goods.getType());
         }
     }
 
@@ -617,7 +617,7 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
             getOwner().modifyGold(cashInAmount);
             addModelMessage(o, "model.unit.cashInTreasureTrain", new String[][] {
                     { "%amount%", Integer.toString(getTreasureAmount()) },
-                    { "%cashInAmount%", Integer.toString(cashInAmount) } }, ModelMessage.DEFAULT);
+                    { "%cashInAmount%", Integer.toString(cashInAmount) } }, ModelMessage.MessageType.DEFAULT);
             dispose();
         } else {
             throw new IllegalStateException("Cannot cash in treasure train at the current location.");
@@ -2176,7 +2176,7 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
             getOwner().getMarket().buy(goodsType, amount, getOwner());
             goodsContainer.addGoods(goodsType, amount);
         } catch (IllegalStateException ise) {
-            this.addModelMessage(this, "notEnoughGold", null, ModelMessage.DEFAULT);
+            this.addModelMessage(this, "notEnoughGold", null, ModelMessage.MessageType.DEFAULT);
         }
     }
 
@@ -2844,7 +2844,7 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
                                     "model.unit.arriveInEurope",
                                     new String[][] {
                                         {"%europe%", getOwner().getEurope().getName()}},
-                                    ModelMessage.DEFAULT, this);
+                                    ModelMessage.MessageType.DEFAULT, this);
                     Iterator<Unit> iter = getUnitIterator();
                     while (iter.hasNext()) {
                         Unit u = iter.next();
@@ -2933,12 +2933,12 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
                 addModelMessage(this, "model.unit.noMoreToolsPioneer",
                                 new String[][] {
                                     {"%unit%", getName()}},
-                                ModelMessage.WARNING, this);
+                                ModelMessage.MessageType.WARNING, this);
             } else {
                 addModelMessage(this, "model.unit.noMoreTools",
                                 new String[][] {
                                     { "%unit%", getName() } },
-                                ModelMessage.WARNING, this);
+                                ModelMessage.MessageType.WARNING, this);
             }
         }
     }
@@ -3068,7 +3068,7 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
                                 { "%oldName%", oldName },
                                 { "%unit%", newName }, 
                                 { "%colony%", colony.getName() } },
-                            ModelMessage.UNIT_IMPROVED, this);
+                            ModelMessage.MessageType.UNIT_IMPROVED, this);
         }
     }
 
@@ -3251,7 +3251,7 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
                                     { "%oldName%", oldName },
                                     { "%unit%", getName() },
                                     { "%colony%", getColony().getName() } },
-                                ModelMessage.UNIT_IMPROVED, this);
+                                ModelMessage.MessageType.UNIT_IMPROVED, this);
             }
         }
     }

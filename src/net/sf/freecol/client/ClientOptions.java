@@ -344,7 +344,7 @@ public class ClientOptions extends OptionMap {
     private Comparator<ModelMessage> messageTypeComparator = new Comparator<ModelMessage>() {
         // sort according to message type
         public int compare(ModelMessage message1, ModelMessage message2) {
-            int dtype = message1.getType() - message2.getType();
+            int dtype = message1.getType().ordinal() - message2.getType().ordinal();
             if (dtype == 0 && message1.getSource() != message2.getSource()) {
                 return messageSourceComparator.compare(message1, message2);
             } else {
@@ -514,31 +514,31 @@ public class ClientOptions extends OptionMap {
      */
     public BooleanOption getBooleanOption(ModelMessage message) {
         switch (message.getType()) {
-        case ModelMessage.WARNING:
+        case WARNING:
             return (BooleanOption) getObject(ClientOptions.SHOW_WARNING);
-        case ModelMessage.SONS_OF_LIBERTY:
+        case SONS_OF_LIBERTY:
             return (BooleanOption) getObject(ClientOptions.SHOW_SONS_OF_LIBERTY);
-        case ModelMessage.GOVERNMENT_EFFICIENCY:
+        case GOVERNMENT_EFFICIENCY:
             return (BooleanOption) getObject(ClientOptions.SHOW_GOVERNMENT_EFFICIENCY);
-        case ModelMessage.WAREHOUSE_CAPACITY:
+        case WAREHOUSE_CAPACITY:
             return (BooleanOption) getObject(ClientOptions.SHOW_WAREHOUSE_CAPACITY);
-        case ModelMessage.UNIT_IMPROVED:
+        case UNIT_IMPROVED:
             return (BooleanOption) getObject(ClientOptions.SHOW_UNIT_IMPROVED);
-        case ModelMessage.UNIT_DEMOTED:
+        case UNIT_DEMOTED:
             return (BooleanOption) getObject(ClientOptions.SHOW_UNIT_DEMOTED);
-        case ModelMessage.UNIT_LOST:
+        case UNIT_LOST:
             return (BooleanOption) getObject(ClientOptions.SHOW_UNIT_LOST);
-        case ModelMessage.UNIT_ADDED:
+        case UNIT_ADDED:
             return (BooleanOption) getObject(ClientOptions.SHOW_UNIT_ADDED);
-        case ModelMessage.BUILDING_COMPLETED:
+        case BUILDING_COMPLETED:
             return (BooleanOption) getObject(ClientOptions.SHOW_BUILDING_COMPLETED);
-        case ModelMessage.FOREIGN_DIPLOMACY:
+        case FOREIGN_DIPLOMACY:
             return (BooleanOption) getObject(ClientOptions.SHOW_FOREIGN_DIPLOMACY);
-        case ModelMessage.MARKET_PRICES:
+        case MARKET_PRICES:
             return (BooleanOption) getObject(ClientOptions.SHOW_MARKET_PRICES);
-        case ModelMessage.MISSING_GOODS:
+        case MISSING_GOODS:
             return (BooleanOption) getObject(ClientOptions.SHOW_MISSING_GOODS);
-        case ModelMessage.DEFAULT:
+        case DEFAULT:
         default:
             return null;
         }

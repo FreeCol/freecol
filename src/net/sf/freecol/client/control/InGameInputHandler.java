@@ -594,7 +594,7 @@ public final class InGameInputHandler extends InputHandler {
                                                 new String[][] {
                                                     {"%nation%", nation},
                                                     {"%colony%", colony.getName()}},
-                                                ModelMessage.UNIT_ADDED);
+                                                ModelMessage.MessageType.UNIT_ADDED);
         getFreeColClient().getMyPlayer().addModelMessage(message);
         return null;
     }
@@ -748,7 +748,7 @@ public final class InGameInputHandler extends InputHandler {
                 player.addModelMessage(new ModelMessage(player, "model.monarch.forceTaxRaise",
                                                         new String[][] {
                                                             {"%replace%", String.valueOf(amount) }},
-                                                        ModelMessage.WARNING));
+                                                        ModelMessage.MessageType.WARNING));
                 reply = null;
             } else {
                 reply = Message.createNewRootElement("acceptTax");
@@ -777,7 +777,7 @@ public final class InGameInputHandler extends InputHandler {
             player.addModelMessage(new ModelMessage(player, "model.monarch.addToREF",
                                                     new String[][] {
                                                         { "%addition%", monarch.getName(units) }},
-                                                    ModelMessage.WARNING));
+                                                    ModelMessage.MessageType.WARNING));
             break;
         case Monarch.DECLARE_WAR:
             Player enemy = (Player) getGame().getFreeColGameObject(element.getAttribute("nation"));
@@ -785,7 +785,7 @@ public final class InGameInputHandler extends InputHandler {
             player.addModelMessage(new ModelMessage(player, "model.monarch.declareWar",
                                                     new String[][] {
                                                         {"%nation%", enemy.getName()}},
-                                                    ModelMessage.WARNING));
+                                                    ModelMessage.MessageType.WARNING));
             break;
         case Monarch.SUPPORT_LAND:
         case Monarch.SUPPORT_SEA:
@@ -869,13 +869,13 @@ public final class InGameInputHandler extends InputHandler {
                 player.addModelMessage(new ModelMessage(first, "model.diplomacy.war.declared",
                                                         new String[][] {
                                                             {"%nation%", first.getNationAsString()}},
-                                                        ModelMessage.FOREIGN_DIPLOMACY));
+                                                        ModelMessage.MessageType.FOREIGN_DIPLOMACY));
             } else {
                 player.addModelMessage(new ModelMessage(first, "model.diplomacy.war.others",
                                                         new String[][] {
                                                             { "%attacker%", first.getNationAsString() },
                                                             { "%defender%", second.getNationAsString() } },
-                                                        ModelMessage.FOREIGN_DIPLOMACY));
+                                                        ModelMessage.MessageType.FOREIGN_DIPLOMACY));
             }
         }
 
@@ -949,7 +949,7 @@ public final class InGameInputHandler extends InputHandler {
                                              new String[][] { { "%colony%", colony.getName() },
                                                  { "%amount%", String.valueOf(goods.getAmount()) },
                                                  { "%goods%", goods.getName() } },
-                                             ModelMessage.WARNING)).invokeLater();
+                                             ModelMessage.MessageType.WARNING)).invokeLater();
         }
 
         return null;
@@ -981,28 +981,28 @@ public final class InGameInputHandler extends InputHandler {
             Player indianPlayer = tile.getOwner();
             indianPlayer.modifyTension(player, Tension.Level.HATEFUL.getLimit());
             m = new ModelMessage(unit, "lostCityRumour.BurialGround", new String[][] { { "%nation%",
-                    indianPlayer.getNationAsString() } }, ModelMessage.LOST_CITY_RUMOUR);
+                    indianPlayer.getNationAsString() } }, ModelMessage.MessageType.LOST_CITY_RUMOUR);
             break;
         case LostCityRumour.EXPEDITION_VANISHES:
-            m = new ModelMessage(unit, "lostCityRumour.ExpeditionVanishes", null, ModelMessage.LOST_CITY_RUMOUR);
+            m = new ModelMessage(unit, "lostCityRumour.ExpeditionVanishes", null, ModelMessage.MessageType.LOST_CITY_RUMOUR);
             unit.dispose();
             break;
         case LostCityRumour.NOTHING:
-            m = new ModelMessage(unit, "lostCityRumour.Nothing", null, ModelMessage.LOST_CITY_RUMOUR);
+            m = new ModelMessage(unit, "lostCityRumour.Nothing", null, ModelMessage.MessageType.LOST_CITY_RUMOUR);
             break;
         case LostCityRumour.LEARN:
             m = new ModelMessage(unit, "lostCityRumour.SeasonedScout", new String[][] { { "%unit%", unit.getName() } },
-                    ModelMessage.LOST_CITY_RUMOUR);
+                    ModelMessage.MessageType.LOST_CITY_RUMOUR);
             unit.setType(FreeCol.getSpecification().getUnitType(element.getAttribute("unitType")));
             break;
         case LostCityRumour.TRIBAL_CHIEF:
             String amount = element.getAttribute("amount");
             m = new ModelMessage(unit, "lostCityRumour.TribalChief", new String[][] { { "%money%", amount } },
-                    ModelMessage.LOST_CITY_RUMOUR);
+                    ModelMessage.MessageType.LOST_CITY_RUMOUR);
             player.modifyGold(Integer.parseInt(amount));
             break;
         case LostCityRumour.COLONIST:
-            m = new ModelMessage(unit, "lostCityRumour.Colonist", null, ModelMessage.LOST_CITY_RUMOUR);
+            m = new ModelMessage(unit, "lostCityRumour.Colonist", null, ModelMessage.MessageType.LOST_CITY_RUMOUR);
             unitList = element.getChildNodes();
             for (int i = 0; i < unitList.getLength(); i++) {
                 Element unitElement = (Element) unitList.item(i);
@@ -1018,7 +1018,7 @@ public final class InGameInputHandler extends InputHandler {
         case LostCityRumour.TREASURE:
             String treasure = element.getAttribute("amount");
             m = new ModelMessage(unit, "lostCityRumour.TreasureTrain", new String[][] { { "%money%", treasure } },
-                    ModelMessage.LOST_CITY_RUMOUR);
+                    ModelMessage.MessageType.LOST_CITY_RUMOUR);
             unitList = element.getChildNodes();
             for (int i = 0; i < unitList.getLength(); i++) {
                 Element unitElement = (Element) unitList.item(i);
@@ -1034,10 +1034,10 @@ public final class InGameInputHandler extends InputHandler {
         case LostCityRumour.FOUNTAIN_OF_YOUTH:
             if (player.getEurope() == null) {
                 m = new ModelMessage(player, "lostCityRumour.FountainOfYouthWithoutEurope", null,
-                                     ModelMessage.LOST_CITY_RUMOUR);
+                                     ModelMessage.MessageType.LOST_CITY_RUMOUR);
             } else {
                 m = new ModelMessage(player.getEurope(), "lostCityRumour.FountainOfYouth", null,
-                                     ModelMessage.LOST_CITY_RUMOUR);
+                                     ModelMessage.MessageType.LOST_CITY_RUMOUR);
                 if (player.hasAbility("model.ability.selectRecruit")) {
                     final int emigrants = Integer.parseInt(element.getAttribute("emigrants"));
                     SwingUtilities.invokeLater(new Runnable() {

@@ -254,7 +254,7 @@ public final class Europe extends FreeColGameObject implements Location, Ownable
 
         if (!unit.getOwner().hasAbility("model.ability.selectRecruit")) {
             addModelMessage(this, "model.europe.emigrate", new String[][] { {
-                    "%unit%", unit.getName() } }, ModelMessage.UNIT_ADDED, unit);
+                    "%unit%", unit.getName() } }, ModelMessage.MessageType.UNIT_ADDED, unit);
         }
         // In case William Brewster is in the congress we don't need
         // to show a message to the user because he has already been
@@ -492,7 +492,7 @@ public final class Europe extends FreeColGameObject implements Location, Ownable
                                     new String[][] {
                                         { "%unit%", unit.getName() },
                                         { "%repairLocation%", getLocationName() } },
-                                    ModelMessage.DEFAULT, this);
+                                    ModelMessage.MessageType.DEFAULT, this);
                 }
             }
         }

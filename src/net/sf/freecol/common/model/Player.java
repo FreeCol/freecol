@@ -608,7 +608,7 @@ public class Player extends FreeColGameObject implements Nameable {
         if (unitNames.length() > 0) {
             addModelMessage(this, "model.player.independence.unitsSeized", 
                             new String[][] {{"%units%", unitNames.substring(2)}},
-                            ModelMessage.UNIT_LOST);
+                            ModelMessage.MessageType.UNIT_LOST);
         }
         List<Unit> veterans = new ArrayList<Unit>();
         for (Colony colony : getColonies()) {
@@ -630,7 +630,7 @@ public class Player extends FreeColGameObject implements Nameable {
                                     new String[][] {
                                         { "%colony%", colony.getName() },
                                         { "%number%", String.valueOf(limit) }
-                                    }, ModelMessage.DEFAULT);
+                                    }, ModelMessage.MessageType.DEFAULT);
                 }
                 veterans.clear();
             }
@@ -651,7 +651,7 @@ public class Player extends FreeColGameObject implements Nameable {
         }
         setPlayerType(PlayerType.INDEPENDENT);
         setStance(getREFPlayer(), Stance.PEACE);
-        addModelMessage(this, "model.player.independence", null, ModelMessage.DEFAULT);
+        addModelMessage(this, "model.player.independence", null, ModelMessage.MessageType.DEFAULT);
     }
 
     /**
@@ -877,18 +877,18 @@ public class Player extends FreeColGameObject implements Nameable {
                 // these dialogs should only appear on the first event
                 if (player.isEuropean()) {
                     if (!contactedEuro) {
-                        addModelMessage(this, "EventPanel.MEETING_EUROPEANS", null, ModelMessage.FOREIGN_DIPLOMACY, player);
+                        addModelMessage(this, "EventPanel.MEETING_EUROPEANS", null, ModelMessage.MessageType.FOREIGN_DIPLOMACY, player);
                     }
                 } else {
                     if (!contactedIndians) {
-                        addModelMessage(this, "EventPanel.MEETING_NATIVES", null, ModelMessage.FOREIGN_DIPLOMACY, player);
+                        addModelMessage(this, "EventPanel.MEETING_NATIVES", null, ModelMessage.MessageType.FOREIGN_DIPLOMACY, player);
                     }
                     // special cases for Aztec/Inca
                     if (player.getNationType() == FreeCol.getSpecification().getNationType("model.nationType.aztec")) {
-                        addModelMessage(this, "EventPanel.MEETING_AZTEC", null, ModelMessage.FOREIGN_DIPLOMACY, player);
+                        addModelMessage(this, "EventPanel.MEETING_AZTEC", null, ModelMessage.MessageType.FOREIGN_DIPLOMACY, player);
                     } else if (player.getNationType() == 
                                FreeCol.getSpecification().getNationType("model.nationType.inca")) {
-                        addModelMessage(this, "EventPanel.MEETING_INCA", null, ModelMessage.FOREIGN_DIPLOMACY, player);
+                        addModelMessage(this, "EventPanel.MEETING_INCA", null, ModelMessage.MessageType.FOREIGN_DIPLOMACY, player);
                     }
                 }
             } else if (!isEuropean()) {
@@ -2035,7 +2035,7 @@ public class Player extends FreeColGameObject implements Nameable {
                         new String[][] {
                             { "%foundingFather%", father.getName() },
                             { "%description%", father.getDescription() }
-                        }, ModelMessage.DEFAULT);
+                        }, ModelMessage.MessageType.DEFAULT);
         featureContainer.add(father.getFeatureContainer());
 
         List<AbstractUnit> units = father.getUnits();
@@ -2173,11 +2173,11 @@ public class Player extends FreeColGameObject implements Nameable {
                     if (newSoL > oldSoL) {
                         addModelMessage(this, "model.player.SoLIncrease", new String[][] {
                                 { "%oldSoL%", String.valueOf(oldSoL) }, { "%newSoL%", String.valueOf(newSoL) } },
-                            ModelMessage.SONS_OF_LIBERTY);
+                            ModelMessage.MessageType.SONS_OF_LIBERTY);
                     } else {
                         addModelMessage(this, "model.player.SoLDecrease", new String[][] {
                                 { "%oldSoL%", String.valueOf(oldSoL) }, { "%newSoL%", String.valueOf(newSoL) } },
-                            ModelMessage.SONS_OF_LIBERTY);
+                            ModelMessage.MessageType.SONS_OF_LIBERTY);
                     }
                 }
             }

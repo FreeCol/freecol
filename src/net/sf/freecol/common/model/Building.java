@@ -474,7 +474,7 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
                             new String[][] {
                                 { "%unit%", unit.getName() },
                                 { "%repairLocation%", getLocationName() } },
-                                ModelMessage.DEFAULT, this);
+                                ModelMessage.MessageType.DEFAULT, this);
                 }
             }
         }
@@ -489,7 +489,7 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
         if (goodsInput == 0 && !canAutoProduce() && getMaximumGoodsInput() > 0) {
             addModelMessage(getColony(), "model.building.notEnoughInput", new String[][] {
                     { "%inputGoods%", goodsInputType.getName() }, { "%building%", getName() },
-                    { "%colony%", colony.getName() } }, ModelMessage.MISSING_GOODS,
+                    { "%colony%", colony.getName() } }, ModelMessage.MessageType.MISSING_GOODS,
                 goodsInputType);
         }
 
@@ -543,7 +543,7 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
                                     new String[][] {
                                         { "%teacher%", teacher.getName() },
                                         { "%colony%", colony.getName() } },
-                                    ModelMessage.WARNING, teacher);
+                                    ModelMessage.MessageType.WARNING, teacher);
                     continue;
                 } else {
                     teacher.setStudent(student);

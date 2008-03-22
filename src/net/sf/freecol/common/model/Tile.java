@@ -1440,7 +1440,7 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
                                 new String[][] { 
                                     { "%resource%", resource.getName() },
                                     { "%colony%", ((Colony) settlement).getName() } },
-                                ModelMessage.WARNING);
+                                ModelMessage.MessageType.WARNING);
             }
         }
     }

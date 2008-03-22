@@ -459,29 +459,29 @@ public final class InGameController implements NetworkConstants {
 
             ArrayList<ModelMessage> messages = new ArrayList<ModelMessage>();
             if (landLocked) {
-                messages.add(new ModelMessage(unit, "buildColony.landLocked", null, ModelMessage.MISSING_GOODS,
+                messages.add(new ModelMessage(unit, "buildColony.landLocked", null, ModelMessage.MessageType.MISSING_GOODS,
                                               FreeCol.getSpecification().getGoodsType("model.goods.fish")));
             }
             if (food < 8) {
-                messages.add(new ModelMessage(unit, "buildColony.noFood", null, ModelMessage.MISSING_GOODS, 
+                messages.add(new ModelMessage(unit, "buildColony.noFood", null, ModelMessage.MessageType.MISSING_GOODS, 
                                               FreeCol.getSpecification().getGoodsType("model.goods.food")));
             }
             if (lumber < 4) {
-                messages.add(new ModelMessage(unit, "buildColony.noLumber", null, ModelMessage.MISSING_GOODS,
+                messages.add(new ModelMessage(unit, "buildColony.noLumber", null, ModelMessage.MessageType.MISSING_GOODS,
                                               FreeCol.getSpecification().getGoodsType("model.goods.lumber")));
             }
             if (ore < 2) {
-                messages.add(new ModelMessage(unit, "buildColony.noOre", null, ModelMessage.MISSING_GOODS, 
+                messages.add(new ModelMessage(unit, "buildColony.noOre", null, ModelMessage.MessageType.MISSING_GOODS, 
                                               FreeCol.getSpecification().getGoodsType("model.goods.ore")));
             }
             if (ownedBySelf) {
-                messages.add(new ModelMessage(unit, "buildColony.ownLand", null, ModelMessage.WARNING));
+                messages.add(new ModelMessage(unit, "buildColony.ownLand", null, ModelMessage.MessageType.WARNING));
             }
             if (ownedByEuropeans) {
-                messages.add(new ModelMessage(unit, "buildColony.EuropeanLand", null, ModelMessage.WARNING));
+                messages.add(new ModelMessage(unit, "buildColony.EuropeanLand", null, ModelMessage.MessageType.WARNING));
             }
             if (ownedByIndians) {
-                messages.add(new ModelMessage(unit, "buildColony.IndianLand", null, ModelMessage.WARNING));
+                messages.add(new ModelMessage(unit, "buildColony.IndianLand", null, ModelMessage.MessageType.WARNING));
             }
 
             if (messages.size() > 0) {
@@ -1528,7 +1528,7 @@ public final class InGameController implements NetworkConstants {
                 {"%build_colony_menu_item%", Messages.message("unit.state.7")},
                 {"%orders_menu_item%", Messages.message("menuBar.orders")}
             };
-            player.addModelMessage(new ModelMessage(player, "tutorial.buildColony", data, ModelMessage.TUTORIAL, player));
+            player.addModelMessage(new ModelMessage(player, "tutorial.buildColony", data, ModelMessage.MessageType.TUTORIAL, player));
             nextModelMessage();
         }
 
@@ -1801,7 +1801,7 @@ public final class InGameController implements NetworkConstants {
                 ModelMessage message = new ModelMessage(convert,
                                                 "model.unit.newConvertFromAttack",
                                                 new String[][] {{"%nation%", nation}},
-                                                ModelMessage.UNIT_ADDED);
+                                                ModelMessage.MessageType.UNIT_ADDED);
                 freeColClient.getMyPlayer().addModelMessage(message);
                 nextModelMessage();
             }
@@ -3466,7 +3466,7 @@ public final class InGameController implements NetworkConstants {
 
         for (ModelMessage message : inputList) {
             if (shouldAllowMessage(message)) {
-                if (message.getType() == ModelMessage.WAREHOUSE_CAPACITY) {
+                if (message.getType() == ModelMessage.MessageType.WAREHOUSE_CAPACITY) {
                     String key = message.getSource().getId();
                     for (String[] replacement : message.getData()) {
                         if (replacement[0].equals("%goods%")) {
@@ -3555,33 +3555,33 @@ public final class InGameController implements NetworkConstants {
     private boolean shouldAllowMessage(ModelMessage message) {
 
         switch (message.getType()) {
-        case ModelMessage.DEFAULT:
+        case DEFAULT:
             return true;
-        case ModelMessage.WARNING:
+        case WARNING:
             return freeColClient.getClientOptions().getBoolean(ClientOptions.SHOW_WARNING);
-        case ModelMessage.SONS_OF_LIBERTY:
+        case SONS_OF_LIBERTY:
             return freeColClient.getClientOptions().getBoolean(ClientOptions.SHOW_SONS_OF_LIBERTY);
-        case ModelMessage.GOVERNMENT_EFFICIENCY:
+        case GOVERNMENT_EFFICIENCY:
             return freeColClient.getClientOptions().getBoolean(ClientOptions.SHOW_GOVERNMENT_EFFICIENCY);
-        case ModelMessage.WAREHOUSE_CAPACITY:
+        case WAREHOUSE_CAPACITY:
             return freeColClient.getClientOptions().getBoolean(ClientOptions.SHOW_WAREHOUSE_CAPACITY);
-        case ModelMessage.UNIT_IMPROVED:
+        case UNIT_IMPROVED:
             return freeColClient.getClientOptions().getBoolean(ClientOptions.SHOW_UNIT_IMPROVED);
-        case ModelMessage.UNIT_DEMOTED:
+        case UNIT_DEMOTED:
             return freeColClient.getClientOptions().getBoolean(ClientOptions.SHOW_UNIT_DEMOTED);
-        case ModelMessage.UNIT_LOST:
+        case UNIT_LOST:
             return freeColClient.getClientOptions().getBoolean(ClientOptions.SHOW_UNIT_LOST);
-        case ModelMessage.UNIT_ADDED:
+        case UNIT_ADDED:
             return freeColClient.getClientOptions().getBoolean(ClientOptions.SHOW_UNIT_ADDED);
-        case ModelMessage.BUILDING_COMPLETED:
+        case BUILDING_COMPLETED:
             return freeColClient.getClientOptions().getBoolean(ClientOptions.SHOW_BUILDING_COMPLETED);
-        case ModelMessage.FOREIGN_DIPLOMACY:
+        case FOREIGN_DIPLOMACY:
             return freeColClient.getClientOptions().getBoolean(ClientOptions.SHOW_FOREIGN_DIPLOMACY);
-        case ModelMessage.MARKET_PRICES:
+        case MARKET_PRICES:
             return freeColClient.getClientOptions().getBoolean(ClientOptions.SHOW_MARKET_PRICES);
-        case ModelMessage.MISSING_GOODS:
+        case MISSING_GOODS:
             return freeColClient.getClientOptions().getBoolean(ClientOptions.SHOW_MISSING_GOODS);
-        case ModelMessage.TUTORIAL:
+        case TUTORIAL:
             return freeColClient.getClientOptions().getBoolean(ClientOptions.SHOW_TUTORIAL);
         default:
             return true;

@@ -380,28 +380,28 @@ public class GoodsContainer extends FreeColGameObject {
                                 new String [][] {{"%goods%", goodsType.getName()},
                                                  {"%waste%", String.valueOf(waste)},
                                                  {"%colony%", colony.getName()}},
-                                ModelMessage.WAREHOUSE_CAPACITY, goodsType);
+                                ModelMessage.MessageType.WAREHOUSE_CAPACITY, goodsType);
             } else if (storedGoods[index] == limit && 
                        oldStoredGoods[index] < limit) {
                 // limit has been reached during this turn
                 addModelMessage(colony, "model.building.warehouseOverfull",
                                 new String [][] {{"%goods%", goodsType.getName()},
                                                  {"%colony%", colony.getName()}},
-                                ModelMessage.WAREHOUSE_CAPACITY, goodsType);
+                                ModelMessage.MessageType.WAREHOUSE_CAPACITY, goodsType);
             } else if (storedGoods[index] > high &&
                        oldStoredGoods[index] <= high) {
                 addModelMessage(colony, "model.building.warehouseFull",
                                 new String [][] {{"%goods%", goodsType.getName()},
                                                  {"%level%", String.valueOf(high)},
                                                  {"%colony%", colony.getName()}},
-                                ModelMessage.WAREHOUSE_CAPACITY, goodsType);
+                                ModelMessage.MessageType.WAREHOUSE_CAPACITY, goodsType);
             } else if (storedGoods[index] < low &&
                        oldStoredGoods[index] >= low) {
                 addModelMessage(colony, "model.building.warehouseEmpty",
                                 new String [][] {{"%goods%", goodsType.getName()},
                                                  {"%level%", String.valueOf(low)},
                                                  {"%colony%", colony.getName()}},
-                                ModelMessage.WAREHOUSE_CAPACITY, goodsType);
+                                ModelMessage.MessageType.WAREHOUSE_CAPACITY, goodsType);
             }
         }
 

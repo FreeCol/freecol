@@ -35,32 +35,31 @@ import net.sf.freecol.client.gui.i18n.Messages;
  */
 public class ModelMessage extends FreeColObject {
 
-
     /** Constants describing the type of message. */
-    // TODO: use enum
-    public static final int DEFAULT = 0;
-    public static final int WARNING = 1;
-    public static final int SONS_OF_LIBERTY = 2;
-    public static final int GOVERNMENT_EFFICIENCY = 3;
-    public static final int WAREHOUSE_CAPACITY = 4;
-    public static final int UNIT_IMPROVED = 5;
-    public static final int UNIT_DEMOTED = 6;
-    public static final int UNIT_LOST = 7;
-    public static final int UNIT_ADDED = 8;
-    public static final int BUILDING_COMPLETED = 9;
-    public static final int FOREIGN_DIPLOMACY = 10;
-    public static final int MARKET_PRICES = 11;
-    public static final int LOST_CITY_RUMOUR = 12;
-    public static final int GIFT_GOODS = 13;
-    public static final int MISSING_GOODS = 14;
-    public static final int TUTORIAL = 15;
-    public static final int COMBAT_RESULT = 16;
+    public static enum MessageType { 
+            DEFAULT,
+            WARNING,
+            SONS_OF_LIBERTY,
+            GOVERNMENT_EFFICIENCY,
+            WAREHOUSE_CAPACITY,
+            UNIT_IMPROVED,
+            UNIT_DEMOTED,
+            UNIT_LOST,
+            UNIT_ADDED,
+            BUILDING_COMPLETED,
+            FOREIGN_DIPLOMACY,
+            MARKET_PRICES,
+            LOST_CITY_RUMOUR,
+            GIFT_GOODS,
+            MISSING_GOODS,
+            TUTORIAL,
+            COMBAT_RESULT }
 
     private Player owner;
     private FreeColGameObject source;
     private Tile sourceTile;
     private FreeColObject display;
-    private int type;
+    private MessageType type;
     private String[][] data;
     private boolean beenDisplayed = false;
 
@@ -80,7 +79,7 @@ public class ModelMessage extends FreeColObject {
     * @param display The Object to display.
     * @see FreeColGameObject#addModelMessage(FreeColGameObject, String, String[][], int)
     */
-    public ModelMessage(FreeColGameObject source, String id, String[][] data, int type, FreeColObject display) {
+    public ModelMessage(FreeColGameObject source, String id, String[][] data, MessageType type, FreeColObject display) {
         this.source = source;
         if (source instanceof Unit) {
             this.owner = ((Unit) source).getOwner();
@@ -158,7 +157,7 @@ public class ModelMessage extends FreeColObject {
      * @param type The type of this model message.
      * @see FreeColGameObject#addModelMessage(FreeColGameObject, String, String[][], int)
      */
-     public ModelMessage(FreeColGameObject source, String id, String[][] data, int type) {
+     public ModelMessage(FreeColGameObject source, String id, String[][] data, MessageType type) {
          this(source, id, data, type, getDefaultDisplay(type, source));
 
      }
@@ -174,7 +173,7 @@ public class ModelMessage extends FreeColObject {
      * @see FreeColGameObject#addModelMessage(FreeColGameObject, String, String[][], int)
      */
      public ModelMessage(FreeColGameObject source, String id, String[][] data) {
-         this(source, id, data, DEFAULT);
+         this(source, id, data, MessageType.DEFAULT);
      }
      
     /**
@@ -183,7 +182,7 @@ public class ModelMessage extends FreeColObject {
      * @param source the source object
      * @return an object to be displayed for the message. 
      */
-    static private FreeColObject getDefaultDisplay(int type, FreeColGameObject source) {
+    static private FreeColObject getDefaultDisplay(MessageType type, FreeColGameObject source) {
         FreeColObject newDisplay = null;
         switch(type) {
         case SONS_OF_LIBERTY:
@@ -265,46 +264,14 @@ public class ModelMessage extends FreeColObject {
      * Gets the type of the message to display.   
      * @return The type. 
      */
-    public int getType() {
+    public MessageType getType() {
         return type;
 
     }
 
 
     public String getTypeName() {
-        switch (type) {
-        case WARNING:
-            return Messages.message("model.message.warning");
-        case SONS_OF_LIBERTY:
-            return Messages.message("model.message.sonsOfLiberty");
-        case GOVERNMENT_EFFICIENCY:
-            return Messages.message("model.message.governmentEfficiency");
-        case WAREHOUSE_CAPACITY:
-            return Messages.message("model.message.warehouseCapacity");
-        case UNIT_IMPROVED:
-            return Messages.message("model.message.unitImproved");
-        case UNIT_DEMOTED:
-            return Messages.message("model.message.unitDemoted");
-        case UNIT_LOST:
-            return Messages.message("model.message.unitLost");
-        case UNIT_ADDED:
-            return Messages.message("model.message.unitAdded");
-        case BUILDING_COMPLETED:
-            return Messages.message("model.message.buildingCompleted");
-        case FOREIGN_DIPLOMACY:
-            return Messages.message("model.message.foreignDiplomacy");
-        case MARKET_PRICES:
-            return Messages.message("model.message.marketPrices");
-        case LOST_CITY_RUMOUR:
-            return Messages.message("model.message.lostCityRumour");
-        case GIFT_GOODS:
-            return Messages.message("model.message.giftGoods");
-        case MISSING_GOODS:
-            return Messages.message("model.message.missingGoods");
-        case DEFAULT:
-        default:
-            return Messages.message("model.message.default");
-        }
+        return Messages.message("model.message." + type.toString());
     }
 
 
@@ -363,7 +330,7 @@ public class ModelMessage extends FreeColObject {
                 value = 37 * value + s[1].hashCode();
             }
         }
-        value = 37 * value + type;
+        value = 37 * value + type.ordinal();
         return value;
     }
     
@@ -399,7 +366,7 @@ public class ModelMessage extends FreeColObject {
         if (display != null) {
             out.writeAttribute("display", display.getId());
         }
-        out.writeAttribute("type", String.valueOf(type));
+        out.writeAttribute("type", type.toString());
         out.writeAttribute("ID", getId());
         out.writeAttribute("hasBeenDisplayed", String.valueOf(beenDisplayed));
         if (data != null) {
@@ -416,7 +383,7 @@ public class ModelMessage extends FreeColObject {
      */
     public void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
         setId(in.getAttributeValue(null, "ID"));
-        type = getAttribute(in, "type", DEFAULT);
+        type = Enum.valueOf(MessageType.class, getAttribute(in, "type", MessageType.DEFAULT.toString()));
         beenDisplayed = Boolean.parseBoolean(in.getAttributeValue(null, "hasBeenDisplayed"));
 
         while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
@@ -441,7 +408,7 @@ public class ModelMessage extends FreeColObject {
         String ownerPlayer = in.getAttributeValue(null, "owner");
         owner = (Player)game.getFreeColGameObject(ownerPlayer);
          
-        type = getAttribute(in, "type", DEFAULT);
+        type = Enum.valueOf(MessageType.class, getAttribute(in, "type", MessageType.DEFAULT.toString()));
         beenDisplayed = Boolean.parseBoolean(in.getAttributeValue(null, "hasBeenDisplayed"));
 
         String sourceString = in.getAttributeValue(null, "source");

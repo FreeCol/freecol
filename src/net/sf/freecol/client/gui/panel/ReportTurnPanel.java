@@ -91,7 +91,7 @@ public final class ReportTurnPanel extends ReportPanel implements ActionListener
         int groupBy = options.getInteger(ClientOptions.MESSAGES_GROUP_BY);
 
         Object source = this;
-        int type = -1;
+        ModelMessage.MessageType type = null;
         int headlines = 0;
 
         // count number of headlines
@@ -124,7 +124,7 @@ public final class ReportTurnPanel extends ReportPanel implements ActionListener
         reportPanel.setLayout(layout);
 
         source = this;
-        type = -1;
+        type = null;
 
         int row = 1;
         for (final ModelMessage message : messages) {
@@ -172,7 +172,7 @@ public final class ReportTurnPanel extends ReportPanel implements ActionListener
 
             final JTextPane textPane = getTextPane(message);
             reportPanel.add(textPane, higConst.rc(row, textColumn));
-            if (message.getType() == ModelMessage.WAREHOUSE_CAPACITY) {
+            if (message.getType() == ModelMessage.MessageType.WAREHOUSE_CAPACITY) {
                 JButton ignoreButton = new JButton("x");
                 ignoreButton.setToolTipText(Messages.message("model.message.ignore", message.getData()));
                 ignoreButton.addActionListener(new ActionListener() {

@@ -377,7 +377,8 @@ abstract public class FreeColGameObject extends FreeColObject {
      * @see Player#addModelMessage(ModelMessage)
      * @see ModelMessage
      */    
-    protected void addModelMessage(FreeColGameObject source, String messageID, String[][] data, int type) {
+    protected void addModelMessage(FreeColGameObject source, String messageID, String[][] data, 
+                                   ModelMessage.MessageType type) {
         ModelMessage message = new ModelMessage(source, messageID, data, type);
         initializeModelMessage(message);
     }
@@ -407,7 +408,7 @@ abstract public class FreeColGameObject extends FreeColObject {
      * @see ModelMessage
      */
     protected void addModelMessage(FreeColGameObject source, String messageID, String[][] data,
-                                   int type, FreeColObject display) {
+                                   ModelMessage.MessageType type, FreeColObject display) {
         ModelMessage message = new ModelMessage(source, messageID, data, type, display);
         initializeModelMessage(message);
     }

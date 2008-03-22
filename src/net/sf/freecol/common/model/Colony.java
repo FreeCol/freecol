@@ -1098,7 +1098,7 @@ public final class Colony extends Settlement implements Location, Nameable {
                                                       {"%buildable%", buildable.getName()},
                                                       {"%amount%", String.valueOf(required - available)},
                                                       {"%goodsType%", requiredGoodsType.getName()}},
-                                                  ModelMessage.MISSING_GOODS,
+                                                  ModelMessage.MessageType.MISSING_GOODS,
                                                   requiredGoodsType));
                 }
             }
@@ -1119,7 +1119,7 @@ public final class Colony extends Settlement implements Location, Nameable {
                     addModelMessage(this, "model.colony.unitReady",
                                     new String[][] { { "%colony%", getName() },
                                                      { "%unit%", unit.getName() } },
-                                    ModelMessage.UNIT_ADDED, unit);
+                                    ModelMessage.MessageType.UNIT_ADDED, unit);
                 } else if (buildable instanceof BuildingType) {
                     BuildingType upgradesFrom = ((BuildingType) buildable).getUpgradesFrom();
                     if (upgradesFrom == null) {
@@ -1337,14 +1337,14 @@ public final class Colony extends Settlement implements Location, Nameable {
             getRandomUnit().dispose();
             removeGoods(Goods.FOOD, food);
             addModelMessage(this, "model.colony.colonistStarved", new String[][] { { "%colony%", getName() } },
-                    ModelMessage.UNIT_LOST);
+                    ModelMessage.MessageType.UNIT_LOST);
         } else {
             removeGoods(Goods.FOOD, eat);
 
             if (eat > getFoodProduction() && (food - eat) / (eat - getFoodProduction()) <= 3) {
                 addModelMessage(this, "model.colony.famineFeared", new String[][] { { "%colony%", getName() },
                         { "%number%", Integer.toString((food - eat) / (eat - getFoodProduction())) } },
-                        ModelMessage.WARNING);
+                        ModelMessage.MessageType.WARNING);
             }
         }
     }
@@ -1359,7 +1359,7 @@ public final class Colony extends Settlement implements Location, Nameable {
                                                 getTile(), getOwner(), unitTypes.get(random));
                 removeGoods(Goods.FOOD, FOOD_PER_COLONIST);
                 addModelMessage(this, "model.colony.newColonist", new String[][] { { "%colony%", getName() } },
-                                ModelMessage.UNIT_ADDED, u);
+                                ModelMessage.MessageType.UNIT_ADDED, u);
                 logger.info("New colonist created in " + getName() + " with ID=" + u.getId());
             }
         }
@@ -1404,7 +1404,7 @@ public final class Colony extends Settlement implements Location, Nameable {
                                     new String [][] {{"%goods%", goods.getName()},
                                                      {"%colony%", getName()},
                                                      {"%amount%", String.valueOf(waste)}},
-                                    ModelMessage.WAREHOUSE_CAPACITY, goods.getType());
+                                    ModelMessage.MessageType.WAREHOUSE_CAPACITY, goods.getType());
                 }
             }
         }
@@ -1419,13 +1419,13 @@ public final class Colony extends Settlement implements Location, Nameable {
                 addModelMessage(this, "model.colony.SoLIncrease", new String[][] {
                         { "%oldSoL%", String.valueOf(oldSonsOfLiberty) },
                         { "%newSoL%", String.valueOf(sonsOfLiberty) }, { "%colony%", getName() } },
-                    ModelMessage.SONS_OF_LIBERTY,
+                    ModelMessage.MessageType.SONS_OF_LIBERTY,
                     FreeCol.getSpecification().getGoodsType("model.goods.bells"));
             } else {
                 addModelMessage(this, "model.colony.SoLDecrease", new String[][] {
                         { "%oldSoL%", String.valueOf(oldSonsOfLiberty) },
                         { "%newSoL%", String.valueOf(sonsOfLiberty) }, { "%colony%", getName() } },
-                    ModelMessage.SONS_OF_LIBERTY,
+                    ModelMessage.MessageType.SONS_OF_LIBERTY,
                     FreeCol.getSpecification().getGoodsType("model.goods.bells"));
 
             }
@@ -1437,7 +1437,7 @@ public final class Colony extends Settlement implements Location, Nameable {
             bonus = 2;
             if (oldSonsOfLiberty < 100) {
                 addModelMessage(this, "model.colony.SoL100", new String[][] { { "%colony%", getName() } },
-                                ModelMessage.SONS_OF_LIBERTY,
+                                ModelMessage.MessageType.SONS_OF_LIBERTY,
                                 FreeCol.getSpecification().getGoodsType("model.goods.bells"));
             }
         } else {
@@ -1445,7 +1445,7 @@ public final class Colony extends Settlement implements Location, Nameable {
                 bonus += 1;
                 if (oldSonsOfLiberty < 50) {
                     addModelMessage(this, "model.colony.SoL50", new String[][] { { "%colony%", getName() } },
-                                    ModelMessage.SONS_OF_LIBERTY,
+                                    ModelMessage.MessageType.SONS_OF_LIBERTY,
                                     FreeCol.getSpecification().getGoodsType("model.goods.bells"));
                 }
             }
@@ -1454,7 +1454,7 @@ public final class Colony extends Settlement implements Location, Nameable {
                 if (oldTories <= veryBadGovernment) {
                     // government has become very bad
                     addModelMessage(this, "model.colony.veryBadGovernment",
-                            new String[][] { { "%colony%", getName() } }, ModelMessage.GOVERNMENT_EFFICIENCY,
+                            new String[][] { { "%colony%", getName() } }, ModelMessage.MessageType.GOVERNMENT_EFFICIENCY,
                                     FreeCol.getSpecification().getGoodsType("model.goods.bells"));
                 }
             } else if (tories > badGovernment) {
@@ -1462,19 +1462,19 @@ public final class Colony extends Settlement implements Location, Nameable {
                 if (oldTories <= badGovernment) {
                     // government has become bad
                     addModelMessage(this, "model.colony.badGovernment", new String[][] { { "%colony%", getName() } },
-                                    ModelMessage.GOVERNMENT_EFFICIENCY, 
+                                    ModelMessage.MessageType.GOVERNMENT_EFFICIENCY, 
                                     FreeCol.getSpecification().getGoodsType("model.goods.bells"));
                 } else if (oldTories > veryBadGovernment) {
                     // government has improved, but is still bad
                     addModelMessage(this, "model.colony.governmentImproved1",
                                     new String[][] { { "%colony%", getName() } }, 
-                                    ModelMessage.GOVERNMENT_EFFICIENCY,
+                                    ModelMessage.MessageType.GOVERNMENT_EFFICIENCY,
                     FreeCol.getSpecification().getGoodsType("model.goods.bells"));
                 }
             } else if (oldTories > badGovernment) {
                 // government was bad, but has improved
                 addModelMessage(this, "model.colony.governmentImproved2", new String[][] { { "%colony%", getName() } },
-                                ModelMessage.GOVERNMENT_EFFICIENCY, 
+                                ModelMessage.MessageType.GOVERNMENT_EFFICIENCY, 
                                 FreeCol.getSpecification().getGoodsType("model.goods.bells"));
             }
         }
