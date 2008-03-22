@@ -3321,7 +3321,7 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
         }
         out.writeAttribute("owner", ownerID);
         out.writeAttribute("turnsOfTraining", Integer.toString(turnsOfTraining));
-        out.writeAttribute("workType", Integer.toString(workType.getIndex()));
+        out.writeAttribute("workType", workType.getId());
         out.writeAttribute("experience", Integer.toString(experience));
         out.writeAttribute("treasureAmount", Integer.toString(treasureAmount));
         out.writeAttribute("hitpoints", Integer.toString(hitpoints));
@@ -3475,7 +3475,7 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
 
         final String workTypeStr = in.getAttributeValue(null, "workType");
         if (workTypeStr != null) {
-            workType = FreeCol.getSpecification().getGoodsType(Integer.parseInt(workTypeStr));
+            workType = FreeCol.getSpecification().getGoodsType(workTypeStr);
         }
 
         final String experienceStr = in.getAttributeValue(null, "experience");
