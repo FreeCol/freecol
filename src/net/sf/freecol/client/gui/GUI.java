@@ -1859,8 +1859,8 @@ public final class GUI {
                     if (indianSettlement.isCapital()) {
                         // TODO: make this look nicer
                         g.drawString("*",
-                                     x + (STATE_OFFSET_X * lib.getScalingFactor()) + TEXT_OFFSET_X,
-                                     y + (int) (STATE_OFFSET_Y * lib.getScalingFactor()) + TEXT_OFFSET_Y);
+                                     x + (STATE_OFFSET_X * lib.getScalingFactor()) + TEXT_OFFSET_X + 1,
+                                     y + (int) (STATE_OFFSET_Y * lib.getScalingFactor()) + TEXT_OFFSET_Y + 2);
                     } else {
                         g.drawString("-", 
                                      x + (int) (STATE_OFFSET_X * lib.getScalingFactor()) + TEXT_OFFSET_X,
