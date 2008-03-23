@@ -170,10 +170,12 @@ public final class InGameController extends Controller {
                 Market market = newPlayer.getMarket();
                 // make random change to the market
                 List<GoodsType> goodsTypes = FreeCol.getSpecification().getGoodsTypeList();
-                market.remove(goodsTypes.get(getPseudoRandom().nextInt(goodsTypes.size())),
-                              (getPseudoRandom().nextInt(21)));
-                Element updateElement = Message.createNewRootElement("update");
-                updateElement.appendChild(newPlayer.getMarket().toXMLElement(newPlayer, updateElement.getOwnerDocument()));
+                GoodsType typeToRemove = goodsTypes.get(getPseudoRandom().nextInt(goodsTypes.size()));
+                int amountToRemove = getPseudoRandom().nextInt(21);
+                market.remove(typeToRemove, amountToRemove);
+                Element updateElement = Message.createNewRootElement("marketElement");
+                updateElement.setAttribute("type", typeToRemove.getId());
+                updateElement.setAttribute("amount", String.valueOf(-amountToRemove));
                 newPlayer.getConnection().send(updateElement);
             } catch (IOException e) {
                 logger.warning("Could not send message to: " + newPlayer.getName() +
