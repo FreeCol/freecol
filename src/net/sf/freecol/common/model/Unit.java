@@ -3325,7 +3325,7 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
         out.writeAttribute("experience", Integer.toString(experience));
         out.writeAttribute("treasureAmount", Integer.toString(treasureAmount));
         out.writeAttribute("hitpoints", Integer.toString(hitpoints));
-
+        
         if (student != null) {
             out.writeAttribute("student", student.getId());
         }
@@ -3359,6 +3359,10 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
         if (tradeRoute != null) {
             out.writeAttribute("tradeRoute", tradeRoute.getId());
             out.writeAttribute("currentStop", String.valueOf(currentStop));
+        }
+        
+        if (workImprovement!=null) {
+            workImprovement.toXMLImpl(out, player, showAll, toSavedGame);
         }
 
         // Do not show enemy units hidden in a carrier:
@@ -3477,7 +3481,7 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
         if (workTypeStr != null) {
             workType = FreeCol.getSpecification().getGoodsType(workTypeStr);
         }
-
+        
         final String experienceStr = in.getAttributeValue(null, "experience");
         if (experienceStr != null) {
             experience = Integer.parseInt(experienceStr);
@@ -3522,6 +3526,13 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
                 String[] equipmentStrings = readFromArrayElement("equipment", in, new String[0]);
                 for (String equipmentId : equipmentStrings) {
                     equipment.add(FreeCol.getSpecification().getEquipmentType(equipmentId));
+                }
+            } else if (in.getLocalName().equals(TileImprovement.getXMLElementTagName())) {
+                workImprovement = (TileImprovement) getGame().getFreeColGameObject(in.getAttributeValue(null, "ID"));
+                if (workImprovement != null) {
+                    workImprovement.readFromXML(in);
+                } else {
+                    workImprovement = new TileImprovement(getGame(), in);
                 }
             }
         }
