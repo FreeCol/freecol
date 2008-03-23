@@ -170,7 +170,18 @@ public class FoundingFatherTest extends FreeColTestCase {
         player.addFather(father);
         assertTrue(colony.canBuild(customHouse));
     }
-    
+
+    public void testAddAllFathers() {
+        // check that all fathers can be added
+        Colony colony = getStandardColony(4);
+        Player player = colony.getOwner();
+        
+        for (FoundingFather father : spec().getFoundingFathers()) {
+            player.addFather(father);
+        }
+    }
+
+    /*    
     public void testPocahontas() {
         
         Colony colony = getStandardColony(4);
@@ -179,5 +190,6 @@ public class FoundingFatherTest extends FreeColTestCase {
         FoundingFather father = spec().getFoundingFather("model.foundingFather.pocahontas");
         player.addFather(father);
      }
+    */
 
 }

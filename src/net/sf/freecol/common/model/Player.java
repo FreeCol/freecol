@@ -2063,13 +2063,13 @@ public class Player extends FreeColGameObject implements Nameable {
         for (String event : father.getEvents().keySet()) {
             if (event.equals("model.event.resetNativeAlarm")) {
                 // reduce indian tension and alarm
-                Iterator<Player> pi = getGame().getPlayerIterator();
-                while (pi.hasNext()) {
-                    Player p = pi.next();
-                    if (!p.isEuropean()) {
-                        p.getTension(this).setValue(0);
-                        for (IndianSettlement is : getIndianSettlements()) {
-                            is.getAlarm(this).setValue(0);
+                for (Player player : getGame().getPlayers()) {
+                    if (!player.isEuropean() && player.getTension(this) != null) {
+                        player.getTension(this).setValue(0);
+                        for (IndianSettlement is : player.getIndianSettlements()) {
+                            if (is.getAlarm(this) != null) {
+                                is.getAlarm(this).setValue(0);
+                            }
                         }
                     }
                 }
