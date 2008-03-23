@@ -40,6 +40,7 @@ import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.Map;
 import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.Market;
+import net.sf.freecol.common.model.Modifier;
 import net.sf.freecol.common.model.Monarch;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Player.PlayerType;
@@ -521,8 +522,10 @@ public final class InGameController extends Controller {
                                     if (colony.getGoodsCount(goods.getType()) >= goods.getAmount()) {
                                         nextPlayer.setTax(oldTax); // player hasn't accepted, restoring tax
                                         Element removeGoodsElement = Message.createNewRootElement("removeGoods");
-                                        ((Colony) goods.getLocation()).removeGoods(goods);
+                                        colony.removeGoods(goods);
                                         nextPlayer.setArrears(goods);
+                                        colony.getFeatureContainer().addModifier(Modifier
+                                            .createTeaPartyModifier(getGame().getTurn()));
                                         removeGoodsElement.appendChild(goods.toXMLElement(nextPlayer, removeGoodsElement
                                                                                           .getOwnerDocument()));
                                         nextPlayer.getConnection().send(removeGoodsElement);

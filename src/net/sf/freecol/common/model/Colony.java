@@ -1652,8 +1652,16 @@ public final class Colony extends Settlement implements Location, Nameable {
             for (ExportData data : exportData.values()) {
                 data.toXML(out);
             }
-            /* Don't write features, they will be added from buildings in readFromXMLImpl
+            /** 
+             * Don't write other features, they will be added from buildings in readFromXMLImpl
              */
+            for (Modifier modifier : featureContainer.getModifierSet("model.goods.bells",
+                                                                     null, getGame().getTurn())) {
+                if (Modifier.COLONY_GOODS_PARTY.equals(modifier.getSource())) {
+                    modifier.toXML(out);
+                }
+            }
+
             for (WorkLocation workLocation : getWorkLocations()) {
                 ((FreeColGameObject) workLocation).toXML(out, player, showAll, toSavedGame);
             }
@@ -1731,6 +1739,11 @@ public final class Colony extends Settlement implements Location, Nameable {
                 ExportData data = new ExportData();
                 data.readFromXML(in);
                 exportData.put(data.getId(), data);
+            } else if (Modifier.getXMLElementTagName().equals(in.getLocalName())) {
+                Modifier modifier = new Modifier(in);
+                if (Modifier.COLONY_GOODS_PARTY.equals(modifier.getSource())) {
+                    featureContainer.addModifier(modifier);
+                }
             } else {
                 logger.warning("Unknown tag: " + in.getLocalName() + " loading colony " + name);
             }

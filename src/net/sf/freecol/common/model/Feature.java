@@ -162,7 +162,7 @@ public abstract class Feature extends FreeColObject {
      * @return a <code>boolean</code> value
      */
     public boolean appliesTo(final FreeColGameObjectType objectType) {
-        if (!hasScope()) {
+        if (objectType == null || !hasScope()) {
             return true;
         } else {
             for (Scope scope : scopes) {

@@ -45,6 +45,7 @@ import net.sf.freecol.common.model.LostCityRumour;
 import net.sf.freecol.common.model.Map;
 import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.ModelMessage;
+import net.sf.freecol.common.model.Modifier;
 import net.sf.freecol.common.model.Monarch;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Player.Stance;
@@ -63,11 +64,8 @@ import org.w3c.dom.NodeList;
  * Handles the network messages that arrives while in the getGame().
  */
 public final class InGameInputHandler extends InputHandler {
+
     private static final Logger logger = Logger.getLogger(InGameInputHandler.class.getName());
-
-
-
-
 
     /**
      * The constructor to use.
@@ -940,16 +938,18 @@ public final class InGameInputHandler extends InputHandler {
             String messageID = goods.getType().getId() + ".destroyed";
             if (!Messages.containsKey(messageID)) {
                 if (colony.isLandLocked()) {
-                    messageID = "model.monarch.bostonTeaParty.landLocked";
+                    messageID = "model.monarch.colonyGoodsParty.landLocked";
                 } else {
-                    messageID = "model.monarch.bostonTeaParty.harbour";
+                    messageID = "model.monarch.colonyGoodsParty.harbour";
                 }
             }
-            new ShowModelMessageSwingTask(new ModelMessage(colony, messageID,
-                                             new String[][] { { "%colony%", colony.getName() },
-                                                 { "%amount%", String.valueOf(goods.getAmount()) },
-                                                 { "%goods%", goods.getName() } },
-                                             ModelMessage.MessageType.WARNING)).invokeLater();
+            colony.getFeatureContainer().addModifier(Modifier
+               .createTeaPartyModifier(getGame().getTurn()));
+            new ShowModelMessageSwingTask(new ModelMessage(colony, ModelMessage.MessageType.WARNING,
+                                                           null, messageID,    
+                                                           "%colony%", colony.getName(),
+                                                           "%amount%", String.valueOf(goods.getAmount()),
+                                                           "%goods%", goods.getName())).invokeLater();
         }
 
         return null;

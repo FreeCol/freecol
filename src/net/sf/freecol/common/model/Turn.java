@@ -28,15 +28,10 @@ import net.sf.freecol.client.gui.i18n.Messages;
 */
 public class Turn {
 
-
-
     public static final int STARTING_YEAR = 1492;
     public static final int SEASON_YEAR = 1600;
 
-
     private int turn;
-
-    
 
     public Turn(int turn) {
         this.turn = turn;

@@ -39,6 +39,8 @@ import org.w3c.dom.Element;
  */
 public final class Modifier extends Feature {
 
+    public static final String COLONY_GOODS_PARTY = "model.monarch.colonyGoodsParty";
+
     public static enum Type { ADDITIVE, MULTIPLICATIVE, PERCENTAGE }
 
     private float value;
@@ -219,6 +221,16 @@ public final class Modifier extends Feature {
             return number;
         }
     }
+
+    // -- Factory methods --
+
+    public static Modifier createTeaPartyModifier(Turn turn) {
+        Modifier bellsBonus = new Modifier("model.goods.bells", COLONY_GOODS_PARTY,
+                                           50, Type.PERCENTAGE);
+        bellsBonus.setIncrement(-2, Type.ADDITIVE, turn, new Turn(turn.getNumber() + 25));
+        return bellsBonus;
+    }
+
 
     // -- Serialization --
 
