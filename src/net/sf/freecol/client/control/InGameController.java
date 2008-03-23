@@ -23,6 +23,7 @@ import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -3457,8 +3458,8 @@ public final class InGameController implements NetworkConstants {
 
         int thisTurn = freeColClient.getGame().getTurn().getNumber();
 
-        final ArrayList<ModelMessage> messageList = new ArrayList<ModelMessage>();
-        List<ModelMessage> inputList;
+        final ArrayList<ModelMessage> messageList = new ArrayList<ModelMessage>();;
+        Collection<ModelMessage> inputList;
         if (allMessages) {
             inputList = freeColClient.getMyPlayer().getModelMessages();
         } else {

@@ -21,6 +21,7 @@ package net.sf.freecol.common.model;
 
 import java.awt.Color;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -184,7 +185,7 @@ public class Player extends FreeColGameObject implements Nameable {
     private List<TradeRoute> tradeRoutes = new ArrayList<TradeRoute>();
 
     // Model messages for this player
-    private final List<ModelMessage> modelMessages = new ArrayList<ModelMessage>();
+    private final Set<ModelMessage> modelMessages = new HashSet<ModelMessage>();
 
     // Temporary variables:
     protected boolean[][] canSeeTiles = null;
@@ -465,7 +466,7 @@ public class Player extends FreeColGameObject implements Nameable {
      * 
      * @return all ModelMessages for this player.
      */
-    public List<ModelMessage> getModelMessages() {
+    public Collection<ModelMessage> getModelMessages() {
         return modelMessages;
     }
 
