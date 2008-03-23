@@ -1002,7 +1002,7 @@ public final class InGameInputHandler extends InputHandler {
             player.modifyGold(Integer.parseInt(amount));
             break;
         case LostCityRumour.COLONIST:
-            m = new ModelMessage(unit, "lostCityRumour.Colonist", null, ModelMessage.MessageType.LOST_CITY_RUMOUR);
+            m = new ModelMessage(unit, ModelMessage.MessageType.LOST_CITY_RUMOUR, null, "lostCityRumour.Colonist");
             unitList = element.getChildNodes();
             for (int i = 0; i < unitList.getLength(); i++) {
                 Element unitElement = (Element) unitList.item(i);
