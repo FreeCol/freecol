@@ -3430,9 +3430,10 @@ public final class InGameController implements NetworkConstants {
      */
     public synchronized void ignoreMessage(ModelMessage message, boolean flag) {
         String key = message.getSource().getId();
-        for (String[] replacement : message.getData()) {
-            if (replacement[0].equals("%goods%")) {
-                key += replacement[1];
+        String[] data = message.getData();
+        for (int index = 0; index < data.length; index += 2) {
+            if (data[index].equals("%goods%")) {
+                key += data[index + 1];
                 break;
             }
         }
@@ -3468,9 +3469,10 @@ public final class InGameController implements NetworkConstants {
             if (shouldAllowMessage(message)) {
                 if (message.getType() == ModelMessage.MessageType.WAREHOUSE_CAPACITY) {
                     String key = message.getSource().getId();
-                    for (String[] replacement : message.getData()) {
-                        if (replacement[0].equals("%goods%")) {
-                            key += replacement[1];
+                    String[] data = message.getData();
+                    for (int index = 0; index < data.length; index += 2) {
+                        if (data[index].equals("%goods%")) {
+                            key += data[index + 1];
                             break;
                         }
                     }

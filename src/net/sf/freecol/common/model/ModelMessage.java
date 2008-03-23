@@ -60,11 +60,24 @@ public class ModelMessage extends FreeColObject {
     private Tile sourceTile;
     private FreeColObject display;
     private MessageType type;
-    private String[][] data;
+    private String[] data;
     private boolean beenDisplayed = false;
 
 
     public ModelMessage() {
+    }
+
+
+    private static String[] convertData(String[][] data) {
+        if (data == null) {
+            return null;
+        }
+        String[] strings = new String[data.length * 2];
+        for (int index = 0; index < data.length; index++) {
+            strings[index * 2] = data[index][0];
+            strings[index * 2 + 1] = data[index][1];
+        }
+        return strings;
     }
 
     /**
@@ -79,7 +92,25 @@ public class ModelMessage extends FreeColObject {
     * @param display The Object to display.
     * @see FreeColGameObject#addModelMessage(FreeColGameObject, String, String[][], int)
     */
+    @Deprecated
     public ModelMessage(FreeColGameObject source, String id, String[][] data, MessageType type, FreeColObject display) {
+        this(source, type, display, id, convertData(data));
+    }
+
+    /**
+     * Creates a new <code>ModelMessage</code>.
+     *
+     * @param source The source of the message. This is what the message should be
+     *               associated with. In addition, the owner of the source is the
+     *               player getting the message.
+     * @param type The type of this model message.
+     * @param display The Object to display.
+     * @param id The ID of the message to display.
+     * @param data Contains data to be displayed in the message or <i>null</i>.
+     * @see FreeColGameObject#addModelMessage(FreeColGameObject, String, String[][], int)
+    */
+    public ModelMessage(FreeColGameObject source, MessageType type, FreeColObject display,
+                        String id, String... data) {
         this.source = source;
         this.sourceTile = null;
         if (source instanceof Unit) {
@@ -133,12 +164,8 @@ public class ModelMessage extends FreeColObject {
             throw new IllegalArgumentException("The display must be a FreeColGameObject or FreeColGameObjectType!");
         }
 
-        if (data != null) {
-            for (String[] s : data) {
-                if (s == null || s.length != 2) {
-                    throw new IllegalArgumentException("The data can only contain arrays of size 2.");
-                }
-            }
+        if (data != null && data.length % 2 != 0) {
+            throw new IllegalArgumentException("Data length must be multiple of 2.");
         }
     }
     
@@ -154,7 +181,7 @@ public class ModelMessage extends FreeColObject {
      * @see FreeColGameObject#addModelMessage(FreeColGameObject, String, String[][], int)
      */
      public ModelMessage(FreeColGameObject source, String id, String[][] data, MessageType type) {
-         this(source, id, data, type, getDefaultDisplay(type, source));
+         this(source, type, getDefaultDisplay(type, source), id, convertData(data));
 
      }
 
@@ -169,7 +196,7 @@ public class ModelMessage extends FreeColObject {
      * @see FreeColGameObject#addModelMessage(FreeColGameObject, String, String[][], int)
      */
      public ModelMessage(FreeColGameObject source, String id, String[][] data) {
-         this(source, id, data, MessageType.DEFAULT);
+         this(source, MessageType.DEFAULT, getDefaultDisplay(MessageType.DEFAULT, source), id, convertData(data));
      }
      
     /**
@@ -252,7 +279,7 @@ public class ModelMessage extends FreeColObject {
      * @return The data as a <code>String[][]</code> or <i>null</i>
      *         if no data applies.
      */
-    public String[][] getData() {
+    public String[] getData() {
         return data;
     }
 
@@ -300,15 +327,8 @@ public class ModelMessage extends FreeColObject {
         if ( ! (o instanceof ModelMessage) ) { return false; }
         ModelMessage m = (ModelMessage) o;
         // Check that the content of the data array is equal
-        if (!(data == m.data)) {
-            if (data != null && m.data != null && data.length == m.data.length) {
-                for (int i = 0 ; i < data.length ; i++) {
-                    if (!Arrays.equals(data[i], m.data[i]))
-                        return false;
-                }
-            } else {
-                return false;
-            }
+        if (!Arrays.equals(data, m.data)) {
+            return false;
         }
         return ( source.equals(m.source)
                 && getId().equals(m.getId())
@@ -321,9 +341,8 @@ public class ModelMessage extends FreeColObject {
         value = 37 * value + source.hashCode();
         value = 37 * value + getId().hashCode();
         if (data != null) {
-            for (String[] s : data) {
-                value = 37 * value + s[0].hashCode();
-                value = 37 * value + s[1].hashCode();
+            for (String s : data) {
+                value = 37 * value + s.hashCode();
             }
         }
         value = 37 * value + type.ordinal();
@@ -335,8 +354,8 @@ public class ModelMessage extends FreeColObject {
         StringBuilder sb = new StringBuilder("ModelMessage<");
         sb.append(hashCode() + ", " + source.getId() + ", " + getId() + ", ");
         if (data != null) {
-            for (String[] s : data) {
-                sb.append(Arrays.toString(s) + "/");
+            for (String s : data) {
+                sb.append(s + "/");
             }
         }
         sb.append(", " + type + " >");
@@ -384,7 +403,7 @@ public class ModelMessage extends FreeColObject {
 
         while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
             if (in.getLocalName().equals("data")) {
-                data =  readFromArrayElement("data", in, new String[0][0]);
+                data =  readFromArrayElement("data", in, new String[0]);
             }
         }
 
@@ -427,7 +446,7 @@ public class ModelMessage extends FreeColObject {
 
         while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
             if (in.getLocalName().equals("data")) {
-                data =  readFromArrayElement("data", in, new String[0][0]);
+                data =  readFromArrayElement("data", in, new String[0]);
             }
         }
 

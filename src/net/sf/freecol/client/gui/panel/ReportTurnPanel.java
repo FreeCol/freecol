@@ -292,7 +292,7 @@ public final class ReportTurnPanel extends ReportPanel implements ActionListener
             while ((end = input.indexOf('%', start + 1)) >= 0) {
                 String var = input.substring(start, end + 1);
                 String[] item = findReplacementData(message, var);
-                if (item!=null && var.equals(item[0])) {
+                if (item != null && var.equals(item[0])) {
                     // found variable to replace
                     if (var.equals("%colony%")) {
                         Colony colony = player.getColony(item[1]);
@@ -339,16 +339,15 @@ public final class ReportTurnPanel extends ReportPanel implements ActionListener
     }
     
     private String[] findReplacementData(ModelMessage message, String variable) {
-        
-        for (String[] item : message.getData()) {
-            if (item == null || item.length != 2) {
-                logger.warning("Data has a wrong format for message: " + message);
-            } else if (item[0] == null || item[1] == null) {
-                logger.warning("Data in model message is 'null': " + message + ", " +
-                               item[0] + ", " + item[1]);
-            } else if (variable.equals(item[0])) {
-                return item;
+        String[] data = message.getData();
+        if (data.length % 2 == 0) {
+            for (int index = 0; index < data.length; index += 2) {
+                if (variable.equals(data[index])) {
+                    return new String[] { variable, data[index + 1] };
+                }
             }
+        } else {
+            logger.warning("Data has a wrong format for message: " + message);
         }
         return null;
     }

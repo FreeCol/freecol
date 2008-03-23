@@ -453,21 +453,20 @@ public final class Market extends FreeColGameObject implements Ownable {
             }
             if (addMessages && owner != null && owner.getEurope() != null) {
                 if (data.getOldPrice() > data.getCostToBuy()) {
-                    addModelMessage(owner.getEurope(), "model.market.priceDecrease",
-                                    new String[][] {
-                                        {"%europe%", owner.getEurope().getName()},
-                                        {"%goods%", goodsType.getName()},
-                                        {"%buy%", String.valueOf(data.getCostToBuy())},
-                                        {"%sell%", String.valueOf(data.getPaidForSale())}},
-                                    ModelMessage.MessageType.MARKET_PRICES, goodsType);
+                    addModelMessage(owner.getEurope(), ModelMessage.MessageType.MARKET_PRICES, goodsType,
+                                    "model.market.priceDecrease",
+                                    "%europe%", owner.getEurope().getName(),
+                                    "%goods%", goodsType.getName(),
+                                    "%buy%", String.valueOf(data.getCostToBuy()),
+                                    "%sell%", String.valueOf(data.getPaidForSale()));
+                             
                 } else if (data.getOldPrice() < data.getCostToBuy()) {
-                    addModelMessage(owner.getEurope(), "model.market.priceIncrease",
-                                    new String[][] {
-                                        {"%europe%", owner.getEurope().getName()},
-                                        {"%goods%", goodsType.getName()},
-                                        {"%buy%", String.valueOf(data.getCostToBuy())},
-                                        {"%sell%", String.valueOf(data.getPaidForSale())}},
-                                    ModelMessage.MessageType.MARKET_PRICES, goodsType);
+                    addModelMessage(owner.getEurope(), ModelMessage.MessageType.MARKET_PRICES, goodsType,
+                                    "model.market.priceIncrease",
+                                    "%europe%", owner.getEurope().getName(),
+                                    "%goods%", goodsType.getName(),
+                                    "%buy%", String.valueOf(data.getCostToBuy()),
+                                    "%sell%", String.valueOf(data.getPaidForSale()));
                 }
             }
         }
@@ -507,7 +506,8 @@ public final class Market extends FreeColGameObject implements Ownable {
      * @throws XMLStreamException if there are any problems writing
      *      to the stream.
      */
-    protected void toXMLImpl(XMLStreamWriter out, Player player, boolean showAll, boolean toSavedGame) throws XMLStreamException {
+    protected void toXMLImpl(XMLStreamWriter out, Player player, boolean showAll, boolean toSavedGame)
+        throws XMLStreamException {
         // Start element:
         out.writeStartElement(getXMLElementTagName());
 
