@@ -234,8 +234,7 @@ public final class PreGameController {
         freeColClient.getCanvas().setJMenuBar(new InGameMenuBar(freeColClient));
         if (freeColClient.getGame().getTurn().getNumber() == 1) {
             Player player = freeColClient.getMyPlayer();
-            player.addModelMessage(new ModelMessage(player, "tutorial.startGame", null,
-                                                    ModelMessage.MessageType.TUTORIAL, player));
+            player.addModelMessage(new ModelMessage(player, ModelMessage.MessageType.TUTORIAL, player, "tutorial.startGame"));
         }
 
         Unit activeUnit = freeColClient.getMyPlayer().getNextActiveUnit();
