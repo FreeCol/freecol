@@ -890,8 +890,10 @@ public final class EuropePanel extends FreeColPanel implements ActionListener, C
             if (editState) {
                 if (comp instanceof UnitLabel) {
                     comp.getParent().remove(comp);
+                    /* Unnecessary, leaveShip() is called in CargoPanel.remove()
                     Unit unit = ((UnitLabel) comp).getUnit();
                     inGameController.leaveShip(unit);
+                    */
                 } else {
                     logger.warning("An invalid component got dropped on this DocksPanel.");
                     return null;

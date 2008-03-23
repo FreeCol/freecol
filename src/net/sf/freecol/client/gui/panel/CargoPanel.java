@@ -184,9 +184,10 @@ public class CargoPanel extends FreeColPanel {
             if (carrier == null) {
                 border.setTitle(Messages.message("cargoOnCarrier"));
             } else {
+                int spaceLeft = carrier.getSpaceLeft();
                 border.setTitle(Messages.message("cargoOnCarrierLong", 
                                                  "%name%", carrier.getName(),
-                                                 "%space%", String.valueOf(carrier.getSpaceLeft())));
+                                                 "%space%", String.valueOf(spaceLeft)));
             }
         }
     }
