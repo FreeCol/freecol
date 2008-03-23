@@ -1214,7 +1214,7 @@ public final class Colony extends Settlement implements Location, Nameable {
         } else {
             //food is never wasted -> new settler is produced
             int waste = (amount + production - getWarehouseCapacity());
-            if (waste > 0 && !getExportData(goodsType).isExported()) {
+            if (waste > 0 && !getExportData(goodsType).isExported() && !goodsType.limitIgnored()) {
                 result.add(Messages.message("model.building.warehouseSoonFull",
                         "%goods%", goodsType.getName(),
                         "%colony%", getName(),
