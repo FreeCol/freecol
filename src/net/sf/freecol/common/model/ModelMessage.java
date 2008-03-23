@@ -81,10 +81,20 @@ public class ModelMessage extends FreeColObject {
     */
     public ModelMessage(FreeColGameObject source, String id, String[][] data, MessageType type, FreeColObject display) {
         this.source = source;
+        this.sourceTile = null;
         if (source instanceof Unit) {
-            this.owner = ((Unit) source).getOwner();
+            Unit u = (Unit) source;
+            this.owner = u.getOwner();
+            if (u.getTile() != null) {
+                this.sourceTile = u.getTile();
+            } else if (u.getColony() != null) {
+                this.sourceTile = u.getColony().getTile();
+            } else if (u.getIndianSettlement() != null) {
+                this.sourceTile = u.getIndianSettlement().getTile();
+            }
         } else if (source instanceof Settlement) {
             this.owner = ((Settlement) source).getOwner();
+            this.sourceTile = ((Settlement) source).getTile();
         } else if (source instanceof Europe) {
             this.owner = ((Europe) source).getOwner();
         } else if (source instanceof Player) {
@@ -92,29 +102,15 @@ public class ModelMessage extends FreeColObject {
         } else if (source instanceof Ownable) {
             this.owner = ((Ownable) source).getOwner();
         }
-        if (source instanceof Settlement) {
-            this.sourceTile = ((Settlement)source).getTile();
-        } else if (source instanceof Unit) {
-            Unit u = (Unit) source;
-            if (u.getTile()!=null)
-                this.sourceTile = u.getTile();
-            else if (u.getColony()!=null)
-                this.sourceTile = u.getColony().getTile();
-            else if (u.getIndianSettlement()!=null)
-                this.sourceTile = u.getIndianSettlement().getTile();
-            else
-                this.sourceTile = null;
-        } else {
-            this.sourceTile = null;
-        }
-        
+
         setId(id);
         this.data = data;
         this.type = type;
-        if (display == null)
+        if (display == null) {
             this.display = getDefaultDisplay(type, source);
-        else
+        } else {
             this.display = display;
+        }
         verifyFields();
     }
 
