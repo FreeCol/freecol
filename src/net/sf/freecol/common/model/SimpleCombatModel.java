@@ -692,6 +692,10 @@ public class SimpleCombatModel implements CombatModel {
                 capturedUnit.setState(UnitState.ACTIVE);
             }
 
+            for (GoodsType goodsType : FreeCol.getSpecification().getGoodsTypeList()) {
+                colony.getExportData(goodsType).setExported(false);
+            }                                 
+
             if (attacker.isUndead()) {
                 for (Unit capturedUnit : colony.getUnitList()) {
                     capturedUnit.setType(attacker.getType());
