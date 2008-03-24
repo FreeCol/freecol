@@ -110,7 +110,6 @@ public final class PreGameController extends Controller {
         
         // Add AI players
         game.setUnknownEnemy(new Player(game, Player.UNKNOWN_ENEMY, false, null));
-        int i = 0;
         for (Nation nation : nations) {
             if (game.getPlayer(nation.getId()) != null ||
                 nation.getType().isREF() && game.getPlayer(nation.getRefID()) == null) {
@@ -135,7 +134,7 @@ public final class PreGameController extends Controller {
             aiConnection.setOutgoingMessageHandler(theConnection);
             theConnection.setOutgoingMessageHandler(aiConnection);
 
-            freeColServer.getServer().addConnection(theConnection, 3 - i);
+            freeColServer.getServer().addDummyConnection(theConnection);
 
             game.addPlayer(aiPlayer);
 
@@ -143,7 +142,6 @@ public final class PreGameController extends Controller {
             Element addNewPlayer = Message.createNewRootElement("addPlayer");
             addNewPlayer.appendChild(aiPlayer.toXMLElement(null, addNewPlayer.getOwnerDocument()));
             freeColServer.getServer().sendToAll(addNewPlayer, theConnection);
-            i++;
         }
         
         // Make the map:        
@@ -153,31 +151,6 @@ public final class PreGameController extends Controller {
         // Inform the clients:
         setMap(map);
         
-        // Initialise the crosses required values.
-        /* not necessary for simple scheme
-        Iterator<Player> playerIterator = game.getPlayerIterator();
-        while (playerIterator.hasNext()) {
-            Player p = playerIterator.next();
-            p.updateCrossesRequired();
-        }
-        */
-        Iterator<Player> playerIterator = game.getPlayerIterator();
-        while (playerIterator.hasNext()) {
-            ServerPlayer player = (ServerPlayer) playerIterator.next();
-            if (player.isEuropean()) {
-                player.getMarket().randomizeInitialPrices();
-                logger.fine("Randomized market for " + player.getName());
-                try {
-                    Element updateElement = Message.createNewRootElement("updateMarket");
-                    updateElement.appendChild(player.getMarket().toXMLElement(player, updateElement.getOwnerDocument()));
-                    player.getConnection().send(updateElement);
-                } catch (IOException e) {
-                    logger.warning("Could not send message to: " + player.getName() + " with connection "
-                                   + player.getConnection());
-                }
-            }
-        }
-
         // Start the game:
         freeColServer.setGameState(FreeColServer.IN_GAME);
         try {

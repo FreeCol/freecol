@@ -85,38 +85,6 @@ public final class Market extends FreeColGameObject implements Ownable {
     }
 
     /**
-     * Randomizes the initial prices.
-     *
-     */
-    public void randomizeInitialPrices() {
-        /*
-          List<GoodsType> goodsList = FreeCol.getSpecification().getGoodsTypeList();
-          for (GoodsType g : goodsList) {
-          if (!g.isStorable()) {
-          continue;
-          }
-          switch(g) {
-          case Goods.TOOLS:
-          case Goods.MUSKETS:
-          case Goods.TRADE_GOODS:
-          case Goods.HORSES:
-          continue;
-          default:
-          switch (getGame().getModelController().getPseudoRandom().nextInt(5)) {
-          case 1:
-          initialPrices[g.getIndex()]++;
-          break;
-          case 2:
-          initialPrices[g.getIndex()] += 2;
-          break;
-          default:
-          }
-          }
-          }
-        */
-    }
-
-    /**
      * Initiates a new <code>Market</code> from an
      * XML representation.
      *
@@ -277,9 +245,8 @@ public final class Market extends FreeColGameObject implements Ownable {
                 listener.logSale(type, amount, unitPrice, tax);
             }
         } else {
-            addModelMessage(this, "model.europe.market",
-                            new String [][] {{"%goods%", type.getName()}},
-                            ModelMessage.MessageType.WARNING);
+            addModelMessage(this, ModelMessage.MessageType.WARNING,
+                            "model.europe.market", "%goods%", type.getName());
         }
     }
 

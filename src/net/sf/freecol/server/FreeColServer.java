@@ -723,7 +723,7 @@ public final class FreeColServer {
                             new AIInGameInputHandler(this, player, aiMain));
                     aiConnection.setOutgoingMessageHandler(theConnection);
                     theConnection.setOutgoingMessageHandler(aiConnection);
-                    getServer().addConnection(theConnection, -1);
+                    getServer().addDummyConnection(theConnection);
                     player.setConnection(theConnection);
                     player.setConnected(true);
                 }

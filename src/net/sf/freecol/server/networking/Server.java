@@ -240,9 +240,8 @@ public final class Server extends Thread {
     /**
     * Adds a (usually Dummy)Connection into the hashmap.
     * @param connection The connection to add.
-    * @param fakesocket The false socket number to use.
     */
-    public void addConnection(Connection connection, int fakesocket) {
+    public void addDummyConnection(Connection connection) {
         connections.put(new Socket(), connection);
     }
 
