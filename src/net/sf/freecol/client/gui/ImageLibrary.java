@@ -310,13 +310,13 @@ public final class ImageLibrary extends ImageProvider {
         */
     }
 
-    private Image scaleImage(Image image, float scale) {
+    public Image scaleImage(Image image, float scale) {
         return image.getScaledInstance(Math.round(image.getWidth(null) * scale),
                                        Math.round(image.getHeight(null) * scale),
                                        Image.SCALE_SMOOTH);
     }
 
-    private ImageIcon scaleIcon(ImageIcon icon, float scale) {
+    public ImageIcon scaleIcon(ImageIcon icon, float scale) {
         return new ImageIcon(scaleImage(icon.getImage(), scale));
     }
 
