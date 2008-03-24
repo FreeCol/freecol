@@ -393,7 +393,9 @@ public final class Market extends FreeColGameObject implements Ownable {
      */
     private void priceGoods(boolean addMessages) {        
         for (GoodsType goodsType : FreeCol.getSpecification().getGoodsTypeList()) {
-            priceGoods(goodsType, addMessages);
+            if (goodsType.isStorable()) {
+                priceGoods(goodsType, addMessages);
+            }
         }
     }
 
