@@ -44,31 +44,31 @@
       <market initial-amount="2000"  initial-price="4"  price-difference="3"/>
     </goods-type>
     <goods-type id="model.goods.silver" art="goods/silver.png" is-farmed="true">
-      <market initial-amount="500"   initial-price="16" price-difference="1"/>
+      <market initial-amount="500"   initial-price="16" price-difference="2"/>
     </goods-type>
     <goods-type id="model.goods.horses" art="goods/horses.png" is-farmed="false" made-from="model.goods.food">
-      <market initial-amount="1000"  initial-price="1"  price-difference="1"/>
+      <market initial-amount="1000"  initial-price="1"  price-difference="2"/>
     </goods-type>
     <goods-type id="model.goods.rum" art="goods/rum.png" is-farmed="false" made-from="model.goods.sugar">
-      <market initial-amount="1000"  initial-price="10" price-difference="1"/>
+      <market initial-amount="1000"  initial-price="10" price-difference="2"/>
     </goods-type>
     <goods-type id="model.goods.cigars" art="goods/cigars.png" is-farmed="false" made-from="model.goods.tobacco">
-      <market initial-amount="1000"  initial-price="10" price-difference="1"/>
+      <market initial-amount="1000"  initial-price="10" price-difference="2"/>
     </goods-type>
     <goods-type id="model.goods.cloth" art="goods/cloth.png" is-farmed="false" made-from="model.goods.cotton">
-      <market initial-amount="1000"  initial-price="10" price-difference="1"/>
+      <market initial-amount="1000"  initial-price="10" price-difference="2"/>
     </goods-type>
     <goods-type id="model.goods.coats" art="goods/coats.png" is-farmed="false" made-from="model.goods.furs">
-      <market initial-amount="1000"  initial-price="10" price-difference="1"/>
+      <market initial-amount="1000"  initial-price="10" price-difference="2"/>
     </goods-type>
     <goods-type id="model.goods.tradeGoods" art="goods/tradeGoods.png" is-farmed="false">
-      <market initial-amount="1000"  initial-price="1"  price-difference="1"/>
+      <market initial-amount="1000"  initial-price="1"  price-difference="2"/>
     </goods-type>
     <goods-type id="model.goods.tools" art="goods/tools.png" is-farmed="false" made-from="model.goods.ore">
-      <market initial-amount="500"   initial-price="1"  price-difference="1"/>
+      <market initial-amount="500"   initial-price="1"  price-difference="2"/>
     </goods-type>
     <goods-type id="model.goods.muskets" art="goods/muskets.png" is-farmed="false" made-from="model.goods.tools">
-      <market initial-amount="500"   initial-price="1"  price-difference="1"/>
+      <market initial-amount="500"   initial-price="1"  price-difference="2"/>
     </goods-type>
     <goods-type id="model.goods.fish" art="goods/fish.png" is-farmed="true" storable="false" stored-as="model.goods.food" is-food="true" />
     <goods-type id="model.goods.bells" art="goods/bells.png" is-farmed="false" ignore-limit="true" storable="false"/>

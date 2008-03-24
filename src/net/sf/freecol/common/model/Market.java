@@ -40,6 +40,7 @@ import org.w3c.dom.Element;
  */
 public final class Market extends FreeColGameObject implements Ownable {
 
+    public static final int MINIMUM_PRICE = 1, MAXIMUM_PRICE = 19;
 
     private Player owner;
     
@@ -441,12 +442,12 @@ public final class Market extends FreeColGameObject implements Ownable {
             data.setOldPrice(data.getCostToBuy());
             int newPrice = Math.round(goodsType.getInitialAmount() * goodsType.getInitialSellPrice() /
                                       (float) data.getAmountInMarket());
-            if (newPrice + goodsType.getPriceDifference() > 19) {
-                data.setCostToBuy(19);
-                data.setPaidForSale(19 - goodsType.getPriceDifference());
+            if (newPrice + goodsType.getPriceDifference() > MAXIMUM_PRICE) {
+                data.setCostToBuy(MAXIMUM_PRICE);
+                data.setPaidForSale(MAXIMUM_PRICE - goodsType.getPriceDifference());
             } else {
-                if (newPrice < 1) {
-                    newPrice = 1;
+                if (newPrice < MINIMUM_PRICE) {
+                    newPrice = MINIMUM_PRICE;
                 }
                 data.setPaidForSale(newPrice);
                 data.setCostToBuy(data.getPaidForSale() + goodsType.getPriceDifference());
