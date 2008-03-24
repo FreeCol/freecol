@@ -257,8 +257,6 @@ public class AIColony extends AIObject {
             }
         }
 
-        // Create a TileImprovementPlan for the center tile: - not sure if it's allowed - ryan
-/*
         Iterator<TileImprovementPlan> tiIterator = TileImprovementPlans.iterator();
         boolean centerTileFound = false;
         while (tiIterator.hasNext()) {
@@ -275,7 +273,7 @@ public class AIColony extends AIObject {
         if (!centerTileFound && colony.getTile().canBePlowed()) {
             TileImprovementPlans.add(new TileImprovementPlan(getAIMain(), colony.getTile(), TileImprovementPlan.PLOW, 15));
         }
-*/
+
         Collections.sort(TileImprovementPlans, new Comparator<TileImprovementPlan>() {
             public int compare(TileImprovementPlan o, TileImprovementPlan p) {
                 Integer i = o.getValue();

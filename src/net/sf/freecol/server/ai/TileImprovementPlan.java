@@ -41,14 +41,10 @@ import org.w3c.dom.Element;
  * @see Tile
  */
 public class TileImprovementPlan extends AIObject {
+
     @SuppressWarnings("unused")
     private static final Logger logger = Logger.getLogger(TileImprovementPlan.class.getName());
 
-/*
-    public static final int PLOW = Unit.PLOW;
-    public static final int BUILD_ROAD = Unit.BUILD_ROAD;
-*/
-    
     /**
      * The type of improvement, from TileImprovementTypes.
      */
