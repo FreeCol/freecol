@@ -257,6 +257,7 @@ public class AIColony extends AIObject {
             }
         }
 
+        /*
         Iterator<TileImprovementPlan> tiIterator = TileImprovementPlans.iterator();
         boolean centerTileFound = false;
         while (tiIterator.hasNext()) {
@@ -273,6 +274,7 @@ public class AIColony extends AIObject {
         if (!centerTileFound && colony.getTile().canBePlowed()) {
             TileImprovementPlans.add(new TileImprovementPlan(getAIMain(), colony.getTile(), TileImprovementPlan.PLOW, 15));
         }
+        */
 
         Collections.sort(TileImprovementPlans, new Comparator<TileImprovementPlan>() {
             public int compare(TileImprovementPlan o, TileImprovementPlan p) {
