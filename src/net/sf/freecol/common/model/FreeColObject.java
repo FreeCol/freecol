@@ -285,7 +285,8 @@ public abstract class FreeColObject {
      * @throws XMLStreamException if there are any problems writing
      *      to the stream.
      */
-    protected void  toArrayElement(String tagName, int[] array, XMLStreamWriter out) throws XMLStreamException {
+    protected void toArrayElement(String tagName, int[] array, XMLStreamWriter out)
+        throws XMLStreamException {
         out.writeStartElement(tagName);
         
         out.writeAttribute("xLength", Integer.toString(array.length));
@@ -306,7 +307,8 @@ public abstract class FreeColObject {
      * @throws XMLStreamException if there are any problems writing
      *      to the stream.
      */
-    protected void  toArrayElement(String tagName, float[] array, XMLStreamWriter out) throws XMLStreamException {
+    protected void toArrayElement(String tagName, float[] array, XMLStreamWriter out)
+        throws XMLStreamException {
         out.writeStartElement(tagName);
         
         out.writeAttribute("xLength", Integer.toString(array.length));
@@ -328,7 +330,8 @@ public abstract class FreeColObject {
      * @throws XMLStreamException if a problem was encountered
      *      during parsing.
      */               
-    protected float[] readFromArrayElement(String tagName, XMLStreamReader in, float[] arrayType) throws XMLStreamException {
+    protected float[] readFromArrayElement(String tagName, XMLStreamReader in, float[] arrayType)
+        throws XMLStreamException {
         if (!in.getLocalName().equals(tagName)) {
             in.nextTag();
         }
@@ -355,7 +358,8 @@ public abstract class FreeColObject {
      * @throws XMLStreamException if a problem was encountered
      *      during parsing.
      */               
-    protected int[] readFromArrayElement(String tagName, XMLStreamReader in, int[] arrayType) throws XMLStreamException {
+    protected int[] readFromArrayElement(String tagName, XMLStreamReader in, int[] arrayType)
+        throws XMLStreamException {
         if (!in.getLocalName().equals(tagName)) {
             in.nextTag();
         }
@@ -371,130 +375,6 @@ public abstract class FreeColObject {
     }
 
     /**
-    * Creates an XML-representation of an array.
-    * 
-    * @param tagName The tagname for the <code>Element</code>
-    *       representing the array.
-    * @param array The array to represent.
-    * @param out The target stream.
-    * @throws XMLStreamException if there are any problems writing
-    *      to the stream.
-    */
-    protected void toArrayElement(String tagName, int[][] array, XMLStreamWriter out) throws XMLStreamException {
-        out.writeStartElement(tagName);
-        
-        out.writeAttribute("xLength", Integer.toString(array.length));
-        out.writeAttribute("yLength", Integer.toString(array[0].length));
-        for (int x=0; x < array.length; x++) {
-            for (int y=0; y < array[0].length; y++) {
-                out.writeAttribute("x" + Integer.toString(x) + "y" + Integer.toString(y), Integer.toString(array[x][y]));
-            }
-        }
-        
-        out.writeEndElement();
-    }
-    
-
-    /**
-    * Reads an XML-representation of an array.
-    * 
-    * @param tagName The tagname for the <code>Element</code>
-    *       representing the array.
-    * @param in The input stream with the XML.
-    * @param arrayType The type of array to be read.
-    * @return The array.
-    * @throws XMLStreamException if a problem was encountered
-     *      during parsing.
-    */                
-    protected int[][] readFromArrayElement(String tagName, XMLStreamReader in, int[][] arrayType) throws XMLStreamException {
-        if (!in.getLocalName().equals(tagName)) {
-            in.nextTag();
-        }
-        
-        int[][] array = new int[Integer.parseInt(in.getAttributeValue(null, "xLength"))][Integer.parseInt(in.getAttributeValue(null, "yLength"))];
-        
-        for (int x=0; x<array.length; x++) {
-            for (int y=0; y<array[0].length; y++) {
-                array[x][y] = Integer.parseInt(in.getAttributeValue(null, "x" + Integer.toString(x) + "y" + Integer.toString(y)));
-            }
-        }
-        
-        in.nextTag();
-        return array;
-    }
-
-    /**
-     * Creates an XML-representation of an array.
-     * 
-     * @param tagName The tagname for the <code>Element</code>
-     *       representing the array.
-     * @param array The array to represent.
-     * @param out The target stream.
-     * @throws XMLStreamException if there are any problems writing
-     *      to the stream.
-     */    
-    protected void toArrayElement(String tagName, boolean[][] array, XMLStreamWriter out) throws XMLStreamException {
-        out.writeStartElement(tagName);
-        
-        out.writeAttribute("xLength", Integer.toString(array.length));
-        out.writeAttribute("yLength", Integer.toString(array[0].length));
-        
-        StringBuffer sb = new StringBuffer(array.length * array[0].length);
-        for (int x=0; x < array.length; x++) {
-            for (int y=0; y < array[0].length; y++) {
-                if (array[x][y]) {
-                    sb.append("1");
-                } else {
-                    sb.append("0");
-                }
-            }
-        }
-        
-        out.writeAttribute("data", sb.toString());
-
-        out.writeEndElement();
-    }
-
-
-    /**
-     * Reads an XML-representation of an array.
-     * 
-     * @param tagName The tagname for the <code>Element</code>
-     *       representing the array.
-     * @param in The input stream with the XML.
-     * @param arrayType The type of array to be read.
-     * @return The array.
-     * @throws XMLStreamException if a problem was encountered
-     *      during parsing.
-     */ 
-    protected boolean[][] readFromArrayElement(String tagName, XMLStreamReader in, boolean[][] arrayType) throws XMLStreamException {
-        if (!in.getLocalName().equals(tagName)) {
-            in.nextTag();
-        }
-        
-        boolean[][] array = new boolean[Integer.parseInt(in.getAttributeValue(null, "xLength"))][Integer.parseInt(in.getAttributeValue(null, "yLength"))];
-
-        String data = in.getAttributeValue(null, "data");
-        
-        for (int x=0; x<array.length; x++) {
-            for (int y=0; y<array[0].length; y++) {
-                if (data != null) {
-                    if (data.charAt(x*array[0].length+y) == '1') {
-                        array[x][y] = true;
-                    } else {
-                        array[x][y] = false;
-                    }
-                } else { // Old type of storing booleans:
-                    array[x][y] = Boolean.valueOf(in.getAttributeValue(null, "x" + Integer.toString(x) + "y" + Integer.toString(y))).booleanValue();
-                }
-            }
-        }
-
-        in.nextTag();
-        return array;
-    }
-    
-    /**
      * Creates an XML-representation of an array.
      * 
      * @param tagName The tagname for the <code>Element</code>
@@ -504,7 +384,8 @@ public abstract class FreeColObject {
      * @throws XMLStreamException if there are any problems writing
      *      to the stream.
      */
-    protected void toArrayElement(String tagName, String[] array, XMLStreamWriter out) throws XMLStreamException {
+    protected void toArrayElement(String tagName, String[] array, XMLStreamWriter out)
+        throws XMLStreamException {
         out.writeStartElement(tagName);
         
         out.writeAttribute("xLength", Integer.toString(array.length));
@@ -527,68 +408,14 @@ public abstract class FreeColObject {
      * @throws XMLStreamException if a problem was encountered
      *      during parsing.
      */               
-    protected String[] readFromArrayElement(String tagName, XMLStreamReader in, String[] arrayType) throws XMLStreamException {
+    protected String[] readFromArrayElement(String tagName, XMLStreamReader in, String[] arrayType)
+        throws XMLStreamException {
         if (!in.getLocalName().equals(tagName)) {
             in.nextTag();
         }
         String[] array = new String[Integer.parseInt(in.getAttributeValue(null, "xLength"))];        
         for (int x=0; x<array.length; x++) {
             array[x] = in.getAttributeValue(null, "x" + Integer.toString(x));
-        }
-        
-        in.nextTag();
-        return array;
-    }
-
-    /**
-    * Creates an XML-representation of an array.
-    * 
-    * @param tagName The tagname for the <code>Element</code>
-    *       representing the array.
-    * @param array The array to represent.
-    * @param out The target stream.
-    * @throws XMLStreamException if there are any problems writing
-    *      to the stream.
-    */
-    protected void toArrayElement(String tagName, String[][] array, XMLStreamWriter out) throws XMLStreamException {
-        out.writeStartElement(tagName);
-        
-        out.writeAttribute("xLength", Integer.toString(array.length));
-        out.writeAttribute("yLength", Integer.toString(array[0].length));
-        for (int x=0; x < array.length; x++) {
-            for (int y=0; y < array[0].length; y++) {
-                out.writeAttribute("x" + Integer.toString(x) + "y" + Integer.toString(y), array[x][y]);
-            }
-        }
-        
-        out.writeEndElement();
-    }
-    
-
-    /**
-    * Reads an XML-representation of an array.
-    * 
-    * @param tagName The tagname for the <code>Element</code>
-    *       representing the array.
-    * @param in The input stream with the XML.
-    * @param arrayType The type of array to be read.
-    * @return The array.
-    * @throws XMLStreamException if a problem was encountered
-     *      during parsing.
-    */                
-    protected String[][] readFromArrayElement(String tagName, XMLStreamReader in, String[][] arrayType)
-        throws XMLStreamException {
-        if (!in.getLocalName().equals(tagName)) {
-            in.nextTag();
-        }
-        
-        String[][] array = new String[Integer.parseInt(in.getAttributeValue(null, "xLength"))]
-            [Integer.parseInt(in.getAttributeValue(null, "yLength"))];
-        
-        for (int x=0; x<array.length; x++) {
-            for (int y=0; y<array[0].length; y++) {
-                array[x][y] = in.getAttributeValue(null, "x" + Integer.toString(x) + "y" + Integer.toString(y));
-            }
         }
         
         in.nextTag();
