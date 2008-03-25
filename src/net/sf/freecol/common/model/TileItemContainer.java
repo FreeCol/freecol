@@ -34,6 +34,7 @@ import javax.xml.stream.XMLStreamWriter;
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.Map.Direction;
+import net.sf.freecol.server.generator.River;
 import net.sf.freecol.server.generator.RiverSection;
 
 import org.w3c.dom.Element;
@@ -454,8 +455,11 @@ public class TileItemContainer extends FreeColGameObject {
         }
         if (hasRiver()) {
             // Already have a river here, see if magnitude is correct, return existing river.
-            if (river.getMagnitude() != magnitude) {
-                setRiverMagnitude(magnitude);
+            int oldMagnitude = river.getMagnitude();
+            if (oldMagnitude != magnitude) {
+                //setRiverMagnitude(magnitude);
+                river.setMagnitude(magnitude);
+                adjustNeighbourRiverStyle(oldMagnitude);
             }
             return river;
         }
@@ -487,84 +491,39 @@ public class TileItemContainer extends FreeColGameObject {
         return (TileImprovement) removeTileItem(river);
     }
 
-    /**
-     * This function is for adjusting the river magnitude of an existing river in this Tile/Container.
-     * <ol>
-     * <li>Redirects to appropriate function for adding or removing rivers if intended.
-     * <li>Sets the magnitude of the river in this Tile/Container
-     * <li>Adjusts the style of this and adjacent Tiles/Containers
-     * </ol>
-     * @param magnitude The 'size' of the river, 0=none, 1=minor, 2=major
-     */
-    public void setRiverMagnitude(int magnitude) {
-        if (!hasRiver() && magnitude > TileImprovement.NO_RIVER) {
-            // No river at the moment, create a new one
-            addRiver(magnitude);
-            return;
-        }
-        if (river.getMagnitude() == magnitude) {
-            return;
-        }
-        if (magnitude == TileImprovement.NO_RIVER) {
-            // Remove river
-            removeRiver();
-            return;
-        }
-        int oldMagnitude = river.getMagnitude();
-        // Get the list of ImprovementTypes
-        List<TileImprovementType> tiTypeList = FreeCol.getSpecification().getTileImprovementTypeList();
-        // Check if there is another river type defined for this magnitude
-        for (TileImprovementType tiType : tiTypeList) {
-            if ("model.improvement.River".equals(tiType.getId()) && 
-                tiType.getMagnitude() <= magnitude) {
-                if (tiType != river.getType()) {
-                    // Has a different river type for this magnitude
-                    TileImprovement r = new TileImprovement(getGame(), tile, tiType);
-                    this.river = r;
-                } else {
-                    // Same river type, adjust magnitude
-                    river.setMagnitude(magnitude);
-                }
-                adjustNeighbourRiverStyle(oldMagnitude);
-                return;
-            }
-        }
-        // Don't have any river ImprovementTypes? Throw exception
-        throw new RuntimeException("No TileImprovementType with TypeId == river");
-    }
 
     /**
      * Call this function after changing River Magnitude or when adding/removing a River
      * @param oldMagnitude The magnitude of the River before the change
      */
-    public void adjustNeighbourRiverStyle(int oldMagnitude) {
+    private void adjustNeighbourRiverStyle(int oldMagnitude) {
         if (river == null || river.getMagnitude() == oldMagnitude) {
             // nothing changed
             return;
         }
-        Direction[] directions = {Direction.NE, Direction.SE, Direction.SW, Direction.NW};
         RiverSection mysection = new RiverSection(river.getStyle());
         // for each neighboring tile
-        for (int i = 0; i < directions.length; i++) {
-            Tile t = getTile().getMap().getNeighbourOrNull(directions[i], getTile());
+        for (Direction direction : River.directions) {
+            Tile t = getTile().getMap().getNeighbourOrNull(direction, getTile());
             if (t == null) {
                 continue;
             }
             TileImprovement otherRiver = t.getRiver();
-            if (!t.isLand() && otherRiver==null) {
+            if (!t.isLand() && otherRiver == null) {
                 // add a virtual river in the ocean/lake tile 
                 // just for the purpose of drawing the river mouth
-                t.addRiver(river.getMagnitude());
-                otherRiver = t.getRiver();
+                otherRiver = new TileImprovement(getGame(), tile, FreeCol.getSpecification()
+                                                 .getTileImprovementType("model.improvement.River"));
+                otherRiver.setMagnitude(river.getMagnitude());
             }
             if (otherRiver != null) {
                 // update the other tile river branch
-                Direction otherDirection = directions[i].getReverseDirection();
+                Direction otherDirection = direction.getReverseDirection();
                 RiverSection oppositesection = new RiverSection(otherRiver.getStyle());
                 oppositesection.setBranch(otherDirection, river.getMagnitude());
                 otherRiver.setStyle(oppositesection.encodeStyle());
                 // update the current tile river branch
-                mysection.setBranch(directions[i], river.getMagnitude());
+                mysection.setBranch(direction, river.getMagnitude());
             }
             // else the neighbor tile doesn't have a river, nothing to do
         }
@@ -609,7 +568,8 @@ public class TileItemContainer extends FreeColGameObject {
      * @throws XMLStreamException if there are any problems writing
      *      to the stream.
      */
-    protected void toXMLImpl(XMLStreamWriter out, Player player, boolean showAll, boolean toSavedGame) throws XMLStreamException {
+    protected void toXMLImpl(XMLStreamWriter out, Player player, boolean showAll, boolean toSavedGame) 
+        throws XMLStreamException {
         // Start element:
         out.writeStartElement(getXMLElementTagName());
 

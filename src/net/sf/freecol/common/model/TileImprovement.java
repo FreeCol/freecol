@@ -300,9 +300,9 @@ public class TileImprovement extends TileItem implements Locatable, Named {
 
     /**
      * Returns an int[NUMBER_OF_DIRECTIONS] array based on the baseNumber and the 'active' directions given.
-     * @param directions An int[] that gives the active directions
-     eg {Map.N, Map.NE, Map.E, Map.SE, Map.S, Map.SW, Map.W, Map.NW},
-     or {Map.E, Map.SW};
+     * @param directions An int[] that gives the active directions eg
+     * {Map.N, Map.NE, Map.E, Map.SE, Map.S, Map.SW, Map.W, Map.NW},
+     * or {Map.E, Map.SW};
      * @param baseNumber The base to be used to create the base array.
      * @return A base array that can create unique identifiers for any combination
      */

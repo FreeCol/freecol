@@ -763,10 +763,6 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
         tileItemContainer.addRiver(magnitude);
     }
 
-    public void setRiverMagnitude(int magnitude) {
-        tileItemContainer.setRiverMagnitude(magnitude);
-    }
-
     /**
      * Return the number of land tiles adjacent to this one.
      * 

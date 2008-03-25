@@ -47,7 +47,7 @@ public class River {
      * Directions a river may flow in.
      * @see net.sf.freecol.common.model.Map
      */
-    private static final Direction[] directions = {
+    public static final Direction[] directions = {
         Direction.NE, Direction.SE, Direction.SW, Direction.NW};
 
     /**
