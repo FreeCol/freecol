@@ -363,8 +363,6 @@ public class River {
             
             if (section.getSize() == TileImprovement.SMALL_RIVER || 
                 section.getSize() == TileImprovement.LARGE_RIVER) {
-                // tile.addRiver(Tile.ADD_RIVER_MAJOR, section.getBranches()); // Depreciated
-                // tile.addRiver will process the neighbouring branches as well 
                 tile.addRiver(section.getSize());
                 logger.fine("Added river (magnitude: " + section.getSize() + ") to tile at " + section.getPosition());
             }
@@ -374,7 +372,8 @@ public class River {
                 tile.addRiver(section.getSize());
                 TileImprovement newRiver = tile.getRiver();
                 newRiver.setStyle(oldRiver.getStyle());
-                logger.fine("Created fjord at " + section.getPosition());
+                logger.fine("Added fjord (magnitude: " + section.getSize() +
+                            ") to tile at " + section.getPosition());
             }
             oldSection = section;
         }

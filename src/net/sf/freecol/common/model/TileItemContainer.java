@@ -465,8 +465,8 @@ public class TileItemContainer extends FreeColGameObject {
         for (TileImprovementType tiType : tiTypeList) {
             if ("model.improvement.River".equals(tiType.getId()) &&
                 tiType.getMagnitude() <= magnitude) {
-                TileImprovement river = new TileImprovement(getGame(), tile, tiType);
-                this.river = river;
+                river = new TileImprovement(getGame(), tile, tiType);
+                river.setMagnitude(magnitude);
                 if (this.tile.getType().canHaveRiver()) {
                     // only update surrounding tiles for terrain tiles
                     // river mouth on ocean/lake tiles are treated separately
@@ -577,32 +577,6 @@ public class TileItemContainer extends FreeColGameObject {
         }
         return river.getStyle();
     }
-/* Commented because it doesn't appear to do anything valuable
-    public void updateRiver() {
-        if (river == null) {
-            return;
-        }
-        int[] directions = {Map.NE, Map.SE, Map.SW, Map.NW};
-        int[] base = Map.getBase(directions, 3);
-        int style = 0;
-        for (int i = 0; i < directions.length; i++) {
-            Tile t = getTile().getMap().getNeighbourOrNull(directions[i], getTile());
-            if (t == null) {
-                continue;
-            }
-            style += base[i] * t.getRiverStyle();
-        }
-    }
-*/
-    /**
-     * Removes all references to this object.
-     */
-    /*
-    public void dispose() {
-        disposeAllTileItems();
-        super.dispose();
-    }
-    */
 
     /**
      * Disposes all <code>TileItem</code>s in this <code>TileItemContainer</code>.

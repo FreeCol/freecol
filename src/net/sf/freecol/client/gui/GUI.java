@@ -1670,21 +1670,11 @@ public final class GUI {
                     g.drawImage(lib.getMiscImage(ti.getType().getArtOverlay()), x, y, null);
                 }
             }
-/*
-            if (tile.isPlowed()) {
-                g.drawImage(lib.getMiscImage(ImageLibrary.PLOWED), x, y, null);
-            }
-*/
+
             // Draw River if any
-            if (tic.hasRiver()) {
+            if (tic.hasRiver() && tic.getRiver().getMagnitude() < TileImprovement.FJORD_RIVER) {
                 g.drawImage(lib.getRiverImage(tic.getRiverStyle()), x, y, null);
             }
-/*
-            if (tile.getAddition() == Tile.ADD_RIVER_MAJOR
-                    || tile.getAddition() == Tile.ADD_RIVER_MINOR) {
-                g.drawImage(lib.getRiverImage(tile.getRiverStyle()), x, y, null);
-            }
-*/
             if (tile.isForested()) {
                 g.drawImage(lib.getForestImage(tile.getType()), x, y, null);
             }
@@ -1701,11 +1691,12 @@ public final class GUI {
             if (tile.hasResource()) {
                 Image bonusImage = lib.getBonusImage(tic.getResource().getType());
                 if (bonusImage != null) {
-                    g.drawImage(bonusImage, x + tileWidth/2 - bonusImage.getWidth(null)/2, y + tileHeight/2 - bonusImage.getHeight(null)/2, null);
+                    g.drawImage(bonusImage, x + tileWidth/2 - bonusImage.getWidth(null)/2,
+                                y + tileHeight/2 - bonusImage.getHeight(null)/2, null);
                 }
             }
 
-            /* Until the forest bordering tils are done... -sjm
+            /* Until the forest bordering tiles are done... -sjm
             // When that happens, use normal bordering method. - ryan
             if (tile.isLand()) {
                 for (int i = 0; i < 8; i++) {
@@ -1721,7 +1712,8 @@ public final class GUI {
                             continue;
                         }
                         if (borderingTile.isForested()) {
-                            g.drawImage(lib.getTerrainImage(ImageLibrary.FOREST, i, tile.getX(), tile.getY()), x, y - 32, null);
+                            g.drawImage(lib.getTerrainImage(ImageLibrary.FOREST, i, tile.getX(), tile.getY()),
+                            x, y - 32, null);
                         } else 
                     }
                 }
