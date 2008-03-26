@@ -88,8 +88,19 @@ public class MovementTest extends FreeColTestCase {
         tile2.setExploredBy(dutch, true);
 
         TileImprovementType roadType = spec().getTileImprovementType("model.improvement.Road");
-        tile1.getTileItemContainer().addTileItem(new TileImprovement(game, tile1, roadType));
-        tile2.getTileItemContainer().addTileItem(new TileImprovement(game, tile2, roadType));
+        TileImprovement road1 = new TileImprovement(game, tile1, roadType);
+        assertTrue(road1.isRoad());
+        assertFalse(road1.isComplete());
+        road1.setTurnsToComplete(0);
+        assertTrue(road1.isComplete());
+        tile1.getTileItemContainer().addTileItem(road1);
+        assertTrue(tile1.hasRoad());
+
+        TileImprovement road2 = new TileImprovement(game, tile2, roadType);
+        road2.setTurnsToComplete(0);
+        tile2.getTileItemContainer().addTileItem(road2);
+        assertTrue(road2.isComplete());
+        assertTrue(tile2.hasRoad());
 
         Unit colonist = new Unit(game, tile1, dutch, colonistType, UnitState.ACTIVE);
 
