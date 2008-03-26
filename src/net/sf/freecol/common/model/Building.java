@@ -1003,9 +1003,9 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
         if (goodsOutputType == null) {
             return 0;
         }
-        return (int) colony.getFeatureContainer().applyModifier(productivity,
-                                                                goodsOutputType.getId(),
-                                                                buildingType, getGame().getTurn());
+        return Math.round(colony.getFeatureContainer().applyModifier(productivity,
+                                                                     goodsOutputType.getId(),
+                                                                     buildingType, getGame().getTurn()));
     }
     
     private static Comparator<Building> buildingComparator = new Comparator<Building>() {
