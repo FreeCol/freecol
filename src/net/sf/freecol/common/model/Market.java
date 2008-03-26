@@ -421,7 +421,8 @@ public final class Market extends FreeColGameObject implements Ownable {
                 data.setPaidForSale(newPrice);
                 data.setCostToBuy(data.getPaidForSale() + goodsType.getPriceDifference());
             }
-            if (addMessages && owner != null && owner.getEurope() != null) {
+            if (addMessages && owner != null && owner.getEurope() != null && 
+                goodsType.isStorable()) {
                 if (data.getOldPrice() > data.getCostToBuy()) {
                     addModelMessage(owner.getEurope(), ModelMessage.MessageType.MARKET_PRICES, goodsType,
                                     "model.market.priceDecrease",
