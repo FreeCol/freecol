@@ -447,8 +447,24 @@ public class TileItemContainer extends FreeColGameObject {
      * Creates a river <code>TileImprovement</code> and adds to this Tile/Container.
      * Checking for overwrite is done by {@link #addTileItem}.
      * @param magnitude The Magnitude of the river to be created
+     * @param style an <code>int</code> value
      * @return The new river added, or the existing river TileImprovement
      */
+    public TileImprovement addRiver(int magnitude, int style) {
+        if (magnitude == TileImprovement.NO_RIVER) {
+            return null;
+        }
+        if (!hasRiver()) {
+            river = new TileImprovement(getGame(), tile, FreeCol.getSpecification()
+                                        .getTileImprovementType("model.improvement.River"));
+            addTileItem(river);
+        }
+        river.setMagnitude(magnitude);
+        river.setStyle(style);
+        return river;
+    }
+
+
     public TileImprovement addRiver(int magnitude) {
         if (magnitude == TileImprovement.NO_RIVER) {
             return null;

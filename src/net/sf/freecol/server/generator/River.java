@@ -167,11 +167,8 @@ public class River {
     public void grow(RiverSection lastSection, Map.Position position) {
         
         boolean found = false;
-        RiverSection section = null;
         
-        Iterator<RiverSection> sectionIterator = sections.iterator();
-        while (sectionIterator.hasNext()) {
-            section = sectionIterator.next();
+        for (RiverSection section : sections) {
             if (found) {
                 section.grow();
             } else if (section.getPosition().equals(position)) {
@@ -183,6 +180,7 @@ public class River {
         }
         drawToMap();
         if (nextRiver != null) {
+            RiverSection section = sections.get(sections.size() - 1);
             Position neighbor = Map.getAdjacent(section.getPosition(), section.direction);
             nextRiver.grow(section, neighbor);
         }
@@ -351,9 +349,7 @@ public class River {
     private void drawToMap() {
         RiverSection oldSection = null;
         
-        Iterator<RiverSection> sectionIterator = sections.iterator();
-        while (sectionIterator.hasNext()) {
-            RiverSection section = sectionIterator.next();
+        for (RiverSection section : sections) {
             riverMap.put(section.getPosition(), this);
             if (oldSection != null) {
                 section.setBranch(oldSection.direction.getReverseDirection(),
@@ -363,13 +359,13 @@ public class River {
             
             if (section.getSize() == TileImprovement.SMALL_RIVER || 
                 section.getSize() == TileImprovement.LARGE_RIVER) {
-                tile.addRiver(section.getSize());
-                logger.fine("Added river (magnitude: " + section.getSize() + ") to tile at " + section.getPosition());
-            }
-            else if (section.getSize() >= TileImprovement.FJORD_RIVER) {
+                tile.addRiver(section.getSize(), section.encodeStyle());
+                logger.fine("Added river (magnitude: " + section.getSize() +
+                            ") to tile at " + section.getPosition());
+            } else if (section.getSize() >= TileImprovement.FJORD_RIVER) {
                 TileImprovement oldRiver = tile.getRiver(); // save the previous river
                 tile.setType(greatRiver);   // changing the type resets the improvements
-                tile.addRiver(section.getSize());
+                tile.addRiver(section.getSize(), section.encodeStyle());
                 TileImprovement newRiver = tile.getRiver();
                 newRiver.setStyle(oldRiver.getStyle());
                 logger.fine("Added fjord (magnitude: " + section.getSize() +

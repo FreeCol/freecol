@@ -628,27 +628,21 @@ public class TerrainGenerator {
 
         for (int i = 0; i < number; i++) {
             River river = new River(map, riverMap);
-            for (int tries = 0; tries < 100; tries++) {
+            nextTry: for (int tries = 0; tries < 100; tries++) {
                 Position position = new Position(random.nextInt(map.getWidth()),
                                                  random.nextInt(map.getHeight()));
-                if (position.getY()==0 || position.getY()==map.getHeight()-1 ||
-                    position.getY()==1 || position.getY()==map.getHeight()-2) {
+                if (position.getY() == 0 || position.getY() == map.getHeight()-1 ||
+                    position.getY() == 1 || position.getY() == map.getHeight()-2) {
                     // please no rivers in polar regions
                     continue;
                 }
                 // check the river source/spring is not too close to the ocean
-                boolean isWaterCloseBy = false;
                 Iterator<Position> it = map.getCircleIterator(position, true, 2);
                 while (it.hasNext()) {
                     Tile neighborTile = map.getTile(it.next());
                     if (!neighborTile.isLand()) {
-                        isWaterCloseBy = true;
-                        break;
+                        continue nextTry;
                     }
-                }
-                if (isWaterCloseBy) {
-                    // do not start a new river too close to the ocean
-                    continue;
                 }
                 if (riverMap.get(position) == null) {
                     // no river here yet

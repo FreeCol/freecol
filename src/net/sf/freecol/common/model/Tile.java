@@ -755,12 +755,24 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
     }
 
     /**
-     * Adds a river to this tile.
+     * Adds a river to this tile. Use this method only if the style of
+     * the river is unknown, e.g. in the map editor.
      * 
      * @param magnitude The magnitude of the river at this point
      */
     public void addRiver(int magnitude) {
         tileItemContainer.addRiver(magnitude);
+    }
+
+    /**
+     * Adds a river to this tile. Use this method only if the style of
+     * the river is known, e.g. in the map generator.
+     * 
+     * @param magnitude The magnitude of the river at this point
+     * @param style an <code>int</code> value
+     */
+    public void addRiver(int magnitude, int style) {
+        tileItemContainer.addRiver(magnitude, style);
     }
 
     /**
