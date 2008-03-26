@@ -322,8 +322,10 @@ public final class Modifier extends Feature {
             out.writeAttribute("lastTurn", String.valueOf(getLastTurn().getNumber()));
         }
 
-        for (Scope scope : getScopes()) {
-            scope.toXMLImpl(out);
+        if (getScopes() != null) {
+            for (Scope scope : getScopes()) {
+                scope.toXMLImpl(out);
+            }
         }
 
         out.writeEndElement();
