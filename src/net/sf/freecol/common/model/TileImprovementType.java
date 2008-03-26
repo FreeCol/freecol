@@ -271,7 +271,7 @@ public final class TileImprovementType extends FreeColGameObjectType
         setId(in.getAttributeValue(null, "id"));
         natural = getAttribute(in, "natural", false);
         addWorkTurns = getAttribute(in, "add-work-turns", 0);
-        movementCost = -1;
+        movementCost = getAttribute(in, "movement-cost", -1);
         movementCostFactor = -1;
         magnitude = getAttribute(in, "magnitude", 1);
 

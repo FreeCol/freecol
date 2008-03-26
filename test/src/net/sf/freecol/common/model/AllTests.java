@@ -41,6 +41,7 @@ public class AllTests {
 	suite.addTestSuite(ModelMessageTest.class);
 	suite.addTestSuite(ModifierTest.class);
 	suite.addTestSuite(MonarchTest.class);
+	suite.addTestSuite(MovementTest.class);
 	suite.addTestSuite(NationTypeTest.class);
 	suite.addTestSuite(PlayerTest.class);
 	suite.addTestSuite(SchoolTest.class);
