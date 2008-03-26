@@ -356,22 +356,24 @@ public class River {
                         oldSection.getSize());
             }
             Tile tile = map.getTile(section.getPosition());
+            if (tile.isLand()) {
             
-            if (section.getSize() == TileImprovement.SMALL_RIVER || 
-                section.getSize() == TileImprovement.LARGE_RIVER) {
-                tile.addRiver(section.getSize(), section.encodeStyle());
-                logger.fine("Added river (magnitude: " + section.getSize() +
-                            ") to tile at " + section.getPosition());
-            } else if (section.getSize() >= TileImprovement.FJORD_RIVER) {
-                TileImprovement oldRiver = tile.getRiver(); // save the previous river
-                tile.setType(greatRiver);   // changing the type resets the improvements
-                tile.addRiver(section.getSize(), section.encodeStyle());
-                TileImprovement newRiver = tile.getRiver();
-                newRiver.setStyle(oldRiver.getStyle());
-                logger.fine("Added fjord (magnitude: " + section.getSize() +
-                            ") to tile at " + section.getPosition());
+                if (section.getSize() == TileImprovement.SMALL_RIVER || 
+                    section.getSize() == TileImprovement.LARGE_RIVER) {
+                    tile.addRiver(section.getSize(), section.encodeStyle());
+                    logger.fine("Added river (magnitude: " + section.getSize() +
+                                ") to tile at " + section.getPosition());
+                } else if (section.getSize() >= TileImprovement.FJORD_RIVER) {
+                    TileImprovement oldRiver = tile.getRiver(); // save the previous river
+                    tile.setType(greatRiver);   // changing the type resets the improvements
+                    tile.addRiver(section.getSize(), section.encodeStyle());
+                    TileImprovement newRiver = tile.getRiver();
+                    newRiver.setStyle(oldRiver.getStyle());
+                    logger.fine("Added fjord (magnitude: " + section.getSize() +
+                                ") to tile at " + section.getPosition());
+                }
+                oldSection = section;
             }
-            oldSection = section;
         }
     }
 }
