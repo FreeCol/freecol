@@ -340,7 +340,10 @@ public final class ReportTurnPanel extends ReportPanel implements ActionListener
     
     private String[] findReplacementData(ModelMessage message, String variable) {
         String[] data = message.getData();
-        if (data.length % 2 == 0) {
+        if (data == null) {
+            // message with no variables
+            return null;
+        } else if (data.length % 2 == 0) {
             for (int index = 0; index < data.length; index += 2) {
                 if (variable.equals(data[index])) {
                     return new String[] { variable, data[index + 1] };

@@ -147,7 +147,7 @@ public class Messages {
         if (messageId == null) {
             throw new NullPointerException();
         }
-        if (data.length % 2 != 0) {
+        if (data!=null && data.length % 2 != 0) {
             throw new IllegalArgumentException("Programming error, the data should consist of only pairs.");
         }
         if (messageBundle == null) {
@@ -159,7 +159,7 @@ public class Messages {
             return messageId;
         }
 
-        if (data.length > 0 && message != null) {
+        if (data!=null && data.length > 0 && message != null) {
             for (int i = 0; i < data.length; i += 2) {
                 if (data[i] == null || data[i+1] == null) {
                     throw new IllegalArgumentException("Programming error, no data should be <null>.");
