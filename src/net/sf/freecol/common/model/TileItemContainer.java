@@ -464,7 +464,6 @@ public class TileItemContainer extends FreeColGameObject {
         return river;
     }
 
-
     public TileImprovement addRiver(int magnitude) {
         if (magnitude == TileImprovement.NO_RIVER) {
             return null;
@@ -512,7 +511,7 @@ public class TileItemContainer extends FreeColGameObject {
      * Call this function after changing River Magnitude or when adding/removing a River
      * @param oldMagnitude The magnitude of the River before the change
      */
-    private void adjustNeighbourRiverStyle(int oldMagnitude) {
+    public void adjustNeighbourRiverStyle(int oldMagnitude) {
         if (river == null || river.getMagnitude() == oldMagnitude) {
             // nothing changed
             return;

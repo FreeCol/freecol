@@ -61,9 +61,6 @@ public final class MapEditorTransformPanel extends FreeColPanel {
     @SuppressWarnings("unused")
     private static final Logger logger = Logger.getLogger(MapEditorTransformPanel.class.getName());
     
-
-
-
     private static final int MINOR_RIVER = -1,
             MAJOR_RIVER = -2,
             RESOURCE = -3,
@@ -123,18 +120,24 @@ public final class MapEditorTransformPanel extends FreeColPanel {
     private void buildButton(int index, String text, final MapTransform mt) {
         Image scaledImage;
         Image image;
-        if (index == MINOR_RIVER) {
+        switch(index) {
+        case MINOR_RIVER:
             image = library.getRiverImage(10);
-        } else if (index == MAJOR_RIVER) {
+            break;
+        case MAJOR_RIVER:
             image = library.getRiverImage(10);
-        } else if (index == RESOURCE) {
+            break;
+        case RESOURCE:
             image = library.getBonusImage(FreeCol.getSpecification().getResourceType(0));
-        } else if (index == LOST_CITY_RUMOUR) {
+            break;
+        case LOST_CITY_RUMOUR:
             image = library.getMiscImage(ImageLibrary.LOST_CITY_RUMOUR);
-        } else {
+            break;
+        default:
             image = library.getScaledTerrainImage(FreeCol.getSpecification().getTileType(index), 1.0f);
+            break;
         }
-        scaledImage = image.getScaledInstance((int) (image.getWidth(null) * 0.5f), (int) (image.getHeight(null) * 0.5f), Image.SCALE_SMOOTH);
+        scaledImage = library.scaleImage(image, 0.5f);
         
         JPanel descriptionPanel = new JPanel(new BorderLayout());
         descriptionPanel.add(new JLabel(new ImageIcon(image)), BorderLayout.CENTER);
@@ -215,30 +218,6 @@ public final class MapEditorTransformPanel extends FreeColPanel {
             t.setLostCityRumour(false);
         }
     }
-/*  Depreciated    
-    private class ForestTransform extends MapTransform {
-        public void transform(Tile t) {
-            t.setForested(true);            
-        }
-    }
-
-    private class AdditionTransform extends MapTransform {
-        private int addition;
-        
-        private AdditionTransform(int addition) {
-            this.addition = addition;
-        }
-        
-        public void transform(Tile t) {
-            if (addition == Tile.ADD_RIVER_MAJOR ||
-                addition == Tile.ADD_RIVER_MINOR) {
-                t.addRiver(addition);
-            } else {
-                t.setAddition(addition);            
-            }
-        }
-    }
-*/
     
     private class RiverTransform extends MapTransform {
         private int magnitude;
@@ -251,7 +230,7 @@ public final class MapEditorTransformPanel extends FreeColPanel {
             if (t.getType().canHaveRiver()) {
                 // only add a river on terrain tiles
                 // river mouth on ocean/lake tiles are treated separately
-                t.addRiver(magnitude);
+                t.getTileItemContainer().addRiver(magnitude);
             }
         }
     }
