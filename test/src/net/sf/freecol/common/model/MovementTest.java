@@ -111,4 +111,37 @@ public class MovementTest extends FreeColTestCase {
 
     }
 
+    public void testMoveAlongRiver() throws Exception {
+
+        Game game = getStandardGame();
+        Player dutch = game.getPlayer("model.nation.dutch");
+        Map map = getTestMap(plains);
+        game.setMap(map);
+        Tile tile1 = map.getTile(5, 8);
+        Tile tile2 = map.getTile(4, 8);
+        tile1.setExploredBy(dutch, true);
+        tile2.setExploredBy(dutch, true);
+
+        TileImprovementType riverType = spec().getTileImprovementType("model.improvement.River");
+        TileImprovement river1 = new TileImprovement(game, tile1, riverType);
+        assertTrue(river1.isRiver());
+        assertTrue(river1.isComplete());
+        tile1.getTileItemContainer().addTileItem(river1);
+        assertTrue(tile1.hasRiver());
+
+        TileImprovement river2 = new TileImprovement(game, tile2, riverType);
+        river2.setTurnsToComplete(0);
+        tile2.getTileItemContainer().addTileItem(river2);
+        assertTrue(river2.isComplete());
+        assertTrue(tile2.hasRiver());
+
+        Unit colonist = new Unit(game, tile1, dutch, colonistType, UnitState.ACTIVE);
+
+        int moveCost = 1;
+        assertEquals(moveCost, tile2.getMoveCost(tile1));
+        assertEquals(Math.min(moveCost, colonistType.getMovement()),
+                     colonist.getMoveCost(tile2));
+
+    }
+
 }
