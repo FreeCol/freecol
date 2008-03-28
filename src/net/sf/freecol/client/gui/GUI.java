@@ -81,9 +81,6 @@ public final class GUI {
 
     private static final Logger logger = Logger.getLogger(GUI.class.getName());
 
-    private static final Direction[] southernDirections = new Direction[] {
-        Direction.SE, Direction.S, Direction.SW };
-
     private final FreeColClient freeColClient;
     private Dimension size;
     private ImageLibrary lib;
@@ -1607,12 +1604,14 @@ public final class GUI {
      *        unexplored terrain.
      * @param withNumber indicates if the number of inhabitants should be drawn too.
      */
-    private void displayTileOverlays(Graphics2D g, Map map, Tile tile, int x, int y, boolean drawUnexploredBorders, boolean withNumber) {  
+    private void displayTileOverlays(Graphics2D g, Map map, Tile tile, int x, int y,
+                                     boolean drawUnexploredBorders, boolean withNumber) {  
         displayAdditionsAndImprovements(g, map, tile, x, y);
         displaySettlement(g, map, tile, x, y, withNumber);
         displayFogOfWar(g, map, tile, x, y);
-        if (drawUnexploredBorders)
+        if (drawUnexploredBorders) {
             displayUnexploredBorders(g, map, tile, x, y);
+        }
         displayOptionalValues(g, map, tile, x, y);
     }
 
@@ -1914,7 +1913,7 @@ public final class GUI {
         if (tile.isExplored()) {
             Map.Position pos = new Map.Position(tile.getX(), tile.getY());
 
-            for (Direction direction : southernDirections) {
+            for (Direction direction : Direction.values()) {
                 Map.Position p = Map.getAdjacent(pos, direction);
                 if (map.isValid(p)) {
                     Tile borderingTile = map.getTile(p);

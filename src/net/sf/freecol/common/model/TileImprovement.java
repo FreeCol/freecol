@@ -35,10 +35,9 @@ import org.w3c.dom.Element;
 
 
 /**
- * Represents a locatable goods of a specified type and quantity.
+ * Represents a tile improvement, such as a river or road.
  */
 public class TileImprovement extends TileItem implements Locatable, Named {
-
 
     private static Logger logger = Logger.getLogger(TileImprovement.class.getName());
 
