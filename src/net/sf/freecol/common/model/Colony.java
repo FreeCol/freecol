@@ -116,6 +116,10 @@ public final class Colony extends Settlement implements Location, Nameable {
         oldSonsOfLiberty = 0;
         final Map map = game.getMap();
         tile.setOwner(owner);
+        TileImprovement road = new TileImprovement(game, tile, FreeCol.getSpecification()
+                                                   .getTileImprovementType("model.improvement.Road"));
+        road.setTurnsToComplete(0);
+        tile.add(road);
         for (Direction direction : Direction.values()) {
             Tile t = map.getNeighbourOrNull(direction, tile);
             if (t == null) {

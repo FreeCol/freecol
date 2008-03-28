@@ -1906,18 +1906,15 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
             Colony colony = new Colony(getGame(), player, name, unit.getTile());
             Element reply = Message.createNewRootElement("buildColonyConfirmed");
             reply.appendChild(colony.toXMLElement(player, reply.getOwnerDocument()));
-            if (colony.getLineOfSight() > unit.getLineOfSight()) {
-                Element updateElement = reply.getOwnerDocument().createElement("update");
-                List<Tile> surroundingTiles = getGame().getMap().getSurroundingTiles(unit.getTile(),
-                        colony.getLineOfSight());
-                for (int i = 0; i < surroundingTiles.size(); i++) {
-                    Tile t = surroundingTiles.get(i);
-                    if (t != unit.getTile()) {
-                        updateElement.appendChild(t.toXMLElement(player, reply.getOwnerDocument()));
-                    }
+            Element updateElement = reply.getOwnerDocument().createElement("update");
+            int range = colony.getLineOfSight();
+            if (range > unit.getLineOfSight()) {
+                for (Tile t : getGame().getMap().getSurroundingTiles(unit.getTile(), range)) {
+                    updateElement.appendChild(t.toXMLElement(player, reply.getOwnerDocument()));
                 }
-                reply.appendChild(updateElement);
             }
+            updateElement.appendChild(unit.getTile().toXMLElement(player, reply.getOwnerDocument()));
+            reply.appendChild(updateElement);
             unit.buildColony(colony);
             sendUpdatedTileToAll(unit.getTile(), player);
             return reply;

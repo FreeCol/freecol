@@ -516,7 +516,6 @@ public final class InGameController implements NetworkConstants {
                 Element updateElement = (Element) reply.getElementsByTagName("update").item(0);
                 freeColClient.getInGameInputHandler().update(updateElement);
             }
-
             Colony colony = (Colony) game.getFreeColGameObject(((Element) reply.getChildNodes().item(0))
                     .getAttribute("ID"));
             if (colony == null) {

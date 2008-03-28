@@ -1073,7 +1073,8 @@ public class Map extends FreeColGameObject {
     }
 
     /**
-     * Returns all the tiles surrounding the given tile within the given range.
+     * Returns all the tiles surrounding the given tile within the
+     * given range. The center tile itself is not included.
      * 
      * @param t
      *            The tile that lies on the center of the tiles to return.

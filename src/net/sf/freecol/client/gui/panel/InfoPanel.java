@@ -347,7 +347,6 @@ public final class InfoPanel extends FreeColPanel {
                 } else {
                     counter++;
                 }
-                goodsPanel.add(goodsLabel);
             }
             goodsPanel.validate();
         }
@@ -364,42 +363,23 @@ public final class InfoPanel extends FreeColPanel {
             if (tile != null) {
                 tileNameLabel.setText(tile.getName());
                 labelPanel.add(tileNameLabel, higConst.rc(1, 1));
-                String text;
+                StringBuilder text = new StringBuilder();
                 int row = 2;
-                
-                text = "";
-                TileImprovement river = tile.getRiver();
-                if (river != null) {
-                    if (river.getMagnitude() == 1) {
-                        text = Messages.message("minorRiver");
-                    } else if (river.getMagnitude() > 1) {
-                        text = Messages.message("majorRiver");
-                    }
-                }
-                if (tile.hasRoad()) {
-                    if (!text.equals("")) {
-                        text += ", ";
-                    }
-                    text += Messages.message("road");
-                }
-                riverRoadLabel.setText(text);
-                if (!text.equals("")) {
-                    labelPanel.add(riverRoadLabel, higConst.rc(row, 1));
-                    row++;
-                }
-
-                text = "";
-                if (tile.isPlowed()) {
-                    text = Messages.message("plowed");
-                    if (tile.getOwner() != null) {
-                        text += ", ";
-                    }
+                for (TileImprovement tileImprovement : tile.getCompletedTileImprovements()) {
+                    text.append(tileImprovement.getType().getDescription());
+                    text.append(", ");
                 }
                 if (tile.getOwner() != null) {
-                    text += tile.getOwner().getNationAsString();
+                    text.append(tile.getOwner().getNationAsString());
+                } else {
+                    int length = text.length();
+                    if (length > 2) {
+                        text.delete(length - 2, length);
+                    }
                 }
-                plowOwnerLabel.setText(text);
-                if (!text.equals("")) {
+
+                if (text.length() > 0) {
+                    plowOwnerLabel.setText(text.toString());
                     labelPanel.add(plowOwnerLabel, higConst.rc(row, 1));
                     row++;
                 }
@@ -420,8 +400,8 @@ public final class InfoPanel extends FreeColPanel {
                 int width = library.getTerrainImageWidth(tile.getType());
                 int height = library.getTerrainImageHeight(tile.getType());
                 BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
-                freeColClient.getGUI().displayTerrain(image.createGraphics(), freeColClient.getGame().getMap(), tile,
-                        0, 0);
+                freeColClient.getGUI().displayTerrain(image.createGraphics(), freeColClient.getGame().getMap(),
+                                                      tile, 0, 0);
                 tileLabel.setIcon(new ImageIcon(image));
             } else {
                 tileLabel.setIcon(null);

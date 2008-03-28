@@ -349,7 +349,7 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
 
     /**
      * Returns the treasure train carrying the largest treasure located on this
-     * <code>Tile</code>.
+     * <code>Tile</code>. This is only ever used by the AIPlayer.
      * 
      * @return The best treasure train or <code>null</code> if no treasure
      *         train is located on this <code>Tile</code>.
@@ -649,7 +649,7 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
      * @return 'true' if this Tile has a road.
      */
     public boolean hasRoad() {
-        return getTileItemContainer().hasRoad() || (getSettlement() != null);
+        return getTileItemContainer().hasRoad();
     }
 
     public TileImprovement getRoad() {
@@ -660,19 +660,6 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
         return getTileItemContainer().hasRiver();
     }
 
-    /**
-     * Returns 'true' if this Tile has been plowed.
-     * 
-     * @return 'true' if this Tile has been plowed.
-     *
-     * TODO: remove as soon as alternative is clear
-     * 
-     * @deprecated Plowing is an specification dependent improvement type and should not be needed.
-     */
-    public boolean isPlowed() {
-        return hasImprovement(FreeCol.getSpecification().getTileImprovementType("model.improvement.Plow"));
-    }
-    
     /**
      * Returns 'true' if this Tile has a resource on it.
      * 
@@ -1833,19 +1820,6 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
             }
         }
     }
-
-    /**
-     * Updates the information about this <code>Tile</code> for the given
-     * <code>Player</code>.
-     * 
-     * @param nation The {@link Player#getNationID nation} identifying the
-     *            <code>Player</code>.
-     */
-    /*
-    public void updatePlayerExploredTile(int nation) {
-        updatePlayerExploredTile(getGame().getPlayer(nation));
-    }
-    */
 
     /**
      * Checks if this <code>Tile</code> has been explored by the given
