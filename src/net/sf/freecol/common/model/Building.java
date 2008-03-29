@@ -478,8 +478,6 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
         final GoodsType goodsInputType = getGoodsInputType();
         final GoodsType goodsOutputType = getGoodsOutputType();
 
-        System.out.println(getName() + " " + goodsOutput);
-
         if (goodsInput == 0 && !canAutoProduce() && getMaximumGoodsInput() > 0) {
             addModelMessage(getColony(), ModelMessage.MessageType.MISSING_GOODS,
                             goodsInputType,
