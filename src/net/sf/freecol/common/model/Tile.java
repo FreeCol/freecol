@@ -382,9 +382,10 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
             return 0;
         } else {
             int value = potential(Goods.FOOD) * 3;
-
+            
             boolean nearbyTileHasForest = false;
             boolean nearbyTileIsOcean = false;
+            boolean nearbyTileHasOre = false;
 
             for (Tile tile : getGame().getMap().getSurroundingTiles(this, 1)) {
                 if (tile.getColony() != null) {
@@ -400,6 +401,9 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
                         }
                         if (tile.isForested()) {
                             nearbyTileHasForest = true;
+                        }
+                        if (tile.potential(Goods.ORE)>=4) {
+                            nearbyTileHasOre = true;
                         }
                     } else {
                         nearbyTileIsOcean = true;
@@ -430,8 +434,17 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
             }
 
             if (!nearbyTileHasForest) {
+                // colonies with no access to forest are penalized
+                // as they must import wood necessary for production
                 value -= 30;
             }
+            
+            if (!nearbyTileHasOre) {
+                // colonies with no access to ore mine are penalized
+                // as they must import ore or tools necessary for production
+                value -= 50;
+            }
+            
             if (!nearbyTileIsOcean) {
                 // TODO: Uncomment when wagon train code has been written:
                 // value -= 20;
@@ -2342,5 +2355,14 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
      */
     public boolean isOccupied() {
         return getOccupyingUnit() != null;
+    }
+    
+    /**
+     * Returns a String representation of this Tile.
+     * 
+     * @return A String representation of this Tile.
+     */
+    public String toString() {
+        return "Tile("+x+","+y+"):"+((type==null)?"unknown":type.getId());
     }
 }
