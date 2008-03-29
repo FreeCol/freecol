@@ -366,16 +366,13 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
      *            this <code>WorkLocation</code>.
      */
     public void remove(final Locatable locatable) {
-        if (!(locatable instanceof Unit)) {
+        if (locatable instanceof Unit) {
+            if (units.remove(locatable)) {
+                ((Unit) locatable).setMovesLeft(0);
+                getColony().updatePopulation();
+            }
+        } else {
             throw new IllegalStateException();
-        }
-
-        final int index = units.indexOf(locatable);
-
-        if (index != -1) {
-            ((Unit) locatable).setMovesLeft(0);
-            units.remove(index);
-            getColony().updatePopulation();
         }
     }
 
@@ -393,11 +390,7 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
      *            </ul>
      */
     public boolean contains(final Locatable locatable) {
-        if (locatable instanceof Unit) {
-            return units.contains(locatable);
-        }
-
-        return false;
+        return units.contains(locatable);
     }
 
     /**
@@ -406,11 +399,11 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
      * @return The <code>Unit</code>.
      */
     public Unit getFirstUnit() {
-        if (!units.isEmpty()) {
+        if (units.isEmpty()) {
+            return null;
+        } else {
             return units.get(0);
         }
-
-        return null;
     }
 
     /**
@@ -419,11 +412,11 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
      * @return The <code>Unit</code>.
      */
     public Unit getLastUnit() {
-        if (!units.isEmpty()) {
+        if (units.isEmpty()) {
+            return null;
+        } else {
             return units.get(units.size() - 1);
         }
-
-        return null;
     }
 
     /**
@@ -470,11 +463,10 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
             if (unit.isNaval() && unit.isUnderRepair()) {
                 unit.setHitpoints(unit.getHitpoints() + 1);
                 if (!unit.isUnderRepair()) {
-                    addModelMessage(this, "model.unit.shipRepaired",
-                            new String[][] {
-                                { "%unit%", unit.getName() },
-                                { "%repairLocation%", getLocationName() } },
-                                ModelMessage.MessageType.DEFAULT, this);
+                    addModelMessage(this, ModelMessage.MessageType.DEFAULT, this,
+                                    "model.unit.shipRepaired",
+                                    "%unit%", unit.getName(),
+                                    "%repairLocation%", getLocationName());
                 }
             }
         }
@@ -486,11 +478,15 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
         final GoodsType goodsInputType = getGoodsInputType();
         final GoodsType goodsOutputType = getGoodsOutputType();
 
+        System.out.println(getName() + " " + goodsOutput);
+
         if (goodsInput == 0 && !canAutoProduce() && getMaximumGoodsInput() > 0) {
-            addModelMessage(getColony(), "model.building.notEnoughInput", new String[][] {
-                    { "%inputGoods%", goodsInputType.getName() }, { "%building%", getName() },
-                    { "%colony%", colony.getName() } }, ModelMessage.MessageType.MISSING_GOODS,
-                goodsInputType);
+            addModelMessage(getColony(), ModelMessage.MessageType.MISSING_GOODS,
+                            goodsInputType,
+                            "model.building.notEnoughInput",
+                            "%inputGoods%", goodsInputType.getName(),
+                            "%building%", getName(),
+                            "%colony%", colony.getName());
         }
 
         if (goodsOutput <= 0) {
@@ -703,9 +699,7 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
         if (buildingType.hasAbility("model.ability.expertsUseConnections") &&
                 getGameOptions().getBoolean(GameOptions.EXPERTS_HAVE_CONNECTIONS)) {
             int minimumProduction = 0;
-            Iterator<Unit> i = getUnitIterator();
-            while (i.hasNext()) {
-                final Unit unit = i.next();
+            for (Unit unit: units) {
                 if (unit.getType() == getExpertUnitType()) {
                     minimumProduction += 4;
                 }
@@ -837,7 +831,7 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
     }
     
     /**
-     * Returns the actual production of a buliding with 0 workplaces for next turn
+     * Returns the actual production of a building with 0 workplaces for next turn
      */
     private int getAutoProductionNextTurn() {
         if (getGoodsOutputType() == null) {
@@ -903,8 +897,6 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
      * Returns the maximum productivity of worker/s currently working
      * in this building.
      *
-     * It doesn't add production bonus of colony
-     *
      * @return The maximum returns from workers in this building,
      *         assuming enough "input goods".
      */
@@ -914,9 +906,8 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
         }
 
         int productivity = 0;
-        Iterator<Unit> unitIterator = getUnitIterator();
-        while (unitIterator.hasNext()) {
-            productivity += getProductivity(unitIterator.next());
+        for (Unit unit : units) {
+            productivity += getProductivity(unit);
         }
         return productivity;
     }
@@ -928,10 +919,7 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
      *         assuming enough "input goods".
      */
     public int getProductivity(Unit prodUnit) {
-        if (getGoodsOutputType() == null) {
-            return 0;
-        }
-        if (prodUnit == null) {
+        if (getGoodsOutputType() == null || prodUnit == null) {
             return 0;
         }
 
@@ -960,7 +948,7 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
     }
     
     /**
-     * Returns the maximum production of a buliding with 0 workplaces
+     * Returns the maximum production of a building with 0 workplaces
      */
     private int getMaximumAutoProduction() {
         int available = colony.getGoodsCount(getGoodsOutputType());

@@ -3190,9 +3190,10 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
     public int getProductionOf(GoodsType goodsType, int base) {
         if (base == 0) {
             return 0;
+        } else {
+            return Math.round(FeatureContainer.applyModifierSet(base, getGame().getTurn(),
+                                                                getModifierSet(goodsType.getId())));
         }
-        return (int) FeatureContainer.applyModifierSet(base, getGame().getTurn(),
-                                                       getModifierSet(goodsType.getId()));
     }
 
     /**

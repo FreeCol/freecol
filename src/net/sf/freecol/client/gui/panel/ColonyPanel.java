@@ -1535,7 +1535,8 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener {
                 TileType tileType = colonyTile.getTile().getType();
                 // Size and position:
                 setSize(lib.getTerrainImageWidth(tileType), lib.getTerrainImageHeight(tileType));
-                setLocation(((2 - x) + y) * lib.getTerrainImageWidth(tileType) / 2, (x + y) * lib.getTerrainImageHeight(tileType) / 2);
+                setLocation(((2 - x) + y) * lib.getTerrainImageWidth(tileType) / 2,
+                            (x + y) * lib.getTerrainImageHeight(tileType) / 2);
             }
 
             /**
