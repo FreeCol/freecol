@@ -1141,7 +1141,7 @@ public class IndianSettlement extends Settlement {
             out.writeAttribute("hasBeenVisited", Boolean.toString(isVisited));
             out.writeAttribute("convertProgress", Integer.toString(convertProgress));
             if (learnableSkill != null) {
-                out.writeAttribute("learnableSkill", Integer.toString(learnableSkill.getIndex()));
+                out.writeAttribute("learnableSkill", learnableSkill.getId());
             }
             for (int i = 0; i < wantedGoods.length; i++) {
                 String tag = "wantedGoods" + Integer.toString(i);
@@ -1231,7 +1231,7 @@ public class IndianSettlement extends Settlement {
         lastTribute = getAttribute(in, "lastTribute", 0);
         String learnableSkillStr = getAttribute(in, "learnableSkill", null);
         if (learnableSkillStr != null) {
-            learnableSkill = FreeCol.getSpecification().getUnitType(Integer.parseInt(learnableSkillStr));
+            learnableSkill = FreeCol.getSpecification().getUnitType(learnableSkillStr);
         }
 
         alarm = new HashMap<Player, Tension>();

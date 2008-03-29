@@ -1534,7 +1534,7 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
                     out.writeAttribute("owner", getSettlement().getOwner().getId());
                     out.writeAttribute("isCapital", Boolean.toString(is.isCapital()));
                     if (pet.getSkill() != null) {
-                        out.writeAttribute("learnableSkill", Integer.toString(pet.getSkill().getIndex()));
+                        out.writeAttribute("learnableSkill", pet.getSkill().getId());
                     }
                     if (pet.getHighlyWantedGoods() != null) {
                         out.writeAttribute("wantedGoods0", pet.getHighlyWantedGoods().getId());
@@ -2157,7 +2157,7 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
                 out.writeAttribute("colonyStockadeLevel", Integer.toString(colonyStockadeLevel));
             }
             if (skill != null) {
-                out.writeAttribute("learnableSkill", Integer.toString(skill.getIndex()));
+                out.writeAttribute("learnableSkill", skill.getId());
             }
             out.writeAttribute("settlementVisited", Boolean.toString(settlementVisited));
             if (highlyWantedGoods != null) {
@@ -2224,7 +2224,7 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
             Specification spec = FreeCol.getSpecification();
             final String learnableSkillStr = in.getAttributeValue(null, "learnableSkill");
             if (learnableSkillStr != null) {
-                skill = spec.getUnitType(Integer.parseInt(learnableSkillStr));
+                skill = spec.getUnitType(learnableSkillStr);
             } else {
                 skill = null;
             }

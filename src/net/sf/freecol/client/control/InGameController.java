@@ -2723,7 +2723,8 @@ public final class InGameController implements NetworkConstants {
         if (reply.getTagName().equals("scoutIndianSettlementResult")) {
             UnitType skill = null;
             String skillStr = reply.getAttribute("skill");
-            if (skillStr != null) {
+            // TODO: find out how skillStr can be empty
+            if (skillStr != null && !skillStr.equals("")) {
                 skill = FreeCol.getSpecification().getUnitType(skillStr);
             }
             settlement.setLearnableSkill(skill);
