@@ -491,7 +491,7 @@ public class Connection {
                 final Message msg = new Message(in);
 
                 final Connection connection = this;
-                Thread t = new Thread() {
+                Thread t = new Thread(msg.getType()) {
                     @Override
                     public void run() {
                         try {

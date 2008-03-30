@@ -491,7 +491,7 @@ public final class InGameController extends Controller {
      */
     private void monarchAction(ServerPlayer player) {
         final ServerPlayer nextPlayer = player;
-        Thread t = new Thread() {
+        Thread t = new Thread("monarchAction") {
                 public void run() {
                     try {
                         Monarch monarch = nextPlayer.getMonarch();
