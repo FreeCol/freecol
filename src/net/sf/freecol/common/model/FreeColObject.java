@@ -298,56 +298,6 @@ public abstract class FreeColObject {
     }
      
     /**
-     * Creates an XML-representation of an array.
-     * 
-     * @param tagName The tagname for the <code>Element</code>
-     *       representing the array.
-     * @param array The array to represent.
-     * @param out The target stream.
-     * @throws XMLStreamException if there are any problems writing
-     *      to the stream.
-     */
-    protected void toArrayElement(String tagName, float[] array, XMLStreamWriter out)
-        throws XMLStreamException {
-        out.writeStartElement(tagName);
-        
-        out.writeAttribute("xLength", Integer.toString(array.length));
-        for (int x=0; x < array.length; x++) {
-            out.writeAttribute("x" + Integer.toString(x), Float.toString(array[x]));
-        }
-        
-        out.writeEndElement();
-    }
-
-    /**
-     * Reads an XML-representation of an array.
-     * 
-     * @param tagName The tagname for the <code>Element</code>
-     *       representing the array.
-     * @param in The input stream with the XML.
-     * @param arrayType The type of array to be read.
-     * @return The array.
-     * @throws XMLStreamException if a problem was encountered
-     *      during parsing.
-     */               
-    protected float[] readFromArrayElement(String tagName, XMLStreamReader in, float[] arrayType)
-        throws XMLStreamException {
-        if (!in.getLocalName().equals(tagName)) {
-            in.nextTag();
-        }
-        
-        float[] array = new float[Integer.parseInt(in.getAttributeValue(null, "xLength"))];
-        
-        for (int x=0; x<array.length; x++) {
-            array[x] = Float.parseFloat(in.getAttributeValue(null, "x" + Integer.toString(x)));
-        }
-        
-        in.nextTag();
-        return array;
-    }
-    
-
-    /**
      * Reads an XML-representation of an array.
      * 
      * @param tagName The tagname for the <code>Element</code>
