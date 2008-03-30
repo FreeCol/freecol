@@ -229,12 +229,6 @@ public class SimpleCombatModel implements CombatModel {
                                         -12.5f * goodsCount,
                                         Modifier.Type.PERCENTAGE));
             }
-            /* this should no longer be necessary, as Drake adds an
-             * offence bonus directly
-            if (attacker.hasAbility("model.ability.piracy")) {
-                result.addAll(attacker.getModifierSet("model.modifier.piracyBonus"));
-            }
-            */
         } else {
             for (EquipmentType equipment : attacker.getEquipment()) {
                 result.addAll(equipment.getFeatureContainer().getModifierSet("model.modifier.offence"));
@@ -249,35 +243,34 @@ public class SimpleCombatModel implements CombatModel {
                 result.add(SMALL_MOVEMENT_PENALTY);
             }
 
-            // In the open
-            if (defender != null && defender.getTile() != null && defender.getTile().getSettlement() == null) {
+            if (defender != null && defender.getTile() != null) {
 
-                /**
-                 * Ambush bonus in the open = defender's defence bonus, if
-                 * defender is REF, or attacker is indian.
-                 */
-                if (attacker.hasAbility("model.ability.ambushBonus") ||
-                    defender.hasAbility("model.ability.ambushPenalty")) {
-                    result.add(new Modifier("model.modifier.offence",
-                                            "modifiers.ambushBonus", 
-                                            defender.getTile().defenceBonus(),
-                                            Modifier.Type.PERCENTAGE));
+                if (defender.getTile().getSettlement() == null) {
+                    // In the open
+
+                    /**
+                     * Ambush bonus in the open = defender's defence bonus, if
+                     * defender is REF, or attacker is indian.
+                     */
+                    if (attacker.hasAbility("model.ability.ambushBonus") ||
+                        defender.hasAbility("model.ability.ambushPenalty")) {
+                        result.add(new Modifier("model.modifier.offence",
+                                                "modifiers.ambushBonus", 
+                                                defender.getTile().defenceBonus(),
+                                                Modifier.Type.PERCENTAGE));
+                    }
+
+                    // 75% Artillery in the open penalty
+                    if (attacker.hasAbility("model.ability.bombard")) {
+                        result.add(ARTILLERY_PENALTY);
+                    }
+                } else {
+                    // Attacking a settlement
+                    // REF bombardment bonus
+                    result.addAll(attacker.getModifierSet("model.modifier.bombardBonus"));
                 }
-
-                // 75% Artillery in the open penalty
-                // TODO: is it right? or should it be another ability?
-                if (attacker.hasAbility("model.ability.bombard")) {
-                    result.add(ARTILLERY_PENALTY);
-                }
-            }
-
-            // Attacking a settlement
-            if (defender != null && defender.getTile() != null && defender.getTile().getSettlement() != null) {
-                // REF bombardment bonus
-                result.addAll(attacker.getModifierSet("model.modifier.bombardBonus"));
             }
         }
-
         return result;
     }
 
@@ -354,12 +347,6 @@ public class SimpleCombatModel implements CombatModel {
                                         -12.5f * goodsCount,
                                         Modifier.Type.PERCENTAGE));
             }
-            /* this should no longer be necessary, as Drake adds an
-             * defence bonus directly
-            if (defender.hasAbility("model.ability.piracy")) {
-                result.addAll(defender.getModifierSet("model.modifier.piracyBonus"));
-            }
-            */
         } else {
             // Paul Revere makes an unarmed colonist in a settlement pick up
             // a stock-piled musket if attacked, so the bonus should be applied
@@ -390,7 +377,6 @@ public class SimpleCombatModel implements CombatModel {
                 if (tile.getSettlement() != null) {
                     result.addAll(tile.getSettlement().getFeatureContainer()
                                   .getModifierSet("model.modifier.defence"));
-                    // TODO: is it right? or should it be another ability?
                     if (defender.hasAbility("model.ability.bombard") &&
                         attacker.getOwner().isIndian()) {
                         // 100% defence bonus against an Indian raid
@@ -403,7 +389,6 @@ public class SimpleCombatModel implements CombatModel {
                         // Terrain defensive bonus.
                         result.addAll(tile.getType().getDefenceBonus());
                     }
-                    // TODO: is it right? or should it be another ability?
                     if (defender.hasAbility("model.ability.bombard") &&
                         defender.getState() != UnitState.FORTIFIED) {
                         // -75% Artillery in the Open penalty
