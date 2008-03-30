@@ -49,6 +49,11 @@ public abstract class FreeColObject {
     protected static Logger logger = Logger.getLogger(FreeColObject.class.getName());
 
     /**
+     * XML tag name for array elements.
+     */
+    protected static final String ARRAY_SIZE = "xLength";
+
+    /**
      * Unique identifier of an object
      */
     private String id;
@@ -289,7 +294,7 @@ public abstract class FreeColObject {
         throws XMLStreamException {
         out.writeStartElement(tagName);
         
-        out.writeAttribute("xLength", Integer.toString(array.length));
+        out.writeAttribute(ARRAY_SIZE, Integer.toString(array.length));
         for (int x=0; x < array.length; x++) {
             out.writeAttribute("x" + Integer.toString(x), Integer.toString(array[x]));
         }
@@ -314,7 +319,7 @@ public abstract class FreeColObject {
             in.nextTag();
         }
         
-        int[] array = new int[Integer.parseInt(in.getAttributeValue(null, "xLength"))];
+        int[] array = new int[Integer.parseInt(in.getAttributeValue(null, ARRAY_SIZE))];
         
         for (int x=0; x<array.length; x++) {
             array[x] = Integer.parseInt(in.getAttributeValue(null, "x" + Integer.toString(x)));
@@ -338,7 +343,7 @@ public abstract class FreeColObject {
         throws XMLStreamException {
         out.writeStartElement(tagName);
         
-        out.writeAttribute("xLength", Integer.toString(array.length));
+        out.writeAttribute(ARRAY_SIZE, Integer.toString(array.length));
         for (int x=0; x < array.length; x++) {
             out.writeAttribute("x" + Integer.toString(x), array[x]);
         }
@@ -363,7 +368,7 @@ public abstract class FreeColObject {
         if (!in.getLocalName().equals(tagName)) {
             in.nextTag();
         }
-        String[] array = new String[Integer.parseInt(in.getAttributeValue(null, "xLength"))];        
+        String[] array = new String[Integer.parseInt(in.getAttributeValue(null, ARRAY_SIZE))];        
         for (int x=0; x<array.length; x++) {
             array[x] = in.getAttributeValue(null, "x" + Integer.toString(x));
         }

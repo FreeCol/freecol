@@ -62,6 +62,11 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
 
     private static final Logger logger = Logger.getLogger(Unit.class.getName());
 
+    /**
+     * XML tag name for equipment list.
+     */
+    private static final String EQUIPMENT_TAG = "equipment";
+
     /** A state a Unit can have. */
     public static enum UnitState { ACTIVE, FORTIFIED, SENTRY, IN_COLONY,
             IMPROVING,      // All TileImprovements use state of IMPROVING
@@ -3389,12 +3394,15 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
             }
         }
 
-        if (equipment.size() > 0) {
-            String[] equipmentStrings = new String[equipment.size()];
-            for (int index = 0; index < equipment.size(); index++) {
-                equipmentStrings[index] = equipment.get(index).getId();
+        if (!equipment.isEmpty()) {
+            out.writeStartElement(EQUIPMENT_TAG);
+            out.writeAttribute(ARRAY_SIZE, Integer.toString(equipment.size()));
+            int index = 0;
+            for (EquipmentType type : equipment) {
+                out.writeAttribute("x" + Integer.toString(index), type.getId());
+                index++;
             }
-            toArrayElement("equipment", equipmentStrings, out);
+            out.writeEndElement();
         }
 
         out.writeEndElement();
@@ -3523,11 +3531,13 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
                 } else {
                     goodsContainer = new GoodsContainer(getGame(), this, in);
                 }
-            } else if (in.getLocalName().equals("equipment")) {
-                String[] equipmentStrings = readFromArrayElement("equipment", in, new String[0]);
-                for (String equipmentId : equipmentStrings) {
+            } else if (in.getLocalName().equals(EQUIPMENT_TAG)) {
+                int length = Integer.parseInt(in.getAttributeValue(null, ARRAY_SIZE));
+                for (int index = 0; index < length; index++) {
+                    String equipmentId = in.getAttributeValue(null, "x" + String.valueOf(index));
                     equipment.add(FreeCol.getSpecification().getEquipmentType(equipmentId));
                 }
+                in.nextTag();
             } else if (in.getLocalName().equals(TileImprovement.getXMLElementTagName())) {
                 workImprovement = (TileImprovement) getGame().getFreeColGameObject(in.getAttributeValue(null, "ID"));
                 if (workImprovement != null) {

@@ -441,9 +441,9 @@ public class BuildQueue extends FreeColObject implements ListModel {
         // Start element:
         out.writeStartElement(getXMLElementTagName());
         out.writeAttribute("type", type.toString());
-        out.writeAttribute("size", String.valueOf(model.size()));
+        out.writeAttribute(ARRAY_SIZE, String.valueOf(model.size()));
         for (int index = 0; index < model.size(); index++) {
-            out.writeAttribute("element" + index, model.get(index).getId());
+            out.writeAttribute("x" + index, model.get(index).getId());
         }
         out.writeEndElement();
     }

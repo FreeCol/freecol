@@ -60,6 +60,21 @@ public class Player extends FreeColGameObject implements Nameable {
     private static final Logger logger = Logger.getLogger(Player.class.getName());
 
     /**
+     * The XML tag name for the set of founding fathers.
+     */
+    private static final String FOUNDING_FATHER_TAG = "foundingFathers";
+
+    /**
+     * The XML tag name for the stance array.
+     */
+    private static final String STANCE_TAG = "stance";
+
+    /**
+     * The XML tag name for the tension array.
+     */
+    private static final String TENSION_TAG = "tension";
+
+    /**
      * The index of this player
      */
     private int index;
@@ -2297,14 +2312,14 @@ public class Player extends FreeColGameObject implements Nameable {
         // attributes end here
 
         for (Entry<Player, Tension> entry : tension.entrySet()) {
-            out.writeStartElement("tension");
+            out.writeStartElement(TENSION_TAG);
             out.writeAttribute("player", entry.getKey().getId());
             out.writeAttribute("value", String.valueOf(entry.getValue().getValue()));
             out.writeEndElement();
         }
 
         for (Entry<Player, Stance> entry : stance.entrySet()) {
-            out.writeStartElement("stance");
+            out.writeStartElement(STANCE_TAG);
             out.writeAttribute("player", entry.getKey().getId());
             out.writeAttribute("value", entry.getValue().toString());
             out.writeEndElement();
@@ -2318,11 +2333,14 @@ public class Player extends FreeColGameObject implements Nameable {
         }
 
         if (getGame().isClientTrusted() || showAll || equals(player)) {
-            List<String> fatherIds = new ArrayList<String>();
+            out.writeStartElement(FOUNDING_FATHER_TAG);
+            out.writeAttribute(ARRAY_SIZE, Integer.toString(allFathers.size()));
+            int index = 0;
             for (FoundingFather father : allFathers) {
-                fatherIds.add(father.getId());
+                out.writeAttribute("x" + Integer.toString(index), father.getId());
+                index++;
             }
-            toArrayElement("foundingFathers", fatherIds.toArray(new String[fatherIds.size()]), out);
+            out.writeEndElement();
 
             if (europe != null) {
                 europe.toXML(out, player, showAll, toSavedGame);
@@ -2345,8 +2363,9 @@ public class Player extends FreeColGameObject implements Nameable {
         index = Integer.parseInt(in.getAttributeValue(null, "index"));
         name = in.getAttributeValue(null, "username");
         nationID = in.getAttributeValue(null, "nationID");
-        if (!name.equals(UNKNOWN_ENEMY))
+        if (!name.equals(UNKNOWN_ENEMY)) {
             nationType = FreeCol.getSpecification().getNationType(in.getAttributeValue(null, "nationType"));
+        }
         color = new Color(Integer.parseInt(in.getAttributeValue(null, "color")));
         admin = getAttribute(in, "admin", false);
         gold = Integer.parseInt(in.getAttributeValue(null, "gold"));
@@ -2387,19 +2406,21 @@ public class Player extends FreeColGameObject implements Nameable {
         tension = new HashMap<Player, Tension>();
         stance = new HashMap<Player, Stance>();
         while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
-            if (in.getLocalName().equals("tension")) {
+            if (in.getLocalName().equals(TENSION_TAG)) {
                 Player player = (Player) getGame().getFreeColGameObject(in.getAttributeValue(null, "player"));
                 tension.put(player, new Tension(getAttribute(in, "value", 0)));
                 in.nextTag(); // close element
-            } else if (in.getLocalName().equals("foundingFathers")) {
-                String[] fatherIds = readFromArrayElement("foundingFathers", in, new String[0]);
-                for (String fatherId : fatherIds) {
+            } else if (in.getLocalName().equals(FOUNDING_FATHER_TAG)) {
+                int length = Integer.parseInt(in.getAttributeValue(null, ARRAY_SIZE));
+                for (int index = 0; index < length; index++) {
+                    String fatherId = in.getAttributeValue(null, "x" + String.valueOf(index));
                     FoundingFather father = FreeCol.getSpecification().getFoundingFather(fatherId);
                     allFathers.add(father);
                     // add only features, no other effects
                     featureContainer.add(father.getFeatureContainer());
                 }
-            } else if (in.getLocalName().equals("stance")) {
+                in.nextTag();
+            } else if (in.getLocalName().equals(STANCE_TAG)) {
                 Player player = (Player) getGame().getFreeColGameObject(in.getAttributeValue(null, "player"));
                 stance.put(player, Enum.valueOf(Stance.class, in.getAttributeValue(null, "value")));
                 in.nextTag(); // close element
