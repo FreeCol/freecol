@@ -40,10 +40,15 @@ import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.control.MapEditorController;
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.ImageLibrary;
+import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.ResourceType;
 import net.sf.freecol.common.model.Tile;
+import net.sf.freecol.common.model.TileItemContainer;
 import net.sf.freecol.common.model.TileImprovement;
 import net.sf.freecol.common.model.TileType;
+import net.sf.freecol.server.generator.River;
+import net.sf.freecol.server.generator.RiverSection;
+
 
 /**
  * A panel for choosing the current <code>MapTransform</code>.
@@ -226,13 +231,47 @@ public final class MapEditorTransformPanel extends FreeColPanel {
             this.magnitude = magnitude;
         }
         
-        public void transform(Tile t) {
-            if (t.getType().canHaveRiver()) {
-                // only add a river on terrain tiles
-                // river mouth on ocean/lake tiles are treated separately
-                t.getTileItemContainer().addRiver(magnitude);
+        public void transform(Tile tile) {
+            if (tile.getType().canHaveRiver()) {
+                TileItemContainer tic = tile.getTileItemContainer();
+                int oldMagnitude = TileImprovement.NO_RIVER;
+                if (tic.hasRiver()) {
+                    oldMagnitude = tic.getRiver().getMagnitude();
+                }
+
+                if (magnitude != oldMagnitude) {
+                    tic.addRiver(magnitude, tic.getRiverStyle());
+                    RiverSection mysection = new RiverSection(tic.getRiverStyle());
+                    // for each neighboring tile
+                    for (Direction direction : River.directions) {
+                        Tile t = tile.getMap().getNeighbourOrNull(direction, tile);
+                        if (t == null) {
+                            continue;
+                        }
+                        TileImprovement otherRiver = t.getRiver();
+                        if (!t.isLand() && otherRiver == null) {
+                            // add a virtual river in the ocean/lake tile 
+                            // just for the purpose of drawing the river mouth
+                            otherRiver = new TileImprovement(tile.getGame(), tile, FreeCol.getSpecification()
+                                                             .getTileImprovementType("model.improvement.River"));
+                            otherRiver.setMagnitude(tile.getRiver().getMagnitude());
+                        }
+                        if (otherRiver != null) {
+                            // update the other tile river branch
+                            Direction otherDirection = direction.getReverseDirection();
+                            RiverSection oppositesection = new RiverSection(otherRiver.getStyle());
+                            oppositesection.setBranch(otherDirection, tile.getRiver().getMagnitude());
+                            otherRiver.setStyle(oppositesection.encodeStyle());
+                            // update the current tile river branch
+                            mysection.setBranch(direction, tile.getRiver().getMagnitude());
+                        }
+                        // else the neighbor tile doesn't have a river, nothing to do
+                    }
+                    tile.getRiver().setStyle(mysection.encodeStyle());
+                }
             }
         }
+
     }
 
     /**

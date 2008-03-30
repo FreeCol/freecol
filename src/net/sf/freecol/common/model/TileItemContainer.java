@@ -464,85 +464,12 @@ public class TileItemContainer extends FreeColGameObject {
         return river;
     }
 
-    public TileImprovement addRiver(int magnitude) {
-        if (magnitude == TileImprovement.NO_RIVER) {
-            return null;
-        }
-        if (hasRiver()) {
-            // Already have a river here, see if magnitude is correct, return existing river.
-            int oldMagnitude = river.getMagnitude();
-            if (oldMagnitude != magnitude) {
-                //setRiverMagnitude(magnitude);
-                river.setMagnitude(magnitude);
-                adjustNeighbourRiverStyle(oldMagnitude);
-            }
-            return river;
-        }
-        // Get the list of ImprovementTypes
-        List<TileImprovementType> tiTypeList = FreeCol.getSpecification().getTileImprovementTypeList();
-        // Get the first river that matches or is below
-        for (TileImprovementType tiType : tiTypeList) {
-            if ("model.improvement.River".equals(tiType.getId()) &&
-                tiType.getMagnitude() <= magnitude) {
-                river = new TileImprovement(getGame(), tile, tiType);
-                river.setMagnitude(magnitude);
-                if (this.tile.getType().canHaveRiver()) {
-                    // only update surrounding tiles for terrain tiles
-                    // river mouth on ocean/lake tiles are treated separately
-                    adjustNeighbourRiverStyle(TileImprovement.NO_RIVER);
-                }
-                return (TileImprovement) addTileItem(river);
-            }
-        }
-        // Don't have any river ImprovementTypes? Throw exception
-        throw new RuntimeException("No TileImprovementType with TypeId == river");
-    }
-
     /**
      * Removes the river <code>TileImprovement</code> from this Tile/Container.
      * Change neighbours' River Style with {@link #adjustNeighbourRiverStyle}.
      */
     public TileImprovement removeRiver() {
         return (TileImprovement) removeTileItem(river);
-    }
-
-
-    /**
-     * Call this function after changing River Magnitude or when adding/removing a River
-     * @param oldMagnitude The magnitude of the River before the change
-     */
-    public void adjustNeighbourRiverStyle(int oldMagnitude) {
-        if (river == null || river.getMagnitude() == oldMagnitude) {
-            // nothing changed
-            return;
-        }
-        RiverSection mysection = new RiverSection(river.getStyle());
-        // for each neighboring tile
-        for (Direction direction : River.directions) {
-            Tile t = getTile().getMap().getNeighbourOrNull(direction, getTile());
-            if (t == null) {
-                continue;
-            }
-            TileImprovement otherRiver = t.getRiver();
-            if (!t.isLand() && otherRiver == null) {
-                // add a virtual river in the ocean/lake tile 
-                // just for the purpose of drawing the river mouth
-                otherRiver = new TileImprovement(getGame(), tile, FreeCol.getSpecification()
-                                                 .getTileImprovementType("model.improvement.River"));
-                otherRiver.setMagnitude(river.getMagnitude());
-            }
-            if (otherRiver != null) {
-                // update the other tile river branch
-                Direction otherDirection = direction.getReverseDirection();
-                RiverSection oppositesection = new RiverSection(otherRiver.getStyle());
-                oppositesection.setBranch(otherDirection, river.getMagnitude());
-                otherRiver.setStyle(oppositesection.encodeStyle());
-                // update the current tile river branch
-                mysection.setBranch(direction, river.getMagnitude());
-            }
-            // else the neighbor tile doesn't have a river, nothing to do
-        }
-        river.setStyle(mysection.encodeStyle());
     }
 
     public int getRiverStyle() {
