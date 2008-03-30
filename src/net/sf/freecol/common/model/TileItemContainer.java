@@ -33,9 +33,6 @@ import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.gui.i18n.Messages;
-import net.sf.freecol.common.model.Map.Direction;
-import net.sf.freecol.server.generator.River;
-import net.sf.freecol.server.generator.RiverSection;
 
 import org.w3c.dom.Element;
 
@@ -44,12 +41,12 @@ import org.w3c.dom.Element;
 * to make certain tasks easier.
 */
 public class TileItemContainer extends FreeColGameObject {
-    @SuppressWarnings("unused")
-    private static Logger logger = Logger.getLogger(Location.class.getName());
 
+    @SuppressWarnings("unused")
+    private static final Logger logger = Logger.getLogger(Location.class.getName());
 
     /** The list of TileItems stored in this <code>TileItemContainer</code>. */
-    private List<TileImprovement> improvements = new ArrayList<TileImprovement>();
+    private final List<TileImprovement> improvements = new ArrayList<TileImprovement>();
     private Resource resource = null;
 
     /** Quick Pointers */
@@ -71,7 +68,7 @@ public class TileItemContainer extends FreeColGameObject {
         super(game);
 
         if (tile == null) {
-            throw new NullPointerException();
+            throw new IllegalArgumentException("Tile must not be 'null'.");
         }
 
         this.tile = tile;
@@ -92,7 +89,7 @@ public class TileItemContainer extends FreeColGameObject {
         super(game, in);
 
         if (tile == null) {
-            throw new NullPointerException();
+            throw new IllegalArgumentException("Tile must not be 'null'.");
         }
 
         this.tile = tile;
@@ -113,7 +110,7 @@ public class TileItemContainer extends FreeColGameObject {
         super(game, e);
 
         if (tile == null) {
-            throw new NullPointerException();
+            throw new IllegalArgumentException("Tile must not be 'null'.");
         }
 
         this.tile = tile;
@@ -548,21 +545,21 @@ public class TileItemContainer extends FreeColGameObject {
         while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
             if (in.getLocalName().equals(Resource.getXMLElementTagName())) {
                 resource = (Resource) getGame().getFreeColGameObject(in.getAttributeValue(null, "ID"));
-                if (resource != null) {
-                    resource.readFromXML(in);
-                } else {
+                if (resource == null) {
                     resource = new Resource(getGame(), in);
+                } else {
+                    resource.readFromXML(in);
                 }
             } else if (in.getLocalName().equals(TileImprovement.getXMLElementTagName())) {
                 TileImprovement ti = (TileImprovement) getGame().getFreeColGameObject(in.getAttributeValue(null, "ID"));
-                if (ti != null) {
+                if (ti == null) {
+                    ti = new TileImprovement(getGame(), in);
+                    improvements.add(ti);
+                } else {
                     ti.readFromXML(in);
                     if (!improvements.contains(ti)) {
                         improvements.add(ti);
                     }
-                } else {
-                    ti = new TileImprovement(getGame(), in);
-                    improvements.add(ti);
                 }
                 if (ti.isRoad()) {
                     road = ti;
@@ -588,7 +585,7 @@ public class TileItemContainer extends FreeColGameObject {
     * <code>TileItemContainer</code>.    
     */
     public String toString() {
-        StringBuffer sb = new StringBuffer();
+        StringBuffer sb = new StringBuffer(60);
         sb.append("TileItemContainer with: ");
         if (hasResource()) {
             sb.append(resource.toString() + ", ");
