@@ -630,7 +630,8 @@
       <ability id="model.ability.canBeCaptured" value="true"/>
       <modifier id="model.goods.crosses" type="multiplicative" value="2"/>
     </unit-type>
-    <unit-type id="model.unit.elderStatesman" art="elderStatesman" offence="0"  defence="1" movement="3" lineOfSight="1" price="1900" 
+    <unit-type id="model.unit.elderStatesman" art="elderStatesman" offence="0"  defence="1"
+               movement="3" lineOfSight="1" price="1900"
                skill="3" recruitProbability="1" expert-production="model.goods.bells"
                scoreValue="6" pathImage="foot">
       <available-to native="false"/>
@@ -728,7 +729,8 @@
       <ability id="model.ability.canBeCaptured" value="true"/>
       <ability id="model.ability.expertPioneer" value="true"/>
     </unit-type>
-    <unit-type id="model.unit.veteranSoldier" art="veteranSoldier" offence="0"  defence="1" movement="3" lineOfSight="1" price="2000" 
+    <unit-type id="model.unit.veteranSoldier" art="veteranSoldier" offence="0"  defence="1"
+               movement="3" lineOfSight="1" price="2000"
                skill="2" recruitProbability="1" scoreValue="5" pathImage="foot">
       <available-to native="false"/>
       <downgrade unit="model.unit.freeColonist" capture="true"/>
@@ -795,7 +797,8 @@
       <modifier id="model.goods.hammers" type="additive" value="-2" />
       <modifier id="model.goods.tools" type="additive" value="-2" />
     </unit-type>
-    <unit-type id="model.unit.indianConvert" art="indianConvert" offence="0"  defence="1" movement="3" lineOfSight="1"               
+    <unit-type id="model.unit.indianConvert" art="indianConvert" offence="0"  defence="1"
+               movement="3" lineOfSight="1" maximumAttrition="5"
                scoreValue="3" skill="0" pathImage="foot">
       <available-to native="false"/>
       <ability id="model.ability.convert" value="true"/>

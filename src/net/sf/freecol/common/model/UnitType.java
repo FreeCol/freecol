@@ -122,6 +122,11 @@ public final class UnitType extends BuildableType {
     private String pathImage;
 
     /**
+     * Describe maximumAttrition here.
+     */
+    private int maximumAttrition;
+
+    /**
      * Describe availableTo here.
      */
     private EnumMap<PlayerType, Boolean> availableTo =
@@ -396,6 +401,24 @@ public final class UnitType extends BuildableType {
     }
 
     /**
+     * Get the <code>MaximumAttrition</code> value.
+     *
+     * @return an <code>int</code> value
+     */
+    public int getMaximumAttrition() {
+        return maximumAttrition;
+    }
+
+    /**
+     * Set the <code>MaximumAttrition</code> value.
+     *
+     * @param newMaximumAttrition The new MaximumAttrition value.
+     */
+    public void setMaximumAttrition(final int newMaximumAttrition) {
+        this.maximumAttrition = newMaximumAttrition;
+    }
+
+    /**
      * Get the <code>ExpertProduction</code> value.
      *
      * @return a <code>GoodsType</code> value
@@ -572,6 +595,7 @@ public final class UnitType extends BuildableType {
         space = getAttribute(in, "space", 0);
         hitPoints = getAttribute(in, "hitPoints", 0);
         spaceTaken = getAttribute(in, "spaceTaken", 1);
+        maximumAttrition = getAttribute(in, "maximumAttrition", Integer.MAX_VALUE);
         
         art = in.getAttributeValue(null, "art");
         pathImage = in.getAttributeValue(null, "pathImage");

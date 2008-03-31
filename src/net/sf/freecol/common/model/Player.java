@@ -2164,11 +2164,11 @@ public class Player extends FreeColGameObject implements Nameable {
             
             // CO: since the pioneer already finishes faster, changing
             // it at both locations would double the bonus.
-            for (Iterator<Unit> unitIterator = getUnitIterator(); unitIterator.hasNext();) {
-                Unit unit = unitIterator.next();
-                if (logger.isLoggable(Level.FINEST)) {
-                    logger.finest("Calling newTurn for unit " + unit.getName() + " " + unit.getId());
-                }
+            /**
+             * Create new collection to avoid to concurrent modification.
+             */
+            for (Unit unit : new ArrayList<Unit>(units.values())) {
+                logger.finest("Calling newTurn for unit " + unit.getName() + " " + unit.getId());
                 unit.newTurn();
             }
 

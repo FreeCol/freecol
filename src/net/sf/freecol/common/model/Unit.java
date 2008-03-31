@@ -137,6 +137,12 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
 
     private int turnsOfTraining = 0;
 
+    /**
+     * The attrition this unit has accumulated. At the moment, this
+     * equals the number of turns it has spent in the open.
+     */
+    private int attrition = 0;
+
     /** The individual name of this unit, not of the unit type. */
     private String name = null;
 
@@ -3279,7 +3285,16 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
         if (getState() == UnitState.SKIPPED) {
             setState(UnitState.ACTIVE);
         }
-
+        if (location instanceof Tile && ((Tile) location).getSettlement() == null) {
+            attrition++;
+        } else {
+            attrition = 0;
+        }
+        if (attrition > getType().getMaximumAttrition()) {
+            addModelMessage(this, ModelMessage.MessageType.UNIT_LOST, getType(),
+                            "model.unit.attrition", "%unit%", getName());
+            dispose();
+        }
     }
 
     /**
@@ -3331,6 +3346,7 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
         out.writeAttribute("experience", Integer.toString(experience));
         out.writeAttribute("treasureAmount", Integer.toString(treasureAmount));
         out.writeAttribute("hitpoints", Integer.toString(hitpoints));
+        out.writeAttribute("attrition", Integer.toString(attrition));
         
         if (student != null) {
             out.writeAttribute("student", student.getId());
@@ -3423,6 +3439,7 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
         state = Enum.valueOf(UnitState.class, in.getAttributeValue(null, "state"));
         role = Enum.valueOf(Role.class, in.getAttributeValue(null, "role"));
         workLeft = Integer.parseInt(in.getAttributeValue(null, "workLeft"));
+        attrition = getAttribute(in, "attrition", 0);
 
         String ownerID = in.getAttributeValue(null, "owner");
         if (ownerID.equals(Player.UNKNOWN_ENEMY)) {
