@@ -261,7 +261,8 @@ public class SimpleCombatModel implements CombatModel {
                     }
 
                     // 75% Artillery in the open penalty
-                    if (attacker.hasAbility("model.ability.bombard")) {
+                    if (attacker.hasAbility("model.ability.bombard") &&
+                        attacker.getTile().getSettlement() == null) {
                         result.add(ARTILLERY_PENALTY);
                     }
                 } else {
@@ -374,15 +375,7 @@ public class SimpleCombatModel implements CombatModel {
 
             if (defender.getTile() != null) {
                 Tile tile = defender.getTile();
-                if (tile.getSettlement() != null) {
-                    result.addAll(tile.getSettlement().getFeatureContainer()
-                                  .getModifierSet("model.modifier.defence"));
-                    if (defender.hasAbility("model.ability.bombard") &&
-                        attacker.getOwner().isIndian()) {
-                        // 100% defence bonus against an Indian raid
-                        result.add(INDIAN_RAID_BONUS);
-                    }
-                } else {
+                if (tile.getSettlement() == null) {
                     // In the open
                     if (!(attacker.hasAbility("model.ability.ambushBonus") ||
                           defender.hasAbility("model.ability.ambushPenalty"))) {
@@ -393,6 +386,14 @@ public class SimpleCombatModel implements CombatModel {
                         defender.getState() != UnitState.FORTIFIED) {
                         // -75% Artillery in the Open penalty
                         result.add(ARTILLERY_PENALTY);
+                    }
+                } else {
+                    result.addAll(tile.getSettlement().getFeatureContainer()
+                                  .getModifierSet("model.modifier.defence"));
+                    if (defender.hasAbility("model.ability.bombard") &&
+                        attacker.getOwner().isIndian()) {
+                        // 100% defence bonus against an Indian raid
+                        result.add(INDIAN_RAID_BONUS);
                     }
                 }
             }
