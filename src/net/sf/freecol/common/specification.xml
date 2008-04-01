@@ -798,7 +798,7 @@
       <modifier id="model.goods.tools" type="additive" value="-2" />
     </unit-type>
     <unit-type id="model.unit.indianConvert" art="indianConvert" offence="0"  defence="1"
-               movement="3" lineOfSight="1" maximumAttrition="5"
+               movement="3" lineOfSight="1" maximumAttrition="10"
                scoreValue="3" skill="0" pathImage="foot">
       <available-to native="false"/>
       <ability id="model.ability.convert" value="true"/>
