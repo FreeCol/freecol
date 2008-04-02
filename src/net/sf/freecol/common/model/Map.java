@@ -1744,6 +1744,10 @@ public class Map extends FreeColGameObject {
         out.writeAttribute("width", Integer.toString(getWidth()));
         out.writeAttribute("height", Integer.toString(getHeight()));
 
+        for (Region region : regions.values()) {
+            region.toXML(out);
+        }
+
         Iterator<Position> tileIterator = getWholeMapIterator();
         while (tileIterator.hasNext()) {
             Tile tile = getTile(tileIterator.next());
@@ -1755,10 +1759,6 @@ public class Map extends FreeColGameObject {
                 hiddenTile.setFakeID(tile.getId());
                 hiddenTile.toXML(out, player, showAll, toSavedGame);
             }
-        }
-
-        for (Region region : regions.values()) {
-            region.toXML(out);
         }
 
         out.writeEndElement();

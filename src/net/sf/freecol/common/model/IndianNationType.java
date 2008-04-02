@@ -23,6 +23,8 @@ package net.sf.freecol.common.model;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.HashSet;
+import java.util.Set;
 
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
@@ -60,6 +62,11 @@ public class IndianNationType extends NationType {
      * Stores the ids of the skills taught by this Nation.
      */
     private List<String> skills = new ArrayList<String>();
+
+    /**
+     * The regions that can be settled by this Nation.
+     */
+    private Set<String> regions = new HashSet<String>();
 
     /**
      * Sole constructor.
@@ -159,6 +166,19 @@ public class IndianNationType extends NationType {
         this.typeOfSettlement = newTypeOfSettlement;
     }
 
+
+    /**
+     * Returns true if this Nation can settle the given Tile.
+     *
+     * @param tile a <code>Tile</code> value
+     * @return a <code>boolean</code> value
+     */
+    public boolean canSettleTile(Tile tile) {
+        return (tile.getType().canSettle() &&
+                regions.contains(tile.getRegion()));
+    }
+
+
     /**
      * Returns a list of this Nation's skills.
      *
@@ -199,6 +219,9 @@ public class IndianNationType extends NationType {
                 specification.getModifierKeys().add(modifier.getId());
             } else if ("skill".equals(childName)) {
                 skills.add(in.getAttributeValue(null, "id"));
+                in.nextTag(); // close this element
+            } else if (Region.getXMLElementTagName().equals(childName)) {
+                regions.add(in.getAttributeValue(null, "id"));
                 in.nextTag(); // close this element
             }
         }

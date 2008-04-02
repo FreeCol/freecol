@@ -109,8 +109,9 @@ public class TerrainGenerator {
                     if (importLandMap || importTile.isLand() == landMap[x][y]) {
                         t = new Tile(game, importTile.getType(), x, y);
                         // TileItemContainer copies everything including Resource unless importBonuses == false
-                        if (importTile.getTileItemContainer()!=null)
+                        if (importTile.getTileItemContainer() != null) {
                             t.getTileItemContainer().copyFrom(importTile.getTileItemContainer(), importBonuses);
+                        }
                         if (!importBonuses) {
                             // In which case, we may add a Bonus Resource
                             perhapsAddBonus(t, landMap);
@@ -129,6 +130,7 @@ public class TerrainGenerator {
         game.setMap(map);
 
         if (!importTerrain) {
+            createRegions(map);
             createHighSeas(map);
             createMountains(map);
             createRivers(map);
@@ -320,6 +322,87 @@ public class TerrainGenerator {
         return chosen;
     }
 
+
+    private void createRegions(Map map) {
+
+        Region pacific = map.getRegion("model.region.pacific");
+        pacific.setDiscoverable(true);
+        Region northPacific = map.getRegion("model.region.northPacific");
+        northPacific.setParent(pacific);
+        Region southPacific = map.getRegion("model.region.southPacific");
+        southPacific.setParent(pacific);
+        Region atlantic = map.getRegion("model.region.atlantic");
+        Region northAtlantic = map.getRegion("model.region.northAtlantic");
+        northAtlantic.setParent(atlantic);
+        Region southAtlantic = map.getRegion("model.region.southAtlantic");
+        southAtlantic.setParent(atlantic);
+
+        Region north = map.getRegion("model.region.north");
+        Region northEast = map.getRegion("model.region.northEast");
+        Region northWest = map.getRegion("model.region.northWest");
+        Region east = map.getRegion("model.region.east");
+        Region center = map.getRegion("model.region.center");
+        Region west = map.getRegion("model.region.west");
+        Region south = map.getRegion("model.region.south");
+        Region southEast = map.getRegion("model.region.southEast");
+        Region southWest = map.getRegion("model.region.southWest");
+
+        int halfHeight = map.getHeight()/2;
+        int halfWidth = map.getWidth()/2;
+        int thirdHeight = map.getHeight()/2;
+        int twoThirdHeight = 2 * thirdHeight;
+        int thirdWidth = map.getWidth()/3;
+        int twoThirdWidth = 2 * thirdWidth;
+        for (int y = 0; y < map.getHeight(); y++) {
+            for (int x = 0; x < map.getWidth(); x++) {
+                if (map.isValid(x, y)) {
+                    Tile tile = map.getTile(x, y);
+                    if (tile.isLand()) {
+                        if (y < thirdHeight) {
+                            if (x < thirdWidth) {
+                                tile.setRegion(northWest);
+                            } else if (x < twoThirdWidth) {
+                                tile.setRegion(north);
+                            } else {
+                                tile.setRegion(northEast);
+                            }
+                        } else if (y < twoThirdHeight) {
+                            if (x < thirdWidth) {
+                                tile.setRegion(west);
+                            } else if (x < twoThirdWidth) {
+                                tile.setRegion(center);
+                            } else {
+                                tile.setRegion(east);
+                            }
+                        } else {
+                            if (x < thirdWidth) {
+                                tile.setRegion(southWest);
+                            } else if (x < twoThirdWidth) {
+                                tile.setRegion(south);
+                            } else {
+                                tile.setRegion(southEast);
+                            }
+                        }
+                    } else {
+                        if (y < halfHeight) {
+                            if (x < halfWidth) {
+                                tile.setRegion(northPacific);
+                            } else {
+                                tile.setRegion(northAtlantic);
+                            }
+                        } else {
+                            if (x < halfWidth) {
+                                tile.setRegion(southPacific);
+                            } else {
+                                tile.setRegion(southAtlantic);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
     /**
      * Places "high seas"-tiles on the border of the given map.
      * @param map The <code>Map</code> to create high seas on.
@@ -384,6 +467,7 @@ public class TerrainGenerator {
         createHighSeas(map, distToLandFromHighSeas, maxDistanceToEdge);
     }
     
+
     /**
      * Places "high seas"-tiles on the border of the given map.
      * 
@@ -415,28 +499,12 @@ public class TerrainGenerator {
             throw new RuntimeException("HighSeas TileType is defined by the 'sail-to-europe' attribute");
         }
 
-        Region pacific = map.getRegion("model.region.pacific");
-        Region northPacific = map.getRegion("model.region.northPacific");
-        northPacific.setParent(pacific);
-        Region southPacific = map.getRegion("model.region.southPacific");
-        southPacific.setParent(pacific);
-        Region atlantic = map.getRegion("model.region.atlantic");
-        Region northAtlantic = map.getRegion("model.region.northAtlantic");
-        northAtlantic.setParent(atlantic);
-        Region southAtlantic = map.getRegion("model.region.southAtlantic");
-        southAtlantic.setParent(atlantic);
-
         for (int y = 0; y < map.getHeight(); y++) {
             for (int x=0; x<maxDistanceToEdge && 
                           x<map.getWidth() && 
                           !map.isLandWithinDistance(x, y, distToLandFromHighSeas); x++) {
                 if (map.isValid(x, y)) {
                     map.getTile(x, y).setType(highSeas);
-                    if (y < map.getHeight() / 2) {
-                        map.getTile(x, y).setRegion(northPacific);
-                    } else {
-                        map.getTile(x, y).setRegion(southPacific);
-                    }
                 }
             }
 
@@ -445,11 +513,6 @@ public class TerrainGenerator {
                           !map.isLandWithinDistance(map.getWidth()-x, y, distToLandFromHighSeas); x++) {
                 if (map.isValid(map.getWidth()-x, y)) {
                     map.getTile(map.getWidth()-x, y).setType(highSeas);
-                    if (y < map.getHeight() / 2) {
-                        map.getTile(map.getWidth()-x, y).setRegion(northAtlantic);
-                    } else {
-                        map.getTile(map.getWidth()-x, y).setRegion(southAtlantic);
-                    }
                 }
             }
         }

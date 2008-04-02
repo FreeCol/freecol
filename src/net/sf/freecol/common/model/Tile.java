@@ -1494,7 +1494,10 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
         }
 
         boolean lostCity = (pet == null) ? lostCityRumour : pet.hasLostCityRumour();
-        out.writeAttribute("lostCityRumour", Boolean.toString(lostCity));
+        if (lostCity) {
+            // this is hardly ever the case
+            out.writeAttribute("lostCityRumour", Boolean.toString(lostCity));
+        }
 
         if (owner != null) {
             if (getGame().isClientTrusted() || showAll || player.canSee(this)) {
