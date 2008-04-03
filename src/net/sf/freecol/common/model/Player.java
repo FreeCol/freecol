@@ -838,6 +838,7 @@ public class Player extends FreeColGameObject implements Nameable {
         modifyGold(-price);
         owner.modifyGold(price);
         tile.setOwner(this);
+        tile.setOwningSettlement(null);
     }
 
     /**

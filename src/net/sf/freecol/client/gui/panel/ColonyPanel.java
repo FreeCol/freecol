@@ -1626,7 +1626,6 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener {
                             } else { // its an indian settlement
                                 parent.errorMessage("tileTakenInd");
                             }
-                            return null;
                         }
                         int price = unit.getOwner().getLandPrice(colonyTile.getWorkTile());
                         if (price > 0) {
