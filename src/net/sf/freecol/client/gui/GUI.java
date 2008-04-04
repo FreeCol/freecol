@@ -133,7 +133,7 @@ public final class GUI {
     private int leftColumnX;
 
     // The height offset to paint a Unit at (in pixels).
-    private static final int UNIT_OFFSET = 20,
+    public static final int UNIT_OFFSET = 20,
     TEXT_OFFSET_X = 2, // Relative to the state indicator.
     TEXT_OFFSET_Y = 13, // Relative to the state indicator.
     STATE_OFFSET_X = 25,
@@ -405,7 +405,7 @@ public final class GUI {
             return null;
         }
 
-        if (activeUnit != null && activeUnit.getTile() == unitTile) {
+        if (activeUnit != null && unitTile.contains(activeUnit)) {
             return activeUnit;
         } else {
             if (unitTile.getSettlement() == null) {
@@ -543,6 +543,19 @@ public final class GUI {
         freeColClient.getCanvas().repaint(0, 0, getWidth(), getHeight());
     }
 
+    /**
+    * Sets the focus of the map and repaints the screen immediately.
+    *
+    * @param focus The <code>Position</code> of the center tile of the
+    *             displayed map.
+    * @see #getFocus
+    */
+    public void setFocusImmediately(Position focus) {
+        this.focus = focus;
+
+        forceReposition();
+        freeColClient.getCanvas().paintImmediately(0, 0, getWidth(), getHeight());
+    }
 
     /**
     * Sets the focus of the map.
@@ -2907,6 +2920,18 @@ public final class GUI {
      * and return it. If the Tile is not on-screen a maximal rectangle is returned.
      * The bounds includes a one-tile padding area above the Tile, to include the space
      * needed by any units in the Tile.
+     * @param tile The tile on the screen.
+     * @return The bounds rectangle
+     */
+    public Rectangle getTileBounds(Tile tile) {
+        return getTileBounds(tile.getX(), tile.getY());
+    }
+    
+    /**
+     * Calculate the bounds of the rectangle containing a Tile on the screen,
+     * and return it. If the Tile is not on-screen a maximal rectangle is returned.
+     * The bounds includes a one-tile padding area above the Tile, to include the space
+     * needed by any units in the Tile.
      * @param x The x-coordinate of the Tile
      * @param y The y-coordinate of the Tile
      * @return The bounds rectangle
@@ -2931,5 +2956,13 @@ public final class GUI {
      */
     public void forceReposition() {
         bottomRow = -1;
+    }
+
+    public int getTileHeight() {
+        return tileHeight;
+    }
+
+    public int getTileWidth() {
+        return tileWidth;
     }
 }

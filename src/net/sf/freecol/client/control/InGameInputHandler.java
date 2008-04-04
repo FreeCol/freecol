@@ -30,6 +30,8 @@ import javax.swing.SwingUtilities;
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.Canvas;
+import net.sf.freecol.client.gui.animation.Animation;
+import net.sf.freecol.client.gui.animation.UnitMoveAnimation;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.AbstractUnit;
 import net.sf.freecol.common.model.Colony;
@@ -44,6 +46,7 @@ import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.LostCityRumour;
 import net.sf.freecol.common.model.Map;
 import net.sf.freecol.common.model.Map.Direction;
+import net.sf.freecol.common.model.Map.Position;
 import net.sf.freecol.common.model.ModelMessage;
 import net.sf.freecol.common.model.Modifier;
 import net.sf.freecol.common.model.Monarch;
@@ -181,8 +184,18 @@ public final class InGameInputHandler extends InputHandler {
      * @return The reply.
      */
     public Element update(Element updateElement) {
-        NodeList nodeList = updateElement.getChildNodes();
-
+        
+        updateGameObjects(updateElement.getChildNodes());
+        
+        new RefreshCanvasSwingTask().invokeLater();
+        return null;
+    }
+    
+    /**
+     * Updates all FreeColGameObjects from the childNodes of the message
+     * @param nodeList The list of nodes from the message
+     */
+    private void updateGameObjects(NodeList nodeList) {
         for (int i = 0; i < nodeList.getLength(); i++) {
             Element element = (Element) nodeList.item(i);
             FreeColGameObject fcgo = getGame().getFreeColGameObjectSafely(element.getAttribute("ID"));
@@ -192,10 +205,8 @@ public final class InGameInputHandler extends InputHandler {
                 logger.warning("Could not find 'FreeColGameObject' with ID: " + element.getAttribute("ID"));
             }
         }
-        new RefreshCanvasSwingTask().invokeLater();
-        return null;
     }
-
+    
     /**
      * Handles a "remove"-message.
      * 
@@ -245,24 +256,17 @@ public final class InGameInputHandler extends InputHandler {
             }
 
             final Tile newTile = map.getNeighbourOrNull(direction, unit.getTile());
+            //Playing the animation before actually moving the unit
+            try {
+                new UnitMoveAnimationCanvasSwingTask(unit, newTile).invokeAndWait();
+            } catch (InvocationTargetException exception) {
+                logger.warning("UnitMoveAnimationCanvasSwingTask raised " + exception.toString());
+            }
+            
             if (getFreeColClient().getMyPlayer().canSee(newTile)) {
-                final Tile oldTile = unit.getTile();
                 unit.moveToTile(newTile);
-                SwingUtilities.invokeLater(new Runnable() {
-                    public void run() {
-                        getFreeColClient().getCanvas().refreshTile(oldTile);
-                        getFreeColClient().getCanvas().refreshTile(newTile);
-                        getFreeColClient().getGUI().setFocus(newTile.getPosition());
-                    }
-                });
             } else {
-                final Tile oldTile = unit.getTile();
                 unit.dispose();
-                SwingUtilities.invokeLater(new Runnable() {
-                    public void run() {
-                        getFreeColClient().getCanvas().refreshTile(oldTile);
-                    }
-                });
             }
         } else {
             String tileID = opponentMoveElement.getAttribute("tile");
@@ -302,15 +306,28 @@ public final class InGameInputHandler extends InputHandler {
 
             if (getGame().getFreeColGameObject(tileID) == null) {
                 logger.warning("Could not find tile with id: " + tileID);
+                unit.setLocation(null);
+                // Can't go on without the tile
+                return null;
             }
-            unit.setLocation((Tile) getGame().getFreeColGameObject(tileID));
+            
+            final Tile newTile = (Tile) getGame().getFreeColGameObject(tileID);
+            
+            if (unit.getLocation() == null) {
+                // Getting the previous tile so we can animate the movement properly
+                final Tile oldTile = map.getNeighbourOrNull(direction.getReverseDirection(), unit.getTile());
+                unit.setLocation(oldTile); // TODO: This may be not a good idea since this method does a lot of updating
+            }
+            
+            //Playing the animation before actually moving the unit
+            try {
+                new UnitMoveAnimationCanvasSwingTask(unit, newTile).invokeAndWait();
+            } catch (InvocationTargetException exception) {
+                logger.warning("UnitMoveAnimationCanvasSwingTask raised " + exception.toString());
+            }
+                    
+            unit.setLocation(newTile);
 
-            SwingUtilities.invokeLater(new Runnable() {
-                public void run() {
-                    getFreeColClient().getCanvas().refreshTile(unit.getTile());
-                    getFreeColClient().getGUI().setFocus(unit.getTile().getPosition());
-                }
-            });
         }
 
         return null;
@@ -1255,6 +1272,7 @@ public final class InGameInputHandler extends InputHandler {
 
         protected void doWork(Canvas canvas) {
             canvas.refresh();
+            
             if (_requestFocus && !canvas.isShowingSubPanel()) {
                 canvas.requestFocusInWindow();
             }
@@ -1264,6 +1282,93 @@ public final class InGameInputHandler extends InputHandler {
         private final boolean _requestFocus;
     }
 
+    /**
+     * This task plays an animation in the Canvas.
+     */
+    class AnimateCanvasSwingTask extends NoResultCanvasSwingTask {
+        
+        private final Animation animation;
+        private boolean bufferAnimation;
+        
+        /**
+         * Constructor - animate canvas without frame buffer
+         * @param animation The animation that will be played
+         */
+        public AnimateCanvasSwingTask(Animation animation) {
+            this(animation, false);
+        }
+        
+        /**
+         * Constructor
+         * @param animation The animation that will be played
+         * @param bufferAnimation If the animation should be buffered or not.
+         */
+        public AnimateCanvasSwingTask(Animation animation, boolean bufferAnimation) {
+            this.animation = animation;
+            this.bufferAnimation = bufferAnimation;
+        }
+
+
+        protected void doWork(Canvas canvas) {
+            animation.animate(bufferAnimation);
+            canvas.refresh();
+        }
+    }
+    
+    /**
+     * This task plays an unit movement animation in the Canvas.
+     */
+    class UnitMoveAnimationCanvasSwingTask extends NoResultCanvasSwingTask {
+        
+        private final Unit unit;
+        private final Tile destinationTile;
+        private boolean bufferAnimation;
+        private boolean focus;
+        
+        /**
+         * Constructor - Play the unit movement animation, focusing the unit
+         * @param unit The unit that is moving
+         * @param destinationTile The Tile where the unit will be moving to.
+         */
+        public UnitMoveAnimationCanvasSwingTask(Unit unit, Tile destinationTile) {
+            this(unit, destinationTile,false, true);
+        }
+        
+        /**
+         * Constructor - Play the unit movement animation, focusing the unit
+         * @param unit The unit that is moving
+         * @param direction The Direction in which the Unit will be moving.
+         */
+        public UnitMoveAnimationCanvasSwingTask(Unit unit, Direction direction) {
+            this(unit, unit.getGame().getMap().getNeighbourOrNull(direction, unit.getTile()),false, true);
+        }
+        
+        /**
+         * Constructor
+         * @param unit The unit that is moving
+         * @param focusPosition Position to set the focus of the screen. null for no focus
+         * @param bufferAnimation If the animation should be buffered or not.
+         * @param focus If before the animation the screen should focus the unit
+         */
+        public UnitMoveAnimationCanvasSwingTask(Unit unit, Tile destinationTile, boolean bufferAnimation, boolean focus) {
+            this.unit = unit;
+            this.destinationTile = destinationTile;
+            this.bufferAnimation = bufferAnimation;
+            this.focus = focus;
+        }
+
+
+        protected void doWork(Canvas canvas) {
+            
+            if (focus)
+                canvas.getGUI().setFocusImmediately(unit.getTile().getPosition());
+                        
+            Animation animation = new UnitMoveAnimation(canvas, unit, destinationTile);
+            animation.animate(bufferAnimation);
+            canvas.refresh();
+        }
+    }
+    
     /**
      * This task reconnects to the server.
      */

@@ -44,6 +44,8 @@ import net.sf.freecol.client.gui.Canvas.ScoutAction;
 import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.InGameMenuBar;
 import net.sf.freecol.client.gui.action.BuildColonyAction;
+import net.sf.freecol.client.gui.animation.Animation;
+import net.sf.freecol.client.gui.animation.UnitMoveAnimation;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.client.gui.option.FreeColActionUI;
 import net.sf.freecol.client.gui.panel.ChoiceItem;
@@ -1489,7 +1491,11 @@ public final class InGameController implements NetworkConstants {
         moveElement.setAttribute("direction", direction.toString());
 
         // TODO: server can actually fail (illegal move)!
-
+        
+        // Play an animation showing the unit movement
+        Animation moveAnimation = new UnitMoveAnimation(canvas, unit, direction);
+        moveAnimation.animate();
+        
         // move before ask to server, to be in new tile in case there is a
         // rumours
         unit.move(direction);
@@ -1497,6 +1503,7 @@ public final class InGameController implements NetworkConstants {
         // client.send(moveElement);
         Element reply = client.ask(moveElement);
         freeColClient.getInGameInputHandler().handle(client.getConnection(), reply);
+        
         if (reply.hasAttribute("movesSlowed")) {
             // ship slowed
             unit.setMovesLeft(unit.getMovesLeft() - Integer.parseInt(reply.getAttribute("movesSlowed")));

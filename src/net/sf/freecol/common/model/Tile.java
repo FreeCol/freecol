@@ -43,7 +43,6 @@ import net.sf.freecol.common.model.Map.CircleIterator;
 import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.Map.Position;
 import net.sf.freecol.common.model.Player.Stance;
-import net.sf.freecol.common.util.EmptyIterator;
 
 import org.w3c.dom.Element;
 
@@ -1119,6 +1118,21 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
             logger.warning("Tried to remove an unrecognized 'Locatable' from a tile.");
         }
         updatePlayerExploredTiles();
+    }
+    
+    /**
+     * Removes the unit from the tile. It does not updatePlayerExploredTiles.
+     * @param unit The unit to be removed
+     */
+    public void removeUnitNoUpdate(Unit unit) {
+        unitContainer.removeUnit(unit);
+    }
+    /**
+     * Adds the unit to the tile. It does not updatePlayerExploredTiles.
+     * @param unit The unit to be added
+     */
+    public void addUnitNoUpdate(Unit unit) {
+        unitContainer.addUnit(unit);
     }
 
     /**
