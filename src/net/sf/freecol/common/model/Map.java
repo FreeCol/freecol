@@ -41,8 +41,11 @@ import net.sf.freecol.common.PseudoRandom;
  */
 public class Map extends FreeColGameObject {
     
-
     private static final Logger logger = Logger.getLogger(Map.class.getName());
+
+    public static final int NUMBER_OF_DIRECTIONS = 8;
+
+    private static PseudoRandom random;
 
     /**
      * The directions a Unit can move to. Includes deltas for moving
@@ -153,7 +156,7 @@ public class Map extends FreeColGameObject {
      */
     public Map(Game game, XMLStreamReader in) throws XMLStreamException {
         super(game, in);
-
+        random = game.getModelController().getPseudoRandom();
         readFromXML(in);
     }
 
@@ -1103,18 +1106,23 @@ public class Map extends FreeColGameObject {
     }
 
     /**
+     * Returns a random Direction.
+     *
+     * @return a <code>Direction</code> value
+     */
+    public Direction getRandomDirection() {
+        return Direction.values()[random.nextInt(NUMBER_OF_DIRECTIONS)];
+    }
+
+    /**
      * Creates an array of the eight directions in a random order.
      * 
      * @return The array.
      */
     public Direction[] getRandomDirectionArray() {
-        PseudoRandom random = getGame().getModelController().getPseudoRandom();
-
-        int length = Direction.values().length;
-        Direction[] directions = new Direction[length];
-        System.arraycopy(Direction.values(), 0, directions, 0, length);
+        Direction[] directions = Direction.values();
         for (int i = 0; i < directions.length; i++) {
-            int i2 = random.nextInt(directions.length);
+            int i2 = random.nextInt(NUMBER_OF_DIRECTIONS);
             if (i2 != i) {
                 Direction temp = directions[i2];
                 directions[i2] = directions[i];
@@ -1261,6 +1269,7 @@ public class Map extends FreeColGameObject {
      * @return Position selected
      */
     public Position getRandomLandPosition() {
+        // TODO: at this point, we can't use PseudoRandom, why not?
         final Random random = new Random();
         
         int x = (getWidth() > 10) ? random.nextInt(getWidth() - 10) + 5 : random.nextInt(getWidth());

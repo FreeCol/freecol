@@ -36,7 +36,7 @@ import net.sf.freecol.client.gui.i18n.Messages;
  */
 public class Region extends FreeColObject implements Nameable {
 
-    private static final String DEFAULT_ID = "model.region.unknownRegion";
+    public static enum RegionType { OCEAN, COAST, LAKE, RIVER, LAND, MOUNTAIN, DESERT }
 
     /**
      * The name of this Region.
@@ -83,6 +83,11 @@ public class Region extends FreeColObject implements Nameable {
     private int scoreValue = 0;
 
     /**
+     * Describe type here.
+     */
+    private RegionType type;
+
+    /**
      * The children Regions of this Region.
      */
     private List<Region> children;
@@ -95,9 +100,9 @@ public class Region extends FreeColObject implements Nameable {
      * @param name a <code>String</code> value
      * @param parent a <code>Region</code> value
      */
-    public Region(String id, String name, Region parent) {
+    public Region(String id, RegionType type, Region parent) {
         setId(id);
-        this.name = name;
+        this.type = type;
         this.parent = parent;
     }
 
@@ -125,12 +130,12 @@ public class Region extends FreeColObject implements Nameable {
      * @return a <code>String</code> value
      */
     public String getDisplayName() {
-        if (name != null) {
-            return name;
-        } else if (prediscovered) {
+        if (prediscovered) {
             return Messages.message(getId());
+        } else if (name == null) {
+            return Messages.message("model.region." + type.toString());
         } else {
-            return Messages.message(DEFAULT_ID);
+            return name;
         }
     }
 
@@ -243,6 +248,24 @@ public class Region extends FreeColObject implements Nameable {
     }
 
     /**
+     * Get the <code>Type</code> value.
+     *
+     * @return a <code>RegionType</code> value
+     */
+    public final RegionType getType() {
+        return type;
+    }
+
+    /**
+     * Set the <code>Type</code> value.
+     *
+     * @param newType The new Type value.
+     */
+    public final void setType(final RegionType newType) {
+        this.type = newType;
+    }
+
+    /**
      * Returns true if this is the whole map Region.
      *
      * @return a <code>boolean</code> value
@@ -326,6 +349,7 @@ public class Region extends FreeColObject implements Nameable {
     public void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
         out.writeStartElement(getXMLElementTagName());
         out.writeAttribute("ID", getId());
+        out.writeAttribute("type", type.toString());
         if (name != null) {
             out.writeAttribute("name", name);
         }
@@ -369,9 +393,11 @@ public class Region extends FreeColObject implements Nameable {
     protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {        
         setId(in.getAttributeValue(null, "ID"));
         name = in.getAttributeValue(null, "name");
+        type = Enum.valueOf(RegionType.class, in.getAttributeValue(null, "type"));
         claimable = getAttribute(in, "claimable", false);
         discoverable = getAttribute(in, "discoverable", false);
         prediscovered = getAttribute(in, "prediscovered", false);
+        scoreValue = getAttribute(in, "scoreValue", 0);
         in.nextTag();
     }
 
@@ -388,6 +414,7 @@ public class Region extends FreeColObject implements Nameable {
         discoverable = getAttribute(in, "discoverable", false);
         prediscovered = getAttribute(in, "prediscovered", false);
         scoreValue = getAttribute(in, "scoreValue", 0);
+        type = Enum.valueOf(RegionType.class, in.getAttributeValue(null, "type"));
         int turn = getAttribute(in, "discoveredIn", -1);
         if (turn > 0) {
             discoveredIn = new Turn(turn);

@@ -32,6 +32,7 @@ import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.TileImprovement;
 import net.sf.freecol.common.model.TileType;
 import net.sf.freecol.common.model.Map.Position;
+import net.sf.freecol.server.model.ServerRegion;
 
 
 /**
@@ -115,6 +116,11 @@ public class River {
     private River nextRiver = null;
 
     /**
+     * The ServerRegion this River belongs to.
+     */
+    private ServerRegion region;
+
+    /**
      * A hashtable of position-river pairs.
      */
     private Hashtable<Position, River> riverMap;
@@ -126,9 +132,10 @@ public class River {
      * @param map The map on which the river flows.
      * @param riverMap A hashtable of position-river pairs.
      */
-    public River(Map map, Hashtable<Position, River> riverMap) {
+    public River(Map map, Hashtable<Position, River> riverMap, ServerRegion region) {
         this.map = map;
         this.riverMap = riverMap;
+        this.region = region;
         int length = directions.length;
         int index = map.getGame().getModelController().getPseudoRandom().nextInt(length);
         direction = directions[index];
@@ -146,6 +153,24 @@ public class River {
 
     public RiverSection getLastSection() {
         return this.sections.get(sections.size() - 1);
+    }
+
+    /**
+     * Get the <code>ServerRegion</code> value.
+     *
+     * @return a <code>ServerRegion</code> value
+     */
+    public final ServerRegion getRegion() {
+        return region;
+    }
+
+    /**
+     * Set the <code>ServerRegion</code> value.
+     *
+     * @param newServerRegion The new ServerRegion value.
+     */
+    public final void setRegion(final ServerRegion newServerRegion) {
+        this.region = newServerRegion;
     }
 
     /**
@@ -268,7 +293,6 @@ public class River {
      * @return true if a river was created, false otherwise.
      */
     private boolean flow(Map.Position source) {
-        //Tile t = map.getTile(source);
         
         if (sections.size() % 2 == 0) {
             // get random new direction
@@ -364,14 +388,15 @@ public class River {
                     logger.fine("Added river (magnitude: " + section.getSize() +
                                 ") to tile at " + section.getPosition());
                 } else if (section.getSize() >= TileImprovement.FJORD_RIVER) {
-                    TileImprovement oldRiver = tile.getRiver(); // save the previous river
+                    //TileImprovement oldRiver = tile.getRiver(); // save the previous river
                     tile.setType(greatRiver);   // changing the type resets the improvements
                     tile.addRiver(section.getSize(), section.encodeStyle());
-                    TileImprovement newRiver = tile.getRiver();
-                    newRiver.setStyle(oldRiver.getStyle());
+                    //TileImprovement newRiver = tile.getRiver();
+                    //newRiver.setStyle(oldRiver.getStyle());
                     logger.fine("Added fjord (magnitude: " + section.getSize() +
                                 ") to tile at " + section.getPosition());
                 }
+                region.addTile(tile);
                 oldSection = section;
             }
         }

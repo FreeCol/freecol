@@ -30,6 +30,7 @@ import net.sf.freecol.FreeCol;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Map;
 import net.sf.freecol.common.model.Map.Direction;
+import net.sf.freecol.common.model.Region;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.TileType;
 import net.sf.freecol.common.model.Map.Position;
@@ -529,63 +530,52 @@ public class TerrainGenerator {
         logger.fine("Maximum length of mountain ranges is " + maximumLength);
         
         // lookup the resources from specification
-        TileType hills = null, mountains = null;
-        for (TileType t : FreeCol.getSpecification().getTileTypeList()) {
-            if (t.getId().equals("model.tile.hills") && hills == null) {
-                hills = t;
-                if (mountains != null)
-                    break;
-            } else if (t.getId().equals("model.tile.mountains") && mountains == null) {
-                mountains = t;
-                if (hills != null)
-                    break;
-            }
-        }
+        TileType hills = FreeCol.getSpecification().getTileType("model.tile.hills");
+        TileType mountains = FreeCol.getSpecification().getTileType("model.tile.mountains");
         if (hills == null || mountains == null) {
             throw new RuntimeException("Both Hills and Mountains TileTypes must be defined");
         }
         
         // generate the mountain ranges
         int counter = 0;
-        for (int tries = 0; tries < 100; tries++) {
+        nextTry: for (int tries = 0; tries < 100; tries++) {
             if (counter < number) {
                 Position p = map.getRandomLandPosition();
-                if (p == null)
-                    continue;
+                if (p == null) {
+                    // this can only happen if the map contains no land
+                    return;
+                }
                 Tile startTile = map.getTile(p);
-                if (startTile==null || !startTile.isLand())
-                    continue;
                 if (startTile.getType() == hills || startTile.getType() == mountains) {
                     // already a high ground
                     continue;
                 }
-                boolean isMountainRangeCloseBy = false;
+
+                // do not start a mountain range too close to another
                 Iterator<Position> it = map.getCircleIterator(p, true, 3);
                 while (it.hasNext()) {
-                    Tile neighborTile = map.getTile(it.next());
-                    if (neighborTile.isLand() && neighborTile.getType() == mountains) {
-                        isMountainRangeCloseBy = true;
-                        break;
+                    if (map.getTile(it.next()).getType() == mountains) {
+                        continue nextTry;
                     }
                 }
-                if (isMountainRangeCloseBy) {
-                    // do not add a mountain range too close to another
-                    continue;
-                }
-                boolean isWaterCloseBy = false;
+
+                // do not add a mountain range too close to the ocean/lake
+                // this helps with good locations for building colonies on shore
                 it = map.getCircleIterator(p, true, 2);
                 while (it.hasNext()) {
-                    Tile neighborTile = map.getTile(it.next());
-                    if (!neighborTile.isLand()) {
-                        isWaterCloseBy = true;
-                        break;
+                    if (!map.getTile(it.next()).isLand()) {
+                        continue nextTry;
                     }
                 }
-                if (isWaterCloseBy) {
-                    // do not add a mountain range too close to the ocean/lake
-                    // this helps with good locations for building colonies on shore
-                    continue;
-                }
+
+                ServerRegion mountainRegion = new ServerRegion("model.region.mountain" + tries,
+                                                               Region.RegionType.MOUNTAIN,
+                                                               startTile.getRegion());
+                mountainRegion.setDiscoverable(true);
+                mountainRegion.setClaimable(true);
+                // TODO: make this depend on size, or other feature?
+                mountainRegion.setScoreValue(10);
+                map.setRegion(mountainRegion);
                 Direction direction = Direction.values()[random.nextInt(8)];
                 int length = maximumLength - random.nextInt(maximumLength/2);
                 logger.info("Direction of mountain range is " + direction +
@@ -596,6 +586,7 @@ public class TerrainGenerator {
                     if (nextTile == null || !nextTile.isLand()) 
                         continue;
                     nextTile.setType(mountains);
+                    mountainRegion.addTile(nextTile);
                     counter++;
                     it = map.getCircleIterator(p, false, 1);
                     while (it.hasNext()) {
@@ -605,9 +596,11 @@ public class TerrainGenerator {
                         int r = random.nextInt(8);
                         if (r == 0) {
                             neighborTile.setType(mountains);
+                            mountainRegion.addTile(neighborTile);
                             counter++;
                         } else if (r > 2) {
                             neighborTile.setType(hills);
+                            mountainRegion.addTile(neighborTile);
                         }
                     }
                 }
@@ -618,46 +611,39 @@ public class TerrainGenerator {
         // and sprinkle a few random hills/mountains here and there
         number = (int)(getMapGeneratorOptions().getNumberOfMountainTiles()*randomHillsRatio);
         counter = 0;
-        for (int tries = 0; tries < 1000; tries++) {
+        nextTry: for (int tries = 0; tries < 1000; tries++) {
             if (counter < number) {
                 Position p = map.getRandomLandPosition();
+                /* this can't happen
                 if (p == null)
                     continue;
                 Tile t = map.getTile(p);
                 if (t==null || !t.isLand())
                     continue;
+                */
+                Tile t = map.getTile(p);
                 if (t.getType() == hills || t.getType() == mountains) {
                     // already a high ground
                     continue;
                 }
-                boolean isMountainRangeCloseBy = false;
+                // do not add hills too close to a mountain range
+                // this would defeat the purpose of adding random hills
                 Iterator<Position> it = map.getCircleIterator(p, true, 3);
                 while (it.hasNext()) {
-                    Tile neighborTile = map.getTile(it.next());
-                    if (neighborTile.isLand() && neighborTile.getType() == mountains) {
-                        isMountainRangeCloseBy = true;
-                        break;
+                    if (map.getTile(it.next()).getType() == mountains) {
+                        continue nextTry;
                     }
                 }
-                if (isMountainRangeCloseBy) {
-                    // do not add hills too close to a mountain range
-                    // this would defeat the purpose of adding random hills
-                    continue;
-                }
-                boolean isWaterCloseBy = false;
+
+                // do not add hills too close to the ocean/lake
+                // this helps with good locations for building colonies on shore
                 it = map.getCircleIterator(p, true, 1);
                 while (it.hasNext()) {
-                    Tile neighborTile = map.getTile(it.next());
-                    if (!neighborTile.isLand()) {
-                        isWaterCloseBy = true;
-                        break;
+                    if (!map.getTile(it.next()).isLand()) {
+                        continue nextTry;
                     }
                 }
-                if (isWaterCloseBy) {
-                    // do not add hills too close to the ocean/lake
-                    // this helps with good locations for building colonies on shore
-                    continue;
-                }
+
                 int k = random.nextInt(4);
                 if (k == 0) {
                     // 25% chance of mountain
@@ -684,15 +670,10 @@ public class TerrainGenerator {
         Hashtable<Position, River> riverMap = new Hashtable<Position, River>();
 
         for (int i = 0; i < number; i++) {
-            River river = new River(map, riverMap);
             nextTry: for (int tries = 0; tries < 100; tries++) {
                 Position position = new Position(random.nextInt(map.getWidth()),
-                                                 random.nextInt(map.getHeight()));
-                if (position.getY() == 0 || position.getY() == map.getHeight()-1 ||
-                    position.getY() == 1 || position.getY() == map.getHeight()-2) {
-                    // please no rivers in polar regions
-                    continue;
-                }
+                                                 // please no rivers in polar regions
+                                                 random.nextInt(map.getHeight() - 4) + 2);
                 // check the river source/spring is not too close to the ocean
                 Iterator<Position> it = map.getCircleIterator(position, true, 2);
                 while (it.hasNext()) {
@@ -703,6 +684,15 @@ public class TerrainGenerator {
                 }
                 if (riverMap.get(position) == null) {
                     // no river here yet
+                    ServerRegion riverRegion = new ServerRegion("model.region.river" + i,
+                                                                Region.RegionType.RIVER,
+                                                                map.getTile(position).getRegion());
+                    riverRegion.setDiscoverable(true);
+                    riverRegion.setClaimable(true);
+                    // TODO: make this depend on size, or other feature?
+                    riverRegion.setScoreValue(10);
+                    map.setRegion(riverRegion);
+                    River river = new River(map, riverMap, riverRegion);
                     if (river.flowFromSource(position)) {
                         logger.fine("Created new river with length " + river.getLength());
                         counter++;
