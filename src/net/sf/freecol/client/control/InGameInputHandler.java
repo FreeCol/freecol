@@ -795,7 +795,7 @@ public final class InGameInputHandler extends InputHandler {
                                                     ModelMessage.MessageType.WARNING));
             break;
         case Monarch.DECLARE_WAR:
-            Player enemy = (Player) getGame().getFreeColGameObject(element.getAttribute("nation"));
+            Player enemy = (Player) getGame().getFreeColGameObject(element.getAttribute("enemy"));
             player.setStance(enemy, Stance.WAR);
             player.addModelMessage(new ModelMessage(player, "model.monarch.declareWar",
                                                     new String[][] {
