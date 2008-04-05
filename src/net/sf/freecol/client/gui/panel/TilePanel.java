@@ -63,6 +63,7 @@ public final class TilePanel extends FreeColDialog implements ActionListener {
     private final JPanel goodsPanel;
     private final JLabel tileNameLabel;
     private final JLabel ownerLabel;
+    private final JLabel regionLabel;
     private final JButton okButton;
     private final JButton colopediaButton;
 
@@ -81,9 +82,13 @@ public final class TilePanel extends FreeColDialog implements ActionListener {
         tileNameLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
         add(tileNameLabel);
 
+        regionLabel = new JLabel("", JLabel.CENTER);
+        regionLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+        add(regionLabel);
+
         ownerLabel = new JLabel("", JLabel.CENTER);
         ownerLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
-        add(ownerLabel);        
+        add(ownerLabel);
 
         List<GoodsType> farmedGoods = FreeCol.getSpecification().getFarmedGoodsTypeList();
         number = farmedGoods.size();
@@ -141,10 +146,10 @@ public final class TilePanel extends FreeColDialog implements ActionListener {
         this.tileType = tile.getType();
         String name = tile.getName() + " (" + tile.getX() + ", " +
             tile.getY() + ")";
-        if (tile.getRegion() != null) {
-            name += " " + tile.getRegion().getDisplayName();
-        }
         tileNameLabel.setText(name);
+        if (tile.getRegion() != null) {
+            regionLabel.setText(tile.getRegion().getDisplayName());
+        }
         if (tile.getOwner() == null) {
             ownerLabel.setText("");
         } else {
