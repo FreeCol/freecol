@@ -1650,7 +1650,9 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener {
                             }
                         }
 
-                        if (colonyTile.canAdd(unit)) {
+                        if (colonyTile.canAdd(unit)) { 
+                            // TODO: the Peter Minuit effect doesn't work (returns false)
+                            // after he joins congress, the unit should take over the indian tile
                             oldParent.remove(comp);
 
                             inGameController.work(unit, colonyTile);
