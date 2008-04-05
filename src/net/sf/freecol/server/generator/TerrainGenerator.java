@@ -30,10 +30,10 @@ import net.sf.freecol.FreeCol;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Map;
 import net.sf.freecol.common.model.Map.Direction;
-import net.sf.freecol.common.model.Region;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.TileType;
 import net.sf.freecol.common.model.Map.Position;
+import net.sf.freecol.server.model.ServerRegion;
 
 /**
  * Class for making a <code>Map</code> based upon a land map.
@@ -42,6 +42,8 @@ public class TerrainGenerator {
 
     private static final Logger logger = Logger.getLogger(TerrainGenerator.class.getName());
     
+    public static final int PACIFIC_SCORE_VALUE = 100;
+
     private final MapGeneratorOptions mapGeneratorOptions;
 
     private final Random random = new Random();
@@ -323,29 +325,21 @@ public class TerrainGenerator {
     }
 
 
+    /**
+     * Creates map regions in the given Map. At the moment, the land
+     * is divided into three by three regions, and the ocean into two
+     * by two regions.
+     *
+     * @param map a <code>Map</code> value
+     */
     private void createRegions(Map map) {
 
-        Region pacific = map.getRegion("model.region.pacific");
-        pacific.setDiscoverable(true);
-        Region northPacific = map.getRegion("model.region.northPacific");
-        northPacific.setParent(pacific);
-        Region southPacific = map.getRegion("model.region.southPacific");
-        southPacific.setParent(pacific);
-        Region atlantic = map.getRegion("model.region.atlantic");
-        Region northAtlantic = map.getRegion("model.region.northAtlantic");
-        northAtlantic.setParent(atlantic);
-        Region southAtlantic = map.getRegion("model.region.southAtlantic");
-        southAtlantic.setParent(atlantic);
+        ServerRegion.PACIFIC.setDiscoverable(true);
+        ServerRegion.PACIFIC.setScoreValue(PACIFIC_SCORE_VALUE);
 
-        Region north = map.getRegion("model.region.north");
-        Region northEast = map.getRegion("model.region.northEast");
-        Region northWest = map.getRegion("model.region.northWest");
-        Region east = map.getRegion("model.region.east");
-        Region center = map.getRegion("model.region.center");
-        Region west = map.getRegion("model.region.west");
-        Region south = map.getRegion("model.region.south");
-        Region southEast = map.getRegion("model.region.southEast");
-        Region southWest = map.getRegion("model.region.southWest");
+        for (ServerRegion region : ServerRegion.PREDEFINED_REGIONS) {
+            map.setRegion(region);
+        }
 
         int halfHeight = map.getHeight()/2;
         int halfWidth = map.getWidth()/2;
@@ -360,41 +354,41 @@ public class TerrainGenerator {
                     if (tile.isLand()) {
                         if (y < thirdHeight) {
                             if (x < thirdWidth) {
-                                tile.setRegion(northWest);
+                                ServerRegion.NORTH_WEST.addTile(tile);
                             } else if (x < twoThirdWidth) {
-                                tile.setRegion(north);
+                                ServerRegion.NORTH.addTile(tile);
                             } else {
-                                tile.setRegion(northEast);
+                                ServerRegion.NORTH_EAST.addTile(tile);
                             }
                         } else if (y < twoThirdHeight) {
                             if (x < thirdWidth) {
-                                tile.setRegion(west);
+                                ServerRegion.WEST.addTile(tile);
                             } else if (x < twoThirdWidth) {
-                                tile.setRegion(center);
+                                ServerRegion.CENTER.addTile(tile);
                             } else {
-                                tile.setRegion(east);
+                                ServerRegion.EAST.addTile(tile);
                             }
                         } else {
                             if (x < thirdWidth) {
-                                tile.setRegion(southWest);
+                                ServerRegion.SOUTH_WEST.addTile(tile);
                             } else if (x < twoThirdWidth) {
-                                tile.setRegion(south);
+                                ServerRegion.SOUTH.addTile(tile);
                             } else {
-                                tile.setRegion(southEast);
+                                ServerRegion.SOUTH_EAST.addTile(tile);
                             }
                         }
                     } else {
                         if (y < halfHeight) {
                             if (x < halfWidth) {
-                                tile.setRegion(northPacific);
+                                ServerRegion.NORTH_PACIFIC.addTile(tile);
                             } else {
-                                tile.setRegion(northAtlantic);
+                                ServerRegion.NORTH_ATLANTIC.addTile(tile);
                             }
                         } else {
                             if (x < halfWidth) {
-                                tile.setRegion(southPacific);
+                                ServerRegion.SOUTH_PACIFIC.addTile(tile);
                             } else {
-                                tile.setRegion(southAtlantic);
+                                ServerRegion.SOUTH_ATLANTIC.addTile(tile);
                             }
                         }
                     }

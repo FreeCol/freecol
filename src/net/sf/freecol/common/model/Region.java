@@ -20,6 +20,7 @@
 
 package net.sf.freecol.common.model;
 
+import java.awt.Rectangle;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -35,15 +36,12 @@ import net.sf.freecol.client.gui.i18n.Messages;
  */
 public class Region extends FreeColObject implements Nameable {
 
+    private static final String DEFAULT_ID = "model.region.unknownRegion";
+
     /**
      * The name of this Region.
      */
     private String name;
-
-    /**
-     * The size of this Region (number of Tiles).
-     */
-    private int size;
 
     /**
      * The parent Region of this Region.
@@ -54,13 +52,35 @@ public class Region extends FreeColObject implements Nameable {
      * Whether this Region is claimable. Ocean Regions and non-leaf
      * Regions should not be claimable.
      */
-    private boolean claimable;
+    private boolean claimable = false;
 
     /**
      * Whether this Region is discoverable. The Eastern Ocean regions
-     * should not be discoverable.
+     * should not be discoverable. In general, non-leaf regions should
+     * not be discoverable. The Pacific Ocean is an exception, however.
      */
-    private boolean discoverable;
+    private boolean discoverable = false;
+
+    /**
+     * Which Turn the Region was discovered in.
+     */
+    private Turn discoveredIn;
+
+    /**
+     * Which Player the Region was discovered by.
+     */
+    private Player discoveredBy;
+
+    /**
+     * Whether the Region is already discovered when the game starts.
+     */
+    private boolean prediscovered = false;
+
+    /**
+     * How much discovering this Region contributes to your score.
+     * This should be zero unless the Region is discoverable.
+     */
+    private int scoreValue = 0;
 
     /**
      * The children Regions of this Region.
@@ -105,29 +125,13 @@ public class Region extends FreeColObject implements Nameable {
      * @return a <code>String</code> value
      */
     public String getDisplayName() {
-        if (name == null) {
+        if (name != null) {
+            return name;
+        } else if (prediscovered) {
             return Messages.message(getId());
         } else {
-            return name;
+            return Messages.message(DEFAULT_ID);
         }
-    }
-
-    /**
-     * Get the <code>Size</code> value.
-     *
-     * @return an <code>int</code> value
-     */
-    public final int getSize() {
-        return size;
-    }
-
-    /**
-     * Set the <code>Size</code> value.
-     *
-     * @param newSize The new Size value.
-     */
-    public final void setSize(final int newSize) {
-        this.size = newSize;
     }
 
     /**
@@ -203,6 +207,42 @@ public class Region extends FreeColObject implements Nameable {
     }
 
     /**
+     * Get the <code>Prediscovered</code> value.
+     *
+     * @return a <code>boolean</code> value
+     */
+    public final boolean isPrediscovered() {
+        return prediscovered;
+    }
+
+    /**
+     * Set the <code>Prediscovered</code> value.
+     *
+     * @param newPrediscovered The new Prediscovered value.
+     */
+    public final void setPrediscovered(final boolean newPrediscovered) {
+        this.prediscovered = newPrediscovered;
+    }
+
+    /**
+     * Get the <code>ScoreValue</code> value.
+     *
+     * @return an <code>int</code> value
+     */
+    public final int getScoreValue() {
+        return scoreValue;
+    }
+
+    /**
+     * Set the <code>ScoreValue</code> value.
+     *
+     * @param newScoreValue The new ScoreValue value.
+     */
+    public final void setScoreValue(final int newScoreValue) {
+        this.scoreValue = newScoreValue;
+    }
+
+    /**
      * Returns true if this is the whole map Region.
      *
      * @return a <code>boolean</code> value
@@ -240,6 +280,42 @@ public class Region extends FreeColObject implements Nameable {
     }
 
     /**
+     * Get the <code>DiscoveredIn</code> value.
+     *
+     * @return a <code>Turn</code> value
+     */
+    public final Turn getDiscoveredIn() {
+        return discoveredIn;
+    }
+
+    /**
+     * Set the <code>DiscoveredIn</code> value.
+     *
+     * @param newDiscoveredIn The new DiscoveredIn value.
+     */
+    public final void setDiscoveredIn(final Turn newDiscoveredIn) {
+        this.discoveredIn = newDiscoveredIn;
+    }
+
+    /**
+     * Get the <code>DiscoveredBy</code> value.
+     *
+     * @return a <code>Player</code> value
+     */
+    public final Player getDiscoveredBy() {
+        return discoveredBy;
+    }
+
+    /**
+     * Set the <code>DiscoveredBy</code> value.
+     *
+     * @param newDiscoveredBy The new DiscoveredBy value.
+     */
+    public final void setDiscoveredBy(final Player newDiscoveredBy) {
+        this.discoveredBy = newDiscoveredBy;
+    }
+
+    /**
      * This method writes an XML-representation of this object to
      * the given stream.
      * 
@@ -253,11 +329,26 @@ public class Region extends FreeColObject implements Nameable {
         if (name != null) {
             out.writeAttribute("name", name);
         }
-        out.writeAttribute("size", Integer.toString(size));
-        out.writeAttribute("claimable", Boolean.toString(claimable));
-        out.writeAttribute("discoverable", Boolean.toString(discoverable));
+        if (prediscovered) {
+            out.writeAttribute("prediscovered", Boolean.toString(prediscovered));
+        }
+        if (claimable) {
+            out.writeAttribute("claimable", Boolean.toString(claimable));
+        }
+        if (discoverable) {
+            out.writeAttribute("discoverable", Boolean.toString(discoverable));
+        }
         if (parent != null) {
             out.writeAttribute("parent", parent.getId());
+        }
+        if (discoveredIn != null) {
+            out.writeAttribute("discoveredIn", String.valueOf(discoveredIn.getNumber()));
+        }
+        if (discoveredBy != null) {
+            out.writeAttribute("discoveredBy", discoveredBy.getId());
+        }
+        if (scoreValue > 0) {
+            out.writeAttribute("scoreValue", String.valueOf(scoreValue));
         }
         if (children != null) {
             String[] childArray = new String[children.size()];
@@ -278,9 +369,9 @@ public class Region extends FreeColObject implements Nameable {
     protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {        
         setId(in.getAttributeValue(null, "ID"));
         name = in.getAttributeValue(null, "name");
-        size = getAttribute(in, "size", 0);
         claimable = getAttribute(in, "claimable", false);
         discoverable = getAttribute(in, "discoverable", false);
+        prediscovered = getAttribute(in, "prediscovered", false);
         in.nextTag();
     }
 
@@ -293,9 +384,18 @@ public class Region extends FreeColObject implements Nameable {
     protected void readFromXMLImpl(XMLStreamReader in, Map map) throws XMLStreamException {        
         setId(in.getAttributeValue(null, "ID"));
         name = in.getAttributeValue(null, "name");
-        size = getAttribute(in, "size", 0);
         claimable = getAttribute(in, "claimable", false);
         discoverable = getAttribute(in, "discoverable", false);
+        prediscovered = getAttribute(in, "prediscovered", false);
+        scoreValue = getAttribute(in, "scoreValue", 0);
+        int turn = getAttribute(in, "discoveredIn", -1);
+        if (turn > 0) {
+            discoveredIn = new Turn(turn);
+        }
+        String playerID = in.getAttributeValue(null, "discoveredBy");
+        if (playerID != null) {
+            discoveredBy = map.getGame().getPlayer(playerID);
+        }
         String parentString = in.getAttributeValue(null, "parent");
         if (parentString != null) {
             parent = map.getRegion(parentString);

@@ -180,12 +180,16 @@ public class Map extends FreeColGameObject {
      * @return a <code>Region</code> value
      */
     public Region getRegion(final String id) {
-        Region result = regions.get(id);
-        if (result == null) {
-            result = new Region(id, null, null);
-            regions.put(id, result);
-        }
-        return result;
+        return regions.get(id);
+    }
+
+    /**
+     * Describe <code>setRegion</code> method here.
+     *
+     * @param region a <code>Region</code> value
+     */
+    public void setRegion(final Region region) {
+        regions.put(region.getId(), region);
     }
 
     /**
@@ -1796,8 +1800,13 @@ public class Map extends FreeColGameObject {
                 }
                 setTile(t, x, y);
             } else if (in.getLocalName().equals(Region.getXMLElementTagName())) {
-                Region region = getRegion(in.getAttributeValue(null, "ID"));
+                String regionID = in.getAttributeValue(null, "ID");
+                Region region = getRegion(regionID);
+                if (region == null) {
+                    region = new Region(regionID, null, null);
+                }
                 region.readFromXMLImpl(in, this);
+                setRegion(region);
             } else {
                 logger.warning("Unknown tag: " + in.getLocalName() + " loading map");
             }
