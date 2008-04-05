@@ -191,5 +191,33 @@ public class FoundingFatherTest extends FreeColTestCase {
         player.addFather(father);
      }
     */
+    
+    public void testLaSalle() {
+        
+        Colony colony = getStandardColony(2);
+        Player player = colony.getOwner();
+        assertEquals(2, colony.getUnitCount());
+        
+        // the colony has no stockade initially
+        BuildingType stockadeType = spec().getBuildingType("model.building.Stockade");
+        Building b = colony.getBuilding(stockadeType);
+        assertNull(b);
+        
+        // adding LaSalle should have no effect when population is 2
+        FoundingFather father = spec().getFoundingFather("model.foundingFather.laSalle");
+        player.addFather(father);
+        b = colony.getBuilding(stockadeType);
+        assertNull(b);
+        
+        // increasing population to 3 should give access to stockade
+        UnitType pioneerType = FreeCol.getSpecification().getUnitType("model.unit.hardyPioneer");
+        Unit unit = new Unit(getGame(), colony.getTile(), player, pioneerType, UnitState.ACTIVE, pioneerType.getDefaultEquipment());
+        // set the unit as a farmer in the colony
+        unit.setWorkType(Goods.FOOD);
+        ColonyTile farmLand = colony.getVacantColonyTileFor(unit, Goods.FOOD);
+        unit.setLocation(farmLand);
+        b = colony.getBuilding(stockadeType);
+        assertNotNull(b);
+     }
 
 }
