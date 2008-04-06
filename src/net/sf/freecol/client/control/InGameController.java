@@ -1072,8 +1072,7 @@ public final class InGameController implements NetworkConstants {
         spyElement.setAttribute("direction", String.valueOf(direction));
         Element reply = freeColClient.getClient().ask(spyElement);
         if (reply != null) {
-            NodeList childNodes = reply.getChildNodes();
-            settlement.readFromXMLElement((Element) childNodes.item(0));
+            settlement.readFromXMLElement((Element) reply.getFirstChild());
         }
 
         DiplomaticTrade agreement = freeColClient.getCanvas().showNegotiationDialog(unit, settlement, null);
@@ -1091,13 +1090,13 @@ public final class InGameController implements NetworkConstants {
                 
                 if (reply != null) {
                     String accept = reply.getAttribute("accept");
-                    if (accept != null && accept.equals("accept")) {
+                    if ("accept".equals(accept)) {
                         freeColClient.getCanvas().showInformationMessage("negotiationDialog.offerAccepted",
                                                                          new String[][] {{"%nation%", nation}});
                         agreement.makeTrade();
                         return;
                     } else {
-                        Element childElement = (Element) reply.getChildNodes().item(0);
+                        Element childElement = (Element) reply.getFirstChild();
                         DiplomaticTrade proposal = new DiplomaticTrade(freeColClient.getGame(), childElement);
                         agreement = freeColClient.getCanvas().showNegotiationDialog(unit, settlement, proposal);
                     }
@@ -1739,7 +1738,7 @@ public final class InGameController implements NetworkConstants {
             NodeList capturedGoods = attackResultElement.getElementsByTagName("capturedGoods");
             for (int i = 0; i < capturedGoods.getLength(); ++i) {
                 Element goods = (Element) capturedGoods.item(i);
-                GoodsType type = FreeCol.getSpecification().getGoodsType(Integer.parseInt(goods.getAttribute("type")));
+                GoodsType type = FreeCol.getSpecification().getGoodsType(goods.getAttribute("type"));
                 int amount = Integer.parseInt(goods.getAttribute("amount"));
                 unit.getGoodsContainer().addGoods(type, amount);
             }
@@ -2328,7 +2327,7 @@ public final class InGameController implements NetworkConstants {
 
         Element changeWorkTypeElement = Message.createNewRootElement("changeWorkType");
         changeWorkTypeElement.setAttribute("unit", unit.getId());
-        changeWorkTypeElement.setAttribute("workType", Integer.toString(workType.getIndex()));
+        changeWorkTypeElement.setAttribute("workType", workType.getId());
 
         unit.setWorkType(workType);
 
@@ -2352,7 +2351,7 @@ public final class InGameController implements NetworkConstants {
         changeWorkTypeElement.setAttribute("improvementType", improvementType.getId());
 
         Element reply = freeColClient.getClient().ask(changeWorkTypeElement);
-        Element improvementElement = (Element) reply.getChildNodes().item(0);
+        Element improvementElement = (Element) reply.getFirstChild();
         TileImprovement improvement = (TileImprovement) freeColClient.getGame()
             .getFreeColGameObject(improvementElement.getAttribute("ID"));
         if (improvement == null) {
@@ -2615,7 +2614,7 @@ public final class InGameController implements NetworkConstants {
                 if (skillStr == null) {
                     skillName = null;
                 } else {
-                    skill = FreeCol.getSpecification().getUnitType(Integer.parseInt(skillStr));
+                    skill = FreeCol.getSpecification().getUnitType(skillStr);
                     skillName = skill.getName();
                 }
             } else {
@@ -3015,7 +3014,7 @@ public final class InGameController implements NetworkConstants {
 
         Element reply = client.ask(trainUnitInEuropeElement);
         if (reply.getTagName().equals("trainUnitInEuropeConfirmed")) {
-            Element unitElement = (Element) reply.getChildNodes().item(0);
+            Element unitElement = (Element) reply.getFirstChild();
             Unit unit = (Unit) game.getFreeColGameObject(unitElement.getAttribute("ID"));
             if (unit == null) {
                 unit = new Unit(game, unitElement);
@@ -3089,15 +3088,15 @@ public final class InGameController implements NetworkConstants {
 
         Element reply = client.ask(recruitUnitInEuropeElement);
         if (reply.getTagName().equals("recruitUnitInEuropeConfirmed")) {
-            Element unitElement = (Element) reply.getChildNodes().item(0);
+            Element unitElement = (Element) reply.getFirstChild();
             Unit unit = (Unit) game.getFreeColGameObject(unitElement.getAttribute("ID"));
             if (unit == null) {
                 unit = new Unit(game, unitElement);
             } else {
                 unit.readFromXMLElement(unitElement);
             }
-            int unitIndex = Integer.parseInt(reply.getAttribute("newRecruitable"));
-            UnitType unitType = FreeCol.getSpecification().getUnitType(unitIndex);
+            String unitId = reply.getAttribute("newRecruitable");
+            UnitType unitType = FreeCol.getSpecification().getUnitType(unitId);
             europe.recruit(slot, unit, unitType);
         } else {
             logger.warning("Could not recruit the specified unit in europe.");
@@ -3142,15 +3141,15 @@ public final class InGameController implements NetworkConstants {
             slot = Integer.parseInt(reply.getAttribute("slot"));
         }
 
-        Element unitElement = (Element) reply.getChildNodes().item(0);
+        Element unitElement = (Element) reply.getFirstChild();
         Unit unit = (Unit) game.getFreeColGameObject(unitElement.getAttribute("ID"));
         if (unit == null) {
             unit = new Unit(game, unitElement);
         } else {
             unit.readFromXMLElement(unitElement);
         }
-        int unitIndex = Integer.parseInt(reply.getAttribute("newRecruitable"));
-        UnitType newRecruitable = FreeCol.getSpecification().getUnitType(unitIndex);
+        String unitId = reply.getAttribute("newRecruitable");
+        UnitType newRecruitable = FreeCol.getSpecification().getUnitType(unitId);
         europe.emigrate(slot, unit, newRecruitable);
 
         freeColClient.getCanvas().updateGoldLabel();

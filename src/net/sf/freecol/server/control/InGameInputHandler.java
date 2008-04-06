@@ -1183,6 +1183,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
      * @exception IllegalStateException If the request is not accepted by the
      *                model.
      */
+    // TODO: is the used? If not, why not?
     private Element selectFromFountainYouth(Connection connection, Element element) {
         FreeColServer freeColServer = getFreeColServer();
         ServerPlayer player = freeColServer.getPlayer(connection);
@@ -1201,7 +1202,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         Unit unit = new Unit(getGame(), europe, player, recruitable, UnitState.ACTIVE);
         player.getEurope().add(unit);
         Element reply = Message.createNewRootElement("selectFromFountainYouthConfirmed");
-        reply.setAttribute("newRecruitable", Integer.toString(newRecruitable.getIndex()));
+        reply.setAttribute("newRecruitable", newRecruitable.getId());
         reply.appendChild(unit.toXMLElement(player, reply.getOwnerDocument()));
         return reply;
     }
@@ -1241,7 +1242,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         unit.setMovesLeft(0);
         Element reply = Message.createNewRootElement("provideSkill");
         if (settlement.getLearnableSkill() != null) {
-            reply.setAttribute("skill", Integer.toString(settlement.getLearnableSkill().getIndex()));
+            reply.setAttribute("skill", settlement.getLearnableSkill().getId());
             if (unit.getType().canBeUpgraded(settlement.getLearnableSkill(), 
                                              UnitType.UpgradeType.NATIVES)) {
                 // We now put the unit on the indian settlement.
@@ -1381,7 +1382,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
                 int capturedGoods = newGoods.getAmount() - oldGoodsCounts.get(newGoods.getType().getId()).intValue();
                 if (capturedGoods > 0) {
                     Element captured = reply.getOwnerDocument().createElement("capturedGoods");
-                    captured.setAttribute("type", Integer.toString(newGoods.getType().getIndex()));
+                    captured.setAttribute("type", newGoods.getType().getId());
                     captured.setAttribute("amount", Integer.toString(capturedGoods));
                     reply.appendChild(captured);
                 }
@@ -1960,7 +1961,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         UnitType newRecruitable = player.generateRecruitable("abc");
         Unit unit = new Unit(getGame(), europe, player, recruitable, UnitState.ACTIVE, recruitable.getDefaultEquipment());
         Element reply = Message.createNewRootElement("recruitUnitInEuropeConfirmed");
-        reply.setAttribute("newRecruitable", Integer.toString(newRecruitable.getIndex()));
+        reply.setAttribute("newRecruitable", newRecruitable.getId());
         reply.appendChild(unit.toXMLElement(player, reply.getOwnerDocument()));
         europe.recruit(slot, unit, newRecruitable);
         return reply;
@@ -1988,7 +1989,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         if (!player.hasAbility("model.ability.selectRecruit")) {
             reply.setAttribute("slot", Integer.toString(slot));
         }
-        reply.setAttribute("newRecruitable", Integer.toString(newRecruitable.getIndex()));
+        reply.setAttribute("newRecruitable", newRecruitable.getId());
         reply.appendChild(unit.toXMLElement(player, reply.getOwnerDocument()));
         europe.emigrate(slot, unit, newRecruitable);
         return reply;
@@ -2090,8 +2091,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
 
         String workTypeString = workElement.getAttribute("workType");
         if (workTypeString != null) {
-            int workTypeIndex = Integer.parseInt(workTypeString);
-            GoodsType workType = FreeCol.getSpecification().getGoodsType(workTypeIndex);
+            GoodsType workType = FreeCol.getSpecification().getGoodsType(workTypeString);
             // No reason to send an update to other players: this is always hidden.
             unit.setWorkType(workType);
 
