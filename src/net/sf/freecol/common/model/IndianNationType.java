@@ -22,9 +22,6 @@ package net.sf.freecol.common.model;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.HashSet;
-import java.util.Set;
 
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
@@ -66,7 +63,7 @@ public class IndianNationType extends NationType {
     /**
      * The regions that can be settled by this Nation.
      */
-    private Set<String> regions = new HashSet<String>();
+    private List<String> regions = new ArrayList<String>();
 
     /**
      * Sole constructor.
@@ -166,6 +163,14 @@ public class IndianNationType extends NationType {
         this.typeOfSettlement = newTypeOfSettlement;
     }
 
+    /**
+     * Returns the list of regions in which this tribe my settle.
+     *
+     * @return the list of regions in which this tribe my settle.
+     */
+    public List<String> getRegionNames() {
+        return regions;
+    }
 
     /**
      * Returns true if this Nation can settle the given Tile.
@@ -174,8 +179,29 @@ public class IndianNationType extends NationType {
      * @return a <code>boolean</code> value
      */
     public boolean canSettleTile(Tile tile) {
-        return (tile.getType().canSettle() &&
-                regions.contains(tile.getRegion()));
+        if (tile.getType().canSettle()) {
+            return canSettleRegion(tile.getRegion());
+        } else {
+            return false;
+        }
+    }
+
+    /**
+     * Returns true if this Nation can settle the given Region.
+     *
+     * @param region a <code>Region</code> value
+     * @return a <code>boolean</code> value
+     */
+    public boolean canSettleRegion(Region region) {
+        if (regions.isEmpty()) {
+            return true;
+        } else if (regions.contains(region)) {
+            return true;
+        } else if (region.getParent() == null) {
+            return false;
+        } else {
+            return canSettleRegion(region.getParent());
+        }
     }
 
 

@@ -25,6 +25,7 @@ import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
@@ -47,6 +48,7 @@ import net.sf.freecol.common.model.FreeColGameObject;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.GoodsType;
+import net.sf.freecol.common.model.IndianNationType;
 import net.sf.freecol.common.model.IndianSettlement;
 import net.sf.freecol.common.model.Map;
 import net.sf.freecol.common.model.Player;
@@ -61,14 +63,15 @@ import net.sf.freecol.common.model.Map.Position;
 import net.sf.freecol.common.networking.Message;
 import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.model.ServerPlayer;
+import net.sf.freecol.server.model.ServerRegion;
 
 
 /**
  * Creates random maps and sets the starting locations for the players.
  */
 public class MapGenerator {
-    private static final Logger logger = Logger.getLogger(MapGenerator.class.getName());
 
+    private static final Logger logger = Logger.getLogger(MapGenerator.class.getName());
     
     private final Random random;
     private final MapGeneratorOptions mapGeneratorOptions;
@@ -286,6 +289,7 @@ public class MapGenerator {
      *       no settlements are added.
      */
     protected void createIndianSettlements(Map map, List<Player> players) {
+        // TODO: why do we need to sort the players?
         Collections.sort(players, new Comparator<Player>() {
             public int compare(Player o, Player p) {
                 return o.getIndex() - p.getIndex();
@@ -293,25 +297,66 @@ public class MapGenerator {
         });
 
         List<Player> indians = new ArrayList<Player>();
-
+        HashMap<String, Territory> territoryMap = new HashMap<String, Territory>();
         for (Player player : players) {
-            if (player.isIndian()) {
-                indians.add(player);
+            if (!player.isIndian()) {
+                continue;
+            }
+            indians.add(player);
+            List<String> regionNames = ((IndianNationType) player.getNationType()).getRegionNames();
+            Territory territory = null;
+            if (regionNames == null || regionNames.isEmpty()) {
+                territory = new Territory(player, map.getRandomLandPosition());
+                territoryMap.put(player.getId(), territory);
+            } else {
+                for (String name : regionNames) {
+                    if (territoryMap.get(name) == null) {
+                        territory = new Territory(player, (ServerRegion) map.getRegion(name));
+                        territoryMap.put(name, territory);
+                        break;
+                    }
+                }
+                if (territory == null) {
+                    outer: for (String name : regionNames) {
+                        Territory otherTerritory = territoryMap.get(name);
+                        for (String otherName : ((IndianNationType) otherTerritory.player.getNationType())
+                                 .getRegionNames()) {
+                            if (territoryMap.get(otherName) == null) {
+                                ServerRegion foundRegion = otherTerritory.region;
+                                otherTerritory.region = (ServerRegion) map.getRegion(otherName);
+                                territoryMap.put(otherName, otherTerritory);
+                                territory = new Territory(player, foundRegion);
+                                territoryMap.put(name, territory);
+                                break outer;
+                            }
+                        }
+                    }
+                    if (territory == null) {
+                        logger.warning("Unable to find free region for " + player.getName());
+                        territory = new Territory(player, map.getRandomLandPosition());
+                        territoryMap.put(player.getId(), territory);
+                    }
+                }
             }
         }
 
-        if (indians.size() == 0)
+        if (indians.isEmpty()) {
             return;
+        }
 
         Position[] territoryCenter = new Position[indians.size()];
-        for (int tribe = 0; tribe < territoryCenter.length; tribe++) {
-            int x = random.nextInt(map.getWidth());
-            int y = random.nextInt(map.getHeight());
-            territoryCenter[tribe] = new Position(x, y);
+        for (Territory territory : territoryMap.values()) {
+            int index = indians.indexOf(territory.player);
+            Position position;
+            if (territory.position == null) {
+                territoryCenter[index] = territory.region.getCenter();
+            } else {
+                territoryCenter[index] = territory.position;
+            }
         }
 
         IndianSettlement[] capitalCandidate = new IndianSettlement[indians.size()];
-        final int minSettlementDistance = 4;
+        final int minSettlementDistance = 3;
         final int width = map.getWidth() / minSettlementDistance;
         final int height = map.getHeight() / (minSettlementDistance * 2);
         for (int i = 1; i < width; i++) {
@@ -336,7 +381,7 @@ public class MapGenerator {
                         }
                     }
                     IndianSettlement is = placeIndianSettlement(indians.get(bestTribe),
-                        bestTribe, false, candidate.getPosition(), map, players);
+                        false, candidate.getPosition(), map, players);
 
                     // CO: Fix for missing capital
                     if (capitalCandidate[bestTribe] == null) {
@@ -359,6 +404,7 @@ public class MapGenerator {
         }
     }
 
+
     /**
      * Builds a <code>IndianSettlement</code> at the given position.
      *
@@ -371,7 +417,7 @@ public class MapGenerator {
      * @return The <code>IndianSettlement</code> just being placed
      *      on the map.
      */
-    private IndianSettlement placeIndianSettlement(Player player, int tribe, boolean capital,
+    private IndianSettlement placeIndianSettlement(Player player, boolean capital,
                                        Position position, Map map, List<Player> players) {
         final Tile tile = map.getTile(position);
         IndianSettlement settlement = new IndianSettlement(map.getGame(), player,
@@ -686,4 +732,22 @@ public class MapGenerator {
         }
         return false;
     }
+
+    private class Territory {
+        public ServerRegion region;
+        public Position position;
+        public Player player;
+
+        public Territory(Player player, Position position) {
+            this.player = player;
+            this.position = position;
+        }
+
+        public Territory(Player player, ServerRegion region) {
+            this.player = player;
+            this.region = region;
+        }
+    }
+
+
 }
