@@ -2099,7 +2099,7 @@ public class Player extends FreeColGameObject implements Nameable {
                                                                                .get(event));
                 for (Colony colony : getColonies()) {
                     Building building = colony.getBuilding(type);
-                    if (building == null) {
+                    if (building == null && colony.canBuild(type)) {
                         colony.addBuilding(new Building(getGame(), colony, type));
                     }
                 }
