@@ -58,6 +58,7 @@ import net.sf.freecol.common.model.Nameable;
 import net.sf.freecol.common.model.Ownable;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Player.Stance;
+import net.sf.freecol.common.model.Region;
 import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.Tension;
 import net.sf.freecol.common.model.Tile;
@@ -924,7 +925,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         }
         
         unit.move(direction);
-        
+
         Element reply = Message.createNewRootElement("update");
         CombatModel combatModel = unit.getGame().getCombatModel();        
         // Check if ship is slowed
@@ -977,6 +978,27 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
             }
         }
         
+
+        Region region = newTile.getRegion();
+        if (region.isDiscoverable()) {
+            String name = moveElement.getAttribute("regionName");
+            if (name != null) {
+                region.discover(player, getGame().getTurn(), name);
+                reply.appendChild(region.toXMLElement(player, reply.getOwnerDocument()));
+            }
+        
+            for (ServerPlayer enemyPlayer : getOtherPlayers(player)) {
+                try {
+                    Element updateElement = Message.createNewRootElement("update");
+                    updateElement.appendChild(region.toXMLElement(enemyPlayer, updateElement.getOwnerDocument()));
+                    enemyPlayer.getConnection().send(updateElement);
+                } catch (IOException e) {
+                    logger.warning("Could not send message to: " + enemyPlayer.getName() + " with connection "
+                                   + enemyPlayer.getConnection());
+                }
+            }
+        }
+
         List<Tile> surroundingTiles = getGame().getMap().getSurroundingTiles(unit.getTile(), unit.getLineOfSight());
         for (int i = 0; i < surroundingTiles.size(); i++) {
             Tile t = surroundingTiles.get(i);

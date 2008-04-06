@@ -1111,6 +1111,8 @@ public class Map extends FreeColGameObject {
      * @return a <code>Direction</code> value
      */
     public Direction getRandomDirection() {
+        // TODO: at this point, we can't use PseudoRandom, why not?
+        final Random random = new Random();
         return Direction.values()[random.nextInt(NUMBER_OF_DIRECTIONS)];
     }
 
@@ -1810,11 +1812,11 @@ public class Map extends FreeColGameObject {
                 setTile(t, x, y);
             } else if (in.getLocalName().equals(Region.getXMLElementTagName())) {
                 String regionID = in.getAttributeValue(null, "ID");
-                Region region = getRegion(regionID);
+                Region region = (Region) getGame().getFreeColGameObject(regionID);
                 if (region == null) {
-                    region = new Region(regionID, null, null);
+                    region = new Region(getGame(), regionID);
                 }
-                region.readFromXMLImpl(in, this);
+                region.readFromXMLImpl(in);
                 setRegion(region);
             } else {
                 logger.warning("Unknown tag: " + in.getLocalName() + " loading map");

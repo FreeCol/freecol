@@ -80,6 +80,7 @@ import net.sf.freecol.common.model.Ownable;
 import net.sf.freecol.common.model.PathNode;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Player.Stance;
+import net.sf.freecol.common.model.Region;
 import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.TileImprovement;
@@ -514,16 +515,16 @@ public final class InGameController implements NetworkConstants {
         Element reply = client.ask(buildColonyElement);
 
         if (reply.getTagName().equals("buildColonyConfirmed")) {
-            if (reply.getElementsByTagName("update").getLength() > 0) {
-                Element updateElement = (Element) reply.getElementsByTagName("update").item(0);
+            Element updateElement = getChildElement(reply, "update");
+            if (updateElement != null) {
                 freeColClient.getInGameInputHandler().update(updateElement);
             }
-            Colony colony = (Colony) game.getFreeColGameObject(((Element) reply.getChildNodes().item(0))
-                    .getAttribute("ID"));
+            Element colonyElement = (Element) reply.getFirstChild();
+            Colony colony = (Colony) game.getFreeColGameObject(colonyElement.getAttribute("ID"));
             if (colony == null) {
-                colony = new Colony(game, (Element) reply.getChildNodes().item(0));
+                colony = new Colony(game, colonyElement);
             } else {
-                colony.readFromXMLElement((Element) reply.getChildNodes().item(0));
+                colony.readFromXMLElement(colonyElement);
             }
 
             changeWorkType(unit, Goods.FOOD);
@@ -1500,10 +1501,17 @@ public final class InGameController implements NetworkConstants {
         // rumours
         unit.move(direction);
 
-        // client.send(moveElement);
+        Region region = unit.getTile().getRegion();
+        if (region.isDiscoverable()) {
+            String name = freeColClient.getCanvas().showInputDialog("nameRegion.text", "", "ok", "cancel", 
+                                                                    "%name%", region.getDisplayName());
+            moveElement.setAttribute("regionName", name);
+        }
+
+        // reply is an "update" Element
         Element reply = client.ask(moveElement);
         freeColClient.getInGameInputHandler().handle(client.getConnection(), reply);
-        
+
         if (reply.hasAttribute("movesSlowed")) {
             // ship slowed
             unit.setMovesLeft(unit.getMovesLeft() - Integer.parseInt(reply.getAttribute("movesSlowed")));

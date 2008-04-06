@@ -34,7 +34,7 @@ import net.sf.freecol.client.gui.i18n.Messages;
 /**
  * A named region on the map.
  */
-public class Region extends FreeColObject implements Nameable {
+public class Region extends FreeColGameObject implements Nameable {
 
     public static enum RegionType { OCEAN, COAST, LAKE, RIVER, LAND, MOUNTAIN, DESERT }
 
@@ -42,6 +42,11 @@ public class Region extends FreeColObject implements Nameable {
      * The name of this Region.
      */
     private String name;
+
+    /**
+     * Key used to retrieve description from Messages.
+     */
+    private String nameKey;
 
     /**
      * The parent Region of this Region.
@@ -96,14 +101,38 @@ public class Region extends FreeColObject implements Nameable {
     /**
      * Creates a new <code>Region</code> instance.
      *
-     * @param id a <code>String</code> value
-     * @param name a <code>String</code> value
-     * @param parent a <code>Region</code> value
+     * @param game a <code>Game</code> value
      */
-    public Region(String id, RegionType type, Region parent) {
-        setId(id);
-        this.type = type;
-        this.parent = parent;
+    public Region(Game game) {
+        super(game);
+    }
+
+    /**
+     * Creates a new <code>Region</code> instance.
+     *
+     * @param game a <code>Game</code> value
+     * @param id a <code>String</code> value
+     */
+    public Region(Game game, String id) {
+        super(game, id);
+    }
+
+    /**
+     * Get the <code>NameKey</code> value.
+     *
+     * @return a <code>String</code> value
+     */
+    public final String getNameKey() {
+        return nameKey;
+    }
+
+    /**
+     * Set the <code>NameKey</code> value.
+     *
+     * @param newNameKey The new NameKey value.
+     */
+    public final void setNameKey(final String newNameKey) {
+        this.nameKey = newNameKey;
     }
 
     /**
@@ -131,7 +160,7 @@ public class Region extends FreeColObject implements Nameable {
      */
     public String getDisplayName() {
         if (prediscovered) {
-            return Messages.message(getId());
+            return Messages.message(nameKey);
         } else if (name == null) {
             return Messages.message("model.region." + type.toString());
         } else {
@@ -339,16 +368,47 @@ public class Region extends FreeColObject implements Nameable {
     }
 
     /**
-     * This method writes an XML-representation of this object to
-     * the given stream.
+     * Mark the Region as discovered.
+     *
+     * @param player a <code>Player</code> value
+     * @param turn a <code>Turn</code> value
+     * @param newName a <code>String</code> value
+     */
+    public void discover(Player player, Turn turn, String newName) {
+        discoveredBy = player;
+        discoveredIn = turn;
+        name = newName;
+        discoverable = false;
+    }
+
+    /**
+     * This method writes an XML-representation of this object to the given
+     * stream.
+     * 
+     * <br>
+     * <br>
+     * 
+     * Only attributes visible to the given <code>Player</code> will be added
+     * to that representation if <code>showAll</code> is set to
+     * <code>false</code>.
      * 
      * @param out The target stream.
-     * @throws XMLStreamException if there are any problems writing
-     *      to the stream.
-     */    
-    public void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
+     * @param player The <code>Player</code> this XML-representation should be
+     *            made for, or <code>null</code> if
+     *            <code>showAll == true</code>.
+     * @param showAll Only attributes visible to <code>player</code> will be
+     *            added to the representation if <code>showAll</code> is set
+     *            to <i>false</i>.
+     * @param toSavedGame If <code>true</code> then information that is only
+     *            needed when saving a game is added.
+     * @throws XMLStreamException if there are any problems writing to the
+     *             stream.
+     */
+    protected void toXMLImpl(XMLStreamWriter out, Player player, boolean showAll, boolean toSavedGame)
+        throws XMLStreamException {
         out.writeStartElement(getXMLElementTagName());
         out.writeAttribute("ID", getId());
+        out.writeAttribute("nameKey", nameKey);
         out.writeAttribute("type", type.toString());
         if (name != null) {
             out.writeAttribute("name", name);
@@ -390,25 +450,9 @@ public class Region extends FreeColObject implements Nameable {
      * @throws XMLStreamException if a problem was encountered
      *      during parsing.
      */
-    protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {        
+    protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
         setId(in.getAttributeValue(null, "ID"));
-        name = in.getAttributeValue(null, "name");
-        type = Enum.valueOf(RegionType.class, in.getAttributeValue(null, "type"));
-        claimable = getAttribute(in, "claimable", false);
-        discoverable = getAttribute(in, "discoverable", false);
-        prediscovered = getAttribute(in, "prediscovered", false);
-        scoreValue = getAttribute(in, "scoreValue", 0);
-        in.nextTag();
-    }
-
-    /**
-     * Initialize this object from an XML-representation of this object.
-     * @param in The input stream with the XML.
-     * @throws XMLStreamException if a problem was encountered
-     *      during parsing.
-     */
-    protected void readFromXMLImpl(XMLStreamReader in, Map map) throws XMLStreamException {        
-        setId(in.getAttributeValue(null, "ID"));
+        nameKey = in.getAttributeValue(null, "nameKey");
         name = in.getAttributeValue(null, "name");
         claimable = getAttribute(in, "claimable", false);
         discoverable = getAttribute(in, "discoverable", false);
@@ -421,18 +465,18 @@ public class Region extends FreeColObject implements Nameable {
         }
         String playerID = in.getAttributeValue(null, "discoveredBy");
         if (playerID != null) {
-            discoveredBy = map.getGame().getPlayer(playerID);
+            discoveredBy = getGame().getPlayer(playerID);
         }
         String parentString = in.getAttributeValue(null, "parent");
         if (parentString != null) {
-            parent = map.getRegion(parentString);
+            parent = getGame().getMap().getRegion(parentString);
         }
         while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
             if (in.getLocalName().equals("children")) {
                 String[] childArray = readFromArrayElement("children", in, new String[0]);
                 children = new ArrayList<Region>();
                 for (String child : childArray) {
-                    children.add(map.getRegion(child));
+                    children.add(getGame().getMap().getRegion(child));
                 }
             }
         }

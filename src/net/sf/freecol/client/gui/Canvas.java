@@ -1374,9 +1374,10 @@ public final class Canvas extends JDesktopPane {
      *         to cancel the action.
      * @see FreeColDialog
      */
-    public String showInputDialog(String text, String defaultValue, String okText, String cancelText) {
+    public String showInputDialog(String text, String defaultValue, String okText, String cancelText,
+                                  String... data) {
         try {
-            text = Messages.message(text);
+            text = Messages.message(text, data);
             okText = Messages.message(okText);
 
             if (cancelText != null) {
