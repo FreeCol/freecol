@@ -1118,22 +1118,33 @@ public final class Colony extends Settlement implements Location, Nameable {
                     }
                 }
                 if (buildable instanceof UnitType) {
+                    // artillery/ship/wagon completed
                     Unit unit = getGame().getModelController().createUnit(getId() + "buildUnit", getTile(), getOwner(),
                                                                           (UnitType) buildable);
-                    addModelMessage(this, "model.colony.unitReady",
-                                    new String[][] { { "%colony%", getName() },
-                                                     { "%unit%", unit.getName() } },
-                                    ModelMessage.MessageType.UNIT_ADDED, unit);
+                    addModelMessage(this, ModelMessage.MessageType.UNIT_ADDED, unit,
+                            "model.colony.unitReady",
+                            "%colony%", getName(),
+                            "%unit%", unit.getName());
                 } else if (buildable instanceof BuildingType) {
+                    // building completed
                     BuildingType upgradesFrom = ((BuildingType) buildable).getUpgradesFrom();
                     if (upgradesFrom == null) {
                         addBuilding(createBuilding((BuildingType) buildable));
                     } else {
                         getBuilding(upgradesFrom).upgrade();
                     }
+                    addModelMessage(this, ModelMessage.MessageType.BUILDING_COMPLETED, this,
+                            "model.colony.buildingReady", 
+                            "%colony%", getName(),
+                            "%building%", buildable.getName());
                     buildQueue.remove(0);
                     if (buildQueue.isEmpty()) {
                         buildQueue.add(BuildableType.NOTHING);
+                    }
+                    if (buildQueue.size()==1 && buildQueue.get(0)==BuildableType.NOTHING) {
+                        addModelMessage(this, ModelMessage.MessageType.WARNING, this, 
+                                "model.colony.cannotBuild", 
+                                "%colony%", getName());
                     }
                 }
             } else {
