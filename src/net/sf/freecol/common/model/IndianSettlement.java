@@ -1004,9 +1004,10 @@ public class IndianSettlement extends Settlement {
                         int random = modelController.getRandom(getId() + "getNewConvertType", converts.size());
                         Unit u = modelController.createUnit(getId() + "newTurn100missionary", targetTile,
                                                             missionary.getOwner(), converts.get(random));
-                        addModelMessage(u, "model.colony.newConvert",
-                                        new String[][] {{"%nation%", getOwner().getNationAsString()}},
-                                        ModelMessage.MessageType.UNIT_ADDED);
+                        addModelMessage(u, ModelMessage.MessageType.UNIT_ADDED, u,
+                                "model.colony.newConvert",
+                                "%nation%", getOwner().getNationAsString(),
+                                "%colony%", targetTile.getColony().getName());
                         logger.info("New convert created for " + missionary.getOwner().getName() + " with ID=" + u.getId());
                     }
                 }
