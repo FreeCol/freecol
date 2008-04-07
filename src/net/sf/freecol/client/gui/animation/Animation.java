@@ -47,11 +47,15 @@ public abstract class Animation {
      */
     protected int canvasY;
     
-    /**
+    /*
      * Display delay between one frame and another, in milliseconds.
      * 33ms == 30 fps
      */
     private static final int ANIMATION_DELAY = 33;
+    
+    // If the animation, by default, should be buffered or not.
+    // Buffered animation is smoother but takes a lot of memory.
+    private static final boolean BUFFER_ANIMATION = false;
     
     public Animation(Canvas canvas) {
         this.canvas = canvas;
@@ -62,7 +66,7 @@ public abstract class Animation {
      * Plays the animation, no buffer mode.
      */
     public void animate() {
-        animate(false);
+        animate(BUFFER_ANIMATION);
     }    
     
     /**

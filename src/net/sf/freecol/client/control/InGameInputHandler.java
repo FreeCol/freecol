@@ -1288,14 +1288,13 @@ public final class InGameInputHandler extends InputHandler {
     class AnimateCanvasSwingTask extends NoResultCanvasSwingTask {
         
         private final Animation animation;
-        private boolean bufferAnimation;
         
         /**
-         * Constructor - animate canvas without frame buffer
+         * Constructor - animate canvas with default buffer option.
          * @param animation The animation that will be played
          */
         public AnimateCanvasSwingTask(Animation animation) {
-            this(animation, false);
+            this(animation, null);
         }
         
         /**
@@ -1303,14 +1302,15 @@ public final class InGameInputHandler extends InputHandler {
          * @param animation The animation that will be played
          * @param bufferAnimation If the animation should be buffered or not.
          */
-        public AnimateCanvasSwingTask(Animation animation, boolean bufferAnimation) {
+        public AnimateCanvasSwingTask(Animation animation, Boolean bufferAnimation) {
             this.animation = animation;
-            this.bufferAnimation = bufferAnimation;
         }
 
 
         protected void doWork(Canvas canvas) {
-            animation.animate(bufferAnimation);
+            
+            animation.animate();
+            
             canvas.refresh();
         }
     }
@@ -1322,7 +1322,6 @@ public final class InGameInputHandler extends InputHandler {
         
         private final Unit unit;
         private final Tile destinationTile;
-        private boolean bufferAnimation;
         private boolean focus;
         
         /**
@@ -1331,7 +1330,7 @@ public final class InGameInputHandler extends InputHandler {
          * @param destinationTile The Tile where the unit will be moving to.
          */
         public UnitMoveAnimationCanvasSwingTask(Unit unit, Tile destinationTile) {
-            this(unit, destinationTile,false, true);
+            this(unit, destinationTile, true);
         }
         
         /**
@@ -1340,23 +1339,21 @@ public final class InGameInputHandler extends InputHandler {
          * @param direction The Direction in which the Unit will be moving.
          */
         public UnitMoveAnimationCanvasSwingTask(Unit unit, Direction direction) {
-            this(unit, unit.getGame().getMap().getNeighbourOrNull(direction, unit.getTile()),false, true);
+            this(unit, unit.getGame().getMap().getNeighbourOrNull(direction, unit.getTile()), true);
         }
         
         /**
          * Constructor
          * @param unit The unit that is moving
-         * @param focusPosition Position to set the focus of the screen. null for no focus
+         * @param destinationTile The Tile where the unit will be moving to.
          * @param bufferAnimation If the animation should be buffered or not.
          * @param focus If before the animation the screen should focus the unit
          */
-        public UnitMoveAnimationCanvasSwingTask(Unit unit, Tile destinationTile, boolean bufferAnimation, boolean focus) {
+        public UnitMoveAnimationCanvasSwingTask(Unit unit, Tile destinationTile, boolean focus) {
             this.unit = unit;
             this.destinationTile = destinationTile;
-            this.bufferAnimation = bufferAnimation;
             this.focus = focus;
         }
-
 
         protected void doWork(Canvas canvas) {
             
@@ -1364,7 +1361,7 @@ public final class InGameInputHandler extends InputHandler {
                 canvas.getGUI().setFocusImmediately(unit.getTile().getPosition());
                         
             Animation animation = new UnitMoveAnimation(canvas, unit, destinationTile);
-            animation.animate(bufferAnimation);
+            animation.animate();
             canvas.refresh();
         }
     }

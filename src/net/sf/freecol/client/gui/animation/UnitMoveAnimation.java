@@ -59,7 +59,7 @@ public final class UnitMoveAnimation extends Animation {
     /**
      * Constructor
      * @param canvas The canvas where the animation will be drawn
-     * @param unit The unit to be animated. nextTile must be set.
+     * @param unit The unit to be animated. 
      * @param direction The Direction in which the Unit will be moving.
      */
     public UnitMoveAnimation(Canvas canvas, Unit unit, Direction direction) {
@@ -69,7 +69,7 @@ public final class UnitMoveAnimation extends Animation {
     /**
      * Constructor
      * @param canvas The canvas where the animation will be drawn
-     * @param unit The unit to be animated. nextTile must be set.
+     * @param unit The unit to be animated. 
      * @param destinationTile The Tile where the Unit will be moving to.
      */
     public UnitMoveAnimation(Canvas canvas, Unit unit, Tile destinationTile) {
