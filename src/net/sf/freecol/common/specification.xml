@@ -384,7 +384,7 @@
     </equipment-type>
     <equipment-type id="model.equipment.muskets" combat-loss-priority="10" role="soldier">
       <modifier id="model.modifier.defence" type="additive" value="1"/>
-      <modifier id="model.modifier.offence" type="additive" value="1"/>
+      <modifier id="model.modifier.offence" type="additive" value="2"/>
       <ability id="model.ability.scoutIndianSettlement" value="false"/>
       <ability id="model.ability.scoutForeignColony" value="false"/>
       <ability id="model.ability.captureUnits" value="true"/>
