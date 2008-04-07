@@ -129,8 +129,8 @@ public class ClientModelController implements ModelController {
             throw new IllegalStateException();
         }
 
-        Unit unit = new Unit(freeColClient.getGame(), (Element) reply.getElementsByTagName(Unit.getXMLElementTagName())
-                .item(0));
+        Element unitElement = (Element) reply.getElementsByTagName(Unit.getXMLElementTagName()).item(0);
+        Unit unit = new Unit(freeColClient.getGame(), unitElement);
         unit.setLocation(unit.getLocation());
 
         return unit;
@@ -166,10 +166,9 @@ public class ClientModelController implements ModelController {
             logger.warning("Wrong tag name.");
             throw new IllegalStateException();
         }
-
-        Building building = new Building(freeColClient.getGame(),
-                                         (Element) reply.getElementsByTagName(Building.getXMLElementTagName())
-                                         .item(0));
+        
+        Element buildingElement = (Element) reply.getElementsByTagName(Building.getXMLElementTagName()).item(0);
+        Building building = new Building(freeColClient.getGame(), buildingElement);
         return building;
     }
 
@@ -255,8 +254,8 @@ public class ClientModelController implements ModelController {
             throw new IllegalStateException();
         }
 
-        TradeRoute tradeRoute = new TradeRoute(game, (Element) reply.getElementsByTagName(
-                TradeRoute.getXMLElementTagName()).item(0));
+        Element routeElement = (Element) reply.getElementsByTagName(TradeRoute.getXMLElementTagName()).item(0);
+        TradeRoute tradeRoute = new TradeRoute(game, routeElement);
 
         return tradeRoute;
     }
