@@ -159,6 +159,8 @@ public final class ReportTurnPanel extends ReportPanel implements ActionListener
                     button.setActionCommand(((Colony) message.getDisplay()).getId());
                     button.addActionListener(this);
                     button.setBorder(BorderFactory.createEmptyBorder());
+                    // button is not used ?
+                    label.setIcon(icon);
                 } else if (message.getDisplay() instanceof Unit) {
                     label.setIcon(icon);
                 } else if (message.getDisplay() instanceof Player) {
