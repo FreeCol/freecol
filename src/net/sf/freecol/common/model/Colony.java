@@ -193,9 +193,9 @@ public final class Colony extends Settlement implements Location, Nameable {
      * @return a <code>boolean</code> value
      */
     private boolean isFree(BuildingType buildingType) {
-        return (owner.getFeatureContainer()
-                .applyModifier(100f, "model.modifier.buildingPriceBonus",
-                               buildingType, getGame().getTurn()) == 0f);
+        float value = owner.getFeatureContainer().applyModifier(100f, 
+                "model.modifier.buildingPriceBonus", buildingType, getGame().getTurn());
+        return (value == 0f);
     }
 
     /**
@@ -1524,8 +1524,23 @@ public final class Colony extends Settlement implements Location, Nameable {
             for (AbstractGoods goodsRequired : getCurrentlyBuilding().getGoodsRequired()) {
                 goodsForBuilding.add(goodsRequired.getType());
             }
+        } else {
+            // something is preventing construction
+            BuildableType currentlyBuilding = getCurrentlyBuilding();
+            if (currentlyBuilding == null || currentlyBuilding == BuildableType.NOTHING) {
+                // production idle
+                addModelMessage(this, ModelMessage.MessageType.WARNING, this, 
+                        "model.colony.cannotBuild", 
+                        "%colony%", getName());
+            } else if (currentlyBuilding.getPopulationRequired() > getUnitCount()) {
+                // not enough units
+                addModelMessage(this, ModelMessage.MessageType.WARNING, this, 
+                        "model.colony.buildNeedPop", 
+                        "%colony%", getName(), 
+                        "%building%", currentlyBuilding.getName());
+            }
         }
-
+        
         List<Building> buildings1 = new ArrayList<Building>();
         List<Building> buildings2 = new ArrayList<Building>();
         for (Building building : getBuildings()) {
