@@ -84,11 +84,7 @@ public final class BuildingType extends BuildableType {
     public int getLevel() {
         return level;
     }
-    
-    public int getDefenceBonus() {
-        return defenceBonus;
-    }
-    
+
     public int getSequence() {
         return sequence;
     }
@@ -112,7 +108,6 @@ public final class BuildingType extends BuildableType {
             level = 1;
         }
         
-        defenceBonus = getAttribute(in, "defence-bonus", 0);
         workPlaces = getAttribute(in, "workplaces", 0);
         basicProduction = getAttribute(in, "basicProduction", 0);
 

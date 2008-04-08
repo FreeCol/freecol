@@ -92,9 +92,7 @@ public final class Colony extends Settlement implements Location, Nameable {
     // Temporary variable:
     private int lastVisited = -1;
 
-    private int defenceBonus;
-
-   /**
+    /**
      * A list of Buildable items, which is NEVER empty.
      */
     private List<BuildableType> buildQueue = new ArrayList<BuildableType>();
@@ -1668,7 +1666,6 @@ public final class Colony extends Settlement implements Location, Nameable {
         out.writeAttribute("name", name);
         out.writeAttribute("owner", owner.getId());
         out.writeAttribute("tile", tile.getId());
-        out.writeAttribute("defenceBonus", Integer.toString(defenceBonus));
         if (getGame().isClientTrusted() || showAll || player == getOwner()) {
             out.writeAttribute("sonsOfLiberty", Integer.toString(sonsOfLiberty));
             out.writeAttribute("oldSonsOfLiberty", Integer.toString(oldSonsOfLiberty));
@@ -1729,7 +1726,6 @@ public final class Colony extends Settlement implements Location, Nameable {
         tories = getAttribute(in, "tories", 0);
         oldTories = getAttribute(in, "oldTories", 0);
         productionBonus = getAttribute(in, "productionBonus", 0);
-        defenceBonus = getAttribute(in, "productionBonus", 0);
         BuildableType buildableType = BuildableType.NOTHING;
         String buildable = getAttribute(in, "currentlyBuilding", null);
         if (buildable != null) {
@@ -1815,7 +1811,7 @@ public final class Colony extends Settlement implements Location, Nameable {
     public Building getStockade() {
         // TODO: it should search for more than one building?
         for (Building building : buildingMap.values()) {
-            if (building.getType().getDefenceBonus() > 0) {
+            if (!building.getType().getModifierSet("model.modifier.defence").isEmpty()) {
                 return building;
             }
         }
@@ -1853,21 +1849,4 @@ public final class Colony extends Settlement implements Location, Nameable {
         return featureContainer;
     }
 
-    /**
-     * Describe <code>getDefenceBonus</code> method here.
-     *
-     * @return an <code>int</code> value
-     */
-    public int getDefenceBonus() {
-        return defenceBonus;
-    }
-
-    /**
-     * Describe <code>setDefenceBonus</code> method here.
-     *
-     * @param newDefenceBonus an <code>int</code> value
-     */
-    public void setDefenceBonus(int newDefenceBonus) {
-        defenceBonus = newDefenceBonus;
-    }
 }

@@ -25,6 +25,7 @@ import java.io.StringReader;
 import java.io.StringWriter;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
@@ -282,15 +283,24 @@ public class BuildingTest extends FreeColTestCase {
     }
 
     public void testStockade() {
+
+        Set<Modifier> modifierSet;
         
         BuildingType stockade = spec().getBuildingType("model.building.Stockade");
-        assertEquals(100, stockade.getDefenceBonus());
-        
+        modifierSet = stockade.getModifierSet("model.modifier.defence");
+        assertEquals(1, modifierSet.size());
+        assertEquals(100f, modifierSet.iterator().next().getValue());
+
         BuildingType fort = spec().getBuildingType("model.building.Fort");
-        assertEquals(150, fort.getDefenceBonus());
+        modifierSet = fort.getModifierSet("model.modifier.defence");
+        assertEquals(1, modifierSet.size());
+        assertEquals(150f, modifierSet.iterator().next().getValue());
         
         BuildingType fortress = spec().getBuildingType("model.building.Fortress");
-        assertEquals(200, fortress.getDefenceBonus());
+        modifierSet = fortress.getModifierSet("model.modifier.defence");
+        assertEquals(1, modifierSet.size());
+        assertEquals(200f, modifierSet.iterator().next().getValue());
+
     }
 
 }

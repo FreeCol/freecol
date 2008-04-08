@@ -237,14 +237,12 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
     private void setType(final BuildingType newBuildingType) {
         // remove features from current type
         colony.getFeatureContainer().remove(buildingType.getFeatureContainer());
-        colony.setDefenceBonus(colony.getDefenceBonus() - buildingType.getDefenceBonus());
 
         if (newBuildingType != null) {
             buildingType = newBuildingType;
             
             // add new features and abilities from new type
             colony.getFeatureContainer().add(buildingType.getFeatureContainer());
-            colony.setDefenceBonus(colony.getDefenceBonus() + buildingType.getDefenceBonus());
             
             // Colonists which can't work here must be put outside
             for (Unit unit : units) {
