@@ -270,7 +270,6 @@ public class BuildingTest extends FreeColTestCase {
         List<Unit> units = colony.getUnitList();
 
         for (Building building : colony.getBuildings()) {
-
             try {
                 StringWriter sw = new StringWriter();
                 XMLOutputFactory xif = XMLOutputFactory.newInstance();
@@ -279,10 +278,19 @@ public class BuildingTest extends FreeColTestCase {
                 xsw.close();
             } catch (XMLStreamException e) {
             }
-
         }
+    }
 
-
+    public void testStockade() {
+        
+        BuildingType stockade = spec().getBuildingType("model.building.Stockade");
+        assertEquals(100, stockade.getDefenceBonus());
+        
+        BuildingType fort = spec().getBuildingType("model.building.Fort");
+        assertEquals(150, fort.getDefenceBonus());
+        
+        BuildingType fortress = spec().getBuildingType("model.building.Fortress");
+        assertEquals(200, fortress.getDefenceBonus());
     }
 
 }
