@@ -23,6 +23,7 @@ import java.io.File;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -52,6 +53,7 @@ import net.sf.freecol.common.model.IndianNationType;
 import net.sf.freecol.common.model.IndianSettlement;
 import net.sf.freecol.common.model.Map;
 import net.sf.freecol.common.model.Player;
+import net.sf.freecol.common.model.Region;
 import net.sf.freecol.common.model.ResourceType;
 import net.sf.freecol.common.model.Settlement.SettlementType;
 import net.sf.freecol.common.model.Tile;
@@ -311,12 +313,16 @@ public class MapGenerator {
             } else {
                 for (String name : regionNames) {
                     if (territoryMap.get(name) == null) {
+                        logger.fine("Allocated region " + name + " for " +
+                                    player.getNation().getName());
                         territory = new Territory(player, (ServerRegion) map.getRegion(name));
                         territoryMap.put(name, territory);
                         break;
                     }
                 }
                 if (territory == null) {
+                    logger.warning("Failed to allocate preferred region " + regionNames.get(0) +
+                                   " for " + player.getNation().getName());
                     outer: for (String name : regionNames) {
                         Territory otherTerritory = territoryMap.get(name);
                         for (String otherName : ((IndianNationType) otherTerritory.player.getNationType())
@@ -344,64 +350,98 @@ public class MapGenerator {
             return;
         }
 
-        Position[] territoryCenter = new Position[indians.size()];
-        for (Territory territory : territoryMap.values()) {
-            int index = indians.indexOf(territory.player);
-            Position position;
-            if (territory.position == null) {
-                territoryCenter[index] = territory.region.getCenter();
-            } else {
-                territoryCenter[index] = territory.position;
-            }
-        }
-
-        IndianSettlement[] capitalCandidate = new IndianSettlement[indians.size()];
+        List<Tile> settlementTiles = new ArrayList<Tile>();
         final int minSettlementDistance = 3;
-        final int width = map.getWidth() / minSettlementDistance;
-        final int height = map.getHeight() / (minSettlementDistance * 2);
-        for (int i = 1; i < width; i++) {
-            for (int j = 1; j < height; j++) {
-                int x = i * minSettlementDistance + random.nextInt(3) - 1;
-                if (j % 2 != 0) {
-                    x += minSettlementDistance / 2;
-                }
-                int y = j * (2 * minSettlementDistance) + random.nextInt(3) - 1;
-                if (!map.isValid(x, y)) {
-                    continue;
-                }
-                Tile candidate = map.getTile(x, y);
-                if (candidate.isSettleable()) {
-                    int bestTribe = 0;
-                    int minDistance = Integer.MAX_VALUE;
-                    for (int t = 0; t < territoryCenter.length; t++) {
-                        if (map.getDistance(territoryCenter[t], candidate.getPosition()) < minDistance) {
-                            minDistance = map.getDistance(territoryCenter[t], candidate
-                                .getPosition());
-                            bestTribe = t;
-                        }
-                    }
-                    IndianSettlement is = placeIndianSettlement(indians.get(bestTribe),
-                        false, candidate.getPosition(), map, players);
+        int number = map.getWidth() * map.getHeight() / 30;
 
-                    // CO: Fix for missing capital
-                    if (capitalCandidate[bestTribe] == null) {
-                        capitalCandidate[bestTribe] = is;
-                    } else {
-                        // If new settlement is closer to center of territory
-                        // for this tribe, mark it as a better candidate
-                        if (map.getDistance(territoryCenter[bestTribe], capitalCandidate[bestTribe]
-                            .getTile().getPosition()) > map.getDistance(territoryCenter[bestTribe],
-                            candidate.getPosition()))
-                            capitalCandidate[bestTribe] = is;
+        for (int i = 0; i < number; i++) {
+            nextTry: for (int tries = 0; tries < 100; tries++) {
+                int x = random.nextInt(map.getWidth());
+                int y = random.nextInt(map.getHeight());
+                if (map.isValid(x, y)) {
+                    Tile candidate = map.getTile(x, y);
+                    if (candidate.isSettleable()) {
+                        for (Tile tile : settlementTiles) {
+                            if (map.getDistance(x, y, tile.getX(), tile.getY()) < minSettlementDistance) {
+                                continue nextTry;
+                            }
+                        }                            
+                        settlementTiles.add(candidate);
+                        break;
                     }
                 }
             }
         }
-        for (int i = 0; i < capitalCandidate.length; i++) {
-            if (capitalCandidate[i] != null) {
-                capitalCandidate[i].setCapital(true);
+        logger.fine("Found " + settlementTiles.size() + " potential settlements.");
+
+        int capitals = indians.size();
+        if (settlementTiles.size() < indians.size()) {
+            logger.warning("Number of potential settlements is smaller than number of tribes.");
+            capitals = settlementTiles.size();
+        }
+
+        List<Territory> highTerritories = new ArrayList<Territory>();
+        List<Territory> averageTerritories = new ArrayList<Territory>();
+        List<Territory> lowTerritories = new ArrayList<Territory>();
+
+        // first, find capitals
+        for (Territory territory : territoryMap.values()) {
+            switch (((IndianNationType) territory.player.getNationType()).getNumberOfSettlements()) {
+            case HIGH:
+                highTerritories.add(territory);
+                break;
+            case AVERAGE:
+                averageTerritories.add(territory);
+                break;
+            case LOW:
+                lowTerritories.add(territory);
+                break;
+            }
+            Tile tile = getClosestTile(map, territory.getCenter(), settlementTiles);
+            if (tile == null) {
+                // no more tiles
+                return;
+            } else {
+                placeIndianSettlement(territory.player, true, tile.getPosition(), map);
+                territory.position = tile.getPosition();
+                settlementTiles.remove(tile);
             }
         }
+        
+        List<Territory> territoryList = new ArrayList<Territory>(highTerritories);
+        territoryList.addAll(averageTerritories);
+        territoryList.addAll(lowTerritories);
+        territoryList.addAll(highTerritories);
+        territoryList.addAll(averageTerritories);
+        territoryList.addAll(highTerritories);
+
+        // next, other settlements
+        while (!settlementTiles.isEmpty()) {
+            for (Territory territory : territoryList) {
+                Tile tile = getClosestTile(map, territory.getCenter(), settlementTiles);
+                if (tile == null) {
+                    // no more tiles
+                    return;
+                } else {
+                    placeIndianSettlement(territory.player, false, tile.getPosition(), map);
+                    settlementTiles.remove(tile);
+                }
+            }            
+        }    
+
+    }
+
+    private Tile getClosestTile(Map map, Position center, List<Tile> tiles) {
+        Tile result = null;
+        int minimumDistance = Integer.MAX_VALUE;
+        for (Tile tile : tiles) {
+            int distance = map.getDistance(tile.getPosition(), center);
+            if (distance < minimumDistance) {
+                minimumDistance = distance;
+                result = tile;
+            }
+        }
+        return result;
     }
 
 
@@ -418,7 +458,7 @@ public class MapGenerator {
      *      on the map.
      */
     private IndianSettlement placeIndianSettlement(Player player, boolean capital,
-                                       Position position, Map map, List<Player> players) {
+                                       Position position, Map map) {
         final Tile tile = map.getTile(position);
         IndianSettlement settlement = new IndianSettlement(map.getGame(), player,
                     tile, capital,
@@ -497,7 +537,7 @@ public class MapGenerator {
             }
         }
 
-        int counter = 0;
+        int counter = 1;
         for (int index = 0; index < farmedList.size(); index++) {
             if (bonuses[index] > 0) {
                 potentials[index] *= bonuses[index] * bonusMultiplier;
@@ -746,6 +786,14 @@ public class MapGenerator {
         public Territory(Player player, ServerRegion region) {
             this.player = player;
             this.region = region;
+        }
+
+        public Position getCenter() {
+            if (position == null) {
+                return region.getCenter();
+            } else {
+                return position;
+            }
         }
     }
 

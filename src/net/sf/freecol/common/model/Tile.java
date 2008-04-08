@@ -1664,7 +1664,7 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
 
         String regionString = in.getAttributeValue(null, "region");
         if (regionString != null) {
-            region = getGame().getMap().getRegion(regionString);
+            region = (Region) getGame().getFreeColGameObject(regionString);
         }
 
         final String lostCityRumourStr = in.getAttributeValue(null, "lostCityRumour");
@@ -2273,7 +2273,7 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
 
             String regionString = in.getAttributeValue(null, "region");
             if (regionString != null) {
-                region = getGame().getMap().getRegion(regionString);
+                region = (Region) getGame().getFreeColGameObject(regionString);
             }
 
             missionary = null;

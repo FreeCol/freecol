@@ -388,7 +388,7 @@ public class TerrainGenerator {
 
         int halfHeight = map.getHeight()/2;
         int halfWidth = map.getWidth()/2;
-        int thirdHeight = map.getHeight()/2;
+        int thirdHeight = map.getHeight()/3;
         int twoThirdHeight = 2 * thirdHeight;
         int thirdWidth = map.getWidth()/3;
         int twoThirdWidth = 2 * thirdWidth;

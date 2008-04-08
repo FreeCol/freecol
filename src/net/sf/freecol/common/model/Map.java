@@ -20,6 +20,7 @@
 package net.sf.freecol.common.model;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -192,7 +193,7 @@ public class Map extends FreeColGameObject {
      * @param region a <code>Region</code> value
      */
     public void setRegion(final Region region) {
-        regions.put(region.getId(), region);
+        regions.put(region.getNameKey(), region);
     }
 
     /**
