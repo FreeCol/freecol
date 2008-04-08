@@ -19,14 +19,13 @@
 
 package net.sf.freecol.client.gui.animation;
 
-import java.awt.Graphics2D;
-import java.awt.Image;
-import java.awt.MediaTracker;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.util.logging.Logger;
+import javax.swing.ImageIcon;
+import javax.swing.JLabel;
+import javax.swing.JLayeredPane;
 import net.sf.freecol.client.gui.Canvas;
-import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
@@ -39,21 +38,18 @@ public final class UnitMoveAnimation extends Animation {
     private static final Logger logger = Logger.getLogger(UnitMoveAnimation.class.getName());
     
     private final Unit unit;
+    private Point currentPoint;
     private final Tile destinationTile;
     private final Point destinationPoint;
     
-    private Image unitImage;
-    private Image bgImage;
+    private JLabel unitLabel;
     
-    // Movement constants
+    // Movement variables & constants
+    private final int signalX; // If X is increasing or decreasing
+    private final int signalY; // If Y is increasing or decreasing
     private static final int MOVEMENT_RATIO = 4; // pixels/frame (must be power of 2)
     private static final int X_RATIO = 2;
     private static final int Y_RATIO = 1;
-    
-    // MediaTracker ids
-    private static final int MT_UNIT_IMAGE_ID = 0;
-    private static final int MT_FRAME_IMAGE_ID = 1;
-    private static final int MT_BG_IMAGE_ID = 2;
     
     
     /**
@@ -77,121 +73,71 @@ public final class UnitMoveAnimation extends Animation {
         this.unit = unit;
         this.destinationTile = destinationTile;
         
-        logger.fine("Starting Constructor");
-        
-        
-        // Painting screen immediately to get rid of dialog boxes
-        logger.finest("Painting screen immediately.");
-        canvas.paintImmediately(canvas.getBounds());    
-        
-        this.unitImage = canvas.getGUI().getImageLibrary().getUnitImageIcon(unit, false).getImage();
-
         Point p = canvas.getGUI().getTilePosition(unit.getTile());
         if (p != null) {
-            canvasX = new Double(p.getX()).intValue();
-            canvasY = new Double(p.getY()).intValue();
-        
-            destinationPoint = canvas.getGUI().getTilePosition(destinationTile);
+            ImageIcon unitImg = canvas.getGUI().getImageLibrary().getUnitImageIcon(unit, false);
+            // No need to use media tracker to wait for images to load since javax.swing.ImageIcon already does this.
+            
+            currentPoint = canvas.getGUI().getUnitPositionInTile(unitImg, p);
+            destinationPoint = canvas.getGUI().getUnitPositionInTile(unitImg, canvas.getGUI().getTilePosition(destinationTile));
+            
+            unitLabel = new JLabel(unitImg);
+            unitLabel.setBounds(currentPoint.x, currentPoint.y, unitImg.getIconWidth(), unitImg.getIconHeight());
+            canvas.add(unitLabel, JLayeredPane.DEFAULT_LAYER, 0);
+            
+            signalX = currentPoint.getX() > destinationPoint.getX() ? -1 : 1;
+            signalY = currentPoint.getY() > destinationPoint.getY() ? -1 : 1;
+            
         } else {
             // Unit is offscreen - no need to animate
             logger.finest("Unit is offscreen - no need to animate.");
-            destinationPoint = null;
-            return;
+            currentPoint = destinationPoint = null;
+            signalX = signalY = 0;
         }
-        
-        // Drawing the background of the animation area.
-        // Removing the unit from the tile temporarily
-        logger.finest("Removing the unit from its Tile temporarily.");
-        unit.getTile().removeUnitNoUpdate(unit);
-        
-        // TODO: Optimize bgImage, since it is larger than it needs to be. Make it so that it uses only animationArea.
-        logger.finest("Drawing the animation's background image.");
-        bgImage = canvas.createImage((int) canvas.getWidth(), (int) canvas.getHeight());
-        Graphics2D bgGraphics =  (Graphics2D) bgImage.getGraphics();
-        bgGraphics.setClip(getAnimationArea());
-        canvas.getGUI().display(bgGraphics);
-        
-        // Putting the unit back
-        logger.finest("Putting the unit back to its Tile.");
-        unit.getTile().addUnitNoUpdate(unit);
     }
 
     
-    protected Image getNextFrame() {
+    protected void drawFrame() {
         
-        logger.finest("Drawing new frame");
-        
-        //MediaTracker to check if all images are loaded before proceeding
-        MediaTracker mt = new MediaTracker(canvas);
+        logger.finest("Drawing new animation frame");
         
         // Calculating the new coordinates for the unit
-        if (canvasX != destinationPoint.getX()) {
-            int signal = 1;
-            if (canvasX > destinationPoint.getX()) signal = -1;
-            
-            canvasX += signal*X_RATIO*MOVEMENT_RATIO;
+        if (currentPoint.getX() != destinationPoint.getX()) {            
+            currentPoint.x += signalX*X_RATIO*MOVEMENT_RATIO;
         }
-        if (canvasY != destinationPoint.getY()) {
-            int signal = 1;
-            if (canvasY > destinationPoint.getY()) signal = -1;
-            
-            canvasY += signal*Y_RATIO*MOVEMENT_RATIO;
+        if (currentPoint.getY() != destinationPoint.getY()) {            
+            currentPoint.y += signalY*Y_RATIO*MOVEMENT_RATIO;
         }
                 
-        //Readying the next frame
-        logger.finest("Getting offscreen graphics context for drawing the frame.");
-        Rectangle animationArea = getAnimationArea();
-        Image nextFrame = canvas.createImage((int) animationArea.getWidth(), (int) animationArea.getHeight());
-        Graphics2D frameGraphics = (Graphics2D) nextFrame.getGraphics();
-        
-        logger.finest("Drawing frame's background image.");
-        // Checking if the bgImage is loaded
-        mt.addImage(bgImage, MT_BG_IMAGE_ID);
-        try {
-            mt.waitForID(MT_BG_IMAGE_ID);
-        } catch (InterruptedException ex) {
-            ex.printStackTrace();
-            return null;
-        }
-        //Drawing the background
-        frameGraphics.drawImage(bgImage, 
-                                0, 0, (int) animationArea.getWidth(), (int) animationArea.getHeight(), 
-                                (int) animationArea.getMinX(), (int) animationArea.getMinY(), (int) animationArea.getMaxX(), (int) animationArea.getMaxY(),  
-                                null);
-        
-        logger.finest("Drawing frame's unit image.");
-        // Checking if the unitImage is loaded
-        mt.addImage(unitImage, MT_UNIT_IMAGE_ID);
-        try {
-            mt.waitForID(MT_UNIT_IMAGE_ID);
-        } catch (InterruptedException ex) {
-            ex.printStackTrace();
-            return null;
-        }
+        logger.finest("Setting the new unit location.");
         //Drawing the unit
-        //TODO: Weird coords calculations taken from GUI.displayUnit :) Maybe place them in one location only
-        int unitX = ((canvasX + canvas.getGUI().getTileWidth() / 2) - unitImage.getWidth(null) / 2) - animationArea.x;
-        int unitY = (canvasY + canvas.getGUI().getTileHeight() / 2) - unitImage.getHeight(null) / 2 -
-                    (int) (GUI.UNIT_OFFSET * canvas.getGUI().getImageLibrary().getScalingFactor()) - animationArea.y;
-        frameGraphics.drawImage(unitImage, unitX, unitY, null);
+        unitLabel.setLocation(currentPoint);
+        //TODO: DisplayOccupationIndicator for the animation
+        //canvas.getGUI().displayOccupationIndicator(frameGraphics, unit, canvasX + (int) (GUI.STATE_OFFSET_X * canvas.getGUI().getImageLibrary().getScalingFactor()) - animationArea.x, canvasY - animationArea.y);
         
-        canvas.getGUI().displayOccupationIndicator(frameGraphics, unit, canvasX + (int) (GUI.STATE_OFFSET_X * canvas.getGUI().getImageLibrary().getScalingFactor()) - animationArea.x, canvasY - animationArea.y);
-        
-        //Wait for the frame to finish before returning
-        mt.addImage(nextFrame, MT_FRAME_IMAGE_ID);
-        try {
-            mt.waitForID(MT_FRAME_IMAGE_ID);
-        } catch (InterruptedException ex) {
-            ex.printStackTrace();
-            return null;
-        }
-        
-        return nextFrame;
+        logger.finest("Drawing next animation step.");
+        canvas.paintImmediately(getAnimationArea());
     }
 
+    @Override
+    public void animate() {
+        logger.finest("Removing the unit temporarily from its Tile and painting screen.");
+        unit.getTile().removeUnitNoUpdate(unit);
+        // Painting the whole screen once to get rid of disposed dialog-boxes.
+        canvas.paintImmediately(canvas.getBounds());
+        try {
+            super.animate();
+        } 
+        finally { // If there are any exceptions during animate() I don't want my unit to just vanish.
+            logger.finest("Adding the unit back to its Tile and removing the label component.");
+            unit.getTile().addUnitNoUpdate(unit);
+            canvas.remove(unitLabel);
+        }
+    }
+    
     protected boolean isFinished() {
         if (destinationPoint != null)
-            return (canvasX == destinationPoint.getX() && canvasY == destinationPoint.getY());
+            return destinationPoint.equals(currentPoint);
         else
             return true;
     }

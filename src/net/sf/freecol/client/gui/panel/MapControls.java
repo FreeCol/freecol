@@ -72,6 +72,7 @@ public final class MapControls {
     @SuppressWarnings("unused")
     private final GUI                    gui;
 
+    private static final int CONTROLS_LAYER = JLayeredPane.MODAL_LAYER;
 
 
 
@@ -175,15 +176,15 @@ public final class MapControls {
         //
         // Add the GUI Objects to the container
         //
-        component.add(infoPanel, JLayeredPane.DEFAULT_LAYER, false);
-        component.add(miniMap, JLayeredPane.DEFAULT_LAYER, false);
+        component.add(infoPanel, CONTROLS_LAYER, false);
+        component.add(miniMap, CONTROLS_LAYER, false);
         if (freeColClient.getClientOptions().getBoolean(ClientOptions.DISPLAY_COMPASS_ROSE)) {
-            component.add(compassRose, JLayeredPane.DEFAULT_LAYER, false);
+            component.add(compassRose, CONTROLS_LAYER, false);
         }
 
         if (!freeColClient.isMapEditor()) {
             for(int i=0; i<unitButton.length; i++) {
-                component.add(unitButton[i], JLayeredPane.DEFAULT_LAYER, false);
+                component.add(unitButton[i], CONTROLS_LAYER, false);
                 Action a = unitButton[i].getAction();
                 unitButton[i].setAction(null);
                 unitButton[i].setAction(a);

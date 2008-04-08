@@ -2228,10 +2228,8 @@ public final class GUI {
             // Draw the unit.
             // If unit is sentry, draw in grayscale
             Image image = lib.getUnitImageIcon(unit, unit.getState() == UnitState.SENTRY).getImage();
-            
-            g.drawImage(image, (x + tileWidth / 2) - image.getWidth(null) / 2,
-                        (y + tileHeight / 2) - image.getHeight(null) / 2 -
-                        (int) (UNIT_OFFSET * lib.getScalingFactor()), null);
+            Point p = getUnitPositionInTile(image.getWidth(null), image.getHeight(null), x, y);
+            g.drawImage(image, p.x, p.y, null);
 
             // Draw an occupation and nation indicator.
             displayOccupationIndicator(g, unit, x + (int) (STATE_OFFSET_X * lib.getScalingFactor()), y);
@@ -2272,6 +2270,45 @@ public final class GUI {
                 g.drawString(debuggingInfo, x , y+25);
             }
         }
+    }
+    
+    /**
+     * Gets the coordinates to draw a unit in a given tile.
+     * @param unitImage The unit's image
+     * @param tilePosition The coordinates of the tile
+     * @return The coordinates where the unit should be drawn onscreen
+     */
+    public Point getUnitPositionInTile(ImageIcon unitImage, Point tilePosition) {
+        int tileX = new Double(tilePosition.getX()).intValue();
+        int tileY = new Double(tilePosition.getY()).intValue();
+        return getUnitPositionInTile(unitImage.getIconWidth(), unitImage.getIconHeight(), tileX, tileY);
+    }
+    
+    /**
+     * Gets the coordinates to draw a unit in a given tile.
+     * @param unitImage The unit's image
+     * @param tileX The X coordinate of the tile
+     * @param tileY The Y coordinate of the tile
+     * @return The coordinates where the unit should be drawn onscreen
+     */
+    public Point getUnitPositionInTile(ImageIcon unitImage, int tileX, int tileY) {
+        return getUnitPositionInTile(unitImage.getIconWidth(), unitImage.getIconHeight(), tileX, tileY);
+    }
+    
+    /**
+     * Gets the coordinates to draw a unit in a given tile.
+     * @param unitImageWidth The unit image's width
+     * @param unitImageHeight The unit image's height
+     * @param tileX The X coordinate of the tile
+     * @param tileY The Y coordinate of the tile
+     * @return The coordinates where the unit should be drawn onscreen
+     */
+    public Point getUnitPositionInTile(int unitImageWidth, int unitImageHeight, int tileX, int tileY) {
+        int unitX = ((tileX + getTileWidth() / 2) - unitImageWidth / 2);
+        int unitY = (tileY + getTileHeight() / 2) - unitImageHeight / 2 -
+                    (int) (GUI.UNIT_OFFSET * lib.getScalingFactor());
+        
+        return new Point(unitX, unitY);
     }
     
     private void drawCursor(Graphics2D g, int x, int y) {
