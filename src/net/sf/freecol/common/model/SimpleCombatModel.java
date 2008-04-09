@@ -1031,7 +1031,7 @@ public class SimpleCombatModel implements CombatModel {
                                          new String[][] {
                                              {"%nation%", enemyUnit.getOwner().getNationAsString()},
                                              {"%equipment%", typeToLose.getName()}},
-                                         ModelMessage.MessageType.FOREIGN_DIPLOMACY);
+                                         ModelMessage.MessageType.COMBAT_RESULT);
                 }
             } else {
                 // be downgraded as a result of combat
