@@ -46,7 +46,7 @@ public abstract class Animation {
     }
     
     /**
-     * Refreshes the screen until the animation is done. 
+     * Refreshes the canvas until the animation is done. 
      * Renders frames on the go.
      */
     public void animate() {
@@ -54,7 +54,7 @@ public abstract class Animation {
         while (!isFinished()) {
             long time = System.currentTimeMillis();
             
-            drawFrame();
+            drawNextFrame();
             
             // Time it took to draw the next frame - should be discounted from the animation delay
             time = System.currentTimeMillis() - time;
@@ -65,7 +65,6 @@ public abstract class Animation {
                     //ignore
                 }
             }
-            // This will generate insane number of log records... but that's what FINEST is for right?
             logger.finest("Frame took " + time + "ms to render.");
         } 
         logger.finer("Finishing animation");
@@ -74,13 +73,31 @@ public abstract class Animation {
     /**
      * Draw the next frame of the animation on the canvas
      */
-    protected abstract void drawFrame();
+    protected void drawNextFrame() {
+        
+        readyNextFrame();
+        
+        logger.finest("Drawing next animation frame");
+        canvas.paintImmediately(getDirtyAnimationArea());
+    }
     
     /**
-     * Returns the area where the animation is being drawn.
+     * Readies the next frame before we draw it. 
+     * Make sure to set the dirty animation area accordingly.
+     */
+    protected abstract void readyNextFrame();
+    
+    /**
+     * Returns the area where the animation happens i.e. the animation's bounds.
      * @return The Rectangle object that represents the area where the animation is being drawn
      */
     protected abstract Rectangle getAnimationArea();
+    
+    /**
+     * Returns the area where the screen is dirty i.e. not updated.
+     * @return The Rectangle object of the area where the screen should be redrawn.
+     */
+    protected abstract Rectangle getDirtyAnimationArea();
     
     /**
      * Checks the condition for the end of the animation

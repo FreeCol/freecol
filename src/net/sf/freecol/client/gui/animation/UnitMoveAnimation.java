@@ -38,11 +38,14 @@ public final class UnitMoveAnimation extends Animation {
     private static final Logger logger = Logger.getLogger(UnitMoveAnimation.class.getName());
     
     private final Unit unit;
-    private Point currentPoint;
     private final Tile destinationTile;
     private final Point destinationPoint;
+    private Point currentPoint;
+    
+    private Rectangle previousBounds;
     
     private JLabel unitLabel;
+    private static final Integer UNIT_LABEL_LAYER = JLayeredPane.DEFAULT_LAYER;
     
     // Movement variables & constants
     private final int signalX; // If X is increasing or decreasing
@@ -75,7 +78,9 @@ public final class UnitMoveAnimation extends Animation {
         
         Point p = canvas.getGUI().getTilePosition(unit.getTile());
         if (p != null) {
-            ImageIcon unitImg = canvas.getGUI().getImageLibrary().getUnitImageIcon(unit, false);
+            ImageIcon unitImg = canvas.getGUI().getImageLibrary().getUnitImageIcon(unit);        
+            //TODO: displayOccupationIndicator for the animation?
+            //canvas.getGUI().displayOccupationIndicator(unitImg.getImage().getGraphics(), unit, (int) (GUI.STATE_OFFSET_X * canvas.getGUI().getImageLibrary().getScalingFactor()), 0);
             // No need to use media tracker to wait for images to load since javax.swing.ImageIcon already does this.
             
             currentPoint = canvas.getGUI().getUnitPositionInTile(unitImg, p);
@@ -83,7 +88,7 @@ public final class UnitMoveAnimation extends Animation {
             
             unitLabel = new JLabel(unitImg);
             unitLabel.setBounds(currentPoint.x, currentPoint.y, unitImg.getIconWidth(), unitImg.getIconHeight());
-            canvas.add(unitLabel, JLayeredPane.DEFAULT_LAYER, 0);
+            canvas.add(unitLabel, UNIT_LABEL_LAYER, 0);
             
             signalX = currentPoint.getX() > destinationPoint.getX() ? -1 : 1;
             signalY = currentPoint.getY() > destinationPoint.getY() ? -1 : 1;
@@ -96,11 +101,14 @@ public final class UnitMoveAnimation extends Animation {
         }
     }
 
-    
-    protected void drawFrame() {
+    /**
+     * Moves the Unit towards its destination point one step.
+     */
+    protected void readyNextFrame() {
         
-        logger.finest("Drawing new animation frame");
-        
+        logger.finest("Calculating and setting the new unit location.");
+        previousBounds = unitLabel.getBounds();
+                
         // Calculating the new coordinates for the unit
         if (currentPoint.getX() != destinationPoint.getX()) {            
             currentPoint.x += signalX*X_RATIO*MOVEMENT_RATIO;
@@ -108,15 +116,8 @@ public final class UnitMoveAnimation extends Animation {
         if (currentPoint.getY() != destinationPoint.getY()) {            
             currentPoint.y += signalY*Y_RATIO*MOVEMENT_RATIO;
         }
-                
-        logger.finest("Setting the new unit location.");
         //Drawing the unit
         unitLabel.setLocation(currentPoint);
-        //TODO: DisplayOccupationIndicator for the animation
-        //canvas.getGUI().displayOccupationIndicator(frameGraphics, unit, canvasX + (int) (GUI.STATE_OFFSET_X * canvas.getGUI().getImageLibrary().getScalingFactor()) - animationArea.x, canvasY - animationArea.y);
-        
-        logger.finest("Drawing next animation step.");
-        canvas.paintImmediately(getAnimationArea());
     }
 
     @Override
@@ -146,6 +147,16 @@ public final class UnitMoveAnimation extends Animation {
         Rectangle r1 = canvas.getGUI().getTileBounds(unit.getTile());
         Rectangle r2 = canvas.getGUI().getTileBounds(destinationTile);
         return r1.union(r2);
+    }
+    
+    protected Rectangle getDirtyAnimationArea() {
+        //The dirty area is where the unit image was drawn before 
+        //and where it should be drawn now.
+        if (previousBounds != null) {
+            return previousBounds.union(unitLabel.getBounds());
+        }
+        else // Should never happen. Just in case.
+            return getAnimationArea();
     }
 
 }
