@@ -716,9 +716,10 @@ public class TerrainGenerator {
 
         for (int i = 0; i < number; i++) {
             nextTry: for (int tries = 0; tries < 100; tries++) {
-                Position position = new Position(random.nextInt(map.getWidth()),
-                                                 // please no rivers in polar regions
-                                                 random.nextInt(map.getHeight() - 4) + 2);
+                Position position = map.getRandomLandPosition();
+                if (!map.getTile(position).getType().canHaveRiver()) {
+                    continue;
+                }
                 // check the river source/spring is not too close to the ocean
                 Iterator<Position> it = map.getCircleIterator(position, true, 2);
                 while (it.hasNext()) {

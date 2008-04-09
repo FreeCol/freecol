@@ -41,7 +41,7 @@ public class LandGenerator {
 
     private static final int C = 2;
 
-    public static final int POLAR_WIDTH = 2;
+    public static final int POLAR_HEIGHT = 2;
 
     private static final Direction[] adjacentDirections = new Direction[] {
         Direction.NE, Direction.SE, Direction.SW, Direction.NW };
@@ -129,10 +129,10 @@ public class LandGenerator {
      */
     private void createPolarRegions() {
         for (int x = 0; x < map.length; x++) {
-            for (int y = 0; y < POLAR_WIDTH; y++) {
+            for (int y = 0; y < POLAR_HEIGHT; y++) {
                 map[x][y] = true;
             }
-            int limit = map[0].length - 1 - POLAR_WIDTH;
+            int limit = map[0].length - 1 - POLAR_HEIGHT;
             for (int y = limit; y < map[0].length; y++) {
                 map[x][y] = true;
             }

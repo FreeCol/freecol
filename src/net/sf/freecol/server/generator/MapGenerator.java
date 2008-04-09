@@ -259,7 +259,8 @@ public class MapGenerator {
                 for (int tries=0; tries<100; tries++) {
                     Position p = new Position(random.nextInt(map.getWidth()), 
                             random.nextInt(map.getHeight()));
-                    if (p.y<=2 || p.y>=map.getHeight()-3) {
+                    if (p.y <= LandGenerator.POLAR_HEIGHT ||
+                        p.y >= map.getHeight() - LandGenerator.POLAR_HEIGHT - 1) {
                         // please no lost city on the poles, 
                         // as they are too difficult to go visit, and not realistic
                         continue;
@@ -356,19 +357,20 @@ public class MapGenerator {
 
         for (int i = 0; i < number; i++) {
             nextTry: for (int tries = 0; tries < 100; tries++) {
-                int x = random.nextInt(map.getWidth());
-                int y = random.nextInt(map.getHeight());
-                if (map.isValid(x, y)) {
-                    Tile candidate = map.getTile(x, y);
-                    if (candidate.isSettleable()) {
-                        for (Tile tile : settlementTiles) {
-                            if (map.getDistance(x, y, tile.getX(), tile.getY()) < minSettlementDistance) {
-                                continue nextTry;
-                            }
-                        }                            
-                        settlementTiles.add(candidate);
-                        break;
-                    }
+                Position position = map.getRandomLandPosition();
+                if (position.getY() <= LandGenerator.POLAR_HEIGHT ||
+                    position.getY() >= map.getHeight() - LandGenerator.POLAR_HEIGHT - 1) {
+                    continue;
+                }
+                Tile candidate = map.getTile(position);
+                if (candidate.isSettleable()) {
+                    for (Tile tile : settlementTiles) {
+                        if (map.getDistance(position, tile.getPosition()) < minSettlementDistance) {
+                            continue nextTry;
+                        }
+                    }                            
+                    settlementTiles.add(candidate);
+                    break;
                 }
             }
         }
@@ -408,6 +410,7 @@ public class MapGenerator {
             }
         }
         
+        // check high settlement numbers first
         List<Territory> territoryList = new ArrayList<Territory>(highTerritories);
         territoryList.addAll(averageTerritories);
         territoryList.addAll(lowTerritories);
@@ -598,7 +601,7 @@ public class MapGenerator {
             for (AbstractUnit startingUnit : unitList) {
                 Unit newUnit = new Unit(map.getGame(), null, player, startingUnit.getUnitType(),
                                         UnitState.SENTRY, startingUnit.getEquipment());
-                if (newUnit.hasAbility("model.ability.carryUnits")) {
+                if (newUnit.hasAbility("model.ability.carryUnits") && newUnit.isNaval()) {
                     newUnit.setState(UnitState.ACTIVE);
                     carriers.add(newUnit);
                 } else {
