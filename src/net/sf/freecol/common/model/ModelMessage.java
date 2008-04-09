@@ -219,11 +219,13 @@ public class ModelMessage extends FreeColObject {
         case UNIT_DEMOTED:
         case UNIT_LOST:
         case UNIT_ADDED:
+        case COMBAT_RESULT:
             newDisplay = source;
             break;
         case BUILDING_COMPLETED:
             newDisplay = FreeCol.getSpecification().getGoodsType("model.goods.hammers");
             break;
+        case TUTORIAL:
         case DEFAULT:
         case WARNING:
         case WAREHOUSE_CAPACITY:
