@@ -90,8 +90,15 @@ public final class UnitMoveAnimation extends Animation {
             unitLabel.setBounds(currentPoint.x, currentPoint.y, unitImg.getIconWidth(), unitImg.getIconHeight());
             canvas.add(unitLabel, UNIT_LABEL_LAYER, 0);
             
-            signalX = currentPoint.getX() > destinationPoint.getX() ? -1 : 1;
-            signalY = currentPoint.getY() > destinationPoint.getY() ? -1 : 1;
+            if (currentPoint.getX() == destinationPoint.getX())
+                signalX = 0;
+            else
+                signalX = currentPoint.getX() > destinationPoint.getX() ? -1 : 1;
+            
+            if (currentPoint.getY() == destinationPoint.getY())
+                signalY = 0;
+            else
+                signalY = currentPoint.getY() > destinationPoint.getY() ? -1 : 1;
             
         } else {
             // Unit is offscreen - no need to animate
@@ -109,14 +116,11 @@ public final class UnitMoveAnimation extends Animation {
         logger.finest("Calculating and setting the new unit location.");
         previousBounds = unitLabel.getBounds();
                 
-        // Calculating the new coordinates for the unit
-        if (currentPoint.getX() != destinationPoint.getX()) {            
-            currentPoint.x += signalX*X_RATIO*MOVEMENT_RATIO;
-        }
-        if (currentPoint.getY() != destinationPoint.getY()) {            
-            currentPoint.y += signalY*Y_RATIO*MOVEMENT_RATIO;
-        }
-        //Drawing the unit
+        // Calculating the new coordinates for the unit            
+        currentPoint.x += signalX*X_RATIO*MOVEMENT_RATIO;        
+        currentPoint.y += signalY*Y_RATIO*MOVEMENT_RATIO;
+        
+        //Setting new location
         unitLabel.setLocation(currentPoint);
     }
 
