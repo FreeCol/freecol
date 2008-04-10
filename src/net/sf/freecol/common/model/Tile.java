@@ -521,7 +521,7 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
                 // on ocean tiles, land units behave as ship cargo and cannot defend
                 continue;
             }
-            float tmpPower = getGame().getCombatModel().getDefencePower(nextUnit, attacker);
+            float tmpPower = getGame().getCombatModel().getDefencePower(attacker,nextUnit);
             if (tmpPower > defencePower) {
                 tileDefender = nextUnit;
                 defencePower = tmpPower;
@@ -534,7 +534,7 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
         }
         // return the strongest of these two units
         if (settlementDefender != null && 
-            getGame().getCombatModel().getDefencePower(settlementDefender, attacker) > defencePower) {
+            getGame().getCombatModel().getDefencePower(attacker, settlementDefender) > defencePower) {
             return settlementDefender;
         } else {
             return tileDefender;

@@ -965,7 +965,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
             }
             
             if (attackPower > 0) {
-                float defencePower = combatModel.getDefencePower(unit, attacker);
+                float defencePower = combatModel.getDefencePower(attacker, unit);
                 float totalProbability = attackPower + defencePower;
                 int r = getPseudoRandom().nextInt(Math.round(totalProbability) + 1);
                 if (r < attackPower) {

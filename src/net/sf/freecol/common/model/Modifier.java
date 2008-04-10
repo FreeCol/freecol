@@ -331,4 +331,8 @@ public final class Modifier extends Feature {
         out.writeEndElement();
     }
     
+    public String toString() {
+        return getId() + " " + type + " " + value;
+    }
+    
 }

@@ -669,7 +669,7 @@ public final class Colony extends Settlement implements Location, Nameable {
         Unit defender = null;
         float defencePower = -1.0f;
         for (Unit nextUnit : getUnitList()) {
-            float tmpPower = getGame().getCombatModel().getDefencePower(nextUnit, attacker);
+            float tmpPower = getGame().getCombatModel().getDefencePower(attacker, nextUnit);
             if (tmpPower > defencePower) {
                 defender = nextUnit;
                 defencePower = tmpPower;
