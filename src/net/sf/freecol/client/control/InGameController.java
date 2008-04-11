@@ -247,7 +247,8 @@ public final class InGameController implements NetworkConstants {
         Canvas canvas = freeColClient.getCanvas();
         if (freeColClient.getMyPlayer().getSoL() < 50) {
             canvas.showInformationMessage("declareIndependence.notMajority", new String[][] { { "%percentage%",
-                    Integer.toString(freeColClient.getMyPlayer().getSoL()) } });
+                    Integer.toString(freeColClient.getMyPlayer().getSoL()) } }, 
+                    FreeCol.getSpecification().getGoodsType("model.goods.bells"));
             return;
         }
         if (!canvas.showConfirmDialog("declareIndependence.areYouSure.text", "declareIndependence.areYouSure.yes",
@@ -344,7 +345,10 @@ public final class InGameController implements NetworkConstants {
         if (object instanceof Colony) {
             name = freeColClient.getCanvas().showInputDialog("renameColony.text", object.getName(), "renameColony.yes",
                     "renameColony.no");
-            if (freeColClient.getMyPlayer().getColony(name) != null) {
+            if (name==null || name.length()==0) {
+                // user canceled 
+                return;
+            } else if (freeColClient.getMyPlayer().getColony(name) != null) {
                 // colony name must be unique (per Player)
                 freeColClient.getCanvas().showInformationMessage("nameColony.notUnique",
                                                                  new String[][] { { "%name%", name } });
@@ -697,7 +701,7 @@ public final class InGameController implements NetworkConstants {
 
         if (path == null) {
             canvas.showInformationMessage("selectDestination.failed", new String[][] { { "%destination%",
-                    destination.getLocationName() } });
+                    destination.getLocationName() } }, unit);
             setDestination(unit, null);
             return;
         }
@@ -1593,9 +1597,9 @@ public final class InGameController implements NetworkConstants {
                         unit.getOwner().modifyGold(Integer.parseInt(amount));
                         freeColClient.getCanvas().updateGoldLabel();
                         freeColClient.getCanvas().showInformationMessage("scoutSettlement.tributeAgree",
-                                new String[][] { { "%replace%", amount } });
+                                new String[][] { { "%replace%", amount } }, settlement);
                     } else if (result.equals("disagree")) {
-                        freeColClient.getCanvas().showInformationMessage("scoutSettlement.tributeDisagree");
+                        freeColClient.getCanvas().showInformationMessage("scoutSettlement.tributeDisagree", settlement);
                     }
                     unit.setMovesLeft(0);
                 } else {
@@ -2629,7 +2633,7 @@ public final class InGameController implements NetworkConstants {
                 canvas.errorMessage("indianSettlement.noMoreSkill");
             } else if (!unit.getType().canBeUpgraded(skill, UnitType.UpgradeType.NATIVES)) {
                 canvas.showInformationMessage("indianSettlement.cantLearnSkill",
-                        new String[][] { {"%unit%", unit.getName()}, {"%skill%", skillName} });
+                        new String[][] { {"%unit%", unit.getName()}, {"%skill%", skillName} }, settlement);
             } else {
                 Element learnSkill = Message.createNewRootElement("learnSkillAtSettlement");
                 learnSkill.setAttribute("unit", unit.getId());
@@ -2788,31 +2792,36 @@ public final class InGameController implements NetworkConstants {
         if (reply.getTagName().equals("scoutIndianSettlementResult")) {
             String result = reply.getAttribute("result"), action = scoutMessage.getAttribute("action");
             if (result.equals("die")) {
+                // unit killed
                 unit.dispose();
-                canvas.showInformationMessage("scoutSettlement.speakDie");
+                canvas.showInformationMessage("scoutSettlement.speakDie", settlement);
             } else if (action.equals("speak") && result.equals("tales")) {
-                // Parse the tiles.
+                // receive an update of the surrounding tiles.
                 Element updateElement = getChildElement(reply, "update");
                 if (updateElement != null) {
                     freeColClient.getInGameInputHandler().handle(client.getConnection(), updateElement);
                 }
-
-                canvas.showInformationMessage("scoutSettlement.speakTales");
+                canvas.showInformationMessage("scoutSettlement.speakTales", settlement);
             } else if (action.equals("speak") && result.equals("beads")) {
+                // receive a small gift of gold
                 String amount = reply.getAttribute("amount");
                 unit.getOwner().modifyGold(Integer.parseInt(amount));
                 freeColClient.getCanvas().updateGoldLabel();
-                canvas.showInformationMessage("scoutSettlement.speakBeads", new String[][] { { "%replace%", amount } });
+                canvas.showInformationMessage("scoutSettlement.speakBeads", 
+                        new String[][] { { "%replace%", amount } }, settlement);
             } else if (action.equals("speak") && result.equals("nothing")) {
-                canvas.showInformationMessage("scoutSettlement.speakNothing");
+                // nothing special
+                canvas.showInformationMessage("scoutSettlement.speakNothing", settlement);
             } else if (action.equals("tribute") && result.equals("agree")) {
+                // receive a tribute
                 String amount = reply.getAttribute("amount");
                 unit.getOwner().modifyGold(Integer.parseInt(amount));
                 freeColClient.getCanvas().updateGoldLabel();
                 canvas.showInformationMessage("scoutSettlement.tributeAgree",
-                        new String[][] { { "%replace%", amount } });
+                        new String[][] { { "%replace%", amount } }, settlement);
             } else if (action.equals("tribute") && result.equals("disagree")) {
-                canvas.showInformationMessage("scoutSettlement.tributeDisagree");
+                // no tribute
+                canvas.showInformationMessage("scoutSettlement.tributeDisagree", settlement);
             }
         } else {
             logger.warning("Server gave an invalid reply to an scoutIndianSettlement message");
