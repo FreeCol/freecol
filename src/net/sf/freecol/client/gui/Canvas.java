@@ -109,6 +109,7 @@ import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.DiplomaticTrade;
 import net.sf.freecol.common.model.Europe;
 import net.sf.freecol.common.model.FoundingFather;
+import net.sf.freecol.common.model.FreeColObject;
 import net.sf.freecol.common.model.FreeColGameObject;
 import net.sf.freecol.common.model.FreeColGameObjectType;
 import net.sf.freecol.common.model.Game;
@@ -443,7 +444,7 @@ public final class Canvas extends JDesktopPane {
      * 
      * @param username The username that should be used when connecting to one
      *            of the servers on the list.
-     * @param serverList The list containing the servers retrived from the
+     * @param serverList The list containing the servers retrieved from the
      *            metaserver.
      * @see ServerListPanel
      */
@@ -560,7 +561,7 @@ public final class Canvas extends JDesktopPane {
      * <ol>
      * <li>The <code>messageID</code> is used to get the message from
      * {@link net.sf.freecol.client.gui.i18n.Messages#message(String)}.
-     * <li>Every occuranse of <code>data[x][0]</code> is replaced with
+     * <li>Every occurrence of <code>data[x][0]</code> is replaced with
      * <code>data[x][1]</code> for every <code>x</code>.
      * <li>The message is displayed using a modal dialog.
      * </ol>
@@ -983,7 +984,7 @@ public final class Canvas extends JDesktopPane {
 
     /**
      * Displays a dialog for setting options when loading a savegame. The
-     * settings can be retrived directly from {@link LoadingSavegameDialog}
+     * settings can be retrieved directly from {@link LoadingSavegameDialog}
      * after calling this method.
      * 
      * @param publicServer Default value.
@@ -1219,7 +1220,7 @@ public final class Canvas extends JDesktopPane {
      * 
      * @return ScoutAction.CANCEL if the action was cancelled,
      *         ScoutAction.FOREIGN_COLONY_NEGOTIATE if he wants to
-     *         negotaite with the foreign power,
+     *         negotiate with the foreign power,
      *         ScoutAction.FOREIGN_COLONY_SPY if he wants to spy the
      *         colony, ScoutAction.FOREIGN_COLONY_ATTACK if he wants
      *         to attack the colony.
@@ -1283,7 +1284,7 @@ public final class Canvas extends JDesktopPane {
      * 
      * @param settlement The indian settlement that is being visited.
      * 
-     * @return ArrayList with an Integer and optionally a Player refencing the
+     * @return ArrayList with an Integer and optionally a Player referencing the
      *         player to attack in case of "incite indians". Integer can be any
      *         of: FreeColDialog.MISSIONARY_ESTABLISH if he wants to establish a
      *         mission, FreeColDialog.MISSIONARY_DENOUNCE_AS_HERESY if he wants
@@ -1434,7 +1435,7 @@ public final class Canvas extends JDesktopPane {
      * @param cancelText The text displayed on the "cancel"-button.
      * @param iterator The <code>Iterator</code> containing the objects to
      *            create buttons for.
-     * @return The choosen object, or <i>null</i> for the cancel-button.
+     * @return The chosen object, or <i>null</i> for the cancel-button.
      */
     public Object showChoiceDialog(String text, String cancelText, Iterator<?> iterator) {
         ArrayList<Object> a = new ArrayList<Object>();
@@ -1452,7 +1453,7 @@ public final class Canvas extends JDesktopPane {
      * @param text The text that explains the choice for the user.
      * @param cancelText The text displayed on the "cancel"-button.
      * @param objects The array containing the objects to create buttons for.
-     * @return The choosen object, or <i>null</i> for the cancel-button.
+     * @return The chosen object, or <i>null</i> for the cancel-button.
      */
     public Object showChoiceDialog(String text, String cancelText, Object[] objects) {
         /*
@@ -2081,7 +2082,7 @@ public final class Canvas extends JDesktopPane {
     /**
      * Removes the mouse listeners for moving the frame of the given component.
      * 
-     * @param c The component the listeneres should be removed from.
+     * @param c The component the listeners should be removed from.
      */
     public void deactivateMovable(JComponent c) {
         for (MouseListener ml : c.getMouseListeners()) {
@@ -2186,7 +2187,7 @@ public final class Canvas extends JDesktopPane {
     /**
      * Shows a tile popup.
      * 
-     * @param pos The coordinates of the Tile where the popup occured.
+     * @param pos The coordinates of the Tile where the popup occurred.
      * @param x The x-coordinate on the screen where the popup needs to be
      *            placed.
      * @param y The y-coordinate on the screen where the popup needs to be
@@ -2221,7 +2222,7 @@ public final class Canvas extends JDesktopPane {
      * Displays an error message.
      * 
      * @param messageID The i18n-keyname of the error message to display.
-     * @param message An alternativ message to display if the resource specified
+     * @param message An alternative message to display if the resource specified
      *            by <code>messageID</code> is unavailable.
      */
     public void errorMessage(String messageID, String message) {
@@ -2248,9 +2249,20 @@ public final class Canvas extends JDesktopPane {
      * @param messageId The messageId of the message to display.
      */
     public void showInformationMessage(String messageId) {
-        showInformationMessage(messageId, null);
+        showInformationMessage(messageId, null, null);
+    }
+    
+    /**
+     * Shows a message with some information and an "OK"-button.
+     * 
+     * @param messageId The messageId of the message to display.
+     * @param displayObject Optional object for displaying an icon
+     */
+    public void showInformationMessage(String messageId, FreeColObject displayObject) {
+        showInformationMessage(messageId, null, displayObject);
     }
 
+    
     /**
      * Shows a message with some information and an "OK"-button.
      * 
@@ -2260,10 +2272,27 @@ public final class Canvas extends JDesktopPane {
      * <code>canvas.showInformationMessage("noNeedForTheGoods", new String[][] {{"%goods%", goods.getName()}});</code>
      * 
      * @param messageId The messageId of the message to display.
-     * @param replace All occurances of <code>replace[i][0]</code> in the
+     * @param replace All occurrences of <code>replace[i][0]</code> in the
      *            message gets replaced by <code>replace[i][1]</code>.
      */
     public void showInformationMessage(String messageId, String[][] replace) {
+        showInformationMessage(messageId, replace, null);
+    }
+    
+    /**
+     * Shows a message with some information and an "OK"-button.
+     * 
+     * <br>
+     * <br>
+     * <b>Example:</b> <br>
+     * <code>canvas.showInformationMessage("noNeedForTheGoods", new String[][] {{"%goods%", goods.getName()}});</code>
+     * 
+     * @param messageId The messageId of the message to display.
+     * @param replace All occurrences of <code>replace[i][0]</code> in the
+     *            message gets replaced by <code>replace[i][1]</code>.
+     * @param displayObject Optional object for displaying an icon
+     */
+    public void showInformationMessage(String messageId, String[][] replace, FreeColObject displayObject) {
         String text;
         try {
             text = Messages.message(messageId, replace);
@@ -2271,8 +2300,11 @@ public final class Canvas extends JDesktopPane {
             text = messageId;
             logger.warning("Missing i18n resource: " + messageId);
         }
+        ImageIcon icon = null;
+        if (displayObject!=null)
+            icon = getImageIcon(displayObject, false);
         FreeColDialog infoDialog = FreeColDialog.createInformationDialog(new String[] { text },
-                new ImageIcon[] { null });
+                new ImageIcon[] { icon });
         addAsFrame(infoDialog);
         infoDialog.requestFocus();
 
@@ -2374,7 +2406,7 @@ public final class Canvas extends JDesktopPane {
     }
 
     /**
-     * Tells the map controls that a chat message was recieved.
+     * Tells the map controls that a chat message was received.
      * 
      * @param sender The player who sent the chat message to the server.
      * @param message The chat message.
@@ -2479,7 +2511,7 @@ public final class Canvas extends JDesktopPane {
      * Displays a "Are you sure you want to quit"-dialog in which the user may
      * choose to quit or cancel.
      * 
-     * @return <i>true</i> if the user desides to quit and <i>false</i>
+     * @return <i>true</i> if the user decides to quit and <i>false</i>
      *         otherwise.
      */
     public boolean confirmQuitDialog() {
@@ -2514,7 +2546,7 @@ public final class Canvas extends JDesktopPane {
     }
 
     /**
-     * Displays a quit dialog and, if desired, logouts the current game and
+     * Displays a quit dialog and, if desired, logs out of the current game and
      * shows the new game panel.
      */
     public void newGame() {
