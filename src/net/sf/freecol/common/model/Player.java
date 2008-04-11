@@ -496,7 +496,7 @@ public class Player extends FreeColGameObject implements Nameable {
 
         for (ModelMessage message : modelMessages) {
             if (message.hasBeenDisplayed()) {
-                break;
+                continue;
             } else {
                 out.add(0, message);
             }
