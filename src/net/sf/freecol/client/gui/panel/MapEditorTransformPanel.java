@@ -40,6 +40,7 @@ import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.control.MapEditorController;
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.ImageLibrary;
+import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.ResourceType;
 import net.sf.freecol.common.model.Tile;
@@ -109,40 +110,29 @@ public final class MapEditorTransformPanel extends FreeColPanel {
     private void buildList() {
         List<TileType> tileList = FreeCol.getSpecification().getTileTypeList();
         for (TileType type : tileList) {
-            buildButton(type.getIndex(), type.getName(), new TileTypeTransform(type));
+            buildButton(library.getScaledTerrainImage(type, 1f),
+                        type.getName(), new TileTypeTransform(type));
         }
-        buildButton(MINOR_RIVER, "Minor River", new RiverTransform(TileImprovement.SMALL_RIVER));
-        buildButton(MAJOR_RIVER, "Major River", new RiverTransform(TileImprovement.LARGE_RIVER));
-        buildButton(RESOURCE, "Change/Remove Resource", new ResourceTransform());
-        buildButton(LOST_CITY_RUMOUR, "Lost City Rumour", new LostCityRumourTransform());
+        buildButton(library.getRiverImage(10), Messages.message("minorRiver"),
+                    new RiverTransform(TileImprovement.SMALL_RIVER));
+        buildButton(library.getRiverImage(20), Messages.message("majorRiver"),
+                    new RiverTransform(TileImprovement.LARGE_RIVER));
+        buildButton(library.getBonusImage(FreeCol.getSpecification().getResourceType(0)),
+                    Messages.message("editor.resource"), new ResourceTransform());
+        buildButton(library.getMiscImage(ImageLibrary.LOST_CITY_RUMOUR),
+                    Messages.message("model.message.LOST_CITY_RUMOUR"), new LostCityRumourTransform());
     }
 
     /**
      * Builds the button for the given terrain.
      * 
-     * @param index the index of terrain or one of {MINOR_RIVER, MAJOR_RIVER, BONUS, LOST_CITY_RUMOUR}
+     * @param image an <code>Image</code> value
+     * @param text a <code>String</code> value
+     * @param mt a <code>MapTransform</code> value
      */
-    private void buildButton(int index, String text, final MapTransform mt) {
-        Image scaledImage;
-        Image image;
-        switch(index) {
-        case MINOR_RIVER:
-            image = library.getRiverImage(10);
-            break;
-        case MAJOR_RIVER:
-            image = library.getRiverImage(10);
-            break;
-        case RESOURCE:
-            image = library.getBonusImage(FreeCol.getSpecification().getResourceType(0));
-            break;
-        case LOST_CITY_RUMOUR:
-            image = library.getMiscImage(ImageLibrary.LOST_CITY_RUMOUR);
-            break;
-        default:
-            image = library.getScaledTerrainImage(FreeCol.getSpecification().getTileType(index), 1.0f);
-            break;
-        }
-        scaledImage = library.scaleImage(image, 0.5f);
+    private void buildButton(Image image, String text, final MapTransform mt) {
+
+        Image scaledImage = library.scaleImage(image, 0.5f);
         
         JPanel descriptionPanel = new JPanel(new BorderLayout());
         descriptionPanel.add(new JLabel(new ImageIcon(image)), BorderLayout.CENTER);
@@ -152,9 +142,6 @@ public final class MapEditorTransformPanel extends FreeColPanel {
         
         ImageIcon icon = new ImageIcon(scaledImage);
         final JButton button = new JButton(icon);
-        //button.setText(text);
-        //button.setVerticalTextPosition(SwingConstants.BOTTOM);
-        //button.setHorizontalTextPosition(SwingConstants.CENTER);
         button.setToolTipText(text);
         button.setOpaque(false);
         group.add(button);
