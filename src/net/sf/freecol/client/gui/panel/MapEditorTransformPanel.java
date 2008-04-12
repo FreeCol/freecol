@@ -67,11 +67,6 @@ public final class MapEditorTransformPanel extends FreeColPanel {
     @SuppressWarnings("unused")
     private static final Logger logger = Logger.getLogger(MapEditorTransformPanel.class.getName());
     
-    private static final int MINOR_RIVER = -1,
-            MAJOR_RIVER = -2,
-            RESOURCE = -3,
-            LOST_CITY_RUMOUR = -4;
-    
     private final FreeColClient freeColClient;
 
     private final ImageLibrary library;

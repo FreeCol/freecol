@@ -94,6 +94,7 @@ import net.sf.freecol.client.gui.panel.ReportReligiousPanel;
 import net.sf.freecol.client.gui.panel.ReportRequirementsPanel;
 import net.sf.freecol.client.gui.panel.ReportTradePanel;
 import net.sf.freecol.client.gui.panel.ReportTurnPanel;
+import net.sf.freecol.client.gui.panel.RiverStylePanel;
 import net.sf.freecol.client.gui.panel.SelectAmountDialog;
 import net.sf.freecol.client.gui.panel.ServerListPanel;
 import net.sf.freecol.client.gui.panel.StartGamePanel;
@@ -1830,6 +1831,19 @@ public final class Canvas extends JDesktopPane {
         remove(emigrationPanel);
 
         return response;
+    }
+
+    /**
+     * Shows a panel that allows the user to adjust the river style of
+     * the current tile.
+     */
+    public int showRiverStylePanel() {
+	RiverStylePanel riverStylePanel = new RiverStylePanel(this);
+	addAsFrame(riverStylePanel);
+	riverStylePanel.requestFocus();
+	int response = riverStylePanel.getResponseInt();
+	remove(riverStylePanel);
+	return response;
     }
 
     /**

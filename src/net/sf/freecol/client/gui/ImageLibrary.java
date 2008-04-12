@@ -69,6 +69,8 @@ public final class ImageLibrary extends ImageProvider {
 
     private static final Logger logger = Logger.getLogger(ImageLibrary.class.getName());
 
+    public static final int RIVER_STYLES = 81;
+
     public static final int UNIT_SELECT = 0, PLOWED = 4, TILE_TAKEN = 5, TILE_OWNED_BY_INDIANS = 6,
             LOST_CITY_RUMOUR = 7, DARKNESS = 8, MISC_COUNT = 10;
 
@@ -584,9 +586,8 @@ public final class ImageLibrary extends ImageProvider {
      */
     private void loadRivers(GraphicsConfiguration gc, Class<FreeCol> resourceLocator, boolean doLookup)
             throws FreeColException {
-        int combinations = 81;
-        rivers = new ArrayList<ImageIcon>(combinations);
-        for (int i = 0; i < combinations; i++) {
+        rivers = new ArrayList<ImageIcon>(RIVER_STYLES);
+        for (int i = 0; i < RIVER_STYLES; i++) {
             String filePath = dataDirectory + path + riverDirectory + riverName + i + extension;
             rivers.add(findImage(filePath, resourceLocator, doLookup));
         }
@@ -1469,6 +1470,19 @@ public final class ImageLibrary extends ImageProvider {
      */
     public ImageIcon getScaledImageIcon(ImageIcon inputIcon, float scale) {
         Image image = inputIcon.getImage();
+        return new ImageIcon(image.getScaledInstance(Math.round(image.getWidth(null) * scale),
+                                                     Math.round(image.getHeight(null) * scale),
+                                                     Image.SCALE_SMOOTH));
+    }
+
+    /**
+     * Returns the scaled ImageIcon.
+     * 
+     * @param image an <code>Image</code> value
+     * @param scale The scale of the ImageIcon to return.
+     * @return The scaled ImageIcon.
+     */
+    public ImageIcon getScaledImageIcon(Image image, float scale) {
         return new ImageIcon(image.getScaledInstance(Math.round(image.getWidth(null) * scale),
                                                      Math.round(image.getHeight(null) * scale),
                                                      Image.SCALE_SMOOTH));

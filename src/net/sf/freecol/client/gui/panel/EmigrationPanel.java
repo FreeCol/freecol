@@ -39,9 +39,6 @@ import cz.autel.dmi.HIGLayout;
  */
 public final class EmigrationPanel extends FreeColDialog implements ActionListener {
 
-
-
-
     private static final Logger logger = Logger.getLogger(EmigrationPanel.class.getName());
 
     private static final int NUMBER_OF_PERSONS = 3;

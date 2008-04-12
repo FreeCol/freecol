@@ -27,6 +27,7 @@ import java.util.logging.Logger;
 import net.sf.freecol.common.model.Map;
 import net.sf.freecol.common.model.PathNode;
 import net.sf.freecol.common.model.Tile;
+import net.sf.freecol.common.model.TileImprovement;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.Map.Position;
 
@@ -34,10 +35,8 @@ import net.sf.freecol.common.model.Map.Position;
  * Listens to mouse buttons being pressed at the level of the Canvas.
  */
 public final class CanvasMapEditorMouseListener implements MouseListener {
+
     private static final Logger logger = Logger.getLogger(CanvasMapEditorMouseListener.class.getName());
-
-
-
 
     private final Canvas canvas;
 
@@ -119,9 +118,21 @@ public final class CanvasMapEditorMouseListener implements MouseListener {
         }
         try {
             if (e.getButton() == MouseEvent.BUTTON3 || e.isPopupTrigger()) {
-                //canvas.showTilePopup(gui.convertToMapCoordinates(e.getX(), e.getY()), e.getX(), e.getY());
                 Position p = gui.convertToMapCoordinates(e.getX(), e.getY());
-                gui.setSelectedTile(p, true);
+		Tile tile = getMap().getTile(p);
+		if (tile != null && tile.hasRiver()) {
+		    TileImprovement river = tile.getRiver();
+		    int style = canvas.showRiverStylePanel();
+		    if (style == 0) {
+			tile.getTileItemContainer().removeTileItem(river);
+		    } else if (0 < style && style < ImageLibrary.RIVER_STYLES) {
+			river.setStyle(style);
+		    } else {
+			logger.warning("Unknown river style: " + style);
+		    }
+		} else {
+		    gui.setSelectedTile(p, true);
+		}
             } else if (e.getButton() == MouseEvent.BUTTON1) {
                 if (gui.getFocus() != null) {
                     Position p = gui.convertToMapCoordinates(e.getX(), e.getY());
