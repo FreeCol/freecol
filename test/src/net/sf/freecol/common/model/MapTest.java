@@ -217,4 +217,17 @@ public class MapTest extends FreeColTestCase {
         }
     }
 
+    public void testRandomDirection() {
+        Game game = getStandardGame();
+        Tile[][] tiles = new Tile[10][15];
+        for (int x = 0; x < 10; x++) {
+            for (int y = 0; y < 15; y++) {
+                tiles[x][y] = new Tile(game, spec().getTileType("model.tile.plains"), x, y);
+            }
+        }
+        Map map = new Map(game, tiles);
+        
+        Direction[] dirs = map.getRandomDirectionArray();
+        assertNotNull(dirs);
+    }
 }
