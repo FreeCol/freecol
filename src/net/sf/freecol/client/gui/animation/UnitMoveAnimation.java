@@ -139,12 +139,16 @@ public final class UnitMoveAnimation extends Animation {
             canvas.remove(unitLabel);
         }
     }
-    
+
     protected boolean isFinished() {
-        if (destinationPoint != null)
-            return destinationPoint.equals(currentPoint);
-        else
+        if (destinationPoint != null) {
+            // when moving 8 or 16 pixels at a time, we may not reach the exact destination point.
+            // checking the distance to the destination is less than half the increment
+            return (Math.abs(destinationPoint.x-currentPoint.x) <= Math.abs(signalX*X_RATIO*MOVEMENT_RATIO/2)) &&
+                   (Math.abs(destinationPoint.y-currentPoint.y) <= Math.abs(signalY*Y_RATIO*MOVEMENT_RATIO/2));
+        } else {
             return true;
+        }
     }
 
     protected Rectangle getAnimationArea() {
