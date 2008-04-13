@@ -52,11 +52,9 @@ import javax.swing.UIManager;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.plaf.basic.BasicInternalFrameUI;
 
-//import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.action.MapControlsAction;
 import net.sf.freecol.client.gui.i18n.Messages;
-import net.sf.freecol.client.gui.panel.AboutPanel;
 import net.sf.freecol.client.gui.panel.ChatPanel;
 import net.sf.freecol.client.gui.panel.ChooseFoundingFatherDialog;
 import net.sf.freecol.client.gui.panel.ClientOptionsDialog;
@@ -69,6 +67,7 @@ import net.sf.freecol.client.gui.panel.ErrorPanel;
 import net.sf.freecol.client.gui.panel.EuropePanel;
 import net.sf.freecol.client.gui.panel.EventPanel;
 import net.sf.freecol.client.gui.panel.FreeColDialog;
+import net.sf.freecol.client.gui.panel.FreeColPanel;
 import net.sf.freecol.client.gui.panel.FreeColImageBorder;
 import net.sf.freecol.client.gui.panel.GameOptionsDialog;
 import net.sf.freecol.client.gui.panel.IndianSettlementPanel;
@@ -103,7 +102,6 @@ import net.sf.freecol.client.gui.panel.TilePanel;
 import net.sf.freecol.client.gui.panel.TradeRouteDialog;
 import net.sf.freecol.client.gui.panel.TradeRouteInputDialog;
 import net.sf.freecol.client.gui.panel.TrainDialog;
-import net.sf.freecol.client.gui.panel.VictoryPanel;
 import net.sf.freecol.client.gui.panel.WarehouseDialog;
 import net.sf.freecol.common.ServerInfo;
 import net.sf.freecol.common.model.Colony;
@@ -211,8 +209,6 @@ public final class Canvas extends JDesktopPane {
 
     private final MainPanel mainPanel;
 
-    private final NewPanel newPanel;
-
     private final StartGamePanel startGamePanel;
 
     private final EuropePanel europePanel;
@@ -221,11 +217,7 @@ public final class Canvas extends JDesktopPane {
 
     private final ChatPanel chatPanel;
     
-    private final AboutPanel aboutPanel;
-
     private final GUI gui;
-
-    private final VictoryPanel victoryPanel;
 
     private final ServerListPanel serverListPanel;
 
@@ -269,16 +261,13 @@ public final class Canvas extends JDesktopPane {
         setLayout(null);
 
         mainPanel = new MainPanel(this, freeColClient);
-        newPanel = new NewPanel(this, freeColClient.getConnectController());
         startGamePanel = new StartGamePanel(this, freeColClient);
         serverListPanel = new ServerListPanel(this, freeColClient, freeColClient.getConnectController());
         europePanel = new EuropePanel(this, freeColClient, freeColClient.getInGameController());
         statusPanel = new StatusPanel(this);
         chatPanel = new ChatPanel(this, freeColClient);
-        victoryPanel = new VictoryPanel(this, freeColClient);
         clientOptionsDialog = new ClientOptionsDialog(this, freeColClient);
         loadingSavegameDialog = new LoadingSavegameDialog(this, freeColClient);
-        aboutPanel = new AboutPanel(this, freeColClient);
 
         setFocusable(true);
         setFocusTraversalKeysEnabled(false);
@@ -458,18 +447,6 @@ public final class Canvas extends JDesktopPane {
     }
 
     /**
-     * Displays the <code>VictoryPanel</code>.
-     * 
-     * @see VictoryPanel
-     */
-    public void showVictoryPanel() {
-        closeMenus();
-        victoryPanel.initialize();
-        addAsFrame(victoryPanel);
-        victoryPanel.requestFocus();
-    }
-
-    /**
      * Displays the <code>WarehouseDialog</code>.
      * 
      * @param colony the colony for which to show the WarehouseDialog.
@@ -505,36 +482,25 @@ public final class Canvas extends JDesktopPane {
     }
 
     /**
-     * Displays the <code>AboutPanel</code>.
+     * Displays a <code>FreeColPanel</code>.
      * 
-     * @see AboutPanel
      */
-    public void showAboutPanel() {
+    public void showPanel(FreeColPanel panel) {
         closeMenus();
-        addAsFrame(aboutPanel);
-        aboutPanel.requestFocus();
+        addAsFrame(panel);
+        panel.requestFocus();
     }
-    
+
     /**
      * Displays the <code>ChatPanel</code>.
      * 
      * @see ChatPanel
      */
+    // TODO: does it have state, or can we create a new one?
     public void showChatPanel() {
         closeMenus();
         addAsFrame(chatPanel);
         chatPanel.requestFocus();
-    }
-
-    /**
-     * Displays the <code>NewGamePanel</code>.
-     * 
-     * @see NewPanel
-     */
-    public void showNewGamePanel() {
-        closeMenus();
-        addAsFrame(newPanel);
-        newPanel.requestFocus();
     }
 
     /**
@@ -2543,7 +2509,7 @@ public final class Canvas extends JDesktopPane {
 
         freeColClient.getConnectController().quitGame(true);
         removeInGameComponents();
-        showNewGamePanel();
+        showPanel(new NewPanel(this));
     }
 
     /**

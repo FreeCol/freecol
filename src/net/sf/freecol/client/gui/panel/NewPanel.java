@@ -17,7 +17,6 @@
  *  along with FreeCol.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
 package net.sf.freecol.client.gui.panel;
 
 import java.awt.Color;
@@ -49,8 +48,8 @@ import cz.autel.dmi.HIGLayout;
 * A panel filled with 'new game' items.
 */
 public final class NewPanel extends FreeColPanel implements ActionListener {
-    private static final Logger logger = Logger.getLogger(NewPanel.class.getName());
 
+    private static final Logger logger = Logger.getLogger(NewPanel.class.getName());
 
     private static final int    OK = 0,
                                 CANCEL = 1,
@@ -89,12 +88,10 @@ public final class NewPanel extends FreeColPanel implements ActionListener {
     * The constructor that will add the items to this panel.
     * 
     * @param parent The parent of this panel.
-    * @param connectController The controller responsible for
-    *       creating new connections.
     */
-    public NewPanel(Canvas parent, ConnectController connectController) {
+    public NewPanel(Canvas parent) {
         this.parent = parent;
-        this.connectController = connectController;
+        this.connectController = parent.getClient().getConnectController();
 
         JButton         cancel = new JButton( Messages.message("cancel") );
         ButtonGroup     group = new ButtonGroup();

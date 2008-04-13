@@ -40,6 +40,7 @@ import javax.swing.border.EmptyBorder;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.i18n.Messages;
+import net.sf.freecol.client.gui.panel.NewPanel;
 
 /**
 * A panel filled with 'main' items.
@@ -150,7 +151,7 @@ public final class MainPanel extends FreeColPanel implements ActionListener {
             switch (Integer.valueOf(command).intValue()) {
                 case NEW:
                     parent.remove(this);                
-                    parent.showNewGamePanel();
+                    parent.showPanel(new NewPanel(parent));
                     break;
                 case OPEN:
                     freeColClient.getConnectController().loadGame();

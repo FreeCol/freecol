@@ -30,7 +30,6 @@ import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.UIManager;
 
-import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.i18n.Messages;
 import cz.autel.dmi.HIGLayout;
@@ -40,16 +39,12 @@ import cz.autel.dmi.HIGLayout;
  */
 public final class VictoryPanel extends FreeColPanel implements ActionListener {
 
-
-
     private static final Logger logger = Logger.getLogger(VictoryPanel.class.getName());
 
     private static final int OK = 0, CONTINUE = 1;
 
     @SuppressWarnings("unused")
     private final Canvas parent;
-
-    private final FreeColClient freeColClient;
 
     private Box buttonsBox = Box.createHorizontalBox();
             
@@ -63,9 +58,8 @@ public final class VictoryPanel extends FreeColPanel implements ActionListener {
      * @param parent The parent of this panel.
      * @param freeColClient The main controller object for the client
      */
-    public VictoryPanel(Canvas parent, FreeColClient freeColClient) {
+    public VictoryPanel(Canvas parent) {
         this.parent = parent;
-        this.freeColClient = freeColClient;
         
         int[] widths = { 0 };
         int[] heights = { 0, margin, 0, margin, 0 };
@@ -103,7 +97,7 @@ public final class VictoryPanel extends FreeColPanel implements ActionListener {
     
     public void initialize() {
         buttonsBox.removeAll();
-        if (freeColClient.isSingleplayer()) {
+        if (parent.getClient().isSingleplayer()) {
             buttonsBox.add(continueButton);
             buttonsBox.add(Box.createGlue());
         }
@@ -127,10 +121,10 @@ public final class VictoryPanel extends FreeColPanel implements ActionListener {
         try {
             switch (Integer.valueOf(command).intValue()) {
             case OK:
-                freeColClient.quit();
+                parent.getClient().quit();
                 break;
             case CONTINUE:
-                freeColClient.continuePlaying();
+                parent.getClient().continuePlaying();
                 parent.remove(this);
                 break;
             default:

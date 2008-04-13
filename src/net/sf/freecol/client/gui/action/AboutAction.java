@@ -24,6 +24,8 @@ import java.util.logging.Logger;
 
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.FreeColClient;
+import net.sf.freecol.client.gui.Canvas;
+import net.sf.freecol.client.gui.panel.AboutPanel;
 
 /**
  * An action for displaying an about box with version numbers.
@@ -62,6 +64,7 @@ public class AboutAction extends FreeColAction {
      * @param e The <code>ActionEvent</code>.
      */
     public void actionPerformed(ActionEvent e) {
-    	freeColClient.getCanvas().showAboutPanel();
+    	Canvas canvas = freeColClient.getCanvas();
+        canvas.showPanel(new AboutPanel(canvas));
     }
 }

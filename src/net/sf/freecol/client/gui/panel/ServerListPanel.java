@@ -203,8 +203,7 @@ public final class ServerListPanel extends FreeColPanel implements ActionListene
                 break;
             case CANCEL:
                 parent.remove(this);
-                // parent.showMainPanel();
-                parent.showNewGamePanel();
+                parent.showPanel(new NewPanel(parent));
                 break;
             default:
                 logger.warning("Invalid Actioncommand: invalid number.");

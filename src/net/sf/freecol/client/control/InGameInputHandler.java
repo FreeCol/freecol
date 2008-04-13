@@ -30,6 +30,7 @@ import javax.swing.SwingUtilities;
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.Canvas;
+import net.sf.freecol.client.gui.panel.VictoryPanel;
 import net.sf.freecol.client.gui.animation.Animation;
 import net.sf.freecol.client.gui.animation.UnitMoveAnimation;
 import net.sf.freecol.client.gui.i18n.Messages;
@@ -1394,7 +1395,7 @@ public final class InGameInputHandler extends InputHandler {
      */
     class ShowVictoryPanelSwingTask extends NoResultCanvasSwingTask {
         protected void doWork(Canvas canvas) {
-            canvas.showVictoryPanel();
+            canvas.showPanel(new VictoryPanel(canvas));
         }
     }
 

@@ -41,7 +41,6 @@ import javax.swing.border.CompoundBorder;
 import javax.swing.border.EmptyBorder;
 
 import net.sf.freecol.FreeCol;
-import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.i18n.Messages;
 
@@ -54,8 +53,7 @@ public final class AboutPanel extends FreeColPanel implements ActionListener {
 
     private static final int CLOSE = 0;
         
-    private final Canvas            parent;
-    private final FreeColClient     freeColClient;
+    private final Canvas parent;
  
     private JButton exitButton;
     
@@ -66,9 +64,8 @@ public final class AboutPanel extends FreeColPanel implements ActionListener {
     * @param freeColClient The main controller object for the
     *       client.
     */
-    public AboutPanel(Canvas parent, FreeColClient freeColClient) {
+    public AboutPanel(Canvas parent) {
         this.parent = parent;
-        this.freeColClient = freeColClient;
         
         setLayout(new BorderLayout());
 
