@@ -46,7 +46,7 @@ public class Map extends FreeColGameObject {
 
     public static final int NUMBER_OF_DIRECTIONS = 8;
 
-    private static PseudoRandom random;
+    private final PseudoRandom random;
 
     /**
      * The directions a Unit can move to. Includes deltas for moving
@@ -140,7 +140,7 @@ public class Map extends FreeColGameObject {
 
     public Map(Game game, Tile[][] tiles) {
         super(game);
-
+        random = game.getModelController().getPseudoRandom();
         this.tiles = tiles;
     }
 
@@ -174,6 +174,7 @@ public class Map extends FreeColGameObject {
      */
     public Map(Game game, String id) {
         super(game, id);
+        random = game.getModelController().getPseudoRandom();
     }
 
     /**
@@ -1112,8 +1113,6 @@ public class Map extends FreeColGameObject {
      * @return a <code>Direction</code> value
      */
     public Direction getRandomDirection() {
-        // TODO: at this point, we can't use PseudoRandom, why not?
-        final Random random = new Random();
         return Direction.values()[random.nextInt(NUMBER_OF_DIRECTIONS)];
     }
 
@@ -1272,9 +1271,6 @@ public class Map extends FreeColGameObject {
      * @return Position selected
      */
     public Position getRandomLandPosition() {
-        // TODO: at this point, we can't use PseudoRandom, why not?
-        final Random random = new Random();
-        
         int x = (getWidth() > 10) ? random.nextInt(getWidth() - 10) + 5 : random.nextInt(getWidth());
         int y = (getHeight() > 10) ? random.nextInt(getHeight() - 10) + 5 : random.nextInt(getHeight());
         Position centerPosition = new Position(x, y);
