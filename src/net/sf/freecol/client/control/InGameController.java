@@ -1220,8 +1220,9 @@ public final class InGameController implements NetworkConstants {
             return;
         }
 
-        Goods goods = (Goods) canvas.showChoiceDialog(Messages.message("tradeProposition.text"), Messages
-                .message("tradeProposition.cancel"), unit.getGoodsIterator());
+        Goods goods = (Goods) canvas.showChoiceDialog(Messages.message("tradeProposition.text"),
+                                                      Messages.message("tradeProposition.cancel"),
+                                                      unit.getGoodsIterator());
         if (goods == null) { // == Trade aborted by the player.
             return;
         }

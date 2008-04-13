@@ -1435,12 +1435,6 @@ public final class Canvas extends JDesktopPane {
      * @return The chosen object, or <i>null</i> for the cancel-button.
      */
     public Object showChoiceDialog(String text, String cancelText, Object[] objects) {
-        /*
-         * try { text = Messages.message(text); cancelText =
-         * Messages.message(cancelText); } catch (MissingResourceException e) {
-         * logger.warning("could not find message with id: " + text + " or " +
-         * cancelText + "."); }
-         */
 
         FreeColDialog choiceDialog = FreeColDialog.createChoiceDialog(text, cancelText, objects);
         if (choiceDialog.getHeight() > getHeight() / 3) {
@@ -1776,7 +1770,7 @@ public final class Canvas extends JDesktopPane {
      * @return true or false
      * @see net.sf.freecol.common.model.Monarch
      */
-    public boolean showMonarchPanel(int action, String[][] replace) {
+    public boolean showMonarchPanel(int action, String... replace) {
         closeStatusPanel();
 
         MonarchPanel monarchPanel = new MonarchPanel(this);

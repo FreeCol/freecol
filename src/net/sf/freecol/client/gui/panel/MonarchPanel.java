@@ -100,7 +100,7 @@ public final class MonarchPanel extends FreeColDialog implements ActionListener 
      * @param action The monarch action.
      * @param replace The data to be used when displaying i18n-strings.
      */
-    public void initialize(int action, String[][] replace) {
+    public void initialize(int action, String... replace) {
         removeAll();
 
         Nation nation = parent.getClient().getMyPlayer().getNation();

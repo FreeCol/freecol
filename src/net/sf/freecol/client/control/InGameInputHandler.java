@@ -772,10 +772,9 @@ public final class InGameInputHandler extends InputHandler {
                 reply = null;
             } else {
                 reply = Message.createNewRootElement("acceptTax");
-                String[][] replace = new String[][] {
-                    { "%replace%", element.getAttribute("amount") },
-                    { "%goods%", element.getAttribute("goods") }, };
-                if (new ShowMonarchPanelSwingTask(action, replace).confirm()) {
+                if (new ShowMonarchPanelSwingTask(action,
+                                                  "%replace%", element.getAttribute("amount"),
+                                                  "%goods%", element.getAttribute("goods")).confirm()) {
                     freeColClient.getMyPlayer().setTax(amount);
                     reply.setAttribute("accepted", String.valueOf(true));
                     new UpdateMenuBarSwingTask().invokeLater();
@@ -825,7 +824,7 @@ public final class InGameInputHandler extends InputHandler {
                 public void run() {
                     Canvas canvas = getFreeColClient().getCanvas();
                     if (!canvas.isShowingSubPanel()
-                            && (action == Monarch.ADD_UNITS || !canvas.showMonarchPanel(action, null))) {
+                            && (action == Monarch.ADD_UNITS || !canvas.showMonarchPanel(action))) {
                         canvas.showEuropePanel();
                     }
                 }
@@ -841,9 +840,9 @@ public final class InGameInputHandler extends InputHandler {
                 unit.readFromXMLElement((Element) childElements.item(index));
                 mercenaries.add(unit);
             }
-            if (new ShowMonarchPanelSwingTask(action, new String[][] {
-                        { "%gold%", element.getAttribute("price") },
-                        { "%mercenaries%", monarch.getName(mercenaries) } }).confirm()) {
+            if (new ShowMonarchPanelSwingTask(action,
+                                              "%gold%", element.getAttribute("price"),
+                                              "%mercenaries%", monarch.getName(mercenaries)).confirm()) {
                 int price = new Integer(element.getAttribute("price")).intValue();
                 freeColClient.getMyPlayer().modifyGold(-price);
                 SwingUtilities.invokeLater(new Runnable() {
@@ -948,7 +947,7 @@ public final class InGameInputHandler extends InputHandler {
 
         if (goodsElement == null) {
             // player has no colony or nothing to trade
-            new ShowMonarchPanelSwingTask(Monarch.WAIVE_TAX, null).confirm();
+            new ShowMonarchPanelSwingTask(Monarch.WAIVE_TAX).confirm();
         } else {
             final Goods goods = new Goods(getGame(), goodsElement);
             final Colony colony = (Colony) goods.getLocation();
@@ -1668,7 +1667,7 @@ public final class InGameInputHandler extends InputHandler {
          * @param action The action key.
          * @param replace The replacement values.
          */
-        public ShowMonarchPanelSwingTask(int action, String[][] replace) {
+        public ShowMonarchPanelSwingTask(int action, String... replace) {
             _action = action;
             _replace = replace;
         }
@@ -1699,6 +1698,6 @@ public final class InGameInputHandler extends InputHandler {
 
         private int _action;
 
-        private String[][] _replace;
+        private String[] _replace;
     }
 }
