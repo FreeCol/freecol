@@ -246,9 +246,10 @@ public final class InGameController implements NetworkConstants {
 
         Canvas canvas = freeColClient.getCanvas();
         if (freeColClient.getMyPlayer().getSoL() < 50) {
-            canvas.showInformationMessage("declareIndependence.notMajority", new String[][] { { "%percentage%",
-                    Integer.toString(freeColClient.getMyPlayer().getSoL()) } }, 
-                    FreeCol.getSpecification().getGoodsType("model.goods.bells"));
+            canvas.showInformationMessage("declareIndependence.notMajority",
+                                          FreeCol.getSpecification().getGoodsType("model.goods.bells"),
+                                          "%percentage%",
+                                          Integer.toString(freeColClient.getMyPlayer().getSoL()));
             return;
         }
         if (!canvas.showConfirmDialog("declareIndependence.areYouSure.text", "declareIndependence.areYouSure.yes",
@@ -351,7 +352,7 @@ public final class InGameController implements NetworkConstants {
             } else if (freeColClient.getMyPlayer().getColony(name) != null) {
                 // colony name must be unique (per Player)
                 freeColClient.getCanvas().showInformationMessage("nameColony.notUnique",
-                                                                 new String[][] { { "%name%", name } });
+                                                                 "%name%", name);
                 return;
             }
         } else if (object instanceof Unit) {
@@ -508,7 +509,7 @@ public final class InGameController implements NetworkConstants {
         } else if (freeColClient.getMyPlayer().getColony(name) != null) {
             // colony name must be unique (per Player)
             freeColClient.getCanvas().showInformationMessage("nameColony.notUnique",
-                    new String[][] { { "%name%", name } });
+                                                             "%name%", name);
             return;
         }
 
@@ -700,8 +701,8 @@ public final class InGameController implements NetworkConstants {
         }
 
         if (path == null) {
-            canvas.showInformationMessage("selectDestination.failed", new String[][] { { "%destination%",
-                    destination.getLocationName() } }, unit);
+            canvas.showInformationMessage("selectDestination.failed", unit,
+                                          "%destination%", destination.getLocationName());
             setDestination(unit, null);
             return;
         }
@@ -1096,7 +1097,7 @@ public final class InGameController implements NetworkConstants {
                     String accept = reply.getAttribute("accept");
                     if ("accept".equals(accept)) {
                         freeColClient.getCanvas().showInformationMessage("negotiationDialog.offerAccepted",
-                                                                         new String[][] {{"%nation%", nation}});
+                                                                         "%nation%", nation);
                         agreement.makeTrade();
                         return;
                     } else {
@@ -1111,7 +1112,7 @@ public final class InGameController implements NetworkConstants {
                 }
             } while (reply != null);
             freeColClient.getCanvas().showInformationMessage("negotiationDialog.offerRejected",
-                                                             new String[][] {{"%nation%", nation}});
+                                                             "%nation%", nation);
         }
     }
 
@@ -1239,7 +1240,7 @@ public final class InGameController implements NetworkConstants {
 
             int gold = Integer.parseInt(reply.getAttribute("gold"));
             if (gold == NO_NEED_FOR_THE_GOODS) {
-                canvas.showInformationMessage("noNeedForTheGoods", new String[][] { { "%goods%", goods.getName() } });
+                canvas.showInformationMessage("noNeedForTheGoods", "%goods%", goods.getName());
                 return;
             } else if (gold <= NO_TRADE) {
                 canvas.showInformationMessage("noTrade");
@@ -1449,7 +1450,7 @@ public final class InGameController implements NetworkConstants {
             boolean cash;
             if (unit.getOwner().getEurope() == null) {
                 canvas.showInformationMessage("cashInTreasureTrain.text.independence",
-                        new String[][] { { "%nation%", unit.getOwner().getNationAsString() } });
+                                              "%nation%", unit.getOwner().getNationAsString());
                 cash = true;
             } else {
                 int transportFee = unit.getTransportFee();
@@ -1519,8 +1520,10 @@ public final class InGameController implements NetworkConstants {
             // ship slowed
             unit.setMovesLeft(unit.getMovesLeft() - Integer.parseInt(reply.getAttribute("movesSlowed")));
             Unit slowedBy = (Unit) freeColClient.getGame().getFreeColGameObject(reply.getAttribute("slowedBy"));
-            canvas.showInformationMessage("model.unit.slowed", new String[][] {{"%unit%", unit.getName()}, 
-                {"%enemyUnit%", slowedBy.getName()}, {"%enemyNation%", slowedBy.getOwner().getNationAsString()}});
+            canvas.showInformationMessage("model.unit.slowed",
+                                          "%unit%", unit.getName(), 
+                                          "%enemyUnit%", slowedBy.getName(),
+                                          "%enemyNation%", slowedBy.getOwner().getNationAsString());
         }
 
         // set location again in order to meet with people player don't see
@@ -1597,7 +1600,8 @@ public final class InGameController implements NetworkConstants {
                         unit.getOwner().modifyGold(Integer.parseInt(amount));
                         freeColClient.getCanvas().updateGoldLabel();
                         freeColClient.getCanvas().showInformationMessage("scoutSettlement.tributeAgree",
-                                new String[][] { { "%replace%", amount } }, settlement);
+                                                                         settlement,
+                                                                         "%replace%", amount);
                     } else if (result.equals("disagree")) {
                         freeColClient.getCanvas().showInformationMessage("scoutSettlement.tributeDisagree", settlement);
                     }
@@ -1665,9 +1669,7 @@ public final class InGameController implements NetworkConstants {
                 case ALLIANCE:
                     freeColClient.playSound(SfxLibrary.ILLEGAL_MOVE);
                     freeColClient.getCanvas().showInformationMessage("model.diplomacy.attack.alliance",
-                                                                     new String[][] {
-                                                                         { "%replace%", enemy.getNationAsString() }
-                                                                     });
+                                                                     "%replace%", enemy.getNationAsString());
                     return false;
                 case WAR:
                     logger.finest("Player at war, no confirmation needed");
@@ -2633,7 +2635,9 @@ public final class InGameController implements NetworkConstants {
                 canvas.errorMessage("indianSettlement.noMoreSkill");
             } else if (!unit.getType().canBeUpgraded(skill, UnitType.UpgradeType.NATIVES)) {
                 canvas.showInformationMessage("indianSettlement.cantLearnSkill",
-                        new String[][] { {"%unit%", unit.getName()}, {"%skill%", skillName} }, settlement);
+                                              settlement,
+                                              "%unit%", unit.getName(),
+                                              "%skill%", skillName);
             } else {
                 Element learnSkill = Message.createNewRootElement("learnSkillAtSettlement");
                 learnSkill.setAttribute("unit", unit.getId());
@@ -2808,7 +2812,8 @@ public final class InGameController implements NetworkConstants {
                 unit.getOwner().modifyGold(Integer.parseInt(amount));
                 freeColClient.getCanvas().updateGoldLabel();
                 canvas.showInformationMessage("scoutSettlement.speakBeads", 
-                        new String[][] { { "%replace%", amount } }, settlement);
+                                              settlement,
+                                              "%replace%", amount);
             } else if (action.equals("speak") && result.equals("nothing")) {
                 // nothing special
                 canvas.showInformationMessage("scoutSettlement.speakNothing", settlement);
@@ -2818,7 +2823,8 @@ public final class InGameController implements NetworkConstants {
                 unit.getOwner().modifyGold(Integer.parseInt(amount));
                 freeColClient.getCanvas().updateGoldLabel();
                 canvas.showInformationMessage("scoutSettlement.tributeAgree",
-                        new String[][] { { "%replace%", amount } }, settlement);
+                                              settlement,
+                                              "%replace%", amount);
             } else if (action.equals("tribute") && result.equals("disagree")) {
                 // no tribute
                 canvas.showInformationMessage("scoutSettlement.tributeDisagree", settlement);
@@ -3278,7 +3284,7 @@ public final class InGameController implements NetworkConstants {
             }
         } else {
             freeColClient.getCanvas().showInformationMessage("model.europe.cantPayArrears",
-                    new String[][] { { "%amount%", String.valueOf(arrears) } });
+                                                             "%amount%", String.valueOf(arrears));
         }
     }
 

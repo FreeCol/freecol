@@ -2263,7 +2263,7 @@ public final class Canvas extends JDesktopPane {
      * @param messageId The messageId of the message to display.
      */
     public void showInformationMessage(String messageId) {
-        showInformationMessage(messageId, null, null);
+        showInformationMessage(messageId, null, new String[0]);
     }
     
     /**
@@ -2273,7 +2273,7 @@ public final class Canvas extends JDesktopPane {
      * @param displayObject Optional object for displaying an icon
      */
     public void showInformationMessage(String messageId, FreeColObject displayObject) {
-        showInformationMessage(messageId, null, displayObject);
+        showInformationMessage(messageId, displayObject, new String[0]);
     }
 
     
@@ -2283,14 +2283,14 @@ public final class Canvas extends JDesktopPane {
      * <br>
      * <br>
      * <b>Example:</b> <br>
-     * <code>canvas.showInformationMessage("noNeedForTheGoods", new String[][] {{"%goods%", goods.getName()}});</code>
+     * <code>canvas.showInformationMessage("noNeedForTheGoods", "%goods%", goods.getName());</code>
      * 
      * @param messageId The messageId of the message to display.
-     * @param replace All occurrences of <code>replace[i][0]</code> in the
-     *            message gets replaced by <code>replace[i][1]</code>.
+     * @param replace All occurrences of <code>replace[2x]</code> in the
+     *            message gets replaced by <code>replace[2x+1]</code>.
      */
-    public void showInformationMessage(String messageId, String[][] replace) {
-        showInformationMessage(messageId, replace, null);
+    public void showInformationMessage(String messageId, String... replace) {
+        showInformationMessage(messageId, null, replace);
     }
     
     /**
@@ -2299,14 +2299,14 @@ public final class Canvas extends JDesktopPane {
      * <br>
      * <br>
      * <b>Example:</b> <br>
-     * <code>canvas.showInformationMessage("noNeedForTheGoods", new String[][] {{"%goods%", goods.getName()}});</code>
+     * <code>canvas.showInformationMessage("noNeedForTheGoods", "%goods%", goods.getName());</code>
      * 
      * @param messageId The messageId of the message to display.
-     * @param replace All occurrences of <code>replace[i][0]</code> in the
-     *            message gets replaced by <code>replace[i][1]</code>.
+     * @param replace All occurrences of <code>replace[2x]</code> in the
+     *            message gets replaced by <code>replace[2x+1]</code>.
      * @param displayObject Optional object for displaying an icon
      */
-    public void showInformationMessage(String messageId, String[][] replace, FreeColObject displayObject) {
+    public void showInformationMessage(String messageId, FreeColObject displayObject, String... replace) {
         String text;
         try {
             text = Messages.message(messageId, replace);
@@ -2315,10 +2315,11 @@ public final class Canvas extends JDesktopPane {
             logger.warning("Missing i18n resource: " + messageId);
         }
         ImageIcon icon = null;
-        if (displayObject!=null)
+        if (displayObject != null) {
             icon = getImageIcon(displayObject, false);
+        }
         FreeColDialog infoDialog = FreeColDialog.createInformationDialog(new String[] { text },
-                new ImageIcon[] { icon });
+                                                                         new ImageIcon[] { icon });
         addAsFrame(infoDialog);
         infoDialog.requestFocus();
 

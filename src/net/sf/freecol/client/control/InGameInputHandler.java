@@ -646,7 +646,7 @@ public final class InGameInputHandler extends InputHandler {
         
         if (proposal.isAccept()) {
             new ShowInformationMessageSwingTask("negotiationDialog.offerAccepted",
-                    new String[][] {{"%nation%", unit.getOwner().getNationAsString()}}).show();
+                                                "%nation%", unit.getOwner().getNationAsString()).show();
             proposal.makeTrade();
         } else {
             DiplomaticTrade agreement = new ShowNegotiationDialogSwingTask(unit, settlement, proposal).select();
@@ -1512,7 +1512,7 @@ public final class InGameInputHandler extends InputHandler {
          * @param messageId The key for the message.
          * @param replace The values to replace text with.
          */
-        public ShowInformationMessageSwingTask(String messageId, String[][] replace) {
+        public ShowInformationMessageSwingTask(String messageId, String... replace) {
             _messageId = messageId;
             _replace = replace;
         }
@@ -1525,7 +1525,7 @@ public final class InGameInputHandler extends InputHandler {
 
         private String _messageId;
 
-        private String[][] _replace;
+        private String[] _replace;
     }
 
     /**

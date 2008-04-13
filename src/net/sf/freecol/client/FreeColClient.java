@@ -205,8 +205,7 @@ public final class FreeColClient {
                     } else {
                         Locale l = ((Language) e.getNewValue()).getLocale();
                         Messages.setMessageBundle(l);
-                        canvas.showInformationMessage("newLanguageSelected",
-                                                      new String[][] {{"%language%", l.getDisplayName()}});
+                        canvas.showInformationMessage("newLanguageSelected", "%language%", l.getDisplayName());
                     }
                 }
             });
