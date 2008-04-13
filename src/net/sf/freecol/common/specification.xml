@@ -1438,7 +1438,7 @@
       <ability id="model.ability.foundColony" value="false"/>
       <region id="model.region.north" />
     </indian-nation-type>
-    <indian-nation-type id="model.nationType.inca" number-of-settlements="low"
+    <indian-nation-type id="model.nationType.inca" number-of-settlements="high"
                         aggression="low" type-of-settlement="inca_city">
       <skill id="model.unit.expertFarmer"/>
       <skill id="model.unit.expertFisherman"/>
@@ -1447,7 +1447,7 @@
       <region id="model.region.southWest" />
       <region id="model.region.south" />
     </indian-nation-type>
-    <indian-nation-type id="model.nationType.aztec" number-of-settlements="low"
+    <indian-nation-type id="model.nationType.aztec" number-of-settlements="high"
                         aggression="high" type-of-settlement="aztec_city">
       <skill id="model.unit.expertFarmer"/>
       <skill id="model.unit.expertFisherman"/>

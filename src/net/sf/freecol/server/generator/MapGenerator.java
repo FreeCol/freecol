@@ -429,9 +429,8 @@ public class MapGenerator {
                     placeIndianSettlement(territory.player, false, tile.getPosition(), map);
                     settlementTiles.remove(tile);
                 }
-            }            
-        }    
-
+            }
+        }
     }
 
     private Tile getClosestTile(Map map, Position center, List<Tile> tiles) {
