@@ -746,9 +746,7 @@ public final class EuropePanel extends FreeColPanel implements ActionListener, C
                                 "europe.leaveColonists",
                                 "yes",
                                 "no",
-                                new String[][] {
-                                    {"%newWorld%", unit.getOwner().getNewLandName()}
-                                });
+                                "%newWorld%", unit.getOwner().getNewLandName());
                         if (!leaveColonists) {
                             // Remain in Europe.
                             return null;

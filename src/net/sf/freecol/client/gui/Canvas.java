@@ -635,20 +635,11 @@ public final class Canvas extends JDesktopPane {
     }
 
     /**
-     * Displays a single ModelMessage.
-     * 
-     * @param modelMessage The message to display.
-     */
-    public void showModelMessage(ModelMessage modelMessage) {
-        showModelMessages(new ModelMessage[] { modelMessage });
-    }
-
-    /**
      * Displays a number of ModelMessages.
      * 
      * @param modelMessages
      */
-    public void showModelMessages(ModelMessage[] modelMessages) {
+    public void showModelMessages(ModelMessage... modelMessages) {
         String okText = "ok";
         String cancelText = "display";
         String[] messageText = new String[modelMessages.length];
@@ -780,20 +771,7 @@ public final class Canvas extends JDesktopPane {
 
     }
 
-    /**
-     * Displays a dialog with a text and a ok/cancel option.
-     * 
-     * @param text The text that explains the choice for the user.
-     * @param okText The text displayed on the "ok"-button.
-     * @param cancelText The text displayed on the "cancel"-button.
-     * @return <i>true</i> if the user clicked the "ok"-button and <i>false</i>
-     *         otherwise.
-     * @see FreeColDialog
-     */
-    public boolean showConfirmDialog(String text, String okText, String cancelText) {
-        return showConfirmDialog(text, okText, cancelText, null);
-    }
-    
+
     /**
      * Displays the given dialog.
      * 
@@ -821,7 +799,7 @@ public final class Canvas extends JDesktopPane {
      *         otherwise.
      * @see FreeColDialog
      */
-    public boolean showConfirmDialog(String text, String okText, String cancelText, String[][] replace) {
+    public boolean showConfirmDialog(String text, String okText, String cancelText, String... replace) {
         try {
             text = Messages.message(text, replace);
             okText = Messages.message(okText);

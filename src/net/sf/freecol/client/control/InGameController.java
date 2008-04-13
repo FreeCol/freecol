@@ -1657,15 +1657,11 @@ public final class InGameController implements NetworkConstants {
                 case CEASE_FIRE:
                     return freeColClient.getCanvas().showConfirmDialog("model.diplomacy.attack.ceaseFire",
                                                                        "model.diplomacy.attack.confirm", "cancel",
-                                                                       new String[][] {
-                                                                           { "%replace%", enemy.getNationAsString() }
-                                                                       });
+                                                                       "%replace%", enemy.getNationAsString());
                 case PEACE:
                     return freeColClient.getCanvas().showConfirmDialog("model.diplomacy.attack.peace",
                                                                        "model.diplomacy.attack.confirm", "cancel",
-                                                                       new String[][] {
-                                                                           { "%replace%", enemy.getNationAsString() }
-                                                                       });
+                                                                       "%replace%", enemy.getNationAsString());
                 case ALLIANCE:
                     freeColClient.playSound(SfxLibrary.ILLEGAL_MOVE);
                     freeColClient.getCanvas().showInformationMessage("model.diplomacy.attack.alliance",
@@ -2643,8 +2639,8 @@ public final class InGameController implements NetworkConstants {
                 learnSkill.setAttribute("unit", unit.getId());
                 learnSkill.setAttribute("direction", direction.toString());
 
-                if (!canvas.showConfirmDialog("learnSkill.text", "learnSkill.yes", "learnSkill.no", new String[][] { {
-                        "%replace%", skillName } })) {
+                if (!canvas.showConfirmDialog("learnSkill.text", "learnSkill.yes", "learnSkill.no",
+                                              "%replace%", skillName)) {
                     // the player declined to learn the skill
                     learnSkill.setAttribute("action", "cancel");
                 }
@@ -3058,8 +3054,8 @@ public final class InGameController implements NetworkConstants {
         }
 
         if (!freeColClient.getCanvas()
-                .showConfirmDialog("payForBuilding.text", "payForBuilding.yes", "payForBuilding.no",
-                        new String[][] { { "%replace%", Integer.toString(colony.getPriceForBuilding()) } })) {
+            .showConfirmDialog("payForBuilding.text", "payForBuilding.yes", "payForBuilding.no",
+                               "%replace%", Integer.toString(colony.getPriceForBuilding()))) {
             return;
         }
 
@@ -3273,7 +3269,7 @@ public final class InGameController implements NetworkConstants {
         int arrears = player.getArrears(type);
         if (player.getGold() >= arrears) {
             if (freeColClient.getCanvas().showConfirmDialog("model.europe.payArrears", "ok", "cancel",
-                    new String[][] { { "%replace%", String.valueOf(arrears) } })) {
+                                                            "%replace%", String.valueOf(arrears))) {
                 player.modifyGold(-arrears);
                 freeColClient.getCanvas().updateGoldLabel();
                 player.resetArrears(type);

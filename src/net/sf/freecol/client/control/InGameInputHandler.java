@@ -712,8 +712,10 @@ public final class InGameInputHandler extends InputHandler {
         if (goodsElement == null) {
             gold = Integer.parseInt(element.getAttribute("gold"));
             accepted = new ShowConfirmDialogSwingTask("indianDemand.gold.text", "indianDemand.gold.yes",
-                    "indianDemand.gold.no", new String[][] { { "%nation%", unit.getOwner().getNationAsString() },
-                            { "%colony%", colony.getName() }, { "%amount%", String.valueOf(gold) } }).confirm();
+                                                      "indianDemand.gold.no",
+                                                      "%nation%", unit.getOwner().getNationAsString(),
+                                                      "%colony%", colony.getName(),
+                                                      "%amount%", String.valueOf(gold)).confirm();
             if (accepted) {
                 colony.getOwner().modifyGold(-gold);
             }
@@ -722,13 +724,16 @@ public final class InGameInputHandler extends InputHandler {
 
             if (goods.getType() == Goods.FOOD) {
                 accepted = new ShowConfirmDialogSwingTask("indianDemand.food.text", "indianDemand.food.yes",
-                        "indianDemand.food.no", new String[][] { { "%nation%", unit.getOwner().getNationAsString() },
-                                { "%colony%", colony.getName() } }).confirm();
+                                                          "indianDemand.food.no",
+                                                          "%nation%", unit.getOwner().getNationAsString(),
+                                                          "%colony%", colony.getName()).confirm();
             } else {
                 accepted = new ShowConfirmDialogSwingTask("indianDemand.other.text", "indianDemand.other.yes",
-                        "indianDemand.other.no", new String[][] { { "%nation%", unit.getOwner().getNationAsString() },
-                                { "%colony%", colony.getName() }, { "%amount%", String.valueOf(goods.getAmount()) },
-                                { "%goods%", goods.getName() } }).confirm();
+                                                          "indianDemand.other.no",
+                                                          "%nation%", unit.getOwner().getNationAsString(),
+                                                          "%colony%", colony.getName(),
+                                                          "%amount%", String.valueOf(goods.getAmount()),
+                                                          "%goods%", goods.getName()).confirm();
             }
 
             if (accepted) {
@@ -1405,20 +1410,9 @@ public final class InGameInputHandler extends InputHandler {
          * @param text The key for the question.
          * @param okText The key for the OK button.
          * @param cancelText The key for the Cancel button.
-         */
-        public ShowConfirmDialogSwingTask(String text, String okText, String cancelText) {
-            this(text, okText, cancelText, null);
-        }
-
-        /**
-         * Constructor.
-         * 
-         * @param text The key for the question.
-         * @param okText The key for the OK button.
-         * @param cancelText The key for the Cancel button.
          * @param replace The replacement values.
          */
-        public ShowConfirmDialogSwingTask(String text, String okText, String cancelText, String[][] replace) {
+        public ShowConfirmDialogSwingTask(String text, String okText, String cancelText, String... replace) {
             _text = text;
             _okText = okText;
             _cancelText = cancelText;
@@ -1455,7 +1449,7 @@ public final class InGameInputHandler extends InputHandler {
 
         private String _cancelText;
 
-        private String[][] _replace;
+        private String[] _replace;
     }
 
     /**
@@ -1493,7 +1487,7 @@ public final class InGameInputHandler extends InputHandler {
         }
 
         protected Object doWork() {
-            getFreeColClient().getCanvas().showModelMessage(_modelMessage);
+            getFreeColClient().getCanvas().showModelMessages(_modelMessage);
             return null;
         }
 
