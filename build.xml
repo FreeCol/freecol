@@ -89,7 +89,9 @@
             debug="on"
             optimize="on"
             deprecation="off"
-            source="1.5"/>
+            source="1.5">
+          <!-- <compilerarg value="-Xlint"/> -->
+        </javac>
     </target>
 
     <!-- Compile the JUnit tests -->
@@ -135,14 +137,11 @@
     </target>
 
     <target name="manifest" description="Creates the Manifest file.">
-      <!--
       <exec executable="svn" output="${basedir}/build/svn.properties">
         <arg value="info"/>
-        <arg value="-r"/>
-        <arg value="HEAD"/>
+        <arg value="."/>
       </exec>
       <property prefix="svn" file="build/svn.properties"/>
-      -->
       <manifest file="${basedir}/src/MANIFEST.MF">
         <attribute name="Created-By" value="FreeCol Team"/>
         <attribute name="Main-Class" value="net.sf.freecol.FreeCol"/>
