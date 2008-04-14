@@ -2244,24 +2244,6 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
     }
 
     /**
-     * Gets the type of the unit.
-     * 
-     * @return The type of the unit.
-     */
-    public int getIndex() {
-        return unitType.getIndex();
-    }
-
-    /**
-     * Sets the type of the unit.
-     * 
-     * @param type The new type of the unit.
-     */
-    public void setType(int type) {
-        setType(FreeCol.getSpecification().getUnitType(type));
-    }
-
-    /**
      * Sets the type of the unit.
      * 
      * @param unitType The new type of the unit.

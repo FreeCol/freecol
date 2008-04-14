@@ -552,7 +552,7 @@ public class TransportMission extends Mission {
             AIColony ac = aiColonies.get(i);
             // Assuming that all colonists which can be bought in Europe take
             // the same space: TODO: fix this
-            int space = getAvailableSpace(1, getUnit().getOwner().getEurope(), ac.getColony());
+            int space = getAvailableSpace(getUnit().getType(), getUnit().getOwner().getEurope(), ac.getColony());
             Iterator<Wish> wishIterator = ac.getWishIterator();
             while (space > 0 && wishIterator.hasNext()) {
                 Wish w = wishIterator.next();
@@ -823,9 +823,9 @@ public class TransportMission extends Mission {
     public int getAvailableSpace(Transportable t) {
         if (t.getTransportLocatable() instanceof Unit) {
             Unit u = (Unit) t.getTransportLocatable();
-            return getAvailableSpace(u.getIndex(), t.getTransportSource(), t.getTransportDestination());
+            return getAvailableSpace(u.getType(), t.getTransportSource(), t.getTransportDestination());
         } else {
-            return getAvailableSpace(-1, t.getTransportSource(), t.getTransportDestination());
+            return getAvailableSpace(null, t.getTransportSource(), t.getTransportDestination());
         }
     }
 
@@ -833,14 +833,14 @@ public class TransportMission extends Mission {
      * Returns the available space for the given type of <code>Unit</code> at
      * the given <code>Location</code>.
      * 
-     * @param unitType The type of {@link Unit} or <code>-1</code> for
+     * @param unitType The type of {@link Unit} or <code>null</code> for
      *            {@link Goods}
      * @param source The source for the unit. This is where the unit is
      *            presently located.
      * @param destination The destination for the unit.
      * @return The space available
      */
-    public int getAvailableSpace(int unitType, Location source, Location destination) {
+    public int getAvailableSpace(UnitType unitType, Location source, Location destination) {
         // TODO: Implement this method properly:
         return Math.max(0, getUnit().getSpaceLeft() - transportList.size());
     }
