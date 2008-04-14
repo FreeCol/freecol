@@ -550,10 +550,12 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
             int value = ((IndianSettlement) settlement).getPrice(goods) / 100;
             ((IndianSettlement)settlement).modifyAlarm(getOwner(), -value*2);
         } else {
-            addModelMessage(settlement, "model.unit.gift", new String[][] {
-                    { "%player%", getOwner().getNationAsString() }, { "%type%", goods.getName() },
-                    { "%amount%", Integer.toString(amount) }, { "%colony%", ((Colony) settlement).getName() } },
-                ModelMessage.MessageType.GIFT_GOODS, goods.getType());
+            addModelMessage(settlement, ModelMessage.MessageType.GIFT_GOODS, goods.getType(),
+                            "model.unit.gift",
+                            "%player%", getOwner().getNationAsString(),
+                            "%type%", goods.getName(),
+                            "%amount%", Integer.toString(amount),
+                            "%colony%", ((Colony) settlement).getName());
         }
     }
 
@@ -621,14 +623,15 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
         if (canCashInTreasureTrain()) {
             int cashInAmount = getTreasureAmount() - getTransportFee();
             cashInAmount = cashInAmount * (100 - getOwner().getTax()) / 100;
-            FreeColGameObject o = getOwner();
+            FreeColGameObject owner = getOwner();
             if (isInEurope()) {
-                o = getOwner().getEurope();
+                owner = getOwner().getEurope();
             }
             getOwner().modifyGold(cashInAmount);
-            addModelMessage(o, "model.unit.cashInTreasureTrain", new String[][] {
-                    { "%amount%", Integer.toString(getTreasureAmount()) },
-                    { "%cashInAmount%", Integer.toString(cashInAmount) } }, ModelMessage.MessageType.DEFAULT);
+            addModelMessage(owner, ModelMessage.MessageType.DEFAULT,
+                            "model.unit.cashInTreasureTrain",
+                            "%amount%", Integer.toString(getTreasureAmount()),
+                            "%cashInAmount%", Integer.toString(cashInAmount));
             dispose();
         } else {
             throw new IllegalStateException("Cannot cash in treasure train at the current location.");
@@ -2187,7 +2190,7 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
             getOwner().getMarket().buy(goodsType, amount, getOwner());
             goodsContainer.addGoods(goodsType, amount);
         } catch (IllegalStateException ise) {
-            this.addModelMessage(this, "notEnoughGold", null, ModelMessage.MessageType.DEFAULT);
+            this.addModelMessage(this, ModelMessage.MessageType.DEFAULT, "notEnoughGold");
         }
     }
 
@@ -2851,11 +2854,9 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
 
                 switch (state) {
                 case TO_EUROPE:
-                    addModelMessage(getOwner().getEurope(),
+                    addModelMessage(getOwner().getEurope(), ModelMessage.MessageType.DEFAULT, this,
                                     "model.unit.arriveInEurope",
-                                    new String[][] {
-                                        {"%europe%", getOwner().getEurope().getName()}},
-                                    ModelMessage.MessageType.DEFAULT, this);
+                                    "%europe%", getOwner().getEurope().getName());
                     Iterator<Unit> iter = getUnitIterator();
                     while (iter.hasNext()) {
                         Unit u = iter.next();
@@ -2940,17 +2941,10 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
         // TODO: make this more generic
         EquipmentType tools = FreeCol.getSpecification().getEquipmentType("model.equipment.tools");
         if (!equipment.contains(tools)) {
-            if (hasAbility("model.ability.expertPioneer")) {
-                addModelMessage(this, "model.unit.noMoreToolsPioneer",
-                                new String[][] {
-                                    {"%unit%", getName()}},
-                                ModelMessage.MessageType.WARNING, this);
-            } else {
-                addModelMessage(this, "model.unit.noMoreTools",
-                                new String[][] {
-                                    { "%unit%", getName() } },
-                                ModelMessage.MessageType.WARNING, this);
-            }
+            addModelMessage(this, ModelMessage.MessageType.WARNING, this,
+                            Messages.getKey(getId() + ".noMoreTools", 
+                                            "model.unit.noMoreTools"),
+                            "%unit%", getName());
         }
     }
 
@@ -3074,12 +3068,11 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
         String newName = getName();
         if (!newName.equals(oldName)) {
             Colony colony = getTile().getColony();
-            addModelMessage(colony, "model.unit.unitEducated",
-                            new String[][] {
-                                { "%oldName%", oldName },
-                                { "%unit%", newName }, 
-                                { "%colony%", colony.getName() } },
-                            ModelMessage.MessageType.UNIT_IMPROVED, this);
+            addModelMessage(colony, ModelMessage.MessageType.UNIT_IMPROVED, this,
+                            "model.unit.unitEducated",
+                            "%oldName%", oldName,
+                            "%unit%", newName,
+                            "%colony%", colony.getName());
         }
     }
 
@@ -3258,12 +3251,11 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
                 logger.finest("About to change type of unit due to experience.");
                 String oldName = getName();
                 setType(learnType);
-                addModelMessage(getColony(), "model.unit.experience",
-                                new String[][] {
-                                    { "%oldName%", oldName },
-                                    { "%unit%", getName() },
-                                    { "%colony%", getColony().getName() } },
-                                ModelMessage.MessageType.UNIT_IMPROVED, this);
+                addModelMessage(getColony(), ModelMessage.MessageType.UNIT_IMPROVED, this,
+                                "model.unit.experience",
+                                "%oldName%", oldName,
+                                "%unit%", getName(),
+                                "%colony%", getColony().getName());
             }
         }
     }

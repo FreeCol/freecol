@@ -724,6 +724,7 @@ public final class Canvas extends JDesktopPane {
      * 
      * @see DeclarationDialog
      */
+    // TODO: shouldn't this be a simple panel? The return value isn't used.
     public void showDeclarationDialog() {
         DeclarationDialog declarationDialog = new DeclarationDialog(this, freeColClient);
 

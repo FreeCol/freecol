@@ -992,19 +992,11 @@ public class SimpleCombatModel implements CombatModel {
                         unit.setType(downgrade);
                     }
                 }
-                String tempID = oldType.getId() + ".captured";
-                if (Messages.containsKey(tempID)) {
-                    messageID = tempID;
-                } else {
-                    messageID = "model.unit.unitCaptured";
-                }
+                messageID = Messages.getKey(oldType.getId() + ".captured",
+                                            "model.unit.unitCaptured");
             } else {
-                String tempID = oldType.getId() + ".destroyed";
-                if (Messages.containsKey(tempID)) {
-                    messageID = tempID;
-                } else {
-                    messageID = "model.unit.unitSlaughtered";
-                }
+                messageID = Messages.getKey(oldType.getId() + ".destroyed", 
+                                            "model.unit.unitSlaughtered");
                 unit.dispose();
             }
         } else {
@@ -1039,19 +1031,11 @@ public class SimpleCombatModel implements CombatModel {
                 if (downgrade != null) {
                     unit.setType(downgrade);
                     messageType = ModelMessage.MessageType.UNIT_DEMOTED;
-                    String tempID = oldType.getId() + ".demoted";
-                    if (Messages.containsKey(tempID)) {
-                        messageID = tempID;
-                    } else {
-                        messageID = "model.unit.unitDemoted";
-                    }
-                } else {                
-                    String tempID = oldType.getId() + ".destroyed";
-                    if (Messages.containsKey(tempID)) {
-                        messageID = tempID;
-                    } else {
-                        messageID = "model.unit.unitSlaughtered";
-                    }
+                    messageID = Messages.getKey(oldType.getId() + ".demoted",
+                                                "model.unit.unitDemoted");
+                } else {
+                    messageID = Messages.getKey(oldType.getId() + ".destroyed",
+                                                "model.unit.unitSlaughtered");
                     unit.dispose();
                 }
             }

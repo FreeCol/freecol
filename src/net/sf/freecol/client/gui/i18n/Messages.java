@@ -85,8 +85,8 @@ public class Messages {
             variant = "_" + variant;
         }
         String[] fileNames = { FILE_PREFIX + FILE_SUFFIX, FILE_PREFIX + language + FILE_SUFFIX,
-                FILE_PREFIX + language + country + FILE_SUFFIX,
-                FILE_PREFIX + language + country + variant + FILE_SUFFIX };
+                               FILE_PREFIX + language + country + FILE_SUFFIX,
+                               FILE_PREFIX + language + country + variant + FILE_SUFFIX };
 
         for (String fileName : fileNames) {
             File resourceFile = new File(getI18nDirectory(), fileName);
@@ -124,7 +124,7 @@ public class Messages {
                     logger.warning("Data has a wrong format for message: " + message);
                 } else if (data[i][0] == null || data[i][1] == null) {
                     logger.warning("Data in model message is 'null': " + message + ", " + data[i][0] + ", "
-                            + data[i][1]);
+                                   + data[i][1]);
                 } else {
                     message = message.replaceAll(data[i][0], data[i][1]);
                 }
@@ -170,12 +170,37 @@ public class Messages {
         return message.trim();
     }
 
+    /**
+     * Returns true if the message bundle contains the given key.
+     *
+     * @param key a <code>String</code> value
+     * @return a <code>boolean</code> value
+     */
     public static boolean containsKey(String key) {
         if (messageBundle == null) {
             setMessageBundle(Locale.getDefault());
         }
-         return (messageBundle.getProperty(key) != null);
+        return (messageBundle.getProperty(key) != null);
     }
+
+
+    /**
+     * Returns the preferred key if it is contained in the message
+     * bundle and the default key otherwise. This should be used to
+     * select the most specific message key available.
+     *
+     * @param preferredKey a <code>String</code> value
+     * @param defaultKey a <code>String</code> value
+     * @return a <code>String</code> value
+     */
+    public static String getKey(String preferredKey, String defaultKey) {
+        if (containsKey(preferredKey)) {
+            return preferredKey;
+        } else {
+            return defaultKey;
+        }
+    }
+
 
     /**
      * Calling this method can be used to replace the messages used currently
