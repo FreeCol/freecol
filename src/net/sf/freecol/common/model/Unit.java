@@ -67,9 +67,17 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
      */
     private static final String EQUIPMENT_TAG = "equipment";
 
-    /** A state a Unit can have. */
-    public static enum UnitState { ACTIVE, FORTIFIED, SENTRY, IN_COLONY,
-            IMPROVING,      // All TileImprovements use state of IMPROVING
+    /**
+     * The number of turns required to sail between Europe and the New
+     * World. TODO: In the future, this should be replaced by an
+     * advanced sailing model taking prevailing winds into account.
+     */
+    public static final int TURNS_TO_SAIL = 3;
+
+    /**
+     * A state a Unit can have.
+     */
+    public static enum UnitState { ACTIVE, FORTIFIED, SENTRY, IN_COLONY, IMPROVING,
             TO_EUROPE, IN_EUROPE, TO_AMERICA, FORTIFYING, SKIPPED }
 
     /** The roles a Unit can have. */
@@ -143,7 +151,9 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
      */
     private int attrition = 0;
 
-    /** The individual name of this unit, not of the unit type. */
+    /**
+     * The individual name of this unit, not of the unit type.
+     */
     private String name = null;
 
     /**
@@ -2146,6 +2156,16 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
     }
 
     /**
+     * Describe <code>getEquipmentCount</code> method here.
+     *
+     * @param equipmentType an <code>EquipmentType</code> value
+     * @return an <code>int</code> value
+     */
+    public int getEquipmentCount(EquipmentType equipmentType) {
+        return Collections.frequency(equipment, equipmentType);
+    }
+
+    /**
      * Checks if this <code>Unit</code> is located in Europe. That is; either
      * directly or onboard a carrier which is in Europe.
      * 
@@ -2159,18 +2179,6 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
                 getState() != UnitState.TO_EUROPE &&
                 getState() != UnitState.TO_AMERICA;
         }
-    }
-
-    // TODO: make this go away
-    public int getNumberOfTools() {
-        int count = 0;
-        EquipmentType tools = FreeCol.getSpecification().getEquipmentType("model.equipment.tools");
-        for (EquipmentType equipmentType : equipment) {
-            if (tools == equipmentType) {
-                count += 20;
-            }
-        }
-        return count;
     }
 
     /**
@@ -2534,10 +2542,9 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
             return;
         case TO_EUROPE:
             if (state == UnitState.ACTIVE && !(location instanceof Europe)) {
-                workLeft = 3;
+                workLeft = TURNS_TO_SAIL;
             } else if ((state == UnitState.TO_AMERICA) && (location instanceof Europe)) {
-                // I think '4' was also used in the original game.
-                workLeft = 4 - workLeft;
+                workLeft = TURNS_TO_SAIL + 1 - workLeft;
             }
             workLeft = (int) getOwner().getFeatureContainer()
                 .applyModifier(workLeft,"model.modifier.sailHighSeas", unitType, getGame().getTurn());
@@ -2545,10 +2552,9 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
             break;
         case TO_AMERICA:
             if ((state == UnitState.ACTIVE) && (location instanceof Europe)) {
-                workLeft = 3;
+                workLeft = TURNS_TO_SAIL;
             } else if ((state == UnitState.TO_EUROPE) && (location instanceof Europe)) {
-                // I think '4' was also used in the original game.
-                workLeft = 4 - workLeft;
+                workLeft = TURNS_TO_SAIL + 1 - workLeft;
             }
             workLeft = (int) getOwner().getFeatureContainer()
                 .applyModifier(workLeft,"model.modifier.sailHighSeas", unitType, getGame().getTurn());
@@ -2560,7 +2566,7 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
         default:
             workLeft = -1;
         }
-        state = s; // PLOW and BUILD_ROAD returned already
+        state = s;
     }
 
     /**

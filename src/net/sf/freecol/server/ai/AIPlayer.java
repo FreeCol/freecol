@@ -105,6 +105,7 @@ public class AIPlayer extends AIObject {
 
     protected static EquipmentType muskets = FreeCol.getSpecification().getEquipmentType("model.equipment.muskets");
     protected static EquipmentType horses = FreeCol.getSpecification().getEquipmentType("model.equipment.horses");
+    protected static EquipmentType toolsType = FreeCol.getSpecification().getEquipmentType("model.equipment.tools");
 
     private static final int MAX_DISTANCE_TO_BRING_GIFT = 5;
 
@@ -1042,7 +1043,8 @@ public class AIPlayer extends AIObject {
                        && (!unit.isColonist() || unit.hasAbility("model.ability.expertSoldier") || 
                         getGame().getTurn().getNumber() > 5)) {
                 giveMilitaryMission(aiUnit);
-            } else if (unit.getNumberOfTools() > 0 && PioneeringMission.isValid(aiUnit)) {
+            } else if (unit.getEquipment().contains(toolsType)
+                       && PioneeringMission.isValid(aiUnit)) {
                 aiUnit.setMission(new PioneeringMission(getAIMain(), aiUnit));
             } else if (unit.isColonist()) {                
                 /*

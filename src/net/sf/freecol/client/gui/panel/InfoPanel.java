@@ -27,6 +27,7 @@ import java.awt.Image;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
+import java.util.Collections;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -36,6 +37,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.UIManager;
 
+import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.ImageLibrary;
@@ -43,6 +45,7 @@ import net.sf.freecol.client.gui.ViewMode;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.client.gui.panel.MapEditorTransformPanel.MapTransform;
 import net.sf.freecol.common.model.AbstractGoods;
+import net.sf.freecol.common.model.EquipmentType;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.Tile;
@@ -498,9 +501,12 @@ public final class InfoPanel extends FreeColPanel {
                 setUnitNameType(unit);
                 unitLabel.setIcon(library.getUnitImageIcon(unit));
                 
-                // Handle the special cases.
+                // Handle the special cases. TODO: make this more generic
                 if (unit.getRole() == Role.PIONEER) {
-                    unitToolsLabel.setText(String.valueOf(unit.getNumberOfTools()));
+                    EquipmentType toolsType = FreeCol.getSpecification()
+                        .getEquipmentType("model.equipment.tools");
+                    int count = unit.getEquipmentCount(toolsType) * 20;
+                    unitToolsLabel.setText(String.valueOf(count));
                     unitCargoPanel.add(unitToolsLabel, higConst.rc(1, 1));
                 } else if (unit.canCarryTreasure()) {
                     goldLabel.setText(unit.getTreasureAmount() + " " + Messages.message("gold"));

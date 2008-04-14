@@ -39,6 +39,7 @@ import net.sf.freecol.common.model.BuildableType;
 import net.sf.freecol.common.model.Building;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.ColonyTile;
+import net.sf.freecol.common.model.EquipmentType;
 import net.sf.freecol.common.model.ExportData;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.GoodsType;
@@ -61,6 +62,8 @@ import org.w3c.dom.Element;
 public class AIColony extends AIObject {
 
     private static final Logger logger = Logger.getLogger(AIColony.class.getName());
+
+    private static final EquipmentType toolsType = FreeCol.getSpecification().getEquipmentType("model.equipment.tools");
 
     /**
      * The FreeColGameObject this AIObject contains AI-information for.
@@ -567,7 +570,9 @@ public class AIColony extends AIObject {
         while (ui.hasNext()) {
             Unit u = ui.next();
             AIUnit au = (AIUnit) getAIMain().getAIObject(u);
-            if (au.getMission() != null && au.getMission() instanceof PioneeringMission && u.getNumberOfTools() == 0) {
+            if (au.getMission() != null && 
+                au.getMission() instanceof PioneeringMission &&
+                !u.getEquipment().contains(toolsType)) {
                 return au;
             }
         }
