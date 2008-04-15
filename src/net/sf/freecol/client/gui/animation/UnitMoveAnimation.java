@@ -26,6 +26,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.JLayeredPane;
 import net.sf.freecol.client.gui.Canvas;
+import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
@@ -38,13 +39,13 @@ public final class UnitMoveAnimation extends Animation {
     private static final Logger logger = Logger.getLogger(UnitMoveAnimation.class.getName());
     
     private final Unit unit;
+    private final Location currentLocation;
     private final Tile destinationTile;
     private final Point destinationPoint;
     private Point currentPoint;
     
-    private Rectangle previousBounds;
-    
     private JLabel unitLabel;
+    private Rectangle previousBounds;
     private static final Integer UNIT_LABEL_LAYER = JLayeredPane.DEFAULT_LAYER;
     
     // Movement variables & constants
@@ -75,6 +76,7 @@ public final class UnitMoveAnimation extends Animation {
         super(canvas);
         this.unit = unit;
         this.destinationTile = destinationTile;
+        this.currentLocation = unit.getLocation();
         
         Point p = canvas.getGUI().getTilePosition(unit.getTile());
         if (p != null) {
@@ -126,8 +128,11 @@ public final class UnitMoveAnimation extends Animation {
 
     @Override
     public void animate() {
-        logger.finest("Removing the unit temporarily from its Tile and painting screen.");
-        unit.getTile().removeUnitNoUpdate(unit);
+        logger.finest("Removing the unit temporarily from its Location and painting screen.");
+        unit.setLocationNoUpdate(null);
+        if (currentLocation instanceof Tile)
+            ((Tile) currentLocation).removeUnitNoUpdate(unit);
+        
         // Painting the whole screen once to get rid of disposed dialog-boxes.
         canvas.paintImmediately(canvas.getBounds());
         try {
@@ -135,7 +140,11 @@ public final class UnitMoveAnimation extends Animation {
         } 
         finally { // If there are any exceptions during animate() I don't want my unit to just vanish.
             logger.finest("Adding the unit back to its Tile and removing the label component.");
-            unit.getTile().addUnitNoUpdate(unit);
+            
+            unit.setLocationNoUpdate(currentLocation);
+            if (currentLocation instanceof Tile)
+                ((Tile) currentLocation).addUnitNoUpdate(unit);
+            
             canvas.remove(unitLabel);
         }
     }
@@ -152,7 +161,7 @@ public final class UnitMoveAnimation extends Animation {
     }
 
     protected Rectangle getAnimationArea() {
-        Rectangle r1 = canvas.getGUI().getTileBounds(unit.getTile());
+        Rectangle r1 = canvas.getGUI().getTileBounds(currentLocation.getTile());
         Rectangle r2 = canvas.getGUI().getTileBounds(destinationTile);
         return r1.union(r2);
     }

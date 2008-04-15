@@ -1861,6 +1861,14 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
         setState(UnitState.IMPROVING);
         // No need to set Location, stay at the tile it is on.
     }
+    
+    /**
+     * Sets the units location without updating any other variables
+     * @param newLocation The new Location
+     */
+    public void setLocationNoUpdate(Location newLocation) {
+        location = newLocation;
+    }
 
     /**
      * Sets the location of this Unit.

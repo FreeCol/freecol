@@ -1499,8 +1499,7 @@ public final class InGameController implements NetworkConstants {
         // TODO: server can actually fail (illegal move)!
         
         // Play an animation showing the unit movement
-        Animation moveAnimation = new UnitMoveAnimation(canvas, unit, direction);
-        moveAnimation.animate();
+        new UnitMoveAnimation(canvas, unit, direction).animate();
         
         // move before ask to server, to be in new tile in case there is a
         // rumours
@@ -1902,6 +1901,9 @@ public final class InGameController implements NetworkConstants {
         Client client = freeColClient.getClient();
         GUI gui = freeColClient.getGUI();
         Canvas canvas = freeColClient.getCanvas();
+        
+        // Animate the units movement
+        new UnitMoveAnimation(canvas, unit, direction).animate();
 
         Tile destinationTile = game.getMap().getNeighbourOrNull(direction, unit.getTile());
         Unit destinationUnit = null;
@@ -3484,7 +3486,7 @@ public final class InGameController implements NetworkConstants {
 
         int thisTurn = freeColClient.getGame().getTurn().getNumber();
 
-        final ArrayList<ModelMessage> messageList = new ArrayList<ModelMessage>();;
+        final ArrayList<ModelMessage> messageList = new ArrayList<ModelMessage>();
         Collection<ModelMessage> inputList;
         if (allMessages) {
             inputList = freeColClient.getMyPlayer().getModelMessages();

@@ -405,7 +405,7 @@ public final class GUI {
             return null;
         }
 
-        if (activeUnit != null && unitTile.contains(activeUnit)) {
+        if (activeUnit != null && activeUnit.getTile() == unitTile) {
             return activeUnit;
         } else {
             if (unitTile.getSettlement() == null) {
