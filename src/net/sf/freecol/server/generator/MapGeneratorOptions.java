@@ -156,6 +156,28 @@ public class MapGeneratorOptions extends OptionMap {
                                                         
     
     /**
+     * Option for setting the number of settlements on the map.
+     * Possible values are:
+     *   <ul>
+     *     <li>{@link #SETTLEMENT_NUMBER_SMALL}</li>
+     *     <li>{@link #SETTLEMENT_NUMBER_MEDIUM}</li>
+     *     <li>{@link #SETTLEMENT_NUMBER_LARGE}</li>
+     *     <li>{@link #SETTLEMENT_NUMBER_HUGE}</li>
+     *     
+     */
+    public static final String SETTLEMENT_NUMBER = "settlementNumber";
+    
+    /**
+     * One of the settings used by {@link #SETTLEMENT_NUMBER}.
+     */
+    public static final int SETTLEMENT_NUMBER_SMALL = 0,
+                            SETTLEMENT_NUMBER_MEDIUM = 1,
+                            SETTLEMENT_NUMBER_LARGE = 2,
+                            SETTLEMENT_NUMBER_VERY_LARGE = 3,
+                            SETTLEMENT_NUMBER_HUGE = 4;
+                                                        
+    
+    /**
      * Option for setting the percentage of forests on the map.
      * Possible values are:
      *   <ul>
@@ -269,6 +291,11 @@ public class MapGeneratorOptions extends OptionMap {
     public static final String IMPORT_RUMOURS = "importRumours";
     
     /**
+     * Option for using the settlements imported from a file.
+     */
+    public static final String IMPORT_SETTLEMENTS = "importSettlements";
+    
+    /**
      * Creates a new <code>MapGeneratorOptions</code>.
      */
     public MapGeneratorOptions() {
@@ -313,6 +340,7 @@ public class MapGeneratorOptions extends OptionMap {
         new BooleanOption(IMPORT_TERRAIN, importGroup, true);
         new BooleanOption(IMPORT_BONUSES, importGroup, false);
         new BooleanOption(IMPORT_RUMOURS, importGroup, false);
+        new BooleanOption(IMPORT_SETTLEMENTS, importGroup, false);
         add(importGroup);
         
         String[] sizes = new String[] {"small", "medium", "large", "veryLarge", "huge"};
@@ -339,6 +367,7 @@ public class MapGeneratorOptions extends OptionMap {
         new RangeOption(RIVER_NUMBER, terrainGeneratorGroup, sizes, RIVER_NUMBER_MEDIUM, true);
         new RangeOption(MOUNTAIN_NUMBER, terrainGeneratorGroup, sizes, MOUNTAIN_NUMBER_MEDIUM, true);
         new RangeOption(RUMOUR_NUMBER, terrainGeneratorGroup, sizes, RUMOUR_NUMBER_MEDIUM, true);
+        new RangeOption(SETTLEMENT_NUMBER, terrainGeneratorGroup, sizes, SETTLEMENT_NUMBER_MEDIUM, true);
         new RangeOption(FOREST_NUMBER, terrainGeneratorGroup, sizes, FOREST_NUMBER_LARGE, true);
         new RangeOption(BONUS_NUMBER, terrainGeneratorGroup, sizes, BONUS_NUMBER_MEDIUM, true);
         
@@ -512,6 +541,31 @@ public class MapGeneratorOptions extends OptionMap {
             return getLand() / 20;
         default:
             throw new IllegalStateException("Invalid rumour number: " + number + ".");
+        }
+    }
+
+    /**
+     * Gets the number of settlements on the map to be created.
+     * @return The number of settlements.
+     */
+    public int getNumberOfSettlements() {
+        return getNumberOfSettlements(getInteger(SETTLEMENT_NUMBER));
+    }
+
+    private int getNumberOfSettlements(int number) {
+        switch (number) {
+        case SETTLEMENT_NUMBER_SMALL:
+            return getLand() / 20;
+        case SETTLEMENT_NUMBER_MEDIUM:
+            return getLand() / 14;
+        case SETTLEMENT_NUMBER_LARGE:
+            return getLand() / 12;
+        case SETTLEMENT_NUMBER_VERY_LARGE:
+            return getLand() / 10;
+        case SETTLEMENT_NUMBER_HUGE:
+            return getLand() / 8;
+        default:
+            throw new IllegalStateException("Invalid settlement number: " + number + ".");
         }
     }
 

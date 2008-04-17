@@ -104,6 +104,11 @@ public class DifficultyLevel extends FreeColGameObjectType {
      */
     private int veryBadGovernmentLimit;
 
+    /**
+     * Describe nativeSettlementDensity here.
+     */
+    private int nativeSettlementDensity;
+
     private Map<UnitType, Integer> purchasePrices;
 
     private Map<UnitType, Integer> trainingPrices;
@@ -220,6 +225,24 @@ public class DifficultyLevel extends FreeColGameObjectType {
      */
     public final void setArrearsFactor(final int newArrearsFactor) {
         this.arrearsFactor = newArrearsFactor;
+    }
+
+    /**
+     * Get the <code>NativeSettlementDensity</code> value.
+     *
+     * @return an <code>int</code> value
+     */
+    public final int getNativeSettlementDensity() {
+        return nativeSettlementDensity;
+    }
+
+    /**
+     * Set the <code>NativeSettlementDensity</code> value.
+     *
+     * @param newNativeSettlementDensity The new NativeSettlementDensity value.
+     */
+    public final void setNativeSettlementDensity(final int newNativeSettlementDensity) {
+        this.nativeSettlementDensity = newNativeSettlementDensity;
     }
 
     /**
@@ -410,6 +433,7 @@ public class DifficultyLevel extends FreeColGameObjectType {
         landPriceFactor = getAttribute(in, "land-price-factor", 60);
         foundingFatherFactor = getAttribute(in, "founding-father-factor", 7);
         arrearsFactor = getAttribute(in, "arrears-factor", 500);
+        nativeSettlementDensity = getAttribute(in, "native-settlement-density", 50);
         nativeConvertProbability = getAttribute(in, "native-convert-probability", 30);
         burnProbability = getAttribute(in, "burn-probability", 6);
         recruitPriceIncrease = getAttribute(in, "recruit-price-increase", 40);

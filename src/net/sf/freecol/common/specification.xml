@@ -1535,8 +1535,9 @@
 
   <!-- crosses-increment: additional crosses required for each new immigrant
        land-price-factor: determines the price of land bought from the natives
-       founing-father-factor: determines how many bells are required for founding fathers
+       founding-father-factor: determines how many bells are required for founding fathers
        arrears-factor: determines how much money is required to lift a boycott
+       native-settlement-density: determines the density of native settlements (percentage)
        native-convert-probability: determines the probability of getting native converts
        burn-probability: determines the probability of missions getting burned
        recruit-price-increase: determines how fast the price for recruiting colonists increases
@@ -1551,6 +1552,7 @@
        land-price-factor="40"
        founding-father-factor="5"
        arrears-factor="300"
+       native-settlement-density="40"
        native-convert-probability="50"
        burn-probability="2"
        recruit-price-increase="20"
@@ -1576,6 +1578,7 @@
        land-price-factor="50"
        founding-father-factor="6"
        arrears-factor="400"
+       native-settlement-density="50"
        native-convert-probability="40"
        burn-probability="4"
        recruit-price-increase="30"
@@ -1594,6 +1597,7 @@
        land-price-factor="60"
        founding-father-factor="7"
        arrears-factor="500"
+       native-settlement-density="60"
        native-convert-probability="30"
        burn-probability="6"
        recruit-price-increase="40"
@@ -1612,6 +1616,7 @@
        land-price-factor="70"
        founding-father-factor="8"
        arrears-factor="600"
+       native-settlement-density="70"
        native-convert-probability="20"
        burn-probability="8"
        recruit-price-increase="30"
@@ -1630,6 +1635,7 @@
        land-price-factor="80"
        founding-father-factor="9"
        arrears-factor="700"
+       native-settlement-density="80"
        native-convert-probability="40"
        burn-probability="10"
        recruit-price-increase="30"

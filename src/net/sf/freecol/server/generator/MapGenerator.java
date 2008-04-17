@@ -46,6 +46,7 @@ import net.sf.freecol.common.model.ColonyTile;
 import net.sf.freecol.common.model.EuropeanNationType;
 import net.sf.freecol.common.model.FreeColGameObject;
 import net.sf.freecol.common.model.Game;
+import net.sf.freecol.common.model.GameOptions;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.IndianNationType;
@@ -366,7 +367,9 @@ public class MapGenerator {
         List<Tile> settlementTiles = new ArrayList<Tile>();
 
         final int minSettlementDistance = 3;
-        int number = map.getWidth() * map.getHeight() / 30;
+        int level = map.getGame().getGameOptions().getInteger(GameOptions.DIFFICULTY);
+        int number = mapGeneratorOptions.getNumberOfSettlements() *
+            FreeCol.getSpecification().getDifficultyLevel(level).getNativeSettlementDensity() / 100;
 
         for (int i = 0; i < number; i++) {
             nextTry: for (int tries = 0; tries < 100; tries++) {
@@ -399,6 +402,7 @@ public class MapGenerator {
         float share = settlementTiles.size() / shares;
 
         // first, find capitals
+        int counter = 0;
         for (Territory territory : territories) {
             switch (((IndianNationType) territory.player.getNationType()).getNumberOfSettlements()) {
             case HIGH:
@@ -423,6 +427,7 @@ public class MapGenerator {
                 territory.numberOfSettlements--;
                 territory.position = tile.getPosition();
                 settlementTiles.remove(tile);
+                counter++;
             }
         }
 
@@ -438,7 +443,6 @@ public class MapGenerator {
         });
 
         // next, other settlements
-        int counter = 0;
         for (Tile tile : settlementTiles) {
             Territory territory = getClosestTerritory(map, tile, territories);
             if (territory == null) {
