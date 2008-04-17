@@ -491,4 +491,7 @@ public class Region extends FreeColGameObject implements Nameable {
         return "region";
     }
 
+    public String toString() {
+        return nameKey;
+    }
 }

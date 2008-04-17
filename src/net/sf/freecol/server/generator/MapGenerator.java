@@ -416,7 +416,11 @@ public class MapGenerator {
                 // no more tiles
                 break;
             } else {
+                logger.fine("Placing the " + territory.player.getNationAsString() + 
+                        " capital in region: " + territory.region.getNameKey() +
+                        " at Tile: "+ tile.getPosition());
                 placeIndianSettlement(territory.player, true, tile.getPosition(), map);
+                territory.numberOfSettlements--;
                 territory.position = tile.getPosition();
                 settlementTiles.remove(tile);
             }
@@ -441,6 +445,9 @@ public class MapGenerator {
                 // no more territories
                 break;
             } else {
+                logger.fine("Placing a " + territory.player.getNationAsString() + 
+                        " camp in region: " + territory.region.getNameKey() +
+                        " at Tile: "+ tile.getPosition());
                 placeIndianSettlement(territory.player, false, tile.getPosition(), map);
                 counter++;
                 if (territory.numberOfSettlements < 2) {
@@ -843,6 +850,10 @@ public class MapGenerator {
             } else {
                 return position;
             }
+        }
+        
+        public String toString() {
+            return player.getNationAsString() + " territory at " + region.toString();
         }
     }
 
