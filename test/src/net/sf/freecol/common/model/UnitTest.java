@@ -49,6 +49,8 @@ public class UnitTest extends FreeColTestCase {
     TileImprovementType plow = spec().getTileImprovementType("model.improvement.Plow");
     TileImprovementType clear = spec().getTileImprovementType("model.improvement.ClearForest");
 
+    EquipmentType toolsType = spec().getEquipmentType("model.equipment.tools");
+
     /**
      * Test Plowing with a hardy pioneer
      * 
@@ -69,7 +71,7 @@ public class UnitTest extends FreeColTestCase {
         assertEquals(3, hardyPioneer.getMovesLeft());
         assertEquals(UnitState.ACTIVE, hardyPioneer.getState());
         assertEquals(-1, hardyPioneer.getWorkLeft());
-        assertEquals(100, hardyPioneer.getNumberOfTools());
+        assertEquals(100, hardyPioneer.getEquipmentCount(toolsType) * 20);
         assertEquals(false, plain.hasImprovement(plow));
 
         TileImprovement plowImprovement = new TileImprovement(game, plain, plow);
@@ -79,7 +81,7 @@ public class UnitTest extends FreeColTestCase {
         assertEquals(0, hardyPioneer.getMovesLeft());
         assertEquals(Unit.UnitState.IMPROVING, hardyPioneer.getState());
         assertEquals(1, hardyPioneer.getWorkLeft());
-        assertEquals(100, hardyPioneer.getNumberOfTools());
+        assertEquals(100, hardyPioneer.getEquipmentCount(toolsType) * 20);
         assertEquals(false, plain.hasImprovement(plow));
 
         // Advance 1 turn
@@ -89,7 +91,7 @@ public class UnitTest extends FreeColTestCase {
         assertEquals(0, hardyPioneer.getMovesLeft());
         assertEquals(UnitState.ACTIVE, hardyPioneer.getState());
         assertEquals(-1, hardyPioneer.getWorkLeft());
-        assertEquals(80, hardyPioneer.getNumberOfTools());
+        assertEquals(80, hardyPioneer.getEquipmentCount(toolsType) * 20);
         assertEquals(true, plain.hasImprovement(plow));
 
         // Advance last turn
@@ -98,7 +100,7 @@ public class UnitTest extends FreeColTestCase {
         assertEquals(3, hardyPioneer.getMovesLeft());
         assertEquals(UnitState.ACTIVE, hardyPioneer.getState());
         assertEquals(-1, hardyPioneer.getWorkLeft());
-        assertEquals(80, hardyPioneer.getNumberOfTools());
+        assertEquals(80, hardyPioneer.getEquipmentCount(toolsType) * 20);
         assertEquals(true, plain.hasImprovement(plow));
     }
 
@@ -192,7 +194,7 @@ public class UnitTest extends FreeColTestCase {
         // Before
         assertEquals(3, hardyPioneer.getMovesLeft());
         assertEquals(-1, hardyPioneer.getWorkLeft());
-        assertEquals(100, hardyPioneer.getNumberOfTools());
+        assertEquals(100, hardyPioneer.getEquipmentCount(toolsType) * 20);
         assertEquals(false, plain.hasRoad());
         assertEquals(UnitState.ACTIVE, hardyPioneer.getState());
 
@@ -204,7 +206,7 @@ public class UnitTest extends FreeColTestCase {
         // After
         assertEquals(0, hardyPioneer.getMovesLeft());
         assertEquals(-1, hardyPioneer.getWorkLeft());
-        assertEquals(80, hardyPioneer.getNumberOfTools());
+        assertEquals(80, hardyPioneer.getEquipmentCount(toolsType) * 20);
         assertEquals(true, plain.hasRoad());
         assertEquals(UnitState.ACTIVE, hardyPioneer.getState());
 
@@ -214,7 +216,7 @@ public class UnitTest extends FreeColTestCase {
         assertEquals(3, hardyPioneer.getMovesLeft());
         assertEquals(UnitState.ACTIVE, hardyPioneer.getState());
         assertEquals(-1, hardyPioneer.getWorkLeft());
-        assertEquals(80, hardyPioneer.getNumberOfTools());
+        assertEquals(80, hardyPioneer.getEquipmentCount(toolsType) * 20);
     }
 
     public static int getWorkLeftForPioneerWork(UnitType unitType, TileType tileType, TileImprovementType whichWork) {
