@@ -46,6 +46,8 @@ import java.util.logging.Logger;
 
 import javax.swing.ImageIcon;
 import javax.swing.JComponent;
+import javax.swing.JLabel;
+import javax.swing.JLayeredPane;
 import javax.swing.UIManager;
 
 import net.sf.freecol.FreeCol;
@@ -168,6 +170,10 @@ public final class GUI {
     private volatile boolean blinkingMarqueeEnabled;
     
     private Image cursorImage;
+    
+    private JLabel coatOfArms;
+    private JLabel greyLayer;
+    private JLabel waitingForMsg;
 
     /**
     * The constructor to use.
@@ -1151,14 +1157,33 @@ public final class GUI {
         ======
         Grey out the map if it is not my turn (and a multiplayer game).
          */
+        Canvas canvas = freeColClient.getCanvas();
+        // Remove the last coat of arms and waiting for message if it was set
+        if (coatOfArms != null) {
+            canvas.remove(coatOfArms);
+            coatOfArms = null;
+        }
+        if (waitingForMsg != null) {
+            canvas.remove(waitingForMsg);
+            waitingForMsg = null;
+        }
+        
         if (!freeColClient.isMapEditor()
                 && freeColClient.getGame() != null
                 && freeColClient.getMyPlayer() != freeColClient.getGame().getCurrentPlayer()) {
-            g.setColor(Color.BLACK);
-            Composite oldComposite = g.getComposite();
-            g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.6f));
-            g.fill(new Rectangle(0, 0, size.width, size.height));
-            g.setComposite(oldComposite);
+            
+            if (greyLayer == null) {
+                BufferedImage greyLayerImg = new BufferedImage(size.width, size.height, BufferedImage.TYPE_INT_ARGB);
+                Graphics2D greyG = greyLayerImg.createGraphics();
+                greyG.setColor(Color.BLACK);
+                Composite oldComposite = greyG.getComposite();
+                greyG.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.6f));
+                greyG.fill(new Rectangle(0, 0, size.width, size.height));
+                greyG.setComposite(oldComposite);
+                greyLayer = new JLabel(new ImageIcon(greyLayerImg));
+                greyLayer.setBounds(0, 0, size.width, size.height);
+            }
+            canvas.add(greyLayer, JLayeredPane.DEFAULT_LAYER, 0);
             
             final Color currentPlayerColor = freeColClient.getGame().getCurrentPlayer().getColor();
             final String nation = freeColClient.getGame().getCurrentPlayer().getNationAsString();
@@ -1167,11 +1192,25 @@ public final class GUI {
                     currentPlayerColor,
                     640,
                     18);
-            final Image coatOfArms = lib.getCoatOfArmsImage(freeColClient.getGame().getCurrentPlayer().getNation());
-            final int cHeight = (coatOfArms != null) ? coatOfArms.getHeight(null) : 0;
-            g.drawImage(im, (size.width - im.getWidth(null)) / 2, (size.height - im.getHeight(null) - cHeight) / 2, null);
-            if (coatOfArms != null) {
-                g.drawImage(coatOfArms, (size.width - coatOfArms.getWidth(null)) / 2, (size.height - cHeight) / 2 + im.getHeight(null), null);
+                        
+            final ImageIcon coatOfArmsIcon = lib.getCoatOfArmsImageIcon(freeColClient.getGame().getCurrentPlayer().getNation());
+            final int cHeight = (coatOfArmsIcon != null) ? coatOfArmsIcon.getIconHeight() : 0;
+            final int cWidth = (coatOfArmsIcon != null) ? coatOfArmsIcon.getIconWidth() : 0;
+            
+            waitingForMsg = new JLabel(new ImageIcon(im));
+            waitingForMsg.setBounds((size.width - im.getWidth(null)) / 2, (size.height - im.getHeight(null) - cHeight) / 2, im.getWidth(null), im.getHeight(null));
+            canvas.add(waitingForMsg, JLayeredPane.POPUP_LAYER, -1);
+            //g.drawImage(im, (size.width - im.getWidth(null)) / 2, (size.height - im.getHeight(null) - cHeight) / 2, null);
+            if (coatOfArmsIcon != null) {
+                coatOfArms = new JLabel(coatOfArmsIcon);
+                coatOfArms.setBounds((size.width - cWidth) / 2, (size.height - cHeight) / 2 + im.getHeight(null), cWidth, cHeight);
+                canvas.add(coatOfArms, JLayeredPane.POPUP_LAYER, -1);
+                //g.drawImage(coatOfArms, (size.width - coatOfArms.getWidth(null)) / 2, (size.height - cHeight) / 2 + im.getHeight(null), null);
+            }
+        }
+        else {
+            if (greyLayer != null) {
+                canvas.remove(greyLayer);
             }
         }
 
@@ -2185,9 +2224,12 @@ public final class GUI {
         }
     }
 
-    public void displayOccupationIndicator(Graphics g, Unit unit, int x, int y) {
-        g.drawImage(lib.getColorChip(unit.getOwner().getColor()), x, y, null);
-
+    private Image getOccupationIndicatorImage(Unit unit) {
+        Image chip = lib.getColorChip(unit.getOwner().getColor());
+        BufferedImage img = new BufferedImage(chip.getWidth(null), chip.getHeight(null), BufferedImage.TYPE_INT_ARGB);
+        Graphics g = img.getGraphics();
+        g.drawImage(chip, 0, 0, null);
+        
         if (unit.getOwner().getColor() == Color.BLACK) {
             g.setColor(Color.WHITE);
         } else {
@@ -2202,7 +2244,13 @@ public final class GUI {
             if (unit.getState() == UnitState.FORTIFIED)
                 g.setColor(Color.GRAY);
         }
-        g.drawString(occupationString, x + TEXT_OFFSET_X, y + TEXT_OFFSET_Y);
+        g.drawString(occupationString, TEXT_OFFSET_X, TEXT_OFFSET_Y);
+        
+        return img;
+    }
+    
+    public void displayOccupationIndicator(Graphics g, Unit unit, int x, int y) {
+        g.drawImage(getOccupationIndicatorImage(unit), x, y, null);
     }
 
     /**
@@ -2228,7 +2276,7 @@ public final class GUI {
             // Draw the unit.
             // If unit is sentry, draw in grayscale
             Image image = lib.getUnitImageIcon(unit, unit.getState() == UnitState.SENTRY).getImage();
-            Point p = getUnitPositionInTile(image.getWidth(null), image.getHeight(null), x, y);
+            Point p = getUnitImagePositionInTile(image, x, y);
             g.drawImage(image, p.x, p.y, null);
 
             // Draw an occupation and nation indicator.
@@ -2275,24 +2323,12 @@ public final class GUI {
     /**
      * Gets the coordinates to draw a unit in a given tile.
      * @param unitImage The unit's image
-     * @param tilePosition The coordinates of the tile
-     * @return The coordinates where the unit should be drawn onscreen
-     */
-    public Point getUnitPositionInTile(ImageIcon unitImage, Point tilePosition) {
-        int tileX = new Double(tilePosition.getX()).intValue();
-        int tileY = new Double(tilePosition.getY()).intValue();
-        return getUnitPositionInTile(unitImage.getIconWidth(), unitImage.getIconHeight(), tileX, tileY);
-    }
-    
-    /**
-     * Gets the coordinates to draw a unit in a given tile.
-     * @param unitImage The unit's image
      * @param tileX The X coordinate of the tile
      * @param tileY The Y coordinate of the tile
      * @return The coordinates where the unit should be drawn onscreen
      */
-    public Point getUnitPositionInTile(ImageIcon unitImage, int tileX, int tileY) {
-        return getUnitPositionInTile(unitImage.getIconWidth(), unitImage.getIconHeight(), tileX, tileY);
+    private Point getUnitImagePositionInTile(Image unitImage, int tileX, int tileY) {
+        return getUnitImagePositionInTile(unitImage.getWidth(null), unitImage.getHeight(null), tileX, tileY);
     }
     
     /**
@@ -2303,12 +2339,63 @@ public final class GUI {
      * @param tileY The Y coordinate of the tile
      * @return The coordinates where the unit should be drawn onscreen
      */
-    public Point getUnitPositionInTile(int unitImageWidth, int unitImageHeight, int tileX, int tileY) {
+    private Point getUnitImagePositionInTile(int unitImageWidth, int unitImageHeight, int tileX, int tileY) {
         int unitX = ((tileX + getTileWidth() / 2) - unitImageWidth / 2);
         int unitY = (tileY + getTileHeight() / 2) - unitImageHeight / 2 -
-                    (int) (GUI.UNIT_OFFSET * lib.getScalingFactor());
+                    (int) (UNIT_OFFSET * lib.getScalingFactor());
         
         return new Point(unitX, unitY);
+    }
+    
+    /**
+     * Gets the position where a unitLabel located at tile should be drawn. 
+     * @param unitLabel The unit label with the unit's image and occupation indicator drawn.
+     * @param tile The tile where the unitLabel will be drawn over
+     * @return The position where to put the label, null if the Tile is offscreen.
+     */
+    public Point getUnitLabelPositionInTile(JLabel unitLabel, Tile tile) {
+        return getUnitLabelPositionInTile(unitLabel, getTilePosition(tile));
+    }
+    
+    /**
+     * Gets the position where a unitLabel located at tile should be drawn. 
+     * @param unitLabel The unit label with the unit's image and occupation indicator drawn.
+     * @param tileP The position of the Tile on the screen.
+     * @return The position where to put the label, null if tileP is null.
+     */
+    public Point getUnitLabelPositionInTile(JLabel unitLabel, Point tileP) {
+        if (tileP != null) {
+            int labelX = tileP.x;
+            int labelY = (tileP.y + getTileHeight() / 2) - unitLabel.getHeight() / 2 -
+                        (int) (UNIT_OFFSET * lib.getScalingFactor());
+            
+            return new Point(labelX, labelY);
+        } else {
+            return null;
+        }
+    }
+    
+    /**
+     * Draw the unit's image and occupation indicator in one JLabel object.
+     * @param unit The unit to be drawn
+     * @return A JLabel object with the unit's image. The JLabel has location 0,0
+     */
+    public JLabel getUnitLabel(Unit unit) {
+        Image unitImg = lib.getUnitImageIcon(unit).getImage();
+        Image chipImg = getOccupationIndicatorImage(unit);
+        
+        int width = tileWidth/2 + unitImg.getWidth(null)/2;
+        int height = unitImg.getHeight(null);
+        
+        BufferedImage img = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+        Graphics g = img.getGraphics();
+        
+        g.drawImage(unitImg, width - unitImg.getWidth(null), 0, null);
+        g.drawImage(chipImg, ((int)(STATE_OFFSET_X * lib.getScalingFactor())), (height/2 + (UNIT_OFFSET * (int)lib.getScalingFactor())) - tileHeight/2, null);
+        
+        JLabel label = new JLabel(new ImageIcon(img));
+        label.setBounds(0, 0, width, height);
+        return label;
     }
     
     private void drawCursor(Graphics2D g, int x, int y) {

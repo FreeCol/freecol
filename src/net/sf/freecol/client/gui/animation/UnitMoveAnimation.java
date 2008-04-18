@@ -22,10 +22,10 @@ package net.sf.freecol.client.gui.animation;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.util.logging.Logger;
-import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.JLayeredPane;
 import net.sf.freecol.client.gui.Canvas;
+import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.Tile;
@@ -78,18 +78,17 @@ public final class UnitMoveAnimation extends Animation {
         this.destinationTile = destinationTile;
         this.currentLocation = unit.getLocation();
         
-        Point p = canvas.getGUI().getTilePosition(unit.getTile());
-        if (p != null) {
-            ImageIcon unitImg = canvas.getGUI().getImageLibrary().getUnitImageIcon(unit);        
-            //TODO: displayOccupationIndicator for the animation?
-            //canvas.getGUI().displayOccupationIndicator(unitImg.getImage().getGraphics(), unit, (int) (GUI.STATE_OFFSET_X * canvas.getGUI().getImageLibrary().getScalingFactor()), 0);
-            // No need to use media tracker to wait for images to load since javax.swing.ImageIcon already does this.
+        GUI gui = canvas.getGUI();
+        
+        Point currP = gui.getTilePosition(unit.getTile());
+        Point destP = gui.getTilePosition(destinationTile);
+        if (currP != null && destP != null) {
             
-            currentPoint = canvas.getGUI().getUnitPositionInTile(unitImg, p);
-            destinationPoint = canvas.getGUI().getUnitPositionInTile(unitImg, canvas.getGUI().getTilePosition(destinationTile));
+            unitLabel = gui.getUnitLabel(unit);
+            currentPoint = gui.getUnitLabelPositionInTile(unitLabel, currP);
+            destinationPoint = gui.getUnitLabelPositionInTile(unitLabel, destP);
+            unitLabel.setLocation(currentPoint);
             
-            unitLabel = new JLabel(unitImg);
-            unitLabel.setBounds(currentPoint.x, currentPoint.y, unitImg.getIconWidth(), unitImg.getIconHeight());
             canvas.add(unitLabel, UNIT_LABEL_LAYER, 0);
             
             if (currentPoint.getX() == destinationPoint.getX())
@@ -150,7 +149,7 @@ public final class UnitMoveAnimation extends Animation {
     }
 
     protected boolean isFinished() {
-        if (destinationPoint != null) {
+        if (currentPoint != null && destinationPoint != null) {
             // when moving 8 or 16 pixels at a time, we may not reach the exact destination point.
             // checking the distance to the destination is less than half the increment
             return (Math.abs(destinationPoint.x-currentPoint.x) <= Math.abs(signalX*X_RATIO*MOVEMENT_RATIO/2)) &&
@@ -167,13 +166,7 @@ public final class UnitMoveAnimation extends Animation {
     }
     
     protected Rectangle getDirtyAnimationArea() {
-        //The dirty area is where the unit image was drawn before 
-        //and where it should be drawn now.
-        if (previousBounds != null) {
-            return previousBounds.union(unitLabel.getBounds());
-        }
-        else // Should never happen. Just in case.
-            return getAnimationArea();
+        return getAnimationArea();
     }
 
 }
