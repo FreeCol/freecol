@@ -255,20 +255,30 @@ public class ColonyTile extends FreeColGameObject implements WorkLocation, Ownab
     * @return <code>true</code> if the <code>Unit</code> may be added and <code>false</code> otherwise.
     */
     public boolean canAdd(Locatable locatable) {
-        if (getWorkTile().getOwningSettlement() != null && getWorkTile().getOwningSettlement() != getColony()) {
+        if (isColonyCenterTile()) {
             return false;
-        }
+        } else if (locatable instanceof Unit) {
+            Unit unit = (Unit) locatable;
+            Settlement settlement = getWorkTile().getOwningSettlement();
+            if (settlement != null) {
+                if (settlement instanceof Colony && settlement != getColony()) {
+                    return false;
+                } else if (settlement instanceof IndianSettlement &&
+                           unit.getOwner().getLandPrice(getWorkTile()) > 0) {
+                    return false;
+                }
+            }
+            if (!(workTile.isLand() || getColony().hasAbility("model.ability.produceInWater"))) {
+                return false;
+            }
 
-        if (!(workTile.isLand() || getColony().hasAbility("model.ability.produceInWater"))) {
+            if (!unit.getType().hasSkill()) {
+                return false;
+            }
+            return (getUnit() == null || unit == getUnit());
+        } else {
             return false;
         }
-        
-        if (!((Unit) locatable).getType().hasSkill()) {
-            return false;
-        }
-
-        return ( ! isColonyCenterTile()  &&  locatable instanceof Unit
-                &&  ( getUnit() == null || locatable == getUnit()) );
     }
 
 

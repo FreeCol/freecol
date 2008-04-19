@@ -26,6 +26,7 @@ import java.util.Map;
 import java.util.Set;
 
 import net.sf.freecol.FreeCol;
+import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.Unit.UnitState;
 import net.sf.freecol.util.test.FreeColTestCase;
 
@@ -87,9 +88,9 @@ public class FoundingFatherTest extends FreeColTestCase {
         father.setUnits(units);
 
         /** this doesn't work because we haven't got a real model controller
-        assertEquals(2, dutch.getUnits().size());
-        assertEquals(colonistType, dutch.getUnits().get(0).getType());
-        assertEquals(statesmanType, dutch.getUnits().get(1).getType());
+            assertEquals(2, dutch.getUnits().size());
+            assertEquals(colonistType, dutch.getUnits().get(0).getType());
+            assertEquals(statesmanType, dutch.getUnits().get(1).getType());
         */
 
     }
@@ -182,14 +183,14 @@ public class FoundingFatherTest extends FreeColTestCase {
     }
 
     /*    
-    public void testPocahontas() {
+          public void testPocahontas() {
         
-        Colony colony = getStandardColony(4);
-        Player player = colony.getOwner();
+          Colony colony = getStandardColony(4);
+          Player player = colony.getOwner();
                 
-        FoundingFather father = spec().getFoundingFather("model.foundingFather.pocahontas");
-        player.addFather(father);
-     }
+          FoundingFather father = spec().getFoundingFather("model.foundingFather.pocahontas");
+          player.addFather(father);
+          }
     */
     
     public void testLaSalle() {
@@ -218,6 +219,30 @@ public class FoundingFatherTest extends FreeColTestCase {
         unit.setLocation(farmLand);
         b = colony.getBuilding(stockadeType);
         assertNotNull(b);
-     }
+    }
+
+    public void testMinuit() {
+        Colony colony = getStandardColony();
+        Player player = colony.getOwner();
+        Player iroquois = getGame().getPlayer("model.nation.iroquois");
+        Tile colonyCenterTile = colony.getTile();
+        Tile disputedTile = getGame().getMap().getNeighbourOrNull(Direction.N, colonyCenterTile);
+        Tile settlementTile = getGame().getMap().getNeighbourOrNull(Direction.N, disputedTile);
+        IndianSettlement indianSettlement = 
+            new IndianSettlement(getGame(), iroquois, settlementTile, false, null, false, null);
+        disputedTile.setOwner(iroquois);
+        disputedTile.setOwningSettlement(indianSettlement);
+
+        assertTrue(player.getLandPrice(disputedTile) > 0);
+        assertFalse(colony.getColonyTile(disputedTile).canAdd(colony.getRandomUnit()));
+
+        FoundingFather minuit = spec().getFoundingFather("model.foundingFather.peterMinuit");
+        player.addFather(minuit);
+
+        assertEquals(0, player.getLandPrice(disputedTile));
+        assertTrue(colony.getColonyTile(disputedTile).canAdd(colony.getRandomUnit()));
+
+    }
+
 
 }
