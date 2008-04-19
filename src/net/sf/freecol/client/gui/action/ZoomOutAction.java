@@ -88,7 +88,13 @@ public class ZoomOutAction extends FreeColAction {
      */
     public void actionPerformed(ActionEvent e) {
         float oldScaling = getFreeColClient().getGUI().getImageLibrary().getScalingFactor();
-        ImageLibrary im = getFreeColClient().getImageLibrary().getScaledImageLibrary(oldScaling - 1/8f);
+        ImageLibrary im;
+        try {
+            im = getFreeColClient().getImageLibrary().getScaledImageLibrary(oldScaling - 1/8f);
+        } catch (Exception ex) {
+            logger.warning("Failed to retrieve scaled image library.");
+            im = getFreeColClient().getImageLibrary();
+        }
         getFreeColClient().getGUI().setImageLibrary(im);
         getFreeColClient().getGUI().forceReposition();
         getFreeColClient().getCanvas().refresh();

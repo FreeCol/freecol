@@ -170,63 +170,9 @@ public final class ImageLibrary extends ImageProvider {
         }
     }
 
-    /**
-     * Private constructor used for cloning and getting a
-     * scaled version of this <code>ImageLibrary</code>.
-     * @param scalingFactor The scaling factor.
-     * @see #getScaledImageLibrary
-     */
-    private ImageLibrary(float scalingFactor,
-            EnumMap<Role, Map<UnitType, ImageIcon>> units,
-            EnumMap<Role, Map<UnitType, ImageIcon>> unitsGrayscale,
-            List<ImageIcon> rivers,
-            List<ImageIcon> misc,
-            EnumMap<SettlementType, Image> settlements,
-            Map<String, ImageIcon>  terrain1,
-            Map<String, ImageIcon>  terrain2,
-            Map<String, ImageIcon> overlay1,
-            Map<String, ImageIcon> overlay2,
-            Map<String, ImageIcon> forests,
-            Map<String, ImageIcon> bonus,
-            Map<String, ImageIcon> goods,
-            Map<String, ImageIcon> buildings,
-            Map<String, ArrayList<ImageIcon>> border1,
-            Map<String, ArrayList<ImageIcon>> border2,
-            Map<String, ArrayList<ImageIcon>> coast1,
-            Map<String, ArrayList<ImageIcon>> coast2,
-            List<ArrayList<ImageIcon>> unitButtons,
-            EnumMap<Tension.Level, Image> alarmChips,
-            Map<Color, Image> colorChips,
-            Map<Color, Image> missionChips,
-            Map<Color, Image> expertMissionChips) {
-        dataDirectory = "";
-
+    private ImageLibrary(String dataDirectory, float scalingFactor) {
+        this.dataDirectory = dataDirectory;
         this.scalingFactor = scalingFactor;
-        this.units = units;
-        this.unitsGrayscale = unitsGrayscale;
-        this.rivers = rivers;
-        this.misc = misc;
-        this.settlements = settlements;
-        this.terrain1 = terrain1;
-        this.terrain2 = terrain2;
-        this.overlay1 = overlay1;
-        this.overlay2 = overlay2;
-        this.forests = forests;
-        this.bonus = bonus;
-        this.goods = goods;
-        this.buildings = buildings;
-        this.border1 = border1;
-        this.border2 = border2;
-        this.coast1 = coast1;
-        this.coast2 = coast2;
-
-        this.unitButtons = unitButtons;
-        this.alarmChips = alarmChips;
-        this.colorChips = colorChips;
-        this.missionChips = missionChips;
-        this.expertMissionChips = expertMissionChips;
-
-        scaleImages(scalingFactor);
     }
 
 
@@ -280,47 +226,43 @@ public final class ImageLibrary extends ImageProvider {
      *      the size of the original images and 0.5 is half.
      * @return A new <code>ImageLibrary</code>.
      */
-    public ImageLibrary getScaledImageLibrary(float scalingFactor) {
-        return new ImageLibrary(scalingFactor, units, unitsGrayscale, rivers,
-                                misc, settlements, terrain1, terrain2, overlay1, overlay2,
-                                forests, bonus, goods, buildings, border1, border2, coast1, coast2, unitButtons,
-                                alarmChips, colorChips, missionChips, expertMissionChips);
-    }
+    public ImageLibrary getScaledImageLibrary(float scalingFactor) throws FreeColException {
+        ImageLibrary scaledLibrary = new ImageLibrary("", scalingFactor);
+        scaledLibrary.units = scaleUnitImages(units, scalingFactor);
+        scaledLibrary.unitsGrayscale = scaleUnitImages(unitsGrayscale, scalingFactor);
+        scaledLibrary.rivers = scaleImages(rivers, scalingFactor);
+        scaledLibrary.misc = scaleImages(misc, scalingFactor);
+        scaledLibrary.settlements = scaleImages(settlements, scalingFactor);
+        //scaledLibrary.monarch = scaleImages(monarch);
+        scaledLibrary.monarch = new HashMap<Nation, ImageIcon>(monarch);
 
-    /**
-     * Scales the images in this <code>ImageLibrary</code>
-     * using the given factor.
-     * @param scalingFactor The factor used when scaling. 2 is twice
-     *      the size of the original images and 0.5 is half.
-     */
-    private void scaleImages(float scalingFactor) {
-        units = scaleUnitImages(units, scalingFactor);
-        unitsGrayscale = scaleUnitImages(unitsGrayscale, scalingFactor);
-        rivers = scaleImages(rivers, scalingFactor);
-        misc = scaleImages(misc, scalingFactor);
-        settlements = scaleImages(settlements, scalingFactor);
-        //monarch = scaleImages(monarch);
-
-        terrain1 = scaleImages(terrain1, scalingFactor);
-        terrain2 = scaleImages(terrain2, scalingFactor);
-        overlay1 = scaleImages(overlay1, scalingFactor);
-        overlay2 = scaleImages(overlay2, scalingFactor);
-        forests = scaleImages(forests, scalingFactor);
-        bonus = scaleImages(bonus, scalingFactor);
-        goods = scaleImages(goods, scalingFactor);
-        buildings = scaleImages(buildings, scalingFactor);
+        scaledLibrary.terrain1 = scaleImages(terrain1, scalingFactor);
+        scaledLibrary.terrain2 = scaleImages(terrain2, scalingFactor);
+        scaledLibrary.overlay1 = scaleImages(overlay1, scalingFactor);
+        scaledLibrary.overlay2 = scaleImages(overlay2, scalingFactor);
+        scaledLibrary.forests = scaleImages(forests, scalingFactor);
+        scaledLibrary.bonus = scaleImages(bonus, scalingFactor);
+        scaledLibrary.goods = scaleImages(goods, scalingFactor);
+        scaledLibrary.buildings = scaleImages(buildings, scalingFactor);
         
-        border1 = scaleImages2(border1, scalingFactor);
-        border2 = scaleImages2(border2, scalingFactor);
-        coast1 = scaleImages2(coast1, scalingFactor);
-        coast2 = scaleImages2(coast2, scalingFactor);
-        //unitButtons = scaleImages2(unitButtons);
+        scaledLibrary.border1 = scaleImages2(border1, scalingFactor);
+        scaledLibrary.border2 = scaleImages2(border2, scalingFactor);
+        scaledLibrary.coast1 = scaleImages2(coast1, scalingFactor);
+        scaledLibrary.coast2 = scaleImages2(coast2, scalingFactor);
+        //scaledLibrary.unitButtons = scaleImages2(unitButtons);
+        scaledLibrary.unitButtons = new ArrayList<ArrayList<ImageIcon>>(unitButtons);
         /*
-        alarmChips = scaleChips(alarmChips, scalingFactor);
-        colorChips = scaleChips(colorChips, scalingFactor);
-        missionChips = scaleChips(missionChips, scalingFactor);
-        expertMissionChips = scaleChips(expertMissionChips, scalingFactor);
+        scaledLibrary.alarmChips = scaleChips(alarmChips, scalingFactor);
+        scaledLibrary.colorChips = scaleChips(colorChips, scalingFactor);
+        scaledLibrary.missionChips = scaleChips(missionChips, scalingFactor);
+        scaledLibrary.expertMissionChips = scaleChips(expertMissionChips, scalingFactor);
         */
+        scaledLibrary.alarmChips = new EnumMap<Tension.Level, Image>(alarmChips);
+        scaledLibrary.colorChips = new HashMap<Color, Image>(colorChips);
+        scaledLibrary.missionChips = new HashMap<Color, Image>(missionChips);
+        scaledLibrary.expertMissionChips = new HashMap<Color, Image>(expertMissionChips);
+
+        return scaledLibrary;
     }
 
     public Image scaleImage(Image image, float scale) {

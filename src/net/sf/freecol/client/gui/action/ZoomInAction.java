@@ -89,12 +89,17 @@ public class ZoomInAction extends FreeColAction {
     public void actionPerformed(ActionEvent e) {
         float oldScaling = getFreeColClient().getGUI().getImageLibrary().getScalingFactor();
         float newScaling = oldScaling + 1/8f;
-        final ImageLibrary im;
+        ImageLibrary im;
         if (newScaling >= 1f) {
             newScaling = 1f;
             im = getFreeColClient().getImageLibrary();
         } else {
-            im = getFreeColClient().getImageLibrary().getScaledImageLibrary(newScaling);
+            try {
+                im = getFreeColClient().getImageLibrary().getScaledImageLibrary(newScaling);
+            } catch(Exception ex) {
+                logger.warning("Failed to retrieve scaled image library.");
+                im = getFreeColClient().getImageLibrary();
+            }
         }
         getFreeColClient().getGUI().setImageLibrary(im);
         getFreeColClient().getGUI().forceReposition();
