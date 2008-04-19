@@ -1111,7 +1111,7 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener {
 
             public final int[] widths = { 162, 46, 46, 46, 90 };
 
-            public final int[] heights = { 60, 0, 0 };
+            public final int[] heights = { 64, 0, 0 };
 
             public static final int labelColumn = 1;
             public static final int unitColumn = 2;
@@ -1136,11 +1136,16 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener {
             public void initialize() {
 
                 removeAll();
+                JLabel buildingLabel = new JLabel(parent.getGUI().getImageLibrary()
+                                                  .getBuildingImageIcon(building.getType()));
+                JLabel buildingName = new JLabel();
                 if (building.getMaxUnits() == 0) {
-                    add(new JLabel("(" + building.getName() + ")"), higConst.rc(1, 1));
+                    buildingName.setText("(" + building.getName() + ")");
                 } else {
-                    add(new JLabel(building.getName()), higConst.rc(1, labelColumn));
+                    buildingName.setText(building.getName());
                 }
+                add(buildingName, higConst.rc(1, labelColumn));
+                add(buildingLabel, higConst.rc(1, labelColumn));
 
                 List<Unit> unitList = building.getUnitList();
                 for (int index = 0; index < unitList.size(); index++) {
