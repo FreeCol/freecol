@@ -55,6 +55,8 @@ public final class UnitMoveAnimation extends Animation {
     private static final int X_RATIO = 2;
     private static final int Y_RATIO = 1;
     
+    private int distanceToTarget;
+    
     
     /**
      * Constructor
@@ -101,11 +103,14 @@ public final class UnitMoveAnimation extends Animation {
             else
                 signalY = currentPoint.getY() > destinationPoint.getY() ? -1 : 1;
             
+            distanceToTarget = distance(destinationPoint, currentPoint);
+            
         } else {
             // Unit is offscreen - no need to animate
             logger.finest("Unit is offscreen - no need to animate.");
             currentPoint = destinationPoint = null;
             signalX = signalY = 0;
+            distanceToTarget = 0;
         }
     }
 
@@ -147,14 +152,30 @@ public final class UnitMoveAnimation extends Animation {
             canvas.remove(unitLabel);
         }
     }
+    
+    protected int distance(Point p1, Point p2) {
+        return Math.abs(p1.x-p2.x) + Math.abs(p1.y-p2.y);
+    }
 
     protected boolean isFinished() {
         if (currentPoint != null && destinationPoint != null) {
-            // when moving 8 or 16 pixels at a time, we may not reach the exact destination point.
-            // checking the distance to the destination is less than half the increment
-            return (Math.abs(destinationPoint.x-currentPoint.x) <= Math.abs(signalX*X_RATIO*MOVEMENT_RATIO/2)) &&
-                   (Math.abs(destinationPoint.y-currentPoint.y) <= Math.abs(signalY*Y_RATIO*MOVEMENT_RATIO/2));
+            int newDistanceToTarget = distance(currentPoint, destinationPoint);
+            if (newDistanceToTarget > distanceToTarget) {
+                // when moving 8 or 16 pixels at a time, we may not reach the exact destination point.
+                // checking we have not overshot the destination (the distance to target is now increasing)
+                distanceToTarget = 0;
+                return true;
+            } else if (newDistanceToTarget == 0 ) {
+                // reached the exact target
+                distanceToTarget = newDistanceToTarget;
+                return true;
+            } else {
+                // the distance is still decreasing
+                distanceToTarget = newDistanceToTarget;
+                return false;
+            }
         } else {
+            distanceToTarget = 0;
             return true;
         }
     }
