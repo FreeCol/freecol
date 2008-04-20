@@ -169,7 +169,7 @@ public final class NegotiationDialog extends FreeColDialog implements ActionList
         int number = report.getChildNodes().getLength();
         for (int i = 0; i < number; i++) {
             Element enemyElement = (Element) report.getChildNodes().item(i);
-            Player enemy = (Player) getCanvas().getClient().getGame().getFreeColGameObject(enemyElement.getAttribute("nation"));
+            Player enemy = (Player) getCanvas().getClient().getGame().getFreeColGameObject(enemyElement.getAttribute("player"));
             if (enemy == otherPlayer) {
                 foreignGold = Integer.parseInt(enemyElement.getAttribute("gold"));
                 break;
