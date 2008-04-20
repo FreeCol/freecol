@@ -129,7 +129,7 @@ public class GoldTradeItem extends TradeItem {
      */
     public void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
         out.writeStartElement(getXMLElementTagName());
-        super.toXML(out);
+        super.toXMLImpl(out);
         out.writeAttribute("gold", Integer.toString(this.gold));
         out.writeEndElement();
     }

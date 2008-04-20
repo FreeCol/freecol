@@ -127,7 +127,7 @@ public class StanceTradeItem extends TradeItem {
      */
     public void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
         out.writeStartElement(getXMLElementTagName());
-        super.toXML(out);
+        super.toXMLImpl(out);
         out.writeAttribute("stance", this.stance.toString());
         out.writeEndElement();
     }
