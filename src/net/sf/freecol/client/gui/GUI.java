@@ -2288,7 +2288,11 @@ public final class GUI {
             displayOccupationIndicator(g, unit, x + (int) (STATE_OFFSET_X * lib.getScalingFactor()), y);
 
             // Draw one small line for each additional unit (like in civ3).
-            int unitsOnTile = unit.getTile().getTotalUnitCount();
+            int unitsOnTile = 0;
+            if (unit.getTile() != null) {
+                // TODO: find out why this happens
+                unitsOnTile = unit.getTile().getTotalUnitCount();
+            }
             if (unitsOnTile > 1) {
                 g.setColor(Color.WHITE);
                 int unitLinesY = y + OTHER_UNITS_OFFSET_Y;
