@@ -2290,7 +2290,9 @@ public final class GUI {
             // Draw one small line for each additional unit (like in civ3).
             int unitsOnTile = 0;
             if (unit.getTile() != null) {
-                // TODO: find out why this happens
+                // When a unit is moving from tile to tile, it is removed from the source tile
+                // So the unit stack indicator cannot be drawn during the movement
+                // see UnitMoveAnimation.animate() for details
                 unitsOnTile = unit.getTile().getTotalUnitCount();
             }
             if (unitsOnTile > 1) {
