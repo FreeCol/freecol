@@ -319,7 +319,7 @@ public class Player extends FreeColGameObject implements Nameable {
         } else {
             // virtual "enemy privateer" player
             // or undead ?
-            this.nationID = "";
+            this.nationID = "model.nation.unknownEnemy";
             this.color = noNationColor;
             this.playerType = PlayerType.COLONIAL;
         }

@@ -1624,14 +1624,6 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener {
                 if (editState) {
                     if (comp instanceof UnitLabel) {
                         Unit unit = ((UnitLabel) comp).getUnit();
-                        if (colonyTile.getWorkTile().getOwningSettlement() != null
-                                && colonyTile.getWorkTile().getOwningSettlement() != getColony()) {
-                            if (colonyTile.getWorkTile().getOwningSettlement().getOwner().isEuropean()) {
-                                parent.errorMessage("tileTakenEuro");
-                            } else { // its an indian settlement
-                                parent.errorMessage("tileTakenInd");
-                            }
-                        }
                         int price = unit.getOwner().getLandPrice(colonyTile.getWorkTile());
                         if (price > 0) {
                             Player player = colonyTile.getWorkTile().getOwner();
@@ -1677,6 +1669,14 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener {
 
                             colonyPanel.updateSoLLabel();
                         } else {
+                            if (colonyTile.getWorkTile().getOwningSettlement() != null
+                                && colonyTile.getWorkTile().getOwningSettlement() != getColony()) {
+                                if (colonyTile.getWorkTile().getOwningSettlement().getOwner().isEuropean()) {
+                                    parent.errorMessage("tileTakenEuro");
+                                } else { // its an indian settlement
+                                    parent.errorMessage("tileTakenInd");
+                                }
+                            }
                             return null;
                         }
                     } else {
