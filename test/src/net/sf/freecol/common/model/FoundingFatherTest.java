@@ -223,24 +223,28 @@ public class FoundingFatherTest extends FreeColTestCase {
 
     public void testMinuit() {
         Colony colony = getStandardColony();
+        Unit unit = colony.getRandomUnit();
         Player player = colony.getOwner();
         Player iroquois = getGame().getPlayer("model.nation.iroquois");
         Tile colonyCenterTile = colony.getTile();
         Tile disputedTile = getGame().getMap().getNeighbourOrNull(Direction.N, colonyCenterTile);
-        Tile settlementTile = getGame().getMap().getNeighbourOrNull(Direction.N, disputedTile);
+        Tile settlementTile = getGame().getMap().getNeighbourOrNull(Direction.NE, colonyCenterTile);
         IndianSettlement indianSettlement = 
             new IndianSettlement(getGame(), iroquois, settlementTile, false, null, false, null);
         disputedTile.setOwner(iroquois);
         disputedTile.setOwningSettlement(indianSettlement);
+        //settlementTile.setOwningSettlement(indianSettlement); // doesn't the constructor take care of this ?
 
         assertTrue(player.getLandPrice(disputedTile) > 0);
-        assertFalse(colony.getColonyTile(disputedTile).canAdd(colony.getRandomUnit()));
+        assertFalse(colony.getColonyTile(disputedTile).canAdd(unit));
+        assertFalse(colony.getColonyTile(settlementTile).canAdd(unit));
 
         FoundingFather minuit = spec().getFoundingFather("model.foundingFather.peterMinuit");
         player.addFather(minuit);
 
         assertEquals(0, player.getLandPrice(disputedTile));
-        assertTrue(colony.getColonyTile(disputedTile).canAdd(colony.getRandomUnit()));
+        assertTrue(colony.getColonyTile(disputedTile).canAdd(unit));
+        assertFalse(colony.getColonyTile(settlementTile).canAdd(unit));
 
     }
 
