@@ -1502,21 +1502,21 @@ public final class GUI {
     public void displayColonyTile(Graphics2D g, Map map, Tile tile, int x, int y, Colony colony) {
         displayBaseTile(g, map, tile, x, y, false);        
 
-        // tile is used by another Colony
         Unit occupyingUnit = colony.getColonyTile(tile).getOccupyingUnit();
-        if ((tile.getOwningSettlement() != null &&
-             tile.getOwningSettlement() instanceof Colony &&
-             tile.getOwningSettlement() != colony) ||
+        Settlement settlement = tile.getOwningSettlement();
+        int price = colony.getOwner().getLandPrice(tile);
+        if ((settlement != null &&
+             (settlement instanceof Colony && settlement != colony) ||
+             (settlement instanceof IndianSettlement && price > 0)) ||
             occupyingUnit != null) {
+            // tile is used by another Settlement
             g.drawImage(lib.getMiscImage(ImageLibrary.TILE_TAKEN), x, y, null);
         }
         displayTileOverlays(g, map, tile, x, y, false, false);
         
-        // tile is used by an IndianSettlement
-        int price = colony.getOwner().getLandPrice(tile);
         if (price > 0 && tile.getSettlement() == null) {
+            // tile is owned by an IndianSettlement
             Image image = lib.getMiscImage(ImageLibrary.TILE_OWNED_BY_INDIANS);
-            g.drawImage(lib.getMiscImage(ImageLibrary.TILE_TAKEN), x, y, null);
             g.drawImage(image, x+tileWidth/2-image.getWidth(null)/2, y+tileHeight/2-image.getHeight(null)/2, null);
         }
         
