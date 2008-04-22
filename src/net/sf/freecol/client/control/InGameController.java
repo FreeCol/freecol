@@ -322,6 +322,7 @@ public final class InGameController implements NetworkConstants {
 
             if (!freeColClient.isSingleplayer()) {
                 freeColClient.playSound(SfxLibrary.ANTHEM_BASE + currentPlayer.getNationType().getIndex());
+                // FIXME: this doesn't work properly, the french anthem is played for dutch player.
             }
             
             checkTradeRoutesInEurope();
