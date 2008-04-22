@@ -120,7 +120,7 @@ public final class UserConnectionHandler implements MessageHandler, StreamedMess
     private Element getVacantPlayers(Connection connection, Element element) {
         Game game = freeColServer.getGame();
 
-        if (freeColServer.getGameState() == FreeColServer.STARTING_GAME) {
+        if (freeColServer.getGameState() == FreeColServer.GameState.STARTING_GAME) {
             return null;
         }
 
@@ -167,7 +167,7 @@ public final class UserConnectionHandler implements MessageHandler, StreamedMess
             return;
         }
         
-        if (freeColServer.getGameState() != FreeColServer.STARTING_GAME) {
+        if (freeColServer.getGameState() != FreeColServer.GameState.STARTING_GAME) {
             if (game.getPlayerByName(username) == null) {
                 Message.createError(out, "server.alreadyStarted", "The game has already been started!");
                 return;

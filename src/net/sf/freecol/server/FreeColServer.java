@@ -97,10 +97,10 @@ public final class FreeColServer {
     private static final int META_SERVER_UPDATE_INTERVAL = 60000;
 
     /** Constant for storing the state of the game. */
-    public static final int STARTING_GAME = 0, IN_GAME = 1, ENDING_GAME = 2;
+    public static enum GameState {STARTING_GAME, IN_GAME, ENDING_GAME};
 
     /** Stores the current state of the game. */
-    private int gameState = STARTING_GAME;
+    private GameState gameState = GameState.STARTING_GAME;
 
     // Networking:
     private Server server;
@@ -437,9 +437,9 @@ public final class FreeColServer {
             element.setAttribute("port", Integer.toString(port));
             element.setAttribute("slotsAvailable", Integer.toString(getSlotsAvailable()));
             element.setAttribute("currentlyPlaying", Integer.toString(getNumberOfLivingHumanPlayers()));
-            element.setAttribute("isGameStarted", Boolean.toString(gameState != STARTING_GAME));
+            element.setAttribute("isGameStarted", Boolean.toString(gameState != GameState.STARTING_GAME));
             element.setAttribute("version", FreeCol.getVersion());
-            element.setAttribute("gameState", Integer.toString(getGameState()));
+            element.setAttribute("gameState", Integer.toString(getGameState().ordinal()));
             Element reply = mc.ask(element);
             if (reply != null && reply.getTagName().equals("noRouteToServer")) {
                 throw new NoRouteToServerException();
@@ -685,7 +685,7 @@ public final class FreeColServer {
                     game = new Game(null, getModelController(), xsr, serverObjects
                             .toArray(new FreeColGameObject[0]));
                     game.setCurrentPlayer(null);
-                    gameState = IN_GAME;
+                    gameState = GameState.IN_GAME;
                     game.checkIntegrity();
                 } else if (xsr.getLocalName().equals(AIMain.getXMLElementTagName())) {
                     if (doNotLoadAI) {
@@ -825,7 +825,7 @@ public final class FreeColServer {
      * @return The <code>Controller</code>.
      */
     public Controller getController() {
-        if (getGameState() == IN_GAME) {
+        if (getGameState() == GameState.IN_GAME) {
             return inGameController;
         } else {
             return preGameController;
@@ -905,7 +905,7 @@ public final class FreeColServer {
      * @return One of: {@link #STARTING_GAME}, {@link #IN_GAME} and
      *         {@link #ENDING_GAME}.
      */
-    public int getGameState() {
+    public GameState getGameState() {
         return gameState;
     }
 
@@ -915,7 +915,7 @@ public final class FreeColServer {
      * @param state The new state to be set. One of: {@link #STARTING_GAME},
      *            {@link #IN_GAME} and {@link #ENDING_GAME}.
      */
-    public void setGameState(int state) {
+    public void setGameState(GameState state) {
         gameState = state;
     }
 

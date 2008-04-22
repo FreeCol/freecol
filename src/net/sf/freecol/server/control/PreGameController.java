@@ -152,7 +152,7 @@ public final class PreGameController extends Controller {
         setMap(map);
         
         // Start the game:
-        freeColServer.setGameState(FreeColServer.IN_GAME);
+        freeColServer.setGameState(FreeColServer.GameState.IN_GAME);
         try {
             freeColServer.updateMetaServer();
         } catch (NoRouteToServerException e) {}
