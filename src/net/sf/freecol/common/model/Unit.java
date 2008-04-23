@@ -1441,7 +1441,7 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
     public int getLineOfSight() {
         float line = unitType.getLineOfSight();
         Set<Modifier> modifierSet = getModifierSet("model.modifier.lineOfSightBonus");
-        if (getTile() != null) {
+        if (getTile() != null && getTile().getType() != null) {
             modifierSet.addAll(getTile().getType().getFeatureContainer()
                                .getModifierSet("model.modifier.lineOfSightBonus",
                                                unitType, getGame().getTurn()));
