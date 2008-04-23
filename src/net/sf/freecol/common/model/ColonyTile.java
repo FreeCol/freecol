@@ -255,9 +255,7 @@ public class ColonyTile extends FreeColGameObject implements WorkLocation, Ownab
     * @return <code>true</code> if the <code>Unit</code> may be added and <code>false</code> otherwise.
     */
     public boolean canAdd(Locatable locatable) {
-        if (isColonyCenterTile()) {
-            return false;
-        } else if (workTile.getSettlement() != null) {
+        if (workTile.getSettlement() != null) {
             return false;
         } else if (locatable instanceof Unit) {
             Unit unit = (Unit) locatable;
