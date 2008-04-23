@@ -121,8 +121,7 @@ public class MapGenerator {
         
         // Create land map:
         boolean[][] landMap;
-        if (importGame != null
-                && getMapGeneratorOptions().getBoolean(MapGeneratorOptions.IMPORT_LAND_MAP)) {
+        if (importGame != null) {
             landMap = landGenerator.importLandMap(importGame);
         } else {
             landMap = landGenerator.createLandMap();

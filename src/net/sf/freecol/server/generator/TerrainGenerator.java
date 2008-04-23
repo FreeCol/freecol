@@ -101,20 +101,19 @@ public class TerrainGenerator {
         
         final boolean importTerrain = (importGame != null) && getMapGeneratorOptions().getBoolean(MapGeneratorOptions.IMPORT_TERRAIN);
         final boolean importBonuses = (importGame != null) && getMapGeneratorOptions().getBoolean(MapGeneratorOptions.IMPORT_BONUSES);
-        final boolean importLandMap = (importGame != null) && getMapGeneratorOptions().getBoolean(MapGeneratorOptions.IMPORT_LAND_MAP);
 
-	boolean mapHasLand = false;
+        boolean mapHasLand = false;
         Tile[][] tiles = new Tile[width][height];
         for (int y = 0; y < height; y++) {
             int latitude = (Math.min(y, (height-1) - y) * 200) / height; // lat=0 for poles; lat=100 for equator
             for (int x = 0; x < width; x++) {
-		if (landMap[x][y]) {
-		    mapHasLand = true;
-		}
+                if (landMap[x][y]) {
+                    mapHasLand = true;
+                }
                 Tile t;
                 if (importTerrain && importGame.getMap().isValid(x, y)) {
                     Tile importTile = importGame.getMap().getTile(x, y);
-                    if (importLandMap || importTile.isLand() == landMap[x][y]) {
+                    if (importTile.isLand() == landMap[x][y]) {
                         t = new Tile(game, importTile.getType(), x, y);
                         // TileItemContainer copies everything including Resource unless importBonuses == false
                         if (importTile.getTileItemContainer() != null) {

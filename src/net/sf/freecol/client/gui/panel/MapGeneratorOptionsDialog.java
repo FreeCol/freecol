@@ -177,7 +177,6 @@ public final class MapGeneratorOptionsDialog extends FreeColDialog implements Ac
                             FileOptionUI fou = (FileOptionUI) theUI.getOptionUI(MapGeneratorOptions.IMPORT_FILE);
                             fou.setValue(file);
                     
-                            ((BooleanOptionUI) theUI.getOptionUI(MapGeneratorOptions.IMPORT_LAND_MAP)).setValue(true);
                             ((BooleanOptionUI) theUI.getOptionUI(MapGeneratorOptions.IMPORT_RUMOURS)).setValue(false);
                             ((BooleanOptionUI) theUI.getOptionUI(MapGeneratorOptions.IMPORT_TERRAIN)).setValue(true);
                             ((BooleanOptionUI) theUI.getOptionUI(MapGeneratorOptions.IMPORT_BONUSES)).setValue(false);

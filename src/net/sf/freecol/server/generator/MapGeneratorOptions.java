@@ -269,11 +269,6 @@ public class MapGeneratorOptions extends OptionMap {
      * Option for setting a file to be imported (map etc).
      */
     public static final String IMPORT_FILE = "importFile";
-
-    /**
-     * Option for using the land map imported from a file.
-     */
-    public static final String IMPORT_LAND_MAP = "importLandMap";
     
     /**
      * Option for using the terrain imported from a file.
@@ -336,7 +331,6 @@ public class MapGeneratorOptions extends OptionMap {
         /* Add options here: */
         final OptionGroup importGroup = new OptionGroup("mapGeneratorOptions.import");
         new FileOption(IMPORT_FILE, importGroup);
-        new BooleanOption(IMPORT_LAND_MAP, importGroup, true);
         new BooleanOption(IMPORT_TERRAIN, importGroup, true);
         new BooleanOption(IMPORT_BONUSES, importGroup, false);
         new BooleanOption(IMPORT_RUMOURS, importGroup, false);
