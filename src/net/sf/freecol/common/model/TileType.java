@@ -68,11 +68,6 @@ public final class TileType extends FreeColGameObjectType {
      */
     private List<AbstractGoods> production;
 
-    /**
-     * Contains the abilities and modifiers of this type.
-     */
-    private FeatureContainer featureContainer = new FeatureContainer();
-
     // ------------------------------------------------------------ constructor
 
     public TileType(int index) {
