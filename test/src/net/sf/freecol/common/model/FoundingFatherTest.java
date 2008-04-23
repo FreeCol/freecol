@@ -233,8 +233,8 @@ public class FoundingFatherTest extends FreeColTestCase {
             new IndianSettlement(getGame(), iroquois, settlementTile, false, null, false, null);
         disputedTile.setOwner(iroquois);
         disputedTile.setOwningSettlement(indianSettlement);
-        //settlementTile.setOwningSettlement(indianSettlement); // doesn't the constructor take care of this ?
 
+        assertNotNull(settlementTile.getSettlement());
         assertTrue(player.getLandPrice(disputedTile) > 0);
         assertFalse(colony.getColonyTile(disputedTile).canAdd(unit));
         assertFalse(colony.getColonyTile(settlementTile).canAdd(unit));

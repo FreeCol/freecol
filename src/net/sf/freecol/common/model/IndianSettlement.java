@@ -139,6 +139,7 @@ public class IndianSettlement extends Settlement {
         }
         
         tile.setOwner(player);
+        tile.setSettlement(this);
 
         unitContainer = new UnitContainer(game, this);
         goodsContainer = new GoodsContainer(game, this);
