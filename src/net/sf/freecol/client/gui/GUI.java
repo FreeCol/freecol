@@ -1160,11 +1160,11 @@ public final class GUI {
         Canvas canvas = freeColClient.getCanvas();
         // Remove the last coat of arms and waiting for message if it was set
         if (coatOfArms != null) {
-            canvas.remove(coatOfArms);
+            canvas.remove(coatOfArms, false);
             coatOfArms = null;
         }
         if (waitingForMsg != null) {
-            canvas.remove(waitingForMsg);
+            canvas.remove(waitingForMsg, false);
             waitingForMsg = null;
         }
         
@@ -1172,18 +1172,11 @@ public final class GUI {
                 && freeColClient.getGame() != null
                 && freeColClient.getMyPlayer() != freeColClient.getGame().getCurrentPlayer()) {
             
-            if (greyLayer == null) {
-                BufferedImage greyLayerImg = new BufferedImage(size.width, size.height, BufferedImage.TYPE_INT_ARGB);
-                Graphics2D greyG = greyLayerImg.createGraphics();
-                greyG.setColor(Color.BLACK);
-                Composite oldComposite = greyG.getComposite();
-                greyG.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.6f));
-                greyG.fill(new Rectangle(0, 0, size.width, size.height));
-                greyG.setComposite(oldComposite);
-                greyLayer = new JLabel(new ImageIcon(greyLayerImg));
-                greyLayer.setBounds(0, 0, size.width, size.height);
+            if (greyLayer == null || !greyLayer.getSize().equals(size)) {
+                greyLayer = buildGreyLayer();
             }
-            canvas.add(greyLayer, JLayeredPane.DEFAULT_LAYER, 0);
+            if (greyLayer.getParent() == null) // Not added to the canvas yet.
+                canvas.add(greyLayer, JLayeredPane.DEFAULT_LAYER, 0);
             
             final Color currentPlayerColor = freeColClient.getGame().getCurrentPlayer().getColor();
             final String nation = freeColClient.getGame().getCurrentPlayer().getNationAsString();
@@ -1200,17 +1193,16 @@ public final class GUI {
             waitingForMsg = new JLabel(new ImageIcon(im));
             waitingForMsg.setBounds((size.width - im.getWidth(null)) / 2, (size.height - im.getHeight(null) - cHeight) / 2, im.getWidth(null), im.getHeight(null));
             canvas.add(waitingForMsg, JLayeredPane.POPUP_LAYER, -1);
-            //g.drawImage(im, (size.width - im.getWidth(null)) / 2, (size.height - im.getHeight(null) - cHeight) / 2, null);
+            
             if (coatOfArmsIcon != null) {
                 coatOfArms = new JLabel(coatOfArmsIcon);
                 coatOfArms.setBounds((size.width - cWidth) / 2, (size.height - cHeight) / 2 + im.getHeight(null), cWidth, cHeight);
                 canvas.add(coatOfArms, JLayeredPane.POPUP_LAYER, -1);
-                //g.drawImage(coatOfArms, (size.width - coatOfArms.getWidth(null)) / 2, (size.height - cHeight) / 2 + im.getHeight(null), null);
             }
         }
         else {
-            if (greyLayer != null) {
-                canvas.remove(greyLayer);
+            if (greyLayer != null && greyLayer.getParent() != null) {
+                canvas.remove(greyLayer, false);
             }
         }
 
@@ -1233,6 +1225,25 @@ public final class GUI {
                 yy += si.getHeight();
             }
         }
+    }
+    
+    /**
+     * Builds a JLabel object which is a image of a black rectangle with 60% opacity.
+     * The size will be the GUI's size and coordinates 0,0
+     * @return The JLabel containing the grey layer
+     */
+    private JLabel buildGreyLayer() {
+        BufferedImage greyLayerImg = new BufferedImage(size.width, size.height, BufferedImage.TYPE_INT_ARGB);
+        Graphics2D greyG = greyLayerImg.createGraphics();
+        greyG.setColor(Color.BLACK);
+        Composite oldComposite = greyG.getComposite();
+        greyG.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.6f));
+        greyG.fill(new Rectangle(0, 0, size.width, size.height));
+        greyG.setComposite(oldComposite);
+        JLabel toReturn = new JLabel(new ImageIcon(greyLayerImg));
+        toReturn.setBounds(0, 0, size.width, size.height);
+        
+        return toReturn;
     }
     
     /**

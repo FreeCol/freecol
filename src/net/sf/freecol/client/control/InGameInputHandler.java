@@ -1286,39 +1286,6 @@ public final class InGameInputHandler extends InputHandler {
 
         private final boolean _requestFocus;
     }
-
-    /**
-     * This task plays an animation in the Canvas.
-     */
-    class AnimateCanvasSwingTask extends NoResultCanvasSwingTask {
-        
-        private final Animation animation;
-        
-        /**
-         * Constructor - animate canvas with default buffer option.
-         * @param animation The animation that will be played
-         */
-        public AnimateCanvasSwingTask(Animation animation) {
-            this(animation, null);
-        }
-        
-        /**
-         * Constructor
-         * @param animation The animation that will be played
-         * @param bufferAnimation If the animation should be buffered or not.
-         */
-        public AnimateCanvasSwingTask(Animation animation, Boolean bufferAnimation) {
-            this.animation = animation;
-        }
-
-
-        protected void doWork(Canvas canvas) {
-            
-            animation.animate();
-            
-            canvas.refresh();
-        }
-    }
     
     /**
      * This task plays an unit movement animation in the Canvas.

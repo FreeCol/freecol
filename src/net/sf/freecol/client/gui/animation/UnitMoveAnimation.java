@@ -45,7 +45,6 @@ public final class UnitMoveAnimation extends Animation {
     private Point currentPoint;
     
     private JLabel unitLabel;
-    private Rectangle previousBounds;
     private static final Integer UNIT_LABEL_LAYER = JLayeredPane.DEFAULT_LAYER;
     
     // Movement variables & constants
@@ -120,7 +119,6 @@ public final class UnitMoveAnimation extends Animation {
     protected void readyNextFrame() {
         
         logger.finest("Calculating and setting the new unit location.");
-        previousBounds = unitLabel.getBounds();
                 
         // Calculating the new coordinates for the unit            
         currentPoint.x += signalX*X_RATIO*MOVEMENT_RATIO;        
@@ -149,7 +147,7 @@ public final class UnitMoveAnimation extends Animation {
             if (currentLocation instanceof Tile)
                 ((Tile) currentLocation).addUnitNoUpdate(unit);
             
-            canvas.remove(unitLabel);
+            canvas.remove(unitLabel, false);
         }
     }
     
