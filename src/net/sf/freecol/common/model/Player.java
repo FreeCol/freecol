@@ -806,7 +806,8 @@ public class Player extends FreeColGameObject implements Nameable {
         Player nationOwner = tile.getOwner();
         if (nationOwner == null ||
             nationOwner == this ||
-            nationOwner.isEuropean()) {
+            nationOwner.isEuropean() ||
+            tile.getSettlement() != null) {
             return 0;
         }
         int price = 0;
