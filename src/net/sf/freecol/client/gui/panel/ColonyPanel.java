@@ -81,6 +81,7 @@ import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.Player;
+import net.sf.freecol.common.model.IndianSettlement;
 import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.TileType;
@@ -1669,14 +1670,19 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener {
 
                             colonyPanel.updateSoLLabel();
                         } else {
-                            if (colonyTile.getWorkTile().getOwningSettlement() != null
-                                && colonyTile.getWorkTile().getOwningSettlement() != getColony()) {
-                                if (colonyTile.getWorkTile().getOwningSettlement().getOwner().isEuropean()) {
+                            // could not add the unit on the tile
+                            Settlement s = colonyTile.getWorkTile().getOwningSettlement();
+                            if (s != null && s != getColony()) {
+                                if (s.getOwner().isEuropean()) {
+                                    // occupied by a foreign european colony
                                     parent.errorMessage("tileTakenEuro");
-                                } else { // its an indian settlement
+                                } else if (s instanceof IndianSettlement &&
+                                           price > 0) { 
+                                    // occupied by an indian settlement
                                     parent.errorMessage("tileTakenInd");
                                 }
                             }
+                            // else perhaps water tile with no docks
                             return null;
                         }
                     } else {
