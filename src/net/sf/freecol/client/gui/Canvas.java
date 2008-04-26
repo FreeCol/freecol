@@ -160,38 +160,20 @@ public final class Canvas extends JDesktopPane {
     private static final Logger logger = Logger.getLogger(Canvas.class.getName());
 
     public static enum ScoutAction {
-        CANCEL ("scoutSettlement.cancel"),
-        INDIAN_SETTLEMENT_SPEAK ("scoutSettlement.speak"),
-        INDIAN_SETTLEMENT_TRIBUTE ("scoutSettlement.tribute"),
-        INDIAN_SETTLEMENT_ATTACK ("scoutSettlement.attack"),
-        FOREIGN_COLONY_NEGOTIATE ("scoutColony.negotiate"),
-        FOREIGN_COLONY_SPY ("scoutColony.spy"),
-        FOREIGN_COLONY_ATTACK ("scoutColony.attack");
-
-        private String key;
-        ScoutAction(String key) {
-            this.key = key;
-        }
-
-        public String toString() {
-            return Messages.message(key);
-        }
+        CANCEL,
+        INDIAN_SETTLEMENT_SPEAK,
+        INDIAN_SETTLEMENT_TRIBUTE,
+        INDIAN_SETTLEMENT_ATTACK,
+        FOREIGN_COLONY_NEGOTIATE,
+        FOREIGN_COLONY_SPY,
+        FOREIGN_COLONY_ATTACK
     }
 
     public static enum MissionaryAction {
-        CANCEL ("missionarySettlement.cancel"),
-        ESTABLISH_MISSION ("missionarySettlement.establish"),
-        DENOUNCE_HERESY ("missionarySettlement.cancel"),
-        INCITE_INDIANS ("missionarySettlement.incite");
-
-        private String key;
-        MissionaryAction(String key) {
-            this.key = key;
-        }
-
-        public String toString() {
-            return Messages.message(key);
-        }
+        CANCEL,
+        ESTABLISH_MISSION,
+        DENOUNCE_HERESY,
+        INCITE_INDIANS
     }
 
     private static final Integer MAIN_LAYER = JLayeredPane.DEFAULT_LAYER;
