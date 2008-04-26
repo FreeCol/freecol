@@ -37,6 +37,7 @@ public class AllTests {
 
         // $JUnit-END$
         suite.addTest(net.sf.freecol.common.AllTests.suite());
+        suite.addTest(net.sf.freecol.server.AllTests.suite());
         suite.addTest(net.sf.freecol.server.generator.AllTests.suite());
         suite.addTest(net.sf.freecol.client.gui.i18n.AllTests.suite());
 

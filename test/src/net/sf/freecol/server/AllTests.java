@@ -17,7 +17,7 @@
  *  along with FreeCol.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package net.sf.freecol.server.generator;
+package net.sf.freecol.server;
 
 import junit.framework.Test;
 import junit.framework.TestSuite;
@@ -25,9 +25,9 @@ import junit.framework.TestSuite;
 public class AllTests {
 
 	public static Test suite() {
-		TestSuite suite = new TestSuite("Test for net.sf.freecol.server.generator");
+		TestSuite suite = new TestSuite("Test for net.sf.freecol.server");
 		//$JUnit-BEGIN$
-		suite.addTestSuite(MapGeneratorTest.class);
+		suite.addTestSuite(ServerTest.class);
 		//$JUnit-END$
 		return suite;
 	}
