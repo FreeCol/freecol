@@ -535,7 +535,7 @@ public class FreeColDialog extends FreeColPanel {
     * @return The <code>FreeColDialog</code>.
     * @see ChoiceItem
     */
-    public static FreeColDialog createChoiceDialog(String text, String cancelText, Object... objects) {
+    public static FreeColDialog createChoiceDialog(String text, String cancelText, ChoiceItem... objects) {
 
         if (objects.length == 0) {
             throw new IllegalArgumentException("Can not create choice dialog with 0 choices!");

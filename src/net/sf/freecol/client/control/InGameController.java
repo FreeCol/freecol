@@ -621,8 +621,10 @@ public final class InGameController implements NetworkConstants {
         }, Integer.MAX_VALUE);
 
         Canvas canvas = freeColClient.getCanvas();
-        ChoiceItem choice = (ChoiceItem) canvas.showChoiceDialog(Messages.message("selectDestination.text"), Messages
-                .message("selectDestination.cancel"), destinations.toArray());
+        ChoiceItem choice = (ChoiceItem) canvas
+            .showChoiceDialog(Messages.message("selectDestination.text"),
+                              Messages.message("selectDestination.cancel"),
+                              destinations.toArray(new ChoiceItem[0]));
         if (choice == null) {
             // user aborted
             return;
@@ -1272,15 +1274,15 @@ public final class InGameController implements NetworkConstants {
                 canvas.showInformationMessage("noTrade");
                 return;
             } else {
-                ChoiceItem[] objects = { new ChoiceItem(Messages.message("trade.takeOffer"), 1),
-                        new ChoiceItem(Messages.message("trade.moreGold"), 2),
-                        new ChoiceItem(Messages.message("trade.gift").replaceAll("%goods%", goods.getName()), 0), };
-
-                String text = Messages.message("trade.text").replaceAll("%nation%",
-                        settlement.getOwner().getNationAsString());
-                text = text.replaceAll("%goods%", goods.getName());
-                text = text.replaceAll("%gold%", Integer.toString(gold));
-                ChoiceItem ci = (ChoiceItem) canvas.showChoiceDialog(text, Messages.message("trade.cancel"), objects);
+                String text = Messages.message("trade.text",
+                                               "%nation%", settlement.getOwner().getNationAsString(),
+                                               "%goods%", goods.getName(),
+                                               "%gold%", Integer.toString(gold));
+                ChoiceItem ci = (ChoiceItem) canvas
+                    .showChoiceDialog(text, Messages.message("trade.cancel"), 
+                                      new ChoiceItem(Messages.message("trade.takeOffer"), 1),
+                                      new ChoiceItem(Messages.message("trade.moreGold"), 2),
+                                      new ChoiceItem(Messages.message("trade.gift", "%goods%", goods.getName()), 0));
                 if (ci == null) { // == Trade aborted by the player.
                     return;
                 }
@@ -1378,15 +1380,15 @@ public final class InGameController implements NetworkConstants {
                 canvas.showInformationMessage("noTrade");
                 return;
             } else {
-                ChoiceItem[] objects = { new ChoiceItem(Messages.message("buy.takeOffer"), 1),
-                        new ChoiceItem(Messages.message("buy.moreGold"), 2), };
-
                 IndianSettlement settlement = (IndianSettlement) goods.getLocation();
-                String text = Messages.message("buy.text").replaceAll("%nation%",
-                        settlement.getOwner().getNationAsString());
-                text = text.replaceAll("%goods%", goods.getName());
-                text = text.replaceAll("%gold%", Integer.toString(gold));
-                ChoiceItem ci = (ChoiceItem) canvas.showChoiceDialog(text, Messages.message("buy.cancel"), objects);
+                String text = Messages.message("buy.text",
+                                               "%nation%", settlement.getOwner().getNationAsString(),
+                                               "%goods%", goods.getName(),
+                                               "%gold%", Integer.toString(gold));
+                ChoiceItem ci = (ChoiceItem) canvas
+                    .showChoiceDialog(text, Messages.message("buy.cancel"),
+                                      new ChoiceItem(Messages.message("buy.takeOffer"), 1),
+                                      new ChoiceItem(Messages.message("buy.moreGold"), 2));
                 if (ci == null) { // == Trade aborted by the player.
                     return;
                 }
@@ -2488,13 +2490,13 @@ public final class InGameController implements NetworkConstants {
             int price = unit.getOwner().getLandPrice(unit.getTile());
             if (price > 0) {
                 Player nation = unit.getTile().getOwner();
-                ChoiceItem[] choices = {
-                    new ChoiceItem(Messages.message("indianLand.pay" ,"%amount%",
-                                                    Integer.toString(price)), 1),
-                    new ChoiceItem(Messages.message("indianLand.take"), 2) };
-                ChoiceItem ci = (ChoiceItem) canvas.showChoiceDialog(Messages.message("indianLand.text",
-                                                                                      "%player%", nation.getName()),
-                                                                     Messages.message("indianLand.cancel"), choices);
+                ChoiceItem ci = (ChoiceItem) canvas
+                    .showChoiceDialog(Messages.message("indianLand.text",
+                                                       "%player%", nation.getName()),
+                                      Messages.message("indianLand.cancel"),
+                                      new ChoiceItem(Messages.message("indianLand.pay" ,"%amount%",
+                                                                      Integer.toString(price)), 1),
+                                      new ChoiceItem(Messages.message("indianLand.take"), 2));
                 if (ci == null) {
                     return;
                 } else if (ci.getChoice() == 1) {

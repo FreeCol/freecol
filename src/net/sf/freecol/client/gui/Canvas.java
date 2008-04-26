@@ -56,6 +56,7 @@ import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.action.MapControlsAction;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.client.gui.panel.ChatPanel;
+import net.sf.freecol.client.gui.panel.ChoiceItem;
 import net.sf.freecol.client.gui.panel.ChooseFoundingFatherDialog;
 import net.sf.freecol.client.gui.panel.ClientOptionsDialog;
 import net.sf.freecol.client.gui.panel.ColonyPanel;
@@ -1384,12 +1385,14 @@ public final class Canvas extends JDesktopPane {
      * @return The chosen object, or <i>null</i> for the cancel-button.
      */
     public Object showChoiceDialog(String text, String cancelText, Iterator<?> iterator) {
-        ArrayList<Object> a = new ArrayList<Object>();
+        ArrayList<ChoiceItem> a = new ArrayList<ChoiceItem>();
+        int counter = 0;
         while (iterator.hasNext()) {
-            a.add(iterator.next());
+            a.add(new ChoiceItem(iterator.next().toString(), counter));
+            counter++;
         }
 
-        return showChoiceDialog(text, cancelText, a.toArray());
+        return showChoiceDialog(text, cancelText, a.toArray(new ChoiceItem[0]));
     }
 
     /**
@@ -1401,7 +1404,7 @@ public final class Canvas extends JDesktopPane {
      * @param objects The array containing the objects to create buttons for.
      * @return The chosen object, or <i>null</i> for the cancel-button.
      */
-    public Object showChoiceDialog(String text, String cancelText, Object[] objects) {
+    public Object showChoiceDialog(String text, String cancelText, ChoiceItem... objects) {
 
         FreeColDialog choiceDialog = FreeColDialog.createChoiceDialog(text, cancelText, objects);
         if (choiceDialog.getHeight() > getHeight() / 3) {
