@@ -367,6 +367,12 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
                 return buyLand(connection, element);
             }
         });
+        register("stealLand", new CurrentPlayerNetworkRequestHandler() {
+            @Override
+            public Element handle(Player player, Connection connection, Element element) {
+                return stealLand(connection, element);
+            }
+        });
         register("payForBuilding", new CurrentPlayerNetworkRequestHandler() {
             @Override
             public Element handle(Player player, Connection connection, Element element) {
@@ -511,9 +517,30 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         ServerPlayer player = getFreeColServer().getPlayer(connection);
         Tile tile = (Tile) getGame().getFreeColGameObject(element.getAttribute("tile"));
         if (tile == null) {
-            throw new NullPointerException();
+            throw new IllegalArgumentException("Tile must not be 'null'.");
         }
         player.buyLand(tile);
+        return null;
+    }
+
+    /**
+     * Handles a "stealLand"-message from a client.
+     * 
+     * @param connection The connection the message came from.
+     * @param element The element containing the request.
+     */
+    private Element stealLand(Connection connection, Element element) {
+        ServerPlayer player = getFreeColServer().getPlayer(connection);
+        Colony colony = null;
+        Tile tile = (Tile) getGame().getFreeColGameObject(element.getAttribute("tile"));
+        if (tile == null) {
+            throw new IllegalArgumentException("Tile must not be 'null'.");
+        }
+        String colonyID = element.getAttribute("colony");
+        if (colonyID != null) {
+            colony = (Colony) getGame().getFreeColGameObject(colonyID);
+        }
+        tile.takeOwnership(player, colony);
         return null;
     }
 

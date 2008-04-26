@@ -1186,6 +1186,30 @@ public final class InGameController implements NetworkConstants {
     }
 
     /**
+     * Steals the given land from the indians.
+     * 
+     * @param tile The land which should be stolen from the indians.
+     * @param colony a <code>Colony</code> value
+     */
+    public void stealLand(Tile tile, Colony colony) {
+        if (freeColClient.getGame().getCurrentPlayer() != freeColClient.getMyPlayer()) {
+            freeColClient.getCanvas().showInformationMessage("notYourTurn");
+            return;
+        }
+
+        Element stealLandElement = Message.createNewRootElement("stealLand");
+        stealLandElement.setAttribute("tile", tile.getId());
+        if (colony != null) {
+            stealLandElement.setAttribute("colony", colony.getId());
+        }
+
+        freeColClient.getClient().sendAndWait(stealLandElement);
+
+        tile.takeOwnership(freeColClient.getMyPlayer(), colony);
+
+    }
+
+    /**
      * Uses the given unit to trade with a <code>Settlement</code> in the
      * given direction.
      * 

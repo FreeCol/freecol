@@ -730,9 +730,7 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
             }
         }
         setOwner(player);
-        if (settlement != null) {
-            owningSettlement = settlement;
-        }
+        owningSettlement = settlement;
         updatePlayerExploredTiles();
     }
 

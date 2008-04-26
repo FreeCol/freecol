@@ -1645,6 +1645,8 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener {
                                 }
 
                                 inGameController.buyLand(colonyTile.getWorkTile());
+                            } else if (ci.getChoice() == 2) {
+                                inGameController.stealLand(colonyTile.getWorkTile(), colony);
                             }
                         }
 
@@ -1676,8 +1678,7 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener {
                                 if (s.getOwner().isEuropean()) {
                                     // occupied by a foreign european colony
                                     parent.errorMessage("tileTakenEuro");
-                                } else if (s instanceof IndianSettlement &&
-                                           price > 0) { 
+                                } else if (s instanceof IndianSettlement && price > 0) { 
                                     // occupied by an indian settlement
                                     parent.errorMessage("tileTakenInd");
                                 }
