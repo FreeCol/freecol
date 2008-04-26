@@ -93,6 +93,7 @@ import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.model.WorkLocation;
 import net.sf.freecol.common.model.Map.Position;
 import net.sf.freecol.common.model.TradeRoute.Stop;
+import net.sf.freecol.common.networking.BuyLandMessage;
 import net.sf.freecol.common.networking.Message;
 import net.sf.freecol.common.networking.NetworkConstants;
 import net.sf.freecol.common.networking.StealLandMessage;
@@ -1176,8 +1177,7 @@ public final class InGameController implements NetworkConstants {
             return;
         }
 
-        Element buyLandElement = Message.createNewRootElement("buyLand");
-        buyLandElement.setAttribute("tile", tile.getId());
+        Element buyLandElement = new BuyLandMessage(tile).toXMLElement();
 
         freeColClient.getMyPlayer().buyLand(tile);
 
