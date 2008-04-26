@@ -1144,10 +1144,14 @@ public final class Canvas extends JDesktopPane {
     
         FreeColDialog scoutDialog = FreeColDialog
             .createChoiceDialog(text.toString(), null,
-                                ScoutAction.INDIAN_SETTLEMENT_SPEAK,
-                                ScoutAction.INDIAN_SETTLEMENT_TRIBUTE,
-                                ScoutAction.INDIAN_SETTLEMENT_ATTACK,
-                                ScoutAction.CANCEL);
+                                new ChoiceItem(Messages.message("scoutSettlement.speak"),
+                                               ScoutAction.INDIAN_SETTLEMENT_SPEAK),
+                                new ChoiceItem(Messages.message("scoutSettlement.tribute"),
+                                               ScoutAction.INDIAN_SETTLEMENT_TRIBUTE),
+                                new ChoiceItem(Messages.message("scoutSettlement.attack"),
+                                               ScoutAction.INDIAN_SETTLEMENT_ATTACK),
+                                new ChoiceItem(Messages.message("cancel"),
+                                               ScoutAction.CANCEL));
 
         addAsFrame(scoutDialog);
         scoutDialog.requestFocus();
@@ -1178,11 +1182,15 @@ public final class Canvas extends JDesktopPane {
                                            "%colony%", colony.getName());
 
         FreeColDialog scoutDialog = FreeColDialog
-            .createChoiceDialog(mainText, null,
-                                ScoutAction.FOREIGN_COLONY_NEGOTIATE,
-                                ScoutAction.FOREIGN_COLONY_SPY,
-                                ScoutAction.FOREIGN_COLONY_ATTACK,
-                                ScoutAction.CANCEL);
+        .createChoiceDialog(mainText, null,
+                            new ChoiceItem(Messages.message("scoutColony.negotiate"), 
+                                           ScoutAction.FOREIGN_COLONY_NEGOTIATE),
+                            new ChoiceItem(Messages.message("scoutColony.spy"),
+                                           ScoutAction.FOREIGN_COLONY_SPY),
+                            new ChoiceItem(Messages.message("scoutColony.attack"),
+                                           ScoutAction.FOREIGN_COLONY_ATTACK),
+                            new ChoiceItem(Messages.message("cancel"),
+                                           ScoutAction.CANCEL));
         addAsFrame(scoutDialog);
         scoutDialog.requestFocus();
 
@@ -1212,9 +1220,12 @@ public final class Canvas extends JDesktopPane {
 
         FreeColDialog armedUnitDialog = FreeColDialog
             .createChoiceDialog(introText, null,
-                                ScoutAction.INDIAN_SETTLEMENT_TRIBUTE,
-                                ScoutAction.INDIAN_SETTLEMENT_ATTACK,
-                                ScoutAction.CANCEL);
+                                new ChoiceItem(Messages.message("scoutSettlement.tribute"),
+                                               ScoutAction.INDIAN_SETTLEMENT_TRIBUTE),
+                                new ChoiceItem(Messages.message("scoutSettlement.attack"),
+                                               ScoutAction.INDIAN_SETTLEMENT_ATTACK),
+                                new ChoiceItem(Messages.message("cancel"),
+                                               ScoutAction.CANCEL));
         addAsFrame(armedUnitDialog);
         armedUnitDialog.requestFocus();
 
@@ -1251,10 +1262,14 @@ public final class Canvas extends JDesktopPane {
 
         FreeColDialog missionaryDialog = FreeColDialog
             .createChoiceDialog(introText.toString(), null,
-                                MissionaryAction.ESTABLISH_MISSION,
-                                MissionaryAction.DENOUNCE_HERESY,
-                                MissionaryAction.INCITE_INDIANS,
-                                MissionaryAction.CANCEL);
+                                new ChoiceItem(Messages.message("missionarySettlement.establish"),
+                                               MissionaryAction.ESTABLISH_MISSION),
+                                new ChoiceItem(Messages.message("missionarySettlement.heresy"),
+                                               MissionaryAction.DENOUNCE_HERESY),
+                                new ChoiceItem(Messages.message("missionarySettlement.incite"),
+                                               MissionaryAction.INCITE_INDIANS),
+                                new ChoiceItem(Messages.message("cancel"),
+                                               MissionaryAction.CANCEL));
 
         addAsFrame(missionaryDialog);
         missionaryDialog.requestFocus();
