@@ -57,6 +57,7 @@ import net.sf.freecol.common.model.FreeColGameObject;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Player.PlayerType;
+import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.Unit.UnitState;
 import net.sf.freecol.common.model.UnitType;
@@ -1047,4 +1048,25 @@ public final class FreeColServer {
             }
         }
     }
+
+    public void sendUpdatedTileToAll(Tile newTile, Player player) {
+        // TODO: can Player be null?
+        for (Player enemy : getGame().getPlayers()) {
+            ServerPlayer enemyPlayer = (ServerPlayer) enemy;
+            if (player != null && player.equals(enemyPlayer) || enemyPlayer.getConnection() == null) {
+                continue;
+            }
+            try {
+                if (enemyPlayer.canSee(newTile)) {
+                    Element updateElement = Message.createNewRootElement("update");
+                    updateElement.appendChild(newTile.toXMLElement(enemyPlayer, updateElement.getOwnerDocument()));
+                    enemyPlayer.getConnection().send(updateElement);
+                }
+            } catch (IOException e) {
+                logger.warning("Could not send message to: " + enemyPlayer.getName() + " with connection "
+                        + enemyPlayer.getConnection());
+            }
+        }
+    }
+
 }

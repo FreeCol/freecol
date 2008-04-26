@@ -46,19 +46,21 @@ import org.xml.sax.SAXException;
  * Class for parsing raw message data into an XML-tree and for creating new
  * XML-trees.
  */
-public final class Message {
-    private static final Logger logger = Logger.getLogger(Message.class.getName());
+public class Message {
 
-
-
+    protected static final Logger logger = Logger.getLogger(Message.class.getName());
 
     private static final String FREECOL_PROTOCOL_VERSION = "0.1.4";
 
     private static final String INVALID_MESSAGE = "invalid";
 
     /** The actual Message data. */
-    private final Document document;
+    protected Document document;
 
+
+    protected Message() {
+        // empty constructor
+    }
 
     /**
      * Constructs a new Message with data from the given String. The constructor

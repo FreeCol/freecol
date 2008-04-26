@@ -95,6 +95,7 @@ import net.sf.freecol.common.model.Map.Position;
 import net.sf.freecol.common.model.TradeRoute.Stop;
 import net.sf.freecol.common.networking.Message;
 import net.sf.freecol.common.networking.NetworkConstants;
+import net.sf.freecol.common.networking.StealLandMessage;
 
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
@@ -103,10 +104,8 @@ import org.w3c.dom.NodeList;
  * The controller that will be used while the game is played.
  */
 public final class InGameController implements NetworkConstants {
+
     private static final Logger logger = Logger.getLogger(InGameController.class.getName());
-
-
-
 
     private final FreeColClient freeColClient;
 
@@ -1199,12 +1198,7 @@ public final class InGameController implements NetworkConstants {
             return;
         }
 
-        Element stealLandElement = Message.createNewRootElement("stealLand");
-        stealLandElement.setAttribute("tile", tile.getId());
-        if (colony != null) {
-            stealLandElement.setAttribute("colony", colony.getId());
-        }
-
+        Element stealLandElement = new StealLandMessage(tile, colony).toXMLElement();
         freeColClient.getClient().sendAndWait(stealLandElement);
 
         tile.takeOwnership(freeColClient.getMyPlayer(), colony);

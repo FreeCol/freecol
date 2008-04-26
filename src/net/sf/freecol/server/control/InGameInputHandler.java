@@ -71,10 +71,12 @@ import net.sf.freecol.common.model.Unit.UnitState;
 import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.model.WorkLocation;
 import net.sf.freecol.common.model.Map.Position;
+import net.sf.freecol.common.networking.BuyLandMessage;
 import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.networking.Message;
 import net.sf.freecol.common.networking.NetworkConstants;
 import net.sf.freecol.common.networking.NoRouteToServerException;
+import net.sf.freecol.common.networking.StealLandMessage;
 import net.sf.freecol.common.option.BooleanOption;
 import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.ai.AIPlayer;
@@ -89,17 +91,14 @@ import org.w3c.dom.NodeList;
  */
 public final class InGameInputHandler extends InputHandler implements NetworkConstants {
 
-
-
     private static Logger logger = Logger.getLogger(InGameInputHandler.class.getName());
-
 
     /**
      * The constructor to use.
      * 
      * @param freeColServer The main server object.
      */
-    public InGameInputHandler(FreeColServer freeColServer) {
+    public InGameInputHandler(final FreeColServer freeColServer) {
         super(freeColServer);
         // TODO: move and simplify methods later, for now just delegate
         register("createUnit", new NetworkRequestHandler() {
@@ -361,16 +360,18 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
                 return indianDemand(connection, element);
             }
         });
-        register("buyLand", new CurrentPlayerNetworkRequestHandler() {
+        register(BuyLandMessage.getXMLElementTagName(), new CurrentPlayerNetworkRequestHandler() {
             @Override
             public Element handle(Player player, Connection connection, Element element) {
-                return buyLand(connection, element);
+                BuyLandMessage message = new BuyLandMessage(getGame(), element);
+                return message.handle(freeColServer, player, connection);
             }
         });
-        register("stealLand", new CurrentPlayerNetworkRequestHandler() {
+        register(StealLandMessage.getXMLElementTagName(), new CurrentPlayerNetworkRequestHandler() {
             @Override
             public Element handle(Player player, Connection connection, Element element) {
-                return stealLand(connection, element);
+                StealLandMessage message = new StealLandMessage(getGame(), element);
+                return message.handle(freeColServer, player, connection);
             }
         });
         register("payForBuilding", new CurrentPlayerNetworkRequestHandler() {
@@ -505,43 +506,6 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
                 }
             }
         }
-    }
-
-    /**
-     * Handles a "buyLand"-message from a client.
-     * 
-     * @param connection The connection the message came from.
-     * @param element The element containing the request.
-     */
-    private Element buyLand(Connection connection, Element element) {
-        ServerPlayer player = getFreeColServer().getPlayer(connection);
-        Tile tile = (Tile) getGame().getFreeColGameObject(element.getAttribute("tile"));
-        if (tile == null) {
-            throw new IllegalArgumentException("Tile must not be 'null'.");
-        }
-        player.buyLand(tile);
-        return null;
-    }
-
-    /**
-     * Handles a "stealLand"-message from a client.
-     * 
-     * @param connection The connection the message came from.
-     * @param element The element containing the request.
-     */
-    private Element stealLand(Connection connection, Element element) {
-        ServerPlayer player = getFreeColServer().getPlayer(connection);
-        Colony colony = null;
-        Tile tile = (Tile) getGame().getFreeColGameObject(element.getAttribute("tile"));
-        if (tile == null) {
-            throw new IllegalArgumentException("Tile must not be 'null'.");
-        }
-        String colonyID = element.getAttribute("colony");
-        if (colonyID != null) {
-            colony = (Colony) getGame().getFreeColGameObject(colonyID);
-        }
-        tile.takeOwnership(player, colony);
-        return null;
     }
 
     /**

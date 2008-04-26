@@ -44,10 +44,8 @@ import org.w3c.dom.Element;
  * @see Controller
  */
 public abstract class InputHandler extends FreeColServerHolder implements MessageHandler {
+
     private static Logger logger = Logger.getLogger(InputHandler.class.getName());
-
-
-
 
     /**
      * The handler map provides named handlers for network requests. Each
