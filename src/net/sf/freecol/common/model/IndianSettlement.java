@@ -788,11 +788,23 @@ public class IndianSettlement extends Settlement {
      * @return The bonus multiplier.
      */
     public int getBonusMultiplier() {
-        int addition = getTypeOfSettlement().ordinal() + 1;
-        if (isCapital()) {
-            addition++;
+        int multiplier = 0;
+        switch (getTypeOfSettlement()) {
+        case INDIAN_CAMP:
+            multiplier = 1;
+            break;
+        case INDIAN_VILLAGE:
+            multiplier = 2;
+            break;
+        case AZTEC_CITY:
+        case INCA_CITY:
+            multiplier = 3;
+            break;
         }
-        return addition;
+        if (isCapital()) {
+            multiplier++;
+        }
+        return multiplier;
     }
 
 
