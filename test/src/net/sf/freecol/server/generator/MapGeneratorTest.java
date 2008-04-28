@@ -19,6 +19,7 @@
 
 package net.sf.freecol.server.generator;
 
+import java.io.File;
 import java.util.Iterator;
 import java.util.Vector;
 
@@ -140,7 +141,7 @@ public class MapGeneratorTest extends FreeColTestCase {
     }
 
     /**
-     * Make sure that each tribe has exactely one capital
+     * Make sure that each tribe has exactly one capital
      * 
      */
     public void testIndianCapital() {
@@ -171,7 +172,7 @@ public class MapGeneratorTest extends FreeColTestCase {
             if (!p.isIndian())
                 continue;
 
-            // Check that every indian player has exactely one capital if s/he
+            // Check that every indian player has exactly one capital if s/he
             // has at least one settlement.
             int settlements = 0;
             int capitals = 0;
@@ -183,6 +184,15 @@ public class MapGeneratorTest extends FreeColTestCase {
             if (settlements > 0) 
                 assertEquals(1, capitals);
         }
+    }
+    
+    public void testImportMap() {
+        
+        Game g = new Game(new MockModelController());
+        MapGenerator gen = new MapGenerator();
+        File importFile = new File("data/maps/Africa.fsg");
+        gen.getMapGeneratorOptions().setFile(MapGeneratorOptions.IMPORT_FILE, importFile);
+        gen.createMap(g);
     }
 }
 
