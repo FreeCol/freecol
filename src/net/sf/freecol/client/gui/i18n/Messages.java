@@ -94,45 +94,15 @@ public class Messages {
         }
     }
 
+    /**
+     * Returns the directory containing language property files.
+     *
+     * @return a <code>File</code> value
+     */
     public static File getI18nDirectory() {
         return new File(FreeCol.getDataDirectory(), STRINGS_DIRECTORY);
     }
 
-    /**
-     * Finds the message with a particular ID in the default locale and performs
-     * string replacements.
-     * 
-     * @param messageId The key of the message to find
-     * @param data Every occurrences of <code>data[x][0]</code> is replaced with
-     *            <code>data[x][1]</code> for every <code>x</code>.
-     * @return The message with the specified id or null if message could not be
-     *         found.
-     * 
-     * @throws NullPointerException if messageId is null
-     * @deprecated
-     */
-    public static String message(String messageId, String[][] data) {
-
-        String message = Messages.message(messageId);
-        if (message == null) {
-            return messageId;
-        }
-
-        if (data != null && message != null) {
-            for (int i = 0; i < data.length; i++) {
-                if (data[i] == null || data[i].length != 2) {
-                    logger.warning("Data has a wrong format for message: " + message);
-                } else if (data[i][0] == null || data[i][1] == null) {
-                    logger.warning("Data in model message is 'null': " + message + ", " + data[i][0] + ", "
-                                   + data[i][1]);
-                } else {
-                    message = message.replaceAll(data[i][0], data[i][1]);
-                }
-            }
-        }
-
-        return message;
-    }
 
     /**
      * Finds the message with a particular ID in the default locale and performs

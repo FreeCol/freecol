@@ -531,11 +531,10 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
             if (teacher.getStudent() == null) {
                 final Unit student = findStudent(teacher);
                 if (student == null) {
-                    addModelMessage(getColony(), "model.building.noStudent",
-                                    new String[][] {
-                                        { "%teacher%", teacher.getName() },
-                                        { "%colony%", colony.getName() } },
-                                    ModelMessage.MessageType.WARNING, teacher);
+                    addModelMessage(getColony(), ModelMessage.MessageType.WARNING, teacher,
+                                    "model.building.noStudent",
+                                    "%teacher%", teacher.getName(),
+                                    "%colony%", colony.getName());
                     continue;
                 } else {
                     teacher.setStudent(student);

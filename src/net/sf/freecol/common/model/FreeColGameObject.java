@@ -414,13 +414,6 @@ abstract public class FreeColGameObject extends FreeColObject {
      * @see Player#addModelMessage(ModelMessage)
      * @see ModelMessage
      */
-    @Deprecated
-    protected void addModelMessage(FreeColGameObject source, String messageID, String[][] data,
-                                   ModelMessage.MessageType type, FreeColObject display) {
-        ModelMessage message = new ModelMessage(source, messageID, data, type, display);
-        initializeModelMessage(message);
-    }
-
     protected void addModelMessage(FreeColGameObject source, ModelMessage.MessageType type, 
                                    FreeColObject display, String messageID, String... data) {
         ModelMessage message = new ModelMessage(source, type, display, messageID, data);

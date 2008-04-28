@@ -25,9 +25,6 @@ import net.sf.freecol.util.test.FreeColTestCase;
 
 public class MessagesTest extends FreeColTestCase {
 
-
-
-
     public static final String noSuchKey = "should.not.exist.and.thus.return.null";
 
     public void tearDown(){
@@ -52,38 +49,6 @@ public class MessagesTest extends FreeColTestCase {
         assertEquals(noSuchKey, Messages.message(noSuchKey));
     }
 
-    @SuppressWarnings("deprecation")
-    public void testMessageStringStringArrayArray() {
-
-        assertEquals("Trade Advisor", Messages.message("menuBar.report.trade", new String[][] {} ));
-
-        // With parameters for "Gold: %gold% | Tax: %tax%% | Year: %year%"
-        assertEquals("Score: 1050    |    Gold: silver    |    Tax: 13%    |    Year: %year%", 
-                     Messages.message("menuBar.statusLine",
-                                      new String[][] {
-                                          { "%score%", "1050" }, 
-                                          { "%gold%", "silver" }, 
-                                          { "%tax%", "13" } }));
-
-        // Long String
-        assertEquals("Food is necessary to feed your colonists and to breed horses. "
-                + "A new colonist is born whenever a colony has 200 units of food or more.", 
-                     Messages.message("model.goods.food.description", new String[][] {}));
-
-        // Invalid Inputs
-        assertEquals("Trade Advisor", Messages.message("menuBar.report.trade", new String[][] {}));
-        assertEquals("Score: %score%    |    Gold: %gold%    |    Tax: %tax%%    |    Year: %year%", 
-                     Messages.message("menuBar.statusLine",
-                                      new String[][] { new String[] { "%tax%" } }));
-
-        
-        // Message not found
-        assertEquals(noSuchKey, Messages.message(noSuchKey, new String[][] {}));
-        
-        assertEquals(noSuchKey, Messages.message(noSuchKey, 
-                new String[][] { new String[] { "%gold%", "silver" }, new String[] { "%tax%", "13" } }));
-    }
-    
     public void testMessageStringVarargs() {
         
         try {

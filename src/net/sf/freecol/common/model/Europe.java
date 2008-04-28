@@ -253,8 +253,8 @@ public final class Europe extends FreeColGameObject implements Location, Ownable
         unit.getOwner().reduceCrosses();
 
         if (!unit.getOwner().hasAbility("model.ability.selectRecruit")) {
-            addModelMessage(this, "model.europe.emigrate", new String[][] { {
-                    "%unit%", unit.getName() } }, ModelMessage.MessageType.UNIT_ADDED, unit);
+            addModelMessage(this, ModelMessage.MessageType.UNIT_ADDED, unit,
+                            "model.europe.emigrate", "%unit%", unit.getName());
         }
         // In case William Brewster is in the congress we don't need
         // to show a message to the user because he has already been
@@ -488,11 +488,10 @@ public final class Europe extends FreeColGameObject implements Location, Ownable
             if (unit.isNaval() && unit.isUnderRepair()) {
                 unit.setHitpoints(unit.getHitpoints() + 1);
                 if (!unit.isUnderRepair()) {
-                    addModelMessage(this, "model.unit.shipRepaired",
-                                    new String[][] {
-                                        { "%unit%", unit.getName() },
-                                        { "%repairLocation%", getLocationName() } },
-                                    ModelMessage.MessageType.DEFAULT, this);
+                    addModelMessage(this, ModelMessage.MessageType.DEFAULT, this,
+                                    "model.unit.shipRepaired",
+                                    "%unit%", unit.getName(),
+                                    "%repairLocation%", getLocationName());
                 }
             }
         }

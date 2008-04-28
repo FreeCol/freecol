@@ -895,18 +895,22 @@ public class Player extends FreeColGameObject implements Nameable {
                 // these dialogs should only appear on the first event
                 if (player.isEuropean()) {
                     if (!contactedEuro) {
-                        addModelMessage(this, "EventPanel.MEETING_EUROPEANS", null, ModelMessage.MessageType.FOREIGN_DIPLOMACY, player);
+                        addModelMessage(this, ModelMessage.MessageType.FOREIGN_DIPLOMACY, 
+                                        player, "EventPanel.MEETING_EUROPEANS");
                     }
                 } else {
                     if (!contactedIndians) {
-                        addModelMessage(this, "EventPanel.MEETING_NATIVES", null, ModelMessage.MessageType.FOREIGN_DIPLOMACY, player);
+                        addModelMessage(this, ModelMessage.MessageType.FOREIGN_DIPLOMACY,
+                                        player, "EventPanel.MEETING_NATIVES");
                     }
                     // special cases for Aztec/Inca
                     if (player.getNationType() == FreeCol.getSpecification().getNationType("model.nationType.aztec")) {
-                        addModelMessage(this, "EventPanel.MEETING_AZTEC", null, ModelMessage.MessageType.FOREIGN_DIPLOMACY, player);
+                        addModelMessage(this, ModelMessage.MessageType.FOREIGN_DIPLOMACY,
+                                        player, "EventPanel.MEETING_AZTEC");
                     } else if (player.getNationType() == 
                                FreeCol.getSpecification().getNationType("model.nationType.inca")) {
-                        addModelMessage(this, "EventPanel.MEETING_INCA", null, ModelMessage.MessageType.FOREIGN_DIPLOMACY, player);
+                        addModelMessage(this, ModelMessage.MessageType.FOREIGN_DIPLOMACY,
+                                        player, "EventPanel.MEETING_INCA");
                     }
                 }
             } else if (!isEuropean()) {
