@@ -22,6 +22,7 @@ package net.sf.freecol.client.control;
 
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -366,10 +367,12 @@ public final class ConnectController {
         final boolean singleplayer;
         final String name;
         final int port;
+        FileInputStream fis = null;
         try {
             // Get suggestions for "singleplayer" and "public game" settings from the file:
-            XMLStreamReader in = FreeColServer.createXMLStreamReader(theFile);
-            in.nextTag();                    
+            fis = new FileInputStream(theFile);
+            XMLStreamReader in = FreeColServer.createXMLStreamReader(fis);
+            in.nextTag();
             final boolean defaultSingleplayer = Boolean.valueOf(in.getAttributeValue(null, "singleplayer")).booleanValue();
             final boolean defaultPublicServer;
             final String publicServerStr =  in.getAttributeValue(null, "publicServer");
@@ -410,6 +413,13 @@ public final class ConnectController {
             logger.warning(sw.toString());                    
             SwingUtilities.invokeLater( new ErrorJob("server.couldNotStart") );
             return;
+        } finally {
+            try {
+                if (fis!=null)
+                    fis.close();
+            } catch (IOException e) {
+                // do nothing
+            }
         }
         
         if (freeColClient.getFreeColServer() != null && freeColClient.getFreeColServer().getServer().getPort() == port) {

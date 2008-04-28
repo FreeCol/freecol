@@ -34,6 +34,8 @@ public class ServerTest extends FreeColTestCase {
     
     private static final String SERVER_NAME = "MyTestServer";
     private static final int SERVER_PORT = FreeCol.getDefaultPort();
+    
+    private static final String TEST_FILE = "test/data/test.fsg";
 
     
     private FreeColServer startServer(boolean publicServer, boolean singleplayer, int port, String name) 
@@ -84,7 +86,7 @@ public class ServerTest extends FreeColTestCase {
         assertNotNull(server.getGame().getMap());
         
         // save the game as a file
-        File file = new File("test/data/test.fsg");
+        File file = new File(TEST_FILE);
         try {
             server.saveGame(file, "user");
         } catch (IOException e) {
@@ -108,6 +110,7 @@ public class ServerTest extends FreeColTestCase {
         }
         assertNotNull(server.getGame());
         assertNotNull(server.getGame().getMap());
-        
+        file.delete();
+        assertFalse(file.exists());
     }
 }

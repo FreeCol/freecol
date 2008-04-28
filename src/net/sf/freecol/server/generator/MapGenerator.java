@@ -20,6 +20,8 @@
 package net.sf.freecol.server.generator;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.ArrayList;
@@ -148,10 +150,11 @@ public class MapGenerator {
          * TODO-LATER: We are using same method in FreeColServer.
          *       Create a framework for loading games/maps.
          */
-        
+        FileInputStream fis = null;
         try {
             Game game = null;
-            XMLStreamReader xsr = FreeColServer.createXMLStreamReader(importFile);
+            fis = new FileInputStream(importFile);
+            XMLStreamReader xsr = FreeColServer.createXMLStreamReader(fis);
             xsr.nextTag();
             final String version = xsr.getAttributeValue(null, "version");
             if (!Message.getFreeColProtocolVersion().equals(version)) {
@@ -194,6 +197,13 @@ public class MapGenerator {
             e.printStackTrace(new PrintWriter(sw));
             logger.warning(sw.toString());
             return null;
+        } finally {
+            try {
+                if (fis!=null)
+                    fis.close();
+            } catch (IOException e) {
+                // do nothing
+            }
         }
     }
 

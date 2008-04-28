@@ -28,6 +28,7 @@ import java.awt.Rectangle;
 import java.awt.Toolkit;
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.Locale;
@@ -180,10 +181,12 @@ public final class FreeCol {
             try {
                 final FreeColServer freeColServer;
                 if (savegameFile != null) {
+                    FileInputStream fis = null;
                     try {
                         // Get suggestions for "singleplayer" and "public game" settings from the file:
-                        XMLStreamReader in = FreeColServer.createXMLStreamReader(savegameFile);
-                        in.nextTag();                    
+                        fis = new FileInputStream(savegameFile);
+                        XMLStreamReader in = FreeColServer.createXMLStreamReader(fis);
+                        in.nextTag();
                         final boolean defaultSingleplayer = Boolean.valueOf(in.getAttributeValue(null, "singleplayer")).booleanValue();
                         final boolean defaultPublicServer;
                         final String publicServerStr =  in.getAttributeValue(null, "publicServer");
@@ -199,6 +202,14 @@ public final class FreeCol {
                         removeSplash(splash);
                         System.out.println("Could not load savegame.");
                         return;
+                    } finally {
+                        try {
+                            if (fis!=null) {
+                                fis.close();
+                            }
+                        } catch (IOException e) {
+                            // do nothing
+                        }
                     }
                 } else {
                     try {

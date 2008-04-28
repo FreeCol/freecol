@@ -552,15 +552,17 @@ public final class FreeColServer {
     public void saveGame(File file, String username) throws IOException {
         final Game game = getGame();
         XMLOutputFactory xof = XMLOutputFactory.newInstance();
+        FileOutputStream fos = null;
         try {
             XMLStreamWriter xsw;
             GZIPOutputStream gzip;
+            fos = new FileOutputStream(file);
             if (DISABLE_SAVEGAME_COMPRESSION) {
                 // No compression
-                xsw = xof.createXMLStreamWriter(new FileOutputStream(file), "UTF-8");
+                xsw = xof.createXMLStreamWriter(fos, "UTF-8");
             } else {
                 // Compression
-                gzip = new GZIPOutputStream(new FileOutputStream(file));
+                gzip = new GZIPOutputStream(fos);
                 xsw = xof.createXMLStreamWriter(gzip);
             }
             xsw.writeStartDocument("UTF-8", "1.0");
@@ -589,11 +591,12 @@ public final class FreeColServer {
             }
             xsw.writeEndElement();
             xsw.writeEndDocument();
-            if (!DISABLE_SAVEGAME_COMPRESSION) {
-                gzip.finish();
-            }
             xsw.flush();
             xsw.close();
+            if (!DISABLE_SAVEGAME_COMPRESSION) {
+                gzip.finish();
+                gzip.close();
+            }
         } catch (XMLStreamException e) {
             StringWriter sw = new StringWriter();
             e.printStackTrace(new PrintWriter(sw));
@@ -604,6 +607,14 @@ public final class FreeColServer {
             e.printStackTrace(new PrintWriter(sw));
             logger.warning(sw.toString());
             throw new IOException(e.toString());
+        } finally {
+            try {
+                if (fos!=null) {
+                    fos.close();
+                }
+            } catch (IOException e) {
+                // do nothing
+            }
         }
     }
 
@@ -617,8 +628,8 @@ public final class FreeColServer {
      *                <code>XMLStreamException</code> have been thrown by the
      *                parser.
      */
-    public static XMLStreamReader createXMLStreamReader(File file) throws IOException {
-        InputStream in = new BufferedInputStream(new FileInputStream(file));
+    public static XMLStreamReader createXMLStreamReader(FileInputStream fis) throws IOException {
+        InputStream in = new BufferedInputStream(fis);
         // Automatically detect compression:
         in.mark(10);
         byte[] buf = new byte[5];
@@ -652,8 +663,10 @@ public final class FreeColServer {
      */
     public String loadGame(File file) throws IOException, FreeColException {
         boolean doNotLoadAI = false;
+        FileInputStream fis = null;
         try {
-            XMLStreamReader xsr = createXMLStreamReader(file);
+            fis = new FileInputStream(file);
+            XMLStreamReader xsr = createXMLStreamReader(fis);
             xsr.nextTag();
             final String version = xsr.getAttributeValue(null, "version");
             if (!Message.getFreeColProtocolVersion().equals(version)) {
@@ -747,6 +760,13 @@ public final class FreeColServer {
             e.printStackTrace(new PrintWriter(sw));
             logger.warning(sw.toString());
             throw new IOException(e.toString());
+        } finally {
+            try {
+                if (fis!=null)
+                    fis.close();
+            } catch (IOException e) {
+                // do nothing
+            }
         }
     }
 
