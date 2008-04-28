@@ -1138,7 +1138,8 @@ public final class Canvas extends JDesktopPane {
         addAsFrame(scoutDialog);
         scoutDialog.requestFocus();
 
-        ScoutAction response = (ScoutAction) scoutDialog.getResponse();
+        ChoiceItem responseItem = (ChoiceItem) scoutDialog.getResponse();
+        ScoutAction response = (ScoutAction) responseItem.getObject();
 
         remove(scoutDialog);
 
@@ -1176,7 +1177,8 @@ public final class Canvas extends JDesktopPane {
         addAsFrame(scoutDialog);
         scoutDialog.requestFocus();
 
-        ScoutAction response = (ScoutAction) scoutDialog.getResponse();
+        ChoiceItem responseItem = (ChoiceItem) scoutDialog.getResponse();
+        ScoutAction response = (ScoutAction) responseItem.getObject();
 
         remove(scoutDialog);
 
@@ -1211,7 +1213,8 @@ public final class Canvas extends JDesktopPane {
         addAsFrame(armedUnitDialog);
         armedUnitDialog.requestFocus();
 
-        ScoutAction response = (ScoutAction) armedUnitDialog.getResponse();
+        ChoiceItem responseItem = (ChoiceItem) armedUnitDialog.getResponse();
+        ScoutAction response = (ScoutAction) responseItem.getObject();
 
         remove(armedUnitDialog);
 
@@ -1256,7 +1259,8 @@ public final class Canvas extends JDesktopPane {
         addAsFrame(missionaryDialog);
         missionaryDialog.requestFocus();
 
-        MissionaryAction response = (MissionaryAction) missionaryDialog.getResponse();
+        ChoiceItem responseItem = (ChoiceItem) missionaryDialog.getResponse();
+        MissionaryAction response = (MissionaryAction) responseItem.getObject();
         ArrayList<Object> returnValue = new ArrayList<Object>();
         // TODO: Find a solution so that we can use a more specialized list.
         returnValue.add(response);
