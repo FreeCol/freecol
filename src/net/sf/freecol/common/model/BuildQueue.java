@@ -257,10 +257,10 @@ public class BuildQueue extends FreeColObject implements ListModel {
     /**
      * Returns <code>true</code> if this build queue contains the
      * Building given.
-     * @param type The building type to search for.
-     * @param level The building level to search for.
+     *
+     * @param buildingType The BuildingType to search for.
      * @return Whether this build queue contains the
-     * Building given.
+     * BuildingType given.
      */
     private boolean hasBuildingType(BuildingType buildingType) {
         if (model.contains(buildingType)) {
@@ -349,61 +349,6 @@ public class BuildQueue extends FreeColObject implements ListModel {
     }
 
 
-    /**
-     * Returns an array of four <code>BuildQueue</code>s. The first
-     * contains all buildings already built in the <code>Colony</code>
-     * given. The second contains the current <code>BuildQueue</code>
-     * of the <code>Colony</code> given. The third contains all units
-     * that can be built in the <code>Colony</code> given, except the
-     * Man'O'War, which can only be built after the Declaration of
-     * Independence. The fourth contains all buildings that can be
-     * built in the <code>Colony</code> given.
-     *
-     * @param colony A <code>Colony</code>.
-     * @return An array of four <code>BuildQueue</code>s.
-     */
-    /*
-    public static BuildQueue[] getBuildQueues(Colony colony) {
-        BuildQueue builtList = new BuildQueue(MIXED);
-        BuildQueue buildQueue = colony.getBuildQueue();
-        if (buildQueue.isEmpty()) {
-            System.out.println("buildQueue empty");
-        }
-        BuildQueue unitList = new BuildQueue(UNITS);
-        BuildQueue buildingList = new BuildQueue(BUILDINGS);
-        for (BuildableType item : BuildableType.BUILDINGS) {
-            if (colony.getBuilding(item.getType()).getLevel() < item.getLevel() &&
-                !buildQueue.hasBuilding(item.getType(), item.getLevel())) {
-                buildingList.addUnchecked(item);
-            } else {
-                builtList.addUnchecked(item);
-            }
-        }
-        for (BuildableType item : BuildableType.UNITS) {
-            unitList.addUnchecked(item);
-        }
-        if (!colony.isLandLocked()) {
-            for (BuildableType item : BuildableType.NAVAL_BUILDINGS) {
-                if (colony.getBuilding(item.getType()).getLevel() < item.getLevel() &&
-                !buildQueue.hasBuilding(item.getType(), item.getLevel())) {
-                    buildingList.addUnchecked(item);
-                } else {
-                    builtList.addUnchecked(item);
-                }
-            }
-            for (BuildableType item : BuildableType.NAVAL_UNITS) {
-                unitList.addUnchecked(item);
-            }
-        }
-        return new BuildQueue[] {
-            builtList,
-            buildQueue,
-            unitList,
-            buildingList
-        };
-    }
-    */
-
     public void addListDataListener(ListDataListener l) {
         dataListeners.add(l);
     }
@@ -431,9 +376,6 @@ public class BuildQueue extends FreeColObject implements ListModel {
      * set to <code>false</code>.
      *  
      * @param out The target stream.
-     * @param player The <code>Player</code> this XML-representation 
-     *      should be made for, or <code>null</code> if
-     *      <code>showAll == true</code>.
      * @throws XMLStreamException if there are any problems writing
      *      to the stream.
      */

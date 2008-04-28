@@ -90,7 +90,6 @@ public class ModelMessage extends FreeColObject {
     * @param data Contains data to be displayed in the message or <i>null</i>.
     * @param type The type of this model message.
     * @param display The Object to display.
-    * @see FreeColGameObject#addModelMessage(FreeColGameObject, String, String[][], int)
     */
     @Deprecated
     public ModelMessage(FreeColGameObject source, String id, String[][] data, MessageType type, FreeColObject display) {
@@ -107,8 +106,7 @@ public class ModelMessage extends FreeColObject {
      * @param display The Object to display.
      * @param id The ID of the message to display.
      * @param data Contains data to be displayed in the message or <i>null</i>.
-     * @see FreeColGameObject#addModelMessage(FreeColGameObject, String, String[][], int)
-    */
+     */
     public ModelMessage(FreeColGameObject source, MessageType type, FreeColObject display,
                         String id, String... data) {
         this.source = source;
@@ -178,7 +176,6 @@ public class ModelMessage extends FreeColObject {
      * @param id The ID of the message to display.
      * @param data Contains data to be displayed in the message or <i>null</i>.
      * @param type The type of this model message.
-     * @see FreeColGameObject#addModelMessage(FreeColGameObject, String, String[][], int)
      */
      public ModelMessage(FreeColGameObject source, String id, String[][] data, MessageType type) {
          this(source, type, getDefaultDisplay(type, source), id, convertData(data));
@@ -193,7 +190,6 @@ public class ModelMessage extends FreeColObject {
      *               player getting the message.
      * @param id The ID of the message to display.
      * @param data Contains data to be displayed in the message or <i>null</i>.
-     * @see FreeColGameObject#addModelMessage(FreeColGameObject, String, String[][], int)
      */
      public ModelMessage(FreeColGameObject source, String id, String[][] data) {
          this(source, MessageType.DEFAULT, getDefaultDisplay(MessageType.DEFAULT, source), id, convertData(data));

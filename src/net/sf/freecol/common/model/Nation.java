@@ -127,7 +127,7 @@ public class Nation extends FreeColGameObjectType {
     /**
      * Set the <code>MonarchArt</code> value.
      *
-     * @param newMonarch-Art The new Monarch-Art value.
+     * @param newMonarchArt The new Monarch art value.
      */
     public final void setMonarchArt(final String newMonarchArt) {
         this.monarchArt = newMonarchArt;

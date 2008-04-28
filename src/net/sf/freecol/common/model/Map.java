@@ -319,9 +319,9 @@ public class Map extends FreeColGameObject {
      * @param end
      *            The end of the path.
      * @param type
-     *            One of: {@link #BOTH_LAND_AND_SEA},
-     *            {@link #BOTH_LAND_AND_SEA}, {@link #ONLY_LAND} and
-     *            {@link #ONLY_SEA}. This argument if ignored if
+     *            One of: {@link PathType#BOTH_LAND_AND_SEA},
+     *            {@link PathType#BOTH_LAND_AND_SEA}, {@link PathType#ONLY_LAND} and
+     *            {@link PathType#ONLY_SEA}. This argument if ignored if
      *            <code>unit != null</code>.
      * @return A <code>PathNode</code> for the first tile in the path. Calling
      *         {@link PathNode#getTile} on this object, will return the

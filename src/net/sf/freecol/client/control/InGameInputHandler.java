@@ -1318,7 +1318,6 @@ public final class InGameInputHandler extends InputHandler {
          * Constructor
          * @param unit The unit that is moving
          * @param destinationTile The Tile where the unit will be moving to.
-         * @param bufferAnimation If the animation should be buffered or not.
          * @param focus If before the animation the screen should focus the unit
          */
         public UnitMoveAnimationCanvasSwingTask(Unit unit, Tile destinationTile, boolean focus) {

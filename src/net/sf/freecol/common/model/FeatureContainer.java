@@ -213,7 +213,6 @@ public class FeatureContainer {
      *
      * @param number a <code>float</code> value
      * @param id a <code>String</code> value
-     * @param a <code>float</code> value
      */
     public float applyModifier(float number, String id) {
         return applyModifier(number, id, null, null);
@@ -226,7 +225,6 @@ public class FeatureContainer {
      * @param number a <code>float</code> value
      * @param id a <code>String</code> value
      * @param objectType a <code>FreeColGameObjectType</code> value
-     * @param a <code>float</code> value
      */
     public float applyModifier(float number, String id, FreeColGameObjectType objectType) {
         return applyModifier(number, id, objectType, null);
@@ -240,7 +238,6 @@ public class FeatureContainer {
      * @param id a <code>String</code> value
      * @param objectType a <code>FreeColGameObjectType</code> value
      * @param turn a <code>Turn</code> value
-     * @param a <code>float</code> value
      */
     public float applyModifier(float number, String id, FreeColGameObjectType objectType, Turn turn) {
         return applyModifierSet(number, turn, getModifierSet(id, objectType, turn));
@@ -304,7 +301,7 @@ public class FeatureContainer {
      * ID already present, the old Ability will be replaced.
      *
      * @param ability a <code>Ability</code> value
-     * @param return true if the Ability was added
+     * @return true if the Ability was added
      */
     public boolean addAbility(Ability ability) {
         if (ability == null) {
@@ -324,7 +321,7 @@ public class FeatureContainer {
      * ID already present, the old Modifier will be replaced.
      *
      * @param modifier a <code>Modifier</code> value
-     * @param return true if the Modifier was added
+     * @return true if the Modifier was added
      */
     public boolean addModifier(Modifier modifier) {
         if (modifier == null) {

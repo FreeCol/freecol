@@ -862,7 +862,7 @@ public class Player extends FreeColGameObject implements Nameable {
      * Sets whether this player has contacted the given player.
      * 
      * @param player The <code>Player</code>.
-     * @param b <code>true</code> if this <code>Player</code> has
+     * @param contacted <code>true</code> if this <code>Player</code> has
      * contacted the given <code>Player</code>.
      */
     public void setContacted(Player player, boolean contacted) {

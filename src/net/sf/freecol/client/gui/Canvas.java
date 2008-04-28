@@ -1583,7 +1583,8 @@ public final class Canvas extends JDesktopPane {
      * Displays one of the Europe Dialogs for Recruit, Purchase, Train.
      * Closes any currently open Dialogs. 
      * Does not return from this method before the panel is closed.
-     * @param intCommand One of {ExIT, RECRUIT, PURCHASE, TRAIN, UNLOAD}
+     *    
+     * @param europeAction the type of panel to display
      * @return <code>FreeColDialog.getResponseInt</code>.
      */
     public int showEuropeDialog(EuropePanel.EuropeAction europeAction) {
@@ -1719,8 +1720,8 @@ public final class Canvas extends JDesktopPane {
     /**
      * Displays the <code>DumpCargoDialog</code>.
      * 
-     * @param tile The tile whose panel needs to be displayed.
-     * @see Tile
+     * @param unit The Unit that should dump all cargo
+     * @see Unit
      */
     public void showDumpCargoDialog(Unit unit) {
         DumpCargoDialog dumpCargoDialog = new DumpCargoDialog(this);

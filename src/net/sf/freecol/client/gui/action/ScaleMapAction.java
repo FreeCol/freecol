@@ -203,7 +203,7 @@ public class ScaleMapAction extends FreeColAction {
     
     /**
      * Scales the current map into the specified size. The current
-     * map is given by {@link FreeColClient#getGame()#getMap()}.
+     * map is given by freeColClient.getGame().getMap().
      * 
      * @param width The width of the resulting map.
      * @param height The height of the resulting map.

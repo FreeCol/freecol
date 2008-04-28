@@ -130,7 +130,7 @@ public abstract class Feature extends FreeColObject {
     /**
      * Set the <code>LastTurn</code> value.
      *
-     * @param newEnd The new LastTurn value.
+     * @param newLastTurn The new LastTurn value.
      */
     public final void setLastTurn(final Turn newLastTurn) {
         this.lastTurn = newLastTurn;

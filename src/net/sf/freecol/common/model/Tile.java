@@ -1979,15 +1979,14 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
 
         private Unit missionary = null;
 
-        // private Settlement settlement;
-
         private boolean lostCityRumour;
 
 
         /**
          * Creates a new <code>PlayerExploredTile</code>.
          * 
-         * @param nation The nation.
+         * @param player the player 
+         * @param tic a tile item container
          */
         public PlayerExploredTile(Player player, TileItemContainer tic) {
             this.player = player;
