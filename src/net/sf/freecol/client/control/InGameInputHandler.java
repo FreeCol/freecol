@@ -257,14 +257,17 @@ public final class InGameInputHandler extends InputHandler {
             }
 
             final Tile newTile = map.getNeighbourOrNull(direction, unit.getTile());
-            //Playing the animation before actually moving the unit
-            try {
-                new UnitMoveAnimationCanvasSwingTask(unit, newTile).invokeAndWait();
-            } catch (InvocationTargetException exception) {
-                logger.warning("UnitMoveAnimationCanvasSwingTask raised " + exception.toString());
+            if (newTile==null) {
+                // TODO: find out why this can happen
+            } else {
+                //Playing the animation before actually moving the unit
+                try {
+                    new UnitMoveAnimationCanvasSwingTask(unit, newTile).invokeAndWait();
+                } catch (InvocationTargetException exception) {
+                    logger.warning("UnitMoveAnimationCanvasSwingTask raised " + exception.toString());
+                }
             }
-            
-            if (getFreeColClient().getMyPlayer().canSee(newTile)) {
+            if (newTile!=null && getFreeColClient().getMyPlayer().canSee(newTile)) {
                 unit.moveToTile(newTile);
             } else {
                 unit.dispose();
