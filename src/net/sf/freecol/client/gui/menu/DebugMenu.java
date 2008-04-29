@@ -346,7 +346,28 @@ public class DebugMenu extends JMenu {
             }
         });
 
-        final JMenuItem gc = new JMenuItem("Run the garbage collector");
+        // memory manager
+        final JMenuItem memoryManager = new JMenuItem(Messages.message("menuBar.debug.memoryManager"));
+        memoryManager.setOpaque(false);
+        memoryManager.setMnemonic(KeyEvent.VK_O);
+        this.add(memoryManager);
+        memoryManager.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                long free = Runtime.getRuntime().freeMemory();
+                long total = Runtime.getRuntime().totalMemory();
+                long max = Runtime.getRuntime().maxMemory();
+                String freeMemory = Messages.message("menuBar.debug.memoryManager.free",
+                        "%free%", Long.toString(free/(1024*1024)));
+                String totalMemory = Messages.message("menuBar.debug.memoryManager.total",
+                        "%total%", Long.toString(total/(1024*1024)));
+                String maxMemory = Messages.message("menuBar.debug.memoryManager.max",
+                        "%max%", Long.toString(max/(1024*1024)));
+                canvas.showInformationMessage(freeMemory+"\n"+totalMemory+"\n"+maxMemory);
+            }
+        });
+
+        // garbage collector
+        final JMenuItem gc = new JMenuItem(Messages.message("menuBar.debug.memoryManager.gc"));
         gc.setOpaque(false);
         gc.setMnemonic(KeyEvent.VK_G);
         this.add(gc);
