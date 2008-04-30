@@ -187,20 +187,22 @@ public final class ReportTurnPanel extends ReportPanel implements ActionListener
                 });
                 reportPanel.add(ignoreButton, higConst.rc(row, button1Column, ""));
             }
-            JButton filterButton = new JButton("X");
-            filterButton.setToolTipText(Messages.message("model.message.filter", 
-                    "%type%", message.getTypeName()));
             final BooleanOption filterOption = options.getBooleanOption(message);
-            filterButton.addActionListener(new ActionListener() {
-                public void actionPerformed(ActionEvent event) {
-                    boolean flag = filterOption.getValue();
-                    filterOption.setValue(!flag);
-                    textPane.setEnabled(!flag);
-                    label.setEnabled(!flag);
-                }
-            });
-            reportPanel.add(filterButton, higConst.rc(row, button2Column, ""));
-
+            // Message type can be filtered
+            if(filterOption != null){
+                JButton filterButton = new JButton("X");
+                filterButton.setToolTipText(Messages.message("model.message.filter", 
+                    "%type%", message.getTypeName()));
+                filterButton.addActionListener(new ActionListener() {
+                    public void actionPerformed(ActionEvent event) {
+                        boolean flag = filterOption.getValue();
+                        filterOption.setValue(!flag);
+                        textPane.setEnabled(!flag);
+                        label.setEnabled(!flag);
+                    }
+                });
+                reportPanel.add(filterButton, higConst.rc(row, button2Column, ""));
+            }
             row += 2;
         }
 
