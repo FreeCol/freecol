@@ -70,6 +70,11 @@ public class Nation extends FreeColGameObjectType {
      */
     private String monarchArt;
 
+    /**
+     * Describe anthem here.
+     */
+    private String anthem;
+
 
     /**
      * Sole constructor.
@@ -131,6 +136,24 @@ public class Nation extends FreeColGameObjectType {
      */
     public final void setMonarchArt(final String newMonarchArt) {
         this.monarchArt = newMonarchArt;
+    }
+
+    /**
+     * Get the <code>Anthem</code> value.
+     *
+     * @return a <code>String</code> value
+     */
+    public final String getAnthem() {
+        return anthem;
+    }
+
+    /**
+     * Set the <code>Anthem</code> value.
+     *
+     * @param newAnthem The new Anthem value.
+     */
+    public final void setAnthem(final String newAnthem) {
+        this.anthem = newAnthem;
     }
 
     /**
@@ -232,6 +255,7 @@ public class Nation extends FreeColGameObjectType {
         refID = getAttribute(in, "ref-of", null);
         coatOfArms = getAttribute(in, "coat-of-arms", "native.png");
         monarchArt = getAttribute(in, "monarch-art", "louis.png");
+        anthem = in.getAttributeValue(null, "anthem");
         in.nextTag();
    }
 

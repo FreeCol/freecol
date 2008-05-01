@@ -55,7 +55,7 @@ public final class Playlist {
     * The constructor to use. All songs will be played once, in order.
     * @param soundFiles The sounds that will make up this Playlist. The order of the sounds is important.
     */
-    public Playlist(File[] soundFiles) {
+    public Playlist(File... soundFiles) {
         if (soundFiles.length == 0) {
             throw new IllegalArgumentException("It's not possible to create an empty Playlist.");
         }

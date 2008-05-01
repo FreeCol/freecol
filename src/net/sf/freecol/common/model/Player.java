@@ -652,6 +652,7 @@ public class Player extends FreeColGameObject implements Nameable {
         }
         europe.dispose();
         europe = null;
+        monarch = null;
     }
 
     /**

@@ -51,6 +51,7 @@ import net.sf.freecol.client.gui.option.FreeColActionUI;
 import net.sf.freecol.client.gui.panel.ChoiceItem;
 import net.sf.freecol.client.gui.panel.EventPanel;
 import net.sf.freecol.client.gui.sound.SfxLibrary;
+import net.sf.freecol.client.gui.sound.SoundLibrary.SoundEffect;
 import net.sf.freecol.client.networking.Client;
 import net.sf.freecol.common.Specification;
 import net.sf.freecol.common.model.AbstractGoods;
@@ -261,7 +262,6 @@ public final class InGameController implements NetworkConstants {
         freeColClient.getMyPlayer().declareIndependence();
         freeColClient.getActionManager().update();
         freeColClient.getClient().sendAndWait(declareIndependenceElement);
-        freeColClient.getMyPlayer().setMonarch(null);
 
         canvas.showDeclarationDialog();
     }
@@ -321,8 +321,7 @@ public final class InGameController implements NetworkConstants {
             }
 
             if (!freeColClient.isSingleplayer()) {
-                freeColClient.playSound(SfxLibrary.ANTHEM_BASE + currentPlayer.getNationType().getIndex());
-                // FIXME: this doesn't work properly, the french anthem is played for dutch player.
+                freeColClient.playSound(currentPlayer.getNation().getAnthem());
             }
             
             checkTradeRoutesInEurope();
@@ -1034,7 +1033,7 @@ public final class InGameController implements NetworkConstants {
             exploreLostCityRumour(unit, direction);
             break;
         case ILLEGAL_MOVE:
-            freeColClient.playSound(SfxLibrary.ILLEGAL_MOVE);
+            freeColClient.playSound(SoundEffect.ILLEGAL_MOVE);
             break;
         default:
             throw new RuntimeException("unrecognised move: " + move);
@@ -1684,7 +1683,7 @@ public final class InGameController implements NetworkConstants {
                                                                        "model.diplomacy.attack.confirm", "cancel",
                                                                        "%replace%", enemy.getNationAsString());
                 case ALLIANCE:
-                    freeColClient.playSound(SfxLibrary.ILLEGAL_MOVE);
+                    freeColClient.playSound(SoundEffect.ILLEGAL_MOVE);
                     freeColClient.getCanvas().showInformationMessage("model.diplomacy.attack.alliance",
                                                                      "%replace%", enemy.getNationAsString());
                     return false;
@@ -1733,7 +1732,7 @@ public final class InGameController implements NetworkConstants {
         Tile target = game.getMap().getNeighbourOrNull(direction, unit.getTile());
 
         if (unit.hasAbility("model.ability.bombard") || unit.isNaval()) {
-            freeColClient.playSound(SfxLibrary.ARTILLERY);
+            freeColClient.playSound(SoundEffect.ARTILLERY);
         }
 
         Element attackElement = Message.createNewRootElement("attack");
@@ -1796,19 +1795,19 @@ public final class InGameController implements NetworkConstants {
                 if (winner.isArmed()) {
                     if (winner.isMounted()) {
                         if (winner.getOwner().isIndian()) {
-                            freeColClient.playSound(SfxLibrary.MUSKETSHORSES);
+                            freeColClient.playSound(SoundEffect.MUSKETS_HORSES);
                         } else {
-                            freeColClient.playSound(SfxLibrary.DRAGOON);
+                            freeColClient.playSound(SoundEffect.DRAGOON);
                         }
                     } else {
-                        freeColClient.playSound(SfxLibrary.ATTACK);
+                        freeColClient.playSound(SoundEffect.ATTACK);
                     }
                 } else if (winner.isMounted()) {
-                    freeColClient.playSound(SfxLibrary.DRAGOON);
+                    freeColClient.playSound(SoundEffect.DRAGOON);
                 }
             } else {
                 if (result == CombatResultType.GREAT_WIN || result == CombatResultType.GREAT_LOSS) {
-                    freeColClient.playSound(SfxLibrary.SUNK);
+                    freeColClient.playSound(SoundEffect.SUNK);
                 }
             }
             try {
@@ -2000,7 +1999,7 @@ public final class InGameController implements NetworkConstants {
             return false;
         }
 
-        freeColClient.playSound(SfxLibrary.LOAD_CARGO);
+        freeColClient.playSound(SoundEffect.LOAD_CARGO);
 
         Element boardShipElement = Message.createNewRootElement("boardShip");
         boardShipElement.setAttribute("unit", unit.getId());
@@ -2073,7 +2072,7 @@ public final class InGameController implements NetworkConstants {
             throw new NullPointerException();
         }
 
-        freeColClient.playSound(SfxLibrary.LOAD_CARGO);
+        freeColClient.playSound(SoundEffect.LOAD_CARGO);
 
         Client client = freeColClient.getClient();
         goods.adjustAmount();
@@ -2168,7 +2167,7 @@ public final class InGameController implements NetworkConstants {
             return;
         }
 
-        freeColClient.playSound(SfxLibrary.LOAD_CARGO);
+        freeColClient.playSound(SoundEffect.LOAD_CARGO);
 
         Element buyGoodsElement = Message.createNewRootElement("buyGoods");
         buyGoodsElement.setAttribute("carrier", carrier.getId());
@@ -2195,7 +2194,7 @@ public final class InGameController implements NetworkConstants {
         Client client = freeColClient.getClient();
         Player player = freeColClient.getMyPlayer();
 
-        freeColClient.playSound(SfxLibrary.SELL_CARGO);
+        freeColClient.playSound(SoundEffect.SELL_CARGO);
 
         goods.adjustAmount();
 

@@ -52,6 +52,7 @@ import net.sf.freecol.client.gui.action.ActionManager;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.client.gui.sound.MusicLibrary;
 import net.sf.freecol.client.gui.sound.SfxLibrary;
+import net.sf.freecol.client.gui.sound.SoundLibrary;
 import net.sf.freecol.client.gui.sound.SoundPlayer;
 import net.sf.freecol.client.networking.Client;
 import net.sf.freecol.common.PseudoRandom;
@@ -71,10 +72,8 @@ import org.w3c.dom.Element;
  * keeps references to the GUI and the control objects.
  */
 public final class FreeColClient {
+
     private static final Logger logger = Logger.getLogger(FreeColClient.class.getName());
-
-
-
 
     // Control:
     private ConnectController connectController;
@@ -615,7 +614,18 @@ public final class FreeColClient {
      * 
      * @param sound The key sound effect given by {@link SfxLibrary}.
      */
-    public void playSound(int sound) {
+    public void playSound(String sound) {
+        if (sfxPlayer != null) {
+            sfxPlayer.play(sfxLibrary.get(sound));
+        }
+    }
+
+    /**
+     * Plays the given sound effect.
+     * 
+     * @param sound The key sound effect given by {@link SfxLibrary}.
+     */
+    public void playSound(SoundLibrary.SoundEffect sound) {
         if (sfxPlayer != null) {
             sfxPlayer.play(sfxLibrary.get(sound));
         }

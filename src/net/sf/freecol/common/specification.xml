@@ -1459,16 +1459,16 @@
   </nation-types>
 
   <nations>
-    <nation id="model.nation.dutch" color="#ff9d3c" 
+    <nation id="model.nation.dutch" color="#ff9d3c" anthem="anthem_dutch"
             nation-type="model.nationType.trade" selectable="true" classic="true"
             monarch-art="william.png" coat-of-arms="dutch.png"/>
-    <nation id="model.nation.french" color="#0000ff"
+    <nation id="model.nation.french" color="#0000ff" anthem="anthem_french"
             nation-type="model.nationType.cooperation" selectable="true" classic="true"
             monarch-art="louis.png" coat-of-arms="french.png"/>
-    <nation id="model.nation.english" color="#ff0000"
+    <nation id="model.nation.english" color="#ff0000" anthem="anthem_english"
             nation-type="model.nationType.immigration" selectable="true" classic="true"
             monarch-art="elizabeth.png" coat-of-arms="english.png"/>
-    <nation id="model.nation.spanish" color="#ffff00"
+    <nation id="model.nation.spanish" color="#ffff00" anthem="anthem_spanish"
             nation-type="model.nationType.conquest" selectable="true" classic="true"
             monarch-art="philip.png" coat-of-arms="spanish.png"/>
     <nation id="model.nation.portuguese" color="#00ff00"

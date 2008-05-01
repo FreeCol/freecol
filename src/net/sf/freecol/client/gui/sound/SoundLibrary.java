@@ -20,154 +20,96 @@
 package net.sf.freecol.client.gui.sound;
 
 import java.io.File;
-import java.util.ArrayList;
+import java.io.FileFilter;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.Map;
 
 import net.sf.freecol.common.FreeColException;
 
 /**
- * A <i>SoundLibrary</i> stores an array of playlists.
+ * A <i>SoundLibrary</i> stores a number of playlists.
  */
 public class SoundLibrary {
 
 
+    // These constants are used to index the "Playlist[]" from SoundLibrary:
+    public static enum SoundEffect { ERROR,
+            ATTACK,
+            ILLEGAL_MOVE,
+            LOAD_CARGO,
+            SELL_CARGO,
+            ARTILLERY,
+            HORSES,
+            MUSKETS_HORSES,
+            DRAGOON,
+            SUNK }
 
+    
     /** This array contains the playlists. */
-    private Playlist[] playlists;
+    private Map<String, Playlist> playlists = new HashMap<String, Playlist>();
 
+    private static final FileFilter soundFileFilter =
+        new FileFilter() {
+            public boolean accept(File file) {
+                if (file.isDirectory()) {
+                    return false;
+                } else {
+                    String s = file.getName();
+                    return (s.endsWith(".au") || s.endsWith(".rmf") || 
+                            s.endsWith(".mid") || s.endsWith(".wav") || 
+                            s.endsWith(".aif") || s.endsWith(".aiff"));
+                }
+            }
+        };
+                
 
     /**
      * The constructor. Load the directory spesified by <i>file</i>.
      * 
-     * @param file A directory containing the sound-files.
+     * @param dir A directory containing the sound-files.
      * @throws FreeColException If the file spesified is not a directory.
      */
-    public SoundLibrary(File file) throws FreeColException {
-        if (!file.isDirectory())
-            throw new FreeColException("The file \"" + file.getName() + "\" is not a directory.");
+    public SoundLibrary(File dir) throws FreeColException {
+        if (!dir.isDirectory()) {
+            throw new FreeColException("The file \"" + dir.getName() + "\" is not a directory.");
+        }
 
-        HashMap<Integer, Playlist> playlists = new HashMap<Integer, Playlist>();
-        int greatestNumber = -1;
-
-        String[] files = file.list();
-
-        for (int i = 0; i < files.length; i++) {
-            File leafFile = new File(file.getAbsolutePath(), files[i]);
-            if (leafFile.getAbsolutePath().endsWith(".svn"))
+        for (File file : dir.listFiles()) {
+            if (file.getName().endsWith(".svn")) {
                 continue;
-            int fileNumber = getNumber(leafFile.getName());
-
-            if (fileNumber == -1)
-                continue;
-
-            if (fileNumber > greatestNumber)
-                greatestNumber = fileNumber;
-
-            if (leafFile.isDirectory()) {
-                ArrayList<File> arrayList = new ArrayList<File>();
-                playlists.put(new Integer(fileNumber), new Playlist(loadFiles(leafFile.getAbsolutePath(), arrayList)
-                        .toArray(new File[0])));
+            } else if (file.isDirectory()) {
+                File[] files = file.listFiles(soundFileFilter);
+                Arrays.sort(files);
+                playlists.put(file.getName(), new Playlist(files));
             } else {
-                ArrayList<File> arrayList = new ArrayList<File>();
-                addFile(leafFile, arrayList);
-                playlists.put(fileNumber, new Playlist(arrayList.toArray(new File[0])));
+                String fileName = file.getName();
+                fileName = fileName.substring(0, fileName.lastIndexOf('.'));
+                playlists.put(fileName, new Playlist(file));
             }
 
         }
-
-        this.playlists = new Playlist[greatestNumber + 1];
-
-        for (int i = 0; i < greatestNumber + 1; i++)
-            if (playlists.containsKey(new Integer(i)))
-                this.playlists[i] = playlists.get(i);
     }
 
     /**
-     * Get a number from a filename like this:
+     * Returns a playlist associated with a <code>Nation</code>.
      * 
-     * "01Attack.wav" returns 1. "Build12.wav" returns 12.
-     * 
-     * @param filename The filename to get the number from.
-     * @return Mentioned above.
+     * @param string The key to look up a Playlist.
+     * @return The <code>PlayList</code> specified by the ID.
      */
-    private int getNumber(String filename) {
-        StringBuffer stringBuffer = new StringBuffer();
-
-        for (int i = 0; i < filename.length(); i++)
-            if (Character.isDigit(filename.charAt(i)))
-                stringBuffer.append(filename.charAt(i));
-
-        try {
-            return Integer.parseInt(stringBuffer.toString());
-        } catch (NumberFormatException e) {
-            return -1;
-        }
+    public Playlist get(String string) {
+        return playlists.get(string);
     }
 
-    /**
-     * Go recursive through the files/directories from the file/directory
-     * spesified by name and add the files to an <i>ArrayList</i>.
-     * 
-     * @param name A file/directory containing sound/sound-files.
-     * @param arrayList The arrayList you should add the sound files to.
-     * @return The <i>ArrayList</i> with the files added.
-     */
-    private ArrayList<File> loadFiles(String name, ArrayList<File> arrayList) {
-        try {
-            File file = new File(name);
-
-            if (file != null && file.isDirectory()) {
-                String[] files = file.list();
-                for (int i = 0; i < files.length; i++) {
-                    File leafFile = new File(file.getAbsolutePath(), files[i]);
-                    if (leafFile.isDirectory()) {
-                        loadFiles(leafFile.getAbsolutePath(), arrayList);
-                    } else {
-                        addFile(leafFile, arrayList);
-                    }
-                }
-            } else if (file != null && file.exists()) {
-                addFile(file, arrayList);
-            }
-
-        } catch (SecurityException ex) {
-            // TODO: Log the exception: "SecurityException while loading files."
-        } catch (Exception ex) {
-            // TODO: Log the exception: "Error while loading files."
-        }
-
-        return arrayList;
-    }
-
-    /**
-     * Adds a file to an <i>ArrayList</i>. It only adds files that ends with
-     * ".au", ".mid", ".aif", ".aiff", ".rmf" or ".wav"; other files are
-     * ignored.
-     * 
-     * @param file The file to add.
-     * @param arrayList The arrayList the file is added to.
-     */
-    private void addFile(File file, ArrayList<File> arrayList) {
-        String s = file.getName();
-
-        // Only accept sound file-types.
-        if (s.endsWith(".au") || s.endsWith(".rmf") || s.endsWith(".mid") || s.endsWith(".wav") || s.endsWith(".aif")
-                || s.endsWith(".aiff")) {
-
-            arrayList.add(file);
-        }
-    }
 
     /**
      * Returns a playlist identified by id.
      * 
-     * @param id The ID.
-     * @return The <code>PlayList</code> specified by the ID.
+     * @param effect The sound effect.
+     * @return The <code>Playlist</code> specified by the ID.
      */
-    public Playlist get(int id) {
-        if (id >= 0 && id < playlists.length)
-            return playlists[id];
-        else
-            return null;
+    public Playlist get(SoundEffect effect) {
+        return playlists.get(effect.toString().toLowerCase());
     }
+
 }
