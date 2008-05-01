@@ -832,10 +832,10 @@ public class SimpleCombatModel implements CombatModel {
                 tTrain.setTreasureAmount((tTrain.getTreasureAmount() * 3) / 2);
             }
 
-            attacker.addModelMessage(attacker, "model.unit.indianTreasure", new String[][] {
-                    { "%indian%", enemy.getNationAsString() },
-                    { "%amount%", Integer.toString(tTrain.getTreasureAmount()) }
-                }, ModelMessage.MessageType.DEFAULT);
+            attacker.addModelMessage(attacker, ModelMessage.MessageType.DEFAULT,
+                                     "model.unit.indianTreasure",
+                                     "%indian%", enemy.getNationAsString(),
+                                     "%amount%", Integer.toString(tTrain.getTreasureAmount()));
         }
         attacker.setLocation(newTile);
     }

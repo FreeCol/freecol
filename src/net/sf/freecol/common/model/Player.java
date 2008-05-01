@@ -622,9 +622,9 @@ public class Player extends FreeColGameObject implements Nameable {
             u.dispose();
         }
         if (unitNames.length() > 0) {
-            addModelMessage(this, "model.player.independence.unitsSeized", 
-                            new String[][] {{"%units%", unitNames.substring(2)}},
-                            ModelMessage.MessageType.UNIT_LOST);
+            addModelMessage(this, ModelMessage.MessageType.UNIT_LOST,
+                            "model.player.independence.unitsSeized", 
+                            "%units%", unitNames.substring(2));
         }
         List<Unit> veterans = new ArrayList<Unit>();
         for (Colony colony : getColonies()) {
@@ -642,11 +642,10 @@ public class Player extends FreeColGameObject implements Nameable {
                         // TODO: use a new upgrade type?
                         unit.setType(unit.getType().getPromotion());
                     }
-                    addModelMessage(colony, "model.player.continentalArmyMuster", 
-                                    new String[][] {
-                                        { "%colony%", colony.getName() },
-                                        { "%number%", String.valueOf(limit) }
-                                    }, ModelMessage.MessageType.DEFAULT);
+                    addModelMessage(colony, ModelMessage.MessageType.DEFAULT,
+                                    "model.player.continentalArmyMuster", 
+                                    "%colony%", colony.getName(),
+                                    "%number%", String.valueOf(limit));
                 }
                 veterans.clear();
             }
@@ -667,7 +666,7 @@ public class Player extends FreeColGameObject implements Nameable {
         }
         setPlayerType(PlayerType.INDEPENDENT);
         setStance(getREFPlayer(), Stance.PEACE);
-        addModelMessage(this, "model.player.independence", null, ModelMessage.MessageType.DEFAULT);
+        addModelMessage(this, ModelMessage.MessageType.DEFAULT, "model.player.independence");
     }
 
     /**
@@ -2053,11 +2052,10 @@ public class Player extends FreeColGameObject implements Nameable {
 
         allFathers.add(father);
 
-        addModelMessage(this, "model.player.foundingFatherJoinedCongress", 
-                        new String[][] {
-                            { "%foundingFather%", father.getName() },
-                            { "%description%", father.getDescription() }
-                        }, ModelMessage.MessageType.DEFAULT);
+        addModelMessage(this, ModelMessage.MessageType.DEFAULT,
+                        "model.player.foundingFatherJoinedCongress", 
+                        "%foundingFather%", father.getName(),
+                        "%description%", father.getDescription());
         featureContainer.add(father.getFeatureContainer());
 
         List<AbstractUnit> units = father.getUnits();
@@ -2193,13 +2191,15 @@ public class Player extends FreeColGameObject implements Nameable {
                 newSoL = newSoL / numberOfColonies;
                 if (oldSoL / 10 != newSoL / 10) {
                     if (newSoL > oldSoL) {
-                        addModelMessage(this, "model.player.SoLIncrease", new String[][] {
-                                { "%oldSoL%", String.valueOf(oldSoL) }, { "%newSoL%", String.valueOf(newSoL) } },
-                            ModelMessage.MessageType.SONS_OF_LIBERTY);
+                        addModelMessage(this, ModelMessage.MessageType.SONS_OF_LIBERTY,
+                                        "model.player.SoLIncrease",
+                                        "%oldSoL%", String.valueOf(oldSoL),
+                                        "%newSoL%", String.valueOf(newSoL));
                     } else {
-                        addModelMessage(this, "model.player.SoLDecrease", new String[][] {
-                                { "%oldSoL%", String.valueOf(oldSoL) }, { "%newSoL%", String.valueOf(newSoL) } },
-                            ModelMessage.MessageType.SONS_OF_LIBERTY);
+                        addModelMessage(this, ModelMessage.MessageType.SONS_OF_LIBERTY,
+                                        "model.player.SoLDecrease",
+                                        "%oldSoL%", String.valueOf(oldSoL),
+                                        "%newSoL%", String.valueOf(newSoL));
                     }
                 }
             }

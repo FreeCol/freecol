@@ -1349,15 +1349,15 @@ public final class Colony extends Settlement implements Location, Nameable {
             // Kill a colonist:
             getRandomUnit().dispose();
             removeGoods(Goods.FOOD, food);
-            addModelMessage(this, "model.colony.colonistStarved", new String[][] { { "%colony%", getName() } },
-                    ModelMessage.MessageType.UNIT_LOST);
+            addModelMessage(this, ModelMessage.MessageType.UNIT_LOST,
+                            "model.colony.colonistStarved", "%colony%", getName());
         } else {
             removeGoods(Goods.FOOD, eat);
 
             if (eat > getFoodProduction() && (food - eat) / (eat - getFoodProduction()) <= 3) {
-                addModelMessage(this, "model.colony.famineFeared", new String[][] { { "%colony%", getName() },
-                        { "%number%", Integer.toString((food - eat) / (eat - getFoodProduction())) } },
-                        ModelMessage.MessageType.WARNING);
+                addModelMessage(this, ModelMessage.MessageType.WARNING,
+                                "model.colony.famineFeared", "%colony%", getName(),
+                                "%number%", Integer.toString((food - eat) / (eat - getFoodProduction())));
             }
         }
     }
