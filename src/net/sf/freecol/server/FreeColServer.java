@@ -20,11 +20,9 @@
 package net.sf.freecol.server;
 
 import java.awt.Color;
-import java.io.BufferedInputStream;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -39,8 +37,9 @@ import java.util.List;
 import java.util.Random;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.jar.JarEntry;
+import java.util.jar.JarOutputStream;
 import java.util.logging.Logger;
-import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
 import javax.xml.stream.XMLInputFactory;
@@ -53,14 +52,15 @@ import javax.xml.stream.XMLStreamWriter;
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.common.FreeColException;
 import net.sf.freecol.common.PseudoRandom;
+import net.sf.freecol.common.io.FreeColSavegameFile;
 import net.sf.freecol.common.model.FreeColGameObject;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Player;
-import net.sf.freecol.common.model.Player.PlayerType;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
-import net.sf.freecol.common.model.Unit.UnitState;
 import net.sf.freecol.common.model.UnitType;
+import net.sf.freecol.common.model.Player.PlayerType;
+import net.sf.freecol.common.model.Unit.UnitState;
 import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.networking.Message;
 import net.sf.freecol.common.networking.NoRouteToServerException;
@@ -92,8 +92,6 @@ import org.w3c.dom.Element;
 public final class FreeColServer {
 
     private static Logger logger = Logger.getLogger(FreeColServer.class.getName());
-
-    private static final boolean DISABLE_SAVEGAME_COMPRESSION = false;
 
     private static final int META_SERVER_UPDATE_INTERVAL = 60000;
 
@@ -552,21 +550,17 @@ public final class FreeColServer {
     public void saveGame(File file, String username) throws IOException {
         final Game game = getGame();
         XMLOutputFactory xof = XMLOutputFactory.newInstance();
-        FileOutputStream fos = null;
+        JarOutputStream fos = null;
         try {
             XMLStreamWriter xsw;
             GZIPOutputStream gzip;
-            fos = new FileOutputStream(file);
-            if (DISABLE_SAVEGAME_COMPRESSION) {
-                // No compression
-                xsw = xof.createXMLStreamWriter(fos, "UTF-8");
-            } else {
-                // Compression
-                gzip = new GZIPOutputStream(fos);
-                xsw = xof.createXMLStreamWriter(gzip);
-            }
+            fos = new JarOutputStream(new FileOutputStream(file));
+            fos.putNextEntry(new JarEntry(file.getName().split("\\.")[0] + "/" + FreeColSavegameFile.SAVEGAME_FILE));
+            xsw = xof.createXMLStreamWriter(fos, "UTF-8");
+
             xsw.writeStartDocument("UTF-8", "1.0");
             xsw.writeStartElement("savedGame");
+            
             // Add the attributes:
             xsw.writeAttribute("owner", username);
             xsw.writeAttribute("publicServer", Boolean.toString(publicServer));
@@ -593,10 +587,6 @@ public final class FreeColServer {
             xsw.writeEndDocument();
             xsw.flush();
             xsw.close();
-            if (!DISABLE_SAVEGAME_COMPRESSION) {
-                gzip.finish();
-                gzip.close();
-            }
         } catch (XMLStreamException e) {
             StringWriter sw = new StringWriter();
             e.printStackTrace(new PrintWriter(sw));
@@ -609,7 +599,7 @@ public final class FreeColServer {
             throw new IOException(e.toString());
         } finally {
             try {
-                if (fos!=null) {
+                if (fos != null) {
                     fos.close();
                 }
             } catch (IOException e) {
@@ -628,16 +618,8 @@ public final class FreeColServer {
      *                <code>XMLStreamException</code> have been thrown by the
      *                parser.
      */
-    public static XMLStreamReader createXMLStreamReader(FileInputStream fis) throws IOException {
-        InputStream in = new BufferedInputStream(fis);
-        // Automatically detect compression:
-        in.mark(10);
-        byte[] buf = new byte[5];
-        in.read(buf, 0, 5);
-        in.reset();
-        if (!(new String(buf)).equals("<?xml")) {
-            in = new BufferedInputStream(new GZIPInputStream(in));
-        }
+    public static XMLStreamReader createXMLStreamReader(FreeColSavegameFile fis) throws IOException {
+        InputStream in = fis.getSavegameInputStream();
         XMLInputFactory xif = XMLInputFactory.newInstance();
         try {
             return xif.createXMLStreamReader(in);
@@ -663,9 +645,9 @@ public final class FreeColServer {
      */
     public String loadGame(File file) throws IOException, FreeColException {
         boolean doNotLoadAI = false;
-        FileInputStream fis = null;
+        FreeColSavegameFile fis = null;
         try {
-            fis = new FileInputStream(file);
+            fis = new FreeColSavegameFile(file);
             XMLStreamReader xsr = createXMLStreamReader(fis);
             xsr.nextTag();
             final String version = xsr.getAttributeValue(null, "version");
@@ -761,11 +743,8 @@ public final class FreeColServer {
             logger.warning(sw.toString());
             throw new IOException(e.toString());
         } finally {
-            try {
-                if (fis!=null)
-                    fis.close();
-            } catch (IOException e) {
-                // do nothing
+            if (fis != null) {
+                fis.close();
             }
         }
     }

@@ -28,7 +28,6 @@ import java.awt.Rectangle;
 import java.awt.Toolkit;
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.Locale;
@@ -56,6 +55,7 @@ import net.sf.freecol.client.gui.sound.MusicLibrary;
 import net.sf.freecol.client.gui.sound.SfxLibrary;
 import net.sf.freecol.common.FreeColException;
 import net.sf.freecol.common.Specification;
+import net.sf.freecol.common.io.FreeColSavegameFile;
 import net.sf.freecol.common.logging.DefaultHandler;
 import net.sf.freecol.common.networking.NoRouteToServerException;
 import net.sf.freecol.common.option.LanguageOption;
@@ -87,7 +87,7 @@ public final class FreeCol {
      */
     private static Specification specification;
 
-    private static final String FREECOL_VERSION = "0.8.0-svn";
+    private static final String FREECOL_VERSION = "test";
     private static String FREECOL_REVISION;
     
     private static final String MIN_JDK_VERSION = "1.5";
@@ -181,10 +181,10 @@ public final class FreeCol {
             try {
                 final FreeColServer freeColServer;
                 if (savegameFile != null) {
-                    FileInputStream fis = null;
+                    FreeColSavegameFile fis = null;
                     try {
                         // Get suggestions for "singleplayer" and "public game" settings from the file:
-                        fis = new FileInputStream(savegameFile);
+                        fis = new FreeColSavegameFile(savegameFile);
                         XMLStreamReader in = FreeColServer.createXMLStreamReader(fis);
                         in.nextTag();
                         final boolean defaultSingleplayer = Boolean.valueOf(in.getAttributeValue(null, "singleplayer")).booleanValue();
@@ -203,12 +203,8 @@ public final class FreeCol {
                         System.out.println("Could not load savegame.");
                         return;
                     } finally {
-                        try {
-                            if (fis!=null) {
-                                fis.close();
-                            }
-                        } catch (IOException e) {
-                            // do nothing
+                        if (fis!=null) {
+                            fis.close();
                         }
                     }
                 } else {

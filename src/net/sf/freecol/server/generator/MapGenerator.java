@@ -20,8 +20,6 @@
 package net.sf.freecol.server.generator;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.ArrayList;
@@ -39,6 +37,7 @@ import javax.xml.stream.XMLStreamReader;
 
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.common.FreeColException;
+import net.sf.freecol.common.io.FreeColSavegameFile;
 import net.sf.freecol.common.model.AbstractGoods;
 import net.sf.freecol.common.model.AbstractUnit;
 import net.sf.freecol.common.model.Building;
@@ -56,13 +55,13 @@ import net.sf.freecol.common.model.IndianSettlement;
 import net.sf.freecol.common.model.Map;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.ResourceType;
-import net.sf.freecol.common.model.Settlement.SettlementType;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.TileType;
 import net.sf.freecol.common.model.Unit;
-import net.sf.freecol.common.model.Unit.UnitState;
 import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.model.Map.Position;
+import net.sf.freecol.common.model.Settlement.SettlementType;
+import net.sf.freecol.common.model.Unit.UnitState;
 import net.sf.freecol.common.networking.Message;
 import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.model.ServerPlayer;
@@ -150,10 +149,10 @@ public class MapGenerator {
          * TODO-LATER: We are using same method in FreeColServer.
          *       Create a framework for loading games/maps.
          */
-        FileInputStream fis = null;
+        FreeColSavegameFile fis = null;
         try {
             Game game = null;
-            fis = new FileInputStream(importFile);
+            fis = new FreeColSavegameFile(importFile);
             XMLStreamReader xsr = FreeColServer.createXMLStreamReader(fis);
             xsr.nextTag();
             final String version = xsr.getAttributeValue(null, "version");
@@ -198,11 +197,8 @@ public class MapGenerator {
             logger.warning(sw.toString());
             return null;
         } finally {
-            try {
-                if (fis!=null)
-                    fis.close();
-            } catch (IOException e) {
-                // do nothing
+            if (fis != null) {
+                fis.close();
             }
         }
     }
