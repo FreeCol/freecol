@@ -927,6 +927,16 @@ public final class GUI {
         }
     }
 
+    private int getXOffset(int clipLeftX, int tileY) {
+        int xx = clipLeftX;
+        if ((tileY % 2) != 0) {
+            xx += tileWidth / 2;
+        }
+        return xx;
+    }
+
+
+
     /**
      * Displays the Map onto the given Graphics2D object. The Tile at
      * location (x, y) is displayed in the center.
@@ -934,7 +944,8 @@ public final class GUI {
      */
     private void displayMap(Graphics2D g) {
         Rectangle clipBounds = g.getClipBounds();
-        Game gameData = freeColClient.getGame();
+        Map map = freeColClient.getGame().getMap();
+
         /*
         PART 1
         ======
@@ -996,7 +1007,6 @@ public final class GUI {
         g.setColor(Color.black);
         g.fillRect(clipBounds.x, clipBounds.y, clipBounds.width, clipBounds.height);
         int xx;
-        Map map = gameData.getMap();
 
         /*
         PART 2a
@@ -1008,17 +1018,11 @@ public final class GUI {
 
         // Row per row; start with the top modified row
         for (int tileY = clipTopRow; tileY <= clipBottomRow; tileY++) {
-            xx = clipLeftX;
-            if ((tileY % 2) != 0) {
-                xx += tileWidth / 2;
-            }
+            xx = getXOffset(clipLeftX, tileY);
 
             // Column per column; start at the left side to display the tiles.
             for (int tileX = clipLeftCol; tileX <= clipRightCol; tileX++) {
-                if (map.isValid(tileX, tileY)) {
-                    // Display the Tile:
-                    displayBaseTile(g, map, map.getTile(tileX, tileY), xx, yy, true);
-                }
+                displayBaseTile(g, map, map.getTile(tileX, tileY), xx, yy, true);
                 xx += tileWidth;
             }
 
@@ -1039,10 +1043,7 @@ public final class GUI {
 
         // Row per row; start with the top modified row
         for (int tileY = clipTopRow; tileY <= clipBottomRow; tileY++) {
-            xx = clipLeftX;
-            if ((tileY % 2) != 0) {
-                xx += tileWidth / 2;
-            }
+            xx = getXOffset(clipLeftX, tileY);
 
             if (displayGrid) {
                 // Display the grid.
@@ -1054,39 +1055,31 @@ public final class GUI {
 
             // Column per column; start at the left side to display the tiles.
             for (int tileX = clipLeftCol; tileX <= clipRightCol; tileX++) {
-                if (map.isValid(tileX, tileY)) {
+                Tile tile = map.getTile(tileX, tileY);
                     
-                    Tile tile = map.getTile(tileX, tileY);
+                // Display the Tile overlays:
+                displayTileOverlays(g, map, tile, xx, yy, true, true);
                     
-                    // Display the Tile overlays:
-                    displayTileOverlays(g, map, tile, xx, yy, true, true);
-                    
-                    if(viewMode.displayTileCursor(tile,xx,yy)){
-                        drawCursor(g, xx, yy);
-                    }
+                if (viewMode.displayTileCursor(tile,xx,yy)) {
+                    drawCursor(g, xx, yy);
                 }
                 xx += tileWidth;
             }
 
-            xx = clipLeftX;
-            if ((tileY % 2) != 0) {
-                xx += tileWidth / 2;
-            }
+            xx = getXOffset(clipLeftX, tileY);
 
             // Again, column per column starting at the left side. Now display the units
             for (int tileX = clipLeftCol; tileX <= clipRightCol; tileX++) {
-                if (map.isValid(tileX, tileY)) {
-                    // Display any units on that Tile:
-                    //Tile unitTile = map.getTile(tileX, tileY);
-                    Unit unitInFront = getUnitInFront(map.getTile(tileX, tileY));
-                    if (unitInFront != null) {
-                        displayUnit(g, unitInFront, xx, yy);
+                // Display any units on that Tile:
+
+                Unit unitInFront = getUnitInFront(map.getTile(tileX, tileY));
+                if (unitInFront != null) {
+                    displayUnit(g, unitInFront, xx, yy);
                         
-                        if (unitInFront.isUndead()) {
-                            darkUnits.add(unitInFront);
-                            darkUnitsX.add(xx);
-                            darkUnitsY.add(yy);
-                        }
+                    if (unitInFront.isUndead()) {
+                        darkUnits.add(unitInFront);
+                        darkUnitsX.add(xx);
+                        darkUnitsY.add(yy);
                     }
                 }
                 xx += tileWidth;
@@ -1117,26 +1110,23 @@ public final class GUI {
         ======
         Display the colony names.
         */
-        xx = 0;
+        //xx = 0;
         yy = clipTopY;
         // Row per row; start with the top modified row
         for (int tileY = clipTopRow; tileY <= clipBottomRow; tileY++) {
-            xx = clipLeftX;
-            if ((tileY % 2) != 0) {
-                xx += tileWidth / 2;
-            }
+            xx = getXOffset(clipLeftX, tileY);
+
             // Column per column; start at the left side
             for (int tileX = clipLeftCol; tileX <= clipRightCol; tileX++) {
-                if (map.isValid(tileX, tileY)) {
-                    Tile tile = map.getTile(tileX, tileY);
-                    if (tile.getSettlement() instanceof Colony) {
-                        Colony colony = (Colony) map.getTile(tileX, tileY).getSettlement();
-                        BufferedImage stringImage = createStringImage(g, colony.getName(), colony.getOwner().getColor(), lib.getTerrainImageWidth(tile.getType()) * 4/3, 16);
-                        g.drawImage(stringImage, 
-                                    xx + (lib.getTerrainImageWidth(tile.getType()) - 
-                                          stringImage.getWidth())/2 + 1,
-                                    yy + (lib.getSettlementImage(colony).getHeight(null) + 1), null);
-                    }
+                Tile tile = map.getTile(tileX, tileY);
+                if (tile != null && tile.getSettlement() instanceof Colony) {
+                    Colony colony = (Colony) tile.getSettlement();
+                    BufferedImage stringImage = createStringImage(g, colony.getName(), colony.getOwner().getColor(), 
+                                                                  lib.getTerrainImageWidth(tile.getType()) * 4/3, 16);
+                    g.drawImage(stringImage, 
+                                xx + (lib.getTerrainImageWidth(tile.getType()) - 
+                                      stringImage.getWidth())/2 + 1,
+                                yy + (lib.getSettlementImage(colony).getHeight(null) + 1), null);
                 }
                 xx += tileWidth;
             }
@@ -1615,6 +1605,9 @@ public final class GUI {
      *        unexplored terrain.
      */
     private void displayBaseTile(Graphics2D g, Map map, Tile tile, int x, int y, boolean drawUnexploredBorders) {
+        if (tile == null) {
+            return;
+        }
         g.drawImage(lib.getTerrainImage(tile.getType(), tile.getX(), tile.getY()), x, y, null);
 
         Map.Position pos = new Map.Position(tile.getX(), tile.getY());
@@ -1673,14 +1666,16 @@ public final class GUI {
      * @param withNumber indicates if the number of inhabitants should be drawn too.
      */
     private void displayTileOverlays(Graphics2D g, Map map, Tile tile, int x, int y,
-                                     boolean drawUnexploredBorders, boolean withNumber) {  
-        if (drawUnexploredBorders) {
-            displayUnexploredBorders(g, map, tile, x, y);
+                                     boolean drawUnexploredBorders, boolean withNumber) {
+        if (tile != null) {
+            if (drawUnexploredBorders) {
+                displayUnexploredBorders(g, map, tile, x, y);
+            }
+            displayAdditionsAndImprovements(g, map, tile, x, y);
+            displaySettlement(g, map, tile, x, y, withNumber);
+            displayFogOfWar(g, map, tile, x, y);
+            displayOptionalValues(g, map, tile, x, y);
         }
-        displayAdditionsAndImprovements(g, map, tile, x, y);
-        displaySettlement(g, map, tile, x, y, withNumber);
-        displayFogOfWar(g, map, tile, x, y);
-        displayOptionalValues(g, map, tile, x, y);
     }
 
     /**
