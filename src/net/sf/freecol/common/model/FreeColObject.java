@@ -458,9 +458,13 @@ public abstract class FreeColObject {
     }
 
     /**
-    * Gets the tag name of the root element representing this object.
-    * @return "goods".
-    */
+     * Gets the tag name used to serialize this object, generally the
+     * class name starting with a lower case letter. This method
+     * should be overridden by all subclasses that need to be
+     * serialized.
+     *
+     * @return <code>null</code>.
+     */
     public static String getXMLElementTagName() {
         return null;
     }

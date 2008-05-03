@@ -31,8 +31,8 @@ import net.sf.freecol.common.util.Utils;
 import org.w3c.dom.Element;
 
 /**
-* The superclass of all game objects in FreeCol.
-*/
+ * The superclass of all game objects in FreeCol.
+ */
 abstract public class FreeColGameObject extends FreeColObject {
 
     private static final Logger logger = Logger.getLogger(FreeColGameObject.class.getName());
@@ -48,11 +48,11 @@ abstract public class FreeColGameObject extends FreeColObject {
     
 
     /**
-    * Creates a new <code>FreeColGameObject</code> with an automatically assigned 
-    * ID and registers this object at the specified <code>Game</code>.
-    *
-    * @param game The <code>Game</code> in which this object belong.
-    */
+     * Creates a new <code>FreeColGameObject</code> with an automatically assigned 
+     * ID and registers this object at the specified <code>Game</code>.
+     *
+     * @param game The <code>Game</code> in which this object belong.
+     */
     public FreeColGameObject(Game game) {
         this.game = game;
 
@@ -131,38 +131,38 @@ abstract public class FreeColGameObject extends FreeColObject {
     
     
     /**
-    * Gets the game object this <code>FreeColGameObject</code> belongs to.
-    * @return The <code>game</code>.
-    */
+     * Gets the game object this <code>FreeColGameObject</code> belongs to.
+     * @return The <code>game</code>.
+     */
     public Game getGame() {
         return game;
     }
 
 
     /**
-    * Gets the <code>GameOptions</code> that is associated with the 
-    * {@link Game} owning this <code>FreeColGameObject</code>.
-    * 
-    * @return The same <code>GameOptions</code>-object as returned
-    *       by <code>getGame().getGameOptions()</code>.
-    */
+     * Gets the <code>GameOptions</code> that is associated with the 
+     * {@link Game} owning this <code>FreeColGameObject</code>.
+     * 
+     * @return The same <code>GameOptions</code>-object as returned
+     *       by <code>getGame().getGameOptions()</code>.
+     */
     public GameOptions getGameOptions() {
         return game.getGameOptions();
     }
 
     
     /**
-    * Sets the game object this <code>FreeColGameObject</code> belongs to.
-    * @param game The <code>game</code>.
-    */
+     * Sets the game object this <code>FreeColGameObject</code> belongs to.
+     * @param game The <code>game</code>.
+     */
     public void setGame(Game game) {
         this.game = game;
     }    
 
 
     /**
-    * Removes all references to this object.
-    */
+     * Removes all references to this object.
+     */
     public void dispose() {
         disposed = true;
         getGame().removeFreeColGameObject(getId());
@@ -170,10 +170,10 @@ abstract public class FreeColGameObject extends FreeColObject {
     
 
     /**
-    * Checks if this object has been disposed.
-    * @return <code>true</code> if this object has been disposed.
-    * @see #dispose
-    */
+     * Checks if this object has been disposed.
+     * @return <code>true</code> if this object has been disposed.
+     * @see #dispose
+     */
     public boolean isDisposed() {
         return disposed;
     }
@@ -191,9 +191,9 @@ abstract public class FreeColGameObject extends FreeColObject {
     }
 
     /**
-    * Updates the id. This method should be overwritten
-    * by server model objects.
-    */
+     * Updates the id. This method should be overwritten
+     * by server model objects.
+     */
     public void updateID() {
         
     }
@@ -245,7 +245,8 @@ abstract public class FreeColGameObject extends FreeColObject {
      * @throws XMLStreamException if there are any problems writing
      *      to the stream.
      */    
-    abstract protected void toXMLImpl(XMLStreamWriter out, Player player, boolean showAll, boolean toSavedGame) throws XMLStreamException;
+    abstract protected void toXMLImpl(XMLStreamWriter out, Player player, boolean showAll, 
+                                      boolean toSavedGame) throws XMLStreamException;
 
 
     /**
@@ -270,7 +271,8 @@ abstract public class FreeColGameObject extends FreeColObject {
      * @throws XMLStreamException if there are any problems writing
      *      to the stream.
      */    
-    public final void toXML(XMLStreamWriter out, Player player, boolean showAll, boolean toSavedGame) throws XMLStreamException {
+    public final void toXML(XMLStreamWriter out, Player player, boolean showAll,
+                            boolean toSavedGame) throws XMLStreamException {
         if (toSavedGame && !showAll) {
             throw new IllegalArgumentException("'showAll' should be true when saving a game.");
         }
@@ -289,22 +291,23 @@ abstract public class FreeColGameObject extends FreeColObject {
     }
 
     /**
-    * Gets the tag name of the root element representing this object.
-    * This method should be overwritten by any sub-class, preferably
-    * with the name of the class with the first letter in lower case.
-    *
-    * @return "unknown".
-    */
+     * Gets the tag name of the root element representing this object.
+     * This method should be overwritten by any sub-class, preferably
+     * with the name of the class with the first letter in lower case.
+     *
+     * @return "unknown".
+     */
     public static String getXMLElementTagName() {
         return "unknown";
     }
 
-
     /**
-    * Gets the ID's integer part of this object.
-    *
-    * @return The unique ID of this object.
-    */
+     * Gets the ID's integer part of this object. The age of two
+     * FreeColGameObjects can be compared by comparing their integer
+     * IDs.
+     *
+     * @return The unique ID of this object.
+     */
     public Integer getIntegerID() {
         String stringPart = getRealXMLElementTagName() + ":";
         return new Integer(getId().substring(stringPart.length()));
@@ -320,12 +323,12 @@ abstract public class FreeColGameObject extends FreeColObject {
     }
 
     /**
-    * Sets the unique ID of this object. When setting a new ID to this object,
-    * it it automatically registered at the corresponding <code>Game</code>
-    * with the new ID.
-    *
-    * @param newID the unique ID of this object,
-    */
+     * Sets the unique ID of this object. When setting a new ID to this object,
+     * it it automatically registered at the corresponding <code>Game</code>
+     * with the new ID.
+     *
+     * @param newID the unique ID of this object,
+     */
     public final void setId(String newID) {
         if (game != null && !(this instanceof Game)) {
             if (!newID.equals(getId())) {
@@ -343,12 +346,12 @@ abstract public class FreeColGameObject extends FreeColObject {
 
     
     /**
-    * Sets the ID of this object for temporary use with
-    * <code>toXMLElement</code>. This method does not
-    * register the object.
-    *
-    * @param newID the unique ID of this object,
-    */
+     * Sets the ID of this object for temporary use with
+     * <code>toXMLElement</code>. This method does not
+     * register the object.
+     *
+     * @param newID the unique ID of this object,
+     */
     public void setFakeID(String newID) {
         super.setId(newID);
     }
@@ -384,8 +387,7 @@ abstract public class FreeColGameObject extends FreeColObject {
      */    
     protected void addModelMessage(FreeColGameObject source, ModelMessage.MessageType type,
                                    String messageID, String... data) {
-        ModelMessage message = new ModelMessage(source, type, null, messageID, data);
-        initializeModelMessage(message);
+        addModelMessage(source, type, null, messageID, data);
     }
 
     /**
@@ -423,10 +425,6 @@ abstract public class FreeColGameObject extends FreeColObject {
     protected void addModelMessage(FreeColGameObject source, ModelMessage.MessageType type, 
                                    FreeColObject display, String messageID, String... data) {
         ModelMessage message = new ModelMessage(source, type, display, messageID, data);
-        initializeModelMessage(message);
-    }
-
-    private void initializeModelMessage(ModelMessage message) {
         if (message.getSource() == null) {
             logger.warning("ModelMessage with ID " + message.getId() + " has null source.");
         } else if (message.getOwner() == null) {
@@ -437,23 +435,23 @@ abstract public class FreeColGameObject extends FreeColObject {
 
 
     /**
-    * Checks if this object has the specified ID.
-    *
-    * @param id The ID to check against.
-    * @return <i>true</i> if the specified ID match the ID of this object and
-    *         <i>false</i> otherwise.
-    */
+     * Checks if this object has the specified ID.
+     *
+     * @param id The ID to check against.
+     * @return <i>true</i> if the specified ID match the ID of this object and
+     *         <i>false</i> otherwise.
+     */
     public boolean hasID(String id) {
         return getId().equals(id);
     }
 
 
     /**
-    * Checks if the given <code>FreeColGameObject</code> equals this object.
-    *
-    * @param o The <code>FreeColGameObject</code> to compare against this object.
-    * @return <i>true</i> if the two <code>FreeColGameObject</code> are equal and <i>false</i> otherwise.
-    */
+     * Checks if the given <code>FreeColGameObject</code> equals this object.
+     *
+     * @param o The <code>FreeColGameObject</code> to compare against this object.
+     * @return <i>true</i> if the two <code>FreeColGameObject</code> are equal and <i>false</i> otherwise.
+     */
     public boolean equals(FreeColGameObject o) {
         if (o != null) {
             return Utils.equals(this.getGame(), o.getGame()) && getId().equals(o.getId());
@@ -478,9 +476,9 @@ abstract public class FreeColGameObject extends FreeColObject {
 
     
     /**
-    * Returns a string representation of the object.
-    * @return The <code>String</code>
-    */
+     * Returns a string representation of the object.
+     * @return The <code>String</code>
+     */
     public String toString() {
         return getClass().getName() + ": " + getId() + " (super's hash code: " +
             Integer.toHexString(super.hashCode()) + ")";
