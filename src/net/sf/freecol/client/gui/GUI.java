@@ -1559,7 +1559,7 @@ public final class GUI {
     public void displayTerrain(Graphics2D g, Map map, Tile tile, int x, int y) {
         displayBaseTile(g, map, tile, x, y, true);
         displayAdditionsAndImprovements(g, map, tile, x, y);
-        displayUnexploredBorders(g, map, tile, x, y);
+        //displayUnexploredBorders(g, map, tile, x, y);
     }
 
     /**
@@ -1674,12 +1674,12 @@ public final class GUI {
      */
     private void displayTileOverlays(Graphics2D g, Map map, Tile tile, int x, int y,
                                      boolean drawUnexploredBorders, boolean withNumber) {  
-        displayAdditionsAndImprovements(g, map, tile, x, y);
-        displaySettlement(g, map, tile, x, y, withNumber);
-        displayFogOfWar(g, map, tile, x, y);
         if (drawUnexploredBorders) {
             displayUnexploredBorders(g, map, tile, x, y);
         }
+        displayAdditionsAndImprovements(g, map, tile, x, y);
+        displaySettlement(g, map, tile, x, y, withNumber);
+        displayFogOfWar(g, map, tile, x, y);
         displayOptionalValues(g, map, tile, x, y);
     }
 
