@@ -575,18 +575,6 @@ public final class Canvas extends JDesktopPane {
      */
 
     /**
-     * Displays all model messages for the current turn.
-     * 
-     * @param messages A list of messages to display.
-     */
-    public void showTurnReport(ArrayList<ModelMessage> messages) {
-        final ReportTurnPanel reportTurnPanel = new ReportTurnPanel(this);
-        reportTurnPanel.initialize(messages);
-        addAsFrame(reportTurnPanel);
-        reportTurnPanel.requestFocus();
-    }
-
-    /**
      * Displays a number of ModelMessages.
      * 
      * @param modelMessages

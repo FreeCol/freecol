@@ -24,7 +24,7 @@ import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
-import java.util.Collections;
+import java.util.Arrays;
 import java.util.Comparator;
 
 import javax.swing.BorderFactory;
@@ -59,10 +59,6 @@ import cz.autel.dmi.HIGLayout;
  */
 public final class ReportTurnPanel extends ReportPanel implements ActionListener {
 
-
-
-    private final FreeColClient freeColClient;
-
     private StyledDocument document;
 
     /**
@@ -70,21 +66,12 @@ public final class ReportTurnPanel extends ReportPanel implements ActionListener
      * 
      * @param parent The parent of this panel.
      */
-    public ReportTurnPanel(Canvas parent) {
+    public ReportTurnPanel(Canvas parent, ModelMessage... messages) {
         super(parent, Messages.message("menuBar.report.turn"));
-        this.freeColClient = parent.getClient();
-    }
-
-    /**
-     * Prepares this panel to be displayed.
-     *
-     * @param messages The messages to be displayed
-     */
-    public void initialize(ArrayList<ModelMessage> messages) {
 
         Comparator<ModelMessage> comparator = getCanvas().getClient().getClientOptions().getModelMessageComparator();
         if (comparator != null) {
-            Collections.sort(messages, comparator);
+            Arrays.sort(messages, comparator);
         }
 
         ClientOptions options = getCanvas().getClient().getClientOptions();
@@ -109,7 +96,7 @@ public final class ReportTurnPanel extends ReportPanel implements ActionListener
         reportPanel.removeAll();
 
         int[] widths = new int[] { 0, margin, 500, margin, 0, margin, 0 };
-        int[] heights = new int[2 * (messages.size() + headlines) - 1];
+        int[] heights = new int[2 * (messages.length + headlines) - 1];
         int imageColumn = 1;
         int textColumn = 3;
         int button1Column = 5;
@@ -144,7 +131,7 @@ public final class ReportTurnPanel extends ReportPanel implements ActionListener
             final JLabel label = new JLabel();
             if (message.getDisplay() != null) {
 
-                // TODO Scale icons relative to fond size.
+                // TODO: Scale icons relative to font size.
                 ImageIcon icon = getCanvas().getImageIcon(message.getDisplay(), false);
                 if (icon != null && icon.getIconHeight() > 40) {
                     Image image = icon.getImage();
@@ -172,7 +159,7 @@ public final class ReportTurnPanel extends ReportPanel implements ActionListener
                 reportPanel.add(label, higConst.rc(row, imageColumn, ""));
             }
 
-            final JTextPane textPane = getTextPane(message);
+            final JTextPane textPane = getTextPane(message, getCanvas().getClient().getMyPlayer());
             reportPanel.add(textPane, higConst.rc(row, textColumn));
             if (message.getType() == ModelMessage.MessageType.WAREHOUSE_CAPACITY) {
                 JButton ignoreButton = new JButton("x");
@@ -180,7 +167,7 @@ public final class ReportTurnPanel extends ReportPanel implements ActionListener
                 ignoreButton.addActionListener(new ActionListener() {
                     public void actionPerformed(ActionEvent event) {
                         boolean flag = label.isEnabled();
-                        freeColClient.getInGameController().ignoreMessage(message, flag);
+                        getCanvas().getClient().getInGameController().ignoreMessage(message, flag);
                         textPane.setEnabled(!flag);
                         label.setEnabled(!flag);
                     }
@@ -226,7 +213,7 @@ public final class ReportTurnPanel extends ReportPanel implements ActionListener
         } else if (source instanceof Market) {
             JButton button = new JButton(Messages.message("model.message.marketPrices"));
             button.addActionListener(this);
-            button.setActionCommand(freeColClient.getMyPlayer().getEurope().getId());
+            button.setActionCommand(getCanvas().getClient().getMyPlayer().getEurope().getId());
             headline = button;
         } else if (source instanceof Colony) {
             final Colony colony = (Colony) source;
@@ -254,7 +241,7 @@ public final class ReportTurnPanel extends ReportPanel implements ActionListener
     }
 
     //Create a text pane.
-    private JTextPane getTextPane(ModelMessage message) {
+    private JTextPane getTextPane(ModelMessage message, Player player) {
         JTextPane textPane = new JTextPane();
         textPane.setOpaque(false);
         textPane.setEditable(false);
@@ -271,15 +258,14 @@ public final class ReportTurnPanel extends ReportPanel implements ActionListener
         Style buttonStyle = document.addStyle("button", regular);
         StyleConstants.setForeground(buttonStyle, LINK_COLOR);
 
-        insertMessage(message);
+        insertMessage(message, player);
         return textPane;
     }
 
 
 
-    private void insertMessage(ModelMessage message) {
+    private void insertMessage(ModelMessage message, Player player) {
 
-        Player player = freeColClient.getMyPlayer();
         try {
             String input = Messages.message(message.getId());
             int start = input.indexOf('%');
@@ -388,11 +374,10 @@ public final class ReportTurnPanel extends ReportPanel implements ActionListener
     @Override
     public void actionPerformed(ActionEvent event) {
         String command = event.getActionCommand();
-        //System.out.println(command);
         if (command.equals(String.valueOf(OK))) {
             super.actionPerformed(event);
         } else {
-            FreeColGameObject object = freeColClient.getGame().getFreeColGameObject(command);
+            FreeColGameObject object = getCanvas().getClient().getGame().getFreeColGameObject(command);
             if (object instanceof Europe) {
                 getCanvas().showEuropePanel();
             } else if (object instanceof Tile) {

@@ -50,6 +50,7 @@ import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.client.gui.option.FreeColActionUI;
 import net.sf.freecol.client.gui.panel.ChoiceItem;
 import net.sf.freecol.client.gui.panel.EventPanel;
+import net.sf.freecol.client.gui.panel.ReportTurnPanel;
 import net.sf.freecol.client.gui.sound.SfxLibrary;
 import net.sf.freecol.client.gui.sound.SoundLibrary.SoundEffect;
 import net.sf.freecol.client.networking.Client;
@@ -3541,15 +3542,17 @@ public final class InGameController implements NetworkConstants {
         }
 
         purgeOldMessagesFromMessagesToIgnore(thisTurn);
+        final ModelMessage[] messages = messageList.toArray(new ModelMessage[0]);
 
         Runnable uiTask = new Runnable() {
             public void run() {
+                Canvas canvas = freeColClient.getCanvas();
                 if (messageList.size() > 0) {
                     if (allMessages || messageList.size() > 5) {
-                        freeColClient.getCanvas().showTurnReport(messageList);
+                        canvas.showPanel(new ReportTurnPanel(canvas, messages));
                     } else {
-                        freeColClient.getCanvas().showModelMessages(
-                                messageList.toArray(new ModelMessage[0]));
+                        canvas.showModelMessages(messages);
+                                
                     }
                 }
                 freeColClient.getActionManager().update();
