@@ -1174,7 +1174,6 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
      * @exception IllegalStateException If the request is not accepted by the
      *                model.
      */
-    // TODO: is the used? If not, why not?
     private Element selectFromFountainYouth(Connection connection, Element element) {
         FreeColServer freeColServer = getFreeColServer();
         ServerPlayer player = freeColServer.getPlayer(connection);
@@ -1687,9 +1686,8 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         } else if (action.equals("heresy")) {
             Element reply = Message.createNewRootElement("missionaryReply");
             sendRemoveUnitToAll(unit, player);
-            // TODO: chance needs to depend on amount of crosses that the
-            // players who are involved have.
-            double random = Math.random();
+            double random = Math.random() * settlement.getMissionary().getOwner().getCrosses() /
+                (unit.getOwner().getCrosses() + 1);
             if (settlement.getMissionary().hasAbility("model.ability.expertMissionary")) {
                 random += 0.2;
             }
