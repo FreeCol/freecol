@@ -19,14 +19,45 @@
 
 package net.sf.freecol.common.util;
 
+import java.util.List;
+
 /**
  * Collection of small static helper methods.
  */
 public class Utils {
 
+    /**
+     * Joins the given strings.
+     * 
+     * @param delimiter The delimiter to place between the individual strings.
+     * @param strings The strings to be joined.
+     * @return Each of the strings in the given array delimited by the given
+     *         string.
+     */
+    public static String join(String delimiter, String... strings) {
+        if (strings == null || strings.length == 0) {
+            return null;
+        } else {
+            StringBuilder result = new StringBuilder(strings[0]);
+            for (int i = 1; i < strings.length; i++) {
+                result.append(delimiter);
+                result.append(strings[i]);
+            }
+            return result.toString();
+        }
+    }
 
-
-
+    /**
+     * Joins the given strings.
+     * 
+     * @param delimiter The delimiter to place between the individual strings.
+     * @param strings The strings to be joined.
+     * @return Each of the strings in the given array delimited by the given
+     *         string.
+     */
+    public static String join(String delimiter, List<String> strings) {
+        return join(delimiter, strings.toArray(new String[0]));
+    }
 
     /**
      * Will check if both objects are equal but also checks for null.

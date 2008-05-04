@@ -418,21 +418,6 @@ public final class Monarch extends FreeColGameObject {
         }
     }
 
-    public String getName(List<AbstractUnit> units) {
-        StringBuilder name = new StringBuilder();
-        String and = " " + Messages.message("and") + " ";
-        for (AbstractUnit unit : units) {
-            if (name.length() > 0) {
-                name.append(and);
-            }
-            name.append(unit.getNumber());
-            name.append(" ");
-            name.append(Unit.getName(unit.getUnitType(), unit.getRole()));
-        }
-        return name.toString();
-    }
-
-
     /**
      * Returns the price for the given units.
      *

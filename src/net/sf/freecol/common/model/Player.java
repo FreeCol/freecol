@@ -42,6 +42,7 @@ import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.Map.Position;
 import net.sf.freecol.common.model.Unit.UnitState;
+import net.sf.freecol.common.util.Utils;
 
 import org.w3c.dom.Element;
 
@@ -614,17 +615,15 @@ public class Player extends FreeColGameObject implements Nameable {
         }
 
         // Dispose all units in Europe.
-        Iterator<Unit> it = europe.getUnitIterator();
-        String unitNames = "";
-        while (it.hasNext()) {
-            Unit u = it.next();
-            unitNames += ", " + u.getName();
-            u.dispose();
+        ArrayList<String> unitNames = new ArrayList<String>();
+        for (Unit unit : europe.getUnitList()) {
+            unitNames.add(unit.getName());
+            unit.dispose();
         }
-        if (unitNames.length() > 0) {
+        if (unitNames.size() > 0) {
             addModelMessage(this, ModelMessage.MessageType.UNIT_LOST,
                             "model.player.independence.unitsSeized", 
-                            "%units%", unitNames.substring(2));
+                            "%units%", Utils.join(", ", unitNames));
         }
         List<Unit> veterans = new ArrayList<Unit>();
         for (Colony colony : getColonies()) {

@@ -19,6 +19,7 @@
 
 package net.sf.freecol.common.model;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -29,6 +30,7 @@ import javax.xml.stream.XMLStreamReader;
 
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.Specification;
+import net.sf.freecol.common.util.Utils;
 
 /**
  * Contains information on buildable types.
@@ -64,19 +66,15 @@ public class BuildableType extends FreeColGameObjectType {
     }
 
     public String getGoodsRequiredAsString() {
-        String result = "";
+        ArrayList<String> result = new ArrayList();
         if (goodsRequired != null) {
             for (AbstractGoods goods : goodsRequired) {
-                result += Messages.message("model.goods.goodsAmount",
-                                           "%amount%", String.valueOf(goods.getAmount()),
-                                           "%goods%", goods.getType().getName()) +
-                    ", ";
-            }
-            if (result.length() > 1) {
-                result = result.substring(0, result.length() - 2);
+                result.add(Messages.message("model.goods.goodsAmount",
+                                            "%amount%", String.valueOf(goods.getAmount()),
+                                            "%goods%", goods.getType().getName()));
             }
         }
-        return result;
+        return Utils.join(", ", result);
     }
 
     /**

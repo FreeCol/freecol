@@ -40,6 +40,7 @@ import javax.swing.UIManager;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.FAFile;
+import net.sf.freecol.common.util.Utils;
 
 /**
  * This panel displays the signing of the Declaration of Independence.
@@ -171,12 +172,12 @@ public final class DeclarationDialog extends FreeColDialog {
             String[] partNames = name.split(" ");
 
             // Abbreviate middle names:
-            for (int i = 1; i < partNames.length - 1 && isTooLarge(join(partNames, " ")); i++) {
+            for (int i = 1; i < partNames.length - 1 && isTooLarge(Utils.join(" ", partNames)); i++) {
                 partNames[i] = partNames[i].charAt(0) + ".";
             }
 
             // Remove middle names:
-            while (partNames.length > 2 && isTooLarge(join(partNames, " "))) {
+            while (partNames.length > 2 && isTooLarge(Utils.join(" ", partNames))) {
                 String[] newPartNames = new String[partNames.length - 1];
                 newPartNames[0] = partNames[0];
                 for (int i = 1; i < newPartNames.length; i++) {
@@ -185,8 +186,8 @@ public final class DeclarationDialog extends FreeColDialog {
                 partNames = newPartNames;
             }
 
-            if (!isTooLarge(join(partNames, " "))) {
-                return join(partNames, " ");
+            if (!isTooLarge(Utils.join(" ", partNames))) {
+                return Utils.join(" ", partNames);
             } else if (!isTooLarge(partNames[0].charAt(0) + ". " + partNames[1])) {
                 return partNames[0].charAt(0) + ". " + partNames[1];
             } else if (!isTooLarge(partNames[0] + " " + partNames[1].charAt(0) + ".")) {
@@ -194,23 +195,6 @@ public final class DeclarationDialog extends FreeColDialog {
             } else {
                 return partNames[0].charAt(0) + ". " + partNames[1].charAt(0) + ".";
             }
-        }
-
-        /**
-         * Joins the given strings.
-         * 
-         * @param strings The strings to be joined.
-         * @param delim The delimiter to place between the individual strings.
-         * @return Each of the strings in the given array delimited by the given
-         *         string.
-         */
-        private String join(String[] strings, String delim) {
-            String s = strings[0];
-            for (int i = 1; i < strings.length; i++) {
-                s += delim;
-                s += strings[i];
-            }
-            return s;
         }
 
         /**
