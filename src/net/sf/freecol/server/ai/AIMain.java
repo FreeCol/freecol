@@ -145,7 +145,8 @@ public class AIMain extends FreeColObject implements FreeColGameObjectListener {
         Iterator<FreeColGameObject> fit = getGame().getFreeColGameObjectIterator();
         while (fit.hasNext()) {
             FreeColGameObject f = fit.next();
-            if ((f instanceof Unit || f instanceof Player || f instanceof Colony)
+            if ((f instanceof Unit || f instanceof Colony ||
+                 (f instanceof Player && !((Player)f).getName().equals(Player.UNKNOWN_ENEMY)) )
                     && !aiObjects.containsKey(f.getId())) {
                 logger.warning("Missing AIObject for: " + f.getId());
                 ok = false;
