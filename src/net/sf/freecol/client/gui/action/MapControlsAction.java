@@ -35,11 +35,9 @@ import net.sf.freecol.client.gui.panel.MapControls;
  * @see MapControls
  */
 public class MapControlsAction extends SelectableAction {
+
     @SuppressWarnings("unused")
     private static final Logger logger = Logger.getLogger(MapControlsAction.class.getName());
-
-
-
 
     public static final String id = "mapControlsAction";
 
@@ -98,7 +96,7 @@ public class MapControlsAction extends SelectableAction {
     private void showMapControls(boolean value) {
         if (value && getFreeColClient().getGUI().isInGame()) {
             if (mapControls == null) {
-                mapControls = new MapControls(getFreeColClient(), getFreeColClient().getGUI());
+                mapControls = new MapControls(getFreeColClient());
             }
             mapControls.update();
         }

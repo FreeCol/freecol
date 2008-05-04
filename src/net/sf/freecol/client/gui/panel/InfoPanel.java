@@ -61,8 +61,6 @@ import cz.autel.dmi.HIGLayout;
  */
 public final class InfoPanel extends FreeColPanel {
     
-    
-    
     @SuppressWarnings("unused")
     private static final Logger logger = Logger.getLogger(InfoPanel.class.getName());
     
@@ -90,15 +88,11 @@ public final class InfoPanel extends FreeColPanel {
      * The constructor that will add the items to this panel.
      *
      * @param freeColClient The main controller object for the client.
-     * @param game The Game object that has all kinds of useful information that
-     *            we want to display here.
-     * @param imageProvider The ImageProvider that can provide us with images to
-     *            display on this panel.
      */
-    public InfoPanel(final FreeColClient freeColClient, Game game, ImageProvider imageProvider) {
+    public InfoPanel(final FreeColClient freeColClient) {
         this.freeColClient = freeColClient;
-        this.game = game;
-        this.library = (ImageLibrary) imageProvider;
+        this.game = freeColClient.getGame();
+        this.library = freeColClient.getImageLibrary();
         
         unitInfoPanel = new UnitInfoPanel();
         setLayout(null);

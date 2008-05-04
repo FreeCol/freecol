@@ -61,9 +61,6 @@ import net.sf.freecol.common.model.Map.Direction;
  */
 public final class MapControls {
 
-    public static final int EUROPE = 2;
-    public static final int UNITBUTTON = 3;
-    
     private final FreeColClient freeColClient;
 
     private final InfoPanel        infoPanel;
@@ -71,25 +68,20 @@ public final class MapControls {
     private final UnitButton[]     unitButton;   
     private final JLabel compassRose;
 
-    @SuppressWarnings("unused")
-    private final GUI                    gui;
-
     private static final int CONTROLS_LAYER = JLayeredPane.MODAL_LAYER;
 
     /**
      * The basic constructor.
      * @param freeColClient The main controller object for the client
-     * @param gui An object that contains useful GUI-related methods.
      */
-    public MapControls(final FreeColClient freeColClient, final GUI gui) {
+    public MapControls(final FreeColClient freeColClient) {
         this.freeColClient = freeColClient;
-        this.gui = gui;
 
         //
         // Create GUI Objects
         //
 
-        infoPanel = new InfoPanel(freeColClient, freeColClient.getGame(), freeColClient.getImageLibrary());
+        infoPanel = new InfoPanel(freeColClient);
         miniMap = new MiniMap(freeColClient);
         compassRose = new JLabel(freeColClient.getGUI().getImageLibrary().getMiscImageIcon(9));
         
