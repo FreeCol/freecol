@@ -214,6 +214,8 @@ public final class Canvas extends JDesktopPane {
 
     private boolean clientOptionsDialogShowing = false;
 
+    private MapControls mapControls;
+
     /**
      * Variable used for detecting resizing.
      */
@@ -347,6 +349,7 @@ public final class Canvas extends JDesktopPane {
             if (mc != null && mc.isShowing()) {
                 mc.removeFromComponent(this);
                 mc.addToComponent(this);
+                mapControls = mc;
             }
             if (europePanel != null) {
                 JInternalFrame f = getInternalFrame(europePanel);
@@ -2127,6 +2130,15 @@ public final class Canvas extends JDesktopPane {
      */
     public EuropePanel getEuropePanel() {
         return europePanel;
+    }
+
+    /**
+     * Returns the MapControls of this Canvas.
+     *
+     * @return a <code>MapControls</code> value
+     */
+    public MapControls getMapControls() {
+        return mapControls;
     }
 
     /**

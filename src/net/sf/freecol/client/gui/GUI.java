@@ -54,6 +54,7 @@ import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.i18n.Messages;
+import net.sf.freecol.client.gui.panel.MapControls;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.Europe;
 import net.sf.freecol.common.model.Game;
@@ -353,8 +354,13 @@ public final class GUI {
         freeColClient.getActionManager().update();
         freeColClient.getCanvas().updateJMenuBar();
 
-        //TODO: update only within the bounds of InfoPanel
-        freeColClient.getCanvas().repaint(0, 0, getWidth(), getHeight());
+        int x = 0, y = 0;
+        MapControls mapControls = freeColClient.getCanvas().getMapControls();
+        if (mapControls != null) {
+            x = getWidth() - mapControls.getInfoPanelWidth();
+            y = getHeight() - mapControls.getInfoPanelHeight();
+        }
+        freeColClient.getCanvas().repaint(x, y, getWidth(), getHeight());
 
         // Check if the gui needs to reposition:
         if ((!onScreen(selectedTile) &&
@@ -516,8 +522,13 @@ public final class GUI {
             freeColClient.getActionManager().update();
             freeColClient.getCanvas().updateJMenuBar();
 
-            //TODO: update only within the bounds of InfoPanel
-            freeColClient.getCanvas().repaint(0, 0, getWidth(), getHeight());
+            int x = 0, y = 0;
+            MapControls mapControls = freeColClient.getCanvas().getMapControls();
+            if (mapControls != null) {
+                x = getWidth() - mapControls.getInfoPanelWidth();
+                y = getHeight() - mapControls.getInfoPanelHeight();
+            }
+            freeColClient.getCanvas().repaint(x, y, getWidth(), getHeight());
         }
     }
 

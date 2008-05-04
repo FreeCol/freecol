@@ -51,15 +51,16 @@ import net.sf.freecol.common.model.Map.Direction;
 
 
 /**
-* A collection of panels and buttons that are used to provide
-* the user with a more detailed view of certain elements on the
-* map and also to provide a means of input in case the user
-* can't use the keyboard.
-*
-* The MapControls are useless by themselves, this object needs to
-* be placed on a JComponent in order to be usable.
-*/
+ * A collection of panels and buttons that are used to provide
+ * the user with a more detailed view of certain elements on the
+ * map and also to provide a means of input in case the user
+ * can't use the keyboard.
+ *
+ * The MapControls are useless by themselves, this object needs to
+ * be placed on a JComponent in order to be usable.
+ */
 public final class MapControls {
+
     public static final int EUROPE = 2;
     public static final int UNITBUTTON = 3;
     
@@ -69,18 +70,17 @@ public final class MapControls {
     private final MiniMap          miniMap;
     private final UnitButton[]     unitButton;   
     private final JLabel compassRose;
+
     @SuppressWarnings("unused")
     private final GUI                    gui;
 
     private static final int CONTROLS_LAYER = JLayeredPane.MODAL_LAYER;
 
-
-
     /**
-    * The basic constructor.
-    * @param freeColClient The main controller object for the client
-    * @param gui An object that contains useful GUI-related methods.
-    */
+     * The basic constructor.
+     * @param freeColClient The main controller object for the client
+     * @param gui An object that contains useful GUI-related methods.
+     */
     public MapControls(final FreeColClient freeColClient, final GUI gui) {
         this.freeColClient = freeColClient;
         this.gui = gui;
@@ -146,12 +146,12 @@ public final class MapControls {
     }
 
     /**
-    * Adds the map controls to the given component.
-    * @param component The component to add the map controls to.
-    */
+     * Adds the map controls to the given component.
+     * @param component The component to add the map controls to.
+     */
     public void addToComponent(Canvas component) {
         if (freeColClient.getGame() == null
-                || freeColClient.getGame().getMap() == null) {
+            || freeColClient.getGame().getMap() == null) {
             return;
         }
         
@@ -192,6 +192,24 @@ public final class MapControls {
         }
     }
 
+    /**
+     * Returns the width of the InfoPanel.
+     *
+     * @return an <code>int</code> value
+     */
+    public int getInfoPanelWidth() {
+        return infoPanel.getWidth();
+    }
+
+    /**
+     * Returns the height of the InfoPanel.
+     *
+     * @return an <code>int</code> value
+     */
+    public int getInfoPanelHeight() {
+        return infoPanel.getHeight();
+    }
+
 
     /**
      * Removes the map controls from the parent component.
@@ -213,16 +231,16 @@ public final class MapControls {
 
 
     /**
-    * Zooms in the mini map.
-    */
+     * Zooms in the mini map.
+     */
     public void zoomIn() {
         miniMap.zoomIn();
     }
 
 
     /**
-    * Zooms out the mini map.
-    */
+     * Zooms out the mini map.
+     */
     public void zoomOut() {
         miniMap.zoomOut();
     }
@@ -244,23 +262,23 @@ public final class MapControls {
     }
 
     /**
-    * Updates this <code>MapControls</code>.
-    */
+     * Updates this <code>MapControls</code>.
+     */
     public void update() {
         GUI gui = freeColClient.getGUI();
         int viewMode = gui.getViewMode().getView();
         switch (viewMode) {
-            case ViewMode.MOVE_UNITS_MODE:
-                infoPanel.update(gui.getActiveUnit());
-                break;
-            case ViewMode.VIEW_TERRAIN_MODE:
-                if (gui.getSelectedTile() != null) {
-                    Tile selectedTile = freeColClient.getGame().getMap().getTile(gui.getSelectedTile());
-                    if (infoPanel.getTile() != selectedTile) {
-                        infoPanel.update(selectedTile);
-                    }
+        case ViewMode.MOVE_UNITS_MODE:
+            infoPanel.update(gui.getActiveUnit());
+            break;
+        case ViewMode.VIEW_TERRAIN_MODE:
+            if (gui.getSelectedTile() != null) {
+                Tile selectedTile = freeColClient.getGame().getMap().getTile(gui.getSelectedTile());
+                if (infoPanel.getTile() != selectedTile) {
+                    infoPanel.update(selectedTile);
                 }
-                break;
+            }
+            break;
         }
     }
 }
