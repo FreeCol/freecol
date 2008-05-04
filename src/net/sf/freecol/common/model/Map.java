@@ -1813,7 +1813,7 @@ public class Map extends FreeColGameObject {
                 if (region == null) {
                     region = new Region(getGame(), regionID);
                 }
-                region.readFromXMLImpl(in);
+                region.readFromXML(in);
                 setRegion(region);
             } else {
                 logger.warning("Unknown tag: " + in.getLocalName() + " loading map");
