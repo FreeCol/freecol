@@ -1563,14 +1563,17 @@ public final class InGameController implements NetworkConstants {
             canvas.showEventDialog(EventPanel.FIRST_LANDING);
             
             final Player player = freeColClient.getMyPlayer();
-            final BuildColonyAction bca = (BuildColonyAction) freeColClient.getActionManager().getFreeColAction(BuildColonyAction.id);
+            final BuildColonyAction bca = (BuildColonyAction) freeColClient.getActionManager()
+                .getFreeColAction(BuildColonyAction.id);
             final KeyStroke keyStroke = bca.getAccelerator();
-            final String[][] data = new String[][] {
-                {"%build_colony_key%", FreeColActionUI.getHumanKeyStrokeText(keyStroke)},
-                {"%build_colony_menu_item%", Messages.message("unit.state.7")},
-                {"%orders_menu_item%", Messages.message("menuBar.orders")}
-            };
-            player.addModelMessage(new ModelMessage(player, "tutorial.buildColony", data, ModelMessage.MessageType.TUTORIAL, player));
+            player.addModelMessage(new ModelMessage(player, ModelMessage.MessageType.TUTORIAL, player,
+                                                    "tutorial.buildColony", 
+                                                    "%build_colony_key%",
+                                                    FreeColActionUI.getHumanKeyStrokeText(keyStroke),
+                                                    "%build_colony_menu_item%",
+                                                    Messages.message("unit.state.7"),
+                                                    "%orders_menu_item%",
+                                                    Messages.message("menuBar.orders")));
             nextModelMessage();
         }
 

@@ -266,12 +266,12 @@ public class FreeColDialog extends FreeColPanel {
     public static FreeColDialog createInformationDialog(String[] texts, ImageIcon[] images) {
 
         int[] widths = {0, margin, 0};
-        int[] heights = new int[2 * texts.length + 1];
+        int[] heights = new int[2 * texts.length - 1];
         int imageColumn = 1;
         int textColumn = 3;
 
-        for (int index = 0; index < texts.length; index++) {
-            heights[2 * index + 1] = margin;
+        for (int index = 1; index < texts.length; index += 2) {
+            heights[index] = margin;
         }
 
         if (images == null) {
@@ -288,7 +288,8 @@ public class FreeColDialog extends FreeColPanel {
         };
 
         HIGLayout layout = new HIGLayout(widths, heights);
-        informationDialog.setLayout(layout);
+        JPanel textPanel = new JPanel(layout);
+        informationDialog.setLayout(new BorderLayout());
 
         theButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent event) {
@@ -299,13 +300,18 @@ public class FreeColDialog extends FreeColPanel {
         int row = 1;
         for (int i = 0; i < texts.length; i++) {
             if (images != null && images[i] != null) {
-                informationDialog.add(new JLabel(images[i]), higConst.rc(row, imageColumn));
+                textPanel.add(new JLabel(images[i]), higConst.rc(row, imageColumn));
             }
-            informationDialog.add(getDefaultTextArea(texts[i]), higConst.rc(row, textColumn));
+            textPanel.add(getDefaultTextArea(texts[i]), higConst.rc(row, textColumn));
             row += 2;
         }
 
-        informationDialog.add(theButton, higConst.rcwh(row, imageColumn, widths.length, 1));
+        JScrollPane scrollPane = new JScrollPane(textPanel,
+                                                 JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
+                                                 JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+
+        informationDialog.add(scrollPane, BorderLayout.CENTER);
+        informationDialog.add(theButton, BorderLayout.SOUTH);
         informationDialog.setSize(informationDialog.getPreferredSize());
 
         return informationDialog;

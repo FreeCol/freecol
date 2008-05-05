@@ -1069,6 +1069,7 @@ public class Game extends FreeColGameObject {
         
         HashMap<String, Long> map = new HashMap<String, Long>();
         Iterator<FreeColGameObject> iter = this.getFreeColGameObjectIterator();
+        map.put("disposed", new Long(0));
         while (iter.hasNext()) {
             FreeColGameObject obj = iter.next();
             String className = obj.getClass().getSimpleName();
@@ -1079,6 +1080,11 @@ public class Game extends FreeColGameObject {
             } else {
                 Long count = new Long(1);
                 map.put(className, count);
+            }
+            if (obj.isDisposed()) {
+                Long count = map.get("disposed");
+                count++;
+                map.put("disposed", count);
             }
         }
         
