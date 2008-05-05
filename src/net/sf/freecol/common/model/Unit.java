@@ -1493,9 +1493,9 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
             setState(UnitState.ACTIVE);
             setStateToAllChildren(UnitState.SENTRY);
             int moveCost = getMoveCost(newTile);
+            setMovesLeft(getMovesLeft() - moveCost);
             setLocation(newTile);
             activeAdjacentSentryUnits(newTile);
-            setMovesLeft(getMovesLeft() - moveCost);
 
             // Clear the alreadyOnHighSea flag if we move onto a non-highsea
             // tile.
