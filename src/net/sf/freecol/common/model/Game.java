@@ -1060,4 +1060,28 @@ public class Game extends FreeColGameObject {
     public int getNextPlayerIndex() {
         return playerIndex++;
     }
+    
+    /**
+     * Computes how many objects of each class have been created, 
+     * to track memory leaks over time
+     */
+    public HashMap<String, Long> getGameStatistics() {
+        
+        HashMap<String, Long> map = new HashMap<String, Long>();
+        Iterator<FreeColGameObject> iter = this.getFreeColGameObjectIterator();
+        while (iter.hasNext()) {
+            FreeColGameObject obj = iter.next();
+            String className = obj.getClass().getSimpleName();
+            if (map.containsKey(className)) {
+                Long count = map.get(className);
+                count++;
+                map.put(className, count);
+            } else {
+                Long count = new Long(1);
+                map.put(className, count);
+            }
+        }
+        
+        return map;
+    }
 }

@@ -432,4 +432,28 @@ public class AIMain extends FreeColObject implements FreeColGameObjectListener {
     public static String getXMLElementTagName() {
         return "aiMain";
     }
+    
+    /**
+     * Computes how many objects of each class have been created, 
+     * to track memory leaks over time
+     */
+    public HashMap<String, Long> getAIStatistics() {
+        
+        HashMap<String, Long> map = new HashMap<String, Long>();
+        Iterator<AIObject> iter = aiObjects.values().iterator();
+        while (iter.hasNext()) {
+            AIObject obj = iter.next();
+            String className = obj.getClass().getSimpleName();
+            if (map.containsKey(className)) {
+                Long count = map.get(className);
+                count++;
+                map.put(className, count);
+            } else {
+                Long count = new Long(1);
+                map.put(className, count);
+            }
+        }
+        
+        return map;
+    }
 }

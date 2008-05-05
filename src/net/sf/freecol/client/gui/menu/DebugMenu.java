@@ -25,6 +25,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.io.File;
+import java.util.HashMap;
 import java.util.Iterator;
 
 import javax.swing.ButtonGroup;
@@ -345,7 +346,36 @@ public class DebugMenu extends JMenu {
                 }
             }
         });
-
+        
+        
+        // statistics
+        final JMenuItem statistics = new JMenuItem("Statistics");
+        statistics.setOpaque(false);
+        statistics.setMnemonic(KeyEvent.VK_I);
+        this.add(statistics);
+        statistics.addActionListener(new ActionListener() {
+            private String serializeStats(String title, HashMap<String, Long> stats) {
+                String message = title+"\n";
+                long total = 0;
+                for (String s :stats.keySet()) {
+                    Long value = stats.get(s);
+                    message += s+": "+value.toString()+"\n";
+                    total += value;
+                }
+                message += "Total: "+total+"\n";
+                return message;
+            }
+            public void actionPerformed(ActionEvent e) {
+                HashMap<String, Long> serverAIStats = freeColClient.getFreeColServer().getAIMain().getAIStatistics();
+                HashMap<String, Long> serverGameStats = freeColClient.getFreeColServer().getGame().getGameStatistics();
+                HashMap<String, Long> clientGameStats = freeColClient.getGame().getGameStatistics();
+                String message = serializeStats("Client game statistics", clientGameStats)+"\n"+
+                                 serializeStats("Server game statistics", serverGameStats)+"\n"+
+                                 serializeStats("Server AI statistics", serverAIStats);
+                canvas.showInformationMessage(message);
+            }
+        });
+        
         // memory manager
         final JMenuItem memoryManager = new JMenuItem(Messages.message("menuBar.debug.memoryManager"));
         memoryManager.setOpaque(false);
