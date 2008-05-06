@@ -327,7 +327,11 @@ public final class TileImprovementType extends FreeColGameObjectType
 
             } else if ("tile".equals(childName)) {
                 String tileId = in.getAttributeValue(null, "id");
-                allowedTileTypes.add(specification.getTileType(tileId));
+                if (getAttribute(in, "value", true)) {
+                    allowedTileTypes.add(specification.getTileType(tileId));
+                } else {
+                    allowedTileTypes.remove(specification.getTileType(tileId));
+                }
                 in.nextTag(); // close this element
 
             } else if ("worker".equals(childName)) {

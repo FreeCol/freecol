@@ -158,6 +158,33 @@ public class TileTest extends FreeColTestCase {
         assertEquals(3,tile.potential(s.getGoodsType("model.goods.silver")));
     }
 
+    public void testMaximumPotential() {
+        Game game = getStandardGame();
+        Specification s = FreeCol.getSpecification();
+
+        Tile tile1 = new Tile(game, s.getTileType("model.tile.mountains"), 0, 0);
+        assertEquals(0, tile1.potential(s.getGoodsType("model.goods.food")));
+        assertEquals(0, tile1.getMaximumPotential(s.getGoodsType("model.goods.food")));
+        assertEquals(1, tile1.potential(s.getGoodsType("model.goods.silver")));
+        assertEquals(2, tile1.getMaximumPotential(s.getGoodsType("model.goods.silver")));
+        tile1.setResource(s.getResourceType("model.resource.Silver"));
+        assertEquals(0, tile1.potential(s.getGoodsType("model.goods.food")));
+        assertEquals(3, tile1.potential(s.getGoodsType("model.goods.silver")));
+        assertEquals(4, tile1.getMaximumPotential(s.getGoodsType("model.goods.silver")));
+
+        Tile tile2 = new Tile(game, s.getTileType("model.tile.plains"), 0, 1);
+        assertEquals(5, tile2.potential(s.getGoodsType("model.goods.food")));
+        assertEquals(6, tile2.getMaximumPotential(s.getGoodsType("model.goods.food")));
+        tile2.setResource(s.getResourceType("model.resource.Grain"));
+        assertEquals(7, tile2.potential(s.getGoodsType("model.goods.food")));
+        assertEquals(8, tile2.getMaximumPotential(s.getGoodsType("model.goods.food")));
+
+        Tile tile3 = new Tile(game, s.getTileType("model.tile.mixedForest"), 1, 1);
+        assertEquals(3, tile3.potential(s.getGoodsType("model.goods.food")));
+        assertEquals(6, tile3.getMaximumPotential(s.getGoodsType("model.goods.food")));
+
+    }
+
     public void testMovement() {
         Game game = getStandardGame();
         Specification spec = FreeCol.getSpecification();

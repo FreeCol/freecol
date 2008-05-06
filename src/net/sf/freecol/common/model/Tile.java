@@ -1214,43 +1214,35 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
         // there are options to change tiletype using an improvement,
         // consider that too.
 
-        // Assortment of valid TileTypes and their respective
-        // TileItemContainers, including this one
         List<TileType> tileTypes = new ArrayList<TileType>();
-        List<TileItemContainer> tiContainers = new ArrayList<TileItemContainer>();
-        List<TileImprovementType> tiList = FreeCol.getSpecification().getTileImprovementTypeList();
-
         tileTypes.add(getType());
-        // Get a clone of the tileitemcontainer for calculation
-        tiContainers.add(getTileItemContainer().clone());
 
         // Add to the list the various possible tile type changes
-        for (TileImprovementType impType : tiList) {
+        for (TileImprovementType impType : FreeCol.getSpecification().getTileImprovementTypeList()) {
             if (impType.getChange(getType()) != null) {
                 // There is an option to change TileType
                 tileTypes.add(impType.getChange(getType()));
-                // Clone container with the natural improvements of this tile (without resource)
-                tiContainers.add(getTileItemContainer().clone(false, true));
             }
         }
 
         int maxProduction = 0;
-        // For each combination, fill the tiContainers with anything that would increase production of oodsType
-        for (int i = 0; i < tiContainers.size() ; i++) {
-            TileType t = tileTypes.get(i);
-            TileItemContainer tic = tiContainers.get(i);
-            for (TileImprovementType impType : tiList) {
-                if (impType.isNatural() || !impType.isTileTypeAllowed(t)) {
+
+        for (TileType tileType : tileTypes) {
+            float potential = tileType.getPotential(goodsType);
+            if (tileType.isWater() && goodsType == Goods.FISH) {
+                potential += fishBonus;
+            }
+            if (tileType == getType() && tileItemContainer.hasResource()) {
+                potential = tileItemContainer.getResourceBonusPotential(goodsType, (int) potential);
+            }
+            for (TileImprovementType impType : FreeCol.getSpecification().getTileImprovementTypeList()) {
+                if (impType.isNatural() || !impType.isTileTypeAllowed(tileType)) {
                     continue;
-                }
-                if (tic.findTileImprovementType(impType) != null) {
-                    continue;
-                }
-                if (impType.getBonus(goodsType) > 0) {
-                    tic.addTileItem(new TileImprovement(getGame(), this, impType));
+                } else if (impType.getBonus(goodsType) > 0) {
+                    potential = impType.getProductionBonus(goodsType).applyTo(potential);
                 }
             }
-            maxProduction = Math.max(getTileTypePotential(t, goodsType, tic, getFishBonus()), maxProduction);
+            maxProduction = Math.max((int) potential, maxProduction);
         }
         return maxProduction;
     }

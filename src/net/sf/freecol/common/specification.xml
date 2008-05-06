@@ -451,6 +451,8 @@
     <tileimprovement-type id="model.improvement.Plow" add-work-turns="2" overlay="4"
             expended-equipment-type="model.equipment.tools" expended-amount="1" magnitude="1">
       <tiles all-land-tiles="true" all-forest-tiles="false"/>
+      <tile id="model.tile.hills" value="false"/>
+      <tile id="model.tile.mountains" value="false"/>
       <modifier id="model.goods.food" type="additive" value="1"/>
       <modifier id="model.goods.sugar" type="additive" value="1"/>
       <modifier id="model.goods.tobacco" type="additive" value="1"/>
