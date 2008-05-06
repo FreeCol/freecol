@@ -67,6 +67,7 @@ import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.TransactionListener;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.Unit.UnitState;
+import net.sf.freecol.common.resources.ResourceManager;
 import cz.autel.dmi.HIGLayout;
 
 /**
@@ -346,15 +347,15 @@ public final class EuropePanel extends FreeColPanel implements ActionListener, C
         int width = getWidth();
         int height = getHeight();
 
-        Image bgImage = (Image) UIManager.get("EuropeBackgroundImage.scaled");
+        Image bgImage = ResourceManager.getImage("EuropeBackgroundImage.scaled");
         if (bgImage == null) {
-            bgImage = (Image) UIManager.get("EuropeBackgroundImage");
+            bgImage = ResourceManager.getImage("EuropeBackgroundImage");
         }
         if (bgImage != null) {
             if (bgImage.getWidth(null) != parent.getWidth() || bgImage.getHeight(null) != parent.getHeight()) {
-                final Image fullSizeBgImage = (Image) UIManager.get("EuropeBackgroundImage");
+                final Image fullSizeBgImage = ResourceManager.getImage("EuropeBackgroundImage");
                 bgImage = fullSizeBgImage.getScaledInstance(parent.getWidth(), parent.getHeight(), Image.SCALE_SMOOTH);
-                UIManager.put("EuropeBackgroundImage.scaled", bgImage);
+                //UIManager.put("EuropeBackgroundImage.scaled", bgImage);
 
                 /*
                  * We have to use a MediaTracker to ensure that the image has
@@ -375,7 +376,7 @@ public final class EuropePanel extends FreeColPanel implements ActionListener, C
 
             g.drawImage(bgImage, 0, 0, null);
         } else {
-            Image tempImage = (Image) UIManager.get("BackgroundImage");
+            Image tempImage = ResourceManager.getImage("BackgroundImage");
 
             if (tempImage != null) {
                 for (int x = 0; x < width; x += tempImage.getWidth(null)) {

@@ -28,11 +28,11 @@ import java.awt.Image;
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JPanel;
-import javax.swing.UIManager;
 
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.GoodsType;
+import net.sf.freecol.common.resources.ResourceManager;
 
 /**
  * Implements a simple progress bar suitable for use with FreeCol. Unlike
@@ -163,7 +163,7 @@ public class FreeColProgressBar extends JPanel {
         }
 
         if (isOpaque()) {
-            Image tempImage = (Image) UIManager.get("BackgroundImage");
+            Image tempImage = ResourceManager.getImage("BackgroundImage");
 
             if (tempImage != null) {
                 for (int x = getInsets().left; x < width + getInsets().left; x += tempImage.getWidth(null)) {

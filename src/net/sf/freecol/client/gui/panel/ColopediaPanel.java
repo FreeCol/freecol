@@ -24,14 +24,13 @@ import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.GridLayout;
 import java.awt.Image;
-import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
+import java.util.Map.Entry;
 import java.util.logging.Logger;
 
 import javax.swing.BorderFactory;
@@ -43,7 +42,6 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTree;
 import javax.swing.SwingConstants;
-import javax.swing.UIManager;
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
@@ -58,7 +56,6 @@ import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.AbstractGoods;
 import net.sf.freecol.common.model.BuildingType;
 import net.sf.freecol.common.model.Europe;
-import net.sf.freecol.common.model.Feature;
 import net.sf.freecol.common.model.FoundingFather;
 import net.sf.freecol.common.model.FreeColGameObjectType;
 import net.sf.freecol.common.model.Goods;
@@ -68,8 +65,8 @@ import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.ResourceType;
 import net.sf.freecol.common.model.TileImprovementType;
 import net.sf.freecol.common.model.TileType;
-import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.UnitType;
+import net.sf.freecol.common.resources.ResourceManager;
 import cz.autel.dmi.HIGLayout;
 
 /**
@@ -341,7 +338,7 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
      * @param parent
      */
     private void buildBuildingSubtree(DefaultMutableTreeNode parent) {
-        Image buildingImage = (Image) UIManager.get("Colopedia.buildingSection.image");
+        Image buildingImage = ResourceManager.getImage("Colopedia.buildingSection.image");
         ImageIcon buildingIcon = new ImageIcon((buildingImage != null) ? buildingImage : null);
 
         List<BuildingType> buildingTypes = FreeCol.getSpecification().getBuildingTypeList();
@@ -1040,7 +1037,7 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
         name.setPreferredSize(new Dimension(400, 50));
         detailPanel.add(name);
 
-        Image image = (Image) UIManager.get("FoundingFather." + father.getType().toString().toLowerCase());
+        Image image = ResourceManager.getImage("FoundingFather." + father.getType().toString().toLowerCase());
 
         JLabel imageLabel;
         if (image != null) {

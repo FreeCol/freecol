@@ -32,9 +32,10 @@ import java.awt.Point;
 import javax.swing.AbstractButton;
 import javax.swing.JComponent;
 import javax.swing.SwingUtilities;
-import javax.swing.UIManager;
 import javax.swing.plaf.ComponentUI;
 import javax.swing.plaf.metal.MetalButtonUI;
+
+import net.sf.freecol.common.resources.ResourceManager;
 
 
 /**
@@ -62,7 +63,7 @@ public class FreeColButtonUI extends MetalButtonUI {
             int width = b.getWidth();
             int height = b.getHeight();
             
-            Image tempImage = (Image) UIManager.get("BackgroundImage");
+            Image tempImage = ResourceManager.getImage("BackgroundImage");
             
             if (tempImage != null) {
                 for (int x=0; x<width; x+=tempImage.getWidth(null)) {

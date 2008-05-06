@@ -35,7 +35,6 @@ import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextArea;
-import javax.swing.UIManager;
 import javax.swing.border.BevelBorder;
 import javax.swing.border.CompoundBorder;
 import javax.swing.border.EmptyBorder;
@@ -43,6 +42,7 @@ import javax.swing.border.EmptyBorder;
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.i18n.Messages;
+import net.sf.freecol.common.resources.ResourceManager;
 
 /**
  * This is the About panel 
@@ -72,7 +72,7 @@ public final class AboutPanel extends FreeColPanel implements ActionListener {
         // Header with image
         JPanel header = new JPanel();
         this.add(header, BorderLayout.NORTH);
-        Image tempImage = (Image) UIManager.get("TitleImage");
+        Image tempImage = ResourceManager.getImage("TitleImage");
         if (tempImage != null) {
             JLabel logoLabel = new JLabel(new ImageIcon(tempImage));
             logoLabel.setBorder(new CompoundBorder(new EmptyBorder(2,2,2,2), new BevelBorder(BevelBorder.LOWERED)));

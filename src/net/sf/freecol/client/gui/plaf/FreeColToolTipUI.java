@@ -29,11 +29,12 @@ import java.awt.Rectangle;
 
 import javax.swing.JComponent;
 import javax.swing.JToolTip;
-import javax.swing.UIManager;
 import javax.swing.plaf.ComponentUI;
 import javax.swing.plaf.basic.BasicHTML;
 import javax.swing.plaf.basic.BasicToolTipUI;
 import javax.swing.text.View;
+
+import net.sf.freecol.common.resources.ResourceManager;
 
 
 
@@ -59,7 +60,7 @@ public class FreeColToolTipUI extends BasicToolTipUI {
             int width = c.getWidth();
             int height = c.getHeight();
 
-            Image tempImage = (Image) UIManager.get("BackgroundImage");
+            Image tempImage = ResourceManager.getImage("BackgroundImage");
 
             if (tempImage != null) {
                 for (int x=0; x<width; x+=tempImage.getWidth(null)) {

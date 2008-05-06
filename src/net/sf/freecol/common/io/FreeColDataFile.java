@@ -1,3 +1,22 @@
+/**
+ *  Copyright (C) 2002-2008  The FreeCol Team
+ *
+ *  This file is part of FreeCol.
+ *
+ *  FreeCol is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 2 of the License, or
+ *  (at your option) any later version.
+ *
+ *  FreeCol is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with FreeCol.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package net.sf.freecol.common.io;
 
 import java.io.BufferedInputStream;
@@ -5,11 +24,19 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URL;
+import java.util.Enumeration;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Properties;
 import java.util.jar.JarFile;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.zip.GZIPInputStream;
+
+import net.sf.freecol.common.resources.ResourceFactory;
+import net.sf.freecol.common.resources.ResourceMapping;
+
 
 /**
  * Support for reading a FreeCol data file. The data file
@@ -107,6 +134,39 @@ public class FreeColDataFile {
             return fis;
         } else {
             return new BufferedInputStream(jarFile.getInputStream(jarFile.getJarEntry(jarDirectory + "/" + filename)));
+        }
+    }
+    
+    /**
+     * Creates a <code>ResourceMapping</code> from the file
+     * {@value #RESOURCES_PROPERTIES_FILE}.
+     * 
+     * @return A <code>ResourceMapping</code> or <code>null</code>
+     *      there is no resource mapping file.
+     */
+    public ResourceMapping getResourceMapping() {
+        try {
+            final Properties properties = new Properties();
+            properties.load(getInputStream(RESOURCES_PROPERTIES_FILE));
+            ResourceMapping rc = new ResourceMapping();
+            if (supportOldSavegames != null) {
+                return rc;
+            }
+            Enumeration<?> pn = properties.propertyNames();
+            while (pn.hasMoreElements()) {
+                final String key = (String) pn.nextElement();
+                final URL resourceLocator;
+                if (file.isDirectory()) {
+                    resourceLocator =  new URL("file", null, (new File(file, properties.getProperty(key))).getAbsolutePath());
+                } else {
+                    resourceLocator = new URL("jar:file:" + file.getAbsoluteFile() + "!/" + jarDirectory + "/" + properties.getProperty(key));
+                }
+                rc.add(key, ResourceFactory.createResource(resourceLocator));
+            }  
+            return rc;
+        } catch (IOException e) {
+            logger.log(Level.WARNING, "Exception while reading ResourceMapping from: " + file, e);
+            return null;
         }
     }
 

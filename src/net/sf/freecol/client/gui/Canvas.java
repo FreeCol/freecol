@@ -48,7 +48,6 @@ import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 import javax.swing.SwingUtilities;
-import javax.swing.UIManager;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.plaf.basic.BasicInternalFrameUI;
 
@@ -68,8 +67,8 @@ import net.sf.freecol.client.gui.panel.ErrorPanel;
 import net.sf.freecol.client.gui.panel.EuropePanel;
 import net.sf.freecol.client.gui.panel.EventPanel;
 import net.sf.freecol.client.gui.panel.FreeColDialog;
-import net.sf.freecol.client.gui.panel.FreeColPanel;
 import net.sf.freecol.client.gui.panel.FreeColImageBorder;
+import net.sf.freecol.client.gui.panel.FreeColPanel;
 import net.sf.freecol.client.gui.panel.GameOptionsDialog;
 import net.sf.freecol.client.gui.panel.IndianSettlementPanel;
 import net.sf.freecol.client.gui.panel.LoadingSavegameDialog;
@@ -109,9 +108,9 @@ import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.DiplomaticTrade;
 import net.sf.freecol.common.model.Europe;
 import net.sf.freecol.common.model.FoundingFather;
-import net.sf.freecol.common.model.FreeColObject;
 import net.sf.freecol.common.model.FreeColGameObject;
 import net.sf.freecol.common.model.FreeColGameObjectType;
+import net.sf.freecol.common.model.FreeColObject;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.GoodsType;
@@ -126,6 +125,7 @@ import net.sf.freecol.common.model.TradeRoute;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.WorkLocation;
 import net.sf.freecol.common.model.Map.Position;
+import net.sf.freecol.common.resources.ResourceManager;
 import net.sf.freecol.server.generator.MapGeneratorOptions;
 
 /**
@@ -1940,14 +1940,14 @@ public final class Canvas extends JDesktopPane {
         }
 
         if (comp.getBorder() != null) {
-            Image menuborderN = (Image) UIManager.get("menuborder.n.image");
-            Image menuborderNW = (Image) UIManager.get("menuborder.nw.image");
-            Image menuborderNE = (Image) UIManager.get("menuborder.ne.image");
-            Image menuborderW = (Image) UIManager.get("menuborder.w.image");
-            Image menuborderE = (Image) UIManager.get("menuborder.e.image");
-            Image menuborderS = (Image) UIManager.get("menuborder.s.image");
-            Image menuborderSW = (Image) UIManager.get("menuborder.sw.image");
-            Image menuborderSE = (Image) UIManager.get("menuborder.se.image");
+            Image menuborderN = ResourceManager.getImage("menuborder.n.image");
+            Image menuborderNW = ResourceManager.getImage("menuborder.nw.image");
+            Image menuborderNE = ResourceManager.getImage("menuborder.ne.image");
+            Image menuborderW = ResourceManager.getImage("menuborder.w.image");
+            Image menuborderE = ResourceManager.getImage("menuborder.e.image");
+            Image menuborderS = ResourceManager.getImage("menuborder.s.image");
+            Image menuborderSW = ResourceManager.getImage("menuborder.sw.image");
+            Image menuborderSE = ResourceManager.getImage("menuborder.se.image");
             final FreeColImageBorder imageBorder = new FreeColImageBorder(menuborderN, menuborderW, menuborderS,
                     menuborderE, menuborderNW, menuborderNE, menuborderSW, menuborderSE);
             // comp.setBorder(BorderFactory.createCompoundBorder(imageBorder,

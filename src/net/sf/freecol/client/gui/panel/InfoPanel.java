@@ -27,7 +27,6 @@ import java.awt.Image;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
-import java.util.Collections;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -52,6 +51,7 @@ import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.TileImprovement;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.Unit.Role;
+import net.sf.freecol.common.resources.ResourceManager;
 import cz.autel.dmi.HIGLayout;
 
 /**
@@ -99,7 +99,7 @@ public final class InfoPanel extends FreeColPanel {
         
         int internalPanelTop = 0;
         int internalPanelHeight = 128;
-        Image skin = (Image) UIManager.get("InfoPanel.skin");
+        Image skin = ResourceManager.getImage("InfoPanel.skin");
         if (skin == null) {
             setSize(PANEL_WIDTH, PANEL_HEIGHT);
         } else {
@@ -244,7 +244,7 @@ public final class InfoPanel extends FreeColPanel {
             }
         }
         
-        Image skin = (Image) UIManager.get("InfoPanel.skin");
+        Image skin = ResourceManager.getImage("InfoPanel.skin");
         if (skin != null) {
             graphics.drawImage(skin, 0, 0, null);
         }

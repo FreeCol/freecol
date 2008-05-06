@@ -42,6 +42,7 @@ import javax.swing.UIManager;
 import javax.swing.border.Border;
 
 import net.sf.freecol.client.gui.Canvas;
+import net.sf.freecol.common.resources.ResourceManager;
 import cz.autel.dmi.HIGConstraints;
 
 /**
@@ -132,14 +133,14 @@ public class FreeColPanel extends JPanel {
         this.canvas = parent;
         setFocusCycleRoot(true);
 
-        Image menuborderN = (Image) UIManager.get("menuborder.n.image");
-        Image menuborderNW = (Image) UIManager.get("menuborder.nw.image");
-        Image menuborderNE = (Image) UIManager.get("menuborder.ne.image");
-        Image menuborderW = (Image) UIManager.get("menuborder.w.image");
-        Image menuborderE = (Image) UIManager.get("menuborder.e.image");
-        Image menuborderS = (Image) UIManager.get("menuborder.s.image");
-        Image menuborderSW = (Image) UIManager.get("menuborder.sw.image");
-        Image menuborderSE = (Image) UIManager.get("menuborder.se.image");
+        Image menuborderN = ResourceManager.getImage("menuborder.n.image");
+        Image menuborderNW = ResourceManager.getImage("menuborder.nw.image");
+        Image menuborderNE = ResourceManager.getImage("menuborder.ne.image");
+        Image menuborderW = ResourceManager.getImage("menuborder.w.image");
+        Image menuborderE = ResourceManager.getImage("menuborder.e.image");
+        Image menuborderS = ResourceManager.getImage("menuborder.s.image");
+        Image menuborderSW = ResourceManager.getImage("menuborder.sw.image");
+        Image menuborderSE = ResourceManager.getImage("menuborder.se.image");
         final FreeColImageBorder imageBorder = new FreeColImageBorder(menuborderN, menuborderW, menuborderS,
                 menuborderE, menuborderNW, menuborderNE, menuborderSW, menuborderSE);
         setBorder(BorderFactory.createCompoundBorder(imageBorder,

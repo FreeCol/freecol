@@ -23,9 +23,10 @@ import java.awt.Graphics;
 import java.awt.Image;
 
 import javax.swing.JComponent;
-import javax.swing.UIManager;
 import javax.swing.plaf.ComponentUI;
 import javax.swing.plaf.basic.BasicTextFieldUI;
+
+import net.sf.freecol.common.resources.ResourceManager;
 
 
 /**
@@ -57,7 +58,7 @@ public class FreeColTextFieldUI extends BasicTextFieldUI {
             int width = c.getWidth();
             int height = c.getHeight();
 
-            Image tempImage = (Image) UIManager.get("BackgroundImage2");
+            Image tempImage = ResourceManager.getImage("BackgroundImage2");
 
             if (tempImage != null) {
                 for (int x=0; x<width; x+=tempImage.getWidth(null)) {

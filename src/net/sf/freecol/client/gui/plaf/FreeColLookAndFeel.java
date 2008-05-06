@@ -222,53 +222,6 @@ public class FreeColLookAndFeel extends MetalLookAndFeel {
             
             // Add image UI resources:
             String [][] resources = {                
-                {"BackgroundImage", "bg.png"},
-                {"BackgroundImage2", "bg2.png"},
-                {"CanvasBackgroundImage", "bg_map1.jpg"},
-                {"EuropeBackgroundImage", "bg_europe.jpg"},
-                {"TitleImage", "freecol2.png"},
-                {"EventImage.firstLanding", "landing.png"},
-                {"EventImage.meetingNatives", "meet_natives.png"},
-                {"EventImage.meetingEuropeans", "meet_europeans.png"},
-                {"EventImage.meetingAztec", "meet_aztec.png"},
-                {"EventImage.meetingInca", "meet_inca.png"},
-                {"VictoryImage", "victory.png"},
-                {"FoundingFather.trade", "trade.png"},
-                {"FoundingFather.exploration", "exploration.png"},
-                {"FoundingFather.military", "military.png"},
-                {"FoundingFather.political", "political.png"},
-                {"FoundingFather.religious", "religious.png"},
-                {"cursor.go.image", "go.png"},
-                {"MiniMap.skin", "minimap-skin.png"},
-                {"InfoPanel.skin", "infopanel-skin.png"},
-                {"Declaration.image", "doi.png"},
-                {"path.foot.image", "path-foot.png"},
-                {"path.foot.nextTurn.image", "path-foot-nextturn.png"},
-                {"path.foot.illegal.image", "path-foot-illegal.png"},
-                {"path.naval.image", "path-naval.png"},
-                {"path.naval.nextTurn.image", "path-naval-nextturn.png"},
-                {"path.naval.illegal.image", "path-naval-illegal.png"},
-                {"path.wagon.image", "path-wagon.png"},
-                {"path.wagon.nextTurn.image", "path-wagon-nextturn.png"},
-                {"path.wagon.illegal.image", "path-wagon-illegal.png"},
-                {"path.horse.image", "path-horse.png"},
-                {"path.horse.nextTurn.image", "path-horse-nextturn.png"},
-                {"path.horse.illegal.image", "path-horse-illegal.png"},
-                {"menuborder.n.image", "menuborder-n.png"},
-                {"menuborder.nw.image", "menuborder-nw.png"},
-                {"menuborder.ne.image", "menuborder-ne.png"},
-                {"menuborder.w.image", "menuborder-w.png"},
-                {"menuborder.e.image", "menuborder-e.png"},
-                {"menuborder.s.image", "menuborder-s.png"},
-                {"menuborder.sw.image", "menuborder-sw.png"},
-                {"menuborder.se.image", "menuborder-se.png"},
-                {"menuborder.shadow.sw.image", "menuborder-shadow-sw.png"},
-                {"menuborder.shadow.s.image", "menuborder-shadow-s.png"},
-                {"menuborder.shadow.se.image", "menuborder-shadow-se.png"},
-                {"map.americas", "map-americas.png"},
-                {"Colopedia.openSection.image", "open_section.png"},
-                {"Colopedia.closedSection.image", "closed_section.png"},
-                {"Colopedia.buildingSection.image", "building_section.png"},
             };
 
             /*
@@ -299,7 +252,7 @@ public class FreeColLookAndFeel extends MetalLookAndFeel {
             }
             
             // Resize background image:
-            String[] fullscreenImages = new String[] {
+            /*String[] fullscreenImages = new String[] {
                 "CanvasBackgroundImage",
                 "EuropeBackgroundImage"
             };
@@ -310,7 +263,7 @@ public class FreeColLookAndFeel extends MetalLookAndFeel {
                     u.put(imageID + ".scaled", bgImage);
                     mt.addImage(bgImage, 0, windowSize.width, windowSize.height);
                 }
-            }
+            }*/
                 
             try {
                 mt.waitForID(0, 30000); // Wait a maximum of 30 seconds for the images to load.

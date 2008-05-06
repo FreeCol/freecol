@@ -25,9 +25,10 @@ import java.awt.Image;
 import javax.swing.JComponent;
 import javax.swing.JList;
 import javax.swing.ListCellRenderer;
-import javax.swing.UIManager;
 import javax.swing.plaf.ComponentUI;
 import javax.swing.plaf.basic.BasicListUI;
+
+import net.sf.freecol.common.resources.ResourceManager;
 
 /**
  * UI-class for lists.
@@ -48,7 +49,7 @@ public class FreeColListUI extends BasicListUI {
         int width = c.getWidth();
         int height = c.getHeight();
 
-        Image tempImage = (Image) UIManager.get("BackgroundImage2");
+        Image tempImage = ResourceManager.getImage("BackgroundImage2");
 
         if (tempImage != null) {
             for (int x=0; x<width; x+=tempImage.getWidth(null)) {

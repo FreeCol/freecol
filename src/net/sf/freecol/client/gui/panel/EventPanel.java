@@ -32,6 +32,7 @@ import javax.swing.UIManager;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.i18n.Messages;
+import net.sf.freecol.common.resources.ResourceManager;
 import cz.autel.dmi.HIGLayout;
 
 /**
@@ -102,24 +103,24 @@ public final class EventPanel extends FreeColDialog implements ActionListener {
 
     public void initialize(int eventID) {
         if (eventID == FIRST_LANDING) {
-            Image image = (Image) UIManager.get("EventImage.firstLanding");
+            Image image = ResourceManager.getImage("EventImage.firstLanding");
             imageLabel.setIcon(new ImageIcon(image));
             header.setText(Messages.message("event.firstLanding", "%name%",
                     freeColClient.getMyPlayer().getNewLandName()));
         } else if (eventID == MEETING_NATIVES) {
-            Image image = (Image) UIManager.get("EventImage.meetingNatives");
+            Image image = ResourceManager.getImage("EventImage.meetingNatives");
             imageLabel.setIcon(new ImageIcon(image));
             header.setText(Messages.message("event.meetingNatives"));
         } else if (eventID == MEETING_EUROPEANS) {
-            Image image = (Image) UIManager.get("EventImage.meetingEuropeans");
+            Image image = ResourceManager.getImage("EventImage.meetingEuropeans");
             imageLabel.setIcon(new ImageIcon(image));
             header.setText(Messages.message("event.meetingEuropeans"));
         } else if (eventID == MEETING_AZTEC) {
-            Image image = (Image) UIManager.get("EventImage.meetingAztec");
+            Image image = ResourceManager.getImage("EventImage.meetingAztec");
             imageLabel.setIcon(new ImageIcon(image));
             header.setText(Messages.message("event.meetingAztec"));
         } else if (eventID == MEETING_INCA) {
-            Image image = (Image) UIManager.get("EventImage.meetingInca");
+            Image image = ResourceManager.getImage("EventImage.meetingInca");
             imageLabel.setIcon(new ImageIcon(image));
             header.setText(Messages.message("event.meetingInca"));
         } else {

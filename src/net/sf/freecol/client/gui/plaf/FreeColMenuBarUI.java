@@ -22,9 +22,10 @@ package net.sf.freecol.client.gui.plaf;
 import java.awt.Image;
 
 import javax.swing.JComponent;
-import javax.swing.UIManager;
 import javax.swing.plaf.ComponentUI;
 import javax.swing.plaf.basic.BasicMenuBarUI;
+
+import net.sf.freecol.common.resources.ResourceManager;
 
 
 /**
@@ -46,7 +47,7 @@ public class FreeColMenuBarUI extends BasicMenuBarUI {
             int width = c.getWidth();
             int height = c.getHeight();
 
-            Image tempImage = (Image) UIManager.get("BackgroundImage");
+            Image tempImage = ResourceManager.getImage("BackgroundImage");
 
             if (tempImage != null) {
                 for (int x=0; x<width; x+=tempImage.getWidth(null)) {

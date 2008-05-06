@@ -28,7 +28,6 @@ import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Image;
-import java.awt.MediaTracker;
 import java.awt.Point;
 import java.awt.Polygon;
 import java.awt.Rectangle;
@@ -60,7 +59,6 @@ import net.sf.freecol.common.model.Europe;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.IndianSettlement;
 import net.sf.freecol.common.model.Map;
-import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.PathNode;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Settlement;
@@ -70,8 +68,10 @@ import net.sf.freecol.common.model.TileImprovement;
 import net.sf.freecol.common.model.TileItemContainer;
 import net.sf.freecol.common.model.TileType;
 import net.sf.freecol.common.model.Unit;
-import net.sf.freecol.common.model.Unit.UnitState;
+import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.Map.Position;
+import net.sf.freecol.common.model.Unit.UnitState;
+import net.sf.freecol.common.resources.ResourceManager;
 
 
 
@@ -682,33 +682,9 @@ public final class GUI {
                 g.setColor(Color.black);
                 g.fillRect(0, 0, size.width, size.height);                
             } else {
-                Image bgImage = (Image) UIManager.get("CanvasBackgroundImage.scaled");
-                if (bgImage == null) {
-                    bgImage = (Image) UIManager.get("CanvasBackgroundImage");
-                }
+                Image bgImage = ResourceManager.getImage("CanvasBackgroundImage", size);
                 if (bgImage != null) {
-                    if (bgImage.getWidth(null) != size.width || bgImage.getHeight(null) != size.height) {
-                        final Image fullSizeBgImage = (Image) UIManager.get("CanvasBackgroundImage");
-                        bgImage = fullSizeBgImage.getScaledInstance(size.width, size.height, Image.SCALE_SMOOTH);
-                        UIManager.put("CanvasBackgroundImage.scaled", bgImage);
-                        /*
-                      We have to use a MediaTracker to ensure that the
-                      image has been scaled before we paint it.
-                         */
-                        MediaTracker mt = new MediaTracker(freeColClient.getCanvas());
-                        mt.addImage(bgImage, 0, size.width, size.height);
-
-                        try {
-                            mt.waitForID(0);
-                        } catch (InterruptedException e) {
-                            g.setColor(Color.black);
-                            g.fillRect(0, 0, size.width, size.height);
-                            return;
-                        }
-
-                    }
-
-                    g.drawImage(bgImage, 0, 0, null);
+                    g.drawImage(bgImage, 0, 0, freeColClient.getCanvas());
                 } else {
                     g.setColor(Color.black);
                     g.fillRect(0, 0, size.width, size.height);
@@ -1257,7 +1233,7 @@ public final class GUI {
         if (u == null) {
             return null;
         } else {
-            return (Image) UIManager.get("path." + u.getPathTypeImage() + ".image");
+            return ResourceManager.getImage("path." + u.getPathTypeImage() + ".image");
         }
     }
     
@@ -1290,7 +1266,7 @@ public final class GUI {
         if (u == null) {
             return null;
         } else {
-            return (Image) UIManager.get("path." + u.getPathTypeImage() + ".nextTurn.image");
+            return ResourceManager.getImage("path." + u.getPathTypeImage() + ".nextTurn.image");
         }
     }
 

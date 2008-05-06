@@ -29,6 +29,8 @@ import javax.swing.UIManager;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeCellRenderer;
 
+import net.sf.freecol.common.resources.ResourceManager;
+
 /**
  * This TreeCellRenderer is responsible for rendering tree items in the Colopedia.
  */
@@ -58,13 +60,13 @@ public class ColopediaTreeCellRenderer extends DefaultTreeCellRenderer {
             ImageIcon icon = nodeItem.getIcon();
             setIcon(icon);
         } else if (expanded) {
-            Image openImage = (Image) UIManager.get("Colopedia.openSection.image");
+            Image openImage = ResourceManager.getImage("Colopedia.openSection.image");
             ImageIcon openIcon = new ImageIcon((openImage != null) ? openImage : null);
             if (openIcon != null) {
                 setIcon(openIcon);
             }
         } else {
-            Image closedImage = (Image) UIManager.get("Colopedia.closedSection.image");
+            Image closedImage = ResourceManager.getImage("Colopedia.closedSection.image");
             ImageIcon closedIcon = new ImageIcon((closedImage != null) ? closedImage : null);
             if (closedIcon != null) {
                 setIcon(closedIcon);

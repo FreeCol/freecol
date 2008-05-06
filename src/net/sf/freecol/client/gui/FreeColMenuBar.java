@@ -37,6 +37,7 @@ import net.sf.freecol.client.gui.action.ActionManager;
 import net.sf.freecol.client.gui.action.FreeColAction;
 import net.sf.freecol.client.gui.action.SelectableAction;
 import net.sf.freecol.client.gui.panel.FreeColImageBorder;
+import net.sf.freecol.common.resources.ResourceManager;
 
 /**
  * The menu bar that is displayed on the top left corner of the
@@ -110,17 +111,17 @@ public abstract class FreeColMenuBar extends JMenuBar {
 
         this.am = f.getActionManager();
 
-        Image menuborderN = (Image) UIManager.get("menuborder.n.image");
-        Image menuborderNW = (Image) UIManager.get("menuborder.nw.image");
-        Image menuborderNE = (Image) UIManager.get("menuborder.ne.image");
-        Image menuborderW = (Image) UIManager.get("menuborder.w.image");
-        Image menuborderE = (Image) UIManager.get("menuborder.e.image");
-        Image menuborderS = (Image) UIManager.get("menuborder.s.image");
-        Image menuborderSW = (Image) UIManager.get("menuborder.sw.image");
-        Image menuborderSE = (Image) UIManager.get("menuborder.se.image");
-        Image menuborderShadowSW = (Image) UIManager.get("menuborder.shadow.sw.image");
-        Image menuborderShadowS = (Image) UIManager.get("menuborder.shadow.s.image");
-        Image menuborderShadowSE = (Image) UIManager.get("menuborder.shadow.se.image");
+        Image menuborderN = ResourceManager.getImage("menuborder.n.image");
+        Image menuborderNW = ResourceManager.getImage("menuborder.nw.image");
+        Image menuborderNE = ResourceManager.getImage("menuborder.ne.image");
+        Image menuborderW = ResourceManager.getImage("menuborder.w.image");
+        Image menuborderE = ResourceManager.getImage("menuborder.e.image");
+        Image menuborderS = ResourceManager.getImage("menuborder.s.image");
+        Image menuborderSW = ResourceManager.getImage("menuborder.sw.image");
+        Image menuborderSE = ResourceManager.getImage("menuborder.se.image");
+        Image menuborderShadowSW = ResourceManager.getImage("menuborder.shadow.sw.image");
+        Image menuborderShadowS = ResourceManager.getImage("menuborder.shadow.s.image");
+        Image menuborderShadowSE = ResourceManager.getImage("menuborder.shadow.se.image");
         final FreeColImageBorder innerBorder = new FreeColImageBorder(menuborderN, menuborderW, menuborderS,
                 menuborderE, menuborderNW, menuborderNE, menuborderSW, menuborderSE);
         outerBorder = new FreeColImageBorder(null, null, menuborderShadowS, null, null, null, menuborderShadowSW,
@@ -244,7 +245,7 @@ public abstract class FreeColMenuBar extends JMenuBar {
             int width = getWidth() - insets.left - insets.right;
             int height = getHeight() - insets.top - insets.bottom;
 
-            Image tempImage = (Image) UIManager.get("BackgroundImage");
+            Image tempImage = ResourceManager.getImage("BackgroundImage");
 
             final Shape originalClip = g.getClip();
             g.setClip(insets.left, insets.top, width, height);

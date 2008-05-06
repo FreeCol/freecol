@@ -40,6 +40,7 @@ import javax.swing.UIManager;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.FAFile;
+import net.sf.freecol.common.resources.ResourceManager;
 import net.sf.freecol.common.util.Utils;
 
 /**
@@ -75,7 +76,7 @@ public final class DeclarationDialog extends FreeColDialog {
 
         setLayout(null);
 
-        Image image = (Image) UIManager.get("Declaration.image");
+        Image image = ResourceManager.getImage("Declaration.image");
         setSize(image.getWidth(null), image.getHeight(null));
         setOpaque(false);
         setBorder(null);

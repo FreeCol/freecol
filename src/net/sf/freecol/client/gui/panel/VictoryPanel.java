@@ -28,10 +28,10 @@ import javax.swing.Box;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JLabel;
-import javax.swing.UIManager;
 
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.i18n.Messages;
+import net.sf.freecol.common.resources.ResourceManager;
 import cz.autel.dmi.HIGLayout;
 
 /**
@@ -69,7 +69,7 @@ public final class VictoryPanel extends FreeColPanel implements ActionListener {
 
         JLabel victoryLabel = getDefaultHeader(Messages.message("victory.text"));
 
-        Image tempImage = (Image) UIManager.get("VictoryImage");
+        Image tempImage = ResourceManager.getImage("VictoryImage");
         JLabel imageLabel;
 
         if (tempImage != null) {

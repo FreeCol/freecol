@@ -30,7 +30,6 @@ import java.util.logging.Logger;
 
 import javax.swing.JButton;
 import javax.swing.JPanel;
-import javax.swing.UIManager;
 import javax.swing.border.BevelBorder;
 import javax.swing.event.MouseInputListener;
 
@@ -44,6 +43,7 @@ import net.sf.freecol.common.model.Map;
 import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.TileType;
+import net.sf.freecol.common.resources.ResourceManager;
 
 
 
@@ -107,7 +107,7 @@ public final class MiniMap extends JPanel implements MouseInputListener {
         setLayout(null);
 
         //boolean usingSkin;
-        Image skin = (Image) UIManager.get("MiniMap.skin");
+        Image skin = ResourceManager.getImage("MiniMap.skin");
         if (skin == null) {
             try {
                 BevelBorder border = new BevelBorder(BevelBorder.RAISED);
@@ -209,7 +209,7 @@ public final class MiniMap extends JPanel implements MouseInputListener {
                 || freeColClient.getGame().getMap() == null) {
             return;
         }        
-        Image skin = (Image) UIManager.get("MiniMap.skin");
+        Image skin = ResourceManager.getImage("MiniMap.skin");
         
     	int colorIndex = freeColClient.getClientOptions().getInteger(ClientOptions.MINIMAP_BACKGROUND_COLOR);
     	Color newBackground = MiniMapChangeBackgroundAction.interpretIndex(colorIndex);

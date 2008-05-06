@@ -55,10 +55,12 @@ import net.sf.freecol.client.gui.sound.MusicLibrary;
 import net.sf.freecol.client.gui.sound.SfxLibrary;
 import net.sf.freecol.common.FreeColException;
 import net.sf.freecol.common.Specification;
+import net.sf.freecol.common.io.FreeColDataFile;
 import net.sf.freecol.common.io.FreeColSavegameFile;
 import net.sf.freecol.common.logging.DefaultHandler;
 import net.sf.freecol.common.networking.NoRouteToServerException;
 import net.sf.freecol.common.option.LanguageOption;
+import net.sf.freecol.common.resources.ResourceManager;
 import net.sf.freecol.server.FreeColServer;
 
 
@@ -101,7 +103,7 @@ public final class FreeCol {
                             memoryCheck = true,
                             consoleLogging = false;
     private static Dimension windowSize = new Dimension(-1, -1);
-    private static String   dataFolder = "";
+    private static String   dataFolder = "data" + FILE_SEP;
     
     private static FreeColClient freeColClient;
 
@@ -173,6 +175,20 @@ public final class FreeCol {
             removeSplash(splash);
             System.out.println("You need to assign more memory to the JVM. Restart FreeCol with:");
             System.out.println("java -Xmx" + minMemory + "M -jar FreeCol.jar");
+            return;
+        }
+        
+        try {
+            FreeColDataFile baseData = new FreeColDataFile(new File(dataFolder, "base"));
+            try {
+                ResourceManager.setBaseMapping(baseData.getResourceMapping());
+                ResourceManager.update();
+            } finally {
+                baseData.close();
+            }
+        } catch (IOException e) {
+            removeSplash(splash);
+            System.err.println("Could not find base data directory.");
             return;
         }
 

@@ -566,6 +566,18 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
         unitContainer.disposeAllUnits();
         updatePlayerExploredTiles();
     }
+    
+    public void dispose() {
+        if (settlement != null) {
+            settlement.dispose();
+        }
+        if (tileItemContainer != null) {
+            tileItemContainer.dispose();
+        }
+        unitContainer.dispose();
+        
+        super.dispose();
+    }
 
     /**
      * Gets the first <code>Unit</code> on this tile.

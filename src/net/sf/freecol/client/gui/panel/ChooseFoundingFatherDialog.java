@@ -24,7 +24,6 @@ import java.awt.Dimension;
 import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -34,13 +33,13 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextArea;
-import javax.swing.UIManager;
 import javax.swing.border.EmptyBorder;
 
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.FoundingFather;
 import net.sf.freecol.common.model.FoundingFather.FoundingFatherType;
+import net.sf.freecol.common.resources.ResourceManager;
 
 /**
  * This panel displays the different founding fathers the player can work
@@ -161,7 +160,7 @@ public final class ChooseFoundingFatherDialog extends FreeColDialog implements A
             p1.setOpaque(false);
             p1.setBorder(new EmptyBorder(20, 20, 20, 20));
 
-            Image image = (Image) UIManager.get("FoundingFather." + type.toString().toLowerCase());
+            Image image = ResourceManager.getImage("FoundingFather." + type.toString().toLowerCase());
 
             JLabel imageLabel;
             if (image != null) {
