@@ -99,6 +99,7 @@ import net.sf.freecol.common.networking.BuyLandMessage;
 import net.sf.freecol.common.networking.Message;
 import net.sf.freecol.common.networking.NetworkConstants;
 import net.sf.freecol.common.networking.StealLandMessage;
+import net.sf.freecol.common.networking.StatisticsMessage;
 
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
@@ -3699,5 +3700,15 @@ public final class InGameController implements NetworkConstants {
 
         colony.dispose();
         client.sendAndWait(abandonColony);
+    }
+    
+    /**
+     * Retrieves server statistics
+     */
+    public StatisticsMessage getServerStatistics() {
+        Element request = Message.createNewRootElement(StatisticsMessage.getXMLElementTagName());
+        Element reply = freeColClient.getClient().ask(request);
+        StatisticsMessage m = new StatisticsMessage(reply);
+        return m;
     }
 }

@@ -76,6 +76,7 @@ import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.networking.Message;
 import net.sf.freecol.common.networking.NetworkConstants;
 import net.sf.freecol.common.networking.NoRouteToServerException;
+import net.sf.freecol.common.networking.StatisticsMessage;
 import net.sf.freecol.common.networking.StealLandMessage;
 import net.sf.freecol.common.option.BooleanOption;
 import net.sf.freecol.server.FreeColServer;
@@ -474,6 +475,11 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         register("assignTeacher", new NetworkRequestHandler() {
             public Element handle(Connection connection, Element element) {
                 return assignTeacher(connection, element);
+            }
+        });
+        register(StatisticsMessage.getXMLElementTagName(), new NetworkRequestHandler() {
+            public Element handle(Connection connection, Element element) {
+                return getServerStatistics(connection, element);
             }
         });
     }
@@ -2949,4 +2955,10 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
      * logger.warning("Could not send message to: " + enemyPlayer.getName() + "
      * with connection " + enemyPlayer.getConnection()); } } }
      */
+    
+    private Element getServerStatistics(Connection connection, Element request) {
+        StatisticsMessage m = new StatisticsMessage(getGame(), getFreeColServer().getAIMain());
+        Element reply = m.toXMLElement();
+        return reply;
+    }
 }

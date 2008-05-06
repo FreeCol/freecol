@@ -28,6 +28,8 @@ import java.io.File;
 import java.util.HashMap;
 import java.util.Iterator;
 
+import org.w3c.dom.Element;
+
 import javax.swing.ButtonGroup;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JMenu;
@@ -47,6 +49,7 @@ import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.Map.Position;
+import net.sf.freecol.common.networking.StatisticsMessage;
 import net.sf.freecol.server.ai.AIUnit;
 
 public class DebugMenu extends JMenu {
@@ -366,12 +369,11 @@ public class DebugMenu extends JMenu {
                 return message;
             }
             public void actionPerformed(ActionEvent e) {
-                HashMap<String, Long> serverAIStats = freeColClient.getFreeColServer().getAIMain().getAIStatistics();
-                HashMap<String, Long> serverGameStats = freeColClient.getFreeColServer().getGame().getGameStatistics();
-                HashMap<String, Long> clientGameStats = freeColClient.getGame().getGameStatistics();
-                String message = serializeStats("Client game statistics", clientGameStats)+"\n"+
-                                 serializeStats("Server game statistics", serverGameStats)+"\n"+
-                                 serializeStats("Server AI statistics", serverAIStats);
+                StatisticsMessage serverStatistics = freeColClient.getInGameController().getServerStatistics();
+                StatisticsMessage clientStatistics = new StatisticsMessage(freeColClient.getGame(), null);
+                String message = serializeStats("Client game statistics", clientStatistics.getGameStatistics())+"\n"+
+                                 serializeStats("Server game statistics", serverStatistics.getGameStatistics())+"\n"+
+                                 serializeStats("Server AI statistics", serverStatistics.getAIStatistics());
                 canvas.showInformationMessage(message);
             }
         });
@@ -382,17 +384,22 @@ public class DebugMenu extends JMenu {
         memoryManager.setMnemonic(KeyEvent.VK_O);
         this.add(memoryManager);
         memoryManager.addActionListener(new ActionListener() {
+            private String serializeMemoryStats(String title, StatisticsMessage stats) {
+                String message = title+"\n";
+                message += Messages.message("menuBar.debug.memoryManager.free",
+                         "%free%", Long.toString(stats.getFreeMemory()/(1024*1024))) + "\n";
+                message += Messages.message("menuBar.debug.memoryManager.total",
+                        "%total%", Long.toString(stats.getTotalMemory()/(1024*1024))) + "\n";
+                message += Messages.message("menuBar.debug.memoryManager.max",
+                        "%max%", Long.toString(stats.getMaxMemory()/(1024*1024))) + "\n";
+                return message;
+            }
             public void actionPerformed(ActionEvent e) {
-                long free = Runtime.getRuntime().freeMemory();
-                long total = Runtime.getRuntime().totalMemory();
-                long max = Runtime.getRuntime().maxMemory();
-                String freeMemory = Messages.message("menuBar.debug.memoryManager.free",
-                        "%free%", Long.toString(free/(1024*1024)));
-                String totalMemory = Messages.message("menuBar.debug.memoryManager.total",
-                        "%total%", Long.toString(total/(1024*1024)));
-                String maxMemory = Messages.message("menuBar.debug.memoryManager.max",
-                        "%max%", Long.toString(max/(1024*1024)));
-                canvas.showInformationMessage(freeMemory+"\n"+totalMemory+"\n"+maxMemory);
+                StatisticsMessage serverStatistics = freeColClient.getInGameController().getServerStatistics();
+                StatisticsMessage clientStatistics = new StatisticsMessage(freeColClient.getGame(), null);
+                String message = serializeMemoryStats("Client:", clientStatistics)+"\n"+
+                                 serializeMemoryStats("Server:", serverStatistics);
+                canvas.showInformationMessage(message);
             }
         });
 
