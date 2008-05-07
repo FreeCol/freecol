@@ -43,6 +43,7 @@ import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.i18n.Messages;
+import net.sf.freecol.client.gui.panel.StatisticsPanel;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.Map;
 import net.sf.freecol.common.model.Player;
@@ -357,24 +358,8 @@ public class DebugMenu extends JMenu {
         statistics.setMnemonic(KeyEvent.VK_I);
         this.add(statistics);
         statistics.addActionListener(new ActionListener() {
-            private String serializeStats(String title, HashMap<String, Long> stats) {
-                String message = title+"\n";
-                long total = 0;
-                for (String s :stats.keySet()) {
-                    Long value = stats.get(s);
-                    message += s+": "+value.toString()+"\n";
-                    total += value;
-                }
-                message += "Total: "+total+"\n";
-                return message;
-            }
             public void actionPerformed(ActionEvent e) {
-                StatisticsMessage serverStatistics = freeColClient.getInGameController().getServerStatistics();
-                StatisticsMessage clientStatistics = new StatisticsMessage(freeColClient.getGame(), null);
-                String message = serializeStats("Client game statistics", clientStatistics.getGameStatistics())+"\n"+
-                                 serializeStats("Server game statistics", serverStatistics.getGameStatistics())+"\n"+
-                                 serializeStats("Server AI statistics", serverStatistics.getAIStatistics());
-                canvas.showInformationMessage(message);
+                canvas.showPanel(new StatisticsPanel(canvas, freeColClient));
             }
         });
         
@@ -384,22 +369,8 @@ public class DebugMenu extends JMenu {
         memoryManager.setMnemonic(KeyEvent.VK_O);
         this.add(memoryManager);
         memoryManager.addActionListener(new ActionListener() {
-            private String serializeMemoryStats(String title, StatisticsMessage stats) {
-                String message = title+"\n";
-                message += Messages.message("menuBar.debug.memoryManager.free",
-                         "%free%", Long.toString(stats.getFreeMemory()/(1024*1024))) + "\n";
-                message += Messages.message("menuBar.debug.memoryManager.total",
-                        "%total%", Long.toString(stats.getTotalMemory()/(1024*1024))) + "\n";
-                message += Messages.message("menuBar.debug.memoryManager.max",
-                        "%max%", Long.toString(stats.getMaxMemory()/(1024*1024))) + "\n";
-                return message;
-            }
             public void actionPerformed(ActionEvent e) {
-                StatisticsMessage serverStatistics = freeColClient.getInGameController().getServerStatistics();
-                StatisticsMessage clientStatistics = new StatisticsMessage(freeColClient.getGame(), null);
-                String message = serializeMemoryStats("Client:", clientStatistics)+"\n"+
-                                 serializeMemoryStats("Server:", serverStatistics);
-                canvas.showInformationMessage(message);
+                canvas.showPanel(new StatisticsPanel(canvas, freeColClient));
             }
         });
 

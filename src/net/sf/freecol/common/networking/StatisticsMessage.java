@@ -37,16 +37,13 @@ import net.sf.freecol.server.ai.AIMain;
 
 public class StatisticsMessage extends Message {
     
-    private long free, total, max;
+    private HashMap<String, Long> memoryStats = null;
     private HashMap<String, Long> gameStats = null;
     private HashMap<String, Long> aiStats = null;
 
     public StatisticsMessage(Game game, AIMain aiMain) {
         // memory statistics
-        System.gc();
-        free = Runtime.getRuntime().freeMemory();
-        total = Runtime.getRuntime().totalMemory();
-        max = Runtime.getRuntime().maxMemory();
+        memoryStats = game.getMemoryStatistics();
         // game statistics
         gameStats = game.getGameStatistics();
         // AI statistics
@@ -83,26 +80,8 @@ public class StatisticsMessage extends Message {
      *
      * @return a <code>Tile</code> value
      */
-    public final long getFreeMemory() {
-        return free;
-    }
-    
-    /**
-     * Get the total memory.
-     *
-     * @return a <code>Tile</code> value
-     */
-    public final long getTotalMemory() {
-        return total;
-    }
-    
-    /**
-     * Get the max memory.
-     *
-     * @return a <code>Tile</code> value
-     */
-    public final long getMaxMemory() {
-        return max;
+    public final HashMap<String, Long> getMemoryStatistics() {
+        return memoryStats;
     }
 
     public void readFromXML(Element element) {
@@ -111,9 +90,11 @@ public class StatisticsMessage extends Message {
         }
         Element memoryElement = (Element)element.getElementsByTagName("memoryStatistics").item(0);
         if (memoryElement != null) {
-            free = Long.valueOf(memoryElement.getAttribute("free"));
-            total = Long.valueOf(memoryElement.getAttribute("total"));
-            max = Long.valueOf(memoryElement.getAttribute("max"));
+            memoryStats = new HashMap<String, Long>();
+            NamedNodeMap atts = (NamedNodeMap)memoryElement.getAttributes();
+            for (int i=0; i<atts.getLength(); i++) {
+                memoryStats.put(atts.item(i).getNodeName(), new Long(atts.item(i).getNodeValue()));
+            }
         }
         Element gameElement = (Element)element.getElementsByTagName("gameStatistics").item(0);
         if (gameElement != null) {
@@ -138,9 +119,9 @@ public class StatisticsMessage extends Message {
         // memory statistics
         Element memoryElement = result.getOwnerDocument().createElement("memoryStatistics");
         result.appendChild(memoryElement);
-        memoryElement.setAttribute("free", new Long(free).toString());
-        memoryElement.setAttribute("total", new Long(total).toString());
-        memoryElement.setAttribute("max", new Long(max).toString());
+        for (String s : memoryStats.keySet()) {
+            memoryElement.setAttribute(s, memoryStats.get(s).toString());
+        }
         // game statistics
         Element gameElement = result.getOwnerDocument().createElement("gameStatistics");
         result.appendChild(gameElement);

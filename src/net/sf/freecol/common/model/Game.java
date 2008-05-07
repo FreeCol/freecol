@@ -32,6 +32,7 @@ import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.freecol.FreeCol;
+import net.sf.freecol.client.gui.i18n.Messages;
 
 /**
  * The main component of the game model.
@@ -1088,6 +1089,18 @@ public class Game extends FreeColGameObject {
             }
         }
         
+        return map;
+    }
+    
+    public HashMap<String, Long> getMemoryStatistics() {
+        System.gc();
+        long free = Runtime.getRuntime().freeMemory()/(1024*1024);
+        long total = Runtime.getRuntime().totalMemory()/(1024*1024);
+        long max = Runtime.getRuntime().maxMemory()/(1024*1024);
+        HashMap<String, Long> map = new HashMap<String, Long>();
+        map.put(Messages.message("menuBar.debug.memoryManager.free"), new Long(free));
+        map.put(Messages.message("menuBar.debug.memoryManager.total"), new Long(total));
+        map.put(Messages.message("menuBar.debug.memoryManager.max"), new Long(max));
         return map;
     }
 }
