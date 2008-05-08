@@ -207,7 +207,6 @@ public final class StatisticsPanel extends FreeColPanel implements ActionListene
         model.setData(data);
         JTable table = new JTable(model);
         table.setAutoCreateColumnsFromModel(true);
-        table.setAutoCreateRowSorter(true);
         table.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
         JScrollPane scrollPane = new JScrollPane(table);
         table.addNotify();
