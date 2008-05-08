@@ -82,7 +82,18 @@ public class FreeColDataFile {
      * @throws IOException if thrown while opening the file.
      */
     public FreeColDataFile(File file) throws IOException {
+        if (!file.exists()) {
+            for (String ending : getFileEndings()) {
+                final File tempFile = new File(file.getAbsolutePath() + ending);
+                if (tempFile.exists()) {
+                    file = tempFile;
+                    break;
+                }
+            }
+        }
+        
         this.file = file;
+        
         if (file.isDirectory()) {
             this.jarFile = null;
             this.openStreams = new LinkedList<InputStream>();
@@ -191,5 +202,13 @@ public class FreeColDataFile {
                 supportOldSavegames.close();
             } catch (IOException e) {}
         }
+    }
+    
+    /**
+     * File endings that are supported for this type of data file.
+     * @return An array with a single element: ".zip".
+     */
+    protected String[] getFileEndings() {
+        return new String[] {".zip"};   
     }
 }

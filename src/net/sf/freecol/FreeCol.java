@@ -57,6 +57,7 @@ import net.sf.freecol.common.FreeColException;
 import net.sf.freecol.common.Specification;
 import net.sf.freecol.common.io.FreeColDataFile;
 import net.sf.freecol.common.io.FreeColSavegameFile;
+import net.sf.freecol.common.io.FreeColTcFile;
 import net.sf.freecol.common.logging.DefaultHandler;
 import net.sf.freecol.common.networking.NoRouteToServerException;
 import net.sf.freecol.common.option.LanguageOption;
@@ -96,6 +97,7 @@ public final class FreeCol {
     private static final String FILE_SEP = System.getProperty("file.separator");
 
     private static final String DEFAULT_SPLASH_FILE = "splash.jpg";
+    private static final String DEFAULT_TC = "freecol";
 
     private static boolean  windowed = false,
                             sound = true,
@@ -115,6 +117,8 @@ public final class FreeCol {
     private static final int DEFAULT_PORT = 3541;
 
     private static File saveDirectory;
+    
+    private static String tc = DEFAULT_TC;
     
     private static File savegameFile = null;
     
@@ -182,7 +186,6 @@ public final class FreeCol {
             FreeColDataFile baseData = new FreeColDataFile(new File(dataFolder, "base"));
             try {
                 ResourceManager.setBaseMapping(baseData.getResourceMapping());
-                ResourceManager.update();
             } finally {
                 baseData.close();
             }
@@ -191,6 +194,19 @@ public final class FreeCol {
             System.err.println("Could not find base data directory.");
             return;
         }
+        try {
+            FreeColTcFile tcData = new FreeColTcFile(new File(dataFolder, tc));
+            try {
+                ResourceManager.setTcMapping(tcData.getResourceMapping());
+            } finally {
+                tcData.close();
+            }
+        } catch (IOException e) {
+            removeSplash(splash);
+            System.err.println("Could not load: " + tc);
+            return;
+        }
+        ResourceManager.update();
 
         if (standAloneServer) {
             logger.info("Starting stand-alone server.");
@@ -545,6 +561,14 @@ public final class FreeCol {
                     printUsage();
                     System.exit(0);
                 }
+            } else if (args[i].equals("--tc")) {
+                i++;
+                if (i < args.length) {
+                    tc = args[i];
+                } else {
+                    printUsage();
+                    System.exit(0);
+                }
             } else if (args[i].equals("--log-console")) {
                 consoleLogging = true;
                 initLogging();
@@ -787,6 +811,8 @@ public final class FreeCol {
         System.out.println("  loads the given specification file.");
         System.out.println("--splash[=SPLASH_IMAGE_FILE]");
         System.out.println("  displays a splash screen while loading the game");
+        System.out.println("--tc NAME");
+        System.out.println("  Loads the total conversion with the given NAME");
         System.out.println("--usage");
         System.out.println("  displays this help screen");
         System.out.println("--version");
