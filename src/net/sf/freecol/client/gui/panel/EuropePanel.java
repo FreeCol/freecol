@@ -24,7 +24,6 @@ import java.awt.Component;
 import java.awt.Graphics;
 import java.awt.GridLayout;
 import java.awt.Image;
-import java.awt.MediaTracker;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ContainerEvent;
@@ -47,7 +46,6 @@ import javax.swing.JTextPane;
 import javax.swing.KeyStroke;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.SwingUtilities;
-import javax.swing.UIManager;
 import javax.swing.border.TitledBorder;
 import javax.swing.text.SimpleAttributeSet;
 import javax.swing.text.StyleConstants;
@@ -347,34 +345,9 @@ public final class EuropePanel extends FreeColPanel implements ActionListener, C
         int width = getWidth();
         int height = getHeight();
 
-        Image bgImage = ResourceManager.getImage("EuropeBackgroundImage.scaled");
-        if (bgImage == null) {
-            bgImage = ResourceManager.getImage("EuropeBackgroundImage");
-        }
+        Image bgImage = ResourceManager.getImage("EuropeBackgroundImage", parent.getSize());
         if (bgImage != null) {
-            if (bgImage.getWidth(null) != parent.getWidth() || bgImage.getHeight(null) != parent.getHeight()) {
-                final Image fullSizeBgImage = ResourceManager.getImage("EuropeBackgroundImage");
-                bgImage = fullSizeBgImage.getScaledInstance(parent.getWidth(), parent.getHeight(), Image.SCALE_SMOOTH);
-                //UIManager.put("EuropeBackgroundImage.scaled", bgImage);
-
-                /*
-                 * We have to use a MediaTracker to ensure that the image has
-                 * been scaled before we paint it.
-                 */
-                MediaTracker mt = new MediaTracker(freeColClient.getCanvas());
-                mt.addImage(bgImage, 0, parent.getWidth(), parent.getHeight());
-
-                try {
-                    mt.waitForID(0);
-                } catch (InterruptedException e) {
-                    g.setColor(Color.black);
-                    g.fillRect(0, 0, parent.getWidth(), parent.getHeight());
-                    return;
-                }
-
-            }
-
-            g.drawImage(bgImage, 0, 0, null);
+            g.drawImage(bgImage, 0, 0, this);
         } else {
             Image tempImage = ResourceManager.getImage("BackgroundImage");
 
