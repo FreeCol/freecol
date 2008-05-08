@@ -22,14 +22,17 @@ package net.sf.freecol.client.gui.panel;
 
 import java.awt.BorderLayout;
 import java.awt.GridLayout;
+import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.HashMap;
 import java.util.logging.Logger;
 
+import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.table.AbstractTableModel;
 
@@ -74,7 +77,7 @@ public final class StatisticsPanel extends FreeColPanel implements ActionListene
             int i=0;
             for (String s : statsData.keySet()) {
                 data[NAME_COLUMN][i] = s;
-                data[VALUE_COLUMN][i] = statsData.get(s).toString();
+                data[VALUE_COLUMN][i] = statsData.get(s);
                 i++;
             }
         }
@@ -135,6 +138,13 @@ public final class StatisticsPanel extends FreeColPanel implements ActionListene
         public boolean isCellEditable(int row, int column) {
             return false;
         }
+        
+        /**
+         * Returns the Class of the objects in the given column.
+         */
+        public Class<?> getColumnClass(int column) {
+            return getValueAt(0, column).getClass();
+        }
     }
     
     /**
@@ -159,20 +169,10 @@ public final class StatisticsPanel extends FreeColPanel implements ActionListene
         header.add(new JLabel("Statistics"),JPanel.CENTER_ALIGNMENT);
         
         // Actual stats panel
-        JPanel statsPanel = new JPanel(new GridLayout(6, 2)); 
+        JPanel statsPanel = new JPanel(new GridLayout(1,2)); 
         this.add(statsPanel,BorderLayout.CENTER);
-        statsPanel.add(new JLabel("Client memory:"));
-        statsPanel.add(new JLabel("Server memory:"));
-        statsPanel.add(createStatsTable(clientStatistics.getMemoryStatistics()));
-        statsPanel.add(createStatsTable(serverStatistics.getMemoryStatistics()));
-        statsPanel.add(new JLabel("Client game statistics:"));
-        statsPanel.add(new JLabel("Server game statistics:"));
-        statsPanel.add(createStatsTable(clientStatistics.getGameStatistics()));
-        statsPanel.add(createStatsTable(serverStatistics.getGameStatistics()));
-        statsPanel.add(new JLabel());
-        statsPanel.add(new JLabel("Server AI statistics:"));
-        statsPanel.add(new JLabel());
-        statsPanel.add(createStatsTable(serverStatistics.getAIStatistics()));
+        statsPanel.add(displayStatsMessage("Client", clientStatistics));
+        statsPanel.add(displayStatsMessage("Server", serverStatistics));
 
         // Close button
         exitButton = new JButton(Messages.message("close"));
@@ -186,14 +186,36 @@ public final class StatisticsPanel extends FreeColPanel implements ActionListene
         setSize(getPreferredSize());
     }
     
-    private JTable createStatsTable(HashMap<String,Long> data) {
+    private JPanel displayStatsMessage(String title, StatisticsMessage statistics) {
+        JPanel panel = new JPanel(new GridLayout(3,1));
+        panel.setBorder(BorderFactory.createTitledBorder(title));
+        panel.add(createStatsTable("Memory", statistics.getMemoryStatistics()));
+        panel.add(createStatsTable("Game", statistics.getGameStatistics()));
+        if (statistics.getAIStatistics()!=null) {
+            panel.add(createStatsTable("AI", statistics.getAIStatistics()));
+        } else {
+            panel.add(new JLabel());
+        }
+        return panel;
+    }
+    
+    private JPanel createStatsTable(String title, HashMap<String,Long> data) {
+        JPanel panel = new JPanel();
+        panel.setLayout(new BorderLayout());
+        panel.add(new JLabel(title), BorderLayout.NORTH);
         StatisticsModel model = new StatisticsModel();
         model.setData(data);
         JTable table = new JTable(model);
         table.setAutoCreateColumnsFromModel(true);
         table.setAutoCreateRowSorter(true);
         table.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
-        return table;
+        JScrollPane scrollPane = new JScrollPane(table);
+        table.addNotify();
+        scrollPane.getViewport().setOpaque(false);
+        scrollPane.getColumnHeader().setOpaque(false);
+        panel.add(scrollPane, BorderLayout.CENTER);
+        panel.setPreferredSize(new Dimension(300, 150));
+        return panel;
     }
 
     private String serializeStats(String title, HashMap<String, Long> stats) {
