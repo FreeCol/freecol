@@ -30,6 +30,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.lang.Thread.UncaughtExceptionHandler;
 import java.util.Locale;
 import java.util.jar.Attributes;
 import java.util.jar.Manifest;
@@ -393,6 +394,11 @@ public final class FreeCol {
         } catch (FreeColException e) {
             e.printStackTrace();
         }
+        Thread.setDefaultUncaughtExceptionHandler(new UncaughtExceptionHandler() {
+            public void uncaughtException(Thread thread, Throwable e) {
+                baseLogger.log(Level.WARNING, "Uncaught exception from thread: " + thread, e);
+            }
+        });
     }
     
     /**
