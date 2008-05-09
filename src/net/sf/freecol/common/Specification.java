@@ -68,8 +68,6 @@ public final class Specification {
      * Singleton
      */
     protected static Specification specification;
-
-    protected static File specFile = null;
     
     private static final Logger logger = Logger.getLogger(Specification.class.getName());
 
@@ -99,28 +97,6 @@ public final class Specification {
     private final List<EquipmentType> equipmentTypes;
 
     private final List<DifficultyLevel> difficultyLevels;
-
-    /**
-     * Creates a new <code>Specification</code> instance.
-     *
-     */
-    public Specification() {
-        this(Specification.class.getResourceAsStream("specification.xml"));
-        logger.info("loaded default specification.");
-    }
-
-    /**
-     * Creates a new <code>Specification</code> instance.
-     *
-     * @param specFile a <code>File</code> value
-     * @exception FileNotFoundException if an error occurs
-     */
-    public Specification(File specFile) throws FileNotFoundException {
-        this(new FileInputStream(specFile));
-        this.specFile = specFile;
-        logger.info("loaded specification from file '" + specFile.getPath() + "'");
-    }
-
 
     /**
      * Creates a new Specification object by loading it from the
@@ -778,26 +754,14 @@ public final class Specification {
 
 
     /**
-     * Describe <code>setSpecificationFile</code> method here.
-     *
-     * @param file a <code>File</code> value
+     * Loads the specification.
+     * @param is The stream to load the specification from.
      */
-    public static void setSpecificationFile(File file) {
-        specFile = file;
+    public static void createSpecification(InputStream is) {
+        specification = new Specification(is);
     }
 
     public static Specification getSpecification() {
-        if (specification == null){
-            if (specFile == null) {
-                specification = new Specification();
-            } else {
-                try {
-                    specification = new Specification(specFile);
-                } catch(FileNotFoundException e) {
-                    specification = new Specification();
-                }
-            }
-        }
         return specification;
     }
 

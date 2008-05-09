@@ -195,8 +195,9 @@ public final class FreeCol {
             System.err.println("Could not find base data directory.");
             return;
         }
+        FreeColTcFile tcData;
         try {
-            FreeColTcFile tcData = new FreeColTcFile(new File(dataFolder, tc));
+            tcData = new FreeColTcFile(new File(dataFolder, tc));
             try {
                 ResourceManager.setTcMapping(tcData.getResourceMapping());
             } finally {
@@ -292,7 +293,13 @@ public final class FreeCol {
             }
 
             // This needs to be initialized before ImageLibrary
-            getSpecification();
+            try {
+                Specification.createSpecification(tcData.getSpecificationInputStream());
+            } catch (IOException e) {
+                removeSplash(splash);
+                System.err.println("Could not load specification.xml for: " + tc);
+                return;
+            }
 
             // TODO: don't use same datafolder for both images and music because the images are best kept inside the .JAR file.
 
@@ -684,22 +691,6 @@ public final class FreeCol {
                     printUsage();
                     System.exit(0);
                 }
-            } else if (args[i].equals("--specification")) {
-                i++;
-                if (i < args.length) {
-                    File specFile = new File(args[i]);
-                    if (!specFile.exists() || !specFile.isFile()) {                        
-                        specFile = new File(getSaveDirectory(), args[i]);
-                        if (!specFile.exists() || !specFile.isFile()) {
-                            System.out.println("The given specification file could not be found: " + args[i]);
-                            System.exit(1);
-                        }
-                    }
-                    Specification.setSpecificationFile(specFile);
-                } else {
-                    printUsage();
-                    System.exit(0);
-                }
             } else if (args[i].equals("--server-help")) {
                 printServerUsage();
                 System.exit(0);
@@ -777,9 +768,7 @@ public final class FreeCol {
         System.out.println("--server-name NAME");
         System.out.println("  specifies a custom name for the server");
         System.out.println("--load-savegame SAVEGAME_FILE");
-        System.out.println("  loads the given savegame.");      
-        System.out.println("--specification SPECIFICATION_FILE");
-        System.out.println("  loads the given specification file.");
+        System.out.println("  loads the given savegame.");
         System.out.println("--no-java-check");
         System.out.println("  skips the java version check");        
         System.out.println();
@@ -813,8 +802,6 @@ public final class FreeCol {
         System.out.println("  starts a stand-alone server on the specifed port");
         System.out.println("--server-help");
         System.out.println("  displays a help screen for the more advanced server options");
-        System.out.println("--specification SPECIFICATION_FILE");
-        System.out.println("  loads the given specification file.");
         System.out.println("--splash[=SPLASH_IMAGE_FILE]");
         System.out.println("  displays a splash screen while loading the game");
         System.out.println("--tc NAME");

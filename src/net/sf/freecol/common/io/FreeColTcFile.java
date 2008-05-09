@@ -21,11 +21,14 @@ package net.sf.freecol.common.io;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 
 /**
  * A Total Conversion (TC).
  */
 public class FreeColTcFile extends FreeColDataFile {
+    
+    private static final String SPECIFICATION_FILE = "specification.xml";
 
     /**
      * Opens the given file for reading.
@@ -35,6 +38,18 @@ public class FreeColTcFile extends FreeColDataFile {
      */
     public FreeColTcFile(File file) throws IOException {
         super(file);
+    }
+    
+    /**
+     * Gets the input stream to the specification.
+     * 
+     * @return An <code>InputStream</code> to the file
+     *      "specification.xml" within this data file.
+     * @throws IOException if thrown while opening the
+     *      input stream.
+     */
+    public InputStream getSpecificationInputStream() throws IOException {
+        return getInputStream(SPECIFICATION_FILE);
     }
     
     /**
