@@ -35,7 +35,6 @@ import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.GUI;
-import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.client.gui.ViewMode;
 import net.sf.freecol.client.gui.action.ActionManager;
 import net.sf.freecol.client.gui.action.BuildColonyAction;
@@ -48,6 +47,7 @@ import net.sf.freecol.client.gui.action.WaitAction;
 import net.sf.freecol.client.gui.panel.MapEditorTransformPanel.MapTransform;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Map.Direction;
+import net.sf.freecol.common.resources.ResourceManager;
 
 
 /**
@@ -83,7 +83,7 @@ public final class MapControls {
 
         infoPanel = new InfoPanel(freeColClient);
         miniMap = new MiniMap(freeColClient);
-        compassRose = new JLabel(freeColClient.getGUI().getImageLibrary().getMiscImageIcon(ImageLibrary.COMPASS));
+        compassRose = new JLabel(ResourceManager.getImageIcon("compass.image"));
         
         final ActionManager am = freeColClient.getActionManager();
         

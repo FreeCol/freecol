@@ -78,8 +78,7 @@ public final class ImageLibrary extends ImageProvider {
                                TILE_TAKEN = "tileTaken.image",
                                TILE_OWNED_BY_INDIANS = "nativeLand.image",
                                LOST_CITY_RUMOUR = "lostCityRumour.image",
-                               DARKNESS = "halo.dark.image",
-                               COMPASS = "compass.image";
+                               DARKNESS = "halo.dark.image";
 
     public static final int UNIT_BUTTON_WAIT = 0, UNIT_BUTTON_DONE = 1, UNIT_BUTTON_FORTIFY = 2,
             UNIT_BUTTON_SENTRY = 3, UNIT_BUTTON_CLEAR = 4, UNIT_BUTTON_PLOW = 5, UNIT_BUTTON_ROAD = 6,
@@ -116,7 +115,7 @@ public final class ImageLibrary extends ImageProvider {
     private EnumMap<SettlementType, Image> settlements;
 
     private Map<String, ImageIcon> terrain1, terrain2, overlay1, overlay2,
-        forests, bonus, goods, buildings;
+        forests, goods, buildings;
 
     private Map<String, ArrayList<ImageIcon>> border1, border2, coast1, coast2;
 
@@ -201,7 +200,6 @@ public final class ImageLibrary extends ImageProvider {
         loadSettlements(gc, resourceLocator, doLookup);
         loadGoods(gc, resourceLocator, doLookup);
         loadBuildings(gc, resourceLocator, doLookup);
-        loadBonus(gc, resourceLocator, doLookup);
         loadMonarch(gc, resourceLocator, doLookup);
         loadCoatOfArms(gc, resourceLocator, doLookup);
 
@@ -238,7 +236,6 @@ public final class ImageLibrary extends ImageProvider {
         scaledLibrary.overlay1 = scaleImages(overlay1, scalingFactor);
         scaledLibrary.overlay2 = scaleImages(overlay2, scalingFactor);
         scaledLibrary.forests = scaleImages(forests, scalingFactor);
-        scaledLibrary.bonus = scaleImages(bonus, scalingFactor);
         scaledLibrary.goods = scaleImages(goods, scalingFactor);
         scaledLibrary.buildings = scaleImages(buildings, scalingFactor);
         
@@ -635,29 +632,6 @@ public final class ImageLibrary extends ImageProvider {
     }
 
     /**
-     * Loads the bonus-images from file into memory.
-     * 
-     * @param gc The GraphicsConfiguration is needed to create images that are
-     *            compatible with the local environment.
-     * @param resourceLocator The class that is used to locate data files.
-     * @param doLookup Must be set to 'false' if the path to the image files has
-     *            been manually provided by the user. If set to 'true' then a
-     *            lookup will be done to search for image files from
-     *            net.sf.freecol, in this case the images need to be placed in
-     *            net/sf/freecol/images.
-     * @throws FreeColException If one of the data files could not be found.
-     */
-    private void loadBonus(GraphicsConfiguration gc, Class<FreeCol> resourceLocator, boolean doLookup)
-            throws FreeColException {
-        bonus = new HashMap<String, ImageIcon>();
-        
-        for (ResourceType type : FreeCol.getSpecification().getResourceTypeList()) {
-            String filePath = dataDirectory + path + type.getArt();
-            bonus.put(type.getId(), findImage(filePath, resourceLocator, doLookup));
-        }
-    }
-
-    /**
      * Loads the monarch-images from file into memory.
      * 
      * @param gc The GraphicsConfiguration is needed to create images that are
@@ -873,7 +847,7 @@ public final class ImageLibrary extends ImageProvider {
     }
 
     public Image getBonusImage(ResourceType type) {
-        return getBonusImageIcon(type).getImage();
+        return ResourceManager.getImage(type.getId() + ".image", scalingFactor);
     }
 
     /**
@@ -882,7 +856,7 @@ public final class ImageLibrary extends ImageProvider {
      * @param type The type of the bonus-ImageIcon to return.
      */
     public ImageIcon getBonusImageIcon(ResourceType type) {
-        return bonus.get(type.getId());
+        return new ImageIcon(getBonusImage(type));
     }
 
     public ImageIcon getScaledBonusImageIcon(ResourceType type, float scale) {
@@ -1072,7 +1046,7 @@ public final class ImageLibrary extends ImageProvider {
      * @return The image.
      */
     public Image getMiscImage(String id) {
-        return ResourceManager.getImage(id);
+        return ResourceManager.getImage(id, scalingFactor);
     }
 
     /**
@@ -1082,7 +1056,7 @@ public final class ImageLibrary extends ImageProvider {
      * @return The image.
      */
     public ImageIcon getMiscImageIcon(String id) {
-        return ResourceManager.getImageIcon(id);
+        return new ImageIcon(getMiscImage(id));
     }
 
     /**

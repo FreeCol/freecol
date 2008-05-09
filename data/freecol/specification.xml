@@ -77,45 +77,45 @@
   </goods-types>
 
   <resource-types>
-    <resource-type id="model.resource.Game" art="bonus/game.png">
+    <resource-type id="model.resource.Game">
       <modifier id="model.goods.food" type="additive" value="2"/>
       <!-- in colonization game gives 2 food (4 for expert farmer) -->
       <modifier id="model.goods.furs" type="additive" value="2"/>
     </resource-type>
-    <resource-type id="model.resource.Minerals" art="bonus/minerals.png" minimum-value="40" maximum-value="400">
+    <resource-type id="model.resource.Minerals" minimum-value="40" maximum-value="400">
       <modifier id="model.goods.ore" type="additive" value="3"/>
       <modifier id="model.goods.silver" type="additive" value="1"/>
     </resource-type>
-    <resource-type id="model.resource.Ore" art="bonus/ore.png" minimum-value="40" maximum-value="4000">
+    <resource-type id="model.resource.Ore" minimum-value="40" maximum-value="4000">
       <modifier id="model.goods.ore" type="additive" value="2"/>
     </resource-type>
-    <resource-type id="model.resource.Silver" art="bonus/silver.png" minimum-value="40" maximum-value="800">
+    <resource-type id="model.resource.Silver" minimum-value="40" maximum-value="800">
       <modifier id="model.goods.silver" type="additive" value="2"/>
     </resource-type>
-    <resource-type id="model.resource.Lumber" art="bonus/lumber.png">
+    <resource-type id="model.resource.Lumber">
       <modifier id="model.goods.lumber" type="additive" value="4"/>
     </resource-type>
-    <resource-type id="model.resource.Furs" art="bonus/furs.png">
+    <resource-type id="model.resource.Furs">
       <modifier id="model.goods.furs" type="additive" value="3"/>
     </resource-type>
-    <resource-type id="model.resource.Tobacco" art="bonus/tobacco.png">
+    <resource-type id="model.resource.Tobacco">
       <modifier id="model.goods.tobacco" type="multiplicative" value="2"/>
     </resource-type>
-    <resource-type id="model.resource.Sugar" art="bonus/sugar.png">
+    <resource-type id="model.resource.Sugar">
       <modifier id="model.goods.sugar" type="multiplicative" value="2"/>
     </resource-type>
-    <resource-type id="model.resource.Cotton" art="bonus/cotton.png">
+    <resource-type id="model.resource.Cotton">
       <modifier id="model.goods.cotton" type="multiplicative" value="2"/>
     </resource-type>
-    <resource-type id="model.resource.Oasis" art="bonus/grain.png">
+    <resource-type id="model.resource.Oasis">
       <modifier id="model.goods.food" type="additive" value="2"/>
       <!-- in colonization game gives 2 food (4 for expert farmer) -->
     </resource-type>
-    <resource-type id="model.resource.Grain" art="bonus/grain.png">
+    <resource-type id="model.resource.Grain">
       <modifier id="model.goods.food" type="additive" value="2"/>
       <!-- in colonization game gives 2 food (4 for expert farmer) -->
     </resource-type>
-    <resource-type id="model.resource.Fish" art="bonus/fish.png">
+    <resource-type id="model.resource.Fish">
       <modifier id="model.goods.fish" type="additive" value="3"/>
       <!-- in colonization game gives 3 food (6 for expert fisherman) -->
     </resource-type>
