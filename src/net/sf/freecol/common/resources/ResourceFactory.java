@@ -70,7 +70,11 @@ public class ResourceFactory {
      *      already been created, or a new instance if not.
      */
     public static Resource createResource(URL url) {
-        final Resource r = getResource(url);
-        return (r != null) ? r : new ImageResource(url);
+        Resource r = getResource(url);
+        if (r == null) {
+            r = new ImageResource(url);
+            resources.put(url, new WeakReference<Resource>(r));
+        }
+        return r;
     }
 }
