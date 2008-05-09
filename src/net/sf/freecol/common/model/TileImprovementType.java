@@ -42,7 +42,7 @@ public final class TileImprovementType extends FreeColGameObjectType
     private int magnitude;
     private int addWorkTurns;
 
-    private int artOverlay;
+    private String artOverlay;
     private boolean artOverTrees;
 
     private List<TileType> allowedTileTypes;
@@ -84,9 +84,7 @@ public final class TileImprovementType extends FreeColGameObjectType
         return Messages.message(getId() + ".occupationString");
     }
 
-    // TODO: Make this work like the other *types with images using Hashtable
-    // Currently only Plowing has any art, the others have special display methods (roads/rivers)
-    public int getArtOverlay() {
+    public String getArtOverlay() {
         return artOverlay;
     }
 
@@ -279,7 +277,7 @@ public final class TileImprovementType extends FreeColGameObjectType
         if (req != null) {
             requiredImprovementType = specification.getTileImprovementType(req);
         }
-        artOverlay = getAttribute(in, "overlay", -1);
+        artOverlay = getAttribute(in, "overlay", null);
         artOverTrees = getAttribute(in, "over-trees", false);
 
         String g = in.getAttributeValue(null, "expended-equipment-type");

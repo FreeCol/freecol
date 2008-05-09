@@ -24,13 +24,11 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.logging.Logger;
 
-import javax.swing.ImageIcon;
 import javax.swing.JButton;
 
+import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.ImageLibrary;
-import net.sf.freecol.common.model.Tile;
-import net.sf.freecol.common.model.TileImprovement;
 
 
 /**
@@ -57,7 +55,7 @@ public final class RiverStylePanel extends FreeColDialog implements ActionListen
         
         ImageLibrary library = parent.getGUI().getImageLibrary();
 
-	JButton deleteButton = new JButton(library.getScaledImageIcon(library.getMiscImageIcon(1), 0.5f));
+	JButton deleteButton = new JButton(library.getScaledImageIcon(library.getMiscImageIcon(ImageLibrary.DELETE), 0.5f));
 	deleteButton.setActionCommand("0");
 	deleteButton.addActionListener(this);
 	add(deleteButton);

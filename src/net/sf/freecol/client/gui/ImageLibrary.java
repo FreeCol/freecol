@@ -71,9 +71,15 @@ public final class ImageLibrary extends ImageProvider {
     private static final Logger logger = Logger.getLogger(ImageLibrary.class.getName());    
     
     public static final int RIVER_STYLES = 81;
-
-    public static final int UNIT_SELECT = 0, PLOWED = 4, TILE_TAKEN = 5, TILE_OWNED_BY_INDIANS = 6,
-            LOST_CITY_RUMOUR = 7, DARKNESS = 8, MISC_COUNT = 10;
+ 
+    public static final String UNIT_SELECT = "unitSelect.image",
+                               DELETE = "delete.image",
+                               PLOWED = "model.improvement.Plow.image",
+                               TILE_TAKEN = "tileTaken.image",
+                               TILE_OWNED_BY_INDIANS = "nativeLand.image",
+                               LOST_CITY_RUMOUR = "lostCityRumour.image",
+                               DARKNESS = "halo.dark.image",
+                               COMPASS = "compass.image";
 
     public static final int UNIT_BUTTON_WAIT = 0, UNIT_BUTTON_DONE = 1, UNIT_BUTTON_FORTIFY = 2,
             UNIT_BUTTON_SENTRY = 3, UNIT_BUTTON_CLEAR = 4, UNIT_BUTTON_PLOW = 5, UNIT_BUTTON_ROAD = 6,
@@ -89,8 +95,6 @@ public final class ImageLibrary extends ImageProvider {
         unexploredName = new String("unexplored"),
         riverDirectory = new String("river/"),
         riverName = new String("river"),
-        miscDirectory = new String("misc/"),
-        miscName = new String("Misc"),
         unitButtonDirectory = new String("order-buttons/"),
         unitButtonName = new String("button"),
         settlementDirectory = new String("settlements/"),
@@ -103,7 +107,7 @@ public final class ImageLibrary extends ImageProvider {
     /**
      * A ArrayList of Image objects.
      */
-    private List<ImageIcon> rivers, misc;
+    private List<ImageIcon> rivers;
 
     private Map<Nation, ImageIcon> monarch;
 
@@ -193,7 +197,6 @@ public final class ImageLibrary extends ImageProvider {
         loadTerrain(gc, resourceLocator, doLookup);
         loadForests(gc, resourceLocator, doLookup);
         loadRivers(gc, resourceLocator, doLookup);
-        loadMisc(gc, resourceLocator, doLookup);
         loadUnitButtons(gc, resourceLocator, doLookup);
         loadSettlements(gc, resourceLocator, doLookup);
         loadGoods(gc, resourceLocator, doLookup);
@@ -226,7 +229,6 @@ public final class ImageLibrary extends ImageProvider {
     public ImageLibrary getScaledImageLibrary(float scalingFactor) throws FreeColException {
         ImageLibrary scaledLibrary = new ImageLibrary("", scalingFactor);
         scaledLibrary.rivers = scaleImages(rivers, scalingFactor);
-        scaledLibrary.misc = scaleImages(misc, scalingFactor);
         scaledLibrary.settlements = scaleImages(settlements, scalingFactor);
         //scaledLibrary.monarch = scaleImages(monarch);
         scaledLibrary.monarch = new HashMap<Nation, ImageIcon>(monarch);
@@ -500,29 +502,6 @@ public final class ImageLibrary extends ImageProvider {
                 String filePath = dataDirectory + path + type.getArtForest();
                 forests.put(type.getId(), findImage(filePath, resourceLocator, doLookup));
             }
-        }
-    }
-
-    /**
-     * Loads miscellaneous images from file into memory.
-     * 
-     * @param gc The GraphicsConfiguration is needed to create images that are
-     *            compatible with the local environment.
-     * @param resourceLocator The class that is used to locate data files.
-     * @param doLookup Must be set to 'false' if the path to the image files has
-     *            been manually provided by the user. If set to 'true' then a
-     *            lookup will be done to search for image files from
-     *            net.sf.freecol, in this case the images need to be placed in
-     *            net.sf.freecol/images.
-     * @throws FreeColException If one of the data files could not be found.
-     */
-    private void loadMisc(GraphicsConfiguration gc, Class<FreeCol> resourceLocator, boolean doLookup)
-            throws FreeColException {
-        misc = new ArrayList<ImageIcon>(MISC_COUNT);
-
-        for (int i = 0; i < MISC_COUNT; i++) {
-            String filePath = dataDirectory + path + miscDirectory + miscName + i + extension;
-            misc.add(findImage(filePath, resourceLocator, doLookup));
         }
     }
 
@@ -1087,23 +1066,23 @@ public final class ImageLibrary extends ImageProvider {
     }
 
     /**
-     * Returns the image at the given index.
+     * Returns the image with the given id.
      * 
-     * @param index The index of the image to return.
-     * @return The image at the given index.
+     * @param id The id of the image to return.
+     * @return The image.
      */
-    public Image getMiscImage(int index) {
-        return misc.get(index).getImage();
+    public Image getMiscImage(String id) {
+        return ResourceManager.getImage(id);
     }
 
     /**
-     * Returns the image at the given index.
+     * Returns the image with the given id.
      * 
-     * @param index The index of the image to return.
-     * @return The image at the given index.
+     * @param id The id of the image to return.
+     * @return The image.
      */
-    public ImageIcon getMiscImageIcon(int index) {
-        return misc.get(index);
+    public ImageIcon getMiscImageIcon(String id) {
+        return ResourceManager.getImageIcon(id);
     }
 
     /**

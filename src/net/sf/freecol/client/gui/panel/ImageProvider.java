@@ -70,7 +70,7 @@ public abstract class ImageProvider {
      * @param type The type of the graphic of which we need the Image.
      * @return The Image of the graphic with the given type.
      */
-    public abstract Image getMiscImage(int type);
+    public abstract Image getMiscImage(String type);
 
     /**
      * Should return the Image of the color chip with the given color.

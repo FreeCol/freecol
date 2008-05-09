@@ -1714,9 +1714,9 @@ public final class GUI {
                     continue;
                 if (!ti.getType().isArtOverTrees()) {
                     tiList2.add(ti);
-                } else if (ti.getType().getArtOverlay() > 0) {
+                } else if (ti.getType().getArtOverlay() != null) {
                     // Has its own Overlay Image in Misc, use it
-                    g.drawImage(lib.getMiscImage(ti.getType().getArtOverlay()), x, y, null);
+                    g.drawImage(ResourceManager.getImage(ti.getType().getArtOverlay()), x, y, null);
                 }
             }
 
@@ -1731,9 +1731,9 @@ public final class GUI {
             for (TileImprovement ti : tiList2) {
                 if (ti == tic.getRiver() || ti == tic.getRoad())
                     continue;
-                if (ti.getType().getArtOverlay() > 0) {
+                if (ti.getType().getArtOverlay() != null) {
                     // Has its own Overlay Image in Misc, use it
-                    g.drawImage(lib.getMiscImage(ti.getType().getArtOverlay()), x, y, null);
+                    g.drawImage(ResourceManager.getImage(ti.getType().getArtOverlay()), x, y, null);
                 }
             }
 
