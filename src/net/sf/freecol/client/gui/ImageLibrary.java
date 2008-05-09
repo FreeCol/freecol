@@ -45,7 +45,6 @@ import javax.swing.ImageIcon;
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.gui.panel.ImageProvider;
 import net.sf.freecol.common.FreeColException;
-import net.sf.freecol.common.model.BuildingType;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.IndianSettlement;
@@ -98,8 +97,7 @@ public final class ImageLibrary extends ImageProvider {
         unitButtonName = new String("button"),
         settlementDirectory = new String("settlements/"),
         monarchDirectory = new String("monarch/"),
-        coatOfArmsDirectory = new String("coat-of-arms/"),
-        buildingDirectory = new String("buildings/");
+        coatOfArmsDirectory = new String("coat-of-arms/");
 
     private final String dataDirectory;
 
@@ -115,7 +113,7 @@ public final class ImageLibrary extends ImageProvider {
     private EnumMap<SettlementType, Image> settlements;
 
     private Map<String, ImageIcon> terrain1, terrain2, overlay1, overlay2,
-        forests, goods, buildings;
+        forests, goods;
 
     private Map<String, ArrayList<ImageIcon>> border1, border2, coast1, coast2;
 
@@ -199,7 +197,6 @@ public final class ImageLibrary extends ImageProvider {
         loadUnitButtons(gc, resourceLocator, doLookup);
         loadSettlements(gc, resourceLocator, doLookup);
         loadGoods(gc, resourceLocator, doLookup);
-        loadBuildings(gc, resourceLocator, doLookup);
         loadMonarch(gc, resourceLocator, doLookup);
         loadCoatOfArms(gc, resourceLocator, doLookup);
 
@@ -237,7 +234,6 @@ public final class ImageLibrary extends ImageProvider {
         scaledLibrary.overlay2 = scaleImages(overlay2, scalingFactor);
         scaledLibrary.forests = scaleImages(forests, scalingFactor);
         scaledLibrary.goods = scaleImages(goods, scalingFactor);
-        scaledLibrary.buildings = scaleImages(buildings, scalingFactor);
         
         scaledLibrary.border1 = scaleImages2(border1, scalingFactor);
         scaledLibrary.border2 = scaleImages2(border2, scalingFactor);
@@ -605,30 +601,6 @@ public final class ImageLibrary extends ImageProvider {
          * tempImage.getGraphics().drawImage(unitsImage, 0, 0, null);
          * units.add(tempImage);
          */
-    }
-
-    /**
-     * Loads the buildings-images from file into memory.
-     * 
-     * @param gc The GraphicsConfiguration is needed to create images that are
-     *            compatible with the local environment.
-     * @param resourceLocator The class that is used to locate data files.
-     * @param doLookup Must be set to 'false' if the path to the image files has
-     *            been manually provided by the user. If set to 'true' then a
-     *            lookup will be done to search for image files from
-     *            net.sf.freecol, in this case the images need to be placed in
-     *            net/sf/freecol/images.
-     * @throws FreeColException If one of the data files could not be found.
-     */
-    private void loadBuildings(GraphicsConfiguration gc, Class<FreeCol> resourceLocator, boolean doLookup)
-            throws FreeColException {
-        buildings = new HashMap<String, ImageIcon>();
-        
-        for (BuildingType type : FreeCol.getSpecification().getBuildingTypeList()) {
-            String filePath = dataDirectory + path + buildingDirectory + type.getArt() + extension;
-            buildings.put(type.getId(), findImage(filePath, resourceLocator, doLookup));
-        }
-
     }
 
     /**
@@ -1088,26 +1060,6 @@ public final class ImageLibrary extends ImageProvider {
      */
     public ImageIcon getGoodsImageIcon(GoodsType g) {
         return goods.get(g.getId());
-    }
-
-    /**
-     * Returns the buildings-image at the given index.
-     * 
-     * @param g The type of the buildings-image to return.
-     * @return The buildings-image at the given index.
-     */
-    public Image getBuildingImage(BuildingType g) {
-        return getBuildingImageIcon(g).getImage();
-    }
-
-    /**
-     * Returns the buildings-image for a buildings type.
-     * 
-     * @param g The type of the buildings-image to return.
-     * @return The buildings-image at the given index.
-     */
-    public ImageIcon getBuildingImageIcon(BuildingType g) {
-        return buildings.get(g.getId());
     }
 
     /**

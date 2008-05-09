@@ -19,14 +19,15 @@
 
 package net.sf.freecol.common.model;
 
+import java.awt.Image;
 import java.util.ArrayList;
-import java.util.Map;
 
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
 import net.sf.freecol.common.Specification;
+import net.sf.freecol.common.resources.ResourceManager;
 
 /**
  * Contains information on building types, like the number of upgrade levels a
@@ -43,11 +44,6 @@ public final class BuildingType extends BuildableType {
     private BuildingType upgradesFrom;
     private BuildingType upgradesTo;
     private int sequence;
-
-    /**
-     * Describe art here.
-     */
-    private String art;
     
     public BuildingType(int index) {
         setIndex(index);
@@ -60,6 +56,10 @@ public final class BuildingType extends BuildableType {
     
     public BuildingType getUpgradesTo() {
         return upgradesTo;
+    }
+    
+    public Image getImage() {
+        return ResourceManager.getImage(getId() + ".image");
     }
     
     public BuildingType getFirstLevel() {
@@ -98,24 +98,6 @@ public final class BuildingType extends BuildableType {
         return this;
     }
 
-    /**
-     * Get the <code>Art</code> value.
-     *
-     * @return a <code>String</code> value
-     */
-    public String getArt() {
-        return art;
-    }
-
-    /**
-     * Set the <code>Art</code> value.
-     *
-     * @param newArt The new Art value.
-     */
-    public void setArt(final String newArt) {
-        this.art = newArt;
-    }
-
     protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
         throw new UnsupportedOperationException("Call 'readFromXML' instead.");
     }
@@ -131,7 +113,6 @@ public final class BuildingType extends BuildableType {
             level = 1;
         }
 
-        art = getAttribute(in, "art", "default");
         workPlaces = getAttribute(in, "workplaces", 0);
         basicProduction = getAttribute(in, "basicProduction", 0);
 

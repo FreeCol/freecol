@@ -32,8 +32,6 @@ import java.awt.Rectangle;
 import java.awt.dnd.Autoscroll;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.ContainerEvent;
-import java.awt.event.ContainerListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseListener;
@@ -74,20 +72,17 @@ import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.AbstractGoods;
 import net.sf.freecol.common.model.BuildableType;
 import net.sf.freecol.common.model.Building;
-import net.sf.freecol.common.model.BuildingType;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.ColonyTile;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.GoodsType;
-import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.IndianSettlement;
+import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.TileType;
 import net.sf.freecol.common.model.Unit;
-import net.sf.freecol.common.model.UnitType;
-import net.sf.freecol.common.util.Utils;
 import cz.autel.dmi.HIGLayout;
 
 /**
@@ -1137,8 +1132,7 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener {
             public void initialize() {
 
                 removeAll();
-                JLabel buildingLabel = new JLabel(parent.getGUI().getImageLibrary()
-                                                  .getBuildingImageIcon(building.getType()));
+                JLabel buildingLabel = new JLabel(new ImageIcon(building.getType().getImage()));
                 JLabel buildingName = new JLabel();
                 if (building.getMaxUnits() == 0) {
                     buildingName.setText("(" + building.getName() + ")");
