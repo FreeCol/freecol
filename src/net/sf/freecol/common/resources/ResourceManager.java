@@ -124,7 +124,7 @@ public class ResourceManager {
      *      or <code>null</code> if there is no image
      *      identified by that name.
      */
-    public static Image getImage(String resource, double scale) {
+    public static Image getImage(String resource, double scale) {        
         final Resource r = mergedContainer.get(resource);
         if (!(r instanceof ImageResource)) {
             return null;
@@ -148,6 +148,44 @@ public class ResourceManager {
             return null;
         }
         return ((ImageResource) r).getImage(size);
+    }
+    
+    /**
+     * Returns the a grayscale version of the image specified by
+     * the given name.
+     * 
+     * @param resource The name of the resource to return.
+     * @param size The size of the requested image. Rescaling
+     *      will be performed if necessary.
+     * @return The image identified by <code>resource</code>
+     *      or <code>null</code> if there is no image
+     *      identified by that name.
+     */
+    public static Image getGrayscaleImage(String resource, Dimension size) {
+        final Resource r = mergedContainer.get(resource);
+        if (!(r instanceof ImageResource)) {
+            return null;
+        }
+        return ((ImageResource) r).getGrayscaleImage(size);
+    }
+    
+    /**
+     * Returns the grayscale version of the image specified by the given name.
+     * 
+     * @param resource The name of the resource to return.
+     * @param scale The size of the requested image (with 1 being normal size,
+     *      2 twice the size, 0.5 half the size etc). Rescaling
+     *      will be performed unless using 1.
+     * @return The image identified by <code>resource</code>
+     *      or <code>null</code> if there is no image
+     *      identified by that name.
+     */
+    public static Image getGrayscaleImage(String resource, double scale) {        
+        final Resource r = mergedContainer.get(resource);
+        if (!(r instanceof ImageResource)) {
+            return null;
+        }
+        return ((ImageResource) r).getGrayscaleImage(scale);
     }
 
     /**

@@ -24,8 +24,8 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map.Entry;
 import java.util.Set;
+import java.util.Map.Entry;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -37,12 +37,12 @@ import javax.xml.stream.XMLStreamWriter;
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.Map.Direction;
+import net.sf.freecol.common.model.Map.PathType;
 import net.sf.freecol.common.model.Map.Position;
 import net.sf.freecol.common.model.Player.Stance;
-import net.sf.freecol.common.model.Settlement.SettlementType;
+import net.sf.freecol.common.model.TradeRoute.Stop;
 import net.sf.freecol.common.model.UnitType.DowngradeType;
 import net.sf.freecol.common.model.UnitType.UpgradeType;
-import net.sf.freecol.common.model.TradeRoute.Stop;
 import net.sf.freecol.common.util.EmptyIterator;
 import net.sf.freecol.common.util.Utils;
 
@@ -81,7 +81,13 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
             TO_EUROPE, IN_EUROPE, TO_AMERICA, FORTIFYING, SKIPPED }
 
     /** The roles a Unit can have. */
-    public static enum Role { DEFAULT, PIONEER, MISSIONARY, SOLDIER, SCOUT, DRAGOON }
+    public static enum Role {
+        DEFAULT, PIONEER, MISSIONARY, SOLDIER, SCOUT, DRAGOON;
+    
+        public String getId() {
+            return toString().toLowerCase();
+        }
+    }
 
     /**
      * A move type.

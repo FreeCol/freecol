@@ -49,17 +49,18 @@ import net.sf.freecol.common.model.BuildingType;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.IndianSettlement;
-import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.Nation;
 import net.sf.freecol.common.model.ResourceType;
 import net.sf.freecol.common.model.Settlement;
-import net.sf.freecol.common.model.Settlement.SettlementType;
 import net.sf.freecol.common.model.Tension;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.TileType;
 import net.sf.freecol.common.model.Unit;
-import net.sf.freecol.common.model.Unit.Role;
 import net.sf.freecol.common.model.UnitType;
+import net.sf.freecol.common.model.Map.Direction;
+import net.sf.freecol.common.model.Settlement.SettlementType;
+import net.sf.freecol.common.model.Unit.Role;
+import net.sf.freecol.common.resources.ResourceManager;
 
 /**
  * Holds various images that can be called upon by others in order to display
@@ -67,8 +68,8 @@ import net.sf.freecol.common.model.UnitType;
  */
 public final class ImageLibrary extends ImageProvider {
 
-    private static final Logger logger = Logger.getLogger(ImageLibrary.class.getName());
-
+    private static final Logger logger = Logger.getLogger(ImageLibrary.class.getName());    
+    
     public static final int RIVER_STYLES = 81;
 
     public static final int UNIT_SELECT = 0, PLOWED = 4, TILE_TAKEN = 5, TILE_OWNED_BY_INDIANS = 6,
@@ -81,7 +82,6 @@ public final class ImageLibrary extends ImageProvider {
 
     private static final String path = new String("images/"),
         extension = new String(".png"),
-        unitsDirectory = new String("units/"),
         terrainDirectory = new String("terrain/"),
         tileName = new String("center"),
         borderName = new String("border"),
@@ -110,8 +110,6 @@ public final class ImageLibrary extends ImageProvider {
     private Map<Nation, ImageIcon> coatOfArms;
 
     private EnumMap<SettlementType, Image> settlements;
-
-    private EnumMap<Role, Map<UnitType, ImageIcon>> units, unitsGrayscale;
 
     private Map<String, ImageIcon> terrain1, terrain2, overlay1, overlay2,
         forests, bonus, goods, buildings;
@@ -192,7 +190,6 @@ public final class ImageLibrary extends ImageProvider {
 
         Class<FreeCol> resourceLocator = net.sf.freecol.FreeCol.class;
 
-        loadUnits(gc, resourceLocator, doLookup);
         loadTerrain(gc, resourceLocator, doLookup);
         loadForests(gc, resourceLocator, doLookup);
         loadRivers(gc, resourceLocator, doLookup);
@@ -228,8 +225,6 @@ public final class ImageLibrary extends ImageProvider {
      */
     public ImageLibrary getScaledImageLibrary(float scalingFactor) throws FreeColException {
         ImageLibrary scaledLibrary = new ImageLibrary("", scalingFactor);
-        scaledLibrary.units = scaleUnitImages(units, scalingFactor);
-        scaledLibrary.unitsGrayscale = scaleUnitImages(unitsGrayscale, scalingFactor);
         scaledLibrary.rivers = scaleImages(rivers, scalingFactor);
         scaledLibrary.misc = scaleImages(misc, scalingFactor);
         scaledLibrary.settlements = scaleImages(settlements, scalingFactor);
@@ -380,69 +375,6 @@ public final class ImageLibrary extends ImageProvider {
         }
 
         return new ImageIcon(filePath);
-    }
-
-    /**
-     * Loads the unit-images from file into memory.
-     * 
-     * @param gc The GraphicsConfiguration is needed to create images that are
-     *            compatible with the local environment.
-     * @param resourceLocator The class that is used to locate data files.
-     * @param doLookup Must be set to 'false' if the path to the image files has
-     *            been manually provided by the user. If set to 'true' then a
-     *            lookup will be done to search for image files from
-     *            net.sf.freecol, in this case the images need to be placed in
-     *            net.sf.freecol/images.
-     * @throws FreeColException If one of the data files could not be found.
-     */
-    private void loadUnits(GraphicsConfiguration gc, Class<FreeCol> resourceLocator, boolean doLookup)
-            throws FreeColException {
-
-        units = new EnumMap<Role, Map<UnitType, ImageIcon>>(Role.class);
-        unitsGrayscale = new EnumMap<Role, Map<UnitType, ImageIcon>>(Role.class);
-
-        for (Role role : Role.values()) {
-            Map<UnitType, ImageIcon> unitMap = new HashMap<UnitType, ImageIcon>();
-            Map<UnitType, ImageIcon> grayMap = new HashMap<UnitType, ImageIcon>();
-            String filePath = dataDirectory + path + unitsDirectory;
-            String fileName = null;
-
-            if (role == Role.DEFAULT) {
-                fileName = "unit" + extension;
-            } else {
-                String roleName = role.toString().toLowerCase();
-                filePath += roleName + "/";
-                fileName = roleName + extension;
-            }
-            ImageIcon defaultIcon = findImage(filePath + fileName, resourceLocator, doLookup);
-            ImageIcon defaultIconGrayscale = convertToGrayscale(defaultIcon.getImage());
-
-            for (UnitType unitType : FreeCol.getSpecification().getUnitTypeList()) {
-                fileName = unitType.getArt() + extension;
-                try {
-                    ImageIcon unitIcon = findImage(filePath + fileName, resourceLocator, doLookup);
-                    unitMap.put(unitType, unitIcon);
-                    grayMap.put(unitType, convertToGrayscale(unitIcon.getImage()));
-                } catch (FreeColException e) {
-                    logger.fine("Using default icon for UnitType " + unitType.getName());
-                    unitMap.put(unitType, defaultIcon);
-                    grayMap.put(unitType, defaultIconGrayscale);
-                }
-            }
-            units.put(role, unitMap);
-            unitsGrayscale.put(role, grayMap);
-        }
-
-        /*
-         * If all units are patched together in one graphics file then this is
-         * the way to load them into different images:
-         * 
-         * Image unitsImage = new ImageIcon(url).getImage(); BufferedImage
-         * tempImage = gc.createCompatibleImage(42, 63,
-         * Transparency.TRANSLUCENT);
-         * tempImage.getGraphics().drawImage(unitsImage, 0, 0, null);
-         * units.add(tempImage);
-         */
     }
 
     /**
@@ -1404,7 +1336,8 @@ public final class ImageLibrary extends ImageProvider {
      * @return an <code>ImageIcon</code> value
      */
     public ImageIcon getUnitImageIcon(UnitType unitType) {
-        return units.get(Role.DEFAULT).get(unitType);
+        final Image im = ResourceManager.getImage(unitType.getId() + ".image", scalingFactor);
+        return (im != null) ? new ImageIcon(im) : null;
     }
     
     /**
@@ -1416,7 +1349,9 @@ public final class ImageLibrary extends ImageProvider {
      * @return an <code>ImageIcon</code> value
      */
     public ImageIcon getUnitImageIcon(UnitType unitType, Role role) {
-        return units.get(role).get(unitType);
+        final String roleStr = (role != Role.DEFAULT) ? "." + role.getId() : "";
+        final Image im = ResourceManager.getImage(unitType.getId() + roleStr + ".image", scalingFactor);
+        return (im != null) ? new ImageIcon(im) : null;
     }
 
     /**
@@ -1452,9 +1387,11 @@ public final class ImageLibrary extends ImageProvider {
      */
     public ImageIcon getUnitImageIcon(UnitType unitType, Role role, boolean grayscale) {
         if (grayscale) {
-            return unitsGrayscale.get(role).get(unitType);
+            final String roleStr = (role != Role.DEFAULT) ? "." + role.getId() : "";
+            final Image im = ResourceManager.getGrayscaleImage(unitType.getId() + roleStr + ".image", scalingFactor);
+            return (im != null) ? new ImageIcon(im) : null;
         } else {
-            return units.get(role).get(unitType);
+            return getUnitImageIcon(unitType, role);
         }
     }
 
