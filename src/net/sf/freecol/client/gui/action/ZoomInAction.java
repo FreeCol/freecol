@@ -88,7 +88,7 @@ public class ZoomInAction extends FreeColAction {
      */
     public void actionPerformed(ActionEvent e) {
         float oldScaling = getFreeColClient().getGUI().getImageLibrary().getScalingFactor();
-        float newScaling = oldScaling + 1/8f;
+        float newScaling = oldScaling + 1/4f;
         ImageLibrary im;
         if (newScaling >= 1f) {
             newScaling = 1f;
