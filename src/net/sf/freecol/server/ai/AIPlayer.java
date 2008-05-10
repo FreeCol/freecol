@@ -1371,6 +1371,7 @@ public class AIPlayer extends AIObject {
         CombatModel combatModel = unit.getGame().getCombatModel();
         if (newTile.isLand() && !unit.isNaval() && newTile.getDefendingUnit(unit) != null
                 && defender.getOwner() != unit.getOwner()
+                && !defender.isNaval()
                 && unit.getOwner().getStance(defender.getOwner()) == Stance.WAR) {
             int value = 10020;
             if (newTile.getBestTreasureTrain() != null) {
@@ -1403,7 +1404,7 @@ public class AIPlayer extends AIObject {
             value -= turns * 10;
             return Math.max(0, value);
         } else {
-            return 0;
+            return Integer.MIN_VALUE;
         }
     }
 
