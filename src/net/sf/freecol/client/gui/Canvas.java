@@ -1592,16 +1592,17 @@ public final class Canvas extends JDesktopPane {
 
         // Open new Dialog
         switch (europeAction) {
-            case EXIT:
-            case UNLOAD:
-                return -1;
-            case RECRUIT:
-                localDialog = new RecruitDialog(this);
-                break;
-            case PURCHASE:
-            case TRAIN:
-                localDialog = new TrainDialog(this, europeAction);
-                break;
+        case EXIT:
+        case UNLOAD:
+        case SAIL:
+            return -1;
+        case RECRUIT:
+            localDialog = new RecruitDialog(this);
+            break;
+        case PURCHASE:
+        case TRAIN:
+            localDialog = new TrainDialog(this, europeAction);
+            break;
         }
         localDialog.initialize();
         europeOpenDialog = localDialog; // Set the open dialog to the class variable

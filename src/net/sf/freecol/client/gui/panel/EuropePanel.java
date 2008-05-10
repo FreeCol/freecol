@@ -76,7 +76,7 @@ public final class EuropePanel extends FreeColPanel implements ActionListener, C
 
     private static Logger logger = Logger.getLogger(EuropePanel.class.getName());
 
-    public static enum EuropeAction { EXIT, RECRUIT, PURCHASE, TRAIN, UNLOAD }
+    public static enum EuropeAction { EXIT, RECRUIT, PURCHASE, TRAIN, UNLOAD, SAIL }
 
     private final Canvas parent;
 
@@ -127,38 +127,63 @@ public final class EuropePanel extends FreeColPanel implements ActionListener, C
 
         // Use ESCAPE for closing the ColonyPanel:
         exitButton = new JButton(Messages.message("close"));
+        exitButton.setActionCommand(EuropeAction.EXIT.toString());
+        exitButton.addActionListener(this);
         InputMap closeInputMap = new ComponentInputMap(exitButton);
         closeInputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0, false), "pressed");
         closeInputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0, true), "released");
         SwingUtilities.replaceUIInputMap(exitButton, JComponent.WHEN_IN_FOCUSED_WINDOW, closeInputMap);
+        enterPressesWhenFocused(exitButton);
 
         // train button
         JButton trainButton = new JButton(Messages.message("train"));
+        trainButton.setActionCommand(EuropeAction.TRAIN.toString());
+        trainButton.addActionListener(this);
         InputMap trainInputMap = new ComponentInputMap(trainButton);
         trainInputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_T, 0, false), "pressed");
         trainInputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_T, 0, true), "released");
         SwingUtilities.replaceUIInputMap(trainButton, JComponent.WHEN_IN_FOCUSED_WINDOW, trainInputMap);
+        enterPressesWhenFocused(trainButton);
 
         // purchase button
         JButton purchaseButton = new JButton(Messages.message("purchase"));
+        purchaseButton.setActionCommand(EuropeAction.PURCHASE.toString());
+        purchaseButton.addActionListener(this);
         InputMap purchaseInputMap = new ComponentInputMap(purchaseButton);
         purchaseInputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_P, 0, false), "pressed");
         purchaseInputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_P, 0, true), "released");
         SwingUtilities.replaceUIInputMap(purchaseButton, JComponent.WHEN_IN_FOCUSED_WINDOW, purchaseInputMap);
+        enterPressesWhenFocused(purchaseButton);
 
         // recruit button
         JButton recruitButton = new JButton(Messages.message("recruit"));
+        recruitButton.setActionCommand(EuropeAction.RECRUIT.toString());
+        recruitButton.addActionListener(this);
         InputMap recruitInputMap = new ComponentInputMap(recruitButton);
         recruitInputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_R, 0, false), "pressed");
         recruitInputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_R, 0, true), "released");
         SwingUtilities.replaceUIInputMap(recruitButton, JComponent.WHEN_IN_FOCUSED_WINDOW, recruitInputMap);
+        enterPressesWhenFocused(recruitButton);
 
         // unload button
         JButton unloadButton = new JButton(Messages.message("unload"));
+        unloadButton.setActionCommand(EuropeAction.UNLOAD.toString());
+        unloadButton.addActionListener(this);
         InputMap unloadInputMap = new ComponentInputMap(unloadButton);
         unloadInputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_U, 0, false), "pressed");
         unloadInputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_U, 0, true), "released");
         SwingUtilities.replaceUIInputMap(unloadButton, JComponent.WHEN_IN_FOCUSED_WINDOW, unloadInputMap);
+        enterPressesWhenFocused(unloadButton);
+
+        // sail button
+        JButton sailButton = new JButton(Messages.message("sail"));
+        sailButton.setActionCommand(EuropeAction.SAIL.toString());
+        sailButton.addActionListener(this);
+        InputMap sailInputMap = new ComponentInputMap(sailButton);
+        sailInputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_S, 0, false), "pressed");
+        sailInputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_S, 0, true), "released");
+        SwingUtilities.replaceUIInputMap(sailButton, JComponent.WHEN_IN_FOCUSED_WINDOW, sailInputMap);
+        enterPressesWhenFocused(sailButton);
 
         toAmericaPanel = new ToAmericaPanel(this);
         toEuropePanel = new ToEuropePanel(this);
@@ -253,17 +278,18 @@ public final class EuropePanel extends FreeColPanel implements ActionListener, C
         unloadButton.setOpaque(false);
 
         int[] widths = { 0, 315, margin, 103, margin, 198, margin, 0, 0 };
-        int[] heights = { 0, // top margin
-                120, margin, // log
-                // sailing to America, sailing to Europe
-                39, margin, // recruit button
-                39, margin, // buy button
-                39, margin, // train button
-                39, margin, // unload button
-                116, margin, // in port
-                116, margin, // cargo
-                75, 39, // market
-                0 // bottom margin
+        int[] heights = {
+            0, // top margin
+            120, margin, // log
+            // sailing to America, sailing to Europe
+            39, margin, // recruit button
+            39, margin, // buy button
+            39, margin, // train button
+            39, margin, // unload button
+            116, margin, // in port
+            75, 39, margin, // cargo
+            75, 39, // market
+            0 // bottom margin
         };
 
         HIGLayout layout = new HIGLayout(widths, heights);
@@ -287,31 +313,16 @@ public final class EuropePanel extends FreeColPanel implements ActionListener, C
         add(unloadButton, higConst.rc(row, 8));
         row += 2;
         add(inPortScroll, higConst.rcwh(row, 2, 3, 1));
-        add(docksScroll, higConst.rcwh(row, 6, 1, 3));
+        add(docksScroll, higConst.rcwh(row, 6, 1, 4));
         row += 2;
-        add(cargoScroll, higConst.rcwh(row, 2, 3, 1));
+        add(cargoScroll, higConst.rcwh(row, 2, 3, 2));
+        row += 1;
+        add(sailButton, higConst.rc(row, 8));
         row += 2;
         add(marketScroll, higConst.rcwh(row, 2, 5, 2));
         row += 1;
         add(exitButton, higConst.rc(row, 8));
 
-        exitButton.setActionCommand(EuropeAction.EXIT.toString());
-        recruitButton.setActionCommand(EuropeAction.RECRUIT.toString());
-        purchaseButton.setActionCommand(EuropeAction.PURCHASE.toString());
-        trainButton.setActionCommand(EuropeAction.TRAIN.toString());
-        unloadButton.setActionCommand(EuropeAction.UNLOAD.toString());
-        
-        enterPressesWhenFocused(exitButton);
-        enterPressesWhenFocused(recruitButton);
-        enterPressesWhenFocused(purchaseButton);
-        enterPressesWhenFocused(trainButton);
-        enterPressesWhenFocused(unloadButton);
-
-        exitButton.addActionListener(this);
-        recruitButton.addActionListener(this);
-        purchaseButton.addActionListener(this);
-        trainButton.addActionListener(this);
-        unloadButton.addActionListener(this);
         setBorder(null);
 
         selectedUnit = null;
@@ -468,6 +479,7 @@ public final class EuropePanel extends FreeColPanel implements ActionListener, C
                 // going to america.
                 switch (unit.getState()) {
                 case ACTIVE:
+                default:
                     lastCarrier = unitLabel;
                     inPortPanel.add(unitLabel);
                     break;
@@ -477,10 +489,6 @@ public final class EuropePanel extends FreeColPanel implements ActionListener, C
                 case TO_AMERICA:
                     toAmericaPanel.add(unitLabel, false);
                     break;
-                default:
-                    // This should normally not happen, but until the problem is solved, i comment it out.
-                    // throw new RuntimeException("Naval unit in Europe is in an invalid state.");
-                    // TODO: Find the cause of units not arriving active in Europe.
                 }
             }
         }
@@ -617,9 +625,8 @@ public final class EuropePanel extends FreeColPanel implements ActionListener, C
             // Get Command
             EuropeAction europeAction = Enum.valueOf(EuropeAction.class, command);
             // Close any open Europe Dialog, and show new one if required
-            //int response = 
             parent.showEuropeDialog(europeAction);
-            // Process Command
+            // Refresh if necessary
             switch (europeAction) {
             case EXIT:
                 freeColClient.getMyPlayer().getMarket().removeTransactionListener(log);
@@ -635,6 +642,16 @@ public final class EuropePanel extends FreeColPanel implements ActionListener, C
                 break;
             case UNLOAD:
                 unload();
+                break;
+            case SAIL:
+                Unit unit = getSelectedUnit();
+                if (unit != null && unit.isNaval()) {
+                    freeColClient.getInGameController().moveToAmerica(unit);
+                    UnitLabel unitLabel = getSelectedUnitLabel();
+                    inPortPanel.remove(unitLabel);
+                    toAmericaPanel.add(unitLabel, false);
+                    refresh();
+                }
                 break;
             default:
                 logger.warning("Invalid action command");
