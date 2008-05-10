@@ -354,7 +354,7 @@ public final class InGameController extends Controller {
          * Die if: (No colonies or units on map)
          *         && ((After 20 turns) || (Cannot get a unit from Europe))
          */
-        
+    	
         if (player.isREF()) {
             /*
              * The REF never dies. I can grant independence to
@@ -366,12 +366,43 @@ public final class InGameController extends Controller {
         // Quick check to avoid long processing time:
         if (!player.getSettlements().isEmpty()) {
             return false;
-        } else if (!player.getUnits().isEmpty()) {
-            return false;
+        }
+        
+        boolean hasCarrier = false;
+        List<Unit> unitList = player.getUnits();
+        if (!unitList.isEmpty()) {
+            for(int i=0; i < unitList.size(); i++){
+            	Unit unit = unitList.get(i);
+            	
+            	// Can found new colony
+            	if(unit.isColonist()){
+            		logger.info("Unit " + unit.getId() + " can found colony");
+            		return false;
+            	}
+            	
+            	// Can capture units/goods
+            	if(unit.isOffensiveUnit()){
+            		logger.info("Unit " + unit.getId() + " has offense");
+            		return false;
+            	}
+            	
+            	// Is carrying units and/or goods
+            	if(unit.getGoodsCount() > 0){
+            		logger.info("Unit " + unit.getId() + " has goods");
+            		return false;
+            	}
+            	if(unit.getUnitCount()>0){
+            		logger.info("Unit " + unit.getId() + " has units");
+            		return false;
+            	}
+            	
+            	if(unit.isNaval() && unit.isCarrier())
+            		hasCarrier = true;
+            }
         }
         
         /*
-         * At this point we know the player does not have any units or
+         * At this point we know the player does not have any valid units or
          * settlements on the map.
          */
         
@@ -390,7 +421,6 @@ public final class InGameController extends Controller {
         /*
          * Check if player has colonists and carrier to transport them to New World
          */
-        boolean hasCarrier = false;
         boolean hasColonistsWaiting = false;
         
         Iterator<Unit> unitIterator = player.getEurope().getUnitIterator();

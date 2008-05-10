@@ -331,6 +331,28 @@ public class UnitTest extends FreeColTestCase {
             assertEquals(2, getWorkLeftForPioneerWork(hardyPioneer, swamp, road));
         }
     }
+    
+    /**
+     * Test unit for colonist status
+     * 
+     */
+    public void testIsColonist() {
+        Game game = getStandardGame();
+        Player dutch = game.getPlayer("model.nation.dutch");
+        Map map = getTestMap(plains, true);
+        game.setMap(map);
+
+        
+        Unit merchantman = new Unit(game, map.getTile(6, 8), dutch, spec().getUnitType("model.unit.merchantman"),
+                                UnitState.ACTIVE);
+        
+        assertFalse("Merchantman isnt a colonist",merchantman.isColonist());
+        
+        Unit soldier = new Unit(game, map.getTile(6, 8), dutch, spec().getUnitType("model.unit.veteranSoldier"),
+                UnitState.ACTIVE);
+        
+        assertTrue("A soldier is a colonist",soldier.isColonist());
+    }
 
     /**
      * Make sure that a colony can only be built by a worker on the
