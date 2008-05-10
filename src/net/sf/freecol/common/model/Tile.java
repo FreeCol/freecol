@@ -55,16 +55,11 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
 
     private static final Logger logger = Logger.getLogger(Tile.class.getName());
 
-    // Indians' claims on the tile may be one of the following:
-    public static final int CLAIM_NONE = 0, CLAIM_VISITED = 1, CLAIM_CLAIMED = 2;
-
     private TileType type;
     
     private boolean lostCityRumour;
 
     private int x, y;
-
-    private int indianClaim;
 
     /** The player that consider this tile to be their land. */
     private Player owner;
@@ -118,7 +113,6 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
         super(game);
 
         this.type = type;
-        this.indianClaim = CLAIM_NONE;
 
         unitContainer = new UnitContainer(game, this);
         tileItemContainer = new TileItemContainer(game, this);
@@ -816,25 +810,6 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
             }
         }
         return fishBonus;
-    }
-
-    /**
-     * Returns the claim on this Tile.
-     * 
-     * @return The claim on this Tile.
-     */
-    public int getClaim() {
-        return indianClaim;
-    }
-
-    /**
-     * Sets the claim on this Tile.
-     * 
-     * @param claim The claim on this Tile.
-     */
-    public void setClaim(int claim) {
-        indianClaim = claim;
-        updatePlayerExploredTiles();
     }
 
     /**

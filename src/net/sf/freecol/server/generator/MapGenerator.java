@@ -521,13 +521,11 @@ public class MapGenerator {
 
         tile.setSettlement(settlement);
         
-        tile.setClaim(Tile.CLAIM_CLAIMED);
         tile.setOwningSettlement(settlement);
         
         Iterator<Position> circleIterator = map.getCircleIterator(position, true, settlement.getRadius());
         while (circleIterator.hasNext()) {
             Tile newTile = map.getTile(circleIterator.next());
-            newTile.setClaim(Tile.CLAIM_CLAIMED);
             newTile.setOwningSettlement(settlement);
             newTile.setOwner(player);
         }

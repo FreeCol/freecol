@@ -1077,14 +1077,6 @@ public class IndianSettlement extends Settlement {
         Position position = settlementTile.getPosition();
         Iterator<Position> circleIterator = map.getCircleIterator(position, true, getRadius());
         
-        settlementTile.setClaim(Tile.CLAIM_NONE);
-        while (circleIterator.hasNext()) {
-            Tile tile = map.getTile(circleIterator.next());
-            if (tile.getOwner() == owner) {
-                tile.setClaim(Tile.CLAIM_NONE);
-            }
-        }
-
         super.dispose();
     }
 
