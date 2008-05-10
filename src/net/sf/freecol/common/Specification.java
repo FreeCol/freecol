@@ -761,7 +761,14 @@ public final class Specification {
         specification = new Specification(is);
     }
 
+    // FIXME urgently!
     public static Specification getSpecification() {
+        if (specification == null) {
+            try {
+                specification = new Specification(new FileInputStream("data/freecol/specification.xml"));
+            } catch(Exception e) {
+            }
+        }
         return specification;
     }
 
