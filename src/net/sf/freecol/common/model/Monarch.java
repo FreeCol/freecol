@@ -123,7 +123,7 @@ public final class Monarch extends FreeColGameObject {
             if (unitType.hasAbility("model.ability.refUnit")) {
                 if (unitType.hasAbility("model.ability.navalUnit")) {
                     navalUnits.add(new AbstractUnit(unitType, Role.DEFAULT, number));
-                    if (unitType.hasAbility("model.ability.carryUnits")) {
+                    if (unitType.canCarryUnits()) {
                         capacity += unitType.getSpace() * number;
                     }
                 } else if (unitType.hasAbility("model.ability.canBeEquipped")) {
@@ -401,7 +401,7 @@ public final class Monarch extends FreeColGameObject {
                 for (AbstractUnit refUnit : navalUnits) {
                     if (refUnit.getUnitType().equals(unitType)) {
                         refUnit.setNumber(refUnit.getNumber() + unitToAdd.getNumber());
-                        if (unitType.hasAbility("model.ability.carryUnits")) {
+                        if (unitType.canCarryUnits()) {
                             capacity += unitType.getSpace() * unitToAdd.getNumber();
                         }
                     }

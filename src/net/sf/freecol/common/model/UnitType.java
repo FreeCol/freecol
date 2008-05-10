@@ -154,6 +154,24 @@ public final class UnitType extends BuildableType {
     }
 
     /**
+     * Returns <code>true</code> if Units of this type can carry other Units.
+     *
+     * @return a <code>boolean</code> value
+     */
+    public boolean canCarryUnits() {
+        return hasAbility("model.ability.carryUnits");
+    }
+
+    /**
+     * Returns <code>true</code> if Units of this type can carry Goods.
+     *
+     * @return a <code>boolean</code> value
+     */
+    public boolean canCarryGoods() {
+        return hasAbility("model.ability.carryGoods");
+    }
+
+    /**
      * Get the <code>Art</code> value.
      *
      * @return a <code>String</code> value

@@ -354,8 +354,7 @@ public final class ReportUnitPanel extends JPanel implements ActionListener {
         case CARGO:
             for (UnitType unitType : FreeCol.getSpecification().getUnitTypeList()) {
                 if (unitType.isAvailableTo(player.getPlayerType()) && 
-                    (unitType.hasAbility("model.ability.carryUnits") ||
-                     unitType.hasAbility("model.ability.carryGoods"))) {
+                    (unitType.canCarryUnits() || unitType.canCarryGoods())) {
                     unitPanel.add(createUnitTypeLabel(unitType, Role.DEFAULT, getCount(others, unitType)));
                 }
             }

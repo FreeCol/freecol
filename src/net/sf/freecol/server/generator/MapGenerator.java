@@ -649,7 +649,7 @@ public class MapGenerator {
             for (AbstractUnit startingUnit : unitList) {
                 Unit newUnit = new Unit(map.getGame(), null, player, startingUnit.getUnitType(),
                                         UnitState.SENTRY, startingUnit.getEquipment());
-                if (newUnit.hasAbility("model.ability.carryUnits") && newUnit.isNaval()) {
+                if (newUnit.canCarryUnits() && newUnit.isNaval()) {
                     newUnit.setState(UnitState.ACTIVE);
                     carriers.add(newUnit);
                 } else {

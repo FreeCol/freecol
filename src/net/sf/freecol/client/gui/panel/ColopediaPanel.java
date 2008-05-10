@@ -660,8 +660,7 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
         }
 
         String capacity = null;
-        if (type.hasAbility("model.ability.carryGoods") || 
-            type.hasAbility("model.ability.carryUnits")) {
+        if (type.canCarryGoods() || type.canCarryUnits()) {
             capacity = String.valueOf(type.getSpace());
             rowsRequired++;
         }

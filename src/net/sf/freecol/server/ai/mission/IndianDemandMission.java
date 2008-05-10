@@ -77,7 +77,7 @@ public class IndianDemandMission extends Mission {
 
         this.target = target;
 
-        if (!getUnit().getOwner().isIndian() || !getUnit().hasAbility("model.ability.carryGoods")) {
+        if (!getUnit().getOwner().isIndian() || !getUnit().canCarryGoods()) {
             logger.warning("Only an indian which can carry goods can be given the mission: IndianBringGiftMission");
             throw new IllegalArgumentException("Only an indian which can carry goods can be given the mission: IndianBringGiftMission");
         }
