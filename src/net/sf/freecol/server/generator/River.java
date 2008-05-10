@@ -30,6 +30,7 @@ import net.sf.freecol.common.model.Map;
 import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.TileImprovement;
+import net.sf.freecol.common.model.TileItemContainer;
 import net.sf.freecol.common.model.TileType;
 import net.sf.freecol.common.model.Map.Position;
 import net.sf.freecol.server.model.ServerRegion;
@@ -381,6 +382,9 @@ public class River {
             }
             Tile tile = map.getTile(section.getPosition());
             if (tile.isLand()) {
+                if (tile.getTileItemContainer() == null) {
+                    tile.setTileItemContainer(new TileItemContainer(tile.getGame(), tile));
+                }
             
                 if (section.getSize() == TileImprovement.SMALL_RIVER || 
                     section.getSize() == TileImprovement.LARGE_RIVER) {

@@ -30,11 +30,12 @@ import net.sf.freecol.FreeCol;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Map;
 import net.sf.freecol.common.model.Map.Direction;
+import net.sf.freecol.common.model.Map.Position;
 import net.sf.freecol.common.model.Region;
 import net.sf.freecol.common.model.Region.RegionType;
 import net.sf.freecol.common.model.Tile;
+import net.sf.freecol.common.model.TileItemContainer;
 import net.sf.freecol.common.model.TileType;
-import net.sf.freecol.common.model.Map.Position;
 import net.sf.freecol.server.model.ServerRegion;
 
 /**
@@ -117,7 +118,9 @@ public class TerrainGenerator {
                         t = new Tile(game, importTile.getType(), x, y);
                         // TileItemContainer copies everything including Resource unless importBonuses == false
                         if (importTile.getTileItemContainer() != null) {
-                            t.getTileItemContainer().copyFrom(importTile.getTileItemContainer(), importBonuses);
+                            TileItemContainer container = new TileItemContainer(game, t);
+                            container.copyFrom(importTile.getTileItemContainer(), importBonuses);
+                            t.setTileItemContainer(container);
                         }
                         if (!importBonuses) {
                             // In which case, we may add a Bonus Resource
@@ -183,6 +186,9 @@ public class TerrainGenerator {
             }
 
             if (adjacentLand > 1 && random.nextInt(10 - adjacentLand) == 0) {
+                if (t.getTileItemContainer() == null) {
+                    t.setTileItemContainer(new TileItemContainer(t.getGame(), t));
+                }
                 t.setResource(t.getType().getRandomResourceType());
             }
         }
@@ -664,13 +670,6 @@ public class TerrainGenerator {
         nextTry: for (int tries = 0; tries < 1000; tries++) {
             if (counter < number) {
                 Position p = map.getRandomLandPosition();
-                /* this can't happen
-                if (p == null)
-                    continue;
-                Tile t = map.getTile(p);
-                if (t==null || !t.isLand())
-                    continue;
-                */
                 Tile t = map.getTile(p);
                 if (t.getType() == hills || t.getType() == mountains) {
                     // already a high ground

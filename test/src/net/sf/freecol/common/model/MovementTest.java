@@ -93,11 +93,13 @@ public class MovementTest extends FreeColTestCase {
         assertFalse(road1.isComplete());
         road1.setTurnsToComplete(0);
         assertTrue(road1.isComplete());
+        tile1.setTileItemContainer(new TileItemContainer(game, tile1));
         tile1.getTileItemContainer().addTileItem(road1);
         assertTrue(tile1.hasRoad());
 
         TileImprovement road2 = new TileImprovement(game, tile2, roadType);
         road2.setTurnsToComplete(0);
+        tile2.setTileItemContainer(new TileItemContainer(game, tile2));
         tile2.getTileItemContainer().addTileItem(road2);
         assertTrue(road2.isComplete());
         assertTrue(tile2.hasRoad());
@@ -126,11 +128,13 @@ public class MovementTest extends FreeColTestCase {
         TileImprovement river1 = new TileImprovement(game, tile1, riverType);
         assertTrue(river1.isRiver());
         assertTrue(river1.isComplete());
+        tile1.setTileItemContainer(new TileItemContainer(game, tile1));
         tile1.getTileItemContainer().addTileItem(river1);
         assertTrue(tile1.hasRiver());
 
         TileImprovement river2 = new TileImprovement(game, tile2, riverType);
         river2.setTurnsToComplete(0);
+        tile2.setTileItemContainer(new TileItemContainer(game, tile2));
         tile2.getTileItemContainer().addTileItem(river2);
         assertTrue(river2.isComplete());
         assertTrue(tile2.hasRiver());

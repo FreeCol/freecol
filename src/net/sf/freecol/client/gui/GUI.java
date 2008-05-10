@@ -1705,84 +1705,90 @@ public final class GUI {
             }
             
             TileItemContainer tic = tile.getTileItemContainer();
-            List<TileImprovement> tiList = tile.getCompletedTileImprovements();
-            List<TileImprovement> tiList2 = new ArrayList<TileImprovement>();
-            // Go through improvements and add those that are drawn over trees to another list for later
-            // Skip roads and rivers
-            for (TileImprovement ti : tiList) {
-                if (ti == tic.getRiver() || ti == tic.getRoad())
-                    continue;
-                if (!ti.getType().isArtOverTrees()) {
-                    tiList2.add(ti);
-                } else if (ti.getType().getArtOverlay() != null) {
-                    // Has its own Overlay Image in Misc, use it
-                    g.drawImage(ResourceManager.getImage(ti.getType().getArtOverlay()), x, y, null);
+            if (tic == null) {
+                if(tile.isForested()) {
+                    g.drawImage(lib.getForestImage(tile.getType()), x, y, null);
                 }
-            }
-
-            // Draw River if any
-            if (tic.hasRiver() && tic.getRiver().getMagnitude() < TileImprovement.FJORD_RIVER) {
-                g.drawImage(lib.getRiverImage(tic.getRiverStyle()), x, y, null);
-            }
-            if (tile.isForested()) {
-                g.drawImage(lib.getForestImage(tile.getType()), x, y, null);
-            }
-
-            for (TileImprovement ti : tiList2) {
-                if (ti == tic.getRiver() || ti == tic.getRoad())
-                    continue;
-                if (ti.getType().getArtOverlay() != null) {
-                    // Has its own Overlay Image in Misc, use it
-                    g.drawImage(ResourceManager.getImage(ti.getType().getArtOverlay()), x, y, null);
-                }
-            }
-
-            if (tile.hasResource()) {
-                Image bonusImage = lib.getBonusImage(tic.getResource().getType());
-                if (bonusImage != null) {
-                    g.drawImage(bonusImage, x + tileWidth/2 - bonusImage.getWidth(null)/2,
-                                y + tileHeight/2 - bonusImage.getHeight(null)/2, null);
-                }
-            }
-
-            /* Until the forest bordering tiles are done... -sjm
-            // When that happens, use normal bordering method. - ryan
-            if (tile.isLand()) {
-                for (int i = 0; i < 8; i++) {
-                    Map.Position p = Map.getAdjacent(pos, i);
-                    if (map.isValid(p)) {
-                        Tile borderingTile = map.getTile(p);
-                        if (tile.getType() == borderingTile.getType() ||
-                            !borderingTile.isLand() ||
-                            !tile.isLand() ||
-                            !(borderingTile.getType().getIndex() < tile.getType().getIndex()) ||
-                            !borderingTile.isExplored()) {
-                            // Equal tiles, sea tiles and unexplored tiles have no effect
-                            continue;
-                        }
-                        if (borderingTile.isForested()) {
-                            g.drawImage(lib.getTerrainImage(ImageLibrary.FOREST, i, tile.getX(), tile.getY()),
-                            x, y - 32, null);
-                        } else 
+            } else {
+                List<TileImprovement> tiList = tile.getCompletedTileImprovements();
+                List<TileImprovement> tiList2 = new ArrayList<TileImprovement>();
+                // Go through improvements and add those that are drawn over trees to another list for later
+                // Skip roads and rivers
+                for (TileImprovement ti : tiList) {
+                    if (ti == tic.getRiver() || ti == tic.getRoad())
+                        continue;
+                    if (!ti.getType().isArtOverTrees()) {
+                        tiList2.add(ti);
+                    } else if (ti.getType().getArtOverlay() != null) {
+                        // Has its own Overlay Image in Misc, use it
+                        g.drawImage(ResourceManager.getImage(ti.getType().getArtOverlay()), x, y, null);
                     }
                 }
-            }
-            */
 
-            // Paint the roads:
-            if (tile.hasRoad()) {
-                long seed = Long.parseLong(Integer.toString(tile.getX()) + Integer.toString(tile.getY()));
-                boolean connectedRoad = false;
-                for (Direction direction : Direction.values()) {
-                    Map.Position p = Map.getAdjacent(pos, direction);
-                    if (map.isValid(p)) {
-                        Tile borderingTile = map.getTile(p);
-                        if (borderingTile.hasRoad()) {
-                            connectedRoad =  true;
-                            int nx = x + tileWidth/2;
-                            int ny = y + tileHeight/2;
+                // Draw River if any
+                if (tic.hasRiver() && tic.getRiver().getMagnitude() < TileImprovement.FJORD_RIVER) {
+                    g.drawImage(lib.getRiverImage(tic.getRiverStyle()), x, y, null);
+                }
+                if (tile.isForested()) {
+                    g.drawImage(lib.getForestImage(tile.getType()), x, y, null);
+                }
 
-                            switch (direction) {
+                for (TileImprovement ti : tiList2) {
+                    if (ti == tic.getRiver() || ti == tic.getRoad())
+                        continue;
+                    if (ti.getType().getArtOverlay() != null) {
+                        // Has its own Overlay Image in Misc, use it
+                        g.drawImage(ResourceManager.getImage(ti.getType().getArtOverlay()), x, y, null);
+                    }
+                }
+
+                if (tile.hasResource()) {
+                    Image bonusImage = lib.getBonusImage(tic.getResource().getType());
+                    if (bonusImage != null) {
+                        g.drawImage(bonusImage, x + tileWidth/2 - bonusImage.getWidth(null)/2,
+                                    y + tileHeight/2 - bonusImage.getHeight(null)/2, null);
+                    }
+                }
+
+
+                /* Until the forest bordering tiles are done... -sjm
+                // When that happens, use normal bordering method. - ryan
+                if (tile.isLand()) {
+                for (int i = 0; i < 8; i++) {
+                Map.Position p = Map.getAdjacent(pos, i);
+                if (map.isValid(p)) {
+                Tile borderingTile = map.getTile(p);
+                if (tile.getType() == borderingTile.getType() ||
+                !borderingTile.isLand() ||
+                !tile.isLand() ||
+                !(borderingTile.getType().getIndex() < tile.getType().getIndex()) ||
+                !borderingTile.isExplored()) {
+                // Equal tiles, sea tiles and unexplored tiles have no effect
+                continue;
+                }
+                if (borderingTile.isForested()) {
+                g.drawImage(lib.getTerrainImage(ImageLibrary.FOREST, i, tile.getX(), tile.getY()),
+                x, y - 32, null);
+                } else 
+                }
+                }
+                }
+                */
+
+                // Paint the roads:
+                if (tile.hasRoad()) {
+                    long seed = Long.parseLong(Integer.toString(tile.getX()) + Integer.toString(tile.getY()));
+                    boolean connectedRoad = false;
+                    for (Direction direction : Direction.values()) {
+                        Map.Position p = Map.getAdjacent(pos, direction);
+                        if (map.isValid(p)) {
+                            Tile borderingTile = map.getTile(p);
+                            if (borderingTile.hasRoad()) {
+                                connectedRoad =  true;
+                                int nx = x + tileWidth/2;
+                                int ny = y + tileHeight/2;
+
+                                switch (direction) {
                                 case N : nx = x + tileWidth/2; ny = y; break;
                                 case NE: nx = x + (tileWidth*3)/4; ny = y + tileHeight/4; break;
                                 case E : nx = x + tileWidth; ny = y + tileHeight/2; break;
@@ -1791,16 +1797,17 @@ public final class GUI {
                                 case SW: nx = x + tileWidth/4; ny = y + (tileHeight*3)/4; break;
                                 case W : nx = x; ny = y + tileHeight/2; break;
                                 case NW: nx = x + tileWidth/4; ny = y + tileHeight/4; break;
-                            }
+                                }
 
-                            drawRoad(g, seed, x + tileWidth/2, y + tileHeight/2, nx, ny);
+                                drawRoad(g, seed, x + tileWidth/2, y + tileHeight/2, nx, ny);
+                            }
                         }
                     }
-                }
 
-                if (!connectedRoad) {
-                    drawRoad(g, seed, x + tileWidth/2 - 10, y + tileHeight/2, x + tileWidth/2 + 10, y + tileHeight/2);
-                    drawRoad(g, seed, x + tileWidth/2, y + tileHeight/2 - 10, x + tileWidth/2, y + tileHeight/2 + 10);
+                    if (!connectedRoad) {
+                        drawRoad(g, seed, x + tileWidth/2 - 10, y + tileHeight/2, x + tileWidth/2 + 10, y + tileHeight/2);
+                        drawRoad(g, seed, x + tileWidth/2, y + tileHeight/2 - 10, x + tileWidth/2, y + tileHeight/2 + 10);
+                    }
                 }
             }
         }

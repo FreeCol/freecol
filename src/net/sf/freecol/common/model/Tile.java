@@ -115,7 +115,7 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
         this.type = type;
 
         unitContainer = new UnitContainer(game, this);
-        tileItemContainer = new TileItemContainer(game, this);
+        //tileItemContainer = new TileItemContainer(game, this);
         lostCityRumour = false;
 
         x = locX;
@@ -238,7 +238,11 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
      * @return The description label for this tile
      */
     public String getLabel() {
-        return getName() + tileItemContainer.getLabel();
+        if (tileItemContainer == null) {
+            return getName();
+        } else {
+            return getName() + tileItemContainer.getLabel();
+        }
     }
     
     /**
@@ -295,12 +299,25 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
     }
 
     /**
+     * Sets the <code>TileItemContainer</code>.
+     *
+     * @param newTileItemContainer a <code>TileItemContainer</code> value
+     */
+    public void setTileItemContainer(TileItemContainer newTileItemContainer) {
+        tileItemContainer = newTileItemContainer;
+    }
+
+    /**
      * Returns a List of <code>TileImprovements</code>.
      *
      * @return a List of <code>TileImprovements</code>
      */
     public List<TileImprovement> getTileImprovements() {
-        return tileItemContainer.getImprovements();
+        if (tileItemContainer == null) {
+            return new ArrayList<TileImprovement>();
+        } else {
+            return tileItemContainer.getImprovements();
+        }
     }
 
     /**
@@ -310,9 +327,11 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
      */
     public List<TileImprovement> getCompletedTileImprovements() {
         List<TileImprovement> result = new ArrayList<TileImprovement>();
-        for (TileImprovement improvement : tileItemContainer.getImprovements()) {
-            if (improvement.getTurnsToComplete() == 0) {
-                result.add(improvement);
+        if (tileItemContainer != null) {
+            for (TileImprovement improvement : tileItemContainer.getImprovements()) {
+                if (improvement.getTurnsToComplete() == 0) {
+                    result.add(improvement);
+                }
             }
         }
         return result;
@@ -550,7 +569,11 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
      * @see Unit#getMoveCost
      */
     public int getMoveCost(Tile fromTile) {
-        return tileItemContainer.getMoveCost(getType().getBasicMoveCost(), fromTile);
+        if (tileItemContainer == null) {
+            return getType().getBasicMoveCost();
+        } else {
+            return tileItemContainer.getMoveCost(getType().getBasicMoveCost(), fromTile);
+        }
     }
 
     /**
@@ -644,47 +667,62 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
     }
 
     /**
-     * Returns 'true' if this Tile is a land Tile, 'false' otherwise.
+     * Returns <code>true</code> if this Tile is a land Tile, 'false' otherwise.
      * 
-     * @return 'true' if this Tile is a land Tile, 'false' otherwise.
+     * @return <code>true</code> if this Tile is a land Tile, 'false' otherwise.
      */
     public boolean isLand() {
         return type != null && !type.isWater();
     }
 
     /**
-     * Returns 'true' if this Tile is forested.
+     * Returns <code>true</code> if this Tile is forested.
      * 
-     * @return 'true' if this Tile is forested.
+     * @return <code>true</code> if this Tile is forested.
      */
     public boolean isForested() {
         return type != null && type.isForested();
     }
 
     /**
-     * Returns 'true' if this Tile has a road.
+     * Returns <code>true</code> if this Tile has a River.
      * 
-     * @return 'true' if this Tile has a road.
+     * @return <code>true</code> if this Tile has a River.
      */
-    public boolean hasRoad() {
-        return getTileItemContainer().hasRoad();
-    }
-
-    public TileImprovement getRoad() {
-        return getTileItemContainer().getRoad();
-    }
-
     public boolean hasRiver() {
-        return getTileItemContainer().hasRiver();
+        return tileItemContainer != null && getTileItemContainer().hasRiver();
     }
 
     /**
-     * Returns 'true' if this Tile has a resource on it.
+     * Returns <code>true</code> if this Tile has a resource on it.
      * 
-     * @return 'true' if this Tile has a resource on it.
+     * @return <code>true</code> if this Tile has a resource on it.
      */
     public boolean hasResource() {
-        return getTileItemContainer().hasResource();
+        return tileItemContainer != null && getTileItemContainer().hasResource();
+    }
+
+    /**
+     * Returns <code>true</code> if this Tile has a road.
+     * 
+     * @return <code>true</code> if this Tile has a road.
+     */
+    public boolean hasRoad() {
+        return tileItemContainer != null && getTileItemContainer().hasRoad();
+    }
+
+    /**
+     * Returns the road on this tile, if there is one, and
+     * <code>null</code> otherwise.
+     *
+     * @return a <code>TileImprovement</code> value
+     */
+    public TileImprovement getRoad() {
+        if (tileItemContainer == null) {
+            return null;
+        } else {
+            return getTileItemContainer().getRoad();
+        }
     }
 
     /**
@@ -889,6 +927,10 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
         if (r == null) {
             return;
         }
+        if (tileItemContainer == null) {
+            tileItemContainer = new TileItemContainer(getGame(), this);
+        }
+
         Resource resource = new Resource(getGame(), this, r);
         tileItemContainer.addTileItem(resource);
         updatePlayerExploredTiles();
@@ -904,7 +946,9 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
             throw new IllegalStateException("Tile type must be valid");
         }
         type = t;
-        getTileItemContainer().clear();
+        if (tileItemContainer != null) {
+            getTileItemContainer().clear();
+        }
         if (!isLand()) {
             settlement = null;
         }
@@ -1081,6 +1125,9 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
         if (locatable instanceof Unit) {
             unitContainer.addUnit((Unit) locatable);
         } else if (locatable instanceof TileItem) {
+            if (tileItemContainer == null) {
+                tileItemContainer = new TileItemContainer(getGame(), this);
+            }
             tileItemContainer.addTileItem((TileItem) locatable);
         } else {
             logger.warning("Tried to add an unrecognized 'Locatable' to a tile.");
@@ -1219,7 +1266,7 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
             if (tileType.isWater() && goodsType == Goods.FISH) {
                 potential += fishBonus;
             }
-            if (tileType == getType() && tileItemContainer.hasResource()) {
+            if (tileType == getType() && hasResource()) {
                 potential = tileItemContainer.getResourceBonusPotential(goodsType, (int) potential);
             }
             for (TileImprovementType impType : FreeCol.getSpecification().getTileImprovementTypeList()) {
@@ -1261,7 +1308,11 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
      * Finds the TileImprovement of a given Type, or null if there is no match.
      */
     public TileImprovement findTileImprovementType(TileImprovementType type) {
-        return tileItemContainer.findTileImprovementType(type);
+        if (tileItemContainer == null) {
+            return null;
+        } else {
+            return tileItemContainer.findTileImprovementType(type);
+        }
     }
     
     /**
@@ -1277,7 +1328,7 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
      *         completed.
      */
     public boolean hasImprovement(TileImprovementType type) {
-        return tileItemContainer.hasImprovement(type);
+        return tileItemContainer != null && tileItemContainer.hasImprovement(type);
     }
     
     /**
@@ -1583,14 +1634,18 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
             || (player.canSee(this) && (settlement == null || settlement.getOwner() == player))
             || !getGameOptions().getBoolean(GameOptions.UNIT_HIDING) && player.canSee(this)) {
             unitContainer.toXML(out, player, showAll, toSavedGame);
-            tileItemContainer.toXML(out, player, showAll, toSavedGame);
+            if (tileItemContainer != null) {
+                tileItemContainer.toXML(out, player, showAll, toSavedGame);
+            }
         } else {
             UnitContainer emptyUnitContainer = new UnitContainer(getGame(), this);
             emptyUnitContainer.setFakeID(unitContainer.getId());
             emptyUnitContainer.toXML(out, player, showAll, toSavedGame);
-            TileItemContainer emptyTileItemContainer = new TileItemContainer(getGame(), this);
-            emptyTileItemContainer.setFakeID(tileItemContainer.getId());
-            emptyTileItemContainer.toXML(out, player, showAll, toSavedGame);
+            if (tileItemContainer != null) {
+                TileItemContainer emptyTileItemContainer = new TileItemContainer(getGame(), this);
+                emptyTileItemContainer.setFakeID(tileItemContainer.getId());
+                emptyTileItemContainer.toXML(out, player, showAll, toSavedGame);
+            }
         }
 
         if (toSavedGame) {
@@ -1986,10 +2041,14 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
          * @param tic The <code>TileItemContainer</code> to copy from
          */
         public void getTileItemInfo(TileItemContainer tic) {
-            resource = tic.getResource();
-            improvements = tic.getImprovements();
-            road = tic.getRoad();
-            river = tic.getRiver();
+            if (tic != null) {
+                resource = tic.getResource();
+                improvements = tic.getImprovements();
+                road = tic.getRoad();
+                river = tic.getRiver();
+            } else {
+                improvements = new ArrayList<TileImprovement>();
+            }
         }
 
         public void setColonyUnitCount(int colonyUnitCount) {

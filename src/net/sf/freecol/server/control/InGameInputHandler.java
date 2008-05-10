@@ -64,6 +64,7 @@ import net.sf.freecol.common.model.Tension;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.TileImprovement;
 import net.sf.freecol.common.model.TileImprovementType;
+import net.sf.freecol.common.model.TileItemContainer;
 import net.sf.freecol.common.model.TradeRoute;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.Unit.Role;
@@ -2107,11 +2108,17 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         if (unit.getOwner() != player) {
             throw new IllegalStateException("Not your unit!");
         }
-
-        Element reply = null;
+        Tile tile = unit.getTile();
 
         String improvementTypeString = workElement.getAttribute("improvementType");
         if (improvementTypeString != null) {
+            Element reply = Message.createNewRootElement("workImprovementConfirmed");
+
+            if (tile.getTileItemContainer() == null) {
+                tile.setTileItemContainer(new TileItemContainer(tile.getGame(), tile));
+                reply.appendChild(tile.getTileItemContainer().toXMLElement(player, reply.getOwnerDocument()));
+            }
+
             TileImprovementType type = FreeCol.getSpecification().getTileImprovementType(improvementTypeString);
             TileImprovement improvement = unit.getTile().findTileImprovementType(type);
             if (improvement == null) {
@@ -2119,11 +2126,12 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
                 improvement = new TileImprovement(getGame(), unit.getTile(), type);
                 unit.getTile().add(improvement);
             }
-            reply = Message.createNewRootElement("workImprovementConfirmed");
             reply.appendChild(improvement.toXMLElement(player, reply.getOwnerDocument()));
             unit.work(improvement);
+            return reply;
+        } else {
+            return null;
         }
-        return reply;
 
     }
 

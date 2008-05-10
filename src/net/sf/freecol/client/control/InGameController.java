@@ -87,6 +87,7 @@ import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.TileImprovement;
 import net.sf.freecol.common.model.TileImprovementType;
+import net.sf.freecol.common.model.TileItemContainer;
 import net.sf.freecol.common.model.TradeRoute;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.Unit.MoveType;
@@ -2381,16 +2382,29 @@ public final class InGameController implements NetworkConstants {
         changeWorkTypeElement.setAttribute("improvementType", improvementType.getId());
 
         Element reply = freeColClient.getClient().ask(changeWorkTypeElement);
-        Element improvementElement = (Element) reply.getFirstChild();
-        TileImprovement improvement = (TileImprovement) freeColClient.getGame()
-            .getFreeColGameObject(improvementElement.getAttribute("ID"));
-        if (improvement == null) {
-            improvement = new TileImprovement(freeColClient.getGame(), improvementElement);
-            unit.getTile().add(improvement);
-        } else {
-            improvement.readFromXMLElement(improvementElement);
+        Element containerElement = getChildElement(reply, TileItemContainer.getXMLElementTagName());
+        if (containerElement != null) {
+            TileItemContainer container = (TileItemContainer) freeColClient.getGame()
+                .getFreeColGameObject(containerElement.getAttribute("ID"));
+            if (container == null) {
+                container = new TileItemContainer(freeColClient.getGame(), unit.getTile(), containerElement);
+                unit.getTile().setTileItemContainer(container);
+            } else {
+                container.readFromXMLElement(containerElement);
+            }
         }
-        unit.work(improvement);
+        Element improvementElement = getChildElement(reply, TileImprovement.getXMLElementTagName());
+        if (improvementElement != null) {
+            TileImprovement improvement = (TileImprovement) freeColClient.getGame()
+                .getFreeColGameObject(improvementElement.getAttribute("ID"));
+            if (improvement == null) {
+                improvement = new TileImprovement(freeColClient.getGame(), improvementElement);
+                unit.getTile().add(improvement);
+            } else {
+                improvement.readFromXMLElement(improvementElement);
+            }
+            unit.work(improvement);
+        }
     }
 
     /**
