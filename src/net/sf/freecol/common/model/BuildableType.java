@@ -66,7 +66,7 @@ public class BuildableType extends FreeColGameObjectType {
     }
 
     public String getGoodsRequiredAsString() {
-        ArrayList<String> result = new ArrayList();
+        ArrayList<String> result = new ArrayList<String>();
         if (goodsRequired != null) {
             for (AbstractGoods goods : goodsRequired) {
                 result.add(Messages.message("model.goods.goodsAmount",
