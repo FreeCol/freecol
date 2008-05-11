@@ -115,7 +115,6 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
         this.type = type;
 
         unitContainer = new UnitContainer(game, this);
-        //tileItemContainer = new TileItemContainer(game, this);
         lostCityRumour = false;
 
         x = locX;
@@ -640,7 +639,7 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
         if (locatable instanceof Unit) {
             return unitContainer.contains((Unit) locatable);
         } else if (locatable instanceof TileItem) {
-            return tileItemContainer.contains((TileItem) locatable);
+            return tileItemContainer != null && tileItemContainer.contains((TileItem) locatable);
         }
 
         logger.warning("Tile.contains(" + locatable + ") Not implemented yet!");
@@ -783,7 +782,11 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
      * @return River <code>TileImprovement</code>
      */
     public TileImprovement getRiver() {
-        return tileItemContainer.getRiver();
+        if (tileItemContainer == null) {
+            return null;
+        } else {
+            return tileItemContainer.getRiver();
+        }
     }
 
     /**
@@ -792,7 +795,11 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
      * @return an <code>int</code> value
      */
     public int getRiverStyle() {
-        return tileItemContainer.getRiverStyle();
+        if (tileItemContainer == null) {
+            return 0;
+        } else {
+            return tileItemContainer.getRiverStyle();
+        }
     }
 
     /**
@@ -803,6 +810,9 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
      * @param style an <code>int</code> value
      */
     public void addRiver(int magnitude, int style) {
+        if (tileItemContainer == null) {
+            tileItemContainer = new TileItemContainer(getGame(), this);
+        }
         tileItemContainer.addRiver(magnitude, style);
     }
 
@@ -1290,7 +1300,9 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
     public Set<Modifier> getProductionBonus(GoodsType goodsType) {
         Set<Modifier> result = new HashSet<Modifier>();
         result.add(type.getProductionBonus(goodsType));
-        result.addAll(tileItemContainer.getProductionBonus(goodsType));
+        if (tileItemContainer != null) {
+            result.addAll(tileItemContainer.getProductionBonus(goodsType));
+        }
         return result;
     }
 
@@ -1301,7 +1313,7 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
      * @return The result.
      */
     public boolean canGetRoad() {
-        return isLand() && !tileItemContainer.hasRoad();
+        return isLand() && (tileItemContainer == null || !tileItemContainer.hasRoad());
     }
 
     /**
@@ -2047,7 +2059,7 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
                 road = tic.getRoad();
                 river = tic.getRiver();
             } else {
-                improvements = new ArrayList<TileImprovement>();
+                improvements = Collections.emptyList();
             }
         }
 
