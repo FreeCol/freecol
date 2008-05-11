@@ -80,7 +80,7 @@ public class TileImprovement extends TileItem implements Locatable, Named {
     public TileImprovement(Game game, Tile tile, TileImprovementType type) {
         super(game, tile);
         if (type == null) {
-            throw new NullPointerException();
+            throw new IllegalArgumentException("Parameter 'type' must not be 'null'.");
         }
         this.type = type;
         if (!type.isNatural()) {

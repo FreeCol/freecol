@@ -51,7 +51,7 @@ public class Resource extends TileItem {
     public Resource(Game game, Tile tile, ResourceType type) {
         super(game, tile);
         if (type == null) {
-            throw new NullPointerException();
+            throw new IllegalArgumentException("Parameter 'type' must not be 'null'.");
         }
         this.type = type;
         this.quantity = type.getRandomValue();

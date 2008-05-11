@@ -41,7 +41,7 @@ public abstract class TileItem extends FreeColGameObject implements Locatable, N
     public TileItem(Game game, Tile tile) {
         super(game);
         if (tile == null) {
-            throw new NullPointerException();
+            throw new IllegalArgumentException("Parameter 'tile' must not be 'null'.");
         }
         this.tile = tile;
     }

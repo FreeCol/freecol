@@ -1041,7 +1041,7 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
      *         <code>null</code> if no path is found.
      * @see Map#findPath(Tile, Tile, PathType)
      * @see Map#findPath(Unit, Tile , Tile)
-     * @exception NullPointerException if <code>end == null</code>
+     * @exception IllegalArgumentException if <code>end == null</code>
      */
     public PathNode findPath(Tile end) {
         if (getTile() == null) {
@@ -1562,7 +1562,6 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
      * 
      * @param unit The unit to embark onto.
      * @exception IllegalStateException If the embark is illegal.
-     *                NullPointerException If <code>unit == null</code>.
      */
     public void embark(Unit unit) {
         if (unit == null) {

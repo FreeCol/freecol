@@ -173,7 +173,6 @@ public final class Market extends FreeColGameObject implements Ownable {
      *
      * @param type a <code>GoodsType</code> value
      * @return The cost to buy a single unit of the given type of goods.
-     * @exception NullPointerException  if the argument is <TT>null</TT>
      */
     public int costToBuy(GoodsType type) {
         MarketData data = marketData.get(type);
@@ -191,7 +190,6 @@ public final class Market extends FreeColGameObject implements Ownable {
      * @param type a <code>GoodsType</code> value
      * @return The price for a single unit of the given type of goods
      *      if being sold. 
-     * @exception NullPointerException  if the argument is <TT>null</TT>
      */
     public int paidForSale(GoodsType type) {
         MarketData data = marketData.get(type);

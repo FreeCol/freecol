@@ -414,13 +414,15 @@ public class Game extends FreeColGameObject {
      * @param id The unique ID of the <code>FreeColGameObject</code>.
      * @param freeColGameObject The <code>FreeColGameObject</code> that shall
      *            be added to this <code>Game</code>.
-     * @exception NullPointerException If either <code>id</code> or
-     *                <code>freeColGameObject
-     *                                   </code> are <i>null</i>.
+     * @exception IllegalArgumentException If either <code>id</code>
+     *                or <code>freeColGameObject </code> are
+     *                <i>null</i>.
      */
     public void setFreeColGameObject(String id, FreeColGameObject freeColGameObject) {
-        if (id == null || id.equals("") || freeColGameObject == null) {
-            throw new NullPointerException();
+        if (id == null || id.equals("")) {
+            throw new IllegalArgumentException("Parameter 'id' must not be 'null' or empty string.");
+        } else if (freeColGameObject == null) {
+            throw new IllegalArgumentException("Parameter 'freeColGameObject' must not be 'null'.");
         }
 
         FreeColGameObject old = freeColGameObjects.put(id, freeColGameObject);
@@ -448,11 +450,11 @@ public class Game extends FreeColGameObject {
      * 
      * @param id The identifier of the <code>FreeColGameObject</code>.
      * @return The <code>FreeColGameObject</code>.
-     * @exception NullPointerException If <code>id == null</code>.
+     * @exception IllegalArgumentException If <code>id == null</code>, or <code>id = ""</code>.
      */
     public FreeColGameObject getFreeColGameObject(String id) {
         if (id == null || id.equals("")) {
-            throw new NullPointerException();
+            throw new IllegalArgumentException("Parameter 'id' must not be null or empty string.");
         }
 
         return freeColGameObjects.get(id);
@@ -479,11 +481,11 @@ public class Game extends FreeColGameObject {
      * @param id The identifier of the <code>FreeColGameObject</code> that
      *            shall be removed from this <code>Game</code>.
      * @return The <code>FreeColGameObject</code> that has been removed.
-     * @exception NullPointerException If <code>id == null</code>.
+     * @exception IllegalArgumentException If <code>id == null</code>, or <code>id = ""</code>.
      */
     public FreeColGameObject removeFreeColGameObject(String id) {
         if (id == null || id.equals("")) {
-            throw new NullPointerException();
+            throw new IllegalArgumentException("Parameter 'id' must not be null or empty string.");
         }
 
         if (freeColGameObjectListener != null) {

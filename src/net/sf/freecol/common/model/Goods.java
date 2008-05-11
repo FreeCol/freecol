@@ -74,15 +74,15 @@ public class Goods extends AbstractGoods implements Locatable, Ownable, Named {
      */
     public Goods(Game game, Location location, GoodsType type, int amount) {
         if (game == null) {
-            throw new NullPointerException();
+            throw new IllegalArgumentException("Parameter 'game' must not be 'null'.");
         }
         
-        if (location != null && location.getGoodsContainer() == null){
-            throw new IllegalArgumentException("This location cannot store goods");
+        if (type == null) {
+            throw new IllegalArgumentException("Parameter 'type' must not be 'null'.");
         }
 
-        if (type == null) {
-            throw new NullPointerException();
+        if (location != null && location.getGoodsContainer() == null){
+            throw new IllegalArgumentException("This location cannot store goods");
         }
 
         this.game = game;

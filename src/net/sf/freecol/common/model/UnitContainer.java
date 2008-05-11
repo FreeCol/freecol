@@ -61,7 +61,7 @@ public class UnitContainer extends FreeColGameObject {
         super(game);
 
         if (parent == null) {
-            throw new NullPointerException();
+            throw new IllegalArgumentException("Parameter 'parent' must not be 'null'.");
         }
 
         this.parent = parent;
@@ -99,7 +99,7 @@ public class UnitContainer extends FreeColGameObject {
         super(game, e);
 
         if (parent == null) {
-            throw new NullPointerException();
+            throw new IllegalArgumentException("Parameter 'parent' must not be 'null'.");
         }
 
         this.parent = parent;
@@ -155,10 +155,10 @@ public class UnitContainer extends FreeColGameObject {
      * @return The amount of Units in this container.
      */
     public int getUnitCount() {
-        try {
-            return units.size();
-        } catch (NullPointerException e) {
+        if (units == null) {
             return 0;
+        } else {
+            return units.size();
         }
     }
 

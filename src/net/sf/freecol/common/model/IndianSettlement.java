@@ -135,7 +135,7 @@ public class IndianSettlement extends Settlement {
         super(game, player, tile);
 
         if (tile == null) {
-            throw new NullPointerException();
+            throw new IllegalArgumentException("Parameter 'tile' must not be 'null'.");
         }
         
         tile.setOwner(player);
@@ -344,15 +344,15 @@ public class IndianSettlement extends Settlement {
      * Adds the given <code>Unit</code> to the list of units that belongs to this
      * <code>IndianSettlement</code>.
      * 
-     * @param u The <code>Unit</code> to be added.
+     * @param unit The <code>Unit</code> to be added.
      */
-    public void addOwnedUnit(Unit u) {
-        if (u == null) {
-            throw new NullPointerException();
+    public void addOwnedUnit(Unit unit) {
+        if (unit == null) {
+            throw new IllegalArgumentException("Parameter 'unit' must not be 'null'.");
         }
 
-        if (!ownedUnits.contains(u)) {
-            ownedUnits.add(u);
+        if (!ownedUnits.contains(unit)) {
+            ownedUnits.add(unit);
         }
     }
 
@@ -369,23 +369,20 @@ public class IndianSettlement extends Settlement {
 
 
     /**
-     * Removes the given <code>Unit</code> to the list of units 
-     * that belongs to this <code>IndianSettlement</code>.
+     * Removes the given <code>Unit</code> to the list of units that
+     * belongs to this <code>IndianSettlement</code>. Returns true if
+     * the Unit was removed.
      * 
-     * @param u The <code>Unit</code> to be removed from the
+     * @param unit The <code>Unit</code> to be removed from the
      *       list of the units this <code>IndianSettlement</code>
      *       owns.
+     * @return a <code>boolean</code> value
      */
-    public void removeOwnedUnit(Unit u) {
-        if (u == null) {
-            throw new NullPointerException();
+    public boolean removeOwnedUnit(Unit unit) {
+        if (unit == null) {
+            throw new IllegalArgumentException("Parameter 'unit' must not be 'null'.");
         }
-
-        int index = ownedUnits.indexOf(u);
-
-        if (index >= 0) {
-            ownedUnits.remove(index);
-        }
+        return ownedUnits.remove(unit);
     }
 
 

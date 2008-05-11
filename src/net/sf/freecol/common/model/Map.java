@@ -231,7 +231,7 @@ public class Map extends FreeColGameObject {
      *         <code>null</code> if no path is found.
      * @see #findPath(Unit, Tile, Tile)
      * @see Unit#findPath(Tile)
-     * @exception NullPointerException
+     * @exception IllegalArgumentException
      *                if either <code>start</code> or <code>end</code> are
      *                <code>null</code>.
      */
@@ -329,7 +329,7 @@ public class Map extends FreeColGameObject {
      *         {@link PathNode#getDirection} will return the direction you need
      *         to take in order to reach that tile. This method returns
      *         <code>null</code> if no path is found.
-     * @exception NullPointerException
+     * @exception IllegalArgumentException
      *                if either <code>start</code> or <code>end</code> are
      *                <code>null</code>.
      * @exception IllegalArgumentException
@@ -367,7 +367,7 @@ public class Map extends FreeColGameObject {
      *         {@link PathNode#getDirection} will return the direction you need
      *         to take in order to reach that tile. This method returns
      *         <code>null</code> if no path is found.
-     * @exception NullPointerException
+     * @exception IllegalArgumentException
      *                if either <code>start</code> or <code>end</code> are
      *                <code>null</code>.
      * @exception IllegalArgumentException
