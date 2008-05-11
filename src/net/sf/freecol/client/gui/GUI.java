@@ -1149,7 +1149,10 @@ public final class GUI {
                 && freeColClient.getGame() != null
                 && freeColClient.getMyPlayer() != freeColClient.getGame().getCurrentPlayer()) {
             
-            if (greyLayer == null || !greyLayer.getSize().equals(size)) {
+            if (greyLayer == null) {
+                greyLayer = buildGreyLayer();
+            } else if (!greyLayer.getSize().equals(size)) {
+                canvas.remove(greyLayer, false);
                 greyLayer = buildGreyLayer();
             }
             if (greyLayer.getParent() == null) // Not added to the canvas yet.
