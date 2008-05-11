@@ -313,7 +313,7 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
      */
     public List<TileImprovement> getTileImprovements() {
         if (tileItemContainer == null) {
-            return new ArrayList<TileImprovement>();
+            return Collections.emptyList();
         } else {
             return tileItemContainer.getImprovements();
         }
@@ -325,37 +325,17 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
      * @return a List of <code>TileImprovements</code>
      */
     public List<TileImprovement> getCompletedTileImprovements() {
-        List<TileImprovement> result = new ArrayList<TileImprovement>();
-        if (tileItemContainer != null) {
+        if (tileItemContainer == null) {
+            return Collections.emptyList();
+        } else {
+            List<TileImprovement> result = new ArrayList<TileImprovement>();
             for (TileImprovement improvement : tileItemContainer.getImprovements()) {
                 if (improvement.getTurnsToComplete() == 0) {
                     result.add(improvement);
                 }
             }
+            return result;
         }
-        return result;
-    }
-
-
-
-    /**
-     * Gets the total value of all treasure trains on this <code>Tile</code>.
-     * 
-     * @return The total value of all treasure trains on this <code>Tile</code>
-     *         or <code>0</code> if there are no treasure trains at all.
-     */
-    public int getUnitTreasureAmount() {
-        int amount = 0;
-
-        Iterator<Unit> ui = getUnitIterator();
-        while (ui.hasNext()) {
-            Unit u = ui.next();
-            if (u.canCarryTreasure()) {
-                amount += u.getTreasureAmount();
-            }
-        }
-
-        return amount;
     }
 
     /**
@@ -800,20 +780,6 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
         } else {
             return tileItemContainer.getRiverStyle();
         }
-    }
-
-    /**
-     * Adds a river to this tile. Use this method only if the style of
-     * the river is known, e.g. in the map generator.
-     * 
-     * @param magnitude The magnitude of the river at this point
-     * @param style an <code>int</code> value
-     */
-    public void addRiver(int magnitude, int style) {
-        if (tileItemContainer == null) {
-            tileItemContainer = new TileItemContainer(getGame(), this);
-        }
-        tileItemContainer.addRiver(magnitude, style);
     }
 
     /**

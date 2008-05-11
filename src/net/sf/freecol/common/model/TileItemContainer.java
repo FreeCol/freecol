@@ -37,9 +37,9 @@ import net.sf.freecol.client.gui.i18n.Messages;
 import org.w3c.dom.Element;
 
 /**
-* Contains <code>TileItem</code>s and can be used by a {@link Tile}
-* to make certain tasks easier.
-*/
+ * Contains <code>TileItem</code>s and can be used by a {@link Tile}
+ * to make certain tasks easier.
+ */
 public class TileItemContainer extends FreeColGameObject {
 
     @SuppressWarnings("unused")
@@ -384,11 +384,11 @@ public class TileItemContainer extends FreeColGameObject {
     }
 
     /**
-    * Checks if the specified <code>TileItem</code> is in this container.
-    *
-    * @param t The <code>TileItem</code> to test the presence of.
-    * @return The result.
-    */
+     * Checks if the specified <code>TileItem</code> is in this container.
+     *
+     * @param t The <code>TileItem</code> to test the presence of.
+     * @return The result.
+     */
     public boolean contains(TileItem t) {
         if (t instanceof Resource) {
             return ((Resource) t) == resource;
@@ -399,11 +399,11 @@ public class TileItemContainer extends FreeColGameObject {
     }
 
     /**
-    * Checks if a TileImprovement of this Type is already in this container.
-    *
-    * @param type The <code>TileImprovementType</code> to test the presence of.
-    * @return The result.
-    */
+     * Checks if a TileImprovement of this Type is already in this container.
+     *
+     * @param type The <code>TileImprovementType</code> to test the presence of.
+     * @return The result.
+     */
     public TileImprovement findTileImprovementType(TileImprovementType type) {
         for (TileImprovement ti : improvements) {
             if (ti.getType() == type) {
@@ -414,21 +414,21 @@ public class TileItemContainer extends FreeColGameObject {
     }
     
     /**
-	 * Will check whether this tile has a completed improvement of the given
-	 * type.
-	 * 
-	 * Useful for checking whether the tile for instance has a road or is
-	 * plowed.
-	 * 
-	 * @param type
-	 *            The type to check for.
-	 * @return Whether the tile has the improvement and the improvement is
-	 *         completed.
-	 */
-	public boolean hasImprovement(TileImprovementType type) {
-		TileImprovement improvement = findTileImprovementType(type);
-		return improvement != null && improvement.isComplete();
-	}
+     * Will check whether this tile has a completed improvement of the given
+     * type.
+     * 
+     * Useful for checking whether the tile for instance has a road or is
+     * plowed.
+     * 
+     * @param type
+     *            The type to check for.
+     * @return Whether the tile has the improvement and the improvement is
+     *         completed.
+     */
+    public boolean hasImprovement(TileImprovementType type) {
+        TileImprovement improvement = findTileImprovementType(type);
+        return improvement != null && improvement.isComplete();
+    }
 
     /**
      * Removes all references to this object.
@@ -581,9 +581,9 @@ public class TileItemContainer extends FreeColGameObject {
     
     
     /**
-    * Creates a <code>String</code> representation of this
-    * <code>TileItemContainer</code>.    
-    */
+     * Creates a <code>String</code> representation of this
+     * <code>TileItemContainer</code>.    
+     */
     public String toString() {
         StringBuffer sb = new StringBuffer(60);
         sb.append("TileItemContainer with: ");

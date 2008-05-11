@@ -382,21 +382,20 @@ public class River {
             }
             Tile tile = map.getTile(section.getPosition());
             if (tile.isLand()) {
-                if (tile.getTileItemContainer() == null) {
-                    tile.setTileItemContainer(new TileItemContainer(tile.getGame(), tile));
+                TileItemContainer container = tile.getTileItemContainer();
+                if (container == null) {
+                    container = new TileItemContainer(tile.getGame(), tile);
+                    tile.setTileItemContainer(container);
                 }
             
                 if (section.getSize() == TileImprovement.SMALL_RIVER || 
                     section.getSize() == TileImprovement.LARGE_RIVER) {
-                    tile.addRiver(section.getSize(), section.encodeStyle());
+                    container.addRiver(section.getSize(), section.encodeStyle());
                     logger.fine("Added river (magnitude: " + section.getSize() +
                                 ") to tile at " + section.getPosition());
                 } else if (section.getSize() >= TileImprovement.FJORD_RIVER) {
-                    //TileImprovement oldRiver = tile.getRiver(); // save the previous river
                     tile.setType(greatRiver);   // changing the type resets the improvements
-                    tile.addRiver(section.getSize(), section.encodeStyle());
-                    //TileImprovement newRiver = tile.getRiver();
-                    //newRiver.setStyle(oldRiver.getStyle());
+                    container.addRiver(section.getSize(), section.encodeStyle());
                     logger.fine("Added fjord (magnitude: " + section.getSize() +
                                 ") to tile at " + section.getPosition());
                 }
