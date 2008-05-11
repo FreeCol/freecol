@@ -29,6 +29,8 @@ import java.util.HashMap;
 import java.util.logging.Logger;
 
 import javax.swing.BorderFactory;
+import javax.swing.Box;
+import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -187,14 +189,16 @@ public final class StatisticsPanel extends FreeColPanel implements ActionListene
     }
     
     private JPanel displayStatsMessage(String title, StatisticsMessage statistics) {
-        JPanel panel = new JPanel(new GridLayout(3,1));
+        JPanel panel = new JPanel();
         panel.setBorder(BorderFactory.createTitledBorder(title));
-        panel.add(createStatsTable("Memory", statistics.getMemoryStatistics()));
-        panel.add(createStatsTable("Game", statistics.getGameStatistics()));
+        Box b = new Box(BoxLayout.Y_AXIS);
+        panel.add(b);
+        b.add(createStatsTable("Memory", statistics.getMemoryStatistics()));
+        b.add(createStatsTable("Game", statistics.getGameStatistics()));
         if (statistics.getAIStatistics()!=null) {
-            panel.add(createStatsTable("AI", statistics.getAIStatistics()));
+            b.add(createStatsTable("AI", statistics.getAIStatistics()));
         } else {
-            panel.add(new JLabel());
+            b.add(new JLabel());
         }
         return panel;
     }
@@ -208,12 +212,13 @@ public final class StatisticsPanel extends FreeColPanel implements ActionListene
         JTable table = new JTable(model);
         table.setAutoCreateColumnsFromModel(true);
         table.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
+        //table.setAutoCreateRowSorter(true); // Java 1.6 only
         JScrollPane scrollPane = new JScrollPane(table);
         table.addNotify();
         scrollPane.getViewport().setOpaque(false);
         scrollPane.getColumnHeader().setOpaque(false);
         panel.add(scrollPane, BorderLayout.CENTER);
-        panel.setPreferredSize(new Dimension(300, 150));
+        panel.setPreferredSize(new Dimension(300, (data.size()+2)*17));
         return panel;
     }
 

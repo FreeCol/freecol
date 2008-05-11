@@ -362,17 +362,6 @@ public class DebugMenu extends JMenu {
                 canvas.showPanel(new StatisticsPanel(canvas, freeColClient));
             }
         });
-        
-        // memory manager
-        final JMenuItem memoryManager = new JMenuItem(Messages.message("menuBar.debug.memoryManager"));
-        memoryManager.setOpaque(false);
-        memoryManager.setMnemonic(KeyEvent.VK_O);
-        this.add(memoryManager);
-        memoryManager.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                canvas.showPanel(new StatisticsPanel(canvas, freeColClient));
-            }
-        });
 
         // garbage collector
         final JMenuItem gc = new JMenuItem(Messages.message("menuBar.debug.memoryManager.gc"));
