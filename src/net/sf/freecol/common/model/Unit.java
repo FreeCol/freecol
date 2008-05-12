@@ -2478,7 +2478,10 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
     public String getOccupationIndicator() {
 
         if (getDestination() != null) {
-            return Messages.message("model.unit.occupation.goingSomewhere");
+        	if(getTradeRoute() != null)
+        		return Messages.message("model.unit.occupation.inTradeRoute");
+        	else
+        		return Messages.message("model.unit.occupation.goingSomewhere");
         } else if (state == UnitState.IMPROVING && workImprovement != null) {
             return workImprovement.getOccupationString();
         } else if (state == UnitState.ACTIVE && getMovesLeft() == 0) {
