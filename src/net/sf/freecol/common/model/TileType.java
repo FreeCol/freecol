@@ -133,24 +133,27 @@ public final class TileType extends FreeColGameObjectType {
         return getModifierSet("model.modifier.defence");
     }
 
+    /**
+     * Returns the amount of goods of given GoodsType this TileType
+     * can produce. This method applies the production bonus to
+     * <code>0f</code>.
+     *
+     * @param goodsType a <code>GoodsType</code> value
+     * @return an <code>int</code> value
+     * @see getProductionBonus(goodsType)
+     */
     public int getPotential(GoodsType goodsType) {
-        for (AbstractGoods goods : production) {
-            if (goods.getType() == goodsType) {
-                return goods.getAmount();
-            }
-        }
-        return 0;
+        return (int) featureContainer.applyModifier(0f, goodsType.getId());
     }
 
-    public Modifier getProductionBonus(GoodsType goodsType) {
-        Modifier result = new Modifier(goodsType.getId(), getId(), 0f, Modifier.Type.ADDITIVE);
-        for (AbstractGoods goods : production) {
-            if (goods.getType() == goodsType) {
-                result.setValue(goods.getAmount());
-                break;
-            }
-        }
-        return result;
+    /**
+     * Returns the production bonus for the given GoodsType.
+     *
+     * @param goodsType a <code>GoodsType</code> value
+     * @return a <code>Modifier</code> value
+     */
+    public Set<Modifier> getProductionBonus(GoodsType goodsType) {
+        return featureContainer.getModifierSet(goodsType.getId());
     }
 
     public GoodsType getSecondaryGoods() {
@@ -261,6 +264,7 @@ public final class TileType extends FreeColGameObjectType {
                 GoodsType type = specification.getGoodsType(in.getAttributeValue(null, "goods-type"));
                 int amount = Integer.parseInt(in.getAttributeValue(null, "value"));
                 production.add(new AbstractGoods(type, amount));
+                addModifier(new Modifier(type.getId(), getId(), amount, Modifier.Type.ADDITIVE));
                 in.nextTag(); // close this element
             } else if ("resource".equals(childName)) {
                 String r = in.getAttributeValue(null, "type");
