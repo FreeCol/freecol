@@ -257,9 +257,8 @@ public class FeatureContainer {
         float additive = 0, percentage = 0, multiplicative = 1;
         for (Modifier modifier : modifierSet) {
             float value = modifier.getValue();
-            if (value == Float.MIN_VALUE) {
-                // special case: unknown value
-                return Float.MIN_VALUE;
+            if (value == Modifier.UNKNOWN) {
+                return Modifier.UNKNOWN;
             }
             if (modifier.hasIncrement() && turn != null) {
                 int diff = turn.getNumber() - modifier.getFirstTurn().getNumber();

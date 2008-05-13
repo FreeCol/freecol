@@ -41,6 +41,8 @@ public final class Modifier extends Feature {
 
     public static final String COLONY_GOODS_PARTY = "model.monarch.colonyGoodsParty";
 
+    public static final float UNKNOWN = Float.MIN_VALUE;
+
     public static enum Type { ADDITIVE, MULTIPLICATIVE, PERCENTAGE }
 
     private float value;

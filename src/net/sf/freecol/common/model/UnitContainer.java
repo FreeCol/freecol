@@ -21,6 +21,7 @@ package net.sf.freecol.common.model;
 
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamConstants;
@@ -35,14 +36,12 @@ import org.w3c.dom.Element;
  * easier.
  */
 public class UnitContainer extends FreeColGameObject {
+
     @SuppressWarnings("unused")
     private static Logger logger = Logger.getLogger(Location.class.getName());
 
-
-
-
     /** The list of units stored in this <code>UnitContainer</code>. */
-    private ArrayList<Unit> units = new ArrayList<Unit>();
+    private List<Unit> units = new ArrayList<Unit>();
 
     /** The owner of this <code>UnitContainer</code>. */
     @SuppressWarnings("unused")
@@ -185,9 +184,8 @@ public class UnitContainer extends FreeColGameObject {
      * 
      * @return The clone.
      */
-    @SuppressWarnings("unchecked")
     public ArrayList<Unit> getUnitsClone() {
-        return (ArrayList<Unit>) units.clone();
+        return new ArrayList<Unit>(units);
     }
 
     /**
@@ -238,10 +236,10 @@ public class UnitContainer extends FreeColGameObject {
      * Disposes all units in this <code>UnitContainer</code>.
      */
     public void disposeAllUnits() {
-        while(! units.isEmpty()) {
-            Unit unit = units.remove(units.size() - 1);
+        for (Unit unit : units) {
             unit.dispose();
         }
+        units.clear();
     }
 
 

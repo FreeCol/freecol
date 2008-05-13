@@ -326,7 +326,7 @@ public class FreeColDialog extends FreeColPanel {
         Set<Modifier> defense;
         if (defender == null && settlement != null) {
             defense = new LinkedHashSet<Modifier>();
-            defense.add(new Modifier("modifiers.baseDefense", Float.MIN_VALUE, Modifier.Type.ADDITIVE));
+            defense.add(new Modifier("modifiers.baseDefense", Modifier.UNKNOWN, Modifier.Type.ADDITIVE));
             defense.addAll(settlement.getFeatureContainer()
                            .getModifierSet("model.modifier.defence", attacker.getType()));
         } else {
@@ -466,7 +466,7 @@ public class FreeColDialog extends FreeColPanel {
             preCombatDialog.add(new JLabel(source),
                                 higConst.rc(row, defenseLabelColumn));
             String bonus = String.valueOf(modifier.getValue());
-            if (modifier.getValue() == Float.MIN_VALUE) {
+            if (modifier.getValue() == Modifier.UNKNOWN) {
                 bonus = "???";
             }
             switch(modifier.getType()) {
@@ -511,7 +511,7 @@ public class FreeColDialog extends FreeColPanel {
         preCombatDialog.add(finalDefenseLabel,
                             higConst.rc(row, defenseLabelColumn));
         JLabel finalDefenseResult = new JLabel(String.valueOf(defenseResult));
-        if (defenseResult == Float.MIN_VALUE) {
+        if (defenseResult == Modifier.UNKNOWN) {
             finalDefenseResult.setText("???");
         }
         finalDefenseResult.setFont(bigFont);
