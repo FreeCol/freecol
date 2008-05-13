@@ -29,6 +29,7 @@ import java.util.logging.Logger;
 import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.freecol.FreeCol;
+import net.sf.freecol.common.FreeColException;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.GameOptions;
 import net.sf.freecol.common.model.Map;
@@ -143,8 +144,12 @@ public final class PreGameController extends Controller {
             freeColServer.getServer().sendToAll(addNewPlayer, theConnection);
         }
         
-        // Make the map:        
-        mapGenerator.createMap(game);
+        try {
+            // Make the map:
+            mapGenerator.createMap(game);
+        } catch (FreeColException e) {
+            // what now?
+        }
         Map map = game.getMap();
         
         // Inform the clients:

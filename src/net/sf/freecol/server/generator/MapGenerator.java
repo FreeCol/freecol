@@ -109,7 +109,7 @@ public class MapGenerator {
      * @see LandGenerator
      * @see TerrainGenerator
      */
-    public void createMap(Game game) {        
+    public void createMap(Game game) throws FreeColException {        
         
         // Prepare imports:
         final File importFile = getMapGeneratorOptions().getFile(MapGeneratorOptions.IMPORT_FILE);
@@ -144,14 +144,14 @@ public class MapGenerator {
      *      <code>Game</code> from.
      * @return The <code>Game</code>.
      */
-    private Game loadSaveGame(File importFile) {        
+    private Game loadSaveGame(File importFile) throws FreeColException {        
         /* 
          * TODO-LATER: We are using same method in FreeColServer.
          *       Create a framework for loading games/maps.
          */
         FreeColSavegameFile fis = null;
+        Game game = null;
         try {
-            Game game = null;
             fis = new FreeColSavegameFile(importFile);
             XMLStreamReader xsr = FreeColServer.createXMLStreamReader(fis);
             xsr.nextTag();
@@ -180,27 +180,27 @@ public class MapGenerator {
                 }
             }
             xsr.close();
-            return game ;
         } catch (XMLStreamException e) {
             StringWriter sw = new StringWriter();
             e.printStackTrace(new PrintWriter(sw));
             logger.warning(sw.toString());
-            return null;
+            throw new FreeColException(e.toString());
         } catch (FreeColException fe) {
             StringWriter sw = new StringWriter();
             fe.printStackTrace(new PrintWriter(sw));
             logger.warning(sw.toString());
-            return null;
+            throw new FreeColException(fe.toString());
         } catch (Exception e) {
             StringWriter sw = new StringWriter();
             e.printStackTrace(new PrintWriter(sw));
             logger.warning(sw.toString());
-            return null;
+            throw new FreeColException(e.toString());
         } finally {
             if (fis != null) {
                 fis.close();
             }
         }
+        return game;
     }
 
     public LandGenerator getLandGenerator() {

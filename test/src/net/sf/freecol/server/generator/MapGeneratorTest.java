@@ -24,6 +24,7 @@ import java.util.Iterator;
 import java.util.Vector;
 
 import net.sf.freecol.FreeCol;
+import net.sf.freecol.common.FreeColException;
 import net.sf.freecol.common.Specification;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.IndianSettlement;
@@ -54,7 +55,11 @@ public class MapGeneratorTest extends FreeColTestCase {
             }
         }
 
-        gen.createMap(g);
+        try {
+            gen.createMap(g);
+        } catch (FreeColException e) {
+            fail();
+        }
 
         // Check that the map is created at all
         assertNotNull(g.getMap());
@@ -76,7 +81,11 @@ public class MapGeneratorTest extends FreeColTestCase {
 
         g.addPlayer(new Player(g, nation.getType().getName(), false, nation));
 
-        gen.createMap(g);
+        try {
+            gen.createMap(g);
+        } catch (FreeColException e) {
+            fail();
+        }
 
         // Check that the map is created at all
         assertNotNull(g.getMap());
@@ -110,7 +119,11 @@ public class MapGeneratorTest extends FreeColTestCase {
             players.add(p);
         }
 
-        gen.createMap(g);
+        try {
+            gen.createMap(g);
+        } catch (FreeColException e) {
+            fail();
+        }
 		
         // Check that the map is created at all
         assertNotNull(g.getMap());
@@ -163,7 +176,11 @@ public class MapGeneratorTest extends FreeColTestCase {
             players.add(p);
         }
 
-        gen.createMap(g);
+        try {
+            gen.createMap(g);
+        } catch (FreeColException e) {
+            fail();
+        }
 
         // Check that the map is created at all
         assertNotNull(g.getMap());
@@ -192,7 +209,11 @@ public class MapGeneratorTest extends FreeColTestCase {
         MapGenerator gen = new MapGenerator();
         File importFile = new File("data/maps/Africa.fsg");
         gen.getMapGeneratorOptions().setFile(MapGeneratorOptions.IMPORT_FILE, importFile);
-        gen.createMap(g);
+        try {
+            gen.createMap(g);
+        } catch (FreeColException e) {
+            fail();
+        }
     }
 }
 

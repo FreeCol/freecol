@@ -28,6 +28,8 @@ import net.sf.freecol.common.networking.NoRouteToServerException;
 import net.sf.freecol.server.control.Controller;
 import net.sf.freecol.server.control.InGameController;
 import net.sf.freecol.server.control.PreGameController;
+import net.sf.freecol.server.generator.MapGenerator;
+import net.sf.freecol.server.generator.MapGeneratorOptions;
 import net.sf.freecol.util.test.FreeColTestCase;
 
 public class ServerTest extends FreeColTestCase {
@@ -70,7 +72,7 @@ public class ServerTest extends FreeColTestCase {
         return server;
     }
     
-    public void testServer() {
+    public void testSaveLoadFile() {
         
         // start a server
         FreeColServer server = startServer(false, true, SERVER_PORT, SERVER_NAME);
@@ -108,6 +110,53 @@ public class ServerTest extends FreeColTestCase {
         } catch (Exception e) {
             fail();
         }
+        assertNotNull(server.getGame());
+        assertNotNull(server.getGame().getMap());
+        file.delete();
+        assertFalse(file.exists());
+    }
+    
+public void testImportFile() {
+        
+        // start a server
+        FreeColServer server = startServer(false, true, SERVER_PORT, SERVER_NAME);
+
+        // generate a random map
+        Controller c = server.getController();
+        assertNotNull(c);
+        assertTrue(c instanceof PreGameController);
+        PreGameController pgc = (PreGameController)c;
+        pgc.startGame();
+        assertEquals(FreeColServer.GameState.IN_GAME, server.getGameState());
+        assertNotNull(server.getGame());
+        assertNotNull(server.getGame().getMap());
+        
+        // save the game as a file
+        File file = new File(TEST_FILE);
+        try {
+            server.saveGame(file, "user");
+        } catch (IOException e) {
+            fail();
+        }
+        assertTrue(file.exists());
+        
+        // stop the server
+        c = server.getController();
+        assertNotNull(c);
+        assertTrue(c instanceof InGameController);
+        InGameController ic = (InGameController)c;
+        ic.shutdown();
+        
+        // start a new server and import the file
+        server = startServer(false, true, SERVER_PORT, SERVER_NAME);
+        MapGenerator mapGenerator = server.getMapGenerator();
+        mapGenerator.getMapGeneratorOptions().setFile(MapGeneratorOptions.IMPORT_FILE, file);
+        c = server.getController();
+        assertNotNull(c);
+        assertTrue(c instanceof PreGameController);
+        pgc = (PreGameController)c;
+        pgc.startGame();
+        assertEquals(FreeColServer.GameState.IN_GAME, server.getGameState());
         assertNotNull(server.getGame());
         assertNotNull(server.getGame().getMap());
         file.delete();

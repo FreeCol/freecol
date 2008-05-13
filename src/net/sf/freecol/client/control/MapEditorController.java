@@ -164,11 +164,15 @@ public final class MapEditorController {
             return;
         }
         
-        mapGenerator.createMap(game);        
-        
-        freeColClient.getGUI().setFocus(1, 1);
-        freeColClient.getActionManager().update();
-        canvas.refresh();
+        try {
+            mapGenerator.createMap(game);
+            freeColClient.getGUI().setFocus(1, 1);
+            freeColClient.getActionManager().update();
+            canvas.refresh();
+        } catch (FreeColException e) {
+            canvas.closeMenus();
+            canvas.errorMessage( e.getMessage() );
+        }
     }
     
     /**
