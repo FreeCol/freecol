@@ -1983,7 +1983,7 @@ public final class Canvas extends JDesktopPane {
             height = getHeight() - FRAME_EMPTY_SPACE;
         }
         f.setSize(width, height);
-        addCentered(f);
+        addCentered(f, MODAL_LAYER);
         f.setName(comp.getClass().getSimpleName());
 
         f.setFrameIcon(null);
@@ -2080,7 +2080,7 @@ public final class Canvas extends JDesktopPane {
      * @param i The layer to add the component to (see JLayeredPane).
      */
     public void add(Component comp, Integer i, boolean update) {
-
+        
         if (comp != statusPanel && !(comp instanceof JMenuItem) && !(comp instanceof FreeColDialog)
                 && statusPanel.isVisible()) {
             remove(statusPanel, false);

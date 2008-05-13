@@ -90,7 +90,7 @@ public final class UnitMoveAnimation extends Animation {
             destinationPoint = gui.getUnitLabelPositionInTile(unitLabel, destP);
             unitLabel.setLocation(currentPoint);
             
-            canvas.add(unitLabel, UNIT_LABEL_LAYER, 0);
+            canvas.add(unitLabel, UNIT_LABEL_LAYER, false);
             
             if (currentPoint.getX() == destinationPoint.getX())
                 signalX = 0;

@@ -1155,8 +1155,10 @@ public final class GUI {
                 canvas.remove(greyLayer, false);
                 greyLayer = buildGreyLayer();
             }
-            if (greyLayer.getParent() == null) // Not added to the canvas yet.
-                canvas.add(greyLayer, JLayeredPane.DEFAULT_LAYER, 0);
+            if (greyLayer.getParent() == null) { // Not added to the canvas yet.
+                canvas.add(greyLayer, JLayeredPane.DEFAULT_LAYER, false);
+                canvas.moveToFront(greyLayer);
+            }
             
             final Color currentPlayerColor = freeColClient.getGame().getCurrentPlayer().getColor();
             final String nation = freeColClient.getGame().getCurrentPlayer().getNationAsString();
@@ -1172,12 +1174,14 @@ public final class GUI {
             
             waitingForMsg = new JLabel(new ImageIcon(im));
             waitingForMsg.setBounds((size.width - im.getWidth(null)) / 2, (size.height - im.getHeight(null) - cHeight) / 2, im.getWidth(null), im.getHeight(null));
-            canvas.add(waitingForMsg, JLayeredPane.POPUP_LAYER, -1);
+            canvas.add(waitingForMsg, JLayeredPane.DEFAULT_LAYER, false);
+            canvas.moveToFront(waitingForMsg);
             
             if (coatOfArmsIcon != null) {
                 coatOfArms = new JLabel(coatOfArmsIcon);
                 coatOfArms.setBounds((size.width - cWidth) / 2, (size.height - cHeight) / 2 + im.getHeight(null), cWidth, cHeight);
-                canvas.add(coatOfArms, JLayeredPane.POPUP_LAYER, -1);
+                canvas.add(coatOfArms, JLayeredPane.DEFAULT_LAYER, false);
+                canvas.moveToFront(coatOfArms);
             }
         }
         else {
