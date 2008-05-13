@@ -33,7 +33,9 @@ import java.awt.Polygon;
 import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.font.TextLayout;
 import java.awt.geom.GeneralPath;
+import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.Date;
@@ -685,6 +687,24 @@ public final class GUI {
                 Image bgImage = ResourceManager.getImage("CanvasBackgroundImage", size);
                 if (bgImage != null) {
                     g.drawImage(bgImage, 0, 0, freeColClient.getCanvas());
+                    
+                    // Show version on initial screen
+                    String versionStr = "v. " + FreeCol.getVersion();
+                    Font oldFont = g.getFont();
+                    Color oldColor = g.getColor();
+                    Font newFont = oldFont.deriveFont(Font.BOLD);
+                    TextLayout layout = new TextLayout(versionStr, newFont, g.getFontRenderContext());
+                   
+                    Rectangle2D bounds = layout.getBounds();
+                    float x = getWidth() - (float) bounds.getWidth() - 5;
+                    float y = getHeight() - (float) bounds.getHeight();
+                    g.setColor(Color.white);
+                    layout.draw(g, x, y);
+                    
+                    // restore old values
+                    g.setFont(oldFont);
+                    g.setColor(oldColor);
+                    
                 } else {
                     g.setColor(Color.black);
                     g.fillRect(0, 0, size.width, size.height);
