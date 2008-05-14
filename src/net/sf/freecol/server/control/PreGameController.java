@@ -91,7 +91,7 @@ public final class PreGameController extends Controller {
     *   <li>Sends the "startGame"-message to the clients.
     * </ol>
     */
-    public void startGame() {
+    public void startGame() throws FreeColException{
         FreeColServer freeColServer = getFreeColServer();
 
         Game game = freeColServer.getGame();
@@ -144,12 +144,8 @@ public final class PreGameController extends Controller {
             freeColServer.getServer().sendToAll(addNewPlayer, theConnection);
         }
         
-        try {
-            // Make the map:
-            mapGenerator.createMap(game);
-        } catch (FreeColException e) {
-            // what now?
-        }
+        // Make the map:
+        mapGenerator.createMap(game);
         Map map = game.getMap();
         
         // Inform the clients:

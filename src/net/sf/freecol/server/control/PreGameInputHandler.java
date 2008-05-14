@@ -25,6 +25,7 @@ import java.util.LinkedList;
 import java.util.logging.Logger;
 
 import net.sf.freecol.FreeCol;
+import net.sf.freecol.common.FreeColException;
 import net.sf.freecol.common.model.Nation;
 import net.sf.freecol.common.model.NationType;
 import net.sf.freecol.common.model.Player;
@@ -284,7 +285,15 @@ public final class PreGameInputHandler extends InputHandler {
             reply.setAttribute("messageID", "server.notAllReady");
             return reply;
         }
-        ((PreGameController) freeColServer.getController()).startGame();
+        try {
+            ((PreGameController) freeColServer.getController()).startGame();
+        } catch (FreeColException e) {
+            // send an error message to the client(s)
+            Element reply = Message.createNewRootElement("error");
+            reply.setAttribute("message", "An error occurred while starting the game!");
+            reply.setAttribute("messageID", "server.errorStartingGame");
+            return reply;
+        }
         return null;
     }
 

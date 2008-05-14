@@ -72,8 +72,7 @@ public class ServerTest extends FreeColTestCase {
         return server;
     }
     
-    public void testSaveLoadFile() {
-        
+    private File createRandomSaveGame() {
         // start a server
         FreeColServer server = startServer(false, true, SERVER_PORT, SERVER_NAME);
 
@@ -82,7 +81,11 @@ public class ServerTest extends FreeColTestCase {
         assertNotNull(c);
         assertTrue(c instanceof PreGameController);
         PreGameController pgc = (PreGameController)c;
-        pgc.startGame();
+        try {
+            pgc.startGame();
+        } catch (FreeColException e) {
+            fail();
+        }
         assertEquals(FreeColServer.GameState.IN_GAME, server.getGameState());
         assertNotNull(server.getGame());
         assertNotNull(server.getGame().getMap());
@@ -96,15 +99,26 @@ public class ServerTest extends FreeColTestCase {
         }
         assertTrue(file.exists());
         
+        stopServer(server);
+        
+        return file;
+    }
+
+    private void stopServer(FreeColServer server) {
         // stop the server
-        c = server.getController();
+        Controller c = server.getController();
         assertNotNull(c);
         assertTrue(c instanceof InGameController);
         InGameController ic = (InGameController)c;
         ic.shutdown();
+    }
+
+    public void testDelayedLoading() {
+        
+        File file = createRandomSaveGame();
         
         // start a new server and read the file back
-        server = startServer(false, true, SERVER_PORT, SERVER_NAME);
+        FreeColServer server = startServer(false, true, SERVER_PORT, SERVER_NAME);
         try {
             server.loadGame(file);
         } catch (Exception e) {
@@ -114,52 +128,47 @@ public class ServerTest extends FreeColTestCase {
         assertNotNull(server.getGame().getMap());
         file.delete();
         assertFalse(file.exists());
-    }
-    
-public void testImportFile() {
         
-        // start a server
-        FreeColServer server = startServer(false, true, SERVER_PORT, SERVER_NAME);
+        stopServer(server);
+    }
 
-        // generate a random map
+    public void testImmediateLoading() {
+        
+        File file = createRandomSaveGame();
+        
+        // start a new server and read the file back
+        FreeColServer server = startServer(file, false, true, SERVER_PORT, SERVER_NAME);
+        assertNotNull(server.getGame());
+        assertNotNull(server.getGame().getMap());
+        file.delete();
+        assertFalse(file.exists());
+
+        stopServer(server);
+}
+    
+    public void testImport() {
+        
+        File file = createRandomSaveGame();
+        
+        // start a new server and import the file
+        FreeColServer server = startServer(false, true, SERVER_PORT, SERVER_NAME);
+        MapGenerator mapGenerator = server.getMapGenerator();
+        mapGenerator.getMapGeneratorOptions().setFile(MapGeneratorOptions.IMPORT_FILE, file);
         Controller c = server.getController();
         assertNotNull(c);
         assertTrue(c instanceof PreGameController);
         PreGameController pgc = (PreGameController)c;
-        pgc.startGame();
-        assertEquals(FreeColServer.GameState.IN_GAME, server.getGameState());
-        assertNotNull(server.getGame());
-        assertNotNull(server.getGame().getMap());
-        
-        // save the game as a file
-        File file = new File(TEST_FILE);
         try {
-            server.saveGame(file, "user");
-        } catch (IOException e) {
+            pgc.startGame();
+        } catch (FreeColException e) {
             fail();
         }
-        assertTrue(file.exists());
-        
-        // stop the server
-        c = server.getController();
-        assertNotNull(c);
-        assertTrue(c instanceof InGameController);
-        InGameController ic = (InGameController)c;
-        ic.shutdown();
-        
-        // start a new server and import the file
-        server = startServer(false, true, SERVER_PORT, SERVER_NAME);
-        MapGenerator mapGenerator = server.getMapGenerator();
-        mapGenerator.getMapGeneratorOptions().setFile(MapGeneratorOptions.IMPORT_FILE, file);
-        c = server.getController();
-        assertNotNull(c);
-        assertTrue(c instanceof PreGameController);
-        pgc = (PreGameController)c;
-        pgc.startGame();
         assertEquals(FreeColServer.GameState.IN_GAME, server.getGameState());
         assertNotNull(server.getGame());
         assertNotNull(server.getGame().getMap());
         file.delete();
         assertFalse(file.exists());
-    }
+
+        stopServer(server);
+}
 }
