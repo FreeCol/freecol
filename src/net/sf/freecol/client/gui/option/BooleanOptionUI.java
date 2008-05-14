@@ -106,4 +106,11 @@ public final class BooleanOptionUI extends JPanel implements OptionUpdater, Prop
     public void setValue(boolean b) {
         checkBox.setSelected(b);
     }
+    
+    /**
+     * Enables or disables the UI
+     */
+    public void setEnabled(boolean b) {
+    	checkBox.setEnabled(b);
+    }
 }

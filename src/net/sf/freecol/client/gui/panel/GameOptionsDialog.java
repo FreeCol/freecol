@@ -37,7 +37,9 @@ import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.i18n.Messages;
+import net.sf.freecol.client.gui.option.BooleanOptionUI;
 import net.sf.freecol.client.gui.option.OptionMapUI;
+import net.sf.freecol.common.model.GameOptions;
 
 /**
  * Dialog for changing the {@link net.sf.freecol.common.model.GameOptions}.
@@ -142,6 +144,17 @@ public final class GameOptionsDialog extends FreeColDialog implements ActionList
         ok.setEnabled(editable);
         save.setEnabled(editable);
         load.setEnabled(editable);
+        
+        // Set special cases
+        
+        // Disable victory option "All humans defeated"
+        //when playing single player
+        if(editable && freeColClient.isSingleplayer()){
+        	BooleanOptionUI comp = (BooleanOptionUI) ui.getOptionUI(GameOptions.VICTORY_DEFEAT_HUMANS);
+
+        	comp.setValue(false);
+        	comp.setEnabled(false);
+        }
     }
 
     public void requestFocus() {
