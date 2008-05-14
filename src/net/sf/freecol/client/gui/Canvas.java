@@ -484,6 +484,12 @@ public final class Canvas extends JDesktopPane {
      */
     // TODO: does it have state, or can we create a new one?
     public void showChatPanel() {
+    	
+    	// in single player, no chat available
+    	if(freeColClient.isSingleplayer()){
+    		return;
+    	}
+    	
         closeMenus();
         addAsFrame(chatPanel);
         chatPanel.requestFocus();
