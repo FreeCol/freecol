@@ -1522,7 +1522,10 @@ public final class InGameController implements NetworkConstants {
         // TODO: server can actually fail (illegal move)!
         
         // Play an animation showing the unit movement
-        new UnitMoveAnimation(canvas, unit, direction).animate();
+        
+        if (freeColClient.getClientOptions().getBoolean(ClientOptions.DISPLAY_ANIMATIONS)) {
+            new UnitMoveAnimation(canvas, unit, direction).animate();
+        }
         
         // move before ask to server, to be in new tile in case there is a
         // rumours

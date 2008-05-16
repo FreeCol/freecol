@@ -102,6 +102,11 @@ public class ClientOptions extends OptionMap {
      * Whether to display the grid by default or not.
      */
     public static final String DISPLAY_GRID = "displayGrid";
+    
+    /**
+     * Whether to display animations or not.
+     */
+    public static final String DISPLAY_ANIMATIONS = "displayAnimations";
 
     /**
      * Used by GUI, this defines the grouping of ModelMessages.
@@ -394,6 +399,7 @@ public class ClientOptions extends OptionMap {
         new BooleanOption(MAP_SCROLL_ON_DRAG, guiGroup, true);
         new BooleanOption(DISPLAY_COMPASS_ROSE, guiGroup, false);
         new BooleanOption(DISPLAY_GRID, guiGroup, false);
+        new BooleanOption(DISPLAY_ANIMATIONS, guiGroup, true);
         new SelectOption(COLONY_COMPARATOR, guiGroup,
                          new String[] {"byName",
                                        "byAge",
