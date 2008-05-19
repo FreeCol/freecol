@@ -45,7 +45,7 @@ public final class FullScreenFrame extends JFrame {
 	 *            The context of this <code>FullScreenFrame</code>.
 	 */
 	public FullScreenFrame(GraphicsDevice gd) {
-		super("Freecol " + FreeCol.getRevision(), gd.getDefaultConfiguration());
+		super("Freecol " + FreeCol.getVersion(), gd.getDefaultConfiguration());
 		
 		logger.info("FullScreenFrame's JFrame created.");
 

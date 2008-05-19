@@ -49,7 +49,7 @@ public final class WindowedFrame extends JFrame {
     * The constructor to use.
     */
     public WindowedFrame() {
-        super("FreeCol " + FreeCol.getRevision());
+        super("FreeCol " + FreeCol.getVersion());
         logger.info("WindowedFrame's JFrame created.");
 
         setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
