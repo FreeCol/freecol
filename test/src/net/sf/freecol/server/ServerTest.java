@@ -34,13 +34,13 @@ import net.sf.freecol.util.test.FreeColTestCase;
 
 public class ServerTest extends FreeColTestCase {
     
-    private static final String SERVER_NAME = "MyTestServer";
-    private static final int SERVER_PORT = FreeCol.getDefaultPort();
+    protected static final String SERVER_NAME = "MyTestServer";
+    protected static final int SERVER_PORT = FreeCol.getDefaultPort();
     
     private static final String TEST_FILE = "test/data/test.fsg";
 
     
-    private FreeColServer startServer(boolean publicServer, boolean singleplayer, int port, String name) 
+    protected FreeColServer startServer(boolean publicServer, boolean singleplayer, int port, String name) 
     {
         FreeColServer server = null;
         try {
@@ -55,7 +55,7 @@ public class ServerTest extends FreeColTestCase {
         return server;
     }
     
-    private FreeColServer startServer(File file, boolean publicServer, boolean singleplayer, int port, String name)
+    protected FreeColServer startServer(File file, boolean publicServer, boolean singleplayer, int port, String name)
     {
         FreeColServer server = null;
         try {
@@ -72,7 +72,7 @@ public class ServerTest extends FreeColTestCase {
         return server;
     }
     
-    private File createRandomSaveGame() {
+    protected File createRandomSaveGame() {
         // start a server
         FreeColServer server = startServer(false, true, SERVER_PORT, SERVER_NAME);
 
@@ -104,7 +104,7 @@ public class ServerTest extends FreeColTestCase {
         return file;
     }
 
-    private void stopServer(FreeColServer server) {
+    protected void stopServer(FreeColServer server) {
         // stop the server
         Controller c = server.getController();
         assertNotNull(c);
