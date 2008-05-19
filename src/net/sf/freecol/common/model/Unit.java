@@ -2485,7 +2485,10 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
         } else if (state == UnitState.IMPROVING && workImprovement != null) {
             return workImprovement.getOccupationString();
         } else if (state == UnitState.ACTIVE && getMovesLeft() == 0) {
-            return Messages.message("model.unit.occupation.activeNoMovesLeft");
+        	if(isUnderRepair())
+        		return Messages.message("model.unit.occupation.underRepair");
+        	else
+        		return Messages.message("model.unit.occupation.activeNoMovesLeft");
         } else {
             return Messages.message("model.unit.occupation." + state.toString().toLowerCase());
         }

@@ -275,8 +275,8 @@ public final class UnitLabel extends JLabel implements ActionListener {
                     .createStringImage((Graphics2D) g,
                                        Messages.message("underRepair", "%turns%",
                                                         Integer.toString(unit.getTurnsForRepair())),
-                                       Color.RED, getWidth(), 12);
-                g.drawImage(repairImage, (getWidth() - repairImage.getWidth()) / 2,
+                                       Color.RED, getWidth(), 16);
+                g.drawImage(repairImage, (getIcon().getIconWidth() - repairImage.getWidth()) / 2,
                             (getHeight() - repairImage.getHeight()) / 2, null);
             }
         }
