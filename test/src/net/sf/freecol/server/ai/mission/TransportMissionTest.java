@@ -86,11 +86,13 @@ public class TransportMissionTest extends ServerTest {
         assertTrue(galleon.isUnderRepair());
         assertFalse(aiUnit.getMission().isValid());
         
-        // this will call AIPlayer.abortInvalidMissions() and should kill the transported colonist
-        // Disposing the colonist triggers a ConcurrentModificationException
-        // because it attempts disposing an AIUnit while iterating on the list of AIUnits
-        aiPlayer.startWorking();
-        
-        this.stopServer(server);
+        try {
+            // this will call AIPlayer.abortInvalidMissions() and should kill the transported colonist
+            // Disposing the colonist triggers a ConcurrentModificationException
+            // because it attempts disposing an AIUnit while iterating on the list of AIUnits
+            aiPlayer.startWorking();
+        } finally {
+            this.stopServer(server);
+        }
     }
 }

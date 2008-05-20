@@ -17,20 +17,20 @@
  *  along with FreeCol.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package net.sf.freecol.server;
+package net.sf.freecol.server.ai.mission;
 
 import junit.framework.Test;
 import junit.framework.TestSuite;
 
 public class AllTests {
 
-	public static Test suite() {
-		TestSuite suite = new TestSuite("Test for net.sf.freecol.server");
-		//$JUnit-BEGIN$
-		suite.addTestSuite(ServerTest.class);
-		//$JUnit-END$
-		suite.addTest(net.sf.freecol.server.ai.mission.AllTests.suite());
-		return suite;
-	}
 
+
+    public static Test suite() {
+        TestSuite suite = new TestSuite("Test for net.sf.freecol.server.ai.mission");
+        //$JUnit-BEGIN$
+        suite.addTestSuite(TransportMissionTest.class);
+        //$JUnit-END$
+        return suite;
+    }
 }
