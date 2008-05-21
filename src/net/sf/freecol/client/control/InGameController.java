@@ -684,14 +684,20 @@ public final class InGameController implements NetworkConstants {
             return;
         }
 
-        // Unit can be waiting to load and continuing with a trade route
-        if (destination.getTile() == unit.getTile()) {
-            // try to load and follow the trade route
-            if (unit.getTradeRoute() != null) {
-                followTradeRoute(unit);
-            }
-            return;
+        // Trade unit is at current stop
+        if (unit.getTradeRoute() != null && unit.getLocation().getTile() == unit.getCurrentStop().getLocation().getTile()){
+        	logger.info("Trade unit " + unit.getId() + " in route " + unit.getTradeRoute().getName() + " is at " + unit.getCurrentStop().getLocation().getLocationName());
+        	followTradeRoute(unit);
+        	return;
         }
+        
+        if(unit.getTradeRoute() != null){
+        	logger.info("Unit " + unit.getId() + " is a trade unit in route " + unit.getTradeRoute().getName() + ", going to " + unit.getCurrentStop().getLocation().getLocationName());
+        }
+        else
+        	logger.info("Moving unit " + unit.getId() + " to position " + unit.getDestination().getLocationName());
+        
+
 
         PathNode path;
         if (destination instanceof Europe) {
@@ -777,17 +783,13 @@ public final class InGameController implements NetworkConstants {
             moveToEurope(unit);
         }
 
-        // we have reached our destination
-        if (unit.getTradeRoute() != null) {
-            if (unit.getCurrentStop().getLocation() != unit.getLocation()) {
-                setDestination(unit, unit.getCurrentStop().getLocation());
-                moveToDestination(unit);
-                return;
-            } else {
-                followTradeRoute(unit);
-            }
-        } else {
+     // we have reached our destination
+        // if in a trade route, unload and update next stop
+        if (unit.getTradeRoute() == null) {
             setDestination(unit, null);
+        }
+        else{
+        	followTradeRoute(unit);
         }
 
         // Display a "cash in"-dialog if a treasure train have been
@@ -823,89 +825,216 @@ public final class InGameController implements NetworkConstants {
             return;
         }
 
-        Location location = unit.getLocation();
-        // TODO: Not all instances handled?
-        if (location instanceof Tile) {
-            logger.finer("Stopped in colony " + unit.getColony().getName());
-            stopInColony(unit);
-        } else if (location instanceof Europe && unit.isInEurope()) {
-            logger.finer("Stopped in Europe.");
-            stopInEurope(unit);
+        boolean inEurope = unit.isInEurope();
+        boolean stopIsEurope = (stop.getLocation().getId() == freeColClient.getMyPlayer().getEurope().getId());
+        
+        // ship has not arrived in europe yet
+        if(stopIsEurope && !inEurope)
+        	return;
+        
+        // Unit was already in this location at the beginning of the turn
+    	// Allow loading
+    	if(unit.getInitialMovesLeft() == unit.getMovesLeft()){
+        	Stop oldStop = unit.getCurrentStop();
+        	
+        	if(inEurope)
+        		buyTradeGoodsFromEurope(unit);
+        	else
+        		loadTradeGoodsFromColony(unit);
+        	
+        	updateCurrentStop(unit);
+        	// It may happen that the unit may need to wait
+        	// (Not enough goods in warehouse to load yet)
+        	if(oldStop.getLocation().getTile() == unit.getCurrentStop().getLocation().getTile()){
+        		unit.setMovesLeft(0);
+        	}
+        } else {
+        	// Has only just arrived, unload and stop here,
+        	//no more moves allowed
+        	logger.info("Trade unit " + unit.getId() + " in route " + unit.getTradeRoute().getName() + " arrives at " + unit.getCurrentStop().getLocation().getLocationName());
+        	
+        	if(inEurope)
+        		sellTradeGoodsInEurope(unit);
+        	else
+        		unloadTradeGoodsToColony(unit);
+        	
+        	unit.setMovesLeft(0);
         }
     }
+    
+    private void loadTradeGoodsFromColony(Unit unit){
+    	Stop stop = unit.getCurrentStop();
+        Location location = unit.getColony();
 
-    private void stopInColony(Unit unit) {
-
-        Stop stop = unit.getCurrentStop();
-        Colony colony = unit.getColony();
-
-        GoodsContainer warehouse = colony.getGoodsContainer();
+        logger.info("Trade unit " + unit.getId() + " loading in " + location.getLocationName());
+        
+        GoodsContainer warehouse = location.getGoodsContainer();
         if (warehouse == null) {
             throw new IllegalStateException("No warehouse in a stop's location");
         }
-
-        // unload cargo that should not be on board and complete loaded goods
-        // with less than 100 units
+        
         ArrayList<GoodsType> goodsTypesToLoad = stop.getCargo();
         Iterator<Goods> goodsIterator = unit.getGoodsIterator();
-        test: while (goodsIterator.hasNext()) {
+        
+        // First, finish loading  partially empty slots
+        while (goodsIterator.hasNext()) {
             Goods goods = goodsIterator.next();
-            for (int index = 0; index < goodsTypesToLoad.size(); index++) {
-                GoodsType goodsType = goodsTypesToLoad.get(index);
-                if (goods.getType() == goodsType) {
-                    if (goods.getAmount() < 100) {
+            if (goods.getAmount() < 100) {
+            	for (int index = 0; index < goodsTypesToLoad.size(); index++) {
+            		GoodsType goodsType = goodsTypesToLoad.get(index);
+            		ExportData exportData =   unit.getColony().getExportData(goodsType);
+            		if (goods.getType() == goodsType) {
                         // complete goods until 100 units
                         // respect the lower limit for TradeRoute
-                        int amountPresent = warehouse.getGoodsCount(goodsType) - 
-                            colony.getExportData(goodsType).getExportLevel();
+                        int amountPresent = warehouse.getGoodsCount(goodsType) - exportData.getExportLevel();
                         if (amountPresent > 0) {
                             logger.finest("Automatically loading goods " + goods.getName());
                             int amountToLoad = Math.min(100 - goods.getAmount(), amountPresent);
-                            loadCargo(new Goods(freeColClient.getGame(), colony, goods.getType(), amountToLoad), unit);
+                            loadCargo(new Goods(freeColClient.getGame(), location, goods.getType(), amountToLoad), unit);
                         }
                     }
                     // remove item: other items of the same type
                     // may or may not be present
                     goodsTypesToLoad.remove(index);
-                    continue test;
+                    break;
                 }
+            }	
+        }
+        
+        // load rest of the cargo that should be on board
+        //while space is available
+        for (GoodsType goodsType : goodsTypesToLoad) {
+        	//  no more space left
+        	if (unit.getSpaceLeft() == 0) {
+        		break;
+        	}
+        	
+            // respect the lower limit for TradeRoute
+        	ExportData exportData =   unit.getColony().getExportData(goodsType);
+        	
+            int amountPresent = warehouse.getGoodsCount(goodsType) - exportData.getExportLevel();
+            
+            if(amountPresent > 0){
+            	logger.finest("Automatically loading goods " + goodsType.getName());
+            	loadCargo(new Goods(freeColClient.getGame(), location, goodsType, Math.min(
+                            amountPresent, 100)), unit);
             }
-            // this type of goods was not in the cargo list: do not
-            // unload more than the warehouse can store
-            int capacity = colony.getWarehouseCapacity() - warehouse.getGoodsCount(goods.getType());
-            if (capacity < goods.getAmount() &&
-                !freeColClient.getCanvas().showConfirmDialog(Messages.message("traderoute.warehouseCapacity",
+        }
+    	
+    }
+    
+    private void unloadTradeGoodsToColony(Unit unit){
+    	Stop stop = unit.getCurrentStop();
+        Location location = unit.getColony();
+    	
+        logger.info("Trade unit " + unit.getId() + " unloading in " + location.getLocationName());
+        
+        GoodsContainer warehouse = location.getGoodsContainer();
+        if (warehouse == null) {
+            throw new IllegalStateException("No warehouse in a stop's location");
+        }
+        
+        ArrayList<GoodsType> goodsTypesToKeep = stop.getCargo();
+        Iterator<Goods> goodsIterator = unit.getGoodsIterator();
+        
+        while (goodsIterator.hasNext()) {
+            Goods goods = goodsIterator.next();
+            boolean toKeep = false;
+            
+            for (int index = 0; index < goodsTypesToKeep.size(); index++) {
+            	
+            	GoodsType goodsType = goodsTypesToKeep.get(index);
+        		if (goods.getType() == goodsType) {
+            		// remove item: other items of the same type
+        			// may or may not be present
+        			goodsTypesToKeep.remove(index);
+                    toKeep = true;
+                    break;
+        		}
+            }
+        	
+            // Cargo should be kept
+        	if(toKeep)
+        		continue;
+        	
+        	// do not unload more than the warehouse can store
+        	int capacity = ((Colony) location).getWarehouseCapacity() - warehouse.getGoodsCount(goods.getType());
+        	if (capacity < goods.getAmount() &&
+        			!freeColClient.getCanvas().showConfirmDialog(Messages.message("traderoute.warehouseCapacity",
                                                                               "%unit%", unit.getName(),
-                                                                              "%colony%", colony.getName(),
+                                                                              "%colony%", ((Colony) location).getName(),
                                                                               "%amount%", String.valueOf(goods.getAmount() - capacity),
                                                                               "%goods%", goods.getName()),
                                                              "yes", "no")) {
-                logger.finest("Automatically unloading " + capacity + " " + goods.getName());
-                unloadCargo(new Goods(freeColClient.getGame(), unit, goods.getType(), capacity));
-            } else {
-                logger.finest("Automatically unloading " + goods.getAmount() + " " + goods.getName());
-                unloadCargo(goods);
-            }
+        		logger.finest("Automatically unloading " + capacity + " " + goods.getName());
+        		unloadCargo(new Goods(freeColClient.getGame(), unit, goods.getType(), capacity));
+        	} else {
+        		logger.finest("Automatically unloading " + goods.getAmount() + " " + goods.getName());
+        		unloadCargo(goods);
+        	}
         }
+    }
+    
+    private void sellTradeGoodsInEurope(Unit unit) {
 
-        // load cargo that should be on board
-        for (GoodsType goodsType : goodsTypesToLoad) {
-            // respect the lower limit for TradeRoute
-            int amountPresent = warehouse.getGoodsCount(goodsType) -
-                colony.getExportData(goodsType).getExportLevel();
-            if (amountPresent > 0) {
-                if (unit.getSpaceLeft() > 0) {
-                    logger.finest("Automatically loading goods " + goodsType.getName());
-                    loadCargo(new Goods(freeColClient.getGame(), colony, goodsType,
-                            Math.min(amountPresent, 100)), unit);
+        Stop stop = unit.getCurrentStop();
+
+        // unload cargo that should not be on board
+        ArrayList<GoodsType> goodsTypesToLoad = stop.getCargo();
+        Iterator<Goods> goodsIterator = unit.getGoodsIterator();
+        while (goodsIterator.hasNext()) {
+            Goods goods = goodsIterator.next();
+            boolean toKeep = false;
+            for (int index = 0; index < goodsTypesToLoad.size(); index++) {
+            	GoodsType goodsType = goodsTypesToLoad.get(index);
+                if (goods.getType() == goodsType) {
+                    // remove item: other items of the same type
+                    // may or may not be present
+                    goodsTypesToLoad.remove(index);
+                    toKeep = true;
+                    break;
+                }
+            }
+            if(toKeep)
+            	continue;
+            
+            // this type of goods was not in the cargo list
+            logger.finest("Automatically unloading " + goods.getName());
+            sellGoods(goods);
+        }
+    }
+    
+    private void buyTradeGoodsFromEurope(Unit unit) {
+
+        Stop stop = unit.getCurrentStop();
+
+        // First, finish loading partially empty slots
+        ArrayList<GoodsType> goodsTypesToLoad = stop.getCargo();
+        Iterator<Goods> goodsIterator = unit.getGoodsIterator();
+        while (goodsIterator.hasNext()) {
+            Goods goods = goodsIterator.next();
+            for (int index = 0; index < goodsTypesToLoad.size(); index++) {
+            	GoodsType goodsType = goodsTypesToLoad.get(index);
+                if (goods.getType() == goodsType) {
+                    if (goods.getAmount() < 100) {
+                        logger.finest("Automatically loading goods " + goods.getName());
+                        buyGoods(goods.getType(), (100 - goods.getAmount()), unit);
+                    }
+                    // remove item: other items of the same type
+                    // may or may not be present
+                    goodsTypesToLoad.remove(index);
+                    break;
                 }
             }
         }
 
-        // TODO: do we want to load/unload units as well?
-        // if so, when?
-
-        updateCurrentStop(unit);
+        // load rest of cargo that should be on board
+        for (GoodsType goodsType : goodsTypesToLoad) {
+            if (unit.getSpaceLeft() > 0) {
+                logger.finest("Automatically loading goods " + goodsType.getName());
+                buyGoods(goodsType, 100, unit);
+            }
+        }
     }
     
     private void updateCurrentStop(Unit unit) {
@@ -923,48 +1052,6 @@ public final class InGameController implements NetworkConstants {
                 moveToDestination(unit);
             }
         }
-    }
-
-    private void stopInEurope(Unit unit) {
-
-        Stop stop = unit.getCurrentStop();
-
-        // unload cargo that should not be on board and complete loaded goods
-        // with less than 100 units
-        ArrayList<GoodsType> goodsTypesToLoad = stop.getCargo();
-        Iterator<Goods> goodsIterator = unit.getGoodsIterator();
-        test: while (goodsIterator.hasNext()) {
-            Goods goods = goodsIterator.next();
-            for (int index = 0; index < goodsTypesToLoad.size(); index++) {
-                GoodsType goodsType = goodsTypesToLoad.get(index);
-                if (goods.getType() == goodsType) {
-                    if (goods.getAmount() < 100) {
-                        logger.finest("Automatically loading goods " + goods.getName());
-                        buyGoods(goods.getType(), (100 - goods.getAmount()), unit);
-                    }
-                    // remove item: other items of the same type
-                    // may or may not be present
-                    goodsTypesToLoad.remove(index);
-                    continue test;
-                }
-            }
-            // this type of goods was not in the cargo list
-            logger.finest("Automatically unloading " + goods.getName());
-            sellGoods(goods);
-        }
-
-        // load cargo that should be on board
-        for (GoodsType goodsType : goodsTypesToLoad) {
-            if (unit.getSpaceLeft() > 0) {
-                logger.finest("Automatically loading goods " + goodsType.getName());
-                buyGoods(goodsType, 100, unit);
-            }
-        }
-
-        // TODO: do we want to load/unload units as well?
-        // if so, when?
-
-        updateCurrentStop(unit);
     }
 
     /**

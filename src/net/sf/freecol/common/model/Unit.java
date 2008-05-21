@@ -2885,6 +2885,13 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
 
                 switch (state) {
                 case TO_EUROPE:
+                	// trade unit arrives in Europe
+                	if(this.getTradeRoute() != null){
+                		setMovesLeft(0);
+                		setState(UnitState.ACTIVE);
+                		return;
+                	}
+                	
                     addModelMessage(getOwner().getEurope(), ModelMessage.MessageType.DEFAULT, this,
                                     "model.unit.arriveInEurope",
                                     "%europe%", getOwner().getEurope().getName());
