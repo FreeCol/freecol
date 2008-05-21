@@ -920,7 +920,7 @@ public class SimpleCombatModel implements CombatModel {
                                         "%enemyNation%", attackerUnit.getOwner().getNationAsString());
         }
         damagedShip.setHitpoints(1);
-        damagedShip.getUnitContainer().disposeAllUnits();
+        damagedShip.disposeAllUnits();
         damagedShip.getGoodsContainer().removeAll();
         damagedShip.sendToRepairLocation();
     }

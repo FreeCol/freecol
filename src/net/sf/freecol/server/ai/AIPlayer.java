@@ -1374,8 +1374,8 @@ public class AIPlayer extends AIObject {
                 && !defender.isNaval()
                 && unit.getOwner().getStance(defender.getOwner()) == Stance.WAR) {
             int value = 10020;
-            if (newTile.getBestTreasureTrain() != null) {
-                value += Math.min(newTile.getBestTreasureTrain().getTreasureAmount() / 10, 50);
+            if (getBestTreasureTrain(newTile) != null) {
+                value += Math.min(getBestTreasureTrain(newTile).getTreasureAmount() / 10, 50);
             }
             if (defender.getType().getOffence() > 0 &&
                 newTile.getSettlement() == null) {
@@ -1565,8 +1565,8 @@ public class AIPlayer extends AIObject {
                 bestValue = value;
                 if (targetTile.getSettlement() != null) {
                     bestTarget = targetTile.getSettlement();
-                } else if (targetTile.getBestTreasureTrain() != null) {
-                    bestTarget = targetTile.getBestTreasureTrain();
+                } else if (getBestTreasureTrain(targetTile) != null) {
+                    bestTarget = getBestTreasureTrain(targetTile);
                 } else {
                     bestTarget = targetTile.getDefendingUnit(unit);
                 }
@@ -2137,4 +2137,25 @@ public class AIPlayer extends AIObject {
             }
         }
     }
+    /**
+     * Returns the treasure train carrying the largest treasure
+     * located on the given <code>Tile</code>.
+     * 
+     * @param tile a <code>Tile</code> value
+     * @return The best treasure train or <code>null</code> if no treasure
+     *         train is located on this <code>Tile</code>.
+     */
+    public Unit getBestTreasureTrain(Tile tile) {
+        Unit bestTreasureTrain = null;
+        for (Unit unit : tile.getUnitList()) {
+            if (unit.canCarryTreasure() &&
+                (bestTreasureTrain == null || 
+                 bestTreasureTrain.getTreasureAmount() < unit.getTreasureAmount())) {
+                bestTreasureTrain = unit;
+            }
+        }
+
+        return bestTreasureTrain;
+    }
+
 }

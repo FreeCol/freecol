@@ -55,9 +55,11 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
 
     private static final Logger logger = Logger.getLogger(Tile.class.getName());
 
+    private static final String UNITS_TAG_NAME = "units";
+
     private TileType type;
     
-    private boolean lostCityRumour;
+    private boolean lostCityRumour = false;
 
     private int x, y;
 
@@ -74,8 +76,11 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
      * Stores all Improvements and Resources (if any)
      */
     private TileItemContainer tileItemContainer;
-    
-    private UnitContainer unitContainer;
+
+    /**
+     * Stores all Units (if any).
+     */
+    private List<Unit> units = Collections.emptyList();
 
     /** The number of adjacent land tiles, if this is an ocean tile */
     private int landCount = Integer.MIN_VALUE;
@@ -114,7 +119,6 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
 
         this.type = type;
 
-        unitContainer = new UnitContainer(game, this);
         lostCityRumour = false;
 
         x = locX;
@@ -339,28 +343,6 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
     }
 
     /**
-     * Returns the treasure train carrying the largest treasure located on this
-     * <code>Tile</code>. This is only ever used by the AIPlayer.
-     * 
-     * @return The best treasure train or <code>null</code> if no treasure
-     *         train is located on this <code>Tile</code>.
-     */
-    public Unit getBestTreasureTrain() {
-        Unit bestTreasureTrain = null;
-
-        Iterator<Unit> ui = getUnitIterator();
-        while (ui.hasNext()) {
-            Unit u = ui.next();
-            if (u.canCarryTreasure()
-                && (bestTreasureTrain == null || bestTreasureTrain.getTreasureAmount() < u.getTreasureAmount())) {
-                bestTreasureTrain = u;
-            }
-        }
-
-        return bestTreasureTrain;
-    }
-
-    /**
      * Calculates the value of a future colony at this tile.
      * 
      * @return The value of a future colony located on this tile. This value is
@@ -507,18 +489,19 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
         // First, find the strongest defender of this tile, if any
         Unit tileDefender = null;
         float defencePower = -1.0f;
-        for(Unit nextUnit : unitContainer.getUnitsClone()) {
-            if (this.isLand() == nextUnit.isNaval()) {
+
+        for (Unit nextUnit : units) {
+            if (isLand() != nextUnit.isNaval()) {
                 // on land tiles, ships are docked in port and cannot defend
                 // on ocean tiles, land units behave as ship cargo and cannot defend
-                continue;
-            }
-            float tmpPower = getGame().getCombatModel().getDefencePower(attacker,nextUnit);
-            if (tmpPower > defencePower) {
-                tileDefender = nextUnit;
-                defencePower = tmpPower;
+                float tmpPower = getGame().getCombatModel().getDefencePower(attacker,nextUnit);
+                if (tmpPower > defencePower) {
+                    tileDefender = nextUnit;
+                    defencePower = tmpPower;
+                }
             }
         }
+
         // Then, find the strongest defender working in a settlement, if any
         Unit settlementDefender = null;
         if (getSettlement() != null) {
@@ -559,7 +542,9 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
      * Disposes all units on this <code>Tile</code>.
      */
     public void disposeAllUnits() {
-        unitContainer.disposeAllUnits();
+        for (Unit unit : units) {
+            unit.dispose();
+        }
         updatePlayerExploredTiles();
     }
     
@@ -570,7 +555,6 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
         if (tileItemContainer != null) {
             tileItemContainer.dispose();
         }
-        unitContainer.dispose();
         
         super.dispose();
     }
@@ -581,7 +565,11 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
      * @return The first <code>Unit</code> on this tile.
      */
     public Unit getFirstUnit() {
-        return unitContainer.getFirstUnit();
+        if (units.isEmpty()) {
+            return null;
+        } else {
+            return units.get(0);
+        }
     }
 
     /**
@@ -590,7 +578,11 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
      * @return The last <code>Unit</code> on this tile.
      */
     public Unit getLastUnit() {
-        return unitContainer.getLastUnit();
+        if (units.isEmpty()) {
+            return null;
+        } else {
+            return units.get(units.size() - 1);
+        }
     }
 
     /**
@@ -600,7 +592,12 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
      * @return The total amount of Units at this Location.
      */
     public int getTotalUnitCount() {
-        return unitContainer.getTotalUnitCount();
+        int result = 0;
+        for (Unit unit : units) {
+            result++;
+            result += unit.getUnitCount();
+        }
+        return result;
     }
 
     /**
@@ -617,7 +614,7 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
      */
     public boolean contains(Locatable locatable) {
         if (locatable instanceof Unit) {
-            return unitContainer.contains((Unit) locatable);
+            return units.contains((Unit) locatable);
         } else if (locatable instanceof TileItem) {
             return tileItemContainer != null && tileItemContainer.contains((TileItem) locatable);
         }
@@ -1099,7 +1096,10 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
      */
     public void add(Locatable locatable) {
         if (locatable instanceof Unit) {
-            unitContainer.addUnit((Unit) locatable);
+            if (units.equals(Collections.emptyList())) {
+                units = new ArrayList<Unit>();
+            }
+            units.add((Unit) locatable);
         } else if (locatable instanceof TileItem) {
             if (tileItemContainer == null) {
                 tileItemContainer = new TileItemContainer(getGame(), this);
@@ -1119,7 +1119,7 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
      */
     public void remove(Locatable locatable) {
         if (locatable instanceof Unit) {
-            unitContainer.removeUnit((Unit) locatable);
+            units.remove((Unit) locatable);
         } else if (locatable instanceof TileItem) {
             tileItemContainer.addTileItem((TileItem) locatable);
         } else {
@@ -1133,14 +1133,17 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
      * @param unit The unit to be removed
      */
     public void removeUnitNoUpdate(Unit unit) {
-        unitContainer.removeUnit(unit);
+        units.remove(unit);
     }
     /**
      * Adds the unit to the tile. It does not updatePlayerExploredTiles.
      * @param unit The unit to be added
      */
     public void addUnitNoUpdate(Unit unit) {
-        unitContainer.addUnit(unit);
+        if (units.equals(Collections.emptyList())) {
+            units = new ArrayList<Unit>();
+        }
+        units.add(unit);
     }
 
     /**
@@ -1149,7 +1152,7 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
      * @return The amount of units at this <code>Location</code>.
      */
     public int getUnitCount() {
-        return unitContainer.getUnitCount();
+        return units.size();
     }
 
     /**
@@ -1161,7 +1164,7 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
      * @return The <code>List</code>.
      */
     public List<Unit> getUnitList() {
-        return unitContainer.getUnitsClone();
+        return units;
     }
     
     /**
@@ -1173,7 +1176,7 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
      * @return The <code>Iterator</code>.
      */
     public Iterator<Unit> getUnitIterator() {
-        return getUnitList().iterator();
+        return units.iterator();
     }
 
     /**
@@ -1458,6 +1461,18 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
         }
     }
 
+    private void unitsToXML(XMLStreamWriter out, Player player, boolean showAll, boolean toSavedGame)
+            throws XMLStreamException {
+        if (!units.isEmpty()) {
+            out.writeStartElement(UNITS_TAG_NAME);
+            for (Unit unit : units) {
+                unit.toXML(out, player, showAll, toSavedGame);
+            }
+            out.writeEndElement();
+        }
+    }
+
+
     /**
      * This method writes an XML-representation of this object to the given
      * stream.
@@ -1591,10 +1606,6 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
                         out.writeEndElement();
                     }
 
-                    UnitContainer emptyUnitContainer = new UnitContainer(getGame(), getSettlement());
-                    emptyUnitContainer.setFakeID(is.getUnitContainer().getId());
-                    emptyUnitContainer.toXML(out, player, showAll, toSavedGame);
-
                     GoodsContainer emptyGoodsContainer = new GoodsContainer(getGame(), is);
                     emptyGoodsContainer.setFakeID(is.getGoodsContainer().getId());
                     emptyGoodsContainer.toXML(out, player, showAll, toSavedGame);
@@ -1611,14 +1622,11 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
         if (getGame().isClientTrusted() || showAll
             || (player.canSee(this) && (settlement == null || settlement.getOwner() == player))
             || !getGameOptions().getBoolean(GameOptions.UNIT_HIDING) && player.canSee(this)) {
-            unitContainer.toXML(out, player, showAll, toSavedGame);
+            unitsToXML(out, player, showAll, toSavedGame);
             if (tileItemContainer != null) {
                 tileItemContainer.toXML(out, player, showAll, toSavedGame);
             }
         } else {
-            UnitContainer emptyUnitContainer = new UnitContainer(getGame(), this);
-            emptyUnitContainer.setFakeID(unitContainer.getId());
-            emptyUnitContainer.toXML(out, player, showAll, toSavedGame);
             if (tileItemContainer != null) {
                 TileItemContainer emptyTileItemContainer = new TileItemContainer(getGame(), this);
                 emptyTileItemContainer.setFakeID(tileItemContainer.getId());
@@ -1724,12 +1732,19 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
                     settlement = new IndianSettlement(getGame(), in);
                 }
                 settlementSent = true;
-            } else if (in.getLocalName().equals(UnitContainer.getXMLElementTagName())) {
-                unitContainer = (UnitContainer) getGame().getFreeColGameObject(in.getAttributeValue(null, "ID"));
-                if (unitContainer != null) {
-                    unitContainer.readFromXML(in);
-                } else {
-                    unitContainer = new UnitContainer(getGame(), this, in);
+            } else if (in.getLocalName().equals(UNITS_TAG_NAME)) {
+                units = new ArrayList<Unit>();
+                while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
+                    if (in.getLocalName().equals(Unit.getXMLElementTagName())) {
+                        Unit unit = (Unit) getGame().getFreeColGameObject(in.getAttributeValue(null, "ID"));
+                        if (unit != null) {
+                            unit.readFromXML(in);
+                            units.add(unit);
+                        } else {
+                            unit = new Unit(getGame(), in);
+                            units.add(unit);
+                        }
+                    }
                 }
             } else if (in.getLocalName().equals(TileItemContainer.getXMLElementTagName())) {
                 tileItemContainer = (TileItemContainer) getGame().getFreeColGameObject(in.getAttributeValue(null, "ID"));

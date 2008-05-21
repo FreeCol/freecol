@@ -67,6 +67,8 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
      */
     private static final String EQUIPMENT_TAG = "equipment";
 
+    private static final String UNITS_TAG_NAME = "units";
+
     /**
      * The number of turns required to sail between Europe and the New
      * World. TODO: In the future, this should be replaced by an
@@ -121,7 +123,7 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
 
     private Player owner;
 
-    private UnitContainer unitContainer;
+    private List<Unit> units = Collections.emptyList();
 
     private GoodsContainer goodsContainer;
 
@@ -242,9 +244,7 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
         super(game);
 
         visibleGoodsCount = -1;
-        if (type.canCarryUnits()) {
-            unitContainer = new UnitContainer(game, this);
-        }
+
         if (type.canCarryGoods()) {
             goodsContainer = new GoodsContainer(game, this);
         }
@@ -1650,8 +1650,10 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
             if (getSpaceLeft() <= 0) {
                 throw new IllegalStateException();
             }
-
-            unitContainer.addUnit((Unit) locatable);
+            if (units.equals(Collections.emptyList())) {
+                units = new ArrayList<Unit>();
+            }
+            units.add((Unit) locatable);
             spendAllMoves();
         } else if (locatable instanceof Goods && canCarryGoods()) {
             goodsContainer.addGoods((Goods) locatable);
@@ -1674,7 +1676,7 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
         if (locatable == null) {
             throw new IllegalArgumentException("Locatable must not be 'null'.");
         } else if (locatable instanceof Unit && canCarryUnits()) {
-            unitContainer.removeUnit((Unit) locatable);
+            units.remove((Unit) locatable);
             spendAllMoves();
         } else if (locatable instanceof Goods && canCarryGoods()) {
             goodsContainer.removeGoods((Goods) locatable);
@@ -1698,7 +1700,7 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
      */
     public boolean contains(Locatable locatable) {
         if (locatable instanceof Unit && canCarryUnits()) {
-            return unitContainer.contains((Unit) locatable);
+            return units.contains((Unit) locatable);
         } else if (locatable instanceof Goods && canCarryGoods()) {
             return goodsContainer.contains((Goods) locatable);
         } else {
@@ -1752,7 +1754,7 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
      * @return The amount of Units at this Location.
      */
     public int getUnitCount() {
-        return canCarryUnits() ? unitContainer.getUnitCount() : 0;
+        return units.size();
     }
 
     /**
@@ -1762,7 +1764,25 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
      * @return The <code>Unit</code>.
      */
     public Unit getFirstUnit() {
-        return canCarryUnits() ? unitContainer.getFirstUnit() : null;
+        if (units.isEmpty()) {
+            return null;
+        } else {
+            return units.get(0);
+        }
+    }
+
+    /**
+     * Gets the last <code>Unit</code> beeing carried by this
+     * <code>Unit</code>.
+     * 
+     * @return The <code>Unit</code>.
+     */
+    public Unit getLastUnit() {
+        if (units.isEmpty()) {
+            return null;
+        } else {
+            return units.get(units.size() - 1);
+        }
     }
 
     /**
@@ -1785,31 +1805,17 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
     }
 
     /**
-     * Gets the last <code>Unit</code> beeing carried by this
-     * <code>Unit</code>.
-     * 
-     * @return The <code>Unit</code>.
-     */
-    public Unit getLastUnit() {
-        return canCarryUnits() ? unitContainer.getLastUnit() : null;
-    }
-
-    /**
      * Gets a <code>Iterator</code> of every <code>Unit</code> directly
      * located on this <code>Location</code>.
      * 
      * @return The <code>Iterator</code>.
      */
     public Iterator<Unit> getUnitIterator() {
-        return getUnitList().iterator();
+        return units.iterator();
     }
 
     public List<Unit> getUnitList() {
-        if (canCarryUnits()) {
-            return unitContainer.getUnitsClone();
-        } else {
-            return Collections.emptyList();
-        }
+        return units;
     }
 
     /**
@@ -1840,10 +1846,6 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
 
     public GoodsContainer getGoodsContainer() {
         return goodsContainer;
-    }
-
-    public UnitContainer getUnitContainer() {
-        return unitContainer;
     }
 
     /**
@@ -2822,8 +2824,8 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
      * @param u The unit to move to the front.
      */
     public void moveToFront(Unit u) {
-        if (canCarryUnits() && unitContainer.removeUnit(u)) {
-            unitContainer.addUnit(0, u);
+        if (canCarryUnits() && units.remove(u)) {
+            units.add(0, u);
         }
     }
 
@@ -3230,13 +3232,20 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
     }
 
     /**
+     * Disposes all Units aboard this one.
+     *
+     */
+    public void disposeAllUnits() {
+        for (Unit unit : units) {
+            unit.dispose();
+        }
+    }
+
+    /**
      * Removes all references to this object.
      */
     public void dispose() {
-        if (unitType.canCarryUnits()) {
-            unitContainer.dispose();
-        }
-
+        disposeAllUnits();
         if (unitType.canCarryGoods()) {
             goodsContainer.dispose();
         }
@@ -3315,6 +3324,17 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
             addModelMessage(this, ModelMessage.MessageType.UNIT_LOST, getType(),
                             "model.unit.attrition", "%unit%", getName());
             dispose();
+        }
+    }
+
+    private void unitsToXML(XMLStreamWriter out, Player player, boolean showAll, boolean toSavedGame)
+            throws XMLStreamException {
+        if (!units.isEmpty()) {
+            out.writeStartElement(UNITS_TAG_NAME);
+            for (Unit unit : units) {
+                unit.toXML(out, player, showAll, toSavedGame);
+            }
+            out.writeEndElement();
         }
     }
 
@@ -3411,9 +3431,7 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
         // Do not show enemy units hidden in a carrier:
         if (getGame().isClientTrusted() || showAll || getOwner().equals(player)
             || !getGameOptions().getBoolean(GameOptions.UNIT_HIDING) && player.canSee(getTile())) {
-            if (canCarryUnits()) {
-                unitContainer.toXML(out, player, showAll, toSavedGame);
-            }
+            unitsToXML(out, player, showAll, toSavedGame);
             if (canCarryGoods()) {
                 goodsContainer.toXML(out, player, showAll, toSavedGame);
             }
@@ -3423,11 +3441,6 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
                 GoodsContainer emptyGoodsContainer = new GoodsContainer(getGame(), this);
                 emptyGoodsContainer.setFakeID(goodsContainer.getId());
                 emptyGoodsContainer.toXML(out, player, showAll, toSavedGame);
-            }
-            if (canCarryUnits()) {
-                UnitContainer emptyUnitContainer = new UnitContainer(getGame(), this);
-                emptyUnitContainer.setFakeID(unitContainer.getId());
-                emptyUnitContainer.toXML(out, player, showAll, toSavedGame);
             }
         }
 
@@ -3555,12 +3568,19 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
         equipment.clear();
 
         while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
-            if (in.getLocalName().equals(UnitContainer.getXMLElementTagName())) {
-                unitContainer = (UnitContainer) getGame().getFreeColGameObject(in.getAttributeValue(null, "ID"));
-                if (unitContainer != null) {
-                    unitContainer.readFromXML(in);
-                } else {
-                    unitContainer = new UnitContainer(getGame(), this, in);
+            if (in.getLocalName().equals(UNITS_TAG_NAME)) {
+                units = new ArrayList<Unit>();
+                while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
+                    if (in.getLocalName().equals(Unit.getXMLElementTagName())) {
+                        Unit unit = (Unit) getGame().getFreeColGameObject(in.getAttributeValue(null, "ID"));
+                        if (unit != null) {
+                            unit.readFromXML(in);
+                            units.add(unit);
+                        } else {
+                            unit = new Unit(getGame(), in);
+                            units.add(unit);
+                        }
+                    }
                 }
             } else if (in.getLocalName().equals(GoodsContainer.getXMLElementTagName())) {
                 goodsContainer = (GoodsContainer) getGame().getFreeColGameObject(in.getAttributeValue(null, "ID"));
@@ -3586,11 +3606,6 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
             }
         }
         
-        if (unitContainer == null && canCarryUnits()) {
-            logger.warning("Carrier did not have a \"unitContainer\"-tag.");
-            unitContainer = new UnitContainer(getGame(), this);
-
-        }
         if (goodsContainer == null && canCarryGoods()) {
             logger.warning("Carrier did not have a \"goodsContainer\"-tag.");
             goodsContainer = new GoodsContainer(getGame(), this);

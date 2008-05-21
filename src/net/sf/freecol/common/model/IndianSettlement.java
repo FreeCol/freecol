@@ -54,6 +54,8 @@ public class IndianSettlement extends Settlement {
     public static final int MAX_CONVERT_DISTANCE = 10;
     public static final int TURNS_PER_TRIBUTE = 5;
 
+    public static final String UNITS_TAG_NAME = "units";
+
     /** The amount of goods a brave can produce a single turn. */
     //private static final int WORK_AMOUNT = 5;
 
@@ -82,7 +84,7 @@ public class IndianSettlement extends Settlement {
      */
     private boolean isCapital = false;
 
-    private UnitContainer unitContainer;
+    private List<Unit> units = Collections.emptyList();
 
     private ArrayList<Unit> ownedUnits = new ArrayList<Unit>();
 
@@ -141,7 +143,6 @@ public class IndianSettlement extends Settlement {
         tile.setOwner(player);
         tile.setSettlement(this);
 
-        unitContainer = new UnitContainer(game, this);
         goodsContainer = new GoodsContainer(game, this);
 
         this.learnableSkill = learnableSkill;
@@ -517,7 +518,10 @@ public class IndianSettlement extends Settlement {
     @Override
     public void add(Locatable locatable) {
         if (locatable instanceof Unit) {
-            unitContainer.addUnit((Unit) locatable);
+            if (units.equals(Collections.emptyList())) {
+                units = new ArrayList<Unit>();
+            }
+            units.add((Unit) locatable);
         } else if (locatable instanceof Goods) {
             goodsContainer.addGoods((Goods)locatable);
         } else {
@@ -534,7 +538,7 @@ public class IndianSettlement extends Settlement {
     @Override
     public void remove(Locatable locatable) {
         if (locatable instanceof Unit) {
-            unitContainer.removeUnit((Unit) locatable);
+            units.remove((Unit) locatable);
         } else if (locatable instanceof Goods) {
             goodsContainer.removeGoods((Goods)locatable);
         } else {
@@ -550,26 +554,32 @@ public class IndianSettlement extends Settlement {
      */
     @Override
     public int getUnitCount() {
-        return unitContainer.getUnitCount();
+        return units.size();
     }
 
     public List<Unit> getUnitList() {
-        return unitContainer.getUnitsClone();
+        return units;
     }
     
     public Iterator<Unit> getUnitIterator() {
-        return getUnitList().iterator();
+        return units.iterator();
     }
 
     public Unit getFirstUnit() {
-        return unitContainer.getFirstUnit();
+        if (units.isEmpty()) {
+            return null;
+        } else {
+            return units.get(0);
+        }
     }
-
 
     public Unit getLastUnit() {
-        return unitContainer.getLastUnit();
+        if (units.isEmpty()) {
+            return null;
+        } else {
+            return units.get(units.size() - 1);
+        }
     }
-
 
     /**
      * Gets the <code>Unit</code> that is currently defending this <code>IndianSettlement</code>.
@@ -580,7 +590,7 @@ public class IndianSettlement extends Settlement {
     public Unit getDefendingUnit(Unit attacker) {
         Unit defender = null;
         float defencePower = -1.0f;
-        for(Unit nextUnit : unitContainer.getUnitsClone()) {
+        for (Unit nextUnit : units) {
             float tmpPower = attacker.getGame().getCombatModel().getDefencePower(attacker, nextUnit);
             if (tmpPower > defencePower) {
                 defender = nextUnit;
@@ -808,7 +818,7 @@ public class IndianSettlement extends Settlement {
     @Override
     public boolean contains(Locatable locatable) {
         if (locatable instanceof Unit) {
-            return unitContainer.contains((Unit) locatable);
+            return units.contains((Unit) locatable);
         } else {
             return false;
         }
@@ -1066,7 +1076,9 @@ public class IndianSettlement extends Settlement {
         while (ownedUnits.size() > 0) {
             ownedUnits.remove(0).setIndianSettlement(null);
         }
-        unitContainer.dispose();
+        for (Unit unit : units) {
+            unit.dispose();
+        }
 
         Tile settlementTile = getTile();     
         
@@ -1077,10 +1089,6 @@ public class IndianSettlement extends Settlement {
         super.dispose();
     }
 
-    public UnitContainer getUnitContainer() {
-        return unitContainer;
-    }
-
     /**
      * Creates the {@link GoodsContainer}.
      * <br><br>
@@ -1089,6 +1097,17 @@ public class IndianSettlement extends Settlement {
      */
     public void createGoodsContainer() {
         goodsContainer = new GoodsContainer(getGame(), this);
+    }
+
+    private void unitsToXML(XMLStreamWriter out, Player player, boolean showAll, boolean toSavedGame)
+            throws XMLStreamException {
+        if (!units.isEmpty()) {
+            out.writeStartElement(UNITS_TAG_NAME);
+            for (Unit unit : units) {
+                unit.toXML(out, player, showAll, toSavedGame);
+            }
+            out.writeEndElement();
+        }
     }
 
     /**
@@ -1167,13 +1186,9 @@ public class IndianSettlement extends Settlement {
         }
 
         if (getGame().isClientTrusted() || showAll || player == getOwner()) {
-            unitContainer.toXML(out, player, showAll, toSavedGame);
+            unitsToXML(out, player, showAll, toSavedGame);
             goodsContainer.toXML(out, player, showAll, toSavedGame);
         } else {
-            UnitContainer emptyUnitContainer = new UnitContainer(getGame(), this);
-            emptyUnitContainer.setFakeID(unitContainer.getId());
-            emptyUnitContainer.toXML(out, player, showAll, toSavedGame);
-
             GoodsContainer emptyGoodsContainer = new GoodsContainer(getGame(), this);
             emptyGoodsContainer.setFakeID(goodsContainer.getId());
             emptyGoodsContainer.toXML(out, player, showAll, toSavedGame);
@@ -1259,13 +1274,20 @@ public class IndianSettlement extends Settlement {
                     missionary.readFromXML(in);
                 }
                 in.nextTag();                
-            } else if (in.getLocalName().equals(UnitContainer.getXMLElementTagName())) {
-                unitContainer = (UnitContainer) getGame().getFreeColGameObject(in.getAttributeValue(null, "ID"));
-                if (unitContainer != null) {
-                    unitContainer.readFromXML(in);
-                } else {
-                    unitContainer = new UnitContainer(getGame(), this, in);
-                } 
+            } else if (in.getLocalName().equals(UNITS_TAG_NAME)) {
+                units = new ArrayList<Unit>();
+                while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
+                    if (in.getLocalName().equals(Unit.getXMLElementTagName())) {
+                        Unit unit = (Unit) getGame().getFreeColGameObject(in.getAttributeValue(null, "ID"));
+                        if (unit != null) {
+                            unit.readFromXML(in);
+                            units.add(unit);
+                        } else {
+                            unit = new Unit(getGame(), in);
+                            units.add(unit);
+                        }
+                    }
+                }
             } else if (in.getLocalName().equals(GoodsContainer.getXMLElementTagName())) {
                 goodsContainer = (GoodsContainer) getGame().getFreeColGameObject(in.getAttributeValue(null, "ID"));
                 if (goodsContainer != null) {
