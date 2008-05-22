@@ -19,8 +19,9 @@
 
 package net.sf.freecol.common.model;
 
-import net.sf.freecol.util.test.FreeColTestCase;
+import java.util.ConcurrentModificationException;
 import net.sf.freecol.common.model.Unit.UnitState;
+import net.sf.freecol.util.test.FreeColTestCase;
 
 public class UnitTest extends FreeColTestCase {
 
@@ -490,7 +491,10 @@ public class UnitTest extends FreeColTestCase {
         
         // The following method call can occur in the client InGameController.removeUnitsOutsideLOS()
         // Unfortunately, it throws a ConcurrentModificationException
-        tile.disposeAllUnits();
-        
+        try {
+            tile.disposeAllUnits();
+        } catch (ConcurrentModificationException e) {
+            fail();
+        }
     }
 }
