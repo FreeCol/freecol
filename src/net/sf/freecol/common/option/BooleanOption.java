@@ -39,6 +39,12 @@ public class BooleanOption extends AbstractOption {
 
     private boolean value;
 
+    /**
+     * Creates a new empty <code>BooleanOption</code>.
+     */
+     public BooleanOption() {
+         super(NO_ID);
+     }
 
     /**
     * Creates a new <code>BooleanOption</code>.
@@ -114,13 +120,21 @@ public class BooleanOption extends AbstractOption {
      *      during parsing.
      */
     protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
-        final boolean oldValue = value;
-        value = Boolean.valueOf(in.getAttributeValue(null, "value")).booleanValue();
-        in.nextTag();
-        
-        if (value != oldValue) {
-            firePropertyChange("value", Boolean.valueOf(oldValue), Boolean.valueOf(value));
+
+        if (getId().equals(NO_ID)) {
+            // Reading the specifications
+            setId(in.getAttributeValue(null, "id"));            
+            value = Boolean.valueOf(in.getAttributeValue(null, "defaultValue")).booleanValue();
+        } else {
+            // Reading a saved value
+            final boolean oldValue = value;
+            value = Boolean.valueOf(in.getAttributeValue(null, "value")).booleanValue();
+            if (value != oldValue) {
+                firePropertyChange("value", Boolean.valueOf(oldValue), Boolean.valueOf(value));
+            }      
         }
+        in.nextTag();
+
     }
 
 

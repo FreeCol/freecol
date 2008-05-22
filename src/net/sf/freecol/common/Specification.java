@@ -56,6 +56,9 @@ import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.TileImprovementType;
 import net.sf.freecol.common.model.TileType;
 import net.sf.freecol.common.model.UnitType;
+import net.sf.freecol.common.option.AbstractOption;
+import net.sf.freecol.common.option.IntegerOption;
+import net.sf.freecol.common.option.BooleanOption;
 
 /**
  * This class encapsulates any parts of the "specification" for FreeCol that are
@@ -72,6 +75,7 @@ public final class Specification {
     private static final Logger logger = Logger.getLogger(Specification.class.getName());
 
     private final Map<String, FreeColGameObjectType> allTypes;
+    private final Map<String, AbstractOption> allOptions;
 
     private final Set<String> abilityKeys;
     private final Set<String> modifierKeys;
@@ -115,6 +119,7 @@ public final class Specification {
         logger.info("Initializing Specification");
 
         allTypes = new HashMap<String, FreeColGameObjectType>();
+        allOptions = new HashMap<String, AbstractOption>();
         abilityKeys = new HashSet<String>();
         modifierKeys = new HashSet<String>();
         buildingTypeList = new ArrayList<BuildingType>();
@@ -130,7 +135,6 @@ public final class Specification {
         equipmentTypes = new ArrayList<EquipmentType>();
         difficultyLevels = new ArrayList<DifficultyLevel>();
         farmedGoodsTypeList = new ArrayList<GoodsType>();
-
 
         try {
             XMLStreamReader xsr = XMLInputFactory.newInstance().createXMLStreamReader(in);
@@ -278,6 +282,22 @@ public final class Specification {
                         difficultyLevels.add(level);
                     }
 
+                } else if ("options".equals(childName)) {
+
+                    logger.finest("Found child named " + childName);
+                    while (xsr.nextTag() != XMLStreamConstants.END_ELEMENT) {
+                        String optionType = xsr.getLocalName();
+                        if("integerOption".equals(optionType)) {
+                            IntegerOption option = new IntegerOption();
+                            option.readFromXML(xsr);
+                            allOptions.put(option.getId(), option);
+                        } else if("booleanOption".equals(optionType)) {
+                            BooleanOption option = new BooleanOption();
+                            option.readFromXML(xsr);
+                            allOptions.put(option.getId(), option);
+                        }
+                    }
+
                 } else {
                     throw new RuntimeException("unexpected: " + childName);
                 }
@@ -325,6 +345,26 @@ public final class Specification {
                                                " with ID '" + Id + "' returned 'null'.");
         } else {
             return allTypes.get(Id);
+        }
+    }
+
+    /**
+     * Returns the <code>AbstractOption</code> with the given
+     * ID. Throws an IllegalArgumentException if the ID is null, or if
+     * no such Type can be retrieved.
+     *
+     * @param Id a <code>String</code> value
+     * @return an <code>AbstractOption</code> value
+     */
+    public AbstractOption getOption(String Id) throws IllegalArgumentException {
+        if (Id == null) {
+            throw new IllegalArgumentException("Trying to retrieve AbstractOption" +
+                                               " with ID 'null'.");
+        } else if (!allOptions.containsKey(Id)) {
+            throw new IllegalArgumentException("Trying to retrieve AbstractOption" +
+                                               " with ID '" + Id + "' returned 'null'.");
+        } else {
+            return allOptions.get(Id);
         }
     }
 
@@ -752,6 +792,25 @@ public final class Specification {
         return difficultyLevels.get(level);
     }
 
+    /**
+     * Returns the <code>IntegerOption</code> corresponding to the ID.
+     *
+     * @param id a <code>String</code> value
+     * @return a <code>IntegerOption</code> value
+     */
+    public IntegerOption getIntegerOption(String id) {
+        return (IntegerOption) getOption(id);
+    }
+
+    /**
+     * Returns the <code>BooleanOption</code> corresponding to the ID.
+     *
+     * @param id a <code>String</code> value
+     * @return a <code>BooleanOption</code> value
+     */
+    public BooleanOption getBooleanOption(String id) {
+        return (BooleanOption) getOption(id);
+    }
 
     /**
      * Loads the specification.

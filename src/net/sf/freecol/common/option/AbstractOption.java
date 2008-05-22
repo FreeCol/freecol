@@ -38,15 +38,12 @@ import net.sf.freecol.common.model.FreeColObject;
  */
 abstract public class AbstractOption extends FreeColObject implements Option {
 
-
-
     public static final String NO_ID = "NO_ID";
 
     private static Logger logger = Logger.getLogger(AbstractOption.class.getName());
 
     private ArrayList<PropertyChangeListener> propertyChangeListeners = new ArrayList<PropertyChangeListener>();
 
-    private final String id;
     private final String group;
 
 
@@ -68,7 +65,7 @@ abstract public class AbstractOption extends FreeColObject implements Option {
      * @param optionGroup The OptionGroup this Option belongs to.
      */
     public AbstractOption(String id, OptionGroup optionGroup) {
-        this.id = id;
+        setId(id);
         if (optionGroup == null) {
             this.group = "";
         } else {
@@ -118,7 +115,7 @@ abstract public class AbstractOption extends FreeColObject implements Option {
      * @return A short description of this <code>Option</code>.
      */
     public String getShortDescription() {
-        return Messages.message(group + id + ".shortDescription");
+        return Messages.message(group + getId() + ".shortDescription");
     }
 
     /**
@@ -129,15 +126,6 @@ abstract public class AbstractOption extends FreeColObject implements Option {
      */
     public String toString() {
         return getName();
-    }
-
-    /**
-     * Returns the id of this <code>Option</code>.
-     * 
-     * @return The unique identifier as provided in the constructor.
-     */
-    public String getId() {
-        return id;
     }
 
     /**
@@ -156,7 +144,7 @@ abstract public class AbstractOption extends FreeColObject implements Option {
      * @return The name as provided in the constructor.
      */
     public String getName() {
-        return Messages.message(group + id + ".name");
+        return Messages.message(group + getId() + ".name");
     }
 
     /**

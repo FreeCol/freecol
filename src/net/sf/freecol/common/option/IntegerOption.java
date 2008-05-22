@@ -34,11 +34,11 @@ public class IntegerOption extends AbstractOption {
     @SuppressWarnings("unused")
     private static Logger logger = Logger.getLogger(IntegerOption.class.getName());
 
+    private static int UNDEFINED = Integer.MIN_VALUE;
 
-
-    private int value;
-    private int minimumValue;
-    private int maximumValue;
+    private int value = UNDEFINED;
+    private int minimumValue = UNDEFINED;
+    private int maximumValue = UNDEFINED;
 
     
 
@@ -60,6 +60,12 @@ public class IntegerOption extends AbstractOption {
         this.maximumValue = maximumValue;
     }
 
+    /**
+     * Creates a new empty <code>IntegerOption</code>.
+     */
+     public IntegerOption() {
+         super(NO_ID);
+     }
 
     
     /**
@@ -126,16 +132,25 @@ public class IntegerOption extends AbstractOption {
      *      during parsing.
      */
     protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
-        final int oldValue = this.value;
-        
-        value = Integer.parseInt(in.getAttributeValue(null, "value"));
-        in.nextTag();
-        
-        if (value != oldValue) {
-            firePropertyChange("value", Integer.valueOf(oldValue), Integer.valueOf(value));
-        }
-    }
+ 
+        if (getId().equals(NO_ID)) {
+            // Reading the specifications
+            setId(in.getAttributeValue(null, "id"));
+            value = Integer.parseInt(in.getAttributeValue(null, "defaultValue"));
+            minimumValue = Integer.parseInt(in.getAttributeValue(null, "minimumValue"));
+            maximumValue = Integer.parseInt(in.getAttributeValue(null, "maximumValue"));
+        } else        {
+            // Reading a saved value
+            final int oldValue = this.value;
+            value = Integer.parseInt(in.getAttributeValue(null, "value"));
+            if (value != oldValue) {
+                firePropertyChange("value", Integer.valueOf(oldValue), Integer.valueOf(value));
+            }
+       }
 
+       in.nextTag();
+        
+    }
 
     /**
     * Gets the tag name of the root element representing this object.

@@ -36,6 +36,7 @@ import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.gui.i18n.Messages;
+import net.sf.freecol.common.Specification;
 import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.Map.PathType;
 import net.sf.freecol.common.model.Map.Position;
@@ -74,7 +75,8 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
      * World. TODO: In the future, this should be replaced by an
      * advanced sailing model taking prevailing winds into account.
      */
-    public static final int TURNS_TO_SAIL = 3;
+    public static final int TURNS_TO_SAIL = Specification.getSpecification().getIntegerOption(
+            "model.option.turnsToSail").getValue();
 
     /**
      * A state a Unit can have.
