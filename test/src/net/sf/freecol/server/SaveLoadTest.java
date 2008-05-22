@@ -62,7 +62,7 @@ public class SaveLoadTest extends ServerTest {
         stopServer(server);
     }
     
-    public void testAImport() {
+    public void testImport() {
         
         File file = createRandomSaveGame();
         

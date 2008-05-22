@@ -475,4 +475,22 @@ public class UnitTest extends FreeColTestCase {
         assertEquals(4, revenger.getLineOfSight()); // should get +1 bonus
         assertEquals(3, colonist.getLineOfSight()); // should get +1 bonus
     }
+    
+    public void testDisposingUnits() {
+        Game game = getStandardGame();
+        Map map = getTestMap(plains, true);
+        game.setMap(map);
+        Player player = game.getPlayer("model.nation.dutch");
+        Tile tile = map.getTile(6, 9);
+        
+        UnitType colonistType = spec().getUnitType("model.unit.freeColonist");
+        UnitType frigateType = spec().getUnitType("model.unit.frigate");
+        Unit frigate = new Unit(game, tile, player, frigateType, UnitState.ACTIVE);
+        Unit colonist = new Unit(game, frigate, player, colonistType, UnitState.ACTIVE);
+        
+        // The following method call can occur in the client InGameController.removeUnitsOutsideLOS()
+        // Unfortunately, it throws a ConcurrentModificationException
+        tile.disposeAllUnits();
+        
+    }
 }
