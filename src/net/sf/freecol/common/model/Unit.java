@@ -3245,7 +3245,9 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
      *
      */
     public void disposeAllUnits() {
-        for (Unit unit : units) {
+        // Copy the list first, as the Unit will try to remove itself
+        // from its location.
+        for (Unit unit : new ArrayList<Unit>(units)) {
             unit.dispose();
         }
     }

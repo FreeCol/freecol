@@ -489,12 +489,10 @@ public class UnitTest extends FreeColTestCase {
         Unit frigate = new Unit(game, tile, player, frigateType, UnitState.ACTIVE);
         Unit colonist = new Unit(game, frigate, player, colonistType, UnitState.ACTIVE);
         
-        // The following method call can occur in the client InGameController.removeUnitsOutsideLOS()
-        // Unfortunately, it throws a ConcurrentModificationException
-        try {
-            tile.disposeAllUnits();
-        } catch (ConcurrentModificationException e) {
-            fail();
-        }
+        tile.disposeAllUnits();
+        assertTrue(frigate.isDisposed());
+        assertTrue(colonist.isDisposed());
+        assertEquals(0, frigate.getUnitCount());
+        assertEquals(0, tile.getUnitCount());
     }
 }

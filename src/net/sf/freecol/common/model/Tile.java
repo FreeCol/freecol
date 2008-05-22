@@ -542,7 +542,9 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
      * Disposes all units on this <code>Tile</code>.
      */
     public void disposeAllUnits() {
-        for (Unit unit : units) {
+        // Copy the list first, as the Unit will try to remove itself
+        // from its location.
+        for (Unit unit : new ArrayList<Unit>(units)) {
             unit.dispose();
         }
         updatePlayerExploredTiles();
