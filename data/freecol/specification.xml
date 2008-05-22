@@ -1650,4 +1650,8 @@
 
   </difficulty-levels>
 
+  <options>
+    <integerOption id="model.option.turnsToSail" defaultValue="3" minimumValue="1" maximumValue="10"/>
+  </options>
+
 </freecol-specification>
