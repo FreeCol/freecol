@@ -1766,6 +1766,7 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
                 }
             } else {
                 logger.warning("Unknown tag: " + in.getLocalName() + " loading tile");
+                in.nextTag();
             }
         }
         if (!settlementSent && settlement != null) {
@@ -2335,6 +2336,7 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
                     tileItemContainer.addTileItem(ti);
                 } else {
                     logger.warning("Unknown tag: " + in.getLocalName() + " loading PlayerExploredTile");
+                    in.nextTag();
                 }
             }
             getTileItemInfo(tileItemContainer);

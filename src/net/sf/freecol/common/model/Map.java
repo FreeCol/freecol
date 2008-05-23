@@ -1815,6 +1815,7 @@ public class Map extends FreeColGameObject {
                 setRegion(region);
             } else {
                 logger.warning("Unknown tag: " + in.getLocalName() + " loading map");
+                in.nextTag();
             }
         }
     }

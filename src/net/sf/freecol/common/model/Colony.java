@@ -1773,6 +1773,7 @@ public final class Colony extends Settlement implements Location, Nameable {
                 }
             } else {
                 logger.warning("Unknown tag: " + in.getLocalName() + " loading colony " + name);
+                in.nextTag();
             }
         }
     }

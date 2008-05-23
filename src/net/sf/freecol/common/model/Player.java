@@ -2457,6 +2457,7 @@ public class Player extends FreeColGameObject implements Nameable {
                 }
             } else {
                 logger.warning("Unknown tag: " + in.getLocalName() + " loading player");
+                in.nextTag();
             }
         }
         

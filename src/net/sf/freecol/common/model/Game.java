@@ -1026,6 +1026,7 @@ public class Game extends FreeColGameObject {
                 message.readFromXML(in, this);
             } else {
                 logger.warning("Unknown tag: " + in.getLocalName() + " loading game");
+                in.nextTag();
             }
         }
         // sanity check: we should be on the closing tag
