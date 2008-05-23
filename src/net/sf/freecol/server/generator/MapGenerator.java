@@ -330,7 +330,12 @@ public class MapGenerator {
             } else {
                 for (String name : regionNames) {
                     if (territoryMap.get(name) == null) {
-                        territory = new Territory(player, (ServerRegion) map.getRegion(name));
+                        ServerRegion region = (ServerRegion) map.getRegion(name);
+                        if (region == null) {
+                            territory = new Territory(player, map.getRandomLandPosition());
+                        } else {
+                            territory = new Territory(player, region);
+                        }
                         territoryMap.put(name, territory);
                         logger.fine("Allocated region " + name + " for " +
                                     player.getNationAsString() + ". Center is " +
@@ -425,8 +430,12 @@ public class MapGenerator {
                 // no more tiles
                 break;
             } else {
+                String name = "default region";
+                if (territory.region != null) {
+                    name = territory.region.getNameKey();
+                }
                 logger.fine("Placing the " + territory.player.getNationAsString() + 
-                        " capital in region: " + territory.region.getNameKey() +
+                        " capital in region: " + name +
                         " at Tile: "+ tile.getPosition());
                 placeIndianSettlement(territory.player, true, tile.getPosition(), map);
                 territory.numberOfSettlements--;
@@ -454,8 +463,12 @@ public class MapGenerator {
                 // no more territories
                 break;
             } else {
+                String name = "default region";
+                if (territory.region != null) {
+                    name = territory.region.getNameKey();
+                }
                 logger.fine("Placing a " + territory.player.getNationAsString() + 
-                        " camp in region: " + territory.region.getNameKey() +
+                        " camp in region: " + name +
                         " at Tile: "+ tile.getPosition());
                 placeIndianSettlement(territory.player, false, tile.getPosition(), map);
                 counter++;

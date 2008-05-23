@@ -33,7 +33,6 @@ import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.gui.i18n.Messages;
-import net.sf.freecol.common.PseudoRandom;
 import net.sf.freecol.common.model.Player.PlayerType;
 import net.sf.freecol.common.model.Player.Stance;
 import net.sf.freecol.common.model.Unit.Role;
@@ -53,9 +52,6 @@ public final class Monarch extends FreeColGameObject {
     /** The player of this monarch. */
     private Player player;
 
-    /** Pseudo-random number generator. */
-    PseudoRandom random = getGame().getModelController().getPseudoRandom();
-    
     private static final Logger logger = Logger.getLogger(Monarch.class.getName());
 
     private static final EquipmentType muskets = FreeCol.getSpecification().getEquipmentType("model.equipment.muskets");
@@ -150,7 +146,6 @@ public final class Monarch extends FreeColGameObject {
      */
     public Monarch(Game game, XMLStreamReader in) throws XMLStreamException {
         super(game, in);
-
         readFromXML(in);
     }
 
@@ -164,7 +159,6 @@ public final class Monarch extends FreeColGameObject {
      */
     public Monarch(Game game, Element e) {
         super(game, e);
-
         readFromXMLElement(e);
     }
 
@@ -270,7 +264,7 @@ public final class Monarch extends FreeColGameObject {
             probability[k] = accumulator;
         }
 
-        int randomInt = random.nextInt(accumulator);
+        int randomInt = getGame().getModelController().getPseudoRandom().nextInt(accumulator);
 
         for (int action = 0; action < NUMBER_OF_ACTIONS; action++) {
             if (randomInt < probability[action]) {
@@ -301,7 +295,7 @@ public final class Monarch extends FreeColGameObject {
         int turn = getGame().getTurn().getNumber();
         int adjustment = (6 - player.getDifficulty().getIndex()) * 10; // 20-60
         // later in the game, the taxes will increase by more
-        int increase = random.nextInt(5 + turn/adjustment) + 1;
+        int increase = getGame().getModelController().getPseudoRandom().nextInt(5 + turn/adjustment) + 1;
         int newTax = player.getTax() + increase;
         return Math.min(newTax, MAXIMUM_TAX_RATE);
     }
@@ -326,7 +320,7 @@ public final class Monarch extends FreeColGameObject {
         int limit = unitTypes.size();
         UnitType unitType = null;
         for (int count = 0; count < limit; count++) {
-            int index = random.nextInt(unitTypes.size());
+            int index = getGame().getModelController().getPseudoRandom().nextInt(unitTypes.size());
             unitType = unitTypes.get(index);
             if (unitType.hasAbility("model.ability.canBeEquipped")) {
                 int newPrice = getPrice(unitType, Role.DRAGOON);
@@ -379,11 +373,11 @@ public final class Monarch extends FreeColGameObject {
     public List<AbstractUnit> addToREF() {
         ArrayList<AbstractUnit> result = new ArrayList<AbstractUnit>();
         if (capacity < spaceRequired) {
-            AbstractUnit unit = navalUnits.get(random.nextInt(navalUnits.size()));
+            AbstractUnit unit = navalUnits.get(getGame().getModelController().getPseudoRandom().nextInt(navalUnits.size()));
             result.add(new AbstractUnit(unit.getUnitType(), unit.getRole(), 1));
         } else {
-            int number = random.nextInt(3) + 1;
-            AbstractUnit unit = landUnits.get(random.nextInt(landUnits.size()));
+            int number = getGame().getModelController().getPseudoRandom().nextInt(3) + 1;
+            AbstractUnit unit = landUnits.get(getGame().getModelController().getPseudoRandom().nextInt(landUnits.size()));
             result.add(new AbstractUnit(unit.getUnitType(), unit.getRole(), number));
         }
         return result;
@@ -483,7 +477,7 @@ public final class Monarch extends FreeColGameObject {
             }
         }
         if (europeanPlayers.size() > 0) {
-            int randomInt = random.nextInt(europeanPlayers.size());
+            int randomInt = getGame().getModelController().getPseudoRandom().nextInt(europeanPlayers.size());
             Player enemy = europeanPlayers.get(randomInt);
             player.setStance(enemy, Stance.WAR);
             return enemy;

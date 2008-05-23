@@ -46,8 +46,6 @@ public class Map extends FreeColGameObject {
 
     public static final int NUMBER_OF_DIRECTIONS = 8;
 
-    private final PseudoRandom random;
-
     /**
      * The directions a Unit can move to. Includes deltas for moving
      * to adjacent squares, which are required due to the isometric
@@ -140,7 +138,6 @@ public class Map extends FreeColGameObject {
 
     public Map(Game game, Tile[][] tiles) {
         super(game);
-        random = game.getModelController().getPseudoRandom();
         this.tiles = tiles;
     }
 
@@ -157,7 +154,6 @@ public class Map extends FreeColGameObject {
      */
     public Map(Game game, XMLStreamReader in) throws XMLStreamException {
         super(game, in);
-        random = game.getModelController().getPseudoRandom();
         readFromXML(in);
     }
 
@@ -174,7 +170,6 @@ public class Map extends FreeColGameObject {
      */
     public Map(Game game, String id) {
         super(game, id);
-        random = game.getModelController().getPseudoRandom();
     }
 
     /**
@@ -1113,7 +1108,8 @@ public class Map extends FreeColGameObject {
      * @return a <code>Direction</code> value
      */
     public Direction getRandomDirection() {
-        return Direction.values()[random.nextInt(NUMBER_OF_DIRECTIONS)];
+        int random = getGame().getModelController().getPseudoRandom().nextInt(NUMBER_OF_DIRECTIONS);
+        return Direction.values()[random];
     }
 
     /**
@@ -1123,6 +1119,7 @@ public class Map extends FreeColGameObject {
      */
     public Direction[] getRandomDirectionArray() {
         Direction[] directions = Direction.values();
+        PseudoRandom random = getGame().getModelController().getPseudoRandom();
         for (int i = 0; i < directions.length; i++) {
             int i2 = random.nextInt(NUMBER_OF_DIRECTIONS);
             if (i2 != i) {
@@ -1271,6 +1268,7 @@ public class Map extends FreeColGameObject {
      * @return Position selected
      */
     public Position getRandomLandPosition() {
+        PseudoRandom random = getGame().getModelController().getPseudoRandom();
         int x = (getWidth() > 10) ? random.nextInt(getWidth() - 10) + 5 : random.nextInt(getWidth());
         int y = (getHeight() > 10) ? random.nextInt(getHeight() - 10) + 5 : random.nextInt(getHeight());
         Position centerPosition = new Position(x, y);
