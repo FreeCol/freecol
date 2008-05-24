@@ -675,16 +675,17 @@ public class MapGenerator {
                 startAtSea = false;
             }
 
-            int x, y;
+            // find an appropriate starting latitude
+            int x = width - 1;
+            int y;
             do {
-                x = width - 1;
-                y = random.nextInt(height - 20) + 10;
-            } while (map.getTile(x, y).isLand() == startAtSea);
-            while (isStartingPositionTooClose(map, y, startingPositions, startingYPositions)) {
-                y = random.nextInt(height - 20) + 10;
-            }
+                 y = random.nextInt(height - 20) + 10;
+            } while (map.getTile(x, y).isLand() == startAtSea ||
+                     isStartingPositionTooClose(map, y, startingPositions, startingYPositions));
             startingYPositions.add(new Integer(y));
+            
             if (startAtSea) {
+                // move westward to find the limit between high seas and coastal waters
                 while (map.getTile(x - 1, y).getType().canSailToEurope()) {
                     x--;
                 }
