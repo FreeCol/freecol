@@ -1619,7 +1619,7 @@ public final class InGameController implements NetworkConstants {
         unit.move(direction);
 
         Region region = unit.getTile().getRegion();
-        if (region.isDiscoverable()) {
+        if (region!=null && region.isDiscoverable()) {
             String name = freeColClient.getCanvas().showInputDialog("nameRegion.text", "", "ok", "cancel", 
                                                                     "%name%", region.getDisplayName());
             moveElement.setAttribute("regionName", name);

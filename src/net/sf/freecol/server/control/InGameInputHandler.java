@@ -978,7 +978,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         
 
         Region region = newTile.getRegion();
-        if (region.isDiscoverable()) {
+        if (region!=null && region.isDiscoverable()) {
             String name = moveElement.getAttribute("regionName");
             if (name != null) {
                 region.discover(player, getGame().getTurn(), name);
@@ -1494,8 +1494,11 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
             throw new IllegalStateException("Unit can't learn that skill from settlement!");
         }
         
+        // FIXME: This is supposed to return the unit to the original location the unit came from
+        // outside the indian camp. This doesn't work if the unit was in a ship sailing the coast
         Tile tile = map.getNeighbourOrNull(direction.getReverseDirection(), unit.getTile());
         unit.setLocation(tile);
+        
         if (!cancelAction) {
             Tension tension = settlement.getAlarm(player);
             if (tension == null) {
