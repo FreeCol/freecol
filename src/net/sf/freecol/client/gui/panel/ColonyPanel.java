@@ -246,8 +246,10 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener {
 
         JScrollPane outsideColonyScroll = new JScrollPane(outsideColonyPanel,
                 ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED, ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+        outsideColonyScroll.getVerticalScrollBar().setUnitIncrement( 16 );
         JScrollPane inPortScroll = new JScrollPane(inPortPanel, ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
                 ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+        inPortScroll.getVerticalScrollBar().setUnitIncrement( 16 );
         JScrollPane cargoScroll = new JScrollPane(cargoPanel, ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER,
                 ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
         JScrollPane warehouseScroll = new JScrollPane(warehousePanel, ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER,
@@ -256,6 +258,7 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener {
                 ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
         JScrollPane buildingsScroll = new JScrollPane(buildingsPanel, ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
                 ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+        buildingsScroll.getVerticalScrollBar().setUnitIncrement( 16 );
 
         // Make the colony label
         nameBox = new JComboBox();

@@ -89,6 +89,7 @@ public class ReportPanel extends FreeColPanel implements ActionListener {
 
         scrollPane = new JScrollPane(reportPanel, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
                                      JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+        scrollPane.getVerticalScrollBar().setUnitIncrement( 16 );
         add(scrollPane, BorderLayout.CENTER);
 
         ok = new JButton(Messages.message("ok"));
