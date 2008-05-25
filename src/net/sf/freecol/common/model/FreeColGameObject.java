@@ -445,7 +445,6 @@ abstract public class FreeColGameObject extends FreeColObject {
         return getId().equals(id);
     }
 
-
     /**
      * Checks if the given <code>FreeColGameObject</code> equals this object.
      *

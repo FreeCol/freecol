@@ -928,9 +928,8 @@ public class Game extends FreeColGameObject {
 
         out.writeAttribute("ID", getId());
         out.writeAttribute("turn", Integer.toString(getTurn().getNumber()));
-        if (currentPlayer != null) {
-            out.writeAttribute("currentPlayer", currentPlayer.getId());
-        }
+
+        writeAttribute(out, "currentPlayer", currentPlayer);
 
         if (toSavedGame) {
             out.writeAttribute("nextID", Integer.toString(nextId));
@@ -944,13 +943,11 @@ public class Game extends FreeColGameObject {
             Player p = playerIterator.next();
             p.toXML(out, player, showAll, toSavedGame);
         }
-        if (getUnknownEnemy()!=null) {
-            getUnknownEnemy().toXML(out, player, showAll, toSavedGame);
-        }
+        writeFreeColGameObject(getUnknownEnemy(), out, player, showAll, toSavedGame);
+
         // serialize map
-        if (map != null) {
-            map.toXML(out, player, showAll, toSavedGame);
-        }
+        writeFreeColGameObject(map, out, player, showAll, toSavedGame);
+
         // serialize messages
         playerIterator = getPlayerIterator();
         while (playerIterator.hasNext()) {

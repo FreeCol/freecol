@@ -3400,18 +3400,11 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
         out.writeAttribute("hitpoints", Integer.toString(hitpoints));
         out.writeAttribute("attrition", Integer.toString(attrition));
         
-        if (student != null) {
-            out.writeAttribute("student", student.getId());
-        }
+        writeAttribute(out, "student", student);
+        writeAttribute(out, "teacher", teacher);
 
-        if (teacher != null) {
-            out.writeAttribute("teacher", teacher.getId());
-        }
-
-        if (indianSettlement != null) {
-            if (getGame().isClientTrusted() || showAll || player == getOwner()) {
-                out.writeAttribute("indianSettlement", indianSettlement.getId());
-            }
+        if (getGame().isClientTrusted() || showAll || player == getOwner()) {
+            writeAttribute(out, "indianSettlement", indianSettlement);
         }
 
         if (entryLocation != null) {
@@ -3435,9 +3428,7 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
             out.writeAttribute("currentStop", String.valueOf(currentStop));
         }
         
-        if (workImprovement!=null) {
-            workImprovement.toXMLImpl(out, player, showAll, toSavedGame);
-        }
+        writeFreeColGameObject(workImprovement, out, player, showAll, toSavedGame);
 
         // Do not show enemy units hidden in a carrier:
         if (getGame().isClientTrusted() || showAll || getOwner().equals(player)

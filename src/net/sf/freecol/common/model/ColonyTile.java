@@ -574,9 +574,7 @@ public class ColonyTile extends FreeColGameObject implements WorkLocation, Ownab
         out.writeAttribute("colony", colony.getId());
         out.writeAttribute("workTile", workTile.getId());
 
-        if (unit != null) {
-            unit.toXML(out, player, showAll, toSavedGame);
-        }
+        writeFreeColGameObject(unit, out, player, showAll, toSavedGame);
 
         // End element:
         out.writeEndElement();

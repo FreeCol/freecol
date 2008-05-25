@@ -458,6 +458,29 @@ public abstract class FreeColObject {
     }
 
     /**
+     * Write an ID attribute if object is not null.
+     *
+     * @param out a <code>XMLStreamWriter</code> value
+     * @param attributeName a <code>String</code> value
+     * @param object a <code>FreeColObject</code> value
+     * @exception XMLStreamException if an error occurs
+     */
+    public void writeAttribute(XMLStreamWriter out, String attributeName, FreeColObject object)
+        throws XMLStreamException {
+        if (object != null) {
+            out.writeAttribute(attributeName, object.getId());
+        }
+    }
+
+    public void writeFreeColGameObject(FreeColGameObject object, XMLStreamWriter out, Player player,
+                                   boolean showAll, boolean toSavedGame)
+        throws XMLStreamException {
+        if (object != null) {
+            object.toXMLImpl(out, player, showAll, toSavedGame);
+        }
+    }
+
+    /**
      * Gets the tag name used to serialize this object, generally the
      * class name starting with a lower case letter. This method
      * should be overridden by all subclasses that need to be

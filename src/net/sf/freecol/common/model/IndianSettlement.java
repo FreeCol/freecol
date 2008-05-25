@@ -1162,9 +1162,8 @@ public class IndianSettlement extends Settlement {
 
             out.writeAttribute("hasBeenVisited", Boolean.toString(isVisited));
             out.writeAttribute("convertProgress", Integer.toString(convertProgress));
-            if (learnableSkill != null) {
-                out.writeAttribute("learnableSkill", learnableSkill.getId());
-            }
+            writeAttribute(out, "learnableSkill", learnableSkill);
+
             for (int i = 0; i < wantedGoods.length; i++) {
                 String tag = "wantedGoods" + Integer.toString(i);
                 out.writeAttribute(tag, wantedGoods[i].getId());

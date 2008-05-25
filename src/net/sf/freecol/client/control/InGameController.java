@@ -3660,7 +3660,6 @@ public final class InGameController implements NetworkConstants {
                         canvas.showPanel(new ReportTurnPanel(canvas, messages));
                     } else {
                         canvas.showModelMessages(messages);
-                                
                     }
                 }
                 freeColClient.getActionManager().update();
