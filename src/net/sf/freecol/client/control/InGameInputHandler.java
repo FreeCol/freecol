@@ -153,7 +153,7 @@ public final class InGameInputHandler extends InputHandler {
         } else {
             throw new RuntimeException("Received empty (null) message! - should never happen");
         }
-
+        getFreeColClient().getInGameController().nextModelMessage();
         return reply;
     }
 
@@ -366,21 +366,16 @@ public final class InGameInputHandler extends InputHandler {
             String updateAttribute = opponentAttackElement.getAttribute("update");
             if (updateAttribute.equals("unit")) {
                 Element unitElement = Message.getChildElement(opponentAttackElement, Unit.getXMLElementTagName());
-                if (unitElement == null) {
-                    logger.warning("unitElement == null");
-                    throw new NullPointerException("unitElement == null");
-                }
                 unit = (Unit) getGame().getFreeColGameObject(unitElement.getAttribute("ID"));
                 if (unit == null) {
                     unit = new Unit(getGame(), unitElement);
                 } else {
                     unit.readFromXMLElement(unitElement);
                 }
-                unit.setLocation(unit.getTile());
                 if (unit.getTile() == null) {
-                    logger.warning("unit.getTile() == null");
                     throw new NullPointerException("unit.getTile() == null");
                 }
+                unit.setLocation(unit.getTile());
             } else if (updateAttribute.equals("defender")) {
                 Element defenderTileElement = Message.getChildElement(opponentAttackElement, Tile
                         .getXMLElementTagName());
@@ -390,22 +385,16 @@ public final class InGameInputHandler extends InputHandler {
                 }
 
                 Element defenderElement = Message.getChildElement(opponentAttackElement, Unit.getXMLElementTagName());
-                if (defenderElement == null) {
-                    logger.warning("defenderElement == null");
-                    throw new NullPointerException("defenderElement == null");
-                }
                 defender = (Unit) getGame().getFreeColGameObject(defenderElement.getAttribute("ID"));
                 if (defender == null) {
                     defender = new Unit(getGame(), defenderElement);
                 } else {
                     defender.readFromXMLElement(defenderElement);
                 }
-                defender.setLocation(defender.getTile());
-
                 if (defender.getTile() == null) {
-                    logger.warning("defender.getTile() == null");
-                    throw new NullPointerException();
+                    throw new NullPointerException("defender.getTile() == null");
                 }
+                defender.setLocation(defender.getTile());
             } else if (updateAttribute.equals("tile")) {
                 Element tileElement = Message.getChildElement(opponentAttackElement, Tile
                         .getXMLElementTagName());
@@ -417,18 +406,15 @@ public final class InGameInputHandler extends InputHandler {
                 }
                 colony = tile.getColony();
             } else {
-                logger.warning("Unknown update: " + updateAttribute);
                 throw new IllegalStateException("Unknown update " + updateAttribute);
             }
         }
 
         if (unit == null && colony == null) {
-            logger.warning("unit == null && colony == null");
             throw new NullPointerException("unit == null && colony == null");
         }
 
         if (defender == null) {
-            logger.warning("defender == null");
             throw new NullPointerException("defender == null");
         }
 
@@ -436,7 +422,9 @@ public final class InGameInputHandler extends InputHandler {
             unit.getGame().getCombatModel().bombard(colony, defender, new CombatResult(result, damage));
         } else {
             unit.getGame().getCombatModel().attack(unit, defender, new CombatResult(result, damage), plunderGold);
-            if (!unit.isDisposed() && (unit.getLocation() == null || !unit.isVisibleTo(getFreeColClient().getMyPlayer()))) {
+            if (!unit.isDisposed() &&
+                (unit.getLocation() == null ||
+                 !unit.isVisibleTo(getFreeColClient().getMyPlayer()))) {
                 unit.dispose();
             }
         }
