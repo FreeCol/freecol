@@ -282,7 +282,9 @@ public class DiplomaticTrade extends FreeColObject {
 
         items = new ArrayList<TradeItem>();
         TradeItem item;
-        while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
+        while (in.hasNext()){
+        	if(in.next() != XMLStreamConstants.START_ELEMENT)
+        		continue;
             if (in.getLocalName().equals(StanceTradeItem.getXMLElementTagName())) {
                 item = new StanceTradeItem(getGame(), in);
             } else if (in.getLocalName().equals(GoodsTradeItem.getXMLElementTagName())) {
