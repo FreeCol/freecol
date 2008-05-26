@@ -19,13 +19,17 @@
 
 package net.sf.freecol.client.gui.panel;
 
+import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.logging.Logger;
 
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JLabel;
+import javax.swing.JPanel;
 
+import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.IndianSettlement;
@@ -41,8 +45,11 @@ public final class IndianSettlementPanel extends FreeColDialog implements Action
 
     private static final Logger logger = Logger.getLogger(EventPanel.class.getName());
 
+    private final FreeColClient freeColClient;
+
     private static final int OK = 0;
 
+    private final JLabel settlementImageLabel, settlementNameLabel;
     private final JLabel skillLabel, highlyWantedLabel, otherWantedLabel;
 
     private final JButton okButton;
@@ -51,26 +58,35 @@ public final class IndianSettlementPanel extends FreeColDialog implements Action
     /**
      * The constructor that will add the items to this panel.
      */
-    public IndianSettlementPanel() {
+    public IndianSettlementPanel(FreeColClient freeColClient) {
+        
+        this.freeColClient = freeColClient;
+        
         int[] w = { 10, 0, 0, 10 };
-        int[] h = { 10, 0, 5, 0, 5, 0, 10, 0, 10 };
+        int[] h = { 10, 0, 5, 0, 5, 0, 5, 0, 10, 0, 10 };
         setLayout(new HIGLayout(w, h));
 
         okButton = new JButton(Messages.message("ok"));
         okButton.setActionCommand(String.valueOf(OK));
         okButton.addActionListener(this);
 
+        settlementImageLabel = new JLabel();
+        settlementNameLabel = new JLabel();
         skillLabel = new JLabel();
         highlyWantedLabel = new JLabel();
         otherWantedLabel = new JLabel();
 
-        add(new JLabel(Messages.message("indianSettlement.learnableSkill") + " "), higConst.rc(2, 2));
-        add(skillLabel, higConst.rc(2, 3));
-        add(new JLabel(Messages.message("indianSettlement.highlyWanted") + " "), higConst.rc(4, 2));
-        add(highlyWantedLabel, higConst.rc(4, 3));
-        add(new JLabel(Messages.message("indianSettlement.otherWanted") + " "), higConst.rc(6, 2));
-        add(otherWantedLabel, higConst.rc(6, 3));
-        add(okButton, higConst.rc(8, 3));
+        JPanel titlePanel = new JPanel();
+        titlePanel.add(settlementImageLabel);
+        titlePanel.add(settlementNameLabel);
+        add(titlePanel, higConst.rcwh(2, 2, 2, 1));
+        add(new JLabel(Messages.message("indianSettlement.learnableSkill") + " "), higConst.rc(4, 2));
+        add(skillLabel, higConst.rc(4, 3));
+        add(new JLabel(Messages.message("indianSettlement.highlyWanted") + " "), higConst.rc(6, 2));
+        add(highlyWantedLabel, higConst.rc(6, 3));
+        add(new JLabel(Messages.message("indianSettlement.otherWanted") + " "), higConst.rc(8, 2));
+        add(otherWantedLabel, higConst.rc(8, 3));
+        add(okButton, higConst.rc(10, 3));
     }
 
     public void requestFocus() {
@@ -85,6 +101,9 @@ public final class IndianSettlementPanel extends FreeColDialog implements Action
      *            displayed.
      */
     public void initialize(IndianSettlement settlement) {
+        Image settlementImage = freeColClient.getImageLibrary().getSettlementImage(settlement);
+        settlementImageLabel.setIcon(new ImageIcon(settlementImage));
+        settlementNameLabel.setText(settlement.getLocationName());
         UnitType skill = settlement.getLearnableSkill();
         String skillName;
         if (skill != null) {

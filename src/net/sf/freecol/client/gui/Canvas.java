@@ -1688,7 +1688,7 @@ public final class Canvas extends JDesktopPane {
     public void showIndianSettlementPanel(IndianSettlement settlement) {
         closeMenus();
 
-        IndianSettlementPanel indianSettlementPanel = new IndianSettlementPanel();
+        IndianSettlementPanel indianSettlementPanel = new IndianSettlementPanel(freeColClient);
         indianSettlementPanel.initialize(settlement);
 
         addAsFrame(indianSettlementPanel);
