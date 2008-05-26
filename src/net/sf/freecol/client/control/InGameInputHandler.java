@@ -153,7 +153,7 @@ public final class InGameInputHandler extends InputHandler {
         } else {
             throw new RuntimeException("Received empty (null) message! - should never happen");
         }
-        getFreeColClient().getInGameController().nextModelMessage();
+
         return reply;
     }
 
