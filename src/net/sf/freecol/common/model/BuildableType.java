@@ -50,7 +50,7 @@ public class BuildableType extends FreeColGameObjectType {
     /**
      * A list of AbstractGoods required to build this type.
      */
-    private List<AbstractGoods> goodsRequired;
+    private List<AbstractGoods> goodsRequired = null;
     
     /**
      * Stores the abilities required by this Type.
@@ -74,7 +74,14 @@ public class BuildableType extends FreeColGameObjectType {
                                             "%goods%", goods.getType().getName()));
             }
         }
-        return Utils.join(", ", result);
+        String resultAsStr = Utils.join(", ", result);
+        
+        // has  no goods required
+        if(resultAsStr == null){
+        	resultAsStr = "";
+        }
+        
+        return resultAsStr;
     }
 
     /**
