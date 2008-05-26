@@ -327,15 +327,22 @@ public final class GUI {
                 (activeUnit.getTile() != null &&
                  !activeUnit.getTile().getPosition().equals(selectedTile))) {
                 Tile t = gameData.getMap().getTile(selectedTile);
-                if (t != null && t.getSettlement() != null && t.getSettlement() instanceof Colony
-                    && t.getSettlement().getOwner().equals(freeColClient.getMyPlayer())) {
-
-                    setFocus(selectedTile);
-
-                    freeColClient.getCanvas().showColonyPanel((Colony) t.getSettlement());
-                    return;
+                if (t != null && t.getSettlement() != null) {
+                    Settlement s = t.getSettlement();
+                    if (s instanceof Colony && s.getOwner().equals(freeColClient.getMyPlayer())) {
+                        // show my colony
+                        setFocus(selectedTile);
+                        freeColClient.getCanvas().showColonyPanel((Colony) s);
+                        return;
+                    } else if (s instanceof IndianSettlement) {
+                        // show the Indian camp
+                        setFocus(selectedTile);
+                        freeColClient.getCanvas().showIndianSettlementPanel((IndianSettlement)s);
+                        return;
+                    }
                 }
 
+                // else, just select a unit on the selected tile
                 Unit unitInFront = getUnitInFront(gameData.getMap().getTile(selectedTile));
                 if (unitInFront != null) {
                     setActiveUnit(unitInFront);
