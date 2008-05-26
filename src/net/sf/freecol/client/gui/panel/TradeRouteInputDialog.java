@@ -286,6 +286,15 @@ public final class TradeRouteInputDialog extends FreeColDialog implements Action
     public void requestFocus() {
         ok.requestFocus();
     }
+    
+    private boolean verifyNewTradeRoute(){
+    	// Verify that it has at least two stops
+    	if(listModel.getSize() < 2){
+    		 getCanvas().errorMessage("traderouteDialog.notEnoughStops");
+    		 return false;
+    	} 	
+    	return true;
+    }
 
     /**
      * This function analyses an event and calls the right methods to take care
@@ -298,6 +307,10 @@ public final class TradeRouteInputDialog extends FreeColDialog implements Action
         try {
             switch (Integer.valueOf(command).intValue()) {
             case OK:
+            	
+            	if(! verifyNewTradeRoute())
+            		break;
+            	
                 getCanvas().remove(this);
                 originalRoute.setName(tradeRouteName.getText());
                 ArrayList<Stop> stops = new ArrayList<Stop>();
