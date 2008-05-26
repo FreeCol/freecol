@@ -3108,7 +3108,7 @@ public final class InGameController implements NetworkConstants {
             final boolean autoload = co.getBoolean(ClientOptions.AUTOLOAD_EMIGRANTS);
             if (autoload) {
                 int spaceLeft = unit.getSpaceLeft();
-                List<Unit> unitsInEurope = unit.getLocation().getUnitList();
+                List<Unit> unitsInEurope = new ArrayList<Unit>(unit.getLocation().getUnitList());
                 for (Unit possiblePassenger : unitsInEurope) {
                     if (possiblePassenger.isNaval()) {
                         continue;
