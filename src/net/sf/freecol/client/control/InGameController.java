@@ -569,8 +569,11 @@ public final class InGameController implements NetworkConstants {
             clearGotoOrders(unit);
             move(unit, direction);
 
-            //centers unit if option "always center" is active
-            if(freeColClient.getClientOptions().getBoolean(ClientOptions.ALWAYS_CENTER)){
+            // centers unit if option "always center" is active
+            // A few checks need to be remade, as the unit may no longer exist
+            //or no longer be on the map
+            boolean alwaysCenter = freeColClient.getClientOptions().getBoolean(ClientOptions.ALWAYS_CENTER);
+            if(alwaysCenter && unit != null && unit.getTile() != null){
             	Position unitPosition = unit.getTile().getPosition();
             	freeColClient.getGUI().setFocus(unitPosition);
             }
