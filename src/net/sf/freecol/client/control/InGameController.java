@@ -840,7 +840,9 @@ public final class InGameController implements NetworkConstants {
         }
         List<Unit> units = europe.getUnitList();
         for(Unit unit : units) {
-            if (unit.getTradeRoute() != null) {
+        	// Process units that have a trade route and 
+        	//are actually in Europe, not bound to/from
+            if (unit.getTradeRoute() != null && unit.isInEurope()) {
                 followTradeRoute(unit);
             }
         }
