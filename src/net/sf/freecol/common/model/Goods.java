@@ -47,7 +47,7 @@ public class Goods extends AbstractGoods implements Locatable, Ownable, Named {
      * order to remove reliance on these static quick links.  Only the
      * essential should have a quick link.
      */
-    public static GoodsType FOOD, SUGAR, TOBACCO, COTTON, FURS, LUMBER, ORE, SILVER,
+    public static GoodsType FOOD, LUMBER, ORE, SILVER,
         HORSES, 
         RUM, CIGARS, CLOTH, COATS, TRADEGOODS, TOOLS, MUSKETS, 
         FISH, BELLS, CROSSES, HAMMERS;

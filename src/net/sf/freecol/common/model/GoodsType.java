@@ -36,6 +36,7 @@ public final class GoodsType extends FreeColGameObjectType
     private boolean isFarmed;
     private boolean isFood;
     private boolean ignoreLimit;
+    private boolean newWorldGoods;
 
     private GoodsType madeFrom;
     private GoodsType makes;
@@ -87,6 +88,10 @@ public final class GoodsType extends FreeColGameObjectType
 
     public boolean limitIgnored() {
         return ignoreLimit;
+    }
+
+    public boolean isNewWorldGoodsType() {
+        return newWorldGoods;
     }
 
     public boolean isStorable() {
@@ -143,6 +148,7 @@ public final class GoodsType extends FreeColGameObjectType
         isFarmed = getAttribute(in, "is-farmed", false);
         isFood = getAttribute(in, "is-food", false);
         ignoreLimit = getAttribute(in, "ignore-limit", false);
+        newWorldGoods = getAttribute(in, "new-world-goods", false);
         art = in.getAttributeValue(null, "art");
 
         if (hasAttribute(in, "made-from")) {

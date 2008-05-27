@@ -84,6 +84,7 @@ public final class Specification {
 
     private final List<GoodsType> goodsTypeList;
     private final List<GoodsType> farmedGoodsTypeList;
+    private final List<GoodsType> newWorldGoodsTypeList;
 
     private final List<ResourceType> resourceTypeList;
 
@@ -135,6 +136,7 @@ public final class Specification {
         equipmentTypes = new ArrayList<EquipmentType>();
         difficultyLevels = new ArrayList<DifficultyLevel>();
         farmedGoodsTypeList = new ArrayList<GoodsType>();
+        newWorldGoodsTypeList = new ArrayList<GoodsType>();
 
         try {
             XMLStreamReader xsr = XMLInputFactory.newInstance().createXMLStreamReader(in);
@@ -153,6 +155,9 @@ public final class Specification {
                         allTypes.put(goodsType.getId(), goodsType);
                         if (goodsType.isFarmed()) {
                             farmedGoodsTypeList.add(goodsType);
+                        }
+                        if (goodsType.isNewWorldGoodsType()) {
+                            newWorldGoodsTypeList.add(goodsType);
                         }
                     }
 
@@ -432,6 +437,10 @@ public final class Specification {
 
     public List<GoodsType> getFarmedGoodsTypeList() {
         return farmedGoodsTypeList;
+    }
+
+    public List<GoodsType> getNewWorldGoodsTypeList() {
+        return newWorldGoodsTypeList;
     }
 
     /**

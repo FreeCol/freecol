@@ -150,40 +150,6 @@ public class WorkLocationPlan {
         }
         return null;
     }
-/*
-            int gain = tile.getMaximumPotential(goodsType) - tile.potential(goodsType);
-            TileImprovementType impType = tip.getType();
-            int gain = impType.getValue(
-            if (gain > 0) {
-                int value = gain;
-                if (tile.hasBonus()) {
-                    value += 5;
-                }
-                if (!tile.isForested()) {
-                    value += 5;
-                }
-                boolean roadIsImprovement = (goodsType == Goods.FURS) 
-                        || goodsType == Goods.LUMBER 
-                        || goodsType == Goods.ORE 
-                        || goodsType == Goods.SILVER;
-                int type = (roadIsImprovement) ? TileImprovementPlan.BUILD_ROAD : TileImprovementPlan.PLOW;
-                
-                if (type == TileImprovementPlan.BUILD_ROAD && tile.canGetRoad()
-                        || type == TileImprovementPlan.PLOW && tile.canBePlowed()) {
-                    if (ti == null) {
-                        return new TileImprovementPlan(getAIMain(), tile, type, value);
-                    } else {
-                        ti.setType(type);
-                        ti.setValue(value);
-                        return ti;
-                    }
-                }
-            }
-        }
-        
-        return null;
-    }
-*/
 
     /**
     * Gets the <code>WorkLocation</code> this 
@@ -197,16 +163,16 @@ public class WorkLocationPlan {
 
     
     /**
-    * Gets the production of the given type of goods according to this
-    * <code>WorkLocationPlan</code>. The plan has been created for either
-    * a {@link ColonyTile} or a {@link Building}. If this is a plan for a
-    * <code>ColonyTile</code> then the maximum possible production of the
-    * tile gets returned, while the <code>Building</code>-plans only returns
-    * a number used for identifying the value of the goods produced.
-    *
-    * @param goodsType The type of goods to get the production for.
-    * @return The production.
-    */
+     * Gets the production of the given type of goods according to this
+     * <code>WorkLocationPlan</code>. The plan has been created for either
+     * a {@link ColonyTile} or a {@link Building}. If this is a plan for a
+     * <code>ColonyTile</code> then the maximum possible production of the
+     * tile gets returned, while the <code>Building</code>-plans only returns
+     * a number used for identifying the value of the goods produced.
+     *
+     * @param goodsType The type of goods to get the production for.
+     * @return The production.
+     */
     public int getProductionOf(GoodsType goodsType) {
         if (goodsType != this.goodsType) {
             return 0;
@@ -226,8 +192,14 @@ public class WorkLocationPlan {
             if (t.isLand() && base != 0) {
                 base++;
             }
-
-            return expertUnitType.getProductionFor(goodsType, base) * ((goodsType == Goods.FURS) ? 2 : 1);
+            /**
+             * What's this supposed to be? Are we checking for the
+             * possible production bonus granted by Henry Hudson? If
+             * so, we should check all possible production bonuses instead.
+             *
+             * return expertUnitType.getProductionFor(goodsType, base) * ((goodsType == Goods.FURS) ? 2 : 1);
+             */
+            return expertUnitType.getProductionFor(goodsType, base);
         } else {
             if (goodsType.isFarmed()) {
                 return 0;

@@ -128,8 +128,7 @@ public class IndianDemandMission extends Mission {
                 // Load the goods:
                 ArrayList<Goods> goodsList = new ArrayList<Goods>();
                 GoodsContainer gc = getUnit().getIndianSettlement().getGoodsContainer();
-                // Come back to clean up - takes SUGAR, TOBACCO, COTTON, FURS
-                for (GoodsType goodsType : new GoodsType[] {Goods.SUGAR, Goods.TOBACCO, Goods.COTTON, Goods.FURS}) {
+                for (GoodsType goodsType : FreeCol.getSpecification().getNewWorldGoodsTypeList()) {
                     if (gc.getGoodsCount(goodsType) >= IndianSettlement.KEEP_RAW_MATERIAL + 25) {
                         goodsList.add(new Goods(getGame(), getUnit().getIndianSettlement(),
                                                 goodsType,

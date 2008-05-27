@@ -786,7 +786,7 @@ public class MapGenerator {
                                 break;
                             }
                         }
-                        lumberjack.setWorkType(Goods.LUMBER);
+                        lumberjack.setWorkType(lumberjack.getType().getExpertProduction());
                     }
 
                     unitType = FreeCol.getSpecification().getUnitType("model.unit.seasonedScout");

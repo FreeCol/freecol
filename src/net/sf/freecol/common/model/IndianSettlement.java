@@ -881,20 +881,6 @@ public class IndianSettlement extends Settlement {
                     }
                 }
             }
-            /*
-              if (potential[Goods.SUGAR]-KEEP_RAW_MATERIAL > 0) {
-              typeWithSmallestAmount = Goods.RUM;
-              }
-              if (potential[Goods.TOBACCO]-KEEP_RAW_MATERIAL > 0 && goodsContainer.getGoodsCount(Goods.CIGARS) < goodsContainer.getGoodsCount(typeWithSmallestAmount)) {
-              typeWithSmallestAmount = Goods.CIGARS;
-              }
-              if (potential[Goods.COTTON]-KEEP_RAW_MATERIAL > 0 && goodsContainer.getGoodsCount(Goods.CLOTH) < goodsContainer.getGoodsCount(typeWithSmallestAmount)) {
-              typeWithSmallestAmount = Goods.CLOTH;
-              }
-              if (potential[Goods.FURS]-KEEP_RAW_MATERIAL > 0 && goodsContainer.getGoodsCount(Goods.COATS) < goodsContainer.getGoodsCount(typeWithSmallestAmount)) {
-              typeWithSmallestAmount = Goods.COATS;
-              }
-            */
             if (typeWithSmallestAmount != null) {
                 int production = Math.min(goodsContainer.getGoodsCount(typeWithSmallestAmount.getRawMaterial()),
                                           Math.min(10, goodsContainer.getGoodsCount(Goods.TOOLS)));
@@ -904,20 +890,19 @@ public class IndianSettlement extends Settlement {
             }
         }
 
-        /* Consume goods: */
-        for (int i=0; i<workers; i++) {
-            consumeGoods(Goods.FOOD, 2);
-            consumeGoods(Goods.TOBACCO, 1);
-            consumeGoods(Goods.COTTON, 1);
-            consumeGoods(Goods.FURS, 1);
-            consumeGoods(Goods.ORE, 1);
-            consumeGoods(Goods.SILVER, 1);
-            consumeGoods(Goods.RUM, 2);
-            consumeGoods(Goods.CIGARS, 1);
-            consumeGoods(Goods.COATS, 1);
-            consumeGoods(Goods.CLOTH, 1);
-            consumeGoods(Goods.TRADEGOODS, 2);
+        /* Consume goods: TODO: make this more generic */
+        consumeGoods(Goods.FOOD, 2 * workers);
+        consumeGoods(Goods.RUM, 2 * workers);
+        consumeGoods(Goods.TRADEGOODS, 2 * workers);
+        for (GoodsType goodsType : FreeCol.getSpecification().getNewWorldGoodsTypeList()) {
+            consumeGoods(goodsType, workers);
         }
+        consumeGoods(Goods.ORE, workers);
+        consumeGoods(Goods.SILVER, workers);
+        consumeGoods(Goods.CIGARS, workers);
+        consumeGoods(Goods.COATS, workers);
+        consumeGoods(Goods.CLOTH, workers);
+
         goodsContainer.removeAbove(500);
 
         checkForNewIndian();
