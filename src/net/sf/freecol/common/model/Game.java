@@ -244,14 +244,31 @@ public class Game extends FreeColGameObject {
         this.viewOwner = getPlayerByName(viewOwnerUsername);
     }
 
+    /**
+     * Returns the Game's ModelController.
+     *
+     * @return a <code>ModelController</code> value
+     */
     public ModelController getModelController() {
         return modelController;
     }
 
+    /**
+     * Returns the "Unknown Enemy" Player, which is used for
+     * privateers.
+     *
+     * @return a <code>Player</code> value
+     */
     public Player getUnknownEnemy() {
     	return unknownEnemy;
     }
 
+    /**
+     * Sets the "Unknown Enemy" Player, which is used for
+     * privateers.
+     *
+     * @param player a <code>Player</code> value
+     */
     public void setUnknownEnemy(Player player) {
         this.unknownEnemy = player;
     }
@@ -365,9 +382,7 @@ public class Game extends FreeColGameObject {
 
             return id;
         } else {
-            logger.warning("The client's \"Game\" was requested to give out an id.");
             throw new Error("The client's \"Game\" was requested to give out an id.");
-            // return null;
         }
     }
 
@@ -543,10 +558,6 @@ public class Game extends FreeColGameObject {
         }
 
         return null;
-    }
-
-    public Player getPlayer(int index) {
-        return players.get(index);
     }
 
     /**

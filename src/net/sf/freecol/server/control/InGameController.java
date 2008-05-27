@@ -202,10 +202,8 @@ public final class InGameController extends Controller {
     }
     
     private boolean isHumanPlayersLeft() {
-        Iterator<Player> playerIterator = getFreeColServer().getGame().getPlayerIterator();
-        while (playerIterator.hasNext()) {
-            ServerPlayer p = (ServerPlayer) playerIterator.next();
-            if (!p.isDead() && !p.isAI() && p.isConnected()) {
+        for (Player player : getFreeColServer().getGame().getPlayers()) {
+            if (!player.isDead() && !player.isAI() && ((ServerPlayer) player).isConnected()) {
                 return true;
             }
         }
@@ -292,28 +290,25 @@ public final class InGameController extends Controller {
      *         if the game is not finished.
      */
     public Player checkForWinner() {
+        List<Player> players = getGame().getPlayers();
         GameOptions go = getGame().getGameOptions();
         if (go.getBoolean(GameOptions.VICTORY_DEFEAT_REF)) {
-            Iterator<Player> playerIterator = getGame().getPlayerIterator();
-            while (playerIterator.hasNext()) {
-                Player p = playerIterator.next();
-                if (!p.isAI() && p.getPlayerType() == PlayerType.INDEPENDENT) {
-                    return p;
+            for (Player player : players) {
+                if (!player.isAI() && player.getPlayerType() == PlayerType.INDEPENDENT) {
+                    return player;
                 }
             }
         }
         if (go.getBoolean(GameOptions.VICTORY_DEFEAT_EUROPEANS)) {
             Player winner = null;
-            Iterator<Player> playerIterator = getGame().getPlayerIterator();
-            while (playerIterator.hasNext()) {
-                Player p = playerIterator.next();
-                if (!p.isDead() && p.isEuropean() && !p.isREF()) {
+            for (Player player : players) {
+                if (!player.isDead() && player.isEuropean() && !player.isREF()) {
                     if (winner != null) {
                         // There is more than one european player alive:
                         winner = null;
                         break;
                     } else {
-                        winner = p;
+                        winner = player;
                     }
                 }
             }
@@ -323,16 +318,14 @@ public final class InGameController extends Controller {
         }
         if (go.getBoolean(GameOptions.VICTORY_DEFEAT_HUMANS)) {
             Player winner = null;
-            Iterator<Player> playerIterator = getGame().getPlayerIterator();
-            while (playerIterator.hasNext()) {
-                Player p = playerIterator.next();
-                if (!p.isDead() && !p.isAI()) {
+            for (Player player : players) {
+                if (!player.isDead() && !player.isAI()) {
                     if (winner != null) {
                         // There is more than one human player alive:
                         winner = null;
                         break;
                     } else {
-                        winner = p;
+                        winner = player;
                     }
                 }
             }

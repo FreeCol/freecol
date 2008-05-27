@@ -53,6 +53,7 @@ public class IndianSettlement extends Settlement {
     public static final int MISSIONARY_TENSION = -3;
     public static final int MAX_CONVERT_DISTANCE = 10;
     public static final int TURNS_PER_TRIBUTE = 5;
+    public static final int ALARM_RADIUS = 2;
 
     public static final String UNITS_TAG_NAME = "units";
 
@@ -923,53 +924,65 @@ public class IndianSettlement extends Settlement {
 
         /* Increase alarm: */
         if (getUnitCount() > 0) {
-            int[] extraAlarm = new int[getGame().getNumberOfPlayers()];
+            java.util.Map<Player, Integer> extraAlarm = new HashMap<Player, Integer>();
+            for (Player enemy : getGame().getEuropeanPlayers()) {
+                extraAlarm.put(enemy, new Integer(0));
+            }
+            CombatModel combatModel = getGame().getCombatModel();
             
-            int alarmRadius = getRadius() + 2; // the radius in which Europeans cause alarm
+            int alarmRadius = getRadius() + ALARM_RADIUS; // the radius in which Europeans cause alarm
             Iterator<Position> ci = getGame().getMap().getCircleIterator(getTile().getPosition(), true, alarmRadius);
             while (ci.hasNext()) {
                 Tile t = getGame().getMap().getTile(ci.next());
                 
                 // Nearby military units:
-                if (t.getFirstUnit() != null 
-                    && t.getFirstUnit().getOwner().isEuropean()
-                    && t.getSettlement() == null) {                    
-                    Iterator<Unit> ui = t.getUnitIterator();
-                    while (ui.hasNext()) {
-                        Unit u = ui.next();
-                        if (u.isOffensiveUnit() && !u.isNaval()) {                          
-                            extraAlarm[u.getOwner().getIndex()] +=
-                                u.getGame().getCombatModel().getOffencePower(u, getTile().getDefendingUnit(u));
+                if (t.getSettlement() == null &&
+                    t.getFirstUnit() != null) {
+                    Player owner =  t.getFirstUnit().getOwner();
+                    if (owner.isEuropean()) {
+                        int alarm = extraAlarm.get(owner);
+                        for (Unit unit : t.getUnitList()) {
+                            if (unit.isOffensiveUnit() && !unit.isNaval()) {
+                                alarm += combatModel.getOffencePower(unit, getTile().getDefendingUnit(unit));
+                            }
                         }
+                        extraAlarm.put(owner, alarm);
                     }
                 }
                 
                 // Land being used by another settlement:
-                if (t.getOwningSettlement() != null && t.getOwningSettlement().getOwner().isEuropean()) {
-                    extraAlarm[t.getOwningSettlement().getOwner().getIndex()] += 2;
+                if (t.getOwningSettlement() != null) {
+                    Player owner = t.getOwningSettlement().getOwner();
+                    if (owner.isEuropean()) {
+                        extraAlarm.put(owner, extraAlarm.get(owner).intValue() + 2);
+                    }
                 }
 
                 // Settlement:
-                if (t.getSettlement() != null && t.getSettlement().getOwner().isEuropean()) {
-                    extraAlarm[t.getSettlement().getOwner().getIndex()] += t.getSettlement().getUnitCount();
+                Settlement settlement = t.getSettlement();
+                if (settlement != null) {
+                    Player owner = settlement.getOwner();
+                    if (owner.isEuropean()) {
+                        extraAlarm.put(owner, extraAlarm.get(owner).intValue() + settlement.getUnitCount());
+                    }
                 }
             }
 
             // Missionary helps reducing alarm a bit, here and to the tribe as a whole.
             // No reduction effect on other settlements (1/4 of this) unless this is capital. 
             if (missionary != null) {
-                extraAlarm[missionary.getOwner().getIndex()] += MISSIONARY_TENSION;
+                Player owner = missionary.getOwner();
+                extraAlarm.put(owner, extraAlarm.get(owner).intValue() + MISSIONARY_TENSION);
             }
 
-            for (int i=0; i<extraAlarm.length; i++) {
-                Player p = getGame().getPlayer(i);
-                if (p.isEuropean() && extraAlarm[i] != 0) {
-                    if (extraAlarm[i] > 0) {
-                        extraAlarm[i] = (int) p.getFeatureContainer()
-                            .applyModifier(extraAlarm[i], "model.modifier.nativeAlarmModifier",
-                                           null, getGame().getTurn());
-                    }
-                    modifyAlarm(p, extraAlarm[i]);
+            for (Entry<Player, Integer> entry : extraAlarm.entrySet()) {
+                Integer alarm = entry.getValue();
+                if (alarm != null && alarm.intValue() > 0) {
+                    Player player = entry.getKey();
+                    int modifiedAlarm = (int) player.getFeatureContainer()
+                        .applyModifier(alarm.intValue(), "model.modifier.nativeAlarmModifier",
+                                       null, getGame().getTurn());
+                    modifyAlarm(player, modifiedAlarm);
                 }
             }
 
