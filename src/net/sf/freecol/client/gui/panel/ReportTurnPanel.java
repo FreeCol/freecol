@@ -225,7 +225,7 @@ public final class ReportTurnPanel extends ReportPanel implements ActionListener
             final Unit unit = (Unit) source;
             JButton button = new JButton(unit.getName());
             button.addActionListener(this);
-            button.setActionCommand(unit.getTile().getId());
+            button.setActionCommand(unit.getLocation().getId());
             headline = button;
         } else if (source instanceof Nameable) {
             headline = new JLabel(((Nameable) source).getName());
