@@ -216,13 +216,13 @@ public final class DragListener extends MouseAdapter {
                                 });
                             menu.add(newItem);
                         }
-                        if (tempUnit.canBeEquippedWith(equipmentType) &&
-                            tempUnit.equipmentCanBeBuilt(equipmentType)) {
+                        if (tempUnit.canBeEquippedWith(equipmentType)) {
                             JMenuItem newItem = new JMenuItem();
                             count = equipmentType.getMaximumCount() - count;
                             if (equipmentType.getGoodsRequired().isEmpty()) {
                                 newItem.setText(Messages.message(equipmentType.getId() + ".add"));
-                            } else if (tempUnit.isInEurope()) {
+                            } else if (tempUnit.isInEurope() &&
+                                       tempUnit.getOwner().getEurope().canBuildEquipment(equipmentType)) {
                                 int price = 0;
                                 for (AbstractGoods goodsRequired : equipmentType.getGoodsRequired()) {
                                     price += tempUnit.getOwner().getMarket().getBidPrice(goodsRequired.getType(),
@@ -236,7 +236,8 @@ public final class DragListener extends MouseAdapter {
                                                 Messages.message("goldAmount", "%amount%", 
                                                                  String.valueOf(count * price)) +
                                                 ")");
-                            } else {
+                            } else if (tempUnit.getColony() != null &&
+                                       tempUnit.getColony().canBuildEquipment(equipmentType)) {
                                 for (AbstractGoods goodsRequired : equipmentType.getGoodsRequired()) {
                                     int present = tempUnit.getColony().getGoodsCount(goodsRequired.getType()) /
                                         goodsRequired.getAmount();

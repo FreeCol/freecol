@@ -29,6 +29,7 @@ import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.freecol.FreeCol;
+import net.sf.freecol.common.model.AbstractGoods;
 import net.sf.freecol.common.model.EquipmentType;
 import net.sf.freecol.common.model.GoalDecider;
 import net.sf.freecol.common.model.Goods;
@@ -211,12 +212,16 @@ public class PioneeringMission extends Mission {
             public boolean check(Unit u, PathNode pathNode) {
                 Tile t = pathNode.getTile();
                 boolean target = false;
-                if (t.getColony() != null 
-                        && t.getColony().getOwner() == u.getOwner()
-                        && t.getColony().getGoodsContainer().getGoodsCount(Goods.TOOLS) >= 20) {
+                if (t.getColony() != null && 
+                    t.getColony().getOwner() == u.getOwner() &&
+                    t.getColony().canBuildEquipment(toolsType)) {
                     AIColony ac = (AIColony) getAIMain().getAIObject(t.getColony());
-                    if (ac.getAvailableTools() >= 20) {
-                        target = true;
+                    target = true;
+                    for (AbstractGoods materials : toolsType.getGoodsRequired()) {
+                        if (ac.getAvailableGoods(materials.getType()) < materials.getAmount()) {
+                            target = false;
+                            break;
+                        }
                     }
                 }
                 if (target) {
@@ -252,20 +257,27 @@ public class PioneeringMission extends Mission {
                 }
                 if (getUnit().getColony() != null) {
                     AIColony ac = (AIColony) getAIMain().getAIObject(getUnit().getColony());
-                    final int tools = ac.getAvailableTools();
-                    if (tools >= 20) {                    
+                    int amount = toolsType.getMaximumCount();
+                    for (AbstractGoods materials : toolsType.getGoodsRequired()) {
+                        int availableAmount = ac.getAvailableGoods(materials.getType());
+                        int requiredAmount = materials.getAmount();
+                        if (availableAmount < requiredAmount) {
+                            skipMission = true;
+                            break;
+                        } else {
+                            amount = Math.min(amount, availableAmount / requiredAmount);
+                        }
+                    }
+                    if (!skipMission) {
                         Element equipUnitElement = Message.createNewRootElement("equipUnit");
                         equipUnitElement.setAttribute("unit", getUnit().getId());
                         equipUnitElement.setAttribute("type", toolsType.getId());
-                        equipUnitElement.setAttribute("amount", Integer.toString(Math.min(tools / 20, 
-                                                                                          toolsType.getMaximumCount())));
+                        equipUnitElement.setAttribute("amount", Integer.toString(amount));
                         try {
                             connection.sendAndWait(equipUnitElement);
                         } catch (Exception e) {
                             logger.warning("Could not send equip message.");
                         }
-                    } else {
-                        skipMission = true;
                     }
                 }
                 return;

@@ -144,6 +144,24 @@ public final class Europe extends FreeColGameObject implements Location, Ownable
 
 
     /**
+     * Return true if this Europe could build at least one item of the
+     * given EquipmentType.
+     *
+     * @param equipmentType an <code>EquipmentType</code> value
+     * @return a <code>boolean</code> value
+     */
+    public boolean canBuildEquipment(EquipmentType equipmentType) {
+        for (AbstractGoods requiredGoods : equipmentType.getGoodsRequired()) {
+            GoodsType goodsType = requiredGoods.getType();
+            if (!(getOwner().canTrade(goodsType) &&
+                  getOwner().getGold() >= getOwner().getMarket().getBidPrice(goodsType, requiredGoods.getAmount()))) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /**
      * Returns true if not all recruitables are of the same type.
      *
      * @return a <code>boolean</code> value

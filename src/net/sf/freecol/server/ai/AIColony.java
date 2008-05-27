@@ -778,18 +778,23 @@ public class AIColony extends AIObject {
     }
 
     /**
-     * Returns the available amount of tools.
+     * Returns the available amount of the GoodsType given.
      * 
      * @return The amount of tools not needed for the next thing we are
      *         building.
      */
-    public int getAvailableTools() {
-        int toolsRequiredForBuilding = 0;
+    public int getAvailableGoods(GoodsType goodsType) {
+        int materialsRequiredForBuilding = 0;
         if (colony.getCurrentlyBuilding() != BuildableType.NOTHING) {
-            toolsRequiredForBuilding = getToolsRequired(colony.getCurrentlyBuilding());
+            for (AbstractGoods materials : colony.getCurrentlyBuilding().getGoodsRequired()) {
+                if (materials.getType() == goodsType) {
+                    materialsRequiredForBuilding = materials.getAmount();
+                    break;
+                }
+            }
         }
 
-        return Math.max(0, colony.getGoodsCount(Goods.TOOLS) - toolsRequiredForBuilding);
+        return Math.max(0, colony.getGoodsCount(goodsType) - materialsRequiredForBuilding);
     }
 
     /**
@@ -807,13 +812,23 @@ public class AIColony extends AIObject {
 
         // Move a pioneer outside the colony if we have a sufficient amount of
         // tools:
-        if (colony.getUnitCount() > 1 && getAvailableTools() >= 20) {
-            AIUnit unequippedPioneer = getUnequippedHardyPioneer();
-            if (unequippedPioneer != null
-                    && (unequippedPioneer.getMission() == null || !(unequippedPioneer.getMission() instanceof PioneeringMission))
+        if (colony.getUnitCount() > 1) {
+            boolean canBuildTools = true;
+            for (AbstractGoods materials : toolsType.getGoodsRequired()) {
+                if (getAvailableGoods(materials.getType()) < materials.getAmount()) {
+                    canBuildTools = false;
+                    break;
+                }
+            }
+            if (canBuildTools) {
+                AIUnit unequippedPioneer = getUnequippedHardyPioneer();
+                if (unequippedPioneer != null
+                    && (unequippedPioneer.getMission() == null ||
+                        !(unequippedPioneer.getMission() instanceof PioneeringMission))
                     && PioneeringMission.isValid(unequippedPioneer)) {
-                unequippedPioneer.getUnit().setLocation(colony.getTile());
-                unequippedPioneer.setMission(new PioneeringMission(getAIMain(), unequippedPioneer));
+                    unequippedPioneer.getUnit().setLocation(colony.getTile());
+                    unequippedPioneer.setMission(new PioneeringMission(getAIMain(), unequippedPioneer));
+                }
             }
         }
 

@@ -2081,36 +2081,6 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
         return true;
     }
 
-    /**
-     * Checks whether the given <code>EquipmentType</code> can be
-     * built at the current <code>Location</code>. This is the case if
-     * the unit is in a colony in which the goods are present, or if
-     * it is in Europe and the player can trade the goods and has
-     * enough gold to pay for them.
-     * 
-     * @param equipmentType an <code>EquipmentType</code> value
-     * @return whether this unit can be equipped with the given
-     *         <code>EquipmentType</code> at the current location.
-     */
-    public boolean equipmentCanBeBuilt(EquipmentType equipmentType) {
-        if (getColony() != null) {
-            for (AbstractGoods requiredGoods : equipmentType.getGoodsRequired()) {
-                if (!(getColony().getGoodsCount(requiredGoods.getType()) >= requiredGoods.getAmount())) {
-                    return false;
-                }
-            }
-        } else if (isInEurope()) {
-            for (AbstractGoods requiredGoods : equipmentType.getGoodsRequired()) {
-                GoodsType goodsType = requiredGoods.getType();
-                if (!(getOwner().canTrade(goodsType) &&
-                      getOwner().getGold() >= getOwner().getMarket().getBidPrice(goodsType, requiredGoods.getAmount()))) {
-                    return false;
-                }
-            }
-        }
-        return true;
-    }
-
     public void equipWith(EquipmentType equipmentType) {
         equipWith(equipmentType, false);
     }
@@ -2123,7 +2093,6 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
      * @param equipmentType an <code>EquipmentType</code> value
      * @param asResultOfCombat a <code>boolean</code> value
      * @see #canBeEquippedWith
-     * @see #equipmentCanBeBuilt
      */
     public void equipWith(EquipmentType equipmentType, boolean asResultOfCombat) {
         if (equipmentType == null) {
@@ -2133,7 +2102,9 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
             logger.fine("Unable to equip unit " + getId() + " with " + equipmentType.getName());
             return;
         }
-        if (!(asResultOfCombat || equipmentCanBeBuilt(equipmentType))) {
+        if (!(asResultOfCombat || 
+              (getColony() != null && getColony().canBuildEquipment(equipmentType)) ||
+              (isInEurope() && getOwner().getEurope().canBuildEquipment(equipmentType)))) {
             logger.fine("Unable to build equipment " + equipmentType.getName());
             return;
         }

@@ -649,11 +649,14 @@ public final class UnitType extends BuildableType {
             } else if ("required-goods".equals(nodeName)) {
                 GoodsType type = specification.getGoodsType(in.getAttributeValue(null, "id"));
                 int amount = getAttribute(in, "value", 0);
-                AbstractGoods requiredGoods = new AbstractGoods(type, amount);
-                if (getGoodsRequired() == null) {
-                    setGoodsRequired(new ArrayList<AbstractGoods>());
+                if (amount > 0) {
+                    type.setBuildingMaterial(true);
+                    AbstractGoods requiredGoods = new AbstractGoods(type, amount);
+                    if (getGoodsRequired() == null) {
+                        setGoodsRequired(new ArrayList<AbstractGoods>());
+                    }
+                    getGoodsRequired().add(requiredGoods);
                 }
-                getGoodsRequired().add(requiredGoods);
                 in.nextTag(); // close this element
             } else if ("upgrade".equals(nodeName)) {
                 Upgrade upgrade = new Upgrade();

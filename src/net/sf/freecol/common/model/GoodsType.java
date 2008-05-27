@@ -50,6 +50,11 @@ public final class GoodsType extends FreeColGameObjectType
     private int initialPrice;
     private int priceDiff;
 
+    /**
+     * Describe buildingMaterial here.
+     */
+    private boolean buildingMaterial;
+
     // ----------------------------------------------------------- constructors
 
     public GoodsType(int index) {
@@ -134,6 +139,24 @@ public final class GoodsType extends FreeColGameObjectType
 
     public GoodsType inputType() {
         return madeFrom;
+    }
+
+    /**
+     * Get the <code>BuildingMaterial</code> value.
+     *
+     * @return a <code>boolean</code> value
+     */
+    public boolean isBuildingMaterial() {
+        return buildingMaterial;
+    }
+
+    /**
+     * Set the <code>BuildingMaterial</code> value.
+     *
+     * @param newBuildingMaterial The new BuildingMaterial value.
+     */
+    public void setBuildingMaterial(final boolean newBuildingMaterial) {
+        this.buildingMaterial = newBuildingMaterial;
     }
 
     // ------------------------------------------------------------ API methods

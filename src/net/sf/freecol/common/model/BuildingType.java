@@ -152,11 +152,14 @@ public final class BuildingType extends BuildableType {
             } else if ("required-goods".equals(childName)) {
                 GoodsType type = specification.getGoodsType(in.getAttributeValue(null, "id"));
                 int amount = getAttribute(in, "value", 0);
-                AbstractGoods requiredGoods = new AbstractGoods(type, amount);
-                if (getGoodsRequired() == null) {
-                    setGoodsRequired(new ArrayList<AbstractGoods>());
+                if (amount > 0) {
+                    type.setBuildingMaterial(true);
+                    AbstractGoods requiredGoods = new AbstractGoods(type, amount);
+                    if (getGoodsRequired() == null) {
+                        setGoodsRequired(new ArrayList<AbstractGoods>());
+                    }
+                    getGoodsRequired().add(requiredGoods);
                 }
-                getGoodsRequired().add(requiredGoods);
                 in.nextTag(); // close this element
             } else if (Modifier.getXMLElementTagName().equals(childName)) {
                 Modifier modifier = new Modifier(in);

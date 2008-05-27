@@ -465,7 +465,7 @@ public class UnitTest extends FreeColTestCase {
         assertEquals(1, colonist.getLineOfSight());
         
         EquipmentType horses = spec().getEquipmentType("model.equipment.horses");
-        colonist.equipWith(horses);
+        colonist.equipWith(horses, true);
         assertEquals(2, colonist.getLineOfSight());
         
         // with Hernando De Soto, land units should see further 
