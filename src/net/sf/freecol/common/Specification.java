@@ -397,16 +397,6 @@ public final class Specification {
         return buildingTypeList.get(buildingTypeIndex);
     }
 
-    /**
-     * Describe <code>getBuildingIndex</code> method here.
-     *
-     * @param b a <code>BuildingType</code> value
-     * @return an <code>int</code> value
-     */
-    public int getBuildingIndex(BuildingType b) {
-        return buildingTypeList.indexOf(b);
-    }
-
     public BuildingType getBuildingType(String id) {
         return (BuildingType) getType(id);
     }
@@ -579,10 +569,6 @@ public final class Specification {
         return unitTypeList.get(unitTypeIndex);
     }
 
-    public int getUnitIndex(UnitType b) {
-        return unitTypeList.indexOf(b);
-    }
-
     public UnitType getUnitType(String id) {
         return (UnitType) getType(id);
     }
@@ -655,10 +641,6 @@ public final class Specification {
         return foundingFathers.get(foundingFatherIndex);
     }
 
-    public int getFoundingFatherIndex(FoundingFather father) {
-        return foundingFathers.indexOf(father);
-    }
-
     public FoundingFather getFoundingFather(String id) {
         return (FoundingFather) getType(id);
     }
@@ -715,10 +697,6 @@ public final class Specification {
 
     public NationType getNationType(int nationIndex) {
         return nationTypes.get(nationIndex);
-    }
-
-    public int getNationTypeIndex(NationType nation) {
-        return nationTypes.indexOf(nation);
     }
 
     public NationType getNationType(String id) {
