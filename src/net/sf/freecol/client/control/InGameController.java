@@ -424,15 +424,28 @@ public final class InGameController implements NetworkConstants {
         if (freeColClient.getClientOptions().getBoolean(ClientOptions.SHOW_COLONY_WARNINGS)) {
 
             boolean landLocked = true;
-            int lumber = 0;
-            int food = tile.potential(Goods.FOOD);
-            int ore = 0;
             boolean ownedByEuropeans = false;
             boolean ownedBySelf = false;
             boolean ownedByIndians = false;
 
-            if (tile.secondaryGoods() == Goods.ORE) {
-                ore = 3;
+            java.util.Map<GoodsType, Integer> goodsMap = new HashMap<GoodsType, Integer>();
+            for (GoodsType goodsType : FreeCol.getSpecification().getGoodsTypeList()) {
+                if (goodsType.isFoodType()) {
+                    int potential = 0;
+                    if (tile.primaryGoods() == goodsType) {
+                        potential = tile.potential(goodsType);
+                    }
+                    goodsMap.put(goodsType, new Integer(potential));
+                } else if (goodsType.isBuildingMaterial()) {
+                    while (goodsType.isRefined()) {
+                        goodsType = goodsType.getRawMaterial();
+                    }
+                    int potential = 0;
+                    if (tile.secondaryGoods() == goodsType) {
+                        potential = tile.potential(goodsType);
+                    }
+                    goodsMap.put(goodsType, new Integer(potential));
+                }
             }
 
             Map map = game.getMap();
@@ -440,9 +453,10 @@ public final class InGameController implements NetworkConstants {
             while (tileIterator.hasNext()) {
                 Tile newTile = map.getTile(tileIterator.next());
                 if (newTile.isLand()) {
-                    lumber += newTile.potential(Goods.LUMBER);
-                    food += newTile.potential(Goods.FOOD);
-                    ore += newTile.potential(Goods.ORE);
+                    for (Entry<GoodsType, Integer> entry : goodsMap.entrySet()) {
+                        entry.setValue(entry.getValue().intValue() +
+                                       newTile.potential(entry.getKey()));
+                    }
                     Player tileOwner = newTile.getOwner();
                     if (tileOwner == unit.getOwner()) {
                         if (newTile.getOwningSettlement() != null) {
@@ -469,31 +483,40 @@ public final class InGameController implements NetworkConstants {
                 }
             }
 
+            int food = 0;
+            for (Entry<GoodsType, Integer> entry : goodsMap.entrySet()) {
+                if (entry.getKey().isFoodType()) {
+                    food += entry.getValue().intValue();
+                }
+            }
+
             ArrayList<ModelMessage> messages = new ArrayList<ModelMessage>();
             if (landLocked) {
-                messages.add(new ModelMessage(unit, "buildColony.landLocked", null, ModelMessage.MessageType.MISSING_GOODS,
-                                              FreeCol.getSpecification().getGoodsType("model.goods.fish")));
+                messages.add(new ModelMessage(unit, ModelMessage.MessageType.MISSING_GOODS,
+                                              FreeCol.getSpecification().getGoodsType("model.goods.fish"),
+                                              "buildColony.landLocked"));
             }
             if (food < 8) {
-                messages.add(new ModelMessage(unit, "buildColony.noFood", null, ModelMessage.MessageType.MISSING_GOODS, 
-                                              FreeCol.getSpecification().getGoodsType("model.goods.food")));
+                messages.add(new ModelMessage(unit, ModelMessage.MessageType.MISSING_GOODS, 
+                                              FreeCol.getSpecification().getGoodsType("model.goods.food"),
+                                              "buildColony.noFood"));
             }
-            if (lumber < 4) {
-                messages.add(new ModelMessage(unit, "buildColony.noLumber", null, ModelMessage.MessageType.MISSING_GOODS,
-                                              FreeCol.getSpecification().getGoodsType("model.goods.lumber")));
+            for (Entry<GoodsType, Integer> entry : goodsMap.entrySet()) {
+                if (!entry.getKey().isFoodType() && entry.getValue().intValue() < 4) {
+                    messages.add(new ModelMessage(unit, ModelMessage.MessageType.MISSING_GOODS, entry.getKey(),
+                                                  "buildColony.noBuildingMaterials",
+                                                  "%goods%", entry.getKey().getName()));
+                }
             }
-            if (ore < 2) {
-                messages.add(new ModelMessage(unit, "buildColony.noOre", null, ModelMessage.MessageType.MISSING_GOODS, 
-                                              FreeCol.getSpecification().getGoodsType("model.goods.ore")));
-            }
+
             if (ownedBySelf) {
-                messages.add(new ModelMessage(unit, "buildColony.ownLand", null, ModelMessage.MessageType.WARNING));
+                messages.add(new ModelMessage(unit, ModelMessage.MessageType.WARNING, null, "buildColony.ownLand"));
             }
             if (ownedByEuropeans) {
-                messages.add(new ModelMessage(unit, "buildColony.EuropeanLand", null, ModelMessage.MessageType.WARNING));
+                messages.add(new ModelMessage(unit, ModelMessage.MessageType.WARNING, null, "buildColony.EuropeanLand"));
             }
             if (ownedByIndians) {
-                messages.add(new ModelMessage(unit, "buildColony.IndianLand", null, ModelMessage.MessageType.WARNING));
+                messages.add(new ModelMessage(unit, ModelMessage.MessageType.WARNING, null, "buildColony.IndianLand"));
             }
 
             if (messages.size() > 0) {

@@ -274,7 +274,7 @@ public class ModelMessage extends FreeColObject {
     
     /**
      * Returns the data to be displayed in the message.
-     * @return The data as a <code>String[][]</code> or <i>null</i>
+     * @return The data as a <code>String[]</code> or <i>null</i>
      *         if no data applies.
      */
     public String[] getData() {

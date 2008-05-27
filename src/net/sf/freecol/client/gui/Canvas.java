@@ -814,7 +814,7 @@ public final class Canvas extends JDesktopPane {
         for (int i = 0; i < messages.length; i++) {
             String id = messages[i].getId();
             try {
-                texts[i] = Messages.message(id);
+                texts[i] = Messages.message(id, messages[i].getData());
             } catch (MissingResourceException e) {
                 logger.warning("could not find message with id: " + id + ".");
             }
