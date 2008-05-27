@@ -33,6 +33,7 @@ import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.CombatModel;
 import net.sf.freecol.common.model.EquipmentType;
 import net.sf.freecol.common.model.FoundingFather;
+import net.sf.freecol.common.model.IndianSettlement;
 import net.sf.freecol.common.model.FoundingFather.FoundingFatherType;
 import net.sf.freecol.common.model.GameOptions;
 import net.sf.freecol.common.model.Goods;
@@ -667,6 +668,13 @@ public final class InGameController extends Controller {
                 element.appendChild(newUnit.toXMLElement(nextPlayer, element.getOwnerDocument()));
             }
         }
+    }
+    
+    public boolean createMission(IndianSettlement settlement,Unit missionary){
+    	settlement.setMissionary(missionary);
+    	
+    	//TODO: make possibility of indians refusing the mission 
+    	return true;
     }
 
     private void bombardEnemyShips(ServerPlayer currentPlayer) {

@@ -457,7 +457,44 @@ public class IndianSettlement extends Settlement {
         getTile().updatePlayerExploredTiles();
     }
 
-
+    /**
+     * Gets the response to an attempt to create a mission
+     * @return response
+     */
+    public String getResponseToMissionaryAttempt(Tension.Level tension, String success) {
+    	String response = null;
+    	
+    	// Attempt Successful
+    	if(success.equals("true")){
+    		switch(tension){
+    			case HAPPY:
+    				response = "indianSettlement.mission.Happy";
+    				break;
+    			case CONTENT:
+    				response = "indianSettlement.mission.Content";
+    				break;
+    			case DISPLEASED:
+    				response = "indianSettlement.mission.Displeased";
+    				break;
+    			default:
+    				logger.warning("Unknown response for tension " + tension);
+    		}
+    				
+    	}
+    	else{
+    		switch(tension){
+    			case ANGRY:
+    				response = "indianSettlement.mission.Angry";
+    				break;	
+    			case HATEFUL:
+    				response = "indianSettlement.mission.Hateful";
+    				break;	
+    			default:
+    				logger.warning("Requesting reaction when no mission was established");
+    		}
+    	}
+    	return response;
+    }
 
     public GoodsType[] getWantedGoods() {
         return wantedGoods;

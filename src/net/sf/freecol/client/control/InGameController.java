@@ -75,6 +75,7 @@ import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.IndianSettlement;
 import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.Map;
+import net.sf.freecol.common.model.Tension;
 import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.ModelMessage;
 import net.sf.freecol.common.model.Nameable;
@@ -3020,6 +3021,8 @@ public final class InGameController implements NetworkConstants {
 
         unit.setMovesLeft(0);
 
+        String success = "";
+        
         switch (action) {
         case CANCEL:
             missionaryMessage.setAttribute("action", "cancel");
@@ -3027,8 +3030,33 @@ public final class InGameController implements NetworkConstants {
             break;
         case ESTABLISH_MISSION:
             missionaryMessage.setAttribute("action", "establish");
-            settlement.setMissionary(unit);
-            client.sendAndWait(missionaryMessage);
+            reply = client.ask(missionaryMessage);
+            
+            if (!reply.getTagName().equals("missionaryReply")) {
+                logger.warning("Server gave an invalid reply to a missionaryAtSettlement message");
+                return;
+            }
+
+            success = reply.getAttribute("success");
+            
+            Tension.Level tension = Tension.Level.valueOf(reply.getAttribute("tension"));
+            
+            String missionResponse = null;
+            
+            String[] data = new String [] {"%nation%",settlement.getOwner().getNationAsString() };
+            
+            if (success.equals("true")) {
+            	settlement.setMissionary(unit);
+            	
+            	missionResponse = settlement.getResponseToMissionaryAttempt(tension, success);
+                
+                canvas.showInformationMessage(missionResponse,settlement,data);
+            }
+            else{
+            	missionResponse = settlement.getResponseToMissionaryAttempt(tension, success);
+            	canvas.showInformationMessage(missionResponse,settlement,data);
+            	unit.dispose();
+            }
             nextActiveUnit(); // At this point: unit.getTile() == null
             return;
         case DENOUNCE_HERESY:
@@ -3040,7 +3068,7 @@ public final class InGameController implements NetworkConstants {
                 return;
             }
 
-            String success = reply.getAttribute("success");
+            success = reply.getAttribute("success");
             if (success.equals("true")) {
                 settlement.setMissionary(unit);
                 nextActiveUnit(); // At this point: unit.getTile() == null

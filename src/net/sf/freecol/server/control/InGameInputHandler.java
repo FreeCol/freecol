@@ -1679,6 +1679,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
      */
     private Element missionaryAtSettlement(Connection connection, Element element) {
         FreeColServer freeColServer = getFreeColServer();
+        InGameController inGameController = freeColServer.getInGameController();
         Map map = getGame().getMap();
         ServerPlayer player = freeColServer.getPlayer(connection);
         Unit unit = (Unit) getGame().getFreeColGameObject(element.getAttribute("unit"));
@@ -1691,8 +1692,13 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
             return null;
         } else if (action.equals("establish")) {
             sendRemoveUnitToAll(unit, player);
-            settlement.setMissionary(unit);
-            return null;
+            
+            boolean success = inGameController.createMission(settlement,unit);
+            
+        	Element reply = Message.createNewRootElement("missionaryReply");
+        	reply.setAttribute("success", String.valueOf(success));
+        	reply.setAttribute("tension", settlement.getAlarm(unit.getOwner()).getLevel().toString());
+            return reply;
         } else if (action.equals("heresy")) {
             Element reply = Message.createNewRootElement("missionaryReply");
             sendRemoveUnitToAll(unit, player);
@@ -1705,8 +1711,9 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
                 random -= 0.2;
             }
             if (random < 0.5) {
-                reply.setAttribute("success", "true");
-                settlement.setMissionary(unit);
+            	boolean success = inGameController.createMission(settlement,unit);
+            	reply.setAttribute("success", String.valueOf(success));
+            	reply.setAttribute("tension", settlement.getAlarm(unit.getOwner()).getLevel().toString());    
             } else {
                 reply.setAttribute("success", "false");
                 unit.dispose();
