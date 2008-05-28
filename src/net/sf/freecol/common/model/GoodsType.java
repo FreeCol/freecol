@@ -38,6 +38,23 @@ public final class GoodsType extends FreeColGameObjectType
     private boolean ignoreLimit;
     private boolean newWorldGoods;
 
+    /**
+     * Whether this type of goods is required for building.
+     */
+    private boolean buildingMaterial;
+
+    /**
+     * Whether this type of goods is required for building equipment
+     * that grants an offence bonus or defence bonus.
+     */
+    private boolean militaryGoods;
+
+    /**
+     * Whether these are trade goods that can only be obtained in
+     * Europe.
+     */
+    private boolean tradeGoods;
+
     private GoodsType madeFrom;
     private GoodsType makes;
     
@@ -49,11 +66,6 @@ public final class GoodsType extends FreeColGameObjectType
     private int initialAmount;
     private int initialPrice;
     private int priceDiff;
-
-    /**
-     * Describe buildingMaterial here.
-     */
-    private boolean buildingMaterial;
 
     // ----------------------------------------------------------- constructors
 
@@ -157,6 +169,42 @@ public final class GoodsType extends FreeColGameObjectType
      */
     public void setBuildingMaterial(final boolean newBuildingMaterial) {
         this.buildingMaterial = newBuildingMaterial;
+    }
+
+    /**
+     * Get the <code>MilitaryGoods</code> value.
+     *
+     * @return a <code>boolean</code> value
+     */
+    public boolean isMilitaryGoods() {
+        return militaryGoods;
+    }
+
+    /**
+     * Set the <code>MilitaryGoods</code> value.
+     *
+     * @param newMilitaryGoods The new MilitaryGoods value.
+     */
+    public void setMilitaryGoods(final boolean newMilitaryGoods) {
+        this.militaryGoods = newMilitaryGoods;
+    }
+
+    /**
+     * Get the <code>TradeGoods</code> value.
+     *
+     * @return a <code>boolean</code> value
+     */
+    public boolean isTradeGoods() {
+        return tradeGoods;
+    }
+
+    /**
+     * Set the <code>TradeGoods</code> value.
+     *
+     * @param newTradeGoods The new TradeGoods value.
+     */
+    public void setTradeGoods(final boolean newTradeGoods) {
+        this.tradeGoods = newTradeGoods;
     }
 
     // ------------------------------------------------------------ API methods

@@ -31,7 +31,7 @@ import javax.xml.stream.XMLStreamReader;
 import net.sf.freecol.common.Specification;
 import net.sf.freecol.common.model.Unit.Role;
 
-public class EquipmentType extends FreeColGameObjectType {
+public class EquipmentType extends BuildableType {
 
     /**
      * The maximum number of equipment items that can be combined.
@@ -39,20 +39,22 @@ public class EquipmentType extends FreeColGameObjectType {
     private int maximumCount = 1;
 
     /**
-     * Describe combatLossPriority here.
+     * Determines which type of Equipment will be lost first if the
+     * Unit carrying it is defeated. Horses should be lost before
+     * Muskets, for example.
      */
     private int combatLossPriority;
 
     /**
-     * Describe role here.
+     * The default Role of the Unit carrying this type of Equipment.
      */
     private Role role;
 
     /**
-     * A list of AbstractGoods required to build this Type.
+     * Describe militaryEquipment here.
      */
-    private List<AbstractGoods> goodsRequired = new ArrayList<AbstractGoods>();
-    
+    private boolean militaryEquipment;
+
     /**
      * Stores the abilities required of a unit to be equipped.
      */
@@ -140,24 +142,6 @@ public class EquipmentType extends FreeColGameObjectType {
     }
 
     /**
-     * Get the <code>GoodsRequired</code> value.
-     *
-     * @return a <code>List<AbstractGoods></code> value
-     */
-    public final List<AbstractGoods> getGoodsRequired() {
-        return goodsRequired;
-    }
-
-    /**
-     * Set the <code>GoodsRequired</code> value.
-     *
-     * @param newGoodsRequired The new GoodsRequired value.
-     */
-    public final void setGoodsRequired(final List<AbstractGoods> newGoodsRequired) {
-        this.goodsRequired = newGoodsRequired;
-    }
-
-    /**
      * Returns the abilities required by this Type.
      *
      * @return the abilities required by this Type.
@@ -189,6 +173,25 @@ public class EquipmentType extends FreeColGameObjectType {
         }
         return compatibleEquipment.contains(otherType.getId()) &&
             otherType.compatibleEquipment.contains(getId());
+    }
+
+    /**
+     * Returns true if Equipment of this type grants an offence bonus
+     * or a defence bonus.
+     *
+     * @return a <code>boolean</code> value
+     */
+    public final boolean isMilitaryEquipment() {
+        return militaryEquipment;
+    }
+
+    /**
+     * Set the <code>MilitaryEquipment</code> value.
+     *
+     * @param newMilitaryEquipment The new MilitaryEquipment value.
+     */
+    public final void setMilitaryEquipment(final boolean newMilitaryEquipment) {
+        this.militaryEquipment = newMilitaryEquipment;
     }
 
 
@@ -245,6 +248,10 @@ public class EquipmentType extends FreeColGameObjectType {
                 }
                 addModifier(modifier);
                 specification.getModifierKeys().add(modifier.getId());
+                if (modifier.getId().equals(Modifier.OFFENCE) ||
+                    modifier.getId().equals(Modifier.DEFENCE)) {
+                    militaryEquipment = true;
+                }
             } else {
                 logger.finest("Parsing of " + nodeName + " is not implemented yet");
                 while (in.nextTag() != XMLStreamConstants.END_ELEMENT ||
@@ -253,5 +260,12 @@ public class EquipmentType extends FreeColGameObjectType {
                 }
             }
         }
+
+        if (militaryEquipment) {
+            for (AbstractGoods goods : getGoodsRequired()) {
+                goods.getType().setMilitaryGoods(true);
+            }
+        }
+
     }
 }

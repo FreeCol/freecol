@@ -53,12 +53,10 @@ import org.w3c.dom.Element;
  * Mission for demanding goods from a specified player.
  */
 public class IndianDemandMission extends Mission {
+
     private static final Logger logger = Logger.getLogger(IndianDemandMission.class.getName());
 
-
-
-
-    /** The <code>Colony</code> receiving the gift. */
+    /** The <code>Colony</code> receiving the demand. */
     private Colony target;
 
     /** Whether this mission has been completed or not. */
@@ -191,7 +189,7 @@ public class IndianDemandMission extends Mission {
                     tension = -(5 - difficulty) * 50;
                     unit.getOwner().modifyTension(enemy, tension);
                     if (unitTension <= Tension.Level.HAPPY.getLimit() &&
-                        (goods == null || goods.getType() == Goods.FOOD)) {
+                        (goods == null || goods.getType().isFoodType())) {
                         Element deliverGiftElement = Message.createNewRootElement("deliverGift");
                         deliverGiftElement.setAttribute("unit", getUnit().getId());
                         deliverGiftElement.setAttribute("settlement", target.getId());
@@ -237,13 +235,14 @@ public class IndianDemandMission extends Mission {
     public Goods selectGoods(Colony target) {
         Tension.Level tension = getUnit().getOwner().getTension(target.getOwner()).getLevel();
         int dx = target.getOwner().getDifficulty().getIndex() + 1;
+        GoodsType food = FreeCol.getSpecification().getGoodsType("model.goods.food");
         Goods goods = null;
         GoodsContainer warehouse = target.getGoodsContainer();
         if (tension.compareTo(Tension.Level.CONTENT) <= 0 &&
-            warehouse.getGoodsCount(Goods.FOOD) >= 100) {
-            int amount = (warehouse.getGoodsCount(Goods.FOOD) * dx) / 6;
+            warehouse.getGoodsCount(food) >= 100) {
+            int amount = (warehouse.getGoodsCount(food) * dx) / 6;
             if (amount > 0) {
-                return new Goods(getGame(), target, Goods.FOOD, amount);
+                return new Goods(getGame(), target, food, amount);
             }
         } else if (tension.compareTo(Tension.Level.DISPLEASED) <= 0) {
             Market market = target.getOwner().getMarket();
@@ -251,8 +250,8 @@ public class IndianDemandMission extends Mission {
             List<Goods> warehouseGoods = warehouse.getCompactGoods();
             for (Goods currentGoods : warehouseGoods) {
                 int goodsValue = market.getSalePrice(currentGoods);
-                if (currentGoods.getType() == Goods.FOOD || currentGoods.getType() == Goods.HORSES
-                        || currentGoods.getType() == Goods.MUSKETS) {
+                if (currentGoods.getType().isFoodType() ||
+                    currentGoods.getType().isMilitaryGoods()) {
                     continue;
                 } else if (goodsValue > value) {
                     value = goodsValue;
@@ -264,14 +263,40 @@ public class IndianDemandMission extends Mission {
                 return goods;
             }
         } else {
-            // TODO: change hardcoded list the preferred GoodsType
-            GoodsType[] preferred = new GoodsType[] { Goods.MUSKETS, Goods.HORSES, Goods.TOOLS, Goods.TRADEGOODS, Goods.RUM,
-                    Goods.CLOTH, Goods.COATS, Goods.CIGARS };
-            for (int i = 0; i < preferred.length; i++) {
-                int amount = warehouse.getGoodsCount(preferred[i]);
-                if (amount > 0) {
-                    return new Goods(getGame(), target, preferred[i], Math.max((amount * dx) / 6, 1));
-                    
+            // military goods
+            for (GoodsType preferred : FreeCol.getSpecification().getGoodsTypeList()) {
+                if (preferred.isMilitaryGoods()) {
+                    int amount = warehouse.getGoodsCount(preferred);
+                    if (amount > 0) {
+                        return new Goods(getGame(), target, preferred, Math.max((amount * dx) / 6, 1));
+                    }
+                }
+            }
+            // storable building materials (what do the natives need tools for?)
+            for (GoodsType preferred : FreeCol.getSpecification().getGoodsTypeList()) {
+                if (preferred.isBuildingMaterial() && preferred.isStorable()) {
+                    int amount = warehouse.getGoodsCount(preferred);
+                    if (amount > 0) {
+                        return new Goods(getGame(), target, preferred, Math.max((amount * dx) / 6, 1));
+                    }
+                }
+            }
+            // trade goods
+            for (GoodsType preferred : FreeCol.getSpecification().getGoodsTypeList()) {
+                if (preferred.isTradeGoods()) {
+                    int amount = warehouse.getGoodsCount(preferred);
+                    if (amount > 0) {
+                        return new Goods(getGame(), target, preferred, Math.max((amount * dx) / 6, 1));
+                    }
+                }
+            }
+            // refined goods
+            for (GoodsType preferred : FreeCol.getSpecification().getGoodsTypeList()) {
+                if (preferred.isRefined() && preferred.isStorable()) {
+                    int amount = warehouse.getGoodsCount(preferred);
+                    if (amount > 0) {
+                        return new Goods(getGame(), target, preferred, Math.max((amount * dx) / 6, 1));
+                    }
                 }
             }
         }

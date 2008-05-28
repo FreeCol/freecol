@@ -39,6 +39,9 @@ import org.w3c.dom.Element;
  */
 public final class Modifier extends Feature {
 
+    public static final String OFFENCE = "model.modifier.offence";
+    public static final String DEFENCE = "model.modifier.defence";
+
     public static final String COLONY_GOODS_PARTY = "model.monarch.colonyGoodsParty";
 
     public static final float UNKNOWN = Float.MIN_VALUE;
