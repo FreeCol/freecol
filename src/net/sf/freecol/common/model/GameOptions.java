@@ -145,7 +145,7 @@ public class GameOptions extends OptionMap {
 
         /* Colony options: */
         OptionGroup colony = new OptionGroup("gameOptions.colony");
-        new IntegerOption(HAMMER_PRICE, colony, 0, 50, 20);
+        //new IntegerOption(HAMMER_PRICE, colony, 0, 50, 20);
         new BooleanOption(CUSTOM_IGNORE_BOYCOTT, colony, false);
         new BooleanOption(EXPERTS_HAVE_CONNECTIONS, colony, false);
         new BooleanOption(SAVE_PRODUCTION_OVERFLOW, colony, false);

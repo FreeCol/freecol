@@ -852,12 +852,16 @@ public final class Colony extends Settlement implements Location, Nameable {
     }
 
     /**
-     * Gets the production of food.
-     * 
-     * @return The same as <code>getProductionOf(Goods.FOOD)</code>.
+     * Gets the combined production of all food types.
+     *
+     * @return an <code>int</code> value
      */
     public int getFoodProduction() {
-        return getProductionOf(Goods.FOOD);
+        int result = 0;
+        for (GoodsType foodType : FreeCol.getSpecification().getGoodsFood()) {
+            result += getProductionOf(foodType);
+        }
+        return result;
     }
 
     /**
@@ -885,17 +889,18 @@ public final class Colony extends Settlement implements Location, Nameable {
      *         location.
      */
     public WorkLocation getVacantWorkLocationFor(Unit unit) {
-        WorkLocation result = getVacantColonyTileFor(unit, Goods.FOOD);
-        if (result == null) {
-            for (Building building : buildingMap.values()) {
-                if (building.canAdd(unit)) {
-                    return building;
-                }
+        for (GoodsType foodType : FreeCol.getSpecification().getGoodsFood()) {
+            WorkLocation colonyTile = getVacantColonyTileFor(unit, foodType);
+            if (colonyTile != null) {
+                return colonyTile;
             }
-            return null;
-        } else {
-            return result;
         }
+        for (Building building : buildingMap.values()) {
+            if (building.canAdd(unit)) {
+                return building;
+            }
+        }
+        return null;
     }
 
     /**
@@ -1197,10 +1202,10 @@ public final class Colony extends Settlement implements Location, Nameable {
             GoodsType requiredGoodsType = goodsRequired.getType();
             int remaining = goodsRequired.getAmount() - getGoodsCount(requiredGoodsType);
             if (remaining > 0) {
-                if (requiredGoodsType == Goods.HAMMERS) {
-                    price += remaining * getGameOptions().getInteger(GameOptions.HAMMER_PRICE);
+                if (requiredGoodsType.isStorable()) {
+                    price += (getOwner().getMarket().getBidPrice(requiredGoodsType, remaining) * 110) / 100;
                 } else {
-                    price += (getOwner().getMarket().getBidPrice(Goods.TOOLS, remaining) * 110) / 100;
+                    price += requiredGoodsType.getPrice() * remaining;
                 }
             }
         }
@@ -1225,13 +1230,12 @@ public final class Colony extends Settlement implements Location, Nameable {
             GoodsType requiredGoodsType = goodsRequired.getType();
             int remaining = goodsRequired.getAmount() - getGoodsCount(requiredGoodsType);
             if (remaining > 0) {
-                if (requiredGoodsType == Goods.HAMMERS) {
-                    getOwner().modifyGold(-remaining * getGameOptions().getInteger(GameOptions.HAMMER_PRICE));
-                    addGoods(Goods.HAMMERS, remaining);
-                } else {
+                if (requiredGoodsType.isStorable()) {
                     getOwner().getMarket().buy(requiredGoodsType, remaining, getOwner());
-                    addGoods(requiredGoodsType, remaining);
+                } else {
+                    getOwner().modifyGold(-remaining * requiredGoodsType.getPrice());
                 }
+                addGoods(requiredGoodsType, remaining);
             }
         }
     }
@@ -1247,7 +1251,7 @@ public final class Colony extends Settlement implements Location, Nameable {
     public Collection<String> getWarnings(GoodsType goodsType, int amount, int production) {
         List<String> result = new LinkedList<String>();
 
-        if (goodsType == Goods.FOOD) {
+        if (goodsType.isFoodType() && goodsType.isStorable()) {
             if (amount + production < 0) {
                 result.add(Messages.message("model.colony.famineFeared",
                         "%colony%", getName(),
@@ -1368,38 +1372,68 @@ public final class Colony extends Settlement implements Location, Nameable {
         }
     }
 
+    private void removeFood(final int amount) {
+        int rest = amount;
+        List<AbstractGoods> backlog = new ArrayList<AbstractGoods>();
+        for (GoodsType foodType : FreeCol.getSpecification().getGoodsFood()) {
+            int available = getGoodsCount(foodType);
+            if (available >= rest) {
+                removeGoods(foodType, rest);
+                for (AbstractGoods food : backlog) {
+                    removeGoods(food.getType(), food.getAmount());
+                }
+                rest = 0;
+            } else {
+                backlog.add(new AbstractGoods(foodType, available));
+                rest -= available;
+            }
+        }
+        if (rest > 0) {
+            throw new IllegalStateException("Attempted to remove more food than was present.");
+        }
+    }
+            
+    public int getFoodCount() {
+        int result = 0;
+        for (GoodsType foodType : FreeCol.getSpecification().getGoodsFood()) {
+            result += getGoodsCount(foodType);
+        }
+        return result;
+    }
+
 
     // Eat food:
     private void updateFood() {
-        int eat = getFoodConsumption();
-        int food = getGoodsCount(Goods.FOOD);
+        int required = getFoodConsumption();
+        int available = getFoodCount();
+        int production = getFoodProduction();
 
-        if (eat > food) {
+        if (required > available) {
             // Kill a colonist:
             getRandomUnit().dispose();
-            removeGoods(Goods.FOOD, food);
+            removeFood(available);
             addModelMessage(this, ModelMessage.MessageType.UNIT_LOST,
                             "model.colony.colonistStarved", "%colony%", getName());
         } else {
-            removeGoods(Goods.FOOD, eat);
-
-            if (eat > getFoodProduction() && (food - eat) / (eat - getFoodProduction()) <= 3) {
+            removeFood(required);
+            int turnsToLive = (available - required) / (required - production);
+            if (required > production && turnsToLive <= 3) {
                 addModelMessage(this, ModelMessage.MessageType.WARNING,
                                 "model.colony.famineFeared", "%colony%", getName(),
-                                "%number%", Integer.toString((food - eat) / (eat - getFoodProduction())));
+                                "%number%", String.valueOf(turnsToLive));
             }
         }
     }
 
     // Create a new colonist if there is enough food:
     private void checkForNewColonist() {
-        if (getGoodsCount(Goods.FOOD) >= FOOD_PER_COLONIST) {
+        if (getFoodCount() >= FOOD_PER_COLONIST) {
             List<UnitType> unitTypes = FreeCol.getSpecification().getUnitTypesWithAbility("model.ability.bornInColony");
             if (!unitTypes.isEmpty()) {
                 int random = getGame().getModelController().getRandom(getId() + "bornInColony", unitTypes.size());
                 Unit u = getGame().getModelController().createUnit(getId() + "newTurn200food",
                                                 getTile(), getOwner(), unitTypes.get(random));
-                removeGoods(Goods.FOOD, FOOD_PER_COLONIST);
+                removeFood(FOOD_PER_COLONIST);
                 addModelMessage(this, ModelMessage.MessageType.UNIT_ADDED, u,
                                 "model.colony.newColonist", "%colony%", getName());
                 logger.info("New colonist created in " + getName() + " with ID=" + u.getId());

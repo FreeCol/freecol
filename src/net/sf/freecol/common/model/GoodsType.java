@@ -31,6 +31,7 @@ import net.sf.freecol.common.Specification;
 public final class GoodsType extends FreeColGameObjectType {
 
     public static final int NO_BREEDING = Integer.MAX_VALUE;
+    public static final int NO_PRICE = Integer.MAX_VALUE;
 
     private boolean isFarmed;
     private boolean isFood;
@@ -74,6 +75,12 @@ public final class GoodsType extends FreeColGameObjectType {
      * obviously only applies to animals.
      */
     private int breedingNumber = NO_BREEDING;
+
+    /**
+     * The price of this type of goods. This is only used for goods
+     * that can not be traded in the market, such as hammers.
+     */
+    private int price = NO_PRICE;
 
     // ----------------------------------------------------------- constructors
 
@@ -244,6 +251,24 @@ public final class GoodsType extends FreeColGameObjectType {
         return breedingNumber != NO_BREEDING;
     }
 
+    /**
+     * Get the <code>Price</code> value.
+     *
+     * @return an <code>int</code> value
+     */
+    public int getPrice() {
+        return price;
+    }
+
+    /**
+     * Set the <code>Price</code> value.
+     *
+     * @param newPrice The new Price value.
+     */
+    public void setPrice(final int newPrice) {
+        this.price = newPrice;
+    }
+
     // ------------------------------------------------------------ API methods
 
     protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
@@ -259,6 +284,7 @@ public final class GoodsType extends FreeColGameObjectType {
         newWorldGoods = getAttribute(in, "new-world-goods", false);
         art = in.getAttributeValue(null, "art");
         breedingNumber = getAttribute(in, "breeding-number", NO_BREEDING);
+        price = getAttribute(in, "price", NO_PRICE);
 
         if (hasAttribute(in, "made-from")) {
             String  madeFromRef = in.getAttributeValue(null, "made-from");
