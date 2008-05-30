@@ -46,7 +46,8 @@
     <goods-type id="model.goods.silver" art="goods/silver.png" is-farmed="true">
       <market initial-amount="500"   initial-price="16" price-difference="2"/>
     </goods-type>
-    <goods-type id="model.goods.horses" art="goods/horses.png" is-farmed="false" made-from="model.goods.food">
+    <goods-type id="model.goods.horses" art="goods/horses.png" is-farmed="false"
+                breeding-number="2" made-from="model.goods.food">
       <market initial-amount="1000"  initial-price="1"  price-difference="2"/>
     </goods-type>
     <goods-type id="model.goods.rum" art="goods/rum.png" is-farmed="false" made-from="model.goods.sugar">

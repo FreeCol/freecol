@@ -216,13 +216,7 @@ public class PioneeringMission extends Mission {
                     t.getColony().getOwner() == u.getOwner() &&
                     t.getColony().canBuildEquipment(toolsType)) {
                     AIColony ac = (AIColony) getAIMain().getAIObject(t.getColony());
-                    target = true;
-                    for (AbstractGoods materials : toolsType.getGoodsRequired()) {
-                        if (ac.getAvailableGoods(materials.getType()) < materials.getAmount()) {
-                            target = false;
-                            break;
-                        }
-                    }
+                    target = ac.canBuildEquipment(toolsType);
                 }
                 if (target) {
                     best = pathNode;

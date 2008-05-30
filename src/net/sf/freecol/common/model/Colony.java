@@ -1019,6 +1019,20 @@ public final class Colony extends Settlement implements Location, Nameable {
         return count - used;
     }
 
+    /**
+     * Returns <code>true</code> if this Colony can breed the given
+     * type of Goods. Only animals (such as horses) are expected to be
+     * breedable.
+     *
+     * @param goodsType a <code>GoodsType</code> value
+     * @return a <code>boolean</code> value
+     */
+    public boolean canBreed(GoodsType goodsType) {
+        int breedingNumber = goodsType.getBreedingNumber();
+        return (breedingNumber != GoodsType.NO_BREEDING &&
+                breedingNumber <= getGoodsCount(goodsType));
+    }
+
 
     /**
      * Describe <code>canBuild</code> method here.
@@ -1110,14 +1124,13 @@ public final class Colony extends Settlement implements Location, Nameable {
                         // goods (e.g. hammers) are still missing
                         return;
                     }
-                    messages.add(new ModelMessage(this, "model.colony.buildableNeedsGoods",
-                                                  new String[][]{
-                                                      {"%colony%", getName()},
-                                                      {"%buildable%", buildable.getName()},
-                                                      {"%amount%", String.valueOf(required - available)},
-                                                      {"%goodsType%", requiredGoodsType.getName()}},
-                                                  ModelMessage.MessageType.MISSING_GOODS,
-                                                  requiredGoodsType));
+                    messages.add(new ModelMessage(this, ModelMessage.MessageType.MISSING_GOODS,
+                                                  requiredGoodsType,
+                                                  "model.colony.buildableNeedsGoods",
+                                                  "%colony%", getName(),
+                                                  "%buildable%", buildable.getName(),
+                                                  "%amount%", String.valueOf(required - available),
+                                                  "%goodsType%", requiredGoodsType.getName()));
                 }
             }
             if (messages.isEmpty()) {

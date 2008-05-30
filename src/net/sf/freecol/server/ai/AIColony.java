@@ -797,6 +797,35 @@ public class AIColony extends AIObject {
         return Math.max(0, colony.getGoodsCount(goodsType) - materialsRequiredForBuilding);
     }
 
+
+    /**
+     * Returns <code>true</code> if this AIColony can build the given
+     * type of equipment. Unlike the method of the Colony, this takes
+     * goods "reserved" for building or breeding purposes into account.
+     *
+     * @param equipmentType an <code>EquipmentType</code> value
+     * @return a <code>boolean</code> value
+     * @see Colony#canBuildEquipment(EquipmentType equipmentType)
+     */
+    public boolean canBuildEquipment(EquipmentType equipmentType) {
+        if (getColony().canBuildEquipment(equipmentType)) {
+            for (AbstractGoods goods : equipmentType.getGoodsRequired()) {
+                int breedingNumber = goods.getType().getBreedingNumber();
+                if (breedingNumber != GoodsType.NO_BREEDING &&
+                    getColony().getGoodsCount(goods.getType()) < goods.getAmount() + breedingNumber) {
+                    return false;
+                }
+                if (getAvailableGoods(goods.getType()) < goods.getAmount()) {
+                    return false;
+                }
+            }
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+
     /**
      * Rearranges the workers within this colony. This is done according to the
      * {@link ColonyPlan}, although minor adjustments can be done to increase

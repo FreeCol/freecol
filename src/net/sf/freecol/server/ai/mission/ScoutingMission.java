@@ -28,9 +28,11 @@ import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.freecol.FreeCol;
+import net.sf.freecol.common.model.AbstractGoods;
 import net.sf.freecol.common.model.EquipmentType;
 import net.sf.freecol.common.model.GoalDecider;
 import net.sf.freecol.common.model.Goods;
+import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.IndianSettlement;
 import net.sf.freecol.common.model.Map;
 import net.sf.freecol.common.model.Map.Direction;
@@ -43,6 +45,7 @@ import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.networking.Message;
 import net.sf.freecol.server.ai.AIMain;
 import net.sf.freecol.server.ai.AIObject;
+import net.sf.freecol.server.ai.AIColony;
 import net.sf.freecol.server.ai.AIUnit;
 
 import org.w3c.dom.Element;
@@ -59,6 +62,8 @@ public class ScoutingMission extends Mission {
     private static final EquipmentType horsesType = FreeCol.getSpecification().getEquipmentType("model.equipment.horses");
 
     private boolean valid = true;
+
+    private EquipmentType scoutEquipment;
 
     private Tile transportDestination = null;
 
@@ -124,33 +129,33 @@ public class ScoutingMission extends Mission {
             return;
         }
 
-        if (!getUnit().isMounted()) {
-            if (getUnit().getColony() != null
-                    && getUnit().getColony().getGoodsContainer().getGoodsCount(Goods.HORSES) >= 50) {
-                if (getUnit().getColony().getFoodProduction()
-                        - getUnit().getColony().getFoodConsumption() < 2
-                        || getUnit().getColony().getGoodsContainer().getGoodsCount(Goods.HORSES) >= 52) {
-                    Element equipUnitElement = Message.createNewRootElement("equipUnit");
-                    equipUnitElement.setAttribute("unit", getUnit().getId());
-                    equipUnitElement.setAttribute("type", horsesType.getId());
-                    equipUnitElement.setAttribute("amount", "1");
-                    try {
-                        connection.ask(equipUnitElement);
-                    } catch (IOException e) {
-                        logger.warning("Could not send \"equipUnit (50)\"-message!");
+        if (getUnit().getRole() != Unit.Role.SCOUT) {
+            if (getUnit().getColony() != null) {
+                AIColony colony = (AIColony) getAIMain().getAIObject(getUnit().getColony());
+                for (EquipmentType equipment : FreeCol.getSpecification().getEquipmentTypeList()) {
+                    if (equipment.getRole() == Unit.Role.SCOUT &&
+                        getUnit().canBeEquippedWith(equipment) && 
+                        colony.canBuildEquipment(equipment)) {
+                        Element equipUnitElement = Message.createNewRootElement("equipUnit");
+                        equipUnitElement.setAttribute("unit", getUnit().getId());
+                        equipUnitElement.setAttribute("type", equipment.getId());
+                        equipUnitElement.setAttribute("amount", "1");
+                        try {
+                            connection.ask(equipUnitElement);
+                            scoutEquipment = equipment;
+                        } catch (IOException e) {
+                            logger.warning("Could not send \"equipUnit\"-message!");
+                        }
+                        return;
                     }
-                    return;
-                } else {
-                    debugAction = "Awaiting 52 horses";
-                    return;
                 }
-            } else {
                 valid = false;
                 return;
             }
+
         }
 
-        if (!isTarget(getUnit().getTile(), getUnit())) {
+        if (!isTarget(getUnit().getTile(), getUnit(), scoutEquipment)) {
             GoalDecider destinationDecider = new GoalDecider() {
                 private PathNode best = null;
 
@@ -165,7 +170,7 @@ public class ScoutingMission extends Mission {
 
                 public boolean check(Unit u, PathNode pathNode) {
                     Tile t = pathNode.getTile();
-                    boolean target = isTarget(t, getUnit());
+                    boolean target = isTarget(t, getUnit(), scoutEquipment);
                     if (target) {
                         best = pathNode;
                         debugAction = "Target: " + t.getPosition();
@@ -206,7 +211,7 @@ public class ScoutingMission extends Mission {
                     }
                 }
             } else {
-                if (transportDestination != null && !isTarget(transportDestination, getUnit())) {
+                if (transportDestination != null && !isTarget(transportDestination, getUnit(), scoutEquipment)) {
                     transportDestination = null;
                 }
                 if (transportDestination == null) {
@@ -220,19 +225,22 @@ public class ScoutingMission extends Mission {
             return;
         }
 
-        if (isTarget(getUnit().getTile(), getUnit()) && getUnit().getColony() != null) {
-            Element equipUnitElement = Message.createNewRootElement("equipUnit");
-            equipUnitElement.setAttribute("unit", getUnit().getId());
-            EquipmentType equipment = FreeCol.getSpecification().getEquipmentType("model.equipment.horses");
-            equipUnitElement.setAttribute("type", equipment.getId());
-            equipUnitElement.setAttribute("amount", Integer.toString(0));
-            try {
-                connection.ask(equipUnitElement);
-            } catch (IOException e) {
-                logger.warning("Could not send \"equipUnit (0)\"-message!");
-                return;
+        if (isTarget(getUnit().getTile(), getUnit(), scoutEquipment) &&
+            getUnit().getColony() != null) {
+            if (scoutEquipment != null) {
+                Element equipUnitElement = Message.createNewRootElement("equipUnit");
+                equipUnitElement.setAttribute("unit", getUnit().getId());
+                equipUnitElement.setAttribute("type", scoutEquipment.getId());
+                equipUnitElement.setAttribute("amount", "0");
+                try {
+                    connection.ask(equipUnitElement);
+                    scoutEquipment = null;
+                } catch (IOException e) {
+                    logger.warning("Could not send \"equipUnit (0)\"-message!");
+                    return;
+                }
+                debugAction = "Awaiting 52 horses";
             }
-            debugAction = "Awaiting 52 horses";
         }
     }
         
@@ -254,7 +262,7 @@ public class ScoutingMission extends Mission {
 
                 public boolean check(Unit u, PathNode pathNode) {
                     Tile t = pathNode.getTile();
-                    boolean target = isTarget(t, getUnit());
+                    boolean target = isTarget(t, getUnit(), scoutEquipment);
                     if (target) {
                         best = pathNode;
                         debugAction = "Target: " + t.getPosition();
@@ -274,7 +282,7 @@ public class ScoutingMission extends Mission {
             Iterator<Position> it = getGame().getMap().getFloodFillIterator(getUnit().getTile().getPosition());
             while (it.hasNext()) {
                 Tile t = getGame().getMap().getTile(it.next());
-                if (isTarget(t, getUnit())) {
+                if (isTarget(t, getUnit(), scoutEquipment)) {
                     transportDestination = t;
                     debugAction = "Transport to: " + transportDestination.getPosition();
                     return;
@@ -285,13 +293,20 @@ public class ScoutingMission extends Mission {
         }
     }
 
-    private static boolean isTarget(Tile t, Unit u) {
+    private static boolean isTarget(Tile t, Unit u, EquipmentType scoutEquipment) {
         if (t.hasLostCityRumour()) {
             return true;
-        } else if (t.getColony() != null && t.getColony().getOwner() == u.getOwner()
-                && t.getColony().getGoodsContainer().getGoodsCount(Goods.HORSES) <= 1
-                && t.getColony().getFoodProduction() - t.getColony().getFoodConsumption() >= 2) {
-            return true;
+        } else if (scoutEquipment != null && t.getColony() != null &&
+                   t.getColony().getOwner() == u.getOwner()) {
+            for (AbstractGoods goods : scoutEquipment.getGoodsRequired()) {
+                if (goods.getType().isBreedable() &&
+                    !t.getColony().canBreed(goods.getType()) &&
+                    // TODO: remove assumptions about auto-production implementation
+                    t.getColony().getProductionNetOf(goods.getType()) > 1) {
+                    return true;
+                }
+            }
+            return false;
         } else if (t.getSettlement() != null && t.getSettlement() instanceof IndianSettlement
                 && !((IndianSettlement) t.getSettlement()).hasBeenVisited()) {
             return true;
@@ -361,7 +376,7 @@ public class ScoutingMission extends Mission {
         Iterator<Position> it = au.getGame().getMap().getFloodFillIterator(au.getUnit().getTile().getPosition());
         while (it.hasNext()) {
             Tile t = au.getGame().getMap().getTile(it.next());
-            if (isTarget(t, au.getUnit())) {
+            if (isTarget(t, au.getUnit(), null)) {
                 return true;
             }
         }
@@ -413,4 +428,5 @@ public class ScoutingMission extends Mission {
     public String getDebuggingInfo() {
         return debugAction;
     }
+
 }

@@ -17,9 +17,7 @@
  *  along with FreeCol.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
 package net.sf.freecol.common.model;
-
 
 import java.util.Map;
 
@@ -30,8 +28,9 @@ import javax.xml.stream.XMLStreamReader;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.Specification;
 
-public final class GoodsType extends FreeColGameObjectType
-{
+public final class GoodsType extends FreeColGameObjectType {
+
+    public static final int NO_BREEDING = Integer.MAX_VALUE;
 
     private boolean isFarmed;
     private boolean isFood;
@@ -55,17 +54,26 @@ public final class GoodsType extends FreeColGameObjectType
      */
     private boolean tradeGoods;
 
-    private GoodsType madeFrom;
-    private GoodsType makes;
-    
-    private GoodsType storedAs;
+    /**
+     * Whether this type of goods can be stored in a warehouse.
+     */
     private boolean storable;
 
+    private GoodsType madeFrom;
+    private GoodsType makes;
+    private GoodsType storedAs;
+    
     private String art;
     
     private int initialAmount;
     private int initialPrice;
     private int priceDiff;
+
+    /**
+     * The number of units required to breed this type of goods. This
+     * obviously only applies to animals.
+     */
+    private int breedingNumber = NO_BREEDING;
 
     // ----------------------------------------------------------- constructors
 
@@ -207,6 +215,35 @@ public final class GoodsType extends FreeColGameObjectType
         this.tradeGoods = newTradeGoods;
     }
 
+    /**
+     * Get the <code>BreedingNumber</code> value.
+     *
+     * @return an <code>int</code> value
+     */
+    public int getBreedingNumber() {
+        return breedingNumber;
+    }
+
+    /**
+     * Set the <code>BreedingNumber</code> value.
+     *
+     * @param newBreedingNumber The new BreedingNumber value.
+     */
+    public void setBreedingNumber(final int newBreedingNumber) {
+        this.breedingNumber = newBreedingNumber;
+    }
+
+    /**
+     * Returns <code>true</code> if this type of Goods is
+     * breedable. This should only be true for animals, such as
+     * horses.
+     *
+     * @return a <code>boolean</code> value
+     */
+    public boolean isBreedable() {
+        return breedingNumber != NO_BREEDING;
+    }
+
     // ------------------------------------------------------------ API methods
 
     protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
@@ -221,6 +258,7 @@ public final class GoodsType extends FreeColGameObjectType
         ignoreLimit = getAttribute(in, "ignore-limit", false);
         newWorldGoods = getAttribute(in, "new-world-goods", false);
         art = in.getAttributeValue(null, "art");
+        breedingNumber = getAttribute(in, "breeding-number", NO_BREEDING);
 
         if (hasAttribute(in, "made-from")) {
             String  madeFromRef = in.getAttributeValue(null, "made-from");
