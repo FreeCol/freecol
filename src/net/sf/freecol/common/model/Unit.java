@@ -2716,7 +2716,7 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
      *         where it is located and <code>false</code> otherwise.
      */
     public boolean canBuildColony() {
-        return (hasAbility("model.ability.foundColony") &&
+        return (unitType.hasAbility("model.ability.foundColony") &&
                 getMovesLeft() > 0 && 
                 getTile() != null && 
                 getTile().isColonizeable());
