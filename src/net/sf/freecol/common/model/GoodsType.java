@@ -169,9 +169,11 @@ public final class GoodsType extends FreeColGameObjectType {
     }
 
     /**
-     * Get the <code>BuildingMaterial</code> value.
+     * Returns true if this type of goods is required for building a
+     * BuildableType.
      *
      * @return a <code>boolean</code> value
+     * @see BuildableType
      */
     public boolean isBuildingMaterial() {
         return buildingMaterial;
@@ -184,6 +186,25 @@ public final class GoodsType extends FreeColGameObjectType {
      */
     public void setBuildingMaterial(final boolean newBuildingMaterial) {
         this.buildingMaterial = newBuildingMaterial;
+    }
+
+    /**
+     * Returns true if this type of goods is required for producing a
+     * type of goods required for building a BuildableType.
+     *
+     * @return a <code>boolean</code> value
+     * @see BuildableType
+     */
+    public boolean isRawBuildingMaterial() {
+        GoodsType refinedType = makes;
+        while (refinedType != null) {
+            if (refinedType.isBuildingMaterial()) {
+                return true;
+            } else {
+                refinedType = refinedType.makes;
+            }
+        }
+        return false;
     }
 
     /**

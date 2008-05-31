@@ -1553,10 +1553,10 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
                     out.writeAttribute("owner", getSettlement().getOwner().getId());
                     out.writeAttribute("isCapital", Boolean.toString(is.isCapital()));
                     writeAttribute(out, "learnableSkill", pet.getSkill());
-                    if (pet.getHighlyWantedGoods() != null) {
-                        out.writeAttribute("wantedGoods0", pet.getHighlyWantedGoods().getId());
-                        out.writeAttribute("wantedGoods1", pet.getWantedGoods1().getId());
-                        out.writeAttribute("wantedGoods2", pet.getWantedGoods2().getId());
+                    if (pet.getWantedGoods()[0] != null) {
+                        out.writeAttribute("wantedGoods0", pet.getWantedGoods()[0].getId());
+                        out.writeAttribute("wantedGoods1", pet.getWantedGoods()[1].getId());
+                        out.writeAttribute("wantedGoods2", pet.getWantedGoods()[2].getId());
                     }
                     out.writeAttribute("hasBeenVisited", Boolean.toString(pet.hasBeenVisited()));
 
@@ -1926,9 +1926,7 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
         PlayerExploredTile playerExploredTile = getPlayerExploredTile(player);
         IndianSettlement is = (IndianSettlement) getSettlement();
         playerExploredTile.setSkill(is.getLearnableSkill());
-        playerExploredTile.setHighlyWantedGoods(is.getHighlyWantedGoods());
-        playerExploredTile.setWantedGoods1(is.getWantedGoods1());
-        playerExploredTile.setWantedGoods2(is.getWantedGoods2());
+        playerExploredTile.setWantedGoods(is.getWantedGoods());
         playerExploredTile.setVisited();
     }
 
@@ -1969,7 +1967,7 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
 
         // IndianSettlement data:
         private UnitType skill = null;
-        private GoodsType highlyWantedGoods = null, wantedGoods1 = null, wantedGoods2 = null;
+        private GoodsType[] wantedGoods = {null, null, null};
         private boolean settlementVisited = false;
 
         private Unit missionary = null;
@@ -2073,28 +2071,12 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
             return owner;
         }
 
-        public void setHighlyWantedGoods(GoodsType highlyWantedGoods) {
-            this.highlyWantedGoods = highlyWantedGoods;
+        public void setWantedGoods(GoodsType[] newWantedGoods) {
+            this.wantedGoods = newWantedGoods;
         }
 
-        public GoodsType getHighlyWantedGoods() {
-            return highlyWantedGoods;
-        }
-
-        public void setWantedGoods1(GoodsType wantedGoods1) {
-            this.wantedGoods1 = wantedGoods1;
-        }
-
-        public GoodsType getWantedGoods1() {
-            return wantedGoods1;
-        }
-
-        public void setWantedGoods2(GoodsType wantedGoods2) {
-            this.wantedGoods2 = wantedGoods2;
-        }
-
-        public GoodsType getWantedGoods2() {
-            return wantedGoods2;
+        public GoodsType[] getWantedGoods() {
+            return wantedGoods;
         }
 
         public void setMissionary(Unit missionary) {
@@ -2185,9 +2167,9 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
 
             writeAttribute(out, "learnableSkill", skill);
             writeAttribute(out, "region", region);
-            writeAttribute(out, "wantedGoods0", highlyWantedGoods);
-            writeAttribute(out, "wantedGoods1", wantedGoods1);
-            writeAttribute(out, "wantedGoods2", wantedGoods2);
+            writeAttribute(out, "wantedGoods0", wantedGoods[0]);
+            writeAttribute(out, "wantedGoods1", wantedGoods[1]);
+            writeAttribute(out, "wantedGoods2", wantedGoods[2]);
 
             out.writeAttribute("settlementVisited", Boolean.toString(settlementVisited));
 
@@ -2255,13 +2237,9 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
 
             final String highlyWantedGoodsStr = in.getAttributeValue(null, "wantedGoods0");
             if (highlyWantedGoodsStr != null) {
-                highlyWantedGoods = spec.getGoodsType(highlyWantedGoodsStr);
-                wantedGoods1 = spec.getGoodsType(in.getAttributeValue(null, "wantedGoods1"));
-                wantedGoods2 = spec.getGoodsType(in.getAttributeValue(null, "wantedGoods2"));
-            } else {
-                highlyWantedGoods = null;
-                wantedGoods1 = null;
-                wantedGoods2 = null;
+                wantedGoods[0] = spec.getGoodsType(highlyWantedGoodsStr);
+                wantedGoods[1] = spec.getGoodsType(in.getAttributeValue(null, "wantedGoods1"));
+                wantedGoods[2] = spec.getGoodsType(in.getAttributeValue(null, "wantedGoods2"));
             }
 
             String regionString = in.getAttributeValue(null, "region");

@@ -27,6 +27,7 @@ import java.util.List;
 import java.util.logging.Logger;
 
 import net.sf.freecol.FreeCol;
+import net.sf.freecol.common.model.AbstractGoods;
 import net.sf.freecol.common.model.BuildableType;
 import net.sf.freecol.common.model.Building;
 import net.sf.freecol.common.model.BuildingType;
@@ -615,8 +616,14 @@ public class ColonyPlan {
     private GoodsType getBestGoodsToProduce(Tile t) {
         if (t.hasResource()) {
             return t.getTileItemContainer().getResource().getBestGoodsType();
+        } else {
+            List<AbstractGoods> sortedPotentials = t.getSortedPotential();
+            if (sortedPotentials.isEmpty()) {
+                return null;
+            } else {
+                return sortedPotentials.get(0).getType();
+            }
         }
-        return t.getSortedPotential().get(0).getType();
     }
 
     /**

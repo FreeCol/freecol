@@ -1116,9 +1116,9 @@ public final class Canvas extends JDesktopPane {
             text.append(" ");
         }
         text.append(Messages.message("scoutSettlement.trade",
-                                     "%goods1%", settlement.getHighlyWantedGoods().getName(),
-                                     "%goods2%", settlement.getWantedGoods1().getName(),
-                                     "%goods3%", settlement.getWantedGoods2().getName()));
+                                     "%goods1%", settlement.getWantedGoods()[0].getName(),
+                                     "%goods2%", settlement.getWantedGoods()[1].getName(),
+                                     "%goods3%", settlement.getWantedGoods()[2].getName()));
         text.append("\n\n");
     
         FreeColDialog scoutDialog = FreeColDialog

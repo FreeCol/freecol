@@ -49,6 +49,11 @@ public abstract class FreeColObject {
     protected static Logger logger = Logger.getLogger(FreeColObject.class.getName());
 
     /**
+     * XML tag name for ID attribute.
+     */
+    protected static final String ID_ATTRIBUTE = "ID";
+
+    /**
      * XML tag name for array elements.
      */
     protected static final String ARRAY_SIZE = "xLength";

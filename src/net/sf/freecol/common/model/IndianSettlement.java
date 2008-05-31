@@ -17,7 +17,6 @@
  *  along with FreeCol.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
 package net.sf.freecol.common.model;
 
 import java.util.ArrayList;
@@ -56,6 +55,10 @@ public class IndianSettlement extends Settlement {
     public static final int ALARM_RADIUS = 2;
 
     public static final String UNITS_TAG_NAME = "units";
+    public static final String OWNED_UNITS_TAG_NAME = "ownedUnits";
+    public static final String ALARM_TAG_NAME = "alarm";
+    public static final String MISSIONARY_TAG_NAME = "missionary";
+    public static final String WANTED_GOODS_TAG_NAME = "wantedGoods";
 
     /** The amount of goods a brave can produce a single turn. */
     //private static final int WORK_AMOUNT = 5;
@@ -396,34 +399,6 @@ public class IndianSettlement extends Settlement {
         return learnableSkill;
     }
 
-
-    /**
-     * Returns this settlement's highly wanted goods.
-     * @return This settlement's highly wanted goods.
-     */
-    public GoodsType getHighlyWantedGoods() {
-        return wantedGoods[0];
-    }
-
-
-    /**
-     * Returns this settlement's wanted goods 1.
-     * @return This settlement's wanted goods 1.
-     */
-    public GoodsType getWantedGoods1() {
-        return wantedGoods[1];
-    }
-
-
-    /**
-     * Returns this settlement's wanted goods 2.
-     * @return This settlement's wanted goods 2.
-     */
-    public GoodsType getWantedGoods2() {
-        return wantedGoods[2];
-    }
-
-
     /**
      * Returns the missionary from this settlement if there is one or null if there is none.
      * @return The missionary from this settlement if there is one or null if there is none.
@@ -466,32 +441,32 @@ public class IndianSettlement extends Settlement {
     	
     	// Attempt Successful
     	if(success.equals("true")){
-    		switch(tension){
-    			case HAPPY:
-    				response = "indianSettlement.mission.Happy";
-    				break;
-    			case CONTENT:
-    				response = "indianSettlement.mission.Content";
-    				break;
-    			case DISPLEASED:
-    				response = "indianSettlement.mission.Displeased";
-    				break;
-    			default:
-    				logger.warning("Unknown response for tension " + tension);
-    		}
+            switch(tension){
+            case HAPPY:
+                response = "indianSettlement.mission.Happy";
+                break;
+            case CONTENT:
+                response = "indianSettlement.mission.Content";
+                break;
+            case DISPLEASED:
+                response = "indianSettlement.mission.Displeased";
+                break;
+            default:
+                logger.warning("Unknown response for tension " + tension);
+            }
     				
     	}
     	else{
-    		switch(tension){
-    			case ANGRY:
-    				response = "indianSettlement.mission.Angry";
-    				break;	
-    			case HATEFUL:
-    				response = "indianSettlement.mission.Hateful";
-    				break;	
-    			default:
-    				logger.warning("Requesting reaction when no mission was established");
-    		}
+            switch(tension){
+            case ANGRY:
+                response = "indianSettlement.mission.Angry";
+                break;	
+            case HATEFUL:
+                response = "indianSettlement.mission.Hateful";
+                break;	
+            default:
+                logger.warning("Requesting reaction when no mission was established");
+            }
     	}
     	return response;
     }
@@ -712,7 +687,9 @@ public class IndianSettlement extends Settlement {
             int startPrice = (24+getPriceAddition()) - (supply/Unit.HORSES_TO_MOUNT_INDIAN);
 
             for (int i=0; i<sets; i++) {
-                if ((startPrice-(i*4)) < 4 && (need > supply || goodsContainer.getGoodsCount(Goods.HORSES) < Unit.HORSES_TO_MOUNT_INDIAN * 2)) {
+                if ((startPrice-(i*4)) < 4 &&
+                    (need > supply ||
+                     goodsContainer.getGoodsCount(Goods.HORSES) < Unit.HORSES_TO_MOUNT_INDIAN * 2)) {
                     startPrice = 4+(i*4);
                 }
                 returnPrice += Unit.HORSES_TO_MOUNT_INDIAN * (startPrice-(i*4));
@@ -784,9 +761,7 @@ public class IndianSettlement extends Settlement {
 
 
     /**
-     * Updates the variables {@link #getHighlyWantedGoods wantedGoods[0]},
-     * {@link #getWantedGoods1 wantedGoods[1]} and
-     * {@link #getWantedGoods2 wantedGoods[2]}.
+     * Updates the variable wantedGoods.
      *
      * <br><br>
      *
@@ -879,7 +854,7 @@ public class IndianSettlement extends Settlement {
             }
         }
         
-        if (type == Goods.FOOD) {
+        if (type.isFoodType()) {
             potential = Math.min(potential, ownedUnits.size()*3);
         }
         
@@ -909,8 +884,9 @@ public class IndianSettlement extends Settlement {
         if (goodsContainer.getGoodsCount(Goods.TOOLS) > 0) {
             GoodsType typeWithSmallestAmount = null;
             for (GoodsType g : goodsList) {
-                if (g == Goods.FOOD || g == Goods.LUMBER || g == Goods.ORE || g == Goods.TOOLS)
+                if (g.isFoodType() || g.isBuildingMaterial() || g.isRawBuildingMaterial()) {
                     continue;
+                }
                 if (g.isRawMaterial() && goodsContainer.getGoodsCount(g) > KEEP_RAW_MATERIAL) {
                     if (typeWithSmallestAmount == null ||
                         goodsContainer.getGoodsCount(g.getProducedMaterial()) < goodsContainer.getGoodsCount(typeWithSmallestAmount)) {
@@ -1060,9 +1036,9 @@ public class IndianSettlement extends Settlement {
                         Unit u = modelController.createUnit(getId() + "newTurn100missionary", targetTile,
                                                             missionary.getOwner(), converts.get(random));
                         addModelMessage(u, ModelMessage.MessageType.UNIT_ADDED, u,
-                                "model.colony.newConvert",
-                                "%nation%", getOwner().getNationAsString(),
-                                "%colony%", targetTile.getColony().getName());
+                                        "model.colony.newConvert",
+                                        "%nation%", getOwner().getNationAsString(),
+                                        "%colony%", targetTile.getColony().getName());
                         logger.info("New convert created for " + missionary.getOwner().getName() + " with ID=" + u.getId());
                     }
                 }
@@ -1135,7 +1111,7 @@ public class IndianSettlement extends Settlement {
     }
 
     private void unitsToXML(XMLStreamWriter out, Player player, boolean showAll, boolean toSavedGame)
-            throws XMLStreamException {
+        throws XMLStreamException {
         if (!units.isEmpty()) {
             out.writeStartElement(UNITS_TAG_NAME);
             for (Unit unit : units) {
@@ -1184,17 +1160,6 @@ public class IndianSettlement extends Settlement {
         out.writeAttribute("isCapital", Boolean.toString(isCapital));
 
         if (getGame().isClientTrusted() || showAll || player == getOwner()) {
-            String ownedUnitsString = "";
-            for (int i=0; i<ownedUnits.size(); i++) {
-                ownedUnitsString += ownedUnits.get(i).getId();
-                if (i != ownedUnits.size() - 1) {
-                    ownedUnitsString += ", ";
-                }
-            }
-            if (!ownedUnitsString.equals("")) {
-                out.writeAttribute("ownedUnits", ownedUnitsString);
-            }
-
             out.writeAttribute("hasBeenVisited", Boolean.toString(isVisited));
             out.writeAttribute("convertProgress", Integer.toString(convertProgress));
             writeAttribute(out, "learnableSkill", learnableSkill);
@@ -1203,18 +1168,19 @@ public class IndianSettlement extends Settlement {
                 String tag = "wantedGoods" + Integer.toString(i);
                 out.writeAttribute(tag, wantedGoods[i].getId());
             }
-
         }
+
+        // attributes end here
         
         for (Entry<Player, Tension> entry : alarm.entrySet()) {
-            out.writeStartElement("alarm");
+            out.writeStartElement(ALARM_TAG_NAME);
             out.writeAttribute("player", entry.getKey().getId());
             out.writeAttribute("value", String.valueOf(entry.getValue().getValue()));
             out.writeEndElement();
         }
 
         if (missionary != null) {
-            out.writeStartElement("missionary");
+            out.writeStartElement(MISSIONARY_TAG_NAME);
             missionary.toXML(out, player, showAll, toSavedGame);
             out.writeEndElement();
         }
@@ -1222,6 +1188,11 @@ public class IndianSettlement extends Settlement {
         if (getGame().isClientTrusted() || showAll || player == getOwner()) {
             unitsToXML(out, player, showAll, toSavedGame);
             goodsContainer.toXML(out, player, showAll, toSavedGame);
+            for (Unit unit : ownedUnits) {
+                out.writeStartElement(OWNED_UNITS_TAG_NAME);
+                out.writeAttribute(ID_ATTRIBUTE, unit.getId());
+                out.writeEndElement();
+            }
         } else {
             GoodsContainer emptyGoodsContainer = new GoodsContainer(getGame(), this);
             emptyGoodsContainer.setFakeID(goodsContainer.getId());
@@ -1239,7 +1210,7 @@ public class IndianSettlement extends Settlement {
      */
     @Override
     protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
-        setId(in.getAttributeValue(null, "ID"));
+        setId(in.getAttributeValue(null, ID_ATTRIBUTE));
 
         tile = (Tile) getGame().getFreeColGameObject(in.getAttributeValue(null, "tile"));
         if (tile == null) {
@@ -1256,6 +1227,7 @@ public class IndianSettlement extends Settlement {
         
         ownedUnits.clear();
         
+        // TODO: this is support for 0.7 savegames, remove sometime
         final String ownedUnitsStr = in.getAttributeValue(null, "ownedUnits");
         if (ownedUnitsStr != null) {
             StringTokenizer st = new StringTokenizer(ownedUnitsStr, ", ", false);
@@ -1269,9 +1241,10 @@ public class IndianSettlement extends Settlement {
                 ownedUnits.add(u);
             }
         }
+        // end TODO
 
         for (int i = 0; i < wantedGoods.length; i++) {
-            String tag = "wantedGoods" + Integer.toString(i);
+            String tag = WANTED_GOODS_TAG_NAME + Integer.toString(i);
             String wantedGoodsId = getAttribute(in, tag, null);
             if (wantedGoodsId != null) {
                 wantedGoods[i] = FreeCol.getSpecification().getGoodsType(wantedGoodsId);
@@ -1288,31 +1261,31 @@ public class IndianSettlement extends Settlement {
 
         alarm = new HashMap<Player, Tension>();
         while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
-            if (in.getLocalName().equals("alarm")) {
+            if (ALARM_TAG_NAME.equals(in.getLocalName())) {
                 Player player = (Player) getGame().getFreeColGameObject(in.getAttributeValue(null, "player"));
                 alarm.put(player, new Tension(getAttribute(in, "value", 0)));
                 in.nextTag(); // close element
-            } else if (in.getLocalName().equals("wantedGoods")) {
-                String[] wantedGoodsID = readFromArrayElement("wantedGoods", in, new String[0]);
+            } else if (WANTED_GOODS_TAG_NAME.equals(in.getLocalName())) {
+                String[] wantedGoodsID = readFromArrayElement(WANTED_GOODS_TAG_NAME, in, new String[0]);
                 for (int i = 0; i < wantedGoodsID.length; i++) {
                     if (i == 3)
                         break;
                     wantedGoods[i] = FreeCol.getSpecification().getGoodsType(wantedGoodsID[i]);
                 }
-            } else if (in.getLocalName().equals("missionary")) {
+            } else if (MISSIONARY_TAG_NAME.equals(in.getLocalName())) {
                 in.nextTag();
-                missionary = (Unit) getGame().getFreeColGameObject(in.getAttributeValue(null, "ID"));
+                missionary = (Unit) getGame().getFreeColGameObject(in.getAttributeValue(null, ID_ATTRIBUTE));
                 if (missionary == null) {
                     missionary = new Unit(getGame(), in);
                 } else {
                     missionary.readFromXML(in);
                 }
                 in.nextTag();                
-            } else if (in.getLocalName().equals(UNITS_TAG_NAME)) {
+            } else if (UNITS_TAG_NAME.equals(in.getLocalName())) {
                 units = new ArrayList<Unit>();
                 while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
                     if (in.getLocalName().equals(Unit.getXMLElementTagName())) {
-                        Unit unit = (Unit) getGame().getFreeColGameObject(in.getAttributeValue(null, "ID"));
+                        Unit unit = (Unit) getGame().getFreeColGameObject(in.getAttributeValue(null, ID_ATTRIBUTE));
                         if (unit != null) {
                             unit.readFromXML(in);
                             units.add(unit);
@@ -1322,8 +1295,17 @@ public class IndianSettlement extends Settlement {
                         }
                     }
                 }
+            } else if (OWNED_UNITS_TAG_NAME.equals(in.getLocalName())) {
+                String unitID = in.getAttributeValue(null, ID_ATTRIBUTE);
+                Unit unit = (Unit) getGame().getFreeColGameObject(unitID);
+                if (unit == null) {
+                    unit = new Unit(getGame(), unitID);
+                }
+                ownedUnits.add(unit);
+                owner.setUnit(unit);
+                in.nextTag();
             } else if (in.getLocalName().equals(GoodsContainer.getXMLElementTagName())) {
-                goodsContainer = (GoodsContainer) getGame().getFreeColGameObject(in.getAttributeValue(null, "ID"));
+                goodsContainer = (GoodsContainer) getGame().getFreeColGameObject(in.getAttributeValue(null, ID_ATTRIBUTE));
                 if (goodsContainer != null) {
                     goodsContainer.readFromXML(in);
                 } else {
