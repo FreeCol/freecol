@@ -396,7 +396,7 @@ public class ColonyPlan {
         }
 
         // Remove the secondary goods if we need food:
-        if (getProductionOf(Goods.FOOD) < workLocationPlans.size() * 2 &&
+        if (getFoodProduction() < workLocationPlans.size() * Colony.FOOD_CONSUMPTION &&
             secondaryRawMaterial.isNewWorldGoodsType()) {
             Iterator<WorkLocationPlan> wlpIterator2 = workLocationPlans.iterator();
             while (wlpIterator2.hasNext()) {
@@ -413,9 +413,9 @@ public class ColonyPlan {
         }
 
         // Remove the workers on the primary goods one-by-one if we need food:
-        if (getProductionOf(Goods.FOOD) < workLocationPlans.size() * 2) {
+        if (getFoodProduction() < workLocationPlans.size() * Colony.FOOD_CONSUMPTION) {
             Iterator<WorkLocationPlan> wlpIterator2 = workLocationPlans.iterator();
-            while (wlpIterator2.hasNext() && getProductionOf(Goods.FOOD) < workLocationPlans.size() * 2) {
+            while (wlpIterator2.hasNext() && getFoodProduction() < workLocationPlans.size() * Colony.FOOD_CONSUMPTION) {
                 WorkLocationPlan wlp = wlpIterator2.next();
                 if (wlp.getWorkLocation() instanceof ColonyTile && wlp.getGoodsType() == primaryRawMaterial) {
                     Tile t = ((ColonyTile) wlp.getWorkLocation()).getWorkTile();
@@ -429,9 +429,9 @@ public class ColonyPlan {
         }
 
         // Remove the manufacturer if we still lack food:
-        if (getProductionOf(Goods.FOOD) < workLocationPlans.size() * 2) {
+        if (getFoodProduction() < workLocationPlans.size() * Colony.FOOD_CONSUMPTION) {
             Iterator<WorkLocationPlan> wlpIterator2 = workLocationPlans.iterator();
-            while (wlpIterator2.hasNext() && getProductionOf(Goods.FOOD) < workLocationPlans.size() * 2) {
+            while (wlpIterator2.hasNext() && getFoodProduction() < workLocationPlans.size() * Colony.FOOD_CONSUMPTION) {
                 WorkLocationPlan wlp = wlpIterator2.next();
                 if (wlp.getWorkLocation() instanceof Building) {
                     Building b = (Building) wlp.getWorkLocation();
@@ -443,9 +443,9 @@ public class ColonyPlan {
         }
 
         // Remove the lumberjacks if we still lack food:
-        if (getProductionOf(Goods.FOOD) < workLocationPlans.size() * 2) {
+        if (getFoodProduction() < workLocationPlans.size() * Colony.FOOD_CONSUMPTION) {
             Iterator<WorkLocationPlan> wlpIterator2 = workLocationPlans.iterator();
-            while (wlpIterator2.hasNext() && getProductionOf(Goods.FOOD) < workLocationPlans.size() * 2) {
+            while (wlpIterator2.hasNext() && getFoodProduction() < workLocationPlans.size() * Colony.FOOD_CONSUMPTION) {
                 WorkLocationPlan wlp = wlpIterator2.next();
                 if (wlp.getWorkLocation() instanceof ColonyTile && wlp.getGoodsType() == Goods.LUMBER) {
                     wlpIterator2.remove();
@@ -455,9 +455,9 @@ public class ColonyPlan {
 
         // Remove the carpenter if we have no lumber or lack food:
         // TODO: Erik - run short on lumber as long as there is a stockpile!
-        if (getProductionOf(Goods.LUMBER) < 1 || getProductionOf(Goods.FOOD) < workLocationPlans.size() * 2) {
+        if (getProductionOf(Goods.LUMBER) < 1 || getFoodProduction() < workLocationPlans.size() * Colony.FOOD_CONSUMPTION) {
             Iterator<WorkLocationPlan> wlpIterator2 = workLocationPlans.iterator();
-            while (wlpIterator2.hasNext() && getProductionOf(Goods.FOOD) < workLocationPlans.size() * 2) {
+            while (wlpIterator2.hasNext() && getFoodProduction() < workLocationPlans.size() * Colony.FOOD_CONSUMPTION) {
                 WorkLocationPlan wlp = wlpIterator2.next();
                 if (wlp.getWorkLocation() instanceof Building) {
                     Building b = (Building) wlp.getWorkLocation();
@@ -469,9 +469,9 @@ public class ColonyPlan {
         }
 
         // Remove all other colonists in buildings if we still are lacking food:
-        if (getProductionOf(Goods.FOOD) < workLocationPlans.size() * 2) {
+        if (getFoodProduction() < workLocationPlans.size() * Colony.FOOD_CONSUMPTION) {
             Iterator<WorkLocationPlan> wlpIterator2 = workLocationPlans.iterator();
-            while (wlpIterator2.hasNext() && getProductionOf(Goods.FOOD) < workLocationPlans.size() * 2) {
+            while (wlpIterator2.hasNext() && getFoodProduction() < workLocationPlans.size() * Colony.FOOD_CONSUMPTION) {
                 WorkLocationPlan wlp = wlpIterator2.next();
                 if (wlp.getWorkLocation() instanceof Building) {
                     wlpIterator2.remove();
@@ -488,7 +488,7 @@ public class ColonyPlan {
             boolean blacksmithAdded = false;
 
             // Add a manufacturer for the secondary type of goods:
-            if (getProductionOf(Goods.FOOD) >= workLocationPlans.size() * 2 + 2 &&
+            if (getFoodProduction() >= workLocationPlans.size() * Colony.FOOD_CONSUMPTION + 2 &&
                 secondaryRawMaterial != null &&
                 12 * secondaryWorkers + 6 <= getProductionOf(secondaryRawMaterial) &&
                 secondaryWorkers <= MAX_LEVEL) {
@@ -506,7 +506,7 @@ public class ColonyPlan {
             }
 
             // Add a manufacturer for the primary type of goods:
-            if (getProductionOf(Goods.FOOD) >= workLocationPlans.size() * 2 + 2 && primaryRawMaterial != null
+            if (getFoodProduction() >= workLocationPlans.size() * Colony.FOOD_CONSUMPTION + 2 && primaryRawMaterial != null
                     && 12 * primaryWorkers + 6 <= getProductionOf(primaryRawMaterial)
                     && primaryWorkers <= MAX_LEVEL) {
                 GoodsType producedGoods = primaryRawMaterial.getProducedMaterial();
@@ -523,7 +523,7 @@ public class ColonyPlan {
             }
 
             // Add a gunsmith:
-            if (blacksmithAdded && getProductionOf(Goods.FOOD) >= workLocationPlans.size() * 2 + 2
+            if (blacksmithAdded && getFoodProduction() >= workLocationPlans.size() * Colony.FOOD_CONSUMPTION + 2
                     && gunsmiths < MAX_LEVEL) {
                 Building b = colony.getBuildingForProducing(Goods.MUSKETS);
                 if (b != null) {
@@ -535,7 +535,7 @@ public class ColonyPlan {
             }
 
             // Add carpenters:
-            if (getProductionOf(Goods.FOOD) >= workLocationPlans.size() * 2 + 2
+            if (getFoodProduction() >= workLocationPlans.size() * Colony.FOOD_CONSUMPTION + 2
                     && 12 * carpenters + 6 <= getProductionOf(Goods.LUMBER) && carpenters <= MAX_LEVEL) {
                 if (carpenter != null) {
                     WorkLocationPlan wlp = new WorkLocationPlan(getAIMain(), carpenter, Goods.HAMMERS);
@@ -572,10 +572,34 @@ public class ColonyPlan {
         }
 
         // Add values for the center tile:
-        if (goodsType == Goods.FOOD) {
-            amount += colony.getTile().getMaximumPotential(Goods.FOOD);
-        } else if (goodsType == colony.getTile().secondaryGoods()) {
+        if (goodsType == colony.getTile().primaryGoods() ||
+            goodsType == colony.getTile().secondaryGoods()) {
             amount += colony.getTile().getMaximumPotential(goodsType);
+        }
+
+        return amount;
+    }
+
+    /**
+     * Returns the production of food accoring to this plan.
+     * 
+     * @return The maximum possible food production
+     *         according to this <code>ColonyPlan</code>.
+     */
+    public int getFoodProduction() {
+        int amount = 0;
+        for (GoodsType foodType : FreeCol.getSpecification().getGoodsFood()) {
+            Iterator<WorkLocationPlan> wlpIterator = workLocationPlans.iterator();
+            while (wlpIterator.hasNext()) {
+                WorkLocationPlan wlp = wlpIterator.next();
+                amount += wlp.getProductionOf(foodType);
+            }
+
+            // Add values for the center tile:
+            if (foodType == colony.getTile().primaryGoods() ||
+                foodType == colony.getTile().secondaryGoods()) {
+                amount += colony.getTile().getMaximumPotential(foodType);
+            }
         }
 
         return amount;
@@ -592,8 +616,7 @@ public class ColonyPlan {
         if (t.hasResource()) {
             return t.getTileItemContainer().getResource().getBestGoodsType();
         }
-        GoodsType[] top = Tile.getSortedGoodsTop(t.getType(), t.getTileItemContainer(), t.getFishBonus());
-        return top[0];
+        return t.getSortedPotential().get(0).getType();
     }
 
     /**

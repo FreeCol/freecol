@@ -42,12 +42,11 @@ import org.w3c.dom.Element;
 * Objects of this class contains AI-information for a single {@link WorkLocation}.
 */
 public class WorkLocationPlan {
+
     @SuppressWarnings("unused")
     private static final Logger logger = Logger.getLogger(WorkLocationPlan.class.getName());
 
-
     private AIMain aiMain;
-    
 
     /**
     * The FreeColGameObject this AIObject contains AI-information for.
@@ -220,7 +219,6 @@ public class WorkLocationPlan {
             }
         }
     }
-
 
     /**
     * Gets the type of goods which should be produced at the <code>WorkLocation</code>.

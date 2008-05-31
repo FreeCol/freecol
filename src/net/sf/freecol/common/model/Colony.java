@@ -51,8 +51,8 @@ public final class Colony extends Settlement implements Location, Nameable {
     private static final Logger logger = Logger.getLogger(Colony.class.getName());
 
     public static final int BELLS_PER_REBEL = 200;
-    private static final int FOOD_PER_COLONIST = 200;
-    private static final int FOOD_CONSUMPTION = 2;
+    public static final int FOOD_PER_COLONIST = 200;
+    public static final int FOOD_CONSUMPTION = 2;
 
     public static final Ability HAS_PORT = new Ability("model.ability.hasPort");
 

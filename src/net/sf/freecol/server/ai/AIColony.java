@@ -161,23 +161,28 @@ public class AIColony extends AIObject {
      * Updates custom house export settings.
      */
     private void updateCustomHouse() {
-        /*
-         * TODO: This method should use the properties of the
-         *       goods to determine if it should be sold,
-         *       instead of explicitly handling each type.
-         */
         int capacity = colony.getWarehouseCapacity();
-        ExportData defaultExports = new ExportData(Goods.FOOD, true, 0, 100, 0);
         for (GoodsType goodsType : FreeCol.getSpecification().getGoodsTypeList()) {
-            if (goodsType.isStorable()) {
-                colony.setExportData(new ExportData(goodsType, defaultExports));
+            if (goodsType.isTradeGoods()) {
+                // can only be produced in Europe
+                colony.setExportData(new ExportData(goodsType, false, 0));
+            } else if (!goodsType.isStorable()) {
+                // abstract goods such as hammers
+                colony.setExportData(new ExportData(goodsType, false, 0));
+            } else if (goodsType.isBreedable()) {
+                colony.setExportData(new ExportData(goodsType, true, capacity - 20));
+            } else if (goodsType.isMilitaryGoods()) {
+                colony.setExportData(new ExportData(goodsType, true, capacity - 50));
+            } else if (goodsType.isBuildingMaterial()) {
+                colony.setExportData(new ExportData(goodsType, true, Math.min(capacity, 250)));
+            } else if (goodsType.isFoodType()) {
+                colony.setExportData(new ExportData(goodsType, false, 0));
+            } else if (goodsType.isNewWorldGoodsType() || goodsType.isRefined()) {
+                colony.setExportData(new ExportData(goodsType, true, 0));
+            } else {
+                colony.setExportData(new ExportData(goodsType, false, 0));
             }
         }
-        colony.getExportData(Goods.HORSES).setExportLevel(capacity - 20);
-        colony.getExportData(Goods.TOOLS).setExportLevel(Math.min(capacity, 250));
-        colony.getExportData(Goods.MUSKETS).setExportLevel(capacity - 50);
-        colony.getExportData(Goods.FOOD).setExported(false);
-        colony.getExportData(Goods.LUMBER).setExported(false);
     }
 
     /**

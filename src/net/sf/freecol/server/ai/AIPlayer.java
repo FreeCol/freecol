@@ -1888,12 +1888,12 @@ public class AIPlayer extends AIObject {
         }
         
         GoodsType goodsType = toBeDestroyed.getType();
-        if (goodsType == Goods.FOOD || goodsType == Goods.HORSES) {
-            // we should be able to produce goods and horses
-            // ourselves
+        if (goodsType.isFoodType() || goodsType.isBreedable()) {
+            // we should be able to produce food and horses ourselves
             return false;
-        } else if (goodsType == Goods.TRADEGOODS || goodsType == Goods.TOOLS
-                || goodsType == Goods.MUSKETS) {
+        } else if (goodsType.isMilitaryGoods() || 
+                   goodsType.isTradeGoods() ||
+                   goodsType.isBuildingMaterial()) {
             if (getGame().getTurn().getAge() == 3) {
                 // by this time, we should be able to produce
                 // enough ourselves

@@ -24,8 +24,6 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
-//import net.sf.freecol.FreeCol;
-
 /**
  * Objects of this class hold the export data for a particular type of
  * goods.
@@ -83,6 +81,17 @@ public class ExportData extends FreeColObject {
         this.lowLevel = lowLevel;
         this.highLevel = highLevel;
         this.exportLevel = exportLevel;
+    }
+
+    /**
+     * Creates a new <code>ExportData</code> instance.
+     *
+     * @param goodsType a <code>GoodsType</code> value
+     * @param exported a <code>boolean</code> value
+     * @param exportLevel an <code>int</code> value
+     */
+    public ExportData(GoodsType goodsType, boolean exported, int exportLevel) {
+        this(goodsType, exported, 0, 100, exportLevel);
     }
 
     /**

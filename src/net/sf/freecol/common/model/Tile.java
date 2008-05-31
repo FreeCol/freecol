@@ -1335,7 +1335,7 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
         }
         // Get tile potential + bonus if any
         int potential = tileType.getPotential(goodsType);
-        if (tileType.isWater() && goodsType == Goods.FISH) {
+        if (potential > 0 && tileType.isWater() && goodsType.isFoodType()) {
             potential += fishBonus;
         }
         if (tiContainer != null) {
@@ -1345,46 +1345,22 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
     }
 
     /**
-     * Finds the top three outputs based on TileType, TileItemContainer and FishBonus if any
-     * @param tileType The <code>TileType</code>
-     * @param tiContainer The <code>TileItemContainer</code>
-     * @param fishBonus The Bonus Fish to be considered if valid
-     * @return The sorted top three of the outputs.
+     * Sorts GoodsTypes according to potential based on TileType,
+     * TileItemContainer and FishBonus if any.
+     *
+     * @return The sorted GoodsTypes.
      */
-    public static GoodsType[] getSortedGoodsTop(TileType tileType, TileItemContainer tiContainer, int fishBonus) {
-        GoodsType[] top = new GoodsType[3];
-        int[] val = new int[3];
-        List<GoodsType> goodsTypeList = FreeCol.getSpecification().getGoodsTypeList();
-        for (GoodsType g : goodsTypeList) {
-            int potential = getTileTypePotential(tileType, g, tiContainer, fishBonus);
-            // Higher than the lowest saved value (which is 0 by default)
-            if (potential > val[2]) {
-                // Find highest spot to put this item
-                for (int i = 0; i < 3; i++) {
-                    if (potential > val[i]) {
-                        // Shift and move down
-                        for (int j = 2; j > i; j--) {
-                            top[j] = top[j-1];
-                            val[j] = val[j-1];
-                        }
-                        top[i] = g;
-                        val[i] = potential;
-                        break;
-                    }
-                }
+    public List<AbstractGoods> getSortedPotential() {
+        List<AbstractGoods> goodsTypeList = new ArrayList<AbstractGoods>();
+        for (GoodsType goodsType : FreeCol.getSpecification().getGoodsTypeList()) {
+            int potential = potential(goodsType);
+            if (potential > 0) {
+                goodsTypeList.add(new AbstractGoods(goodsType, potential));
             }
         }
-        return top;
-    }
-
-    public List<GoodsType> getSortedGoodsList(final TileType tileType,
-                                              final TileItemContainer tiContainer,
-                                              final int fishBonus) {
-        List<GoodsType> goodsTypeList = FreeCol.getSpecification().getGoodsTypeList();
-        Collections.sort(goodsTypeList, new Comparator<GoodsType>() {
-                public int compare(GoodsType o, GoodsType p) {
-                    return getTileTypePotential(tileType, p, tiContainer, fishBonus) - 
-                        getTileTypePotential(tileType, o, tiContainer, fishBonus);
+        Collections.sort(goodsTypeList, new Comparator<AbstractGoods>() {
+                public int compare(AbstractGoods o, AbstractGoods p) {
+                    return p.getAmount() - o.getAmount();
                 }
             });
         return goodsTypeList;
@@ -1396,18 +1372,15 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
      * 
      * @return The type of primary good best produced by this tile.
      * 
-     * TODO: This might fail if the tile produces more other stuff than food.
-     * 
      */
     public GoodsType primaryGoods() {
         if (type == null) {
             return null;
         }
         
-        GoodsType[] top = getSortedGoodsTop(type, tileItemContainer, getFishBonus());
-        for (GoodsType g : top) {
-            if (g != null && g.isFoodType()) {
-                return g;
+        for (AbstractGoods goods : getSortedPotential()) {
+            if (goods.getType().isFoodType()) {
+                return goods.getType();
             }
         }
         return null;
@@ -1420,10 +1393,10 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
      * @return The type of secondary good best produced by this tile (or null if none found).
      */
     public GoodsType secondaryGoods() {
-        if (type != null) {
-            return type.getSecondaryGoods();
-        } else {
+        if (type == null) {
             return null;
+        } else {
+            return type.getSecondaryGoods();
         }
     }
 
