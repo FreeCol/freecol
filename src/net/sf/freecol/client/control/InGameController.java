@@ -562,7 +562,8 @@ public final class InGameController implements NetworkConstants {
             changeWorkType(unit, Goods.FOOD);
             unit.buildColony(colony);
             
-            for(Unit unitInTile : tile.getUnitList()) {
+            ArrayList<Unit> units = new ArrayList<Unit>(tile.getUnitList());
+            for(Unit unitInTile : units) {
                 if (unitInTile.canCarryTreasure()) {
                     checkCashInTreasureTrain(unitInTile);
                 }
