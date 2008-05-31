@@ -87,8 +87,7 @@ public class BuildQueuePanel extends ReportPanel {
 
         units = new BuildQueue();
         for (UnitType unitType : FreeCol.getSpecification().getUnitTypeList()) {
-            if (unitType.getGoodsRequired() != null &&
-                !unitType.getGoodsRequired().isEmpty()) {
+            if (!unitType.getGoodsRequired().isEmpty()) {
                 units.add(unitType);
             }
         }

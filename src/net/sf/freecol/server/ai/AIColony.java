@@ -479,12 +479,10 @@ public class AIColony extends AIObject {
 
     private int getToolsRequired(BuildableType buildableType) {
         int toolsRequiredForBuilding = 0;
-        if (buildableType.getGoodsRequired() != null) {
-            for (AbstractGoods goodsRequired : buildableType.getGoodsRequired()) {
-                if (goodsRequired.getType() == Goods.TOOLS) {
-                    toolsRequiredForBuilding = goodsRequired.getAmount();
-                    break;
-                }
+        for (AbstractGoods goodsRequired : buildableType.getGoodsRequired()) {
+            if (goodsRequired.getType() == Goods.TOOLS) {
+                toolsRequiredForBuilding = goodsRequired.getAmount();
+                break;
             }
         }
         return toolsRequiredForBuilding;
@@ -493,12 +491,10 @@ public class AIColony extends AIObject {
 
     private int getHammersRequired(BuildableType buildableType) {
         int hammersRequiredForBuilding = 0;
-        if (buildableType.getGoodsRequired() != null) {
-            for (AbstractGoods goodsRequired : buildableType.getGoodsRequired()) {
-                if (goodsRequired.getType() == Goods.HAMMERS) {
-                    hammersRequiredForBuilding = goodsRequired.getAmount();
-                    break;
-                }
+        for (AbstractGoods goodsRequired : buildableType.getGoodsRequired()) {
+            if (goodsRequired.getType() == Goods.HAMMERS) {
+                hammersRequiredForBuilding = goodsRequired.getAmount();
+                break;
             }
         }
         return hammersRequiredForBuilding;
@@ -951,12 +947,12 @@ public class AIColony extends AIObject {
                         Iterator<Unit> unitIterator = units.iterator();
                         while (unitIterator.hasNext()) {
                             Unit unit = unitIterator.next();
-                            int production;
+                            int production = 0;
                             WorkLocation location = wlp.getWorkLocation();
                             if (location instanceof ColonyTile) {
                                 production = ((ColonyTile) wlp.getWorkLocation()).getProductionOf(unit,
                                         wlp.getGoodsType());
-                            } else { // Building
+                            } else if (location instanceof Building) {
                                 production = ((Building) location).getProductivity(unit);
                             }
                             if (bestUnit == null || production > bestProduction || production == bestProduction

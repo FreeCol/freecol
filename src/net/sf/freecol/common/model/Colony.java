@@ -138,7 +138,7 @@ public final class Colony extends Settlement implements Location, Nameable {
         List<BuildingType> buildingTypes = FreeCol.getSpecification().getBuildingTypeList();
         for (BuildingType buildingType : buildingTypes) {
             if (buildingType.getUpgradesFrom() == null &&
-                buildingType.getGoodsRequired() == null) {
+                buildingType.getGoodsRequired().isEmpty()) {
                 addBuilding(new Building(getGame(), this, buildingType));
             } else if (isFree(buildingType)) {
                 addBuilding(new Building(getGame(), this, buildingType));
@@ -692,7 +692,7 @@ public final class Colony extends Settlement implements Location, Nameable {
         ArrayList<UnitType> buildableUnits = new ArrayList<UnitType>();
         List<UnitType> unitTypes = FreeCol.getSpecification().getUnitTypeList();
         for (UnitType unitType : unitTypes) {
-            if (unitType.getGoodsRequired() != null && canBuild(unitType)) {
+            if (unitType.getGoodsRequired().isEmpty() == false && canBuild(unitType)) {
                 buildableUnits.add(unitType);
             }
         }
@@ -996,7 +996,7 @@ public final class Colony extends Settlement implements Location, Nameable {
             BuildableType currentBuildable = getCurrentlyBuilding();
             if (currentBuildable != null &&
                 currentBuildable != BuildableType.NOTHING &&
-                currentBuildable.getGoodsRequired() != null) {
+                currentBuildable.getGoodsRequired().isEmpty() == false) {
                 boolean willBeFinished = true;
                 int possiblyUsed = 0;
                 for (AbstractGoods goodsRequired : currentBuildable.getGoodsRequired()) {
@@ -1057,7 +1057,7 @@ public final class Colony extends Settlement implements Location, Nameable {
     public boolean canBuild(BuildableType buildableType) {
         if (buildableType == null || buildableType == BuildableType.NOTHING) {
             return false;
-        } else if (buildableType.getGoodsRequired() == null) {
+        } else if (buildableType.getGoodsRequired().isEmpty()) {
             return false;
         } else if (buildableType.getPopulationRequired() > getUnitCount()) {
             return false;

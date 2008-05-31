@@ -718,7 +718,7 @@ public final class UnitType extends BuildableType {
      * @return a <code>boolean</code> value
      */
     public boolean canBeBuilt() {
-        return getGoodsRequired() != null;
+        return getGoodsRequired().isEmpty() == false;
     }
 
 

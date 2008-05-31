@@ -124,7 +124,7 @@ public final class ReportProductionPanel extends JPanel implements ActionListene
         for (BuildingType buildingType : FreeCol.getSpecification().getBuildingTypeList()) {
             if ((buildingType.getProducedGoodsType() == goodsType ||
                  !buildingType.getModifierSet(goodsType.getId()).isEmpty()) &&
-                buildingType.getGoodsRequired() != null) {
+                !buildingType.getGoodsRequired().isEmpty()) {
                 buildingTypes.add(buildingType);
                 buildingCount[buildingType.getIndex()] = 0;
             }

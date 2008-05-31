@@ -666,7 +666,7 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
         }
 
         JPanel goodsRequired = null;
-        if (type.getGoodsRequired() != null) {
+        if (!type.getGoodsRequired().isEmpty()) {
             rowsRequired++;
             goodsRequired = new JPanel();
             goodsRequired.setOpaque(false);
@@ -961,7 +961,7 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
 
         // Costs to build - Hammers & Tools
         detailPanel.add(new JLabel(Messages.message("colopedia.buildings.cost")), higConst.rc(row, leftColumn));
-        if (buildingType.getGoodsRequired() != null) {
+        if (!buildingType.getGoodsRequired().isEmpty()) {
             JPanel costs = new JPanel();
             costs.setOpaque(false);
             costs.setLayout(new FlowLayout(FlowLayout.LEFT));
