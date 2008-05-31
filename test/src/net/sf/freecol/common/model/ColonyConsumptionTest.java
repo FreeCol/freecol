@@ -26,20 +26,18 @@ public class ColonyConsumptionTest extends FreeColTestCase {
         
         //////////////////////
         // Setting test colony and colonist
-        
         Colony colony = new Colony(game, dutch, "New Amsterdam", map.getTile(5, 8));
-        
         UnitType colonistType = FreeCol.getSpecification().getUnitType("model.unit.freeColonist");
-        
         new Unit(game, colony.getBuildingForProducing(Goods.BELLS), dutch, colonistType, UnitState.ACTIVE,
                 colonistType.getDefaultEquipment());
+        assertEquals(0, colony.getFoodCount());
         
-        colony.addGoods(Goods.FOOD, colony.getFoodConsumption() * 2);
-        
+        int quantity = colony.getFoodConsumption() * 2;
+        colony.addGoods(Goods.FOOD, quantity);
         int foodStored = colony.getFoodCount();
+        assertEquals(quantity, foodStored); // this fails, food and fish are counted twice?!
         
         colony.updateFood();
-        
         int foodRemaining = foodStored - colony.getFoodConsumption();
         
         assertEquals("Unexpected value for remaining food, ", foodRemaining,colony.getFoodCount());
