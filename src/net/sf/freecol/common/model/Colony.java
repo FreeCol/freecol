@@ -521,7 +521,7 @@ public final class Colony extends Settlement implements Location, Nameable {
         if (type.getStoredAs() == null) {
             return goodsContainer.getGoodsCount(type);
         } else {
-            return goodsContainer.getGoodsCount(type.getStoredAs());
+            return 0;
         }
     }
 
@@ -1393,6 +1393,11 @@ public final class Colony extends Settlement implements Location, Nameable {
         }
     }
             
+    /**
+     * Returns the total amount of food present. 
+     *
+     * @return an <code>int</code> value
+     */
     public int getFoodCount() {
         int result = 0;
         for (GoodsType foodType : FreeCol.getSpecification().getGoodsFood()) {

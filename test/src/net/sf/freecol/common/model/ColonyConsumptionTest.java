@@ -35,7 +35,7 @@ public class ColonyConsumptionTest extends FreeColTestCase {
         int quantity = colony.getFoodConsumption() * 2;
         colony.addGoods(Goods.FOOD, quantity);
         int foodStored = colony.getFoodCount();
-        assertEquals(quantity, foodStored); // this fails, food and fish are counted twice?!
+        assertEquals(quantity, foodStored);
         
         colony.updateFood();
         int foodRemaining = foodStored - colony.getFoodConsumption();
