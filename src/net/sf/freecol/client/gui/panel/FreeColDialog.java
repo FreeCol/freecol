@@ -309,6 +309,7 @@ public class FreeColDialog extends FreeColPanel {
         JScrollPane scrollPane = new JScrollPane(textPanel,
                                                  JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
                                                  JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+        scrollPane.setBorder(null);
 
         informationDialog.add(scrollPane, BorderLayout.CENTER);
         informationDialog.add(theButton, BorderLayout.SOUTH);
