@@ -1140,12 +1140,26 @@ public class AIPlayer extends AIObject {
                 }
                 // Choose to build a new colony:
                 if (colonyTile != null) {
-                    aiUnit.setMission(new BuildColonyMission(getAIMain(), aiUnit, colonyTile, player
-                            .getColonyValue(colonyTile)));
-                    if (aiUnit.getUnit().getLocation() instanceof Unit) {
+                	Mission mission = new BuildColonyMission(getAIMain(), 
+                							aiUnit, 
+                							colonyTile, 
+                							player.getColonyValue(colonyTile));
+                    aiUnit.setMission(mission);
+                    
+                    boolean isUnitOnCarrier = aiUnit.getUnit().getLocation() instanceof Unit; 
+                    if (isUnitOnCarrier) {
                         AIUnit carrier = (AIUnit) getAIMain().getAIObject(
                                 (FreeColGameObject) aiUnit.getUnit().getLocation());
-                        ((TransportMission) carrier.getMission()).addToTransportList(aiUnit);
+                        
+                        //make verification of carrier mission
+                        Mission carrierMission = carrier.getMission();
+                        
+                        boolean isCarrierMissionToTransport = carrierMission instanceof TransportMission; 
+                        if(!isCarrierMissionToTransport){
+                        	throw new IllegalStateException("Carrier carrying unit not on a transport mission");
+                        }
+                        //transport unit to carrier destination (is this what is truly wanted?)
+                        ((TransportMission) carrierMission).addToTransportList(aiUnit);
                     }
                     continue;
                 }

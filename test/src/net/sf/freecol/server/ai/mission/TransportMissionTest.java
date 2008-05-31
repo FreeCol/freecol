@@ -20,6 +20,7 @@
 package net.sf.freecol.server.ai.mission;
 
 import net.sf.freecol.common.FreeColException;
+import net.sf.freecol.common.model.CombatModel;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Map;
 import net.sf.freecol.common.model.Tile;
@@ -62,35 +63,46 @@ public class TransportMissionTest extends ServerTest {
         AIMain aiMain = server.getAIMain();
         assertNotNull(aiMain);
         
-        ServerPlayer player = (ServerPlayer) game.getPlayer("model.nation.dutch");
-        AIPlayer aiPlayer = (AIPlayer)aiMain.getAIObject(player.getId());
+        ServerPlayer player1 = (ServerPlayer) game.getPlayer("model.nation.dutch");
+        AIPlayer aiPlayer = (AIPlayer)aiMain.getAIObject(player1.getId());
 
+        
+        
         // create a ship carrying a colonist
-        Tile tile = map.getTile(6, 9);
+        Tile tile1 = map.getTile(6, 9);
+        
         UnitType galleonType = spec().getUnitType("model.unit.galleon");
-        Unit galleon = new Unit(game, tile, player, galleonType, UnitState.ACTIVE);
+        Unit galleon = new Unit(game, tile1, player1, galleonType, UnitState.ACTIVE);
         AIUnit aiUnit = (AIUnit) aiMain.getAIObject(galleon);
         assertNotNull(aiUnit);
         assertTrue(galleon.hasAbility("model.ability.navalUnit"));
         UnitType colonistType = spec().getUnitType("model.unit.freeColonist");
-        Unit colonist = new Unit(game, galleon, player, colonistType, UnitState.SENTRY);
+        Unit colonist = new Unit(game, galleon, player1, colonistType, UnitState.SENTRY);
         assertTrue(colonist.getLocation()==galleon);
         
+        //Create the attacker
+        ServerPlayer player2 = (ServerPlayer) game.getPlayer("model.nation.french");
+        Tile tile2 = map.getTile(5, 9);
+        UnitType privateerType = spec().getUnitType("model.unit.privateer");
+        Unit privateer = new Unit(game, tile2, player2, privateerType, UnitState.ACTIVE);
+                
         // assign transport mission to the ship
         aiUnit.setMission(new TransportMission(aiMain, aiUnit));
         
-        // Now, we simulate an attack on this ship from an enemy ship or fortress
-        // Setting the hit points to zero should result in a return to Europe for repairs
-        // and also invalidate the transport mission as side effect
-        galleon.setHitpoints(0);
+        //Simulate the combat
+        CombatModel combatModel = game.getCombatModel();
+        CombatModel.CombatResult combatResult = new CombatModel.CombatResult(CombatModel.CombatResultType.WIN,galleon.getHitpoints());
+        combatModel.attack(privateer, galleon, combatResult , 0);
+
+        // Verify that the outcome of the combat is  a return to Europe for repairs
+        // and also invalidation of the transport mission as side effect
         assertTrue(galleon.isUnderRepair());
         assertFalse(aiUnit.getMission().isValid());
         
         try {
-            // this will call AIPlayer.abortInvalidMissions() and should kill the transported colonist
-            // Disposing the colonist triggers a ConcurrentModificationException
-            // because it attempts disposing an AIUnit while iterating on the list of AIUnits
+            // this will call AIPlayer.abortInvalidMissions() and change the carrier mission
             aiPlayer.startWorking();
+            assertFalse(aiUnit.getMission() instanceof TransportMission);
         } finally {
             this.stopServer(server);
         }
