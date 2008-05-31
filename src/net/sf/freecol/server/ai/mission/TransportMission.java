@@ -172,15 +172,26 @@ public class TransportMission extends Mission {
      * Disposes this <code>Mission</code>.
      */
     public void dispose() {
-        Iterator<Transportable> ti = transportList.iterator();
+    	// a new list must be created as the first one may be changed
+    	//elsewhere in between loop calls
+    	List<Transportable> cargoList = new ArrayList<Transportable>();
+        
+    	Iterator<Transportable> ti = transportList.iterator();
         while (ti.hasNext()) {
             Transportable t = ti.next();
+            // the cargo is on board, add to list to be disposed of
             if (isCarrying(t)) {
-                ((AIObject) t).dispose();
+            	cargoList.add(t);
             } else {
+            	// the cargo was scheduled to be transported by the carrier
+            	// not possible anymore, cancel the order
                 t.setTransport(null);
             }
         }
+        
+        for (Transportable t : cargoList)
+        	((AIObject) t).dispose();
+        
         super.dispose();
     }
 

@@ -711,11 +711,17 @@ public class SimpleCombatModel implements CombatModel {
      * @see #damageShip
      */
     private void damageAllShips(Colony colony, Unit attacker) {
+    	// a new list must be created as the first one may be changed
+    	//elsewhere in between loop calls
+    	List<Unit> navalUnitsOutsideColony = new ArrayList<Unit>();
         for (Unit unit : colony.getTile().getUnitList()) {
             if (unit.isNaval()) {
-                damageShip(unit, null, attacker);
+            	navalUnitsOutsideColony.add(unit);
             }
         }
+        
+        for (Unit unit : navalUnitsOutsideColony)
+        	damageShip(unit, null, attacker);
     }
 
     /**
