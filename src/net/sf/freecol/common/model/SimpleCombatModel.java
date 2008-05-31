@@ -437,10 +437,10 @@ public class SimpleCombatModel implements CombatModel {
         if (!attacker.hasAbility("model.ability.multipleAttacks")) {
             attacker.setMovesLeft(0);
         }
-
-        Tile newTile = defender.getTile();
+        Location defenderLocation = defender.getLocation();
+        //Tile newTile = defender.getTile();
         //attacker.adjustTension(defender);
-        Settlement settlement = newTile.getSettlement();
+        //Settlement settlement = newTile.getSettlement();
 
         switch (result.type) {
         case EVADES:
@@ -501,11 +501,11 @@ public class SimpleCombatModel implements CombatModel {
             }
             break;
         case DONE_SETTLEMENT:
-            if (settlement instanceof IndianSettlement) {
+            if (defenderLocation instanceof IndianSettlement) {
                 defender.dispose();
-                destroySettlement(attacker, (IndianSettlement) settlement);
-            } else if (settlement instanceof Colony) {
-                captureColony(attacker, (Colony) settlement, plunderGold);
+                destroySettlement(attacker, (IndianSettlement) defenderLocation);
+            } else if (defenderLocation instanceof Colony) {
+                captureColony(attacker, (Colony) defenderLocation, plunderGold);
             } else {
                 throw new IllegalStateException("Unknown type of settlement.");
             }
@@ -539,8 +539,8 @@ public class SimpleCombatModel implements CombatModel {
                 }
                 if (!defender.isNaval()) {
                     demote(defender, attacker);
-                    if (settlement instanceof IndianSettlement) {
-                        getConvert(attacker, (IndianSettlement) settlement);
+                    if (defenderLocation instanceof IndianSettlement) {
+                        getConvert(attacker, (IndianSettlement) defenderLocation);
                     }
                 }
             }
@@ -563,8 +563,8 @@ public class SimpleCombatModel implements CombatModel {
                 promote(attacker);
                 if (!defender.isNaval()) {
                     demote(defender, attacker);
-                    if (settlement instanceof IndianSettlement) {
-                        getConvert(attacker, (IndianSettlement) settlement);
+                    if (defenderLocation instanceof IndianSettlement) {
+                        getConvert(attacker, (IndianSettlement) defenderLocation);
                     }
                 }
             }
