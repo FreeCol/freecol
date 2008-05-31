@@ -1403,7 +1403,7 @@ public final class Colony extends Settlement implements Location, Nameable {
 
 
     // Eat food:
-    private void updateFood() {
+    void updateFood() {
         int required = getFoodConsumption();
         int available = getFoodCount();
         int production = getFoodProduction();
@@ -1416,11 +1416,13 @@ public final class Colony extends Settlement implements Location, Nameable {
                             "model.colony.colonistStarved", "%colony%", getName());
         } else {
             removeFood(required);
-            int turnsToLive = (available - required) / (required - production);
-            if (required > production && turnsToLive <= 3) {
-                addModelMessage(this, ModelMessage.MessageType.WARNING,
+            if (required > production){
+            	int turnsToLive = (available - required) / (required - production);
+            	if(turnsToLive <= 3) {
+            		addModelMessage(this, ModelMessage.MessageType.WARNING,
                                 "model.colony.famineFeared", "%colony%", getName(),
                                 "%number%", String.valueOf(turnsToLive));
+            	}
             }
         }
     }
