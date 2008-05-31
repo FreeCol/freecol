@@ -420,7 +420,7 @@ public final class InGameInputHandler extends InputHandler {
 
         if (colony != null) {
             unit.getGame().getCombatModel().bombard(colony, defender, new CombatResult(result, damage));
-        } else {
+        } else {            
             unit.getGame().getCombatModel().attack(unit, defender, new CombatResult(result, damage), plunderGold);
             if (!unit.isDisposed() &&
                 (unit.getLocation() == null ||
@@ -804,7 +804,7 @@ public final class InGameInputHandler extends InputHandler {
             break;
         case Monarch.DECLARE_WAR:
             Player enemy = (Player) getGame().getFreeColGameObject(element.getAttribute("enemy"));
-            player.setStance(enemy, Stance.WAR);
+            player.changeRelationWithPlayer(enemy, Stance.WAR);
             player.addModelMessage(new ModelMessage(player, "model.monarch.declareWar",
                                                     new String[][] {
                                                         {"%nation%", enemy.getName()}},

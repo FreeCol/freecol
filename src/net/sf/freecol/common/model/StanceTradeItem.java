@@ -100,8 +100,7 @@ public class StanceTradeItem extends TradeItem {
      *
      */
     public void makeTrade() {
-        getSource().setStance(getDestination(), stance);
-        getDestination().setStance(getSource(), stance);
+        getSource().changeRelationWithPlayer(getDestination(), stance);
     }
 
 

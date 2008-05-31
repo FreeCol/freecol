@@ -1758,7 +1758,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
             }
             // Set the indian player at war with the european player (and vice
             // versa).
-            settlement.getOwner().setStance(enemy, Stance.WAR);
+            settlement.getOwner().changeRelationWithPlayer(enemy, Stance.WAR);
             // Increase tension levels:
             settlement.modifyAlarm(enemy, 1000); // let propagation works
             enemy.modifyTension(settlement.getOwner(), 500);

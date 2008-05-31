@@ -511,13 +511,13 @@ public class AIPlayer extends AIObject {
                     }
                     if (stance != Stance.WAR &&
                         tension.getLevel() == Tension.Level.HATEFUL) {
-                        getPlayer().setStance(p, Stance.WAR);
+                        getPlayer().changeRelationWithPlayer(p, Stance.WAR);
                     } else if (stance == Stance.WAR
                                && tension.getLevel().compareTo(Tension.Level.CONTENT) <= 0) {
-                        getPlayer().setStance(p, Stance.CEASE_FIRE);
+                        getPlayer().changeRelationWithPlayer(p, Stance.CEASE_FIRE);
                     } else if (stance == Stance.CEASE_FIRE
                                && tension.getLevel().compareTo(Tension.Level.HAPPY) <= 0) {
-                        getPlayer().setStance(p, Stance.PEACE);
+                        getPlayer().changeRelationWithPlayer(p, Stance.PEACE);
                     }
                 }
             }

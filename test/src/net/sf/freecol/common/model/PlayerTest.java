@@ -20,6 +20,8 @@
 package net.sf.freecol.common.model;
 
 import java.util.Iterator;
+
+import net.sf.freecol.common.model.Player.Stance;
 import net.sf.freecol.common.model.Unit.UnitState;
 import net.sf.freecol.util.test.FreeColTestCase;
 
@@ -182,5 +184,23 @@ public class PlayerTest extends FreeColTestCase {
         assertEquals(russianREF, russian.getREFPlayer());
     }
 
-    
+    public void testDeclarationOfWar(){
+    	String errMsg = "";
+    	Game game = getStandardGame();
+        
+        Player dutch = game.getPlayer("model.nation.dutch");
+        Player french = game.getPlayer("model.nation.french");
+        
+        errMsg ="The Dutch cant be at war with the French";
+        assertFalse(errMsg,dutch.getStance(french) == Stance.WAR);
+        errMsg ="The French cant be at war with the Dutch";
+        assertFalse(errMsg,french.getStance(dutch) == Stance.WAR);
+        
+        french.changeRelationWithPlayer(dutch, Stance.WAR);
+        
+        errMsg ="The Dutch should be at war with the French";
+        assertTrue(errMsg,dutch.getStance(french) == Stance.WAR);
+        errMsg ="The French should be at war with the Dutch";
+        assertTrue(errMsg,french.getStance(dutch) == Stance.WAR);
+    }
 }

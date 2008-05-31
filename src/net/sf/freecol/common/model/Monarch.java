@@ -479,7 +479,6 @@ public final class Monarch extends FreeColGameObject {
         if (europeanPlayers.size() > 0) {
             int randomInt = getGame().getModelController().getPseudoRandom().nextInt(europeanPlayers.size());
             Player enemy = europeanPlayers.get(randomInt);
-            player.setStance(enemy, Stance.WAR);
             return enemy;
         }
         return null;

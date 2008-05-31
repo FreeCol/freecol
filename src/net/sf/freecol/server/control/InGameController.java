@@ -584,7 +584,7 @@ public final class InGameController extends Controller {
                                 logger.warning("Declared war on nobody.");
                                 return;
                             }
-                            nextPlayer.setStance(enemy, Stance.WAR);
+                            nextPlayer.changeRelationWithPlayer(enemy, Stance.WAR);
                             monarchActionElement.setAttribute("enemy", enemy.getId());
                             try {
                                 nextPlayer.getConnection().send(monarchActionElement);

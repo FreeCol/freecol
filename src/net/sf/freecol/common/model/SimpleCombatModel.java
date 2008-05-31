@@ -423,8 +423,7 @@ public class SimpleCombatModel implements CombatModel {
         if (attacker.hasAbility("model.ability.piracy")) {
             defendingPlayer.setAttackedByPrivateers();
         } else if (!defender.hasAbility("model.ability.piracy")) {
-            attackingPlayer.setStance(defendingPlayer, Stance.WAR);
-            defendingPlayer.setStance(attackingPlayer, Stance.WAR);
+            attackingPlayer.changeRelationWithPlayer(defendingPlayer, Stance.WAR);
         }
 
         // Wake up if you're attacking something.

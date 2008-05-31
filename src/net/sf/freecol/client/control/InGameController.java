@@ -3085,7 +3085,7 @@ public final class InGameController implements NetworkConstants {
             missionaryMessage.setAttribute("incite", ((Player) response.get(1)).getId());
 
             reply = client.ask(missionaryMessage);
-
+            
             if (reply.getTagName().equals("missionaryReply")) {
                 int amount = Integer.parseInt(reply.getAttribute("amount"));
 
@@ -3102,15 +3102,20 @@ public final class InGameController implements NetworkConstants {
                 inciteMessage.setAttribute("enemy", ((Player) response.get(1)).getId());
 
                 if (confirmed) {
-                    unit.getOwner().modifyGold(-amount);
+                	Player briber = unit.getOwner();
+                    Player indianNation = settlement.getOwner();
+                    Player proposedEnemy = (Player) response.get(1);
+                	
+                	
+                    briber.modifyGold(-amount);
 
                     // Maybe at this point we can keep track of the fact that
                     // the indian is now at
                     // war with the chosen european player, but is this really
                     // necessary at the client
                     // side?
-                    settlement.getOwner().setStance((Player) response.get(1), Stance.WAR);
-                    ((Player) response.get(1)).setStance(settlement.getOwner(), Stance.WAR);
+                    
+                    indianNation.changeRelationWithPlayer(proposedEnemy, Stance.WAR);
                 }
 
                 client.sendAndWait(inciteMessage);
