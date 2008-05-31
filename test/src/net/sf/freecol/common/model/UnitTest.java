@@ -20,6 +20,8 @@
 package net.sf.freecol.common.model;
 
 import java.util.ConcurrentModificationException;
+
+import net.sf.freecol.FreeCol;
 import net.sf.freecol.common.model.Unit.UnitState;
 import net.sf.freecol.util.test.FreeColTestCase;
 
@@ -494,5 +496,46 @@ public class UnitTest extends FreeColTestCase {
         assertTrue(colonist.isDisposed());
         assertEquals(0, frigate.getUnitCount());
         assertEquals(0, tile.getUnitCount());
+    }
+    
+    public void testUnitCanBuildColony() {
+
+        Game game = getStandardGame();
+
+        Player dutch = game.getPlayer("model.nation.dutch");
+        Player sioux = game.getPlayer("model.nation.sioux");
+
+        TileType plains = FreeCol.getSpecification().getTileType("model.tile.plains");
+        Map map = getTestMap(plains, true);
+        game.setMap(map);
+        Tile tile1 = map.getTile(10, 4);
+        
+        UnitType farmerType = FreeCol.getSpecification().getUnitType("model.unit.expertFarmer");
+        Unit farmer = new Unit(game, tile1, dutch, farmerType, UnitState.ACTIVE, farmerType.getDefaultEquipment());
+        assertTrue(farmer.canBuildColony());
+        
+        UnitType artyType = FreeCol.getSpecification().getUnitType("model.unit.artillery");
+        Unit arty = new Unit(game, tile1, dutch, artyType, UnitState.ACTIVE, artyType.getDefaultEquipment());
+        assertFalse(arty.canBuildColony());
+        
+        UnitType shipType = FreeCol.getSpecification().getUnitType("model.unit.galleon");
+        Unit ship = new Unit(game, tile1, dutch, shipType, UnitState.ACTIVE, shipType.getDefaultEquipment());
+        assertFalse(ship.canBuildColony());
+        
+        UnitType treasureType = FreeCol.getSpecification().getUnitType("model.unit.treasureTrain");
+        Unit treasure = new Unit(game, tile1, dutch, treasureType, UnitState.ACTIVE, treasureType.getDefaultEquipment());
+        assertFalse(treasure.canBuildColony());
+        
+        UnitType wagonType = FreeCol.getSpecification().getUnitType("model.unit.wagonTrain");
+        Unit wagon = new Unit(game, tile1, dutch, wagonType, UnitState.ACTIVE, wagonType.getDefaultEquipment());
+        assertFalse(wagon.canBuildColony());
+        
+        UnitType indianConvertType = FreeCol.getSpecification().getUnitType("model.unit.indianConvert");
+        Unit indianConvert = new Unit(game, tile1, dutch, indianConvertType, UnitState.ACTIVE, indianConvertType.getDefaultEquipment());
+        assertFalse(indianConvert.canBuildColony());
+        
+        UnitType braveType = FreeCol.getSpecification().getUnitType("model.unit.brave");
+        Unit brave = new Unit(game, tile1, sioux, braveType, UnitState.ACTIVE, braveType.getDefaultEquipment());
+        assertFalse(brave.canBuildColony());
     }
 }
