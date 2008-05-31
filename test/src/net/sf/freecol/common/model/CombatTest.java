@@ -22,6 +22,7 @@ package net.sf.freecol.common.model;
 import java.util.Iterator;
 import java.util.Set;
 
+import net.sf.freecol.common.model.Player.Stance;
 import net.sf.freecol.common.model.Unit.UnitState;
 import net.sf.freecol.util.test.FreeColTestCase;
 
@@ -203,5 +204,53 @@ public class CombatTest extends FreeColTestCase {
         assertEquals("modifiers.cargoPenalty", goodsPenalty1.getSource());
         assertEquals(-12.5f, goodsPenalty1.getValue());
 
+    }
+    public void testAtackedNavalUnitIsDamaged(){
+    	Game game = getStandardGame();
+        CombatModel combatModel = game.getCombatModel();
+        Player dutch = game.getPlayer("model.nation.dutch");
+        Player french = game.getPlayer("model.nation.french");
+        dutch.setStance(french, Stance.WAR);
+        french.setStance(dutch, Stance.WAR);
+        
+        assertEquals("Dutch should be at war with french",dutch.getStance(french),Stance.WAR);
+        assertEquals("French should be at war with dutch",french.getStance(dutch),Stance.WAR);
+        
+        Map map = getTestMap(ocean);
+        game.setMap(map);
+        Tile tile1 = map.getTile(5, 8);
+        tile1.setExploredBy(dutch, true);
+        tile1.setExploredBy(french, true);
+        Tile tile2 = map.getTile(4, 8);
+        tile2.setExploredBy(dutch, true);
+        tile2.setExploredBy(french, true);
+
+        Unit galleon = new Unit(game, tile1, dutch, galleonType, UnitState.ACTIVE);
+        Unit privateer = new Unit(game, tile2, french, privateerType, UnitState.ACTIVE);
+        
+        String errMsg = "Galleon should be empty";
+        assertEquals(errMsg,galleon.getGoodsCount(),0);
+        
+        Goods cargo = new Goods(game,galleon,Goods.MUSKETS,100);
+        galleon.add(cargo);
+        
+        errMsg = "Galleon should be loaded";
+        assertEquals(errMsg,galleon.getGoodsCount(),1);
+        
+        errMsg = "Galeon should not be repairing";
+        assertFalse(errMsg,galleon.isUnderRepair());
+        
+        int damage = galleon.getHitpoints() -1;
+        CombatModel.CombatResultType combatResolution = CombatModel.CombatResultType.WIN;
+        
+        CombatModel.CombatResult combatResult = new  CombatModel.CombatResult(combatResolution,damage);
+        
+        combatModel.attack(privateer, galleon, combatResult, 0);
+        
+        errMsg = "Galleon should be in Europe repairing";
+        assertTrue(errMsg,galleon.isUnderRepair());
+        
+        errMsg = "Galleon should be empty";
+        assertEquals(errMsg,galleon.getGoodsCount(),0);
     }
 }
