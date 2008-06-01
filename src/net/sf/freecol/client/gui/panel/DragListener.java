@@ -320,10 +320,13 @@ public final class DragListener extends MouseAdapter {
             } else if (comp instanceof GoodsLabel) {
                 final GoodsLabel goodsLabel = (GoodsLabel) comp;
                 final InGameController inGameController = goodsLabel.getCanvas().getClient().getInGameController();
+                ImageLibrary imageLibrary = goodsLabel.getCanvas().getGUI().getImageLibrary();
                 JPopupMenu menu = new JPopupMenu("Cargo");
-                JMenuItem name = new JMenuItem(goodsLabel.getGoods().getName());
+                ImageIcon goodsIcon = imageLibrary.getScaledGoodsImageIcon(goodsLabel.getGoods().getType(), 0.66f);
+                JMenuItem name = new JMenuItem(goodsLabel.getGoods().getName(), goodsIcon);
                 name.setEnabled(false);
                 menu.add(name);
+                
                 JMenuItem unload = new JMenuItem(Messages.message("unload"));
                 unload.addActionListener(new ActionListener() {
                         public void actionPerformed(ActionEvent e) {
@@ -350,7 +353,12 @@ public final class DragListener extends MouseAdapter {
                         }
                     });
                 menu.add(dump);
-                JMenuItem colopedia = new JMenuItem(Messages.message("menuBar.colopedia"));
+                
+                menu.addSeparator();
+                
+                Image colopediaIcon = ResourceManager.getImage("Colopedia.closedSection.image");
+                JMenuItem colopedia = new JMenuItem(Messages.message("menuBar.colopedia"), 
+                        imageLibrary.getScaledImageIcon(colopediaIcon, 0.66f));
                 colopedia.addActionListener(new ActionListener() {
                         public void actionPerformed(ActionEvent e) {
                             goodsLabel.getCanvas().showColopediaPanel(ColopediaPanel.PanelType.GOODS,
