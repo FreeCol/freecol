@@ -60,6 +60,11 @@ public final class GoodsType extends FreeColGameObjectType {
      */
     private boolean storable;
 
+    /**
+     * Whether this type of goods is accumulated by the Player.
+     */
+    private boolean playerAccumulated;
+
     private GoodsType madeFrom;
     private GoodsType makes;
     private GoodsType storedAs;
@@ -244,6 +249,24 @@ public final class GoodsType extends FreeColGameObjectType {
     }
 
     /**
+     * Get the <code>PlayerAccumulated</code> value.
+     *
+     * @return a <code>boolean</code> value
+     */
+    public boolean isPlayerAccumulated() {
+        return playerAccumulated;
+    }
+
+    /**
+     * Set the <code>PlayerAccumulated</code> value.
+     *
+     * @param newPlayerAccumulated The new PlayerAccumulated value.
+     */
+    public void setPlayerAccumulated(final boolean newPlayerAccumulated) {
+        this.playerAccumulated = newPlayerAccumulated;
+    }
+
+    /**
      * Get the <code>BreedingNumber</code> value.
      *
      * @return an <code>int</code> value
@@ -306,6 +329,7 @@ public final class GoodsType extends FreeColGameObjectType {
         art = in.getAttributeValue(null, "art");
         breedingNumber = getAttribute(in, "breeding-number", NO_BREEDING);
         price = getAttribute(in, "price", NO_PRICE);
+        playerAccumulated = getAttribute(in, "player-accumulated", false);
 
         if (hasAttribute(in, "made-from")) {
             String  madeFromRef = in.getAttributeValue(null, "made-from");

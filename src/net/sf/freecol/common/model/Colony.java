@@ -52,7 +52,6 @@ public final class Colony extends Settlement implements Location, Nameable {
 
     public static final int BELLS_PER_REBEL = 200;
     public static final int FOOD_PER_COLONIST = 200;
-    public static final int FOOD_CONSUMPTION = 2;
 
     public static final Ability HAS_PORT = new Ability("model.ability.hasPort");
 
@@ -502,75 +501,6 @@ public final class Colony extends Settlement implements Location, Nameable {
         return count;
     }
 
-    /**
-     * Gives the food needed to keep all current colonists alive in this colony.
-     * 
-     * @return The amount of food eaten in this colony each this turn.
-     */
-    public int getFoodConsumption() {
-        return FOOD_CONSUMPTION * getUnitCount();
-    }
-
-    /**
-     * Gets the amount of one type of Goods at this Colony.
-     * 
-     * @param type The type of goods to look for.
-     * @return The amount of this type of Goods at this Location.
-     */
-    public int getGoodsCount(GoodsType type) {
-        if (type.getStoredAs() == null) {
-            return goodsContainer.getGoodsCount(type);
-        } else {
-            return 0;
-        }
-    }
-
-    /**
-     * Removes a specified amount of a type of Goods from this container.
-     * 
-     * @param type The type of Goods to remove from this container.
-     * @param amount The amount of Goods to remove from this container.
-     */
-    public void removeGoods(GoodsType type, int amount) {
-        goodsContainer.removeGoods(type, amount);
-    }
-
-    /**
-     * Removes the given Goods from the Colony.
-     *
-     * @param goods a <code>Goods</code> value
-     */
-    public void removeGoods(AbstractGoods goods) {
-        goodsContainer.removeGoods(goods);
-    }
-
-    /**
-     * Removes all Goods of the given type from the Colony.
-     *
-     * @param type a <code>GoodsType</code> value
-     */
-    public void removeGoods(GoodsType type) {
-        goodsContainer.removeGoods(type);
-    }
-
-    /**
-     * Describe <code>addGoods</code> method here.
-     *
-     * @param type a <code>GoodsType</code> value
-     * @param amount an <code>int</code> value
-     */
-    public void addGoods(GoodsType type, int amount) {
-        if (type.getStoredAs() != null) {
-            goodsContainer.addGoods(type.getStoredAs(), amount);
-        } else {
-            goodsContainer.addGoods(type, amount);
-        }
-    }
-
-    public void addGoods(AbstractGoods goods) {
-        addGoods(goods.getType(), goods.getAmount());
-    }
-
     public List<Unit> getUnitList() {
         ArrayList<Unit> units = new ArrayList<Unit>();
         for (WorkLocation wl : getWorkLocations()) {
@@ -750,9 +680,10 @@ public final class Colony extends Settlement implements Location, Nameable {
      * @param amount The number of bells to add.
      */
     public void addBells(int amount) {
+        GoodsType bells = FreeCol.getSpecification().getGoodsType("model.goods.bells");
         getOwner().incrementBells(amount);
         if (getMembers() <= getUnitCount() + 1 && amount > 0) {
-            addGoods(Goods.BELLS, amount);
+            addGoods(bells, amount);
         }
     }
 
@@ -775,7 +706,8 @@ public final class Colony extends Settlement implements Location, Nameable {
             return;
         }
         // Update "addSol(int)" and "getMembers()" if this formula gets changed:
-        int membership = (getGoodsCount(Goods.BELLS) * 100) / (BELLS_PER_REBEL * units);
+        GoodsType bells = FreeCol.getSpecification().getGoodsType("model.goods.bells");
+        int membership = (getGoodsCount(bells) * 100) / (BELLS_PER_REBEL * units);
         if (membership < 0) {
             membership = 0;
         } else if (membership > 100) {
@@ -1372,41 +1304,6 @@ public final class Colony extends Settlement implements Location, Nameable {
         }
     }
 
-    private void removeFood(final int amount) {
-        int rest = amount;
-        List<AbstractGoods> backlog = new ArrayList<AbstractGoods>();
-        for (GoodsType foodType : FreeCol.getSpecification().getGoodsFood()) {
-            int available = getGoodsCount(foodType);
-            if (available >= rest) {
-                removeGoods(foodType, rest);
-                for (AbstractGoods food : backlog) {
-                    removeGoods(food.getType(), food.getAmount());
-                }
-                rest = 0;
-            } else {
-                backlog.add(new AbstractGoods(foodType, available));
-                rest -= available;
-            }
-        }
-        if (rest > 0) {
-            throw new IllegalStateException("Attempted to remove more food than was present.");
-        }
-    }
-            
-    /**
-     * Returns the total amount of food present. 
-     *
-     * @return an <code>int</code> value
-     */
-    public int getFoodCount() {
-        int result = 0;
-        for (GoodsType foodType : FreeCol.getSpecification().getGoodsFood()) {
-            result += getGoodsCount(foodType);
-        }
-        return result;
-    }
-
-
     // Eat food:
     void updateFood() {
         int required = getFoodConsumption();
@@ -1662,7 +1559,8 @@ public final class Colony extends Settlement implements Location, Nameable {
         createWarehouseCapacityWarning();
 
         // Remove bells:
-        removeGoods(Goods.BELLS, Math.max(0, getUnitCount() - 2));
+        GoodsType bells = FreeCol.getSpecification().getGoodsType("model.goods.bells");
+        removeGoods(bells, Math.max(0, getUnitCount() - 2));
 
         // Update SoL:
         updateSoL();

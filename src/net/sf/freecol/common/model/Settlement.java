@@ -19,6 +19,7 @@
 
 package net.sf.freecol.common.model;
 
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.logging.Logger;
@@ -26,6 +27,7 @@ import java.util.logging.Logger;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
+import net.sf.freecol.FreeCol;
 import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.Map.Position;
 
@@ -48,6 +50,7 @@ abstract public class Settlement extends FreeColGameObject implements Location, 
             INDIAN_CAMP, INDIAN_VILLAGE, AZTEC_CITY, INCA_CITY }
     
     public static final int RADIUS = 1;
+    public static final int FOOD_CONSUMPTION = 2;
 
     public static final Modifier DEFENCE_MODIFIER =
         new Modifier("model.modifier.defence", "modifiers.inSettlement", 
@@ -350,5 +353,108 @@ abstract public class Settlement extends FreeColGameObject implements Location, 
     }
 
     public abstract void newTurn();
+
+    /**
+     * Removes a specified amount of a type of Goods from this Settlement.
+     * 
+     * @param type The type of Goods to remove from this settlement.
+     * @param amount The amount of Goods to remove from this settlement.
+     */
+    public void removeGoods(GoodsType type, int amount) {
+        goodsContainer.removeGoods(type, amount);
+    }
+
+    /**
+     * Removes the given Goods from the Settlement.
+     *
+     * @param goods a <code>Goods</code> value
+     */
+    public void removeGoods(AbstractGoods goods) {
+        goodsContainer.removeGoods(goods);
+    }
+
+    /**
+     * Removes all Goods of the given type from the Settlement.
+     *
+     * @param type a <code>GoodsType</code> value
+     */
+    public void removeGoods(GoodsType type) {
+        goodsContainer.removeGoods(type);
+    }
+
+    /**
+     * Describe <code>addGoods</code> method here.
+     *
+     * @param type a <code>GoodsType</code> value
+     * @param amount an <code>int</code> value
+     */
+    public void addGoods(GoodsType type, int amount) {
+        if (type.getStoredAs() != null) {
+            goodsContainer.addGoods(type.getStoredAs(), amount);
+        } else {
+            goodsContainer.addGoods(type, amount);
+        }
+    }
+
+    public void addGoods(AbstractGoods goods) {
+        addGoods(goods.getType(), goods.getAmount());
+    }
+
+    /**
+     * Gets the amount of one type of Goods at this Settlement.
+     * 
+     * @param type The type of goods to look for.
+     * @return The amount of this type of Goods at this Location.
+     */
+    public int getGoodsCount(GoodsType type) {
+        if (type.getStoredAs() == null) {
+            return goodsContainer.getGoodsCount(type);
+        } else {
+            return 0;
+        }
+    }
+
+    /**
+     * Gives the food needed to keep all units alive in this Settlement.
+     * 
+     * @return The amount of food eaten in this colony each this turn.
+     */
+    public int getFoodConsumption() {
+        return FOOD_CONSUMPTION * getUnitCount();
+    }
+
+    protected void removeFood(final int amount) {
+        int rest = amount;
+        List<AbstractGoods> backlog = new ArrayList<AbstractGoods>();
+        for (GoodsType foodType : FreeCol.getSpecification().getGoodsFood()) {
+            int available = getGoodsCount(foodType);
+            if (available >= rest) {
+                removeGoods(foodType, rest);
+                for (AbstractGoods food : backlog) {
+                    removeGoods(food.getType(), food.getAmount());
+                }
+                rest = 0;
+            } else {
+                backlog.add(new AbstractGoods(foodType, available));
+                rest -= available;
+            }
+        }
+        if (rest > 0) {
+            throw new IllegalStateException("Attempted to remove more food than was present.");
+        }
+    }
+            
+    /**
+     * Returns the total amount of food present. 
+     *
+     * @return an <code>int</code> value
+     */
+    public int getFoodCount() {
+        int result = 0;
+        for (GoodsType foodType : FreeCol.getSpecification().getGoodsFood()) {
+            result += getGoodsCount(foodType);
+        }
+        return result;
+    }
 
 }

@@ -166,8 +166,8 @@ public class GoodsContainer extends FreeColGameObject {
     }
 
     /**
-     * Removes all goods above given amount, except for
-     * <code>Goods.FOOD</code> which is left unchanged.
+     * Removes all goods above given amount, provided that the goods
+     * are storable and do not ignore warehouse limits.
      * 
      * @param amount The treshold.
      */

@@ -353,11 +353,12 @@ public class SimpleCombatModel implements CombatModel {
             // a stock-piled musket if attacked, so the bonus should be applied
             // for unarmed colonists inside colonies where there are muskets
             // available.
+            EquipmentType muskets = FreeCol.getSpecification().getEquipmentType("model.equipment.muskets");
             if (!defender.isArmed() &&
                 defender.isColonist() &&
                 defender.getLocation() instanceof WorkLocation &&
                 defender.getOwner().hasAbility("model.ability.automaticDefence") &&
-                defender.getColony().getGoodsCount(Goods.MUSKETS) >= 50) {
+                defender.getColony().canBuildEquipment(muskets)) {
                 Set<Ability> autoDefence = defender.getOwner().getFeatureContainer()
                     .getAbilitySet("model.ability.automaticDefence");
                 result.add(new Modifier(Modifier.DEFENCE, 

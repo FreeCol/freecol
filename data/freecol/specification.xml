@@ -71,11 +71,12 @@
     <goods-type id="model.goods.muskets" art="goods/muskets.png" is-farmed="false" made-from="model.goods.tools">
       <market initial-amount="500"   initial-price="1"  price-difference="2"/>
     </goods-type>
-    <goods-type id="model.goods.fish" art="goods/fish.png" is-farmed="true" storable="false" stored-as="model.goods.food" is-food="true" />
+    <goods-type id="model.goods.fish" art="goods/fish.png" is-farmed="true" storable="false"
+                stored-as="model.goods.food" is-food="true" />
     <goods-type id="model.goods.bells" art="goods/bells.png" is-farmed="false"
-                ignore-limit="true" storable="false"/>
+                ignore-limit="true" storable="false" player-accumulated="true"/>
     <goods-type id="model.goods.crosses" art="goods/crosses.png" is-farmed="false"
-                ignore-limit="true" storable="false"/>
+                ignore-limit="true" storable="false" player-accumulated="true"/>
     <goods-type id="model.goods.hammers" art="goods/hammers.png" is-farmed="false"
                 made-from="model.goods.lumber" ignore-limit="true" storable="false" price="20"/>
   </goods-types>

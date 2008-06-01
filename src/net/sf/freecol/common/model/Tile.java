@@ -354,11 +354,16 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
         } else if (getSettlement() != null) {
             return 0;
         } else {
-            int value = potential(Goods.FOOD) * 3;
+            int value = potential(primaryGoods()) * 3;
             
-            boolean nearbyTileHasForest = false;
             boolean nearbyTileIsOcean = false;
-            boolean nearbyTileHasOre = false;
+
+            java.util.Map<GoodsType, Boolean> buildingMaterialMap = new HashMap<GoodsType, Boolean>();
+            for (GoodsType type : FreeCol.getSpecification().getGoodsTypeList()) {
+                if (type.isRawBuildingMaterial()) {
+                    buildingMaterialMap.put(type, false);
+                }
+            }
 
             for (Tile tile : getGame().getMap().getSurroundingTiles(this, 1)) {
                 if (tile.getColony() != null) {
@@ -368,19 +373,15 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
                     // can build next to an indian settlement
                     value -= 10;
                 } else {
-                    if (tile.isLand()) {
-                        for (GoodsType type : FreeCol.getSpecification().getGoodsTypeList()) {
-                            value += tile.potential(type);
-                        }
-                        if (tile.isForested()) {
-                            nearbyTileHasForest = true;
-                        }
-                        if (tile.potential(Goods.ORE)>=4) {
-                            nearbyTileHasOre = true;
-                        }
-                    } else {
+                    if (!tile.isLand()) {
                         nearbyTileIsOcean = true;
-                        value += tile.potential(Goods.FOOD);
+                    }
+                    for (GoodsType type : FreeCol.getSpecification().getGoodsTypeList()) {
+                        int potential = tile.potential(type);
+                        value += potential;
+                        if (type.isRawBuildingMaterial() && potential > 4) {
+                            buildingMaterialMap.put(type, true);
+                        }
                     }
                     if (tile.hasResource()) {
                         value += 20;
@@ -406,18 +407,12 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
                 value -= 5;
             }
 
-            if (!nearbyTileHasForest) {
-                // colonies with no access to forest are penalized
-                // as they must import wood necessary for production
-                value -= 30;
+            for (Boolean buildingMaterial : buildingMaterialMap.values()) {
+                if (!buildingMaterial) {
+                    value -= 40;
+                }
             }
-            
-            if (!nearbyTileHasOre) {
-                // colonies with no access to ore mine are penalized
-                // as they must import ore or tools necessary for production
-                value -= 50;
-            }
-            
+
             if (!nearbyTileIsOcean) {
                 // TODO: Uncomment when wagon train code has been written:
                 // value -= 20;
@@ -1244,7 +1239,7 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
 
         for (TileType tileType : tileTypes) {
             float potential = tileType.getPotential(goodsType);
-            if (tileType.isWater() && goodsType == Goods.FISH) {
+            if (tileType.isWater() && goodsType.isFoodType()) {
                 potential += fishBonus;
             }
             if (tileType == getType() && hasResource()) {

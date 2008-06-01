@@ -655,7 +655,7 @@ public class IndianSettlement extends Settlement {
 
         if (type == Goods.MUSKETS) {
             int need = 0;
-            int supply = goodsContainer.getGoodsCount(Goods.MUSKETS);
+            int supply = getGoodsCount(Goods.MUSKETS);
             for (int i=0; i<ownedUnits.size(); i++) {
                 need += Unit.MUSKETS_TO_ARM_INDIAN;
                 if (ownedUnits.get(i).isArmed()) {
@@ -663,18 +663,18 @@ public class IndianSettlement extends Settlement {
                 }
             }
 
-            int sets = ((goodsContainer.getGoodsCount(Goods.MUSKETS) + amount) / Unit.MUSKETS_TO_ARM_INDIAN)
-                - (goodsContainer.getGoodsCount(Goods.MUSKETS) / Unit.MUSKETS_TO_ARM_INDIAN);
+            int sets = ((getGoodsCount(Goods.MUSKETS) + amount) / Unit.MUSKETS_TO_ARM_INDIAN)
+                - (getGoodsCount(Goods.MUSKETS) / Unit.MUSKETS_TO_ARM_INDIAN);
             int startPrice = (19+getPriceAddition()) - (supply / Unit.MUSKETS_TO_ARM_INDIAN);
             for (int i=0; i<sets; i++) {
-                if ((startPrice-i) < 8 && (need > supply || goodsContainer.getGoodsCount(Goods.MUSKETS) < Unit.MUSKETS_TO_ARM_INDIAN * 2)) {
+                if ((startPrice-i) < 8 && (need > supply || getGoodsCount(Goods.MUSKETS) < Unit.MUSKETS_TO_ARM_INDIAN * 2)) {
                     startPrice = 8+i;
                 }
                 returnPrice += Unit.MUSKETS_TO_ARM_INDIAN * (startPrice-i);
             }
         } else if (type == Goods.HORSES) {
             int need = 0;
-            int supply = goodsContainer.getGoodsCount(Goods.HORSES);
+            int supply = getGoodsCount(Goods.HORSES);
             for (int i=0; i<ownedUnits.size(); i++) {
                 need += Unit.HORSES_TO_MOUNT_INDIAN;
                 if (ownedUnits.get(i).isMounted()) {
@@ -682,14 +682,14 @@ public class IndianSettlement extends Settlement {
                 }
             }
 
-            int sets = (goodsContainer.getGoodsCount(Goods.HORSES) + amount) / Unit.HORSES_TO_MOUNT_INDIAN
-                - (goodsContainer.getGoodsCount(Goods.HORSES) / Unit.HORSES_TO_MOUNT_INDIAN);
+            int sets = (getGoodsCount(Goods.HORSES) + amount) / Unit.HORSES_TO_MOUNT_INDIAN
+                - (getGoodsCount(Goods.HORSES) / Unit.HORSES_TO_MOUNT_INDIAN);
             int startPrice = (24+getPriceAddition()) - (supply/Unit.HORSES_TO_MOUNT_INDIAN);
 
             for (int i=0; i<sets; i++) {
                 if ((startPrice-(i*4)) < 4 &&
                     (need > supply ||
-                     goodsContainer.getGoodsCount(Goods.HORSES) < Unit.HORSES_TO_MOUNT_INDIAN * 2)) {
+                     getGoodsCount(Goods.HORSES) < Unit.HORSES_TO_MOUNT_INDIAN * 2)) {
                     startPrice = 4+(i*4);
                 }
                 returnPrice += Unit.HORSES_TO_MOUNT_INDIAN * (startPrice-(i*4));
@@ -697,7 +697,7 @@ public class IndianSettlement extends Settlement {
         } else if (type.isFarmed()) {
             returnPrice = 0;
         } else {
-            int currentGoods = goodsContainer.getGoodsCount(type);
+            int currentGoods = getGoodsCount(type);
 
             // Increase amount if raw materials are produced:
             GoodsType rawType = type.getRawMaterial();
@@ -715,7 +715,7 @@ public class IndianSettlement extends Settlement {
                     }
                 }
             }
-            if (type == Goods.TRADEGOODS) {
+            if (type.isTradeGoods()) {
                 currentGoods += 20;
             }
 
@@ -777,10 +777,10 @@ public class IndianSettlement extends Settlement {
         int wantedIndex = 0;
         for (GoodsType goodsType : goodsTypes) {
             // Indians do not ask for horses or guns
-            if (goodsType == Goods.HORSES || goodsType == Goods.MUSKETS) 
+            if (goodsType.isMilitaryGoods()) 
                 continue;
             // no sense asking for bells or crosses
-            if (goodsType.isStorable()==false)
+            if (!goodsType.isStorable())
                 continue;
             if (wantedIndex < wantedGoods.length) {
                 wantedGoods[wantedIndex] = goodsType;
@@ -881,22 +881,22 @@ public class IndianSettlement extends Settlement {
         }
 
         /* Use tools (if available) to produce manufactured goods: */
-        if (goodsContainer.getGoodsCount(Goods.TOOLS) > 0) {
+        if (getGoodsCount(Goods.TOOLS) > 0) {
             GoodsType typeWithSmallestAmount = null;
             for (GoodsType g : goodsList) {
                 if (g.isFoodType() || g.isBuildingMaterial() || g.isRawBuildingMaterial()) {
                     continue;
                 }
-                if (g.isRawMaterial() && goodsContainer.getGoodsCount(g) > KEEP_RAW_MATERIAL) {
+                if (g.isRawMaterial() && getGoodsCount(g) > KEEP_RAW_MATERIAL) {
                     if (typeWithSmallestAmount == null ||
-                        goodsContainer.getGoodsCount(g.getProducedMaterial()) < goodsContainer.getGoodsCount(typeWithSmallestAmount)) {
+                        getGoodsCount(g.getProducedMaterial()) < getGoodsCount(typeWithSmallestAmount)) {
                         typeWithSmallestAmount = g.getProducedMaterial();
                     }
                 }
             }
             if (typeWithSmallestAmount != null) {
-                int production = Math.min(goodsContainer.getGoodsCount(typeWithSmallestAmount.getRawMaterial()),
-                                          Math.min(10, goodsContainer.getGoodsCount(Goods.TOOLS)));
+                int production = Math.min(getGoodsCount(typeWithSmallestAmount.getRawMaterial()),
+                                          Math.min(10, getGoodsCount(Goods.TOOLS)));
                 goodsContainer.removeGoods(Goods.TOOLS, production);
                 goodsContainer.removeGoods(typeWithSmallestAmount.getRawMaterial(), production);
                 goodsContainer.addGoods(typeWithSmallestAmount, production * 5);
@@ -904,7 +904,7 @@ public class IndianSettlement extends Settlement {
         }
 
         /* Consume goods: TODO: make this more generic */
-        consumeGoods(Goods.FOOD, 2 * workers);
+        removeFood(getFoodConsumption());
         consumeGoods(Goods.RUM, 2 * workers);
         consumeGoods(Goods.TRADEGOODS, 2 * workers);
         for (GoodsType goodsType : FreeCol.getSpecification().getNewWorldGoodsTypeList()) {
@@ -1051,7 +1051,7 @@ public class IndianSettlement extends Settlement {
     // Create a new colonist if there is enough food:
     private void checkForNewIndian() {
         // Alcohol also contributes to create children. 
-        if (goodsContainer.getGoodsCount(Goods.FOOD) + 4*goodsContainer.getGoodsCount(Goods.RUM) > 200+KEEP_RAW_MATERIAL ) {
+        if (getFoodCount() + 4*getGoodsCount(Goods.RUM) > 200+KEEP_RAW_MATERIAL ) {
             if (ownedUnits.size() <= 6 + getTypeOfSettlement().ordinal()) {
                 // up to a limit. Anyway cities produce more children than camps
                 List<UnitType> unitTypes = FreeCol.getSpecification().getUnitTypesWithAbility("model.ability.bornInIndianSettlement");
@@ -1059,7 +1059,7 @@ public class IndianSettlement extends Settlement {
                     int random = getGame().getModelController().getRandom(getId() + "bornInIndianSettlement", unitTypes.size());
                     Unit u = getGame().getModelController().createUnit(getId() + "newTurn200food",
                                                                        getTile(), getOwner(), unitTypes.get(random));
-                    consumeGoods(Goods.FOOD, 200);  // All food will be consumed, even if RUM helped
+                    removeFood(200);  // All food will be consumed, even if RUM helped
                     consumeGoods(Goods.RUM, 200/4);    // Also, some available RUM is consumed
                     // I know that consumeGoods will produce gold, which is explained because children are always a gift
 
@@ -1071,8 +1071,8 @@ public class IndianSettlement extends Settlement {
     }
 
     private void consumeGoods(GoodsType type, int amount) {
-        if (goodsContainer.getGoodsCount(type) > 0) {
-            amount = Math.min(amount, goodsContainer.getGoodsCount(type));
+        if (getGoodsCount(type) > 0) {
+            amount = Math.min(amount, getGoodsCount(type));
             getOwner().modifyGold(amount);
             goodsContainer.removeGoods(type, amount);
         }
@@ -1349,7 +1349,7 @@ public class IndianSettlement extends Settlement {
         int i = 0;
         for(Goods goods : settlementGoods) {
             // Only sell raw materials but never sell food and lumber
-            if (goods.getType() != Goods.FOOD && goods.getType() != Goods.LUMBER &&
+            if (goods.getType().isFoodType() && goods.getType() != Goods.LUMBER &&
                 goods.getType().isStorable()) {
                 sellGoods[i] = goods;
                 i++;
