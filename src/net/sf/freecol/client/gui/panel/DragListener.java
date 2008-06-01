@@ -19,14 +19,14 @@
 
 package net.sf.freecol.client.gui.panel;
 
+import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.util.Iterator;
 import java.util.List;
 
-import javax.swing.AbstractAction;
+import javax.swing.ImageIcon;
 import javax.swing.JComponent;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
@@ -40,12 +40,12 @@ import net.sf.freecol.common.model.AbstractGoods;
 import net.sf.freecol.common.model.Building;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.EquipmentType;
-import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.Unit.UnitState;
 import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.model.WorkLocation;
+import net.sf.freecol.common.resources.ResourceManager;
 
 /**
  * A DragListener should be attached to Swing components that have a
@@ -87,7 +87,9 @@ public final class DragListener extends MouseAdapter {
                 final Unit tempUnit = unitLabel.getUnit();
                 final InGameController inGameController = unitLabel.getCanvas().getClient().getInGameController();
                 JPopupMenu menu = new JPopupMenu("Unit");
-                JMenuItem name = new JMenuItem(tempUnit.getName());
+                ImageIcon unitIcon = imageLibrary.getUnitImageIcon(tempUnit);
+                JMenuItem name = new JMenuItem(tempUnit.getName(),
+                        imageLibrary.getScaledImageIcon(unitIcon, 0.66f));
                 name.setEnabled(false);
                 menu.add(name);
 
@@ -201,6 +203,7 @@ public final class DragListener extends MouseAdapter {
                             }
                         }
                         if (count > 0) {
+                            // "remove current equipment" action
                             JMenuItem newItem = new JMenuItem(Messages.message(equipmentType.getId() + ".remove"));
                             if (!equipmentType.getGoodsRequired().isEmpty()) {
                                 GoodsType goodsType = equipmentType.getGoodsRequired().get(0).getType();
@@ -217,6 +220,7 @@ public final class DragListener extends MouseAdapter {
                             menu.add(newItem);
                         }
                         if (tempUnit.canBeEquippedWith(equipmentType)) {
+                            // "add new equipment" action
                             JMenuItem newItem = new JMenuItem();
                             count = equipmentType.getMaximumCount() - count;
                             if (equipmentType.getGoodsRequired().isEmpty()) {
@@ -284,7 +288,9 @@ public final class DragListener extends MouseAdapter {
                     
                 }
 
-                menuItem = new JMenuItem(Messages.message("menuBar.colopedia"));
+                Image colopediaIcon = ResourceManager.getImage("Colopedia.closedSection.image");
+                menuItem = new JMenuItem(Messages.message("menuBar.colopedia"), 
+                        imageLibrary.getScaledImageIcon(colopediaIcon, 0.66f));
                 menuItem.setActionCommand(String.valueOf(UnitLabel.COLOPEDIA));
                 menuItem.addActionListener(unitLabel);
                 menu.add(menuItem);
@@ -302,7 +308,7 @@ public final class DragListener extends MouseAdapter {
                 }
                 if (experience > 0) {
                     JMenuItem experienceItem = new JMenuItem(Messages.message("menuBar.experience") +
-                                                             ": " + experience + "/200 (max. 4%");
+                                                             ": " + experience + "/200");
                     experienceItem.setEnabled(false);
                     menu.add(experienceItem);
                 }
