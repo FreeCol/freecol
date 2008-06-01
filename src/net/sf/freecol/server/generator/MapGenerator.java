@@ -735,6 +735,11 @@ public class MapGenerator {
                 Iterator<Position> cti = map.getFloodFillIterator(new Position(x, y));
                 while(cti.hasNext()) {
                     Tile tempTile = map.getTile(cti.next());
+                    if (tempTile.getY() <= LandGenerator.POLAR_HEIGHT ||
+                        tempTile.getY() >= map.getHeight() - LandGenerator.POLAR_HEIGHT - 1) {
+                        // do not place the initial colony at the pole
+                        continue;
+                    }
                     if (tempTile.isColonizeable()) {
                         colonyTile = tempTile;
                         break;
