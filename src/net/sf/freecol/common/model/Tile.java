@@ -230,7 +230,7 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
                 return Messages.message("unexplored");
             } else {
                 logger.warning("player == null");
-                return null;
+                return "";
             }
         }
     }
