@@ -626,10 +626,7 @@ public final class UnitType extends BuildableType {
         price = getAttribute(in, "price", UNDEFINED);
         increasingPrice = getAttribute(in, "increasingPrice", UNDEFINED);
 
-        String goodsTypeRef = in.getAttributeValue(null, "expert-production");
-        if (goodsTypeRef != null) {
-            expertProduction = specification.getGoodsType(goodsTypeRef);
-        }
+        expertProduction = specification.getType(in, "expert-production", GoodsType.class, null);
 
         while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
             String nodeName = in.getLocalName();

@@ -52,6 +52,10 @@ public class LostCityRumour extends FreeColGameObjectType {
         // this class is really just an enum, but needs to inherit from FreeColGameObjectType
     }
 
+    public static String getXMLElementTagName() {
+        return "lostCityRumour";
+    }
+
 }
 
 

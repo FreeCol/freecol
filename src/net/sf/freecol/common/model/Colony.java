@@ -1695,12 +1695,8 @@ public final class Colony extends Settlement implements Location, Nameable {
         tories = getAttribute(in, "tories", 0);
         oldTories = getAttribute(in, "oldTories", 0);
         productionBonus = getAttribute(in, "productionBonus", 0);
-        BuildableType buildableType = BuildableType.NOTHING;
-        String buildable = getAttribute(in, "currentlyBuilding", null);
-        if (buildable != null) {
-            buildableType = (BuildableType) FreeCol.getSpecification().getType(buildable);
-        }
-        setCurrentlyBuilding(buildableType);
+        setCurrentlyBuilding(FreeCol.getSpecification().getType(in, "currentlyBuilding", BuildableType.class, 
+                                                                BuildableType.NOTHING));
         landLocked = getAttribute(in, "landLocked", true);
         if (!landLocked) {
             featureContainer.addAbility(HAS_PORT);

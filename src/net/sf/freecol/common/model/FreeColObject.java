@@ -44,6 +44,8 @@ import org.w3c.dom.Element;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
+import net.sf.freecol.FreeCol;
+
 public abstract class FreeColObject {
 
     protected static Logger logger = Logger.getLogger(FreeColObject.class.getName());

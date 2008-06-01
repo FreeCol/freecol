@@ -116,15 +116,8 @@ public final class BuildingType extends BuildableType {
         workPlaces = getAttribute(in, "workplaces", 0);
         basicProduction = getAttribute(in, "basicProduction", 0);
 
-        String consumeStr = in.getAttributeValue(null, "consumes");
-        if (consumeStr != null) {
-            consumes = specification.getGoodsType(consumeStr);
-        }
-
-        String produceStr = in.getAttributeValue(null, "produces");
-        if (produceStr != null) {
-            produces = specification.getGoodsType(produceStr);
-        }
+        consumes = specification.getType(in, "consumes", GoodsType.class, null);
+        produces = specification.getType(in, "produces", GoodsType.class, null);
 
         minSkill = getAttribute(in, "minSkill", Integer.MIN_VALUE);
         maxSkill = getAttribute(in, "maxSkill", Integer.MAX_VALUE);

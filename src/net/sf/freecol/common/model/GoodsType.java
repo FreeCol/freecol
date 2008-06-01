@@ -331,19 +331,13 @@ public final class GoodsType extends FreeColGameObjectType {
         price = getAttribute(in, "price", NO_PRICE);
         playerAccumulated = getAttribute(in, "player-accumulated", false);
 
-        if (hasAttribute(in, "made-from")) {
-            String  madeFromRef = in.getAttributeValue(null, "made-from");
-            GoodsType rawMaterial = specification.getGoodsType(madeFromRef);
-            madeFrom = rawMaterial;
-            if (rawMaterial != null) {
-                rawMaterial.makes = this;
-            }
+        madeFrom = specification.getType(in, "made-from", GoodsType.class, null);
+        if (madeFrom != null) {
+            madeFrom.makes = this;
         }
 
         storable = getAttribute(in, "storable", true);
-        if (hasAttribute(in, "stored-as")) {
-            storedAs = specification.getGoodsType(in.getAttributeValue(null, "stored-as"));
-        }
+        storedAs = specification.getType(in, "stored-as", GoodsType.class, null);
 
         // Only expected child is 'market'
         while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {

@@ -3348,7 +3348,7 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
         // Start element:
         out.writeStartElement(getXMLElementTagName());
 
-        out.writeAttribute("ID", getId());
+        out.writeAttribute(ID_ATTRIBUTE, getId());
         if (name != null) {
             out.writeAttribute("name", name);
         }
@@ -3438,7 +3438,7 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
      * @throws javax.xml.stream.XMLStreamException is thrown if something goes wrong.
      */
     protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
-        setId(in.getAttributeValue(null, "ID"));
+        setId(in.getAttributeValue(null, ID_ATTRIBUTE));
         setName(in.getAttributeValue(null, "name"));
         unitType = FreeCol.getSpecification().getUnitType(in.getAttributeValue(null, "unitType"));
         naval = unitType.hasAbility("model.ability.navalUnit");
@@ -3510,16 +3510,8 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
             }
         }
 
-        final String workTypeStr = in.getAttributeValue(null, "workType");
-        if (workTypeStr != null) {
-            workType = FreeCol.getSpecification().getGoodsType(workTypeStr);
-        }
-        
-        final String experienceStr = in.getAttributeValue(null, "experience");
-        if (experienceStr != null) {
-            experience = Integer.parseInt(experienceStr);
-        }
-
+        workType = FreeCol.getSpecification().getType(in, "workType", GoodsType.class, null);
+        experience = getAttribute(in, "experience", 0);
         visibleGoodsCount = getAttribute(in, "visibleGoodsCount", -1);
 
         final String entryLocationStr = in.getAttributeValue(null, "entryLocation");
@@ -3545,7 +3537,7 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
                 units = new ArrayList<Unit>();
                 while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
                     if (in.getLocalName().equals(Unit.getXMLElementTagName())) {
-                        Unit unit = (Unit) getGame().getFreeColGameObject(in.getAttributeValue(null, "ID"));
+                        Unit unit = (Unit) getGame().getFreeColGameObject(in.getAttributeValue(null, ID_ATTRIBUTE));
                         if (unit != null) {
                             unit.readFromXML(in);
                             units.add(unit);
@@ -3556,7 +3548,7 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
                     }
                 }
             } else if (in.getLocalName().equals(GoodsContainer.getXMLElementTagName())) {
-                goodsContainer = (GoodsContainer) getGame().getFreeColGameObject(in.getAttributeValue(null, "ID"));
+                goodsContainer = (GoodsContainer) getGame().getFreeColGameObject(in.getAttributeValue(null, ID_ATTRIBUTE));
                 if (goodsContainer != null) {
                     goodsContainer.readFromXML(in);
                 } else {
@@ -3570,7 +3562,7 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
                 }
                 in.nextTag();
             } else if (in.getLocalName().equals(TileImprovement.getXMLElementTagName())) {
-                workImprovement = (TileImprovement) getGame().getFreeColGameObject(in.getAttributeValue(null, "ID"));
+                workImprovement = (TileImprovement) getGame().getFreeColGameObject(in.getAttributeValue(null, ID_ATTRIBUTE));
                 if (workImprovement != null) {
                     workImprovement.readFromXML(in);
                 } else {

@@ -482,4 +482,15 @@ abstract public class FreeColGameObject extends FreeColObject {
         return getClass().getName() + ": " + getId() + " (super's hash code: " +
             Integer.toHexString(super.hashCode()) + ")";
     }
+
+    public <T extends FreeColGameObject> T getFreeColGameObject(XMLStreamReader in, String attributeName,
+                                                                Class<T> returnClass, T defaultValue) {
+        final String attributeString = in.getAttributeValue(null, attributeName);
+        if (attributeString != null) {
+            return returnClass.cast(getGame().getFreeColGameObject(attributeString));
+        } else {
+            return defaultValue;
+        }
+    }
+
 }

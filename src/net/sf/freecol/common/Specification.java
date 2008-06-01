@@ -818,4 +818,13 @@ public final class Specification {
         return specification;
     }
 
+    public <T extends FreeColGameObjectType> T getType(XMLStreamReader in, String attributeName,
+                                                       Class<T> returnClass, T defaultValue) {
+        final String attributeString = in.getAttributeValue(null, attributeName);
+        if (attributeString != null) {
+            return returnClass.cast(getType(attributeString));
+        } else {
+            return defaultValue;
+        }
+    }
 }

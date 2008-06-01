@@ -273,22 +273,15 @@ public final class TileImprovementType extends FreeColGameObjectType
         movementCostFactor = -1;
         magnitude = getAttribute(in, "magnitude", 1);
 
-        String req = in.getAttributeValue(null, "required-improvement");
-        if (req != null) {
-            requiredImprovementType = specification.getTileImprovementType(req);
-        }
+        requiredImprovementType = specification.getType(in, "required-improvement", 
+                                                        TileImprovementType.class, null);
+
         artOverlay = getAttribute(in, "overlay", null);
         artOverTrees = getAttribute(in, "over-trees", false);
 
-        String g = in.getAttributeValue(null, "expended-equipment-type");
-        if (g != null) {
-            expendedEquipmentType = specification.getEquipmentType(g);
-        }
+        expendedEquipmentType = specification.getType(in, "expended-equipment-type", EquipmentType.class, null);
         expendedAmount = getAttribute(in, "expended-amount", 0);
-        g = in.getAttributeValue(null, "deliver-goods-type");
-        if (g != null) {
-            deliverGoodsType = specification.getGoodsType(g);
-        }
+        deliverGoodsType = specification.getType(in, "deliver-goods-type", GoodsType.class, null);
         deliverAmount = getAttribute(in, "deliver-amount", 0);
 
         allowedWorkers = new HashSet<String>();

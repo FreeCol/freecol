@@ -1486,7 +1486,7 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
             }
         }
 
-        out.writeAttribute("ID", getId());
+        out.writeAttribute(ID_ATTRIBUTE, getId());
         out.writeAttribute("x", Integer.toString(x));
         out.writeAttribute("y", Integer.toString(y));
 
@@ -1519,7 +1519,7 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
                     if (!player.canSee(getTile())) {
                         if (pet.getColonyUnitCount() != 0) {
                             out.writeStartElement(Colony.getXMLElementTagName());
-                            out.writeAttribute("ID", getColony().getId());
+                            out.writeAttribute(ID_ATTRIBUTE, getColony().getId());
                             out.writeAttribute("name", getColony().getName());
                             out.writeAttribute("owner", getColony().getOwner().getId());
                             out.writeAttribute("tile", getId());
@@ -1543,7 +1543,7 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
                     final IndianSettlement is = (IndianSettlement) getSettlement();
 
                     out.writeStartElement(IndianSettlement.getXMLElementTagName());
-                    out.writeAttribute("ID", getSettlement().getId());
+                    out.writeAttribute(ID_ATTRIBUTE, getSettlement().getId());
                     out.writeAttribute("tile", getId());
                     out.writeAttribute("owner", getSettlement().getOwner().getId());
                     out.writeAttribute("isCapital", Boolean.toString(is.isCapital()));
@@ -1613,7 +1613,7 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
      * @param in The input stream with the XML.
      */
     protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
-        setId(in.getAttributeValue(null, "ID"));
+        setId(in.getAttributeValue(null, ID_ATTRIBUTE));
 
         x = Integer.parseInt(in.getAttributeValue(null, "x"));
         y = Integer.parseInt(in.getAttributeValue(null, "y"));
@@ -1641,24 +1641,9 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
             type = FreeCol.getSpecification().getTileType(typeStr);
         }
 
-        String regionString = in.getAttributeValue(null, "region");
-        if (regionString != null) {
-            region = (Region) getGame().getFreeColGameObject(regionString);
-        }
-
-        final String lostCityRumourStr = in.getAttributeValue(null, "lostCityRumour");
-        if (lostCityRumourStr != null) {
-            lostCityRumour = Boolean.valueOf(lostCityRumourStr).booleanValue();
-        } else {
-            lostCityRumour = false;
-        }
-
-        final String ownerStr = in.getAttributeValue(null, "owner");
-        if (ownerStr != null) {
-            owner = (Player) getGame().getFreeColGameObject(ownerStr);
-        } else {
-            owner = null;
-        }
+        lostCityRumour = getAttribute(in, LostCityRumour.getXMLElementTagName(), false);
+        owner = getFreeColGameObject(in, "owner", Player.class, null);
+        region = getFreeColGameObject(in, "region", Region.class, null);
 
         final String owningSettlementStr = in.getAttributeValue(null, "owningSettlement");
         if (owningSettlementStr != null) {
@@ -1679,7 +1664,7 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
         boolean settlementSent = false;
         while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
             if (in.getLocalName().equals(Colony.getXMLElementTagName())) {
-                settlement = (Settlement) getGame().getFreeColGameObject(in.getAttributeValue(null, "ID"));
+                settlement = (Settlement) getGame().getFreeColGameObject(in.getAttributeValue(null, ID_ATTRIBUTE));
                 if (settlement != null) {
                     settlement.readFromXML(in);
                 } else {
@@ -1687,7 +1672,7 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
                 }
                 settlementSent = true;
             } else if (in.getLocalName().equals(IndianSettlement.getXMLElementTagName())) {
-                settlement = (Settlement) getGame().getFreeColGameObject(in.getAttributeValue(null, "ID"));
+                settlement = (Settlement) getGame().getFreeColGameObject(in.getAttributeValue(null, ID_ATTRIBUTE));
                 if (settlement != null) {
                     settlement.readFromXML(in);
                 } else {
@@ -1698,7 +1683,7 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
                 units = new ArrayList<Unit>();
                 while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
                     if (in.getLocalName().equals(Unit.getXMLElementTagName())) {
-                        Unit unit = (Unit) getGame().getFreeColGameObject(in.getAttributeValue(null, "ID"));
+                        Unit unit = (Unit) getGame().getFreeColGameObject(in.getAttributeValue(null, ID_ATTRIBUTE));
                         if (unit != null) {
                             unit.readFromXML(in);
                             units.add(unit);
@@ -1709,7 +1694,7 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
                     }
                 }
             } else if (in.getLocalName().equals(TileItemContainer.getXMLElementTagName())) {
-                tileItemContainer = (TileItemContainer) getGame().getFreeColGameObject(in.getAttributeValue(null, "ID"));
+                tileItemContainer = (TileItemContainer) getGame().getFreeColGameObject(in.getAttributeValue(null, ID_ATTRIBUTE));
                 if (tileItemContainer != null) {
                     tileItemContainer.readFromXML(in);
                 } else {
@@ -2192,62 +2177,28 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
         public void readFromXML(XMLStreamReader in) throws XMLStreamException {
             player = (Player) getGame().getFreeColGameObject(in.getAttributeValue(null, "player"));
 
-            final String exploredStr = in.getAttributeValue(null, "explored");
-            if (exploredStr != null) {
-                explored = Boolean.valueOf(exploredStr).booleanValue();
-            } else {
-                explored = true;
-            }
+            explored = getAttribute(in, "explored", true);
+            settlementVisited = getAttribute(in, "settlementVisited", false);
+            colonyUnitCount = getAttribute(in, "colonyUnitCount", 0);
+            colonyStockadeLevel = getAttribute(in, "colonyStockadeLevel", 0);
+            lostCityRumour = getAttribute(in, LostCityRumour.getXMLElementTagName(),
+                                          Tile.this.hasLostCityRumour());
 
-            final String lostCityRumourStr = in.getAttributeValue(null, "lostCityRumour");
-            if (lostCityRumourStr != null) {
-                lostCityRumour = Boolean.valueOf(lostCityRumourStr).booleanValue();
-            } else {
-                lostCityRumour = Tile.this.hasLostCityRumour();
-            }
-
-            final String ownerStr = in.getAttributeValue(null, "owner");
-            if (ownerStr != null) {
-                owner = (Player) getGame().getFreeColGameObject(ownerStr);
-            } else {
-                owner = Tile.this.getOwner();
-            }
-
-            final String colonyUnitCountStr = in.getAttributeValue(null, "colonyUnitCount");
-            if (colonyUnitCountStr != null) {
-                colonyUnitCount = Integer.parseInt(colonyUnitCountStr);
-                colonyStockadeLevel = Integer.parseInt(in.getAttributeValue(null, "colonyStockadeLevel"));
-            } else {
-                colonyUnitCount = 0;
-            }
+            owner = getFreeColGameObject(in, "owner", Player.class, Tile.this.getOwner());
+            region = getFreeColGameObject(in, "region", Region.class, null);
 
             Specification spec = FreeCol.getSpecification();
-            final String learnableSkillStr = in.getAttributeValue(null, "learnableSkill");
-            if (learnableSkillStr != null) {
-                skill = spec.getUnitType(learnableSkillStr);
-            } else {
-                skill = null;
-            }
-            settlementVisited = Boolean.valueOf(in.getAttributeValue(null, "settlementVisited")).booleanValue();
-
-            final String highlyWantedGoodsStr = in.getAttributeValue(null, "wantedGoods0");
-            if (highlyWantedGoodsStr != null) {
-                wantedGoods[0] = spec.getGoodsType(highlyWantedGoodsStr);
-                wantedGoods[1] = spec.getGoodsType(in.getAttributeValue(null, "wantedGoods1"));
-                wantedGoods[2] = spec.getGoodsType(in.getAttributeValue(null, "wantedGoods2"));
-            }
-
-            String regionString = in.getAttributeValue(null, "region");
-            if (regionString != null) {
-                region = (Region) getGame().getFreeColGameObject(regionString);
-            }
+            skill = spec.getType(in, "learnableSkill", UnitType.class, null);
+            wantedGoods[0] = spec.getType(in, "wantedGoods0", GoodsType.class, null);
+            wantedGoods[1] = spec.getType(in, "wantedGoods1", GoodsType.class, null);
+            wantedGoods[2] = spec.getType(in, "wantedGoods2", GoodsType.class, null);
 
             missionary = null;
             TileItemContainer tileItemContainer = new TileItemContainer(getGame(), Tile.this);
             while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
-                if (in.getLocalName().equals("missionary")) {
+                if (in.getLocalName().equals(IndianSettlement.MISSIONARY_TAG_NAME)) {
                     in.nextTag(); // advance to the Unit tag
-                    missionary = (Unit) getGame().getFreeColGameObject(in.getAttributeValue(null, "ID"));
+                    missionary = (Unit) getGame().getFreeColGameObject(in.getAttributeValue(null, ID_ATTRIBUTE));
                     if (missionary == null) {
                         missionary = new Unit(getGame(), in);
                     } else {
@@ -2255,7 +2206,7 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
                     }
                     in.nextTag(); // close <missionary> tag
                 } else if (in.getLocalName().equals(Resource.getXMLElementTagName())) {
-                    Resource resource = (Resource) getGame().getFreeColGameObject(in.getAttributeValue(null, "ID"));
+                    Resource resource = (Resource) getGame().getFreeColGameObject(in.getAttributeValue(null, ID_ATTRIBUTE));
                     if (resource != null) {
                         resource.readFromXML(in);
                     } else {
@@ -2263,7 +2214,7 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
                     }
                     tileItemContainer.addTileItem(resource);
                 } else if (in.getLocalName().equals(TileImprovement.getXMLElementTagName())) {
-                    TileImprovement ti = (TileImprovement) getGame().getFreeColGameObject(in.getAttributeValue(null, "ID"));
+                    TileImprovement ti = (TileImprovement) getGame().getFreeColGameObject(in.getAttributeValue(null, ID_ATTRIBUTE));
                     if (ti != null) {
                         ti.readFromXML(in);
                     } else {

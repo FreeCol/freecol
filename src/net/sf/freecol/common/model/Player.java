@@ -2395,15 +2395,9 @@ public class Player extends FreeColGameObject implements Nameable {
         tax = Integer.parseInt(in.getAttributeValue(null, "tax"));
         numberOfSettlements = getAttribute(in, "numberOfSettlements", 0);
         playerType = Enum.valueOf(PlayerType.class, in.getAttributeValue(null, "playerType"));
-        String currentFatherId = in.getAttributeValue(null, "currentFather");
-        if (currentFatherId != null) {
-            currentFather = FreeCol.getSpecification().getFoundingFather(currentFatherId);
-        }
-        crossesRequired = Integer.parseInt(in.getAttributeValue(null, "crossesRequired"));
-        final String newLandNameStr = in.getAttributeValue(null, "newLandName");
-        if (newLandNameStr != null) {
-            newLandName = newLandNameStr;
-        }
+        currentFather = FreeCol.getSpecification().getType(in, "currentFather", FoundingFather.class, null);
+        crossesRequired = getAttribute(in, "crossesRequired", 12);
+        newLandName = getAttribute(in, "newLandName", null);
 
         attackedByPrivateers = getAttribute(in, "attackedByPrivateers", false);
         final String entryLocationStr = in.getAttributeValue(null, "entryLocation");

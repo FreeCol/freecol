@@ -1213,7 +1213,7 @@ public class IndianSettlement extends Settlement {
         if (owner == null) {
             owner = new Player(getGame(), in.getAttributeValue(null, "owner"));
         }
-        isCapital = (new Boolean(in.getAttributeValue(null, "isCapital"))).booleanValue();
+        isCapital = getAttribute(in, "isCapital", false);
 
         owner.addSettlement(this);
         featureContainer.addModifier(Settlement.DEFENCE_MODIFIER);
@@ -1247,10 +1247,7 @@ public class IndianSettlement extends Settlement {
         isVisited = getAttribute(in, "hasBeenVisited", false);
         convertProgress = getAttribute(in, "convertProgress", 0);
         lastTribute = getAttribute(in, "lastTribute", 0);
-        String learnableSkillStr = getAttribute(in, "learnableSkill", null);
-        if (learnableSkillStr != null) {
-            learnableSkill = FreeCol.getSpecification().getUnitType(learnableSkillStr);
-        }
+        learnableSkill = FreeCol.getSpecification().getType(in, "learnableSkill", UnitType.class, null);
 
         alarm = new HashMap<Player, Tension>();
         while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
