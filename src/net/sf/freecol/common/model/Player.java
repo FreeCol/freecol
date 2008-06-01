@@ -2435,30 +2435,14 @@ public class Player extends FreeColGameObject implements Nameable {
                 stance.put(player, Enum.valueOf(Stance.class, in.getAttributeValue(null, "value")));
                 in.nextTag(); // close element
             } else if (in.getLocalName().equals(Europe.getXMLElementTagName())) {
-                europe = (Europe) getGame().getFreeColGameObject(in.getAttributeValue(null, "ID"));
-                if (europe == null) {
-                    europe = new Europe(getGame(), in);
-                } else {
-                    europe.readFromXML(in);
-                }
+                europe = updateFreeColGameObject(in, Europe.class);
             } else if (in.getLocalName().equals(Monarch.getXMLElementTagName())) {
-                monarch = (Monarch) getGame().getFreeColGameObject(in.getAttributeValue(null, "ID"));
-                if (monarch == null) {
-                    monarch = new Monarch(getGame(), in);
-                } else {
-                    monarch.readFromXML(in);
-                }
+                monarch = updateFreeColGameObject(in, Monarch.class);
             } else if (in.getLocalName().equals(TradeRoute.getXMLElementTagName())) {
                 TradeRoute route = new TradeRoute(getGame(), in);
                 getTradeRoutes().add(route);
             } else if (in.getLocalName().equals(Market.getXMLElementTagName())) {
-                market = (Market) getGame().getFreeColGameObject(in.getAttributeValue(null, "ID"));
-                // Get the market
-                if (market == null) {
-                    market = new Market(getGame(), in);
-                } else {
-                    market.readFromXML(in);
-                }
+                market = updateFreeColGameObject(in, Market.class);
             } else {
                 logger.warning("Unknown tag: " + in.getLocalName() + " loading player");
                 in.nextTag();

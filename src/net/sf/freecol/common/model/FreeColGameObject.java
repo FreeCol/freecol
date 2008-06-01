@@ -19,6 +19,7 @@
 
 package net.sf.freecol.common.model;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.util.logging.Logger;
 
@@ -484,12 +485,53 @@ abstract public class FreeColGameObject extends FreeColObject {
     }
 
     public <T extends FreeColGameObject> T getFreeColGameObject(XMLStreamReader in, String attributeName,
+                                                                Class<T> returnClass) {
+        final String attributeString = in.getAttributeValue(null, attributeName);
+        if (attributeString == null) {
+            return null;
+        } else {
+            T returnValue = returnClass.cast(getGame().getFreeColGameObject(attributeString));
+            try {
+                if (returnValue == null) {
+                    Constructor c = returnClass.getConstructor(Game.class, String.class);
+                    returnValue = returnClass.cast(c.newInstance(getGame(), attributeString));
+                }
+                return returnValue;
+            } catch(Exception e) {
+                logger.warning("Failed to create FreeColGameObject with ID " + attributeString);
+                return null;
+            }
+        }
+    }
+
+    public <T extends FreeColGameObject> T getFreeColGameObject(XMLStreamReader in, String attributeName,
                                                                 Class<T> returnClass, T defaultValue) {
         final String attributeString = in.getAttributeValue(null, attributeName);
         if (attributeString != null) {
             return returnClass.cast(getGame().getFreeColGameObject(attributeString));
         } else {
             return defaultValue;
+        }
+    }
+
+    public <T extends FreeColGameObject> T updateFreeColGameObject(XMLStreamReader in, Class<T> returnClass) {
+        final String attributeString = in.getAttributeValue(null, ID_ATTRIBUTE);
+        if (attributeString == null) {
+            return null;
+        } else {
+            T returnValue = returnClass.cast(getGame().getFreeColGameObject(attributeString));
+            try {
+                if (returnValue == null) {
+                    Constructor c = returnClass.getConstructor(Game.class, XMLStreamReader.class);
+                    returnValue = returnClass.cast(c.newInstance(getGame(), in));
+                } else {
+                    returnValue.readFromXML(in);
+                }
+                return returnValue;
+            } catch(Exception e) {
+                logger.warning("Failed to update FreeColGameObject with ID " + attributeString);
+                return null;
+            }
         }
     }
 

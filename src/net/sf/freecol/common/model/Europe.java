@@ -597,7 +597,7 @@ public final class Europe extends FreeColGameObject implements Location, Ownable
         // Start element:
         out.writeStartElement(getXMLElementTagName());
 
-        out.writeAttribute("ID", getId());
+        out.writeAttribute(ID_ATTRIBUTE, getId());
         out.writeAttribute("recruit0", recruitables[0].getId());
         out.writeAttribute("recruit1", recruitables[1].getId());
         out.writeAttribute("recruit2", recruitables[2].getId());
@@ -627,31 +627,17 @@ public final class Europe extends FreeColGameObject implements Location, Ownable
      */
     protected void readFromXMLImpl(XMLStreamReader in)
             throws XMLStreamException {
-        setId(in.getAttributeValue(null, "ID"));
+        setId(in.getAttributeValue(null, ID_ATTRIBUTE));
 
         Specification spec = FreeCol.getSpecification();
         recruitables[0] = spec.getUnitType(in.getAttributeValue(null, "recruit0"));
         recruitables[1] = spec.getUnitType(in.getAttributeValue(null, "recruit1"));
         recruitables[2] = spec.getUnitType(in.getAttributeValue(null, "recruit2"));
 
-        owner = (Player) getGame().getFreeColGameObject(in.getAttributeValue(null, "owner"));
-        if (owner == null) {
-            owner = new Player(getGame(), in.getAttributeValue(null, "owner"));
-        }
+        owner = getFreeColGameObject(in, "owner", Player.class);
 
-        String recruitPriceString = in.getAttributeValue(null, "recruitPrice");
-        if (recruitPriceString != null) {
-            recruitPrice = Integer.parseInt(recruitPriceString);
-        } else {
-            recruitPrice = RECRUIT_PRICE_INITIAL;
-        }
-
-        String recruitLowerCapString = in.getAttributeValue(null, "recruitLowerCap");
-        if (recruitLowerCapString != null) {
-            recruitLowerCap = Integer.parseInt(recruitLowerCapString);
-        } else {
-            recruitLowerCap = LOWER_CAP_INITIAL;
-        }
+        recruitPrice = getAttribute(in, "recruitPrice", RECRUIT_PRICE_INITIAL);
+        recruitLowerCap = getAttribute(in, "recruitLowerCap", LOWER_CAP_INITIAL);
 
         unitPrices.clear();
         while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
@@ -659,14 +645,7 @@ public final class Europe extends FreeColGameObject implements Location, Ownable
                 units = new ArrayList<Unit>();
                 while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
                     if (in.getLocalName().equals(Unit.getXMLElementTagName())) {
-                        Unit unit = (Unit) getGame().getFreeColGameObject(in.getAttributeValue(null, "ID"));
-                        if (unit != null) {
-                            unit.readFromXML(in);
-                            units.add(unit);
-                        } else {
-                            unit = new Unit(getGame(), in);
-                            units.add(unit);
-                        }
+                        units.add(updateFreeColGameObject(in, Unit.class));
                     }
                 }
             } else if (in.getLocalName().equals("unitPrice")) {

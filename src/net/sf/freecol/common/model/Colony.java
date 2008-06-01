@@ -1681,14 +1681,8 @@ public final class Colony extends Settlement implements Location, Nameable {
     protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
         setId(in.getAttributeValue(null, "ID"));
         name = in.getAttributeValue(null, "name");
-        owner = (Player) getGame().getFreeColGameObject(in.getAttributeValue(null, "owner"));
-        if (owner == null) {
-            owner = new Player(getGame(), in.getAttributeValue(null, "owner"));
-        }
-        tile = (Tile) getGame().getFreeColGameObject(in.getAttributeValue(null, "tile"));
-        if (tile == null) {
-            tile = new Tile(getGame(), in.getAttributeValue(null, "owner"));
-        }
+        owner = getFreeColGameObject(in, "owner", Player.class);
+        tile = getFreeColGameObject(in, "tile", Tile.class);
         owner.addSettlement(this);
         sonsOfLiberty = getAttribute(in, "sonsOfLiberty", 0);
         oldSonsOfLiberty = getAttribute(in, "oldSonsOfLiberty", 0);

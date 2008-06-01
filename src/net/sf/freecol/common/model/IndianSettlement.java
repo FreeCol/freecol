@@ -1264,25 +1264,13 @@ public class IndianSettlement extends Settlement {
                 }
             } else if (MISSIONARY_TAG_NAME.equals(in.getLocalName())) {
                 in.nextTag();
-                missionary = (Unit) getGame().getFreeColGameObject(in.getAttributeValue(null, ID_ATTRIBUTE));
-                if (missionary == null) {
-                    missionary = new Unit(getGame(), in);
-                } else {
-                    missionary.readFromXML(in);
-                }
+                missionary = updateFreeColGameObject(in, Unit.class);
                 in.nextTag();                
             } else if (UNITS_TAG_NAME.equals(in.getLocalName())) {
                 units = new ArrayList<Unit>();
                 while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
                     if (in.getLocalName().equals(Unit.getXMLElementTagName())) {
-                        Unit unit = (Unit) getGame().getFreeColGameObject(in.getAttributeValue(null, ID_ATTRIBUTE));
-                        if (unit != null) {
-                            unit.readFromXML(in);
-                            units.add(unit);
-                        } else {
-                            unit = new Unit(getGame(), in);
-                            units.add(unit);
-                        }
+                        units.add(updateFreeColGameObject(in, Unit.class));
                     }
                 }
             } else if (OWNED_UNITS_TAG_NAME.equals(in.getLocalName())) {

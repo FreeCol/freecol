@@ -3461,21 +3461,8 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
         turnsOfTraining = Integer.parseInt(in.getAttributeValue(null, "turnsOfTraining"));
         hitpoints = Integer.parseInt(in.getAttributeValue(null, "hitpoints"));
 
-        final String teacherString = in.getAttributeValue(null, "teacher");
-        if (teacherString != null) {
-            teacher = (Unit) getGame().getFreeColGameObject(teacherString);
-            if (teacher == null) {
-                teacher = new Unit(getGame(), teacherString);
-            }
-        }
-
-        final String studentString = in.getAttributeValue(null, "student");
-        if (studentString != null) {
-            student = (Unit) getGame().getFreeColGameObject(studentString);
-            if (student == null) {
-                student = new Unit(getGame(), studentString);
-            }
-        }
+        teacher = getFreeColGameObject(in, "teacher", Unit.class);
+        student = getFreeColGameObject(in, "student", Unit.class);
 
         final String indianSettlementStr = in.getAttributeValue(null, "indianSettlement");
         if (indianSettlementStr != null) {
@@ -3537,14 +3524,7 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
                 units = new ArrayList<Unit>();
                 while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
                     if (in.getLocalName().equals(Unit.getXMLElementTagName())) {
-                        Unit unit = (Unit) getGame().getFreeColGameObject(in.getAttributeValue(null, ID_ATTRIBUTE));
-                        if (unit != null) {
-                            unit.readFromXML(in);
-                            units.add(unit);
-                        } else {
-                            unit = new Unit(getGame(), in);
-                            units.add(unit);
-                        }
+                        units.add(updateFreeColGameObject(in, Unit.class));
                     }
                 }
             } else if (in.getLocalName().equals(GoodsContainer.getXMLElementTagName())) {
@@ -3562,12 +3542,7 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
                 }
                 in.nextTag();
             } else if (in.getLocalName().equals(TileImprovement.getXMLElementTagName())) {
-                workImprovement = (TileImprovement) getGame().getFreeColGameObject(in.getAttributeValue(null, ID_ATTRIBUTE));
-                if (workImprovement != null) {
-                    workImprovement.readFromXML(in);
-                } else {
-                    workImprovement = new TileImprovement(getGame(), in);
-                }
+                workImprovement = updateFreeColGameObject(in, TileImprovement.class);
             }
         }
         
