@@ -154,7 +154,6 @@ public class IndianSettlement extends Settlement {
         this.isVisited = isVisited;
         this.missionary = missionary;
 
-        goodsContainer.addGoods(Goods.LUMBER, 300);
         convertProgress = 0;
         
         updateWantedGoods();
@@ -455,8 +454,7 @@ public class IndianSettlement extends Settlement {
                 logger.warning("Unknown response for tension " + tension);
             }
     				
-    	}
-    	else{
+    	} else {
             switch(tension){
             case ANGRY:
                 response = "indianSettlement.mission.Angry";
@@ -861,11 +859,6 @@ public class IndianSettlement extends Settlement {
         return potential;
     }
 
-    public int getProductionOf(int goodsIndex) {
-        return getProductionOf(FreeCol.getSpecification().getGoodsType(goodsIndex));
-    }
-
-
     @Override
     public void newTurn() {
         if (isUninitialized()) {
@@ -904,7 +897,7 @@ public class IndianSettlement extends Settlement {
         }
 
         /* Consume goods: TODO: make this more generic */
-        removeFood(getFoodConsumption());
+        consumeGoods(Goods.FOOD, getFoodConsumption());
         consumeGoods(Goods.RUM, 2 * workers);
         consumeGoods(Goods.TRADEGOODS, 2 * workers);
         for (GoodsType goodsType : FreeCol.getSpecification().getNewWorldGoodsTypeList()) {
@@ -1059,7 +1052,7 @@ public class IndianSettlement extends Settlement {
                     int random = getGame().getModelController().getRandom(getId() + "bornInIndianSettlement", unitTypes.size());
                     Unit u = getGame().getModelController().createUnit(getId() + "newTurn200food",
                                                                        getTile(), getOwner(), unitTypes.get(random));
-                    removeFood(200);  // All food will be consumed, even if RUM helped
+                    consumeGoods(Goods.FOOD, 200);  // All food will be consumed, even if RUM helped
                     consumeGoods(Goods.RUM, 200/4);    // Also, some available RUM is consumed
                     // I know that consumeGoods will produce gold, which is explained because children are always a gift
 
@@ -1153,7 +1146,7 @@ public class IndianSettlement extends Settlement {
             logger.warning("toSavedGame is true, but showAll is false");
         }
 
-        out.writeAttribute("ID", getId());
+        out.writeAttribute(ID_ATTRIBUTE, getId());
         out.writeAttribute("tile", tile.getId());
         out.writeAttribute("owner", owner.getId());
         out.writeAttribute("lastTribute", Integer.toString(lastTribute));
@@ -1348,9 +1341,7 @@ public class IndianSettlement extends Settlement {
         
         int i = 0;
         for(Goods goods : settlementGoods) {
-            // Only sell raw materials but never sell food and lumber
-            if (goods.getType().isFoodType() && goods.getType() != Goods.LUMBER &&
-                goods.getType().isStorable()) {
+            if (goods.getType().isNewWorldGoodsType()) {
                 sellGoods[i] = goods;
                 i++;
                 if (i == sellGoods.length) break;
