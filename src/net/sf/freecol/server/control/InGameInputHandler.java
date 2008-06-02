@@ -1160,6 +1160,9 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         }
         // tell everyone the rumour has been explored
         for (ServerPlayer updatePlayer : getOtherPlayers(player)) {
+            if (!updatePlayer.canSee(tile)) {
+                continue;
+            }
             try {
                 Element rumourUpdate = Message.createNewRootElement("update");
                 rumourUpdate.appendChild(tile.toXMLElement(updatePlayer, rumourUpdate.getOwnerDocument()));
