@@ -50,7 +50,8 @@ public final class IndianSettlementPanel extends FreeColDialog implements Action
     private static final int OK = 0;
 
     private final JLabel settlementImageLabel, settlementNameLabel;
-    private final JLabel skillLabel, highlyWantedLabel, otherWantedLabel;
+    private final JLabel skillLabel;
+    private final JLabel wantedGoodsLabels[];
 
     private final JButton okButton;
 
@@ -73,8 +74,10 @@ public final class IndianSettlementPanel extends FreeColDialog implements Action
         settlementImageLabel = new JLabel();
         settlementNameLabel = new JLabel();
         skillLabel = new JLabel();
-        highlyWantedLabel = new JLabel();
-        otherWantedLabel = new JLabel();
+        wantedGoodsLabels = new JLabel[3];
+        for (int i=0; i<3; i++) {
+            wantedGoodsLabels[i] = new JLabel();
+        }
 
         JPanel titlePanel = new JPanel();
         titlePanel.add(settlementImageLabel);
@@ -83,9 +86,13 @@ public final class IndianSettlementPanel extends FreeColDialog implements Action
         add(new JLabel(Messages.message("indianSettlement.learnableSkill") + " "), higConst.rc(4, 2));
         add(skillLabel, higConst.rc(4, 3));
         add(new JLabel(Messages.message("indianSettlement.highlyWanted") + " "), higConst.rc(6, 2));
-        add(highlyWantedLabel, higConst.rc(6, 3));
+        add(wantedGoodsLabels[0], higConst.rc(6, 3));
         add(new JLabel(Messages.message("indianSettlement.otherWanted") + " "), higConst.rc(8, 2));
-        add(otherWantedLabel, higConst.rc(8, 3));
+        JPanel otherGoodsPanel = new JPanel();
+        otherGoodsPanel.setOpaque(false);
+        otherGoodsPanel.add(wantedGoodsLabels[1]);
+        otherGoodsPanel.add(wantedGoodsLabels[2]);
+        add(otherGoodsPanel, higConst.rc(8, 3));
         add(okButton, higConst.rc(10, 3));
     }
 
@@ -108,16 +115,21 @@ public final class IndianSettlementPanel extends FreeColDialog implements Action
         String skillName;
         if (skill != null) {
             skillName = skill.getName();
+            ImageIcon skillImage = freeColClient.getImageLibrary().getUnitImageIcon(skill);
+            skillLabel.setIcon(freeColClient.getImageLibrary().getScaledImageIcon(skillImage, 0.66f));
         } else {
             skillName = "indianSettlement.skill" + (settlement.hasBeenVisited() ? "None" : "Unknown");
         }
         skillLabel.setText(Messages.message(skillName));
 
         GoodsType[] wantedGoods = settlement.getWantedGoods();
-        if (wantedGoods[0]!=null)
-            highlyWantedLabel.setText(wantedGoods[0].getName());
-        if (wantedGoods[1]!=null && wantedGoods[2]!=null)
-            otherWantedLabel.setText(wantedGoods[1].getName() + ", " + wantedGoods[2].getName());
+        for (int i=0; i<wantedGoods.length; i++) {
+            GoodsType g = wantedGoods[i];
+            if (g != null) {
+                wantedGoodsLabels[i].setText(g.getName());
+                wantedGoodsLabels[i].setIcon(freeColClient.getImageLibrary().getScaledGoodsImageIcon(g, 0.66f));
+            }
+        }
         setSize(getPreferredSize());
     }
 
