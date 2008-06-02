@@ -498,10 +498,7 @@ public final class Market extends FreeColGameObject implements Ownable {
     protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
         setId(in.getAttributeValue(null, "ID"));
         
-        owner = (Player) getGame().getFreeColGameObject(in.getAttributeValue(null, "owner"));
-        if (owner == null) {
-            owner = new Player(getGame(), in.getAttributeValue(null, "owner"));
-        }
+        owner = getFreeColGameObject(in, "owner", Player.class);
 
         while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
             if (in.getLocalName().equals(MarketData.getXMLElementTagName())) {

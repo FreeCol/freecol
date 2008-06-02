@@ -1067,25 +1067,15 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
     protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
         setId(in.getAttributeValue(null, "ID"));
 
-        colony = (Colony) getGame().getFreeColGameObject(in.getAttributeValue(null, "colony"));
-        if (colony == null) {
-            colony = new Colony(getGame(), in.getAttributeValue(null, "colony"));
-        }
-        String buildingTypeString = in.getAttributeValue(null, "buildingType");
-        buildingType = FreeCol.getSpecification().getBuildingType(buildingTypeString);
+        colony = getFreeColGameObject(in, "colony", Colony.class);
+        buildingType = FreeCol.getSpecification().getBuildingType(in.getAttributeValue(null, "buildingType"));
 
         units.clear();
 
         while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
-            Unit unit = (Unit) getGame().getFreeColGameObject(in.getAttributeValue(null, "ID"));
-            if (unit == null) {
-                unit = new Unit(getGame(), in);
+            Unit unit = updateFreeColGameObject(in, Unit.class);
+            if (!units.contains(unit)) {
                 units.add(unit);
-            } else {
-                unit.readFromXML(in);
-                if (!units.contains(unit)) {
-                    units.add(unit);
-                }
             }
         }
     }

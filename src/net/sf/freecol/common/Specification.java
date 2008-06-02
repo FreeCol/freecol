@@ -771,10 +771,22 @@ public final class Specification {
         return difficultyLevels;
     }
 
+    /**
+     * Describe <code>getDifficultyLevel</code> method here.
+     *
+     * @param id a <code>String</code> value
+     * @return a <code>DifficultyLevel</code> value
+     */
     public DifficultyLevel getDifficultyLevel(String id) {
         return (DifficultyLevel) getType(id);
     }
 
+    /**
+     * Describe <code>getDifficultyLevel</code> method here.
+     *
+     * @param level an <code>int</code> value
+     * @return a <code>DifficultyLevel</code> value
+     */
     public DifficultyLevel getDifficultyLevel(int level) {
         return difficultyLevels.get(level);
     }
@@ -818,6 +830,19 @@ public final class Specification {
         return specification;
     }
 
+    /**
+     * Returns the FreeColGameObjectType identified by the
+     * attributeName, or the default value if there is no such
+     * attribute.
+     *
+     * @param in the XMLStreamReader
+     * @param attributeName the name of the attribute identifying the
+     * FreeColGameObjectType
+     * @param returnClass the class of the return value
+     * @param defaultValue the value to return if there is no
+     * attribute named attributeName
+     * @return a FreeColGameObjectType value
+     */
     public <T extends FreeColGameObjectType> T getType(XMLStreamReader in, String attributeName,
                                                        Class<T> returnClass, T defaultValue) {
         final String attributeString = in.getAttributeValue(null, attributeName);

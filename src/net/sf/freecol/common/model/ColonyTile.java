@@ -589,33 +589,17 @@ public class ColonyTile extends FreeColGameObject implements WorkLocation, Ownab
     protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
         setId(in.getAttributeValue(null, "ID"));
 
-        colony = (Colony) getGame().getFreeColGameObject(in.getAttributeValue(null, "colony"));
-        if (colony == null) {
-            colony = new Colony(getGame(), in.getAttributeValue(null, "colony"));
-        }
-        workTile = (Tile) getGame().getFreeColGameObject(in.getAttributeValue(null, "workTile"));
-        if (workTile == null) {
-            workTile = new Tile(getGame(), in.getAttributeValue(null, "workTile"));
-        }
+        colony = getFreeColGameObject(in, "colony", Colony.class);
+        workTile = getFreeColGameObject(in, "workTile", Tile.class);
+        colonyCenterTile = (colony.getTile() == workTile);
         
         unit = null;
         while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
             if (in.getLocalName().equals(Unit.getXMLElementTagName())) {
-                Unit unit = (Unit) getGame().getFreeColGameObject(in.getAttributeValue(null, "ID"));
-                if (unit != null) {
-                    unit.readFromXML(in);
-                    this.unit = unit;
-                } else {
-                    this.unit = new Unit(getGame(), in);
-                } 
+                unit = updateFreeColGameObject(in, Unit.class);
             }
         }
 
-        if (colony.getTile() == workTile) {
-            colonyCenterTile = true;
-        } else {
-            colonyCenterTile = false;
-        }
     }
 
     /**

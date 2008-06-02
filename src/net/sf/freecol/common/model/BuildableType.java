@@ -65,22 +65,17 @@ public class BuildableType extends FreeColGameObjectType {
     }
 
     public String getGoodsRequiredAsString() {
-        ArrayList<String> result = new ArrayList<String>();
-        if (goodsRequired != null) {
+        if (goodsRequired == null || goodsRequired.isEmpty()) {
+            return "";
+        } else {
+            ArrayList<String> result = new ArrayList<String>();
             for (AbstractGoods goods : goodsRequired) {
                 result.add(Messages.message("model.goods.goodsAmount",
                                             "%amount%", String.valueOf(goods.getAmount()),
                                             "%goods%", goods.getType().getName()));
             }
+            return Utils.join(", ", result);
         }
-        String resultAsStr = Utils.join(", ", result);
-        
-        // has  no goods required
-        if(resultAsStr == null){
-        	resultAsStr = "";
-        }
-        
-        return resultAsStr;
     }
 
     /**

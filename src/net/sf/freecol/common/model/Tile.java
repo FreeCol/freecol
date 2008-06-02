@@ -1664,33 +1664,16 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
         boolean settlementSent = false;
         while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
             if (in.getLocalName().equals(Colony.getXMLElementTagName())) {
-                settlement = (Settlement) getGame().getFreeColGameObject(in.getAttributeValue(null, ID_ATTRIBUTE));
-                if (settlement != null) {
-                    settlement.readFromXML(in);
-                } else {
-                    settlement = new Colony(getGame(), in);
-                }
+                settlement = updateFreeColGameObject(in, Colony.class);
                 settlementSent = true;
             } else if (in.getLocalName().equals(IndianSettlement.getXMLElementTagName())) {
-                settlement = (Settlement) getGame().getFreeColGameObject(in.getAttributeValue(null, ID_ATTRIBUTE));
-                if (settlement != null) {
-                    settlement.readFromXML(in);
-                } else {
-                    settlement = new IndianSettlement(getGame(), in);
-                }
+                settlement = updateFreeColGameObject(in, IndianSettlement.class);
                 settlementSent = true;
             } else if (in.getLocalName().equals(UNITS_TAG_NAME)) {
                 units = new ArrayList<Unit>();
                 while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
                     if (in.getLocalName().equals(Unit.getXMLElementTagName())) {
-                        Unit unit = (Unit) getGame().getFreeColGameObject(in.getAttributeValue(null, ID_ATTRIBUTE));
-                        if (unit != null) {
-                            unit.readFromXML(in);
-                            units.add(unit);
-                        } else {
-                            unit = new Unit(getGame(), in);
-                            units.add(unit);
-                        }
+                        units.add(updateFreeColGameObject(in, Unit.class));
                     }
                 }
             } else if (in.getLocalName().equals(TileItemContainer.getXMLElementTagName())) {

@@ -232,10 +232,7 @@ public class Resource extends TileItem {
         protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
         setId(in.getAttributeValue(null, "ID"));
 
-        tile = (Tile) getGame().getFreeColGameObject(in.getAttributeValue(null, "tile"));
-        if (tile == null) {
-            tile = new Tile(getGame(), in.getAttributeValue(null, "tile"));
-        }
+        tile = getFreeColGameObject(in, "tile", Tile.class);
         type = FreeCol.getSpecification().getResourceType(in.getAttributeValue(null, "type"));
         quantity = Integer.parseInt(in.getAttributeValue(null, "quantity"));
 

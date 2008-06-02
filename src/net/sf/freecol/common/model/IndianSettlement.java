@@ -1274,11 +1274,7 @@ public class IndianSettlement extends Settlement {
                     }
                 }
             } else if (OWNED_UNITS_TAG_NAME.equals(in.getLocalName())) {
-                String unitID = in.getAttributeValue(null, ID_ATTRIBUTE);
-                Unit unit = (Unit) getGame().getFreeColGameObject(unitID);
-                if (unit == null) {
-                    unit = new Unit(getGame(), unitID);
-                }
+                Unit unit = getFreeColGameObject(in, ID_ATTRIBUTE, Unit.class);
                 ownedUnits.add(unit);
                 owner.setUnit(unit);
                 in.nextTag();

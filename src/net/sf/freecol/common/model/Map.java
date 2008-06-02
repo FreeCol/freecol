@@ -1794,17 +1794,8 @@ public class Map extends FreeColGameObject {
 
         while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
             if (in.getLocalName().equals(Tile.getXMLElementTagName())) {
-                Tile t = (Tile) getGame().getFreeColGameObject(
-                        in.getAttributeValue(null, "ID"));
-                int x = Integer.parseInt(in.getAttributeValue(null, "x"));
-                int y = Integer.parseInt(in.getAttributeValue(null, "y"));
-
-                if (t != null) {
-                    t.readFromXML(in);
-                } else {
-                    t = new Tile(getGame(), in);
-                }
-                setTile(t, x, y);
+                Tile t = updateFreeColGameObject(in, Tile.class);
+                setTile(t, t.getX(), t.getY());
             } else if (in.getLocalName().equals(Region.getXMLElementTagName())) {
                 String regionID = in.getAttributeValue(null, "ID");
                 Region region = (Region) getGame().getFreeColGameObject(regionID);
