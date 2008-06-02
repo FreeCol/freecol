@@ -33,6 +33,8 @@ import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.IndianSettlement;
+import net.sf.freecol.common.model.Tension;
+import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.UnitType;
 import cz.autel.dmi.HIGLayout;
 
@@ -49,7 +51,8 @@ public final class IndianSettlementPanel extends FreeColDialog implements Action
 
     private static final int OK = 0;
 
-    private final JLabel settlementImageLabel, settlementNameLabel;
+    private final JLabel settlementLabel;
+    private final JLabel missionnaryLabel;
     private final JLabel skillLabel;
     private final JLabel wantedGoodsLabels[];
 
@@ -71,18 +74,16 @@ public final class IndianSettlementPanel extends FreeColDialog implements Action
         okButton.setActionCommand(String.valueOf(OK));
         okButton.addActionListener(this);
 
-        settlementImageLabel = new JLabel();
-        settlementNameLabel = new JLabel();
+        settlementLabel = new JLabel();
+        missionnaryLabel = new JLabel();
         skillLabel = new JLabel();
         wantedGoodsLabels = new JLabel[3];
         for (int i=0; i<3; i++) {
             wantedGoodsLabels[i] = new JLabel();
         }
 
-        JPanel titlePanel = new JPanel();
-        titlePanel.add(settlementImageLabel);
-        titlePanel.add(settlementNameLabel);
-        add(titlePanel, higConst.rcwh(2, 2, 2, 1));
+        add(settlementLabel, higConst.rc(2, 2));
+        add(missionnaryLabel, higConst.rc(2, 3));
         add(new JLabel(Messages.message("indianSettlement.learnableSkill") + " "), higConst.rc(4, 2));
         add(skillLabel, higConst.rc(4, 3));
         add(new JLabel(Messages.message("indianSettlement.highlyWanted") + " "), higConst.rc(6, 2));
@@ -109,8 +110,20 @@ public final class IndianSettlementPanel extends FreeColDialog implements Action
      */
     public void initialize(IndianSettlement settlement) {
         Image settlementImage = freeColClient.getImageLibrary().getSettlementImage(settlement);
-        settlementImageLabel.setIcon(new ImageIcon(settlementImage));
-        settlementNameLabel.setText(settlement.getLocationName());
+        settlementLabel.setIcon(new ImageIcon(settlementImage));
+        String text = settlement.getLocationName();
+        Tension tension = settlement.getAlarm(freeColClient.getMyPlayer());
+        if (tension != null) {
+            text += " (" + tension.toString() + ")";
+        }
+        settlementLabel.setText(text);
+        Unit missionnary = settlement.getMissionary();
+        if (missionnary != null) {
+            ImageIcon missionnaryImage = freeColClient.getImageLibrary().getUnitImageIcon(missionnary);
+            missionnaryLabel.setIcon(freeColClient.getImageLibrary().getScaledImageIcon(missionnaryImage, 0.66f));
+            String missionnaryName = missionnary.getName() + " (" + missionnary.getOwner().getNationAsString() + ")";
+            missionnaryLabel.setText(missionnaryName);
+        }
         UnitType skill = settlement.getLearnableSkill();
         String skillName;
         if (skill != null) {
