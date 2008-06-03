@@ -162,5 +162,6 @@ public class ImprovementAction extends MapboardAction {
     public void actionPerformed(ActionEvent e) {
         getFreeColClient().getInGameController().changeWorkType(getFreeColClient().getGUI().getActiveUnit(),
                                                                 iaType.getImpTypes().get(actionID));
+        getFreeColClient().getInGameController().nextActiveUnit();
     }
 }
