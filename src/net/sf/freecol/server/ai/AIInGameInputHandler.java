@@ -269,6 +269,11 @@ public final class AIInGameInputHandler implements MessageHandler, StreamedMessa
             reply = Message.createNewRootElement("acceptTax");
             reply.setAttribute("accepted", String.valueOf(accept));
             break;
+            
+        case Monarch.LOWER_TAX:
+            int newTax = Integer.parseInt(element.getAttribute("amount"));
+            getAIPlayer().getPlayer().setTax(newTax);
+            break;
 
         case Monarch.OFFER_MERCENARIES:
             reply = Message.createNewRootElement("hireMercenaries");

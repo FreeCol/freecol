@@ -785,6 +785,18 @@ public final class InGameInputHandler extends InputHandler {
                 }
             }
             return reply;
+		case Monarch.LOWER_TAX:
+	
+			final int newTax = new Integer(element.getAttribute("amount")).intValue();
+			final int difference = freeColClient.getMyPlayer().getTax() - newTax;
+    
+			freeColClient.getMyPlayer().setTax(newTax);
+			player.addModelMessage(new ModelMessage(player, ModelMessage.MessageType.WARNING, null,
+    										"model.monarch.lowerTax",
+    										"%difference%",String.valueOf(difference),
+    										"%newTax%",
+    										String.valueOf(newTax)));
+			break;
         case Monarch.ADD_TO_REF:
             Element additionElement = Message.getChildElement(element, "addition");
             NodeList childElements = additionElement.getChildNodes();

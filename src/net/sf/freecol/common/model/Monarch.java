@@ -21,9 +21,7 @@
 package net.sf.freecol.common.model;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamConstants;
@@ -32,7 +30,6 @@ import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.freecol.FreeCol;
-import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.Player.PlayerType;
 import net.sf.freecol.common.model.Player.Stance;
 import net.sf.freecol.common.model.Unit.Role;
@@ -65,9 +62,10 @@ public final class Monarch extends FreeColGameObject {
         SUPPORT_SEA = 4,
         SUPPORT_LAND = 5,
         OFFER_MERCENARIES = 6,
-        NUMBER_OF_ACTIONS = 7,
-        WAIVE_TAX = 8,
-        ADD_UNITS = 9;
+        LOWER_TAX = 7,
+        NUMBER_OF_ACTIONS = 8,
+        WAIVE_TAX = 9,
+        ADD_UNITS = 10;
 
     /** The space required to transport all land units. */
     int spaceRequired;
@@ -89,6 +87,12 @@ public final class Monarch extends FreeColGameObject {
      */
     private static final int MAXIMUM_TAX_RATE = 95;
 
+    /**
+     * The minimum tax rate (given in percentage) from where it
+     *can be lowered 
+     */
+    private static final int MINIMUM_TAX_RATE = 20;
+    
     /** Whether a frigate has been provided. */
     // Setting this to true here disables the action completely.
     private boolean supportSea = true;
@@ -258,6 +262,10 @@ public final class Monarch extends FreeColGameObject {
             }
         }
 
+        if (player.getTax() > MINIMUM_TAX_RATE) {
+        	probability[LOWER_TAX] = (int) 10 - dx;
+        }
+        
         int accumulator = 0;
         for (int k = 0; k < NUMBER_OF_ACTIONS; k++ ) {
             accumulator += probability[k];
@@ -291,15 +299,33 @@ public final class Monarch extends FreeColGameObject {
      *
      * @return The increased tax.
      */
-    public int getNewTax() {
-        int turn = getGame().getTurn().getNumber();
-        int adjustment = (6 - player.getDifficulty().getIndex()) * 10; // 20-60
-        // later in the game, the taxes will increase by more
-        int increase = getGame().getModelController().getPseudoRandom().nextInt(5 + turn/adjustment) + 1;
-        int newTax = player.getTax() + increase;
-        return Math.min(newTax, MAXIMUM_TAX_RATE);
+    public int getNewTax(int taxChange) {
+    	
+    	int newTax = 110; // set bigger that 100% to catch errors
+        int adjustment = 0;
+        
+        switch(taxChange){
+        	case Monarch.RAISE_TAX:
+        		int turn = getGame().getTurn().getNumber();
+        		adjustment = (6 - player.getDifficulty().getIndex()) * 10; // 20-60
+        		// later in the game, the taxes will increase by more
+        		int increase = getGame().getModelController().getPseudoRandom().nextInt(5 + turn/adjustment) + 1;
+        		newTax = player.getTax() + increase;
+        		newTax = Math.min(newTax, MAXIMUM_TAX_RATE);
+        		break;
+        	case Monarch.LOWER_TAX:
+        		adjustment = 10 - player.getDifficulty().getIndex(); // 5-10
+        		int decrease = getGame().getModelController().getPseudoRandom().nextInt(adjustment) + 1;
+        		newTax = player.getTax() - decrease;
+        		newTax = Math.max(newTax, MINIMUM_TAX_RATE);
+        		break;
+        	default:
+        		logger.warning("Wrong tax change type");
+        		return newTax;
+        }
+        
+        return newTax;
     }
-
 
     /**
      * Returns units available as mercenaries.

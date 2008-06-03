@@ -141,6 +141,9 @@ public final class MonarchPanel extends FreeColDialog implements ActionListener 
             messageID = "model.monarch.supportLand";
             cancelText = "display";
             break;
+        case Monarch.LOWER_TAX:
+            messageID = "model.monarch.lowerTax";
+            break;
         case Monarch.WAIVE_TAX:
             messageID = "model.monarch.waiveTax";
             break;

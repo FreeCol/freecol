@@ -520,13 +520,12 @@ public final class InGameController extends Controller {
                     try {
                         Monarch monarch = nextPlayer.getMonarch();
                         int action = monarch.getAction();
-                        Unit newUnit;
                         Element monarchActionElement = Message.createNewRootElement("monarchAction");
                         monarchActionElement.setAttribute("action", String.valueOf(action));
                         switch (action) {
                         case Monarch.RAISE_TAX:
                             int oldTax = nextPlayer.getTax();
-                            int newTax = monarch.getNewTax();
+                            int newTax = monarch.getNewTax(Monarch.RAISE_TAX);
                             if (newTax > 100) {
                                 logger.warning("Tax rate exceeds 100 percent.");
                                 return;
@@ -561,6 +560,20 @@ public final class InGameController extends Controller {
                                         nextPlayer.getConnection().send(monarchActionElement);
                                     }
                                 }
+                            } catch (IOException e) {
+                                logger.warning("Could not send message to: " + nextPlayer.getName());
+                            }
+                            break;
+                        case Monarch.LOWER_TAX:
+                            int taxLowered = monarch.getNewTax(Monarch.LOWER_TAX);
+                            if (taxLowered < 0) {
+                                logger.warning("Tax rate less than 0 percent.");
+                                return;
+                            }
+                            monarchActionElement.setAttribute("amount", String.valueOf(taxLowered));
+                            try {
+                                nextPlayer.setTax(taxLowered); // to avoid cheating
+                                nextPlayer.getConnection().send(monarchActionElement); 
                             } catch (IOException e) {
                                 logger.warning("Could not send message to: " + nextPlayer.getName());
                             }
