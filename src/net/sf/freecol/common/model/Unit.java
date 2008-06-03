@@ -1370,7 +1370,7 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
                     return MoveType.ENTER_SETTLEMENT_WITH_CARRIER_AND_GOODS;
                 } else if (settlement instanceof IndianSettlement) {
                     IndianSettlement indian = (IndianSettlement) settlement;
-                    if (hasAbility("model.ability.scoutIndianSettlement")) {
+                    if (isColonist() && !isArmed() && hasAbility("model.ability.scoutIndianSettlement")) {
                         return MoveType.ENTER_INDIAN_VILLAGE_WITH_SCOUT;
                     } else if (hasAbility("model.ability.missionary")) {
                         return MoveType.ENTER_INDIAN_VILLAGE_WITH_MISSIONARY;
@@ -1382,7 +1382,7 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
                         return MoveType.ILLEGAL_MOVE;
                     }
                 } else if (settlement instanceof Colony) {
-                    if (hasAbility("model.ability.scoutForeignColony")) {
+                    if (isColonist() && !isArmed() && hasAbility("model.ability.scoutForeignColony")) {
                         return MoveType.ENTER_FOREIGN_COLONY_WITH_SCOUT;
                     } else if (isOffensiveUnit()) {
                         return MoveType.ATTACK;
@@ -2868,9 +2868,8 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
                     addModelMessage(getOwner().getEurope(), ModelMessage.MessageType.DEFAULT, this,
                                     "model.unit.arriveInEurope",
                                     "%europe%", getOwner().getEurope().getName());
-                    Iterator<Unit> iter = getUnitIterator();
-                    while (iter.hasNext()) {
-                        Unit u = iter.next();
+                    ArrayList<Unit> unitList = new ArrayList<Unit>(getUnitList());
+                    for (Unit u : unitList) {
                         if (u.canCarryTreasure()) {
                             u.cashInTreasureTrain();
                         }
