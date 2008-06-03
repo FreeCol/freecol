@@ -3286,6 +3286,7 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
     public void newTurn() {
         if (isUninitialized()) {
             logger.warning("Calling newTurn for an uninitialized object: " + getId());
+            return;
         }
         checkExperiencePromotion();
         if (isUnderRepair()) {

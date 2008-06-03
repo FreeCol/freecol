@@ -1029,11 +1029,18 @@ public class AIPlayer extends AIObject {
         Iterator<AIUnit> aiUnitsIterator = getAIUnitIterator();
         while (aiUnitsIterator.hasNext()) {
             AIUnit aiUnit = aiUnitsIterator.next();
+            
             if (aiUnit.hasMission()) {
                 continue;
             }
             
             Unit unit = aiUnit.getUnit();
+            
+            if (unit.isUninitialized()) {
+                logger.warning("Trying to assign a mission to an uninitialized object: " + unit.getId());
+                continue;
+            }
+            
             if (unit.canCarryTreasure()) {
                 aiUnit.setMission(new CashInTreasureTrainMission(getAIMain(), aiUnit));
             } else if (unit.hasAbility("model.ability.scoutIndianSettlement") &&
