@@ -538,4 +538,36 @@ public class UnitTest extends FreeColTestCase {
         Unit brave = new Unit(game, tile1, sioux, braveType, UnitState.ACTIVE, braveType.getDefaultEquipment());
         assertFalse(brave.canBuildColony());
     }
+    
+    public void testIndianDies() {
+    	 Game game = getStandardGame();
+    	 Map map = getEmptyMap();
+         game.setMap(map);
+    	 
+         Player indianPlayer = game.getPlayer("model.nation.sioux");
+
+         //////////////////////
+         // Setting test settlement and brave
+         Tile settlementTile = map.getTile(5, 8);
+         UnitType skillToTeach = FreeCol.getSpecification().getUnitType("model.unit.masterCottonPlanter");
+         boolean isCapital = false;
+         boolean isVisited = false;
+         Unit residentMissionary = null;
+         IndianSettlement camp = new IndianSettlement(game,indianPlayer,settlementTile,isCapital,skillToTeach,isVisited,residentMissionary);
+         
+         UnitType indianBraveType = FreeCol.getSpecification().getUnitType("model.unit.brave");
+         Unit brave = new Unit(game, camp, indianPlayer, indianBraveType, UnitState.ACTIVE,
+                 indianBraveType.getDefaultEquipment());
+         camp.addOwnedUnit(brave);
+         
+         assertEquals("Brave wasnt added to camp",1, camp.getUnitCount());
+         assertFalse("Brave wasnt added to player unit list",indianPlayer.getUnit(brave.getId()) == null);
+         
+         // unit dies
+         brave.dispose();
+        
+         assertTrue("Brave wasnt disposed properly",brave.isDisposed());
+         assertEquals("Brave wasnt removed from camp",0, camp.getUnitCount());
+         assertTrue("Brave wasnt removed from player unit list",indianPlayer.getUnit(brave.getId()) == null);
+    }
 }
