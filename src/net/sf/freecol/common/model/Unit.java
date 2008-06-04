@@ -2868,13 +2868,13 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
                     addModelMessage(getOwner().getEurope(), ModelMessage.MessageType.DEFAULT, this,
                                     "model.unit.arriveInEurope",
                                     "%europe%", getOwner().getEurope().getName());
+                    setState(UnitState.ACTIVE);
                     ArrayList<Unit> unitList = new ArrayList<Unit>(getUnitList());
                     for (Unit u : unitList) {
                         if (u.canCarryTreasure()) {
                             u.cashInTreasureTrain();
                         }
                     }
-                    setState(UnitState.ACTIVE);
                     break;
                 case TO_AMERICA:
                     getGame().getModelController().setToVacantEntryLocation(this);
