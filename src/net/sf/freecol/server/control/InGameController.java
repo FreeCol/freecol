@@ -637,6 +637,7 @@ public final class InGameController extends Controller {
                             for (AbstractUnit unit : units) {
                                 mercenaryElement.appendChild(unit.toXMLElement(monarchActionElement.getOwnerDocument()));
                             }
+                            monarchActionElement.appendChild(mercenaryElement);
                             try {
                                 Element reply = nextPlayer.getConnection().ask(monarchActionElement);
                                 boolean accepted = Boolean.valueOf(reply.getAttribute("accepted")).booleanValue();
