@@ -213,7 +213,10 @@ public final class Colony extends Settlement implements Location, Nameable {
         // this means we might get a building for free
         for (BuildingType buildingType : FreeCol.getSpecification().getBuildingTypeList()) {
             if (isFree(buildingType)) {
-                addBuilding(createBuilding(buildingType));
+                Building b = createBuilding(buildingType);
+                if (b!=null) {
+                    addBuilding(b);
+                }
             }
         }
         getTile().updatePlayerExploredTiles();
