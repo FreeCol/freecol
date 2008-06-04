@@ -127,6 +127,7 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
         JScrollPane sl = new JScrollPane(listPanel, 
                 JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,
                 JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+        sl.getVerticalScrollBar().setUnitIncrement(16);
         sl.getViewport().setOpaque(false);
         add(sl, BorderLayout.WEST);
 
